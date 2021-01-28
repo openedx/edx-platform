@@ -1,4 +1,4 @@
-import warnings
+import warnings  # lint-amnesty, pylint: disable=django-not-configured, missing-module-docstring
 
 if __name__ == 'courseware':
     # Show the call stack that imported us wrong.

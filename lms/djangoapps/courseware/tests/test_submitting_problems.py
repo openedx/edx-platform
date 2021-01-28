@@ -10,20 +10,20 @@ import json
 import os
 from textwrap import dedent
 
-import ddt
+import ddt  # lint-amnesty, pylint: disable=import-error
 import six
 from django.conf import settings
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.db import connections
 from django.test import TestCase
 from django.test.client import RequestFactory
 from django.urls import reverse
 from django.utils.timezone import now
-from mock import patch
+from mock import patch  # lint-amnesty, pylint: disable=import-error
 from six import text_type
-from submissions import api as submissions_api
+from submissions import api as submissions_api  # lint-amnesty, pylint: disable=import-error
 
-from capa.tests.response_xml_factory import (
+from capa.tests.response_xml_factory import (  # lint-amnesty, pylint: disable=import-error
     CodeResponseXMLFactory,
     CustomResponseXMLFactory,
     OptionResponseXMLFactory,
@@ -38,9 +38,9 @@ from openedx.core.djangoapps.credit.models import CreditCourse, CreditProvider
 from openedx.core.djangoapps.user_api.tests.factories import UserCourseTagFactory
 from openedx.core.lib.url_utils import quote_slashes
 from common.djangoapps.student.models import CourseEnrollment, anonymous_id_for_user
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
-from xmodule.partitions.partitions import Group, UserPartition
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase  # lint-amnesty, pylint: disable=import-error, wrong-import-order
+from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory  # lint-amnesty, pylint: disable=import-error, wrong-import-order
+from xmodule.partitions.partitions import Group, UserPartition  # lint-amnesty, pylint: disable=import-error, wrong-import-order
 
 
 class ProblemSubmissionTestMixin(TestCase):
@@ -140,7 +140,7 @@ class TestSubmittingProblems(ModuleStoreTestCase, LoginEnrollmentTestCase, Probl
     """
 
     # Tell Django to clean out all databases, not just default
-    databases = {alias for alias in connections}
+    databases = {alias for alias in connections}  # lint-amnesty, pylint: disable=unnecessary-comprehension
     # arbitrary constant
     COURSE_SLUG = "100"
     COURSE_NAME = "test_course"
@@ -149,7 +149,7 @@ class TestSubmittingProblems(ModuleStoreTestCase, LoginEnrollmentTestCase, Probl
     ENABLED_SIGNALS = ['course_published']
 
     def setUp(self):
-        super(TestSubmittingProblems, self).setUp()
+        super(TestSubmittingProblems, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
 
         # create a test student
         self.course = CourseFactory.create(display_name=self.COURSE_NAME, number=self.COURSE_SLUG)
@@ -307,7 +307,7 @@ class TestCourseGrades(TestSubmittingProblems):
     Tests grades are updated correctly when manipulating problems.
     """
     def setUp(self):
-        super(TestCourseGrades, self).setUp()
+        super(TestCourseGrades, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.homework = self.add_graded_section_to_course('homework')
         self.problem = self.add_dropdown_to_section(self.homework.location, 'p1', 1)
 
@@ -343,7 +343,7 @@ class TestCourseGrader(TestSubmittingProblems):
     Suite of tests for the course grader.
     """
     # Tell Django to clean out all databases, not just default
-    databases = {alias for alias in connections}
+    databases = {alias for alias in connections}  # lint-amnesty, pylint: disable=unnecessary-comprehension
 
     def basic_setup(self, late=False, reset=False, showanswer=False):
         """
@@ -756,10 +756,10 @@ class TestCourseGrader(TestSubmittingProblems):
 class ProblemWithUploadedFilesTest(TestSubmittingProblems):
     """Tests of problems with uploaded files."""
     # Tell Django to clean out all databases, not just default
-    databases = {alias for alias in connections}
+    databases = {alias for alias in connections}  # lint-amnesty, pylint: disable=unnecessary-comprehension
 
     def setUp(self):
-        super(ProblemWithUploadedFilesTest, self).setUp()
+        super(ProblemWithUploadedFilesTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.section = self.add_graded_section_to_course('section')
 
     def problem_setup(self, name, files):
@@ -812,7 +812,7 @@ class TestPythonGradedResponse(TestSubmittingProblems):
     Check that we can submit a schematic and custom response, and it answers properly.
     """
     # Tell Django to clean out all databases, not just default
-    databases = {alias for alias in connections}
+    databases = {alias for alias in connections}  # lint-amnesty, pylint: disable=unnecessary-comprehension
 
     SCHEMATIC_SCRIPT = dedent("""
         # for a schematic response, submission[i] is the json representation
@@ -903,7 +903,7 @@ class TestPythonGradedResponse(TestSubmittingProblems):
     COMPUTED_ANSWER_INCORRECT = "because we never let them in"
 
     def setUp(self):
-        super(TestPythonGradedResponse, self).setUp()
+        super(TestPythonGradedResponse, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.section = self.add_graded_section_to_course('section')
         self.correct_responses = {}
         self.incorrect_responses = {}
@@ -1067,7 +1067,7 @@ class TestConditionalContent(TestSubmittingProblems):
         One section is pre-populated with a problem (with 2 inputs), visible to all students.
         The second section is empty. Test cases should add conditional content to it.
         """
-        super(TestConditionalContent, self).setUp()
+        super(TestConditionalContent, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
 
         self.user_partition_group_0 = 0
         self.user_partition_group_1 = 1

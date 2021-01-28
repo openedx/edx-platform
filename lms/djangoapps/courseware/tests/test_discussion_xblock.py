@@ -10,22 +10,22 @@ functionalities.
 import json
 import uuid
 
-import ddt
-import mock
+import ddt  # lint-amnesty, pylint: disable=import-error
+import mock  # lint-amnesty, pylint: disable=import-error
 import six
 from django.urls import reverse
 from six.moves import range
-from web_fragments.fragment import Fragment
-from xblock.field_data import DictFieldData
+from web_fragments.fragment import Fragment  # lint-amnesty, pylint: disable=import-error
+from xblock.field_data import DictFieldData  # lint-amnesty, pylint: disable=import-error
 
 from lms.djangoapps.course_api.blocks.tests.helpers import deserialize_usage_key
 from lms.djangoapps.courseware.module_render import get_module_for_descriptor_internal
 from lms.djangoapps.courseware.tests.helpers import XModuleRenderingTestBase
 from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
-from xblock_discussion import DiscussionXBlock, loader
-from xmodule.modulestore import ModuleStoreEnum
-from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
-from xmodule.modulestore.tests.factories import ItemFactory, ToyCourseFactory
+from xblock_discussion import DiscussionXBlock, loader  # lint-amnesty, pylint: disable=import-error, wrong-import-order
+from xmodule.modulestore import ModuleStoreEnum  # lint-amnesty, pylint: disable=import-error, wrong-import-order
+from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase  # lint-amnesty, pylint: disable=import-error, wrong-import-order
+from xmodule.modulestore.tests.factories import ItemFactory, ToyCourseFactory  # lint-amnesty, pylint: disable=import-error, wrong-import-order
 
 
 @ddt.ddt
@@ -40,7 +40,7 @@ class TestDiscussionXBlock(XModuleRenderingTestBase):
         """
         Set up the xblock runtime, test course, discussion, and user.
         """
-        super(TestDiscussionXBlock, self).setUp()
+        super(TestDiscussionXBlock, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.patchers = []
         self.course_id = "test_course"
         self.runtime = self.new_module_runtime()
@@ -77,7 +77,7 @@ class TestDiscussionXBlock(XModuleRenderingTestBase):
         """
         Tears down any patchers added during tests.
         """
-        super(TestDiscussionXBlock, self).tearDown()
+        super(TestDiscussionXBlock, self).tearDown()  # lint-amnesty, pylint: disable=super-with-arguments
         for patcher in self.patchers:
             patcher.stop()
 
@@ -93,7 +93,7 @@ class TestGetDjangoUser(TestDiscussionXBlock):
         """
         Mock the user service and runtime.
         """
-        super(TestGetDjangoUser, self).setUp()
+        super(TestGetDjangoUser, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.django_user = object()
         self.user_service = mock.Mock()
         self.add_patcher(
@@ -129,7 +129,7 @@ class TestViews(TestDiscussionXBlock):
         """
         Mock the methods needed for these tests.
         """
-        super(TestViews, self).setUp()
+        super(TestViews, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.template_canary = u'canary'
         self.render_template = mock.Mock()
         self.render_template.return_value = self.template_canary

@@ -4,19 +4,19 @@
 
 from datetime import datetime, timedelta
 
-import crum
-import ddt
+import crum  # lint-amnesty, pylint: disable=import-error
+import ddt  # lint-amnesty, pylint: disable=import-error
 import waffle
 from django.contrib.messages.middleware import MessageMiddleware
 from django.test import RequestFactory
 from django.urls import reverse
-from edx_toggles.toggles.testutils import override_waffle_flag
-from mock import patch
+from edx_toggles.toggles.testutils import override_waffle_flag  # lint-amnesty, pylint: disable=import-error
+from mock import patch  # lint-amnesty, pylint: disable=import-error
 from pytz import utc
 
 from common.djangoapps.course_modes.models import CourseMode
 from common.djangoapps.course_modes.tests.factories import CourseModeFactory
-from freezegun import freeze_time
+from freezegun import freeze_time  # lint-amnesty, pylint: disable=import-error, wrong-import-order
 from lms.djangoapps.commerce.models import CommerceConfiguration
 from lms.djangoapps.course_home_api.toggles import COURSE_HOME_MICROFRONTEND, COURSE_HOME_MICROFRONTEND_DATES_TAB
 from lms.djangoapps.courseware.courses import get_course_date_blocks
@@ -52,9 +52,9 @@ from openedx.features.course_experience import (
     CourseHomeMessages
 )
 from common.djangoapps.student.tests.factories import TEST_PASSWORD, CourseEnrollmentFactory, UserFactory
-from xmodule.modulestore import ModuleStoreEnum
-from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
+from xmodule.modulestore import ModuleStoreEnum  # lint-amnesty, pylint: disable=import-error, wrong-import-order
+from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase  # lint-amnesty, pylint: disable=import-error, wrong-import-order
+from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory  # lint-amnesty, pylint: disable=import-error, wrong-import-order
 
 
 @ddt.ddt
@@ -62,7 +62,7 @@ class CourseDateSummaryTest(SharedModuleStoreTestCase):
     """Tests for course date summary blocks."""
 
     def setUp(self):
-        super(CourseDateSummaryTest, self).setUp()
+        super(CourseDateSummaryTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         SelfPacedConfiguration.objects.create(enable_course_home_improvements=True)
 
     def make_request(self, user):
@@ -587,7 +587,7 @@ class CourseDateSummaryTest(SharedModuleStoreTestCase):
         self.assertEqual(block.link, '{}?sku={}'.format(configuration.basket_checkout_page, sku))
 
     ## CertificateAvailableDate
-    @waffle.testutils.override_switch('certificates.auto_certificate_generation', True)
+    @waffle.testutils.override_switch('certificates.auto_certificate_generation', True)  # lint-amnesty, pylint: disable=no-member
     def test_no_certificate_available_date(self):
         course = create_course_run(days_till_start=-1)
         user = create_user()
@@ -597,7 +597,7 @@ class CourseDateSummaryTest(SharedModuleStoreTestCase):
         self.assertFalse(block.is_allowed)
 
     ## CertificateAvailableDate
-    @waffle.testutils.override_switch('certificates.auto_certificate_generation', True)
+    @waffle.testutils.override_switch('certificates.auto_certificate_generation', True)  # lint-amnesty, pylint: disable=no-member
     def test_no_certificate_available_date_for_self_paced(self):
         course = create_self_paced_course_run()
         verified_user = create_user()
@@ -631,7 +631,7 @@ class CourseDateSummaryTest(SharedModuleStoreTestCase):
         self.assertFalse(block.is_allowed)
         self.assertNotEqual(block.date, None)
 
-    @waffle.testutils.override_switch('certificates.auto_certificate_generation', True)
+    @waffle.testutils.override_switch('certificates.auto_certificate_generation', True)  # lint-amnesty, pylint: disable=no-member
     def test_certificate_available_date_defined(self):
         course = create_course_run()
         audit_user = create_user()
@@ -785,7 +785,7 @@ class TestDateAlerts(SharedModuleStoreTestCase):
     Unit tests for date alerts.
     """
     def setUp(self):
-        super(TestDateAlerts, self).setUp()
+        super(TestDateAlerts, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         with freeze_time('2017-07-01 09:00:00'):
             self.course = create_course_run(days_till_start=0)
             self.course.certificate_available_date = self.course.start + timedelta(days=21)
@@ -878,7 +878,7 @@ class TestDateAlerts(SharedModuleStoreTestCase):
         ['2017-07-23 09:00:00', None],
     )
     @ddt.unpack
-    @waffle.testutils.override_switch('certificates.auto_certificate_generation', True)
+    @waffle.testutils.override_switch('certificates.auto_certificate_generation', True)  # lint-amnesty, pylint: disable=no-member
     def test_certificate_availability_alert(self, current_time, expected_message_html):
         """
         Verify the verified upgrade deadline alerts.
@@ -899,7 +899,7 @@ class TestScheduleOverrides(SharedModuleStoreTestCase):
     """ Tests for Schedule Overrides """
 
     def setUp(self):
-        super(TestScheduleOverrides, self).setUp()
+        super(TestScheduleOverrides, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
 
         patcher = patch('openedx.core.djangoapps.schedules.signals.get_current_site')
         mock_get_current_site = patcher.start()

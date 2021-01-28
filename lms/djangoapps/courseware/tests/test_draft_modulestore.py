@@ -4,9 +4,9 @@ Test the draft modulestore
 
 
 from django.test import TestCase
-from opaque_keys.edx.keys import CourseKey
+from opaque_keys.edx.keys import CourseKey  # lint-amnesty, pylint: disable=import-error
 
-from xmodule.modulestore.django import modulestore
+from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=import-error
 
 
 class TestDraftModuleStore(TestCase):

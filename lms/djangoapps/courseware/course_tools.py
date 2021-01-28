@@ -6,7 +6,7 @@ Platform plugins to support a verified upgrade tool.
 import datetime
 
 import pytz
-from crum import get_current_request
+from crum import get_current_request  # lint-amnesty, pylint: disable=import-error
 from django.conf import settings
 from django.utils.translation import ugettext as _
 from django.urls import reverse
@@ -55,14 +55,14 @@ class VerifiedUpgradeTool(CourseTool):
         return True
 
     @classmethod
-    def title(cls):
+    def title(cls):  # lint-amnesty, pylint: disable=arguments-differ
         """
         Returns the title of this tool.
         """
         return _('Upgrade to Verified')
 
     @classmethod
-    def icon_classes(cls):
+    def icon_classes(cls):  # lint-amnesty, pylint: disable=arguments-differ
         """
         Returns the icon classes needed to represent this tool.
         """

@@ -10,10 +10,10 @@ from collections import OrderedDict
 from functools import partial
 
 import six
-from completion.waffle import ENABLE_COMPLETION_TRACKING_SWITCH
-from completion.models import BlockCompletion
+from completion.waffle import ENABLE_COMPLETION_TRACKING_SWITCH  # lint-amnesty, pylint: disable=import-error
+from completion.models import BlockCompletion  # lint-amnesty, pylint: disable=import-error
 from django.conf import settings
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.core.cache import cache
 from django.db import transaction
 from django.http import Http404, HttpResponse, HttpResponseForbidden
@@ -23,28 +23,28 @@ from django.urls import reverse
 from django.utils.text import slugify
 from django.views.decorators.clickjacking import xframe_options_exempt
 from django.views.decorators.csrf import csrf_exempt
-from edx_django_utils.cache import RequestCache
-from edx_django_utils.monitoring import set_custom_attributes_for_course_key, set_monitoring_transaction_name
-from edx_proctoring.api import get_attempt_status_summary
-from edx_proctoring.services import ProctoringService
-from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthentication
-from edx_when.field_data import DateLookupFieldData
-from eventtracking import tracker
-from opaque_keys import InvalidKeyError
-from opaque_keys.edx.keys import CourseKey, UsageKey
-from requests.auth import HTTPBasicAuth
-from rest_framework.decorators import api_view
-from rest_framework.exceptions import APIException
+from edx_django_utils.cache import RequestCache  # lint-amnesty, pylint: disable=import-error
+from edx_django_utils.monitoring import set_custom_attributes_for_course_key, set_monitoring_transaction_name  # lint-amnesty, pylint: disable=import-error
+from edx_proctoring.api import get_attempt_status_summary  # lint-amnesty, pylint: disable=import-error
+from edx_proctoring.services import ProctoringService  # lint-amnesty, pylint: disable=import-error
+from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthentication  # lint-amnesty, pylint: disable=import-error
+from edx_when.field_data import DateLookupFieldData  # lint-amnesty, pylint: disable=import-error
+from eventtracking import tracker  # lint-amnesty, pylint: disable=import-error
+from opaque_keys import InvalidKeyError  # lint-amnesty, pylint: disable=import-error
+from opaque_keys.edx.keys import CourseKey, UsageKey  # lint-amnesty, pylint: disable=import-error
+from requests.auth import HTTPBasicAuth  # lint-amnesty, pylint: disable=import-error
+from rest_framework.decorators import api_view  # lint-amnesty, pylint: disable=import-error
+from rest_framework.exceptions import APIException  # lint-amnesty, pylint: disable=import-error
 from six import text_type
-from web_fragments.fragment import Fragment
-from xblock.core import XBlock
-from xblock.django.request import django_to_webob_request, webob_to_django_response
-from xblock.exceptions import NoSuchHandlerError, NoSuchViewError
-from xblock.reference.plugins import FSService
-from xblock.runtime import KvsFieldData
+from web_fragments.fragment import Fragment  # lint-amnesty, pylint: disable=import-error
+from xblock.core import XBlock  # lint-amnesty, pylint: disable=import-error
+from xblock.django.request import django_to_webob_request, webob_to_django_response  # lint-amnesty, pylint: disable=import-error
+from xblock.exceptions import NoSuchHandlerError, NoSuchViewError  # lint-amnesty, pylint: disable=import-error
+from xblock.reference.plugins import FSService  # lint-amnesty, pylint: disable=import-error
+from xblock.runtime import KvsFieldData  # lint-amnesty, pylint: disable=import-error
 
 from common.djangoapps import static_replace
-from capa.xqueue_interface import XQueueInterface
+from capa.xqueue_interface import XQueueInterface  # lint-amnesty, pylint: disable=import-error, wrong-import-order
 from lms.djangoapps.courseware.access import get_user_role, has_access
 from lms.djangoapps.courseware.entrance_exams import user_can_skip_entrance_exam, user_has_passed_entrance_exam
 from lms.djangoapps.courseware.masquerade import (
@@ -93,14 +93,14 @@ from common.djangoapps.track import contexts
 from common.djangoapps.util import milestones_helpers
 from common.djangoapps.util.json_request import JsonResponse
 from common.djangoapps.xblock_django.user_service import DjangoXBlockUserService
-from xmodule.contentstore.django import contentstore
-from xmodule.error_module import ErrorBlock, NonStaffErrorBlock
-from xmodule.exceptions import NotFoundError, ProcessingError
-from xmodule.lti_module import LTIModule
-from xmodule.modulestore.django import modulestore
-from xmodule.modulestore.exceptions import ItemNotFoundError
-from xmodule.util.sandboxing import can_execute_unsafe_code, get_python_lib_zip
-from xmodule.x_module import XModuleDescriptor
+from xmodule.contentstore.django import contentstore  # lint-amnesty, pylint: disable=import-error, wrong-import-order
+from xmodule.error_module import ErrorBlock, NonStaffErrorBlock  # lint-amnesty, pylint: disable=import-error, wrong-import-order
+from xmodule.exceptions import NotFoundError, ProcessingError  # lint-amnesty, pylint: disable=import-error, wrong-import-order
+from xmodule.lti_module import LTIModule  # lint-amnesty, pylint: disable=import-error, wrong-import-order
+from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=import-error, wrong-import-order
+from xmodule.modulestore.exceptions import ItemNotFoundError  # lint-amnesty, pylint: disable=import-error, wrong-import-order
+from xmodule.util.sandboxing import can_execute_unsafe_code, get_python_lib_zip  # lint-amnesty, pylint: disable=import-error, wrong-import-order
+from xmodule.x_module import XModuleDescriptor  # lint-amnesty, pylint: disable=import-error, wrong-import-order
 
 log = logging.getLogger(__name__)
 
@@ -124,7 +124,7 @@ class LmsModuleRenderError(Exception):
     """
     An exception class for exceptions thrown by module_render that don't fit well elsewhere
     """
-    pass
+    pass  # lint-amnesty, pylint: disable=unnecessary-pass
 
 
 def make_track_function(request):
@@ -566,7 +566,7 @@ def get_module_system_for_user(
         """
         Submit a completion object for the block.
         """
-        if not ENABLE_COMPLETION_TRACKING_SWITCH.is_enabled():
+        if not ENABLE_COMPLETION_TRACKING_SWITCH.is_enabled():  # lint-amnesty, pylint: disable=no-else-raise
             raise Http404
         else:
             BlockCompletion.objects.submit_completion(
@@ -600,7 +600,7 @@ def get_module_system_for_user(
         edx-solutions.  New XBlocks should not emit these events, but instead
         emit completion events directly.
         """
-        if not ENABLE_COMPLETION_TRACKING_SWITCH.is_enabled():
+        if not ENABLE_COMPLETION_TRACKING_SWITCH.is_enabled():  # lint-amnesty, pylint: disable=no-else-raise
             raise Http404
         else:
             requested_user_id = event.get('user_id', user.id)
@@ -1063,13 +1063,13 @@ def handle_xblock_callback(request, course_id, usage_id, handler, suffix=None):
     try:
         course_key = CourseKey.from_string(course_id)
     except InvalidKeyError:
-        raise Http404(u'{} is not a valid course key'.format(course_id))
+        raise Http404(u'{} is not a valid course key'.format(course_id))  # lint-amnesty, pylint: disable=raise-missing-from
 
     with modulestore().bulk_operations(course_key):
         try:
             course = modulestore().get_course(course_key)
         except ItemNotFoundError:
-            raise Http404(u'{} does not exist in the modulestore'.format(course_id))
+            raise Http404(u'{} does not exist in the modulestore'.format(course_id))  # lint-amnesty, pylint: disable=raise-missing-from
 
         return _invoke_xblock_handler(request, course_id, usage_id, handler, suffix, course=course)
 
@@ -1087,7 +1087,7 @@ def get_module_by_usage_id(request, course_id, usage_id, disable_staff_debug_inf
         course_id = CourseKey.from_string(course_id)
         usage_key = UsageKey.from_string(unquote_slashes(usage_id)).map_into_course(course_id)
     except InvalidKeyError:
-        raise Http404("Invalid location")
+        raise Http404("Invalid location")  # lint-amnesty, pylint: disable=raise-missing-from
 
     try:
         descriptor = modulestore().get_item(usage_key)
@@ -1098,7 +1098,7 @@ def get_module_by_usage_id(request, course_id, usage_id, disable_staff_debug_inf
             usage_key.course_key,
             usage_key
         )
-        raise Http404
+        raise Http404  # lint-amnesty, pylint: disable=raise-missing-from
 
     tracking_context = {
         'module': {
@@ -1161,7 +1161,7 @@ def _invoke_xblock_handler(request, course_id, usage_id, handler, suffix, course
     try:
         course_key = CourseKey.from_string(course_id)
     except InvalidKeyError:
-        raise Http404
+        raise Http404  # lint-amnesty, pylint: disable=raise-missing-from
 
     set_custom_attributes_for_course_key(course_key)
 
@@ -1169,7 +1169,7 @@ def _invoke_xblock_handler(request, course_id, usage_id, handler, suffix, course
         try:
             usage_key = UsageKey.from_string(unquote_slashes(usage_id))
         except InvalidKeyError:
-            raise Http404
+            raise Http404  # lint-amnesty, pylint: disable=raise-missing-from
         if is_xblock_aside(usage_key):
             # Get the usage key for the block being wrapped by the aside (not the aside itself)
             block_usage_key = usage_key.usage_key
@@ -1207,12 +1207,12 @@ def _invoke_xblock_handler(request, course_id, usage_id, handler, suffix, course
 
         except NoSuchHandlerError:
             log.exception(u"XBlock %s attempted to access missing handler %r", instance, handler)
-            raise Http404
+            raise Http404  # lint-amnesty, pylint: disable=raise-missing-from
 
         # If we can't find the module, respond with a 404
         except NotFoundError:
             log.exception("Module indicating to user that request doesn't exist")
-            raise Http404
+            raise Http404  # lint-amnesty, pylint: disable=raise-missing-from
 
         # For XModule-specific errors, we log the error and respond with an error message
         except ProcessingError as err:
@@ -1247,7 +1247,7 @@ def xblock_view(request, course_id, usage_id, view_name):
     try:
         course_key = CourseKey.from_string(course_id)
     except InvalidKeyError:
-        raise Http404("Invalid location")
+        raise Http404("Invalid location")  # lint-amnesty, pylint: disable=raise-missing-from
 
     with modulestore().bulk_operations(course_key):
         course = modulestore().get_course(course_key)
@@ -1257,7 +1257,7 @@ def xblock_view(request, course_id, usage_id, view_name):
             fragment = instance.render(view_name, context=request.GET)
         except NoSuchViewError:
             log.exception(u"Attempt to render missing view on %s: %s", instance, view_name)
-            raise Http404
+            raise Http404  # lint-amnesty, pylint: disable=raise-missing-from
 
         hashed_resources = OrderedDict()
         for resource in fragment.resources:

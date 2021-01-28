@@ -3,13 +3,13 @@ This file contains all entrance exam related utils/logic.
 """
 
 
-from opaque_keys.edx.keys import UsageKey
+from opaque_keys.edx.keys import UsageKey  # lint-amnesty, pylint: disable=import-error
 
 from lms.djangoapps.courseware.access import has_access
 from common.djangoapps.student.models import EntranceExamConfiguration
 from common.djangoapps.util.milestones_helpers import get_required_content
 from openedx.core.toggles import ENTRANCE_EXAMS
-from xmodule.modulestore.django import modulestore
+from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=import-error, wrong-import-order
 
 
 def course_has_entrance_exam(course):

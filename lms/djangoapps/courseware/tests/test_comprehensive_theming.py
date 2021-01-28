@@ -4,7 +4,7 @@
 from django.conf import settings
 from django.contrib import staticfiles
 from django.test import TestCase
-from path import Path
+from path import Path  # lint-amnesty, pylint: disable=import-error
 
 from common.djangoapps import edxmako
 from openedx.core.djangoapps.theming.tests.test_util import with_comprehensive_theme
@@ -15,7 +15,7 @@ class TestComprehensiveTheming(TestCase):
     """Test comprehensive theming."""
 
     def setUp(self):
-        super(TestComprehensiveTheming, self).setUp()
+        super(TestComprehensiveTheming, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
 
         # Clear the internal staticfiles caches, to get test isolation.
         staticfiles.finders.get_finder.cache_clear()

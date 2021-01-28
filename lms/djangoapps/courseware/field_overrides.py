@@ -22,10 +22,10 @@ from contextlib import contextmanager
 
 import six
 from django.conf import settings
-from edx_django_utils.cache import DEFAULT_REQUEST_CACHE
-from xblock.field_data import FieldData
+from edx_django_utils.cache import DEFAULT_REQUEST_CACHE  # lint-amnesty, pylint: disable=import-error
+from xblock.field_data import FieldData  # lint-amnesty, pylint: disable=import-error
 
-from xmodule.modulestore.inheritance import InheritanceMixin
+from xmodule.modulestore.inheritance import InheritanceMixin  # lint-amnesty, pylint: disable=import-error
 
 NOTSET = object()
 ENABLED_OVERRIDE_PROVIDERS_KEY = u'courseware.field_overrides.enabled_providers.{course_id}'
@@ -193,7 +193,7 @@ class OverrideFieldData(FieldData):
         enabled_providers = request_cache.data.get(cache_key, NOTSET)
         if enabled_providers == NOTSET:
             enabled_providers = tuple(
-                (provider_class for provider_class in cls.provider_classes if provider_class.enabled_for(course))
+                (provider_class for provider_class in cls.provider_classes if provider_class.enabled_for(course))  # lint-amnesty, pylint: disable=not-an-iterable
             )
             request_cache.data[cache_key] = enabled_providers
 
@@ -227,7 +227,7 @@ class OverrideFieldData(FieldData):
     def delete(self, block, name):
         self.fallback.delete(block, name)
 
-    def has(self, block, name):
+    def has(self, block, name):  # lint-amnesty, pylint: disable=missing-function-docstring
         if not self.providers:
             return self.fallback.has(block, name)
 
@@ -247,7 +247,7 @@ class OverrideFieldData(FieldData):
     def set_many(self, block, update_dict):
         return self.fallback.set_many(block, update_dict)
 
-    def default(self, block, name):
+    def default(self, block, name):  # lint-amnesty, pylint: disable=missing-function-docstring
         # The `default` method is overloaded by the field storage system to
         # also handle inheritance.
         if self.providers and not overrides_disabled():
@@ -304,11 +304,11 @@ class OverrideModulestoreFieldData(OverrideFieldData):
 
         if enabled_providers is None:
             enabled_providers = [
-                provider_class for provider_class in cls.provider_classes if provider_class.enabled_for(block)
+                provider_class for provider_class in cls.provider_classes if provider_class.enabled_for(block)  # lint-amnesty, pylint: disable=not-an-iterable
             ]
             request_cache.data[cache_key] = enabled_providers
 
         return enabled_providers
 
     def __init__(self, fallback, providers):
-        super(OverrideModulestoreFieldData, self).__init__(None, fallback, providers)
+        super(OverrideModulestoreFieldData, self).__init__(None, fallback, providers)  # lint-amnesty, pylint: disable=super-with-arguments

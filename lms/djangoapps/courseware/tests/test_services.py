@@ -6,12 +6,12 @@ Tests for courseware services.
 import itertools
 import json
 
-import ddt
+import ddt  # lint-amnesty, pylint: disable=import-error
 
 from lms.djangoapps.courseware.services import UserStateService
 from lms.djangoapps.courseware.tests.factories import StudentModuleFactory, UserFactory
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase  # lint-amnesty, pylint: disable=import-error, wrong-import-order
+from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory  # lint-amnesty, pylint: disable=import-error, wrong-import-order
 
 
 @ddt.ddt
@@ -24,7 +24,7 @@ class TestUserStateService(ModuleStoreTestCase):
         """
         Creating pre-requisites for the test cases.
         """
-        super(TestUserStateService, self).setUp()
+        super(TestUserStateService, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.user = UserFactory.create()
         self.course = CourseFactory.create()
         chapter = ItemFactory.create(

@@ -8,8 +8,8 @@ from django.test.client import RequestFactory
 
 from lms.djangoapps.courseware.exceptions import Redirect
 from lms.djangoapps.courseware.middleware import RedirectMiddleware
-from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory
+from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase  # lint-amnesty, pylint: disable=import-error, wrong-import-order
+from xmodule.modulestore.tests.factories import CourseFactory  # lint-amnesty, pylint: disable=import-error, wrong-import-order
 
 
 class CoursewareMiddlewareTestCase(SharedModuleStoreTestCase):
@@ -39,5 +39,5 @@ class CoursewareMiddlewareTestCase(SharedModuleStoreTestCase):
             request, exception
         )
         self.assertEqual(response.status_code, 302)
-        target_url = response._headers['location'][1]
+        target_url = response._headers['location'][1]  # lint-amnesty, pylint: disable=protected-access
         self.assertTrue(target_url.endswith(test_url))

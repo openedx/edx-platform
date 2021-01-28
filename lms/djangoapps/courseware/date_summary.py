@@ -7,8 +7,8 @@ course-run-specific date which will be displayed to the user.
 
 import datetime
 
-import crum
-from babel.dates import format_timedelta
+import crum  # lint-amnesty, pylint: disable=import-error
+from babel.dates import format_timedelta  # lint-amnesty, pylint: disable=import-error
 from django.conf import settings
 from django.urls import reverse
 from django.utils.formats import date_format
@@ -16,7 +16,7 @@ from django.utils.functional import cached_property
 from django.utils.translation import get_language, to_locale
 from django.utils.translation import ugettext as _
 from django.utils.translation import ugettext_lazy
-from lazy import lazy
+from lazy import lazy  # lint-amnesty, pylint: disable=no-name-in-module
 from pytz import utc
 
 from common.djangoapps.course_modes.models import CourseMode, get_cosmetic_verified_display_price
@@ -85,7 +85,7 @@ class DateSummary(object):
         """
         Registers any relevant course alerts given the current request.
         """
-        pass
+        pass  # lint-amnesty, pylint: disable=unnecessary-pass
 
     @property
     def date(self):
@@ -139,7 +139,7 @@ class DateSummary(object):
         # 'absolute'. For example, 'absolute' might be "Jan 01, 2020",
         # and if today were December 5th, 2020, 'relative' would be "1
         # month".
-        date_format = _(u"{relative} ago - {absolute}") if date_has_passed else _(u"in {relative} - {absolute}")
+        date_format = _(u"{relative} ago - {absolute}") if date_has_passed else _(u"in {relative} - {absolute}")  # lint-amnesty, pylint: disable=redefined-outer-name
         return date_format.format(
             relative=relative_date,
             absolute='{date}',
@@ -187,7 +187,7 @@ class DateSummary(object):
         locale = to_locale(get_language())
         return format_timedelta(self.date - self.current_time, locale=locale)
 
-    def date_html(self, date_format='shortDate'):
+    def date_html(self, date_format='shortDate'):  # lint-amnesty, pylint: disable=redefined-outer-name
         """
         Returns a representation of the date as HTML.
 
@@ -240,7 +240,7 @@ class TodaysDate(DateSummary):
 
     # The date is shown in the title, no need to display it again.
     def get_context(self):
-        context = super(TodaysDate, self).get_context()
+        context = super(TodaysDate, self).get_context()  # lint-amnesty, pylint: disable=no-member, super-with-arguments
         context['date'] = ''
         return context
 
@@ -543,7 +543,7 @@ class VerifiedUpgradeDeadlineDate(DateSummary):
         return can_show_verified_upgrade(self.user, self.enrollment, self.course)
 
     @lazy
-    def date(self):
+    def date(self):  # lint-amnesty, pylint: disable=invalid-overridden-method
         if self.enrollment:
             return self.enrollment.upgrade_deadline
         else:
@@ -581,7 +581,7 @@ class VerifiedUpgradeDeadlineDate(DateSummary):
     def relative_datestring(self):
         dynamic_deadline = self._dynamic_deadline()
         if dynamic_deadline is None:
-            return super(VerifiedUpgradeDeadlineDate, self).relative_datestring
+            return super(VerifiedUpgradeDeadlineDate, self).relative_datestring  # lint-amnesty, pylint: disable=super-with-arguments
 
         if self.date is None or self.deadline_has_passed():
             return ' '
@@ -600,7 +600,7 @@ class VerifiedUpgradeDeadlineDate(DateSummary):
         if not UPGRADE_DEADLINE_MESSAGE.is_enabled(course.id) or not self.is_enabled or not upgrade_price:
             return
         days_left_to_upgrade = (self.date - self.current_time).days
-        if self.date > self.current_time and days_left_to_upgrade <= settings.COURSE_MESSAGE_ALERT_DURATION_IN_DAYS:
+        if self.date > self.current_time and days_left_to_upgrade <= settings.COURSE_MESSAGE_ALERT_DURATION_IN_DAYS:  # lint-amnesty, pylint: disable=comparison-with-callable
             upgrade_message = _(
                 u"Don't forget, you have {time_remaining_string} left to upgrade to a Verified Certificate."
             ).format(time_remaining_string=self.time_remaining_string)
@@ -690,7 +690,7 @@ class VerificationDeadlineDate(DateSummary):
         )
 
     @lazy
-    def date(self):
+    def date(self):  # lint-amnesty, pylint: disable=invalid-overridden-method
         return VerificationDeadline.deadline_for_course(self.course_id)
 
     @property
@@ -714,4 +714,4 @@ class VerificationDeadlineDate(DateSummary):
 
     def must_retry(self):
         """Return True if the user must re-submit verification, False otherwise."""
-        return self.verification_status == 'must_reverify'
+        return self.verification_status == 'must_reverify'  # lint-amnesty, pylint: disable=comparison-with-callable

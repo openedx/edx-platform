@@ -5,25 +5,25 @@ Unit tests for course tools.
 
 import datetime
 
-import crum
+import crum  # lint-amnesty, pylint: disable=import-error
 import pytz
 from django.test import RequestFactory
-from mock import patch
+from mock import patch  # lint-amnesty, pylint: disable=import-error
 
 from common.djangoapps.course_modes.models import CourseMode
 from common.djangoapps.course_modes.tests.factories import CourseModeFactory
-from edx_toggles.toggles.testutils import override_waffle_flag
+from edx_toggles.toggles.testutils import override_waffle_flag  # lint-amnesty, pylint: disable=import-error, wrong-import-order
 from lms.djangoapps.courseware.course_tools import FinancialAssistanceTool, VerifiedUpgradeTool
 from lms.djangoapps.courseware.models import DynamicUpgradeDeadlineConfiguration
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.schedules.config import CREATE_SCHEDULE_WAFFLE_FLAG
 from openedx.core.djangoapps.site_configuration.tests.factories import SiteFactory
 from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
-from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory
+from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase  # lint-amnesty, pylint: disable=import-error, wrong-import-order
+from xmodule.modulestore.tests.factories import CourseFactory  # lint-amnesty, pylint: disable=import-error, wrong-import-order
 
 
-class VerifiedUpgradeToolTest(SharedModuleStoreTestCase):
+class VerifiedUpgradeToolTest(SharedModuleStoreTestCase):  # lint-amnesty, pylint: disable=missing-class-docstring
 
     @classmethod
     def setUpClass(cls):
@@ -41,7 +41,7 @@ class VerifiedUpgradeToolTest(SharedModuleStoreTestCase):
 
     @override_waffle_flag(CREATE_SCHEDULE_WAFFLE_FLAG, True)
     def setUp(self):
-        super(VerifiedUpgradeToolTest, self).setUp()
+        super(VerifiedUpgradeToolTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
 
         self.course_verified_mode = CourseModeFactory(
             course_id=self.course.id,
@@ -124,7 +124,7 @@ class FinancialAssistanceToolTest(SharedModuleStoreTestCase):
 
     @override_waffle_flag(CREATE_SCHEDULE_WAFFLE_FLAG, True)
     def setUp(self):
-        super(FinancialAssistanceToolTest, self).setUp()
+        super(FinancialAssistanceToolTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
 
         self.course_financial_mode = CourseModeFactory(
             course_id=self.course.id,

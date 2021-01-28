@@ -4,8 +4,8 @@
 import json
 from collections import OrderedDict
 
-import mock
-import oauthlib
+import mock  # lint-amnesty, pylint: disable=import-error
+import oauthlib  # lint-amnesty, pylint: disable=import-error
 import six
 from django.conf import settings
 from django.urls import reverse
@@ -14,9 +14,9 @@ from six import text_type
 from lms.djangoapps.courseware.tests.helpers import BaseTestXmodule
 from lms.djangoapps.courseware.views.views import get_course_lti_endpoints
 from openedx.core.lib.url_utils import quote_slashes
-from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
-from xmodule.x_module import STUDENT_VIEW
+from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase  # lint-amnesty, pylint: disable=import-error, wrong-import-order
+from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory  # lint-amnesty, pylint: disable=import-error, wrong-import-order
+from xmodule.x_module import STUDENT_VIEW  # lint-amnesty, pylint: disable=import-error, wrong-import-order
 
 
 class TestLTI(BaseTestXmodule):
@@ -33,7 +33,7 @@ class TestLTI(BaseTestXmodule):
         """
         Mock oauth1 signing of requests library for testing.
         """
-        super(TestLTI, self).setUp()
+        super(TestLTI, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         mocked_nonce = u'135685044251684026041377608307'
         mocked_timestamp = u'1234567890'
         mocked_signature_after_sign = u'my_signature%3D'

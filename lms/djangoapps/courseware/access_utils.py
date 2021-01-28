@@ -8,7 +8,7 @@ from datetime import datetime, timedelta
 from logging import getLogger
 
 from django.conf import settings
-from django.utils.translation import ugettext as _
+from django.utils.translation import ugettext as _  # lint-amnesty, pylint: disable=unused-import
 from pytz import UTC
 from lms.djangoapps.courseware.access_response import (
     AccessResponse,
@@ -17,16 +17,16 @@ from lms.djangoapps.courseware.access_response import (
     AuthenticationRequiredAccessError,
 )
 from lms.djangoapps.courseware.masquerade import get_course_masquerade, is_masquerading_as_student
-from openedx.core.djangoapps.util.user_messages import PageLevelMessages
-from openedx.core.djangolib.markup import HTML
+from openedx.core.djangoapps.util.user_messages import PageLevelMessages  # lint-amnesty, pylint: disable=unused-import
+from openedx.core.djangolib.markup import HTML  # lint-amnesty, pylint: disable=unused-import
 from openedx.features.course_experience import (
     COURSE_PRE_START_ACCESS_FLAG,
     COURSE_ENABLE_UNENROLLED_ACCESS_FLAG,
 )
 from common.djangoapps.student.models import CourseEnrollment
 from common.djangoapps.student.roles import CourseBetaTesterRole
-from xmodule.util.xmodule_django import get_current_request_hostname
-from xmodule.course_module import COURSE_VISIBILITY_PUBLIC
+from xmodule.util.xmodule_django import get_current_request_hostname  # lint-amnesty, pylint: disable=import-error, wrong-import-order
+from xmodule.course_module import COURSE_VISIBILITY_PUBLIC  # lint-amnesty, pylint: disable=import-error, wrong-import-order
 
 DEBUG_ACCESS = False
 log = getLogger(__name__)

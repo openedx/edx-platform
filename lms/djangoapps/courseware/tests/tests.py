@@ -6,17 +6,17 @@ Test for LMS courseware app.
 from textwrap import dedent
 from unittest import TestCase
 
-import mock
+import mock  # lint-amnesty, pylint: disable=import-error
 from django.urls import reverse
-from opaque_keys.edx.keys import CourseKey
+from opaque_keys.edx.keys import CourseKey  # lint-amnesty, pylint: disable=import-error
 from six import text_type
 
 from lms.djangoapps.courseware.tests.helpers import LoginEnrollmentTestCase
 from lms.djangoapps.lms_xblock.field_data import LmsFieldData
-from xmodule.error_module import ErrorBlock
-from xmodule.modulestore.django import modulestore
-from xmodule.modulestore.tests.django_utils import TEST_DATA_MIXED_MODULESTORE, ModuleStoreTestCase
-from xmodule.modulestore.tests.factories import ToyCourseFactory
+from xmodule.error_module import ErrorBlock  # lint-amnesty, pylint: disable=import-error, wrong-import-order
+from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=import-error, wrong-import-order
+from xmodule.modulestore.tests.django_utils import TEST_DATA_MIXED_MODULESTORE, ModuleStoreTestCase  # lint-amnesty, pylint: disable=import-error, wrong-import-order
+from xmodule.modulestore.tests.factories import ToyCourseFactory  # lint-amnesty, pylint: disable=import-error, wrong-import-order
 
 
 class ActivateLoginTest(LoginEnrollmentTestCase):
@@ -24,14 +24,14 @@ class ActivateLoginTest(LoginEnrollmentTestCase):
     Test logging in and logging out.
     """
     def setUp(self):
-        super(ActivateLoginTest, self).setUp()
+        super(ActivateLoginTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.setup_user()
 
     def test_activate_login(self):
         """
         Test login -- the setup function does all the work.
         """
-        pass
+        pass  # lint-amnesty, pylint: disable=unnecessary-pass
 
     def test_logout(self):
         """
@@ -129,7 +129,7 @@ class TestMongoCoursesLoad(ModuleStoreTestCase, PageLoaderTestCase):
     MODULESTORE = TEST_DATA_MIXED_MODULESTORE
 
     def setUp(self):
-        super(TestMongoCoursesLoad, self).setUp()
+        super(TestMongoCoursesLoad, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.setup_user()
         self.toy_course_key = ToyCourseFactory.create().id
 
@@ -145,7 +145,7 @@ class TestMongoCoursesLoad(ModuleStoreTestCase, PageLoaderTestCase):
         self.assertGreater(len(course.textbooks), 0)
 
 
-class TestDraftModuleStore(ModuleStoreTestCase):
+class TestDraftModuleStore(ModuleStoreTestCase):  # lint-amnesty, pylint: disable=missing-class-docstring
     def test_get_items_with_course_items(self):
         store = modulestore()
 

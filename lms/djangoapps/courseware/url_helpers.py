@@ -8,8 +8,8 @@ from django.conf import settings
 from django.urls import reverse
 from six.moves.urllib.parse import urlencode
 
-from xmodule.modulestore.django import modulestore
-from xmodule.modulestore.search import navigation_index, path_to_location
+from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=import-error
+from xmodule.modulestore.search import navigation_index, path_to_location  # lint-amnesty, pylint: disable=import-error
 
 
 def get_redirect_url(course_key, usage_key, request=None):

@@ -6,18 +6,18 @@ Common test utilities for courseware functionality
 from abc import ABCMeta, abstractmethod
 from datetime import datetime, timedelta
 
-import ddt
+import ddt  # lint-amnesty, pylint: disable=import-error
 import six
-from mock import patch
+from mock import patch  # lint-amnesty, pylint: disable=import-error
 from six.moves.urllib.parse import urlencode
 
 from lms.djangoapps.courseware.field_overrides import OverrideModulestoreFieldData
 from lms.djangoapps.courseware.url_helpers import get_redirect_url
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from common.djangoapps.student.tests.factories import AdminFactory, CourseEnrollmentFactory, UserFactory
-from xmodule.modulestore import ModuleStoreEnum
-from xmodule.modulestore.django import modulestore
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory, check_mongo_calls
+from xmodule.modulestore import ModuleStoreEnum  # lint-amnesty, pylint: disable=import-error, wrong-import-order
+from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=import-error, wrong-import-order
+from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory, check_mongo_calls  # lint-amnesty, pylint: disable=import-error, wrong-import-order
 
 
 @ddt.ddt
@@ -56,7 +56,7 @@ class RenderXBlockTestMixin(six.with_metaclass(ABCMeta, object)):
         """
         Clear out the block to be requested/tested before each test.
         """
-        super(RenderXBlockTestMixin, self).setUp()
+        super(RenderXBlockTestMixin, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         # to adjust the block to be tested, update block_name_to_be_tested before calling setup_course.
         self.block_name_to_be_tested = 'html_block'
 
@@ -69,7 +69,7 @@ class RenderXBlockTestMixin(six.with_metaclass(ABCMeta, object)):
             usage_key: The course block usage key. This ensures that the positive and negative tests stay in sync.
             url_encoded_params: URL encoded parameters that should be appended to the requested URL.
         """
-        pass  # pragma: no cover
+        pass  # pragma: no cover  # lint-amnesty, pylint: disable=unnecessary-pass
 
     def login(self):
         """
@@ -273,9 +273,9 @@ class FieldOverrideTestMixin(object):
     """
 
     def setUp(self):
-        super(FieldOverrideTestMixin, self).setUp()
+        super(FieldOverrideTestMixin, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         OverrideModulestoreFieldData.provider_classes = None
 
     def tearDown(self):
-        super(FieldOverrideTestMixin, self).tearDown()
+        super(FieldOverrideTestMixin, self).tearDown()  # lint-amnesty, pylint: disable=super-with-arguments
         OverrideModulestoreFieldData.provider_classes = None

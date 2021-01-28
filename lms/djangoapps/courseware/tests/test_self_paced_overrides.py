@@ -4,15 +4,15 @@ import datetime
 
 import pytz
 from django.test.utils import override_settings
-from mock import patch
+from mock import patch  # lint-amnesty, pylint: disable=import-error
 
 from lms.djangoapps.courseware.access import has_access
 from lms.djangoapps.courseware.tests.factories import BetaTesterFactory
 from lms.djangoapps.ccx.tests.test_overrides import inject_field_overrides
 from lms.djangoapps.courseware.field_overrides import OverrideFieldData, OverrideModulestoreFieldData
 from lms.djangoapps.discussion.django_comment_client.utils import get_accessible_discussion_xblocks
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase  # lint-amnesty, pylint: disable=import-error, wrong-import-order
+from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory  # lint-amnesty, pylint: disable=import-error, wrong-import-order
 
 
 @override_settings(
@@ -28,7 +28,7 @@ class SelfPacedDateOverrideTest(ModuleStoreTestCase):
 
     def setUp(self):
         self.reset_setting_cache_variables()
-        super(SelfPacedDateOverrideTest, self).setUp()
+        super(SelfPacedDateOverrideTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
 
         self.non_staff_user, __ = self.create_non_staff_user()
         self.now = datetime.datetime.now(pytz.UTC).replace(microsecond=0)
@@ -36,7 +36,7 @@ class SelfPacedDateOverrideTest(ModuleStoreTestCase):
 
     def tearDown(self):
         self.reset_setting_cache_variables()
-        super(SelfPacedDateOverrideTest, self).tearDown()
+        super(SelfPacedDateOverrideTest, self).tearDown()  # lint-amnesty, pylint: disable=super-with-arguments
 
     def reset_setting_cache_variables(self):
         """
@@ -58,7 +58,7 @@ class SelfPacedDateOverrideTest(ModuleStoreTestCase):
         inject_field_overrides((course, section), course, self.user)
         return (course, section)
 
-    def create_discussion_xblocks(self, parent):
+    def create_discussion_xblocks(self, parent):  # lint-amnesty, pylint: disable=missing-function-docstring
         # Create a released discussion xblock
         ItemFactory.create(
             parent=parent,

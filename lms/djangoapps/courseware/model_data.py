@@ -28,18 +28,18 @@ from abc import ABCMeta, abstractmethod
 from collections import defaultdict, namedtuple
 
 import six
-from contracts import contract, new_contract
+from contracts import contract, new_contract  # lint-amnesty, pylint: disable=import-error
 from django.db import DatabaseError, IntegrityError, transaction
-from opaque_keys.edx.asides import AsideUsageKeyV1, AsideUsageKeyV2
-from opaque_keys.edx.block_types import BlockTypeKeyV1
-from opaque_keys.edx.keys import LearningContextKey
-from xblock.core import XBlockAside
-from xblock.exceptions import InvalidScopeError, KeyValueMultiSaveError
-from xblock.fields import Scope, UserScope
-from xblock.runtime import KeyValueStore
+from opaque_keys.edx.asides import AsideUsageKeyV1, AsideUsageKeyV2  # lint-amnesty, pylint: disable=import-error
+from opaque_keys.edx.block_types import BlockTypeKeyV1  # lint-amnesty, pylint: disable=import-error
+from opaque_keys.edx.keys import LearningContextKey  # lint-amnesty, pylint: disable=import-error
+from xblock.core import XBlockAside  # lint-amnesty, pylint: disable=import-error
+from xblock.exceptions import InvalidScopeError, KeyValueMultiSaveError  # lint-amnesty, pylint: disable=import-error
+from xblock.fields import Scope, UserScope  # lint-amnesty, pylint: disable=import-error
+from xblock.runtime import KeyValueStore  # lint-amnesty, pylint: disable=import-error
 
 from lms.djangoapps.courseware.user_state_client import DjangoXBlockUserStateClient
-from xmodule.modulestore.django import modulestore
+from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=import-error, wrong-import-order
 
 from .models import StudentModule, XModuleStudentInfoField, XModuleStudentPrefsField, XModuleUserStateSummaryField
 
@@ -237,7 +237,7 @@ class DjangoOrmFieldCache(six.with_metaclass(ABCMeta, object)):
 
             except DatabaseError:
                 log.exception(u"Saving field %r failed", kvs_key.field_name)
-                raise KeyValueMultiSaveError(saved_fields)
+                raise KeyValueMultiSaveError(saved_fields)  # lint-amnesty, pylint: disable=raise-missing-from
 
             finally:
                 saved_fields.append(kvs_key.field_name)
@@ -421,7 +421,7 @@ class UserStateCache(object):
             )
         except DatabaseError:
             log.exception(u"Saving user state failed for %s", self.user.username)
-            raise KeyValueMultiSaveError([])
+            raise KeyValueMultiSaveError([])  # lint-amnesty, pylint: disable=raise-missing-from
         finally:
             self._cache.update(pending_updates)
 
@@ -499,7 +499,7 @@ class UserStateSummaryCache(DjangoOrmFieldCache):
     Cache for Scope.user_state_summary xblock field data.
     """
     def __init__(self, course_id):
-        super(UserStateSummaryCache, self).__init__()
+        super(UserStateSummaryCache, self).__init__()  # lint-amnesty, pylint: disable=super-with-arguments
         self.course_id = course_id
 
     def _create_object(self, kvs_key, value):
@@ -560,7 +560,7 @@ class PreferencesCache(DjangoOrmFieldCache):
     Cache for Scope.preferences xblock field data.
     """
     def __init__(self, user):
-        super(PreferencesCache, self).__init__()
+        super(PreferencesCache, self).__init__()  # lint-amnesty, pylint: disable=super-with-arguments
         self.user = user
 
     def _create_object(self, kvs_key, value):
@@ -623,7 +623,7 @@ class UserInfoCache(DjangoOrmFieldCache):
     Cache for Scope.user_info xblock field data
     """
     def __init__(self, user):
-        super(UserInfoCache, self).__init__()
+        super(UserInfoCache, self).__init__()  # lint-amnesty, pylint: disable=super-with-arguments
         self.user = user
 
     def _create_object(self, kvs_key, value):
@@ -861,7 +861,7 @@ class FieldDataCache(object):
                 saved_fields.extend(key.field_name for key in set_many_data)
             except KeyValueMultiSaveError as exc:
                 log.exception(u'Error saving fields %r', [key.field_name for key in set_many_data])
-                raise KeyValueMultiSaveError(saved_fields + exc.saved_field_names)
+                raise KeyValueMultiSaveError(saved_fields + exc.saved_field_names)  # lint-amnesty, pylint: disable=raise-missing-from
 
     @contract(key=DjangoKeyValueStore.Key)
     def delete(self, key):

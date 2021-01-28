@@ -9,16 +9,16 @@ from datetime import datetime
 
 import pytz
 import six
-from crum import get_current_request
-from dateutil.parser import parse as parse_date
+from crum import get_current_request  # lint-amnesty, pylint: disable=import-error
+from dateutil.parser import parse as parse_date  # lint-amnesty, pylint: disable=import-error
 from django.conf import settings
 from django.http import Http404, QueryDict
 from django.urls import reverse
 from django.utils.translation import ugettext as _
-from edx_django_utils.monitoring import function_trace
-from fs.errors import ResourceNotFound
-from opaque_keys.edx.keys import UsageKey
-from path import Path as path
+from edx_django_utils.monitoring import function_trace  # lint-amnesty, pylint: disable=import-error
+from fs.errors import ResourceNotFound  # lint-amnesty, pylint: disable=import-error
+from opaque_keys.edx.keys import UsageKey  # lint-amnesty, pylint: disable=import-error
+from path import Path as path  # lint-amnesty, pylint: disable=import-error
 from six import text_type
 
 from openedx.core.lib.cache_utils import request_cached
@@ -63,9 +63,9 @@ from openedx.features.course_experience.utils import is_block_structure_complete
 from common.djangoapps.static_replace import replace_static_urls
 from lms.djangoapps.survey.utils import SurveyRequiredAccessError, check_survey_required_and_unanswered
 from common.djangoapps.util.date_utils import strftime_localized
-from xmodule.modulestore.django import modulestore
-from xmodule.modulestore.exceptions import ItemNotFoundError
-from xmodule.x_module import STUDENT_VIEW
+from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=import-error, wrong-import-order
+from xmodule.modulestore.exceptions import ItemNotFoundError  # lint-amnesty, pylint: disable=import-error, wrong-import-order
+from xmodule.x_module import STUDENT_VIEW  # lint-amnesty, pylint: disable=import-error, wrong-import-order
 
 log = logging.getLogger(__name__)
 
@@ -109,7 +109,7 @@ def get_course_by_id(course_key, depth=0):
         raise Http404(u"Course not found: {}.".format(six.text_type(course_key)))
 
 
-def get_course_with_access(user, action, course_key, depth=0, check_if_enrolled=False, check_survey_complete=True, check_if_authenticated=False):
+def get_course_with_access(user, action, course_key, depth=0, check_if_enrolled=False, check_survey_complete=True, check_if_authenticated=False):  # lint-amnesty, pylint: disable=line-too-long
     """
     Given a course_key, look up the corresponding course descriptor,
     check that the user has the access to perform the specified action
@@ -128,7 +128,7 @@ def get_course_with_access(user, action, course_key, depth=0, check_if_enrolled=
       be plugged in as additional callback checks for different actions.
     """
     course = get_course_by_id(course_key, depth)
-    check_course_access_with_redirect(course, user, action, check_if_enrolled, check_survey_complete, check_if_authenticated)
+    check_course_access_with_redirect(course, user, action, check_if_enrolled, check_survey_complete, check_if_authenticated)  # lint-amnesty, pylint: disable=line-too-long
     return course
 
 
@@ -146,12 +146,12 @@ def get_course_overview_with_access(user, action, course_key, check_if_enrolled=
     try:
         course_overview = CourseOverview.get_from_id(course_key)
     except CourseOverview.DoesNotExist:
-        raise Http404("Course not found.")
+        raise Http404("Course not found.")  # lint-amnesty, pylint: disable=raise-missing-from
     check_course_access_with_redirect(course_overview, user, action, check_if_enrolled)
     return course_overview
 
 
-def check_course_access(course, user, action, check_if_enrolled=False, check_survey_complete=True, check_if_authenticated=False):
+def check_course_access(course, user, action, check_if_enrolled=False, check_survey_complete=True, check_if_authenticated=False):  # lint-amnesty, pylint: disable=line-too-long
     """
     Check that the user has the access to perform the specified action
     on the course (CourseDescriptor|CourseOverview).
@@ -197,7 +197,7 @@ def check_course_access(course, user, action, check_if_enrolled=False, check_sur
     return nonstaff_access_response
 
 
-def check_course_access_with_redirect(course, user, action, check_if_enrolled=False, check_survey_complete=True, check_if_authenticated=False):
+def check_course_access_with_redirect(course, user, action, check_if_enrolled=False, check_survey_complete=True, check_if_authenticated=False):  # lint-amnesty, pylint: disable=line-too-long
     """
     Check that the user has the access to perform the specified action
     on the course (CourseDescriptor|CourseOverview).
@@ -208,7 +208,7 @@ def check_course_access_with_redirect(course, user, action, check_if_enrolled=Fa
     request = get_current_request()
     check_content_start_date_for_masquerade_user(course.id, user, request, course.start)
 
-    access_response = check_course_access(course, user, action, check_if_enrolled, check_survey_complete, check_if_authenticated)
+    access_response = check_course_access(course, user, action, check_if_enrolled, check_survey_complete, check_if_authenticated)  # lint-amnesty, pylint: disable=line-too-long
 
     if not access_response:
         # Redirect if StartDateError
@@ -519,7 +519,7 @@ def get_course_assignment_date_blocks(course, user, request, num_return=None,
 
 
 @request_cached()
-def get_course_assignments(course_key, user, include_access=False):
+def get_course_assignments(course_key, user, include_access=False):  # lint-amnesty, pylint: disable=too-many-statements
     """
     Returns a list of assignment (at the subsection/sequential level) due dates for the given course.
 
@@ -534,7 +534,7 @@ def get_course_assignments(course_key, user, include_access=False):
 
     now = datetime.now(pytz.UTC)
     assignments = []
-    for section_key in block_data.get_children(course_usage_key):
+    for section_key in block_data.get_children(course_usage_key):  # lint-amnesty, pylint: disable=too-many-nested-blocks
         for subsection_key in block_data.get_children(section_key):
             due = block_data.get_xblock_field(subsection_key, 'due')
             graded = block_data.get_xblock_field(subsection_key, 'graded', False)
@@ -586,7 +586,7 @@ def get_course_assignments(course_key, user, include_access=False):
                     block_title = block_data.get_xblock_field(descendent, 'title', _('Open Response Assessment'))
 
                     for assessment in all_assessments:
-                        due = parse_date(assessment.get('due')).replace(tzinfo=pytz.UTC) if assessment.get('due') else None
+                        due = parse_date(assessment.get('due')).replace(tzinfo=pytz.UTC) if assessment.get('due') else None  # lint-amnesty, pylint: disable=line-too-long
                         if due is None:
                             continue
 
@@ -606,7 +606,7 @@ def get_course_assignments(course_key, user, include_access=False):
                             assessment_type = assessment_name
                         title = "{} ({})".format(block_title, assessment_type)
                         url = ''
-                        start = parse_date(assessment.get('start')).replace(tzinfo=pytz.UTC) if assessment.get('start') else None
+                        start = parse_date(assessment.get('start')).replace(tzinfo=pytz.UTC) if assessment.get('start') else None  # lint-amnesty, pylint: disable=line-too-long
                         assignment_released = not start or start < now
                         if assignment_released:
                             url = reverse('jump_to', args=[course_key, descendent])

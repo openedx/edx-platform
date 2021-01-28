@@ -20,12 +20,12 @@ from django.utils.translation import ugettext as _
 from django.views.decorators.cache import cache_control
 from django.views.decorators.csrf import ensure_csrf_cookie
 from django.views.generic import View
-from edx_django_utils.monitoring import set_custom_attributes_for_course_key
-from edx_toggles.toggles import LegacyWaffleSwitchNamespace
-from opaque_keys import InvalidKeyError
-from opaque_keys.edx.keys import CourseKey, UsageKey
+from edx_django_utils.monitoring import set_custom_attributes_for_course_key  # lint-amnesty, pylint: disable=import-error
+from edx_toggles.toggles import LegacyWaffleSwitchNamespace  # lint-amnesty, pylint: disable=import-error
+from opaque_keys import InvalidKeyError  # lint-amnesty, pylint: disable=import-error
+from opaque_keys.edx.keys import CourseKey, UsageKey  # lint-amnesty, pylint: disable=import-error
 from six.moves import urllib
-from web_fragments.fragment import Fragment
+from web_fragments.fragment import Fragment  # lint-amnesty, pylint: disable=import-error
 
 from common.djangoapps.edxmako.shortcuts import render_to_response, render_to_string
 from lms.djangoapps.courseware.exceptions import CourseAccessRedirect, Redirect
@@ -47,9 +47,9 @@ from openedx.features.course_experience.views.course_sock import CourseSockFragm
 from openedx.features.enterprise_support.api import data_sharing_consent_required
 from common.djangoapps.student.models import CourseEnrollment
 from common.djangoapps.util.views import ensure_valid_course_key
-from xmodule.course_module import COURSE_VISIBILITY_PUBLIC
-from xmodule.modulestore.django import modulestore
-from xmodule.x_module import PUBLIC_VIEW, STUDENT_VIEW
+from xmodule.course_module import COURSE_VISIBILITY_PUBLIC  # lint-amnesty, pylint: disable=import-error, wrong-import-order
+from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=import-error, wrong-import-order
+from xmodule.x_module import PUBLIC_VIEW, STUDENT_VIEW  # lint-amnesty, pylint: disable=import-error, wrong-import-order
 
 from ..access import has_access
 from ..access_utils import check_public_access
@@ -287,7 +287,7 @@ class CoursewareIndex(View):
             try:
                 self.position = max(int(self.position), 1)
             except ValueError:
-                raise Http404(u"Position {} is not an integer!".format(self.position))
+                raise Http404(u"Position {} is not an integer!".format(self.position))  # lint-amnesty, pylint: disable=raise-missing-from
 
     def _reset_section_to_exam_if_required(self):
         """

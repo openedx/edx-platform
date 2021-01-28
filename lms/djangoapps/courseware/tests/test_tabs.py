@@ -4,16 +4,16 @@ Test cases for tabs.
 
 
 import six
-from crum import set_current_request
+from crum import set_current_request  # lint-amnesty, pylint: disable=import-error
 from django.contrib.auth.models import AnonymousUser
 from django.http import Http404
 from django.urls import reverse
-from milestones.tests.utils import MilestonesTestCaseMixin
-from mock import MagicMock, Mock, patch
+from milestones.tests.utils import MilestonesTestCaseMixin  # lint-amnesty, pylint: disable=import-error
+from mock import MagicMock, Mock, patch  # lint-amnesty, pylint: disable=import-error
 from six import text_type
 from six.moves import range
 
-from edx_toggles.toggles.testutils import override_waffle_flag
+from edx_toggles.toggles.testutils import override_waffle_flag  # lint-amnesty, pylint: disable=import-error
 from lms.djangoapps.courseware.courses import get_course_by_id
 from lms.djangoapps.courseware.tabs import (
     CourseInfoTab,
@@ -37,15 +37,15 @@ from common.djangoapps.util.milestones_helpers import (
     add_milestone,
     get_milestone_relationship_types
 )
-from xmodule import tabs as xmodule_tabs
-from xmodule.modulestore.tests.django_utils import (
+from xmodule import tabs as xmodule_tabs  # lint-amnesty, pylint: disable=import-error, wrong-import-order
+from xmodule.modulestore.tests.django_utils import (  # lint-amnesty, pylint: disable=import-error, wrong-import-order
     TEST_DATA_MIXED_MODULESTORE,
     ModuleStoreTestCase,
     SharedModuleStoreTestCase
 )
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
-from xmodule.modulestore.tests.utils import TEST_DATA_DIR
-from xmodule.modulestore.xml_importer import import_course_from_xml
+from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory  # lint-amnesty, pylint: disable=import-error, wrong-import-order
+from xmodule.modulestore.tests.utils import TEST_DATA_DIR  # lint-amnesty, pylint: disable=import-error, wrong-import-order
+from xmodule.modulestore.xml_importer import import_course_from_xml  # lint-amnesty, pylint: disable=import-error, wrong-import-order
 
 
 class TabTestCase(SharedModuleStoreTestCase):
@@ -59,7 +59,7 @@ class TabTestCase(SharedModuleStoreTestCase):
         cls.books = None
 
     def setUp(self):
-        super(TabTestCase, self).setUp()
+        super(TabTestCase, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.reverse = lambda name, args: "name/{0}/args/{1}".format(name, ",".join(str(a) for a in args))
 
     def create_mock_user(self, is_staff=True, is_enrolled=True):
@@ -197,7 +197,7 @@ class TextbooksTestCase(TabTestCase):
     """Test cases for Textbook Tab."""
 
     def setUp(self):
-        super(TextbooksTestCase, self).setUp()
+        super(TextbooksTestCase, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
 
         self.set_up_books(2)
 
@@ -299,7 +299,7 @@ class StaticTabDateTestCaseXML(LoginEnrollmentTestCase, ModuleStoreTestCase):
         """
         Set up the tests
         """
-        super(StaticTabDateTestCaseXML, self).setUp()
+        super(StaticTabDateTestCaseXML, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
 
         # The following XML test course (which lives at common/test/data/2014)
         # is closed; we're testing that tabs still appear when
@@ -347,7 +347,7 @@ class EntranceExamsTabsTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase, Mi
         """
         Test case scaffolding
         """
-        super(EntranceExamsTabsTestCase, self).setUp()
+        super(EntranceExamsTabsTestCase, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
 
         self.course = CourseFactory.create()
         self.instructor_tab = ItemFactory.create(
@@ -452,7 +452,7 @@ class TextBookCourseViewsTestCase(LoginEnrollmentTestCase, SharedModuleStoreTest
         cls.course = CourseFactory.create()
 
     def setUp(self):
-        super(TextBookCourseViewsTestCase, self).setUp()
+        super(TextBookCourseViewsTestCase, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
 
         self.set_up_books(2)
         self.setup_user()
@@ -502,7 +502,7 @@ class TabListTestCase(TabTestCase):
     """Base class for Test cases involving tab lists."""
 
     def setUp(self):
-        super(TabListTestCase, self).setUp()
+        super(TabListTestCase, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
 
         # invalid tabs
         self.invalid_tabs = [
@@ -598,7 +598,7 @@ class CourseTabListTestCase(TabListTestCase):
     """Testing the generator method for iterating through displayable tabs"""
 
     def setUp(self):
-        super(CourseTabListTestCase, self).setUp()
+        super(CourseTabListTestCase, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.addCleanup(set_current_request, None)
 
     def has_tab(self, tab_list, tab_type):
@@ -770,7 +770,7 @@ class StaticTabTestCase(TabTestCase):
 
 class CourseInfoTabTestCase(TabTestCase):
     """Test cases for the course info tab."""
-    def setUp(self):
+    def setUp(self):  # lint-amnesty, pylint: disable=super-method-not-called
         self.user = self.create_mock_user()
         self.addCleanup(set_current_request, None)
 
@@ -804,7 +804,7 @@ class DiscussionLinkTestCase(TabTestCase):
     """Test cases for discussion link tab."""
 
     def setUp(self):
-        super(DiscussionLinkTestCase, self).setUp()
+        super(DiscussionLinkTestCase, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
 
         self.tabs_with_discussion = [
             xmodule_tabs.CourseTab.load('discussion'),

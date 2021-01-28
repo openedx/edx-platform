@@ -2,7 +2,7 @@
 Permission definitions for the courseware djangoapp
 """
 
-from bridgekeeper import perms
+from bridgekeeper import perms  # lint-amnesty, pylint: disable=import-error
 from .rules import HasAccessRule, HasStaffAccessToContent
 
 EDIT_BOOKMARK = 'courseware.edit_bookmark'

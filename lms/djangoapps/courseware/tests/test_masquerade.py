@@ -8,17 +8,17 @@ import json
 import pickle
 from datetime import datetime
 
-import ddt
+import ddt  # lint-amnesty, pylint: disable=import-error
 import six
 from django.conf import settings
 from django.test import TestCase
 from django.urls import reverse
-from edx_toggles.toggles.testutils import override_waffle_flag
-from mock import patch
+from edx_toggles.toggles.testutils import override_waffle_flag  # lint-amnesty, pylint: disable=import-error
+from mock import patch  # lint-amnesty, pylint: disable=import-error
 from pytz import UTC
-from xblock.runtime import DictKeyValueStore
+from xblock.runtime import DictKeyValueStore  # lint-amnesty, pylint: disable=import-error
 
-from capa.tests.response_xml_factory import OptionResponseXMLFactory
+from capa.tests.response_xml_factory import OptionResponseXMLFactory  # lint-amnesty, pylint: disable=import-error
 from lms.djangoapps.courseware.masquerade import (
     CourseMasquerade,
     MasqueradingKeyValueStore,
@@ -33,10 +33,10 @@ from openedx.core.djangoapps.user_api.preferences.api import get_user_preference
 from openedx.features.course_experience import DISABLE_UNIFIED_COURSE_TAB_FLAG
 from common.djangoapps.student.models import CourseEnrollment
 from common.djangoapps.student.tests.factories import UserFactory
-from xmodule.modulestore.django import modulestore
-from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
-from xmodule.partitions.partitions import Group, UserPartition
+from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=import-error, wrong-import-order
+from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase  # lint-amnesty, pylint: disable=import-error, wrong-import-order
+from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory  # lint-amnesty, pylint: disable=import-error, wrong-import-order
+from xmodule.partitions.partitions import Group, UserPartition  # lint-amnesty, pylint: disable=import-error, wrong-import-order
 
 
 class MasqueradeTestCase(SharedModuleStoreTestCase, LoginEnrollmentTestCase, MasqueradeMixin):
@@ -83,7 +83,7 @@ class MasqueradeTestCase(SharedModuleStoreTestCase, LoginEnrollmentTestCase, Mas
         )
 
     def setUp(self):
-        super(MasqueradeTestCase, self).setUp()
+        super(MasqueradeTestCase, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
 
         self.test_user = self.create_user()
         self.login(self.test_user.email, 'test')
@@ -251,7 +251,7 @@ class TestStaffMasqueradeAsSpecificStudent(StaffMasqueradeTestCase, ProblemSubmi
     Check for staff being able to masquerade as a specific student.
     """
     def setUp(self):
-        super(TestStaffMasqueradeAsSpecificStudent, self).setUp()
+        super(TestStaffMasqueradeAsSpecificStudent, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.student_user = self.create_user()
         self.login_student()
         self.enroll(self.course, True)
@@ -441,7 +441,7 @@ class TestGetMasqueradingGroupId(StaffMasqueradeTestCase):
     Check for staff being able to masquerade as belonging to a group.
     """
     def setUp(self):
-        super(TestGetMasqueradingGroupId, self).setUp()
+        super(TestGetMasqueradingGroupId, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.user_partition = UserPartition(
             0, 'Test User Partition', '',
             [Group(0, 'Group 1'), Group(1, 'Group 2')],
@@ -473,10 +473,10 @@ class ReadOnlyKeyValueStore(DictKeyValueStore):
 
     Used to make sure MasqueradingKeyValueStore does not try to modify the underlying KeyValueStore.
     """
-    def set(self, key, value):
+    def set(self, key, value):  # lint-amnesty, pylint: disable=unused-argument
         assert False, "ReadOnlyKeyValueStore may not be modified."
 
-    def delete(self, key):
+    def delete(self, key):  # lint-amnesty, pylint: disable=unused-argument
         assert False, "ReadOnlyKeyValueStore may not be modified."
 
     def set_many(self, update_dict):  # pylint: disable=unused-argument
@@ -493,7 +493,7 @@ class MasqueradingKeyValueStoreTest(TestCase):
     Unit tests for the MasqueradingKeyValueStore class.
     """
     def setUp(self):
-        super(MasqueradingKeyValueStoreTest, self).setUp()
+        super(MasqueradingKeyValueStoreTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.ro_kvs = ReadOnlyKeyValueStore({'a': 42, 'b': None, 'c': 'OpenCraft'})
         self.session = FakeSession()
         self.kvs = MasqueradingKeyValueStore(self.ro_kvs, self.session)

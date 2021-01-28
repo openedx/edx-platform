@@ -2,7 +2,7 @@
 Toggles for courseware in-course experience.
 """
 
-from edx_toggles.toggles import LegacyWaffleFlagNamespace
+from edx_toggles.toggles import LegacyWaffleFlagNamespace  # lint-amnesty, pylint: disable=import-error
 from openedx.core.djangoapps.waffle_utils import CourseWaffleFlag
 
 # Namespace for courseware waffle flags.

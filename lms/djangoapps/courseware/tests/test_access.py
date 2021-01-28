@@ -7,17 +7,17 @@ Test the access control framework
 import datetime
 import itertools
 
-import ddt
+import ddt  # lint-amnesty, pylint: disable=import-error
 import pytz
 import six
-from ccx_keys.locator import CCXLocator
-from django.contrib.auth.models import User
+from ccx_keys.locator import CCXLocator  # lint-amnesty, pylint: disable=import-error
+from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.test import TestCase
 from django.test.client import RequestFactory
 from django.urls import reverse
-from milestones.tests.utils import MilestonesTestCaseMixin
-from mock import Mock, patch
-from opaque_keys.edx.locator import CourseLocator
+from milestones.tests.utils import MilestonesTestCaseMixin  # lint-amnesty, pylint: disable=import-error
+from mock import Mock, patch  # lint-amnesty, pylint: disable=import-error
+from opaque_keys.edx.locator import CourseLocator  # lint-amnesty, pylint: disable=import-error
 
 import lms.djangoapps.courseware.access as access
 import lms.djangoapps.courseware.access_response as access_response
@@ -43,20 +43,20 @@ from common.djangoapps.student.tests.factories import (
     CourseEnrollmentFactory
 )
 from common.djangoapps.util.milestones_helpers import fulfill_course_milestone, set_prerequisite_courses
-from xmodule.course_module import (
+from xmodule.course_module import (  # lint-amnesty, pylint: disable=import-error, wrong-import-order
     CATALOG_VISIBILITY_ABOUT,
     CATALOG_VISIBILITY_CATALOG_AND_ABOUT,
     CATALOG_VISIBILITY_NONE
 )
-from xmodule.modulestore import ModuleStoreEnum
-from xmodule.modulestore.django import modulestore
-from xmodule.modulestore.tests.django_utils import (
+from xmodule.modulestore import ModuleStoreEnum  # lint-amnesty, pylint: disable=import-error, wrong-import-order
+from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=import-error, wrong-import-order
+from xmodule.modulestore.tests.django_utils import (  # lint-amnesty, pylint: disable=import-error, wrong-import-order
     TEST_DATA_SPLIT_MODULESTORE,
     ModuleStoreTestCase,
     SharedModuleStoreTestCase
 )
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
-from xmodule.partitions.partitions import MINIMUM_STATIC_PARTITION_ID, Group, UserPartition
+from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory  # lint-amnesty, pylint: disable=import-error, wrong-import-order
+from xmodule.partitions.partitions import MINIMUM_STATIC_PARTITION_ID, Group, UserPartition  # lint-amnesty, pylint: disable=import-error, wrong-import-order
 
 QUERY_COUNT_TABLE_BLACKLIST = WAFFLE_TABLES
 
@@ -81,7 +81,7 @@ class CoachAccessTestCaseCCX(SharedModuleStoreTestCase, LoginEnrollmentTestCase)
         """
         Set up tests
         """
-        super(CoachAccessTestCaseCCX, self).setUp()
+        super(CoachAccessTestCaseCCX, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
 
         # Create ccx coach account
         self.coach = AdminFactory.create(password="test")
@@ -174,7 +174,7 @@ class AccessTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase, MilestonesTes
     }
 
     def setUp(self):
-        super(AccessTestCase, self).setUp()
+        super(AccessTestCase, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.course = CourseFactory.create(org='edX', course='toy', run='test_run')
         self.anonymous_user = AnonymousUserFactory()
         self.beta_user = BetaTesterFactory(course_key=self.course.id)
@@ -683,7 +683,7 @@ class UserRoleTestCase(TestCase):
     """
 
     def setUp(self):
-        super(UserRoleTestCase, self).setUp()
+        super(UserRoleTestCase, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.course_key = CourseLocator('edX', 'toy', '2012_Fall')
         self.anonymous_user = AnonymousUserFactory()
         self.student = UserFactory()
@@ -741,7 +741,7 @@ class CourseOverviewAccessTestCase(ModuleStoreTestCase):
     """
 
     def setUp(self):
-        super(CourseOverviewAccessTestCase, self).setUp()
+        super(CourseOverviewAccessTestCase, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
 
         today = datetime.datetime.now(pytz.UTC)
         last_week = today - datetime.timedelta(days=7)

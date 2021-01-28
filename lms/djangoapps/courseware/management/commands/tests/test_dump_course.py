@@ -8,21 +8,21 @@ Tests for Django management commands
 import json
 from six import StringIO
 
-import factory
+import factory  # lint-amnesty, pylint: disable=import-error
 import six
 from django.conf import settings
 from django.core.management import call_command
 from six import text_type
 
-from xmodule.modulestore import ModuleStoreEnum
-from xmodule.modulestore.django import modulestore
-from xmodule.modulestore.tests.django_utils import (
+from xmodule.modulestore import ModuleStoreEnum  # lint-amnesty, pylint: disable=import-error
+from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=import-error
+from xmodule.modulestore.tests.django_utils import (  # lint-amnesty, pylint: disable=import-error
     TEST_DATA_MONGO_MODULESTORE,
     TEST_DATA_SPLIT_MODULESTORE,
     SharedModuleStoreTestCase
 )
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
-from xmodule.modulestore.xml_importer import import_course_from_xml
+from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory  # lint-amnesty, pylint: disable=import-error
+from xmodule.modulestore.xml_importer import import_course_from_xml  # lint-amnesty, pylint: disable=import-error
 
 DATA_DIR = settings.COMMON_TEST_DATA_ROOT
 XML_COURSE_DIRS = ['simple']

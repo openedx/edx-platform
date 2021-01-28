@@ -5,7 +5,7 @@ Courseware services.
 
 import json
 
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 
 from lms.djangoapps.courseware.models import StudentModule
 from common.djangoapps.student.models import get_user_by_username_or_email

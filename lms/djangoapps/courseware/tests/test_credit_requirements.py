@@ -3,18 +3,18 @@ Tests for credit requirement display on the progress page.
 """
 
 
-import ddt
+import ddt  # lint-amnesty, pylint: disable=import-error
 import six
 from django.conf import settings
 from django.urls import reverse
-from mock import patch
+from mock import patch  # lint-amnesty, pylint: disable=import-error
 
 from common.djangoapps.course_modes.models import CourseMode
 from openedx.core.djangoapps.credit import api as credit_api
 from openedx.core.djangoapps.credit.models import CreditCourse
 from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
-from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory
+from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase  # lint-amnesty, pylint: disable=import-error, wrong-import-order
+from xmodule.modulestore.tests.factories import CourseFactory  # lint-amnesty, pylint: disable=import-error, wrong-import-order
 
 
 @patch.dict(settings.FEATURES, {"ENABLE_CREDIT_ELIGIBILITY": True})
@@ -37,7 +37,7 @@ class ProgressPageCreditRequirementsTest(SharedModuleStoreTestCase):
         cls.course = CourseFactory.create()
 
     def setUp(self):
-        super(ProgressPageCreditRequirementsTest, self).setUp()
+        super(ProgressPageCreditRequirementsTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
 
         # Configure course as a credit course
         CreditCourse.objects.create(course_key=self.course.id, enabled=True)

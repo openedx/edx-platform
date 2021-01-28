@@ -7,18 +7,18 @@ Tests for course access
 import datetime
 import itertools
 
-import ddt
-import mock
+import ddt  # lint-amnesty, pylint: disable=import-error
+import mock  # lint-amnesty, pylint: disable=import-error
 import pytz
 import six
-from completion.models import BlockCompletion
-from completion.test_utils import CompletionWaffleTestMixin
-from crum import set_current_request
+from completion.models import BlockCompletion  # lint-amnesty, pylint: disable=import-error
+from completion.test_utils import CompletionWaffleTestMixin  # lint-amnesty, pylint: disable=import-error
+from crum import set_current_request  # lint-amnesty, pylint: disable=import-error
 from django.conf import settings
 from django.test.client import RequestFactory
 from django.test.utils import override_settings
 from django.urls import reverse
-from opaque_keys.edx.keys import CourseKey
+from opaque_keys.edx.keys import CourseKey  # lint-amnesty, pylint: disable=import-error
 from six import text_type
 from six.moves import range
 
@@ -42,13 +42,13 @@ from lms.djangoapps.courseware.courseware_access_exception import CoursewareAcce
 from openedx.core.djangolib.testing.utils import get_mock_request
 from openedx.core.lib.courses import course_image_url
 from common.djangoapps.student.tests.factories import UserFactory
-from xmodule.modulestore import ModuleStoreEnum
-from xmodule.modulestore.django import _get_modulestore_branch_setting, modulestore
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory, check_mongo_calls
-from xmodule.modulestore.xml_importer import import_course_from_xml
-from xmodule.tests.xml import XModuleXmlImportTest
-from xmodule.tests.xml import factories as xml
+from xmodule.modulestore import ModuleStoreEnum  # lint-amnesty, pylint: disable=import-error, wrong-import-order
+from xmodule.modulestore.django import _get_modulestore_branch_setting, modulestore  # lint-amnesty, pylint: disable=import-error, wrong-import-order
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase  # lint-amnesty, pylint: disable=import-error, wrong-import-order
+from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory, check_mongo_calls  # lint-amnesty, pylint: disable=import-error, wrong-import-order
+from xmodule.modulestore.xml_importer import import_course_from_xml  # lint-amnesty, pylint: disable=import-error, wrong-import-order
+from xmodule.tests.xml import XModuleXmlImportTest  # lint-amnesty, pylint: disable=import-error, wrong-import-order
+from xmodule.tests.xml import factories as xml  # lint-amnesty, pylint: disable=import-error, wrong-import-order
 
 CMS_BASE_TEST = 'testcms'
 TEST_DATA_DIR = settings.COMMON_TEST_DATA_ROOT
@@ -70,7 +70,7 @@ class CoursesTest(ModuleStoreTestCase):
         """
         Tests that get_cms_course_link_by_id and get_cms_block_link_by_id return the right thing
         """
-        self.course = CourseFactory.create(
+        self.course = CourseFactory.create(  # lint-amnesty, pylint: disable=attribute-defined-outside-init
             org='org', number='num', display_name='name'
         )
 
@@ -303,7 +303,7 @@ class CoursesRenderTest(ModuleStoreTestCase):
         """
         Set up the course and user context
         """
-        super(CoursesRenderTest, self).setUp()
+        super(CoursesRenderTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
 
         store = modulestore()
         course_items = import_course_from_xml(store, self.user.id, TEST_DATA_DIR, ['toy'])
@@ -340,9 +340,9 @@ class CoursesRenderTest(ModuleStoreTestCase):
             self.assertIn("this module is temporarily unavailable", course_about)
 
 
-class CourseEnrollmentOpenTests(ModuleStoreTestCase):
+class CourseEnrollmentOpenTests(ModuleStoreTestCase):  # lint-amnesty, pylint: disable=missing-class-docstring
     def setUp(self):
-        super(CourseEnrollmentOpenTests, self).setUp()
+        super(CourseEnrollmentOpenTests, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.now = datetime.datetime.now().replace(tzinfo=pytz.UTC)
 
     def test_course_enrollment_open(self):
@@ -392,7 +392,7 @@ class CourseInstantiationTests(ModuleStoreTestCase):
     Tests around instantiating a course multiple times in the same request.
     """
     def setUp(self):
-        super(CourseInstantiationTests, self).setUp()
+        super(CourseInstantiationTests, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
 
         self.factory = RequestFactory()
 

@@ -4,13 +4,13 @@ Tests use cases related to LMS Entrance Exam behavior, such as gated content acc
 
 
 import six
-from crum import set_current_request
+from crum import set_current_request  # lint-amnesty, pylint: disable=import-error
 from django.urls import reverse
-from milestones.tests.utils import MilestonesTestCaseMixin
-from mock import Mock, patch
+from milestones.tests.utils import MilestonesTestCaseMixin  # lint-amnesty, pylint: disable=import-error
+from mock import Mock, patch  # lint-amnesty, pylint: disable=import-error
 
-from capa.tests.response_xml_factory import MultipleChoiceResponseXMLFactory
-from edx_toggles.toggles.testutils import override_waffle_flag
+from capa.tests.response_xml_factory import MultipleChoiceResponseXMLFactory  # lint-amnesty, pylint: disable=import-error
+from edx_toggles.toggles.testutils import override_waffle_flag  # lint-amnesty, pylint: disable=import-error
 from lms.djangoapps.courseware.entrance_exams import (
     course_has_entrance_exam,
     get_entrance_exam_content,
@@ -33,9 +33,9 @@ from common.djangoapps.util.milestones_helpers import (
     get_milestone_relationship_types,
     get_namespace_choices
 )
-from xmodule.modulestore.django import modulestore
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
+from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=import-error, wrong-import-order
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase  # lint-amnesty, pylint: disable=import-error, wrong-import-order
+from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory  # lint-amnesty, pylint: disable=import-error, wrong-import-order
 
 
 @patch.dict('django.conf.settings.FEATURES', {'ENTRANCE_EXAMS': True})
@@ -52,7 +52,7 @@ class EntranceExamTestCases(LoginEnrollmentTestCase, ModuleStoreTestCase, Milest
         """
         Test case scaffolding
         """
-        super(EntranceExamTestCases, self).setUp()
+        super(EntranceExamTestCases, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.course = CourseFactory.create(
             metadata={
                 'entrance_exam_enabled': True,

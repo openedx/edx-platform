@@ -3,7 +3,7 @@ Admin view for courseware.
 """
 
 
-from config_models.admin import ConfigurationModelAdmin, KeyedConfigurationModelAdmin
+from config_models.admin import ConfigurationModelAdmin, KeyedConfigurationModelAdmin  # lint-amnesty, pylint: disable=import-error
 from django.contrib import admin
 
 from lms.djangoapps.courseware import models

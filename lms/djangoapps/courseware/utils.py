@@ -5,11 +5,11 @@ import datetime
 
 from django.conf import settings
 from lms.djangoapps.commerce.utils import EcommerceService
-from pytz import utc
+from pytz import utc  # lint-amnesty, pylint: disable=wrong-import-order
 
 from common.djangoapps.course_modes.models import CourseMode
-from xmodule.partitions.partitions import ENROLLMENT_TRACK_PARTITION_ID
-from xmodule.partitions.partitions_service import PartitionService
+from xmodule.partitions.partitions import ENROLLMENT_TRACK_PARTITION_ID  # lint-amnesty, pylint: disable=import-error, wrong-import-order
+from xmodule.partitions.partitions_service import PartitionService  # lint-amnesty, pylint: disable=import-error, wrong-import-order
 
 
 def verified_upgrade_deadline_link(user, course=None, course_id=None):

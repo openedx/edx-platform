@@ -8,18 +8,18 @@ import time
 from django.conf import settings
 from django.test.utils import override_settings
 from django.urls import reverse
-from mock import patch
+from mock import patch  # lint-amnesty, pylint: disable=import-error
 from six import text_type
 from six.moves import range
 
-from edx_toggles.toggles.testutils import override_waffle_flag
+from edx_toggles.toggles.testutils import override_waffle_flag  # lint-amnesty, pylint: disable=import-error
 from lms.djangoapps.courseware.tests.factories import GlobalStaffFactory
 from lms.djangoapps.courseware.tests.helpers import LoginEnrollmentTestCase
 from openedx.features.course_experience import DISABLE_COURSE_OUTLINE_PAGE_FLAG
 from common.djangoapps.student.tests.factories import UserFactory
-from xmodule.modulestore.django import modulestore
-from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
+from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=import-error, wrong-import-order
+from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase  # lint-amnesty, pylint: disable=import-error, wrong-import-order
+from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory  # lint-amnesty, pylint: disable=import-error, wrong-import-order
 
 
 class TestNavigation(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
@@ -37,7 +37,7 @@ class TestNavigation(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
             cls.course = CourseFactory.create()
 
     @classmethod
-    def setUpTestData(cls):
+    def setUpTestData(cls):  # lint-amnesty, pylint: disable=super-method-not-called
         cls.chapter0 = ItemFactory.create(parent=cls.course,
                                           display_name='Overview')
         cls.chapter9 = ItemFactory.create(parent=cls.course,
@@ -75,7 +75,7 @@ class TestNavigation(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
         cls.user = UserFactory()
 
     def setUp(self):
-        super(TestNavigation, self).setUp()
+        super(TestNavigation, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
 
         # Create student accounts and activate them.
         for i in range(len(self.STUDENT_INFO)):
@@ -91,7 +91,7 @@ class TestNavigation(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
                 return
         raise AssertionError(u"assertTabActive failed: {} not active".format(tabname))
 
-    def assertTabInactive(self, tabname, response):
+    def assertTabInactive(self, tabname, response):  # lint-amnesty, pylint: disable=useless-return
         ''' Check if the progress tab is active in the tab set '''
         for line in response.content.decode('utf-8').split('\n'):
             if tabname in line and 'active' in line:

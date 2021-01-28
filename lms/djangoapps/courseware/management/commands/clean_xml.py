@@ -7,13 +7,13 @@ import os
 import sys
 import traceback
 
-import lxml.etree
+import lxml.etree  # lint-amnesty, pylint: disable=import-error
 from django.core.management.base import BaseCommand
-from fs.osfs import OSFS
-from path import Path as path
+from fs.osfs import OSFS  # lint-amnesty, pylint: disable=import-error
+from path import Path as path  # lint-amnesty, pylint: disable=import-error
 from six.moves import map
 
-from xmodule.modulestore.xml import XMLModuleStore
+from xmodule.modulestore.xml import XMLModuleStore  # lint-amnesty, pylint: disable=import-error
 
 
 def traverse_tree(course):
@@ -45,14 +45,14 @@ def export(course, export_dir):
             root.write(f)
 
         return True
-    except:
+    except:  # lint-amnesty, pylint: disable=bare-except
         print('Export failed!')
         traceback.print_exc()
 
     return False
 
 
-def import_with_checks(course_dir):
+def import_with_checks(course_dir):  # lint-amnesty, pylint: disable=missing-function-docstring
     all_ok = True
 
     print(u'Attempting to load "{}"'.format(course_dir))
@@ -134,7 +134,7 @@ def check_roundtrip(course_dir):
     print('======== ideally there is no diff above this =======')
 
 
-class Command(BaseCommand):
+class Command(BaseCommand):  # lint-amnesty, pylint: disable=missing-class-docstring
     help = 'Imports specified course, validates it, then exports it in a canonical format.'
 
     def add_arguments(self, parser):

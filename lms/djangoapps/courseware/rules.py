@@ -6,23 +6,23 @@ django-rules and Bridgekeeper rules for courseware related features
 import logging
 import traceback
 
-import laboratory
+import laboratory  # lint-amnesty, pylint: disable=import-error
 import rules
 import six
-from bridgekeeper.rules import EMPTY, Rule
+from bridgekeeper.rules import EMPTY, Rule  # lint-amnesty, pylint: disable=import-error
 from django.conf import settings
 from django.db.models import Q
-from opaque_keys.edx.django.models import CourseKeyField
-from opaque_keys.edx.keys import CourseKey, UsageKey
-from xblock.core import XBlock
+from opaque_keys.edx.django.models import CourseKeyField  # lint-amnesty, pylint: disable=import-error
+from opaque_keys.edx.keys import CourseKey, UsageKey  # lint-amnesty, pylint: disable=import-error
+from xblock.core import XBlock  # lint-amnesty, pylint: disable=import-error
 
 from common.djangoapps.course_modes.models import CourseMode
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from common.djangoapps.student.models import CourseAccessRole, CourseEnrollment
 from common.djangoapps.student.roles import CourseRole, OrgRole
-from xmodule.course_module import CourseDescriptor
-from xmodule.error_module import ErrorBlock
-from xmodule.x_module import XModule
+from xmodule.course_module import CourseDescriptor  # lint-amnesty, pylint: disable=import-error, wrong-import-order
+from xmodule.error_module import ErrorBlock  # lint-amnesty, pylint: disable=import-error, wrong-import-order
+from xmodule.x_module import XModule  # lint-amnesty, pylint: disable=import-error, wrong-import-order
 
 
 from .access import has_access
@@ -30,7 +30,7 @@ from .access import has_access
 LOG = logging.getLogger(__name__)
 
 
-@rules.predicate
+@rules.predicate  # lint-amnesty, pylint: disable=no-member
 def is_track_ok_for_exam(user, exam):
     """
     Returns whether the user is in an appropriate enrollment mode
@@ -48,7 +48,7 @@ def is_track_ok_for_exam(user, exam):
 # The edx_proctoring.api uses this permission to gate access to the
 # proctored experience
 can_take_proctored_exam = is_track_ok_for_exam
-rules.set_perm('edx_proctoring.can_take_proctored_exam', is_track_ok_for_exam)
+rules.set_perm('edx_proctoring.can_take_proctored_exam', is_track_ok_for_exam)  # lint-amnesty, pylint: disable=no-member
 
 
 class HasAccessRule(Rule):
@@ -61,7 +61,7 @@ class HasAccessRule(Rule):
     def check(self, user, instance=None):
         return has_access(user, self.action, instance)
 
-    def query(self, user):
+    def query(self, user):  # lint-amnesty, pylint: disable=missing-function-docstring, unused-argument
         # Return an always-empty queryset filter so that this always
         # fails permissions, but still passes the is_possible_for check
         # that is used to determine if the rule should allow a user
@@ -69,7 +69,7 @@ class HasAccessRule(Rule):
         return Q(pk__in=[])
 
 
-class StaffAccessExperiment(laboratory.Experiment):
+class StaffAccessExperiment(laboratory.Experiment):  # lint-amnesty, pylint: disable=missing-class-docstring
     def compare(self, control, candidate):
         return bool(control.value) == candidate.value
 
@@ -160,11 +160,11 @@ class HasStaffAccessToContent(Rule):
         return query
 
 
-class HasRolesRule(Rule):
+class HasRolesRule(Rule):  # lint-amnesty, pylint: disable=missing-class-docstring
     def __init__(self, *roles):
         self.roles = roles
 
-    def check(self, user, instance=None):
+    def check(self, user, instance=None):  # lint-amnesty, pylint: disable=missing-function-docstring
         if not user.is_authenticated:
             return False
         if isinstance(instance, CourseKey):

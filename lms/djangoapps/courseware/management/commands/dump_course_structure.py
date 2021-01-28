@@ -22,19 +22,19 @@ from textwrap import dedent
 
 import six
 from django.core.management.base import BaseCommand, CommandError
-from opaque_keys import InvalidKeyError
-from opaque_keys.edx.keys import CourseKey
-from xblock.fields import Scope
+from opaque_keys import InvalidKeyError  # lint-amnesty, pylint: disable=import-error
+from opaque_keys.edx.keys import CourseKey  # lint-amnesty, pylint: disable=import-error
+from xblock.fields import Scope  # lint-amnesty, pylint: disable=import-error
 
-from xblock_discussion import DiscussionXBlock
-from xmodule.modulestore.django import modulestore
-from xmodule.modulestore.inheritance import compute_inherited_metadata, own_metadata
+from xblock_discussion import DiscussionXBlock  # lint-amnesty, pylint: disable=import-error
+from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=import-error
+from xmodule.modulestore.inheritance import compute_inherited_metadata, own_metadata  # lint-amnesty, pylint: disable=import-error
 
 FILTER_LIST = ['xml_attributes']
 INHERITED_FILTER_LIST = ['children', 'xml_attributes']
 
 
-class Command(BaseCommand):
+class Command(BaseCommand):  # lint-amnesty, pylint: disable=missing-class-docstring
     help = dedent(__doc__).strip()
 
     def add_arguments(self, parser):
@@ -61,7 +61,7 @@ class Command(BaseCommand):
         try:
             course_key = CourseKey.from_string(options['course_id'])
         except InvalidKeyError:
-            raise CommandError("Invalid course_id")
+            raise CommandError("Invalid course_id")  # lint-amnesty, pylint: disable=raise-missing-from
 
         course = store.get_course(course_key)
         if course is None:
@@ -117,7 +117,7 @@ def dump_module(module, destination=None, inherited=False, defaults=False):
             else:
                 return field.values != field.default
 
-        inherited_metadata = {field.name: field.read_json(module) for field in module.fields.values() if is_inherited(field)}
+        inherited_metadata = {field.name: field.read_json(module) for field in module.fields.values() if is_inherited(field)}  # lint-amnesty, pylint: disable=line-too-long
         destination[six.text_type(module.location)]['inherited_metadata'] = inherited_metadata
 
     for child in module.get_children():

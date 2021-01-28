@@ -18,11 +18,11 @@ from datetime import datetime
 import six
 from django.conf import settings  # pylint: disable=unused-import
 from django.contrib.auth.models import AnonymousUser
-from edx_django_utils.monitoring import function_trace
-from opaque_keys.edx.keys import CourseKey, UsageKey
+from edx_django_utils.monitoring import function_trace  # lint-amnesty, pylint: disable=import-error
+from opaque_keys.edx.keys import CourseKey, UsageKey  # lint-amnesty, pylint: disable=import-error
 from pytz import UTC
 from six import text_type
-from xblock.core import XBlock
+from xblock.core import XBlock  # lint-amnesty, pylint: disable=import-error
 
 from lms.djangoapps.courseware.access_response import (
     IncorrectPartitionGroupError,
@@ -58,16 +58,16 @@ from common.djangoapps.student.roles import (
     OrgStaffRole,
     SupportStaffRole
 )
-from common.djangoapps.util import milestones_helpers as milestones_helpers
+from common.djangoapps.util import milestones_helpers as milestones_helpers  # lint-amnesty, pylint: disable=useless-import-alias
 from common.djangoapps.util.milestones_helpers import (
     any_unfulfilled_milestones,
     get_pre_requisite_courses_not_completed,
     is_prerequisite_courses_enabled
 )
-from xmodule.course_module import CATALOG_VISIBILITY_ABOUT, CATALOG_VISIBILITY_CATALOG_AND_ABOUT, CourseDescriptor
-from xmodule.error_module import ErrorBlock
-from xmodule.partitions.partitions import NoSuchUserPartitionError, NoSuchUserPartitionGroupError
-from xmodule.x_module import XModule
+from xmodule.course_module import CATALOG_VISIBILITY_ABOUT, CATALOG_VISIBILITY_CATALOG_AND_ABOUT, CourseDescriptor  # lint-amnesty, pylint: disable=import-error, wrong-import-order
+from xmodule.error_module import ErrorBlock  # lint-amnesty, pylint: disable=import-error, wrong-import-order
+from xmodule.partitions.partitions import NoSuchUserPartitionError, NoSuchUserPartitionGroupError  # lint-amnesty, pylint: disable=import-error, wrong-import-order
+from xmodule.x_module import XModule  # lint-amnesty, pylint: disable=import-error, wrong-import-order
 
 log = logging.getLogger(__name__)
 

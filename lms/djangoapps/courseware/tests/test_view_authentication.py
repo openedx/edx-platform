@@ -7,7 +7,7 @@ import datetime
 
 import pytz
 from django.urls import reverse
-from mock import patch
+from mock import patch  # lint-amnesty, pylint: disable=import-error
 from six import text_type
 from six.moves import range
 
@@ -23,9 +23,9 @@ from lms.djangoapps.courseware.tests.factories import (
 from lms.djangoapps.courseware.tests.helpers import CourseAccessTestMixin, LoginEnrollmentTestCase
 from openedx.features.enterprise_support.tests.mixins.enterprise import EnterpriseTestConsentRequired
 from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
-from xmodule.modulestore.django import modulestore
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
+from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=import-error, wrong-import-order
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase  # lint-amnesty, pylint: disable=import-error, wrong-import-order
+from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory  # lint-amnesty, pylint: disable=import-error, wrong-import-order
 
 
 class TestViewAuth(EnterpriseTestConsentRequired, ModuleStoreTestCase, LoginEnrollmentTestCase):
@@ -114,11 +114,11 @@ class TestViewAuth(EnterpriseTestConsentRequired, ModuleStoreTestCase, LoginEnro
         url = self._reverse_urls(['courseware'], course)[0]
         self.assert_request_status_code(302, url)
 
-    def login(self, user):
-        return super(TestViewAuth, self).login(user.email, 'test')
+    def login(self, user):  # lint-amnesty, pylint: disable=arguments-differ
+        return super(TestViewAuth, self).login(user.email, 'test')  # lint-amnesty, pylint: disable=super-with-arguments
 
     def setUp(self):
-        super(TestViewAuth, self).setUp()
+        super(TestViewAuth, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
 
         self.course = CourseFactory.create(number='999', display_name='Robot_Super_Course')
         self.courseware_chapter = ItemFactory.create(display_name='courseware')
@@ -219,7 +219,7 @@ class TestViewAuth(EnterpriseTestConsentRequired, ModuleStoreTestCase, LoginEnro
             'courseware',
             kwargs={'course_id': text_type(self.course.id)}
         )
-        self.verify_consent_required(self.client, url, status_code=302)
+        self.verify_consent_required(self.client, url, status_code=302)  # lint-amnesty, pylint: disable=no-value-for-parameter
 
     def test_instructor_page_access_nonstaff(self):
         """
@@ -420,7 +420,7 @@ class TestBetatesterAccess(ModuleStoreTestCase, CourseAccessTestMixin):
     """
 
     def setUp(self):
-        super(TestBetatesterAccess, self).setUp()
+        super(TestBetatesterAccess, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
 
         now = datetime.datetime.now(pytz.UTC)
         tomorrow = now + datetime.timedelta(days=1)
