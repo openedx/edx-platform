@@ -4,7 +4,7 @@ Tests for the badges API views.
 
 
 import six
-from ddt import data, ddt, unpack
+from ddt import data, ddt, unpack  # lint-amnesty, pylint: disable=import-error
 from django.conf import settings
 from django.test.utils import override_settings
 from six.moves import range
@@ -13,8 +13,8 @@ from lms.djangoapps.badges.tests.factories import BadgeAssertionFactory, BadgeCl
 from openedx.core.lib.api.test_utils import ApiTestCase
 from common.djangoapps.student.tests.factories import UserFactory
 from common.djangoapps.util.testing import UrlResetMixin
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase  # lint-amnesty, pylint: disable=import-error, wrong-import-order
+from xmodule.modulestore.tests.factories import CourseFactory  # lint-amnesty, pylint: disable=import-error, wrong-import-order
 
 FEATURES_WITH_BADGES_ENABLED = settings.FEATURES.copy()
 FEATURES_WITH_BADGES_ENABLED['ENABLE_OPENBADGES'] = True
@@ -27,7 +27,7 @@ class UserAssertionTestCase(UrlResetMixin, ModuleStoreTestCase, ApiTestCase):
     """
 
     def setUp(self):
-        super(UserAssertionTestCase, self).setUp()
+        super(UserAssertionTestCase, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.course = CourseFactory.create()
         self.user = UserFactory.create()
         # Password defined by factory.
