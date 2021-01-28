@@ -91,14 +91,14 @@ REQ_FILES = \
 
 compile-requirements: export CUSTOM_COMPILE_COMMAND=make upgrade
 compile-requirements: ## Re-compile *.in requirements to *.txt
-	@ export REBUILD='--rebuild'; \
-	for f in $(REQ_FILES); do \
-		echo ; \
-		echo "== $$f ===============================" ; \
-		echo "pip-compile -v --no-emit-trusted-host --no-index $$REBUILD ${COMPILE_OPTS} -o $$f.txt $$f.in"; \
-		pip-compile -v --no-emit-trusted-host --no-index $$REBUILD ${COMPILE_OPTS} -o $$f.txt $$f.in || exit 1; \
-		export REBUILD=''; \
-	done
+	# @ export REBUILD='--rebuild'; \
+	# for f in $(REQ_FILES); do \
+	# 	echo ; \
+	# 	echo "== $$f ===============================" ; \
+	# 	echo "pip-compile -v --no-emit-trusted-host --no-index $$REBUILD ${COMPILE_OPTS} -o $$f.txt $$f.in"; \
+	# 	pip-compile -v --no-emit-trusted-host --no-index $$REBUILD ${COMPILE_OPTS} -o $$f.txt $$f.in || exit 1; \
+	# 	export REBUILD=''; \
+	# done
 	# Post process all of the files generated above to work around open pip-tools issues
 	scripts/post-pip-compile.sh $(REQ_FILES:=.txt)
 	# Let tox control the Django version for tests
@@ -130,4 +130,3 @@ docker_push: docker_tag docker_auth ## push to docker hub
 	docker push "openedx/edx-platform:${GITHUB_SHA}-newrelic"
 	docker push 'openedx/edx-platform:latest-devstack'
 	docker push "openedx/edx-platform:${GITHUB_SHA}-devstack"
-

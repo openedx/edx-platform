@@ -42,7 +42,7 @@ chardet==4.0.0            # via -r requirements/edx/testing.txt, diff-cover, pys
 chem==1.2.0               # via -r requirements/edx/testing.txt
 click-log==0.3.2          # via -r requirements/edx/testing.txt, edx-lint
 click==7.1.2              # via -r requirements/edx/development.in, -r requirements/edx/pip-tools.txt, -r requirements/edx/testing.txt, click-log, code-annotations, edx-lint, nltk, pip-tools, user-util
-code-annotations==1.0.2   # via -r requirements/edx/testing.txt, edx-enterprise, edx-lint, edx-toggles
+code-annotations==1.1.0   # via -r requirements/edx/testing.txt, edx-enterprise, edx-lint, edx-toggles
 contextlib2==0.6.0.post1  # via -r requirements/edx/testing.txt
 coreapi==2.3.3            # via -r requirements/edx/testing.txt, drf-yasg
 coreschema==0.0.4         # via -r requirements/edx/testing.txt, coreapi, drf-yasg
@@ -112,7 +112,7 @@ edx-drf-extensions==6.4.0  # via -r requirements/edx/testing.txt, edx-completion
 edx-enterprise==3.17.14   # via -c requirements/edx/../constraints.txt, -r requirements/edx/testing.txt
 edx-event-routing-backends==4.0.1  # via -r requirements/edx/testing.txt
 edx-i18n-tools==0.5.3     # via -r requirements/edx/testing.txt, ora2
-edx-lint==3.0.2           # via -r requirements/edx/testing.txt
+git+https://github.com/regisb/edx-lint.git@regisb/generic-code-annotations-errors#egg=edx-lint==4.0.0  # via -r requirements/edx/testing.txt
 edx-milestones==0.3.0     # via -r requirements/edx/testing.txt
 edx-opaque-keys[django]==2.2.0  # via -r requirements/edx/testing.txt, edx-bulk-grades, edx-ccx-keys, edx-completion, edx-drf-extensions, edx-enterprise, edx-milestones, edx-organizations, edx-proctoring, edx-user-state-client, edx-when, lti-consumer-xblock, xmodule
 edx-organizations==6.8.0  # via -r requirements/edx/testing.txt
