@@ -437,9 +437,9 @@ FEATURES = {
     # .. toggle_name: FEATURES['ENABLE_EDXNOTES']
     # .. toggle_implementation: SettingToggle
     # .. toggle_default: False
-    # .. toggle_description: The edxnotes app is responsible for displaying parts of the Notes UI to students in different parts
-    #   of the LMS, as well as figuring out whether Notes is enabled for a particular situation.
-    #   The bulk of the actual work in storing the notes is done by a separate service (see the edx-notes-api repo).
+    # .. toggle_description: This toggle enables the students to save and manage their annotations in the
+    #   course using the notes service. The bulk of the actual work in storing the notes is done by
+    #   by a separate service(see the edx-notes-api repo)
     # .. toggle_warnings: Requires the edx-notes-api service properly running and to have configured the django settings
     #   EDXNOTES_INTERNAL_API and EDXNOTES_PUBLIC_API
     # .. toggle_use_cases: open_edx
