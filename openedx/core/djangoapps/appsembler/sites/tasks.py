@@ -25,11 +25,18 @@ from organizations.models import Organization, OrganizationCourse
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from xmodule.contentstore.django import contentstore
 from xmodule.modulestore import ModuleStoreEnum
-from xmodule.modulestore.django import modulestore
+from xmodule.modulestore.django import modulestore, SignalHandler
 from xmodule.modulestore.exceptions import ItemNotFoundError
 from xmodule.modulestore.xml_importer import import_course_from_xml
 
 LOGGER = get_task_logger(__name__)
+
+
+def current_year():
+    """
+    A helper to get current year.
+    """
+    return datetime.datetime.now().year
 
 
 def import_course_on_site_creation_after_transaction(organization):
@@ -91,7 +98,7 @@ def import_course_on_site_creation(organization_id):
             'course-v1:{}+{}+{}'.format(
                 organization.short_name,
                 course_name,
-                datetime.datetime.now().year,
+                current_year(),
             )
         )
 
@@ -132,7 +139,7 @@ def import_course_on_site_creation(organization_id):
                 create_if_not_present=True,
             )
 
-            # TODO: Remove this line once we implement OrgStaffRole in Tahoe.
+            # TODO: Remove this once we roll out Tahoe 2.0 sites, because OrgStaffRole is implemented there.
             # Add the new registered user as admin in the course
             CourseAccessRole.objects.get_or_create(
                 # TODO: Ensure only an admin get this course (`is_amc_admin`).
@@ -146,6 +153,11 @@ def import_course_on_site_creation(organization_id):
                 organization=organization,
                 course_id=str(course_target_id),
                 active=True
+            )
+
+            SignalHandler.course_published.send(
+                sender=__name__,
+                course_key=course_target_id,
             )
 
     # catch all exceptions so we can update the state and properly cleanup the course.
