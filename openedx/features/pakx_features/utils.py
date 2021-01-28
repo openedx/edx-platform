@@ -60,13 +60,13 @@ def add_course_progress_and_resume_info_tags_to_enrolled_courses(request, course
     """
     for course in courses_list:
         is_enrolled = CourseEnrollment.is_enrolled(request.user, course.id)
+        course.user_progress = '0'
         if is_enrolled:
             course_id = text_type(course.id)
             has_visited_course, resume_course_url, resume_course_title = _get_resume_course_info(
                 request, course_id, True
             )
-            user_progress = get_course_progress_percentage(request, course_id)
-            course.user_progress = user_progress
+            course.user_progress = get_course_progress_percentage(request, course_id)
             course.resume_course_url = resume_course_url
             course.has_visited_course = has_visited_course
             course.resume_course_title = resume_course_title
