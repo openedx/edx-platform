@@ -569,4 +569,3 @@ class UserApplicationADGAdmin(admin.ModelAdmin):
 
 
 adg_admin_site.register(UserApplication, UserApplicationADGAdmin)
-

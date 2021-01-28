@@ -11,7 +11,6 @@ from django.utils.translation import ugettext_lazy as _
 from model_utils.models import TimeStampedModel
 
 from lms.djangoapps.grades.api import CourseGradeFactory
-from openedx.adg.common.course_meta.models import CourseMeta
 from openedx.adg.lms.utils.date_utils import month_choices
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.lib.grade_utils import round_away_from_zero
@@ -191,7 +190,9 @@ class UserApplication(TimeStampedModel):
         Returns:
             list: Prereq course name and score pairs
         """
-        prereq_course_overviews = CourseOverview.objects.filter(id__in=CourseMeta.prereq_course_ids.all())
+        prereq_course_overviews = CourseOverview.objects.filter(
+            id__in=PrerequisiteCourse.objects.all().values_list('course', flat=True)
+        )
 
         CourseScore = namedtuple('CourseScore', 'course_name course_percentage')
         scores_in_prereq_courses = []
