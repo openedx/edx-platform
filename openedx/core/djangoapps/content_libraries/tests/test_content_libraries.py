@@ -11,6 +11,7 @@ from django.test.utils import override_settings
 from mock import patch
 from organizations.models import Organization
 
+from openedx.core.djangoapps.content_libraries.libraries_index import LibraryBlockIndexer, ContentLibraryIndexer
 from openedx.core.djangoapps.content_libraries.tests.base import ContentLibrariesRestApiTest, elasticsearch_test
 from openedx.core.djangoapps.content_libraries.constants import VIDEO, COMPLEX, PROBLEM, CC_4_BY, ALL_RIGHTS_RESERVED
 from common.djangoapps.student.tests.factories import UserFactory
@@ -41,6 +42,12 @@ class ContentLibrariesTest(ContentLibrariesRestApiTest):
     library slug and bundle UUID does not because it's assumed to be immutable
     and cached forever.
     """
+
+    def setUp(self):
+        super().setUp()
+        if settings.ENABLE_ELASTICSEARCH_FOR_TESTS:
+            ContentLibraryIndexer.remove_all_items()
+            LibraryBlockIndexer.remove_all_items()
 
     def test_library_crud(self):
         """
@@ -218,30 +225,44 @@ class ContentLibrariesTest(ContentLibrariesRestApiTest):
         """
         Test the filters in the list libraries API
         """
+        suffix = str(is_indexing_enabled)
         with override_settings(FEATURES={**settings.FEATURES, 'ENABLE_CONTENT_LIBRARY_INDEX': is_indexing_enabled}):
-            self._create_library(slug="test-lib1", title="Foo", description="Bar", library_type=VIDEO)
-            self._create_library(slug="test-lib2", title="Library-Title-2", description="Bar2")
-            self._create_library(slug="l3", title="Library-Title-3", description="Description", library_type=VIDEO)
+            self._create_library(
+                slug=f"test-lib-filter-{suffix}-1", title="Fob", description=f"Bar-{suffix}", library_type=VIDEO,
+            )
+            self._create_library(
+                slug=f"test-lib-filter-{suffix}-2", title=f"Library-Title-{suffix}-2", description=f"Bar-{suffix}-2",
+            )
+            self._create_library(
+                slug=f"l3{suffix}", title=f"Library-Title-{suffix}-3", description="Description", library_type=VIDEO,
+            )
 
             Organization.objects.get_or_create(
-                short_name="org-test",
+                short_name=f"org-test-{suffix}",
                 defaults={"name": "Content Libraries Tachyon Exploration & Survey Team"},
             )
             self._create_library(
-                slug="l4", title="Library-Title-4", description="Library-Description", org='org-test',
+                slug=f"l4-{suffix}", title=f"Library-Title-{suffix}-4",
+                description="Library-Description", org=f'org-test-{suffix}',
                 library_type=VIDEO,
             )
-            self._create_library(slug="l5", title="Library-Title-5", description="Library-Description", org='org-test')
+            self._create_library(
+                slug="l5", title=f"Library-Title-{suffix}-5", description="Library-Description",
+                org=f'org-test-{suffix}',
+            )
 
             self.assertEqual(len(self._list_libraries()), 5)
-            self.assertEqual(len(self._list_libraries({'org': 'org-test'})), 2)
-            self.assertEqual(len(self._list_libraries({'text_search': 'test-lib'})), 2)
-            self.assertEqual(len(self._list_libraries({'text_search': 'test-lib', 'type': VIDEO})), 1)
-            self.assertEqual(len(self._list_libraries({'text_search': 'library-title'})), 4)
-            self.assertEqual(len(self._list_libraries({'text_search': 'library-title', 'type': VIDEO})), 2)
-            self.assertEqual(len(self._list_libraries({'text_search': 'bar'})), 2)
-            self.assertEqual(len(self._list_libraries({'text_search': 'org-tes'})), 2)
-            self.assertEqual(len(self._list_libraries({'org': 'org-test', 'text_search': 'library-title-4'})), 1)
+            self.assertEqual(len(self._list_libraries({'org': f'org-test-{suffix}'})), 2)
+            self.assertEqual(len(self._list_libraries({'text_search': f'test-lib-filter-{suffix}'})), 2)
+            self.assertEqual(len(self._list_libraries({'text_search': f'test-lib-filter-{suffix}', 'type': VIDEO})), 1)
+            self.assertEqual(len(self._list_libraries({'text_search': f'library-title-{suffix}'})), 4)
+            self.assertEqual(len(self._list_libraries({'text_search': f'library-title-{suffix}', 'type': VIDEO})), 2)
+            self.assertEqual(len(self._list_libraries({'text_search': f'bar-{suffix}'})), 2)
+            self.assertEqual(len(self._list_libraries({'text_search': f'org-test-{suffix}'})), 2)
+            self.assertEqual(
+                len(self._list_libraries({'org': f'org-test-{suffix}', 'text_search': f'library-title-{suffix}-4'})),
+                1,
+            )
             self.assertEqual(len(self._list_libraries({'type': VIDEO})), 3)
 
     # General Content Library XBlock tests:
