@@ -1589,6 +1589,14 @@ SIMPLE_WIKI_REQUIRE_LOGIN_VIEW = False
 ################################# WIKI ###################################
 from lms.djangoapps.course_wiki import settings as course_wiki_settings  # pylint: disable=wrong-import-position
 
+# .. toggle_name: WIKI_ACCOUNT_HANDLING
+# .. toggle_implementation: Django setting
+# .. toggle_default: True
+# .. toggle_description: This setting allows the access to Sign up, login and     logout views.
+# .. toggle_warnings: Turn to False only if you have your own account handling
+# .. toggle_use_cases: open_edx
+# .. toggle_creation_date: None
+# .. toggle_tickets: None
 WIKI_ACCOUNT_HANDLING = False
 WIKI_EDITOR = 'lms.djangoapps.course_wiki.editors.CodeMirror'
 WIKI_SHOW_MAX_CHILDREN = 0  # We don't use the little menu that shows children of an article in the breadcrumb
