@@ -173,8 +173,7 @@ STUDIO_SHORT_NAME = _("Studio")
 FEATURES = {
     'GITHUB_PUSH': False,
 
-    # for consistency in user-experience, keep the value of the following 3 settings
-    # in sync with the ones in lms/envs/common.py
+    # See annotations in lms/envs/common.py for details.
     'ENABLE_DISCUSSION_SERVICE': True,
     'ENABLE_TEXTBOOK': True,
 
