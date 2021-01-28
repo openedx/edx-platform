@@ -7,15 +7,15 @@ Tests for signal handling in commerce djangoapp.
 import base64
 import json
 
-import ddt
-import httpretty
-import mock
+import ddt  # lint-amnesty, pylint: disable=import-error
+import httpretty  # lint-amnesty, pylint: disable=import-error
+import mock  # lint-amnesty, pylint: disable=import-error
 from django.conf import settings
 from django.contrib.auth.models import AnonymousUser
 from django.test import TestCase
 from django.test.utils import override_settings
-from opaque_keys.edx.keys import CourseKey
-from requests import Timeout
+from opaque_keys.edx.keys import CourseKey  # lint-amnesty, pylint: disable=import-error
+from requests import Timeout  # lint-amnesty, pylint: disable=import-error
 from six.moves.urllib.parse import urljoin
 
 from common.djangoapps.course_modes.models import CourseMode
@@ -40,7 +40,7 @@ class TestRefundSignal(TestCase):
     """
 
     def setUp(self):
-        super(TestRefundSignal, self).setUp()
+        super(TestRefundSignal, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
 
         # Ensure the E-Commerce service user exists
         UserFactory(username=settings.ECOMMERCE_SERVICE_WORKER_USERNAME, is_staff=True)

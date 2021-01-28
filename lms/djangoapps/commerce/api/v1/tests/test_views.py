@@ -5,7 +5,7 @@ import itertools
 import json
 from datetime import datetime, timedelta
 
-import ddt
+import ddt  # lint-amnesty, pylint: disable=import-error
 import pytz
 import six
 from django.conf import settings
@@ -13,13 +13,13 @@ from django.contrib.auth.models import Permission
 from django.test import TestCase
 from django.test.utils import override_settings
 from django.urls import reverse, reverse_lazy
-from rest_framework.utils.encoders import JSONEncoder
+from rest_framework.utils.encoders import JSONEncoder  # lint-amnesty, pylint: disable=import-error
 
 from common.djangoapps.course_modes.models import CourseMode
 from lms.djangoapps.verify_student.models import VerificationDeadline
 from common.djangoapps.student.tests.factories import UserFactory
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase  # lint-amnesty, pylint: disable=import-error, wrong-import-order
+from xmodule.modulestore.tests.factories import CourseFactory  # lint-amnesty, pylint: disable=import-error, wrong-import-order
 
 from ....tests.mocks import mock_order_endpoint
 from ....tests.test_views import UserMixin
@@ -35,7 +35,7 @@ class CourseApiViewTestMixin(object):
     """
 
     def setUp(self):
-        super(CourseApiViewTestMixin, self).setUp()
+        super(CourseApiViewTestMixin, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.course = CourseFactory.create()
         self.course_mode = CourseMode.objects.create(
             course_id=self.course.id,
@@ -114,7 +114,7 @@ class CourseRetrieveUpdateViewTests(CourseApiViewTestMixin, ModuleStoreTestCase)
     }
 
     def setUp(self):
-        super(CourseRetrieveUpdateViewTests, self).setUp()
+        super(CourseRetrieveUpdateViewTests, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.path = reverse('commerce_api:v1:courses:retrieve_update', args=[six.text_type(self.course.id)])
         self.user = UserFactory.create()
         self.client.login(username=self.user.username, password=PASSWORD)
@@ -450,7 +450,7 @@ class OrderViewTests(UserMixin, TestCase):
     path = reverse_lazy(view_name, kwargs={'number': ORDER_NUMBER})
 
     def setUp(self):
-        super(OrderViewTests, self).setUp()
+        super(OrderViewTests, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self._login()
 
     def test_order_found(self):

@@ -5,14 +5,14 @@ import logging
 
 import six
 from django.urls import reverse
-from edx_rest_api_client import exceptions
-from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthentication
-from opaque_keys import InvalidKeyError
-from opaque_keys.edx.keys import CourseKey
-from rest_framework.authentication import SessionAuthentication
-from rest_framework.permissions import IsAuthenticated
-from rest_framework.status import HTTP_406_NOT_ACCEPTABLE, HTTP_409_CONFLICT
-from rest_framework.views import APIView
+from edx_rest_api_client import exceptions  # lint-amnesty, pylint: disable=import-error
+from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthentication  # lint-amnesty, pylint: disable=import-error
+from opaque_keys import InvalidKeyError  # lint-amnesty, pylint: disable=import-error
+from opaque_keys.edx.keys import CourseKey  # lint-amnesty, pylint: disable=import-error
+from rest_framework.authentication import SessionAuthentication  # lint-amnesty, pylint: disable=import-error
+from rest_framework.permissions import IsAuthenticated  # lint-amnesty, pylint: disable=import-error
+from rest_framework.status import HTTP_406_NOT_ACCEPTABLE, HTTP_409_CONFLICT  # lint-amnesty, pylint: disable=import-error
+from rest_framework.views import APIView  # lint-amnesty, pylint: disable=import-error
 from six import text_type
 
 from common.djangoapps.course_modes.models import CourseMode
@@ -88,7 +88,7 @@ class BasketsView(APIView):
                     u'Failed to handle marketing opt-in flag: user="%s", course="%s"', user.username, course_key
                 )
 
-    def post(self, request, *args, **kwargs):
+    def post(self, request, *args, **kwargs):  # lint-amnesty, pylint: disable=unused-argument
         """
         Attempt to enroll the user.
         """

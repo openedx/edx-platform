@@ -6,8 +6,8 @@ from itertools import groupby
 
 import six
 from django.db import transaction
-from opaque_keys import InvalidKeyError
-from opaque_keys.edx.keys import CourseKey
+from opaque_keys import InvalidKeyError  # lint-amnesty, pylint: disable=import-error
+from opaque_keys.edx.keys import CourseKey  # lint-amnesty, pylint: disable=import-error
 
 from common.djangoapps.course_modes.models import CourseMode
 from lms.djangoapps.verify_student.models import VerificationDeadline
@@ -130,7 +130,7 @@ class Course(object):
             course_id = CourseKey.from_string(six.text_type(course_id))
         except InvalidKeyError:
             log.debug(u'[%s] is not a valid course key.', course_id)
-            raise ValueError
+            raise ValueError  # lint-amnesty, pylint: disable=raise-missing-from
 
         course_modes = CourseMode.objects.filter(course_id=course_id)
 

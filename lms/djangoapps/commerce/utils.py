@@ -4,21 +4,21 @@
 import json
 import logging
 
-import requests
+import requests  # lint-amnesty, pylint: disable=import-error
 import six
-import waffle
+import waffle  # lint-amnesty, pylint: disable=import-error
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.urls import reverse
 from django.utils.translation import ugettext as _
-from opaque_keys.edx.keys import CourseKey
+from opaque_keys.edx.keys import CourseKey  # lint-amnesty, pylint: disable=import-error
 from six.moves.urllib.parse import urlencode, urljoin
 
 from common.djangoapps.course_modes.models import CourseMode
 from openedx.core.djangoapps.commerce.utils import ecommerce_api_client, is_commerce_service_configured
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.theming import helpers as theming_helpers
-from common.djangoapps.student.models import CourseEnrollment
+from common.djangoapps.student.models import CourseEnrollment  # lint-amnesty, pylint: disable=unused-import
 
 from .models import CommerceConfiguration
 

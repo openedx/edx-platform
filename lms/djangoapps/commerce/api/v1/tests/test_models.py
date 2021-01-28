@@ -1,7 +1,7 @@
 """ Tests for models. """
 
 
-import ddt
+import ddt  # lint-amnesty, pylint: disable=import-error
 from django.test import TestCase
 
 from common.djangoapps.course_modes.models import CourseMode
@@ -14,7 +14,7 @@ class CourseTests(TestCase):
     """ Tests for Course model. """
 
     def setUp(self):
-        super(CourseTests, self).setUp()
+        super(CourseTests, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.course = Course('a/b/c', [])
 
     @ddt.unpack

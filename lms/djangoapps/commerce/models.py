@@ -3,9 +3,9 @@ Commerce-related models.
 """
 
 
-from config_models.models import ConfigurationModel
+from config_models.models import ConfigurationModel  # lint-amnesty, pylint: disable=import-error
 from django.db import models
-from django.utils.encoding import python_2_unicode_compatible
+from django.utils.encoding import python_2_unicode_compatible  # lint-amnesty, pylint: disable=no-name-in-module
 from django.utils.translation import ugettext_lazy as _
 
 

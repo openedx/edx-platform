@@ -1,8 +1,8 @@
 """ Factories for generating fake commerce-related data. """
 
 
-import factory
-from factory.fuzzy import FuzzyText
+import factory  # lint-amnesty, pylint: disable=import-error
+from factory.fuzzy import FuzzyText  # lint-amnesty, pylint: disable=import-error
 
 
 class OrderFactory(factory.Factory):

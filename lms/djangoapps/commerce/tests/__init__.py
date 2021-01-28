@@ -2,11 +2,11 @@
 """ Commerce app tests package. """
 
 
-import httpretty
-import mock
+import httpretty  # lint-amnesty, pylint: disable=import-error
+import mock  # lint-amnesty, pylint: disable=import-error
 from django.conf import settings
 from django.test import TestCase
-from freezegun import freeze_time
+from freezegun import freeze_time  # lint-amnesty, pylint: disable=import-error
 
 from openedx.core.djangoapps.commerce.utils import ecommerce_api_client
 from openedx.core.djangoapps.oauth_dispatch.jwt import create_jwt_for_user
@@ -34,7 +34,7 @@ class EdxRestApiClientTest(TestCase):
     ]
 
     def setUp(self):
-        super(EdxRestApiClientTest, self).setUp()
+        super(EdxRestApiClientTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.user = UserFactory()
 
     @httpretty.activate

@@ -5,7 +5,7 @@ Signal handling functions for use with external commerce service.
 
 import logging
 
-from crum import get_current_request
+from crum import get_current_request  # lint-amnesty, pylint: disable=import-error
 from django.contrib.auth.models import AnonymousUser
 from django.dispatch import receiver
 

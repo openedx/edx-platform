@@ -13,11 +13,11 @@ from django.conf import settings
 from django.contrib.auth import get_user_model
 
 from django.core.management.base import BaseCommand, CommandError
-from opaque_keys.edx.keys import CourseKey
-from requests import Timeout
-from slumber.exceptions import HttpServerError, SlumberBaseException
+from opaque_keys.edx.keys import CourseKey  # lint-amnesty, pylint: disable=import-error
+from requests import Timeout  # lint-amnesty, pylint: disable=import-error
+from slumber.exceptions import HttpServerError, SlumberBaseException  # lint-amnesty, pylint: disable=import-error
 
-from enterprise.models import EnterpriseCourseEnrollment
+from enterprise.models import EnterpriseCourseEnrollment  # lint-amnesty, pylint: disable=import-error
 from common.djangoapps.student.models import CourseEnrollment
 from openedx.core.djangoapps.commerce.utils import ecommerce_api_client
 
@@ -289,4 +289,4 @@ class Command(BaseCommand):
 
         except Exception as ex:
             traceback.print_exc()
-            raise CommandError(u'Command failed with traceback %s' % str(ex))
+            raise CommandError(u'Command failed with traceback %s' % str(ex))  # lint-amnesty, pylint: disable=raise-missing-from

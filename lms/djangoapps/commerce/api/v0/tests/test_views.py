@@ -6,8 +6,8 @@ import json
 from datetime import datetime, timedelta
 from uuid import uuid4
 
-import ddt
-import mock
+import ddt  # lint-amnesty, pylint: disable=import-error
+import mock  # lint-amnesty, pylint: disable=import-error
 import pytz
 import six
 from django.conf import settings
@@ -22,9 +22,9 @@ from openedx.core.djangoapps.enrollments.api import get_enrollment
 from openedx.core.lib.django_test_client_utils import get_absolute_url
 from common.djangoapps.student.models import CourseEnrollment
 from common.djangoapps.student.tests.tests import EnrollmentEventTestMixin
-from xmodule.modulestore.django import modulestore
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory
+from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=import-error, wrong-import-order
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase  # lint-amnesty, pylint: disable=import-error, wrong-import-order
+from xmodule.modulestore.tests.factories import CourseFactory  # lint-amnesty, pylint: disable=import-error, wrong-import-order
 
 from ....constants import Messages
 from ....tests.mocks import mock_basket_order
@@ -69,7 +69,7 @@ class BasketsViewTests(EnrollmentEventTestMixin, UserMixin, ModuleStoreTestCase)
         self.assertEqual(actual, expected_msg)
 
     def setUp(self):
-        super(BasketsViewTests, self).setUp()
+        super(BasketsViewTests, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.url = reverse('commerce_api:v0:baskets:create')
         self._login()
 
@@ -290,7 +290,7 @@ class BasketOrderViewTests(UserMixin, TestCase):
     path = reverse_lazy(view_name, kwargs={'basket_id': 1})
 
     def setUp(self):
-        super(BasketOrderViewTests, self).setUp()
+        super(BasketOrderViewTests, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self._login()
 
     def test_order_found(self):

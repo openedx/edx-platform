@@ -6,8 +6,8 @@ import re
 
 from django.core.management import call_command
 from django.test import TestCase, override_settings
-from django.utils.six import StringIO
-from mock import patch
+from django.utils.six import StringIO  # lint-amnesty, pylint: disable=import-error, no-name-in-module
+from mock import patch  # lint-amnesty, pylint: disable=import-error
 from six.moves import range
 
 from common.djangoapps.course_modes.models import CourseMode

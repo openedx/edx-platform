@@ -3,16 +3,16 @@
 
 import json
 
-import ddt
-import httpretty
+import ddt  # lint-amnesty, pylint: disable=import-error
+import httpretty  # lint-amnesty, pylint: disable=import-error
 from django.conf import settings
 from django.test import TestCase
 from django.test.client import RequestFactory
 from django.test.utils import override_settings
-from mock import patch
-from opaque_keys.edx.locator import CourseLocator
+from mock import patch  # lint-amnesty, pylint: disable=import-error
+from opaque_keys.edx.locator import CourseLocator  # lint-amnesty, pylint: disable=import-error
 from six.moves.urllib.parse import urlencode
-from waffle.testutils import override_switch
+from waffle.testutils import override_switch  # lint-amnesty, pylint: disable=import-error
 
 from common.djangoapps.course_modes.models import CourseMode
 from common.djangoapps.course_modes.tests.factories import CourseModeFactory
@@ -22,8 +22,8 @@ from openedx.core.djangolib.testing.utils import skip_unless_lms
 from openedx.core.lib.log_utils import audit_log
 from common.djangoapps.student.models import CourseEnrollment
 from common.djangoapps.student.tests.factories import TEST_PASSWORD, UserFactory
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase  # lint-amnesty, pylint: disable=import-error, wrong-import-order
+from xmodule.modulestore.tests.factories import CourseFactory  # lint-amnesty, pylint: disable=import-error, wrong-import-order
 
 # Entitlements is not in CMS' INSTALLED_APPS so these imports will error during test collection
 if settings.ROOT_URLCONF == 'lms.urls':
@@ -61,7 +61,7 @@ class EcommerceServiceTests(TestCase):
         self.user = UserFactory.create()
         self.request = self.request_factory.get("foo")
         update_commerce_config(enabled=True)
-        super(EcommerceServiceTests, self).setUp()
+        super(EcommerceServiceTests, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
 
     def test_is_enabled(self):
         """Verify that is_enabled() returns True when ecomm checkout is enabled. """
@@ -187,7 +187,7 @@ class RefundUtilMethodTests(ModuleStoreTestCase):
     """Tests for Refund Utilities"""
 
     def setUp(self):
-        super(RefundUtilMethodTests, self).setUp()
+        super(RefundUtilMethodTests, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.user = UserFactory()
         UserFactory(username=settings.ECOMMERCE_SERVICE_WORKER_USERNAME, is_staff=True)
 

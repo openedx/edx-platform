@@ -1,8 +1,8 @@
 """ Custom API permissions. """
 
 
-from django.contrib.auth.models import User
-from rest_framework.permissions import BasePermission, DjangoModelPermissions
+from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
+from rest_framework.permissions import BasePermission, DjangoModelPermissions  # lint-amnesty, pylint: disable=import-error
 
 from openedx.core.lib.api.permissions import ApiKeyHeaderPermission
 
@@ -19,10 +19,10 @@ class ApiKeyOrModelPermission(BasePermission):
 
 class IsAuthenticatedOrActivationOverridden(BasePermission):
     """ Considers the account activation override switch when determining the authentication status of the user """
-    def has_permission(self, request, view):
+    def has_permission(self, request, view):  # lint-amnesty, pylint: disable=missing-function-docstring, unused-argument
         if not request.user.is_authenticated and is_account_activation_requirement_disabled():
             try:
-                request.user = User.objects.get(id=request.session._session_cache['_auth_user_id'])
+                request.user = User.objects.get(id=request.session._session_cache['_auth_user_id'])  # lint-amnesty, pylint: disable=protected-access
             except User.DoesNotExist:
                 pass
         return request.user.is_authenticated
