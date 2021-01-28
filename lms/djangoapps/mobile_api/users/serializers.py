@@ -80,6 +80,8 @@ class CourseOverviewField(serializers.RelatedField):
             # field present in case API parsers expect it, but this API is now
             # removed.
             'video_outline': None,
+
+            'is_self_paced': course_overview.self_paced
         }
 
 
