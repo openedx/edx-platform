@@ -434,6 +434,16 @@ FEATURES = {
     'ENABLE_FOOTER_MOBILE_APP_LINKS': False,
 
     # Let students save and manage their annotations
+    # .. toggle_name: FEATURES['ENABLE_EDXNOTES']
+    # .. toggle_implementation: SettingToggle
+    # .. toggle_default: False
+    # .. toggle_description: The edxnotes app is responsible for displaying parts of the Notes UI to students in different parts 
+    #   of the LMS, as well as figuring out whether Notes is enabled for a particular situation. The bulk of the actual work in 
+    #   storing the notes is done by a separate service (see the edx-notes-api repo).
+    # .. toggle_warnings: Requires the edx-notes-api service properly running and to have configured the django settings as well
+    # .. toggle_use_cases: open_edx
+    # .. toggle_creation_date: None
+    # .. toggle_tickets: None
     'ENABLE_EDXNOTES': False,
 
     # Toggle to enable coordination with the Publisher tool (keep in sync with cms/envs/common.py)
