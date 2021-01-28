@@ -1724,16 +1724,24 @@ ADVANCED_PROBLEM_TYPES = [
 ]
 
 ############### Settings for Retirement #####################
+# See annotations in lms/envs/common.py for details.
 RETIRED_USERNAME_PREFIX = 'retired__user_'
+# See annotations in lms/envs/common.py for details.
 RETIRED_EMAIL_PREFIX = 'retired__user_'
+# See annotations in lms/envs/common.py for details.
 RETIRED_EMAIL_DOMAIN = 'retired.invalid'
+# See annotations in lms/envs/common.py for details.
 RETIRED_USERNAME_FMT = lambda settings: settings.RETIRED_USERNAME_PREFIX + '{}'
+# See annotations in lms/envs/common.py for details.
 RETIRED_EMAIL_FMT = lambda settings: settings.RETIRED_EMAIL_PREFIX + '{}@' + settings.RETIRED_EMAIL_DOMAIN
 derived('RETIRED_USERNAME_FMT', 'RETIRED_EMAIL_FMT')
+# See annotations in lms/envs/common.py for details.
 RETIRED_USER_SALTS = ['abc', '123']
+# See annotations in lms/envs/common.py for details.
 RETIREMENT_SERVICE_WORKER_USERNAME = 'RETIREMENT_SERVICE_USER'
 
 # These states are the default, but are designed to be overridden in configuration.
+# See annotations in lms/envs/common.py for details.
 RETIREMENT_STATES = [
     'PENDING',
 
