@@ -439,7 +439,7 @@ FEATURES = {
     # .. toggle_default: False
     # .. toggle_description: This toggle enables the students to save and manage their annotations in the
     #   course using the notes service. The bulk of the actual work in storing the notes is done by
-    #   by a separate service(see the edx-notes-api repo)
+    #   by a separate service(see the edx-notes-api repo).
     # .. toggle_warnings: Requires the edx-notes-api service properly running and to have configured the django settings
     #   EDXNOTES_INTERNAL_API and EDXNOTES_PUBLIC_API
     # .. toggle_use_cases: open_edx
