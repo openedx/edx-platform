@@ -4086,13 +4086,27 @@ USERNAME_REPLACEMENT_WORKER = "REPLACE WITH VALID USERNAME"
 # If running a Gradebook container locally,
 # modify lms/envs/private.py to give it a non-null value
 WRITABLE_GRADEBOOK_URL = None
-
+# .. setting_name: PROFILE_MICROFRONTEND_URL
+# .. setting_default: None
+# .. setting_description: Base URL of the micro-frontend-based profile page.
+# .. setting_warning: Also set site's ENABLE_PROFILE_MICROFRONTEND and
+#     learner_profile.redirect_to_microfrontend waffle flag
 PROFILE_MICROFRONTEND_URL = None
 ORDER_HISTORY_MICROFRONTEND_URL = None
+# .. setting_name: ACCOUNT_MICROFRONTEND_URL
+# .. setting_default: None
+# .. setting_description: Base URL of the micro-frontend-based account settings page.
+# .. setting_warning: Also set site's ENABLE_ACCOUNT_MICROFRONTEND and
+#     account.redirect_to_microfrontend waffle flag
 ACCOUNT_MICROFRONTEND_URL = None
 LOGISTRATION_MICROFRONTEND_URL = None
 LOGISTRATION_MICROFRONTEND_DOMAIN = None
 PROGRAM_CONSOLE_MICROFRONTEND_URL = None
+# .. setting_name: LEARNING_MICROFRONTEND_URL
+# .. setting_default: None
+# .. setting_description: Base URL of the micro-frontend-based courseware page.
+# .. setting_warning: Also set site's ENABLE_COURSEWARE_MICROFRONTEND or
+#     FEATURES['ENABLE_COURSEWARE_MICROFRONTEND'] and courseware.courseware_mfe waffle flag
 LEARNING_MICROFRONTEND_URL = None
 
 ############### Settings for the ace_common plugin #################
