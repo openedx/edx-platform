@@ -32,8 +32,7 @@ REFERENCE_PARAMS = {
         ({}, True),
         # Ensure token still valid in 1 hour
         ({"validation_time_delta_s": 3600}, True),
-        # Ensure token still valid in 1 day, this should be true but isn't due
-        # to the bug that will be fixed in ARCHBOM-1677
+        # Ensure token still valid in 1 day
         ({"validation_time_delta_s": 86400}, True),
         # Ensure token is invalid after 5 days
         ({"validation_time_delta_s": 86400 * 5}, False),
