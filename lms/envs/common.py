@@ -579,7 +579,14 @@ FEATURES = {
     # See LEARNER-493
     'ENABLE_ONE_CLICK_PROGRAM_PURCHASE': False,
 
-    # Allow users to change their email address.
+    # .. toggle_name: FEATURES['ALLOW_EMAIL_ADDRESS_CHANGE']
+    # .. toggle_implementation: DjangoSetting
+    # .. toggle_default: True
+    # .. toggle_description: Allow users to change their email address on the Account Settings page. If this is
+    #   disabled, users will not be able to change their email address.
+    # .. toggle_use_cases: open_edx
+    # .. toggle_creation_date: 2017-06-26
+    # .. toggle_tickets: https://openedx.atlassian.net/browse/OSPR-1735
     'ALLOW_EMAIL_ADDRESS_CHANGE': True,
 
     # Whether the bulk enrollment view is enabled.
