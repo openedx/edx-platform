@@ -6,14 +6,14 @@ Asynchronous tasks for the CCX app.
 import logging
 
 import six
-from ccx_keys.locator import CCXLocator
+from ccx_keys.locator import CCXLocator  # lint-amnesty, pylint: disable=import-error
 from django.dispatch import receiver
-from opaque_keys import InvalidKeyError
-from opaque_keys.edx.locator import CourseLocator
+from opaque_keys import InvalidKeyError  # lint-amnesty, pylint: disable=import-error
+from opaque_keys.edx.locator import CourseLocator  # lint-amnesty, pylint: disable=import-error
 
 from lms import CELERY_APP
 from lms.djangoapps.ccx.models import CustomCourseForEdX
-from xmodule.modulestore.django import SignalHandler
+from xmodule.modulestore.django import SignalHandler  # lint-amnesty, pylint: disable=import-error, wrong-import-order
 
 log = logging.getLogger("edx.ccx")
 

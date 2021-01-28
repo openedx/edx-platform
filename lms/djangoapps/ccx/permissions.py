@@ -2,7 +2,7 @@
 Permission definitions for the ccx djangoapp
 """
 
-from bridgekeeper import perms
+from bridgekeeper import perms  # lint-amnesty, pylint: disable=import-error
 from lms.djangoapps.courseware.rules import HasAccessRule
 
 VIEW_CCX_COACH_DASHBOARD = 'ccx.view_ccx_coach_dashboard'

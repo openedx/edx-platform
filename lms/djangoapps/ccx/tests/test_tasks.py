@@ -5,22 +5,22 @@ Tests for celery tasks defined in tasks module
 
 import contextlib
 
-import mock
+import mock  # lint-amnesty, pylint: disable=import-error
 import six
-from ccx_keys.locator import CCXLocator
+from ccx_keys.locator import CCXLocator  # lint-amnesty, pylint: disable=import-error
 
 from lms.djangoapps.ccx.tasks import send_ccx_course_published
 from lms.djangoapps.ccx.tests.factories import CcxFactory
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from common.djangoapps.student.roles import CourseCcxCoachRole
 from common.djangoapps.student.tests.factories import AdminFactory
-from xmodule.modulestore.django import SignalHandler
-from xmodule.modulestore.tests.django_utils import TEST_DATA_SPLIT_MODULESTORE, ModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory
+from xmodule.modulestore.django import SignalHandler  # lint-amnesty, pylint: disable=import-error, wrong-import-order
+from xmodule.modulestore.tests.django_utils import TEST_DATA_SPLIT_MODULESTORE, ModuleStoreTestCase  # lint-amnesty, pylint: disable=import-error, wrong-import-order
+from xmodule.modulestore.tests.factories import CourseFactory  # lint-amnesty, pylint: disable=import-error, wrong-import-order
 
 
 @contextlib.contextmanager
-def mock_signal_receiver(signal):
+def mock_signal_receiver(signal):  # lint-amnesty, pylint: disable=missing-function-docstring
     receiver = mock.Mock()
     signal.connect(receiver)
     yield receiver
@@ -39,7 +39,7 @@ class TestSendCCXCoursePublished(ModuleStoreTestCase):
         """
         Set up tests
         """
-        super(TestSendCCXCoursePublished, self).setUp()
+        super(TestSendCCXCoursePublished, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         course = self.course = CourseFactory.create(org="edX", course="999", display_name="Run 666")
         course2 = self.course2 = CourseFactory.create(org="edX", course="999a", display_name="Run 667")
         coach = AdminFactory.create()

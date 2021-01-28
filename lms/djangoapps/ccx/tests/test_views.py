@@ -7,21 +7,21 @@ import datetime
 import json
 import re
 
-import ddt
+import ddt  # lint-amnesty, pylint: disable=import-error
 import six
 from six.moves import range, zip
-from ccx_keys.locator import CCXLocator
+from ccx_keys.locator import CCXLocator  # lint-amnesty, pylint: disable=import-error
 from django.conf import settings
 from django.test import RequestFactory
 from django.test.utils import override_settings
 from django.urls import resolve, reverse
 from django.utils.translation import ugettext as _
-from edx_django_utils.cache import RequestCache
-from mock import MagicMock, patch
-from opaque_keys.edx.keys import CourseKey
+from edx_django_utils.cache import RequestCache  # lint-amnesty, pylint: disable=import-error
+from mock import MagicMock, patch  # lint-amnesty, pylint: disable=import-error
+from opaque_keys.edx.keys import CourseKey  # lint-amnesty, pylint: disable=import-error
 from pytz import UTC
 
-from capa.tests.response_xml_factory import StringResponseXMLFactory
+from capa.tests.response_xml_factory import StringResponseXMLFactory  # lint-amnesty, pylint: disable=import-error
 from lms.djangoapps.courseware.courses import get_course_by_id
 from lms.djangoapps.courseware.tabs import get_course_tab_list
 from lms.djangoapps.courseware.tests.factories import StudentModuleFactory
@@ -43,15 +43,15 @@ from openedx.core.djangoapps.django_comment_common.utils import are_permissions_
 from common.djangoapps.student.models import CourseEnrollment, CourseEnrollmentAllowed
 from common.djangoapps.student.roles import CourseCcxCoachRole, CourseInstructorRole, CourseStaffRole
 from common.djangoapps.student.tests.factories import AdminFactory, CourseEnrollmentFactory, UserFactory
-from xmodule.modulestore import ModuleStoreEnum
-from xmodule.modulestore.django import modulestore
-from xmodule.modulestore.tests.django_utils import (
+from xmodule.modulestore import ModuleStoreEnum  # lint-amnesty, pylint: disable=import-error, wrong-import-order
+from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=import-error, wrong-import-order
+from xmodule.modulestore.tests.django_utils import (  # lint-amnesty, pylint: disable=import-error, wrong-import-order
     TEST_DATA_SPLIT_MODULESTORE,
     ModuleStoreTestCase,
     SharedModuleStoreTestCase
 )
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory, SampleCourseFactory
-from xmodule.x_module import XModuleMixin
+from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory, SampleCourseFactory  # lint-amnesty, pylint: disable=import-error, wrong-import-order
+from xmodule.x_module import XModuleMixin  # lint-amnesty, pylint: disable=import-error, wrong-import-order
 
 
 def intercept_renderer(path, context):
@@ -132,7 +132,7 @@ class TestAdminAccessCoachDashboard(CcxTestCase, LoginEnrollmentTestCase):
     MODULESTORE = TEST_DATA_SPLIT_MODULESTORE
 
     def setUp(self):
-        super(TestAdminAccessCoachDashboard, self).setUp()
+        super(TestAdminAccessCoachDashboard, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.make_coach()
         ccx = self.make_ccx()
         ccx_key = CCXLocator.from_course_locator(self.course.id, ccx.id)
@@ -303,7 +303,7 @@ class TestCoachDashboard(CcxTestCase, LoginEnrollmentTestCase):
         """
         Set up tests
         """
-        super(TestCoachDashboard, self).setUp()
+        super(TestCoachDashboard, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         # Login with the instructor account
         self.client.login(username=self.coach.username, password="test")
 
@@ -847,7 +847,7 @@ class TestCoachDashboardSchedule(CcxTestCase, LoginEnrollmentTestCase, ModuleSto
     ENABLED_CACHES = ['default', 'mongo_inheritance_cache', 'loc_cache']
 
     def setUp(self):
-        super(TestCoachDashboardSchedule, self).setUp()
+        super(TestCoachDashboardSchedule, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.course = course = CourseFactory.create(enable_ccx=True)
 
         # Create a course outline
@@ -1027,7 +1027,7 @@ class TestCCXGrades(FieldOverrideTestMixin, SharedModuleStoreTestCase, LoginEnro
         """
         Set up tests
         """
-        super(TestCCXGrades, self).setUp()
+        super(TestCCXGrades, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
 
         # Create instructor account
         self.coach = coach = AdminFactory.create()
@@ -1061,7 +1061,7 @@ class TestCCXGrades(FieldOverrideTestMixin, SharedModuleStoreTestCase, LoginEnro
         setup_students_and_grades(self)
         self.client.login(username=coach.username, password="test")
         self.addCleanup(RequestCache.clear_all_namespaces)
-        from xmodule.modulestore.django import SignalHandler
+        from xmodule.modulestore.django import SignalHandler  # lint-amnesty, pylint: disable=import-error
 
         # using CCX object as sender here.
         SignalHandler.course_published.send(
@@ -1146,7 +1146,7 @@ class CCXCoachTabTestCase(CcxTestCase):
         cls.ccx_disabled_course = CourseFactory.create(enable_ccx=False)
 
     def setUp(self):
-        super(CCXCoachTabTestCase, self).setUp()
+        super(CCXCoachTabTestCase, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.user = UserFactory.create()
         for course in [self.ccx_enabled_course, self.ccx_disabled_course]:
             CourseEnrollmentFactory.create(user=self.user, course_id=course.id)
@@ -1246,7 +1246,7 @@ class TestStudentViewsWithCCX(ModuleStoreTestCase):
         """
         Set up courses and enrollments.
         """
-        super(TestStudentViewsWithCCX, self).setUp()
+        super(TestStudentViewsWithCCX, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
 
         # Create a Draft Mongo and a Split Mongo course and enroll a student user in them.
         self.student_password = "foobar"

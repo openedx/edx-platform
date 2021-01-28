@@ -7,9 +7,9 @@ by the individual custom courses feature.
 import json
 import logging
 
-from ccx_keys.locator import CCXBlockUsageLocator, CCXLocator
+from ccx_keys.locator import CCXBlockUsageLocator, CCXLocator  # lint-amnesty, pylint: disable=import-error
 from django.db import transaction
-from opaque_keys.edx.keys import CourseKey, UsageKey
+from opaque_keys.edx.keys import CourseKey, UsageKey  # lint-amnesty, pylint: disable=import-error
 
 from lms.djangoapps.ccx.models import CcxFieldOverride, CustomCourseForEdX
 from lms.djangoapps.courseware.field_overrides import FieldOverrideProvider
@@ -49,7 +49,7 @@ class CustomCoursesForEdxOverrideProvider(FieldOverrideProvider):
         return default
 
     @classmethod
-    def enabled_for(cls, block):
+    def enabled_for(cls, block):  # lint-amnesty, pylint: disable=arguments-differ
         """
         CCX field overrides are enabled for CCX blocks.
         """

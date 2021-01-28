@@ -7,22 +7,22 @@ Performance tests for field overrides.
 import itertools
 from datetime import datetime
 
-import ddt
-import mock
-import pytest
+import ddt  # lint-amnesty, pylint: disable=import-error
+import mock  # lint-amnesty, pylint: disable=import-error
+import pytest  # lint-amnesty, pylint: disable=import-error
 import six
 from six.moves import range
-from ccx_keys.locator import CCXLocator
+from ccx_keys.locator import CCXLocator  # lint-amnesty, pylint: disable=import-error
 from django.conf import settings
 from django.contrib.messages.storage.fallback import FallbackStorage
 from django.core.cache import caches
 from django.db import connections
 from django.test.client import RequestFactory
 from django.test.utils import override_settings
-from edx_django_utils.cache import RequestCache
-from opaque_keys.edx.keys import CourseKey
+from edx_django_utils.cache import RequestCache  # lint-amnesty, pylint: disable=import-error
+from opaque_keys.edx.keys import CourseKey  # lint-amnesty, pylint: disable=import-error
 from pytz import UTC
-from xblock.core import XBlock
+from xblock.core import XBlock  # lint-amnesty, pylint: disable=import-error
 
 from lms.djangoapps.courseware.testutils import FieldOverrideTestMixin
 from lms.djangoapps.courseware.views.views import progress
@@ -33,13 +33,13 @@ from openedx.core.djangoapps.waffle_utils.testutils import WAFFLE_TABLES
 from openedx.features.content_type_gating.models import ContentTypeGatingConfig
 from common.djangoapps.student.models import CourseEnrollment
 from common.djangoapps.student.tests.factories import UserFactory
-from xmodule.modulestore.tests.django_utils import (
+from xmodule.modulestore.tests.django_utils import (  # lint-amnesty, pylint: disable=import-error, wrong-import-order
     TEST_DATA_MONGO_MODULESTORE,
     TEST_DATA_SPLIT_MODULESTORE,
     ModuleStoreTestCase
 )
-from xmodule.modulestore.tests.factories import CourseFactory, check_mongo_calls, check_sum_of_calls
-from xmodule.modulestore.tests.utils import ProceduralCourseTestMixin
+from xmodule.modulestore.tests.factories import CourseFactory, check_mongo_calls, check_sum_of_calls  # lint-amnesty, pylint: disable=import-error, wrong-import-order
+from xmodule.modulestore.tests.utils import ProceduralCourseTestMixin  # lint-amnesty, pylint: disable=import-error, wrong-import-order
 
 QUERY_COUNT_TABLE_BLACKLIST = WAFFLE_TABLES
 
@@ -58,7 +58,7 @@ class FieldOverridePerformanceTestCase(FieldOverrideTestMixin, ProceduralCourseT
     """
     __test__ = False
     # Tell Django to clean out all databases, not just default
-    databases = {alias for alias in connections}
+    databases = {alias for alias in connections}  # lint-amnesty, pylint: disable=unnecessary-comprehension
 
     # TEST_DATA must be overridden by subclasses
     TEST_DATA = None
@@ -67,7 +67,7 @@ class FieldOverridePerformanceTestCase(FieldOverrideTestMixin, ProceduralCourseT
         """
         Create a test client, course, and user.
         """
-        super(FieldOverridePerformanceTestCase, self).setUp()
+        super(FieldOverridePerformanceTestCase, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
 
         self.request_factory = RequestFactory()
         self.student = UserFactory.create()
@@ -229,7 +229,7 @@ class FieldOverridePerformanceTestCase(FieldOverrideTestMixin, ProceduralCourseT
             XBLOCK_FIELD_DATA_WRAPPERS=['lms.djangoapps.courseware.field_overrides:OverrideModulestoreFieldData.wrap'],
             MODULESTORE_FIELD_OVERRIDE_PROVIDERS=providers[overrides],
         ):
-            sql_queries, mongo_reads = self.TEST_DATA[
+            sql_queries, mongo_reads = self.TEST_DATA[  # lint-amnesty, pylint: disable=unsubscriptable-object
                 (overrides, course_width, enable_ccx, view_as_ccx)
             ]
             self.instrument_course_progress_render(

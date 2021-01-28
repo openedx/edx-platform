@@ -7,18 +7,18 @@ import logging
 
 import pytz
 import six
-from ccx_keys.locator import CCXLocator
-from django.contrib.auth.models import User
+from ccx_keys.locator import CCXLocator  # lint-amnesty, pylint: disable=import-error
+from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.db import transaction
 from django.http import Http404
-from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthentication
-from edx_rest_framework_extensions.auth.session.authentication import SessionAuthenticationAllowInactiveUser
-from opaque_keys import InvalidKeyError
-from opaque_keys.edx.keys import CourseKey, UsageKey
-from rest_framework import status
-from rest_framework.generics import GenericAPIView
-from rest_framework.permissions import IsAuthenticated
-from rest_framework.response import Response
+from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthentication  # lint-amnesty, pylint: disable=import-error
+from edx_rest_framework_extensions.auth.session.authentication import SessionAuthenticationAllowInactiveUser  # lint-amnesty, pylint: disable=import-error
+from opaque_keys import InvalidKeyError  # lint-amnesty, pylint: disable=import-error
+from opaque_keys.edx.keys import CourseKey, UsageKey  # lint-amnesty, pylint: disable=import-error
+from rest_framework import status  # lint-amnesty, pylint: disable=import-error
+from rest_framework.generics import GenericAPIView  # lint-amnesty, pylint: disable=import-error
+from rest_framework.permissions import IsAuthenticated  # lint-amnesty, pylint: disable=import-error
+from rest_framework.response import Response  # lint-amnesty, pylint: disable=import-error
 
 from lms.djangoapps.courseware import courses
 from lms.djangoapps.ccx.models import CcxFieldOverride, CustomCourseForEdX
@@ -29,7 +29,7 @@ from openedx.core.djangoapps.content.course_overviews.models import CourseOvervi
 from openedx.core.lib.api import authentication, permissions
 from common.djangoapps.student.models import CourseEnrollment
 from common.djangoapps.student.roles import CourseCcxCoachRole
-from xmodule.modulestore.django import SignalHandler
+from xmodule.modulestore.django import SignalHandler  # lint-amnesty, pylint: disable=import-error, wrong-import-order
 
 from .paginators import CCXAPIPagination
 from .serializers import CCXCourseSerializer

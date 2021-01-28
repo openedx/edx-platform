@@ -6,13 +6,13 @@ tests for the models
 import json
 from datetime import datetime, timedelta
 
-import ddt
+import ddt  # lint-amnesty, pylint: disable=import-error
 from pytz import utc
 
 from common.djangoapps.student.roles import CourseCcxCoachRole
 from common.djangoapps.student.tests.factories import AdminFactory
-from xmodule.modulestore.tests.django_utils import TEST_DATA_SPLIT_MODULESTORE, ModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory, check_mongo_calls
+from xmodule.modulestore.tests.django_utils import TEST_DATA_SPLIT_MODULESTORE, ModuleStoreTestCase  # lint-amnesty, pylint: disable=import-error, wrong-import-order
+from xmodule.modulestore.tests.factories import CourseFactory, check_mongo_calls  # lint-amnesty, pylint: disable=import-error, wrong-import-order
 
 from ..overrides import override_field_for_ccx
 from .factories import CcxFactory
@@ -27,7 +27,7 @@ class TestCCX(ModuleStoreTestCase):
 
     def setUp(self):
         """common setup for all tests"""
-        super(TestCCX, self).setUp()
+        super(TestCCX, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.course = CourseFactory.create()
         self.coach = AdminFactory.create()
         role = CourseCcxCoachRole(self.course.id)

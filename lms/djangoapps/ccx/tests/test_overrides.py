@@ -6,11 +6,11 @@ tests for overrides
 
 import datetime
 
-import mock
+import mock  # lint-amnesty, pylint: disable=import-error
 import pytz
-from ccx_keys.locator import CCXLocator
+from ccx_keys.locator import CCXLocator  # lint-amnesty, pylint: disable=import-error
 from django.test.utils import override_settings
-from edx_django_utils.cache import RequestCache
+from edx_django_utils.cache import RequestCache  # lint-amnesty, pylint: disable=import-error
 from six.moves import range
 
 from lms.djangoapps.courseware.courses import get_course_by_id
@@ -21,8 +21,8 @@ from lms.djangoapps.ccx.tests.utils import flatten, iter_blocks
 from lms.djangoapps.courseware.field_overrides import OverrideFieldData
 from lms.djangoapps.courseware.tests.test_field_overrides import inject_field_overrides
 from common.djangoapps.student.tests.factories import AdminFactory
-from xmodule.modulestore.tests.django_utils import TEST_DATA_SPLIT_MODULESTORE, SharedModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
+from xmodule.modulestore.tests.django_utils import TEST_DATA_SPLIT_MODULESTORE, SharedModuleStoreTestCase  # lint-amnesty, pylint: disable=import-error, wrong-import-order
+from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory  # lint-amnesty, pylint: disable=import-error, wrong-import-order
 
 
 @override_settings(
@@ -63,7 +63,7 @@ class TestFieldOverrides(FieldOverrideTestMixin, SharedModuleStoreTestCase):
         """
         Set up tests
         """
-        super(TestFieldOverrides, self).setUp()
+        super(TestFieldOverrides, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
 
         self.ccx = ccx = CustomCourseForEdX(
             course_id=self.course.id,

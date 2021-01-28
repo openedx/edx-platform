@@ -6,8 +6,8 @@ test utils
 import uuid
 from smtplib import SMTPException
 
-import mock
-from ccx_keys.locator import CCXLocator
+import mock  # lint-amnesty, pylint: disable=import-error
+from ccx_keys.locator import CCXLocator  # lint-amnesty, pylint: disable=import-error
 
 from lms.djangoapps.ccx.tests.factories import CcxFactory
 from lms.djangoapps.ccx.tests.utils import CcxTestCase
@@ -16,9 +16,9 @@ from lms.djangoapps.instructor.access import list_with_level
 from common.djangoapps.student.models import CourseEnrollment, CourseEnrollmentException
 from common.djangoapps.student.roles import CourseCcxCoachRole, CourseInstructorRole, CourseStaffRole
 from common.djangoapps.student.tests.factories import AdminFactory
-from xmodule.modulestore.django import modulestore
-from xmodule.modulestore.tests.django_utils import TEST_DATA_SPLIT_MODULESTORE, ModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory
+from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=import-error, wrong-import-order
+from xmodule.modulestore.tests.django_utils import TEST_DATA_SPLIT_MODULESTORE, ModuleStoreTestCase  # lint-amnesty, pylint: disable=import-error, wrong-import-order
+from xmodule.modulestore.tests.factories import CourseFactory  # lint-amnesty, pylint: disable=import-error, wrong-import-order
 
 
 class TestGetCCXFromCCXLocator(ModuleStoreTestCase):
@@ -27,7 +27,7 @@ class TestGetCCXFromCCXLocator(ModuleStoreTestCase):
 
     def setUp(self):
         """Set up a course, coach, ccx and user"""
-        super(TestGetCCXFromCCXLocator, self).setUp()
+        super(TestGetCCXFromCCXLocator, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.course = CourseFactory.create()
         coach = self.coach = AdminFactory.create()
         role = CourseCcxCoachRole(self.course.id)
@@ -60,7 +60,7 @@ class TestStaffOnCCX(CcxTestCase):
     MODULESTORE = TEST_DATA_SPLIT_MODULESTORE
 
     def setUp(self):
-        super(TestStaffOnCCX, self).setUp()
+        super(TestStaffOnCCX, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
 
         # Create instructor account
         self.client.login(username=self.coach.username, password="test")

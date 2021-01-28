@@ -8,13 +8,13 @@ from collections import deque
 from itertools import chain
 
 import pytz
-from ccx_keys.locator import CCXLocator
+from ccx_keys.locator import CCXLocator  # lint-amnesty, pylint: disable=import-error
 from six.moves import range, zip_longest
 
 from lms.djangoapps.ccx.models import CustomCourseForEdX
 from common.djangoapps.student.tests.factories import AdminFactory, UserFactory
-from xmodule.modulestore.tests.django_utils import TEST_DATA_SPLIT_MODULESTORE, SharedModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
+from xmodule.modulestore.tests.django_utils import TEST_DATA_SPLIT_MODULESTORE, SharedModuleStoreTestCase  # lint-amnesty, pylint: disable=import-error, wrong-import-order
+from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory  # lint-amnesty, pylint: disable=import-error, wrong-import-order
 
 
 class TestCCXModulestoreWrapper(SharedModuleStoreTestCase):
@@ -57,7 +57,7 @@ class TestCCXModulestoreWrapper(SharedModuleStoreTestCase):
         """
         Set up tests
         """
-        super(TestCCXModulestoreWrapper, self).setUp()
+        super(TestCCXModulestoreWrapper, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.ccx = ccx = CustomCourseForEdX(
             course_id=self.course.id,
             display_name='Test CCX',

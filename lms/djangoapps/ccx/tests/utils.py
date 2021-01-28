@@ -14,9 +14,9 @@ from lms.djangoapps.ccx.tests.factories import CcxFactory
 from openedx.core.djangoapps.ace_common.tests.mixins import EmailTemplateTagMixin
 from common.djangoapps.student.roles import CourseCcxCoachRole, CourseInstructorRole, CourseStaffRole
 from common.djangoapps.student.tests.factories import UserFactory
-from xmodule.modulestore.django import modulestore
-from xmodule.modulestore.tests.django_utils import TEST_DATA_SPLIT_MODULESTORE, SharedModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
+from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=import-error, wrong-import-order
+from xmodule.modulestore.tests.django_utils import TEST_DATA_SPLIT_MODULESTORE, SharedModuleStoreTestCase  # lint-amnesty, pylint: disable=import-error, wrong-import-order
+from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory  # lint-amnesty, pylint: disable=import-error, wrong-import-order
 
 
 class CcxTestCase(EmailTemplateTagMixin, SharedModuleStoreTestCase):
@@ -69,7 +69,7 @@ class CcxTestCase(EmailTemplateTagMixin, SharedModuleStoreTestCase):
         """
         Set up tests
         """
-        super(CcxTestCase, self).setUp()
+        super(CcxTestCase, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         # Create instructor account
         self.coach = UserFactory.create(password="test")
         # create an instance of modulestore

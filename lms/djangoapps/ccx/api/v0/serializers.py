@@ -2,8 +2,8 @@
 
 
 import six
-from ccx_keys.locator import CCXLocator
-from rest_framework import serializers
+from ccx_keys.locator import CCXLocator  # lint-amnesty, pylint: disable=import-error
+from rest_framework import serializers  # lint-amnesty, pylint: disable=import-error
 
 from lms.djangoapps.ccx.models import CustomCourseForEdX
 

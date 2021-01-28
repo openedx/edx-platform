@@ -3,8 +3,8 @@ Dummy factories for tests
 """
 
 
-from factory import Sequence, SubFactory
-from factory.django import DjangoModelFactory
+from factory import Sequence, SubFactory  # lint-amnesty, pylint: disable=import-error
+from factory.django import DjangoModelFactory  # lint-amnesty, pylint: disable=import-error
 
 from lms.djangoapps.ccx.models import CustomCourseForEdX
 from common.djangoapps.student.tests.factories import UserFactory

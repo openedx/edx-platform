@@ -8,15 +8,15 @@ import logging
 from datetime import datetime
 
 import six
-from ccx_keys.locator import CCXLocator
-from django.contrib.auth.models import User
+from ccx_keys.locator import CCXLocator  # lint-amnesty, pylint: disable=import-error
+from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.db import models
-from lazy import lazy
-from opaque_keys.edx.django.models import CourseKeyField, UsageKeyField
+from lazy import lazy  # lint-amnesty, pylint: disable=no-name-in-module
+from opaque_keys.edx.django.models import CourseKeyField, UsageKeyField  # lint-amnesty, pylint: disable=import-error
 from pytz import utc
 
-from xmodule.error_module import ErrorBlock
-from xmodule.modulestore.django import modulestore
+from xmodule.error_module import ErrorBlock  # lint-amnesty, pylint: disable=import-error
+from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=import-error
 
 log = logging.getLogger("edx.ccx")
 
@@ -77,14 +77,14 @@ class CustomCourseForEdX(models.Model):
 
     def has_started(self):
         """Return True if the CCX start date is in the past"""
-        return datetime.now(utc) > self.start
+        return datetime.now(utc) > self.start  # lint-amnesty, pylint: disable=comparison-with-callable
 
     def has_ended(self):
         """Return True if the CCX due date is set and is in the past"""
         if self.due is None:
             return False
 
-        return datetime.now(utc) > self.due
+        return datetime.now(utc) > self.due  # lint-amnesty, pylint: disable=comparison-with-callable
 
     @property
     def structure(self):

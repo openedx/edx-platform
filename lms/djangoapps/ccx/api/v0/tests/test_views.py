@@ -1,4 +1,4 @@
-"""
+"""  # lint-amnesty, pylint: disable=cyclic-import
 Tests for the CCX REST APIs.
 """
 
@@ -8,18 +8,18 @@ import math
 import string
 from datetime import timedelta
 
-import ddt
-import mock
+import ddt  # lint-amnesty, pylint: disable=import-error
+import mock  # lint-amnesty, pylint: disable=import-error
 import six
-from ccx_keys.locator import CCXLocator
+from ccx_keys.locator import CCXLocator  # lint-amnesty, pylint: disable=import-error
 from django.conf import settings
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.urls import Resolver404, resolve, reverse
 from django.utils.timezone import now
-from oauth2_provider import models as dot_models
-from opaque_keys.edx.keys import CourseKey
-from rest_framework import status
-from rest_framework.test import APITestCase
+from oauth2_provider import models as dot_models  # lint-amnesty, pylint: disable=import-error
+from opaque_keys.edx.keys import CourseKey  # lint-amnesty, pylint: disable=import-error
+from rest_framework import status  # lint-amnesty, pylint: disable=import-error
+from rest_framework.test import APITestCase  # lint-amnesty, pylint: disable=import-error
 from six.moves import range, zip
 
 from lms.djangoapps.ccx.api.v0 import views
@@ -49,7 +49,7 @@ class CcxRestApiTest(CcxTestCase, APITestCase):
         """
         Set up tests
         """
-        super(CcxRestApiTest, self).setUp()
+        super(CcxRestApiTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         # add some info about the course for easy access
         self.master_course_key = self.course.location.course_key
         self.master_course_key_str = six.text_type(self.master_course_key)
@@ -138,7 +138,7 @@ class CcxListTest(CcxRestApiTest):
         """
         Set up tests
         """
-        super(CcxListTest, self).setUp()
+        super(CcxListTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.list_url = reverse('ccx_api:v0:ccx:list')
         self.list_url_master_course = six.moves.urllib.parse.urljoin(
             self.list_url,
@@ -696,7 +696,7 @@ class CcxDetailTest(CcxRestApiTest):
         """
         Set up tests
         """
-        super(CcxDetailTest, self).setUp()
+        super(CcxDetailTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.make_coach()
         # create a ccx
         self.ccx = self.make_ccx(max_students_allowed=123)
@@ -709,7 +709,7 @@ class CcxDetailTest(CcxRestApiTest):
         Overridden method to replicate (part of) the actual
         creation of ccx courses
         """
-        ccx = super(CcxDetailTest, self).make_ccx(max_students_allowed=max_students_allowed)
+        ccx = super(CcxDetailTest, self).make_ccx(max_students_allowed=max_students_allowed)  # lint-amnesty, pylint: disable=super-with-arguments
         ccx.structure_json = json.dumps(self.master_course_chapters)
         ccx.save()
 
