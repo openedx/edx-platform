@@ -1592,7 +1592,7 @@ from lms.djangoapps.course_wiki import settings as course_wiki_settings  # pylin
 # .. toggle_name: WIKI_ACCOUNT_HANDLING
 # .. toggle_implementation: Django setting
 # .. toggle_default: True
-# .. toggle_description: This setting allows the access to Sign up, login and     logout views.
+# .. toggle_description: This setting allows the access to Sign up, login and logout views.
 # .. toggle_warnings: Turn to False only if you have your own account handling
 # .. toggle_use_cases: open_edx
 # .. toggle_creation_date: None
