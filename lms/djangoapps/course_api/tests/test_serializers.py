@@ -6,17 +6,17 @@ Test data created by CourseSerializer and CourseDetailSerializer
 from datetime import datetime
 from unittest import TestCase
 
-import ddt
-from rest_framework.request import Request
-from rest_framework.test import APIRequestFactory
-from xblock.core import XBlock
-from opaque_keys.edx.locator import CourseLocator
+import ddt  # lint-amnesty, pylint: disable=import-error
+from rest_framework.request import Request  # lint-amnesty, pylint: disable=import-error
+from rest_framework.test import APIRequestFactory  # lint-amnesty, pylint: disable=import-error
+from xblock.core import XBlock  # lint-amnesty, pylint: disable=import-error
+from opaque_keys.edx.locator import CourseLocator  # lint-amnesty, pylint: disable=import-error
 
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.models.course_details import CourseDetails
-from xmodule.course_module import DEFAULT_START_DATE
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-from xmodule.modulestore.tests.factories import check_mongo_calls
+from xmodule.course_module import DEFAULT_START_DATE  # lint-amnesty, pylint: disable=import-error, wrong-import-order
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase  # lint-amnesty, pylint: disable=import-error, wrong-import-order
+from xmodule.modulestore.tests.factories import check_mongo_calls  # lint-amnesty, pylint: disable=import-error, wrong-import-order
 
 from ..serializers import CourseDetailSerializer, CourseKeySerializer, CourseSerializer
 from .mixins import CourseApiFactoryMixin
@@ -34,7 +34,7 @@ class TestCourseSerializer(CourseApiFactoryMixin, ModuleStoreTestCase):
     ENABLED_SIGNALS = ['course_published']
 
     def setUp(self):
-        super(TestCourseSerializer, self).setUp()
+        super(TestCourseSerializer, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.staff_user = self.create_user('staff', is_staff=True)
         self.honor_user = self.create_user('honor', is_staff=False)
         self.request_factory = APIRequestFactory()
@@ -158,7 +158,7 @@ class TestCourseDetailSerializer(TestCourseSerializer):
     serializer_class = CourseDetailSerializer
 
     def setUp(self):
-        super(TestCourseDetailSerializer, self).setUp()
+        super(TestCourseDetailSerializer, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
 
         # update the expected_data to include the 'overview' data.
         about_descriptor = XBlock.load_class('about')
@@ -166,7 +166,7 @@ class TestCourseDetailSerializer(TestCourseSerializer):
         self.expected_data['overview'] = overview_template.get('data')
 
 
-class TestCourseKeySerializer(TestCase):
+class TestCourseKeySerializer(TestCase):  # lint-amnesty, pylint: disable=missing-class-docstring
 
     def test_course_key_serializer(self):
         course_key = CourseLocator(org='org', course='course', run='2020_Q3')

@@ -7,30 +7,30 @@ from datetime import datetime
 from hashlib import md5
 from unittest import TestCase
 
-import ddt
+import ddt  # lint-amnesty, pylint: disable=import-error
 import six
 from six.moves import range
 from django.core.exceptions import ImproperlyConfigured
 from django.test import RequestFactory
 from django.test.utils import override_settings
 from django.urls import reverse
-from edx_django_utils.cache import RequestCache
-from search.tests.test_course_discovery import DemoCourse
-from search.tests.tests import TEST_INDEX_NAME
-from search.tests.utils import SearcherMixin
-from waffle.testutils import override_switch
+from edx_django_utils.cache import RequestCache  # lint-amnesty, pylint: disable=import-error
+from search.tests.test_course_discovery import DemoCourse  # lint-amnesty, pylint: disable=import-error
+from search.tests.tests import TEST_INDEX_NAME  # lint-amnesty, pylint: disable=import-error
+from search.tests.utils import SearcherMixin  # lint-amnesty, pylint: disable=import-error
+from waffle.testutils import override_switch  # lint-amnesty, pylint: disable=import-error
 
 from common.djangoapps.course_modes.models import CourseMode
 from common.djangoapps.course_modes.tests.factories import CourseModeFactory
-from opaque_keys.edx.locator import LibraryLocator
+from opaque_keys.edx.locator import LibraryLocator  # lint-amnesty, pylint: disable=import-error, wrong-import-order
 from openedx.core.lib.api.view_utils import LazySequence
 from openedx.features.content_type_gating.models import ContentTypeGatingConfig
 from openedx.features.course_duration_limits.models import CourseDurationLimitConfig
 from common.djangoapps.student.auth import add_users
 from common.djangoapps.student.roles import CourseInstructorRole, CourseStaffRole
 from common.djangoapps.student.tests.factories import AdminFactory
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, SharedModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, SharedModuleStoreTestCase  # lint-amnesty, pylint: disable=import-error, wrong-import-order
+from xmodule.modulestore.tests.factories import CourseFactory  # lint-amnesty, pylint: disable=import-error, wrong-import-order
 
 from ..views import CourseDetailView, CourseListUserThrottle, LazyPageNumberPagination
 from .mixins import TEST_PASSWORD, CourseApiFactoryMixin
@@ -160,7 +160,7 @@ class CourseListViewTestCaseMultipleCourses(CourseApiTestViewMixin, ModuleStoreT
     ENABLED_SIGNALS = ['course_published']
 
     def setUp(self):
-        super(CourseListViewTestCaseMultipleCourses, self).setUp()
+        super(CourseListViewTestCaseMultipleCourses, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.course = self.create_course(mobile_available=False)
         self.url = reverse('course-list')
         self.staff_user = self.create_user(username='staff', is_staff=True)
@@ -298,7 +298,7 @@ class CourseListSearchViewTest(CourseApiTestViewMixin, ModuleStoreTestCase, Sear
     ENABLED_CACHES = ModuleStoreTestCase.ENABLED_CACHES + ['configuration']
 
     def setUp(self):
-        super(CourseListSearchViewTest, self).setUp()
+        super(CourseListSearchViewTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         DemoCourse.reset_count()
         self.searcher.destroy()
 
@@ -422,7 +422,7 @@ class CourseIdListViewTestCase(CourseApiTestViewMixin, ModuleStoreTestCase):
     ENABLED_SIGNALS = ['course_published']
 
     def setUp(self):
-        super(CourseIdListViewTestCase, self).setUp()
+        super(CourseIdListViewTestCase, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.course = self.create_course()
         self.url = reverse('course-id-list')
         self.staff_user = self.create_user(username='staff', is_staff=True)
@@ -535,7 +535,7 @@ class CourseIdListViewTestCase(CourseApiTestViewMixin, ModuleStoreTestCase):
         self.assertTrue(filtered_response.data['results'][0].startswith(self.course.org))
 
 
-class LazyPageNumberPaginationTestCase(TestCase):
+class LazyPageNumberPaginationTestCase(TestCase):  # lint-amnesty, pylint: disable=missing-class-docstring
 
     def test_lazy_page_number_pagination(self):
         number_sequence = range(20)

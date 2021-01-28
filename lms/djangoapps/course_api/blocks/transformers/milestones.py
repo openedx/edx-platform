@@ -7,8 +7,8 @@ import logging
 
 import six
 from django.conf import settings
-from edx_proctoring.api import get_attempt_status_summary
-from edx_proctoring.exceptions import ProctoredExamNotFoundException
+from edx_proctoring.api import get_attempt_status_summary  # lint-amnesty, pylint: disable=import-error
+from edx_proctoring.exceptions import ProctoredExamNotFoundException  # lint-amnesty, pylint: disable=import-error
 
 from openedx.core.djangoapps.content.block_structure.transformer import BlockStructureTransformer
 from common.djangoapps.student.models import EntranceExamConfiguration
@@ -21,7 +21,7 @@ class MilestonesAndSpecialExamsTransformer(BlockStructureTransformer):
     """
     A transformer that handles both milestones and special (timed) exams.
 
-    It includes or excludes all unfulfilled milestones from the student view based on the value of `include_gated_sections`.
+    It includes or excludes all unfulfilled milestones from the student view based on the value of `include_gated_sections`.  # lint-amnesty, pylint: disable=line-too-long
 
     An entrance exam is considered a milestone, and is not considered a "special exam".
 
@@ -155,13 +155,13 @@ class MilestonesAndSpecialExamsTransformer(BlockStructureTransformer):
 
         if user_can_skip_entrance_exam:
             # remove the entrance exam from required content
-            entrance_exam_id = block_structure.get_xblock_field(block_structure.root_block_usage_key, 'entrance_exam_id')
+            entrance_exam_id = block_structure.get_xblock_field(block_structure.root_block_usage_key, 'entrance_exam_id')  # lint-amnesty, pylint: disable=line-too-long
             required_content = [content for content in required_content if not content == entrance_exam_id]
 
         return required_content
 
     @staticmethod
-    def gated_by_required_content(block_key, block_structure, required_content):
+    def gated_by_required_content(block_key, block_structure, required_content):  # lint-amnesty, pylint: disable=unused-argument
         """
         Returns True if the current block associated with the block_key should be gated by the given required_content.
         Returns False otherwise.

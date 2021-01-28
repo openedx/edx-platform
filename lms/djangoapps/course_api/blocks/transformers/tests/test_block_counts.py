@@ -6,8 +6,8 @@ Tests for BlockCountsTransformer.
 
 
 from openedx.core.djangoapps.content.block_structure.factory import BlockStructureFactory
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-from xmodule.modulestore.tests.factories import SampleCourseFactory
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase  # lint-amnesty, pylint: disable=import-error, wrong-import-order
+from xmodule.modulestore.tests.factories import SampleCourseFactory  # lint-amnesty, pylint: disable=import-error, wrong-import-order
 
 from ..block_counts import BlockCountsTransformer
 
@@ -18,7 +18,7 @@ class TestBlockCountsTransformer(ModuleStoreTestCase):
     """
 
     def setUp(self):
-        super(TestBlockCountsTransformer, self).setUp()
+        super(TestBlockCountsTransformer, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.course_key = SampleCourseFactory.create().id
         self.course_usage_key = self.store.make_course_usage_key(self.course_key)
         self.block_structure = BlockStructureFactory.create_from_modulestore(self.course_usage_key, self.store)

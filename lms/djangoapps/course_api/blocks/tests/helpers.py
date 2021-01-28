@@ -3,7 +3,7 @@ Helper functions for unit tests
 """
 
 
-from opaque_keys.edx.keys import UsageKey
+from opaque_keys.edx.keys import UsageKey  # lint-amnesty, pylint: disable=import-error
 
 
 def deserialize_usage_key(usage_key_string, course_key):

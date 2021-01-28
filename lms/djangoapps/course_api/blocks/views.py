@@ -9,15 +9,15 @@ from django.db import transaction
 from django.http import Http404
 from django.utils.cache import patch_response_headers
 from django.utils.decorators import method_decorator
-from opaque_keys import InvalidKeyError
-from opaque_keys.edx.keys import CourseKey
-from rest_framework.generics import ListAPIView
-from rest_framework.response import Response
+from opaque_keys import InvalidKeyError  # lint-amnesty, pylint: disable=import-error
+from opaque_keys.edx.keys import CourseKey  # lint-amnesty, pylint: disable=import-error
+from rest_framework.generics import ListAPIView  # lint-amnesty, pylint: disable=import-error
+from rest_framework.response import Response  # lint-amnesty, pylint: disable=import-error
 from six import text_type
 
 from openedx.core.lib.api.view_utils import DeveloperErrorViewMixin, view_auth_classes
-from xmodule.modulestore.django import modulestore
-from xmodule.modulestore.exceptions import ItemNotFoundError
+from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=import-error, wrong-import-order
+from xmodule.modulestore.exceptions import ItemNotFoundError  # lint-amnesty, pylint: disable=import-error, wrong-import-order
 
 from .api import get_blocks
 from .forms import BlockListGetForm
@@ -238,7 +238,7 @@ class BlocksView(DeveloperErrorViewMixin, ListAPIView):
                 patch_response_headers(response)
             return response
         except ItemNotFoundError as exception:
-            raise Http404(u"Block not found: {}".format(text_type(exception)))
+            raise Http404(u"Block not found: {}".format(text_type(exception)))  # lint-amnesty, pylint: disable=raise-missing-from
 
 
 @view_auth_classes(is_authenticated=False)
@@ -301,5 +301,5 @@ class BlocksInCourseView(BlocksView):
             course_key = CourseKey.from_string(course_key_string)
             course_usage_key = modulestore().make_course_usage_key(course_key)
         except InvalidKeyError:
-            raise ValidationError(u"'{}' is not a valid course key.".format(six.text_type(course_key_string)))
-        return super(BlocksInCourseView, self).list(request, course_usage_key, hide_access_denials=hide_access_denials)
+            raise ValidationError(u"'{}' is not a valid course key.".format(six.text_type(course_key_string)))  # lint-amnesty, pylint: disable=raise-missing-from
+        return super(BlocksInCourseView, self).list(request, course_usage_key, hide_access_denials=hide_access_denials)  # lint-amnesty, pylint: disable=super-with-arguments

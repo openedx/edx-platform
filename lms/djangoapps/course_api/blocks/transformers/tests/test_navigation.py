@@ -6,7 +6,7 @@ Tests for BlockNavigationTransformer.
 
 from unittest import TestCase
 
-import ddt
+import ddt  # lint-amnesty, pylint: disable=import-error
 import six
 
 from lms.djangoapps.course_api.blocks.transformers.block_depth import BlockDepthTransformer
@@ -14,9 +14,9 @@ from lms.djangoapps.course_api.blocks.transformers.navigation import BlockNaviga
 from openedx.core.djangoapps.content.block_structure.block_structure import BlockStructureModulestoreData
 from openedx.core.djangoapps.content.block_structure.factory import BlockStructureFactory
 from openedx.core.djangoapps.content.block_structure.tests.helpers import ChildrenMapTestMixin
-from xmodule.modulestore import ModuleStoreEnum
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-from xmodule.modulestore.tests.factories import SampleCourseFactory
+from xmodule.modulestore import ModuleStoreEnum  # lint-amnesty, pylint: disable=import-error, wrong-import-order
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase  # lint-amnesty, pylint: disable=import-error, wrong-import-order
+from xmodule.modulestore.tests.factories import SampleCourseFactory  # lint-amnesty, pylint: disable=import-error, wrong-import-order
 
 
 @ddt.ddt

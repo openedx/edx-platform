@@ -4,7 +4,7 @@ Tests for Course API forms.
 
 from itertools import product
 
-import ddt
+import ddt  # lint-amnesty, pylint: disable=import-error
 import six
 from six.moves.urllib.parse import urlencode
 from django.contrib.auth.models import AnonymousUser
@@ -12,8 +12,8 @@ from django.http import QueryDict
 
 from openedx.core.djangoapps.util.test_forms import FormTestMixin
 from common.djangoapps.student.tests.factories import UserFactory
-from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory
+from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase  # lint-amnesty, pylint: disable=import-error, wrong-import-order
+from xmodule.modulestore.tests.factories import CourseFactory  # lint-amnesty, pylint: disable=import-error, wrong-import-order
 
 from ..forms import CourseDetailGetForm, CourseIdListGetForm, CourseListGetForm
 
@@ -48,7 +48,7 @@ class TestCourseListGetForm(FormTestMixin, UsernameTestMixin, SharedModuleStoreT
         cls.course = CourseFactory.create()
 
     def setUp(self):
-        super(TestCourseListGetForm, self).setUp()
+        super(TestCourseListGetForm, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
 
         self.student = UserFactory.create()
         self.set_up_data(self.student)
@@ -100,7 +100,7 @@ class TestCourseListGetForm(FormTestMixin, UsernameTestMixin, SharedModuleStoreT
         self.assert_valid(self.cleaned_data)
 
 
-class TestCourseIdListGetForm(FormTestMixin, UsernameTestMixin, SharedModuleStoreTestCase):
+class TestCourseIdListGetForm(FormTestMixin, UsernameTestMixin, SharedModuleStoreTestCase):  # lint-amnesty, pylint: disable=missing-class-docstring
     FORM_CLASS = CourseIdListGetForm
 
     @classmethod
@@ -110,7 +110,7 @@ class TestCourseIdListGetForm(FormTestMixin, UsernameTestMixin, SharedModuleStor
         cls.course = CourseFactory.create()
 
     def setUp(self):
-        super(TestCourseIdListGetForm, self).setUp()
+        super(TestCourseIdListGetForm, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
 
         self.student = UserFactory.create()
         self.set_up_data(self.student)
@@ -149,7 +149,7 @@ class TestCourseDetailGetForm(FormTestMixin, UsernameTestMixin, SharedModuleStor
         cls.course = CourseFactory.create()
 
     def setUp(self):
-        super(TestCourseDetailGetForm, self).setUp()
+        super(TestCourseDetailGetForm, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
 
         self.student = UserFactory.create()
         self.set_up_data(self.student)

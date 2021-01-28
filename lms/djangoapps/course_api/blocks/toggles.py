@@ -3,7 +3,7 @@ Toggles for Course API.
 """
 
 
-from edx_toggles.toggles import LegacyWaffleFlag, LegacyWaffleFlagNamespace
+from edx_toggles.toggles import LegacyWaffleFlag, LegacyWaffleFlagNamespace  # lint-amnesty, pylint: disable=import-error
 
 COURSE_BLOCKS_API_NAMESPACE = LegacyWaffleFlagNamespace(name=u'course_blocks_api')
 

@@ -7,7 +7,7 @@ Tests for BlockDepthTransformer.
 
 from unittest import TestCase
 
-import ddt
+import ddt  # lint-amnesty, pylint: disable=import-error
 
 from openedx.core.djangoapps.content.block_structure.block_structure import BlockStructureModulestoreData
 from openedx.core.djangoapps.content.block_structure.tests.helpers import ChildrenMapTestMixin

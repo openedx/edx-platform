@@ -3,18 +3,18 @@ Tests for Course Blocks forms
 """
 
 
-import ddt
+import ddt  # lint-amnesty, pylint: disable=import-error
 import six
 from six.moves.urllib.parse import urlencode
 from django.http import Http404, QueryDict
-from opaque_keys.edx.locator import CourseLocator
-from rest_framework.exceptions import PermissionDenied
+from opaque_keys.edx.locator import CourseLocator  # lint-amnesty, pylint: disable=import-error
+from rest_framework.exceptions import PermissionDenied  # lint-amnesty, pylint: disable=import-error
 
 from openedx.core.djangoapps.util.test_forms import FormTestMixin
 from common.djangoapps.student.models import CourseEnrollment
 from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
-from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory
+from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase  # lint-amnesty, pylint: disable=import-error, wrong-import-order
+from xmodule.modulestore.tests.factories import CourseFactory  # lint-amnesty, pylint: disable=import-error, wrong-import-order
 
 from ..forms import BlockListGetForm
 
@@ -34,7 +34,7 @@ class TestBlockListGetForm(FormTestMixin, SharedModuleStoreTestCase):
         cls.course = CourseFactory.create()
 
     def setUp(self):
-        super(TestBlockListGetForm, self).setUp()
+        super(TestBlockListGetForm, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
 
         self.student = UserFactory.create()
         self.student2 = UserFactory.create()

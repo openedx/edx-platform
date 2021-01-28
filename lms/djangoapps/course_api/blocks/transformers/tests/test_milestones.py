@@ -3,10 +3,10 @@ Tests for ProctoredExamTransformer.
 """
 
 
-import ddt
+import ddt  # lint-amnesty, pylint: disable=import-error
 import six
-from milestones.tests.utils import MilestonesTestCaseMixin
-from mock import Mock, patch
+from milestones.tests.utils import MilestonesTestCaseMixin  # lint-amnesty, pylint: disable=import-error, no-name-in-module
+from mock import Mock, patch  # lint-amnesty, pylint: disable=import-error
 
 from lms.djangoapps.gating import api as lms_gating_api
 from lms.djangoapps.course_blocks.api import get_course_blocks
@@ -30,7 +30,7 @@ class MilestonesTransformerTestCase(CourseStructureTestCase, MilestonesTestCaseM
         """
         Setup course structure and create user for split test transformer test.
         """
-        super(MilestonesTransformerTestCase, self).setUp()
+        super(MilestonesTransformerTestCase, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
 
         # Build course.
         self.course_hierarchy = self.get_course_hierarchy()
@@ -198,7 +198,7 @@ class MilestonesTransformerTestCase(CourseStructureTestCase, MilestonesTestCaseM
         self.course.enable_subsection_gating = True
         self.setup_gated_section(self.blocks['H'], self.blocks['A'])
         expected_blocks = (
-            'course', 'A', 'B', 'C', 'ProctoredExam', 'D', 'E', 'PracticeExam', 'F', 'G', 'TimedExam', 'J', 'K', 'H', 'I'
+            'course', 'A', 'B', 'C', 'ProctoredExam', 'D', 'E', 'PracticeExam', 'F', 'G', 'TimedExam', 'J', 'K', 'H', 'I'  # lint-amnesty, pylint: disable=line-too-long
         )
         self.get_blocks_and_check_against_expected(self.user, expected_blocks)
         # clear the request cache to simulate a new request

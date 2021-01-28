@@ -3,12 +3,12 @@ Tests for StudentViewTransformer.
 """
 
 
-import ddt
+import ddt  # lint-amnesty, pylint: disable=import-error
 
 # pylint: disable=protected-access
 from openedx.core.djangoapps.content.block_structure.factory import BlockStructureFactory
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-from xmodule.modulestore.tests.factories import ToyCourseFactory
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase  # lint-amnesty, pylint: disable=import-error, wrong-import-order
+from xmodule.modulestore.tests.factories import ToyCourseFactory  # lint-amnesty, pylint: disable=import-error, wrong-import-order
 
 from ..student_view import StudentViewTransformer
 
@@ -20,7 +20,7 @@ class TestStudentViewTransformer(ModuleStoreTestCase):
     """
 
     def setUp(self):
-        super(TestStudentViewTransformer, self).setUp()
+        super(TestStudentViewTransformer, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.course_key = ToyCourseFactory.create().id
         self.course_usage_key = self.store.make_course_usage_key(self.course_key)
         self.block_structure = BlockStructureFactory.create_from_modulestore(self.course_usage_key, self.store)

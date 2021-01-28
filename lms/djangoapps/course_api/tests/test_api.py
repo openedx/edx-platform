@@ -7,16 +7,16 @@ from hashlib import md5
 
 from django.contrib.auth.models import AnonymousUser
 from django.http import Http404
-import mock
-from opaque_keys.edx.keys import CourseKey
-from rest_framework.exceptions import PermissionDenied
-from rest_framework.request import Request
-from rest_framework.test import APIRequestFactory
+import mock  # lint-amnesty, pylint: disable=import-error
+from opaque_keys.edx.keys import CourseKey  # lint-amnesty, pylint: disable=import-error
+from rest_framework.exceptions import PermissionDenied  # lint-amnesty, pylint: disable=import-error
+from rest_framework.request import Request  # lint-amnesty, pylint: disable=import-error
+from rest_framework.test import APIRequestFactory  # lint-amnesty, pylint: disable=import-error
 
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
-from xmodule.modulestore.exceptions import ItemNotFoundError
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, SharedModuleStoreTestCase
-from xmodule.modulestore.tests.factories import ItemFactory, check_mongo_calls
+from xmodule.modulestore.exceptions import ItemNotFoundError  # lint-amnesty, pylint: disable=import-error, wrong-import-order
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, SharedModuleStoreTestCase  # lint-amnesty, pylint: disable=import-error, wrong-import-order
+from xmodule.modulestore.tests.factories import ItemFactory, check_mongo_calls  # lint-amnesty, pylint: disable=import-error, wrong-import-order
 
 from ..api import UNKNOWN_BLOCK_DISPLAY_NAME, course_detail, get_due_dates, list_courses
 from .mixins import CourseApiFactoryMixin
@@ -164,7 +164,7 @@ class TestGetCourseListMultipleCourses(CourseListTestMixin, ModuleStoreTestCase)
     ENABLED_SIGNALS = ['course_published']
 
     def setUp(self):
-        super(TestGetCourseListMultipleCourses, self).setUp()
+        super(TestGetCourseListMultipleCourses, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.course = self.create_course(mobile_available=False)
         self.staff_user = self.create_user("staff", is_staff=True)
         self.honor_user = self.create_user("honor", is_staff=False)

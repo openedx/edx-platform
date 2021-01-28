@@ -6,7 +6,7 @@ Common mixins for Course API Tests
 from datetime import datetime
 
 from common.djangoapps.student.tests.factories import UserFactory
-from xmodule.modulestore.tests.factories import ToyCourseFactory
+from xmodule.modulestore.tests.factories import ToyCourseFactory  # lint-amnesty, pylint: disable=import-error, wrong-import-order
 
 TEST_PASSWORD = u'edx'
 

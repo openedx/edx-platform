@@ -1,7 +1,7 @@
-""" Course API """
+""" Course API """  # lint-amnesty, pylint: disable=django-not-configured
 
 
-from edx_toggles.toggles import LegacyWaffleSwitch, LegacyWaffleSwitchNamespace
+from edx_toggles.toggles import LegacyWaffleSwitch, LegacyWaffleSwitchNamespace  # lint-amnesty, pylint: disable=import-error
 
 WAFFLE_SWITCH_NAMESPACE = LegacyWaffleSwitchNamespace(name='course_list_api_rate_limit')
 

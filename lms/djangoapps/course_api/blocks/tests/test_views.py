@@ -10,12 +10,12 @@ from urllib.parse import urlencode, urlunparse
 
 from django.conf import settings
 from django.urls import reverse
-from opaque_keys.edx.locator import CourseLocator
+from opaque_keys.edx.locator import CourseLocator  # lint-amnesty, pylint: disable=import-error
 
 from common.djangoapps.student.models import CourseEnrollment
 from common.djangoapps.student.tests.factories import AdminFactory, CourseEnrollmentFactory, UserFactory
-from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
-from xmodule.modulestore.tests.factories import ToyCourseFactory
+from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase  # lint-amnesty, pylint: disable=import-error, wrong-import-order
+from xmodule.modulestore.tests.factories import ToyCourseFactory  # lint-amnesty, pylint: disable=import-error, wrong-import-order
 
 from .helpers import deserialize_usage_key
 
@@ -47,7 +47,7 @@ class TestBlocksView(SharedModuleStoreTestCase):
         )
 
     def setUp(self):
-        super(TestBlocksView, self).setUp()
+        super(TestBlocksView, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
 
         # create and enroll user in the toy course
         self.user = UserFactory.create()
@@ -401,7 +401,7 @@ class TestBlocksInCourseView(TestBlocksView):  # pylint: disable=test-inherits-t
     """
 
     def setUp(self):
-        super(TestBlocksInCourseView, self).setUp()
+        super(TestBlocksInCourseView, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.url = reverse('blocks_in_course')
         self.query_params['course_id'] = str(self.course_key)
 

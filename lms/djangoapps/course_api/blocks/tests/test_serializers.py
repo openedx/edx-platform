@@ -4,15 +4,15 @@ Tests for Course Blocks serializers
 
 
 import six
-from mock import MagicMock
+from mock import MagicMock  # lint-amnesty, pylint: disable=import-error
 
 from lms.djangoapps.course_blocks.api import get_course_block_access_transformers, get_course_blocks
 from openedx.core.djangoapps.content.block_structure.transformers import BlockStructureTransformers
 from common.djangoapps.student.roles import CourseStaffRole
 from common.djangoapps.student.tests.factories import UserFactory
-from xmodule.modulestore import ModuleStoreEnum
-from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
-from xmodule.modulestore.tests.factories import ToyCourseFactory
+from xmodule.modulestore import ModuleStoreEnum  # lint-amnesty, pylint: disable=import-error, wrong-import-order
+from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase  # lint-amnesty, pylint: disable=import-error, wrong-import-order
+from xmodule.modulestore.tests.factories import ToyCourseFactory  # lint-amnesty, pylint: disable=import-error, wrong-import-order
 
 from ..serializers import BlockDictSerializer, BlockSerializer
 from ..transformers.blocks_api import BlocksAPITransformer
@@ -37,7 +37,7 @@ class TestBlockSerializerBase(SharedModuleStoreTestCase):
         cls.store.update_item(cls.html_block, ModuleStoreEnum.UserID.test)
 
     def setUp(self):
-        super(TestBlockSerializerBase, self).setUp()
+        super(TestBlockSerializerBase, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
 
         self.user = UserFactory.create()
 

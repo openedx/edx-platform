@@ -3,8 +3,8 @@ Block Completion Transformer
 """
 
 
-from completion.models import BlockCompletion
-from xblock.completable import XBlockCompletionMode as CompletionMode
+from completion.models import BlockCompletion  # lint-amnesty, pylint: disable=import-error
+from xblock.completable import XBlockCompletionMode as CompletionMode  # lint-amnesty, pylint: disable=import-error
 
 from openedx.core.djangoapps.content.block_structure.transformer import BlockStructureTransformer
 

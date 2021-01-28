@@ -5,17 +5,17 @@ Tests for Blocks api.py
 
 from itertools import product
 
-import ddt
+import ddt  # lint-amnesty, pylint: disable=import-error
 import six
 from django.test.client import RequestFactory
-from edx_toggles.toggles.testutils import override_waffle_switch
-from mock import patch
+from edx_toggles.toggles.testutils import override_waffle_switch  # lint-amnesty, pylint: disable=import-error
+from mock import patch  # lint-amnesty, pylint: disable=import-error
 
 from common.djangoapps.student.tests.factories import UserFactory
-from xmodule.modulestore import ModuleStoreEnum
-from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
-from xmodule.modulestore.tests.factories import SampleCourseFactory, check_mongo_calls
-from xmodule.modulestore.tests.sample_courses import BlockInfo
+from xmodule.modulestore import ModuleStoreEnum  # lint-amnesty, pylint: disable=import-error, wrong-import-order
+from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase  # lint-amnesty, pylint: disable=import-error, wrong-import-order
+from xmodule.modulestore.tests.factories import SampleCourseFactory, check_mongo_calls  # lint-amnesty, pylint: disable=import-error, wrong-import-order
+from xmodule.modulestore.tests.sample_courses import BlockInfo  # lint-amnesty, pylint: disable=import-error, wrong-import-order
 from openedx.core.djangoapps.content.block_structure.api import clear_course_from_cache
 from openedx.core.djangoapps.content.block_structure.config import STORAGE_BACKING_FOR_CACHE
 
@@ -39,7 +39,7 @@ class TestGetBlocks(SharedModuleStoreTestCase):
         cls.store.update_item(cls.html_block, ModuleStoreEnum.UserID.test)
 
     def setUp(self):
-        super(TestGetBlocks, self).setUp()
+        super(TestGetBlocks, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.user = UserFactory.create()
         self.request = RequestFactory().get("/dummy")
         self.request.user = self.user
@@ -139,7 +139,7 @@ class TestGetBlocksMobileHack(SharedModuleStoreTestCase):
             )
 
     def setUp(self):
-        super(TestGetBlocksMobileHack, self).setUp()
+        super(TestGetBlocksMobileHack, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.user = UserFactory.create()
         self.request = RequestFactory().get("/dummy")
         self.request.user = self.user
@@ -193,7 +193,7 @@ class TestGetBlocksQueryCountsBase(SharedModuleStoreTestCase):
     ENABLED_SIGNALS = ['course_published']
 
     def setUp(self):
-        super(TestGetBlocksQueryCountsBase, self).setUp()
+        super(TestGetBlocksQueryCountsBase, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
 
         self.user = UserFactory.create()
         self.request = RequestFactory().get("/dummy")
