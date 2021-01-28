@@ -36,7 +36,7 @@ REFERENCE_PARAMS = {
         # In the case where the validating server is really skewed
         # from the generating server.
         ({"validation_time_delta_s": 86400 * -5}, False),
-        # Different user tries to user your token.
+        # Different user tries to use your token.
         ({"validation_user_id": 54321}, False),
         # Access a different block.
         ({"validation_block_key_str": "some other block"}, False),
@@ -67,7 +67,7 @@ REFERENCE_PARAMS = {
             {
                 "generation_xblock_handler_token_keys": ["new token key"],
                 "validation_xblock_handler_token_keys": ["new token key"],
-                "validation_secret_key": "new secret key", # Ensure that we're not matching with secret key
+                "validation_secret_key": "new secret key",  # Ensure that we're not matching with secret key
             },
             True,
         ),
