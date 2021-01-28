@@ -1,17 +1,17 @@
-# Source: https://github.com/mayoff/python-markdown-mathjax
+# Source: https://github.com/mayoff/python-markdown-mathjax  # lint-amnesty, pylint: disable=missing-module-docstring
 
 
-import markdown
+import markdown  # lint-amnesty, pylint: disable=import-error
 
 try:
     # Markdown 2.1.0 changed from 2.0.3. We try importing the new version first,
     # but import the 2.0.3 version if it fails
     from markdown.util import etree, AtomicString
-except:
+except:  # lint-amnesty, pylint: disable=bare-except
     from markdown import etree, AtomicString
 
 
-class MathJaxPattern(markdown.inlinepatterns.Pattern):
+class MathJaxPattern(markdown.inlinepatterns.Pattern):  # lint-amnesty, pylint: disable=missing-class-docstring
 
     def __init__(self):
         markdown.inlinepatterns.Pattern.__init__(self, r'(?<!\\)(\$\$?)(.+?)\2')
@@ -23,7 +23,7 @@ class MathJaxPattern(markdown.inlinepatterns.Pattern):
 
 
 class MathJaxExtension(markdown.Extension):
-    def extendMarkdown(self, md, md_globals):
+    def extendMarkdown(self, md, md_globals):  # lint-amnesty, pylint: disable=unused-argument
         # Needs to come before escape matching because \ is pretty important in LaTeX
         md.inlinePatterns.add('mathjax', MathJaxPattern(), '<escape')
 

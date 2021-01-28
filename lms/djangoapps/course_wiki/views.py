@@ -9,9 +9,9 @@ import re
 from django.conf import settings
 from django.shortcuts import redirect
 from django.utils.translation import ugettext as _
-from opaque_keys.edx.keys import CourseKey
-from wiki.core.exceptions import NoRootURL
-from wiki.models import Article, URLPath
+from opaque_keys.edx.keys import CourseKey  # lint-amnesty, pylint: disable=import-error
+from wiki.core.exceptions import NoRootURL  # lint-amnesty, pylint: disable=import-error
+from wiki.models import Article, URLPath  # lint-amnesty, pylint: disable=import-error
 
 from lms.djangoapps.course_wiki.utils import course_wiki_slug
 from lms.djangoapps.courseware.courses import get_course_by_id
@@ -46,7 +46,7 @@ def course_wiki_redirect(request, course_id, wiki_path=""):
         log.exception("This course is improperly configured. The slug cannot be empty.")
         valid_slug = False
     if re.match(r'^[-\w\.]+$', course_slug) is None:
-        log.exception("This course is improperly configured. The slug can only contain letters, numbers, periods or hyphens.")
+        log.exception("This course is improperly configured. The slug can only contain letters, numbers, periods or hyphens.")  # lint-amnesty, pylint: disable=line-too-long
         valid_slug = False
 
     if not valid_slug:

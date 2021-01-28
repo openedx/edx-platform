@@ -6,13 +6,13 @@ Tests for wiki middleware.
 from unittest import skip
 
 from django.test.client import Client
-from wiki.models import URLPath
+from wiki.models import URLPath  # lint-amnesty, pylint: disable=import-error
 
 from lms.djangoapps.course_wiki.views import get_or_create_root
 from lms.djangoapps.courseware.tests.factories import InstructorFactory
 from openedx.core.djangoapps.theming.tests.test_util import with_comprehensive_theme
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase  # lint-amnesty, pylint: disable=import-error, wrong-import-order
+from xmodule.modulestore.tests.factories import CourseFactory  # lint-amnesty, pylint: disable=import-error, wrong-import-order
 
 
 class TestComprehensiveTheming(ModuleStoreTestCase):
@@ -20,7 +20,7 @@ class TestComprehensiveTheming(ModuleStoreTestCase):
 
     def setUp(self):
         """Test setup."""
-        super(TestComprehensiveTheming, self).setUp()
+        super(TestComprehensiveTheming, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
 
         self.wiki = get_or_create_root()
 

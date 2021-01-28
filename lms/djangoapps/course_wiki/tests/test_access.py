@@ -4,25 +4,25 @@ Tests for wiki permissions
 
 
 from django.contrib.auth.models import Group
-from wiki.models import URLPath
+from wiki.models import URLPath  # lint-amnesty, pylint: disable=import-error
 
 from lms.djangoapps.course_wiki import settings
 from lms.djangoapps.course_wiki.utils import course_wiki_slug, user_is_article_course_staff
 from lms.djangoapps.course_wiki.views import get_or_create_root
 from lms.djangoapps.courseware.tests.factories import InstructorFactory, StaffFactory
 from common.djangoapps.student.tests.factories import UserFactory
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase  # lint-amnesty, pylint: disable=import-error, wrong-import-order
+from xmodule.modulestore.tests.factories import CourseFactory  # lint-amnesty, pylint: disable=import-error, wrong-import-order
 
 
 class TestWikiAccessBase(ModuleStoreTestCase):
     """Base class for testing wiki access."""
     def setUp(self):
-        super(TestWikiAccessBase, self).setUp()
+        super(TestWikiAccessBase, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
 
         self.wiki = get_or_create_root()
 
-        self.course_math101 = CourseFactory.create(org='org', number='math101', display_name='Course', metadata={'use_unique_wiki_id': 'false'})
+        self.course_math101 = CourseFactory.create(org='org', number='math101', display_name='Course', metadata={'use_unique_wiki_id': 'false'})  # lint-amnesty, pylint: disable=line-too-long
         self.course_math101_staff = self.create_staff_for_course(self.course_math101)
 
         wiki_math101 = self.create_urlpath(self.wiki, course_wiki_slug(self.course_math101))
@@ -30,7 +30,7 @@ class TestWikiAccessBase(ModuleStoreTestCase):
         wiki_math101_page_page = self.create_urlpath(wiki_math101_page, 'Grandchild')
         self.wiki_math101_pages = [wiki_math101, wiki_math101_page, wiki_math101_page_page]
 
-        self.course_math101b = CourseFactory.create(org='org', number='math101b', display_name='Course', metadata={'use_unique_wiki_id': 'true'})
+        self.course_math101b = CourseFactory.create(org='org', number='math101b', display_name='Course', metadata={'use_unique_wiki_id': 'true'})  # lint-amnesty, pylint: disable=line-too-long
         self.course_math101b_staff = self.create_staff_for_course(self.course_math101b)
 
         wiki_math101b = self.create_urlpath(self.wiki, course_wiki_slug(self.course_math101b))
@@ -54,7 +54,7 @@ class TestWikiAccessBase(ModuleStoreTestCase):
 class TestWikiAccess(TestWikiAccessBase):
     """Test wiki access for course staff."""
     def setUp(self):
-        super(TestWikiAccess, self).setUp()
+        super(TestWikiAccess, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
 
         self.course_310b = CourseFactory.create(org='org', number='310b', display_name='Course')
         self.course_310b_staff = self.create_staff_for_course(self.course_310b)
@@ -114,7 +114,7 @@ class TestWikiAccess(TestWikiAccessBase):
 class TestWikiAccessForStudent(TestWikiAccessBase):
     """Test access for students."""
     def setUp(self):
-        super(TestWikiAccessForStudent, self).setUp()
+        super(TestWikiAccessForStudent, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
 
         self.student = UserFactory.create()
 
@@ -129,7 +129,7 @@ class TestWikiAccessForStudent(TestWikiAccessBase):
 class TestWikiAccessForNumericalCourseNumber(TestWikiAccessBase):
     """Test staff has access if course number is numerical and wiki slug has an underscore appended."""
     def setUp(self):
-        super(TestWikiAccessForNumericalCourseNumber, self).setUp()
+        super(TestWikiAccessForNumericalCourseNumber, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
 
         self.course_200 = CourseFactory.create(org='org', number='200', display_name='Course')
         self.course_200_staff = self.create_staff_for_course(self.course_200)
@@ -148,7 +148,7 @@ class TestWikiAccessForNumericalCourseNumber(TestWikiAccessBase):
 class TestWikiAccessForOldFormatCourseStaffGroups(TestWikiAccessBase):
     """Test staff has access if course group has old format."""
     def setUp(self):
-        super(TestWikiAccessForOldFormatCourseStaffGroups, self).setUp()
+        super(TestWikiAccessForOldFormatCourseStaffGroups, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
 
         self.course_math101c = CourseFactory.create(org='org', number='math101c', display_name='Course')
         Group.objects.get_or_create(name='instructor_math101c')

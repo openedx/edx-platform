@@ -8,15 +8,15 @@ from django.test.client import RequestFactory
 
 from lms.djangoapps.courseware.tabs import get_course_tab_list
 from common.djangoapps.student.tests.factories import AdminFactory, UserFactory
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase  # lint-amnesty, pylint: disable=import-error, wrong-import-order
+from xmodule.modulestore.tests.factories import CourseFactory  # lint-amnesty, pylint: disable=import-error, wrong-import-order
 
 
 class WikiTabTestCase(ModuleStoreTestCase):
     """Test cases for Wiki Tab."""
 
     def setUp(self):
-        super(WikiTabTestCase, self).setUp()
+        super(WikiTabTestCase, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.course = CourseFactory.create()
         self.instructor = AdminFactory.create()
         self.user = UserFactory()

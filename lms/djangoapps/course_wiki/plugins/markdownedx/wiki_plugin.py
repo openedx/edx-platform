@@ -1,8 +1,8 @@
-# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-  # lint-amnesty, pylint: disable=missing-module-docstring
 
 
-from wiki.core.plugins import registry as plugin_registry
-from wiki.core.plugins.base import BasePlugin
+from wiki.core.plugins import registry as plugin_registry  # lint-amnesty, pylint: disable=import-error
+from wiki.core.plugins.base import BasePlugin  # lint-amnesty, pylint: disable=import-error
 
 from lms.djangoapps.course_wiki.plugins.markdownedx import mdx_mathjax, mdx_video
 
