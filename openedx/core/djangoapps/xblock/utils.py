@@ -93,8 +93,9 @@ def _get_secure_token_for_xblock_handler(user_id, block_key_str, time_idx: int, 
     call mulitple times with different time_idx and hashing peppers.
     """
     TOKEN_PERIOD = 24 * 60 * 60 * 2  # These URLs are valid for 2-4 days
-    time_token = math.floor(time.time() / TOKEN_PERIOD) * TOKEN_PERIOD
-    time_token += TOKEN_PERIOD * time_idx
+    # time_token is the number of time periods since unix epoch
+    time_token = math.floor(time.time() / TOKEN_PERIOD)
+    time_token += time_idx
     check_string = str(time_token) + ':' + str(user_id) + ':' + block_key_str
     secure_key = hmac.new(hashing_key.encode('utf-8'), check_string.encode('utf-8'), hashlib.sha256).hexdigest()
     return secure_key[:20]
