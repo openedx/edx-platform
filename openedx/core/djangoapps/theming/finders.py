@@ -48,7 +48,7 @@ class ThemeFilesFinder(BaseFinder):
         themes = get_themes()
         for theme in themes:
             customer_theme_storage = self.storage_class(
-                os.path.join(theme.customer_specific_path, self.source_dir),
+                location=os.path.join(theme.customer_specific_path, self.source_dir),
                 prefix=theme.theme_dir_name,
             )
             theme_storage = self.storage_class(
