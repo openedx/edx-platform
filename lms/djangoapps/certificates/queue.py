@@ -6,16 +6,16 @@ import logging
 import random
 from uuid import uuid4
 
-import lxml.html
+import lxml.html  # lint-amnesty, pylint: disable=import-error
 import six
 from django.conf import settings
 from django.test.client import RequestFactory
 from django.urls import reverse
-from django.utils.encoding import python_2_unicode_compatible
-from lxml.etree import ParserError, XMLSyntaxError
-from requests.auth import HTTPBasicAuth
+from django.utils.encoding import python_2_unicode_compatible  # lint-amnesty, pylint: disable=no-name-in-module
+from lxml.etree import ParserError, XMLSyntaxError  # lint-amnesty, pylint: disable=import-error
+from requests.auth import HTTPBasicAuth  # lint-amnesty, pylint: disable=import-error
 
-from capa.xqueue_interface import XQueueInterface, make_hashkey, make_xheader
+from capa.xqueue_interface import XQueueInterface, make_hashkey, make_xheader  # lint-amnesty, pylint: disable=import-error
 from common.djangoapps.course_modes.models import CourseMode
 from lms.djangoapps.certificates.models import CertificateStatuses as status
 from lms.djangoapps.certificates.models import (
@@ -27,7 +27,7 @@ from lms.djangoapps.certificates.models import (
 from lms.djangoapps.grades.api import CourseGradeFactory
 from lms.djangoapps.verify_student.services import IDVerificationService
 from common.djangoapps.student.models import CourseEnrollment, UserProfile
-from xmodule.modulestore.django import modulestore
+from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=import-error, wrong-import-order
 
 LOGGER = logging.getLogger(__name__)
 
@@ -39,7 +39,7 @@ class XQueueAddToQueueError(Exception):
     def __init__(self, error_code, error_msg):
         self.error_code = error_code
         self.error_msg = error_msg
-        super(XQueueAddToQueueError, self).__init__(six.text_type(self))
+        super(XQueueAddToQueueError, self).__init__(six.text_type(self))  # lint-amnesty, pylint: disable=super-with-arguments
 
     def __str__(self):
         return (
@@ -332,7 +332,7 @@ class XQueueCertInterface(object):
             mode_is_verified,
             generate_pdf
         )
-        cert, created = GeneratedCertificate.objects.get_or_create(user=student, course_id=course_id)
+        cert, created = GeneratedCertificate.objects.get_or_create(user=student, course_id=course_id)  # lint-amnesty, pylint: disable=unused-variable
 
         cert.mode = cert_mode
         cert.user = student

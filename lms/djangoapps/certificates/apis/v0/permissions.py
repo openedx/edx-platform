@@ -3,8 +3,8 @@ This module provides a custom DRF Permission class for supporting the course cer
 to Admin users and users whom they belongs to.
 """
 
-from django.contrib.auth.models import User
-from rest_framework.permissions import BasePermission
+from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
+from rest_framework.permissions import BasePermission  # lint-amnesty, pylint: disable=import-error
 
 from openedx.core.djangoapps.user_api.models import UserPreference
 
@@ -14,7 +14,7 @@ class IsOwnerOrPublicCertificates(BasePermission):
     Method that will ensure whether the requesting user is staff or
     the user whom the certificate belongs to
     """
-    def has_permission(self, request, view):
+    def has_permission(self, request, view):  # lint-amnesty, pylint: disable=missing-function-docstring
         requested_profile_username = view.kwargs.get('username')
         # check whether requesting user is the owner of certs or not
         if request.user.username == requested_profile_username:

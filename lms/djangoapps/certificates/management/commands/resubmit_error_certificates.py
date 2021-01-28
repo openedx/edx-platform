@@ -22,13 +22,13 @@ import logging
 from textwrap import dedent
 
 from django.core.management.base import BaseCommand, CommandError
-from opaque_keys import InvalidKeyError
-from opaque_keys.edx.keys import CourseKey
+from opaque_keys import InvalidKeyError  # lint-amnesty, pylint: disable=import-error
+from opaque_keys.edx.keys import CourseKey  # lint-amnesty, pylint: disable=import-error
 from six import text_type
 
 from lms.djangoapps.certificates import api as certs_api
 from lms.djangoapps.certificates.models import CertificateStatuses, GeneratedCertificate
-from xmodule.modulestore.django import modulestore
+from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=import-error, wrong-import-order
 
 LOGGER = logging.getLogger(__name__)
 
@@ -65,7 +65,7 @@ class Command(BaseCommand):
             try:
                 only_course_keys.append(CourseKey.from_string(course_key_str))
             except InvalidKeyError:
-                raise CommandError(
+                raise CommandError(  # lint-amnesty, pylint: disable=raise-missing-from
                     u'"{course_key_str}" is not a valid course key.'.format(
                         course_key_str=course_key_str
                     )

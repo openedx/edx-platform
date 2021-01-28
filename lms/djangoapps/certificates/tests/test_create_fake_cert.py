@@ -5,7 +5,7 @@ import six
 from django.core.management import call_command
 from django.core.management.base import CommandError
 from django.test import TestCase
-from opaque_keys.edx.locator import CourseLocator
+from opaque_keys.edx.locator import CourseLocator  # lint-amnesty, pylint: disable=import-error
 from six import text_type
 
 from lms.djangoapps.certificates.models import GeneratedCertificate
@@ -18,7 +18,7 @@ class CreateFakeCertTest(TestCase):
     COURSE_KEY = CourseLocator(org='edX', course='DemoX', run='Demo_Course')
 
     def setUp(self):
-        super(CreateFakeCertTest, self).setUp()
+        super(CreateFakeCertTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.user = UserFactory.create(username=self.USERNAME)
 
     def test_create_fake_cert(self):

@@ -7,8 +7,8 @@ from lms.djangoapps.certificates.models import CertificateStatuses, GeneratedCer
 from lms.djangoapps.certificates.services import CertificateService
 from lms.djangoapps.certificates.tests.factories import GeneratedCertificateFactory
 from common.djangoapps.student.tests.factories import UserFactory
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase  # lint-amnesty, pylint: disable=import-error, wrong-import-order
+from xmodule.modulestore.tests.factories import CourseFactory  # lint-amnesty, pylint: disable=import-error, wrong-import-order
 
 
 class CertificateServiceTests(ModuleStoreTestCase):
@@ -17,7 +17,7 @@ class CertificateServiceTests(ModuleStoreTestCase):
     """
 
     def setUp(self):
-        super(CertificateServiceTests, self).setUp()
+        super(CertificateServiceTests, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.service = CertificateService()
         self.course = CourseFactory()
         self.user = UserFactory()

@@ -6,7 +6,7 @@ Certificate service
 import logging
 
 from django.core.exceptions import ObjectDoesNotExist
-from opaque_keys.edx.keys import CourseKey
+from opaque_keys.edx.keys import CourseKey  # lint-amnesty, pylint: disable=import-error
 
 from lms.djangoapps.certificates.models import GeneratedCertificate
 from lms.djangoapps.utils import _get_key

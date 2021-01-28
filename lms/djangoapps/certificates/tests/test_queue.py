@@ -6,23 +6,23 @@ import json
 from contextlib import contextmanager
 from datetime import datetime, timedelta
 
-import ddt
-import freezegun
+import ddt  # lint-amnesty, pylint: disable=import-error
+import freezegun  # lint-amnesty, pylint: disable=import-error
 import pytz
 import six
 from django.conf import settings
 from django.test import TestCase
 from django.test.utils import override_settings
-from mock import Mock, patch
-from opaque_keys.edx.locator import CourseLocator
-from testfixtures import LogCapture
+from mock import Mock, patch  # lint-amnesty, pylint: disable=import-error
+from opaque_keys.edx.locator import CourseLocator  # lint-amnesty, pylint: disable=import-error
+from testfixtures import LogCapture  # lint-amnesty, pylint: disable=import-error
 
 # It is really unfortunate that we are using the XQueue client
 # code from the capa library.  In the future, we should move this
 # into a shared library.  We import it here so we can mock it
 # and verify that items are being correctly added to the queue
 # in our `XQueueCertInterface` implementation.
-from capa.xqueue_interface import XQueueInterface
+from capa.xqueue_interface import XQueueInterface  # lint-amnesty, pylint: disable=import-error
 from common.djangoapps.course_modes.models import CourseMode
 from lms.djangoapps.certificates.models import (
     CertificateStatuses,
@@ -35,8 +35,8 @@ from lms.djangoapps.certificates.tests.factories import CertificateWhitelistFact
 from lms.djangoapps.grades.tests.utils import mock_passing_grade
 from lms.djangoapps.verify_student.tests.factories import SoftwareSecurePhotoVerificationFactory
 from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase  # lint-amnesty, pylint: disable=import-error, wrong-import-order
+from xmodule.modulestore.tests.factories import CourseFactory  # lint-amnesty, pylint: disable=import-error, wrong-import-order
 
 
 @ddt.ddt
@@ -45,7 +45,7 @@ class XQueueCertInterfaceAddCertificateTest(ModuleStoreTestCase):
     """Test the "add to queue" operation of the XQueue interface. """
 
     def setUp(self):
-        super(XQueueCertInterfaceAddCertificateTest, self).setUp()
+        super(XQueueCertInterfaceAddCertificateTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.user = UserFactory.create()
         self.course = CourseFactory.create()
         self.enrollment = CourseEnrollmentFactory(
@@ -378,7 +378,7 @@ class XQueueCertInterfaceExampleCertificateTest(TestCase):
     ERROR_MSG = 'Kaboom!'
 
     def setUp(self):
-        super(XQueueCertInterfaceExampleCertificateTest, self).setUp()
+        super(XQueueCertInterfaceExampleCertificateTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.xqueue = XQueueCertInterface()
 
     def test_add_example_cert(self):

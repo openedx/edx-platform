@@ -3,15 +3,15 @@
 
 import json
 
-import ddt
+import ddt  # lint-amnesty, pylint: disable=import-error
 from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import TestCase
 from django.test.utils import override_settings
-from mock import patch
-from opaque_keys.edx.locator import CourseKey, CourseLocator
-from path import Path as path
+from mock import patch  # lint-amnesty, pylint: disable=import-error
+from opaque_keys.edx.locator import CourseKey, CourseLocator  # lint-amnesty, pylint: disable=import-error
+from path import Path as path  # lint-amnesty, pylint: disable=import-error
 
 from lms.djangoapps.certificates.models import (
     CertificateGenerationHistory,
@@ -27,8 +27,8 @@ from lms.djangoapps.certificates.tests.factories import CertificateInvalidationF
 from lms.djangoapps.instructor_task.tests.factories import InstructorTaskFactory
 from openedx.core.djangoapps.content.course_overviews.tests.factories import CourseOverviewFactory
 from common.djangoapps.student.tests.factories import AdminFactory, UserFactory
-from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory
+from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase  # lint-amnesty, pylint: disable=import-error, wrong-import-order
+from xmodule.modulestore.tests.factories import CourseFactory  # lint-amnesty, pylint: disable=import-error, wrong-import-order
 
 FEATURES_INVALID_FILE_PATH = settings.FEATURES.copy()
 FEATURES_INVALID_FILE_PATH['CERTS_HTML_VIEW_CONFIG_PATH'] = 'invalid/path/to/config.json'
@@ -50,7 +50,7 @@ class ExampleCertificateTest(TestCase):
     ERROR_REASON = 'Kaboom!'
 
     def setUp(self):
-        super(ExampleCertificateTest, self).setUp()
+        super(ExampleCertificateTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.cert_set = ExampleCertificateSet.objects.create(course_key=self.COURSE_KEY)
         self.cert = ExampleCertificate.objects.create(
             example_cert_set=self.cert_set,
@@ -109,7 +109,7 @@ class CertificateHtmlViewConfigurationTest(TestCase):
     Test the CertificateHtmlViewConfiguration model.
     """
     def setUp(self):
-        super(CertificateHtmlViewConfigurationTest, self).setUp()
+        super(CertificateHtmlViewConfigurationTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.configuration_string = """{
             "default": {
                 "url": "http://www.edx.org",
@@ -204,7 +204,7 @@ class EligibleCertificateManagerTest(SharedModuleStoreTestCase):
     """
 
     def setUp(self):
-        super(EligibleCertificateManagerTest, self).setUp()
+        super(EligibleCertificateManagerTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.user = UserFactory()
 
         self.course1 = CourseOverviewFactory()
@@ -319,7 +319,7 @@ class CertificateInvalidationTest(SharedModuleStoreTestCase):
     """
 
     def setUp(self):
-        super(CertificateInvalidationTest, self).setUp()
+        super(CertificateInvalidationTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.course = CourseFactory()
         self.user = UserFactory()
         self.course_id = self.course.id

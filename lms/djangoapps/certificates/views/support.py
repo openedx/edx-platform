@@ -9,15 +9,15 @@ See lms/djangoapps/support for more details.
 import logging
 from functools import wraps
 
-import bleach
+import bleach  # lint-amnesty, pylint: disable=import-error
 import six
 from django.db import transaction
 from django.db.models import Q
 from django.http import HttpResponse, HttpResponseBadRequest, HttpResponseForbidden, HttpResponseServerError
 from django.utils.translation import ugettext as _
 from django.views.decorators.http import require_GET, require_POST
-from opaque_keys import InvalidKeyError
-from opaque_keys.edx.keys import CourseKey
+from opaque_keys import InvalidKeyError  # lint-amnesty, pylint: disable=import-error
+from opaque_keys.edx.keys import CourseKey  # lint-amnesty, pylint: disable=import-error
 
 from lms.djangoapps.certificates import api
 from lms.djangoapps.certificates.models import CertificateInvalidation
@@ -26,7 +26,7 @@ from lms.djangoapps.instructor_task.api import generate_certificates_for_student
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from common.djangoapps.student.models import CourseEnrollment, User
 from common.djangoapps.util.json_request import JsonResponse
-from xmodule.modulestore.django import modulestore
+from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=import-error, wrong-import-order
 
 log = logging.getLogger(__name__)
 

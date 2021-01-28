@@ -7,7 +7,7 @@ Signal handlers are connected here.
 
 from django.apps import AppConfig
 from django.conf import settings
-from edx_proctoring.runtime import set_runtime_service
+from edx_proctoring.runtime import set_runtime_service  # lint-amnesty, pylint: disable=import-error
 
 
 class CertificatesConfig(AppConfig):

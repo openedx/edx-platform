@@ -3,18 +3,18 @@
 
 import logging
 
-import edx_api_doc_tools as apidocs
+import edx_api_doc_tools as apidocs  # lint-amnesty, pylint: disable=import-error
 import six
 from django.contrib.auth import get_user_model
-from edx_rest_framework_extensions import permissions
-from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthentication
-from edx_rest_framework_extensions.auth.session.authentication import SessionAuthenticationAllowInactiveUser
-from opaque_keys import InvalidKeyError
-from opaque_keys.edx.keys import CourseKey
-from rest_condition import C
-from rest_framework.permissions import IsAuthenticated
-from rest_framework.response import Response
-from rest_framework.views import APIView
+from edx_rest_framework_extensions import permissions  # lint-amnesty, pylint: disable=import-error
+from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthentication  # lint-amnesty, pylint: disable=import-error
+from edx_rest_framework_extensions.auth.session.authentication import SessionAuthenticationAllowInactiveUser  # lint-amnesty, pylint: disable=import-error
+from opaque_keys import InvalidKeyError  # lint-amnesty, pylint: disable=import-error
+from opaque_keys.edx.keys import CourseKey  # lint-amnesty, pylint: disable=import-error
+from rest_condition import C  # lint-amnesty, pylint: disable=import-error
+from rest_framework.permissions import IsAuthenticated  # lint-amnesty, pylint: disable=import-error
+from rest_framework.response import Response  # lint-amnesty, pylint: disable=import-error
+from rest_framework.views import APIView  # lint-amnesty, pylint: disable=import-error
 
 from lms.djangoapps.certificates.api import get_certificate_for_user, get_certificates_for_user
 from lms.djangoapps.certificates.apis.v0.permissions import IsOwnerOrPublicCertificates

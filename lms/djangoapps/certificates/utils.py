@@ -7,9 +7,9 @@ import logging
 import six
 from django.conf import settings
 from django.urls import reverse
-from eventtracking import tracker
-from opaque_keys.edx.keys import CourseKey
-from xmodule.modulestore.django import modulestore
+from eventtracking import tracker  # lint-amnesty, pylint: disable=import-error
+from opaque_keys.edx.keys import CourseKey  # lint-amnesty, pylint: disable=import-error
+from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=import-error
 
 from lms.djangoapps.certificates.models import (
     GeneratedCertificate

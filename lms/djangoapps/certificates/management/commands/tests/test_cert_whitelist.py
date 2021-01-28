@@ -3,7 +3,7 @@ Extremely basic tests for the cert_whitelist command
 """
 
 
-import pytest
+import pytest  # lint-amnesty, pylint: disable=import-error
 from django.core.management import call_command
 
 

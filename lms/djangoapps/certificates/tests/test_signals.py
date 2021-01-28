@@ -4,14 +4,14 @@ and disabling for instructor-paced courses.
 """
 
 
-import ddt
-import mock
+import ddt  # lint-amnesty, pylint: disable=import-error
+import mock  # lint-amnesty, pylint: disable=import-error
 import six
-from edx_toggles.toggles import LegacyWaffleSwitch
-from edx_toggles.toggles.testutils import override_waffle_switch
+from edx_toggles.toggles import LegacyWaffleSwitch  # lint-amnesty, pylint: disable=import-error
+from edx_toggles.toggles.testutils import override_waffle_switch  # lint-amnesty, pylint: disable=import-error
 from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase  # lint-amnesty, pylint: disable=import-error, wrong-import-order
+from xmodule.modulestore.tests.factories import CourseFactory  # lint-amnesty, pylint: disable=import-error, wrong-import-order
 
 from lms.djangoapps.certificates import api as certs_api
 from lms.djangoapps.certificates.models import (
@@ -36,7 +36,7 @@ class SelfGeneratedCertsSignalTest(ModuleStoreTestCase):
     ENABLED_SIGNALS = ['course_published']
 
     def setUp(self):
-        super(SelfGeneratedCertsSignalTest, self).setUp()
+        super(SelfGeneratedCertsSignalTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         CertificateGenerationConfiguration.objects.create(enabled=True)
 
     def test_cert_generation_flag_on_pacing_toggle(self):
@@ -44,7 +44,7 @@ class SelfGeneratedCertsSignalTest(ModuleStoreTestCase):
         Verify that signal enables or disables self-generated certificates
         according to course-pacing.
         """
-        self.course = CourseFactory.create(self_paced=False, emit_signals=True)
+        self.course = CourseFactory.create(self_paced=False, emit_signals=True)  # lint-amnesty, pylint: disable=attribute-defined-outside-init
         self.assertFalse(certs_api.cert_generation_enabled(self.course.id))
 
         self.course.self_paced = True
@@ -62,7 +62,7 @@ class WhitelistGeneratedCertificatesTest(ModuleStoreTestCase):
     """
 
     def setUp(self):
-        super(WhitelistGeneratedCertificatesTest, self).setUp()
+        super(WhitelistGeneratedCertificatesTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.course = CourseFactory.create(self_paced=True)
         self.user = UserFactory.create()
         CourseEnrollmentFactory(
@@ -142,7 +142,7 @@ class PassingGradeCertsTest(ModuleStoreTestCase):
     """
 
     def setUp(self):
-        super(PassingGradeCertsTest, self).setUp()
+        super(PassingGradeCertsTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.course = CourseFactory.create(
             self_paced=True,
         )
@@ -235,7 +235,7 @@ class FailingGradeCertsTest(ModuleStoreTestCase):
     """
 
     def setUp(self):
-        super(FailingGradeCertsTest, self).setUp()
+        super(FailingGradeCertsTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.course = CourseFactory.create(
             self_paced=True,
         )
@@ -289,7 +289,7 @@ class LearnerTrackChangeCertsTest(ModuleStoreTestCase):
     """
 
     def setUp(self):
-        super(LearnerTrackChangeCertsTest, self).setUp()
+        super(LearnerTrackChangeCertsTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.course_one = CourseFactory.create(self_paced=True)
         self.user_one = UserFactory.create()
         self.enrollment_one = CourseEnrollmentFactory(
@@ -361,7 +361,7 @@ class CertificateGenerationTaskTest(ModuleStoreTestCase):
     """
 
     def setUp(self):
-        super(CertificateGenerationTaskTest, self).setUp()
+        super(CertificateGenerationTaskTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.course = CourseFactory.create()
 
     @ddt.data(
@@ -379,8 +379,8 @@ class CertificateGenerationTaskTest(ModuleStoreTestCase):
         Test that certificate generation task is fired for only modes that are
         allowed to generate certificates automatically.
         """
-        self.user = UserFactory.create()
-        self.enrollment = CourseEnrollmentFactory(
+        self.user = UserFactory.create()  # lint-amnesty, pylint: disable=attribute-defined-outside-init
+        self.enrollment = CourseEnrollmentFactory(  # lint-amnesty, pylint: disable=attribute-defined-outside-init
             user=self.user,
             course_id=self.course.id,
             is_active=True,

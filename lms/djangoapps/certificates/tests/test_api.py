@@ -5,19 +5,19 @@ import uuid
 from contextlib import contextmanager
 from datetime import datetime, timedelta
 
-import ddt
+import ddt  # lint-amnesty, pylint: disable=import-error
 import pytz
 import six
-from config_models.models import cache
+from config_models.models import cache  # lint-amnesty, pylint: disable=import-error
 from django.conf import settings
 from django.test import RequestFactory, TestCase
 from django.test.utils import override_settings
 from django.urls import reverse
 from django.utils import timezone
-from freezegun import freeze_time
-from mock import patch
-from opaque_keys.edx.keys import CourseKey
-from opaque_keys.edx.locator import CourseLocator
+from freezegun import freeze_time  # lint-amnesty, pylint: disable=import-error
+from mock import patch  # lint-amnesty, pylint: disable=import-error
+from opaque_keys.edx.keys import CourseKey  # lint-amnesty, pylint: disable=import-error
+from opaque_keys.edx.locator import CourseLocator  # lint-amnesty, pylint: disable=import-error
 
 from common.djangoapps.course_modes.models import CourseMode
 from common.djangoapps.course_modes.tests.factories import CourseModeFactory
@@ -37,8 +37,8 @@ from openedx.core.djangoapps.site_configuration.tests.test_util import with_site
 from common.djangoapps.student.models import CourseEnrollment
 from common.djangoapps.student.tests.factories import UserFactory
 from common.djangoapps.util.testing import EventTestMixin
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, SharedModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, SharedModuleStoreTestCase  # lint-amnesty, pylint: disable=import-error, wrong-import-order
+from xmodule.modulestore.tests.factories import CourseFactory  # lint-amnesty, pylint: disable=import-error, wrong-import-order
 
 FEATURES_WITH_CERTS_ENABLED = settings.FEATURES.copy()
 FEATURES_WITH_CERTS_ENABLED['CERTIFICATES_HTML_VIEW'] = True
@@ -89,7 +89,7 @@ class CertificateDownloadableStatusTests(WebCertificateTestMixin, ModuleStoreTes
     ENABLED_SIGNALS = ['course_published']
 
     def setUp(self):
-        super(CertificateDownloadableStatusTests, self).setUp()
+        super(CertificateDownloadableStatusTests, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
 
         self.student = UserFactory()
         self.student_no_cert = UserFactory()
@@ -629,7 +629,7 @@ class CertificateGenerationEnabledTest(EventTestMixin, TestCase):
     COURSE_KEY = CourseLocator(org='test', course='test', run='test')
 
     def setUp(self):  # pylint: disable=arguments-differ
-        super(CertificateGenerationEnabledTest, self).setUp('lms.djangoapps.certificates.api.tracker')
+        super(CertificateGenerationEnabledTest, self).setUp('lms.djangoapps.certificates.api.tracker')  # lint-amnesty, pylint: disable=super-with-arguments
 
         # Since model-based configuration is cached, we need
         # to clear the cache before each test.

@@ -7,18 +7,18 @@ import json
 from urllib.parse import urlencode
 from uuid import uuid4
 
-import ddt
+import ddt  # lint-amnesty, pylint: disable=import-error
 import six
 from django.conf import settings
 from django.test.client import Client, RequestFactory
 from django.test.utils import override_settings
 from django.urls import reverse
-from mock import patch
-from organizations import api as organizations_api
+from mock import patch  # lint-amnesty, pylint: disable=import-error
+from organizations import api as organizations_api  # lint-amnesty, pylint: disable=import-error
 
 from common.djangoapps.course_modes.models import CourseMode
-from edx_toggles.toggles import LegacyWaffleSwitch
-from edx_toggles.toggles.testutils import override_waffle_switch
+from edx_toggles.toggles import LegacyWaffleSwitch  # lint-amnesty, pylint: disable=import-error, wrong-import-order
+from edx_toggles.toggles.testutils import override_waffle_switch  # lint-amnesty, pylint: disable=import-error, wrong-import-order
 from lms.djangoapps.badges.events.course_complete import get_completion_badge
 from lms.djangoapps.badges.tests.factories import (
     BadgeAssertionFactory,
@@ -54,8 +54,8 @@ from common.djangoapps.student.roles import CourseStaffRole
 from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
 from common.djangoapps.track.tests import EventTrackingTestCase
 from common.djangoapps.util.date_utils import strftime_localized
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase  # lint-amnesty, pylint: disable=import-error, wrong-import-order
+from xmodule.modulestore.tests.factories import CourseFactory  # lint-amnesty, pylint: disable=import-error, wrong-import-order
 
 AUTO_CERTIFICATE_GENERATION_SWITCH = LegacyWaffleSwitch(waffle.waffle(), waffle.AUTO_CERTIFICATE_GENERATION)
 FEATURES_WITH_CERTS_ENABLED = settings.FEATURES.copy()
@@ -80,7 +80,7 @@ class CommonCertificatesTestCase(ModuleStoreTestCase):
     ENABLED_SIGNALS = ['course_published']
 
     def setUp(self):
-        super(CommonCertificatesTestCase, self).setUp()
+        super(CommonCertificatesTestCase, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.client = Client()
         self.course = CourseFactory.create(
             org='testorg',
@@ -249,7 +249,7 @@ class CertificatesViewsTests(CommonCertificatesTestCase, CacheIsolationTestCase)
     """
 
     def setUp(self):
-        super(CertificatesViewsTests, self).setUp()
+        super(CertificatesViewsTests, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.mock_course_run_details = {
             'content_language': 'en',
             'weeks_to_complete': '4',

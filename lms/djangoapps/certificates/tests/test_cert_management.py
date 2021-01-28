@@ -1,12 +1,12 @@
 """Tests for the resubmit_error_certificates management command. """
 
 
-import ddt
+import ddt  # lint-amnesty, pylint: disable=import-error
 from django.core.management import call_command
 from django.core.management.base import CommandError
 from django.test.utils import override_settings
-from mock import patch
-from opaque_keys.edx.locator import CourseLocator
+from mock import patch  # lint-amnesty, pylint: disable=import-error
+from opaque_keys.edx.locator import CourseLocator  # lint-amnesty, pylint: disable=import-error
 from six import text_type
 from six.moves import range
 
@@ -17,8 +17,8 @@ from common.djangoapps.course_modes.models import CourseMode
 from lms.djangoapps.certificates.models import CertificateStatuses, GeneratedCertificate
 from lms.djangoapps.grades.tests.utils import mock_passing_grade
 from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory, check_mongo_calls
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase  # lint-amnesty, pylint: disable=import-error, wrong-import-order
+from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory, check_mongo_calls  # lint-amnesty, pylint: disable=import-error, wrong-import-order
 
 
 class CertificateManagementTest(ModuleStoreTestCase):
@@ -29,7 +29,7 @@ class CertificateManagementTest(ModuleStoreTestCase):
     command = 'resubmit_error_certificates'
 
     def setUp(self):
-        super(CertificateManagementTest, self).setUp()
+        super(CertificateManagementTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.user = UserFactory.create()
         self.courses = [
             CourseFactory.create()
@@ -160,7 +160,7 @@ class RegenerateCertificatesTest(CertificateManagementTest):
         """
         We just need one course here.
         """
-        super(RegenerateCertificatesTest, self).setUp()
+        super(RegenerateCertificatesTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.course = self.courses[0]
 
     @ddt.data(True, False)
@@ -229,7 +229,7 @@ class UngenerateCertificatesTest(CertificateManagementTest):
         """
         We just need one course here.
         """
-        super(UngenerateCertificatesTest, self).setUp()
+        super(UngenerateCertificatesTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.course = self.courses[0]
 
     @override_settings(CERT_QUEUE='test-queue')

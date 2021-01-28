@@ -10,10 +10,10 @@ import logging
 
 import six
 from django.db.models import Q
-from eventtracking import tracker
-from opaque_keys.edx.django.models import CourseKeyField
-from organizations.api import get_course_organization_id
-from xmodule.modulestore.django import modulestore
+from eventtracking import tracker  # lint-amnesty, pylint: disable=import-error
+from opaque_keys.edx.django.models import CourseKeyField  # lint-amnesty, pylint: disable=import-error
+from organizations.api import get_course_organization_id  # lint-amnesty, pylint: disable=import-error
+from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=import-error
 
 from lms.djangoapps.branding import api as branding_api
 from lms.djangoapps.certificates.models import (
@@ -306,9 +306,9 @@ def certificate_downloadable_status(student, course_key):
 
     response_data = {
         'is_downloadable': False,
-        'is_generating': True if current_status['status'] in [CertificateStatuses.generating,
+        'is_generating': True if current_status['status'] in [CertificateStatuses.generating,  # lint-amnesty, pylint: disable=simplifiable-if-expression
                                                               CertificateStatuses.error] else False,
-        'is_unverified': True if current_status['status'] == CertificateStatuses.unverified else False,
+        'is_unverified': True if current_status['status'] == CertificateStatuses.unverified else False,  # lint-amnesty, pylint: disable=simplifiable-if-expression
         'download_url': None,
         'uuid': None,
     }
@@ -562,7 +562,7 @@ def get_language_specific_template(language, templates):
     return None
 
 
-def get_all_languages_or_default_template(templates):
+def get_all_languages_or_default_template(templates):  # lint-amnesty, pylint: disable=missing-function-docstring
     for template in templates:
         if template.language == '':
             return template

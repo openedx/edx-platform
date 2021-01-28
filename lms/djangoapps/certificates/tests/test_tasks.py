@@ -3,10 +3,10 @@ Test module for user certificate generation.
 """
 
 
-import ddt
+import ddt  # lint-amnesty, pylint: disable=import-error
 from django.test import TestCase
-from mock import call, patch
-from opaque_keys.edx.keys import CourseKey
+from mock import call, patch  # lint-amnesty, pylint: disable=import-error
+from opaque_keys.edx.keys import CourseKey  # lint-amnesty, pylint: disable=import-error
 
 from lms.djangoapps.certificates.tasks import generate_certificate
 from lms.djangoapps.verify_student.models import IDVerificationAttempt
@@ -14,7 +14,7 @@ from common.djangoapps.student.tests.factories import UserFactory
 
 
 @ddt.ddt
-class GenerateUserCertificateTest(TestCase):
+class GenerateUserCertificateTest(TestCase):  # lint-amnesty, pylint: disable=missing-class-docstring
 
     @patch('lms.djangoapps.certificates.tasks.generate_user_certificates')
     @patch('lms.djangoapps.certificates.tasks.User.objects.get')

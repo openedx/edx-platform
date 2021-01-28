@@ -3,17 +3,17 @@ Tests for the Certificate REST APIs.
 """
 
 
-from itertools import product
+from itertools import product  # lint-amnesty, pylint: disable=unused-import
 
-import ddt
+import ddt  # lint-amnesty, pylint: disable=import-error
 import six
 from django.conf import settings
 from django.urls import reverse
 from django.utils import timezone
-from freezegun import freeze_time
-from mock import patch
-from rest_framework import status
-from rest_framework.test import APITestCase
+from freezegun import freeze_time  # lint-amnesty, pylint: disable=import-error
+from mock import patch  # lint-amnesty, pylint: disable=import-error
+from rest_framework import status  # lint-amnesty, pylint: disable=import-error
+from rest_framework.test import APITestCase  # lint-amnesty, pylint: disable=import-error
 
 from common.djangoapps.course_modes.models import CourseMode
 from lms.djangoapps.certificates.apis.v0.views import CertificatesDetailView, CertificatesListView
@@ -23,8 +23,8 @@ from openedx.core.djangoapps.content.course_overviews.tests.factories import Cou
 from openedx.core.djangoapps.user_api.tests.factories import UserPreferenceFactory
 from openedx.core.djangoapps.user_authn.tests.utils import JWT_AUTH_TYPES, AuthAndScopesTestMixin, AuthType
 from common.djangoapps.student.tests.factories import UserFactory
-from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory
+from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase  # lint-amnesty, pylint: disable=import-error, wrong-import-order
+from xmodule.modulestore.tests.factories import CourseFactory  # lint-amnesty, pylint: disable=import-error, wrong-import-order
 
 
 @ddt.ddt
@@ -56,7 +56,7 @@ class CertificatesDetailRestApiTest(AuthAndScopesTestMixin, SharedModuleStoreTes
         freezer.start()
         self.addCleanup(freezer.stop)
 
-        super(CertificatesDetailRestApiTest, self).setUp()
+        super(CertificatesDetailRestApiTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
 
         self.cert = GeneratedCertificateFactory.create(
             user=self.student,
@@ -159,7 +159,7 @@ class CertificatesListRestApiTest(AuthAndScopesTestMixin, SharedModuleStoreTestC
         freezer.start()
         self.addCleanup(freezer.stop)
 
-        super(CertificatesListRestApiTest, self).setUp()
+        super(CertificatesListRestApiTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
 
         self.cert = GeneratedCertificateFactory.create(
             user=self.student,

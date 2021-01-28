@@ -5,14 +5,14 @@ import datetime
 import json
 from uuid import uuid4
 
-import ddt
+import ddt  # lint-amnesty, pylint: disable=import-error
 import six
 from django.conf import settings
 from django.core.cache import cache
 from django.test.client import Client
 from django.test.utils import override_settings
 from django.urls import reverse
-from opaque_keys.edx.locator import CourseLocator
+from opaque_keys.edx.locator import CourseLocator  # lint-amnesty, pylint: disable=import-error
 from six.moves import range
 
 from lms.djangoapps.certificates.models import (
@@ -25,8 +25,8 @@ from lms.djangoapps.certificates.utils import get_certificate_url
 from openedx.core.djangoapps.site_configuration.tests.test_util import with_site_configuration
 from openedx.core.djangolib.testing.utils import CacheIsolationTestCase
 from common.djangoapps.student.tests.factories import UserFactory
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase  # lint-amnesty, pylint: disable=import-error, wrong-import-order
+from xmodule.modulestore.tests.factories import CourseFactory  # lint-amnesty, pylint: disable=import-error, wrong-import-order
 
 FEATURES_WITH_CERTS_ENABLED = settings.FEATURES.copy()
 FEATURES_WITH_CERTS_ENABLED['CERTIFICATES_HTML_VIEW'] = True
@@ -54,7 +54,7 @@ class UpdateExampleCertificateViewTest(CacheIsolationTestCase):
     ENABLED_CACHES = ['default']
 
     def setUp(self):
-        super(UpdateExampleCertificateViewTest, self).setUp()
+        super(UpdateExampleCertificateViewTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.cert_set = ExampleCertificateSet.objects.create(course_key=self.COURSE_KEY)
         self.cert = ExampleCertificate.objects.create(
             example_cert_set=self.cert_set,
@@ -206,7 +206,7 @@ class CertificatesViewsSiteTests(ModuleStoreTestCase):
     }"""
 
     def setUp(self):
-        super(CertificatesViewsSiteTests, self).setUp()
+        super(CertificatesViewsSiteTests, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.client = Client()
         self.course = CourseFactory.create(
             org='testorg',
@@ -216,7 +216,7 @@ class CertificatesViewsSiteTests(ModuleStoreTestCase):
         )
         self.course.cert_html_view_enabled = True
         self.course.save()
-        self.store.update_item(self.course, self.user.id)
+        self.store.update_item(self.course, self.user.id)  # lint-amnesty, pylint: disable=access-member-before-definition
         self.course_id = self.course.location.course_key
         self.user = UserFactory.create(
             email='joe_user@edx.org',

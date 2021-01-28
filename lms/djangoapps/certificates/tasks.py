@@ -5,11 +5,11 @@ Module for generating certificate for a user
 
 from logging import getLogger
 
-from celery import shared_task
-from celery_utils.persist_on_failure import LoggedPersistOnFailureTask
-from django.contrib.auth.models import User
-from edx_django_utils.monitoring import set_code_owner_attribute
-from opaque_keys.edx.keys import CourseKey
+from celery import shared_task  # lint-amnesty, pylint: disable=import-error
+from celery_utils.persist_on_failure import LoggedPersistOnFailureTask  # lint-amnesty, pylint: disable=import-error
+from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
+from edx_django_utils.monitoring import set_code_owner_attribute  # lint-amnesty, pylint: disable=import-error
+from opaque_keys.edx.keys import CourseKey  # lint-amnesty, pylint: disable=import-error
 
 from lms.djangoapps.certificates.api import generate_user_certificates
 from lms.djangoapps.verify_student.services import IDVerificationService

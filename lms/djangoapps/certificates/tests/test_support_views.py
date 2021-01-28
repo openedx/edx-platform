@@ -6,14 +6,14 @@ Tests for certificate app views used by the support team.
 import json
 from uuid import uuid4
 
-import ddt
+import ddt  # lint-amnesty, pylint: disable=import-error
 import six
 
 from django.conf import settings
 from django.test.utils import override_settings
 from django.urls import reverse
-from mock import patch
-from opaque_keys.edx.keys import CourseKey
+from mock import patch  # lint-amnesty, pylint: disable=import-error
+from opaque_keys.edx.keys import CourseKey  # lint-amnesty, pylint: disable=import-error
 
 from lms.djangoapps.certificates import api
 from lms.djangoapps.certificates.models import CertificateInvalidation, CertificateStatuses, GeneratedCertificate
@@ -23,8 +23,8 @@ from openedx.core.djangoapps.content.course_overviews.tests.factories import Cou
 from common.djangoapps.student.models import CourseEnrollment
 from common.djangoapps.student.roles import GlobalStaff, SupportStaffRole
 from common.djangoapps.student.tests.factories import UserFactory
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase  # lint-amnesty, pylint: disable=import-error, wrong-import-order
+from xmodule.modulestore.tests.factories import CourseFactory  # lint-amnesty, pylint: disable=import-error, wrong-import-order
 
 FEATURES_WITH_CERTS_ENABLED = settings.FEATURES.copy()
 FEATURES_WITH_CERTS_ENABLED['CERTIFICATES_HTML_VIEW'] = True
@@ -57,7 +57,7 @@ class CertificateSupportTestCase(ModuleStoreTestCase):
         Create a support team member and a student with a certificate.
         Log in as the support team member.
         """
-        super(CertificateSupportTestCase, self).setUp()
+        super(CertificateSupportTestCase, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         CourseFactory(
             org=CertificateSupportTestCase.EXISTED_COURSE_KEY_1.org,
             course=CertificateSupportTestCase.EXISTED_COURSE_KEY_1.course,
@@ -105,7 +105,7 @@ class CertificateSearchTests(CertificateSupportTestCase):
         """
         Create a course
         """
-        super(CertificateSearchTests, self).setUp()
+        super(CertificateSearchTests, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.course = CourseFactory(
             org=self.CERT_COURSE_KEY.org,
             course=self.CERT_COURSE_KEY.course,
@@ -253,7 +253,7 @@ class CertificateRegenerateTests(CertificateSupportTestCase):
         """
         Create a course and enroll the student in the course.
         """
-        super(CertificateRegenerateTests, self).setUp()
+        super(CertificateRegenerateTests, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.course = CourseFactory(
             org=self.CERT_COURSE_KEY.org,
             course=self.CERT_COURSE_KEY.course,
@@ -456,7 +456,7 @@ class CertificateGenerateTests(CertificateSupportTestCase):
         """
         Create a course and enroll the student in the course.
         """
-        super(CertificateGenerateTests, self).setUp()
+        super(CertificateGenerateTests, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.course = CourseFactory(
             org=self.EXISTED_COURSE_KEY_2.org,
             course=self.EXISTED_COURSE_KEY_2.course,
