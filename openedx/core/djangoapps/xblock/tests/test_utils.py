@@ -1,11 +1,16 @@
-import pytest
+"""
+Tests for xblock utils.
+"""
 import datetime
+
+import pytest
 from django.test import override_settings
+from freezegun import freeze_time
+
 from openedx.core.djangoapps.xblock.utils import (
     get_secure_token_for_xblock_handler,
-    validate_secure_token_for_xblock_handler,
+    validate_secure_token_for_xblock_handler
 )
-from freezegun import freeze_time
 
 REFERENCE_PARAMS = {
     "generation_user_id": "12344",
@@ -42,6 +47,8 @@ REFERENCE_PARAMS = {
         ({"validation_block_key_str": "some other block"}, False),
         # If key is changed, token shouldn't be valid.
         ({"validation_secret_key": "new secret key"}, False),
+        # Test with token keys setting overrides that don't have anything to do with the secret key.
+        ({"generation_xblock_handler_token_keys": [], "validation_xblock_handler_token_keys": []}, True),
         # Test migration from secret key to keys list. The secret_key has changed
         # but the old secret key is in the token keys list.
         (
@@ -55,14 +62,14 @@ REFERENCE_PARAMS = {
         # token key at validation time.
         (
             {
-                "validation_xblock_handler_token_keys": ["baseline_key", ],
+                "generation_xblock_handler_token_keys": ["baseline_key", ],
                 "validation_xblock_handler_token_keys": ["now token key", "baseline_key", ],
                 "validation_secret_key": "new secret key",
             },
             True,
         ),
-        # Test with token keys setting overrides that don't have anything to do with the secret key.
-        ({"generation_xblock_handler_token_keys": [], "validation_xblock_handler_token_keys": []}, True),
+        # Test token generated with the new key is valid with the new key even if the secret key
+        # changes.
         (
             {
                 "generation_xblock_handler_token_keys": ["new token key"],
