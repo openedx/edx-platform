@@ -44,19 +44,30 @@ REFERENCE_PARAMS = {
         # Setting reference_time to 20 seconds after start of a 2 day time period(UTC)
         # Demonstrating maximum possible validity period is just below 4 days
         # This passes because validation time is just below the cutoff point
-        ({"reference_time": datetime.datetime(2021, 1, 27, 0, 0, 20, tzinfo=datetime.timezone.utc), "validation_time_delta_s":86400*4-21}, True),
+        ({"reference_time": datetime.datetime(2021, 1, 27, 0, 0, 20, tzinfo=datetime.timezone.utc),
+          "validation_time_delta_s": (86400 * 4) - 21},
+         True,
+        ),
         # Setting reference_time to 20 seconds after start of a 2 day time period(UTC)
         # Demonstrating maximum possible validity period is just below 4 days
         # This does not pass because validation time is just above the cutoff point
-        ({"reference_time": datetime.datetime(2021, 1, 27, 0, 0, 20, tzinfo=datetime.timezone.utc), "validation_time_delta_s":86400*4-19}, False),
+        ({"reference_time": datetime.datetime(2021, 1, 27, 0, 0, 20, tzinfo=datetime.timezone.utc),
+          "validation_time_delta_s": (86400 *  4) - 19},
+         False,
+        ),
         # Setting reference_time to 20 seconds before end of a 2 day time period(UTC)
         # Demonstrating minimum possible validity period is just above 2 days
         # This passes because validation time is just below the cutoff point
-        ({"reference_time": datetime.datetime(2021, 1, 28, 23, 59, 40, tzinfo=datetime.timezone.utc), "validation_time_delta_s":86400*2+19}, True),
+        ({"reference_time": datetime.datetime(2021, 1, 28, 23, 59, 40, tzinfo=datetime.timezone.utc),
+          "validation_time_delta_s": (86400 * 2) + 19},
+         True,
+        ),
          # Setting reference_time to 20 seconds before end of a 2 day time period(UTC)
         # Demonstrating minimum possible validity period is just above 2 days
         # This fails because validation time is just above the cutoff point
-        ({"reference_time": datetime.datetime(2021, 1, 28, 23, 59, 40, tzinfo=datetime.timezone.utc), "validation_time_delta_s":86400*2+21}, False),
+        ({"reference_time": datetime.datetime(2021, 1, 28, 23, 59, 40, tzinfo=datetime.timezone.utc),
+          "validation_time_delta_s": (86400 * 2) + 21},
+         False),
         # Different user tries to use your token.
         ({"validation_user_id": 54321}, False),
         # Access a different block.
