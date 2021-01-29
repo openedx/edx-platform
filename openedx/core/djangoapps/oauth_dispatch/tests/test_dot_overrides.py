@@ -42,17 +42,11 @@ class AuthenticateTestCase(TestCase):
 
     def test_authenticate_with_username(self):
         user = self.validator._authenticate(username='darkhelmet', password='12345')
-        self.assertEqual(
-            self.user,
-            user
-        )
+        assert self.user == user
 
     def test_authenticate_with_email(self):
         user = self.validator._authenticate(username='darkhelmet@spaceball_one.org', password='12345')
-        self.assertEqual(
-            self.user,
-            user
-        )
+        assert self.user == user
 
 
 @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
@@ -73,15 +67,15 @@ class CustomValidationTestCase(TestCase):
         self.request_factory = RequestFactory()
 
     def test_active_user_validates(self):
-        self.assertTrue(self.user.is_active)
+        assert self.user.is_active
         request = self.request_factory.get('/')
-        self.assertTrue(self.validator.validate_user('darkhelmet', '12345', client=None, request=request))
+        assert self.validator.validate_user('darkhelmet', '12345', client=None, request=request)
 
     def test_inactive_user_validates(self):
         self.user.is_active = False
         self.user.save()
         request = self.request_factory.get('/')
-        self.assertTrue(self.validator.validate_user('darkhelmet', '12345', client=None, request=request))
+        assert self.validator.validate_user('darkhelmet', '12345', client=None, request=request)
 
 
 @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
@@ -137,11 +131,11 @@ class CustomAuthorizationViewTestCase(TestCase):
 
     def test_no_reprompting(self):
         response = self._get_authorize(scope='profile')
-        self.assertEqual(response.status_code, 302)
-        self.assertTrue(response.url.startswith(DUMMY_REDIRECT_URL))
+        assert response.status_code == 302
+        assert response.url.startswith(DUMMY_REDIRECT_URL)
 
     def test_prompting_with_new_scope(self):
         response = self._get_authorize(scope='email')
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
         self.assertContains(response, settings.OAUTH2_PROVIDER['SCOPES']['email'])
         self.assertNotContains(response, settings.OAUTH2_PROVIDER['SCOPES']['profile'])

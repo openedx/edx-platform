@@ -20,7 +20,7 @@ class TestClientFactory(TestCase):
     def test_client_factory(self):
         actual_application = factories.ApplicationFactory(user=self.user)
         expected_application = Application.objects.get(user=self.user)
-        self.assertEqual(actual_application, expected_application)
+        assert actual_application == expected_application
 
 
 @unittest.skipUnless(settings.FEATURES.get("ENABLE_OAUTH2_PROVIDER"), "OAuth2 not enabled")
@@ -33,7 +33,7 @@ class TestAccessTokenFactory(TestCase):
         application = factories.ApplicationFactory(user=self.user)
         actual_access_token = factories.AccessTokenFactory(user=self.user, application=application)
         expected_access_token = AccessToken.objects.get(user=self.user)
-        self.assertEqual(actual_access_token, expected_access_token)
+        assert actual_access_token == expected_access_token
 
 
 @unittest.skipUnless(settings.FEATURES.get("ENABLE_OAUTH2_PROVIDER"), "OAuth2 not enabled")
@@ -49,4 +49,4 @@ class TestRefreshTokenFactory(TestCase):
             user=self.user, application=application, access_token=access_token
         )
         expected_refresh_token = RefreshToken.objects.get(user=self.user, access_token=access_token)
-        self.assertEqual(actual_refresh_token, expected_refresh_token)
+        assert actual_refresh_token == expected_refresh_token
