@@ -58,10 +58,13 @@ def get_secure_token_for_xblock_handler(user_id, block_key_str, time_idx=0):
     # breaks people because in this case a malicious actor can generate valid tokens to submit
     # answers as any user.
 
+    # XBLOCK_HANDLER_TOKEN_KEYS takes the form of a list of strings with at least 128 bits of entropy each.
+    # It is reasonable to use django.core.management.utils.get_random_secret_key to generate these keys.
+
     # Transitioning from SECRET_KEY to XBLOCK_HANDLER_TOKEN_KEYS:
     #
-    # 1. Add the current secret key and a new xblock handler specific secret key to the
-    # XBLOCK_HANDLER_TOKEN_KEYS list in your settings file or yaml. The order of the keys
+    # 1. Add a new xblock handler specific secret key and the current secret key to the
+    # XBLOCK_HANDLER_TOKEN_KEYS list in your LMS and Studio settings file or yaml. The order of the keys
     # matters and so the new xblock specific key should be at index 0.
     #   eg. XBLOCK_HANDLER_TOKEN_KEYS = ["<new xblock specific hashing key>", "<value of django secret key>"]
     # 2. Wait 4 days after the code has been deployed to production.
