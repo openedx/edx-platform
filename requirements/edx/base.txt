@@ -185,7 +185,7 @@ pymongo==3.10.1           # via -c requirements/edx/../constraints.txt, -r requi
 pynliner==0.8.0           # via -r requirements/edx/base.in
 pyparsing==2.4.7          # via chem, openedx-calc, packaging, pycontracts
 pysrt==1.1.2              # via -r requirements/edx/base.in, edxval
-python-dateutil==2.4.0    # via -c requirements/edx/../constraints.txt, -r requirements/edx/base.in, analytics-python, botocore, edx-ace, edx-drf-extensions, edx-enterprise, edx-event-routing-backends, edx-proctoring, icalendar, ora2, xblock
+python-dateutil==2.8.1    # via -r requirements/edx/base.in, analytics-python, botocore, edx-ace, edx-drf-extensions, edx-enterprise, edx-event-routing-backends, edx-proctoring, icalendar, ora2, xblock
 python-levenshtein==0.12.1  # via -r requirements/edx/base.in
 python-memcached==1.59    # via -r requirements/edx/paver.txt
 python-slugify==4.0.1     # via code-annotations

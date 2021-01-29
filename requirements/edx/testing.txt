@@ -133,7 +133,7 @@ execnet==1.8.0            # via pytest-xdist
 factory-boy==2.8.1        # via -c requirements/edx/../constraints.txt, -r requirements/edx/testing.in
 faker==5.8.0              # via factory-boy
 filelock==3.0.12          # via tox, virtualenv
-freezegun==0.3.12         # via -c requirements/edx/../constraints.txt, -r requirements/edx/testing.in
+freezegun==1.1.0          # via -r requirements/edx/testing.in
 fs-s3fs==0.1.8            # via -r requirements/edx/base.txt, django-pyfs
 fs==2.0.18                # via -r requirements/edx/base.txt, django-pyfs, fs-s3fs, xblock
 future==0.18.2            # via -r requirements/edx/base.txt, django-ses, edx-celeryutils, edx-enterprise, pycontracts, pyjwkest
@@ -227,7 +227,7 @@ pytest-metadata==1.8.0    # via -r requirements/edx/testing.in, pytest-json-repo
 pytest-randomly==3.5.0    # via -r requirements/edx/testing.in
 pytest-xdist[psutil]==2.2.0  # via -r requirements/edx/testing.in
 pytest==6.2.2             # via -r requirements/edx/testing.in, pytest-attrib, pytest-cov, pytest-django, pytest-forked, pytest-json-report, pytest-metadata, pytest-randomly, pytest-xdist
-python-dateutil==2.4.0    # via -c requirements/edx/../constraints.txt, -r requirements/edx/base.txt, analytics-python, botocore, edx-ace, edx-drf-extensions, edx-enterprise, edx-event-routing-backends, edx-proctoring, faker, freezegun, icalendar, ora2, xblock
+python-dateutil==2.8.1    # via -r requirements/edx/base.txt, analytics-python, botocore, edx-ace, edx-drf-extensions, edx-enterprise, edx-event-routing-backends, edx-proctoring, faker, freezegun, icalendar, ora2, xblock
 python-levenshtein==0.12.1  # via -r requirements/edx/base.txt
 python-memcached==1.59    # via -r requirements/edx/base.txt
 python-slugify==4.0.1     # via -r requirements/edx/base.txt, code-annotations, transifex-client
@@ -255,7 +255,7 @@ semantic-version==2.8.5   # via -r requirements/edx/base.txt, edx-drf-extensions
 shapely==1.7.1            # via -r requirements/edx/base.txt
 simplejson==3.17.2        # via -r requirements/edx/base.txt, sailthru-client, super-csv, xblock-utils
 singledispatch==3.4.0.3   # via -r requirements/edx/testing.in
-six==1.15.0               # via -r requirements/edx/base.txt, analytics-python, astroid, bleach, bok-choy, chem, codejail, crowdsourcehinter-xblock, cryptography, django-countries, django-simple-history, edx-ace, edx-bulk-grades, edx-ccx-keys, edx-django-release-util, edx-drf-extensions, edx-enterprise, edx-i18n-tools, edx-lint, edx-milestones, edx-opaque-keys, edx-rbac, event-tracking, freezegun, fs, fs-s3fs, html5lib, httpretty, isodate, libsass, mock, paver, pycontracts, pyjwkest, python-dateutil, python-memcached, python-swiftclient, singledispatch, social-auth-app-django, social-auth-core, stevedore, tox, transifex-client, virtualenv, xblock
+six==1.15.0               # via -r requirements/edx/base.txt, analytics-python, astroid, bleach, bok-choy, chem, codejail, crowdsourcehinter-xblock, cryptography, django-countries, django-simple-history, edx-ace, edx-bulk-grades, edx-ccx-keys, edx-django-release-util, edx-drf-extensions, edx-enterprise, edx-i18n-tools, edx-lint, edx-milestones, edx-opaque-keys, edx-rbac, event-tracking, fs, fs-s3fs, html5lib, httpretty, isodate, libsass, mock, paver, pycontracts, pyjwkest, python-dateutil, python-memcached, python-swiftclient, singledispatch, social-auth-app-django, social-auth-core, stevedore, tox, transifex-client, virtualenv, xblock
 slumber==0.7.1            # via -r requirements/edx/base.txt, edx-bulk-grades, edx-enterprise, edx-rest-api-client
 smmap==3.0.5              # via gitdb
 social-auth-app-django==4.0.0  # via -r requirements/edx/base.txt
