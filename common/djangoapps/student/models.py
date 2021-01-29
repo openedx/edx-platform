@@ -206,7 +206,9 @@ def anonymous_id_for_user(user, course_id, save=True):
         # Impact of exposure: If a person has the SECRET_KEY and a user's `id`
         # they can correlate the users anonymous user IDs across any courses they have participated in.
         #
-        # Rotation process: Can be rotated at will.
+        # Rotation process: Can be rotated at will. There is a small chance (on the order of 1%) that
+        # any given new user will be assigned multiple anonymous user IDs during the period in which
+        # servers are configured with a mix of old and new keys.
         hasher.update(settings.SECRET_KEY.encode('utf8'))
         hasher.update(text_type(user.id).encode('utf8'))
         if course_id:
