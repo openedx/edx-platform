@@ -2,7 +2,6 @@
 Tasks that generate a course certificate for a user
 """
 
-
 from logging import getLogger
 
 from celery import shared_task
@@ -16,6 +15,7 @@ from lms.djangoapps.certificates.generation import generate_allowlist_certificat
 from lms.djangoapps.verify_student.services import IDVerificationService
 
 logger = getLogger(__name__)
+CERTIFICATE_DELAY_SECONDS = 2
 
 
 @shared_task(base=LoggedPersistOnFailureTask, bind=True, default_retry_delay=30, max_retries=2)
