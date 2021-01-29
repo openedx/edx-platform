@@ -20,9 +20,13 @@ from openedx.core.lib.celery.task_utils import emulate_http_request
 log = logging.getLogger('edx.celery.task')
 
 
-@shared_task(bind=True, name='student.send_activation_email')
+# This is a task function that is in the process of being renamed.
+# In order to avoid dropping tasks during deployment, we have to register it twice,
+# once under each name. This allows us to cut from one name to the other safely.
+# Once we have fully switched to the new name, we can go back to registering
+# this task function with a simple decorator.
 @set_code_owner_attribute
-def send_activation_email(self, msg_string, from_address=None):
+def _send_activation_email(self, msg_string, from_address=None):
     """
     Sending an activation email to the user.
     """
@@ -67,3 +71,15 @@ def send_activation_email(self, msg_string, from_address=None):
             dest_addr,
         )
         raise Exception
+
+
+_OLD_TASK_NAME = 'student.send_activation_email'
+_NEW_TASK_NAME = 'common.djangoapps.student.tasks.send_activation_email'
+
+
+# Register task under both its old and new names,
+# but expose only the old-named task for invocation.
+# -> Next step: Once we deploy and teach Celery workers the new name,
+#    set `send_activation_email` to the new-named task.
+send_activation_email = shared_task(bind=True, name=_OLD_TASK_NAME)(_send_activation_email)
+shared_task(bind=True, name=_NEW_TASK_NAME)(_send_activation_email)
