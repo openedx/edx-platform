@@ -1077,7 +1077,7 @@ ENABLE_MULTICOURSE = False  # set to False to disable multicourse display (see l
 # .. toggle_name: WIKI_ENABLED
 # .. toggle_implementation: Django setting
 # .. toggle_default: True
-# .. toggle_description: This setting allows us to have a collaborative tool to contribute or 
+# .. toggle_description: This setting allows us to have a collaborative tool to contribute or
 #   modify content of course related materials.
 # .. toggle_warnings: In some cases you may want to disable it in deployment envs.
 # .. toggle_use_cases: open_edx
@@ -1626,7 +1626,7 @@ WIKI_CAN_ASSIGN = course_wiki_settings.CAN_ASSIGN
 # .. toggle_name: WIKI_USE_BOOTSTRAP_SELECT_WIDGET
 # .. toggle_implementation: Django setting
 # .. toggle_default: True
-# .. toggle_description: This setting allows you to use bootstrap and you can switch off 
+# .. toggle_description: This setting allows you to use bootstrap and you can switch off
 #   if you are not using it.
 # .. toggle_warnings: None
 # .. toggle_use_cases: open_edx
