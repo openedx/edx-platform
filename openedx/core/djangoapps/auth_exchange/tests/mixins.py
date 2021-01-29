@@ -60,7 +60,7 @@ class DOTAdapterMixin(object):
         request.session = {}
         view = DOTAccessTokenExchangeView.as_view()
         response = view(request, backend='facebook')
-        self.assertEqual(response.status_code, 400)
+        assert response.status_code == 400
 
     @expectedFailure
     def test_single_access_token(self):
