@@ -14,6 +14,7 @@ from django.utils.translation import ugettext as _
 from six import text_type
 from xblock.fields import Scope
 
+from cms.djangoapps.contentstore import toggles
 from openedx.core.lib.teams_config import TeamsetType
 from openedx.features.course_experience import COURSE_ENABLE_UNENROLLED_ACCESS_FLAG
 from common.djangoapps.student.roles import GlobalStaff
@@ -84,7 +85,7 @@ class CourseMetadata(object):
         exclude_list = list(cls.FIELDS_EXCLUDE_LIST)
 
         # Do not show giturl if feature is not enabled.
-        if not settings.FEATURES.get('ENABLE_EXPORT_GIT'):
+        if not toggles.EXPORT_GIT.is_enabled():
             exclude_list.append('giturl')
 
         # Do not show edxnotes if the feature is disabled.

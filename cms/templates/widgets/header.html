@@ -6,6 +6,7 @@
   from django.conf import settings
   from django.urls import reverse
   from django.utils.translation import ugettext as _
+  from cms.djangoapps.contentstore import toggles
   from openedx.core.djangoapps.lang_pref.api import header_language_selector_is_enabled, released_languages
 %>
 <div class="wrapper-header wrapper" id="view-top">
@@ -137,7 +138,7 @@
                   <li class="nav-item nav-course-tools-export">
                     <a href="${export_url}">${_("Export")}</a>
                   </li>
-                  % if settings.FEATURES.get('ENABLE_EXPORT_GIT') and context_course.giturl:
+                  % if toggles.EXPORT_GIT.is_enabled() and context_course.giturl:
                   <li class="nav-item nav-course-tools-export-git">
                     <a href="${reverse('export_git', kwargs=dict(course_key_string=six.text_type(course_key)))}">${_("Export to Git")}</a>
                   </li>
