@@ -338,6 +338,15 @@ FEATURES = {
     'ENABLE_READING_FROM_MULTIPLE_HISTORY_TABLES': True,
     'SHOW_FOOTER_LANGUAGE_SELECTOR': False,
     'ENABLE_ENROLLMENT_RESET': False,
+
+    # .. toggle_name: FEATURES['DISABLE_MOBILE_COURSE_AVAILABLE']
+    # .. toggle_implementation: DjangoSetting
+    # .. toggle_default: False
+    # .. toggle_description: Set to True to remove Mobile Course Available UI Flag from Studio's Advanced Settings
+    #   page else Mobile Course Available UI Flag will be available on Studio side.
+    # .. toggle_use_cases: open_edx
+    # .. toggle_creation_date: 2020-02-14
+    # .. toggle_tickets: https://github.com/edx/edx-platform/pull/23073
     'DISABLE_MOBILE_COURSE_AVAILABLE': False,
 
     # .. toggle_name: FEATURES['ENABLE_CHANGE_USER_PASSWORD_ADMIN']
