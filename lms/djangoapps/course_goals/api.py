@@ -85,7 +85,7 @@ def get_course_goal_options():
     Returns the valid options for goal keys, mapped to their translated
     strings, as defined by theCourseGoal model.
     """
-    return {goal_key: goal_text for goal_key, goal_text in models.GOAL_KEY_CHOICES}
+    return {goal_key: goal_text for goal_key, goal_text in models.GOAL_KEY_CHOICES}  # lint-amnesty, pylint: disable=unnecessary-comprehension
 
 
 def get_course_goal_text(goal_key):

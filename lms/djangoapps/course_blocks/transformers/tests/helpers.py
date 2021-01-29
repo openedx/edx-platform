@@ -26,7 +26,7 @@ class TransformerRegistryTestMixin(object):
     TRANSFORMER_CLASS_TO_TEST as a registered transformer.
     """
     def setUp(self):
-        super(TransformerRegistryTestMixin, self).setUp()
+        super(TransformerRegistryTestMixin, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.patcher = patch(
             'openedx.core.djangoapps.content.block_structure.transformer_registry.'
             'TransformerRegistry.get_registered_transformers'
@@ -48,7 +48,7 @@ class CourseStructureTestCase(TransformerRegistryTestMixin, ModuleStoreTestCase)
         """
         Create users.
         """
-        super(CourseStructureTestCase, self).setUp()
+        super(CourseStructureTestCase, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         # Set up users.
         self.password = 'test'
         self.user = UserFactory.create(password=self.password)
@@ -199,7 +199,7 @@ class CourseStructureTestCase(TransformerRegistryTestMixin, ModuleStoreTestCase)
         Returns: set[UsageKey]
         """
         xblocks = (blocks[ref] for ref in refs)
-        return set([xblock.location for xblock in xblocks])
+        return set([xblock.location for xblock in xblocks])  # lint-amnesty, pylint: disable=consider-using-set-comprehension
 
 
 class BlockParentsMapTestCase(TransformerRegistryTestMixin, ModuleStoreTestCase):
@@ -221,7 +221,7 @@ class BlockParentsMapTestCase(TransformerRegistryTestMixin, ModuleStoreTestCase)
     parents_map = [[], [0], [0], [1], [1], [2], [2, 4]]
 
     def setUp(self):
-        super(BlockParentsMapTestCase, self).setUp()
+        super(BlockParentsMapTestCase, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
 
         # create the course
         self.course = CourseFactory.create()
