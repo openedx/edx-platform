@@ -225,9 +225,7 @@ FEATURES = {
     # Turn off Video Upload Pipeline through Studio, by default
     'ENABLE_VIDEO_UPLOAD_PIPELINE': False,
 
-    # let students save and manage their annotations
-    # for consistency in user-experience, keep the value of this feature flag
-    # in sync with the one in lms/envs/common.py
+    # See LMS annotations for details.
     'ENABLE_EDXNOTES': False,
 
     # Toggle to enable coordination with the Publisher tool (keep in sync with lms/envs/common.py)
