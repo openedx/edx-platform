@@ -1077,7 +1077,7 @@ ENABLE_MULTICOURSE = False  # set to False to disable multicourse display (see l
 # .. toggle_name: WIKI_ENABLED
 # .. toggle_implementation: Django setting
 # .. toggle_default: True
-# .. toggle_description: This setting allows us to have a collaborative tool to contribute or 
+# .. toggle_description: This setting allows us to have a collaborative tool to contribute or
 #   modify content of course related materials.
 # .. toggle_warnings: In some cases you may want to disable it in deployment envs.
 # .. toggle_use_cases: open_edx
