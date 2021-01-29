@@ -22,9 +22,8 @@ from django.utils.translation import ugettext_lazy as _
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
 
-from edx_toggles.toggles import LegacyWaffleSwitch
+from edx_toggles.toggles import WaffleSwitch
 from openedx.core.lib.courses import clean_course_id
-from common.djangoapps.student import STUDENT_WAFFLE_NAMESPACE
 from common.djangoapps.student.models import (
     AccountRecovery,
     AccountRecoveryConfiguration,
@@ -50,10 +49,16 @@ from xmodule.modulestore.django import modulestore
 
 User = get_user_model()  # pylint:disable=invalid-name
 
-# This switch exists because the CourseEnrollment admin views make DB queries that impact performance.
-# In a large enough deployment of Open edX, this is enough to cause a site outage.
-# See https://openedx.atlassian.net/browse/OPS-2943
-COURSE_ENROLLMENT_ADMIN_SWITCH = LegacyWaffleSwitch(STUDENT_WAFFLE_NAMESPACE, 'courseenrollment_admin', __name__)
+# .. toggle_name: student.courseenrollment_admin
+# .. toggle_implementation: WaffleSwitch
+# .. toggle_default: False
+# .. toggle_description: This toggle will enable the rendering of the admin view of the CourseEnrollment model.
+# .. toggle_warnings: Enabling this toggle may cause performance problems. The CourseEnrollment admin view
+#     makes DB queries that could cause site outages for a large enough Open edX installation.
+# .. toggle_use_cases: opt_in, open_edx
+# .. toggle_creation_date: 2018-08-01
+# .. toggle_tickets: https://github.com/edx/edx-platform/pull/18638
+COURSE_ENROLLMENT_ADMIN_SWITCH = WaffleSwitch('student.courseenrollment_admin', __name__)
 
 
 class _Check(object):
