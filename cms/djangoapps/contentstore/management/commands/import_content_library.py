@@ -44,13 +44,13 @@ class Command(BaseCommand):
         username = options['owner_username']
 
         data_root = Path(settings.GITHUB_REPO_ROOT)
-        subdir = base64.urlsafe_b64encode(os.path.basename(archive_path))
+        subdir = base64.urlsafe_b64encode(os.path.basename(archive_path).encode('utf-8')).decode('utf-8')
         course_dir = data_root / subdir
 
         # Extract library archive
         tar_file = tarfile.open(archive_path)
         try:
-            safetar_extractall(tar_file, course_dir.encode('utf-8'))
+            safetar_extractall(tar_file, course_dir)
         except SuspiciousOperation as exc:
             raise CommandError(u'\n=== Course import {0}: Unsafe tar file - {1}\n'.format(archive_path, exc.args[0]))
         finally:
