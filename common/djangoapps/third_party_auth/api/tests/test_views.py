@@ -131,9 +131,9 @@ class UserViewsMixin(object):
         url = self.make_url({'username': target_user})
 
         response = self.client.get(url)
-        self.assertEqual(response.status_code, expect_result)
+        assert response.status_code == expect_result
         if expect_result == 200:
-            self.assertIn("active", response.data)
+            assert 'active' in response.data
             six.assertCountEqual(self, response.data["active"], self.expected_active(target_user))
 
     @ddt.data(
@@ -147,9 +147,9 @@ class UserViewsMixin(object):
     def test_list_connected_providers_with_api_key(self, api_key, target_user, expect_result):
         url = self.make_url({'username': target_user})
         response = self.client.get(url, HTTP_X_EDX_API_KEY=api_key)
-        self.assertEqual(response.status_code, expect_result)
+        assert response.status_code == expect_result
         if expect_result == 200:
-            self.assertIn("active", response.data)
+            assert 'active' in response.data
             six.assertCountEqual(self, response.data["active"], self.expected_active(target_user))
 
     @ddt.data(
@@ -164,18 +164,18 @@ class UserViewsMixin(object):
         with override_settings(ALLOW_UNPRIVILEGED_SSO_PROVIDER_QUERY=allow_unprivileged):
             url = self.make_url({'username': ALICE_USERNAME})
             response = self.client.get(url)
-        self.assertEqual(response.status_code, expect)
+        assert response.status_code == expect
         if response.status_code == 200:
-            self.assertGreater(len(response.data['active']), 0)
+            assert len(response.data['active']) > 0
             for provider_data in response.data['active']:
-                self.assertEqual(include_remote_id, 'remote_id' in provider_data)
+                assert include_remote_id == ('remote_id' in provider_data)
 
     def test_allow_query_by_email(self):
         self.client.login(username=ALICE_USERNAME, password=PASSWORD)
         url = self.make_url({'email': '{}@example.com'.format(ALICE_USERNAME)})
         response = self.client.get(url)
-        self.assertEqual(response.status_code, 200)
-        self.assertGreater(len(response.data['active']), 0)
+        assert response.status_code == 200
+        assert len(response.data['active']) > 0
 
     def test_throttling(self):
         # Default throttle is 10/min.  Make 11 requests to verify
@@ -185,9 +185,9 @@ class UserViewsMixin(object):
         with override_settings(ALLOW_UNPRIVILEGED_SSO_PROVIDER_QUERY=True):
             for _ in range(10):
                 response = self.client.get(url)
-                self.assertEqual(response.status_code, 200)
+                assert response.status_code == 200
             response = self.client.get(url)
-            self.assertEqual(response.status_code, 200)
+            assert response.status_code == 200
 
 
 @override_settings(EDX_API_KEY=VALID_API_KEY)
@@ -332,7 +332,7 @@ class UserMappingViewAPITests(TpaAPITestCase):
 
         url = reverse('third_party_auth_user_mapping_api', kwargs={'provider_id': PROVIDER_ID_TESTSHIB})
         response = self.client.get(url, HTTP_X_EDX_API_KEY=VALID_API_KEY)
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
         self._verify_response(response, 200, get_mapping_data_by_usernames(LINKED_USERS))
 
     @ddt.data(
@@ -346,14 +346,14 @@ class UserMappingViewAPITests(TpaAPITestCase):
             with patch.object(JwtRestrictedApplication, 'has_permission', return_value=has_permission):
                 with patch.object(JwtHasScope, 'has_permission', return_value=has_permission):
                     response = self.client.get(url)
-                    self.assertEqual(response.status_code, expect)
+                    assert response.status_code == expect
 
     def _verify_response(self, response, expect_code, expect_result):
         """ verify the items in data_list exists in response and data_results matches results in response """
-        self.assertEqual(response.status_code, expect_code)
+        assert response.status_code == expect_code
         if expect_code == 200:
             for item in ['results', 'count', 'num_pages']:
-                self.assertIn(item, response.data)
+                assert item in response.data
             six.assertCountEqual(self, response.data['results'], expect_result)
 
 
@@ -375,15 +375,11 @@ class TestThirdPartyAuthUserStatusView(ThirdPartyAuthTestMixin, APITestCase):
         """
         self.client.login(username=self.user.username, password=PASSWORD)
         response = self.client.get(self.url, content_type="application/json")
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(
-            response.data,
-            [{
-                "accepts_logins": True,
-                "name": "Google",
-                "disconnect_url": "/auth/disconnect/google-oauth2/?",
-                "connect_url": "/auth/login/google-oauth2/?auth_entry=account_settings&next=%2Faccount%2Fsettings",
-                "connected": False,
-                "id": "oa2-google-oauth2"
-            }]
-        )
+        assert response.status_code == 200
+        assert (response.data ==
+               [{
+                   'accepts_logins': True, 'name': 'Google',
+                   'disconnect_url': '/auth/disconnect/google-oauth2/?',
+                   'connect_url': '/auth/login/google-oauth2/?auth_entry=account_settings&next=%2Faccount%2Fsettings',
+                   'connected': False, 'id': 'oa2-google-oauth2'
+               }])

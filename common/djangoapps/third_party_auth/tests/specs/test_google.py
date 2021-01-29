@@ -51,7 +51,7 @@ class GoogleOauth2IntegrationTest(base.Oauth2IntegrationTest):  # lint-amnesty, 
 
     def assert_redirect_to_provider_looks_correct(self, response):
         super(GoogleOauth2IntegrationTest, self).assert_redirect_to_provider_looks_correct(response)  # lint-amnesty, pylint: disable=super-with-arguments
-        self.assertIn('google.com', response['Location'])
+        assert 'google.com' in response['Location']
 
     def test_custom_form(self):
         """
@@ -75,27 +75,20 @@ class GoogleOauth2IntegrationTest(base.Oauth2IntegrationTest):  # lint-amnesty, 
         with patch.object(self.provider.backend_class, 'auth_complete', fake_auth_complete):
             response = self.client.get(complete_url)
         # This should redirect to the custom login/register form:
-        self.assertEqual(response.status_code, 302)
-        self.assertEqual(response['Location'], '/auth/custom_auth_entry')
+        assert response.status_code == 302
+        assert response['Location'] == '/auth/custom_auth_entry'
 
         response = self.client.get(response['Location'])
-        self.assertEqual(response.status_code, 200)
-        self.assertIn('action="/misc/my-custom-registration-form" method="post"', response.content.decode('utf-8'))
+        assert response.status_code == 200
+        assert 'action="/misc/my-custom-registration-form" method="post"' in response.content.decode('utf-8')
         data_decoded = base64.b64decode(response.context['data']).decode('utf-8')
         data_parsed = json.loads(data_decoded)
         # The user's details get passed to the custom page as a base64 encoded query parameter:
-        self.assertEqual(data_parsed, {
-            'auth_entry': 'custom1',
-            'backend_name': 'google-oauth2',
-            'provider_id': 'oa2-google-oauth2',
-            'user_details': {
-                'username': 'user',
-                'email': 'user@email.com',
-                'fullname': 'name_value',
-                'first_name': 'given_name_value',
-                'last_name': 'family_name_value',
-            },
-        })
+        assert data_parsed == {'auth_entry': 'custom1', 'backend_name': 'google-oauth2',
+                               'provider_id': 'oa2-google-oauth2',
+                               'user_details': {'username': 'user', 'email': 'user@email.com',
+                                                'fullname': 'name_value', 'first_name': 'given_name_value',
+                                                'last_name': 'family_name_value'}}
         # Check the hash that is used to confirm the user's data in the GET parameter is correct
         secret_key = settings.THIRD_PARTY_AUTH_CUSTOM_AUTH_FORMS['custom1']['secret_key']
         hmac_expected = hmac.new(
@@ -103,18 +96,18 @@ class GoogleOauth2IntegrationTest(base.Oauth2IntegrationTest):  # lint-amnesty, 
             msg=data_decoded.encode('utf-8'),
             digestmod=hashlib.sha256
         ).digest()
-        self.assertEqual(base64.b64decode(response.context['hmac']), hmac_expected)
+        assert base64.b64decode(response.context['hmac']) == hmac_expected
 
         # Now our custom registration form creates or logs in the user:
         email, password = data_parsed['user_details']['email'], 'random_password'
         created_user = UserFactory(email=email, password=password)
         login_response = self.client.post(reverse('login_api'), {'email': email, 'password': password})
-        self.assertEqual(login_response.status_code, 200)
+        assert login_response.status_code == 200
 
         # Now our custom login/registration page must resume the pipeline:
         response = self.client.get(complete_url)
-        self.assertEqual(response.status_code, 302)
-        self.assertEqual(response['Location'], '/misc/final-destination')
+        assert response.status_code == 302
+        assert response['Location'] == '/misc/final-destination'
 
         _, strategy = self.get_request_and_strategy()
         self.assert_social_auth_exists_for_user(created_user, strategy)
@@ -140,5 +133,5 @@ class GoogleOauth2IntegrationTest(base.Oauth2IntegrationTest):  # lint-amnesty, 
         with patch.object(self.provider.backend_class, 'auth_complete', fake_auth_complete_error):
             response = self.client.get(complete_url)
         # This should redirect to the custom error URL
-        self.assertEqual(response.status_code, 302)
-        self.assertEqual(response['Location'], '/misc/my-custom-sso-error-page')
+        assert response.status_code == 302
+        assert response['Location'] == '/misc/my-custom-sso-error-page'

@@ -23,7 +23,7 @@ class ProviderUserStateTestCase(testutil.TestCase):
     def test_get_unlink_form_name(self):
         google_provider = self.configure_google_provider(enabled=True)
         state = pipeline.ProviderUserState(google_provider, object(), None)
-        self.assertEqual(google_provider.provider_id + '_unlink_form', state.get_unlink_form_name())
+        assert (google_provider.provider_id + '_unlink_form') == state.get_unlink_form_name()
 
     @ddt.data(
         ('saml', 'tpa-saml'),
@@ -52,7 +52,7 @@ class ProviderUserStateTestCase(testutil.TestCase):
         }
         with simulate_running_pipeline("common.djangoapps.third_party_auth.pipeline", backend_name, **kwargs):
             logout_url = pipeline.get_idp_logout_url_from_running_pipeline(request)
-            self.assertEqual(idp_config['logout_url'], logout_url)
+            assert idp_config['logout_url'] == logout_url
 
 
 @skip_unless_thirdpartyauth()
@@ -98,4 +98,4 @@ class PipelineOverridesTest(SamlIntegrationTestUtilities, IntegrationTestMixin, 
             type(uuid4).hex = mock.PropertyMock(return_value='9fe2c4e93f654fdbb24c02b15259716c')
             mock_uuid.return_value = uuid4
             final_username = pipeline.get_username(strategy, details, self.provider.backend_class())
-            self.assertEqual(expected_username, final_username['username'])
+            assert expected_username == final_username['username']

@@ -88,10 +88,10 @@ class SAMLProviderDataTests(APITestCase):
 
         response = self.client.get(url, format='json')
 
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        assert response.status_code == status.HTTP_200_OK
         results = response.data['results']
-        self.assertEqual(len(results), 1)
-        self.assertEqual(results[0]['sso_url'], SINGLE_PROVIDER_DATA['sso_url'])
+        assert len(results) == 1
+        assert results[0]['sso_url'] == SINGLE_PROVIDER_DATA['sso_url']
 
     def test_create_one_provider_data_success(self):
         # POST auth/saml/v0/providerdata/ -d data
@@ -102,12 +102,9 @@ class SAMLProviderDataTests(APITestCase):
 
         response = self.client.post(url, data)
 
-        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
-        self.assertEqual(SAMLProviderData.objects.count(), orig_count + 1)
-        self.assertEqual(
-            SAMLProviderData.objects.get(entity_id=SINGLE_PROVIDER_DATA_2['entity_id']).sso_url,
-            SINGLE_PROVIDER_DATA_2['sso_url']
-        )
+        assert response.status_code == status.HTTP_201_CREATED
+        assert SAMLProviderData.objects.count() == (orig_count + 1)
+        assert SAMLProviderData.objects.get(entity_id=SINGLE_PROVIDER_DATA_2['entity_id']).sso_url == SINGLE_PROVIDER_DATA_2['sso_url']
 
     def test_create_one_data_with_absent_enterprise_uuid(self):
         """
@@ -119,8 +116,8 @@ class SAMLProviderDataTests(APITestCase):
 
         response = self.client.post(url, data)
 
-        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
-        self.assertEqual(SAMLProviderData.objects.count(), orig_count)
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        assert SAMLProviderData.objects.count() == orig_count
 
     def test_patch_one_provider_data(self):
         # PATCH auth/saml/v0/providerdata/ -d data
@@ -133,14 +130,14 @@ class SAMLProviderDataTests(APITestCase):
 
         response = self.client.patch(url, data)
 
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(SAMLProviderData.objects.count(), orig_count)
+        assert response.status_code == status.HTTP_200_OK
+        assert SAMLProviderData.objects.count() == orig_count
 
         # ensure only the sso_url was updated
         fetched_provider_data = SAMLProviderData.objects.get(pk=self.saml_provider_data.id)
-        self.assertEqual(fetched_provider_data.sso_url, 'http://new.url')
-        self.assertEqual(fetched_provider_data.fetched_at, SINGLE_PROVIDER_DATA['fetched_at'])
-        self.assertEqual(fetched_provider_data.entity_id, SINGLE_PROVIDER_DATA['entity_id'])
+        assert fetched_provider_data.sso_url == 'http://new.url'
+        assert fetched_provider_data.fetched_at == SINGLE_PROVIDER_DATA['fetched_at']
+        assert fetched_provider_data.entity_id == SINGLE_PROVIDER_DATA['entity_id']
 
     def test_delete_one_provider_data(self):
         # DELETE auth/saml/v0/providerdata/ -d data
@@ -151,12 +148,12 @@ class SAMLProviderDataTests(APITestCase):
 
         response = self.client.delete(url)
 
-        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
-        self.assertEqual(SAMLProviderData.objects.count(), orig_count - 1)
+        assert response.status_code == status.HTTP_204_NO_CONTENT
+        assert SAMLProviderData.objects.count() == (orig_count - 1)
 
         # ensure only the sso_url was updated
         query_set_count = SAMLProviderData.objects.filter(pk=self.saml_provider_data.id).count()
-        self.assertEqual(query_set_count, 0)
+        assert query_set_count == 0
 
     def test_get_one_provider_data_failure(self):
         set_jwt_cookie(self.client, self.user, [(ENTERPRISE_ADMIN_ROLE, BAD_ENTERPRISE_ID)])
@@ -167,7 +164,7 @@ class SAMLProviderDataTests(APITestCase):
 
         response = self.client.get(url, format='json')
 
-        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+        assert response.status_code == status.HTTP_404_NOT_FOUND
 
     def test_unauthenticated_request_is_forbidden(self):
         self.client.logout()
@@ -176,10 +173,10 @@ class SAMLProviderDataTests(APITestCase):
         url = '{}?{}'.format(urlbase, urlencode(query_kwargs))
         set_jwt_cookie(self.client, self.user, [(ENTERPRISE_LEARNER_ROLE, ENTERPRISE_ID)])
         response = self.client.get(url, format='json')
-        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        assert response.status_code == status.HTTP_403_FORBIDDEN
 
         # manually running second case as DDT is having issues.
         self.client.logout()
         set_jwt_cookie(self.client, self.user, [(ENTERPRISE_ADMIN_ROLE, BAD_ENTERPRISE_ID)])
         response = self.client.get(url, format='json')
-        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        assert response.status_code == status.HTTP_403_FORBIDDEN

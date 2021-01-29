@@ -26,9 +26,9 @@ class TestEdXSAMLIdentityProvider(SAMLTestCase):
             u'[THIRD_PARTY_AUTH] Invalid EdXSAMLIdentityProvider subclass--'
             u'using EdXSAMLIdentityProvider base class. Provider: {provider}'.format(provider='fake_idp_class_option')
         )
-        self.assertIs(idp_class, EdXSAMLIdentityProvider)
+        assert idp_class is EdXSAMLIdentityProvider
 
     def test_get_user_details(self):
         """ test get_attr and get_user_details of EdXSAMLIdentityProvider"""
         edx_saml_identity_provider = EdXSAMLIdentityProvider('demo', **mock_conf)
-        self.assertEqual(edx_saml_identity_provider.get_user_details(mock_attributes), expected_user_details)
+        assert edx_saml_identity_provider.get_user_details(mock_attributes) == expected_user_details

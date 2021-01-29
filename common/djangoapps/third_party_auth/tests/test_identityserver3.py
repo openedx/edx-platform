@@ -3,7 +3,8 @@ Unit tests for the IdentityServer3 OAuth2 Backend
 """
 import json
 import ddt
-import unittest  # lint-amnesty, pylint: disable=unused-import, wrong-import-order
+import pytest  # pylint: disable=unused-import
+
 from common.djangoapps.third_party_auth.identityserver3 import IdentityServer3
 from common.djangoapps.third_party_auth.tests import testutil
 from common.djangoapps.third_party_auth.tests.utils import skip_unless_thirdpartyauth
@@ -41,21 +42,21 @@ class IdentityServer3Test(testutil.TestCase):
         make sure the "sub" claim works properly to grab user Id
         """
         response = {"sub": 1, "email": "example@example.com"}
-        self.assertEqual(self.id3_instance.get_user_id({}, response), 1)
+        assert self.id3_instance.get_user_id({}, response) == 1
 
     def test_key_error_thrown_with_no_sub(self):
         """
         test that a KeyError is thrown if the "sub" claim does not exist
         """
         response = {"id": 1}
-        self.assertRaises(TypeError, self.id3_instance.get_user_id({}, response))
+        assert self.id3_instance.get_user_id({}, response) is None
 
     def test_proper_config_access(self):
         """
         test that the IdentityServer3 model properly grabs OAuth2Configs
         """
         provider_config = self.configure_identityServer3_provider(backend_name="identityServer3")
-        self.assertEqual(self.id3_instance.get_config(), provider_config)
+        assert self.id3_instance.get_config() == provider_config
 
     def test_config_after_updating(self):
         """
@@ -66,8 +67,8 @@ class IdentityServer3Test(testutil.TestCase):
             slug="updated",
             backend_name="identityServer3"
         )
-        self.assertEqual(self.id3_instance.get_config(), updated_provider_config)
-        self.assertNotEqual(self.id3_instance.get_config(), original_provider_config)
+        assert self.id3_instance.get_config() == updated_provider_config
+        assert self.id3_instance.get_config() != original_provider_config
 
     @ddt.data(
         ('first_name_claim_key', 'given_name', 'first_name', 'Edx'),
@@ -91,7 +92,7 @@ class IdentityServer3Test(testutil.TestCase):
                 setting_field_key: setting_field_value,
             })
         )
-        self.assertEqual(provider_config.backend_class().get_user_details(self.response)[output_name], output_value)
+        assert provider_config.backend_class().get_user_details(self.response)[output_name] == output_value
 
     def test_user_details_without_settings(self):
         """

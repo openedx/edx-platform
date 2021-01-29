@@ -70,8 +70,8 @@ class IntegrationTestLTI(testutil.TestCase):
         )
         login_response = self.client.post(path=uri, content_type=FORM_ENCODED, data=body)
         # The user should be redirected to the registration form
-        self.assertEqual(login_response.status_code, 302)
-        self.assertTrue(login_response['Location'].endswith(reverse('signin_user')))
+        assert login_response.status_code == 302
+        assert login_response['Location'].endswith(reverse('signin_user'))
         register_response = self.client.get(login_response['Location'])
         self.assertContains(register_response, '"currentProvider": "LTI Test Tool Consumer"')
         self.assertContains(register_response, '"errorMessage": null')
@@ -86,15 +86,12 @@ class IntegrationTestLTI(testutil.TestCase):
                 'honor_code': True,
             }
         )
-        self.assertEqual(ajax_register_response.status_code, 200)
+        assert ajax_register_response.status_code == 200
         continue_response = self.client.get(self.url_prefix + LTI_TPA_COMPLETE_URL)
         # The user should be redirected to the finish_auth view which will enroll them.
         # FinishAuthView.js reads the URL parameters directly from $.url
-        self.assertEqual(continue_response.status_code, 302)
-        self.assertEqual(
-            continue_response['Location'],
-            '/account/finish_auth/?course_id=my_course_id&enrollment_action=enroll'
-        )
+        assert continue_response.status_code == 302
+        assert continue_response['Location'] == '/account/finish_auth/?course_id=my_course_id&enrollment_action=enroll'
 
         # Now check that we can login again
         self.client.logout()
@@ -106,19 +103,20 @@ class IntegrationTestLTI(testutil.TestCase):
         )
         login_2_response = self.client.post(path=uri, content_type=FORM_ENCODED, data=body)
         # The user should be redirected to the dashboard
-        self.assertEqual(login_2_response.status_code, 302)
-        self.assertEqual(login_2_response['Location'], LTI_TPA_COMPLETE_URL + "?")
+        assert login_2_response.status_code == 302
+        assert login_2_response['Location'] == (LTI_TPA_COMPLETE_URL + '?')
         continue_2_response = self.client.get(login_2_response['Location'])
-        self.assertEqual(continue_2_response.status_code, 302)
-        self.assertTrue(continue_2_response['Location'].endswith(reverse('dashboard')))
+        assert continue_2_response.status_code == 302
+        assert continue_2_response['Location'].endswith(reverse('dashboard'))
 
         # Check that the user was created correctly
         user = User.objects.get(email=EMAIL)
-        self.assertEqual(user.username, EDX_USER_ID)
+        assert user.username == EDX_USER_ID
 
     def test_reject_initiating_login(self):
         response = self.client.get(self.url_prefix + LTI_TPA_LOGIN_URL)
-        self.assertEqual(response.status_code, 405)  # Not Allowed
+        assert response.status_code == 405
+        # Not Allowed
 
     def test_reject_bad_login(self):
         login_response = self.client.post(
@@ -127,8 +125,8 @@ class IntegrationTestLTI(testutil.TestCase):
         )
         # The user should be redirected to the login page with an error message
         # (auth_entry defaults to login for this provider)
-        self.assertEqual(login_response.status_code, 302)
-        self.assertTrue(login_response['Location'].endswith(reverse('signin_user')))
+        assert login_response.status_code == 302
+        assert login_response['Location'].endswith(reverse('signin_user'))
         error_response = self.client.get(login_response['Location'])
         self.assertContains(
             error_response,
@@ -152,8 +150,8 @@ class IntegrationTestLTI(testutil.TestCase):
         with self.settings(SOCIAL_AUTH_LTI_CONSUMER_SECRETS={OTHER_LTI_CONSUMER_KEY: OTHER_LTI_CONSUMER_SECRET}):
             login_response = self.client.post(path=uri, content_type=FORM_ENCODED, data=body)
             # The user should be redirected to the registration form
-            self.assertEqual(login_response.status_code, 302)
-            self.assertTrue(login_response['Location'].endswith(reverse('signin_user')))
+            assert login_response.status_code == 302
+            assert login_response['Location'].endswith(reverse('signin_user'))
             register_response = self.client.get(login_response['Location'])
             self.assertContains(
                 register_response,
