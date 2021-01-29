@@ -434,6 +434,17 @@ FEATURES = {
     'ENABLE_FOOTER_MOBILE_APP_LINKS': False,
 
     # Let students save and manage their annotations
+    # .. toggle_name: FEATURES['ENABLE_EDXNOTES']
+    # .. toggle_implementation: SettingToggle
+    # .. toggle_default: False
+    # .. toggle_description: This toggle enables the students to save and manage their annotations in the
+    #   course using the notes service. The bulk of the actual work in storing the notes is done by
+    #   a separate service (see the edx-notes-api repo).
+    # .. toggle_warnings: Requires the edx-notes-api service properly running and to have configured the django settings
+    #   EDXNOTES_INTERNAL_API and EDXNOTES_PUBLIC_API. If you update this setting, also update it in Studio.
+    # .. toggle_use_cases: open_edx
+    # .. toggle_creation_date: 2015-01-04
+    # .. toggle_tickets: https://github.com/edx/edx-platform/pull/6321
     'ENABLE_EDXNOTES': False,
 
     # Toggle to enable coordination with the Publisher tool (keep in sync with cms/envs/common.py)
