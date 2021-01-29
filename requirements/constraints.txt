@@ -42,6 +42,9 @@ edx-enterprise==3.17.14
 # Upgrading to 2.12.0 breaks several test classes due to API changes, need to update our code accordingly
 factory-boy==2.8.1
 
+# Newer versions need a more recent version of python-dateutil
+freezegun==0.3.12
+
 # When we went from httpretty 0.9.7 to 1.0.2, tests broke
 httpretty<1.0
 
@@ -90,6 +93,9 @@ pillow<8.0.0
 
 # ARCHBOM-1141: pip-tools upgrade requires pip upgrade
 pip-tools<5.0.0
+
+# Upgrading to 2.5.3 on 2020-01-03 triggered "'tzlocal' object has no attribute '_std_offset'" errors in production
+python-dateutil==2.4.0
 
 # stevedore 2.0.0 requires python >= 3.6
 stevedore<2.0.0
