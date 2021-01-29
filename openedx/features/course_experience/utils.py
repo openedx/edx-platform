@@ -281,13 +281,6 @@ def dates_banner_should_display(course_key, user):
     if not CourseEnrollment.is_enrolled(user, course_key):
         return False, False
 
-    # Don't display the banner for course staff
-    is_course_staff = bool(
-        user and course_overview and has_access(user, 'staff', course_overview, course_overview.id)
-    )
-    if is_course_staff:
-        return False, False
-
     # Don't display the banner if the course has ended
     if course_end_date and course_end_date < timezone.now():
         return False, False
