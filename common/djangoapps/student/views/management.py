@@ -50,7 +50,7 @@ from openedx.core.djangoapps.programs.models import ProgramsApiConfig
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.theming import helpers as theming_helpers
 from openedx.core.djangoapps.user_api.preferences import api as preferences_api
-from openedx.core.djangoapps.user_authn.utils import should_redirect_to_logistration_mircrofrontend
+from openedx.core.djangoapps.user_authn.utils import should_redirect_to_authn_microfrontend
 from openedx.core.djangolib.markup import HTML, Text
 from common.djangoapps.student.helpers import DISABLE_UNENROLL_CERT_STATES, cert_info, generate_activation_email_context
 from common.djangoapps.student.message_types import AccountActivation, EmailChange, EmailChangeConfirmation, RecoveryEmailCreate
@@ -547,9 +547,9 @@ def activate_account(request, key):
                 extra_tags='account-activation aa-icon',
             )
 
-    if should_redirect_to_logistration_mircrofrontend() and not request.user.is_authenticated:
+    if should_redirect_to_authn_microfrontend() and not request.user.is_authenticated:
         url_path = '/login?account_activation_status={}'.format(activation_message_type)
-        return redirect(settings.LOGISTRATION_MICROFRONTEND_URL + url_path)
+        return redirect(settings.AUTHN_MICROFRONTEND_URL + url_path)
 
     return redirect('dashboard')
 

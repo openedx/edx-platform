@@ -22,7 +22,7 @@ from openedx.core.djangoapps.site_configuration import helpers as configuration_
 from openedx.core.djangoapps.theming.helpers import get_current_site
 from openedx.core.djangoapps.user_api import accounts as accounts_settings
 from openedx.core.djangoapps.user_api.accounts.utils import is_secondary_email_feature_enabled
-from openedx.core.djangoapps.user_authn.utils import should_redirect_to_logistration_mircrofrontend
+from openedx.core.djangoapps.user_authn.utils import should_redirect_to_authn_microfrontend
 from openedx.core.djangoapps.user_api.preferences.api import get_user_preference
 from common.djangoapps.student.message_types import AccountRecovery as AccountRecoveryMessage
 from common.djangoapps.student.models import CourseEnrollmentAllowed, email_exists_or_retired
@@ -39,7 +39,7 @@ def send_account_recovery_email_for_user(user, request, email=None):
     """
     site = get_current_site()
     message_context = get_base_template_context(site)
-    site_name = settings.LOGISTRATION_MICROFRONTEND_DOMAIN if should_redirect_to_logistration_mircrofrontend() \
+    site_name = settings.AUTHN_MICROFRONTEND_DOMAIN if should_redirect_to_authn_microfrontend() \
         else configuration_helpers.get_value('SITE_NAME', settings.SITE_NAME)
     message_context.update({
         'request': request,  # Used by google_analytics_tracking_pixel
