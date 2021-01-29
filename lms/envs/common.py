@@ -1623,7 +1623,15 @@ WIKI_CAN_DELETE = course_wiki_settings.CAN_DELETE
 WIKI_CAN_MODERATE = course_wiki_settings.CAN_MODERATE
 WIKI_CAN_CHANGE_PERMISSIONS = course_wiki_settings.CAN_CHANGE_PERMISSIONS
 WIKI_CAN_ASSIGN = course_wiki_settings.CAN_ASSIGN
-
+# .. toggle_name: WIKI_USE_BOOTSTRAP_SELECT_WIDGET
+# .. toggle_implementation: Django setting
+# .. toggle_default: True
+# .. toggle_description: This setting allows you to use bootstrap and you can switch off 
+#   if you are not using it.
+# .. toggle_warnings: None
+# .. toggle_use_cases: open_edx
+# .. toggle_creation_date: None
+# .. toggle_tickets: None
 WIKI_USE_BOOTSTRAP_SELECT_WIDGET = False
 WIKI_LINK_LIVE_LOOKUPS = False
 WIKI_LINK_DEFAULT_LEVEL = 2
