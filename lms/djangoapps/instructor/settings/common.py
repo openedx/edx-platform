@@ -35,7 +35,7 @@ def plugin_settings(settings):
         # .. toggle_default: 200
         # .. toggle_description: Disable instructor dashboard buttons for downloading course data
         #   when enrollment exceeds this number. The number indicates the maximum allowed enrollments
-        #   until a course considered "small". Courses exceeding the upper limit of "small" courses
+        #   for the course to be considered "small". Courses exceeding the upper limit of "small" courses
         #   will have disabled buttons at the instructor dashboard.
         # .. toggle_use_cases: open_edx
         # .. toggle_creation_date: 2020-07-06
