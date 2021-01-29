@@ -1,7 +1,7 @@
 (function(define) {
     'use strict';
-    define(['jquery', 'underscore', 'backbone'],
-        function($, _, Backbone) {
+    define(['jquery', 'underscore', 'backbone', 'edx-ui-toolkit/js/utils/html-utils'],
+        function($, _, Backbone, HtmlUtils) {
             return Backbone.View.extend({
                 el: '#hinted-login-form',
 
@@ -22,10 +22,12 @@
                 },
 
                 render: function() {
-                    $(this.el).html(_.template(this.tpl)({
-                        hintedProvider: this.hintedProvider
-                    }));
-
+                    HtmlUtils.setHtml(
+                        $(this.el),
+                        HtmlUtils.template(this.tpl)({
+                            hintedProvider: this.hintedProvider
+                        })
+                    );
                     return this;
                 },
 
