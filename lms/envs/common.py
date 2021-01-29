@@ -1212,7 +1212,12 @@ from xmodule.x_module import XModuleMixin
 # once the responsibility of XBlock creation is moved out of modulestore - cpennington
 XBLOCK_MIXINS = (LmsBlockMixin, InheritanceMixin, XModuleMixin, EditInfoMixin)
 
-# Allow any XBlock in the LMS
+# .. setting_name: XBLOCK_SELECT_FUNCTION
+# .. setting_default: prefer_xmodules
+# .. setting_description: Function used to select an XBlock from the python package EntryPoints.
+#     Some alternatives are `prefer_xmodules` and `default_select`. The `prefer_modules` function
+#     will choose the first "xmodule" if there is one, otherwise, it will act like `default_select`.
+#     The `default_select` function will simply choose the first match found.
 XBLOCK_SELECT_FUNCTION = prefer_xmodules
 
 # .. setting_name: XBLOCK_FIELD_DATA_WRAPPERS
