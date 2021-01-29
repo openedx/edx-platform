@@ -1600,6 +1600,14 @@ from lms.djangoapps.course_wiki import settings as course_wiki_settings  # pylin
 WIKI_ACCOUNT_HANDLING = False
 WIKI_EDITOR = 'lms.djangoapps.course_wiki.editors.CodeMirror'
 WIKI_SHOW_MAX_CHILDREN = 0  # We don't use the little menu that shows children of an article in the breadcrumb
+# .. toggle_name: WIKI_ANONYMOUS
+# .. toggle_implementation: Django setting
+# .. toggle_default: True
+# .. toggle_description: This setting treats none logged in users as the ¨other¨ user group.
+# .. toggle_warnings: In False it doesn´t allow to access anonymous users.
+# .. toggle_use_cases: open_edx
+# .. toggle_creation_date: None
+# .. toggle_tickets: None
 WIKI_ANONYMOUS = False  # Don't allow anonymous access until the styling is figured out
 
 WIKI_CAN_DELETE = course_wiki_settings.CAN_DELETE
