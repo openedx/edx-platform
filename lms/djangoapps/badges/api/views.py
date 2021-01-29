@@ -3,12 +3,12 @@ API views for badges
 """
 
 
-from edx_rest_framework_extensions.auth.session.authentication import SessionAuthenticationAllowInactiveUser
-from opaque_keys import InvalidKeyError
-from opaque_keys.edx.django.models import CourseKeyField
-from opaque_keys.edx.keys import CourseKey
-from rest_framework import generics
-from rest_framework.exceptions import APIException
+from edx_rest_framework_extensions.auth.session.authentication import SessionAuthenticationAllowInactiveUser  # lint-amnesty, pylint: disable=import-error
+from opaque_keys import InvalidKeyError  # lint-amnesty, pylint: disable=import-error
+from opaque_keys.edx.django.models import CourseKeyField  # lint-amnesty, pylint: disable=import-error
+from opaque_keys.edx.keys import CourseKey  # lint-amnesty, pylint: disable=import-error
+from rest_framework import generics  # lint-amnesty, pylint: disable=import-error
+from rest_framework.exceptions import APIException  # lint-amnesty, pylint: disable=import-error
 
 from lms.djangoapps.badges.models import BadgeAssertion
 from openedx.core.djangoapps.user_api.permissions import is_field_shared_factory
@@ -119,7 +119,7 @@ class UserBadgeAssertions(generics.ListAPIView):
             try:
                 course_id = CourseKey.from_string(provided_course_id)
             except InvalidKeyError:
-                raise InvalidCourseKeyError
+                raise InvalidCourseKeyError  # lint-amnesty, pylint: disable=raise-missing-from
         elif 'slug' not in self.request.query_params:
             # Need to get all badges for the user.
             course_id = None

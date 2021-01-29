@@ -35,7 +35,7 @@ from openedx.core.djangoapps.oauth_dispatch.api import destroy_oauth_tokens
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.theming.helpers import get_current_request, get_current_site
 from openedx.core.djangoapps.user_api import accounts, errors, helpers
-from openedx.core.djangoapps.user_authn.utils import should_redirect_to_logistration_mircrofrontend
+from openedx.core.djangoapps.user_authn.utils import should_redirect_to_authn_microfrontend
 from openedx.core.djangoapps.user_api.accounts.utils import is_secondary_email_feature_enabled
 from openedx.core.djangoapps.user_api.helpers import FormDescription
 from openedx.core.djangoapps.user_api.models import UserRetirementRequest
@@ -147,7 +147,7 @@ def send_password_reset_email_for_user(user, request, preferred_email=None):
         preferred_email (str): Send email to this address if present, otherwise fallback to user's email address.
     """
     message_context, user_language_preference = get_user_default_email_params(user)
-    site_name = settings.LOGISTRATION_MICROFRONTEND_DOMAIN if should_redirect_to_logistration_mircrofrontend() \
+    site_name = settings.AUTHN_MICROFRONTEND_DOMAIN if should_redirect_to_authn_microfrontend() \
         else configuration_helpers.get_value('SITE_NAME', settings.SITE_NAME)
     message_context.update({
         'request': request,  # Used by google_analytics_tracking_pixel

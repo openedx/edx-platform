@@ -643,7 +643,7 @@ FEATURES = {
     #   rollout.
     'ENABLE_COURSEWARE_MICROFRONTEND': False,
 
-    # .. toggle_name: FEATURES['ENABLE_LOGISTRATION_MICROFRONTEND']
+    # .. toggle_name: FEATURES['ENABLE_AUTHN_MICROFRONTEND']
     # .. toggle_implementation: DjangoSetting
     # .. toggle_default: False
     # .. toggle_description: Supports staged rollout of a new micro-frontend-based implementation of the logistration.
@@ -651,9 +651,9 @@ FEATURES = {
     # .. toggle_creation_date: 2020-09-08
     # .. toggle_target_removal_date: None
     # .. toggle_tickets: 'https://github.com/edx/edx-platform/pull/24908'
-    # .. toggle_warnings: Also set settings.LOGISTRATION_MICROFRONTEND_URL for rollout. This temporary feature
+    # .. toggle_warnings: Also set settings.AUTHN_MICROFRONTEND_URL for rollout. This temporary feature
     # toggle does not have a target removal date.
-    'ENABLE_LOGISTRATION_MICROFRONTEND': False,
+    'ENABLE_AUTHN_MICROFRONTEND': False,
 
     ### ORA Feature Flags ###
     # .. toggle_name: FEATURES['ENABLE_ORA_ALL_FILE_URLS']
@@ -704,6 +704,17 @@ FEATURES = {
     # .. toggle_tickets: https://openedx.atlassian.net/browse/ENT-3818
     # .. toggle_warnings: None.
     'ENABLE_COURSE_ASSESSMENT_GRADE_CHANGE_SIGNAL': False,
+
+    # .. toggle_name: FEATURES['ALLOW_ADMIN_ENTERPRISE_COURSE_ENROLLMENT_DELETION']
+    # .. toggle_implementation: DjangoSetting
+    # .. toggle_default: False
+    # .. toggle_description: If true, allows for the deletion of EnterpriseCourseEnrollment records via Django Admin.
+    # .. toggle_use_cases: enterprise
+    # .. toggle_creation_date: 2021-01-27
+    # .. toggle_target_removal_date: None
+    # .. toggle_tickets: https://openedx.atlassian.net/browse/ENT-4022
+    # .. toggle_warnings: None.
+    'ALLOW_ADMIN_ENTERPRISE_COURSE_ENROLLMENT_DELETION': False,
 }
 
 # Specifies extra XBlock fields that should available when requested via the Course Blocks API
@@ -1059,6 +1070,10 @@ DJFS = {
     'url_root': '/static/django-pyfs',
 }
 
+# Set certificate issued date format. It supports all formats supported by
+# `common.djangoapps.util.date_utils.strftime_localized`.
+CERTIFICATE_DATE_FORMAT = "%B %-d, %Y"
+
 ### Dark code. Should be enabled in local settings for devel.
 
 ENABLE_MULTICOURSE = False  # set to False to disable multicourse display (see lib.util.views.edXhome)
@@ -1207,6 +1222,13 @@ XBLOCK_FIELD_DATA_WRAPPERS = ()
 
 XBLOCK_FS_STORAGE_BUCKET = None
 XBLOCK_FS_STORAGE_PREFIX = None
+
+# .. setting_name: XBLOCK_SETTINGS
+# .. setting_default: {}
+# .. setting_description: Dictionary containing server-wide configuration of XBlocks on a per-type basis.
+#     By default, keys should match the XBlock `block_settings_key` attribute/property. If the attribute/property
+#     is not defined, use the XBlock class name. Check `common.lib.xmodule.xmodule.services.SettingsService`
+#     for more reference.
 XBLOCK_SETTINGS = {}
 
 ############# ModuleStore Configuration ##########
@@ -3432,6 +3454,16 @@ COURSE_CATALOG_VISIBILITY_PERMISSION = 'see_exists'
 COURSE_ABOUT_VISIBILITY_PERMISSION = 'see_exists'
 
 DEFAULT_COURSE_VISIBILITY_IN_CATALOG = "both"
+
+# .. toggle_name: DEFAULT_MOBILE_AVAILABLE
+# .. toggle_implementation: DjangoSetting
+# .. toggle_default: False
+# .. toggle_description: This specifies if the courses are available for mobile by default. To make any individual
+#   course available for mobile one can set the value of Mobile Course Available to true in Advanced Settings from the
+#   studio when this is False.
+# .. toggle_use_cases: open_edx
+# .. toggle_creation_date: 2021-01-26
+# .. toggle_tickets: https://openedx.atlassian.net/browse/OSPR-1985
 DEFAULT_MOBILE_AVAILABLE = False
 
 # Enrollment API Cache Timeout
@@ -4058,8 +4090,8 @@ WRITABLE_GRADEBOOK_URL = None
 PROFILE_MICROFRONTEND_URL = None
 ORDER_HISTORY_MICROFRONTEND_URL = None
 ACCOUNT_MICROFRONTEND_URL = None
-LOGISTRATION_MICROFRONTEND_URL = None
-LOGISTRATION_MICROFRONTEND_DOMAIN = None
+AUTHN_MICROFRONTEND_URL = None
+AUTHN_MICROFRONTEND_DOMAIN = None
 PROGRAM_CONSOLE_MICROFRONTEND_URL = None
 LEARNING_MICROFRONTEND_URL = None
 

@@ -86,7 +86,7 @@ urlpatterns = [
     ),
     url(r'^account/password$', password_reset.password_change_request_handler, name='password_change_request'),
 
-    # logistration MFE flow
+    # authn MFE flow
     url(
         r'^api/user/v1/account/password_reset/token/validate/$',
         password_reset.PasswordResetTokenValidation.as_view(),
@@ -96,7 +96,7 @@ urlpatterns = [
     url(r'^user_api/v1/account/password_reset/token/validate/$', password_reset.PasswordResetTokenValidation.as_view(),
         name="user_api_password_reset_token_validate_legacy"),
 
-    # logistration MFE reset flow
+    # authn MFE reset flow
     url(
         r'^password/reset/(?P<uidb36>[0-9A-Za-z]+)-(?P<token>.+)/$',
         password_reset.LogistrationPasswordResetView.as_view(),

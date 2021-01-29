@@ -9,8 +9,8 @@ from django.core.files.storage import default_storage
 from django.db.utils import IntegrityError
 from django.test import TestCase
 from django.test.utils import override_settings
-from mock import Mock, patch
-from path import Path
+from mock import Mock, patch  # lint-amnesty, pylint: disable=import-error
+from path import Path  # lint-amnesty, pylint: disable=import-error
 from six.moves import range
 
 from lms.djangoapps.badges.models import (
@@ -23,15 +23,15 @@ from lms.djangoapps.badges.models import (
 from lms.djangoapps.badges.tests.factories import BadgeAssertionFactory, BadgeClassFactory, RandomBadgeClassFactory
 from lms.djangoapps.certificates.tests.test_models import TEST_DATA_ROOT
 from common.djangoapps.student.tests.factories import UserFactory
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase  # lint-amnesty, pylint: disable=import-error, wrong-import-order
+from xmodule.modulestore.tests.factories import CourseFactory  # lint-amnesty, pylint: disable=import-error, wrong-import-order
 
 
 def get_image(name):
     """
     Get one of the test images from the test data directory.
     """
-    return ImageFile(open(TEST_DATA_ROOT / 'badges' / name + '.png', mode='rb'))  # pylint: disable=open-builtin
+    return ImageFile(open(TEST_DATA_ROOT / 'badges' / name + '.png', mode='rb'))  # lint-amnesty, pylint: disable=bad-option-value, open-builtin
 
 
 @override_settings(MEDIA_ROOT=TEST_DATA_ROOT)
@@ -40,7 +40,7 @@ class BadgeImageConfigurationTest(TestCase):
     Test the validation features of BadgeImageConfiguration.
     """
 
-    def tearDown(self):
+    def tearDown(self):  # lint-amnesty, pylint: disable=super-method-not-called
         tmp_path = Path(TEST_DATA_ROOT / 'course_complete_badges')
         Path.rmtree_p(tmp_path)
 
@@ -78,7 +78,7 @@ class BadgeClassTest(ModuleStoreTestCase):
     """
 
     def setUp(self):
-        super(BadgeClassTest, self).setUp()
+        super(BadgeClassTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.addCleanup(self.cleanup_uploads)
 
     def cleanup_uploads(self):
@@ -163,7 +163,7 @@ class BadgeClassTest(ModuleStoreTestCase):
         self.assertEqual(badge_class.description, 'This is a test')
         self.assertEqual(badge_class.criteria, 'https://example.com/test_criteria')
         self.assertEqual(badge_class.display_name, 'Super Badge')
-        self.assertTrue('good' in badge_class.image.name.rsplit('/', 1)[-1])
+        self.assertTrue('good' in badge_class.image.name.rsplit('/', 1)[-1])  # lint-amnesty, pylint: disable=wrong-assert-type
 
     def test_get_badge_class_nocreate(self):
         """

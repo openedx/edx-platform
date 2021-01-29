@@ -88,7 +88,7 @@ from lms.djangoapps.verify_student.utils import earliest_allowed_verification_da
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.user_api import accounts
 from openedx.core.djangoapps.user_authn import cookies as user_authn_cookies
-from openedx.core.djangoapps.user_authn.utils import should_redirect_to_logistration_mircrofrontend
+from openedx.core.djangoapps.user_authn.utils import should_redirect_to_authn_microfrontend
 from common.djangoapps.third_party_auth.utils import user_exists
 from common.djangoapps.track import segment
 from common.djangoapps.util.json_request import JsonResponse
@@ -129,8 +129,8 @@ AUTH_ENTRY_REGISTER_API = 'register_api'
 # registration/login form/logic.
 AUTH_ENTRY_CUSTOM = getattr(settings, 'THIRD_PARTY_AUTH_CUSTOM_AUTH_FORMS', {})
 
-# If logistration MFE is enabled, the redirect should be to MFE instead of FE
-BASE_URL = settings.LOGISTRATION_MICROFRONTEND_URL if should_redirect_to_logistration_mircrofrontend() else ''
+# If authn MFE is enabled, the redirect should be to MFE instead of FE
+BASE_URL = settings.AUTHN_MICROFRONTEND_URL if should_redirect_to_authn_microfrontend() else ''
 
 
 def is_api(auth_entry):

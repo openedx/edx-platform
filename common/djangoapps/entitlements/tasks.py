@@ -3,7 +3,7 @@ This file contains celery tasks for entitlements-related functionality.
 """
 
 
-from celery import task
+from celery import shared_task
 from celery.utils.log import get_task_logger
 from django.conf import settings
 from edx_django_utils.monitoring import set_code_owner_attribute
@@ -19,7 +19,7 @@ LOGGER = get_task_logger(__name__)
 MAX_RETRIES = 11
 
 
-@task(
+@shared_task(
     bind=True,
     ignore_result=True,
     name='entitlements.expire_old_entitlements',

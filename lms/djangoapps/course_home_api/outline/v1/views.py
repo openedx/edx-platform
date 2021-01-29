@@ -36,7 +36,7 @@ from openedx.features.course_experience.course_tools import CourseToolsPluginMan
 from openedx.features.course_experience.course_updates import (
     dismiss_current_update_for_user, get_current_update_for_user,
 )
-from openedx.features.course_experience.utils import get_course_outline_block_tree
+from openedx.features.course_experience.utils import get_course_outline_block_tree, get_start_block
 from openedx.features.discounts.utils import generate_offer_data
 from common.djangoapps.student.models import CourseEnrollment
 from xmodule.course_module import COURSE_VISIBILITY_PUBLIC, COURSE_VISIBILITY_PUBLIC_OUTLINE
@@ -235,13 +235,15 @@ class OutlineTabView(RetrieveAPIView):
             try:
                 resume_block = get_key_to_last_completed_block(request.user, course.id)
                 resume_course['has_visited_course'] = True
+                resume_path = reverse('jump_to', kwargs={
+                    'course_id': course_key_string,
+                    'location': str(resume_block)
+                })
+                resume_course['url'] = request.build_absolute_uri(resume_path)
             except UnavailableCompletionData:
-                resume_block = course_usage_key
-            resume_path = reverse('jump_to', kwargs={
-                'course_id': course_key_string,
-                'location': str(resume_block)
-            })
-            resume_course['url'] = request.build_absolute_uri(resume_path)
+                start_block = get_start_block(course_blocks)
+                resume_course['url'] = start_block['lms_web_url']
+
         elif allow_public_outline or allow_public:
             course_blocks = get_course_outline_block_tree(request, course_key_string, None)
             if allow_public:

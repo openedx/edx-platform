@@ -14,7 +14,7 @@ from django.utils.translation import ugettext_lazy as _
 
 from lms.djangoapps.badges.models import BadgeAssertion, BadgeClass, CourseCompleteImageConfiguration
 from lms.djangoapps.badges.utils import requires_badges_enabled, site_prefix
-from xmodule.modulestore.django import modulestore
+from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=import-error, wrong-import-order
 
 
 LOGGER = logging.getLogger(__name__)

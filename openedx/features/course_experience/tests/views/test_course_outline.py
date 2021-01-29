@@ -580,7 +580,8 @@ class TestCourseOutlineResumeCourse(SharedModuleStoreTestCase, CompletionWaffleT
         response = self.visit_course_home(course, start_count=1, resume_count=0)
         content = pq(response.content)
 
-        self.assertTrue(content('.action-resume-course').attr('href').endswith('/course/' + course.url_name))
+        vertical = course.children[0].children[0].children[0]
+        self.assertTrue(content('.action-resume-course').attr('href').endswith('/vertical/' + vertical.url_name))
 
     @override_settings(LMS_BASE='test_url:9999')
     def test_resume_course_with_completion_api(self):
@@ -680,7 +681,8 @@ class TestCourseOutlineResumeCourse(SharedModuleStoreTestCase, CompletionWaffleT
         CourseEnrollment.get_enrollment(self.user, course.id).delete()
         response = self.visit_course_home(course, start_count=1, resume_count=0)
         content = pq(response.content)
-        self.assertTrue(content('.action-resume-course').attr('href').endswith('/course/' + course.url_name))
+        vertical = course.children[0].children[0].children[0]
+        self.assertTrue(content('.action-resume-course').attr('href').endswith('/vertical/' + vertical.url_name))
 
     @override_waffle_switch(ENABLE_COMPLETION_TRACKING_SWITCH, active=True)
     def test_course_outline_auto_open(self):

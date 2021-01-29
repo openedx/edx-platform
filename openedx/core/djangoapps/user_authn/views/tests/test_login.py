@@ -80,7 +80,7 @@ class LoginTest(SiteMixin, CacheIsolationTestCase):
         self._assert_audit_log(mock_audit_log, 'info', [u'Login success', self.user_email])
 
     FEATURES_WITH_LOGIN_MFE_ENABLED = settings.FEATURES.copy()
-    FEATURES_WITH_LOGIN_MFE_ENABLED['ENABLE_LOGISTRATION_MICROFRONTEND'] = True
+    FEATURES_WITH_LOGIN_MFE_ENABLED['ENABLE_AUTHN_MICROFRONTEND'] = True
 
     @patch.dict(settings.FEATURES, {
         "ENABLE_THIRD_PARTY_AUTH": True

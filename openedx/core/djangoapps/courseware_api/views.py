@@ -483,7 +483,8 @@ class SequenceMetadata(DeveloperErrorViewMixin, APIView):
             self.request,
             str(usage_key.course_key),
             str(usage_key),
-            disable_staff_debug_info=True)
+            disable_staff_debug_info=True,
+            will_recheck_access=True)
 
         view = STUDENT_VIEW
         if request.user.is_anonymous:

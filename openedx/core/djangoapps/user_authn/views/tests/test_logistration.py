@@ -65,7 +65,7 @@ class LoginAndRegistrationTest(ThirdPartyAuthTestMixin, UrlResetMixin, ModuleSto
         self.hidden_disabled_provider = self.configure_azure_ad_provider()
 
     FEATURES_WITH_LOGIN_MFE_ENABLED = settings.FEATURES.copy()
-    FEATURES_WITH_LOGIN_MFE_ENABLED['ENABLE_LOGISTRATION_MICROFRONTEND'] = True
+    FEATURES_WITH_LOGIN_MFE_ENABLED['ENABLE_AUTHN_MICROFRONTEND'] = True
 
     @ddt.data(
         ("signin_user", "/login"),
@@ -81,7 +81,7 @@ class LoginAndRegistrationTest(ThirdPartyAuthTestMixin, UrlResetMixin, ModuleSto
         """
         response = self.client.get(reverse(url_name))
 
-        self.assertEqual(response.url, settings.LOGISTRATION_MICROFRONTEND_URL + path)
+        self.assertEqual(response.url, settings.AUTHN_MICROFRONTEND_URL + path)
         self.assertEqual(response.status_code, 302)
 
     @ddt.data(
@@ -103,7 +103,7 @@ class LoginAndRegistrationTest(ThirdPartyAuthTestMixin, UrlResetMixin, ModuleSto
         Test that if request is redirected to logistration MFE,
         query params are passed to the redirect url.
         """
-        expected_url = settings.LOGISTRATION_MICROFRONTEND_URL + path + '?' + urlencode(query_params)
+        expected_url = settings.AUTHN_MICROFRONTEND_URL + path + '?' + urlencode(query_params)
         response = self.client.get(reverse(url_name), query_params)
 
         self.assertRedirects(response, expected_url, target_status_code=302)
