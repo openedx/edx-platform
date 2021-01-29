@@ -274,7 +274,7 @@ text-unidecode==1.3       # via -r requirements/edx/base.txt, faker, python-slug
 tincan==1.0.0             # via -r requirements/edx/base.txt, edx-event-routing-backends
 toml==0.10.2              # via pylint, pytest, tox
 tox-battery==0.6.1        # via -r requirements/edx/testing.in
-tox==3.21.2               # via -r requirements/edx/testing.in, tox-battery
+tox==3.21.3               # via -r requirements/edx/testing.in, tox-battery
 tqdm==4.56.0              # via -r requirements/edx/base.txt, nltk
 transifex-client==0.14.2  # via -r requirements/edx/testing.in
 ua-parser==0.10.0         # via -r requirements/edx/base.txt, django-cookies-samesite
