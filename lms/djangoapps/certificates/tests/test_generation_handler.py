@@ -1,5 +1,7 @@
 """
 Tests for certificate generation handler
+
+Hi!
 """
 import logging
 
