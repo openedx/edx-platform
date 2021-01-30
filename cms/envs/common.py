@@ -386,7 +386,7 @@ FEATURES = {
     #        eg: '2020-09-01'
     # .. toggle_use_cases: temporary
     # .. toggle_creation_date: 2020-06-12
-    # .. toggle_target_removal_date: 2020-12-01
+    # .. toggle_target_removal_date: 2021-04-01
     # .. toggle_warnings: This can be removed once support is removed for deprecated
     #   course keys.
     # .. toggle_tickets: https://openedx.atlassian.net/browse/DEPR-58
