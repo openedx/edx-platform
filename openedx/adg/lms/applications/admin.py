@@ -162,6 +162,7 @@ class EducationInline(ApplicationReviewInline):
 
     def dates(self, obj):
         return get_duration(obj, obj.is_in_progress)
+    dates.short_description = _('Dates')
 
 
 class WorkExperienceInline(ApplicationReviewInline):
@@ -176,9 +177,11 @@ class WorkExperienceInline(ApplicationReviewInline):
 
     def dates(self, obj):
         return get_duration(obj, obj.is_current_position)
+    dates.short_description = _('Dates')
 
     def responsibilities(self, obj):
         return obj.job_responsibilities
+    responsibilities.short_description = _('Responsibilities')
 
 
 class UserApplicationADGAdmin(admin.ModelAdmin):
@@ -223,6 +226,7 @@ class UserApplicationADGAdmin(admin.ModelAdmin):
 
     def applicant_name(self, obj):
         return obj.user.profile.name
+    applicant_name.short_description = _('Applicant Name')
 
     def date_received(self, obj):
         return obj.user.application_hub.submission_date.strftime(MONTH_DAY_YEAR_FORMAT)
@@ -308,8 +312,22 @@ class UserApplicationADGAdmin(admin.ModelAdmin):
     email.short_description = _('Email')
 
     def location(self, obj):
+        """
+        Field method for location of applicant.
+
+        Arguments:
+            obj (UserApplication): Application under review
+
+        Returns:
+            str: city and optionally country of applicant
+        """
         user_profile = obj.user.profile
-        return '{city}, {country}'.format(city=user_profile.city, country=user_profile.country)
+        location = str(user_profile.city)
+        if user_profile.country:
+            location += ', {country}'.format(country=user_profile.country)
+
+        return location
+    location.short_description = _('Location')
 
     def linked_in_profile(self, obj):
         return format_html(LINKED_IN_PROFILE_HTML, url=obj.linkedin_url)
@@ -325,6 +343,7 @@ class UserApplicationADGAdmin(admin.ModelAdmin):
 
     def phone_number(self, obj):
         return obj.user.profile.phone_number
+    phone_number.short_description = _('Phone Number')
 
     def date_of_birth(self, obj):
         return obj.user.extended_profile.birth_date.strftime(DAY_MONTH_YEAR_FORMAT)
@@ -332,6 +351,7 @@ class UserApplicationADGAdmin(admin.ModelAdmin):
 
     def applying_to(self, obj):
         return obj.business_line
+    applying_to.short_description = _('Applying to')
 
     def resume_display(self, obj):
         return get_embedded_view_html(obj.resume)
@@ -362,6 +382,7 @@ class UserApplicationADGAdmin(admin.ModelAdmin):
             )
 
         return format_html(final_html)
+    prerequisites.short_description = _('Prerequisites')
 
     def get_fieldsets(self, request, obj=None):
         """
@@ -381,7 +402,7 @@ class UserApplicationADGAdmin(admin.ModelAdmin):
         preliminary_info_fieldset = self._get_preliminary_info_fieldset(obj)
         fieldsets.append(preliminary_info_fieldset)
 
-        applicant_info_fieldset = self._get_applicant_info_fieldset()
+        applicant_info_fieldset = self._get_applicant_info_fieldset(obj)
         fieldsets.append(applicant_info_fieldset)
 
         if obj.cover_letter_or_resume:
@@ -413,9 +434,12 @@ class UserApplicationADGAdmin(admin.ModelAdmin):
 
         return fieldset
 
-    def _get_applicant_info_fieldset(self):
+    def _get_applicant_info_fieldset(self, application):
         """
         Get fieldset for applicant information.
+
+        Arguments:
+            application (UserApplication): Application under review
 
         Returns:
             tuple: Fieldset containing applicant's nationality info, gender, contact number, date of birth, organization

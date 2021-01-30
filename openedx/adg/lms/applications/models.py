@@ -153,7 +153,7 @@ class UserApplication(TimeStampedModel):
     reviewed_by = models.ForeignKey(
         User, null=True, blank=True, on_delete=models.CASCADE, verbose_name=_('Reviewed By')
     )
-    internal_admin_note = models.TextField(null=True, blank=True, verbose_name=_('Admin Note'))
+    internal_admin_note = models.TextField(blank=True, verbose_name=_('Admin Note'))
 
     objects = models.Manager()
     submitted_applications = SubmittedApplicationsManager()
