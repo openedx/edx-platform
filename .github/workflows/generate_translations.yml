@@ -1,0 +1,105 @@
+name: Generate Transifex translations
+
+on:
+  pull_request:
+    types: [ opened, synchronize, reopened ]
+    branches:
+      - master
+
+jobs:
+  generate-translations:
+    name: Detect changed source and generate Transifex translations
+    runs-on: ubuntu-18.04
+    timeout-minutes: 30
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Set up python
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.5
+
+      - name: Install OS requirements
+        run: |
+          sudo apt-get install libxmlsec1-dev pkg-config gettext
+          sudo apt-get update
+
+      - name: Install pip requirements
+        run: |
+          python3 -m pip install pip==20.0.2
+          python3 -m pip install setuptools==50.3.0
+          python3 -m pip install wheel==0.35.1
+          pip install --disable-pip-version-check --exists-action w -r requirements/edx/development.txt
+
+      - name: Clone adg-edx-theme repo
+        id: clone-theme-repo
+        uses: actions/checkout@v2
+        continue-on-error: true
+        with:
+          repository: OmnipreneurshipAcademy/adg-edx-theme
+          path: ./themes
+          ref: ${{ github.head_ref }}
+          token: ${{ secrets.ADG_THEME_ACCESS_TOKEN }}
+
+      - name: Add comment if cloning fails
+        uses: mshick/add-pr-comment@v1
+        with:
+          message: |
+            Cloning failed. :x:
+            No branch ref `${{ github.head_ref }}` found on adg-edx-theme repo.
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+          repo-token-user-login: 'github-actions[bot]'
+          allow-repeats: true
+        if: steps.clone-theme-repo.outcome == 'failure'
+
+      - name: Pull latest translations
+        id: pull-latest-translations
+        env:
+          TX_TOKEN: ${{ secrets.TX_TOKEN }}
+        run: tx pull -l ar
+
+      - name: Generate translations for changed source
+        id: generate-new-translations
+        env:
+          TX_TOKEN: ${{ secrets.TX_TOKEN }}
+        run: make extract_translations
+
+      - name: Merge all the translations
+        id: merge-translations
+        run: |
+          msgmerge conf/locale/ar/LC_MESSAGES/django-partial.po conf/locale/en/LC_MESSAGES/django-partial.po --update
+          msgmerge conf/locale/ar/LC_MESSAGES/django-partial.po conf/locale/en/LC_MESSAGES/django-partial.po --update
+          msgmerge conf/locale/ar/LC_MESSAGES/django-studio.po conf/locale/en/LC_MESSAGES/django-studio.po --update
+          msgmerge conf/locale/ar/LC_MESSAGES/djangojs-partial.po conf/locale/en/LC_MESSAGES/djangojs-partial.po --update
+          msgmerge conf/locale/ar/LC_MESSAGES/djangojs-studio.po conf/locale/en/LC_MESSAGES/djangojs-studio.po --update
+          msgmerge conf/locale/ar/LC_MESSAGES/mako.po conf/locale/en/LC_MESSAGES/mako.po --update
+          msgmerge conf/locale/ar/LC_MESSAGES/mako-studio.po conf/locale/en/LC_MESSAGES/mako-studio.po --update
+          msgmerge conf/locale/ar/LC_MESSAGES/underscore.po conf/locale/en/LC_MESSAGES/underscore.po --update
+          msgmerge conf/locale/ar/LC_MESSAGES/underscore-studio.po conf/locale/en/LC_MESSAGES/underscore-studio.po --update
+          msgmerge conf/locale/ar/LC_MESSAGES/wiki.po conf/locale/en/LC_MESSAGES/wiki.po --update
+
+      - name: Generate i18n files
+        id: generate-i18n-files
+        run: paver i18n_fastgenerate
+
+      - name: Commit changed translation files
+        id: commit-and-push-generated-files
+        uses: EndBug/add-and-commit@v6
+        with:
+          message: 'Add changed translation files'
+          add: "['conf/locale/ar/LC_MESSAGES/django.mo',
+                 'conf/locale/ar/LC_MESSAGES/django.po',
+                 'conf/locale/ar/LC_MESSAGES/djangojs.po',
+                 'conf/locale/ar/LC_MESSAGES/djangojs.mo',
+                 'lms/static/js/i18n/ar/djangojs.js']"
+          push: true
+          token: ${{ secrets.GITHUB_TOKEN }}
+          signoff: true
+
+      - name: Push generated translation strings
+        id: push-generated-translations
+        env:
+          TX_TOKEN: ${{ secrets.TX_TOKEN }}
+        run: tx push -s -t

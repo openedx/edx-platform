@@ -4,7 +4,16 @@ All model factories for applications
 import factory
 
 from common.djangoapps.student.tests.factories import UserFactory
-from openedx.adg.lms.applications.models import ApplicationHub, BusinessLine, Education, UserApplication, WorkExperience
+from openedx.adg.lms.applications.models import (
+    ApplicationHub,
+    BusinessLine,
+    Education,
+    PrerequisiteCourse,
+    PrerequisiteCourseGroup,
+    UserApplication,
+    WorkExperience
+)
+from openedx.core.djangoapps.content.course_overviews.tests.factories import CourseOverviewFactory
 
 
 class BusinessLineFactory(factory.DjangoModelFactory):
@@ -78,3 +87,26 @@ class WorkExperienceFactory(factory.DjangoModelFactory):
     date_started_year = 2018
     date_completed_month = 1
     date_completed_year = 2020
+
+
+class PrerequisiteCourseGroupFactory(factory.DjangoModelFactory):
+    """
+    Factory for Work experience model
+    """
+
+    name = factory.Sequence(lambda n: 'Course group #%s' % n)
+
+    class Meta:
+        model = PrerequisiteCourseGroup
+
+
+class PrerequisiteCourseFactory(factory.DjangoModelFactory):
+    """
+    Factory for Work experience model
+    """
+
+    course = factory.SubFactory(CourseOverviewFactory)
+    prereq_course_group = factory.SubFactory(PrerequisiteCourseGroupFactory)
+
+    class Meta:
+        model = PrerequisiteCourse

@@ -10,13 +10,12 @@ from django.views import View
 from django.views.generic import TemplateView
 from rest_framework.status import HTTP_400_BAD_REQUEST
 
-from openedx.adg.common.course_meta.models import CourseMeta
 from openedx.adg.lms.applications.forms import ExtendedUserProfileForm, UserApplicationForm, UserProfileForm
 from openedx.adg.lms.registration_extension.models import ExtendedUserProfile
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 
 from .helpers import send_application_submission_confirmation_email
-from .models import ApplicationHub, UserApplication
+from .models import ApplicationHub, PrerequisiteCourse, UserApplication
 
 
 class RedirectToLoginOrRelevantPageMixin(AccessMixin):
@@ -78,7 +77,7 @@ class ApplicationHubView(RedirectToLoginOrRelevantPageMixin, View):
             HttpResponse object.
         """
         user_application_hub, _ = ApplicationHub.objects.get_or_create(user=self.request.user)
-        pre_req_course_ids = CourseMeta.open_pre_req_courses.all()
+        pre_req_course_ids = PrerequisiteCourse.open_prereq_course_manager.all()
         pre_req_courses = [CourseOverview.get_from_id(course_id) for course_id in pre_req_course_ids]
 
         return render(
