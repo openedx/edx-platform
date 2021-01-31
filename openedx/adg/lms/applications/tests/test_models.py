@@ -8,13 +8,12 @@ import pytest
 
 from common.djangoapps.student.tests.factories import UserFactory
 from lms.djangoapps.grades.api import CourseGradeFactory
-from openedx.adg.common.course_meta.tests.factories import CourseMetaFactory
 from openedx.adg.lms.applications.constants import CourseScore
 from openedx.adg.lms.applications.models import UserApplication
 from openedx.core.lib.grade_utils import round_away_from_zero
 
 from .constants import USERNAME
-from .factories import ApplicationHubFactory, UserApplicationFactory
+from .factories import ApplicationHubFactory, PrerequisiteCourseFactory, UserApplicationFactory
 
 
 @pytest.mark.django_db
@@ -118,15 +117,8 @@ def test_prereq_course_scores(mock_read, user_application, percent):
     Test that the `prereq_course_scores` property returns the correct prerequisite course names and respective scores of
     the applicant in those courses, in the correct format.
     """
-    course_meta_1 = CourseMetaFactory()
-    course_meta_1.is_prereq = True
-    course_meta_1.save()
-    course_meta_2 = CourseMetaFactory()
-    course_meta_2.is_prereq = True
-    course_meta_2.save()
-
-    course_overview_1 = course_meta_1.course
-    course_overview_2 = course_meta_2.course
+    test_course_1 = PrerequisiteCourseFactory().course
+    test_course_2 = PrerequisiteCourseFactory().course
 
     course_grade = CourseGradeFactory()
     course_grade.percent = percent
@@ -134,8 +126,8 @@ def test_prereq_course_scores(mock_read, user_application, percent):
     mock_read.return_value = course_grade
 
     score = int(round_away_from_zero(course_grade.percent * 100))
-    course_score_1 = CourseScore(course_overview_1.display_name, score)
-    course_score_2 = CourseScore(course_overview_2.display_name, score)
+    course_score_1 = CourseScore(test_course_1.display_name, score)
+    course_score_2 = CourseScore(test_course_2.display_name, score)
 
     expected_prereq_course_scores = [course_score_1, course_score_2]
     actual_prereq_course_scores = user_application.prereq_course_scores
