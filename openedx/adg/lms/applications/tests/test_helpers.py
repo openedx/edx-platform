@@ -1,7 +1,7 @@
 """
 All tests for applications helpers functions
 """
-from datetime import datetime
+from datetime import date
 from unittest.mock import Mock, patch
 
 import mock
@@ -270,7 +270,7 @@ def test_get_application_review_info(user_application, application_status):
         reviewer = UserFactory()
         user_application.reviewed_by = reviewer
 
-        current_date = datetime.now().date()
+        current_date = date.today()
         user_application.modified = current_date
 
         expected_reviewed_by = reviewer.profile.name

@@ -1,7 +1,7 @@
 """
 File containing common fixtures used across different test modules
 """
-from datetime import datetime
+from datetime import date
 
 import pytest
 
@@ -33,4 +33,4 @@ def user_application_adg_admin_instance():
 
 @pytest.fixture
 def current_date():
-    return datetime.now().date()
+    return date.today()
