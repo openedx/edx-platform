@@ -27,8 +27,8 @@ class TestStringLines(TestCase):
         Test StringLines index_to_line_start_index and index_to_line_end_index.
         """
         lines = StringLines(data['string'])
-        self.assertEqual(lines.index_to_line_start_index(data['index']), data['line_start_index'])
-        self.assertEqual(lines.index_to_line_end_index(data['index']), data['line_end_index'])
+        assert lines.index_to_line_start_index(data['index']) == data['line_start_index']
+        assert lines.index_to_line_end_index(data['index']) == data['line_end_index']
 
     @data(
         {'string': 'test', 'line_number': 1, 'line': 'test'},
@@ -43,4 +43,4 @@ class TestStringLines(TestCase):
         Test line_number_to_line.
         """
         lines = StringLines(data['string'])
-        self.assertEqual(lines.line_number_to_line(data['line_number']), data['line'])
+        assert lines.line_number_to_line(data['line_number']) == data['line']
