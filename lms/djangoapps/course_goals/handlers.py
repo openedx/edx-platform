@@ -7,7 +7,7 @@ import six
 from django.db import models
 from django.dispatch import receiver
 
-import six
+import six  # lint-amnesty, pylint: disable=reimported
 from common.djangoapps.course_modes.models import CourseMode
 from common.djangoapps.student.models import CourseEnrollment
 

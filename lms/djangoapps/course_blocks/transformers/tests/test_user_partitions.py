@@ -287,7 +287,7 @@ class MergedGroupAccessTestData(UserPartitionTestMixin, CourseStructureTestCase)
         Setup course structure and create user for user partition
         transformer test.
         """
-        super(MergedGroupAccessTestData, self).setUp()
+        super(MergedGroupAccessTestData, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
 
         # Set up multiple user partitions and groups.
         self.setup_groups_partitions(num_user_partitions=3)

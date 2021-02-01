@@ -36,7 +36,7 @@ class ContentLibraryTransformerTestCase(CourseStructureTestCase):
         """
         Setup course structure and create user for content library transformer test.
         """
-        super(ContentLibraryTransformerTestCase, self).setUp()
+        super(ContentLibraryTransformerTestCase, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
 
         # Build course.
         self.course_hierarchy = self.get_course_hierarchy()
@@ -180,7 +180,7 @@ class ContentLibraryOrderTransformerTestCase(CourseStructureTestCase):
         """
         Setup course structure and create user for content library order transformer test.
         """
-        super(ContentLibraryOrderTransformerTestCase, self).setUp()
+        super(ContentLibraryOrderTransformerTestCase, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.course_hierarchy = self.get_course_hierarchy()
         self.blocks = self.build_course(self.course_hierarchy)
         self.course = self.blocks['course']

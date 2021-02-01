@@ -58,7 +58,7 @@ class CourseGoalViewSet(viewsets.ModelViewSet):
     serializer_class = CourseGoalSerializer
 
     # Another version of this endpoint exists in ../course_home_api/outline/v1/views.py
-    def create(self, post_data):
+    def create(self, post_data):  # lint-amnesty, pylint: disable=arguments-differ
         """ Create a new goal if one does not exist, otherwise update the existing goal. """
         # Ensure goal_key is valid
         goal_options = get_course_goal_options()
@@ -105,11 +105,11 @@ class CourseGoalViewSet(viewsets.ModelViewSet):
             'goal_text': str(goal_options[goal_key]),
             'is_unsure': goal_key == GOAL_KEY_CHOICES.unsure,
         }
-        return JsonResponse(data, content_type="application/json", status=(200 if goal else 201))
+        return JsonResponse(data, content_type="application/json", status=(200 if goal else 201))  # lint-amnesty, pylint: disable=redundant-content-type-for-json-response
 
 
 @receiver(post_save, sender=CourseGoal, dispatch_uid="emit_course_goals_event")
-def emit_course_goal_event(sender, instance, **kwargs):
+def emit_course_goal_event(sender, instance, **kwargs):  # lint-amnesty, pylint: disable=unused-argument
     """Emit events for both tracking logs and for Segment."""
     name = 'edx.course.goal.added' if kwargs.get('created', False) else 'edx.course.goal.updated'
     tracker.emit(

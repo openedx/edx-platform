@@ -29,7 +29,7 @@ class SplitTestTransformerTestCase(CourseStructureTestCase):
         """
         Setup course structure and create user for split test transformer test.
         """
-        super(SplitTestTransformerTestCase, self).setUp()
+        super(SplitTestTransformerTestCase, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
 
         # Set up user partitions and groups.
         self.groups = [Group(0, 'Group 0'), Group(1, 'Group 1'), Group(2, 'Group 2')]

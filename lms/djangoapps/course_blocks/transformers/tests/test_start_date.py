@@ -50,7 +50,7 @@ class StartDateTransformerTestCase(BlockParentsMapTestCase):
                 return DEFAULT_START_DATE
 
     def setUp(self):
-        super(StartDateTransformerTestCase, self).setUp()
+        super(StartDateTransformerTestCase, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.beta_user = BetaTesterFactory(course_key=self.course.id, username='beta_tester', password=self.password)
         course = self.get_block(0)
         course.days_early_for_beta = 33
