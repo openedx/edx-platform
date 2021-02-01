@@ -373,7 +373,7 @@ class CourseFields(object):
         scope=Scope.settings
     )
     display_name = String(
-        help=_("Enter the name of the course as it should appear in the edX.org course list."),
+        help=_("Enter the name of the course as it should appear in the course list."),
         default="Empty",
         display_name=_("Course Display Name"),
         scope=Scope.settings,
@@ -442,7 +442,7 @@ class CourseFields(object):
     is_new = Boolean(
         display_name=_("Course Is New"),
         help=_(
-            "Enter true or false. If true, the course appears in the list of new courses on edx.org, and a New! "
+            "Enter true or false. If true, the course appears in the list of new courses, and a New! "
             "badge temporarily appears next to the course image."
         ),
         scope=Scope.settings
@@ -741,7 +741,7 @@ class CourseFields(object):
     allow_public_wiki_access = Boolean(
         display_name=_("Allow Public Wiki Access"),
         help=_(
-            "Enter true or false. If true, edX users can view the course wiki even "
+            "Enter true or false. If true, students can view the course wiki even "
             "if they're not enrolled in the course."
         ),
         default=False,
