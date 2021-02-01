@@ -200,9 +200,8 @@ class TestCourseOutlinePage(SharedModuleStoreTestCase, MasqueradeMixin):
     @ddt.data(
         ([CourseMode.AUDIT, CourseMode.VERIFIED], CourseMode.AUDIT, False, True),
         ([CourseMode.AUDIT, CourseMode.VERIFIED], CourseMode.VERIFIED, False, True),
-        ([CourseMode.AUDIT, CourseMode.VERIFIED, CourseMode.MASTERS], CourseMode.MASTERS, False, True),
-        ([CourseMode.PROFESSIONAL], CourseMode.PROFESSIONAL, False, True),
-        ([CourseMode.AUDIT, CourseMode.VERIFIED], CourseMode.VERIFIED, True, False),
+        ([CourseMode.MASTERS], CourseMode.MASTERS, False, True),
+        ([CourseMode.PROFESSIONAL], CourseMode.PROFESSIONAL, True, True),  # staff accounts should also see the banner
     )
     @ddt.unpack
     def test_reset_course_deadlines_banner_shows_for_self_paced_course(
