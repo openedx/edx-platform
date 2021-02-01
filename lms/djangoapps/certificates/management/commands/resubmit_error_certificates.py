@@ -65,7 +65,7 @@ class Command(BaseCommand):
             try:
                 only_course_keys.append(CourseKey.from_string(course_key_str))
             except InvalidKeyError:
-                raise CommandError(
+                raise CommandError(  # lint-amnesty, pylint: disable=raise-missing-from
                     u'"{course_key_str}" is not a valid course key.'.format(
                         course_key_str=course_key_str
                     )

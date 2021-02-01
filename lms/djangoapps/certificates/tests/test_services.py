@@ -17,16 +17,16 @@ class CertificateServiceTests(ModuleStoreTestCase):
     """
 
     def setUp(self):
-        super(CertificateServiceTests, self).setUp()
+        super(CertificateServiceTests, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.service = CertificateService()
         self.course = CourseFactory()
         self.user = UserFactory()
         self.user_id = self.user.id
-        self.course_id = self.course.id
+        self.course_id = self.course.id  # lint-amnesty, pylint: disable=no-member
         GeneratedCertificateFactory.create(
             status=CertificateStatuses.downloadable,
             user=self.user,
-            course_id=self.course.id,
+            course_id=self.course.id,  # lint-amnesty, pylint: disable=no-member
             grade=1.0
         )
 

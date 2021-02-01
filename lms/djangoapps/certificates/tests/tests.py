@@ -34,7 +34,7 @@ class CertificatesModelTest(ModuleStoreTestCase, MilestonesTestCaseMixin):
     """
 
     def setUp(self):
-        super(CertificatesModelTest, self).setUp()
+        super(CertificatesModelTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
 
         today = datetime.now(UTC)
         self.instructor_paced_course = CourseFactory.create(
@@ -71,7 +71,7 @@ class CertificatesModelTest(ModuleStoreTestCase, MilestonesTestCaseMixin):
         """
         student = UserFactory()
         student.profile.allow_certificate = allow_certificate
-        student.profile.save()
+        student.profile.save()  # lint-amnesty, pylint: disable=no-member
 
         # for instructor paced course
         certificate_info = certificate_info_for_user(
@@ -106,7 +106,7 @@ class CertificatesModelTest(ModuleStoreTestCase, MilestonesTestCaseMixin):
         """
         student = UserFactory()
         student.profile.allow_certificate = allow_certificate
-        student.profile.save()
+        student.profile.save()  # lint-amnesty, pylint: disable=no-member
 
         certificate1 = GeneratedCertificateFactory.create(
             user=student,
@@ -161,7 +161,7 @@ class CertificatesModelTest(ModuleStoreTestCase, MilestonesTestCaseMixin):
         student_no_certs = UserFactory()
         student_with_certs = UserFactory()
         student_with_certs.profile.allow_certificate = True
-        student_with_certs.profile.save()
+        student_with_certs.profile.save()  # lint-amnesty, pylint: disable=no-member
 
         # Set up a couple of courses
         course_1 = CourseFactory.create()

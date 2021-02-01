@@ -57,7 +57,7 @@ class CertificateSupportTestCase(ModuleStoreTestCase):
         Create a support team member and a student with a certificate.
         Log in as the support team member.
         """
-        super(CertificateSupportTestCase, self).setUp()
+        super(CertificateSupportTestCase, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         CourseFactory(
             org=CertificateSupportTestCase.EXISTED_COURSE_KEY_1.org,
             course=CertificateSupportTestCase.EXISTED_COURSE_KEY_1.course,
@@ -105,7 +105,7 @@ class CertificateSearchTests(CertificateSupportTestCase):
         """
         Create a course
         """
-        super(CertificateSearchTests, self).setUp()
+        super(CertificateSearchTests, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.course = CourseFactory(
             org=self.CERT_COURSE_KEY.org,
             course=self.CERT_COURSE_KEY.course,
@@ -127,10 +127,10 @@ class CertificateSearchTests(CertificateSupportTestCase):
         ]
 
         self.course.certificates = {'certificates': certificates}
-        self.course.save()
+        self.course.save()  # lint-amnesty, pylint: disable=no-member
         self.store.update_item(self.course, self.user.id)
         self.course_overview = CourseOverviewFactory(
-            id=self.course.id,
+            id=self.course.id,  # lint-amnesty, pylint: disable=no-member
             cert_html_view_enabled=True,
         )
 
@@ -215,7 +215,7 @@ class CertificateSearchTests(CertificateSupportTestCase):
 
     @override_settings(FEATURES=FEATURES_WITH_CERTS_ENABLED)
     def test_download_link(self):
-        self.cert.course_id = self.course.id
+        self.cert.course_id = self.course.id  # lint-amnesty, pylint: disable=no-member
         self.cert.download_url = ''
         self.cert.save()
 
@@ -253,7 +253,7 @@ class CertificateRegenerateTests(CertificateSupportTestCase):
         """
         Create a course and enroll the student in the course.
         """
-        super(CertificateRegenerateTests, self).setUp()
+        super(CertificateRegenerateTests, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.course = CourseFactory(
             org=self.CERT_COURSE_KEY.org,
             course=self.CERT_COURSE_KEY.course,
@@ -293,7 +293,7 @@ class CertificateRegenerateTests(CertificateSupportTestCase):
         self.cert.save()
 
         response = self._regenerate(
-            course_key=self.course.id,
+            course_key=self.course.id,  # lint-amnesty, pylint: disable=no-member
             username=self.STUDENT_USERNAME,
         )
         self.assertEqual(response.status_code, 200)
@@ -316,7 +316,7 @@ class CertificateRegenerateTests(CertificateSupportTestCase):
         with mock_passing_grade(percent=0.75):
             with patch('common.djangoapps.course_modes.models.CourseMode.mode_for_course') as mock_mode_for_course:
                 mock_mode_for_course.return_value = 'honor'
-                api.regenerate_user_certificates(self.student, self.course.id,
+                api.regenerate_user_certificates(self.student, self.course.id,  # lint-amnesty, pylint: disable=no-member
                                                  course=self.course)
 
                 mock_generate_cert.assert_called()
@@ -456,7 +456,7 @@ class CertificateGenerateTests(CertificateSupportTestCase):
         """
         Create a course and enroll the student in the course.
         """
-        super(CertificateGenerateTests, self).setUp()
+        super(CertificateGenerateTests, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.course = CourseFactory(
             org=self.EXISTED_COURSE_KEY_2.org,
             course=self.EXISTED_COURSE_KEY_2.course,
@@ -492,7 +492,7 @@ class CertificateGenerateTests(CertificateSupportTestCase):
 
     def test_generate_certificate(self):
         response = self._generate(
-            course_key=self.course.id,
+            course_key=self.course.id,  # lint-amnesty, pylint: disable=no-member
             username=self.STUDENT_USERNAME,
         )
         self.assertEqual(response.status_code, 200)

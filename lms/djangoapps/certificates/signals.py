@@ -50,7 +50,9 @@ def _update_cert_settings_on_pacing_change(sender, updated_course_overview, **kw
 
 
 @receiver(post_save, sender=CertificateWhitelist, dispatch_uid="append_certificate_whitelist")
-def _listen_for_certificate_whitelist_append(sender, instance, **kwargs):  # pylint: disable=unused-argument
+def _listen_for_certificate_whitelist_append(sender, instance, **kwargs):  # lint-amnesty, pylint: disable=missing-function-docstring, unused-argument
+    course = CourseOverview.get_from_id(instance.course_id)  # lint-amnesty, pylint: disable=unused-variable
+
     if not auto_certificate_generation_enabled():
         return
 
@@ -67,6 +69,10 @@ def listen_for_passing_grade(sender, user, course_id, **kwargs):  # pylint: disa
     Listen for a learner passing a course, send cert generation task,
     downstream signal from COURSE_GRADE_CHANGED
     """
+<<<<<<< HEAD
+=======
+    course = CourseOverview.get_from_id(course_id)  # lint-amnesty, pylint: disable=unused-variable
+>>>>>>> Applied pylint-amnesty to certificates
     if not auto_certificate_generation_enabled():
         return
 

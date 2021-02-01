@@ -1,4 +1,4 @@
-# pylint: disable=bad-continuation
+  # lint-amnesty, pylint: disable=bad-continuation, bad-option-value
 """
 Certificate HTML webview.
 """
@@ -66,7 +66,7 @@ def get_certificate_description(mode, certificate_type, platform_name):
     if mode == 'honor':
         # Translators:  This text describes the 'Honor' course certificate type.
         certificate_type_description = _(u"An {cert_type} certificate signifies that a "
-                                         u"learner has agreed to abide by the honor code established by {platform_name} "
+                                         u"learner has agreed to abide by the honor code established by {platform_name} "  # lint-amnesty, pylint: disable=line-too-long
                                          u"and has completed all of the required tasks for this course under its "
                                          u"guidelines.").format(cert_type=certificate_type,
                                                                 platform_name=platform_name)
@@ -74,7 +74,7 @@ def get_certificate_description(mode, certificate_type, platform_name):
         # Translators:  This text describes the 'ID Verified' course certificate type, which is a higher level of
         # verification offered by edX.  This type of verification is useful for professional education/certifications
         certificate_type_description = _(u"A {cert_type} certificate signifies that a "
-                                         u"learner has agreed to abide by the honor code established by {platform_name} "
+                                         u"learner has agreed to abide by the honor code established by {platform_name} "  # lint-amnesty, pylint: disable=line-too-long
                                          u"and has completed all of the required tasks for this course under its "
                                          u"guidelines. A {cert_type} certificate also indicates that the "
                                          u"identity of the learner has been checked and "
@@ -224,7 +224,7 @@ def _update_context_with_basic_info(context, course_id, platform_name, configura
     )
 
 
-def _update_course_context(request, context, course, course_key, platform_name):
+def _update_course_context(request, context, course, course_key, platform_name):  # lint-amnesty, pylint: disable=unused-argument
     """
     Updates context dictionary with course info.
     """
@@ -250,7 +250,7 @@ def _update_course_context(request, context, course, course_key, platform_name):
             platform_name=platform_name)
 
 
-def _update_social_context(request, context, course, user, user_certificate, platform_name):
+def _update_social_context(request, context, course, user, user_certificate, platform_name):  # lint-amnesty, pylint: disable=unused-argument
     """
     Updates context dictionary with info required for social sharing.
     """
@@ -356,7 +356,7 @@ def _get_user_certificate(request, user, course_key, course, preview_mode=None):
     return user_certificate
 
 
-def _track_certificate_events(request, context, course, user, user_certificate):
+def _track_certificate_events(request, context, course, user, user_certificate):  # lint-amnesty, pylint: disable=unused-argument
     """
     Tracks web certificate view related events.
     """
@@ -437,7 +437,7 @@ def _update_organization_context(context, course):
     context['organization_logo'] = organization_logo
 
 
-def unsupported_url(request, user_id, course_id):
+def unsupported_url(request, user_id, course_id):  # lint-amnesty, pylint: disable=unused-argument
     """
     This view returns the un-supported url page aimed to let the user aware that
     url is no longer supported
@@ -468,7 +468,7 @@ def render_cert_by_uuid(request, certificate_uuid):
         )
         return render_html_view(request, six.text_type(certificate.course_id), certificate)
     except GeneratedCertificate.DoesNotExist:
-        raise Http404
+        raise Http404  # lint-amnesty, pylint: disable=raise-missing-from
 
 
 @handle_500(
@@ -676,7 +676,7 @@ def _render_invalid_certificate(request, course_id, platform_name, configuration
     return render_to_response(cert_path, context)
 
 
-def _render_valid_certificate(request, context, custom_template=None):
+def _render_valid_certificate(request, context, custom_template=None):  # lint-amnesty, pylint: disable=missing-function-docstring
     if custom_template:
         template = Template(
             custom_template.template,

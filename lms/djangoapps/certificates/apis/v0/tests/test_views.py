@@ -3,7 +3,7 @@ Tests for the Certificate REST APIs.
 """
 
 
-from itertools import product
+from itertools import product  # lint-amnesty, pylint: disable=unused-import
 
 import ddt
 import six
@@ -56,7 +56,7 @@ class CertificatesDetailRestApiTest(AuthAndScopesTestMixin, SharedModuleStoreTes
         freezer.start()
         self.addCleanup(freezer.stop)
 
-        super(CertificatesDetailRestApiTest, self).setUp()
+        super(CertificatesDetailRestApiTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
 
         self.cert = GeneratedCertificateFactory.create(
             user=self.student,
@@ -159,7 +159,7 @@ class CertificatesListRestApiTest(AuthAndScopesTestMixin, SharedModuleStoreTestC
         freezer.start()
         self.addCleanup(freezer.stop)
 
-        super(CertificatesListRestApiTest, self).setUp()
+        super(CertificatesListRestApiTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
 
         self.cert = GeneratedCertificateFactory.create(
             user=self.student,

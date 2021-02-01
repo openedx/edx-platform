@@ -27,7 +27,7 @@ class CertificateTemplateForm(forms.ModelForm):
     Django admin form for CertificateTemplate model
     """
     def __init__(self, *args, **kwargs):
-        super(CertificateTemplateForm, self).__init__(*args, **kwargs)
+        super(CertificateTemplateForm, self).__init__(*args, **kwargs)  # lint-amnesty, pylint: disable=super-with-arguments
         organizations = get_organizations()
         org_choices = [(org["id"], org["name"]) for org in organizations]
         org_choices.insert(0, ('', 'None'))
@@ -68,7 +68,7 @@ class CertificateTemplateAssetAdmin(admin.ModelAdmin):
             extra_context = {'title': mark_safe('Select Certificate Template Asset to change <br/><br/>'
                                                 '<div><strong style="color: red;"> Warning!</strong> Updating '
                                                 'stage asset would also update production asset</div>')}
-        return super(CertificateTemplateAssetAdmin, self).changelist_view(request, extra_context=extra_context)
+        return super(CertificateTemplateAssetAdmin, self).changelist_view(request, extra_context=extra_context)  # lint-amnesty, pylint: disable=super-with-arguments
 
 
 class GeneratedCertificateAdmin(admin.ModelAdmin):

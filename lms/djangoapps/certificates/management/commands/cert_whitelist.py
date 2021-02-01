@@ -4,7 +4,7 @@ user/course
 """
 
 
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.core.management.base import BaseCommand, CommandError
 from opaque_keys.edx.keys import CourseKey
 
@@ -98,7 +98,7 @@ class Command(BaseCommand):
 
         if options['add'] or options['del']:
             user_str = options['add'] or options['del']
-            add_to_whitelist = True if options['add'] else False
+            add_to_whitelist = True if options['add'] else False  # lint-amnesty, pylint: disable=simplifiable-if-expression
             users_list = user_str.split(",")
             for username in users_list:
                 if username.strip():

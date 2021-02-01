@@ -45,7 +45,7 @@ class XQueueCertInterfaceAddCertificateTest(ModuleStoreTestCase):
     """Test the "add to queue" operation of the XQueue interface. """
 
     def setUp(self):
-        super(XQueueCertInterfaceAddCertificateTest, self).setUp()
+        super(XQueueCertInterfaceAddCertificateTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.user = UserFactory.create()
         self.course = CourseFactory.create()
         self.enrollment = CourseEnrollmentFactory(
@@ -378,7 +378,7 @@ class XQueueCertInterfaceExampleCertificateTest(TestCase):
     ERROR_MSG = 'Kaboom!'
 
     def setUp(self):
-        super(XQueueCertInterfaceExampleCertificateTest, self).setUp()
+        super(XQueueCertInterfaceExampleCertificateTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.xqueue = XQueueCertInterface()
 
     def test_add_example_cert(self):

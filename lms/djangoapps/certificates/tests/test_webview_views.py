@@ -17,8 +17,8 @@ from mock import patch
 from organizations import api as organizations_api
 
 from common.djangoapps.course_modes.models import CourseMode
-from edx_toggles.toggles import LegacyWaffleSwitch
-from edx_toggles.toggles.testutils import override_waffle_switch
+from edx_toggles.toggles import LegacyWaffleSwitch  # lint-amnesty, pylint: disable=wrong-import-order
+from edx_toggles.toggles.testutils import override_waffle_switch  # lint-amnesty, pylint: disable=wrong-import-order
 from lms.djangoapps.badges.events.course_complete import get_completion_badge
 from lms.djangoapps.badges.tests.factories import (
     BadgeAssertionFactory,
@@ -80,7 +80,7 @@ class CommonCertificatesTestCase(ModuleStoreTestCase):
     ENABLED_SIGNALS = ['course_published']
 
     def setUp(self):
-        super(CommonCertificatesTestCase, self).setUp()
+        super(CommonCertificatesTestCase, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.client = Client()
         self.course = CourseFactory.create(
             org='testorg',
@@ -249,7 +249,7 @@ class CertificatesViewsTests(CommonCertificatesTestCase, CacheIsolationTestCase)
     """
 
     def setUp(self):
-        super(CertificatesViewsTests, self).setUp()
+        super(CertificatesViewsTests, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.mock_course_run_details = {
             'content_language': 'en',
             'weeks_to_complete': '4',

@@ -39,7 +39,7 @@ class XQueueAddToQueueError(Exception):
     def __init__(self, error_code, error_msg):
         self.error_code = error_code
         self.error_msg = error_msg
-        super(XQueueAddToQueueError, self).__init__(six.text_type(self))
+        super(XQueueAddToQueueError, self).__init__(six.text_type(self))  # lint-amnesty, pylint: disable=super-with-arguments
 
     def __str__(self):
         return (
@@ -332,7 +332,7 @@ class XQueueCertInterface(object):
             mode_is_verified,
             generate_pdf
         )
-        cert, created = GeneratedCertificate.objects.get_or_create(user=student, course_id=course_id)
+        cert, created = GeneratedCertificate.objects.get_or_create(user=student, course_id=course_id)  # lint-amnesty, pylint: disable=unused-variable
 
         cert.mode = cert_mode
         cert.user = student
