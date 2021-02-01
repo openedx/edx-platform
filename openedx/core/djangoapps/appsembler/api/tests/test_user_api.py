@@ -1,12 +1,12 @@
 
-from unittest import skip
+import unittest
 
 from django.contrib.sites.models import Site
 from django.urls import resolve, reverse
 from django.test import TestCase
 from rest_framework.test import APIRequestFactory, force_authenticate
 
-from student.tests.factories import CourseEnrollmentFactory, UserFactory
+from student.tests.factories import UserFactory
 
 import ddt
 import mock
@@ -20,7 +20,6 @@ from openedx.core.djangoapps.appsembler.api.sites import (
 from openedx.core.djangoapps.appsembler.api.v1.serializers import UserIndexSerializer
 
 from openedx.core.djangoapps.appsembler.api.tests.factories import (
-    CourseOverviewFactory,
     OrganizationFactory,
     UserOrganizationMappingFactory,
 )
@@ -94,7 +93,6 @@ class UserIndexViewSetTest(TestCase):
         response.render()
         results = response.data['results']
 
-        response_count = len(results)
         expected_users = get_users_for_site(self.my_site)
 
         user_ids = [rec['id'] for rec in results]
@@ -102,10 +100,18 @@ class UserIndexViewSetTest(TestCase):
 
     @ddt.unpack
     @ddt.data(
-        {'email': JANE_DUE_EMAIL.lower(), 'expected_count': 1, 'msg': 'Should find Jane (lower case) in the users'},
-        {'email': JANE_DUE_EMAIL.upper(), 'expected_count': 1, 'msg': 'Should find Jane (upper case) in the users'},
-        {'email': JANE_DUE_USERNAME, 'expected_count': 0, 'msg': 'Should not do partial matching'},
-        {'email': NON_USER_EMAIL, 'expected_count': 0, 'msg': 'Should not match any user.'},
+        {'email': JANE_DUE_EMAIL.lower(),
+         'expected_count': 1,
+         'msg': 'Should find Jane (lower case) in the users'},
+        {'email': JANE_DUE_EMAIL.upper(),
+         'expected_count': 1,
+         'msg': 'Should find Jane (upper case) in the users'},
+        {'email': JANE_DUE_USERNAME,
+         'expected_count': 0,
+         'msg': 'Should not do partial matching'},
+        {'email': NON_USER_EMAIL,
+         'expected_count': 0,
+         'msg': 'Should not match any user.'},
     )
     def test_filter_by_email(self, email, expected_count, msg):
         """
@@ -126,9 +132,11 @@ class UserIndexViewSetTest(TestCase):
             # Ignore the email case
             assert results[0]['email'].lower() == email.lower(), msg
 
-    @skip("Need to implement user filter")
+    @unittest.expectedFailure
     def test_get_all_enrolled_learners_for_site(self):
-
+        """
+        Need to implement enrollments filtering in the ViewSet
+        """
         # Set up enrollment data
 
         url = reverse('tahoe-api:v1:users-list')
@@ -141,6 +149,5 @@ class UserIndexViewSetTest(TestCase):
         response.render()
         results = response.data['results']
 
-        response_count = len(results)
         user_ids = [rec['id'] for rec in results]
         assert set(user_ids) == set([obj.id for obj in self.my_site_users])

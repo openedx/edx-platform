@@ -1,7 +1,7 @@
 """URL definitions for Tahoe API version 1
 """
 
-from django.conf.urls import include, url
+from django.urls import include, path
 from rest_framework import routers
 
 # Initially doing relative pathing because the full path is a mouthful and a half:
@@ -15,27 +15,27 @@ router = routers.DefaultRouter()
 router.register(
     r'courses',
     views.CourseViewSet,
-    'courses',
+    basename='courses',
 )
 
 router.register(
     r'enrollments',
     views.EnrollmentViewSet,
-    'enrollments',
+    basename='enrollments',
 )
 
 router.register(
     r'registrations',
     views.RegistrationViewSet,
-    'registrations',
+    basename='registrations',
 )
 
 router.register(
     r'users',
     views.UserIndexViewSet,
-    'users',
+    basename='users'
 )
 
 urlpatterns = [
-    url(r'', include(router.urls, )),
+    path('', include(router.urls)),
 ]

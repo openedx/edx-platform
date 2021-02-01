@@ -9,5 +9,5 @@ from openedx.core.djangoapps.appsembler.api.v1 import urls as v1_urls
 
 
 urlpatterns = [
-    url(r'^v1/', include(v1_urls, namespace='v1')),
+    url(r'^v1/', include((v1_urls, 'v1'), namespace='v1')),
 ]
