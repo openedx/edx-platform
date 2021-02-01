@@ -9,7 +9,7 @@ from django.test.utils import override_settings
 from django.urls import reverse
 
 from ..api import _footer_business_links, get_footer, get_home_url, get_logo_url
-from openedx.core.djangoapps.site_configuration.tests.test_util import with_site_configuration
+from openedx.core.djangoapps.site_configuration.tests.test_util import with_site_configuration  # lint-amnesty, pylint: disable=wrong-import-order
 
 test_config_disabled_contact_us = {   # pylint: disable=invalid-name
     "CONTACT_US_ENABLE": False,

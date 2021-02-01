@@ -9,7 +9,7 @@ from django.core.cache import cache
 from django.db import transaction
 from django.http import Http404, HttpResponse
 from django.shortcuts import redirect
-from django.urls import reverse
+from django.urls import reverse  # lint-amnesty, pylint: disable=unused-import
 from django.urls.exceptions import NoReverseMatch
 from django.utils import translation
 from django.utils.translation.trans_real import get_supported_language_variant
@@ -309,7 +309,7 @@ def footer(request):
             with translation.override(language):
                 footer_dict = branding_api.get_footer(is_secure=request.is_secure())
                 cache.set(cache_key, footer_dict, settings.FOOTER_CACHE_TIMEOUT)
-        return JsonResponse(footer_dict, 200, content_type="application/json; charset=utf-8")
+        return JsonResponse(footer_dict, 200, content_type="application/json; charset=utf-8")  # lint-amnesty, pylint: disable=redundant-content-type-for-json-response
 
     else:
         return HttpResponse(status=406)

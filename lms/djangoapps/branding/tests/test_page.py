@@ -44,7 +44,7 @@ class AnonymousIndexPageTest(ModuleStoreTestCase):
     Tests that anonymous users can access the '/' page,  Need courses with start date
     """
     def setUp(self):
-        super(AnonymousIndexPageTest, self).setUp()
+        super(AnonymousIndexPageTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.factory = RequestFactory()
         self.course = CourseFactory.create(
             days_early_for_beta=5,
@@ -161,7 +161,7 @@ class IndexPageCourseCardsSortingTests(ModuleStoreTestCase):
     ENABLED_SIGNALS = ['course_published']
 
     def setUp(self):
-        super(IndexPageCourseCardsSortingTests, self).setUp()
+        super(IndexPageCourseCardsSortingTests, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.starting_later = CourseFactory.create(
             org='MITx',
             number='1000',
