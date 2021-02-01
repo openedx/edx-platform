@@ -60,7 +60,7 @@ class TestProgramListing(ProgramsApiConfigMixin, SharedModuleStoreTestCase):
         super(TestProgramListing, cls).setUpClass()
 
         cls.course = ModuleStoreCourseFactory()
-        course_run = CourseRunFactory(key=six.text_type(cls.course.id))
+        course_run = CourseRunFactory(key=six.text_type(cls.course.id))  # lint-amnesty, pylint: disable=no-member
         course = CourseFactory(course_runs=[course_run])
 
         cls.first_program = ProgramFactory(courses=[course])
@@ -69,7 +69,7 @@ class TestProgramListing(ProgramsApiConfigMixin, SharedModuleStoreTestCase):
         cls.data = sorted([cls.first_program, cls.second_program], key=cls.program_sort_key)
 
     def setUp(self):
-        super(TestProgramListing, self).setUp()
+        super(TestProgramListing, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
 
         self.user = UserFactory()
         self.client.login(username=self.user.username, password=self.password)
@@ -140,7 +140,7 @@ class TestProgramListing(ProgramsApiConfigMixin, SharedModuleStoreTestCase):
         self.create_programs_config()
         mock_get_programs.return_value = self.data
 
-        CourseEnrollmentFactory(user=self.user, course_id=self.course.id)
+        CourseEnrollmentFactory(user=self.user, course_id=self.course.id)  # lint-amnesty, pylint: disable=no-member
 
         response = self.client.get(self.url)
         actual = load_serialized_data(response, 'programsData')
@@ -181,7 +181,7 @@ class TestProgramListing(ProgramsApiConfigMixin, SharedModuleStoreTestCase):
         self.create_programs_config()
         mock_get_programs.return_value = self.data
 
-        CourseEnrollmentFactory(user=self.user, course_id=self.course.id)
+        CourseEnrollmentFactory(user=self.user, course_id=self.course.id)  # lint-amnesty, pylint: disable=no-member
 
         response = self.client.get(self.url)
         actual = load_serialized_data(response, 'programsData')
@@ -208,17 +208,17 @@ class TestProgramDetails(ProgramsApiConfigMixin, CatalogIntegrationMixin, Shared
         super(TestProgramDetails, cls).setUpClass()
 
         modulestore_course = ModuleStoreCourseFactory()
-        course_run = CourseRunFactory(key=six.text_type(modulestore_course.id))
+        course_run = CourseRunFactory(key=six.text_type(modulestore_course.id))  # lint-amnesty, pylint: disable=no-member
         course = CourseFactory(course_runs=[course_run])
 
         cls.program_data = ProgramFactory(uuid=cls.program_uuid, courses=[course])
         cls.pathway_data = PathwayFactory()
         cls.program_data['pathway_ids'] = [cls.pathway_data['id']]
         cls.pathway_data['program_uuids'] = [cls.program_data['uuid']]
-        del cls.pathway_data['programs']
+        del cls.pathway_data['programs']  # lint-amnesty, pylint: disable=unsupported-delete-operation
 
     def setUp(self):
-        super(TestProgramDetails, self).setUp()
+        super(TestProgramDetails, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
 
         self.user = UserFactory()
         self.client.login(username=self.user.username, password=self.password)

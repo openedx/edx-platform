@@ -35,7 +35,7 @@ class AlreadyRunningError(Exception):
 
         if not message:
             message = self.message
-        super(AlreadyRunningError, self).__init__(message)
+        super(AlreadyRunningError, self).__init__(message)  # lint-amnesty, pylint: disable=super-with-arguments
 
 
 class QueueConnectionError(Exception):
@@ -47,7 +47,7 @@ class QueueConnectionError(Exception):
     def __init__(self, message=None):
         if not message:
             message = self.message
-        super(QueueConnectionError, self).__init__(message)
+        super(QueueConnectionError, self).__init__(message)  # lint-amnesty, pylint: disable=super-with-arguments
 
 
 def _task_is_running(course_id, task_type, task_key):
@@ -449,7 +449,7 @@ def submit_task(request, task_type, task_class, course_key, task_input, task_key
     try:
         task_class.apply_async(task_args, task_id=task_id)
 
-    except Exception as error:
+    except Exception as error:  # lint-amnesty, pylint: disable=broad-except
         _handle_instructor_task_failure(instructor_task, error)
 
     return instructor_task

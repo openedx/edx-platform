@@ -105,7 +105,7 @@ class TestAnalyticsFormatInstances(TestCase):
             return 'dval'
 
     def setUp(self):
-        super(TestAnalyticsFormatInstances, self).setUp()
+        super(TestAnalyticsFormatInstances, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.instances = [self.TestDataClass() for _ in range(5)]
 
     def test_format_instances_response(self):
