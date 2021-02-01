@@ -35,7 +35,7 @@ class GitImportError(Exception):
     def __init__(self, message=None):
         if message is None:
             message = self.MESSAGE
-        super(GitImportError, self).__init__(message)
+        super(GitImportError, self).__init__(message)  # lint-amnesty, pylint: disable=super-with-arguments
 
 
 class GitImportErrorNoDir(GitImportError):
@@ -43,7 +43,7 @@ class GitImportErrorNoDir(GitImportError):
     GitImportError when no directory exists at the specified path.
     """
     def __init__(self, repo_dir):
-        super(GitImportErrorNoDir, self).__init__(
+        super(GitImportErrorNoDir, self).__init__(  # lint-amnesty, pylint: disable=super-with-arguments
             _(
                 u"Path {0} doesn't exist, please create it, "
                 u"or configure a different path with "
@@ -136,7 +136,7 @@ def switch_branch(branch, rdir):
         cmd_log(['git', 'fetch', ], rdir)
     except subprocess.CalledProcessError as ex:
         log.exception(u'Unable to fetch remote: %r', ex.output)
-        raise GitImportErrorCannotBranch()
+        raise GitImportErrorCannotBranch()  # lint-amnesty, pylint: disable=raise-missing-from
 
     # Check if the branch is available from the remote.
     cmd = ['git', 'ls-remote', 'origin', '-h', 'refs/heads/{0}'.format(branch), ]
@@ -144,7 +144,7 @@ def switch_branch(branch, rdir):
         output = cmd_log(cmd, rdir)
     except subprocess.CalledProcessError as ex:
         log.exception(u'Getting a list of remote branches failed: %r', ex.output)
-        raise GitImportErrorCannotBranch()
+        raise GitImportErrorCannotBranch()  # lint-amnesty, pylint: disable=raise-missing-from
     if branch not in output:
         raise GitImportErrorRemoteBranchMissing()
     # Check it the remote branch has already been made locally
@@ -153,7 +153,7 @@ def switch_branch(branch, rdir):
         output = cmd_log(cmd, rdir)
     except subprocess.CalledProcessError as ex:
         log.exception(u'Getting a list of local branches failed: %r', ex.output)
-        raise GitImportErrorCannotBranch()
+        raise GitImportErrorCannotBranch()  # lint-amnesty, pylint: disable=raise-missing-from
     branches = []
     for line in output.split('\n'):
         branches.append(line.replace('*', '').strip())
@@ -166,14 +166,14 @@ def switch_branch(branch, rdir):
             cmd_log(cmd, rdir)
         except subprocess.CalledProcessError as ex:
             log.exception(u'Unable to checkout remote branch: %r', ex.output)
-            raise GitImportErrorCannotBranch()
+            raise GitImportErrorCannotBranch()  # lint-amnesty, pylint: disable=raise-missing-from
     # Go ahead and reset hard to the newest version of the branch now that we know
     # it is local.
     try:
         cmd_log(['git', 'reset', '--hard', 'origin/{0}'.format(branch), ], rdir)
     except subprocess.CalledProcessError as ex:
         log.exception(u'Unable to reset to branch: %r', ex.output)
-        raise GitImportErrorCannotBranch()
+        raise GitImportErrorCannotBranch()  # lint-amnesty, pylint: disable=raise-missing-from
 
 
 def add_repo(repo, rdir_in, branch=None):
@@ -232,7 +232,7 @@ def add_repo(repo, rdir_in, branch=None):
         ret_git = cmd_log(cmd, cwd=cwd)
     except subprocess.CalledProcessError as ex:
         log.exception(u'Error running git pull: %r', ex.output)
-        raise GitImportErrorCannotPull()
+        raise GitImportErrorCannotPull()  # lint-amnesty, pylint: disable=raise-missing-from
 
     if branch:
         switch_branch(branch, rdirp)
@@ -243,7 +243,7 @@ def add_repo(repo, rdir_in, branch=None):
         commit_id = cmd_log(cmd, cwd=rdirp)
     except subprocess.CalledProcessError as ex:
         log.exception(u'Unable to get git log: %r', ex.output)
-        raise GitImportErrorBadRepo()
+        raise GitImportErrorBadRepo()  # lint-amnesty, pylint: disable=raise-missing-from
 
     ret_git += u'\nCommit ID: {0}'.format(commit_id)
 
@@ -255,7 +255,7 @@ def add_repo(repo, rdir_in, branch=None):
         # I can't discover a way to excercise this, but git is complex
         # so still logging and raising here in case.
         log.exception(u'Unable to determine branch: %r', ex.output)
-        raise GitImportErrorBadRepo()
+        raise GitImportErrorBadRepo()  # lint-amnesty, pylint: disable=raise-missing-from
 
     ret_git += u'{0}Branch: {1}'.format('   \n', branch)
 
@@ -281,9 +281,9 @@ def add_repo(repo, rdir_in, branch=None):
             python_lib_filename=python_lib_filename
         )
     except CommandError:
-        raise GitImportErrorXmlImportFailed()
+        raise GitImportErrorXmlImportFailed()  # lint-amnesty, pylint: disable=raise-missing-from
     except NotImplementedError:
-        raise GitImportErrorUnsupportedStore()
+        raise GitImportErrorUnsupportedStore()  # lint-amnesty, pylint: disable=raise-missing-from
 
     ret_import = output.getvalue()
 

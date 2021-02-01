@@ -59,7 +59,7 @@ class TestGitAddCourse(SharedModuleStoreTestCase):
     ENABLED_CACHES = ['default', 'mongo_metadata_inheritance', 'loc_cache']
 
     def setUp(self):
-        super(TestGitAddCourse, self).setUp()
+        super(TestGitAddCourse, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.git_repo_dir = settings.GIT_REPO_DIR
 
     def assertCommandFailureRegexp(self, regex, *args):

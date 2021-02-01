@@ -1,4 +1,4 @@
-import json
+import json  # lint-amnesty, pylint: disable=missing-module-docstring
 
 import django.http
 from django.test import TestCase
@@ -8,10 +8,10 @@ import lms.djangoapps.discussion.django_comment_client.middleware as middleware
 import openedx.core.djangoapps.django_comment_common.comment_client as comment_client
 
 
-class AjaxExceptionTestCase(TestCase):
+class AjaxExceptionTestCase(TestCase):  # lint-amnesty, pylint: disable=missing-class-docstring
 
     def setUp(self):
-        super(AjaxExceptionTestCase, self).setUp()
+        super(AjaxExceptionTestCase, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.a = middleware.AjaxExceptionMiddleware()
         self.request1 = django.http.HttpRequest()
         self.request0 = django.http.HttpRequest()

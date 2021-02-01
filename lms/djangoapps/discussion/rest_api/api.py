@@ -62,7 +62,7 @@ from openedx.core.djangoapps.django_comment_common.signals import (
 )
 from openedx.core.djangoapps.django_comment_common.utils import get_course_discussion_settings
 from openedx.core.djangoapps.user_api.accounts.api import get_account_settings
-from openedx.core.djangoapps.user_api.accounts.views import AccountViewSet
+from openedx.core.djangoapps.user_api.accounts.views import AccountViewSet  # lint-amnesty, pylint: disable=unused-import
 from openedx.core.lib.exceptions import CourseNotFoundError, DiscussionNotFoundError, PageNotFoundError
 
 
@@ -96,11 +96,11 @@ def _get_course(course_key, user):
         course = get_course_with_access(user, 'load', course_key, check_if_enrolled=True)
     except Http404:
         # Convert 404s into CourseNotFoundErrors.
-        raise CourseNotFoundError("Course not found.")
+        raise CourseNotFoundError("Course not found.")  # lint-amnesty, pylint: disable=raise-missing-from
     except CourseAccessRedirect:
         # Raise course not found if the user cannot access the course
         # since it doesn't make sense to redirect an API.
-        raise CourseNotFoundError("Course not found.")
+        raise CourseNotFoundError("Course not found.")  # lint-amnesty, pylint: disable=raise-missing-from
     if not any([tab.type == 'discussion' and tab.is_enabled(course, user) for tab in course.tabs]):
         raise DiscussionDisabledError("Discussion is disabled for the course.")
     return course
@@ -137,7 +137,7 @@ def _get_thread_and_context(request, thread_id, retrieve_kwargs=None):
     except CommentClientRequestError:
         # params are validated at a higher level, so the only possible request
         # error is if the thread doesn't exist
-        raise ThreadNotFoundError("Thread not found.")
+        raise ThreadNotFoundError("Thread not found.")  # lint-amnesty, pylint: disable=raise-missing-from
 
 
 def _get_comment_and_context(request, comment_id):
@@ -153,7 +153,7 @@ def _get_comment_and_context(request, comment_id):
         _, context = _get_thread_and_context(request, cc_comment["thread_id"])
         return cc_comment, context
     except CommentClientRequestError:
-        raise CommentNotFoundError("Comment not found.")
+        raise CommentNotFoundError("Comment not found.")  # lint-amnesty, pylint: disable=raise-missing-from
 
 
 def _is_user_author_or_privileged(cc_content, context):
@@ -677,7 +677,7 @@ def get_comment_list(request, thread_id, endorsed, page, page_size, requested_fi
     # responses to question threads must be separated by endorsed due to the
     # existing comments service interface
     if cc_thread["thread_type"] == "question":
-        if endorsed is None:
+        if endorsed is None:  # lint-amnesty, pylint: disable=no-else-raise
             raise ValidationError({"endorsed": ["This field is required for question threads."]})
         elif endorsed:
             # CS does not apply resp_skip and resp_limit to endorsed responses
@@ -827,7 +827,7 @@ def _handle_voted_field(form_value, cc_content, api_content, request, context):
         context["cc_requester"].unvote(cc_content)
         api_content["vote_count"] -= 1
     track_voted_event(
-        request, context["course"], cc_content, vote_value="up", undo_vote=False if form_value else True
+        request, context["course"], cc_content, vote_value="up", undo_vote=False if form_value else True  # lint-amnesty, pylint: disable=simplifiable-if-expression
     )
 
 
@@ -866,7 +866,7 @@ def create_thread(request, thread_data):
         course_key = CourseKey.from_string(course_id)
         course = _get_course(course_key, user)
     except InvalidKeyError:
-        raise ValidationError({"course_id": ["Invalid value."]})
+        raise ValidationError({"course_id": ["Invalid value."]})  # lint-amnesty, pylint: disable=raise-missing-from
 
     context = get_context(course, request)
     _check_initializable_thread_fields(thread_data, context)
@@ -1100,7 +1100,7 @@ def get_response_comments(request, comment_id, page, page_size, requested_fields
         paginator = DiscussionAPIPagination(request, page, num_pages, comments_count)
         return paginator.get_paginated_response(results)
     except CommentClientRequestError:
-        raise CommentNotFoundError("Comment not found")
+        raise CommentNotFoundError("Comment not found")  # lint-amnesty, pylint: disable=raise-missing-from
 
 
 def delete_thread(request, thread_id):

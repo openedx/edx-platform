@@ -3,13 +3,13 @@ Reload forum (comment client) users from existing users.
 """
 
 
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.core.management.base import BaseCommand
 
 import openedx.core.djangoapps.django_comment_common.comment_client as cc
 
 
-class Command(BaseCommand):
+class Command(BaseCommand):  # lint-amnesty, pylint: disable=missing-class-docstring
     help = 'Reload forum (comment client) users from existing users.'
 
     def add_arguments(self, parser):
@@ -18,12 +18,12 @@ class Command(BaseCommand):
                             metavar='username',
                             help='zero or more usernames (zero implies all users)')
 
-    def adduser(self, user):
+    def adduser(self, user):  # lint-amnesty, pylint: disable=missing-function-docstring
         print(user)
         try:
             cc_user = cc.User.from_django_user(user)
             cc_user.save()
-        except Exception as err:
+        except Exception as err:  # lint-amnesty, pylint: disable=broad-except
             print(u'update user info to discussion failed for user with id: {}, error={}'.format(user, str(err)))
 
     def handle(self, *args, **options):

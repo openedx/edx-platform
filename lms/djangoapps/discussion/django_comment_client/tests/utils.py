@@ -26,7 +26,7 @@ class ForumsEnableMixin(object):
     Ensures that the forums are enabled for a given test class.
     """
     def setUp(self):
-        super(ForumsEnableMixin, self).setUp()
+        super(ForumsEnableMixin, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
 
         config = ForumsConfig.current()
         config.enabled = True
@@ -61,7 +61,7 @@ class CohortedTestCase(ForumsEnableMixin, UrlResetMixin, SharedModuleStoreTestCa
 
     @patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
     def setUp(self):
-        super(CohortedTestCase, self).setUp()
+        super(CohortedTestCase, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
 
         seed_permissions_roles(self.course.id)
         self.student = UserFactory.create()

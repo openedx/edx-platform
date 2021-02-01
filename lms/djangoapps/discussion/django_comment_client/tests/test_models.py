@@ -18,7 +18,7 @@ class RoleClassTestCase(ModuleStoreTestCase):
     MODULESTORE = TEST_DATA_MIXED_MODULESTORE
 
     def setUp(self):
-        super(RoleClassTestCase, self).setUp()
+        super(RoleClassTestCase, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
 
         # For course ID, syntax edx/classname/classdate is important
         # because xmodel.course_module.id_to_location looks for a string to split
@@ -58,7 +58,7 @@ class PermissionClassTestCase(TestCase):
     """
 
     def setUp(self):
-        super(PermissionClassTestCase, self).setUp()
+        super(PermissionClassTestCase, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.permission = models.Permission.objects.get_or_create(name="test")[0]
 
     def test_unicode(self):

@@ -75,18 +75,18 @@ class ThreadListGetForm(_PaginationForm):
         try:
             return CourseLocator.from_string(value)
         except InvalidKeyError:
-            raise ValidationError(u"'{}' is not a valid course id".format(value))
+            raise ValidationError(u"'{}' is not a valid course id".format(value))  # lint-amnesty, pylint: disable=raise-missing-from
 
     def clean_following(self):
         """Validate following"""
         value = self.cleaned_data["following"]
-        if value is False:
+        if value is False:  # lint-amnesty, pylint: disable=no-else-raise
             raise ValidationError("The value of the 'following' parameter must be true.")
         else:
             return value
 
     def clean(self):
-        cleaned_data = super(ThreadListGetForm, self).clean()
+        cleaned_data = super(ThreadListGetForm, self).clean()  # lint-amnesty, pylint: disable=super-with-arguments
         exclusive_params_count = sum(
             1 for param in self.EXCLUSIVE_PARAMS if cleaned_data.get(param)
         )
@@ -143,7 +143,7 @@ class CourseDiscussionSettingsForm(Form):
 
     def __init__(self, *args, **kwargs):
         self.request_user = kwargs.pop('request_user')
-        super(CourseDiscussionSettingsForm, self).__init__(*args, **kwargs)
+        super(CourseDiscussionSettingsForm, self).__init__(*args, **kwargs)  # lint-amnesty, pylint: disable=super-with-arguments
 
     def clean_course_id(self):
         """Validate the 'course_id' value"""
@@ -154,7 +154,7 @@ class CourseDiscussionSettingsForm(Form):
             self.cleaned_data['course_key'] = course_key
             return course_id
         except InvalidKeyError:
-            raise ValidationError(u"'{}' is not a valid course key".format(text_type(course_id)))
+            raise ValidationError(u"'{}' is not a valid course key".format(text_type(course_id)))  # lint-amnesty, pylint: disable=raise-missing-from
 
 
 class CourseDiscussionRolesForm(CourseDiscussionSettingsForm):
@@ -179,7 +179,7 @@ class CourseDiscussionRolesForm(CourseDiscussionSettingsForm):
             try:
                 role = Role.objects.get(name=rolename, course_id=course_id)
             except Role.DoesNotExist:
-                raise ValidationError(u"Role '{}' does not exist".format(rolename))
+                raise ValidationError(u"Role '{}' does not exist".format(rolename))  # lint-amnesty, pylint: disable=raise-missing-from
 
             self.cleaned_data['role'] = role
             return rolename

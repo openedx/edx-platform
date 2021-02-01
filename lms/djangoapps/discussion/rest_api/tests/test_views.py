@@ -61,7 +61,7 @@ class DiscussionAPIViewTestMixin(ForumsEnableMixin, CommentsServiceMockMixin, Ur
 
     @mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
     def setUp(self):
-        super(DiscussionAPIViewTestMixin, self).setUp()
+        super(DiscussionAPIViewTestMixin, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.maxDiff = None  # pylint: disable=invalid-name
         self.course = CourseFactory.create(
             org="x",
@@ -139,7 +139,7 @@ class DiscussionAPIViewTestMixin(ForumsEnableMixin, CommentsServiceMockMixin, Ur
 class CourseViewTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
     """Tests for CourseView"""
     def setUp(self):
-        super(CourseViewTest, self).setUp()
+        super(CourseViewTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.url = reverse("discussion_course", kwargs={"course_id": text_type(self.course.id)})
 
     def test_404(self):
@@ -174,7 +174,7 @@ class CourseViewTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
 class RetireViewTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
     """Tests for CourseView"""
     def setUp(self):
-        super(RetireViewTest, self).setUp()
+        super(RetireViewTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         RetirementState.objects.create(state_name='PENDING', state_execution_order=1)
         self.retire_forums_state = RetirementState.objects.create(state_name='RETIRE_FORUMS', state_execution_order=11)
 
@@ -238,7 +238,7 @@ class RetireViewTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
         """
         Override the parent implementation of this, we JWT auth for this API
         """
-        pass
+        pass  # lint-amnesty, pylint: disable=unnecessary-pass
 
 
 @ddt.ddt
@@ -248,7 +248,7 @@ class RetireViewTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
 class ReplaceUsernamesViewTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
     """Tests for ReplaceUsernamesView"""
     def setUp(self):
-        super(ReplaceUsernamesViewTest, self).setUp()
+        super(ReplaceUsernamesViewTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.client_user = UserFactory()
         self.client_user.username = "test_replace_username_service_worker"
         self.new_username = "test_username_replacement"
@@ -332,7 +332,7 @@ class ReplaceUsernamesViewTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
         """
         Override the parent implementation of this, we JWT auth for this API
         """
-        pass
+        pass  # lint-amnesty, pylint: disable=unnecessary-pass
 
 
 @ddt.ddt
@@ -342,7 +342,7 @@ class CourseTopicsViewTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
     Tests for CourseTopicsView
     """
     def setUp(self):
-        super(CourseTopicsViewTest, self).setUp()
+        super(CourseTopicsViewTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.url = reverse("course_topics", kwargs={"course_id": text_type(self.course.id)})
 
     def create_course(self, modules_count, module_store, topics):
@@ -495,7 +495,7 @@ class CourseTopicsViewTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
 class ThreadViewSetListTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase, ProfileImageTestMixin):
     """Tests for ThreadViewSet list"""
     def setUp(self):
-        super(ThreadViewSetListTest, self).setUp()
+        super(ThreadViewSetListTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.author = UserFactory.create()
         self.url = reverse("thread-list")
 
@@ -664,7 +664,7 @@ class ThreadViewSetListTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase, Pro
             expected_response
         )
         self.assertEqual(
-            urlparse(httpretty.last_request().path).path,
+            urlparse(httpretty.last_request().path).path,  # lint-amnesty, pylint: disable=no-member
             "/api/v1/users/{}/subscribed_threads".format(self.user.id)
         )
 
@@ -835,7 +835,7 @@ class ThreadViewSetListTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase, Pro
 class ThreadViewSetCreateTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
     """Tests for ThreadViewSet create"""
     def setUp(self):
-        super(ThreadViewSetCreateTest, self).setUp()
+        super(ThreadViewSetCreateTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.url = reverse("thread-list")
 
     def test_basic(self):
@@ -862,7 +862,7 @@ class ThreadViewSetCreateTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
         response_data = json.loads(response.content.decode('utf-8'))
         self.assertEqual(response_data, self.expected_thread_data({"read": True}))
         self.assertEqual(
-            httpretty.last_request().parsed_body,
+            httpretty.last_request().parsed_body,  # lint-amnesty, pylint: disable=no-member
             {
                 "course_id": [text_type(self.course.id)],
                 "commentable_id": ["test_topic"],
@@ -901,7 +901,7 @@ class ThreadViewSetPartialUpdateTest(DiscussionAPIViewTestMixin, ModuleStoreTest
     """Tests for ThreadViewSet partial_update"""
     def setUp(self):
         self.unsupported_media_type = JSONParser.media_type
-        super(ThreadViewSetPartialUpdateTest, self).setUp()
+        super(ThreadViewSetPartialUpdateTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.url = reverse("thread-detail", kwargs={"thread_id": "test_thread"})
 
     def test_basic(self):
@@ -932,7 +932,7 @@ class ThreadViewSetPartialUpdateTest(DiscussionAPIViewTestMixin, ModuleStoreTest
             })
         )
         self.assertEqual(
-            httpretty.last_request().parsed_body,
+            httpretty.last_request().parsed_body,  # lint-amnesty, pylint: disable=no-member
             {
                 "course_id": [text_type(self.course.id)],
                 "commentable_id": ["test_topic"],
@@ -1056,7 +1056,7 @@ class ThreadViewSetPartialUpdateTest(DiscussionAPIViewTestMixin, ModuleStoreTest
 class ThreadViewSetDeleteTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
     """Tests for ThreadViewSet delete"""
     def setUp(self):
-        super(ThreadViewSetDeleteTest, self).setUp()
+        super(ThreadViewSetDeleteTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.url = reverse("thread-detail", kwargs={"thread_id": "test_thread"})
         self.thread_id = "test_thread"
 
@@ -1074,7 +1074,7 @@ class ThreadViewSetDeleteTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
         self.assertEqual(response.status_code, 204)
         self.assertEqual(response.content, b"")
         self.assertEqual(
-            urlparse(httpretty.last_request().path).path,
+            urlparse(httpretty.last_request().path).path,  # lint-amnesty, pylint: disable=no-member
             "/api/v1/threads/{}".format(self.thread_id)
         )
         self.assertEqual(httpretty.last_request().method, "DELETE")
@@ -1091,7 +1091,7 @@ class ThreadViewSetDeleteTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
 class CommentViewSetListTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase, ProfileImageTestMixin):
     """Tests for CommentViewSet list"""
     def setUp(self):
-        super(CommentViewSetListTest, self).setUp()
+        super(CommentViewSetListTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.author = UserFactory.create()
         self.url = reverse("comment-list")
         self.thread_id = "test_thread"
@@ -1466,7 +1466,7 @@ class CommentViewSetDeleteTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
     """Tests for ThreadViewSet delete"""
 
     def setUp(self):
-        super(CommentViewSetDeleteTest, self).setUp()
+        super(CommentViewSetDeleteTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.url = reverse("comment-detail", kwargs={"comment_id": "test_comment"})
         self.comment_id = "test_comment"
 
@@ -1490,7 +1490,7 @@ class CommentViewSetDeleteTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
         self.assertEqual(response.status_code, 204)
         self.assertEqual(response.content, b"")
         self.assertEqual(
-            urlparse(httpretty.last_request().path).path,
+            urlparse(httpretty.last_request().path).path,  # lint-amnesty, pylint: disable=no-member
             "/api/v1/comments/{}".format(self.comment_id)
         )
         self.assertEqual(httpretty.last_request().method, "DELETE")
@@ -1507,7 +1507,7 @@ class CommentViewSetDeleteTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
 class CommentViewSetCreateTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
     """Tests for CommentViewSet create"""
     def setUp(self):
-        super(CommentViewSetCreateTest, self).setUp()
+        super(CommentViewSetCreateTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.url = reverse("comment-list")
 
     def test_basic(self):
@@ -1548,11 +1548,11 @@ class CommentViewSetCreateTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
         response_data = json.loads(response.content.decode('utf-8'))
         self.assertEqual(response_data, expected_response_data)
         self.assertEqual(
-            urlparse(httpretty.last_request().path).path,
+            urlparse(httpretty.last_request().path).path,  # lint-amnesty, pylint: disable=no-member
             "/api/v1/threads/test_thread/comments"
         )
         self.assertEqual(
-            httpretty.last_request().parsed_body,
+            httpretty.last_request().parsed_body,  # lint-amnesty, pylint: disable=no-member
             {
                 "course_id": [text_type(self.course.id)],
                 "body": ["Test body"],
@@ -1596,7 +1596,7 @@ class CommentViewSetPartialUpdateTest(DiscussionAPIViewTestMixin, ModuleStoreTes
     """Tests for CommentViewSet partial_update"""
     def setUp(self):
         self.unsupported_media_type = JSONParser.media_type
-        super(CommentViewSetPartialUpdateTest, self).setUp()
+        super(CommentViewSetPartialUpdateTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         httpretty.reset()
         httpretty.enable()
         self.addCleanup(httpretty.reset)
@@ -1650,7 +1650,7 @@ class CommentViewSetPartialUpdateTest(DiscussionAPIViewTestMixin, ModuleStoreTes
             })
         )
         self.assertEqual(
-            httpretty.last_request().parsed_body,
+            httpretty.last_request().parsed_body,  # lint-amnesty, pylint: disable=no-member
             {
                 "body": ["Edited body"],
                 "course_id": [text_type(self.course.id)],
@@ -1713,7 +1713,7 @@ class CommentViewSetPartialUpdateTest(DiscussionAPIViewTestMixin, ModuleStoreTes
 class ThreadViewSetRetrieveTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase, ProfileImageTestMixin):
     """Tests for ThreadViewSet Retrieve"""
     def setUp(self):
-        super(ThreadViewSetRetrieveTest, self).setUp()
+        super(ThreadViewSetRetrieveTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.url = reverse("thread-detail", kwargs={"thread_id": "test_thread"})
         self.thread_id = "test_thread"
 
@@ -1767,7 +1767,7 @@ class ThreadViewSetRetrieveTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase,
 class CommentViewSetRetrieveTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase, ProfileImageTestMixin):
     """Tests for CommentViewSet Retrieve"""
     def setUp(self):
-        super(CommentViewSetRetrieveTest, self).setUp()
+        super(CommentViewSetRetrieveTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.url = reverse("comment-detail", kwargs={"comment_id": "test_comment"})
         self.thread_id = "test_thread"
         self.comment_id = "test_comment"
@@ -1892,7 +1892,7 @@ class CourseDiscussionSettingsAPIViewTest(APITestCase, UrlResetMixin, ModuleStor
     """
     @mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
     def setUp(self):
-        super(CourseDiscussionSettingsAPIViewTest, self).setUp()
+        super(CourseDiscussionSettingsAPIViewTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.course = CourseFactory.create(
             org="x",
             course="y",
@@ -2135,7 +2135,7 @@ class CourseDiscussionRolesAPIViewTest(APITestCase, UrlResetMixin, ModuleStoreTe
     """
     @mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
     def setUp(self):
-        super(CourseDiscussionRolesAPIViewTest, self).setUp()
+        super(CourseDiscussionRolesAPIViewTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.course = CourseFactory.create(
             org="x",
             course="y",
