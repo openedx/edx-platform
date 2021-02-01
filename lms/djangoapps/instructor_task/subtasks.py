@@ -273,7 +273,7 @@ def initialize_subtask_info(entry, action_name, total_num, subtask_id_list):
     return task_progress
 
 
-  # lint-amnesty, pylint: disable=bad-continuation, bad-option-value
+# lint-amnesty, pylint: disable=bad-continuation, bad-option-value
 def queue_subtasks_for_query(
     entry,
     action_name,
