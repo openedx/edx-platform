@@ -13,8 +13,10 @@ from xmodule.modulestore.tests.factories import CourseFactory
 from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
 from lms.djangoapps.certificates.generation_handler import CERTIFICATES_USE_ALLOWLIST
 from lms.djangoapps.certificates.tests.factories import CertificateWhitelistFactory
-from lms.djangoapps.certificates.tests.test_generation_handler import AUTO_GENERATION_SWITCH_NAME, \
+from lms.djangoapps.certificates.tests.test_generation_handler import (
+    AUTO_GENERATION_SWITCH_NAME,
     ID_VERIFIED_METHOD
+)
 
 
 @override_switch(AUTO_GENERATION_SWITCH_NAME, active=True)

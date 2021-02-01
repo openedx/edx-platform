@@ -19,11 +19,12 @@ from lms.djangoapps.certificates.generation_handler import CERTIFICATES_USE_ALLO
 from lms.djangoapps.certificates.models import (
     CertificateGenerationConfiguration,
     CertificateStatuses,
-    CertificateWhitelist,
     GeneratedCertificate
 )
 from lms.djangoapps.certificates.signals import fire_ungenerated_certificate_task
 from lms.djangoapps.certificates.tasks import CERTIFICATE_DELAY_SECONDS
+from lms.djangoapps.certificates.tests.factories import CertificateWhitelistFactory
+from lms.djangoapps.certificates.tests.factories import GeneratedCertificateFactory
 from lms.djangoapps.grades.course_grade_factory import CourseGradeFactory
 from lms.djangoapps.grades.tests.utils import mock_passing_grade
 from lms.djangoapps.verify_student.models import IDVerificationAttempt, SoftwareSecurePhotoVerification
@@ -92,13 +93,13 @@ class WhitelistGeneratedCertificatesTest(ModuleStoreTestCase):
             return_value=None
         ) as mock_generate_certificate_apply_async:
             with override_waffle_switch(AUTO_CERTIFICATE_GENERATION_SWITCH, active=False):
-                CertificateWhitelist.objects.create(
+                CertificateWhitelistFactory(
                     user=self.user,
                     course_id=self.course.id
                 )
                 mock_generate_certificate_apply_async.assert_not_called()
             with override_waffle_switch(AUTO_CERTIFICATE_GENERATION_SWITCH, active=True):
-                CertificateWhitelist.objects.create(
+                CertificateWhitelistFactory(
                     user=self.user,
                     course_id=self.course.id
                 )
@@ -120,13 +121,13 @@ class WhitelistGeneratedCertificatesTest(ModuleStoreTestCase):
                 return_value=None
         ) as mock_generate_certificate_apply_async:
             with override_waffle_switch(AUTO_CERTIFICATE_GENERATION_SWITCH, active=False):
-                CertificateWhitelist.objects.create(
+                CertificateWhitelistFactory(
                     user=self.user,
                     course_id=self.ip_course.id
                 )
                 mock_generate_certificate_apply_async.assert_not_called()
             with override_waffle_switch(AUTO_CERTIFICATE_GENERATION_SWITCH, active=True):
-                CertificateWhitelist.objects.create(
+                CertificateWhitelistFactory(
                     user=self.user,
                     course_id=self.ip_course.id
                 )
@@ -151,7 +152,7 @@ class WhitelistGeneratedCertificatesTest(ModuleStoreTestCase):
                 'lms.djangoapps.certificates.signals.generate_allowlist_certificate_task',
                 return_value=None
             ) as mock_generate_allowlist_task:
-                CertificateWhitelist.objects.create(
+                CertificateWhitelistFactory(
                     user=self.user,
                     course_id=self.ip_course.id,
                     whitelist=True
@@ -173,7 +174,7 @@ class WhitelistGeneratedCertificatesTest(ModuleStoreTestCase):
                 'lms.djangoapps.certificates.signals.generate_allowlist_certificate_task',
                 return_value=None
             ) as mock_generate_allowlist_task:
-                CertificateWhitelist.objects.create(
+                CertificateWhitelistFactory(
                     user=self.user,
                     course_id=self.ip_course.id,
                     whitelist=True
@@ -269,7 +270,7 @@ class PassingGradeCertsTest(ModuleStoreTestCase):
         ) as mock_generate_certificate_apply_async:
             grade_factory = CourseGradeFactory()
             # Create the certificate
-            GeneratedCertificate.eligible_certificates.create(
+            GeneratedCertificateFactory(
                 user=self.user,
                 course_id=self.course.id,
                 status=CertificateStatuses.downloadable
@@ -327,7 +328,7 @@ class FailingGradeCertsTest(ModuleStoreTestCase):
             expected_status = CertificateStatuses.notpassing
         else:
             expected_status = status
-        GeneratedCertificate.eligible_certificates.create(
+        GeneratedCertificateFactory(
             user=self.user,
             course_id=self.course.id,
             status=status
