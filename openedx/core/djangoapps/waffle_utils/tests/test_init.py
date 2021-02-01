@@ -6,7 +6,6 @@ import crum
 import ddt
 from django.test import TestCase
 from django.test.client import RequestFactory
-from django.test.utils import override_settings
 from edx_django_utils.cache import RequestCache
 from mock import patch
 from opaque_keys.edx.keys import CourseKey
@@ -44,7 +43,6 @@ class TestCourseWaffleFlag(TestCase):
         crum.set_current_request(request)
         RequestCache.clear_all_namespaces()
 
-    @override_settings(WAFFLE_FLAG_CUSTOM_ATTRIBUTES=[NAMESPACED_FLAG_NAME])
     @ddt.data(
         {'course_override': WaffleFlagCourseOverrideModel.ALL_CHOICES.on, 'waffle_enabled': False, 'result': True},
         {'course_override': WaffleFlagCourseOverrideModel.ALL_CHOICES.off, 'waffle_enabled': True, 'result': False},
@@ -80,7 +78,6 @@ class TestCourseWaffleFlag(TestCase):
             second_value = False
             self.assertEqual(self.TEST_COURSE_FLAG.is_enabled(self.TEST_COURSE_2_KEY), second_value)
 
-    @override_settings(WAFFLE_FLAG_CUSTOM_ATTRIBUTES=[NAMESPACED_FLAG_NAME])
     def test_undefined_waffle_flag(self):
         """
         Test flag with undefined waffle flag.

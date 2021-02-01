@@ -196,6 +196,5 @@ class CourseWaffleFlag(LegacyWaffleFlag):
             )
         is_enabled_for_course = self._get_course_override_value(course_key)
         if is_enabled_for_course is not None:
-            self.set_monitor_value(is_enabled_for_course)
             return is_enabled_for_course
         return super().is_enabled()
