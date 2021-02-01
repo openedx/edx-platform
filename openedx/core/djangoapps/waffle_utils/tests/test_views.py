@@ -12,14 +12,14 @@ from waffle.testutils import override_switch
 from common.djangoapps.student.tests.factories import UserFactory
 
 from .. import WaffleFlag, WaffleFlagNamespace
-from ..views import ToggleStateView
+from .. import models
+from .. import views as toggle_state_views
 
 TEST_WAFFLE_FLAG_NAMESPACE = WaffleFlagNamespace("test")
 TEST_WAFFLE_FLAG = WaffleFlag(TEST_WAFFLE_FLAG_NAMESPACE, "flag", __name__)
 
 
 # TODO: Missing coverage for:
-# - course overrides
 # - computed_status
 class ToggleStateViewTests(TestCase):
 
@@ -144,11 +144,26 @@ class ToggleStateViewTests(TestCase):
         ][0]
         self.assertNotIn("code_owner", result)
 
+    def test_course_overrides(self):
+        models.WaffleFlagCourseOverrideModel.objects.create(waffle_flag="my.flag", enabled=True)
+        course_overrides = {}
+
+        # pylint: disable=protected-access
+        toggle_state_views._add_waffle_flag_course_override_state(course_overrides)
+        toggle_state_views._add_waffle_flag_computed_status(course_overrides)
+
+        self.assertIn("my.flag", course_overrides)
+        self.assertIn("course_overrides", course_overrides["my.flag"])
+        self.assertEqual(1, len(course_overrides["my.flag"]["course_overrides"]))
+        self.assertEqual("None", course_overrides["my.flag"]["course_overrides"][0]["course_id"])
+        self.assertEqual("on", course_overrides["my.flag"]["course_overrides"][0]["force"])
+        self.assertEqual("both", course_overrides["my.flag"]["computed_status"])
+
     def _get_toggle_state_response(self, is_staff=True):
         request = APIRequestFactory().get('/api/toggles/state/')
         user = UserFactory()
         user.is_staff = is_staff
         request.user = user
-        view = ToggleStateView.as_view()
+        view = toggle_state_views.ToggleStateView.as_view()
         response = view(request)
         return response
