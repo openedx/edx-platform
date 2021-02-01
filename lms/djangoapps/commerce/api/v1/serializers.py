@@ -47,7 +47,7 @@ def validate_course_id(course_id):
     try:
         course_key = CourseKey.from_string(six.text_type(course_id))
     except InvalidKeyError:
-        raise serializers.ValidationError(
+        raise serializers.ValidationError(  # lint-amnesty, pylint: disable=raise-missing-from
             _(u"{course_id} is not a valid course key.").format(
                 course_id=course_id
             )
@@ -69,7 +69,7 @@ class PossiblyUndefinedDateTimeField(serializers.DateTimeField):
     def to_representation(self, value):
         if value is UNDEFINED:
             return None
-        return super(PossiblyUndefinedDateTimeField, self).to_representation(value)
+        return super(PossiblyUndefinedDateTimeField, self).to_representation(value)  # lint-amnesty, pylint: disable=super-with-arguments
 
 
 class CourseSerializer(serializers.Serializer):
