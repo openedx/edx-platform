@@ -2402,21 +2402,47 @@ HEARTBEAT_CELERY_ROUTING_KEY = HIGH_PRIORITY_QUEUE
 
 ################################ Block Structures ###################################
 
+# .. setting_name: BLOCK_STRUCTURES_SETTINGS
+# .. setting_default: dict of settings
+# .. setting_description: Stores all the settings used by block structures and block structure
+#   related tasks. See BLOCK_STRUCTURES_SETTINGS[XXX] documentation for details of each setting.
+#   For more information, check https://openedx.atlassian.net/browse/TNL-5041.
 BLOCK_STRUCTURES_SETTINGS = dict(
-    # Delay, in seconds, after a new edit of a course is published
-    # before updating the block structures cache.  This is needed
-    # for a better chance at getting the latest changes when there
-    # are secondary reads in sharded mongoDB clusters. See TNL-5041
-    # for more info.
+    # .. setting_name: BLOCK_STRUCTURES_SETTINGS['COURSE_PUBLISH_TASK_DELAY']
+    # .. setting_default: 30
+    # .. setting_description: Delay, in seconds, after a new edit of a course is published before
+    #   updating the block structures cache. This is needed for a better chance at getting
+    #   the latest changes when there are secondary reads in sharded mongoDB clusters.
+    #   For more information, check https://openedx.atlassian.net/browse/TNL-5041.
     COURSE_PUBLISH_TASK_DELAY=30,
 
-    # Delay, in seconds, between retry attempts if a task fails.
+    # .. setting_name: BLOCK_STRUCTURES_SETTINGS['TASK_DEFAULT_RETRY_DELAY']
+    # .. setting_default: 30
+    # .. setting_description: Delay, in seconds, between retry attempts if a block structure task
+    #   fails. For more information, check https://openedx.atlassian.net/browse/TNL-5041.
     TASK_DEFAULT_RETRY_DELAY=30,
 
-    # Maximum number of retries per task.
+    # .. setting_name: BLOCK_STRUCTURES_SETTINGS['TASK_MAX_RETRIES']
+    # .. setting_default: 5
+    # .. setting_description: Maximum number of retries per block structure task.
+    #   If the maximum number of retries is exceeded, then you can attempt to either manually run
+    #   the celery task, or wait for it to be triggered again.
+    #   For more information, check https://openedx.atlassian.net/browse/TNL-5041.
     TASK_MAX_RETRIES=5,
 
-    # Backend storage options
+    # .. toggle_name: BLOCK_STRUCTURES_SETTINGS['PRUNING_ACTIVE']
+    # .. toggle_implementation: DjangoSetting
+    # .. toggle_default: False
+    # .. toggle_description: When `True`, only a specified number of versions of block structure
+    #   files are kept for each structure, and the rest are cleaned up. The number of versions that
+    #   are kept can be specified in the `BlockStructureConfiguration`, which can be edited in
+    #   Django Admin. The default number of versions that are kept is `5`.
+    # .. toggle_warnings: This toggle will likely be deprecated and removed.
+    #   The annotation will be updated with the DEPR ticket once that process has started.
+    # .. toggle_use_cases: temporary
+    # .. toggle_creation_date: 2018-03-22
+    # .. toggle_target_removal_date: 2018-06-22
+    # .. toggle_tickets: https://openedx.atlassian.net/browse/EDUCATOR-499
     PRUNING_ACTIVE=False,
 )
 
