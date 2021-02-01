@@ -527,7 +527,17 @@ FEATURES = {
     # .. toggle_tickets: https://github.com/edx/edx-platform/pull/9744
     'ENABLE_SPECIAL_EXAMS': False,
 
-    # Enable OpenBadge support. See the BADGR_* settings later in this file.
+    # .. toggle_name: FEATURES['ENABLE_OPENBADGES']
+    # .. toggle_implementation: DjangoSetting
+    # .. toggle_default: False
+    # .. toggle_description: Enables support for the creation of OpenBadges as a method of awarding credentials.
+    # .. toggle_warnings: The following settings (all of which are in the same file) should be set or reviewed prior to
+    #    enabling this setting: BADGING_BACKEND, BADGR_API_TOKEN, BADGR_BASE_URL, BADGR_ISSUER_SLUG, BADGR_TIMEOUT.
+    #    Full guide for setting up OpenBadges available here:
+    #    https://edx.readthedocs.io/projects/edx-installing-configuring-and-running/en/latest/configuration/enable_badging.html  pylint: disable=line-too-long,useless-suppression
+    # .. toggle_use_cases: open_edx
+    # .. toggle_creation_date: 2015-04-30
+    # .. toggle_tickets: https://openedx.atlassian.net/browse/SOL-1325
     'ENABLE_OPENBADGES': False,
 
     # Enable LTI Provider feature.
@@ -3089,14 +3099,38 @@ CERT_NAME_LONG = "Certificate of Achievement"
 
 #################### OpenBadges Settings #######################
 
+# .. setting_name: BADGING_BACKEND
+# .. setting_default: 'lms.djangoapps.badges.backends.badgr.BadgrBackend'
+# .. setting_description: The backend service class (or callable) for creating OpenBadges. It must implement
+#    the interface provided by lms.djangoapps.badges.backends.base.BadgeBackend
+# .. setting_warning: Review FEATURES['ENABLE_OPENBADGES'] for further context.
 BADGING_BACKEND = 'lms.djangoapps.badges.backends.badgr.BadgrBackend'
 
-# Be sure to set up images for course modes using the BadgeImageConfiguration model in the certificates app.
+# .. setting_name: BADGR_API_TOKEN
+# .. setting_default: None
+# .. setting_description: The API token string for Badgr. You should be able to create this via Badgr's settings. See
+#    https://github.com/concentricsky/badgr-server for details on setting up Badgr.
+# .. setting_warning: Review FEATURES['ENABLE_OPENBADGES'] for further context.
 BADGR_API_TOKEN = None
-# Do not add the trailing slash here.
+
+# .. setting_name: BADGR_BASE_URL
+# .. setting_default: 'http://localhost:8005'
+# .. setting_description: The base URL for the Badgr server.
+# .. setting_warning: DO NOT include a trailing slash. Review FEATURES['ENABLE_OPENBADGES'] for further context.
 BADGR_BASE_URL = "http://localhost:8005"
+
+# .. setting_name: BADGR_ISSUER_SLUG
+# .. setting_default: 'example-issuer'
+# .. setting_description: A string that is the slug for the Badgr issuer. The slug can be obtained from the URL of
+#    the Badgr Server page that displays the issuer. For example, in the URL
+#    http://exampleserver.com/issuer/test-issuer, the issuer slug is "test-issuer".
+# .. setting_warning: Review FEATURES['ENABLE_OPENBADGES'] for further context.
 BADGR_ISSUER_SLUG = "example-issuer"
-# Number of seconds to wait on the badging server when contacting it before giving up.
+
+# .. setting_name: BADGR_TIMEOUT
+# .. setting_default: 10
+# .. setting_description: Number of seconds to wait on the badging server when contacting it before giving up.
+# .. setting_warning: Review FEATURES['ENABLE_OPENBADGES'] for further context.
 BADGR_TIMEOUT = 10
 
 ###################### Grade Downloads ######################
