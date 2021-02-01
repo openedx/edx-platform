@@ -28,7 +28,8 @@ class Command(BaseCommand):
         users_to_be_checked_for_update = self.get_minimal_users_to_be_checked_for_update(prereq_course_groups)
 
         if not users_to_be_checked_for_update:
-            sys.exit('None of the users passed pre-req courses')
+            logger.info('None of the users passed pre-req courses')
+            sys.exit(0)
 
         self.check_users_for_application_update(users_to_be_checked_for_update, prereq_course_groups)
 
