@@ -19,12 +19,12 @@ from six import text_type
 from waffle.testutils import override_switch
 
 from common.djangoapps.course_modes.models import CourseMode
-from edx_toggles.toggles.testutils import override_waffle_flag
+from edx_toggles.toggles.testutils import override_waffle_flag  # lint-amnesty, pylint: disable=wrong-import-order
 from lms.djangoapps.ccx.tests.factories import CcxFactory
 from openedx.features.course_experience import COURSE_ENABLE_UNENROLLED_ACCESS_FLAG
 from openedx.features.course_experience.waffle import ENABLE_COURSE_ABOUT_SIDEBAR_HTML
 from openedx.features.course_experience.waffle import WAFFLE_NAMESPACE as COURSE_EXPERIENCE_WAFFLE_NAMESPACE
-from common.djangoapps.student.models import CourseEnrollment
+from common.djangoapps.student.models import CourseEnrollment  # lint-amnesty, pylint: disable=unused-import
 from common.djangoapps.student.tests.factories import AdminFactory, CourseEnrollmentAllowedFactory, UserFactory
 from common.djangoapps.track.tests import EventTrackingTestCase
 from common.djangoapps.util.milestones_helpers import get_prerequisite_courses_display, set_prerequisite_courses
@@ -79,7 +79,7 @@ class AboutTestCase(LoginEnrollmentTestCase, SharedModuleStoreTestCase, EventTra
         )
 
     def setUp(self):
-        super(AboutTestCase, self).setUp()
+        super(AboutTestCase, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
 
         self.course_mode = CourseMode(
             course_id=self.purchase_course.id,
@@ -242,7 +242,7 @@ class AboutTestCase(LoginEnrollmentTestCase, SharedModuleStoreTestCase, EventTra
             with override_waffle_flag(COURSE_ENABLE_UNENROLLED_ACCESS_FLAG, active=True):
                 url = reverse('about_course', args=[text_type(self.course.id)])
                 resp = self.client.get(url)
-        if course_visibility == COURSE_VISIBILITY_PUBLIC or course_visibility == COURSE_VISIBILITY_PUBLIC_OUTLINE:
+        if course_visibility == COURSE_VISIBILITY_PUBLIC or course_visibility == COURSE_VISIBILITY_PUBLIC_OUTLINE:  # lint-amnesty, pylint: disable=consider-using-in
             self.assertContains(resp, "View Course")
         else:
             self.assertContains(resp, "Enroll Now")
@@ -258,7 +258,7 @@ class AboutTestCaseXML(LoginEnrollmentTestCase, ModuleStoreTestCase):
         """
         Set up the tests
         """
-        super(AboutTestCaseXML, self).setUp()
+        super(AboutTestCaseXML, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
 
         # The following test course (which lives at common/test/data/2014)
         # is closed; we're testing that an about page still appears when
@@ -387,7 +387,7 @@ class AboutWithClosedEnrollment(ModuleStoreTestCase):
     set but it is currently outside of that period.
     """
     def setUp(self):
-        super(AboutWithClosedEnrollment, self).setUp()
+        super(AboutWithClosedEnrollment, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
 
         self.course = CourseFactory.create(metadata={"invitation_only": False})
 
@@ -427,7 +427,7 @@ class AboutSidebarHTMLTestCase(SharedModuleStoreTestCase):
     This test case will check the About page for the content in the HTML sidebar.
     """
     def setUp(self):
-        super(AboutSidebarHTMLTestCase, self).setUp()
+        super(AboutSidebarHTMLTestCase, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.course = CourseFactory.create()
 
     @ddt.data(
@@ -476,7 +476,7 @@ class CourseAboutTestCaseCCX(SharedModuleStoreTestCase, LoginEnrollmentTestCase)
         cls.course = CourseFactory.create()
 
     def setUp(self):
-        super(CourseAboutTestCaseCCX, self).setUp()
+        super(CourseAboutTestCaseCCX, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
 
         # Create ccx coach account
         self.coach = coach = AdminFactory.create(password="test")

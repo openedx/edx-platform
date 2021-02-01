@@ -34,7 +34,7 @@ FILTER_LIST = ['xml_attributes']
 INHERITED_FILTER_LIST = ['children', 'xml_attributes']
 
 
-class Command(BaseCommand):
+class Command(BaseCommand):  # lint-amnesty, pylint: disable=missing-class-docstring
     help = dedent(__doc__).strip()
 
     def add_arguments(self, parser):
@@ -61,7 +61,7 @@ class Command(BaseCommand):
         try:
             course_key = CourseKey.from_string(options['course_id'])
         except InvalidKeyError:
-            raise CommandError("Invalid course_id")
+            raise CommandError("Invalid course_id")  # lint-amnesty, pylint: disable=raise-missing-from
 
         course = store.get_course(course_key)
         if course is None:
@@ -117,7 +117,7 @@ def dump_module(module, destination=None, inherited=False, defaults=False):
             else:
                 return field.values != field.default
 
-        inherited_metadata = {field.name: field.read_json(module) for field in module.fields.values() if is_inherited(field)}
+        inherited_metadata = {field.name: field.read_json(module) for field in module.fields.values() if is_inherited(field)}  # lint-amnesty, pylint: disable=line-too-long
         destination[six.text_type(module.location)]['inherited_metadata'] = inherited_metadata
 
     for child in module.get_children():

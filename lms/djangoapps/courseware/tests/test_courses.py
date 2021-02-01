@@ -70,7 +70,7 @@ class CoursesTest(ModuleStoreTestCase):
         """
         Tests that get_cms_course_link_by_id and get_cms_block_link_by_id return the right thing
         """
-        self.course = CourseFactory.create(
+        self.course = CourseFactory.create(  # lint-amnesty, pylint: disable=attribute-defined-outside-init
             org='org', number='num', display_name='name'
         )
 
@@ -303,7 +303,7 @@ class CoursesRenderTest(ModuleStoreTestCase):
         """
         Set up the course and user context
         """
-        super(CoursesRenderTest, self).setUp()
+        super(CoursesRenderTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
 
         store = modulestore()
         course_items = import_course_from_xml(store, self.user.id, TEST_DATA_DIR, ['toy'])
@@ -340,9 +340,9 @@ class CoursesRenderTest(ModuleStoreTestCase):
             self.assertIn("this module is temporarily unavailable", course_about)
 
 
-class CourseEnrollmentOpenTests(ModuleStoreTestCase):
+class CourseEnrollmentOpenTests(ModuleStoreTestCase):  # lint-amnesty, pylint: disable=missing-class-docstring
     def setUp(self):
-        super(CourseEnrollmentOpenTests, self).setUp()
+        super(CourseEnrollmentOpenTests, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.now = datetime.datetime.now().replace(tzinfo=pytz.UTC)
 
     def test_course_enrollment_open(self):
@@ -392,7 +392,7 @@ class CourseInstantiationTests(ModuleStoreTestCase):
     Tests around instantiating a course multiple times in the same request.
     """
     def setUp(self):
-        super(CourseInstantiationTests, self).setUp()
+        super(CourseInstantiationTests, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
 
         self.factory = RequestFactory()
 

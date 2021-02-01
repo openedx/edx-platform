@@ -12,7 +12,7 @@ from mock import patch
 
 from common.djangoapps.course_modes.models import CourseMode
 from common.djangoapps.course_modes.tests.factories import CourseModeFactory
-from edx_toggles.toggles.testutils import override_waffle_flag
+from edx_toggles.toggles.testutils import override_waffle_flag  # lint-amnesty, pylint: disable=wrong-import-order
 from lms.djangoapps.courseware.course_tools import FinancialAssistanceTool, VerifiedUpgradeTool
 from lms.djangoapps.courseware.models import DynamicUpgradeDeadlineConfiguration
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
@@ -23,7 +23,7 @@ from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
 
-class VerifiedUpgradeToolTest(SharedModuleStoreTestCase):
+class VerifiedUpgradeToolTest(SharedModuleStoreTestCase):  # lint-amnesty, pylint: disable=missing-class-docstring
 
     @classmethod
     def setUpClass(cls):
@@ -41,7 +41,7 @@ class VerifiedUpgradeToolTest(SharedModuleStoreTestCase):
 
     @override_waffle_flag(CREATE_SCHEDULE_WAFFLE_FLAG, True)
     def setUp(self):
-        super(VerifiedUpgradeToolTest, self).setUp()
+        super(VerifiedUpgradeToolTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
 
         self.course_verified_mode = CourseModeFactory(
             course_id=self.course.id,
@@ -124,7 +124,7 @@ class FinancialAssistanceToolTest(SharedModuleStoreTestCase):
 
     @override_waffle_flag(CREATE_SCHEDULE_WAFFLE_FLAG, True)
     def setUp(self):
-        super(FinancialAssistanceToolTest, self).setUp()
+        super(FinancialAssistanceToolTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
 
         self.course_financial_mode = CourseModeFactory(
             course_id=self.course.id,

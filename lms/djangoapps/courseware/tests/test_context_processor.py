@@ -18,7 +18,7 @@ class UserPrefContextProcessorUnitTest(ModuleStoreTestCase):
     """
 
     def setUp(self):
-        super(UserPrefContextProcessorUnitTest, self).setUp()
+        super(UserPrefContextProcessorUnitTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
 
         self.user = UserFactory.create()
         self.request = Mock()

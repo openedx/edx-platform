@@ -287,7 +287,7 @@ class CoursewareIndex(View):
             try:
                 self.position = max(int(self.position), 1)
             except ValueError:
-                raise Http404(u"Position {} is not an integer!".format(self.position))
+                raise Http404(u"Position {} is not an integer!".format(self.position))  # lint-amnesty, pylint: disable=raise-missing-from
 
     def _reset_section_to_exam_if_required(self):
         """

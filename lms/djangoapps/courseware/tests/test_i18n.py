@@ -8,7 +8,7 @@ import re
 import six
 
 from django.conf import settings
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.test.client import Client
 from django.urls import reverse, reverse_lazy
 from django.utils import translation
@@ -29,7 +29,7 @@ class BaseI18nTestCase(CacheIsolationTestCase):
     url = reverse_lazy('dashboard')
 
     def setUp(self):
-        super(BaseI18nTestCase, self).setUp()
+        super(BaseI18nTestCase, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.addCleanup(translation.deactivate)
         self.client = Client()
         self.create_user()
@@ -166,7 +166,7 @@ class I18nLangPrefTests(BaseI18nTestCase):
     and use the dark lang preview functionality.
     """
     def setUp(self):
-        super(I18nLangPrefTests, self).setUp()
+        super(I18nLangPrefTests, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.user_login()
 
     def set_lang_preference(self, language):

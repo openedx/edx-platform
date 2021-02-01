@@ -10,7 +10,7 @@ from datetime import timedelta
 
 import six
 from django.contrib import messages
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.test import TestCase
 from django.test.client import Client, RequestFactory
 from django.urls import reverse
@@ -77,7 +77,7 @@ class BaseTestXmodule(ModuleStoreTestCase):
         runtime.get_block = modulestore().get_item
         return runtime
 
-    def initialize_module(self, **kwargs):
+    def initialize_module(self, **kwargs):  # lint-amnesty, pylint: disable=missing-function-docstring
         kwargs.update({
             'parent_location': self.section.location,
             'category': self.CATEGORY
@@ -90,13 +90,13 @@ class BaseTestXmodule(ModuleStoreTestCase):
         field_data = {}
         field_data.update(self.MODEL_DATA)
         student_data = DictFieldData(field_data)
-        self.item_descriptor._field_data = LmsFieldData(self.item_descriptor._field_data, student_data)
+        self.item_descriptor._field_data = LmsFieldData(self.item_descriptor._field_data, student_data)  # lint-amnesty, pylint: disable=protected-access
 
         self.item_descriptor.xmodule_runtime = self.new_module_runtime()
 
         self.item_url = six.text_type(self.item_descriptor.location)
 
-    def setup_course(self):
+    def setup_course(self):  # lint-amnesty, pylint: disable=missing-function-docstring
         self.course = CourseFactory.create(data=self.COURSE_DATA)
 
         # Turn off cache.
@@ -132,7 +132,7 @@ class BaseTestXmodule(ModuleStoreTestCase):
         self.assertTrue(all(self.login_statuses))
 
     def setUp(self):
-        super(BaseTestXmodule, self).setUp()
+        super(BaseTestXmodule, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.setup_course()
         self.initialize_module(metadata=self.METADATA, data=self.DATA)
 
@@ -144,13 +144,13 @@ class BaseTestXmodule(ModuleStoreTestCase):
         )
 
 
-class XModuleRenderingTestBase(BaseTestXmodule):
+class XModuleRenderingTestBase(BaseTestXmodule):  # lint-amnesty, pylint: disable=missing-class-docstring
 
     def new_module_runtime(self):
         """
         Create a runtime that actually does html rendering
         """
-        runtime = super(XModuleRenderingTestBase, self).new_module_runtime()
+        runtime = super(XModuleRenderingTestBase, self).new_module_runtime()  # lint-amnesty, pylint: disable=super-with-arguments
         runtime.render_template = render_to_string
         return runtime
 
@@ -166,9 +166,9 @@ class LoginEnrollmentTestCase(TestCase):
         """
         Create a user account, activate, and log in.
         """
-        self.email = 'foo@test.com'
-        self.password = 'bar'
-        self.username = 'test'
+        self.email = 'foo@test.com'  # lint-amnesty, pylint: disable=attribute-defined-outside-init
+        self.password = 'bar'  # lint-amnesty, pylint: disable=attribute-defined-outside-init
+        self.username = 'test'  # lint-amnesty, pylint: disable=attribute-defined-outside-init
         self.user = self.create_account(
             self.username,
             self.email,
@@ -195,7 +195,7 @@ class LoginEnrollmentTestCase(TestCase):
         )
         return response
 
-    def assert_account_activated(self, url, method="GET", **kwargs):
+    def assert_account_activated(self, url, method="GET", **kwargs):  # lint-amnesty, pylint: disable=missing-function-docstring
         make_request = getattr(self.client, method.lower())
         response = make_request(url, **kwargs)
         message_list = list(messages.get_messages(response.wsgi_request))
@@ -410,7 +410,7 @@ def _create_mock_json_request(user, data, method='POST'):
     return request
 
 
-def get_expiration_banner_text(user, course, language='en'):
+def get_expiration_banner_text(user, course, language='en'):  # lint-amnesty, pylint: disable=unused-argument
     """
     Get text for banner that messages user course expiration date
     for different tests that depend on it.

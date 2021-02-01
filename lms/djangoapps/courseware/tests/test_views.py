@@ -7,7 +7,7 @@ Tests courseware views.py
 import html
 import itertools
 import json
-import unittest
+import unittest  # lint-amnesty, pylint: disable=unused-import
 from datetime import datetime, timedelta
 from uuid import uuid4
 
@@ -40,7 +40,7 @@ import lms.djangoapps.courseware.views.views as views
 from capa.tests.response_xml_factory import MultipleChoiceResponseXMLFactory
 from common.djangoapps.course_modes.models import CourseMode
 from common.djangoapps.course_modes.tests.factories import CourseModeFactory
-from freezegun import freeze_time
+from freezegun import freeze_time  # lint-amnesty, pylint: disable=wrong-import-order
 from lms.djangoapps.certificates import api as certs_api
 from lms.djangoapps.certificates.models import (
     CertificateGenerationConfiguration,
@@ -121,7 +121,7 @@ class TestJumpTo(ModuleStoreTestCase):
     MODULESTORE = TEST_DATA_MIXED_MODULESTORE
 
     def setUp(self):
-        super(TestJumpTo, self).setUp()
+        super(TestJumpTo, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         # Use toy course from XML
         self.course_key = CourseKey.from_string('edX/toy/2012_Fall')
 
@@ -303,9 +303,9 @@ class IndexQueryTestCase(ModuleStoreTestCase):
                 self.assertEqual(response.status_code, 200)
 
 
-class BaseViewsTestCase(ModuleStoreTestCase):
+class BaseViewsTestCase(ModuleStoreTestCase):  # lint-amnesty, pylint: disable=missing-class-docstring
     def setUp(self):
-        super(BaseViewsTestCase, self).setUp()
+        super(BaseViewsTestCase, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.course = CourseFactory.create(display_name=u'teꜱᴛ course', run="Testing_course")
         with self.store.bulk_operations(self.course.id):
             self.chapter = ItemFactory.create(
@@ -713,7 +713,7 @@ class ViewsTestCase(BaseViewsTestCase):
     @ddt.unpack
     def test_submission_history_timezone(self, timezone, hour_diff):
         with freeze_time('2012-01-01'):
-            with (override_settings(TIME_ZONE=timezone)):
+            with (override_settings(TIME_ZONE=timezone)):  # lint-amnesty, pylint: disable=superfluous-parens
                 course = CourseFactory.create()
                 course_key = course.id
                 client = Client()
@@ -739,7 +739,7 @@ class ViewsTestCase(BaseViewsTestCase):
 
     def _email_opt_in_checkbox(self, response, org_name_string=None):
         """Check if the email opt-in checkbox appears in the response content."""
-        checkbox_html = '<input id="email-opt-in" type="checkbox" name="opt-in" class="email-opt-in" value="true" checked>'
+        checkbox_html = '<input id="email-opt-in" type="checkbox" name="opt-in" class="email-opt-in" value="true" checked>'  # lint-amnesty, pylint: disable=line-too-long
         if org_name_string:
             # Verify that the email opt-in checkbox appears, and that the expected
             # organization name is displayed.
@@ -951,7 +951,7 @@ class TestProgramMarketingView(SharedModuleStoreTestCase):
         super(TestProgramMarketingView, cls).setUpClass()
 
         modulestore_course = CourseFactory()
-        course_run = CourseRunFactory(key=six.text_type(modulestore_course.id))
+        course_run = CourseRunFactory(key=six.text_type(modulestore_course.id))  # lint-amnesty, pylint: disable=no-member
         course = CatalogCourseFactory(course_runs=[course_run])
 
         cls.data = ProgramFactory(
@@ -1015,7 +1015,7 @@ class BaseDueDateTests(ModuleStoreTestCase):
         return course
 
     def setUp(self):
-        super(BaseDueDateTests, self).setUp()
+        super(BaseDueDateTests, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.user = UserFactory.create()
         self.assertTrue(self.client.login(username=self.user.username, password='test'))
 
@@ -1086,27 +1086,27 @@ class TestAccordionDueDate(BaseDueDateTests):
     # TODO: LEARNER-71: Delete entire TestAccordionDueDate class
     @override_waffle_flag(DISABLE_COURSE_OUTLINE_PAGE_FLAG, active=True)
     def test_backwards_compatibility(self):
-        super(TestAccordionDueDate, self).test_backwards_compatibility()
+        super(TestAccordionDueDate, self).test_backwards_compatibility()  # lint-amnesty, pylint: disable=super-with-arguments
 
     # TODO: LEARNER-71: Delete entire TestAccordionDueDate class
     @override_waffle_flag(DISABLE_COURSE_OUTLINE_PAGE_FLAG, active=True)
     def test_defaults(self):
-        super(TestAccordionDueDate, self).test_defaults()
+        super(TestAccordionDueDate, self).test_defaults()  # lint-amnesty, pylint: disable=super-with-arguments
 
     # TODO: LEARNER-71: Delete entire TestAccordionDueDate class
     @override_waffle_flag(DISABLE_COURSE_OUTLINE_PAGE_FLAG, active=True)
     def test_format_date(self):
-        super(TestAccordionDueDate, self).test_format_date()
+        super(TestAccordionDueDate, self).test_format_date()  # lint-amnesty, pylint: disable=super-with-arguments
 
     # TODO: LEARNER-71: Delete entire TestAccordionDueDate class
     @override_waffle_flag(DISABLE_COURSE_OUTLINE_PAGE_FLAG, active=True)
     def test_format_invalid(self):
-        super(TestAccordionDueDate, self).test_format_invalid()
+        super(TestAccordionDueDate, self).test_format_invalid()  # lint-amnesty, pylint: disable=super-with-arguments
 
     # TODO: LEARNER-71: Delete entire TestAccordionDueDate class
     @override_waffle_flag(DISABLE_COURSE_OUTLINE_PAGE_FLAG, active=True)
     def test_format_none(self):
-        super(TestAccordionDueDate, self).test_format_none()
+        super(TestAccordionDueDate, self).test_format_none()  # lint-amnesty, pylint: disable=super-with-arguments
 
 
 class StartDateTests(ModuleStoreTestCase):
@@ -1116,7 +1116,7 @@ class StartDateTests(ModuleStoreTestCase):
     """
 
     def setUp(self):
-        super(StartDateTests, self).setUp()
+        super(StartDateTests, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.user = UserFactory.create()
 
     def set_up_course(self):
@@ -1157,7 +1157,7 @@ class ProgressPageBaseTests(ModuleStoreTestCase):
     ENABLED_SIGNALS = ['course_published']
 
     def setUp(self):
-        super(ProgressPageBaseTests, self).setUp()
+        super(ProgressPageBaseTests, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.user = UserFactory.create()
         self.assertTrue(self.client.login(username=self.user.username, password='test'))
 
@@ -1165,7 +1165,7 @@ class ProgressPageBaseTests(ModuleStoreTestCase):
 
     def create_course(self, **options):
         """Create the test course."""
-        self.course = CourseFactory.create(
+        self.course = CourseFactory.create(  # lint-amnesty, pylint: disable=attribute-defined-outside-init
             start=datetime(2013, 9, 16, 7, 17, 28),
             grade_cutoffs={u'çü†øƒƒ': 0.75, 'Pass': 0.5},
             end=datetime.now(),
@@ -1233,7 +1233,7 @@ class ProgressPageTests(ProgressPageBaseTests):
 
         # Create new course with respect to 'default_store'
         # Enroll student into course
-        self.course = CourseFactory.create(default_store=default_store)
+        self.course = CourseFactory.create(default_store=default_store)  # lint-amnesty, pylint: disable=attribute-defined-outside-init
         CourseEnrollmentFactory(user=self.user, course_id=self.course.id, mode=CourseMode.HONOR)
 
         # Invalid Student Ids (Integer and Non-int)
@@ -1839,10 +1839,10 @@ class ProgressPageShowCorrectnessTests(ProgressPageBaseTests):
     }
 
     def setUp(self):
-        super(ProgressPageShowCorrectnessTests, self).setUp()
+        super(ProgressPageShowCorrectnessTests, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.staff_user = UserFactory.create(is_staff=True)
 
-    def setup_course(self, show_correctness='', due_date=None, graded=False, **course_options):
+    def setup_course(self, show_correctness='', due_date=None, graded=False, **course_options):  # lint-amnesty, pylint: disable=arguments-differ
         """
         Set up course with a subsection with the given show_correctness, due_date, and graded settings.
         """
@@ -1889,10 +1889,10 @@ class ProgressPageShowCorrectnessTests(ProgressPageBaseTests):
             choices=[True, False],
             choice_names=['choice_0', 'choice_1']
         )
-        self.problem = ItemFactory.create(category='problem', parent_location=self.vertical.location,
+        self.problem = ItemFactory.create(category='problem', parent_location=self.vertical.location,  # lint-amnesty, pylint: disable=attribute-defined-outside-init
                                           data=problem_xml, display_name='Problem 1')
         # Re-fetch the course from the database
-        self.course = self.store.get_course(self.course.id)
+        self.course = self.store.get_course(self.course.id)  # lint-amnesty, pylint: disable=attribute-defined-outside-init
 
     def answer_problem(self, value=1, max_value=1):
         """
@@ -1918,7 +1918,7 @@ class ProgressPageShowCorrectnessTests(ProgressPageBaseTests):
         module.system.publish(self.problem, 'grade', grade_dict)
 
     def assert_progress_page_show_grades(self, response, show_correctness, due_date, graded,
-                                         show_grades, score, max_score, avg):
+                                         show_grades, score, max_score, avg):  # lint-amnesty, pylint: disable=unused-argument
         """
         Ensures that grades and scores are shown or not shown on the progress page as required.
         """
@@ -2117,7 +2117,7 @@ class VerifyCourseKeyDecoratorTests(TestCase):
     """
 
     def setUp(self):
-        super(VerifyCourseKeyDecoratorTests, self).setUp()
+        super(VerifyCourseKeyDecoratorTests, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
 
         self.request = RequestFactoryNoCsrf().get("foo")
         self.valid_course_id = "edX/test/1"
@@ -2142,7 +2142,7 @@ class GenerateUserCertTests(ModuleStoreTestCase):
     """
 
     def setUp(self):
-        super(GenerateUserCertTests, self).setUp()
+        super(GenerateUserCertTests, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
 
         self.student = UserFactory()
         self.course = CourseFactory.create(
@@ -2168,7 +2168,7 @@ class GenerateUserCertTests(ModuleStoreTestCase):
 
     @patch('lms.djangoapps.courseware.views.views.is_course_passed', return_value=True)
     @override_settings(CERT_QUEUE='certificates', LMS_SEGMENT_KEY="foobar")
-    def test_user_with_passing_grade(self, mock_is_course_passed):
+    def test_user_with_passing_grade(self, mock_is_course_passed):  # lint-amnesty, pylint: disable=unused-argument
         # If user has above passing grading then json will return cert generating message and
         # status valid code
         # mocking xqueue and Segment analytics
@@ -2421,8 +2421,8 @@ class TestIndexView(ModuleStoreTestCase):
             'courseware_section',
             kwargs={
                 'course_id': str(course.id),
-                'chapter': chapter.url_name,
-                'section': section.url_name,
+                'chapter': chapter.url_name,  # lint-amnesty, pylint: disable=no-member
+                'section': section.url_name,  # lint-amnesty, pylint: disable=no-member
             }
         )
 
@@ -2684,7 +2684,7 @@ class TestIndexViewWithVerticalPositions(ModuleStoreTestCase):
         """
         Set up initial test data
         """
-        super(TestIndexViewWithVerticalPositions, self).setUp()
+        super(TestIndexViewWithVerticalPositions, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
 
         self.user = UserFactory()
 
@@ -2747,7 +2747,7 @@ class TestIndexViewWithGating(ModuleStoreTestCase, MilestonesTestCaseMixin):
         """
         Set up the initial test data
         """
-        super(TestIndexViewWithGating, self).setUp()
+        super(TestIndexViewWithGating, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
 
         self.user = UserFactory()
         self.course = CourseFactory.create()
@@ -2798,7 +2798,7 @@ class TestIndexViewWithCourseDurationLimits(ModuleStoreTestCase):
         """
         Set up the initial test data.
         """
-        super(TestIndexViewWithCourseDurationLimits, self).setUp()
+        super(TestIndexViewWithCourseDurationLimits, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
 
         self.user = UserFactory()
         self.course = CourseFactory.create(start=datetime.now() - timedelta(weeks=1))
@@ -2866,7 +2866,7 @@ class TestRenderXBlock(RenderXBlockTestMixin, ModuleStoreTestCase, CompletionWaf
     """
     def setUp(self):
         reload_django_url_config()
-        super(TestRenderXBlock, self).setUp()
+        super(TestRenderXBlock, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
 
     def test_render_xblock_with_invalid_usage_key(self):
         """
@@ -2983,16 +2983,16 @@ class TestRenderXBlock(RenderXBlockTestMixin, ModuleStoreTestCase, CompletionWaf
         )
 
 
-class TestRenderXBlockSelfPaced(TestRenderXBlock):
+class TestRenderXBlockSelfPaced(TestRenderXBlock):  # lint-amnesty, pylint: disable=test-inherits-tests
     """
     Test rendering XBlocks for a self-paced course. Relies on the query
     count assertions in the tests defined by RenderXBlockMixin.
     """
-    def setUp(self):
-        super(TestRenderXBlockSelfPaced, self).setUp()
+    def setUp(self):  # lint-amnesty, pylint: disable=useless-super-delegation
+        super(TestRenderXBlockSelfPaced, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
 
     def course_options(self):
-        options = super(TestRenderXBlockSelfPaced, self).course_options()
+        options = super(TestRenderXBlockSelfPaced, self).course_options()  # lint-amnesty, pylint: disable=super-with-arguments
         options['self_paced'] = True
         return options
 
@@ -3017,14 +3017,14 @@ class TestIndexViewCrawlerStudentStateWrites(SharedModuleStoreTestCase):
                 cls.vertical = ItemFactory.create(category='vertical', parent_location=cls.section.location)
 
     @classmethod
-    def setUpTestData(cls):
+    def setUpTestData(cls):  # lint-amnesty, pylint: disable=super-method-not-called
         """Set up and enroll our fake user in the course."""
         cls.user = UserFactory()
         CourseEnrollment.enroll(cls.user, cls.course.id)
 
     def setUp(self):
         """Do the client login."""
-        super(TestIndexViewCrawlerStudentStateWrites, self).setUp()
+        super(TestIndexViewCrawlerStudentStateWrites, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.client.login(username=self.user.username, password=TEST_PASSWORD)
 
     def test_write_by_default(self):
@@ -3080,7 +3080,7 @@ class EnterpriseConsentTestCase(EnterpriseTestConsentRequired, ModuleStoreTestCa
     Ensure that the Enterprise Data Consent redirects are in place only when consent is required.
     """
     def setUp(self):
-        super(EnterpriseConsentTestCase, self).setUp()
+        super(EnterpriseConsentTestCase, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.user = UserFactory.create()
         self.assertTrue(self.client.login(username=self.user.username, password='test'))
         self.course = CourseFactory.create()
@@ -3101,7 +3101,7 @@ class EnterpriseConsentTestCase(EnterpriseTestConsentRequired, ModuleStoreTestCa
                 reverse("progress", kwargs=dict(course_id=course_id)),
                 reverse("student_progress", kwargs=dict(course_id=course_id, student_id=str(self.user.id))),
         ):
-            self.verify_consent_required(self.client, url)
+            self.verify_consent_required(self.client, url)  # lint-amnesty, pylint: disable=no-value-for-parameter
 
 
 @ddt.ddt
@@ -3130,7 +3130,7 @@ class DatesTabTestCase(ModuleStoreTestCase):
     """
 
     def setUp(self):
-        super(DatesTabTestCase, self).setUp()
+        super(DatesTabTestCase, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
 
         now = datetime.now(utc)
         self.course = CourseFactory.create(start=now + timedelta(days=-1), self_paced=True)
@@ -3394,10 +3394,10 @@ class TestShowCoursewareMFE(TestCase):
 
 @patch.dict('django.conf.settings.FEATURES', {'ENABLE_COURSEWARE_MICROFRONTEND': True})
 @ddt.ddt
-class MFERedirectTests(BaseViewsTestCase):
+class MFERedirectTests(BaseViewsTestCase):  # lint-amnesty, pylint: disable=missing-class-docstring
     MODULESTORE = TEST_DATA_SPLIT_MODULESTORE
 
-    def _get_urls(self):
+    def _get_urls(self):  # lint-amnesty, pylint: disable=missing-function-docstring
         lms_url = reverse(
             'courseware_section',
             kwargs={
@@ -3421,7 +3421,7 @@ class MFERedirectTests(BaseViewsTestCase):
             assert self.client.get(lms_url).url == mfe_url
 
     def test_staff_no_redirect(self):
-        lms_url, mfe_url = self._get_urls()
+        lms_url, mfe_url = self._get_urls()  # lint-amnesty, pylint: disable=unused-variable
 
         # course staff will not redirect
         course_staff = UserFactory.create(is_staff=False)
@@ -3444,7 +3444,7 @@ class MFERedirectTests(BaseViewsTestCase):
         self.section2.is_time_limited = True
         self.store.update_item(self.section2, self.user.id)
 
-        lms_url, mfe_url = self._get_urls()
+        lms_url, mfe_url = self._get_urls()  # lint-amnesty, pylint: disable=unused-variable
 
         with override_waffle_flag(REDIRECT_TO_COURSEWARE_MICROFRONTEND, active=True):
             assert self.client.get(lms_url).status_code == 200

@@ -33,7 +33,7 @@ class TestLTI(BaseTestXmodule):
         """
         Mock oauth1 signing of requests library for testing.
         """
-        super(TestLTI, self).setUp()
+        super(TestLTI, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         mocked_nonce = u'135685044251684026041377608307'
         mocked_timestamp = u'1234567890'
         mocked_signature_after_sign = u'my_signature%3D'

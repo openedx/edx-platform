@@ -87,7 +87,7 @@ class TestWordCloud(BaseTestXmodule):
         users_state = self._get_users_state()
 
         self.assertEqual(
-            ''.join(set([
+            ''.join(set([  # lint-amnesty, pylint: disable=consider-using-set-comprehension
                         content['status']
                         for _, content in users_state.items()
                         ])),
@@ -127,7 +127,7 @@ class TestWordCloud(BaseTestXmodule):
         users_state = self._post_words(input_words)
 
         self.assertEqual(
-            ''.join(set([
+            ''.join(set([  # lint-amnesty, pylint: disable=consider-using-set-comprehension
                         content['status']
                         for _, content in users_state.items()
                         ])),
@@ -175,7 +175,7 @@ class TestWordCloud(BaseTestXmodule):
         users_state = self._get_users_state()
 
         self.assertEqual(
-            ''.join(set([
+            ''.join(set([  # lint-amnesty, pylint: disable=consider-using-set-comprehension
                         content['status']
                         for _, content in users_state.items()
                         ])),
@@ -186,7 +186,7 @@ class TestWordCloud(BaseTestXmodule):
         users_state_after_post = self._post_words(['word1', 'word2'])
 
         self.assertEqual(
-            ''.join(set([
+            ''.join(set([  # lint-amnesty, pylint: disable=consider-using-set-comprehension
                         content['status']
                         for _, content in users_state_after_post.items()
                         ])),
@@ -200,7 +200,7 @@ class TestWordCloud(BaseTestXmodule):
             ['word1', 'word2', 'word3'])
 
         self.assertEqual(
-            ''.join(set([
+            ''.join(set([  # lint-amnesty, pylint: disable=consider-using-set-comprehension
                         content['status']
                         for _, content in users_state_after_post.items()
                         ])),
@@ -217,7 +217,7 @@ class TestWordCloud(BaseTestXmodule):
         users_state = self._post_words(input_words)
 
         self.assertEqual(
-            ''.join(set([
+            ''.join(set([  # lint-amnesty, pylint: disable=consider-using-set-comprehension
                         content['status']
                         for _, content in users_state.items()
                         ])),

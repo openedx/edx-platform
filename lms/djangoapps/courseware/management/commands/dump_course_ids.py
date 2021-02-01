@@ -13,7 +13,7 @@ from six import text_type
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 
 
-class Command(BaseCommand):
+class Command(BaseCommand):  # lint-amnesty, pylint: disable=missing-class-docstring
     help = dedent(__doc__).strip()
 
     def add_arguments(self, parser):

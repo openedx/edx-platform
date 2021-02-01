@@ -24,7 +24,7 @@ class TestUserStateService(ModuleStoreTestCase):
         """
         Creating pre-requisites for the test cases.
         """
-        super(TestUserStateService, self).setUp()
+        super(TestUserStateService, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.user = UserFactory.create()
         self.course = CourseFactory.create()
         chapter = ItemFactory.create(

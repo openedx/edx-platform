@@ -5,7 +5,7 @@ import datetime
 
 from django.conf import settings
 from lms.djangoapps.commerce.utils import EcommerceService
-from pytz import utc
+from pytz import utc  # lint-amnesty, pylint: disable=wrong-import-order
 
 from common.djangoapps.course_modes.models import CourseMode
 from xmodule.partitions.partitions import ENROLLMENT_TRACK_PARTITION_ID

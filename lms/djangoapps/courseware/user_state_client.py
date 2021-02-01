@@ -11,7 +11,7 @@ from time import time
 
 import six
 from django.conf import settings
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.core.paginator import Paginator
 from django.db import transaction
 from django.db.utils import IntegrityError
@@ -57,19 +57,19 @@ class DjangoXBlockUserStateClient(XBlockUserStateClient):
         """
         This error is raised if the service backing this client is currently unavailable.
         """
-        pass
+        pass  # lint-amnesty, pylint: disable=unnecessary-pass
 
     class PermissionDenied(XBlockUserStateClient.PermissionDenied):
         """
         This error is raised if the caller is not allowed to access the requested data.
         """
-        pass
+        pass  # lint-amnesty, pylint: disable=unnecessary-pass
 
     class DoesNotExist(XBlockUserStateClient.DoesNotExist):
         """
         This error is raised if the caller has requested data that does not exist.
         """
-        pass
+        pass  # lint-amnesty, pylint: disable=unnecessary-pass
 
     def __init__(self, user=None):
         """
@@ -265,7 +265,7 @@ class DjangoXBlockUserStateClient(XBlockUserStateClient):
                 return
 
             num_fields_before = num_fields_after = num_new_fields_set = len(state)
-            num_fields_updated = 0
+            num_fields_updated = 0  # lint-amnesty, pylint: disable=unused-variable
             if not created:
                 if student_module.state is None:
                     current_state = {}
@@ -324,7 +324,7 @@ class DjangoXBlockUserStateClient(XBlockUserStateClient):
         if scope != Scope.user_state:
             raise ValueError("Only Scope.user_state is supported")
 
-        evt_time = time()
+        evt_time = time()  # lint-amnesty, pylint: disable=unused-variable
         student_modules = self._get_student_modules(username, block_keys)
         for student_module, _ in student_modules:
             if fields is None:
@@ -341,7 +341,7 @@ class DjangoXBlockUserStateClient(XBlockUserStateClient):
             student_module.save(force_update=True)
 
         # Event for the entire delete_many call.
-        finish_time = time()
+        finish_time = time()  # lint-amnesty, pylint: disable=unused-variable
 
     def get_history(self, username, block_key, scope=Scope.user_state):
         """

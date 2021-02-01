@@ -28,7 +28,7 @@ class SelfPacedDateOverrideTest(ModuleStoreTestCase):
 
     def setUp(self):
         self.reset_setting_cache_variables()
-        super(SelfPacedDateOverrideTest, self).setUp()
+        super(SelfPacedDateOverrideTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
 
         self.non_staff_user, __ = self.create_non_staff_user()
         self.now = datetime.datetime.now(pytz.UTC).replace(microsecond=0)
@@ -36,7 +36,7 @@ class SelfPacedDateOverrideTest(ModuleStoreTestCase):
 
     def tearDown(self):
         self.reset_setting_cache_variables()
-        super(SelfPacedDateOverrideTest, self).tearDown()
+        super(SelfPacedDateOverrideTest, self).tearDown()  # lint-amnesty, pylint: disable=super-with-arguments
 
     def reset_setting_cache_variables(self):
         """
@@ -58,7 +58,7 @@ class SelfPacedDateOverrideTest(ModuleStoreTestCase):
         inject_field_overrides((course, section), course, self.user)
         return (course, section)
 
-    def create_discussion_xblocks(self, parent):
+    def create_discussion_xblocks(self, parent):  # lint-amnesty, pylint: disable=missing-function-docstring
         # Create a released discussion xblock
         ItemFactory.create(
             parent=parent,
