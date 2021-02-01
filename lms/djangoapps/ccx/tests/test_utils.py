@@ -27,7 +27,7 @@ class TestGetCCXFromCCXLocator(ModuleStoreTestCase):
 
     def setUp(self):
         """Set up a course, coach, ccx and user"""
-        super(TestGetCCXFromCCXLocator, self).setUp()
+        super(TestGetCCXFromCCXLocator, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.course = CourseFactory.create()
         coach = self.coach = AdminFactory.create()
         role = CourseCcxCoachRole(self.course.id)
@@ -60,7 +60,7 @@ class TestStaffOnCCX(CcxTestCase):
     MODULESTORE = TEST_DATA_SPLIT_MODULESTORE
 
     def setUp(self):
-        super(TestStaffOnCCX, self).setUp()
+        super(TestStaffOnCCX, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
 
         # Create instructor account
         self.client.login(username=self.coach.username, password="test")

@@ -14,7 +14,7 @@ class CCXAPIPagination(DefaultPagination):
         """
         Annotate the response with pagination information.
         """
-        response = super(CCXAPIPagination, self).get_paginated_response(data)
+        response = super(CCXAPIPagination, self).get_paginated_response(data)  # lint-amnesty, pylint: disable=super-with-arguments
 
         # Add the current page to the response.
         response.data["current_page"] = self.page.number
