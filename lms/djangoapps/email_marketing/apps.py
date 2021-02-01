@@ -15,4 +15,4 @@ class EmailMarketingConfig(AppConfig):
 
     def ready(self):
         # Register the signal handlers.
-        from . import signals  # pylint: disable=unused-variable
+        from . import signals  # lint-amnesty, pylint: disable=unused-import, unused-variable

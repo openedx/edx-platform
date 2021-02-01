@@ -177,11 +177,11 @@ def notes(request, course_id):
     except (EdxNotesParseError, EdxNotesServiceUnavailable) as err:
         return JsonResponseBadRequest({"error": text_type(err)}, status=500)
 
-    return HttpResponse(json.dumps(notes_info, cls=NoteJSONEncoder), content_type="application/json")
+    return HttpResponse(json.dumps(notes_info, cls=NoteJSONEncoder), content_type="application/json")  # lint-amnesty, pylint: disable=http-response-with-content-type-json, http-response-with-json-dumps
 
 
 @login_required
-def get_token(request, course_id):
+def get_token(request, course_id):  # lint-amnesty, pylint: disable=unused-argument
     """
     Get JWT ID-Token, in case you need new one.
     """
