@@ -1,4 +1,4 @@
-"""
+"""  # lint-amnesty, pylint: disable=django-not-configured
 WSGI config for LMS.
 
 This module contains the WSGI application used by Django's development server
@@ -13,16 +13,16 @@ from safe_lxml import defuse_xml_libs
 defuse_xml_libs()
 
 # Disable PyContract contract checking when running as a webserver
-import contracts
+import contracts  # lint-amnesty, pylint: disable=wrong-import-order, wrong-import-position
 contracts.disable_all()
 
-import os
+import os  # lint-amnesty, pylint: disable=wrong-import-order, wrong-import-position
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "lms.envs.aws")
 
-import lms.startup as startup
+import lms.startup as startup  # lint-amnesty, pylint: disable=wrong-import-position
 startup.run()
 
-from xmodule.modulestore.django import modulestore
+from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-position
 
 # Trigger a forced initialization of our modulestores since this can take a
 # while to complete and we want this done before HTTP requests are accepted.
@@ -31,5 +31,5 @@ modulestore()
 
 # This application object is used by the development server
 # as well as any WSGI server configured to use this file.
-from django.core.wsgi import get_wsgi_application
+from django.core.wsgi import get_wsgi_application  # lint-amnesty, pylint: disable=wrong-import-order, wrong-import-position
 application = get_wsgi_application()
