@@ -27,9 +27,6 @@ django-countries==5.5
 # Removes deprecated get_ip function, which we still use (ARCHBOM-1329 for unpinning)
 django-ipware<3.0.0
 
-# 2.0.0 dropped support for Python 3.5
-django-pipeline<2.0.0
-
 # django-storages version 1.9 drops support for boto storage backend.
 django-storages<1.9
 
