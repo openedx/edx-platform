@@ -20,7 +20,7 @@ class WikiRedirectTestCase(EnterpriseTestConsentRequired, LoginEnrollmentTestCas
     """
 
     def setUp(self):
-        super(WikiRedirectTestCase, self).setUp()
+        super(WikiRedirectTestCase, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.toy = CourseFactory.create(org='edX', course='toy', display_name='2012_Fall')
 
         # Create two accounts
@@ -227,4 +227,4 @@ class WikiRedirectTestCase(EnterpriseTestConsentRequired, LoginEnrollmentTestCas
                 (reverse('course_wiki', kwargs={'course_id': course_id}), 302),
                 ('/courses/{}/wiki/'.format(course_id), 200),
         ):
-            self.verify_consent_required(self.client, url, status_code=status_code)
+            self.verify_consent_required(self.client, url, status_code=status_code)  # lint-amnesty, pylint: disable=no-value-for-parameter
