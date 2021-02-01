@@ -22,6 +22,15 @@ class OpenPreRequisiteCourseManager(models.Manager):
         ).prefetch_related('course').values_list('course', flat=True)
 
 
+class PreRequisiteCourseManager(models.Manager):
+    """
+    Manager which returns all prerequisite course IDs
+    """
+
+    def get_queryset(self):
+        return super().get_queryset().filter(is_prereq=True).values_list('course', flat=True)
+
+
 class CourseMeta(models.Model):
     """
     Model that stores meta data for a course
@@ -37,6 +46,7 @@ class CourseMeta(models.Model):
 
     objects = models.Manager()
     open_pre_req_courses = OpenPreRequisiteCourseManager()
+    prereq_course_ids = PreRequisiteCourseManager()
 
     class Meta(object):
         app_label = 'course_meta'

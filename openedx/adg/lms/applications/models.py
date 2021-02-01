@@ -1,6 +1,7 @@
 """
 All models for applications app
 """
+from collections import namedtuple
 from datetime import date
 
 from django.contrib.auth.models import User
@@ -10,7 +11,11 @@ from django.db import models
 from django.utils.translation import ugettext_lazy as _
 from model_utils.models import TimeStampedModel
 
+from lms.djangoapps.grades.api import CourseGradeFactory
+from openedx.adg.common.course_meta.models import CourseMeta
 from openedx.adg.lms.utils.date_utils import month_choices
+from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
+from openedx.core.lib.grade_utils import round_away_from_zero
 
 from .constants import ALLOWED_LOGO_EXTENSIONS
 from .helpers import max_year_value_validator, min_year_value_validator, validate_logo_size
@@ -20,14 +25,16 @@ class ApplicationHub(TimeStampedModel):
     """
     Model for status of all required parts of user application submission.
     """
+
     TOTAL_APPLICATION_OBJECTIVES = 2
 
     user = models.OneToOneField(
         User, related_name='application_hub', on_delete=models.CASCADE, verbose_name=_('User'),
     )
     is_prerequisite_courses_passed = models.BooleanField(default=False, verbose_name=_('Prerequisite Courses Passed'), )
-    is_written_application_completed = models.BooleanField(default=False,
-                                                           verbose_name=_('Written Application Submitted'), )
+    is_written_application_completed = models.BooleanField(
+        default=False, verbose_name=_('Written Application Submitted'),
+    )
     is_application_submitted = models.BooleanField(default=False, verbose_name=_('Application Submitted'), )
     submission_date = models.DateField(null=True, blank=True, verbose_name=_('Submission Date'), )
 
@@ -92,6 +99,7 @@ class BusinessLine(TimeStampedModel):
     """
     Model to save the business lines
     """
+
     title = models.CharField(verbose_name=_('Title'), max_length=150, unique=True, )
     logo = models.ImageField(
         upload_to='business-lines/logos/', verbose_name=_('Logo'),
@@ -107,10 +115,20 @@ class BusinessLine(TimeStampedModel):
         return '{}'.format(self.title)
 
 
+class SubmittedApplicationsManager(models.Manager):
+    """
+    Manager which returns all user applications which have been submitted successfully.
+    """
+
+    def get_queryset(self):
+        return super().get_queryset().filter(user__application_hub__is_application_submitted=True)
+
+
 class UserApplication(TimeStampedModel):
     """
     Model for status of all required parts of user application submission.
     """
+
     user = models.OneToOneField(User, related_name='application', on_delete=models.CASCADE, verbose_name=_('User'), )
     business_line = models.ForeignKey(BusinessLine, verbose_name=_('Business Line'),
                                       on_delete=models.CASCADE, null=True)
@@ -118,7 +136,7 @@ class UserApplication(TimeStampedModel):
     organization = models.CharField(verbose_name=_('Organization'), max_length=255, blank=True, )
     linkedin_url = models.URLField(verbose_name=_('LinkedIn URL'), max_length=255, blank=True, )
     resume = models.FileField(
-        max_length=500, blank=True, null=True, upload_to='files/resume/', verbose_name=_('Resume'),
+        max_length=500, blank=True, null=True, upload_to='files/resume/', verbose_name=_('Resume File'),
         validators=[FileExtensionValidator(['pdf', 'doc', 'jpg', 'png'])],
         help_text=_('Accepted extensions: .pdf, .doc, .jpg, .png'),
     )
@@ -143,15 +161,70 @@ class UserApplication(TimeStampedModel):
     status = models.CharField(
         verbose_name=_('Application Status'), choices=STATUS_CHOICES, max_length=8, default=OPEN,
     )
-    reviewed_by = models.ForeignKey(User, null=True, on_delete=models.CASCADE, verbose_name=_('Reviewed By'), )
+    reviewed_by = models.ForeignKey(
+        User, null=True, blank=True, on_delete=models.CASCADE, verbose_name=_('Reviewed By')
+    )
+    internal_admin_note = models.TextField(null=True, blank=True, verbose_name=_('Admin Note'))
+
+    objects = models.Manager()
+    submitted_applications = SubmittedApplicationsManager()
 
     class Meta:
         app_label = 'applications'
-        verbose_name = _('User Application')
-        verbose_name_plural = _('User Applications')
+        verbose_name = _('Application')
+        ordering = ['created']
 
     def __str__(self):
-        return 'UserApplication {id}, for user {email}'.format(id=self.id, email=self.user.email)
+        return '{}'.format(self.user.profile.name)  # pylint: disable=E1101
+
+    @property
+    def cover_letter_provided(self):
+        return self.cover_letter or self.cover_letter_file
+
+    @property
+    def cover_letter_and_resume(self):
+        return self.cover_letter_provided and self.resume
+
+    @property
+    def cover_letter_or_resume(self):
+        return self.cover_letter_provided or self.resume
+
+    @property
+    def file_attached(self):
+        return self.resume or self.cover_letter_file
+
+    @property
+    def prereq_course_scores(self):
+        """
+        Fetch and return applicant scores in the pre-requisite courses of the franchise program.
+
+        Returns:
+            list: Prereq course name and score pairs
+        """
+        prereq_course_overviews = CourseOverview.objects.filter(id__in=CourseMeta.prereq_course_ids.all())
+
+        CourseScore = namedtuple('CourseScore', 'course_name course_percentage')
+        scores_in_prereq_courses = []
+
+        for course_overview in prereq_course_overviews:
+            course_name = course_overview.display_name
+            course_grade = CourseGradeFactory().read(self.user, course_key=course_overview.id)
+            course_percentage = int(round_away_from_zero(course_grade.percent * 100))
+
+            course_score = CourseScore(course_name, course_percentage)
+            scores_in_prereq_courses.append(course_score)
+
+        return scores_in_prereq_courses
+
+    @property
+    def has_no_work_experience(self):
+        """
+        Check if any work experience is associated with the user application.
+
+        Returns:
+            bool: True if no work experience is associated with the application, False otherwise
+        """
+        return not WorkExperience.objects.filter(user_application=self).exists()
 
     def save(self, *args, **kwargs):  # pylint: disable=arguments-differ
         if self.pk:
@@ -167,6 +240,7 @@ class UserStartAndEndDates(TimeStampedModel):
     """
     An abstract model for start and end dates.
     """
+
     month_choices = month_choices(default_title='Month')
 
     user_application = models.ForeignKey(
@@ -194,6 +268,7 @@ class Education(UserStartAndEndDates):
     """
     Model for user education qualification for application submission.
     """
+
     HIGH_SCHOOL_DIPLOMA = 'HD'
     ASSOCIATE_DEGREE = 'AD'
     BACHELOR_DEGREE = 'BD'
@@ -208,7 +283,7 @@ class Education(UserStartAndEndDates):
         (DOCTORAL_DEGREE, _('Doctoral Degree')),
     ]
 
-    name_of_school = models.CharField(verbose_name=_('Name of School / University'), max_length=255, )
+    name_of_school = models.CharField(verbose_name=_('School / University'), max_length=255, )
     degree = models.CharField(verbose_name=_('Degree Received'), choices=DEGREE_TYPES, max_length=2, )
     area_of_study = models.CharField(verbose_name=_('Area of Study'), max_length=255, blank=True, )
     is_in_progress = models.BooleanField(verbose_name=_('In Progress'), default=False, )
@@ -217,14 +292,15 @@ class Education(UserStartAndEndDates):
         app_label = 'applications'
 
     def __str__(self):
-        return 'Education {id}, for {degree}'.format(id=self.id, degree=self.degree)
+        return ''
 
 
 class WorkExperience(UserStartAndEndDates):
     """
     Model for user work experience for application submission.
     """
-    name_of_organization = models.CharField(verbose_name=_('Name of Organization'), max_length=255, )
+
+    name_of_organization = models.CharField(verbose_name=_('Organization'), max_length=255, )
     job_position_title = models.CharField(verbose_name=_('Job Position / Title'), max_length=255, )
     is_current_position = models.BooleanField(verbose_name=_('Current Position'), default=False, )
     job_responsibilities = models.TextField(verbose_name=_('Job Responsibilities'), )
@@ -233,21 +309,4 @@ class WorkExperience(UserStartAndEndDates):
         app_label = 'applications'
 
     def __str__(self):
-        return 'WorkExperience {id}, for {organization}'.format(id=self.id, organization=self.name_of_organization)
-
-
-class AdminNote(TimeStampedModel):
-    """
-    Model to save the notes of admin on the user application.
-    """
-    user_application = models.ForeignKey(
-        UserApplication, on_delete=models.CASCADE, verbose_name=_('User Application'),
-    )
-    admin = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name=_('Admin'), )
-    note = models.TextField(verbose_name=_('Note'))
-
-    class Meta:
-        app_label = 'applications'
-
-    def __str__(self):
-        return 'Application {id}, Admin note {note} '.format(id=self.user_application.id, note=self.note)
+        return ''
