@@ -14,12 +14,19 @@ from xmodule.modulestore.tests.factories import CourseFactory
 
 from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
 from lms.djangoapps.certificates.generation_handler import CERTIFICATES_USE_ALLOWLIST
-from lms.djangoapps.certificates.generation_handler import _is_using_certificate_allowlist, \
-    _can_generate_allowlist_certificate_for_status, generate_allowlist_certificate_task, \
-    can_generate_allowlist_certificate
+from lms.djangoapps.certificates.generation_handler import (
+    _can_generate_allowlist_certificate_for_status,
+    _is_using_certificate_allowlist,
+    can_generate_allowlist_certificate,
+    generate_allowlist_certificate_task,
+    is_using_certificate_allowlist_and_is_on_allowlist
+)
 from lms.djangoapps.certificates.models import GeneratedCertificate, CertificateStatuses
-from lms.djangoapps.certificates.tests.factories import CertificateWhitelistFactory, GeneratedCertificateFactory, \
+from lms.djangoapps.certificates.tests.factories import (
+    CertificateWhitelistFactory,
+    GeneratedCertificateFactory,
     CertificateInvalidationFactory
+)
 from openedx.core.djangoapps.certificates.config import waffle
 
 log = logging.getLogger(__name__)
@@ -69,6 +76,33 @@ class AllowlistTests(ModuleStoreTestCase):
         Test the allowlist flag without the override
         """
         self.assertFalse(_is_using_certificate_allowlist(self.course_run_key))
+
+    def test_is_using_allowlist_and_is_on_list(self):
+        """
+        Test the allowlist flag and the presence of the user on the list
+        """
+        self.assertTrue(is_using_certificate_allowlist_and_is_on_allowlist(self.user, self.course_run_key))
+
+    @override_waffle_flag(CERTIFICATES_USE_ALLOWLIST, active=False)
+    def test_is_using_allowlist_and_is_on_list_with_flag_off(self):
+        """
+        Test the allowlist flag and the presence of the user on the list when the flag is off
+        """
+        self.assertFalse(is_using_certificate_allowlist_and_is_on_allowlist(self.user, self.course_run_key))
+
+    def test_is_using_allowlist_and_is_on_list_true(self):
+        """
+        Test the allowlist flag and the presence of the user on the list when the user is not on the list
+        """
+        u = UserFactory()
+        CourseEnrollmentFactory(
+            user=u,
+            course_id=self.course_run_key,
+            is_active=True,
+            mode="verified",
+        )
+        CertificateWhitelistFactory.create(course_id=self.course_run_key, user=u, whitelist=False)
+        self.assertFalse(is_using_certificate_allowlist_and_is_on_allowlist(u, self.course_run_key))
 
     @ddt.data(
         (CertificateStatuses.deleted, True),

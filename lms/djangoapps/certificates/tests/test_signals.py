@@ -8,19 +8,22 @@ import ddt
 import mock
 import six
 from edx_toggles.toggles import LegacyWaffleSwitch
+from edx_toggles.toggles.testutils import override_waffle_flag
 from edx_toggles.toggles.testutils import override_waffle_switch
-from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
+from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
 from lms.djangoapps.certificates import api as certs_api
+from lms.djangoapps.certificates.generation_handler import CERTIFICATES_USE_ALLOWLIST
 from lms.djangoapps.certificates.models import (
     CertificateGenerationConfiguration,
     CertificateStatuses,
     CertificateWhitelist,
     GeneratedCertificate
 )
-from lms.djangoapps.certificates.signals import CERTIFICATE_DELAY_SECONDS, fire_ungenerated_certificate_task
+from lms.djangoapps.certificates.signals import fire_ungenerated_certificate_task
+from lms.djangoapps.certificates.tasks import CERTIFICATE_DELAY_SECONDS
 from lms.djangoapps.grades.course_grade_factory import CourseGradeFactory
 from lms.djangoapps.grades.tests.utils import mock_passing_grade
 from lms.djangoapps.verify_student.models import IDVerificationAttempt, SoftwareSecurePhotoVerification
@@ -134,6 +137,57 @@ class WhitelistGeneratedCertificatesTest(ModuleStoreTestCase):
                         'course_key': six.text_type(self.ip_course.id),
                     }
                 )
+
+    @override_waffle_flag(CERTIFICATES_USE_ALLOWLIST, active=True)
+    def test_fire_task_allowlist_enabled(self):
+        """
+        Test that the allowlist generation is invoked if the allowlist is enabled for a user on the list
+        """
+        with mock.patch(
+            'lms.djangoapps.certificates.signals.generate_certificate.apply_async',
+            return_value=None
+        ) as mock_generate_certificate_apply_async:
+            with mock.patch(
+                'lms.djangoapps.certificates.signals.generate_allowlist_certificate_task',
+                return_value=None
+            ) as mock_generate_allowlist_task:
+                CertificateWhitelist.objects.create(
+                    user=self.user,
+                    course_id=self.ip_course.id,
+                    whitelist=True
+                )
+
+                fire_ungenerated_certificate_task(self.user, self.ip_course.id)
+                mock_generate_certificate_apply_async.assert_not_called()
+                mock_generate_allowlist_task.assert_called_with(self.user, self.ip_course.id)
+
+    def test_fire_task_allowlist_disabled(self):
+        """
+        Test that the normal logic is followed if the allowlist is disabled for a user on the list
+        """
+        with mock.patch(
+            'lms.djangoapps.certificates.signals.generate_certificate.apply_async',
+            return_value=None
+        ) as mock_generate_certificate_apply_async:
+            with mock.patch(
+                'lms.djangoapps.certificates.signals.generate_allowlist_certificate_task',
+                return_value=None
+            ) as mock_generate_allowlist_task:
+                CertificateWhitelist.objects.create(
+                    user=self.user,
+                    course_id=self.ip_course.id,
+                    whitelist=True
+                )
+
+                fire_ungenerated_certificate_task(self.user, self.ip_course.id)
+                mock_generate_certificate_apply_async.assert_called_with(
+                    countdown=CERTIFICATE_DELAY_SECONDS,
+                    kwargs={
+                        'student': six.text_type(self.user.id),
+                        'course_key': six.text_type(self.ip_course.id),
+                    }
+                )
+                mock_generate_allowlist_task.assert_not_called()
 
 
 class PassingGradeCertsTest(ModuleStoreTestCase):

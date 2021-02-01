@@ -19,8 +19,7 @@ from lms.djangoapps.certificates.models import (
     CertificateWhitelist,
     GeneratedCertificate
 )
-from lms.djangoapps.certificates.signals import CERTIFICATE_DELAY_SECONDS
-from lms.djangoapps.certificates.tasks import generate_certificate
+from lms.djangoapps.certificates.tasks import CERTIFICATE_DELAY_SECONDS, generate_certificate
 from lms.djangoapps.verify_student.services import IDVerificationService
 from openedx.core.djangoapps.certificates.api import auto_certificate_generation_enabled
 from openedx.core.djangoapps.waffle_utils import CourseWaffleFlag
@@ -108,7 +107,7 @@ def can_generate_allowlist_certificate(user, course_key):
             ))
         return False
 
-    if not CertificateWhitelist.objects.filter(user=user, course_id=course_key, whitelist=True).exists():
+    if not _is_on_certificate_allowlist(user, course_key):
         log.info('{user} : {course} is not on the certificate allowlist. Certificate cannot be generated.'.format(
             user=user.id,
             course=course_key
@@ -123,11 +122,27 @@ def can_generate_allowlist_certificate(user, course_key):
     return _can_generate_allowlist_certificate_for_status(cert)
 
 
+def is_using_certificate_allowlist_and_is_on_allowlist(user, course_key):
+    """
+    Return True if both:
+    1) the course run is using the allowlist, and
+    2) if the user is on the allowlist for this course run
+    """
+    return _is_using_certificate_allowlist(course_key) and _is_on_certificate_allowlist(user, course_key)
+
+
 def _is_using_certificate_allowlist(course_key):
     """
     Check if the course run is using the allowlist, aka V2 of certificate whitelisting
     """
     return CERTIFICATES_USE_ALLOWLIST.is_enabled(course_key)
+
+
+def _is_on_certificate_allowlist(user, course_key):
+    """
+    Check if the user is on the allowlist for this course run
+    """
+    return CertificateWhitelist.objects.filter(user=user, course_id=course_key, whitelist=True).exists()
 
 
 def _can_generate_allowlist_certificate_for_status(cert):
