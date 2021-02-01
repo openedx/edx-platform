@@ -25,17 +25,6 @@ from six import iteritems, text_type
 
 from common.djangoapps import third_party_auth
 from common.djangoapps.course_modes.models import CourseMode
-from lms.djangoapps.certificates.api import get_certificate_url, has_html_certificates_enabled
-from lms.djangoapps.certificates.models import CertificateStatuses, certificate_status_for_student
-from lms.djangoapps.grades.api import CourseGradeFactory
-from lms.djangoapps.verify_student.models import VerificationDeadline
-from lms.djangoapps.verify_student.services import IDVerificationService
-from lms.djangoapps.verify_student.utils import is_verification_expiring_soon, verification_for_datetime
-from openedx.core.djangoapps.ace_common.template_context import get_base_template_context
-from openedx.core.djangoapps.certificates.api import certificates_viewable_for_course
-from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
-from openedx.core.djangoapps.theming.helpers import get_themes
-from openedx.core.djangoapps.user_authn.utils import is_safe_login_or_logout_redirect
 from common.djangoapps.student.models import (
     CourseEnrollment,
     LinkedInAddToProfileConfiguration,
@@ -47,6 +36,16 @@ from common.djangoapps.student.models import (
     username_exists_or_retired
 )
 from common.djangoapps.util.password_policy_validators import normalize_password
+from lms.djangoapps.certificates.api import get_certificate_url, has_html_certificates_enabled
+from lms.djangoapps.certificates.models import CertificateStatuses, certificate_status_for_student
+from lms.djangoapps.grades.api import CourseGradeFactory
+from lms.djangoapps.verify_student.models import VerificationDeadline
+from lms.djangoapps.verify_student.services import IDVerificationService
+from lms.djangoapps.verify_student.utils import is_verification_expiring_soon, verification_for_datetime
+from openedx.core.djangoapps.certificates.api import certificates_viewable_for_course
+from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
+from openedx.core.djangoapps.theming.helpers import get_themes
+from openedx.core.djangoapps.user_authn.utils import is_safe_login_or_logout_redirect
 
 # Enumeration of per-course verification statuses
 # we display on the student dashboard.
@@ -383,28 +382,6 @@ def _get_redirect_to(request_host, request_headers, request_params, request_is_h
                     break
 
     return redirect_to
-
-
-def generate_activation_email_context(user, registration):
-    """
-    Constructs a dictionary for use in activation email contexts
-
-    Arguments:
-        user (User): Currently logged-in user
-        registration (Registration): Registration object for the currently logged-in user
-    """
-    context = get_base_template_context(None)
-    context.update({
-        'name': user.profile.name,
-        'key': registration.activation_key,
-        'lms_url': configuration_helpers.get_value('LMS_ROOT_URL', settings.LMS_ROOT_URL),
-        'platform_name': configuration_helpers.get_value('PLATFORM_NAME', settings.PLATFORM_NAME),
-        'support_url': configuration_helpers.get_value(
-            'ACTIVATION_EMAIL_SUPPORT_LINK', settings.ACTIVATION_EMAIL_SUPPORT_LINK
-        ) or settings.SUPPORT_SITE_LINK,
-        'support_email': configuration_helpers.get_value('CONTACT_EMAIL', settings.CONTACT_EMAIL),
-    })
-    return context
 
 
 def create_or_set_user_attribute_created_on_site(user, site):

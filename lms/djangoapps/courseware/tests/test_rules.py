@@ -4,37 +4,37 @@ Tests for permissions defined in courseware.rules
 
 
 import ddt
-import six
-from django.test import TestCase
-from django.test.utils import override_settings
-from opaque_keys.edx.locator import CourseLocator
+from mock import patch
 
 from common.djangoapps.course_modes.tests.factories import CourseModeFactory
 from common.djangoapps.student.models import CourseEnrollment
 from common.djangoapps.student.tests.factories import UserFactory
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from xmodule.modulestore.tests.factories import CourseFactory
 
 
 @ddt.ddt
-class PermissionTests(TestCase):
+@patch.dict('django.conf.settings.FEATURES', {'ENABLE_SPECIAL_EXAMS': True})
+class PermissionTests(ModuleStoreTestCase):
     """
     Tests for permissions defined in courseware.rules
     """
     def setUp(self):
-        super(PermissionTests, self).setUp()
+        super().setUp()
         self.user = UserFactory()
+        self.course = CourseFactory(enable_proctored_exams=True)
 
-        self.course_id = CourseLocator('MITx', '000', 'Perm_course')
+        self.course_id = self.course.id  # pylint: disable=no-member
         CourseModeFactory(mode_slug='verified', course_id=self.course_id)
         CourseModeFactory(mode_slug='masters', course_id=self.course_id)
         CourseModeFactory(mode_slug='professional', course_id=self.course_id)
         CourseEnrollment.unenroll(self.user, self.course_id)
 
     def tearDown(self):
-        super(PermissionTests, self).tearDown()
+        super().tearDown()
         self.user.delete()
 
     @ddt.data(
-        (None, False),
         ('audit', False),
         ('verified', True),
         ('masters', True),
@@ -48,29 +48,28 @@ class PermissionTests(TestCase):
         """
         if mode is not None:
             CourseEnrollment.enroll(self.user, self.course_id, mode=mode)
-        has_perm = self.user.has_perm('edx_proctoring.can_take_proctored_exam',
-                                      {'course_id': six.text_type(self.course_id)})
+        has_perm = self.user.has_perm(
+            'edx_proctoring.can_take_proctored_exam', {'course_id': str(self.course_id)}
+        )
         assert has_perm == should_have_perm
 
-    @override_settings(
-        PROCTORING_BACKENDS={
-            'mock_proctoring_allow_honor_mode': {
-                'allow_honor_mode': True,
-            },
-        }
+    @patch.dict(
+        'django.conf.settings.PROCTORING_BACKENDS',
+        {'mock_proctoring_allow_honor_mode': {'allow_honor_mode': True}}
     )
     def test_proctoring_perm_with_honor_mode_permission(self):
         """
         Test that the user has the edx_proctoring.can_take_proctored_exam permission in honor enrollment mode.
 
         If proctoring backend configuration allows exam in honor mode {`allow_honor_mode`: True} the user is
-        granter proctored exam permission.
+        granted proctored exam permission.
         """
-        CourseEnrollment.enroll(self.user, self.course_id, mode='honor')
-        self.assertTrue(self.user.has_perm(
-            'edx_proctoring.can_take_proctored_exam', {
-                'course_id': six.text_type(self.course_id),
-                'backend': 'mock_proctoring_allow_honor_mode',
-                'is_proctored': True
-            }
-        ))
+        course_allow_honor = CourseFactory(
+            enable_proctored_exams=True, proctoring_provider='mock_proctoring_allow_honor_mode'
+        )
+        CourseEnrollment.enroll(self.user, course_allow_honor.id, mode='honor')
+        self.assertTrue(
+            self.user.has_perm(
+                'edx_proctoring.can_take_proctored_exam', {'course_id': str(course_allow_honor.id)}
+            )
+        )
