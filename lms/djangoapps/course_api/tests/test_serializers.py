@@ -34,7 +34,7 @@ class TestCourseSerializer(CourseApiFactoryMixin, ModuleStoreTestCase):
     ENABLED_SIGNALS = ['course_published']
 
     def setUp(self):
-        super(TestCourseSerializer, self).setUp()
+        super(TestCourseSerializer, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.staff_user = self.create_user('staff', is_staff=True)
         self.honor_user = self.create_user('honor', is_staff=False)
         self.request_factory = APIRequestFactory()
@@ -146,7 +146,7 @@ class TestCourseSerializer(CourseApiFactoryMixin, ModuleStoreTestCase):
         self.assertEqual(result['pacing'], expected_pacing)
 
 
-class TestCourseDetailSerializer(TestCourseSerializer):
+class TestCourseDetailSerializer(TestCourseSerializer):  # lint-amnesty, pylint: disable=test-inherits-tests
     """
     Test CourseDetailSerializer by rerunning all the tests
     in TestCourseSerializer, but with the
@@ -158,7 +158,7 @@ class TestCourseDetailSerializer(TestCourseSerializer):
     serializer_class = CourseDetailSerializer
 
     def setUp(self):
-        super(TestCourseDetailSerializer, self).setUp()
+        super(TestCourseDetailSerializer, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
 
         # update the expected_data to include the 'overview' data.
         about_descriptor = XBlock.load_class('about')
@@ -166,7 +166,7 @@ class TestCourseDetailSerializer(TestCourseSerializer):
         self.expected_data['overview'] = overview_template.get('data')
 
 
-class TestCourseKeySerializer(TestCase):
+class TestCourseKeySerializer(TestCase):  # lint-amnesty, pylint: disable=missing-class-docstring
 
     def test_course_key_serializer(self):
         course_key = CourseLocator(org='org', course='course', run='2020_Q3')

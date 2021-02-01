@@ -164,7 +164,7 @@ class TestGetCourseListMultipleCourses(CourseListTestMixin, ModuleStoreTestCase)
     ENABLED_SIGNALS = ['course_published']
 
     def setUp(self):
-        super(TestGetCourseListMultipleCourses, self).setUp()
+        super(TestGetCourseListMultipleCourses, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.course = self.create_course(mobile_available=False)
         self.staff_user = self.create_user("staff", is_staff=True)
         self.honor_user = self.create_user("honor", is_staff=False)

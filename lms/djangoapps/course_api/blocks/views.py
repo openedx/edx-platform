@@ -238,7 +238,7 @@ class BlocksView(DeveloperErrorViewMixin, ListAPIView):
                 patch_response_headers(response)
             return response
         except ItemNotFoundError as exception:
-            raise Http404(u"Block not found: {}".format(text_type(exception)))
+            raise Http404(u"Block not found: {}".format(text_type(exception)))  # lint-amnesty, pylint: disable=raise-missing-from
 
 
 @view_auth_classes(is_authenticated=False)
@@ -301,9 +301,9 @@ class BlocksInCourseView(BlocksView):
             course_key = CourseKey.from_string(course_key_string)
             course_usage_key = modulestore().make_course_usage_key(course_key)
         except InvalidKeyError:
-            raise ValidationError(u"'{}' is not a valid course key.".format(six.text_type(course_key_string)))
+            raise ValidationError(u"'{}' is not a valid course key.".format(six.text_type(course_key_string)))  # lint-amnesty, pylint: disable=raise-missing-from
         response = super().list(request, course_usage_key,
-                                hide_access_denials=hide_access_denials)
+                                hide_access_denials=hide_access_denials)  # lint-amnesty, pylint: disable=super-with-arguments
 
         if 'completion' not in request.query_params.getlist('requested_fields', ''):
             return response
@@ -353,3 +353,4 @@ def recurse_mark_complete(block_id, blocks):
         completable_blocks = [blocks[child_block_id] for child_block_id in child_blocks
                               if blocks[child_block_id].get('type') != 'discussion']
         block['completion'] = int(all(child.get('completion') == 1 for child in completable_blocks))
+
