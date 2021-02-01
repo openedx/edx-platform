@@ -321,7 +321,7 @@ class BlocksInCourseView(BlocksView):
             course_blocks = response.data['blocks']
 
         if not root:
-            return Http404("Unable to find course block in {}".format(request.query_params.get('course_id', None)))
+            raise ValueError("Unable to find course block in {}".format(course_key_string))
 
         recurse_mark_complete(root, course_blocks)
 
