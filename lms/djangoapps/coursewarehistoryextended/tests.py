@@ -22,10 +22,10 @@ from lms.djangoapps.courseware.tests.factories import StudentModuleFactory, cour
 class TestStudentModuleHistoryBackends(TestCase):
     """ Tests of data in CSMH and CSMHE """
     # Tell Django to clean out all databases, not just default
-    databases = {alias for alias in connections}
+    databases = {alias for alias in connections}  # lint-amnesty, pylint: disable=unnecessary-comprehension
 
     def setUp(self):
-        super(TestStudentModuleHistoryBackends, self).setUp()
+        super(TestStudentModuleHistoryBackends, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         for record in (1, 2, 3):
             # This will store into CSMHE via the post_save signal
             csm = StudentModuleFactory.create(module_state_key=location('usage_id'),
