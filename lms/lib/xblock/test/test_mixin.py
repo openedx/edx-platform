@@ -1,7 +1,7 @@
 """
 Tests of the LMS XBlock Mixin
 """
-
+# pylint: disable=cyclic-import
 
 import ddt
 from xblock.validation import ValidationMessage
