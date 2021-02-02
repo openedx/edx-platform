@@ -68,14 +68,7 @@ def listen_for_passing_grade(sender, user, course_id, **kwargs):  # pylint: disa
     Listen for a learner passing a course, send cert generation task,
     downstream signal from COURSE_GRADE_CHANGED
     """
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
     course = CourseOverview.get_from_id(course_id)  # lint-amnesty, pylint: disable=unused-variable
->>>>>>> Applied pylint-amnesty to certificates
-=======
-    course = CourseOverview.get_from_id(course_id)  # lint-amnesty, pylint: disable=unused-variable
->>>>>>> Applied pylint-amnesty to certificates
     if not auto_certificate_generation_enabled():
         return
 
