@@ -50,7 +50,7 @@ class VideoBaseTest(UniqueCourseTest):
         """
         Initialization of pages and course fixture for video tests
         """
-        super(VideoBaseTest, self).setUp()
+        super(VideoBaseTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.longMessage = True
 
         self.video = VideoPage(self.browser)
@@ -229,7 +229,7 @@ class LMSVideoBlockA11yTest(VideoBaseTest):
             browser = 'firefox'
 
         with patch.dict(os.environ, {'SELENIUM_BROWSER': browser}):
-            super(LMSVideoBlockA11yTest, self).setUp()
+            super(LMSVideoBlockA11yTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
 
     def test_video_player_a11y(self):
         # load transcripts so we can test skipping to

@@ -14,7 +14,7 @@ from selenium.webdriver.common.action_chains import ActionChains
 from selenium.webdriver.common.keys import Keys
 from six.moves import range
 
-from common.test.acceptance.pages.common.utils import sync_on_notification
+from common.test.acceptance.pages.common.utils import sync_on_notification  # lint-amnesty, pylint: disable=no-name-in-module
 from common.test.acceptance.pages.lms.video.video import VideoPage
 from common.test.acceptance.tests.helpers import YouTubeStubConfig
 
@@ -113,7 +113,7 @@ class VideoComponentPage(VideoPage):
         )
 
     def get_element_selector(self, class_name, vertical=False):
-        return super(VideoComponentPage, self).get_element_selector(class_name, vertical=vertical)
+        return super(VideoComponentPage, self).get_element_selector(class_name, vertical=vertical)  # lint-amnesty, pylint: disable=super-with-arguments
 
     def _wait_for(self, check_func, desc, result=False, timeout=30):
         """
@@ -549,7 +549,7 @@ class VideoComponentPage(VideoPage):
         mime_type = 'application/x-subrip'
         lang_code = '?language_code={}'.format(language_code)
         link = [link for link in self.q(css='.download-action').attrs('href') if lang_code in link]
-        result, headers, content = self._get_transcript(link[0])
+        result, headers, content = self._get_transcript(link[0])  # lint-amnesty, pylint: disable=no-member
 
         return result is True and mime_type in headers['content-type'] and text_to_search in content.decode('utf-8')
 
@@ -578,7 +578,7 @@ class VideoComponentPage(VideoPage):
 
         As all the captions lines are exactly same so only getting partial lines will work.
         """
-        self.wait_for_captions()
+        self.wait_for_captions()  # lint-amnesty, pylint: disable=no-member
         selector = u'.subtitles li:nth-child({})'
         return ' '.join([self.q(css=selector.format(i)).text[0] for i in range(1, 6)])
 

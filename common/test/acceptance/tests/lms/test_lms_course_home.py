@@ -22,7 +22,7 @@ class CourseHomeBaseTest(UniqueCourseTest):
         """
         Initialize pages and install a course fixture.
         """
-        super(CourseHomeBaseTest, self).setUp()
+        super(CourseHomeBaseTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
 
         self.course_home_page = CourseHomePage(self.browser, self.course_id)
         self.courseware_page = CoursewarePage(self.browser, self.course_id)

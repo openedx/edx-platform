@@ -30,7 +30,7 @@ class CourseWikiA11yTest(UniqueCourseTest):
         """
         Initialize pages and install a course fixture.
         """
-        super(CourseWikiA11yTest, self).setUp()
+        super(CourseWikiA11yTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
 
         # self.course_info['number'] must be shorter since we are accessing the wiki. See TNL-1751
         self.course_info['number'] = self.unique_id[0:6]
