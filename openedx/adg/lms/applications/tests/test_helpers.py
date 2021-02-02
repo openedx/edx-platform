@@ -206,7 +206,7 @@ def test_validate_file_size_with_valid_size(size, expected):
 )
 def test_is_displayable_on_browser(filename, expected_is_displayable_on_browser):
     """
-    Test that the `is_displayable_on_browser` function returns False if the input file is a .doc file, False otherwise.
+    Test that the `is_displayable_on_browser` function returns False if the input file is a .doc file, True otherwise.
     """
     test_file = SimpleUploadedFile(filename, b'')
     actual_is_displayable_on_browser = is_displayable_on_browser(test_file)

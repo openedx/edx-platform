@@ -16,6 +16,8 @@ RESUME_FILE_MAX_SIZE = 4 * 1024 * 1024
 
 # Fieldset titles for application review admin page
 
+APPLICANT_INFO = _('APPLICANT INFORMATION')
+
 RESUME_AND_COVER_LETTER = _('RESUME & COVER LETTER')
 RESUME_ONLY = _('RESUME')
 COVER_LETTER_ONLY = _('COVER LETTER')
@@ -51,8 +53,8 @@ ACCEPTED_APPLICATIONS_TITLE = _('ACCEPTED APPLICATIONS')
 
 STATUS_PARAM = 'status__exact'
 
-EMAIL_ADDRESS_HTML = '<a href="mailto:{email_address}">{email_address}</a>'
-LINKED_IN_PROFILE_HTML = '<a href={url}>{url}</a>'
+EMAIL_ADDRESS_HTML_FORMAT = '<a href="mailto:{email_address}">{email_address}</a>'
+LINKED_IN_PROFILE_HTML_FORMAT = '<a href={url}>{url}</a>'
 
 GENDER_MAP = {
     'm': _('Man'),
@@ -64,8 +66,6 @@ DAY_MONTH_YEAR_FORMAT = '%d %B %Y'
 MONTH_NAME_DAY_YEAR_FORMAT = '%B %d, %Y'
 
 CourseScore = namedtuple('CourseScore', 'course_name course_percentage')
-
-APPLICANT_INFO_FIELDSET_TITLE = _('APPLICANT INFORMATION')
 
 APPLICATION_REVIEW_ERROR_MSG = _('Please make a decision before submitting.')
 

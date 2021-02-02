@@ -9,16 +9,11 @@ from django.utils.html import format_html
 
 from common.djangoapps.student.tests.factories import UserFactory
 from openedx.adg.constants import MONTH_DAY_YEAR_FORMAT
-from openedx.adg.lms.applications.admin import (
-    EducationInline,
-    UserApplicationADGAdmin,
-    WorkExperienceInline,
-    adg_admin_site
-)
+from openedx.adg.lms.applications.admin import UserApplicationADGAdmin
 from openedx.adg.lms.applications.constants import (
     ACCEPTED_APPLICATIONS_TITLE,
     ALL_APPLICATIONS_TITLE,
-    APPLICANT_INFO_FIELDSET_TITLE,
+    APPLICANT_INFO,
     APPLYING_TO,
     COVER_LETTER_FILE,
     COVER_LETTER_FILE_DISPLAY,
@@ -27,12 +22,12 @@ from openedx.adg.lms.applications.constants import (
     DATE_OF_BIRTH,
     DAY_MONTH_YEAR_FORMAT,
     EMAIL,
-    EMAIL_ADDRESS_HTML,
+    EMAIL_ADDRESS_HTML_FORMAT,
     GENDER,
     GENDER_MAP,
     IS_SAUDI_NATIONAL,
     LINKED_IN_PROFILE,
-    LINKED_IN_PROFILE_HTML,
+    LINKED_IN_PROFILE_HTML_FORMAT,
     LOCATION,
     OPEN_APPLICATIONS_TITLE,
     ORGANIZATION,
@@ -51,6 +46,7 @@ from openedx.adg.lms.applications.models import UserApplication
 from openedx.adg.lms.applications.tests.constants import (
     ALL_FIELDSETS,
     FIELDSETS_WITHOUT_RESUME_OR_COVER_LETTER,
+    FORMSET,
     LINKED_IN_URL,
     NOTE,
     TEST_COVER_LETTER_FILE,
@@ -128,12 +124,7 @@ def test_changelist_view(
 
 
 @pytest.mark.parametrize(
-    'request_method, status, note', [
-        ('POST', None, NOTE),
-        ('POST', UserApplication.WAITLIST, NOTE),
-        ('GET', None, '')
-    ],
-    ids=['post_without_status', 'post_with_status', 'get']
+    'request_method', ['GET', 'POST'], ids=['get', 'post_without_status']
 )
 @pytest.mark.django_db
 @mock.patch('openedx.adg.lms.applications.admin.admin.ModelAdmin.changeform_view')
@@ -146,22 +137,17 @@ def test_changeform_view(
     request,
     user_application,
     user_application_adg_admin_instance,
-    request_method,
-    status,
-    note
+    request_method
 ):
     """
     Test the overridden changeform_view.
 
-    Test Case 1: post_without_status
-        Test that if a POST request is made with an internal note but without status, the application should not be
-        saved and admin should be shown the application review page with the right context.
-
-    Test Case 2: post_with_status
-        Test that if a POST request is made with internal note and status, the application should be updated and saved.
-
-    Test Case 3: get
+    Test Case 1: get
         Test that if a GET request is made, the right context should be rendered for the application review page.
+
+    Test Case 2: post_without_status
+        Test that if a POST request is made with an internal note but without status, the application should not be
+        saved and the right context should be rendered for the application review page.
     """
     application_id = user_application.id
 
@@ -170,24 +156,38 @@ def test_changeform_view(
 
     request.method = request_method
     if request.method == 'POST':
-        request.POST = {'internal_note': note}
-        if status:
-            request.POST['status'] = status
-            UserApplicationADGAdmin.changeform_view(user_application_adg_admin_instance, request, application_id)
+        request.POST = {'internal_note': NOTE}
 
-            mock_save_application_review_info.assert_called_once_with(user_application, request, note)
-            mock_changeform_view.assert_called_once_with(request, application_id, extra_context=None)
-        else:
-            UserApplicationADGAdmin.changeform_view(user_application_adg_admin_instance, request, application_id)
+    UserApplicationADGAdmin.changeform_view(user_application_adg_admin_instance, request, application_id)
 
-            mock_save_application_review_info.assert_not_called()
-            mock_get_extra_context_for_application_review_page.assert_called_once_with(user_application)
-            mock_changeform_view.assert_called_once_with(request, application_id, extra_context=expected_context)
-    elif request.method == 'GET':
-        UserApplicationADGAdmin.changeform_view(user_application_adg_admin_instance, request, application_id)
+    mock_save_application_review_info.assert_not_called()
+    mock_get_extra_context_for_application_review_page.assert_called_once_with(user_application)
+    mock_changeform_view.assert_called_once_with(request, application_id, extra_context=expected_context)
 
-        mock_get_extra_context_for_application_review_page.assert_called_once_with(user_application)
-        mock_changeform_view.assert_called_once_with(request, application_id, extra_context=expected_context)
+
+@pytest.mark.django_db
+@mock.patch('openedx.adg.lms.applications.admin.admin.ModelAdmin.changeform_view')
+@mock.patch('openedx.adg.lms.applications.admin.UserApplicationADGAdmin._save_application_review_info')
+def test_changeform_view_post_with_status(
+    mock_save_application_review_info,
+    mock_changeform_view,
+    request,
+    user_application,
+    user_application_adg_admin_instance,
+):
+    """
+    Test the overridden changeform_view.
+
+    Test that if a POST request is made with internal note and status, the application should be updated and saved.
+    """
+    application_id = user_application.id
+
+    request.method = 'POST'
+    request.POST = {'internal_note': NOTE, 'status': 'test_status'}
+    UserApplicationADGAdmin.changeform_view(user_application_adg_admin_instance, request, application_id)
+
+    mock_save_application_review_info.assert_called_once_with(user_application, request, NOTE)
+    mock_changeform_view.assert_called_once_with(request, application_id, extra_context=None)
 
 
 @pytest.mark.django_db
@@ -212,7 +212,7 @@ def test_email(user_application):
     """
     Test that the `email` field method returns safe HTML containing the correct email address of the applicant.
     """
-    expected_email_address = format_html(EMAIL_ADDRESS_HTML, email_address=user_application.user.email)
+    expected_email_address = format_html(EMAIL_ADDRESS_HTML_FORMAT, email_address=user_application.user.email)
     actual_email_address = UserApplicationADGAdmin.email('self', user_application)
 
     assert expected_email_address == actual_email_address
@@ -245,7 +245,7 @@ def test_linked_in_profile(user_application):
     """
     user_application.linkedin_url = LINKED_IN_URL
 
-    expected_linked_in_profile = format_html(LINKED_IN_PROFILE_HTML, url='Test LinkedIn URL')
+    expected_linked_in_profile = format_html(LINKED_IN_PROFILE_HTML_FORMAT, url='Test LinkedIn URL')
     actual_linked_in_profile = UserApplicationADGAdmin.linked_in_profile('self', user_application)
 
     assert expected_linked_in_profile == actual_linked_in_profile
@@ -458,7 +458,7 @@ def test_get_applicant_info_fieldset(user_application, organization):
 
     expected_fields.append(APPLYING_TO)
 
-    expected_fieldset = (APPLICANT_INFO_FIELDSET_TITLE, {'fields': tuple(expected_fields)})
+    expected_fieldset = (APPLICANT_INFO, {'fields': tuple(expected_fields)})
     actual_fieldset = UserApplicationADGAdmin._get_applicant_info_fieldset('self', user_application)
 
     assert expected_fieldset == actual_fieldset
@@ -557,57 +557,83 @@ def test_get_fieldset_for_scores():
     assert expected_fieldset == actual_fieldset
 
 
-@pytest.mark.parametrize(
-    'resume, has_work_experience', [
-        (None, False),
-        (None, True),
-        (TEST_RESUME, True)
-    ], ids=['no_resume, no_experience', 'no_resume, with_experience', 'with_resume']
-)
+def _mock_get_formsets_with_inlines_dependencies(mocker, education_inline, work_experience_inline):
+    """
+    Mock all dependencies of the generator function 'get_formsets_with_inlines' at module level.
+    """
+    mocker.patch(
+        'openedx.adg.lms.applications.admin.UserApplicationADGAdmin.get_inline_instances',
+        return_value=[education_inline, work_experience_inline]
+    )
+    mocker.patch(
+        'openedx.adg.lms.applications.admin.ApplicationReviewInline.get_formset',
+        return_value=FORMSET
+    )
+
+
 @pytest.mark.django_db
-@mock.patch('openedx.adg.lms.applications.admin.ApplicationReviewInline.get_formset')
-@mock.patch('openedx.adg.lms.applications.admin.UserApplicationADGAdmin.get_inline_instances')
-def test_get_formsets_with_inlines(
-    mock_get_inline_instances,
-    mock_get_formset,
-    user_application,
-    user_application_adg_admin_instance,
-    resume,
-    has_work_experience
-):
+def test_get_formsets_with_inlines_with_resume(user_application, user_application_adg_admin_instance):
     """
-    Test that the overridden generator function `get_formsets_with_inlines`:
-        1. Yields no formsets in case of a user application with attached resume
-        2. Yields formsets for both education and work experience in case the applicant has provided work experience
-        3. Yields formset for only education in case of no work experience.
+    Test that the overridden generator function `get_formsets_with_inlines` yields no formsets in case of a user
+    application with attached resume
     """
-    education_inline_instance = EducationInline(UserApplication, adg_admin_site)
-    work_experience_inline_instance = WorkExperienceInline(UserApplication, adg_admin_site)
-
-    mock_get_inline_instances.return_value = [education_inline_instance, work_experience_inline_instance]
-    mock_get_formset.return_value = 'test_formset'
-
-    user_application.resume = resume
-
-    if has_work_experience:
-        work_experience = WorkExperienceFactory()
-        work_experience.user_application = user_application
-        work_experience.save()
+    user_application.resume = TEST_RESUME
 
     actual_formsets = UserApplicationADGAdmin.get_formsets_with_inlines(
         user_application_adg_admin_instance, 'request', user_application
     )
 
-    if resume:
-        with pytest.raises(StopIteration):
-            next(actual_formsets)
-    else:
-        assert next(actual_formsets) == ('test_formset', education_inline_instance)
-        if has_work_experience:
-            assert next(actual_formsets) == ('test_formset', work_experience_inline_instance)
-        else:
-            with pytest.raises(StopIteration):
-                next(actual_formsets)
+    with pytest.raises(StopIteration):
+        next(actual_formsets)
+
+
+@pytest.mark.django_db
+def test_get_formsets_with_inlines_no_resume_no_experience(
+    user_application,
+    user_application_adg_admin_instance,
+    education_inline,
+    work_experience_inline,
+    mocker
+):
+    """
+    Test that the overridden generator function `get_formsets_with_inlines` yields formset for only education in case of
+    no work experience.
+    """
+    _mock_get_formsets_with_inlines_dependencies(mocker, education_inline, work_experience_inline)
+
+    actual_formsets = UserApplicationADGAdmin.get_formsets_with_inlines(
+        user_application_adg_admin_instance, 'request', user_application
+    )
+
+    assert next(actual_formsets) == (FORMSET, education_inline)
+    with pytest.raises(StopIteration):
+        next(actual_formsets)
+
+
+@pytest.mark.django_db
+def test_get_formsets_with_inlines_no_resume_with_experience(
+    user_application,
+    user_application_adg_admin_instance,
+    education_inline,
+    work_experience_inline,
+    mocker
+):
+    """
+    Test that the overridden generator function `get_formsets_with_inlines` yields formsets for both education and work
+    experience in case the applicant has provided work experience.
+    """
+    _mock_get_formsets_with_inlines_dependencies(mocker, education_inline, work_experience_inline)
+
+    work_experience = WorkExperienceFactory()
+    work_experience.user_application = user_application
+    work_experience.save()
+
+    actual_formsets = UserApplicationADGAdmin.get_formsets_with_inlines(
+        user_application_adg_admin_instance, 'request', user_application
+    )
+
+    assert next(actual_formsets) == (FORMSET, education_inline)
+    assert next(actual_formsets) == (FORMSET, work_experience_inline)
 
 
 @pytest.mark.django_db

@@ -12,7 +12,7 @@ from openedx.adg.lms.constants import SAUDI_NATIONAL_PROMPT
 from .constants import (
     ACCEPTED_APPLICATIONS_TITLE,
     ALL_APPLICATIONS_TITLE,
-    APPLICANT_INFO_FIELDSET_TITLE,
+    APPLICANT_INFO,
     APPLYING_TO,
     COVER_LETTER_FILE,
     COVER_LETTER_FILE_DISPLAY,
@@ -21,12 +21,12 @@ from .constants import (
     DATE_OF_BIRTH,
     DAY_MONTH_YEAR_FORMAT,
     EMAIL,
-    EMAIL_ADDRESS_HTML,
+    EMAIL_ADDRESS_HTML_FORMAT,
     GENDER,
     GENDER_MAP,
     IS_SAUDI_NATIONAL,
     LINKED_IN_PROFILE,
-    LINKED_IN_PROFILE_HTML,
+    LINKED_IN_PROFILE_HTML_FORMAT,
     LOCATION,
     OPEN_APPLICATIONS_TITLE,
     ORGANIZATION,
@@ -326,7 +326,7 @@ class UserApplicationADGAdmin(admin.ModelAdmin):
         application.save()
 
     def email(self, obj):
-        return format_html(EMAIL_ADDRESS_HTML, email_address=obj.user.email)
+        return format_html(EMAIL_ADDRESS_HTML_FORMAT, email_address=obj.user.email)
     email.short_description = _('Email')
 
     def location(self, obj):
@@ -348,7 +348,7 @@ class UserApplicationADGAdmin(admin.ModelAdmin):
     location.short_description = _('Location')
 
     def linked_in_profile(self, obj):
-        return format_html(LINKED_IN_PROFILE_HTML, url=obj.linkedin_url)
+        return format_html(LINKED_IN_PROFILE_HTML_FORMAT, url=obj.linkedin_url)
     linked_in_profile.short_description = _('LinkedIn Profile')
 
     def is_saudi_national(self, obj):
@@ -470,7 +470,7 @@ class UserApplicationADGAdmin(admin.ModelAdmin):
 
         applicant_info_fields.append(APPLYING_TO)
 
-        fieldset = (APPLICANT_INFO_FIELDSET_TITLE, {'fields': tuple(applicant_info_fields)})
+        fieldset = (APPLICANT_INFO, {'fields': tuple(applicant_info_fields)})
 
         return fieldset
 
