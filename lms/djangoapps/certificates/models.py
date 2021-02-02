@@ -513,12 +513,7 @@ class CertificateInvalidation(TimeStampedModel):
     invalidated_by = models.ForeignKey(User, on_delete=models.CASCADE)
     notes = models.TextField(default=None, null=True)
     active = models.BooleanField(default=True)
-
-    # This is necessary because CMS does not install the certificates app, but it
-    # imports this models code. Simple History will attempt to connect to the installed
-    # model in the certificates app, which will fail.
-    if 'certificates' in apps.app_configs:
-        history = HistoricalRecords()
+    history = HistoricalRecords()
 
     class Meta(object):
         app_label = "certificates"
