@@ -12,10 +12,10 @@ import six
 from common.djangoapps.terrain.stubs.http import StubHttpRequestHandler, StubHttpService, require_params
 
 
-class StubHttpServiceTest(unittest.TestCase):
+class StubHttpServiceTest(unittest.TestCase):  # lint-amnesty, pylint: disable=missing-class-docstring
 
     def setUp(self):
-        super(StubHttpServiceTest, self).setUp()
+        super(StubHttpServiceTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.server = StubHttpService()
         self.addCleanup(self.server.shutdown)
         self.url = "http://127.0.0.1:{0}/set_config".format(self.server.port)
@@ -71,7 +71,7 @@ class StubHttpServiceTest(unittest.TestCase):
         self.assertEqual(response.status_code, 404)
 
 
-class RequireRequestHandler(StubHttpRequestHandler):
+class RequireRequestHandler(StubHttpRequestHandler):  # lint-amnesty, pylint: disable=missing-class-docstring
     @require_params('GET', 'test_param')
     def do_GET(self):
         self.send_response(200)
@@ -91,7 +91,7 @@ class RequireParamTest(unittest.TestCase):
     """
 
     def setUp(self):
-        super(RequireParamTest, self).setUp()
+        super(RequireParamTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.server = RequireHttpService()
         self.addCleanup(self.server.shutdown)
         self.url = "http://127.0.0.1:{port}".format(port=self.server.port)

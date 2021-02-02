@@ -10,10 +10,10 @@ import requests
 from ..youtube import StubYouTubeService
 
 
-class StubYouTubeServiceTest(unittest.TestCase):
+class StubYouTubeServiceTest(unittest.TestCase):  # lint-amnesty, pylint: disable=missing-class-docstring
 
     def setUp(self):
-        super(StubYouTubeServiceTest, self).setUp()
+        super(StubYouTubeServiceTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.server = StubYouTubeService()
         self.url = "http://127.0.0.1:{0}/".format(self.server.port)
         self.server.config['time_to_response'] = 0.0

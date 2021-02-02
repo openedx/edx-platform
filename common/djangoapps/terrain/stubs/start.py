@@ -78,7 +78,7 @@ def _parse_config_args(args):
             if len(components) >= 2:
                 config_dict[components[0]] = "=".join(components[1:])
 
-        except:
+        except:  # lint-amnesty, pylint: disable=bare-except
             print("Warning: could not interpret config value '{0}'".format(config_str))
 
     return config_dict

@@ -24,7 +24,7 @@ class StubEdxNotesServiceTest(unittest.TestCase):
         """
         Start the stub server.
         """
-        super(StubEdxNotesServiceTest, self).setUp()
+        super(StubEdxNotesServiceTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.server = StubEdxNotesService()
         dummy_notes = self._get_dummy_notes(count=5)
         self.server.add_notes(dummy_notes)

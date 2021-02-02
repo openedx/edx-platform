@@ -20,7 +20,7 @@ class StubLtiServiceTest(unittest.TestCase):
     Used for lettuce BDD tests in lms/courseware/features/lti.feature
     """
     def setUp(self):
-        super(StubLtiServiceTest, self).setUp()
+        super(StubLtiServiceTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.server = StubLtiService()
         self.uri = 'http://127.0.0.1:{}/'.format(self.server.port)
         self.launch_uri = self.uri + 'correct_lti_endpoint'
@@ -60,7 +60,7 @@ class StubLtiServiceTest(unittest.TestCase):
         self.assertIn(b'Wrong LTI signature', response.content)
 
     @patch('common.djangoapps.terrain.stubs.lti.signature.verify_hmac_sha1', return_value=True)
-    def test_success_response_launch_lti(self, check_oauth):
+    def test_success_response_launch_lti(self, check_oauth):  # lint-amnesty, pylint: disable=unused-argument
         """
         Success lti launch.
         """
