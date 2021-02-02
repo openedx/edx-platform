@@ -52,7 +52,7 @@ class LmsSearchFilterGeneratorTestCase(ModuleStoreTestCase):
         )
 
     def setUp(self):
-        super(LmsSearchFilterGeneratorTestCase, self).setUp()
+        super(LmsSearchFilterGeneratorTestCase, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.build_courses()
         self.user = UserFactory.create(username="jack", email="jack@fake.edx.org", password='test')
 

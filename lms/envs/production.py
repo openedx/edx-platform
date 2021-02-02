@@ -44,7 +44,7 @@ def get_env_setting(setting):
         return os.environ[setting]
     except KeyError:
         error_msg = u"Set the %s env variable" % setting
-        raise ImproperlyConfigured(error_msg)
+        raise ImproperlyConfigured(error_msg)  # lint-amnesty, pylint: disable=raise-missing-from
 
 ################################ ALWAYS THE SAME ##############################
 
@@ -189,7 +189,7 @@ SESSION_COOKIE_DOMAIN = ENV_TOKENS.get('SESSION_COOKIE_DOMAIN')
 SESSION_COOKIE_HTTPONLY = ENV_TOKENS.get('SESSION_COOKIE_HTTPONLY', True)
 
 DCS_SESSION_COOKIE_SAMESITE = ENV_TOKENS.get('DCS_SESSION_COOKIE_SAMESITE', DCS_SESSION_COOKIE_SAMESITE)
-DCS_SESSION_COOKIE_SAMESITE_FORCE_ALL = ENV_TOKENS.get('DCS_SESSION_COOKIE_SAMESITE_FORCE_ALL', DCS_SESSION_COOKIE_SAMESITE_FORCE_ALL)
+DCS_SESSION_COOKIE_SAMESITE_FORCE_ALL = ENV_TOKENS.get('DCS_SESSION_COOKIE_SAMESITE_FORCE_ALL', DCS_SESSION_COOKIE_SAMESITE_FORCE_ALL)  # lint-amnesty, pylint: disable=line-too-long
 
 AWS_SES_REGION_NAME = ENV_TOKENS.get('AWS_SES_REGION_NAME', 'us-east-1')
 AWS_SES_REGION_ENDPOINT = ENV_TOKENS.get('AWS_SES_REGION_ENDPOINT', 'email.us-east-1.amazonaws.com')

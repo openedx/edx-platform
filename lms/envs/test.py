@@ -17,15 +17,15 @@ sessions. Assumes structure:
 import logging
 import os
 from collections import OrderedDict
-from random import choice
-from string import digits, ascii_letters, punctuation
+from random import choice  # lint-amnesty, pylint: disable=unused-import
+from string import digits, ascii_letters, punctuation  # lint-amnesty, pylint: disable=unused-import
 from uuid import uuid4
 
 import openid.oidutil
 from django.utils.translation import ugettext_lazy
 from edx_django_utils.plugins import add_plugins
 from path import Path as path
-from six.moves import range
+from six.moves import range  # lint-amnesty, pylint: disable=unused-import
 
 from openedx.core.djangoapps.plugins.constants import ProjectType, SettingsType
 from openedx.core.lib.derived import derive_settings
@@ -535,7 +535,7 @@ JWT_AUTH.update({
         ': "RSA"}'
     ),
 })
-# pylint: enable=unicode-format-string
+# pylint: enable=unicode-format-string  # lint-amnesty, pylint: disable=bad-option-value
 ####################### Plugin Settings ##########################
 
 add_plugins(__name__, ProjectType.LMS, SettingsType.TEST)

@@ -70,7 +70,7 @@ class XBlockValidationTest(LmsXBlockMixinTestCase):
     Unit tests for XBlock validation
     """
     def setUp(self):
-        super(XBlockValidationTest, self).setUp()
+        super(XBlockValidationTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.build_course()
 
     def verify_validation_message(self, message, expected_message, expected_message_type):
@@ -280,7 +280,7 @@ class OpenAssessmentBlockMixinTestCase(ModuleStoreTestCase):
     """
 
     def setUp(self):
-        super(OpenAssessmentBlockMixinTestCase, self).setUp()
+        super(OpenAssessmentBlockMixinTestCase, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.course = CourseFactory.create()
         self.section = ItemFactory.create(parent=self.course, category='chapter', display_name='Test Section')
         self.open_assessment = ItemFactory.create(
@@ -376,7 +376,7 @@ class RenamedTuple(tuple):
     This class is only used to allow overriding __name__ on the tuples passed
     through ddt, in order to have the generated test names make sense.
     """
-    pass
+    pass  # lint-amnesty, pylint: disable=unnecessary-pass
 
 
 def ddt_named(parent, child):
@@ -412,7 +412,7 @@ class XBlockMergedGroupAccessTest(LmsXBlockMixinTestCase):
     )
 
     def setUp(self):
-        super(XBlockMergedGroupAccessTest, self).setUp()
+        super(XBlockMergedGroupAccessTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.build_course()
 
     def verify_group_access(self, block_location, expected_dict):
