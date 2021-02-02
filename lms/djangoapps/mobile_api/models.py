@@ -85,10 +85,10 @@ class AppVersionConfig(models.Model):
             if utils.parsed_version(config.version) >= parsed_version:
                 return config.expire_at
 
-    def save(self, *args, **kwargs):
+    def save(self, *args, **kwargs):  # lint-amnesty, pylint: disable=signature-differs
         """ parses version into major, minor and patch versions before saving """
         self.major_version, self.minor_version, self.patch_version = utils.parsed_version(self.version)
-        super(AppVersionConfig, self).save(*args, **kwargs)
+        super(AppVersionConfig, self).save(*args, **kwargs)  # lint-amnesty, pylint: disable=super-with-arguments
 
 
 class IgnoreMobileAvailableFlagConfig(ConfigurationModel):

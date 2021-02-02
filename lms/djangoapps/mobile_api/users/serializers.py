@@ -14,11 +14,11 @@ from common.djangoapps.student.models import CourseEnrollment, User
 from common.djangoapps.util.course import get_encoded_course_sharing_utm_params, get_link_for_about_page
 
 
-class CourseOverviewField(serializers.RelatedField):
+class CourseOverviewField(serializers.RelatedField):  # lint-amnesty, pylint: disable=abstract-method
     """
     Custom field to wrap a CourseOverview object. Read-only.
     """
-    def to_representation(self, course_overview):
+    def to_representation(self, course_overview):  # lint-amnesty, pylint: disable=arguments-differ
         course_id = six.text_type(course_overview.id)
         request = self.context.get('request')
         api_version = self.context.get('api_version')
