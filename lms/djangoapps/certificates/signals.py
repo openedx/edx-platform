@@ -24,7 +24,6 @@ from lms.djangoapps.certificates.tasks import CERTIFICATE_DELAY_SECONDS, generat
 from lms.djangoapps.grades.api import CourseGradeFactory
 from lms.djangoapps.verify_student.services import IDVerificationService
 from openedx.core.djangoapps.certificates.api import auto_certificate_generation_enabled
-from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.content.course_overviews.signals import COURSE_PACING_CHANGED
 from openedx.core.djangoapps.signals.signals import (
     COURSE_GRADE_NOW_FAILED,
@@ -52,7 +51,6 @@ def _update_cert_settings_on_pacing_change(sender, updated_course_overview, **kw
 
 @receiver(post_save, sender=CertificateWhitelist, dispatch_uid="append_certificate_whitelist")
 def _listen_for_certificate_whitelist_append(sender, instance, **kwargs):  # pylint: disable=unused-argument
-    course = CourseOverview.get_from_id(instance.course_id)
     if not auto_certificate_generation_enabled():
         return
 
@@ -69,7 +67,6 @@ def listen_for_passing_grade(sender, user, course_id, **kwargs):  # pylint: disa
     Listen for a learner passing a course, send cert generation task,
     downstream signal from COURSE_GRADE_CHANGED
     """
-    course = CourseOverview.get_from_id(course_id)
     if not auto_certificate_generation_enabled():
         return
 

@@ -14,19 +14,19 @@ from django.test.utils import override_settings
 from django.urls import reverse
 from opaque_keys.edx.locator import CourseLocator
 from six.moves import range
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from xmodule.modulestore.tests.factories import CourseFactory
 
+from common.djangoapps.student.tests.factories import UserFactory
 from lms.djangoapps.certificates.models import (
     CertificateHtmlViewConfiguration,
     ExampleCertificate,
-    ExampleCertificateSet,
-    GeneratedCertificate
+    ExampleCertificateSet
 )
+from lms.djangoapps.certificates.tests.factories import GeneratedCertificateFactory
 from lms.djangoapps.certificates.utils import get_certificate_url
 from openedx.core.djangoapps.site_configuration.tests.test_util import with_site_configuration
 from openedx.core.djangolib.testing.utils import CacheIsolationTestCase
-from common.djangoapps.student.tests.factories import UserFactory
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory
 
 FEATURES_WITH_CERTS_ENABLED = settings.FEATURES.copy()
 FEATURES_WITH_CERTS_ENABLED['CERTIFICATES_HTML_VIEW'] = True
@@ -226,7 +226,7 @@ class CertificatesViewsSiteTests(ModuleStoreTestCase):
         self.user.profile.name = "Joe User"
         self.user.profile.save()
         self.client.login(username=self.user.username, password='foo')
-        self.cert = GeneratedCertificate.eligible_certificates.create(
+        self.cert = GeneratedCertificateFactory(
             user=self.user,
             course_id=self.course_id,
             download_uuid=uuid4().hex,
