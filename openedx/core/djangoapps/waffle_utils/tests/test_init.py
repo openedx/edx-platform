@@ -13,7 +13,6 @@ from waffle.testutils import override_flag
 
 from .. import (
     CourseWaffleFlag,
-    WaffleFlagNamespace,
     WaffleSwitchNamespace,
 )
 from ..models import WaffleFlagCourseOverrideModel
@@ -33,8 +32,7 @@ class TestCourseWaffleFlag(TestCase):
 
     TEST_COURSE_KEY = CourseKey.from_string("edX/DemoX/Demo_Course")
     TEST_COURSE_2_KEY = CourseKey.from_string("edX/DemoX/Demo_Course_2")
-    TEST_NAMESPACE = WaffleFlagNamespace(NAMESPACE_NAME)
-    TEST_COURSE_FLAG = CourseWaffleFlag(TEST_NAMESPACE, FLAG_NAME, __name__)
+    TEST_COURSE_FLAG = CourseWaffleFlag(NAMESPACE_NAME, FLAG_NAME, __name__)
 
     def setUp(self):
         super().setUp()
@@ -83,7 +81,7 @@ class TestCourseWaffleFlag(TestCase):
         Test flag with undefined waffle flag.
         """
         test_course_flag = CourseWaffleFlag(
-            self.TEST_NAMESPACE,
+            self.NAMESPACE_NAME,
             self.FLAG_NAME,
             __name__,
         )
@@ -109,7 +107,7 @@ class TestCourseWaffleFlag(TestCase):
         """
         crum.set_current_request(None)
         test_course_flag = CourseWaffleFlag(
-            self.TEST_NAMESPACE,
+            self.NAMESPACE_NAME,
             self.FLAG_NAME,
             __name__,
         )
@@ -121,7 +119,7 @@ class TestCourseWaffleFlag(TestCase):
         """
         crum.set_current_request(None)
         test_course_flag = CourseWaffleFlag(
-            self.TEST_NAMESPACE,
+            self.NAMESPACE_NAME,
             self.FLAG_NAME,
             __name__,
         )
