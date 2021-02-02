@@ -772,11 +772,11 @@ def associate_by_email_if_saml(auth_entry, backend, details, user, strategy, *ar
             enterprise_customer_user = is_enterprise_customer_user(current_provider.provider_id, current_user)
             logger.info(
                 u'[Multiple_SSO_SAML_Accounts_Association_to_User] Enterprise user verification:'
-                u'Email: {email}, user_id: {user_id}, Provider: {provider},'
-                u' enterprise_customer_user: {enterprise_customer_user}'.format(
+                u'User Email: {email}, User ID: {user_id}, Provider ID: {provider_id},'
+                u' is_enterprise_customer_user: {enterprise_customer_user}'.format(
                     email=current_user.email,
                     user_id=current_user.id,
-                    provider=current_provider.provider_id,
+                    provider_id=current_provider.provider_id,
                     enterprise_customer_user=enterprise_customer_user,
                 )
             )
@@ -803,11 +803,11 @@ def associate_by_email_if_saml(auth_entry, backend, details, user, strategy, *ar
                 ):
                     logger.info(
                         u'[Multiple_SSO_SAML_Accounts_Association_to_User] User association account is not'
-                        u' active: Email: {email}, user_id: {user_id}, Provider: {provider},'
-                        u' enterprise_customer_user: {enterprise_customer_user}'.format(
+                        u' active: User Email: {email}, User ID: {user_id}, Provider ID: {provider_id},'
+                        u' is_enterprise_customer_user: {enterprise_customer_user}'.format(
                             email=current_user.email,
                             user_id=current_user.id,
-                            provider=current_provider.provider_id,
+                            provider_id=current_provider.provider_id,
                             enterprise_customer_user=enterprise_customer_user
                         )
                     )
@@ -815,7 +815,9 @@ def associate_by_email_if_saml(auth_entry, backend, details, user, strategy, *ar
 
         except Exception as ex:  # pylint: disable=broad-except
             logger.exception('[Multiple_SSO_SAML_Accounts_Association_to_User] Error in'
-                             ' saml multiple accounts association: %s:, %s:', current_user.id, ex)
+                             ' saml multiple accounts association: User ID: %s, User Email: %s:,'
+                             'Provider ID: %s, Exception: %s', current_user.id, current_user.email,
+                             current_provider.provider_id, ex)
 
     # this is waffle switch to enable and disable this functionality from admin panel.
     if is_multiple_sso_accounts_association_to_saml_user_enabled():
