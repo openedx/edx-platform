@@ -71,6 +71,7 @@ def _send_activation_email(self, msg_string, from_address=None):
             dest_addr,
         )
         raise Exception  # lint-amnesty, pylint: disable=raise-missing-from
+<<<<<<< HEAD
 
 
 _OLD_TASK_NAME = 'student.send_activation_email'
@@ -83,3 +84,5 @@ _NEW_TASK_NAME = 'common.djangoapps.student.tasks.send_activation_email'
 #    set `send_activation_email` to the new-named task.
 send_activation_email = shared_task(bind=True, name=_OLD_TASK_NAME)(_send_activation_email)
 shared_task(bind=True, name=_NEW_TASK_NAME)(_send_activation_email)
+=======
+>>>>>>> Applied pylint-amnesty to student
