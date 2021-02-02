@@ -10,7 +10,7 @@ certifi==2020.11.8        # via requests
 chardet==3.0.4            # via requests
 click==7.1.2              # via code-annotations
 code-annotations==0.10.1  # via -r requirements/edx/doc.in
-django==2.2.17            # via -c requirements/edx/../constraints.txt, code-annotations
+django==2.2.18            # via -c requirements/edx/../constraints.txt, code-annotations
 docutils==0.16            # via sphinx
 edx-sphinx-theme==1.5.0   # via -r requirements/edx/doc.in
 gitdb==4.0.5              # via gitpython
