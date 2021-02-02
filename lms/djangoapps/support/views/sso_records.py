@@ -1,4 +1,8 @@
-from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user, missing-module-docstring
+"""
+Views for SSO records.
+"""
+
+from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.db.models import Q
 from django.utils.decorators import method_decorator
 from rest_framework.generics import GenericAPIView
