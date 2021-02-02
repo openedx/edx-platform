@@ -21,7 +21,7 @@ class MemcacheTest(TestCase):
                           [129, 500, 2 ** 8 - 1, 2 ** 8 + 1, 2 ** 16 - 1])
 
     def setUp(self):
-        super(MemcacheTest, self).setUp()
+        super(MemcacheTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.cache = caches['default']
 
     def test_safe_key(self):
