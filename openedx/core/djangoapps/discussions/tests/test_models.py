@@ -124,6 +124,7 @@ class DiscussionsConfigurationModelTest(TestCase):
         """
         Configure shared test data (configuration, course_key, etc.)
         """
+        super().setUp()
         self.course_key_with_defaults = CourseKey.from_string("course-v1:TestX+Course+Configured")
         self.course_key_without_config = CourseKey.from_string("course-v1:TestX+Course+NoConfig")
         self.course_key_with_values = CourseKey.from_string("course-v1:TestX+Course+Values")
@@ -140,14 +141,13 @@ class DiscussionsConfigurationModelTest(TestCase):
             },
         )
         self.configuration_with_values.save()
-        pass
 
     def test_get_nonexistent(self):
         """
         Assert we can not fetch a non-existent record
         """
         with self.assertRaises(DiscussionsConfiguration.DoesNotExist):
-            configuration = DiscussionsConfiguration.objects.get(
+            DiscussionsConfiguration.objects.get(
                 context_key=self.course_key_without_config,
             )
 
@@ -170,7 +170,9 @@ class DiscussionsConfigurationModelTest(TestCase):
         assert configuration is not None
         assert not configuration.enabled
         assert configuration.lti_configuration is None
-        assert configuration.plugin_configuration['url'] == self.configuration_with_values.plugin_configuration['url']
+        actual_url = configuration.plugin_configuration.get('url')
+        expected_url = self.configuration_with_values.plugin_configuration.get('url')
+        assert actual_url == expected_url
         assert configuration.provider_type == self.configuration_with_values.provider_type
 
     def test_update_defaults(self):
@@ -212,7 +214,7 @@ class DiscussionsConfigurationModelTest(TestCase):
         is_enabled = DiscussionsConfiguration.is_enabled(self.course_key_with_values)
         assert not is_enabled
 
-    def test_get_nonexistent(self):
+    def test_get_nonexistent_empty(self):
         """
         Assert we get an "empty" model back for nonexistent records
         """
