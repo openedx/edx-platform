@@ -47,4 +47,4 @@ class SSPVerificationRetryAdmin(admin.ModelAdmin):
     """
     Admin for the SSPVerificationRetryConfig table.
     """
-    pass
+    pass  # lint-amnesty, pylint: disable=unnecessary-pass

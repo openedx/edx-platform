@@ -1,4 +1,4 @@
-"""
+"""  # lint-amnesty, pylint: disable=cyclic-import
 Tests for django admin commands in the verify_student module
 
 """
@@ -27,7 +27,7 @@ class TestVerifyStudentCommand(TestCase):
     tmp_file_path = os.path.join(tempfile.gettempdir(), 'tmp-emails.txt')
 
     def setUp(self):
-        super(TestVerifyStudentCommand, self).setUp()
+        super(TestVerifyStudentCommand, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.user1 = UserFactory.create()
         self.user2 = UserFactory.create()
         self.user3 = UserFactory.create()

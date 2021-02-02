@@ -14,7 +14,7 @@ from django.test.utils import override_settings
 from django.utils.timezone import now
 from mock import patch
 from common.djangoapps.student.tests.factories import UserFactory
-from testfixtures import LogCapture
+from testfixtures import LogCapture  # lint-amnesty, pylint: disable=wrong-import-order
 
 from common.test.utils import MockS3BotoMixin
 from lms.djangoapps.verify_student.models import ManualVerification, SoftwareSecurePhotoVerification, SSOVerification
@@ -30,7 +30,7 @@ class TestSendVerificationExpiryEmail(MockS3BotoMixin, TestCase):
 
     def setUp(self):
         """ Initial set up for tests """
-        super(TestSendVerificationExpiryEmail, self).setUp()
+        super(TestSendVerificationExpiryEmail, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         Site.objects.create(domain='edx.org', name='edx.org')
         self.resend_days = settings.VERIFICATION_EXPIRY_EMAIL['RESEND_DAYS']
         self.days = settings.VERIFICATION_EXPIRY_EMAIL['DAYS_RANGE']

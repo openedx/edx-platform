@@ -23,7 +23,7 @@ import requests
 import six
 from config_models.models import ConfigurationModel
 from django.conf import settings
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.core.files.base import ContentFile
 from django.db import models, transaction
 from django.urls import reverse
@@ -119,7 +119,7 @@ class IDVerificationAttempt(StatusModel):
     created_at = models.DateTimeField(auto_now_add=True, db_index=True)
     updated_at = models.DateTimeField(auto_now=True, db_index=True)
 
-    def expiration_default():
+    def expiration_default():  # lint-amnesty, pylint: disable=no-method-argument
         return now() + timedelta(days=settings.VERIFY_STUDENT["DAYS_GOOD_FOR"])
 
     # Datetime that the verification will expire.
@@ -658,7 +658,7 @@ class SoftwareSecurePhotoVerification(PhotoVerification):
         """Use expiry_date for older entries if it still exists."""
         if self.expiry_date:
             return self.expiry_date
-        return super(SoftwareSecurePhotoVerification, self).expiration_datetime
+        return super(SoftwareSecurePhotoVerification, self).expiration_datetime  # lint-amnesty, pylint: disable=super-with-arguments
 
     @classmethod
     def get_initial_verification(cls, user, earliest_allowed_date=None):
@@ -1083,7 +1083,7 @@ class SoftwareSecurePhotoVerification(PhotoVerification):
 
         verification = SoftwareSecurePhotoVerification.get_recent_verification(user)
 
-        if verification and verification.expiration_datetime < recently_expired_date and not verification.expiry_email_date:
+        if verification and verification.expiration_datetime < recently_expired_date and not verification.expiry_email_date:  # lint-amnesty, pylint: disable=line-too-long
             expiry_email_date = today - timedelta(days=email_config['RESEND_DAYS'])
             SoftwareSecurePhotoVerification.objects.filter(pk=verification.pk).update(
                 expiry_email_date=expiry_email_date)

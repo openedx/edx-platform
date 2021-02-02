@@ -7,7 +7,7 @@ from collections import OrderedDict
 
 import ddt
 import six
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.core.exceptions import ValidationError
 from django.test import TestCase
 from django.test.client import Client
@@ -26,7 +26,7 @@ class SurveyModelsTests(TestCase):
         """
         Set up the test data used in the specific tests
         """
-        super(SurveyModelsTests, self).setUp()
+        super(SurveyModelsTests, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.client = Client()
 
         # Create two accounts
@@ -35,7 +35,7 @@ class SurveyModelsTests(TestCase):
         self.student2 = User.objects.create_user('student2', 'student2@test.com', self.password)
 
         self.test_survey_name = 'TestForm'
-        self.test_form = '<li><input name="field1" /></li><li><input name="field2" /></li><li><select name="ddl"><option>1</option></select></li>'
+        self.test_form = '<li><input name="field1" /></li><li><input name="field2" /></li><li><select name="ddl"><option>1</option></select></li>'  # lint-amnesty, pylint: disable=line-too-long
         self.test_form_update = '<input name="field1" />'
         self.course_id = 'foo/bar/baz'
 

@@ -5,7 +5,7 @@ Python tests for the Survey models
 
 from collections import OrderedDict
 
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.test.client import Client
 
 from lms.djangoapps.survey.models import SurveyForm
@@ -23,7 +23,7 @@ class SurveyModelsTests(ModuleStoreTestCase):
         """
         Set up the test data used in the specific tests
         """
-        super(SurveyModelsTests, self).setUp()
+        super(SurveyModelsTests, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
 
         self.client = Client()
 

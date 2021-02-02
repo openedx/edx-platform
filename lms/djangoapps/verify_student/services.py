@@ -8,7 +8,7 @@ from itertools import chain
 from urllib.parse import quote
 
 from django.conf import settings
-from django.urls import reverse
+from django.urls import reverse  # lint-amnesty, pylint: disable=unused-import
 from django.utils.timezone import now
 from django.utils.translation import ugettext as _
 
@@ -18,7 +18,7 @@ from openedx.core.djangoapps.site_configuration import helpers as configuration_
 from common.djangoapps.student.models import User
 
 from .models import ManualVerification, SoftwareSecurePhotoVerification, SSOVerification
-from .utils import earliest_allowed_verification_date, most_recent_verification, active_verifications
+from .utils import earliest_allowed_verification_date, most_recent_verification, active_verifications  # lint-amnesty, pylint: disable=unused-import
 
 log = logging.getLogger(__name__)
 

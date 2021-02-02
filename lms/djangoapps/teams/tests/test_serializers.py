@@ -24,7 +24,7 @@ class SerializerTestCase(SharedModuleStoreTestCase):
         """
         Set up a course with a teams configuration.
         """
-        super(SerializerTestCase, self).setUp()
+        super(SerializerTestCase, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.course = CourseFactory.create(
             teams_configuration=TeamsConfig({
                 "max_team_size": 10,
@@ -39,7 +39,7 @@ class MembershipSerializerTestCase(SerializerTestCase):
     """
 
     def setUp(self):
-        super(MembershipSerializerTestCase, self).setUp()
+        super(MembershipSerializerTestCase, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.team = CourseTeamFactory.create(
             course_id=self.course.id,
             topic_id=self.course.teamsets[0].teamset_id,

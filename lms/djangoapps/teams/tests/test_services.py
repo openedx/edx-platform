@@ -16,7 +16,7 @@ class TeamsServiceTests(ModuleStoreTestCase):
     """ Tests for the TeamsService """
 
     def setUp(self):
-        super(TeamsServiceTests, self).setUp()
+        super(TeamsServiceTests, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.course_run = CourseRunFactory.create()
         self.course_key = self.course_run['key']
         self.team = CourseTeamFactory.create(course_id=self.course_key)

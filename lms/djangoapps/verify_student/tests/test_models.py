@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-  # lint-amnesty, pylint: disable=missing-module-docstring
 
 import base64
 from datetime import datetime, timedelta
@@ -49,7 +49,7 @@ iwIDAQAB
 }
 
 
-def mock_software_secure_post(url, headers=None, data=None, **kwargs):
+def mock_software_secure_post(url, headers=None, data=None, **kwargs):  # lint-amnesty, pylint: disable=unused-argument
     """
     Mocks our interface when we post to Software Secure. Does basic assertions
     on the fields we send over to make sure we're not missing headers or giving
@@ -75,7 +75,7 @@ def mock_software_secure_post(url, headers=None, data=None, **kwargs):
     return response
 
 
-def mock_software_secure_post_error(url, headers=None, data=None, **kwargs):
+def mock_software_secure_post_error(url, headers=None, data=None, **kwargs):  # lint-amnesty, pylint: disable=unused-argument
     """
     Simulates what happens if our post to Software Secure is rejected, for
     whatever reason.
@@ -94,7 +94,7 @@ def mock_software_secure_post_unavailable(url, headers=None, data=None, **kwargs
 @patch.dict(settings.VERIFY_STUDENT, FAKE_SETTINGS)
 @patch('lms.djangoapps.verify_student.models.requests.post', new=mock_software_secure_post)
 @ddt.ddt
-class TestPhotoVerification(TestVerificationBase, MockS3BotoMixin, ModuleStoreTestCase):
+class TestPhotoVerification(TestVerificationBase, MockS3BotoMixin, ModuleStoreTestCase):  # lint-amnesty, pylint: disable=missing-class-docstring
 
     def test_state_transitions(self):
         """
