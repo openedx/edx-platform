@@ -97,21 +97,10 @@ def _get_secure_token_for_xblock_handler(user_id, block_key_str, time_idx: int, 
     Internal function to extract repeating hashing steps which we
     call multiple times with different time_idx and hashing key.
     """
-    # This was supposed to be an interval boundary number that matches
-    # the current 2 day chunk(midnight UTC of every other day).
-    # Instead it's a number that will always be consistent but
-    # otherwise does not have a semantic meaning.
-    # Right now the math is missing a multiplication by TOKEN_PERIOD after
-    # the math.floor which means the unit is days which is then added to
-    # 0 or -TOKEN_PERIOD seconds.
-    # Right now this is only valid for 0-2 days instead of the intended
-    # 2-4 days because of the units issue above. Correcting the math should
-    # be possible but we are not going to do it in the middle of the other
-    # change we're making. We've made https://openedx.atlassian.net/browse/ARCHBOM-1677
-    # to come back and deal with it.
     TOKEN_PERIOD = 24 * 60 * 60 * 2  # These URLs are valid for 2-4 days
+    # time_token is the number of time periods since unix epoch
     time_token = math.floor(time.time() / TOKEN_PERIOD)
-    time_token += TOKEN_PERIOD * time_idx
+    time_token += time_idx
     check_string = str(time_token) + ':' + str(user_id) + ':' + block_key_str
     secure_key = hmac.new(hashing_key.encode('utf-8'), check_string.encode('utf-8'), hashlib.sha256).hexdigest()
     return secure_key[:20]
