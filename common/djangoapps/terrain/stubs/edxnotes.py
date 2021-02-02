@@ -107,7 +107,7 @@ class StubEdxNotesServiceHandler(StubHttpRequestHandler):
         self.send_response(200, headers={
             "Access-Control-Allow-Origin": "*",
             "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
-            "Access-Control-Allow-Headers": "Content-Length, Content-Type, X-Annotator-Auth-Token, X-Requested-With, X-Annotator-Auth-Token, X-Requested-With, X-CSRFToken",
+            "Access-Control-Allow-Headers": "Content-Length, Content-Type, X-Annotator-Auth-Token, X-Requested-With, X-Annotator-Auth-Token, X-Requested-With, X-CSRFToken",  # lint-amnesty, pylint: disable=line-too-long
         })
 
     def respond(self, status_code=200, content=None):
@@ -300,7 +300,7 @@ class StubEdxNotesService(StubHttpService):
     HANDLER_CLASS = StubEdxNotesServiceHandler
 
     def __init__(self, *args, **kwargs):
-        super(StubEdxNotesService, self).__init__(*args, **kwargs)
+        super(StubEdxNotesService, self).__init__(*args, **kwargs)  # lint-amnesty, pylint: disable=super-with-arguments
         self.notes = list()
 
     def get_all_notes(self):
