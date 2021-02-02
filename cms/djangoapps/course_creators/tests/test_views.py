@@ -4,7 +4,7 @@ Tests course_creators.views.py.
 
 
 import mock
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.core.exceptions import PermissionDenied
 from django.test import TestCase
 from django.urls import reverse
@@ -27,7 +27,7 @@ class CourseCreatorView(TestCase):
 
     def setUp(self):
         """ Test case setup """
-        super(CourseCreatorView, self).setUp()
+        super(CourseCreatorView, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.user = User.objects.create_user('test_user', 'test_user+courses@edx.org', 'foo')
         self.admin = User.objects.create_user('Mark', 'admin+courses@edx.org', 'foo')
         self.admin.is_staff = True

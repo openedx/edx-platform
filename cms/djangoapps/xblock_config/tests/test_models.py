@@ -34,7 +34,7 @@ class TestLTIConsumerHideFieldsFlag(TestCase):
     These are set via Django admin settings.
     """
     def setUp(self):
-        super(TestLTIConsumerHideFieldsFlag, self).setUp()
+        super(TestLTIConsumerHideFieldsFlag, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.course_id = CourseLocator(org="edx", course="course", run="run")
 
     @ddt.data(
