@@ -20,7 +20,7 @@ from xmodule.modulestore.tests.factories import CourseFactory
 
 
 @contextlib.contextmanager
-def mock_signal_receiver(signal):
+def mock_signal_receiver(signal):  # lint-amnesty, pylint: disable=missing-function-docstring
     receiver = mock.Mock()
     signal.connect(receiver)
     yield receiver
@@ -39,7 +39,7 @@ class TestSendCCXCoursePublished(ModuleStoreTestCase):
         """
         Set up tests
         """
-        super(TestSendCCXCoursePublished, self).setUp()
+        super(TestSendCCXCoursePublished, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         course = self.course = CourseFactory.create(org="edX", course="999", display_name="Run 666")
         course2 = self.course2 = CourseFactory.create(org="edX", course="999a", display_name="Run 667")
         coach = AdminFactory.create()
