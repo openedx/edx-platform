@@ -12,6 +12,7 @@ from django_mysql.models import ListCharField
 from jsonfield import JSONField
 from model_utils.models import TimeStampedModel
 from opaque_keys.edx.django.models import LearningContextKeyField
+from opaque_keys.edx.keys import CourseKey
 from simple_history.models import HistoricalRecords
 
 from lti_consumer.models import LtiConfiguration
@@ -22,7 +23,7 @@ from openedx.core.djangoapps.content.course_overviews.models import CourseOvervi
 log = logging.getLogger(__name__)
 
 
-def get_supported_providers():
+def get_supported_providers() -> List[str]:
     """
     Return the list of supported discussion providers
 
@@ -115,7 +116,7 @@ class ProviderFilter(StackedConfigurationModel):
         return _providers
 
     @classmethod
-    def get_available_providers(cls, course_key) -> List[str]:
+    def get_available_providers(cls, course_key: CourseKey) -> List[str]:
         _filter = cls.current(course_key=course_key)
         providers = _filter.available_providers
         return providers
@@ -178,7 +179,7 @@ class DiscussionsConfiguration(TimeStampedModel):
         )
 
     @classmethod
-    def is_enabled(cls, context_key) -> bool:
+    def is_enabled(cls, context_key: CourseKey) -> bool:
         """
         Check if there is an active configuration for a given course key
 
@@ -189,7 +190,7 @@ class DiscussionsConfiguration(TimeStampedModel):
 
     # pylint: disable=undefined-variable
     @classmethod
-    def get(cls, context_key) -> cls:
+    def get(cls, context_key: CourseKey) -> cls:
         """
         Lookup a model by context_key
         """
@@ -205,5 +206,5 @@ class DiscussionsConfiguration(TimeStampedModel):
         return ProviderFilter.current(course_key=self.context_key).available_providers
 
     @classmethod
-    def get_available_providers(cls, context_key) -> List[str]:
+    def get_available_providers(cls, context_key: CourseKey) -> List[str]:
         return ProviderFilter.current(course_key=context_key).available_providers
