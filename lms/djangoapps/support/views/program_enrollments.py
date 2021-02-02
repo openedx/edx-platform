@@ -6,7 +6,7 @@ Support tool for changing course enrollments.
 import csv
 from uuid import UUID
 
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.db.models import Q
 from django.utils.decorators import method_decorator
 from django.views.generic import View
@@ -115,7 +115,7 @@ class LinkProgramEnrollmentSupportView(View):
             for item in ext_key_to_username.items()
             if item not in link_errors
         ]
-        errors = [message for message in link_errors.values()]
+        errors = [message for message in link_errors.values()]  # lint-amnesty, pylint: disable=unnecessary-comprehension
         return successes, errors
 
 
