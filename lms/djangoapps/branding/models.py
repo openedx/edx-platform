@@ -43,7 +43,7 @@ class BrandingInfoConfig(ConfigurationModel):
         try:
             json.loads(self.configuration)
         except ValueError:
-            raise ValidationError('Must be valid JSON string.')
+            raise ValidationError('Must be valid JSON string.')  # lint-amnesty, pylint: disable=raise-missing-from
 
     @classmethod
     def get_config(cls):
