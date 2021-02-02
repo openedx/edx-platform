@@ -2,7 +2,7 @@
 
 
 import re
-import unittest
+import unittest  # lint-amnesty, pylint: disable=unused-import
 
 from django.contrib.sites.models import Site
 from django.db import connections, DEFAULT_DB_ALIAS
@@ -178,7 +178,7 @@ class RegistryTest(testutil.TestCase):
         which doesn't match any of the possible backend_names.
         """
         google_provider = self.configure_google_provider(enabled=True, slug='custom_slug')
-        self.assertIn(google_provider, provider.Registry._enabled_providers())
+        self.assertIn(google_provider, provider.Registry._enabled_providers())  # lint-amnesty, pylint: disable=protected-access
         self.assertIn(google_provider, provider.Registry.get_enabled_by_backend_name('google-oauth2'))
 
     def test_oath2_different_slug_from_backend_name(self):
