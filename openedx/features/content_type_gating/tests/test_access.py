@@ -1156,7 +1156,7 @@ class TestContentTypeGatingService(ModuleStoreTestCase):
         # The method returns a content type gate for blocks that should be gated
         self.assertIn(
             'content-paywall',
-            ContentTypeGatingService().content_type_gate_for_block(
+            ContentTypeGatingService()._content_type_gate_for_block(
                 self.user, blocks_dict['graded_1'], course['course'].id
             ).content
         )
@@ -1164,7 +1164,47 @@ class TestContentTypeGatingService(ModuleStoreTestCase):
         # The method returns None for blocks that should not be gated
         self.assertEquals(
             None,
-            ContentTypeGatingService().content_type_gate_for_block(
+            ContentTypeGatingService()._content_type_gate_for_block(
                 self.user, blocks_dict['not_graded_1'], course['course'].id
+            )
+        )
+
+    @patch.object(ContentTypeGatingService, '_get_user', return_value=UserFactory.build())
+    def test_check_children_for_content_type_gating_paywall(self, mocked_user):  # pylint: disable=unused-argument
+        ''' Verify that the method returns a content type gate when appropriate '''
+        course = self._create_course()
+        blocks_dict = course['blocks']
+        CourseEnrollmentFactory.create(
+            user=self.user,
+            course_id=course['course'].id,
+            mode='audit'
+        )
+        blocks_dict['not_graded_1'] = ItemFactory.create(
+            parent=blocks_dict['vertical'],
+            category='problem',
+            graded=False,
+            metadata=METADATA,
+        )
+
+        # The method returns a content type gate for blocks that should be gated
+        self.assertEquals(
+            None,
+            ContentTypeGatingService().check_children_for_content_type_gating_paywall(
+                blocks_dict['vertical'], course['course'].id
+            )
+        )
+
+        blocks_dict['graded_1'] = ItemFactory.create(
+            parent=blocks_dict['vertical'],
+            category='problem',
+            graded=True,
+            metadata=METADATA,
+        )
+
+        # The method returns None for blocks that should not be gated
+        self.assertIn(
+            'content-paywall',
+            ContentTypeGatingService().check_children_for_content_type_gating_paywall(
+                blocks_dict['vertical'], course['course'].id
             )
         )

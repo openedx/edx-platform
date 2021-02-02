@@ -479,6 +479,13 @@ class SequenceMetadata(DeveloperErrorViewMixin, APIView):
         except InvalidKeyError:
             raise NotFound("Invalid usage key: '{}'.".format(usage_key_string))
 
+        _, request.user = setup_masquerade(
+            request,
+            usage_key.course_key,
+            staff_access=has_access(request.user, 'staff', usage_key.course_key),
+            reset_masquerade_data=True,
+        )
+
         sequence, _ = get_module_by_usage_id(
             self.request,
             str(usage_key.course_key),
