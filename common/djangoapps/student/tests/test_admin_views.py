@@ -8,9 +8,9 @@ import datetime
 
 import ddt
 import six
-from django.conf import settings
+from django.conf import settings  # lint-amnesty, pylint: disable=unused-import
 from django.contrib.admin.sites import AdminSite
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.forms import ValidationError
 from django.test import TestCase, override_settings
 from django.urls import reverse
@@ -19,7 +19,7 @@ from edx_toggles.toggles.testutils import override_waffle_switch
 from mock import Mock
 from pytz import UTC
 
-from common.djangoapps.student.admin import AllowedAuthUserForm, COURSE_ENROLLMENT_ADMIN_SWITCH, UserAdmin, CourseEnrollmentForm
+from common.djangoapps.student.admin import AllowedAuthUserForm, COURSE_ENROLLMENT_ADMIN_SWITCH, UserAdmin, CourseEnrollmentForm  # lint-amnesty, pylint: disable=line-too-long
 from common.djangoapps.student.models import AllowedAuthUser, CourseEnrollment, LoginFailures
 from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
@@ -38,7 +38,7 @@ class AdminCourseRolesPageTest(SharedModuleStoreTestCase):
         cls.course = CourseFactory.create(org='edx')
 
     def setUp(self):
-        super(AdminCourseRolesPageTest, self).setUp()
+        super(AdminCourseRolesPageTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.user = UserFactory.create(is_staff=True, is_superuser=True)
         self.user.save()
 
@@ -178,7 +178,7 @@ class AdminUserPageTest(TestCase):
     Unit tests for the UserAdmin view.
     """
     def setUp(self):
-        super(AdminUserPageTest, self).setUp()
+        super(AdminUserPageTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.admin = UserAdmin(User, AdminSite())
 
     def test_username_is_writable_for_user_creation(self):
@@ -221,7 +221,7 @@ class CourseEnrollmentAdminTest(SharedModuleStoreTestCase):
     )
 
     def setUp(self):
-        super(CourseEnrollmentAdminTest, self).setUp()
+        super(CourseEnrollmentAdminTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.user = UserFactory.create(is_staff=True, is_superuser=True)
         self.course = CourseFactory()
         self.course_enrollment = CourseEnrollmentFactory(
@@ -327,7 +327,7 @@ class LoginFailuresAdminTest(TestCase):
 
     def setUp(self):
         """Setup."""
-        super(LoginFailuresAdminTest, self).setUp()
+        super(LoginFailuresAdminTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.client.login(username=self.user.username, password='test')
         self.user2 = UserFactory.create(username=u'Zażółć gęślą jaźń')
         self.user_lockout_until = datetime.datetime.now(UTC)
@@ -336,7 +336,7 @@ class LoginFailuresAdminTest(TestCase):
 
     def tearDown(self):
         """Tear Down."""
-        super(LoginFailuresAdminTest, self).tearDown()
+        super(LoginFailuresAdminTest, self).tearDown()  # lint-amnesty, pylint: disable=super-with-arguments
         LoginFailures.objects.all().delete()
 
     def test_unicode_username(self):
@@ -406,7 +406,7 @@ class CourseEnrollmentAdminFormTest(SharedModuleStoreTestCase):
         cls.course = CourseOverviewFactory(start=now())
 
     def setUp(self):
-        super(CourseEnrollmentAdminFormTest, self).setUp()
+        super(CourseEnrollmentAdminFormTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.user = UserFactory.create()
 
     def test_admin_model_form_create(self):

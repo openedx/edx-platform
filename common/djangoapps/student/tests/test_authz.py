@@ -5,12 +5,12 @@ Tests authz.py
 
 import mock
 from ccx_keys.locator import CCXLocator
-from django.contrib.auth.models import AnonymousUser, User
+from django.contrib.auth.models import AnonymousUser, User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.core.exceptions import PermissionDenied
 from django.test import TestCase
 from opaque_keys.edx.locator import CourseLocator
 
-from common.djangoapps.student.auth import add_users, has_studio_read_access, has_studio_write_access, remove_users, user_has_role
+from common.djangoapps.student.auth import add_users, has_studio_read_access, has_studio_write_access, remove_users, user_has_role  # lint-amnesty, pylint: disable=line-too-long
 from common.djangoapps.student.roles import CourseCreatorRole, CourseInstructorRole, CourseStaffRole
 from common.djangoapps.student.tests.factories import AdminFactory
 
@@ -22,7 +22,7 @@ class CreatorGroupTest(TestCase):
 
     def setUp(self):
         """ Test case setup """
-        super(CreatorGroupTest, self).setUp()
+        super(CreatorGroupTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.user = User.objects.create_user('testuser', 'test+courses@edx.org', 'foo')
         self.admin = User.objects.create_user('Mark', 'admin+courses@edx.org', 'foo')
         self.admin.is_staff = True
@@ -150,7 +150,7 @@ class CCXCourseGroupTest(TestCase):
         """
         Set up test variables
         """
-        super(CCXCourseGroupTest, self).setUp()
+        super(CCXCourseGroupTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.global_admin = AdminFactory()
         self.staff = User.objects.create_user('teststaff', 'teststaff+courses@edx.org', 'foo')
         self.ccx_course_key = CCXLocator.from_string('ccx-v1:edX+DemoX+Demo_Course+ccx@1')
@@ -188,7 +188,7 @@ class CourseGroupTest(TestCase):
 
     def setUp(self):
         """ Test case setup """
-        super(CourseGroupTest, self).setUp()
+        super(CourseGroupTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.global_admin = AdminFactory()
         self.creator = User.objects.create_user('testcreator', 'testcreator+courses@edx.org', 'foo')
         self.staff = User.objects.create_user('teststaff', 'teststaff+courses@edx.org', 'foo')

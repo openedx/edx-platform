@@ -14,7 +14,7 @@ from completion.exceptions import UnavailableCompletionData
 from completion.utilities import get_key_to_last_completed_block
 from django.conf import settings
 from django.contrib.auth import load_backend
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.core.exceptions import PermissionDenied, ObjectDoesNotExist
 from django.core.validators import ValidationError
 from django.db import IntegrityError, transaction, ProgrammingError
@@ -423,7 +423,7 @@ class AccountValidationError(Exception):
     Used in account creation views to raise exceptions with details about specific invalid fields
     """
     def __init__(self, message, field):
-        super(AccountValidationError, self).__init__(message)
+        super(AccountValidationError, self).__init__(message)  # lint-amnesty, pylint: disable=super-with-arguments
         self.field = field
 
 
@@ -641,13 +641,13 @@ def do_create_account(form, custom_form=None):
         # AccountValidationError and a consistent user message returned (i.e. both should
         # return "It looks like {username} belongs to an existing account. Try again with a
         # different username.")
-        if username_exists_or_retired(user.username):
-            raise AccountValidationError(
+        if username_exists_or_retired(user.username):  # lint-amnesty, pylint: disable=no-else-raise
+            raise AccountValidationError(  # lint-amnesty, pylint: disable=raise-missing-from
                 USERNAME_EXISTS_MSG_FMT.format(username=proposed_username),
                 field="username"
             )
         elif email_exists_or_retired(user.email):
-            raise AccountValidationError(
+            raise AccountValidationError(  # lint-amnesty, pylint: disable=raise-missing-from
                 _("An account with the Email '{email}' already exists.").format(email=user.email),
                 field="email"
             )

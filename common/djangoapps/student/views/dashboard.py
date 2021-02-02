@@ -110,7 +110,7 @@ def _get_recently_enrolled_courses(course_enrollments):
     ]
 
 
-def _create_recent_enrollment_message(course_enrollments, course_modes):
+def _create_recent_enrollment_message(course_enrollments, course_modes):  # lint-amnesty, pylint: disable=unused-argument
     """
     Builds a recent course enrollment message.
 
@@ -476,7 +476,7 @@ def get_dashboard_course_limit():
 @login_required
 @ensure_csrf_cookie
 @add_maintenance_banner
-def student_dashboard(request):
+def student_dashboard(request):  # lint-amnesty, pylint: disable=too-many-statements
     """
     Provides the LMS dashboard view
 
@@ -583,10 +583,10 @@ def student_dashboard(request):
     recovery_email_message = recovery_email_activation_message = None
     if is_secondary_email_feature_enabled():
         try:
-            pending_email = PendingSecondaryEmailChange.objects.get(user=user)
+            pending_email = PendingSecondaryEmailChange.objects.get(user=user)  # lint-amnesty, pylint: disable=unused-variable
         except PendingSecondaryEmailChange.DoesNotExist:
             try:
-                account_recovery_obj = AccountRecovery.objects.get(user=user)
+                account_recovery_obj = AccountRecovery.objects.get(user=user)  # lint-amnesty, pylint: disable=unused-variable
             except AccountRecovery.DoesNotExist:
                 recovery_email_message = Text(
                     _(

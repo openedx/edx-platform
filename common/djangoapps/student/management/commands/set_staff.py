@@ -1,13 +1,13 @@
-
+  # lint-amnesty, pylint: disable=missing-module-docstring
 
 import re
 
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.core.management.base import BaseCommand
 from six import text_type
 
 
-class Command(BaseCommand):
+class Command(BaseCommand):  # lint-amnesty, pylint: disable=missing-class-docstring
 
     help = """
     This command will set is_staff to true for one or more users.

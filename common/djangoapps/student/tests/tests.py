@@ -13,7 +13,7 @@ import ddt
 import pytz
 from config_models.models import cache
 from django.conf import settings
-from django.contrib.auth.models import AnonymousUser, User
+from django.contrib.auth.models import AnonymousUser, User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.test import TestCase, override_settings
 from django.test.client import Client
 from django.urls import reverse
@@ -301,7 +301,7 @@ class DashboardTest(ModuleStoreTestCase, TestVerificationBase):
     ENABLED_SIGNALS = ['course_published']
 
     def setUp(self):
-        super(DashboardTest, self).setUp()
+        super(DashboardTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.course = CourseFactory.create()
         self.user = UserFactory.create(username="jack", email="jack@fake.edx.org", password='test')
         self.client = Client()
@@ -569,7 +569,7 @@ class DashboardTestsWithSiteOverrides(SiteMixin, ModuleStoreTestCase):
     """
 
     def setUp(self):
-        super(DashboardTestsWithSiteOverrides, self).setUp()
+        super(DashboardTestsWithSiteOverrides, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.org = 'fakeX'
         self.course = CourseFactory.create(org=self.org)
         self.user = UserFactory.create(username='jack', email='jack@fake.edx.org', password='test')
@@ -624,8 +624,8 @@ class UserSettingsEventTestMixin(EventTestMixin):
     """
     Mixin for verifying that user setting events were emitted during a test.
     """
-    def setUp(self):
-        super(UserSettingsEventTestMixin, self).setUp('common.djangoapps.util.model_utils.tracker')
+    def setUp(self):  # lint-amnesty, pylint: disable=arguments-differ
+        super(UserSettingsEventTestMixin, self).setUp('common.djangoapps.util.model_utils.tracker')  # lint-amnesty, pylint: disable=super-with-arguments
 
     def assert_user_setting_event_emitted(self, **kwargs):
         """
@@ -651,8 +651,8 @@ class UserSettingsEventTestMixin(EventTestMixin):
 
 class EnrollmentEventTestMixin(EventTestMixin):
     """ Mixin with assertions for validating enrollment events. """
-    def setUp(self):
-        super(EnrollmentEventTestMixin, self).setUp('common.djangoapps.student.models.tracker')
+    def setUp(self):  # lint-amnesty, pylint: disable=arguments-differ
+        super(EnrollmentEventTestMixin, self).setUp('common.djangoapps.student.models.tracker')  # lint-amnesty, pylint: disable=super-with-arguments
 
     def assert_enrollment_mode_change_event_was_emitted(self, user, course_key, mode):
         """Ensures an enrollment mode change event was emitted"""
@@ -880,7 +880,7 @@ class ChangeEnrollmentViewTest(ModuleStoreTestCase):
     """Tests the student.views.change_enrollment view"""
 
     def setUp(self):
-        super(ChangeEnrollmentViewTest, self).setUp()
+        super(ChangeEnrollmentViewTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.course = CourseFactory.create()
         self.user = UserFactory.create(password='secret')
         self.client.login(username=self.user.username, password='secret')
@@ -962,7 +962,7 @@ class AnonymousLookupTable(ModuleStoreTestCase):
     Tests for anonymous_id_functions
     """
     def setUp(self):
-        super(AnonymousLookupTable, self).setUp()
+        super(AnonymousLookupTable, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.course = CourseFactory.create()
         self.user = UserFactory.create()
         CourseModeFactory.create(
@@ -1051,7 +1051,7 @@ class RelatedProgramsTests(ProgramsApiConfigMixin, SharedModuleStoreTestCase):
         cls.enrollment = CourseEnrollmentFactory(user=cls.user, course_id=cls.course.id)  # pylint: disable=no-member
 
     def setUp(self):
-        super(RelatedProgramsTests, self).setUp()
+        super(RelatedProgramsTests, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
 
         self.url = reverse('dashboard')
 
@@ -1116,7 +1116,7 @@ class UserAttributeTests(TestCase):
     """Tests for the UserAttribute model."""
 
     def setUp(self):
-        super(UserAttributeTests, self).setUp()
+        super(UserAttributeTests, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.user = UserFactory()
         self.name = 'test'
         self.value = 'test-value'

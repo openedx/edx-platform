@@ -19,7 +19,7 @@ class TestUserProfileEvents(UserSettingsEventTestMixin, TestCase):
     Test that we emit field change events when UserProfile models are changed.
     """
     def setUp(self):
-        super(TestUserProfileEvents, self).setUp()
+        super(TestUserProfileEvents, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.table = 'auth_userprofile'
         self.user = UserFactory.create()
         self.profile = self.user.profile
@@ -93,7 +93,7 @@ class TestUserEvents(UserSettingsEventTestMixin, TestCase):
     Test that we emit field change events when User models are changed.
     """
     def setUp(self):
-        super(TestUserEvents, self).setUp()
+        super(TestUserEvents, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.user = UserFactory.create()
         self.reset_tracker()
         self.table = 'auth_user'
@@ -161,7 +161,7 @@ class TestUserEvents(UserSettingsEventTestMixin, TestCase):
         """
         Test that when a user's email changes, the user is enrolled in pending courses.
         """
-        pending_enrollment = CourseEnrollmentAllowedFactory(auto_enroll=True)
+        pending_enrollment = CourseEnrollmentAllowedFactory(auto_enroll=True)  # lint-amnesty, pylint: disable=unused-variable
 
         # the e-mail will change to test@edx.org (from something else)
         self.assertNotEqual(self.user.email, 'test@edx.org')
