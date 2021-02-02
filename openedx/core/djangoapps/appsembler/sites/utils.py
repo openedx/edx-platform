@@ -37,12 +37,12 @@ def get_lms_link_from_course_key(base_lms_url, course_key):
     """
     beeline.add_context_field("base_lms_url", base_lms_url)
     beeline.add_context_field("course_key", course_key)
-    try:
-        site_domain = Site.objects.get(name=course_key.org).domain
-    except Site.DoesNotExist:
-        site_domain = "{}.{}".format(course_key.org, base_lms_url)
-
-    return site_domain
+    # avoid circular import
+    from openedx.core.djangoapps.appsembler.api.sites import get_site_for_course
+    course_site = get_site_for_course(course_key)
+    if course_site:
+        return course_site.domain
+    return base_lms_url
 
 
 @beeline.traced(name="get_site_by_organization")
