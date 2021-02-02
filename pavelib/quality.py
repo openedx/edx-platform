@@ -786,7 +786,7 @@ def run_pii_check(options):
             print("-" * 45)
             run_output_file = str(output_file).format(env_name.lower())
             sh(
-                "mkdir -p {} && "
+                "mkdir -p {} && "  # lint-amnesty, pylint: disable=duplicate-string-formatting-argument
                 "export DJANGO_SETTINGS_MODULE={}; "
                 "code_annotations django_find_annotations "
                 "--config_file .pii_annotations.yml --report_path {} --app_name {} "

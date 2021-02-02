@@ -1,4 +1,4 @@
-"""
+"""  # lint-amnesty, pylint: disable=django-not-configured
 Utilities for warning about deprecated imports temporarily supported by
 the import_shim/ system.
 

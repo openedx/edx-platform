@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-  # lint-amnesty, pylint: disable=missing-module-docstring
 #
 # Configuration file for the Sphinx documentation builder.
 #
@@ -7,7 +7,7 @@
 # http://www.sphinx-doc.org/en/master/config
 
 
-import datetime
+import datetime  # lint-amnesty, pylint: disable=unused-import
 import os
 import sys
 from subprocess import check_call
@@ -45,7 +45,7 @@ django.setup()
 # -- Project information -----------------------------------------------------
 
 project = u'edx-platform'
-copyright = edx_theme.COPYRIGHT
+copyright = edx_theme.COPYRIGHT  # lint-amnesty, pylint: disable=redefined-builtin
 author = edx_theme.AUTHOR
 
 # The short X.Y version
@@ -278,7 +278,7 @@ def update_settings_module(service='lms'):
     os.environ['DJANGO_SETTINGS_MODULE'] = settings_module
 
 
-def on_init(app):  # pylint: disable=unused-argument
+def on_init(app):  # lint-amnesty, pylint: disable=redefined-outer-name, unused-argument
     """
     Run sphinx-apidoc after Sphinx initialization.
 
@@ -325,7 +325,7 @@ def on_init(app):  # pylint: disable=unused-argument
         check_call(args)
 
 
-def setup(app):
+def setup(app):  # lint-amnesty, pylint: disable=redefined-outer-name
     """Sphinx extension: run sphinx-apidoc."""
     event = 'builder-inited'
     app.connect(event, on_init)

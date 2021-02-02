@@ -146,7 +146,7 @@ def is_mysql_running():
     """
     # We need to check whether or not mysql is running as a process
     # even if it is not daemonized.
-    with open(os.devnull, 'w') as os_devnull:  # pylint: disable=W6005
+    with open(os.devnull, 'w') as os_devnull:  # lint-amnesty, pylint: disable=W6005, bad-option-value
         #pgrep returns the PID, which we send to /dev/null
         returncode = subprocess.call("pgrep mysqld", stdout=os_devnull, shell=True)
     return returncode == 0
@@ -212,4 +212,4 @@ def check_services():
     """
     Check that all required services are running
     """
-    pass
+    pass  # lint-amnesty, pylint: disable=unnecessary-pass
