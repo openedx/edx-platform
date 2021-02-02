@@ -7,7 +7,7 @@ class UserMixin(object):
     """ Mixin for tests involving users. """
 
     def setUp(self):
-        super(UserMixin, self).setUp()
+        super(UserMixin, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.user = UserFactory()
 
     def _login(self):

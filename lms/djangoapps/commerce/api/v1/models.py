@@ -130,7 +130,7 @@ class Course(object):
             course_id = CourseKey.from_string(six.text_type(course_id))
         except InvalidKeyError:
             log.debug(u'[%s] is not a valid course key.', course_id)
-            raise ValueError
+            raise ValueError  # lint-amnesty, pylint: disable=raise-missing-from
 
         course_modes = CourseMode.objects.filter(course_id=course_id)
 

@@ -69,7 +69,7 @@ class BasketsViewTests(EnrollmentEventTestMixin, UserMixin, ModuleStoreTestCase)
         self.assertEqual(actual, expected_msg)
 
     def setUp(self):
-        super(BasketsViewTests, self).setUp()
+        super(BasketsViewTests, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.url = reverse('commerce_api:v0:baskets:create')
         self._login()
 
@@ -290,7 +290,7 @@ class BasketOrderViewTests(UserMixin, TestCase):
     path = reverse_lazy(view_name, kwargs={'basket_id': 1})
 
     def setUp(self):
-        super(BasketOrderViewTests, self).setUp()
+        super(BasketOrderViewTests, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self._login()
 
     def test_order_found(self):
