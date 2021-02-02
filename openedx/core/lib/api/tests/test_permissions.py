@@ -23,7 +23,7 @@ class TestObject(object):
 class TestCcxObject(TestObject):
     """ Fake class for object permission for CCX Courses """
     def __init__(self, user=None, course_id=None):
-        super(TestCcxObject, self).__init__(user, course_id)
+        super(TestCcxObject, self).__init__(user, course_id)  # lint-amnesty, pylint: disable=super-with-arguments
         self.coach = user
 
 
@@ -31,7 +31,7 @@ class IsCourseStaffInstructorTests(TestCase):
     """ Test for IsCourseStaffInstructor permission class. """
 
     def setUp(self):
-        super(IsCourseStaffInstructorTests, self).setUp()
+        super(IsCourseStaffInstructorTests, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.permission = IsCourseStaffInstructor()
         self.coach = UserFactory()
         self.user = UserFactory()
@@ -64,7 +64,7 @@ class IsMasterCourseStaffInstructorTests(TestCase):
     """ Test for IsMasterCourseStaffInstructorTests permission class. """
 
     def setUp(self):
-        super(IsMasterCourseStaffInstructorTests, self).setUp()
+        super(IsMasterCourseStaffInstructorTests, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.permission = IsMasterCourseStaffInstructor()
         master_course_id = 'edx/test123/run'
         self.user = UserFactory()
@@ -109,7 +109,7 @@ class IsStaffOrOwnerTests(TestCase):
     """ Tests for IsStaffOrOwner permission class. """
 
     def setUp(self):
-        super(IsStaffOrOwnerTests, self).setUp()
+        super(IsStaffOrOwnerTests, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.permission = IsStaffOrOwner()
         self.request = RequestFactory().get('/')
         self.obj = TestObject()

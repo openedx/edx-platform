@@ -22,11 +22,11 @@ class PutAsCreateMixin(CreateModelMixin):
         # First, try to update the existing instance
         try:
             try:
-                return super(PutAsCreateMixin, self).update(request, *args, **kwargs)
+                return super(PutAsCreateMixin, self).update(request, *args, **kwargs)  # lint-amnesty, pylint: disable=super-with-arguments
             except Http404:
                 # If no instance exists yet, create it.
                 # This is backwards-compatible with the behavior of DRF v2.
-                return super(PutAsCreateMixin, self).create(request, *args, **kwargs)
+                return super(PutAsCreateMixin, self).create(request, *args, **kwargs)  # lint-amnesty, pylint: disable=super-with-arguments
 
         # Backwards compatibility with DRF v2 behavior, which would catch model-level
         # validation errors and return a 400

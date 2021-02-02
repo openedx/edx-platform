@@ -19,7 +19,7 @@ class TestGetMockRequest(TestCase):
     """
     Validate the behavior of get_mock_request
     """
-    def setUp(self):
+    def setUp(self):  # lint-amnesty, pylint: disable=super-method-not-called
         self.addCleanup(set_current_request, None)
 
     def test_mock_request_is_request(self):

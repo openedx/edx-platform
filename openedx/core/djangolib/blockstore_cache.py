@@ -102,7 +102,7 @@ class BundleCache(object):
         cache.delete(cache_key)
 
 
-def _construct_versioned_cache_key(bundle_uuid, version_num, key_parts, draft_name=None):
+def _construct_versioned_cache_key(bundle_uuid, version_num, key_parts, draft_name=None):  # lint-amnesty, pylint: disable=missing-function-docstring
     cache_key = str(bundle_uuid)
     if draft_name:
         cache_key += ":" + draft_name

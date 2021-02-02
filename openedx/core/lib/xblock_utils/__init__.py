@@ -15,7 +15,7 @@ import six
 import webpack_loader.utils
 from contracts import contract
 from django.conf import settings
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.contrib.staticfiles.storage import staticfiles_storage
 from django.urls import reverse
 from django.utils.html import escape
@@ -438,7 +438,7 @@ def get_course_update_items(course_updates, provided_index=0):
         try:
             course_html_parsed = html.fromstring(course_updates.data)
         except (etree.XMLSyntaxError, etree.ParserError):
-            log.error("Cannot parse: " + course_updates.data)
+            log.error("Cannot parse: " + course_updates.data)  # lint-amnesty, pylint: disable=logging-not-lazy
             escaped = escape(course_updates.data)
             # xss-lint: disable=python-concat-html
             course_html_parsed = html.fromstring("<ol><li>" + escaped + "</li></ol>")

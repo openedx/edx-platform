@@ -66,7 +66,7 @@ class DiscussionXBlockImportExportTests(TestCase):
         """
         Set up method
         """
-        super(DiscussionXBlockImportExportTests, self).setUp()
+        super(DiscussionXBlockImportExportTests, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.keys = ScopeIds("any_user", "discussion", "def_id", "usage_id")
         self.runtime_mock = mock.Mock(spec=Runtime)
         self.runtime_mock.construct_xblock_from_class = mock.Mock(side_effect=self._construct_xblock_mock)

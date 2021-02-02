@@ -26,7 +26,7 @@ class TestGetEdxApiData(CatalogIntegrationMixin, CredentialsApiConfigMixin, Cach
     ENABLED_CACHES = ['default']
 
     def setUp(self):
-        super(TestGetEdxApiData, self).setUp()
+        super(TestGetEdxApiData, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
 
         self.user = UserFactory()
 
