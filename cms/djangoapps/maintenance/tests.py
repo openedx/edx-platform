@@ -30,7 +30,7 @@ class TestMaintenanceIndex(ModuleStoreTestCase):
     """
 
     def setUp(self):
-        super(TestMaintenanceIndex, self).setUp()
+        super(TestMaintenanceIndex, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.user = AdminFactory()
         login_success = self.client.login(username=self.user.username, password='test')
         self.assertTrue(login_success)
@@ -56,7 +56,7 @@ class MaintenanceViewTestCase(ModuleStoreTestCase):
     view_url = ''
 
     def setUp(self):
-        super(MaintenanceViewTestCase, self).setUp()
+        super(MaintenanceViewTestCase, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.user = AdminFactory()
         login_success = self.client.login(username=self.user.username, password='test')
         self.assertTrue(login_success)
@@ -73,7 +73,7 @@ class MaintenanceViewTestCase(ModuleStoreTestCase):
         Reverse the setup.
         """
         self.client.logout()
-        super(MaintenanceViewTestCase, self).tearDown()
+        super(MaintenanceViewTestCase, self).tearDown()  # lint-amnesty, pylint: disable=super-with-arguments
 
 
 @ddt.ddt
@@ -131,7 +131,7 @@ class TestForcePublish(MaintenanceViewTestCase):
     """
 
     def setUp(self):
-        super(TestForcePublish, self).setUp()
+        super(TestForcePublish, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.view_url = reverse('maintenance:force_publish_course')
 
     def setup_test_course(self):
@@ -271,7 +271,7 @@ class TestAnnouncementsViews(MaintenanceViewTestCase):
     """
 
     def setUp(self):
-        super(TestAnnouncementsViews, self).setUp()
+        super(TestAnnouncementsViews, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.admin = AdminFactory.create(
             email='staff@edx.org',
             username='admin',
