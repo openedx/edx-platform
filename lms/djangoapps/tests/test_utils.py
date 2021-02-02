@@ -26,4 +26,4 @@ class UtilsTests(TestCase):
     )
     @ddt.unpack
     def test_get_key(self, input_key, output_key, key_cls):
-        self.assertEqual(_get_key(input_key, key_cls), output_key)
+        assert _get_key(input_key, key_cls) == output_key

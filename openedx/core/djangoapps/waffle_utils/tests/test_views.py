@@ -25,55 +25,42 @@ class ToggleStateViewTests(TestCase):
 
     def test_success_for_staff(self):
         response = self._get_toggle_state_response()
-        self.assertEqual(response.status_code, 200)
-        self.assertTrue(response.data)
+        assert response.status_code == 200
+        assert response.data
 
     def test_failure_for_non_staff(self):
         response = self._get_toggle_state_response(is_staff=False)
-        self.assertEqual(response.status_code, 403)
+        assert response.status_code == 403
 
     @override_waffle_flag(TEST_WAFFLE_FLAG, True)
     def test_response_with_waffle_flag(self):
         response = self._get_toggle_state_response()
-        self.assertIn('waffle_flags', response.data)
-        self.assertTrue(response.data['waffle_flags'])
+        assert 'waffle_flags' in response.data
+        assert response.data['waffle_flags']
         waffle_names = [waffle["name"] for waffle in response.data['waffle_flags']]
-        self.assertIn('test.flag', waffle_names)
+        assert 'test.flag' in waffle_names
 
     @override_switch('test.switch', True)
     def test_response_with_waffle_switch(self):
         response = self._get_toggle_state_response()
-        self.assertIn('waffle_switches', response.data)
-        self.assertTrue(response.data['waffle_switches'])
+        assert 'waffle_switches' in response.data
+        assert response.data['waffle_switches']
         waffle_names = [waffle["name"] for waffle in response.data['waffle_switches']]
-        self.assertIn('test.switch', waffle_names)
+        assert 'test.switch' in waffle_names
 
     def test_response_with_setting_toggle(self):
         _toggle = SettingToggle("MYSETTING", default=False, module_name="module1")
         with override_settings(MYSETTING=True):
             response = self._get_toggle_state_response()
 
-        self.assertIn(
-            {
-                "name": "MYSETTING",
-                "is_active": True,
-                "module": "module1",
-                "class": "SettingToggle",
-            },
-            response.data["django_settings"],
-        )
+        assert {'name': 'MYSETTING', 'is_active': True, 'module': 'module1', 'class': 'SettingToggle'}\
+               in response.data['django_settings']
 
     def test_response_with_existing_setting_dict_toggle(self):
         response = self._get_toggle_state_response()
-        self.assertIn(
-            {
-                "name": "FEATURES['MILESTONES_APP']",
-                "is_active": True,
-                "module": "common.djangoapps.util.milestones_helpers",
-                "class": "SettingDictToggle",
-            },
-            response.data["django_settings"],
-        )
+        assert {'name': "FEATURES['MILESTONES_APP']", 'is_active': True,
+                'module': 'common.djangoapps.util.milestones_helpers',
+                'class': 'SettingDictToggle'} in response.data['django_settings']
 
     def test_response_with_new_setting_dict_toggle(self):
         _toggle = SettingDictToggle(
@@ -84,15 +71,8 @@ class ToggleStateViewTests(TestCase):
 
         setting_dict = {toggle["name"]: toggle for toggle in response.data["django_settings"]}
 
-        self.assertEqual(
-            {
-                "name": "CUSTOM_FEATURES['MYSETTING']",
-                "is_active": True,
-                "module": "module1",
-                "class": "SettingDictToggle",
-            },
-            setting_dict["CUSTOM_FEATURES['MYSETTING']"],
-        )
+        assert {'name': "CUSTOM_FEATURES['MYSETTING']", 'is_active': True, 'module': 'module1',
+                'class': 'SettingDictToggle'} == setting_dict["CUSTOM_FEATURES['MYSETTING']"]
 
     def test_setting_overridden_by_setting_toggle(self):
         _toggle2 = SettingToggle(
@@ -103,18 +83,18 @@ class ToggleStateViewTests(TestCase):
         )
         with override_settings(MYSETTING1=True, MYSETTING2=False, MYDICT={"MYSETTING3": False}):
             # Need to pre-load settings, otherwise they are not picked up by the view
-            self.assertTrue(settings.MYSETTING1)
+            assert settings.MYSETTING1
             response = self._get_toggle_state_response()
 
         setting_dict = {toggle["name"]: toggle for toggle in response.data["django_settings"]}
 
         # Check that Django settings for which a SettingToggle exists have both the correct is_active and class values
-        self.assertTrue(setting_dict["MYSETTING1"]["is_active"])
-        self.assertNotIn("class", setting_dict["MYSETTING1"])
-        self.assertFalse(setting_dict["MYSETTING2"]["is_active"])
-        self.assertEqual("SettingToggle", setting_dict["MYSETTING2"]["class"])
-        self.assertFalse(setting_dict["MYDICT['MYSETTING3']"]["is_active"])
-        self.assertEqual("SettingDictToggle", setting_dict["MYDICT['MYSETTING3']"]["class"])
+        assert setting_dict['MYSETTING1']['is_active']
+        assert 'class' not in setting_dict['MYSETTING1']
+        assert not setting_dict['MYSETTING2']['is_active']
+        assert 'SettingToggle' == setting_dict['MYSETTING2']['class']
+        assert not setting_dict["MYDICT['MYSETTING3']"]['is_active']
+        assert 'SettingDictToggle' == setting_dict["MYDICT['MYSETTING3']"]['class']
 
     def test_no_duplicate_setting_toggle(self):
         _toggle1 = SettingToggle(
@@ -131,8 +111,8 @@ class ToggleStateViewTests(TestCase):
         response_toggles_2 = [
             toggle for toggle in response.data["django_settings"] if toggle["name"] == "MYDICT['MYSETTING2']"
         ]
-        self.assertEqual(1, len(response_toggles_1))
-        self.assertEqual(1, len(response_toggles_2))
+        assert 1 == len(response_toggles_1)
+        assert 1 == len(response_toggles_2)
 
     def test_code_owners_without_module_information(self):
         # Create a waffle flag without any associated module_name
@@ -142,7 +122,7 @@ class ToggleStateViewTests(TestCase):
         result = [
             flag for flag in response.data["waffle_flags"] if flag["name"] == waffle_flag.name
         ][0]
-        self.assertNotIn("code_owner", result)
+        assert 'code_owner' not in result
 
     def test_course_overrides(self):
         models.WaffleFlagCourseOverrideModel.objects.create(waffle_flag="my.flag", enabled=True)
@@ -152,12 +132,12 @@ class ToggleStateViewTests(TestCase):
         toggle_state_views._add_waffle_flag_course_override_state(course_overrides)
         toggle_state_views._add_waffle_flag_computed_status(course_overrides)
 
-        self.assertIn("my.flag", course_overrides)
-        self.assertIn("course_overrides", course_overrides["my.flag"])
-        self.assertEqual(1, len(course_overrides["my.flag"]["course_overrides"]))
-        self.assertEqual("None", course_overrides["my.flag"]["course_overrides"][0]["course_id"])
-        self.assertEqual("on", course_overrides["my.flag"]["course_overrides"][0]["force"])
-        self.assertEqual("both", course_overrides["my.flag"]["computed_status"])
+        assert 'my.flag' in course_overrides
+        assert 'course_overrides' in course_overrides['my.flag']
+        assert 1 == len(course_overrides['my.flag']['course_overrides'])
+        assert 'None' == course_overrides['my.flag']['course_overrides'][0]['course_id']
+        assert 'on' == course_overrides['my.flag']['course_overrides'][0]['force']
+        assert 'both' == course_overrides['my.flag']['computed_status']
 
     def _get_toggle_state_response(self, is_staff=True):
         request = APIRequestFactory().get('/api/toggles/state/')
