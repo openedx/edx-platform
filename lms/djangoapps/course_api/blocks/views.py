@@ -324,7 +324,6 @@ class BlocksInCourseView(BlocksView):
             raise ValueError("Unable to find course block in {}".format(course_key_string))
 
         recurse_mark_complete(root, course_blocks)
-
         return response
 
 
