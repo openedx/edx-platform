@@ -302,4 +302,54 @@ class BlocksInCourseView(BlocksView):
             course_usage_key = modulestore().make_course_usage_key(course_key)
         except InvalidKeyError:
             raise ValidationError(u"'{}' is not a valid course key.".format(six.text_type(course_key_string)))
-        return super(BlocksInCourseView, self).list(request, course_usage_key, hide_access_denials=hide_access_denials)
+        response = super().list(request, course_usage_key,
+                                hide_access_denials=hide_access_denials)
+
+        if 'completion' not in request.query_params.getlist('requested_fields', ''):
+            return response
+
+        course_blocks = {}
+        root = None
+        if request.query_params.get('return_type') == 'list':
+            for course_block in response.data:
+                course_blocks[course_block['id']] = course_block
+
+                if course_block.get('type') == 'course':
+                    root = course_block['id']
+        else:
+            root = response.data['root']
+            course_blocks = response.data['blocks']
+
+        if not root:
+            raise ValueError("Unable to find course block in {}".format(course_key_string))
+
+        recurse_mark_complete(root, course_blocks)
+        return response
+
+
+def recurse_mark_complete(block_id, blocks):
+    """
+    Helper function to walk course tree dict,
+    marking completion as 1 or 0
+
+    If all blocks are complete, mark parent block complete
+
+    :param blocks: dict of all blocks
+    :param block_id: root or child block id
+
+    :return:
+        block: course_outline_root_block block object or child block
+    """
+    block = blocks.get(block_id, {})
+    if block.get('completion') == 1:
+        return
+
+    child_blocks = block.get('children', block.get('descendents'))
+    # Unit blocks(blocks with no children) completion is being marked by patch call to completion service.
+    if child_blocks:
+        for child_block in child_blocks:
+            recurse_mark_complete(child_block, blocks)
+
+        completable_blocks = [blocks[child_block_id] for child_block_id in child_blocks
+                              if blocks[child_block_id].get('type') != 'discussion']
+        block['completion'] = int(all(child.get('completion') == 1 for child in completable_blocks))
