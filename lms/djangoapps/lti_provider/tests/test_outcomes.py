@@ -21,7 +21,7 @@ class StoreOutcomeParametersTest(TestCase):
     """
 
     def setUp(self):
-        super(StoreOutcomeParametersTest, self).setUp()
+        super(StoreOutcomeParametersTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.user = UserFactory.create()
         self.course_key = CourseLocator(
             org='some_org',
@@ -135,7 +135,7 @@ class SignAndSendReplaceResultTest(TestCase):
     """
 
     def setUp(self):
-        super(SignAndSendReplaceResultTest, self).setUp()
+        super(SignAndSendReplaceResultTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.course_key = CourseLocator(
             org='some_org',
             course='some_course',
@@ -298,7 +298,7 @@ class TestAssignmentsForProblem(ModuleStoreTestCase):
     """
 
     def setUp(self):
-        super(TestAssignmentsForProblem, self).setUp()
+        super(TestAssignmentsForProblem, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.user = UserFactory.create()
         self.user_id = self.user.id
         self.outcome_service = self.create_outcome_service('outcomes')

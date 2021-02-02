@@ -64,7 +64,7 @@ class CommandExecutionTestCase(SharedModuleStoreTestCase):
         cls.lti_block = u'block-v1:edX+lti_provider+3000+type@chapter+block@chapter_2'
 
     def setUp(self):
-        super(CommandExecutionTestCase, self).setUp()
+        super(CommandExecutionTestCase, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.user = UserFactory()
         self.user2 = UserFactory(username=u'anotheruser')
         self.client.login(username=self.user.username, password=u'test')
