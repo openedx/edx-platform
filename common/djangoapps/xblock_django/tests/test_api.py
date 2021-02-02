@@ -7,7 +7,7 @@ import six
 
 from openedx.core.djangolib.testing.utils import CacheIsolationTestCase
 from common.djangoapps.xblock_django.api import authorable_xblocks, deprecated_xblocks, disabled_xblocks
-from common.djangoapps.xblock_django.models import XBlockConfiguration, XBlockStudioConfiguration, XBlockStudioConfigurationFlag
+from common.djangoapps.xblock_django.models import XBlockConfiguration, XBlockStudioConfiguration, XBlockStudioConfigurationFlag  # lint-amnesty, pylint: disable=line-too-long
 
 
 class XBlockSupportTestCase(CacheIsolationTestCase):
@@ -15,7 +15,7 @@ class XBlockSupportTestCase(CacheIsolationTestCase):
     Tests for XBlock Support methods.
     """
     def setUp(self):
-        super(XBlockSupportTestCase, self).setUp()
+        super(XBlockSupportTestCase, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
 
         # Set up XBlockConfigurations for disabled and deprecated states
         block_config = [
