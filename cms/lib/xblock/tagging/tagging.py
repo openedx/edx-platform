@@ -77,7 +77,7 @@ class StructuredTagsAside(XBlockAside):
             return Fragment(u'')
 
     @XBlock.handler
-    def save_tags(self, request=None, suffix=None):
+    def save_tags(self, request=None, suffix=None):  # lint-amnesty, pylint: disable=unused-argument
         """
         Handler to save choosen tags with connected XBlock
         """
