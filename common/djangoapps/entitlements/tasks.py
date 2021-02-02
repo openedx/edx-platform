@@ -19,11 +19,7 @@ LOGGER = get_task_logger(__name__)
 MAX_RETRIES = 11
 
 
-@shared_task(
-    bind=True,
-    ignore_result=True,
-    name='entitlements.expire_old_entitlements',
-)
+@shared_task(bind=True, ignore_result=True)
 @set_code_owner_attribute
 def expire_old_entitlements(self, start, end, logid='...'):
     """
