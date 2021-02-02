@@ -7,6 +7,7 @@ from django.conf import settings
 from django.urls import reverse
 from django.utils.html import format_html
 from django.utils.translation import ugettext as _
+from eventtracking import tracker
 
 from rest_framework.decorators import api_view, authentication_classes, permission_classes
 from rest_framework.exceptions import APIException, ParseError
@@ -18,11 +19,12 @@ from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthenticat
 from edx_rest_framework_extensions.auth.session.authentication import SessionAuthenticationAllowInactiveUser
 from opaque_keys.edx.keys import CourseKey
 
+from lms.djangoapps.course_api.api import course_detail
 from lms.djangoapps.course_home_api.toggles import course_home_mfe_dates_tab_is_active
 from lms.djangoapps.course_home_api.utils import get_microfrontend_url
 from lms.djangoapps.courseware.access import has_access
 from lms.djangoapps.courseware.courses import get_course_with_access
-from lms.djangoapps.courseware.masquerade import setup_masquerade
+from lms.djangoapps.courseware.masquerade import is_masquerading, setup_masquerade
 
 from openedx.core.djangoapps.schedules.utils import reset_self_paced_schedule
 from openedx.core.lib.api.authentication import BearerAuthenticationAllowInactiveUser
@@ -48,22 +50,24 @@ def reset_course_deadlines(request):
     Set the start_date of a schedule to today, which in turn will adjust due dates for
     sequentials belonging to a self paced course
 
+    Request Parameters:
+        course_key: course key
+        research_event_data: any data that should be included in the research tracking event
+            Example: sending the location of where the reset deadlines banner (i.e. outline-tab)
+
     IMPORTANT NOTE: If updates are happening to the logic here, ALSO UPDATE the `reset_course_deadlines`
     function in common/djangoapps/util/views.py as well.
     """
     course_key = request.data.get('course_key', None)
+    research_event_data = request.data.get('research_event_data', {})
 
     # If body doesnt contain 'course_key', return 400 to client.
     if not course_key:
         raise ParseError(_("'course_key' is required."))
 
-    # If body contains params other than 'course_key', return 400 to client.
-    if len(request.data) > 1:
-        raise ParseError(_("Only 'course_key' is expected."))
-
     try:
         course_key = CourseKey.from_string(course_key)
-        _course_masquerade, user = setup_masquerade(
+        course_masquerade, user = setup_masquerade(
             request,
             course_key,
             has_access(request.user, 'staff', course_key)
@@ -72,6 +76,19 @@ def reset_course_deadlines(request):
         missed_deadlines, missed_gated_content = dates_banner_should_display(course_key, user)
         if missed_deadlines and not missed_gated_content:
             reset_self_paced_schedule(user, course_key)
+
+            course_overview = course_detail(request, user.username, course_key)
+            # For context here, research_event_data should already contain `location` indicating
+            # the page/location dates were reset from and could also contain `block_id` if reset
+            # within courseware.
+            research_event_data.update({
+                'courserun_key': str(course_key),
+                'is_masquerading': is_masquerading(user, course_key, course_masquerade),
+                'is_staff': has_access(user, 'staff', course_key).has_access,
+                'org_key': course_overview.display_org_with_default,
+                'user_id': user.id,
+            })
+            tracker.emit('edx.ui.lms.reset_deadlines.clicked', research_event_data)
 
         if course_home_mfe_dates_tab_is_active(course_key):
             body_link = get_microfrontend_url(course_key=str(course_key), view_name='dates')

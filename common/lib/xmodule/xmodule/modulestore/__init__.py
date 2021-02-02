@@ -32,12 +32,6 @@ from xmodule.errortracker import make_error_tracker
 
 from .exceptions import InsufficientSpecificationError, InvalidLocationError
 
-# The name of the type for patterns in re changed in Python 3.7.
-try:
-    Pattern = re._pattern_type  # pylint: disable=protected-access
-except AttributeError:
-    Pattern = re.Pattern  # pylint: disable=no-member
-
 log = logging.getLogger('edx.modulestore')
 
 new_contract('CourseKey', CourseKey)
@@ -905,7 +899,7 @@ class ModuleStoreRead(six.with_metaclass(ABCMeta, ModuleStoreAssetBase)):
         """
         if isinstance(target, list):
             return any(self._value_matches(ele, criteria) for ele in target)
-        elif isinstance(criteria, Pattern):
+        elif isinstance(criteria, re.Pattern):
             return criteria.search(target) is not None
         elif callable(criteria):
             return criteria(target)

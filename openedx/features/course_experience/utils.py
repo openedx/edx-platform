@@ -254,6 +254,18 @@ def get_resume_block(block):
     return block
 
 
+def get_start_block(block):
+    """
+    Gets the deepest block to use as the starting block.
+    """
+    if not block.get('children'):
+        return block
+
+    first_child = block['children'][0]
+
+    return get_start_block(first_child)
+
+
 def dates_banner_should_display(course_key, user):
     """
     Return whether or not the reset banner should display,
@@ -279,13 +291,6 @@ def dates_banner_should_display(course_key, user):
 
     # Only display the banner for enrolled users
     if not CourseEnrollment.is_enrolled(user, course_key):
-        return False, False
-
-    # Don't display the banner for course staff
-    is_course_staff = bool(
-        user and course_overview and has_access(user, 'staff', course_overview, course_overview.id)
-    )
-    if is_course_staff:
         return False, False
 
     # Don't display the banner if the course has ended

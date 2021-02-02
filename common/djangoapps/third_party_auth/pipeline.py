@@ -87,9 +87,15 @@ from lms.djangoapps.verify_student.models import SSOVerification
 from lms.djangoapps.verify_student.utils import earliest_allowed_verification_date
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.user_api import accounts
+from openedx.core.djangoapps.user_api.accounts.utils import is_multiple_sso_accounts_association_to_saml_user_enabled
 from openedx.core.djangoapps.user_authn import cookies as user_authn_cookies
-from openedx.core.djangoapps.user_authn.utils import should_redirect_to_logistration_mircrofrontend
-from common.djangoapps.third_party_auth.utils import user_exists
+from openedx.core.djangoapps.user_authn.utils import should_redirect_to_authn_microfrontend
+from common.djangoapps.third_party_auth.utils import (
+    get_user_from_email,
+    is_enterprise_customer_user,
+    is_saml_provider,
+    user_exists,
+)
 from common.djangoapps.track import segment
 from common.djangoapps.util.json_request import JsonResponse
 
@@ -129,8 +135,8 @@ AUTH_ENTRY_REGISTER_API = 'register_api'
 # registration/login form/logic.
 AUTH_ENTRY_CUSTOM = getattr(settings, 'THIRD_PARTY_AUTH_CUSTOM_AUTH_FORMS', {})
 
-# If logistration MFE is enabled, the redirect should be to MFE instead of FE
-BASE_URL = settings.LOGISTRATION_MICROFRONTEND_URL if should_redirect_to_logistration_mircrofrontend() else ''
+# If authn MFE is enabled, the redirect should be to MFE instead of FE
+BASE_URL = settings.AUTHN_MICROFRONTEND_URL if should_redirect_to_authn_microfrontend() else ''
 
 
 def is_api(auth_entry):
@@ -738,6 +744,94 @@ def associate_by_email_if_login_api(auth_entry, backend, details, user, current_
             # email address and the legitimate user would now login to the illegitimate
             # account.
             return association_response
+
+
+@partial.partial
+def associate_by_email_if_saml(auth_entry, backend, details, user, strategy, *args, **kwargs):
+    """
+    This pipeline step associates the current social auth with the user with the
+    same email address in the database.  It defers to the social library's associate_by_email
+    implementation, which verifies that only a single database user is associated with the email.
+
+    This association is done ONLY if the user entered the pipeline belongs to SAML provider.
+    """
+
+    def get_user():
+        """
+        This is the helper method to get the user from system by matching email.
+        """
+        user_details = {'email': details.get('email')} if details else None
+        return get_user_from_email(user_details or {})
+
+    def associate_by_email_if_enterprise_user():
+        """
+        If the learner arriving via SAML is already linked to the enterprise customer linked to the same IdP,
+        they should not be prompted for their edX password.
+        """
+        try:
+            enterprise_customer_user = is_enterprise_customer_user(current_provider.provider_id, current_user)
+            logger.info(
+                u'[Multiple_SSO_SAML_Accounts_Association_to_User] Enterprise user verification:'
+                u'User Email: {email}, User ID: {user_id}, Provider ID: {provider_id},'
+                u' is_enterprise_customer_user: {enterprise_customer_user}'.format(
+                    email=current_user.email,
+                    user_id=current_user.id,
+                    provider_id=current_provider.provider_id,
+                    enterprise_customer_user=enterprise_customer_user,
+                )
+            )
+
+            if enterprise_customer_user:
+                # this is python social auth pipeline default method to automatically associate social accounts
+                # if the email already matches a user account.
+                association_response = associate_by_email(backend, details, user, *args, **kwargs)
+
+                if (
+                    association_response and
+                    association_response.get('user') and
+                    association_response['user'].is_active
+                ):
+                    # Only return the user matched by email if their email has been activated.
+                    # Otherwise, an illegitimate user can create an account with another user's
+                    # email address and the legitimate user would now login to the illegitimate
+                    # account.
+                    return association_response
+                elif (
+                    association_response and
+                    association_response.get('user') and
+                    not association_response['user'].is_active
+                ):
+                    logger.info(
+                        u'[Multiple_SSO_SAML_Accounts_Association_to_User] User association account is not'
+                        u' active: User Email: {email}, User ID: {user_id}, Provider ID: {provider_id},'
+                        u' is_enterprise_customer_user: {enterprise_customer_user}'.format(
+                            email=current_user.email,
+                            user_id=current_user.id,
+                            provider_id=current_provider.provider_id,
+                            enterprise_customer_user=enterprise_customer_user
+                        )
+                    )
+                    return None
+
+        except Exception as ex:  # pylint: disable=broad-except
+            logger.exception('[Multiple_SSO_SAML_Accounts_Association_to_User] Error in'
+                             ' saml multiple accounts association: User ID: %s, User Email: %s:,'
+                             'Provider ID: %s, Exception: %s', current_user.id, current_user.email,
+                             current_provider.provider_id, ex)
+
+    # this is waffle switch to enable and disable this functionality from admin panel.
+    if is_multiple_sso_accounts_association_to_saml_user_enabled():
+
+        saml_provider, current_provider = is_saml_provider(strategy.request.backend.name, kwargs)
+
+        if saml_provider:
+            # get the user by matching email if the pipeline user is not available.
+            current_user = user if user else get_user()
+
+            # Verify that the user linked to enterprise customer of current identity provider and an active user
+            associate_response = associate_by_email_if_enterprise_user() if current_user else None
+            if associate_response:
+                return associate_response
 
 
 def user_details_force_sync(auth_entry, strategy, details, user=None, *args, **kwargs):

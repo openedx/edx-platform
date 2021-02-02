@@ -8,7 +8,7 @@ import logging
 import pytz
 import six
 from ccx_keys.locator import CCXLocator
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.db import transaction
 from django.http import Http404
 from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthentication

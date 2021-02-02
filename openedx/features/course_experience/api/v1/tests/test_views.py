@@ -10,6 +10,7 @@ from mock import patch
 
 from common.djangoapps.course_modes.models import CourseMode
 from common.djangoapps.student.models import CourseEnrollment
+from common.djangoapps.util.testing import EventTestMixin
 from lms.djangoapps.courseware.tests.helpers import MasqueradeMixin
 from lms.djangoapps.course_home_api.tests.utils import BaseCourseHomeTests
 from openedx.core.djangoapps.schedules.models import Schedule
@@ -18,28 +19,30 @@ from xmodule.modulestore.tests.factories import CourseFactory
 
 
 @ddt.ddt
-class ResetCourseDeadlinesViewTests(BaseCourseHomeTests, MasqueradeMixin):
+class ResetCourseDeadlinesViewTests(EventTestMixin, BaseCourseHomeTests, MasqueradeMixin):
     """
     Tests for reset deadlines endpoint.
     """
+    def setUp(self):
+        # Need to supply tracker name for the EventTestMixin. Also, EventTestMixin needs to come
+        # first in class inheritance so the setUp call here appropriately works
+        super().setUp('openedx.features.course_experience.api.v1.views.tracker')
+
     def test_reset_deadlines(self):
         CourseEnrollment.enroll(self.user, self.course.id, CourseMode.VERIFIED)
         # Test correct post body
         response = self.client.post(reverse('course-experience-reset-course-deadlines'), {'course_key': self.course.id})
         self.assertEqual(response.status_code, 200)
-        # Test body with incorrect body param
+        # Test body with incorrect body param (course_key is required)
         response = self.client.post(reverse('course-experience-reset-course-deadlines'), {'course': self.course.id})
         self.assertEqual(response.status_code, 400)
-        # Test body with additional incorrect body param
-        response = self.client.post(
-            reverse('course-experience-reset-course-deadlines'), {'course_key': self.course.id, 'invalid': 'value'}
-        )
-        self.assertEqual(response.status_code, 400)
+        self.assert_no_events_were_emitted()
 
     def test_reset_deadlines_with_masquerade(self):
         """ Staff users should be able to masquerade as a learner and reset the learner's schedule """
         course = CourseFactory.create(self_paced=True)
         student_username = self.user.username
+        student_user_id = self.user.id
         student_enrollment = CourseEnrollment.enroll(self.user, course.id)
         student_schedule = ScheduleFactory.create(
             start_date=timezone.now() - datetime.timedelta(days=100),
@@ -61,6 +64,14 @@ class ResetCourseDeadlinesViewTests(BaseCourseHomeTests, MasqueradeMixin):
         self.assertEqual(updated_schedule.start_date.date(), datetime.datetime.today().date())
         updated_staff_schedule = Schedule.objects.get(id=staff_schedule.id)
         self.assertEqual(updated_staff_schedule.start_date, staff_schedule.start_date)
+        self.assert_event_emitted(
+            'edx.ui.lms.reset_deadlines.clicked',
+            courserun_key=str(course.id),
+            is_masquerading=True,
+            is_staff=False,
+            org_key=course.org,
+            user_id=student_user_id,
+        )
 
     def test_post_unauthenticated_user(self):
         self.client.logout()

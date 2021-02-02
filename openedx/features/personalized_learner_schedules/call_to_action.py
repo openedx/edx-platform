@@ -151,6 +151,10 @@ class PersonalizedLearnerScheduleCallToAction:
                     },
                     'url': '{}{}'.format(settings.LMS_ROOT_URL, reverse('course-experience-reset-course-deadlines')),
                 },
+                'research_event_data': {
+                    'block_id': str(xblock.location),
+                    'location': '{category}-view'.format(category=xblock.category),
+                },
             }
 
         return cta_data

@@ -9,22 +9,22 @@ babel==2.9.0              # via sphinx
 certifi==2020.12.5        # via requests
 chardet==4.0.0            # via requests
 click==7.1.2              # via code-annotations
-code-annotations==1.0.2   # via -r requirements/edx/doc.in
-django==2.2.17            # via -c https://raw.githubusercontent.com/edx/edx-lint/master/edx_lint/files/common_constraints.txt, code-annotations
+code-annotations==1.1.0   # via -r requirements/edx/doc.in
+django==2.2.18            # via -c https://raw.githubusercontent.com/edx/edx-lint/master/edx_lint/files/common_constraints.txt, code-annotations
 docutils==0.16            # via sphinx
 edx-sphinx-theme==1.6.1   # via -r requirements/edx/doc.in
 gitdb==4.0.5              # via gitpython
 gitpython==3.1.12         # via -r requirements/edx/doc.in
 idna==2.10                # via requests
 imagesize==1.2.0          # via sphinx
-jinja2==2.11.2            # via code-annotations, sphinx
+jinja2==2.11.3            # via code-annotations, sphinx
 markupsafe==1.1.1         # via jinja2
-packaging==20.8           # via sphinx
+packaging==20.9           # via sphinx
 pbr==5.5.1                # via stevedore
 pygments==2.7.4           # via sphinx
 pyparsing==2.4.7          # via packaging
 python-slugify==4.0.1     # via code-annotations
-pytz==2020.5              # via babel, django
+pytz==2021.1              # via babel, django
 pyyaml==5.4.1             # via code-annotations
 requests==2.25.1          # via sphinx
 six==1.15.0               # via edx-sphinx-theme, stevedore

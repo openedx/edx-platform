@@ -1,4 +1,4 @@
-"""
+"""  # lint-amnesty, pylint: disable=cyclic-import
 Test utils for CCX
 """
 
@@ -69,7 +69,7 @@ class CcxTestCase(EmailTemplateTagMixin, SharedModuleStoreTestCase):
         """
         Set up tests
         """
-        super(CcxTestCase, self).setUp()
+        super(CcxTestCase, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         # Create instructor account
         self.coach = UserFactory.create(password="test")
         # create an instance of modulestore

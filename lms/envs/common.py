@@ -434,6 +434,17 @@ FEATURES = {
     'ENABLE_FOOTER_MOBILE_APP_LINKS': False,
 
     # Let students save and manage their annotations
+    # .. toggle_name: FEATURES['ENABLE_EDXNOTES']
+    # .. toggle_implementation: SettingToggle
+    # .. toggle_default: False
+    # .. toggle_description: This toggle enables the students to save and manage their annotations in the
+    #   course using the notes service. The bulk of the actual work in storing the notes is done by
+    #   a separate service (see the edx-notes-api repo).
+    # .. toggle_warnings: Requires the edx-notes-api service properly running and to have configured the django settings
+    #   EDXNOTES_INTERNAL_API and EDXNOTES_PUBLIC_API. If you update this setting, also update it in Studio.
+    # .. toggle_use_cases: open_edx
+    # .. toggle_creation_date: 2015-01-04
+    # .. toggle_tickets: https://github.com/edx/edx-platform/pull/6321
     'ENABLE_EDXNOTES': False,
 
     # Toggle to enable coordination with the Publisher tool (keep in sync with cms/envs/common.py)
@@ -516,7 +527,17 @@ FEATURES = {
     # .. toggle_tickets: https://github.com/edx/edx-platform/pull/9744
     'ENABLE_SPECIAL_EXAMS': False,
 
-    # Enable OpenBadge support. See the BADGR_* settings later in this file.
+    # .. toggle_name: FEATURES['ENABLE_OPENBADGES']
+    # .. toggle_implementation: DjangoSetting
+    # .. toggle_default: False
+    # .. toggle_description: Enables support for the creation of OpenBadges as a method of awarding credentials.
+    # .. toggle_warnings: The following settings (all of which are in the same file) should be set or reviewed prior to
+    #    enabling this setting: BADGING_BACKEND, BADGR_API_TOKEN, BADGR_BASE_URL, BADGR_ISSUER_SLUG, BADGR_TIMEOUT.
+    #    Full guide for setting up OpenBadges available here:
+    #    https://edx.readthedocs.io/projects/edx-installing-configuring-and-running/en/latest/configuration/enable_badging.html  pylint: disable=line-too-long,useless-suppression
+    # .. toggle_use_cases: open_edx
+    # .. toggle_creation_date: 2015-04-30
+    # .. toggle_tickets: https://openedx.atlassian.net/browse/SOL-1325
     'ENABLE_OPENBADGES': False,
 
     # Enable LTI Provider feature.
@@ -579,7 +600,14 @@ FEATURES = {
     # See LEARNER-493
     'ENABLE_ONE_CLICK_PROGRAM_PURCHASE': False,
 
-    # Allow users to change their email address.
+    # .. toggle_name: FEATURES['ALLOW_EMAIL_ADDRESS_CHANGE']
+    # .. toggle_implementation: DjangoSetting
+    # .. toggle_default: True
+    # .. toggle_description: Allow users to change their email address on the Account Settings page. If this is
+    #   disabled, users will not be able to change their email address.
+    # .. toggle_use_cases: open_edx
+    # .. toggle_creation_date: 2017-06-26
+    # .. toggle_tickets: https://openedx.atlassian.net/browse/OSPR-1735
     'ALLOW_EMAIL_ADDRESS_CHANGE': True,
 
     # Whether the bulk enrollment view is enabled.
@@ -643,7 +671,7 @@ FEATURES = {
     #   rollout.
     'ENABLE_COURSEWARE_MICROFRONTEND': False,
 
-    # .. toggle_name: FEATURES['ENABLE_LOGISTRATION_MICROFRONTEND']
+    # .. toggle_name: FEATURES['ENABLE_AUTHN_MICROFRONTEND']
     # .. toggle_implementation: DjangoSetting
     # .. toggle_default: False
     # .. toggle_description: Supports staged rollout of a new micro-frontend-based implementation of the logistration.
@@ -651,9 +679,9 @@ FEATURES = {
     # .. toggle_creation_date: 2020-09-08
     # .. toggle_target_removal_date: None
     # .. toggle_tickets: 'https://github.com/edx/edx-platform/pull/24908'
-    # .. toggle_warnings: Also set settings.LOGISTRATION_MICROFRONTEND_URL for rollout. This temporary feature
+    # .. toggle_warnings: Also set settings.AUTHN_MICROFRONTEND_URL for rollout. This temporary feature
     # toggle does not have a target removal date.
-    'ENABLE_LOGISTRATION_MICROFRONTEND': False,
+    'ENABLE_AUTHN_MICROFRONTEND': False,
 
     ### ORA Feature Flags ###
     # .. toggle_name: FEATURES['ENABLE_ORA_ALL_FILE_URLS']
@@ -704,6 +732,17 @@ FEATURES = {
     # .. toggle_tickets: https://openedx.atlassian.net/browse/ENT-3818
     # .. toggle_warnings: None.
     'ENABLE_COURSE_ASSESSMENT_GRADE_CHANGE_SIGNAL': False,
+
+    # .. toggle_name: FEATURES['ALLOW_ADMIN_ENTERPRISE_COURSE_ENROLLMENT_DELETION']
+    # .. toggle_implementation: DjangoSetting
+    # .. toggle_default: False
+    # .. toggle_description: If true, allows for the deletion of EnterpriseCourseEnrollment records via Django Admin.
+    # .. toggle_use_cases: enterprise
+    # .. toggle_creation_date: 2021-01-27
+    # .. toggle_target_removal_date: None
+    # .. toggle_tickets: https://openedx.atlassian.net/browse/ENT-4022
+    # .. toggle_warnings: None.
+    'ALLOW_ADMIN_ENTERPRISE_COURSE_ENROLLMENT_DELETION': False,
 }
 
 # Specifies extra XBlock fields that should available when requested via the Course Blocks API
@@ -1059,6 +1098,10 @@ DJFS = {
     'url_root': '/static/django-pyfs',
 }
 
+# Set certificate issued date format. It supports all formats supported by
+# `common.djangoapps.util.date_utils.strftime_localized`.
+CERTIFICATE_DATE_FORMAT = "%B %-d, %Y"
+
 ### Dark code. Should be enabled in local settings for devel.
 
 ENABLE_MULTICOURSE = False  # set to False to disable multicourse display (see lib.util.views.edXhome)
@@ -1197,7 +1240,12 @@ from xmodule.x_module import XModuleMixin
 # once the responsibility of XBlock creation is moved out of modulestore - cpennington
 XBLOCK_MIXINS = (LmsBlockMixin, InheritanceMixin, XModuleMixin, EditInfoMixin)
 
-# Allow any XBlock in the LMS
+# .. setting_name: XBLOCK_SELECT_FUNCTION
+# .. setting_default: prefer_xmodules
+# .. setting_description: Function used to select an XBlock from the python package EntryPoints.
+#     Some alternatives are `prefer_xmodules` and `default_select`. The `prefer_modules` function
+#     will choose the first "xmodule" if there is one, otherwise, it will act like `default_select`.
+#     The `default_select` function will simply choose the first match found.
 XBLOCK_SELECT_FUNCTION = prefer_xmodules
 
 # .. setting_name: XBLOCK_FIELD_DATA_WRAPPERS
@@ -1207,6 +1255,13 @@ XBLOCK_FIELD_DATA_WRAPPERS = ()
 
 XBLOCK_FS_STORAGE_BUCKET = None
 XBLOCK_FS_STORAGE_PREFIX = None
+
+# .. setting_name: XBLOCK_SETTINGS
+# .. setting_default: {}
+# .. setting_description: Dictionary containing server-wide configuration of XBlocks on a per-type basis.
+#     By default, keys should match the XBlock `block_settings_key` attribute/property. If the attribute/property
+#     is not defined, use the XBlock class name. Check `common.lib.xmodule.xmodule.services.SettingsService`
+#     for more reference.
 XBLOCK_SETTINGS = {}
 
 ############# ModuleStore Configuration ##########
@@ -2347,21 +2402,47 @@ HEARTBEAT_CELERY_ROUTING_KEY = HIGH_PRIORITY_QUEUE
 
 ################################ Block Structures ###################################
 
+# .. setting_name: BLOCK_STRUCTURES_SETTINGS
+# .. setting_default: dict of settings
+# .. setting_description: Stores all the settings used by block structures and block structure
+#   related tasks. See BLOCK_STRUCTURES_SETTINGS[XXX] documentation for details of each setting.
+#   For more information, check https://openedx.atlassian.net/browse/TNL-5041.
 BLOCK_STRUCTURES_SETTINGS = dict(
-    # Delay, in seconds, after a new edit of a course is published
-    # before updating the block structures cache.  This is needed
-    # for a better chance at getting the latest changes when there
-    # are secondary reads in sharded mongoDB clusters. See TNL-5041
-    # for more info.
+    # .. setting_name: BLOCK_STRUCTURES_SETTINGS['COURSE_PUBLISH_TASK_DELAY']
+    # .. setting_default: 30
+    # .. setting_description: Delay, in seconds, after a new edit of a course is published before
+    #   updating the block structures cache. This is needed for a better chance at getting
+    #   the latest changes when there are secondary reads in sharded mongoDB clusters.
+    #   For more information, check https://openedx.atlassian.net/browse/TNL-5041.
     COURSE_PUBLISH_TASK_DELAY=30,
 
-    # Delay, in seconds, between retry attempts if a task fails.
+    # .. setting_name: BLOCK_STRUCTURES_SETTINGS['TASK_DEFAULT_RETRY_DELAY']
+    # .. setting_default: 30
+    # .. setting_description: Delay, in seconds, between retry attempts if a block structure task
+    #   fails. For more information, check https://openedx.atlassian.net/browse/TNL-5041.
     TASK_DEFAULT_RETRY_DELAY=30,
 
-    # Maximum number of retries per task.
+    # .. setting_name: BLOCK_STRUCTURES_SETTINGS['TASK_MAX_RETRIES']
+    # .. setting_default: 5
+    # .. setting_description: Maximum number of retries per block structure task.
+    #   If the maximum number of retries is exceeded, then you can attempt to either manually run
+    #   the celery task, or wait for it to be triggered again.
+    #   For more information, check https://openedx.atlassian.net/browse/TNL-5041.
     TASK_MAX_RETRIES=5,
 
-    # Backend storage options
+    # .. toggle_name: BLOCK_STRUCTURES_SETTINGS['PRUNING_ACTIVE']
+    # .. toggle_implementation: DjangoSetting
+    # .. toggle_default: False
+    # .. toggle_description: When `True`, only a specified number of versions of block structure
+    #   files are kept for each structure, and the rest are cleaned up. The number of versions that
+    #   are kept can be specified in the `BlockStructureConfiguration`, which can be edited in
+    #   Django Admin. The default number of versions that are kept is `5`.
+    # .. toggle_warnings: This toggle will likely be deprecated and removed.
+    #   The annotation will be updated with the DEPR ticket once that process has started.
+    # .. toggle_use_cases: temporary
+    # .. toggle_creation_date: 2018-03-22
+    # .. toggle_target_removal_date: 2018-06-22
+    # .. toggle_tickets: https://openedx.atlassian.net/browse/EDUCATOR-499
     PRUNING_ACTIVE=False,
 )
 
@@ -3044,14 +3125,38 @@ CERT_NAME_LONG = "Certificate of Achievement"
 
 #################### OpenBadges Settings #######################
 
+# .. setting_name: BADGING_BACKEND
+# .. setting_default: 'lms.djangoapps.badges.backends.badgr.BadgrBackend'
+# .. setting_description: The backend service class (or callable) for creating OpenBadges. It must implement
+#    the interface provided by lms.djangoapps.badges.backends.base.BadgeBackend
+# .. setting_warning: Review FEATURES['ENABLE_OPENBADGES'] for further context.
 BADGING_BACKEND = 'lms.djangoapps.badges.backends.badgr.BadgrBackend'
 
-# Be sure to set up images for course modes using the BadgeImageConfiguration model in the certificates app.
+# .. setting_name: BADGR_API_TOKEN
+# .. setting_default: None
+# .. setting_description: The API token string for Badgr. You should be able to create this via Badgr's settings. See
+#    https://github.com/concentricsky/badgr-server for details on setting up Badgr.
+# .. setting_warning: Review FEATURES['ENABLE_OPENBADGES'] for further context.
 BADGR_API_TOKEN = None
-# Do not add the trailing slash here.
+
+# .. setting_name: BADGR_BASE_URL
+# .. setting_default: 'http://localhost:8005'
+# .. setting_description: The base URL for the Badgr server.
+# .. setting_warning: DO NOT include a trailing slash. Review FEATURES['ENABLE_OPENBADGES'] for further context.
 BADGR_BASE_URL = "http://localhost:8005"
+
+# .. setting_name: BADGR_ISSUER_SLUG
+# .. setting_default: 'example-issuer'
+# .. setting_description: A string that is the slug for the Badgr issuer. The slug can be obtained from the URL of
+#    the Badgr Server page that displays the issuer. For example, in the URL
+#    http://exampleserver.com/issuer/test-issuer, the issuer slug is "test-issuer".
+# .. setting_warning: Review FEATURES['ENABLE_OPENBADGES'] for further context.
 BADGR_ISSUER_SLUG = "example-issuer"
-# Number of seconds to wait on the badging server when contacting it before giving up.
+
+# .. setting_name: BADGR_TIMEOUT
+# .. setting_default: 10
+# .. setting_description: Number of seconds to wait on the badging server when contacting it before giving up.
+# .. setting_warning: Review FEATURES['ENABLE_OPENBADGES'] for further context.
 BADGR_TIMEOUT = 10
 
 ###################### Grade Downloads ######################
@@ -3432,6 +3537,16 @@ COURSE_CATALOG_VISIBILITY_PERMISSION = 'see_exists'
 COURSE_ABOUT_VISIBILITY_PERMISSION = 'see_exists'
 
 DEFAULT_COURSE_VISIBILITY_IN_CATALOG = "both"
+
+# .. toggle_name: DEFAULT_MOBILE_AVAILABLE
+# .. toggle_implementation: DjangoSetting
+# .. toggle_default: False
+# .. toggle_description: This specifies if the courses are available for mobile by default. To make any individual
+#   course available for mobile one can set the value of Mobile Course Available to true in Advanced Settings from the
+#   studio when this is False.
+# .. toggle_use_cases: open_edx
+# .. toggle_creation_date: 2021-01-26
+# .. toggle_tickets: https://openedx.atlassian.net/browse/OSPR-1985
 DEFAULT_MOBILE_AVAILABLE = False
 
 # Enrollment API Cache Timeout
@@ -4058,8 +4173,8 @@ WRITABLE_GRADEBOOK_URL = None
 PROFILE_MICROFRONTEND_URL = None
 ORDER_HISTORY_MICROFRONTEND_URL = None
 ACCOUNT_MICROFRONTEND_URL = None
-LOGISTRATION_MICROFRONTEND_URL = None
-LOGISTRATION_MICROFRONTEND_DOMAIN = None
+AUTHN_MICROFRONTEND_URL = None
+AUTHN_MICROFRONTEND_DOMAIN = None
 PROGRAM_CONSOLE_MICROFRONTEND_URL = None
 LEARNING_MICROFRONTEND_URL = None
 

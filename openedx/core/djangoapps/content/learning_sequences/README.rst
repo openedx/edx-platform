@@ -9,6 +9,8 @@ users through the LMS, though it is also available to Studio for pushing data
 into the system. The first API this app implements is computing the Course
 Outline.
 
+This package should _not_ depend on the modulestore directly.
+
 ---------------
 Direction: Keep
 ---------------

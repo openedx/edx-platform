@@ -29,7 +29,7 @@ class LmsSearchFilterGenerator(SearchFilterGenerator):
 
     def field_dictionary(self, **kwargs):
         """ add course if provided otherwise add courses in which the user is enrolled in """
-        field_dictionary = super(LmsSearchFilterGenerator, self).field_dictionary(**kwargs)
+        field_dictionary = super(LmsSearchFilterGenerator, self).field_dictionary(**kwargs)  # lint-amnesty, pylint: disable=super-with-arguments
         if not kwargs.get('user'):
             field_dictionary['course'] = []
         elif not kwargs.get('course_id'):
@@ -47,7 +47,7 @@ class LmsSearchFilterGenerator(SearchFilterGenerator):
         """
             Exclude any courses defined outside the current org.
         """
-        exclude_dictionary = super(LmsSearchFilterGenerator, self).exclude_dictionary(**kwargs)
+        exclude_dictionary = super(LmsSearchFilterGenerator, self).exclude_dictionary(**kwargs)  # lint-amnesty, pylint: disable=super-with-arguments
         course_org_filter = configuration_helpers.get_current_site_orgs()
         # If we have a course filter we are ensuring that we only get those courses above
         if not course_org_filter:

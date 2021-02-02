@@ -43,7 +43,7 @@ class MobileAPITestCase(ModuleStoreTestCase, APITestCase):
     They may also override any of the methods defined in this class to control the behavior of the TestMixins.
     """
     def setUp(self):
-        super(MobileAPITestCase, self).setUp()
+        super(MobileAPITestCase, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.course = CourseFactory.create(
             mobile_available=True,
             static_asset_path="needed_for_split",
@@ -57,7 +57,7 @@ class MobileAPITestCase(ModuleStoreTestCase, APITestCase):
         IgnoreMobileAvailableFlagConfig(enabled=False).save()
 
     def tearDown(self):
-        super(MobileAPITestCase, self).tearDown()
+        super(MobileAPITestCase, self).tearDown()  # lint-amnesty, pylint: disable=super-with-arguments
         self.logout()
 
     def login(self):

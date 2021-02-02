@@ -15,7 +15,7 @@ class TestAnalyticsDistributions(TestCase):
     '''Test analytics distribution gathering.'''
 
     def setUp(self):
-        super(TestAnalyticsDistributions, self).setUp()
+        super(TestAnalyticsDistributions, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.course_id = CourseLocator('robot', 'course', 'id')
 
         self.users = [UserFactory(
@@ -78,7 +78,7 @@ class TestAnalyticsDistributionsNoData(TestCase):
     '''Test analytics distribution gathering.'''
 
     def setUp(self):
-        super(TestAnalyticsDistributionsNoData, self).setUp()
+        super(TestAnalyticsDistributionsNoData, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.course_id = CourseLocator('robot', 'course', 'id')
 
         self.users = [UserFactory(

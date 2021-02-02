@@ -1,5 +1,5 @@
 """
-Logistration API Views
+Authn API Views
 """
 
 from django.conf import settings

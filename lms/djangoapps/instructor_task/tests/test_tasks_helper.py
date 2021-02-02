@@ -15,14 +15,14 @@ import tempfile
 from collections import OrderedDict
 from contextlib import contextmanager, ExitStack
 from datetime import datetime, timedelta
-from io import BytesIO
-from zipfile import ZipFile
+from io import BytesIO  # lint-amnesty, pylint: disable=unused-import
+from zipfile import ZipFile  # lint-amnesty, pylint: disable=unused-import
 
 import ddt
 import unicodecsv
 from django.conf import settings
 from django.test.utils import override_settings
-from django.urls import reverse
+from django.urls import reverse  # lint-amnesty, pylint: disable=unused-import
 from edx_django_utils.cache import RequestCache
 from freezegun import freeze_time
 from mock import ANY, MagicMock, Mock, patch
@@ -30,16 +30,16 @@ from pytz import UTC
 from six import text_type
 from six.moves import range, zip
 from six.moves.urllib.parse import quote
-from waffle.testutils import override_switch
+from waffle.testutils import override_switch  # lint-amnesty, pylint: disable=unused-import
 
 import openedx.core.djangoapps.user_api.course_tag.api as course_tag_api
 from capa.tests.response_xml_factory import MultipleChoiceResponseXMLFactory
 from common.djangoapps.course_modes.models import CourseMode
-from common.djangoapps.course_modes.tests.factories import CourseModeFactory
+from common.djangoapps.course_modes.tests.factories import CourseModeFactory  # lint-amnesty, pylint: disable=unused-import
 from lms.djangoapps.courseware.models import StudentModule
 from lms.djangoapps.certificates.models import CertificateStatuses, GeneratedCertificate
 from lms.djangoapps.certificates.tests.factories import CertificateWhitelistFactory, GeneratedCertificateFactory
-from lms.djangoapps.courseware.tests.factories import InstructorFactory
+from lms.djangoapps.courseware.tests.factories import InstructorFactory  # lint-amnesty, pylint: disable=unused-import
 from lms.djangoapps.grades.course_data import CourseData
 from lms.djangoapps.grades.models import PersistentCourseGrade, PersistentSubsectionGradeOverride
 from lms.djangoapps.grades.subsection_grade import CreateSubsectionGrade
@@ -76,7 +76,7 @@ from openedx.core.djangoapps.credit.tests.factories import CreditCourseFactory
 from openedx.core.djangoapps.user_api.partition_schemes import RandomUserPartitionScheme
 from openedx.core.djangoapps.util.testing import ContentGroupTestCase, TestConditionalContent
 from openedx.core.lib.teams_config import TeamsConfig
-from common.djangoapps.student.models import ALLOWEDTOENROLL_TO_ENROLLED, CourseEnrollment, CourseEnrollmentAllowed, ManualEnrollmentAudit
+from common.djangoapps.student.models import ALLOWEDTOENROLL_TO_ENROLLED, CourseEnrollment, CourseEnrollmentAllowed, ManualEnrollmentAudit  # lint-amnesty, pylint: disable=line-too-long, unused-import
 from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
 from lms.djangoapps.survey.models import SurveyAnswer, SurveyForm
 from xmodule.modulestore import ModuleStoreEnum
@@ -121,7 +121,7 @@ class TestInstructorGradeReport(InstructorGradeReportTestCase):
     Tests that CSV grade report generation works.
     """
     def setUp(self):
-        super(TestInstructorGradeReport, self).setUp()
+        super(TestInstructorGradeReport, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.course = CourseFactory.create()
 
     @ddt.data([u'student@example.com', u'ni\xf1o@example.com'])
@@ -445,7 +445,7 @@ class TestTeamGradeReport(InstructorGradeReportTestCase):
     """ Test that teams appear correctly in the grade report when it is enabled for the course. """
 
     def setUp(self):
-        super(TestTeamGradeReport, self).setUp()
+        super(TestTeamGradeReport, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.course = CourseFactory.create(teams_configuration=_TEAMS_CONFIG)
         self.student1 = UserFactory.create()
         CourseEnrollment.enroll(self.student1, self.course.id)
@@ -485,7 +485,7 @@ class TestProblemResponsesReport(TestReportMixin, InstructorTaskModuleTestCase):
     """
 
     def setUp(self):
-        super(TestProblemResponsesReport, self).setUp()
+        super(TestProblemResponsesReport, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.initialize_course()
         self.instructor = self.create_instructor('instructor')
         self.student = self.create_student('student')
@@ -811,7 +811,7 @@ class TestProblemGradeReport(TestReportMixin, InstructorTaskModuleTestCase):
     Test that the problem CSV generation works.
     """
     def setUp(self):
-        super(TestProblemGradeReport, self).setUp()
+        super(TestProblemGradeReport, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.initialize_course()
         # Add unicode data to CSV even though unicode usernames aren't
         # technically possible in openedx.
@@ -959,7 +959,7 @@ class TestProblemReportSplitTestContent(TestReportMixin, TestConditionalContent,
     OPTION_2 = 'Option 2'
 
     def setUp(self):
-        super(TestProblemReportSplitTestContent, self).setUp()
+        super(TestProblemReportSplitTestContent, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.problem_a_url = u'problem_a_url'
         self.problem_b_url = u'problem_b_url'
         self.define_option_problem(self.problem_a_url, parent=self.vertical_a)
@@ -1088,7 +1088,7 @@ class TestProblemReportCohortedContent(TestReportMixin, ContentGroupTestCase, In
     Test the problem report on a course that has cohorted content.
     """
     def setUp(self):
-        super(TestProblemReportCohortedContent, self).setUp()
+        super(TestProblemReportCohortedContent, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         # construct cohorted problems to work on.
         self.add_course_content()
         vertical = ItemFactory.create(
@@ -1184,7 +1184,7 @@ class TestCourseSurveyReport(TestReportMixin, InstructorTaskCourseTestCase):
     Tests that Course Survey report generation works.
     """
     def setUp(self):
-        super(TestCourseSurveyReport, self).setUp()
+        super(TestCourseSurveyReport, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.course = CourseFactory.create()
 
         self.question1 = "question1"
@@ -1279,7 +1279,7 @@ class TestStudentReport(TestReportMixin, InstructorTaskCourseTestCase):
     Tests that CSV student profile report generation works.
     """
     def setUp(self):
-        super(TestStudentReport, self).setUp()
+        super(TestStudentReport, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.course = CourseFactory.create()
 
     def test_success(self):
@@ -1323,7 +1323,7 @@ class TestTeamStudentReport(TestReportMixin, InstructorTaskCourseTestCase):
     "Test the student report when including teams information. "
 
     def setUp(self):
-        super(TestTeamStudentReport, self).setUp()
+        super(TestTeamStudentReport, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.course = CourseFactory.create(teams_configuration=_TEAMS_CONFIG)
         self.student1 = UserFactory.create()
         CourseEnrollment.enroll(self.student1, self.course.id)
@@ -1393,7 +1393,7 @@ class TestListMayEnroll(TestReportMixin, InstructorTaskCourseTestCase):
         )
 
     def setUp(self):
-        super(TestListMayEnroll, self).setUp()
+        super(TestListMayEnroll, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.course = CourseFactory.create()
 
     def test_success(self):
@@ -1431,7 +1431,7 @@ class MockDefaultStorage(object):
 
     def open(self, file_name):
         """Mock out DefaultStorage.open with standard python open"""
-        return open(file_name)  # pylint: disable=open-builtin
+        return open(file_name)  # lint-amnesty, pylint: disable=bad-option-value, open-builtin
 
 
 @patch('lms.djangoapps.instructor_task.tasks_helper.misc.DefaultStorage', new=MockDefaultStorage)
@@ -1440,7 +1440,7 @@ class TestCohortStudents(TestReportMixin, InstructorTaskCourseTestCase):
     Tests that bulk student cohorting works.
     """
     def setUp(self):
-        super(TestCohortStudents, self).setUp()
+        super(TestCohortStudents, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
 
         self.course = CourseFactory.create()
         self.cohort_1 = CohortFactory(course_id=self.course.id, name='Cohort 1')
@@ -1699,7 +1699,7 @@ class TestGradeReport(TestReportMixin, InstructorTaskModuleTestCase):
     Test that grade report has correct grade values.
     """
     def setUp(self):
-        super(TestGradeReport, self).setUp()
+        super(TestGradeReport, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.create_course()
         self.student = self.create_student(u'üser_1')
 
@@ -1858,7 +1858,7 @@ class TestGradeReportEnrollmentAndCertificateInfo(TestReportMixin, InstructorTas
     Test that grade report has correct user enrollment, verification, and certificate information.
     """
     def setUp(self):
-        super(TestGradeReportEnrollmentAndCertificateInfo, self).setUp()
+        super(TestGradeReportEnrollmentAndCertificateInfo, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
 
         today = datetime.now(UTC)
         course_factory_kwargs = {
@@ -2010,7 +2010,7 @@ class TestCertificateGeneration(InstructorTaskModuleTestCase):
     ENABLED_CACHES = ['default', 'mongo_metadata_inheritance', 'loc_cache']
 
     def setUp(self):
-        super(TestCertificateGeneration, self).setUp()
+        super(TestCertificateGeneration, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.initialize_course()
 
     def test_certificate_generation_for_students(self):
@@ -2569,13 +2569,13 @@ class TestInstructorOra2Report(SharedModuleStoreTestCase):
         cls.course = CourseFactory.create()
 
     def setUp(self):
-        super(TestInstructorOra2Report, self).setUp()
+        super(TestInstructorOra2Report, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
 
         self.current_task = Mock()
         self.current_task.update_state = Mock()
 
     def tearDown(self):
-        super(TestInstructorOra2Report, self).tearDown()
+        super(TestInstructorOra2Report, self).tearDown()  # lint-amnesty, pylint: disable=super-with-arguments
         if os.path.exists(settings.GRADES_DOWNLOAD['ROOT_PATH']):
             shutil.rmtree(settings.GRADES_DOWNLOAD['ROOT_PATH'])
 

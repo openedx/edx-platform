@@ -200,9 +200,8 @@ class TestCourseOutlinePage(SharedModuleStoreTestCase, MasqueradeMixin):
     @ddt.data(
         ([CourseMode.AUDIT, CourseMode.VERIFIED], CourseMode.AUDIT, False, True),
         ([CourseMode.AUDIT, CourseMode.VERIFIED], CourseMode.VERIFIED, False, True),
-        ([CourseMode.AUDIT, CourseMode.VERIFIED, CourseMode.MASTERS], CourseMode.MASTERS, False, True),
-        ([CourseMode.PROFESSIONAL], CourseMode.PROFESSIONAL, False, True),
-        ([CourseMode.AUDIT, CourseMode.VERIFIED], CourseMode.VERIFIED, True, False),
+        ([CourseMode.MASTERS], CourseMode.MASTERS, False, True),
+        ([CourseMode.PROFESSIONAL], CourseMode.PROFESSIONAL, True, True),  # staff accounts should also see the banner
     )
     @ddt.unpack
     def test_reset_course_deadlines_banner_shows_for_self_paced_course(
@@ -580,7 +579,8 @@ class TestCourseOutlineResumeCourse(SharedModuleStoreTestCase, CompletionWaffleT
         response = self.visit_course_home(course, start_count=1, resume_count=0)
         content = pq(response.content)
 
-        self.assertTrue(content('.action-resume-course').attr('href').endswith('/course/' + course.url_name))
+        vertical = course.children[0].children[0].children[0]
+        self.assertTrue(content('.action-resume-course').attr('href').endswith('/vertical/' + vertical.url_name))
 
     @override_settings(LMS_BASE='test_url:9999')
     def test_resume_course_with_completion_api(self):
@@ -680,7 +680,8 @@ class TestCourseOutlineResumeCourse(SharedModuleStoreTestCase, CompletionWaffleT
         CourseEnrollment.get_enrollment(self.user, course.id).delete()
         response = self.visit_course_home(course, start_count=1, resume_count=0)
         content = pq(response.content)
-        self.assertTrue(content('.action-resume-course').attr('href').endswith('/course/' + course.url_name))
+        vertical = course.children[0].children[0].children[0]
+        self.assertTrue(content('.action-resume-course').attr('href').endswith('/vertical/' + vertical.url_name))
 
     @override_waffle_switch(ENABLE_COMPLETION_TRACKING_SWITCH, active=True)
     def test_course_outline_auto_open(self):

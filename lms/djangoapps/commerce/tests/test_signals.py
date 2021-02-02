@@ -40,7 +40,7 @@ class TestRefundSignal(TestCase):
     """
 
     def setUp(self):
-        super(TestRefundSignal, self).setUp()
+        super(TestRefundSignal, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
 
         # Ensure the E-Commerce service user exists
         UserFactory(username=settings.ECOMMERCE_SERVICE_WORKER_USERNAME, is_staff=True)

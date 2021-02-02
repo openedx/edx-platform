@@ -3,6 +3,7 @@
 
 import json
 import unittest
+from string import capwords
 
 import ddt
 import six
@@ -15,26 +16,32 @@ from django.test import TransactionTestCase, override_settings
 from django.test.client import RequestFactory
 from django.urls import reverse
 from django.utils.html import escape
+from edx_toggles.toggles.testutils import override_waffle_flag
 from mock import Mock, patch
 from six import text_type
 
-from common.djangoapps.edxmako.shortcuts import marketing_link, render_to_string
-from openedx.core.djangoapps.ace_common.tests.mixins import EmailTemplateTagMixin
-from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
-from openedx.core.djangoapps.theming.tests.test_util import with_comprehensive_theme
-from openedx.core.djangolib.testing.utils import CacheIsolationMixin, CacheIsolationTestCase
-from openedx.core.lib.request_utils import safe_get_host
+from common.djangoapps.edxmako.shortcuts import marketing_link
+from common.djangoapps.student.email_helpers import generate_proctoring_requirements_email_context
+from common.djangoapps.student.emails import send_proctoring_requirements_email
 from common.djangoapps.student.models import PendingEmailChange, Registration, UserProfile
 from common.djangoapps.student.tests.factories import PendingEmailChangeFactory, UserFactory
 from common.djangoapps.student.views import (
     SETTING_CHANGE_INITIATED,
     confirm_email_change,
     do_email_change_request,
-    generate_activation_email_context,
     validate_new_email
 )
 from common.djangoapps.third_party_auth.views import inactive_user_view
 from common.djangoapps.util.testing import EventTestMixin
+from lms.djangoapps.courseware.toggles import COURSEWARE_PROCTORING_IMPROVEMENTS
+from lms.djangoapps.verify_student.services import IDVerificationService
+from openedx.core.djangoapps.ace_common.tests.mixins import EmailTemplateTagMixin
+from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
+from openedx.core.djangoapps.theming.tests.test_util import with_comprehensive_theme
+from openedx.core.djangolib.testing.utils import CacheIsolationMixin, CacheIsolationTestCase
+from xmodule.modulestore.django import modulestore
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from xmodule.modulestore.tests.factories import CourseFactory
 
 
 class TestException(Exception):
@@ -213,6 +220,71 @@ class ActivationEmailTests(EmailTemplateTagMixin, CacheIsolationTestCase):
             with patch('common.djangoapps.third_party_auth.pipeline.running', return_value=False):
                 inactive_user_view(request)
                 self.assertEqual(email.called, True, msg='method should have been called')
+
+
+@ddt.ddt
+@override_waffle_flag(COURSEWARE_PROCTORING_IMPROVEMENTS, active=True)
+@patch.dict('django.conf.settings.FEATURES', {'ENABLE_SPECIAL_EXAMS': True})
+@override_settings(ACCOUNT_MICROFRONTEND_URL='http://account-mfe')
+@unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', "Test only valid in LMS")
+class ProctoringRequirementsEmailTests(EmailTemplateTagMixin, ModuleStoreTestCase):
+    """
+    Test sending of the proctoring requirements email.
+    """
+    # pylint: disable=no-member
+    def setUp(self):
+        super().setUp()
+        self.course = CourseFactory(enable_proctored_exams=True)
+        self.user = UserFactory()
+
+    def test_send_proctoring_requirements_email(self):
+        context = generate_proctoring_requirements_email_context(self.user, self.course.id)
+        send_proctoring_requirements_email(context)
+        self._assert_email()
+
+    def _assert_email(self):
+        """
+        Verify that the email was sent.
+        """
+        assert len(mail.outbox) == 1
+
+        message = mail.outbox[0]
+        text = message.body
+        html = message.alternatives[0][0]
+
+        self.assertEqual(
+            message.subject,
+            "Proctoring requirements for {}".format(self.course.display_name)
+        )
+
+        for fragment in self._get_fragments():
+            assert fragment in text
+            assert escape(fragment) in html
+
+    def _get_fragments(self):
+        course_module = modulestore().get_course(self.course.id)
+        proctoring_provider = capwords(course_module.proctoring_provider.replace('_', ' '))
+        id_verification_url = IDVerificationService.get_verify_location()
+        return [
+            (
+                "You are enrolled in {} at {}. This course contains proctored exams.".format(
+                    self.course.display_name,
+                    settings.PLATFORM_NAME
+                )
+            ),
+            (
+                "Proctored exams are timed exams that you take while proctoring software monitors "
+                "your computer's desktop, webcam video, and audio."
+            ),
+            proctoring_provider,
+            (
+                "Carefully review the system requirements as well as the steps to take a proctored "
+                "exam in order to ensure that you are prepared."
+            ),
+            settings.PROCTORING_SETTINGS.get('LINK_URLS', {}).get('faq', ''),
+            ("Before taking a graded proctored exam, you must have approved ID verification photos."),
+            id_verification_url
+        ]
 
 
 @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', "Test only valid in LMS")

@@ -25,7 +25,7 @@ class Badge(PageObject):
 
     def __init__(self, element, browser):
         self.element = element
-        super(Badge, self).__init__(browser)
+        super(Badge, self).__init__(browser)  # lint-amnesty, pylint: disable=super-with-arguments
 
     def is_browser_on_page(self):
         return BrowserQuery(self.element, css=".badge-details").visible
@@ -84,7 +84,7 @@ class LearnerProfilePage(FieldsMixin, PageObject):
             browser (Browser): The browser instance.
             username (str): Profile username.
         """
-        super(LearnerProfilePage, self).__init__(browser)
+        super(LearnerProfilePage, self).__init__(browser)  # lint-amnesty, pylint: disable=super-with-arguments
         self.username = username
 
     @property

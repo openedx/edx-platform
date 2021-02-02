@@ -1,8 +1,10 @@
-"""Certificates API
+"""
+Certificates API
 
-This is a Python API for generating certificates asynchronously.
-Other Django apps should use the API functions defined in this module
-rather than importing Django models directly.
+This provides APIs for generating course certificates asynchronously.
+
+Other Django apps should use the API functions defined here in this module; other apps should not import the
+certificates models or any other certificates modules.
 """
 
 

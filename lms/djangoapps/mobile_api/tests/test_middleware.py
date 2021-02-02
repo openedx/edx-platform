@@ -25,7 +25,7 @@ class TestAppVersionUpgradeMiddleware(CacheIsolationTestCase):
     ENABLED_CACHES = ['default']
 
     def setUp(self):
-        super(TestAppVersionUpgradeMiddleware, self).setUp()
+        super(TestAppVersionUpgradeMiddleware, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.middleware = AppVersionUpgrade()
         self.set_app_version_config()
 

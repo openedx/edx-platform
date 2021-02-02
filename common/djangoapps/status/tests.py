@@ -21,7 +21,7 @@ class TestStatus(TestCase):
     """Test that the get_site_status_msg function does the right thing"""
 
     def setUp(self):
-        super(TestStatus, self).setUp()
+        super(TestStatus, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         # Clear the cache between test runs.
         cache.clear()
         self.course_key = CourseLocator(org='TestOrg', course='TestCourse', run='TestRun')

@@ -68,7 +68,7 @@ class LtiTestMixin(object):
     """
     @patch.dict('django.conf.settings.FEATURES', {'ENABLE_LTI_PROVIDER': True})
     def setUp(self):
-        super(LtiTestMixin, self).setUp()
+        super(LtiTestMixin, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         # Always accept the OAuth signature
         self.mock_verify = MagicMock(return_value=True)
         patcher = patch('lms.djangoapps.lti_provider.signature_validator.SignatureValidator.verify', self.mock_verify)

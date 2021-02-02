@@ -9,7 +9,7 @@ from os.path import abspath, dirname, join
 
 from corsheaders.defaults import default_headers as corsheaders_default_headers
 
-# pylint: enable=unicode-format-string
+# pylint: enable=unicode-format-string  # lint-amnesty, pylint: disable=bad-option-value
 #####################################################################
 from edx_django_utils.plugins import add_plugins
 
@@ -105,7 +105,7 @@ DEBUG_TOOLBAR_CONFIG = {
 }
 
 
-def should_show_debug_toolbar(request):
+def should_show_debug_toolbar(request):  # lint-amnesty, pylint: disable=missing-function-docstring
     # We always want the toolbar on devstack unless running tests from another Docker container
     hostname = request.get_host()
     if hostname.startswith('edx.devstack.lms:') or hostname.startswith('lms.devstack.edx:'):
@@ -174,7 +174,7 @@ FEATURES['CERTIFICATES_HTML_VIEW'] = True
 
 
 ########################## Course Discovery #######################
-LANGUAGE_MAP = {'terms': {lang: display for lang, display in ALL_LANGUAGES}, 'name': 'Language'}
+LANGUAGE_MAP = {'terms': {lang: display for lang, display in ALL_LANGUAGES}, 'name': 'Language'}  # lint-amnesty, pylint: disable=unnecessary-comprehension
 COURSE_DISCOVERY_MEANINGS = {
     'org': {
         'name': 'Organization',
@@ -331,8 +331,8 @@ EDXNOTES_CLIENT_NAME = 'edx_notes_api-backend-service'
 ############## Settings for Microfrontends  #########################
 LEARNING_MICROFRONTEND_URL = 'http://localhost:2000'
 ACCOUNT_MICROFRONTEND_URL = 'http://localhost:1997'
-LOGISTRATION_MICROFRONTEND_URL = 'http://localhost:1999'
-LOGISTRATION_MICROFRONTEND_DOMAIN = 'localhost:1999'
+AUTHN_MICROFRONTEND_URL = 'http://localhost:1999'
+AUTHN_MICROFRONTEND_DOMAIN = 'localhost:1999'
 
 ############## Docker based devstack settings #######################
 

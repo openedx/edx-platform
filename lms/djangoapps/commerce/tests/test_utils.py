@@ -61,7 +61,7 @@ class EcommerceServiceTests(TestCase):
         self.user = UserFactory.create()
         self.request = self.request_factory.get("foo")
         update_commerce_config(enabled=True)
-        super(EcommerceServiceTests, self).setUp()
+        super(EcommerceServiceTests, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
 
     def test_is_enabled(self):
         """Verify that is_enabled() returns True when ecomm checkout is enabled. """
@@ -187,7 +187,7 @@ class RefundUtilMethodTests(ModuleStoreTestCase):
     """Tests for Refund Utilities"""
 
     def setUp(self):
-        super(RefundUtilMethodTests, self).setUp()
+        super(RefundUtilMethodTests, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.user = UserFactory()
         UserFactory(username=settings.ECOMMERCE_SERVICE_WORKER_USERNAME, is_staff=True)
 

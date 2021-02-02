@@ -132,7 +132,7 @@ class TestAdminAccessCoachDashboard(CcxTestCase, LoginEnrollmentTestCase):
     MODULESTORE = TEST_DATA_SPLIT_MODULESTORE
 
     def setUp(self):
-        super(TestAdminAccessCoachDashboard, self).setUp()
+        super(TestAdminAccessCoachDashboard, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.make_coach()
         ccx = self.make_ccx()
         ccx_key = CCXLocator.from_course_locator(self.course.id, ccx.id)
@@ -303,7 +303,7 @@ class TestCoachDashboard(CcxTestCase, LoginEnrollmentTestCase):
         """
         Set up tests
         """
-        super(TestCoachDashboard, self).setUp()
+        super(TestCoachDashboard, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         # Login with the instructor account
         self.client.login(username=self.coach.username, password="test")
 
@@ -847,7 +847,7 @@ class TestCoachDashboardSchedule(CcxTestCase, LoginEnrollmentTestCase, ModuleSto
     ENABLED_CACHES = ['default', 'mongo_inheritance_cache', 'loc_cache']
 
     def setUp(self):
-        super(TestCoachDashboardSchedule, self).setUp()
+        super(TestCoachDashboardSchedule, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.course = course = CourseFactory.create(enable_ccx=True)
 
         # Create a course outline
@@ -1027,7 +1027,7 @@ class TestCCXGrades(FieldOverrideTestMixin, SharedModuleStoreTestCase, LoginEnro
         """
         Set up tests
         """
-        super(TestCCXGrades, self).setUp()
+        super(TestCCXGrades, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
 
         # Create instructor account
         self.coach = coach = AdminFactory.create()
@@ -1121,7 +1121,7 @@ class TestCCXGrades(FieldOverrideTestMixin, SharedModuleStoreTestCase, LoginEnro
         get_course.return_value = self.course
         self.addCleanup(patch_context.stop)
 
-        self.client.login(username=self.student.username, password="test")
+        self.client.login(username=self.student.username, password="test")  # lint-amnesty, pylint: disable=no-member
         url = reverse(
             'progress',
             kwargs={'course_id': self.ccx_key}
@@ -1146,7 +1146,7 @@ class CCXCoachTabTestCase(CcxTestCase):
         cls.ccx_disabled_course = CourseFactory.create(enable_ccx=False)
 
     def setUp(self):
-        super(CCXCoachTabTestCase, self).setUp()
+        super(CCXCoachTabTestCase, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.user = UserFactory.create()
         for course in [self.ccx_enabled_course, self.ccx_disabled_course]:
             CourseEnrollmentFactory.create(user=self.user, course_id=course.id)
@@ -1246,7 +1246,7 @@ class TestStudentViewsWithCCX(ModuleStoreTestCase):
         """
         Set up courses and enrollments.
         """
-        super(TestStudentViewsWithCCX, self).setUp()
+        super(TestStudentViewsWithCCX, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
 
         # Create a Draft Mongo and a Split Mongo course and enroll a student user in them.
         self.student_password = "foobar"

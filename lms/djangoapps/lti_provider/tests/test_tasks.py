@@ -19,7 +19,7 @@ class BaseOutcomeTest(TestCase):
     Super type for tests of both the leaf and composite outcome celery tasks.
     """
     def setUp(self):
-        super(BaseOutcomeTest, self).setUp()
+        super(BaseOutcomeTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.course_key = CourseLocator(
             org='some_org',
             course='some_course',
@@ -96,7 +96,7 @@ class SendCompositeOutcomeTest(BaseOutcomeTest):
     """
 
     def setUp(self):
-        super(SendCompositeOutcomeTest, self).setUp()
+        super(SendCompositeOutcomeTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.descriptor = MagicMock()
         self.descriptor.location = BlockUsageLocator(
             course_key=self.course_key,

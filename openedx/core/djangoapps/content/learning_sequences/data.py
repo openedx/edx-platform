@@ -59,13 +59,13 @@ class VisibilityData:
     # lets you define a Sequence that is reachable by direct URL but not shown
     # in Course navigation. It was used for things like supplementary tutorials
     # that were not considered a part of the normal course path.
-    hide_from_toc = attr.ib(type=bool)
+    hide_from_toc = attr.ib(type=bool, default=False)
 
     # Restrict visibility to course staff, regardless of start date. This is
     # often used to hide content that either still being built out, or is a
     # scratch space of content that will eventually be copied over to other
     # sequences.
-    visible_to_staff_only = attr.ib(type=bool)
+    visible_to_staff_only = attr.ib(type=bool, default=False)
 
 
 @attr.s(frozen=True)
@@ -93,10 +93,9 @@ class CourseLearningSequenceData:
     """
     usage_key = attr.ib(type=UsageKey)
     title = attr.ib(type=str)
-    visibility = attr.ib(type=VisibilityData)
-
+    visibility = attr.ib(type=VisibilityData, default=VisibilityData())
     exam = attr.ib(type=ExamData, default=ExamData())
-    inaccessible_after_due = attr.ib(type=bool, default=True)
+    inaccessible_after_due = attr.ib(type=bool, default=False)
 
 
 @attr.s(frozen=True)

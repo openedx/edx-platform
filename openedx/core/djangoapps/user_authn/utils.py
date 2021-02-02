@@ -70,10 +70,10 @@ def is_registration_api_v1(request):
     return 'v1' in request.get_full_path() and 'register' not in request.get_full_path()
 
 
-def should_redirect_to_logistration_mircrofrontend():
+def should_redirect_to_authn_microfrontend():
     """
     Checks if login/registration should be done via MFE.
     """
     return configuration_helpers.get_value(
-        'ENABLE_LOGISTRATION_MICROFRONTEND', settings.FEATURES.get('ENABLE_LOGISTRATION_MICROFRONTEND')
+        'ENABLE_AUTHN_MICROFRONTEND', settings.FEATURES.get('ENABLE_AUTHN_MICROFRONTEND')
     )

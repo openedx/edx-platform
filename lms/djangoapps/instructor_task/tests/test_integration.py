@@ -15,7 +15,7 @@ from collections import namedtuple
 import ddt
 import six
 from celery.states import FAILURE, SUCCESS
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.test.utils import override_settings
 from django.urls import reverse
 from mock import patch
@@ -61,7 +61,7 @@ class TestIntegrationTask(InstructorTaskModuleTestCase):
         self.assertEqual(instructor_task.task_type, task_type)
         task_input = json.loads(instructor_task.task_input)
         self.assertNotIn('student', task_input)
-        self.assertEqual(task_input['problem_url'], text_type(InstructorTaskModuleTestCase.problem_location(problem_url_name)))
+        self.assertEqual(task_input['problem_url'], text_type(InstructorTaskModuleTestCase.problem_location(problem_url_name)))  # lint-amnesty, pylint: disable=line-too-long
         status = json.loads(instructor_task.task_output)
         self.assertEqual(status['exception'], 'ZeroDivisionError')
         self.assertEqual(status['message'], expected_message)
@@ -80,7 +80,7 @@ class TestRescoringTask(TestIntegrationTask):
     """
 
     def setUp(self):
-        super(TestRescoringTask, self).setUp()
+        super(TestRescoringTask, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
 
         self.initialize_course()
         self.create_instructor('instructor')
@@ -305,7 +305,7 @@ class TestRescoringTask(TestIntegrationTask):
         self.assertEqual(instructor_task.task_type, 'rescore_problem')
         task_input = json.loads(instructor_task.task_input)
         self.assertNotIn('student', task_input)
-        self.assertEqual(task_input['problem_url'], text_type(InstructorTaskModuleTestCase.problem_location(problem_url_name)))
+        self.assertEqual(task_input['problem_url'], text_type(InstructorTaskModuleTestCase.problem_location(problem_url_name)))  # lint-amnesty, pylint: disable=line-too-long
         status = json.loads(instructor_task.task_output)
         self.assertEqual(status['attempted'], 1)
         self.assertEqual(status['succeeded'], 0)
@@ -370,7 +370,7 @@ class TestRescoringTask(TestIntegrationTask):
                 InstructorTaskModuleTestCase.problem_location(problem_url_name)
             )
             descriptor.data = problem_xml
-            with self.module_store.branch_setting(ModuleStoreEnum.Branch.draft_preferred, descriptor.location.course_key):
+            with self.module_store.branch_setting(ModuleStoreEnum.Branch.draft_preferred, descriptor.location.course_key):  # lint-amnesty, pylint: disable=line-too-long
                 self.module_store.update_item(descriptor, self.user.id)
                 self.module_store.publish(descriptor.location, self.user.id)
         else:
@@ -444,7 +444,7 @@ class TestResetAttemptsTask(TestIntegrationTask):
     userlist = ['u1', 'u2', 'u3', 'u4']
 
     def setUp(self):
-        super(TestResetAttemptsTask, self).setUp()
+        super(TestResetAttemptsTask, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.initialize_course()
         self.create_instructor('instructor')
         for username in self.userlist:
@@ -513,7 +513,7 @@ class TestDeleteProblemTask(TestIntegrationTask):
     userlist = ['u1', 'u2', 'u3', 'u4']
 
     def setUp(self):
-        super(TestDeleteProblemTask, self).setUp()
+        super(TestDeleteProblemTask, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
 
         self.initialize_course()
         self.create_instructor('instructor')
@@ -598,7 +598,7 @@ class TestGradeReportConditionalContent(TestReportMixin, TestConditionalContent,
             Arguments:
                 dicts: tuple of dicts
             """
-            return dict([item for d in dicts for item in d.items()])
+            return dict([item for d in dicts for item in d.items()])  # lint-amnesty, pylint: disable=consider-using-dict-comprehension
 
         def user_partition_group(user):
             """Return a dict having single key with value equals to students group in partition"""

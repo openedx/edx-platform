@@ -46,8 +46,8 @@ from common.djangoapps.util.password_policy_validators import create_validator_c
 from common.djangoapps.util.testing import EventTestMixin
 
 
-ENABLE_LOGISTRATION_MICROFRONTEND = settings.FEATURES.copy()
-ENABLE_LOGISTRATION_MICROFRONTEND['ENABLE_LOGISTRATION_MICROFRONTEND'] = True
+ENABLE_AUTHN_MICROFRONTEND = settings.FEATURES.copy()
+ENABLE_AUTHN_MICROFRONTEND['ENABLE_AUTHN_MICROFRONTEND'] = True
 
 
 def process_request(request):
@@ -330,7 +330,7 @@ class ResetPasswordTests(EventTestMixin, CacheIsolationTestCase):
             SETTING_CHANGE_INITIATED, user_id=self.user.id, setting=u'password', old=None, new=None
         )
 
-    @override_settings(FEATURES=ENABLE_LOGISTRATION_MICROFRONTEND)
+    @override_settings(FEATURES=ENABLE_AUTHN_MICROFRONTEND)
     @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', "Test only valid in LMS")
     @ddt.data(('Crazy Awesome Site', 'Crazy Awesome Site'), ('edX', 'edX'))
     @ddt.unpack
@@ -354,7 +354,7 @@ class ResetPasswordTests(EventTestMixin, CacheIsolationTestCase):
                 reset_msg = reset_msg.format(site_name)
 
                 self.assertIn(reset_msg, msg)
-                self.assertIn(settings.LOGISTRATION_MICROFRONTEND_URL, msg)
+                self.assertIn(settings.AUTHN_MICROFRONTEND_URL, msg)
 
                 sign_off = u"The {} Team".format(platform_name)
                 self.assertIn(sign_off, msg)

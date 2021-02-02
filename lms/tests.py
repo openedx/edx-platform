@@ -1,10 +1,10 @@
-"""Tests for the lms module itself."""
+"""Tests for the lms module itself."""  # lint-amnesty, pylint: disable=django-not-configured
 
 
 import logging
 import mimetypes
 
-from django.conf import settings
+from django.conf import settings  # lint-amnesty, pylint: disable=unused-import
 from django.test import TestCase
 
 log = logging.getLogger(__name__)

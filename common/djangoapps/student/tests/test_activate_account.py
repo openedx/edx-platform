@@ -16,7 +16,7 @@ from common.djangoapps.student.tests.factories import UserFactory
 
 
 FEATURES_WITH_LOGIN_MFE_ENABLED = settings.FEATURES.copy()
-FEATURES_WITH_LOGIN_MFE_ENABLED['ENABLE_LOGISTRATION_MICROFRONTEND'] = True
+FEATURES_WITH_LOGIN_MFE_ENABLED['ENABLE_AUTHN_MICROFRONTEND'] = True
 
 
 @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
@@ -158,7 +158,7 @@ class TestActivateAccount(TestCase):
         login page with correct query param.
         """
         login_page_url = "{authn_mfe}/login?account_activation_status=".format(
-            authn_mfe=settings.LOGISTRATION_MICROFRONTEND_URL
+            authn_mfe=settings.AUTHN_MICROFRONTEND_URL
         )
 
         self._assert_user_active_state(expected_active_state=False)

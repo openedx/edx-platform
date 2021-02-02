@@ -44,7 +44,6 @@ class CourseSerializer(serializers.Serializer):  # pylint: disable=abstract-meth
     course_end = serializers.DateTimeField(source="end", format=None)
     invite_only = serializers.BooleanField(source="invitation_only")
     course_modes = serializers.SerializerMethodField()
-    self_paced = serializers.BooleanField()
 
     class Meta(object):
         # For disambiguating within the drf-yasg swagger schema

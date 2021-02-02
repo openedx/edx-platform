@@ -18,7 +18,7 @@ class ContactUsView(View):
     View for viewing and submitting contact us form.
     """
 
-    def get(self, request):
+    def get(self, request):  # lint-amnesty, pylint: disable=missing-function-docstring
         if not configuration_helpers.get_value('CONTACT_US_PAGE', True):
             raise Http404
 

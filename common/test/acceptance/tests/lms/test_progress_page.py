@@ -36,7 +36,7 @@ class ProgressPageBaseTest(UniqueCourseTest):
     PROBLEM_NAME_2 = 'Test Problem 2'
 
     def setUp(self):
-        super(ProgressPageBaseTest, self).setUp()
+        super(ProgressPageBaseTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.courseware_page = CoursewarePage(self.browser, self.course_id)
         self.problem_page = ProblemPage(self.browser)
         self.progress_page = ProgressPage(self.browser, self.course_id)
@@ -97,14 +97,14 @@ class ProgressPageBaseTest(UniqueCourseTest):
         Return a list of scores from the progress page.
         """
         self.progress_page.visit()
-        return self.progress_page.section_score(self.SECTION_NAME, self.SUBSECTION_NAME)
+        return self.progress_page.section_score(self.SECTION_NAME, self.SUBSECTION_NAME)  # lint-amnesty, pylint: disable=no-member
 
     def _get_problem_scores(self):
         """
         Return a list of scores from the progress page.
         """
         self.progress_page.visit()
-        return self.progress_page.scores(self.SECTION_NAME, self.SUBSECTION_NAME)
+        return self.progress_page.scores(self.SECTION_NAME, self.SUBSECTION_NAME)  # lint-amnesty, pylint: disable=no-member
 
     @contextmanager
     def _logged_in_session(self, staff=False):
@@ -128,7 +128,7 @@ class SubsectionGradingPolicyBase(ProgressPageBaseTest):
     the progress page
     """
     def setUp(self):
-        super(SubsectionGradingPolicyBase, self).setUp()
+        super(SubsectionGradingPolicyBase, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self._set_policy_for_subsection("Homework", 0)
         self._set_policy_for_subsection("Lab", 1)
 
@@ -150,7 +150,7 @@ class SubsectionGradingPolicyBase(ProgressPageBaseTest):
         """
         self.assertEqual(self._get_problem_scores(), problem_scores)
         self.assertEqual(self._get_section_score(), section_score)
-        self.assertTrue(self.progress_page.text_on_page(text))
+        self.assertTrue(self.progress_page.text_on_page(text))  # lint-amnesty, pylint: disable=no-member
 
     def _check_tick_text(self, index, sr_text, label, label_hidden=True):
         """

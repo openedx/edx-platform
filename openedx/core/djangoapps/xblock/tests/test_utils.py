@@ -11,6 +11,7 @@ from openedx.core.djangoapps.xblock.utils import (
     get_secure_token_for_xblock_handler,
     validate_secure_token_for_xblock_handler,
     _get_secure_token_for_xblock_handler,
+    validate_secure_token_for_xblock_handler
 )
 
 REFERENCE_PARAMS = {
@@ -22,7 +23,9 @@ REFERENCE_PARAMS = {
     "validation_secret_key": "baseline_key",
     "generation_xblock_handler_token_keys": None,
     "validation_xblock_handler_token_keys": None,
-    "reference_time": datetime.datetime(2021, 1, 28, 13, 26, 38, 787309, tzinfo=datetime.timezone.utc),
+    # A reference time that produces a token that will expire within the next day
+    # but not for a few hours.
+    "reference_time": datetime.datetime(2021, 1, 28, 13, 26, 38, 787309, datetime.timezone.utc),
     "validation_time_delta_s": 0,
 }
 
@@ -30,6 +33,7 @@ REFERENCE_PARAMS = {
 @pytest.mark.parametrize(
     "param_delta,expected_validation",
     [
+        # Happy Path case with the above REFERENCE_PARAMS.
         ({}, True),
         # Ensure token still valid in 1 hour
         ({"validation_time_delta_s": 3600}, True),
@@ -98,7 +102,7 @@ REFERENCE_PARAMS = {
         (
             {
                 "generation_xblock_handler_token_keys": ["baseline_key", ],
-                "validation_xblock_handler_token_keys": ["now token key", "baseline_key", ],
+                "validation_xblock_handler_token_keys": ["new token key", "baseline_key", ],
                 "validation_secret_key": "new secret key",
             },
             True,
@@ -112,6 +116,14 @@ REFERENCE_PARAMS = {
                 "validation_secret_key": "new secret key",  # Ensure that we're not matching with secret key
             },
             True,
+        ),
+        # Test that if the new token key is used to generate, that validating with the SECRET_KEY won't work.
+        (
+            {
+                "generation_xblock_handler_token_keys": ["new token key"],
+                "validation_xblock_handler_token_keys": [],
+            },
+            False,
         ),
     ],
 )

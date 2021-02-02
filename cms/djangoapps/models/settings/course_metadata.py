@@ -173,14 +173,14 @@ class CourseMetadata(object):
             if field.scope != Scope.settings:
                 continue
 
-            field_help = _(field.help)
+            field_help = _(field.help)  # lint-amnesty, pylint: disable=translation-of-non-string
             help_args = field.runtime_options.get('help_format_args')
             if help_args is not None:
                 field_help = field_help.format(**help_args)
 
             result[field.name] = {
                 'value': field.read_json(descriptor),
-                'display_name': _(field.display_name),
+                'display_name': _(field.display_name),  # lint-amnesty, pylint: disable=translation-of-non-string
                 'help': field_help,
                 'deprecated': field.runtime_options.get('deprecated', False),
                 'hide_on_enabled_publisher': field.runtime_options.get('hide_on_enabled_publisher', False)
@@ -211,7 +211,7 @@ class CourseMetadata(object):
                 if hasattr(descriptor, key) and getattr(descriptor, key) != val:
                     key_values[key] = descriptor.fields[key].from_json(val)
             except (TypeError, ValueError) as err:
-                raise ValueError(_(u"Incorrect format for field '{name}'. {detailed_message}").format(
+                raise ValueError(_(u"Incorrect format for field '{name}'. {detailed_message}").format(  # lint-amnesty, pylint: disable=raise-missing-from
                     name=model['display_name'], detailed_message=text_type(err)))
 
         return cls.update_from_dict(key_values, descriptor, user)

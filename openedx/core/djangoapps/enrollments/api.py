@@ -14,6 +14,7 @@ from opaque_keys.edx.keys import CourseKey
 
 from common.djangoapps.course_modes.models import CourseMode
 from openedx.core.djangoapps.enrollments import errors
+from xmodule.modulestore.django import modulestore
 
 log = logging.getLogger(__name__)
 
@@ -492,6 +493,41 @@ def serialize_enrollments(enrollments):
         A list of enrollments
     """
     return _data_api().serialize_enrollments(enrollments)
+
+
+def is_enrollment_valid_for_proctoring(username, course_id):
+    """
+    Returns a boolean value regarding whether user's course enrollment is eligible for proctoring. Returns
+    False if the enrollment is not active, special exams aren't enabled, proctored exams aren't enabled
+    for the course, or if the course mode is audit.
+
+    Arguments:
+        username: The user associated with the enrollment.
+        course_id (str): The course id associated with the enrollment.
+    """
+    if not settings.FEATURES.get('ENABLE_SPECIAL_EXAMS'):
+        return False
+
+    enrollment = _data_api().get_course_enrollment(username, str(course_id))
+    if not enrollment['is_active']:
+        return False
+
+    course_module = modulestore().get_course(course_id)
+    if not course_module.enable_proctored_exams:
+        return False
+
+    appropriate_modes = [
+        CourseMode.VERIFIED, CourseMode.MASTERS, CourseMode.PROFESSIONAL, CourseMode.EXECUTIVE_EDUCATION
+    ]
+
+    # If the proctoring provider allows learners in honor mode to take exams, include it
+    if settings.PROCTORING_BACKENDS.get(course_module.proctoring_provider, {}).get('allow_honor_mode'):
+        appropriate_modes.append(CourseMode.HONOR)
+
+    if enrollment['mode'] not in appropriate_modes:
+        return False
+
+    return True
 
 
 def _data_api():

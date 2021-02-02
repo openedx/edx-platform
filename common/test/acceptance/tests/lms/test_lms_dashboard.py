@@ -23,7 +23,7 @@ class BaseLmsDashboardTestMultiple(UniqueCourseTest):
         """
         # Some parameters are provided by the parent setUp() routine, such as the following:
         # self.course_id, self.course_info, self.unique_id
-        super(BaseLmsDashboardTestMultiple, self).setUp()
+        super(BaseLmsDashboardTestMultiple, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
 
         # Load page objects for use by the tests
         self.dashboard_page = DashboardPage(self.browser)

@@ -4,8 +4,9 @@
         'underscore',
         'backbone',
         'gettext',
-        'js/discovery/views/course_card'
-    ], function($, _, Backbone, gettext, CourseCardView) {
+        'js/discovery/views/course_card',
+        'edx-ui-toolkit/js/utils/html-utils'
+    ], function($, _, Backbone, gettext, CourseCardView, HtmlUtils) {
         'use strict';
 
         return Backbone.View.extend({
@@ -38,7 +39,10 @@
                     var item = new CourseCardView({model: result});
                     return item.render().el;
                 }, this);
-                this.$list.append(items);
+                HtmlUtils.append(
+                    this.$list,
+                    HtmlUtils.HTML(items)
+                );
                 /* eslint no-param-reassign: [2, { "props": false }] */
             },
 

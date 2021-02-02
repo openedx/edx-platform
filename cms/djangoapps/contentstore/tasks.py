@@ -53,6 +53,7 @@ from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import DuplicateCourseError, ItemNotFoundError
 from xmodule.modulestore.xml_exporter import export_course_to_xml, export_library_to_xml
 from xmodule.modulestore.xml_importer import import_course_from_xml, import_library_from_xml
+from .outlines import update_outline_from_modulestore
 
 User = get_user_model()
 
@@ -560,3 +561,17 @@ def import_olx(self, user_id, course_key_string, archive_path, archive_name, lan
                 from .views.entrance_exam import add_entrance_exam_milestone
                 add_entrance_exam_milestone(course.id, entrance_exam_chapter)
                 LOGGER.info(u'Course %s Entrance exam imported', course.id)
+
+
+@shared_task
+@set_code_owner_attribute
+def update_outline_from_modulestore_task(course_key_str):
+    """
+    Celery task that creates a learning_sequence course outline.
+    """
+    try:
+        course_key = CourseKey.from_string(course_key_str)
+        update_outline_from_modulestore(course_key)
+    except Exception:  # pylint disable=broad-except
+        LOGGER.exception("Could not create course outline for course %s", course_key_str)
+        raise  # Re-raise so that errors are noted in reporting.

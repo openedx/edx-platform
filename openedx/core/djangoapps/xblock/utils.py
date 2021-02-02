@@ -46,7 +46,7 @@ def get_secure_token_for_xblock_handler(user_id, block_key_str, time_idx=0):
     token each user gets for a given XBlock doesn't change, which makes
     debugging and reasoning about the system simpler.)
     """
-    # Impact of exposer of the SECRET_KEY or XBLOCK_HANDLER_TOKEN_KEYS:
+    # Impact of exposure of the SECRET_KEY or XBLOCK_HANDLER_TOKEN_KEYS:
     # An actor with the key could produce valid secure tokens for any given user_id and xblock and
     # could submit answers to questions on behalf of other users. This would violate the integrity
     # of the answer data on our platform.
@@ -54,24 +54,28 @@ def get_secure_token_for_xblock_handler(user_id, block_key_str, time_idx=0):
     # Score URL: https://www.first.org/cvss/calculator/3.1#CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:H/A:N
     # Environment score not given because the importance of the environment may change over time.
 
-    # Fall back to SECRET_KEY if XBLOCK_HANDLER_PEPPERS is not set or is an empty list.
     # If this key is actually exposed to malicious actors, we should do a rapid rotation that
     # breaks people because in this case a malicious actor can generate valid tokens to submit
     # answers as any user.
+
+    # XBLOCK_HANDLER_TOKEN_KEYS takes the form of a list of strings with at least 128 bits of entropy each.
+    # It is reasonable to use django.core.management.utils.get_random_secret_key to generate these keys.
+
     # Transitioning from SECRET_KEY to XBLOCK_HANDLER_TOKEN_KEYS:
     #
-    # 1. Add the current secret key and a new xblock handler specific secret key to the
-    # XBLOCK_HANDLER_TOKEN_KEYS list in your settings file or yml. The order of the keys
+    # 1. Add a new xblock handler specific secret key and the current secret key to the
+    # XBLOCK_HANDLER_TOKEN_KEYS list in your LMS and Studio settings file or yaml. The order of the keys
     # matters and so the new xblock specific key should be at index 0.
     #   eg. XBLOCK_HANDLER_TOKEN_KEYS = ["<new xblock specific hashing key>", "<value of django secret key>"]
     # 2. Wait 4 days after the code has been deployed to production.
     # 3. Remove the django secret key from the XBLOCK_HANDLER_TOKEN_KEYS list.
     #   eg. XBLOCK_HANDLER_TOKEN_KEYS = ["<new xblock specific hashing key>"]
 
-    # Rotation Process(Assumes you've already transitioned from SECRET_KEY to XBLOCK_HANDLER_TOKEN_KEYS):
+    # Rotation Process (Assumes you've already transitioned from SECRET_KEY to XBLOCK_HANDLER_TOKEN_KEYS):
+    #
     # If the likelihood that the old key has been exposed to malicious actors is high, you should do a rapid rotation
     # that breaks people because in this case a malicious actor can generate valid tokens to submit answers
-    # impersonating any user.  If the likelyhood of a malicious actor is high, skip step 2 from this process(Start
+    # impersonating any user.  If the likelihood of a malicious actor is high, skip step 2 from this process (Start
     # using only the new key right away.)
     # 1. Add the newly generated hashing key at index 0 of the XBLOCK_HANDLER_TOKEN_KEYS list in your settings.
     #   eg. XBLOCK_HANDLER_TOKEN_KEYS = ["<new xblock specific hashing key>", "<old xblock specific hashing key>"]
@@ -79,6 +83,7 @@ def get_secure_token_for_xblock_handler(user_id, block_key_str, time_idx=0):
     # 3. Remove the old key from the list.
     #   eg. XBLOCK_HANDLER_TOKEN_KEYS = ["<new xblock specific hashing key>"]
 
+    # Fall back to SECRET_KEY if XBLOCK_HANDLER_TOKEN_KEYS is not set or is an empty list.
     if getattr(settings, "XBLOCK_HANDLER_TOKEN_KEYS", None):
         hashing_key = settings.XBLOCK_HANDLER_TOKEN_KEYS[0]
     else:
@@ -104,7 +109,7 @@ def _get_secure_token_for_xblock_handler(user_id, block_key_str, time_idx: int, 
 def validate_secure_token_for_xblock_handler(user_id, block_key_str, token):
     """
     Returns True if the specified handler authentication token is valid for the
-    given XBlock ID and user ID. Otherwise returns false.
+    given Xblock ID and user ID. Otherwise returns false.
 
     See get_secure_token_for_xblock_handler
     """
@@ -117,7 +122,7 @@ def validate_secure_token_for_xblock_handler(user_id, block_key_str, token):
     for key in hashing_keys:
         final_result |= _validate_secure_token_for_xblock_handler(user_id, block_key_str, token, key)
 
-    # We check all peppers so that the computation takes a constant amount of
+    # We check all keys so that the computation takes a constant amount of
     # time to produce its answer (security best practice).
     return final_result
 
@@ -125,7 +130,7 @@ def validate_secure_token_for_xblock_handler(user_id, block_key_str, token):
 def _validate_secure_token_for_xblock_handler(user_id, block_key_str, token: str, hashing_key):
     """
     Internal function to validate the incoming token with tokens generated with the given
-    hashing pepper.
+    hashing key.
     """
     token_expected = _get_secure_token_for_xblock_handler(user_id, block_key_str, 0, hashing_key)
     prev_token_expected = _get_secure_token_for_xblock_handler(user_id, block_key_str, -1, hashing_key)

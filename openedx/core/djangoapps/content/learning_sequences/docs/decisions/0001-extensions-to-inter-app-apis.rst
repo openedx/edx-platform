@@ -33,25 +33,19 @@ Decision
 
 #. All API data structures will be declared as immutable attrs classes in a
 separate ``data.py`` file. All data class attributes will have type annotations.
-
 #. Data structures in ``data.py`` will include basic validation of their inputs,
 though this will *not* include validation that requires database access.
-
 #. All public inter-app API functions will use type annotations for arguments
 and return values.
-
 #. All public inter-app API functions will be exported in the top level ``api``
 package. Other applications will only ever import from this top level package.
-
 #. Views, tasks, and any other parts of the learning_sequences app that are not
 in the api package will obey the same rules that external apps would follow.
 This means that views for learning_sequences will only import from api and will
 not directly import from models.
-
 #. Serializers for REST APIs will be defined as inner classes on the views.
 Serializer re-use across use cases will be explicitly discouraged to prevent
 modifications from rippling across and breaking compatibility elsewhere.
-
 #. Wherever possible, API-level tests will be written without mocking internals,
 or prepping the database with model manipulations. The goal of this is to make
 it so that that API-level tests *only* break when there are in fact API changes.
@@ -63,10 +57,8 @@ Consequences
 
 #. It will be easier for other applications to access learning_sequence
 functionality in a more easily understood and maintainable way.
-
 #. It will be easier to build and maintain plugin code that depends on this
 application.
-
 #. Changes that break backwards compatibility will be more obvious.
 
 

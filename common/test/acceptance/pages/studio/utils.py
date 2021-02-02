@@ -15,7 +15,7 @@ SIDE_BAR_HELP_CSS = '.external-help a, .external-help-button'
 
 
 @js_defined('window.jQuery')
-def type_in_codemirror(page, index, text, find_prefix="$"):
+def type_in_codemirror(page, index, text, find_prefix="$"):  # lint-amnesty, pylint: disable=missing-function-docstring
     script = u"""
     var cm = {find_prefix}('div.CodeMirror:eq({index})').get(0).CodeMirror;
     CodeMirror.signal(cm, "focus", cm);
@@ -71,7 +71,7 @@ def verify_ordering(test_class, page, expected_orderings):
                 expected_length = len(expected_ordering.get(parent))
                 test_class.assertEqual(
                     expected_length, len(children),
-                    u"Number of children incorrect for group {0}. Expected {1} but got {2}.".format(parent, expected_length, len(children)))
+                    u"Number of children incorrect for group {0}. Expected {1} but got {2}.".format(parent, expected_length, len(children)))  # lint-amnesty, pylint: disable=line-too-long
                 for idx, expected in enumerate(expected_ordering.get(parent)):
                     test_class.assertEqual(expected, children[idx].name)
                     blocks_checked.add(expected)
