@@ -12,7 +12,7 @@ In two separate processes on devstack:
 """
 
 
-import os
+import os  # lint-amnesty, pylint: disable=unused-import
 
 # We intentionally define lots of variables that aren't used, and
 # want to import all variables from base settings files
