@@ -451,7 +451,7 @@ def get_saml_provider_by_org_key(org_key):
     try:
         organization = Organization.objects.get(short_name=org_key)
     except Organization.DoesNotExist:
-        raise BadOrganizationShortNameException(org_key)
+        raise BadOrganizationShortNameException(org_key)  # lint-amnesty, pylint: disable=raise-missing-from
     return get_saml_provider_for_organization(organization)
 
 
@@ -495,9 +495,9 @@ def get_saml_provider_for_organization(organization):
     try:
         provider_config = organization.samlproviderconfig_set.current_set().get(enabled=True)
     except SAMLProviderConfig.DoesNotExist:
-        raise ProviderDoesNotExistException(organization)
+        raise ProviderDoesNotExistException(organization)  # lint-amnesty, pylint: disable=raise-missing-from
     except SAMLProviderConfig.MultipleObjectsReturned:
-        raise ProviderConfigurationException(organization)
+        raise ProviderConfigurationException(organization)  # lint-amnesty, pylint: disable=raise-missing-from
     return provider_config
 
 

@@ -4,7 +4,7 @@ Django model specifications for the Program Enrollments API
 """
 
 from django.conf import settings
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
@@ -85,7 +85,7 @@ class ProgramEnrollment(TimeStampedModel):
         return '[ProgramEnrollment id={}]'.format(self.id)
 
     def __repr__(self):
-        return (
+        return (  # lint-amnesty, pylint: disable=missing-format-attribute
             "<ProgramEnrollment"    # pylint: disable=missing-format-attribute
             " id={self.id}"
             " user={self.user!r}"
@@ -141,7 +141,7 @@ class ProgramCourseEnrollment(TimeStampedModel):
         return '[ProgramCourseEnrollment id={}]'.format(self.id)
 
     def __repr__(self):
-        return (
+        return (  # lint-amnesty, pylint: disable=missing-format-attribute
             "<ProgramCourseEnrollment"  # pylint: disable=missing-format-attribute
             " id={self.id}"
             " program_enrollment={self.program_enrollment!r}"
@@ -168,7 +168,7 @@ class CourseAccessRoleAssignment(TimeStampedModel):
         return '[CourseAccessRoleAssignment id={}]'.format(self.id)
 
     def __repr__(self):
-        return (
+        return (  # lint-amnesty, pylint: disable=missing-format-attribute
             "<CourseAccessRoleAssignment"  # pylint: disable=missing-format-attribute
             " id={self.id}"
             " role={self.role!r}"

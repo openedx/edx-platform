@@ -75,7 +75,7 @@ class EnrollmentTestMixin(CacheIsolationTestCase):
         cls.student_2 = UserFactory(username='student-2')
 
     def setUp(self):
-        super(EnrollmentTestMixin, self).setUp()
+        super(EnrollmentTestMixin, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         cache.set(PROGRAM_CACHE_KEY_TPL.format(uuid=self.program_uuid), self.program, None)
 
     def create_program_enrollment(self, external_user_key, user=False):

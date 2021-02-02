@@ -14,7 +14,7 @@ class RssProxyViewTests(TestCase):
     """ Tests for the rss_proxy views """
 
     def setUp(self):
-        super(RssProxyViewTests, self).setUp()
+        super(RssProxyViewTests, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
 
         self.whitelisted_url1 = 'http://www.example.com'
         self.whitelisted_url2 = 'http://www.example.org'

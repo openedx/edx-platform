@@ -109,7 +109,7 @@ class ProgramCourseGradeOk(BaseProgramCourseGrade):
         Given a ProgramCourseEnrollment and course grade object,
         create a ProgramCourseGradeOk.
         """
-        super(ProgramCourseGradeOk, self).__init__(
+        super(ProgramCourseGradeOk, self).__init__(  # lint-amnesty, pylint: disable=super-with-arguments
             program_course_enrollment
         )
         self.passed = course_grade.passed
@@ -129,7 +129,7 @@ class ProgramCourseGradeError(BaseProgramCourseGrade):
         Given a ProgramCourseEnrollment and an Exception,
         create a ProgramCourseGradeError.
         """
-        super(ProgramCourseGradeError, self).__init__(
+        super(ProgramCourseGradeError, self).__init__(  # lint-amnesty, pylint: disable=super-with-arguments
             program_course_enrollment
         )
         self.error = text_type(exception) if exception else "Unknown error"
