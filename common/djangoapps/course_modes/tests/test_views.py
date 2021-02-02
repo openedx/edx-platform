@@ -43,7 +43,7 @@ class CourseModeViewTest(CatalogIntegrationMixin, UrlResetMixin, ModuleStoreTest
 
     @patch.dict(settings.FEATURES, {'MODE_CREATION_FOR_TESTING': True})
     def setUp(self):
-        super(CourseModeViewTest, self).setUp()
+        super(CourseModeViewTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         now = datetime.now(pytz.utc)
         day = timedelta(days=1)
         tomorrow = now + day
@@ -517,7 +517,7 @@ class TrackSelectionEmbargoTest(UrlResetMixin, ModuleStoreTestCase):
 
     @patch.dict(settings.FEATURES, {'EMBARGO': True})
     def setUp(self):
-        super(TrackSelectionEmbargoTest, self).setUp()
+        super(TrackSelectionEmbargoTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
 
         # Create a course and course modes
         self.course = CourseFactory.create()

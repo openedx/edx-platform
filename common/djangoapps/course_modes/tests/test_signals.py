@@ -25,7 +25,7 @@ class CourseModeSignalTest(ModuleStoreTestCase):
     """
 
     def setUp(self):
-        super(CourseModeSignalTest, self).setUp()
+        super(CourseModeSignalTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.end = datetime.now(tz=UTC).replace(microsecond=0) + timedelta(days=7)
         self.course = CourseFactory.create(end=self.end)
         CourseMode.objects.all().delete()

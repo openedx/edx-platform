@@ -1,4 +1,4 @@
-
+  # lint-amnesty, pylint: disable=cyclic-import, missing-module-docstring
 
 import unittest
 
@@ -69,7 +69,7 @@ class ShortcutsTests(UrlResetMixin, TestCase):
                 self.assertTrue(is_any_marketing_link_set(['ABOUT', 'NOT_CONFIGURED']))
                 self.assertFalse(is_any_marketing_link_set(['NOT_CONFIGURED']))
 
-    def _get_test_url_name(self):
+    def _get_test_url_name(self):  # lint-amnesty, pylint: disable=missing-function-docstring
         if settings.ROOT_URLCONF == 'lms.urls':
             # return any lms url name
             return 'dashboard'
@@ -137,7 +137,7 @@ class MakoRequestContextTest(TestCase):
     """
 
     def setUp(self):
-        super(MakoRequestContextTest, self).setUp()
+        super(MakoRequestContextTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.user = UserFactory.create()
         self.url = "/"
         self.request = RequestFactory().get(self.url)

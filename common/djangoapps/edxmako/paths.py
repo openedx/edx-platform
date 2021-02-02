@@ -25,7 +25,7 @@ class TopLevelTemplateURI(six.text_type):
     to the URI should be looked up straight in the standard edx-platform location instead of trying to locate an
     overridding template in the current theme first.
     """
-    pass
+    pass  # lint-amnesty, pylint: disable=unnecessary-pass
 
 
 class DynamicTemplateLookup(TemplateLookup):
@@ -34,7 +34,7 @@ class DynamicTemplateLookup(TemplateLookup):
     for adding directories progressively.
     """
     def __init__(self, *args, **kwargs):
-        super(DynamicTemplateLookup, self).__init__(*args, **kwargs)
+        super(DynamicTemplateLookup, self).__init__(*args, **kwargs)  # lint-amnesty, pylint: disable=super-with-arguments
         self.__original_module_directory = self.template_args['module_directory']
 
     def __repr__(self):
@@ -74,7 +74,7 @@ class DynamicTemplateLookup(TemplateLookup):
         that template lookup skips the current theme and looks up the built-in template in standard locations.
         """
         # Make requested uri relative to the calling uri.
-        relative_uri = super(DynamicTemplateLookup, self).adjust_uri(uri, relativeto)
+        relative_uri = super(DynamicTemplateLookup, self).adjust_uri(uri, relativeto)  # lint-amnesty, pylint: disable=super-with-arguments
         # Is the calling template (relativeto) which is including or inheriting current template (uri)
         # located inside a theme?
         if relativeto != strip_site_theme_templates_path(relativeto):
@@ -99,7 +99,7 @@ class DynamicTemplateLookup(TemplateLookup):
         else:
             try:
                 # Try to find themed template, i.e. see if current theme overrides the template
-                template = super(DynamicTemplateLookup, self).get_template(get_template_path_with_theme(uri))
+                template = super(DynamicTemplateLookup, self).get_template(get_template_path_with_theme(uri))  # lint-amnesty, pylint: disable=super-with-arguments
             except TopLevelLookupException:
                 template = self._get_toplevel_template(uri)
 
@@ -110,7 +110,7 @@ class DynamicTemplateLookup(TemplateLookup):
         Lookup a default/toplevel template, ignoring current theme.
         """
         # Strip off the prefix path to theme and look in default template dirs.
-        return super(DynamicTemplateLookup, self).get_template(strip_site_theme_templates_path(uri))
+        return super(DynamicTemplateLookup, self).get_template(strip_site_theme_templates_path(uri))  # lint-amnesty, pylint: disable=super-with-arguments
 
 
 def clear_lookups(namespace):
