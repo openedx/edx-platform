@@ -118,13 +118,13 @@ class TestUserEnrollmentApi(UrlResetMixin, MobileAPITestCase, MobileAuthUserTest
 
     @patch.dict(settings.FEATURES, {"ENABLE_DISCUSSION_SERVICE": True})
     def setUp(self):
-        super(TestUserEnrollmentApi, self).setUp()
+        super(TestUserEnrollmentApi, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
 
     def verify_success(self, response):
         """
         Verifies user course enrollment response for success
         """
-        super(TestUserEnrollmentApi, self).verify_success(response)
+        super(TestUserEnrollmentApi, self).verify_success(response)  # lint-amnesty, pylint: disable=super-with-arguments
         courses = response.data
         self.assertEqual(len(courses), 1)
 
@@ -299,7 +299,7 @@ class TestUserEnrollmentApi(UrlResetMixin, MobileAPITestCase, MobileAuthUserTest
         self.create_enrollment(expired)
         return self.api_response(api_version=api_version).data
 
-    def _assert_enrollment_results(self, api_version, courses, num_courses_returned, gating_enabled=True):
+    def _assert_enrollment_results(self, api_version, courses, num_courses_returned, gating_enabled=True):  # lint-amnesty, pylint: disable=missing-function-docstring
         self.assertEqual(len(courses), num_courses_returned)
 
         if api_version == API_V05:
@@ -425,7 +425,7 @@ class CourseStatusAPITestCase(MobileAPITestCase):
         """
         Creates a basic course structure for our course
         """
-        super(CourseStatusAPITestCase, self).setUp()
+        super(CourseStatusAPITestCase, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
 
         self.section = ItemFactory.create(
             parent=self.course,
@@ -591,7 +591,7 @@ class TestCourseEnrollmentSerializer(MobileAPITestCase, MilestonesTestCaseMixin)
     ENABLED_SIGNALS = ['course_published']
 
     def setUp(self):
-        super(TestCourseEnrollmentSerializer, self).setUp()
+        super(TestCourseEnrollmentSerializer, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.login_and_enroll()
         self.request = RequestFactory().get('/')
         self.request.user = self.user
