@@ -11,10 +11,10 @@ import logging
 
 import six
 from django.conf import settings
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.serializers.json import DjangoJSONEncoder
-from django.db.models import Count, Q
+from django.db.models import Count, Q  # lint-amnesty, pylint: disable=unused-import
 from django.urls import reverse
 from edx_proctoring.api import get_exam_violation_report
 from opaque_keys.edx.keys import CourseKey, UsageKey
@@ -426,7 +426,7 @@ def course_registration_features(features, registration_codes, csv_type):
         site_name = configuration_helpers.get_value('SITE_NAME', settings.SITE_NAME)
         registration_features = [x for x in COURSE_REGISTRATION_FEATURES if x in features]
 
-        course_registration_dict = dict((feature, getattr(registration_code, feature)) for feature in registration_features)
+        course_registration_dict = dict((feature, getattr(registration_code, feature)) for feature in registration_features)  # lint-amnesty, pylint: disable=line-too-long
         course_registration_dict['company_name'] = None
         if registration_code.invoice_item:
             course_registration_dict['company_name'] = registration_code.invoice_item.invoice.company_name

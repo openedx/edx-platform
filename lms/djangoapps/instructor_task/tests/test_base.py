@@ -14,7 +14,7 @@ from uuid import uuid4
 import six
 import unicodecsv
 from celery.states import FAILURE, SUCCESS
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.urls import reverse
 from mock import Mock, patch
 from opaque_keys.edx.keys import CourseKey
@@ -55,7 +55,7 @@ class InstructorTaskTestCase(CacheIsolationTestCase):
     Tests API and view methods that involve the reporting of status for background tasks.
     """
     def setUp(self):
-        super(InstructorTaskTestCase, self).setUp()
+        super(InstructorTaskTestCase, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
 
         self.student = UserFactory.create(username="student", email="student@edx.org")
         self.instructor = UserFactory.create(username="instructor", email="instructor@edx.org")
@@ -314,7 +314,7 @@ class TestReportMixin(object):
             if os.path.exists(self.tmp_dir):
                 shutil.rmtree(self.tmp_dir)
 
-        super(TestReportMixin, self).setUp()
+        super(TestReportMixin, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
 
         # Ensure that working with the temp directories in tests is thread safe
         # by creating a unique temporary directory for each testcase.
@@ -356,7 +356,7 @@ class TestReportMixin(object):
         report_path = report_store.path_to(self.course.id, report_csv_filename)
         with report_store.storage.open(report_path) as csv_file:
             # Expand the dict reader generator so we don't lose it's content
-            csv_rows = [row for row in unicodecsv.DictReader(csv_file, encoding='utf-8-sig')]
+            csv_rows = [row for row in unicodecsv.DictReader(csv_file, encoding='utf-8-sig')]  # lint-amnesty, pylint: disable=unnecessary-comprehension
 
             if ignore_other_columns:
                 csv_rows = [

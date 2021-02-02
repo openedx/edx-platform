@@ -11,13 +11,13 @@ from time import time
 import re
 import six
 from lms.djangoapps.course_blocks.api import get_course_blocks
-from django.conf import settings
-from django.contrib.auth import get_user_model
-from lazy import lazy
-from opaque_keys.edx.keys import UsageKey
-from pytz import UTC
-from six import text_type
-from six.moves import zip, zip_longest
+from django.conf import settings  # lint-amnesty, pylint: disable=wrong-import-order
+from django.contrib.auth import get_user_model  # lint-amnesty, pylint: disable=wrong-import-order
+from lazy import lazy  # lint-amnesty, pylint: disable=wrong-import-order
+from opaque_keys.edx.keys import UsageKey  # lint-amnesty, pylint: disable=wrong-import-order
+from pytz import UTC  # lint-amnesty, pylint: disable=wrong-import-order
+from six import text_type  # lint-amnesty, pylint: disable=wrong-import-order
+from six.moves import zip, zip_longest  # lint-amnesty, pylint: disable=wrong-import-order
 
 from common.djangoapps.course_modes.models import CourseMode
 from lms.djangoapps.certificates.models import CertificateWhitelist, GeneratedCertificate, certificate_info_for_user
@@ -371,7 +371,7 @@ class _CertificateBulkContext(object):
         }
 
 
-class _TeamBulkContext(object):
+class _TeamBulkContext(object):  # lint-amnesty, pylint: disable=missing-class-docstring
     def __init__(self, context, users):
         self.enabled = context.teams_enabled
         if self.enabled:
@@ -390,7 +390,7 @@ class _EnrollmentBulkContext(object):
         self.verified_users = set(IDVerificationService.get_verified_user_ids(users))
 
 
-class _CourseGradeBulkContext(object):
+class _CourseGradeBulkContext(object):  # lint-amnesty, pylint: disable=missing-class-docstring
     def __init__(self, context, users):
         self.certs = _CertificateBulkContext(context, users)
         self.teams = _TeamBulkContext(context, users)
@@ -415,7 +415,7 @@ class CourseGradeReport(object):
         """
         with modulestore().bulk_operations(course_id):
             context = _CourseGradeReportContext(_xmodule_instance_args, _entry_id, course_id, _task_input, action_name)
-            return CourseGradeReport()._generate(context)
+            return CourseGradeReport()._generate(context)  # lint-amnesty, pylint: disable=protected-access
 
     def _generate(self, context):
         """
@@ -604,7 +604,7 @@ class CourseGradeReport(object):
             subsection_grades.append(subsection_grade)
         return subsection_grades, grade_results
 
-    def _user_assignment_average(self, course_grade, subsection_grades, assignment_info):
+    def _user_assignment_average(self, course_grade, subsection_grades, assignment_info):  # lint-amnesty, pylint: disable=missing-function-docstring
         if assignment_info['separate_subsection_avg_headers']:
             if assignment_info['grader']:
                 if course_grade.attempted:
@@ -902,7 +902,7 @@ class ProblemResponses(object):
         student_data_keys = OrderedDict()
 
         with store.bulk_operations(course_key):
-            for usage_key in usage_keys:
+            for usage_key in usage_keys:  # lint-amnesty, pylint: disable=too-many-nested-blocks
                 if max_count is not None and max_count <= 0:
                     break
                 course_blocks = get_course_blocks(user, usage_key)

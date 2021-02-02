@@ -18,10 +18,10 @@ class TestSubtasks(InstructorTaskCourseTestCase):
     """Tests for subtasks."""
 
     def setUp(self):
-        super(TestSubtasks, self).setUp()
+        super(TestSubtasks, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.initialize_course()
 
-    def _enroll_students_in_course(self, course_id, num_students):
+    def _enroll_students_in_course(self, course_id, num_students):  # lint-amnesty, pylint: disable=unused-argument
         """Create and enroll some students in the course."""
 
         for _ in range(num_students):

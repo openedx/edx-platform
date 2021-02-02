@@ -5,7 +5,7 @@ Instructor tasks related to certificates.
 
 from time import time
 
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.db.models import Q
 
 from lms.djangoapps.certificates.api import generate_user_certificates
