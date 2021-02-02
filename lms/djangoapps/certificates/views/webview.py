@@ -1,4 +1,4 @@
-  # lint-amnesty, pylint: disable=bad-continuation, bad-option-value
+# lint-amnesty, pylint: disable=bad-continuation, bad-option-value
 """
 Certificate HTML webview.
 """
