@@ -67,7 +67,7 @@ def track_memory_usage(metric, course_id):  # lint-amnesty, pylint: disable=unus
 
 
 def _generate_items_for_subtask(
-    item_querysets,  # lint-amnesty, pylint: disable=bad-continuation, bad-option-value
+    item_querysets,  # lint-amnesty, # pylint: disable=bad-option-value
     item_fields,
     total_num_items,
     items_per_task,
@@ -273,7 +273,7 @@ def initialize_subtask_info(entry, action_name, total_num, subtask_id_list):
     return task_progress
 
 
-# lint-amnesty, pylint: disable=bad-continuation, bad-option-value
+# lint-amnesty, # pylint: disable=bad-option-value
 def queue_subtasks_for_query(
     entry,
     action_name,
