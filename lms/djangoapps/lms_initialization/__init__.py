@@ -1,3 +1,4 @@
-"""  # lint-amnesty, pylint: disable=django-not-configured
+"""
+# lint-amnesty, pylint: disable=django-not-configured
 Initialization app for the LMS
 """
