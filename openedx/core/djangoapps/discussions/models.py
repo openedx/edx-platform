@@ -170,7 +170,7 @@ class DiscussionsConfiguration(TimeStampedModel):
             raise ValidationError('Context Key should be an existing learning context.')
 
     def __str__(self):
-        return "{context_key}: provider={provider} enabled={enabled}".format(
+        return "DiscussionsConfiguration(context_key='{context_key}', provider='{provider}', enabled={enabled})".format(
             context_key=self.context_key,
             provider=self.provider_type,
             enabled=self.enabled,
