@@ -6,7 +6,7 @@ which is currently use by ccx and instructor apps.
 
 import math
 
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.db import transaction
 from django.urls import reverse
 from django.views.decorators.cache import cache_control

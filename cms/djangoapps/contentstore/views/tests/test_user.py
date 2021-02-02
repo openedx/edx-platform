@@ -5,7 +5,7 @@ Tests for contentstore/views/user.py.
 
 import json
 
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 
 from cms.djangoapps.contentstore.tests.utils import CourseTestCase
 from cms.djangoapps.contentstore.utils import reverse_course_url
@@ -14,9 +14,9 @@ from common.djangoapps.student.models import CourseEnrollment
 from common.djangoapps.student.roles import CourseInstructorRole, CourseStaffRole
 
 
-class UsersTestCase(CourseTestCase):
+class UsersTestCase(CourseTestCase):  # lint-amnesty, pylint: disable=missing-class-docstring
     def setUp(self):
-        super(UsersTestCase, self).setUp()
+        super(UsersTestCase, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.ext_user = User.objects.create_user(
             "joe", "joe@comedycentral.com", "haha")
         self.ext_user.is_active = True

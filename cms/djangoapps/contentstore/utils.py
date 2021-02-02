@@ -99,7 +99,7 @@ def _remove_instructors(course_key):
 
     try:
         remove_all_instructors(course_key)
-    except Exception as err:
+    except Exception as err:  # lint-amnesty, pylint: disable=broad-except
         log.error(u"Error in deleting course groups for {0}: {1}".format(course_key, err))
 
 
@@ -191,7 +191,7 @@ def is_currently_visible_to_students(xblock):
         return False
 
     # Check start date
-    if 'detached' not in published._class_tags and published.start is not None:
+    if 'detached' not in published._class_tags and published.start is not None:  # lint-amnesty, pylint: disable=protected-access
         return datetime.now(UTC) > published.start
 
     # No start date, so it's always visible

@@ -174,7 +174,7 @@ class PureXBlock(XBlock):
     """
     Pure XBlock to use in tests.
     """
-    pass
+    pass  # lint-amnesty, pylint: disable=unnecessary-pass
 
 
 @ddt.ddt
@@ -186,7 +186,7 @@ class StudioXBlockServiceBindingTest(ModuleStoreTestCase):
         """
         Set up the user and request that will be used.
         """
-        super(StudioXBlockServiceBindingTest, self).setUp()
+        super(StudioXBlockServiceBindingTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.user = UserFactory()
         self.course = CourseFactory.create()
         self.request = mock.Mock()

@@ -28,7 +28,7 @@ class ExportAllCourses(ModuleStoreTestCase):
 
     def setUp(self):
         """ Common setup. """
-        super(ExportAllCourses, self).setUp()
+        super(ExportAllCourses, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.content_store = contentstore()
         # pylint: disable=protected-access
         self.module_store = modulestore()._get_modulestore_by_type(ModuleStoreEnum.Type.mongo)
@@ -56,7 +56,7 @@ class ExportAllCourses(ModuleStoreTestCase):
         # check that there are two assets ['example.txt', '.example.txt'] in contentstore for imported course
         all_assets, count = self.content_store.get_all_content_for_course(course.id)
         self.assertEqual(count, 2)
-        self.assertEqual(set([asset['_id']['name'] for asset in all_assets]), set([u'.example.txt', u'example.txt']))
+        self.assertEqual(set([asset['_id']['name'] for asset in all_assets]), set([u'.example.txt', u'example.txt']))  # lint-amnesty, pylint: disable=consider-using-set-comprehension
 
         # manually add redundant assets (file ".DS_Store" and filename starts with "._")
         course_filter = course.id.make_asset_key("asset", None)
@@ -72,11 +72,11 @@ class ExportAllCourses(ModuleStoreTestCase):
         all_assets, count = self.content_store.get_all_content_for_course(course.id)
         self.assertEqual(count, 4)
         self.assertEqual(
-            set([asset['_id']['name'] for asset in all_assets]),
+            set([asset['_id']['name'] for asset in all_assets]),  # lint-amnesty, pylint: disable=consider-using-set-comprehension
             set([u'.example.txt', u'example.txt', u'._example_test.txt', u'.DS_Store'])
         )
         # now call asset_cleanup command and check that there is only two proper assets in contentstore for the course
         call_command('cleanup_assets')
         all_assets, count = self.content_store.get_all_content_for_course(course.id)
         self.assertEqual(count, 2)
-        self.assertEqual(set([asset['_id']['name'] for asset in all_assets]), set([u'.example.txt', u'example.txt']))
+        self.assertEqual(set([asset['_id']['name'] for asset in all_assets]), set([u'.example.txt', u'example.txt']))  # lint-amnesty, pylint: disable=consider-using-set-comprehension

@@ -91,7 +91,7 @@ class AuthTestCase(ContentStoreTestCase):
     ENABLED_CACHES = ['default', 'mongo_metadata_inheritance', 'loc_cache']
 
     def setUp(self):
-        super(AuthTestCase, self).setUp()
+        super(AuthTestCase, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
 
         self.email = 'a@b.com'
         self.pw = 'xyz'
@@ -191,7 +191,7 @@ class ForumTestCase(CourseTestCase):
 
     def setUp(self):
         """ Creates the test course. """
-        super(ForumTestCase, self).setUp()
+        super(ForumTestCase, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.course = CourseFactory.create(org='testX', number='727', display_name='Forum Course')
 
     def set_blackout_dates(self, blackout_dates):
@@ -242,7 +242,7 @@ class CourseKeyVerificationTestCase(CourseTestCase):
         """
         Create test course.
         """
-        super(CourseKeyVerificationTestCase, self).setUp()
+        super(CourseKeyVerificationTestCase, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.course = CourseFactory.create(org='edX', number='test_course_key', display_name='Test Course')
 
     @data(('edX/test_course_key/Test_Course', 200), ('garbage:edX+test_course_key+Test_Course', 404))

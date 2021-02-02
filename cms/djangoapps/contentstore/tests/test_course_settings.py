@@ -100,7 +100,7 @@ class CourseAdvanceSettingViewTest(CourseTestCase, MilestonesTestCaseMixin):
     """
 
     def setUp(self):
-        super(CourseAdvanceSettingViewTest, self).setUp()
+        super(CourseAdvanceSettingViewTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.fullcourse = CourseFactory.create()
         self.course_setting_url = get_url(self.course.id, 'advanced_settings_handler')
 
@@ -916,7 +916,7 @@ class CourseMetadataEditingTest(CourseTestCase):
     """
 
     def setUp(self):
-        super(CourseMetadataEditingTest, self).setUp()
+        super(CourseMetadataEditingTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.fullcourse = CourseFactory.create()
         self.course_setting_url = get_url(self.course.id, 'advanced_settings_handler')
         self.fullcourse_setting_url = get_url(self.fullcourse.id, 'advanced_settings_handler')
@@ -1175,7 +1175,7 @@ class CourseMetadataEditingTest(CourseTestCase):
         self.assertEqual(len(errors), 3)
         self.assertFalse(test_model)
 
-        error_keys = set([error_obj['model']['display_name'] for error_obj in errors])
+        error_keys = set([error_obj['model']['display_name'] for error_obj in errors])  # lint-amnesty, pylint: disable=consider-using-set-comprehension
         test_keys = set(['Advanced Module List', 'Course Advertised Start Date', 'Days Early for Beta Users'])
         self.assertEqual(error_keys, test_keys)
 
@@ -1527,7 +1527,7 @@ class CourseGraderUpdatesTest(CourseTestCase):
 
     def setUp(self):
         """Compute the url to use in tests"""
-        super(CourseGraderUpdatesTest, self).setUp()
+        super(CourseGraderUpdatesTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.url = get_url(self.course.id, 'grading_handler')
         self.starting_graders = CourseGradingModel(self.course).graders
 
@@ -1625,7 +1625,7 @@ id=\"course-enrollment-end-time\" value=\"\" placeholder=\"HH:MM\" autocomplete=
         """
         Initialize course used to test enrollment fields.
         """
-        super(CourseEnrollmentEndFieldTest, self).setUp()
+        super(CourseEnrollmentEndFieldTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.course = CourseFactory.create(org='edX', number='dummy', display_name='Marketing Site Course')
         self.course_details_url = reverse_course_url('settings_handler', six.text_type(self.course.id))
 

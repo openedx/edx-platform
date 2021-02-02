@@ -1,4 +1,4 @@
-
+# lint-amnesty, pylint: disable=missing-module-docstring
 
 import logging
 from functools import partial
@@ -74,11 +74,11 @@ def preview_handler(request, usage_key_string, handler, suffix=''):
 
     except NoSuchHandlerError:
         log.exception(u"XBlock %s attempted to access missing handler %r", instance, handler)
-        raise Http404
+        raise Http404  # lint-amnesty, pylint: disable=raise-missing-from
 
     except NotFoundError:
         log.exception("Module indicating to user that request doesn't exist")
-        raise Http404
+        raise Http404  # lint-amnesty, pylint: disable=raise-missing-from
 
     except ProcessingError:
         log.warning("Module raised an error while processing AJAX request",
@@ -121,7 +121,7 @@ class PreviewModuleSystem(ModuleSystem):  # pylint: disable=abstract-method
         # (see https://openedx.atlassian.net/browse/TE-811)
         return [
             aside_type
-            for aside_type in super(PreviewModuleSystem, self).applicable_aside_types(block)
+            for aside_type in super(PreviewModuleSystem, self).applicable_aside_types(block)  # lint-amnesty, pylint: disable=super-with-arguments
             if aside_type != 'acid_aside'
         ]
 
@@ -285,7 +285,7 @@ def _studio_wrap_xblock(xblock, view, frag, context, display_name_only=False):
         is_reorderable = _is_xblock_reorderable(xblock, context)
         selected_groups_label = get_visibility_partition_info(xblock)['selected_groups_label']
         if selected_groups_label:
-            selected_groups_label = _(u'Access restricted to: {list_of_groups}').format(list_of_groups=selected_groups_label)
+            selected_groups_label = _(u'Access restricted to: {list_of_groups}').format(list_of_groups=selected_groups_label)  # lint-amnesty, pylint: disable=line-too-long
         course = modulestore().get_course(xblock.location.course_key)
         template_context = {
             'xblock_context': context,

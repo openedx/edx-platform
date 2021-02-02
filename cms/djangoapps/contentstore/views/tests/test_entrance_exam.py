@@ -7,7 +7,7 @@ import json
 
 import six
 from django.conf import settings
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.test.client import RequestFactory
 from milestones.tests.utils import MilestonesTestCaseMixin
 from mock import patch
@@ -40,7 +40,7 @@ class EntranceExamHandlerTests(CourseTestCase, MilestonesTestCaseMixin):
         """
         Shared scaffolding for individual test runs
         """
-        super(EntranceExamHandlerTests, self).setUp()
+        super(EntranceExamHandlerTests, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.course_key = self.course.id
         self.usage_key = self.course.location
         self.course_url = '/course/{}'.format(six.text_type(self.course.id))

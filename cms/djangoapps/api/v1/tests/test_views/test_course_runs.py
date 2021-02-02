@@ -8,7 +8,7 @@ import pytz
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import RequestFactory, override_settings
 from django.urls import reverse
-from mock import patch
+from mock import patch  # lint-amnesty, pylint: disable=unused-import
 from opaque_keys.edx.keys import CourseKey
 from organizations.api import add_organization, get_course_organizations
 from rest_framework.test import APIClient
@@ -35,7 +35,7 @@ class CourseRunViewSetTests(ModuleStoreTestCase):
     list_url = reverse('api:v1:course_run-list')
 
     def setUp(self):
-        super(CourseRunViewSetTests, self).setUp()
+        super(CourseRunViewSetTests, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.client = APIClient()
         user = AdminFactory()
         self.client.login(username=user.username, password=TEST_PASSWORD)
@@ -331,7 +331,7 @@ class CourseRunViewSetTests(ModuleStoreTestCase):
         original_course_run = ToyCourseFactory()
         add_organization({
             'name': 'Test Organization',
-            'short_name': original_course_run.id.org,
+            'short_name': original_course_run.id.org,  # lint-amnesty, pylint: disable=no-member
             'description': 'Testing Organization Description',
         })
         start = datetime.datetime.now(pytz.UTC).replace(microsecond=0)
@@ -339,7 +339,7 @@ class CourseRunViewSetTests(ModuleStoreTestCase):
         user = UserFactory()
         role = 'instructor'
         run = '3T2017'
-        url = reverse('api:v1:course_run-rerun', kwargs={'pk': str(original_course_run.id)})
+        url = reverse('api:v1:course_run-rerun', kwargs={'pk': str(original_course_run.id)})  # lint-amnesty, pylint: disable=no-member
         data = {
             'run': run,
             'schedule': {
@@ -369,16 +369,16 @@ class CourseRunViewSetTests(ModuleStoreTestCase):
 
         if number:
             assert course_run.id.course == number
-            assert course_run.id.course != original_course_run.id.course
+            assert course_run.id.course != original_course_run.id.course  # lint-amnesty, pylint: disable=no-member
         else:
-            assert course_run.id.course == original_course_run.id.course
+            assert course_run.id.course == original_course_run.id.course  # lint-amnesty, pylint: disable=no-member
 
         self.assert_course_run_schedule(course_run, start, end)
         self.assert_access_role(course_run, user, role)
         self.assert_course_access_role_count(course_run, 1)
         course_orgs = get_course_organizations(course_run_key)
         self.assertEqual(len(course_orgs), 1)
-        self.assertEqual(course_orgs[0]['short_name'], original_course_run.id.org)
+        self.assertEqual(course_orgs[0]['short_name'], original_course_run.id.org)  # lint-amnesty, pylint: disable=no-member
 
     def test_rerun_duplicate_run(self):
         course_run = ToyCourseFactory()

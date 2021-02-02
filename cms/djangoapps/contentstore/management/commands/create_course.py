@@ -5,7 +5,7 @@ Django management command to create a course in a specific modulestore
 
 from datetime import datetime, timedelta
 
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.core.management.base import BaseCommand, CommandError
 from six import text_type
 
@@ -53,7 +53,7 @@ class Command(BaseCommand):
         try:
             user_object = user_from_str(user)
         except User.DoesNotExist:
-            raise CommandError(u"No user {user} found.".format(user=user))
+            raise CommandError(u"No user {user} found.".format(user=user))  # lint-amnesty, pylint: disable=raise-missing-from
         return user_object
 
     def handle(self, *args, **options):
