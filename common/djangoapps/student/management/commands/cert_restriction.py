@@ -1,4 +1,4 @@
-
+  # lint-amnesty, pylint: disable=missing-module-docstring
 
 import csv
 import os
@@ -8,7 +8,7 @@ from django.core.management.base import BaseCommand, CommandError
 from common.djangoapps.student.models import UserProfile
 
 
-class Command(BaseCommand):
+class Command(BaseCommand):  # lint-amnesty, pylint: disable=missing-class-docstring
     help = """
     Sets or gets certificate restrictions for users
     from embargoed countries. (allow_certificate in

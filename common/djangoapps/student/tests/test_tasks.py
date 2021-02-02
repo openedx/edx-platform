@@ -21,7 +21,7 @@ class SendActivationEmailTestCase(TestCase):
     """
     def setUp(self):
         """ Setup components used by each test."""
-        super(SendActivationEmailTestCase, self).setUp()
+        super(SendActivationEmailTestCase, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.student = UserFactory()
 
         registration = Registration()
@@ -45,7 +45,7 @@ class SendActivationEmailTestCase(TestCase):
 
     @mock.patch('time.sleep', mock.Mock(return_value=None))
     @mock.patch('common.djangoapps.student.tasks.log')
-    @mock.patch('common.djangoapps.student.tasks.ace.send', mock.Mock(side_effect=RecoverableChannelDeliveryError(None, None)))
+    @mock.patch('common.djangoapps.student.tasks.ace.send', mock.Mock(side_effect=RecoverableChannelDeliveryError(None, None)))  # lint-amnesty, pylint: disable=line-too-long
     def test_RetrySendUntilFail(self, mock_log):
         """
         Tests retries when the activation email doesn't send

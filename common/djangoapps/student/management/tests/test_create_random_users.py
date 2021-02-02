@@ -19,7 +19,7 @@ class CreateRandomUserTests(SharedModuleStoreTestCase):
     Test creating random users via command line, with various options
     """
     def setUp(self):
-        super(CreateRandomUserTests, self).setUp()
+        super(CreateRandomUserTests, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.course = CourseFactory.create()
         self.user_model = get_user_model()
         self.num_users_start = len(self.user_model.objects.all())

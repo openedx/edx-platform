@@ -18,7 +18,7 @@ class UserStandingTest(TestCase):
     """test suite for user standing view for enabling and disabling accounts"""
 
     def setUp(self):
-        super(UserStandingTest, self).setUp()
+        super(UserStandingTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         # create users
         self.bad_user = UserFactory.create(
             username='bad_user',
@@ -72,7 +72,7 @@ class UserStandingTest(TestCase):
         self.assertEqual(
             UserStanding.objects.filter(user=self.good_user).count(), 0
         )
-        response = self.admin_client.post(reverse('disable_account_ajax'), {
+        response = self.admin_client.post(reverse('disable_account_ajax'), {  # lint-amnesty, pylint: disable=unused-variable
             'username': self.good_user.username,
             'account_action': 'disable',
         })
@@ -87,7 +87,7 @@ class UserStandingTest(TestCase):
 
     @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
     def test_reenable_account(self):
-        response = self.admin_client.post(reverse('disable_account_ajax'), {
+        response = self.admin_client.post(reverse('disable_account_ajax'), {  # lint-amnesty, pylint: disable=unused-variable
             'username': self.bad_user.username,
             'account_action': 'reenable'
         })

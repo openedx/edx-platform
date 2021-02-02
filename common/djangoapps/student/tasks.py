@@ -8,7 +8,7 @@ import logging
 from celery.exceptions import MaxRetriesExceededError
 from celery import shared_task
 from django.conf import settings
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.contrib.sites.models import Site
 from edx_ace import ace
 from edx_ace.errors import RecoverableChannelDeliveryError
@@ -66,4 +66,4 @@ def send_activation_email(self, msg_string, from_address=None):
             from_address,
             dest_addr,
         )
-        raise Exception
+        raise Exception  # lint-amnesty, pylint: disable=raise-missing-from

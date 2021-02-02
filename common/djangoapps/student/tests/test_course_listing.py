@@ -13,7 +13,7 @@ from django.test.client import Client
 from milestones.tests.utils import MilestonesTestCaseMixin
 
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
-from common.djangoapps.student.models import CourseEnrollment, DashboardConfiguration
+from common.djangoapps.student.models import CourseEnrollment, DashboardConfiguration  # lint-amnesty, pylint: disable=unused-import
 from common.djangoapps.student.roles import GlobalStaff
 from common.djangoapps.student.tests.factories import UserFactory
 from common.djangoapps.student.views import get_course_enrollments
@@ -35,7 +35,7 @@ class TestCourseListing(ModuleStoreTestCase, MilestonesTestCaseMixin):
         """
         Add a student & teacher
         """
-        super(TestCourseListing, self).setUp()
+        super(TestCourseListing, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
 
         self.student = UserFactory()
         self.teacher = UserFactory()
@@ -65,7 +65,7 @@ class TestCourseListing(ModuleStoreTestCase, MilestonesTestCaseMixin):
         Reverse the setup
         """
         self.client.logout()
-        super(TestCourseListing, self).tearDown()
+        super(TestCourseListing, self).tearDown()  # lint-amnesty, pylint: disable=super-with-arguments
 
     @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
     def test_get_course_list(self):
@@ -125,7 +125,7 @@ class TestCourseListing(ModuleStoreTestCase, MilestonesTestCaseMixin):
         Create good courses, courses that won't load, and deleted courses which still have
         roles. Test course listing.
         """
-        mongo_store = modulestore()._get_modulestore_by_type(ModuleStoreEnum.Type.mongo)
+        mongo_store = modulestore()._get_modulestore_by_type(ModuleStoreEnum.Type.mongo)  # lint-amnesty, pylint: disable=protected-access
 
         good_location = mongo_store.make_course_key('testOrg', 'testCourse', 'RunBabyRun')
         self._create_course_with_access_groups(good_location, default_store=ModuleStoreEnum.Type.mongo)

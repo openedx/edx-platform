@@ -24,7 +24,7 @@ class ChangeEligibilityDeadlineTests(SharedModuleStoreTestCase):
 
     def setUp(self):
         """ Initial set up for tests """
-        super(ChangeEligibilityDeadlineTests, self).setUp()
+        super(ChangeEligibilityDeadlineTests, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.course = CourseFactory.create()
 
         self.enrolled_user = UserFactory.create(username='amy', email='amy@pond.com', password='password')

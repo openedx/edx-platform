@@ -15,8 +15,8 @@ from pytz import UTC
 from six.moves import range, zip
 
 from common.test.utils import XssTestMixin
-from common.djangoapps.course_modes.tests.factories import CourseModeFactory
-from openedx.core.djangoapps.site_configuration.tests.test_util import with_site_configuration_context
+from common.djangoapps.course_modes.tests.factories import CourseModeFactory  # lint-amnesty, pylint: disable=unused-import
+from openedx.core.djangoapps.site_configuration.tests.test_util import with_site_configuration_context  # lint-amnesty, pylint: disable=unused-import
 from common.djangoapps.student.models import CourseEnrollment, DashboardConfiguration
 from common.djangoapps.student.tests.factories import UserFactory
 from common.djangoapps.student.views import get_course_enrollments
@@ -37,7 +37,7 @@ class TestRecentEnrollments(ModuleStoreTestCase, XssTestMixin):
         """
         Add a student
         """
-        super(TestRecentEnrollments, self).setUp()
+        super(TestRecentEnrollments, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.student = UserFactory()
         self.student.set_password(self.PASSWORD)
         self.student.save()
@@ -159,7 +159,7 @@ class TestRecentEnrollments(ModuleStoreTestCase, XssTestMixin):
             'Course2',
             'Run2'
         )
-        course, _ = self._create_course_and_enrollment(course_location)
+        course, _ = self._create_course_and_enrollment(course_location)  # lint-amnesty, pylint: disable=unused-variable
 
         self.client.login(username=self.student.username, password=self.PASSWORD)
         response = self.client.get(reverse("dashboard"))

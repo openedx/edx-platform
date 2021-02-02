@@ -1,4 +1,4 @@
-# coding=utf-8
+# coding=utf-8  # lint-amnesty, pylint: disable=missing-module-docstring
 
 
 import json
@@ -7,7 +7,7 @@ import unittest
 import ddt
 import six
 from django.conf import settings
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.core import mail
 from django.db import transaction
 from django.http import HttpResponse
@@ -18,15 +18,15 @@ from django.utils.html import escape
 from mock import Mock, patch
 from six import text_type
 
-from common.djangoapps.edxmako.shortcuts import marketing_link, render_to_string
+from common.djangoapps.edxmako.shortcuts import marketing_link, render_to_string  # lint-amnesty, pylint: disable=unused-import
 from openedx.core.djangoapps.ace_common.tests.mixins import EmailTemplateTagMixin
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.theming.tests.test_util import with_comprehensive_theme
 from openedx.core.djangolib.testing.utils import CacheIsolationMixin, CacheIsolationTestCase
-from openedx.core.lib.request_utils import safe_get_host
+from openedx.core.lib.request_utils import safe_get_host  # lint-amnesty, pylint: disable=unused-import
 from common.djangoapps.student.models import PendingEmailChange, Registration, UserProfile
 from common.djangoapps.student.tests.factories import PendingEmailChangeFactory, UserFactory
-from common.djangoapps.student.views import (
+from common.djangoapps.student.views import (  # lint-amnesty, pylint: disable=unused-import
     SETTING_CHANGE_INITIATED,
     confirm_email_change,
     do_email_change_request,
@@ -41,7 +41,7 @@ class TestException(Exception):
     """
     Exception used for testing that nothing will catch explicitly
     """
-    pass
+    pass  # lint-amnesty, pylint: disable=unnecessary-pass
 
 
 def mock_render_to_string(template_name, context):
@@ -222,7 +222,7 @@ class EmailChangeRequestTests(EventTestMixin, EmailTemplateTagMixin, CacheIsolat
     """
 
     def setUp(self, tracker='common.djangoapps.student.views.management.tracker'):
-        super(EmailChangeRequestTests, self).setUp(tracker)
+        super(EmailChangeRequestTests, self).setUp(tracker)  # lint-amnesty, pylint: disable=super-with-arguments
         self.user = UserFactory.create()
         self.new_email = 'new.email@edx.org'
         self.req_factory = RequestFactory()
@@ -257,7 +257,7 @@ class EmailChangeRequestTests(EventTestMixin, EmailTemplateTagMixin, CacheIsolat
         self.assertEqual(expected_error, response_data['error'])
         self.assertFalse(self.user.email_user.called)
 
-    @patch('common.djangoapps.student.views.management.render_to_string', Mock(side_effect=mock_render_to_string, autospec=True))
+    @patch('common.djangoapps.student.views.management.render_to_string', Mock(side_effect=mock_render_to_string, autospec=True))  # lint-amnesty, pylint: disable=line-too-long
     def test_duplicate_activation_key(self):
         """
         Assert that if two users change Email address simultaneously, no error is thrown
@@ -346,14 +346,14 @@ class EmailChangeRequestTests(EventTestMixin, EmailTemplateTagMixin, CacheIsolat
 
 
 @ddt.ddt
-@patch('common.djangoapps.student.views.management.render_to_response', Mock(side_effect=mock_render_to_response, autospec=True))
-@patch('common.djangoapps.student.views.management.render_to_string', Mock(side_effect=mock_render_to_string, autospec=True))
+@patch('common.djangoapps.student.views.management.render_to_response', Mock(side_effect=mock_render_to_response, autospec=True))  # lint-amnesty, pylint: disable=line-too-long
+@patch('common.djangoapps.student.views.management.render_to_string', Mock(side_effect=mock_render_to_string, autospec=True))  # lint-amnesty, pylint: disable=line-too-long
 class EmailChangeConfirmationTests(EmailTestMixin, EmailTemplateTagMixin, CacheIsolationMixin, TransactionTestCase):
     """
     Test that confirmation of email change requests function even in the face of exceptions thrown while sending email
     """
     def setUp(self):
-        super(EmailChangeConfirmationTests, self).setUp()
+        super(EmailChangeConfirmationTests, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.clear_caches()
         self.addCleanup(self.clear_caches)
         self.user = UserFactory.create()
@@ -530,7 +530,7 @@ class SecondaryEmailChangeRequestTests(EventTestMixin, EmailTemplateTagMixin, Ca
     """
 
     def setUp(self, tracker='common.djangoapps.student.views.management.tracker'):
-        super(SecondaryEmailChangeRequestTests, self).setUp(tracker)
+        super(SecondaryEmailChangeRequestTests, self).setUp(tracker)  # lint-amnesty, pylint: disable=super-with-arguments
         self.user = UserFactory.create()
         self.new_secondary_email = 'new.secondary.email@edx.org'
         self.req_factory = RequestFactory()

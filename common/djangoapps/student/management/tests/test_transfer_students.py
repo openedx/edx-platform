@@ -35,11 +35,11 @@ class TestTransferStudents(ModuleStoreTestCase):
     PASSWORD = 'test'
     signal_fired = False
 
-    def setUp(self, **kwargs):
+    def setUp(self, **kwargs):  # lint-amnesty, pylint: disable=unused-argument
         """
         Connect a stub receiver, and analytics event tracking.
         """
-        super(TestTransferStudents, self).setUp()
+        super(TestTransferStudents, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
 
         UNENROLL_DONE.connect(self.assert_unenroll_signal)
         patcher = patch('common.djangoapps.student.models.tracker')
@@ -141,7 +141,7 @@ class TestTransferStudents(ModuleStoreTestCase):
             run=course_location.run
         )
 
-    def _create_and_purchase_verified(self, student, course_id):
+    def _create_and_purchase_verified(self, student, course_id):  # lint-amnesty, pylint: disable=unused-argument
         """
         Creates a verified mode for the course and purchases it for the student.
         """

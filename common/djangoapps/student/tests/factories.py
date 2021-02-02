@@ -32,7 +32,7 @@ from common.djangoapps.student.models import (
 TEST_PASSWORD = 'test'
 
 
-class GroupFactory(DjangoModelFactory):
+class GroupFactory(DjangoModelFactory):  # lint-amnesty, pylint: disable=missing-class-docstring
     class Meta(object):
         model = Group
         django_get_or_create = ('name', )
@@ -40,7 +40,7 @@ class GroupFactory(DjangoModelFactory):
     name = factory.Sequence(u'group{0}'.format)
 
 
-class UserStandingFactory(DjangoModelFactory):
+class UserStandingFactory(DjangoModelFactory):  # lint-amnesty, pylint: disable=missing-class-docstring
     class Meta(object):
         model = UserStanding
 
@@ -49,7 +49,7 @@ class UserStandingFactory(DjangoModelFactory):
     changed_by = None
 
 
-class UserProfileFactory(DjangoModelFactory):
+class UserProfileFactory(DjangoModelFactory):  # lint-amnesty, pylint: disable=missing-class-docstring
     class Meta(object):
         model = UserProfile
         django_get_or_create = ('user', )
@@ -63,7 +63,7 @@ class UserProfileFactory(DjangoModelFactory):
     allow_certificate = True
 
 
-class RegistrationFactory(DjangoModelFactory):
+class RegistrationFactory(DjangoModelFactory):  # lint-amnesty, pylint: disable=missing-class-docstring
     class Meta(object):
         model = Registration
 
@@ -71,7 +71,7 @@ class RegistrationFactory(DjangoModelFactory):
     activation_key = six.text_type(uuid4().hex)
 
 
-class UserFactory(DjangoModelFactory):
+class UserFactory(DjangoModelFactory):  # lint-amnesty, pylint: disable=missing-class-docstring
     class Meta(object):
         model = User
         django_get_or_create = ('email', 'username')
@@ -100,7 +100,7 @@ class UserFactory(DjangoModelFactory):
             return None
 
     @factory.post_generation
-    def groups(self, create, extracted, **kwargs):
+    def groups(self, create, extracted, **kwargs):  # lint-amnesty, pylint: disable=missing-function-docstring, unused-argument
         if extracted is None:
             return
 
@@ -108,7 +108,7 @@ class UserFactory(DjangoModelFactory):
             extracted = [extracted]
 
         for group_name in extracted:
-            self.groups.add(GroupFactory.simple_generate(create, name=group_name))
+            self.groups.add(GroupFactory.simple_generate(create, name=group_name))  # lint-amnesty, pylint: disable=no-member
 
 
 class AnonymousUserFactory(factory.Factory):
@@ -124,7 +124,7 @@ class SuperuserFactory(UserFactory):
     is_superuser = True
 
 
-class CourseEnrollmentFactory(DjangoModelFactory):
+class CourseEnrollmentFactory(DjangoModelFactory):  # lint-amnesty, pylint: disable=missing-class-docstring
     class Meta(object):
         model = CourseEnrollment
 
@@ -173,7 +173,7 @@ class CourseEnrollmentCelebrationFactory(DjangoModelFactory):
     enrollment = factory.SubFactory(CourseEnrollmentFactory)
 
 
-class CourseAccessRoleFactory(DjangoModelFactory):
+class CourseAccessRoleFactory(DjangoModelFactory):  # lint-amnesty, pylint: disable=missing-class-docstring
     class Meta(object):
         model = CourseAccessRole
 
@@ -182,7 +182,7 @@ class CourseAccessRoleFactory(DjangoModelFactory):
     role = 'TestRole'
 
 
-class CourseEnrollmentAllowedFactory(DjangoModelFactory):
+class CourseEnrollmentAllowedFactory(DjangoModelFactory):  # lint-amnesty, pylint: disable=missing-class-docstring
     class Meta(object):
         model = CourseEnrollmentAllowed
 
@@ -212,7 +212,7 @@ class ContentTypeFactory(DjangoModelFactory):
     app_label = factory.Faker('app_name')
 
 
-class PermissionFactory(DjangoModelFactory):
+class PermissionFactory(DjangoModelFactory):  # lint-amnesty, pylint: disable=missing-class-docstring
     class Meta(object):
         model = Permission
 
@@ -220,7 +220,7 @@ class PermissionFactory(DjangoModelFactory):
     content_type = factory.SubFactory(ContentTypeFactory)
 
 
-class AccountRecoveryFactory(DjangoModelFactory):
+class AccountRecoveryFactory(DjangoModelFactory):  # lint-amnesty, pylint: disable=missing-class-docstring
     class Meta(object):
         model = AccountRecovery
         django_get_or_create = ('user',)

@@ -19,7 +19,7 @@ LOGGER_NAME = 'common.djangoapps.student.management.commands.bulk_unenroll'
 class BulkUnenrollTests(SharedModuleStoreTestCase):
     """Test Bulk un-enroll command works fine for all test cases."""
     def setUp(self):
-        super(BulkUnenrollTests, self).setUp()
+        super(BulkUnenrollTests, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.course = CourseFactory.create()
         self.audit_mode = CourseModeFactory.create(
             course_id=self.course.id,

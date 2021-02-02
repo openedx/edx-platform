@@ -1,10 +1,10 @@
-import datetime
+import datetime  # lint-amnesty, pylint: disable=missing-module-docstring
 import hashlib
 
 import ddt
 import factory
 import pytz
-from django.contrib.auth.models import AnonymousUser, User
+from django.contrib.auth.models import AnonymousUser, User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.core.cache import cache
 from django.db.models import signals
 from django.db.models.functions import Lower
@@ -33,14 +33,14 @@ from xmodule.modulestore.tests.factories import CourseFactory
 
 
 @ddt.ddt
-class CourseEnrollmentTests(SharedModuleStoreTestCase):
+class CourseEnrollmentTests(SharedModuleStoreTestCase):  # lint-amnesty, pylint: disable=missing-class-docstring
     @classmethod
     def setUpClass(cls):
         super(CourseEnrollmentTests, cls).setUpClass()
         cls.course = CourseFactory()
 
     def setUp(self):
-        super(CourseEnrollmentTests, self).setUp()
+        super(CourseEnrollmentTests, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.user = UserFactory()
         self.user_2 = UserFactory()
 
@@ -59,7 +59,7 @@ class CourseEnrollmentTests(SharedModuleStoreTestCase):
         self.assertIsNone(CourseEnrollment.generate_enrollment_status_hash(AnonymousUser()))
 
         # No enrollments
-        expected = hashlib.md5(self.user.username.encode('utf-8')).hexdigest()
+        expected = hashlib.md5(self.user.username.encode('utf-8')).hexdigest()  # lint-amnesty, pylint: disable=no-member
         self.assertEqual(CourseEnrollment.generate_enrollment_status_hash(self.user), expected)
         self.assert_enrollment_status_hash_cached(self.user, expected)
 
@@ -108,20 +108,20 @@ class CourseEnrollmentTests(SharedModuleStoreTestCase):
     def test_users_enrolled_in_active_only(self):
         """CourseEnrollment.users_enrolled_in should return only Users with active enrollments when
         `include_inactive` has its default value (False)."""
-        CourseEnrollmentFactory.create(user=self.user, course_id=self.course.id, is_active=True)
-        CourseEnrollmentFactory.create(user=self.user_2, course_id=self.course.id, is_active=False)
+        CourseEnrollmentFactory.create(user=self.user, course_id=self.course.id, is_active=True)  # lint-amnesty, pylint: disable=no-member
+        CourseEnrollmentFactory.create(user=self.user_2, course_id=self.course.id, is_active=False)  # lint-amnesty, pylint: disable=no-member
 
-        active_enrolled_users = list(CourseEnrollment.objects.users_enrolled_in(self.course.id))
+        active_enrolled_users = list(CourseEnrollment.objects.users_enrolled_in(self.course.id))  # lint-amnesty, pylint: disable=no-member
         self.assertEqual([self.user], active_enrolled_users)
 
     def test_users_enrolled_in_all(self):
         """CourseEnrollment.users_enrolled_in should return active and inactive users when
         `include_inactive` is True."""
-        CourseEnrollmentFactory.create(user=self.user, course_id=self.course.id, is_active=True)
-        CourseEnrollmentFactory.create(user=self.user_2, course_id=self.course.id, is_active=False)
+        CourseEnrollmentFactory.create(user=self.user, course_id=self.course.id, is_active=True)  # lint-amnesty, pylint: disable=no-member
+        CourseEnrollmentFactory.create(user=self.user_2, course_id=self.course.id, is_active=False)  # lint-amnesty, pylint: disable=no-member
 
         all_enrolled_users = list(
-            CourseEnrollment.objects.users_enrolled_in(self.course.id, include_inactive=True)
+            CourseEnrollment.objects.users_enrolled_in(self.course.id, include_inactive=True)  # lint-amnesty, pylint: disable=no-member
         )
         self.assertListEqual([self.user, self.user_2], all_enrolled_users)
 
@@ -169,7 +169,7 @@ class CourseEnrollmentTests(SharedModuleStoreTestCase):
     @ddt.data(*(set(CourseMode.ALL_MODES) - set(CourseMode.AUDIT_MODES)))
     def test_upgrade_deadline_for_non_upgradeable_enrollment(self, mode):
         """ The property should return None if an upgrade cannot be upgraded. """
-        enrollment = CourseEnrollmentFactory(course_id=self.course.id, mode=mode)
+        enrollment = CourseEnrollmentFactory(course_id=self.course.id, mode=mode)  # lint-amnesty, pylint: disable=no-member
         self.assertIsNone(enrollment.upgrade_deadline)
 
     @skip_unless_lms
@@ -253,7 +253,7 @@ class PendingNameChangeTests(SharedModuleStoreTestCase):
         cls.user = UserFactory()
         cls.user2 = UserFactory()
 
-    def setUp(self):
+    def setUp(self):  # lint-amnesty, pylint: disable=super-method-not-called
         self.name_change, _ = PendingNameChange.objects.get_or_create(
             user=self.user,
             new_name='New Name PII',
@@ -282,7 +282,7 @@ class PendingEmailChangeTests(SharedModuleStoreTestCase):
         cls.user = UserFactory()
         cls.user2 = UserFactory()
 
-    def setUp(self):
+    def setUp(self):  # lint-amnesty, pylint: disable=super-method-not-called
         self.email_change, _ = PendingEmailChange.objects.get_or_create(
             user=self.user,
             new_email='new@example.com',
@@ -300,10 +300,10 @@ class PendingEmailChangeTests(SharedModuleStoreTestCase):
         self.assertEqual(1, len(PendingEmailChange.objects.all()))
 
 
-class TestCourseEnrollmentAllowed(TestCase):
+class TestCourseEnrollmentAllowed(TestCase):  # lint-amnesty, pylint: disable=missing-class-docstring
 
     def setUp(self):
-        super(TestCourseEnrollmentAllowed, self).setUp()
+        super(TestCourseEnrollmentAllowed, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.email = 'learner@example.com'
         self.course_key = CourseKey.from_string("course-v1:edX+DemoX+Demo_Course")
         self.user = UserFactory.create()
@@ -354,8 +354,8 @@ class TestManualEnrollmentAudit(SharedModuleStoreTestCase):
         the enrolled_email and reason columns of each row associated with that
         enrollment.
         """
-        enrollment = CourseEnrollment.enroll(self.user, self.course.id)
-        other_enrollment = CourseEnrollment.enroll(self.user, self.other_course.id)
+        enrollment = CourseEnrollment.enroll(self.user, self.course.id)  # lint-amnesty, pylint: disable=no-member
+        other_enrollment = CourseEnrollment.enroll(self.user, self.other_course.id)  # lint-amnesty, pylint: disable=no-member
         ManualEnrollmentAudit.create_manual_enrollment_audit(
             self.instructor, self.user.email, ALLOWEDTOENROLL_TO_ENROLLED,
             'manually enrolling unenrolled user', enrollment
@@ -413,7 +413,7 @@ class TestUserPostSaveCallback(SharedModuleStoreTestCase):
     changing any existing course mode states.
     """
     def setUp(self):
-        super(TestUserPostSaveCallback, self).setUp()
+        super(TestUserPostSaveCallback, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.course = CourseFactory.create()
 
     @ddt.data(*(set(CourseMode.ALL_MODES) - set(CourseMode.AUDIT_MODES)))
