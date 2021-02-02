@@ -28,7 +28,7 @@ class ProgramEnrollmentModelTests(TestCase):
         """
         Set up the test data used in the specific tests
         """
-        super(ProgramEnrollmentModelTests, self).setUp()
+        super(ProgramEnrollmentModelTests, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.user = UserFactory(username="rocko")
         self.program_uuid = UUID("88888888-4444-2222-1111-000000000000")
         self.other_program_uuid = UUID("88888888-4444-3333-1111-000000000000")
@@ -124,7 +124,7 @@ class ProgramCourseEnrollmentModelTests(TestCase):
         """
         Set up test data
         """
-        super(ProgramCourseEnrollmentModelTests, self).setUp()
+        super(ProgramCourseEnrollmentModelTests, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         RequestCache.clear_all_namespaces()
         self.user = UserFactory(username="rocko")
         self.program_uuid = UUID("88888888-4444-2222-1111-000000000000")
@@ -216,7 +216,7 @@ class CourseAccessRoleAssignmentTests(TestCase):
     Tests for the CourseAccessRoleAssignment model.
     """
     def setUp(self):
-        super(CourseAccessRoleAssignmentTests, self).setUp()
+        super(CourseAccessRoleAssignmentTests, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.program_course_enrollment = ProgramCourseEnrollmentFactory()
         self.pending_role_assignment = CourseAccessRoleAssignmentFactory(
             enrollment=self.program_course_enrollment,
