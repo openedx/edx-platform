@@ -95,7 +95,7 @@ def get_secure_token_for_xblock_handler(user_id, block_key_str, time_idx=0):
 def _get_secure_token_for_xblock_handler(user_id, block_key_str, time_idx: int, hashing_key: str):
     """
     Internal function to extract repeating hashing steps which we
-    call mulitple times with different time_idx and hashing peppers.
+    call multiple times with different time_idx and hashing key.
     """
     TOKEN_PERIOD = 24 * 60 * 60 * 2  # These URLs are valid for 2-4 days
     # time_token is the number of time periods since unix epoch
