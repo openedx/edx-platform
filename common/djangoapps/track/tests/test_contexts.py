@@ -1,4 +1,4 @@
-from unittest import TestCase
+from unittest import TestCase  # lint-amnesty, pylint: disable=missing-module-docstring
 
 import ddt
 
@@ -6,7 +6,7 @@ from common.djangoapps.track import contexts
 
 
 @ddt.ddt
-class TestContexts(TestCase):
+class TestContexts(TestCase):  # lint-amnesty, pylint: disable=missing-class-docstring
 
     COURSE_ID = 'test/course_name/course_run'
     SPLIT_COURSE_ID = 'course-v1:test+course_name+course_run'

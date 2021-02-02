@@ -1,4 +1,4 @@
-
+  # lint-amnesty, pylint: disable=missing-module-docstring
 
 from django.conf import settings
 from django.test import TestCase
@@ -31,7 +31,7 @@ class TestTrackerInstantiation(TestCase):
     """Test that a helper function can instantiate backends from their name."""
     def setUp(self):
         # pylint: disable=protected-access
-        super(TestTrackerInstantiation, self).setUp()
+        super(TestTrackerInstantiation, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.get_backend = tracker._instantiate_backend_from_name
 
     def test_instatiate_backend(self):
@@ -100,7 +100,7 @@ class TestTrackerDjangoInstantiation(TestCase):
 
         self.assertEqual(len(backends), 1)
 
-    def _reload_backends(self):
+    def _reload_backends(self):  # lint-amnesty, pylint: disable=missing-function-docstring
         # pylint: disable=protected-access
 
         # Reset backends
@@ -109,9 +109,9 @@ class TestTrackerDjangoInstantiation(TestCase):
         return tracker.backends
 
 
-class DummyBackend(BaseBackend):
+class DummyBackend(BaseBackend):  # lint-amnesty, pylint: disable=missing-class-docstring
     def __init__(self, **options):
-        super(DummyBackend, self).__init__(**options)
+        super(DummyBackend, self).__init__(**options)  # lint-amnesty, pylint: disable=super-with-arguments
         self.flag = options.get('flag', False)
         self.count = 0
 
