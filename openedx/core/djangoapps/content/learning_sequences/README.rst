@@ -88,4 +88,4 @@ I want to pull data from ModuleStore or Block Structures.
 
 Making any synchronous calls to these systems will break the performance goals
 of this app. If you need data from these systems, please find a way to push that
-data into smaller mdoels at course publish time.
+data into smaller models at course publish time.
