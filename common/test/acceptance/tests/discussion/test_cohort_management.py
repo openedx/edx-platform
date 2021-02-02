@@ -24,7 +24,7 @@ class CohortConfigurationTest(EventsTestMixin, UniqueCourseTest, CohortTestMixin
         """
         Set up a cohorted course
         """
-        super(CohortConfigurationTest, self).setUp()
+        super(CohortConfigurationTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
 
         # create course with cohorts
         self.manual_cohort_name = "ManualCohort1"

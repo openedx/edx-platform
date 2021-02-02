@@ -57,7 +57,7 @@ class ProblemTypeTestBaseMeta(ABCMeta):
                 if obj.__getattribute__(required_attr) is None:
                     raise NotImplementedError(msg)
             except AttributeError:
-                raise NotImplementedError(msg)
+                raise NotImplementedError(msg)  # lint-amnesty, pylint: disable=raise-missing-from
 
         return obj
 
@@ -96,7 +96,7 @@ class ProblemTypeTestBase(six.with_metaclass(ProblemTypeTestBaseMeta, ProblemsTe
         """
         Visits courseware_page and defines self.problem_page.
         """
-        super(ProblemTypeTestBase, self).setUp()
+        super(ProblemTypeTestBase, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.courseware_page.visit()
         self.problem_page = ProblemPage(self.browser)
 
@@ -215,7 +215,7 @@ class AnnotationProblemTypeBase(ProblemTypeTestBase):
         """
         Additional setup for AnnotationProblemTypeBase
         """
-        super(AnnotationProblemTypeBase, self).setUp(*args, **kwargs)
+        super(AnnotationProblemTypeBase, self).setUp(*args, **kwargs)  # lint-amnesty, pylint: disable=super-with-arguments
 
         self.problem_page.a11y_audit.config.set_rules({
             "ignore": [
@@ -247,7 +247,7 @@ class AnnotationProblemTypeTest(AnnotationProblemTypeBase, ProblemTypeA11yTestMi
     Standard tests for the Annotation Problem Type
     """
     shard = 20
-    pass
+    pass  # lint-amnesty, pylint: disable=unnecessary-pass
 
 
 class CheckboxProblemTypeBase(ProblemTypeTestBase):
@@ -445,7 +445,7 @@ class RadioProblemTypeTest(RadioProblemTypeBase, ProblemTypeA11yTestMixin):
     Standard tests for the Multiple Radio Problem Type
     """
     shard = 24
-    pass
+    pass  # lint-amnesty, pylint: disable=unnecessary-pass
 
 
 class RadioProblemTypeTestNonRandomized(RadioProblemTypeBase, ProblemTypeA11yTestMixin):
@@ -500,7 +500,7 @@ class DropdownProblemTypeTest(DropDownProblemTypeBase, ProblemTypeA11yTestMixin)
     Standard tests for the Dropdown Problem Type
     """
     shard = 8
-    pass
+    pass  # lint-amnesty, pylint: disable=unnecessary-pass
 
 
 @ddt.ddt
@@ -569,7 +569,7 @@ class StringProblemTypeBase(ProblemTypeTestBase):
         Answer string problem.
         """
         textvalue = 'correct string' if correctness == 'correct' else 'incorrect string'
-        self.problem_page.fill_answer(textvalue)
+        self.problem_page.fill_answer(textvalue)  # lint-amnesty, pylint: disable=no-member
 
 
 class StringProblemTypeTest(StringProblemTypeBase, ProblemTypeA11yTestMixin):
@@ -577,7 +577,7 @@ class StringProblemTypeTest(StringProblemTypeBase, ProblemTypeA11yTestMixin):
     Standard tests for the String Problem Type
     """
     shard = 8
-    pass
+    pass  # lint-amnesty, pylint: disable=unnecessary-pass
 
 
 class NumericalProblemTypeBase(ProblemTypeTestBase):
@@ -633,7 +633,7 @@ class NumericalProblemTypeBase(ProblemTypeTestBase):
             textvalue = 'notNum'
         else:
             textvalue = str(random.randint(-2, 2))
-        self.problem_page.fill_answer(textvalue)
+        self.problem_page.fill_answer(textvalue)  # lint-amnesty, pylint: disable=no-member
 
 
 @ddt.ddt
@@ -713,7 +713,7 @@ class FormulaProblemTypeBase(ProblemTypeTestBase):
         Answer formula problem.
         """
         textvalue = "x^2+2*x+y" if correctness == 'correct' else 'x^2'
-        self.problem_page.fill_answer(textvalue)
+        self.problem_page.fill_answer(textvalue)  # lint-amnesty, pylint: disable=no-member
 
 
 @ddt.ddt
@@ -781,8 +781,8 @@ class ScriptProblemTypeBase(ProblemTypeTestBase):
         if not correctness == 'correct':
             second_addend += random.randint(1, 10)
 
-        self.problem_page.fill_answer(first_addend, input_num=0)
-        self.problem_page.fill_answer(second_addend, input_num=1)
+        self.problem_page.fill_answer(first_addend, input_num=0)  # lint-amnesty, pylint: disable=no-member
+        self.problem_page.fill_answer(second_addend, input_num=1)  # lint-amnesty, pylint: disable=no-member
 
 
 @ddt.ddt
@@ -791,7 +791,7 @@ class ScriptProblemTypeTest(ScriptProblemTypeBase, ProblemTypeA11yTestMixin):
     Standard tests for the Script Problem Type
     """
     shard = 20
-    pass
+    pass  # lint-amnesty, pylint: disable=unnecessary-pass
 
 
 class ScriptProblemTypeTestNonRandomized(ScriptProblemTypeBase, ProblemTypeA11yTestMixin):
@@ -871,7 +871,7 @@ class CodeProblemTypeBase(ProblemTypeTestBase):
         # (there's not <textarea> we can just fill text into)
         # For this reason, we submit the initial code in the response
         # (configured in the problem XML above)
-        pass
+        pass  # lint-amnesty, pylint: disable=unnecessary-pass
 
 
 class CodeProblemTypeTest(CodeProblemTypeBase, ProblemTypeA11yTestMixin):
@@ -885,7 +885,7 @@ class CodeProblemTypeTest(CodeProblemTypeBase, ProblemTypeA11yTestMixin):
         Overridden for script test because the testing grader always responds
         with "correct"
         """
-        pass
+        pass  # lint-amnesty, pylint: disable=unnecessary-pass
 
 
 class ChoiceTextProblemTypeTestBase(ProblemTypeTestBase):
@@ -974,7 +974,7 @@ class RadioTextProblemTypeBase(ChoiceTextProblemTypeTestBase):
         """
         Additional setup for RadioTextProblemTypeBase
         """
-        super(RadioTextProblemTypeBase, self).setUp(*args, **kwargs)
+        super(RadioTextProblemTypeBase, self).setUp(*args, **kwargs)  # lint-amnesty, pylint: disable=super-with-arguments
 
         self.problem_page.a11y_audit.config.set_rules({
             "ignore": [
@@ -991,7 +991,7 @@ class RadioTextProblemTypeTest(RadioTextProblemTypeBase, ProblemTypeA11yTestMixi
     Standard tests for the Radio Text Problem Type
     """
     shard = 8
-    pass
+    pass  # lint-amnesty, pylint: disable=unnecessary-pass
 
 
 class RadioTextProblemTypeTestNonRandomized(RadioTextProblemTypeBase, ProblemTypeA11yTestMixin):
@@ -1037,7 +1037,7 @@ class CheckboxTextProblemTypeBase(ChoiceTextProblemTypeTestBase):
         """
         Additional setup for CheckboxTextProblemTypeBase
         """
-        super(CheckboxTextProblemTypeBase, self).setUp(*args, **kwargs)
+        super(CheckboxTextProblemTypeBase, self).setUp(*args, **kwargs)  # lint-amnesty, pylint: disable=super-with-arguments
 
         self.problem_page.a11y_audit.config.set_rules({
             "ignore": [
@@ -1052,7 +1052,7 @@ class CheckboxTextProblemTypeTest(CheckboxTextProblemTypeBase, ProblemTypeA11yTe
     """
     Standard tests for the Checkbox Text Problem Type
     """
-    pass
+    pass  # lint-amnesty, pylint: disable=unnecessary-pass
 
 
 class CheckboxTextProblemTypeTestNonRandomized(CheckboxTextProblemTypeBase, ProblemTypeA11yTestMixin):
@@ -1100,11 +1100,11 @@ class SymbolicProblemTypeBase(ProblemTypeTestBase):
         Answer symbolic problem.
         """
         choice = "2*x+3*y" if correctness == 'correct' else "3*a+4*b"
-        self.problem_page.fill_answer(choice)
+        self.problem_page.fill_answer(choice)  # lint-amnesty, pylint: disable=no-member
 
 
 class SymbolicProblemTypeTest(SymbolicProblemTypeBase, ProblemTypeA11yTestMixin):
     """
     Standard tests for the Symbolic Problem Type
     """
-    pass
+    pass  # lint-amnesty, pylint: disable=unnecessary-pass

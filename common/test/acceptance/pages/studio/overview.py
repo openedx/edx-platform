@@ -3,7 +3,7 @@ Course Outline page in Studio.
 """
 
 
-from bok_choy.javascript import js_defined, wait_for_js
+from bok_choy.javascript import js_defined, wait_for_js  # lint-amnesty, pylint: disable=unused-import
 from bok_choy.page_object import PageObject
 from bok_choy.promise import EmptyPromise
 from selenium.webdriver.support.ui import Select
@@ -58,7 +58,7 @@ class CourseOutlineItem(object):
         Puts the item into editable form.
         """
         self.q(css=self._bounded_selector(self.CONFIGURATION_BUTTON_SELECTOR)).first.click()  # pylint: disable=no-member
-        if 'subsection' in self.BODY_SELECTOR:
+        if 'subsection' in self.BODY_SELECTOR:  # lint-amnesty, pylint: disable=unsupported-membership-test
             modal = SubsectionOutlineModal(self)
         else:
             modal = CourseOutlineModal(self)
@@ -105,7 +105,7 @@ class CourseOutlineChild(PageObject, CourseOutlineItem):
     BODY_SELECTOR = '.outline-item'
 
     def __init__(self, browser, locator):
-        super(CourseOutlineChild, self).__init__(browser)
+        super(CourseOutlineChild, self).__init__(browser)  # lint-amnesty, pylint: disable=super-with-arguments
         self.locator = locator
 
     def is_browser_on_page(self):
@@ -160,7 +160,7 @@ class CourseOutlineSubsection(CourseOutlineContainer, CourseOutlineChild):
         """
         Return the :class:`.CourseOutlineUnit with the title `title`.
         """
-        return self.child(title)
+        return self.child(title)  # lint-amnesty, pylint: disable=no-member
 
     def units(self):
         """
@@ -195,7 +195,7 @@ class CourseOutlineSection(CourseOutlineContainer, CourseOutlineChild):
         """
         Return the :class:`.CourseOutlineSubsection` with the title `title`.
         """
-        return self.child(title)
+        return self.child(title)  # lint-amnesty, pylint: disable=no-member
 
     def subsections(self):
         """
@@ -213,7 +213,7 @@ class CourseOutlineSection(CourseOutlineContainer, CourseOutlineChild):
         """
         Adds a subsection to this section
         """
-        self.add_child()
+        self.add_child()  # lint-amnesty, pylint: disable=no-member
 
 
 class ExpandCollapseLinkState(object):
@@ -251,7 +251,7 @@ class CourseOutlinePage(CoursePage, CourseOutlineContainer):
         """
         Starts course reindex by clicking reindex button
         """
-        self.reindex_button.click()
+        self.reindex_button.click()  # lint-amnesty, pylint: disable=no-member
 
     def open_subsection_settings_dialog(self, index=0):
         """
@@ -363,7 +363,7 @@ class SubsectionOutlineModal(CourseOutlineModal):
         """
         Returns the current visibility setting for a subsection
         """
-        self.ensure_staff_lock_visible()
+        self.ensure_staff_lock_visible()  # lint-amnesty, pylint: disable=no-member
         return self.find_css('input[name=content-visibility]:checked').first.attrs('value')[0]
 
     @is_explicitly_locked.setter
@@ -380,7 +380,7 @@ class SubsectionOutlineModal(CourseOutlineModal):
         """
         Sets the subsection visibility to the given value.
         """
-        self.ensure_staff_lock_visible()
+        self.ensure_staff_lock_visible()  # lint-amnesty, pylint: disable=no-member
         self.find_css('input[name=content-visibility][value=' + value + ']').click()
         EmptyPromise(lambda: value == self.subsection_visibility, "Subsection visibility is updated").fulfill()
 

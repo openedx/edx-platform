@@ -43,4 +43,4 @@ def confirm_prompt(page, cancel=False, require_notification=None):
     confirmation_button_css = '.prompt .action-' + ('secondary' if cancel else 'primary')
     page.wait_for_element_visibility(confirmation_button_css, 'Confirmation button is visible')
     require_notification = (not cancel) if require_notification is None else require_notification
-    click_css(page, confirmation_button_css, require_notification=require_notification)
+    click_css(page, confirmation_button_css, require_notification=require_notification)  # lint-amnesty, pylint: disable=unexpected-keyword-arg

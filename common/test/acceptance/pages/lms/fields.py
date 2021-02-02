@@ -245,7 +245,7 @@ class FieldsMixin(object):
         Returns bool based on the highlighted border for field.
         """
         query = self.q(css=u'.u-field-{}.error'.format(field_id))
-        return True if query.present else False
+        return True if query.present else False  # lint-amnesty, pylint: disable=simplifiable-if-expression
 
     def get_social_first_element(self):
         """

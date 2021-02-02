@@ -22,7 +22,7 @@ class LibraryFixture(XBlockContainerFixture):
         """
         Configure the library fixture to create a library with
         """
-        super(LibraryFixture, self).__init__()
+        super(LibraryFixture, self).__init__()  # lint-amnesty, pylint: disable=super-with-arguments
         self.library_info = {
             'org': org,
             'number': number,
@@ -31,7 +31,7 @@ class LibraryFixture(XBlockContainerFixture):
 
         self.display_name = display_name
         self._library_key = None
-        super(LibraryFixture, self).__init__()
+        super(LibraryFixture, self).__init__()  # lint-amnesty, pylint: disable=super-with-arguments
 
     def __str__(self):
         """
@@ -92,4 +92,4 @@ class LibraryFixture(XBlockContainerFixture):
         # Disable publishing for library XBlocks:
         xblock_desc.publish = "not-applicable"
 
-        return super(LibraryFixture, self).create_xblock(parent_loc, xblock_desc)
+        return super(LibraryFixture, self).create_xblock(parent_loc, xblock_desc)  # lint-amnesty, pylint: disable=super-with-arguments

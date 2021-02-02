@@ -22,7 +22,7 @@ class StudioSettingsA11yTest(StudioCourseTest):
     """
 
     def setUp(self):  # pylint: disable=arguments-differ
-        super(StudioSettingsA11yTest, self).setUp()
+        super(StudioSettingsA11yTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.settings_page = SettingsPage(self.browser, self.course_info['org'], self.course_info['number'],
                                           self.course_info['run'])
 
@@ -67,7 +67,7 @@ class StudioSubsectionSettingsA11yTest(StudioCourseTest):
             browser = 'firefox'
 
         with patch.dict(os.environ, {'SELENIUM_BROWSER': browser}):
-            super(StudioSubsectionSettingsA11yTest, self).setUp(is_staff=True)
+            super(StudioSubsectionSettingsA11yTest, self).setUp(is_staff=True)  # lint-amnesty, pylint: disable=super-with-arguments
 
         self.course_outline = CourseOutlinePage(
             self.browser,

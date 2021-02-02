@@ -20,8 +20,8 @@ class CoursewarePage(CoursePage):
     section_selector = '.chapter'
     subsection_selector = '.chapter-content-container a'
 
-    def __init__(self, browser, course_id):
-        super(CoursewarePage, self).__init__(browser, course_id)
+    def __init__(self, browser, course_id):  # lint-amnesty, pylint: disable=useless-super-delegation
+        super(CoursewarePage, self).__init__(browser, course_id)  # lint-amnesty, pylint: disable=super-with-arguments
         # self.nav = CourseNavPage(browser, self)
 
     def is_browser_on_page(self):

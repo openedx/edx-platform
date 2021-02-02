@@ -20,7 +20,7 @@ class ProblemsTest(UniqueCourseTest):
     """
 
     def setUp(self):
-        super(ProblemsTest, self).setUp()
+        super(ProblemsTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
 
         self.username = "test_student_{uuid}".format(uuid=self.unique_id[0:8])
         self.email = "{username}@example.com".format(username=self.username)

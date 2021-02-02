@@ -7,7 +7,7 @@ import logging
 
 from bok_choy.javascript import js_defined, wait_for_js
 from bok_choy.page_object import PageObject
-from bok_choy.promise import EmptyPromise, Promise
+from bok_choy.promise import EmptyPromise, Promise  # lint-amnesty, pylint: disable=unused-import
 
 log = logging.getLogger('VideoPage')
 
@@ -220,7 +220,7 @@ class VideoPage(PageObject):
 
         # toggle captions visibility state if needed
         if self.is_captions_visible() != captions_new_state:
-            self.click_player_button('transcript_button')
+            self.click_player_button('transcript_button')  # lint-amnesty, pylint: disable=no-member
 
             # Verify that captions state is toggled/changed
             EmptyPromise(lambda: self.is_captions_visible() == captions_new_state,
