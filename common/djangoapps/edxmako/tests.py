@@ -1,4 +1,4 @@
-  # lint-amnesty, pylint: disable=cyclic-import, missing-module-docstring
+# lint-amnesty, pylint: disable=cyclic-import, missing-module-docstring
 
 import unittest
 
@@ -29,6 +29,7 @@ class ShortcutsTests(UrlResetMixin, TestCase):
     """
     Test the edxmako shortcuts file
     """
+
     @override_settings(MKTG_URLS={'ROOT': 'https://dummy-root', 'ABOUT': '/about-us'})
     def test_marketing_link(self):
         with override_settings(MKTG_URL_LINK_MAP={'ABOUT': self._get_test_url_name()}):
@@ -123,6 +124,7 @@ class AddLookupTests(TestCase):
     """
     Test the `add_lookup` function.
     """
+
     @patch('common.djangoapps.edxmako.LOOKUP', {})
     def test_with_package(self):
         add_lookup('test', 'management', __name__)
