@@ -1,3 +1,6 @@
+"""
+All urls for marketplace
+"""
 from django.conf.urls import url
 
 from openedx.features.marketplace.views import (MarketplaceListView, MarketplaceCreateRequestView,

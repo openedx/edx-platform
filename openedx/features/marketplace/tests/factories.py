@@ -1,3 +1,6 @@
+"""
+All model factories for marketplace
+"""
 import factory
 
 from lms.djangoapps.onboarding.tests.factories import UserFactory
@@ -8,7 +11,7 @@ from openedx.features.marketplace.models import MarketplaceRequest
 class ChallengeFactory(OrganizationBaseFactory, LocationFactory):
     """Factory for MarketplaceRequest model. It contains fake data or sub-factories for all mandatory fields"""
 
-    class Meta:
+    class Meta(object):
         model = MarketplaceRequest
 
     user = factory.SubFactory(UserFactory)

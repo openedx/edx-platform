@@ -1,3 +1,6 @@
+"""
+All helper methods for marketplace
+"""
 from django.conf import settings
 
 
@@ -13,10 +16,13 @@ def get_connect_url(marketplace_request, request_user):
     :param request_user: request user object
     """
     chat_url_formatter = '{nodebb_end_point}/chat/{username}'
-    responsible_user = marketplace_request.organization.admin or marketplace_request.organization.first_learner \
-                       or marketplace_request.user
+    organization = marketplace_request.organization
+    responsible_user = organization.admin or organization.first_learner or marketplace_request.user
+
     if responsible_user.username != request_user.username:
-        connect_url = chat_url_formatter.format(nodebb_end_point=settings.NODEBB_ENDPOINT, username=responsible_user.username)
+        connect_url = chat_url_formatter.format(
+            nodebb_end_point=settings.NODEBB_ENDPOINT, username=responsible_user.username
+        )
     else:
         connect_url = None
 

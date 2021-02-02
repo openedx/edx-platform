@@ -1,4 +1,7 @@
 # -*- coding: utf-8 -*-
+"""
+All models for marketplace
+"""
 from __future__ import unicode_literals
 
 from django.contrib.auth.models import User
@@ -17,6 +20,9 @@ from openedx.features.marketplace.constants import (
 
 
 class MarketplaceRequest(OrganizationBase, Location, VisualAttachment, TimeStampedModel):
+    """
+    Model for marketplace request
+    """
     user = models.ForeignKey(User, related_name='challenges', related_query_name='challenge', on_delete=models.CASCADE)
 
     organization_sector = MultiSelectWithOtherField(other_max_length=50, choices=ORG_SECTOR_CHOICES,
@@ -48,3 +54,6 @@ class MarketplaceRequest(OrganizationBase, Location, VisualAttachment, TimeStamp
     @property
     def created_date(self):
         return self.created.strftime(PUBLISHED_DATE_FORMAT)
+
+    def __unicode__(self):
+        return '{id} | {username}'.format(id=self.id, username=self.user.username)

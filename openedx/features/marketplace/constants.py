@@ -1,3 +1,6 @@
+"""
+All constants for marketplace
+"""
 from django.utils.translation import ugettext as _
 
 DJANGO_COUNTRIES_INDEX = 0

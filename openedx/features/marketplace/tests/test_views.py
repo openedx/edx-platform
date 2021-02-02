@@ -1,4 +1,7 @@
 # -*- coding: utf-8 -*-
+"""
+All test for marketplace views
+"""
 from __future__ import unicode_literals
 
 from django.test import TestCase
@@ -10,6 +13,9 @@ from openedx.core.djangolib.testing.philu_utils import configure_philu_theme
 
 
 class MarketplaceViewTests(TestCase):
+    """
+    Test case class for marketplace views
+    """
 
     @classmethod
     def setUpClass(cls):
@@ -21,7 +27,7 @@ class MarketplaceViewTests(TestCase):
         self.user = UserFactory()
         self.organization, _created = Organization.objects.get_or_create(label='Arbisoft')
         self.user.extended_profile.organization = self.organization
-        self.user.extended_profile.save()
+        self.user.extended_profile.save()  # pylint: disable=no-member
         self.payload = {
             'organization': self.organization.id,
             'country': 'PK',
