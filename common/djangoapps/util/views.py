@@ -1,4 +1,4 @@
-import json
+import json  # lint-amnesty, pylint: disable=missing-module-docstring
 import logging
 import sys
 from functools import wraps
@@ -38,7 +38,7 @@ def ensure_valid_course_key(view_func):
             try:
                 CourseKey.from_string(course_key)
             except InvalidKeyError:
-                raise Http404
+                raise Http404  # lint-amnesty, pylint: disable=raise-missing-from
 
         response = view_func(request, *args, **kwargs)
         return response
@@ -58,7 +58,7 @@ def ensure_valid_usage_key(view_func):
             try:
                 UsageKey.from_string(usage_key)
             except InvalidKeyError:
-                raise Http404
+                raise Http404  # lint-amnesty, pylint: disable=raise-missing-from
 
         response = view_func(request, *args, **kwargs)
         return response
@@ -138,7 +138,7 @@ def handle_500(template_path, context=None, test_func=None):
             try:
                 return func(request, *args, **kwargs)
             except Exception:  # pylint: disable=broad-except
-                if settings.DEBUG:
+                if settings.DEBUG:  # lint-amnesty, pylint: disable=no-else-raise
                     # In debug mode let django process the 500 errors and display debug info for the developer
                     raise
                 elif test_func is None or test_func(request):
@@ -159,12 +159,12 @@ def calculate(request):
     equation = request.GET['equation']
     try:
         result = calc.evaluator({}, {}, equation)
-    except:
+    except:  # lint-amnesty, pylint: disable=bare-except
         event = {'error': list(map(str, sys.exc_info())),
                  'equation': equation}
         track_views.server_track(request, 'error:calc', event, page='calc')
-        return HttpResponse(json.dumps({'result': 'Invalid syntax'}))
-    return HttpResponse(json.dumps({'result': str(result)}))
+        return HttpResponse(json.dumps({'result': 'Invalid syntax'}))  # lint-amnesty, pylint: disable=http-response-with-json-dumps
+    return HttpResponse(json.dumps({'result': str(result)}))  # lint-amnesty, pylint: disable=http-response-with-json-dumps
 
 
 def info(request):

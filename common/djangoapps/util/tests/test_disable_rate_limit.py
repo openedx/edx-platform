@@ -32,7 +32,7 @@ class DisableRateLimitTest(TestCase):
     """Check that we can disable rate limiting for perf testing. """
 
     def setUp(self):
-        super(DisableRateLimitTest, self).setUp()
+        super(DisableRateLimitTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         cache.clear()
         self.view = FakeApiView()
 

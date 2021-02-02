@@ -19,7 +19,7 @@ class CourseCatalogServiceMockMixin(object):
     )
 
     def setUp(self):
-        super(CourseCatalogServiceMockMixin, self).setUp()
+        super(CourseCatalogServiceMockMixin, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         cache.clear()
 
     def mock_course_discovery_api_for_catalog_contains(self, catalog_id=1, course_run_ids=None):

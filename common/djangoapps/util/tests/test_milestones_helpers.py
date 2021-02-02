@@ -31,7 +31,7 @@ class MilestonesHelpersTestCase(ModuleStoreTestCase):
         """
         Test case scaffolding
         """
-        super(MilestonesHelpersTestCase, self).setUp()
+        super(MilestonesHelpersTestCase, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.course = CourseFactory.create(
             metadata={
                 'entrance_exam_enabled': True,

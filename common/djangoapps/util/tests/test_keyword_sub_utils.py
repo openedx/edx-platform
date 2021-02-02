@@ -21,7 +21,7 @@ class KeywordSubTest(ModuleStoreTestCase):
     CREATE_USER = False
 
     def setUp(self):
-        super(KeywordSubTest, self).setUp()
+        super(KeywordSubTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.user = UserFactory.create(
             email="testuser@edx.org",
             username="testuser",

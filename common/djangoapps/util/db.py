@@ -5,11 +5,11 @@ Utility functions related to databases.
 
 import random
 # TransactionManagementError used below actually *does* derive from the standard "Exception" class.
-# pylint: disable=nonstandard-exception
+  # lint-amnesty, pylint: disable=bad-option-value, nonstandard-exception
 from contextlib import contextmanager
-from functools import wraps
+from functools import wraps  # lint-amnesty, pylint: disable=unused-import
 
-from django.db import DEFAULT_DB_ALIAS, DatabaseError, Error, transaction
+from django.db import DEFAULT_DB_ALIAS, DatabaseError, Error, transaction  # lint-amnesty, pylint: disable=unused-import
 
 from openedx.core.lib.cache_utils import get_cache
 
@@ -55,7 +55,7 @@ class OuterAtomic(transaction.Atomic):
     def __init__(self, using, savepoint, read_committed=False, name=None):
         self.read_committed = read_committed
         self.name = name
-        super(OuterAtomic, self).__init__(using, savepoint)
+        super(OuterAtomic, self).__init__(using, savepoint)  # lint-amnesty, pylint: disable=super-with-arguments
 
     def __enter__(self):
 
@@ -75,7 +75,7 @@ class OuterAtomic(transaction.Atomic):
             # The inner atomic starts a savepoint around the test.
             # So, for tests only, there should be exactly one savepoint_id and two atomic_for_testcase_calls.
             # atomic_for_testcase_calls below is added in a monkey-patch for tests only.
-            if self.ALLOW_NESTED and (self.atomic_for_testcase_calls - len(connection.savepoint_ids)) < 1:
+            if self.ALLOW_NESTED and (self.atomic_for_testcase_calls - len(connection.savepoint_ids)) < 1:  # lint-amnesty, pylint: disable=no-member
                 raise transaction.TransactionManagementError('Cannot be inside an atomic block.')
 
             # Otherwise, this shouldn't be nested in any atomic block.
@@ -88,7 +88,7 @@ class OuterAtomic(transaction.Atomic):
                     cursor = connection.cursor()
                     cursor.execute("SET TRANSACTION ISOLATION LEVEL READ COMMITTED")
 
-        super(OuterAtomic, self).__enter__()
+        super(OuterAtomic, self).__enter__()  # lint-amnesty, pylint: disable=super-with-arguments
 
 
 def outer_atomic(using=None, savepoint=True, read_committed=False, name=None):

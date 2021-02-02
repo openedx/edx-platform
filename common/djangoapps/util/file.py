@@ -18,7 +18,7 @@ class FileValidationException(Exception):
     """
     An exception thrown during file validation.
     """
-    pass
+    pass  # lint-amnesty, pylint: disable=unnecessary-pass
 
 
 def store_uploaded_file(

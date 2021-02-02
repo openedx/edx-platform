@@ -20,7 +20,7 @@ class TestCourseSharingLinks(ModuleStoreTestCase):
     Tests for course sharing links.
     """
     def setUp(self):
-        super(TestCourseSharingLinks, self).setUp()
+        super(TestCourseSharingLinks, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
 
         # create test mongo course
         self.course = CourseFactory.create(

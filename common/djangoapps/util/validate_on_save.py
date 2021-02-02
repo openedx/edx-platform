@@ -11,4 +11,4 @@ class ValidateOnSaveMixin(object):
         """
         if not (force_insert or force_update):
             self.full_clean()
-        super(ValidateOnSaveMixin, self).save(force_insert, force_update, **kwargs)
+        super(ValidateOnSaveMixin, self).save(force_insert, force_update, **kwargs)  # lint-amnesty, pylint: disable=super-with-arguments
