@@ -20,7 +20,7 @@ class TestComprehensiveTheming(ModuleStoreTestCase):
 
     def setUp(self):
         """Test setup."""
-        super(TestComprehensiveTheming, self).setUp()
+        super(TestComprehensiveTheming, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
 
         self.wiki = get_or_create_root()
 
