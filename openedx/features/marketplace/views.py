@@ -3,6 +3,7 @@
 All views for marketplace
 """
 from __future__ import unicode_literals
+
 import operator
 
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -44,8 +45,8 @@ from .constants import (
     ORG_SECTOR_OTHER,
     ORG_SECTOR_SANITATION,
     ORG_SECTOR_SOCIAL_JUSTICE,
-    ORG_SECTOR_WORK_AND_ECONOMIC_GROWTH,
-    ORG_SECTOR_TEMPLATE_CHOICES
+    ORG_SECTOR_TEMPLATE_CHOICES,
+    ORG_SECTOR_WORK_AND_ECONOMIC_GROWTH
 )
 from .models import MarketplaceRequest
 

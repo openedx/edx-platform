@@ -1,8 +1,8 @@
 """
 All tests for marketplace models
 """
-from ddt import data, unpack, ddt
-from django.db import IntegrityError, DataError
+from ddt import data, ddt, unpack
+from django.db import DataError, IntegrityError
 from django.test import TestCase
 
 from openedx.features.idea.constants import CITY_MAX_LENGTH

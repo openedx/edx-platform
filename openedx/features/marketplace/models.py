@@ -12,8 +12,8 @@ from model_utils.models import TimeStampedModel
 from openedx.features.custom_fields.multiselect_with_other.db.fields import MultiSelectWithOtherField
 from openedx.features.idea.models import Location, OrganizationBase, VisualAttachment
 from openedx.features.marketplace.constants import (
-    ORG_SECTOR_CHOICES,
     ORG_PROBLEM_CHOICES,
+    ORG_SECTOR_CHOICES,
     PUBLISHED_DATE_FORMAT,
     USER_SERVICES_CHOICES
 )
