@@ -2,10 +2,13 @@
 Provide django models to back the discussions app
 """
 from __future__ import annotations
+import logging
+from typing import List
 
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
+from django_mysql.models import ListCharField
 from jsonfield import JSONField
 from model_utils.models import TimeStampedModel
 from opaque_keys.edx.django.models import LearningContextKeyField
@@ -13,7 +16,108 @@ from simple_history.models import HistoricalRecords
 
 from lti_consumer.models import LtiConfiguration
 
+from openedx.core.djangoapps.config_model_utils.models import StackedConfigurationModel
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
+
+log = logging.getLogger(__name__)
+
+
+def get_supported_providers():
+    """
+    Return the list of supported discussion providers
+
+    TODO: Load this from entry points?
+    """
+    providers = [
+        'cs_comments_service',
+        'lti',
+        'test',
+    ]
+    return providers
+
+
+class ProviderFilter(StackedConfigurationModel):
+    """
+    Associate allow/deny-lists of discussions providers with courses/orgs
+    """
+
+    allow = ListCharField(
+        base_field=models.CharField(
+            choices=[
+                (provider, provider)
+                for provider in get_supported_providers()
+            ],
+            max_length=20,
+        ),
+        blank=True,
+        help_text=_("Comma-separated list of providers to allow, eg: {choices}").format(
+            choices=','.join(get_supported_providers()),
+        ),
+        # max_length = (size * (max_length + len(','))
+        # max_length = (   3 * (        20 +       1))
+        max_length=63,
+        # size = len(get_supported_providers())
+        size=3,
+        verbose_name=_('Allow List'),
+    )
+    deny = ListCharField(
+        base_field=models.CharField(
+            choices=[
+                (provider, provider)
+                for provider in get_supported_providers()
+            ],
+            max_length=20,
+        ),
+        blank=True,
+        help_text=_("Comma-separated list of providers to deny, eg: {choices}").format(
+            choices=','.join(get_supported_providers()),
+        ),
+        # max_length = (size * (max_length + len(','))
+        # max_length = (   3 * (        20 +       1))
+        max_length=63,
+        # size = len(get_supported_providers())
+        size=3,
+        verbose_name=_('Deny List'),
+    )
+
+    STACKABLE_FIELDS = (
+        'allow',
+        'deny',
+    )
+
+    def __str__(self):
+        return 'ProviderFilter(org="{org}", course="{course}", allow={allow}, deny={deny})'.format(
+            allow=self.allow,
+            course=self.course or '',
+            deny=self.deny,
+            org=self.org or '',
+        )
+
+    @property
+    def available_providers(self) -> List[str]:
+        """
+        Return a filtered list of available providers
+        """
+        _providers = get_supported_providers()
+        if self.allow:
+            _providers = [
+                provider
+                for provider in _providers
+                if provider in self.allow
+            ]
+        if self.deny:
+            _providers = [
+                provider
+                for provider in _providers
+                if provider not in self.deny
+            ]
+        return _providers
+
+    @classmethod
+    def get_available_providers(cls, course_key) -> List[str]:
+        _filter = cls.current(course_key=course_key)
+        providers = _filter.available_providers
+        return providers
 
 
 class DiscussionsConfiguration(TimeStampedModel):
@@ -90,3 +194,11 @@ class DiscussionsConfiguration(TimeStampedModel):
         except cls.DoesNotExist:
             configuration = cls(context_key=context_key, enabled=False)
         return configuration
+
+    @property
+    def available_providers(self) -> List[str]:
+        return ProviderFilter.current(course_key=self.context_key).available_providers
+
+    @classmethod
+    def get_available_providers(cls, context_key) -> List[str]:
+        return ProviderFilter.current(course_key=context_key).available_providers
