@@ -81,6 +81,7 @@ class ProviderFilter(StackedConfigurationModel):
     )
 
     STACKABLE_FIELDS = (
+        'enabled',
         'allow',
         'deny',
     )
