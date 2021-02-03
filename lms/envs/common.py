@@ -112,8 +112,17 @@ FEATURES = {
     ## Doing so will cause all courses to be released on production
     'DISABLE_START_DATES': False,
 
-    # for consistency in user-experience, keep the value of the following 3 settings
-    # in sync with the corresponding ones in cms/envs/common.py
+    # .. toggle_name: FEATURES['ENABLE_DISCUSSION_SERVICE']
+    # .. toggle_implementation: DjangoSetting
+    # .. toggle_default: True
+    # .. toggle_description: When True, it will enable the Discussion tab in courseware for all courses. Setting this
+    #   to False will not contain inline discussion components and discussion tab in any courses.
+    # .. toggle_use_cases: open_edx
+    # .. toggle_creation_date: 2012-08-14
+    # .. toggle_warnings: If the discussion panel is present in the course and the value for this flag is False then,
+    #   attempting to expand those components will cause errors. So, this should only be set to False with an LMS that
+    #   is running courses that do not contain discussion components.
+    #   For consistency in user-experience, keep the value in sync with the setting of the same name in the CMS.
     'ENABLE_DISCUSSION_SERVICE': True,
 
     # .. toggle_name: FEATURES['ENABLE_TEXTBOOK']
@@ -123,7 +132,8 @@ FEATURES = {
     # .. toggle_use_cases: open_edx
     # .. toggle_creation_date: 2014-03-27
     # .. toggle_target_removal_date: None
-    # .. toggle_warnings: None
+    # .. toggle_warnings: For consistency in user-experience, keep the value in sync with the setting of the same name
+    #   in the CMS.
     # .. toggle_tickets: https://github.com/edx/edx-platform/pull/3064
     'ENABLE_TEXTBOOK': True,
 
