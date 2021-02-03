@@ -1,4 +1,5 @@
-import datetime  # lint-amnesty, pylint: disable=missing-module-docstring
+# lint-amnesty, pylint: disable=missing-module-docstring
+import datetime
 import hashlib
 
 import ddt
