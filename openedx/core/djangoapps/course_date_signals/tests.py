@@ -1,4 +1,5 @@
-from datetime import timedelta  # lint-amnesty, pylint: disable=missing-module-docstring
+# lint-amnesty, pylint: disable=missing-module-docstring
+from datetime import timedelta
 import ddt
 from unittest.mock import patch  # lint-amnesty, pylint: disable=wrong-import-order
 
