@@ -34,7 +34,7 @@ class TestCorsMiddlewareProcessRequest(TestCase):
 
     @override_settings(FEATURES={'ENABLE_CORS_HEADERS': True})
     def setUp(self):
-        super(TestCorsMiddlewareProcessRequest, self).setUp()
+        super(TestCorsMiddlewareProcessRequest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.middleware = CorsCSRFMiddleware()
 
     def check_not_enabled(self, request):
@@ -114,7 +114,7 @@ class TestCsrfCrossDomainCookieMiddleware(TestCase):
         CROSS_DOMAIN_CSRF_COOKIE_DOMAIN=COOKIE_DOMAIN
     )
     def setUp(self):
-        super(TestCsrfCrossDomainCookieMiddleware, self).setUp()
+        super(TestCsrfCrossDomainCookieMiddleware, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.middleware = CsrfCrossDomainCookieMiddleware()
 
     @override_settings(FEATURES={'ENABLE_CROSS_DOMAIN_CSRF_COOKIE': False})
@@ -264,7 +264,7 @@ class TestCsrfCrossDomainCookieMiddleware(TestCase):
         if is_set:
             self.assertIn(self.COOKIE_NAME, response.cookies)
             cookie_header = six.text_type(response.cookies[self.COOKIE_NAME])
-            # pylint: disable=unicode-format-string
+  # lint-amnesty, pylint: disable=bad-option-value, unicode-format-string
             expected = six.u('Set-Cookie: {name}={value}; Domain={domain};').format(
                 name=self.COOKIE_NAME,
                 value=self.COOKIE_VALUE,

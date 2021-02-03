@@ -3,7 +3,7 @@ Module for a collection of BlockStructureTransformers.
 """
 
 
-import functools
+import functools  # lint-amnesty, pylint: disable=unused-import
 from logging import getLogger
 
 from .exceptions import TransformerDataIncompatible, TransformerException
@@ -100,7 +100,7 @@ class BlockStructureTransformers(object):
                 outdated_transformers.append(transformer)
 
         if outdated_transformers:
-            raise TransformerDataIncompatible(
+            raise TransformerDataIncompatible(  # lint-amnesty, pylint: disable=raising-format-tuple
                 u"Collected Block Structure data for the following transformers is outdated: '%s'.",
                 [(transformer.name(), transformer.READ_VERSION) for transformer in outdated_transformers],
             )

@@ -32,7 +32,7 @@ class TestGenerateCourseBlocks(ModuleStoreTestCase):
         """
         Create courses in modulestore.
         """
-        super(TestGenerateCourseBlocks, self).setUp()
+        super(TestGenerateCourseBlocks, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.courses = [CourseFactory.create() for _ in range(self.num_courses)]
         self.course_keys = [course.id for course in self.courses]
         self.command = generate_course_blocks.Command()

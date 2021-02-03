@@ -11,8 +11,8 @@ from openedx.core.djangoapps.content_libraries.constants import (
     LIBRARY_TYPES, COMPLEX, LICENSE_OPTIONS,
     ALL_RIGHTS_RESERVED,
 )
-from organizations.models import Organization
-import six
+from organizations.models import Organization  # lint-amnesty, pylint: disable=wrong-import-order
+import six  # lint-amnesty, pylint: disable=wrong-import-order
 
 User = get_user_model()
 
@@ -113,7 +113,7 @@ class ContentLibraryPermission(models.Model):
             ('library', 'group'),
         ]
 
-    def save(self, *args, **kwargs):  # pylint: disable=arguments-differ
+    def save(self, *args, **kwargs):  # lint-amnesty, pylint: disable=arguments-differ, signature-differs
         """
         Validate any constraints on the model.
 

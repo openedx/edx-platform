@@ -1,4 +1,4 @@
-
+  # lint-amnesty, pylint: disable=missing-module-docstring
 
 from datetime import timedelta
 import json
@@ -11,7 +11,7 @@ from opaque_keys.edx.locator import CourseLocator
 from ..models import CourseOverview
 
 
-class CourseOverviewFactory(DjangoModelFactory):
+class CourseOverviewFactory(DjangoModelFactory):  # lint-amnesty, pylint: disable=missing-class-docstring
     class Meta(object):
         model = CourseOverview
         django_get_or_create = ('id', )

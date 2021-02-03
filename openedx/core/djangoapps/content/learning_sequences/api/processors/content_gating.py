@@ -1,4 +1,4 @@
-import logging
+import logging  # lint-amnesty, pylint: disable=missing-module-docstring
 from datetime import datetime
 
 from django.contrib.auth import get_user_model

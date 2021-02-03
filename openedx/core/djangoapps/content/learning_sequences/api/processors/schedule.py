@@ -1,10 +1,10 @@
-import logging
-from collections import defaultdict, OrderedDict
+import logging  # lint-amnesty, pylint: disable=missing-module-docstring
+from collections import defaultdict, OrderedDict  # lint-amnesty, pylint: disable=unused-import
 from datetime import datetime, timedelta
 
 from django.contrib.auth import get_user_model
 from edx_when.api import get_dates_for_course
-from opaque_keys.edx.keys import CourseKey, UsageKey
+from opaque_keys.edx.keys import CourseKey, UsageKey  # lint-amnesty, pylint: disable=unused-import
 from common.djangoapps.student.auth import user_has_role
 from common.djangoapps.student.roles import CourseBetaTesterRole
 
@@ -119,7 +119,7 @@ class ScheduleOutlineProcessor(OutlineProcessor):
             specified_dates = [date for date in dates if date is not None]
             return max(specified_dates) if specified_dates else None
 
-        pruned_section_keys = {section.usage_key for section in pruned_course_outline.sections}
+        pruned_section_keys = {section.usage_key for section in pruned_course_outline.sections}  # lint-amnesty, pylint: disable=unused-variable
         course_usage_key = self.course_key.make_usage_key('course', 'course')
         course_start = self.keys_to_schedule_fields[course_usage_key].get('start')
         course_end = self.keys_to_schedule_fields[course_usage_key].get('end')

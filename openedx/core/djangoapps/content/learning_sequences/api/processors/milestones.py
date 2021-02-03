@@ -1,7 +1,7 @@
-import logging
+import logging  # lint-amnesty, pylint: disable=missing-module-docstring
 
 from django.contrib.auth import get_user_model
-from opaque_keys.edx.keys import CourseKey
+from opaque_keys.edx.keys import CourseKey  # lint-amnesty, pylint: disable=unused-import
 from common.djangoapps.util import milestones_helpers
 
 from .base import OutlineProcessor

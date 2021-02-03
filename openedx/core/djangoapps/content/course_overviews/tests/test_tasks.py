@@ -1,4 +1,4 @@
-
+  # lint-amnesty, pylint: disable=missing-module-docstring
 
 import mock
 import six
@@ -10,9 +10,9 @@ from xmodule.modulestore.tests.factories import CourseFactory
 from ..tasks import enqueue_async_course_overview_update_tasks
 
 
-class BatchedAsyncCourseOverviewUpdateTests(ModuleStoreTestCase):
+class BatchedAsyncCourseOverviewUpdateTests(ModuleStoreTestCase):  # lint-amnesty, pylint: disable=missing-class-docstring
     def setUp(self):
-        super(BatchedAsyncCourseOverviewUpdateTests, self).setUp()
+        super(BatchedAsyncCourseOverviewUpdateTests, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.course_1 = CourseFactory.create(default_store=ModuleStoreEnum.Type.mongo)
         self.course_2 = CourseFactory.create(default_store=ModuleStoreEnum.Type.mongo)
         self.course_3 = CourseFactory.create(default_store=ModuleStoreEnum.Type.mongo)

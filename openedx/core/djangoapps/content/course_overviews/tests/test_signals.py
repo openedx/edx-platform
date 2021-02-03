@@ -1,4 +1,4 @@
-
+  # lint-amnesty, pylint: disable=missing-module-docstring
 
 import datetime
 
@@ -70,7 +70,7 @@ class CourseOverviewSignalsTestCase(ModuleStoreTestCase):
                 self.store.delete_course(course.id, ModuleStoreEnum.UserID.test)
                 CourseOverview.get_from_id(course.id)
 
-    def assert_changed_signal_sent(self, field_name, initial_value, changed_value, mock_signal):
+    def assert_changed_signal_sent(self, field_name, initial_value, changed_value, mock_signal):  # lint-amnesty, pylint: disable=missing-function-docstring
         course = CourseFactory.create(emit_signals=True, **{field_name: initial_value})
 
         # changing display name doesn't fire the signal

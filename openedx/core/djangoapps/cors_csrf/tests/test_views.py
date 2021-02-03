@@ -23,7 +23,7 @@ class XDomainProxyTest(TestCase):
 
     def setUp(self):
         """Clear model-based config cache. """
-        super(XDomainProxyTest, self).setUp()
+        super(XDomainProxyTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         try:
             self.url = reverse('xdomain_proxy')
         except NoReverseMatch:

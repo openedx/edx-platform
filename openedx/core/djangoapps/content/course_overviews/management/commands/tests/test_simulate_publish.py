@@ -47,7 +47,7 @@ class TestSimulatePublish(SharedModuleStoreTestCase):
         might look like you can move this to setUpClass, but be very careful if
         doing so, to make sure side-effects don't leak out between tests.
         """
-        super(TestSimulatePublish, self).setUp()
+        super(TestSimulatePublish, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
 
         # Instead of using the process global SignalHandler.course_published, we
         # create our own SwitchedSignal to manually send to.
@@ -79,7 +79,7 @@ class TestSimulatePublish(SharedModuleStoreTestCase):
         )
         Command.course_published_signal.disconnect(self.sample_receiver_1)
         Command.course_published_signal.disconnect(self.sample_receiver_2)
-        super(TestSimulatePublish, self).tearDown()
+        super(TestSimulatePublish, self).tearDown()  # lint-amnesty, pylint: disable=super-with-arguments
 
     def options(self, **kwargs):
         """

@@ -7,10 +7,10 @@ import copy
 
 import datetime
 import ddt
-import logging
+import logging  # lint-amnesty, pylint: disable=wrong-import-order
 import six
-import unittest
-from uuid import uuid4
+import unittest  # lint-amnesty, pylint: disable=wrong-import-order
+from uuid import uuid4  # lint-amnesty, pylint: disable=wrong-import-order
 
 from django.conf import settings
 from django.test import RequestFactory
@@ -24,7 +24,7 @@ from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.xml_importer import import_course_from_xml
 from xmodule.assetstore.assetmgr import AssetManager
-from opaque_keys import InvalidKeyError
+from opaque_keys import InvalidKeyError  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.exceptions import ItemNotFoundError
 
 from common.djangoapps.student.models import CourseEnrollment
@@ -108,7 +108,7 @@ class ContentStoreToyCourseTest(SharedModuleStoreTestCase):
         """
         Create user and login.
         """
-        super(ContentStoreToyCourseTest, self).setUp()
+        super(ContentStoreToyCourseTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.staff_usr = AdminFactory.create()
         self.non_staff_usr = UserFactory.create()
 
@@ -244,7 +244,7 @@ class ContentStoreToyCourseTest(SharedModuleStoreTestCase):
         """
         first_byte = self.length_unlocked / 4
         last_byte = self.length_unlocked / 2
-        # pylint: disable=unicode-format-string
+  # lint-amnesty, pylint: disable=bad-option-value, unicode-format-string
         resp = self.client.get(self.url_unlocked, HTTP_RANGE='bytes={first}-{last}, -100'.format(
             first=first_byte, last=last_byte))
 
@@ -409,7 +409,7 @@ class ParseRangeHeaderTestCase(unittest.TestCase):
     """
 
     def setUp(self):
-        super(ParseRangeHeaderTestCase, self).setUp()
+        super(ParseRangeHeaderTestCase, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.content_length = 10000
 
     def test_bytes_unit(self):

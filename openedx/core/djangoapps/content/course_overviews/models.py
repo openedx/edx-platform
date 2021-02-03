@@ -131,7 +131,7 @@ class CourseOverview(TimeStampedModel):
     history = HistoricalRecords()
 
     @classmethod
-    def _create_or_update(cls, course):
+    def _create_or_update(cls, course):  # lint-amnesty, pylint: disable=too-many-statements
         """
         Creates or updates a CourseOverview object from a CourseDescriptor.
 
@@ -184,7 +184,7 @@ class CourseOverview(TimeStampedModel):
 
         course_overview.version = cls.VERSION
         course_overview.id = course.id
-        course_overview._location = course.location
+        course_overview._location = course.location  # lint-amnesty, pylint: disable=protected-access
         course_overview.org = course.location.org
         course_overview.display_name = display_name
         course_overview.display_number_with_default = course.display_number_with_default
@@ -215,7 +215,7 @@ class CourseOverview(TimeStampedModel):
         course_overview.days_early_for_beta = course.days_early_for_beta
         course_overview.mobile_available = course.mobile_available
         course_overview.visible_to_staff_only = course.visible_to_staff_only
-        course_overview._pre_requisite_courses_json = json.dumps(course.pre_requisite_courses)
+        course_overview._pre_requisite_courses_json = json.dumps(course.pre_requisite_courses)  # lint-amnesty, pylint: disable=protected-access
 
         course_overview.enrollment_start = course.enrollment_start
         course_overview.enrollment_end = course.enrollment_end
@@ -306,7 +306,7 @@ class CourseOverview(TimeStampedModel):
 
                 return course_overview
             elif course is not None:
-                raise IOError(
+                raise IOError(  # lint-amnesty, pylint: disable=raising-format-tuple
                     "Error while loading CourseOverview for course {} "
                     "from the module store: {}",
                     six.text_type(course_id),
@@ -586,7 +586,7 @@ class CourseOverview(TimeStampedModel):
         cause a lot of issues. These should not be mutable after
         construction, so for now we just eat this.
         """
-        pass
+        pass  # lint-amnesty, pylint: disable=unnecessary-pass
 
     @classmethod
     def update_select_courses(cls, course_keys, force_update=False):

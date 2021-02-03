@@ -1,4 +1,4 @@
-from datetime import datetime, timezone
+from datetime import datetime, timezone  # lint-amnesty, pylint: disable=missing-module-docstring
 from unittest import TestCase
 
 import pytest
@@ -22,7 +22,7 @@ class TestCourseOutlineData(TestCase):
         test as needed.
         """
         super().setUpClass()
-        normal_visibility = VisibilityData(
+        normal_visibility = VisibilityData(  # lint-amnesty, pylint: disable=unused-variable
             hide_from_toc=False,
             visible_to_staff_only=False
         )

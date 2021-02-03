@@ -24,7 +24,7 @@ Note: we're using old-style syntax for attrs because we need to support Python
 TODO: Validate all datetimes to be UTC.
 """
 import logging
-from datetime import datetime, timezone
+from datetime import datetime, timezone  # lint-amnesty, pylint: disable=unused-import
 from enum import Enum
 from typing import Dict, List, Optional, Set
 
@@ -47,7 +47,7 @@ class ObjectDoesNotExist(Exception):
     Imitating Django model conventions, we put a subclass of this in some of our
     data classes to indicate when something is not found.
     """
-    pass
+    pass  # lint-amnesty, pylint: disable=unnecessary-pass
 
 
 @attr.s(frozen=True)
@@ -168,7 +168,7 @@ class CourseOutlineData:
         sequences = {}
         for section in self.sections:
             for seq in section.sequences:
-                if seq.usage_key in sequences:
+                if seq.usage_key in sequences:  # lint-amnesty, pylint: disable=no-else-raise
                     raise ValueError(
                         "Sequence {} appears in more than one Section."
                         .format(seq.usage_key)
@@ -220,7 +220,7 @@ class CourseOutlineData:
         )
 
     @days_early_for_beta.validator
-    def validate_days_early_for_beta(self, attribute, value):
+    def validate_days_early_for_beta(self, attribute, value):  # lint-amnesty, pylint: disable=unused-argument
         """
         Ensure that days_early_for_beta isn't negative.
         """
