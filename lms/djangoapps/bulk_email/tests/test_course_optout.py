@@ -26,14 +26,14 @@ from xmodule.modulestore.tests.factories import CourseFactory
 from lms.djangoapps.bulk_email.api import get_unsubscribed_link
 
 
-@patch('lms.djangoapps.bulk_email.models.html_to_text', Mock(return_value='Mocking CourseEmail.text_message', autospec=True))
+@patch('lms.djangoapps.bulk_email.models.html_to_text', Mock(return_value='Mocking CourseEmail.text_message', autospec=True))  # lint-amnesty, pylint: disable=line-too-long
 class TestOptoutCourseEmails(ModuleStoreTestCase):
     """
     Test that optouts are referenced in sending course email.
     """
 
     def setUp(self):
-        super(TestOptoutCourseEmails, self).setUp()
+        super(TestOptoutCourseEmails, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         course_title = u"ẗëṡẗ title ｲ乇丂ｲ ﾶ乇丂丂ﾑg乇 ｷo尺 ﾑﾚﾚ тэѕт мэѕѕаБэ"
         self.course = CourseFactory.create(run='testcourse1', display_name=course_title)
         self.instructor = AdminFactory.create()
@@ -144,14 +144,14 @@ class TestOptoutCourseEmails(ModuleStoreTestCase):
         self.assertIn(self.instructor.email, sent_addresses)
 
 
-@patch('lms.djangoapps.bulk_email.models.html_to_text', Mock(return_value='Mocking CourseEmail.text_message', autospec=True))
+@patch('lms.djangoapps.bulk_email.models.html_to_text', Mock(return_value='Mocking CourseEmail.text_message', autospec=True))  # lint-amnesty, pylint: disable=line-too-long
 class TestACEOptoutCourseEmails(ModuleStoreTestCase):
     """
     Test that optouts are referenced in sending course email.
     """
 
     def setUp(self):
-        super(TestACEOptoutCourseEmails, self).setUp()
+        super(TestACEOptoutCourseEmails, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         course_title = u"ẗëṡẗ title ｲ乇丂ｲ ﾶ乇丂丂ﾑg乇 ｷo尺 ﾑﾚﾚ тэѕт мэѕѕаБэ"
         self.course = CourseFactory.create(run='testcourse1', display_name=course_title)
         self.instructor = AdminFactory.create()
@@ -163,7 +163,7 @@ class TestACEOptoutCourseEmails(ModuleStoreTestCase):
         self._set_email_optout(False)
         self.policy = CourseEmailOptout()
 
-    def _set_email_optout(self, opted_out):
+    def _set_email_optout(self, opted_out):  # lint-amnesty, pylint: disable=missing-function-docstring
         url = reverse('change_email_settings')
         # This is a checkbox, so on the post of opting out (that is, an Un-check of the box),
         # the Post that is sent will not contain 'receive_emails'

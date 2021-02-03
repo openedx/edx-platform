@@ -31,7 +31,7 @@ from xmodule.modulestore.tests.factories import CourseFactory
 
 
 @ddt.ddt
-@patch('lms.djangoapps.bulk_email.models.html_to_text', Mock(return_value='Mocking CourseEmail.text_message', autospec=True))
+@patch('lms.djangoapps.bulk_email.models.html_to_text', Mock(return_value='Mocking CourseEmail.text_message', autospec=True))  # lint-amnesty, pylint: disable=line-too-long
 class CourseEmailTest(ModuleStoreTestCase):
     """Test the CourseEmail model."""
 
@@ -148,7 +148,7 @@ class CourseEmailTest(ModuleStoreTestCase):
         self.assertEqual(target.long_display(), 'Cohort: test cohort')
 
 
-class OptoutTest(TestCase):
+class OptoutTest(TestCase):  # lint-amnesty, pylint: disable=missing-class-docstring
     def test_is_user_opted_out_for_course(self):
         user = UserFactory.create()
         course_id = CourseKey.from_string('abc/123/doremi')
@@ -175,7 +175,7 @@ class CourseEmailTemplateTest(TestCase):
     """Test the CourseEmailTemplate model."""
 
     def setUp(self):
-        super(CourseEmailTemplateTest, self).setUp()
+        super(CourseEmailTemplateTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
 
         # load initial content (since we don't run migrations as part of tests):
         call_command("loaddata", "course_email_template.json")
@@ -274,7 +274,7 @@ class CourseAuthorizationTest(TestCase):
     """Test the CourseAuthorization model."""
 
     def tearDown(self):
-        super(CourseAuthorizationTest, self).tearDown()
+        super(CourseAuthorizationTest, self).tearDown()  # lint-amnesty, pylint: disable=super-with-arguments
         BulkEmailFlag.objects.all().delete()
 
     def test_creation_auth_on(self):

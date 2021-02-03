@@ -18,13 +18,13 @@ class CourseAuthorizationFormTest(ModuleStoreTestCase):
     """Test the CourseAuthorizationAdminForm form for Mongo-backed courses."""
 
     def setUp(self):
-        super(CourseAuthorizationFormTest, self).setUp()
+        super(CourseAuthorizationFormTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         course_title = u"ẗëṡẗ title ｲ乇丂ｲ ﾶ乇丂丂ﾑg乇 ｷo尺 ﾑﾚﾚ тэѕт мэѕѕаБэ"
         self.course = CourseFactory.create(display_name=course_title)
         BulkEmailFlag.objects.create(enabled=True, require_course_email_auth=True)
 
     def tearDown(self):
-        super(CourseAuthorizationFormTest, self).tearDown()
+        super(CourseAuthorizationFormTest, self).tearDown()  # lint-amnesty, pylint: disable=super-with-arguments
         BulkEmailFlag.objects.all().delete()
 
     def test_authorize_mongo_course(self):
