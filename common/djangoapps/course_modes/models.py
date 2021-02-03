@@ -5,6 +5,7 @@ Add and create new modes for running courses on this particular LMS
 
 from collections import defaultdict, namedtuple
 from datetime import timedelta
+from decimal import Decimal
 
 import inspect  # lint-amnesty, pylint: disable=unused-import
 import logging
@@ -70,6 +71,9 @@ class CourseMode(models.Model):
     # switched to using a single price.  Although this field is called `min_price`, it is
     # really just the price of the course.
     min_price = models.IntegerField(default=0, verbose_name=_("Price"))
+
+    # This price is the same as min_price, but this is saved as a Decimal to accomodate courses that have a price with decimals (ie. 49.99) for propper display and consistency with ecommerce db, since min_price is currently an integer. This will eventually become the only price column in this model.
+    price = models.DecimalField(default=Decimal('0.00'), verbose_name=_("Price"), max_digits=30, decimal_places=2)
 
     # the currency these prices are in, using lower case ISO currency codes
     currency = models.CharField(default=u"usd", max_length=8)
