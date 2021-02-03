@@ -73,7 +73,7 @@ class TestGetPrograms(CacheIsolationTestCase):
     ENABLED_CACHES = ['default']
 
     def setUp(self):
-        super(TestGetPrograms, self).setUp()
+        super(TestGetPrograms, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.site = SiteFactory()
 
     def test_get_many(self, mock_warning, mock_info):
@@ -272,7 +272,7 @@ class TestGetPathways(CacheIsolationTestCase):
     ENABLED_CACHES = ['default']
 
     def setUp(self):
-        super(TestGetPathways, self).setUp()
+        super(TestGetPathways, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.site = SiteFactory()
 
     def test_get_many(self, mock_warning, mock_info):
@@ -470,7 +470,7 @@ class TestGetCourseRuns(CatalogIntegrationMixin, CacheIsolationTestCase):
     Tests covering retrieval of course runs from the catalog service.
     """
     def setUp(self):
-        super(TestGetCourseRuns, self).setUp()
+        super(TestGetCourseRuns, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
 
         self.catalog_integration = self.create_catalog_integration(cache_ttl=1)
         self.user = UserFactory(username=self.catalog_integration.service_username)
@@ -553,7 +553,7 @@ class TestGetCourseOwners(CatalogIntegrationMixin, TestCase):
     Tests covering retrieval of course runs from the catalog service.
     """
     def setUp(self):
-        super(TestGetCourseOwners, self).setUp()
+        super(TestGetCourseOwners, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
 
         self.catalog_integration = self.create_catalog_integration(cache_ttl=1)
         self.user = UserFactory(username=self.catalog_integration.service_username)
@@ -578,7 +578,7 @@ class TestSessionEntitlement(CatalogIntegrationMixin, TestCase):
     Test Covering data related Entitlements.
     """
     def setUp(self):
-        super(TestSessionEntitlement, self).setUp()
+        super(TestSessionEntitlement, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
 
         self.catalog_integration = self.create_catalog_integration(cache_ttl=1)
         self.user = UserFactory(username=self.catalog_integration.service_username)
@@ -686,7 +686,7 @@ class TestGetCourseRunDetails(CatalogIntegrationMixin, TestCase):
     Tests covering retrieval of information about a specific course run from the catalog service.
     """
     def setUp(self):
-        super(TestGetCourseRunDetails, self).setUp()
+        super(TestGetCourseRunDetails, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.catalog_integration = self.create_catalog_integration(cache_ttl=1)
         self.user = UserFactory(username=self.catalog_integration.service_username)
 
@@ -865,7 +865,7 @@ class TestGetProgramsByType(CacheIsolationTestCase):
 
     def setUp(self):
         """ Loads program data into the cache before each test function. """
-        super(TestGetProgramsByType, self).setUp()
+        super(TestGetProgramsByType, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.init_cache()
 
     def init_cache(self):

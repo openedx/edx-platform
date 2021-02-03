@@ -6,7 +6,7 @@ The public API for certificates.
 import logging
 from datetime import datetime
 
-import six
+import six  # lint-amnesty, pylint: disable=unused-import
 from pytz import UTC
 
 from lms.djangoapps.certificates.models import CertificateStatuses, CertificateWhitelist
@@ -59,7 +59,7 @@ def is_certificate_valid(certificate):
     return CourseEnrollment.is_enrolled_as_verified(certificate.user, certificate.course_id) and certificate.is_valid()
 
 
-def can_show_certificate_message(course, student, course_grade, certificates_enabled_for_course):
+def can_show_certificate_message(course, student, course_grade, certificates_enabled_for_course):  # lint-amnesty, pylint: disable=missing-function-docstring
     is_whitelisted = CertificateWhitelist.objects.filter(user=student, course_id=course.id, whitelist=True).exists()
     auto_cert_gen_enabled = auto_certificate_generation_enabled()
     has_active_enrollment = CourseEnrollment.is_enrolled(student, course.id)

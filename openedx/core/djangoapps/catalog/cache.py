@@ -1,4 +1,4 @@
-# Template used to create cache keys for individual programs.
+# Template used to create cache keys for individual programs.  # lint-amnesty, pylint: disable=missing-module-docstring
 PROGRAM_CACHE_KEY_TPL = 'program-{uuid}'
 
 # Cache key used to locate an item containing a list of all program UUIDs for a site.
