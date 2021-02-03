@@ -14,9 +14,9 @@ from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 
 
-class SendMessageHandlerTestCase(TestCase):
+class SendMessageHandlerTestCase(TestCase):  # lint-amnesty, pylint: disable=missing-class-docstring
 
-    def setUp(self):
+    def setUp(self):  # lint-amnesty, pylint: disable=super-method-not-called
         self.sender = mock.Mock()
         self.user = mock.Mock()
         self.post = mock.Mock()
@@ -38,7 +38,7 @@ class SendMessageHandlerTestCase(TestCase):
 
     @mock.patch('lms.djangoapps.discussion.signals.handlers.get_current_site', return_value=None)
     @mock.patch('lms.djangoapps.discussion.signals.handlers.send_message')
-    def test_comment_created_signal_message_not_sent_without_site(self, mock_send_message, mock_get_current_site):
+    def test_comment_created_signal_message_not_sent_without_site(self, mock_send_message, mock_get_current_site):  # lint-amnesty, pylint: disable=unused-argument
         signals.comment_created.send(sender=self.sender, user=self.user, post=self.post)
 
         self.assertFalse(mock_send_message.called)

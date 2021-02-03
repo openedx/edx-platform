@@ -13,7 +13,7 @@ import warnings
 import mongoengine
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.core.paginator import EmptyPage, PageNotAnInteger, Paginator
 from django.db import IntegrityError
 from django.http import Http404
@@ -58,7 +58,7 @@ class SysadminDashboardView(TemplateView):
         self.def_ms = modulestore()
         self.msg = u''
         self.datatable = []
-        super(SysadminDashboardView, self).__init__(**kwargs)
+        super(SysadminDashboardView, self).__init__(**kwargs)  # lint-amnesty, pylint: disable=super-with-arguments
 
     @method_decorator(ensure_csrf_cookie)
     @method_decorator(login_required)
@@ -66,7 +66,7 @@ class SysadminDashboardView(TemplateView):
                                     must_revalidate=True))
     @method_decorator(condition(etag_func=None))
     def dispatch(self, *args, **kwargs):
-        return super(SysadminDashboardView, self).dispatch(*args, **kwargs)
+        return super(SysadminDashboardView, self).dispatch(*args, **kwargs)  # lint-amnesty, pylint: disable=super-with-arguments
 
     def get_courses(self):
         """ Get an iterable list of courses."""
@@ -162,7 +162,7 @@ class Users(SysadminDashboardView):
         }
         return datatable
 
-    def get(self, request):
+    def get(self, request):  # lint-amnesty, pylint: disable=arguments-differ
         if not request.user.is_staff:
             raise Http404
         context = {
@@ -314,7 +314,7 @@ class Courses(SysadminDashboardView):
                     title=_('Information about all courses'),
                     data=data)
 
-    def get(self, request):
+    def get(self, request):  # lint-amnesty, pylint: disable=arguments-differ
         """Displays forms and course information"""
 
         if not request.user.is_staff:
@@ -356,7 +356,7 @@ class Courses(SysadminDashboardView):
                     course = get_course_by_id(course_key)
                     course_found = True
                 except Exception as err:   # pylint: disable=broad-except
-                    self.msg += _(
+                    self.msg += _(  # lint-amnesty, pylint: disable=translation-of-non-string
                         HTML(u'Error - cannot get course with ID {0}<br/><pre>{1}</pre>')
                     ).format(
                         course_key,
@@ -386,7 +386,7 @@ class Staffing(SysadminDashboardView):
     courses.
     """
 
-    def get(self, request):
+    def get(self, request):  # lint-amnesty, pylint: disable=arguments-differ
         """Displays course Enrollment and staffing course statistics"""
 
         if not request.user.is_staff:
@@ -458,7 +458,7 @@ class GitLogs(TemplateView):
                 mdb = mongoengine.connect(mongo_db['db'], host=mongouri)
             else:
                 mdb = mongoengine.connect(mongo_db['db'], host=mongo_db['host'])
-        except mongoengine.connection.ConnectionError:
+        except mongoengine.connection.ConnectionError:  # lint-amnesty, pylint: disable=no-member
             log.exception('Unable to connect to mongodb to save log, '
                           'please check MONGODB_LOG settings.')
 

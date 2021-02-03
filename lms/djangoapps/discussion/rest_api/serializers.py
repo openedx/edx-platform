@@ -3,7 +3,7 @@ Discussion API serializers
 """
 
 
-from django.contrib.auth.models import User as DjangoUser
+from django.contrib.auth.models import User as DjangoUser  # lint-amnesty, pylint: disable=imported-auth-user
 from django.core.exceptions import ValidationError
 from django.urls import reverse
 from rest_framework import serializers
@@ -103,7 +103,7 @@ class _ContentSerializer(serializers.Serializer):
     non_updatable_fields = set()
 
     def __init__(self, *args, **kwargs):
-        super(_ContentSerializer, self).__init__(*args, **kwargs)
+        super(_ContentSerializer, self).__init__(*args, **kwargs)  # lint-amnesty, pylint: disable=super-with-arguments
 
         for field in self.non_updatable_fields:
             setattr(self, "validate_{}".format(field), self._validate_non_updatable)
@@ -223,7 +223,7 @@ class ThreadSerializer(_ContentSerializer):
     non_updatable_fields = NON_UPDATABLE_THREAD_FIELDS
 
     def __init__(self, *args, **kwargs):
-        super(ThreadSerializer, self).__init__(*args, **kwargs)
+        super(ThreadSerializer, self).__init__(*args, **kwargs)  # lint-amnesty, pylint: disable=super-with-arguments
         # Compensate for the fact that some threads in the comments service do
         # not have the pinned field set
         if self.instance and self.instance.get("pinned") is None:
@@ -329,7 +329,7 @@ class CommentSerializer(_ContentSerializer):
 
     def __init__(self, *args, **kwargs):
         remove_fields = kwargs.pop('remove_fields', None)
-        super(CommentSerializer, self).__init__(*args, **kwargs)
+        super(CommentSerializer, self).__init__(*args, **kwargs)  # lint-amnesty, pylint: disable=super-with-arguments
 
         if remove_fields:
             # for multiple fields in a list
@@ -379,7 +379,7 @@ class CommentSerializer(_ContentSerializer):
 
     def to_representation(self, data):
         # pylint: disable=arguments-differ
-        data = super(CommentSerializer, self).to_representation(data)
+        data = super(CommentSerializer, self).to_representation(data)  # lint-amnesty, pylint: disable=super-with-arguments
 
         # Django Rest Framework v3 no longer includes None values
         # in the representation.  To maintain the previous behavior,
@@ -453,13 +453,13 @@ class DiscussionTopicSerializer(serializers.Serializer):
         """
         Overriden create abstract method
         """
-        pass
+        pass  # lint-amnesty, pylint: disable=unnecessary-pass
 
     def update(self, instance, validated_data):
         """
         Overriden update abstract method
         """
-        pass
+        pass  # lint-amnesty, pylint: disable=unnecessary-pass
 
 
 class DiscussionSettingsSerializer(serializers.Serializer):
@@ -478,7 +478,7 @@ class DiscussionSettingsSerializer(serializers.Serializer):
     def __init__(self, *args, **kwargs):
         self.course = kwargs.pop('course')
         self.discussion_settings = kwargs.pop('discussion_settings')
-        super(DiscussionSettingsSerializer, self).__init__(*args, **kwargs)
+        super(DiscussionSettingsSerializer, self).__init__(*args, **kwargs)  # lint-amnesty, pylint: disable=super-with-arguments
 
     def validate(self, attrs):
         """
@@ -510,13 +510,13 @@ class DiscussionSettingsSerializer(serializers.Serializer):
         """
         Overriden create abstract method
         """
-        pass
+        pass  # lint-amnesty, pylint: disable=unnecessary-pass
 
     def update(self, instance, validated_data):
         """
         Overriden update abstract method
         """
-        pass
+        pass  # lint-amnesty, pylint: disable=unnecessary-pass
 
 
 class DiscussionRolesSerializer(serializers.Serializer):
@@ -532,15 +532,15 @@ class DiscussionRolesSerializer(serializers.Serializer):
     user_id = serializers.CharField()
 
     def __init__(self, *args, **kwargs):
-        super(DiscussionRolesSerializer, self).__init__(*args, **kwargs)
+        super(DiscussionRolesSerializer, self).__init__(*args, **kwargs)  # lint-amnesty, pylint: disable=super-with-arguments
         self.user = None
 
-    def validate_user_id(self, user_id):
+    def validate_user_id(self, user_id):  # lint-amnesty, pylint: disable=missing-function-docstring
         try:
             self.user = get_user_by_username_or_email(user_id)
             return user_id
         except DjangoUser.DoesNotExist:
-            raise ValidationError(u"'{}' is not a valid student identifier".format(user_id))
+            raise ValidationError(u"'{}' is not a valid student identifier".format(user_id))  # lint-amnesty, pylint: disable=raise-missing-from
 
     def validate(self, attrs):
         """Validate the data at an object level."""
@@ -554,13 +554,13 @@ class DiscussionRolesSerializer(serializers.Serializer):
         """
         Overriden create abstract method
         """
-        pass
+        pass  # lint-amnesty, pylint: disable=unnecessary-pass
 
     def update(self, instance, validated_data):
         """
         Overriden update abstract method
         """
-        pass
+        pass  # lint-amnesty, pylint: disable=unnecessary-pass
 
 
 class DiscussionRolesMemberSerializer(serializers.Serializer):
@@ -574,7 +574,7 @@ class DiscussionRolesMemberSerializer(serializers.Serializer):
     group_name = serializers.SerializerMethodField()
 
     def __init__(self, *args, **kwargs):
-        super(DiscussionRolesMemberSerializer, self).__init__(*args, **kwargs)
+        super(DiscussionRolesMemberSerializer, self).__init__(*args, **kwargs)  # lint-amnesty, pylint: disable=super-with-arguments
         self.course_discussion_settings = self.context['course_discussion_settings']
 
     def get_group_name(self, instance):
@@ -587,13 +587,13 @@ class DiscussionRolesMemberSerializer(serializers.Serializer):
         """
         Overriden create abstract method
         """
-        pass
+        pass  # lint-amnesty, pylint: disable=unnecessary-pass
 
     def update(self, instance, validated_data):
         """
         Overriden update abstract method
         """
-        pass
+        pass  # lint-amnesty, pylint: disable=unnecessary-pass
 
 
 class DiscussionRolesListSerializer(serializers.Serializer):
@@ -621,10 +621,10 @@ class DiscussionRolesListSerializer(serializers.Serializer):
         """
         Overriden create abstract method
         """
-        pass
+        pass  # lint-amnesty, pylint: disable=unnecessary-pass
 
     def update(self, instance, validated_data):
         """
         Overriden update abstract method
         """
-        pass
+        pass  # lint-amnesty, pylint: disable=unnecessary-pass

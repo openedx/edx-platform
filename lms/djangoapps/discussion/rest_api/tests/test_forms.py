@@ -45,7 +45,7 @@ class ThreadListGetFormTest(FormTestMixin, PaginationTestMixin, TestCase):
     FORM_CLASS = ThreadListGetForm
 
     def setUp(self):
-        super(ThreadListGetFormTest, self).setUp()
+        super(ThreadListGetFormTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.form_data = QueryDict(
             urlencode(
                 {
@@ -171,7 +171,7 @@ class CommentListGetFormTest(FormTestMixin, PaginationTestMixin, TestCase):
     FORM_CLASS = CommentListGetForm
 
     def setUp(self):
-        super(CommentListGetFormTest, self).setUp()
+        super(CommentListGetFormTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.form_data = {
             "thread_id": "deadbeef",
             "endorsed": "False",

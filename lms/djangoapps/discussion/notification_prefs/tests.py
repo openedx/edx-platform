@@ -27,12 +27,12 @@ from common.djangoapps.util.testing import UrlResetMixin
 
 
 @override_settings(SECRET_KEY="test secret key")
-class NotificationPrefViewTest(UrlResetMixin, TestCase):
+class NotificationPrefViewTest(UrlResetMixin, TestCase):  # lint-amnesty, pylint: disable=missing-class-docstring
     INITIALIZATION_VECTOR = b"\x00" * 16
 
     @patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
     def setUp(self):
-        super(NotificationPrefViewTest, self).setUp()
+        super(NotificationPrefViewTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.user = UserFactory.create(username="testuser")
         # Tokens are intentionally hard-coded instead of computed to help us
         # avoid breaking existing links.

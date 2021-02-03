@@ -66,7 +66,7 @@ class CohortedTopicGroupIdTestMixin(GroupIdAssertionMixin):
         Call the view for the implementing test class, constructing a request
         from the parameters.
         """
-        pass
+        pass  # lint-amnesty, pylint: disable=unnecessary-pass
 
     def test_cohorted_topic_student_without_group_id(self, mock_request):
         self.call_view(mock_request, "cohorted_topic", self.student, '', pass_group_id=False)
@@ -102,7 +102,7 @@ class CohortedTopicGroupIdTestMixin(GroupIdAssertionMixin):
 
     def test_cohorted_topic_moderator_with_invalid_group_id(self, mock_request):
         invalid_id = self.student_cohort.id + self.moderator_cohort.id
-        response = self.call_view(mock_request, "cohorted_topic", self.moderator, invalid_id)
+        response = self.call_view(mock_request, "cohorted_topic", self.moderator, invalid_id)  # lint-amnesty, pylint: disable=assignment-from-no-return
         self.assertEqual(response.status_code, 500)
 
     def test_cohorted_topic_enrollment_track_invalid_group_id(self, mock_request):
@@ -116,7 +116,7 @@ class CohortedTopicGroupIdTestMixin(GroupIdAssertionMixin):
         )
 
         invalid_id = -1000
-        response = self.call_view(mock_request, "cohorted_topic", self.moderator, invalid_id)
+        response = self.call_view(mock_request, "cohorted_topic", self.moderator, invalid_id)  # lint-amnesty, pylint: disable=assignment-from-no-return
         self.assertEqual(response.status_code, 500)
 
 
@@ -130,7 +130,7 @@ class NonCohortedTopicGroupIdTestMixin(GroupIdAssertionMixin):
         Call the view for the implementing test class, constructing a request
         from the parameters.
         """
-        pass
+        pass  # lint-amnesty, pylint: disable=unnecessary-pass
 
     def test_non_cohorted_topic_student_without_group_id(self, mock_request):
         self.call_view(mock_request, "non_cohorted_topic", self.student, '', pass_group_id=False)

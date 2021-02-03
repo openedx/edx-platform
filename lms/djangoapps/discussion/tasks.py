@@ -9,8 +9,8 @@ import logging
 import six
 from celery import shared_task
 from celery_utils.logged_task import LoggedTask
-from django.conf import settings
-from django.contrib.auth.models import User
+from django.conf import settings  # lint-amnesty, pylint: disable=unused-import
+from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.contrib.sites.models import Site
 from edx_ace import ace
 from edx_ace.recipient import Recipient
@@ -63,7 +63,7 @@ class ResponseNotification(BaseMessageType):
 
 @shared_task(base=LoggedTask)
 @set_code_owner_attribute
-def send_ace_message(context):
+def send_ace_message(context):  # lint-amnesty, pylint: disable=missing-function-docstring
     context['course_id'] = CourseKey.from_string(context['course_id'])
 
     if _should_send_message(context):
@@ -125,7 +125,7 @@ def _is_not_subcomment(comment_id):
     return not getattr(comment, 'parent_id', None)
 
 
-def _is_first_comment(comment_id, thread_id):
+def _is_first_comment(comment_id, thread_id):  # lint-amnesty, pylint: disable=missing-function-docstring
     thread = cc.Thread.find(id=thread_id).retrieve(with_responses=True)
     if getattr(thread, 'children', None):
         first_comment = thread.children[0]
@@ -134,7 +134,7 @@ def _is_first_comment(comment_id, thread_id):
         return False
 
 
-def _is_user_subscribed_to_thread(cc_user, thread_id):
+def _is_user_subscribed_to_thread(cc_user, thread_id):  # lint-amnesty, pylint: disable=missing-function-docstring
     paginated_result = cc_user.subscribed_threads()
     thread_ids = {thread['id'] for thread in paginated_result.collection}
 
@@ -152,7 +152,7 @@ def _get_course_language(course_id):
     return language
 
 
-def _build_message_context(context):
+def _build_message_context(context):  # lint-amnesty, pylint: disable=missing-function-docstring
     message_context = get_base_template_context(context['site'])
     message_context.update(context)
     thread_author = User.objects.get(id=context['thread_author_id'])
@@ -167,7 +167,7 @@ def _build_message_context(context):
     return message_context
 
 
-def _get_thread_url(context):
+def _get_thread_url(context):  # lint-amnesty, pylint: disable=missing-function-docstring
     thread_content = {
         'type': 'thread',
         'course_id': context['course_id'],

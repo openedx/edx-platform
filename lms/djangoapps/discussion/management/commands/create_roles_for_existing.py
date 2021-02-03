@@ -12,7 +12,7 @@ from openedx.core.djangoapps.django_comment_common.models import assign_default_
 from common.djangoapps.student.models import CourseEnrollment
 
 
-class Command(BaseCommand):
+class Command(BaseCommand):  # lint-amnesty, pylint: disable=missing-class-docstring
     help = 'Seed default permisssions and roles.'
 
     def handle(self, *args, **options):

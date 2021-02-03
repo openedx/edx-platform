@@ -51,4 +51,4 @@ class Command(BaseCommand):
         try:
             git_import.add_repo(options['repository_url'], rdir_arg, branch)
         except git_import.GitImportError as ex:
-            raise CommandError(str(ex))
+            raise CommandError(str(ex))  # lint-amnesty, pylint: disable=raise-missing-from

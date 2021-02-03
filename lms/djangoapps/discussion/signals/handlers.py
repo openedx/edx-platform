@@ -42,7 +42,7 @@ def update_discussions_on_course_publish(sender, course_key, **kwargs):  # pylin
 
 
 @receiver(signals.comment_created)
-def send_discussion_email_notification(sender, user, post, **kwargs):
+def send_discussion_email_notification(sender, user, post, **kwargs):  # lint-amnesty, pylint: disable=missing-function-docstring, unused-argument
     current_site = get_current_site()
     if current_site is None:
         log.info(u'Discussion: No current site, not sending notification about post: %s.', post.id)
@@ -61,7 +61,7 @@ def send_discussion_email_notification(sender, user, post, **kwargs):
     send_message(post, current_site)
 
 
-def send_message(comment, site):
+def send_message(comment, site):  # lint-amnesty, pylint: disable=missing-function-docstring
     thread = comment.thread
     context = {
         'course_id': six.text_type(thread.course_id),
