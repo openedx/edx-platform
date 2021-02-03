@@ -1636,7 +1636,6 @@ from lms.djangoapps.course_wiki import settings as course_wiki_settings  # pylin
 # .. toggle_description: We recommend you leave this as 'False' for an Open edX installation
 #   to get the proper behavior for register, login and logout. For the original docs see:
 #   https://github.com/edx/django-wiki/blob/edx_release/wiki/conf/settings.py
-# .. toggle_warnings: Turn to False only if you have your own account handling
 # .. toggle_use_cases: open_edx
 # .. toggle_creation_date: 2012-08-13
 WIKI_ACCOUNT_HANDLING = False
