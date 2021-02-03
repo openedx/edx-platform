@@ -1,4 +1,4 @@
-  # lint-amnesty, pylint: disable=missing-module-docstring
+# lint-amnesty, pylint: disable=missing-module-docstring
 
 from django.contrib.auth.models import Group, User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.core.management.base import BaseCommand, CommandError
