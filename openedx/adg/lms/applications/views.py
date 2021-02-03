@@ -148,7 +148,7 @@ class ContactInformationView(RedirectToLoginOrRelevantPageMixin, View):
     View for the contact information of user application
     """
 
-    login_url = '/register'
+    login_url = reverse_lazy('register_user')
     template_name = 'adg/lms/applications/contact_info.html'
     user_profile_form = None
     extended_profile_form = None
@@ -268,7 +268,7 @@ class ContactInformationView(RedirectToLoginOrRelevantPageMixin, View):
 
 class EducationAndExperienceView(RedirectToLoginOrRelevantPageMixin, TemplateView):
 
-    login_url = '/register'
+    login_url = reverse_lazy('register_user')
     template_name = 'adg/lms/applications/education_experience.html'
 
     def get_context_data(self, **kwargs):
