@@ -17,7 +17,7 @@ import pytest
 import six
 from boto.exception import BotoServerError
 from django.conf import settings
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.core import mail
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.http import HttpRequest, HttpResponse
@@ -36,12 +36,12 @@ from testfixtures import LogCapture
 from lms.djangoapps.bulk_email.models import BulkEmailFlag, CourseEmail, CourseEmailTemplate
 from common.djangoapps.course_modes.models import CourseMode
 from common.djangoapps.course_modes.tests.factories import CourseModeFactory
-from edx_toggles.toggles.testutils import override_waffle_flag
+from edx_toggles.toggles.testutils import override_waffle_flag  # lint-amnesty, pylint: disable=unused-import, wrong-import-order
 from lms.djangoapps.certificates.api import generate_user_certificates
 from lms.djangoapps.certificates.models import CertificateStatuses
 from lms.djangoapps.certificates.tests.factories import GeneratedCertificateFactory
 from lms.djangoapps.courseware.models import StudentModule
-from lms.djangoapps.courseware.tests.factories import (
+from lms.djangoapps.courseware.tests.factories import (  # lint-amnesty, pylint: disable=unused-import
     BetaTesterFactory,
     GlobalStaffFactory,
     InstructorFactory,
@@ -87,14 +87,14 @@ from common.djangoapps.student.models import (
     get_retired_email_by_email,
     get_retired_username_by_username
 )
-from common.djangoapps.student.roles import (
+from common.djangoapps.student.roles import (  # lint-amnesty, pylint: disable=unused-import
     CourseBetaTesterRole,
     CourseDataResearcherRole,
     CourseFinanceAdminRole,
     CourseInstructorRole,
     CourseSalesAdminRole
 )
-from common.djangoapps.student.tests.factories import AdminFactory, UserFactory
+from common.djangoapps.student.tests.factories import AdminFactory, UserFactory  # lint-amnesty, pylint: disable=unused-import
 from xmodule.fields import Date
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, SharedModuleStoreTestCase
@@ -251,7 +251,7 @@ class TestCommonExceptions400(TestCase):
     """
 
     def setUp(self):
-        super(TestCommonExceptions400, self).setUp()
+        super(TestCommonExceptions400, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.request = Mock(spec=HttpRequest)
         self.request.META = {}
 
@@ -318,7 +318,7 @@ class TestEndpointHttpMethods(SharedModuleStoreTestCase, LoginEnrollmentTestCase
         """
         Set up global staff role so authorization will not fail.
         """
-        super(TestEndpointHttpMethods, self).setUp()
+        super(TestEndpointHttpMethods, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         global_user = GlobalStaffFactory()
         self.client.login(username=global_user.username, password='test')
 
@@ -353,7 +353,7 @@ class TestEndpointHttpMethods(SharedModuleStoreTestCase, LoginEnrollmentTestCase
         )
 
 
-@patch('lms.djangoapps.bulk_email.models.html_to_text', Mock(return_value='Mocking CourseEmail.text_message', autospec=True))
+@patch('lms.djangoapps.bulk_email.models.html_to_text', Mock(return_value='Mocking CourseEmail.text_message', autospec=True))  # lint-amnesty, pylint: disable=line-too-long
 class TestInstructorAPIDenyLevels(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
     """
     Ensure that users cannot access endpoints they shouldn't be able to.
@@ -402,7 +402,7 @@ class TestInstructorAPIDenyLevels(SharedModuleStoreTestCase, LoginEnrollmentTest
         BulkEmailFlag.objects.all().delete()
 
     def setUp(self):
-        super(TestInstructorAPIDenyLevels, self).setUp()
+        super(TestInstructorAPIDenyLevels, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.user = UserFactory.create()
         CourseEnrollment.enroll(self.user, self.course.id)
 
@@ -613,7 +613,7 @@ class TestInstructorAPIBulkAccountCreationAndEnrollment(SharedModuleStoreTestCas
         )
 
     def setUp(self):
-        super(TestInstructorAPIBulkAccountCreationAndEnrollment, self).setUp()
+        super(TestInstructorAPIBulkAccountCreationAndEnrollment, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
 
         # Create a course with mode 'honor' and with price
         self.white_label_course = CourseFactory.create()
@@ -754,7 +754,7 @@ class TestInstructorAPIBulkAccountCreationAndEnrollment(SharedModuleStoreTestCas
         self.assertEqual(len(data['row_errors']), 0)
         self.assertEqual(len(data['warnings']), 0)
         self.assertEqual(len(data['general_errors']), 1)
-        self.assertEqual(data['general_errors'][0]['response'], 'Data in row #1 must have exactly four columns: email, username, full name, and country')
+        self.assertEqual(data['general_errors'][0]['response'], 'Data in row #1 must have exactly four columns: email, username, full name, and country')  # lint-amnesty, pylint: disable=line-too-long
 
         manual_enrollments = ManualEnrollmentAudit.objects.all()
         self.assertEqual(manual_enrollments.count(), 0)
@@ -808,7 +808,7 @@ class TestInstructorAPIBulkAccountCreationAndEnrollment(SharedModuleStoreTestCas
         self.assertEqual(response.status_code, 200)
         data = json.loads(response.content.decode('utf-8'))
         warning_message = u'An account with email {email} exists but the provided username {username} ' \
-                          u'is different. Enrolling anyway with {email}.'.format(email='test_student@example.com', username='test_student_2')
+                          u'is different. Enrolling anyway with {email}.'.format(email='test_student@example.com', username='test_student_2')  # lint-amnesty, pylint: disable=line-too-long
         self.assertNotEqual(len(data['warnings']), 0)
         self.assertEqual(data['warnings'][0]['response'], warning_message)
         user = User.objects.get(email='test_student@example.com')
@@ -861,7 +861,7 @@ class TestInstructorAPIBulkAccountCreationAndEnrollment(SharedModuleStoreTestCas
         self.assertEqual(response.status_code, 200)
         data = json.loads(response.content.decode('utf-8'))
         self.assertNotEqual(len(data['row_errors']), 0)
-        self.assertEqual(data['row_errors'][0]['response'], u'Username {user} already exists.'.format(user='test_student_1'))
+        self.assertEqual(data['row_errors'][0]['response'], u'Username {user} already exists.'.format(user='test_student_1'))  # lint-amnesty, pylint: disable=line-too-long
 
     def test_csv_file_not_attached(self):
         """
@@ -1046,7 +1046,7 @@ class TestInstructorAPIEnrollment(SharedModuleStoreTestCase, LoginEnrollmentTest
         cls.course_path = '/courses/{}/'.format(cls.course.id)
 
     def setUp(self):
-        super(TestInstructorAPIEnrollment, self).setUp()
+        super(TestInstructorAPIEnrollment, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
 
         self.request = RequestFactory().request()
         self.instructor = InstructorFactory(course_key=self.course.id)
@@ -1088,7 +1088,7 @@ class TestInstructorAPIEnrollment(SharedModuleStoreTestCase, LoginEnrollmentTest
 
     def test_invalid_email(self):
         url = reverse('students_update_enrollment', kwargs={'course_id': text_type(self.course.id)})
-        response = self.client.post(url, {'identifiers': 'percivaloctavius@', 'action': 'enroll', 'email_students': False})
+        response = self.client.post(url, {'identifiers': 'percivaloctavius@', 'action': 'enroll', 'email_students': False})  # lint-amnesty, pylint: disable=line-too-long
         self.assertEqual(response.status_code, 200)
 
         # test the response data
@@ -1935,7 +1935,7 @@ class TestInstructorAPIBulkBetaEnrollment(SharedModuleStoreTestCase, LoginEnroll
         cls.course_path = '/courses/{}/'.format(cls.course.id)
 
     def setUp(self):
-        super(TestInstructorAPIBulkBetaEnrollment, self).setUp()
+        super(TestInstructorAPIBulkBetaEnrollment, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
 
         self.instructor = InstructorFactory(course_key=self.course.id)
         self.client.login(username=self.instructor.username, password='test')
@@ -2019,25 +2019,25 @@ class TestInstructorAPIBulkBetaEnrollment(SharedModuleStoreTestCase, LoginEnroll
 
     def test_add_notenrolled_email(self):
         url = reverse('bulk_beta_modify_access', kwargs={'course_id': text_type(self.course.id)})
-        response = self.client.post(url, {'identifiers': self.notenrolled_student.email, 'action': 'add', 'email_students': False})
+        response = self.client.post(url, {'identifiers': self.notenrolled_student.email, 'action': 'add', 'email_students': False})  # lint-amnesty, pylint: disable=line-too-long
         self.add_notenrolled(response, self.notenrolled_student.email)
         self.assertFalse(CourseEnrollment.is_enrolled(self.notenrolled_student, self.course.id))
 
     def test_add_notenrolled_email_autoenroll(self):
         url = reverse('bulk_beta_modify_access', kwargs={'course_id': text_type(self.course.id)})
-        response = self.client.post(url, {'identifiers': self.notenrolled_student.email, 'action': 'add', 'email_students': False, 'auto_enroll': True})
+        response = self.client.post(url, {'identifiers': self.notenrolled_student.email, 'action': 'add', 'email_students': False, 'auto_enroll': True})  # lint-amnesty, pylint: disable=line-too-long
         self.add_notenrolled(response, self.notenrolled_student.email)
         self.assertTrue(CourseEnrollment.is_enrolled(self.notenrolled_student, self.course.id))
 
     def test_add_notenrolled_username(self):
         url = reverse('bulk_beta_modify_access', kwargs={'course_id': text_type(self.course.id)})
-        response = self.client.post(url, {'identifiers': self.notenrolled_student.username, 'action': 'add', 'email_students': False})
+        response = self.client.post(url, {'identifiers': self.notenrolled_student.username, 'action': 'add', 'email_students': False})  # lint-amnesty, pylint: disable=line-too-long
         self.add_notenrolled(response, self.notenrolled_student.username)
         self.assertFalse(CourseEnrollment.is_enrolled(self.notenrolled_student, self.course.id))
 
     def test_add_notenrolled_username_autoenroll(self):
         url = reverse('bulk_beta_modify_access', kwargs={'course_id': text_type(self.course.id)})
-        response = self.client.post(url, {'identifiers': self.notenrolled_student.username, 'action': 'add', 'email_students': False, 'auto_enroll': True})
+        response = self.client.post(url, {'identifiers': self.notenrolled_student.username, 'action': 'add', 'email_students': False, 'auto_enroll': True})  # lint-amnesty, pylint: disable=line-too-long
         self.add_notenrolled(response, self.notenrolled_student.username)
         self.assertTrue(CourseEnrollment.is_enrolled(self.notenrolled_student, self.course.id))
 
@@ -2155,7 +2155,7 @@ class TestInstructorAPIBulkBetaEnrollment(SharedModuleStoreTestCase, LoginEnroll
     def test_add_notenrolled_email_mktgsite(self):
         # Try with marketing site enabled
         url = reverse('bulk_beta_modify_access', kwargs={'course_id': text_type(self.course.id)})
-        response = self.client.post(url, {'identifiers': self.notenrolled_student.email, 'action': 'add', 'email_students': True})
+        response = self.client.post(url, {'identifiers': self.notenrolled_student.email, 'action': 'add', 'email_students': True})  # lint-amnesty, pylint: disable=line-too-long
 
         self.assertEqual(response.status_code, 200)
 
@@ -2302,7 +2302,7 @@ class TestInstructorAPILevelsAccess(SharedModuleStoreTestCase, LoginEnrollmentTe
         cls.course = CourseFactory.create()
 
     def setUp(self):
-        super(TestInstructorAPILevelsAccess, self).setUp()
+        super(TestInstructorAPILevelsAccess, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
 
         self.instructor = InstructorFactory(course_key=self.course.id)
         self.client.login(username=self.instructor.username, password='test')
@@ -2537,7 +2537,7 @@ class TestInstructorAPILevelsDataDump(SharedModuleStoreTestCase, LoginEnrollment
         cls.course = CourseFactory.create()
 
     def setUp(self):
-        super(TestInstructorAPILevelsDataDump, self).setUp()
+        super(TestInstructorAPILevelsDataDump, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.course_mode = CourseMode(course_id=self.course.id,
                                       mode_slug="honor",
                                       mode_display_name="honor cert",
@@ -2957,7 +2957,7 @@ class TestInstructorAPIRegradeTask(SharedModuleStoreTestCase, LoginEnrollmentTes
         cls.problem_urlname = text_type(cls.problem_location)
 
     def setUp(self):
-        super(TestInstructorAPIRegradeTask, self).setUp()
+        super(TestInstructorAPIRegradeTask, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.instructor = InstructorFactory(course_key=self.course.id)
         self.client.login(username=self.instructor.username, password='test')
 
@@ -3147,7 +3147,7 @@ class TestEntranceExamInstructorAPIRegradeTask(SharedModuleStoreTestCase, LoginE
             )
 
     def setUp(self):
-        super(TestEntranceExamInstructorAPIRegradeTask, self).setUp()
+        super(TestEntranceExamInstructorAPIRegradeTask, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
 
         self.instructor = InstructorFactory(course_key=self.course.id)
         # Add instructor to invalid ee course
@@ -3382,7 +3382,7 @@ class TestEntranceExamInstructorAPIRegradeTask(SharedModuleStoreTestCase, LoginE
         self.assertContains(response, message)
 
 
-@patch('lms.djangoapps.bulk_email.models.html_to_text', Mock(return_value='Mocking CourseEmail.text_message', autospec=True))
+@patch('lms.djangoapps.bulk_email.models.html_to_text', Mock(return_value='Mocking CourseEmail.text_message', autospec=True))  # lint-amnesty, pylint: disable=line-too-long
 class TestInstructorSendEmail(SiteMixin, SharedModuleStoreTestCase, LoginEnrollmentTestCase):
     """
     Checks that only instructors have access to email endpoints, and that
@@ -3408,7 +3408,7 @@ class TestInstructorSendEmail(SiteMixin, SharedModuleStoreTestCase, LoginEnrollm
         BulkEmailFlag.objects.all().delete()
 
     def setUp(self):
-        super(TestInstructorSendEmail, self).setUp()
+        super(TestInstructorSendEmail, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
 
         self.instructor = InstructorFactory(course_key=self.course.id)
         self.client.login(username=self.instructor.username, password='test')
@@ -3581,7 +3581,7 @@ class TestInstructorAPITaskLists(SharedModuleStoreTestCase, LoginEnrollmentTestC
         cls.problem_urlname = text_type(cls.problem_location)
 
     def setUp(self):
-        super(TestInstructorAPITaskLists, self).setUp()
+        super(TestInstructorAPITaskLists, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.instructor = InstructorFactory(course_key=self.course.id)
         self.client.login(username=self.instructor.username, password='test')
 
@@ -3700,7 +3700,7 @@ class TestInstructorEmailContentList(SharedModuleStoreTestCase, LoginEnrollmentT
         cls.course = CourseFactory.create()
 
     def setUp(self):
-        super(TestInstructorEmailContentList, self).setUp()
+        super(TestInstructorEmailContentList, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
 
         self.instructor = InstructorFactory(course_key=self.course.id)
         self.client.login(username=self.instructor.username, password='test')
@@ -3909,7 +3909,7 @@ class TestDueDateExtensions(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
         """
         Fixtures.
         """
-        super(TestDueDateExtensions, self).setUp()
+        super(TestDueDateExtensions, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
 
         user1 = UserFactory.create()
         StudentModule(
@@ -4075,7 +4075,7 @@ class TestDueDateExtensionsDeletedDate(ModuleStoreTestCase, LoginEnrollmentTestC
         """
         Fixtures.
         """
-        super(TestDueDateExtensionsDeletedDate, self).setUp()
+        super(TestDueDateExtensionsDeletedDate, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
 
         self.course = CourseFactory.create()
         self.due = datetime.datetime(2010, 5, 12, 2, 42, tzinfo=UTC)
@@ -4192,7 +4192,7 @@ class TestCourseIssuedCertificatesData(SharedModuleStoreTestCase):
         cls.course = CourseFactory.create()
 
     def setUp(self):
-        super(TestCourseIssuedCertificatesData, self).setUp()
+        super(TestCourseIssuedCertificatesData, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.instructor = InstructorFactory(course_key=self.course.id)
         self.client.login(username=self.instructor.username, password='test')
 
@@ -4302,7 +4302,7 @@ class TestBulkCohorting(SharedModuleStoreTestCase):
         cls.course = CourseFactory.create()
 
     def setUp(self):
-        super(TestBulkCohorting, self).setUp()
+        super(TestBulkCohorting, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.staff_user = StaffFactory(course_key=self.course.id)
         self.non_staff_user = UserFactory.create()
         self.tempdir = tempfile.mkdtemp()

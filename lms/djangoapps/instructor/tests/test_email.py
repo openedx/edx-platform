@@ -34,14 +34,14 @@ class TestNewInstructorDashboardEmailViewMongoBacked(SharedModuleStoreTestCase):
         cls.email_link = '<button type="button" class="btn-link send_email" data-section="send_email">Email</button>'
 
     def setUp(self):
-        super(TestNewInstructorDashboardEmailViewMongoBacked, self).setUp()
+        super(TestNewInstructorDashboardEmailViewMongoBacked, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
 
         # Create instructor account
         instructor = AdminFactory.create()
         self.client.login(username=instructor.username, password="test")
 
     def tearDown(self):
-        super(TestNewInstructorDashboardEmailViewMongoBacked, self).tearDown()
+        super(TestNewInstructorDashboardEmailViewMongoBacked, self).tearDown()  # lint-amnesty, pylint: disable=super-with-arguments
         BulkEmailFlag.objects.all().delete()
 
     # In order for bulk email to work, we must have both the BulkEmailFlag.is_enabled()
@@ -128,7 +128,7 @@ class TestNewInstructorDashboardEmailViewXMLBacked(SharedModuleStoreTestCase):
         cls.email_link = '<button type="button" class="btn-link send_email" data-section="send_email">Email</button>'
 
     def setUp(self):
-        super(TestNewInstructorDashboardEmailViewXMLBacked, self).setUp()
+        super(TestNewInstructorDashboardEmailViewXMLBacked, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
 
         # Create instructor account
         instructor = AdminFactory.create()
@@ -140,7 +140,7 @@ class TestNewInstructorDashboardEmailViewXMLBacked(SharedModuleStoreTestCase):
         self.email_link = '<button type="button" class="btn-link send_email" data-section="send_email">Email</button>'
 
     def tearDown(self):
-        super(TestNewInstructorDashboardEmailViewXMLBacked, self).tearDown()
+        super(TestNewInstructorDashboardEmailViewXMLBacked, self).tearDown()  # lint-amnesty, pylint: disable=super-with-arguments
         BulkEmailFlag.objects.all().delete()
 
     # The flag is enabled, and since REQUIRE_COURSE_EMAIL_AUTH is False, all courses should

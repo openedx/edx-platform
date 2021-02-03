@@ -35,7 +35,7 @@ class CourseData(object):
         self._location = None
 
     @property
-    def course_key(self):
+    def course_key(self):  # lint-amnesty, pylint: disable=missing-function-docstring
         if not self._course_key:
             if self._course:
                 self._course_key = self._course.id
@@ -45,7 +45,7 @@ class CourseData(object):
         return self._course_key
 
     @property
-    def location(self):
+    def location(self):  # lint-amnesty, pylint: disable=missing-function-docstring
         if not self._location:
             structure = self.effective_structure
             if structure:
@@ -57,7 +57,7 @@ class CourseData(object):
         return self._location
 
     @property
-    def structure(self):
+    def structure(self):  # lint-amnesty, pylint: disable=missing-function-docstring
         if self._structure is None:
             self._structure = get_course_blocks(
                 self.user,
@@ -79,7 +79,7 @@ class CourseData(object):
         return self._course
 
     @property
-    def grading_policy_hash(self):
+    def grading_policy_hash(self):  # lint-amnesty, pylint: disable=missing-function-docstring
         structure = self.effective_structure
         if structure:
             return structure.get_transformer_block_field(
@@ -97,7 +97,7 @@ class CourseData(object):
         return getattr(course_block, 'course_version', None)
 
     @property
-    def edited_on(self):
+    def edited_on(self):  # lint-amnesty, pylint: disable=missing-function-docstring
         # get course block from structure only; subtree_edited_on field on modulestore's course block isn't optimized.
         structure = self.effective_structure
         if structure:
@@ -110,7 +110,7 @@ class CourseData(object):
         """
         return u'Course: course_key: {}'.format(self.course_key)
 
-    def full_string(self):
+    def full_string(self):  # lint-amnesty, pylint: disable=missing-function-docstring
         if self.effective_structure:
             return u'Course: course_key: {}, version: {}, edited_on: {}, grading_policy: {}'.format(
                 self.course_key, self.version, self.edited_on, self.grading_policy_hash,

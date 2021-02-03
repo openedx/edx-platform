@@ -13,7 +13,7 @@ class DummyRequest(object):
 
     META = {}
 
-    def __init__(self):
+    def __init__(self):  # lint-amnesty, pylint: disable=useless-return
         self.session = {}
         self.user = None
         return

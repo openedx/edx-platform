@@ -12,7 +12,7 @@ from .utils import mock_get_score
 
 
 @ddt
-class SubsectionGradeTest(GradeTestBase):
+class SubsectionGradeTest(GradeTestBase):  # lint-amnesty, pylint: disable=missing-class-docstring
 
     @data((50, 100, .50), (59.49, 100, .59), (59.51, 100, .60), (59.50, 100, .60), (60.5, 100, .60))
     @unpack
@@ -22,8 +22,8 @@ class SubsectionGradeTest(GradeTestBase):
             created_grade = CreateSubsectionGrade(
                 self.sequence,
                 self.course_structure,
-                self.subsection_grade_factory._submissions_scores,
-                self.subsection_grade_factory._csm_scores,
+                self.subsection_grade_factory._submissions_scores,  # lint-amnesty, pylint: disable=protected-access
+                self.subsection_grade_factory._csm_scores,  # lint-amnesty, pylint: disable=protected-access
             )
             self.assertEqual(PersistentSubsectionGrade.objects.count(), 0)
             self.assertEqual(created_grade.percent_graded, expected_result)
@@ -53,7 +53,7 @@ class SubsectionGradeTest(GradeTestBase):
             grade = CreateSubsectionGrade(
                 self.sequence,
                 self.course_structure,
-                self.subsection_grade_factory._submissions_scores,
-                self.subsection_grade_factory._csm_scores,
+                self.subsection_grade_factory._submissions_scores,  # lint-amnesty, pylint: disable=protected-access
+                self.subsection_grade_factory._csm_scores,  # lint-amnesty, pylint: disable=protected-access
             )
             self.assertEqual(grade.percent_graded, 0.0)

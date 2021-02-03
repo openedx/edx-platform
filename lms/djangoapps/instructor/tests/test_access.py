@@ -23,7 +23,7 @@ class TestInstructorAccessList(SharedModuleStoreTestCase):
         cls.course = CourseFactory.create()
 
     def setUp(self):
-        super(TestInstructorAccessList, self).setUp()
+        super(TestInstructorAccessList, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.instructors = [UserFactory.create() for _ in range(4)]
         for user in self.instructors:
             allow_access(self.course, user, 'instructor')
@@ -48,7 +48,7 @@ class TestInstructorAccessAllow(EmailTemplateTagMixin, SharedModuleStoreTestCase
         cls.course = CourseFactory.create()
 
     def setUp(self):
-        super(TestInstructorAccessAllow, self).setUp()
+        super(TestInstructorAccessAllow, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
 
         self.course = CourseFactory.create()
 
@@ -93,7 +93,7 @@ class TestInstructorAccessRevoke(SharedModuleStoreTestCase):
         cls.course = CourseFactory.create()
 
     def setUp(self):
-        super(TestInstructorAccessRevoke, self).setUp()
+        super(TestInstructorAccessRevoke, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.staff = [UserFactory.create() for _ in range(4)]
         for user in self.staff:
             allow_access(self.course, user, 'staff')
@@ -132,7 +132,7 @@ class TestInstructorAccessForum(SharedModuleStoreTestCase):
         cls.course = CourseFactory.create()
 
     def setUp(self):
-        super(TestInstructorAccessForum, self).setUp()
+        super(TestInstructorAccessForum, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.mod_role = Role.objects.create(
             course_id=self.course.id,
             name=FORUM_ROLE_MODERATOR

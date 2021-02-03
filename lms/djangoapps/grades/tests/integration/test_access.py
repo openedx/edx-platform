@@ -69,7 +69,7 @@ class GradesAccessIntegrationTest(ProblemSubmissionTestMixin, SharedModuleStoreT
         )
 
     def setUp(self):
-        super(GradesAccessIntegrationTest, self).setUp()
+        super(GradesAccessIntegrationTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.addCleanup(set_current_request, None)
         self.request = get_mock_request(UserFactory())
         self.student = self.request.user

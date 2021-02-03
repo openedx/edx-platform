@@ -79,7 +79,7 @@ class ZeroSubsectionGrade(SubsectionGradeBase):
     """
 
     def __init__(self, subsection, course_data):
-        super(ZeroSubsectionGrade, self).__init__(subsection)
+        super(ZeroSubsectionGrade, self).__init__(subsection)  # lint-amnesty, pylint: disable=super-with-arguments
         self.course_data = course_data
 
     @property
@@ -146,7 +146,7 @@ class NonZeroSubsectionGrade(six.with_metaclass(ABCMeta, SubsectionGradeBase)):
     """
 
     def __init__(self, subsection, all_total, graded_total, override=None):
-        super(NonZeroSubsectionGrade, self).__init__(subsection)
+        super(NonZeroSubsectionGrade, self).__init__(subsection)  # lint-amnesty, pylint: disable=super-with-arguments
         self.all_total = all_total
         self.graded_total = graded_total
         self.override = override
@@ -160,7 +160,7 @@ class NonZeroSubsectionGrade(six.with_metaclass(ABCMeta, SubsectionGradeBase)):
         return compute_percent(self.graded_total.earned, self.graded_total.possible)
 
     @staticmethod
-    def _compute_block_score(
+    def _compute_block_score(  # lint-amnesty, pylint: disable=missing-function-docstring
             block_key,
             course_structure,
             submissions_scores,
@@ -244,7 +244,7 @@ class ReadSubsectionGrade(NonZeroSubsectionGrade):
         self.model = model
         self.factory = factory
 
-        super(ReadSubsectionGrade, self).__init__(subsection, all_total, graded_total, override)
+        super(ReadSubsectionGrade, self).__init__(subsection, all_total, graded_total, override)  # lint-amnesty, pylint: disable=super-with-arguments
 
     @lazy
     def problem_scores(self):
@@ -297,7 +297,7 @@ class CreateSubsectionGrade(NonZeroSubsectionGrade):
                      u' and grade_total ***{}*** for subsection ***{}***'
                      .format(all_total, graded_total, subsection.location))
 
-        super(CreateSubsectionGrade, self).__init__(subsection, all_total, graded_total)
+        super(CreateSubsectionGrade, self).__init__(subsection, all_total, graded_total)  # lint-amnesty, pylint: disable=super-with-arguments
 
     def update_or_create_model(self, student, score_deleted=False, force_update_subsections=False):
         """

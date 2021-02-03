@@ -20,7 +20,7 @@ from six.moves import range
 
 from common.test.utils import XssTestMixin
 from common.djangoapps.course_modes.models import CourseMode
-from edx_toggles.toggles.testutils import override_waffle_flag
+from edx_toggles.toggles.testutils import override_waffle_flag  # lint-amnesty, pylint: disable=wrong-import-order
 from common.djangoapps.edxmako.shortcuts import render_to_response
 from lms.djangoapps.courseware.tabs import get_course_tab_list
 from lms.djangoapps.courseware.tests.factories import StaffFactory, StudentModuleFactory, UserFactory
@@ -30,7 +30,7 @@ from lms.djangoapps.instructor.toggles import DATA_DOWNLOAD_V2
 from lms.djangoapps.instructor.views.gradebook_api import calculate_page_info
 from openedx.core.djangoapps.site_configuration.models import SiteConfiguration
 from common.djangoapps.student.models import CourseEnrollment
-from common.djangoapps.student.roles import CourseFinanceAdminRole
+from common.djangoapps.student.roles import CourseFinanceAdminRole  # lint-amnesty, pylint: disable=unused-import
 from common.djangoapps.student.tests.factories import AdminFactory, CourseAccessRoleFactory, CourseEnrollmentFactory
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.tests.django_utils import TEST_DATA_SPLIT_MODULESTORE, ModuleStoreTestCase
@@ -61,7 +61,7 @@ class TestInstructorDashboard(ModuleStoreTestCase, LoginEnrollmentTestCase, XssT
         """
         Set up tests
         """
-        super(TestInstructorDashboard, self).setUp()
+        super(TestInstructorDashboard, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.course = CourseFactory.create(
             grading_policy={"GRADE_CUTOFFS": {"A": 0.75, "B": 0.63, "C": 0.57, "D": 0.5}},
             display_name='<script>alert("XSS")</script>'
@@ -574,7 +574,7 @@ class TestInstructorDashboardPerformance(ModuleStoreTestCase, LoginEnrollmentTes
         """
         Set up tests
         """
-        super(TestInstructorDashboardPerformance, self).setUp()
+        super(TestInstructorDashboardPerformance, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.course = CourseFactory.create(
             grading_policy={"GRADE_CUTOFFS": {"A": 0.75, "B": 0.63, "C": 0.57, "D": 0.5}},
             display_name='<script>alert("XSS")</script>',

@@ -17,7 +17,7 @@ from hashlib import sha1
 
 import six
 from django.apps import apps
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user, unused-import
 from django.db import models
 from django.utils.encoding import python_2_unicode_compatible
 from django.utils.timezone import now
@@ -29,7 +29,7 @@ from simple_history.models import HistoricalRecords
 from six.moves import map
 
 from lms.djangoapps.courseware.fields import UnsignedBigIntAutoField
-from lms.djangoapps.grades import constants, events
+from lms.djangoapps.grades import constants, events  # lint-amnesty, pylint: disable=unused-import
 from openedx.core.lib.cache_utils import get_cache
 
 log = logging.getLogger(__name__)
@@ -330,7 +330,7 @@ class PersistentSubsectionGrade(TimeStampedModel):
         """
         Returns the "correct" usage key value with the run filled in.
         """
-        if self.usage_key.run is None:
+        if self.usage_key.run is None:  # lint-amnesty, pylint: disable=no-member
             # pylint: disable=unexpected-keyword-arg,no-value-for-parameter
             return self.usage_key.replace(course_key=self.course_id)
         else:
@@ -600,7 +600,7 @@ class PersistentCourseGrade(TimeStampedModel):
             except KeyError:
                 # user's grade is not in the prefetched dict, so
                 # assume they have no grade
-                raise cls.DoesNotExist
+                raise cls.DoesNotExist  # lint-amnesty, pylint: disable=raise-missing-from
         except KeyError:
             # grades were not prefetched for the course, so fetch it
             return cls.objects.get(user_id=user_id, course_id=course_id)
@@ -701,7 +701,7 @@ class PersistentSubsectionGradeOverride(models.Model):
         }
 
     @classmethod
-    def get_override(cls, user_id, usage_key):
+    def get_override(cls, user_id, usage_key):  # lint-amnesty, pylint: disable=missing-function-docstring
         prefetch_values = get_cache(cls._CACHE_NAMESPACE).get((user_id, str(usage_key.course_key)), None)
         if prefetch_values is not None:
             return prefetch_values.get(usage_key)
@@ -716,7 +716,7 @@ class PersistentSubsectionGradeOverride(models.Model):
 
     @classmethod
     def update_or_create_override(
-        cls, requesting_user, subsection_grade_model, feature=None, action=None, **override_data
+        cls, requesting_user, subsection_grade_model, feature=None, action=None, **override_data  # lint-amnesty, pylint: disable=unused-argument
     ):
         """
         Creates or updates an override object for the given PersistentSubsectionGrade.

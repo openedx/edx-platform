@@ -35,7 +35,7 @@ class TestGatedContent(MilestonesTestCaseMixin, SharedModuleStoreTestCase):
         cls.set_up_course()
 
     def setUp(self):
-        super(TestGatedContent, self).setUp()
+        super(TestGatedContent, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.setup_gating_milestone(50, 100)
         self.non_staff_user = UserFactory()
         self.staff_user = UserFactory(is_staff=True, is_superuser=True)

@@ -58,7 +58,7 @@ class CertificatesInstructorDashTest(SharedModuleStoreTestCase):
         )
 
     def setUp(self):
-        super(CertificatesInstructorDashTest, self).setUp()
+        super(CertificatesInstructorDashTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.global_staff = GlobalStaffFactory()
         self.instructor = InstructorFactory(course_key=self.course.id)
 
@@ -224,7 +224,7 @@ class CertificatesInstructorApiTest(SharedModuleStoreTestCase):
         cls.course = CourseFactory.create()
 
     def setUp(self):
-        super(CertificatesInstructorApiTest, self).setUp()
+        super(CertificatesInstructorApiTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.global_staff = GlobalStaffFactory()
         self.instructor = InstructorFactory(course_key=self.course.id)
         self.user = UserFactory()
@@ -491,7 +491,7 @@ class CertificateExceptionViewInstructorApiTest(SharedModuleStoreTestCase):
         cls.course = CourseFactory.create()
 
     def setUp(self):
-        super(CertificateExceptionViewInstructorApiTest, self).setUp()
+        super(CertificateExceptionViewInstructorApiTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.global_staff = GlobalStaffFactory()
         self.instructor = InstructorFactory(course_key=self.course.id)
         self.user = UserFactory()
@@ -777,7 +777,7 @@ class GenerateCertificatesInstructorApiTest(SharedModuleStoreTestCase):
         cls.course = CourseFactory.create()
 
     def setUp(self):
-        super(GenerateCertificatesInstructorApiTest, self).setUp()
+        super(GenerateCertificatesInstructorApiTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.global_staff = GlobalStaffFactory()
         self.instructor = InstructorFactory(course_key=self.course.id)
         self.user = UserFactory()
@@ -897,7 +897,7 @@ class TestCertificatesInstructorApiBulkWhiteListExceptions(SharedModuleStoreTest
                           kwargs={'course_id': cls.course.id})
 
     def setUp(self):
-        super(TestCertificatesInstructorApiBulkWhiteListExceptions, self).setUp()
+        super(TestCertificatesInstructorApiBulkWhiteListExceptions, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.global_staff = GlobalStaffFactory()
         self.enrolled_user_1 = UserFactory(
             username='TestStudent1',
@@ -1055,7 +1055,7 @@ class CertificateInvalidationViewTests(SharedModuleStoreTestCase):
         cls.notes = "Test notes."
 
     def setUp(self):
-        super(CertificateInvalidationViewTests, self).setUp()
+        super(CertificateInvalidationViewTests, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.global_staff = GlobalStaffFactory()
         self.enrolled_user_1 = UserFactory(
             username='TestStudent1',

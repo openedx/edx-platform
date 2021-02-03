@@ -510,7 +510,7 @@ class GradebookView(GradeViewMixin, PaginatedAPIView):
     @verify_course_exists
     @verify_writable_gradebook_enabled
     @course_author_access_required
-    def get(self, request, course_key):
+    def get(self, request, course_key):  # lint-amnesty, pylint: disable=too-many-statements
         """
         Returns a gradebook entry/entries (i.e. both course and subsection-level grade data)
         for all users enrolled in a course, or a single user enrolled in a course
@@ -906,7 +906,7 @@ class GradebookBulkUpdateView(GradeViewMixin, PaginatedAPIView):
         return override
 
     @staticmethod
-    def _log_update_result(
+    def _log_update_result(  # lint-amnesty, pylint: disable=missing-function-docstring
         request_user,
         user_id, usage_id,
         subsection_grade_model=None,
@@ -1031,7 +1031,7 @@ class SubsectionGradeView(GradeViewMixin, APIView):
         try:
             usage_key = UsageKey.from_string(subsection_id)
         except InvalidKeyError:
-            raise self.api_error(
+            raise self.api_error(  # lint-amnesty, pylint: disable=raise-missing-from
                 status_code=status.HTTP_404_NOT_FOUND,
                 developer_message='Invalid UsageKey',
                 error_code='invalid_usage_key'
@@ -1047,7 +1047,7 @@ class SubsectionGradeView(GradeViewMixin, APIView):
         try:
             user_id = int(request.GET.get('user_id'))
         except ValueError:
-            raise self.api_error(
+            raise self.api_error(  # lint-amnesty, pylint: disable=raise-missing-from
                 status_code=status.HTTP_404_NOT_FOUND,
                 developer_message='Invalid UserID',
                 error_code='invalid_user_id'

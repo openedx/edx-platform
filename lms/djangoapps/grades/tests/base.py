@@ -78,7 +78,7 @@ class GradeTestBase(SharedModuleStoreTestCase):
             cls.store.update_item(cls.chapter_2, UserFactory().id)
 
     def setUp(self):
-        super(GradeTestBase, self).setUp()
+        super(GradeTestBase, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.addCleanup(set_current_request, None)
         self.request = get_mock_request(UserFactory())
         self.client.login(username=self.request.user.username, password="test")

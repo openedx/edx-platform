@@ -104,7 +104,7 @@ class Command(BaseCommand):
             # This is a tuple to reduce memory consumption.
             # The dictionaries with their extra overhead will be created
             # and consumed one at a time.
-            for task_arg_tuple in tasks._course_task_args(course_key, **options):
+            for task_arg_tuple in tasks._course_task_args(course_key, **options):  # lint-amnesty, pylint: disable=protected-access
                 all_args.append(task_arg_tuple)
 
         all_args.sort(key=lambda x: hashlib.md5('{!r}'.format(x).encode('utf-8')).digest())

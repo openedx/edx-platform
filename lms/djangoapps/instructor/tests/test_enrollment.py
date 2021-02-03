@@ -48,7 +48,7 @@ from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 class TestSettableEnrollmentState(CacheIsolationTestCase):
     """ Test the basis class for enrollment tests. """
     def setUp(self):
-        super(TestSettableEnrollmentState, self).setUp()
+        super(TestSettableEnrollmentState, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.course_key = CourseLocator('Robot', 'fAKE', 'C--se--ID')
 
     def test_mes_create(self):
@@ -77,7 +77,7 @@ class TestEnrollmentChangeBase(six.with_metaclass(ABCMeta, CacheIsolationTestCas
     """
 
     def setUp(self):
-        super(TestEnrollmentChangeBase, self).setUp()
+        super(TestEnrollmentChangeBase, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.course_key = CourseLocator('Robot', 'fAKE', 'C--se--ID')
 
     def _run_state_change_test(self, before_ideal, after_ideal, action):
@@ -378,8 +378,8 @@ class TestInstructorEnrollmentStudentModule(SharedModuleStoreTestCase):
             org='course',
             run='id',
         )
-        cls.course_key = cls.course.location.course_key
-        with cls.store.bulk_operations(cls.course.id, emit_signals=False):
+        cls.course_key = cls.course.location.course_key  # lint-amnesty, pylint: disable=no-member
+        with cls.store.bulk_operations(cls.course.id, emit_signals=False):  # lint-amnesty, pylint: disable=no-member
             cls.parent = ItemFactory(
                 category="library_content",
                 parent=cls.course,
@@ -403,7 +403,7 @@ class TestInstructorEnrollmentStudentModule(SharedModuleStoreTestCase):
             )
 
     def setUp(self):
-        super(TestInstructorEnrollmentStudentModule, self).setUp()
+        super(TestInstructorEnrollmentStudentModule, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
 
         self.user = UserFactory()
 
@@ -860,7 +860,7 @@ class TestSendBetaRoleEmail(CacheIsolationTestCase):
     """
 
     def setUp(self):
-        super(TestSendBetaRoleEmail, self).setUp()
+        super(TestSendBetaRoleEmail, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.user = UserFactory.create()
         self.email_params = {'course': 'Robot Super Course'}
 
@@ -885,7 +885,7 @@ class TestGetEmailParamsCCX(SharedModuleStoreTestCase):
 
     @patch.dict('django.conf.settings.FEATURES', {'CUSTOM_COURSES_EDX': True})
     def setUp(self):
-        super(TestGetEmailParamsCCX, self).setUp()
+        super(TestGetEmailParamsCCX, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.coach = AdminFactory.create()
         role = CourseCcxCoachRole(self.course.id)
         role.add_users(self.coach)
@@ -978,7 +978,7 @@ class TestRenderMessageToString(EmailTemplateTagMixin, SharedModuleStoreTestCase
 
     @patch.dict('django.conf.settings.FEATURES', {'CUSTOM_COURSES_EDX': True})
     def setUp(self):
-        super(TestRenderMessageToString, self).setUp()
+        super(TestRenderMessageToString, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         coach = AdminFactory.create()
         role = CourseCcxCoachRole(self.course.id)
         role.add_users(coach)

@@ -9,7 +9,7 @@ import unittest
 
 import mock
 import six
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.core.exceptions import MultipleObjectsReturned
 from django.test import TestCase
 from opaque_keys.edx.keys import CourseKey
@@ -56,7 +56,7 @@ class TestHandleDashboardError(unittest.TestCase):
 
     def test_no_error(self):
         @tools.handle_dashboard_error
-        def view(request, course_id):
+        def view(request, course_id):  # lint-amnesty, pylint: disable=unused-argument
             """
             Returns "Oh yes!"
             """
@@ -73,7 +73,7 @@ class TestRequireStudentIdentifier(TestCase):
         """
         Fixtures
         """
-        super(TestRequireStudentIdentifier, self).setUp()
+        super(TestRequireStudentIdentifier, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.student = UserFactory.create()
 
     def test_valid_student_id(self):
@@ -208,7 +208,7 @@ class TestSetDueDateExtension(ModuleStoreTestCase):
         """
         Fixtures.
         """
-        super(TestSetDueDateExtension, self).setUp()
+        super(TestSetDueDateExtension, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
 
         self.due = due = datetime.datetime(2010, 5, 12, 2, 42, tzinfo=UTC)
         course = CourseFactory.create()
@@ -297,7 +297,7 @@ class TestDataDumps(ModuleStoreTestCase):
         """
         Fixtures.
         """
-        super(TestDataDumps, self).setUp()
+        super(TestDataDumps, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
 
         due = datetime.datetime(2010, 5, 12, 2, 42, tzinfo=UTC)
         course = CourseFactory.create()

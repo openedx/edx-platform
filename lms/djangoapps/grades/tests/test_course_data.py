@@ -22,7 +22,7 @@ class CourseDataTest(ModuleStoreTestCase):
     """
 
     def setUp(self):
-        super(CourseDataTest, self).setUp()
+        super(CourseDataTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         with self.store.default_store(ModuleStoreEnum.Type.split):
             self.course = CourseFactory.create()
             # need to re-retrieve the course since the version on the original course isn't accurate.
@@ -53,13 +53,13 @@ class CourseDataTest(ModuleStoreTestCase):
             course_data = CourseData(self.user, **kwargs)
             for arg in self.expected_results:
                 # No point validating the data we used as input, and c_b_s is input-only
-                if arg != kwarg and arg != "collected_block_structure":
+                if arg != kwarg and arg != "collected_block_structure":  # lint-amnesty, pylint: disable=consider-using-in
                     expected = self.expected_results[arg]
                     actual = getattr(course_data, arg)
                     self.assertEqual(expected, actual)
 
     def test_properties(self):
-        expected_edited_on = getattr(
+        expected_edited_on = getattr(  # lint-amnesty, pylint: disable=literal-used-as-attribute
             self.one_true_structure[self.one_true_structure.root_block_usage_key],
             'subtree_edited_on',
         )

@@ -249,7 +249,7 @@ class CourseGrade(CourseGradeBase):
     Course Grade class when grades are updated or read from storage.
     """
     def __init__(self, user, course_data, *args, **kwargs):
-        super(CourseGrade, self).__init__(user, course_data, *args, **kwargs)
+        super(CourseGrade, self).__init__(user, course_data, *args, **kwargs)  # lint-amnesty, pylint: disable=super-with-arguments
         self._subsection_grade_factory = SubsectionGradeFactory(user, course_data=course_data)
 
     def update(self):
@@ -270,7 +270,7 @@ class CourseGrade(CourseGradeBase):
         return self
 
     @lazy
-    def attempted(self):
+    def attempted(self):  # lint-amnesty, pylint: disable=invalid-overridden-method
         """
         Returns whether any of the subsections in this course
         have been attempted by the student.
