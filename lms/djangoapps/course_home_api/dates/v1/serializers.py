@@ -24,6 +24,7 @@ class DateSummarySerializer(serializers.Serializer):
     link_text = serializers.CharField()
     title = serializers.CharField()
     extra_info = serializers.CharField()
+    first_component_block_id = serializers.SerializerMethodField()
 
     def get_learner_has_access(self, block):
         learner_is_full_access = self.context.get('learner_is_full_access', False)
@@ -36,6 +37,9 @@ class DateSummarySerializer(serializers.Serializer):
             request = self.context.get('request')
             return request.build_absolute_uri(block.link)
         return ''
+
+    def get_first_component_block_id(self, block):
+        return getattr(block, 'first_component_block_id', '')
 
 
 class DatesTabSerializer(DatesBannerSerializerMixin, serializers.Serializer):

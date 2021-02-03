@@ -41,7 +41,7 @@ class TestIcsGeneration(TestCase):
 
     def make_assigment(
         self, block_key=None, title=None, url=None, date=None, contains_gated_content=False, complete=False,
-        past_due=False, assignment_type=None, extra_info=None
+        past_due=False, assignment_type=None, extra_info=None, first_component_block_id=None
     ):
         """ Bundles given info into a namedtupled like get_course_assignments returns """
         return _Assignment(
@@ -53,7 +53,8 @@ class TestIcsGeneration(TestCase):
             complete,
             past_due,
             assignment_type,
-            extra_info
+            extra_info,
+            first_component_block_id
         )
 
     def expected_ics(self, *assignments):
