@@ -42,6 +42,7 @@ def parse_path_data(path_data):
     return path
 
 
+@python_2_unicode_compatible
 class Bookmark(TimeStampedModel):
     """
     Bookmarks model.
@@ -192,6 +193,7 @@ class Bookmark(TimeStampedModel):
         return path_data
 
 
+@python_2_unicode_compatible
 class XBlockCache(TimeStampedModel):
     """
     XBlockCache model to store info about xblocks.
