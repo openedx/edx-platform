@@ -2,7 +2,7 @@
 
 
 from django.conf import settings
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.urls import reverse
 from django.test import TestCase
 from mock import patch
@@ -15,7 +15,7 @@ class CachedAuthMiddlewareTestCase(TestCase):
     """Tests for CacheBackedAuthenticationMiddleware class."""
 
     def setUp(self):
-        super(CachedAuthMiddlewareTestCase, self).setUp()
+        super(CachedAuthMiddlewareTestCase, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         password = 'test-password'
         self.user = UserFactory(password=password)
         self.client.login(username=self.user.username, password=password)

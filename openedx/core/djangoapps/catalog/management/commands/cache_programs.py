@@ -44,8 +44,8 @@ class Command(BaseCommand):
     """
     help = "Rebuild the LMS' cache of program data."
 
-    # pylint: disable=unicode-format-string
-    def handle(self, *args, **options):
+    # lint-amnesty, pylint: disable=bad-option-value, unicode-format-string
+    def handle(self, *args, **options):  # lint-amnesty, pylint: disable=too-many-statements
         failure = False
         logger.info('populate-multitenant-programs switch is ON')
 
@@ -135,7 +135,7 @@ class Command(BaseCommand):
         if failure:
             sys.exit(1)
 
-    def get_site_program_uuids(self, client, site):
+    def get_site_program_uuids(self, client, site):  # lint-amnesty, pylint: disable=missing-function-docstring
         failure = False
         uuids = []
         try:
@@ -157,7 +157,7 @@ class Command(BaseCommand):
         ))
         return uuids, failure
 
-    def fetch_program_details(self, client, uuids):
+    def fetch_program_details(self, client, uuids):  # lint-amnesty, pylint: disable=missing-function-docstring
         programs = {}
         failure = False
         for uuid in uuids:

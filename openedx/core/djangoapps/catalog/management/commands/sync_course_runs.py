@@ -10,7 +10,7 @@ from opaque_keys.edx.keys import CourseKey
 
 from openedx.core.djangoapps.catalog.utils import get_course_runs
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
-import six
+import six  # lint-amnesty, pylint: disable=wrong-import-order
 
 log = logging.getLogger(__name__)
 

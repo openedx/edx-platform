@@ -12,7 +12,7 @@ from openedx.core.djangoapps.catalog.management.commands.sync_course_runs import
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
-import six
+import six  # lint-amnesty, pylint: disable=wrong-import-order
 
 COMMAND_MODULE = 'openedx.core.djangoapps.catalog.management.commands.sync_course_runs'
 
@@ -24,7 +24,7 @@ class TestSyncCourseRunsCommand(ModuleStoreTestCase):
     Test for the sync course runs management command.
     """
     def setUp(self):
-        super(TestSyncCourseRunsCommand, self).setUp()
+        super(TestSyncCourseRunsCommand, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         # create mongo course
         self.course = CourseFactory.create()
         # load this course into course overview
@@ -57,7 +57,7 @@ class TestSyncCourseRunsCommand(ModuleStoreTestCase):
             # course overview value matches catalog value
             self.assertEqual(
                 updated_course_overview_value,
-                self.catalog_course_run.get(catalog_field_name),
+                self.catalog_course_run.get(catalog_field_name),  # lint-amnesty, pylint: disable=no-member
             )
             # new value doesn't match old value
             self.assertNotEqual(
