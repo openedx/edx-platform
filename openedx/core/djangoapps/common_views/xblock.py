@@ -24,10 +24,10 @@ def xblock_resource(request, block_type, uri):  # pylint: disable=unused-argumen
         content = xblock_class.open_local_resource(uri)
     except IOError:
         log.info('Failed to load xblock resource', exc_info=True)
-        raise Http404
+        raise Http404  # lint-amnesty, pylint: disable=raise-missing-from
     except Exception:
         log.error('Failed to load xblock resource', exc_info=True)
-        raise Http404
+        raise Http404  # lint-amnesty, pylint: disable=raise-missing-from
 
     mimetype, _ = mimetypes.guess_type(uri)
     return HttpResponse(content, content_type=mimetype)
