@@ -70,7 +70,7 @@ from uuid import uuid4
 import six
 import social_django
 from django.conf import settings
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.contrib.auth import logout
 from django.core.mail.message import EmailMessage
 from django.http import HttpResponseBadRequest
@@ -141,7 +141,7 @@ BASE_URL = settings.AUTHN_MICROFRONTEND_URL if should_redirect_to_authn_microfro
 
 def is_api(auth_entry):
     """Returns whether the auth entry point is via an API call."""
-    return (auth_entry == AUTH_ENTRY_LOGIN_API) or (auth_entry == AUTH_ENTRY_REGISTER_API)
+    return (auth_entry == AUTH_ENTRY_LOGIN_API) or (auth_entry == AUTH_ENTRY_REGISTER_API)  # lint-amnesty, pylint: disable=consider-using-in
 
 # URLs associated with auth entry points
 # These are used to request additional user information
@@ -550,7 +550,7 @@ def redirect_to_custom_form(request, auth_entry, details, kwargs):
 
 
 @partial.partial
-def ensure_user_information(strategy, auth_entry, backend=None, user=None, social=None, current_partial=None,
+def ensure_user_information(strategy, auth_entry, backend=None, user=None, social=None, current_partial=None,  # lint-amnesty, pylint: disable=keyword-arg-before-vararg
                             allow_inactive_user=False, details=None, *args, **kwargs):
     """
     Ensure that we have the necessary information about a user (either an
@@ -654,7 +654,7 @@ def ensure_user_information(strategy, auth_entry, backend=None, user=None, socia
 
 
 @partial.partial
-def set_logged_in_cookies(backend=None, user=None, strategy=None, auth_entry=None, current_partial=None,
+def set_logged_in_cookies(backend=None, user=None, strategy=None, auth_entry=None, current_partial=None,  # lint-amnesty, pylint: disable=keyword-arg-before-vararg
                           *args, **kwargs):
     """This pipeline step sets the "logged in" cookie for authenticated users.
 
@@ -706,7 +706,7 @@ def set_logged_in_cookies(backend=None, user=None, strategy=None, auth_entry=Non
 
 
 @partial.partial
-def login_analytics(strategy, auth_entry, current_partial=None, *args, **kwargs):
+def login_analytics(strategy, auth_entry, current_partial=None, *args, **kwargs):  # lint-amnesty, pylint: disable=keyword-arg-before-vararg
     """ Sends login info to Segment """
 
     event_name = None
@@ -724,7 +724,7 @@ def login_analytics(strategy, auth_entry, current_partial=None, *args, **kwargs)
 
 
 @partial.partial
-def associate_by_email_if_login_api(auth_entry, backend, details, user, current_partial=None, *args, **kwargs):
+def associate_by_email_if_login_api(auth_entry, backend, details, user, current_partial=None, *args, **kwargs):  # lint-amnesty, pylint: disable=keyword-arg-before-vararg
     """
     This pipeline step associates the current social auth with the user with the
     same email address in the database.  It defers to the social library's associate_by_email
@@ -834,7 +834,7 @@ def associate_by_email_if_saml(auth_entry, backend, details, user, strategy, *ar
                 return associate_response
 
 
-def user_details_force_sync(auth_entry, strategy, details, user=None, *args, **kwargs):
+def user_details_force_sync(auth_entry, strategy, details, user=None, *args, **kwargs):  # lint-amnesty, pylint: disable=keyword-arg-before-vararg
     """
     Update normally protected user details using data from provider.
 
@@ -921,7 +921,7 @@ def user_details_force_sync(auth_entry, strategy, details, user=None, *args, **k
                                      u'notification email. Username: {username}'.format(username=user.username))
 
 
-def set_id_verification_status(auth_entry, strategy, details, user=None, *args, **kwargs):
+def set_id_verification_status(auth_entry, strategy, details, user=None, *args, **kwargs):  # lint-amnesty, pylint: disable=keyword-arg-before-vararg
     """
     Use the user's authentication with the provider, if configured, as evidence of their identity being verified.
     """
@@ -949,7 +949,7 @@ def set_id_verification_status(auth_entry, strategy, details, user=None, *args, 
             verification.send_approval_signal(current_provider.slug)
 
 
-def get_username(strategy, details, backend, user=None, *args, **kwargs):
+def get_username(strategy, details, backend, user=None, *args, **kwargs):  # lint-amnesty, pylint: disable=keyword-arg-before-vararg
     """
     Copy of social_core.pipeline.user.get_username to achieve
     1. additional logging

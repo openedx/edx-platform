@@ -27,7 +27,7 @@ def mock_get(status_code=200):
     Returns:
         returns a function that can be used as a mock function for requests.get.
     """
-    def _(url=None, *args, **kwargs):  # pylint: disable=unused-argument
+    def _(url=None, *args, **kwargs):  # lint-amnesty, pylint: disable=keyword-arg-before-vararg, unused-argument
         """
         mock method for requests.get, this method will read xml file, form a Response object from the
         contents of this file, set status code and return the Response object.
@@ -56,7 +56,7 @@ class TestSAMLCommand(CacheIsolationTestCase):
         Setup operations for saml configurations. these operations contain
         creation of SAMLConfiguration and SAMLProviderConfig records in database.
         """
-        super(TestSAMLCommand, self).setUp()
+        super(TestSAMLCommand, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
 
         self.stdout = StringIO()
 

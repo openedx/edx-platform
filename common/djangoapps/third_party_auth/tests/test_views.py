@@ -164,7 +164,7 @@ class IdPRedirectViewTest(SAMLTestCase):
         Test IdPRedirectView.
     """
     def setUp(self):
-        super(IdPRedirectViewTest, self).setUp()
+        super(IdPRedirectViewTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
 
         self.enable_saml()
         self.configure_saml_provider(

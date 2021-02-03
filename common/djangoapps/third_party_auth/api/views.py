@@ -6,7 +6,7 @@ Third Party Auth REST API views
 from collections import namedtuple
 
 from django.conf import settings
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.db.models import Q
 from django.http import Http404
 from django.urls import reverse
@@ -40,7 +40,7 @@ class ProviderBaseThrottle(throttling.UserRateThrottle):
         Only throttle unprivileged requests.
         """
         if view.is_unprivileged_query(request, view.get_identifier_for_requested_user(request)):
-            return super(ProviderBaseThrottle, self).allow_request(request, view)
+            return super(ProviderBaseThrottle, self).allow_request(request, view)  # lint-amnesty, pylint: disable=super-with-arguments
         return True
 
 
@@ -175,7 +175,7 @@ class UserView(BaseUserView):
               login.
     """
 
-    def get(self, request, username):
+    def get(self, request, username):  # lint-amnesty, pylint: disable=unused-argument
         """Read provider information for a user.
 
         Allows reading the list of providers for a specified user.
@@ -378,7 +378,7 @@ class UserMappingView(ListAPIView):
         Extra context provided to the serializer class with current provider. We need the provider to
         remove idp_slug from the remote_id if there is any
         """
-        context = super(UserMappingView, self).get_serializer_context()
+        context = super(UserMappingView, self).get_serializer_context()  # lint-amnesty, pylint: disable=super-with-arguments
         context['provider'] = self.provider
 
         return context

@@ -3,7 +3,7 @@ Utility functions for third_party_auth
 """
 
 from uuid import UUID
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from enterprise.models import EnterpriseCustomerUser, EnterpriseCustomerIdentityProvider
 from . import provider
 
@@ -49,7 +49,7 @@ def get_user_from_email(details):
     return None
 
 
-def convert_saml_slug_provider_id(provider):
+def convert_saml_slug_provider_id(provider):  # lint-amnesty, pylint: disable=redefined-outer-name
     """
     Provider id is stored with the backend type prefixed to it (ie "saml-")
     Slug is stored without this prefix.

@@ -6,12 +6,12 @@ Decorators that can be used to interact with third_party_auth.
 from functools import wraps
 
 from django.conf import settings
-from django.shortcuts import redirect
+from django.shortcuts import redirect  # lint-amnesty, pylint: disable=unused-import
 from django.utils.decorators import available_attrs
-from six.moves.urllib.parse import urlencode, urlparse
+from six.moves.urllib.parse import urlencode, urlparse  # lint-amnesty, pylint: disable=unused-import
 
 from common.djangoapps.third_party_auth.models import LTIProviderConfig
-from common.djangoapps.third_party_auth.provider import Registry
+from common.djangoapps.third_party_auth.provider import Registry  # lint-amnesty, pylint: disable=unused-import
 
 
 def xframe_allow_whitelisted(view_func):

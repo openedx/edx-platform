@@ -1,7 +1,7 @@
 """Unit tests for settings.py."""
 
 
-import unittest
+import unittest  # lint-amnesty, pylint: disable=unused-import
 
 from mock import patch
 from common.djangoapps.third_party_auth import provider, settings
@@ -32,7 +32,7 @@ class SettingsUnitTest(testutil.TestCase):
     # pylint: disable=no-member
 
     def setUp(self):
-        super(SettingsUnitTest, self).setUp()
+        super(SettingsUnitTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.settings = testutil.FakeDjangoSettings(_SETTINGS_MAP)
 
     def test_apply_settings_adds_exception_middleware(self):

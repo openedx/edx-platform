@@ -16,7 +16,7 @@ from django.contrib.messages.storage import fallback
 from django.contrib.sessions.backends import cache
 from django.urls import reverse
 from django.test import utils as django_utils
-from django.conf import settings as django_settings
+from django.conf import settings as django_settings  # lint-amnesty, pylint: disable=reimported
 from social_core import actions, exceptions
 from social_django import utils as social_utils
 from social_django import views as social_views
@@ -58,7 +58,7 @@ class HelperMixin(object):
         self.assertEqual(302, response.status_code)
         self.assertTrue(response.has_header('Location'))
 
-    def assert_register_response_in_pipeline_looks_correct(self, response, pipeline_kwargs, required_fields):
+    def assert_register_response_in_pipeline_looks_correct(self, response, pipeline_kwargs, required_fields):  # lint-amnesty, pylint: disable=invalid-name
         """Performs spot checks of the rendered register.html page.
 
         When we display the new account registration form after the user signs
@@ -366,7 +366,7 @@ class IntegrationTestMixin(testutil.TestCase, test.TestCase, HelperMixin):
     USER_USERNAME = "override"
 
     def setUp(self):
-        super(IntegrationTestMixin, self).setUp()
+        super(IntegrationTestMixin, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
 
         self.request_factory = test.RequestFactory()
         self.login_page_url = reverse('signin_user')
@@ -536,7 +536,7 @@ class IntegrationTest(testutil.TestCase, test.TestCase, HelperMixin):
     """Abstract base class for provider integration tests."""
 
     def setUp(self):
-        super(IntegrationTest, self).setUp()
+        super(IntegrationTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.request_factory = test.RequestFactory()
 
     # Actual tests, executed once per child.
@@ -1023,7 +1023,7 @@ class IntegrationTest(testutil.TestCase, test.TestCase, HelperMixin):
 
 # pylint: disable=abstract-method
 @django_utils.override_settings(ECOMMERCE_API_URL=TEST_API_URL)
-class Oauth2IntegrationTest(IntegrationTest):
+class Oauth2IntegrationTest(IntegrationTest):  # lint-amnesty, pylint: disable=test-inherits-tests
     """Base test case for integration tests of Oauth2 providers."""
 
     # Dict of string -> object. Information about the token granted to the
