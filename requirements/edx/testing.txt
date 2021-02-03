@@ -57,6 +57,7 @@ defusedxml==0.6.0         # via -r requirements/edx/base.txt, djangorestframewor
 diff-cover==4.2.1         # via -r requirements/edx/coverage.txt
 distlib==0.3.1            # via virtualenv
 django-appconf==1.0.4     # via -r requirements/edx/base.txt, django-statici18n
+django-cache-memoize==0.1.7  # via -r requirements/edx/base.txt, edx-enterprise
 django-celery-results==2.0.1  # via -r requirements/edx/base.txt
 django-classy-tags==2.0.0  # via -r requirements/edx/base.txt, django-sekizai
 django-config-models==2.1.1  # via -r requirements/edx/base.txt, edx-enterprise, edx-event-routing-backends
@@ -106,7 +107,7 @@ edx-django-release-util==1.0.0  # via -r requirements/edx/base.txt
 edx-django-sites-extensions==3.0.0  # via -r requirements/edx/base.txt
 edx-django-utils==3.13.0  # via -r requirements/edx/base.txt, django-config-models, edx-drf-extensions, edx-enterprise, edx-rest-api-client, edx-toggles, edx-when, ora2, super-csv
 edx-drf-extensions==6.4.0  # via -r requirements/edx/base.txt, edx-completion, edx-enterprise, edx-organizations, edx-proctoring, edx-rbac, edx-when, edxval
-edx-enterprise==3.17.20   # via -c requirements/edx/../constraints.txt, -r requirements/edx/base.txt
+edx-enterprise==3.17.21   # via -c requirements/edx/../constraints.txt, -r requirements/edx/base.txt
 edx-event-routing-backends==4.0.1  # via -r requirements/edx/base.txt
 edx-i18n-tools==0.5.3     # via -r requirements/edx/base.txt, -r requirements/edx/testing.in, ora2
 edx-lint==3.0.2           # via -r requirements/edx/testing.in
@@ -131,7 +132,7 @@ enmerkar==0.7.1           # via -r requirements/edx/base.txt, enmerkar-underscor
 event-tracking==1.0.4     # via -r requirements/edx/base.txt, edx-event-routing-backends, edx-proctoring, edx-search
 execnet==1.8.0            # via pytest-xdist
 factory-boy==2.8.1        # via -c requirements/edx/../constraints.txt, -r requirements/edx/testing.in
-faker==5.8.0              # via factory-boy
+faker==6.0.0              # via factory-boy
 filelock==3.0.12          # via tox, virtualenv
 freezegun==0.3.12         # via -c requirements/edx/../constraints.txt, -r requirements/edx/testing.in
 fs-s3fs==0.1.8            # via -r requirements/edx/base.txt, django-pyfs
@@ -274,7 +275,7 @@ text-unidecode==1.3       # via -r requirements/edx/base.txt, faker, python-slug
 tincan==1.0.0             # via -r requirements/edx/base.txt, edx-event-routing-backends
 toml==0.10.2              # via pylint, pytest, tox
 tox-battery==0.6.1        # via -r requirements/edx/testing.in
-tox==3.21.3               # via -r requirements/edx/testing.in, tox-battery
+tox==3.21.4               # via -r requirements/edx/testing.in, tox-battery
 tqdm==4.56.0              # via -r requirements/edx/base.txt, nltk
 transifex-client==0.14.2  # via -r requirements/edx/testing.in
 ua-parser==0.10.0         # via -r requirements/edx/base.txt, django-cookies-samesite

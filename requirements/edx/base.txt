@@ -48,6 +48,7 @@ ddt==1.4.1                # via xblock-drag-and-drop-v2, xblock-poll
 decorator==4.4.2          # via pycontracts
 defusedxml==0.6.0         # via -r requirements/edx/base.in, djangorestframework-xml, ora2, python3-openid, python3-saml, safe-lxml, social-auth-core
 django-appconf==1.0.4     # via -r requirements/edx/base.in, django-statici18n
+django-cache-memoize==0.1.7  # via edx-enterprise
 django-celery-results==2.0.1  # via -r requirements/edx/base.in
 django-classy-tags==2.0.0  # via django-sekizai
 django-config-models==2.1.1  # via -r requirements/edx/base.in, edx-enterprise, edx-event-routing-backends
@@ -98,7 +99,7 @@ edx-django-release-util==1.0.0  # via -r requirements/edx/base.in
 edx-django-sites-extensions==3.0.0  # via -r requirements/edx/base.in
 edx-django-utils==3.13.0  # via -r requirements/edx/base.in, django-config-models, edx-drf-extensions, edx-enterprise, edx-rest-api-client, edx-toggles, edx-when, ora2, super-csv
 edx-drf-extensions==6.4.0  # via -r requirements/edx/base.in, edx-completion, edx-enterprise, edx-organizations, edx-proctoring, edx-rbac, edx-when, edxval
-edx-enterprise==3.17.20   # via -c requirements/edx/../constraints.txt, -r requirements/edx/base.in
+edx-enterprise==3.17.21   # via -c requirements/edx/../constraints.txt, -r requirements/edx/base.in
 edx-event-routing-backends==4.0.1  # via -r requirements/edx/base.in
 edx-i18n-tools==0.5.3     # via ora2
 edx-milestones==0.3.0     # via -r requirements/edx/base.in
