@@ -44,7 +44,7 @@ class Command(BaseCommand):
     """
     help = "Rebuild the LMS' cache of program data."
 
-  # lint-amnesty, pylint: disable=bad-option-value, unicode-format-string
+    # lint-amnesty, pylint: disable=bad-option-value, unicode-format-string
     def handle(self, *args, **options):  # lint-amnesty, pylint: disable=too-many-statements
         failure = False
         logger.info('populate-multitenant-programs switch is ON')
