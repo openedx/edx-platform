@@ -1,4 +1,4 @@
-  # lint-amnesty, pylint: disable=missing-module-docstring
+# lint-amnesty, pylint: disable=missing-module-docstring
 
 from django.conf import settings
 from django.test import TestCase
