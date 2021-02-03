@@ -244,7 +244,7 @@ class ContentStoreToyCourseTest(SharedModuleStoreTestCase):
         """
         first_byte = self.length_unlocked / 4
         last_byte = self.length_unlocked / 2
-  # lint-amnesty, pylint: disable=bad-option-value, unicode-format-string
+        # lint-amnesty, pylint: disable=bad-option-value, unicode-format-string
         resp = self.client.get(self.url_unlocked, HTTP_RANGE='bytes={first}-{last}, -100'.format(
             first=first_byte, last=last_byte))
 

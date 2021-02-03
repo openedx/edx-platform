@@ -264,7 +264,7 @@ class TestCsrfCrossDomainCookieMiddleware(TestCase):
         if is_set:
             self.assertIn(self.COOKIE_NAME, response.cookies)
             cookie_header = six.text_type(response.cookies[self.COOKIE_NAME])
-  # lint-amnesty, pylint: disable=bad-option-value, unicode-format-string
+            # lint-amnesty, pylint: disable=bad-option-value, unicode-format-string
             expected = six.u('Set-Cookie: {name}={value}; Domain={domain};').format(
                 name=self.COOKIE_NAME,
                 value=self.COOKIE_VALUE,
