@@ -185,7 +185,17 @@ FEATURES = {
     # .. toggle_tickets: None
     'ENABLE_SYSADMIN_DASHBOARD': False,  # sysadmin dashboard, to see what courses are loaded, to delete & load courses
 
-    'DISABLE_LOGIN_BUTTON': False,  # used in systems where login is automatic, eg MIT SSL
+    # .. toggle_name: FEATURES['DISABLE_LOGIN_BUTTON']
+    # .. toggle_implementation: DjangoSetting
+    # .. toggle_default: False
+    # .. toggle_description: Removes the display of the login button in the navigation bar.
+    #   Change is only at the UI level. Used in systems where login is automatic, eg MIT SSL
+    # .. toggle_use_cases: open_edx
+    # .. toggle_creation_date: 2013-12-03
+    # .. toggle_target_removal_date: None
+    # .. toggle_warnings: None
+    # .. toggle_tickets: None
+    'DISABLE_LOGIN_BUTTON': False,
 
     # .. toggle_name: FEATURES['ENABLE_OAUTH2_PROVIDER']
     # .. toggle_implementation: DjangoSetting
