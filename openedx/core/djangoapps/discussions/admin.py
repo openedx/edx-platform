@@ -12,6 +12,10 @@ from .models import ProviderFilter
 
 
 class DiscussionsConfigurationAdmin(SimpleHistoryAdmin):
+    """
+    Customize the admin interface for the discussions configuration
+    """
+
     search_fields = (
         'context_key',
         'enabled',

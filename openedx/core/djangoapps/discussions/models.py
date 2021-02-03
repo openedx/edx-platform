@@ -130,7 +130,9 @@ class DiscussionsConfiguration(TimeStampedModel):
         db_index=True,
         unique=True,
         max_length=255,
-        # Translators: A key specifying a course, library, program, website, or some other collection of content where learning happens.
+        # Translators: A key specifying a course, library, program,
+        # website, or some other collection of content where learning
+        # happens.
         verbose_name=_("Learning Context Key"),
     )
     enabled = models.BooleanField(
@@ -184,6 +186,7 @@ class DiscussionsConfiguration(TimeStampedModel):
         configuration = cls.get(context_key)
         return configuration.enabled
 
+    # pylint: disable=undefined-variable
     @classmethod
     def get(cls, context_key) -> cls:
         """
@@ -194,6 +197,7 @@ class DiscussionsConfiguration(TimeStampedModel):
         except cls.DoesNotExist:
             configuration = cls(context_key=context_key, enabled=False)
         return configuration
+    # pylint: enable=undefined-variable
 
     @property
     def available_providers(self) -> List[str]:
