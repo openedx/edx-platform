@@ -17,7 +17,7 @@ class ProfileParentalControlsTest(TestCase):
     password = "test"
 
     def setUp(self):
-        super(ProfileParentalControlsTest, self).setUp()
+        super(ProfileParentalControlsTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.user = UserFactory.create(password=self.password)
         self.profile = UserProfile.objects.get(id=self.user.id)
 

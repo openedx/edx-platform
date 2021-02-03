@@ -7,7 +7,7 @@ import itertools
 import json
 import re
 import unittest
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta  # lint-amnesty, pylint: disable=unused-import
 
 import ddt
 import six
@@ -40,7 +40,7 @@ from common.djangoapps.student.helpers import DISABLE_UNENROLL_CERT_STATES
 from common.djangoapps.student.models import CourseEnrollment, UserProfile
 from common.djangoapps.student.signals import REFUND_ORDER
 from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
-from common.djangoapps.util.milestones_helpers import get_course_milestones, remove_prerequisite_course, set_prerequisite_courses
+from common.djangoapps.util.milestones_helpers import get_course_milestones, remove_prerequisite_course, set_prerequisite_courses  # lint-amnesty, pylint: disable=line-too-long
 from common.djangoapps.util.testing import UrlResetMixin
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
@@ -64,7 +64,7 @@ class TestStudentDashboardUnenrollments(SharedModuleStoreTestCase):
 
     def setUp(self):
         """ Create a course and user, then log in. """
-        super(TestStudentDashboardUnenrollments, self).setUp()
+        super(TestStudentDashboardUnenrollments, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.user = UserFactory()
         self.enrollment = CourseEnrollmentFactory(course_id=self.course.id, user=self.user)
         self.cert_status = 'processing'
@@ -196,7 +196,7 @@ class StudentDashboardTests(SharedModuleStoreTestCase, MilestonesTestCaseMixin, 
         """
         Create a course and user, then log in.
         """
-        super(StudentDashboardTests, self).setUp()
+        super(StudentDashboardTests, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.user = UserFactory()
         self.client.login(username=self.user.username, password=PASSWORD)
         self.path = reverse('dashboard')
@@ -227,11 +227,11 @@ class StudentDashboardTests(SharedModuleStoreTestCase, MilestonesTestCaseMixin, 
         Verify that learners are not able to see their final grade before the end
         of course in the learner dashboard
         """
-        self.course_key = CourseKey.from_string('course-v1:edX+DemoX+Demo_Course')
-        self.course = CourseOverviewFactory.create(id=self.course_key, end_date=self.TOMORROW,
+        self.course_key = CourseKey.from_string('course-v1:edX+DemoX+Demo_Course')  # lint-amnesty, pylint: disable=attribute-defined-outside-init
+        self.course = CourseOverviewFactory.create(id=self.course_key, end_date=self.TOMORROW,  # lint-amnesty, pylint: disable=attribute-defined-outside-init
                                                    certificate_available_date=self.THREE_YEARS_AGO,
                                                    lowest_passing_grade=0.3)
-        self.course_enrollment = CourseEnrollmentFactory(course_id=self.course.id, user=self.user)
+        self.course_enrollment = CourseEnrollmentFactory(course_id=self.course.id, user=self.user)  # lint-amnesty, pylint: disable=attribute-defined-outside-init
         GeneratedCertificateFactory(status='notpassing', course_id=self.course.id, user=self.user, grade=0.45)
 
         response = self.client.get(reverse('dashboard'))
@@ -244,11 +244,11 @@ class StudentDashboardTests(SharedModuleStoreTestCase, MilestonesTestCaseMixin, 
         Verify that learners are able to see their final grade of the course in
         the learner dashboard after the course had ended
         """
-        self.course_key = CourseKey.from_string('course-v1:edX+DemoX+Demo_Course')
-        self.course = CourseOverviewFactory.create(id=self.course_key, end_date=self.THREE_YEARS_AGO,
+        self.course_key = CourseKey.from_string('course-v1:edX+DemoX+Demo_Course')  # lint-amnesty, pylint: disable=attribute-defined-outside-init
+        self.course = CourseOverviewFactory.create(id=self.course_key, end_date=self.THREE_YEARS_AGO,  # lint-amnesty, pylint: disable=attribute-defined-outside-init
                                                    certificate_available_date=self.TOMORROW,
                                                    lowest_passing_grade=0.3)
-        self.course_enrollment = CourseEnrollmentFactory(course_id=self.course.id, user=self.user)
+        self.course_enrollment = CourseEnrollmentFactory(course_id=self.course.id, user=self.user)  # lint-amnesty, pylint: disable=attribute-defined-outside-init
         GeneratedCertificateFactory(status='notpassing', course_id=self.course.id, user=self.user, grade=0.45)
 
         response = self.client.get(reverse('dashboard'))
@@ -269,8 +269,8 @@ class StudentDashboardTests(SharedModuleStoreTestCase, MilestonesTestCaseMixin, 
         Verify that the course sharing icons show up if course is starting in future and
         any of marketing or social sharing urls are set.
         """
-        self.course = CourseFactory.create(start=self.TOMORROW, emit_signals=True, default_store=modulestore_type)
-        self.course_enrollment = CourseEnrollmentFactory(course_id=self.course.id, user=self.user)
+        self.course = CourseFactory.create(start=self.TOMORROW, emit_signals=True, default_store=modulestore_type)  # lint-amnesty, pylint: disable=attribute-defined-outside-init
+        self.course_enrollment = CourseEnrollmentFactory(course_id=self.course.id, user=self.user)  # lint-amnesty, pylint: disable=attribute-defined-outside-init
         self.set_course_sharing_urls(set_marketing, set_social_sharing)
 
         # Assert course sharing icons
@@ -285,14 +285,14 @@ class StudentDashboardTests(SharedModuleStoreTestCase, MilestonesTestCaseMixin, 
         If we remove the prerequisite and access the dashboard again, the prerequisite
         should not appear.
         """
-        self.pre_requisite_course = CourseFactory.create(org='edx', number='999', display_name='Pre requisite Course')
-        self.course = CourseFactory.create(
+        self.pre_requisite_course = CourseFactory.create(org='edx', number='999', display_name='Pre requisite Course')  # lint-amnesty, pylint: disable=attribute-defined-outside-init
+        self.course = CourseFactory.create(  # lint-amnesty, pylint: disable=attribute-defined-outside-init
             org='edx',
             number='998',
             display_name='Test Course',
             pre_requisite_courses=[six.text_type(self.pre_requisite_course.id)]
         )
-        self.course_enrollment = CourseEnrollmentFactory(course_id=self.course.id, user=self.user)
+        self.course_enrollment = CourseEnrollmentFactory(course_id=self.course.id, user=self.user)  # lint-amnesty, pylint: disable=attribute-defined-outside-init
 
         set_prerequisite_courses(self.course.id, [six.text_type(self.pre_requisite_course.id)])
         response = self.client.get(reverse('dashboard'))
@@ -506,7 +506,7 @@ class StudentDashboardTests(SharedModuleStoreTestCase, MilestonesTestCaseMixin, 
             start=self.TOMORROW, self_paced=True, enrollment_end=self.TOMORROW
         )
         mock_course_overview.return_value = mocked_course_overview
-        course_enrollment = CourseEnrollmentFactory(user=self.user, course_id=six.text_type(mocked_course_overview.id), created=self.THREE_YEARS_AGO)
+        course_enrollment = CourseEnrollmentFactory(user=self.user, course_id=six.text_type(mocked_course_overview.id), created=self.THREE_YEARS_AGO)  # lint-amnesty, pylint: disable=line-too-long
         mock_course_runs.return_value = [
             {
                 'key': str(mocked_course_overview.id),
@@ -516,7 +516,7 @@ class StudentDashboardTests(SharedModuleStoreTestCase, MilestonesTestCaseMixin, 
                 'status': 'published'
             }
         ]
-        entitlement = CourseEntitlementFactory(user=self.user, enrollment_course_run=course_enrollment, created=self.THREE_YEARS_AGO)
+        entitlement = CourseEntitlementFactory(user=self.user, enrollment_course_run=course_enrollment, created=self.THREE_YEARS_AGO)  # lint-amnesty, pylint: disable=line-too-long
         program = ProgramFactory()
         program['courses'][0]['course_runs'] = [{'key': six.text_type(mocked_course_overview.id)}]
         program['courses'][0]['uuid'] = entitlement.course_uuid
@@ -619,7 +619,7 @@ class StudentDashboardTests(SharedModuleStoreTestCase, MilestonesTestCaseMixin, 
         return ''.join(response.content.decode('utf-8').split())
 
     @staticmethod
-    def _pull_course_run_from_course_key(course_key_string):
+    def _pull_course_run_from_course_key(course_key_string):  # lint-amnesty, pylint: disable=missing-function-docstring
         search_results = re.search(r'Run_[0-9]+$', course_key_string)
         assert search_results
         course_run_string = search_results.group(0).replace('_', ' ')

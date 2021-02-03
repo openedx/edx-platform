@@ -53,7 +53,7 @@ class EnrollmentTest(UrlResetMixin, SharedModuleStoreTestCase):
     @patch.dict(settings.FEATURES, {'EMBARGO': True})
     def setUp(self):
         """ Create a course and user, then log in. """
-        super(EnrollmentTest, self).setUp()
+        super(EnrollmentTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.user = UserFactory.create(username=self.USERNAME, email=self.EMAIL, password=self.PASSWORD)
         self.client.login(username=self.USERNAME, password=self.PASSWORD)
         self.course_limited.max_student_enrollments_allowed = 1

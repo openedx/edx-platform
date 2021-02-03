@@ -29,7 +29,7 @@ def is_valid_django_hash(encoded):
     return True
 
 
-class Command(BaseCommand):
+class Command(BaseCommand):  # lint-amnesty, pylint: disable=missing-class-docstring
     help = 'Creates the specified user, if it does not exist, and sets its groups.'
 
     def add_arguments(self, parser):
@@ -74,7 +74,7 @@ class Command(BaseCommand):
                 ).format(user.username)
             )
 
-    def _handle_remove(self, username, email):
+    def _handle_remove(self, username, email):  # lint-amnesty, pylint: disable=missing-function-docstring
         try:
             user = get_user_model().objects.get(username=username)
         except get_user_model().DoesNotExist:
@@ -85,7 +85,7 @@ class Command(BaseCommand):
         user.delete()
 
     @transaction.atomic
-    def handle(self, username, email, is_remove, is_staff, is_superuser, groups,
+    def handle(self, username, email, is_remove, is_staff, is_superuser, groups,  # lint-amnesty, pylint: disable=arguments-differ
                unusable_password, initial_password_hash, *args, **options):
 
         if is_remove:

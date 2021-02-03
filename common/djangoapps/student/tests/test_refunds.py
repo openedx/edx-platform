@@ -51,7 +51,7 @@ class RefundableTest(SharedModuleStoreTestCase):
 
     def setUp(self):
         """ Setup components used by each refund test."""
-        super(RefundableTest, self).setUp()
+        super(RefundableTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.user = UserFactory.create(password=self.USER_PASSWORD)
         self.verified_mode = CourseModeFactory.create(
             course_id=self.course.id,

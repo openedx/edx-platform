@@ -5,7 +5,7 @@ Unittests for populate_created_on_site_user_attribute management command.
 
 import ddt
 import mock
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.core.management import CommandError, call_command
 from django.test import TestCase
 from six.moves import range
@@ -24,7 +24,7 @@ class TestPopulateUserAttribute(SiteMixin, TestCase):
     """
 
     def setUp(self):
-        super(TestPopulateUserAttribute, self).setUp()
+        super(TestPopulateUserAttribute, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
 
         self._create_sample_data()
         self.users = User.objects.all()

@@ -1,4 +1,4 @@
-
+  # lint-amnesty, pylint: disable=missing-module-docstring
 
 import unittest
 from tempfile import NamedTemporaryFile
@@ -27,7 +27,7 @@ class BulkChangeEnrollmentCSVTests(SharedModuleStoreTestCase):
     Tests bulk_change_enrollmetn_csv command
     """
     def setUp(self):
-        super(BulkChangeEnrollmentCSVTests, self).setUp()
+        super(BulkChangeEnrollmentCSVTests, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.courses = []
 
         self.user_info = [
