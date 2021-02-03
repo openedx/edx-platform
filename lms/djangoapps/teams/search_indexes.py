@@ -10,7 +10,7 @@ from django.conf import settings
 from django.db.models.signals import post_delete, post_save
 from django.dispatch import receiver
 from django.utils import translation
-from elasticsearch.exceptions import ConnectionError
+from elasticsearch.exceptions import ConnectionError  # lint-amnesty, pylint: disable=redefined-builtin
 from search.search_engine_base import SearchEngine
 
 from lms.djangoapps.teams.models import CourseTeam
@@ -124,7 +124,7 @@ class CourseTeamIndexer(object):
             return SearchEngine.get_search_engine(index=cls.INDEX_NAME)
         except ConnectionError as err:
             logging.error(u'Error connecting to elasticsearch: %s', err)
-            raise ElasticSearchConnectionError
+            raise ElasticSearchConnectionError  # lint-amnesty, pylint: disable=raise-missing-from
 
     @classmethod
     def search_is_enabled(cls):

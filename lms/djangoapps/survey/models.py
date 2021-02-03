@@ -48,7 +48,7 @@ class SurveyForm(TimeStampedModel):
         self.validate_form_html(self.form)
 
         # now call the actual save method
-        super(SurveyForm, self).save(*args, **kwargs)
+        super(SurveyForm, self).save(*args, **kwargs)  # lint-amnesty, pylint: disable=super-with-arguments
 
     @classmethod
     def validate_form_html(cls, html):
@@ -59,9 +59,9 @@ class SurveyForm(TimeStampedModel):
             fields = cls.get_field_names_from_html(html)
         except Exception as ex:
             log.exception(u"Cannot parse SurveyForm html: {}".format(ex))
-            raise ValidationError(u"Cannot parse SurveyForm as HTML: {}".format(ex))
+            raise ValidationError(u"Cannot parse SurveyForm as HTML: {}".format(ex))  # lint-amnesty, pylint: disable=raise-missing-from
 
-        if not len(fields):
+        if not len(fields):  # lint-amnesty, pylint: disable=len-as-condition
             raise ValidationError("SurveyForms must contain at least one form input field")
 
     @classmethod

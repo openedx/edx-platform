@@ -128,7 +128,7 @@ class StartView(TestCase):
         self.client.login(username="rusty", password="test")
 
     def must_be_logged_in(self):
-        self.assertHttpForbidden(self.client.get(self.start_url()))
+        self.assertHttpForbidden(self.client.get(self.start_url()))  # lint-amnesty, pylint: disable=no-member
 
 
 @ddt.ddt
@@ -151,7 +151,7 @@ class TestPayAndVerifyView(UrlResetMixin, ModuleStoreTestCase, XssTestMixin, Tes
 
     @mock.patch.dict(settings.FEATURES, {'EMBARGO': True})
     def setUp(self):
-        super(TestPayAndVerifyView, self).setUp()
+        super(TestPayAndVerifyView, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.user = UserFactory.create(username=self.USERNAME, password=self.PASSWORD)
         result = self.client.login(username=self.USERNAME, password=self.PASSWORD)
         self.assertTrue(result, msg="Could not log in")
@@ -855,7 +855,7 @@ class TestPayAndVerifyView(UrlResetMixin, ModuleStoreTestCase, XssTestMixin, Tes
             attempt.system_error("Error!")
 
         if status == "expired":
-            days_good_for = settings.VERIFY_STUDENT["DAYS_GOOD_FOR"]
+            days_good_for = settings.VERIFY_STUDENT["DAYS_GOOD_FOR"]  # lint-amnesty, pylint: disable=unused-variable
             attempt.expiration_date = now() - timedelta(days=1)
             attempt.save()
 
@@ -1060,7 +1060,7 @@ class CheckoutTestMixin(object):
 
     def setUp(self):
         """ Create a user and course. """
-        super(CheckoutTestMixin, self).setUp()
+        super(CheckoutTestMixin, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
 
         self.user = UserFactory.create(username="test", password="test")
         self.course = CourseFactory.create()
@@ -1247,7 +1247,7 @@ class TestSubmitPhotosForVerification(MockS3BotoMixin, TestVerificationBase):
     FULL_NAME = u"Ḟüḷḷ Ṅäṁë"
 
     def setUp(self):
-        super(TestSubmitPhotosForVerification, self).setUp()
+        super(TestSubmitPhotosForVerification, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.user = UserFactory.create(username=self.USERNAME, password=self.PASSWORD)
         result = self.client.login(username=self.USERNAME, password=self.PASSWORD)
         self.assertTrue(result, msg="Could not log in")
@@ -1460,7 +1460,7 @@ class TestPhotoVerificationResultsCallback(ModuleStoreTestCase, TestVerification
     """
 
     def setUp(self):
-        super(TestPhotoVerificationResultsCallback, self).setUp()
+        super(TestPhotoVerificationResultsCallback, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
 
         self.course = CourseFactory.create(org='Robot', number='999', display_name='Test Course')
         self.course_id = self.course.id
@@ -1737,7 +1737,7 @@ class TestReverifyView(TestVerificationBase):
     PASSWORD = "detachment-2702"
 
     def setUp(self):
-        super(TestReverifyView, self).setUp()
+        super(TestReverifyView, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.user = UserFactory.create(username=self.USERNAME, password=self.PASSWORD)
         success = self.client.login(username=self.USERNAME, password=self.PASSWORD)
         self.assertTrue(success, msg="Could not log in")
@@ -1835,7 +1835,7 @@ class TestPhotoURLView(TestVerificationBase):
     """
 
     def setUp(self):
-        super(TestPhotoURLView, self).setUp()
+        super(TestPhotoURLView, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
 
         self.user = AdminFactory()
         login_success = self.client.login(username=self.user.username, password='test')
@@ -1868,7 +1868,7 @@ class TestPhotoURLView(TestVerificationBase):
         )
 
     def test_photo_url_view_returns_404_if_invalid_receipt_id(self):
-        url = reverse('verification_photo_urls', kwargs={'receipt_id': six.text_type('00000000-0000-0000-0000-000000000000')})
+        url = reverse('verification_photo_urls', kwargs={'receipt_id': six.text_type('00000000-0000-0000-0000-000000000000')})  # lint-amnesty, pylint: disable=line-too-long
         response = self.client.get(url)
         self.assertEqual(response.status_code, 404)
 

@@ -22,7 +22,7 @@ class VerificationDeadlineSignalTest(ModuleStoreTestCase):
     """
 
     def setUp(self):
-        super(VerificationDeadlineSignalTest, self).setUp()
+        super(VerificationDeadlineSignalTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.end = now().replace(microsecond=0) + timedelta(days=7)
         self.course = CourseFactory.create(end=self.end)
         VerificationDeadline.objects.all().delete()

@@ -11,7 +11,7 @@ from datetime import datetime
 import ddt
 import pytz
 import six
-from mock import Mock, patch
+from mock import Mock, patch  # lint-amnesty, pylint: disable=unused-import
 from opaque_keys.edx.keys import CourseKey
 
 from common.djangoapps.course_modes.models import CourseMode
@@ -161,7 +161,7 @@ class TeamMembershipTest(SharedModuleStoreTestCase):
         """
         Set up tests.
         """
-        super(TeamMembershipTest, self).setUp()
+        super(TeamMembershipTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
 
         self.user1 = UserFactory.create(username='user1')
         self.user2 = UserFactory.create(username='user2')
@@ -266,7 +266,7 @@ class TeamSignalsTest(EventTestMixin, SharedModuleStoreTestCase):
 
     def setUp(self):  # pylint: disable=arguments-differ
         """Create a user with a team to test signals."""
-        super(TeamSignalsTest, self).setUp('lms.djangoapps.teams.utils.tracker')
+        super(TeamSignalsTest, self).setUp('lms.djangoapps.teams.utils.tracker')  # lint-amnesty, pylint: disable=super-with-arguments
         self.user = UserFactory.create(username="user")
         self.moderator = UserFactory.create(username="moderator")
         self.team = CourseTeamFactory(discussion_topic_id=self.DISCUSSION_TOPIC_ID)

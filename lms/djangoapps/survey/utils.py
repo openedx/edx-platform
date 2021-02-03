@@ -18,7 +18,7 @@ class SurveyRequiredAccessError(AccessError):
         error_code = "survey_required"
         developer_message = u"User must complete a survey"
         user_message = _(u"You must complete a survey")
-        super(SurveyRequiredAccessError, self).__init__(error_code, developer_message, user_message)
+        super(SurveyRequiredAccessError, self).__init__(error_code, developer_message, user_message)  # lint-amnesty, pylint: disable=super-with-arguments
 
 
 def is_survey_required_for_course(course_descriptor):

@@ -25,7 +25,7 @@ class SurveyViewsTests(ModuleStoreTestCase):
         """
         Set up the test data used in the specific tests
         """
-        super(SurveyViewsTests, self).setUp()
+        super(SurveyViewsTests, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
 
         self.client = Client()
 

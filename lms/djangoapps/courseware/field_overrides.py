@@ -199,7 +199,7 @@ class OverrideFieldData(FieldData):
 
         return enabled_providers
 
-    def __init__(self, user, fallback, providers):
+    def __init__(self, user, fallback, providers):  # pylint: disable=super-init-not-called
         self.fallback = fallback
         self.providers = tuple(provider(user, fallback) for provider in providers)
 
