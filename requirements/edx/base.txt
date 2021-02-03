@@ -240,7 +240,7 @@ web-fragments==1.0.0      # via -r requirements/edx/base.in, crowdsourcehinter-x
 webencodings==0.5.1       # via bleach, html5lib
 webob==1.8.6              # via xblock, xmodule
 wrapt==1.11.2             # via -c requirements/edx/../constraints.txt, -r requirements/edx/paver.txt
-git+https://github.com/edx-solutions/xblock-drag-and-drop-v2@v2.2.10#egg=xblock-drag-and-drop-v2==2.2.10  # via -r requirements/edx/github.in
+git+https://github.com/edx-solutions/xblock-drag-and-drop-v2@v2.3.0#egg=xblock-drag-and-drop-v2==2.3.0  # via -r requirements/edx/github.in
 git+https://github.com/open-craft/xblock-poll@922cd36fb1c3cfe00b4ce03b19a13185d136447d#egg=xblock-poll==1.10.2  # via -r requirements/edx/github.in
 xblock-utils==2.1.2       # via -r requirements/edx/base.in, edx-sga, lti-consumer-xblock, staff-graded-xblock, xblock-drag-and-drop-v2, xblock-google-drive
 xblock==1.4.0             # via -r requirements/edx/base.in, acid-xblock, crowdsourcehinter-xblock, done-xblock, edx-completion, edx-sga, edx-user-state-client, edx-when, lti-consumer-xblock, ora2, rate-xblock, staff-graded-xblock, xblock-discussion, xblock-drag-and-drop-v2, xblock-google-drive, xblock-poll, xblock-utils
