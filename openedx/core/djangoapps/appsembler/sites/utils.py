@@ -438,10 +438,13 @@ def json_to_sass(json_input):
 def bootstrap_site(site, org_data=None, username=None):
     from openedx.core.djangoapps.site_configuration.models import SiteConfiguration
     organization_slug = org_data.get('name')
+    beeline.add_context_field("org_data", org_data)
+    beeline.add_context_field("username", username)
     # don't use create because we need to call save() to set some values automatically
     site_config = SiteConfiguration(site=site, enabled=True)
     site_config.save()
     site.configuration_id = site_config.id
+    beeline.add_context_field("site_config_id", site_config.id)
     # temp workarounds while old staging is still up and running
     if organization_slug:
         organization_data = org_api.add_organization({
