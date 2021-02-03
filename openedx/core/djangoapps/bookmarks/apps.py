@@ -35,4 +35,4 @@ class BookmarksConfig(AppConfig):
 
     def ready(self):
         # Register the signals handled by bookmarks.
-        from . import signals
+        from . import signals  # lint-amnesty, pylint: disable=unused-import

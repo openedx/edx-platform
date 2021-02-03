@@ -6,7 +6,7 @@ import json
 
 from rest_framework.reverse import reverse
 
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.test import TestCase
 
 from openedx.core.djangoapps.api_admin.tests import factories
@@ -21,7 +21,7 @@ class ApiAccessRequestViewTests(TestCase):
     """
     password = 'test'
 
-    def setUp(self):
+    def setUp(self):  # lint-amnesty, pylint: disable=super-method-not-called
         """
         Perform operations common to all test cases.
         """

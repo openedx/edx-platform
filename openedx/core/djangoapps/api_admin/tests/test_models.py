@@ -22,7 +22,7 @@ from common.djangoapps.student.tests.factories import UserFactory
 class ApiAccessRequestTests(TestCase):
 
     def setUp(self):
-        super(ApiAccessRequestTests, self).setUp()
+        super(ApiAccessRequestTests, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.user = UserFactory()
         self.request = ApiAccessRequestFactory(user=self.user)
 
@@ -97,7 +97,7 @@ class ApiAccessConfigTests(TestCase):
 @skip_unless_lms
 class ApiAccessRequestSignalTests(TestCase):
     def setUp(self):
-        super(ApiAccessRequestSignalTests, self).setUp()
+        super(ApiAccessRequestSignalTests, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.user = UserFactory()
         self.api_access_request = ApiAccessRequest(user=self.user, site=SiteFactory())
         self.send_new_pending_email_function = 'openedx.core.djangoapps.api_admin.models._send_new_pending_email'

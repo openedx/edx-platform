@@ -2,7 +2,7 @@
 
 
 from django import forms
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.utils.translation import ugettext as _
 
 from openedx.core.djangoapps.api_admin.models import ApiAccessRequest, Catalog
@@ -34,7 +34,7 @@ class ApiAccessRequestForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         # Get rid of the colons at the end of the field labels.
         kwargs.setdefault('label_suffix', '')
-        super(ApiAccessRequestForm, self).__init__(*args, **kwargs)
+        super(ApiAccessRequestForm, self).__init__(*args, **kwargs)  # lint-amnesty, pylint: disable=super-with-arguments
 
 
 class ViewersWidget(forms.widgets.TextInput):
@@ -61,7 +61,7 @@ class ViewersField(forms.Field):
         return [username.strip() for username in value.split(',')]
 
     def validate(self, value):
-        super(ViewersField, self).validate(value)
+        super(ViewersField, self).validate(value)  # lint-amnesty, pylint: disable=super-with-arguments
         nonexistent_users = []
         for username in value:
             try:

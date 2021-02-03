@@ -38,19 +38,19 @@ class AccessTokenExchangeBase(APIView):
     @method_decorator(csrf_exempt)
     @method_decorator(social_utils.psa("social:complete"))
     def dispatch(self, *args, **kwargs):  # pylint: disable=arguments-differ
-        return super(AccessTokenExchangeBase, self).dispatch(*args, **kwargs)
+        return super(AccessTokenExchangeBase, self).dispatch(*args, **kwargs)  # lint-amnesty, pylint: disable=super-with-arguments
 
     def get(self, request, _backend):
         """
         Pass through GET requests without the _backend
         """
-        return super(AccessTokenExchangeBase, self).get(request)
+        return super(AccessTokenExchangeBase, self).get(request)  # lint-amnesty, pylint: disable=no-member, super-with-arguments
 
     def post(self, request, _backend):
         """
         Handle POST requests to get a first-party access token.
         """
-        form = AccessTokenExchangeForm(request=request, oauth2_adapter=self.oauth2_adapter, data=request.POST)
+        form = AccessTokenExchangeForm(request=request, oauth2_adapter=self.oauth2_adapter, data=request.POST)  # lint-amnesty, pylint: disable=no-member
         if not form.is_valid():
             error_response = self.error_response(form.errors)  # pylint: disable=no-member
             if error_response.status_code == 403:
@@ -74,7 +74,7 @@ class AccessTokenExchangeBase(APIView):
         """
 
         edx_access_token = self.create_access_token(request, user, scope, client)
-        return self.access_token_response(edx_access_token)
+        return self.access_token_response(edx_access_token)  # lint-amnesty, pylint: disable=no-member
 
 
 class DOTAccessTokenExchangeView(AccessTokenExchangeBase, DOTAccessTokenView):

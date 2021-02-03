@@ -29,7 +29,7 @@ class ApiAdminTest(TestCase):
     Base class to allow API admin access to tests.
     """
     def setUp(self):
-        super(ApiAdminTest, self).setUp()
+        super(ApiAdminTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         ApiAccessConfig(enabled=True).save()
 
 
@@ -39,7 +39,7 @@ class ApiRequestViewTest(ApiAdminTest):
     Test the API Request View.
     """
     def setUp(self):
-        super(ApiRequestViewTest, self).setUp()
+        super(ApiRequestViewTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.url = reverse('api_admin:api-request')
         password = 'abc123'
         self.user = UserFactory(password=password)
@@ -110,7 +110,7 @@ class ApiRequestStatusViewTest(ApiAdminTest):
     Tests of the API Status endpoint.
     """
     def setUp(self):
-        super(ApiRequestStatusViewTest, self).setUp()
+        super(ApiRequestStatusViewTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         password = 'abc123'
         self.user = UserFactory(password=password)
         self.client.login(username=self.user.username, password=password)
@@ -226,7 +226,7 @@ class CatalogTest(ApiAdminTest):
     Test the catalog API.
     """
     def setUp(self):
-        super(CatalogTest, self).setUp()
+        super(CatalogTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         password = 'abc123'
         self.user = UserFactory(password=password, is_staff=True)
         self.client.login(username=self.user.username, password=password)
@@ -254,7 +254,7 @@ class CatalogSearchViewTest(CatalogTest):
     Test the catalog search endpoint.
     """
     def setUp(self):
-        super(CatalogSearchViewTest, self).setUp()
+        super(CatalogSearchViewTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.url = reverse('api_admin:catalog-search')
 
     def test_get(self):
@@ -279,7 +279,7 @@ class CatalogListViewTest(CatalogTest):
     Test the catalog list endpoint.
     """
     def setUp(self):
-        super(CatalogListViewTest, self).setUp()
+        super(CatalogListViewTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.catalog_user = UserFactory()
         self.url = reverse('api_admin:catalog-list', kwargs={'username': self.catalog_user.username})
 
@@ -331,7 +331,7 @@ class CatalogEditViewTest(CatalogTest):
     Test edits to the catalog endpoint.
     """
     def setUp(self):
-        super(CatalogEditViewTest, self).setUp()
+        super(CatalogEditViewTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.catalog_user = UserFactory()
         self.catalog = CatalogFactory(viewers=[self.catalog_user.username])
         self.url = reverse('api_admin:catalog-edit', kwargs={'catalog_id': self.catalog.id})
@@ -353,7 +353,7 @@ class CatalogEditViewTest(CatalogTest):
         self.assertRedirects(response, reverse('api_admin:catalog-search'))
         self.assertEqual(httpretty.last_request().method, 'DELETE')
         self.assertEqual(
-            httpretty.last_request().path,
+            httpretty.last_request().path,  # lint-amnesty, pylint: disable=no-member
             '/api/v1/catalogs/{}/'.format(self.catalog.id)
         )
         self.assertEqual(len(httpretty.httpretty.latest_requests), 1)
@@ -382,7 +382,7 @@ class CatalogPreviewViewTest(CatalogTest):
     Test the catalog preview endpoint.
     """
     def setUp(self):
-        super(CatalogPreviewViewTest, self).setUp()
+        super(CatalogPreviewViewTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.url = reverse('api_admin:catalog-preview')
 
     @httpretty.activate

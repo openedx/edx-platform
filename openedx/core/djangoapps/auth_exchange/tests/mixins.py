@@ -65,4 +65,4 @@ class DOTAdapterMixin(object):
     @expectedFailure
     def test_single_access_token(self):
         # TODO: Single access tokens not supported yet for DOT (See MA-2122)
-        super(DOTAdapterMixin, self).test_single_access_token()
+        super(DOTAdapterMixin, self).test_single_access_token()  # lint-amnesty, pylint: disable=super-with-arguments

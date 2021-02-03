@@ -22,7 +22,7 @@ from social_django.models import Partial
 
 from openedx.core.djangoapps.oauth_dispatch.tests import factories as dot_factories
 from common.djangoapps.student.tests.factories import UserFactory
-from common.djangoapps.third_party_auth.tests.utils import ThirdPartyOAuthTestMixinFacebook, ThirdPartyOAuthTestMixinGoogle
+from common.djangoapps.third_party_auth.tests.utils import ThirdPartyOAuthTestMixinFacebook, ThirdPartyOAuthTestMixinGoogle  # lint-amnesty, pylint: disable=line-too-long
 
 from .mixins import DOTAdapterMixin
 from .utils import TPA_FEATURE_ENABLED, TPA_FEATURES_KEY, AccessTokenExchangeTestMixin
@@ -34,12 +34,12 @@ class AccessTokenExchangeViewTest(AccessTokenExchangeTestMixin):
     Mixin that defines test cases for AccessTokenExchangeView
     """
     def setUp(self):
-        super(AccessTokenExchangeViewTest, self).setUp()
+        super(AccessTokenExchangeViewTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.url = reverse("exchange_access_token", kwargs={"backend": self.BACKEND})
         self.csrf_client = APIClient(enforce_csrf_checks=True)
 
     def tearDown(self):
-        super(AccessTokenExchangeViewTest, self).tearDown()
+        super(AccessTokenExchangeViewTest, self).tearDown()  # lint-amnesty, pylint: disable=super-with-arguments
         Partial.objects.all().delete()
 
     def _assert_error(self, data, expected_error, expected_error_description, error_code=None):
@@ -120,7 +120,7 @@ class AccessTokenExchangeViewTest(AccessTokenExchangeTestMixin):
         Remove when dop has been removed from third party auth
         (currently underlying code used dop adapter, which is no longer supported by auth_exchange)
         """
-        pass
+        pass  # lint-amnesty, pylint: disable=unnecessary-pass
 
     @pytest.mark.skip(reason="this is very entangled with dop use in third_party_auth")
     def test_missing_fields(self):
@@ -128,7 +128,7 @@ class AccessTokenExchangeViewTest(AccessTokenExchangeTestMixin):
         Remove when dop has been removed from third party auth
         (currently underlying code used dop adapter, which is no longer supported by auth_exchange)
         """
-        pass
+        pass  # lint-amnesty, pylint: disable=unnecessary-pass
 
     def test_disabled_user(self):
         """
@@ -151,7 +151,7 @@ class DOTAccessTokenExchangeViewTestFacebook(
     """
     Rerun AccessTokenExchangeViewTestFacebook tests against DOT backend
     """
-    pass
+    pass  # lint-amnesty, pylint: disable=unnecessary-pass
 
 
 # This is necessary because cms does not implement third party auth
@@ -167,7 +167,7 @@ class DOTAccessTokenExchangeViewTestGoogle(
     Tests for AccessTokenExchangeView used with Google using
     django-oauth-toolkit backend.
     """
-    pass
+    pass  # lint-amnesty, pylint: disable=unnecessary-pass
 
 
 @unittest.skipUnless(settings.FEATURES.get("ENABLE_OAUTH2_PROVIDER"), "OAuth2 not enabled")
@@ -176,7 +176,7 @@ class TestLoginWithAccessTokenView(TestCase):
     Tests for LoginWithAccessTokenView
     """
     def setUp(self):
-        super(TestLoginWithAccessTokenView, self).setUp()
+        super(TestLoginWithAccessTokenView, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.user = UserFactory()
         self.oauth2_client = Application.objects.create(client_type=Application.CLIENT_CONFIDENTIAL)
 
