@@ -1,4 +1,5 @@
-import json  # lint-amnesty, pylint: disable=missing-module-docstring
+# lint-amnesty, pylint: disable=missing-module-docstring
+import json
 import logging
 import sys
 from functools import wraps
