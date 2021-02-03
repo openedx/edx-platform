@@ -1680,11 +1680,39 @@ PAID_COURSE_REGISTRATION_CURRENCY = ['usd', '$']
 ################################# EdxNotes config  #########################
 
 # Configure the LMS to use our stub EdxNotes implementation
+# .. setting_name: EDXNOTES_PUBLIC_API
+# .. setting_default: http://localhost:18120/api/v1
+# .. setting_description: Set the public API endpoint LMS will use in the frontend to
+#     interact with the edx_notes_api service.
+# .. setting_warning: This setting must be a publicly accessible endpoint. It is only used
+#     when the setting FEATURES['ENABLE_EDXNOTES'] is activated.
 EDXNOTES_PUBLIC_API = 'http://localhost:18120/api/v1'
+# .. setting_name: EDXNOTES_INTERNAL_API
+# .. setting_default: http://localhost:18120/api/v1
+# .. setting_description: Set the internal API endpoint LMS will use in the backend to
+#     interact with the edx_notes_api service.
+# .. setting_warning: Normally set to the same value of EDXNOTES_PUBLIC_API. It is not
+#     mandatory for this setting to be a publicly accessible endpoint, but to be accessible
+#     by the LMS service. It is only used when the setting FEATURES['ENABLE_EDXNOTES'] is
+#     activated.
 EDXNOTES_INTERNAL_API = 'http://localhost:18120/api/v1'
+# .. setting_name: EDXNOTES_CLIENT_NAME
+# .. setting_default: edx-notes
+# .. setting_description: Set the name of the Oauth client used by LMS to authenticate with
+#     the edx_notes_api service.
+# .. setting_warning: The Oauth client must be created in the platform Django admin in the
+#     path /admin/oauth2_provider/application/, setting the name field of the client as the
+#     value of this setting.
 EDXNOTES_CLIENT_NAME = "edx-notes"
-
+# .. setting_name: EDXNOTES_CONNECT_TIMEOUT
+# .. setting_default: 0.5
+# .. setting_description: Set the number of seconds LMS will wait to establish an internal
+#     connection to the edx_notes_api service.
 EDXNOTES_CONNECT_TIMEOUT = 0.5  # time in seconds
+# .. setting_name: EDXNOTES_READ_TIMEOUT
+# .. setting_default: 1.5
+# .. setting_description: Set the number of seconds LMS will wait for a response from the
+#     edx_notes_api service internal endpoint.
 EDXNOTES_READ_TIMEOUT = 1.5  # time in seconds
 
 ########################## Parental controls config  #######################
