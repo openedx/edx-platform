@@ -54,7 +54,7 @@ class UpdateExampleCertificateViewTest(CacheIsolationTestCase):
     ENABLED_CACHES = ['default']
 
     def setUp(self):
-        super(UpdateExampleCertificateViewTest, self).setUp()
+        super(UpdateExampleCertificateViewTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.cert_set = ExampleCertificateSet.objects.create(course_key=self.COURSE_KEY)
         self.cert = ExampleCertificate.objects.create(
             example_cert_set=self.cert_set,
@@ -206,7 +206,7 @@ class CertificatesViewsSiteTests(ModuleStoreTestCase):
     }"""
 
     def setUp(self):
-        super(CertificatesViewsSiteTests, self).setUp()
+        super(CertificatesViewsSiteTests, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.client = Client()
         self.course = CourseFactory.create(
             org='testorg',

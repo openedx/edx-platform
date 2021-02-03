@@ -14,7 +14,7 @@ from common.djangoapps.student.tests.factories import UserFactory
 
 
 @ddt.ddt
-class GenerateUserCertificateTest(TestCase):
+class GenerateUserCertificateTest(TestCase):  # lint-amnesty, pylint: disable=missing-class-docstring
 
     @patch('lms.djangoapps.certificates.tasks.generate_user_certificates')
     @patch('lms.djangoapps.certificates.tasks.User.objects.get')

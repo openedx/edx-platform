@@ -18,7 +18,7 @@ class CreateFakeCertTest(TestCase):
     COURSE_KEY = CourseLocator(org='edX', course='DemoX', run='Demo_Course')
 
     def setUp(self):
-        super(CreateFakeCertTest, self).setUp()
+        super(CreateFakeCertTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.user = UserFactory.create(username=self.USERNAME)
 
     def test_create_fake_cert(self):

@@ -50,7 +50,7 @@ class ExampleCertificateTest(TestCase):
     ERROR_REASON = 'Kaboom!'
 
     def setUp(self):
-        super(ExampleCertificateTest, self).setUp()
+        super(ExampleCertificateTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.cert_set = ExampleCertificateSet.objects.create(course_key=self.COURSE_KEY)
         self.cert = ExampleCertificate.objects.create(
             example_cert_set=self.cert_set,
@@ -109,7 +109,7 @@ class CertificateHtmlViewConfigurationTest(TestCase):
     Test the CertificateHtmlViewConfiguration model.
     """
     def setUp(self):
-        super(CertificateHtmlViewConfigurationTest, self).setUp()
+        super(CertificateHtmlViewConfigurationTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.configuration_string = """{
             "default": {
                 "url": "http://www.edx.org",
@@ -204,7 +204,7 @@ class EligibleCertificateManagerTest(SharedModuleStoreTestCase):
     """
 
     def setUp(self):
-        super(EligibleCertificateManagerTest, self).setUp()
+        super(EligibleCertificateManagerTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.user = UserFactory()
 
         self.course1 = CourseOverviewFactory()
@@ -319,10 +319,10 @@ class CertificateInvalidationTest(SharedModuleStoreTestCase):
     """
 
     def setUp(self):
-        super(CertificateInvalidationTest, self).setUp()
+        super(CertificateInvalidationTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.course = CourseFactory()
         self.user = UserFactory()
-        self.course_id = self.course.id
+        self.course_id = self.course.id  # lint-amnesty, pylint: disable=no-member
         self.certificate = GeneratedCertificateFactory.create(
             status=CertificateStatuses.downloadable,
             user=self.user,
