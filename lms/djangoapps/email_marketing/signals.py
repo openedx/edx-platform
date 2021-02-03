@@ -17,7 +17,7 @@ from six import text_type
 
 from common.djangoapps import third_party_auth
 from common.djangoapps.course_modes.models import CourseMode
-from edx_toggles.toggles import LegacyWaffleSwitchNamespace
+from edx_toggles.toggles import LegacyWaffleSwitchNamespace  # lint-amnesty, pylint: disable=wrong-import-order
 from lms.djangoapps.email_marketing.tasks import (
     get_email_cookies_via_sailthru,
     update_course_enrollment,
@@ -114,7 +114,7 @@ def add_email_marketing_cookies(sender, response=None, user=None,
     except SailthruClientError as exc:
         log.error(u"Exception attempting to obtain cookie from Sailthru: %s", text_type(exc))
         return response
-    except Exception:
+    except Exception:  # lint-amnesty, pylint: disable=broad-except
         log.error(u"Exception Connecting to celery task for %s", user.email)
         return response
 

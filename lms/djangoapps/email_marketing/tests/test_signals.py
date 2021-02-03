@@ -20,7 +20,7 @@ from sailthru.sailthru_error import SailthruClientError
 from sailthru.sailthru_response import SailthruResponse
 from testfixtures import LogCapture
 
-from lms.djangoapps.email_marketing.tasks import (
+from lms.djangoapps.email_marketing.tasks import (  # lint-amnesty, pylint: disable=unused-import
     _create_user_list,
     _get_list_from_email_marketing_provider,
     _get_or_create_user_list,
@@ -31,7 +31,7 @@ from lms.djangoapps.email_marketing.tasks import (
 )
 from openedx.core.djangoapps.lang_pref import LANGUAGE_KEY
 from common.djangoapps.student.models import Registration, User
-from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory, UserProfileFactory
+from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory, UserProfileFactory  # lint-amnesty, pylint: disable=unused-import
 from common.djangoapps.util.json_request import JsonResponse
 
 from ..models import EmailMarketingConfiguration
@@ -92,7 +92,7 @@ class EmailMarketingTests(TestCase):
 
         self.site = Site.objects.get_current()
         self.request.site = self.site
-        super(EmailMarketingTests, self).setUp()
+        super(EmailMarketingTests, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
 
     @freeze_time(datetime.datetime.now())
     @patch('lms.djangoapps.email_marketing.signals.crum.get_current_request')
@@ -131,7 +131,7 @@ class EmailMarketingTests(TestCase):
                                           'cookies': {'anonymous_interest': 'cookie_content'},
                                           'id': TEST_EMAIL,
                                           'vars': {'last_login_date': ANY}})
-        self.assertTrue('sailthru_hid' in response.cookies)
+        self.assertTrue('sailthru_hid' in response.cookies)  # lint-amnesty, pylint: disable=wrong-assert-type
         self.assertEqual(response.cookies['sailthru_hid'].value, "test_cookie")
 
     @patch('sailthru.sailthru_client.SailthruClient.api_post')
@@ -167,15 +167,15 @@ class EmailMarketingTests(TestCase):
         })
         mock_sailthru.return_value = SailthruResponse(JsonResponse({'keys': {'cookiexx': 'test_cookie'}}))
         add_email_marketing_cookies(None, response=response, user=self.user)
-        self.assertFalse('sailthru_hid' in response.cookies)
+        self.assertFalse('sailthru_hid' in response.cookies)  # lint-amnesty, pylint: disable=wrong-assert-type
 
         mock_sailthru.return_value = SailthruResponse(JsonResponse({'error': "error", "errormsg": "errormsg"}))
         add_email_marketing_cookies(None, response=response, user=self.user)
-        self.assertFalse('sailthru_hid' in response.cookies)
+        self.assertFalse('sailthru_hid' in response.cookies)  # lint-amnesty, pylint: disable=wrong-assert-type
 
         mock_sailthru.side_effect = SailthruClientError
         add_email_marketing_cookies(None, response=response, user=self.user)
-        self.assertFalse('sailthru_hid' in response.cookies)
+        self.assertFalse('sailthru_hid' in response.cookies)  # lint-amnesty, pylint: disable=wrong-assert-type
 
     @patch('lms.djangoapps.email_marketing.tasks.log.error')
     @patch('lms.djangoapps.email_marketing.tasks.SailthruClient.api_post')
@@ -615,7 +615,7 @@ class SailthruTests(TestCase):
     """
 
     def setUp(self):
-        super(SailthruTests, self).setUp()
+        super(SailthruTests, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.user = UserFactory()
         self.course_id = CourseKey.from_string('edX/toy/2012_Fall')
         self.course_url = 'http://lms.testserver.fake/courses/edX/toy/2012_Fall/info'

@@ -10,7 +10,7 @@ from lms.djangoapps.experiments.models import ExperimentData, ExperimentKeyValue
 from common.djangoapps.student.tests.factories import UserFactory
 
 
-class ExperimentDataFactory(factory.DjangoModelFactory):
+class ExperimentDataFactory(factory.DjangoModelFactory):  # lint-amnesty, pylint: disable=missing-class-docstring
     class Meta(object):
         model = ExperimentData
 
@@ -20,7 +20,7 @@ class ExperimentDataFactory(factory.DjangoModelFactory):
     value = factory.Faker('word')
 
 
-class ExperimentKeyValueFactory(factory.DjangoModelFactory):
+class ExperimentKeyValueFactory(factory.DjangoModelFactory):  # lint-amnesty, pylint: disable=missing-class-docstring
     class Meta(object):
         model = ExperimentKeyValue
 

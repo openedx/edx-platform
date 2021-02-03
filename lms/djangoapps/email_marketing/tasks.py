@@ -24,7 +24,7 @@ SAILTHRU_LIST_CACHE_KEY = "email.marketing.cache"
 # TODO: Remove in AA-607
 @shared_task(bind=True)
 @set_code_owner_attribute
-def get_email_cookies_via_sailthru(self, user_email, post_parms):
+def get_email_cookies_via_sailthru(self, user_email, post_parms):  # lint-amnesty, pylint: disable=unused-argument
     """
     Adds/updates Sailthru cookie information for a new user.
      Args:
@@ -47,7 +47,7 @@ def get_email_cookies_via_sailthru(self, user_email, post_parms):
         sailthru_response = sailthru_client.api_post("user", post_parms)
     except SailthruClientError as exc:
         log.error(u"Exception attempting to obtain cookie from Sailthru: %s", six.text_type(exc))
-        raise SailthruClientError
+        raise SailthruClientError  # lint-amnesty, pylint: disable=raise-missing-from
 
     if sailthru_response.is_ok():
         if 'keys' in sailthru_response.json and 'cookie' in sailthru_response.json['keys']:
@@ -310,7 +310,7 @@ def _retryable_sailthru_error(error):
     See: https://getstarted.sailthru.com/new-for-developers-overview/api/api-response-errors/
     """
     code = error.get_error_code()
-    return code == 9 or code == 43
+    return code == 9 or code == 43  # lint-amnesty, pylint: disable=consider-using-in
 
 
 # TODO: Remove in AA-607
@@ -335,7 +335,7 @@ def update_course_enrollment(self, email, course_key, mode, site=None):
 
     try:
         sailthru_client = SailthruClient(config.sailthru_key, config.sailthru_secret)
-    except:
+    except:  # lint-amnesty, pylint: disable=bare-except
         return
 
     send_template = config.sailthru_enroll_template
