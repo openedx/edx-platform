@@ -1,4 +1,5 @@
-import logging  # lint-amnesty, pylint: disable=missing-module-docstring
+# lint-amnesty, pylint: disable=missing-module-docstring
+import logging
 from collections import defaultdict, OrderedDict  # lint-amnesty, pylint: disable=unused-import
 from datetime import datetime, timedelta
 

@@ -1,4 +1,5 @@
-from .outlines import (  # lint-amnesty, pylint: disable=missing-module-docstring
+# lint-amnesty, pylint: disable=missing-module-docstring
+from .outlines import (
     get_course_outline,
     get_user_course_outline,
     get_user_course_outline_details,

@@ -1,4 +1,5 @@
-from django.apps import AppConfig  # lint-amnesty, pylint: disable=missing-module-docstring
+# lint-amnesty, pylint: disable=missing-module-docstring
+from django.apps import AppConfig
 from django.utils.translation import ugettext_lazy as _
 
 

@@ -1,4 +1,5 @@
-from datetime import datetime, timezone  # lint-amnesty, pylint: disable=missing-module-docstring
+# lint-amnesty, pylint: disable=missing-module-docstring
+from datetime import datetime, timezone
 from unittest import TestCase
 
 import pytest

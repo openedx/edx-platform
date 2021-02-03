@@ -1,4 +1,5 @@
-import logging  # lint-amnesty, pylint: disable=missing-module-docstring
+# lint-amnesty, pylint: disable=missing-module-docstring
+import logging
 
 from django.contrib.auth import get_user_model
 from opaque_keys.edx.keys import CourseKey  # lint-amnesty, pylint: disable=unused-import

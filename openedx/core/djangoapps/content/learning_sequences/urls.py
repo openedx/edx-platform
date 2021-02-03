@@ -1,4 +1,5 @@
-from django.conf.urls import url  # lint-amnesty, pylint: disable=missing-module-docstring
+# lint-amnesty, pylint: disable=missing-module-docstring
+from django.conf.urls import url
 
 from .views import CourseOutlineView
 
