@@ -267,7 +267,15 @@ FEATURES = {
     # Enable content libraries (blockstore) indexing
     'ENABLE_CONTENT_LIBRARY_INDEX': False,
 
-    # Enable course reruns, which will always use the split modulestore
+    # .. toggle_name: FEATURES['ALLOW_COURSE_RERUNS']
+    # .. toggle_implementation: DjangoSetting
+    # .. toggle_default: True
+    # .. toggle_description: This will allow staff member to re-run the course from the studio home page and will
+    #   always use the split modulestore. When this is set to False, the Re-run Course link will not be available on
+    #   the studio home page.
+    # .. toggle_use_cases: open_edx
+    # .. toggle_creation_date: 2015-02-13
+    # .. toggle_tickets: https://github.com/edx/edx-platform/pull/6965
     'ALLOW_COURSE_RERUNS': True,
 
     # Certificates Web/HTML Views
