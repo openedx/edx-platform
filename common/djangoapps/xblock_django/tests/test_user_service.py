@@ -26,7 +26,7 @@ class UserServiceTestCase(TestCase):
     Tests for the DjangoXBlockUserService.
     """
     def setUp(self):
-        super(UserServiceTestCase, self).setUp()
+        super(UserServiceTestCase, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.user = UserFactory(username="tester", email="test@tester.com")
         self.user.profile.name = "Test Tester"
         set_user_preference(self.user, 'pref-lang', 'en')

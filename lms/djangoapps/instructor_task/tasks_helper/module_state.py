@@ -241,7 +241,7 @@ def override_score_module_state(xmodule_instance_args, module_descriptor, studen
             raise UpdateProblemModuleStateError(msg)
 
         weighted_override_score = float(task_input['score'])
-        if not (0 <= weighted_override_score <= instance.max_score()):
+        if not (0 <= weighted_override_score <= instance.max_score()):  # lint-amnesty, pylint: disable=superfluous-parens
             msg = "Score must be between 0 and the maximum points available for the problem."
             raise UpdateProblemModuleStateError(msg)
 
@@ -252,7 +252,7 @@ def override_score_module_state(xmodule_instance_args, module_descriptor, studen
         set_event_transaction_type(grades_events.GRADES_OVERRIDE_EVENT_TYPE)
 
         problem_weight = instance.weight if instance.weight is not None else 1
-        if problem_weight == 0:
+        if problem_weight == 0:  # lint-amnesty, pylint: disable=no-else-raise
             msg = "Scores cannot be overridden for a problem that has a weight of zero."
             raise UpdateProblemModuleStateError(msg)
         else:

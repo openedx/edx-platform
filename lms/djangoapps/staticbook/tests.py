@@ -50,7 +50,7 @@ class StaticBookTest(ModuleStoreTestCase):
     """
 
     def __init__(self, *args, **kwargs):
-        super(StaticBookTest, self).__init__(*args, **kwargs)
+        super(StaticBookTest, self).__init__(*args, **kwargs)  # lint-amnesty, pylint: disable=super-with-arguments
         self.course = None
 
     def make_course(self, **kwargs):

@@ -198,7 +198,7 @@ class LmsBlockMixin(XBlockMixin):
         Validates the state of this xblock instance.
         """
         _ = self.runtime.service(self, "i18n").ugettext
-        validation = super(LmsBlockMixin, self).validate()
+        validation = super(LmsBlockMixin, self).validate()  # lint-amnesty, pylint: disable=super-with-arguments
         has_invalid_user_partitions = False
         has_invalid_groups = False
         block_is_unit = is_unit(self)
@@ -253,7 +253,7 @@ class LmsBlockMixin(XBlockMixin):
         Publish completion data from the front end.
         """
         completion_service = self.runtime.service(self, 'completion')
-        if completion_service is None:
+        if completion_service is None:  # lint-amnesty, pylint: disable=no-else-raise
             raise JsonHandlerError(500, u"No completion service found")
         elif not completion_service.completion_tracking_enabled():
             raise JsonHandlerError(404, u"Completion tracking is not enabled and API calls are unexpected")

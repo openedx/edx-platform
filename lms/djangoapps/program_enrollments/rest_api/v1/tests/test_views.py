@@ -10,7 +10,7 @@ from uuid import UUID, uuid4
 import ddt
 import mock
 from django.conf import settings
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.core.cache import cache
 from django.test import override_settings
 from django.urls import reverse
@@ -137,7 +137,7 @@ class EnrollmentsDataMixin(ProgramCacheMixin):
         cls.global_staff = GlobalStaffFactory(username='global-staff', password=cls.password)
 
     def setUp(self):
-        super(EnrollmentsDataMixin, self).setUp()
+        super(EnrollmentsDataMixin, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.set_program_in_catalog_cache(self.program_uuid, self.program)
 
     @classmethod
@@ -456,12 +456,12 @@ class ProgramEnrollmentsPostTests(ProgramEnrollmentsWriteMixin, APITestCase):
     add_uuid = True
 
     def setUp(self):
-        super(ProgramEnrollmentsPostTests, self).setUp()
+        super(ProgramEnrollmentsPostTests, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.request = self.client.post
         self.client.login(username=self.global_staff.username, password='password')
 
     def tearDown(self):
-        super(ProgramEnrollmentsPostTests, self).tearDown()
+        super(ProgramEnrollmentsPostTests, self).tearDown()  # lint-amnesty, pylint: disable=super-with-arguments
         ProgramEnrollment.objects.all().delete()
 
     def test_successful_program_enrollments_no_existing_user(self):
@@ -554,7 +554,7 @@ class ProgramEnrollmentsPatchTests(ProgramEnrollmentsWriteMixin, APITestCase):
     add_uuid = False
 
     def setUp(self):
-        super(ProgramEnrollmentsPatchTests, self).setUp()
+        super(ProgramEnrollmentsPatchTests, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.request = self.client.patch
         self.client.login(username=self.global_staff.username, password=self.password)
 
@@ -699,7 +699,7 @@ class ProgramEnrollmentsPutTests(ProgramEnrollmentsWriteMixin, APITestCase):
     add_uuid = True
 
     def setUp(self):
-        super(ProgramEnrollmentsPutTests, self).setUp()
+        super(ProgramEnrollmentsPutTests, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.request = self.client.put
         self.client.login(username=self.global_staff.username, password='password')
 
@@ -785,7 +785,7 @@ class ProgramCourseEnrollmentsMixin(EnrollmentsDataMixin):
         super(ProgramCourseEnrollmentsMixin, cls).tearDownClass()
 
     def setUp(self):
-        super(ProgramCourseEnrollmentsMixin, self).setUp()
+        super(ProgramCourseEnrollmentsMixin, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.default_url = self.get_url(course_id=self.course_id)
         self.log_in_staff()
 
@@ -1150,7 +1150,7 @@ class MultiprogramEnrollmentsTest(EnrollmentsDataMixin, APITestCase):
         cls.user = UserFactory.create(username='multiprogram_user')
 
     def setUp(self):
-        super(MultiprogramEnrollmentsTest, self).setUp()
+        super(MultiprogramEnrollmentsTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.set_program_in_catalog_cache(self.another_program_uuid, self.another_program)
         self.client.login(username=self.global_staff.username, password=self.password)
 
@@ -2297,7 +2297,7 @@ class UserProgramCourseEnrollmentViewGetTests(ProgramCourseEnrollmentOverviewGet
         and the sizes of the each request.
         """
 
-        def mock_get_enrollment_overviews(user, program, enrollments, request):
+        def mock_get_enrollment_overviews(user, program, enrollments, request):  # lint-amnesty, pylint: disable=unused-argument
             """
             Mock implementation of `utils.get_enrollments_overviews`
             that returns a dict with the correct `course_run_id`
@@ -2371,7 +2371,7 @@ class EnrollmentDataResetViewTests(ProgramCacheMixin, APITestCase):
     )
 
     def setUp(self):
-        super(EnrollmentDataResetViewTests, self).setUp()
+        super(EnrollmentDataResetViewTests, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.start_cache_isolation()
 
         self.organization = LMSOrganizationFactory(short_name='uox')
@@ -2389,7 +2389,7 @@ class EnrollmentDataResetViewTests(ProgramCacheMixin, APITestCase):
 
     def tearDown(self):
         self.end_cache_isolation()
-        super(EnrollmentDataResetViewTests, self).tearDown()
+        super(EnrollmentDataResetViewTests, self).tearDown()  # lint-amnesty, pylint: disable=super-with-arguments
 
     @patch_call_command
     def test_feature_disabled_by_default(self, mock_call_command):

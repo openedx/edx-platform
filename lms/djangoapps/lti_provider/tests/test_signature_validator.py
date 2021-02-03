@@ -30,7 +30,7 @@ class ClientKeyValidatorTest(TestCase):
     """
 
     def setUp(self):
-        super(ClientKeyValidatorTest, self).setUp()
+        super(ClientKeyValidatorTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.lti_consumer = get_lti_consumer()
 
     def test_valid_client_key(self):
@@ -60,7 +60,7 @@ class NonceValidatorTest(TestCase):
     """
 
     def setUp(self):
-        super(NonceValidatorTest, self).setUp()
+        super(NonceValidatorTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.lti_consumer = get_lti_consumer()
 
     def test_valid_nonce(self):
@@ -91,7 +91,7 @@ class SignatureValidatorTest(TestCase):
     """
 
     def setUp(self):
-        super(SignatureValidatorTest, self).setUp()
+        super(SignatureValidatorTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.lti_consumer = get_lti_consumer()
 
     def test_get_existing_client_secret(self):

@@ -235,7 +235,7 @@ class CourseGradingModel(object):
 
         # 'minimum_grade_credit' cannot be set to None
         if minimum_grade_credit is not None:
-            minimum_grade_credit = minimum_grade_credit
+            minimum_grade_credit = minimum_grade_credit  # lint-amnesty, pylint: disable=self-assigning-variable
 
             descriptor.minimum_grade_credit = minimum_grade_credit
             modulestore().update_item(descriptor, user.id)
@@ -276,7 +276,7 @@ class CourseGradingModel(object):
         }
 
     @staticmethod
-    def update_section_grader_type(descriptor, grader_type, user):
+    def update_section_grader_type(descriptor, grader_type, user):  # lint-amnesty, pylint: disable=missing-function-docstring
         if grader_type is not None and grader_type != u'notgraded':
             descriptor.format = grader_type
             descriptor.graded = True
@@ -289,7 +289,7 @@ class CourseGradingModel(object):
         return {'graderType': grader_type}
 
     @staticmethod
-    def convert_set_grace_period(descriptor):
+    def convert_set_grace_period(descriptor):  # lint-amnesty, pylint: disable=missing-function-docstring
         # 5 hours 59 minutes 59 seconds => converted to iso format
         rawgrace = descriptor.graceperiod
         if rawgrace:
@@ -316,7 +316,7 @@ class CourseGradingModel(object):
             return None
 
     @staticmethod
-    def parse_grader(json_grader):
+    def parse_grader(json_grader):  # lint-amnesty, pylint: disable=missing-function-docstring
         # manual to clear out kruft
         result = {"type": json_grader["type"],
                   "min_count": int(json_grader.get('min_count', 0)),
@@ -328,7 +328,7 @@ class CourseGradingModel(object):
         return result
 
     @staticmethod
-    def jsonize_grader(i, grader):
+    def jsonize_grader(i, grader):  # lint-amnesty, pylint: disable=missing-function-docstring
         # Warning: converting weight to integer might give unwanted results due
         # to the reason how floating point arithmetic works
         # e.g, "0.29 * 100 = 28.999999999999996"
@@ -342,7 +342,7 @@ class CourseGradingModel(object):
         }
 
 
-def _grading_event_and_signal(course_key, user_id):
+def _grading_event_and_signal(course_key, user_id):  # lint-amnesty, pylint: disable=missing-function-docstring
     name = GRADING_POLICY_CHANGED_EVENT_TYPE
     course = modulestore().get_course(course_key)
     grading_policy_hash = six.text_type(hash_grading_policy(course.grading_policy))
@@ -362,7 +362,7 @@ def _grading_event_and_signal(course_key, user_id):
     )
 
 
-def hash_grading_policy(grading_policy):
+def hash_grading_policy(grading_policy):  # lint-amnesty, pylint: disable=missing-function-docstring
     ordered_policy = json.dumps(
         grading_policy,
         separators=(',', ':'),  # Remove spaces from separators for more compact representation

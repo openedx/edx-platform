@@ -83,7 +83,7 @@ def lti_launch(request, course_id, usage_id):
             usage_id,
             request
         )
-        raise Http404()
+        raise Http404()  # lint-amnesty, pylint: disable=raise-missing-from
     params['course_key'] = course_key
     params['usage_key'] = usage_key
 

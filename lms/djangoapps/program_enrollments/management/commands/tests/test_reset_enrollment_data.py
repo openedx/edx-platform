@@ -29,7 +29,7 @@ class TestResetEnrollmentData(TestCase):
         cls.program_uuid = uuid4()
 
     def setUp(self):
-        super(TestResetEnrollmentData, self).setUp()
+        super(TestResetEnrollmentData, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.user = UserFactory()
 
     @contextmanager

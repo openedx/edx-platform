@@ -3,7 +3,7 @@ Support for converting a django user to an XBlock user
 """
 
 
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from opaque_keys.edx.keys import CourseKey
 from xblock.reference.user_service import UserService, XBlockUser
 
@@ -24,7 +24,7 @@ class DjangoXBlockUserService(UserService):
     A user service that converts Django users to XBlockUser
     """
     def __init__(self, django_user, **kwargs):
-        super(DjangoXBlockUserService, self).__init__(**kwargs)
+        super(DjangoXBlockUserService, self).__init__(**kwargs)  # lint-amnesty, pylint: disable=super-with-arguments
         self._django_user = django_user
         if self._django_user:
             self._django_user.user_is_staff = kwargs.get('user_is_staff', False)

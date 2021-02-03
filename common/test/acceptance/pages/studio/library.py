@@ -18,7 +18,7 @@ class LibraryPage(PageObject, HelpMixin):
     Base page for Library pages. Defaults URL to the edit page.
     """
     def __init__(self, browser, locator):
-        super(LibraryPage, self).__init__(browser)
+        super(LibraryPage, self).__init__(browser)  # lint-amnesty, pylint: disable=super-with-arguments
         self.locator = locator
 
     @property
@@ -50,4 +50,4 @@ class LibraryEditPage(LibraryPage, PaginatedMixin, UsersPageMixin):
         for improved test reliability.
         """
         self.wait_for_ajax()
-        super(LibraryEditPage, self).wait_until_ready()
+        super(LibraryEditPage, self).wait_until_ready()  # lint-amnesty, pylint: disable=super-with-arguments

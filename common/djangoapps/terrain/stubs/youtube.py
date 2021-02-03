@@ -91,7 +91,7 @@ class StubYouTubeHandler(StubHttpRequestHandler):
             youtube_id = params.path.split('/').pop()
 
             if self.server.config.get('youtube_api_private_video'):
-                self._send_private_video_response(youtube_id, "I'm youtube private video.")
+                self._send_private_video_response(youtube_id, "I'm youtube private video.")  # lint-amnesty, pylint: disable=too-many-function-args
             else:
                 self._send_video_response(youtube_id, "I'm youtube.")
 

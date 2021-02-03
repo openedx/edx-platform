@@ -5,7 +5,7 @@ Asynchronous tasks for the LTI provider app.
 
 import logging
 
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from opaque_keys.edx.keys import CourseKey
 
 import lms.djangoapps.lti_provider.outcomes as outcomes

@@ -1,3 +1,4 @@
+# lint-amnesty, pylint: disable=django-not-configured
 """
 Utility functions related to databases.
 """
@@ -5,7 +6,7 @@ Utility functions related to databases.
 
 import random
 # TransactionManagementError used below actually *does* derive from the standard "Exception" class.
-  # lint-amnesty, pylint: disable=bad-option-value, nonstandard-exception
+# lint-amnesty, pylint: disable=bad-option-value, nonstandard-exception
 from contextlib import contextmanager
 from functools import wraps  # lint-amnesty, pylint: disable=unused-import
 

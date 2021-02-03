@@ -17,17 +17,17 @@ class FakeTimer(object):
     """
     Fake timer implementation that executes immediately.
     """
-    def __init__(self, delay, func):
+    def __init__(self, delay, func):  # lint-amnesty, pylint: disable=unused-argument
         self.func = func
 
     def start(self):
         self.func()
 
 
-class StubXQueueServiceTest(unittest.TestCase):
+class StubXQueueServiceTest(unittest.TestCase):  # lint-amnesty, pylint: disable=missing-class-docstring
 
     def setUp(self):
-        super(StubXQueueServiceTest, self).setUp()
+        super(StubXQueueServiceTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.server = StubXQueueService()
         self.url = "http://127.0.0.1:{0}/xqueue/submit".format(self.server.port)
         self.addCleanup(self.server.shutdown)
@@ -119,7 +119,7 @@ class StubXQueueServiceTest(unittest.TestCase):
             self.assertFalse(self.post.called)
             self.assertTrue(logger.error.called)
 
-    def _post_submission(self, callback_url, lms_key, queue_name, xqueue_body):
+    def _post_submission(self, callback_url, lms_key, queue_name, xqueue_body):  # lint-amnesty, pylint: disable=unused-argument
         """
         Post a submission to the stub XQueue implementation.
         `callback_url` is the URL at which we expect to receive a grade response

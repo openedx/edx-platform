@@ -13,14 +13,14 @@ class CertificateConfigFixtureError(Exception):
     """
     Error occurred while installing certificate config fixture.
     """
-    pass
+    pass  # lint-amnesty, pylint: disable=unnecessary-pass
 
 
 class CertificateConfigUpdateFixtureError(Exception):
     """
     Error occurred while updating certificate config fixture.
     """
-    pass
+    pass  # lint-amnesty, pylint: disable=unnecessary-pass
 
 
 class CertificateConfigFixture(StudioApiFixture):
@@ -32,7 +32,7 @@ class CertificateConfigFixture(StudioApiFixture):
     def __init__(self, course_id, certificates_data):
         self.course_id = course_id
         self.certificates = certificates_data
-        super(CertificateConfigFixture, self).__init__()
+        super(CertificateConfigFixture, self).__init__()  # lint-amnesty, pylint: disable=super-with-arguments
 
     def install(self):
         """

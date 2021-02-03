@@ -39,7 +39,7 @@ class StructuredTagsAsideTestCase(ModuleStoreTestCase):
         """
         Preparation for the test execution
         """
-        super(StructuredTagsAsideTestCase, self).setUp()
+        super(StructuredTagsAsideTestCase, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.aside_name = 'tagging_aside'
         self.aside_tag_dif = 'difficulty'
         self.aside_tag_dif_value = 'Hard'
@@ -113,7 +113,7 @@ class StructuredTagsAsideTestCase(ModuleStoreTestCase):
     def tearDown(self):
         TagAvailableValues.objects.all().delete()
         TagCategories.objects.all().delete()
-        super(StructuredTagsAsideTestCase, self).tearDown()
+        super(StructuredTagsAsideTestCase, self).tearDown()  # lint-amnesty, pylint: disable=super-with-arguments
 
     def test_aside_contains_tags(self):
         """
@@ -181,11 +181,11 @@ class StructuredTagsAsideTestCase(ModuleStoreTestCase):
         self.assertEqual(option_values2, ['Learned a few things', 'Learned everything', 'Learned nothing'])
 
         # Now ensure the acid_aside is not in the result
-        self.assertNotRegexpMatches(problem_html, r"data-block-type=[\"\']acid_aside[\"\']")
+        self.assertNotRegexpMatches(problem_html, r"data-block-type=[\"\']acid_aside[\"\']")  # lint-amnesty, pylint: disable=deprecated-method
 
         # Ensure about video don't have asides
         video_html = get_preview_fragment(request, self.video, context).content
-        self.assertNotRegexpMatches(video_html, "<select")
+        self.assertNotRegexpMatches(video_html, "<select")  # lint-amnesty, pylint: disable=deprecated-method
 
     @ddt.data(AsideUsageKeyV1, AsideUsageKeyV2)
     def test_handle_requests(self, aside_key_class):

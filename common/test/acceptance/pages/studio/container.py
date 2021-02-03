@@ -22,7 +22,7 @@ class ContainerPage(PageObject, HelpMixin):
     ADD_MISSING_GROUPS_SELECTOR = '.notification-action-button[data-notification-action="add-missing-groups"]'
 
     def __init__(self, browser, locator):
-        super(ContainerPage, self).__init__(browser)
+        super(ContainerPage, self).__init__(browser)  # lint-amnesty, pylint: disable=super-with-arguments
         self.locator = locator
 
     @property
@@ -31,7 +31,7 @@ class ContainerPage(PageObject, HelpMixin):
         return u"{}/container/{}".format(BASE_URL, self.locator)
 
     @property
-    def name(self):
+    def name(self):  # lint-amnesty, pylint: disable=missing-function-docstring
         titles = self.q(css=self.NAME_SELECTOR).text
         if titles:
             return titles[0]
@@ -51,7 +51,7 @@ class ContainerPage(PageObject, HelpMixin):
             if len(data_request_elements) > 0:
                 request_token = data_request_elements.first.attrs('data-request-token')[0]
                 # Then find the number of Studio xblock wrappers on the page with that request token.
-                num_wrappers = len(self.q(css=u'{} [data-request-token="{}"]'.format(XBlockWrapper.BODY_SELECTOR, request_token)).results)
+                num_wrappers = len(self.q(css=u'{} [data-request-token="{}"]'.format(XBlockWrapper.BODY_SELECTOR, request_token)).results)  # lint-amnesty, pylint: disable=line-too-long
                 # Wait until all components have been loaded and marked as either initialized or failed.
                 # See:
                 #   - common/static/js/xblock/core.js which adds the class "xblock-initialized"
@@ -159,9 +159,9 @@ class ContainerPage(PageObject, HelpMixin):
         if not warnings.is_present():
             return False
         warning_text = warnings.first.text[0]
-        return warning_text == "Caution: The last published version of this unit is live. By publishing changes you will change the student experience."
+        return warning_text == "Caution: The last published version of this unit is live. By publishing changes you will change the student experience."  # lint-amnesty, pylint: disable=line-too-long
 
-    def shows_inherited_staff_lock(self, parent_type=None, parent_name=None):
+    def shows_inherited_staff_lock(self, parent_type=None, parent_name=None):  # lint-amnesty, pylint: disable=unused-argument
         """
         Returns True if the unit inherits staff lock from a section or subsection.
         """
@@ -187,14 +187,14 @@ class ContainerPage(PageObject, HelpMixin):
         Publishes the container.
         """
         self.scroll_to_element('.action-publish')
-        click_css(self, '.action-publish', 0, require_notification=False)
+        click_css(self, '.action-publish', 0, require_notification=False)  # lint-amnesty, pylint: disable=unexpected-keyword-arg
 
     def discard_changes(self):
         """
         Discards draft changes (which will then re-render the page).
         """
         self.scroll_to_element('a.action-discard')
-        click_css(self, 'a.action-discard', 0, require_notification=False)
+        click_css(self, 'a.action-discard', 0, require_notification=False)  # lint-amnesty, pylint: disable=unexpected-keyword-arg
         confirm_prompt(self)
         self.wait_for_ajax()
 
@@ -237,7 +237,7 @@ class ContainerPage(PageObject, HelpMixin):
         if not was_locked_initially:
             self.q(css='a.action-staff-lock').first.click()
         else:
-            click_css(self, 'a.action-staff-lock', 0, require_notification=False)
+            click_css(self, 'a.action-staff-lock', 0, require_notification=False)  # lint-amnesty, pylint: disable=unexpected-keyword-arg
             if not inherits_staff_lock:
                 confirm_prompt(self)
         self.wait_for_ajax()
@@ -299,7 +299,7 @@ class ContainerPage(PageObject, HelpMixin):
         The index of the first item is 0.
         """
         # Click the delete button
-        click_css(self, '.delete-button', source_index, require_notification=False)
+        click_css(self, '.delete-button', source_index, require_notification=False)  # lint-amnesty, pylint: disable=unexpected-keyword-arg
         # Click the confirmation dialog button
         confirm_prompt(self)
 
@@ -338,7 +338,7 @@ class ContainerPage(PageObject, HelpMixin):
         """
         Click take me there link.
         """
-        click_css(self, '#page-alert .alert.confirmation .nav-actions .action-secondary', require_notification=False)
+        click_css(self, '#page-alert .alert.confirmation .nav-actions .action-secondary', require_notification=False)  # lint-amnesty, pylint: disable=unexpected-keyword-arg
 
     def add_missing_groups(self):
         """
@@ -433,7 +433,7 @@ class XBlockWrapper(PageObject):
     }
 
     def __init__(self, browser, locator):
-        super(XBlockWrapper, self).__init__(browser)
+        super(XBlockWrapper, self).__init__(browser)  # lint-amnesty, pylint: disable=super-with-arguments
         self.locator = locator
 
     def is_browser_on_page(self):
@@ -465,7 +465,7 @@ class XBlockWrapper(PageObject):
         return self.q(css=self._bounded_selector('.xblock-author_view'))[0].text
 
     @property
-    def name(self):
+    def name(self):  # lint-amnesty, pylint: disable=missing-function-docstring
         titles = self.q(css=self._bounded_selector(self.NAME_SELECTOR)).text
         if titles:
             return titles[0]
@@ -618,7 +618,7 @@ class XBlockWrapper(PageObject):
         """
         Opens the move modal.
         """
-        click_css(self, '.move-button', require_notification=False)
+        click_css(self, '.move-button', require_notification=False)  # lint-amnesty, pylint: disable=unexpected-keyword-arg
         self.wait_for(
             lambda: self.q(css='.modal-window.move-modal').visible, description='move modal is visible'
         )
