@@ -42,7 +42,7 @@ class KeyCheckerTestCase(TestCase):
     """Test cases for KeyChecker class"""
 
     def setUp(self):
-        super(KeyCheckerTestCase, self).setUp()
+        super(KeyCheckerTestCase, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
 
         self.valid_keys = ['a', 'b']
         self.invalid_keys = ['a', 'v', 'g']
@@ -60,7 +60,7 @@ class NeedNameTestCase(TestCase):
     """Test cases for NeedName validator"""
 
     def setUp(self):
-        super(NeedNameTestCase, self).setUp()
+        super(NeedNameTestCase, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
 
         self.valid_dict1 = {'a': 1, 'name': 2}
         self.valid_dict2 = {'name': 1}

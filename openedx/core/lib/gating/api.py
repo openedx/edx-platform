@@ -6,7 +6,7 @@ import json
 import logging
 
 from completion.models import BlockCompletion
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.urls import reverse
 from django.utils.translation import ugettext as _
 from milestones import api as milestones_api
@@ -72,7 +72,7 @@ def _validate_min_score(min_score):
         try:
             min_score = int(min_score)
         except ValueError:
-            raise GatingValidationError(message)
+            raise GatingValidationError(message)  # lint-amnesty, pylint: disable=raise-missing-from
 
         if min_score < 0 or min_score > 100:
             raise GatingValidationError(message)

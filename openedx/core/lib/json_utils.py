@@ -28,4 +28,4 @@ class EdxJSONEncoder(DjangoJSONEncoder):
             else:
                 return o.isoformat()
         else:
-            return super(EdxJSONEncoder, self).default(o)
+            return super(EdxJSONEncoder, self).default(o)  # lint-amnesty, pylint: disable=super-with-arguments

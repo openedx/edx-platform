@@ -37,7 +37,7 @@ class TestGatingApi(ModuleStoreTestCase, MilestonesTestCaseMixin):
         """
         Initial data setup
         """
-        super(TestGatingApi, self).setUp()
+        super(TestGatingApi, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
 
         # create course
         self.course = CourseFactory.create(

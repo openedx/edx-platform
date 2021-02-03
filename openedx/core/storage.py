@@ -19,9 +19,9 @@ class PipelineForgivingMixin(object):
     """
     An extension of the django-pipeline storage backend which forgives missing files.
     """
-    def hashed_name(self, name, content=None, **kwargs):
+    def hashed_name(self, name, content=None, **kwargs):  # lint-amnesty, pylint: disable=missing-function-docstring
         try:
-            out = super(PipelineForgivingMixin, self).hashed_name(name, content, **kwargs)
+            out = super(PipelineForgivingMixin, self).hashed_name(name, content, **kwargs)  # lint-amnesty, pylint: disable=super-with-arguments
         except ValueError:
             # This means that a file could not be found, and normally this would
             # cause a fatal error, which seems rather excessive given that
@@ -29,9 +29,9 @@ class PipelineForgivingMixin(object):
             out = name
         return out
 
-    def stored_name(self, name):
+    def stored_name(self, name):  # lint-amnesty, pylint: disable=missing-function-docstring
         try:
-            out = super(PipelineForgivingMixin, self).stored_name(name)
+            out = super(PipelineForgivingMixin, self).stored_name(name)  # lint-amnesty, pylint: disable=super-with-arguments
         except ValueError:
             # This means that a file could not be found, and normally this would
             # cause a fatal error, which seems rather excessive given that
@@ -54,7 +54,7 @@ class ProductionMixin(
     """
     def __init__(self, *args, **kwargs):
         kwargs.update(settings.STATICFILES_STORAGE_KWARGS.get(settings.STATICFILES_STORAGE, {}))
-        super(ProductionMixin, self).__init__(*args, **kwargs)
+        super(ProductionMixin, self).__init__(*args, **kwargs)  # lint-amnesty, pylint: disable=super-with-arguments
 
 
 class ProductionStorage(ProductionMixin, StaticFilesStorage):
@@ -76,7 +76,7 @@ class DevelopmentStorage(
     that provide additional functionality. We use this version for development,
     so that we can skip packaging and optimization.
     """
-    pass
+    pass  # lint-amnesty, pylint: disable=unnecessary-pass
 
 
 @deconstructible
