@@ -12,6 +12,10 @@
 import logging
 import traceback
 
+from markupsafe import escape
+
+from openedx.core.djangolib.markup import HTML
+
 from .formula import *
 
 log = logging.getLogger(__name__)
@@ -49,8 +53,9 @@ def symmath_check_simple(expect, ans, adict={}, symtab=None, extra_options=None)
                     )
     except Exception as err:
         return {'ok': False,
-                'msg': 'Error %s<br/>Failed in evaluating check(%s,%s)' % (err, expect, ans)
-                }
+                'msg': HTML('Error {err}<br/>Failed in evaluating check({expect},{ans})').format(
+                    err=err, expect=expect, ans=ans
+                )}
     return ret
 
 #-----------------------------------------------------------------------------
@@ -94,22 +99,28 @@ def check(expect, given, numerical=False, matrix=False, normphase=False, abcsym=
     try:
         xgiven = my_sympify(given, normphase, matrix, do_qubit=do_qubit, abcsym=abcsym, symtab=symtab)
     except Exception as err:
-        return {'ok': False, 'msg': 'Error %s<br/> in evaluating your expression "%s"' % (err, given)}
+        return {'ok': False, 'msg': HTML('Error {err}<br/> in evaluating your expression "{given}"').format(
+            err=err, given=given
+        )}
 
     try:
         xexpect = my_sympify(expect, normphase, matrix, do_qubit=do_qubit, abcsym=abcsym, symtab=symtab)
     except Exception as err:
-        return {'ok': False, 'msg': 'Error %s<br/> in evaluating OUR expression "%s"' % (err, expect)}
+        return {'ok': False, 'msg': HTML('Error {err}<br/> in evaluating OUR expression "{expect}"').format(
+            err=err, expect=expect
+        )}
 
     if 'autonorm' in flags:	 # normalize trace of matrices
         try:
             xgiven /= xgiven.trace()
         except Exception as err:
-            return {'ok': False, 'msg': 'Error %s<br/> in normalizing trace of your expression %s' % (err, to_latex(xgiven))}
+            return {'ok': False, 'msg': HTML('Error {err}<br/> in normalizing trace of your expression {xgiven}').
+                    format(err=err, xgiven=to_latex(xgiven))}
         try:
             xexpect /= xexpect.trace()
         except Exception as err:
-            return {'ok': False, 'msg': 'Error %s<br/> in normalizing trace of OUR expression %s' % (err, to_latex(xexpect))}
+            return {'ok': False, 'msg': HTML('Error {err}<br/> in normalizing trace of OUR expression {xexpect}').
+                    format(err=err, xexpect=to_latex(xexpect))}
 
     msg = 'Your expression was evaluated as ' + to_latex(xgiven)
     # msg += '<br/>Expected ' + to_latex(xexpect)
@@ -145,7 +156,7 @@ def check(expect, given, numerical=False, matrix=False, normphase=False, abcsym=
 
 def make_error_message(msg):
     # msg = msg.replace('<p>','<p><span class="inline-error">').replace('</p>','</span></p>')
-    msg = '<div class="capa_alert">%s</div>' % msg
+    msg = HTML('<div class="capa_alert">{msg}</div>').format(msg=msg)
     return msg
 
 
@@ -210,7 +221,7 @@ def symmath_check(expect, ans, dynamath=None, options=None, debug=None, xml=None
     try:
         fexpect = my_sympify(str(expect), matrix=do_matrix, do_qubit=do_qubit)
     except Exception as err:
-        msg += '<p>Error %s in parsing OUR expected answer "%s"</p>' % (err, expect)
+        msg += HTML('<p>Error {err} in parsing OUR expected answer "{expect}"</p>').format(err=err, expect=expect)
         return {'ok': False, 'msg': make_error_message(msg)}
 
     ###### Sympy input #######
@@ -226,18 +237,19 @@ def symmath_check(expect, ans, dynamath=None, options=None, debug=None, xml=None
         if is_within_tolerance(fexpect, fans, threshold):
             return {'ok': True, 'msg': msg}
         else:
-            msg += '<p>You entered: %s</p>' % to_latex(fans)
+            msg += HTML('<p>You entered: {fans}</p>').format(fans=to_latex(fans))
             return {'ok': False, 'msg': msg}
 
     if do_numerical:		# numerical answer expected - force numerical comparison
         if is_within_tolerance(fexpect, fans, threshold):
             return {'ok': True, 'msg': msg}
         else:
-            msg += '<p>You entered: %s (note that a numerical answer is expected)</p>' % to_latex(fans)
+            msg += HTML('<p>You entered: {fans} (note that a numerical answer is expected)</p>').\
+                format(fans=to_latex(fans))
             return {'ok': False, 'msg': msg}
 
     if fexpect == fans:
-        msg += '<p>You entered: %s</p>' % to_latex(fans)
+        msg += HTML('<p>You entered: {fans}</p>').format(fans=to_latex(fans))
         return {'ok': True, 'msg': msg}
 
     ###### PMathML input ######
@@ -255,20 +267,18 @@ def symmath_check(expect, ans, dynamath=None, options=None, debug=None, xml=None
     # if DEBUG: msg += '<p/> mmlans=%s' % repr(mmlans).replace('<','&lt;')
     try:
         fsym = f.sympy
-        msg += '<p>You entered: %s</p>' % to_latex(f.sympy)
+        msg += HTML('<p>You entered: {sympy}</p>').format(sympy=to_latex(f.sympy))
     except Exception as err:
         log.exception("Error evaluating expression '%s' as a valid equation", ans)
-        msg += "<p>Error in evaluating your expression '%s' as a valid equation</p>" % (ans)
+        msg += HTML("<p>Error in evaluating your expression '{ans}' as a valid equation</p>").format(ans=ans)
         if "Illegal math" in str(err):
-            msg += "<p>Illegal math expression</p>"
+            msg += HTML("<p>Illegal math expression</p>")
         if DEBUG:
-            msg += 'Error: %s' % str(err).replace('<', '&lt;')
-            msg += '<hr>'
-            msg += '<p><font color="blue">DEBUG messages:</p>'
-            msg += "<p><pre>%s</pre></p>" % traceback.format_exc()
-            msg += '<p>cmathml=<pre>%s</pre></p>' % f.cmathml.replace('<', '&lt;')
-            msg += '<p>pmathml=<pre>%s</pre></p>' % mmlans.replace('<', '&lt;')
-            msg += '<hr>'
+            msg += HTML('Error: {err}<hr><p><font color="blue">DEBUG messages:</p><p><pre>{format_exc}</pre></p>'
+                        '<p>cmathml=<pre>{cmathml}</pre></p><p>pmathml=<pre>{pmathml}</pre></p><hr>').format(
+                err=escape(str(err)), format_exc=traceback.format_exc(), cmathml=escape(f.cmathml),
+                pmathml=escape(mmlans)
+            )
         return {'ok': False, 'msg': make_error_message(msg)}
 
     # do numerical comparison with expected
@@ -277,9 +287,9 @@ def symmath_check(expect, ans, dynamath=None, options=None, debug=None, xml=None
             if abs(abs(fsym - fexpect) / fexpect) < threshold:
                 return {'ok': True, 'msg': msg}
             return {'ok': False, 'msg': msg}
-        msg += "<p>Expecting a numerical answer!</p>"
-        msg += "<p>given = %s</p>" % repr(ans)
-        msg += "<p>fsym = %s</p>" % repr(fsym)
+        msg += HTML("<p>Expecting a numerical answer!</p><p>given = {ans}</p><p>fsym = {fsym}</p>").format(
+            ans=repr(ans), fsym=repr(fsym)
+        )
         # msg += "<p>cmathml = <pre>%s</pre></p>" % str(f.cmathml).replace('<','&lt;')
         return {'ok': False, 'msg': make_error_message(msg)}
 
@@ -297,12 +307,12 @@ def symmath_check(expect, ans, dynamath=None, options=None, debug=None, xml=None
             if abs(dm.vec().norm().evalf()) < threshold:
                 return {'ok': True, 'msg': msg}
         except sympy.ShapeError:
-            msg += "<p>Error - your input vector or matrix has the wrong dimensions"
+            msg += HTML("<p>Error - your input vector or matrix has the wrong dimensions")
             return {'ok': False, 'msg': make_error_message(msg)}
         except Exception as err:
-            msg += "<p>Error %s in comparing expected (a list) and your answer</p>" % str(err).replace('<', '&lt;')
+            msg += HTML("<p>Error %s in comparing expected (a list) and your answer</p>").format(escape(str(err)))
             if DEBUG:
-                msg += "<p/><pre>%s</pre>" % traceback.format_exc()
+                msg += HTML("<p/><pre>{format_exc}</pre>").format(format_exc=traceback.format_exc())
             return {'ok': False, 'msg': make_error_message(msg)}
 
     #diff = (fexpect-fsym).simplify()
@@ -314,15 +324,13 @@ def symmath_check(expect, ans, dynamath=None, options=None, debug=None, xml=None
         diff = None
 
     if DEBUG:
-        msg += '<hr>'
-        msg += '<p><font color="blue">DEBUG messages:</p>'
-        msg += "<p>Got: %s</p>" % repr(fsym)
+        msg += HTML('<hr><p><font color="blue">DEBUG messages:</p><p>Got: {fsym}</p><p>Expecting: {fexpect}</p>')\
+            .format(fsym=repr(fsym), fexpect=repr(fexpect).replace('**', '^').replace('hat(I)', 'hat(i)'))
         # msg += "<p/>Got: %s" % str([type(x) for x in fsym.atoms()]).replace('<','&lt;')
-        msg += "<p>Expecting: %s</p>" % repr(fexpect).replace('**', '^').replace('hat(I)', 'hat(i)')
         # msg += "<p/>Expecting: %s" % str([type(x) for x in fexpect.atoms()]).replace('<','&lt;')
         if diff:
-            msg += "<p>Difference: %s</p>" % to_latex(diff)
-        msg += '<hr>'
+            msg += HTML("<p>Difference: {diff}</p>").format(diff=to_latex(diff))
+        msg += HTML('<hr>')
 
     # Used to return more keys: 'ex': fexpect, 'got': fsym
     return {'ok': False, 'msg': msg}
