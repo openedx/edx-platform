@@ -227,6 +227,15 @@ FEATURES = {
     'ENABLE_CORS_HEADERS': False,
 
     # Can be turned off if course lists need to be hidden. Effects views and templates.
+    # .. toggle_name: FEATURES['COURSES_ARE_BROWSABLE']
+    # .. toggle_implementation: DjangoSetting
+    # .. toggle_default: True
+    # .. toggle_description: When this is set to True, all the courses will be listed on the /courses page and Explore
+    #   Courses link will be visible. Set to False if courses list and Explore Courses link need to be hidden.
+    # .. toggle_use_cases: open_edx
+    # .. toggle_creation_date: 2013-09-28
+    # .. toggle_warnings: This Effects views and templates.
+    # .. toggle_tickets: https://github.com/edx/edx-platform/pull/1073
     'COURSES_ARE_BROWSABLE': True,
 
     # Set to hide the courses list on the Learner Dashboard if they are not enrolled in
