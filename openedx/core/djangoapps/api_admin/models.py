@@ -6,7 +6,7 @@ from smtplib import SMTPException
 
 from config_models.models import ConfigurationModel
 from django.conf import settings
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.contrib.sites.models import Site
 from django.core.mail import send_mail
 from django.db import models
@@ -252,9 +252,9 @@ class Catalog(models.Model):
             self.query = attributes['query']
             self.viewers = attributes['viewers']
         else:
-            super(Catalog, self).__init__(*args, **kwargs)
+            super(Catalog, self).__init__(*args, **kwargs)  # lint-amnesty, pylint: disable=super-with-arguments
 
-    def save(self, **kwargs):  # pylint: disable=unused-argument
+    def save(self, **kwargs):  # lint-amnesty, pylint: disable=arguments-differ, unused-argument
         return None
 
     @property

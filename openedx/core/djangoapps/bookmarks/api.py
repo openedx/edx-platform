@@ -19,7 +19,7 @@ class BookmarksLimitReachedError(Exception):
     """
     if try to create new bookmark when max limit of bookmarks already reached
     """
-    pass
+    pass  # lint-amnesty, pylint: disable=unnecessary-pass
 
 
 def get_bookmark(user, usage_key, fields=None):

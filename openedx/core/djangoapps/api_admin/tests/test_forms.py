@@ -37,7 +37,7 @@ class ViewersWidgetTest(TestCase):
         extra_formating = ''
         if django.VERSION < (2, 1):
             extra_formating = ' /'
-        expected_widget_html = '<input type="text" name="{input_field_name}" value="{serialized_value}"{extra_formating}>'.format(
+        expected_widget_html = '<input type="text" name="{input_field_name}" value="{serialized_value}"{extra_formating}>'.format(  # lint-amnesty, pylint: disable=line-too-long
             input_field_name=input_field_name,
             serialized_value=dummy_string_value,
             extra_formating=extra_formating,

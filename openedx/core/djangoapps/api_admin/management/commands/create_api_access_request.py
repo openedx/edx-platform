@@ -4,7 +4,7 @@
 import logging
 from contextlib import contextmanager
 
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.contrib.sites.models import Site
 from django.core.management.base import BaseCommand, CommandError
 from django.db.models.signals import post_save, pre_save
@@ -106,7 +106,7 @@ class Command(BaseCommand):
         try:
             return User.objects.get(username=username)
         except User.DoesNotExist:
-            raise CommandError('User {} not found'.format(username))
+            raise CommandError('User {} not found'.format(username))  # lint-amnesty, pylint: disable=raise-missing-from
 
     def create_api_access_request(self, user, status, reason, website):
         """
@@ -127,14 +127,14 @@ class Command(BaseCommand):
             if 'Permission denied' in error_msg and 'mako_lms' in error_msg:
                 logger.warning('Error sending email about access request: {}'.format(error_msg))
             else:
-                raise CommandError(error_msg)
+                raise CommandError(error_msg)  # lint-amnesty, pylint: disable=raise-missing-from
         except Exception as e:
             msg = 'Unable to create ApiAccessRequest for {}. Exception is {}: {}'.format(
                 user.username,
                 type(e).__name__,
                 e
             )
-            raise CommandError(msg)
+            raise CommandError(msg)  # lint-amnesty, pylint: disable=raise-missing-from
 
         logger.info('Created ApiAccessRequest for user {}'.format(user.username))
 
@@ -146,7 +146,7 @@ class Command(BaseCommand):
             _, created = ApiAccessConfig.objects.get_or_create(enabled=True)
         except Exception as e:
             msg = 'Unable to create ApiAccessConfig. Exception is {}: {}'.format(type(e).__name__, e)
-            raise CommandError(msg)
+            raise CommandError(msg)  # lint-amnesty, pylint: disable=raise-missing-from
 
         if created:
             logger.info('Created ApiAccessConfig')

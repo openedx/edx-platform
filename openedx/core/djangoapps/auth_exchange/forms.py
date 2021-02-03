@@ -3,7 +3,7 @@ Forms to support third-party to first-party OAuth 2.0 access token exchange
 """
 
 from django import forms
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.forms import CharField
 from django.conf import settings
 from django.utils.encoding import smart_text
@@ -86,7 +86,7 @@ class AccessTokenExchangeForm(forms.Form):
     client_id = CharField(required=False)
 
     def __init__(self, request, oauth2_adapter, *args, **kwargs):
-        super(AccessTokenExchangeForm, self).__init__(*args, **kwargs)
+        super(AccessTokenExchangeForm, self).__init__(*args, **kwargs)  # lint-amnesty, pylint: disable=super-with-arguments
         self.request = request
         self.oauth2_adapter = oauth2_adapter
 
@@ -96,7 +96,7 @@ class AccessTokenExchangeForm(forms.Form):
         instead of validating each field.
         """
         try:
-            super(AccessTokenExchangeForm, self)._clean_fields()
+            super(AccessTokenExchangeForm, self)._clean_fields()  # lint-amnesty, pylint: disable=super-with-arguments
         except OAuthValidationError as e:
             self._errors.update(e.args[0])
 
@@ -105,7 +105,7 @@ class AccessTokenExchangeForm(forms.Form):
         Overriding the default cleaning behaviour for a shallow error dict.
         """
         try:
-            super(AccessTokenExchangeForm, self)._clean_form()
+            super(AccessTokenExchangeForm, self)._clean_form()  # lint-amnesty, pylint: disable=super-with-arguments
         except OAuthValidationError as e:
             self._errors.update(e.args[0])
 
@@ -164,7 +164,7 @@ class AccessTokenExchangeForm(forms.Form):
         try:
             client = self.oauth2_adapter.get_client(client_id=client_id)
         except Application.DoesNotExist:
-            raise OAuthValidationError(
+            raise OAuthValidationError(  # lint-amnesty, pylint: disable=raise-missing-from
                 {
                     "error": "invalid_client",
                     "error_description": u"{} is not a valid client_id".format(client_id),

@@ -67,7 +67,7 @@ class QueryStringAssertionMixin(object):
 class EmailTemplateTagMixin(object):
 
     def setUp(self):
-        super(EmailTemplateTagMixin, self).setUp()
+        super(EmailTemplateTagMixin, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
 
         patcher = patch('openedx.core.djangoapps.ace_common.templatetags.ace.get_current_request')
         self.mock_get_current_request = patcher.start()
