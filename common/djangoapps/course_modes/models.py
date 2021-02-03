@@ -911,6 +911,9 @@ class CourseModesArchive(models.Model):
     # minimum price in USD that we would like to charge for this mode of the course
     min_price = models.IntegerField(default=0)
 
+    # This price is the same as min_price, but this is saved as a Decimal to accomodate courses that have a price with decimals (ie. 49.99) for propper display and consistency with ecommerce db, since min_price is currently an integer. This will eventually become the only price column in this model.
+    price = models.DecimalField(default=Decimal('0.00'), max_digits=30, decimal_places=2)
+
     # the suggested prices for this mode
     suggested_prices = models.CharField(max_length=255, blank=True, default=u'',
                                         validators=[validate_comma_separated_integer_list])
