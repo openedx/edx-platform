@@ -1160,6 +1160,13 @@ CERTIFICATE_DATE_FORMAT = "%B %-d, %Y"
 
 ENABLE_MULTICOURSE = False  # set to False to disable multicourse display (see lib.util.views.edXhome)
 
+# .. toggle_name: WIKI_ENABLED
+# .. toggle_implementation: DjangoSetting
+# .. toggle_default: True
+# .. toggle_description: This setting allows us to have a collaborative tool to contribute or
+#   modify content of course related materials.
+# .. toggle_use_cases: open_edx
+# .. toggle_creation_date: 2012-07-13
 WIKI_ENABLED = True
 
 ###
@@ -1687,17 +1694,48 @@ SIMPLE_WIKI_REQUIRE_LOGIN_VIEW = False
 ################################# WIKI ###################################
 from lms.djangoapps.course_wiki import settings as course_wiki_settings  # pylint: disable=wrong-import-position
 
+# .. toggle_name: WIKI_ACCOUNT_HANDLING
+# .. toggle_implementation: DjangoSetting
+# .. toggle_default: False
+# .. toggle_description: We recommend you leave this as 'False' for an Open edX installation
+#   to get the proper behavior for register, login and logout. For the original docs see:
+#   https://github.com/edx/django-wiki/blob/edx_release/wiki/conf/settings.py
+# .. toggle_use_cases: open_edx
+# .. toggle_creation_date: 2012-08-13
 WIKI_ACCOUNT_HANDLING = False
 WIKI_EDITOR = 'lms.djangoapps.course_wiki.editors.CodeMirror'
 WIKI_SHOW_MAX_CHILDREN = 0  # We don't use the little menu that shows children of an article in the breadcrumb
-WIKI_ANONYMOUS = False  # Don't allow anonymous access until the styling is figured out
+# .. toggle_name: WIKI_ANONYMOUS
+# .. toggle_implementation: DjangoSetting
+# .. toggle_default: False
+# .. toggle_description: Enabling this allows access to anonymous users.
+#   For the original docs, see:
+#   https://github.com/edx/django-wiki/blob/edx_release/wiki/conf/settings.py
+# .. toggle_warnings: Setting allow anonymous access to `True` may have styling issues.
+# .. toggle_use_cases: open_edx
+# .. toggle_creation_date: 2012-08-21
+WIKI_ANONYMOUS = False
 
 WIKI_CAN_DELETE = course_wiki_settings.CAN_DELETE
 WIKI_CAN_MODERATE = course_wiki_settings.CAN_MODERATE
 WIKI_CAN_CHANGE_PERMISSIONS = course_wiki_settings.CAN_CHANGE_PERMISSIONS
 WIKI_CAN_ASSIGN = course_wiki_settings.CAN_ASSIGN
-
+# .. toggle_name: WIKI_USE_BOOTSTRAP_SELECT_WIDGET
+# .. toggle_implementation: DjangoSetting
+# .. toggle_default: False
+# .. toggle_description: Enabling this will use the bootstrap select widget.
+#   For the original docs, see:
+#   https://github.com/edx/django-wiki/blob/edx_release/wiki/conf/settings.py
+# .. toggle_use_cases: open_edx
+# .. toggle_creation_date: 2012-08-22
 WIKI_USE_BOOTSTRAP_SELECT_WIDGET = False
+# .. toggle_name: WIKI_LINK_LIVE_LOOKUPS
+# .. toggle_implementation: DjangoSetting
+# .. toggle_default: False
+# .. toggle_description: This setting is defined in the original docs:
+#   https://github.com/edx/django-wiki/blob/edx_release/wiki/conf/settings.py
+# .. toggle_use_cases: open_edx
+# .. toggle_creation_date: 2012-08-23
 WIKI_LINK_LIVE_LOOKUPS = False
 WIKI_LINK_DEFAULT_LEVEL = 2
 
