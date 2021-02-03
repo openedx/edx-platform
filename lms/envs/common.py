@@ -399,9 +399,15 @@ FEATURES = {
     # Prevent concurrent logins per user
     'PREVENT_CONCURRENT_LOGINS': True,
 
-    # When a logged in user goes to the homepage ('/') should the user be
-    # redirected to the dashboard - this is default Open edX behavior. Set to
-    # False to not redirect the user
+    # .. toggle_name: FEATURES['ALWAYS_REDIRECT_HOMEPAGE_TO_DASHBOARD_FOR_AUTHENTICATED_USER']
+    # .. toggle_implementation: DjangoSetting
+    # .. toggle_default: True
+    # .. toggle_description: When a logged in user goes to the homepage ('/') the user will be redirected to the
+    #   dashboard page when this flag is set to True - this is default Open edX behavior. Set to False to not redirect
+    #   the user.
+    # .. toggle_use_cases: open_edx
+    # .. toggle_creation_date: 2014-09-16
+    # .. toggle_tickets: https://github.com/edx/edx-platform/pull/5220
     'ALWAYS_REDIRECT_HOMEPAGE_TO_DASHBOARD_FOR_AUTHENTICATED_USER': True,
 
     # .. toggle_name: FEATURES['ENABLE_COURSE_SORTING_BY_START_DATE']
