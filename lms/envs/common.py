@@ -1098,6 +1098,11 @@ LOG_DIR = '/edx/var/log/edx'
 
 DATA_DIR = '/edx/var/edxapp/data'
 
+# .. setting_name: MAINTENANCE_BANNER_TEXT
+# .. setting_default: 'Sample banner message'
+# .. setting_description: Specifies the text that is rendered on the maintenance banner.
+# .. setting_warning: Depends on the `open_edx_util.display_maintenance_warning` waffle switch.
+#   The banner is only rendered when the switch is activated.
 MAINTENANCE_BANNER_TEXT = 'Sample banner message'
 
 GIT_REPO_DIR = '/edx/var/edxapp/course_repos'
