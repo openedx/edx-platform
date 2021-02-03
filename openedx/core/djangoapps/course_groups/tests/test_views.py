@@ -10,7 +10,7 @@ from collections import namedtuple
 
 import six
 from six.moves import range
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.http import Http404
 from django.test.client import RequestFactory
 from opaque_keys.edx.locator import CourseLocator
@@ -41,7 +41,7 @@ class CohortViewsTestCase(ModuleStoreTestCase):
     Base class which sets up a course and staff/non-staff users.
     """
     def setUp(self):
-        super(CohortViewsTestCase, self).setUp()
+        super(CohortViewsTestCase, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.course = CourseFactory.create()
         self.staff_user = UserFactory(is_staff=True, username="staff")
         self.non_staff_user = UserFactory(username="nonstaff")
@@ -241,7 +241,7 @@ class CohortHandlerTestCase(CohortViewsTestCase):
     Tests the `cohort_handler` view.
     """
     def setUp(self):
-        super(CohortHandlerTestCase, self).setUp()
+        super(CohortHandlerTestCase, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.course_staff_user = StaffFactory(
             username="coursestaff",
             course_key=self.course.id
@@ -742,7 +742,7 @@ class AddUsersToCohortTestCase(CohortViewsTestCase):
     Tests the `add_users_to_cohort` view.
     """
     def setUp(self):
-        super(AddUsersToCohortTestCase, self).setUp()
+        super(AddUsersToCohortTestCase, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self._create_cohorts()
 
     def request_add_users_to_cohort(self, users_string, cohort, course, should_raise_404=False):

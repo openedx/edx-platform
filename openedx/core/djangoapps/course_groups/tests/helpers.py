@@ -35,8 +35,8 @@ class CohortFactory(DjangoModelFactory):
         Returns the users associated with the cohort.
         """
         if extracted:
-            self.users.add(*extracted)
-            for user in self.users.all():
+            self.users.add(*extracted)  # lint-amnesty, pylint: disable=no-member
+            for user in self.users.all():  # lint-amnesty, pylint: disable=no-member
                 CohortMembership.objects.create(
                     user=user,
                     course_user_group=self,

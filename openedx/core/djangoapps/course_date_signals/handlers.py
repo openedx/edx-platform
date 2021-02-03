@@ -9,7 +9,7 @@ from six import text_type
 
 from common.lib.xmodule.xmodule.util.misc import is_xblock_an_assignment
 from openedx.core.lib.graph_traversals import get_children, leaf_filter, traverse_pre_order
-from xblock.fields import Scope
+from xblock.fields import Scope  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import SignalHandler, modulestore
 
@@ -37,7 +37,7 @@ def _field_values(fields, xblock):
                     location=text_type(xblock.location),
                     field_name=field.name
                 )
-                raise TypeError(exception_message)
+                raise TypeError(exception_message)  # lint-amnesty, pylint: disable=raise-missing-from
     return result
 
 
@@ -52,7 +52,7 @@ def _has_assignment_blocks(item):
     )
 
 
-def _gather_graded_items(root, due):
+def _gather_graded_items(root, due):  # lint-amnesty, pylint: disable=missing-function-docstring
     items = [root]
     has_non_ora_scored_content = False
     collected_items = []

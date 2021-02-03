@@ -8,7 +8,7 @@ import logging
 import random
 
 import six
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.core.exceptions import ValidationError
 from django.core.validators import validate_email
 from django.db import IntegrityError
@@ -37,7 +37,7 @@ log = logging.getLogger(__name__)
 
 
 @receiver(post_save, sender=CourseUserGroup)
-def _cohort_added(sender, **kwargs):
+def _cohort_added(sender, **kwargs):  # lint-amnesty, pylint: disable=unused-argument
     """Emits a tracking log event each time a cohort is created"""
     instance = kwargs["instance"]
     if kwargs["created"] and instance.group_type == CourseUserGroup.COHORT:
@@ -48,7 +48,7 @@ def _cohort_added(sender, **kwargs):
 
 
 @receiver(m2m_changed, sender=CourseUserGroup.users.through)
-def _cohort_membership_changed(sender, **kwargs):
+def _cohort_membership_changed(sender, **kwargs):  # lint-amnesty, pylint: disable=unused-argument
     """Emits a tracking log event each time cohort membership is modified"""
     def get_event_iter(user_id_iter, cohort_iter):
         """
@@ -390,7 +390,7 @@ def add_cohort(course_key, name, assignment_type):
     try:
         course = courses.get_course_by_id(course_key)
     except Http404:
-        raise ValueError("Invalid course_key")
+        raise ValueError("Invalid course_key")  # lint-amnesty, pylint: disable=raise-missing-from
 
     cohort = CourseCohort.create(
         cohort_name=name,
@@ -432,7 +432,7 @@ def remove_user_from_cohort(cohort, username_or_email):
         membership.delete()
         COHORT_MEMBERSHIP_UPDATED.send(sender=None, user=user, course_key=course_key)
     except CohortMembership.DoesNotExist:
-        raise ValueError(u"User {} was not present in cohort {}".format(username_or_email, cohort))
+        raise ValueError(u"User {} was not present in cohort {}".format(username_or_email, cohort))  # lint-amnesty, pylint: disable=raise-missing-from
 
 
 def add_user_to_cohort(cohort, username_or_email_or_user):
@@ -504,10 +504,10 @@ def add_user_to_cohort(cohort, username_or_email_or_user):
 
             return (None, None, True)
         except ValidationError as invalid:
-            if "@" in username_or_email_or_user:
+            if "@" in username_or_email_or_user:  # lint-amnesty, pylint: disable=no-else-raise
                 raise invalid
             else:
-                raise ex
+                raise ex  # lint-amnesty, pylint: disable=raise-missing-from
 
 
 def get_group_info_for_cohort(cohort, use_cached=False):
@@ -599,7 +599,7 @@ def _get_course_cohort_settings(course_key):
     return course_cohort_settings
 
 
-def get_legacy_discussion_settings(course_key):
+def get_legacy_discussion_settings(course_key):  # lint-amnesty, pylint: disable=missing-function-docstring
 
     try:
         course_cohort_settings = CourseCohortsSettings.objects.get(course_id=course_key)

@@ -14,7 +14,7 @@ class _MediaSerializer(serializers.Serializer):  # pylint: disable=abstract-meth
     """
 
     def __init__(self, uri_attribute, *args, **kwargs):
-        super(_MediaSerializer, self).__init__(*args, **kwargs)
+        super(_MediaSerializer, self).__init__(*args, **kwargs)  # lint-amnesty, pylint: disable=super-with-arguments
         self.uri_attribute = uri_attribute
 
     uri = serializers.SerializerMethodField(source='*')
@@ -56,7 +56,7 @@ class _CourseApiMediaCollectionSerializer(serializers.Serializer):  # pylint: di
         ref_name = 'courseware_api'
 
 
-class CourseProgramSerializer(serializers.Serializer):
+class CourseProgramSerializer(serializers.Serializer):  # lint-amnesty, pylint: disable=abstract-method, missing-class-docstring
     progress = serializers.SerializerMethodField()
     slug = serializers.CharField()
     title = serializers.CharField()

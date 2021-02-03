@@ -105,7 +105,7 @@ class TestDumpToNeo4jCommandBase(SharedModuleStoreTestCase):
             number_commits: number of commits we expect against the graph
             number_rollbacks: number of commit rollbacks we expect
         """
-        courses = set([node['course_key'] for node in mock_graph.nodes])
+        courses = set([node['course_key'] for node in mock_graph.nodes])  # lint-amnesty, pylint: disable=consider-using-set-comprehension
         self.assertEqual(len(courses), number_of_courses)
         self.assertEqual(mock_graph.number_commits, number_commits)
         self.assertEqual(mock_graph.number_rollbacks, number_rollbacks)
@@ -362,7 +362,7 @@ class TestModuleStoreSerializer(TestDumpToNeo4jCommandBase):
         """
         Test that we add index values on nodes
         """
-        nodes, relationships = serialize_course(self.course.id)
+        nodes, relationships = serialize_course(self.course.id)  # lint-amnesty, pylint: disable=unused-variable
 
         # the html node should have 0 index, and the problem should have 1
         html_nodes = [node for node in nodes if node['block_type'] == 'html']
@@ -410,7 +410,7 @@ class TestModuleStoreSerializer(TestDumpToNeo4jCommandBase):
         # mocking is thorwing error in kombu serialzier and its not require here any more.
         credentials = {}
 
-        submitted, skipped = self.mss.dump_courses_to_neo4j(credentials)
+        submitted, skipped = self.mss.dump_courses_to_neo4j(credentials)  # lint-amnesty, pylint: disable=unused-variable
 
         self.assertCourseDump(
             mock_graph,
@@ -438,7 +438,7 @@ class TestModuleStoreSerializer(TestDumpToNeo4jCommandBase):
         # mocking is thorwing error in kombu serialzier and its not require here any more.
         credentials = {}
 
-        submitted, skipped = self.mss.dump_courses_to_neo4j(credentials)
+        submitted, skipped = self.mss.dump_courses_to_neo4j(credentials)  # lint-amnesty, pylint: disable=unused-variable
 
         self.assertCourseDump(
             mock_graph,
@@ -496,7 +496,7 @@ class TestModuleStoreSerializer(TestDumpToNeo4jCommandBase):
         credentials = {}
 
         # run once to warm the cache
-        submitted, skipped = self.mss.dump_courses_to_neo4j(credentials)
+        submitted, skipped = self.mss.dump_courses_to_neo4j(credentials)  # lint-amnesty, pylint: disable=unused-variable
         self.assertEqual(len(submitted), len(self.course_strings))
 
         # simulate one of the courses being published
