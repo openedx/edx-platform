@@ -78,8 +78,8 @@ _NEW_TASK_NAME = 'common.djangoapps.student.tasks.send_activation_email'
 
 
 # Register task under both its old and new names,
-# but expose only the old-named task for invocation.
-# -> Next step: Once we deploy and teach Celery workers the new name,
-#    set `send_activation_email` to the new-named task.
-send_activation_email = shared_task(bind=True, name=_OLD_TASK_NAME)(_send_activation_email)
-shared_task(bind=True, name=_NEW_TASK_NAME)(_send_activation_email)
+# but expose only the new-named task for invocation.
+# -> Next step: Once we deploy and stop using the old task name,
+#    stop registering the task under the old name.
+shared_task(bind=True, name=_OLD_TASK_NAME)(_send_activation_email)
+send_activation_email = shared_task(bind=True, name=_NEW_TASK_NAME)(_send_activation_email)
