@@ -4162,16 +4162,74 @@ PASSWORD_RESET_IP_RATE = '1/m'
 PASSWORD_RESET_EMAIL_RATE = '2/h'
 
 ############### Settings for Retirement #####################
+# .. setting_name: RETIRED_USERNAME_PREFIX
+# .. setting_default: retired__user_
+# .. setting_description: Set the prefix part of hashed usernames for retired users. Used by the derived
+#     setting RETIRED_USERNAME_FMT.
 RETIRED_USERNAME_PREFIX = 'retired__user_'
+# .. setting_name: RETIRED_EMAIL_PREFIX
+# .. setting_default: retired__user_
+# .. setting_description: Set the prefix part of hashed emails for retired users. Used by the derived
+#     setting RETIRED_EMAIL_FMT.
 RETIRED_EMAIL_PREFIX = 'retired__user_'
+# .. setting_name: RETIRED_EMAIL_DOMAIN
+# .. setting_default: retired.invalid
+# .. setting_description: Set the domain part of hashed emails for retired users. Used by the derived
+#     setting RETIRED_EMAIL_FMT.
 RETIRED_EMAIL_DOMAIN = 'retired.invalid'
+# .. setting_name: RETIRED_USERNAME_FMT
+# .. setting_default: retired__user_{}
+# .. setting_description: Set the format a retired user username field gets transformed into, where {}
+#     is replaced with the hash of the original username. This is a derived setting that depends on
+#     RETIRED_USERNAME_PREFIX value.
 RETIRED_USERNAME_FMT = lambda settings: settings.RETIRED_USERNAME_PREFIX + '{}'
+# .. setting_name: RETIRED_EMAIL_FMT
+# .. setting_default: retired__user_{}@retired.invalid
+# .. setting_description: Set the format a retired user email field gets transformed into, where {} is
+#     replaced with the hash of the original email. This is a derived setting that depends on
+#     RETIRED_EMAIL_PREFIX and RETIRED_EMAIL_DOMAIN values.
 RETIRED_EMAIL_FMT = lambda settings: settings.RETIRED_EMAIL_PREFIX + '{}@' + settings.RETIRED_EMAIL_DOMAIN
 derived('RETIRED_USERNAME_FMT', 'RETIRED_EMAIL_FMT')
+# .. setting_name: RETIRED_USER_SALTS
+# .. setting_default: ['abc', '123']
+# .. setting_description: Set a list of salts used for hashing usernames and emails on users retirement.
+# .. setting_warning: Only the last item in this list is used as a salt for all new retirements, but
+#     historical salts are preserved in order to guarantee that all hashed usernames and emails can still
+#     be checked.
 RETIRED_USER_SALTS = ['abc', '123']
+# .. setting_name: RETIREMENT_SERVICE_WORKER_USERNAME
+# .. setting_default: RETIREMENT_SERVICE_USER
+# .. setting_description: Set the username of the retirement service worker user. Retirement scripts
+#     authenticate with LMS as this user with oauth client credentials.
 RETIREMENT_SERVICE_WORKER_USERNAME = 'RETIREMENT_SERVICE_USER'
 
 # These states are the default, but are designed to be overridden in configuration.
+# .. setting_name: RETIREMENT_STATES
+# .. setting_default:
+#     [
+#         'PENDING',
+#         'LOCKING_ACCOUNT',
+#         'LOCKING_COMPLETE',
+#         'RETIRING_FORUMS',
+#         'FORUMS_COMPLETE',
+#         'RETIRING_EMAIL_LISTS',
+#         'EMAIL_LISTS_COMPLETE',
+#         'RETIRING_ENROLLMENTS',
+#         'ENROLLMENTS_COMPLETE',
+#         'RETIRING_NOTES',
+#         'NOTES_COMPLETE',
+#         'RETIRING_LMS',
+#         'LMS_COMPLETE',
+#         'ERRORED',
+#         'ABORTED',
+#         'COMPLETE',
+#     ]
+# .. setting_description: Set a list that defines the name and order of states for the retirement
+#     workflow.
+# .. setting_warning: These states are stored in the database and it is the responsibility of the
+#     administrator to populate the state list since the states can vary across different installations.
+#     There must be, at minimum, a PENDING state at the beginning, and COMPLETED, ERRORED, and ABORTED
+#     states at the end of the list.
 RETIREMENT_STATES = [
     'PENDING',
 
