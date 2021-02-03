@@ -20,6 +20,7 @@ from django.utils.translation import ugettext_noop
 from django.views.decorators.cache import cache_control
 from django.views.decorators.csrf import ensure_csrf_cookie
 from django.views.decorators.http import require_POST
+from edx_proctoring.api import does_backend_support_onboarding
 from edx_when.api import is_enabled_for_course
 from mock import patch
 from opaque_keys import InvalidKeyError
@@ -277,6 +278,7 @@ def _section_special_exams(course, access):
         'course_id': course_key,
         'escalation_email': escalation_email,
         'show_dashboard': is_backend_dashboard_available(course_key),
+        'show_onboarding': does_backend_support_onboarding(course.proctoring_provider),
         'enable_exam_resume_proctoring_improvements': EXAM_RESUME_PROCTORING_IMPROVEMENTS.is_enabled(course.id),
     }
     return section_data
