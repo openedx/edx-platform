@@ -175,6 +175,7 @@ FEATURES = {
 
     # See annotations in lms/envs/common.py for details.
     'ENABLE_DISCUSSION_SERVICE': True,
+    # See annotations in lms/envs/common.py for details.
     'ENABLE_TEXTBOOK': True,
 
     # When True, all courses will be active, regardless of start date
