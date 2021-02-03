@@ -1,4 +1,4 @@
-# coding=utf-8  # lint-amnesty, pylint: disable=missing-module-docstring
+# lint-amnesty, pylint: disable=missing-module-docstring
 
 
 class UnicodeTestMixin(object):  # lint-amnesty, pylint: disable=missing-class-docstring
