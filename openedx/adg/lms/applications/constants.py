@@ -42,8 +42,6 @@ RESUME_DISPLAY = 'resume_display'
 COVER_LETTER_TEXT = 'cover_letter'
 PREREQUISITES = 'prerequisites'
 
-APPLICATION_RECEPTION_DATE_FORMAT = ''
-
 # Application listing page titles
 
 ALL_APPLICATIONS_TITLE = _('APPLICATIONS')
