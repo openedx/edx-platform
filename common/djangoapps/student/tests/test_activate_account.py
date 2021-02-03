@@ -8,15 +8,17 @@ from django.conf import settings
 from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.test import TestCase, override_settings
 from django.urls import reverse
+from edx_toggles.toggles.testutils import override_waffle_flag
 from mock import patch
 
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
+from openedx.core.djangoapps.user_authn.toggles import REDIRECT_TO_AUTHN_MICROFRONTEND
 from common.djangoapps.student.models import Registration
 from common.djangoapps.student.tests.factories import UserFactory
 
 
-FEATURES_WITH_LOGIN_MFE_ENABLED = settings.FEATURES.copy()
-FEATURES_WITH_LOGIN_MFE_ENABLED['ENABLE_AUTHN_MICROFRONTEND'] = True
+FEATURES_WITH_AUTHN_MFE_ENABLED = settings.FEATURES.copy()
+FEATURES_WITH_AUTHN_MFE_ENABLED['ENABLE_AUTHN_MICROFRONTEND'] = True
 
 
 @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
@@ -151,7 +153,8 @@ class TestActivateAccount(TestCase):
         self.assertRedirects(response, login_page_url)
         self.assertContains(response, 'Your account could not be activated')
 
-    @override_settings(FEATURES=FEATURES_WITH_LOGIN_MFE_ENABLED)
+    @override_settings(FEATURES=FEATURES_WITH_AUTHN_MFE_ENABLED)
+    @override_waffle_flag(REDIRECT_TO_AUTHN_MICROFRONTEND, active=True)
     def test_unauthenticated_user_redirects_to_mfe(self):
         """
         Verify that if Authn MFE is enabled then authenticated user redirects to
