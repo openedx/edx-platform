@@ -1,4 +1,5 @@
-import ddt  # lint-amnesty, pylint: disable=missing-module-docstring
+# lint-amnesty, pylint: disable=missing-module-docstring
+import ddt
 import six
 from crum import set_current_request
 from django.conf import settings
