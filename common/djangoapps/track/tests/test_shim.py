@@ -234,7 +234,7 @@ class EventTransformerRegistryTestCase(EventTrackingTestCase):
     """
 
     def setUp(self):
-        super(EventTransformerRegistryTestCase, self).setUp()
+        super(EventTransformerRegistryTestCase, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.registry = transformers.EventTransformerRegistry()
 
     @ddt.data(
