@@ -10,7 +10,7 @@ import subprocess
 import sys
 from distutils import sysconfig
 
-from paver.easy import BuildFailure, sh, task
+from paver.easy import BuildFailure, sh, task  # lint-amnesty, pylint: disable=unused-import
 
 from .utils.envs import Env
 from .utils.timer import timed
@@ -340,7 +340,7 @@ def log_installed_python_prereqs():
     sh("pip freeze > {}".format(Env.GEN_LOG_DIR + "/pip_freeze.log"))
 
 
-def print_devstack_warning():
+def print_devstack_warning():  # lint-amnesty, pylint: disable=missing-function-docstring
     if Env.USING_DOCKER:  # pragma: no cover
         print("********************************************************************************")
         print("* WARNING: Mac users should run this from both the lms and studio shells")

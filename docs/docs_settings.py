@@ -8,8 +8,8 @@ import all the Studio code.
 import os
 
 if os.environ['EDX_PLATFORM_SETTINGS'] == 'devstack_docker':
-    from lms.envs.devstack_docker import *
-    from cms.envs.devstack_docker import (
+    from lms.envs.devstack_docker import *  # lint-amnesty, pylint: disable=wildcard-import
+    from cms.envs.devstack_docker import (  # lint-amnesty, pylint: disable=unused-import
         ADVANCED_PROBLEM_TYPES,
         COURSE_IMPORT_EXPORT_STORAGE,
         LIBRARY_AUTHORING_MICROFRONTEND_URL,
@@ -18,7 +18,7 @@ if os.environ['EDX_PLATFORM_SETTINGS'] == 'devstack_docker':
         UPDATE_SEARCH_INDEX_JOB_QUEUE,
     )
 else:
-    from lms.envs.devstack import *
+    from lms.envs.devstack import *  # lint-amnesty, pylint: disable=wildcard-import
     from cms.envs.devstack import (
         ADVANCED_PROBLEM_TYPES,
         COURSE_IMPORT_EXPORT_STORAGE,
