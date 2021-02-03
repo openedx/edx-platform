@@ -1,4 +1,5 @@
-from unittest import TestCase  # lint-amnesty, pylint: disable=missing-module-docstring
+# lint-amnesty, pylint: disable=missing-module-docstring
+from unittest import TestCase
 
 import ddt
 
