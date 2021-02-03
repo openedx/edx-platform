@@ -34,8 +34,8 @@ class FakeContentTask(FakeInfo):
         'requester',
     ]
 
-    def __init__(self, email_id, num_sent, num_failed, sent_to):
-        super(FakeContentTask, self).__init__()
+    def __init__(self, email_id, num_sent, num_failed, sent_to):  # lint-amnesty, pylint: disable=unused-argument
+        super(FakeContentTask, self).__init__()  # lint-amnesty, pylint: disable=super-with-arguments
         self.task_input = {'email_id': email_id}
         self.task_input = json.dumps(self.task_input)
         self.task_output = {'succeeded': num_sent, 'failed': num_failed}
@@ -57,7 +57,7 @@ class FakeEmail(FakeInfo):
     ]
 
     def __init__(self, email_id):
-        super(FakeEmail, self).__init__()
+        super(FakeEmail, self).__init__()  # lint-amnesty, pylint: disable=super-with-arguments
         self.id = six.text_type(email_id)  # pylint: disable=invalid-name
         # Select a random data for create field
         year = random.randint(1950, 2000)
@@ -102,7 +102,7 @@ class FakeEmailInfo(FakeInfo):
     ]
 
     def __init__(self, fake_email, num_sent, num_failed):
-        super(FakeEmailInfo, self).__init__()
+        super(FakeEmailInfo, self).__init__()  # lint-amnesty, pylint: disable=super-with-arguments
         self.created = get_default_time_display(fake_email.created)
 
         number_sent = str(num_sent) + ' sent'

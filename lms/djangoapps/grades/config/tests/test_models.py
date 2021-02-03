@@ -25,7 +25,7 @@ class PersistentGradesFeatureFlagTests(TestCase):
     """
 
     def setUp(self):
-        super(PersistentGradesFeatureFlagTests, self).setUp()
+        super(PersistentGradesFeatureFlagTests, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.course_id_1 = CourseLocator(org="edx", course="course", run="run")
         self.course_id_2 = CourseLocator(org="edx", course="course2", run="run")
 

@@ -108,11 +108,11 @@ class CourseGradeFactory(object):
         course_data = CourseData(
             user=None, course=course, collected_block_structure=collected_block_structure, course_key=course_key,
         )
-        stats_tags = [u'action:{}'.format(course_data.course_key)]
+        stats_tags = [u'action:{}'.format(course_data.course_key)]  # lint-amnesty, pylint: disable=unused-variable
         for user in users:
             yield self._iter_grade_result(user, course_data, force_update)
 
-    def _iter_grade_result(self, user, course_data, force_update):
+    def _iter_grade_result(self, user, course_data, force_update):  # lint-amnesty, pylint: disable=missing-function-docstring
         try:
             kwargs = {
                 'user': user,
@@ -187,7 +187,7 @@ class CourseGradeFactory(object):
 
         should_persist = should_persist and course_grade.attempted
         if should_persist:
-            course_grade._subsection_grade_factory.bulk_create_unsaved()
+            course_grade._subsection_grade_factory.bulk_create_unsaved()  # lint-amnesty, pylint: disable=protected-access
             PersistentCourseGrade.update_or_create(
                 user_id=user.id,
                 course_id=course_data.course_key,

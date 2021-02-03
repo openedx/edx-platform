@@ -105,7 +105,7 @@ def show_analytics_dashboard_message(course_key):
 
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
-def instructor_dashboard_2(request, course_id):
+def instructor_dashboard_2(request, course_id):  # lint-amnesty, pylint: disable=too-many-statements
     """ Display the instructor dashboard for a course. """
     try:
         course_key = CourseKey.from_string(course_id)
@@ -128,9 +128,9 @@ def instructor_dashboard_2(request, course_id):
     if not request.user.has_perm(permissions.VIEW_DASHBOARD, course_key):
         raise Http404()
 
-    is_white_label = CourseMode.is_white_label(course_key)
+    is_white_label = CourseMode.is_white_label(course_key)  # lint-amnesty, pylint: disable=unused-variable
 
-    reports_enabled = configuration_helpers.get_value('SHOW_ECOMMERCE_REPORTS', False)
+    reports_enabled = configuration_helpers.get_value('SHOW_ECOMMERCE_REPORTS', False)  # lint-amnesty, pylint: disable=unused-variable
 
     sections = []
     if access['staff']:
@@ -160,7 +160,7 @@ def instructor_dashboard_2(request, course_id):
         sections.append(_section_analytics(course, access))
 
     # Check if there is corresponding entry in the CourseMode Table related to the Instructor Dashboard course
-    course_mode_has_price = False
+    course_mode_has_price = False  # lint-amnesty, pylint: disable=unused-variable
     paid_modes = CourseMode.paid_modes_for_course(course_key)
     if len(paid_modes) == 1:
         course_mode_has_price = True
@@ -510,7 +510,7 @@ def _section_cohort_management(course, access):
     return section_data
 
 
-def _section_discussions_management(course, access):
+def _section_discussions_management(course, access):  # lint-amnesty, pylint: disable=unused-argument
     """ Provide data for the corresponding discussion management section """
     course_key = course.id
     enrollment_track_schemes = available_division_schemes(course_key)
@@ -626,7 +626,7 @@ def _section_data_download(course, access):
         'list_report_downloads_url': reverse('list_report_downloads', kwargs={'course_id': six.text_type(course_key)}),
         'calculate_grades_csv_url': reverse('calculate_grades_csv', kwargs={'course_id': six.text_type(course_key)}),
         'problem_grade_report_url': reverse('problem_grade_report', kwargs={'course_id': six.text_type(course_key)}),
-        'course_has_survey': True if course.course_survey_name else False,
+        'course_has_survey': True if course.course_survey_name else False,  # lint-amnesty, pylint: disable=simplifiable-if-expression
         'course_survey_results_url': reverse(
             'get_course_survey_results', kwargs={'course_id': six.text_type(course_key)}
         ),

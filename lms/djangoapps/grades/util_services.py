@@ -9,7 +9,7 @@ class GradesUtilService(object):
     An interface to be used by xblocks.
     """
     def __init__(self, **kwargs):
-        super(GradesUtilService, self).__init__()
+        super(GradesUtilService, self).__init__()  # lint-amnesty, pylint: disable=super-with-arguments
         self.course_id = kwargs.get('course_id', None)
 
     def are_grades_frozen(self):

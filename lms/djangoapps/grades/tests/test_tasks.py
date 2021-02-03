@@ -23,7 +23,7 @@ from lms.djangoapps.grades.config.models import PersistentGradesEnabledFlag
 from lms.djangoapps.grades.config.waffle import ENFORCE_FREEZE_GRADE_AFTER_COURSE_END, waffle_flags
 from lms.djangoapps.grades.constants import ScoreDatabaseTableEnum
 from lms.djangoapps.grades.models import PersistentCourseGrade, PersistentSubsectionGrade
-from lms.djangoapps.grades.services import GradesService
+from lms.djangoapps.grades.services import GradesService  # lint-amnesty, pylint: disable=unused-import
 from lms.djangoapps.grades.signals.signals import PROBLEM_WEIGHTED_SCORE_CHANGED
 from lms.djangoapps.grades.tasks import (
     RECALCULATE_GRADE_DELAY_SECONDS,
@@ -115,7 +115,7 @@ class RecalculateSubsectionGradeTest(HasCourseWithProblemsMixin, ModuleStoreTest
     ENABLED_SIGNALS = ['course_published', 'pre_publish']
 
     def setUp(self):
-        super(RecalculateSubsectionGradeTest, self).setUp()
+        super(RecalculateSubsectionGradeTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.user = UserFactory()
         PersistentGradesEnabledFlag.objects.create(enabled_for_all_courses=True, enabled=True)
 
@@ -411,7 +411,7 @@ class ComputeGradesForCourseTest(HasCourseWithProblemsMixin, ModuleStoreTestCase
     ENABLED_SIGNALS = ['course_published', 'pre_publish']
 
     def setUp(self):
-        super(ComputeGradesForCourseTest, self).setUp()
+        super(ComputeGradesForCourseTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.users = [UserFactory.create() for _ in range(12)]
         self.set_up_course()
         for user in self.users:
@@ -452,7 +452,7 @@ class RecalculateGradesForUserTest(HasCourseWithProblemsMixin, ModuleStoreTestCa
     Test recalculate_course_and_subsection_grades_for_user task.
     """
     def setUp(self):
-        super(RecalculateGradesForUserTest, self).setUp()
+        super(RecalculateGradesForUserTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.user = UserFactory.create()
         self.set_up_course()
         CourseEnrollment.enroll(self.user, self.course.id)
@@ -500,7 +500,7 @@ class FreezeGradingAfterCourseEndTest(HasCourseWithProblemsMixin, ModuleStoreTes
     Test enforce_freeze_grade_after_course_end waffle flag controlling grading tasks.
     """
     def setUp(self):
-        super(FreezeGradingAfterCourseEndTest, self).setUp()
+        super(FreezeGradingAfterCourseEndTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.users = [UserFactory.create() for _ in range(12)]
         self.user = self.users[0]
         self.freeze_grade_flag = waffle_flags()[ENFORCE_FREEZE_GRADE_AFTER_COURSE_END]
@@ -513,7 +513,7 @@ class FreezeGradingAfterCourseEndTest(HasCourseWithProblemsMixin, ModuleStoreTes
             mock_log.info.call_args_list[0][0][0]
         )
 
-    def _assert_for_freeze_grade_flag(
+    def _assert_for_freeze_grade_flag(  # lint-amnesty, pylint: disable=missing-function-docstring
         self,
         result,
         freeze_flag_value,
@@ -637,7 +637,7 @@ class FreezeGradingAfterCourseEndTest(HasCourseWithProblemsMixin, ModuleStoreTes
             CourseEnrollment.enroll(user, self.course.id)
 
         with override_waffle_flag(self.freeze_grade_flag, active=freeze_flag_value):
-            modified_datetime = datetime.utcnow().replace(tzinfo=pytz.UTC) - timedelta(days=1)
+            modified_datetime = datetime.utcnow().replace(tzinfo=pytz.UTC) - timedelta(days=1)  # lint-amnesty, pylint: disable=unused-variable
             with patch('lms.djangoapps.grades.tasks._has_db_updated_with_new_score') as mock_has_db_updated:
                 result = recalculate_subsection_grade_v3.apply_async(kwargs=self.recalculate_subsection_grade_kwargs)
                 self._assert_for_freeze_grade_flag(

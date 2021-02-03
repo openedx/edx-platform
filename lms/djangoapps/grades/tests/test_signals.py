@@ -103,7 +103,7 @@ class ScoreChangedSignalRelayTest(TestCase):
         """
         Configure mocks for all the dependencies of the render method
         """
-        super(ScoreChangedSignalRelayTest, self).setUp()
+        super(ScoreChangedSignalRelayTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.signal_mock = self.setup_patch(
             'lms.djangoapps.grades.signals.signals.PROBLEM_WEIGHTED_SCORE_CHANGED.send',
             None,

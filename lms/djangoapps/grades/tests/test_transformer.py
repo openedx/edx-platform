@@ -41,7 +41,7 @@ class GradesTransformerTestCase(CourseStructureTestCase):
     }
 
     def setUp(self):
-        super(GradesTransformerTestCase, self).setUp()
+        super(GradesTransformerTestCase, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         password = u'test'
         self.student = UserFactory.create(is_staff=False, username=u'test_student', password=password)
         self.client.login(username=self.student.username, password=password)
@@ -433,7 +433,7 @@ class MultiProblemModulestoreAccessTestCase(CourseStructureTestCase, SharedModul
     TRANSFORMER_CLASS_TO_TEST = GradesTransformer
 
     def setUp(self):
-        super(MultiProblemModulestoreAccessTestCase, self).setUp()
+        super(MultiProblemModulestoreAccessTestCase, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         password = u'test'
         self.student = UserFactory.create(is_staff=False, username=u'test_student', password=password)
         self.client.login(username=self.student.username, password=password)

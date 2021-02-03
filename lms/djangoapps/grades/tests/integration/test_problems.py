@@ -1,3 +1,4 @@
+# lint-amnesty, pylint: disable=missing-module-docstring
 import datetime
 import itertools
 
@@ -40,7 +41,7 @@ class TestMultipleProblemTypesSubsectionScores(SharedModuleStoreTestCase):
         cls.seq1 = chapter1.get_children()[0]
 
     def setUp(self):
-        super(TestMultipleProblemTypesSubsectionScores, self).setUp()
+        super(TestMultipleProblemTypesSubsectionScores, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         password = u'test'
         self.student = UserFactory.create(is_staff=False, username=u'test_student', password=password)
         self.client.login(username=self.student.username, password=password)
@@ -109,7 +110,7 @@ class TestVariedMetadata(ProblemSubmissionTestMixin, ModuleStoreTestCase):
     }
 
     def setUp(self):
-        super(TestVariedMetadata, self).setUp()
+        super(TestVariedMetadata, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.course = CourseFactory.create()
         with self.store.bulk_operations(self.course.id):
             self.chapter = ItemFactory.create(
@@ -232,7 +233,7 @@ class TestWeightedProblems(SharedModuleStoreTestCase):
                 )
 
     def setUp(self):
-        super(TestWeightedProblems, self).setUp()
+        super(TestWeightedProblems, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.user = UserFactory()
         self.addCleanup(set_current_request, None)
         self.request = get_mock_request(self.user)

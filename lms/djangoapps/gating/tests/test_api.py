@@ -25,7 +25,7 @@ class GatingTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase):
         """
         Initial data setup
         """
-        super(GatingTestCase, self).setUp()
+        super(GatingTestCase, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
 
         # create course
         self.course = CourseFactory.create(
@@ -65,7 +65,7 @@ class TestEvaluatePrerequisite(GatingTestCase, MilestonesTestCaseMixin):
     """
 
     def setUp(self):
-        super(TestEvaluatePrerequisite, self).setUp()
+        super(TestEvaluatePrerequisite, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.user_dict = {'id': self.user.id}
         self.prereq_milestone = None
         self.subsection_grade = Mock(location=self.seq1.location, percent_graded=0.5)

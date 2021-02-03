@@ -1,4 +1,4 @@
-"""
+"""  # lint-amnesty, pylint: disable=cyclic-import
 Tests for the course grading API view
 """
 
@@ -18,7 +18,7 @@ from rest_framework.test import APITestCase
 from six import text_type
 
 from common.djangoapps.course_modes.models import CourseMode
-from edx_toggles.toggles.testutils import override_waffle_flag
+from edx_toggles.toggles.testutils import override_waffle_flag  # lint-amnesty, pylint: disable=wrong-import-order
 from lms.djangoapps.certificates.models import CertificateStatuses, GeneratedCertificate
 from lms.djangoapps.courseware.tests.factories import InstructorFactory, StaffFactory
 from lms.djangoapps.grades.config.waffle import WRITABLE_GRADEBOOK, waffle_flags
@@ -397,7 +397,7 @@ class GradebookViewTest(GradebookViewTestBase):
         """
         Helper function to create the course gradebook API read url.
         """
-        base_url = super(GradebookViewTest, self).get_url(course_key)
+        base_url = super(GradebookViewTest, self).get_url(course_key)  # lint-amnesty, pylint: disable=super-with-arguments
         if username:
             return "{0}?username={1}".format(base_url, username)
         if user_contains:

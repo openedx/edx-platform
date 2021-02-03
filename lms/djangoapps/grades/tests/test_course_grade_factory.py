@@ -262,7 +262,7 @@ class TestGradeIteration(SharedModuleStoreTestCase):
         """
         Create a course and a handful of users to assign grades
         """
-        super(TestGradeIteration, self).setUp()
+        super(TestGradeIteration, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
 
         self.students = [
             UserFactory.create(username='student1'),

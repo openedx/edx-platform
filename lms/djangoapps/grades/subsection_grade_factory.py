@@ -72,7 +72,7 @@ class SubsectionGradeFactory(object):
         )
         self._unsaved_subsection_grades.clear()
 
-    def update(self, subsection, only_if_higher=None, score_deleted=False, force_update_subsections=False, persist_grade=True):
+    def update(self, subsection, only_if_higher=None, score_deleted=False, force_update_subsections=False, persist_grade=True):  # lint-amnesty, pylint: disable=line-too-long
         """
         Updates the SubsectionGrade object for the student and subsection.
         """

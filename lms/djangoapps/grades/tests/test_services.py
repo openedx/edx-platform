@@ -44,7 +44,7 @@ class GradesServiceTests(ModuleStoreTestCase):
     """
 
     def setUp(self):
-        super(GradesServiceTests, self).setUp()
+        super(GradesServiceTests, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.service = GradesService()
         self.course = CourseFactory.create(org='edX', number='DemoX', display_name='Demo_Course', run='Spring2019')
         self.subsection = ItemFactory.create(parent=self.course, category="subsection", display_name="Subsection")
@@ -79,7 +79,7 @@ class GradesServiceTests(ModuleStoreTestCase):
         }
 
     def tearDown(self):
-        super(GradesServiceTests, self).tearDown()
+        super(GradesServiceTests, self).tearDown()  # lint-amnesty, pylint: disable=super-with-arguments
         PersistentSubsectionGradeOverride.objects.all().delete()  # clear out all previous overrides
         self.signal_patcher.stop()
         self.id_patcher.stop()
@@ -252,7 +252,7 @@ class GradesServiceTests(ModuleStoreTestCase):
             grade=self.grade,
             system=GradeOverrideFeatureEnum.proctoring
         )
-        override_id = override.id
+        override_id = override.id  # lint-amnesty, pylint: disable=unused-variable
         self.service.undo_override_subsection_grade(
             user_id=self.user.id,
             course_key_or_id=self.course.id,
