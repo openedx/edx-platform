@@ -1,4 +1,4 @@
-
+# lint-amnesty, pylint: disable=cyclic-import, missing-module-docstring
 
 import unittest
 
@@ -29,6 +29,7 @@ class ShortcutsTests(UrlResetMixin, TestCase):
     """
     Test the edxmako shortcuts file
     """
+
     @override_settings(MKTG_URLS={'ROOT': 'https://dummy-root', 'ABOUT': '/about-us'})
     def test_marketing_link(self):
         with override_settings(MKTG_URL_LINK_MAP={'ABOUT': self._get_test_url_name()}):
@@ -69,7 +70,7 @@ class ShortcutsTests(UrlResetMixin, TestCase):
                 self.assertTrue(is_any_marketing_link_set(['ABOUT', 'NOT_CONFIGURED']))
                 self.assertFalse(is_any_marketing_link_set(['NOT_CONFIGURED']))
 
-    def _get_test_url_name(self):
+    def _get_test_url_name(self):  # lint-amnesty, pylint: disable=missing-function-docstring
         if settings.ROOT_URLCONF == 'lms.urls':
             # return any lms url name
             return 'dashboard'
@@ -123,6 +124,7 @@ class AddLookupTests(TestCase):
     """
     Test the `add_lookup` function.
     """
+
     @patch('common.djangoapps.edxmako.LOOKUP', {})
     def test_with_package(self):
         add_lookup('test', 'management', __name__)
@@ -137,7 +139,7 @@ class MakoRequestContextTest(TestCase):
     """
 
     def setUp(self):
-        super(MakoRequestContextTest, self).setUp()
+        super(MakoRequestContextTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.user = UserFactory.create()
         self.url = "/"
         self.request = RequestFactory().get(self.url)

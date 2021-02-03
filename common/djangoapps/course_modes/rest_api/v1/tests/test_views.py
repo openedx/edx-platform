@@ -66,7 +66,7 @@ class CourseModesViewTestBase(AuthAndScopesTestMixin):
         cls.other_mode.delete()
 
     def setUp(self):
-        super(CourseModesViewTestBase, self).setUp()
+        super(CourseModesViewTestBase, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         # overwrite self.student to be a staff member, since only staff
         # should be able to access the course_modes API endpoints.
         # This is needed to make a handful of tests inherited from AuthAndScopesTestMixin pass.

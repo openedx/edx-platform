@@ -17,7 +17,7 @@ class TestCourseRerunStateManager(TestCase):
     Test class for testing the CourseRerunUIStateManager.
     """
     def setUp(self):
-        super(TestCourseRerunStateManager, self).setUp()
+        super(TestCourseRerunStateManager, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.source_course_key = CourseLocator("source_org", "source_course_num", "source_run")
         self.course_key = CourseLocator("test_org", "test_course_num", "test_run")
         self.created_user = UserFactory()
@@ -97,7 +97,7 @@ class TestCourseRerunStateManager(TestCase):
         exception = Exception("failure in rerunning")
         try:
             raise exception
-        except:
+        except:  # lint-amnesty, pylint: disable=bare-except
             CourseRerunState.objects.failed(course_key=self.course_key)
 
         self.expected_rerun_state.update(
