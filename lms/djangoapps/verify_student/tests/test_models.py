@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-  # lint-amnesty, pylint: disable=missing-module-docstring
+# lint-amnesty, pylint: disable=missing-module-docstring
 
 import base64
 from datetime import datetime, timedelta

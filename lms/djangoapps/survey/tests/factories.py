@@ -1,4 +1,5 @@
-import factory  # lint-amnesty, pylint: disable=missing-module-docstring
+# lint-amnesty, pylint: disable=missing-module-docstring
+import factory
 
 from common.djangoapps.student.tests.factories import UserFactory
 from lms.djangoapps.survey.models import SurveyAnswer, SurveyForm

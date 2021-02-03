@@ -1,4 +1,5 @@
-# Lots of patching to stub in our own settings, and HTTP posting  # lint-amnesty, pylint: disable=missing-module-docstring
+# lint-amnesty, pylint: disable=missing-module-docstring
+# Lots of patching to stub in our own settings, and HTTP posting
 import ddt
 import mock
 from django.conf import settings
