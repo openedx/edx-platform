@@ -5,7 +5,7 @@ import unittest
 from uuid import uuid4
 
 from django.conf import settings
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.test import TestCase, override_settings
 from django.urls import reverse
 from mock import patch
@@ -24,7 +24,7 @@ class TestActivateAccount(TestCase):
     """Tests for account creation"""
 
     def setUp(self):
-        super(TestActivateAccount, self).setUp()
+        super(TestActivateAccount, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.username = "jack"
         self.email = "jack@fake.edx.org"
         self.password = "test-password"

@@ -25,7 +25,7 @@ class TestLoginHelper(TestCase):
     static_url = settings.STATIC_URL
 
     def setUp(self):
-        super(TestLoginHelper, self).setUp()
+        super(TestLoginHelper, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.request = RequestFactory()
 
     @staticmethod

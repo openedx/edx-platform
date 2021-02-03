@@ -11,7 +11,7 @@ the following:
 
 import csv
 
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.core.management.base import BaseCommand, CommandError
 from opaque_keys.edx.keys import CourseKey
 from six import text_type
@@ -60,4 +60,4 @@ class Command(BaseCommand):
                         anonymous_id_for_user(student, course_key)
                     ))
         except IOError:
-            raise CommandError("Error writing to file: %s" % output_filename)
+            raise CommandError("Error writing to file: %s" % output_filename)  # lint-amnesty, pylint: disable=raise-missing-from

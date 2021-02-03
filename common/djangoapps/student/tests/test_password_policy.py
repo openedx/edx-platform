@@ -6,14 +6,14 @@ This test file will verify proper password policy enforcement, which is an optio
 
 import json
 
-from django.contrib.auth.models import AnonymousUser
+from django.contrib.auth.models import AnonymousUser  # lint-amnesty, pylint: disable=unused-import
 from django.test import TestCase
 from django.test.client import RequestFactory
 from django.test.utils import override_settings
 from django.urls import reverse
-from mock import patch
+from mock import patch  # lint-amnesty, pylint: disable=unused-import
 
-from openedx.core.djangoapps.site_configuration.tests.factories import SiteFactory
+from openedx.core.djangoapps.site_configuration.tests.factories import SiteFactory  # lint-amnesty, pylint: disable=unused-import
 from common.djangoapps.util.password_policy_validators import create_validator_config
 
 
@@ -22,7 +22,7 @@ class TestPasswordPolicy(TestCase):
     Go through some password policy tests to make sure things are properly working
     """
     def setUp(self):
-        super(TestPasswordPolicy, self).setUp()
+        super(TestPasswordPolicy, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.url = reverse('create_account')
         self.request_factory = RequestFactory()
         self.url_params = {
@@ -34,7 +34,7 @@ class TestPasswordPolicy(TestCase):
         }
 
     @override_settings(AUTH_PASSWORD_VALIDATORS=[
-        create_validator_config('common.djangoapps.util.password_policy_validators.MinimumLengthValidator', {'min_length': 6})
+        create_validator_config('common.djangoapps.util.password_policy_validators.MinimumLengthValidator', {'min_length': 6})  # lint-amnesty, pylint: disable=line-too-long
     ])
     def test_password_length_too_short(self):
         self.url_params['password'] = 'aaa'
@@ -47,7 +47,7 @@ class TestPasswordPolicy(TestCase):
         )
 
     @override_settings(AUTH_PASSWORD_VALIDATORS=[
-        create_validator_config('common.djangoapps.util.password_policy_validators.MinimumLengthValidator', {'min_length': 6})
+        create_validator_config('common.djangoapps.util.password_policy_validators.MinimumLengthValidator', {'min_length': 6})  # lint-amnesty, pylint: disable=line-too-long
     ])
     def test_password_length_long_enough(self):
         self.url_params['password'] = 'ThisIsALongerPassword'
@@ -57,7 +57,7 @@ class TestPasswordPolicy(TestCase):
         self.assertTrue(obj['success'])
 
     @override_settings(AUTH_PASSWORD_VALIDATORS=[
-        create_validator_config('common.djangoapps.util.password_policy_validators.MaximumLengthValidator', {'max_length': 12})
+        create_validator_config('common.djangoapps.util.password_policy_validators.MaximumLengthValidator', {'max_length': 12})  # lint-amnesty, pylint: disable=line-too-long
     ])
     def test_password_length_too_long(self):
         self.url_params['password'] = 'ThisPasswordIsWayTooLong'
@@ -70,7 +70,7 @@ class TestPasswordPolicy(TestCase):
         )
 
     @override_settings(AUTH_PASSWORD_VALIDATORS=[
-        create_validator_config('common.djangoapps.util.password_policy_validators.UppercaseValidator', {'min_upper': 3})
+        create_validator_config('common.djangoapps.util.password_policy_validators.UppercaseValidator', {'min_upper': 3})  # lint-amnesty, pylint: disable=line-too-long
     ])
     def test_password_not_enough_uppercase(self):
         self.url_params['password'] = 'thisshouldfail'
@@ -83,7 +83,7 @@ class TestPasswordPolicy(TestCase):
         )
 
     @override_settings(AUTH_PASSWORD_VALIDATORS=[
-        create_validator_config('common.djangoapps.util.password_policy_validators.UppercaseValidator', {'min_upper': 3})
+        create_validator_config('common.djangoapps.util.password_policy_validators.UppercaseValidator', {'min_upper': 3})  # lint-amnesty, pylint: disable=line-too-long
     ])
     def test_password_enough_uppercase(self):
         self.url_params['password'] = 'ThisShouldPass'
@@ -93,7 +93,7 @@ class TestPasswordPolicy(TestCase):
         self.assertTrue(obj['success'])
 
     @override_settings(AUTH_PASSWORD_VALIDATORS=[
-        create_validator_config('common.djangoapps.util.password_policy_validators.LowercaseValidator', {'min_lower': 3})
+        create_validator_config('common.djangoapps.util.password_policy_validators.LowercaseValidator', {'min_lower': 3})  # lint-amnesty, pylint: disable=line-too-long
     ])
     def test_password_not_enough_lowercase(self):
         self.url_params['password'] = 'THISSHOULDFAIL'
@@ -106,7 +106,7 @@ class TestPasswordPolicy(TestCase):
         )
 
     @override_settings(AUTH_PASSWORD_VALIDATORS=[
-        create_validator_config('common.djangoapps.util.password_policy_validators.LowercaseValidator', {'min_lower': 3})
+        create_validator_config('common.djangoapps.util.password_policy_validators.LowercaseValidator', {'min_lower': 3})  # lint-amnesty, pylint: disable=line-too-long
     ])
     def test_password_enough_lowercase(self):
         self.url_params['password'] = 'ThisShouldPass'
@@ -116,7 +116,7 @@ class TestPasswordPolicy(TestCase):
         self.assertTrue(obj['success'])
 
     @override_settings(AUTH_PASSWORD_VALIDATORS=[
-        create_validator_config('common.djangoapps.util.password_policy_validators.PunctuationValidator', {'min_punctuation': 3})
+        create_validator_config('common.djangoapps.util.password_policy_validators.PunctuationValidator', {'min_punctuation': 3})  # lint-amnesty, pylint: disable=line-too-long
     ])
     def test_not_enough_punctuations(self):
         self.url_params['password'] = 'thisshouldfail'
@@ -129,7 +129,7 @@ class TestPasswordPolicy(TestCase):
         )
 
     @override_settings(AUTH_PASSWORD_VALIDATORS=[
-        create_validator_config('common.djangoapps.util.password_policy_validators.PunctuationValidator', {'min_punctuation': 3})
+        create_validator_config('common.djangoapps.util.password_policy_validators.PunctuationValidator', {'min_punctuation': 3})  # lint-amnesty, pylint: disable=line-too-long
     ])
     def test_enough_punctuations(self):
         self.url_params['password'] = 'Th!sSh.uldPa$*'
@@ -139,7 +139,7 @@ class TestPasswordPolicy(TestCase):
         self.assertTrue(obj['success'])
 
     @override_settings(AUTH_PASSWORD_VALIDATORS=[
-        create_validator_config('common.djangoapps.util.password_policy_validators.NumericValidator', {'min_numeric': 3})
+        create_validator_config('common.djangoapps.util.password_policy_validators.NumericValidator', {'min_numeric': 3})  # lint-amnesty, pylint: disable=line-too-long
     ])
     def test_not_enough_numeric_characters(self):
         # The unicode ២ is the number 2 in Khmer and the ٧ is the Arabic-Indic number 7
@@ -153,7 +153,7 @@ class TestPasswordPolicy(TestCase):
         )
 
     @override_settings(AUTH_PASSWORD_VALIDATORS=[
-        create_validator_config('common.djangoapps.util.password_policy_validators.NumericValidator', {'min_numeric': 3})
+        create_validator_config('common.djangoapps.util.password_policy_validators.NumericValidator', {'min_numeric': 3})  # lint-amnesty, pylint: disable=line-too-long
     ])
     def test_enough_numeric_characters(self):
         # The unicode ២ is the number 2 in Khmer
@@ -164,7 +164,7 @@ class TestPasswordPolicy(TestCase):
         self.assertTrue(obj['success'])
 
     @override_settings(AUTH_PASSWORD_VALIDATORS=[
-        create_validator_config('common.djangoapps.util.password_policy_validators.AlphabeticValidator', {'min_alphabetic': 3})
+        create_validator_config('common.djangoapps.util.password_policy_validators.AlphabeticValidator', {'min_alphabetic': 3})  # lint-amnesty, pylint: disable=line-too-long
     ])
     def test_not_enough_alphabetic_characters(self):
         self.url_params['password'] = '123456ab'
@@ -177,7 +177,7 @@ class TestPasswordPolicy(TestCase):
         )
 
     @override_settings(AUTH_PASSWORD_VALIDATORS=[
-        create_validator_config('common.djangoapps.util.password_policy_validators.AlphabeticValidator', {'min_alphabetic': 3})
+        create_validator_config('common.djangoapps.util.password_policy_validators.AlphabeticValidator', {'min_alphabetic': 3})  # lint-amnesty, pylint: disable=line-too-long
     ])
     def test_enough_alphabetic_characters(self):
         self.url_params['password'] = u'𝒯𝓗Ï𝓼𝒫å𝓼𝓼𝔼𝓼'
@@ -187,10 +187,10 @@ class TestPasswordPolicy(TestCase):
         self.assertTrue(obj['success'])
 
     @override_settings(AUTH_PASSWORD_VALIDATORS=[
-        create_validator_config('common.djangoapps.util.password_policy_validators.MinimumLengthValidator', {'min_length': 3}),
-        create_validator_config('common.djangoapps.util.password_policy_validators.UppercaseValidator', {'min_upper': 3}),
-        create_validator_config('common.djangoapps.util.password_policy_validators.NumericValidator', {'min_numeric': 3}),
-        create_validator_config('common.djangoapps.util.password_policy_validators.PunctuationValidator', {'min_punctuation': 3}),
+        create_validator_config('common.djangoapps.util.password_policy_validators.MinimumLengthValidator', {'min_length': 3}),  # lint-amnesty, pylint: disable=line-too-long
+        create_validator_config('common.djangoapps.util.password_policy_validators.UppercaseValidator', {'min_upper': 3}),  # lint-amnesty, pylint: disable=line-too-long
+        create_validator_config('common.djangoapps.util.password_policy_validators.NumericValidator', {'min_numeric': 3}),  # lint-amnesty, pylint: disable=line-too-long
+        create_validator_config('common.djangoapps.util.password_policy_validators.PunctuationValidator', {'min_punctuation': 3}),  # lint-amnesty, pylint: disable=line-too-long
     ])
     def test_multiple_errors_fail(self):
         self.url_params['password'] = 'thisshouldfail'
@@ -206,11 +206,11 @@ class TestPasswordPolicy(TestCase):
             self.assertEqual(obj['password'][i]['user_message'], error_strings[i])
 
     @override_settings(AUTH_PASSWORD_VALIDATORS=[
-        create_validator_config('common.djangoapps.util.password_policy_validators.MinimumLengthValidator', {'min_length': 3}),
-        create_validator_config('common.djangoapps.util.password_policy_validators.UppercaseValidator', {'min_upper': 3}),
-        create_validator_config('common.djangoapps.util.password_policy_validators.LowercaseValidator', {'min_lower': 3}),
-        create_validator_config('common.djangoapps.util.password_policy_validators.NumericValidator', {'min_numeric': 3}),
-        create_validator_config('common.djangoapps.util.password_policy_validators.PunctuationValidator', {'min_punctuation': 3}),
+        create_validator_config('common.djangoapps.util.password_policy_validators.MinimumLengthValidator', {'min_length': 3}),  # lint-amnesty, pylint: disable=line-too-long
+        create_validator_config('common.djangoapps.util.password_policy_validators.UppercaseValidator', {'min_upper': 3}),  # lint-amnesty, pylint: disable=line-too-long
+        create_validator_config('common.djangoapps.util.password_policy_validators.LowercaseValidator', {'min_lower': 3}),  # lint-amnesty, pylint: disable=line-too-long
+        create_validator_config('common.djangoapps.util.password_policy_validators.NumericValidator', {'min_numeric': 3}),  # lint-amnesty, pylint: disable=line-too-long
+        create_validator_config('common.djangoapps.util.password_policy_validators.PunctuationValidator', {'min_punctuation': 3}),  # lint-amnesty, pylint: disable=line-too-long
     ])
     def test_multiple_errors_pass(self):
         self.url_params['password'] = u'tH1s Sh0u!d P3#$!'
@@ -243,8 +243,8 @@ class TestPasswordPolicy(TestCase):
         self.assertTrue(obj['success'])
 
     @override_settings(AUTH_PASSWORD_VALIDATORS=[
-        create_validator_config('common.djangoapps.util.password_policy_validators.MinimumLengthValidator', {'min_length': 6}),
-        create_validator_config('common.djangoapps.util.password_policy_validators.MaximumLengthValidator', {'max_length': 75}),
+        create_validator_config('common.djangoapps.util.password_policy_validators.MinimumLengthValidator', {'min_length': 6}),  # lint-amnesty, pylint: disable=line-too-long
+        create_validator_config('common.djangoapps.util.password_policy_validators.MaximumLengthValidator', {'max_length': 75}),  # lint-amnesty, pylint: disable=line-too-long
     ])
     def test_with_unicode(self):
         self.url_params['password'] = u'四節比分和七年前'
@@ -259,7 +259,7 @@ class TestUsernamePasswordNonmatch(TestCase):
     Test that registration username and password fields differ
     """
     def setUp(self):
-        super(TestUsernamePasswordNonmatch, self).setUp()
+        super(TestUsernamePasswordNonmatch, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.url = reverse('create_account')
 
         self.url_params = {

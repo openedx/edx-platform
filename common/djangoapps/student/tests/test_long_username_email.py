@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-  # lint-amnesty, pylint: disable=missing-module-docstring
 
 
 import json
@@ -9,10 +9,10 @@ from django.urls import reverse
 from openedx.core.djangoapps.user_api.accounts import USERNAME_BAD_LENGTH_MSG
 
 
-class TestLongUsernameEmail(TestCase):
+class TestLongUsernameEmail(TestCase):  # lint-amnesty, pylint: disable=missing-class-docstring
 
     def setUp(self):
-        super(TestLongUsernameEmail, self).setUp()
+        super(TestLongUsernameEmail, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.url = reverse('create_account')
         self.url_params = {
             'username': 'username',
@@ -44,7 +44,7 @@ class TestLongUsernameEmail(TestCase):
         """
         Test name cannot contain html.
         """
-        self.url_params['name'] = '<p style="font-size:300px; color:green;"></br>Name<input type="text"></br>Content spoof'
+        self.url_params['name'] = '<p style="font-size:300px; color:green;"></br>Name<input type="text"></br>Content spoof'  # lint-amnesty, pylint: disable=line-too-long
         response = self.client.post(self.url, self.url_params)
         self.assertEqual(response.status_code, 400)
 

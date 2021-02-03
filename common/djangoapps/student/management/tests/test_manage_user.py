@@ -7,7 +7,7 @@ import itertools
 
 import ddt
 from django.contrib.auth.hashers import make_password
-from django.contrib.auth.models import Group, User
+from django.contrib.auth.models import Group, User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.core.management import CommandError, call_command
 from django.test import TestCase
 

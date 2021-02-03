@@ -26,7 +26,7 @@ import six
 from config_models.models import ConfigurationModel
 from django.apps import apps
 from django.conf import settings
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.contrib.auth.signals import user_logged_in, user_logged_out
 from django.contrib.sites.models import Site
 from django.core.cache import cache
@@ -806,7 +806,7 @@ def user_profile_pre_save_callback(sender, **kwargs):
     # Cache "old" field values on the model instance so that they can be
     # retrieved in the post_save callback when we emit an event with new and
     # old field values.
-    user_profile._changed_fields = get_changed_fields_dict(user_profile, sender)
+    user_profile._changed_fields = get_changed_fields_dict(user_profile, sender)  # lint-amnesty, pylint: disable=protected-access
 
 
 @receiver(post_save, sender=UserProfile)
@@ -830,7 +830,7 @@ def user_pre_save_callback(sender, **kwargs):
     private field on the current model for use in the post_save callback.
     """
     user = kwargs['instance']
-    user._changed_fields = get_changed_fields_dict(user, sender)
+    user._changed_fields = get_changed_fields_dict(user, sender)  # lint-amnesty, pylint: disable=protected-access
 
 
 @receiver(post_save, sender=User)
@@ -844,7 +844,7 @@ def user_post_save_callback(sender, **kwargs):
     """
     user = kwargs['instance']
 
-    changed_fields = user._changed_fields
+    changed_fields = user._changed_fields  # lint-amnesty, pylint: disable=protected-access
 
     if 'is_active' in changed_fields or 'email' in changed_fields:
         if user.is_active:
@@ -1147,7 +1147,7 @@ class CourseEnrollmentManager(models.Manager):
         """
         max_enrollments = settings.FEATURES.get("MAX_ENROLLMENT_INSTR_BUTTONS")
 
-        enrollment_number = super(CourseEnrollmentManager, self).get_queryset().filter(
+        enrollment_number = super(CourseEnrollmentManager, self).get_queryset().filter(  # lint-amnesty, pylint: disable=super-with-arguments
             course_id=course_id,
             is_active=1
         )[:max_enrollments + 1].count()
@@ -1176,7 +1176,7 @@ class CourseEnrollmentManager(models.Manager):
         admins = CourseInstructorRole(course_locator).users_with_role()
         coaches = CourseCcxCoachRole(course_locator).users_with_role()
 
-        return super(CourseEnrollmentManager, self).get_queryset().filter(
+        return super(CourseEnrollmentManager, self).get_queryset().filter(  # lint-amnesty, pylint: disable=super-with-arguments
             course_id=course_id,
             is_active=1,
         ).exclude(user__in=staff).exclude(user__in=admins).exclude(user__in=coaches).count()
@@ -1220,7 +1220,7 @@ class CourseEnrollmentManager(models.Manager):
         """
         # Unfortunately, Django's "group by"-style queries look super-awkward
         query = use_read_replica_if_available(
-            super(CourseEnrollmentManager, self).get_queryset().filter(course_id=course_id, is_active=True).values(
+            super(CourseEnrollmentManager, self).get_queryset().filter(course_id=course_id, is_active=True).values(  # lint-amnesty, pylint: disable=super-with-arguments
                 'mode').order_by().annotate(Count('mode')))
         total = 0
         enroll_dict = defaultdict(int)
@@ -1303,7 +1303,7 @@ class CourseEnrollment(models.Model):
         ordering = ('user', 'course')
 
     def __init__(self, *args, **kwargs):
-        super(CourseEnrollment, self).__init__(*args, **kwargs)
+        super(CourseEnrollment, self).__init__(*args, **kwargs)  # lint-amnesty, pylint: disable=super-with-arguments
 
         # Private variable for storing course_overview to minimize calls to the database.
         # When the property .course_overview is accessed for the first time, this variable will be set.
@@ -1315,7 +1315,7 @@ class CourseEnrollment(models.Model):
         ).format(self.user, self.course_id, self.created, self.is_active)
 
     def save(self, force_insert=False, force_update=False, using=None, update_fields=None):
-        super(CourseEnrollment, self).save(force_insert=force_insert, force_update=force_update, using=using,
+        super(CourseEnrollment, self).save(force_insert=force_insert, force_update=force_update, using=using,  # lint-amnesty, pylint: disable=super-with-arguments
                                            update_fields=update_fields)
 
         # Delete the cached status hash, forcing the value to be recalculated the next time it is needed.
@@ -1583,7 +1583,7 @@ class CourseEnrollment(models.Model):
             # announced before the start of content creation.
             if check_access:
                 log.warning(u"User %s failed to enroll in non-existent course %s", user.username, text_type(course_key))
-                raise NonExistentCourseError
+                raise NonExistentCourseError  # lint-amnesty, pylint: disable=raise-missing-from
 
         if check_access:
             if cls.is_enrollment_closed(user, course) and not can_upgrade:
@@ -2075,9 +2075,9 @@ class CourseEnrollment(models.Model):
 
             log.debug(
                 'Schedules: Pulling upgrade deadline for CourseEnrollment %d from Schedule %d.',
-                self.id, self.schedule.id
+                self.id, self.schedule.id  # lint-amnesty, pylint: disable=no-member
             )
-            return self.schedule.upgrade_deadline
+            return self.schedule.upgrade_deadline  # lint-amnesty, pylint: disable=no-member
         except ObjectDoesNotExist:
             # NOTE: Schedule has a one-to-one mapping with CourseEnrollment. If no schedule is associated
             # with this enrollment, Django will raise an exception rather than return None.
@@ -2180,7 +2180,7 @@ class CourseEnrollment(models.Model):
         RequestCache(cls.MODE_CACHE_NAMESPACE).clear()
 
         records = cls.objects.filter(user__in=users, course_id=course_key).select_related('user')
-        cache = cls._get_mode_active_request_cache()
+        cache = cls._get_mode_active_request_cache()  # lint-amnesty, pylint: disable=redefined-outer-name
         for record in records:
             enrollment_state = CourseEnrollmentState(record.mode, record.is_active)
             cls._update_enrollment(cache, record.user.id, course_key, enrollment_state)
@@ -2209,7 +2209,7 @@ class CourseEnrollment(models.Model):
         cls._update_enrollment(cls._get_mode_active_request_cache(), user.id, course_key, enrollment_state)
 
     @classmethod
-    def _update_enrollment(cls, cache, user_id, course_key, enrollment_state):
+    def _update_enrollment(cls, cache, user_id, course_key, enrollment_state):  # lint-amnesty, pylint: disable=redefined-outer-name
         """
         Updates the cached value for the user's enrollment in the
         given cache.
@@ -2430,7 +2430,7 @@ class CourseAccessRole(models.Model):
         Overriding eq b/c the django impl relies on the primary key which requires fetch. sometimes we
         just want to compare roles w/o doing another fetch.
         """
-        return type(self) == type(other) and self._key == other._key  # pylint: disable=protected-access
+        return type(self) == type(other) and self._key == other._key  # lint-amnesty, pylint: disable=protected-access, unidiomatic-typecheck
 
     def __hash__(self):
         return hash(self._key)
@@ -2442,7 +2442,7 @@ class CourseAccessRole(models.Model):
         return self._key < other._key
 
     def __str__(self):
-        return "[CourseAccessRole] user: {}   role: {}   org: {}   course: {}".format(self.user.username, self.role, self.org, self.course_id)
+        return "[CourseAccessRole] user: {}   role: {}   org: {}   course: {}".format(self.user.username, self.role, self.org, self.course_id)  # lint-amnesty, pylint: disable=line-too-long
 
 
 #### Helper methods for use from python manage.py shell and other classes.
@@ -2484,7 +2484,7 @@ def get_user(email):
     return user, u_prof
 
 
-def user_info(email):
+def user_info(email):  # lint-amnesty, pylint: disable=missing-function-docstring
     user, u_prof = get_user(email)
     print("User id", user.id)
     print("Username", user.username)
@@ -2543,7 +2543,7 @@ DEFAULT_GROUPS = {
 }
 
 
-def add_user_to_default_group(user, group):
+def add_user_to_default_group(user, group):  # lint-amnesty, pylint: disable=missing-function-docstring
     try:
         utg = UserTestGroup.objects.get(name=group)
     except UserTestGroup.DoesNotExist:
@@ -2555,7 +2555,7 @@ def add_user_to_default_group(user, group):
     utg.save()
 
 
-def create_comments_service_user(user):
+def create_comments_service_user(user):  # lint-amnesty, pylint: disable=missing-function-docstring
     if not settings.FEATURES['ENABLE_DISCUSSION_SERVICE']:
         # Don't try--it won't work, and it will fill the logs with lots of errors
         return
@@ -2576,7 +2576,7 @@ def create_comments_service_user(user):
 
 
 @receiver(user_logged_in)
-def log_successful_login(sender, request, user, **kwargs):
+def log_successful_login(sender, request, user, **kwargs):  # lint-amnesty, pylint: disable=unused-argument
     """Handler to log when logins have occurred successfully."""
     if settings.FEATURES['SQUELCH_PII_IN_LOGS']:
         AUDIT_LOG.info(u"Login success - user.id: {0}".format(user.id))
@@ -2585,7 +2585,7 @@ def log_successful_login(sender, request, user, **kwargs):
 
 
 @receiver(user_logged_out)
-def log_successful_logout(sender, request, user, **kwargs):
+def log_successful_logout(sender, request, user, **kwargs):  # lint-amnesty, pylint: disable=unused-argument
     """Handler to log when logouts have occurred successfully."""
     if hasattr(request, 'user'):
         if settings.FEATURES['SQUELCH_PII_IN_LOGS']:
@@ -2798,7 +2798,7 @@ class LanguageField(models.CharField):
             'help_text',
             _("The ISO 639-1 language code for this language."),
         )
-        super(LanguageField, self).__init__(
+        super(LanguageField, self).__init__(  # lint-amnesty, pylint: disable=super-with-arguments
             max_length=16,
             choices=settings.ALL_LANGUAGES,
             help_text=help_text,
@@ -2984,7 +2984,7 @@ class RegistrationCookieConfiguration(ConfigurationModel):
         )
 
 
-class BulkUnenrollConfiguration(ConfigurationModel):
+class BulkUnenrollConfiguration(ConfigurationModel):  # lint-amnesty, pylint: disable=empty-docstring
     """
 
     """
@@ -3068,13 +3068,13 @@ class AccountRecoveryManager(models.Manager):
             AccountRecovery: AccountRecovery object with is_active=true
         """
         filters['is_active'] = True
-        return super(AccountRecoveryManager, self).get_queryset().get(**filters)
+        return super(AccountRecoveryManager, self).get_queryset().get(**filters)  # lint-amnesty, pylint: disable=super-with-arguments
 
     def activate(self):
         """
         Set is_active flag to True.
         """
-        super(AccountRecoveryManager, self).get_queryset().update(is_active=True)
+        super(AccountRecoveryManager, self).get_queryset().update(is_active=True)  # lint-amnesty, pylint: disable=super-with-arguments
 
 
 class AccountRecovery(models.Model):
