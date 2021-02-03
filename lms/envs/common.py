@@ -649,7 +649,14 @@ FEATURES = {
     # Sets the default browser support. For more information go to http://browser-update.org/customize.html
     'UNSUPPORTED_BROWSER_ALERT_VERSIONS': "{i:10,f:-3,o:-3,s:-3,c:-3}",
 
-    # Whether to display the account deletion section the account settings page
+    # .. toggle_name: FEATURES['ENABLE_ACCOUNT_DELETION']
+    # .. toggle_implementation: DjangoSetting
+    # .. toggle_default: True
+    # .. toggle_description: Whether to display the account deletion section on Account Settings page. Set to False to
+    #   hide this section.
+    # .. toggle_use_cases: open_edx
+    # .. toggle_creation_date: 2018-06-01
+    # .. toggle_tickets: https://github.com/edx/edx-platform/pull/18298
     'ENABLE_ACCOUNT_DELETION': True,
 
     # Enable feature to remove enrollments and users. Used to reset state of master's integration environments
