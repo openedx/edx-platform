@@ -620,7 +620,14 @@ FEATURES = {
     # .. toggle_tickets: https://openedx.atlassian.net/browse/OSPR-1735
     'ALLOW_EMAIL_ADDRESS_CHANGE': True,
 
-    # Whether the bulk enrollment view is enabled.
+    # .. toggle_name: FEATURES['ENABLE_BULK_ENROLLMENT_VIEW']
+    # .. toggle_implementation: DjangoSetting
+    # .. toggle_default: False
+    # .. toggle_description: When set to True the bulk enrollment view is enabled and one can use it to enroll multiple
+    #   users in a course using bulk enrollment API endpoint (/api/bulk_enroll/v1/bulk_enroll).
+    # .. toggle_use_cases: open_edx
+    # .. toggle_creation_date: 2017-07-15
+    # .. toggle_tickets: https://github.com/edx/edx-platform/pull/15006
     'ENABLE_BULK_ENROLLMENT_VIEW': False,
 
     # Whether course goals is enabled.
