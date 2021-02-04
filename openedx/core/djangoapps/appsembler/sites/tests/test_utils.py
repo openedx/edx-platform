@@ -1,12 +1,18 @@
 import unittest
+
+from django.db.models import QuerySet
 from mock import patch
 
 from django.core.exceptions import ImproperlyConfigured, MultipleObjectsReturned
-from django.test import TestCase, override_settings
+from django.test import TestCase
 from django.test.client import RequestFactory
 
 from openedx.core.djangoapps.appsembler.api.tests.factories import OrganizationFactory
-from openedx.core.djangoapps.appsembler.sites.utils import get_current_organization, get_initial_page_elements
+from openedx.core.djangoapps.appsembler.sites.utils import (
+    get_current_organization,
+    get_initial_page_elements,
+    get_active_sites,
+)
 from openedx.core.djangoapps.site_configuration.tests.factories import SiteFactory
 from organizations.models import Organization
 
@@ -22,6 +28,44 @@ class JSONMigrationUtilsTestCase(TestCase):
         self.assertEqual(element['options']['text-content'], {
             'en': 'Welcome to your Tahoe trial LMS site!',
         })
+
+
+class ActiveSitesTestCase(TestCase):
+    def setUp(self):
+        super(ActiveSitesTestCase, self).setUp()
+        self.siteFoo = SiteFactory.create(domain='foo.dev', name='foo.dev')
+        self.siteBar = SiteFactory.create(domain='bar.dev', name='bar.dev')
+        self.organizationA = OrganizationFactory(sites=[self.siteFoo])
+        self.organizationB = OrganizationFactory(sites=[self.siteBar])
+
+    def test_get_active_sites(self):
+        """
+        Basic test for results.
+        """
+        with patch('openedx.core.djangoapps.appsembler.sites.utils.get_active_organizations') as mocked:
+            mocked.return_value = [self.organizationA, self.organizationB]
+            active_sites = get_active_sites()
+            assert len(active_sites) == 2
+            assert active_sites[0].domain == 'bar.dev'
+            assert active_sites[1].domain == 'foo.dev'
+
+    def test_get_active_sites_queryset(self):
+        """
+        Should return QuerySet to work well with ViewSets and other plugins.
+        """
+        with patch('openedx.core.djangoapps.appsembler.sites.utils.get_active_organizations') as mocked:
+            mocked.return_value = [self.organizationA, self.organizationB]
+            active_sites = get_active_sites()
+            assert type(active_sites) == QuerySet
+
+    def test_get_active_sites_ordering(self):
+        """
+        Result ordering is useful for tests but it's worth testing it itself.
+        """
+        with patch('openedx.core.djangoapps.appsembler.sites.utils.get_active_organizations') as mocked:
+            mocked.return_value = [self.organizationA, self.organizationB]
+            active_sites = get_active_sites('-domain')
+            assert active_sites[0].domain == 'foo.dev'
 
 
 class OrganizationByRequestTestCase(TestCase):
