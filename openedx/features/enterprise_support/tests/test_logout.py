@@ -28,7 +28,7 @@ class EnterpriseLogoutTests(EnterpriseServiceMockMixin, CacheIsolationTestCase, 
     """ Tests for the enterprise logout functionality. """
 
     def setUp(self):
-        super(EnterpriseLogoutTests, self).setUp()
+        super(EnterpriseLogoutTests, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.user = UserFactory()
 
         self.enterprise_customer = FAKE_ENTERPRISE_CUSTOMER

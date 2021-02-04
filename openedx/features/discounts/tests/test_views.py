@@ -19,7 +19,7 @@ class TestCourseUserDiscount(ModuleStoreTestCase):
     """
 
     def setUp(self):
-        super(TestCourseUserDiscount, self).setUp()
+        super(TestCourseUserDiscount, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.user = UserFactory.create()
         self.course = CourseFactory.create(run='test', display_name='test')
         self.client = Client()

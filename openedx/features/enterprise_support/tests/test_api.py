@@ -8,7 +8,7 @@ import httpretty
 import mock
 from consent.models import DataSharingConsent
 from django.conf import settings
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.core.cache import cache
 from django.http import HttpResponseRedirect
 from django.test.utils import override_settings
@@ -53,7 +53,7 @@ from openedx.features.enterprise_support.tests.mixins.enterprise import Enterpri
 from openedx.features.enterprise_support.utils import clear_data_consent_share_cache
 from common.djangoapps.student.tests.factories import UserFactory
 
-from enterprise.models import EnterpriseCustomerUser
+from enterprise.models import EnterpriseCustomerUser  # lint-amnesty, pylint: disable=wrong-import-order
 
 
 class MockEnrollment(mock.MagicMock):
@@ -386,7 +386,7 @@ class TestEnterpriseApi(EnterpriseServiceMockMixin, CacheIsolationTestCase):
         assert [] == get_enterprise_learner_data_from_db(self.user)
 
     def test_get_enterprise_learner_data_from_db(self):
-        enterprise_customer_user = EnterpriseCustomerUserFactory(user_id=self.user.id)
+        enterprise_customer_user = EnterpriseCustomerUserFactory(user_id=self.user.id)  # lint-amnesty, pylint: disable=unused-variable
         user_data = get_enterprise_learner_data_from_db(self.user)[0]['user']
         assert user_data['username'] == self.user.username
 
@@ -1040,7 +1040,7 @@ class TestEnterpriseApi(EnterpriseServiceMockMixin, CacheIsolationTestCase):
             provider_id='the-provider',
         )
         customer = customer_idp.enterprise_customer
-        customer_user = EnterpriseCustomerUserFactory.create(
+        customer_user = EnterpriseCustomerUserFactory.create(  # lint-amnesty, pylint: disable=unused-variable
             enterprise_customer=customer,
             user_id=self.user.id,
         )

@@ -29,13 +29,13 @@ class CourseSearchView(CourseTabView):
     @method_decorator(ensure_csrf_cookie)
     @method_decorator(cache_control(no_cache=True, no_store=True, must_revalidate=True))
     @method_decorator(ensure_valid_course_key)
-    def get(self, request, course_id, **kwargs):
+    def get(self, request, course_id, **kwargs):  # lint-amnesty, pylint: disable=arguments-differ
         """
         Displays the home page for the specified course.
         """
-        return super(CourseSearchView, self).get(request, course_id, 'courseware', **kwargs)
+        return super(CourseSearchView, self).get(request, course_id, 'courseware', **kwargs)  # lint-amnesty, pylint: disable=super-with-arguments
 
-    def render_to_fragment(self, request, course=None, tab=None, **kwargs):
+    def render_to_fragment(self, request, course=None, tab=None, **kwargs):  # lint-amnesty, pylint: disable=arguments-differ, unused-argument
         course_id = six.text_type(course.id)
         home_fragment_view = CourseSearchFragmentView()
         return home_fragment_view.render_to_fragment(request, course_id=course_id, **kwargs)
@@ -46,7 +46,7 @@ class CourseSearchFragmentView(EdxFragmentView):
     A fragment to render the home page for a course.
     """
 
-    def render_to_fragment(self, request, course_id=None, **kwargs):
+    def render_to_fragment(self, request, course_id=None, **kwargs):  # lint-amnesty, pylint: disable=arguments-differ
         """
         Renders the course's home page as a fragment.
         """
