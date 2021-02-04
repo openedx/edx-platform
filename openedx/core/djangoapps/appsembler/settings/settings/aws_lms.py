@@ -60,6 +60,10 @@ def plugin_settings(settings):
             'openedx.core.djangoapps.appsembler.sites.middleware.RedirectMiddleware'
         ):
             settings.MIDDLEWARE_CLASSES.insert(redir_middleware, tahoe_redir_middleware)
+
+        settings.TAHOE_MAIN_SITE_REDIRECT_URL = settings.ENV_TOKENS.get(
+            'TAHOE_MAIN_SITE_REDIRECT_URL', 'https://appsembler.com/tahoe/'
+        )
         # This is used in the appsembler_sites.middleware.RedirectMiddleware to exclude certain paths
         # from the redirect mechanics.
         settings.MAIN_SITE_REDIRECT_WHITELIST = [
