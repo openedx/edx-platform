@@ -38,7 +38,7 @@ class EmbargoMiddlewareAccessTests(UrlResetMixin, ModuleStoreTestCase):
 
     @patch.dict(settings.FEATURES, {'EMBARGO': True})
     def setUp(self):
-        super(EmbargoMiddlewareAccessTests, self).setUp()
+        super(EmbargoMiddlewareAccessTests, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.user = UserFactory(username=self.USERNAME, password=self.PASSWORD)
         self.course = CourseFactory.create()
         self.client.login(username=self.USERNAME, password=self.PASSWORD)

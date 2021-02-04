@@ -51,7 +51,7 @@ class CourseSerializer(serializers.Serializer):  # pylint: disable=abstract-meth
 
     def __init__(self, *args, **kwargs):
         self.include_expired = kwargs.pop("include_expired", False)
-        super(CourseSerializer, self).__init__(*args, **kwargs)
+        super(CourseSerializer, self).__init__(*args, **kwargs)  # lint-amnesty, pylint: disable=super-with-arguments
 
     def get_course_modes(self, obj):
         """
@@ -96,7 +96,7 @@ class CourseEnrollmentsApiListSerializer(CourseEnrollmentSerializer):
     course_id = serializers.CharField(source='course_overview.id')
 
     def __init__(self, *args, **kwargs):
-        super(CourseEnrollmentsApiListSerializer, self).__init__(*args, **kwargs)
+        super(CourseEnrollmentsApiListSerializer, self).__init__(*args, **kwargs)  # lint-amnesty, pylint: disable=super-with-arguments
         self.fields.pop('course_details')
 
     class Meta(CourseEnrollmentSerializer.Meta):

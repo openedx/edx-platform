@@ -62,7 +62,7 @@ class EmbargoMiddleware(MiddlewareMixin):
         # If embargoing is turned off, make this middleware do nothing
         if not settings.FEATURES.get('EMBARGO'):
             raise MiddlewareNotUsed()
-        super(EmbargoMiddleware, self).__init__(*args, **kwargs)
+        super(EmbargoMiddleware, self).__init__(*args, **kwargs)  # lint-amnesty, pylint: disable=super-with-arguments
 
     def process_request(self, request):
         """Block requests based on embargo rules.

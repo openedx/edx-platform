@@ -11,13 +11,13 @@ from mock import patch, MagicMock
 
 from .factories import CountryAccessRuleFactory, RestrictedCourseFactory
 from .. import messages
-from lms.djangoapps.course_api.tests.mixins import CourseApiFactoryMixin
-from openedx.core.djangolib.testing.utils import CacheIsolationTestCase, skip_unless_lms
-from openedx.core.djangoapps.theming.tests.test_util import with_comprehensive_theme
-from common.djangoapps.student.tests.factories import UserFactory
-from common.djangoapps.util.testing import UrlResetMixin
-from xmodule.modulestore.tests.factories import CourseFactory
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from lms.djangoapps.course_api.tests.mixins import CourseApiFactoryMixin  # lint-amnesty, pylint: disable=wrong-import-order
+from openedx.core.djangolib.testing.utils import CacheIsolationTestCase, skip_unless_lms  # lint-amnesty, pylint: disable=wrong-import-order
+from openedx.core.djangoapps.theming.tests.test_util import with_comprehensive_theme  # lint-amnesty, pylint: disable=wrong-import-order
+from common.djangoapps.student.tests.factories import UserFactory  # lint-amnesty, pylint: disable=wrong-import-order
+from common.djangoapps.util.testing import UrlResetMixin  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.tests.factories import CourseFactory  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase  # lint-amnesty, pylint: disable=wrong-import-order
 
 
 @skip_unless_lms
@@ -46,7 +46,7 @@ class CourseAccessMessageViewTest(CacheIsolationTestCase, UrlResetMixin):
 
     @patch.dict(settings.FEATURES, {'EMBARGO': True})
     def setUp(self):
-        super(CourseAccessMessageViewTest, self).setUp()
+        super(CourseAccessMessageViewTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
 
     @ddt.data(*list(messages.ENROLL_MESSAGES.keys()))
     def test_enrollment_messages(self, msg_key):
@@ -102,11 +102,11 @@ class CheckCourseAccessViewTest(CourseApiFactoryMixin, ModuleStoreTestCase):
 
     @patch.dict(settings.FEATURES, {'EMBARGO': True})
     def setUp(self):
-        super(CheckCourseAccessViewTest, self).setUp()
+        super(CheckCourseAccessViewTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.url = reverse('api_embargo:v1_course_access')
         user = UserFactory(is_staff=True)
-        self.client.login(username=user.username, password=UserFactory._DEFAULT_PASSWORD)
-        self.course_id = str(CourseFactory().id)
+        self.client.login(username=user.username, password=UserFactory._DEFAULT_PASSWORD)  # lint-amnesty, pylint: disable=protected-access
+        self.course_id = str(CourseFactory().id)  # lint-amnesty, pylint: disable=no-member
         self.request_data = {
             'course_ids': [self.course_id],
             'ip_address': '0.0.0.0',
@@ -159,7 +159,7 @@ class CheckCourseAccessViewTest(CourseApiFactoryMixin, ModuleStoreTestCase):
 
     def test_course_access_endpoint_with_non_staff_user(self):
         user = UserFactory(is_staff=False)
-        self.client.login(username=user.username, password=UserFactory._DEFAULT_PASSWORD)
+        self.client.login(username=user.username, password=UserFactory._DEFAULT_PASSWORD)  # lint-amnesty, pylint: disable=protected-access
 
         response = self.client.get(self.url, data=self.request_data)
         self.assertEqual(response.status_code, 403)

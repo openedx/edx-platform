@@ -1,4 +1,4 @@
-# """
+# """  # lint-amnesty, pylint: disable=missing-module-docstring
 # Test the logic behind the Generate External IDs tools in Admin
 # """
 import mock
@@ -18,7 +18,7 @@ class TestGenerateExternalIds(TestCase):
     Test generating ExternalIDs for Users.
     """
     def setUp(self):
-        super(TestGenerateExternalIds, self).setUp()
+        super(TestGenerateExternalIds, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.users = UserFactory.create_batch(10)
         self.user_id_list = [user.id for user in self.users]
         self.external_id_admin = ExternalIdAdmin(ExternalId, AdminSite())

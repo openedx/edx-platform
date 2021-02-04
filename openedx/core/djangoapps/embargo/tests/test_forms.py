@@ -59,7 +59,7 @@ class IPFilterFormTest(TestCase):
     """Test form for adding [black|white]list IP addresses"""
 
     def tearDown(self):
-        super(IPFilterFormTest, self).tearDown()
+        super(IPFilterFormTest, self).tearDown()  # lint-amnesty, pylint: disable=super-with-arguments
         # Explicitly clear ConfigurationModel's cache so tests have a clear cache
         # and don't interfere with each other
         cache.clear()

@@ -14,16 +14,16 @@ class CountryFactory(DjangoModelFactory):
     country = 'US'
 
 
-class RestrictedCourseFactory(DjangoModelFactory):
+class RestrictedCourseFactory(DjangoModelFactory):  # lint-amnesty, pylint: disable=missing-class-docstring
     class Meta(object):
         model = RestrictedCourse
 
     @factory.lazy_attribute
     def course_key(self):
-        return CourseFactory().id
+        return CourseFactory().id  # lint-amnesty, pylint: disable=no-member
 
 
-class CountryAccessRuleFactory(DjangoModelFactory):
+class CountryAccessRuleFactory(DjangoModelFactory):  # lint-amnesty, pylint: disable=missing-class-docstring
     class Meta(object):
         model = CountryAccessRule
 

@@ -19,7 +19,7 @@ class CountryMiddlewareTests(TestCase):
     Tests of CountryMiddleware.
     """
     def setUp(self):
-        super(CountryMiddlewareTests, self).setUp()
+        super(CountryMiddlewareTests, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.country_middleware = CountryMiddleware()
         self.session_middleware = SessionMiddleware()
         self.authenticated_user = UserFactory.create()

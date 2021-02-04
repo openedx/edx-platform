@@ -10,12 +10,12 @@ import logging
 from six import text_type
 
 from common.djangoapps.course_modes.models import CourseMode
-from django.core.exceptions import ObjectDoesNotExist, ValidationError
-from django.utils.decorators import method_decorator
-from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthentication
-from edx_rest_framework_extensions.auth.session.authentication import SessionAuthenticationAllowInactiveUser
-from opaque_keys import InvalidKeyError
-from opaque_keys.edx.keys import CourseKey
+from django.core.exceptions import ObjectDoesNotExist, ValidationError  # lint-amnesty, pylint: disable=wrong-import-order
+from django.utils.decorators import method_decorator  # lint-amnesty, pylint: disable=wrong-import-order
+from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthentication  # lint-amnesty, pylint: disable=wrong-import-order
+from edx_rest_framework_extensions.auth.session.authentication import SessionAuthenticationAllowInactiveUser  # lint-amnesty, pylint: disable=wrong-import-order
+from opaque_keys import InvalidKeyError  # lint-amnesty, pylint: disable=wrong-import-order
+from opaque_keys.edx.keys import CourseKey  # lint-amnesty, pylint: disable=wrong-import-order
 from openedx.core.djangoapps.cors_csrf.authentication import SessionAuthenticationCrossDomainCsrf
 from openedx.core.djangoapps.cors_csrf.decorators import ensure_csrf_cookie_cross_domain
 from openedx.core.djangoapps.course_groups.cohorts import CourseUserGroup, add_user_to_cohort, get_cohort_by_name
@@ -41,11 +41,11 @@ from openedx.features.enterprise_support.api import (
     EnterpriseApiServiceClient,
     enterprise_enabled
 )
-from rest_framework import permissions, status
-from rest_framework.generics import ListAPIView
-from rest_framework.response import Response
-from rest_framework.throttling import UserRateThrottle
-from rest_framework.views import APIView
+from rest_framework import permissions, status  # lint-amnesty, pylint: disable=wrong-import-order
+from rest_framework.generics import ListAPIView  # lint-amnesty, pylint: disable=wrong-import-order
+from rest_framework.response import Response  # lint-amnesty, pylint: disable=wrong-import-order
+from rest_framework.throttling import UserRateThrottle  # lint-amnesty, pylint: disable=wrong-import-order
+from rest_framework.views import APIView  # lint-amnesty, pylint: disable=wrong-import-order
 from common.djangoapps.student.auth import user_has_role
 from common.djangoapps.student.models import CourseEnrollment, User
 from common.djangoapps.student.roles import CourseStaffRole, GlobalStaff
@@ -59,7 +59,7 @@ REQUIRED_ATTRIBUTES = {
 
 class EnrollmentCrossDomainSessionAuth(SessionAuthenticationAllowInactiveUser, SessionAuthenticationCrossDomainCsrf):
     """Session authentication that allows inactive users and cross-domain requests. """
-    pass
+    pass  # lint-amnesty, pylint: disable=unnecessary-pass
 
 
 class ApiKeyPermissionMixIn(object):
@@ -99,7 +99,7 @@ class EnrollmentUserThrottle(UserRateThrottle, ApiKeyPermissionMixIn):
             self.rate = self.get_rate()
             self.num_requests, self.duration = self.parse_rate(self.rate)
 
-        return self.has_api_key_permissions(request) or super(EnrollmentUserThrottle, self).allow_request(request, view)
+        return self.has_api_key_permissions(request) or super(EnrollmentUserThrottle, self).allow_request(request, view)  # lint-amnesty, pylint: disable=super-with-arguments
 
 
 @can_disable_rate_limit
@@ -749,7 +749,7 @@ class EnrollmentListView(APIView, ApiKeyPermissionMixIn):
                 except EnterpriseApiException as error:
                     log.exception(u"An unexpected error occurred while creating the new EnterpriseCourseEnrollment "
                                   u"for user [%s] in course run [%s]", username, course_id)
-                    raise CourseEnrollmentError(text_type(error))
+                    raise CourseEnrollmentError(text_type(error))  # lint-amnesty, pylint: disable=raise-missing-from
                 kwargs = {
                     'username': username,
                     'course_id': text_type(course_id),
