@@ -16,7 +16,7 @@ class TestCourseTagAPI(TestCase):
     """
 
     def setUp(self):
-        super(TestCourseTagAPI, self).setUp()
+        super(TestCourseTagAPI, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.user = UserFactory.create()
         self.course_id = CourseLocator('test_org', 'test_course_number', 'test_run')
         self.test_key = 'test_key'

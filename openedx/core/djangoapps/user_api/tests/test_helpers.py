@@ -6,7 +6,7 @@ Tests for helper functions.
 import json
 import re
 
-import ddt
+import ddt  # lint-amnesty, pylint: disable=unused-import
 import mock
 import pytest
 from django import forms
@@ -18,12 +18,12 @@ from ..helpers import FormDescription, InvalidFieldError, intercept_errors
 
 class FakeInputException(Exception):
     """Fake exception that should be intercepted."""
-    pass
+    pass  # lint-amnesty, pylint: disable=unnecessary-pass
 
 
 class FakeOutputException(Exception):
     """Fake exception that should be raised."""
-    pass
+    pass  # lint-amnesty, pylint: disable=unnecessary-pass
 
 
 @intercept_errors(FakeOutputException, ignore_errors=[ValueError])

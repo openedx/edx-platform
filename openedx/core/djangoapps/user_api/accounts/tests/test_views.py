@@ -47,7 +47,7 @@ class UserAPITestCase(APITestCase):
     """
 
     def setUp(self):
-        super(UserAPITestCase, self).setUp()
+        super(UserAPITestCase, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
 
         self.anonymous_client = APIClient()
         self.different_user = UserFactory.create(password=TEST_PASSWORD)
@@ -156,7 +156,7 @@ class TestOwnUsernameAPI(CacheIsolationTestCase, UserAPITestCase):
     ENABLED_CACHES = ['default']
 
     def setUp(self):
-        super(TestOwnUsernameAPI, self).setUp()
+        super(TestOwnUsernameAPI, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
 
         self.url = reverse("own_username_api")
 
@@ -214,7 +214,7 @@ class TestAccountsAPI(CacheIsolationTestCase, UserAPITestCase):
     ENABLED_CACHES = ['default']
 
     def setUp(self):
-        super(TestAccountsAPI, self).setUp()
+        super(TestAccountsAPI, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
 
         self.url = reverse("accounts_api", kwargs={'username': self.user.username})
 
@@ -948,7 +948,7 @@ class TestAccountAPITransactions(TransactionTestCase):
     """
 
     def setUp(self):
-        super(TestAccountAPITransactions, self).setUp()
+        super(TestAccountAPITransactions, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.client = APIClient()
         self.user = UserFactory.create(password=TEST_PASSWORD)
         self.url = reverse("accounts_api", kwargs={'username': self.user.username})
@@ -983,7 +983,7 @@ class UsernameReplacementViewTests(APITestCase):
     SERVICE_USERNAME = 'test_replace_username_service_worker'
 
     def setUp(self):
-        super(UsernameReplacementViewTests, self).setUp()
+        super(UsernameReplacementViewTests, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.service_user = UserFactory(username=self.SERVICE_USERNAME)
         self.url = reverse("username_replacement")
 

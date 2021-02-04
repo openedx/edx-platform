@@ -24,7 +24,7 @@ class LogoutTests(TestCase):
 
     def setUp(self):
         """ Create a course and user, then log in. """
-        super(LogoutTests, self).setUp()
+        super(LogoutTests, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.user = UserFactory()
         self.client.login(username=self.user.username, password='test')
 

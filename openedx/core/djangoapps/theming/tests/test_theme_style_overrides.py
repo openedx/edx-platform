@@ -9,7 +9,7 @@ from django.test import TestCase
 from django.urls import reverse
 
 from openedx.core.djangoapps.theming.tests.test_util import with_comprehensive_theme
-from openedx.core.djangolib.testing.utils import skip_unless_cms, skip_unless_lms
+from openedx.core.djangolib.testing.utils import skip_unless_cms, skip_unless_lms  # lint-amnesty, pylint: disable=unused-import
 from common.djangoapps.student.tests.factories import UserFactory
 
 
@@ -23,7 +23,7 @@ class TestComprehensiveThemeLMS(TestCase):
         """
         Clear static file finders cache and register cleanup methods.
         """
-        super(TestComprehensiveThemeLMS, self).setUp()
+        super(TestComprehensiveThemeLMS, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.user = UserFactory()
 
         # Clear the internal staticfiles caches, to get test isolation.
@@ -152,7 +152,7 @@ class TestComprehensiveThemeDisabledLMS(TestCase):
         """
         Clear static file finders cache.
         """
-        super(TestComprehensiveThemeDisabledLMS, self).setUp()
+        super(TestComprehensiveThemeDisabledLMS, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
 
         # Clear the internal staticfiles caches, to get test isolation.
         staticfiles.finders.get_finder.cache_clear()
@@ -177,7 +177,7 @@ class TestStanfordTheme(TestCase):
         """
         Clear static file finders cache and register cleanup methods.
         """
-        super(TestStanfordTheme, self).setUp()
+        super(TestStanfordTheme, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
 
         # Clear the internal staticfiles caches, to get test isolation.
         staticfiles.finders.get_finder.cache_clear()

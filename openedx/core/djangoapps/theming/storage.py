@@ -41,7 +41,7 @@ class ThemeMixin(object):
     def __init__(self, **kwargs):
 
         self.prefix = kwargs.pop('prefix', None)
-        super(ThemeMixin, self).__init__(**kwargs)
+        super(ThemeMixin, self).__init__(**kwargs)  # lint-amnesty, pylint: disable=super-with-arguments
 
     def url(self, name):
         """
@@ -70,7 +70,7 @@ class ThemeMixin(object):
         if prefix and self.themed(name, prefix):
             name = os.path.join(prefix, name)
 
-        return super(ThemeMixin, self).url(name)
+        return super(ThemeMixin, self).url(name)  # lint-amnesty, pylint: disable=super-with-arguments
 
     def themed(self, name, theme):
         """
@@ -287,7 +287,7 @@ class ThemePipelineMixin(PipelineMixin):
                 paths[output_file] = (self, output_file)
                 yield output_file, output_file, True
 
-        super_class = super(ThemePipelineMixin, self)
+        super_class = super(ThemePipelineMixin, self)  # lint-amnesty, pylint: disable=super-with-arguments
         if hasattr(super_class, 'post_process'):
             for name, hashed_name, processed in super_class.post_process(paths.copy(), dry_run, **options):
                 yield name, hashed_name, processed

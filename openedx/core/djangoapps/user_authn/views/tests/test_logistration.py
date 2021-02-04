@@ -47,7 +47,7 @@ class LoginAndRegistrationTest(ThirdPartyAuthTestMixin, UrlResetMixin, ModuleSto
 
     @mock.patch.dict(settings.FEATURES, {'EMBARGO': True})
     def setUp(self):  # pylint: disable=arguments-differ
-        super(LoginAndRegistrationTest, self).setUp()
+        super(LoginAndRegistrationTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
 
         # Several third party auth providers are created for these tests:
         self.google_provider = self.configure_google_provider(enabled=True, visible=True)
@@ -662,7 +662,7 @@ class AccountCreationTestCaseWithSiteOverrides(SiteMixin, TestCase):
 
     def setUp(self):
         """Set up the tests"""
-        super(AccountCreationTestCaseWithSiteOverrides, self).setUp()
+        super(AccountCreationTestCaseWithSiteOverrides, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
 
         # Set the feature flag ALLOW_PUBLIC_ACCOUNT_CREATION to False
         self.site_configuration_values = {

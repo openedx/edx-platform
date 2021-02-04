@@ -12,7 +12,7 @@ from django.conf import settings
 from django.contrib.auth import authenticate
 from django.contrib.auth import login as django_login
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.contrib import admin
 from django.http import HttpRequest, HttpResponse, HttpResponseForbidden
 from django.shortcuts import redirect
@@ -88,7 +88,7 @@ def _do_third_party_auth(request):
             )
         )
 
-        raise AuthFailedError(message, error_code='third-party-auth-with-no-linked-account')
+        raise AuthFailedError(message, error_code='third-party-auth-with-no-linked-account')  # lint-amnesty, pylint: disable=raise-missing-from
 
 
 def _get_user_by_email(request):
@@ -145,7 +145,7 @@ def _generate_locked_out_error_message():
             locked_out_period=int(locked_out_period_in_sec / 60)))
 
 
-def _enforce_password_policy_compliance(request, user):
+def _enforce_password_policy_compliance(request, user):  # lint-amnesty, pylint: disable=missing-function-docstring
     try:
         password_policy_compliance.enforce_compliance_on_login(user, request.POST.get('password'))
     except password_policy_compliance.NonCompliantPasswordWarning as e:
@@ -155,7 +155,7 @@ def _enforce_password_policy_compliance(request, user):
         AUDIT_LOG.info("Password reset initiated for email %s.", user.email)
         send_password_reset_email_for_user(user, request)
         # Prevent the login attempt.
-        raise AuthFailedError(HTML(six.text_type(e)), error_code=e.__class__.__name__)
+        raise AuthFailedError(HTML(six.text_type(e)), error_code=e.__class__.__name__)  # lint-amnesty, pylint: disable=raise-missing-from
 
 
 def _log_and_raise_inactive_user_auth_error(unauthenticated_user):
@@ -210,7 +210,7 @@ def _authenticate_first_party(request, unauthenticated_user, third_party_auth_re
 
     # This occurs when there are too many attempts from the same IP address
     except RateLimitException:
-        raise AuthFailedError(_('Too many failed login attempts. Try again later.'))
+        raise AuthFailedError(_('Too many failed login attempts. Try again later.'))  # lint-amnesty, pylint: disable=raise-missing-from
 
 
 def _handle_failed_authentication(user, authenticated_user):
@@ -357,7 +357,7 @@ def _check_user_auth_flow(site, user):
             # we don't record their e-mail in case there is sensitive info accidentally
             # in there.
             set_custom_attribute('login_tpa_domain_shortcircuit_user_id', user.id)
-            log.warn("User %s has nonstandard e-mail. Shortcircuiting THIRD_PART_AUTH_ONLY_DOMAIN check.", user.id)
+            log.warn("User %s has nonstandard e-mail. Shortcircuiting THIRD_PART_AUTH_ONLY_DOMAIN check.", user.id)  # lint-amnesty, pylint: disable=deprecated-method
             return
         user_domain = email_parts[1].strip().lower()
 
@@ -412,7 +412,7 @@ def finish_auth(request):
     rate=settings.LOGISTRATION_RATELIMIT_RATE,
     method='POST',
     block=True
-)
+)  # lint-amnesty, pylint: disable=too-many-statements
 def login_user(request):
     """
     AJAX request to log in the user.
@@ -539,7 +539,7 @@ def login_user(request):
 # complexity.
 @csrf_exempt
 @require_http_methods(['POST'])
-def login_refresh(request):
+def login_refresh(request):  # lint-amnesty, pylint: disable=missing-function-docstring
     if not request.user.is_authenticated or request.user.is_anonymous:
         return JsonResponse('Unauthorized', status=401)
 
@@ -570,7 +570,7 @@ class LoginSessionView(APIView):
 
     @method_decorator(ensure_csrf_cookie)
     def get(self, request):
-        return HttpResponse(get_login_session_form(request).to_json(), content_type="application/json")
+        return HttpResponse(get_login_session_form(request).to_json(), content_type="application/json")  # lint-amnesty, pylint: disable=http-response-with-content-type-json
 
     @method_decorator(require_post_params(["email", "password"]))
     @method_decorator(csrf_protect)
@@ -591,7 +591,7 @@ class LoginSessionView(APIView):
 
     @method_decorator(sensitive_post_parameters("password"))
     def dispatch(self, request, *args, **kwargs):
-        return super(LoginSessionView, self).dispatch(request, *args, **kwargs)
+        return super(LoginSessionView, self).dispatch(request, *args, **kwargs)  # lint-amnesty, pylint: disable=super-with-arguments
 
 
 def _parse_analytics_param_for_course_id(request):

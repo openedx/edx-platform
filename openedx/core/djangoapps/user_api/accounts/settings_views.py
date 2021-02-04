@@ -113,11 +113,11 @@ def account_settings_context(request):
             'country': {
                 'options': list(countries),
             }, 'gender': {
-                'options': [(choice[0], _(choice[1])) for choice in UserProfile.GENDER_CHOICES],
+                'options': [(choice[0], _(choice[1])) for choice in UserProfile.GENDER_CHOICES],  # lint-amnesty, pylint: disable=translation-of-non-string
             }, 'language': {
                 'options': released_languages(),
             }, 'level_of_education': {
-                'options': [(choice[0], _(choice[1])) for choice in UserProfile.LEVEL_OF_EDUCATION_CHOICES],
+                'options': [(choice[0], _(choice[1])) for choice in UserProfile.LEVEL_OF_EDUCATION_CHOICES],  # lint-amnesty, pylint: disable=translation-of-non-string
             }, 'password': {
                 'url': reverse('password_reset'),
             }, 'year_of_birth': {

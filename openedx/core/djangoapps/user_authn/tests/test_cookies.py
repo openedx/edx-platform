@@ -24,7 +24,7 @@ from openedx.core.djangoapps.user_api.accounts.image_helpers import get_profile_
 
 class CookieTests(TestCase):
     def setUp(self):
-        super(CookieTests, self).setUp()
+        super(CookieTests, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.user = UserFactory.create()
         self.user.profile = UserProfileFactory.create(user=self.user)
         self.request = RequestFactory().get('/')
@@ -102,7 +102,7 @@ class CookieTests(TestCase):
         """ Verify cookies in the response have the same expiration, as expected. """
         self.assertEqual(
             num_of_unique_expires,
-            len(set([response.cookies[c]['expires'] for c in response.cookies])),
+            len(set([response.cookies[c]['expires'] for c in response.cookies])),  # lint-amnesty, pylint: disable=consider-using-set-comprehension
         )
 
     @skip_unless_lms

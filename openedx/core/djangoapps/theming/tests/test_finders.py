@@ -17,7 +17,7 @@ class TestThemeFinders(TestCase):
     """
 
     def setUp(self):
-        super(TestThemeFinders, self).setUp()
+        super(TestThemeFinders, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.finder = ThemeFilesFinder()
 
     def test_find_first_themed_asset(self):

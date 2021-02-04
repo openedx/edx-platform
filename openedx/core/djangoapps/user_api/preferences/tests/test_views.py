@@ -30,7 +30,7 @@ class TestPreferencesAPI(UserAPITestCase):
     Unit tests /api/user/v1/accounts/{username}/
     """
     def setUp(self):
-        super(TestPreferencesAPI, self).setUp()
+        super(TestPreferencesAPI, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.url_endpoint_name = "preferences_api"
         self.url = reverse(self.url_endpoint_name, kwargs={'username': self.user.username})
 
@@ -96,7 +96,7 @@ class TestPreferencesAPI(UserAPITestCase):
         # Log in the client and do the GET.
         client = self.login_client(api_client, user)
         response = self.send_get(client)
-        self.assertEqual({"dict_pref": "{'int_key': 10}", "string_pref": "value", "time_zone": "Asia/Tokyo"},  # pylint: disable=unicode-format-string
+        self.assertEqual({"dict_pref": "{'int_key': 10}", "string_pref": "value", "time_zone": "Asia/Tokyo"},  # lint-amnesty, pylint: disable=bad-option-value, unicode-format-string
                          response.data)
 
     @ddt.data(
@@ -155,7 +155,7 @@ class TestPreferencesAPI(UserAPITestCase):
         if six.PY2:
             pref_dict = {u"dict_pref": u"{u'int_key': 10}", u"string_pref": u"value"}
         else:
-            # pylint: disable=unicode-format-string
+            # lint-amnesty, pylint: disable=bad-option-value, unicode-format-string
             pref_dict = {"dict_pref": "{'int_key': 10}", "string_pref": "value"}
         self.assertEqual(pref_dict, response.data)
 
@@ -204,7 +204,7 @@ class TestPreferencesAPI(UserAPITestCase):
         # Verify that GET returns the updated preferences
         response = self.send_get(self.client)
         expected_preferences = {
-            "dict_pref": "{'int_key': 10}",  # pylint: disable=unicode-format-string
+            "dict_pref": "{'int_key': 10}",  # lint-amnesty, pylint: disable=bad-option-value, unicode-format-string
             "string_pref": "updated_value",
             "new_pref": "new_value",
             "time_zone": "Europe/London",
@@ -330,7 +330,7 @@ class TestPreferencesAPITransactions(TransactionTestCase):
     test_password = "test"
 
     def setUp(self):
-        super(TestPreferencesAPITransactions, self).setUp()
+        super(TestPreferencesAPITransactions, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.client = APIClient()
         self.user = UserFactory.create(password=TEST_PASSWORD)
         self.url = reverse("preferences_api", kwargs={'username': self.user.username})
@@ -375,7 +375,7 @@ class TestPreferencesDetailAPI(UserAPITestCase):
     Unit tests /api/user/v1/accounts/{username}/{preference_key}
     """
     def setUp(self):
-        super(TestPreferencesDetailAPI, self).setUp()
+        super(TestPreferencesDetailAPI, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.test_pref_key = "test_key"
         self.test_pref_value = "test_value"
         set_user_preference(self.user, self.test_pref_key, self.test_pref_value)
