@@ -32,7 +32,7 @@ from ..tests.factories import ScheduleConfigFactory
 @ddt.ddt
 @patch('openedx.core.djangoapps.schedules.signals.get_current_site')
 @skip_unless_lms
-class CreateScheduleTests(SharedModuleStoreTestCase):
+class CreateScheduleTests(SharedModuleStoreTestCase):  # lint-amnesty, pylint: disable=missing-class-docstring
 
     def assert_schedule_created(self, is_self_paced=True, experience_type=ScheduleExperience.EXPERIENCES.default):
         """
@@ -48,14 +48,14 @@ class CreateScheduleTests(SharedModuleStoreTestCase):
         assert enrollment.schedule.upgrade_deadline is None
         assert enrollment.schedule.experience.experience_type == experience_type
 
-    def assert_schedule_not_created(self):
+    def assert_schedule_not_created(self):  # lint-amnesty, pylint: disable=missing-function-docstring
         course = _create_course_run(self_paced=True)
         enrollment = CourseEnrollmentFactory(
             course_id=course.id,
             mode=CourseMode.AUDIT,
         )
         with pytest.raises(Schedule.DoesNotExist):
-            enrollment.schedule
+            enrollment.schedule  # lint-amnesty, pylint: disable=pointless-statement
 
     @override_waffle_flag(CREATE_SCHEDULE_WAFFLE_FLAG, True)
     def test_create_schedule(self, mock_get_current_site):
@@ -121,7 +121,7 @@ class CreateScheduleTests(SharedModuleStoreTestCase):
         self,
         hold_back_ratio,
         expect_schedule_created,
-        mock_random,
+        mock_random,  # lint-amnesty, pylint: disable=unused-argument
         mock_track,
         mock_get_current_site
     ):
@@ -174,12 +174,12 @@ class CreateScheduleTests(SharedModuleStoreTestCase):
 @ddt.ddt
 @skip_unless_lms
 @patch('openedx.core.djangoapps.schedules.signals.get_current_site')
-class UpdateScheduleTests(SharedModuleStoreTestCase):
+class UpdateScheduleTests(SharedModuleStoreTestCase):  # lint-amnesty, pylint: disable=missing-class-docstring
     ENABLED_SIGNALS = ['course_published']
     VERIFICATION_DEADLINE_DAYS = 14
 
     def setUp(self):
-        super(UpdateScheduleTests, self).setUp()
+        super(UpdateScheduleTests, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.site = SiteFactory.create()
         ScheduleConfigFactory.create(site=self.site)
         DynamicUpgradeDeadlineConfiguration.objects.create(enabled=True, deadline_days=self.VERIFICATION_DEADLINE_DAYS)
@@ -229,7 +229,7 @@ class UpdateScheduleTests(SharedModuleStoreTestCase):
 
 @skip_unless_lms
 @override_waffle_flag(CREATE_SCHEDULE_WAFFLE_FLAG, True)
-class ResetScheduleTests(SharedModuleStoreTestCase):
+class ResetScheduleTests(SharedModuleStoreTestCase):  # lint-amnesty, pylint: disable=missing-class-docstring
     def setUp(self):
         super().setUp()
 
