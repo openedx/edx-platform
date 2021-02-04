@@ -59,7 +59,10 @@ from user_util import user_util
 import openedx.core.djangoapps.django_comment_common.comment_client as cc
 from common.djangoapps.course_modes.models import CourseMode, get_cosmetic_verified_display_price
 from common.djangoapps.student.emails import send_proctoring_requirements_email
-from common.djangoapps.student.email_helpers import generate_proctoring_requirements_email_context
+from common.djangoapps.student.email_helpers import (
+    generate_proctoring_requirements_email_context,
+    should_send_proctoring_requirements_email
+)
 from common.djangoapps.student.signals import ENROLL_STATUS_CHANGE, ENROLLMENT_TRACK_UPDATED, UNENROLL_DONE
 from common.djangoapps.track import contexts, segment
 from common.djangoapps.util.model_utils import emit_field_changed_events, get_changed_fields_dict
@@ -76,7 +79,6 @@ from openedx.core.djangoapps.content.course_overviews.models import CourseOvervi
 from openedx.core.djangoapps.enrollments.api import (
     _default_course_mode,
     get_enrollment_attributes,
-    is_enrollment_valid_for_proctoring,
     set_enrollment_attributes,
 )
 from openedx.core.djangoapps.signals.signals import USER_ACCOUNT_ACTIVATED
@@ -1461,7 +1463,7 @@ class CourseEnrollment(models.Model):
         if mode_changed:
             if COURSEWARE_PROCTORING_IMPROVEMENTS.is_enabled(self.course_id):
                 # If mode changed to one that requires proctoring, send proctoring requirements email
-                if is_enrollment_valid_for_proctoring(self.user.username, self.course_id):
+                if should_send_proctoring_requirements_email(self.user.username, self.course_id):
                     email_context = generate_proctoring_requirements_email_context(self.user, self.course_id)
                     send_proctoring_requirements_email(context=email_context)
 

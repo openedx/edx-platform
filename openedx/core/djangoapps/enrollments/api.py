@@ -497,25 +497,32 @@ def serialize_enrollments(enrollments):
 
 def is_enrollment_valid_for_proctoring(username, course_id):
     """
-    Returns a boolean value regarding whether user's course enrollment is eligible for proctoring. Returns
-    False if the enrollment is not active, special exams aren't enabled, proctored exams aren't enabled
-    for the course, or if the course mode is audit.
+    Returns a boolean value regarding whether user's course enrollment is eligible for proctoring.
+
+    Returns false if:
+        * special exams aren't enabled
+        * the enrollment is not active
+        * proctored exams aren't enabled for the course
+        * the course mode is audit
 
     Arguments:
-        username: The user associated with the enrollment.
-        course_id (str): The course id associated with the enrollment.
+        * username (str): The user associated with the enrollment.
+        * course_id (str): The course id associated with the enrollment.
     """
     if not settings.FEATURES.get('ENABLE_SPECIAL_EXAMS'):
         return False
 
+    # Verify that the learner's enrollment is active
     enrollment = _data_api().get_course_enrollment(username, str(course_id))
     if not enrollment['is_active']:
         return False
 
+    # Check that the course has proctored exams enabled
     course_module = modulestore().get_course(course_id)
     if not course_module.enable_proctored_exams:
         return False
 
+    # Only allow verified modes
     appropriate_modes = [
         CourseMode.VERIFIED, CourseMode.MASTERS, CourseMode.PROFESSIONAL, CourseMode.EXECUTIVE_EDUCATION
     ]
