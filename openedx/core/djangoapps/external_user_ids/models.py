@@ -85,7 +85,7 @@ class ExternalId(TimeStampedModel):
             type_obj = ExternalIdType.objects.get(name=type_name)
         except ExternalIdType.DoesNotExist:
             LOGGER.info(
-                'External ID Creation failed for user {user}, no external id type of {type}'.format(
+                'External ID Creation failed for user {user}, no external id type of {type}'.format(  # lint-amnesty, pylint: disable=logging-format-interpolation
                     user=user.id,
                     type=type_name
                 )
@@ -97,7 +97,7 @@ class ExternalId(TimeStampedModel):
         )
         if created:
             LOGGER.info(
-                'External ID Created for user {user}, of type {type}'.format(
+                'External ID Created for user {user}, of type {type}'.format(  # lint-amnesty, pylint: disable=logging-format-interpolation
                     user=user.id,
                     type=type_name
                 )

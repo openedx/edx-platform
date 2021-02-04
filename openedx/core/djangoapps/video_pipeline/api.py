@@ -37,14 +37,14 @@ def send_transcript_credentials(pipeline_integration, credentials_payload):
         else:
             is_updated = False
             error_response = json.loads(response.text)
-            log.error(error_message.format(
+            log.error(error_message.format(  # lint-amnesty, pylint: disable=logging-format-interpolation
                 credentials_payload.get('org'),
                 credentials_payload.get('provider'),
                 response.text
             ))
     except HttpClientError as ex:
         is_updated = False
-        log.exception(error_message.format(
+        log.exception(error_message.format(  # lint-amnesty, pylint: disable=logging-format-interpolation
             credentials_payload.get('org'),
             credentials_payload.get('provider'),
             ex.content
@@ -74,7 +74,7 @@ def update_3rd_party_transcription_service_credentials(**credentials_payload):
     vem_pipeline_integration = VEMPipelineIntegration.current()
 
     if vem_pipeline_integration.enabled:
-        log.info('Sending transcript credentials to VEM for org: {} and provider: {}'.format(
+        log.info('Sending transcript credentials to VEM for org: {} and provider: {}'.format(  # lint-amnesty, pylint: disable=logging-format-interpolation
             credentials_payload.get('org'), credentials_payload.get('provider')
         ))
         error_response, is_updated = send_transcript_credentials(vem_pipeline_integration, credentials_payload)

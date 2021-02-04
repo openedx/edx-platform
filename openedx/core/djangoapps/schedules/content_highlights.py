@@ -36,7 +36,7 @@ def course_has_highlights(course_key):
 
         if not highlights_are_available:
             log.warning(
-                'Course team enabled highlights and provided no highlights in {}'.format(course_key)
+                'Course team enabled highlights and provided no highlights in {}'.format(course_key)  # lint-amnesty, pylint: disable=logging-format-interpolation
             )
 
         return highlights_are_available

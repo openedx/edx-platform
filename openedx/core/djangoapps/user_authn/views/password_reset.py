@@ -451,7 +451,7 @@ class PasswordResetConfirmWrapper(PasswordResetConfirmView):
                 }
             )
         except ObjectDoesNotExist:
-            log.error('Account recovery process initiated without AccountRecovery instance for user {username}'
+            log.error('Account recovery process initiated without AccountRecovery instance for user {username}'  # lint-amnesty, pylint: disable=logging-format-interpolation
                       .format(username=updated_user.username))
 
     def _handle_password_creation(self, request, updated_user):
@@ -633,7 +633,7 @@ def password_change_request_handler(request):
                 )
                 ace.send(msg)
         except errors.UserAPIInternalError as err:
-            log.exception(u'Error occured during password change for user {email}: {error}'
+            log.exception(u'Error occured during password change for user {email}: {error}'  # lint-amnesty, pylint: disable=logging-format-interpolation
                           .format(email=email, error=err))
             return HttpResponse(_("Some error occured during password change. Please try again"), status=500)
 
@@ -717,7 +717,7 @@ class LogistrationPasswordResetView(APIView):  # lint-amnesty, pylint: disable=m
                         user.save()
                     except ObjectDoesNotExist:
                         err = 'Account recovery process initiated without AccountRecovery instance for user {username}'
-                        log.error(err.format(username=user.username))
+                        log.error(err.format(username=user.username))  # lint-amnesty, pylint: disable=logging-format-interpolation
                 send_password_reset_success_email(user, request)
         except ValidationError as err:
             AUDIT_LOG.exception("Password validation failed")

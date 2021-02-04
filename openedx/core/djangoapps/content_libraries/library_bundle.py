@@ -209,7 +209,7 @@ class LibraryBundle(object):
             try:
                 xml_node = xml_for_definition(def_key)
             except:  # pylint:disable=bare-except
-                log.exception("Unable to load definition {}".format(def_key))
+                log.exception("Unable to load definition {}".format(def_key))  # lint-amnesty, pylint: disable=logging-format-interpolation
                 return
 
             for child in xml_node:
@@ -220,7 +220,7 @@ class LibraryBundle(object):
                     child_usage = usage_for_child_include(usage_key, def_key, parsed_include)
                     child_def_key = definition_for_include(parsed_include, def_key)
                 except BundleFormatException:
-                    log.exception("Unable to parse a child of {}".format(def_key))
+                    log.exception("Unable to parse a child of {}".format(def_key))  # lint-amnesty, pylint: disable=logging-format-interpolation
                     continue
                 usages_found[child_usage] = child_def_key
                 add_definitions_children(child_usage, child_def_key)

@@ -56,7 +56,7 @@ class Command(BaseCommand):
             user = User.objects.get(username=username)
         except User.DoesNotExist:
             logger.exception(
-                u'Failed to create API client. Service user {username} does not exist.'.format(username=username)
+                u'Failed to create API client. Service user {username} does not exist.'.format(username=username)  # lint-amnesty, pylint: disable=logging-format-interpolation
             )
             raise
 
@@ -70,7 +70,7 @@ class Command(BaseCommand):
         for site in Site.objects.all():
             site_config = getattr(site, 'configuration', None)
             if site_config is None or not site_config.get_value('COURSE_CATALOG_API_URL'):
-                logger.info(u'Skipping site {domain}. No configuration.'.format(domain=site.domain))
+                logger.info(u'Skipping site {domain}. No configuration.'.format(domain=site.domain))  # lint-amnesty, pylint: disable=logging-format-interpolation
                 cache.set(SITE_PROGRAM_UUIDS_CACHE_KEY_TPL.format(domain=site.domain), [], None)
                 cache.set(SITE_PATHWAY_IDS_CACHE_KEY_TPL.format(domain=site.domain), [], None)
                 continue
@@ -98,29 +98,29 @@ class Command(BaseCommand):
             programs_by_type_slug.update(self.get_programs_by_type_slug(site, new_programs))
             organizations.update(self.get_programs_by_organization(new_programs))
 
-            logger.info(u'Caching UUIDs for {total} programs for site {site_name}.'.format(
+            logger.info(u'Caching UUIDs for {total} programs for site {site_name}.'.format(  # lint-amnesty, pylint: disable=logging-format-interpolation
                 total=len(uuids),
                 site_name=site.domain,
             ))
             cache.set(SITE_PROGRAM_UUIDS_CACHE_KEY_TPL.format(domain=site.domain), uuids, None)
 
             pathway_ids = list(new_pathways.keys())
-            logger.info(u'Caching ids for {total} pathways for site {site_name}.'.format(
+            logger.info(u'Caching ids for {total} pathways for site {site_name}.'.format(  # lint-amnesty, pylint: disable=logging-format-interpolation
                 total=len(pathway_ids),
                 site_name=site.domain,
             ))
             cache.set(SITE_PATHWAY_IDS_CACHE_KEY_TPL.format(domain=site.domain), pathway_ids, None)
 
-        logger.info(u'Caching details for {} programs.'.format(len(programs)))
+        logger.info(u'Caching details for {} programs.'.format(len(programs)))  # lint-amnesty, pylint: disable=logging-format-interpolation
         cache.set_many(programs, None)
 
-        logger.info(u'Caching details for {} pathways.'.format(len(pathways)))
+        logger.info(u'Caching details for {} pathways.'.format(len(pathways)))  # lint-amnesty, pylint: disable=logging-format-interpolation
         cache.set_many(pathways, None)
 
-        logger.info(u'Caching programs uuids for {} courses.'.format(len(courses)))
+        logger.info(u'Caching programs uuids for {} courses.'.format(len(courses)))  # lint-amnesty, pylint: disable=logging-format-interpolation
         cache.set_many(courses, None)
 
-        logger.info(u'Caching programs uuids for {} catalog courses.'.format(len(catalog_courses)))
+        logger.info(u'Caching programs uuids for {} catalog courses.'.format(len(catalog_courses)))  # lint-amnesty, pylint: disable=logging-format-interpolation
         cache.set_many(catalog_courses, None)
 
         logger.info(text_type('Caching program UUIDs by {} program types.'.format(len(programs_by_type))))
@@ -129,7 +129,7 @@ class Command(BaseCommand):
         logger.info(text_type('Caching program UUIDs by {} program type slugs.'.format(len(programs_by_type_slug))))
         cache.set_many(programs_by_type_slug, None)
 
-        logger.info(u'Caching programs uuids for {} organizations'.format(len(organizations)))
+        logger.info(u'Caching programs uuids for {} organizations'.format(len(organizations)))  # lint-amnesty, pylint: disable=logging-format-interpolation
         cache.set_many(organizations, None)
 
         if failure:
@@ -145,13 +145,13 @@ class Command(BaseCommand):
                 'uuids_only': 1,
             }
 
-            logger.info(u'Requesting program UUIDs for {domain}.'.format(domain=site.domain))
+            logger.info(u'Requesting program UUIDs for {domain}.'.format(domain=site.domain))  # lint-amnesty, pylint: disable=logging-format-interpolation
             uuids = client.programs.get(**querystring)
         except:  # pylint: disable=bare-except
-            logger.exception(u'Failed to retrieve program UUIDs for site: {domain}.'.format(domain=site.domain))
+            logger.exception(u'Failed to retrieve program UUIDs for site: {domain}.'.format(domain=site.domain))  # lint-amnesty, pylint: disable=logging-format-interpolation
             failure = True
 
-        logger.info(u'Received {total} UUIDs for site {domain}'.format(
+        logger.info(u'Received {total} UUIDs for site {domain}'.format(  # lint-amnesty, pylint: disable=logging-format-interpolation
             total=len(uuids),
             domain=site.domain
         ))
@@ -163,13 +163,13 @@ class Command(BaseCommand):
         for uuid in uuids:
             try:
                 cache_key = PROGRAM_CACHE_KEY_TPL.format(uuid=uuid)
-                logger.info(u'Requesting details for program {uuid}.'.format(uuid=uuid))
+                logger.info(u'Requesting details for program {uuid}.'.format(uuid=uuid))  # lint-amnesty, pylint: disable=logging-format-interpolation
                 program = client.programs(uuid).get(exclude_utm=1)
                 # pathways get added in process_pathways
                 program['pathway_ids'] = []
                 programs[cache_key] = program
             except:  # pylint: disable=bare-except
-                logger.exception(u'Failed to retrieve details for program {uuid}.'.format(uuid=uuid))
+                logger.exception(u'Failed to retrieve details for program {uuid}.'.format(uuid=uuid))  # lint-amnesty, pylint: disable=logging-format-interpolation
                 failure = True
                 continue
         return programs, failure
@@ -180,7 +180,7 @@ class Command(BaseCommand):
         """
         pathways = []
         failure = False
-        logger.info(u'Requesting pathways for {domain}.'.format(domain=site.domain))
+        logger.info(u'Requesting pathways for {domain}.'.format(domain=site.domain))  # lint-amnesty, pylint: disable=logging-format-interpolation
         try:
             next_page = 1
             while next_page:
@@ -194,7 +194,7 @@ class Command(BaseCommand):
             )
             failure = True
 
-        logger.info(u'Received {total} pathways for site {domain}'.format(
+        logger.info(u'Received {total} pathways for site {domain}'.format(  # lint-amnesty, pylint: disable=logging-format-interpolation
             total=len(pathways),
             domain=site.domain
         ))
@@ -225,7 +225,7 @@ class Command(BaseCommand):
                 del pathway['programs']
                 pathway['program_uuids'] = uuids
             except:  # pylint: disable=bare-except
-                logger.exception(u'Failed to process pathways for {domain}'.format(domain=site.domain))
+                logger.exception(u'Failed to process pathways for {domain}'.format(domain=site.domain))  # lint-amnesty, pylint: disable=logging-format-interpolation
                 failure = True
         return processed_pathways, programs, failure
 

@@ -68,7 +68,7 @@ def _do_third_party_auth(request):
         return pipeline.get_authenticated_user(requested_provider, username, third_party_uid)
     except User.DoesNotExist:
         AUDIT_LOG.info(
-            u"Login failed - user with username {username} has no social auth "
+            u"Login failed - user with username {username} has no social auth "  # lint-amnesty, pylint: disable=logging-format-interpolation
             u"with backend_name {backend_name}".format(
                 username=username, backend_name=backend_name)
         )
@@ -106,7 +106,7 @@ def _get_user_by_email(request):
         if settings.FEATURES['SQUELCH_PII_IN_LOGS']:
             AUDIT_LOG.warning(u"Login failed - Unknown user email")
         else:
-            AUDIT_LOG.warning(u"Login failed - Unknown user email: {0}".format(email))
+            AUDIT_LOG.warning(u"Login failed - Unknown user email: {0}".format(email))  # lint-amnesty, pylint: disable=logging-format-interpolation
 
 
 def _check_excessive_login_attempts(user):
@@ -163,11 +163,11 @@ def _log_and_raise_inactive_user_auth_error(unauthenticated_user):
     """
     if settings.FEATURES['SQUELCH_PII_IN_LOGS']:
         AUDIT_LOG.warning(
-            u"Login failed - Account not active for user.id: {0}, resending activation".format(
+            u"Login failed - Account not active for user.id: {0}, resending activation".format(  # lint-amnesty, pylint: disable=logging-format-interpolation
                 unauthenticated_user.id)
         )
     else:
-        AUDIT_LOG.warning(u"Login failed - Account not active for user {0}, resending activation".format(
+        AUDIT_LOG.warning(u"Login failed - Account not active for user {0}, resending activation".format(  # lint-amnesty, pylint: disable=logging-format-interpolation
             unauthenticated_user.username)
         )
 
@@ -226,9 +226,9 @@ def _handle_failed_authentication(user, authenticated_user):
         # doesn't exist, and doesn't have a corresponding password
         if settings.FEATURES['SQUELCH_PII_IN_LOGS']:
             loggable_id = user.id if user else "<unknown>"
-            AUDIT_LOG.warning(u"Login failed - password for user.id: {0} is invalid".format(loggable_id))
+            AUDIT_LOG.warning(u"Login failed - password for user.id: {0} is invalid".format(loggable_id))  # lint-amnesty, pylint: disable=logging-format-interpolation
         else:
-            AUDIT_LOG.warning(u"Login failed - password for {0} is invalid".format(user.email))
+            AUDIT_LOG.warning(u"Login failed - password for {0} is invalid".format(user.email))  # lint-amnesty, pylint: disable=logging-format-interpolation
 
     if user and LoginFailures.is_feature_enabled():
         blocked_threshold, failure_count = LoginFailures.check_user_reset_password_threshold(user)
@@ -611,7 +611,7 @@ def _parse_analytics_param_for_course_id(request):
         except (ValueError, TypeError):
             set_custom_attribute('shim_analytics_course_id', 'parse-error')
             log.error(
-                u"Could not parse analytics object sent to user API: {analytics}".format(
+                u"Could not parse analytics object sent to user API: {analytics}".format(  # lint-amnesty, pylint: disable=logging-format-interpolation
                     analytics=analytics
                 )
             )

@@ -83,20 +83,20 @@ class Command(BaseCommand):
                 name=domain,
             )
         if created:
-            LOG.info("Site does not exist. Created new site '{site_name}'".format(site_name=site.domain))
+            LOG.info("Site does not exist. Created new site '{site_name}'".format(site_name=site.domain))  # lint-amnesty, pylint: disable=logging-format-interpolation
         else:
-            LOG.info("Found existing site for '{site_name}'".format(site_name=site.domain))
+            LOG.info("Found existing site for '{site_name}'".format(site_name=site.domain))  # lint-amnesty, pylint: disable=logging-format-interpolation
 
         site_configuration, created = SiteConfiguration.objects.get_or_create(site=site)
         if created:
             LOG.info(
-                "Site configuration does not exist. Created new instance for '{site_name}'".format(
+                "Site configuration does not exist. Created new instance for '{site_name}'".format(  # lint-amnesty, pylint: disable=logging-format-interpolation
                     site_name=site.domain
                 )
             )
         else:
             LOG.info(
-                "Found existing site configuration for '{site_name}'. Updating it.".format(site_name=site.domain)
+                "Found existing site configuration for '{site_name}'. Updating it.".format(site_name=site.domain)  # lint-amnesty, pylint: disable=logging-format-interpolation
             )
 
         site_configuration_values = configuration or config_file_data

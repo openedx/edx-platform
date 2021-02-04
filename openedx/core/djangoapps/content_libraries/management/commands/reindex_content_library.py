@@ -70,7 +70,7 @@ class Command(BaseCommand):
             else:
                 return
         else:
-            logging.info("Indexing libraries: {}".format(options['library_ids']))
+            logging.info("Indexing libraries: {}".format(options['library_ids']))  # lint-amnesty, pylint: disable=logging-format-interpolation
             library_keys = list(map(LibraryLocatorV2.from_string, options['library_ids']))
 
         ContentLibraryIndexer.index_items(library_keys)

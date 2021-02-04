@@ -84,7 +84,7 @@ def create_zendesk_ticket(
 
         # Check for HTTP codes other than 201 (Created)
         if response.status_code == status.HTTP_201_CREATED:
-            log.debug(u'Successfully created ticket for {}'.format(requester_email))
+            log.debug(u'Successfully created ticket for {}'.format(requester_email))  # lint-amnesty, pylint: disable=logging-format-interpolation
         else:
             log.error(
                 _std_error_message(
@@ -136,7 +136,7 @@ def post_additional_info_as_comment(ticket_id, additional_info):
     try:
         response = requests.put(url, data=json.dumps(data), headers=_get_request_headers())
         if response.status_code == 200:
-            log.debug(u'Successfully created comment for ticket {}'.format(ticket_id))
+            log.debug(u'Successfully created comment for ticket {}'.format(ticket_id))  # lint-amnesty, pylint: disable=logging-format-interpolation
         else:
             log.error(
                 _std_error_message(

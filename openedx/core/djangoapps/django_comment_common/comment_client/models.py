@@ -106,7 +106,7 @@ class Model(object):
                 self.__setattr__(k, v)
             else:
                 log.warning(
-                    u"Unexpected field {field_name} in model {model_name}".format(
+                    u"Unexpected field {field_name} in model {model_name}".format(  # lint-amnesty, pylint: disable=logging-format-interpolation
                         field_name=k,
                         model_name=self.__class__.__name__
                     )

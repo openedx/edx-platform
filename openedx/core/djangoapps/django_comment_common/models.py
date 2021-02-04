@@ -64,7 +64,7 @@ def assign_role(course_id, user, rolename):
     """
     role, created = Role.objects.get_or_create(course_id=course_id, name=rolename)
     if created:
-        logging.info(u"EDUCATOR-1635: Created role {} for course {}".format(role, course_id))
+        logging.info(u"EDUCATOR-1635: Created role {} for course {}".format(role, course_id))  # lint-amnesty, pylint: disable=logging-format-interpolation
     user.roles.add(role)
 
 

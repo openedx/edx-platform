@@ -65,7 +65,7 @@ def update_dsc_cache_on_enterprise_customer_update(sender, instance, **kwargs):
         if new_value != old_value:
             kwargs = {'enterprise_customer_uuid': six.text_type(instance.uuid)}
             result = clear_enterprise_customer_data_consent_share_cache.apply_async(kwargs=kwargs)
-            log.info(u"DSC: Created {task_name}[{task_id}] with arguments {kwargs}".format(
+            log.info(u"DSC: Created {task_name}[{task_id}] with arguments {kwargs}".format(  # lint-amnesty, pylint: disable=logging-format-interpolation
                 task_name=clear_enterprise_customer_data_consent_share_cache.name,
                 task_id=result.task_id,
                 kwargs=kwargs,
@@ -127,9 +127,9 @@ def refund_order_voucher(sender, course_enrollment, skip_refund=False, **kwargs)
             client.enterprise.coupons.create_refunded_voucher.post({"order": order_number})
         except HttpClientError as ex:
             log.info(
-                error_message.format(type(ex).__name__, order_number, course_enrollment, course_enrollment.user)
+                error_message.format(type(ex).__name__, order_number, course_enrollment, course_enrollment.user)  # lint-amnesty, pylint: disable=logging-format-interpolation
             )
         except Exception as ex:  # pylint: disable=broad-except
             log.exception(
-                error_message.format(type(ex).__name__, order_number, course_enrollment, course_enrollment.user)
+                error_message.format(type(ex).__name__, order_number, course_enrollment, course_enrollment.user)  # lint-amnesty, pylint: disable=logging-format-interpolation
             )

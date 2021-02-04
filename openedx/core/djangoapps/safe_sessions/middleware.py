@@ -372,7 +372,7 @@ class SafeSessionMiddleware(SessionMiddleware, MiddlewareMixin):
                 # conditionally set the log level.
                 log_func = log.debug if request.user.id is None else log.warning
                 log_func(
-                    u"SafeCookieData user at request '{0}' does not match user at response: '{1}'".format(
+                    u"SafeCookieData user at request '{0}' does not match user at response: '{1}'".format(  # lint-amnesty, pylint: disable=logging-format-interpolation
                         request.safe_cookie_verified_user_id,
                         request.user.id,
                     ),

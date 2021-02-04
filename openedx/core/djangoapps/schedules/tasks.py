@@ -60,7 +60,7 @@ def update_course_schedules(self, **kwargs):  # lint-amnesty, pylint: disable=mi
         )
     except Exception as exc:
         if not isinstance(exc, KNOWN_RETRY_ERRORS):
-            LOG.exception(u"Unexpected failure: task id: {}, kwargs={}".format(self.request.id, kwargs))
+            LOG.exception(u"Unexpected failure: task id: {}, kwargs={}".format(self.request.id, kwargs))  # lint-amnesty, pylint: disable=logging-format-interpolation
         raise self.retry(kwargs=kwargs, exc=exc)
 
 

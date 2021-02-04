@@ -565,7 +565,7 @@ def consent_needed_for_course(request, user, course_id, enrollment_exists=False)
     data sharing permissions before accessing a course.
     """
     LOGGER.info(
-        u"Determining if user [{username}] must consent to data sharing for course [{course_id}]".format(
+        u"Determining if user [{username}] must consent to data sharing for course [{course_id}]".format(  # lint-amnesty, pylint: disable=logging-format-interpolation
             username=user.username,
             course_id=course_id
         )
@@ -575,7 +575,7 @@ def consent_needed_for_course(request, user, course_id, enrollment_exists=False)
     data_sharing_consent_needed_cache = TieredCache.get_cached_response(consent_cache_key)
     if data_sharing_consent_needed_cache.is_found and data_sharing_consent_needed_cache.value == 0:
         LOGGER.info(
-            u"Consent from user [{username}] is not needed for course [{course_id}]. The DSC cache was checked,"
+            u"Consent from user [{username}] is not needed for course [{course_id}]. The DSC cache was checked,"  # lint-amnesty, pylint: disable=logging-format-interpolation
             u" and the value was 0.".format(
                 username=user.username,
                 course_id=course_id
@@ -587,7 +587,7 @@ def consent_needed_for_course(request, user, course_id, enrollment_exists=False)
     enterprise_learner_details = get_enterprise_learner_data_from_db(user)
     if not enterprise_learner_details:
         LOGGER.info(
-            u"Consent from user [{username}] is not needed for course [{course_id}]. The user is not linked to an"
+            u"Consent from user [{username}] is not needed for course [{course_id}]. The user is not linked to an"  # lint-amnesty, pylint: disable=logging-format-interpolation
             u" enterprise.".format(
                 username=user.username,
                 course_id=course_id
@@ -636,7 +636,7 @@ def consent_needed_for_course(request, user, course_id, enrollment_exists=False)
 
         if consent_needed:
             LOGGER.info(
-                u"Consent from user [{username}] is needed for course [{course_id}]. The user's current enterprise"
+                u"Consent from user [{username}] is needed for course [{course_id}]. The user's current enterprise"  # lint-amnesty, pylint: disable=logging-format-interpolation
                 u" required data sharing consent, and it has not been given.".format(
                     username=user.username,
                     course_id=course_id
@@ -644,7 +644,7 @@ def consent_needed_for_course(request, user, course_id, enrollment_exists=False)
             )
         else:
             LOGGER.info(
-                u"Consent from user [{username}] is not needed for course [{course_id}]. The user's current enterprise "
+                u"Consent from user [{username}] is not needed for course [{course_id}]. The user's current enterprise "  # lint-amnesty, pylint: disable=logging-format-interpolation
                 u"does not require data sharing consent.".format(
                     username=user.username,
                     course_id=course_id
@@ -698,7 +698,7 @@ def get_enterprise_consent_url(request, course_id, user=None, return_to=None, en
     user = user or request.user
 
     LOGGER.info(
-        u'Getting enterprise consent url for user [{username}] and course [{course_id}].'.format(
+        u'Getting enterprise consent url for user [{username}] and course [{course_id}].'.format(  # lint-amnesty, pylint: disable=logging-format-interpolation
             username=user.username,
             course_id=course_id
         )
@@ -812,7 +812,7 @@ def get_consent_notification_data(enterprise_customer):
         message_template = consent_page.declined_notification_message
     except DataSharingConsentTextOverrides.DoesNotExist:
         LOGGER.info(
-            u"DataSharingConsentPage object doesn't exit for {enterprise_customer_name}".format(
+            u"DataSharingConsentPage object doesn't exit for {enterprise_customer_name}".format(  # lint-amnesty, pylint: disable=logging-format-interpolation
                 enterprise_customer_name=enterprise_customer['name']
             )
         )

@@ -125,7 +125,7 @@ class Command(BaseCommand):
             # see https://openedx.atlassian.net/browse/EDUCATOR-4478
             error_msg = text_type(e)
             if 'Permission denied' in error_msg and 'mako_lms' in error_msg:
-                logger.warning('Error sending email about access request: {}'.format(error_msg))
+                logger.warning('Error sending email about access request: {}'.format(error_msg))  # lint-amnesty, pylint: disable=logging-format-interpolation
             else:
                 raise CommandError(error_msg)  # lint-amnesty, pylint: disable=raise-missing-from
         except Exception as e:
@@ -136,7 +136,7 @@ class Command(BaseCommand):
             )
             raise CommandError(msg)  # lint-amnesty, pylint: disable=raise-missing-from
 
-        logger.info('Created ApiAccessRequest for user {}'.format(user.username))
+        logger.info('Created ApiAccessRequest for user {}'.format(user.username))  # lint-amnesty, pylint: disable=logging-format-interpolation
 
     def create_api_access_config(self):
         """

@@ -109,17 +109,17 @@ class Command(BaseCommand):
             defaults={"name": theme_dir_name}
         )
         if created:
-            LOG.info(u"Creating '{site_name}' SiteTheme".format(site_name=site_domain))
+            LOG.info(u"Creating '{site_name}' SiteTheme".format(site_name=site_domain))  # lint-amnesty, pylint: disable=logging-format-interpolation
             SiteTheme.objects.create(site=site, theme_dir_name=theme_dir_name)
 
-            LOG.info(u"Creating '{site_name}' SiteConfiguration".format(site_name=site_domain))
+            LOG.info(u"Creating '{site_name}' SiteConfiguration".format(site_name=site_domain))  # lint-amnesty, pylint: disable=logging-format-interpolation
             SiteConfiguration.objects.create(
                 site=site,
                 site_values=site_configuration,
                 enabled=True
             )
         else:
-            LOG.info(u"'{site_domain}' site already exists".format(site_domain=site_domain))
+            LOG.info(u"'{site_domain}' site already exists".format(site_domain=site_domain))  # lint-amnesty, pylint: disable=logging-format-interpolation
 
     def find(self, pattern, path):
         """
@@ -172,7 +172,7 @@ class Command(BaseCommand):
         """
         site_data = {}
         for config_file in self.find(self.configuration_filename, self.theme_path):
-            LOG.info(u"Reading file from {file}".format(file=config_file))
+            LOG.info(u"Reading file from {file}".format(file=config_file))  # lint-amnesty, pylint: disable=logging-format-interpolation
             configuration_data = json.loads(
                 json.dumps(
                     json.load(
@@ -246,13 +246,13 @@ class Command(BaseCommand):
             discovery_url = self.discovery_base_url_fmt.format(site_domain=site_domain)
             ecommerce_url = self.ecommerce_base_url_fmt.format(site_domain=site_domain)
 
-            LOG.info(u"Creating '{site_name}' Site".format(site_name=site_name))
+            LOG.info(u"Creating '{site_name}' Site".format(site_name=site_name))  # lint-amnesty, pylint: disable=logging-format-interpolation
             self._create_sites(site_domain, site_data['theme_dir_name'], site_data['configuration'])
 
-            LOG.info(u"Creating discovery oauth2 client for '{site_name}' site".format(site_name=site_name))
+            LOG.info(u"Creating discovery oauth2 client for '{site_name}' site".format(site_name=site_name))  # lint-amnesty, pylint: disable=logging-format-interpolation
             self._create_oauth2_client(discovery_url, site_name, 'discovery', self.discovery_user)
 
-            LOG.info(u"Creating ecommerce oauth2 client for '{site_name}' site".format(site_name=site_name))
+            LOG.info(u"Creating ecommerce oauth2 client for '{site_name}' site".format(site_name=site_name))  # lint-amnesty, pylint: disable=logging-format-interpolation
             self._create_oauth2_client(ecommerce_url, site_name, 'ecommerce', self.ecommerce_user)
 
         self._enable_commerce_configuration()

@@ -468,15 +468,15 @@ class DeactivateLogoutView(APIView):
                 logout(request)
             return Response(status=status.HTTP_204_NO_CONTENT)
         except KeyError:
-            log.exception('Username not specified {}'.format(request.user))
+            log.exception('Username not specified {}'.format(request.user))  # lint-amnesty, pylint: disable=logging-format-interpolation
             return Response(u'Username not specified.', status=status.HTTP_404_NOT_FOUND)
         except user_model.DoesNotExist:
-            log.exception('The user "{}" does not exist.'.format(request.user.username))
+            log.exception('The user "{}" does not exist.'.format(request.user.username))  # lint-amnesty, pylint: disable=logging-format-interpolation
             return Response(
                 u'The user "{}" does not exist.'.format(request.user.username), status=status.HTTP_404_NOT_FOUND
             )
         except Exception as exc:  # pylint: disable=broad-except
-            log.exception('500 error deactivating account {}'.format(exc))
+            log.exception('500 error deactivating account {}'.format(exc))  # lint-amnesty, pylint: disable=logging-format-interpolation
             return Response(text_type(exc), status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
     def _verify_user_password(self, request):
@@ -498,7 +498,7 @@ class DeactivateLogoutView(APIView):
                 self._handle_failed_authentication(request.user)
         except AuthFailedError as err:
             log.exception(
-                "The user password to deactivate was incorrect. {}".format(request.user.username)
+                "The user password to deactivate was incorrect. {}".format(request.user.username)  # lint-amnesty, pylint: disable=logging-format-interpolation
             )
             return Response(text_type(err), status=status.HTTP_403_FORBIDDEN)
         except Exception as err:  # pylint: disable=broad-except

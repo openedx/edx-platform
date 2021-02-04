@@ -64,7 +64,7 @@ class SpecialExamsOutlineProcessor(OutlineProcessor):
                         )
                     except ProctoredExamNotFoundException:
                         log.info(
-                            'No exam found for {sequence_key} in {course_key}'.format(
+                            'No exam found for {sequence_key} in {course_key}'.format(  # lint-amnesty, pylint: disable=logging-format-interpolation
                                 sequence_key=sequence.usage_key,
                                 course_key=self.course_key
                             )

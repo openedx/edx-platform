@@ -221,7 +221,7 @@ class Command(BaseCommand):
             course_keys, options['start_date'], options['end_date'], user
         )
 
-        log.info('notify_credentials Sending notifications for {certs} certificates and {grades} grades'.format(
+        log.info('notify_credentials Sending notifications for {certs} certificates and {grades} grades'.format(  # lint-amnesty, pylint: disable=logging-format-interpolation
             certs=certs.count(),
             grades=grades.count()
         ))

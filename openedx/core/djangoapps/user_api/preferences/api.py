@@ -300,7 +300,7 @@ def update_email_opt_in(user, org, opt_in):
             _track_update_email_opt_in(user.id, org, opt_in)
     except IntegrityError as err:
         log.warning(
-            u"Could not update organization wide preference due to IntegrityError: {}".format(six.text_type(err))
+            u"Could not update organization wide preference due to IntegrityError: {}".format(six.text_type(err))  # lint-amnesty, pylint: disable=logging-format-interpolation
         )
 
 

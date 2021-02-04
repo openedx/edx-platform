@@ -134,7 +134,7 @@ class Command(BaseCommand):
 
         # Let the user know what's about to happen
         LOGGER.info(
-            "Retrieving data for courses: {courses}".format(
+            "Retrieving data for courses: {courses}".format(  # lint-amnesty, pylint: disable=logging-format-interpolation
                 courses=", ".join([text_type(course) for course in courses])
             )
         )
@@ -148,7 +148,7 @@ class Command(BaseCommand):
                     self._write_email_opt_in_prefs(file_handle, org_list, course_group)
 
         # Remind the user where the output file is
-        LOGGER.info("Output file: {file_path}".format(file_path=file_path))
+        LOGGER.info("Output file: {file_path}".format(file_path=file_path))  # lint-amnesty, pylint: disable=logging-format-interpolation
 
     def _get_courses_for_org(self, org_aliases):
         """
@@ -176,7 +176,7 @@ class Command(BaseCommand):
         start_time = time.time()
         yield
         execution_time = time.time() - start_time
-        LOGGER.info("Execution time: {time} seconds".format(time=execution_time))
+        LOGGER.info("Execution time: {time} seconds".format(time=execution_time))  # lint-amnesty, pylint: disable=logging-format-interpolation
 
     def _write_email_opt_in_prefs(self, file_handle, org_aliases, courses):
         """
@@ -266,7 +266,7 @@ class Command(BaseCommand):
             row_count += 1
 
         # Log the number of rows we processed
-        LOGGER.info("Retrieved {num_rows} records for orgs {org}.".format(num_rows=row_count, org=org_aliases))
+        LOGGER.info("Retrieved {num_rows} records for orgs {org}.".format(num_rows=row_count, org=org_aliases))  # lint-amnesty, pylint: disable=logging-format-interpolation
 
     def _iterate_results(self, cursor):
         """

@@ -25,7 +25,7 @@ def clear_enterprise_customer_data_consent_share_cache(enterprise_customer_uuid)
     )
     count = enterprise_course_enrollments.count()
     log.info(
-        u'Stated Clearing {count} data_sharing_consent_needed cache for enterprise customer {uuid}'.format(
+        u'Stated Clearing {count} data_sharing_consent_needed cache for enterprise customer {uuid}'.format(  # lint-amnesty, pylint: disable=logging-format-interpolation
             count=count,
             uuid=enterprise_customer_uuid,
         )
@@ -35,6 +35,6 @@ def clear_enterprise_customer_data_consent_share_cache(enterprise_customer_uuid)
             enrollment.enterprise_customer_user.user_id,
             enrollment.course_id
         )
-    log.info(u'Ended Clearing data_sharing_consent_needed cache for enterprise customer {uuid}'.format(
+    log.info(u'Ended Clearing data_sharing_consent_needed cache for enterprise customer {uuid}'.format(  # lint-amnesty, pylint: disable=logging-format-interpolation
         uuid=enterprise_customer_uuid,
     ))

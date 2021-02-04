@@ -238,7 +238,7 @@ def create_account_with_params(request, params):
         try:
             enable_notifications(user)
         except Exception:  # pylint: disable=broad-except
-            log.exception(u"Enable discussion notifications failed for user {id}.".format(id=user.id))
+            log.exception(u"Enable discussion notifications failed for user {id}.".format(id=user.id))  # lint-amnesty, pylint: disable=logging-format-interpolation
 
     _track_user_registration(user, profile, params, third_party_provider)
 
@@ -256,7 +256,7 @@ def create_account_with_params(request, params):
     # TODO: there is no error checking here to see that the user actually logged in successfully,
     # and is not yet an active user.
     if new_user is not None:
-        AUDIT_LOG.info(u"Login success on new account creation - {0}".format(new_user.username))
+        AUDIT_LOG.info(u"Login success on new account creation - {0}".format(new_user.username))  # lint-amnesty, pylint: disable=logging-format-interpolation
 
     return new_user
 

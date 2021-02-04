@@ -55,7 +55,7 @@ def create_schedule(sender, **kwargs):  # pylint: disable=unused-argument
     except Exception:  # pylint: disable=broad-except
         # We do not want to block the creation of a CourseEnrollment because of an error in creating a Schedule.
         # No Schedule is acceptable, but no CourseEnrollment is not.
-        log.exception(u'Encountered error in creating a Schedule for CourseEnrollment for user {} in course {}'.format(
+        log.exception(u'Encountered error in creating a Schedule for CourseEnrollment for user {} in course {}'.format(  # lint-amnesty, pylint: disable=logging-format-interpolation
             enrollment.user.id if (enrollment and enrollment.user) else None,
             enrollment.course_id if enrollment else None
         ))

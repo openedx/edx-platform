@@ -119,7 +119,7 @@ def handle_course_cert_changed(sender, user, course_key, mode, status, **kwargs)
     if not is_learner_records_enabled_for_org(course_key.org):
         if verbose:
             LOGGER.info(
-                u"Skipping send cert: ENABLE_LEARNER_RECORDS False for org [{org}]".format(
+                u"Skipping send cert: ENABLE_LEARNER_RECORDS False for org [{org}]".format(  # lint-amnesty, pylint: disable=logging-format-interpolation
                     org=course_key.org
                 )
             )

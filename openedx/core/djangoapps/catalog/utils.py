@@ -71,7 +71,7 @@ def check_catalog_integration_and_get_user(error_message_field):
             user = catalog_integration.get_service_user()
         except ObjectDoesNotExist:
             logger.error(
-                u'Catalog service user with username [{username}] does not exist. '
+                u'Catalog service user with username [{username}] does not exist. '  # lint-amnesty, pylint: disable=logging-format-interpolation
                 u'{field} will not be retrieved.'.format(
                     username=catalog_integration.service_username,
                     field=error_message_field,
@@ -81,7 +81,7 @@ def check_catalog_integration_and_get_user(error_message_field):
         return user, catalog_integration
     else:
         logger.error(
-            u'Unable to retrieve details about {field} because Catalog Integration is not enabled'.format(
+            u'Unable to retrieve details about {field} because Catalog Integration is not enabled'.format(  # lint-amnesty, pylint: disable=logging-format-interpolation
                 field=error_message_field,
             )
         )
@@ -112,7 +112,7 @@ def get_programs(site=None, uuid=None, uuids=None, course=None, catalog_course_u
     if uuid:
         program = cache.get(PROGRAM_CACHE_KEY_TPL.format(uuid=uuid))
         if not program:
-            logger.warning(missing_details_msg_tpl.format(uuid=uuid))
+            logger.warning(missing_details_msg_tpl.format(uuid=uuid))  # lint-amnesty, pylint: disable=logging-format-interpolation
 
         return program
     elif course:
@@ -133,7 +133,7 @@ def get_programs(site=None, uuid=None, uuids=None, course=None, catalog_course_u
         if site_config and catalog_url:
             uuids = cache.get(SITE_PROGRAM_UUIDS_CACHE_KEY_TPL.format(domain=site.domain), [])
             if not uuids:
-                logger.warning(u'Failed to get program UUIDs from the cache for site {}.'.format(site.domain))
+                logger.warning(u'Failed to get program UUIDs from the cache for site {}.'.format(site.domain))  # lint-amnesty, pylint: disable=logging-format-interpolation
         else:
             uuids = []
     elif organization:
@@ -208,7 +208,7 @@ def get_programs_by_uuids(uuids):
     missing_uuids = set(uuid_strings) - set(program['uuid'] for program in programs)
     if missing_uuids:
         logger.info(
-            u'Failed to get details for {count} programs. Retrying.'.format(count=len(missing_uuids))
+            u'Failed to get details for {count} programs. Retrying.'.format(count=len(missing_uuids))  # lint-amnesty, pylint: disable=logging-format-interpolation
         )
 
         retried_programs = cache.get_many([PROGRAM_CACHE_KEY_TPL.format(uuid=uuid) for uuid in missing_uuids])
@@ -216,7 +216,7 @@ def get_programs_by_uuids(uuids):
 
         still_missing_uuids = set(uuid_strings) - set(program['uuid'] for program in programs)
         for uuid in still_missing_uuids:
-            logger.warning(missing_details_msg_tpl.format(uuid=uuid))
+            logger.warning(missing_details_msg_tpl.format(uuid=uuid))  # lint-amnesty, pylint: disable=logging-format-interpolation
 
     return programs
 
@@ -268,7 +268,7 @@ def get_pathways(site, pathway_id=None):
     if pathway_id:
         pathway = cache.get(PATHWAY_CACHE_KEY_TPL.format(id=pathway_id))
         if not pathway:
-            logger.warning(missing_details_msg_tpl.format(id=pathway_id))
+            logger.warning(missing_details_msg_tpl.format(id=pathway_id))  # lint-amnesty, pylint: disable=logging-format-interpolation
 
         return pathway
     pathway_ids = cache.get(SITE_PATHWAY_IDS_CACHE_KEY_TPL.format(domain=site.domain), [])
@@ -289,7 +289,7 @@ def get_pathways(site, pathway_id=None):
     missing_ids = set(pathway_ids) - set(pathway['id'] for pathway in pathways)
     if missing_ids:
         logger.info(
-            u'Failed to get details for {count} pathways. Retrying.'.format(count=len(missing_ids))
+            u'Failed to get details for {count} pathways. Retrying.'.format(count=len(missing_ids))  # lint-amnesty, pylint: disable=logging-format-interpolation
         )
 
         retried_pathways = cache.get_many(
@@ -299,7 +299,7 @@ def get_pathways(site, pathway_id=None):
 
         still_missing_ids = set(pathway_ids) - set(pathway['id'] for pathway in pathways)
         for missing_id in still_missing_ids:
-            logger.warning(missing_details_msg_tpl.format(id=missing_id))
+            logger.warning(missing_details_msg_tpl.format(id=missing_id))  # lint-amnesty, pylint: disable=logging-format-interpolation
 
     return pathways
 

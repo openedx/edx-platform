@@ -257,7 +257,7 @@ def update_enrollment(
         }
 
     """
-    log.info(u'Starting Update Enrollment process for user {user} in course {course} to mode {mode}'.format(
+    log.info(u'Starting Update Enrollment process for user {user} in course {course} to mode {mode}'.format(  # lint-amnesty, pylint: disable=logging-format-interpolation
         user=username,
         course=course_id,
         mode=mode,
@@ -272,7 +272,7 @@ def update_enrollment(
     else:
         if enrollment_attributes is not None:
             set_enrollment_attributes(username, course_id, enrollment_attributes)
-    log.info(u'Course Enrollment updated for user {user} in course {course} to mode {mode}'.format(
+    log.info(u'Course Enrollment updated for user {user} in course {course} to mode {mode}'.format(  # lint-amnesty, pylint: disable=logging-format-interpolation
         user=username,
         course=course_id,
         mode=mode
@@ -550,5 +550,5 @@ def _data_api():
     try:
         return importlib.import_module(api_path)
     except (ImportError, ValueError):
-        log.exception(u"Could not load module at '{path}'".format(path=api_path))
+        log.exception(u"Could not load module at '{path}'".format(path=api_path))  # lint-amnesty, pylint: disable=logging-format-interpolation
         raise errors.EnrollmentApiLoadError(api_path)  # lint-amnesty, pylint: disable=raise-missing-from
