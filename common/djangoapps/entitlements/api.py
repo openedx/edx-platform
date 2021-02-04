@@ -1,4 +1,4 @@
-"""
+"""  # lint-amnesty, pylint: disable=django-not-configured
 Python APIs exposed by the Entitlements app to other in-process apps.
 """
 

@@ -33,7 +33,7 @@ log = logging.getLogger(__name__)
 # Entitlements is not in CMS' INSTALLED_APPS so these imports will error during test collection
 if settings.ROOT_URLCONF == 'lms.urls':
     from common.djangoapps.entitlements.tests.factories import CourseEntitlementFactory
-    from common.djangoapps.entitlements.models import CourseEntitlement, CourseEntitlementPolicy, CourseEntitlementSupportDetail
+    from common.djangoapps.entitlements.models import CourseEntitlement, CourseEntitlementPolicy, CourseEntitlementSupportDetail  # lint-amnesty, pylint: disable=line-too-long
     from common.djangoapps.entitlements.rest_api.v1.serializers import CourseEntitlementSerializer
     from common.djangoapps.entitlements.rest_api.v1.views import set_entitlement_policy
 
@@ -46,7 +46,7 @@ class EntitlementViewSetTest(ModuleStoreTestCase):
     ENTITLEMENTS_DETAILS_PATH = 'entitlements_api:v1:entitlements-detail'
 
     def setUp(self):
-        super(EntitlementViewSetTest, self).setUp()
+        super(EntitlementViewSetTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.user = UserFactory(is_staff=True)
         self.client.login(username=self.user.username, password=TEST_PASSWORD)
         self.course = CourseFactory()
@@ -819,7 +819,7 @@ class EntitlementEnrollmentViewSetTest(ModuleStoreTestCase):
     ENTITLEMENTS_ENROLLMENT_NAMESPACE = 'entitlements_api:v1:enrollments'
 
     def setUp(self):
-        super(EntitlementEnrollmentViewSetTest, self).setUp()
+        super(EntitlementEnrollmentViewSetTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.user = UserFactory()
         UserFactory(username=settings.ECOMMERCE_SERVICE_WORKER_USERNAME, is_staff=True)
 
@@ -1103,7 +1103,7 @@ class EntitlementEnrollmentViewSetTest(ModuleStoreTestCase):
         assert course_entitlement.enrollment_course_run is None
         assert course_entitlement.expired_at is not None
 
-    @patch('common.djangoapps.entitlements.rest_api.v1.views.CourseEntitlement.is_entitlement_refundable', return_value=False)
+    @patch('common.djangoapps.entitlements.rest_api.v1.views.CourseEntitlement.is_entitlement_refundable', return_value=False)  # lint-amnesty, pylint: disable=line-too-long
     @patch('common.djangoapps.entitlements.models.refund_entitlement', return_value=True)
     @patch('common.djangoapps.entitlements.rest_api.v1.views.get_course_runs_for_course')
     def test_user_can_revoke_and_no_refund_available(
@@ -1147,7 +1147,7 @@ class EntitlementEnrollmentViewSetTest(ModuleStoreTestCase):
         assert course_entitlement.enrollment_course_run is not None
         assert course_entitlement.expired_at is None
 
-    @patch('common.djangoapps.entitlements.rest_api.v1.views.CourseEntitlement.is_entitlement_refundable', return_value=True)
+    @patch('common.djangoapps.entitlements.rest_api.v1.views.CourseEntitlement.is_entitlement_refundable', return_value=True)  # lint-amnesty, pylint: disable=line-too-long
     @patch('common.djangoapps.entitlements.models.refund_entitlement', return_value=False)
     @patch("common.djangoapps.entitlements.rest_api.v1.views.get_course_runs_for_course")
     def test_user_is_not_unenrolled_on_failed_refund(
