@@ -372,7 +372,7 @@ class GeneratedCertificate(models.Model):
             4 - grade = ''
             5 - status = 'unavailable'
         """
-        log.info('Marking certificate as unavailable for {user} : {course}'.format(
+        log.info('Marking certificate as unavailable for {user} : {course}'.format(  # lint-amnesty, pylint: disable=logging-format-interpolation
             user=self.user.id,
             course=self.course_id
         ))
@@ -395,7 +395,7 @@ class GeneratedCertificate(models.Model):
         """
         Invalidates a Generated Certificate by marking it as not passing
         """
-        log.info('Marking certificate as notpassing for {user} : {course}'.format(
+        log.info('Marking certificate as notpassing for {user} : {course}'.format(  # lint-amnesty, pylint: disable=logging-format-interpolation
             user=self.user.id,
             course=self.course_id
         ))

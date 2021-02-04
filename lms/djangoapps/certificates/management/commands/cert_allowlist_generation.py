@@ -61,7 +61,7 @@ class Command(BaseCommand):
             user = _get_user_from_identifier(user_identifier)
             if user is not None:
                 log.info(
-                    'Calling generate_allowlist_certificate_task for {user} : {course}'.format(
+                    'Calling generate_allowlist_certificate_task for {user} : {course}'.format(  # lint-amnesty, pylint: disable=logging-format-interpolation
                         user=user.id,
                         course=course_key
                     ))
@@ -79,5 +79,5 @@ def _get_user_from_identifier(identifier):
             user = User.objects.get(username=identifier)
         return user
     except User.DoesNotExist:
-        log.warning('User {user} could not be found'.format(user=identifier))
+        log.warning('User {user} could not be found'.format(user=identifier))  # lint-amnesty, pylint: disable=logging-format-interpolation
         return None

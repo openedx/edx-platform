@@ -44,7 +44,7 @@ def _update_cert_settings_on_pacing_change(sender, updated_course_overview, **kw
         updated_course_overview.id,
         updated_course_overview.self_paced,
     )
-    log.info(u'Certificate Generation Setting Toggled for {course_id} via pacing change'.format(
+    log.info(u'Certificate Generation Setting Toggled for {course_id} via pacing change'.format(  # lint-amnesty, pylint: disable=logging-format-interpolation
         course_id=updated_course_overview.id
     ))
 
@@ -55,7 +55,7 @@ def _listen_for_certificate_whitelist_append(sender, instance, **kwargs):  # lin
         return
 
     if fire_ungenerated_certificate_task(instance.user, instance.course_id):
-        log.info(u'Certificate generation task initiated for {user} : {course} via whitelist'.format(
+        log.info(u'Certificate generation task initiated for {user} : {course} via whitelist'.format(  # lint-amnesty, pylint: disable=logging-format-interpolation
             user=instance.user.id,
             course=instance.course_id
         ))
@@ -71,7 +71,7 @@ def listen_for_passing_grade(sender, user, course_id, **kwargs):  # pylint: disa
         return
 
     if fire_ungenerated_certificate_task(user, course_id):
-        log.info(u'Certificate generation task initiated for {user} : {course} via passing grade'.format(
+        log.info(u'Certificate generation task initiated for {user} : {course} via passing grade'.format(  # lint-amnesty, pylint: disable=logging-format-interpolation
             user=user.id,
             course=course_id
         ))
@@ -93,7 +93,7 @@ def _listen_for_failing_grade(sender, user, course_id, grade, **kwargs):  # pyli
     if cert is not None:
         if CertificateStatuses.is_passing_status(cert.status):
             cert.mark_notpassing(grade.percent)
-            log.info(u'Certificate marked not passing for {user} : {course} via failing grade: {grade}'.format(
+            log.info(u'Certificate marked not passing for {user} : {course} via failing grade: {grade}'.format(  # lint-amnesty, pylint: disable=logging-format-interpolation
                 user=user.id,
                 course=course_id,
                 grade=grade
@@ -121,7 +121,7 @@ def _listen_for_id_verification_status_changed(sender, user, **kwargs):  # pylin
                     u'Certificate generation task initiated for {user} : {course} via track change ' +
                     u'with verification status of {status}'
                 )
-                log.info(message.format(
+                log.info(message.format(  # lint-amnesty, pylint: disable=logging-format-interpolation
                     user=user.id,
                     course=enrollment.course_id,
                     status=expected_verification_status
@@ -151,15 +151,15 @@ def fire_ungenerated_certificate_task(user, course_key, expected_verification_st
     """
 
     message = u'Entered into Ungenerated Certificate task for {user} : {course}'
-    log.info(message.format(user=user.id, course=course_key))
+    log.info(message.format(user=user.id, course=course_key))  # lint-amnesty, pylint: disable=logging-format-interpolation
 
     if is_using_certificate_allowlist_and_is_on_allowlist(user, course_key):
-        log.info('{course} is using allowlist certificates, and the user {user} is on its allowlist. Attempt will be '
+        log.info('{course} is using allowlist certificates, and the user {user} is on its allowlist. Attempt will be '  # lint-amnesty, pylint: disable=logging-format-interpolation
                  'made to generate an allowlist certificate.'.format(course=course_key, user=user.id))
         generate_allowlist_certificate_task(user, course_key)
         return True
 
-    log.info('{course} is not using allowlist certificates (or user {user} is not on its allowlist). The normal '
+    log.info('{course} is not using allowlist certificates (or user {user} is not on its allowlist). The normal '  # lint-amnesty, pylint: disable=logging-format-interpolation
              'generation logic will be followed.'.format(course=course_key, user=user.id))
 
     allowed_enrollment_modes_list = [
@@ -188,5 +188,5 @@ def fire_ungenerated_certificate_task(user, course_key, expected_verification_st
         return True
 
     message = u'Certificate Generation task failed for {user} : {course}'
-    log.info(message.format(user=user.id, course=course_key))
+    log.info(message.format(user=user.id, course=course_key))  # lint-amnesty, pylint: disable=logging-format-interpolation
     return False
