@@ -36,7 +36,7 @@ class StubCompletableXBlock(XBlock, CompletableXBlockMixin):
     XBlock to test behaviour of BlockCompletionTransformer
     when transforming completable XBlock.
     """
-    pass
+    pass  # lint-amnesty, pylint: disable=unnecessary-pass
 
 
 class BlockCompletionTransformerTestCase(TransformerRegistryTestMixin, CompletionWaffleTestMixin, ModuleStoreTestCase):
@@ -47,7 +47,7 @@ class BlockCompletionTransformerTestCase(TransformerRegistryTestMixin, Completio
     COMPLETION_TEST_VALUE = 0.4
 
     def setUp(self):
-        super(BlockCompletionTransformerTestCase, self).setUp()
+        super(BlockCompletionTransformerTestCase, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.user = UserFactory.create(password='test')
         # Set ENABLE_COMPLETION_TRACKING waffle switch to True
         self.override_waffle_switch(True)
