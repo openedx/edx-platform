@@ -199,7 +199,7 @@ class MilestonesTransformerTestCase(CourseStructureTestCase, MilestonesTestCaseM
         self.setup_gated_section(self.blocks['H'], self.blocks['A'])
         expected_blocks = (
             'course', 'A', 'B', 'C', 'ProctoredExam', 'D', 'E', 'PracticeExam', 'F', 'G', 'TimedExam', 'J', 'K', 'H',
-            'I') # lint-amnesty, pylint: disable=line-too-long
+            'I')  # lint-amnesty, pylint: disable=line-too-long
         self.get_blocks_and_check_against_expected(self.user, expected_blocks)
         # clear the request cache to simulate a new request
         self.clear_caches()

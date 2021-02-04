@@ -353,4 +353,3 @@ def recurse_mark_complete(block_id, blocks):
         completable_blocks = [blocks[child_block_id] for child_block_id in child_blocks
                               if blocks[child_block_id].get('type') != 'discussion']
         block['completion'] = int(all(child.get('completion') == 1 for child in completable_blocks))
-
