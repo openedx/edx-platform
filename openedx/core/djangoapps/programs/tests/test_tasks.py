@@ -125,7 +125,7 @@ class AwardProgramCertificatesTestCase(CatalogIntegrationMixin, CredentialsApiCo
     """
 
     def setUp(self):
-        super(AwardProgramCertificatesTestCase, self).setUp()
+        super(AwardProgramCertificatesTestCase, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.create_credentials_config()
         self.student = UserFactory.create(username='test-student')
         self.site = SiteFactory()
@@ -431,7 +431,7 @@ class PostCourseCertificateTestCase(TestCase):
     Test the award_program_certificate function
     """
 
-    def setUp(self):
+    def setUp(self):  # lint-amnesty, pylint: disable=super-method-not-called
         self.student = UserFactory.create(username='test-student')
         self.course = CourseOverviewFactory.create(
             self_paced=True  # Any option to allow the certificate to be viewable for the course
@@ -487,7 +487,7 @@ class AwardCourseCertificatesTestCase(CredentialsApiConfigMixin, TestCase):
     """
 
     def setUp(self):
-        super(AwardCourseCertificatesTestCase, self).setUp()
+        super(AwardCourseCertificatesTestCase, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
 
         self.available_date = datetime.now(pytz.UTC) + timedelta(days=1)
         self.course = CourseOverviewFactory.create(
@@ -638,7 +638,7 @@ class RevokeProgramCertificatesTestCase(CatalogIntegrationMixin, CredentialsApiC
     """
 
     def setUp(self):
-        super(RevokeProgramCertificatesTestCase, self).setUp()
+        super(RevokeProgramCertificatesTestCase, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
 
         self.student = UserFactory.create(username='test-student')
         self.course_key = 'course-v1:testX+test101+2T2020'

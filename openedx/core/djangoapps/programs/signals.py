@@ -182,7 +182,7 @@ def handle_course_cert_revoked(sender, user, course_key, mode, status, **kwargs)
 
 
 @receiver(COURSE_CERT_DATE_CHANGE, dispatch_uid='course_certificate_date_change_handler')
-def handle_course_cert_date_change(sender, course_key, **kwargs):
+def handle_course_cert_date_change(sender, course_key, **kwargs):  # lint-amnesty, pylint: disable=unused-argument
     """
     If course is updated and the certificate_available_date is changed,
     schedule a celery task to update visible_date for all certificates

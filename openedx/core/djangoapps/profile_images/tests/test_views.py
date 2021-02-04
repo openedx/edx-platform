@@ -43,7 +43,7 @@ class ProfileImageEndpointMixin(UserSettingsEventTestMixin):
     _view_name = None
 
     def setUp(self):
-        super(ProfileImageEndpointMixin, self).setUp()
+        super(ProfileImageEndpointMixin, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.user = UserFactory.create(password=TEST_PASSWORD)
         # Ensure that parental controls don't apply to this user
         self.user.profile.year_of_birth = 1980
@@ -61,7 +61,7 @@ class ProfileImageEndpointMixin(UserSettingsEventTestMixin):
         self.reset_tracker()
 
     def tearDown(self):
-        super(ProfileImageEndpointMixin, self).tearDown()
+        super(ProfileImageEndpointMixin, self).tearDown()  # lint-amnesty, pylint: disable=super-with-arguments
         for name in get_profile_image_names(self.user.username).values():
             self.storage.delete(name)
 
@@ -366,7 +366,7 @@ class ProfileImageViewDeleteTestCase(ProfileImageEndpointMixin, APITestCase):
     _view_name = "accounts_profile_image_api"
 
     def setUp(self):
-        super(ProfileImageViewDeleteTestCase, self).setUp()
+        super(ProfileImageViewDeleteTestCase, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         with make_image_file() as image_file:
             create_profile_images(image_file, get_profile_image_names(self.user.username))
             self.check_images()
