@@ -1,4 +1,5 @@
-from django.contrib.auth import get_user_model  # lint-amnesty, pylint: disable=missing-module-docstring
+# lint-amnesty, pylint: disable=missing-module-docstring
+from django.contrib.auth import get_user_model
 from django.db import models
 from model_utils.models import TimeStampedModel
 from simple_history.models import HistoricalRecords

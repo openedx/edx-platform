@@ -1,4 +1,5 @@
-from django.conf import settings  # lint-amnesty, pylint: disable=cyclic-import, missing-module-docstring
+# lint-amnesty, pylint: disable=cyclic-import, missing-module-docstring
+from django.conf import settings
 
 if hasattr(settings, "COMMENTS_SERVICE_URL"):
     SERVICE_HOST = settings.COMMENTS_SERVICE_URL
