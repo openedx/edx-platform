@@ -20,7 +20,7 @@ from openedx.core.lib.api.test_utils import ApiTestCase
     ZENDESK_OAUTH_ACCESS_TOKEN="abcdefghijklmnopqrstuvwxyz1234567890",
     ZENDESK_GROUP_ID_MAPPING={"Financial Assistance": 123},
 )
-class TestUtils(ApiTestCase):
+class TestUtils(ApiTestCase):  # lint-amnesty, pylint: disable=missing-class-docstring
     def setUp(self):
         self.request_data = {
             'email': 'JohnQStudent@example.com',
@@ -28,7 +28,7 @@ class TestUtils(ApiTestCase):
             'subject': 'Python Unit Test Help Request',
             'body': "Help! I'm trapped in a unit test factory and I can't get out!",
         }
-        return super(TestUtils, self).setUp()
+        return super(TestUtils, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
 
     @override_settings(
         ZENDESK_URL=None,

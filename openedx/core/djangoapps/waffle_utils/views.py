@@ -24,7 +24,7 @@ class ToggleStateView(views.APIView):
     authentication_classes = (JwtAuthentication, SessionAuthentication,)
     permission_classes = (permissions.IsAuthenticated, IsStaff,)
 
-    def get(self, request):
+    def get(self, request):  # lint-amnesty, pylint: disable=missing-function-docstring
         response = OrderedDict()
         response['waffle_flags'] = _get_all_waffle_flags()
         response['waffle_switches'] = _get_all_waffle_switches()
