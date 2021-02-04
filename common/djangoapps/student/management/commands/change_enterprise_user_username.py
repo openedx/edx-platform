@@ -51,11 +51,11 @@ class Command(BaseCommand):
         try:
             EnterpriseCustomerUser.objects.get(user_id=user_id)
         except EnterpriseCustomerUser.DoesNotExist:
-            LOGGER.info('User {} must be an Enterprise User.'.format(user_id))
+            LOGGER.info('User {} must be an Enterprise User.'.format(user_id))  # lint-amnesty, pylint: disable=logging-format-interpolation
             return
 
         user = User.objects.get(id=user_id)
         user.username = new_username
         user.save()
 
-        LOGGER.info('User {} has been updated with username {}.'.format(user_id, new_username))
+        LOGGER.info('User {} has been updated with username {}.'.format(user_id, new_username))  # lint-amnesty, pylint: disable=logging-format-interpolation

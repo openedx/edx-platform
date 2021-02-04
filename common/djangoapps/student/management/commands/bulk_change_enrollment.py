@@ -98,7 +98,7 @@ class Command(BaseCommand):
         """
         unicode_course_key = text_type(course_key)
         if CourseMode.mode_for_course(course_key, to_mode) is None:
-            logger.info('Mode ({}) does not exist for course ({}).'.format(to_mode, unicode_course_key))
+            logger.info('Mode ({}) does not exist for course ({}).'.format(to_mode, unicode_course_key))  # lint-amnesty, pylint: disable=logging-format-interpolation
             return
 
         course_enrollments = CourseEnrollment.objects.filter(course_id=course_key, mode=from_mode)

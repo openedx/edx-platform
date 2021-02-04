@@ -1581,7 +1581,7 @@ class CourseEnrollment(models.Model):
             return cls.enroll(user, course_id, mode)
         except User.DoesNotExist:
             err_msg = u"Tried to enroll email {} into course {}, but user not found"
-            log.error(err_msg.format(email, course_id))
+            log.error(err_msg.format(email, course_id))  # lint-amnesty, pylint: disable=logging-format-interpolation
             if ignore_errors:
                 return None
             raise
@@ -1867,19 +1867,19 @@ class CourseEnrollment(models.Model):
                 set_enrollment_attributes(username, six.text_type(self.course_id), enrollment_attributes)
             except HttpClientError:
                 log.warning(
-                    u"Encountered HttpClientError while getting order details from ecommerce. "
+                    u"Encountered HttpClientError while getting order details from ecommerce. "  # lint-amnesty, pylint: disable=logging-format-interpolation
                     u"Order={number} and user {user}".format(number=order_number, user=self.user.id))
                 return None
 
             except HttpServerError:
                 log.warning(
-                    u"Encountered HttpServerError while getting order details from ecommerce. "
+                    u"Encountered HttpServerError while getting order details from ecommerce. "  # lint-amnesty, pylint: disable=logging-format-interpolation
                     u"Order={number} and user {user}".format(number=order_number, user=self.user.id))
                 return None
 
             except SlumberBaseException:
                 log.warning(
-                    u"Encountered an error while getting order details from ecommerce. "
+                    u"Encountered an error while getting order details from ecommerce. "  # lint-amnesty, pylint: disable=logging-format-interpolation
                     u"Order={number} and user {user}".format(number=order_number, user=self.user.id))
                 return None
 
@@ -2494,7 +2494,7 @@ def create_comments_service_user(user):  # lint-amnesty, pylint: disable=missing
     except Exception:  # pylint: disable=broad-except
         log = logging.getLogger("edx.discussion")  # pylint: disable=redefined-outer-name
         log.error(
-            "Could not create comments service user with id {}".format(user.id),
+            "Could not create comments service user with id {}".format(user.id),  # lint-amnesty, pylint: disable=logging-format-interpolation
             exc_info=True
         )
 
@@ -2508,9 +2508,9 @@ def create_comments_service_user(user):  # lint-amnesty, pylint: disable=missing
 def log_successful_login(sender, request, user, **kwargs):  # lint-amnesty, pylint: disable=unused-argument
     """Handler to log when logins have occurred successfully."""
     if settings.FEATURES['SQUELCH_PII_IN_LOGS']:
-        AUDIT_LOG.info(u"Login success - user.id: {0}".format(user.id))
+        AUDIT_LOG.info(u"Login success - user.id: {0}".format(user.id))  # lint-amnesty, pylint: disable=logging-format-interpolation
     else:
-        AUDIT_LOG.info(u"Login success - {0} ({1})".format(user.username, user.email))
+        AUDIT_LOG.info(u"Login success - {0} ({1})".format(user.username, user.email))  # lint-amnesty, pylint: disable=logging-format-interpolation
 
 
 @receiver(user_logged_out)

@@ -78,13 +78,13 @@ class Command(BaseCommand):
         if username:
             enrollments = enrollments.filter(user__username=username)
 
-        logger.info("Processing [{}] with [{}] enrollments.".format(course_id, enrollments.count()))
+        logger.info("Processing [{}] with [{}] enrollments.".format(course_id, enrollments.count()))  # lint-amnesty, pylint: disable=logging-format-interpolation
 
         if self.commit:
             for enrollment in enrollments:
                 enrollment.update_enrollment(is_active=False, skip_refund=True)
                 logger.info(
-                    "User [{}] have been successfully unenrolled from the course: {}".format(
+                    "User [{}] have been successfully unenrolled from the course: {}".format(  # lint-amnesty, pylint: disable=logging-format-interpolation
                         enrollment.user.username, course_key
                     )
                 )

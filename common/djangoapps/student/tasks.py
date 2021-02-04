@@ -46,7 +46,7 @@ def send_activation_email(self, msg_string, from_address=None):
         with emulate_http_request(site=site, user=user):
             ace.send(msg)
     except RecoverableChannelDeliveryError:
-        log.info('Retrying sending email to user {dest_addr}, attempt # {attempt} of {max_attempts}'.format(
+        log.info('Retrying sending email to user {dest_addr}, attempt # {attempt} of {max_attempts}'.format(  # lint-amnesty, pylint: disable=logging-format-interpolation
             dest_addr=dest_addr,
             attempt=retries,
             max_attempts=max_retries

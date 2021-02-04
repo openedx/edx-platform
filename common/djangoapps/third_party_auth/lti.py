@@ -189,7 +189,7 @@ class LTIAuthBackend(BaseAuth):
             if valid:
                 return data
         except AttributeError as error:
-            log.error(u"'{}' not found.".format(text_type(error)))
+            log.error(u"'{}' not found.".format(text_type(error)))  # lint-amnesty, pylint: disable=logging-format-interpolation
         return None
 
     @classmethod

@@ -260,7 +260,7 @@ class StubHttpService(ThreadingMixIn, HTTPServer, object):
         server_thread.start()
 
         # Log the port we're using to help identify port conflict errors
-        LOGGER.debug('Starting service on port {0}'.format(self.port))
+        LOGGER.debug('Starting service on port {0}'.format(self.port))  # lint-amnesty, pylint: disable=logging-format-interpolation
 
     def shutdown(self):
         """

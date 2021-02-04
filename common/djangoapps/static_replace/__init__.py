@@ -39,7 +39,7 @@ def try_staticfiles_lookup(path):
     try:
         url = staticfiles_storage.url(path)
     except Exception as err:  # lint-amnesty, pylint: disable=broad-except
-        log.warning("staticfiles_storage couldn't find path {0}: {1}".format(
+        log.warning("staticfiles_storage couldn't find path {0}: {1}".format(  # lint-amnesty, pylint: disable=logging-format-interpolation
             path, str(err)))
         # Just return the original path; don't kill everything.
         url = path
@@ -192,7 +192,7 @@ def replace_static_urls(text, data_directory=None, course_id=None, static_asset_
             try:
                 exists_in_staticfiles_storage = staticfiles_storage.exists(rest)
             except Exception as err:  # lint-amnesty, pylint: disable=broad-except
-                log.warning("staticfiles_storage couldn't find path {0}: {1}".format(
+                log.warning("staticfiles_storage couldn't find path {0}: {1}".format(  # lint-amnesty, pylint: disable=logging-format-interpolation
                     rest, str(err)))
 
             if exists_in_staticfiles_storage:
@@ -220,7 +220,7 @@ def replace_static_urls(text, data_directory=None, course_id=None, static_asset_
                     url = staticfiles_storage.url(course_path)
             # And if that fails, assume that it's course content, and add manually data directory
             except Exception as err:  # lint-amnesty, pylint: disable=broad-except
-                log.warning("staticfiles_storage couldn't find path {0}: {1}".format(
+                log.warning("staticfiles_storage couldn't find path {0}: {1}".format(  # lint-amnesty, pylint: disable=logging-format-interpolation
                     rest, str(err)))
                 url = "".join([prefix, course_path])
 

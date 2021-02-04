@@ -97,12 +97,12 @@ class Command(BaseCommand):
             try:
                 course_key = CourseKey.from_string(row['course_id'])
             except InvalidKeyError:
-                logger.warning('Invalid or non-existent course id [{}]'.format(row['course_id']))
+                logger.warning('Invalid or non-existent course id [{}]'.format(row['course_id']))  # lint-amnesty, pylint: disable=logging-format-interpolation
 
             try:
                 user = User.objects.get(username=row['user'])
             except ObjectDoesNotExist:
-                logger.warning('Invalid or non-existent user [{}]'.format(row['user']))
+                logger.warning('Invalid or non-existent user [{}]'.format(row['user']))  # lint-amnesty, pylint: disable=logging-format-interpolation
 
             if course_key and user:
                 try:

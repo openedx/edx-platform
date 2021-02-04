@@ -648,7 +648,7 @@ def ensure_user_information(strategy, auth_entry, backend=None, user=None, socia
             # register anew via SSO. See SOL-1324 in JIRA.
             # However, we will log a warning for this case:
             logger.warning(
-                u'[THIRD_PARTY_AUTH] User is using third_party_auth to login but has not yet activated their account. '
+                u'[THIRD_PARTY_AUTH] User is using third_party_auth to login but has not yet activated their account. '  # lint-amnesty, pylint: disable=logging-format-interpolation
                 u'Username: {username}'.format(username=user.username)
             )
 
@@ -771,7 +771,7 @@ def associate_by_email_if_saml(auth_entry, backend, details, user, strategy, *ar
         try:
             enterprise_customer_user = is_enterprise_customer_user(current_provider.provider_id, current_user)
             logger.info(
-                u'[Multiple_SSO_SAML_Accounts_Association_to_User] Enterprise user verification:'
+                u'[Multiple_SSO_SAML_Accounts_Association_to_User] Enterprise user verification:'  # lint-amnesty, pylint: disable=logging-format-interpolation
                 u'User Email: {email}, User ID: {user_id}, Provider ID: {provider_id},'
                 u' is_enterprise_customer_user: {enterprise_customer_user}'.format(
                     email=current_user.email,
@@ -802,7 +802,7 @@ def associate_by_email_if_saml(auth_entry, backend, details, user, strategy, *ar
                     not association_response['user'].is_active
                 ):
                     logger.info(
-                        u'[Multiple_SSO_SAML_Accounts_Association_to_User] User association account is not'
+                        u'[Multiple_SSO_SAML_Accounts_Association_to_User] User association account is not'  # lint-amnesty, pylint: disable=logging-format-interpolation
                         u' active: User Email: {email}, User ID: {user_id}, Provider ID: {provider_id},'
                         u' is_enterprise_customer_user: {enterprise_customer_user}'.format(
                             email=current_user.email,
@@ -874,7 +874,7 @@ def user_details_force_sync(auth_entry, strategy, details, user=None, *args, **k
             current_value = getattr(model, field)
             if provider_value is not None and current_value != provider_value:
                 if field in integrity_conflict_fields and User.objects.filter(**{field: provider_value}).exists():
-                    logger.warning(u'[THIRD_PARTY_AUTH] Profile data synchronization conflict. '
+                    logger.warning(u'[THIRD_PARTY_AUTH] Profile data synchronization conflict. '  # lint-amnesty, pylint: disable=logging-format-interpolation
                                    u'UserId: {user_id}, Provider: {provider}, ConflictField: {conflict_field}, '
                                    u'ConflictValue: {conflict_value}'.format(
                                        user_id=user.id,
@@ -887,7 +887,7 @@ def user_details_force_sync(auth_entry, strategy, details, user=None, *args, **k
 
         if changed:
             logger.info(
-                u'[THIRD_PARTY_AUTH] User performed SSO and data was synchronized. '
+                u'[THIRD_PARTY_AUTH] User performed SSO and data was synchronized. '  # lint-amnesty, pylint: disable=logging-format-interpolation
                 u'Username: {username}, Provider: {provider}, UpdatedKeys: {updated_keys}'.format(
                     username=user.username,
                     provider=current_provider.name,
@@ -917,7 +917,7 @@ def user_details_force_sync(auth_entry, strategy, details, user=None, *args, **k
                 try:
                     email.send()
                 except SMTPException:
-                    logger.exception('[THIRD_PARTY_AUTH] Error sending IdP learner data sync-initiated email change '
+                    logger.exception('[THIRD_PARTY_AUTH] Error sending IdP learner data sync-initiated email change '  # lint-amnesty, pylint: disable=logging-format-interpolation
                                      u'notification email. Username: {username}'.format(username=user.username))
 
 
@@ -1006,7 +1006,7 @@ def get_username(strategy, details, backend, user=None, *args, **kwargs):  # lin
         while not final_username or len(final_username) < min_length or user_exists({'username': final_username}):
             username = short_username + uuid4().hex[:uuid_length]
             final_username = slug_func(clean_func(username[:max_length]))
-            logger.info(u'[THIRD_PARTY_AUTH] New username generated. Username: {username}'.format(
+            logger.info(u'[THIRD_PARTY_AUTH] New username generated. Username: {username}'.format(  # lint-amnesty, pylint: disable=logging-format-interpolation
                 username=final_username))
     else:
         final_username = storage.user.get_username(user)

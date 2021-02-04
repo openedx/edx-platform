@@ -65,17 +65,17 @@ class Command(BaseCommand):  # lint-amnesty, pylint: disable=missing-class-docst
         try:
             user = User.objects.get(username=username)
         except User.DoesNotExist:
-            logger.exception('Invalid or non-existent username {}'.format(username))
+            logger.exception('Invalid or non-existent username {}'.format(username))  # lint-amnesty, pylint: disable=logging-format-interpolation
             raise
 
         try:
             course_key = CourseKey.from_string(course_id)
             CourseEnrollment.objects.get(user=user, course_id=course_key, mode=CourseMode.CREDIT_MODE)
         except InvalidKeyError:
-            logger.exception('Invalid or non-existent course id {}'.format(course_id))
+            logger.exception('Invalid or non-existent course id {}'.format(course_id))  # lint-amnesty, pylint: disable=logging-format-interpolation
             raise
         except CourseEnrollment.DoesNotExist:
-            logger.exception('No enrollment found in database for {username} in course {course_id}'
+            logger.exception('No enrollment found in database for {username} in course {course_id}'  # lint-amnesty, pylint: disable=logging-format-interpolation
                              .format(username=username, course_id=course_id))
             raise
 
@@ -89,7 +89,7 @@ class Command(BaseCommand):  # lint-amnesty, pylint: disable=missing-class-docst
             expected_date = datetime.utcnow() + timedelta(days=DEFAULT_DAYS)
 
         self.update_credit_eligibility_deadline(username, course_key, expected_date)
-        logger.info("Successfully updated credit eligibility deadline for {}".format(username))
+        logger.info("Successfully updated credit eligibility deadline for {}".format(username))  # lint-amnesty, pylint: disable=logging-format-interpolation
 
     def update_credit_eligibility_deadline(self, username, course_key, new_deadline):
         """ Update Credit Eligibility new_deadline for a specific user """

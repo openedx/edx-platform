@@ -27,7 +27,7 @@ def course_context_from_url(url):
             course_id = CourseKey.from_string(course_id_string)
         except InvalidKeyError:
             log.warning(
-                'unable to parse course_id "{course_id}"'.format(
+                'unable to parse course_id "{course_id}"'.format(  # lint-amnesty, pylint: disable=logging-format-interpolation
                     course_id=course_id_string
                 ),
                 exc_info=True

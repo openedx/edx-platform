@@ -93,7 +93,7 @@ class SAMLAuthBackend(SAMLAuth):  # pylint: disable=abstract-method
             return super(SAMLAuthBackend, self).get_user_id(details, response)  # lint-amnesty, pylint: disable=super-with-arguments
         except KeyError as ex:
             log.warning(
-                u'[THIRD_PARTY_AUTH] Error in SAML authentication flow. '
+                u'[THIRD_PARTY_AUTH] Error in SAML authentication flow. '  # lint-amnesty, pylint: disable=logging-format-interpolation
                 u'Provider: {idp_name}, Message: {message}'.format(
                     message=ex.message,  # lint-amnesty, pylint: disable=no-member
                     idp_name=response.get('idp_name')
@@ -150,7 +150,7 @@ class SAMLAuthBackend(SAMLAuth):  # pylint: disable=abstract-method
             for expected in idp.conf['requiredEntitlements']:
                 if expected not in entitlements:
                     log.warning(
-                        u'[THIRD_PARTY_AUTH] SAML user rejected due to missing eduPersonEntitlement. '
+                        u'[THIRD_PARTY_AUTH] SAML user rejected due to missing eduPersonEntitlement. '  # lint-amnesty, pylint: disable=logging-format-interpolation
                         u'Provider: {provider}, Entitlement: {entitlement}'.format(
                             provider=idp.name,
                             entitlement=expected)
@@ -227,7 +227,7 @@ class EdXSAMLIdentityProvider(SAMLIdentityProvider):
             try:
                 return attributes[key][0]
             except IndexError:
-                log.warning(u'[THIRD_PARTY_AUTH] SAML attribute value not found. '
+                log.warning(u'[THIRD_PARTY_AUTH] SAML attribute value not found. '  # lint-amnesty, pylint: disable=logging-format-interpolation
                             u'SamlAttribute: {attribute}'.format(attribute=key))
         return self.conf['attr_defaults'].get(conf_key) or None
 
@@ -375,7 +375,7 @@ class SapSuccessFactorsIdentityProvider(EdXSAMLIdentityProvider):
         if not all(var in self.conf for var in self.required_variables):
             missing = [var for var in self.required_variables if var not in self.conf]
             log.warning(
-                u'[THIRD_PARTY_AUTH] To retrieve rich user data for a SAP SuccessFactors identity provider, '
+                u'[THIRD_PARTY_AUTH] To retrieve rich user data for a SAP SuccessFactors identity provider, '  # lint-amnesty, pylint: disable=logging-format-interpolation
                 u'the following keys in other_settings are required, but were missing. MissingKeys: {keys}'.format(
                     keys=missing
                 )
@@ -552,7 +552,7 @@ def get_saml_idp_class(idp_identifier_string):
     }
     if idp_identifier_string not in choices:
         log.error(
-            u'[THIRD_PARTY_AUTH] Invalid EdXSAMLIdentityProvider subclass--'
+            u'[THIRD_PARTY_AUTH] Invalid EdXSAMLIdentityProvider subclass--'  # lint-amnesty, pylint: disable=logging-format-interpolation
             u'using EdXSAMLIdentityProvider base class. Provider: {provider}'.format(provider=idp_identifier_string)
         )
     return choices.get(idp_identifier_string, EdXSAMLIdentityProvider)

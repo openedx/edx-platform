@@ -36,7 +36,7 @@ def is_course_run_entitlement_fulfillable(
     try:
         course_overview = CourseOverview.get_from_id(course_run_key)
     except CourseOverview.DoesNotExist:
-        log.error((u'There is no CourseOverview entry available for {course_run_id}, '
+        log.error((u'There is no CourseOverview entry available for {course_run_id}, '  # lint-amnesty, pylint: disable=logging-format-interpolation
                    u'course run cannot be applied to entitlement').format(
             course_run_id=str(course_run_key)
         ))

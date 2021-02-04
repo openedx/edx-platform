@@ -217,7 +217,7 @@ def track_segmentio_event(request):  # pylint: disable=too-many-statements
             context['org_id'] = course_key.org
         except InvalidKeyError:
             log.warning(
-                'unable to parse course_id "{course_id}" from event: {event}'.format(
+                'unable to parse course_id "{course_id}" from event: {event}'.format(  # lint-amnesty, pylint: disable=logging-format-interpolation
                     course_id=course_id,
                     event=json.dumps(full_segment_event),
                 ),
