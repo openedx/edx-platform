@@ -1,4 +1,4 @@
-"""
+"""  # lint-amnesty, pylint: disable=django-not-configured
 Script to process pytest warnings output by pytest-json-report plugin and output it as a html
 """
 
