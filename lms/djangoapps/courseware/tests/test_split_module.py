@@ -58,7 +58,7 @@ class SplitTestBase(SharedModuleStoreTestCase):
         )
 
     def setUp(self):
-        super(SplitTestBase, self).setUp()
+        super(SplitTestBase, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
 
         self.student = UserFactory.create()
         CourseEnrollmentFactory.create(user=self.student, course_id=self.course.id)
@@ -172,7 +172,7 @@ class TestSplitTestVert(SplitTestBase):
 
     def setUp(self):
         # We define problem compenents that we need but don't explicitly call elsewhere.
-        super(TestSplitTestVert, self).setUp()
+        super(TestSplitTestVert, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
 
         c0_url = self.course.id.make_usage_key("vertical", "split_test_cond0")
         c1_url = self.course.id.make_usage_key("vertical", "split_test_cond1")
@@ -240,7 +240,7 @@ class TestVertSplitTestVert(SplitTestBase):
 
     def setUp(self):
         # We define problem compenents that we need but don't explicitly call elsewhere.
-        super(TestVertSplitTestVert, self).setUp()
+        super(TestVertSplitTestVert, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
 
         vert1 = ItemFactory.create(
             parent_location=self.sequential.location,
@@ -316,7 +316,7 @@ class SplitTestPosition(SharedModuleStoreTestCase):
         )
 
     def setUp(self):
-        super(SplitTestPosition, self).setUp()
+        super(SplitTestPosition, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
 
         self.student = UserFactory.create()
         CourseEnrollmentFactory.create(user=self.student, course_id=self.course.id)

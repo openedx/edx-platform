@@ -37,7 +37,7 @@ class ProgressPageCreditRequirementsTest(SharedModuleStoreTestCase):
         cls.course = CourseFactory.create()
 
     def setUp(self):
-        super(ProgressPageCreditRequirementsTest, self).setUp()
+        super(ProgressPageCreditRequirementsTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
 
         # Configure course as a credit course
         CreditCourse.objects.create(course_key=self.course.id, enabled=True)

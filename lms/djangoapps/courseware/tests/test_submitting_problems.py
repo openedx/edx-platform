@@ -13,7 +13,7 @@ from textwrap import dedent
 import ddt
 import six
 from django.conf import settings
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.db import connections
 from django.test import TestCase
 from django.test.client import RequestFactory
@@ -140,7 +140,7 @@ class TestSubmittingProblems(ModuleStoreTestCase, LoginEnrollmentTestCase, Probl
     """
 
     # Tell Django to clean out all databases, not just default
-    databases = {alias for alias in connections}
+    databases = {alias for alias in connections}  # lint-amnesty, pylint: disable=unnecessary-comprehension
     # arbitrary constant
     COURSE_SLUG = "100"
     COURSE_NAME = "test_course"
@@ -149,7 +149,7 @@ class TestSubmittingProblems(ModuleStoreTestCase, LoginEnrollmentTestCase, Probl
     ENABLED_SIGNALS = ['course_published']
 
     def setUp(self):
-        super(TestSubmittingProblems, self).setUp()
+        super(TestSubmittingProblems, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
 
         # create a test student
         self.course = CourseFactory.create(display_name=self.COURSE_NAME, number=self.COURSE_SLUG)
@@ -307,7 +307,7 @@ class TestCourseGrades(TestSubmittingProblems):
     Tests grades are updated correctly when manipulating problems.
     """
     def setUp(self):
-        super(TestCourseGrades, self).setUp()
+        super(TestCourseGrades, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.homework = self.add_graded_section_to_course('homework')
         self.problem = self.add_dropdown_to_section(self.homework.location, 'p1', 1)
 
@@ -343,7 +343,7 @@ class TestCourseGrader(TestSubmittingProblems):
     Suite of tests for the course grader.
     """
     # Tell Django to clean out all databases, not just default
-    databases = {alias for alias in connections}
+    databases = {alias for alias in connections}  # lint-amnesty, pylint: disable=unnecessary-comprehension
 
     def basic_setup(self, late=False, reset=False, showanswer=False):
         """
@@ -756,10 +756,10 @@ class TestCourseGrader(TestSubmittingProblems):
 class ProblemWithUploadedFilesTest(TestSubmittingProblems):
     """Tests of problems with uploaded files."""
     # Tell Django to clean out all databases, not just default
-    databases = {alias for alias in connections}
+    databases = {alias for alias in connections}  # lint-amnesty, pylint: disable=unnecessary-comprehension
 
     def setUp(self):
-        super(ProblemWithUploadedFilesTest, self).setUp()
+        super(ProblemWithUploadedFilesTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.section = self.add_graded_section_to_course('section')
 
     def problem_setup(self, name, files):
@@ -812,7 +812,7 @@ class TestPythonGradedResponse(TestSubmittingProblems):
     Check that we can submit a schematic and custom response, and it answers properly.
     """
     # Tell Django to clean out all databases, not just default
-    databases = {alias for alias in connections}
+    databases = {alias for alias in connections}  # lint-amnesty, pylint: disable=unnecessary-comprehension
 
     SCHEMATIC_SCRIPT = dedent("""
         # for a schematic response, submission[i] is the json representation
@@ -903,7 +903,7 @@ class TestPythonGradedResponse(TestSubmittingProblems):
     COMPUTED_ANSWER_INCORRECT = "because we never let them in"
 
     def setUp(self):
-        super(TestPythonGradedResponse, self).setUp()
+        super(TestPythonGradedResponse, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.section = self.add_graded_section_to_course('section')
         self.correct_responses = {}
         self.incorrect_responses = {}
@@ -1067,7 +1067,7 @@ class TestConditionalContent(TestSubmittingProblems):
         One section is pre-populated with a problem (with 2 inputs), visible to all students.
         The second section is empty. Test cases should add conditional content to it.
         """
-        super(TestConditionalContent, self).setUp()
+        super(TestConditionalContent, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
 
         self.user_partition_group_0 = 0
         self.user_partition_group_1 = 1

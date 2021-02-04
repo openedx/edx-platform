@@ -33,7 +33,7 @@ def mock_field(scope, name):
     return field
 
 
-def mock_descriptor(fields=[]):
+def mock_descriptor(fields=[]):  # lint-amnesty, pylint: disable=dangerous-default-value, missing-function-docstring
     descriptor = Mock(entry_point=XBlock.entry_point)
     descriptor.scope_ids = ScopeIds('user1', 'mock_problem', location('def_id'), location('usage_id'))
     descriptor.module_class.fields.values.return_value = fields
@@ -56,11 +56,11 @@ class StudentModuleFactory(cmfStudentModuleFactory):
     course_id = course_id
 
 
-class TestInvalidScopes(TestCase):
+class TestInvalidScopes(TestCase):  # lint-amnesty, pylint: disable=missing-class-docstring
     def setUp(self):
-        super(TestInvalidScopes, self).setUp()
+        super(TestInvalidScopes, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.user = UserFactory.create(username='user')
-        self.field_data_cache = FieldDataCache([mock_descriptor([mock_field(Scope.user_state, 'a_field')])], course_id, self.user)
+        self.field_data_cache = FieldDataCache([mock_descriptor([mock_field(Scope.user_state, 'a_field')])], course_id, self.user)  # lint-amnesty, pylint: disable=line-too-long
         self.kvs = DjangoKeyValueStore(self.field_data_cache)
 
     def test_invalid_scopes(self):
@@ -105,10 +105,10 @@ class TestStudentModuleStorage(OtherUserFailureTestMixin, TestCase):
     other_key_factory = partial(DjangoKeyValueStore.Key, Scope.user_state, 2, location('usage_id'))  # user_id=2, not 1
     existing_field_name = "a_field"
     # Tell Django to clean out all databases, not just default
-    databases = {alias for alias in connections}
+    databases = {alias for alias in connections}  # lint-amnesty, pylint: disable=unnecessary-comprehension
 
     def setUp(self):
-        super(TestStudentModuleStorage, self).setUp()
+        super(TestStudentModuleStorage, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         student_module = StudentModuleFactory(state=json.dumps({'a_field': 'a_value', 'b_field': 'b_value'}))
         self.user = student_module.student
         self.assertEqual(self.user.id, 1)   # check our assumption hard-coded in the key functions above.
@@ -144,7 +144,7 @@ class TestStudentModuleStorage(OtherUserFailureTestMixin, TestCase):
             with self.assertNumQueries(1, using='student_module_history'):
                 self.kvs.set(user_state_key('a_field'), 'new_value')
         self.assertEqual(1, StudentModule.objects.all().count())
-        self.assertEqual({'b_field': 'b_value', 'a_field': 'new_value'}, json.loads(StudentModule.objects.all()[0].state))
+        self.assertEqual({'b_field': 'b_value', 'a_field': 'new_value'}, json.loads(StudentModule.objects.all()[0].state))  # lint-amnesty, pylint: disable=line-too-long
 
     def test_set_missing_field(self):
         "Test that setting a new user_state field changes the value"
@@ -157,7 +157,7 @@ class TestStudentModuleStorage(OtherUserFailureTestMixin, TestCase):
             with self.assertNumQueries(1, using='student_module_history'):
                 self.kvs.set(user_state_key('not_a_field'), 'new_value')
         self.assertEqual(1, StudentModule.objects.all().count())
-        self.assertEqual({'b_field': 'b_value', 'a_field': 'a_value', 'not_a_field': 'new_value'}, json.loads(StudentModule.objects.all()[0].state))
+        self.assertEqual({'b_field': 'b_value', 'a_field': 'a_value', 'not_a_field': 'new_value'}, json.loads(StudentModule.objects.all()[0].state))  # lint-amnesty, pylint: disable=line-too-long
 
     def test_delete_existing_field(self):
         "Test that deleting an existing field removes it from the StudentModule"
@@ -228,12 +228,12 @@ class TestStudentModuleStorage(OtherUserFailureTestMixin, TestCase):
         self.assertEqual(exception_context.exception.saved_field_names, [])
 
 
-class TestMissingStudentModule(TestCase):
+class TestMissingStudentModule(TestCase):  # lint-amnesty, pylint: disable=missing-class-docstring
     # Tell Django to clean out all databases, not just default
-    databases = {alias for alias in connections}
+    databases = {alias for alias in connections}  # lint-amnesty, pylint: disable=unnecessary-comprehension
 
     def setUp(self):
-        super(TestMissingStudentModule, self).setUp()
+        super(TestMissingStudentModule, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
 
         self.user = UserFactory.create(username='user')
         self.assertEqual(self.user.id, 1)   # check our assumption hard-coded in the key functions above.

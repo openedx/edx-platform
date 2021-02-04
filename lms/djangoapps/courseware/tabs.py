@@ -11,10 +11,10 @@ from django.utils.translation import ugettext_noop
 
 from lms.djangoapps.courseware.access import has_access
 from lms.djangoapps.courseware.entrance_exams import user_can_skip_entrance_exam
-from lms.djangoapps.course_home_api.toggles import course_home_mfe_dates_tab_is_active, course_home_mfe_outline_tab_is_active
+from lms.djangoapps.course_home_api.toggles import course_home_mfe_dates_tab_is_active, course_home_mfe_outline_tab_is_active  # lint-amnesty, pylint: disable=line-too-long
 from lms.djangoapps.course_home_api.utils import get_microfrontend_url
 from openedx.core.lib.course_tabs import CourseTabPluginManager
-from openedx.features.course_experience import RELATIVE_DATES_FLAG, DISABLE_UNIFIED_COURSE_TAB_FLAG, default_course_url_name
+from openedx.features.course_experience import RELATIVE_DATES_FLAG, DISABLE_UNIFIED_COURSE_TAB_FLAG, default_course_url_name  # lint-amnesty, pylint: disable=line-too-long
 from common.djangoapps.student.models import CourseEnrollment
 from xmodule.tabs import CourseTab, CourseTabList, course_reverse_func_from_name_func, key_checker
 
@@ -218,27 +218,27 @@ class LinkTab(CourseTab):
 
         tab_dict['link_func'] = link_value_func
 
-        super(LinkTab, self).__init__(tab_dict)
+        super(LinkTab, self).__init__(tab_dict)  # lint-amnesty, pylint: disable=super-with-arguments
 
     def __getitem__(self, key):
         if key == 'link':
             return self.link_value
         else:
-            return super(LinkTab, self).__getitem__(key)
+            return super(LinkTab, self).__getitem__(key)  # lint-amnesty, pylint: disable=super-with-arguments
 
     def __setitem__(self, key, value):
         if key == 'link':
             self.link_value = value
         else:
-            super(LinkTab, self).__setitem__(key, value)
+            super(LinkTab, self).__setitem__(key, value)  # lint-amnesty, pylint: disable=super-with-arguments
 
     def to_json(self):
-        to_json_val = super(LinkTab, self).to_json()
+        to_json_val = super(LinkTab, self).to_json()  # lint-amnesty, pylint: disable=super-with-arguments
         to_json_val.update({'link': self.link_value})
         return to_json_val
 
     def __eq__(self, other):
-        if not super(LinkTab, self).__eq__(other):
+        if not super(LinkTab, self).__eq__(other):  # lint-amnesty, pylint: disable=super-with-arguments
             return False
         return self.link_value == other.get('link')
 
@@ -306,7 +306,7 @@ class SingleTextbookTab(CourseTab):
         tab_dict['name'] = name
         tab_dict['tab_id'] = tab_id
         tab_dict['link_func'] = link_func
-        super(SingleTextbookTab, self).__init__(tab_dict)
+        super(SingleTextbookTab, self).__init__(tab_dict)  # lint-amnesty, pylint: disable=super-with-arguments
 
     def to_json(self):
         raise NotImplementedError('SingleTextbookTab should not be serialized.')
@@ -331,7 +331,7 @@ class DatesTab(EnrolledTab):
                 return reverse_func(self.view_name, args=[six.text_type(course.id)])
 
         tab_dict['link_func'] = link_func
-        super(DatesTab, self).__init__(tab_dict)
+        super(DatesTab, self).__init__(tab_dict)  # lint-amnesty, pylint: disable=super-with-arguments
 
     @classmethod
     def is_enabled(cls, course, user=None):

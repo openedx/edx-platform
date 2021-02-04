@@ -10,7 +10,7 @@ from datetime import datetime
 
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.db.models import Q
 from django.utils.decorators import method_decorator
 from django.utils.translation import ugettext as _
@@ -461,7 +461,7 @@ class MasqueradingKeyValueStore(KeyValueStore):
             return value != _DELETED_SENTINEL
 
 
-def filter_displayed_blocks(block, unused_view, frag, unused_context):
+def filter_displayed_blocks(block, unused_view, frag, unused_context):  # lint-amnesty, pylint: disable=unused-argument
     """
     A wrapper to only show XBlocks that set `show_in_read_only_mode` when masquerading as a specific user.
 

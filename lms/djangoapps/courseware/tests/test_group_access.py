@@ -80,7 +80,7 @@ class GroupAccessTestCase(ModuleStoreTestCase):
         modulestore().update_item(block, 1)
 
     def setUp(self):
-        super(GroupAccessTestCase, self).setUp()
+        super(GroupAccessTestCase, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
 
         UserPartition.scheme_extensions = ExtensionManager.make_test_instance(
             [
@@ -176,7 +176,7 @@ class GroupAccessTestCase(ModuleStoreTestCase):
         side-effects in other tests.
         """
         UserPartition.scheme_extensions = None
-        super(GroupAccessTestCase, self).tearDown()
+        super(GroupAccessTestCase, self).tearDown()  # lint-amnesty, pylint: disable=super-with-arguments
 
     def check_access(self, user, block_location, is_accessible):
         """

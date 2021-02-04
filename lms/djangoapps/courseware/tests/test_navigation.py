@@ -37,7 +37,7 @@ class TestNavigation(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
             cls.course = CourseFactory.create()
 
     @classmethod
-    def setUpTestData(cls):
+    def setUpTestData(cls):  # lint-amnesty, pylint: disable=super-method-not-called
         cls.chapter0 = ItemFactory.create(parent=cls.course,
                                           display_name='Overview')
         cls.chapter9 = ItemFactory.create(parent=cls.course,
@@ -75,7 +75,7 @@ class TestNavigation(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
         cls.user = UserFactory()
 
     def setUp(self):
-        super(TestNavigation, self).setUp()
+        super(TestNavigation, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
 
         # Create student accounts and activate them.
         for i in range(len(self.STUDENT_INFO)):
@@ -91,7 +91,7 @@ class TestNavigation(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
                 return
         raise AssertionError(u"assertTabActive failed: {} not active".format(tabname))
 
-    def assertTabInactive(self, tabname, response):
+    def assertTabInactive(self, tabname, response):  # lint-amnesty, pylint: disable=useless-return
         ''' Check if the progress tab is active in the tab set '''
         for line in response.content.decode('utf-8').split('\n'):
             if tabname in line and 'active' in line:

@@ -22,9 +22,9 @@ class TestDjangoUserStateClient(UserStateClientTestBase, ModuleStoreTestCase):
     """
     __test__ = True
     # Tell Django to clean out all databases, not just default
-    databases = {alias for alias in connections}
+    databases = {alias for alias in connections}  # lint-amnesty, pylint: disable=unnecessary-comprehension
 
-    def _user(self, user_idx):
+    def _user(self, user_idx):  # lint-amnesty, pylint: disable=arguments-differ
         return self.users[user_idx].username
 
     def _block_type(self, block):
@@ -33,6 +33,6 @@ class TestDjangoUserStateClient(UserStateClientTestBase, ModuleStoreTestCase):
         return 'problem'
 
     def setUp(self):
-        super(TestDjangoUserStateClient, self).setUp()
+        super(TestDjangoUserStateClient, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.client = DjangoXBlockUserStateClient()
         self.users = defaultdict(UserFactory.create)

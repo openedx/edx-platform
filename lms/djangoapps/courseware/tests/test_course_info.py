@@ -24,7 +24,7 @@ from openedx.core.djangoapps.waffle_utils.testutils import WAFFLE_TABLES
 from openedx.features.content_type_gating.models import ContentTypeGatingConfig
 from openedx.features.course_experience import DISABLE_UNIFIED_COURSE_TAB_FLAG
 from openedx.features.enterprise_support.tests.mixins.enterprise import EnterpriseTestConsentRequired
-from pyquery import PyQuery as pq
+from pyquery import PyQuery as pq  # lint-amnesty, pylint: disable=wrong-import-order
 from common.djangoapps.student.models import CourseEnrollment
 from common.djangoapps.student.tests.factories import AdminFactory
 from common.djangoapps.util.date_utils import strftime_localized
@@ -87,7 +87,7 @@ class CourseInfoTestCase(EnterpriseTestConsentRequired, LoginEnrollmentTestCase,
 
         url = reverse('info', args=[text_type(self.course.id)])
 
-        self.verify_consent_required(self.client, url)
+        self.verify_consent_required(self.client, url)  # lint-amnesty, pylint: disable=no-value-for-parameter
 
     def test_anonymous_user(self):
         url = reverse('info', args=[text_type(self.course.id)])
@@ -162,7 +162,7 @@ class CourseInfoLastAccessedTestCase(LoginEnrollmentTestCase, ModuleStoreTestCas
     """
 
     def setUp(self):
-        super(CourseInfoLastAccessedTestCase, self).setUp()
+        super(CourseInfoLastAccessedTestCase, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.course = CourseFactory.create()
         self.page = ItemFactory.create(
             category="course_info", parent_location=self.course.location,
@@ -230,7 +230,7 @@ class CourseInfoTitleTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase):
     Tests of the CourseInfo page title site configuration options.
     """
     def setUp(self):
-        super(CourseInfoTitleTestCase, self).setUp()
+        super(CourseInfoTitleTestCase, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.course = CourseFactory.create(
             org="HogwartZ",
             number="Potions_3",
@@ -330,7 +330,7 @@ class CourseInfoTestCaseCCX(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
         cls.course = CourseFactory.create()
 
     def setUp(self):
-        super(CourseInfoTestCaseCCX, self).setUp()
+        super(CourseInfoTestCaseCCX, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
 
         # Create ccx coach account
         self.coach = coach = AdminFactory.create(password="test")
@@ -363,7 +363,7 @@ class CourseInfoTestCaseXML(LoginEnrollmentTestCase, ModuleStoreTestCase):
         """
         Set up the tests
         """
-        super(CourseInfoTestCaseXML, self).setUp()
+        super(CourseInfoTestCaseXML, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
 
         # The following test course (which lives at common/test/data/2014)
         # is closed; we're testing that a course info page still appears when
@@ -413,7 +413,7 @@ class SelfPacedCourseInfoTestCase(LoginEnrollmentTestCase, SharedModuleStoreTest
         cls.self_paced_course = CourseFactory.create(self_paced=True)
 
     def setUp(self):
-        super(SelfPacedCourseInfoTestCase, self).setUp()
+        super(SelfPacedCourseInfoTestCase, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         ContentTypeGatingConfig.objects.create(enabled=True, enabled_as_of=datetime(2018, 1, 1))
 
         self.setup_user()

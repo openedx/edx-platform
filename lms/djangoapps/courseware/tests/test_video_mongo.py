@@ -74,7 +74,7 @@ I am overwatch.
 TRANSCRIPT_FILE_SJSON_DATA = """{\n   "start": [10],\n   "end": [100],\n   "text": ["Hi, welcome to edxval."]\n}"""
 
 
-class TestVideoYouTube(TestVideo):  # pylint: disable=test-inherits-tests
+class TestVideoYouTube(TestVideo):  # lint-amnesty, pylint: disable=missing-class-docstring, test-inherits-tests
     METADATA = {}
 
     def test_video_constructor(self):
@@ -239,7 +239,7 @@ class TestGetHtmlMethod(BaseTestVideoXBlock):
     METADATA = {}
 
     def setUp(self):
-        super(TestGetHtmlMethod, self).setUp()
+        super(TestGetHtmlMethod, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.setup_course()
         self.default_metadata_dict = OrderedDict({
             'autoAdvance': False,
@@ -284,6 +284,7 @@ class TestGetHtmlMethod(BaseTestVideoXBlock):
 
     def test_get_html_track(self):
         # pylint: disable=invalid-name
+        # lint-amnesty, pylint: disable=redefined-outer-name
         SOURCE_XML = """
             <video show_captions="true"
             display_name="A Name"
@@ -399,6 +400,7 @@ class TestGetHtmlMethod(BaseTestVideoXBlock):
             )
 
     def test_get_html_source(self):
+        # lint-amnesty, pylint: disable=invalid-name, redefined-outer-name
         SOURCE_XML = """
             <video show_captions="true"
             display_name="A Name"
@@ -479,7 +481,7 @@ class TestGetHtmlMethod(BaseTestVideoXBlock):
         initial_context['metadata']['duration'] = None
 
         for data in cases:
-            DATA = SOURCE_XML.format(
+            DATA = SOURCE_XML.format(  # lint-amnesty, pylint: disable=invalid-name
                 download_video=data['download_video'],
                 source=data['source'],
                 sources=data['sources']
@@ -513,6 +515,7 @@ class TestGetHtmlMethod(BaseTestVideoXBlock):
         Tests the VideoBlock get_html where a edx_video_id is given but a video is not found
         """
         # pylint: disable=invalid-name
+        # lint-amnesty, pylint: disable=redefined-outer-name
         SOURCE_XML = u"""
             <video show_captions="true"
             display_name="A Name"
@@ -550,6 +553,7 @@ class TestGetHtmlMethod(BaseTestVideoXBlock):
         self.assertIn("example.mp4", self.item_descriptor.render(STUDENT_VIEW).content)
 
     def test_get_html_with_mocked_edx_video_id(self):
+        # lint-amnesty, pylint: disable=invalid-name, redefined-outer-name
         SOURCE_XML = """
             <video show_captions="true"
             display_name="A Name"
@@ -603,7 +607,7 @@ class TestGetHtmlMethod(BaseTestVideoXBlock):
             'metadata': metadata
         }
 
-        DATA = SOURCE_XML.format(
+        DATA = SOURCE_XML.format(  # lint-amnesty, pylint: disable=invalid-name
             download_video=data['download_video'],
             source=data['source'],
             sources=data['sources'],
@@ -746,6 +750,7 @@ class TestGetHtmlMethod(BaseTestVideoXBlock):
         Create expected context and get actual context returned by `get_html` method.
         """
         # make sure the urls for the various encodings are included as part of the alternative sources.
+        # lint-amnesty, pylint: disable=invalid-name, redefined-outer-name
         SOURCE_XML = u"""
             <video show_captions="true"
             display_name="A Name"
@@ -825,7 +830,7 @@ class TestGetHtmlMethod(BaseTestVideoXBlock):
             }
         }
 
-        def side_effect(*args, **kwargs):
+        def side_effect(*args, **kwargs):  # lint-amnesty, pylint: disable=unused-argument
             cdn = {
                 'http://example.com/example.mp4': 'http://cdn-example.com/example.mp4',
                 'http://example.com/example.webm': 'http://cdn-example.com/example.webm',
@@ -1216,7 +1221,7 @@ class TestVideoBlockInitialization(BaseTestVideoXBlock):
     METADATA = {}
 
     def setUp(self):
-        super(TestVideoBlockInitialization, self).setUp()
+        super(TestVideoBlockInitialization, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.setup_course()
 
     @ddt.data(
@@ -1318,7 +1323,7 @@ class TestEditorSavedMethod(BaseTestVideoXBlock):
     METADATA = {}
 
     def setUp(self):
-        super(TestEditorSavedMethod, self).setUp()
+        super(TestEditorSavedMethod, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.setup_course()
         self.metadata = {
             'source': 'http://youtu.be/3_yD_cEKoCk',
@@ -1339,7 +1344,7 @@ class TestEditorSavedMethod(BaseTestVideoXBlock):
         self.MODULESTORE = MODULESTORES[default_store]  # pylint: disable=invalid-name
         self.initialize_block(metadata=self.metadata)
         item = self.store.get_item(self.item_descriptor.location)
-        with open(self.file_path, "rb") as myfile:  # pylint: disable=open-builtin
+        with open(self.file_path, "rb") as myfile:  # lint-amnesty, pylint: disable=bad-option-value, open-builtin
             save_to_store(myfile.read(), self.file_name, 'text/sjson', item.location)
         item.sub = "3_yD_cEKoCk"
         # subs_video.srt.sjson does not exist before calling editor_saved function
@@ -1359,7 +1364,7 @@ class TestEditorSavedMethod(BaseTestVideoXBlock):
         self.MODULESTORE = MODULESTORES[default_store]
         self.initialize_block(metadata=self.metadata)
         item = self.store.get_item(self.item_descriptor.location)
-        with open(self.file_path, "rb") as myfile:  # pylint: disable=open-builtin
+        with open(self.file_path, "rb") as myfile:  # lint-amnesty, pylint: disable=bad-option-value, open-builtin
             save_to_store(myfile.read(), self.file_name, 'text/sjson', item.location)
             save_to_store(myfile.read(), 'subs_video.srt.sjson', 'text/sjson', item.location)
         item.sub = "3_yD_cEKoCk"
@@ -1431,7 +1436,7 @@ class TestVideoBlockStudentViewJson(BaseTestVideoXBlock, CacheIsolationTestCase)
     TEST_YOUTUBE_EXPECTED_URL = u'https://www.youtube.com/watch?v=test_youtube_id'
 
     def setUp(self):
-        super(TestVideoBlockStudentViewJson, self).setUp()
+        super(TestVideoBlockStudentViewJson, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         video_declaration = (
             "<video display_name='Test Video' edx_video_id='123' youtube_id_1_0=\'" + self.TEST_YOUTUBE_ID + "\'>"
         )
@@ -1614,7 +1619,7 @@ class VideoBlockTest(TestCase, VideoBlockTestBase):
     Tests for video descriptor that requires access to django settings.
     """
     def setUp(self):
-        super(VideoBlockTest, self).setUp()
+        super(VideoBlockTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.descriptor.runtime.handler_url = MagicMock()
         self.descriptor.runtime.course_id = MagicMock()
         self.temp_dir = mkdtemp()
@@ -2270,7 +2275,7 @@ class TestVideoWithBumper(TestVideo):  # pylint: disable=test-inherits-tests
 
 
 @ddt.ddt
-class TestAutoAdvanceVideo(TestVideo):
+class TestAutoAdvanceVideo(TestVideo):  # lint-amnesty, pylint: disable=test-inherits-tests
     """
     Tests the server side of video auto-advance.
     """

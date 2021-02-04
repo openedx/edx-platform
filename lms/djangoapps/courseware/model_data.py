@@ -122,7 +122,7 @@ class DjangoKeyValueStore(KeyValueStore):
         """
         self.set_many({key: value})
 
-    def set_many(self, kv_dict):
+    def set_many(self, kv_dict):  # lint-amnesty, pylint: disable=arguments-differ
         """
         Provide a bulk save mechanism.
 
@@ -237,7 +237,7 @@ class DjangoOrmFieldCache(six.with_metaclass(ABCMeta, object)):
 
             except DatabaseError:
                 log.exception(u"Saving field %r failed", kvs_key.field_name)
-                raise KeyValueMultiSaveError(saved_fields)
+                raise KeyValueMultiSaveError(saved_fields)  # lint-amnesty, pylint: disable=raise-missing-from
 
             finally:
                 saved_fields.append(kvs_key.field_name)
@@ -421,7 +421,7 @@ class UserStateCache(object):
             )
         except DatabaseError:
             log.exception(u"Saving user state failed for %s", self.user.username)
-            raise KeyValueMultiSaveError([])
+            raise KeyValueMultiSaveError([])  # lint-amnesty, pylint: disable=raise-missing-from
         finally:
             self._cache.update(pending_updates)
 
@@ -499,7 +499,7 @@ class UserStateSummaryCache(DjangoOrmFieldCache):
     Cache for Scope.user_state_summary xblock field data.
     """
     def __init__(self, course_id):
-        super(UserStateSummaryCache, self).__init__()
+        super(UserStateSummaryCache, self).__init__()  # lint-amnesty, pylint: disable=super-with-arguments
         self.course_id = course_id
 
     def _create_object(self, kvs_key, value):
@@ -560,7 +560,7 @@ class PreferencesCache(DjangoOrmFieldCache):
     Cache for Scope.preferences xblock field data.
     """
     def __init__(self, user):
-        super(PreferencesCache, self).__init__()
+        super(PreferencesCache, self).__init__()  # lint-amnesty, pylint: disable=super-with-arguments
         self.user = user
 
     def _create_object(self, kvs_key, value):
@@ -623,7 +623,7 @@ class UserInfoCache(DjangoOrmFieldCache):
     Cache for Scope.user_info xblock field data
     """
     def __init__(self, user):
-        super(UserInfoCache, self).__init__()
+        super(UserInfoCache, self).__init__()  # lint-amnesty, pylint: disable=super-with-arguments
         self.user = user
 
     def _create_object(self, kvs_key, value):
@@ -861,7 +861,7 @@ class FieldDataCache(object):
                 saved_fields.extend(key.field_name for key in set_many_data)
             except KeyValueMultiSaveError as exc:
                 log.exception(u'Error saving fields %r', [key.field_name for key in set_many_data])
-                raise KeyValueMultiSaveError(saved_fields + exc.saved_field_names)
+                raise KeyValueMultiSaveError(saved_fields + exc.saved_field_names)  # lint-amnesty, pylint: disable=raise-missing-from
 
     @contract(key=DjangoKeyValueStore.Key)
     def delete(self, key):

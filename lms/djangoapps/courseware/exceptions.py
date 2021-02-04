@@ -8,7 +8,7 @@ class Redirect(Exception):
     Exception class that requires redirecting to a URL.
     """
     def __init__(self, url):
-        super(Redirect, self).__init__()
+        super(Redirect, self).__init__()  # lint-amnesty, pylint: disable=super-with-arguments
         self.url = url
 
 
@@ -23,7 +23,7 @@ class CourseAccessRedirect(Redirect):
             the user was denied access. These strings can then be exposed to the user.
     """
     def __init__(self, url, access_error=None):
-        super(CourseAccessRedirect, self).__init__(url)
+        super(CourseAccessRedirect, self).__init__(url)  # lint-amnesty, pylint: disable=super-with-arguments
         self.access_error = access_error
 
 

@@ -1,4 +1,4 @@
-# Factories are self documenting
+# Factories are self documenting  # lint-amnesty, pylint: disable=missing-module-docstring
 
 
 import json
@@ -125,7 +125,7 @@ class GlobalStaffFactory(UserFactory):
 # pylint: enable=unused-argument
 
 
-class StudentModuleFactory(DjangoModelFactory):
+class StudentModuleFactory(DjangoModelFactory):  # lint-amnesty, pylint: disable=missing-class-docstring
     class Meta(object):
         model = StudentModule
 
@@ -138,7 +138,7 @@ class StudentModuleFactory(DjangoModelFactory):
     done = 'na'
 
 
-class UserStateSummaryFactory(DjangoModelFactory):
+class UserStateSummaryFactory(DjangoModelFactory):  # lint-amnesty, pylint: disable=missing-class-docstring
     class Meta(object):
         model = XModuleUserStateSummaryField
 
@@ -147,7 +147,7 @@ class UserStateSummaryFactory(DjangoModelFactory):
     usage_id = location('usage_id')
 
 
-class StudentPrefsFactory(DjangoModelFactory):
+class StudentPrefsFactory(DjangoModelFactory):  # lint-amnesty, pylint: disable=missing-class-docstring
     class Meta(object):
         model = XModuleStudentPrefsField
 
@@ -157,7 +157,7 @@ class StudentPrefsFactory(DjangoModelFactory):
     module_type = 'mock_problem'
 
 
-class StudentInfoFactory(DjangoModelFactory):
+class StudentInfoFactory(DjangoModelFactory):  # lint-amnesty, pylint: disable=missing-class-docstring
     class Meta(object):
         model = XModuleStudentInfoField
 
@@ -171,6 +171,6 @@ class RequestFactoryNoCsrf(RequestFactory):
     RequestFactory, which disables csrf checks.
     """
     def request(self, **kwargs):
-        request = super(RequestFactoryNoCsrf, self).request(**kwargs)
+        request = super(RequestFactoryNoCsrf, self).request(**kwargs)  # lint-amnesty, pylint: disable=super-with-arguments
         setattr(request, '_dont_enforce_csrf_checks', True)  # pylint: disable=literal-used-as-attribute
         return request

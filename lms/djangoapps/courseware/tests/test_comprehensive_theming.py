@@ -15,7 +15,7 @@ class TestComprehensiveTheming(TestCase):
     """Test comprehensive theming."""
 
     def setUp(self):
-        super(TestComprehensiveTheming, self).setUp()
+        super(TestComprehensiveTheming, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
 
         # Clear the internal staticfiles caches, to get test isolation.
         staticfiles.finders.get_finder.cache_clear()

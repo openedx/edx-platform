@@ -83,7 +83,7 @@ class MasqueradeTestCase(SharedModuleStoreTestCase, LoginEnrollmentTestCase, Mas
         )
 
     def setUp(self):
-        super(MasqueradeTestCase, self).setUp()
+        super(MasqueradeTestCase, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
 
         self.test_user = self.create_user()
         self.login(self.test_user.email, 'test')
@@ -251,7 +251,7 @@ class TestStaffMasqueradeAsSpecificStudent(StaffMasqueradeTestCase, ProblemSubmi
     Check for staff being able to masquerade as a specific student.
     """
     def setUp(self):
-        super(TestStaffMasqueradeAsSpecificStudent, self).setUp()
+        super(TestStaffMasqueradeAsSpecificStudent, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.student_user = self.create_user()
         self.login_student()
         self.enroll(self.course, True)
@@ -441,7 +441,7 @@ class TestGetMasqueradingGroupId(StaffMasqueradeTestCase):
     Check for staff being able to masquerade as belonging to a group.
     """
     def setUp(self):
-        super(TestGetMasqueradingGroupId, self).setUp()
+        super(TestGetMasqueradingGroupId, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.user_partition = UserPartition(
             0, 'Test User Partition', '',
             [Group(0, 'Group 1'), Group(1, 'Group 2')],
@@ -479,7 +479,7 @@ class ReadOnlyKeyValueStore(DictKeyValueStore):
     def delete(self, key):
         assert False, "ReadOnlyKeyValueStore may not be modified."
 
-    def set_many(self, update_dict):  # pylint: disable=unused-argument
+    def set_many(self, update_dict):  # lint-amnesty, pylint: disable=arguments-differ, unused-argument
         assert False, "ReadOnlyKeyValueStore may not be modified."
 
 
@@ -493,7 +493,7 @@ class MasqueradingKeyValueStoreTest(TestCase):
     Unit tests for the MasqueradingKeyValueStore class.
     """
     def setUp(self):
-        super(MasqueradingKeyValueStoreTest, self).setUp()
+        super(MasqueradingKeyValueStoreTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.ro_kvs = ReadOnlyKeyValueStore({'a': 42, 'b': None, 'c': 'OpenCraft'})
         self.session = FakeSession()
         self.kvs = MasqueradingKeyValueStore(self.ro_kvs, self.session)
