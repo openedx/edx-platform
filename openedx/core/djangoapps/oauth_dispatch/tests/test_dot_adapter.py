@@ -2,9 +2,9 @@
 Tests for DOT Adapter
 """
 
-
 import unittest
 from datetime import timedelta
+import pytest
 
 import ddt
 import six
@@ -56,9 +56,8 @@ class DOTAdapterTestCase(TestCase):
         """
         Make sure unicode representation of RestrictedApplication is correct
         """
-        self.assertEqual(six.text_type(self.restricted_app), u"<RestrictedApplication '{name}'>".format(
-            name=self.restricted_client.name
-        ))
+        assert six.text_type(self.restricted_app) == "<RestrictedApplication '{name}'>"\
+            .format(name=self.restricted_client.name)
 
     @ddt.data(
         ('confidential', models.Application.CLIENT_CONFIDENTIAL),
@@ -67,9 +66,9 @@ class DOTAdapterTestCase(TestCase):
     @ddt.unpack
     def test_create_client(self, client_name, client_type):
         client = getattr(self, '{}_client'.format(client_name))
-        self.assertIsInstance(client, models.Application)
-        self.assertEqual(client.client_id, '{}-client-id'.format(client_name))
-        self.assertEqual(client.client_type, client_type)
+        assert isinstance(client, models.Application)
+        assert client.client_id == '{}-client-id'.format(client_name)
+        assert client.client_type == client_type
 
     def test_get_client(self):
         """
@@ -80,11 +79,11 @@ class DOTAdapterTestCase(TestCase):
             redirect_uris=DUMMY_REDIRECT_URL,
             client_type=models.Application.CLIENT_CONFIDENTIAL
         )
-        self.assertIsInstance(client, models.Application)
-        self.assertEqual(client.client_type, models.Application.CLIENT_CONFIDENTIAL)
+        assert isinstance(client, models.Application)
+        assert client.client_type == models.Application.CLIENT_CONFIDENTIAL
 
     def test_get_client_not_found(self):
-        with self.assertRaises(models.Application.DoesNotExist):
+        with pytest.raises(models.Application.DoesNotExist):
             self.adapter.get_client(client_id='not-found')
 
     def test_get_client_for_token(self):
@@ -92,7 +91,7 @@ class DOTAdapterTestCase(TestCase):
             user=self.user,
             application=self.public_client,
         )
-        self.assertEqual(self.adapter.get_client_for_token(token), self.public_client)
+        assert self.adapter.get_client_for_token(token) == self.public_client
 
     def test_get_access_token(self):
         token = self.adapter.create_access_token_for_test(
@@ -101,7 +100,7 @@ class DOTAdapterTestCase(TestCase):
             user=self.user,
             expires=now() + timedelta(days=30),
         )
-        self.assertEqual(self.adapter.get_access_token(token_string='token-id'), token)
+        assert self.adapter.get_access_token(token_string='token-id') == token
 
     def test_get_restricted_access_token(self):
         """
@@ -116,4 +115,4 @@ class DOTAdapterTestCase(TestCase):
         )
 
         readback_token = self.adapter.get_access_token(token_string='expired-token-id')
-        self.assertTrue(RestrictedApplication.verify_access_token_as_expired(readback_token))
+        assert RestrictedApplication.verify_access_token_as_expired(readback_token)
