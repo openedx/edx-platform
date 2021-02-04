@@ -1,4 +1,4 @@
-"""
+"""  # lint-amnesty, pylint: disable=django-not-configured
 Platform support for Programs.
 
 This package is a thin wrapper around interactions with the Programs service,
@@ -10,7 +10,7 @@ this package should be kept small, thin, and stateless.
 """
 default_app_config = 'openedx.core.djangoapps.programs.apps.ProgramsConfig'
 
-from edx_toggles.toggles import LegacyWaffleSwitch, LegacyWaffleSwitchNamespace
+from edx_toggles.toggles import LegacyWaffleSwitch, LegacyWaffleSwitchNamespace  # lint-amnesty, pylint: disable=wrong-import-position
 
 PROGRAMS_WAFFLE_SWITCH_NAMESPACE = LegacyWaffleSwitchNamespace(name='programs')
 

@@ -7,7 +7,7 @@ from celery import task
 from celery.exceptions import MaxRetriesExceededError
 from celery.utils.log import get_task_logger
 from django.conf import settings
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.contrib.sites.models import Site
 from edx_django_utils.monitoring import set_code_owner_attribute
 from edx_rest_api_client import exceptions
@@ -123,7 +123,7 @@ def award_program_certificate(client, username, program_uuid, visible_date):
 
 @task(bind=True, ignore_result=True)
 @set_code_owner_attribute
-def award_program_certificates(self, username):
+def award_program_certificates(self, username):  # lint-amnesty, pylint: disable=too-many-statements
     """
     This task is designed to be called whenever a student's completion status
     changes with respect to one or more courses (primarily, when a course
@@ -225,7 +225,7 @@ def award_program_certificates(self, username):
                 # client handles all 4XX errors the same way. In the future,
                 # we may want to fork slumber, add 429 handling, and use that
                 # in edx_rest_api_client.
-                if exc.response.status_code == 429:  # pylint: disable=no-member
+                if exc.response.status_code == 429:  # lint-amnesty, pylint: disable=no-else-raise, no-member
                     rate_limit_countdown = 60
                     LOGGER.info(
                         u"""Rate limited. Retrying task to award certificates to user {username} in {countdown}
