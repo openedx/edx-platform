@@ -22,7 +22,7 @@ class CreateOrUpdateSiteConfigurationTest(TestCase):
     command = 'create_or_update_site_configuration'
 
     def setUp(self):
-        super(CreateOrUpdateSiteConfigurationTest, self).setUp()
+        super(CreateOrUpdateSiteConfigurationTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.site_id = 1
         self.site_id_arg = ['--site-id', str(self.site_id)]
         self.json_file_path = Path(__file__).parent / "fixtures/config1.json"
