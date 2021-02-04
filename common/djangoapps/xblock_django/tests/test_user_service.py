@@ -105,8 +105,7 @@ class UserServiceTestCase(TestCase):
         course_key = CourseKey.from_string('edX/toy/2012_Fall')
         anon_user_id = anonymous_id_for_user(
             user=self.user,
-            course_id=course_key,
-            save=True
+            course_id=course_key
         )
 
         django_user_service = DjangoXBlockUserService(self.user, user_is_staff=True)
