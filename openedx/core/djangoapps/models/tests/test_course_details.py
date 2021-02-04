@@ -21,7 +21,7 @@ class CourseDetailsTestCase(ModuleStoreTestCase):
     """
 
     def setUp(self):
-        super(CourseDetailsTestCase, self).setUp()
+        super(CourseDetailsTestCase, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.course = CourseFactory.create()
 
     def test_virgin_fetch(self):
@@ -116,7 +116,7 @@ class CourseDetailsTestCase(ModuleStoreTestCase):
             )
             jsondetails.video_thumbnail_image_name = "an_image.jpg"
             self.assertEqual(
-                CourseDetails.update_from_json(self.course.id, jsondetails.__dict__, self.user).video_thumbnail_image_name,
+                CourseDetails.update_from_json(self.course.id, jsondetails.__dict__, self.user).video_thumbnail_image_name,  # lint-amnesty, pylint: disable=line-too-long
                 jsondetails.video_thumbnail_image_name
             )
             jsondetails.language = "hr"

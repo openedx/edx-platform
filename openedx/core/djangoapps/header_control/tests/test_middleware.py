@@ -11,7 +11,7 @@ from openedx.core.djangoapps.header_control.middleware import HeaderControlMiddl
 class TestHeaderControlMiddlewareProcessResponse(TestCase):
     """Test the `header_control` middleware. """
     def setUp(self):
-        super(TestHeaderControlMiddlewareProcessResponse, self).setUp()
+        super(TestHeaderControlMiddlewareProcessResponse, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.middleware = HeaderControlMiddleware()
 
     def test_doesnt_barf_if_not_modifying_anything(self):

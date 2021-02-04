@@ -28,7 +28,7 @@ def heartbeat(request):
         for check in check_results:
             if not check_results[check]['status']:
                 status_code = 503  # 503 on any failure
-    except Exception as e:
+    except Exception as e:  # lint-amnesty, pylint: disable=broad-except
         status_code = 503
         check_results = {'error': six.text_type(e)}
 

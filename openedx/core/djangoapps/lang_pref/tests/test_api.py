@@ -3,7 +3,7 @@
 
 
 import ddt
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.test.utils import override_settings
 from django.utils import translation
 from mock import patch
