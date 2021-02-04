@@ -29,7 +29,7 @@ class RoleAssignmentTest(TestCase):
     """
 
     def setUp(self):
-        super(RoleAssignmentTest, self).setUp()
+        super(RoleAssignmentTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         # Check a staff account because those used to get the Moderator role
         self.staff_user = User.objects.create_user(
             "patty",
@@ -77,7 +77,7 @@ class RoleAssignmentTest(TestCase):
 class CourseDiscussionSettingsTest(ModuleStoreTestCase):
 
     def setUp(self):
-        super(CourseDiscussionSettingsTest, self).setUp()
+        super(CourseDiscussionSettingsTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.course = CourseFactory.create()
 
     def test_get_course_discussion_settings(self):

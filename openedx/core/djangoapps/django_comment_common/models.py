@@ -6,7 +6,7 @@ import logging
 
 from config_models.models import ConfigurationModel
 from django.conf import settings
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.db import models
 from django.db.models.signals import post_save
 from django.dispatch import receiver
@@ -106,7 +106,7 @@ class Role(models.Model):
             self.add_permission(per)
 
     def add_permission(self, permission):
-        self.permissions.add(Permission.objects.get_or_create(name=permission)[0])
+        self.permissions.add(Permission.objects.get_or_create(name=permission)[0])  # lint-amnesty, pylint: disable=no-member
 
     def has_permission(self, permission):
         """
