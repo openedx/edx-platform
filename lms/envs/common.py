@@ -486,7 +486,17 @@ FEATURES = {
     # Enable organizational email opt-in
     'ENABLE_MKTG_EMAIL_OPT_IN': False,
 
-    # Show the mobile app links in the footer
+    # .. toggle_name: FEATURES['ENABLE_FOOTER_MOBILE_APP_LINKS']
+    # .. toggle_implementation: DjangoSetting
+    # .. toggle_default: False
+    # .. toggle_description: Set to True if you want show the mobile app links (Apple App Store & Google Play Store) in
+    #   the footer.
+    # .. toggle_use_cases: open_edx
+    # .. toggle_creation_date: 2015-01-13
+    # .. toggle_warnings: If you set this to True then you should also set your mobile application's app store and play
+    #   store URLs in the MOBILE_STORE_URLS settings dictionary. These links are not part of the default theme. If you
+    #   want these links on your footer then you should use the edx.org theme.
+    # .. toggle_tickets: https://github.com/edx/edx-platform/pull/6588
     'ENABLE_FOOTER_MOBILE_APP_LINKS': False,
 
     # Let students save and manage their annotations
