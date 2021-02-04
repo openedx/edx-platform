@@ -26,7 +26,7 @@ from openedx.core.djangoapps.enrollments.errors import (
 )
 from openedx.core.djangoapps.enrollments.serializers import CourseEnrollmentSerializer
 from openedx.core.lib.exceptions import CourseNotFoundError
-from common.djangoapps.student.models import AlreadyEnrolledError, CourseEnrollment, CourseFullError, EnrollmentClosedError
+from common.djangoapps.student.models import AlreadyEnrolledError, CourseEnrollment, CourseFullError, EnrollmentClosedError  # lint-amnesty, pylint: disable=line-too-long
 from common.djangoapps.student.tests.factories import CourseAccessRoleFactory, UserFactory, CourseEnrollmentFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
@@ -45,7 +45,7 @@ class EnrollmentDataTest(ModuleStoreTestCase):
 
     def setUp(self):
         """Create a course and user, then log in. """
-        super(EnrollmentDataTest, self).setUp()
+        super(EnrollmentDataTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.course = CourseFactory.create()
         self.user = UserFactory.create(username=self.USERNAME, email=self.EMAIL, password=self.PASSWORD)
         self.client.login(username=self.USERNAME, password=self.PASSWORD)

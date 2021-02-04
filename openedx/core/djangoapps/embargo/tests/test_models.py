@@ -261,7 +261,7 @@ class CourseAccessRuleHistoryTest(TestCase):
     """Test course access rule history. """
 
     def setUp(self):
-        super(CourseAccessRuleHistoryTest, self).setUp()
+        super(CourseAccessRuleHistoryTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.course_key = CourseLocator('edx', 'DemoX', 'Demo_Course')
         self.restricted_course = RestrictedCourse.objects.create(course_key=self.course_key)
         self.countries = {

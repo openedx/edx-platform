@@ -33,7 +33,7 @@ class EnrollmentTest(CacheIsolationTestCase):
     ENABLED_CACHES = ['default']
 
     def setUp(self):
-        super(EnrollmentTest, self).setUp()
+        super(EnrollmentTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         fake_data_api.reset()
 
     @ddt.data(
