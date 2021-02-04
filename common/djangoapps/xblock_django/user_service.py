@@ -81,7 +81,11 @@ class DjangoXBlockUserService(UserService):
             # need this check because profile is only created through registration flow
             full_name = full_name if full_name is not None and full_name != '' else "{} {}".format(
                 django_user.first_name, django_user.last_name)
+            first_name = django_user.first_name
+            # extract first name from full name, if profile does not have first name explicitly
+            first_name = first_name if first_name is not None and first_name != '' else full_name.split()[0]
             xblock_user.full_name = full_name
+            xblock_user.first_name = first_name.title()
             xblock_user.emails = [django_user.email]
             xblock_user.opt_attrs[ATTR_KEY_IS_AUTHENTICATED] = True
             xblock_user.opt_attrs[ATTR_KEY_USER_ID] = django_user.id
