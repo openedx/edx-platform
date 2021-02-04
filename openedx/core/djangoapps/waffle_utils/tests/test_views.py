@@ -21,7 +21,7 @@ TEST_WAFFLE_FLAG = WaffleFlag(TEST_WAFFLE_FLAG_NAMESPACE, "flag", __name__)
 
 # TODO: Missing coverage for:
 # - computed_status
-class ToggleStateViewTests(TestCase):
+class ToggleStateViewTests(TestCase):  # lint-amnesty, pylint: disable=missing-class-docstring
 
     def test_success_for_staff(self):
         response = self._get_toggle_state_response()
@@ -159,7 +159,7 @@ class ToggleStateViewTests(TestCase):
         self.assertEqual("on", course_overrides["my.flag"]["course_overrides"][0]["force"])
         self.assertEqual("both", course_overrides["my.flag"]["computed_status"])
 
-    def _get_toggle_state_response(self, is_staff=True):
+    def _get_toggle_state_response(self, is_staff=True):  # lint-amnesty, pylint: disable=missing-function-docstring
         request = APIRequestFactory().get('/api/toggles/state/')
         user = UserFactory()
         user.is_staff = is_staff

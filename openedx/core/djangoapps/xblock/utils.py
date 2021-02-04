@@ -10,7 +10,7 @@ from uuid import uuid4
 
 import crum
 from django.conf import settings
-from six import text_type
+from six import text_type  # lint-amnesty, pylint: disable=unused-import
 
 
 def get_secure_token_for_xblock_handler(user_id, block_key_str, time_idx=0):

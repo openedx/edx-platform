@@ -24,7 +24,7 @@ class RuntimeShim(object):
     """
 
     def __init__(self, *args, **kwargs):
-        super(RuntimeShim, self).__init__(*args, **kwargs)
+        super(RuntimeShim, self).__init__(*args, **kwargs)  # lint-amnesty, pylint: disable=super-with-arguments
         self._active_block = None
 
     def render(self, block, view_name, context=None):
@@ -40,7 +40,7 @@ class RuntimeShim(object):
         old_active_block = self._active_block
         self._active_block = block
         try:
-            return super(RuntimeShim, self).render(block, view_name, context)
+            return super(RuntimeShim, self).render(block, view_name, context)  # lint-amnesty, pylint: disable=super-with-arguments
         finally:
             # Reset the active view to what it was before entering this method
             self._active_block = old_active_block
@@ -53,7 +53,7 @@ class RuntimeShim(object):
         old_active_block = self._active_block
         self._active_block = block
         try:
-            return super(RuntimeShim, self).handle(block, handler_name, request, suffix)
+            return super(RuntimeShim, self).handle(block, handler_name, request, suffix)  # lint-amnesty, pylint: disable=super-with-arguments
         finally:
             # Reset the active view to what it was before entering this method
             self._active_block = old_active_block
@@ -358,7 +358,7 @@ class RuntimeShim(object):
         Get the list of CSS classes that the wrapping <div> should have for the
         specified xblock or aside's view.
         """
-        css_classes = super(RuntimeShim, self)._css_classes_for(block, view)
+        css_classes = super(RuntimeShim, self)._css_classes_for(block, view)  # lint-amnesty, pylint: disable=super-with-arguments
         # Many CSS styles for former XModules use
         # .xmodule_display.xmodule_VideoBlock
         # as their selector, so add those classes:

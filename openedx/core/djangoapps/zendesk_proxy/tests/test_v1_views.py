@@ -45,7 +45,7 @@ class ZendeskProxyTestCase(ApiTestCase):
                 }
             ],
         }
-        return super(ZendeskProxyTestCase, self).setUp()
+        return super(ZendeskProxyTestCase, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
 
     def test_post(self):
         with patch('requests.post', return_value=MagicMock(status_code=201)) as mock_post:
