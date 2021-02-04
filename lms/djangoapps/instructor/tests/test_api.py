@@ -1970,7 +1970,7 @@ class TestInstructorAPIBulkBetaEnrollment(SharedModuleStoreTestCase, LoginEnroll
             message = message.format(self.beta_tester.username, self.course.id)
 
             generate_user_certificates(self.beta_tester, self.course.id, self.course)
-            capture.check_present(('edx.certificate', 'INFO', message))
+            capture.check_present(('lms.djangoapps.certificates.generation_handler', 'INFO', message))
 
     def test_missing_params(self):
         """ Test missing all query parameters. """

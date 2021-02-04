@@ -18,15 +18,15 @@ from django.utils.translation import ugettext as _
 from django.views.decorators.http import require_GET, require_POST
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
+from xmodule.modulestore.django import modulestore
 
-from lms.djangoapps.certificates import api
+from common.djangoapps.student.models import CourseEnrollment, User
+from common.djangoapps.util.json_request import JsonResponse
+from lms.djangoapps.certificates.api import get_certificates_for_user, regenerate_user_certificates
 from lms.djangoapps.certificates.models import CertificateInvalidation
 from lms.djangoapps.certificates.permissions import GENERATE_ALL_CERTIFICATES, VIEW_ALL_CERTIFICATES
 from lms.djangoapps.instructor_task.api import generate_certificates_for_students
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
-from common.djangoapps.student.models import CourseEnrollment, User
-from common.djangoapps.util.json_request import JsonResponse
-from xmodule.modulestore.django import modulestore
 
 log = logging.getLogger(__name__)
 
@@ -100,7 +100,7 @@ def search_certificates(request):
     except User.DoesNotExist:
         return HttpResponseBadRequest(_(u"user '{user}' does not exist").format(user=user_filter))
 
-    certificates = api.get_certificates_for_user(user.username)
+    certificates = get_certificates_for_user(user.username)
     for cert in certificates:
         cert["course_key"] = six.text_type(cert["course_key"])
         cert["created"] = cert["created"].isoformat()
@@ -201,7 +201,7 @@ def regenerate_certificate_for_user(request):
 
     # Attempt to regenerate certificates
     try:
-        certificate = api.regenerate_user_certificates(params["user"], params["course_key"], course=course)
+        certificate = regenerate_user_certificates(params["user"], params["course_key"], course=course)
     except:  # pylint: disable=bare-except
         # We are pessimistic about the kinds of errors that might get thrown by the
         # certificates API.  This may be overkill, but we're logging everything so we can

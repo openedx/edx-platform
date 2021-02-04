@@ -8,23 +8,22 @@ from uuid import uuid4
 
 import ddt
 import six
-
 from django.conf import settings
 from django.test.utils import override_settings
 from django.urls import reverse
 from mock import patch
 from opaque_keys.edx.keys import CourseKey
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from xmodule.modulestore.tests.factories import CourseFactory
 
-from lms.djangoapps.certificates import api
+from common.djangoapps.student.models import CourseEnrollment
+from common.djangoapps.student.roles import GlobalStaff, SupportStaffRole
+from common.djangoapps.student.tests.factories import UserFactory
+from lms.djangoapps.certificates.api import regenerate_user_certificates
 from lms.djangoapps.certificates.models import CertificateInvalidation, CertificateStatuses, GeneratedCertificate
 from lms.djangoapps.certificates.tests.factories import CertificateInvalidationFactory
 from lms.djangoapps.grades.tests.utils import mock_passing_grade
 from openedx.core.djangoapps.content.course_overviews.tests.factories import CourseOverviewFactory
-from common.djangoapps.student.models import CourseEnrollment
-from common.djangoapps.student.roles import GlobalStaff, SupportStaffRole
-from common.djangoapps.student.tests.factories import UserFactory
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory
 
 FEATURES_WITH_CERTS_ENABLED = settings.FEATURES.copy()
 FEATURES_WITH_CERTS_ENABLED['CERTIFICATES_HTML_VIEW'] = True
@@ -113,7 +112,7 @@ class CertificateSearchTests(CertificateSupportTestCase):
         )
         self.course.cert_html_view_enabled = True
 
-        #course certificate configurations
+        # Course certificate configurations
         certificates = [
             {
                 'id': 1,
@@ -316,8 +315,8 @@ class CertificateRegenerateTests(CertificateSupportTestCase):
         with mock_passing_grade(percent=0.75):
             with patch('common.djangoapps.course_modes.models.CourseMode.mode_for_course') as mock_mode_for_course:
                 mock_mode_for_course.return_value = 'honor'
-                api.regenerate_user_certificates(self.student, self.course.id,  # lint-amnesty, pylint: disable=no-member
-                                                 course=self.course)
+                regenerate_user_certificates(self.student, self.course.id,  # lint-amnesty, pylint: disable=no-member
+                                             course=self.course)
 
                 mock_generate_cert.assert_called()
 
