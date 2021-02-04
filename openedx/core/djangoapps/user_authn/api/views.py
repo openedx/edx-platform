@@ -26,7 +26,7 @@ class TPAContextView(APIView):
     """
     throttle_classes = [ThirdPartyAuthContextThrottle]
 
-    def get(self, request, **kwargs):
+    def get(self, request, **kwargs):  # lint-amnesty, pylint: disable=unused-argument
         """
         Returns the context for third party auth providers and the currently running pipeline.
 

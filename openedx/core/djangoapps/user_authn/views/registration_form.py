@@ -10,7 +10,7 @@ import six
 
 from django import forms
 from django.conf import settings
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.core.exceptions import ImproperlyConfigured
 from django.core.validators import RegexValidator, ValidationError, slug_re
 from django.forms import widgets
@@ -108,8 +108,8 @@ class UsernameField(forms.CharField):
 
     default_validators = [validate_username]
 
-    def __init__(self, *args, **kwargs):
-        super(UsernameField, self).__init__(
+    def __init__(self, *args, **kwargs):  # lint-amnesty, pylint: disable=unused-argument
+        super(UsernameField, self).__init__(  # lint-amnesty, pylint: disable=super-with-arguments
             min_length=accounts.USERNAME_MIN_LENGTH,
             max_length=accounts.USERNAME_MAX_LENGTH,
             error_messages={
@@ -127,7 +127,7 @@ class UsernameField(forms.CharField):
         """
 
         value = self.to_python(value).strip()
-        return super(UsernameField, self).clean(value)
+        return super(UsernameField, self).clean(value)  # lint-amnesty, pylint: disable=super-with-arguments
 
 
 class AccountCreationForm(forms.Form):
@@ -172,7 +172,7 @@ class AccountCreationForm(forms.Form):
         do_third_party_auth=True,
         tos_required=True
     ):
-        super(AccountCreationForm, self).__init__(data)
+        super(AccountCreationForm, self).__init__(data)  # lint-amnesty, pylint: disable=super-with-arguments
 
         extra_fields = extra_fields or {}
         self.extended_profile_fields = extended_profile_fields or {}

@@ -17,7 +17,7 @@ class TagsMiddlewareTest(TestCase):
     Test the UserTagsEventContextMiddleware
     """
     def setUp(self):
-        super(TagsMiddlewareTest, self).setUp()
+        super(TagsMiddlewareTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.middleware = UserTagsEventContextMiddleware()
         self.user = UserFactory.create()
         self.other_user = UserFactory.create()

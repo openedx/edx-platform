@@ -23,7 +23,7 @@ class TestStorageLMS(TestCase):
     """
 
     def setUp(self):
-        super(TestStorageLMS, self).setUp()
+        super(TestStorageLMS, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.themes_dir = get_theme_base_dirs()[0]
         self.enabled_theme = "red-theme"
         self.system_dir = settings.REPO_ROOT / "lms"

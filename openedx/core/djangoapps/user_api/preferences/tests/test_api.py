@@ -8,7 +8,7 @@ import datetime
 
 import ddt
 from dateutil.parser import parse as parse_datetime
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.test.utils import override_settings
 from django.urls import reverse
 from mock import patch
@@ -21,7 +21,7 @@ from common.djangoapps.student.tests.factories import UserFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
-from ...errors import (
+from ...errors import (  # lint-amnesty, pylint: disable=unused-import
     CountryCodeError,
     PreferenceUpdateError,
     PreferenceValidationError,
@@ -50,7 +50,7 @@ class TestPreferenceAPI(CacheIsolationTestCase):
     password = "test"
 
     def setUp(self):
-        super(TestPreferenceAPI, self).setUp()
+        super(TestPreferenceAPI, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.user = UserFactory.create(password=self.password)
         self.different_user = UserFactory.create(password=self.password)
         self.staff_user = UserFactory.create(is_staff=True, password=self.password)
@@ -487,7 +487,7 @@ def get_expected_validation_developer_message(preference_key, preference_value):
     )
 
 
-def get_expected_key_error_user_message(preference_key, preference_value):
+def get_expected_key_error_user_message(preference_key, preference_value):  # lint-amnesty, pylint: disable=unused-argument
     """
     Returns the expected user message for an invalid key.
     """

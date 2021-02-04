@@ -16,7 +16,7 @@ class TestUpdateAssets(TestCase):
     Test comprehensive theming helper functions.
     """
     def setUp(self):
-        super(TestUpdateAssets, self).setUp()
+        super(TestUpdateAssets, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.themes = get_themes()
 
     def test_errors_for_invalid_arguments(self):

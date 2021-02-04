@@ -10,7 +10,7 @@ import httpretty
 import mock
 import six
 from django.conf import settings
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.core import mail
 from django.core.cache import cache
 from django.test import TransactionTestCase
@@ -90,7 +90,7 @@ class RegistrationViewValidationErrorTest(ThirdPartyAuthTestMixin, UserAPITestCa
     GOALS = "Learn all the things!"
 
     def setUp(self):  # pylint: disable=arguments-differ
-        super(RegistrationViewValidationErrorTest, self).setUp()
+        super(RegistrationViewValidationErrorTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.url = reverse("user_api_registration")
 
     @mock.patch.dict(settings.FEATURES, {
@@ -411,7 +411,7 @@ class RegistrationViewTestV1(ThirdPartyAuthTestMixin, UserAPITestCase):
     link_template = u"<a href='/honor' rel='noopener' target='_blank'>{link_label}</a>"
 
     def setUp(self):  # pylint: disable=arguments-differ
-        super(RegistrationViewTestV1, self).setUp()
+        super(RegistrationViewTestV1, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.url = reverse("user_api_registration")
 
     @ddt.data("get", "post")
@@ -613,7 +613,7 @@ class RegistrationViewTestV1(ThirdPartyAuthTestMixin, UserAPITestCase):
                 {
                     "value": country_code,
                     "name": six.text_type(country_name),
-                    "default": True if country_code == expected_country_code else False
+                    "default": True if country_code == expected_country_code else False  # lint-amnesty, pylint: disable=simplifiable-if-expression
                 }
                 for country_code, country_name in SORTED_COUNTRIES
             ]
@@ -1757,7 +1757,7 @@ class RegistrationViewTestV2(RegistrationViewTestV1):
     # pylint: disable=test-inherits-tests
 
     def setUp(self):  # pylint: disable=arguments-differ
-        super(RegistrationViewTestV1, self).setUp()
+        super(RegistrationViewTestV1, self).setUp()  # lint-amnesty, pylint: disable=bad-super-call
         self.url = reverse("user_api_registration_v2")
 
     @override_settings(
@@ -2042,11 +2042,11 @@ class ThirdPartyRegistrationTestMixin(ThirdPartyOAuthTestMixin, CacheIsolationTe
     __test__ = False
 
     def setUp(self):
-        super(ThirdPartyRegistrationTestMixin, self).setUp()
+        super(ThirdPartyRegistrationTestMixin, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.url = reverse('user_api_registration')
 
     def tearDown(self):
-        super(ThirdPartyRegistrationTestMixin, self).tearDown()
+        super(ThirdPartyRegistrationTestMixin, self).tearDown()  # lint-amnesty, pylint: disable=super-with-arguments
         Partial.objects.all().delete()
 
     def data(self, user=None):
@@ -2224,7 +2224,7 @@ class RegistrationValidationViewTests(test_utils.ApiTestCase):
     path = reverse(endpoint_name)
 
     def setUp(self):
-        super(RegistrationValidationViewTests, self).setUp()
+        super(RegistrationValidationViewTests, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         cache.clear()
 
     def get_validation_decision(self, data):
@@ -2256,11 +2256,11 @@ class RegistrationValidationViewTests(test_utils.ApiTestCase):
         )
 
     @ddt.data(
-        ['name', [name for name in testutils.VALID_NAMES]],
-        ['email', [email for email in testutils.VALID_EMAILS]],
-        ['password', [password for password in testutils.VALID_PASSWORDS]],
-        ['username', [username for username in testutils.VALID_USERNAMES]],
-        ['country', [country for country in testutils.VALID_COUNTRIES]]
+        ['name', [name for name in testutils.VALID_NAMES]],  # lint-amnesty, pylint: disable=unnecessary-comprehension
+        ['email', [email for email in testutils.VALID_EMAILS]],  # lint-amnesty, pylint: disable=unnecessary-comprehension
+        ['password', [password for password in testutils.VALID_PASSWORDS]],  # lint-amnesty, pylint: disable=unnecessary-comprehension
+        ['username', [username for username in testutils.VALID_USERNAMES]],  # lint-amnesty, pylint: disable=unnecessary-comprehension
+        ['country', [country for country in testutils.VALID_COUNTRIES]]  # lint-amnesty, pylint: disable=unnecessary-comprehension
     )
     @ddt.unpack
     def test_positive_validation_decision(self, form_field_name, user_data):
@@ -2274,11 +2274,11 @@ class RegistrationValidationViewTests(test_utils.ApiTestCase):
 
     @ddt.data(
         # Skip None type for invalidity checks.
-        ['name', [name for name in testutils.INVALID_NAMES[1:]]],
-        ['email', [email for email in testutils.INVALID_EMAILS[1:]]],
-        ['password', [password for password in testutils.INVALID_PASSWORDS[1:]]],
-        ['username', [username for username in testutils.INVALID_USERNAMES[1:]]],
-        ['country', [country for country in testutils.INVALID_COUNTRIES[1:]]]
+        ['name', [name for name in testutils.INVALID_NAMES[1:]]],  # lint-amnesty, pylint: disable=unnecessary-comprehension
+        ['email', [email for email in testutils.INVALID_EMAILS[1:]]],  # lint-amnesty, pylint: disable=unnecessary-comprehension
+        ['password', [password for password in testutils.INVALID_PASSWORDS[1:]]],  # lint-amnesty, pylint: disable=unnecessary-comprehension
+        ['username', [username for username in testutils.INVALID_USERNAMES[1:]]],  # lint-amnesty, pylint: disable=unnecessary-comprehension
+        ['country', [country for country in testutils.INVALID_COUNTRIES[1:]]]  # lint-amnesty, pylint: disable=unnecessary-comprehension
     )
     @ddt.unpack
     def test_negative_validation_decision(self, form_field_name, user_data):

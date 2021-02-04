@@ -25,7 +25,7 @@ class TestThemingViews(TestCase):
         """
         Initialize middleware and related objects
         """
-        super(TestThemingViews, self).setUp()
+        super(TestThemingViews, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
 
         self.site_theme_middleware = CurrentSiteThemeMiddleware()
         self.user = UserFactory.create()

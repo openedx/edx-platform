@@ -20,7 +20,7 @@ class TestRedirectUtils(TestCase):
     """Test redirect utility methods."""
 
     def setUp(self):
-        super(TestRedirectUtils, self).setUp()
+        super(TestRedirectUtils, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.request = RequestFactory()
 
     RedirectCase = namedtuple('RedirectCase', ['url', 'host', 'req_is_secure', 'expected_is_safe'])

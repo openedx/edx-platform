@@ -11,7 +11,7 @@ import unicodedata
 import ddt
 import six
 from django.conf import settings
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.core import mail
 from django.core.cache import cache
 from django.http import HttpResponse
@@ -55,7 +55,7 @@ class LoginTest(SiteMixin, CacheIsolationTestCase):
 
     def setUp(self):
         """Setup a test user along with its registration and profile"""
-        super(LoginTest, self).setUp()
+        super(LoginTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.user = self._create_user(self.username, self.user_email)
 
         RegistrationFactory(user=self.user)
@@ -817,7 +817,7 @@ class LoginSessionViewTest(ApiTestCase):
     PASSWORD = "password"
 
     def setUp(self):
-        super(LoginSessionViewTest, self).setUp()
+        super(LoginSessionViewTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.url = reverse("user_api_login_session")
 
     @ddt.data("get", "post")

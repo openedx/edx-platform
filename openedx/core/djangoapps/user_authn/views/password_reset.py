@@ -7,7 +7,7 @@ from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.forms import PasswordResetForm, SetPasswordForm
 from django.contrib.auth.hashers import UNUSABLE_PASSWORD_PREFIX
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.contrib.auth.tokens import default_token_generator
 from django.contrib.auth.views import INTERNAL_RESET_SESSION_TOKEN, PasswordResetConfirmView
 from django.core.exceptions import ObjectDoesNotExist
@@ -235,7 +235,7 @@ class PasswordResetView(APIView):
 
     @method_decorator(ensure_csrf_cookie)
     def get(self, request):
-        return HttpResponse(get_password_reset_form().to_json(), content_type="application/json")
+        return HttpResponse(get_password_reset_form().to_json(), content_type="application/json")  # lint-amnesty, pylint: disable=http-response-with-content-type-json
 
 
 @helpers.intercept_errors(errors.UserAPIInternalError, ignore_errors=[errors.UserAPIRequestError])
@@ -359,7 +359,7 @@ class PasswordResetConfirmWrapper(PasswordResetConfirmView):
         self.uidb64 = ''
         self.uid_int = -1
 
-    def _process_password_reset_success(self, request, token, uidb64, extra_context):
+    def _process_password_reset_success(self, request, token, uidb64, extra_context):  # lint-amnesty, pylint: disable=missing-function-docstring
         self.user = self.get_user(uidb64)
         form = SetPasswordForm(self.user, request.POST)
         if self.token_generator.check_token(self.user, token) and form.is_valid():
@@ -382,7 +382,7 @@ class PasswordResetConfirmWrapper(PasswordResetConfirmView):
     def _get_platform_name():
         return {"platform_name": configuration_helpers.get_value('platform_name', settings.PLATFORM_NAME)}
 
-    def _set_user(self, request):
+    def _set_user(self, request):  # lint-amnesty, pylint: disable=missing-function-docstring
         try:
             self.uid_int = base36_to_int(self.uidb36)
             if request.user.is_authenticated and request.user.id != self.uid_int:
@@ -391,7 +391,7 @@ class PasswordResetConfirmWrapper(PasswordResetConfirmView):
         except (ValueError, User.DoesNotExist):
             # if there's any error getting a user, just let django's
             # password_reset_confirm function handle it.
-            return super(PasswordResetConfirmWrapper, self).dispatch(request, uidb64=self.uidb64, token=self.token,
+            return super(PasswordResetConfirmWrapper, self).dispatch(request, uidb64=self.uidb64, token=self.token,  # lint-amnesty, pylint: disable=super-with-arguments
                                                                      extra_context=self.platform_name)
 
     def _handle_retired_user(self, request):
@@ -410,7 +410,7 @@ class PasswordResetConfirmWrapper(PasswordResetConfirmView):
             request, 'registration/password_reset_confirm.html', context
         )
 
-    def _validate_password(self, password, request):
+    def _validate_password(self, password, request):  # lint-amnesty, pylint: disable=missing-function-docstring
         try:
             validate_password(password, user=self.user)
         except ValidationError as err:
@@ -425,7 +425,7 @@ class PasswordResetConfirmWrapper(PasswordResetConfirmView):
                 request, 'registration/password_reset_confirm.html', context
             )
 
-    def _handle_password_reset_failure(self, response):
+    def _handle_password_reset_failure(self, response):  # lint-amnesty, pylint: disable=missing-function-docstring
         form_valid = response.context_data['form'].is_valid() if response.context_data['form'] else False
         if not form_valid:
             log.warning(
@@ -436,7 +436,7 @@ class PasswordResetConfirmWrapper(PasswordResetConfirmView):
             response.context_data['err_msg'] = _('Error in resetting your password. Please try again.')
             return response
 
-    def _handle_primary_email_update(self, updated_user):
+    def _handle_primary_email_update(self, updated_user):  # lint-amnesty, pylint: disable=missing-function-docstring
         try:
             updated_user.email = updated_user.account_recovery.secondary_email
             updated_user.account_recovery.delete()
@@ -531,7 +531,7 @@ class PasswordResetConfirmWrapper(PasswordResetConfirmView):
             self.token = self._get_token_from_session(self.request)
             return self.post(self.request, *args, **kwargs)
         else:
-            response = super(PasswordResetConfirmWrapper, self).dispatch(
+            response = super(PasswordResetConfirmWrapper, self).dispatch(  # lint-amnesty, pylint: disable=super-with-arguments
                 self.request,
                 uidb64=self.uidb64,
                 token=self.token,
@@ -642,7 +642,7 @@ def password_change_request_handler(request):
         return HttpResponseBadRequest(_("No email address provided."))
 
 
-class PasswordResetTokenValidation(APIView):
+class PasswordResetTokenValidation(APIView):  # lint-amnesty, pylint: disable=missing-class-docstring
 
     def post(self, request):
         """ HTTP end-point to validate password reset token. """
@@ -668,7 +668,7 @@ class PasswordResetTokenValidation(APIView):
         return Response({'is_valid': is_valid})
 
 
-class LogistrationPasswordResetView(APIView):
+class LogistrationPasswordResetView(APIView):  # lint-amnesty, pylint: disable=missing-class-docstring
 
     def post(self, request, **kwargs):
         """ Reset learner password using passed token and new credentials """
@@ -682,7 +682,7 @@ class LogistrationPasswordResetView(APIView):
             AUDIT_LOG.exception("Invalid password reset confirm token")
             return Response({'reset_status': reset_status})
 
-        request.data._mutable = True
+        request.data._mutable = True  # lint-amnesty, pylint: disable=protected-access
         request.data['new_password1'] = normalize_password(request.data['new_password1'])
         request.data['new_password2'] = normalize_password(request.data['new_password2'])
 

@@ -11,7 +11,7 @@ from datetime import datetime, timedelta
 import ddt
 from django.conf import settings
 from django.contrib.auth.hashers import UNUSABLE_PASSWORD_PREFIX, make_password
-from django.contrib.auth.models import AnonymousUser, User
+from django.contrib.auth.models import AnonymousUser, User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.contrib.auth.tokens import default_token_generator
 from django.contrib.auth.views import INTERNAL_RESET_SESSION_TOKEN, PasswordResetConfirmView
 from django.contrib.sessions.middleware import SessionMiddleware
@@ -69,7 +69,7 @@ class ResetPasswordTests(EventTestMixin, CacheIsolationTestCase):
     ENABLED_CACHES = ['default']
 
     def setUp(self):  # pylint: disable=arguments-differ
-        super(ResetPasswordTests, self).setUp('openedx.core.djangoapps.user_authn.views.password_reset.tracker')
+        super(ResetPasswordTests, self).setUp('openedx.core.djangoapps.user_authn.views.password_reset.tracker')  # lint-amnesty, pylint: disable=super-with-arguments
         self.user = UserFactory.create()
         self.user.is_active = False
         self.user.save()
@@ -241,7 +241,7 @@ class ResetPasswordTests(EventTestMixin, CacheIsolationTestCase):
 
         cache.clear()
 
-    def request_password_reset(self, status, new_ip=None):
+    def request_password_reset(self, status, new_ip=None):  # lint-amnesty, pylint: disable=missing-function-docstring
         extra_args = {}
         if new_ip:
             extra_args = {'REMOTE_ADDR': new_ip}
@@ -623,7 +623,7 @@ class PasswordResetViewTest(UserAPITestCase):
     """Tests of the user API's password reset endpoint. """
 
     def setUp(self):
-        super(PasswordResetViewTest, self).setUp()
+        super(PasswordResetViewTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.url = reverse("user_api_password_reset")
 
     @ddt.data("get", "post")
@@ -682,7 +682,7 @@ class PasswordResetTokenValidateViewTest(UserAPITestCase):
     """Tests of the user API's password reset endpoint. """
 
     def setUp(self):
-        super(PasswordResetTokenValidateViewTest, self).setUp()
+        super(PasswordResetTokenValidateViewTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.user = UserFactory.create()
         self.user.is_active = False
         self.user.save()
@@ -736,8 +736,8 @@ class ResetPasswordAPITests(EventTestMixin, CacheIsolationTestCase):
     request_factory = RequestFactory()
     ENABLED_CACHES = ['default']
 
-    def setUp(self):
-        super(ResetPasswordAPITests, self).setUp('openedx.core.djangoapps.user_authn.views.password_reset.tracker')
+    def setUp(self):  # lint-amnesty, pylint: disable=arguments-differ
+        super(ResetPasswordAPITests, self).setUp('openedx.core.djangoapps.user_authn.views.password_reset.tracker')  # lint-amnesty, pylint: disable=super-with-arguments
         self.user = UserFactory.create()
         self.user.save()
         self.token = default_token_generator.make_token(self.user)

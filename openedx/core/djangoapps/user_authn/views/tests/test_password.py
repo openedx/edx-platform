@@ -108,7 +108,7 @@ class TestPasswordChange(CreateAccountMixin, CacheIsolationTestCase):
     ENABLED_CACHES = ['default']
 
     def setUp(self):
-        super(TestPasswordChange, self).setUp()
+        super(TestPasswordChange, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
 
         self.create_account(self.USERNAME, self.OLD_PASSWORD, self.OLD_EMAIL)
         result = self.client.login(username=self.USERNAME, password=self.OLD_PASSWORD)

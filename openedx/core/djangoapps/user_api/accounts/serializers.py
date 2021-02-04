@@ -8,7 +8,7 @@ import logging
 import re
 
 from django.conf import settings
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.core.exceptions import ObjectDoesNotExist
 from django.urls import reverse
 from rest_framework import serializers
@@ -39,7 +39,7 @@ PROFILE_IMAGE_KEY_PREFIX = 'image_url'
 LOGGER = logging.getLogger(__name__)
 
 
-class PhoneNumberSerializer(serializers.BaseSerializer):
+class PhoneNumberSerializer(serializers.BaseSerializer):  # lint-amnesty, pylint: disable=abstract-method
     """
     Class to serialize phone number into a digit only representation
     """
@@ -90,7 +90,7 @@ class SocialLinkSerializer(serializers.ModelSerializer):
         return platform
 
 
-class UserReadOnlySerializer(serializers.Serializer):
+class UserReadOnlySerializer(serializers.Serializer):  # lint-amnesty, pylint: disable=abstract-method
     """
     Class that serializes the User model and UserProfile model together.
     """
@@ -103,9 +103,9 @@ class UserReadOnlySerializer(serializers.Serializer):
         # Don't pass the 'custom_fields' arg up to the superclass
         self.custom_fields = kwargs.pop('custom_fields', [])
 
-        super(UserReadOnlySerializer, self).__init__(*args, **kwargs)
+        super(UserReadOnlySerializer, self).__init__(*args, **kwargs)  # lint-amnesty, pylint: disable=super-with-arguments
 
-    def to_representation(self, user):
+    def to_representation(self, user):  # lint-amnesty, pylint: disable=arguments-differ
         """
         Overwrite to_native to handle custom logic since we are serializing three models as one here
         :param user: User object
@@ -285,7 +285,7 @@ class AccountLegacyProfileSerializer(serializers.HyperlinkedModelSerializer, Rea
         """
         Enforce all languages are unique.
         """
-        language_proficiencies = [language for language in value]
+        language_proficiencies = [language for language in value]  # lint-amnesty, pylint: disable=unnecessary-comprehension
         unique_language_proficiencies = set(language["code"] for language in language_proficiencies)
         if len(language_proficiencies) != len(unique_language_proficiencies):
             raise serializers.ValidationError("The language_proficiencies field must consist of unique languages.")
@@ -295,7 +295,7 @@ class AccountLegacyProfileSerializer(serializers.HyperlinkedModelSerializer, Rea
         """
         Enforce only one entry for a particular social platform.
         """
-        social_links = [social_link for social_link in value]
+        social_links = [social_link for social_link in value]  # lint-amnesty, pylint: disable=unnecessary-comprehension
         unique_social_links = set(social_link["platform"] for social_link in social_links)
         if len(social_links) != len(unique_social_links):
             raise serializers.ValidationError("The social_links field must consist of unique social platforms.")
@@ -437,7 +437,7 @@ class AccountLegacyProfileSerializer(serializers.HyperlinkedModelSerializer, Rea
             ])
 
         # Update the user's social links
-        requested_social_links = self._kwargs['data'].get('social_links')
+        requested_social_links = self._kwargs['data'].get('social_links')  # lint-amnesty, pylint: disable=no-member
         if requested_social_links:
             self._update_social_links(instance, requested_social_links)
 

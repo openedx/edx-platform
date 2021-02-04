@@ -10,7 +10,7 @@ from django.test import TestCase
 from django.test.utils import override_settings
 from django.urls import reverse
 
-from lms.djangoapps.verify_student.models import ManualVerification, SoftwareSecurePhotoVerification, SSOVerification
+from lms.djangoapps.verify_student.models import ManualVerification, SoftwareSecurePhotoVerification, SSOVerification  # lint-amnesty, pylint: disable=unused-import
 from lms.djangoapps.verify_student.tests.factories import SSOVerificationFactory
 from common.djangoapps.student.tests.factories import UserFactory
 
@@ -137,12 +137,12 @@ class VerificationsDetailsViewTests(VerificationStatusViewTestsMixin, TestCase):
         }]
 
     def test_multiple_verification_types(self):
-        self.manual_verification = ManualVerification.objects.create(
+        self.manual_verification = ManualVerification.objects.create(  # lint-amnesty, pylint: disable=attribute-defined-outside-init
             user=self.user,
             status='approved',
             reason='testing'
         )
-        self.sso_verification = SSOVerificationFactory(user=self.user, status='approved')
+        self.sso_verification = SSOVerificationFactory(user=self.user, status='approved')  # lint-amnesty, pylint: disable=attribute-defined-outside-init
         self.photo_verification.error_msg = 'tested_error'
         self.photo_verification.error_code = 'error_code'
         self.photo_verification.status = 'denied'
@@ -180,7 +180,7 @@ class VerificationsDetailsViewTests(VerificationStatusViewTestsMixin, TestCase):
         self.assertEqual(json.loads(response.content.decode('utf-8')), expected)
 
     def test_multiple_verification_instances(self):
-        self.sso_verification = SSOVerificationFactory(user=self.user, status='approved')
+        self.sso_verification = SSOVerificationFactory(user=self.user, status='approved')  # lint-amnesty, pylint: disable=attribute-defined-outside-init
         second_ss_photo_verification = SoftwareSecurePhotoVerification.objects.create(
             user=self.user,
             status='denied',

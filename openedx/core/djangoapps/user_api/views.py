@@ -1,12 +1,12 @@
 """HTTP end-points for the User API. """
 
 
-from django.contrib.auth.models import User
-from django.core.exceptions import NON_FIELD_ERRORS, PermissionDenied, ValidationError
-from django.db import transaction
-from django.http import HttpResponse, HttpResponseForbidden
+from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
+from django.core.exceptions import NON_FIELD_ERRORS, PermissionDenied, ValidationError  # lint-amnesty, pylint: disable=unused-import
+from django.db import transaction  # lint-amnesty, pylint: disable=unused-import
+from django.http import HttpResponse, HttpResponseForbidden  # lint-amnesty, pylint: disable=unused-import
 from django.utils.decorators import method_decorator
-from django.utils.translation import ugettext as _
+from django.utils.translation import ugettext as _  # lint-amnesty, pylint: disable=unused-import
 from django.views.decorators.csrf import ensure_csrf_cookie
 from django_filters.rest_framework import DjangoFilterBackend
 from edx_rest_framework_extensions.auth.session.authentication import SessionAuthenticationAllowInactiveUser
@@ -17,10 +17,10 @@ from rest_framework import authentication, generics, status, viewsets
 from rest_framework.exceptions import ParseError
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.views import APIView
-from six import text_type
+from six import text_type  # lint-amnesty, pylint: disable=unused-import
 
 from openedx.core.djangoapps.django_comment_common.models import Role
-from openedx.core.djangoapps.user_api import accounts
+from openedx.core.djangoapps.user_api import accounts  # lint-amnesty, pylint: disable=unused-import
 from openedx.core.lib.api.view_utils import require_post_params
 from openedx.core.djangoapps.user_api.models import UserPreference
 from openedx.core.djangoapps.user_api.preferences.api import get_country_time_zones, update_email_opt_in
@@ -30,8 +30,8 @@ from openedx.core.djangoapps.user_api.serializers import (
     UserSerializer
 )
 from openedx.core.lib.api.permissions import ApiKeyHeaderPermission
-from common.djangoapps.student.helpers import AccountValidationError
-from common.djangoapps.util.json_request import JsonResponse
+from common.djangoapps.student.helpers import AccountValidationError  # lint-amnesty, pylint: disable=unused-import
+from common.djangoapps.util.json_request import JsonResponse  # lint-amnesty, pylint: disable=unused-import
 
 
 class UserViewSet(viewsets.ReadOnlyModelViewSet):

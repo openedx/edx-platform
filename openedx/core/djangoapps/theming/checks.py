@@ -11,7 +11,7 @@ from django.core.checks import Error, Tags, register
 
 
 @register(Tags.compatibility)
-def check_comprehensive_theme_settings(app_configs, **kwargs):
+def check_comprehensive_theme_settings(app_configs, **kwargs):  # lint-amnesty, pylint: disable=unused-argument
     """
     Checks the comprehensive theming theme directory settings.
 
@@ -24,7 +24,7 @@ def check_comprehensive_theme_settings(app_configs, **kwargs):
     Returns:
         List of any Errors.
     """
-    if not getattr(settings, "ENABLE_COMPREHENSIVE_THEMING"):
+    if not getattr(settings, "ENABLE_COMPREHENSIVE_THEMING"):  # lint-amnesty, pylint: disable=literal-used-as-attribute
         # Only perform checks when comprehensive theming is enabled.
         return []
 

@@ -76,7 +76,7 @@ class LogoutView(TemplateView):
 
         logout(request)
 
-        response = super(LogoutView, self).dispatch(request, *args, **kwargs)
+        response = super(LogoutView, self).dispatch(request, *args, **kwargs)  # lint-amnesty, pylint: disable=super-with-arguments
 
         # Clear the cookie used by the edx.org marketing site
         delete_logged_in_cookies(response)
@@ -123,7 +123,7 @@ class LogoutView(TemplateView):
         return False
 
     def get_context_data(self, **kwargs):
-        context = super(LogoutView, self).get_context_data(**kwargs)
+        context = super(LogoutView, self).get_context_data(**kwargs)  # lint-amnesty, pylint: disable=super-with-arguments
 
         # Create a list of URIs that must be called to log the user out of all of the IDAs.
         uris = []

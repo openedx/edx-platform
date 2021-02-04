@@ -6,7 +6,7 @@ import json
 import ddt
 import six
 from django.conf import settings
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.test import TestCase
 from django.test.client import Client
 from mock import Mock, patch
@@ -48,7 +48,7 @@ class AutoAuthEnabledTestCase(AutoAuthTestCase):
         # value affects the contents of urls.py,
         # so we need to call super.setUp() which reloads urls.py (because
         # of the UrlResetMixin)
-        super(AutoAuthEnabledTestCase, self).setUp()
+        super(AutoAuthEnabledTestCase, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.url = '/auto_auth'
         self.client = Client()
 
@@ -309,7 +309,7 @@ class AutoAuthDisabledTestCase(AutoAuthTestCase):
         # value affects the contents of urls.py,
         # so we need to call super.setUp() which reloads urls.py (because
         # of the UrlResetMixin)
-        super(AutoAuthDisabledTestCase, self).setUp()
+        super(AutoAuthDisabledTestCase, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.url = '/auto_auth'
         self.client = Client()
 
@@ -333,7 +333,7 @@ class AutoAuthRestrictedTestCase(AutoAuthTestCase):
         # value affects the contents of urls.py,
         # so we need to call super.setUp() which reloads urls.py (because
         # of the UrlResetMixin)
-        super(AutoAuthRestrictedTestCase, self).setUp()
+        super(AutoAuthRestrictedTestCase, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.url = '/auto_auth'
         self.client = Client()
 
