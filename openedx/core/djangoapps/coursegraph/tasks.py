@@ -7,7 +7,7 @@ neo4j, a graph database.
 import logging
 
 from celery import task
-from django.conf import settings
+from django.conf import settings  # lint-amnesty, pylint: disable=unused-import
 from django.utils import six, timezone
 from edx_django_utils.cache import RequestCache
 from edx_django_utils.monitoring import set_code_owner_attribute

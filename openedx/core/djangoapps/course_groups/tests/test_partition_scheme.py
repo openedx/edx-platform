@@ -35,7 +35,7 @@ class TestCohortPartitionScheme(ModuleStoreTestCase):
         Regenerate a course with cohort configuration, partition and groups,
         and a student for each test.
         """
-        super(TestCohortPartitionScheme, self).setUp()
+        super(TestCohortPartitionScheme, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
 
         self.course_key = ToyCourseFactory.create().id
         self.course = modulestore().get_course(self.course_key)
@@ -280,7 +280,7 @@ class TestGetCohortedUserPartition(ModuleStoreTestCase):
         Regenerate a course with cohort configuration, partition and groups,
         and a student for each test.
         """
-        super(TestGetCohortedUserPartition, self).setUp()
+        super(TestGetCohortedUserPartition, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.course_key = ToyCourseFactory.create().id
         self.course = modulestore().get_course(self.course_key)
         self.student = UserFactory.create()
@@ -331,7 +331,7 @@ class TestMasqueradedGroup(StaffMasqueradeTestCase):
     Check for staff being able to masquerade as belonging to a group.
     """
     def setUp(self):
-        super(TestMasqueradedGroup, self).setUp()
+        super(TestMasqueradedGroup, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.user_partition = UserPartition(
             0, 'Test User Partition', '',
             [Group(0, 'Group 1'), Group(1, 'Group 2')],

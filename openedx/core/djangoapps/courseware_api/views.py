@@ -145,7 +145,7 @@ class CoursewareMeta:
         return course.license
 
     @property
-    def can_load_courseware(self):
+    def can_load_courseware(self):  # lint-amnesty, pylint: disable=missing-function-docstring
         access_response = check_course_access(
             self.overview,
             self.effective_user,
@@ -470,14 +470,14 @@ class SequenceMetadata(DeveloperErrorViewMixin, APIView):
         SessionAuthenticationAllowInactiveUser,
     )
 
-    def get(self, request, usage_key_string, *args, **kwargs):
+    def get(self, request, usage_key_string, *args, **kwargs):  # lint-amnesty, pylint: disable=unused-argument
         """
         Return response to a GET request.
         """
         try:
             usage_key = UsageKey.from_string(usage_key_string)
         except InvalidKeyError:
-            raise NotFound("Invalid usage key: '{}'.".format(usage_key_string))
+            raise NotFound("Invalid usage key: '{}'.".format(usage_key_string))  # lint-amnesty, pylint: disable=raise-missing-from
 
         sequence, _ = get_module_by_usage_id(
             self.request,
@@ -527,7 +527,7 @@ class Resume(DeveloperErrorViewMixin, APIView):
     )
     permission_classes = (IsAuthenticated, )
 
-    def get(self, request, course_key_string, *args, **kwargs):
+    def get(self, request, course_key_string, *args, **kwargs):  # lint-amnesty, pylint: disable=unused-argument
         """
         Return response to a GET request.
         """
@@ -581,7 +581,7 @@ class Celebration(DeveloperErrorViewMixin, APIView):
     permission_classes = (IsAuthenticated, )
     http_method_names = ['post']
 
-    def post(self, request, course_key_string, *args, **kwargs):
+    def post(self, request, course_key_string, *args, **kwargs):  # lint-amnesty, pylint: disable=unused-argument
         """
         Handle a POST request.
         """
