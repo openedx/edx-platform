@@ -39,17 +39,14 @@ class AccessTokenExchangeFormTest(AccessTokenExchangeTestMixin):
 
     def _assert_error(self, data, expected_error, expected_error_description):  # lint-amnesty, pylint: disable=arguments-differ
         form = AccessTokenExchangeForm(request=self.request, oauth2_adapter=self.oauth2_adapter, data=data)
-        self.assertEqual(
-            form.errors,
-            {"error": expected_error, "error_description": expected_error_description}
-        )
+        assert form.errors == {'error': expected_error, 'error_description': expected_error_description}
 
     def _assert_success(self, data, expected_scopes):
         form = AccessTokenExchangeForm(request=self.request, oauth2_adapter=self.oauth2_adapter, data=data)
-        self.assertTrue(form.is_valid())
-        self.assertEqual(form.cleaned_data["user"], self.user)
-        self.assertEqual(form.cleaned_data["client"], self.oauth_client)
-        self.assertEqual(set(form.cleaned_data["scope"]), set(expected_scopes))
+        assert form.is_valid()
+        assert form.cleaned_data['user'] == self.user
+        assert form.cleaned_data['client'] == self.oauth_client
+        assert set(form.cleaned_data['scope']) == set(expected_scopes)
 
 
 # This is necessary because cms does not implement third party auth
