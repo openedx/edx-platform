@@ -81,7 +81,7 @@ class TestMoveToVerified(SharedModuleStoreTestCase):
         cls.course = CourseFactory.create()
 
     def setUp(self):
-        super(TestMoveToVerified, self).setUp()
+        super(TestMoveToVerified, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.user = UserFactory()
         # Spy on number of calls to celery task.
         celery_task_patcher = mock.patch.object(

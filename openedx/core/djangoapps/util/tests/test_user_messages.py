@@ -22,7 +22,7 @@ class UserMessagesTestCase(TestCase):
     Unit tests for page level user messages.
     """
     def setUp(self):
-        super(UserMessagesTestCase, self).setUp()
+        super(UserMessagesTestCase, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.student = UserFactory.create()
         self.request = RequestFactory().request()
         self.request.session = {}

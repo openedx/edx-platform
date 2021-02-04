@@ -3,9 +3,9 @@ Tests for the models that configures HLS Playback feature.
 """
 
 import ddt
-import itertools
+import itertools  # lint-amnesty, pylint: disable=wrong-import-order
 
-from contextlib import contextmanager
+from contextlib import contextmanager  # lint-amnesty, pylint: disable=wrong-import-order
 
 from django.test import TestCase
 

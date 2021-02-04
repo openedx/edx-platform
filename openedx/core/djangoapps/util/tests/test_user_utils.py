@@ -12,7 +12,7 @@ from ..user_utils import SystemUser
 class SystemUserTestCase(unittest.TestCase):
     """ Tests for response-related utility functions """
     def setUp(self):
-        super(SystemUserTestCase, self).setUp()
+        super(SystemUserTestCase, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.sysuser = SystemUser()
 
     def test_system_user_is_anonymous(self):
