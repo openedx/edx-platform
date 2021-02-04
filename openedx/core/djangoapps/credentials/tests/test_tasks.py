@@ -27,7 +27,7 @@ class TestSendGradeToCredentialTask(TestCase):
     Tests for the 'send_grade_to_credentials' method.
     """
     def setUp(self):
-        super(TestSendGradeToCredentialTask, self).setUp()
+        super(TestSendGradeToCredentialTask, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.user = UserFactory.create(username=settings.CREDENTIALS_SERVICE_USERNAME)
 
     def test_happy_path(self, mock_get_api_client):

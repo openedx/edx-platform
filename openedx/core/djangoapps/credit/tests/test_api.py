@@ -11,7 +11,7 @@ import httpretty
 import mock
 import pytz
 import six
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.core import mail
 from django.db import connection
 from django.test.utils import override_settings
@@ -160,7 +160,7 @@ class CreditApiTestBase(ModuleStoreTestCase):
     }
 
     def setUp(self):
-        super(CreditApiTestBase, self).setUp()
+        super(CreditApiTestBase, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.course = CourseFactory.create(org="edx", course="DemoX", run="Demo_Course")
         self.course_key = self.course.id
 
@@ -894,7 +894,7 @@ class CreditProviderIntegrationApiTests(CreditApiTestBase):
     FINAL_GRADE = 0.95
 
     def setUp(self):
-        super(CreditProviderIntegrationApiTests, self).setUp()
+        super(CreditProviderIntegrationApiTests, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.user = UserFactory(
             username=self.USER_INFO['username'],
             email=self.USER_INFO['email'],
@@ -983,7 +983,7 @@ class CreditProviderIntegrationApiTests(CreditApiTestBase):
         self.assertEqual(parameters['final_grade'], six.text_type(self.FINAL_GRADE))
 
         # Validate user information
-        for key in self.USER_INFO.keys():
+        for key in self.USER_INFO.keys():  # lint-amnesty, pylint: disable=consider-iterating-dictionary
             param_key = 'user_{key}'.format(key=key)
             self.assertIn(param_key, parameters)
             expected = '' if key == 'mailing_address' else self.USER_INFO[key]
@@ -1213,7 +1213,7 @@ class CourseApiTests(CreditApiTestBase):
     """Test Python API for course product information."""
 
     def setUp(self):
-        super(CourseApiTests, self).setUp()
+        super(CourseApiTests, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.worker_user = User.objects.create_user(username=TEST_ECOMMERCE_WORKER)
         self.add_credit_course(self.course_key)
         self.credit_config = CreditConfig(cache_ttl=100, enabled=True)

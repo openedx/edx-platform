@@ -34,7 +34,7 @@ class DarkLangMiddlewareTests(CacheIsolationTestCase):
     Tests of DarkLangMiddleware
     """
     def setUp(self):
-        super(DarkLangMiddlewareTests, self).setUp()
+        super(DarkLangMiddlewareTests, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.user = UserFactory.build(username='test', email='test@edx.org', password='test_password')
         self.user.save()
         self.client = Client()
@@ -246,7 +246,7 @@ class DarkLangMiddlewareTests(CacheIsolationTestCase):
         """
         Sends a post request to set the preview language
         """
-        return self.client.post('/update_lang/', {'preview_language': preview_language, 'action': 'set_preview_language'})
+        return self.client.post('/update_lang/', {'preview_language': preview_language, 'action': 'set_preview_language'})  # lint-amnesty, pylint: disable=line-too-long
 
     def _post_clear_preview_lang(self):
         """

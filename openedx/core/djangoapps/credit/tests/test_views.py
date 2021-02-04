@@ -54,7 +54,7 @@ class UserMixin(object):
     list_path = None
 
     def setUp(self):
-        super(UserMixin, self).setUp()
+        super(UserMixin, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
 
         # This value must be set here, as setting it outside of a method results in issues with CMS/Studio tests.
         if self.list_path:
@@ -328,7 +328,7 @@ class CreditProviderRequestCreateViewTests(ApiTestCaseMixin, UserMixin, TestCase
         cls.provider = CreditProviderFactory()
 
     def setUp(self):
-        super(CreditProviderRequestCreateViewTests, self).setUp()
+        super(CreditProviderRequestCreateViewTests, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.path = reverse('credit:create_request', kwargs={'provider_id': self.provider.provider_id})
         self.eligibility = CreditEligibilityFactory(username=self.user.username)
 
@@ -495,7 +495,7 @@ class CreditProviderCallbackViewTests(UserMixin, TestCase):
     """ Tests for CreditProviderCallbackView. """
 
     def setUp(self):
-        super(CreditProviderCallbackViewTests, self).setUp()
+        super(CreditProviderCallbackViewTests, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
 
         # Authentication should NOT be required for this endpoint.
         self.client.logout()
@@ -653,7 +653,7 @@ class CreditEligibilityViewTests(AuthMixin, UserMixin, ReadOnlyMixin, TestCase):
     view_name = 'credit:eligibility_details'
 
     def setUp(self):
-        super(CreditEligibilityViewTests, self).setUp()
+        super(CreditEligibilityViewTests, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.eligibility = CreditEligibilityFactory(username=self.user.username)
         self.path = self.create_url(self.eligibility)
 

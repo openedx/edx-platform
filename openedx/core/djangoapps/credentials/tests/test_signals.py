@@ -35,7 +35,7 @@ class TestCredentialsSignalsSendGrade(TestCase):
     """ Tests for send_grade_if_interesting, the main utility function that sends a grade """
 
     def setUp(self):
-        super(TestCredentialsSignalsSendGrade, self).setUp()
+        super(TestCredentialsSignalsSendGrade, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.user = UserFactory()
         self.key = CourseKey.from_string(CourseRunFactory()['key'])
 
@@ -142,7 +142,7 @@ class TestCredentialsSignalsUtils(TestCase):
     """ Tests helper utility functions in our signal handling. """
 
     def setUp(self):
-        super(TestCredentialsSignalsUtils, self).setUp()
+        super(TestCredentialsSignalsUtils, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.site = SiteFactory()
         self.course_run = CourseRunFactory()
         course = CourseFactory(course_runs=[self.course_run])

@@ -67,7 +67,7 @@ class CreditProviderCallbackSerializer(serializers.Serializer):  # pylint:disabl
 
     def __init__(self, **kwargs):
         self.provider = kwargs.pop('provider', None)
-        super(CreditProviderCallbackSerializer, self).__init__(**kwargs)
+        super(CreditProviderCallbackSerializer, self).__init__(**kwargs)  # lint-amnesty, pylint: disable=super-with-arguments
 
     def validate_timestamp(self, value):
         """ Ensure the request has been received in a timely manner. """

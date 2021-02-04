@@ -119,7 +119,7 @@ def check_keys_exist(shared_secret_key, provider_id):
     Raise CreditProviderNotConfigured if no key available.
     """
     # Accounts for old way of storing provider key
-    if shared_secret_key is None:
+    if shared_secret_key is None:  # lint-amnesty, pylint: disable=no-else-raise
         msg = u'Credit provider with ID "{provider_id}" does not have a secret key configured.'.format(
             provider_id=provider_id
         )
@@ -212,10 +212,10 @@ def create_credit_request(course_key, provider_id, username):
             u'but the user is not eligible for credit',
             username, course_key
         )
-        raise UserIsNotEligible
+        raise UserIsNotEligible  # lint-amnesty, pylint: disable=raise-missing-from
     except CreditProvider.DoesNotExist:
         log.error(u'Credit provider with ID "%s" has not been configured.', provider_id)
-        raise CreditProviderNotConfigured
+        raise CreditProviderNotConfigured  # lint-amnesty, pylint: disable=raise-missing-from
 
     # Check if we've enabled automatic integration with the credit
     # provider.  If not, we'll show the user a link to a URL
@@ -286,7 +286,7 @@ def create_credit_request(course_key, provider_id, username):
         msg = u'Could not retrieve final grade from the credit eligibility table for ' \
               u'user [{user_id}] in course [{course_key}].'.format(user_id=user.id, course_key=course_key)
         log.exception(msg)
-        raise UserIsNotEligible(msg)
+        raise UserIsNotEligible(msg)  # lint-amnesty, pylint: disable=raise-missing-from
 
     # Getting the students's enrollment date
     course_enrollment = CourseEnrollment.get_enrollment(user, course_key)
@@ -382,7 +382,7 @@ def update_credit_request_status(request_uuid, provider_id, status):
             u'with this UUID is associated with the provider.'
         ).format(provider_id=provider_id, request_uuid=request_uuid)
         log.warning(msg)
-        raise CreditRequestNotFound(msg)
+        raise CreditRequestNotFound(msg)  # lint-amnesty, pylint: disable=raise-missing-from
 
 
 def get_credit_requests_for_user(username):

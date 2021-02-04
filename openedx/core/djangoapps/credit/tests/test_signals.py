@@ -39,7 +39,7 @@ class TestMinGradedRequirementStatus(ModuleStoreTestCase):
     }
 
     def setUp(self):
-        super(TestMinGradedRequirementStatus, self).setUp()
+        super(TestMinGradedRequirementStatus, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.course = CourseFactory.create(
             org='Robot', number='999', display_name='Test Course'
         )
