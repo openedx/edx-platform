@@ -363,6 +363,9 @@ class ItemFactory(XModuleFactory):
         location = kwargs.pop('location')
         user_id = kwargs.pop('user_id', ModuleStoreEnum.UserID.test)
         publish_item = kwargs.pop('publish_item', True)
+        has_score = kwargs.pop('has_score', None)
+        submission_start = kwargs.pop('submission_start', None)
+        submission_end = kwargs.pop('submission_end', None)
 
         # Remove the descriptive_tag, it's just for generating display_name,
         # and doesn't need to be passed into the object constructor
@@ -404,6 +407,13 @@ class ItemFactory(XModuleFactory):
                 runtime=parent.runtime,
                 fields=kwargs,
             )
+
+            if has_score:
+                module.has_score = has_score
+            if submission_start:
+                module.submission_start = submission_start
+            if submission_end:
+                module.submission_end = submission_end
 
             # VS[compat] cdodge: This is a hack because static_tabs also have references from the course module, so
             # if we add one then we need to also add it to the policy information (i.e. metadata)

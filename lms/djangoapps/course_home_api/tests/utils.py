@@ -23,6 +23,8 @@ class BaseCourseHomeTests(ModuleStoreTestCase, MasqueradeMixin):
 
     Creates a course to
     """
+    MODULESTORE = TEST_DATA_SPLIT_MODULESTORE
+
     def setUp(self):
         super().setUp()
 
