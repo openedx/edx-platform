@@ -2,8 +2,7 @@ import beeline
 import logging
 
 from django.conf import settings
-from django.core.cache import cache, caches
-from django.contrib.redirects.models import Redirect
+from django.core.cache import caches
 from django.shortcuts import redirect
 
 from openedx.core.djangoapps.appsembler.sites.models import AlternativeDomain
