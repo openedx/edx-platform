@@ -1,4 +1,5 @@
-import csv  # lint-amnesty, pylint: disable=missing-module-docstring
+# lint-amnesty, pylint: disable=missing-module-docstring
+import csv
 from logging import getLogger
 
 from django import forms

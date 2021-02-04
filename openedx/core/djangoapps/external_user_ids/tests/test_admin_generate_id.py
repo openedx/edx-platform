@@ -1,6 +1,6 @@
-# """  # lint-amnesty, pylint: disable=missing-module-docstring
-# Test the logic behind the Generate External IDs tools in Admin
-# """
+"""
+Test the logic behind the Generate External IDs tools in Admin
+"""
 import mock
 from django.contrib.admin.sites import AdminSite
 from django.test import TestCase
