@@ -97,7 +97,7 @@ def get_configuration_dict(name, default=None):
     return output
 
 
-def get_value(val_name, default=None, **kwargs):
+def get_value(val_name, default=None, **kwargs):  # lint-amnesty, pylint: disable=unused-argument
     """
     Return configuration value for the key specified as name argument.
 

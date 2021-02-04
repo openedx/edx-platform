@@ -23,7 +23,7 @@ class SessionCookieDomainTests(TestCase):
     """
 
     def setUp(self):
-        super(SessionCookieDomainTests, self).setUp()
+        super(SessionCookieDomainTests, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         # Create a test client, and log it in so that it will save some session
         # data.
         self.user = UserFactory.create()
@@ -62,7 +62,7 @@ class SessionCookieDomainSiteConfigurationOverrideTests(TestCase):
     """
 
     def setUp(self):
-        super(SessionCookieDomainSiteConfigurationOverrideTests, self).setUp()
+        super(SessionCookieDomainSiteConfigurationOverrideTests, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         # Create a test client, and log it in so that it will save some session data.
         self.user = UserFactory.create()
         self.user.set_password('password')
