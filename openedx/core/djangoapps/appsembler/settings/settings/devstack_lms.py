@@ -35,4 +35,5 @@ def plugin_settings(settings):
 
     # This is used in the appsembler_sites.middleware.RedirectMiddleware to exclude certain paths
     # from the redirect mechanics.
-    settings.MAIN_SITE_REDIRECT_WHITELIST += ['/media/']
+    if settings.APPSEMBLER_FEATURES.get("TAHOE_ENABLE_DOMAIN_REDIRECT_MIDDLEWARE", True):
+        settings.MAIN_SITE_REDIRECT_WHITELIST += ['/media/']

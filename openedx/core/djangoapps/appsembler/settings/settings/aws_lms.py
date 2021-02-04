@@ -6,6 +6,9 @@ from os import path
 from openedx.core.djangoapps.appsembler.settings.settings import aws_common
 
 
+EDX_SITE_REDIRECT_MIDDLEWARE = "django_sites_extensions.middleware.RedirectMiddleware"
+
+
 def _add_theme_static_dirs(settings):
     """
     Appsembler Themes static files customizations.
@@ -49,6 +52,25 @@ def plugin_settings(settings):
     )
 
     aws_common.plugin_settings(settings)
+
+    if settings.APPSEMBLER_FEATURES.get("TAHOE_ENABLE_DOMAIN_REDIRECT_MIDDLEWARE", True):
+        redir_middleware = settings.MIDDLEWARE_CLASSES.index(EDX_SITE_REDIRECT_MIDDLEWARE)
+        for tahoe_redir_middleware in (
+            'openedx.core.djangoapps.appsembler.sites.middleware.CustomDomainsRedirectMiddleware',
+            'openedx.core.djangoapps.appsembler.sites.middleware.RedirectMiddleware'
+        ):
+            settings.MIDDLEWARE_CLASSES.insert(redir_middleware, tahoe_redir_middleware)
+        # This is used in the appsembler_sites.middleware.RedirectMiddleware to exclude certain paths
+        # from the redirect mechanics.
+        settings.MAIN_SITE_REDIRECT_WHITELIST = [
+            'api',
+            'admin',
+            'oauth',
+            'status',
+            '/heartbeat',
+            '/accounts/manage_user_standing',
+            '/accounts/disable_account_ajax',
+        ]
 
     settings.LMS_BASE = settings.ENV_TOKENS.get('LMS_BASE')
 
@@ -98,18 +120,6 @@ def plugin_settings(settings):
 
     if settings.SENTRY_DSN:
         settings.RAVEN_CONFIG['tags']['app'] = 'lms'
-
-    # This is used in the appsembler_sites.middleware.RedirectMiddleware to exclude certain paths
-    # from the redirect mechanics.
-    settings.MAIN_SITE_REDIRECT_WHITELIST = [
-        'api',
-        'admin',
-        'oauth',
-        'status',
-        '/heartbeat',
-        '/accounts/manage_user_standing',
-        '/accounts/disable_account_ajax',
-    ]
 
     settings.USE_S3_FOR_CUSTOMER_THEMES = True
 

@@ -40,8 +40,7 @@ class CustomDomainsRedirectMiddleware(object):
 
 class RedirectMiddleware(object):
     """
-    Redirects requests for URLs persisted using the django.contrib.redirects.models.Redirect model.
-    With the exception of the main site.
+    Redirects requests for main site to Tahoe marketing page, except whitelisted.
     """
     def process_request(self, request):
         """
@@ -61,17 +60,6 @@ class RedirectMiddleware(object):
             # Soooo just in case
             beeline.add_trace_field("redirect_middleware_exception", True)
             pass
-        cache_key = '{prefix}-{site}'.format(prefix=settings.REDIRECT_CACHE_KEY_PREFIX, site=site.domain)
-        redirects = cache.get(cache_key)
-        if redirects is None:
-            redirects = {
-                django_redirect.old_path: django_redirect.new_path
-                for django_redirect in Redirect.objects.filter(site=site)
-            }
-            cache.set(cache_key, redirects, settings.REDIRECT_CACHE_TIMEOUT)
-        redirect_to = redirects.get(request.path)
-        if redirect_to:
-            return redirect(redirect_to, permanent=True)
 
 
 class LmsCurrentOrganizationMiddleware(object):
