@@ -389,6 +389,7 @@ disable =
 	no-else-break,
 	no-else-continue,
 	useless-object-inheritance,
+	useless-suppression,
 
 [REPORTS]
 output-format = text
@@ -488,4 +489,4 @@ int-import-graph =
 [EXCEPTIONS]
 overgeneral-exceptions = Exception
 
-# cdc41a922453bf8501b43a049ba556325da43675
+# b51cbf66bb883f8da5c3cdb5ee2af8891ecbccc6
