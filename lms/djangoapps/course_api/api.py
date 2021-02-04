@@ -240,7 +240,7 @@ def get_due_dates(request, course_key, user):
             try:
                 block_display_name = store.get_item(block_key).display_name
             except ItemNotFoundError:
-                logger.exception('Failed to get block for due date item with key: {}'.format(block_key))
+                logger.exception('Failed to get block for due date item with key: {}'.format(block_key))  # lint-amnesty, pylint: disable=logging-format-interpolation
                 block_display_name = UNKNOWN_BLOCK_DISPLAY_NAME
 
             # get url to the block in the course

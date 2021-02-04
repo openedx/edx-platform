@@ -50,7 +50,7 @@ def generate_certificate(self, **kwargs):
         actual_verification_status = actual_verification_status['status']
         if expected_verification_status != actual_verification_status:
             logger.warning(
-                u'Expected verification status {expected} '
+                u'Expected verification status {expected} '  # lint-amnesty, pylint: disable=logging-format-interpolation
                 u'differs from actual verification status {actual} '
                 u'for user {user} in course {course}'.format(
                     expected=expected_verification_status,

@@ -93,7 +93,7 @@ def check_and_get_upgrade_link_and_date(user, enrollment=None, course=None):
 
     if enrollment:
         if course and enrollment.course_id != course.id:
-            logger.warning(u'{} refers to a different course than {} which was supplied. Enrollment course id={}, '
+            logger.warning(u'{} refers to a different course than {} which was supplied. Enrollment course id={}, '  # lint-amnesty, pylint: disable=logging-format-interpolation
                            u'repr={!r}, deprecated={}. Course id={}, repr={!r}, deprecated={}.'
                            .format(enrollment,
                                    course,
@@ -108,7 +108,7 @@ def check_and_get_upgrade_link_and_date(user, enrollment=None, course=None):
             return (None, None, None)
 
         if enrollment.user_id != user.id:
-            logger.warning(u'{} refers to a different user than {} which was supplied. '
+            logger.warning(u'{} refers to a different user than {} which was supplied. '  # lint-amnesty, pylint: disable=logging-format-interpolation
                            u'Enrollment user id={}, repr={!r}. '
                            u'User id={}, repr={!r}.'.format(enrollment,
                                                             user,
@@ -237,7 +237,7 @@ def is_enrolled_in_course_run(course_run, enrollment_course_ids):
         return course_run_key in enrollment_course_ids
     except InvalidKeyError:
         logger.warning(
-            u'Unable to determine if user was enrolled since the course key {} is invalid'.format(key)
+            u'Unable to determine if user was enrolled since the course key {} is invalid'.format(key)  # lint-amnesty, pylint: disable=logging-format-interpolation
         )
         return False  # Invalid course run key. Assume user is not enrolled.
 

@@ -768,7 +768,7 @@ class DiscussionBoardFragmentView(EdxFragmentView):
             return fragment
         except TeamDiscussionHiddenFromUserException:
             log.warning(
-                u'User with id={user_id} tried to view private discussion with id={discussion_id}'.format(
+                u'User with id={user_id} tried to view private discussion with id={discussion_id}'.format(  # lint-amnesty, pylint: disable=logging-format-interpolation
                     user_id=request.user.id,
                     discussion_id=discussion_id
                 )

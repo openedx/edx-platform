@@ -52,11 +52,11 @@ def generate_allowlist_certificate_task(user, course_key):
     """
     if not can_generate_allowlist_certificate(user, course_key):
         log.info(
-            'Cannot generate an allowlist certificate for {user} : {course}'.format(user=user.id, course=course_key))
+            'Cannot generate an allowlist certificate for {user} : {course}'.format(user=user.id, course=course_key))  # lint-amnesty, pylint: disable=logging-format-interpolation
         return False
 
     log.info(
-        'About to create an allowlist certificate task for {user} : {course}'.format(user=user.id, course=course_key))
+        'About to create an allowlist certificate task for {user} : {course}'.format(user=user.id, course=course_key))  # lint-amnesty, pylint: disable=logging-format-interpolation
 
     kwargs = {
         'student': str(user.id),
@@ -75,7 +75,7 @@ def can_generate_allowlist_certificate(user, course_key):
     if not _is_using_certificate_allowlist(course_key):
         # This course run is not using the allowlist feature
         log.info(
-            '{course} is not using the certificate allowlist. Certificate cannot be generated.'.format(
+            '{course} is not using the certificate allowlist. Certificate cannot be generated.'.format(  # lint-amnesty, pylint: disable=logging-format-interpolation
                 course=course_key
             ))
         return False
@@ -88,7 +88,7 @@ def can_generate_allowlist_certificate(user, course_key):
     if CertificateInvalidation.has_certificate_invalidation(user, course_key):
         # The invalidation list overrides the allowlist
         log.info(
-            '{user} : {course} is on the certificate invalidation list. Certificate cannot be generated.'.format(
+            '{user} : {course} is on the certificate invalidation list. Certificate cannot be generated.'.format(  # lint-amnesty, pylint: disable=logging-format-interpolation
                 user=user.id,
                 course=course_key
             ))
@@ -96,7 +96,7 @@ def can_generate_allowlist_certificate(user, course_key):
 
     enrollment_mode, __ = CourseEnrollment.enrollment_mode_for_user(user, course_key)
     if enrollment_mode is None:
-        log.info('{user} : {course} does not have an enrollment. Certificate cannot be generated.'.format(
+        log.info('{user} : {course} does not have an enrollment. Certificate cannot be generated.'.format(  # lint-amnesty, pylint: disable=logging-format-interpolation
             user=user.id,
             course=course_key
         ))
@@ -104,19 +104,19 @@ def can_generate_allowlist_certificate(user, course_key):
 
     if not IDVerificationService.user_is_verified(user):
         log.info(
-            '{user} does not have a verified id. Certificate cannot be generated.'.format(
+            '{user} does not have a verified id. Certificate cannot be generated.'.format(  # lint-amnesty, pylint: disable=logging-format-interpolation
                 user=user.id
             ))
         return False
 
     if not _is_on_certificate_allowlist(user, course_key):
-        log.info('{user} : {course} is not on the certificate allowlist. Certificate cannot be generated.'.format(
+        log.info('{user} : {course} is not on the certificate allowlist. Certificate cannot be generated.'.format(  # lint-amnesty, pylint: disable=logging-format-interpolation
             user=user.id,
             course=course_key
         ))
         return False
 
-    log.info('{user} : {course} is on the certificate allowlist'.format(
+    log.info('{user} : {course} is on the certificate allowlist'.format(  # lint-amnesty, pylint: disable=logging-format-interpolation
         user=user.id,
         course=course_key
     ))
@@ -155,12 +155,12 @@ def _can_generate_allowlist_certificate_for_status(cert):
         return True
 
     if cert.status == CertificateStatuses.downloadable:
-        log.info('Certificate with status {status} already exists for {user} : {course}, and is NOT eligible for '
+        log.info('Certificate with status {status} already exists for {user} : {course}, and is NOT eligible for '  # lint-amnesty, pylint: disable=logging-format-interpolation
                  'allowlist generation. Certificate cannot be generated.'
                  .format(status=cert.status, user=cert.user.id, course=cert.course_id))
         return False
 
-    log.info('Certificate with status {status} already exists for {user} : {course}, and is eligible for allowlist '
+    log.info('Certificate with status {status} already exists for {user} : {course}, and is eligible for allowlist '  # lint-amnesty, pylint: disable=logging-format-interpolation
              'generation'
              .format(status=cert.status, user=cert.user.id, course=cert.course_id))
     return True

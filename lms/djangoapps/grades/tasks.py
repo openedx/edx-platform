@@ -250,7 +250,7 @@ def _recalculate_subsection_grade(self, **kwargs):
         )
     except Exception as exc:
         if not isinstance(exc, KNOWN_RETRY_ERRORS):
-            log.info(u"tnl-6244 grades unexpected failure: {}. task id: {}. kwargs={}".format(
+            log.info(u"tnl-6244 grades unexpected failure: {}. task id: {}. kwargs={}".format(  # lint-amnesty, pylint: disable=logging-format-interpolation
                 repr(exc),
                 self.request.id,
                 kwargs,
@@ -296,7 +296,7 @@ def _has_db_updated_with_new_score(self, scored_block_usage_key, **kwargs):
 
     if not db_is_updated:
         log.info(
-            u"Grades: tasks._has_database_updated_with_new_score is False. Task ID: {}. Kwargs: {}. Found "
+            u"Grades: tasks._has_database_updated_with_new_score is False. Task ID: {}. Kwargs: {}. Found "  # lint-amnesty, pylint: disable=logging-format-interpolation
             u"modified time: {}".format(
                 self.request.id,
                 kwargs,
@@ -353,7 +353,7 @@ def _course_task_args(course_key, **kwargs):
     from_settings = kwargs.pop('from_settings', True)
     enrollment_count = CourseEnrollment.objects.filter(course_id=course_key).count()
     if enrollment_count == 0:
-        log.warning(u"No enrollments found for {}".format(course_key))
+        log.warning(u"No enrollments found for {}".format(course_key))  # lint-amnesty, pylint: disable=logging-format-interpolation
 
     if from_settings is False:
         batch_size = kwargs.pop('batch_size', 100)

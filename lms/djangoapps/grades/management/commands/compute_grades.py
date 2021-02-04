@@ -84,7 +84,7 @@ class Command(BaseCommand):
         for seq_id, kwargs in enumerate(self._shuffled_task_kwargs(options)):
             kwargs['seq_id'] = seq_id
             result = tasks.compute_grades_for_course_v2.apply_async(kwargs=kwargs, **task_options)
-            log.info("Grades: Created {task_name}[{task_id}] with arguments {kwargs}".format(
+            log.info("Grades: Created {task_name}[{task_id}] with arguments {kwargs}".format(  # lint-amnesty, pylint: disable=logging-format-interpolation
                 task_name=tasks.compute_grades_for_course.name,
                 task_id=result.task_id,
                 kwargs=kwargs,

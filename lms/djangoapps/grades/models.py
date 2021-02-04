@@ -441,7 +441,7 @@ class PersistentSubsectionGrade(TimeStampedModel):
 
         # TODO: Remove as part of EDUCATOR-4602.
         if str(usage_key.course_key) == 'course-v1:UQx+BUSLEAD5x+2T2019':
-            log.info(u'Created/updated grade ***{}*** for user ***{}*** in course ***{}***'
+            log.info(u'Created/updated grade ***{}*** for user ***{}*** in course ***{}***'  # lint-amnesty, pylint: disable=logging-format-interpolation
                      u'for subsection ***{}*** with default params ***{}***'
                      .format(grade, user_id, usage_key.course_key, usage_key, params))
 
@@ -731,7 +731,7 @@ class PersistentSubsectionGradeOverride(models.Model):
 
         # TODO: Remove as part of EDUCATOR-4602.
         if str(subsection_grade_model.course_id) == 'course-v1:UQx+BUSLEAD5x+2T2019':
-            log.info(u'Creating override for user ***{}*** for PersistentSubsectionGrade'
+            log.info(u'Creating override for user ***{}*** for PersistentSubsectionGrade'  # lint-amnesty, pylint: disable=logging-format-interpolation
                      u'***{}*** with override data ***{}*** and derived grade_defaults ***{}***.'
                      .format(requesting_user, subsection_grade_model, override_data, grade_defaults))
         try:

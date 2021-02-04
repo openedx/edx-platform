@@ -58,7 +58,7 @@ class SurveyForm(TimeStampedModel):
         try:
             fields = cls.get_field_names_from_html(html)
         except Exception as ex:
-            log.exception(u"Cannot parse SurveyForm html: {}".format(ex))
+            log.exception(u"Cannot parse SurveyForm html: {}".format(ex))  # lint-amnesty, pylint: disable=logging-format-interpolation
             raise ValidationError(u"Cannot parse SurveyForm as HTML: {}".format(ex))  # lint-amnesty, pylint: disable=raise-missing-from
 
         if not len(fields):  # lint-amnesty, pylint: disable=len-as-condition

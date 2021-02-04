@@ -82,7 +82,7 @@ def _generate_certificate(user, course_id):
     else:
         created_msg = 'Certificate already existed and was updated.'
     log.info(
-        'Generated certificate with status {status} for {user} : {course}. {created_msg}'.format(
+        'Generated certificate with status {status} for {user} : {course}. {created_msg}'.format(  # lint-amnesty, pylint: disable=logging-format-interpolation
             status=cert.status,
             user=cert.user.id,
             course=cert.course_id,

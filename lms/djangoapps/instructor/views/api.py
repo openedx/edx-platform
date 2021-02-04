@@ -589,7 +589,7 @@ def create_and_enroll_user(email, username, name, country, password, course_id, 
             send_mail_to_student(email, email_params)
         except Exception as ex:  # pylint: disable=broad-except
             log.exception(
-                u"Exception '{exception}' raised while sending email to new user.".format(exception=type(ex).__name__)
+                u"Exception '{exception}' raised while sending email to new user.".format(exception=type(ex).__name__)  # lint-amnesty, pylint: disable=logging-format-interpolation
             )
             errors.append({
                 'username': username,

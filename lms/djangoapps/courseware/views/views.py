@@ -338,13 +338,13 @@ def load_metadata_from_youtube(video_id, request):
                     if res_json.get('items', []):
                         metadata = res_json
                     else:
-                        logging.warning(u'Unable to find the items in response. Following response '
+                        logging.warning(u'Unable to find the items in response. Following response '  # lint-amnesty, pylint: disable=logging-format-interpolation
                                         u'was received: {res}'.format(res=res.text))
                 except ValueError:
-                    logging.warning(u'Unable to decode response to json. Following response '
+                    logging.warning(u'Unable to decode response to json. Following response '  # lint-amnesty, pylint: disable=logging-format-interpolation
                                     u'was received: {res}'.format(res=res.text))
             else:
-                logging.warning(u'YouTube API request failed with status code={status} - '
+                logging.warning(u'YouTube API request failed with status code={status} - '  # lint-amnesty, pylint: disable=logging-format-interpolation
                                 u'Error message is={message}'.format(status=status_code, message=res.text))
         except (Timeout, ConnectionError):
             logging.warning(u'YouTube API request failed because of connection time out or connection error')

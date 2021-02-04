@@ -605,7 +605,7 @@ def get_module_system_for_user(
         else:
             requested_user_id = event.get('user_id', user.id)
             if requested_user_id != user.id:
-                log.warning(u"{} tried to submit a completion on behalf of {}".format(user, requested_user_id))
+                log.warning(u"{} tried to submit a completion on behalf of {}".format(user, requested_user_id))  # lint-amnesty, pylint: disable=logging-format-interpolation
                 return
 
             # If blocks explicitly declare support for the new completion API,

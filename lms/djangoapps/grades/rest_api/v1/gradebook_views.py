@@ -829,7 +829,7 @@ class GradebookBulkUpdateView(GradeViewMixin, PaginatedAPIView):
                     subsection_grade_model = self._create_subsection_grade(user, course, subsection)
                     # TODO: Remove as part of EDUCATOR-4602.
                     if str(course_key) == 'course-v1:UQx+BUSLEAD5x+2T2019':
-                        log.info(u'PersistentSubsectionGrade ***{}*** created for'
+                        log.info(u'PersistentSubsectionGrade ***{}*** created for'  # lint-amnesty, pylint: disable=logging-format-interpolation
                                  u' subsection ***{}*** in course ***{}*** for user ***{}***.'
                                  .format(subsection_grade_model, subsection.location, course, user.id))
                 else:

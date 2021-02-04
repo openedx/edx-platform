@@ -90,7 +90,7 @@ class Command(BaseCommand):
             auths = user.social_auth.filter(uid__startswith=slug + ':')
             auth = auths[0]
             if auths.count() > 1:
-                log.info('User {email} has multiple {slug} UserSocialAuth entries, '
+                log.info('User {email} has multiple {slug} UserSocialAuth entries, '  # lint-amnesty, pylint: disable=logging-format-interpolation
                          'updating only one of them'.format(
                              email=email,
                              slug=slug
@@ -102,27 +102,27 @@ class Command(BaseCommand):
             self._count_results(email_map, uid_mappings)
 
         log.info(
-            'Number of users with {slug} UserSocialAuth records for which there was '
+            'Number of users with {slug} UserSocialAuth records for which there was '  # lint-amnesty, pylint: disable=logging-format-interpolation
             'no mapping in the provided file: {missed}'.format(
                 slug=slug,
                 missed=missed
             )
         )
         log.info(
-            'Number of users identified in the mapping file without {slug}'
+            'Number of users identified in the mapping file without {slug}'  # lint-amnesty, pylint: disable=logging-format-interpolation
             ' UserSocialAuth records: {not_previously_linked}'.format(
                 slug=slug,
                 not_previously_linked=not_previously_linked
             )
         )
         log.info(
-            'Number of mappings in the mapping file where the identified'
+            'Number of mappings in the mapping file where the identified'  # lint-amnesty, pylint: disable=logging-format-interpolation
             ' user has already been processed: {duplicated_in_mapping}'.format(
                 duplicated_in_mapping=duplicated_in_mapping
             )
         )
         log.info(
-            'Number of mappings in the mapping file updated: '
+            'Number of mappings in the mapping file updated: '  # lint-amnesty, pylint: disable=logging-format-interpolation
             '{updated}'.format(
                 updated=updated
             )

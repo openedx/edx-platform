@@ -61,7 +61,7 @@ class Command(BaseCommand):
             }
         )
         logger.info(
-            'Commerce Configuration {configuration_status} with checkout on ecommerce {checkout_status}.'.format(
+            'Commerce Configuration {configuration_status} with checkout on ecommerce {checkout_status}.'.format(  # lint-amnesty, pylint: disable=logging-format-interpolation
                 configuration_status="disabled" if disable else "enabled",
                 checkout_status="enabled" if checkout_on_ecommerce else "disabled",
             ),

@@ -363,7 +363,7 @@ def get_team_for_user_course_topic(user, course_id, topic_id):
     except CourseTeam.MultipleObjectsReturned:
         # This shouldn't ever happen but it's here for safety's sake
         msg = "user {username} is on multiple teams within course {course} topic {topic}"
-        logger.error(msg.format(
+        logger.error(msg.format(  # lint-amnesty, pylint: disable=logging-format-interpolation
             username=user.username,
             course=course_id,
             topic=topic_id,

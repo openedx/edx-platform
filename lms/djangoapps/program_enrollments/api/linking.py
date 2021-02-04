@@ -122,7 +122,7 @@ def link_program_enrollments(program_uuid, external_keys_to_usernames):
 
                 link_program_enrollment_to_lms_user(program_enrollment, user)
         except (CourseEnrollmentException, IntegrityError) as e:
-            logger.exception("Rolling back all operations for {}:{}".format(
+            logger.exception("Rolling back all operations for {}:{}".format(  # lint-amnesty, pylint: disable=logging-format-interpolation
                 external_user_key,
                 username,
             ))
@@ -243,7 +243,7 @@ def link_program_enrollment_to_lms_user(program_enrollment, user):
         raise
     except CourseEnrollmentException as e:
         logger.error(
-            "CourseEnrollmentException while linking {}: {}".format(
+            "CourseEnrollmentException while linking {}: {}".format(  # lint-amnesty, pylint: disable=logging-format-interpolation
                 link_log_info, str(e)
             )
         )

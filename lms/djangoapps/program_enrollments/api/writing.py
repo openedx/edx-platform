@@ -404,7 +404,7 @@ def enroll_in_masters_track(user, course_key, status):
                 "and course key={} from mode {} to Master's."
             )
             logger.info(
-                message_template.format(user.id, course_key, course_enrollment.mode)
+                message_template.format(user.id, course_key, course_enrollment.mode)  # lint-amnesty, pylint: disable=logging-format-interpolation
             )
         elif course_enrollment.mode != CourseMode.MASTERS:
             error_message = (
@@ -476,7 +476,7 @@ def _ensure_course_exists(course_key, user_key_or_id):
     if CourseOverview.course_exists(course_key):
         return
     logger.error(
-        "Cannot enroll user={} in non-existent course={}".format(
+        "Cannot enroll user={} in non-existent course={}".format(  # lint-amnesty, pylint: disable=logging-format-interpolation
             user_key_or_id,
             course_key,
         )
@@ -552,7 +552,7 @@ def _get_conflicting_active_course_enrollments(
             and str(existing_enrollment.program_enrollment.program_uuid) != str(program_uuid)
         ):
             logger.error(
-                u'Detected conflicting active ProgramCourseEnrollment. This is happening on'
+                u'Detected conflicting active ProgramCourseEnrollment. This is happening on'  # lint-amnesty, pylint: disable=logging-format-interpolation
                 u' The program_uuid [{}] with course_key [{}] for external_user_key [{}]'.format(
                     program_uuid,
                     course_key,
