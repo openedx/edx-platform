@@ -128,7 +128,7 @@ def handle_grading_policy_changed(sender, **kwargs):
         'event_transaction_type': six.text_type(get_event_transaction_type()),
     }
     result = task_compute_all_grades_for_course.apply_async(kwargs=kwargs, countdown=GRADING_POLICY_COUNTDOWN_SECONDS)
-    log.info(u"Grades: Created {task_name}[{task_id}] with arguments {kwargs}".format(
+    log.info(u"Grades: Created {task_name}[{task_id}] with arguments {kwargs}".format(  # lint-amnesty, pylint: disable=logging-format-interpolation
         task_name=task_compute_all_grades_for_course.name,
         task_id=result.task_id,
         kwargs=kwargs,

@@ -143,7 +143,7 @@ def _write_chunk(request, courselike_key):
         if not course_dir.isdir():
             os.mkdir(course_dir)
 
-        logging.debug(u'importing course to {0}'.format(temp_filepath))
+        logging.debug(u'importing course to {0}'.format(temp_filepath))  # lint-amnesty, pylint: disable=logging-format-interpolation
 
         # Get upload chunks byte ranges
         try:

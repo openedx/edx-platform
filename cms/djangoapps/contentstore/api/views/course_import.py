@@ -135,7 +135,7 @@ class CourseImportView(CourseImportExportViewMixin, GenericAPIView):
             if not course_dir.isdir():
                 os.mkdir(course_dir)
 
-            log.debug(u'importing course to {0}'.format(temp_filepath))
+            log.debug(u'importing course to {0}'.format(temp_filepath))  # lint-amnesty, pylint: disable=logging-format-interpolation
             with open(temp_filepath, "wb+") as temp_file:
                 for chunk in request.FILES['course_data'].chunks():
                     temp_file.write(chunk)

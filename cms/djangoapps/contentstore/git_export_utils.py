@@ -63,9 +63,9 @@ def cmd_log(cmd, cwd):
     command doesn't return 0, and returns the command's output.
     """
     output = subprocess.check_output(cmd, cwd=cwd, stderr=subprocess.STDOUT)
-    log.debug(u'Command was: {0!r}. '
+    log.debug(u'Command was: {0!r}. '  # lint-amnesty, pylint: disable=logging-format-interpolation
               u'Working directory was: {1!r}'.format(' '.join(cmd), cwd))
-    log.debug(u'Command output was: {0!r}'.format(output))
+    log.debug(u'Command output was: {0!r}'.format(output))  # lint-amnesty, pylint: disable=logging-format-interpolation
     return output
 
 

@@ -60,7 +60,7 @@ class Command(BaseCommand):
             # Create the course
             try:
                 new_course = create_new_course_in_store("split", user, org, num, run, fields)
-                logger.info(u"Created {}".format(text_type(new_course.id)))
+                logger.info(u"Created {}".format(text_type(new_course.id)))  # lint-amnesty, pylint: disable=logging-format-interpolation
             except DuplicateCourseError:
                 logger.warning(u"Course already exists for %s, %s, %s", org, num, run)
 

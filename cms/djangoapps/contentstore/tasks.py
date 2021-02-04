@@ -431,7 +431,7 @@ def import_olx(self, user_id, course_key_string, archive_path, archive_name, lan
         if not course_dir.isdir():
             os.mkdir(course_dir)
 
-        LOGGER.debug(u'importing course to {0}'.format(temp_filepath))
+        LOGGER.debug(u'importing course to {0}'.format(temp_filepath))  # lint-amnesty, pylint: disable=logging-format-interpolation
 
         # Copy the OLX archive from where it was uploaded to (S3, Swift, file system, etc.)
         if not course_import_export_storage.exists(archive_path):

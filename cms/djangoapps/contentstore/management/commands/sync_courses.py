@@ -60,7 +60,7 @@ class Command(BaseCommand):
                     course_key.run,
                     fields,
                 )
-                logger.info(u"Created {}".format(text_type(new_course.id)))
+                logger.info(u"Created {}".format(text_type(new_course.id)))  # lint-amnesty, pylint: disable=logging-format-interpolation
             except DuplicateCourseError:
                 logger.warning(
                     u"Course already exists for %s, %s, %s. Skipping",

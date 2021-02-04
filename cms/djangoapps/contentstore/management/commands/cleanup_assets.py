@@ -39,4 +39,4 @@ class Command(BaseCommand):
 
         if success:
             log.info("=" * 80)
-            log.info(u"Total number of assets deleted: {0}".format(assets_deleted))
+            log.info(u"Total number of assets deleted: {0}".format(assets_deleted))  # lint-amnesty, pylint: disable=logging-format-interpolation

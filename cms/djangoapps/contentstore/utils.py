@@ -100,7 +100,7 @@ def _remove_instructors(course_key):
     try:
         remove_all_instructors(course_key)
     except Exception as err:  # lint-amnesty, pylint: disable=broad-except
-        log.error(u"Error in deleting course groups for {0}: {1}".format(course_key, err))
+        log.error(u"Error in deleting course groups for {0}: {1}".format(course_key, err))  # lint-amnesty, pylint: disable=logging-format-interpolation
 
 
 def get_lms_link_for_item(location, preview=False):
@@ -567,7 +567,7 @@ def get_sibling_urls(subsection):
             # section.get_parent SHOULD return the course, but for some reason, it might not
             sections = section.get_parent().get_children()
         except AttributeError:
-            log.error(u"URL Retrieval Error # 1: subsection {subsection} included in section {section}".format(
+            log.error(u"URL Retrieval Error # 1: subsection {subsection} included in section {section}".format(  # lint-amnesty, pylint: disable=logging-format-interpolation
                 section=section.location,
                 subsection=subsection.location
             ))
@@ -583,7 +583,7 @@ def get_sibling_urls(subsection):
         try:
             sections = section.get_parent().get_children()
         except AttributeError:
-            log.error(u"URL Retrieval Error # 2: subsection {subsection} included in section {section}".format(
+            log.error(u"URL Retrieval Error # 2: subsection {subsection} included in section {section}".format(  # lint-amnesty, pylint: disable=logging-format-interpolation
                 section=section.location,
                 subsection=subsection.location
             ))
