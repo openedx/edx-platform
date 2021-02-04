@@ -169,7 +169,16 @@ FEATURES = {
     # .. toggle_tickets: https://github.com/edx/edx-platform/pull/14729
     'ENABLE_UNICODE_USERNAME': False,
 
-    'ENABLE_DJANGO_ADMIN_SITE': True,  # set true to enable django's admin site, even on prod (e.g. for course ops)
+    # .. toggle_name: FEATURES['ENABLE_DJANGO_ADMIN_SITE']
+    # .. toggle_implementation: DjangoSetting
+    # .. toggle_default: True
+    # .. toggle_description: Set to False if you want to disable Django's admin site.
+    # .. toggle_use_cases: open_edx
+    # .. toggle_creation_date: 2013-09-26
+    # .. toggle_warnings: It is not recommended to disable this feature as there are many settings available on
+    #  Django's admin site and will be inaccessible to the superuser.
+    # .. toggle_tickets: https://github.com/edx/edx-platform/pull/829
+    'ENABLE_DJANGO_ADMIN_SITE': True,
     'ENABLE_LMS_MIGRATION': False,
 
     # .. toggle_name: FEATURES['ENABLE_MASQUERADE']
