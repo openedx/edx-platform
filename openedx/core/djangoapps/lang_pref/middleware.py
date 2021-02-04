@@ -32,7 +32,7 @@ class LanguagePreferenceMiddleware(MiddlewareMixin):
             if request.user.is_authenticated:
                 set_user_preference(request.user, LANGUAGE_KEY, cookie_lang)
             else:
-                request._anonymous_user_cookie_lang = cookie_lang
+                request._anonymous_user_cookie_lang = cookie_lang  # lint-amnesty, pylint: disable=protected-access
 
             accept_header = request.META.get(LANGUAGE_HEADER, None)
             if accept_header:
@@ -49,7 +49,7 @@ class LanguagePreferenceMiddleware(MiddlewareMixin):
             if LANGUAGE_SESSION_KEY in request.session and request.session[LANGUAGE_SESSION_KEY] != cookie_lang:
                 del request.session[LANGUAGE_SESSION_KEY]
 
-    def process_response(self, request, response):
+    def process_response(self, request, response):  # lint-amnesty, pylint: disable=missing-function-docstring
         # If the user is logged in, check for their language preference. Also check for real user
         # if current user is a masquerading user,
         user_pref = None

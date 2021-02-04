@@ -22,7 +22,7 @@ class HeartbeatTestCase(ModuleStoreTestCase):
     def setUp(self):
         self.client = Client()
         self.heartbeat_url = reverse('heartbeat')
-        return super(HeartbeatTestCase, self).setUp()
+        return super(HeartbeatTestCase, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
 
     def test_success(self):
         response = self.client.get(self.heartbeat_url + '?extended')

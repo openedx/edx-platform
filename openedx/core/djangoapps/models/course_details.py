@@ -111,7 +111,7 @@ class CourseDetails(object):
         course_details = cls(course_key.org, course_key.course, course_key.run)
         course_details.start_date = course_descriptor.start
         course_details.end_date = course_descriptor.end
-        course_details.certificate_available_date = course_descriptor.certificate_available_date
+        course_details.certificate_available_date = course_descriptor.certificate_available_date  # lint-amnesty, pylint: disable=attribute-defined-outside-init
         course_details.enrollment_start = course_descriptor.enrollment_start
         course_details.enrollment_end = course_descriptor.enrollment_end
         course_details.pre_requisite_courses = course_descriptor.pre_requisite_courses
@@ -325,7 +325,7 @@ class CourseDetails(object):
         if keystring_matcher:
             return keystring_matcher.group(0)
         else:
-            logging.warn("ignoring the content because it doesn't not conform to expected pattern: " + raw_video)
+            logging.warn("ignoring the content because it doesn't not conform to expected pattern: " + raw_video)  # lint-amnesty, pylint: disable=deprecated-method, logging-not-lazy
             return None
 
     @staticmethod

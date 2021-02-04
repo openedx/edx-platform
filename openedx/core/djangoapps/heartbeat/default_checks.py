@@ -77,7 +77,7 @@ def check_cache_set():
     try:
         cache.set(CACHE_KEY, CACHE_VALUE, 30)
         return 'cache_set', True, u'OK'
-    except Exception as fail:
+    except Exception as fail:  # lint-amnesty, pylint: disable=broad-except
         return 'cache_set', False, six.text_type(fail)
 
 
@@ -95,7 +95,7 @@ def check_cache_get():
             return 'cache_get', True, u'OK'
         else:
             return 'cache_get', False, u'value check failed'
-    except Exception as fail:
+    except Exception as fail:  # lint-amnesty, pylint: disable=broad-except
         return 'cache_get', False, six.text_type(fail)
 
 
@@ -120,5 +120,5 @@ def check_celery():
                 return 'celery', True, six.text_type({'time': finished})
             sleep(0.25)
         return 'celery', False, "expired"
-    except Exception as fail:
+    except Exception as fail:  # lint-amnesty, pylint: disable=broad-except
         return 'celery', False, six.text_type(fail)
