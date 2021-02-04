@@ -137,7 +137,7 @@ class LoginAndRegistrationTest(ThirdPartyAuthTestMixin, UrlResetMixin, ModuleSto
 
         # then the rate limiter should kick in and give a HttpForbidden response
         response = self.client.get(login_url)
-        self.assertEqual(response.status_code, 403)
+        self.assertEqual(response.status_code, 429)
 
         # now reset the time to 6 mins from now in future in order to unblock
         reset_time = datetime.now(UTC) + timedelta(seconds=361)

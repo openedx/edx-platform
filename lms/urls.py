@@ -69,6 +69,7 @@ if settings.DEBUG or settings.FEATURES.get('ENABLE_DJANGO_ADMIN_SITE'):
 # Custom error pages
 # These are used by Django to render these error codes. Do not remove.
 # pylint: disable=invalid-name
+handler403 = static_template_view_views.render_403
 handler404 = static_template_view_views.render_404
 handler500 = static_template_view_views.render_500
 
