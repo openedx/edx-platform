@@ -1245,7 +1245,7 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
             if len(items) == 0:  # lint-amnesty, pylint: disable=no-else-raise
                 raise ItemNotFoundError(usage_key)
             elif len(items) > 1:
-                log.debug("Found more than one item for '{}'".format(usage_key))
+                log.debug("Found more than one item for '{}'".format(usage_key))  # lint-amnesty, pylint: disable=logging-format-interpolation
             return items[0]
 
     def get_items(self, course_locator, settings=None, content=None, qualifiers=None, include_orphans=True, **kwargs):  # lint-amnesty, pylint: disable=arguments-differ

@@ -33,7 +33,7 @@ class TimeInfo(object):
                 try:
                     self.grace_period = TimeInfo._delta_standin.from_json(grace_period_string_or_timedelta)
                 except:
-                    log.error("Error parsing the grace period {0}".format(grace_period_string_or_timedelta))
+                    log.error("Error parsing the grace period {0}".format(grace_period_string_or_timedelta))  # lint-amnesty, pylint: disable=logging-format-interpolation
                     raise
             else:
                 self.grace_period = grace_period_string_or_timedelta

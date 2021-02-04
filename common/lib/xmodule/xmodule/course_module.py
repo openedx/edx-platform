@@ -187,7 +187,7 @@ class TextbookList(List):  # lint-amnesty, pylint: disable=missing-class-docstri
             except:  # lint-amnesty, pylint: disable=bare-except
                 # If we can't get to S3 (e.g. on a train with no internet), don't break
                 # the rest of the courseware.
-                log.exception("Couldn't load textbook ({0}, {1})".format(title, book_url))
+                log.exception("Couldn't load textbook ({0}, {1})".format(title, book_url))  # lint-amnesty, pylint: disable=logging-format-interpolation
                 continue
 
         return textbooks
@@ -1129,7 +1129,7 @@ class CourseDescriptor(CourseFields, SequenceDescriptor, LicenseMixin):
         for policy_path in paths:
             if not system.resources_fs.exists(policy_path):
                 continue
-            log.debug("Loading grading policy from {0}".format(policy_path))
+            log.debug("Loading grading policy from {0}".format(policy_path))  # lint-amnesty, pylint: disable=logging-format-interpolation
             try:
                 with system.resources_fs.open(policy_path) as grading_policy_file:
                     policy_str = grading_policy_file.read()
@@ -1634,7 +1634,7 @@ class CourseSummary(object):
             return course_metadata_utils.has_course_ended(self.end)
         except TypeError as e:
             log.warning(
-                "Course '{course_id}' has an improperly formatted end date '{end_date}'. Error: '{err}'.".format(
+                "Course '{course_id}' has an improperly formatted end date '{end_date}'. Error: '{err}'.".format(  # lint-amnesty, pylint: disable=logging-format-interpolation
                     course_id=six.text_type(self.id), end_date=self.end, err=e
                 )
             )

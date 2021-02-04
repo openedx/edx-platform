@@ -46,13 +46,13 @@ class Command(BaseCommand):
         total_emails, failed_emails = self._generate_manual_verification_from_file(email_ids_file)
 
         if failed_emails:
-            log.error(u'Completed manual verification. {} of {} failed.'.format(
+            log.error(u'Completed manual verification. {} of {} failed.'.format(  # lint-amnesty, pylint: disable=logging-format-interpolation
                 len(failed_emails),
                 total_emails
             ))
-            log.error(u'Failed emails:{}'.format(pformat(failed_emails)))
+            log.error(u'Failed emails:{}'.format(pformat(failed_emails)))  # lint-amnesty, pylint: disable=logging-format-interpolation
         else:
-            log.info(u'Successfully generated manual verification for {} emails.'.format(total_emails))
+            log.info(u'Successfully generated manual verification for {} emails.'.format(total_emails))  # lint-amnesty, pylint: disable=logging-format-interpolation
 
     def _generate_manual_verification_from_file(self, email_ids_file):
         """
@@ -70,7 +70,7 @@ class Command(BaseCommand):
         with open(email_ids_file, 'r') as file_handler:
             email_ids = file_handler.readlines()
             total_emails = len(email_ids)
-            log.info(u'Creating manual verification for {} emails.'.format(total_emails))
+            log.info(u'Creating manual verification for {} emails.'.format(total_emails))  # lint-amnesty, pylint: disable=logging-format-interpolation
             for email_id in email_ids:
                 try:
                     email_id = email_id.strip()
@@ -84,5 +84,5 @@ class Command(BaseCommand):
                 except User.DoesNotExist:
                     failed_emails.append(email_id)
                     err_msg = u'Tried to verify email {}, but user not found'
-                    log.error(err_msg.format(email_id))
+                    log.error(err_msg.format(email_id))  # lint-amnesty, pylint: disable=logging-format-interpolation
         return total_emails, failed_emails

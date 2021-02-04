@@ -915,7 +915,7 @@ class SubmitPhotosView(View):
         # The face image is always required.
         if "face_image" not in params:
             msg = _("Missing required parameter face_image")
-            log.error((u"User {user_id} missing required parameter face_image").format(user_id=request.user.id))
+            log.error((u"User {user_id} missing required parameter face_image").format(user_id=request.user.id))  # lint-amnesty, pylint: disable=logging-format-interpolation
             return None, HttpResponseBadRequest(msg)
 
         return params, None
@@ -935,14 +935,14 @@ class SubmitPhotosView(View):
         try:
             update_account_settings(request.user, {"name": full_name})
         except UserNotFound:
-            log.error((u"No profile found for user {user_id}").format(user_id=request.user.id))
+            log.error((u"No profile found for user {user_id}").format(user_id=request.user.id))  # lint-amnesty, pylint: disable=logging-format-interpolation
             return HttpResponseBadRequest(_("No profile found for user"))
         except AccountValidationError:
             msg = _(
                 u"Name must be at least {min_length} character long."
             ).format(min_length=NAME_MIN_LENGTH)
             log.error(
-                (u"User {user_id} provided an account name less than {min_length} characters").format(
+                (u"User {user_id} provided an account name less than {min_length} characters").format(  # lint-amnesty, pylint: disable=logging-format-interpolation
                     user_id=request.user.id,
                     min_length=NAME_MIN_LENGTH
                 )
@@ -977,7 +977,7 @@ class SubmitPhotosView(View):
 
         except InvalidImageData:
             msg = _("Image data is not valid.")
-            log.error((u"Image data for user {user_id} is not valid").format(user_id=request.user.id))
+            log.error((u"Image data for user {user_id} is not valid").format(user_id=request.user.id))  # lint-amnesty, pylint: disable=logging-format-interpolation
             return None, None, HttpResponseBadRequest(msg)
 
     def _submit_attempt(self, user, face_image, photo_id_image=None, initial_verification=None):
@@ -1053,11 +1053,11 @@ def results_callback(request):  # lint-amnesty, pylint: disable=too-many-stateme
     try:
         body_dict = json.loads(body.decode('utf-8'))
     except ValueError:
-        log.exception(u"Invalid JSON received from Software Secure:\n\n{}\n".format(body))
+        log.exception(u"Invalid JSON received from Software Secure:\n\n{}\n".format(body))  # lint-amnesty, pylint: disable=logging-format-interpolation
         return HttpResponseBadRequest(u"Invalid JSON. Received:\n\n{}".format(body))
 
     if not isinstance(body_dict, dict):
-        log.error(u"Reply from Software Secure is not a dict:\n\n{}\n".format(body))
+        log.error(u"Reply from Software Secure is not a dict:\n\n{}\n".format(body))  # lint-amnesty, pylint: disable=logging-format-interpolation
         return HttpResponseBadRequest(u"JSON should be dict. Received:\n\n{}".format(body))
 
     headers = {
@@ -1106,7 +1106,7 @@ def results_callback(request):  # lint-amnesty, pylint: disable=too-many-stateme
         if attempt.status != 'approved':
             verification = SoftwareSecurePhotoVerification.objects.filter(status='approved', user_id=attempt.user_id)
             if verification:
-                log.info(u'Making expiry email date of previous approved verification NULL for {}'.format(attempt.user_id))  # lint-amnesty, pylint: disable=line-too-long
+                log.info(u'Making expiry email date of previous approved verification NULL for {}'.format(attempt.user_id))  # lint-amnesty, pylint: disable=line-too-long  # lint-amnesty, pylint: disable=logging-format-interpolation
                 # The updated_at field in sspv model has auto_now set to True, which means any time save() is called on
                 # the model instance, `updated_at` will change. Some of the existing functionality of verification
                 # (showing your verification has expired on dashboard) relies on updated_at.
@@ -1115,7 +1115,7 @@ def results_callback(request):  # lint-amnesty, pylint: disable=too-many-stateme
                 previous_verification = verification.latest('updated_at')
                 SoftwareSecurePhotoVerification.objects.filter(pk=previous_verification.pk
                                                                ).update(expiry_email_date=None)
-        log.debug(u'Approving verification for {}'.format(receipt_id))
+        log.debug(u'Approving verification for {}'.format(receipt_id))  # lint-amnesty, pylint: disable=logging-format-interpolation
         attempt.approve()
 
         expiry_date = datetime.date.today() + datetime.timedelta(days=settings.VERIFY_STUDENT["DAYS_GOOD_FOR"])

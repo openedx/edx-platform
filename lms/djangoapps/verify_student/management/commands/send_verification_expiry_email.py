@@ -121,11 +121,11 @@ class Command(BaseCommand):
 
         total_verification = sspv.count()
         if not total_verification:
-            logger.info(u"No approved expired entries found in SoftwareSecurePhotoVerification for the "
+            logger.info(u"No approved expired entries found in SoftwareSecurePhotoVerification for the "  # lint-amnesty, pylint: disable=logging-format-interpolation
                         u"date range {} - {}".format(start_date.date(), now().date()))
             return
 
-        logger.info(u"For the date range {} - {}, total Software Secure Photo verification filtered are {}"
+        logger.info(u"For the date range {} - {}, total Software Secure Photo verification filtered are {}"  # lint-amnesty, pylint: disable=logging-format-interpolation
                     .format(start_date.date(), now().date(), total_verification))
 
         batch_verifications = []
@@ -191,7 +191,7 @@ class Command(BaseCommand):
         """
         if email_config['dry_run']:
             logger.info(
-                u"This was a dry run, no email was sent. For the actual run email would have been sent "
+                u"This was a dry run, no email was sent. For the actual run email would have been sent "  # lint-amnesty, pylint: disable=logging-format-interpolation
                 u"to {} learner(s)".format(len(batch_verifications))
             )
             return True

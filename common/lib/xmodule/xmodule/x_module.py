@@ -1071,7 +1071,7 @@ class ResourceTemplates(object):
         if getattr(cls, 'template_dir_name', None):
             dirname = os.path.join('templates', cls.template_dir_name)  # lint-amnesty, pylint: disable=no-member
             if not resource_isdir(__name__, dirname):
-                log.warning(u"No resource directory {dir} found when loading {cls_name} templates".format(
+                log.warning(u"No resource directory {dir} found when loading {cls_name} templates".format(  # lint-amnesty, pylint: disable=logging-format-interpolation
                     dir=dirname,
                     cls_name=cls.__name__,
                 ))

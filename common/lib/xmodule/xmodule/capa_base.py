@@ -447,7 +447,7 @@ class CapaMixin(ScorableXBlockMixin, CapaFields):
         })
 
     def handle_fatal_lcp_error(self, error):  # lint-amnesty, pylint: disable=missing-function-docstring
-        log.exception(u"LcpFatalError Encountered for {block}".format(block=str(self.location)))
+        log.exception(u"LcpFatalError Encountered for {block}".format(block=str(self.location)))  # lint-amnesty, pylint: disable=logging-format-interpolation
         if error:
             return(
                 HTML(u'<p>Error formatting HTML for problem:</p><p><pre style="color:red">{msg}</pre></p>').format(

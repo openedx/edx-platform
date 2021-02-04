@@ -858,7 +858,7 @@ oauth_consumer_key="", oauth_signature="frVp4JuvT1mVXlxktiAUjQ7%2F1cw%3D"'}
         )
         if oauth_body_hash != oauth_headers.get('oauth_body_hash'):
             log.error(
-                "OAuth body hash verification failed, provided: {}, "
+                "OAuth body hash verification failed, provided: {}, "  # lint-amnesty, pylint: disable=logging-format-interpolation
                 "calculated: {}, for url: {}, body is: {}".format(
                     oauth_headers.get('oauth_body_hash'),
                     oauth_body_hash,
@@ -870,7 +870,7 @@ oauth_consumer_key="", oauth_signature="frVp4JuvT1mVXlxktiAUjQ7%2F1cw%3D"'}
 
         if (not signature.verify_hmac_sha1(mock_request_lti_1, client_secret) and not
                 signature.verify_hmac_sha1(mock_request_lti_2, client_secret)):
-            log.error("OAuth signature verification failed, for "
+            log.error("OAuth signature verification failed, for "  # lint-amnesty, pylint: disable=logging-format-interpolation
                       "headers:{} url:{} method:{}".format(
                           oauth_headers,
                           self.get_outcome_service_url(),

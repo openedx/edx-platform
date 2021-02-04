@@ -1797,7 +1797,7 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
         # A single document exists per course to store the course asset metadata.
         course_key = self.fill_in_run(course_key)
         if course_key.run is None:
-            log.warning(u'No run found for combo org "{}" course "{}" on asset request.'.format(
+            log.warning(u'No run found for combo org "{}" course "{}" on asset request.'.format(  # lint-amnesty, pylint: disable=logging-format-interpolation
                 course_key.org, course_key.course
             ))
             course_assets = None

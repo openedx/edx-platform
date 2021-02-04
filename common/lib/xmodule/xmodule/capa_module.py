@@ -292,7 +292,7 @@ class ProblemBlock(
         try:
             tree = etree.XML(self.data)
         except etree.XMLSyntaxError:
-            log.error('Error parsing problem types from xml for capa module {}'.format(self.display_name))
+            log.error('Error parsing problem types from xml for capa module {}'.format(self.display_name))  # lint-amnesty, pylint: disable=logging-format-interpolation
             return None  # short-term fix to prevent errors (TNL-5057). Will be more properly addressed in TNL-4525.
         registered_tags = responsetypes.registry.registered_tags()
         return {node.tag for node in tree.iter() if node.tag in registered_tags}
@@ -384,7 +384,7 @@ class ProblemBlock(
                 minimal_init=True,
             )
         except responsetypes.LoncapaProblemError:
-            log.exception(u"LcpFatalError for block {} while getting max score".format(str(self.location)))
+            log.exception(u"LcpFatalError for block {} while getting max score".format(str(self.location)))  # lint-amnesty, pylint: disable=logging-format-interpolation
             maximum_score = 0
         else:
             maximum_score = lcp.get_max_score()

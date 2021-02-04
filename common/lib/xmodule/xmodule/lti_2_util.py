@@ -110,7 +110,7 @@ class LTI20ModuleMixin(object):
         sha1 = hashlib.sha1()
         sha1.update(request.body)
         oauth_body_hash = six.text_type(base64.b64encode(sha1.digest()))
-        log.debug("[LTI] oauth_body_hash = {}".format(oauth_body_hash))
+        log.debug("[LTI] oauth_body_hash = {}".format(oauth_body_hash))  # lint-amnesty, pylint: disable=logging-format-interpolation
         client_key, client_secret = self.get_client_key_secret()
         client = Client(client_key, client_secret)
         mock_request = mock.Mock(
@@ -127,7 +127,7 @@ class LTI20ModuleMixin(object):
         mock_request.oauth_params.append((u'oauth_signature', sig))
 
         _, headers, _ = client._render(mock_request)  # pylint: disable=protected-access
-        log.debug("\n\n#### COPY AND PASTE AUTHORIZATION HEADER ####\n{}\n####################################\n\n"
+        log.debug("\n\n#### COPY AND PASTE AUTHORIZATION HEADER ####\n{}\n####################################\n\n"  # lint-amnesty, pylint: disable=logging-format-interpolation
                   .format(headers['Authorization']))
 
     def parse_lti_2_0_handler_suffix(self, suffix):
@@ -152,7 +152,7 @@ class LTI20ModuleMixin(object):
                 return match_obj.group('anon_id')
         # fall-through handles all error cases
         msg = "No valid user id found in endpoint URL"
-        log.info("[LTI]: {}".format(msg))
+        log.info("[LTI]: {}".format(msg))  # lint-amnesty, pylint: disable=logging-format-interpolation
         raise LTIError(msg)
 
     def _lti_2_0_result_get_handler(self, request, real_user):
@@ -287,14 +287,14 @@ class LTI20ModuleMixin(object):
         """
         content_type = request.headers.get('Content-Type')
         if verify_content_type and content_type != LTI_2_0_JSON_CONTENT_TYPE:
-            log.info("[LTI]: v2.0 result service -- bad Content-Type: {}".format(content_type))
+            log.info("[LTI]: v2.0 result service -- bad Content-Type: {}".format(content_type))  # lint-amnesty, pylint: disable=logging-format-interpolation
             raise LTIError(
                 "For LTI 2.0 result service, Content-Type must be {}.  Got {}".format(LTI_2_0_JSON_CONTENT_TYPE,
                                                                                       content_type))
         try:
             self.verify_oauth_body_sign(request, content_type=LTI_2_0_JSON_CONTENT_TYPE)
         except (ValueError, LTIError) as err:
-            log.info("[LTI]: v2.0 result service -- OAuth body verification failed:  {}".format(text_type(err)))
+            log.info("[LTI]: v2.0 result service -- OAuth body verification failed:  {}".format(text_type(err)))  # lint-amnesty, pylint: disable=logging-format-interpolation
             raise LTIError(text_type(err))  # lint-amnesty, pylint: disable=raise-missing-from
 
     def parse_lti_2_0_result_json(self, json_str):
@@ -321,7 +321,7 @@ class LTI20ModuleMixin(object):
             json_obj = json.loads(json_str)
         except (ValueError, TypeError):
             msg = "Supplied JSON string in request body could not be decoded: {}".format(json_str)
-            log.info("[LTI] {}".format(msg))
+            log.info("[LTI] {}".format(msg))  # lint-amnesty, pylint: disable=logging-format-interpolation
             raise LTIError(msg)  # lint-amnesty, pylint: disable=raise-missing-from
 
         # the standard supports a list of objects, who knows why. It must contain at least 1 element, and the
@@ -332,14 +332,14 @@ class LTI20ModuleMixin(object):
             else:
                 msg = ("Supplied JSON string is a list that does not contain an object as the first element. {}"
                        .format(json_str))
-                log.info("[LTI] {}".format(msg))
+                log.info("[LTI] {}".format(msg))  # lint-amnesty, pylint: disable=logging-format-interpolation
                 raise LTIError(msg)
 
         # '@type' must be "Result"
         result_type = json_obj.get("@type")
         if result_type != "Result":
             msg = "JSON object does not contain correct @type attribute (should be 'Result', is {})".format(result_type)
-            log.info("[LTI] {}".format(msg))
+            log.info("[LTI] {}".format(msg))  # lint-amnesty, pylint: disable=logging-format-interpolation
             raise LTIError(msg)
 
         # '@context' must be present as a key
@@ -347,7 +347,7 @@ class LTI20ModuleMixin(object):
         for key in REQUIRED_KEYS:
             if key not in json_obj:
                 msg = "JSON object does not contain required key {}".format(key)
-                log.info("[LTI] {}".format(msg))
+                log.info("[LTI] {}".format(msg))  # lint-amnesty, pylint: disable=logging-format-interpolation
                 raise LTIError(msg)
 
         # 'resultScore' is not present.  If this was a PUT this means it's actually a DELETE according
@@ -361,11 +361,11 @@ class LTI20ModuleMixin(object):
             score = float(json_obj.get('resultScore', "unconvertable"))  # Check if float is present and the right type
             if not 0 <= score <= 1:
                 msg = 'score value outside the permitted range of 0-1.'
-                log.info("[LTI] {}".format(msg))
+                log.info("[LTI] {}".format(msg))  # lint-amnesty, pylint: disable=logging-format-interpolation
                 raise LTIError(msg)
         except (TypeError, ValueError) as err:
             msg = "Could not convert resultScore to float: {}".format(text_type(err))
-            log.info("[LTI] {}".format(msg))
+            log.info("[LTI] {}".format(msg))  # lint-amnesty, pylint: disable=logging-format-interpolation
             raise LTIError(msg)  # lint-amnesty, pylint: disable=raise-missing-from
 
         return score, json_obj.get('comment', "")

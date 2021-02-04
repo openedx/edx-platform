@@ -111,7 +111,7 @@ def create_collection_index(
         if ignore_created_opts:
             errors_to_ignore.append(INDEX_OPTIONS_CONFLICT)
         if exc.code in errors_to_ignore:
-            logger.warning("Existing index in collection '{}' remained unchanged!: {}".format(
+            logger.warning("Existing index in collection '{}' remained unchanged!: {}".format(  # lint-amnesty, pylint: disable=logging-format-interpolation
                 collection.full_name, exc.details['errmsg'])
             )
         else:

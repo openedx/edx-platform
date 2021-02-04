@@ -37,7 +37,7 @@ class Date(JSONField):
         result = dateutil.parser.parse(field, default=self.PREVENT_DEFAULT_DAY_MON_SEED1)
         result_other = dateutil.parser.parse(field, default=self.PREVENT_DEFAULT_DAY_MON_SEED2)
         if result != result_other:
-            log.warning("Field {0} is missing month or day".format(self.name))
+            log.warning("Field {0} is missing month or day".format(self.name))  # lint-amnesty, pylint: disable=logging-format-interpolation
             return None
         if result.tzinfo is None:
             result = result.replace(tzinfo=UTC)

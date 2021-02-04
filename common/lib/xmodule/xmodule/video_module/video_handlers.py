@@ -102,8 +102,8 @@ class VideoStudentViewHandlers(object):
 
             return json.dumps({'success': True})
 
-        log.debug(u"GET {0}".format(data))
-        log.debug(u"DISPATCH {0}".format(dispatch))
+        log.debug(u"GET {0}".format(data))  # lint-amnesty, pylint: disable=logging-format-interpolation
+        log.debug(u"DISPATCH {0}".format(dispatch))  # lint-amnesty, pylint: disable=logging-format-interpolation
 
         raise NotFoundError('Unexpected dispatch type')
 

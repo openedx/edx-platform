@@ -390,7 +390,7 @@ class SplitTestBlock(
             child_id = text_type(self.child.scope_ids.usage_id)
         except Exception:
             log.info(
-                "Can't get usage_id of Nonetype object in course {course_key}".format(
+                "Can't get usage_id of Nonetype object in course {course_key}".format(  # lint-amnesty, pylint: disable=logging-format-interpolation
                     course_key=six.text_type(self.location.course_key)
                 )
             )

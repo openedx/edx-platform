@@ -251,7 +251,7 @@ class SSOVerification(IDVerificationAttempt):
         """
         Send a signal indicating that this verification was approved.
         """
-        log.info(u"Verification for user '{user_id}' approved by '{reviewer}' SSO.".format(
+        log.info(u"Verification for user '{user_id}' approved by '{reviewer}' SSO.".format(  # lint-amnesty, pylint: disable=logging-format-interpolation
             user_id=self.user, reviewer=approved_by
         ))
 
@@ -262,7 +262,7 @@ class SSOVerification(IDVerificationAttempt):
         )
 
         message = u'LEARNER_NOW_VERIFIED signal fired for {user} from SSOVerification'
-        log.info(message.format(user=self.user.username))
+        log.info(message.format(user=self.user.username))  # lint-amnesty, pylint: disable=logging-format-interpolation
 
 
 class PhotoVerification(IDVerificationAttempt):
@@ -446,7 +446,7 @@ class PhotoVerification(IDVerificationAttempt):
         if self.status == self.STATUS.approved:
             return
 
-        log.info(u"Verification for user '{user_id}' approved by '{reviewer}'.".format(
+        log.info(u"Verification for user '{user_id}' approved by '{reviewer}'.".format(  # lint-amnesty, pylint: disable=logging-format-interpolation
             user_id=self.user, reviewer=user_id
         ))
         self.error_msg = ""  # reset, in case this attempt was denied before
@@ -465,7 +465,7 @@ class PhotoVerification(IDVerificationAttempt):
         )
 
         message = u'LEARNER_NOW_VERIFIED signal fired for {user} from PhotoVerification'
-        log.info(message.format(user=self.user.username))
+        log.info(message.format(user=self.user.username))  # lint-amnesty, pylint: disable=logging-format-interpolation
 
     @status_before_must_be("ready", "must_retry")
     def mark_submit(self):
@@ -548,7 +548,7 @@ class PhotoVerification(IDVerificationAttempt):
             lets you amend the error message in case there were additional
             details to be made.
         """
-        log.info(u"Verification for user '{user_id}' denied by '{reviewer}'.".format(
+        log.info(u"Verification for user '{user_id}' denied by '{reviewer}'.".format(  # lint-amnesty, pylint: disable=logging-format-interpolation
             user_id=self.user, reviewer=reviewing_user
         ))
         self.error_msg = error_msg
