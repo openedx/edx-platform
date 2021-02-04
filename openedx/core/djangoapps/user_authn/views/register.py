@@ -52,7 +52,11 @@ from openedx.core.djangoapps.user_api.accounts.api import (
 )
 from openedx.core.djangoapps.user_api.preferences import api as preferences_api
 from openedx.core.djangoapps.user_authn.cookies import set_logged_in_cookies
-from openedx.core.djangoapps.user_authn.utils import generate_password, is_registration_api_v1
+from openedx.core.djangoapps.user_authn.utils import (
+    generate_password,
+    is_registration_api_v1,
+    should_redirect_to_authn_microfrontend
+)
 from openedx.core.djangoapps.user_authn.views.registration_form import (
     AccountCreationForm,
     RegistrationFormFactory,
@@ -333,17 +337,26 @@ def _track_user_registration(user, profile, params, third_party_provider):
         # .. pii: Many pieces of PII are sent to Segment here. Retired directly through Segment API call in Tubular.
         # .. pii_types: email_address, username, name, birth_date, location, gender
         # .. pii_retirement: third_party
+        properties = {
+            'category': 'conversion',
+            # ..pii: Learner email is sent to Segment in following line and will be associated with analytics data.
+            'email': user.email,
+            'label': params.get('course_id'),
+            'provider': third_party_provider.name if third_party_provider else None
+        }
+
+        if request.headers.get('host') in [
+            urlparse(settings.LMS_ROOT_URL).netloc, urlparse(settings.LOGISTRATION_MICROFRONTEND_URL).netloc
+        ]:
+            properties.update({
+                'is_edx_mfe': should_redirect_to_authn_microfrontend(),
+            })
+
         segment.identify(*identity_args)
         segment.track(
             user.id,
             "edx.bi.user.account.registered",
-            {
-                'category': 'conversion',
-                # ..pii: Learner email is sent to Segment in following line and will be associated with analytics data.
-                'email': user.email,
-                'label': params.get('course_id'),
-                'provider': third_party_provider.name if third_party_provider else None
-            },
+            properties,
         )
 
 

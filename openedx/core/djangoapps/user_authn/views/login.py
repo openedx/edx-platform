@@ -26,6 +26,7 @@ from edx_django_utils.monitoring import set_custom_attribute
 from ratelimit.decorators import ratelimit
 from ratelimitbackend.exceptions import RateLimitException
 from rest_framework.views import APIView
+from urllib.parse import urlparse
 
 from common.djangoapps.edxmako.shortcuts import render_to_response
 from openedx.core.djangoapps.password_policy import compliance as password_policy_compliance
@@ -296,6 +297,18 @@ def _track_user_login(user, request):
     # .. pii: Username and email are sent to Segment here. Retired directly through Segment API call in Tubular.
     # .. pii_types: email_address, username
     # .. pii_retirement: third_party
+    properties = {
+        'category': "conversion",
+        'label': request.POST.get('course_id'),
+        'provider': None
+    }
+    if request.headers.get('host') in [
+        urlparse(settings.LMS_ROOT_URL).netloc, urlparse(settings.LOGISTRATION_MICROFRONTEND_URL).netloc
+    ]:
+        properties.update({
+            'is_edx_mfe': should_redirect_to_authn_microfrontend(),
+        })
+
     segment.identify(
         user.id,
         {
@@ -312,11 +325,7 @@ def _track_user_login(user, request):
     segment.track(
         user.id,
         "edx.bi.user.account.authenticated",
-        {
-            'category': "conversion",
-            'label': request.POST.get('course_id'),
-            'provider': None
-        },
+        properties,
     )
 
 
