@@ -20,7 +20,7 @@ class TestVideoBlockURLTransformer(ModuleStoreTestCase):
     """
 
     def setUp(self):
-        super(TestVideoBlockURLTransformer, self).setUp()
+        super(TestVideoBlockURLTransformer, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.course_key = ToyCourseFactory.create().id
         self.course_usage_key = self.store.make_course_usage_key(self.course_key)
         self.block_structure = BlockStructureFactory.create_from_modulestore(self.course_usage_key, self.store)

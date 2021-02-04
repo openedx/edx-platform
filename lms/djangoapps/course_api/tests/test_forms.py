@@ -48,7 +48,7 @@ class TestCourseListGetForm(FormTestMixin, UsernameTestMixin, SharedModuleStoreT
         cls.course = CourseFactory.create()
 
     def setUp(self):
-        super(TestCourseListGetForm, self).setUp()
+        super(TestCourseListGetForm, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
 
         self.student = UserFactory.create()
         self.set_up_data(self.student)
@@ -100,7 +100,7 @@ class TestCourseListGetForm(FormTestMixin, UsernameTestMixin, SharedModuleStoreT
         self.assert_valid(self.cleaned_data)
 
 
-class TestCourseIdListGetForm(FormTestMixin, UsernameTestMixin, SharedModuleStoreTestCase):
+class TestCourseIdListGetForm(FormTestMixin, UsernameTestMixin, SharedModuleStoreTestCase):  # lint-amnesty, pylint: disable=missing-class-docstring
     FORM_CLASS = CourseIdListGetForm
 
     @classmethod
@@ -110,7 +110,7 @@ class TestCourseIdListGetForm(FormTestMixin, UsernameTestMixin, SharedModuleStor
         cls.course = CourseFactory.create()
 
     def setUp(self):
-        super(TestCourseIdListGetForm, self).setUp()
+        super(TestCourseIdListGetForm, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
 
         self.student = UserFactory.create()
         self.set_up_data(self.student)
@@ -149,7 +149,7 @@ class TestCourseDetailGetForm(FormTestMixin, UsernameTestMixin, SharedModuleStor
         cls.course = CourseFactory.create()
 
     def setUp(self):
-        super(TestCourseDetailGetForm, self).setUp()
+        super(TestCourseDetailGetForm, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
 
         self.student = UserFactory.create()
         self.set_up_data(self.student)

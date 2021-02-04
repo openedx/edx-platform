@@ -39,7 +39,7 @@ class TestGetBlocks(SharedModuleStoreTestCase):
         cls.store.update_item(cls.html_block, ModuleStoreEnum.UserID.test)
 
     def setUp(self):
-        super(TestGetBlocks, self).setUp()
+        super(TestGetBlocks, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.user = UserFactory.create()
         self.request = RequestFactory().get("/dummy")
         self.request.user = self.user
@@ -139,7 +139,7 @@ class TestGetBlocksMobileHack(SharedModuleStoreTestCase):
             )
 
     def setUp(self):
-        super(TestGetBlocksMobileHack, self).setUp()
+        super(TestGetBlocksMobileHack, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.user = UserFactory.create()
         self.request = RequestFactory().get("/dummy")
         self.request.user = self.user
@@ -193,7 +193,7 @@ class TestGetBlocksQueryCountsBase(SharedModuleStoreTestCase):
     ENABLED_SIGNALS = ['course_published']
 
     def setUp(self):
-        super(TestGetBlocksQueryCountsBase, self).setUp()
+        super(TestGetBlocksQueryCountsBase, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
 
         self.user = UserFactory.create()
         self.request = RequestFactory().get("/dummy")

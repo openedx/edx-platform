@@ -37,7 +37,7 @@ class TestBlockSerializerBase(SharedModuleStoreTestCase):
         cls.store.update_item(cls.html_block, ModuleStoreEnum.UserID.test)
 
     def setUp(self):
-        super(TestBlockSerializerBase, self).setUp()
+        super(TestBlockSerializerBase, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
 
         self.user = UserFactory.create()
 

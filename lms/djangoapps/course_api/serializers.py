@@ -4,14 +4,14 @@ Course API Serializers.  Representing course catalog data
 
 
 from edx_django_utils import monitoring as monitoring_utils
-import six.moves.urllib.error
-import six.moves.urllib.parse
-import six.moves.urllib.request
+import six.moves.urllib.error  # lint-amnesty, pylint: disable=wrong-import-order
+import six.moves.urllib.parse  # lint-amnesty, pylint: disable=wrong-import-order
+import six.moves.urllib.request  # lint-amnesty, pylint: disable=wrong-import-order
 from django.urls import reverse
 from rest_framework import serializers
 
 from openedx.core.djangoapps.models.course_details import CourseDetails
-from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
+from openedx.core.djangoapps.content.course_overviews.models import CourseOverview  # lint-amnesty, pylint: disable=unused-import
 from openedx.core.lib.api.fields import AbsoluteURLField
 
 
@@ -21,7 +21,7 @@ class _MediaSerializer(serializers.Serializer):  # pylint: disable=abstract-meth
     """
 
     def __init__(self, uri_attribute, *args, **kwargs):
-        super(_MediaSerializer, self).__init__(*args, **kwargs)
+        super(_MediaSerializer, self).__init__(*args, **kwargs)  # lint-amnesty, pylint: disable=super-with-arguments
         self.uri_attribute = uri_attribute
 
     uri = serializers.SerializerMethodField(source='*')
@@ -41,7 +41,7 @@ class _AbsolutMediaSerializer(_MediaSerializer):  # pylint: disable=abstract-met
 
     def __call__(self, serializer_field):
         self.context = serializer_field.context
-        return super(self).__call__(serializer_field)
+        return super(self).__call__(serializer_field)  # lint-amnesty, pylint: disable=bad-super-call
 
     uri_absolute = serializers.SerializerMethodField(source="*")
 
@@ -62,7 +62,7 @@ class _AbsolutMediaSerializer(_MediaSerializer):  # pylint: disable=abstract-met
         # In order to use the AbsoluteURLField to have the same
         # behaviour what ImageSerializer provides, we need to set
         # the request for the field
-        field._context = {"request": self.context.get("request")}
+        field._context = {"request": self.context.get("request")}  # lint-amnesty, pylint: disable=protected-access
 
         return field.to_representation(cdn_applied_uri)
 

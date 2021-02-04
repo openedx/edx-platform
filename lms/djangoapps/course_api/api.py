@@ -6,7 +6,7 @@ import logging
 from edx_django_utils.monitoring import function_trace
 from edx_when.api import get_dates_for_course
 from django.conf import settings
-from django.contrib.auth.models import AnonymousUser, User
+from django.contrib.auth.models import AnonymousUser, User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.urls import reverse
 from rest_framework.exceptions import PermissionDenied
 import search
@@ -18,7 +18,7 @@ from lms.djangoapps.courseware.courses import (
     get_courses,
     get_permission_for_course_about
 )
-from opaque_keys.edx.django.models import CourseKeyField
+from opaque_keys.edx.django.models import CourseKeyField  # lint-amnesty, pylint: disable=wrong-import-order
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.lib.api.view_utils import LazySequence
 from common.djangoapps.student.models import CourseAccessRole
