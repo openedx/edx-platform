@@ -46,12 +46,12 @@ def main():  # lint-amnesty, pylint: disable=missing-function-docstring
     system = DemoSystem()
 
     for problem_file in args.files:
-        log.info("Opening {0}".format(problem_file.name))
+        log.info("Opening {0}".format(problem_file.name))  # lint-amnesty, pylint: disable=logging-format-interpolation
 
         try:
             problem = LoncapaProblem(problem_file, "fakeid", seed=args.seed, system=system)  # lint-amnesty, pylint: disable=no-value-for-parameter, unexpected-keyword-arg
         except Exception as ex:  # lint-amnesty, pylint: disable=broad-except
-            log.error("Could not parse file {0}".format(problem_file.name))
+            log.error("Could not parse file {0}".format(problem_file.name))  # lint-amnesty, pylint: disable=logging-format-interpolation
             log.exception(ex)
             continue
 
@@ -98,7 +98,7 @@ def check_that_blanks_fail(problem):
     try:
         assert all(result == 'incorrect' for result in grading_results.values())
     except AssertionError:
-        log.error("Blank accepted as correct answer in {0} for {1}"
+        log.error("Blank accepted as correct answer in {0} for {1}"  # lint-amnesty, pylint: disable=logging-format-interpolation
                   .format(problem,
                           [answer_id for answer_id, result
                            in sorted(grading_results.items())
@@ -125,7 +125,7 @@ def check_that_suggested_answers_work(problem):
     all_answers = dict((answer_id, real_answers.get(answer_id, ""))
                        for answer_id in all_answer_ids)
 
-    log.debug("Real answers: {0}".format(real_answers))
+    log.debug("Real answers: {0}".format(real_answers))  # lint-amnesty, pylint: disable=logging-format-interpolation
     if real_answers:
         try:
             real_results = dict((answer_id, result) for answer_id, result
@@ -138,13 +138,13 @@ def check_that_suggested_answers_work(problem):
             log.error("The variable \"{0}\" specified in the ".format(uv_exc) +  # lint-amnesty, pylint: disable=logging-not-lazy
                       "solution isn't recognized (is it a units measure?).")
         except AssertionError:
-            log.error("The following generated answers were not accepted for {0}:"
+            log.error("The following generated answers were not accepted for {0}:"  # lint-amnesty, pylint: disable=logging-format-interpolation
                       .format(problem))
             for question_id, result in sorted(real_results.items()):
                 if result != 'correct':
-                    log.error("  {0} = {1}".format(question_id, real_answers[question_id]))
+                    log.error("  {0} = {1}".format(question_id, real_answers[question_id]))  # lint-amnesty, pylint: disable=logging-format-interpolation
         except Exception as ex:  # lint-amnesty, pylint: disable=broad-except
-            log.error("Uncaught error in {0}".format(problem))
+            log.error("Uncaught error in {0}".format(problem))  # lint-amnesty, pylint: disable=logging-format-interpolation
             log.exception(ex)
 
 
@@ -153,7 +153,7 @@ def log_captured_output(output_stream, stream_name):  # lint-amnesty, pylint: di
     output_text = output_stream.read()
     if output_text:
         log.info("##### Begin {0} #####\n".format(stream_name) + output_text)  # lint-amnesty, pylint: disable=logging-not-lazy
-        log.info("##### End {0} #####".format(stream_name))
+        log.info("##### End {0} #####".format(stream_name))  # lint-amnesty, pylint: disable=logging-format-interpolation
 
 
 if __name__ == '__main__':

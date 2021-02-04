@@ -217,7 +217,7 @@ def award_program_certificates(self, username):  # lint-amnesty, pylint: disable
                 LOGGER.info(u'Awarded certificate for program %s to user %s', program_uuid, username)
             except exceptions.HttpNotFoundError:
                 LOGGER.exception(
-                    u"""Certificate for program {uuid} could not be found. Unable to award certificate to user  # lint-amnesty, pylint: disable=logging-format-interpolation
+                    u"""Certificate for program {uuid} could not be found. Unable to award certificate to user  # lint-amnesty, pylint: disable=logging-format-interpolation  # lint-amnesty, pylint: disable=logging-format-interpolation
                     {username}. The program might not be configured.""".format(uuid=program_uuid, username=username)
                 )
             except exceptions.HttpClientError as exc:
@@ -228,14 +228,14 @@ def award_program_certificates(self, username):  # lint-amnesty, pylint: disable
                 if exc.response.status_code == 429:  # lint-amnesty, pylint: disable=no-else-raise, no-member
                     rate_limit_countdown = 60
                     LOGGER.info(
-                        u"""Rate limited. Retrying task to award certificates to user {username} in {countdown}  # lint-amnesty, pylint: disable=logging-format-interpolation
+                        u"""Rate limited. Retrying task to award certificates to user {username} in {countdown}  # lint-amnesty, pylint: disable=logging-format-interpolation  # lint-amnesty, pylint: disable=logging-format-interpolation
                         seconds""".format(username=username, countdown=rate_limit_countdown)
                     )
                     # Retry after 60 seconds, when we should be in a new throttling window
                     raise self.retry(exc=exc, countdown=rate_limit_countdown, max_retries=MAX_RETRIES)
                 else:
                     LOGGER.exception(
-                        u"""Unable to award certificate to user {username} for program {uuid}. The program might not be  # lint-amnesty, pylint: disable=logging-format-interpolation
+                        u"""Unable to award certificate to user {username} for program {uuid}. The program might not be  # lint-amnesty, pylint: disable=logging-format-interpolation  # lint-amnesty, pylint: disable=logging-format-interpolation
                         configured.""".format(username=username, uuid=program_uuid)
                     )
             except Exception:  # pylint: disable=broad-except
@@ -476,7 +476,7 @@ def revoke_program_certificates(self, username, course_key):
                 LOGGER.info(u'Revoked certificate for program %s for user %s', program_uuid, username)
             except exceptions.HttpNotFoundError:
                 LOGGER.exception(
-                    u"""Certificate for program {uuid} could not be found. Unable to revoke certificate for user  # lint-amnesty, pylint: disable=logging-format-interpolation
+                    u"""Certificate for program {uuid} could not be found. Unable to revoke certificate for user  # lint-amnesty, pylint: disable=logging-format-interpolation  # lint-amnesty, pylint: disable=logging-format-interpolation
                     {username}.""".format(uuid=program_uuid, username=username)
                 )
             except exceptions.HttpClientError as exc:
@@ -487,7 +487,7 @@ def revoke_program_certificates(self, username, course_key):
                 if exc.response.status_code == 429:  # pylint: disable=no-member, no-else-raise
                     rate_limit_countdown = 60
                     LOGGER.info(
-                        u"""Rate limited. Retrying task to revoke certificates for user {username} in {countdown}  # lint-amnesty, pylint: disable=logging-format-interpolation
+                        u"""Rate limited. Retrying task to revoke certificates for user {username} in {countdown}  # lint-amnesty, pylint: disable=logging-format-interpolation  # lint-amnesty, pylint: disable=logging-format-interpolation
                         seconds""".format(username=username, countdown=rate_limit_countdown)
                     )
                     # Retry after 60 seconds, when we should be in a new throttling window

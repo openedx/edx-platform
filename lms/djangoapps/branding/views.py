@@ -71,7 +71,7 @@ def index(request):
         return student_views.index(request, user=request.user)
     except NoReverseMatch:
         log.error(
-            'https is not a registered namespace Request from {}'.format(domain),
+            'https is not a registered namespace Request from {}'.format(domain),  # lint-amnesty, pylint: disable=logging-format-interpolation
             'request_site= {}'.format(request.site.__dict__),
             'enable_mktg_site= {}'.format(enable_mktg_site),
             'Auth Status= {}'.format(request.user.is_authenticated),
