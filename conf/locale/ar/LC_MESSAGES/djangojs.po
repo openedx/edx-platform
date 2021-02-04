@@ -6,6 +6,7 @@
 #
 # Translators:
 # Rana Waqar <rana.waqar@arbisoft.com>, 2020
+# Imran Bashir <admin@omnipreneurshipacademy.com>, 2021
 #
 # #-#-#-#-#  djangojs-studio.po (0.1a)  #-#-#-#-#
 # edX translation file.
@@ -50,7 +51,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2021-01-28 06:51+0000\n"
+"POT-Creation-Date: 2021-02-02 08:03+0000\n"
 "PO-Revision-Date: 2020-10-27 19:11+0000\n"
 "Last-Translator: Imran Bashir <admin@omnipreneurshipacademy.com>, 2021\n"
 "Language-Team: Arabic (https://www.transifex.com/philanthropy-u/teams/113553/ar/)\n"
@@ -59,7 +60,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=6; plural=n==0 ? 0 : n==1 ? 1 : n==2 ? 2 : n%100>=3 && n%100<=10 ? 3 : n%100>=11 && n%100<=99 ? 4 : 5;\n"
-"Generated-By: Babel 2.8.0\n"
+"Generated-By: Babel 2.8.1\n"
 
 #: cms/static/cms/js/main.js cms/static/js/views/active_video_upload_list.js
 #: cms/static/js/views/video_transcripts.js
@@ -806,7 +807,6 @@ msgstr "حذف الصف"
 msgid "Delete table"
 msgstr "حذف الجدول"
 
-#. #-#-#-#-#  djangojs-partial.po (0.1a)  #-#-#-#-#
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
@@ -5140,7 +5140,6 @@ msgstr "لم نتمكّن من إنشاء حسابك. "
 
 #: lms/static/js/student_account/views/RegisterView.js
 #: lms/templates/student_account/register.underscore
-#: themes/edx-platform/adg/lms/templates/student_account/register.underscore
 msgid "Create Account"
 msgstr "إنشاء حساب "
 
@@ -5653,7 +5652,6 @@ msgid "CHANGE PASSWORD"
 msgstr ""
 
 #: openedx/adg/lms/static/components/student_account/PasswordResetConfirmation.jsx
-#: themes/edx-platform/adg/lms/templates/student_account/password_reset.underscore
 msgid "Password Reset"
 msgstr "كلمة المرور"
 
@@ -5792,26 +5790,6 @@ msgstr "الإنجازات"
 #: openedx/features/learner_profile/static/learner_profile/js/views/learner_profile_view.js
 msgid "Profile"
 msgstr "الملف الشخصي"
-
-#: themes/edx-platform/adg/lms/static/js/applications/contact_info_validations.js
-msgid "This field is required"
-msgstr "كلمة المرور مطلوبة"
-
-#: themes/edx-platform/adg/lms/static/js/applications/contact_info_validations.js
-msgid "Please enter valid url"
-msgstr "يُرجى إدخال الدرجة."
-
-#: themes/edx-platform/adg/lms/static/js/applications/contact_info_validations.js
-msgid "File extension not allowed!"
-msgstr ""
-
-#: themes/edx-platform/adg/lms/static/js/applications/contact_info_validations.js
-msgid "Phone number can only contain numbers"
-msgstr ""
-
-#: themes/edx-platform/adg/lms/static/js/applications/contact_info_validations.js
-msgid "Phone number field can not exceed 15 digits."
-msgstr ""
 
 #: cms/static/cms/js/main.js
 msgid "Studio's having trouble saving your work"
@@ -8847,8 +8825,6 @@ msgstr "إنشاء حساب"
 
 #: lms/templates/student_account/hinted_login.underscore
 #: lms/templates/student_account/login.underscore
-#: themes/edx-platform/adg/lms/templates/student_account/login.underscore
-#: themes/edx-platform/adg/lms/templates/student_account/register.underscore
 msgid "Sign in"
 msgstr "تسجيل الدخول"
 
@@ -8897,23 +8873,19 @@ msgid "Create an Account."
 msgstr "إنشاء حساب."
 
 #: lms/templates/student_account/login.underscore
-#: themes/edx-platform/adg/lms/templates/student_account/login.underscore
 msgid "Sign in to continue learning as {email}"
 msgstr "تسجيل الدخول لمتابعة التعلم كـ {email}"
 
 #: lms/templates/student_account/login.underscore
-#: themes/edx-platform/adg/lms/templates/student_account/login.underscore
 msgid "Sign in to continue learning"
 msgstr "تسجيل الدخول لمتابعة التعلم"
 
 #: lms/templates/student_account/login.underscore
-#: themes/edx-platform/adg/lms/templates/student_account/login.underscore
 msgid ""
 "You already have an edX account with your {enterprise_name} email address."
 msgstr "لديك حساب edX سابق بعنوان بريدك الإلكتروني في {enterprise_name}."
 
 #: lms/templates/student_account/login.underscore
-#: themes/edx-platform/adg/lms/templates/student_account/login.underscore
 msgid ""
 "Going forward, your account information will be updated and maintained by "
 "{enterprise_name}."
@@ -8922,7 +8894,6 @@ msgstr ""
 "{enterprise_name}."
 
 #: lms/templates/student_account/login.underscore
-#: themes/edx-platform/adg/lms/templates/student_account/login.underscore
 msgid ""
 "You can view your information or unlink from {enterprise_name} anytime in "
 "your Account Settings."
@@ -8931,17 +8902,14 @@ msgstr ""
 "إعدادات حسابك."
 
 #: lms/templates/student_account/login.underscore
-#: themes/edx-platform/adg/lms/templates/student_account/login.underscore
 msgid "To continue learning with this account, sign in below."
 msgstr "لمتابعة التعلم باستخدام هذا الحساب ، قم بتسجيل الدخول أدناه."
 
 #: lms/templates/student_account/login.underscore
-#: themes/edx-platform/adg/lms/templates/student_account/login.underscore
 msgid "Sign In"
 msgstr "تسجيل الدخول"
 
 #: lms/templates/student_account/login.underscore
-#: themes/edx-platform/adg/lms/templates/student_account/login.underscore
 msgid ""
 "Sign in here using your email address and password, or use one of the "
 "providers listed below."
@@ -8950,27 +8918,22 @@ msgstr ""
 "أحد المزوِّدين المذكورين أدناه."
 
 #: lms/templates/student_account/login.underscore
-#: themes/edx-platform/adg/lms/templates/student_account/login.underscore
 msgid "Sign in here using your email address and password."
 msgstr "يُرجى تسجيل دخولك باستخدام عنوان بريدك الإلكتروني وكلمة المرور."
 
 #: lms/templates/student_account/login.underscore
-#: themes/edx-platform/adg/lms/templates/student_account/login.underscore
 msgid "If you do not yet have an account, use the button below to register."
 msgstr "إذا لم تكن تملك حسابًا بعد، يُرجى استخدام الزرّ أدناه للتسجيل."
 
 #: lms/templates/student_account/login.underscore
-#: themes/edx-platform/adg/lms/templates/student_account/login.underscore
 msgid "Use my university info"
 msgstr "استخدام معلومات جامعتي"
 
 #: lms/templates/student_account/login.underscore
-#: themes/edx-platform/adg/lms/templates/student_account/login.underscore
 msgid "or sign in with"
 msgstr "أو سجّل الدخول باستخدام"
 
 #: lms/templates/student_account/login.underscore
-#: themes/edx-platform/adg/lms/templates/student_account/login.underscore
 #, python-format
 msgid "Sign in with %(providerName)s"
 msgstr "يُرجى منك تسجيل دخولك باستخدام %(providerName)s"
@@ -9004,13 +8967,11 @@ msgid "Create an account using"
 msgstr "أنشئ حساباً باستخدام"
 
 #: lms/templates/student_account/register.underscore
-#: themes/edx-platform/adg/lms/templates/student_account/register.underscore
 #, python-format
 msgid "Create account using %(providerName)s."
 msgstr "أنشئ حساباً باستخدام %(providerName)s."
 
 #: lms/templates/student_account/register.underscore
-#: themes/edx-platform/adg/lms/templates/student_account/register.underscore
 msgid "Use my institution/campus credentials"
 msgstr "استخدام بياناتي لدى المؤسّسة/ الحرم الجامعي"
 
@@ -9722,49 +9683,6 @@ msgstr ""
 "{download_link_start} قم بتنزيل هذه الصورة (انقر بزر الفأرة الأيمن أو انقر "
 "فوق زر الخيار ، ثم احفظها باسم) {link_end} ثم {upload_link_start} حمّلها "
 "{link_end} إلى backpack."
-
-#: themes/edx-platform/adg/lms/templates/student_account/form_field.underscore
-msgid "Forgot password?"
-msgstr "استعادة كلمة المرور الخاصة بي"
-
-#: themes/edx-platform/adg/lms/templates/student_account/login.underscore
-#: themes/edx-platform/adg/lms/templates/student_account/register.underscore
-msgid "OR CONTINUE WITH"
-msgstr ""
-
-#: themes/edx-platform/adg/lms/templates/student_account/login.underscore
-msgid "New to the Omnipreneurship Academy?"
-msgstr ""
-
-#: themes/edx-platform/adg/lms/templates/student_account/login.underscore
-msgid "Create account"
-msgstr "إنشاء حساب"
-
-#: themes/edx-platform/adg/lms/templates/student_account/password_reset.underscore
-msgid ""
-"Please enter the email address you registered with. We will send you a "
-"password reset email."
-msgstr ""
-
-#: themes/edx-platform/adg/lms/templates/student_account/password_reset.underscore
-msgid "SEND"
-msgstr ""
-
-#: themes/edx-platform/adg/lms/templates/student_account/register.underscore
-msgid "Already have an account?"
-msgstr "هل لديك حساب {platformName} مسبقاً؟"
-
-#: themes/edx-platform/adg/lms/templates/student_account/register.underscore
-msgid "Start learning with the Omnipreneurship Academy!"
-msgstr ""
-
-#: themes/edx-platform/adg/lms/templates/student_account/register.underscore
-msgid "Create a free account in less than a minute."
-msgstr ""
-
-#: cms/templates/js/course_info_update.underscore
-msgid "Date"
-msgstr "تاريخ الاستحقاق"
 
 #: cms/templates/js/access-editor.underscore
 msgid "Limit Access"
@@ -10483,6 +10401,10 @@ msgid ""
 msgstr ""
 "هناك تعليمات برمجية غير صحيحة في المحتوى الخاص بك. يُرجى التأكّد من صحّة "
 "تعليمات HTML المستخدمة."
+
+#: cms/templates/js/course_info_update.underscore
+msgid "Date"
+msgstr "تاريخ الاستحقاق:"
 
 #: cms/templates/js/course_info_update.underscore
 msgid "Post"
@@ -11522,33 +11444,3 @@ msgstr ""
 #: cms/templates/js/video/transcripts/messages/transcripts-use-existing.underscore
 msgid "Use Current Transcript"
 msgstr "استخدم النص الحالي"
-
-#~ msgid " Link"
-#~ msgstr "الربط"
-
-#~ msgid "Order No."
-#~ msgstr "رقم الطلبية"
-
-#~ msgid "No receipt available"
-#~ msgstr "غير متاح"
-
-#~ msgid "Thank you! We have received your payment for {courseName}."
-#~ msgstr "أنت تطور اشتراكك في: {courseName}"
-
-#~ msgid "Check your email"
-#~ msgstr "يُرجى تفقّد بريدك الإلكتروني"
-
-#~ msgid ""
-#~ "You need to activate your account before you can enroll in courses. Check "
-#~ "your inbox for an activation email."
-#~ msgstr ""
-#~ "تحتاج إلى تفعيل حسابك قبل أن تتمكّن من التسجيل في المساقات. لذا يُرجى تفقّد "
-#~ "صندوق بريدك الإلكتروني حيث ستردك رسالة تفعيل. وبعد أن تنتهي من التفعيل، "
-#~ "يمكنك العودة وإعادة فتح هذه الصفحة."
-
-#~ msgid ""
-#~ "A driver's license, passport, or government-issued ID with your name and "
-#~ "photo."
-#~ msgstr ""
-#~ "رخصة القيادة، أو جواز السفر، أو بطاقة شخصية صادرة عن الحكومة، بحيث تحمل أي "
-#~ "واحدة من هذه الوثائق اسمك وصورتك"
