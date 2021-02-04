@@ -1,4 +1,4 @@
-
+  # lint-amnesty, pylint: disable=missing-module-docstring
 from unittest import TestCase
 
 from six.moves import range
@@ -6,9 +6,9 @@ from six.moves import range
 from .symmath_check import symmath_check
 
 
-class SymmathCheckTest(TestCase):
+class SymmathCheckTest(TestCase):  # lint-amnesty, pylint: disable=missing-class-docstring
     def test_symmath_check_integers(self):
-        number_list = [i for i in range(-100, 100)]
+        number_list = [i for i in range(-100, 100)]  # lint-amnesty, pylint: disable=unnecessary-comprehension
         self._symmath_check_numbers(number_list)
 
     def test_symmath_check_floats(self):
@@ -73,7 +73,7 @@ class SymmathCheckTest(TestCase):
         self.assertTrue('ok' in result and not result['ok'])
         self.assertNotIn('fail', result['msg'])
 
-    def _symmath_check_numbers(self, number_list):
+    def _symmath_check_numbers(self, number_list):  # lint-amnesty, pylint: disable=missing-function-docstring
 
         for n in number_list:
 

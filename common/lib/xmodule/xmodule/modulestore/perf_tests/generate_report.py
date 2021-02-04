@@ -95,7 +95,7 @@ class ImportExportReportGen(ReportGenerator):
     Class which generates report for course import/export performance test data.
     """
     def __init__(self, db_name):
-        super(ImportExportReportGen, self).__init__(db_name)
+        super(ImportExportReportGen, self).__init__(db_name)  # lint-amnesty, pylint: disable=super-with-arguments
         self._read_timing_data()
 
     def _read_timing_data(self):
@@ -129,7 +129,7 @@ class ImportExportReportGen(ReportGenerator):
         html = HTMLDocument("Results")
 
         # Output comparison of each phase to a different table.
-        for phase in self.run_data.keys():
+        for phase in self.run_data.keys():  # lint-amnesty, pylint: disable=consider-iterating-dictionary, too-many-nested-blocks
             if phase in ('fake_assets',):
                 continue
             per_phase = self.run_data[phase]
@@ -183,7 +183,7 @@ class FindReportGen(ReportGenerator):
     Class which generates report for asset access performance test data.
     """
     def __init__(self, db_name):
-        super(FindReportGen, self).__init__(db_name)
+        super(FindReportGen, self).__init__(db_name)  # lint-amnesty, pylint: disable=super-with-arguments
         self._read_timing_data()
 
     def _read_timing_data(self):
@@ -229,7 +229,7 @@ class FindReportGen(ReportGenerator):
         #     per_phase = self.run_data[store]
         #     html.add_header(1, store)
 
-        for phase in self.run_data.keys():
+        for phase in self.run_data.keys():  # lint-amnesty, pylint: disable=consider-iterating-dictionary
             per_phase = self.run_data[phase]
 
             # Make the table header columns and the table.

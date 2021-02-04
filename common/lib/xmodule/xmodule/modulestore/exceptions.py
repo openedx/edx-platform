@@ -15,14 +15,14 @@ class MultipleCourseBlocksFound(Exception):
     """
     Raise this exception when Iterating over the course blocks return multiple course blocks.
     """
-    pass
+    pass  # lint-amnesty, pylint: disable=unnecessary-pass
 
 
 class MultipleLibraryBlocksFound(Exception):
     """
     Raise this exception when Iterating over the library blocks return multiple library blocks.
     """
-    pass
+    pass  # lint-amnesty, pylint: disable=unnecessary-pass
 
 
 class InsufficientSpecificationError(Exception):
@@ -47,7 +47,7 @@ class ReferentialIntegrityError(Exception):
     xblock points to a nonexistent child (which probably raises ItemNotFoundError instead depending
     on context).
     """
-    pass
+    pass  # lint-amnesty, pylint: disable=unnecessary-pass
 
 
 class DuplicateItemError(Exception):
@@ -55,7 +55,7 @@ class DuplicateItemError(Exception):
     Attempted to create an item which already exists.
     """
     def __init__(self, element_id, store=None, collection=None):
-        super(DuplicateItemError, self).__init__()
+        super(DuplicateItemError, self).__init__()  # lint-amnesty, pylint: disable=super-with-arguments
         self.element_id = element_id
         self.store = store
         self.collection = collection
@@ -77,7 +77,7 @@ class VersionConflictError(Exception):
     The caller asked for either draft or published head and gave a version which conflicted with it.
     """
     def __init__(self, requestedLocation, currentHeadVersionGuid):
-        super(VersionConflictError, self).__init__(u'Requested {}, but current head is {}'.format(
+        super(VersionConflictError, self).__init__(u'Requested {}, but current head is {}'.format(  # lint-amnesty, pylint: disable=super-with-arguments
             requestedLocation,
             currentHeadVersionGuid
         ))
@@ -91,7 +91,7 @@ class DuplicateCourseError(Exception):
         """
         existing_entry will have the who, when, and other properties of the existing entry
         """
-        super(DuplicateCourseError, self).__init__(
+        super(DuplicateCourseError, self).__init__(  # lint-amnesty, pylint: disable=super-with-arguments
             u'Cannot create course {}, which duplicates {}'.format(course_id, existing_entry)
         )
         self.course_id = course_id
@@ -103,6 +103,6 @@ class InvalidBranchSetting(Exception):
     Raised when the process' branch setting did not match the required setting for the attempted operation on a store.
     """
     def __init__(self, expected_setting, actual_setting):
-        super(InvalidBranchSetting, self).__init__(u"Invalid branch: expected {} but got {}".format(expected_setting, actual_setting))
+        super(InvalidBranchSetting, self).__init__(u"Invalid branch: expected {} but got {}".format(expected_setting, actual_setting))  # lint-amnesty, pylint: disable=line-too-long, super-with-arguments
         self.expected_setting = expected_setting
         self.actual_setting = actual_setting

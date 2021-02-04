@@ -1,4 +1,4 @@
-
+  # lint-amnesty, pylint: disable=missing-module-docstring
 
 import logging
 import os
@@ -26,11 +26,11 @@ VERSIONED_ASSETS_PREFIX = '/assets/courseware'
 VERSIONED_ASSETS_PATTERN = r'/assets/courseware/(v[\d]/)?([a-f0-9]{32})'
 
 
-class StaticContent(object):
+class StaticContent(object):  # lint-amnesty, pylint: disable=missing-class-docstring
     def __init__(self, loc, name, content_type, data, last_modified_at=None, thumbnail_location=None, import_path=None,
                  length=None, locked=False, content_digest=None):
         self.location = loc
-        self.name = name  # a display string which can be edited, and thus not part of the location which needs to be fixed
+        self.name = name  # a display string which can be edited, and thus not part of the location which needs to be fixed  # lint-amnesty, pylint: disable=line-too-long
         self.content_type = content_type
         self._data = data
         self.length = length
@@ -70,7 +70,7 @@ class StaticContent(object):
         )
 
     @staticmethod
-    def compute_location(course_key, path, revision=None, is_thumbnail=False):
+    def compute_location(course_key, path, revision=None, is_thumbnail=False):  # lint-amnesty, pylint: disable=unused-argument
         """
         Constructs a location object for static content.
 
@@ -111,10 +111,10 @@ class StaticContent(object):
     @staticmethod
     def get_static_path_from_location(location):
         """
-        This utility static method will take a location identifier and create a 'durable' /static/.. URL representation of it.
-        This link is 'durable' as it can maintain integrity across cloning of courseware across course-ids, e.g. reruns of
+        This utility static method will take a location identifier and create a 'durable' /static/.. URL representation of it.  # lint-amnesty, pylint: disable=line-too-long
+        This link is 'durable' as it can maintain integrity across cloning of courseware across course-ids, e.g. reruns of  # lint-amnesty, pylint: disable=line-too-long
         courses.
-        In the LMS/CMS, we have runtime link-rewriting, so at render time, this /static/... format will get translated into
+        In the LMS/CMS, we have runtime link-rewriting, so at render time, this /static/... format will get translated into  # lint-amnesty, pylint: disable=line-too-long
         the actual /c4x/... path which the client needs to reference static content
         """
         if location is not None:
@@ -123,7 +123,7 @@ class StaticContent(object):
             return None
 
     @staticmethod
-    def get_base_url_path_for_course_assets(course_key):
+    def get_base_url_path_for_course_assets(course_key):  # lint-amnesty, pylint: disable=missing-function-docstring
         if course_key is None:
             return None
 
@@ -307,10 +307,10 @@ class StaticContent(object):
         return url
 
 
-class StaticContentStream(StaticContent):
-    def __init__(self, loc, name, content_type, stream, last_modified_at=None, thumbnail_location=None, import_path=None,
+class StaticContentStream(StaticContent):  # lint-amnesty, pylint: disable=missing-class-docstring
+    def __init__(self, loc, name, content_type, stream, last_modified_at=None, thumbnail_location=None, import_path=None,  # lint-amnesty, pylint: disable=line-too-long
                  length=None, locked=False, content_digest=None):
-        super(StaticContentStream, self).__init__(loc, name, content_type, None, last_modified_at=last_modified_at,
+        super(StaticContentStream, self).__init__(loc, name, content_type, None, last_modified_at=last_modified_at,  # lint-amnesty, pylint: disable=super-with-arguments
                                                   thumbnail_location=thumbnail_location, import_path=import_path,
                                                   length=length, locked=locked, content_digest=content_digest)
         self._stream = stream
@@ -340,7 +340,7 @@ class StaticContentStream(StaticContent):
     def close(self):
         self._stream.close()
 
-    def copy_to_in_mem(self):
+    def copy_to_in_mem(self):  # lint-amnesty, pylint: disable=missing-function-docstring
         self._stream.seek(0)
         content = StaticContent(self.location, self.name, self.content_type, self._stream.read(),
                                 last_modified_at=self.last_modified_at, thumbnail_location=self.thumbnail_location,
@@ -469,4 +469,4 @@ class ContentStore(object):
         Ensure that all appropriate indexes are created that are needed by this modulestore, or raise
         an exception if unable to.
         """
-        pass
+        pass  # lint-amnesty, pylint: disable=unnecessary-pass

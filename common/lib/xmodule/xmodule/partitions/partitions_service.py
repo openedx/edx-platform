@@ -7,7 +7,7 @@ persist the assignments.
 
 import logging
 
-import six
+import six  # lint-amnesty, pylint: disable=unused-import
 from django.conf import settings
 
 from openedx.core.lib.cache_utils import request_cached

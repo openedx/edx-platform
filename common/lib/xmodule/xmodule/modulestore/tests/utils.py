@@ -33,7 +33,7 @@ from xmodule.tests import DATA_DIR
 from xmodule.x_module import XModuleMixin
 
 
-def load_function(path):
+def load_function(path):  # lint-amnesty, pylint: disable=redefined-outer-name
     """
     Load a function by name.
 
@@ -79,7 +79,7 @@ def mock_tab_from_json(tab_dict):
     return tab_dict
 
 
-def add_temp_files_from_dict(file_dict, dir):
+def add_temp_files_from_dict(file_dict, dir):  # lint-amnesty, pylint: disable=redefined-builtin
     """
     Takes in a dict formatted as: { file_name: content }, and adds files to directory
     """
@@ -90,7 +90,7 @@ def add_temp_files_from_dict(file_dict, dir):
                 opened_file.write(six.text_type(content))
 
 
-def remove_temp_files_from_list(file_list, dir):
+def remove_temp_files_from_list(file_list, dir):  # lint-amnesty, pylint: disable=redefined-builtin
     """
     Takes in a list of file names and removes them from dir if they exist
     """
@@ -134,7 +134,7 @@ class MixedSplitTestCase(TestCase):
         """
         Set up requirements for testing: a user ID and a modulestore
         """
-        super(MixedSplitTestCase, self).setUp()
+        super(MixedSplitTestCase, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.user_id = ModuleStoreEnum.UserID.test
 
         self.store = MixedModuleStore(
@@ -421,7 +421,7 @@ class MixedModulestoreBuilder(StoreBuilderBase):
         names, generators = list(zip(*self.store_builders))
 
         with ExitStack() as stack:
-            modulestores = [stack.enter_context(gen.build_with_contentstore(contentstore, **kwargs)) for gen in generators]
+            modulestores = [stack.enter_context(gen.build_with_contentstore(contentstore, **kwargs)) for gen in generators]  # lint-amnesty, pylint: disable=line-too-long
             # Make the modulestore creation function just return the already-created modulestores
             store_iterator = iter(modulestores)
             next_modulestore = lambda *args, **kwargs: next(store_iterator)
@@ -519,7 +519,7 @@ class PureModulestoreTestCase(TestCase):
     MODULESTORE = None
 
     def setUp(self):
-        super(PureModulestoreTestCase, self).setUp()
+        super(PureModulestoreTestCase, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
 
         builder = self.MODULESTORE.build()
         self.assets, self.store = builder.__enter__()

@@ -274,7 +274,7 @@ class WordCloudBlock(  # pylint: disable=abstract-method
                 'error': 'Unknown Command!'
             })
 
-    def student_view(self, context):
+    def student_view(self, context):  # lint-amnesty, pylint: disable=unused-argument
         """
         Renders the output that a student will see.
         """
@@ -318,7 +318,7 @@ class WordCloudBlock(  # pylint: disable=abstract-method
         # values may be numeric / string or dict
         # default implementation is an empty dict
 
-        xblock_body = super(WordCloudBlock, self).index_dictionary()
+        xblock_body = super(WordCloudBlock, self).index_dictionary()  # lint-amnesty, pylint: disable=super-with-arguments
 
         index_body = {
             "display_name": self.display_name,

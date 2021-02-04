@@ -6,7 +6,7 @@ from string import Template
 
 from lxml import etree
 from xmodule.raw_module import RawDescriptor
-from xmodule.x_module import DEPRECATION_VSCOMPAT_EVENT, XModule
+from xmodule.x_module import DEPRECATION_VSCOMPAT_EVENT, XModule  # lint-amnesty, pylint: disable=unused-import
 
 
 class CustomTagModule(XModule):

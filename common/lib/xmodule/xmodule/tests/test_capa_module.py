@@ -178,10 +178,10 @@ if submission[0] == '':
 
 
 @ddt.ddt
-class ProblemBlockTest(unittest.TestCase):
+class ProblemBlockTest(unittest.TestCase):  # lint-amnesty, pylint: disable=missing-class-docstring
 
     def setUp(self):
-        super(ProblemBlockTest, self).setUp()
+        super(ProblemBlockTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
 
         now = datetime.datetime.now(UTC)
         day_delta = datetime.timedelta(days=1)
@@ -662,7 +662,7 @@ class ProblemBlockTest(unittest.TestCase):
 
         # Expect that we get a dict with "input" stripped from key names
         # and that we get the same values back
-        for key in result.keys():
+        for key in result.keys():  # lint-amnesty, pylint: disable=consider-iterating-dictionary
             original_key = "input_" + key
             self.assertIn(original_key, valid_get_dict, "Output dict should have key %s" % original_key)
             self.assertEqual(valid_get_dict[original_key], result[key])
@@ -1642,7 +1642,7 @@ class ProblemBlockTest(unittest.TestCase):
         self.assertFalse(result['should_enable_next_hint'])
 
     def test_demand_hint_logging(self):
-        def mock_location_text(self):
+        def mock_location_text(self):  # lint-amnesty, pylint: disable=unused-argument
             """
             Mock implementation of __unicode__ or __str__ for the module's location.
             """
@@ -2045,7 +2045,7 @@ class ProblemBlockTest(unittest.TestCase):
         module.submit_problem(get_request_dict)
         # On rescore, state/student_answers should use unmasked names
         with patch.object(module.runtime, 'track_function') as mock_track_function:
-            module.rescore_problem(only_if_higher=False)
+            module.rescore_problem(only_if_higher=False)  # lint-amnesty, pylint: disable=no-member
             mock_call = mock_track_function.mock_calls[0]
             event_info = mock_call[1][1]
             self.assertEqual(mock_call[1][0], 'problem_rescore')
@@ -2108,7 +2108,7 @@ class ProblemBlockTest(unittest.TestCase):
 
 
 @ddt.ddt
-class ProblemBlockXMLTest(unittest.TestCase):
+class ProblemBlockXMLTest(unittest.TestCase):  # lint-amnesty, pylint: disable=missing-class-docstring
     sample_checkbox_problem_xml = textwrap.dedent("""
         <problem>
             <p>Title</p>
@@ -2930,7 +2930,7 @@ class ProblemBlockXMLTest(unittest.TestCase):
             CapaFactory.create(xml=problem_xml)
 
 
-class ComplexEncoderTest(unittest.TestCase):
+class ComplexEncoderTest(unittest.TestCase):  # lint-amnesty, pylint: disable=missing-class-docstring
 
     def test_default(self):
         """
@@ -2948,7 +2948,7 @@ class ProblemCheckTrackingTest(unittest.TestCase):
     """
 
     def setUp(self):
-        super(ProblemCheckTrackingTest, self).setUp()
+        super(ProblemCheckTrackingTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.maxDiff = None
 
     def test_choice_answer_text(self):
@@ -3023,7 +3023,7 @@ class ProblemCheckTrackingTest(unittest.TestCase):
             },
         })
 
-    def capa_factory_for_problem_xml(self, xml):
+    def capa_factory_for_problem_xml(self, xml):  # lint-amnesty, pylint: disable=missing-function-docstring
         class CustomCapaFactory(CapaFactory):
             """
             A factory for creating a Capa problem with arbitrary xml.
@@ -3032,7 +3032,7 @@ class ProblemCheckTrackingTest(unittest.TestCase):
 
         return CustomCapaFactory
 
-    def get_event_for_answers(self, module, answer_input_dict):
+    def get_event_for_answers(self, module, answer_input_dict):  # lint-amnesty, pylint: disable=missing-function-docstring
         with patch.object(module.runtime, 'publish') as mock_track_function:
             module.submit_problem(answer_input_dict)
 
@@ -3270,7 +3270,7 @@ class ProblemBlockReportGenerationTest(unittest.TestCase):
     Ensure that Capa report generation works correctly
     """
 
-    def setUp(self):
+    def setUp(self):  # lint-amnesty, pylint: disable=super-method-not-called
         self.find_question_label_patcher = patch(
             'capa.capa_problem.LoncapaProblem.find_question_label',
             lambda self, answer_id: answer_id
@@ -3304,7 +3304,7 @@ class ProblemBlockReportGenerationTest(unittest.TestCase):
             scope=None,
         )
 
-    def _get_descriptor(self):
+    def _get_descriptor(self):  # lint-amnesty, pylint: disable=missing-function-docstring
         scope_ids = Mock(block_type='problem')
         descriptor = ProblemBlock(get_test_system(), scope_ids=scope_ids)
         descriptor.runtime = Mock()

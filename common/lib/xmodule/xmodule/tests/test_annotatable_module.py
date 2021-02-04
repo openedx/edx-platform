@@ -4,7 +4,7 @@
 import unittest
 
 from lxml import etree
-from mock import Mock
+from mock import Mock  # lint-amnesty, pylint: disable=unused-import
 from opaque_keys.edx.locator import BlockUsageLocator, CourseLocator
 from xblock.field_data import DictFieldData
 from xblock.fields import ScopeIds
@@ -14,7 +14,7 @@ from xmodule.annotatable_module import AnnotatableBlock
 from . import get_test_system
 
 
-class AnnotatableBlockTestCase(unittest.TestCase):
+class AnnotatableBlockTestCase(unittest.TestCase):  # lint-amnesty, pylint: disable=missing-class-docstring
     sample_xml = '''
         <annotatable display_name="Iliad">
             <instructions>Read the text.</instructions>
@@ -49,7 +49,7 @@ class AnnotatableBlockTestCase(unittest.TestCase):
             'data-problem-id': {'value': '0', '_delete': 'problem'}
         }
 
-        actual_attr = self.annotatable._get_annotation_data_attr(0, el)
+        actual_attr = self.annotatable._get_annotation_data_attr(0, el)  # lint-amnesty, pylint: disable=protected-access
 
         self.assertIsInstance(actual_attr, dict)
         self.assertDictEqual(expected_attr, actual_attr)
@@ -59,7 +59,7 @@ class AnnotatableBlockTestCase(unittest.TestCase):
         el = etree.fromstring(xml)
 
         expected_attr = {'class': {'value': 'annotatable-span highlight'}}
-        actual_attr = self.annotatable._get_annotation_class_attr(0, el)
+        actual_attr = self.annotatable._get_annotation_class_attr(0, el)  # lint-amnesty, pylint: disable=protected-access
 
         self.assertIsInstance(actual_attr, dict)
         self.assertDictEqual(expected_attr, actual_attr)
@@ -77,7 +77,7 @@ class AnnotatableBlockTestCase(unittest.TestCase):
                     '_delete': 'highlight'
                 }
             }
-            actual_attr = self.annotatable._get_annotation_class_attr(0, el)
+            actual_attr = self.annotatable._get_annotation_class_attr(0, el)  # lint-amnesty, pylint: disable=protected-access
 
             self.assertIsInstance(actual_attr, dict)
             self.assertDictEqual(expected_attr, actual_attr)
@@ -93,24 +93,24 @@ class AnnotatableBlockTestCase(unittest.TestCase):
                     '_delete': 'highlight'
                 }
             }
-            actual_attr = self.annotatable._get_annotation_class_attr(0, el)
+            actual_attr = self.annotatable._get_annotation_class_attr(0, el)  # lint-amnesty, pylint: disable=protected-access
 
             self.assertIsInstance(actual_attr, dict)
             self.assertDictEqual(expected_attr, actual_attr)
 
     def test_render_annotation(self):
-        expected_html = '<span class="annotatable-span highlight highlight-yellow" data-comment-title="x" data-comment-body="y" data-problem-id="0">z</span>'
+        expected_html = '<span class="annotatable-span highlight highlight-yellow" data-comment-title="x" data-comment-body="y" data-problem-id="0">z</span>'  # lint-amnesty, pylint: disable=line-too-long
         expected_el = etree.fromstring(expected_html)
 
         actual_el = etree.fromstring('<annotation title="x" body="y" problem="0" highlight="yellow">z</annotation>')
-        self.annotatable._render_annotation(0, actual_el)
+        self.annotatable._render_annotation(0, actual_el)  # lint-amnesty, pylint: disable=protected-access
 
         self.assertEqual(expected_el.tag, actual_el.tag)
         self.assertEqual(expected_el.text, actual_el.text)
         self.assertDictEqual(dict(expected_el.attrib), dict(actual_el.attrib))
 
     def test_render_content(self):
-        content = self.annotatable._render_content()
+        content = self.annotatable._render_content()  # lint-amnesty, pylint: disable=protected-access
         el = etree.fromstring(content)
 
         self.assertEqual('div', el.tag, 'root tag is a div')
@@ -128,10 +128,10 @@ class AnnotatableBlockTestCase(unittest.TestCase):
         xmltree = etree.fromstring(self.sample_xml)
 
         expected_xml = u"<div>Read the text.</div>"
-        actual_xml = self.annotatable._extract_instructions(xmltree)
+        actual_xml = self.annotatable._extract_instructions(xmltree)  # lint-amnesty, pylint: disable=protected-access
         self.assertIsNotNone(actual_xml)
         self.assertEqual(expected_xml.strip(), actual_xml.strip())
 
         xmltree = etree.fromstring('<annotatable>foo</annotatable>')
-        actual = self.annotatable._extract_instructions(xmltree)
+        actual = self.annotatable._extract_instructions(xmltree)  # lint-amnesty, pylint: disable=protected-access
         self.assertIsNone(actual)

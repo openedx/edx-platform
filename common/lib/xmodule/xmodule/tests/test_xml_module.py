@@ -65,7 +65,7 @@ class InheritingFieldDataTest(unittest.TestCase):
     Tests of InheritingFieldData.
     """
 
-    class TestableInheritingXBlock(XmlDescriptor):
+    class TestableInheritingXBlock(XmlDescriptor):  # lint-amnesty, pylint: disable=abstract-method
         """
         An XBlock we can use in these tests.
         """
@@ -73,7 +73,7 @@ class InheritingFieldDataTest(unittest.TestCase):
         not_inherited = String(scope=Scope.settings, default="nothing")
 
     def setUp(self):
-        super(InheritingFieldDataTest, self).setUp()
+        super(InheritingFieldDataTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.dummy_course_key = CourseLocator('test_org', 'test_123', 'test_run')
         self.system = get_test_descriptor_system()
         self.all_blocks = {}
@@ -340,10 +340,10 @@ class EditableMetadataFieldsTest(unittest.TestCase):
         ).editable_metadata_fields
 
     def get_descriptor(self, field_data):
-        class TestModuleDescriptor(TestFields, XmlDescriptor):
+        class TestModuleDescriptor(TestFields, XmlDescriptor):  # lint-amnesty, pylint: disable=abstract-method
             @property
             def non_editable_metadata_fields(self):
-                non_editable_fields = super(TestModuleDescriptor, self).non_editable_metadata_fields
+                non_editable_fields = super(TestModuleDescriptor, self).non_editable_metadata_fields  # lint-amnesty, pylint: disable=super-with-arguments
                 non_editable_fields.append(TestModuleDescriptor.due)
                 return non_editable_fields
 
@@ -351,8 +351,8 @@ class EditableMetadataFieldsTest(unittest.TestCase):
         system.render_template = Mock(return_value="<div>Test Template HTML</div>")
         return system.construct_xblock_from_class(TestModuleDescriptor, field_data=field_data, scope_ids=Mock())
 
-    def assert_field_values(self, editable_fields, name, field, explicitly_set, value, default_value,
-                            type='Generic', options=[]):
+    def assert_field_values(self, editable_fields, name, field, explicitly_set, value, default_value,  # lint-amnesty, pylint: disable=dangerous-default-value
+                            type='Generic', options=[]):  # lint-amnesty, pylint: disable=redefined-builtin
         test_field = editable_fields[name]
 
         self.assertEqual(field.name, test_field['field_name'])
@@ -382,7 +382,7 @@ class TestSerialize(unittest.TestCase):
         assert serialize_field('fAlse') == 'fAlse'
         assert serialize_field('hat box') == 'hat box'
         serialized_dict = serialize_field({'bar': 'hat', 'frog': 'green'})
-        assert serialized_dict == '{"bar": "hat", "frog": "green"}' or serialized_dict == '{"frog": "green", "bar": "hat"}'
+        assert serialized_dict == '{"bar": "hat", "frog": "green"}' or serialized_dict == '{"frog": "green", "bar": "hat"}'  # lint-amnesty, pylint: disable=consider-using-in, line-too-long
         assert serialize_field([3.5, 5.6]) == '[3.5, 5.6]'
         assert serialize_field(['foo', 'bar']) == '["foo", "bar"]'
         assert serialize_field("2012-12-31T23:59:59Z") == '2012-12-31T23:59:59Z'
@@ -395,7 +395,7 @@ class TestDeserialize(unittest.TestCase):
         """
         Asserts the result of deserialize_field.
         """
-        assert deserialize_field(self.field_type(), arg) == expected
+        assert deserialize_field(self.field_type(), arg) == expected  # lint-amnesty, pylint: disable=no-member
 
     def assertDeserializeNonString(self):
         """
@@ -649,7 +649,7 @@ class TestXmlAttributes(XModuleXmlImportTest):
         seq = self.process_xml(root)
 
         assert seq.unmixed_class == SequenceDescriptor
-        assert type(seq) != SequenceDescriptor
+        assert type(seq) != SequenceDescriptor  # lint-amnesty, pylint: disable=unidiomatic-typecheck
 
         # `attribute` is added to the constructed sequence, because
         # it's in the InheritanceMixin

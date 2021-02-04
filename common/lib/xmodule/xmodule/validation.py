@@ -33,7 +33,7 @@ class StudioValidationMessage(ValidationMessage):
             action_runtime_event (str): An event name to be triggered on the xblock client-side runtime when
                 the "fix-up" action is clicked (optional).
         """
-        super(StudioValidationMessage, self).__init__(message_type, message_text)
+        super(StudioValidationMessage, self).__init__(message_type, message_text)  # lint-amnesty, pylint: disable=super-with-arguments
         if action_label is not None:
             if not isinstance(action_label, six.text_type):
                 raise TypeError("Action label must be unicode.")
@@ -54,7 +54,7 @@ class StudioValidationMessage(ValidationMessage):
         Returns:
             dict: A dict representation that is json-serializable.
         """
-        serialized = super(StudioValidationMessage, self).to_json()
+        serialized = super(StudioValidationMessage, self).to_json()  # lint-amnesty, pylint: disable=super-with-arguments
         if hasattr(self, "action_label"):
             serialized["action_label"] = self.action_label
         if hasattr(self, "action_class"):
@@ -94,7 +94,7 @@ class StudioValidation(Validation):
         Args:
             xblock_id (object): An identification object that must support conversion to unicode.
         """
-        super(StudioValidation, self).__init__(xblock_id)
+        super(StudioValidation, self).__init__(xblock_id)  # lint-amnesty, pylint: disable=super-with-arguments
         self.summary = None
 
     def set_summary(self, message):
@@ -116,7 +116,7 @@ class StudioValidation(Validation):
         Returns:
             bool: True iff this instance has no validation issues and therefore has no messages or summary.
         """
-        return super(StudioValidation, self).empty and not self.summary
+        return super(StudioValidation, self).empty and not self.summary  # lint-amnesty, pylint: disable=super-with-arguments
 
     def to_json(self):
         """
@@ -125,7 +125,7 @@ class StudioValidation(Validation):
         Returns:
             dict: A dict representation that is json-serializable.
         """
-        serialized = super(StudioValidation, self).to_json()
+        serialized = super(StudioValidation, self).to_json()  # lint-amnesty, pylint: disable=super-with-arguments
         if self.summary:
             serialized["summary"] = self.summary.to_json()
         return serialized

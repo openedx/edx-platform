@@ -35,8 +35,8 @@ def strip_filenames(descriptor):
     Recursively strips 'filename' from all children's definitions.
     """
     print("strip filename from {desc}".format(desc=text_type(descriptor.location)))
-    if descriptor._field_data.has(descriptor, 'filename'):
-        descriptor._field_data.delete(descriptor, 'filename')
+    if descriptor._field_data.has(descriptor, 'filename'):  # lint-amnesty, pylint: disable=protected-access
+        descriptor._field_data.delete(descriptor, 'filename')  # lint-amnesty, pylint: disable=protected-access
 
     if hasattr(descriptor, 'xml_attributes'):
         if 'filename' in descriptor.xml_attributes:
@@ -67,7 +67,7 @@ class RoundTripTestCase(unittest.TestCase):
     """
 
     def setUp(self):
-        super(RoundTripTestCase, self).setUp()
+        super(RoundTripTestCase, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.maxDiff = None
         self.temp_dir = mkdtemp()
         self.addCleanup(shutil.rmtree, self.temp_dir)
@@ -158,18 +158,18 @@ class TestEdxJsonEncoder(unittest.TestCase):
     """
 
     def setUp(self):
-        super(TestEdxJsonEncoder, self).setUp()
+        super(TestEdxJsonEncoder, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
 
         self.encoder = EdxJSONEncoder()
 
-        class OffsetTZ(tzinfo):
+        class OffsetTZ(tzinfo):  # lint-amnesty, pylint: disable=abstract-method
             """A timezone with non-None utcoffset"""
             def utcoffset(self, _dt):
                 return timedelta(hours=4)
 
         self.offset_tz = OffsetTZ()
 
-        class NullTZ(tzinfo):
+        class NullTZ(tzinfo):  # lint-amnesty, pylint: disable=abstract-method
             """A timezone with None as its utcoffset"""
             def utcoffset(self, _dt):
                 return None
@@ -222,7 +222,7 @@ class TestEdxJsonEncoder(unittest.TestCase):
 
         # Initializing a lazy text object with Unicode
         unicode_text = u"Your 𝓟𝓵𝓪𝓽𝓯𝓸𝓻𝓶 Name Here"
-        lazy_text = ugettext_lazy(unicode_text)
+        lazy_text = ugettext_lazy(unicode_text)  # lint-amnesty, pylint: disable=translation-of-non-string
 
         self.assertEqual(
             unicode_text,

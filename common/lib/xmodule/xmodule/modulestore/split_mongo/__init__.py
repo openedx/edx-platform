@@ -9,11 +9,11 @@ from contracts import check, contract
 from opaque_keys.edx.locator import BlockUsageLocator
 
 
-class BlockKey(namedtuple('BlockKey', 'type id')):
+class BlockKey(namedtuple('BlockKey', 'type id')):  # lint-amnesty, pylint: disable=missing-class-docstring
     __slots__ = ()
 
     @contract(type="string[>0]")
-    def __new__(cls, type, id):
+    def __new__(cls, type, id):  # lint-amnesty, pylint: disable=redefined-builtin
         return super(BlockKey, cls).__new__(cls, type, id)
 
     @classmethod

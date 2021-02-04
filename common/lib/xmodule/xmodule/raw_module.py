@@ -1,4 +1,4 @@
-import logging
+import logging  # lint-amnesty, pylint: disable=missing-module-docstring
 import re
 
 from lxml import etree
@@ -22,7 +22,7 @@ class RawMixin(object):
     data = String(help="XML data for the module", default="", scope=Scope.content)
 
     @classmethod
-    def definition_from_xml(cls, xml_object, system):
+    def definition_from_xml(cls, xml_object, system):  # lint-amnesty, pylint: disable=missing-function-docstring, unused-argument
         try:
             data = etree.tostring(xml_object, pretty_print=True, encoding='unicode')
             pre_tag_data = []
@@ -39,7 +39,7 @@ class RawMixin(object):
         except etree.XMLSyntaxError:
             return {'data': etree.tostring(xml_object, pretty_print=True, encoding='unicode')}, []
 
-    def definition_to_xml(self, resource_fs):
+    def definition_to_xml(self, resource_fs):  # lint-amnesty, pylint: disable=unused-argument
         """
         Return an Element if we've kept the import OLX, or None otherwise.
         """
@@ -73,7 +73,7 @@ class RawMixin(object):
                 context=lines[line - 1][offset - 40:offset + 40],
                 loc=self.location,
             )
-            raise SerializationError(self.location, msg)
+            raise SerializationError(self.location, msg)  # lint-amnesty, pylint: disable=raise-missing-from
 
     @classmethod
     def parse_xml_new_runtime(cls, node, runtime, keys):
@@ -103,7 +103,7 @@ class RawDescriptor(RawMixin, XmlDescriptor, XMLEditingDescriptor):
     Module that provides a raw editing view of its data and children.  It
     requires that the definition xml is valid.
     """
-    pass
+    pass  # lint-amnesty, pylint: disable=unnecessary-pass
 
 
 class EmptyDataRawMixin(object):
@@ -115,12 +115,12 @@ class EmptyDataRawMixin(object):
     data = String(default='', scope=Scope.content)
 
     @classmethod
-    def definition_from_xml(cls, xml_object, system):
+    def definition_from_xml(cls, xml_object, system):  # lint-amnesty, pylint: disable=unused-argument
         if len(xml_object) == 0 and len(list(xml_object.items())) == 0:
             return {'data': ''}, []
         return {'data': etree.tostring(xml_object, pretty_print=True, encoding='unicode')}, []
 
-    def definition_to_xml(self, resource_fs):
+    def definition_to_xml(self, resource_fs):  # lint-amnesty, pylint: disable=unused-argument
         if self.data:
             return etree.fromstring(self.data)
         return etree.Element(self.category)
@@ -131,4 +131,4 @@ class EmptyDataRawDescriptor(EmptyDataRawMixin, XmlDescriptor, XMLEditingDescrip
     Version of RawDescriptor for modules which may have no XML data,
     but use XMLEditingDescriptor for import/export handling.
     """
-    pass
+    pass  # lint-amnesty, pylint: disable=unnecessary-pass

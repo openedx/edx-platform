@@ -1,4 +1,4 @@
-
+  # lint-amnesty, pylint: disable=missing-module-docstring
 
 import json
 import unittest
@@ -42,7 +42,7 @@ class Test_PositionsCompare(unittest.TestCase):
         self.assertEqual(PositionsCompare([3.5, 4.5]), PositionsCompare([5, 7]))
 
 
-class Test_DragAndDrop_Grade(unittest.TestCase):
+class Test_DragAndDrop_Grade(unittest.TestCase):  # lint-amnesty, pylint: disable=missing-class-docstring
 
     def test_targets_are_draggable_1(self):
         user_input = json.dumps([
@@ -775,7 +775,7 @@ class Test_DragAndDrop_Grade(unittest.TestCase):
         self.assertTrue(draganddrop.grade(user_input, correct_answer))
 
 
-class Test_DragAndDrop_Populate(unittest.TestCase):
+class Test_DragAndDrop_Populate(unittest.TestCase):  # lint-amnesty, pylint: disable=missing-class-docstring
 
     def test_1(self):
         correct_answer = {'1': [[40, 10], 29], 'name_with_icon': [20, 20]}
@@ -793,7 +793,7 @@ class Test_DragAndDrop_Populate(unittest.TestCase):
         self.assertEqual(user_positions, dnd.user_positions)
 
 
-class Test_DraAndDrop_Compare_Positions(unittest.TestCase):
+class Test_DraAndDrop_Compare_Positions(unittest.TestCase):  # lint-amnesty, pylint: disable=missing-class-docstring
 
     def test_1(self):
         dnd = draganddrop.DragAndDrop({'1': 't1'}, '[{"1": "t1"}]')
@@ -844,7 +844,7 @@ class Test_DraAndDrop_Compare_Positions(unittest.TestCase):
                                                flag='anyof'))
 
 
-def suite():
+def suite():  # lint-amnesty, pylint: disable=missing-function-docstring
 
     testcases = [Test_PositionsCompare,
                  Test_DragAndDrop_Populate,

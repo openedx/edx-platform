@@ -40,7 +40,7 @@ class SequenceBlockTestCase(XModuleXmlImportTest):
     """
 
     def setUp(self):
-        super(SequenceBlockTestCase, self).setUp()
+        super(SequenceBlockTestCase, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
 
         course_xml = self._set_up_course_xml()
         self.course = self.process_xml(course_xml)
@@ -430,7 +430,7 @@ class SequenceBlockTestCase(XModuleXmlImportTest):
                 {'usage_key': usage_key}
             ))
             self.assertIsNot(completion_return, None)
-            self.assertTrue('complete' in completion_return)
+            self.assertTrue('complete' in completion_return)  # lint-amnesty, pylint: disable=wrong-assert-type
             self.assertEqual(completion_return['complete'], True)
 
     def test_handle_ajax_get_completion_return_none(self):
@@ -453,7 +453,7 @@ class SequenceBlockTestCase(XModuleXmlImportTest):
         """
         # rather than dealing with json serialization of the Mock object,
         # let's just disable the bookmarks service
-        self.sequence_3_1.xmodule_runtime._services['bookmarks'] = None
+        self.sequence_3_1.xmodule_runtime._services['bookmarks'] = None  # lint-amnesty, pylint: disable=protected-access
         metadata = json.loads(self.sequence_3_1.handle_ajax('metadata', {}))
         self.assertEqual(len(metadata['items']), 3)
         self.assertEqual(metadata['tag'], 'sequential')

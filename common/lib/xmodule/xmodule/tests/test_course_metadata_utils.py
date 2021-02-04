@@ -44,7 +44,7 @@ class CourseMetadataUtilsTestCase(TestCase):
         """
         Set up module store testing capabilities and initialize test courses.
         """
-        super(CourseMetadataUtilsTestCase, self).setUp()
+        super(CourseMetadataUtilsTestCase, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
 
         mongo_builder = MongoModulestoreBuilder()
         split_builder = VersioningModulestoreBuilder()
@@ -105,7 +105,7 @@ class CourseMetadataUtilsTestCase(TestCase):
             else:
                 raise ValueError("Invalid format string :" + format_string)
 
-        def noop_gettext(text):
+        def noop_gettext(text):  # lint-amnesty, pylint: disable=unused-variable
             """Dummy implementation of gettext, so we don't need Django."""
             return text
 

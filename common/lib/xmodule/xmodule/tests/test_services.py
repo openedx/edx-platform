@@ -21,7 +21,7 @@ from openedx.core.lib.teams_config import TeamsConfig
 
 class _DummyBlock(object):
     """ Dummy Xblock class """
-    pass
+    pass  # lint-amnesty, pylint: disable=unnecessary-pass
 
 
 class DummyConfig(ConfigurationModel):
@@ -36,7 +36,7 @@ class DummyUnexpected(object):
     """
     Dummy Unexpected Class
     """
-    pass
+    pass  # lint-amnesty, pylint: disable=unnecessary-pass
 
 
 @ddt.ddt
@@ -48,7 +48,7 @@ class TestSettingsService(unittest.TestCase):
 
     def setUp(self):
         """ Setting up tests """
-        super(TestSettingsService, self).setUp()
+        super(TestSettingsService, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.settings_service = SettingsService()
         self.xblock_mock = mock.Mock()
         self.xblock_mock.block_settings_key = self.xblock_setting_key1
@@ -124,8 +124,8 @@ class MockConfigurationService(TeamsConfigurationService):
     """
     Mock ConfigurationService for testing.
     """
-    def __init__(self, course, **kwargs):
-        super(MockConfigurationService, self).__init__()
+    def __init__(self, course, **kwargs):  # lint-amnesty, pylint: disable=unused-argument
+        super(MockConfigurationService, self).__init__()  # lint-amnesty, pylint: disable=super-with-arguments
         self._course = course
 
     def get_course(self, course_id):
@@ -138,7 +138,7 @@ class ConfigurationServiceBaseClass(TestCase):
     """
 
     def setUp(self):
-        super(ConfigurationServiceBaseClass, self).setUp()
+        super(ConfigurationServiceBaseClass, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
 
         self.teams_config = TeamsConfig(
             {'max_size': 2, 'topics': [{'id': 'topic', 'name': 'Topic', 'description': 'A Topic'}]}

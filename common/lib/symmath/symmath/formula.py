@@ -21,7 +21,7 @@ import unicodedata
 #import subprocess
 from copy import deepcopy
 from functools import reduce
-from xml.sax.saxutils import unescape
+from xml.sax.saxutils import unescape  # lint-amnesty, pylint: disable=unused-import
 
 import six
 import sympy
@@ -210,7 +210,7 @@ class formula(object):
 
         for k in xml:
             tag = gettag(k)
-            if tag == 'mi' or tag == 'ci':
+            if tag == 'mi' or tag == 'ci':  # lint-amnesty, pylint: disable=consider-using-in
                 usym = six.text_type(k.text)
                 try:
                     udata = unicodedata.name(usym)
@@ -227,7 +227,7 @@ class formula(object):
             self.fix_greek_in_mathml(k)
         return xml
 
-    def preprocess_pmathml(self, xml):
+    def preprocess_pmathml(self, xml):  # lint-amnesty, pylint: disable=too-many-statements
         r"""
         Pre-process presentation MathML from ASCIIMathML to make it more
         acceptable for SnuggleTeX, and also to accomodate some sympy
@@ -420,7 +420,7 @@ class formula(object):
         self.xml = xml  # pylint: disable=attribute-defined-outside-init
         return self.xml
 
-    def get_content_mathml(self):
+    def get_content_mathml(self):  # lint-amnesty, pylint: disable=missing-function-docstring
         if self.the_cmathml:
             return self.the_cmathml
 
@@ -436,7 +436,7 @@ class formula(object):
 
     cmathml = property(get_content_mathml, None, None, 'content MathML representation')
 
-    def make_sympy(self, xml=None):
+    def make_sympy(self, xml=None):  # lint-amnesty, pylint: disable=too-many-statements
         """
         Return sympy expression for the math formula.
         The math formula is converted to Content MathML then that is parsed.
@@ -457,11 +457,11 @@ class formula(object):
                     cmml = self.cmathml
                     xml = etree.fromstring(str(cmml))
                 except Exception as err:
-                    if 'conversion from Presentation MathML to Content MathML was not successful' in cmml:
+                    if 'conversion from Presentation MathML to Content MathML was not successful' in cmml:  # lint-amnesty, pylint: disable=unsupported-membership-test
                         msg = "Illegal math expression"
                     else:
                         msg = 'Err %s while converting cmathml to xml; cmml=%s' % (err, cmml)
-                    raise Exception(msg)
+                    raise Exception(msg)  # lint-amnesty, pylint: disable=raise-missing-from
                 xml = self.fix_greek_in_mathml(xml)
                 self.the_sympy = self.make_sympy(xml[0])
             else:
@@ -482,14 +482,14 @@ class formula(object):
         def op_minus(*args):
             if len(args) == 1:
                 return -args[0]
-            if not len(args) == 2:
+            if not len(args) == 2:  # lint-amnesty, pylint: disable=unneeded-not
                 raise Exception('minus given wrong number of arguments!')
             #return sympy.Add(args[0],-args[1])
             return args[0] - args[1]
 
         opdict = {
             'plus': op_plus,
-            'divide': operator.div,
+            'divide': operator.div,  # lint-amnesty, pylint: disable=no-member
             'times': op_times,
             'minus': op_minus,
             'root': sympy.sqrt,
@@ -546,7 +546,7 @@ class formula(object):
                 except Exception as err:
                     self.args = args  # pylint: disable=attribute-defined-outside-init
                     self.op = op      # pylint: disable=attribute-defined-outside-init, invalid-name
-                    raise Exception('[formula] error=%s failed to apply %s to args=%s' % (err, opstr, args))
+                    raise Exception('[formula] error=%s failed to apply %s to args=%s' % (err, opstr, args))  # lint-amnesty, pylint: disable=raise-missing-from
                 return res
             else:
                 raise Exception('[formula]: unknown operator tag %s' % (opstr))

@@ -71,7 +71,7 @@ class Progress(object):
         checking is done at construction time.
         '''
         (a, b) = self.frac()
-        return a > 0 and a < b
+        return a > 0 and a < b  # lint-amnesty, pylint: disable=chained-comparison
 
     def done(self):
         ''' Return True if this represents done.

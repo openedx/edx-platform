@@ -345,7 +345,7 @@ class LibraryContentBlock(
         for block_type, block_id in self.selected_children():
             yield self.runtime.get_block(self.location.course_key.make_usage_key(block_type, block_id))
 
-    def student_view(self, context):
+    def student_view(self, context):  # lint-amnesty, pylint: disable=missing-function-docstring
         fragment = Fragment()
         contents = []
         child_context = {} if not context else copy(context)
@@ -454,7 +454,7 @@ class LibraryContentBlock(
         return user_id
 
     @XBlock.handler
-    def refresh_children(self, request=None, suffix=None):
+    def refresh_children(self, request=None, suffix=None):  # lint-amnesty, pylint: disable=unused-argument
         """
         Refresh children:
         This method is to be used when any of the libraries that this block
@@ -634,7 +634,7 @@ class LibraryContentBlock(
         values = [{"display_name": name, "value": six.text_type(key)} for key, name in all_libraries]
         return values
 
-    def editor_saved(self, user, old_metadata, old_content):
+    def editor_saved(self, user, old_metadata, old_content):  # lint-amnesty, pylint: disable=unused-argument
         """
         If source_library_id or capa_type has been edited, refresh_children automatically.
         """

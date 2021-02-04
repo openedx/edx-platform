@@ -202,7 +202,7 @@ def sorting_dates(start, advertised_start, announcement):
         if start.tzinfo is None:
             start = start.replace(tzinfo=utc)
     except (TypeError, ValueError, AttributeError):
-        start = start
+        start = start  # lint-amnesty, pylint: disable=self-assigning-variable
 
     now = datetime.now(utc)
 

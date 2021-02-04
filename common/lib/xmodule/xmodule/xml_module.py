@@ -1,4 +1,4 @@
-
+  # lint-amnesty, pylint: disable=missing-module-docstring
 
 import copy
 import json
@@ -14,7 +14,7 @@ from xblock.fields import Dict, Scope, ScopeIds
 from xblock.runtime import KvsFieldData
 from xmodule.modulestore import EdxJSONEncoder
 from xmodule.modulestore.inheritance import InheritanceKeyValueStore, own_metadata
-from xmodule.x_module import DEPRECATION_VSCOMPAT_EVENT, XModuleDescriptor
+from xmodule.x_module import DEPRECATION_VSCOMPAT_EVENT, XModuleDescriptor  # lint-amnesty, pylint: disable=unused-import
 
 log = logging.getLogger(__name__)
 
@@ -206,7 +206,7 @@ class XmlParserMixin(object):
         try:
             with fs.open(filepath) as xml_file:
                 return cls.file_to_xml(xml_file)
-        except Exception as err:
+        except Exception as err:  # lint-amnesty, pylint: disable=broad-except
             # Add info about where we are, but keep the traceback
             msg = 'Unable to load file contents at path %s for item %s: %s ' % (
                 filepath, def_id, err)
@@ -357,7 +357,7 @@ class XmlParserMixin(object):
             metadata['definition_metadata_raw'] = dmdata
             try:
                 metadata.update(json.loads(dmdata))
-            except Exception as err:
+            except Exception as err:  # lint-amnesty, pylint: disable=broad-except
                 log.debug('Error in loading metadata %r', dmdata, exc_info=True)
                 metadata['definition_metadata_err'] = str(err)
 
@@ -470,9 +470,9 @@ class XmlParserMixin(object):
                 val = serialize_field(self._field_data.get(self, attr))
                 try:
                     xml_object.set(attr, val)
-                except Exception:
+                except Exception:  # lint-amnesty, pylint: disable=broad-except
                     logging.exception(
-                        u'Failed to serialize metadata attribute %s with value %s in module %s. This could mean data loss!!!',
+                        u'Failed to serialize metadata attribute %s with value %s in module %s. This could mean data loss!!!',  # lint-amnesty, pylint: disable=line-too-long
                         attr, val, self.url_name
                     )
 
@@ -520,12 +520,12 @@ class XmlParserMixin(object):
         """
         Return a list of all metadata fields that cannot be edited.
         """
-        non_editable_fields = super(XmlParserMixin, self).non_editable_metadata_fields
+        non_editable_fields = super(XmlParserMixin, self).non_editable_metadata_fields  # lint-amnesty, pylint: disable=super-with-arguments
         non_editable_fields.append(XmlParserMixin.xml_attributes)
         return non_editable_fields
 
 
-class XmlMixin(XmlParserMixin):
+class XmlMixin(XmlParserMixin):  # lint-amnesty, pylint: disable=abstract-method
     """
     Mixin class for standardized parsing of XModule xml.
     """
@@ -581,7 +581,7 @@ class XmlMixin(XmlParserMixin):
         except AttributeError:
             return super(XmlMixin, cls).parse_xml(node, runtime, keys, id_generator=None)
 
-    def export_to_xml(self, resource_fs):
+    def export_to_xml(self, resource_fs):  # lint-amnesty, pylint: disable=unused-argument
         """
         Returns an xml string representing this module, and all modules
         underneath it.  May also write required resources out to resource_fs.
@@ -599,7 +599,7 @@ class XmlMixin(XmlParserMixin):
         #    a) define export_to_xml themselves
         #    b) call super(..).export_to_xml(..)
         node = Element(self.category)
-        super(XmlMixin, self).add_xml_to_node(node)
+        super(XmlMixin, self).add_xml_to_node(node)  # lint-amnesty, pylint: disable=super-with-arguments
         return etree.tostring(node)
 
     def add_xml_to_node(self, node):
@@ -607,13 +607,13 @@ class XmlMixin(XmlParserMixin):
         Export this :class:`XModuleDescriptor` as XML, by setting attributes on the provided
         `node`.
         """
-        if self.export_to_xml != XmlMixin.export_to_xml:
+        if self.export_to_xml != XmlMixin.export_to_xml:  # lint-amnesty, pylint: disable=comparison-with-callable
             # Skip the add_xml_to_node from XmlParserMixin to get the shim add_xml_to_node
             # from XModuleDescriptor, which actually calls `export_to_xml`.
             super(XmlParserMixin, self).add_xml_to_node(node)  # pylint: disable=bad-super-call
         else:
-            super(XmlMixin, self).add_xml_to_node(node)
+            super(XmlMixin, self).add_xml_to_node(node)  # lint-amnesty, pylint: disable=super-with-arguments
 
 
-class XmlDescriptor(XmlMixin, XModuleDescriptor):
+class XmlDescriptor(XmlMixin, XModuleDescriptor):  # lint-amnesty, pylint: disable=abstract-method
     pass

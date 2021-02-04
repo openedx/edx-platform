@@ -25,7 +25,7 @@ from xblock.exceptions import NoSuchServiceError
 from xblock.fields import Boolean, Integer, List, Scope, String
 
 from edx_toggles.toggles import LegacyWaffleFlag
-from edx_toggles.toggles import WaffleFlag
+from edx_toggles.toggles import WaffleFlag  # lint-amnesty, pylint: disable=unused-import
 from lms.djangoapps.courseware.toggles import COURSEWARE_PROCTORING_IMPROVEMENTS
 from openedx.core.lib.graph_traversals import get_children, leaf_filter, traverse_pre_order
 
@@ -58,7 +58,7 @@ TIMED_EXAM_GATING_WAFFLE_FLAG = LegacyWaffleFlag(
 )
 
 
-class SequenceFields(object):
+class SequenceFields(object):  # lint-amnesty, pylint: disable=missing-class-docstring
     has_children = True
     completion_mode = XBlockCompletionMode.AGGREGATOR
 
@@ -206,7 +206,7 @@ class SequenceModule(SequenceFields, ProctoringFields, XModule):
     js_module_name = "Sequence"
 
     def __init__(self, *args, **kwargs):
-        super(SequenceModule, self).__init__(*args, **kwargs)
+        super(SequenceModule, self).__init__(*args, **kwargs)  # lint-amnesty, pylint: disable=super-with-arguments
 
         self.gated_sequence_paywall = None
         # If position is specified in system, then use that instead.
@@ -225,7 +225,7 @@ class SequenceModule(SequenceFields, ProctoringFields, XModule):
         progress = reduce(Progress.add_counts, progresses, None)
         return progress
 
-    def handle_ajax(self, dispatch, data, view=STUDENT_VIEW):  # TODO: bounds checking
+    def handle_ajax(self, dispatch, data, view=STUDENT_VIEW):  # TODO: bounds checking  # lint-amnesty, pylint: disable=arguments-differ
         ''' get = request.POST instance '''
         if dispatch == 'goto_position':
             # set position to default value if either 'position' argument not
@@ -260,7 +260,7 @@ class SequenceModule(SequenceFields, ProctoringFields, XModule):
 
             if self._required_prereq():
                 if self.runtime.user_is_staff:
-                    banner_text = _('This subsection is unlocked for learners when they meet the prerequisite requirements.')
+                    banner_text = _('This subsection is unlocked for learners when they meet the prerequisite requirements.')  # lint-amnesty, pylint: disable=line-too-long
                 else:
                     # check if prerequisite has been met
                     prereq_met, prereq_meta_info = self._compute_is_prereq_met(True)
@@ -355,7 +355,7 @@ class SequenceModule(SequenceFields, ProctoringFields, XModule):
         prereq_meta_info = {}
         if self._required_prereq():
             if self.runtime.user_is_staff:
-                banner_text = _('This subsection is unlocked for learners when they meet the prerequisite requirements.')
+                banner_text = _('This subsection is unlocked for learners when they meet the prerequisite requirements.')  # lint-amnesty, pylint: disable=line-too-long
             else:
                 # check if prerequisite has been met
                 prereq_met, prereq_meta_info = self._compute_is_prereq_met(True)
@@ -380,7 +380,7 @@ class SequenceModule(SequenceFields, ProctoringFields, XModule):
             prereq_met, prereq_meta_info = self._compute_is_prereq_met(True)
         return self._student_or_public_view(context or {}, prereq_met, prereq_meta_info, None, PUBLIC_VIEW)
 
-    def author_view(self, context):
+    def author_view(self, context):  # lint-amnesty, pylint: disable=missing-function-docstring
         context = context or {}
         context['exclude_units'] = True
         if 'position' in context:
@@ -444,7 +444,7 @@ class SequenceModule(SequenceFields, ProctoringFields, XModule):
         # NOTE (CCB): We default to true to maintain the behavior in place prior to allowing anonymous access access.
         return context.get('user_authenticated', True)
 
-    def _get_render_metadata(self, context, display_items, prereq_met, prereq_meta_info, banner_text=None, view=STUDENT_VIEW, fragment=None):
+    def _get_render_metadata(self, context, display_items, prereq_met, prereq_meta_info, banner_text=None, view=STUDENT_VIEW, fragment=None):  # lint-amnesty, pylint: disable=line-too-long, missing-function-docstring
         if prereq_met and not self._is_gate_fulfilled():
             banner_text = _(
                 'This section is a prerequisite. You must complete this section in order to unlock additional content.'
@@ -484,7 +484,7 @@ class SequenceModule(SequenceFields, ProctoringFields, XModule):
         self._update_position(context, len(display_items))
 
         fragment = Fragment()
-        params = self._get_render_metadata(context, display_items, prereq_met, prereq_meta_info, banner_text, view, fragment)
+        params = self._get_render_metadata(context, display_items, prereq_met, prereq_meta_info, banner_text, view, fragment)  # lint-amnesty, pylint: disable=line-too-long
         fragment.add_content(self.system.render_template("seq_module.html", params))
 
         self._capture_full_seq_item_metrics(display_items)
@@ -800,7 +800,7 @@ class SequenceModule(SequenceFields, ProctoringFields, XModule):
                 'is_practice_exam': self.is_practice_exam,
                 'allow_proctoring_opt_out': self.allow_proctoring_opt_out,
                 'due_date': self.due,
-                'grace_period': self.graceperiod,
+                'grace_period': self.graceperiod,  # lint-amnesty, pylint: disable=no-member
                 'experimental_proctoring_features': COURSEWARE_PROCTORING_IMPROVEMENTS.is_enabled(course_id),
             }
 
@@ -853,13 +853,13 @@ class SequenceMixin(SequenceFields):
     converted from XModules which inherited from SequenceDescriptor.
     """
     @classmethod
-    def definition_from_xml(cls, xml_object, system):
+    def definition_from_xml(cls, xml_object, system):  # lint-amnesty, pylint: disable=missing-function-docstring
         children = []
         for child in xml_object:
             try:
                 child_block = system.process_xml(etree.tostring(child, encoding='unicode'))
                 children.append(child_block.scope_ids.usage_id)
-            except Exception as e:
+            except Exception as e:  # lint-amnesty, pylint: disable=broad-except
                 log.exception("Unable to load child when parsing Sequence. Continuing...")
                 if system.error_tracker is not None:
                     system.error_tracker(u"ERROR: {0}".format(e))
@@ -873,7 +873,7 @@ class SequenceMixin(SequenceFields):
         # return key/value fields in a Python dict object
         # values may be numeric / string or dict
         # default implementation is an empty dict
-        xblock_body = super(SequenceMixin, self).index_dictionary()
+        xblock_body = super(SequenceMixin, self).index_dictionary()  # lint-amnesty, pylint: disable=super-with-arguments
         html_body = {
             "display_name": self.display_name,
         }
@@ -913,7 +913,7 @@ class SequenceDescriptor(SequenceMixin, ProctoringFields, MakoModuleDescriptor, 
         """
         `is_entrance_exam` should not be editable in the Studio settings editor.
         """
-        non_editable_fields = super(SequenceDescriptor, self).non_editable_metadata_fields
+        non_editable_fields = super(SequenceDescriptor, self).non_editable_metadata_fields  # lint-amnesty, pylint: disable=super-with-arguments
         non_editable_fields.append(self.fields['is_entrance_exam'])  # pylint:disable=unsubscriptable-object
         return non_editable_fields
 

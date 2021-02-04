@@ -38,7 +38,7 @@ class TestPublish(SplitWMongoCourseBootstrapper):
     """
     Test the publish code (primary causing orphans)
     """
-    def _create_course(self):
+    def _create_course(self):  # lint-amnesty, pylint: disable=arguments-differ
         """
         Create the course, publish all verticals
         * some detached items
@@ -47,17 +47,17 @@ class TestPublish(SplitWMongoCourseBootstrapper):
         # create course: finds: 1 to verify uniqueness, 1 to find parents
         # sends: 1 to create course, 1 to create overview
         with check_mongo_calls(4, 2):
-            super(TestPublish, self)._create_course(split=False)  # 2 inserts (course and overview)
+            super(TestPublish, self)._create_course(split=False)  # 2 inserts (course and overview)  # lint-amnesty, pylint: disable=super-with-arguments
 
         # with bulk will delay all inheritance computations which won't be added into the mongo_calls
         with self.draft_mongo.bulk_operations(self.old_course_key):
             # finds: 1 for parent to add child and 2 to get ancestors
             # sends: 1 for insert, 1 for parent (add child)
             with check_mongo_calls(3, 2):
-                self._create_item('chapter', 'Chapter1', {}, {'display_name': 'Chapter 1'}, 'course', 'runid', split=False)
+                self._create_item('chapter', 'Chapter1', {}, {'display_name': 'Chapter 1'}, 'course', 'runid', split=False)  # lint-amnesty, pylint: disable=line-too-long
 
             with check_mongo_calls(4, 2):
-                self._create_item('chapter', 'Chapter2', {}, {'display_name': 'Chapter 2'}, 'course', 'runid', split=False)
+                self._create_item('chapter', 'Chapter2', {}, {'display_name': 'Chapter 2'}, 'course', 'runid', split=False)  # lint-amnesty, pylint: disable=line-too-long
             # For each vertical (2) created:
             #   - load draft
             #   - load non-draft
@@ -66,8 +66,8 @@ class TestPublish(SplitWMongoCourseBootstrapper):
             #   - get ancestors
             #   - load inheritable data
             with check_mongo_calls(15, 6):
-                self._create_item('vertical', 'Vert1', {}, {'display_name': 'Vertical 1'}, 'chapter', 'Chapter1', split=False)
-                self._create_item('vertical', 'Vert2', {}, {'display_name': 'Vertical 2'}, 'chapter', 'Chapter1', split=False)
+                self._create_item('vertical', 'Vert1', {}, {'display_name': 'Vertical 1'}, 'chapter', 'Chapter1', split=False)  # lint-amnesty, pylint: disable=line-too-long
+                self._create_item('vertical', 'Vert2', {}, {'display_name': 'Vertical 2'}, 'chapter', 'Chapter1', split=False)  # lint-amnesty, pylint: disable=line-too-long
             # For each (4) item created
             #   - try to find draft
             #   - try to find non-draft
@@ -75,10 +75,10 @@ class TestPublish(SplitWMongoCourseBootstrapper):
             #   - load draft parent again & compute its parent chain up to course
             # count for updates increased to 16 b/c of edit_info updating
             with check_mongo_calls(36, 16):
-                self._create_item('html', 'Html1', "<p>Goodbye</p>", {'display_name': 'Parented Html'}, 'vertical', 'Vert1', split=False)
+                self._create_item('html', 'Html1', "<p>Goodbye</p>", {'display_name': 'Parented Html'}, 'vertical', 'Vert1', split=False)  # lint-amnesty, pylint: disable=line-too-long
                 self._create_item(
                     'discussion', 'Discussion1',
-                    "discussion discussion_category=\"Lecture 1\" discussion_id=\"a08bfd89b2aa40fa81f2c650a9332846\" discussion_target=\"Lecture 1\"/>\n",
+                    "discussion discussion_category=\"Lecture 1\" discussion_id=\"a08bfd89b2aa40fa81f2c650a9332846\" discussion_target=\"Lecture 1\"/>\n",  # lint-amnesty, pylint: disable=line-too-long
                     {
                         "discussion_category": "Lecture 1",
                         "discussion_target": "Lecture 1",
@@ -88,10 +88,10 @@ class TestPublish(SplitWMongoCourseBootstrapper):
                     'vertical', 'Vert1',
                     split=False
                 )
-                self._create_item('html', 'Html2', "<p>Hello</p>", {'display_name': 'Hollow Html'}, 'vertical', 'Vert1', split=False)
+                self._create_item('html', 'Html2', "<p>Hello</p>", {'display_name': 'Hollow Html'}, 'vertical', 'Vert1', split=False)  # lint-amnesty, pylint: disable=line-too-long
                 self._create_item(
                     'discussion', 'Discussion2',
-                    "discussion discussion_category=\"Lecture 2\" discussion_id=\"b08bfd89b2aa40fa81f2c650a9332846\" discussion_target=\"Lecture 2\"/>\n",
+                    "discussion discussion_category=\"Lecture 2\" discussion_id=\"b08bfd89b2aa40fa81f2c650a9332846\" discussion_target=\"Lecture 2\"/>\n",  # lint-amnesty, pylint: disable=line-too-long
                     {
                         "discussion_category": "Lecture 2",
                         "discussion_target": "Lecture 2",
@@ -104,8 +104,8 @@ class TestPublish(SplitWMongoCourseBootstrapper):
 
             with check_mongo_calls(2, 2):
                 # 2 finds b/c looking for non-existent parents
-                self._create_item('static_tab', 'staticuno', "<p>tab</p>", {'display_name': 'Tab uno'}, None, None, split=False)
-                self._create_item('course_info', 'updates', "<ol><li><h2>Sep 22</h2><p>test</p></li></ol>", {}, None, None, split=False)
+                self._create_item('static_tab', 'staticuno', "<p>tab</p>", {'display_name': 'Tab uno'}, None, None, split=False)  # lint-amnesty, pylint: disable=line-too-long
+                self._create_item('course_info', 'updates', "<ol><li><h2>Sep 22</h2><p>test</p></li></ol>", {}, None, None, split=False)  # lint-amnesty, pylint: disable=line-too-long
 
     def test_publish_draft_delete(self):
         """
@@ -275,7 +275,7 @@ class DraftPublishedOpTestCourseSetup(unittest.TestCase):
         # data needed to check the OLX.
         self.course_db = {}
 
-        super(DraftPublishedOpTestCourseSetup, self).setUp()
+        super(DraftPublishedOpTestCourseSetup, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
 
 
 class OLXFormatChecker(unittest.TestCase):
@@ -508,7 +508,7 @@ class DraftPublishedOpBaseTestSetup(OLXFormatChecker, DraftPublishedOpTestCourse
     EXPORTED_COURSE_AFTER_DIR_NAME = u'exported_course_after_{}'
 
     def setUp(self):
-        super(DraftPublishedOpBaseTestSetup, self).setUp()
+        super(DraftPublishedOpBaseTestSetup, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.export_dir = self.EXPORTED_COURSE_BEFORE_DIR_NAME
         self.root_export_dir = None
         self.contentstore = None
@@ -1024,7 +1024,7 @@ class ElementalDeleteItemTests(DraftPublishedOpBaseTestSetup):
             # Weirdly, this is a difference between old Mongo -and- old Mongo wrapped with a mixed modulestore.
             # When the code attempts and fails to delete the draft vertical using the published_only revision,
             # the draft children are still around in one case and not in the other? Needs investigation.
-            # pylint: disable=bad-continuation
+  # lint-amnesty, pylint: disable=bad-continuation, bad-option-value
             if (
                 isinstance(modulestore_builder, MongoModulestoreBuilder) and
                 revision == ModuleStoreEnum.RevisionOption.published_only

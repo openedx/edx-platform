@@ -1,4 +1,4 @@
-
+  # lint-amnesty, pylint: disable=missing-module-docstring
 
 import unittest
 
@@ -96,7 +96,7 @@ class HtmlBlockCourseApiTestCase(unittest.TestCase):
         self.assertIn(html, rendered)
 
 
-class HtmlBlockSubstitutionTestCase(unittest.TestCase):
+class HtmlBlockSubstitutionTestCase(unittest.TestCase):  # lint-amnesty, pylint: disable=missing-class-docstring
 
     def test_substitution_user_id(self):
         sample_xml = '''%%USER_ID%%'''

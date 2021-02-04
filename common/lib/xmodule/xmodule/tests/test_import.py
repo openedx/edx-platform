@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-  # lint-amnesty, pylint: disable=missing-module-docstring
 
 
 import datetime
@@ -30,7 +30,7 @@ COURSE = 'test_course'
 RUN = 'test_run'
 
 
-class DummySystem(ImportSystem):
+class DummySystem(ImportSystem):  # lint-amnesty, pylint: disable=abstract-method, missing-class-docstring
 
     @patch('xmodule.modulestore.xml.OSFS', lambda dir: OSFS(mkdtemp()))
     def __init__(self, load_error_modules, library=False):
@@ -43,7 +43,7 @@ class DummySystem(ImportSystem):
         course_dir = "test_dir"
         error_tracker = Mock()
 
-        super(DummySystem, self).__init__(
+        super(DummySystem, self).__init__(  # lint-amnesty, pylint: disable=super-with-arguments
             xmlstore=xmlstore,
             course_id=course_id,
             course_dir=course_dir,
@@ -53,7 +53,7 @@ class DummySystem(ImportSystem):
             field_data=KvsFieldData(DictKeyValueStore()),
         )
 
-    def render_template(self, _template, _context):
+    def render_template(self, _template, _context):  # lint-amnesty, pylint: disable=method-hidden
         raise Exception("Shouldn't be called")
 
 
@@ -118,7 +118,7 @@ class PureXBlockImportTest(BaseCourseTestCase):
         self.assertFalse(mock_location.called)
 
 
-class ImportTestCase(BaseCourseTestCase):
+class ImportTestCase(BaseCourseTestCase):  # lint-amnesty, pylint: disable=missing-class-docstring
     date = Date()
 
     def test_fallback(self):
@@ -564,7 +564,7 @@ class ImportTestCase(BaseCourseTestCase):
         expect = "InvalidKeyError"
         errors = [
             (msg, err)
-            for msg, err
+            for msg, err  # lint-amnesty, pylint: disable=unnecessary-comprehension
             in modulestore.get_course_errors(course.id)
         ]
 

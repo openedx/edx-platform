@@ -38,7 +38,7 @@ class BranchSettingMixin(object):
             'branch_setting_func',
             lambda: ModuleStoreEnum.Branch.published_only
         )
-        super(BranchSettingMixin, self).__init__(*args, **kwargs)
+        super(BranchSettingMixin, self).__init__(*args, **kwargs)  # lint-amnesty, pylint: disable=super-with-arguments
 
         # cache the branch setting on a local thread to support a multi-threaded environment
         self.thread_cache = threading.local()
@@ -209,4 +209,4 @@ class UnsupportedRevisionError(ValueError):
                 ModuleStoreEnum.RevisionOption.published_only,
                 ModuleStoreEnum.RevisionOption.draft_only
             ]
-        super(UnsupportedRevisionError, self).__init__('revision not one of {}'.format(allowed_revisions))
+        super(UnsupportedRevisionError, self).__init__('revision not one of {}'.format(allowed_revisions))  # lint-amnesty, pylint: disable=super-with-arguments

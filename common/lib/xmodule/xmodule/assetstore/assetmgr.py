@@ -26,21 +26,21 @@ class AssetException(Exception):
     """
     Base exception class for all exceptions related to assets.
     """
-    pass
+    pass  # lint-amnesty, pylint: disable=unnecessary-pass
 
 
 class AssetMetadataNotFound(AssetException):
     """
     Thrown when no asset metadata is present in the course modulestore for the particular asset requested.
     """
-    pass
+    pass  # lint-amnesty, pylint: disable=unnecessary-pass
 
 
 class AssetMetadataFoundTemporary(AssetException):
     """
     TEMPORARY: Thrown if asset metadata is actually found in the course modulestore.
     """
-    pass
+    pass  # lint-amnesty, pylint: disable=unnecessary-pass
 
 
 class AssetManager(object):

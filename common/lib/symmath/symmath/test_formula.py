@@ -16,13 +16,13 @@ def stripXML(xml):
     return xml
 
 
-class FormulaTest(unittest.TestCase):
+class FormulaTest(unittest.TestCase):  # lint-amnesty, pylint: disable=missing-class-docstring
     # for readability later
     mathml_start = '<math xmlns="http://www.w3.org/1998/Math/MathML"><mstyle displaystyle="true">'
     mathml_end = '</mstyle></math>'
 
     def setUp(self):
-        super(FormulaTest, self).setUp()
+        super(FormulaTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.formulaInstance = formula('')
 
     def test_replace_mathvariants(self):

@@ -106,12 +106,12 @@ def instantiate_descriptor(**field_data):
 
 class _MockValVideoNotFoundError(Exception):
     """Mock ValVideoNotFoundError exception"""
-    pass
+    pass  # lint-amnesty, pylint: disable=unnecessary-pass
 
 
 class _MockValCannotCreateError(Exception):
     """Mock ValCannotCreateError exception"""
-    pass
+    pass  # lint-amnesty, pylint: disable=unnecessary-pass
 
 
 class VideoBlockTest(unittest.TestCase):
@@ -198,7 +198,7 @@ class VideoBlockTestBase(unittest.TestCase):
     """
 
     def setUp(self):
-        super(VideoBlockTestBase, self).setUp()
+        super(VideoBlockTestBase, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.descriptor = instantiate_descriptor()
 
     def assertXmlEqual(self, expected, xml):
@@ -696,7 +696,7 @@ class VideoExportTestCase(VideoBlockTestBase):
     """
 
     def setUp(self):
-        super(VideoExportTestCase, self).setUp()
+        super(VideoExportTestCase, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.temp_dir = mkdtemp()
         self.file_system = OSFS(self.temp_dir)
         self.addCleanup(shutil.rmtree, self.temp_dir)

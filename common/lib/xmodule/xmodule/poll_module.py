@@ -15,10 +15,10 @@ from copy import deepcopy
 
 from pkg_resources import resource_string
 
-import six
+import six  # lint-amnesty, pylint: disable=unused-import
 from lxml import etree
 from openedx.core.djangolib.markup import Text, HTML
-from xblock.fields import Boolean, Dict, List, Scope, String
+from xblock.fields import Boolean, Dict, List, Scope, String  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.mako_module import MakoModuleDescriptor
 from xmodule.stringify import stringify_children
 from xmodule.x_module import XModule
@@ -28,7 +28,7 @@ log = logging.getLogger(__name__)
 _ = lambda text: text
 
 
-class PollFields(object):
+class PollFields(object):  # lint-amnesty, pylint: disable=missing-class-docstring
     # Name of poll to use in links to this poll
     display_name = String(
         help=_("The display name for this component."),
@@ -76,7 +76,7 @@ class PollModule(PollFields, XModule):
     css = {'scss': [resource_string(__name__, 'css/poll/display.scss')]}
     js_module_name = "Poll"
 
-    def handle_ajax(self, dispatch, data):
+    def handle_ajax(self, dispatch, data):  # lint-amnesty, pylint: disable=unused-argument
         """Ajax handler.
 
         Args:
@@ -127,7 +127,7 @@ class PollModule(PollFields, XModule):
             'ajax_url': self.system.ajax_url,
             'configuration_json': self.dump_poll(),
         }
-        self.content = self.system.render_template('poll.html', params)
+        self.content = self.system.render_template('poll.html', params)  # lint-amnesty, pylint: disable=attribute-defined-outside-init
         return self.content
 
     def dump_poll(self):
@@ -166,7 +166,7 @@ class PollModule(PollFields, XModule):
         })
 
 
-class PollDescriptor(PollFields, MakoModuleDescriptor, XmlDescriptor):
+class PollDescriptor(PollFields, MakoModuleDescriptor, XmlDescriptor):  # lint-amnesty, pylint: disable=missing-class-docstring
     _tag_name = 'poll_question'
     _child_tag_name = 'answer'
 
@@ -220,7 +220,7 @@ class PollDescriptor(PollFields, MakoModuleDescriptor, XmlDescriptor):
         xml_object = etree.fromstring(poll_str)
         xml_object.set('display_name', self.display_name)
 
-        def add_child(xml_obj, answer):
+        def add_child(xml_obj, answer):  # lint-amnesty, pylint: disable=unused-argument
             # Escape answer text before adding to xml tree.
             answer_text = str(answer['text'])
             child_str = Text('{tag_begin}{text}{tag_end}').format(

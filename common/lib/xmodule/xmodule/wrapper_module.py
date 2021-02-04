@@ -1,4 +1,4 @@
-# Same as vertical,
+# Same as vertical,  # lint-amnesty, pylint: disable=missing-module-docstring
 # But w/o css delimiters between children
 
 
@@ -13,4 +13,4 @@ class WrapperBlock(VerticalBlock):
     '''
     Layout block for laying out sub-blocks vertically *w/o* css delimiters.
     '''
-    pass
+    pass  # lint-amnesty, pylint: disable=unnecessary-pass

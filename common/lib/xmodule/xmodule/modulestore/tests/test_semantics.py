@@ -58,7 +58,7 @@ class DirectOnlyCategorySemantics(PureModulestoreTestCase):
     ASIDE_DATA_FIELD = TestField('content', '<div>aside test data</div>', '<div>aside different test data</div>')
 
     def setUp(self):
-        super(DirectOnlyCategorySemantics, self).setUp()
+        super(DirectOnlyCategorySemantics, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.course = CourseFactory.create(
             org='test_org',
             number='999',

@@ -85,7 +85,7 @@ class CourseTab(six.with_metaclass(ABCMeta, object)):
         Args:
             tab_dict (dict) - a dictionary of parameters used to build the tab.
         """
-        super(CourseTab, self).__init__()
+        super(CourseTab, self).__init__()  # lint-amnesty, pylint: disable=super-with-arguments
         self.name = tab_dict.get('name', self.title)
         self.tab_id = tab_dict.get('tab_id', getattr(self, 'tab_id', self.type))
         self.course_staff_only = tab_dict.get('course_staff_only', False)
@@ -252,7 +252,7 @@ class TabFragmentViewMixin(object):
     fragment_view_name = None
 
     def __init__(self, tab_dict):
-        super(TabFragmentViewMixin, self).__init__(tab_dict)
+        super(TabFragmentViewMixin, self).__init__(tab_dict)  # lint-amnesty, pylint: disable=super-with-arguments
         self._fragment_view = None
 
     @property
@@ -261,7 +261,7 @@ class TabFragmentViewMixin(object):
 
         # If a view_name is specified, then use the default link function
         if self.view_name:
-            return super(TabFragmentViewMixin, self).link_func
+            return super(TabFragmentViewMixin, self).link_func  # lint-amnesty, pylint: disable=super-with-arguments
 
         # If not, then use the generic course tab URL
         def link_func(course, reverse_func):
@@ -321,7 +321,7 @@ class StaticTab(CourseTab):
         tab_dict['link_func'] = link_func
         tab_dict['tab_id'] = 'static_tab_{0}'.format(self.url_slug)
 
-        super(StaticTab, self).__init__(tab_dict)
+        super(StaticTab, self).__init__(tab_dict)  # lint-amnesty, pylint: disable=super-with-arguments
 
     @classmethod
     def is_enabled(cls, course, user=None):
@@ -342,22 +342,22 @@ class StaticTab(CourseTab):
         if key == 'url_slug':
             return self.url_slug
         else:
-            return super(StaticTab, self).__getitem__(key)
+            return super(StaticTab, self).__getitem__(key)  # lint-amnesty, pylint: disable=super-with-arguments
 
     def __setitem__(self, key, value):
         if key == 'url_slug':
             self.url_slug = value
         else:
-            super(StaticTab, self).__setitem__(key, value)
+            super(StaticTab, self).__setitem__(key, value)  # lint-amnesty, pylint: disable=super-with-arguments
 
     def to_json(self):
         """ Return a dictionary representation of this tab. """
-        to_json_val = super(StaticTab, self).to_json()
+        to_json_val = super(StaticTab, self).to_json()  # lint-amnesty, pylint: disable=super-with-arguments
         to_json_val.update({'url_slug': self.url_slug})
         return to_json_val
 
     def __eq__(self, other):
-        if not super(StaticTab, self).__eq__(other):
+        if not super(StaticTab, self).__eq__(other):  # lint-amnesty, pylint: disable=super-with-arguments
             return False
         return self.url_slug == other.get('url_slug')
 
@@ -528,7 +528,7 @@ class CourseTabList(List):
             )
             raise InvalidTabsException(msg)
 
-    def to_json(self, values):
+    def to_json(self, values):  # lint-amnesty, pylint: disable=arguments-differ
         """
         Overrides the to_json method to serialize all the CourseTab objects to a json-serializable representation.
         """
@@ -543,7 +543,7 @@ class CourseTabList(List):
                     continue
         return json_data
 
-    def from_json(self, values):
+    def from_json(self, values):  # lint-amnesty, pylint: disable=arguments-differ
         """
         Overrides the from_json method to de-serialize the CourseTab objects from a json-like representation.
         """
@@ -572,7 +572,7 @@ def key_checker(expected_keys):
         missing = set(expected_keys) - set(actual_dict.keys())
         if not missing:
             return True
-        if raise_error:
+        if raise_error:  # lint-amnesty, pylint: disable=no-else-raise
             raise InvalidTabsException(
                 "Expected keys '{0}' are not present in the given dict: {1}".format(expected_keys, actual_dict)
             )
@@ -635,11 +635,11 @@ class InvalidTabsException(Exception):
     """
     A complaint about invalid tabs.
     """
-    pass
+    pass  # lint-amnesty, pylint: disable=unnecessary-pass
 
 
 class UnequalTabsException(Exception):
     """
     A complaint about tab lists being unequal
     """
-    pass
+    pass  # lint-amnesty, pylint: disable=unnecessary-pass

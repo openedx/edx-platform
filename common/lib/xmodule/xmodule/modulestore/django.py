@@ -10,7 +10,7 @@ import logging
 
 import six
 from pkg_resources import resource_filename
-import re
+import re  # lint-amnesty, pylint: disable=wrong-import-order
 
 from django.conf import settings
 
@@ -19,16 +19,16 @@ from django.conf import settings
 if not settings.configured:
     settings.configure()
 
-from django.core.cache import caches, InvalidCacheBackendError
-import django.dispatch
-import django.utils
-from django.utils.translation import get_language, to_locale
-from edx_django_utils.cache import DEFAULT_REQUEST_CACHE
+from django.core.cache import caches, InvalidCacheBackendError  # lint-amnesty, pylint: disable=wrong-import-position
+import django.dispatch  # lint-amnesty, pylint: disable=wrong-import-position
+import django.utils  # lint-amnesty, pylint: disable=wrong-import-position
+from django.utils.translation import get_language, to_locale  # lint-amnesty, pylint: disable=wrong-import-position
+from edx_django_utils.cache import DEFAULT_REQUEST_CACHE  # lint-amnesty, pylint: disable=wrong-import-position
 
-from xmodule.contentstore.django import contentstore
-from xmodule.modulestore.draft_and_published import BranchSettingMixin
-from xmodule.modulestore.mixed import MixedModuleStore
-from xmodule.util.xmodule_django import get_current_request_hostname
+from xmodule.contentstore.django import contentstore  # lint-amnesty, pylint: disable=wrong-import-position
+from xmodule.modulestore.draft_and_published import BranchSettingMixin  # lint-amnesty, pylint: disable=wrong-import-position
+from xmodule.modulestore.mixed import MixedModuleStore  # lint-amnesty, pylint: disable=wrong-import-position
+from xmodule.util.xmodule_django import get_current_request_hostname  # lint-amnesty, pylint: disable=wrong-import-position
 
 # We also may not always have the current request user (crum) module available
 try:
@@ -68,7 +68,7 @@ class SwitchedSignal(django.dispatch.Signal):
 
         All other args are passed to the constructor for django.dispatch.Signal.
         """
-        super(SwitchedSignal, self).__init__(*args, **kwargs)
+        super(SwitchedSignal, self).__init__(*args, **kwargs)  # lint-amnesty, pylint: disable=super-with-arguments
         self.name = name
         self._allow_signals = True
 
@@ -103,7 +103,7 @@ class SwitchedSignal(django.dispatch.Signal):
             "ALLOW" if self._allow_signals else "BLOCK"
         )
         if self._allow_signals:
-            return super(SwitchedSignal, self).send(*args, **kwargs)
+            return super(SwitchedSignal, self).send(*args, **kwargs)  # lint-amnesty, pylint: disable=super-with-arguments
         return []
 
     def send_robust(self, *args, **kwargs):
@@ -121,7 +121,7 @@ class SwitchedSignal(django.dispatch.Signal):
             "ALLOW" if self._allow_signals else "BLOCK"
         )
         if self._allow_signals:
-            return super(SwitchedSignal, self).send_robust(*args, **kwargs)
+            return super(SwitchedSignal, self).send_robust(*args, **kwargs)  # lint-amnesty, pylint: disable=super-with-arguments
         return []
 
     def __repr__(self):

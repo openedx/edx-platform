@@ -13,7 +13,7 @@ import pymongo
 import pytest
 import six
 
-# pylint: disable=bad-continuation
+  # lint-amnesty, pylint: disable=bad-continuation, bad-option-value
 # pylint: disable=protected-access
 from django.test import TestCase
 # pylint: enable=E0611
@@ -80,7 +80,7 @@ class TestMongoModuleStoreBase(TestCase):
     courses = ['toy', 'simple', 'simple_with_draft', 'test_unicode']
 
     @classmethod
-    def setUpClass(cls):
+    def setUpClass(cls):  # lint-amnesty, pylint: disable=super-method-not-called
         cls.connection = pymongo.MongoClient(
             host=HOST,
             port=PORT,
@@ -95,7 +95,7 @@ class TestMongoModuleStoreBase(TestCase):
         cls.content_store, cls.draft_store = cls.initdb()
 
     @classmethod
-    def tearDownClass(cls):
+    def tearDownClass(cls):  # lint-amnesty, pylint: disable=super-method-not-called
         if cls.connection:
             cls.connection.drop_database(DB)
             cls.connection.close()
@@ -105,10 +105,10 @@ class TestMongoModuleStoreBase(TestCase):
         """
         No asset collection.
         """
-        pass
+        pass  # lint-amnesty, pylint: disable=unnecessary-pass
 
     @classmethod
-    def initdb(cls):
+    def initdb(cls):  # lint-amnesty, pylint: disable=missing-function-docstring
         # connect to the db
         doc_store_config = {
             'host': HOST,
@@ -173,7 +173,7 @@ class TestMongoModuleStoreBase(TestCase):
         connection.drop_database(DB)
 
     def setUp(self):
-        super(TestMongoModuleStoreBase, self).setUp()
+        super(TestMongoModuleStoreBase, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.dummy_user = ModuleStoreEnum.UserID.test
 
 
@@ -185,7 +185,7 @@ class TestMongoModuleStore(TestMongoModuleStoreBase):
         """
         No asset collection - it's not used in the tests below.
         """
-        pass
+        pass  # lint-amnesty, pylint: disable=unnecessary-pass
 
     @classmethod
     def setUpClass(cls):
@@ -496,7 +496,7 @@ class TestMongoModuleStore(TestMongoModuleStoreBase):
                 block_id='p2',
                 runtime=course.runtime
             )
-            self.refloc = course.id.make_usage_key('ref_test', 'ref_test')
+            self.refloc = course.id.make_usage_key('ref_test', 'ref_test')  # lint-amnesty, pylint: disable=attribute-defined-outside-init
             self.draft_store.create_item(
                 99,
                 self.refloc.course_key,
@@ -616,7 +616,7 @@ class TestMongoModuleStore(TestMongoModuleStoreBase):
         course = 'tree{}'.format(name)
         run = name
 
-        if not self.draft_store.has_course(CourseKey.from_string('/'.join[org, course, run])):
+        if not self.draft_store.has_course(CourseKey.from_string('/'.join[org, course, run])):  # lint-amnesty, pylint: disable=unsubscriptable-object
             self.draft_store.create_course(org, course, run, user_id)
 
             locations = {
@@ -718,7 +718,7 @@ class TestMongoModuleStore(TestMongoModuleStoreBase):
         self.assertEqual(root_block_key.block_id, "2015")
 
 
-class TestMongoModuleStoreWithNoAssetCollection(TestMongoModuleStore):
+class TestMongoModuleStoreWithNoAssetCollection(TestMongoModuleStore):  # lint-amnesty, pylint: disable=test-inherits-tests
     '''
     Tests a situation where no asset_collection is specified.
     '''
@@ -728,7 +728,7 @@ class TestMongoModuleStoreWithNoAssetCollection(TestMongoModuleStore):
         """
         No asset collection.
         """
-        pass
+        pass  # lint-amnesty, pylint: disable=unnecessary-pass
 
     @classmethod
     def setUpClass(cls):
@@ -756,7 +756,7 @@ class TestMongoKeyValueStore(TestCase):
     """
 
     def setUp(self):
-        super(TestMongoKeyValueStore, self).setUp()
+        super(TestMongoKeyValueStore, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.data = {'foo': 'foo_value'}
         self.course_id = CourseKey.from_string('org/course/run')
         self.parent = self.course_id.make_usage_key('parent', 'p')

@@ -22,7 +22,7 @@ from six.moves import range
 from capa.safe_exec import safe_exec, update_hash
 
 
-class TestSafeExec(unittest.TestCase):
+class TestSafeExec(unittest.TestCase):  # lint-amnesty, pylint: disable=missing-class-docstring
     def test_set_values(self):
         g = {}
         safe_exec("a = 17", g)
@@ -80,7 +80,7 @@ class TestSafeExec(unittest.TestCase):
         self.assertIn("ZeroDivisionError", text_type(cm.exception))
 
 
-class TestSafeOrNot(unittest.TestCase):
+class TestSafeOrNot(unittest.TestCase):  # lint-amnesty, pylint: disable=missing-class-docstring
     def test_cant_do_something_forbidden(self):
         # Can't test for forbiddenness if CodeJail isn't configured for python.
         if not jail_code.is_configured("python"):
@@ -231,7 +231,7 @@ class TestSafeExecCaching(unittest.TestCase):
 
         # The exception should be in the cache now.
         self.assertEqual(len(cache), 1)
-        cache_exc_msg, cache_globals = list(cache.values())[0]
+        cache_exc_msg, cache_globals = list(cache.values())[0]  # lint-amnesty, pylint: disable=unused-variable
         self.assertIn("ZeroDivisionError", cache_exc_msg)
 
         # Change the value stored in the cache, the result should change.
@@ -321,7 +321,7 @@ class TestUpdateHash(unittest.TestCase):
         self.assertEqual(h1, h2)
 
 
-class TestRealProblems(unittest.TestCase):
+class TestRealProblems(unittest.TestCase):  # lint-amnesty, pylint: disable=missing-class-docstring
     def test_802x(self):
         code = textwrap.dedent("""\
             import math

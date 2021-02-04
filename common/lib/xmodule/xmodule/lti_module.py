@@ -213,7 +213,7 @@ class LTIFields(object):
     )
 
     # Users will be presented with a message indicating that their e-mail/username would be sent to a third
-    # party application. When "Open in New Page" is not selected, the tool automatically appears without any user action.
+    # party application. When "Open in New Page" is not selected, the tool automatically appears without any user action.  # lint-amnesty, pylint: disable=line-too-long
     ask_to_send_username = Boolean(
         display_name=_("Request user's username"),
         # Translators: This is used to request the user's username for a third party service.
@@ -232,7 +232,7 @@ class LTIFields(object):
     description = String(
         display_name=_("LTI Application Information"),
         help=_(
-            "Enter a description of the third party application. If requesting username and/or email, use this text box to inform users "
+            "Enter a description of the third party application. If requesting username and/or email, use this text box to inform users "  # lint-amnesty, pylint: disable=line-too-long
             "why their username and/or email will be forwarded to a third party application."
         ),
         default="",
@@ -347,7 +347,7 @@ class LTIModule(LTIFields, LTI20ModuleMixin, XModule):
     css = {'scss': [resource_string(__name__, 'css/lti/lti.scss')]}
     js_module_name = 'LTI'
 
-    def get_input_fields(self):
+    def get_input_fields(self):  # lint-amnesty, pylint: disable=missing-function-docstring
         # LTI provides a list of default parameters that might be passed as
         # part of the POST data. These parameters should not be prefixed.
         # Likewise, The creator of an LTI link can add custom key/value parameters
@@ -397,7 +397,7 @@ class LTIModule(LTIFields, LTI20ModuleMixin, XModule):
                 msg = _('Could not parse custom parameter: {custom_parameter}. Should be "x=y" string.').format(
                     custom_parameter="{0!r}".format(custom_parameter)
                 )
-                raise LTIError(msg)
+                raise LTIError(msg)  # lint-amnesty, pylint: disable=raise-missing-from
 
             # LTI specs: 'custom_' should be prepended before each custom parameter, as pointed in link above.
             if param_name not in PARAMETERS:
@@ -512,7 +512,7 @@ class LTIModule(LTIFields, LTI20ModuleMixin, XModule):
         i4x-2-3-lti-31de800015cf4afb973356dbe81496df this part of resource_link_id:
         makes resource_link_id to be unique among courses inside same system.
         """
-        return six.text_type(six.moves.urllib.parse.quote("{}-{}".format(self.system.hostname, self.location.html_id())))
+        return six.text_type(six.moves.urllib.parse.quote("{}-{}".format(self.system.hostname, self.location.html_id())))  # lint-amnesty, pylint: disable=line-too-long
 
     def get_lis_result_sourcedid(self):
         """
@@ -599,8 +599,8 @@ class LTIModule(LTIFields, LTI20ModuleMixin, XModule):
                 u'lis_outcome_service_url': self.get_outcome_service_url()
             })
 
-        self.user_email = ""
-        self.user_username = ""
+        self.user_email = ""  # lint-amnesty, pylint: disable=attribute-defined-outside-init
+        self.user_username = ""  # lint-amnesty, pylint: disable=attribute-defined-outside-init
 
         # Username and email can't be sent in studio mode, because the user object is not defined.
         # To test functionality test in LMS
@@ -608,13 +608,13 @@ class LTIModule(LTIFields, LTI20ModuleMixin, XModule):
         if callable(self.runtime.get_real_user):
             real_user_object = self.runtime.get_real_user(self.runtime.anonymous_student_id)
             try:
-                self.user_email = real_user_object.email
+                self.user_email = real_user_object.email  # lint-amnesty, pylint: disable=attribute-defined-outside-init
             except AttributeError:
-                self.user_email = ""
+                self.user_email = ""  # lint-amnesty, pylint: disable=attribute-defined-outside-init
             try:
-                self.user_username = real_user_object.username
+                self.user_username = real_user_object.username  # lint-amnesty, pylint: disable=attribute-defined-outside-init
             except AttributeError:
-                self.user_username = ""
+                self.user_username = ""  # lint-amnesty, pylint: disable=attribute-defined-outside-init
 
         if self.ask_to_send_username and self.user_username:
             body["lis_person_sourcedid"] = self.user_username
@@ -661,14 +661,14 @@ oauth_consumer_key="", oauth_signature="frVp4JuvT1mVXlxktiAUjQ7%2F1cw%3D"'}
         # so '='' becomes '%3D'.
         # We send form via browser, so browser will encode it again,
         # So we need to decode signature back:
-        params[u'oauth_signature'] = six.moves.urllib.parse.unquote(params[u'oauth_signature']).encode('utf-8').decode('utf8')
+        params[u'oauth_signature'] = six.moves.urllib.parse.unquote(params[u'oauth_signature']).encode('utf-8').decode('utf8')  # lint-amnesty, pylint: disable=line-too-long
 
         # Add LTI parameters to OAuth parameters for sending in form.
         params.update(body)
         return params
 
     @XBlock.handler
-    def grade_handler(self, request, suffix):
+    def grade_handler(self, request, suffix):  # lint-amnesty, pylint: disable=unused-argument
         """
         This is called by courseware.module_render, to handle an AJAX call.
 
@@ -749,9 +749,9 @@ oauth_consumer_key="", oauth_signature="frVp4JuvT1mVXlxktiAUjQ7%2F1cw%3D"'}
 
         try:
             imsx_messageIdentifier, sourcedId, score, action = self.parse_grade_xml_body(request.body)
-        except Exception as e:
+        except Exception as e:  # lint-amnesty, pylint: disable=broad-except
             error_message = "Request body XML parsing error: " + escape(text_type(e))
-            log.debug("[LTI]: " + error_message)
+            log.debug("[LTI]: " + error_message)  # lint-amnesty, pylint: disable=logging-not-lazy
             failure_values['imsx_description'] = error_message
             return Response(response_xml_template.format(**failure_values), content_type="application/xml")
 
@@ -762,7 +762,7 @@ oauth_consumer_key="", oauth_signature="frVp4JuvT1mVXlxktiAUjQ7%2F1cw%3D"'}
             failure_values['imsx_messageIdentifier'] = escape(imsx_messageIdentifier)
             error_message = "OAuth verification error: " + escape(text_type(e))
             failure_values['imsx_description'] = error_message
-            log.debug("[LTI]: " + error_message)
+            log.debug("[LTI]: " + error_message)  # lint-amnesty, pylint: disable=logging-not-lazy
             return Response(response_xml_template.format(**failure_values), content_type="application/xml")
 
         real_user = self.system.get_real_user(six.moves.urllib.parse.unquote(sourcedId.split(':')[-1]))
@@ -808,7 +808,7 @@ oauth_consumer_key="", oauth_signature="frVp4JuvT1mVXlxktiAUjQ7%2F1cw%3D"'}
         imsx_messageIdentifier = root.xpath("//def:imsx_messageIdentifier", namespaces=namespaces)[0].text or ''
         sourcedId = root.xpath("//def:sourcedId", namespaces=namespaces)[0].text
         score = root.xpath("//def:textString", namespaces=namespaces)[0].text
-        action = root.xpath("//def:imsx_POXBody", namespaces=namespaces)[0].getchildren()[0].tag.replace('{' + lti_spec_namespace + '}', '')
+        action = root.xpath("//def:imsx_POXBody", namespaces=namespaces)[0].getchildren()[0].tag.replace('{' + lti_spec_namespace + '}', '')  # lint-amnesty, pylint: disable=line-too-long
         # Raise exception if score is not float or not in range 0.0-1.0 regarding spec.
         score = float(score)
         if not 0 <= score <= 1:
@@ -832,7 +832,7 @@ oauth_consumer_key="", oauth_signature="frVp4JuvT1mVXlxktiAUjQ7%2F1cw%3D"'}
             LTIError if request is incorrect.
         """
 
-        client_key, client_secret = self.get_client_key_secret()
+        client_key, client_secret = self.get_client_key_secret()  # lint-amnesty, pylint: disable=unused-variable
         headers = {
             'Authorization': six.text_type(request.headers.get('Authorization')),
             'Content-Type': content_type,
@@ -891,7 +891,7 @@ oauth_consumer_key="", oauth_signature="frVp4JuvT1mVXlxktiAUjQ7%2F1cw%3D"'}
                 msg = _('Could not parse LTI passport: {lti_passport}. Should be "id:key:secret" string.').format(
                     lti_passport='{0!r}'.format(lti_passport)
                 )
-                raise LTIError(msg)
+                raise LTIError(msg)  # lint-amnesty, pylint: disable=raise-missing-from
 
             if lti_id == self.lti_id.strip():
                 return key, secret

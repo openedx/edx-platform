@@ -122,5 +122,5 @@ class ModuleProgressTest(unittest.TestCase):
     def test_xmodule_default(self):
         '''Make sure default get_progress exists, returns None'''
         xmod = x_module.XModule(Mock(), get_test_system(), DictFieldData({'location': 'a://b/c/d/e'}), Mock())
-        prg = xmod.get_progress()
+        prg = xmod.get_progress()  # lint-amnesty, pylint: disable=assignment-from-none
         self.assertEqual(prg, None)

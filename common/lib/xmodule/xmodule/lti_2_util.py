@@ -27,7 +27,7 @@ LTI_2_0_JSON_CONTENT_TYPE = 'application/vnd.ims.lis.v2.result+json'
 
 class LTIError(Exception):
     """Error class for LTIModule and LTI20ModuleMixin"""
-    pass
+    pass  # lint-amnesty, pylint: disable=unnecessary-pass
 
 
 class LTI20ModuleMixin(object):
@@ -295,7 +295,7 @@ class LTI20ModuleMixin(object):
             self.verify_oauth_body_sign(request, content_type=LTI_2_0_JSON_CONTENT_TYPE)
         except (ValueError, LTIError) as err:
             log.info("[LTI]: v2.0 result service -- OAuth body verification failed:  {}".format(text_type(err)))
-            raise LTIError(text_type(err))
+            raise LTIError(text_type(err))  # lint-amnesty, pylint: disable=raise-missing-from
 
     def parse_lti_2_0_result_json(self, json_str):
         """
@@ -322,7 +322,7 @@ class LTI20ModuleMixin(object):
         except (ValueError, TypeError):
             msg = "Supplied JSON string in request body could not be decoded: {}".format(json_str)
             log.info("[LTI] {}".format(msg))
-            raise LTIError(msg)
+            raise LTIError(msg)  # lint-amnesty, pylint: disable=raise-missing-from
 
         # the standard supports a list of objects, who knows why. It must contain at least 1 element, and the
         # first element must be a dict
@@ -366,6 +366,6 @@ class LTI20ModuleMixin(object):
         except (TypeError, ValueError) as err:
             msg = "Could not convert resultScore to float: {}".format(text_type(err))
             log.info("[LTI] {}".format(msg))
-            raise LTIError(msg)
+            raise LTIError(msg)  # lint-amnesty, pylint: disable=raise-missing-from
 
         return score, json_obj.get('comment', "")

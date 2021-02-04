@@ -1,4 +1,4 @@
-
+  # lint-amnesty, pylint: disable=missing-module-docstring
 
 import datetime
 import logging
@@ -43,7 +43,7 @@ class Date(JSONField):
             result = result.replace(tzinfo=UTC)
         return result
 
-    def from_json(self, field):
+    def from_json(self, field):  # lint-amnesty, pylint: disable=arguments-differ
         """
         Parse an optional metadata key containing a time: if present, complain
         if it doesn't parse.
@@ -55,7 +55,7 @@ class Date(JSONField):
             return None
         elif isinstance(field, six.string_types):
             return self._parse_date_wo_default_month_day(field)
-        elif isinstance(field, six.integer_types) or isinstance(field, float):
+        elif isinstance(field, six.integer_types) or isinstance(field, float):  # lint-amnesty, pylint: disable=consider-merging-isinstance
             return datetime.datetime.fromtimestamp(field / 1000, UTC)
         elif isinstance(field, time.struct_time):
             return datetime.datetime.fromtimestamp(time.mktime(field), UTC)
@@ -90,14 +90,14 @@ class Date(JSONField):
 
     enforce_type = from_json
 
-TIMEDELTA_REGEX = re.compile(r'^((?P<days>\d+?) day(?:s?))?(\s)?((?P<hours>\d+?) hour(?:s?))?(\s)?((?P<minutes>\d+?) minute(?:s)?)?(\s)?((?P<seconds>\d+?) second(?:s)?)?$')
+TIMEDELTA_REGEX = re.compile(r'^((?P<days>\d+?) day(?:s?))?(\s)?((?P<hours>\d+?) hour(?:s?))?(\s)?((?P<minutes>\d+?) minute(?:s)?)?(\s)?((?P<seconds>\d+?) second(?:s)?)?$')  # lint-amnesty, pylint: disable=line-too-long
 
 
-class Timedelta(JSONField):
+class Timedelta(JSONField):  # lint-amnesty, pylint: disable=missing-class-docstring
     # Timedeltas are immutable, see http://docs.python.org/2/library/datetime.html#available-types
     MUTABLE = False
 
-    def from_json(self, time_str):
+    def from_json(self, time_str):  # lint-amnesty, pylint: disable=arguments-differ
         """
         time_str: A string with the following components:
             <D> day[s] (optional)
@@ -177,7 +177,7 @@ class RelativeTime(JSONField):
         try:
             obj_time = time.strptime(value, '%H:%M:%S')
         except ValueError as e:
-            raise ValueError(
+            raise ValueError(  # lint-amnesty, pylint: disable=raise-missing-from
                 "Incorrect RelativeTime value {!r} was set in XML or serialized. "
                 "Original parse message is {}".format(value, text_type(e))
             )
@@ -290,7 +290,7 @@ class ScoreField(JSONField):
                 )
             )
 
-        if not (0 <= raw_earned <= raw_possible):
+        if not (0 <= raw_earned <= raw_possible):  # lint-amnesty, pylint: disable=superfluous-parens
             raise ValueError(
                 'Error deserializing field of type {0}: Expected raw_earned between 0 and {1}, got {2}.'.format(
                     self.display_name,

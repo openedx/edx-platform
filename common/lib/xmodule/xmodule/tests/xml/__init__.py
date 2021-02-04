@@ -30,7 +30,7 @@ class InMemorySystem(XMLParsingSystem, MakoDescriptorSystem):  # pylint: disable
             """Return the policy data for the specified usage"""
             return xml_import_data.policy.get(policy_key(usage_id), {})
 
-        super(InMemorySystem, self).__init__(
+        super(InMemorySystem, self).__init__(  # lint-amnesty, pylint: disable=super-with-arguments
             get_policy=get_policy,
             process_xml=self.process_xml,
             load_item=self.load_item,

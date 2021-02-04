@@ -10,7 +10,7 @@ from unittest import TestCase, skip
 
 import ddt
 import six
-from django.test import TestCase
+from django.test import TestCase  # lint-amnesty, pylint: disable=reimported
 
 from xmodule.modulestore.tests.factories import check_mongo_calls
 from xmodule.modulestore.tests.utils import (
@@ -35,7 +35,7 @@ class CountMongoCallsXMLRoundtrip(TestCase):
     """
 
     def setUp(self):
-        super(CountMongoCallsXMLRoundtrip, self).setUp()
+        super(CountMongoCallsXMLRoundtrip, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.export_dir = mkdtemp()
         self.addCleanup(rmtree, self.export_dir, ignore_errors=True)
 

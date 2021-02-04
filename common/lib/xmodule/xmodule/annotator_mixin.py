@@ -31,7 +31,7 @@ def get_extension(srcurl):
         return 'video/' + file_ext.replace('.', '')
 
 
-class MLStripper(HTMLParser):
+class MLStripper(HTMLParser):  # lint-amnesty, pylint: disable=abstract-method
     "helper function for html_to_text below"
     def __init__(self):
         HTMLParser.__init__(self)
