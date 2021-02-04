@@ -50,7 +50,7 @@ class EnterpriseSupportSignals(SharedModuleStoreTestCase):
         self.user = UserFactory.create(username='test', email=TEST_EMAIL)
         self.course_id = 'course-v1:edX+DemoX+Demo_Course'
         self.enterprise_customer = EnterpriseCustomerFactory()
-        super(EnterpriseSupportSignals, self).setUp()
+        super(EnterpriseSupportSignals, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
 
     @staticmethod
     def _create_dsc_cache(user_id, course_id):

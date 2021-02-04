@@ -1,4 +1,4 @@
-"""
+"""  # lint-amnesty, pylint: disable=cyclic-import
 Mixins for the EnterpriseApiClient.
 """
 
@@ -23,7 +23,7 @@ class EnterpriseServiceMockMixin(object):
     consent_url = '{}{}'.format(settings.ENTERPRISE_CONSENT_API_URL, 'data_sharing_consent')
 
     def setUp(self):
-        super(EnterpriseServiceMockMixin, self).setUp()
+        super(EnterpriseServiceMockMixin, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         cache.clear()
 
     @staticmethod
@@ -78,7 +78,7 @@ class EnterpriseServiceMockMixin(object):
             status=500
         )
 
-    def mock_consent_response(
+    def mock_consent_response(  # lint-amnesty, pylint: disable=missing-function-docstring
             self,
             username,
             course_id,

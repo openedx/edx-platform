@@ -35,7 +35,7 @@ class TestApplicability(ModuleStoreTestCase):
     """
 
     def setUp(self):
-        super(TestApplicability, self).setUp()
+        super(TestApplicability, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.site, _ = Site.objects.get_or_create(domain='example.com')
         self.user = UserFactory.create()
         self.course = CourseFactory.create(run='test', display_name='test')
@@ -79,8 +79,8 @@ class TestApplicability(ModuleStoreTestCase):
         self.assertEqual(applicability, False)
 
         disabled_course = CourseFactory()
-        CourseModeFactory.create(course_id=disabled_course.id, mode_slug='verified')
-        disabled_course_overview = CourseOverview.get_from_id(disabled_course.id)
+        CourseModeFactory.create(course_id=disabled_course.id, mode_slug='verified')  # lint-amnesty, pylint: disable=no-member
+        disabled_course_overview = CourseOverview.get_from_id(disabled_course.id)  # lint-amnesty, pylint: disable=no-member
         DiscountRestrictionConfig.objects.create(disabled=True, course=disabled_course_overview)
         applicability = can_receive_discount(user=self.user, course=disabled_course)
         self.assertEqual(applicability, False)
