@@ -40,3 +40,4 @@ class CourseHomeMetadataSerializer(serializers.Serializer):
     original_user_is_staff = serializers.BooleanField()
     tabs = CourseTabSerializer(many=True)
     title = serializers.CharField()
+    celebrations = serializers.DictField()
