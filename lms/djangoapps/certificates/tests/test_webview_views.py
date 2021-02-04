@@ -963,23 +963,6 @@ class CertificatesViewsTests(CommonCertificatesTestCase, CacheIsolationTestCase)
         response = self.client.get(test_url)
         self.assertContains(response, "Invalid Certificate")
 
-    @override_settings(FEATURES=FEATURES_WITH_CERTS_ENABLED)
-    def test_render_500_view_invalid_certificate_configuration(self):
-        self._add_course_certificates(count=1, signatory_count=2)
-        CertificateHtmlViewConfiguration.objects.all().update(enabled=False)
-
-        test_url = get_certificate_url(
-            user_id=self.user.id,
-            course_id=six.text_type(self.course.id),
-            uuid=self.cert.verify_uuid
-        )
-        response = self.client.get(test_url + "?preview=honor")
-        self.assertContains(response, "Invalid Certificate Configuration")
-
-        # Verify that Exception is raised when certificate is not in the preview mode
-        with self.assertRaises(Exception):
-            self.client.get(test_url)
-
     @override_settings(FEATURES=FEATURES_WITH_CERTS_DISABLED)
     def test_request_certificate_without_passing(self):
         self.cert.status = CertificateStatuses.unavailable
