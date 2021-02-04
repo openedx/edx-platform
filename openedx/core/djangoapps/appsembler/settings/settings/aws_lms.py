@@ -7,6 +7,7 @@ from openedx.core.djangoapps.appsembler.settings.settings import aws_common
 
 
 EDX_SITE_REDIRECT_MIDDLEWARE = "django_sites_extensions.middleware.RedirectMiddleware"
+TAHOE_MARKETING_SITE_URL = "https://appsembler.com/tahoe"
 
 
 def _add_theme_static_dirs(settings):
@@ -62,7 +63,7 @@ def plugin_settings(settings):
             settings.MIDDLEWARE_CLASSES.insert(redir_middleware, tahoe_redir_middleware)
 
         settings.TAHOE_MAIN_SITE_REDIRECT_URL = settings.ENV_TOKENS.get(
-            'TAHOE_MAIN_SITE_REDIRECT_URL', 'https://appsembler.com/tahoe/'
+            'TAHOE_MAIN_SITE_REDIRECT_URL', TAHOE_MARKETING_SITE_URL
         )
         # This is used in the appsembler_sites.middleware.RedirectMiddleware to exclude certain paths
         # from the redirect mechanics.
