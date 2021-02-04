@@ -112,7 +112,7 @@ class RegistrationSerializer(serializers.Serializer):
 
     @beeline.traced(name="RegistrationSerializer.create")
     def create(self, validated_data):
-        beeline.add_context_field(validated_data, validated_data)
+        beeline.add_context_field('validated_data', validated_data)
         site_data = validated_data.pop('site')
         site = Site.objects.create(**site_data)
         organization_data = validated_data.pop('organization')
