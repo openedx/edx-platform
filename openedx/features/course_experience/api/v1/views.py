@@ -104,7 +104,7 @@ def reset_course_deadlines(request):
         })
     except Exception as e:
         log.exception(e)
-        raise UnableToResetDeadlines
+        raise UnableToResetDeadlines  # lint-amnesty, pylint: disable=raise-missing-from
 
 
 class CourseDeadlinesMobileView(RetrieveAPIView):

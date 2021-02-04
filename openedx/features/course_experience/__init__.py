@@ -1,4 +1,4 @@
-"""
+"""  # lint-amnesty, pylint: disable=django-not-configured
 Unified course experience settings and helper methods.
 """
 import crum
