@@ -21,7 +21,6 @@ logger = logging.getLogger(__name__)  # pylint: disable=invalid-name
 MONGO_READ_PREFERENCE_MAP = dict(zip(_MONGOS_MODES, _MODES))
 
 
-  # lint-amnesty, pylint: disable=bad-continuation, bad-option-value
 def connect_to_mongodb(
     db, host,
     port=27017, tz_aware=True, user=None, password=None,

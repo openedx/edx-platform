@@ -387,7 +387,6 @@ class EditInfo(object):
         self.original_usage_version = edit_info.get('original_usage_version', None)
 
     def __repr__(self):
-  # lint-amnesty, pylint: disable=bad-continuation, bad-option-value
         return ("{classname}(previous_version={self.previous_version}, "
                 "update_version={self.update_version}, "
                 "source_version={source_version}, "
@@ -400,7 +399,7 @@ class EditInfo(object):
             self=self,
             classname=self.__class__.__name__,
             source_version="UNSET" if self.source_version is None else self.source_version,
-        )  # lint-amnesty, pylint: disable=bad-continuation, bad-option-value
+        )
 
     def __eq__(self, edit_info):
         """
@@ -474,7 +473,6 @@ class BlockData(object):
         return self.asides
 
     def __repr__(self):
-  # lint-amnesty, pylint: disable=bad-continuation, bad-option-value
         return ("{classname}(fields={self.fields}, "
                 "block_type={self.block_type}, "
                 "definition={self.definition}, "
@@ -485,7 +483,7 @@ class BlockData(object):
             self=self,
             classname=self.__class__.__name__,
             asides=self.get_asides()
-        )  # lint-amnesty, pylint: disable=bad-continuation, bad-option-value
+        )
 
     def __eq__(self, block_data):
         """
@@ -1160,14 +1158,14 @@ class ModuleStoreReadBase(BulkOperationsMixin, ModuleStoreRead):
     """
     Implement interface functionality that can be shared.
     """
-    def __init__(
+    def __init__(  # lint-amnesty, pylint: disable=unused-argument
         self,
         contentstore=None,
-        doc_store_config=None,  # ignore if passed up  # lint-amnesty, pylint: disable=unused-argument
+        doc_store_config=None,  # ignore if passed up
         metadata_inheritance_cache_subsystem=None, request_cache=None,
-        xblock_mixins=(), xblock_select=None, xblock_field_data_wrappers=(), disabled_xblock_types=lambda: [],  # lint-amnesty, pylint: disable=bad-continuation, bad-option-value
+        xblock_mixins=(), xblock_select=None, xblock_field_data_wrappers=(), disabled_xblock_types=lambda: [],
         # temporary parms to enable backward compatibility. remove once all envs migrated
-        db=None, collection=None, host=None, port=None, tz_aware=True, user=None, password=None,  # lint-amnesty, pylint: disable=unused-argument
+        db=None, collection=None, host=None, port=None, tz_aware=True, user=None, password=None,
         # allow lower level init args to pass harmlessly
         ** kwargs
     ):

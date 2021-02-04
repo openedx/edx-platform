@@ -1,4 +1,5 @@
-# -----------------------------------------------------------------------------  # lint-amnesty, pylint: disable=missing-module-docstring
+# lint-amnesty, pylint: disable=missing-module-docstring
+# -----------------------------------------------------------------------------
 # class used to store graded responses to CAPA questions
 #
 # Used by responsetypes and capa_problem
@@ -47,7 +48,7 @@ class CorrectMap(object):
         hint='',
         hintmode=None,
         queuestate=None,
-        answervariable=None,  # lint-amnesty, pylint: disable=C0330, bad-option-value
+        answervariable=None,
         **kwargs
     ):
 

@@ -1287,7 +1287,7 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
             Check that the block matches all the criteria
             """
             # do the checks which don't require loading any additional data
-            if (  # lint-amnesty, pylint: disable=bad-continuation, bad-option-value
+            if (
                 self._block_matches(block_data, qualifiers) and
                 self._block_matches(block_data.fields, settings)
             ):
@@ -1337,7 +1337,7 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
         for block_id, value in six.iteritems(course.structure['blocks']):
             if _block_matches_all(value):
                 if not include_orphans:
-                    if (  # lint-amnesty, pylint: disable=bad-continuation, bad-option-value
+                    if (
                         block_id.type in DETACHED_XBLOCK_TYPES or
                         self.has_path_to_root(block_id, course, path_cache, parents_cache)
                     ):

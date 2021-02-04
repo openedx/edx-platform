@@ -1,4 +1,4 @@
-  # lint-amnesty, pylint: disable=missing-module-docstring
+# lint-amnesty, pylint: disable=missing-module-docstring
 from unittest import TestCase
 
 from six.moves import range

@@ -95,7 +95,7 @@ def modulestore():
         options.update(ModuleStoreNoSettings.MODULESTORE['OPTIONS'])
         options['render_template'] = render_to_template_mock
 
-  # lint-amnesty, pylint: disable=bad-option-value, star-args
+        # lint-amnesty, pylint: disable=bad-option-value, star-args
         ModuleStoreNoSettings.modulestore = class_(
             None,  # contentstore
             ModuleStoreNoSettings.MODULESTORE['DOC_STORE_CONFIG'],

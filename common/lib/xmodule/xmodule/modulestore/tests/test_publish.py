@@ -1024,7 +1024,6 @@ class ElementalDeleteItemTests(DraftPublishedOpBaseTestSetup):
             # Weirdly, this is a difference between old Mongo -and- old Mongo wrapped with a mixed modulestore.
             # When the code attempts and fails to delete the draft vertical using the published_only revision,
             # the draft children are still around in one case and not in the other? Needs investigation.
-  # lint-amnesty, pylint: disable=bad-continuation, bad-option-value
             if (
                 isinstance(modulestore_builder, MongoModulestoreBuilder) and
                 revision == ModuleStoreEnum.RevisionOption.published_only

@@ -212,7 +212,8 @@ class CAPAProblemTest(unittest.TestCase):
         Verify that tag with question text is not removed when inputtype is not fully accessible.
         """
         question = "Click the country which is home to the Pyramids."
-        xml = """  # lint-amnesty, pylint: disable=duplicate-string-formatting-argument
+        # lint-amnesty, pylint: disable=duplicate-string-formatting-argument
+        xml = """
         <problem>
             <p>{}</p>
             <imageresponse>

@@ -1,4 +1,4 @@
-  # lint-amnesty, pylint: disable=missing-module-docstring
+# lint-amnesty, pylint: disable=missing-module-docstring
 
 import codecs  # lint-amnesty, pylint: disable=unused-import
 import glob

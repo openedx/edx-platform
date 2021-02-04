@@ -1,4 +1,5 @@
-# -*- coding: utf-8 -*-  # lint-amnesty, pylint: disable=missing-module-docstring
+# lint-amnesty, pylint: disable=missing-module-docstring
+# -*- coding: utf-8 -*-
 
 
 import datetime

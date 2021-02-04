@@ -1,4 +1,5 @@
-# Same as vertical,  # lint-amnesty, pylint: disable=missing-module-docstring
+# lint-amnesty, pylint: disable=missing-module-docstring
+# Same as vertical,
 # But w/o css delimiters between children
 
 

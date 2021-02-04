@@ -364,6 +364,7 @@ disable =
 	no-else-continue,
 	useless-object-inheritance,
     useless-suppression,
+    cyclic-import,
 
 [REPORTS]
 output-format = text

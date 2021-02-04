@@ -1637,8 +1637,8 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
         but does NOT return a version agnostic location.
         '''
         assert location.branch is None
-        assert revision == ModuleStoreEnum.RevisionOption.published_only \  # lint-amnesty, pylint: disable=consider-using-in
-            or revision == ModuleStoreEnum.RevisionOption.draft_preferred
+        assert revision == ModuleStoreEnum.RevisionOption.published_only \
+            or revision == ModuleStoreEnum.RevisionOption.draft_preferred  # lint-amnesty, pylint: disable=consider-using-in
 
         parent_cache = self._get_parent_cache(self.get_branch_setting())
         if parent_cache.has(six.text_type(location)):

@@ -2266,7 +2266,7 @@ def modulestore():
         options.update(SplitModuleTest.MODULESTORE['OPTIONS'])
         options['render_template'] = render_to_template_mock
 
-  # lint-amnesty, pylint: disable=bad-option-value, star-args
+        # lint-amnesty, pylint: disable=bad-option-value, star-args
         SplitModuleTest.modulestore = class_(
             None,  # contentstore
             SplitModuleTest.MODULESTORE['DOC_STORE_CONFIG'],

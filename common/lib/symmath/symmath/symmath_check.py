@@ -1,4 +1,5 @@
-#!/usr/bin/python  # lint-amnesty, pylint: disable=missing-module-docstring
+# lint-amnesty, pylint: disable=missing-module-docstring
+# !/usr/bin/python
 # -*- coding: utf-8 -*-
 #
 # File:   symmath_check.py

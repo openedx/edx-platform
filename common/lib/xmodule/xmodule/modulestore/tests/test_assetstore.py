@@ -47,7 +47,6 @@ class AssetStoreTestData(object):
         'edited_by', 'edited_by_email', 'edited_on', 'created_by', 'created_by_email', 'created_on',
         'curr_version', 'prev_version'
     )
-  # lint-amnesty, pylint: disable=bad-continuation, bad-option-value
     all_asset_data = (
         ('pic1.jpg', 'EKMND332DDBK', 'pix/archive', False,
             user_id_long, user_email, now + timedelta(seconds=10 * 1), user_id_long, user_email, now, '14', '13'),
@@ -451,7 +450,6 @@ class TestMongoAssetMetadataStorage(TestCase):
         """
         getting all things which are of type other than 'asset'
         """
-  # lint-amnesty, pylint: disable=bad-continuation, bad-option-value
         with storebuilder.build() as (__, store):
             course = CourseFactory.create(modulestore=store)
 
@@ -488,7 +486,6 @@ class TestMongoAssetMetadataStorage(TestCase):
         """
         Save a list of asset metadata all at once.
         """
-  # lint-amnesty, pylint: disable=bad-continuation, bad-option-value
         with storebuilder.build() as (__, store):
             course = CourseFactory.create(modulestore=store)
 
@@ -528,7 +525,6 @@ class TestMongoAssetMetadataStorage(TestCase):
         """
         Save a list of asset metadata all at once - but with one asset's metadata from a different course.
         """
-  # lint-amnesty, pylint: disable=bad-continuation, bad-option-value
         with storebuilder.build() as (__, store):
             course1 = CourseFactory.create(modulestore=store)
             course2 = CourseFactory.create(modulestore=store)

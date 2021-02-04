@@ -28,7 +28,7 @@ class MongoContentStore(ContentStore):
     """
     MongoDB-backed ContentStore.
     """
-  # lint-amnesty, pylint: disable=bad-continuation, bad-option-value, unused-argument
+    # lint-amnesty, pylint: disable=unused-argument
     def __init__(
         self, host, db,
         port=27017, tz_aware=True, user=None, password=None, bucket='fs', collection=None, **kwargs
