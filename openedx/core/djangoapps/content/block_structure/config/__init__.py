@@ -3,7 +3,7 @@ This module contains various configuration settings via
 waffle switches for the Block Structure framework.
 """
 from edx_django_utils.cache import RequestCache
-from edx_toggles.toggles.__future__ import WaffleSwitch
+from edx_toggles.toggles import WaffleSwitch
 
 from openedx.core.lib.cache_utils import request_cached
 
