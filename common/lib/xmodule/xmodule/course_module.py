@@ -105,7 +105,7 @@ edx_xml_parser = etree.XMLParser(dtd_validation=False, load_dtd=False,
 _cached_toc = {}
 
 
-class Textbook(object):  # lint-amnesty, pylint: disable=missing-class-docstring
+class Textbook(object):  # lint-amnesty, pylint: disable=eq-without-hash, missing-class-docstring
     def __init__(self, title, book_url):
         self.title = title
         self.book_url = book_url

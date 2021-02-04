@@ -728,7 +728,7 @@ class SoftwareSecurePhotoVerification(PhotoVerification):
         if six.PY3:
             aes_key = codecs.decode(aes_key_str, "hex")
         else:
-            aes_key = aes_key_str.decode("hex")
+            aes_key = aes_key_str.decode("hex")  # lint-amnesty, pylint: disable=invalid-str-codec
 
         encrypted_data = encrypt_and_encode(img_data, aes_key)
 
@@ -770,7 +770,7 @@ class SoftwareSecurePhotoVerification(PhotoVerification):
         if six.PY3:
             self.photo_id_key = codecs.encode(rsa_encrypted_aes_key, 'base64').decode('utf-8')
         else:
-            self.photo_id_key = rsa_encrypted_aes_key.encode('base64')
+            self.photo_id_key = rsa_encrypted_aes_key.encode('base64')  # lint-amnesty, pylint: disable=invalid-str-codec
 
         self.save()
 
@@ -799,7 +799,7 @@ class SoftwareSecurePhotoVerification(PhotoVerification):
             if six.PY3:
                 aes_key = codecs.decode(aes_key_str, "hex")
             else:
-                aes_key = aes_key_str.decode("hex")
+                aes_key = aes_key_str.decode("hex")  # lint-amnesty, pylint: disable=invalid-str-codec
 
             img_bytes = decode_and_decrypt(byte_img_data, aes_key)
             return img_bytes

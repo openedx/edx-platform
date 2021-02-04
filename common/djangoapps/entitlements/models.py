@@ -457,7 +457,7 @@ class CourseEntitlement(TimeStampedModel):
         """
         if not self.order_number:
             self.order_number = None
-        super(CourseEntitlement, self).save(*args, **kwargs)
+        super(CourseEntitlement, self).save(*args, **kwargs)  # lint-amnesty, pylint: disable=super-with-arguments
 
 
 @python_2_unicode_compatible
