@@ -10,7 +10,7 @@ not migrating so as not to inconvenience users by logging them all out.
 from functools import wraps
 
 import six
-from django.conf import settings
+from django.conf import settings  # lint-amnesty, pylint: disable=unused-import
 from django.core import cache
 # If we can't find a 'general' CACHE defined in settings.py, we simply fall back
 # to returning the default cache. This will happen with dev machines.
@@ -18,7 +18,7 @@ from django.utils.translation import get_language
 
 try:
     cache = cache.caches['general']         # pylint: disable=invalid-name
-except Exception:
+except Exception:  # lint-amnesty, pylint: disable=broad-except
     cache = cache.cache
 
 
@@ -76,7 +76,7 @@ def cache_if_anonymous(*get_parameters):
 
                 if response:
                     # A hack to ensure that the response data is a valid text type for both Python 2 and 3.
-                    response_content = list(response._container)  # pylint: disable=protected-member
+                    response_content = list(response._container)  # lint-amnesty, pylint: disable=bad-option-value, protected-access, protected-member
                     response.content = b''
                     for item in response_content:
                         response.write(item)

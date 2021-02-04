@@ -69,7 +69,7 @@ class UrlResetMixin(object):
             URLCONF_MODULES = ['myapp.url', 'another_app.urls']
 
         """
-        super(UrlResetMixin, self).setUp()
+        super(UrlResetMixin, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
 
         self.reset_urls()
         self.addCleanup(self.reset_urls)
@@ -80,7 +80,7 @@ class EventTestMixin(object):
     Generic mixin for verifying that events were emitted during a test.
     """
     def setUp(self, tracker):
-        super(EventTestMixin, self).setUp()
+        super(EventTestMixin, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         patcher = patch(tracker)
         self.mock_tracker = patcher.start()
         self.addCleanup(patcher.stop)
