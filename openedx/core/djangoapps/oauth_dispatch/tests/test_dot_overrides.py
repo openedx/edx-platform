@@ -9,7 +9,7 @@ import datetime
 import unittest
 
 from django.conf import settings
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.test import RequestFactory, TestCase
 from django.utils import timezone
 
@@ -32,7 +32,7 @@ class AuthenticateTestCase(TestCase):
     """
 
     def setUp(self):
-        super(AuthenticateTestCase, self).setUp()
+        super(AuthenticateTestCase, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.user = User.objects.create_user(
             username='darkhelmet',
             password='12345',
@@ -57,7 +57,7 @@ class CustomValidationTestCase(TestCase):
     In particular, inactive users should be able to validate.
     """
     def setUp(self):
-        super(CustomValidationTestCase, self).setUp()
+        super(CustomValidationTestCase, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.user = User.objects.create_user(
             username='darkhelmet',
             password='12345',
@@ -88,7 +88,7 @@ class CustomAuthorizationViewTestCase(TestCase):
     (This is a temporary override until Auth Scopes is implemented.)
     """
     def setUp(self):
-        super(CustomAuthorizationViewTestCase, self).setUp()
+        super(CustomAuthorizationViewTestCase, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.dot_adapter = adapters.DOTAdapter()
         self.user = UserFactory()
         self.client.login(username=self.user.username, password='test')
@@ -96,7 +96,7 @@ class CustomAuthorizationViewTestCase(TestCase):
         self.restricted_dot_app = self._create_restricted_app()
         self._create_expired_token(self.restricted_dot_app)
 
-    def _create_restricted_app(self):
+    def _create_restricted_app(self):  # lint-amnesty, pylint: disable=missing-function-docstring
         restricted_app = self.dot_adapter.create_confidential_client(
             name='test restricted dot application',
             user=self.user,

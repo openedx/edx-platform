@@ -23,7 +23,7 @@ EXPECTED_DEFAULT_EXPIRES_IN = 36000
 class TestOAuthDispatchAPI(TestCase):
     """ Tests for oauth_dispatch's api.py module. """
     def setUp(self):
-        super(TestOAuthDispatchAPI, self).setUp()
+        super(TestOAuthDispatchAPI, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.adapter = DOTAdapter()
         self.user = UserFactory()
         self.client = self.adapter.create_public_client(

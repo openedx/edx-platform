@@ -21,7 +21,7 @@ class PasswordPolicyAwareAdminAuthForm(AdminAuthenticationForm):
         """
         Overrides the clean method to allow for the enforcement of password policy requirements.
         """
-        cleaned_data = super(PasswordPolicyAwareAdminAuthForm, self).clean()
+        cleaned_data = super(PasswordPolicyAwareAdminAuthForm, self).clean()  # lint-amnesty, pylint: disable=super-with-arguments
 
         if password_policy_compliance.should_enforce_compliance_on_login():
             try:
@@ -31,6 +31,6 @@ class PasswordPolicyAwareAdminAuthForm(AdminAuthenticationForm):
                 messages.warning(self.request, six.text_type(e))
             except password_policy_compliance.NonCompliantPasswordException as e:
                 # Prevent the login attempt.
-                raise ValidationError(six.text_type(e))
+                raise ValidationError(six.text_type(e))  # lint-amnesty, pylint: disable=raise-missing-from
 
         return cleaned_data

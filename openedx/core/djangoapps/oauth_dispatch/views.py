@@ -61,7 +61,7 @@ class _DispatchingView(View):
         Return the appropriate view from the requested backend.
         """
         if backend == self.dot_adapter.backend:
-            return self.dot_view.as_view()
+            return self.dot_view.as_view()  # lint-amnesty, pylint: disable=no-member
         else:
             raise KeyError('Failed to dispatch view. Invalid backend {}'.format(backend))
 
@@ -88,7 +88,7 @@ class AccessTokenView(_DispatchingView):
     dot_view = dot_views.TokenView
 
     def dispatch(self, request, *args, **kwargs):
-        response = super(AccessTokenView, self).dispatch(request, *args, **kwargs)
+        response = super(AccessTokenView, self).dispatch(request, *args, **kwargs)  # lint-amnesty, pylint: disable=super-with-arguments
 
         token_type = request.POST.get('token_type',
                                       request.META.get('HTTP_X_TOKEN_TYPE', 'no_token_type_supplied')).lower()

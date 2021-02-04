@@ -38,7 +38,7 @@ def counter(fn):
 
 
 @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
-class EdxClearExpiredTokensTests(TestCase):
+class EdxClearExpiredTokensTests(TestCase):  # lint-amnesty, pylint: disable=missing-class-docstring
 
     # patching REFRESH_TOKEN_EXPIRE_SECONDS because override_settings not working.
     @patch('oauth2_provider.settings.oauth2_settings.REFRESH_TOKEN_EXPIRE_SECONDS', 'xyz')
