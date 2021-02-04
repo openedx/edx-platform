@@ -24,7 +24,7 @@ class TestGetCredentials(CredentialsApiConfigMixin, CacheIsolationTestCase):
     ENABLED_CACHES = ['default']
 
     def setUp(self):
-        super(TestGetCredentials, self).setUp()
+        super(TestGetCredentials, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
 
         ApplicationFactory(name=CredentialsApiConfig.OAUTH2_CLIENT_NAME)
 

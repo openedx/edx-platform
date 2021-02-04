@@ -30,7 +30,7 @@ class PreviewLanguageFragmentView(EdxFragmentView):
     POST - updates or clears the setting to the given dark language
     """
 
-    def render_to_fragment(self, request, course_id=None, **kwargs):
+    def render_to_fragment(self, request, course_id=None, **kwargs):  # lint-amnesty, pylint: disable=arguments-differ, unused-argument
         """
         Renders the language preview view as a fragment.
         """
@@ -58,10 +58,10 @@ class PreviewLanguageFragmentView(EdxFragmentView):
         """
         if not self._user_can_preview_languages(request.user):
             raise Http404
-        return super(PreviewLanguageFragmentView, self).get(request, *args, **kwargs)
+        return super(PreviewLanguageFragmentView, self).get(request, *args, **kwargs)  # lint-amnesty, pylint: disable=super-with-arguments
 
     @method_decorator(login_required)
-    def post(self, request, **kwargs):
+    def post(self, request, **kwargs):  # lint-amnesty, pylint: disable=unused-argument
         """
         Accept requests to update the preview language.
         """

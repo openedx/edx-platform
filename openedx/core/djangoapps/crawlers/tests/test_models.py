@@ -11,10 +11,10 @@ from ..models import CrawlersConfig
 
 
 @ddt.ddt
-class CrawlersConfigTest(TestCase):
+class CrawlersConfigTest(TestCase):  # lint-amnesty, pylint: disable=missing-class-docstring
 
     def setUp(self):
-        super(CrawlersConfigTest, self).setUp()
+        super(CrawlersConfigTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         CrawlersConfig(known_user_agents='edX-downloader,crawler_foo', enabled=True).save()
 
     @ddt.data(

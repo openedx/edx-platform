@@ -31,7 +31,7 @@ class TestNotifyCredentials(TestCase):
     Tests the ``notify_credentials`` management command.
     """
     def setUp(self):
-        super(TestNotifyCredentials, self).setUp()
+        super(TestNotifyCredentials, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.user = UserFactory.create()
         self.user2 = UserFactory.create()
 
