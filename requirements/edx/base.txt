@@ -254,7 +254,7 @@ xss-utils==0.1.3          # via -r requirements/edx/base.in
 zipp==1.0.0               # via -c requirements/edx/../constraints.txt, -r requirements/edx/paver.txt, importlib-metadata
 
 # edly forked apps
--e git+https://github.com/edly-io/figures.git@edly-1.4.0#egg=figures==edly-1.4.0
+-e git+https://github.com/edly-io/figures.git@develop-juniper#egg=figures==develop-juniper
 -e git+https://github.com/edly-io/edx_xblock_scorm.git@v1.0.8#egg=edx_xblock_scorm==v1.0.8
 -e git+https://github.com/edly-io/xblock-pdf.git@edly-1.0.1#egg=xblock-pdf
 -e git+https://github.com/edly-io/xblock-video.git@dev#egg=video_xblock
