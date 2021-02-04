@@ -29,7 +29,7 @@ class DOTAdapterTestCase(TestCase):
     Test class for DOTAdapter.
     """
     def setUp(self):
-        super(DOTAdapterTestCase, self).setUp()
+        super(DOTAdapterTestCase, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.adapter = DOTAdapter()
         self.user = UserFactory()
         self.public_client = self.adapter.create_public_client(

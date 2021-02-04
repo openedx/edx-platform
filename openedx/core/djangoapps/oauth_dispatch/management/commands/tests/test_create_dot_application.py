@@ -21,11 +21,11 @@ class TestCreateDotApplication(TestCase):
     Tests the ``create_dot_application`` management command.
     """
     def setUp(self):
-        super(TestCreateDotApplication, self).setUp()
+        super(TestCreateDotApplication, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.user = UserFactory.create()
 
     def tearDown(self):
-        super(TestCreateDotApplication, self).tearDown()
+        super(TestCreateDotApplication, self).tearDown()  # lint-amnesty, pylint: disable=super-with-arguments
         Application.objects.filter(user=self.user).delete()
 
     def test_update_dot_application(self):

@@ -47,7 +47,7 @@ class AccessTokenLoginMixin(object):
         """
         Initialize mixin
         """
-        super(AccessTokenLoginMixin, self).setUp()
+        super(AccessTokenLoginMixin, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.login_with_access_token_url = reverse("login_with_access_token")
 
     def login_with_access_token(self, access_token=None):
@@ -83,7 +83,7 @@ class _DispatchingViewTestCase(TestCase):
     Subclasses need to define self.url.
     """
     def setUp(self):
-        super(_DispatchingViewTestCase, self).setUp()
+        super(_DispatchingViewTestCase, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.dot_adapter = adapters.DOTAdapter()
         self.user = UserFactory()
         self.dot_app = self.dot_adapter.create_public_client(
@@ -129,7 +129,7 @@ class TestAccessTokenView(AccessTokenLoginMixin, mixins.AccessTokenMixin, _Dispa
     """
 
     def setUp(self):
-        super(TestAccessTokenView, self).setUp()
+        super(TestAccessTokenView, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.url = reverse('access_token')
         self.view_class = views.AccessTokenView
 
@@ -342,7 +342,7 @@ class TestAccessTokenExchangeView(ThirdPartyOAuthTestMixinGoogle, ThirdPartyOAut
     def setUp(self):
         self.url = reverse('exchange_access_token', kwargs={'backend': 'google-oauth2'})
         self.view_class = views.AccessTokenExchangeView
-        super(TestAccessTokenExchangeView, self).setUp()
+        super(TestAccessTokenExchangeView, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
 
     def _post_body(self, user, client, token_type=None, scope=None):
         return {
@@ -367,7 +367,7 @@ class TestAuthorizationView(_DispatchingViewTestCase):
     """
 
     def setUp(self):
-        super(TestAuthorizationView, self).setUp()
+        super(TestAuthorizationView, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.user = UserFactory()
         self.dot_app = self.dot_adapter.create_confidential_client(
             name='test dot application',
@@ -493,7 +493,7 @@ class TestViewDispatch(TestCase):
     """
 
     def setUp(self):
-        super(TestViewDispatch, self).setUp()
+        super(TestViewDispatch, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.dot_adapter = adapters.DOTAdapter()
         self.user = UserFactory()
         self.view = views._DispatchingView()  # pylint: disable=protected-access
@@ -565,7 +565,7 @@ class TestRevokeTokenView(AccessTokenLoginMixin, _DispatchingViewTestCase):  # p
         self.revoke_token_url = reverse('revoke_token')
         self.access_token_url = reverse('access_token')
 
-        super(TestRevokeTokenView, self).setUp()
+        super(TestRevokeTokenView, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         response = self.client.post(self.access_token_url, self.access_token_post_body_with_password())
         access_token_data = json.loads(response.content.decode('utf-8'))
         self.access_token = access_token_data['access_token']

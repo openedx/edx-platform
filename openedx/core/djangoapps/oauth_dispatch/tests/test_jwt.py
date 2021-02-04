@@ -1,7 +1,7 @@
 """ Tests for OAuth Dispatch's jwt module. """
 
 
-import itertools
+import itertools  # lint-amnesty, pylint: disable=unused-import
 from datetime import timedelta
 
 import ddt
@@ -20,7 +20,7 @@ from common.djangoapps.student.tests.factories import UserFactory
 class TestCreateJWTs(AccessTokenMixin, TestCase):
     """ Tests for oauth_dispatch's jwt creation functionality. """
     def setUp(self):
-        super(TestCreateJWTs, self).setUp()
+        super(TestCreateJWTs, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.user = UserFactory()
         self.default_scopes = ['email', 'profile']
 

@@ -20,7 +20,7 @@ class PasswordPolicyAwareAdminAuthFormTests(TestCase):
     Tests the custom form for enforcing password policy rules
     """
     def setUp(self):
-        super(PasswordPolicyAwareAdminAuthFormTests, self).setUp()
+        super(PasswordPolicyAwareAdminAuthFormTests, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.auth_form = PasswordPolicyAwareAdminAuthForm()
         self.user = UserFactory.create(username='test_user', password='test_password', is_staff=True)
         self.auth_form.cleaned_data = {
