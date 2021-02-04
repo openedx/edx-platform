@@ -48,7 +48,7 @@ from xmodule.partitions.partitions import ENROLLMENT_TRACK_PARTITION_ID
 class CourseExpirationTestCase(ModuleStoreTestCase, MasqueradeMixin):
     """Tests to verify the get_user_course_expiration_date function is working correctly"""
     def setUp(self):
-        super(CourseExpirationTestCase, self).setUp()
+        super(CourseExpirationTestCase, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.course = CourseFactory(
             start=now() - timedelta(weeks=10),
         )
@@ -61,7 +61,7 @@ class CourseExpirationTestCase(ModuleStoreTestCase, MasqueradeMixin):
 
     def tearDown(self):
         CourseEnrollment.unenroll(self.user, self.course.id)
-        super(CourseExpirationTestCase, self).tearDown()
+        super(CourseExpirationTestCase, self).tearDown()  # lint-amnesty, pylint: disable=super-with-arguments
 
     def test_enrollment_mode(self):
         """Tests that verified enrollments do not have an expiration"""

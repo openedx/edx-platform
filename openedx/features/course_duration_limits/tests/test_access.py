@@ -32,12 +32,12 @@ from common.djangoapps.util.date_utils import strftime_localized
 class TestAccess(CacheIsolationTestCase):
     """Tests of openedx.features.course_duration_limits.access"""
     def setUp(self):
-        super(TestAccess, self).setUp()
+        super(TestAccess, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
 
         CourseDurationLimitConfig.objects.create(enabled=True, enabled_as_of=datetime(2018, 1, 1, tzinfo=UTC))
         DynamicUpgradeDeadlineConfiguration.objects.create(enabled=True)
 
-    def assertDateInMessage(self, date, message):
+    def assertDateInMessage(self, date, message):  # lint-amnesty, pylint: disable=missing-function-docstring
         # First, check that the formatted version is in there
         self.assertIn(strftime_localized(date, 'SHORT_DATE'), message)
 

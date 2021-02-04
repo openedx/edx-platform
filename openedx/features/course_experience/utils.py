@@ -3,10 +3,10 @@ Common utilities for the course experience, including course outline.
 """
 
 
-from datetime import timedelta
+from datetime import timedelta  # lint-amnesty, pylint: disable=unused-import
 
 from completion.models import BlockCompletion
-from django.db.models import Q
+from django.db.models import Q  # lint-amnesty, pylint: disable=unused-import
 from django.utils import timezone
 from opaque_keys.edx.keys import CourseKey
 from six.moves import range
@@ -14,7 +14,7 @@ from six.moves import range
 from lms.djangoapps.course_api.blocks.api import get_blocks
 from lms.djangoapps.course_blocks.api import get_course_blocks
 from lms.djangoapps.course_blocks.utils import get_student_module_as_dict
-from lms.djangoapps.courseware.access import has_access
+from lms.djangoapps.courseware.access import has_access  # lint-amnesty, pylint: disable=unused-import
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.lib.cache_utils import request_cached
 from openedx.features.course_experience import RELATIVE_DATES_FLAG
@@ -23,7 +23,7 @@ from xmodule.modulestore.django import modulestore
 
 
 @request_cached()
-def get_course_outline_block_tree(request, course_id, user=None, allow_start_dates_in_future=False):
+def get_course_outline_block_tree(request, course_id, user=None, allow_start_dates_in_future=False):  # lint-amnesty, pylint: disable=too-many-statements
     """
     Returns the root block of the course outline, with children as blocks.
 
