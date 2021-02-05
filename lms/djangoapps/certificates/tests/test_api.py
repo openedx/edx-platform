@@ -103,7 +103,7 @@ class CertificateDownloadableStatusTests(WebCertificateTestMixin, ModuleStoreTes
     ENABLED_SIGNALS = ['course_published']
 
     def setUp(self):
-        super(CertificateDownloadableStatusTests, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
 
         self.student = UserFactory()
         self.student_no_cert = UserFactory()
@@ -643,7 +643,7 @@ class CertificateGenerationEnabledTest(EventTestMixin, TestCase):
     COURSE_KEY = CourseLocator(org='test', course='test', run='test')
 
     def setUp(self):  # pylint: disable=arguments-differ
-        super(CertificateGenerationEnabledTest, self).setUp('lms.djangoapps.certificates.api.tracker')  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp('lms.djangoapps.certificates.api.tracker')
 
         # Since model-based configuration is cached, we need
         # to clear the cache before each test.

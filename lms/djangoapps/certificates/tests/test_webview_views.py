@@ -13,12 +13,18 @@ from django.conf import settings
 from django.test.client import Client, RequestFactory
 from django.test.utils import override_settings
 from django.urls import reverse
+from edx_toggles.toggles import LegacyWaffleSwitch
+from edx_toggles.toggles.testutils import override_waffle_switch
 from mock import patch
 from organizations import api as organizations_api
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from xmodule.modulestore.tests.factories import CourseFactory
 
 from common.djangoapps.course_modes.models import CourseMode
-from edx_toggles.toggles import LegacyWaffleSwitch  # lint-amnesty, pylint: disable=wrong-import-order
-from edx_toggles.toggles.testutils import override_waffle_switch  # lint-amnesty, pylint: disable=wrong-import-order
+from common.djangoapps.student.roles import CourseStaffRole
+from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
+from common.djangoapps.track.tests import EventTrackingTestCase
+from common.djangoapps.util.date_utils import strftime_localized
 from lms.djangoapps.badges.events.course_complete import get_completion_badge
 from lms.djangoapps.badges.tests.factories import (
     BadgeAssertionFactory,
@@ -27,19 +33,18 @@ from lms.djangoapps.badges.tests.factories import (
 )
 from lms.djangoapps.certificates.models import (
     CertificateGenerationCourseSetting,
-    CertificateHtmlViewConfiguration,
     CertificateSocialNetworks,
     CertificateStatuses,
     CertificateTemplate,
     CertificateTemplateAsset,
     GeneratedCertificate
 )
-from lms.djangoapps.certificates.utils import get_certificate_url
 from lms.djangoapps.certificates.tests.factories import (
     CertificateHtmlViewConfigurationFactory,
     GeneratedCertificateFactory,
     LinkedInAddToProfileConfigurationFactory
 )
+from lms.djangoapps.certificates.utils import get_certificate_url
 from lms.djangoapps.grades.tests.utils import mock_passing_grade
 from openedx.core.djangoapps.certificates.config import waffle
 from openedx.core.djangoapps.dark_lang.models import DarkLangConfig
@@ -50,12 +55,6 @@ from openedx.core.djangoapps.site_configuration.tests.test_util import (
 from openedx.core.djangolib.js_utils import js_escaped_string
 from openedx.core.djangolib.testing.utils import CacheIsolationTestCase
 from openedx.core.lib.tests.assertions.events import assert_event_matches
-from common.djangoapps.student.roles import CourseStaffRole
-from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
-from common.djangoapps.track.tests import EventTrackingTestCase
-from common.djangoapps.util.date_utils import strftime_localized
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory
 
 AUTO_CERTIFICATE_GENERATION_SWITCH = LegacyWaffleSwitch(waffle.waffle(), waffle.AUTO_CERTIFICATE_GENERATION)
 FEATURES_WITH_CERTS_ENABLED = settings.FEATURES.copy()
@@ -80,7 +79,7 @@ class CommonCertificatesTestCase(ModuleStoreTestCase):
     ENABLED_SIGNALS = ['course_published']
 
     def setUp(self):
-        super(CommonCertificatesTestCase, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.client = Client()
         self.course = CourseFactory.create(
             org='testorg',
@@ -249,7 +248,7 @@ class CertificatesViewsTests(CommonCertificatesTestCase, CacheIsolationTestCase)
     """
 
     def setUp(self):
-        super(CertificatesViewsTests, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.mock_course_run_details = {
             'content_language': 'en',
             'weeks_to_complete': '4',

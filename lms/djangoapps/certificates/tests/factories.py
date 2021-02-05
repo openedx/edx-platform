@@ -1,10 +1,13 @@
-# Factories are self documenting  # lint-amnesty, pylint: disable=missing-module-docstring
+"""
+Certificates factories
+"""
 
 
 from uuid import uuid4
 
 from factory.django import DjangoModelFactory
 
+from common.djangoapps.student.models import LinkedInAddToProfileConfiguration
 from lms.djangoapps.certificates.models import (
     CertificateHtmlViewConfiguration,
     CertificateInvalidation,
@@ -12,11 +15,12 @@ from lms.djangoapps.certificates.models import (
     CertificateWhitelist,
     GeneratedCertificate
 )
-from common.djangoapps.student.models import LinkedInAddToProfileConfiguration
 
 
-class GeneratedCertificateFactory(DjangoModelFactory):  # lint-amnesty, pylint: disable=missing-class-docstring
-
+class GeneratedCertificateFactory(DjangoModelFactory):
+    """
+    GeneratedCertificate factory
+    """
     class Meta(object):
         model = GeneratedCertificate
 
@@ -28,7 +32,10 @@ class GeneratedCertificateFactory(DjangoModelFactory):  # lint-amnesty, pylint: 
     grade = ''
 
 
-class CertificateWhitelistFactory(DjangoModelFactory):  # lint-amnesty, pylint: disable=missing-class-docstring
+class CertificateWhitelistFactory(DjangoModelFactory):
+    """
+    CertificateWhitelist factory
+    """
 
     class Meta(object):
         model = CertificateWhitelist
@@ -38,7 +45,10 @@ class CertificateWhitelistFactory(DjangoModelFactory):  # lint-amnesty, pylint: 
     notes = 'Test Notes'
 
 
-class CertificateInvalidationFactory(DjangoModelFactory):  # lint-amnesty, pylint: disable=missing-class-docstring
+class CertificateInvalidationFactory(DjangoModelFactory):
+    """
+    CertificateInvalidation factory
+    """
 
     class Meta(object):
         model = CertificateInvalidation
@@ -47,7 +57,10 @@ class CertificateInvalidationFactory(DjangoModelFactory):  # lint-amnesty, pylin
     active = True
 
 
-class CertificateHtmlViewConfigurationFactory(DjangoModelFactory):  # lint-amnesty, pylint: disable=missing-class-docstring
+class CertificateHtmlViewConfigurationFactory(DjangoModelFactory):
+    """
+    CertificateHtmlViewConfiguration factory
+    """
 
     class Meta(object):
         model = CertificateHtmlViewConfiguration
@@ -81,7 +94,10 @@ class CertificateHtmlViewConfigurationFactory(DjangoModelFactory):  # lint-amnes
         }"""
 
 
-class LinkedInAddToProfileConfigurationFactory(DjangoModelFactory):  # lint-amnesty, pylint: disable=missing-class-docstring
+class LinkedInAddToProfileConfigurationFactory(DjangoModelFactory):
+    """
+    LinkedInAddToProfileConfiguration factory
+    """
 
     class Meta(object):
         model = LinkedInAddToProfileConfiguration
