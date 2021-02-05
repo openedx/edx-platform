@@ -29,6 +29,7 @@ COURSE_MODE_DEFAULTS = {
     'description': None,
     'expiration_datetime': None,
     'min_price': 0,
+    'price': 0.00,
     'name': 'Audit',
     'sku': None,
     'slug': 'audit',
