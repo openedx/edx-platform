@@ -3,13 +3,15 @@ Generate a report of certificate statuses
 """
 
 
-from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
+from django.contrib.auth import get_user_model
 from django.core.management.base import BaseCommand, CommandError
 from django.db.models import Count
 from opaque_keys.edx.keys import CourseKey
 from six import text_type
 
 from lms.djangoapps.certificates.models import GeneratedCertificate
+
+User = get_user_model()
 
 
 class Command(BaseCommand):
@@ -110,7 +112,7 @@ class Command(BaseCommand):
 
         # all states we have seen far all courses
         status_headings = sorted(
-            set([status for course in cert_data for status in cert_data[course]])  # lint-amnesty, pylint: disable=consider-using-set-comprehension
+            set([status for course in cert_data for status in cert_data[course]])  # pylint: disable=consider-using-set-comprehension
         )
 
         # print the heading for the report

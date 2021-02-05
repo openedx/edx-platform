@@ -64,12 +64,12 @@ class Command(BaseCommand):
         for course_key_str in options['course_key_list']:
             try:
                 only_course_keys.append(CourseKey.from_string(course_key_str))
-            except InvalidKeyError:
-                raise CommandError(  # lint-amnesty, pylint: disable=raise-missing-from
+            except InvalidKeyError as e:
+                raise CommandError(
                     u'"{course_key_str}" is not a valid course key.'.format(
                         course_key_str=course_key_str
                     )
-                )
+                ) from e
 
         if only_course_keys:
             LOGGER.info(
