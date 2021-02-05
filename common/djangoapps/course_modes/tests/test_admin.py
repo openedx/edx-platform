@@ -51,6 +51,7 @@ class AdminCourseModePageTest(ModuleStoreTestCase):
             'mode_slug': 'verified',
             'mode_display_name': 'verified',
             'min_price': 10,
+            "price": 10.00,
             'currency': 'usd',
             '_expiration_datetime_0': expiration.date(),  # due to django admin datetime widget passing as separate vals
             '_expiration_datetime_1': expiration.time(),
@@ -208,6 +209,7 @@ class AdminCourseModeFormTest(ModuleStoreTestCase):
             "_expiration_datetime": upgrade_deadline,
             "currency": "usd",
             "min_price": 10,
+            "price": 10.00,
         }, instance=course_mode)
 
     def _set_form_verification_deadline(self, form, deadline):

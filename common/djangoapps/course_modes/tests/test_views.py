@@ -3,9 +3,9 @@ Tests for course_modes views.
 """
 
 
-import decimal
 import unittest
 from datetime import datetime, timedelta
+from decimal import Decimal
 
 import ddt
 import freezegun
@@ -366,7 +366,7 @@ class CourseModeViewTest(CatalogIntegrationMixin, UrlResetMixin, ModuleStoreTest
         self.assertIn(six.text_type(self.course.id), self.client.session['donation_for_course'])
 
         actual_amount = self.client.session['donation_for_course'][six.text_type(self.course.id)]
-        expected_amount = decimal.Decimal(self.POST_PARAMS_FOR_COURSE_MODE['verified']['contribution'])
+        expected_amount = Decimal(self.POST_PARAMS_FOR_COURSE_MODE['verified']['contribution'])
         self.assertEqual(actual_amount, expected_amount)
 
     def test_successful_default_enrollment(self):
@@ -410,22 +410,23 @@ class CourseModeViewTest(CatalogIntegrationMixin, UrlResetMixin, ModuleStoreTest
 
         self.assertEqual(response.status_code, 200)
 
-        expected_mode = [Mode(u'honor', u'Honor Code Certificate', 0, '', 'usd', None, None, None, None)]
+        expected_mode = [Mode(u'honor', u'Honor Code Certificate', 0, Decimal('0.00'), '', 'usd', None, None, None, None)]
         course_mode = CourseMode.modes_for_course(self.course.id)
 
         self.assertEqual(course_mode, expected_mode)
 
     @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
     @ddt.data(
-        (u'verified', u'Verified Certificate', 10, '10,20,30', 'usd'),
-        (u'professional', u'Professional Education', 100, '100,200', 'usd'),
+        (u'verified', u'Verified Certificate', 10, Decimal('10.00'), '10,20,30', 'usd'),
+        (u'professional', u'Professional Education', 100, Decimal('100.00'), '100,200', 'usd'),
     )
     @ddt.unpack
-    def test_verified_mode_creation(self, mode_slug, mode_display_name, min_price, suggested_prices, currency):
+    def test_verified_mode_creation(self, mode_slug, mode_display_name, min_price, price, suggested_prices, currency):
         parameters = {}
         parameters['mode_slug'] = mode_slug
         parameters['mode_display_name'] = mode_display_name
         parameters['min_price'] = min_price
+        parameters['price'] = price
         parameters['suggested_prices'] = suggested_prices
         parameters['currency'] = currency
 
@@ -439,6 +440,7 @@ class CourseModeViewTest(CatalogIntegrationMixin, UrlResetMixin, ModuleStoreTest
                 mode_slug,
                 mode_display_name,
                 min_price,
+                price,
                 suggested_prices,
                 currency,
                 None,
@@ -463,14 +465,15 @@ class CourseModeViewTest(CatalogIntegrationMixin, UrlResetMixin, ModuleStoreTest
         parameters['mode_slug'] = u'verified'
         parameters['mode_display_name'] = u'Verified Certificate'
         parameters['min_price'] = 10
+        parameters['price'] = Decimal('10.00')
         parameters['suggested_prices'] = '10,20'
 
         # Create a verified mode
         url = reverse('create_mode', args=[six.text_type(self.course.id)])
         self.client.get(url, parameters)
 
-        honor_mode = Mode(u'honor', u'Honor Code Certificate', 0, '', 'usd', None, None, None, None)
-        verified_mode = Mode(u'verified', u'Verified Certificate', 10, '10,20', 'usd', None, None, None, None)
+        honor_mode = Mode(u'honor', u'Honor Code Certificate', 0, Decimal('0.00'), '', 'usd', None, None, None, None)
+        verified_mode = Mode(u'verified', u'Verified Certificate', 10, Decimal('10.00'), '10,20', 'usd', None, None, None, None)
         expected_modes = [honor_mode, verified_mode]
         course_modes = CourseMode.modes_for_course(self.course.id)
 
