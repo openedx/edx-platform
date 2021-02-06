@@ -1,9 +1,9 @@
-# -*- coding: utf-8 -*-
 """
-NexBlock-framework-as-an-XBlock prototype.
+Expose NexBlock instances in courseware through the NexWrapperBlock.
 """
 
 import logging
+from uuid import uuid4
 
 from xblock.core import XBlock
 from xblock.fields import Dict, Scope, String
@@ -23,43 +23,62 @@ def _(text):
 
 @XBlock.needs("user")
 @XBlock.needs("i18n")
-class NexBlock(
+class NexWrapperBlock(
     XBlock, StudioEditableXBlockMixin
 ):  # lint-amnesty, pylint: disable=abstract-method
     """
-    Instance of a NexBlock.
+    A block type to expose an instance of a NexBlock.
+
+    Settings-scoped fields ares stored authoritatively here (to allow editing
+    via Studio), but are pushed to NexBlockInstance data upon course publish,
+    so they are never read from here in an LMS context.
+
+    Learner state is stored in NexBlockLearnerData model instead of in the XBlock.
+
+    Usages of this block and instance of NexBlocks are related by the UUID.
     """
 
     package = String(
         display_name=_("NexBlock package"),
         help=_("An npm-installable package name/path to NexBlock JS code"),
-        scope=Scope.content,
+        scope=Scope.settings,
     )
-    slug = String(
-        display_name=_("URL slug for block"),
-        help_text=_(
-            "URL-safe identifier for NexBlock. Alphanumeric, dashes, and underscores."
+    uuid = String(
+        display_name=_("Instance UUID"),
+        help=_(
+            "Globally unique ID of a this NexBlock instance. "
+            "Editing this will change the underlying instance"
         ),
-        scope=Scope.content,
+        scope=Scope.settings,
+        default=str(uuid4()),
     )
+    # TODO: do we need this?
+    # slug = String(
+    #     display_name=_("URL slug for block"),
+    #     help_text=_(
+    #         "URL-safe identifier for NexBlock. Alphanumeric, dashes, and underscores."
+    #     ),
+    #     scope=Scope.settings,
+    # )
     display_name = Dict(
         display_name=_("User-friendly display name of block"),
-        scope=Scope.content,
+        scope=Scope.settings,
     )
     instance_data = Dict(
         display_name=_("NexBlock instance data JSON"),
         help=_("Settings for this instance of a NexBlock"),
-        scope=Scope.content,
+        scope=Scope.settings,
         default={},
     )
-    learner_data = Dict(
-        display_name=_("NexBlock learner data JSON"),
-        help=_("Data for this instance of a NexBlock for a particular learner"),
-        scope=Scope.user_state,
-        default={},
-    )
+    # TODO: I think we can remove this.
+    # learner_data = Dict(
+    #    display_name=_("NexBlock learner data JSON"),
+    #    help=_("Data for this instance of a NexBlock for a particular learner"),
+    #    scope=Scope.user_state,
+    #    default={},
+    # )
 
-    editable_fields = []  # @@TODO
+    editable_fields = ["package", "uuid", "slug", "display_name", "instance_data"]
 
     has_author_view = True  # Tells Studio to use author_view
 
