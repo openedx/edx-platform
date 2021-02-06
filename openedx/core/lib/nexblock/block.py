@@ -30,17 +30,31 @@ class NexBlock(
     Instance of a NexBlock.
     """
 
-    path = String(
-        display_name=_("npm-installable path of NexBlock code"),
+    package = String(
+        display_name=_("NexBlock package"),
+        help=_("An npm-installable package name/path to NexBlock JS code"),
+        scope=Scope.content,
+    )
+    slug = String(
+        display_name=_("URL slug for block"),
+        help_text=_(
+            "URL-safe identifier for NexBlock. Alphanumeric, dashes, and underscores."
+        ),
+        scope=Scope.content,
+    )
+    display_name = Dict(
+        display_name=_("User-friendly display name of block"),
         scope=Scope.content,
     )
     instance_data = Dict(
-        display_name=_("Settings for this instance of a NexBlock"),
+        display_name=_("NexBlock instance data JSON"),
+        help=_("Settings for this instance of a NexBlock"),
         scope=Scope.content,
         default={},
     )
     learner_data = Dict(
-        disply_name=_("Data for this instance of a NexBlock for a particular learner"),
+        display_name=_("NexBlock learner data JSON"),
+        help=_("Data for this instance of a NexBlock for a particular learner"),
         scope=Scope.user_state,
         default={},
     )
