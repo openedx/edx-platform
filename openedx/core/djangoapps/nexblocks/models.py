@@ -27,6 +27,7 @@ class NexBlockInstanceDatum(models.Model):
     This model is downstream of the NexWrapperBlock data stored with the course.
     Changes are pushed here upon course publish.
     """
+
     instance = models.ForeignKey(
         to=NexBlockInstance, related_name="instance_data", on_delete=models.CASCADE
     )
