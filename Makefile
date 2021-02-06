@@ -131,3 +131,8 @@ docker_push: docker_tag docker_auth ## push to docker hub
 	docker push 'openedx/edx-platform:latest-devstack'
 	docker push "openedx/edx-platform:${GITHUB_SHA}-devstack"
 
+nexblock_fmt:
+	pip install black==20.8b1
+	black openedx/core/lib/nexblock
+	isort openedx/core/lib/nexblock -rc
+	pylint openedx/core/lib/nexblock
