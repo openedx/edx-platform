@@ -73,6 +73,7 @@
 ignore = ,.git,.tox,migrations,node_modules,.pycharm_helpers
 persistent = yes
 load-plugins = edx_lint.pylint,pylint_django,pylint_celery
+django-settings-module = lms.envs.production
 
 [MESSAGES CONTROL]
 enable =
