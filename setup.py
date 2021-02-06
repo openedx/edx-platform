@@ -120,7 +120,7 @@ setup(
             'content_type_gating = openedx.features.content_type_gating.partitions:create_content_gating_partition'
         ],
         'xblock.v1': [
-            "nexblock = openedx.core.lib.nexblock.block:NexBlock" 
+            "nexblock = openedx.core.djangoapps.nexblocks.xblock:NexBlockWrapper" 
         ],
     }
 )
