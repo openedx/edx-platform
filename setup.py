@@ -119,5 +119,8 @@ setup(
             'enrollment_track = common.lib.xmodule.xmodule.partitions.enrollment_track_partition_generator:create_enrollment_track_partition',  # lint-amnesty, pylint: disable=line-too-long
             'content_type_gating = openedx.features.content_type_gating.partitions:create_content_gating_partition'
         ],
+        'xblock.v1': [
+            "nexblock = openedx.core.lib.nexblock.block:NexBlock" 
+        ],
     }
 )
