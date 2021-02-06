@@ -83,3 +83,47 @@ def third_party_auth_context(request, redirect_to, tpa_hint=None):
                 break
 
     return context
+
+
+def third_party_auth_context_tpa_hint(request, redirect_to, tpa_hint=None):
+    """
+    Context for third party auth providers and the currently running pipeline.
+
+    Arguments:
+        request (HttpRequest): The request, used to determine if a pipeline
+            is currently running.
+        redirect_to: The URL to send the user to following successful
+            authentication.
+        tpa_hint (string): An override flag that will return a matching provider
+            as long as its configuration has been enabled
+
+    Returns:
+        dict
+
+    """
+    context = {
+        "provider": None,
+        "errorMessage": None,
+    }
+
+    if third_party_auth.is_enabled():
+        tpa_provider = None
+        if tpa_hint:
+            for provider in third_party_auth.provider.Registry.enabled():
+                if provider.provider_id == tpa_hint:
+                    tpa_provider = provider
+                    break
+
+            info = {
+                "id": tpa_provider.provider_id,
+                "name": tpa_provider.name,
+                "iconClass": tpa_provider.icon_class or None,
+                "iconImage": tpa_provider.icon_image.url if tpa_provider.icon_image else None,
+                "loginUrl": pipeline.get_login_url(
+                    tpa_provider.provider_id,
+                    pipeline.AUTH_ENTRY_LOGIN,
+                    redirect_url=redirect_to,
+                ),
+            }
+            context['provider'] = info
+    return context
