@@ -715,10 +715,10 @@ class LogistrationPasswordResetView(APIView):  # lint-amnesty, pylint: disable=m
                             }
                         )
                         user.save()
-                        send_password_reset_success_email(user, request)
                     except ObjectDoesNotExist:
                         err = 'Account recovery process initiated without AccountRecovery instance for user {username}'
                         log.error(err.format(username=user.username))
+                send_password_reset_success_email(user, request)
         except ValidationError as err:
             AUDIT_LOG.exception("Password validation failed")
             error_status = {
