@@ -248,8 +248,14 @@ FEATURES = {
     # .. toggle_tickets: https://github.com/edx/edx-platform/pull/1073
     'COURSES_ARE_BROWSABLE': True,
 
-    # Set to hide the courses list on the Learner Dashboard if they are not enrolled in
-    # any courses yet.
+    # .. toggle_name: FEATURES['HIDE_DASHBOARD_COURSES_UNTIL_ACTIVATED']
+    # .. toggle_implementation: DjangoSetting
+    # .. toggle_default: False
+    # .. toggle_description: When set, it hides the Courses list on the Learner Dashboard page if the learner has not
+    #   yet activated the account and not enrolled in any courses.
+    # .. toggle_use_cases: open_edx
+    # .. toggle_creation_date: 2018-05-18
+    # .. toggle_tickets: https://openedx.atlassian.net/browse/OSPR-1814
     'HIDE_DASHBOARD_COURSES_UNTIL_ACTIVATED': False,
 
     # .. toggle_name: FEATURES['ENABLE_STUDENT_HISTORY_VIEW']
