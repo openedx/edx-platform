@@ -1549,6 +1549,9 @@ INSTALLED_APPS = [
 
     # Database-backed Organizations App (http://github.com/edx/edx-organizations)
     'organizations',
+
+    # Hackathon XXV: Prototype NeXBlock implementation.
+    'openedx.core.djangoapps.nexblocks',
 ]
 
 
