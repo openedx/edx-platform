@@ -9,7 +9,7 @@ from uuid import uuid4
 
 import mock
 from django.conf import settings
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.test.utils import override_settings
 from opaque_keys.edx.locator import CourseLocator
 from organizations.models import OrganizationCourse
@@ -114,7 +114,7 @@ class ExportLibraryTestCase(LibraryTestCase):
 
 
 @override_settings(CONTENTSTORE=TEST_DATA_CONTENTSTORE)
-class RerunCourseTaskTestCase(CourseTestCase):
+class RerunCourseTaskTestCase(CourseTestCase):  # lint-amnesty, pylint: disable=missing-class-docstring
     def _rerun_course(self, old_course_key, new_course_key):
         CourseRerunState.objects.initiated(old_course_key, new_course_key, self.user, 'Test Re-run')
         rerun_course(str(old_course_key), str(new_course_key), self.user.id)

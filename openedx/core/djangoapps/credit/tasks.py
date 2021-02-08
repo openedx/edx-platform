@@ -4,7 +4,7 @@ This file contains celery tasks for credit course views.
 
 
 import six
-from celery import task
+from celery import shared_task
 from celery.utils.log import get_task_logger
 from django.conf import settings
 from edx_django_utils.monitoring import set_code_owner_attribute
@@ -20,7 +20,7 @@ from xmodule.modulestore.exceptions import ItemNotFoundError
 LOGGER = get_task_logger(__name__)
 
 
-@task(default_retry_delay=settings.CREDIT_TASK_DEFAULT_RETRY_DELAY, max_retries=settings.CREDIT_TASK_MAX_RETRIES)
+@shared_task(default_retry_delay=settings.CREDIT_TASK_DEFAULT_RETRY_DELAY, max_retries=settings.CREDIT_TASK_MAX_RETRIES)
 @set_code_owner_attribute
 def update_credit_course_requirements(course_id):
     """

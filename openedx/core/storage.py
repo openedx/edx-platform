@@ -1,4 +1,4 @@
-"""
+"""  # lint-amnesty, pylint: disable=django-not-configured
 Django storage backends for Open edX.
 """
 

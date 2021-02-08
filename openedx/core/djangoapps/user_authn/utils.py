@@ -10,7 +10,7 @@ from django.utils import http
 from oauth2_provider.models import Application
 from six.moves.urllib.parse import urlparse  # pylint: disable=import-error
 
-from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
+from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers  # lint-amnesty, pylint: disable=unused-import
 
 
 def is_safe_login_or_logout_redirect(redirect_to, request_host, dot_client_id, require_https):

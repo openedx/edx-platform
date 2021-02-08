@@ -19,7 +19,7 @@ class TestUsersDefaultRole(ModuleStoreTestCase):
         """
         Add a user and a course
         """
-        super(TestUsersDefaultRole, self).setUp()
+        super(TestUsersDefaultRole, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         # create and log in a staff user.
         self.user = UserFactory(is_staff=True)
         self.client = AjaxEnabledTestClient()
@@ -49,7 +49,7 @@ class TestUsersDefaultRole(ModuleStoreTestCase):
         Reverse the setup
         """
         self.client.logout()
-        super(TestUsersDefaultRole, self).tearDown()
+        super(TestUsersDefaultRole, self).tearDown()  # lint-amnesty, pylint: disable=super-with-arguments
 
     def test_user_forum_default_role_on_course_deletion(self):
         """

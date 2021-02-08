@@ -16,7 +16,7 @@ from celery import shared_task
 from celery.utils.log import get_task_logger
 from django.conf import settings
 from django.contrib.auth import get_user_model
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.core.exceptions import SuspiciousOperation
 from django.core.files import File
 from django.test import RequestFactory
@@ -384,7 +384,7 @@ class CourseImportTask(UserTask):  # pylint: disable=abstract-method
 
 
 @shared_task(base=CourseImportTask, bind=True)
-# Note: The decorator @set_code_owner_attribute could not be used because
+# Note: The decorator @set_code_owner_attribute could not be used because  # lint-amnesty, pylint: disable=too-many-statements
 #   the implementation of this task breaks with any additional decorators.
 def import_olx(self, user_id, course_key_string, archive_path, archive_name, language):
     """

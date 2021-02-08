@@ -73,4 +73,4 @@ class Command(BaseCommand):
                 **kwargs
             )
         except InvalidKeyError as exc:
-            raise CommandError(u'Invalid Course Key: ' + six.text_type(exc))
+            raise CommandError(u'Invalid Course Key: ' + six.text_type(exc))  # lint-amnesty, pylint: disable=raise-missing-from

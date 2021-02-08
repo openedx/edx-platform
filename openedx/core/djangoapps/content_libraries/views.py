@@ -55,19 +55,19 @@ def convert_exceptions(fn):
             return fn(*args, **kwargs)
         except api.ContentLibraryNotFound:
             log.exception("Content library not found")
-            raise NotFound
+            raise NotFound  # lint-amnesty, pylint: disable=raise-missing-from
         except api.ContentLibraryBlockNotFound:
             log.exception("XBlock not found in content library")
-            raise NotFound
+            raise NotFound  # lint-amnesty, pylint: disable=raise-missing-from
         except api.LibraryBlockAlreadyExists as exc:
             log.exception(str(exc))
-            raise ValidationError(str(exc))
+            raise ValidationError(str(exc))  # lint-amnesty, pylint: disable=raise-missing-from
         except api.InvalidNameError as exc:
             log.exception(str(exc))
-            raise ValidationError(str(exc))
+            raise ValidationError(str(exc))  # lint-amnesty, pylint: disable=raise-missing-from
         except api.BlockLimitReachedError as exc:
             log.exception(str(exc))
-            raise ValidationError(str(exc))
+            raise ValidationError(str(exc))  # lint-amnesty, pylint: disable=raise-missing-from
     return wrapped_fn
 
 
@@ -166,14 +166,14 @@ class LibraryRootView(APIView):
         try:
             ensure_organization(org_name)
         except InvalidOrganizationException:
-            raise ValidationError(
+            raise ValidationError(  # lint-amnesty, pylint: disable=raise-missing-from
                 detail={"org": "No such organization '{}' found.".format(org_name)}
             )
         org = Organization.objects.get(short_name=org_name)
         try:
             result = api.create_library(org=org, **data)
         except api.LibraryAlreadyExists:
-            raise ValidationError(detail={"slug": "A library with that ID already exists."})
+            raise ValidationError(detail={"slug": "A library with that ID already exists."})  # lint-amnesty, pylint: disable=raise-missing-from
         # Grant the current user admin permissions on the library:
         api.set_library_user_permissions(result.key, request.user, api.AccessLevel.ADMIN_LEVEL)
         return Response(ContentLibraryMetadataSerializer(result).data)
@@ -212,7 +212,7 @@ class LibraryDetailsView(APIView):
         try:
             api.update_library(key, **data)
         except api.IncompatibleTypesError as err:
-            raise ValidationError({'type': str(err)})
+            raise ValidationError({'type': str(err)})  # lint-amnesty, pylint: disable=raise-missing-from
         result = api.get_library(key)
         return Response(ContentLibraryMetadataSerializer(result).data)
 
@@ -249,7 +249,7 @@ class LibraryTeamView(APIView):
         try:
             user = User.objects.get(email=serializer.validated_data.get('email'))
         except User.DoesNotExist:
-            raise ValidationError({'email': _('We could not find a user with that email address.')})
+            raise ValidationError({'email': _('We could not find a user with that email address.')})  # lint-amnesty, pylint: disable=raise-missing-from
         grant = api.get_library_user_permissions(key, user)
         if grant:
             return Response(
@@ -259,7 +259,7 @@ class LibraryTeamView(APIView):
         try:
             api.set_library_user_permissions(key, user, access_level=serializer.validated_data["access_level"])
         except api.LibraryPermissionIntegrityError as err:
-            raise ValidationError(detail=str(err))
+            raise ValidationError(detail=str(err))  # lint-amnesty, pylint: disable=raise-missing-from
         grant = api.get_library_user_permissions(key, user)
         return Response(ContentLibraryPermissionSerializer(grant).data)
 
@@ -295,7 +295,7 @@ class LibraryTeamUserView(APIView):
         try:
             api.set_library_user_permissions(key, user, access_level=serializer.validated_data["access_level"])
         except api.LibraryPermissionIntegrityError as err:
-            raise ValidationError(detail=str(err))
+            raise ValidationError(detail=str(err))  # lint-amnesty, pylint: disable=raise-missing-from
         grant = api.get_library_user_permissions(key, user)
         return Response(ContentLibraryPermissionSerializer(grant).data)
 
@@ -324,7 +324,7 @@ class LibraryTeamUserView(APIView):
         try:
             api.set_library_user_permissions(key, user, access_level=None)
         except api.LibraryPermissionIntegrityError as err:
-            raise ValidationError(detail=str(err))
+            raise ValidationError(detail=str(err))  # lint-amnesty, pylint: disable=raise-missing-from
         return Response({})
 
 
@@ -542,7 +542,7 @@ class LibraryBlocksView(APIView):
             try:
                 result = api.create_library_block(library_key, **serializer.validated_data)
             except api.IncompatibleTypesError as err:
-                raise ValidationError(
+                raise ValidationError(  # lint-amnesty, pylint: disable=raise-missing-from
                     detail={'block_type': str(err)},
                 )
         return Response(LibraryXBlockMetadataSerializer(result).data)
@@ -613,7 +613,7 @@ class LibraryBlockOlxView(APIView):
         try:
             api.set_library_block_olx(key, new_olx_str)
         except ValueError as err:
-            raise ValidationError(detail=str(err))
+            raise ValidationError(detail=str(err))  # lint-amnesty, pylint: disable=raise-missing-from
         return Response(LibraryXBlockOlxSerializer({"olx": new_olx_str}).data)
 
 
@@ -672,7 +672,7 @@ class LibraryBlockAssetView(APIView):
         try:
             result = api.add_library_block_static_asset_file(usage_key, file_path, file_content)
         except ValueError:
-            raise ValidationError("Invalid file path")
+            raise ValidationError("Invalid file path")  # lint-amnesty, pylint: disable=raise-missing-from
         return Response(LibraryXBlockStaticFileSerializer(result).data)
 
     @convert_exceptions
@@ -687,5 +687,5 @@ class LibraryBlockAssetView(APIView):
         try:
             api.delete_library_block_static_asset_file(usage_key, file_path)
         except ValueError:
-            raise ValidationError("Invalid file path")
+            raise ValidationError("Invalid file path")  # lint-amnesty, pylint: disable=raise-missing-from
         return Response(status=status.HTTP_204_NO_CONTENT)

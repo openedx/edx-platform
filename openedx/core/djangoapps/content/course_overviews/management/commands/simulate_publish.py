@@ -86,7 +86,7 @@ class Command(BaseCommand):
             dest='show_receivers',
             action='store_true',
             help=(u'Display the list of possible receiver functions and exit.')
-        ),
+        ),  # lint-amnesty, pylint: disable=trailing-comma-tuple
         parser.add_argument(
             '--dry-run',
             dest='dry_run',
@@ -96,7 +96,7 @@ class Command(BaseCommand):
                 u"expensive modulestore query to find courses, but it will "
                 u"not emit any signals."
             )
-        ),
+        ),  # lint-amnesty, pylint: disable=trailing-comma-tuple
         parser.add_argument(
             '--receivers',
             dest='receivers',
@@ -142,7 +142,7 @@ class Command(BaseCommand):
                 u"process. However, if you know what you're doing and need to "
                 u"override that behavior, use this flag."
             )
-        ),
+        ),  # lint-amnesty, pylint: disable=trailing-comma-tuple
         parser.add_argument(
             '--skip-ccx',
             dest='skip_ccx',
@@ -156,12 +156,12 @@ class Command(BaseCommand):
                 u"if you know what you're doing, you can disable this behavior "
                 u"with this flag, so that CCX receivers are omitted."
             )
-        ),
+        ),  # lint-amnesty, pylint: disable=trailing-comma-tuple
         parser.add_argument(
             '--args-from-database',
             action='store_true',
             help='Use arguments from the SimulateCoursePublishConfig model instead of the command line.',
-        ),
+        ),  # lint-amnesty, pylint: disable=trailing-comma-tuple
 
     def get_args_from_database(self):
         """ Returns an options dictionary from the current SimulateCoursePublishConfig model. """
@@ -194,7 +194,7 @@ class Command(BaseCommand):
             if options['force_lms']:
                 log.info("Forcing simulate_publish to run in LMS process.")
             else:
-                log.fatal(
+                log.fatal(  # lint-amnesty, pylint: disable=logging-not-lazy
                     u"simulate_publish should be run as a CMS (Studio) " +
                     u"command, not %s (override with --force-lms).",
                     os.environ.get('SERVICE_VARIANT')
@@ -245,7 +245,7 @@ class Command(BaseCommand):
         log.info(u"%d receivers specified: %s", len(receiver_names), ", ".join(receiver_names))
         receiver_names_set = set(receiver_names)
         for receiver_fn in get_receiver_fns():
-            if receiver_fn == ccx_receiver_fn and not skip_ccx:
+            if receiver_fn == ccx_receiver_fn and not skip_ccx:  # lint-amnesty, pylint: disable=comparison-with-callable
                 continue
             fn_name = name_from_fn(receiver_fn)
             if fn_name not in receiver_names_set:

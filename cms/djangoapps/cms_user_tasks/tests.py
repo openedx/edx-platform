@@ -9,7 +9,7 @@ from uuid import uuid4
 import mock
 from boto.exception import NoAuthHandlerFound
 from django.conf import settings
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.core import mail
 from django.test import override_settings
 from django.urls import reverse
@@ -72,7 +72,7 @@ class TestUserTasks(APITestCase):
     """
 
     @classmethod
-    def setUpTestData(cls):
+    def setUpTestData(cls):  # lint-amnesty, pylint: disable=super-method-not-called
         cls.user = User.objects.create_user('test_user', 'test@example.com', 'password')
         cls.status = UserTaskStatus.objects.create(
             user=cls.user, task_id=str(uuid4()), task_class='test_rest_api.sample_task', name='SampleTask 2',
@@ -80,7 +80,7 @@ class TestUserTasks(APITestCase):
         cls.artifact = UserTaskArtifact.objects.create(status=cls.status, text='Lorem ipsum')
 
     def setUp(self):
-        super(TestUserTasks, self).setUp()
+        super(TestUserTasks, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.status.refresh_from_db()
         self.client.force_authenticate(self.user)  # pylint: disable=no-member
 
@@ -145,14 +145,14 @@ class TestUserTaskStopped(APITestCase):
     """
 
     @classmethod
-    def setUpTestData(cls):
+    def setUpTestData(cls):  # lint-amnesty, pylint: disable=super-method-not-called
         cls.user = User.objects.create_user('test_user', 'test@example.com', 'password')
         cls.status = UserTaskStatus.objects.create(
             user=cls.user, task_id=str(uuid4()), task_class='test_rest_api.sample_task', name='SampleTask 2',
             total_steps=5)
 
     def setUp(self):
-        super(TestUserTaskStopped, self).setUp()
+        super(TestUserTaskStopped, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.status.refresh_from_db()
         self.client.force_authenticate(self.user)  # pylint: disable=no-member
 

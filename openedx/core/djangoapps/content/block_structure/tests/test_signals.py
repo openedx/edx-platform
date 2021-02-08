@@ -25,7 +25,7 @@ class CourseBlocksSignalTest(ModuleStoreTestCase):
     ENABLED_SIGNALS = ['course_deleted', 'course_published']
 
     def setUp(self):
-        super(CourseBlocksSignalTest, self).setUp()
+        super(CourseBlocksSignalTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.course = CourseFactory.create()
         self.course_usage_key = self.store.make_course_usage_key(self.course.id)
 

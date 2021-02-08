@@ -28,7 +28,7 @@ class TestProctoredExams(ModuleStoreTestCase):
         """
         Initial data setup
         """
-        super(TestProctoredExams, self).setUp()
+        super(TestProctoredExams, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
 
         self.course = CourseFactory.create(
             org='edX',

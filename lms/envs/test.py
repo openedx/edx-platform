@@ -583,6 +583,10 @@ PROCTORING_SETTINGS = {
     }
 }
 
+# Used in edx-proctoring for ID generation in lieu of SECRET_KEY - dummy value
+# (ref MST-637)
+PROCTORING_USER_OBFUSCATION_KEY = '85920908f28904ed733fe576320db18cabd7b6cd'
+
 ############### Settings for Django Rate limit #####################
 
 RATELIMIT_RATE = '2/m'

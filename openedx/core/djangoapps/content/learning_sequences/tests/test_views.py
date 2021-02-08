@@ -15,8 +15,8 @@ from this app, edx-when's set_dates_for_course).
 """
 from datetime import datetime, timezone
 
-from django.contrib.auth.models import User
-from opaque_keys.edx.keys import CourseKey, UsageKey
+from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user, unused-import
+from opaque_keys.edx.keys import CourseKey, UsageKey  # lint-amnesty, pylint: disable=unused-import
 from rest_framework.test import APITestCase, APIClient
 
 from openedx.core.djangolib.testing.utils import CacheIsolationTestCase
@@ -27,10 +27,10 @@ from ..data import CourseOutlineData, CourseVisibility
 from ..api.tests.test_data import generate_sections
 
 
-class CourseOutlineViewTest(CacheIsolationTestCase, APITestCase):
+class CourseOutlineViewTest(CacheIsolationTestCase, APITestCase):  # lint-amnesty, pylint: disable=missing-class-docstring
 
     @classmethod
-    def setUpTestData(cls):
+    def setUpTestData(cls):  # lint-amnesty, pylint: disable=super-method-not-called
         cls.staff = UserFactory.create(
             username='staff', email='staff@example.com', is_staff=True, password='staff_pass'
         )

@@ -142,7 +142,7 @@ def xblock_type_display_name(xblock, default_display_name=None):
         return _('Unit')
     component_class = XBlock.load_class(category, select=settings.XBLOCK_SELECT_FUNCTION)
     if hasattr(component_class, 'display_name') and component_class.display_name.default:
-        return _(component_class.display_name.default)
+        return _(component_class.display_name.default)  # lint-amnesty, pylint: disable=translation-of-non-string
     else:
         return default_display_name
 

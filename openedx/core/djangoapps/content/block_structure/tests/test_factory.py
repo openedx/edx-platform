@@ -19,7 +19,7 @@ class TestBlockStructureFactory(TestCase, ChildrenMapTestMixin):
     """
 
     def setUp(self):
-        super(TestBlockStructureFactory, self).setUp()
+        super(TestBlockStructureFactory, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.children_map = self.SIMPLE_CHILDREN_MAP
         self.modulestore = MockModulestoreFactory.create(self.children_map, self.block_key_factory)
 

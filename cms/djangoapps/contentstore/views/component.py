@@ -113,7 +113,7 @@ def container_handler(request, usage_key_string):
         try:
             usage_key = UsageKey.from_string(usage_key_string)
         except InvalidKeyError:  # Raise Http404 on invalid 'usage_key_string'
-            raise Http404
+            raise Http404  # lint-amnesty, pylint: disable=raise-missing-from
         with modulestore().bulk_operations(usage_key.course_key):
             try:
                 course, xblock, lms_link, preview_lms_link = _get_item_in_course(request, usage_key)
@@ -208,7 +208,7 @@ def container_handler(request, usage_key_string):
         return HttpResponseBadRequest("Only supports HTML requests")
 
 
-def get_component_templates(courselike, library=False):
+def get_component_templates(courselike, library=False):  # lint-amnesty, pylint: disable=too-many-statements
     """
     Returns the applicable component templates that can be used by the specified course or library.
     """
@@ -298,7 +298,7 @@ def get_component_templates(courselike, library=False):
     # Content Libraries currently don't allow opting in to unsupported xblocks/problem types.
     allow_unsupported = getattr(courselike, "allow_unsupported_xblocks", False)
 
-    for category in component_types:
+    for category in component_types:  # lint-amnesty, pylint: disable=too-many-nested-blocks
         authorable_variations = authorable_xblocks(allow_unsupported=allow_unsupported, name=category)
         support_level_without_template = component_support_level(authorable_variations, category)
         templates_for_category = []
@@ -338,7 +338,7 @@ def get_component_templates(courselike, library=False):
 
                         templates_for_category.append(
                             create_template_dict(
-                                _(template['metadata'].get('display_name')),
+                                _(template['metadata'].get('display_name')),  # lint-amnesty, pylint: disable=translation-of-non-string
                                 category,
                                 support_level_with_template,
                                 template_id,
@@ -504,7 +504,7 @@ def component_handler(request, usage_key_string, handler, suffix=''):
         resp = handler_descriptor.handle(handler, req, suffix)
     except NoSuchHandlerError:
         log.info(u"XBlock %s attempted to access missing handler %r", handler_descriptor, handler, exc_info=True)
-        raise Http404
+        raise Http404  # lint-amnesty, pylint: disable=raise-missing-from
 
     # unintentional update to handle any side effects of handle call
     # could potentially be updating actual course data or simply caching its values

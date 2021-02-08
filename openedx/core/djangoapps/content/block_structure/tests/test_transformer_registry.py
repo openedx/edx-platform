@@ -15,21 +15,21 @@ class TestTransformer1(MockTransformer):
     """
     1st test instance of the MockTransformer that is registered.
     """
-    pass
+    pass  # lint-amnesty, pylint: disable=unnecessary-pass
 
 
 class TestTransformer2(MockTransformer):
     """
     2nd test instance of the MockTransformer that is registered.
     """
-    pass
+    pass  # lint-amnesty, pylint: disable=unnecessary-pass
 
 
 class UnregisteredTestTransformer3(MockTransformer):
     """
     3rd test instance of the MockTransformer that is not registered.
     """
-    pass
+    pass  # lint-amnesty, pylint: disable=unnecessary-pass
 
 
 @ddt.ddt
@@ -39,7 +39,7 @@ class TransformerRegistryTestCase(TestCase):
     """
 
     def tearDown(self):
-        super(TransformerRegistryTestCase, self).tearDown()
+        super(TransformerRegistryTestCase, self).tearDown()  # lint-amnesty, pylint: disable=super-with-arguments
         clear_registered_transformers_cache()
 
     @ddt.data(

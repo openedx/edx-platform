@@ -32,7 +32,7 @@ class TestExportGit(CourseTestCase):
         """
         Setup test course, user, and url.
         """
-        super(TestExportGit, self).setUp()
+        super(TestExportGit, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.course_module = modulestore().get_course(self.course.id)
         self.test_url = reverse_course_url('export_git', self.course.id)
 

@@ -31,7 +31,7 @@ class ContainerPageTestCase(StudioPageTestCase, LibraryTestCase):
     reorderable_child_view = 'reorderable_container_child_preview'
 
     def setUp(self):
-        super(ContainerPageTestCase, self).setUp()
+        super(ContainerPageTestCase, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.vertical = self._create_item(self.sequential.location, 'vertical', 'Unit')
         self.html = self._create_item(self.vertical.location, "html", "HTML")
         self.child_container = self._create_item(self.vertical.location, 'split_test', 'Split Test')

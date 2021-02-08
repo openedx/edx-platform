@@ -4,7 +4,7 @@
 from unittest import TestCase
 from pytest import mark
 
-from celery.task import task
+from celery import shared_task
 from django.test.utils import override_settings
 from edx_django_utils.cache import RequestCache
 
@@ -17,7 +17,7 @@ class TestClearRequestCache(TestCase):
     def _get_cache(self):
         return RequestCache("TestClearRequestCache")
 
-    @task
+    @shared_task
     def _dummy_task(self):
         """ A task that adds stuff to the request cache. """
         self._get_cache().set("cache_key", "blah blah")

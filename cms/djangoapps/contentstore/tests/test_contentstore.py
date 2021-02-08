@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+# lint-amnesty, pylint: disable=missing-module-docstring
 
 
 import copy
@@ -15,8 +15,8 @@ import lxml.html
 import mock
 import six
 from django.conf import settings
-from django.contrib.auth.models import User
-from django.middleware.csrf import _compare_salted_tokens
+from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
+from django.middleware.csrf import _compare_salted_tokens  # lint-amnesty, pylint: disable=unused-import
 from django.test import TestCase
 from django.test.utils import override_settings
 from edxval.api import create_video, get_videos_for_course
@@ -76,7 +76,7 @@ def requires_pillow_jpeg(func):
         try:
             from PIL import Image
         except ImportError:
-            raise SkipTest("Pillow is not installed (or not found)")
+            raise SkipTest("Pillow is not installed (or not found)")  # lint-amnesty, pylint: disable=raise-missing-from
         if not getattr(Image.core, "jpeg_decoder", False):
             raise SkipTest("Pillow cannot open JPEG files")
         return func(*args, **kwargs)
@@ -297,7 +297,7 @@ class ImportRequiredTestCases(ContentStoreTestCase):
         html_module = self.store.get_item(html_module_location)
         self.assertIn('/jump_to_id/nonportable_link', html_module.data)
 
-    def verify_content_existence(self, store, root_dir, course_id, dirname, category_name, filename_suffix=''):
+    def verify_content_existence(self, store, root_dir, course_id, dirname, category_name, filename_suffix=''):  # lint-amnesty, pylint: disable=missing-function-docstring
         filesystem = OSFS(root_dir / 'test_export')
         self.assertTrue(filesystem.exists(dirname))
 
@@ -614,7 +614,7 @@ class MiscCourseTests(ContentStoreTestCase):
     """
 
     def setUp(self):
-        super(MiscCourseTests, self).setUp()
+        super(MiscCourseTests, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         # save locs not items b/c the items won't have the subsequently created children in them until refetched
         self.chapter_loc = self.store.create_child(
             self.user.id, self.course.location, 'chapter', 'test_chapter'
@@ -802,7 +802,7 @@ class MiscCourseTests(ContentStoreTestCase):
         """Verifies rendering the editor in all the verticals in the given test course"""
         self._check_verticals([self.vert_loc])
 
-    def _get_draft_counts(self, item):
+    def _get_draft_counts(self, item):  # lint-amnesty, pylint: disable=missing-function-docstring
         cnt = 1 if getattr(item, 'is_draft', False) else 0
         for child in item.get_children():
             cnt = cnt + self._get_draft_counts(child)
@@ -1161,7 +1161,7 @@ class ContentStoreTest(ContentStoreTestCase):
                               "Please change either organization or course number to be unique.")
 
     def setUp(self):
-        super(ContentStoreTest, self).setUp()
+        super(ContentStoreTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
 
         self.course_data = {
             'org': 'MITx',
@@ -1494,7 +1494,7 @@ class ContentStoreTest(ContentStoreTestCase):
         resp = self._show_course_overview(course.id)
         self.assertContains(
             resp,
-            '<article class="outline outline-complex outline-course" data-locator="{locator}" data-course-key="{course_key}">'.format(
+            '<article class="outline outline-complex outline-course" data-locator="{locator}" data-course-key="{course_key}">'.format(  # lint-amnesty, pylint: disable=line-too-long
                 locator=text_type(course.location),
                 course_key=text_type(course.id),
             ),
@@ -1536,7 +1536,7 @@ class ContentStoreTest(ContentStoreTestCase):
         self.assertIsInstance(problem, ProblemBlock, "New problem is not a ProblemBlock")
         context = problem.get_context()
         self.assertIn('markdown', context, "markdown is missing from context")
-        self.assertNotIn('markdown', problem.editable_metadata_fields, "Markdown slipped into the editable metadata fields")
+        self.assertNotIn('markdown', problem.editable_metadata_fields, "Markdown slipped into the editable metadata fields")  # lint-amnesty, pylint: disable=line-too-long
 
     def test_cms_imported_course_walkthrough(self):
         """
@@ -1806,7 +1806,7 @@ class MetadataSaveTestCase(ContentStoreTestCase):
     """Test that metadata is correctly cached and decached."""
 
     def setUp(self):
-        super(MetadataSaveTestCase, self).setUp()
+        super(MetadataSaveTestCase, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
 
         course = CourseFactory.create()
 
@@ -1866,7 +1866,7 @@ class RerunCourseTest(ContentStoreTestCase):
     """
 
     def setUp(self):
-        super(RerunCourseTest, self).setUp()
+        super(RerunCourseTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.destination_course_data = {
             'org': 'MITx',
             'number': '111',
@@ -2174,7 +2174,7 @@ class EntryPageTestCase(TestCase):
     """
 
     def setUp(self):
-        super(EntryPageTestCase, self).setUp()
+        super(EntryPageTestCase, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.client = AjaxEnabledTestClient()
 
     def _test_page(self, page, status_code=200):

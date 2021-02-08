@@ -63,7 +63,7 @@ class StaticContentServer(MiddlewareMixin):
         """Process the given request"""
         asset_path = request.path
 
-        if self.is_asset_request(request):
+        if self.is_asset_request(request):  # lint-amnesty, pylint: disable=too-many-nested-blocks
             # Make sure we can convert this request into a location.
             if AssetLocator.CANONICAL_NAMESPACE in asset_path:
                 asset_path = asset_path.replace('block/', 'block@', 1)
@@ -292,7 +292,7 @@ class StaticContentServer(MiddlewareMixin):
             # Not in cache, so just try and load it from the asset manager.
             try:
                 content = AssetManager.find(location, as_stream=True)
-            except (ItemNotFoundError, NotFoundError):
+            except (ItemNotFoundError, NotFoundError):  # lint-amnesty, pylint: disable=try-except-raise
                 raise
 
             # Now that we fetched it, let's go ahead and try to cache it. We cap this at 1MB
@@ -324,7 +324,7 @@ def parse_range_header(header_value, content_length):
         for byte_range_string in byte_ranges_string.split(','):
             byte_range_string = byte_range_string.strip()
             # Case 0:
-            if '-' not in byte_range_string:  # Invalid syntax of header value.
+            if '-' not in byte_range_string:  # Invalid syntax of header value.  # lint-amnesty, pylint: disable=no-else-raise
                 raise ValueError('Invalid syntax.')
             # Case 1: -500
             elif byte_range_string.startswith('-'):

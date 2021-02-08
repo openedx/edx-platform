@@ -184,7 +184,7 @@ class ContentLibraryXBlockUserStateTest(ContentLibraryContentTestMixin, TestCase
     if the library allows direct learning.
     """
 
-    databases = {alias for alias in connections}
+    databases = {alias for alias in connections}  # lint-amnesty, pylint: disable=unnecessary-comprehension
 
     @XBlock.register_temp_plugin(UserStateTestBlock, UserStateTestBlock.BLOCK_TYPE)
     def test_default_values(self):
@@ -488,7 +488,7 @@ class ContentLibraryXBlockCompletionTest(ContentLibraryContentTestMixin, Complet
     """
 
     def setUp(self):
-        super(ContentLibraryXBlockCompletionTest, self).setUp()
+        super(ContentLibraryXBlockCompletionTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         # Enable the completion waffle flag for these tests
         self.override_waffle_switch(True)
 

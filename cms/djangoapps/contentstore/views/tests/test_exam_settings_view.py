@@ -32,7 +32,7 @@ class TestExamSettingsView(CourseTestCase, UrlResetMixin):
         """
         Set up the for the exam settings view tests.
         """
-        super(TestExamSettingsView, self).setUp()
+        super(TestExamSettingsView, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.reset_urls()
 
     @staticmethod

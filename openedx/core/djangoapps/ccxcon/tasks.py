@@ -3,7 +3,7 @@ This file contains celery tasks for ccxcon
 """
 
 
-from celery.task import task
+from celery import shared_task
 from celery.utils.log import get_task_logger
 from edx_django_utils.monitoring import set_code_owner_attribute
 from opaque_keys.edx.keys import CourseKey
@@ -14,7 +14,7 @@ from openedx.core.djangoapps.ccxcon import api
 log = get_task_logger(__name__)
 
 
-@task(name='openedx.core.djangoapps.ccxcon.tasks.update_ccxcon')
+@shared_task(name='openedx.core.djangoapps.ccxcon.tasks.update_ccxcon')
 @set_code_owner_attribute
 def update_ccxcon(course_id, cur_retry=0):
     """

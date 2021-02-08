@@ -210,7 +210,14 @@ FEATURES = {
     # Turn off account locking if failed login attempts exceeds a limit
     'ENABLE_MAX_FAILED_LOGIN_ATTEMPTS': False,
 
-    # Allow editing of short description in course settings in cms
+    # .. toggle_name: FEATURES['EDITABLE_SHORT_DESCRIPTION']
+    # .. toggle_implementation: DjangoSetting
+    # .. toggle_default: True
+    # .. toggle_description: This feature flag allows editing of short descriptions on the Schedule & Details page in
+    #   Open edX Studio. Set to False if you want to disable the editing of the course short description.
+    # .. toggle_use_cases: open_edx
+    # .. toggle_creation_date: 2014-02-13
+    # .. toggle_tickets: https://github.com/edx/edx-platform/pull/2334
     'EDITABLE_SHORT_DESCRIPTION': True,
 
     # Hide any Personally Identifiable Information from application logs

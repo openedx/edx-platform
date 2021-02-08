@@ -11,7 +11,7 @@ from ..decorators import ensure_csrf_cookie_cross_domain
 
 def fake_view(request):
     """Fake view that returns the request META as a JSON-encoded string. """
-    return HttpResponse(json.dumps(request.META))
+    return HttpResponse(json.dumps(request.META))  # lint-amnesty, pylint: disable=http-response-with-json-dumps
 
 
 class TestEnsureCsrfCookieCrossDomain(TestCase):

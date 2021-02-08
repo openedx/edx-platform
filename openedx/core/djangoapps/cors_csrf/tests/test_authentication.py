@@ -26,7 +26,7 @@ class CrossDomainAuthTest(TestCase):
     REFERER = "https://www.edx.org"
 
     def setUp(self):
-        super(CrossDomainAuthTest, self).setUp()
+        super(CrossDomainAuthTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.auth = SessionAuthenticationCrossDomainCsrf()
         self.csrf_token = get_token(FakeRequest())
 

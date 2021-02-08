@@ -84,6 +84,11 @@ def _listen_for_failing_grade(sender, user, course_id, grade, **kwargs):  # pyli
     if it is currently passing,
     downstream signal from COURSE_GRADE_CHANGED
     """
+    if is_using_certificate_allowlist_and_is_on_allowlist(user, course_id):
+        log.info('{course_id} is using allowlist certificates, and the user {user_id} is on its allowlist. The '
+                 'failing grade will not affect the certificate.'.format(course_id=course_id, user_id=user.id))
+        return
+
     cert = GeneratedCertificate.certificate_for_student(user, course_id)
     if cert is not None:
         if CertificateStatuses.is_passing_status(cert.status):
