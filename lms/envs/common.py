@@ -3386,6 +3386,11 @@ FILE_UPLOAD_STORAGE_BUCKET_NAME = 'SET-ME-PLEASE (ex. bucket-name)'
 FILE_UPLOAD_STORAGE_PREFIX = 'submissions_attachments'
 
 ##### ACCOUNT LOCKOUT DEFAULT PARAMETERS #####
+# .. setting_name: MAX_FAILED_LOGIN_ATTEMPTS_ALLOWED
+# .. setting_default: 6
+# .. setting_description: Specifies the maximum failed login attempts allowed to users. Once the user reaches this
+#   failure threshold then the account will be locked for a configurable amount of seconds (30 minutes) which will
+#   prevent additional login attempts until this time period has passed.
 MAX_FAILED_LOGIN_ATTEMPTS_ALLOWED = 6
 MAX_FAILED_LOGIN_ATTEMPTS_LOCKOUT_PERIOD_SECS = 30 * 60
 
