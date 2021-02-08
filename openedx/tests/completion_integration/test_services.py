@@ -80,7 +80,7 @@ class CompletionServiceTestCase(CompletionWaffleTestMixin, SharedModuleStoreTest
         cls.problems = [cls.problem, cls.problem2, cls.problem3, cls.problem4, cls.problem5]
 
     def setUp(self):
-        super(CompletionServiceTestCase, self).setUp()
+        super(CompletionServiceTestCase, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.override_waffle_switch(True)
         self.user = UserFactory.create()
         self.other_user = UserFactory.create()

@@ -38,7 +38,7 @@ class CompletionBatchTestCase(CompletionWaffleTestMixin, ModuleStoreTestCase):
         """
         Create the test data.
         """
-        super(CompletionBatchTestCase, self).setUp()
+        super(CompletionBatchTestCase, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.url = reverse('completion:v1:completion-batch')
 
         # Enable the waffle flag for all tests

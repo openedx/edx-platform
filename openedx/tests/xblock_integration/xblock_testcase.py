@@ -101,7 +101,7 @@ class XBlockEventTestMixin(object):
         passed into it.
 
         """
-        super(XBlockEventTestMixin, self).setUp()
+        super(XBlockEventTestMixin, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         saved_init = lms.djangoapps.lms_xblock.runtime.LmsModuleSystem.__init__
 
         def patched_init(runtime_self, **kwargs):
@@ -190,7 +190,7 @@ class GradePublishTestMixin(object):
         '''
         Hot-patch the grading emission system to capture grading events.
         '''
-        super(GradePublishTestMixin, self).setUp()
+        super(GradePublishTestMixin, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
 
         def capture_score(user_id, usage_key, score, max_score):
             '''
@@ -305,7 +305,7 @@ class XBlockStudentTestCaseMixin(object):
         users, so we exercise more corner cases, but we could
         standardize if this is more hassle than it's worth.
         """
-        super(XBlockStudentTestCaseMixin, self).setUp()
+        super(XBlockStudentTestCaseMixin, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         for idx, student in enumerate(self.student_list):
             username = "u{}".format(idx)
             self._enroll_user(username, student['email'], student['password'])

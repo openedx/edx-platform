@@ -66,7 +66,7 @@ class TestCrowdsourceHinter(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
         )
 
     def setUp(self):
-        super(TestCrowdsourceHinter, self).setUp()
+        super(TestCrowdsourceHinter, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         for idx, student in enumerate(self.STUDENTS):
             username = "u{}".format(idx)
             self.create_account(username, student['email'], student['password'])
