@@ -7,7 +7,7 @@ import datetime
 import ddt
 import mock
 from django.conf import settings
-from django.test import override_settings
+from django.test import override_settings  # lint-amnesty, pylint: disable=unused-import
 from django.test.client import RequestFactory
 from django.urls import reverse
 from edx_toggles.toggles.testutils import override_waffle_flag
@@ -49,7 +49,7 @@ class LearnerProfileViewTest(SiteMixin, UrlResetMixin, ModuleStoreTestCase):
     ]
 
     def setUp(self):
-        super(LearnerProfileViewTest, self).setUp()
+        super(LearnerProfileViewTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.user = UserFactory.create(username=self.USERNAME, password=self.PASSWORD)
         self.other_user = UserFactory.create(username=self.OTHER_USERNAME, password=self.PASSWORD)
         self.client.login(username=self.USERNAME, password=self.PASSWORD)
