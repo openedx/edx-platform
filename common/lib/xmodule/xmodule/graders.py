@@ -78,7 +78,7 @@ class ProblemScore(ScoreBase):
             :param weight: Weight of this problem
             :type weight: int|float|None
         """
-        super(ProblemScore, self).__init__(*args, **kwargs)
+        super(ProblemScore, self).__init__(*args, **kwargs)  # lint-amnesty, pylint: disable=super-with-arguments
         self.raw_earned = float(raw_earned) if raw_earned is not None else None
         self.raw_possible = float(raw_possible) if raw_possible is not None else None
         self.earned = float(weighted_earned) if weighted_earned is not None else None
@@ -101,7 +101,7 @@ class AggregatedScore(ScoreBase):
             :param tw_possible: Total aggregated sum of all weighted possible values
             :type tw_possible: int|float|None
         """
-        super(AggregatedScore, self).__init__(*args, **kwargs)
+        super(AggregatedScore, self).__init__(*args, **kwargs)  # lint-amnesty, pylint: disable=super-with-arguments
         self.earned = float(tw_earned) if tw_earned is not None else None
         self.possible = float(tw_possible) if tw_possible is not None else None
 
@@ -264,7 +264,7 @@ class WeightedSubsectionsGrader(CourseGrader):
         self.subgraders = subgraders
 
     @property
-    def sum_of_weights(self):
+    def sum_of_weights(self):  # lint-amnesty, pylint: disable=missing-function-docstring
         result = 0
         for _, _, weight in self.subgraders:
             result += weight

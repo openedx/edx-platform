@@ -14,7 +14,7 @@ from lxml import etree
 from web_fragments.fragment import Fragment
 
 from common.lib.xmodule.xmodule.util.misc import is_xblock_an_assignment
-from xblock.core import XBlock
+from xblock.core import XBlock  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.mako_module import MakoTemplateBlockBase
 from xmodule.progress import Progress
 from xmodule.seq_module import SequenceFields
@@ -63,14 +63,14 @@ class VerticalBlock(SequenceFields, XModuleFields, StudioEditableBlock, XmlParse
             if 'bookmarked' not in child_context:
                 bookmarks_service = self.runtime.service(self, 'bookmarks')
                 child_context['bookmarked'] = bookmarks_service.is_bookmarked(
-                    usage_key=self.location),  # pylint: disable=no-member
+                    usage_key=self.location),  # lint-amnesty, pylint: disable=no-member, trailing-comma-tuple
             if 'username' not in child_context:
                 user_service = self.runtime.service(self, 'user')
                 child_context['username'] = user_service.get_current_user().opt_attrs.get(
                     'edx-platform.username'
                 )
 
-        child_blocks = self.get_display_items()
+        child_blocks = self.get_display_items()  # lint-amnesty, pylint: disable=no-member
 
         child_blocks_to_complete_on_view = set()
         completion_service = self.runtime.service(self, 'completion')
@@ -101,7 +101,7 @@ class VerticalBlock(SequenceFields, XModuleFields, StudioEditableBlock, XmlParse
         completed = self.is_block_complete_for_assignments(completion_service)
         past_due = completed is False and self.due and self.due < datetime.now(pytz.UTC)
         cta_service = self.runtime.service(self, 'call_to_action')
-        vertical_banner_ctas = (cta_service and cta_service.get_ctas(self, 'vertical_banner', completed)) or []
+        vertical_banner_ctas = (cta_service and cta_service.get_ctas(self, 'vertical_banner', completed)) or []  # lint-amnesty, pylint: disable=consider-using-ternary
 
         fragment_context = {
             'items': contents,
@@ -204,14 +204,14 @@ class VerticalBlock(SequenceFields, XModuleFields, StudioEditableBlock, XmlParse
         """
         Gather all fields which can't be edited.
         """
-        non_editable_fields = super(VerticalBlock, self).non_editable_metadata_fields
+        non_editable_fields = super(VerticalBlock, self).non_editable_metadata_fields  # lint-amnesty, pylint: disable=super-with-arguments
         non_editable_fields.extend([
-            self.fields['due'],
+            self.fields['due'],  # lint-amnesty, pylint: disable=unsubscriptable-object
         ])
         return non_editable_fields
 
     def studio_view(self, context):
-        fragment = super(VerticalBlock, self).studio_view(context)
+        fragment = super(VerticalBlock, self).studio_view(context)  # lint-amnesty, pylint: disable=super-with-arguments
         # This continues to use the old XModuleDescriptor javascript code to enabled studio editing.
         # TODO: Remove this when studio better supports editing of pure XBlocks.
         fragment.add_javascript('VerticalBlock = XModule.Descriptor;')
@@ -224,7 +224,7 @@ class VerticalBlock(SequenceFields, XModuleFields, StudioEditableBlock, XmlParse
         # return key/value fields in a Python dict object
         # values may be numeric / string or dict
         # default implementation is an empty dict
-        xblock_body = super(VerticalBlock, self).index_dictionary()
+        xblock_body = super(VerticalBlock, self).index_dictionary()  # lint-amnesty, pylint: disable=super-with-arguments
         index_body = {
             "display_name": self.display_name,
         }

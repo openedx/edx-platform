@@ -128,7 +128,7 @@ class CommonMixedModuleStoreSetup(CourseComparisonTest):
         """
         Set up the database for testing
         """
-        super(CommonMixedModuleStoreSetup, self).setUp()
+        super(CommonMixedModuleStoreSetup, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
 
         self.exclude_field(None, 'wiki_slug')
         self.exclude_field(None, 'xml_attributes')
@@ -162,7 +162,7 @@ class CommonMixedModuleStoreSetup(CourseComparisonTest):
         """
         # create course
         with self.store.bulk_operations(course_key):
-            self.course = self.store.create_course(course_key.org, course_key.course, course_key.run, self.user_id)
+            self.course = self.store.create_course(course_key.org, course_key.course, course_key.run, self.user_id)  # lint-amnesty, pylint: disable=attribute-defined-outside-init
             if isinstance(self.course.id, CourseLocator):
                 self.course_locations[self.MONGO_COURSEID] = self.course.location
             else:
@@ -267,7 +267,7 @@ class CommonMixedModuleStoreSetup(CourseComparisonTest):
         """
         # set the default modulestore
         store_configs = self.options['stores']
-        for index in range(len(store_configs)):
+        for index in range(len(store_configs)):  # lint-amnesty, pylint: disable=consider-using-enumerate
             if store_configs[index]['NAME'] == default:
                 if index > 0:
                     store_configs[index], store_configs[0] = store_configs[0], store_configs[index]
@@ -390,7 +390,7 @@ class TestMixedModuleStore(CommonMixedModuleStoreSetup):
         self._create_block_hierarchy()
 
         with check_mongo_calls(max_find.pop(0), max_send):
-            self.assertTrue(self.store.has_item(self.problem_x1a_1))
+            self.assertTrue(self.store.has_item(self.problem_x1a_1))  # lint-amnesty, pylint: disable=no-member
 
         # try negative cases
         with check_mongo_calls(max_find.pop(0), max_send):
@@ -413,7 +413,7 @@ class TestMixedModuleStore(CommonMixedModuleStoreSetup):
         self._create_block_hierarchy()
 
         with check_mongo_calls(max_find.pop(0), max_send):
-            self.assertIsNotNone(self.store.get_item(self.problem_x1a_1))
+            self.assertIsNotNone(self.store.get_item(self.problem_x1a_1))  # lint-amnesty, pylint: disable=no-member
 
         # try negative cases
         with check_mongo_calls(max_find.pop(0), max_send):
@@ -460,7 +460,7 @@ class TestMixedModuleStore(CommonMixedModuleStoreSetup):
             self.assertIsNone(course_version)
 
         blocks = self.store.get_items(self.course.id, qualifiers={'category': 'problem'})
-        blocks.append(self.store.get_item(self.problem_x1a_1))
+        blocks.append(self.store.get_item(self.problem_x1a_1))  # lint-amnesty, pylint: disable=no-member
         self.assertEqual(len(blocks), 7)
         for block in blocks:
             self.assertEqual(block.course_version, course_version)
@@ -496,7 +496,7 @@ class TestMixedModuleStore(CommonMixedModuleStoreSetup):
 
         items = self.store.get_items(course_key)
         # Check items found are either course or about type
-        self.assertTrue(set(['course', 'about']).issubset(set([item.location.block_type for item in items])))
+        self.assertTrue(set(['course', 'about']).issubset(set([item.location.block_type for item in items])))  # lint-amnesty, pylint: disable=consider-using-set-comprehension
         # Assert that about is a detached category found in get_items
         self.assertIn(
             [item.location.block_type for item in items if item.location.block_type == 'about'][0],
@@ -526,7 +526,7 @@ class TestMixedModuleStore(CommonMixedModuleStoreSetup):
         items_in_tree = self.store.get_items(course_key, include_orphans=False)
 
         # Check that course and about blocks are found in get_items
-        self.assertTrue(set(['course', 'about']).issubset(set([item.location.block_type for item in items_in_tree])))
+        self.assertTrue(set(['course', 'about']).issubset(set([item.location.block_type for item in items_in_tree])))  # lint-amnesty, pylint: disable=consider-using-set-comprehension
         # Check orphan is found or not - this is based on mongo/split modulestore. It should be found in mongo.
         self.assertEqual(orphan in [item.location for item in items_in_tree], orphan_in_items)
         self.assertEqual(len(items_in_tree), expected_items_in_tree)
@@ -543,7 +543,7 @@ class TestMixedModuleStore(CommonMixedModuleStoreSetup):
         """
         self.initdb(default_ms)
         self._create_block_hierarchy()
-        problem = self.store.get_item(self.problem_x1a_1)
+        problem = self.store.get_item(self.problem_x1a_1)  # lint-amnesty, pylint: disable=no-member
         # if following raised, then the test is really a noop, change it
         self.assertNotEqual(problem.max_attempts, 2, "Default changed making test meaningless")
         problem.max_attempts = 2
@@ -750,11 +750,11 @@ class TestMixedModuleStore(CommonMixedModuleStoreSetup):
         self._create_block_hierarchy()
 
         locations = {
-            'grandparent': self.chapter_x,
-            'parent_sibling': self.sequential_x2,
-            'parent': self.sequential_x1,
-            'child_sibling': self.vertical_x1b,
-            'child': self.vertical_x1a,
+            'grandparent': self.chapter_x,  # lint-amnesty, pylint: disable=no-member
+            'parent_sibling': self.sequential_x2,  # lint-amnesty, pylint: disable=no-member
+            'parent': self.sequential_x1,  # lint-amnesty, pylint: disable=no-member
+            'child_sibling': self.vertical_x1b,  # lint-amnesty, pylint: disable=no-member
+            'child': self.vertical_x1a,  # lint-amnesty, pylint: disable=no-member
         }
 
         # Publish the vertical units
@@ -939,7 +939,7 @@ class TestMixedModuleStore(CommonMixedModuleStoreSetup):
         if default_ms == ModuleStoreEnum.Type.mongo and mongo_uses_error_check(self.store):
             max_find += 1
 
-        with self.store.branch_setting(ModuleStoreEnum.Branch.draft_preferred, self.writable_chapter_location.course_key):
+        with self.store.branch_setting(ModuleStoreEnum.Branch.draft_preferred, self.writable_chapter_location.course_key):  # lint-amnesty, pylint: disable=line-too-long
             with check_mongo_calls(max_find, max_send):
                 self.store.delete_item(self.writable_chapter_location, self.user_id)
 
@@ -1140,8 +1140,8 @@ class TestMixedModuleStore(CommonMixedModuleStoreSetup):
         self._create_block_hierarchy()
 
         with check_mongo_calls(max_find, max_send):
-            parent = self.store.get_parent_location(self.problem_x1a_1)
-            self.assertEqual(parent, self.vertical_x1a)
+            parent = self.store.get_parent_location(self.problem_x1a_1)  # lint-amnesty, pylint: disable=no-member
+            self.assertEqual(parent, self.vertical_x1a)  # lint-amnesty, pylint: disable=no-member
 
     def verify_get_parent_locations_results(self, expected_results):
         """
@@ -1207,12 +1207,12 @@ class TestMixedModuleStore(CommonMixedModuleStoreSetup):
         self._create_block_hierarchy()
 
         # Publish the course.
-        self.course = self.store.publish(self.course.location, self.user_id)
+        self.course = self.store.publish(self.course.location, self.user_id)  # lint-amnesty, pylint: disable=attribute-defined-outside-init
 
         # Move child problem_x1a_1 to vertical_y1a.
-        item_location = self.problem_x1a_1
-        new_parent_location = self.vertical_y1a
-        old_parent_location = self.vertical_x1a
+        item_location = self.problem_x1a_1  # lint-amnesty, pylint: disable=no-member
+        new_parent_location = self.vertical_y1a  # lint-amnesty, pylint: disable=no-member
+        old_parent_location = self.vertical_x1a  # lint-amnesty, pylint: disable=no-member
         updated_item_location = self.store.update_item_parent(
             item_location, new_parent_location, old_parent_location, self.user_id
         )
@@ -1234,12 +1234,12 @@ class TestMixedModuleStore(CommonMixedModuleStoreSetup):
         self._create_block_hierarchy()
 
         # Publish the course
-        self.course = self.store.publish(self.course.location, self.user_id)
+        self.course = self.store.publish(self.course.location, self.user_id)  # lint-amnesty, pylint: disable=attribute-defined-outside-init
 
         # Move child problem_x1a_1 to vertical_y1a.
-        item_location = self.problem_x1a_1
-        new_parent_location = self.vertical_y1a
-        old_parent_location = self.vertical_x1a
+        item_location = self.problem_x1a_1  # lint-amnesty, pylint: disable=no-member
+        new_parent_location = self.vertical_y1a  # lint-amnesty, pylint: disable=no-member
+        old_parent_location = self.vertical_x1a  # lint-amnesty, pylint: disable=no-member
         updated_item_location = self.store.update_item_parent(
             item_location, new_parent_location, old_parent_location, self.user_id
         )
@@ -1271,12 +1271,12 @@ class TestMixedModuleStore(CommonMixedModuleStoreSetup):
         self._create_block_hierarchy()
 
         # Publish the course
-        self.course = self.store.publish(self.course.location, self.user_id)
+        self.course = self.store.publish(self.course.location, self.user_id)  # lint-amnesty, pylint: disable=attribute-defined-outside-init
 
         # Move child problem_x1a_1 to vertical_y1a.
-        item_location = self.problem_x1a_1
-        new_parent_location = self.vertical_y1a
-        old_parent_location = self.vertical_x1a
+        item_location = self.problem_x1a_1  # lint-amnesty, pylint: disable=no-member
+        new_parent_location = self.vertical_y1a  # lint-amnesty, pylint: disable=no-member
+        old_parent_location = self.vertical_x1a  # lint-amnesty, pylint: disable=no-member
         updated_item_location = self.store.update_item_parent(
             item_location, new_parent_location, old_parent_location, self.user_id
         )
@@ -1312,12 +1312,12 @@ class TestMixedModuleStore(CommonMixedModuleStoreSetup):
         self._create_block_hierarchy()
 
         # Publish the course
-        self.course = self.store.publish(self.course.location, self.user_id)
+        self.course = self.store.publish(self.course.location, self.user_id)  # lint-amnesty, pylint: disable=attribute-defined-outside-init
 
         # Move child problem_x1a_1 to vertical_y1a.
-        item_location = self.problem_x1a_1
-        new_parent_location = self.vertical_y1a
-        old_parent_location = self.vertical_x1a
+        item_location = self.problem_x1a_1  # lint-amnesty, pylint: disable=no-member
+        new_parent_location = self.vertical_y1a  # lint-amnesty, pylint: disable=no-member
+        old_parent_location = self.vertical_x1a  # lint-amnesty, pylint: disable=no-member
         updated_item_location = self.store.update_item_parent(
             item_location, new_parent_location, old_parent_location, self.user_id
         )
@@ -1361,21 +1361,21 @@ class TestMixedModuleStore(CommonMixedModuleStoreSetup):
         self._create_block_hierarchy()
 
         # Publish the course.
-        self.course = self.store.publish(self.course.location, self.user_id)
+        self.course = self.store.publish(self.course.location, self.user_id)  # lint-amnesty, pylint: disable=attribute-defined-outside-init
 
         # Move child problem_x1a_1 to vertical_y1a.
-        item_location = self.problem_x1a_1
-        new_parent_location = self.vertical_y1a
-        old_parent_location = self.vertical_x1a
+        item_location = self.problem_x1a_1  # lint-amnesty, pylint: disable=no-member
+        new_parent_location = self.vertical_y1a  # lint-amnesty, pylint: disable=no-member
+        old_parent_location = self.vertical_x1a  # lint-amnesty, pylint: disable=no-member
 
-        problem = self.store.get_item(self.problem_x1a_1)
+        problem = self.store.get_item(self.problem_x1a_1)  # lint-amnesty, pylint: disable=no-member
         orig_display_name = problem.display_name
 
         # Change display name of problem and update just it.
         problem.display_name = 'updated'
         self.store.update_item(problem, self.user_id)
 
-        updated_problem = self.store.get_item(self.problem_x1a_1)
+        updated_problem = self.store.get_item(self.problem_x1a_1)  # lint-amnesty, pylint: disable=no-member
         self.assertEqual(updated_problem.display_name, 'updated')
 
         # Now, move from x1 to y1.
@@ -1394,7 +1394,7 @@ class TestMixedModuleStore(CommonMixedModuleStoreSetup):
         self.store.revert_to_published(old_parent_location, self.user_id)
 
         # Check that problem has the original name back.
-        reverted_problem = self.store.get_item(self.problem_x1a_1)
+        reverted_problem = self.store.get_item(self.problem_x1a_1)  # lint-amnesty, pylint: disable=no-member
         self.assertEqual(orig_display_name, reverted_problem.display_name)
 
     @ddt.data(ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split)
@@ -1407,14 +1407,14 @@ class TestMixedModuleStore(CommonMixedModuleStoreSetup):
         self._create_block_hierarchy()
 
         # Create some children in vertical_x1a
-        problem_item2 = self.store.create_child(self.user_id, self.vertical_x1a, 'problem', 'Problem_Item2')
+        problem_item2 = self.store.create_child(self.user_id, self.vertical_x1a, 'problem', 'Problem_Item2')  # lint-amnesty, pylint: disable=no-member
 
         # Publish the course.
-        self.course = self.store.publish(self.course.location, self.user_id)
+        self.course = self.store.publish(self.course.location, self.user_id)  # lint-amnesty, pylint: disable=attribute-defined-outside-init
 
-        item_location = self.problem_x1a_1
-        new_parent_location = self.vertical_y1a
-        old_parent_location = self.vertical_x1a
+        item_location = self.problem_x1a_1  # lint-amnesty, pylint: disable=no-member
+        new_parent_location = self.vertical_y1a  # lint-amnesty, pylint: disable=no-member
+        old_parent_location = self.vertical_x1a  # lint-amnesty, pylint: disable=no-member
 
         # Move problem_x1a_1 from x1 to y1.
         updated_item_location = self.store.update_item_parent(
@@ -1430,7 +1430,7 @@ class TestMixedModuleStore(CommonMixedModuleStoreSetup):
 
         # Check that problem_item2 is still present in vertical_x1a
         problem_item2 = self.store.get_item(problem_item2.location)
-        self.assertEqual(problem_item2.parent, self.vertical_x1a)
+        self.assertEqual(problem_item2.parent, self.vertical_x1a)  # lint-amnesty, pylint: disable=no-member
         self.assertIn(problem_item2.location, problem_item2.get_parent().children)
 
     @ddt.data(ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split)
@@ -1444,11 +1444,11 @@ class TestMixedModuleStore(CommonMixedModuleStoreSetup):
         self._create_block_hierarchy()
 
         # Create some children in vertical_x1a
-        problem_item2 = self.store.create_child(self.user_id, self.vertical_x1a, 'problem', 'Problem_Item2')
+        problem_item2 = self.store.create_child(self.user_id, self.vertical_x1a, 'problem', 'Problem_Item2')  # lint-amnesty, pylint: disable=no-member
         orig_display_name = problem_item2.display_name
 
         # Publish the course.
-        self.course = self.store.publish(self.course.location, self.user_id)
+        self.course = self.store.publish(self.course.location, self.user_id)  # lint-amnesty, pylint: disable=attribute-defined-outside-init
 
         # Edit problem_item2.
         problem_item2.display_name = 'updated'
@@ -1457,9 +1457,9 @@ class TestMixedModuleStore(CommonMixedModuleStoreSetup):
         updated_problem2 = self.store.get_item(problem_item2.location)
         self.assertEqual(updated_problem2.display_name, 'updated')
 
-        item_location = self.problem_x1a_1
-        new_parent_location = self.vertical_y1a
-        old_parent_location = self.vertical_x1a
+        item_location = self.problem_x1a_1  # lint-amnesty, pylint: disable=no-member
+        new_parent_location = self.vertical_y1a  # lint-amnesty, pylint: disable=no-member
+        old_parent_location = self.vertical_x1a  # lint-amnesty, pylint: disable=no-member
 
         # Move problem_x1a_1 from x1 to y1.
         updated_item_location = self.store.update_item_parent(
@@ -1491,19 +1491,19 @@ class TestMixedModuleStore(CommonMixedModuleStoreSetup):
         self._create_block_hierarchy()
 
         # Create some children in vertical_x1a
-        problem_item2 = self.store.create_child(self.user_id, self.vertical_x1a, 'problem', 'Problem_Item2')
-        orig_display_name = problem_item2.display_name
+        problem_item2 = self.store.create_child(self.user_id, self.vertical_x1a, 'problem', 'Problem_Item2')  # lint-amnesty, pylint: disable=no-member
+        orig_display_name = problem_item2.display_name  # lint-amnesty, pylint: disable=unused-variable
 
         # Publish the course.
-        self.course = self.store.publish(self.course.location, self.user_id)
+        self.course = self.store.publish(self.course.location, self.user_id)  # lint-amnesty, pylint: disable=attribute-defined-outside-init
 
         # Now delete other problem problem_item2.
         self.store.delete_item(problem_item2.location, self.user_id)
 
         # Move child problem_x1a_1 to vertical_y1a.
-        item_location = self.problem_x1a_1
-        new_parent_location = self.vertical_y1a
-        old_parent_location = self.vertical_x1a
+        item_location = self.problem_x1a_1  # lint-amnesty, pylint: disable=no-member
+        new_parent_location = self.vertical_y1a  # lint-amnesty, pylint: disable=no-member
+        old_parent_location = self.vertical_x1a  # lint-amnesty, pylint: disable=no-member
 
         # Move problem_x1a_1 from x1 to y1.
         updated_item_location = self.store.update_item_parent(
@@ -1522,7 +1522,7 @@ class TestMixedModuleStore(CommonMixedModuleStoreSetup):
 
         # Check that problem_item2 is also back in vertical_x1a
         problem_item2 = self.store.get_item(problem_item2.location)
-        self.assertEqual(problem_item2.parent, self.vertical_x1a)
+        self.assertEqual(problem_item2.parent, self.vertical_x1a)  # lint-amnesty, pylint: disable=no-member
         self.assertIn(problem_item2.location, problem_item2.get_parent().children)
 
     @ddt.data(ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split)
@@ -1531,17 +1531,17 @@ class TestMixedModuleStore(CommonMixedModuleStoreSetup):
         self._create_block_hierarchy()
 
         # publish the course
-        self.course = self.store.publish(self.course.location, self.user_id)
+        self.course = self.store.publish(self.course.location, self.user_id)  # lint-amnesty, pylint: disable=attribute-defined-outside-init
 
         with self.store.bulk_operations(self.course.id):
             # make drafts of verticals
-            self.store.convert_to_draft(self.vertical_x1a, self.user_id)
-            self.store.convert_to_draft(self.vertical_y1a, self.user_id)
+            self.store.convert_to_draft(self.vertical_x1a, self.user_id)  # lint-amnesty, pylint: disable=no-member
+            self.store.convert_to_draft(self.vertical_y1a, self.user_id)  # lint-amnesty, pylint: disable=no-member
 
             # move child problem_x1a_1 to vertical_y1a
-            child_to_move_location = self.problem_x1a_1
-            new_parent_location = self.vertical_y1a
-            old_parent_location = self.vertical_x1a
+            child_to_move_location = self.problem_x1a_1  # lint-amnesty, pylint: disable=no-member
+            new_parent_location = self.vertical_y1a  # lint-amnesty, pylint: disable=no-member
+            old_parent_location = self.vertical_x1a  # lint-amnesty, pylint: disable=no-member
 
             with self.store.branch_setting(ModuleStoreEnum.Branch.draft_preferred):
                 old_parent = self.store.get_item(child_to_move_location).get_parent()
@@ -1585,11 +1585,11 @@ class TestMixedModuleStore(CommonMixedModuleStoreSetup):
         self.store.publish(self.course.location, self.user_id)
 
         # make draft of vertical
-        self.store.convert_to_draft(self.vertical_y1a, self.user_id)
+        self.store.convert_to_draft(self.vertical_y1a, self.user_id)  # lint-amnesty, pylint: disable=no-member
 
         # delete child problem_y1a_1
-        child_to_delete_location = self.problem_y1a_1
-        old_parent_location = self.vertical_y1a
+        child_to_delete_location = self.problem_y1a_1  # lint-amnesty, pylint: disable=no-member
+        old_parent_location = self.vertical_y1a  # lint-amnesty, pylint: disable=no-member
         self.store.delete_item(child_to_delete_location, self.user_id)
 
         self.verify_get_parent_locations_results([
@@ -1624,13 +1624,13 @@ class TestMixedModuleStore(CommonMixedModuleStoreSetup):
         mongo_store = self.store._get_modulestore_for_courselike(course_id)  # pylint: disable=protected-access
         # add another parent (unit) "vertical_x1b" for problem "problem_x1a_1"
         mongo_store.collection.update_one(
-            self.vertical_x1b.to_deprecated_son('_id.'),
-            {'$push': {'definition.children': six.text_type(self.problem_x1a_1)}}
+            self.vertical_x1b.to_deprecated_son('_id.'),  # lint-amnesty, pylint: disable=no-member
+            {'$push': {'definition.children': six.text_type(self.problem_x1a_1)}}  # lint-amnesty, pylint: disable=no-member
         )
 
         # convert first parent (unit) "vertical_x1a" of problem "problem_x1a_1" to draft
-        self.store.convert_to_draft(self.vertical_x1a, self.user_id)
-        item = self.store.get_item(self.vertical_x1a)
+        self.store.convert_to_draft(self.vertical_x1a, self.user_id)  # lint-amnesty, pylint: disable=no-member
+        item = self.store.get_item(self.vertical_x1a)  # lint-amnesty, pylint: disable=no-member
         self.assertTrue(self.store.has_published_version(item))
 
         # now problem "problem_x1a_1" has 3 parents [vertical_x1a (draft),
@@ -1639,8 +1639,8 @@ class TestMixedModuleStore(CommonMixedModuleStoreSetup):
         # published parent "vertical_x1a" without raising "AssertionError" for
         # problem location revision
         with self.store.branch_setting(ModuleStoreEnum.Branch.draft_preferred, course_id):
-            parent = mongo_store.get_parent_location(self.problem_x1a_1)
-            self.assertEqual(parent, self.vertical_x1a)
+            parent = mongo_store.get_parent_location(self.problem_x1a_1)  # lint-amnesty, pylint: disable=no-member
+            self.assertEqual(parent, self.vertical_x1a)  # lint-amnesty, pylint: disable=no-member
 
     # Draft:
     #   Problem path:
@@ -1663,10 +1663,10 @@ class TestMixedModuleStore(CommonMixedModuleStoreSetup):
             self._create_block_hierarchy()
 
             should_work = (
-                (self.problem_x1a_2,
-                 (course_key, u"Chapter_x", u"Sequential_x1", u'Vertical_x1a', '1', self.problem_x1a_2)),
-                (self.chapter_x,
-                 (course_key, "Chapter_x", None, None, None, self.chapter_x)),
+                (self.problem_x1a_2,  # lint-amnesty, pylint: disable=no-member
+                 (course_key, u"Chapter_x", u"Sequential_x1", u'Vertical_x1a', '1', self.problem_x1a_2)),  # lint-amnesty, pylint: disable=no-member
+                (self.chapter_x,  # lint-amnesty, pylint: disable=no-member
+                 (course_key, "Chapter_x", None, None, None, self.chapter_x)),  # lint-amnesty, pylint: disable=no-member
             )
 
             for location, expected in should_work:
@@ -1715,29 +1715,29 @@ class TestMixedModuleStore(CommonMixedModuleStoreSetup):
         self.initdb(default_ms)
         self._create_block_hierarchy()
 
-        vertical = self.store.get_item(self.vertical_x1a)
+        vertical = self.store.get_item(self.vertical_x1a)  # lint-amnesty, pylint: disable=no-member
         vertical_children_num = len(vertical.children)
 
         self.store.publish(self.course.location, self.user_id)
-        self.assertFalse(self._has_changes(self.vertical_x1a))
+        self.assertFalse(self._has_changes(self.vertical_x1a))  # lint-amnesty, pylint: disable=no-member
 
         # delete leaf problem (will make parent vertical a draft)
-        self.store.delete_item(self.problem_x1a_1, self.user_id)
-        self.assertTrue(self._has_changes(self.vertical_x1a))
+        self.store.delete_item(self.problem_x1a_1, self.user_id)  # lint-amnesty, pylint: disable=no-member
+        self.assertTrue(self._has_changes(self.vertical_x1a))  # lint-amnesty, pylint: disable=no-member
 
-        draft_parent = self.store.get_item(self.vertical_x1a)
+        draft_parent = self.store.get_item(self.vertical_x1a)  # lint-amnesty, pylint: disable=no-member
         self.assertEqual(vertical_children_num - 1, len(draft_parent.children))
         published_parent = self.store.get_item(
-            self.vertical_x1a,
+            self.vertical_x1a,  # lint-amnesty, pylint: disable=no-member
             revision=ModuleStoreEnum.RevisionOption.published_only
         )
         self.assertEqual(vertical_children_num, len(published_parent.children))
 
-        self.store.revert_to_published(self.vertical_x1a, self.user_id)
-        reverted_parent = self.store.get_item(self.vertical_x1a)
+        self.store.revert_to_published(self.vertical_x1a, self.user_id)  # lint-amnesty, pylint: disable=no-member
+        reverted_parent = self.store.get_item(self.vertical_x1a)  # lint-amnesty, pylint: disable=no-member
         self.assertEqual(vertical_children_num, len(published_parent.children))
         self.assertBlocksEqualByFields(reverted_parent, published_parent)
-        self.assertFalse(self._has_changes(self.vertical_x1a))
+        self.assertFalse(self._has_changes(self.vertical_x1a))  # lint-amnesty, pylint: disable=no-member
 
     @ddt.data(ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split)
     def test_revert_to_published_root_published(self, default_ms):
@@ -1748,15 +1748,15 @@ class TestMixedModuleStore(CommonMixedModuleStoreSetup):
         self._create_block_hierarchy()
         self.store.publish(self.course.location, self.user_id)
 
-        problem = self.store.get_item(self.problem_x1a_1)
+        problem = self.store.get_item(self.problem_x1a_1)  # lint-amnesty, pylint: disable=no-member
         orig_display_name = problem.display_name
 
         # Change display name of problem and update just it (so parent remains published)
         problem.display_name = "updated before calling revert"
         self.store.update_item(problem, self.user_id)
-        self.store.revert_to_published(self.vertical_x1a, self.user_id)
+        self.store.revert_to_published(self.vertical_x1a, self.user_id)  # lint-amnesty, pylint: disable=no-member
 
-        reverted_problem = self.store.get_item(self.problem_x1a_1)
+        reverted_problem = self.store.get_item(self.problem_x1a_1)  # lint-amnesty, pylint: disable=no-member
         self.assertEqual(orig_display_name, reverted_problem.display_name)
 
     @ddt.data(ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split)
@@ -1768,9 +1768,9 @@ class TestMixedModuleStore(CommonMixedModuleStoreSetup):
         self._create_block_hierarchy()
         self.store.publish(self.course.location, self.user_id)
 
-        orig_vertical = self.store.get_item(self.vertical_x1a)
-        self.store.revert_to_published(self.vertical_x1a, self.user_id)
-        reverted_vertical = self.store.get_item(self.vertical_x1a)
+        orig_vertical = self.store.get_item(self.vertical_x1a)  # lint-amnesty, pylint: disable=no-member
+        self.store.revert_to_published(self.vertical_x1a, self.user_id)  # lint-amnesty, pylint: disable=no-member
+        reverted_vertical = self.store.get_item(self.vertical_x1a)  # lint-amnesty, pylint: disable=no-member
 
         self.assertBlocksEqualByFields(orig_vertical, reverted_vertical)
 
@@ -1782,7 +1782,7 @@ class TestMixedModuleStore(CommonMixedModuleStoreSetup):
         self.initdb(default_ms)
         self._create_block_hierarchy()
         with self.assertRaises(InvalidVersionError):
-            self.store.revert_to_published(self.vertical_x1a, self.user_id)
+            self.store.revert_to_published(self.vertical_x1a, self.user_id)  # lint-amnesty, pylint: disable=no-member
 
     @ddt.data(ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split)
     def test_revert_to_published_direct_only(self, default_ms):
@@ -1791,9 +1791,9 @@ class TestMixedModuleStore(CommonMixedModuleStoreSetup):
         """
         self.initdb(default_ms)
         self._create_block_hierarchy()
-        num_children = len(self.store.get_item(self.sequential_x1).children)
-        self.store.revert_to_published(self.sequential_x1, self.user_id)
-        reverted_parent = self.store.get_item(self.sequential_x1)
+        num_children = len(self.store.get_item(self.sequential_x1).children)  # lint-amnesty, pylint: disable=no-member
+        self.store.revert_to_published(self.sequential_x1, self.user_id)  # lint-amnesty, pylint: disable=no-member
+        reverted_parent = self.store.get_item(self.sequential_x1)  # lint-amnesty, pylint: disable=no-member
         # It does not discard the child vertical, even though that child is a draft (with no published version)
         self.assertEqual(num_children, len(reverted_parent.children))
 
@@ -1808,7 +1808,7 @@ class TestMixedModuleStore(CommonMixedModuleStoreSetup):
 
         # Get children of a vertical as a set.
         # We will use this set as a basis for content comparision in this test.
-        original_vertical = self.store.get_item(self.vertical_x1a)
+        original_vertical = self.store.get_item(self.vertical_x1a)  # lint-amnesty, pylint: disable=no-member
         original_vertical_children = set(original_vertical.children)
 
         # Find the version_guid of our course by diving into Split Mongo.
@@ -1823,16 +1823,16 @@ class TestMixedModuleStore(CommonMixedModuleStoreSetup):
             original_version_guid,
             self.user_id,
         )
-        noop_reset_vertical = self.store.get_item(self.vertical_x1a)
+        noop_reset_vertical = self.store.get_item(self.vertical_x1a)  # lint-amnesty, pylint: disable=no-member
         assert set(noop_reset_vertical.children) == original_vertical_children
 
         # Delete a problem from the vertical and publish.
         # Vertical should have one less problem than before.
-        self.store.delete_item(self.problem_x1a_1, self.user_id)
+        self.store.delete_item(self.problem_x1a_1, self.user_id)  # lint-amnesty, pylint: disable=no-member
         self.store.publish(self.course.location, self.user_id)
-        modified_vertical = self.store.get_item(self.vertical_x1a)
+        modified_vertical = self.store.get_item(self.vertical_x1a)  # lint-amnesty, pylint: disable=no-member
         assert set(modified_vertical.children) == (
-            original_vertical_children - {self.problem_x1a_1}
+            original_vertical_children - {self.problem_x1a_1}  # lint-amnesty, pylint: disable=no-member
         )
 
         # Add a couple more children to the vertical.
@@ -1840,14 +1840,14 @@ class TestMixedModuleStore(CommonMixedModuleStoreSetup):
         # We want to make sure we can restore from something a few versions back.
         self.store.create_child(
             self.user_id,
-            self.vertical_x1a,
+            self.vertical_x1a,  # lint-amnesty, pylint: disable=no-member
             'problem',
             block_id='new_child1',
         )
         self.store.publish(self.course.location, self.user_id)
         self.store.create_child(
             self.user_id,
-            self.vertical_x1a,
+            self.vertical_x1a,  # lint-amnesty, pylint: disable=no-member
             'problem',
             block_id='new_child2',
         )
@@ -1857,7 +1857,7 @@ class TestMixedModuleStore(CommonMixedModuleStoreSetup):
         # We want to make sure that this works with a dirty draft branch.
         self.store.create_child(
             self.user_id,
-            self.vertical_x1a,
+            self.vertical_x1a,  # lint-amnesty, pylint: disable=no-member
             'problem',
             block_id='new_child3',
         )
@@ -1869,7 +1869,7 @@ class TestMixedModuleStore(CommonMixedModuleStoreSetup):
             original_version_guid,
             self.user_id,
         )
-        restored_vertical = self.store.get_item(self.vertical_x1a)
+        restored_vertical = self.store.get_item(self.vertical_x1a)  # lint-amnesty, pylint: disable=no-member
         assert set(restored_vertical.children) == original_vertical_children
 
     def _get_split_modulestore(self):
@@ -1942,8 +1942,8 @@ class TestMixedModuleStore(CommonMixedModuleStoreSetup):
         # test that problem "problem_x1a_1" has only one published parent
         mongo_store = self.store._get_modulestore_for_courselike(course_id)  # pylint: disable=protected-access
         with self.store.branch_setting(ModuleStoreEnum.Branch.published_only, course_id):
-            parent = mongo_store.get_parent_location(self.problem_x1a_1)
-            self.assertEqual(parent, self.vertical_x1a)
+            parent = mongo_store.get_parent_location(self.problem_x1a_1)  # lint-amnesty, pylint: disable=no-member
+            self.assertEqual(parent, self.vertical_x1a)  # lint-amnesty, pylint: disable=no-member
 
         # add some published orphans
         orphan_sequential = course_id.make_usage_key('sequential', 'OrphanSequential')
@@ -1965,29 +1965,29 @@ class TestMixedModuleStore(CommonMixedModuleStoreSetup):
         # add orphan vertical and sequential as another parents of problem "problem_x1a_1"
         mongo_store.collection.update_one(
             orphan_sequential.to_deprecated_son('_id.'),
-            {'$push': {'definition.children': six.text_type(self.problem_x1a_1)}}
+            {'$push': {'definition.children': six.text_type(self.problem_x1a_1)}}  # lint-amnesty, pylint: disable=no-member
         )
         mongo_store.collection.update_one(
             orphan_vertical.to_deprecated_son('_id.'),
-            {'$push': {'definition.children': six.text_type(self.problem_x1a_1)}}
+            {'$push': {'definition.children': six.text_type(self.problem_x1a_1)}}  # lint-amnesty, pylint: disable=no-member
         )
         # test that "get_parent_location" method of published branch still returns the correct non-orphan parent for
         # problem "problem_x1a_1" since the two other parents are orphans
         with self.store.branch_setting(ModuleStoreEnum.Branch.published_only, course_id):
-            parent = mongo_store.get_parent_location(self.problem_x1a_1)
-            self.assertEqual(parent, self.vertical_x1a)
+            parent = mongo_store.get_parent_location(self.problem_x1a_1)  # lint-amnesty, pylint: disable=no-member
+            self.assertEqual(parent, self.vertical_x1a)  # lint-amnesty, pylint: disable=no-member
 
         # now add valid published vertical as another parent of problem
         mongo_store.collection.update_one(
-            self.sequential_x1.to_deprecated_son('_id.'),
-            {'$push': {'definition.children': six.text_type(self.problem_x1a_1)}}
+            self.sequential_x1.to_deprecated_son('_id.'),  # lint-amnesty, pylint: disable=no-member
+            {'$push': {'definition.children': six.text_type(self.problem_x1a_1)}}  # lint-amnesty, pylint: disable=no-member
         )
         # now check that "get_parent_location" method of published branch raises "ReferentialIntegrityError" for
         # problem "problem_x1a_1" since it has now 2 valid published parents
         with self.store.branch_setting(ModuleStoreEnum.Branch.published_only, course_id):
-            self.assertTrue(self.store.has_item(self.problem_x1a_1))
+            self.assertTrue(self.store.has_item(self.problem_x1a_1))  # lint-amnesty, pylint: disable=no-member
             with self.assertRaises(ReferentialIntegrityError):
-                self.store.get_parent_location(self.problem_x1a_1)
+                self.store.get_parent_location(self.problem_x1a_1)  # lint-amnesty, pylint: disable=no-member
 
     @ddt.data(ModuleStoreEnum.Type.mongo)
     def test_create_item_from_parent_location(self, default_ms):
@@ -2072,24 +2072,24 @@ class TestMixedModuleStore(CommonMixedModuleStoreSetup):
         # publish
         self.store.publish(self.course.location, self.user_id)
         published_xblock = self.store.get_item(
-            self.vertical_x1a,
+            self.vertical_x1a,  # lint-amnesty, pylint: disable=no-member
             revision=ModuleStoreEnum.RevisionOption.published_only
         )
         self.assertIsNotNone(published_xblock)
 
         # unpublish
         with check_mongo_calls(max_find, max_send):
-            self.store.unpublish(self.vertical_x1a, self.user_id)
+            self.store.unpublish(self.vertical_x1a, self.user_id)  # lint-amnesty, pylint: disable=no-member
 
         with self.assertRaises(ItemNotFoundError):
             self.store.get_item(
-                self.vertical_x1a,
+                self.vertical_x1a,  # lint-amnesty, pylint: disable=no-member
                 revision=ModuleStoreEnum.RevisionOption.published_only
             )
 
         # make sure draft version still exists
         draft_xblock = self.store.get_item(
-            self.vertical_x1a,
+            self.vertical_x1a,  # lint-amnesty, pylint: disable=no-member
             revision=ModuleStoreEnum.RevisionOption.draft_only
         )
         self.assertIsNotNone(draft_xblock)
@@ -2106,7 +2106,7 @@ class TestMixedModuleStore(CommonMixedModuleStoreSetup):
         self._create_block_hierarchy()
 
         # start off as Private
-        item = self.store.create_child(self.user_id, self.writable_chapter_location, 'problem', 'test_compute_publish_state')
+        item = self.store.create_child(self.user_id, self.writable_chapter_location, 'problem', 'test_compute_publish_state')  # lint-amnesty, pylint: disable=line-too-long
         item_location = item.location
         with check_mongo_calls(max_find, max_send):
             self.assertFalse(self.store.has_published_version(item))
@@ -2405,7 +2405,7 @@ class TestMixedModuleStore(CommonMixedModuleStoreSetup):
         self.initdb(default_ms)
         self._create_block_hierarchy()
 
-        problem_location = self.problem_x1a_1.for_branch(None)
+        problem_location = self.problem_x1a_1.for_branch(None)  # lint-amnesty, pylint: disable=no-member
         problem_original_name = 'Problem_x1a_1'
 
         course_key = problem_location.course_key
@@ -2443,7 +2443,7 @@ class TestMixedModuleStore(CommonMixedModuleStoreSetup):
                 self.store.get_item(problem_location)
 
         # PUBLISH the problem
-        self.store.publish(self.vertical_x1a, self.user_id)
+        self.store.publish(self.vertical_x1a, self.user_id)  # lint-amnesty, pylint: disable=no-member
         self.store.publish(problem_location, self.user_id)
 
         # verify Published problem
@@ -3048,7 +3048,7 @@ class TestPublishOverExportImport(CommonMixedModuleStoreSetup):
         """
         Set up the database for testing
         """
-        super(TestPublishOverExportImport, self).setUp()
+        super(TestPublishOverExportImport, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
 
         self.user_id = ModuleStoreEnum.UserID.test
         self.export_dir = mkdtemp()
@@ -3657,7 +3657,7 @@ class TestAsidesWithMixedModuleStore(CommonMixedModuleStoreSetup):
         """
         Setup environment for testing
         """
-        super(TestAsidesWithMixedModuleStore, self).setUp()
+        super(TestAsidesWithMixedModuleStore, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         key_store = DictKeyValueStore()
         field_data = KvsFieldData(key_store)
         self.runtime = TestRuntime(services={'field-data': field_data})

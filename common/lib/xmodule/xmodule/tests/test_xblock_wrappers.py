@@ -102,7 +102,7 @@ class ModuleSystemFactory(Factory):
         model = ModuleSystem
 
     @classmethod
-    def _build(cls, target_class, *args, **kwargs):  # pylint: disable=unused-argument
+    def _build(cls, target_class, *args, **kwargs):  # lint-amnesty, pylint: disable=arguments-differ, unused-argument
         """See documentation from :meth:`factory.Factory._build`"""
         return get_test_system(*args, **kwargs)
 
@@ -118,7 +118,7 @@ class DescriptorSystemFactory(Factory):
         model = DescriptorSystem
 
     @classmethod
-    def _build(cls, target_class, *args, **kwargs):  # pylint: disable=unused-argument
+    def _build(cls, target_class, *args, **kwargs):  # lint-amnesty, pylint: disable=arguments-differ, unused-argument
         """See documentation from :meth:`factory.Factory._build`"""
         return get_test_descriptor_system(*args, **kwargs)
 
@@ -208,7 +208,7 @@ class LeafDescriptorFactory(Factory):
         return self.location
 
     @classmethod
-    def _build(cls, target_class, *args, **kwargs):  # pylint: disable=unused-argument
+    def _build(cls, target_class, *args, **kwargs):  # lint-amnesty, pylint: disable=arguments-differ, unused-argument
         runtime = kwargs.pop('runtime')
         desc_cls = kwargs.pop('descriptor_cls')
         block_type = kwargs.pop('block_type')
@@ -255,7 +255,7 @@ class ContainerModuleFactory(LeafModuleFactory):
     and are ready to act as XModules.
     """
     @lazy_attribute
-    def xmodule_runtime(self):
+    def xmodule_runtime(self):  # lint-amnesty, pylint: disable=arguments-differ
         return ContainerModuleRuntimeFactory(depth=self.depth)  # pylint: disable=no-member
 
 
@@ -273,7 +273,7 @@ class XBlockWrapperTestMixin(object):
         """
         Raise SkipTest if this descriptor_cls shouldn't be tested.
         """
-        pass
+        pass  # lint-amnesty, pylint: disable=unnecessary-pass
 
     def check_property(self, descriptor):
         """
@@ -356,7 +356,7 @@ class TestStudioView(XBlockWrapperTestMixin, TestCase):
             raise SkipTest(descriptor_cls.__name__ + " is not editable in studio")
 
         pure_xblock_class = issubclass(descriptor_cls, XBlock) and not issubclass(descriptor_cls, XModuleDescriptor)
-        if pure_xblock_class:
+        if pure_xblock_class:  # lint-amnesty, pylint: disable=no-else-raise
             raise SkipTest(descriptor_cls.__name__ + " is a pure XBlock and implements studio_view")
         elif descriptor_cls.studio_view != XModuleDescriptor.studio_view:
             raise SkipTest(descriptor_cls.__name__ + " implements studio_view")
@@ -377,7 +377,7 @@ class TestXModuleHandler(TestCase):
     """
 
     def setUp(self):
-        super(TestXModuleHandler, self).setUp()
+        super(TestXModuleHandler, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.module = XModule(descriptor=Mock(), field_data=Mock(), runtime=Mock(), scope_ids=Mock())
         self.module.handle_ajax = Mock(return_value='{}')
         self.request = webob.Request({})

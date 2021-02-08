@@ -25,7 +25,7 @@ class LTIModuleTest(LogicTest):
     descriptor_class = LTIDescriptor
 
     def setUp(self):
-        super(LTIModuleTest, self).setUp()
+        super(LTIModuleTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.environ = {'wsgi.url_scheme': 'http', 'REQUEST_METHOD': 'POST'}
         self.request_body_xml_template = textwrap.dedent(u"""
             <?xml version = "1.0" encoding = "UTF-8"?>
@@ -63,7 +63,7 @@ class LTIModuleTest(LogicTest):
             self.xmodule.runtime.hostname
         )
 
-        sourced_id = u':'.join(six.moves.urllib.parse.quote(i) for i in (self.lti_id, self.unquoted_resource_link_id, self.user_id))
+        sourced_id = u':'.join(six.moves.urllib.parse.quote(i) for i in (self.lti_id, self.unquoted_resource_link_id, self.user_id))  # lint-amnesty, pylint: disable=line-too-long
 
         self.defaults = {
             'namespace': "http://www.imsglobal.org/services/ltiv1p1/xsd/imsoms_v1p0",

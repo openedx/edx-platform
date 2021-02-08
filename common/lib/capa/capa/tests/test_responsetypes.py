@@ -53,9 +53,9 @@ class ResponseTest(unittest.TestCase):
     maxDiff = None
 
     def setUp(self):
-        super(ResponseTest, self).setUp()
+        super(ResponseTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         if self.xml_factory_class:
-            self.xml_factory = self.xml_factory_class()
+            self.xml_factory = self.xml_factory_class()  # lint-amnesty, pylint: disable=not-callable
 
     def build_problem(self, capa_system=None, **kwargs):
         xml = self.xml_factory.build_xml(**kwargs)
@@ -944,7 +944,7 @@ class CodeResponseTest(ResponseTest):  # pylint: disable=missing-class-docstring
     xml_factory_class = CodeResponseXMLFactory
 
     def setUp(self):
-        super(CodeResponseTest, self).setUp()
+        super(CodeResponseTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
 
         grader_payload = json.dumps({"grader": "ps04/grade_square.py"})
         self.problem = self.build_problem(initial_display="def square(x):",
@@ -1012,7 +1012,7 @@ class CodeResponseTest(ResponseTest):  # pylint: disable=missing-class-docstring
             self.assertEqual(self.problem.correct_map.get_dict(), old_cmap.get_dict())  # Deep comparison
 
             for answer_id in answer_ids:
-                self.assertTrue(self.problem.correct_map.is_queued(answer_id))  # Should be still queued, since message undelivered
+                self.assertTrue(self.problem.correct_map.is_queued(answer_id))  # Should be still queued, since message undelivered  # lint-amnesty, pylint: disable=line-too-long
 
         # Correct queuekey, state should be updated
         for correctness in ['correct', 'incorrect']:
@@ -1023,16 +1023,16 @@ class CodeResponseTest(ResponseTest):  # pylint: disable=missing-class-docstring
                 new_cmap = CorrectMap()
                 new_cmap.update(old_cmap)
                 npoints = 1 if correctness == 'correct' else 0
-                new_cmap.set(answer_id=answer_id, npoints=npoints, correctness=correctness, msg=grader_msg, queuestate=None)
+                new_cmap.set(answer_id=answer_id, npoints=npoints, correctness=correctness, msg=grader_msg, queuestate=None)  # lint-amnesty, pylint: disable=line-too-long
 
                 self.problem.update_score(xserver_msgs[correctness], queuekey=1000 + i)
                 self.assertEqual(self.problem.correct_map.get_dict(), new_cmap.get_dict())
 
                 for j, test_id in enumerate(answer_ids):
                     if j == i:
-                        self.assertFalse(self.problem.correct_map.is_queued(test_id))  # Should be dequeued, message delivered
+                        self.assertFalse(self.problem.correct_map.is_queued(test_id))  # Should be dequeued, message delivered  # lint-amnesty, pylint: disable=line-too-long
                     else:
-                        self.assertTrue(self.problem.correct_map.is_queued(test_id))  # Should be queued, message undelivered
+                        self.assertTrue(self.problem.correct_map.is_queued(test_id))  # Should be queued, message undelivered  # lint-amnesty, pylint: disable=line-too-long
 
     def test_recentmost_queuetime(self):
         '''
@@ -1586,7 +1586,7 @@ class NumericalResponseTest(ResponseTest):  # pylint: disable=missing-class-docs
         )
 
     @mock.patch('capa.responsetypes.log')
-    def test_responsetype_i18n(self, mock_log):
+    def test_responsetype_i18n(self, mock_log):  # lint-amnesty, pylint: disable=unused-argument
         """Test that LoncapaSystem has an i18n that works."""
         staff_ans = "clearly bad syntax )[+1e"
         problem = self.build_problem(answer=staff_ans, tolerance=1e-3)
@@ -1652,7 +1652,7 @@ class NumericalResponseTest(ResponseTest):  # pylint: disable=missing-class-docs
                 def evaluator_side_effect(_, __, math_string):
                     """Raise an error only for the student input."""
                     if math_string != '4':
-                        raise err
+                        raise err  # lint-amnesty, pylint: disable=cell-var-from-loop
                 mock_eval.side_effect = evaluator_side_effect
 
                 with self.assertRaisesRegex(StudentInputError, msg_regex):
@@ -2320,7 +2320,7 @@ class CustomResponseTest(ResponseTest):  # pylint: disable=missing-class-docstri
             num = my_helper.seventeen()
             """)
         capa_system = test_capa_system()
-        capa_system.get_python_lib_zip = lambda: zipstring.getvalue()
+        capa_system.get_python_lib_zip = lambda: zipstring.getvalue()  # lint-amnesty, pylint: disable=unnecessary-lambda
         problem = self.build_problem(script=script, capa_system=capa_system)
         self.assertEqual(problem.context['num'], 17)
 
@@ -2424,7 +2424,7 @@ class SchematicResponseTest(ResponseTest):
 
     def test_check_function_randomization(self):
         # The check function should get a random seed from the problem.
-        script = "correct = ['correct' if (submission[0]['num'] == {code}) else 'incorrect']".format(code=self._get_random_number_code())
+        script = "correct = ['correct' if (submission[0]['num'] == {code}) else 'incorrect']".format(code=self._get_random_number_code())  # lint-amnesty, pylint: disable=line-too-long
         problem = self.build_problem(answer=script)
 
         submission_dict = {'num': self._get_random_number_result(problem.seed)}
@@ -2445,7 +2445,7 @@ class SchematicResponseTest(ResponseTest):
             problem.grade_answers(input_dict)
 
 
-class AnnotationResponseTest(ResponseTest):
+class AnnotationResponseTest(ResponseTest):  # lint-amnesty, pylint: disable=missing-class-docstring
     xml_factory_class = AnnotationResponseXMLFactory
 
     def test_grade(self):

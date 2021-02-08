@@ -24,10 +24,10 @@ class UtilTest(unittest.TestCase):
     """Tests for util"""
 
     def setUp(self):
-        super(UtilTest, self).setUp()
+        super(UtilTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.system = test_capa_system()
 
-    def test_compare_with_tolerance(self):
+    def test_compare_with_tolerance(self):  # lint-amnesty, pylint: disable=too-many-statements
         # Test default tolerance '0.001%' (it is relative)
         result = compare_with_tolerance(100.0, 100.0)
         self.assertTrue(result)

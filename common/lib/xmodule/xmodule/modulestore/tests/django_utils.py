@@ -11,7 +11,7 @@ from contextlib import contextmanager
 from enum import Enum
 
 from django.conf import settings
-from django.contrib.auth.models import AnonymousUser, User
+from django.contrib.auth.models import AnonymousUser, User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.db import connections
 from django.test import TestCase
 from django.test.utils import override_settings
@@ -245,7 +245,7 @@ class SignalIsolationMixin(object):
                     "You tried to enable signal '{}', but I don't recognize that "
                     "signal name. Did you mean one of these?: {}"
                 )
-                raise ValueError(err_msg.format(signal_name, all_signal_names))
+                raise ValueError(err_msg.format(signal_name, all_signal_names))  # lint-amnesty, pylint: disable=raise-missing-from
             signal.enable()
 
 
@@ -398,7 +398,7 @@ class SharedModuleStoreTestCase(
     for Django ORM models that will get cleaned up properly.
     """
     # Tell Django to clean out all databases, not just default
-    databases = {alias for alias in connections}
+    databases = {alias for alias in connections}  # lint-amnesty, pylint: disable=unnecessary-comprehension
 
     @classmethod
     @contextmanager
@@ -441,7 +441,7 @@ class SharedModuleStoreTestCase(
         # OverrideFieldData.provider_classes is always reset to `None` so
         # that they're recalculated for every test
         OverrideFieldData.provider_classes = None
-        super(SharedModuleStoreTestCase, self).setUp()
+        super(SharedModuleStoreTestCase, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
 
 
 class ModuleStoreTestCase(
@@ -487,7 +487,7 @@ class ModuleStoreTestCase(
     CREATE_USER = True
 
     # Tell Django to clean out all databases, not just default
-    databases = {alias for alias in connections}
+    databases = {alias for alias in connections}  # lint-amnesty, pylint: disable=unnecessary-comprehension
 
     @classmethod
     def setUpClass(cls):
@@ -511,7 +511,7 @@ class ModuleStoreTestCase(
         # that they're recalculated for every test
         OverrideFieldData.provider_classes = None
 
-        super(ModuleStoreTestCase, self).setUp()
+        super(ModuleStoreTestCase, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
 
         self.store = modulestore()
 

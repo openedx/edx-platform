@@ -93,7 +93,7 @@ class OptionInputTest(unittest.TestCase):
     def test_option_parsing(self):
         f = inputtypes.OptionInput.parse_options
 
-        def check(input, options):
+        def check(input, options):  # lint-amnesty, pylint: disable=redefined-builtin
             """
             Take list of options, confirm that output is in the silly doubled format
             """
@@ -119,7 +119,7 @@ class ChoiceGroupTest(unittest.TestCase):
     Test choice groups, radio groups, and checkbox groups
     """
 
-    def check_group(self, tag, expected_input_type, expected_suffix):
+    def check_group(self, tag, expected_input_type, expected_suffix):  # lint-amnesty, pylint: disable=missing-function-docstring
         xml_str = """
   <{tag}>
     <choice correct="false" name="foil1"><text>This is foil One.</text></choice>
@@ -480,7 +480,7 @@ class MatlabTest(unittest.TestCase):
     Test Matlab input types
     """
     def setUp(self):
-        super(MatlabTest, self).setUp()
+        super(MatlabTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.rows = '10'
         self.cols = '80'
         self.tabsize = '4'
@@ -606,7 +606,7 @@ class MatlabTest(unittest.TestCase):
             self.assertEqual(context, expected)
 
     @patch('capa.inputtypes.time.time', return_value=10)
-    def test_rendering_while_queued(self, time):
+    def test_rendering_while_queued(self, time):  # lint-amnesty, pylint: disable=unused-argument
         state = {
             'value': 'print "good evening"',
             'status': 'incomplete',
@@ -660,7 +660,7 @@ class MatlabTest(unittest.TestCase):
         self.assertNotIn('queuestate', self.the_input.input_state)
 
     @patch('capa.inputtypes.time.time', return_value=10)
-    def test_ungraded_response_success(self, time):
+    def test_ungraded_response_success(self, time):  # lint-amnesty, pylint: disable=unused-argument
         queuekey = 'abcd'
         input_state = {'queuekey': queuekey, 'queuestate': 'queued', 'queuetime': 5}
         state = {'value': 'print "good evening"',
@@ -679,7 +679,7 @@ class MatlabTest(unittest.TestCase):
         self.assertEqual(input_state['queue_msg'], inner_msg)
 
     @patch('capa.inputtypes.time.time', return_value=10)
-    def test_ungraded_response_key_mismatch(self, time):
+    def test_ungraded_response_key_mismatch(self, time):  # lint-amnesty, pylint: disable=unused-argument
         queuekey = 'abcd'
         input_state = {'queuekey': queuekey, 'queuestate': 'queued', 'queuetime': 5}
         state = {'value': 'print "good evening"',
@@ -698,7 +698,7 @@ class MatlabTest(unittest.TestCase):
         self.assertNotIn('queue_msg', input_state)
 
     @patch('capa.inputtypes.time.time', return_value=20)
-    def test_matlab_response_timeout_not_exceeded(self, time):
+    def test_matlab_response_timeout_not_exceeded(self, time):  # lint-amnesty, pylint: disable=unused-argument
 
         state = {'input_state': {'queuestate': 'queued', 'queuetime': 5}}
         elt = etree.fromstring(self.xml)
@@ -707,7 +707,7 @@ class MatlabTest(unittest.TestCase):
         self.assertEqual(the_input.status, 'queued')
 
     @patch('capa.inputtypes.time.time', return_value=45)
-    def test_matlab_response_timeout_exceeded(self, time):
+    def test_matlab_response_timeout_exceeded(self, time):  # lint-amnesty, pylint: disable=unused-argument
 
         state = {'input_state': {'queuestate': 'queued', 'queuetime': 5}}
         elt = etree.fromstring(self.xml)
@@ -717,7 +717,7 @@ class MatlabTest(unittest.TestCase):
         self.assertEqual(the_input.msg, 'No response from Xqueue within {} seconds. Aborted.'.format(XQUEUE_TIMEOUT))
 
     @patch('capa.inputtypes.time.time', return_value=20)
-    def test_matlab_response_migration_of_queuetime(self, time):
+    def test_matlab_response_migration_of_queuetime(self, time):  # lint-amnesty, pylint: disable=unused-argument
         """
         Test if problem was saved before queuetime was introduced.
         """
@@ -737,7 +737,7 @@ class MatlabTest(unittest.TestCase):
         the_input = lookup_tag('matlabinput')(system, elt, {})
 
         data = {'submission': 'x = 1234;'}
-        response = the_input.handle_ajax("plot", data)
+        response = the_input.handle_ajax("plot", data)  # lint-amnesty, pylint: disable=unused-variable
 
         body = system.xqueue['interface'].send_to_queue.call_args[1]['body']
         payload = json.loads(body)
@@ -856,12 +856,12 @@ class MatlabTest(unittest.TestCase):
         the_input = self.input_class(test_capa_system(), elt, state)
         context = the_input._get_render_context()  # pylint: disable=protected-access
         self.maxDiff = None
-        expected = fromstring(u'\n<div class="matlabResponse"><div class="commandWindowOutput" style="white-space: pre;"> <strong>if</strong> Conditionally execute statements.\nThe general form of the <strong>if</strong> statement is\n\n   <strong>if</strong> expression\n     statements\n   ELSEIF expression\n     statements\n   ELSE\n     statements\n   END\n\nThe statements are executed if the real part of the expression \nhas all non-zero elements. The ELSE and ELSEIF parts are optional.\nZero or more ELSEIF parts can be used as well as nested <strong>if</strong>\'s.\nThe expression is usually of the form expr rop expr where \nrop is ==, &lt;, &gt;, &lt;=, &gt;=, or ~=.\n<img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAjAAAAGkCAIAAACgj==">\n\nExample\n   if I == J\n     A(I,J) = 2;\n   elseif abs(I-J) == 1\n     A(I,J) = -1;\n   else\n     A(I,J) = 0;\n   end\n\nSee also <a>relop</a>, <a>else</a>, <a>elseif</a>, <a>end</a>, <a>for</a>, <a>while</a>, <a>switch</a>.\n\nReference page in Help browser\n   <a>doc if</a>\n\n</div><ul></ul></div>\n')
+        expected = fromstring(u'\n<div class="matlabResponse"><div class="commandWindowOutput" style="white-space: pre;"> <strong>if</strong> Conditionally execute statements.\nThe general form of the <strong>if</strong> statement is\n\n   <strong>if</strong> expression\n     statements\n   ELSEIF expression\n     statements\n   ELSE\n     statements\n   END\n\nThe statements are executed if the real part of the expression \nhas all non-zero elements. The ELSE and ELSEIF parts are optional.\nZero or more ELSEIF parts can be used as well as nested <strong>if</strong>\'s.\nThe expression is usually of the form expr rop expr where \nrop is ==, &lt;, &gt;, &lt;=, &gt;=, or ~=.\n<img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAjAAAAGkCAIAAACgj==">\n\nExample\n   if I == J\n     A(I,J) = 2;\n   elseif abs(I-J) == 1\n     A(I,J) = -1;\n   else\n     A(I,J) = 0;\n   end\n\nSee also <a>relop</a>, <a>else</a>, <a>elseif</a>, <a>end</a>, <a>for</a>, <a>while</a>, <a>switch</a>.\n\nReference page in Help browser\n   <a>doc if</a>\n\n</div><ul></ul></div>\n')  # lint-amnesty, pylint: disable=line-too-long
         received = fromstring(context['queue_msg'])
         html_tree_equal(received, expected)
 
     def test_rendering_with_invalid_queue_msg(self):
-        self.the_input.queue_msg = (u"<div class='matlabResponse'><div style='white-space:pre' class='commandWindowOutput'>"
+        self.the_input.queue_msg = (u"<div class='matlabResponse'><div style='white-space:pre' class='commandWindowOutput'>"  # lint-amnesty, pylint: disable=line-too-long
                                     u"\nans =\n\n\u0002\n\n</div><ul></ul></div>")
         context = self.the_input._get_render_context()  # pylint: disable=protected-access
 
@@ -1003,7 +1003,7 @@ class ImageInputTest(unittest.TestCase):
     """
     Check that image inputs work
     """
-    def check(self, value, egx, egy):
+    def check(self, value, egx, egy):  # lint-amnesty, pylint: disable=missing-function-docstring
         height = '78'
         width = '427'
         src = 'http://www.edx.org/cowclicker.jpg'
@@ -1151,7 +1151,7 @@ class ChemicalEquationTest(unittest.TestCase):
     Check that chemical equation inputs work.
     """
     def setUp(self):
-        super(ChemicalEquationTest, self).setUp()
+        super(ChemicalEquationTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.size = "42"
         xml_str = """<chemicalequationinput id="prob_1_2" size="{size}"/>""".format(size=self.size)
 
@@ -1246,7 +1246,7 @@ class FormulaEquationTest(unittest.TestCase):
     Check that formula equation inputs work.
     """
     def setUp(self):
-        super(FormulaEquationTest, self).setUp()
+        super(FormulaEquationTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.size = "42"
         xml_str = """<formulaequationinput id="prob_1_2" size="{size}"/>""".format(size=self.size)
 
@@ -1427,12 +1427,12 @@ class DragAndDropTest(unittest.TestCase):
                         "base_image": "/dummy-static/images/about_1.png",
                         "draggables": [
                             {"can_reuse": "", "label": "Label 1", "id": "1", "icon": "", "target_fields": []},
-                            {"can_reuse": "", "label": "cc", "id": "name_with_icon", "icon": "/dummy-static/images/cc.jpg", "target_fields": []},
-                            {"can_reuse": "", "label": "arrow-left", "id": "with_icon", "icon": "/dummy-static/images/arrow-left.png", "target_fields": []},
+                            {"can_reuse": "", "label": "cc", "id": "name_with_icon", "icon": "/dummy-static/images/cc.jpg", "target_fields": []},  # lint-amnesty, pylint: disable=line-too-long
+                            {"can_reuse": "", "label": "arrow-left", "id": "with_icon", "icon": "/dummy-static/images/arrow-left.png", "target_fields": []},  # lint-amnesty, pylint: disable=line-too-long
                             {"can_reuse": "", "label": "Label2", "id": "5", "icon": "", "target_fields": []},
-                            {"can_reuse": "", "label": "Mute", "id": "2", "icon": "/dummy-static/images/mute.png", "target_fields": []},
-                            {"can_reuse": "", "label": "spinner", "id": "name_label_icon3", "icon": "/dummy-static/images/spinner.gif", "target_fields": []},
-                            {"can_reuse": "", "label": "Star", "id": "name4", "icon": "/dummy-static/images/volume.png", "target_fields": []},
+                            {"can_reuse": "", "label": "Mute", "id": "2", "icon": "/dummy-static/images/mute.png", "target_fields": []},  # lint-amnesty, pylint: disable=line-too-long
+                            {"can_reuse": "", "label": "spinner", "id": "name_label_icon3", "icon": "/dummy-static/images/spinner.gif", "target_fields": []},  # lint-amnesty, pylint: disable=line-too-long
+                            {"can_reuse": "", "label": "Star", "id": "name4", "icon": "/dummy-static/images/volume.png", "target_fields": []},  # lint-amnesty, pylint: disable=line-too-long
                             {"can_reuse": "", "label": "Label3", "id": "7", "icon": "", "target_fields": []}],
                         "one_per_target": "True",
                         "targets": [

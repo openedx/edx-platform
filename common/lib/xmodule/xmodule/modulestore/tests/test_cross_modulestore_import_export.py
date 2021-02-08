@@ -55,7 +55,7 @@ class CrossStoreXMLRoundtrip(CourseComparisonTest, PartitionTestCase):
     """
 
     def setUp(self):
-        super(CrossStoreXMLRoundtrip, self).setUp()
+        super(CrossStoreXMLRoundtrip, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.export_dir = mkdtemp()
         self.addCleanup(rmtree, self.export_dir, ignore_errors=True)
 
@@ -164,8 +164,8 @@ class CrossStoreXMLRoundtrip(CourseComparisonTest, PartitionTestCase):
                 with MongoContentstoreBuilder().build() as dest_content:
                     # Construct the modulestore for storing the second import (using the second contentstore)
                     with SPLIT_MODULESTORE_SETUP.build(contentstore=dest_content) as dest_store:
-                        source_course_key = source_store.make_course_key('a', 'source', '2015_Fall')
-                        dest_course_key = dest_store.make_course_key('a', 'dest', '2015_Fall')
+                        source_course_key = source_store.make_course_key('a', 'source', '2015_Fall')  # lint-amnesty, pylint: disable=no-member
+                        dest_course_key = dest_store.make_course_key('a', 'dest', '2015_Fall')  # lint-amnesty, pylint: disable=no-member
 
                         import_course_from_xml(
                             source_store,
@@ -186,7 +186,7 @@ class CrossStoreXMLRoundtrip(CourseComparisonTest, PartitionTestCase):
                             EXPORTED_COURSE_DIR_NAME,
                         )
 
-                        source_course = source_store.get_course(source_course_key, depth=None, lazy=False)
+                        source_course = source_store.get_course(source_course_key, depth=None, lazy=False)  # lint-amnesty, pylint: disable=no-member
 
                         self.assertEqual(source_course.url_name, 'course')
 
@@ -206,6 +206,6 @@ class CrossStoreXMLRoundtrip(CourseComparisonTest, PartitionTestCase):
                             create_if_not_present=True,
                         )
 
-                        dest_course = dest_store.get_course(dest_course_key, depth=None, lazy=False)
+                        dest_course = dest_store.get_course(dest_course_key, depth=None, lazy=False)  # lint-amnesty, pylint: disable=no-member
 
                         self.assertEqual(dest_course.url_name, 'course')

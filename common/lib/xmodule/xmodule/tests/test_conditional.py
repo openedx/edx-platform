@@ -1,4 +1,4 @@
-
+# lint-amnesty, pylint: disable=missing-module-docstring
 
 import json
 import unittest
@@ -26,14 +26,14 @@ ORG = 'test_org'
 COURSE = 'conditional'      # name of directory with course data
 
 
-class DummySystem(ImportSystem):
+class DummySystem(ImportSystem):  # lint-amnesty, pylint: disable=abstract-method, missing-class-docstring
 
     @patch('xmodule.modulestore.xml.OSFS', lambda directory: MemoryFS())
     def __init__(self, load_error_modules):
 
         xmlstore = XMLModuleStore("data_dir", source_dirs=[], load_error_modules=load_error_modules)
 
-        super(DummySystem, self).__init__(
+        super(DummySystem, self).__init__(  # lint-amnesty, pylint: disable=super-with-arguments
             xmlstore=xmlstore,
             course_id=CourseKey.from_string('/'.join([ORG, COURSE, 'test_run'])),
             course_dir='test_dir',
@@ -41,7 +41,7 @@ class DummySystem(ImportSystem):
             load_error_modules=load_error_modules,
         )
 
-    def render_template(self, template, context):
+    def render_template(self, template, context):  # lint-amnesty, pylint: disable=method-hidden
         raise Exception("Shouldn't be called")
 
 
@@ -89,8 +89,8 @@ class ConditionalFactory(object):
         # construct other descriptors:
         child_descriptor = Mock(name='child_descriptor')
         child_descriptor.visible_to_staff_only = False
-        child_descriptor._xmodule.student_view.return_value = Fragment(content=u'<p>This is a secret</p>')
-        child_descriptor.student_view = child_descriptor._xmodule.student_view
+        child_descriptor._xmodule.student_view.return_value = Fragment(content=u'<p>This is a secret</p>')  # lint-amnesty, pylint: disable=protected-access
+        child_descriptor.student_view = child_descriptor._xmodule.student_view  # lint-amnesty, pylint: disable=protected-access
         child_descriptor.displayable_items.return_value = [child_descriptor]
         child_descriptor.runtime = descriptor_system
         child_descriptor.xmodule_runtime = get_test_system()
@@ -149,7 +149,7 @@ class ConditionalBlockBasicTest(unittest.TestCase):
     """
 
     def setUp(self):
-        super(ConditionalBlockBasicTest, self).setUp()
+        super(ConditionalBlockBasicTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.test_system = get_test_system()
 
     def test_icon_class(self):
@@ -158,7 +158,7 @@ class ConditionalBlockBasicTest(unittest.TestCase):
         for attempted in ["false", "true"]:
             for icon_class in ['other', 'problem', 'video']:
                 modules['source_module'].is_attempted = attempted
-                modules['child_module'].get_icon_class = lambda: icon_class
+                modules['child_module'].get_icon_class = lambda: icon_class  # lint-amnesty, pylint: disable=cell-var-from-loop
                 self.assertEqual(modules['cond_module'].get_icon_class(), icon_class)
 
     def test_get_html(self):
@@ -226,7 +226,7 @@ class ConditionalBlockXmlTest(unittest.TestCase):
         return DummySystem(load_error_modules)
 
     def setUp(self):
-        super(ConditionalBlockXmlTest, self).setUp()
+        super(ConditionalBlockXmlTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.test_system = get_test_system()
 
     def get_course(self, name):
@@ -235,7 +235,7 @@ class ConditionalBlockXmlTest(unittest.TestCase):
 
         modulestore = XMLModuleStore(DATA_DIR, source_dirs=[name])
         courses = modulestore.get_courses()
-        self.modulestore = modulestore
+        self.modulestore = modulestore  # lint-amnesty, pylint: disable=attribute-defined-outside-init
         self.assertEqual(len(courses), 1)
         return courses[0]
 
@@ -263,7 +263,7 @@ class ConditionalBlockXmlTest(unittest.TestCase):
         location = BlockUsageLocator(CourseLocator("HarvardX", "ER22x", "2013_Spring", deprecated=True),
                                      "conditional", "condone", deprecated=True)
 
-        def replace_urls(text, staticfiles_prefix=None, replace_prefix='/static/', course_namespace=None):
+        def replace_urls(text, staticfiles_prefix=None, replace_prefix='/static/', course_namespace=None):  # lint-amnesty, pylint: disable=unused-argument
             return text
         self.test_system.replace_urls = replace_urls
         self.test_system.get_module = inner_get_module
@@ -330,7 +330,7 @@ class ConditionalBlockXmlTest(unittest.TestCase):
             dummy_scope_ids,
         )
 
-        new_run = conditional.location.course_key.run
+        new_run = conditional.location.course_key.run  # lint-amnesty, pylint: disable=unused-variable
         self.assertEqual(
             conditional.sources_list[0],
             BlockUsageLocator.from_string(
@@ -345,7 +345,7 @@ class ConditionalBlockXmlTest(unittest.TestCase):
         dummy_scope_ids = ScopeIds(None, None, dummy_location, dummy_location)
         dummy_field_data = DictFieldData({
             'data': '<conditional/>',
-            'xml_attributes': {'sources': 'i4x://HarvardX/ER22x/poll_question/T15_poll;i4x://HarvardX/ER22x/poll_question/T16_poll'},
+            'xml_attributes': {'sources': 'i4x://HarvardX/ER22x/poll_question/T15_poll;i4x://HarvardX/ER22x/poll_question/T16_poll'},  # lint-amnesty, pylint: disable=line-too-long
             'children': None,
         })
         conditional = ConditionalBlock(

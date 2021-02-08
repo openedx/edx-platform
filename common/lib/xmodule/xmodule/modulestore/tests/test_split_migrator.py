@@ -24,10 +24,10 @@ class TestMigration(SplitWMongoCourseBootstrapper):
     """
 
     def setUp(self):
-        super(TestMigration, self).setUp()
+        super(TestMigration, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.migrator = SplitMigrator(self.split_mongo, self.draft_mongo)
 
-    def _create_course(self):
+    def _create_course(self):  # lint-amnesty, pylint: disable=arguments-differ
         """
         A course testing all of the conversion mechanisms:
         * some inheritable settings
@@ -35,7 +35,7 @@ class TestMigration(SplitWMongoCourseBootstrapper):
         only the live ones get to published. Some are only draft, some are both, some are only live.
         * about, static_tab, and conditional documents
         """
-        super(TestMigration, self)._create_course(split=False)
+        super(TestMigration, self)._create_course(split=False)  # lint-amnesty, pylint: disable=super-with-arguments
 
         # chapters
         chapter1_name = uuid.uuid4().hex
@@ -54,7 +54,7 @@ class TestMigration(SplitWMongoCourseBootstrapper):
         # vertical in both live and draft
         both_vert_loc = self.old_course_key.make_usage_key('vertical', uuid.uuid4().hex)
         self._create_item(
-            both_vert_loc.block_type, both_vert_loc.block_id, {}, {'display_name': 'Both vertical'}, 'chapter', chapter1_name,
+            both_vert_loc.block_type, both_vert_loc.block_id, {}, {'display_name': 'Both vertical'}, 'chapter', chapter1_name,  # lint-amnesty, pylint: disable=line-too-long
             draft=False, split=False
         )
         self.create_random_units(False, both_vert_loc)
@@ -65,13 +65,13 @@ class TestMigration(SplitWMongoCourseBootstrapper):
         # vertical in draft only (x2)
         draft_vert_loc = self.old_course_key.make_usage_key('vertical', uuid.uuid4().hex)
         self._create_item(
-            draft_vert_loc.block_type, draft_vert_loc.block_id, {}, {'display_name': 'Draft vertical'}, 'chapter', chapter1_name,
+            draft_vert_loc.block_type, draft_vert_loc.block_id, {}, {'display_name': 'Draft vertical'}, 'chapter', chapter1_name,  # lint-amnesty, pylint: disable=line-too-long
             draft=True, split=False
         )
         self.create_random_units(True, draft_vert_loc)
         draft_vert_loc = self.old_course_key.make_usage_key('vertical', uuid.uuid4().hex)
         self._create_item(
-            draft_vert_loc.block_type, draft_vert_loc.block_id, {}, {'display_name': 'Draft vertical2'}, 'chapter', chapter1_name,
+            draft_vert_loc.block_type, draft_vert_loc.block_id, {}, {'display_name': 'Draft vertical2'}, 'chapter', chapter1_name,  # lint-amnesty, pylint: disable=line-too-long
             draft=True, split=False
         )
         self.create_random_units(True, draft_vert_loc)
@@ -79,7 +79,7 @@ class TestMigration(SplitWMongoCourseBootstrapper):
         # and finally one in live only (so published has to skip 2 preceding sibs)
         live_vert_loc = self.old_course_key.make_usage_key('vertical', uuid.uuid4().hex)
         self._create_item(
-            live_vert_loc.block_type, live_vert_loc.block_id, {}, {'display_name': 'Live vertical end'}, 'chapter', chapter1_name,
+            live_vert_loc.block_type, live_vert_loc.block_id, {}, {'display_name': 'Live vertical end'}, 'chapter', chapter1_name,  # lint-amnesty, pylint: disable=line-too-long
             draft=False, split=False
         )
         self.create_random_units(False, live_vert_loc)
@@ -151,7 +151,7 @@ class TestMigration(SplitWMongoCourseBootstrapper):
                 draft=draft, split=False
             )
 
-    def compare_courses(self, presplit, new_course_key, published):
+    def compare_courses(self, presplit, new_course_key, published):  # lint-amnesty, pylint: disable=missing-function-docstring
         # descend via children to do comparison
         old_root = presplit.get_course(self.old_course_key)
         new_root = self.split_mongo.get_course(new_course_key)
@@ -163,7 +163,7 @@ class TestMigration(SplitWMongoCourseBootstrapper):
                 locator = new_course_key.make_usage_key(category, conditional.location.block_id)
                 self.compare_dags(presplit, conditional, self.split_mongo.get_item(locator), published)
 
-    def compare_dags(self, presplit, presplit_dag_root, split_dag_root, published):
+    def compare_dags(self, presplit, presplit_dag_root, split_dag_root, published):  # lint-amnesty, pylint: disable=missing-function-docstring
         if split_dag_root.category != 'course':
             self.assertEqual(presplit_dag_root.location.block_id, split_dag_root.location.block_id)
         # compare all fields but references

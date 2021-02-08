@@ -21,7 +21,7 @@ class TabsEditingDescriptorTestCase(unittest.TestCase):
     """ Testing TabsEditingDescriptor"""
 
     def setUp(self):
-        super(TabsEditingDescriptorTestCase, self).setUp()
+        super(TabsEditingDescriptorTestCase, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         system = get_test_descriptor_system()
         system.render_template = Mock(return_value="<div>Test Template HTML</div>")
         self.tabs = [

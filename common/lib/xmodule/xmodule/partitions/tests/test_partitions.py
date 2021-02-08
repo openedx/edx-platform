@@ -8,7 +8,7 @@ from datetime import datetime
 
 import six
 from django.test import TestCase
-from mock import Mock, patch
+from mock import Mock, patch  # lint-amnesty, pylint: disable=unused-import
 from opaque_keys.edx.locator import CourseLocator
 from stevedore.extension import Extension, ExtensionManager
 
@@ -100,7 +100,7 @@ class MockUserPartitionScheme(object):
     Mock user partition scheme
     """
     def __init__(self, name="mock", current_group=None, **kwargs):
-        super(MockUserPartitionScheme, self).__init__(**kwargs)
+        super(MockUserPartitionScheme, self).__init__(**kwargs)  # lint-amnesty, pylint: disable=super-with-arguments
         self.name = name
         self.current_group = current_group
 
@@ -116,7 +116,7 @@ class MockUserPartitionScheme(object):
         return groups[0]
 
 
-class MockEnrollmentTrackUserPartitionScheme(MockUserPartitionScheme):
+class MockEnrollmentTrackUserPartitionScheme(MockUserPartitionScheme):  # lint-amnesty, pylint: disable=missing-class-docstring
 
     def create_user_partition(self, id, name, description, groups=None, parameters=None, active=True):  # pylint: disable=redefined-builtin, invalid-name
         """
@@ -136,7 +136,7 @@ class PartitionTestCase(TestCase):
     ENROLLMENT_TRACK_SCHEME_NAME = "enrollment_track"
 
     def setUp(self):
-        super(PartitionTestCase, self).setUp()
+        super(PartitionTestCase, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         # Set up two user partition schemes: mock and random
         self.non_random_scheme = MockUserPartitionScheme(self.TEST_SCHEME_NAME)
         self.random_scheme = MockUserPartitionScheme("random")
@@ -424,7 +424,7 @@ class MockPartitionService(PartitionService):
     Mock PartitionService for testing.
     """
     def __init__(self, course, **kwargs):
-        super(MockPartitionService, self).__init__(**kwargs)
+        super(MockPartitionService, self).__init__(**kwargs)  # lint-amnesty, pylint: disable=super-with-arguments
         self._course = course
 
     def get_course(self):
@@ -437,7 +437,7 @@ class PartitionServiceBaseClass(PartitionTestCase):
     """
 
     def setUp(self):
-        super(PartitionServiceBaseClass, self).setUp()
+        super(PartitionServiceBaseClass, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
 
         ContentTypeGatingConfig.objects.create(
             enabled=True,
@@ -560,7 +560,7 @@ class TestGetCourseUserPartitions(PartitionServiceBaseClass):
     """
 
     def setUp(self):
-        super(TestGetCourseUserPartitions, self).setUp()
+        super(TestGetCourseUserPartitions, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         TestGetCourseUserPartitions._enable_enrollment_track_partition(True)
 
     @staticmethod

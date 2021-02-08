@@ -435,7 +435,7 @@ class LoncapaProblem(object):
         # if answers include File objects, convert them to filenames.
         self.student_answers = convert_files_to_filenames(answers)
         new_cmap = self.get_grade_from_current_answers(answers)
-        self.correct_map = new_cmap
+        self.correct_map = new_cmap  # lint-amnesty, pylint: disable=attribute-defined-outside-init
         return self.correct_map
 
     def supports_rescoring(self):
@@ -506,7 +506,7 @@ class LoncapaProblem(object):
         """
         # dict of (id, correct_answer)
         answer_map = dict()
-        for response in self.responders.keys():
+        for response in self.responders.keys():  # lint-amnesty, pylint: disable=consider-iterating-dictionary
             results = self.responder_answers[response]
             answer_map.update(results)
 
@@ -526,7 +526,7 @@ class LoncapaProblem(object):
         get_question_answers may only return a subset of these.
         """
         answer_ids = []
-        for response in self.responders.keys():
+        for response in self.responders.keys():  # lint-amnesty, pylint: disable=consider-iterating-dictionary
             results = self.responder_answers[response]
             answer_ids.append(list(results.keys()))
         return answer_ids
@@ -809,7 +809,7 @@ class LoncapaProblem(object):
                 try:
                     # open using LoncapaSystem OSFS filestore
                     ifp = self.capa_system.filestore.open(filename)
-                except Exception as err:
+                except Exception as err:  # lint-amnesty, pylint: disable=broad-except
                     log.warning(
                         'Error %s in problem xml include: %s',
                         err,
@@ -820,14 +820,14 @@ class LoncapaProblem(object):
                     )
                     # if debugging, don't fail - just log error
                     # TODO (vshnayder): need real error handling, display to users
-                    if not self.capa_system.DEBUG:
+                    if not self.capa_system.DEBUG:  # lint-amnesty, pylint: disable=no-else-raise
                         raise
                     else:
                         continue
                 try:
                     # read in and convert to XML
                     incxml = etree.XML(ifp.read())
-                except Exception as err:
+                except Exception as err:  # lint-amnesty, pylint: disable=broad-except
                     log.warning(
                         'Error %s in problem xml include: %s',
                         err,
@@ -836,7 +836,7 @@ class LoncapaProblem(object):
                     log.warning('Cannot parse XML in %s', (filename))
                     # if debugging, don't fail - just log error
                     # TODO (vshnayder): same as above
-                    if not self.capa_system.DEBUG:
+                    if not self.capa_system.DEBUG:  # lint-amnesty, pylint: disable=no-else-raise
                         raise
                     else:
                         continue
@@ -864,7 +864,7 @@ class LoncapaProblem(object):
         # find additional comma-separated modules search path
         path = []
 
-        for dir in raw_path:
+        for dir in raw_path:  # lint-amnesty, pylint: disable=redefined-builtin
             if not dir:
                 continue
 
@@ -937,7 +937,7 @@ class LoncapaProblem(object):
                     unsafely=self.capa_system.can_execute_unsafe_code(),
                 )
             except Exception as err:
-                log.exception("Error while execing script code: " + all_code)
+                log.exception("Error while execing script code: " + all_code)  # lint-amnesty, pylint: disable=logging-not-lazy
                 msg = Text("Error while executing script code: %s" % str(err))
                 raise responsetypes.LoncapaProblemError(msg)
 
@@ -1111,7 +1111,7 @@ class LoncapaProblem(object):
             # get responder answers (do this only once, since there may be a performance cost,
             # eg with externalresponse)
             self.responder_answers = {}
-            for response in self.responders.keys():
+            for response in self.responders.keys():  # lint-amnesty, pylint: disable=consider-iterating-dictionary
                 try:
                     self.responder_answers[response] = self.responders[response].get_answers()
                 except:

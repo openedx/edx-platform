@@ -38,7 +38,7 @@ class CourseFieldsTestCase(unittest.TestCase):
         )
 
 
-class DummySystem(ImportSystem):
+class DummySystem(ImportSystem):  # lint-amnesty, pylint: disable=abstract-method, missing-class-docstring
     @patch('xmodule.modulestore.xml.OSFS', lambda dir: MemoryFS())
     def __init__(self, load_error_modules, course_id=None):
 
@@ -49,7 +49,7 @@ class DummySystem(ImportSystem):
         course_dir = "test_dir"
         error_tracker = Mock()
 
-        super(DummySystem, self).__init__(
+        super(DummySystem, self).__init__(  # lint-amnesty, pylint: disable=super-with-arguments
             xmlstore=xmlstore,
             course_id=course_id,
             course_dir=course_dir,
@@ -103,11 +103,11 @@ class HasEndedMayCertifyTestCase(unittest.TestCase):
     """Double check the semantics around when to finalize courses."""
 
     def setUp(self):
-        super(HasEndedMayCertifyTestCase, self).setUp()
+        super(HasEndedMayCertifyTestCase, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
 
-        system = DummySystem(load_error_modules=True)
+        system = DummySystem(load_error_modules=True)  # lint-amnesty, pylint: disable=unused-variable
         #sample_xml = """
-        # <course org="{org}" course="{course}" display_organization="{org}_display" display_coursenumber="{course}_display"
+        # <course org="{org}" course="{course}" display_organization="{org}_display" display_coursenumber="{course}_display"  # lint-amnesty, pylint: disable=line-too-long
         #        graceperiod="1 day" url_name="test"
         #        start="2012-01-01T12:00"
         #        {end}
@@ -164,7 +164,7 @@ class IsNewCourseTestCase(unittest.TestCase):
     """Make sure the property is_new works on courses"""
 
     def setUp(self):
-        super(IsNewCourseTestCase, self).setUp()
+        super(IsNewCourseTestCase, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
 
         # Needed for test_is_newish
         datetime_patcher = patch.object(
@@ -277,7 +277,7 @@ class TeamsConfigurationTestCase(unittest.TestCase):
     """
 
     def setUp(self):
-        super(TeamsConfigurationTestCase, self).setUp()
+        super(TeamsConfigurationTestCase, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.course = get_dummy_course('2012-12-02T12:00')
         self.course.teams_configuration = TeamsConfig(None)
         self.count = itertools.count()
@@ -369,7 +369,7 @@ class SelfPacedTestCase(unittest.TestCase):
     """Tests for self-paced courses."""
 
     def setUp(self):
-        super(SelfPacedTestCase, self).setUp()
+        super(SelfPacedTestCase, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.course = get_dummy_course('2012-12-02T12:00')
 
     def test_default(self):
@@ -390,7 +390,7 @@ class CourseDescriptorTestCase(unittest.TestCase):
         """
         Initialize dummy testing course.
         """
-        super(CourseDescriptorTestCase, self).setUp()
+        super(CourseDescriptorTestCase, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.course = get_dummy_course(start=_TODAY, end=_NEXT_WEEK)
 
     def test_clean_id(self):
@@ -439,7 +439,7 @@ class ProctoringProviderTestCase(unittest.TestCase):
         """
         Initialize dummy testing course.
         """
-        super(ProctoringProviderTestCase, self).setUp()
+        super(ProctoringProviderTestCase, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.proctoring_provider = xmodule.course_module.ProctoringProvider()
 
     def test_from_json_with_platform_default(self):

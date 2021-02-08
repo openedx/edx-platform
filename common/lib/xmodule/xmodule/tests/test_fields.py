@@ -10,7 +10,7 @@ from xmodule.fields import Date, RelativeTime, Timedelta
 from xmodule.timeinfo import TimeInfo
 
 
-class DateTest(unittest.TestCase):
+class DateTest(unittest.TestCase):  # lint-amnesty, pylint: disable=missing-class-docstring
     date = Date()
 
     def compare_dates(self, dt1, dt2, expected_delta):
@@ -122,7 +122,7 @@ class DateTest(unittest.TestCase):
             DateTest.date.to_json('2012-12-31T23:00:01-01:00')
 
 
-class TimedeltaTest(unittest.TestCase):
+class TimedeltaTest(unittest.TestCase):  # lint-amnesty, pylint: disable=missing-class-docstring
     delta = Timedelta()
 
     def test_from_json(self):
@@ -156,7 +156,7 @@ class TimedeltaTest(unittest.TestCase):
         )
 
 
-class TimeInfoTest(unittest.TestCase):
+class TimeInfoTest(unittest.TestCase):  # lint-amnesty, pylint: disable=missing-class-docstring
 
     def test_time_info(self):
         due_date = datetime.datetime(2000, 4, 14, 10, tzinfo=UTC)
@@ -168,7 +168,7 @@ class TimeInfoTest(unittest.TestCase):
         )
 
 
-class RelativeTimeTest(unittest.TestCase):
+class RelativeTimeTest(unittest.TestCase):  # lint-amnesty, pylint: disable=missing-class-docstring
 
     delta = RelativeTime()
 

@@ -29,7 +29,7 @@ new_contract('AssetKey', AssetKey)
 new_contract('AssetMetadata', AssetMetadata)
 new_contract('LibraryLocator', LibraryLocator)
 if six.PY2:
-    new_contract('long', long)
+    new_contract('long', long)  # lint-amnesty, pylint: disable=undefined-variable
 else:
     new_contract('long', int)
 
@@ -154,7 +154,7 @@ class MixedModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase):
         Initialize a MixedModuleStore. Here we look into our passed in kwargs which should be a
         collection of other modulestore configuration information
         """
-        super(MixedModuleStore, self).__init__(contentstore, **kwargs)
+        super(MixedModuleStore, self).__init__(contentstore, **kwargs)  # lint-amnesty, pylint: disable=super-with-arguments
 
         if create_modulestore_instance is None:
             raise ValueError('MixedModuleStore constructor must be passed a create_modulestore_instance function')
@@ -253,7 +253,7 @@ class MixedModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase):
         return store.has_item(usage_key, **kwargs)
 
     @strip_key
-    def get_item(self, usage_key, depth=0, **kwargs):
+    def get_item(self, usage_key, depth=0, **kwargs):  # lint-amnesty, pylint: disable=arguments-differ
         """
         see parent doc
         """
@@ -261,7 +261,7 @@ class MixedModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase):
         return store.get_item(usage_key, depth, **kwargs)
 
     @strip_key
-    def get_items(self, course_key, **kwargs):
+    def get_items(self, course_key, **kwargs):  # lint-amnesty, pylint: disable=arguments-differ
         """
         Returns:
             list of XModuleDescriptor instances for the matching items within the course with
@@ -404,7 +404,7 @@ class MixedModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase):
         return store.make_course_usage_key(course_key)
 
     @strip_key
-    def get_course(self, course_key, depth=0, **kwargs):
+    def get_course(self, course_key, depth=0, **kwargs):  # lint-amnesty, pylint: disable=arguments-differ
         """
         returns the course module associated with the course_id. If no such course exists,
         it returns None
@@ -452,7 +452,7 @@ class MixedModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase):
         store = self._get_modulestore_for_courselike(course_id)
         return store.has_course(course_id, ignore_case, **kwargs)
 
-    def delete_course(self, course_key, user_id):
+    def delete_course(self, course_key, user_id):  # lint-amnesty, pylint: disable=arguments-differ
         """
         See xmodule.modulestore.__init__.ModuleStoreWrite.delete_course
         """
@@ -593,7 +593,7 @@ class MixedModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase):
         return store.set_asset_metadata_attrs(asset_key, {attr: value}, user_id)
 
     @contract(asset_key='AssetKey', attr_dict=dict, user_id='int|long')
-    def set_asset_metadata_attrs(self, asset_key, attr_dict, user_id):
+    def set_asset_metadata_attrs(self, asset_key, attr_dict, user_id):  # lint-amnesty, pylint: disable=arguments-differ
         """
         Add/set the given dict of attrs on the asset at the given location. Value can be any type which pymongo accepts.
 
@@ -610,7 +610,7 @@ class MixedModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase):
         return store.set_asset_metadata_attrs(asset_key, attr_dict, user_id)
 
     @strip_key
-    def get_parent_location(self, location, **kwargs):
+    def get_parent_location(self, location, **kwargs):  # lint-amnesty, pylint: disable=arguments-differ
         """
         returns the parent locations for a given location
         """
@@ -660,7 +660,7 @@ class MixedModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase):
         return errs
 
     @strip_key
-    def create_course(self, org, course, run, user_id, **kwargs):
+    def create_course(self, org, course, run, user_id, **kwargs):  # lint-amnesty, pylint: disable=arguments-differ
         """
         Creates and returns the course.
 
@@ -745,7 +745,7 @@ class MixedModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase):
                                                 dest_course_id.course, dest_course_id.run, fields, **kwargs)
 
             # the super handles assets and any other necessities
-            super(MixedModuleStore, self).clone_course(source_course_id, dest_course_id, user_id, fields, **kwargs)
+            super(MixedModuleStore, self).clone_course(source_course_id, dest_course_id, user_id, fields, **kwargs)  # lint-amnesty, pylint: disable=super-with-arguments
         else:
             raise NotImplementedError("No code for cloning from {} to {}".format(
                 source_modulestore, dest_modulestore
@@ -791,7 +791,7 @@ class MixedModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase):
                 in the newly created block
         """
         modulestore = self._verify_modulestore_support(parent_usage_key.course_key, 'create_child')
-        return modulestore.create_child(user_id, parent_usage_key, block_type, block_id=block_id, fields=fields, **kwargs)
+        return modulestore.create_child(user_id, parent_usage_key, block_type, block_id=block_id, fields=fields, **kwargs)  # lint-amnesty, pylint: disable=line-too-long
 
     @strip_key
     @prepare_asides
@@ -805,7 +805,7 @@ class MixedModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase):
         return store.import_xblock(user_id, course_key, block_type, block_id, fields, runtime, **kwargs)
 
     @strip_key
-    def copy_from_template(self, source_keys, dest_key, user_id, **kwargs):
+    def copy_from_template(self, source_keys, dest_key, user_id, **kwargs):  # lint-amnesty, pylint: disable=unused-argument
         """
         See :py:meth `SplitMongoModuleStore.copy_from_template`
         """
@@ -814,7 +814,7 @@ class MixedModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase):
 
     @strip_key
     @prepare_asides
-    def update_item(self, xblock, user_id, allow_not_found=False, **kwargs):
+    def update_item(self, xblock, user_id, allow_not_found=False, **kwargs):  # lint-amnesty, pylint: disable=arguments-differ
         """
         Update the xblock persisted to be the same as the given for all types of fields
         (content, children, and metadata) attribute the change to the given user.
@@ -823,7 +823,7 @@ class MixedModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase):
         return store.update_item(xblock, user_id, allow_not_found, **kwargs)
 
     @strip_key
-    def delete_item(self, location, user_id, **kwargs):
+    def delete_item(self, location, user_id, **kwargs):  # lint-amnesty, pylint: disable=arguments-differ
         """
         Delete the given item from persistence. kwargs allow modulestore specific parameters.
         """

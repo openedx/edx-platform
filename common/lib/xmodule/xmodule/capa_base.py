@@ -112,7 +112,7 @@ class ComplexEncoder(json.JSONEncoder):
     """
     Extend the JSON encoder to correctly handle complex numbers
     """
-    def default(self, obj):  # pylint: disable=method-hidden
+    def default(self, obj):  # lint-amnesty, pylint: disable=arguments-differ, method-hidden
         """
         Print a nicely formatted complex number, or default to the JSON encoder
         """
@@ -294,7 +294,7 @@ class CapaMixin(ScorableXBlockMixin, CapaFields):
         return self.seed
 
     @cached_property
-    def lcp(self):
+    def lcp(self):  # lint-amnesty, pylint: disable=method-hidden, missing-function-docstring
         try:
             lcp = self.new_lcp(self.get_state_for_lcp())
         except Exception as err:  # pylint: disable=broad-except
@@ -446,7 +446,7 @@ class CapaMixin(ScorableXBlockMixin, CapaFields):
             'graded': self.graded,
         })
 
-    def handle_fatal_lcp_error(self, error):
+    def handle_fatal_lcp_error(self, error):  # lint-amnesty, pylint: disable=missing-function-docstring
         log.exception(u"LcpFatalError Encountered for {block}".format(block=str(self.location)))
         if error:
             return(
@@ -876,7 +876,7 @@ class CapaMixin(ScorableXBlockMixin, CapaFields):
                 'correcthint', 'regexphint', 'additional_answer', 'stringequalhint', 'compoundhint',
                 'stringequalhint']
         for tag in tags:
-            html = re.sub(r'<%s.*?>.*?</%s>' % (tag, tag), '', html, flags=re.DOTALL)  # xss-lint: disable=python-interpolate-html
+            html = re.sub(r'<%s.*?>.*?</%s>' % (tag, tag), '', html, flags=re.DOTALL)  # xss-lint: disable=python-interpolate-html  # lint-amnesty, pylint: disable=line-too-long
             # Some of these tags span multiple lines
         # Note: could probably speed this up by calling sub() once with a big regex
         # vs. simply calling sub() many times as we have here.
@@ -1066,7 +1066,7 @@ class CapaMixin(ScorableXBlockMixin, CapaFields):
         event_info = dict()
         event_info['problem_id'] = text_type(self.location)
         self.track_function_unmask('showanswer', event_info)
-        if not self.answer_available():
+        if not self.answer_available():  # lint-amnesty, pylint: disable=no-else-raise
             raise NotFoundError('Answer is not available')
         else:
             answers = self.lcp.get_question_answers()
@@ -1155,7 +1155,7 @@ class CapaMixin(ScorableXBlockMixin, CapaFields):
             # If key has no underscores, then partition
             # will return (key, '', '')
             # We detect this and raise an error
-            if not name:
+            if not name:  # lint-amnesty, pylint: disable=no-else-raise
                 raise ValueError(u"{key} must contain at least one underscore".format(key=key))
 
             else:
@@ -1176,7 +1176,7 @@ class CapaMixin(ScorableXBlockMixin, CapaFields):
                         val = json.loads(data[key])
                     # If the submission wasn't deserializable, raise an error.
                     except(KeyError, ValueError):
-                        raise ValueError(
+                        raise ValueError(  # lint-amnesty, pylint: disable=raise-missing-from
                             u"Invalid submission: {val} for {key}".format(val=data[key], key=key)
                         )
                 else:
@@ -1184,7 +1184,7 @@ class CapaMixin(ScorableXBlockMixin, CapaFields):
 
                 # If the name already exists, then we don't want
                 # to override it.  Raise an error instead
-                if name in answers:
+                if name in answers:  # lint-amnesty, pylint: disable=no-else-raise
                     raise ValueError(u"Key {name} already exists in answers dict".format(name=name))
                 else:
                     answers[name] = val
@@ -1227,7 +1227,7 @@ class CapaMixin(ScorableXBlockMixin, CapaFields):
         answers_without_files = convert_files_to_filenames(answers)
         event_info['answers'] = answers_without_files
 
-        metric_name = u'capa.check_problem.{}'.format
+        metric_name = u'capa.check_problem.{}'.format  # lint-amnesty, pylint: disable=unused-variable
         # Can override current time
         current_time = datetime.datetime.now(utc)
         if override_time is not False:
@@ -1682,7 +1682,7 @@ class CapaMixin(ScorableXBlockMixin, CapaFields):
         try:
             self.update_correctness()
             calculated_score = self.calculate_score()
-        except (StudentInputError, ResponseError, LoncapaProblemError) as inst:
+        except (StudentInputError, ResponseError, LoncapaProblemError) as inst:  # lint-amnesty, pylint: disable=unused-variable
             log.warning("Input error in capa_module:problem_rescore", exc_info=True)
             event_info['failure'] = 'input_error'
             self.track_function_unmask('problem_rescore_fail', event_info)

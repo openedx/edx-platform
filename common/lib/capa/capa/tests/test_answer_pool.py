@@ -14,7 +14,7 @@ from capa.tests.helpers import new_loncapa_problem, test_capa_system
 class CapaAnswerPoolTest(unittest.TestCase):
     """Capa Answer Pool Test"""
     def setUp(self):
-        super(CapaAnswerPoolTest, self).setUp()
+        super(CapaAnswerPoolTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.system = test_capa_system()
 
     # XML problem setup used by a few tests.
@@ -115,7 +115,7 @@ class CapaAnswerPoolTest(unittest.TestCase):
 
         problem = new_loncapa_problem(xml_str)
         the_html = problem.get_html()
-        self.assertRegex(the_html, r"<div>.*\[.*'wrong-1'.*'wrong-2'.*'correct-1'.*'wrong-3'.*'wrong-4'.*'correct-2'.*\].*</div>")
+        self.assertRegex(the_html, r"<div>.*\[.*'wrong-1'.*'wrong-2'.*'correct-1'.*'wrong-3'.*'wrong-4'.*'correct-2'.*\].*</div>")  # lint-amnesty, pylint: disable=line-too-long
         self.assertRegex(the_html, r"<div>\{.*'1_solution_1'.*'1_solution_2'.*\}</div>")
         self.assertEqual(the_html, problem.get_html(), 'should be able to call get_html() twice')
         # Check about masking
@@ -161,7 +161,7 @@ class CapaAnswerPoolTest(unittest.TestCase):
 
         problem = new_loncapa_problem(xml_str)
         the_html = problem.get_html()
-        self.assertRegex(the_html, r"<div>.*\[.*'wrong-1'.*'wrong-2'.*'correct-1'.*'wrong-3'.*'wrong-4'.*'correct-2'.*\].*</div>")
+        self.assertRegex(the_html, r"<div>.*\[.*'wrong-1'.*'wrong-2'.*'correct-1'.*'wrong-3'.*'wrong-4'.*'correct-2'.*\].*</div>")  # lint-amnesty, pylint: disable=line-too-long
         self.assertRegex(the_html, r"<div>\{.*'1_solution_1'.*'1_solution_2'.*\}</div>")
         response = list(problem.responders.values())[0]
         self.assertFalse(response.has_mask())
