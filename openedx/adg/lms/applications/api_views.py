@@ -125,8 +125,12 @@ class WorkExperienceViewSet(ApplicationRequirementsViewSet):
     queryset = WorkExperience.objects.all()
     serializer_class = WorkExperienceSerializer
 
-    @action(detail=False, methods=['patch'],  url_name='update_is_not_applicable', url_path='update_is_not_applicable')
+    @action(detail=False, methods=['patch'], url_name='update_is_not_applicable', url_path='update_is_not_applicable')
     def update_is_work_experience_not_applicable(self, request):
+        """
+        Update is_work_experience_not_applicable to True or False and delete all existing work experience records
+        if update to True.
+        """
         is_work_experience_not_applicable = json.loads(request.data.get('is_work_experience_not_applicable', 'false'))
         user_application = request.user.application
         user_application.is_work_experience_not_applicable = is_work_experience_not_applicable

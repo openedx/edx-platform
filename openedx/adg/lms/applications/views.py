@@ -3,6 +3,7 @@ All views for applications app
 """
 from django.contrib.auth.mixins import AccessMixin
 from django.contrib.auth.views import redirect_to_login
+from django.core.exceptions import ObjectDoesNotExist
 from django.http import HttpResponse
 from django.shortcuts import redirect, render
 from django.urls import reverse_lazy
@@ -267,11 +268,20 @@ class ContactInformationView(RedirectToLoginOrRelevantPageMixin, View):
 
 
 class EducationAndExperienceView(RedirectToLoginOrRelevantPageMixin, TemplateView):
+    """
+    Education and Experience View
+    """
 
     login_url = reverse_lazy('register_user')
     template_name = 'adg/lms/applications/education_experience.html'
 
     def get_context_data(self, **kwargs):
+        """
+        Context data to pre-fill forms and dropdown options.
+
+        Returns:
+            Dict.
+        """
         context = super().get_context_data(**kwargs)
         user_application = self.request.user.application
         context.update({
@@ -284,7 +294,21 @@ class EducationAndExperienceView(RedirectToLoginOrRelevantPageMixin, TemplateVie
         return context
 
     def is_precondition_satisfied(self):
-        application_hub = getattr(self.request.user, 'application_hub')
+        """
+        Checks if a user's application is started but not completed.
 
-        return (application_hub and application_hub.is_written_application_started and
-                not application_hub.is_written_application_completed)
+        Returns:
+            Boolean, True or False.
+        """
+        try:
+            application_hub = self.request.user.application_hub
+        except ObjectDoesNotExist:
+            return False
+
+        return application_hub.is_written_application_started and not application_hub.is_written_application_completed
+
+    def handle_no_permission(self):
+        """
+        Redirects to application hub.
+        """
+        return redirect('application_hub')

@@ -5,6 +5,7 @@ from collections import namedtuple
 from datetime import date, datetime
 
 from django.contrib.auth.models import User
+from django.core.exceptions import ObjectDoesNotExist
 from django.core.validators import FileExtensionValidator
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
@@ -84,7 +85,10 @@ class ApplicationHub(TimeStampedModel):
 
     @property
     def is_written_application_started(self):
-        return hasattr(self.user, 'application')
+        try:
+            return hasattr(self.user, 'application')
+        except ObjectDoesNotExist:
+            return False
 
     def __str__(self):
         return 'User {user_id}, application status id={id}'.format(user_id=self.user.id, id=self.id)
