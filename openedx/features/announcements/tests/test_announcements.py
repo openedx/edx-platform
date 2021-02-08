@@ -40,7 +40,7 @@ class TestGlobalAnnouncements(TestCase):
         ])
 
     def setUp(self):
-        super(TestGlobalAnnouncements, self).setUp()
+        super(TestGlobalAnnouncements, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.client = Client()
         self.admin = AdminFactory.create(
             email='staff@edx.org',
