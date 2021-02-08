@@ -10,8 +10,15 @@ from dateutil.relativedelta import relativedelta
 from django.core.files import File
 
 from openedx.adg.lms.applications.constants import RESUME_FILE_MAX_SIZE
-from openedx.adg.lms.applications.forms import ExtendedUserProfileForm, UserApplicationForm
+from openedx.adg.lms.applications.forms import (
+    ExtendedUserProfileForm,
+    UserApplicationForm,
+    UserApplicationCoverLetterForm
+)
 from openedx.adg.lms.registration_extension.tests.factories import ExtendedUserProfileFactory
+
+from .constants import MOCK_FILE_PATH
+from .factories import BusinessLineFactory
 
 
 @pytest.fixture(name='user_extended_profile')
@@ -94,3 +101,85 @@ def test_user_application_form_with_resume_size(size, expected):
     form = UserApplicationForm(None, files=file_dict)
     assert form.is_valid() == expected
     os.remove(path)
+
+
+# ------- Application Cover Letter Form tests below -------
+
+
+@pytest.fixture(name='mock_cover_letter_file')
+def mock_cover_letter_file_fixture():
+    """
+    Creates a mock cover letter file
+    Returns:
+        File object
+    """
+    with open(MOCK_FILE_PATH, 'w') as f:
+        mocked_file = File(f)
+
+    yield mocked_file
+
+    os.remove(MOCK_FILE_PATH)
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize('expected', [True, False], ids=['business_line_selected', 'no_business_line'])
+def test_user_application_cover_letter_form_business_line(expected):
+    """
+    Validate that business line is a compulsory field
+    """
+    if expected:
+        business_line = BusinessLineFactory().id
+    else:
+        business_line = None
+
+    data_dict = {'business_line': business_line}
+    form = UserApplicationCoverLetterForm(data=data_dict)
+
+    assert form.is_valid() == expected
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize(
+    'data, expected',
+    [
+        ('cover_letter', True),
+        ('cover_letter_file', True),
+        ('cover_letter and cover_letter_file', False)
+    ],
+    ids=['cover_letter', 'cover_letter_file', 'cover_letter_and_cover_letter_file'])
+def test_user_application_cover_letter_form_cover_letter_and_cover_letter_file(data, expected, mock_cover_letter_file):
+    """
+    Validate that either cover letter or cover letter file is being sent; not both
+    """
+    business_line = BusinessLineFactory().id
+    data_dict = {'business_line': business_line}
+    file_dict = None
+
+    if data != 'cover_letter_file':
+        data_dict['cover_letter'] = 'cover_letter_text'
+
+    if data != 'cover_letter':
+        mock_cover_letter_file.size = RESUME_FILE_MAX_SIZE
+
+        file_dict = {'cover_letter_file': mock_cover_letter_file}
+
+    form = UserApplicationCoverLetterForm(data=data_dict, files=file_dict)
+
+    assert form.is_valid() == expected
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize('size , expected', [(RESUME_FILE_MAX_SIZE, True), (RESUME_FILE_MAX_SIZE + 1, False)])
+def test_user_application_cover_letter_form_file_size(size, expected, mock_cover_letter_file):
+    """
+    Validate cover letter file size is less than maximum allowed size
+    """
+    business_line = BusinessLineFactory().id
+
+    mock_cover_letter_file.size = size
+
+    file_dict = {'cover_letter_file': mock_cover_letter_file}
+    data_dict = {'business_line': business_line}
+    form = UserApplicationCoverLetterForm(data=data_dict, files=file_dict)
+
+    assert form.is_valid() == expected

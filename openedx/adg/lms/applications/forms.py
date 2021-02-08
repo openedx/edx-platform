@@ -108,3 +108,36 @@ class UserProfileForm(forms.ModelForm):
         self.fields['phone_number'].required = True
         self.fields['city'].disabled = True
         self.fields['name'].disabled = True
+
+
+class UserApplicationCoverLetterForm(forms.ModelForm):
+    """
+    User Application Form for Cover Letter Page
+    """
+
+    class Meta:
+        model = UserApplication
+        fields = ['business_line', 'cover_letter_file', 'cover_letter']
+
+    def clean_cover_letter_file(self):
+        """
+        Validate cover letter file size is less than maximum allowed size
+        """
+        cover_letter_file = self.cleaned_data.get('cover_letter_file')
+        if cover_letter_file:
+            error = validate_file_size(cover_letter_file, RESUME_FILE_MAX_SIZE)
+            if error:
+                raise forms.ValidationError(error)
+        return cover_letter_file
+
+    def is_valid(self):
+        """
+        In addition to pre-defined validation it validates that either cover letter file or text is sent
+        """
+        valid = super(UserApplicationCoverLetterForm, self).is_valid()
+
+        if 'cover_letter_file' in self.changed_data and self.cleaned_data.get('cover_letter'):
+            valid = False
+            self.add_error('cover_letter_file', _('Either upload a cover letter file or type text'))
+
+        return valid

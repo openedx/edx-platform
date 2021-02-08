@@ -429,36 +429,71 @@ def test_response_for_user_with_complete_written_application_cover_letter_view(
 
 @pytest.mark.django_db
 @mock.patch('openedx.adg.lms.applications.views.render')
-@mock.patch('openedx.adg.lms.applications.views.get_token')
 @mock.patch('openedx.adg.lms.applications.views.BusinessLine.objects.all')
+@mock.patch('openedx.adg.lms.applications.views.UserApplicationCoverLetterForm')
 @pytest.mark.parametrize('is_user_application_saved', [True, False], ids=['user_application', 'no_user_application'])
 def test_get_with_or_without_user_application_cover_letter_view(
-    mock_business_lines, mock_get_token, mock_render, cover_letter_view_get_request, is_user_application_saved
+    mock_cover_letter_form, mock_business_lines, mock_render, cover_letter_view_get_request, is_user_application_saved
 ):
     """
     Test that if a user has not yet saved the user application then the class view sends None and if a user has a saved
-    instance of user application then the view sends that instance in user application in context upon get request.
+    instance of user application then the view sends a form of that instance in context upon get request.
     """
-    mock_get_token.return_value = 'csrf_token'
+    mock_cover_letter_form.return_value = 'form'
     mock_business_lines.return_value = 'business_lines'
 
     if is_user_application_saved:
-        user_application = UserApplicationFactory(user=cover_letter_view_get_request.user)
+        UserApplicationFactory(user=cover_letter_view_get_request.user)
+        form = 'form'
     else:
-        user_application = None
+        form = None
 
     CoverLetterView.as_view()(cover_letter_view_get_request)
 
     expected_context = {
         'business_lines': 'business_lines',
-        'user_application': user_application,
-        'registration_business_line': cover_letter_view_get_request.user.extended_profile.company,
-        'csrf_token': 'csrf_token',
-        'filename': None
+        'application_form': form
     }
 
     mock_render.assert_called_once_with(
         cover_letter_view_get_request, 'adg/lms/applications/cover_letter.html', expected_context
+    )
+
+
+@pytest.mark.django_db
+@mock.patch('openedx.adg.lms.applications.views.render')
+@mock.patch('openedx.adg.lms.applications.views.BusinessLine.objects.all')
+@mock.patch('openedx.adg.lms.applications.views.UserApplicationCoverLetterForm')
+def test_post_with_business_line_cover_letter_view(
+    mock_cover_letter_form, mock_business_lines, mock_render, cover_letter_view_post_request
+):
+    # pylint: disable=protected-access
+    """
+    Test the case when the user has selected no business line
+    """
+    class MockForm:
+        def is_valid(self):
+            return False
+
+    form = MockForm()
+
+    mock_cover_letter_form.return_value = form
+    mock_business_lines.return_value = 'business_lines'
+
+    _mutable = cover_letter_view_post_request.POST._mutable
+    cover_letter_view_post_request.POST._mutable = True
+    cover_letter_view_post_request.POST['button_click'] = 'back'
+    cover_letter_view_post_request.POST._mutable = _mutable
+
+    CoverLetterView.as_view()(cover_letter_view_post_request)
+
+    expected_context = {
+        'business_lines': 'business_lines',
+        'application_form': form
+    }
+
+    mock_render.assert_called_once_with(
+        cover_letter_view_post_request, 'adg/lms/applications/cover_letter.html', expected_context
     )
 
 
@@ -471,9 +506,12 @@ def test_post_back_or_submit_written_application_cover_letter_view(button, templ
     """
     Test that the user is redirected to experience on clicking back and to application hub on submitting.
     """
+    business_line = BusinessLineFactory()
+
     _mutable = cover_letter_view_post_request.POST._mutable
     cover_letter_view_post_request.POST._mutable = True
-    cover_letter_view_post_request.POST['next'] = button
+    cover_letter_view_post_request.POST['business_line'] = business_line.id
+    cover_letter_view_post_request.POST['button_click'] = button
     cover_letter_view_post_request.POST._mutable = _mutable
 
     response = CoverLetterView.as_view()(cover_letter_view_post_request)
@@ -483,32 +521,12 @@ def test_post_back_or_submit_written_application_cover_letter_view(button, templ
 
 
 @pytest.mark.django_db
-def test_post_with_business_line_cover_letter_view(cover_letter_view_post_request):
-    # pylint: disable=protected-access
-    """
-    Test the case when the user has selected business line
-    """
-    business_line = BusinessLineFactory()
-
-    _mutable = cover_letter_view_post_request.POST._mutable
-    cover_letter_view_post_request.POST._mutable = True
-    cover_letter_view_post_request.POST['business_line'] = business_line.id
-    cover_letter_view_post_request.POST['next'] = 'back'
-    cover_letter_view_post_request.POST._mutable = _mutable
-
-    response = CoverLetterView.as_view()(cover_letter_view_post_request)
-
-    assert response.get('Location') == reverse('application_experience')
-    assert response.status_code == 302
-
-
-@pytest.mark.django_db
 @pytest.mark.parametrize(
     'cover_letter, attribute',
     [
-        (None, 'text-coverletter'),
-        ('cover letter', 'text-coverletter'),
-        (SimpleUploadedFile('cover_letter.png', b'<svg><rect width="50" height="100"/></svg>'), 'add-coverletter')
+        (None, 'text-cover-letter'),
+        ('cover letter', 'text-cover-letter'),
+        (SimpleUploadedFile('cover_letter.png', b'<svg><rect width="50" height="100"/></svg>'), 'add-cover-letter')
     ],
     ids=['no_cover_letter', 'typed_cover_letter', 'cover_letter_file'])
 def test_post_with_no_cover_letter_typed_cover_letter_and_file_cover_letter_view(
@@ -520,14 +538,17 @@ def test_post_with_no_cover_letter_typed_cover_letter_and_file_cover_letter_view
     a file, in each case the information is updated in the database
     """
     _mutable = cover_letter_view_post_request.POST._mutable
+
+    business_line = BusinessLineFactory()
     cover_letter_view_post_request.POST._mutable = True
 
-    if attribute == 'text-coverletter':
+    if attribute == 'text-cover-letter':
         cover_letter_view_post_request.POST[attribute] = cover_letter
     else:
         cover_letter_view_post_request.FILES[attribute] = cover_letter
 
-    cover_letter_view_post_request.POST['next'] = 'back'
+    cover_letter_view_post_request.POST['business_line'] = business_line.id
+    cover_letter_view_post_request.POST['button_click'] = 'back'
     cover_letter_view_post_request.POST._mutable = _mutable
 
     response = CoverLetterView.as_view()(cover_letter_view_post_request)

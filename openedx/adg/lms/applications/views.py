@@ -1,12 +1,9 @@
 """
 All views for applications app
 """
-from pathlib import Path
-
 from django.contrib.auth.mixins import AccessMixin
 from django.contrib.auth.views import redirect_to_login
 from django.http import HttpResponse
-from django.middleware.csrf import get_token
 from django.shortcuts import redirect, render
 from django.urls import reverse_lazy
 from django.views import View
@@ -14,7 +11,12 @@ from django.views.generic import TemplateView
 from rest_framework.status import HTTP_400_BAD_REQUEST
 
 from openedx.adg.common.course_meta.models import CourseMeta
-from openedx.adg.lms.applications.forms import ExtendedUserProfileForm, UserApplicationForm, UserProfileForm
+from openedx.adg.lms.applications.forms import (
+    ExtendedUserProfileForm,
+    UserApplicationCoverLetterForm,
+    UserApplicationForm,
+    UserProfileForm,
+)
 from openedx.adg.lms.registration_extension.models import ExtendedUserProfile
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 
@@ -37,6 +39,29 @@ class RedirectToLoginOrRelevantPageMixin(AccessMixin):
         elif not self.is_precondition_satisfied():
             return self.handle_no_permission()
         return super().dispatch(request, *args, **kwargs)
+
+    def is_precondition_satisfied(self):
+        """
+        Checks if a written application is already submitted or not.
+
+        Returns:
+            bool: True if written application is not completed, False otherwise.
+        """
+        user_application_hub, _ = ApplicationHub.objects.get_or_create(user=self.request.user)
+
+        return not user_application_hub.is_written_application_completed
+
+    def handle_no_permission(self):
+        """
+        Redirects to application hub on get request or returns http 400 on post request.
+
+        Returns:
+            HttpResponse object.
+        """
+        if self.request.method == 'POST':
+            return HttpResponse(status=HTTP_400_BAD_REQUEST)
+        else:
+            return redirect('application_hub')
 
 
 class ApplicationHubView(RedirectToLoginOrRelevantPageMixin, View):
@@ -274,92 +299,74 @@ class CoverLetterView(RedirectToLoginOrRelevantPageMixin, View):
     """
 
     template_name = 'adg/lms/applications/cover_letter.html'
-    login_url = '/register'
-
-    def is_precondition_satisfied(self):
-        """
-        Checks if a written application is already submitted or not.
-        Returns:
-            bool: True if written application is not completed, False otherwise.
-        """
-        user_application_hub, _ = ApplicationHub.objects.get_or_create(user=self.request.user)
-
-        return not user_application_hub.is_written_application_completed
-
-    def handle_no_permission(self):
-        """
-        Redirects to application hub on get request or returns http 400 on post request.
-        Returns:
-            HttpResponse object.
-        """
-        if self.request.method == 'POST':
-            return HttpResponse(status=400)
-        else:
-            return redirect('application_hub')
+    login_url = reverse_lazy('register_user')
 
     def get(self, request):
         """
         Send the context data for example a list of business lines and saved user_application.
+
         Returns:
             HttpResponse object.
         """
-        business_lines = BusinessLine.objects.all()
-        file_name = None
-
         try:
-            registration_business_line = request.user.extended_profile.company
-        except ExtendedUserProfile.DoesNotExist:
-            registration_business_line = None
-
-        try:
-            user_application = request.user.application
-            if user_application.cover_letter_file:
-                file_name = Path(user_application.cover_letter_file.name).name
+            form = UserApplicationCoverLetterForm(instance=request.user.application)
         except UserApplication.DoesNotExist:
-            user_application = None
+            form = None
 
-        context = {
-            'business_lines': business_lines,
-            'user_application': user_application,
-            'registration_business_line': registration_business_line,
-            'csrf_token': get_token(request),
-            'filename': file_name
-        }
-
-        return render(request, self.template_name, context)
+        return self.handle_rendering(request, form)
 
     def post(self, request):
         """
-        Submit user application and redirect to application hub or experience depending upon button click.
+        Submit user application and redirect to application hub, experience or contact depending upon button click and
+        existence of resume.
+
         Returns:
             HttpResponse object.
         """
         user_application, _ = UserApplication.objects.get_or_create(user=request.user)
+        form = UserApplicationCoverLetterForm(request.POST, request.FILES, instance=user_application)
 
-        if 'business_line' in request.POST and request.POST['business_line']:
-            business_line = BusinessLine.objects.get(id=request.POST['business_line'])
-            user_application.business_line = business_line
+        if form.is_valid():
+            instance = form.save(commit=False)
 
-        if 'text-coverletter' in request.POST:
-            if request.POST['text-coverletter']:
-                cover_letter_text = request.POST['text-coverletter']
-                user_application.cover_letter = cover_letter_text
-            else:
-                user_application.cover_letter = ''
+            if 'cover_letter_file' in request.POST and 'cover_letter' in request.POST:
+                instance.cover_letter_file.delete()
 
-            user_application.cover_letter_file = None
+            instance.save()
+        else:
+            return self.handle_rendering(request, form)
 
-        elif 'add-coverletter' in request.FILES:
-            cover_letter_file = request.FILES['add-coverletter']
-            user_application.cover_letter = ''
-            user_application.cover_letter_file = cover_letter_file
+        return self.handle_redirection(request, form, user_application)
 
-        if 'business_line' in request.POST or 'text-coverletter' in request.POST or 'add-coverletter' in request.FILES:
-            user_application.save()
+    def handle_rendering(self, request, form):
+        """
+        Create context and render cover letter template
 
-        if request.POST['next'] == 'back':
+        Returns:
+            HttpResponse object.
+        """
+        context = {
+            'business_lines': BusinessLine.objects.all(),
+            'application_form': form,
+        }
+
+        return render(request, self.template_name, context)
+
+    def handle_redirection(self, request, form, application):
+        """
+        Redirects to contact template if resume exists otherwise to experience on clicking back button and to
+        application hub on clicking submit
+
+        Returns:
+            HttpResponse object.
+        """
+        if form.data.get('button_click') == 'back':
+            if application.resume:
+                return redirect('application_contact')
+
             return redirect('application_experience')
         else:
             application_hub = request.user.application_hub
             application_hub.set_is_written_application_completed()
+
             return redirect('application_hub')
