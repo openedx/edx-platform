@@ -25,6 +25,7 @@ from django.test import RequestFactory, TestCase
 from django.urls import reverse as django_reverse
 from django.utils.translation import ugettext as _
 from edx_when.api import get_dates_for_course, get_overrides_for_user, set_date_for_block
+from freezegun import freeze_time
 from mock import Mock, NonCallableMock, patch
 from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locator import UsageKey
@@ -2781,8 +2782,11 @@ class TestInstructorAPILevelsDataDump(SharedModuleStoreTestCase, LoginEnrollment
         """
         Test the CSV output for the anonymized user ids.
         """
+        base_time = datetime.datetime.now(UTC)
         url = reverse('get_anon_ids', kwargs={'course_id': text_type(self.course.id)})
-        response = self.client.post(url, {})
+        with freeze_time(base_time):
+            response = self.client.post(url, {})
+
         self.assertEqual(response['Content-Type'], 'text/csv')
         body = response.content.decode("utf-8").replace('\r', '')
         self.assertTrue(body.startswith(
@@ -2793,6 +2797,19 @@ class TestInstructorAPILevelsDataDump(SharedModuleStoreTestCase, LoginEnrollment
             body.endswith('"{user_id}","41","42"\n'.format(user_id=self.students[-1].id))
         )
         self.assertIn("attachment; filename=org", response['Content-Disposition'])
+
+        # Test rate-limiting
+        # The get_anon_ids view is computationally intensive and its execution time can vary
+        # depending on the number of enrollments in a course.  We are rate limiting it to
+        # prevent too many concurrent calls which could result in a denial of service for
+        # other users of the lms.
+        with freeze_time(base_time + datetime.timedelta(minutes=1)):
+            response = self.client.post(url, {})
+            assert response.status_code == 403
+
+        with freeze_time(base_time + datetime.timedelta(minutes=5)):
+            response = self.client.post(url, {})
+            assert response.status_code == 200
 
     @patch('lms.djangoapps.instructor_task.models.logger.error')
     @patch.dict(settings.GRADES_DOWNLOAD, {'STORAGE_TYPE': 's3', 'ROOT_PATH': 'tmp/edx-s3/grades'})

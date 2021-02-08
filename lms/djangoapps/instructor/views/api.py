@@ -34,6 +34,7 @@ from edx_rest_framework_extensions.auth.session.authentication import SessionAut
 from edx_when.api import get_date_for_block
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey, UsageKey
+from ratelimit.decorators import ratelimit
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from rest_framework.response import Response
@@ -1381,6 +1382,7 @@ def get_proctored_exam_results(request, course_id):
 
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
+@ratelimit(key="user", rate="1/5m", block=True)
 @require_course_permission(permissions.CAN_RESEARCH)
 def get_anon_ids(request, course_id):
     """
