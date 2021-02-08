@@ -329,3 +329,6 @@ REGISTRATION_VALIDATION_RATELIMIT = '5/minute'
 
 # Don't tolerate deprecated edx-platform import usage in tests.
 ERROR_ON_DEPRECATED_EDX_PLATFORM_IMPORTS = True
+
+############### Settings for proctoring  ###############
+PROCTORING_USER_OBFUSCATION_KEY = 'test_key'

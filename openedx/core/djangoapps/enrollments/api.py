@@ -509,11 +509,11 @@ def is_enrollment_valid_for_proctoring(username, course_id):
         return False
 
     enrollment = _data_api().get_course_enrollment(username, str(course_id))
-    if not enrollment['is_active']:
+    if not enrollment or not enrollment['is_active']:
         return False
 
     course_module = modulestore().get_course(course_id)
-    if not course_module.enable_proctored_exams:
+    if not course_module or not course_module.enable_proctored_exams:
         return False
 
     appropriate_modes = [
