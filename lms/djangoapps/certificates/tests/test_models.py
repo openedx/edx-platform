@@ -12,7 +12,10 @@ from django.test.utils import override_settings
 from mock import patch
 from opaque_keys.edx.locator import CourseKey, CourseLocator
 from path import Path as path
+from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
+from xmodule.modulestore.tests.factories import CourseFactory
 
+from common.djangoapps.student.tests.factories import AdminFactory, UserFactory
 from lms.djangoapps.certificates.models import (
     CertificateGenerationHistory,
     CertificateHtmlViewConfiguration,
@@ -26,9 +29,6 @@ from lms.djangoapps.certificates.models import (
 from lms.djangoapps.certificates.tests.factories import CertificateInvalidationFactory, GeneratedCertificateFactory
 from lms.djangoapps.instructor_task.tests.factories import InstructorTaskFactory
 from openedx.core.djangoapps.content.course_overviews.tests.factories import CourseOverviewFactory
-from common.djangoapps.student.tests.factories import AdminFactory, UserFactory
-from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory
 
 FEATURES_INVALID_FILE_PATH = settings.FEATURES.copy()
 FEATURES_INVALID_FILE_PATH['CERTS_HTML_VIEW_CONFIG_PATH'] = 'invalid/path/to/config.json'
@@ -50,7 +50,7 @@ class ExampleCertificateTest(TestCase):
     ERROR_REASON = 'Kaboom!'
 
     def setUp(self):
-        super(ExampleCertificateTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.cert_set = ExampleCertificateSet.objects.create(course_key=self.COURSE_KEY)
         self.cert = ExampleCertificate.objects.create(
             example_cert_set=self.cert_set,
@@ -109,7 +109,7 @@ class CertificateHtmlViewConfigurationTest(TestCase):
     Test the CertificateHtmlViewConfiguration model.
     """
     def setUp(self):
-        super(CertificateHtmlViewConfigurationTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.configuration_string = """{
             "default": {
                 "url": "http://www.edx.org",
@@ -204,7 +204,7 @@ class EligibleCertificateManagerTest(SharedModuleStoreTestCase):
     """
 
     def setUp(self):
-        super(EligibleCertificateManagerTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.user = UserFactory()
 
         self.course1 = CourseOverviewFactory()
@@ -319,10 +319,10 @@ class CertificateInvalidationTest(SharedModuleStoreTestCase):
     """
 
     def setUp(self):
-        super(CertificateInvalidationTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.course = CourseFactory()
         self.user = UserFactory()
-        self.course_id = self.course.id  # lint-amnesty, pylint: disable=no-member
+        self.course_id = self.course.id  # pylint: disable=no-member
         self.certificate = GeneratedCertificateFactory.create(
             status=CertificateStatuses.downloadable,
             user=self.user,

@@ -11,7 +11,12 @@ from django.conf import settings
 from milestones.tests.utils import MilestonesTestCaseMixin
 from mock import patch
 from pytz import UTC
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from xmodule.modulestore.tests.factories import CourseFactory
 
+from common.djangoapps.student.models import CourseEnrollment
+from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
+from common.djangoapps.util.milestones_helpers import milestones_achieved_by_user, set_prerequisite_courses
 from lms.djangoapps.badges.tests.factories import CourseCompleteImageConfigurationFactory
 from lms.djangoapps.certificates.models import (
     CertificateStatuses,
@@ -20,11 +25,6 @@ from lms.djangoapps.certificates.models import (
     certificate_status_for_student
 )
 from lms.djangoapps.certificates.tests.factories import GeneratedCertificateFactory
-from common.djangoapps.student.models import CourseEnrollment
-from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
-from common.djangoapps.util.milestones_helpers import milestones_achieved_by_user, set_prerequisite_courses
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory
 
 
 @ddt
@@ -34,7 +34,7 @@ class CertificatesModelTest(ModuleStoreTestCase, MilestonesTestCaseMixin):
     """
 
     def setUp(self):
-        super(CertificatesModelTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
 
         today = datetime.now(UTC)
         self.instructor_paced_course = CourseFactory.create(
@@ -71,7 +71,7 @@ class CertificatesModelTest(ModuleStoreTestCase, MilestonesTestCaseMixin):
         """
         student = UserFactory()
         student.profile.allow_certificate = allow_certificate
-        student.profile.save()  # lint-amnesty, pylint: disable=no-member
+        student.profile.save()  # pylint: disable=no-member
 
         # for instructor paced course
         certificate_info = certificate_info_for_user(
@@ -106,7 +106,7 @@ class CertificatesModelTest(ModuleStoreTestCase, MilestonesTestCaseMixin):
         """
         student = UserFactory()
         student.profile.allow_certificate = allow_certificate
-        student.profile.save()  # lint-amnesty, pylint: disable=no-member
+        student.profile.save()  # pylint: disable=no-member
 
         certificate1 = GeneratedCertificateFactory.create(
             user=student,
@@ -161,7 +161,7 @@ class CertificatesModelTest(ModuleStoreTestCase, MilestonesTestCaseMixin):
         student_no_certs = UserFactory()
         student_with_certs = UserFactory()
         student_with_certs.profile.allow_certificate = True
-        student_with_certs.profile.save()  # lint-amnesty, pylint: disable=no-member
+        student_with_certs.profile.save()  # pylint: disable=no-member
 
         # Set up a couple of courses
         course_1 = CourseFactory.create()

@@ -40,7 +40,7 @@ class SelfGeneratedCertsSignalTest(ModuleStoreTestCase):
     ENABLED_SIGNALS = ['course_published']
 
     def setUp(self):
-        super(SelfGeneratedCertsSignalTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         CertificateGenerationConfiguration.objects.create(enabled=True)
 
     def test_cert_generation_flag_on_pacing_toggle(self):
@@ -48,16 +48,16 @@ class SelfGeneratedCertsSignalTest(ModuleStoreTestCase):
         Verify that signal enables or disables self-generated certificates
         according to course-pacing.
         """
-        self.course = CourseFactory.create(self_paced=False, emit_signals=True)  # lint-amnesty, pylint: disable=attribute-defined-outside-init
-        self.assertFalse(cert_generation_enabled(self.course.id))
+        course = CourseFactory.create(self_paced=False, emit_signals=True)
+        self.assertFalse(cert_generation_enabled(course.id))
 
-        self.course.self_paced = True
-        self.store.update_item(self.course, self.user.id)
-        self.assertTrue(cert_generation_enabled(self.course.id))
+        course.self_paced = True
+        self.store.update_item(course, self.user.id)
+        self.assertTrue(cert_generation_enabled(course.id))
 
-        self.course.self_paced = False
-        self.store.update_item(self.course, self.user.id)
-        self.assertFalse(cert_generation_enabled(self.course.id))
+        course.self_paced = False
+        self.store.update_item(course, self.user.id)
+        self.assertFalse(cert_generation_enabled(course.id))
 
 
 class WhitelistGeneratedCertificatesTest(ModuleStoreTestCase):
@@ -66,7 +66,7 @@ class WhitelistGeneratedCertificatesTest(ModuleStoreTestCase):
     """
 
     def setUp(self):
-        super(WhitelistGeneratedCertificatesTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.course = CourseFactory.create(self_paced=True)
         self.user = UserFactory.create()
         CourseEnrollmentFactory(
@@ -197,7 +197,7 @@ class PassingGradeCertsTest(ModuleStoreTestCase):
     """
 
     def setUp(self):
-        super(PassingGradeCertsTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.course = CourseFactory.create(
             self_paced=True,
         )
@@ -290,7 +290,7 @@ class FailingGradeCertsTest(ModuleStoreTestCase):
     """
 
     def setUp(self):
-        super(FailingGradeCertsTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.course = CourseFactory.create(
             self_paced=True,
         )
@@ -373,7 +373,7 @@ class LearnerTrackChangeCertsTest(ModuleStoreTestCase):
     """
 
     def setUp(self):
-        super(LearnerTrackChangeCertsTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.course_one = CourseFactory.create(self_paced=True)
         self.user_one = UserFactory.create()
         self.enrollment_one = CourseEnrollmentFactory(
@@ -445,7 +445,7 @@ class CertificateGenerationTaskTest(ModuleStoreTestCase):
     """
 
     def setUp(self):
-        super(CertificateGenerationTaskTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.course = CourseFactory.create()
 
     @ddt.data(
@@ -464,7 +464,7 @@ class CertificateGenerationTaskTest(ModuleStoreTestCase):
         allowed to generate certificates automatically.
         """
         self.user = UserFactory.create()
-        self.enrollment = CourseEnrollmentFactory(  # lint-amnesty, pylint: disable=attribute-defined-outside-init
+        CourseEnrollmentFactory(
             user=self.user,
             course_id=self.course.id,
             is_active=True,
