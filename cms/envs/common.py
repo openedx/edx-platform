@@ -48,6 +48,10 @@ from corsheaders.defaults import default_headers as corsheaders_default_headers
 from datetime import timedelta
 import lms.envs.common
 # Although this module itself may not use these imported variables, other dependent modules may.
+# Warning: Do NOT add any new variables to this list. This is incompatible with future plans to
+#   have more logical separation between LMS and Studio (CMS). It is also incompatible with the
+#   direction documented in OEP-45: Configuring and Operating Open edX:
+#   https://open-edx-proposals.readthedocs.io/en/latest/oep-0045-arch-ops-and-config.html
 from lms.envs.common import (
     USE_TZ, ALL_LANGUAGES, ASSET_IGNORE_REGEX,
     PARENTAL_CONSENT_AGE_LIMIT, REGISTRATION_EMAIL_PATTERNS_ALLOWED,

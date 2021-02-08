@@ -372,8 +372,14 @@ class CourseOverview(TimeStampedModel):
         # Regenerate the thumbnail images if they're missing (either because
         # they were never generated, or because they were flushed out after
         # a change to CourseOverviewImageConfig.
-        if course_overview and not hasattr(course_overview, 'image_set'):
-            CourseOverviewImageSet.create(course_overview)
+        if course_overview:
+            if hasattr(course_overview, 'image_set'):
+                image_set = course_overview.image_set
+                if not image_set.small_url or not image_set.large_url:
+                    CourseOverviewImageSet.objects.filter(course_overview=course_overview).delete()
+                    CourseOverviewImageSet.create(course_overview)
+            else:
+                CourseOverviewImageSet.create(course_overview)
 
         return course_overview or cls.load_from_module_store(course_id)
 

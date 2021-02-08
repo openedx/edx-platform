@@ -169,7 +169,16 @@ FEATURES = {
     # .. toggle_tickets: https://github.com/edx/edx-platform/pull/14729
     'ENABLE_UNICODE_USERNAME': False,
 
-    'ENABLE_DJANGO_ADMIN_SITE': True,  # set true to enable django's admin site, even on prod (e.g. for course ops)
+    # .. toggle_name: FEATURES['ENABLE_DJANGO_ADMIN_SITE']
+    # .. toggle_implementation: DjangoSetting
+    # .. toggle_default: True
+    # .. toggle_description: Set to False if you want to disable Django's admin site.
+    # .. toggle_use_cases: open_edx
+    # .. toggle_creation_date: 2013-09-26
+    # .. toggle_warnings: It is not recommended to disable this feature as there are many settings available on
+    #  Django's admin site and will be inaccessible to the superuser.
+    # .. toggle_tickets: https://github.com/edx/edx-platform/pull/829
+    'ENABLE_DJANGO_ADMIN_SITE': True,
     'ENABLE_LMS_MIGRATION': False,
 
     # .. toggle_name: FEATURES['ENABLE_MASQUERADE']
@@ -248,12 +257,24 @@ FEATURES = {
     # .. toggle_tickets: https://github.com/edx/edx-platform/pull/1073
     'COURSES_ARE_BROWSABLE': True,
 
-    # Set to hide the courses list on the Learner Dashboard if they are not enrolled in
-    # any courses yet.
+    # .. toggle_name: FEATURES['HIDE_DASHBOARD_COURSES_UNTIL_ACTIVATED']
+    # .. toggle_implementation: DjangoSetting
+    # .. toggle_default: False
+    # .. toggle_description: When set, it hides the Courses list on the Learner Dashboard page if the learner has not
+    #   yet activated the account and not enrolled in any courses.
+    # .. toggle_use_cases: open_edx
+    # .. toggle_creation_date: 2018-05-18
+    # .. toggle_tickets: https://openedx.atlassian.net/browse/OSPR-1814
     'HIDE_DASHBOARD_COURSES_UNTIL_ACTIVATED': False,
 
-    # Give a UI to show a student's submission history in a problem by the
-    # Staff Debug tool.
+    # .. toggle_name: FEATURES['ENABLE_STUDENT_HISTORY_VIEW']
+    # .. toggle_implementation: DjangoSetting
+    # .. toggle_default: True
+    # .. toggle_description: This provides a UI to show a student's submission history in a problem by the Staff Debug
+    #   tool. Set to False if you want to hide Submission History from the courseware page.
+    # .. toggle_use_cases: open_edx
+    # .. toggle_creation_date: 2013-02-15
+    # .. toggle_tickets: https://github.com/edx/edx-platform/commit/8f17e6ae9ed76fa75b3caf867b65ccb632cb6870
     'ENABLE_STUDENT_HISTORY_VIEW': True,
 
     # Turn on a page that lets staff enter Python code to be run in the
@@ -4347,13 +4368,27 @@ USERNAME_REPLACEMENT_WORKER = "REPLACE WITH VALID USERNAME"
 # If running a Gradebook container locally,
 # modify lms/envs/private.py to give it a non-null value
 WRITABLE_GRADEBOOK_URL = None
-
+# .. setting_name: PROFILE_MICROFRONTEND_URL
+# .. setting_default: None
+# .. setting_description: Base URL of the micro-frontend-based profile page.
+# .. setting_warning: Also set site's ENABLE_PROFILE_MICROFRONTEND and
+#     learner_profile.redirect_to_microfrontend waffle flag
 PROFILE_MICROFRONTEND_URL = None
 ORDER_HISTORY_MICROFRONTEND_URL = None
+# .. setting_name: ACCOUNT_MICROFRONTEND_URL
+# .. setting_default: None
+# .. setting_description: Base URL of the micro-frontend-based account settings page.
+# .. setting_warning: Also set site's ENABLE_ACCOUNT_MICROFRONTEND and
+#     account.redirect_to_microfrontend waffle flag
 ACCOUNT_MICROFRONTEND_URL = None
 AUTHN_MICROFRONTEND_URL = None
 AUTHN_MICROFRONTEND_DOMAIN = None
 PROGRAM_CONSOLE_MICROFRONTEND_URL = None
+# .. setting_name: LEARNING_MICROFRONTEND_URL
+# .. setting_default: None
+# .. setting_description: Base URL of the micro-frontend-based courseware page.
+# .. setting_warning: Also set site's ENABLE_COURSEWARE_MICROFRONTEND or
+#     FEATURES['ENABLE_COURSEWARE_MICROFRONTEND'] and courseware.courseware_mfe waffle flag
 LEARNING_MICROFRONTEND_URL = None
 
 ############### Settings for the ace_common plugin #################

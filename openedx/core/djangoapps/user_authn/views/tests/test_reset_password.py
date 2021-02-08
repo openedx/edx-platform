@@ -824,12 +824,13 @@ class ResetPasswordAPITests(EventTestMixin, CacheIsolationTestCase):
             new=updated_user.email
         )
 
-    def test_password_reset_email_sent_on_account_recovery_email(self):
+    @ddt.data(True, False)
+    def test_password_reset_email_successfully_sent(self, is_account_recovery):
         """
         Test that with is_account_recovery query param available, password
         reset email is sent to newly updated email address.
         """
-        post_request = self.create_reset_request(self.uidb36, self.token, True)
+        post_request = self.create_reset_request(self.uidb36, self.token, is_account_recovery)
         post_request.user = AnonymousUser()
         post_request.site = Mock(domain='example.com')
         reset_view = LogistrationPasswordResetView.as_view()

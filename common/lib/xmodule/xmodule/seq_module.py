@@ -27,7 +27,6 @@ from xblock.fields import Boolean, Integer, List, Scope, String
 from edx_toggles.toggles import LegacyWaffleFlag
 from edx_toggles.toggles import WaffleFlag
 from lms.djangoapps.courseware.toggles import COURSEWARE_PROCTORING_IMPROVEMENTS
-from openedx.core.lib.graph_traversals import get_children, leaf_filter, traverse_pre_order
 
 from .exceptions import NotFoundError
 from .fields import Date
@@ -283,37 +282,6 @@ class SequenceModule(SequenceFields, ProctoringFields, XModule):
             datetime.now(UTC) < date
         )
 
-    def _get_user(self):
-        """
-        Return the current runtime Django user.
-        """
-        return get_user_model().objects.get(id=self.runtime.user_id)
-
-    def _check_children_for_content_type_gating_paywall(self, item):
-        """
-        If:
-        This xblock contains problems which this user cannot load due to content type gating
-        Then:
-        Return the first content type gating paywall (Fragment)
-        Else:
-        Return None
-        """
-        try:
-            user = self._get_user()
-            course_id = self.runtime.course_id
-            content_type_gating_service = self.runtime.service(self, 'content_type_gating')
-            if not (content_type_gating_service and
-                    content_type_gating_service.enabled_for_enrollment(user=user, course_key=course_id)):
-                return None
-
-            for block in traverse_pre_order(item, get_children, leaf_filter):
-                gate_fragment = content_type_gating_service.content_type_gate_for_block(user, block, course_id)
-                if gate_fragment is not None:
-                    return gate_fragment.content
-        except get_user_model().DoesNotExist:
-            pass
-        return None
-
     def gate_entire_sequence_if_it_is_a_timed_exam_and_contains_content_type_gated_problems(self):
         """
         Problem:
@@ -344,7 +312,11 @@ class SequenceModule(SequenceFields, ProctoringFields, XModule):
         Note that this will break compatability with using sequences outside of edx-platform
         but we are ok with this for now
         """
-        self.gated_sequence_paywall = self._check_children_for_content_type_gating_paywall(self)
+        content_type_gating_service = self.runtime.service(self, 'content_type_gating')
+        if content_type_gating_service:
+            self.gated_sequence_paywall = content_type_gating_service.check_children_for_content_type_gating_paywall(
+                self, self.course_id
+            )
 
     def student_view(self, context):
         _ = self.runtime.service(self, "i18n").ugettext
@@ -669,7 +641,12 @@ class SequenceModule(SequenceFields, ProctoringFields, XModule):
             else:
                 content = ''
 
-            contains_content_type_gated_content = self._check_children_for_content_type_gating_paywall(item) is not None
+            content_type_gating_service = self.runtime.service(self, 'content_type_gating')
+            contains_content_type_gated_content = False
+            if content_type_gating_service:
+                contains_content_type_gated_content = content_type_gating_service.check_children_for_content_type_gating_paywall(  # pylint:disable=line-too-long
+                    item, self.course_id
+                ) is not None
             iteminfo = {
                 'content': content,
                 'page_title': getattr(item, 'tooltip_title', ''),
