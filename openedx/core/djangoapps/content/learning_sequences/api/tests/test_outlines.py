@@ -343,10 +343,10 @@ class ContentGatingTestCase(OutlineProcessorTestCase):
         # Enroll student in the course
         cls.student.courseenrollment_set.create(course_id=cls.course_key, is_active=True, mode="verified")
 
-    """  # lint-amnesty, pylint: disable=pointless-string-statement
+    """
     Currently returns all, and only, sequences in required content, not just the first.
     This logic matches the existing transformer. Is this right?
-    """
+    """  # lint-amnesty, pylint: disable=pointless-string-statement
 
     @patch('openedx.core.djangoapps.content.learning_sequences.api.processors.content_gating.EntranceExamConfiguration.user_can_skip_entrance_exam')  # lint-amnesty, pylint: disable=line-too-long
     @patch('openedx.core.djangoapps.content.learning_sequences.api.processors.content_gating.milestones_helpers.get_required_content')  # lint-amnesty, pylint: disable=line-too-long
