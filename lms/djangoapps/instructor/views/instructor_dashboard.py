@@ -556,7 +556,7 @@ def _section_membership(course, access):
         ),
         'enrollment_role_choices': enrollment_role_choices,
         'upload_bulk_enrollments_csv_url': reverse(
-            'bulk_enroll_users_to_course', kwargs={'course_id': unicode(course_key)}
+            'bulk_enroll_users_to_course', kwargs={'course_id': six.text_type(course_key)}
         ),
         'is_reason_field_enabled': configuration_helpers.get_value('ENABLE_MANUAL_ENROLLMENT_REASON_FIELD', False)
     }
