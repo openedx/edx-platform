@@ -246,13 +246,13 @@ class OutlineTabTestViews(BaseCourseHomeTests):
             graded=True,
             is_time_limited=True,
             default_time_limit_minutes=10,
-            is_proctored_exam=True,
             is_practice_exam=True,
             due=datetime.now(),
             exam_review_rules='allow_use_of_paper',
             hide_after_due=False,
             is_onboarding_exam=False,
         )
+        sequence.is_proctored_exam = True
         mock_summary.return_value = {
             'short_description': 'My Exam',
             'suggested_icon': 'fa-foo-bar',
@@ -284,9 +284,11 @@ class OutlineTabTestViews(BaseCourseHomeTests):
                                           parent_location=sequential.location)
             sequential2 = ItemFactory.create(display_name='Ungraded', category='sequential',
                                              parent_location=chapter.location)
+            problem3 = ItemFactory.create(category='problem', parent_location=sequential2.location)
         course.children = [chapter]
         chapter.children = [sequential, sequential2]
         sequential.children = [problem1, problem2]
+        sequential2.children = [problem3]
         url = reverse('course-home-outline-tab', args=[course.id])
 
         CourseEnrollment.enroll(self.user, course.id)
