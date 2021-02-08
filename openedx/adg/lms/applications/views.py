@@ -265,6 +265,8 @@ class ContactInformationView(RedirectToLoginOrRelevantPageMixin, View):
                     'birth_year': extended_profile.birth_date.year,
                 })
 
+        return context
+
 
 class EducationAndExperienceView(RedirectToLoginOrRelevantPageMixin, TemplateView):
 
@@ -284,9 +286,7 @@ class EducationAndExperienceView(RedirectToLoginOrRelevantPageMixin, TemplateVie
         return context
 
     def is_precondition_satisfied(self):
-        try:
-            application_hub = self.request.user.application_hub
-        except ObjectDoesNotExist:
-            return False
+        application_hub = getattr(self.request.user, 'application_hub')
 
-        return application_hub.is_written_application_started and not application_hub.is_written_application_completed
+        return (application_hub and application_hub.is_written_application_started and
+                not application_hub.is_written_application_completed)

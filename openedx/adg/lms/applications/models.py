@@ -86,10 +86,7 @@ class ApplicationHub(TimeStampedModel):
 
     @property
     def is_written_application_started(self):
-        try:
-            return bool(self.user.application)
-        except ObjectDoesNotExist:
-            return False
+        return hasattr(self.user, 'application')
 
     def __str__(self):
         return 'User {user_id}, application status id={id}'.format(user_id=self.user.id, id=self.id)
@@ -146,8 +143,10 @@ class UserApplication(TimeStampedModel):
         help_text=_('Accepted extensions: .pdf, .doc, .jpg, .png'),
     )
     cover_letter = models.TextField(blank=True, verbose_name=_('Cover Letter'), )
-    is_work_experience_not_applicable = models.BooleanField(verbose_name=_('Work Experience Not Applicable'),
-                                                            default=False)
+    is_work_experience_not_applicable = models.BooleanField(
+        verbose_name=_('Work Experience Not Applicable'),
+        default=False
+    )
 
     OPEN = 'open'
     ACCEPTED = 'accepted'
