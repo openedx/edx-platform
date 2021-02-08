@@ -12,7 +12,7 @@ from mock import Mock
 
 from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
 from openedx.adg.lms.applications.management.commands import update_is_prerequisite_courses_passed as command_module
-from openedx.adg.lms.applications.test.factories import (
+from openedx.adg.lms.applications.tests.factories import (
     ApplicationHubFactory,
     PrerequisiteCourseFactory,
     PrerequisiteCourseGroupFactory

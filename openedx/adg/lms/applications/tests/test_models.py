@@ -91,3 +91,11 @@ def test_are_application_pre_reqs_completed_in_application_hub(objectives_comple
     """
     mark_objectives_complete(application_hub, objectives_completed)
     assert application_hub.are_application_pre_reqs_completed() is expected_return_value
+
+
+@pytest.mark.django_db
+def test_is_written_application_started(application_hub):
+    """
+    Test application started method
+    """
+    assert not application_hub.is_written_application_started

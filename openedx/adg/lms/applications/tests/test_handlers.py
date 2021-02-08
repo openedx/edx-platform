@@ -4,7 +4,7 @@ All tests for applications handlers functions
 import pytest
 from django.contrib.auth.models import Group
 
-from openedx.adg.lms.applications.test.factories import BusinessLineFactory
+from openedx.adg.lms.applications.tests.factories import BusinessLineFactory
 
 
 @pytest.mark.django_db

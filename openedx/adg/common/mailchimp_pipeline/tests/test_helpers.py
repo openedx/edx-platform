@@ -18,7 +18,7 @@ from openedx.adg.common.mailchimp_pipeline.helpers import (
     is_mailchimp_sync_required
 )
 from openedx.adg.lms.applications.models import UserApplication
-from openedx.adg.lms.applications.test.factories import UserApplicationFactory
+from openedx.adg.lms.applications.tests.factories import UserApplicationFactory
 from openedx.adg.lms.registration_extension.models import ExtendedUserProfile
 from openedx.adg.lms.registration_extension.tests.factories import ExtendedUserProfileFactory
 from openedx.core.djangolib.testing.utils import skip_unless_lms
