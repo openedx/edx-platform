@@ -999,7 +999,7 @@ class AnonymousLookupTable(ModuleStoreTestCase):
         anonymous_id = anonymous_id_for_user(self.user, self.course.id)
         real_user = user_by_anonymous_id(anonymous_id)
         self.assertEqual(self.user, real_user)
-        self.assertEqual(anonymous_id, anonymous_id_for_user(self.user, self.course.id, save=False))
+        self.assertEqual(anonymous_id, anonymous_id_for_user(self.user, self.course.id))
 
     def test_roundtrip_with_unicode_course_id(self):
         course2 = CourseFactory.create(display_name=u"Omega Course Ω")
@@ -1007,7 +1007,7 @@ class AnonymousLookupTable(ModuleStoreTestCase):
         anonymous_id = anonymous_id_for_user(self.user, course2.id)
         real_user = user_by_anonymous_id(anonymous_id)
         self.assertEqual(self.user, real_user)
-        self.assertEqual(anonymous_id, anonymous_id_for_user(self.user, course2.id, save=False))
+        self.assertEqual(anonymous_id, anonymous_id_for_user(self.user, course2.id))
 
     def test_anonymous_id_secret_key_changes_do_not_change_existing_anonymous_ids(self):
         """Test that a same anonymous id is returned when the SECRET_KEY changes."""

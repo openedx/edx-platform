@@ -21,6 +21,7 @@ from datetime import datetime, timedelta
 from functools import total_ordering
 from importlib import import_module
 from urllib.parse import urlencode
+import warnings
 
 import six
 from config_models.models import ConfigurationModel
@@ -153,12 +154,12 @@ class AnonymousUserId(models.Model):
     course_id = LearningContextKeyField(db_index=True, max_length=255, blank=True)
 
 
-def anonymous_id_for_user(user, course_id, save=True):
+def anonymous_id_for_user(user, course_id, save='DEPRECATED'):
     """
     Inputs:
         user: User model
         course_id: string or None
-        save:  Whether the id should be saved in an AnonymousUserId object, defaults to True
+        save: Deprecated and ignored: ID is always saved in an AnonymousUserId object
 
     Return a unique id for a (user, course_id) pair, suitable for inserting
     into e.g. personalized survey links.
@@ -171,28 +172,56 @@ def anonymous_id_for_user(user, course_id, save=True):
     # This part is for ability to get xblock instance in xblock_noauth handlers, where user is unauthenticated.
     assert user
 
+    if save != 'DEPRECATED':
+        warnings.warn(
+            "anonymous_id_for_user no longer accepts save param and now "
+            "always saves the ID in the database",
+            DeprecationWarning
+        )
+
     if user.is_anonymous:
         return None
 
     # ARCHBOM-1674: Get a sense of what fraction of anonymous_user_id calls are
     # cached, stored in the DB, or retrieved from the DB. This will help inform
-    # us on decisions about whether we can move to always save IDs,
-    # pregenerate them, use random instead of deterministic IDs, etc.
+    # us on decisions about whether we can
+    # pregenerate IDs, use random instead of deterministic IDs, etc.
     monitoring.increment('temp_anon_uid_v2.requested')
 
     cached_id = getattr(user, '_anonymous_id', {}).get(course_id)
     if cached_id is not None:
         monitoring.increment('temp_anon_uid_v2.returned_from_cache')
         return cached_id
-    # check if an anonymous id already exists for this user and course_id combination
+    # Check if an anonymous id already exists for this user and
+    # course_id combination. Prefer the one with the highest record ID
+    # (see below.)
     anonymous_user_ids = AnonymousUserId.objects.filter(user=user).filter(course_id=course_id).order_by('-id')
     if anonymous_user_ids:
         # If there are multiple anonymous_user_ids per user, course_id pair
-        # select the row which was created most recently
+        # select the row which was created most recently.
+        # There might be more than one if the Django SECRET_KEY had
+        # previously been rotated at a time before this function was
+        # changed to always save the generated IDs to the DB. In that
+        # case, just pick the one with the highest record ID, which is
+        # probably the most recently created one.
         anonymous_user_id = anonymous_user_ids[0].anonymous_user_id
         monitoring.increment('temp_anon_uid_v2.fetched_existing')
     else:
-        # include the secret key as a salt, and to make the ids unique across different LMS installs.
+        # Uses SECRET_KEY as a cryptographic pepper. This
+        # deterministic ID generation means that concurrent identical
+        # calls to this function return the same value -- no need for
+        # locking. (There may be a low level of integrity errors on
+        # creation as a result of concurrent duplicate row inserts.)
+        #
+        # Consequences for this function of SECRET_KEY exposure: Data
+        # researchers and other third parties receiving these
+        # anonymous user IDs would be able to identify users across
+        # courses, and predict the anonymous user IDs of all users
+        # (but not necessarily identify their accounts.)
+        #
+        # Rotation process of SECRET_KEY with respect to this
+        # function: Rotate at will, since the hashes are stored and
+        # will not change.
         hasher = hashlib.md5()
         hasher.update(settings.SECRET_KEY.encode('utf8'))
         hasher.update(text_type(user.id).encode('utf8'))
@@ -200,20 +229,17 @@ def anonymous_id_for_user(user, course_id, save=True):
             hasher.update(text_type(course_id).encode('utf-8'))
         anonymous_user_id = hasher.hexdigest()
 
-        if save is True:
-            try:
-                AnonymousUserId.objects.create(
-                    user=user,
-                    course_id=course_id,
-                    anonymous_user_id=anonymous_user_id,
-                )
-                monitoring.increment('temp_anon_uid_v2.stored')
-            except IntegrityError:
-                # Another thread has already created this entry, so
-                # continue
-                monitoring.increment('temp_anon_uid_v2.store_db_error')
-        else:
-            monitoring.increment('temp_anon_uid_v2.computed_unsaved')
+        try:
+            AnonymousUserId.objects.create(
+                user=user,
+                course_id=course_id,
+                anonymous_user_id=anonymous_user_id,
+            )
+            monitoring.increment('temp_anon_uid_v2.stored')
+        except IntegrityError:
+            # Another thread has already created this entry, so
+            # continue
+            monitoring.increment('temp_anon_uid_v2.store_db_error')
 
     # cache the anonymous_id in the user object
     if not hasattr(user, '_anonymous_id'):
@@ -829,17 +855,23 @@ class UserSignupSource(models.Model):
     site = models.CharField(max_length=255, db_index=True)
 
 
-def unique_id_for_user(user, save=True):
+def unique_id_for_user(user, save='DEPRECATED'):
     """
     Return a unique id for a user, suitable for inserting into
     e.g. personalized survey links.
 
     Keyword arguments:
-    save -- Whether the id should be saved in an AnonymousUserId object.
+    save -- Deprecated and ignored: ID is always saved in an AnonymousUserId object
     """
+    if save != 'DEPRECATED':
+        warnings.warn(
+            "unique_id_for_user no longer accepts save param and now "
+            "always saves the ID in the database",
+            DeprecationWarning
+        )
     # Setting course_id to '' makes it not affect the generated hash,
     # and thus produce the old per-student anonymous id
-    return anonymous_id_for_user(user, None, save=save)
+    return anonymous_id_for_user(user, None)
 
 
 # TODO: Should be renamed to generic UserGroup, and possibly
