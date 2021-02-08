@@ -11,7 +11,8 @@ def plugin_settings(settings):
     settings.USE_S3_FOR_CUSTOMER_THEMES = False
 
     settings.AMC_APP_URL = 'http://localhost:13000'  # Tests needs this URL.
-    settings.AMC_APP_OAUTH2_CLIENT_ID = 'test-amc-app-oauth2-client-id'
+    # TODO: Change to settings.AMC_APP_OAUTH2_CLIENT_ID = 'test-amc-app-oauth2-client-id'
+    settings.AMC_APP_OAUTH2_CLIENT_ID = settings.AMC_APP_URL
 
     # Allow enabling the APPSEMBLER_MULTI_TENANT_EMAILS when running unit tests via environment variables,
     # because it's disabled by default.

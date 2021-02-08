@@ -81,7 +81,7 @@ class Command(BaseCommand):
 
         # Calculated access tokens to the AMC devstack can have them without needing to communicate with the LMS.
         # Just making it easier to automate this without having cross-dependency in devstack
-        fake_token = hashlib.md5(user.username).hexdigest()
+        fake_token = hashlib.md5(user.username.encode('utf-8')).hexdigest()
         reset_amc_tokens(user, access_token=fake_token, refresh_token=fake_token)
 
         data = {

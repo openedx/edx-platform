@@ -1,5 +1,4 @@
-from django.db.models import Q, F
-from django.utils import timezone
+from datetime import timedelta
 
 import beeline
 import json
@@ -9,6 +8,9 @@ from urllib.parse import urlparse
 import cssutils
 import os
 import sass
+
+from django.db.models import Q, F
+from django.utils import timezone
 from django.core.files.storage import get_storage_class
 from django.conf import settings
 from django.contrib.auth.models import User
@@ -94,12 +96,14 @@ def get_active_sites():
     return sites
 
 
-@beeline.traced(name="get_amc_oauth_client")
-def get_amc_oauth_client():
+@beeline.traced(name="get_amc_oauth_app")
+def get_amc_oauth_app():
     """
     Return the AMC OAuth2 Client model instance.
     """
-    return Application.objects.get(client_id=settings.AMC_APP_OAUTH2_CLIENT_ID)
+    # TODO: Temp. hack to override AMC_APP_URL with client ID
+    return Application.objects.get(client_id=settings.AMC_APP_URL)
+    # TODO: Change to Application.objects.get(client_id=settings.AMC_APP_OAUTH2_CLIENT_ID)
 
 
 @beeline.traced(name="get_amc_tokens")
@@ -107,8 +111,7 @@ def get_amc_tokens(user):
     """
     Return the the access and refresh token with expiry date in a dict.
     """
-
-    client = get_amc_oauth_client()
+    app = get_amc_oauth_app()
     tokens = {
         'access_token': '',
         'access_expires': '',
@@ -116,7 +119,7 @@ def get_amc_tokens(user):
     }
 
     try:
-        access = AccessToken.objects.get(user=user, client=client)
+        access = AccessToken.objects.get(user=user, application=app)
         tokens.update({
             'access_token': access.token,
             'access_expires': access.expires,
@@ -125,7 +128,7 @@ def get_amc_tokens(user):
         return tokens
 
     try:
-        refresh = RefreshToken.objects.get(user=user, access_token=access, client=client)
+        refresh = RefreshToken.objects.get(user=user, access_token=access, application=app)
         tokens['refresh_token'] = refresh.token
     except RefreshToken.DoesNotExist:
         pass
@@ -138,26 +141,28 @@ def reset_amc_tokens(user, access_token=None, refresh_token=None):
     """
     Create and return new tokens, or extend existing ones to one year in the future.
     """
-    client = get_amc_oauth_client()
+    app = get_amc_oauth_app()
+    one_year_ahead = timezone.now() + timedelta(days=settings.OAUTH_EXPIRE_CONFIDENTIAL_CLIENT_DAYS)
     try:
-        access = AccessToken.objects.get(user=user, client=client)
+        access = AccessToken.objects.get(user=user, application=app)
     except AccessToken.DoesNotExist:
         access = AccessToken.objects.create(
             user=user,
-            client=client,
+            application=app,
+            expires=one_year_ahead,
         )
 
-    access.expires = access.client.get_default_token_expiry()
+    access.expires = one_year_ahead
     if access_token:
         access.token = access_token
     access.save()
 
     try:
-        refresh = RefreshToken.objects.get(user=user, access_token=access, client=client)
+        refresh = RefreshToken.objects.get(user=user, access_token=access, application=app)
     except RefreshToken.DoesNotExist:
         refresh = RefreshToken.objects.create(
             user=user,
-            client=client,
+            application=app,
             access_token=access,
         )
 
