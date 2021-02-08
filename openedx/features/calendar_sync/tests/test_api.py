@@ -20,7 +20,7 @@ class TestCalendarSyncAPI(SharedModuleStoreTestCase):
         cls.course_key = cls.course.id
 
     def setUp(self):
-        super(TestCalendarSyncAPI, self).setUp()
+        super(TestCalendarSyncAPI, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.user = UserFactory(password=TEST_PASSWORD)
 
     def test_subscribe_to_calendar(self):
