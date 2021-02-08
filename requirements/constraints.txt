@@ -89,7 +89,7 @@ path<13.2.0
 pillow<8.0.0
 
 # ARCHBOM-1141: pip-tools upgrade requires pip upgrade
-pip-tools<5.0.0
+pip-tools<5.4
 
 # Upgrading to 2.5.3 on 2020-01-03 triggered "'tzlocal' object has no attribute '_std_offset'" errors in production
 python-dateutil==2.4.0
