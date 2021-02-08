@@ -24,7 +24,7 @@ class TestSafeCookieData(TestSafeSessionsLogMixin, TestCase):
     """
 
     def setUp(self):
-        super(TestSafeCookieData, self).setUp()
+        super(TestSafeCookieData, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.session_id = 'test_session_id'
         self.user_id = 'test_user_id'
         self.safe_cookie_data = SafeCookieData.create(self.session_id, self.user_id)

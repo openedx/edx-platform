@@ -1,11 +1,11 @@
-
+# lint-amnesty, pylint: disable=django-not-configured, missing-module-docstring
 
 import datetime
 import logging
 
 import pytz
-from django.db.models import F, Subquery
-from django.db.models.functions import Greatest
+from django.db.models import F, Subquery  # lint-amnesty, pylint: disable=unused-import
+from django.db.models.functions import Greatest  # lint-amnesty, pylint: disable=unused-import
 from django.db import transaction
 
 from openedx.core.djangoapps.schedules.models import Schedule
@@ -15,11 +15,11 @@ LOG = logging.getLogger(__name__)
 
 # TODO: consider using a LoggerAdapter instead of this mixin:
 # https://docs.python.org/2/library/logging.html#logging.LoggerAdapter
-class PrefixedDebugLoggerMixin(object):
+class PrefixedDebugLoggerMixin(object):  # lint-amnesty, pylint: disable=missing-class-docstring
     log_prefix = None
 
     def __init__(self, *args, **kwargs):
-        super(PrefixedDebugLoggerMixin, self).__init__(*args, **kwargs)
+        super(PrefixedDebugLoggerMixin, self).__init__(*args, **kwargs)  # lint-amnesty, pylint: disable=super-with-arguments
         if self.log_prefix is None:
             self.log_prefix = self.__class__.__name__
 

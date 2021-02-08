@@ -1,4 +1,4 @@
-"""
+"""  # lint-amnesty, pylint: disable=django-not-configured
 CourseEnrollment related signal handlers.
 """
 
@@ -23,7 +23,7 @@ from openedx.core.djangoapps.schedules.models import ScheduleExperience
 from openedx.core.djangoapps.schedules.utils import reset_self_paced_schedule
 from openedx.core.djangoapps.theming.helpers import get_current_site
 from common.djangoapps.student.models import CourseEnrollment
-from common.djangoapps.student.signals import ENROLL_STATUS_CHANGE, ENROLLMENT_TRACK_UPDATED
+from common.djangoapps.student.signals import ENROLL_STATUS_CHANGE, ENROLLMENT_TRACK_UPDATED  # lint-amnesty, pylint: disable=unused-import
 from common.djangoapps.track import segment
 
 from .config import CREATE_SCHEDULE_WAFFLE_FLAG
@@ -45,7 +45,7 @@ def create_schedule(sender, **kwargs):  # pylint: disable=unused-argument
         schedule_details = _create_schedule(enrollment, enrollment_created)
 
         if schedule_details:
-            log.debug(
+            log.debug(  # lint-amnesty, pylint: disable=logging-not-lazy
                 'Schedules: created a new schedule starting at ' +
                 u'%s with an upgrade deadline of %s and experience type: %s',
                 schedule_details['content_availability_date'],
@@ -92,7 +92,7 @@ def reset_schedule_on_mode_change(sender, user, course_key, mode, **kwargs):  # 
     reset_self_paced_schedule(user, course_key, use_availability_date=use_availability_date)
 
 
-def _calculate_upgrade_deadline(course_id, content_availability_date):
+def _calculate_upgrade_deadline(course_id, content_availability_date):  # lint-amnesty, pylint: disable=missing-function-docstring
     upgrade_deadline = None
 
     delta = _get_upgrade_deadline_delta_setting(course_id)
@@ -114,7 +114,7 @@ def _calculate_upgrade_deadline(course_id, content_availability_date):
     return upgrade_deadline
 
 
-def _get_upgrade_deadline_delta_setting(course_id):
+def _get_upgrade_deadline_delta_setting(course_id):  # lint-amnesty, pylint: disable=missing-function-docstring
     delta = None
 
     global_config = DynamicUpgradeDeadlineConfiguration.current()
@@ -139,7 +139,7 @@ def _get_upgrade_deadline_delta_setting(course_id):
     return delta
 
 
-def _should_randomly_suppress_schedule_creation(
+def _should_randomly_suppress_schedule_creation(  # lint-amnesty, pylint: disable=missing-function-docstring
     schedule_config,
     enrollment,
     upgrade_deadline,
