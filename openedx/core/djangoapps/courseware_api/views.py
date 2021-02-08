@@ -8,6 +8,7 @@ from completion.exceptions import UnavailableCompletionData
 from completion.utilities import get_key_to_last_completed_block
 from django.conf import settings
 from django.urls import reverse
+from django.utils.translation import ugettext as _
 from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthentication
 from edx_rest_framework_extensions.auth.session.authentication import SessionAuthenticationAllowInactiveUser
 from opaque_keys import InvalidKeyError
@@ -168,8 +169,9 @@ class CoursewareMeta:
         """
         tabs = []
         for priority, tab in enumerate(get_course_tab_list(self.effective_user, self.overview)):
+            title = tab.title or tab.get('name', '')
             tabs.append({
-                'title': tab.title or tab.get('name', ''),
+                'title': _(title),  # pylint: disable=translation-of-non-string
                 'slug': tab.tab_id,
                 'priority': priority,
                 'type': tab.type,
