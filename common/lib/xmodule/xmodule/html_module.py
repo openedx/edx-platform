@@ -93,7 +93,11 @@ class HtmlBlock(
         """
         html_data = self.get_html()
         if "%%USERNAME%%" in html_data:
-            html_data = self.data.replace("%%USERNAME%%", self.user_full_name)
+            html_data = html_data.replace("%%USERNAME%%", self.user_full_name)
+
+        if "%%FIRSTNAME%%" in html_data:
+            html_data = html_data.replace("%%FIRSTNAME%%", self.user_first_name)
+
         fragment = Fragment(html_data)
         add_webpack_to_fragment(fragment, 'HtmlBlockPreview')
         shim_xmodule_js(fragment, 'HTMLModule')
@@ -113,6 +117,14 @@ class HtmlBlock(
         """
         current_user = self.runtime.service(self, 'user').get_current_user()
         return current_user.full_name
+
+    @property
+    def user_first_name(self):
+        """
+        returns user first name
+        """
+        current_user = self.runtime.service(self, 'user').get_current_user()
+        return current_user.first_name
 
     def student_view_data(self, context=None):  # pylint: disable=unused-argument
         """
