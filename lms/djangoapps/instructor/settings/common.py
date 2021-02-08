@@ -57,7 +57,7 @@ def plugin_settings(settings):
         #   if set to False, only edX superusers can perform the downloads.
         # .. toggle_use_cases: opt_in
         # .. toggle_creation_date: 2018-03-26
-        # .. toggle_tickets: https://github.com/edx/edx-platform/pull/17385
+        # .. toggle_tickets: https://github.com/edx/edx-platform/pull/1750
         'ALLOW_COURSE_STAFF_GRADE_DOWNLOADS': False,
 
         # .. toggle_name: FEATURES['ALLOW_AUTOMATED_SIGNUPS']
@@ -78,8 +78,6 @@ def plugin_settings(settings):
         #   In case of self-paced courses, the certificate generation button is hidden if certificate
         #   generation is not explicitly enabled globally or for the specific course.
         # .. toggle_use_cases: opt_in
-        # .. toggle_creation_date: 2015-07-17
-        # .. toggle_tickets: https://github.com/edx/edx-platform/pull/8967
         'CERTIFICATES_INSTRUCTOR_GENERATION': False,
 
         # .. toggle_name: FEATURES['BATCH_ENROLLMENT_NOTIFY_USERS_DEFAULT']
