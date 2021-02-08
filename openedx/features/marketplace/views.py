@@ -1,12 +1,16 @@
 # -*- coding: utf-8 -*-
+"""
+All views for marketplace
+"""
 from __future__ import unicode_literals
+
 import operator
 
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db.models import Q
 from django.urls import reverse
 from django.utils.decorators import method_decorator
-from django.views import View, generic
+from django.views import generic
 from django.views.generic.detail import DetailView
 from django.views.generic.list import ListView
 from django_countries import countries
@@ -41,13 +45,16 @@ from .constants import (
     ORG_SECTOR_OTHER,
     ORG_SECTOR_SANITATION,
     ORG_SECTOR_SOCIAL_JUSTICE,
-    ORG_SECTOR_WORK_AND_ECONOMIC_GROWTH,
-    ORG_SECTOR_TEMPLATE_CHOICES
+    ORG_SECTOR_TEMPLATE_CHOICES,
+    ORG_SECTOR_WORK_AND_ECONOMIC_GROWTH
 )
 from .models import MarketplaceRequest
 
 
 class MarketplaceListView(ListView):
+    """
+    View for marketplace listing
+    """
     model = MarketplaceRequest
     context_object_name = 'marketplace_requests'
     paginate_by = 10
@@ -151,13 +158,16 @@ class MarketplaceListView(ListView):
 
 @method_decorator(has_affiliated_user, name='dispatch')
 class MarketplaceCreateRequestView(generic.CreateView, LoginRequiredMixin):
+    """
+    Marketplace view to post a request to the community hub
+    """
     form_class = MarketplaceRequestForm
     template_name = 'features/marketplace/markertplace_request_form.html'
 
     def get_success_url(self):
         return reverse('marketplace-listing')
 
-    def get_initial(self, *args, **kwargs):
+    def get_initial(self, *args, **kwargs):  # pylint: disable=arguments-differ, unused-argument
         initial = super(MarketplaceCreateRequestView, self).get_initial(**kwargs)
         user = self.request.user
         initial['user'] = user
@@ -166,6 +176,9 @@ class MarketplaceCreateRequestView(generic.CreateView, LoginRequiredMixin):
 
 
 class MarketplaceRequestDetailView(DetailView):
+    """
+    Detailed marketplace view for request posted to the community hub
+    """
     model = MarketplaceRequest
     context_object_name = 'marketplace_request'
     template_engine = 'mako'

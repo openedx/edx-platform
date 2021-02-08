@@ -1,3 +1,6 @@
+"""
+All forms for marketplace
+"""
 from django import forms
 from django.utils.translation import ugettext as _
 
@@ -5,8 +8,6 @@ from openedx.features.marketplace.models import MarketplaceRequest
 
 
 class MarketplaceRequestForm(forms.ModelForm):
-    def __init__(self,*args, **kwargs):
-        super(MarketplaceRequestForm,self).__init__(*args, **kwargs)
 
     class Meta:
         model = MarketplaceRequest

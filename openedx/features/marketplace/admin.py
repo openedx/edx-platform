@@ -1,4 +1,7 @@
 # -*- coding: utf-8 -*-
+"""
+Admin configurations for marketplace app
+"""
 from __future__ import unicode_literals
 
 from django.contrib import admin

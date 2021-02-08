@@ -1,7 +1,13 @@
+"""
+All urls for marketplace
+"""
 from django.conf.urls import url
 
-from openedx.features.marketplace.views import (MarketplaceListView, MarketplaceCreateRequestView,
-                                                MarketplaceRequestDetailView)
+from openedx.features.marketplace.views import (
+    MarketplaceCreateRequestView,
+    MarketplaceListView,
+    MarketplaceRequestDetailView
+)
 
 urlpatterns = [
     url(
