@@ -27,7 +27,7 @@ class SessionAuthenticationCrossDomainCsrf(authentication.SessionAuthentication)
     """
     def _process_enforce_csrf(self, request):
         CsrfViewMiddleware().process_request(request)
-        return super(SessionAuthenticationCrossDomainCsrf, self).enforce_csrf(request)
+        return super(SessionAuthenticationCrossDomainCsrf, self).enforce_csrf(request)  # lint-amnesty, pylint: disable=super-with-arguments
 
     def enforce_csrf(self, request):
         """

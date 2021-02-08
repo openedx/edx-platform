@@ -22,7 +22,7 @@ from openedx.core.djangoapps.site_configuration import helpers as configuration_
 from openedx.core.djangoapps.theming.helpers import get_current_site
 from openedx.core.djangoapps.user_api import accounts as accounts_settings  # lint-amnesty, pylint: disable=unused-import
 from openedx.core.djangoapps.user_api.accounts.utils import is_secondary_email_feature_enabled  # lint-amnesty, pylint: disable=unused-import
-from openedx.core.djangoapps.user_authn.utils import should_redirect_to_authn_microfrontend
+from openedx.core.djangoapps.user_authn.toggles import should_redirect_to_authn_microfrontend
 from openedx.core.djangoapps.user_api.preferences.api import get_user_preference
 from common.djangoapps.student.message_types import AccountRecovery as AccountRecoveryMessage
 from common.djangoapps.student.models import CourseEnrollmentAllowed, email_exists_or_retired  # lint-amnesty, pylint: disable=unused-import

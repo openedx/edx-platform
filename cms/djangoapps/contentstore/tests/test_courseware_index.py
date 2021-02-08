@@ -18,7 +18,7 @@ from mock import patch
 from pytz import UTC
 from search.search_engine_base import SearchEngine
 from six.moves import range
-from xblock.core import XBlock
+from xblock.core import XBlock  # lint-amnesty, pylint: disable=unused-import
 
 from cms.djangoapps.contentstore.courseware_index import (
     CourseAboutSearchIndexer,
@@ -71,7 +71,7 @@ def create_children(store, parent, category, load_factor):
         child_object = ItemFactory.create(
             parent_location=parent.location,
             category=category,
-            display_name=u"{} {} {}".format(category, child_index, time.clock()),
+            display_name=u"{} {} {}".format(category, child_index, time.clock()),  # lint-amnesty, pylint: disable=no-member
             modulestore=store,
             publish_item=True,
             start=datetime(2015, 3, 1, tzinfo=UTC),
@@ -140,7 +140,7 @@ class MixedWithOptionsTestCase(MixedSplitTestCase):
 
     def setup_course_base(self, store):
         """ base version of setup_course_base is a no-op """
-        pass
+        pass  # lint-amnesty, pylint: disable=unnecessary-pass
 
     @lazy
     def searcher(self):
@@ -195,7 +195,7 @@ class TestCoursewareSearchIndexer(MixedWithOptionsTestCase):
     WORKS_WITH_STORES = (ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split)
 
     def setUp(self):
-        super(TestCoursewareSearchIndexer, self).setUp()
+        super(TestCoursewareSearchIndexer, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
 
         self.course = None
         self.chapter = None
@@ -605,11 +605,11 @@ class TestLargeCourseDeletions(MixedWithOptionsTestCase):
         self.course_id = None
 
     def setUp(self):
-        super(TestLargeCourseDeletions, self).setUp()
+        super(TestLargeCourseDeletions, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.course_id = None
 
     def tearDown(self):
-        super(TestLargeCourseDeletions, self).tearDown()
+        super(TestLargeCourseDeletions, self).tearDown()  # lint-amnesty, pylint: disable=super-with-arguments
         self._clean_course_id()
 
     def assert_search_count(self, expected_count):
@@ -787,7 +787,7 @@ class TestLibrarySearchIndexer(MixedWithOptionsTestCase):
     WORKS_WITH_STORES = (ModuleStoreEnum.Type.split, )
 
     def setUp(self):
-        super(TestLibrarySearchIndexer, self).setUp()
+        super(TestLibrarySearchIndexer, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
 
         self.library = None
         self.html_unit1 = None
@@ -937,7 +937,7 @@ class GroupConfigurationSearchMongo(CourseTestCase, MixedWithOptionsTestCase):
     INDEX_NAME = CoursewareSearchIndexer.INDEX_NAME
 
     def setUp(self):
-        super(GroupConfigurationSearchMongo, self).setUp()
+        super(GroupConfigurationSearchMongo, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
 
         self._setup_course_with_content()
         self._setup_split_test_module()
@@ -1427,7 +1427,7 @@ class GroupConfigurationSearchMongo(CourseTestCase, MixedWithOptionsTestCase):
             mock_index.reset_mock()
 
 
-class GroupConfigurationSearchSplit(GroupConfigurationSearchMongo):
+class GroupConfigurationSearchSplit(GroupConfigurationSearchMongo):  # lint-amnesty, pylint: disable=test-inherits-tests
     """
     Tests indexing of content groups on course modules using split modulestore.
     """

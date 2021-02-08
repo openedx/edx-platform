@@ -36,7 +36,7 @@ class GroupConfigurationsValidationError(Exception):
     """
     An error thrown when a group configurations input is invalid.
     """
-    pass
+    pass  # lint-amnesty, pylint: disable=unnecessary-pass
 
 
 class GroupConfiguration(object):
@@ -62,7 +62,7 @@ class GroupConfiguration(object):
         try:
             configuration = json.loads(json_string.decode("utf-8"))
         except ValueError:
-            raise GroupConfigurationsValidationError(_("invalid JSON"))
+            raise GroupConfigurationsValidationError(_("invalid JSON"))  # lint-amnesty, pylint: disable=raise-missing-from
         configuration["version"] = UserPartition.VERSION
         return configuration
 
@@ -102,7 +102,7 @@ class GroupConfiguration(object):
         """
         Return a list of IDs that already in use.
         """
-        return set([p.id for p in get_all_partitions_for_course(course)])
+        return set([p.id for p in get_all_partitions_for_course(course)])  # lint-amnesty, pylint: disable=consider-using-set-comprehension
 
     def get_user_partition(self):
         """
@@ -111,7 +111,7 @@ class GroupConfiguration(object):
         try:
             return UserPartition.from_json(self.configuration)
         except ReadOnlyUserPartitionError:
-            raise GroupConfigurationsValidationError(_("unable to load this type of group configuration"))
+            raise GroupConfigurationsValidationError(_("unable to load this type of group configuration"))  # lint-amnesty, pylint: disable=raise-missing-from
 
     @staticmethod
     def _get_usage_dict(course, unit, item, scheme_name=None):

@@ -22,6 +22,7 @@ from django.test.client import RequestFactory
 from django.test.utils import override_settings
 from django.urls import reverse
 from django.utils.http import int_to_base36
+from edx_toggles.toggles.testutils import override_waffle_flag
 from freezegun import freeze_time
 from mock import Mock, patch
 from oauth2_provider import models as dot_models
@@ -36,6 +37,7 @@ from openedx.core.djangoapps.user_api.accounts import EMAIL_MAX_LENGTH, EMAIL_MI
 from openedx.core.djangoapps.user_authn.views.password_reset import (
     SETTING_CHANGE_INITIATED, password_reset, LogistrationPasswordResetView,
     PasswordResetConfirmWrapper)
+from openedx.core.djangoapps.user_authn.toggles import REDIRECT_TO_AUTHN_MICROFRONTEND
 from openedx.core.djangolib.testing.utils import CacheIsolationTestCase
 from common.djangoapps.student.tests.factories import TEST_PASSWORD, UserFactory
 from common.djangoapps.student.tests.test_configuration_overrides import fake_get_value
@@ -331,6 +333,7 @@ class ResetPasswordTests(EventTestMixin, CacheIsolationTestCase):
         )
 
     @override_settings(FEATURES=ENABLE_AUTHN_MICROFRONTEND)
+    @override_waffle_flag(REDIRECT_TO_AUTHN_MICROFRONTEND, active=True)
     @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', "Test only valid in LMS")
     @ddt.data(('Crazy Awesome Site', 'Crazy Awesome Site'), ('edX', 'edX'))
     @ddt.unpack
@@ -821,12 +824,13 @@ class ResetPasswordAPITests(EventTestMixin, CacheIsolationTestCase):
             new=updated_user.email
         )
 
-    def test_password_reset_email_sent_on_account_recovery_email(self):
+    @ddt.data(True, False)
+    def test_password_reset_email_successfully_sent(self, is_account_recovery):
         """
         Test that with is_account_recovery query param available, password
         reset email is sent to newly updated email address.
         """
-        post_request = self.create_reset_request(self.uidb36, self.token, True)
+        post_request = self.create_reset_request(self.uidb36, self.token, is_account_recovery)
         post_request.user = AnonymousUser()
         post_request.site = Mock(domain='example.com')
         reset_view = LogistrationPasswordResetView.as_view()

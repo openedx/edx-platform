@@ -1,3 +1,4 @@
+# lint-amnesty, pylint: disable=missing-module-docstring
 import logging
 
 import dateutil
@@ -110,7 +111,7 @@ class CourseValidationView(DeveloperErrorViewMixin, GenericAPIView):
             has_end_date=course.end is not None,
         )
 
-    def _assignments_validation(self, course, request):
+    def _assignments_validation(self, course, request):  # lint-amnesty, pylint: disable=missing-function-docstring
         assignments, visible_assignments = self._get_assignments(course)
         assignments_with_dates = [
             a for a in visible_assignments if a.due
@@ -218,7 +219,7 @@ class CourseValidationView(DeveloperErrorViewMixin, GenericAPIView):
             has_update=len(updates) > 0,
         )
 
-    def _get_assignments(self, course):
+    def _get_assignments(self, course):  # lint-amnesty, pylint: disable=missing-function-docstring
         store = modulestore()
         sections = [store.get_item(section_usage_key) for section_usage_key in course.children]
         assignments = [
@@ -245,7 +246,7 @@ class CourseValidationView(DeveloperErrorViewMixin, GenericAPIView):
         oras = modulestore().get_items(course.id, qualifiers={'category': 'openassessment'})
         return oras if not graded_only else [ora for ora in oras if ora.graded]
 
-    def _has_date_before_start(self, ora, start):
+    def _has_date_before_start(self, ora, start):  # lint-amnesty, pylint: disable=missing-function-docstring
         if ora.submission_start:
             if dateutil.parser.parse(ora.submission_start).replace(tzinfo=UTC) < start:
                 return True
@@ -262,7 +263,7 @@ class CourseValidationView(DeveloperErrorViewMixin, GenericAPIView):
 
         return False
 
-    def _has_date_after_end(self, ora, end):
+    def _has_date_after_end(self, ora, end):  # lint-amnesty, pylint: disable=missing-function-docstring
         if ora.submission_start:
             if dateutil.parser.parse(ora.submission_start).replace(tzinfo=UTC) > end:
                 return True
@@ -281,7 +282,7 @@ class CourseValidationView(DeveloperErrorViewMixin, GenericAPIView):
     def _has_start_date(self, course):
         return not course.start_date_is_still_default
 
-    def _has_grading_policy(self, course):
+    def _has_grading_policy(self, course):  # lint-amnesty, pylint: disable=missing-function-docstring
         grading_policy_formatted = {}
         default_grading_policy_formatted = {}
 

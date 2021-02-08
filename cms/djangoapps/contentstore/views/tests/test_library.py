@@ -44,7 +44,7 @@ class UnitTestLibraries(CourseTestCase):
     """
 
     def setUp(self):
-        super(UnitTestLibraries, self).setUp()
+        super(UnitTestLibraries, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
 
         self.client = AjaxEnabledTestClient()
         self.client.login(username=self.user.username, password=self.user_password)

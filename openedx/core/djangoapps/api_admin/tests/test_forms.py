@@ -21,7 +21,7 @@ class ApiAccessFormTest(TestCase):
     @ddt.unpack
     def test_form_valid(self, data, is_valid):
         form = ApiAccessRequestForm(data)
-        self.assertEqual(form.is_valid(), is_valid)
+        assert form.is_valid() == is_valid
 
 
 @skip_unless_lms
@@ -43,8 +43,8 @@ class ViewersWidgetTest(TestCase):
             extra_formating=extra_formating,
         )
         output = self.widget.render(name=input_field_name, value=dummy_string_value)
-        self.assertEqual(expected_widget_html, output)
+        assert expected_widget_html == output
 
         dummy_list_value = ['staff', 'verified']
         output = self.widget.render(name=input_field_name, value=dummy_list_value)
-        self.assertEqual(expected_widget_html, output)
+        assert expected_widget_html == output

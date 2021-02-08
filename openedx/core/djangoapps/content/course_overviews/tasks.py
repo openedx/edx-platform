@@ -1,9 +1,9 @@
-
+# lint-amnesty, pylint: disable=missing-module-docstring
 
 import logging
 
 import six
-from celery import task
+from celery import shared_task
 from celery_utils.persist_on_failure import LoggedPersistOnFailureTask
 from django.conf import settings
 from edx_django_utils.monitoring import set_code_owner_attribute
@@ -27,7 +27,7 @@ def chunks(sequence, chunk_size):
     return (sequence[index: index + chunk_size] for index in range(0, len(sequence), chunk_size))
 
 
-def _task_options(routing_key):
+def _task_options(routing_key):  # lint-amnesty, pylint: disable=missing-function-docstring
     task_options = {}
     if getattr(settings, 'HIGH_MEM_QUEUE', None):
         task_options['routing_key'] = settings.HIGH_MEM_QUEUE
@@ -36,7 +36,7 @@ def _task_options(routing_key):
     return task_options
 
 
-def enqueue_async_course_overview_update_tasks(
+def enqueue_async_course_overview_update_tasks(  # lint-amnesty, pylint: disable=missing-function-docstring
         course_ids,
         all_courses=False,
         force_update=False,
@@ -59,7 +59,7 @@ def enqueue_async_course_overview_update_tasks(
         )
 
 
-@task(base=LoggedPersistOnFailureTask)
+@shared_task(base=LoggedPersistOnFailureTask)
 @set_code_owner_attribute
 def async_course_overview_update(*args, **kwargs):
     course_keys = [CourseKey.from_string(arg) for arg in args]

@@ -8,7 +8,7 @@ import textwrap
 
 import six
 from django.conf import settings
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.test.client import Client
 from mock import Mock
 from opaque_keys.edx.keys import AssetKey, CourseKey
@@ -84,7 +84,7 @@ class CourseTestCase(ProceduralCourseTestMixin, ModuleStoreTestCase):
         afterwards.
         """
 
-        super(CourseTestCase, self).setUp()
+        super(CourseTestCase, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
 
         self.client = AjaxEnabledTestClient()
         self.client.login(username=self.user.username, password=self.user_password)
@@ -285,8 +285,8 @@ class CourseTestCase(ProceduralCourseTestMixin, ModuleStoreTestCase):
         course2_items = self.store.get_items(course2_id)
         self.assertGreater(len(course1_items), 0)  # ensure it found content instead of [] == []
         if len(course1_items) != len(course2_items):
-            course1_block_ids = set([item.location.block_id for item in course1_items])
-            course2_block_ids = set([item.location.block_id for item in course2_items])
+            course1_block_ids = set([item.location.block_id for item in course1_items])  # lint-amnesty, pylint: disable=consider-using-set-comprehension
+            course2_block_ids = set([item.location.block_id for item in course2_items])  # lint-amnesty, pylint: disable=consider-using-set-comprehension
             raise AssertionError(
                 u"Course1 extra blocks: {}; course2 extra blocks: {}".format(
                     course1_block_ids - course2_block_ids, course2_block_ids - course1_block_ids

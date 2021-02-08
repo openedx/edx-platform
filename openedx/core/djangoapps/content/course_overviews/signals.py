@@ -62,7 +62,7 @@ def _check_for_course_date_changes(previous_course_overview, updated_course_over
         )
 
 
-def _log_start_date_change(previous_course_overview, updated_course_overview):
+def _log_start_date_change(previous_course_overview, updated_course_overview):  # lint-amnesty, pylint: disable=missing-function-docstring
     previous_start_str = 'None'
     if previous_course_overview.start is not None:
         previous_start_str = previous_course_overview.start.isoformat()

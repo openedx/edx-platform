@@ -106,7 +106,7 @@ class BlockStructureTransformer(object):
                 block structure that is to be modified with collected
                 data to be cached for the transformer.
         """
-        pass
+        pass  # lint-amnesty, pylint: disable=unnecessary-pass
 
     @abstractmethod
     def transform(self, usage_info, block_structure):

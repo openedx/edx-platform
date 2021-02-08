@@ -63,7 +63,7 @@ class MockXBlock(object):
         try:
             return self.field_map[attr]
         except KeyError:
-            raise AttributeError
+            raise AttributeError  # lint-amnesty, pylint: disable=raise-missing-from
 
     def get_children(self):
         """
@@ -211,7 +211,7 @@ def clear_registered_transformers_cache():
     """
     Test helper to clear out any cached values of registered transformers.
     """
-    TransformerRegistry.get_write_version_hash.cache.clear()
+    TransformerRegistry.get_write_version_hash.cache.clear()  # lint-amnesty, pylint: disable=no-member
 
 
 @contextmanager
@@ -224,7 +224,7 @@ def mock_registered_transformers(transformers):
         'openedx.core.djangoapps.content.block_structure.transformer_registry.'
         'TransformerRegistry.get_registered_transformers'
     ) as mock_available_transforms:
-        mock_available_transforms.return_value = {transformer for transformer in transformers}
+        mock_available_transforms.return_value = {transformer for transformer in transformers}  # lint-amnesty, pylint: disable=unnecessary-comprehension
         yield
 
 
@@ -336,7 +336,7 @@ class UsageKeyFactoryMixin(object):
     ChildrenMapTestMixin use integers for block_ids.
     """
     def setUp(self):
-        super(UsageKeyFactoryMixin, self).setUp()
+        super(UsageKeyFactoryMixin, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.course_key = CourseLocator('org', 'course', six.text_type(uuid4()))
 
     def block_key_factory(self, block_id):

@@ -26,7 +26,7 @@ User = get_user_model()
 log = logging.getLogger(__name__)
 
 
-class CourseAccessRoleSerializer(serializers.ModelSerializer):
+class CourseAccessRoleSerializer(serializers.ModelSerializer):  # lint-amnesty, pylint: disable=missing-class-docstring
     user = serializers.SlugRelatedField(slug_field='username', queryset=User.objects.all())
 
     class Meta:
@@ -34,21 +34,21 @@ class CourseAccessRoleSerializer(serializers.ModelSerializer):
         fields = ('user', 'role',)
 
 
-class CourseRunScheduleSerializer(serializers.Serializer):
+class CourseRunScheduleSerializer(serializers.Serializer):  # lint-amnesty, pylint: disable=abstract-method
     start = serializers.DateTimeField()
     end = serializers.DateTimeField()
     enrollment_start = serializers.DateTimeField(allow_null=True, required=False)
     enrollment_end = serializers.DateTimeField(allow_null=True, required=False)
 
 
-class CourseRunTeamSerializer(serializers.Serializer):
+class CourseRunTeamSerializer(serializers.Serializer):  # lint-amnesty, pylint: disable=abstract-method, missing-class-docstring
     def to_internal_value(self, data):
         """Overriding this to support deserialization, for write operations."""
         for member in data:
             try:
                 User.objects.get(username=member['user'])
             except User.DoesNotExist:
-                raise serializers.ValidationError(
+                raise serializers.ValidationError(  # lint-amnesty, pylint: disable=raise-missing-from
                     _('Course team user does not exist')
                 )
 
@@ -64,10 +64,10 @@ class CourseRunTeamSerializer(serializers.Serializer):
         return instance
 
 
-class CourseRunTeamSerializerMixin(serializers.Serializer):
+class CourseRunTeamSerializerMixin(serializers.Serializer):  # lint-amnesty, pylint: disable=abstract-method, missing-class-docstring
     team = CourseRunTeamSerializer(required=False)
 
-    def update_team(self, instance, team):
+    def update_team(self, instance, team):  # lint-amnesty, pylint: disable=missing-function-docstring
         # Existing data should remain intact when performing a partial update.
         if not self.partial:
             CourseAccessRole.objects.filter(course_id=instance.id).delete()
@@ -91,7 +91,7 @@ def image_is_jpeg_or_png(value):
             u'Only JPEG and PNG image types are supported. {} is not valid'.format(content_type))
 
 
-class CourseRunImageField(serializers.ImageField):
+class CourseRunImageField(serializers.ImageField):  # lint-amnesty, pylint: disable=missing-class-docstring
     default_validators = [image_is_jpeg_or_png]
 
     def get_attribute(self, instance):
@@ -103,7 +103,7 @@ class CourseRunImageField(serializers.ImageField):
         return request.build_absolute_uri(value)
 
 
-class CourseRunPacingTypeField(serializers.ChoiceField):
+class CourseRunPacingTypeField(serializers.ChoiceField):  # lint-amnesty, pylint: disable=missing-class-docstring
     def to_representation(self, value):
         return 'self_paced' if value else 'instructor_paced'
 
@@ -111,7 +111,7 @@ class CourseRunPacingTypeField(serializers.ChoiceField):
         return data == 'self_paced'
 
 
-class CourseRunImageSerializer(serializers.Serializer):
+class CourseRunImageSerializer(serializers.Serializer):  # lint-amnesty, pylint: disable=abstract-method, missing-class-docstring
     # We set an empty default to prevent the parent serializer from attempting
     # to save this value to the Course object.
     card_image = CourseRunImageField(source='course_image', default=empty)
@@ -126,13 +126,13 @@ class CourseRunImageSerializer(serializers.Serializer):
         return instance
 
 
-class CourseRunSerializerCommonFieldsMixin(serializers.Serializer):
+class CourseRunSerializerCommonFieldsMixin(serializers.Serializer):  # lint-amnesty, pylint: disable=abstract-method
     schedule = CourseRunScheduleSerializer(source='*', required=False)
     pacing_type = CourseRunPacingTypeField(source='self_paced', required=False,
                                            choices=((False, 'instructor_paced'), (True, 'self_paced'),))
 
 
-class CourseRunSerializer(CourseRunSerializerCommonFieldsMixin, CourseRunTeamSerializerMixin, serializers.Serializer):
+class CourseRunSerializer(CourseRunSerializerCommonFieldsMixin, CourseRunTeamSerializerMixin, serializers.Serializer):  # lint-amnesty, pylint: disable=abstract-method, missing-class-docstring
     id = serializers.CharField(read_only=True)
     title = serializers.CharField(source='display_name')
     images = CourseRunImageSerializer(source='*', required=False)
@@ -150,7 +150,7 @@ class CourseRunSerializer(CourseRunSerializerCommonFieldsMixin, CourseRunTeamSer
             return instance
 
 
-class CourseRunCreateSerializer(CourseRunSerializer):
+class CourseRunCreateSerializer(CourseRunSerializer):  # lint-amnesty, pylint: disable=missing-class-docstring
     org = serializers.CharField(source='id.org')
     number = serializers.CharField(source='id.course')
     run = serializers.CharField(source='id.run')
@@ -166,7 +166,7 @@ class CourseRunCreateSerializer(CourseRunSerializer):
             return instance
 
 
-class CourseRunRerunSerializer(CourseRunSerializerCommonFieldsMixin, CourseRunTeamSerializerMixin,
+class CourseRunRerunSerializer(CourseRunSerializerCommonFieldsMixin, CourseRunTeamSerializerMixin,  # lint-amnesty, pylint: disable=abstract-method, missing-class-docstring
                                serializers.Serializer):
     title = serializers.CharField(source='display_name', required=False)
     number = serializers.CharField(source='id.course', required=False)
@@ -182,7 +182,7 @@ class CourseRunRerunSerializer(CourseRunSerializerCommonFieldsMixin, CourseRunTe
             with store.default_store('split'):
                 new_course_run_key = store.make_course_key(course_run_key.org, number, run)
         except InvalidKeyError:
-            raise serializers.ValidationError(
+            raise serializers.ValidationError(  # lint-amnesty, pylint: disable=raise-missing-from
                 u'Invalid key supplied. Ensure there are no special characters in the Course Number.'
             )
         if store.has_course(new_course_run_key, ignore_case=True):

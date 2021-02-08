@@ -41,7 +41,7 @@ class LibraryTestCase(ModuleStoreTestCase):
     """
 
     def setUp(self):
-        super(LibraryTestCase, self).setUp()
+        super(LibraryTestCase, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
 
         self.user = UserFactory(password=self.user_password, is_staff=True)
         self.client = AjaxEnabledTestClient()
@@ -504,7 +504,7 @@ class TestLibraryAccess(LibraryTestCase):
 
     def setUp(self):
         """ Create a library, staff user, and non-staff user """
-        super(TestLibraryAccess, self).setUp()
+        super(TestLibraryAccess, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.non_staff_user_password = 'foo'
         self.non_staff_user = UserFactory(password=self.non_staff_user_password, is_staff=False)
 
@@ -544,7 +544,7 @@ class TestLibraryAccess(LibraryTestCase):
         Log out when done each test
         """
         self.client.logout()
-        super(TestLibraryAccess, self).tearDown()
+        super(TestLibraryAccess, self).tearDown()  # lint-amnesty, pylint: disable=super-with-arguments
 
     def test_creation(self):
         """
@@ -837,7 +837,7 @@ class TestOverrides(LibraryTestCase):
     """
 
     def setUp(self):
-        super(TestOverrides, self).setUp()
+        super(TestOverrides, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.original_display_name = "A Problem Block"
         self.original_weight = 1
 
@@ -1022,7 +1022,7 @@ class TestIncompatibleModuleStore(LibraryTestCase):
     """
 
     def setUp(self):
-        super(TestIncompatibleModuleStore, self).setUp()
+        super(TestIncompatibleModuleStore, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         # Create a course in an incompatible modulestore.
         with modulestore().default_store(ModuleStoreEnum.Type.mongo):
             self.course = CourseFactory.create()

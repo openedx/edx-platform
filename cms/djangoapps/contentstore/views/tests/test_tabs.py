@@ -20,7 +20,7 @@ class TabsPageTests(CourseTestCase):
         """Common setup for tests"""
 
         # call super class to setup course, etc.
-        super(TabsPageTests, self).setUp()
+        super(TabsPageTests, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
 
         # Set the URL for tests
         self.url = reverse_course_url('tabs_handler', self.course.id)

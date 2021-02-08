@@ -144,13 +144,12 @@ class SequenceBlockTestCase(XModuleXmlImportTest):
         seq_module = SequenceModule(runtime=Mock(position=2), descriptor=Mock(), scope_ids=Mock())
         self.assertEqual(seq_module.position, 2)  # matches position set in the runtime
 
-    @patch('xmodule.seq_module.SequenceModule._get_user', return_value=UserFactory.build())
     @ddt.unpack
     @ddt.data(
         {'view': STUDENT_VIEW},
         {'view': PUBLIC_VIEW},
     )
-    def test_render_student_view(self, mocked_user, view):  # pylint: disable=unused-argument
+    def test_render_student_view(self, view):
         html = self._get_rendered_view(
             self.sequence_3_1,
             extra_context=dict(next_url='NextSequential', prev_url='PrevSequential'),
@@ -164,9 +163,8 @@ class SequenceBlockTestCase(XModuleXmlImportTest):
         self.assertNotIn("fa fa-check-circle check-circle is-hidden", html)
 
     # pylint: disable=line-too-long
-    @patch('xmodule.seq_module.SequenceModule._get_user', return_value=UserFactory.build())
     @patch('xmodule.seq_module.SequenceModule.gate_entire_sequence_if_it_is_a_timed_exam_and_contains_content_type_gated_problems')
-    def test_timed_exam_gating_waffle_flag(self, mocked_function, mocked_user):  # pylint: disable=unused-argument
+    def test_timed_exam_gating_waffle_flag(self, mocked_function):  # pylint: disable=unused-argument
         """
         Verify the code inside the waffle flag is not executed with the flag off
         Verify the code inside the waffle flag is executed with the flag on
@@ -190,11 +188,9 @@ class SequenceBlockTestCase(XModuleXmlImportTest):
             mocked_function.assert_called_once()
 
     @override_waffle_flag(TIMED_EXAM_GATING_WAFFLE_FLAG, active=True)
-    @patch('xmodule.seq_module.SequenceModule._get_user', return_value=UserFactory.build())
-    def test_that_timed_sequence_gating_respects_access_configurations(self, mocked_user):  # pylint: disable=unused-argument
+    def test_that_timed_sequence_gating_respects_access_configurations(self):
         """
         Verify that if a time limited sequence contains content type gated problems, we gate the sequence
-        Verify that if a time limited sequence does not contain content type gated problems, we do not gate the sequence
         """
         # the one problem in this sequence needs to have graded set to true in order to test content type gating
         self.sequence_5_1.get_children()[0].get_children()[0].graded = True
@@ -202,8 +198,7 @@ class SequenceBlockTestCase(XModuleXmlImportTest):
 
         # When a time limited sequence contains content type gated problems, the sequence itself is gated
         self.sequence_5_1.runtime._services['content_type_gating'] = Mock(return_value=Mock(  # pylint: disable=protected-access
-            enabled_for_enrollment=Mock(return_value=True),
-            content_type_gate_for_block=Mock(return_value=gated_fragment)
+            check_children_for_content_type_gating_paywall=Mock(return_value=gated_fragment.content),
         ))
         view = self._get_rendered_view(
             self.sequence_5_1,
@@ -216,62 +211,27 @@ class SequenceBlockTestCase(XModuleXmlImportTest):
         self.assertIn('NextSequential', view)
         self.assertIn('PrevSequential', view)
 
-        # When enabled_for_enrollment is false, the sequence itself is not gated
-        self.sequence_5_1.runtime._services['content_type_gating'] = Mock(return_value=Mock(  # pylint: disable=protected-access
-            enabled_for_enrollment=Mock(return_value=False),
-            content_type_gate_for_block=Mock(return_value=gated_fragment)
-        ))
-        view = self._get_rendered_view(
-            self.sequence_5_1,
-            extra_context=dict(next_url='NextSequential', prev_url='PrevSequential'),
-            view=STUDENT_VIEW
-        )
-        self.assertNotIn('i_am_gated', view)
-        # check a few elements to ensure the correct page was loaded
-        self.assertIn("seq_module.html", view)
-        self.assertIn('NextSequential', view)
-        self.assertIn('PrevSequential', view)
-
-        # When content_type_gate_for_block returns None, the sequence itself is not gated
-        self.sequence_5_1.runtime._services['content_type_gating'] = Mock(return_value=Mock(  # pylint: disable=protected-access
-            enabled_for_enrollment=Mock(return_value=True),
-            content_type_gate_for_block=Mock(return_value=None)
-        ))
-        view = self._get_rendered_view(
-            self.sequence_5_1,
-            extra_context=dict(next_url='NextSequential', prev_url='PrevSequential'),
-            view=STUDENT_VIEW
-        )
-        self.assertNotIn('i_am_gated', view)
-        # check a few elements to ensure the correct page was loaded
-        self.assertIn("seq_module.html", view)
-        self.assertIn('NextSequential', view)
-        self.assertIn('PrevSequential', view)
-
-    @patch('xmodule.seq_module.SequenceModule._get_user', return_value=UserFactory.build())
     @ddt.unpack
     @ddt.data(
         {'view': STUDENT_VIEW},
         {'view': PUBLIC_VIEW},
     )
-    def test_student_view_first_child(self, mocked_user, view):  # pylint: disable=unused-argument
+    def test_student_view_first_child(self, view):
         html = self._get_rendered_view(
             self.sequence_3_1, requested_child='first', view=view
         )
         self._assert_view_at_position(html, expected_position=1)
 
-    @patch('xmodule.seq_module.SequenceModule._get_user', return_value=UserFactory.build())
     @ddt.unpack
     @ddt.data(
         {'view': STUDENT_VIEW},
         {'view': PUBLIC_VIEW},
     )
-    def test_student_view_last_child(self, mocked_user, view):  # pylint: disable=unused-argument
+    def test_student_view_last_child(self, view):
         html = self._get_rendered_view(self.sequence_3_1, requested_child='last', view=view)
         self._assert_view_at_position(html, expected_position=3)
 
-    @patch('xmodule.seq_module.SequenceModule._get_user', return_value=UserFactory.build())
-    def test_tooltip(self, mocked_user):  # pylint: disable=unused-argument
+    def test_tooltip(self):
         html = self._get_rendered_view(self.sequence_3_1, requested_child=None)
         for child in self.sequence_3_1.children:
             self.assertIn("'page_title': '{}'".format(child.block_id), html)
@@ -445,8 +405,7 @@ class SequenceBlockTestCase(XModuleXmlImportTest):
         )
         self.assertIs(completion_return, None)
 
-    @patch('xmodule.seq_module.SequenceModule._get_user', return_value=UserFactory.build())
-    def test_handle_ajax_metadata(self, mocked_user):  # pylint: disable=unused-argument
+    def test_handle_ajax_metadata(self):
         """
         Test that the sequence metadata is returned from the
         metadata ajax handler.
@@ -459,11 +418,10 @@ class SequenceBlockTestCase(XModuleXmlImportTest):
         self.assertEqual(metadata['tag'], 'sequential')
         self.assertEqual(metadata['display_name'], self.sequence_3_1.display_name_with_default)
 
-    @patch('xmodule.seq_module.SequenceModule._get_user', return_value=UserFactory.build())
     @override_settings(FIELD_OVERRIDE_PROVIDERS=(
         'openedx.features.content_type_gating.field_override.ContentTypeGatingFieldOverride',
     ))
-    def test_handle_ajax_metadata_content_type_gated_content(self, mocked_user):  # pylint: disable=unused-argument
+    def test_handle_ajax_metadata_content_type_gated_content(self):
         """
         The contains_content_type_gated_content field should reflect
         whether the given item contains content type gated content

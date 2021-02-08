@@ -16,7 +16,7 @@ class TestCourseOverviewSerializer(TestCase):
     """
 
     def setUp(self):
-        super(TestCourseOverviewSerializer, self).setUp()
+        super(TestCourseOverviewSerializer, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         CourseOverviewFactory.create()
 
     def test_get_course_overview_serializer(self):

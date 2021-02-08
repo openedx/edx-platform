@@ -412,7 +412,7 @@ class MasqueradingKeyValueStore(KeyValueStore):
     This `KeyValueStore` wraps an underlying `KeyValueStore`.  Reads are forwarded to the underlying
     store, but writes go to a Django session (or other dictionary-like object).
     """
-    def __init__(self, kvs, session):
+    def __init__(self, kvs, session):  # lint-amnesty, pylint: disable=super-init-not-called
         """
         Arguments:
           kvs: The KeyValueStore to wrap.

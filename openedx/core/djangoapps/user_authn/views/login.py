@@ -33,7 +33,7 @@ from openedx.core.djangoapps.site_configuration import helpers as configuration_
 from openedx.core.djangoapps.user_authn.views.login_form import get_login_session_form
 from openedx.core.djangoapps.user_authn.cookies import get_response_with_refreshed_jwt_cookies, set_logged_in_cookies
 from openedx.core.djangoapps.user_authn.exceptions import AuthFailedError
-from openedx.core.djangoapps.user_authn.utils import should_redirect_to_authn_microfrontend
+from openedx.core.djangoapps.user_authn.toggles import should_redirect_to_authn_microfrontend
 from openedx.core.djangoapps.util.user_messages import PageLevelMessages
 from openedx.core.djangoapps.user_authn.views.password_reset import send_password_reset_email_for_user
 from openedx.core.djangoapps.user_authn.toggles import is_require_third_party_auth_enabled
@@ -125,24 +125,22 @@ def _generate_locked_out_error_message():
     """
 
     locked_out_period_in_sec = settings.MAX_FAILED_LOGIN_ATTEMPTS_LOCKOUT_PERIOD_SECS
-    if not should_redirect_to_authn_microfrontend:   # pylint: disable=no-else-raise
-        raise AuthFailedError(Text(_('To protect your account, it’s been temporarily '
-                                     'locked. Try again in {locked_out_period} minutes.'
-                                     '{li_start}To be on the safe side, you can reset your '
-                                     'password {link_start}here{link_end} before you try again.')).format(
-            link_start=HTML('<a http="#login" class="form-toggle" data-type="password-reset">'),
-            link_end=HTML('</a>'),
-            li_start=HTML('<li>'),
-            li_end=HTML('</li>'),
-            locked_out_period=int(locked_out_period_in_sec / 60)))
-    else:
-        raise AuthFailedError(Text(_('To protect your account, it’s been temporarily '
-                                     'locked. Try again in {locked_out_period} minutes.\n'
-                                     'To be on the safe side, you can reset your '
-                                     'password {link_start}here{link_end} before you try again.\n')).format(
-            link_start=HTML('<a href="/reset" >'),
-            link_end=HTML('</a>'),
-            locked_out_period=int(locked_out_period_in_sec / 60)))
+    error_message = Text(_('To protect your account, it’s been temporarily '
+                           'locked. Try again in {locked_out_period} minutes.'
+                           '{li_start}To be on the safe side, you can reset your '
+                           'password {link_start}here{link_end} before you try again.')).format(
+                               link_start=HTML('<a http="#login" class="form-toggle" data-type="password-reset">'),
+                               link_end=HTML('</a>'),
+                               li_start=HTML('<li>'),
+                               li_end=HTML('</li>'),
+                               locked_out_period=int(locked_out_period_in_sec / 60))
+    raise AuthFailedError(
+        error_message,
+        error_code='account-locked-out',
+        context={
+            'locked_out_period': int(locked_out_period_in_sec / 60)
+        }
+    )
 
 
 def _enforce_password_policy_compliance(request, user):  # lint-amnesty, pylint: disable=missing-function-docstring
@@ -238,35 +236,29 @@ def _handle_failed_authentication(user, authenticated_user):
             if not LoginFailures.is_user_locked_out(user):
                 max_failures_allowed = settings.MAX_FAILED_LOGIN_ATTEMPTS_ALLOWED
                 remaining_attempts = max_failures_allowed - failure_count
-                if not should_redirect_to_authn_microfrontend:  # pylint: disable=no-else-raise
-                    raise AuthFailedError(Text(_('Email or password is incorrect.'
-                                                 '{li_start}You have {remaining_attempts} more sign-in '
-                                                 'attempts before your account is temporarily locked.{li_end}'
-                                                 '{li_start}If you\'ve forgotten your password, click '
-                                                 '{link_start}here{link_end} to reset.{li_end}'
-                                                 ))
-                                          .format(
-                        link_start=HTML('<a http="#login" class="form-toggle" data-type="password-reset">'),
-                        link_end=HTML('</a>'),
-                        li_start=HTML('<li>'),
-                        li_end=HTML('</li>'),
-                        remaining_attempts=remaining_attempts))
-                else:
-                    raise AuthFailedError(Text(_('Email or password is incorrect.\n'
-                                                 'You have {remaining_attempts} more sign-in '
-                                                 'attempts before your account is temporarily locked.\n'
-                                                 'If you{quote}ve forgotten your password, click '
-                                                 '{link_start}here{link_end} to reset.\n'
-                                                 ))
-                                          .format(
-                        quote=HTML("'"),
-                        link_start=HTML('<a href="/reset" >'),
-                        link_end=HTML('</a>'),
-                        remaining_attempts=remaining_attempts))
-            else:
-                _generate_locked_out_error_message()
+                error_message = Text(_('Email or password is incorrect.'
+                                       '{li_start}You have {remaining_attempts} more sign-in '
+                                       'attempts before your account is temporarily locked.{li_end}'
+                                       '{li_start}If you\'ve forgotten your password, click '
+                                       '{link_start}here{link_end} to reset.{li_end}')).format(
+                                           link_start=HTML(
+                                               '<a http="#login" class="form-toggle" data-type="password-reset">'
+                                           ),
+                                           link_end=HTML('</a>'),
+                                           li_start=HTML('<li>'),
+                                           li_end=HTML('</li>'),
+                                           remaining_attempts=remaining_attempts)
+                raise AuthFailedError(
+                    error_message,
+                    error_code='failed-login-attempt',
+                    context={
+                        'remaining_attempts': remaining_attempts,
+                    }
+                )
 
-    raise AuthFailedError(_('Email or password is incorrect.'))
+            _generate_locked_out_error_message()
+
+    raise AuthFailedError(_('Email or password is incorrect.'), error_code='incorrect-email-or-password')
 
 
 def _handle_successful_authentication_and_login(user, request):

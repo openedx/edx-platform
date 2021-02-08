@@ -22,7 +22,7 @@ class TestHandleItemDeleted(ModuleStoreTestCase, MilestonesTestCaseMixin):
         """
         Initial data setup
         """
-        super(TestHandleItemDeleted, self).setUp()
+        super(TestHandleItemDeleted, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
 
         self.course = CourseFactory.create()
         self.course.enable_subsection_gating = True

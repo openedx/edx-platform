@@ -133,7 +133,7 @@ class AccessListFallback(Exception):
     An exception that is raised whenever we need to `fall back` to fetching *all* courses
     available to a user, rather than using a shorter method (i.e. fetching by group)
     """
-    pass
+    pass  # lint-amnesty, pylint: disable=unnecessary-pass
 
 
 def get_course_and_check_access(course_key, user, depth=0):
@@ -289,7 +289,7 @@ def course_handler(request, course_key_string=None):
         else:
             return HttpResponseNotFound()
     except InvalidKeyError:
-        raise Http404
+        raise Http404  # lint-amnesty, pylint: disable=raise-missing-from
 
 
 @login_required
@@ -357,7 +357,7 @@ def _course_outline_json(request, course_module):
     return create_xblock_info(
         course_module,
         include_child_info=True,
-        course_outline=False if is_concise else True,
+        course_outline=False if is_concise else True,  # lint-amnesty, pylint: disable=simplifiable-if-expression
         include_children_predicate=include_children_predicate,
         is_concise=is_concise,
         user=request.user
@@ -531,8 +531,8 @@ def course_listing(request):
             u'org': uca.course_key.org,
             u'number': uca.course_key.course,
             u'run': uca.course_key.run,
-            u'is_failed': True if uca.state == CourseRerunUIStateManager.State.FAILED else False,
-            u'is_in_progress': True if uca.state == CourseRerunUIStateManager.State.IN_PROGRESS else False,
+            u'is_failed': True if uca.state == CourseRerunUIStateManager.State.FAILED else False,  # lint-amnesty, pylint: disable=simplifiable-if-expression
+            u'is_in_progress': True if uca.state == CourseRerunUIStateManager.State.IN_PROGRESS else False,  # lint-amnesty, pylint: disable=simplifiable-if-expression
             u'dismiss_link': reverse_course_url(
                 u'course_notifications_handler',
                 uca.course_key,
@@ -679,7 +679,7 @@ def course_index(request, course_key):
             'lms_link': lms_link,
             'sections': sections,
             'course_structure': course_structure,
-            'initial_state': course_outline_initial_state(locator_to_show, course_structure) if locator_to_show else None,
+            'initial_state': course_outline_initial_state(locator_to_show, course_structure) if locator_to_show else None,  # lint-amnesty, pylint: disable=line-too-long
             'rerun_notification_id': current_action.id if current_action else None,
             'course_release_date': course_release_date,
             'settings_url': settings_url,
@@ -893,7 +893,7 @@ def create_new_course(user, org, number, run, fields):
     try:
         org_data = ensure_organization(org)
     except InvalidOrganizationException:
-        raise ValidationError(_(
+        raise ValidationError(_(  # lint-amnesty, pylint: disable=raise-missing-from
             'You must link this course to an organization in order to continue. Organization '
             'you selected does not exist in the system, you will need to add it to the system'
         ))
@@ -985,7 +985,7 @@ def course_info_handler(request, course_key_string):
     try:
         course_key = CourseKey.from_string(course_key_string)
     except InvalidKeyError:
-        raise Http404
+        raise Http404  # lint-amnesty, pylint: disable=raise-missing-from
 
     with modulestore().bulk_operations(course_key):
         course_module = get_course_and_check_access(course_key, request.user)
@@ -1041,7 +1041,7 @@ def course_info_update_handler(request, course_key_string, provided_id=None):
     elif request.method == 'DELETE':
         try:
             return JsonResponse(delete_course_update(usage_key, request.json, provided_id, request.user))
-        except:
+        except:  # lint-amnesty, pylint: disable=bare-except
             return HttpResponseBadRequest(
                 "Failed to delete",
                 content_type="text/plain"
@@ -1050,7 +1050,7 @@ def course_info_update_handler(request, course_key_string, provided_id=None):
     elif request.method in ('POST', 'PUT'):
         try:
             return JsonResponse(update_course_updates(usage_key, request.json, provided_id, request.user))
-        except:
+        except:  # lint-amnesty, pylint: disable=bare-except
             return HttpResponseBadRequest(
                 "Failed to save",
                 content_type="text/plain"
@@ -1061,7 +1061,7 @@ def course_info_update_handler(request, course_key_string, provided_id=None):
 @ensure_csrf_cookie
 @require_http_methods(("GET", "PUT", "POST"))
 @expect_json
-def settings_handler(request, course_key_string):
+def settings_handler(request, course_key_string):  # lint-amnesty, pylint: disable=too-many-statements
     """
     Course settings for dates and about pages
     GET
@@ -1156,7 +1156,7 @@ def settings_handler(request, course_key_string):
 
                     # if 'minimum_grade_credit' of a course is not set or 0 then
                     # show warning message to course author.
-                    show_min_grade_warning = False if course_module.minimum_grade_credit > 0 else True
+                    show_min_grade_warning = False if course_module.minimum_grade_credit > 0 else True  # lint-amnesty, pylint: disable=simplifiable-if-expression
                     settings_context.update(
                         {
                             'is_credit_course': True,
@@ -1185,7 +1185,7 @@ def settings_handler(request, course_key_string):
                         set_prerequisite_courses(course_key, prerequisite_course_keys)
                     else:
                         # None is chosen, so remove the course prerequisites
-                        course_milestones = milestones_api.get_course_milestones(course_key=course_key, relationship="requires")
+                        course_milestones = milestones_api.get_course_milestones(course_key=course_key, relationship="requires")  # lint-amnesty, pylint: disable=line-too-long
                         for milestone in course_milestones:
                             remove_prerequisite_course(course_key, milestone)
 
@@ -1412,7 +1412,7 @@ def advanced_settings_handler(request, course_key_string):
 
 class TextbookValidationError(Exception):
     "An error thrown when a textbook input is invalid"
-    pass
+    pass  # lint-amnesty, pylint: disable=unnecessary-pass
 
 
 def validate_textbooks_json(text):
@@ -1424,7 +1424,7 @@ def validate_textbooks_json(text):
     try:
         textbooks = json.loads(text)
     except ValueError:
-        raise TextbookValidationError("invalid JSON")
+        raise TextbookValidationError("invalid JSON")  # lint-amnesty, pylint: disable=raise-missing-from
     if not isinstance(textbooks, (list, tuple)):
         raise TextbookValidationError("must be JSON list")
     for textbook in textbooks:
@@ -1447,7 +1447,7 @@ def validate_textbook_json(textbook):
         try:
             textbook = json.loads(textbook)
         except ValueError:
-            raise TextbookValidationError("invalid JSON")
+            raise TextbookValidationError("invalid JSON")  # lint-amnesty, pylint: disable=raise-missing-from
     if not isinstance(textbook, dict):
         raise TextbookValidationError("must be JSON object")
     if not textbook.get("tab_title"):
@@ -1768,7 +1768,7 @@ def group_configurations_detail_handler(request, course_key_string, group_config
 
         if request.method in ('POST', 'PUT'):  # can be either and sometimes django is rewriting one to the other
             try:
-                new_configuration = GroupConfiguration(request.body, course, group_configuration_id).get_user_partition()
+                new_configuration = GroupConfiguration(request.body, course, group_configuration_id).get_user_partition()  # lint-amnesty, pylint: disable=line-too-long
             except GroupConfigurationsValidationError as err:
                 return JsonResponse({"error": text_type(err)}, status=400)
 

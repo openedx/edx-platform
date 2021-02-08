@@ -39,7 +39,7 @@ class StubModel(object):
         """
         Noop delete method.
         """
-        pass
+        pass  # lint-amnesty, pylint: disable=unnecessary-pass
 
 
 class BlockStructureStore(object):
@@ -216,7 +216,7 @@ class BlockStructureStore(object):
             # Somehow failed to de-serialized the data, assume it's corrupt.
             bs_model = self._get_model(root_block_usage_key)
             logger.exception(u"BlockStructure: Failed to load data from cache for %s", bs_model)
-            raise BlockStructureNotFound(bs_model.data_usage_key)
+            raise BlockStructureNotFound(bs_model.data_usage_key)  # lint-amnesty, pylint: disable=raise-missing-from
 
         return BlockStructureFactory.create_new(
             root_block_usage_key,

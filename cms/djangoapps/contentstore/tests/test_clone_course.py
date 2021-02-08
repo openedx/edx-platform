@@ -79,7 +79,7 @@ class CloneCourseTest(CourseTestCase):
         # Get & verify all assets of the course
         assets, count = contentstore().get_all_content_for_course(course.id)
         self.assertEqual(count, 1)
-        self.assertEqual(set([asset['asset_key'].block_id for asset in assets]), course_assets)
+        self.assertEqual(set([asset['asset_key'].block_id for asset in assets]), course_assets)  # lint-amnesty, pylint: disable=consider-using-set-comprehension
 
         # rerun from split into split
         split_rerun_id = CourseLocator(org=org, course=course_number, run="2012_Q2")
@@ -126,7 +126,7 @@ class CloneCourseTest(CourseTestCase):
         )
 
         # try to hit the generic exception catch
-        with patch('xmodule.modulestore.split_mongo.mongo_connection.MongoConnection.insert_course_index', Mock(side_effect=Exception)):
+        with patch('xmodule.modulestore.split_mongo.mongo_connection.MongoConnection.insert_course_index', Mock(side_effect=Exception)):  # lint-amnesty, pylint: disable=line-too-long
             split_course4_id = CourseLocator(org="edx3", course="split3", run="rerun_fail")
             fields = {'display_name': 'total failure'}
             CourseRerunState.objects.initiated(split_course3_id, split_course4_id, self.user, fields['display_name'])

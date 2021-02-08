@@ -17,7 +17,7 @@ class StudioPageTestCase(CourseTestCase):
     """
 
     def setUp(self):
-        super(StudioPageTestCase, self).setUp()
+        super(StudioPageTestCase, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.chapter = ItemFactory.create(parent_location=self.course.location,
                                           category='chapter', display_name="Week 1")
         self.sequential = ItemFactory.create(parent_location=self.chapter.location,

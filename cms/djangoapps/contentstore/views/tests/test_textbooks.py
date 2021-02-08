@@ -14,7 +14,7 @@ class TextbookIndexTestCase(CourseTestCase):
     "Test cases for the textbook index page"
     def setUp(self):
         "Set the URL for tests"
-        super(TextbookIndexTestCase, self).setUp()
+        super(TextbookIndexTestCase, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.url = reverse_course_url('textbooks_list_handler', self.course.id)
 
     def test_view_index(self):
@@ -113,7 +113,7 @@ class TextbookCreateTestCase(CourseTestCase):
 
     def setUp(self):
         "Set up a url and some textbook content for tests"
-        super(TextbookCreateTestCase, self).setUp()
+        super(TextbookCreateTestCase, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.url = reverse_course_url('textbooks_list_handler', self.course.id)
 
         self.textbook = {
@@ -173,7 +173,7 @@ class TextbookDetailTestCase(CourseTestCase):
 
     def setUp(self):
         "Set some useful content and URLs for tests"
-        super(TextbookDetailTestCase, self).setUp()
+        super(TextbookDetailTestCase, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.textbook1 = {
             "tab_title": "Economics",
             "id": 1,
@@ -295,7 +295,7 @@ class TextbookValidationTestCase(TestCase):
 
     def setUp(self):
         "Set some useful content for tests"
-        super(TextbookValidationTestCase, self).setUp()
+        super(TextbookValidationTestCase, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
 
         self.tb1 = {
             "tab_title": "Hi, mom!",

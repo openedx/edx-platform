@@ -3,7 +3,7 @@ Permissions for Content Libraries (v2, Blockstore-based)
 """
 from bridgekeeper import perms, rules
 from bridgekeeper.rules import Attribute, ManyRelation, Relation, in_current_groups
-from django.contrib.auth.models import Group
+from django.contrib.auth.models import Group  # lint-amnesty, pylint: disable=unused-import
 
 from openedx.core.djangoapps.content_libraries.models import ContentLibraryPermission
 

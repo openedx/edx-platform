@@ -1,4 +1,4 @@
-"""
+"""  # lint-amnesty, pylint: disable=django-not-configured
 Class used to write pytest warning data  into html format
 """
 import textwrap

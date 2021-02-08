@@ -1,8 +1,8 @@
-# -*- coding: utf-8 -*-
+# lint-amnesty, pylint: disable=missing-module-docstring
 
 
 import json
-from io import BytesIO
+from io import BytesIO  # lint-amnesty, pylint: disable=unused-import
 
 import ddt
 import six

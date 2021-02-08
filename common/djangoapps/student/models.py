@@ -59,7 +59,10 @@ from user_util import user_util
 import openedx.core.djangoapps.django_comment_common.comment_client as cc
 from common.djangoapps.course_modes.models import CourseMode, get_cosmetic_verified_display_price
 from common.djangoapps.student.emails import send_proctoring_requirements_email
-from common.djangoapps.student.email_helpers import generate_proctoring_requirements_email_context
+from common.djangoapps.student.email_helpers import (
+    generate_proctoring_requirements_email_context,
+    should_send_proctoring_requirements_email
+)
 from common.djangoapps.student.signals import ENROLL_STATUS_CHANGE, ENROLLMENT_TRACK_UPDATED, UNENROLL_DONE
 from common.djangoapps.track import contexts, segment
 from common.djangoapps.util.model_utils import emit_field_changed_events, get_changed_fields_dict
@@ -76,7 +79,6 @@ from openedx.core.djangoapps.content.course_overviews.models import CourseOvervi
 from openedx.core.djangoapps.enrollments.api import (
     _default_course_mode,
     get_enrollment_attributes,
-    is_enrollment_valid_for_proctoring,
     set_enrollment_attributes,
 )
 from openedx.core.djangoapps.signals.signals import USER_ACCOUNT_ACTIVATED
@@ -166,19 +168,6 @@ def anonymous_id_for_user(user, course_id, save=True):
     else: create new anonymous_id, save it in AnonymousUserId, and return anonymous id
     """
 
-    # .. toggle_name: ANONYMOUS_USER_ID_REVERT_TO_STABLE_HASH
-    # .. toggle_implementation: SettingToggle
-    # .. toggle_default: False
-    # .. toggle_description: Used to make sure we can quickly revert back to old behaviour in case our refractoring
-    #   of anonymous_id_for_user function does not work as intended.  Our concern is that our refractoring adds a
-    #   database lookup on every call and we are worried this will cause preformance issues.
-    # .. toggle_use_cases: temporary
-    # .. toggle_creation_date: 2021-01-26
-    # .. toggle_target_removal_date: 2021-01-29
-    # .. toggle_tickets: https://openedx.atlassian.net/browse/ARCHBOM-1645
-    if getattr(settings, "ANONYMOUS_USER_ID_REVERT_TO_STABLE_HASH", False):
-        return deprecated_anonymous_id_for_user(user, course_id, save)
-
     # This part is for ability to get xblock instance in xblock_noauth handlers, where user is unauthenticated.
     assert user
 
@@ -232,66 +221,6 @@ def anonymous_id_for_user(user, course_id, save=True):
     user._anonymous_id[course_id] = anonymous_user_id  # pylint: disable=protected-access
 
     return anonymous_user_id
-
-
-def deprecated_anonymous_id_for_user(user, course_id, save=True):
-    """
-    Return a unique id for a (user, course) pair, suitable for inserting
-    into e.g. personalized survey links.
-    If user is an `AnonymousUser`, returns `None`
-    Keyword arguments:
-    save -- Whether the id should be saved in an AnonymousUserId object.
-    """
-    # This part is for ability to get xblock instance in xblock_noauth handlers, where user is unauthenticated.
-    assert user
-
-    if user.is_anonymous:
-        return None
-
-    # ARCHBOM-1674: Get a sense of what fraction of anonymous_user_id calls are
-    # cached, stored in the DB, or retrieved from the DB. This will help inform
-    # us on decisions about whether we can move to always save IDs,
-    # pregenerate them, use random instead of deterministic IDs, etc.
-    monitoring.increment('temp_anon_uid_v1.requested')
-
-    cached_id = getattr(user, '_anonymous_id', {}).get(course_id)
-    if cached_id is not None:
-        monitoring.increment('temp_anon_uid_v1.returned_from_cache')
-        return cached_id
-
-    # include the secret key as a salt, and to make the ids unique across different LMS installs.
-    hasher = hashlib.md5()
-    hasher.update(settings.SECRET_KEY.encode('utf8'))
-    hasher.update(text_type(user.id).encode('utf8'))
-    if course_id:
-        hasher.update(text_type(course_id).encode('utf-8'))
-    digest = hasher.hexdigest()
-
-    if not hasattr(user, '_anonymous_id'):
-        user._anonymous_id = {}  # pylint: disable=protected-access
-
-    user._anonymous_id[course_id] = digest  # pylint: disable=protected-access
-
-    if save is False:
-        monitoring.increment('temp_anon_uid_v1.computed_unsaved')
-        return digest
-
-    try:
-        _, created = AnonymousUserId.objects.get_or_create(
-            user=user,
-            course_id=course_id,
-            anonymous_user_id=digest,
-        )
-        if created:
-            monitoring.increment('temp_anon_uid_v1.stored')
-        else:
-            monitoring.increment('temp_anon_uid_v1.computed_existing')
-    except IntegrityError:
-        # Another thread has already created this entry, so
-        # continue
-        monitoring.increment('temp_anon_uid_v1.store_db_error')
-
-    return digest
 
 
 def user_by_anonymous_id(uid):
@@ -1461,7 +1390,7 @@ class CourseEnrollment(models.Model):
         if mode_changed:
             if COURSEWARE_PROCTORING_IMPROVEMENTS.is_enabled(self.course_id):
                 # If mode changed to one that requires proctoring, send proctoring requirements email
-                if is_enrollment_valid_for_proctoring(self.user.username, self.course_id):
+                if should_send_proctoring_requirements_email(self.user.username, self.course_id):
                     email_context = generate_proctoring_requirements_email_context(self.user, self.course_id)
                     send_proctoring_requirements_email(context=email_context)
 

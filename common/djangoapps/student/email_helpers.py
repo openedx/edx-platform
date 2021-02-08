@@ -9,6 +9,7 @@ from django.conf import settings
 
 from lms.djangoapps.verify_student.services import IDVerificationService
 from openedx.core.djangoapps.ace_common.template_context import get_base_template_context
+from openedx.core.djangoapps.enrollments.api import is_enrollment_valid_for_proctoring
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from xmodule.modulestore.django import modulestore
 
@@ -51,3 +52,26 @@ def generate_proctoring_requirements_email_context(user, course_id):
         'proctoring_requirements_url': settings.PROCTORING_SETTINGS.get('LINK_URLS', {}).get('faq', ''),
         'id_verification_url': IDVerificationService.get_verify_location(),
     }
+
+
+def should_send_proctoring_requirements_email(username, course_id):
+    """
+    Returns a boolean whether a proctoring requirements email should be sent.
+
+    Arguments:
+        * username (str): The user associated with the enrollment.
+        * course_id (str): The course id associated with the enrollment.
+    """
+    if not is_enrollment_valid_for_proctoring(username, course_id):
+        return False
+
+    # Only send if a proctored exam is found in the course
+    timed_exams = modulestore().get_items(
+        course_id,
+        qualifiers={'category': 'sequential'},
+        settings={'is_time_limited': True}
+    )
+
+    has_proctored_exam = any([exam.is_proctored_exam for exam in timed_exams])
+
+    return has_proctored_exam

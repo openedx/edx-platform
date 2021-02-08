@@ -28,7 +28,7 @@ class BlockStructureModelTestCase(TestCase):
     Tests for BlockStructureModel.
     """
     def setUp(self):
-        super(BlockStructureModelTestCase, self).setUp()
+        super(BlockStructureModelTestCase, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.course_key = CourseLocator('org', 'course', six.text_type(uuid4()))
         self.usage_key = BlockUsageLocator(course_key=self.course_key, block_type='course', block_id='course')
 
@@ -36,7 +36,7 @@ class BlockStructureModelTestCase(TestCase):
 
     def tearDown(self):
         BlockStructureModel._prune_files(self.usage_key, num_to_keep=0)
-        super(BlockStructureModelTestCase, self).tearDown()
+        super(BlockStructureModelTestCase, self).tearDown()  # lint-amnesty, pylint: disable=super-with-arguments
 
     def _assert_bsm_fields(self, bsm, expected_serialized_data):
         """
@@ -161,7 +161,7 @@ class BlockStructureModelTestCase(TestCase):
         bs_model, _ = BlockStructureModel.update_or_create('test data', **self.params)
         with self.assertRaises(expected_error_raised):
             with _storage_error_handling(bs_model, 'operation', is_read_operation):
-                if errno_raised is not None:
+                if errno_raised is not None:  # lint-amnesty, pylint: disable=no-else-raise
                     raise error_raised_in_operation(errno_raised, message_raised)
                 else:
                     raise error_raised_in_operation

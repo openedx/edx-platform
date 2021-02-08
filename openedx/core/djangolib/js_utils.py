@@ -1,4 +1,4 @@
-"""
+"""  # lint-amnesty, pylint: disable=django-not-configured
 Utilities for dealing with Javascript and JSON.
 """
 

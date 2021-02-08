@@ -37,7 +37,7 @@ class TestCourseListing(ModuleStoreTestCase):
         """
         Add a user and a course
         """
-        super(TestCourseListing, self).setUp()
+        super(TestCourseListing, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         # create and log in a staff user.
         # create and log in a non-staff user
         self.user = UserFactory()

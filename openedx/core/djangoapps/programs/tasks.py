@@ -3,7 +3,7 @@ This file contains celery tasks for programs-related functionality.
 """
 
 
-from celery import task
+from celery import shared_task
 from celery.exceptions import MaxRetriesExceededError
 from celery.utils.log import get_task_logger
 from django.conf import settings
@@ -121,7 +121,7 @@ def award_program_certificate(client, username, program_uuid, visible_date):
     })
 
 
-@task(bind=True, ignore_result=True)
+@shared_task(bind=True, ignore_result=True)
 @set_code_owner_attribute
 def award_program_certificates(self, username):  # lint-amnesty, pylint: disable=too-many-statements
     """
@@ -284,7 +284,7 @@ def post_course_certificate(client, username, certificate, visible_date):
     })
 
 
-@task(bind=True, ignore_result=True)
+@shared_task(bind=True, ignore_result=True)
 @set_code_owner_attribute
 def award_course_certificate(self, username, course_run_key):
     """
@@ -399,7 +399,7 @@ def revoke_program_certificate(client, username, program_uuid):
     })
 
 
-@task(bind=True, ignore_result=True)
+@shared_task(bind=True, ignore_result=True)
 @set_code_owner_attribute
 def revoke_program_certificates(self, username, course_key):
     """
@@ -523,7 +523,7 @@ def revoke_program_certificates(self, username, course_key):
     LOGGER.info(u'Successfully completed the task revoke_program_certificates for username %s', username)
 
 
-@task(bind=True, ignore_result=True)
+@shared_task(bind=True, ignore_result=True)
 @set_code_owner_attribute
 def update_certificate_visible_date_on_course_update(self, course_key):
     """

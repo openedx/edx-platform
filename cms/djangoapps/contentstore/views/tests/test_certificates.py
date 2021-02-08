@@ -208,11 +208,11 @@ class CertificatesListHandlerTestCase(
     Test cases for certificates_list_handler.
     """
 
-    def setUp(self):
+    def setUp(self):  # lint-amnesty, pylint: disable=arguments-differ
         """
         Set up CertificatesListHandlerTestCase.
         """
-        super(CertificatesListHandlerTestCase, self).setUp('cms.djangoapps.contentstore.views.certificates.tracker')
+        super(CertificatesListHandlerTestCase, self).setUp('cms.djangoapps.contentstore.views.certificates.tracker')  # lint-amnesty, pylint: disable=super-with-arguments
         self.reset_urls()
 
     def _url(self):
@@ -437,7 +437,7 @@ class CertificatesDetailHandlerTestCase(
         """
         Set up CertificatesDetailHandlerTestCase.
         """
-        super(CertificatesDetailHandlerTestCase, self).setUp('cms.djangoapps.contentstore.views.certificates.tracker')
+        super(CertificatesDetailHandlerTestCase, self).setUp('cms.djangoapps.contentstore.views.certificates.tracker')  # lint-amnesty, pylint: disable=super-with-arguments
         self.reset_urls()
 
     def _url(self, cid=-1):

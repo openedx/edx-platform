@@ -260,7 +260,7 @@ def download_transcripts(request):
     try:
         content, filename, mimetype = get_transcript(video, lang=u'en')
     except NotFoundError:
-        raise Http404
+        raise Http404  # lint-amnesty, pylint: disable=raise-missing-from
 
     # Construct an HTTP response
     response = HttpResponse(content, content_type=mimetype)
@@ -269,7 +269,7 @@ def download_transcripts(request):
 
 
 @login_required
-def check_transcripts(request):
+def check_transcripts(request):  # lint-amnesty, pylint: disable=too-many-statements
     """
     Check state of transcripts availability.
 
@@ -463,7 +463,7 @@ def _validate_transcripts_data(request):
     try:
         item = _get_item(request, data)
     except (InvalidKeyError, ItemNotFoundError):
-        raise TranscriptsRequestValidationException(_("Can't find item by locator."))
+        raise TranscriptsRequestValidationException(_("Can't find item by locator."))  # lint-amnesty, pylint: disable=raise-missing-from
 
     if item.category != 'video':
         raise TranscriptsRequestValidationException(_('Transcripts are supported only for "video" modules.'))

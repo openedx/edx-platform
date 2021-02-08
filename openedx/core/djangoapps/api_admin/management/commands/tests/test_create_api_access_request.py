@@ -25,14 +25,8 @@ class TestCreateApiAccessRequest(TestCase):
         cls.user = UserFactory()
 
     def assert_models_exist(self, expect_request_exists, expect_config_exists):
-        self.assertEqual(
-            ApiAccessRequest.objects.filter(user=self.user).exists(),
-            expect_request_exists
-        )
-        self.assertEqual(
-            ApiAccessConfig.objects.filter(enabled=True).exists(),
-            expect_config_exists
-        )
+        assert ApiAccessRequest.objects.filter(user=self.user).exists() == expect_request_exists
+        assert ApiAccessConfig.objects.filter(enabled=True).exists() == expect_config_exists
 
     @ddt.data(False, True)
     def test_create_api_access_request(self, create_config):
@@ -45,14 +39,14 @@ class TestCreateApiAccessRequest(TestCase):
         self.assert_models_exist(False, False)
         call_command(self.command, self.user.username, create_config=True, disconnect_signals=True)
         self.assert_models_exist(True, True)
-        self.assertFalse(mock_send_new_pending_email.called)
+        assert not mock_send_new_pending_email.called
 
     @patch('openedx.core.djangoapps.api_admin.models._send_new_pending_email')
     def test_create_api_access_request_signals_connected(self, mock_send_new_pending_email):
         self.assert_models_exist(False, False)
         call_command(self.command, self.user.username, create_config=True, disconnect_signals=False)
         self.assert_models_exist(True, True)
-        self.assertTrue(mock_send_new_pending_email.called)
+        assert mock_send_new_pending_email.called
 
     def test_config_already_exists(self):
         ApiAccessConfig.objects.create(enabled=True)
@@ -125,12 +119,12 @@ class TestCreateApiAccessRequest(TestCase):
         )
         self.assert_models_exist(True, False)
         request = ApiAccessRequest.objects.get(user=self.user)
-        self.assertEqual(request.status, 'approved')
-        self.assertEqual(request.reason, 'whatever')
-        self.assertEqual(request.website, 'test-site.edx.horse')
+        assert request.status == 'approved'
+        assert request.reason == 'whatever'
+        assert request.website == 'test-site.edx.horse'
 
     def test_default_values(self):
         call_command(self.command, self.user.username)
         request = ApiAccessRequest.objects.get(user=self.user)
-        self.assertEqual(request.site, Site.objects.get_current())
-        self.assertEqual(request.status, ApiAccessRequest.APPROVED)
+        assert request.site == Site.objects.get_current()
+        assert request.status == ApiAccessRequest.APPROVED

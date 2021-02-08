@@ -33,7 +33,7 @@ TEST_DATA_CONTENTSTORE['DOC_STORE_CONFIG']['db'] = 'test_xcontent_%s' % uuid4().
 class TestGenerateSubs(unittest.TestCase):
     """Tests for `generate_subs` function."""
     def setUp(self):
-        super(TestGenerateSubs, self).setUp()
+        super(TestGenerateSubs, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
 
         self.source_subs = {
             'start': [100, 200, 240, 390, 1000],
@@ -138,7 +138,7 @@ class TestSaveSubsToStore(SharedModuleStoreTestCase):
         cls.content_location_unjsonable = cls.sub_id_to_location(cls.unjsonable_subs_id)
 
     def setUp(self):
-        super(TestSaveSubsToStore, self).setUp()
+        super(TestSaveSubsToStore, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.addCleanup(self.clear_subs_content)
         self.clear_subs_content()
 
@@ -188,7 +188,7 @@ class TestYoutubeSubsBase(SharedModuleStoreTestCase):
     def setUpClass(cls):
         super(TestYoutubeSubsBase, cls).setUpClass()
         cls.course = CourseFactory.create(
-            org=cls.org, number=cls.number, display_name=cls.display_name)
+            org=cls.org, number=cls.number, display_name=cls.display_name)  # lint-amnesty, pylint: disable=no-member
 
 
 @override_settings(CONTENTSTORE=TEST_DATA_CONTENTSTORE)
@@ -280,7 +280,7 @@ class TestDownloadYoutubeSubs(TestYoutubeSubsBase):
         transcripts_utils.download_youtube_subs(good_youtube_sub, self.course, settings)
 
         # Check assets status after importing subtitles.
-        for subs_id in good_youtube_subs.values():
+        for subs_id in good_youtube_subs.values():  # lint-amnesty, pylint: disable=undefined-variable
             filename = 'subs_{0}.srt.sjson'.format(subs_id)
             content_location = StaticContent.compute_location(
                 self.course.id, filename
@@ -355,7 +355,7 @@ class TestDownloadYoutubeSubs(TestYoutubeSubsBase):
         )
 
 
-class TestGenerateSubsFromSource(TestDownloadYoutubeSubs):
+class TestGenerateSubsFromSource(TestDownloadYoutubeSubs):  # lint-amnesty, pylint: disable=test-inherits-tests
     """Tests for `generate_subs_from_source` function."""
 
     def test_success_generating_subs(self):
@@ -426,7 +426,7 @@ class TestGenerateSubsFromSource(TestDownloadYoutubeSubs):
         self.assertEqual(exception_message, "Something wrong with SubRip transcripts file during parsing.")
 
 
-class TestGenerateSrtFromSjson(TestDownloadYoutubeSubs):
+class TestGenerateSrtFromSjson(TestDownloadYoutubeSubs):  # lint-amnesty, pylint: disable=test-inherits-tests
     """Tests for `generate_srt_from_sjson` function."""
 
     def test_success_generating_subs(self):
@@ -561,7 +561,7 @@ class TestTranscript(unittest.TestCase):
     Tests for Transcript class e.g. different transcript conversions.
     """
     def setUp(self):
-        super(TestTranscript, self).setUp()
+        super(TestTranscript, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
 
         self.srt_transcript = textwrap.dedent("""\
             0
@@ -710,7 +710,7 @@ class TestGetTranscript(SharedModuleStoreTestCase):
     """Tests for `get_transcript` function."""
 
     def setUp(self):
-        super(TestGetTranscript, self).setUp()
+        super(TestGetTranscript, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
 
         self.course = CourseFactory.create()
 

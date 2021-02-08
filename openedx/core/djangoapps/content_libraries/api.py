@@ -222,7 +222,7 @@ class LibraryBundleLink:
     opaque_key = attr.ib(type=LearningContextKey, default=None)
 
 
-class AccessLevel:
+class AccessLevel:  # lint-amnesty, pylint: disable=function-redefined
     """ Enum defining library access levels/permissions """
     ADMIN_LEVEL = ContentLibraryPermission.ADMIN_LEVEL
     AUTHOR_LEVEL = ContentLibraryPermission.AUTHOR_LEVEL
@@ -407,7 +407,7 @@ def create_library(
         )
     except IntegrityError:
         delete_bundle(bundle.uuid)
-        raise LibraryAlreadyExists(slug)
+        raise LibraryAlreadyExists(slug)  # lint-amnesty, pylint: disable=raise-missing-from
     CONTENT_LIBRARY_CREATED.send(sender=None, library_key=ref.library_key)
     return ContentLibraryMetadata(
         key=ref.library_key,
@@ -1015,7 +1015,7 @@ def update_bundle_link(library_key, link_id, version=None, delete=False):
         try:
             link = links[link_id]
         except KeyError:
-            raise InvalidNameError("That link does not exist.")
+            raise InvalidNameError("That link does not exist.")  # lint-amnesty, pylint: disable=raise-missing-from
         if version is None:
             version = get_bundle(link.bundle_uuid).latest_version
         set_draft_link(draft.uuid, link_id, link.bundle_uuid, version)

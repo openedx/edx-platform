@@ -8,7 +8,7 @@ import gettext
 from unittest import skip
 
 import mock
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.utils import translation
 from django.utils.translation import get_language
 
@@ -62,7 +62,7 @@ class TestModuleI18nService(ModuleStoreTestCase):
 
     def setUp(self):
         """ Setting up tests """
-        super(TestModuleI18nService, self).setUp()
+        super(TestModuleI18nService, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.test_language = 'dummy language'
         self.request = mock.Mock()
         self.course = CourseFactory.create()
@@ -187,7 +187,7 @@ class InternationalizationTest(ModuleStoreTestCase):
         will be cleared out before each test case execution and deleted
         afterwards.
         """
-        super(InternationalizationTest, self).setUp()
+        super(InternationalizationTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
 
         self.uname = 'testuser'
         self.email = 'test+courses@edx.org'
@@ -211,7 +211,7 @@ class InternationalizationTest(ModuleStoreTestCase):
 
     def test_course_plain_english(self):
         """Test viewing the index page with no courses"""
-        self.client = AjaxEnabledTestClient()
+        self.client = AjaxEnabledTestClient()  # lint-amnesty, pylint: disable=attribute-defined-outside-init
         self.client.login(username=self.uname, password=self.password)
 
         resp = self.client.get_html('/home/')
@@ -222,7 +222,7 @@ class InternationalizationTest(ModuleStoreTestCase):
 
     def test_course_explicit_english(self):
         """Test viewing the index page with no courses"""
-        self.client = AjaxEnabledTestClient()
+        self.client = AjaxEnabledTestClient()  # lint-amnesty, pylint: disable=attribute-defined-outside-init
         self.client.login(username=self.uname, password=self.password)
 
         resp = self.client.get_html(
@@ -247,7 +247,7 @@ class InternationalizationTest(ModuleStoreTestCase):
     @skip
     def test_course_with_accents(self):
         """Test viewing the index page with no courses"""
-        self.client = AjaxEnabledTestClient()
+        self.client = AjaxEnabledTestClient()  # lint-amnesty, pylint: disable=attribute-defined-outside-init
         self.client.login(username=self.uname, password=self.password)
 
         resp = self.client.get_html(

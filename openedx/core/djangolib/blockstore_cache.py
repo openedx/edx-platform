@@ -1,4 +1,4 @@
-"""
+"""  # lint-amnesty, pylint: disable=django-not-configured
 An API for caching data related to Blockstore bundles
 
 The whole point of this is to make the hard problem of cache invalidation

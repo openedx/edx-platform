@@ -34,7 +34,7 @@ class Command(BaseCommand):
         try:
             library_key = CourseKey.from_string(options['library_id'])
         except InvalidKeyError:
-            raise CommandError(u'Invalid library ID: "{0}".'.format(options['library_id']))
+            raise CommandError(u'Invalid library ID: "{0}".'.format(options['library_id']))  # lint-amnesty, pylint: disable=raise-missing-from
         if not isinstance(library_key, LibraryLocator):
             raise CommandError(u'Argument "{0}" is not a library key'.format(options['library_id']))
 
@@ -50,7 +50,7 @@ class Command(BaseCommand):
             # Generate archive using the handy tasks implementation
             tarball = tasks.create_export_tarball(library, library_key, {}, None)
         except Exception as e:
-            raise CommandError(u'Failed to export "{0}" with "{1}"'.format(library_key, e))
+            raise CommandError(u'Failed to export "{0}" with "{1}"'.format(library_key, e))  # lint-amnesty, pylint: disable=raise-missing-from
         else:
             with tarball:
                 # Save generated archive with keyed filename

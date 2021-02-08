@@ -3,7 +3,7 @@ Tests access.py
 """
 
 
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.test import TestCase
 from opaque_keys.edx.locator import CourseLocator
 
@@ -20,7 +20,7 @@ class RolesTest(TestCase):
     """
     def setUp(self):
         """ Test case setup """
-        super(RolesTest, self).setUp()
+        super(RolesTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
 
         self.global_admin = AdminFactory()
         self.instructor = User.objects.create_user('testinstructor', 'testinstructor+courses@edx.org', 'foo')

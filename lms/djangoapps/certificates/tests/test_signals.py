@@ -337,6 +337,35 @@ class FailingGradeCertsTest(ModuleStoreTestCase):
         cert = GeneratedCertificate.certificate_for_student(self.user, self.course.id)
         self.assertEqual(cert.status, expected_status)
 
+    @override_waffle_flag(CERTIFICATES_USE_ALLOWLIST, active=True)
+    def test_failing_grade_allowlist(self):
+        # User who is not on the allowlist
+        GeneratedCertificateFactory(
+            user=self.user,
+            course_id=self.course.id,
+            status=CertificateStatuses.downloadable
+        )
+        CourseGradeFactory().update(self.user, self.course)
+        cert = GeneratedCertificate.certificate_for_student(self.user, self.course.id)
+        self.assertEqual(cert.status, CertificateStatuses.notpassing)
+
+        # User who is on the allowlist
+        u = UserFactory.create()
+        c = CourseFactory()
+        course_key = c.id  # pylint: disable=no-member
+        CertificateWhitelistFactory(
+            user=u,
+            course_id=course_key
+        )
+        GeneratedCertificateFactory(
+            user=u,
+            course_id=course_key,
+            status=CertificateStatuses.downloadable
+        )
+        CourseGradeFactory().update(u, c)
+        cert = GeneratedCertificate.certificate_for_student(u, course_key)
+        self.assertEqual(cert.status, CertificateStatuses.downloadable)
+
 
 class LearnerTrackChangeCertsTest(ModuleStoreTestCase):
     """

@@ -102,7 +102,7 @@ class TestBlockStructureManager(UsageKeyFactoryMixin, ChildrenMapTestMixin, Test
     """
 
     def setUp(self):
-        super(TestBlockStructureManager, self).setUp()
+        super(TestBlockStructureManager, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
 
         TestTransformer1.collect_call_count = 0
         self.registered_transformers = [TestTransformer1()]

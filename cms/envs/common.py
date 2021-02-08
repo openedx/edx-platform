@@ -48,6 +48,10 @@ from corsheaders.defaults import default_headers as corsheaders_default_headers
 from datetime import timedelta
 import lms.envs.common
 # Although this module itself may not use these imported variables, other dependent modules may.
+# Warning: Do NOT add any new variables to this list. This is incompatible with future plans to
+#   have more logical separation between LMS and Studio (CMS). It is also incompatible with the
+#   direction documented in OEP-45: Configuring and Operating Open edX:
+#   https://open-edx-proposals.readthedocs.io/en/latest/oep-0045-arch-ops-and-config.html
 from lms.envs.common import (
     USE_TZ, ALL_LANGUAGES, ASSET_IGNORE_REGEX,
     PARENTAL_CONSENT_AGE_LIMIT, REGISTRATION_EMAIL_PATTERNS_ALLOWED,
@@ -206,7 +210,14 @@ FEATURES = {
     # Turn off account locking if failed login attempts exceeds a limit
     'ENABLE_MAX_FAILED_LOGIN_ATTEMPTS': False,
 
-    # Allow editing of short description in course settings in cms
+    # .. toggle_name: FEATURES['EDITABLE_SHORT_DESCRIPTION']
+    # .. toggle_implementation: DjangoSetting
+    # .. toggle_default: True
+    # .. toggle_description: This feature flag allows editing of short descriptions on the Schedule & Details page in
+    #   Open edX Studio. Set to False if you want to disable the editing of the course short description.
+    # .. toggle_use_cases: open_edx
+    # .. toggle_creation_date: 2014-02-13
+    # .. toggle_tickets: https://github.com/edx/edx-platform/pull/2334
     'EDITABLE_SHORT_DESCRIPTION': True,
 
     # Hide any Personally Identifiable Information from application logs

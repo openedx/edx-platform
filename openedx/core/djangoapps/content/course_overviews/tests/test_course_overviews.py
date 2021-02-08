@@ -605,7 +605,7 @@ class CourseOverviewImageSetTestCase(ModuleStoreTestCase):
     def setUp(self):
         """Create an active CourseOverviewImageConfig with non-default values."""
         self.set_config(True)
-        super(CourseOverviewImageSetTestCase, self).setUp()
+        super(CourseOverviewImageSetTestCase, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
 
     def _create_course_image(self, course, image_name):
         """
