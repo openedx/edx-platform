@@ -22,27 +22,18 @@ from rest_framework.exceptions import NotFound
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.response import Response
 
-from courseware.courses import get_course_by_id
+from lms.djangoapps.courseware.courses import get_course_by_id
 
 from openedx.core.djangoapps.enrollments.serializers import CourseEnrollmentSerializer
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.user_authn.views.register import create_account_with_params
 from openedx.core.djangoapps.user_authn.views.password_reset import PasswordResetFormNoActive
+from student.helpers import AccountValidationError
+
 from student.models import CourseEnrollment
 
 from .mixins import TahoeAuthMixin
-
-
-if settings.TAHOE_TEMP_MONKEYPATCHING_JUNIPER_TESTS:
-    def check_account_exists(**kwargs):
-        """
-        from openedx.core.djangoapps.user_api.accounts.api import check_account_exists import is broken,
-        this helper silent the error.
-        """
-else:
-    from openedx.core.djangoapps.user_api.accounts.api import check_account_exists
-
 
 from lms.djangoapps.instructor.enrollment import (
     enroll_email,
@@ -52,6 +43,7 @@ from lms.djangoapps.instructor.enrollment import (
 
 from openedx.core.djangoapps.appsembler.api.helpers import as_course_key
 from openedx.core.djangoapps.appsembler.api.v1.api import (
+    account_exists,
     enroll_learners_in_course,
     unenroll_learners_in_course,
 )
@@ -157,7 +149,9 @@ class RegistrationViewSet(TahoeAuthMixin, viewsets.ViewSet):
         The code here is adapted from the LMS ``appsembler_api`` bulk registration
         code. See the ``appsembler/ginkgo/master`` branch
         """
-        data = request.data.copy()  # Using .copy() to make the POST data mutable, see: https://stackoverflow.com/a/49794425/161278
+        # Using .copy() to make the POST data mutable
+        # see: https://stackoverflow.com/a/49794425/161278
+        data = request.data.copy()
         password_provided = 'password' in data
 
         # set the honor_code and honor_code like checked,
@@ -176,7 +170,7 @@ class RegistrationViewSet(TahoeAuthMixin, viewsets.ViewSet):
                     'user_message': '{0} is not a valid value for "send_activation_email"'.format(
                         data['send_activation_email'])
                 }
-                return Response(errors, status=400)
+                return Response(errors, status=status.HTTP_400_BAD_REQUEST)
 
         else:
             data['password'] = create_password()
@@ -186,10 +180,9 @@ class RegistrationViewSet(TahoeAuthMixin, viewsets.ViewSet):
         username = request.data.get('username')
 
         # Handle duplicate email/username
-        conflicts = check_account_exists(email=email, username=username)
-        if conflicts:
+        if account_exists(email=email, username=username):
             errors = {"user_message": "User already exists"}
-            return Response(errors, status=409)
+            return Response(errors, status=status.HTTP_409_CONFLICT)
 
         try:
             user = create_account_with_params(
@@ -206,18 +199,27 @@ class RegistrationViewSet(TahoeAuthMixin, viewsets.ViewSet):
                 if not success:
                     log.error('Tahoe Reg API: Error sending password reset '
                               'email to user {}'.format(user.username))
+
         except ValidationError as err:
             log.error('ValidationError. err={}'.format(err))
             # Should only get non-field errors from this function
+
             assert NON_FIELD_ERRORS not in err.message_dict
             # Only return first error for each field
-
             # TODO: Let's give a clue as to which are the error causing fields
-            errors = {
-                "user_message": "Invalid parameters on user creation"
-            }
-            return Response(errors, status=400)
-        return Response({'user_id ': user_id}, status=200)
+            msg = 'Invalid parameters on user creation'
+            return Response(dict(user_message=msg), status=status.HTTP_400_BAD_REQUEST)
+        except AccountValidationError as err:
+            log.error('AccountValidationError. err={}'.format(err))
+            # Should only get non-field errors from this function
+
+            # assert NON_FIELD_ERRORS not in err.message_dict
+            # Only return first error for each field
+            # TODO: Let's give a clue as to which are the error causing fields
+            msg = 'Invalid parameters on user creation: {field}'.format(
+                field=err.field)
+            return Response(dict(user_message=msg), status=status.HTTP_400_BAD_REQUEST)
+        return Response({'user_id ': user_id}, status=status.HTTP_200_OK)
 
     def _normalize_bool_param(self, unnormalized):
         """
@@ -247,7 +249,7 @@ class CourseViewSet(TahoeAuthMixin, viewsets.ReadOnlyModelViewSet):
     serializer_class = CourseOverviewSerializer
     throttle_classes = (TahoeAPIUserThrottle,)
     filter_backends = (DjangoFilterBackend, )
-    filter_class = CourseOverviewFilter
+    filterset_class = CourseOverviewFilter
 
     def get_queryset(self):
         site = django.contrib.sites.shortcuts.get_current_site(self.request)
@@ -283,7 +285,7 @@ class EnrollmentViewSet(TahoeAuthMixin, viewsets.ModelViewSet):
     serializer_class = CourseEnrollmentSerializer
     throttle_classes = (TahoeAPIUserThrottle,)
     filter_backends = (DjangoFilterBackend, )
-    filter_class = CourseEnrollmentFilter
+    filterset_class = CourseEnrollmentFilter
 
     def get_queryset(self):
         site = django.contrib.sites.shortcuts.get_current_site(self.request)
@@ -418,7 +420,7 @@ class UserIndexViewSet(TahoeAuthMixin, viewsets.ReadOnlyModelViewSet):
     serializer_class = UserIndexSerializer
     throttle_classes = (TahoeAPIUserThrottle,)
     filter_backends = (DjangoFilterBackend, )
-    filter_class = UserIndexFilter
+    filterset_class = UserIndexFilter
 
     def get_queryset(self):
         site = django.contrib.sites.shortcuts.get_current_site(self.request)

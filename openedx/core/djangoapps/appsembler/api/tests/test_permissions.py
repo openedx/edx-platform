@@ -25,12 +25,6 @@ from openedx.core.djangoapps.appsembler.api.permissions import IsSiteAdminUser
 from .factories import OrganizationFactory, UserOrganizationMappingFactory
 
 
-from django.conf import settings
-import unittest
-if settings.TAHOE_TEMP_MONKEYPATCHING_JUNIPER_TESTS:
-    raise unittest.SkipTest('fix broken tests')
-
-
 SITE_CONFIGURATION_CLASS = ('openedx.core.djangoapps.site_configuration'
                             '.models.SiteConfiguration')
 

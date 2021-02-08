@@ -18,12 +18,6 @@ from openedx.core.djangoapps.appsembler.api.permissions import TahoeAPIUserThrot
 APPSEMBLER_API_VIEWS_MODULE = 'openedx.core.djangoapps.appsembler.api.v1.views'
 
 
-from django.conf import settings
-import unittest
-if settings.TAHOE_TEMP_MONKEYPATCHING_JUNIPER_TESTS:
-    raise unittest.SkipTest('fix broken tests')
-
-
 def make_post_data(val):
     """
     val is some unique idetifier, typically an integer

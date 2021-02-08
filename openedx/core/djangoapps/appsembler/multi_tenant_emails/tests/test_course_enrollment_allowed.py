@@ -66,8 +66,9 @@ class TestCourseEnrollmentAllowedMultitenant(ModuleStoreTestCase):
             'courses': [str(course_id)],
         })
         response = client.post(url, data=body, content_type='application/json')
-        assert 'error' not in response.content
-        assert response.status_code == status.HTTP_201_CREATED, response.content
+        content = response.content.decode('utf-8')
+        assert 'error' not in content
+        assert response.status_code == status.HTTP_201_CREATED, content
         return response
 
     def register_user(self, color, email, password):
@@ -82,7 +83,8 @@ class TestCourseEnrollmentAllowedMultitenant(ModuleStoreTestCase):
             'password': password,
             'honor_code': 'true',
         })
-        assert response.status_code == status.HTTP_200_OK, response.content
+        content = response.content.decode('utf-8')
+        assert response.status_code == status.HTTP_200_OK, content
         user = User.objects.get(email=email)
         return user
 
