@@ -12,8 +12,8 @@ from django.core.files import File
 from openedx.adg.lms.applications.constants import RESUME_FILE_MAX_SIZE
 from openedx.adg.lms.applications.forms import (
     ExtendedUserProfileForm,
-    UserApplicationForm,
-    UserApplicationCoverLetterForm
+    UserApplicationCoverLetterForm,
+    UserApplicationForm
 )
 from openedx.adg.lms.registration_extension.tests.factories import ExtendedUserProfileFactory
 

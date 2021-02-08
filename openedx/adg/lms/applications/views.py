@@ -15,7 +15,7 @@ from openedx.adg.lms.applications.forms import (
     ExtendedUserProfileForm,
     UserApplicationCoverLetterForm,
     UserApplicationForm,
-    UserProfileForm,
+    UserProfileForm
 )
 from openedx.adg.lms.registration_extension.models import ExtendedUserProfile
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
