@@ -15,9 +15,13 @@ from django.db.models import Q
 from eventtracking import tracker
 from opaque_keys.edx.django.models import CourseKeyField
 from organizations.api import get_course_organization_id
-from xmodule.modulestore.django import modulestore
 
 from lms.djangoapps.branding import api as branding_api
+from lms.djangoapps.certificates.generation_handler import (
+    is_using_certificate_allowlist_and_is_on_allowlist as _is_using_certificate_allowlist_and_is_on_allowlist,
+    generate_user_certificates as _generate_user_certificates,
+    regenerate_user_certificates as _regenerate_user_certificates
+)
 from lms.djangoapps.certificates.models import (
     CertificateGenerationConfiguration,
     CertificateGenerationCourseSetting,
@@ -30,10 +34,8 @@ from lms.djangoapps.certificates.models import (
     certificate_status_for_student
 )
 from lms.djangoapps.certificates.queue import XQueueCertInterface
-from lms.djangoapps.certificates.utils import emit_certificate_event as _emit_certificate_event
 from lms.djangoapps.certificates.utils import get_certificate_url as _get_certificate_url
 from lms.djangoapps.certificates.utils import has_html_certificates_enabled as _has_html_certificates_enabled
-from lms.djangoapps.instructor.access import list_with_level
 from openedx.core.djangoapps.certificates.api import certificates_viewable_for_course
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 
@@ -181,112 +183,12 @@ def get_recently_modified_certificates(course_keys=None, start_date=None, end_da
 
 def generate_user_certificates(student, course_key, course=None, insecure=False, generation_mode='batch',
                                forced_grade=None):
-    """
-    It will add the add-cert request into the xqueue.
-
-    A new record will be created to track the certificate
-    generation task.  If an error occurs while adding the certificate
-    to the queue, the task will have status 'error'. It also emits
-    `edx.certificate.created` event for analytics.
-
-    Args:
-        student (User)
-        course_key (CourseKey)
-
-    Keyword Arguments:
-        course (Course): Optionally provide the course object; if not provided
-            it will be loaded.
-        insecure - (Boolean)
-        generation_mode - who has requested certificate generation. Its value should `batch`
-        in case of django command and `self` if student initiated the request.
-        forced_grade - a string indicating to replace grade parameter. if present grading
-                       will be skipped.
-    """
-
-    if not course:
-        course = modulestore().get_course(course_key, depth=0)
-
-    beta_testers_queryset = list_with_level(course, u'beta')
-
-    if beta_testers_queryset.filter(username=student.username):
-        message = u'Cancelling course certificate generation for user [{}] against course [{}], user is a Beta Tester.'
-        log.info(message.format(student.username, course_key))
-        return
-
-    xqueue = XQueueCertInterface()
-    if insecure:
-        xqueue.use_https = False
-
-    generate_pdf = not has_html_certificates_enabled(course)
-
-    cert = xqueue.add_cert(
-        student,
-        course_key,
-        course=course,
-        generate_pdf=generate_pdf,
-        forced_grade=forced_grade
-    )
-
-    message = u'Queued Certificate Generation task for {user} : {course}'
-    log.info(message.format(user=student.id, course=course_key))
-
-    # If cert_status is not present in certificate valid_statuses (for example unverified) then
-    # add_cert returns None and raises AttributeError while accessing cert attributes.
-    if cert is None:
-        return
-
-    if CertificateStatuses.is_passing_status(cert.status):
-        _emit_certificate_event('created', student, course_key, course, {
-            'user_id': student.id,
-            'course_id': six.text_type(course_key),
-            'certificate_id': cert.verify_uuid,
-            'enrollment_mode': cert.mode,
-            'generation_mode': generation_mode
-        })
-    return cert.status
+    return _generate_user_certificates(student, course_key, course, insecure, generation_mode, forced_grade)
 
 
 def regenerate_user_certificates(student, course_key, course=None,
                                  forced_grade=None, template_file=None, insecure=False):
-    """
-    It will add the regen-cert request into the xqueue.
-
-    A new record will be created to track the certificate
-    generation task.  If an error occurs while adding the certificate
-    to the queue, the task will have status 'error'.
-
-    Args:
-        student (User)
-        course_key (CourseKey)
-
-    Keyword Arguments:
-        course (Course): Optionally provide the course object; if not provided
-            it will be loaded.
-        grade_value - The grade string, such as "Distinction"
-        template_file - The template file used to render this certificate
-        insecure - (Boolean)
-    """
-    xqueue = XQueueCertInterface()
-    if insecure:
-        xqueue.use_https = False
-
-    if not course:
-        course = modulestore().get_course(course_key, depth=0)
-
-    generate_pdf = not has_html_certificates_enabled(course)
-    log.info(
-        u"Started regenerating certificates for user %s in course %s with generate_pdf status: %s",
-        student.username, six.text_type(course_key), generate_pdf
-    )
-
-    return xqueue.regen_cert(
-        student,
-        course_key,
-        course=course,
-        forced_grade=forced_grade,
-        template_file=template_file,
-        generate_pdf=generate_pdf
-    )
+    return _regenerate_user_certificates(student, course_key, course, forced_grade, template_file, insecure)
 
 
 def certificate_downloadable_status(student, course_key):
@@ -634,3 +536,12 @@ def get_certificate_footer_context():
         data.update({'company_about_url': about})
 
     return data
+
+
+def is_using_certificate_allowlist_and_is_on_allowlist(user, course_key):
+    """
+    Return True if both:
+    1) the course run is using the allowlist, and
+    2) if the user is on the allowlist for this course run
+    """
+    return _is_using_certificate_allowlist_and_is_on_allowlist(user, course_key)

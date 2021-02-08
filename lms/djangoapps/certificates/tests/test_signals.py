@@ -14,7 +14,7 @@ from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
 from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
-from lms.djangoapps.certificates import api as certs_api
+from lms.djangoapps.certificates.api import cert_generation_enabled
 from lms.djangoapps.certificates.generation_handler import CERTIFICATES_USE_ALLOWLIST
 from lms.djangoapps.certificates.models import (
     CertificateGenerationConfiguration,
@@ -49,15 +49,15 @@ class SelfGeneratedCertsSignalTest(ModuleStoreTestCase):
         according to course-pacing.
         """
         self.course = CourseFactory.create(self_paced=False, emit_signals=True)  # lint-amnesty, pylint: disable=attribute-defined-outside-init
-        self.assertFalse(certs_api.cert_generation_enabled(self.course.id))
+        self.assertFalse(cert_generation_enabled(self.course.id))
 
         self.course.self_paced = True
         self.store.update_item(self.course, self.user.id)
-        self.assertTrue(certs_api.cert_generation_enabled(self.course.id))
+        self.assertTrue(cert_generation_enabled(self.course.id))
 
         self.course.self_paced = False
         self.store.update_item(self.course, self.user.id)
-        self.assertFalse(certs_api.cert_generation_enabled(self.course.id))
+        self.assertFalse(cert_generation_enabled(self.course.id))
 
 
 class WhitelistGeneratedCertificatesTest(ModuleStoreTestCase):

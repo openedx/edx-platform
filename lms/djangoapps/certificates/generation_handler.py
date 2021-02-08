@@ -4,13 +4,12 @@ Course certificate generation handler.
 These methods check to see if a certificate can be generated (created if it does not already exist, or updated if it
 exists but its state can be altered). If so, a celery task is launched to do the generation. If the certificate
 cannot be generated, a message is logged and no further action is taken.
-
-For now, these methods deal primarily with allowlist certificates, and are part of the V2 certificates revamp.
 """
 
 import logging
 
 from edx_toggles.toggles import LegacyWaffleFlagNamespace
+from xmodule.modulestore.django import modulestore
 
 from common.djangoapps.student.models import CourseEnrollment
 from lms.djangoapps.certificates.models import (
@@ -19,7 +18,10 @@ from lms.djangoapps.certificates.models import (
     CertificateWhitelist,
     GeneratedCertificate
 )
+from lms.djangoapps.certificates.queue import XQueueCertInterface
 from lms.djangoapps.certificates.tasks import CERTIFICATE_DELAY_SECONDS, generate_certificate
+from lms.djangoapps.certificates.utils import emit_certificate_event, has_html_certificates_enabled
+from lms.djangoapps.instructor.access import list_with_level
 from lms.djangoapps.verify_student.services import IDVerificationService
 from openedx.core.djangoapps.certificates.api import auto_certificate_generation_enabled
 from openedx.core.djangoapps.waffle_utils import CourseWaffleFlag
@@ -162,3 +164,119 @@ def _can_generate_allowlist_certificate_for_status(cert):
              'generation'
              .format(status=cert.status, user=cert.user.id, course=cert.course_id))
     return True
+
+
+def generate_user_certificates(student, course_key, course=None, insecure=False, generation_mode='batch',
+                               forced_grade=None):
+    """
+    It will add the add-cert request into the xqueue.
+
+    A new record will be created to track the certificate
+    generation task.  If an error occurs while adding the certificate
+    to the queue, the task will have status 'error'. It also emits
+    `edx.certificate.created` event for analytics.
+
+    This method has not yet been updated (it predates the certificates revamp). If modifying this method,
+    see also generate_user_certificates() in generation.py (which is very similar but is called from a celery task).
+    In the future these methods will be unified.
+
+    Args:
+        student (User)
+        course_key (CourseKey)
+
+    Keyword Arguments:
+        course (Course): Optionally provide the course object; if not provided
+            it will be loaded.
+        insecure - (Boolean)
+        generation_mode - who has requested certificate generation. Its value should `batch`
+        in case of django command and `self` if student initiated the request.
+        forced_grade - a string indicating to replace grade parameter. if present grading
+                       will be skipped.
+    """
+
+    if not course:
+        course = modulestore().get_course(course_key, depth=0)
+
+    beta_testers_queryset = list_with_level(course, 'beta')
+
+    if beta_testers_queryset.filter(username=student.username):
+        message = 'Cancelling course certificate generation for user [{}] against course [{}], user is a Beta Tester.'
+        log.info(message.format(student.username, course_key))
+        return
+
+    xqueue = XQueueCertInterface()
+    if insecure:
+        xqueue.use_https = False
+
+    generate_pdf = not has_html_certificates_enabled(course)
+
+    cert = xqueue.add_cert(
+        student,
+        course_key,
+        course=course,
+        generate_pdf=generate_pdf,
+        forced_grade=forced_grade
+    )
+
+    message = 'Queued Certificate Generation task for {user} : {course}'
+    log.info(message.format(user=student.id, course=course_key))
+
+    # If cert_status is not present in certificate valid_statuses (for example unverified) then
+    # add_cert returns None and raises AttributeError while accessing cert attributes.
+    if cert is None:
+        return
+
+    if CertificateStatuses.is_passing_status(cert.status):
+        emit_certificate_event('created', student, course_key, course, {
+            'user_id': student.id,
+            'course_id': str(course_key),
+            'certificate_id': cert.verify_uuid,
+            'enrollment_mode': cert.mode,
+            'generation_mode': generation_mode
+        })
+    return cert.status
+
+
+def regenerate_user_certificates(student, course_key, course=None,
+                                 forced_grade=None, template_file=None, insecure=False):
+    """
+    Add the regen-cert request into the xqueue.
+
+    A new record will be created to track the certificate
+    generation task.  If an error occurs while adding the certificate
+    to the queue, the task will have status 'error'.
+
+    This method has not yet been updated (it predates the certificates revamp).
+
+    Args:
+        student (User)
+        course_key (CourseKey)
+
+    Keyword Arguments:
+        course (Course): Optionally provide the course object; if not provided
+            it will be loaded.
+        grade_value - The grade string, such as "Distinction"
+        template_file - The template file used to render this certificate
+        insecure - (Boolean)
+    """
+    xqueue = XQueueCertInterface()
+    if insecure:
+        xqueue.use_https = False
+
+    if not course:
+        course = modulestore().get_course(course_key, depth=0)
+
+    generate_pdf = not has_html_certificates_enabled(course)
+    log.info(
+        "Started regenerating certificates for user %s in course %s with generate_pdf status: %s",
+        student.username, str(course_key), generate_pdf
+    )
+
+    return xqueue.regen_cert(
+        student,
+        course_key,
+        course=course,
+        forced_grade=forced_grade,
+        template_file=template_file,
+        generate_pdf=generate_pdf
+    )
