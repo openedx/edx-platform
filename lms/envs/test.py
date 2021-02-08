@@ -577,11 +577,13 @@ LEARNING_MICROFRONTEND_URL = "http://learning-mfe"
 
 DASHBOARD_COURSE_LIMIT = 250
 
+########################## Settings for proctoring ######################
 PROCTORING_SETTINGS = {
     'LINK_URLS': {
         'faq': 'https://support.example.com/proctoring-faq.html'
     }
 }
+PROCTORING_USER_OBFUSCATION_KEY = 'test_key'
 
 # Used in edx-proctoring for ID generation in lieu of SECRET_KEY - dummy value
 # (ref MST-637)
