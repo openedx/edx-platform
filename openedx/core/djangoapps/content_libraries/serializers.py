@@ -176,7 +176,7 @@ class LibraryXBlockStaticFileSerializer(serializers.Serializer):
         """
         Generate the serialized representation of this static asset file.
         """
-        result = super(LibraryXBlockStaticFileSerializer, self).to_representation(instance)
+        result = super(LibraryXBlockStaticFileSerializer, self).to_representation(instance)  # lint-amnesty, pylint: disable=super-with-arguments
         # Make sure the URL is one that will work from the user's browser,
         # not one that only works from within a docker container:
         result['url'] = blockstore_api.force_browser_url(result['url'])

@@ -728,7 +728,7 @@ class ContentLibrariesTest(ContentLibrariesRestApiTest):
         Test that libraries don't allow more than specified blocks
         """
         with self.settings(MAX_BLOCKS_PER_CONTENT_LIBRARY=1):
-            lib = self._create_library(slug="test_lib_limits", title="Limits Test Library", description="Testing XBlocks limits in a library")
+            lib = self._create_library(slug="test_lib_limits", title="Limits Test Library", description="Testing XBlocks limits in a library")  # lint-amnesty, pylint: disable=line-too-long
             lib_id = lib["id"]
             block_data = self._add_block_to_library(lib_id, "unit", "unit1")
             # Second block should throw error

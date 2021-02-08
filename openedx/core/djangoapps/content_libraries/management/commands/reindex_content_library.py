@@ -1,4 +1,4 @@
-""" Management command to update content libraries' search index """
+""" Management command to update content libraries' search index """  # lint-amnesty, pylint: disable=cyclic-import
 
 
 import logging

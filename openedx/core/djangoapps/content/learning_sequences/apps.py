@@ -1,8 +1,9 @@
+# lint-amnesty, pylint: disable=missing-module-docstring
 from django.apps import AppConfig
 from django.utils.translation import ugettext_lazy as _
 
 
-class LearningSequencesConfig(AppConfig):
+class LearningSequencesConfig(AppConfig):  # lint-amnesty, pylint: disable=missing-class-docstring
     name = 'openedx.core.djangoapps.content.learning_sequences'
     verbose_name = _('Learning Sequences')
 

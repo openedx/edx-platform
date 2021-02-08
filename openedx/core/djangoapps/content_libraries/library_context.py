@@ -27,7 +27,7 @@ class LibraryContextImpl(LearningContext):
     """
 
     def __init__(self, **kwargs):
-        super(LibraryContextImpl, self).__init__(**kwargs)
+        super(LibraryContextImpl, self).__init__(**kwargs)  # lint-amnesty, pylint: disable=super-with-arguments
         self.use_draft = kwargs.get('use_draft', None)
 
     def can_edit_block(self, user, usage_key):
@@ -88,7 +88,7 @@ class LibraryContextImpl(LearningContext):
             bundle_uuid = bundle_uuid_for_library_key(library_key)
         except ContentLibrary.DoesNotExist:
             return None
-        if 'force_draft' in kwargs:
+        if 'force_draft' in kwargs:  # lint-amnesty, pylint: disable=consider-using-get
             use_draft = kwargs['force_draft']
         else:
             use_draft = self.use_draft
