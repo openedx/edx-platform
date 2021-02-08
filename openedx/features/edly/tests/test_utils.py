@@ -7,6 +7,7 @@ from urlparse import urljoin
 from mock import MagicMock
 
 import crum
+import ddt
 from django.conf import settings
 from django.contrib.auth.models import Group
 from django.core.exceptions import PermissionDenied, ValidationError
@@ -14,7 +15,9 @@ from django.http import HttpResponse
 from django.test import TestCase
 from django.test.client import RequestFactory
 from django.urls import reverse
+from opaque_keys.edx.keys import CourseKey
 
+from openedx.core.djangoapps.content.course_overviews.tests.factories import CourseOverviewFactory
 from openedx.core.djangoapps.site_configuration.tests.factories import SiteConfigurationFactory
 from openedx.core.djangoapps.user_authn.cookies import standard_cookie_settings as cookie_settings
 from openedx.core.djangolib.testing.utils import skip_unless_cms
@@ -34,6 +37,7 @@ from openedx.features.edly.utils import (
     get_edly_sub_org_from_cookie,
     get_edx_org_from_cookie,
     get_marketing_link,
+    is_course_org_same_as_site_org,
     set_global_course_creator_status,
     update_course_creator_status,
     user_has_edly_organization_access,
@@ -61,6 +65,7 @@ def mock_render_to_string(template_name, context):
     return str((template_name, context))
 
 
+@ddt.ddt
 class UtilsTests(ModuleStoreTestCase):
     """
     Tests for utility methods.
@@ -84,6 +89,7 @@ class UtilsTests(ModuleStoreTestCase):
             'edly-sub-org': 'cloud',
             'edx-org': 'cloudX'
         }
+        self.course = CourseOverviewFactory()
 
     def _get_stub_session(self, expire_at_browser_close=False, max_age=604800):
         return MagicMock(
@@ -499,3 +505,38 @@ class UtilsTests(ModuleStoreTestCase):
         expected_marketing_link = ''
         marketing_link = get_marketing_link(marketing_urls, 'HONOR')
         assert expected_marketing_link == marketing_link
+
+    @ddt.data(
+        ('edX', 'course-v1:edX+Test+Test_Course', True),
+        ('edly', 'course-v1:edX+Test+Test_Course', False),
+    )
+    @ddt.unpack
+    def test_is_course_org_same_as_site_org(self, edx_org_short_name, course_id, expected_response):
+        """
+        Test "is_course_org_same_as_site_org" for match & mismatch orgs.
+        """
+        EdlySubOrganizationFactory(
+            edx_organization=OrganizationFactory(short_name=edx_org_short_name),
+            lms_site=self.request.site
+        )
+        course_key = CourseKey.from_string(course_id)
+        course = CourseOverviewFactory.create(id=course_key)
+
+        assert expected_response == is_course_org_same_as_site_org(self.request.site, course.id)
+
+    def test_is_course_org_same_as_site_org_for_unlinked_site(self):
+        """
+        Test "is_course_org_same_as_site_org" when unlinked site is passed.
+        """
+        assert False == is_course_org_same_as_site_org(self.request.site, self.course.id)
+
+    def test_is_course_org_same_as_site_org_for_invalid_course_id(self):
+        """
+        Test "is_course_org_same_as_site_org" when invalid "course_id" passed.
+        """
+        EdlySubOrganizationFactory(
+            edx_organization=OrganizationFactory(short_name='edly'),
+            lms_site=self.request.site
+        )
+        course_id = CourseKey.from_string('course-v1:edX+Test+Test_Course')
+        assert False == is_course_org_same_as_site_org(self.request.site, course_id)
