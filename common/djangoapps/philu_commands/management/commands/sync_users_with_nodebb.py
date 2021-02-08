@@ -7,8 +7,12 @@ from logging import getLogger
 from django.core.management.base import BaseCommand
 from requests.exceptions import ConnectionError
 
-from nodebb.tasks import (task_create_user_on_nodebb, task_activate_user_on_nodebb,
-                                            task_update_user_profile_on_nodebb, task_update_onboarding_surveys_status)
+from nodebb.tasks import (
+    task_create_user_on_nodebb,
+    task_activate_user_on_nodebb,
+    task_update_user_profile_on_nodebb,
+    task_update_onboarding_surveys_status
+)
 from common.lib.nodebb_client.client import NodeBBClient
 from lms.djangoapps.onboarding.helpers import COUNTRIES
 from lms.djangoapps.onboarding.models import UserExtendedProfile

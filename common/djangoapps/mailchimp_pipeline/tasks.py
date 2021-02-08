@@ -12,7 +12,7 @@ log = getLogger(__name__)
 
 
 @task()
-def update_org_details_at_mailchimp(org_label, org_type, work_area, org_id,  list_id):
+def update_org_details_at_mailchimp(org_label, org_type, work_area, org_id, list_id):
     log.info("Task to send organization details to MailChimp")
     log.info(org_label)
 

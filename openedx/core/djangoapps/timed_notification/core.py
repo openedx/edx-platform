@@ -66,7 +66,7 @@ def send_course_notification_email(course, template_name, context, to_list=None)
             context["full_name"] = current_recipient.first_name + " " + current_recipient.last_name
 
             log.info(
-            "TimedNotification ==> Recipient num: %s/%s, Recipient name: %s, Email address: %s",
+                "TimedNotification ==> Recipient num: %s/%s, Recipient name: %s, Email address: %s",
                 recipient_num,
                 total_recipients,
                 current_recipient.username,
@@ -142,7 +142,7 @@ def get_course_first_chapter_link(course, request=None):
                     first_section
                 ])
 
-                course_target = access_link if access_link != None else first_target
+                course_target = access_link if access_link is not None else first_target
             else:
                 course_target = '/courses/' + course.id.to_deprecated_string()
         return course_target

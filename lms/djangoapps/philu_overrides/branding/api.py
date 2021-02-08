@@ -166,7 +166,6 @@ def _auth_footer_courses_communities_links():
     ]
 
 
-
 def _footer_navigation_links():
     """Return the navigation links to display in the footer. """
     platform_name = configuration_helpers.get_value('platform_name', settings.PLATFORM_NAME)

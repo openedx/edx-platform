@@ -178,7 +178,7 @@ class TestStudentDashboard(SharedModuleStoreTestCase):
 
         with mock.patch(
             'mailchimp_pipeline.signals.handlers.send_user_enrollments_to_mailchimp') \
-            as send_user_enrollments_to_mailchimp:
+                as send_user_enrollments_to_mailchimp:
             with mock.patch.object(CourseEnrollment, 'send_signal') as send_signal:
                 send_signal.return_value = None
                 send_user_enrollments_to_mailchimp.return_value = None
@@ -196,7 +196,7 @@ class TestStudentDashboard(SharedModuleStoreTestCase):
 
         with mock.patch(
             'mailchimp_pipeline.signals.handlers.send_user_enrollments_to_mailchimp') \
-            as send_user_enrollments_to_mailchimp:
+                as send_user_enrollments_to_mailchimp:
             with mock.patch.object(CourseEnrollment, 'send_signal') as send_signal:
                 send_signal.return_value = None
                 send_user_enrollments_to_mailchimp.return_value = None

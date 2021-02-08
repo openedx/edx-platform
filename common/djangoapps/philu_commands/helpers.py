@@ -26,7 +26,7 @@ def generate_course_structure(course_key):
 
             if (curr_block.category == 'discussion' and
                 hasattr(curr_block, 'discussion_id') and
-                curr_block.discussion_id):
+                    curr_block.discussion_id):
                 discussions[curr_block.discussion_id] = unicode(curr_block.scope_ids.usage_id)
 
             # Retrieve these attributes separately so that we can fail gracefully
@@ -51,6 +51,7 @@ def generate_course_structure(course_key):
             },
             'discussion_id_map': discussions
         }
+
 
 def has_active_certificate(course):
     has_activated_certificate = False

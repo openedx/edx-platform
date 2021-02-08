@@ -98,4 +98,3 @@ class Instruction(TimeStampedModel):
 
     def __str__(self):
         return str(self.question_index)
-

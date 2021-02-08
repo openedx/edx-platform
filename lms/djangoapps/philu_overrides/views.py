@@ -103,7 +103,6 @@ def login_and_registration_form(request, initial_mode="login"):
         except (KeyError, ValueError, IndexError):
             pass
 
-
     # If this is a themed site, revert to the old login/registration pages.
     # We need to do this for now to support existing themes.
     # Themed sites can use the new logistration page by setting
@@ -210,7 +209,7 @@ def courses_custom(request):
                     first_section
                 ])
 
-                course.course_target = access_link if access_link != None else first_target
+                course.course_target = access_link if access_link is not None else first_target
             else:
                 course.course_target = '/courses/' + course.id.to_deprecated_string()
 
@@ -369,7 +368,6 @@ def login_user_custom(request, error=""):  # pylint: disable=too-many-statements
                 "success": False,
                 "value": lockout_message,
             })  # TODO: this should be status code 429  # pylint: disable=fixme
-
 
     # if the user doesn't exist, we want to set the username to an invalid
     # username so that authentication is guaranteed to fail and we can take

@@ -248,7 +248,8 @@ def _recalculate_subsection_grade(self, **kwargs):
                 kwargs,
             ))
 
-        log.info("regrading failure: {} - {}. kwargs={}".format(
+        log.info(
+            'regrading failure: {} - {}. kwargs={}'.format(
                 str(exc),
                 repr(exc),
                 kwargs

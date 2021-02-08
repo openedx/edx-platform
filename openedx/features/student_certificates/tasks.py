@@ -35,6 +35,3 @@ def task_create_certificate_img_and_upload_to_s3(verify_uuid):
         log.info('Certificate image removed from local for verify_uuid:{uuid}'.format(uuid=verify_uuid))
     except Exception as ex:
         log.error('Certificate image creation task failed, Reason: %s', ex.message)
-
-
-

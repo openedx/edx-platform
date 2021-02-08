@@ -31,4 +31,3 @@ def task_correct_polls_data():
                 log.info('Module changed with id ' + str(module.id))
         except Exception as ex:
             log.error('Code failed for ' + str(module.id) + ' and error is ' + str(ex.message))
-

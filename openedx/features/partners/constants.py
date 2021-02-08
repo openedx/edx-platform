@@ -32,7 +32,7 @@ PARTNER_EXTENDED_PROFILE_DEFAULT_DATA = {
 }
 
 PARTNER_USER_PROFILE_DEFAULT_DATA = {
-    GENDER_KEY: 'o', # I'd rather not say
+    GENDER_KEY: 'o',  # I'd rather not say
     LANGUAGE_KEY: 'English',
     LEVEL_OF_EDUCATION_KEY: 'IWRNS',  # I'd rather not say
     YEAR_OF_BIRTH_KEY: 1900,

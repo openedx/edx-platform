@@ -75,4 +75,4 @@ class MailchimpPipelineClientTestClass(TestCase):
         self.mock_request.return_value.status_code = 404
         self.mock_request.return_value.raise_for_status.side_effect = requests.exceptions.HTTPError
         self.mock_request.return_value.json.return_value = {"status": 404}
-        assert self.connection.make_request() == None
+        assert self.connection.make_request() is None

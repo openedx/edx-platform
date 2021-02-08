@@ -196,12 +196,12 @@ class GenerateStudentCertificateViewsTestCase(SharedModuleStoreTestCase):
                 'robots': '',
                 'utm_params': {},
                 'keywords': ''
-                },
+            },
             'course_url': COURSE_URL_FMT.format(
-                base_url = settings.LMS_ROOT_URL,
-                course_url = 'courses',
-                course_id = self.course.id,
-                about_url = 'about'
+                base_url=settings.LMS_ROOT_URL,
+                course_url='courses',
+                course_id=self.course.id,
+                about_url='about'
             )
         }
         mock_method.assert_called_once_with('shared_certificate.html', expected_context)
@@ -234,4 +234,4 @@ class GenerateStudentCertificateViewsTestCase(SharedModuleStoreTestCase):
 
         mock_get_pdf_data_by_certificate_uuid.assert_called_once_with(certificate_uuid)
 
-        self.assertEquals(response.get('Content-Disposition'),'attachment; filename="PhilanthropyUniversity_Run0.pdf"')
+        self.assertEquals(response.get('Content-Disposition'), 'attachment; filename="PhilanthropyUniversity_Run0.pdf"')

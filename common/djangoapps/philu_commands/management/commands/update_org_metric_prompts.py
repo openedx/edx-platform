@@ -36,18 +36,22 @@ class Command(BaseCommand):
         current_date = get_current_utc_date()
 
         # Select those prompts whose lates_metric submission is at least a year back from now
-        prompts = OrganizationMetricUpdatePrompt.objects.filter(latest_metric_submission__lte=current_date.replace(year=current_date.year-1))
+        prompts = OrganizationMetricUpdatePrompt.objects.filter(
+            latest_metric_submission__lte=current_date.replace(year=current_date.year - 1)
+        )
         for prompt in prompts:
             submission_date = prompt.latest_metric_submission
             updated_year = its_been_year(submission_date)
             updated_year_month = its_been_year_month(submission_date)
             updated_year_three_month = its_been_year_three_month(submission_date)
             updated_year_six_month = its_been_year_six_month(submission_date)
-            is_prompt_same = is_prompt_values_are_same(prompt,
-                                                          year=updated_year,
-                                                          year_month=updated_year_month,
-                                                          year_three_month=updated_year_three_month,
-                                                          year_six_month=updated_year_six_month)
+            is_prompt_same = is_prompt_values_are_same(
+                prompt,
+                year=updated_year,
+                year_month=updated_year_month,
+                year_three_month=updated_year_three_month,
+                year_six_month=updated_year_six_month
+            )
 
             if not is_prompt_same:
                 prompt.year = updated_year

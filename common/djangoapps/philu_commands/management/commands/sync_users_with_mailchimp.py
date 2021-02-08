@@ -110,7 +110,7 @@ class Command(BaseCommand):
         page_count = total_user_count / batch_size
         counter = 0
 
-        while counter is not page_count+1:
+        while counter is not page_count + 1:
             try:
                 page_start = counter * batch_size
                 page_end = page_start + batch_size
@@ -123,4 +123,3 @@ class Command(BaseCommand):
                 log.exception(str(ex.args))
 
             counter += 1
-

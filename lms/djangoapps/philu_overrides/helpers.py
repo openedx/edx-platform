@@ -25,10 +25,10 @@ def get_course_details(course_id):
 
 def send_account_activation_email(request, registration, user):
     activation_link = '{protocol}://{site}/activate/{key}'.format(
-            protocol='https' if request.is_secure() else 'http',
-            site=safe_get_host(request),
-            key=registration.activation_key
-        )
+        protocol='https' if request.is_secure() else 'http',
+        site=safe_get_host(request),
+        key=registration.activation_key
+    )
 
     context = {
         'first_name': user.first_name,
@@ -227,7 +227,6 @@ def get_next_url_for_login_page_override(request):
 
     if redirect_to == 'alquity' and request.path == '/login':
         return get_alquity_community_url()
-
 
     # if we get a redirect parameter, make sure it's safe. If it's not, drop the
     # parameter.

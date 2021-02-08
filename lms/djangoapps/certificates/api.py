@@ -131,7 +131,7 @@ def get_certificate_for_user(username, course_key):
 
 
 def generate_user_certificates(student, course_key, course=None, insecure=False, generation_mode='batch',
-                               forced_grade=None,send_email=False):
+                               forced_grade=None, send_email=False):
     """
     It will add the add-cert request into the xqueue.
 

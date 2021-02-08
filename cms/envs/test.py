@@ -125,7 +125,7 @@ DATABASES = {
         'NAME': os.environ.get('TEST_DB_NAME', 'edxtest'),
         'USER': os.environ.get('TEST_DB_USER', 'root'),
         'PASSWORD': os.environ.get('TEST_DB_PASSWORD', ''),
-        'HOST': os.environ.get('TEST_DB_HOST','edx.devstack.mysql'),
+        'HOST': os.environ.get('TEST_DB_HOST', 'edx.devstack.mysql'),
         'PORT': '3306',
         'ATOMIC_REQUESTS': True,
     },

@@ -20,7 +20,7 @@ DAYS_TO_SEND_EMAIL = 7
 class Command(BaseCommand):
     help = """
     Send Notifications prompts to users who have not entered into course after Course Open Date.
-    Orientation module will not be considered because that module will be accessible to user 
+    Orientation module will not be considered because that module will be accessible to user
     before course actually starts. We are managing this by introducing our own date "Course Open Date"
     in custom setting.
     Note: As we know in some cases enrollment process may continues after Course Open Date so if any student

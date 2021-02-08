@@ -151,10 +151,10 @@ def shared_student_achievements(request, certificate_uuid):
 
     context = {
         'course_url': COURSE_URL_FMT.format(
-            base_url = settings.LMS_ROOT_URL,
-            course_url = 'courses',
-            course_id = course.id,
-            about_url = 'about'
+            base_url=settings.LMS_ROOT_URL,
+            course_url='courses',
+            course_id=course.id,
+            about_url='about'
         ),
         'meta_tags': meta_tags,
     }

@@ -9,4 +9,3 @@ class StudentCertificatesConfig(AppConfig):
         Connect signal handlers.
         """
         import openedx.features.student_certificates.handlers
-

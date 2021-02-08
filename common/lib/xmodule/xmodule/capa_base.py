@@ -786,7 +786,7 @@ class CapaMixin(ScorableXBlockMixin, CapaFields):
 
             # Build the notification message based on the notification type and translate it.
             ungettext = self.runtime.service(self, "i18n").ungettext
-            
+
             from lms.djangoapps.philu_api.helpers import get_course_custom_settings
             course_custom_settings = get_course_custom_settings(self.runtime.course_id)
             current_user_role = self.runtime.get_user_role()

@@ -61,8 +61,8 @@ class SmartReferralInvitationAPIViewTest(APITestCase):
 
     @file_data('data/test_data_invalid_invites.json')
     @mock.patch('openedx.features.smart_referral.api_views.task_send_referral_and_toolkit_emails.delay')
-    def test_send_initial_emails_and_save_record_invalid_request_json_elements(self, invalid_data,
-                                                                                           mock_task_send_emails):
+    def test_send_initial_emails_and_save_record_invalid_request_json_elements(
+            self, invalid_data, mock_task_send_emails):
         """Submit smart referral invitation request with invalid json elements"""
 
         response = self.client.post(
@@ -76,8 +76,7 @@ class SmartReferralInvitationAPIViewTest(APITestCase):
 
     @file_data('data/test_data_invites.json')
     @mock.patch('openedx.features.smart_referral.api_views.task_send_referral_and_toolkit_emails.delay')
-    def test_send_initial_emails_and_save_record_refer_particular_user_once(self, invites_data,
-                                                                                        mock_task_send_emails):
+    def test_send_initial_emails_and_save_record_refer_particular_user_once(self, invites_data, mock_task_send_emails):
         """Submit smart referral invitation request and assert that user can refer other, particular, user only once"""
 
         data = invites_data[SELECTED_CONTACTS_LIST_INDEX][SELECTED_CONTACTS_LIST][0]
@@ -95,8 +94,7 @@ class SmartReferralInvitationAPIViewTest(APITestCase):
     @file_data('data/test_data_invites.json')
     @mock.patch('webpack_loader.loader.WebpackLoader.get_bundle')
     @mock.patch('openedx.features.smart_referral.api_views.task_send_referral_and_toolkit_emails.delay')
-    def test_send_initial_emails_and_save_record_login_required(self, invites_data, mock_task_send_emails,
-                                                                            mock_bundle):
+    def test_send_initial_emails_and_save_record_login_required(self, invites_data, mock_task_send_emails, mock_bundle):
         """Submit smart referral invitation request without authentication"""
 
         self.client.logout()

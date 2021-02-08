@@ -93,4 +93,3 @@ class ChimpClient(object):
         path = '/lists/{list_id}/members/{subscriber_hash}'.format(list_id=list_id, subscriber_hash=email_hash)
 
         return self.conn.make_request(method="DELETE", path=path)
-
