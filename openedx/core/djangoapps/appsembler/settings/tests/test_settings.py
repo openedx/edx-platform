@@ -24,7 +24,8 @@ def get_faked_settings():
 
     settings.INSTALLED_APPS = []
     settings.FEATURES = {}
-    settings.AMC_APP_URL = []
+    settings.AMC_APP_URL = ''
+    settings.AMC_APP_OAUTH2_CLIENT_ID = ''
     settings.APPSEMBLER_FEATURES = {}
     settings.STATICFILES_DIRS = []
     settings.CACHES = {}

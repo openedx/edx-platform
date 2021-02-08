@@ -31,8 +31,6 @@ from openedx.core.djangoapps.appsembler.api.tests.factories import (
     UserOrganizationMappingFactory,
 )
 
-from openedx.core.djangoapps.appsembler.api.v1.views import CourseViewSet
-
 
 APPSEMBLER_API_VIEWS_MODULE = 'openedx.core.djangoapps.appsembler.api.v1.views'
 

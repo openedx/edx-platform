@@ -14,16 +14,16 @@ class Command(NoArgsCommand):
             to_new_page_elements(current_page)
             site_configs.page_elements = current_page
 
-            site_configs.values['LANGUAGE_CODE'] = site_configs.values.get(
-                'LANGUAGE_CODE', site_configs.values.get(
+            site_configs.site_values['LANGUAGE_CODE'] = site_configs.site_values.get(
+                'LANGUAGE_CODE', site_configs.site_values.get(
                     'site_default_language', 'en'
                 )
             )
 
-            if 'site_default_language' in site_configs.values:
-                del site_configs.values['site_default_language']
+            if 'site_default_language' in site_configs.site_values:
+                del site_configs.site_values['site_default_language']
 
-            site_configs.values['site_enabled_languages'] = site_configs.values.get(
+            site_configs.site_values['site_enabled_languages'] = site_configs.site_values.get(
                 'site_enabled_languages', [
                     {
                         'languageCode': 'en',

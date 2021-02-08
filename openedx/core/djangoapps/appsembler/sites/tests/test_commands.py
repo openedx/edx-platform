@@ -1,7 +1,6 @@
 import hashlib
 import os
 import pkg_resources
-import uuid
 from mock import patch, mock_open
 from io import StringIO
 
@@ -47,9 +46,7 @@ from student.tests.factories import (
 
 from organizations.models import Organization, OrganizationCourse
 
-if not settings.TAHOE_TEMP_MONKEYPATCHING_JUNIPER_TESTS:
-    from provider.constants import CONFIDENTIAL
-    from oauth2_provider.models import AccessToken, RefreshToken, Client
+from oauth2_provider.models import AccessToken, RefreshToken, Application
 
 from student.roles import CourseCreatorRole
 
@@ -71,7 +68,8 @@ class CreateDevstackSiteCommandTestCase(TestCase):
 
     def setUp(self):
         assert settings.ENABLE_COMPREHENSIVE_THEMING
-        Client.objects.create(url=settings.AMC_APP_URL, client_type=CONFIDENTIAL)
+        Application.objects.create(client_id=settings.AMC_APP_OAUTH2_CLIENT_ID,
+                                   client_type=Application.CLIENT_CONFIDENTIAL)
 
     def test_no_sites(self):
         """
@@ -102,7 +100,7 @@ class CreateDevstackSiteCommandTestCase(TestCase):
 
         assert CourseCreatorRole().has_user(user), 'User should be a course creator'
 
-        fake_token = hashlib.md5(user.username).hexdigest()  # Using a fake token so AMC devstack can guess it
+        fake_token = hashlib.md5(user.username.encode('utf-8')).hexdigest()  # Using a fake token so AMC devstack can guess it
         assert fake_token == '80bfa968ffad007c79bfc603f3670c99', 'Ensure hash is identical to AMC'
         assert AccessToken.objects.get(user=user).token == fake_token, 'Access token is needed'
         assert RefreshToken.objects.get(user=user).token == fake_token, 'Refresh token is needed'
@@ -122,7 +120,8 @@ class RemoveSiteCommandTestCase(TestCase):
     """
     def setUp(self):
         assert settings.ENABLE_COMPREHENSIVE_THEMING
-        Client.objects.create(url=settings.AMC_APP_URL, client_type=CONFIDENTIAL)
+        Application.objects.create(client_id=settings.AMC_APP_OAUTH2_CLIENT_ID,
+                                   client_type=Application.CLIENT_CONFIDENTIAL)
 
         self.to_be_deleted = 'delete'
         self.shall_remain = 'keep'
@@ -264,7 +263,7 @@ class TestExportSiteCommand(TestCase):
         path = '/dummy/path.json'
         content = '{"tetst": "contetnt"}'
 
-        with patch("__builtin__.open", mock_open()) as mock_file:
+        with patch("builtins.open", mock_open()) as mock_file:
             self.command.write_to_file(path, content)
 
         mock_file.assert_called_once_with(path, 'w')
@@ -438,7 +437,7 @@ class TestOffboardSiteCommand(ModuleStoreTestCase):
         new_user_count = 3
 
         assert organization.userorganizationmapping_set.count() == 0
-        users = self.create_org_users(org=organization, new_user_count=new_user_count)
+        self.create_org_users(org=organization, new_user_count=new_user_count)
         assert organization.userorganizationmapping_set.count() == new_user_count
 
         data = self.command.process_organization_users(organization)
@@ -454,7 +453,7 @@ class TestOffboardSiteCommand(ModuleStoreTestCase):
 
         assert data == {
             'enabled': site_configs.enabled,
-            'values': site_configs.values,
+            'values': site_configs.site_values,
             'sass_variables': site_configs.sass_variables,
             'page_elements': site_configs.page_elements,
         }
@@ -464,7 +463,7 @@ class TestOffboardSiteCommand(ModuleStoreTestCase):
         assert data == [
             {
                 'enabled': record.enabled,
-                'values': record.values,
+                'values': record.site_values,
             } for record in SiteConfigurationHistory.objects.filter(site=self.site)
         ]
 
@@ -790,7 +789,7 @@ class TestOffboardSiteCommand(ModuleStoreTestCase):
         path = '/dummy/path.json'
         content = '{"tetst": "contetnt"}'
 
-        with patch("__builtin__.open", mock_open()) as mock_file:
+        with patch("builtins.open", mock_open()) as mock_file:
             self.command.write_to_file(path, content)
 
         mock_file.assert_called_once_with(path, 'w')

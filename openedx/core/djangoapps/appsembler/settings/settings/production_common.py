@@ -19,6 +19,7 @@ def plugin_settings(settings):
     settings.APPSEMBLER_FIRST_LOGIN_API = '/logged_into_edx'
 
     settings.AMC_APP_URL = settings.ENV_TOKENS.get('AMC_APP_URL')
+    settings.AMC_APP_OAUTH2_CLIENT_ID = settings.ENV_TOKENS.get('AMC_APP_OAUTH2_CLIENT_ID')
 
     settings.DEFAULT_COURSE_MODE_SLUG = settings.ENV_TOKENS.get('EDXAPP_DEFAULT_COURSE_MODE_SLUG', 'audit')
     settings.DEFAULT_MODE_NAME_FROM_SLUG = _(settings.DEFAULT_COURSE_MODE_SLUG.capitalize())

@@ -3,8 +3,13 @@ Tests for openedx.core.djangoapps.appsembler.api.views.EnrollmentViewSet
 
 These tests adapted from Appsembler enterprise `appsembler_api` tests
 
+This test module requires that MongoDB is running to prevent the test from hanging.
+
+```
+docker run -p 27017:27017 mongo:3.6.17
+```
+
 """
-# from django.contrib.sites.models import Site
 from django.urls import resolve, reverse
 from rest_framework import status
 from rest_framework.test import APIRequestFactory, force_authenticate
@@ -35,8 +40,6 @@ from openedx.core.djangoapps.appsembler.api.tests.factories import (
     UserOrganizationMappingFactory,
 )
 
-from openedx.core.djangoapps.appsembler.multi_tenant_emails.tests.test_utils import with_organization_context
-
 
 APPSEMBLER_API_VIEWS_MODULE = 'openedx.core.djangoapps.appsembler.api.v1.views'
 
@@ -51,7 +54,8 @@ class BaseEnrollmentApiTestCase(ModuleStoreTestCase):
 
         self.my_courses = [CourseFactory.create() for i in range(0, 2)]
         self.my_course_overviews = [
-            CourseOverviewFactory(id=course.id) for course in self.my_courses
+            CourseOverviewFactory(id=course.id,
+                                  org=self.my_site_org) for course in self.my_courses
         ]
 
         for co in self.my_course_overviews:
@@ -77,6 +81,8 @@ class BaseEnrollmentApiTestCase(ModuleStoreTestCase):
                                        organization=self.my_site_org,
                                        is_amc_admin=True)
 
+        self.get_curent_site_patch = 'lms.djangoapps.instructor.sites.get_current_site'
+
     def call_enrollment_api(self, method, site, caller, req_extra=None):
         req_extra = req_extra or {}
         url = reverse('tahoe-api:v1:enrollments-list')
@@ -85,23 +91,8 @@ class BaseEnrollmentApiTestCase(ModuleStoreTestCase):
         request.META['HTTP_HOST'] = site.domain
         force_authenticate(request, user=caller)
 
-        import unittest
-        from django.conf import settings
-        if settings.TAHOE_TEMP_MONKEYPATCHING_JUNIPER_TESTS:
-            # Those tests are broken bcuz they're expecting `get_current_request` so edx-ace emails work
-            # Consider using `with_organization_context` to fix the `get_current_request` issue
-            #     exception log
-            #     File "/home/omar/work/juniper/merge/openedx/core/djangoapps/ace_common/templatetags/ace.py",
-            #     line 61, in _get_variables_from_context
-            #     u'"emulate_http_request" if you are rendering the template in a celery task.'.format(tag_name)
-            #     VariableDoesNotExist: The google_analytics_tracking_pixel template tag requires a "request" to
-            #     be present
-            #     in the template context. Consider using "emulate_http_request" if you are rendering the template in
-            #     a celery task.
-            raise unittest.SkipTest('TODO: Appsembler - to be fixed in Juniper')
-
-        with mock.patch('lms.djangoapps.instructor.sites.get_current_site', return_value=site):
-            with mock.patch('student.models.get_current_site', return_value=site):
+        with mock.patch(self.get_curent_site_patch, return_value=site):
+            with mock.patch('lms.djangoapps.instructor.enrollment.send_mail_to_student'):
                 view = resolve(url).func
                 response = view(request)
                 response.render()
@@ -111,6 +102,7 @@ class BaseEnrollmentApiTestCase(ModuleStoreTestCase):
 @ddt.ddt
 @mock.patch(APPSEMBLER_API_VIEWS_MODULE + '.EnrollmentViewSet.throttle_classes', [])
 class EnrollmentApiGetTest(BaseEnrollmentApiTestCase):
+
     def test_get_all(self):
         response = self.call_enrollment_api('get', self.my_site, self.caller)
         results = response.data['results']
@@ -229,6 +221,8 @@ class EnrollmentApiPostTest(BaseEnrollmentApiTestCase):
             # make sure that the registered users are not in the enrollments
             mode, is_active = CourseEnrollment.enrollment_mode_for_user(reg_user, co.id)
             assert mode is None and is_active is None, "email: {}".format(reg_user.email)
+
+        # TODO: Add users to other site
 
         new_users_emails = ['alpha@example.com', 'bravo@example.com']
         # TODO: make sure these emails don't exist
@@ -372,12 +366,18 @@ class EnrollmentApiPostTest(BaseEnrollmentApiTestCase):
         assert response.data['error'] == 'invalid-course-ids'
         assert set(response.data['invalid_course_ids']) == set(invalid_course_ids)
 
-    @ddt.data(None, 'spam', 'delete')
+    @ddt.data('', 'spam', 'delete')
     def test_enroll_with_invalid_action(self, action):
+        """
+        Fails when actions is `None` because the test client will not allow
+        `None` to be encoed in the 'django/test/client.py' `encode_multipart`
+        function
+        """
         reg_users = [UserFactory(), UserFactory()]
         # TODO: Improvement - make sure these emails don't exist
         learner_emails = [obj.email for obj in reg_users]
         course_ids = [str(co.id) for co in self.my_course_overviews]
+        # import pdb; pdb.set_trace()
         response = self.call_enrollment_api('post', self.my_site, self.caller, {
             'data': {
                 'action': action,
@@ -388,8 +388,7 @@ class EnrollmentApiPostTest(BaseEnrollmentApiTestCase):
             },
         })
         assert response.status_code == status.HTTP_400_BAD_REQUEST
-        assert response.data['action'] == ['"{}" is not a valid choice.'.format(
-            'None' if not action else action)]
+        assert response.data['action'] == ['"{}" is not a valid choice.'.format(action)]
 
     def test_enroll_learner_by_username(self):
         """
@@ -414,7 +413,8 @@ class EnrollmentApiPostTest(BaseEnrollmentApiTestCase):
             'data': payload,
         })
         assert response.status_code == status.HTTP_201_CREATED, response.content
-        assert 'invalidIdentifier' not in response.content, 'Ensure enrollment is successful by username'
+        message = 'Ensure enrollment is successful by username'
+        assert 'invalidIdentifier' not in response.content.decode(), message
         assert CourseEnrollment.is_enrolled(registered_user, co.id), 'Enrollment is successful by username'
 
 
@@ -492,7 +492,8 @@ class EnrollmentApiUnenrollPostTest(BaseEnrollmentApiTestCase):
             'data': payload,
         })
         assert response.status_code == status.HTTP_200_OK, response.content
-        assert 'invalidIdentifier' not in response.content, 'Should not fail for usernames'
+        message = 'Should not fail for usernames'
+        assert 'invalidIdentifier' not in response.content.decode(), message
         message = 'Enrollments should all be deleted'
         assert not CourseEnrollment.is_enrolled(learner, self.first_course.id), message
 
@@ -515,7 +516,7 @@ class EnrollmentApiUnenrollPostTest(BaseEnrollmentApiTestCase):
         })
         assert response.status_code == status.HTTP_400_BAD_REQUEST, response.content
         message = 'Security: Enrollments should NOT be touched'
-        assert 'invalid_course_ids' in response.content, message
+        assert 'invalid_course_ids' in response.content.decode(), message
         assert CourseEnrollment.is_enrolled(self.reg_users[0], self.first_course.id), message
         assert CourseEnrollment.is_enrolled(self.reg_users[1], self.first_course.id), message
 
