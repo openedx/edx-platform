@@ -85,6 +85,11 @@ class ApplicationHub(TimeStampedModel):
 
     @property
     def is_written_application_started(self):
+        """
+        Check if user has started the application or not
+
+        :return: True or False
+        """
         try:
             return hasattr(self.user, 'application')
         except ObjectDoesNotExist:
