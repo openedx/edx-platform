@@ -14,6 +14,7 @@ from django.test import RequestFactory, TestCase
 from django.test.utils import override_settings
 from django.urls import reverse
 from django.utils import timezone
+from edx_toggles.toggles.testutils import override_waffle_flag
 from freezegun import freeze_time
 from mock import patch
 from opaque_keys.edx.keys import CourseKey
@@ -24,7 +25,10 @@ from xmodule.modulestore.tests.factories import CourseFactory
 from common.djangoapps.course_modes.models import CourseMode
 from common.djangoapps.course_modes.tests.factories import CourseModeFactory
 from common.djangoapps.student.models import CourseEnrollment
-from common.djangoapps.student.tests.factories import UserFactory
+from common.djangoapps.student.tests.factories import (
+    CourseEnrollmentFactory,
+    UserFactory
+)
 from common.djangoapps.util.testing import EventTestMixin
 from lms.djangoapps.certificates.api import (
     cert_generation_enabled,
@@ -32,6 +36,7 @@ from lms.djangoapps.certificates.api import (
     example_certificates_status,
     generate_example_certificates,
     generate_user_certificates,
+    get_allowlisted_users,
     get_certificate_for_user,
     get_certificates_for_user,
     get_certificates_for_user_by_course_keys,
@@ -41,6 +46,7 @@ from lms.djangoapps.certificates.api import (
     is_certificate_invalid,
     set_cert_generation_enabled
 )
+from lms.djangoapps.certificates.generation_handler import CERTIFICATES_USE_ALLOWLIST
 from lms.djangoapps.certificates.models import (
     CertificateGenerationConfiguration,
     CertificateStatuses,
@@ -49,7 +55,11 @@ from lms.djangoapps.certificates.models import (
     certificate_status_for_student
 )
 from lms.djangoapps.certificates.queue import XQueueAddToQueueError, XQueueCertInterface
-from lms.djangoapps.certificates.tests.factories import CertificateInvalidationFactory, GeneratedCertificateFactory
+from lms.djangoapps.certificates.tests.factories import (
+    CertificateWhitelistFactory,
+    GeneratedCertificateFactory,
+    CertificateInvalidationFactory
+)
 from lms.djangoapps.courseware.tests.factories import GlobalStaffFactory
 from lms.djangoapps.grades.tests.utils import mock_passing_grade
 from openedx.core.djangoapps.site_configuration.tests.test_util import with_site_configuration
@@ -782,3 +792,87 @@ class CertificatesBrandingTest(ModuleStoreTestCase):
         assert self.configuration['urls']['ABOUT'] in data['company_about_url']
         assert self.configuration['urls']['PRIVACY'] in data['company_privacy_url']
         assert self.configuration['urls']['TOS_AND_HONOR'] in data['company_tos_url']
+
+
+@override_waffle_flag(CERTIFICATES_USE_ALLOWLIST, active=True)
+class AllowlistTests(ModuleStoreTestCase):
+    """
+    Tests for handling allowlist certificates
+    """
+
+    def setUp(self):
+        super().setUp()
+
+        # Create users, a course run, and enrollments
+        self.user = UserFactory()
+        self.user2 = UserFactory()
+        self.user3 = UserFactory()
+        self.user4 = UserFactory()
+
+        self.course_run = CourseFactory()
+        self.course_run_key = self.course_run.id  # pylint: disable=no-member
+        self.second_course_run = CourseFactory()
+        self.second_course_run_key = self.second_course_run.id  # pylint: disable=no-member
+        self.third_course_run = CourseFactory()
+        self.third_course_run_key = self.third_course_run.id  # pylint: disable=no-member
+
+        CourseEnrollmentFactory(
+            user=self.user,
+            course_id=self.course_run_key,
+            is_active=True,
+            mode="verified",
+        )
+        CourseEnrollmentFactory(
+            user=self.user2,
+            course_id=self.course_run_key,
+            is_active=True,
+            mode="verified",
+        )
+        CourseEnrollmentFactory(
+            user=self.user3,
+            course_id=self.course_run_key,
+            is_active=True,
+            mode="verified",
+        )
+        CourseEnrollmentFactory(
+            user=self.user4,
+            course_id=self.second_course_run_key,
+            is_active=True,
+            mode="verified",
+        )
+
+        # Add user to the allowlist
+        CertificateWhitelistFactory.create(course_id=self.course_run_key, user=self.user)
+        # Add user to the allowlist, but set whitelist to false
+        CertificateWhitelistFactory.create(course_id=self.course_run_key, user=self.user2, whitelist=False)
+        # Add user to the allowlist in the other course
+        CertificateWhitelistFactory.create(course_id=self.second_course_run_key, user=self.user4)
+
+    def test_get_users_allowlist(self):
+        """
+        Test that allowlisted users are returned correctly
+        """
+        users = get_allowlisted_users(self.course_run_key)
+        assert 1 == users.count()
+        assert users[0].id == self.user.id
+
+        users = get_allowlisted_users(self.second_course_run_key)
+        assert 1 == users.count()
+        assert users[0].id == self.user4.id
+
+        users = get_allowlisted_users(self.third_course_run_key)
+        assert 0 == users.count()
+
+    @override_waffle_flag(CERTIFICATES_USE_ALLOWLIST, active=False)
+    def test_get_users_allowlist_false(self):
+        """
+        Test
+        """
+        users = get_allowlisted_users(self.course_run_key)
+        assert 0 == users.count()
+
+        users = get_allowlisted_users(self.second_course_run_key)
+        assert 0 == users.count()
+
+        users = get_allowlisted_users(self.third_course_run_key)
+        assert 0 == users.count()

@@ -11,6 +11,7 @@ certificates models or any other certificates modules.
 import logging
 
 import six
+from django.contrib.auth import get_user_model
 from django.db.models import Q
 from eventtracking import tracker
 from opaque_keys.edx.django.models import CourseKeyField
@@ -18,6 +19,7 @@ from organizations.api import get_course_organization_id
 
 from lms.djangoapps.branding import api as branding_api
 from lms.djangoapps.certificates.generation_handler import (
+    is_using_certificate_allowlist as _is_using_certificate_allowlist,
     is_using_certificate_allowlist_and_is_on_allowlist as _is_using_certificate_allowlist_and_is_on_allowlist,
     generate_allowlist_certificate_task as _generate_allowlist_certificate_task,
     generate_user_certificates as _generate_user_certificates,
@@ -30,6 +32,7 @@ from lms.djangoapps.certificates.models import (
     CertificateStatuses,
     CertificateTemplate,
     CertificateTemplateAsset,
+    CertificateWhitelist,
     ExampleCertificateSet,
     GeneratedCertificate,
     certificate_status_for_student
@@ -41,6 +44,7 @@ from openedx.core.djangoapps.certificates.api import certificates_viewable_for_c
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 
 log = logging.getLogger("edx.certificate")
+User = get_user_model()
 MODES = GeneratedCertificate.MODES
 
 
@@ -553,3 +557,13 @@ def is_using_certificate_allowlist_and_is_on_allowlist(user, course_key):
     2) if the user is on the allowlist for this course run
     """
     return _is_using_certificate_allowlist_and_is_on_allowlist(user, course_key)
+
+
+def get_allowlisted_users(course_key):
+    """
+    Return the users who are on the allowlist for this course run
+    """
+    if not _is_using_certificate_allowlist(course_key):
+        return User.objects.none()
+
+    return User.objects.filter(certificatewhitelist__course_id=course_key, certificatewhitelist__whitelist=True)
