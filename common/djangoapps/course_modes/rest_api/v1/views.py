@@ -75,6 +75,7 @@ class CourseModesView(CourseModesMixin, ListCreateAPIView):
           * mode_display_name: The verbose name for the course mode.
           * min_price: The minimum price for which a user can
             enroll in this mode.
+          * price: The minimum price for which a user can enroll in this mode, as a decimal. This will eventually replace min_price.
           * currency: The currency of the listed prices.
           * expiration_datetime: The date and time after which
             users cannot enroll in the course in this mode (not required for POST).

@@ -4,6 +4,7 @@
 import itertools
 import json
 from datetime import datetime, timedelta
+from decimal import Decimal
 
 import ddt
 import pytz
@@ -63,6 +64,7 @@ class CourseApiViewTestMixin(object):
             u'name': course_mode.mode_slug,
             u'currency': course_mode.currency.lower(),
             u'price': course_mode.min_price,
+            u'price_decimal': course_mode.min_price,
             u'sku': course_mode.sku,
             u'bulk_sku': course_mode.bulk_sku,
             u'expires': cls._serialize_datetime(course_mode.expiration_datetime),
@@ -157,6 +159,7 @@ class CourseRetrieveUpdateViewTests(CourseApiViewTestMixin, ModuleStoreTestCase)
         expected_course_mode = CourseMode(
             mode_slug=u'verified',
             min_price=200,
+            price=Decimal('200.00'),
             currency=u'USD',
             sku=u'ABC123',
             bulk_sku=u'BULK-ABC123',
@@ -228,6 +231,7 @@ class CourseRetrieveUpdateViewTests(CourseApiViewTestMixin, ModuleStoreTestCase)
         verified_mode = CourseMode(
             mode_slug=u'verified',
             min_price=200,
+            price=Decimal('200.00'),
             currency=u'USD',
             sku=u'ABC123',
             bulk_sku=u'BULK-ABC123',
@@ -253,6 +257,7 @@ class CourseRetrieveUpdateViewTests(CourseApiViewTestMixin, ModuleStoreTestCase)
         verified_mode = CourseMode(
             mode_slug=u'verified',
             min_price=200,
+            price=Decimal('200.00'),
             currency=u'USD',
             sku=u'ABC123',
             bulk_sku=u'BULK-ABC123',
@@ -298,6 +303,7 @@ class CourseRetrieveUpdateViewTests(CourseApiViewTestMixin, ModuleStoreTestCase)
             course_id=self.course.id,
             mode_slug=u'masters',
             min_price=10000,
+            price=Decimal('10000.00'),
             currency=u'USD',
             sku=u'DEF456',
             bulk_sku=u'BULK-DEF456'
@@ -306,6 +312,7 @@ class CourseRetrieveUpdateViewTests(CourseApiViewTestMixin, ModuleStoreTestCase)
             course_id=self.course.id,
             mode_slug=u'credit',
             min_price=500,
+            price=Decimal('500.00'),
             currency=u'USD',
             sku=u'ABC123',
             bulk_sku=u'BULK-ABC123'
@@ -341,6 +348,7 @@ class CourseRetrieveUpdateViewTests(CourseApiViewTestMixin, ModuleStoreTestCase)
             CourseMode(
                 mode_slug=mode_slug,
                 min_price=500,
+                price=Decimal('500.00'),
                 currency=u'USD',
                 sku=u'ABC123',
                 bulk_sku=u'BULK-ABC123',

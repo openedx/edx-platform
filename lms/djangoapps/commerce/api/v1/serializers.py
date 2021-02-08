@@ -20,6 +20,7 @@ class CourseModeSerializer(serializers.ModelSerializer):
     """ CourseMode serializer. """
     name = serializers.CharField(source='mode_slug')
     price = serializers.IntegerField(source='min_price')
+    price_decimal = serializers.DecimalField(source='min_price', max_digits=30, decimal_places=2)
     expires = serializers.DateTimeField(
         source='expiration_datetime',
         required=False,

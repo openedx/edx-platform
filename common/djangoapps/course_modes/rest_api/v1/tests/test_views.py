@@ -7,6 +7,7 @@ import json
 import unittest
 
 import ddt
+from decimal import Decimal
 from django.conf import settings
 from django.urls import reverse
 from opaque_keys.edx.keys import CourseKey
@@ -134,6 +135,7 @@ class TestCourseModesListViews(CourseModesViewTestBase, ModuleStoreTestCase, API
                 'mode_slug': 'audit',
                 'mode_display_name': 'Audit',
                 'min_price': 0,
+                'price': Decimal('0.00'),
                 'currency': 'usd',
                 'expiration_datetime': None,
                 'expiration_datetime_is_explicit': False,
@@ -146,6 +148,7 @@ class TestCourseModesListViews(CourseModesViewTestBase, ModuleStoreTestCase, API
                 'mode_slug': 'verified',
                 'mode_display_name': 'Verified',
                 'min_price': 25,
+                'price': Decimal('25.00'),
                 'currency': 'usd',
                 'expiration_datetime': None,
                 'expiration_datetime_is_explicit': False,
@@ -286,6 +289,7 @@ class TestCourseModesDetailViews(CourseModesViewTestBase, APITestCase):
             'mode_slug': 'audit',
             'mode_display_name': 'Audit',
             'min_price': 0,
+            'price': Decimal('0.00'),
             'currency': 'usd',
             'expiration_datetime': None,
             'expiration_datetime_is_explicit': False,

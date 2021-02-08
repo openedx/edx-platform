@@ -188,6 +188,7 @@ class CourseModeAdmin(admin.ModelAdmin):
         'mode_slug',
         'mode_display_name',
         'min_price',
+        'price',
         'currency',
         '_expiration_datetime',
         'verification_deadline',
@@ -202,6 +203,7 @@ class CourseModeAdmin(admin.ModelAdmin):
         'course',
         'mode_slug',
         'min_price',
+        'price',
         'expiration_datetime_custom',
         'sku',
         'bulk_sku'
