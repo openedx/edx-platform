@@ -245,7 +245,7 @@ class SiteConfiguration(models.Model):
                 self.sass_variables[index] = new_value
 
     def delete_css_override(self):
-        css_file = self.values.get('css_overrides_file')
+        css_file = self.get_value('css_overrides_file')
         if css_file:
             try:
                 if settings.USE_S3_FOR_CUSTOMER_THEMES:
@@ -266,7 +266,7 @@ class SiteConfiguration(models.Model):
         if 'branding-basics' in path:
             return [(path, self._formatted_sass_variables())]
         if 'customer-sass-input' in path:
-            return [(path, self.values.get('customer_sass_input', ''))]
+            return [(path, self.get_value('customer_sass_input', ''))]
         return None
 
     def get_initial_microsite_values(self):
