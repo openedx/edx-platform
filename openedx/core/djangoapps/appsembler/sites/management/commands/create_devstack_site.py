@@ -56,8 +56,9 @@ class Command(BaseCommand):
         ))
 
     def handle(self, *args, **options):
-        if not settings.DEBUG:
-            raise CommandError('This only works on devstack.')
+        # TODO: Uncomment after fixing the AMC trial site
+        # if not settings.DEBUG:
+        #     raise CommandError('This only works on devstack.')
 
         name = options['name'][0].lower()
         try:
