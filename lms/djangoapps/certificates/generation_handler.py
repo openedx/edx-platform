@@ -259,6 +259,11 @@ def regenerate_user_certificates(student, course_key, course=None,
         template_file - The template file used to render this certificate
         insecure - (Boolean)
     """
+    if is_using_certificate_allowlist_and_is_on_allowlist(student, course_key):
+        log.info(f'{course_key} is using allowlist certificates, and the user {student.id} is on its allowlist. '
+                 f'Attempt will be made to regenerate an allowlist certificate.')
+        return generate_allowlist_certificate_task(student, course_key)
+
     xqueue = XQueueCertInterface()
     if insecure:
         xqueue.use_https = False
@@ -272,7 +277,7 @@ def regenerate_user_certificates(student, course_key, course=None,
         student.username, str(course_key), generate_pdf
     )
 
-    return xqueue.regen_cert(
+    xqueue.regen_cert(
         student,
         course_key,
         course=course,
@@ -280,3 +285,4 @@ def regenerate_user_certificates(student, course_key, course=None,
         template_file=template_file,
         generate_pdf=generate_pdf
     )
+    return True

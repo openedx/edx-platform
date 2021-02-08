@@ -156,8 +156,7 @@ def fire_ungenerated_certificate_task(user, course_key, expected_verification_st
     if is_using_certificate_allowlist_and_is_on_allowlist(user, course_key):
         log.info('{course} is using allowlist certificates, and the user {user} is on its allowlist. Attempt will be '
                  'made to generate an allowlist certificate.'.format(course=course_key, user=user.id))
-        generate_allowlist_certificate_task(user, course_key)
-        return True
+        return generate_allowlist_certificate_task(user, course_key)
 
     log.info('{course} is not using allowlist certificates (or user {user} is not on its allowlist). The normal '
              'generation logic will be followed.'.format(course=course_key, user=user.id))
