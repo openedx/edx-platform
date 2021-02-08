@@ -432,9 +432,10 @@ if os.path.isfile(join(dirname(abspath(__file__)), 'private.py')):
 FEATURES['ENABLE_SPECIAL_EXAMS'] = True
 FEATURES['ENABLE_PREREQUISITE_COURSES'] = True
 
-# Don't tolerate deprecated edx-platform import usage in devstack.
-ERROR_ON_DEPRECATED_EDX_PLATFORM_IMPORTS = True
-
 # Used in edx-proctoring for ID generation in lieu of SECRET_KEY - dummy value
 # (ref MST-637)
 PROCTORING_USER_OBFUSCATION_KEY = '85920908f28904ed733fe576320db18cabd7b6cd'
+
+
+# Don't tolerate deprecated edx-platform import usage in devstack.
+ERROR_ON_DEPRECATED_EDX_PLATFORM_IMPORTS = True
