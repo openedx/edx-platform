@@ -3390,8 +3390,16 @@ FILE_UPLOAD_STORAGE_PREFIX = 'submissions_attachments'
 # .. setting_default: 6
 # .. setting_description: Specifies the maximum failed login attempts allowed to users. Once the user reaches this
 #   failure threshold then the account will be locked for a configurable amount of seconds (30 minutes) which will
-#   prevent additional login attempts until this time period has passed.
+#   prevent additional login attempts until this time period has passed. This setting is related with
+#   MAX_FAILED_LOGIN_ATTEMPTS_LOCKOUT_PERIOD_SECS and only used when ENABLE_MAX_FAILED_LOGIN_ATTEMPTS is enabled.
 MAX_FAILED_LOGIN_ATTEMPTS_ALLOWED = 6
+
+# .. setting_name: MAX_FAILED_LOGIN_ATTEMPTS_LOCKOUT_PERIOD_SECS
+# .. setting_default: 30 * 60
+# .. setting_description: Specifies the lockout period in seconds for consecutive failed login attempts. Once the user
+#   reaches the threshold of the login failure, then the account will be locked for the given amount of seconds
+#   (30 minutes) which will prevent additional login attempts until this time period has passed. This setting is
+#   related with MAX_FAILED_LOGIN_ATTEMPTS_ALLOWED and only used when ENABLE_MAX_FAILED_LOGIN_ATTEMPTS is enabled.
 MAX_FAILED_LOGIN_ATTEMPTS_LOCKOUT_PERIOD_SECS = 30 * 60
 
 
