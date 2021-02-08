@@ -213,7 +213,7 @@ class EnterpriseSupportSignals(SharedModuleStoreTestCase):
         Test to assert transmit_subsection_learner_data is called when COURSE_ASSESSMENT_GRADE_CHANGED signal is fired.
         """
         with patch(
-            'integrated_channels.integrated_channel.tasks.transmit_subsection_learner_data.apply_async',
+            'integrated_channels.integrated_channel.tasks.transmit_single_subsection_learner_data.apply_async',
             return_value=None
         ) as mock_task_apply:
             course_key = CourseKey.from_string(self.course_id)

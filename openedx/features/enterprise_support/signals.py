@@ -11,7 +11,10 @@ from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imp
 from django.db.models.signals import post_save, pre_save
 from django.dispatch import receiver
 from enterprise.models import EnterpriseCourseEnrollment, EnterpriseCustomer, EnterpriseCustomerUser
-from integrated_channels.integrated_channel.tasks import transmit_single_learner_data, transmit_subsection_learner_data
+from integrated_channels.integrated_channel.tasks import (
+    transmit_single_learner_data,
+    transmit_single_subsection_learner_data
+)
 from slumber.exceptions import HttpClientError
 
 from lms.djangoapps.email_marketing.tasks import update_user
@@ -99,7 +102,7 @@ def handle_enterprise_learner_subsection(sender, user, course_id, subsection_id,
             'grade': str(subsection_grade),
         }
 
-        transmit_subsection_learner_data.apply_async(kwargs=kwargs)
+        transmit_single_subsection_learner_data.apply_async(kwargs=kwargs)
 
 
 @receiver(UNENROLL_DONE)
