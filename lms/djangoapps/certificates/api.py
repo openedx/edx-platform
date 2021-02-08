@@ -19,6 +19,7 @@ from organizations.api import get_course_organization_id
 from lms.djangoapps.branding import api as branding_api
 from lms.djangoapps.certificates.generation_handler import (
     is_using_certificate_allowlist_and_is_on_allowlist as _is_using_certificate_allowlist_and_is_on_allowlist,
+    generate_allowlist_certificate_task as _generate_allowlist_certificate_task,
     generate_user_certificates as _generate_user_certificates,
     regenerate_user_certificates as _regenerate_user_certificates
 )
@@ -189,6 +190,10 @@ def generate_user_certificates(student, course_key, course=None, insecure=False,
 def regenerate_user_certificates(student, course_key, course=None,
                                  forced_grade=None, template_file=None, insecure=False):
     return _regenerate_user_certificates(student, course_key, course, forced_grade, template_file, insecure)
+
+
+def generate_allowlist_certificate_task(user, course_key):
+    return _generate_allowlist_certificate_task(user, course_key)
 
 
 def certificate_downloadable_status(student, course_key):
