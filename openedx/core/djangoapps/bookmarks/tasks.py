@@ -6,7 +6,7 @@ Tasks for bookmarks.
 import logging
 
 import six
-from celery.task import task
+from celery import shared_task
 from django.db import transaction
 from edx_django_utils.monitoring import set_code_owner_attribute
 from opaque_keys.edx.keys import CourseKey
@@ -145,7 +145,7 @@ def _update_xblocks_cache(course_key):
                 update_block_cache_if_needed(block_cache, block_data)
 
 
-@task(name=u'openedx.core.djangoapps.bookmarks.tasks.update_xblocks_cache')
+@shared_task(name=u'openedx.core.djangoapps.bookmarks.tasks.update_xblocks_cache')
 @set_code_owner_attribute
 def update_xblocks_cache(course_id):
     """

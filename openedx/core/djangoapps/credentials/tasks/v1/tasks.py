@@ -3,7 +3,7 @@ This file contains celery tasks for credentials-related functionality.
 """
 
 
-from celery import task
+from celery import shared_task
 from celery.utils.log import get_task_logger
 from django.conf import settings
 from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
@@ -21,7 +21,7 @@ logger = get_task_logger(__name__)
 MAX_RETRIES = 11
 
 
-@task(bind=True, ignore_result=True)
+@shared_task(bind=True, ignore_result=True)
 @set_code_owner_attribute
 def send_grade_to_credentials(self, username, course_run_key, verified, letter_grade, percent_grade):
     """ Celery task to notify the Credentials IDA of a grade change via POST. """
