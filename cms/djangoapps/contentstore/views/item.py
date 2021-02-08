@@ -1,7 +1,7 @@
 """Views for items (modules)."""
 
 
-import hashlib
+import hashlib  # lint-amnesty, pylint: disable=unused-import
 import logging
 from collections import OrderedDict
 from datetime import datetime
@@ -10,7 +10,7 @@ from uuid import uuid4
 
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.core.exceptions import PermissionDenied
 from django.http import Http404, HttpResponse, HttpResponseBadRequest
 from django.utils.translation import ugettext as _
@@ -528,7 +528,7 @@ def _update_with_callback(xblock, user, old_metadata=None, old_content=None):
     return modulestore().update_item(xblock, user.id)
 
 
-def _save_xblock(user, xblock, data=None, children_strings=None, metadata=None, nullout=None,
+def _save_xblock(user, xblock, data=None, children_strings=None, metadata=None, nullout=None,  # lint-amnesty, pylint: disable=too-many-statements
                  grader_type=None, is_prereq=None, prereq_usage_key=None, prereq_min_score=None,
                  prereq_min_completion=None, publish=None, fields=None):
     """
@@ -1124,7 +1124,7 @@ def _get_gating_info(course, xblock):
     return info
 
 
-def create_xblock_info(xblock, data=None, metadata=None, include_ancestor_info=False, include_child_info=False,
+def create_xblock_info(xblock, data=None, metadata=None, include_ancestor_info=False, include_child_info=False,  # lint-amnesty, pylint: disable=too-many-statements
                        course_outline=False, include_children_predicate=NEVER, parent_xblock=None, graders=None,
                        user=None, course=None, is_concise=False):
     """

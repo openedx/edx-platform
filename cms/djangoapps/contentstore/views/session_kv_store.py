@@ -10,7 +10,7 @@ def stringify(key):
     return repr(tuple(key))
 
 
-class SessionKeyValueStore(KeyValueStore):
+class SessionKeyValueStore(KeyValueStore):  # lint-amnesty, pylint: disable=missing-class-docstring
     def __init__(self, request):
         self._session = request.session
 

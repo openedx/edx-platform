@@ -1,4 +1,3 @@
-# lint-amnesty, pylint: disable=bad-option-value, unicode-format-string
 """
 Defines the URL routes for this app.
 

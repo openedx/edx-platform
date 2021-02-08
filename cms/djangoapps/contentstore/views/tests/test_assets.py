@@ -43,7 +43,7 @@ class AssetsTestCase(CourseTestCase):
     Parent class for all asset tests.
     """
     def setUp(self):
-        super(AssetsTestCase, self).setUp()
+        super(AssetsTestCase, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.url = reverse_course_url('assets_handler', self.course.id)
 
     def upload_asset(self, name="asset-1", asset_type='text'):
@@ -343,7 +343,7 @@ class UploadTestCase(AssetsTestCase):
     Unit tests for uploading a file
     """
     def setUp(self):
-        super(UploadTestCase, self).setUp()
+        super(UploadTestCase, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.url = reverse_course_url('assets_handler', self.course.id)
 
     def test_happy_path(self):
@@ -378,7 +378,7 @@ class DownloadTestCase(AssetsTestCase):
     Unit tests for downloading a file.
     """
     def setUp(self):
-        super(DownloadTestCase, self).setUp()
+        super(DownloadTestCase, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.url = reverse_course_url('assets_handler', self.course.id)
         # First, upload something.
         self.asset_name = 'download_test'
@@ -502,7 +502,7 @@ class DeleteAssetTestCase(AssetsTestCase):
     """
     def setUp(self):
         """ Scaffolding """
-        super(DeleteAssetTestCase, self).setUp()
+        super(DeleteAssetTestCase, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.url = reverse_course_url('assets_handler', self.course.id)
         # First, upload something.
         self.asset_name = 'delete_test'

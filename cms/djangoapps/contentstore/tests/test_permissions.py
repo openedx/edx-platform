@@ -5,7 +5,7 @@ Test CRUD for authorization.
 
 import copy
 
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from six.moves import range
 
 from cms.djangoapps.contentstore.tests.utils import AjaxEnabledTestClient
@@ -25,7 +25,7 @@ class TestCourseAccess(ModuleStoreTestCase):
 
         Create a pool of users w/o granting them any permissions
         """
-        super(TestCourseAccess, self).setUp()
+        super(TestCourseAccess, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
 
         self.client = AjaxEnabledTestClient()
         self.client.login(username=self.user.username, password=self.user_password)
@@ -94,7 +94,7 @@ class TestCourseAccess(ModuleStoreTestCase):
             user = users.pop()
             group.add_users(user)
             user_by_role[role].append(user)
-            self.assertTrue(auth.has_course_author_access(user, self.course_key), "{} does not have access".format(user))
+            self.assertTrue(auth.has_course_author_access(user, self.course_key), "{} does not have access".format(user))  # lint-amnesty, pylint: disable=line-too-long
 
         course_team_url = reverse_course_url('course_team_handler', self.course_key)
         response = self.client.get_html(course_team_url)
@@ -132,4 +132,4 @@ class TestCourseAccess(ModuleStoreTestCase):
                     auth.remove_users(self.user, role(self.course_key.org), user)
                 else:
                     auth.remove_users(self.user, role(self.course_key), user)
-                self.assertFalse(auth.has_course_author_access(user, self.course_key), u"{} remove didn't work".format(user))
+                self.assertFalse(auth.has_course_author_access(user, self.course_key), u"{} remove didn't work".format(user))  # lint-amnesty, pylint: disable=line-too-long

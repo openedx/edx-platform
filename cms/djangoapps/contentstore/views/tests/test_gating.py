@@ -30,7 +30,7 @@ class TestSubsectionGating(CourseTestCase):
         """
         Initial data setup
         """
-        super(TestSubsectionGating, self).setUp()
+        super(TestSubsectionGating, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
 
         # Enable subsection gating for the test course
         self.course.enable_subsection_gating = True

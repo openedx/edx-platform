@@ -193,7 +193,7 @@ def validate_transcript_upload_data(data, files):
         data['language_code'] != data['new_language_code'] and
         data['new_language_code'] in get_available_transcript_languages(video_id=data['edx_video_id'])
     ):
-        error = _(u'A transcript with the "{language_code}" language code already exists.'.format(
+        error = _(u'A transcript with the "{language_code}" language code already exists.'.format(  # lint-amnesty, pylint: disable=translation-of-non-string
             language_code=data['new_language_code']
         ))
     elif 'file' not in files:

@@ -82,7 +82,7 @@ class BaseTranscripts(CourseTestCase):
 
     def setUp(self):
         """Create initial data."""
-        super(BaseTranscripts, self).setUp()
+        super(BaseTranscripts, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
 
         # Add video module
         data = {
@@ -156,7 +156,7 @@ class TestUploadTranscripts(BaseTranscripts):
     Tests for '/transcripts/upload' endpoint.
     """
     def setUp(self):
-        super(TestUploadTranscripts, self).setUp()
+        super(TestUploadTranscripts, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.contents = {
             'good': SRT_TRANSCRIPT_CONTENT,
             'bad': u'Some BAD data',
@@ -388,7 +388,7 @@ class TestChooseTranscripts(BaseTranscripts):
     Tests for '/transcripts/choose' endpoint.
     """
     def setUp(self):
-        super(TestChooseTranscripts, self).setUp()
+        super(TestChooseTranscripts, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
 
         # Create test transcript in contentstore
         self.chosen_html5_id = 'test_html5_subs'
@@ -507,7 +507,7 @@ class TestRenameTranscripts(BaseTranscripts):
     Tests for '/transcripts/rename' endpoint.
     """
     def setUp(self):
-        super(TestRenameTranscripts, self).setUp()
+        super(TestRenameTranscripts, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
 
         # Create test transcript in contentstore and update item's sub.
         self.item.sub = 'test_video_subs'
@@ -633,7 +633,7 @@ class TestReplaceTranscripts(BaseTranscripts):
     Tests for '/transcripts/replace' endpoint.
     """
     def setUp(self):
-        super(TestReplaceTranscripts, self).setUp()
+        super(TestReplaceTranscripts, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.youtube_id = 'test_yt_id'
 
         # Setup a VEDA produced video and persist `edx_video_id` in VAL.

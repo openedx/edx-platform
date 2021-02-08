@@ -17,7 +17,7 @@ class LockedTest(ModuleStoreTestCase):
     """Test class to verify locking of mocked resources"""
 
     def setUp(self):
-        super(LockedTest, self).setUp()
+        super(LockedTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.course = CourseFactory.create(
             org='edx',
             name='course',

@@ -57,7 +57,7 @@ class SearchIndexingError(Exception):
     """ Indicates some error(s) occured during indexing """
 
     def __init__(self, message, error_list):
-        super(SearchIndexingError, self).__init__(message)
+        super(SearchIndexingError, self).__init__(message)  # lint-amnesty, pylint: disable=super-with-arguments
         self.error_list = error_list
 
 
@@ -116,7 +116,7 @@ class SearchIndexerBase(object, metaclass=ABCMeta):
         searcher.remove(result_ids)
 
     @classmethod
-    def index(cls, modulestore, structure_key, triggered_at=None, reindex_age=REINDEX_AGE, timeout=INDEXING_REQUEST_TIMEOUT):
+    def index(cls, modulestore, structure_key, triggered_at=None, reindex_age=REINDEX_AGE, timeout=INDEXING_REQUEST_TIMEOUT):  # lint-amnesty, pylint: disable=line-too-long, too-many-statements
         """
         Process course for indexing
 
@@ -187,7 +187,7 @@ class SearchIndexerBase(object, metaclass=ABCMeta):
 
             item_content_groups = None
 
-            if item.category == "split_test":
+            if item.category == "split_test":  # lint-amnesty, pylint: disable=too-many-nested-blocks
                 split_partition = item.get_selected_partition()
                 for split_test_child in item.get_children():
                     if split_partition:
@@ -327,7 +327,7 @@ class SearchIndexerBase(object, metaclass=ABCMeta):
         Returns:
             None
         """
-        pass
+        pass  # lint-amnesty, pylint: disable=unnecessary-pass
 
     @classmethod
     def supplemental_fields(cls, item):  # pylint: disable=unused-argument
@@ -667,7 +667,7 @@ class CourseAboutSearchIndexer(CoursewareSearchIndexer):
         return {"course": text_type(normalized_structure_key), "org": normalized_structure_key.org}
 
     @classmethod
-    def remove_deleted_items(cls, structure_key):
+    def remove_deleted_items(cls, structure_key):  # lint-amnesty, pylint: disable=arguments-differ
         """ Remove item from Course About Search_index """
         searcher = SearchEngine.get_search_engine(cls.INDEX_NAME)
         if not searcher:

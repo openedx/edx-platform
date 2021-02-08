@@ -16,7 +16,7 @@ import string
 import six
 import unicodecsv
 from django.conf import settings
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.core.exceptions import MultipleObjectsReturned, ObjectDoesNotExist, PermissionDenied, ValidationError
 from django.core.validators import validate_email
 from django.db import IntegrityError, transaction
@@ -44,7 +44,7 @@ from submissions import api as sub_api  # installed from the edx-submissions rep
 
 from lms.djangoapps.instructor_analytics import basic as instructor_analytics_basic
 from lms.djangoapps.instructor_analytics import csvs as instructor_analytics_csvs
-from lms.djangoapps.instructor_analytics import distributions as instructor_analytics_distributions
+from lms.djangoapps.instructor_analytics import distributions as instructor_analytics_distributions  # lint-amnesty, pylint: disable=unused-import
 from lms.djangoapps.bulk_email.api import is_bulk_email_feature_enabled
 from lms.djangoapps.bulk_email.models import CourseEmail
 from common.djangoapps.course_modes.models import CourseMode
@@ -337,7 +337,7 @@ def register_and_enroll_students(request, course_id):  # pylint: disable=too-man
         try:
             upload_file = request.FILES.get('students_list')
             if upload_file.name.endswith('.csv'):
-                students = [row for row in csv.reader(upload_file.read().decode('utf-8').splitlines())]
+                students = [row for row in csv.reader(upload_file.read().decode('utf-8').splitlines())]  # lint-amnesty, pylint: disable=unnecessary-comprehension
                 course = get_course_by_id(course_id)
             else:
                 general_errors.append({
@@ -434,7 +434,7 @@ def register_and_enroll_students(request, course_id):  # pylint: disable=too-man
                         'email': email,
                         'response': _(u'Invalid email {email_address}.').format(email_address=email),
                     })
-                    log.warning(u'Email address %s is associated with a retired user, so course enrollment was ' +
+                    log.warning(u'Email address %s is associated with a retired user, so course enrollment was ' +  # lint-amnesty, pylint: disable=logging-not-lazy
                                 u'blocked.', email)
                 else:
                     # This email does not yet exist, so we need to create a new account
@@ -610,14 +610,14 @@ def create_and_enroll_user(email, username, name, country, password, course_id, 
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @require_course_permission(permissions.CAN_ENROLL)
 @require_post_params(action="enroll or unenroll", identifiers="stringified list of emails and/or usernames")
-def students_update_enrollment(request, course_id):
+def students_update_enrollment(request, course_id):  # lint-amnesty, pylint: disable=too-many-statements
     """
     Enroll or unenroll students by email.
     Requires staff access.
 
     Query Parameters:
     - action in ['enroll', 'unenroll']
-    - identifiers is string containing a list of emails and/or usernames separated by anything split_input_list can handle.
+    - identifiers is string containing a list of emails and/or usernames separated by anything split_input_list can handle.  # lint-amnesty, pylint: disable=line-too-long
     - auto_enroll is a boolean (defaults to false)
         If auto_enroll is false, students will be allowed to enroll.
         If auto_enroll is true, students will be enrolled as soon as they register.
@@ -675,7 +675,7 @@ def students_update_enrollment(request, course_id):
         email_params = get_email_params(course, auto_enroll, secure=request.is_secure())
 
     results = []
-    for identifier in identifiers:
+    for identifier in identifiers:  # lint-amnesty, pylint: disable=too-many-nested-blocks
         # First try to get a user object from the identifer
         user = None
         email = None
@@ -1052,7 +1052,7 @@ def get_problem_responses(request, course_id):
 
     try:
         for problem_location in problem_locations.split(','):
-            problem_key = UsageKey.from_string(problem_location).map_into_course(course_key)
+            problem_key = UsageKey.from_string(problem_location).map_into_course(course_key)  # lint-amnesty, pylint: disable=unused-variable
     except InvalidKeyError:
         return JsonResponseBadRequest(_("Could not find problem with this location."))
 
@@ -1748,7 +1748,7 @@ def rescore_problem(request, course_id):
 @require_course_permission(permissions.OVERRIDE_GRADES)
 @require_post_params(problem_to_reset="problem urlname to reset", score='overriding score')
 @common_exceptions_400
-def override_problem_score(request, course_id):
+def override_problem_score(request, course_id):  # lint-amnesty, pylint: disable=missing-function-docstring
     course_key = CourseKey.from_string(course_id)
     score = strip_if_string(request.POST.get('score'))
     problem_to_reset = strip_if_string(request.POST.get('problem_to_reset'))
@@ -2325,7 +2325,7 @@ def update_forum_role_membership(request, course_id):
 
 
 @require_POST
-def get_user_invoice_preference(request, course_id):
+def get_user_invoice_preference(request, course_id):  # lint-amnesty, pylint: disable=unused-argument
     """
     Gets invoice copy user's preferences.
     """
@@ -2691,7 +2691,7 @@ def remove_certificate_exception(course_key, student):
     try:
         certificate_exception = CertificateWhitelist.objects.get(user=student, course_id=course_key)
     except ObjectDoesNotExist:
-        raise ValueError(
+        raise ValueError(  # lint-amnesty, pylint: disable=raise-missing-from
             _(u'Certificate exception (user={user}) does not exist in certificate white list. '
               'Please refresh the page and try again.').format(user=student.username)
         )
@@ -2744,7 +2744,7 @@ def parse_request_data(request):
     try:
         data = json.loads(request.body.decode('utf8') or u'{}')
     except ValueError:
-        raise ValueError(_('The record is not in the correct format. Please add a valid username or email address.'))
+        raise ValueError(_('The record is not in the correct format. Please add a valid username or email address.'))  # lint-amnesty, pylint: disable=raise-missing-from
 
     return data
 
@@ -2761,7 +2761,7 @@ def get_student(username_or_email, course_key):
     try:
         student = get_user_by_username_or_email(username_or_email)
     except ObjectDoesNotExist:
-        raise ValueError(_(u"{user} does not exist in the LMS. Please check your spelling and retry.").format(
+        raise ValueError(_(u"{user} does not exist in the LMS. Please check your spelling and retry.").format(  # lint-amnesty, pylint: disable=raise-missing-from
             user=username_or_email
         ))
 
@@ -2851,7 +2851,7 @@ def generate_bulk_certificate_exceptions(request, course_id):
         try:
             upload_file = request.FILES.get('students_list')
             if upload_file.name.endswith('.csv'):
-                students = [row for row in csv.reader(upload_file.read().decode('utf-8').splitlines())]
+                students = [row for row in csv.reader(upload_file.read().decode('utf-8').splitlines())]  # lint-amnesty, pylint: disable=unnecessary-comprehension
             else:
                 general_errors.append(_('Make sure that the file you upload is in CSV format with no '
                                         'extraneous characters or rows.'))
@@ -3009,7 +3009,7 @@ def re_validate_certificate(request, course_key, generated_certificate):
         # Fetch CertificateInvalidation object
         certificate_invalidation = CertificateInvalidation.objects.get(generated_certificate=generated_certificate)
     except ObjectDoesNotExist:
-        raise ValueError(_("Certificate Invalidation does not exist, Please refresh the page and try again."))
+        raise ValueError(_("Certificate Invalidation does not exist, Please refresh the page and try again."))  # lint-amnesty, pylint: disable=raise-missing-from
     else:
         # Deactivate certificate invalidation if it was fetched successfully.
         certificate_invalidation.deactivate()

@@ -22,7 +22,7 @@ class TestSyncCoursesCommand(ModuleStoreTestCase):
     """ Test sync_courses command """
 
     def setUp(self):
-        super(TestSyncCoursesCommand, self).setUp()
+        super(TestSyncCoursesCommand, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
 
         self.user = UserFactory(username='test', email='test@example.com')
         self.catalog_course_runs = [
@@ -32,9 +32,9 @@ class TestSyncCoursesCommand(ModuleStoreTestCase):
 
     def _validate_courses(self):
         for run in self.catalog_course_runs:
-            course_key = CourseKey.from_string(run.get('key'))
+            course_key = CourseKey.from_string(run.get('key'))  # lint-amnesty, pylint: disable=no-member
             self.assertTrue(modulestore().has_course(course_key))
-            CourseOverview.objects.get(id=run.get('key'))
+            CourseOverview.objects.get(id=run.get('key'))  # lint-amnesty, pylint: disable=no-member
 
     def test_courses_sync(self, mock_catalog_course_runs):
         mock_catalog_course_runs.return_value = self.catalog_course_runs

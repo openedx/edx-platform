@@ -109,7 +109,7 @@ class DjangoKeyValueStore(KeyValueStore):
         Scope.user_info,
     )
 
-    def __init__(self, field_data_cache):
+    def __init__(self, field_data_cache):  # lint-amnesty, pylint: disable=super-init-not-called
         self._field_data_cache = field_data_cache
 
     def get(self, key):

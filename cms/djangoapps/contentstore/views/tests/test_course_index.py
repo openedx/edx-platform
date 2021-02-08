@@ -44,7 +44,7 @@ class TestCourseIndex(CourseTestCase):
         """
         Add a course with odd characters in the fields
         """
-        super(TestCourseIndex, self).setUp()
+        super(TestCourseIndex, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         # had a problem where index showed course but has_access failed to retrieve it for non-staff
         self.odd_course = CourseFactory.create(
             org='test.org_1-2',
@@ -75,7 +75,7 @@ class TestCourseIndex(CourseTestCase):
             self.assertEqual(len(library_tab), 1)
 
         # Add a library:
-        lib1 = LibraryFactory.create()
+        lib1 = LibraryFactory.create()  # lint-amnesty, pylint: disable=unused-variable
 
         index_url = '/home/'
         index_response = self.client.get(index_url, {}, HTTP_ACCEPT='text/html')
@@ -329,7 +329,7 @@ class TestCourseIndexArchived(CourseTestCase):
         """
         Add courses with the end date set to various values
         """
-        super(TestCourseIndexArchived, self).setUp()
+        super(TestCourseIndexArchived, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
 
         # Base course has no end date (so is active)
         self.course.end = None
@@ -426,7 +426,7 @@ class TestCourseOutline(CourseTestCase):
         """
         Set up the for the course outline tests.
         """
-        super(TestCourseOutline, self).setUp()
+        super(TestCourseOutline, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
 
         self.chapter = ItemFactory.create(
             parent_location=self.course.location, category='chapter', display_name="Week 1"
@@ -604,7 +604,7 @@ class TestCourseReIndex(CourseTestCase):
         Set up the for the course outline tests.
         """
 
-        super(TestCourseReIndex, self).setUp()
+        super(TestCourseReIndex, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
 
         self.course.start = datetime.datetime(2014, 1, 1, tzinfo=pytz.utc)
         modulestore().update_item(self.course, self.user.id)
