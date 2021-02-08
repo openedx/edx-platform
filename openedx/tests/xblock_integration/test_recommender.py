@@ -117,7 +117,7 @@ class TestRecommender(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
         }
 
     def setUp(self):
-        super(TestRecommender, self).setUp()
+        super(TestRecommender, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         for idx, student in enumerate(self.STUDENTS):
             username = "u{}".format(idx)
             self.create_account(username, student['email'], student['password'])
@@ -228,7 +228,7 @@ class TestRecommenderCreateFromEmpty(TestRecommender):
 class TestRecommenderResourceBase(TestRecommender):
     """Base helper class for tests with resources."""
     def setUp(self):
-        super(TestRecommenderResourceBase, self).setUp()
+        super(TestRecommenderResourceBase, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.resource_id = self.resource_urls[0]
         self.resource_id_second = self.resource_urls[1]
         self.non_existing_resource_id = 'An non-existing id'
@@ -634,7 +634,7 @@ class TestRecommenderFileUploading(TestRecommender):
     Check whether we can handle file uploading correctly
     """
     def setUp(self):
-        super(TestRecommenderFileUploading, self).setUp()
+        super(TestRecommenderFileUploading, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.initial_configuration = {
             'flagged_accum_resources': {},
             'endorsed_recommendation_reasons': [],

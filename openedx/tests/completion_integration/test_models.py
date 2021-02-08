@@ -59,7 +59,7 @@ class SubmitCompletionTestCase(CompletionSetUpMixin, TestCase):
     semantics.
     """
     def setUp(self):
-        super(SubmitCompletionTestCase, self).setUp()
+        super(SubmitCompletionTestCase, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.override_waffle_switch(True)
         self.set_up_completion()
 
@@ -128,7 +128,7 @@ class CompletionDisabledTestCase(CompletionSetUpMixin, TestCase):
     Tests that completion API is not called when the feature is disabled.
     """
     def setUp(self):
-        super(CompletionDisabledTestCase, self).setUp()
+        super(CompletionDisabledTestCase, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         # insert one completion record...
         self.set_up_completion()
         # ...then disable the feature.
@@ -152,7 +152,7 @@ class SubmitBatchCompletionTestCase(CompletionWaffleTestMixin, TestCase):
     semantics.
     """
     def setUp(self):
-        super(SubmitBatchCompletionTestCase, self).setUp()
+        super(SubmitBatchCompletionTestCase, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.override_waffle_switch(True)
 
         self.block_key = UsageKey.from_string('block-v1:edx+test+run+type@video+block@doggos')
@@ -194,7 +194,7 @@ class BatchCompletionMethodTests(CompletionWaffleTestMixin, TestCase):
     Tests for the classmethods that retrieve course/block completion data.
     """
     def setUp(self):
-        super(BatchCompletionMethodTests, self).setUp()
+        super(BatchCompletionMethodTests, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.override_waffle_switch(True)
 
         self.user = UserFactory.create()
