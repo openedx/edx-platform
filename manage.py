@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python  # lint-amnesty, pylint: disable=django-not-configured
 """
 Usage: manage.py {lms|cms} [--settings env] ...
 
@@ -85,7 +85,7 @@ def parse_args():
         startup='cms.startup',
     )
 
-    edx_args, django_args = parser.parse_known_args()
+    edx_args, django_args = parser.parse_known_args()  # lint-amnesty, pylint: disable=redefined-outer-name
 
     if edx_args.help:
         print("edX:")

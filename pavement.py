@@ -1,4 +1,4 @@
-import sys
+import sys  # lint-amnesty, pylint: disable=django-not-configured, missing-module-docstring
 import os
 
 # Ensure that we can import pavelib, and that our copy of pavelib
@@ -11,4 +11,4 @@ import os
 # take precedence, leading to some very strange results.
 sys.path.insert(0, os.path.dirname(__file__))
 
-from pavelib import *
+from pavelib import *  # lint-amnesty, pylint: disable=wildcard-import, wrong-import-position
