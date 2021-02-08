@@ -387,6 +387,18 @@ FEATURES = {
     ],
 
     # Turn off account locking if failed login attempts exceeds a limit
+    # .. toggle_name: FEATURES['ENABLE_MAX_FAILED_LOGIN_ATTEMPTS']
+    # .. toggle_implementation: DjangoSetting
+    # .. toggle_default: True
+    # .. toggle_description: This feature will keep track of the number of failed login attempts on a given user's
+    #   email. If the number of consecutive failed login attempts - without a successful login at some point - reaches
+    #   a configurable threshold (default 6), then the account will be locked for a configurable amount of seconds
+    #   (30 minutes) which will prevent additional login attempts until this time period has passed. If a user
+    #   successfully logs in, all the counter which tracks the number of failed attempts will be reset back to 0. If
+    #   set to False then account locking will be disabled for failed login attempts.
+    # .. toggle_use_cases: open_edx
+    # .. toggle_creation_date: 2014-01-30
+    # .. toggle_tickets: https://github.com/edx/edx-platform/pull/2331
     'ENABLE_MAX_FAILED_LOGIN_ATTEMPTS': True,
 
     # Hide any Personally Identifiable Information from application logs
