@@ -13,5 +13,5 @@ class CourseMetaAdmin(admin.ModelAdmin):
     """
 
     readonly_fields = ('short_id',)
-    list_display = ('course_id', 'is_prereq', 'short_id')
+    list_display = ('course_id', 'short_id')
     search_fields = ('course_id',)
