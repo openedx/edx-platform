@@ -9,7 +9,8 @@ import pytest
 from dateutil.relativedelta import relativedelta
 from django.core.files import File
 
-from openedx.adg.lms.applications.constants import FILE_MAX_SIZE
+from openedx.adg.lms.applications.admin import UserApplicationADGAdmin
+from openedx.adg.lms.applications.constants import APPLICATION_REVIEW_ERROR_MSG, FILE_MAX_SIZE, MOCK_FILE_PATH
 from openedx.adg.lms.applications.forms import (
     ExtendedUserProfileForm,
     UserApplicationCoverLetterForm,
@@ -17,7 +18,6 @@ from openedx.adg.lms.applications.forms import (
 )
 from openedx.adg.lms.registration_extension.tests.factories import ExtendedUserProfileFactory
 
-from .constants import MOCK_FILE_PATH
 from .factories import BusinessLineFactory
 
 
@@ -101,6 +101,32 @@ def test_user_application_form_with_resume_size(size, expected):
     form = UserApplicationForm(None, files=file_dict)
     assert form.is_valid() == expected
     os.remove(path)
+
+
+@pytest.mark.parametrize(
+    'post_data', [{'internal_note': 'test_note'}, {'status': 'test_status'}],
+    ids=['without_status', 'with_status']
+)
+@pytest.mark.django_db
+def test_user_application_admin_form(
+    user_application_adg_admin_instance, user_application, request, post_data
+):
+    """
+    Test that `UserApplicationAdminForm` is:
+        1. valid when provided with status in post data
+        2. not valid and raises correct validation error when not provided with status in post data
+    """
+    request.POST = post_data
+
+    admin_form_class = UserApplicationADGAdmin.get_form(user_application_adg_admin_instance, request, user_application)
+    admin_form = admin_form_class()
+    admin_form.is_bound = True
+
+    if 'status' in request.POST:
+        assert admin_form.is_valid()
+    else:
+        assert not admin_form.is_valid()
+        assert admin_form.errors['__all__'] == [APPLICATION_REVIEW_ERROR_MSG]
 
 
 # ------- Application Cover Letter Form tests below -------

@@ -8,7 +8,12 @@ from django import forms
 from django.utils.translation import ugettext_lazy as _
 
 from common.djangoapps.student.models import UserProfile
-from openedx.adg.lms.applications.constants import FILE_MAX_SIZE, MAXIMUM_AGE_LIMIT, MINIMUM_AGE_LIMIT
+from openedx.adg.lms.applications.constants import (
+    APPLICATION_REVIEW_ERROR_MSG,
+    MAXIMUM_AGE_LIMIT,
+    MINIMUM_AGE_LIMIT,
+    FILE_MAX_SIZE
+)
 from openedx.adg.lms.applications.models import UserApplication
 from openedx.adg.lms.registration_extension.models import ExtendedUserProfile
 
@@ -108,6 +113,29 @@ class UserProfileForm(forms.ModelForm):
         self.fields['phone_number'].required = True
         self.fields['city'].disabled = True
         self.fields['name'].disabled = True
+
+
+class UserApplicationAdminForm(forms.ModelForm):
+    """
+    Extend form for UserApplication ADG admin view.
+
+    Extension is required to add a validation check ensuring that the application review form cannot be submitted by an
+    admin unless a decision is made regarding the status of the application.
+    """
+
+    class Meta:
+        model = UserApplication
+        fields = '__all__'
+        help_texts = {'cover_letter_file': None, 'resume': None}
+
+    def __init__(self, *args, **kwargs):
+        self.request = kwargs.pop('request')
+        super(UserApplicationAdminForm, self).__init__(*args, **kwargs)
+
+    def clean(self):
+        super(UserApplicationAdminForm, self).clean()
+        if 'status' not in self.request.POST:
+            raise forms.ValidationError(APPLICATION_REVIEW_ERROR_MSG)
 
 
 class UserApplicationCoverLetterForm(forms.ModelForm):

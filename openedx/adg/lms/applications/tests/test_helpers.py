@@ -1,26 +1,41 @@
 """
 All tests for applications helpers functions
 """
+from datetime import date
 from unittest.mock import Mock, patch
 
+import mock
 import pytest
 from django.core.exceptions import ValidationError
+from django.core.files.uploadedfile import SimpleUploadedFile
+from django.utils.html import format_html
 
+from common.djangoapps.student.tests.factories import UserFactory
 from openedx.adg.lms.applications.constants import (
+    COVER_LETTER_ONLY,
     FILE_MAX_SIZE,
+    HTML_FOR_EMBEDDED_FILE_VIEW,
     LOGO_IMAGE_MAX_SIZE,
     MAXIMUM_YEAR_OPTION,
-    MINIMUM_YEAR_OPTION
+    MINIMUM_YEAR_OPTION,
+    MONTH_NAME_DAY_YEAR_FORMAT,
+    SCORES
 )
 from openedx.adg.lms.applications.helpers import (
+    _get_application_review_info,
     check_validations_for_current_record,
     check_validations_for_past_record,
+    get_duration,
+    get_embedded_view_html,
+    get_extra_context_for_application_review_page,
+    is_displayable_on_browser,
     max_year_value_validator,
     min_year_value_validator,
     send_application_submission_confirmation_email,
     validate_file_size,
     validate_logo_size
 )
+from openedx.adg.lms.applications.models import UserApplication
 
 from .constants import EMAIL
 
@@ -181,3 +196,110 @@ def test_validate_file_size_with_valid_size(size, expected):
     mocked_file.size = size
     error = validate_file_size(mocked_file, FILE_MAX_SIZE)
     assert error == expected
+
+
+@pytest.mark.parametrize(
+    'filename, expected_is_displayable_on_browser', [
+        ('test.pdf', True),
+        ('test.doc', False)
+    ]
+)
+def test_is_displayable_on_browser(filename, expected_is_displayable_on_browser):
+    """
+    Test that the `is_displayable_on_browser` function returns False if the input file is a .doc file, True otherwise.
+    """
+    test_file = SimpleUploadedFile(filename, b'')
+    actual_is_displayable_on_browser = is_displayable_on_browser(test_file)
+
+    assert expected_is_displayable_on_browser == actual_is_displayable_on_browser
+
+
+def test_get_embedded_view_html():
+    """
+    Test that the `get_embedded_view_html` function returns the correct and safe HTML to render the input file in an
+    embedded view.
+    """
+    test_file = SimpleUploadedFile('test.pdf', b'')
+    test_file.url = 'test_url'
+
+    expected_html = format_html(HTML_FOR_EMBEDDED_FILE_VIEW.format(path_to_file=test_file.url))
+    actual_html = get_embedded_view_html(test_file)
+
+    assert expected_html == actual_html
+
+
+@pytest.mark.parametrize(
+    'is_current, expected_duration', [
+        (True, 'January 2020 to Present'),
+        (False, 'January 2020 to December 2020')
+    ]
+)
+@pytest.mark.django_db
+def test_get_duration(is_current, expected_duration, work_experience):
+    """
+    Test that the `get_duration` function returns the time duration in the correct format when provided with a
+    `UserStartAndEndDates` entry.
+    """
+    work_experience.date_started_month = 1
+    work_experience.date_started_year = 2020
+
+    if not is_current:
+        work_experience.date_completed_month = 12
+        work_experience.date_completed_year = 2020
+
+    actual_duration = get_duration(work_experience, is_current)
+
+    assert expected_duration == actual_duration
+
+
+@pytest.mark.parametrize(
+    'application_status', [UserApplication.OPEN, UserApplication.WAITLIST]
+)
+@pytest.mark.django_db
+def test_get_application_review_info(user_application, application_status):
+    """
+    Test that the `_get_application_review_info` function extracts and returns the correct reviewer and review date from
+    the input application, depending upon the application status.
+    """
+    user_application.status = application_status
+
+    if application_status == UserApplication.OPEN:
+        expected_reviewed_by = None
+        expected_review_date = None
+    else:
+        reviewer = UserFactory()
+        user_application.reviewed_by = reviewer
+
+        current_date = date.today()
+        user_application.modified = current_date
+
+        expected_reviewed_by = reviewer.profile.name
+        expected_review_date = current_date.strftime(MONTH_NAME_DAY_YEAR_FORMAT)
+
+    expected_review_info = expected_reviewed_by, expected_review_date
+    actual_review_info = _get_application_review_info(user_application)
+
+    assert expected_review_info == actual_review_info
+
+
+@pytest.mark.django_db
+@mock.patch('openedx.adg.lms.applications.helpers._get_application_review_info')
+def test_get_extra_context_for_application_review_page(mock_get_application_review_info, user_application):
+    """
+    Test that the `get_extra_context_for_application_review_page` function returns the correct context when provided
+    with an application.
+    """
+    mock_get_application_review_info.return_value = 'reviewed_by', 'review_date'
+
+    expected_context = {
+        'title': user_application.user.profile.name,
+        'adg_view': True,
+        'application': user_application,
+        'reviewer': 'reviewed_by',
+        'review_date': 'review_date',
+        'COVER_LETTER_ONLY': COVER_LETTER_ONLY,
+        'SCORES': SCORES
+    }
+    actual_context = get_extra_context_for_application_review_page(user_application)
+
+    assert expected_context == actual_context
