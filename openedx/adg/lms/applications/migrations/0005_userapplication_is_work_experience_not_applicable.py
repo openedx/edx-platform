@@ -6,7 +6,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('applications', '0003_prerequisitecourse_prerequisitecoursegroup'),
+        ('applications', '0004_auto_20210131_0952'),
     ]
 
     operations = [
