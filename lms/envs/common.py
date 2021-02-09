@@ -544,6 +544,15 @@ FEATURES = {
     'ENABLE_COURSEWARE_SEARCH_FOR_COURSE_STAFF': False,
 
     # Dashboard search feature
+    # .. toggle_name: FEATURES['ENABLE_DASHBOARD_SEARCH']
+    # .. toggle_implementation: DjangoSetting
+    # .. toggle_default: False
+    # .. toggle_description: When enabled, this adds a Search Your Courses widget on the dashboard page for searching
+    #   courseware data.
+    # .. toggle_use_cases: open_edx
+    # .. toggle_creation_date: 2015-01-29
+    # .. toggle_warnings: In order to get this working, your courses data should be indexed in Elasticsearch.
+    # .. toggle_tickets: https://github.com/edx/edx-platform/pull/6506
     'ENABLE_DASHBOARD_SEARCH': False,
 
     # log all information from cybersource callbacks
