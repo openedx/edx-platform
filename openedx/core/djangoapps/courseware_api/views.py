@@ -36,6 +36,7 @@ from lms.djangoapps.courseware.toggles import REDIRECT_TO_COURSEWARE_MICROFRONTE
 from lms.djangoapps.courseware.views.views import get_cert_data
 from lms.djangoapps.grades.api import CourseGradeFactory
 from lms.djangoapps.verify_student.services import IDVerificationService
+from openedx.core.lib.api.authentication import BearerAuthenticationAllowInactiveUser
 from openedx.core.lib.api.view_utils import DeveloperErrorViewMixin
 from openedx.core.djangoapps.programs.utils import ProgramProgressMeter
 from openedx.features.course_experience import DISPLAY_COURSE_SOCK_FLAG
@@ -583,6 +584,7 @@ class Celebration(DeveloperErrorViewMixin, APIView):
 
     authentication_classes = (
         JwtAuthentication,
+        BearerAuthenticationAllowInactiveUser,
         SessionAuthenticationAllowInactiveUser,
     )
     permission_classes = (IsAuthenticated, )
