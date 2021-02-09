@@ -3,7 +3,6 @@ All views for applications app
 """
 from django.contrib.auth.mixins import AccessMixin
 from django.contrib.auth.views import redirect_to_login
-from django.core.exceptions import ObjectDoesNotExist
 from django.http import HttpResponse
 from django.shortcuts import redirect, render
 from django.urls import reverse_lazy
@@ -300,12 +299,14 @@ class EducationAndExperienceView(RedirectToLoginOrRelevantPageMixin, TemplateVie
         Returns:
             Boolean, True or False.
         """
-        try:
-            application_hub = self.request.user.application_hub
-        except ObjectDoesNotExist:
-            return False
+        user = self.request.user
+        application_hub = user.application_hub if hasattr(user, 'application_hub') else None
 
-        return application_hub.is_written_application_started and not application_hub.is_written_application_completed
+        return (
+            application_hub and
+            application_hub.is_written_application_started and
+            not application_hub.is_written_application_completed
+        )
 
     def handle_no_permission(self):
         """
