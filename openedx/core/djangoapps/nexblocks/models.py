@@ -1,11 +1,9 @@
 """
 Models to support persistence of NexBlock data.
 """
-
-from enum import Enum
-
 from django.contrib.auth import get_user_model
 from django.db import models
+from opaque_keys.edx.django.models import LearningContextKeyField
 
 User = get_user_model()
 
@@ -19,6 +17,7 @@ class NexBlockInstance(models.Model):
     """
 
     uuid = models.UUIDField(editable=False, unique=True)
+    learning_context_key = LearningContextKeyField(max_length=255)
     display_name = models.CharField(max_length=255)
 
 
@@ -61,43 +60,3 @@ class NexBlockLearnerData(models.Model):
 
     class Meta:
         unique_together = ("instance", "learner", "data_key")
-
-
-# Changing this will trigger a migration.
-ACTION_NAME_MAX_LENTH = 32
-
-
-class NexBlockAction(Enum):
-    """
-    TODO
-    """
-
-    SET = "set"
-    INCREMENT = "increment"
-    SCORE_EARNED = "score_earned"
-
-    @classmethod
-    def model_choices(cls):
-        return tuple((action.name, action.name) for action in cls)
-
-
-for action in NexBlockAction:
-    assert (
-        len(action.name) <= ACTION_NAME_MAX_LENTH
-    ), f"NexBlockAction name {action.name} is too long; max length is {ACTION_NAME_MAX_LENTH}"
-
-
-class NexBlockLearnerEvent(models.Model):
-    """
-    TODO
-    """
-
-    instance = models.ForeignKey(
-        to=NexBlockInstance, related_name="learner_events", on_delete=models.CASCADE
-    )
-    learner = models.ForeignKey(to=User, on_delete=models.SET_NULL, null=True)
-    action_type = models.CharField(
-        choices=NexBlockAction.model_choices, max_length=ACTION_NAME_MAX_LENTH
-    )
-    action_target = models.CharField(max_length=255)
-    action_args = models.TextField()
