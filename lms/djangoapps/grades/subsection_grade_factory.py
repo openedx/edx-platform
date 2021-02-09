@@ -107,8 +107,9 @@ class SubsectionGradeFactory(object):
             self._update_saved_subsection_grade(subsection.location, grade_model)
 
             if settings.FEATURES.get('ENABLE_COURSE_ASSESSMENT_GRADE_CHANGE_SIGNAL'):
-                COURSE_ASSESSMENT_GRADE_CHANGED.send_robust(
+                COURSE_ASSESSMENT_GRADE_CHANGED.send(
                     sender=self,
+                    course_id=self.course_data.course_key,
                     user=self.student,
                     subsection_id=calculated_grade.location,
                     subsection_grade=calculated_grade.graded_total.earned
