@@ -1,7 +1,6 @@
 """
 All models for applications app
 """
-from collections import namedtuple
 from datetime import date, datetime
 
 from django.contrib.auth.models import User
@@ -16,7 +15,7 @@ from openedx.adg.lms.utils.date_utils import month_choices
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.lib.grade_utils import round_away_from_zero
 
-from .constants import ALLOWED_LOGO_EXTENSIONS
+from .constants import ALLOWED_LOGO_EXTENSIONS, CourseScore
 from .helpers import max_year_value_validator, min_year_value_validator, validate_logo_size
 
 
@@ -156,13 +155,13 @@ class UserApplication(TimeStampedModel):
     )
 
     OPEN = 'open'
-    ACCEPTED = 'accepted'
     WAITLIST = 'waitlist'
+    ACCEPTED = 'accepted'
 
     STATUS_CHOICES = (
         (OPEN, _('Open')),
-        (ACCEPTED, _('Accepted')),
         (WAITLIST, _('Waitlist')),
+        (ACCEPTED, _('Accepted'))
     )
     status = models.CharField(
         verbose_name=_('Application Status'), choices=STATUS_CHOICES, max_length=8, default=OPEN,
@@ -170,7 +169,7 @@ class UserApplication(TimeStampedModel):
     reviewed_by = models.ForeignKey(
         User, null=True, blank=True, on_delete=models.CASCADE, verbose_name=_('Reviewed By')
     )
-    internal_admin_note = models.TextField(null=True, blank=True, verbose_name=_('Admin Note'))
+    internal_admin_note = models.TextField(blank=True, verbose_name=_('Admin Note'))
 
     objects = models.Manager()
     submitted_applications = SubmittedApplicationsManager()
@@ -196,10 +195,6 @@ class UserApplication(TimeStampedModel):
         return self.cover_letter_provided or self.resume
 
     @property
-    def file_attached(self):
-        return self.resume or self.cover_letter_file
-
-    @property
     def prereq_course_scores(self):
         """
         Fetch and return applicant scores in the pre-requisite courses of the franchise program.
@@ -211,7 +206,6 @@ class UserApplication(TimeStampedModel):
             id__in=PrerequisiteCourse.objects.all().values_list('course', flat=True)
         )
 
-        CourseScore = namedtuple('CourseScore', 'course_name course_percentage')
         scores_in_prereq_courses = []
 
         for course_overview in prereq_course_overviews:

@@ -2,6 +2,7 @@
 Helper methods for Mailchimp pipeline
 """
 from common.djangoapps.student.models import CourseEnrollment, UserProfile
+from openedx.adg.constants import MONTH_DAY_YEAR_FORMAT
 
 
 def get_enrollment_course_names_and_short_ids_by_user(user):
@@ -53,7 +54,7 @@ def get_user_merge_fields(user):
     Returns:
         dict: Contains merge fields for a User instance.
     """
-    return {'USERNAME': user.username, 'DATEREGIS': str(user.date_joined.strftime('%m/%d/%Y'))}
+    return {'USERNAME': user.username, 'DATEREGIS': str(user.date_joined.strftime(MONTH_DAY_YEAR_FORMAT))}
 
 
 def get_userprofile_merge_fields(user_profile):

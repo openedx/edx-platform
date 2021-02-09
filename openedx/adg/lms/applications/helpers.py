@@ -13,7 +13,15 @@ from openedx.adg.common.lib.mandrill_client.client import MandrillClient
 from openedx.adg.lms.student.helpers import send_mandrill_email
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 
-from .constants import COVER_LETTER_ONLY, LOGO_IMAGE_MAX_SIZE, MAXIMUM_YEAR_OPTION, MINIMUM_YEAR_OPTION, SCORES
+from .constants import (
+    COVER_LETTER_ONLY,
+    HTML_FOR_EMBEDDED_FILE_VIEW,
+    LOGO_IMAGE_MAX_SIZE,
+    MAXIMUM_YEAR_OPTION,
+    MINIMUM_YEAR_OPTION,
+    MONTH_NAME_DAY_YEAR_FORMAT,
+    SCORES
+)
 
 
 def validate_logo_size(file_):
@@ -168,7 +176,7 @@ def get_embedded_view_html(file):
     Returns:
         SafeText: HTML to display embedded view of image or pdf file
     """
-    html = '<iframe src="{path_to_file}" style="width:889px; height:393px;"></iframe>'.format(path_to_file=file.url)
+    html = HTML_FOR_EMBEDDED_FILE_VIEW.format(path_to_file=file.url)
 
     return format_html(html)
 
@@ -206,7 +214,7 @@ def _get_application_review_info(application):
     review_date = None
     if application.status != application.OPEN:
         reviewed_by = application.reviewed_by.profile.name
-        review_date = application.modified.strftime('%B %d, %Y')
+        review_date = application.modified.strftime(MONTH_NAME_DAY_YEAR_FORMAT)
 
     return reviewed_by, review_date
 

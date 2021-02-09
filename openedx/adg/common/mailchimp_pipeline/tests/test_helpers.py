@@ -17,6 +17,7 @@ from openedx.adg.common.mailchimp_pipeline.helpers import (
     get_userprofile_merge_fields,
     is_mailchimp_sync_required
 )
+from openedx.adg.constants import MONTH_DAY_YEAR_FORMAT
 from openedx.adg.lms.applications.models import UserApplication
 from openedx.adg.lms.applications.tests.factories import UserApplicationFactory
 from openedx.adg.lms.registration_extension.models import ExtendedUserProfile
@@ -79,7 +80,7 @@ def test_get_user_merge_fields():
     Test user merge fields computation.
     """
     user = UserFactory()
-    user_merge_fields = {'USERNAME': user.username, 'DATEREGIS': str(user.date_joined.strftime('%m/%d/%Y'))}
+    user_merge_fields = {'USERNAME': user.username, 'DATEREGIS': str(user.date_joined.strftime(MONTH_DAY_YEAR_FORMAT))}
     assert get_user_merge_fields(user) == user_merge_fields
 
 

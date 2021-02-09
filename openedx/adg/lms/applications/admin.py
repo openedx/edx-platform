@@ -6,20 +6,29 @@ from django.contrib.admin import AdminSite
 from django.utils.html import format_html
 from django.utils.translation import ugettext_lazy as _
 
+from openedx.adg.constants import MONTH_DAY_YEAR_FORMAT
 from openedx.adg.lms.constants import SAUDI_NATIONAL_PROMPT
 
 from .constants import (
+    ACCEPTED_APPLICATIONS_TITLE,
+    ALL_APPLICATIONS_TITLE,
+    APPLICANT_INFO,
     APPLYING_TO,
     COVER_LETTER_FILE,
     COVER_LETTER_FILE_DISPLAY,
     COVER_LETTER_ONLY,
     COVER_LETTER_TEXT,
     DATE_OF_BIRTH,
+    DAY_MONTH_YEAR_FORMAT,
     EMAIL,
+    EMAIL_ADDRESS_HTML_FORMAT,
     GENDER,
+    GENDER_MAP,
     IS_SAUDI_NATIONAL,
     LINKED_IN_PROFILE,
+    LINKED_IN_PROFILE_HTML_FORMAT,
     LOCATION,
+    OPEN_APPLICATIONS_TITLE,
     ORGANIZATION,
     PHONE_NUMBER,
     PREREQUISITES,
@@ -27,7 +36,9 @@ from .constants import (
     RESUME_AND_COVER_LETTER,
     RESUME_DISPLAY,
     RESUME_ONLY,
-    SCORES
+    SCORES,
+    STATUS_PARAM,
+    WAITLISTED_APPLICATIONS_TITLE
 )
 from .forms import UserApplicationAdminForm
 from .helpers import (
@@ -169,6 +180,7 @@ class EducationInline(ApplicationReviewInline):
 
     def dates(self, obj):
         return get_duration(obj, obj.is_in_progress)
+    dates.short_description = _('Dates')
 
 
 class WorkExperienceInline(ApplicationReviewInline):
@@ -183,9 +195,11 @@ class WorkExperienceInline(ApplicationReviewInline):
 
     def dates(self, obj):
         return get_duration(obj, obj.is_current_position)
+    dates.short_description = _('Dates')
 
     def responsibilities(self, obj):
         return obj.job_responsibilities
+    responsibilities.short_description = _('Responsibilities')
 
 
 class UserApplicationADGAdmin(admin.ModelAdmin):
@@ -230,9 +244,10 @@ class UserApplicationADGAdmin(admin.ModelAdmin):
 
     def applicant_name(self, obj):
         return obj.user.profile.name
+    applicant_name.short_description = _('Applicant Name')
 
     def date_received(self, obj):
-        return obj.user.application_hub.submission_date.strftime('%m/%d/%Y')
+        return obj.user.application_hub.submission_date.strftime(MONTH_DAY_YEAR_FORMAT)
     date_received.short_description = _('Date Received (MM/DD/YYYY)')
 
     def changelist_view(self, request, extra_context=None):
@@ -243,14 +258,14 @@ class UserApplicationADGAdmin(admin.ModelAdmin):
         filter that the admin has selected.
         """
         application_status_map = {
-            UserApplication.OPEN: _('OPEN APPLICATIONS'),
-            UserApplication.ACCEPTED: _('ACCEPTED APPLICATIONS'),
-            UserApplication.WAITLIST: _('WAITLISTED APPLICATIONS')
+            UserApplication.OPEN: OPEN_APPLICATIONS_TITLE,
+            UserApplication.WAITLIST: WAITLISTED_APPLICATIONS_TITLE,
+            UserApplication.ACCEPTED: ACCEPTED_APPLICATIONS_TITLE
         }
 
-        extra_context = {'title': _('APPLICATIONS')}
-        if 'status__exact' in request.GET:
-            extra_context['title'] = application_status_map[request.GET['status__exact']]
+        extra_context = {'title': ALL_APPLICATIONS_TITLE}
+        if STATUS_PARAM in request.GET:
+            extra_context['title'] = application_status_map[request.GET[STATUS_PARAM]]
 
         return super(UserApplicationADGAdmin, self).changelist_view(request, extra_context=extra_context)
 
@@ -258,11 +273,12 @@ class UserApplicationADGAdmin(admin.ModelAdmin):
         """
         Extend change form view of application review page for ADG admin.
 
-        Extension is required to handle conditionally storing review information and to provide extra context to the
-        review form.
+        Extension is required to conditionally store review information in case of POST request and to provide extra
+        context to the review form in case of GET request or unsuccessful POST request, i.e. POST request without
+        status.
 
         Arguments:
-            request(WSGIRequest): Http Request
+            request(WSGIRequest): HTTP Request
             object_id (str): ID of application under review
             form_url (str): URL of the application review form
             extra_context (NoneType): Extra context to be passed to the application review form template
@@ -270,79 +286,90 @@ class UserApplicationADGAdmin(admin.ModelAdmin):
         Returns:
             TemplateResponse: Template response to render application review form
         """
-        if request.method == 'POST' and 'status' in request.POST:
-            self._save_application_review_info(object_id, request)
+        note = ''
+        application = UserApplication.objects.get(id=object_id)
 
-        application = self._get_user_application(object_id)
+        if request.method == 'POST':
+            note = request.POST.get('internal_note')
+            if 'status' in request.POST:
+                self._save_application_review_info(application, request, note)
+
+                return super(UserApplicationADGAdmin, self).changeform_view(
+                    request, object_id, extra_context=extra_context
+                )
+
         extra_context = get_extra_context_for_application_review_page(application)
+        extra_context['note'] = note
 
         return super(UserApplicationADGAdmin, self).changeform_view(
-            request, object_id, form_url, extra_context=extra_context
+            request, object_id, extra_context=extra_context
         )
 
-    def _save_application_review_info(self, application_id, request):
+    def _save_application_review_info(self, application, request, note):
         """
         Save application review information.
 
         Save new status of application (waitlist/accepted) and optional internal note.
 
         Arguments:
-            application_id (str): ID of application under review
+            application (UserApplication): User application under review
             request (WSGIRequest): Post request containing application review information
         """
-        application = self._get_user_application(application_id)
-
         new_status = request.POST.get('status')
         application.status = new_status
 
-        if 'internal_note' in request.POST:
-            note = request.POST.get('internal_note')
+        if note:
             application.internal_admin_note = note
 
         application.reviewed_by = request.user
 
         application.save()
 
-    def _get_user_application(self, application_id):
-        return UserApplication.objects.get(id=application_id)
-
     def email(self, obj):
-        return format_html('<a href="mailto:{email_address}">{email_address}</a>', email_address=obj.user.email)
+        return format_html(EMAIL_ADDRESS_HTML_FORMAT, email_address=obj.user.email)
+    email.short_description = _('Email')
 
     def location(self, obj):
+        """
+        Field method for location of applicant.
+
+        Arguments:
+            obj (UserApplication): Application under review
+
+        Returns:
+            str: city and optionally country of applicant
+        """
         user_profile = obj.user.profile
-        return '{city}, {country}'.format(city=user_profile.city, country=user_profile.country)
+        location = str(user_profile.city)
+        if user_profile.country:
+            location += ', {country}'.format(country=user_profile.country)
+
+        return location
+    location.short_description = _('Location')
 
     def linked_in_profile(self, obj):
-        return format_html('<a href={url}>{url}</a>', url=obj.linkedin_url)
+        return format_html(LINKED_IN_PROFILE_HTML_FORMAT, url=obj.linkedin_url)
     linked_in_profile.short_description = _('LinkedIn Profile')
 
     def is_saudi_national(self, obj):
-        extended_user_profile = obj.user.extended_profile
-        return extended_user_profile.is_saudi_national
+        return obj.user.extended_profile.is_saudi_national
     is_saudi_national.short_description = SAUDI_NATIONAL_PROMPT
 
     def gender(self, obj):
-        """
-        Return gender of applicant
-        """
-        user_profile = obj.user.profile
-        if user_profile.gender == 'm':
-            return _('Man')
-        elif user_profile.gender == 'f':
-            return _('Woman')
-        else:
-            return _('Prefer not to answer')
+        return GENDER_MAP[obj.user.profile.gender]
+    gender.short_description = _('Gender')
 
     def phone_number(self, obj):
         return obj.user.profile.phone_number
+    phone_number.short_description = _('Phone Number')
 
     def date_of_birth(self, obj):
-        extended_user_profile = obj.user.extended_profile
-        return extended_user_profile.birth_date.strftime('%d %B %Y')
+        return obj.user.extended_profile.birth_date.strftime(DAY_MONTH_YEAR_FORMAT)
+    date_of_birth.short_description = _('Date of Birth')
 
     def applying_to(self, obj):
         return obj.business_line
+    applying_to.short_description = _('Applying to')
 
     def resume_display(self, obj):
         return get_embedded_view_html(obj.resume)
@@ -373,6 +400,7 @@ class UserApplicationADGAdmin(admin.ModelAdmin):
             )
 
         return format_html(final_html)
+    prerequisites.short_description = _('Prerequisites')
 
     def get_fieldsets(self, request, obj=None):
         """
@@ -385,14 +413,14 @@ class UserApplicationADGAdmin(admin.ModelAdmin):
             obj (UserApplication): Application under review
 
         Returns:
-            tuple: Tuple of fieldsets
+            tuple: Fieldsets
         """
         fieldsets = []
 
         preliminary_info_fieldset = self._get_preliminary_info_fieldset(obj)
         fieldsets.append(preliminary_info_fieldset)
 
-        applicant_info_fieldset = self._get_applicant_info_fieldset()
+        applicant_info_fieldset = self._get_applicant_info_fieldset(obj)
         fieldsets.append(applicant_info_fieldset)
 
         if obj.cover_letter_or_resume:
@@ -424,17 +452,25 @@ class UserApplicationADGAdmin(admin.ModelAdmin):
 
         return fieldset
 
-    def _get_applicant_info_fieldset(self):
+    def _get_applicant_info_fieldset(self, application):
         """
         Get fieldset for applicant information.
+
+        Arguments:
+            application (UserApplication): Application under review
 
         Returns:
             tuple: Fieldset containing applicant's nationality info, gender, contact number, date of birth, organization
                     and the business line they are applying to.
         """
-        fieldset_title = _('APPLICANT INFORMATION')
-        applicant_info_fields = (IS_SAUDI_NATIONAL, GENDER, PHONE_NUMBER, DATE_OF_BIRTH, ORGANIZATION, APPLYING_TO)
-        fieldset = (fieldset_title, {'fields': applicant_info_fields})
+        applicant_info_fields = [IS_SAUDI_NATIONAL, GENDER, PHONE_NUMBER, DATE_OF_BIRTH]
+
+        if application.organization:
+            applicant_info_fields.append(ORGANIZATION)
+
+        applicant_info_fields.append(APPLYING_TO)
+
+        fieldset = (APPLICANT_INFO, {'fields': tuple(applicant_info_fields)})
 
         return fieldset
 
@@ -454,7 +490,7 @@ class UserApplicationADGAdmin(admin.ModelAdmin):
                     resume only, title returned is 'RESUME'
                     cover letter only, either as an attachment or in text, title returned is 'COVER LETTER'
 
-                Fields returned as part of the fieldset also vary depending on the data that the applicant has provided
+                Fields returned as part of the fieldset also vary depending on the data that the applicant has provided.
         """
         resume_cover_letter_file_fields = []
 
@@ -550,7 +586,8 @@ class UserApplicationADGAdmin(admin.ModelAdmin):
             change (bool): Type of form
 
         Returns:
-            AdminFormWithRequest: Application review form for admin with request object added as a keyword argument
+            AdminFormWithRequest: Application review Form class for admin with request object added as a keyword
+            argument
         """
         admin_form = super(UserApplicationADGAdmin, self).get_form(request, obj, **kwargs)
 
