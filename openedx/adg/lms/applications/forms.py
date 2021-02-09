@@ -168,6 +168,9 @@ class UserApplicationCoverLetterForm(forms.ModelForm):
             self.add_error('cover_letter_file', _('Either upload a cover letter file or type text'))
 
     def save_form(self, post_data):
+        """
+        Before saving user application it checks if the cover letter file needs to be deleted if user has removed it
+        """
         instance = self.save(commit=False)
 
         if 'cover_letter_file' in post_data and 'cover_letter' in post_data:

@@ -3,7 +3,6 @@ Constants for all the tests.
 """
 from django.urls import reverse
 
-
 USERNAME = 'test'
 EMAIL = 'test@example.com'
 PASSWORD = 'edx'
