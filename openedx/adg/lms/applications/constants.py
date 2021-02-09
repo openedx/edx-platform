@@ -4,7 +4,6 @@ Constants related to applications.
 from collections import namedtuple
 from datetime import datetime
 
-from django.urls import reverse
 from django.utils.translation import ugettext_lazy as _
 
 MINIMUM_YEAR_OPTION = 1900
@@ -69,9 +68,3 @@ CourseScore = namedtuple('CourseScore', 'course_name course_percentage')
 APPLICATION_REVIEW_ERROR_MSG = _('Please make a decision before submitting.')
 
 HTML_FOR_EMBEDDED_FILE_VIEW = '<iframe src="{path_to_file}" style="width:889px; height:393px;"></iframe>'
-
-COVER_LETTER_REDIRECT_URL = '{register}?next={next}'.format(
-    register=reverse('register_user'),
-    next=reverse('application_cover_letter')
-)
-MOCK_FILE_PATH = 'dummy_file.pdf'

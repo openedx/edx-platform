@@ -10,7 +10,7 @@ from dateutil.relativedelta import relativedelta
 from django.core.files import File
 
 from openedx.adg.lms.applications.admin import UserApplicationADGAdmin
-from openedx.adg.lms.applications.constants import APPLICATION_REVIEW_ERROR_MSG, FILE_MAX_SIZE, MOCK_FILE_PATH
+from openedx.adg.lms.applications.constants import APPLICATION_REVIEW_ERROR_MSG, FILE_MAX_SIZE
 from openedx.adg.lms.applications.forms import (
     ExtendedUserProfileForm,
     UserApplicationCoverLetterForm,
@@ -18,6 +18,7 @@ from openedx.adg.lms.applications.forms import (
 )
 from openedx.adg.lms.registration_extension.tests.factories import ExtendedUserProfileFactory
 
+from .constants import MOCK_FILE_PATH
 from .factories import BusinessLineFactory
 
 
