@@ -327,12 +327,7 @@ class CoverLetterView(RedirectToLoginOrRelevantPageMixin, View):
         form = UserApplicationCoverLetterForm(request.POST, request.FILES, instance=user_application)
 
         if form.is_valid():
-            instance = form.save(commit=False)
-
-            if 'cover_letter_file' in request.POST and 'cover_letter' in request.POST:
-                instance.cover_letter_file.delete()
-
-            instance.save()
+            form.save_form(request.POST)
         else:
             return self.handle_rendering(request, form)
 

@@ -8,7 +8,7 @@ from django import forms
 from django.utils.translation import ugettext_lazy as _
 
 from common.djangoapps.student.models import UserProfile
-from openedx.adg.lms.applications.constants import MAXIMUM_AGE_LIMIT, MINIMUM_AGE_LIMIT, RESUME_FILE_MAX_SIZE
+from openedx.adg.lms.applications.constants import MAXIMUM_AGE_LIMIT, MINIMUM_AGE_LIMIT, FILE_MAX_SIZE
 from openedx.adg.lms.applications.models import UserApplication
 from openedx.adg.lms.registration_extension.models import ExtendedUserProfile
 
@@ -87,7 +87,7 @@ class UserApplicationForm(forms.ModelForm):
         """
         resume = self.cleaned_data.get('resume')
         if resume:
-            error = validate_file_size(resume, RESUME_FILE_MAX_SIZE)
+            error = validate_file_size(resume, FILE_MAX_SIZE)
             if error:
                 raise forms.ValidationError(error)
         return resume
@@ -125,19 +125,24 @@ class UserApplicationCoverLetterForm(forms.ModelForm):
         """
         cover_letter_file = self.cleaned_data.get('cover_letter_file')
         if cover_letter_file:
-            error = validate_file_size(cover_letter_file, RESUME_FILE_MAX_SIZE)
+            error = validate_file_size(cover_letter_file, FILE_MAX_SIZE)
             if error:
                 raise forms.ValidationError(error)
         return cover_letter_file
 
-    def is_valid(self):
+    def clean(self):
         """
         In addition to pre-defined validation it validates that either cover letter file or text is sent
         """
-        valid = super(UserApplicationCoverLetterForm, self).is_valid()
+        super().clean()
 
         if 'cover_letter_file' in self.changed_data and self.cleaned_data.get('cover_letter'):
-            valid = False
             self.add_error('cover_letter_file', _('Either upload a cover letter file or type text'))
 
-        return valid
+    def save_form(self, post_data):
+        instance = self.save(commit=False)
+
+        if 'cover_letter_file' in post_data and 'cover_letter' in post_data:
+            instance.cover_letter_file.delete()
+
+        instance.save()

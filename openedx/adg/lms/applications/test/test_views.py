@@ -535,7 +535,7 @@ def test_post_with_no_cover_letter_typed_cover_letter_and_file_cover_letter_view
     # pylint: disable=protected-access
     """
     Test that whether the user has neither typed a cover letter nor uploaded a file or typed a cover letter or uploaded
-    a file, in each case the information is updated in the database
+    a file, in each case the information is valid
     """
     _mutable = cover_letter_view_post_request.POST._mutable
 
