@@ -34,7 +34,7 @@
         "python-parse-error": 0,
         "python-requires-html-or-text": 0,
         "python-wrap-html": 0,
-        "underscore-not-escaped": 133
+        "underscore-not-escaped": 67
     },
-    "total": 251
+    "total": 185
 }
