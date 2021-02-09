@@ -4,16 +4,16 @@ Experimentation views
 
 
 from django.contrib.auth import get_user_model
-from django.db import transaction
+from django.db import transaction  # lint-amnesty, pylint: disable=unused-import
 from django_filters.rest_framework import DjangoFilterBackend
 from django.http import Http404
 from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthentication
 from edx_rest_framework_extensions.auth.session.authentication import SessionAuthenticationAllowInactiveUser
 from lms.djangoapps.courseware import courses
-from opaque_keys.edx.keys import CourseKey
-from rest_framework import permissions, viewsets
-from rest_framework.response import Response
-from rest_framework.views import APIView
+from opaque_keys.edx.keys import CourseKey  # lint-amnesty, pylint: disable=wrong-import-order
+from rest_framework import permissions, viewsets  # lint-amnesty, pylint: disable=wrong-import-order
+from rest_framework.response import Response  # lint-amnesty, pylint: disable=unused-import, wrong-import-order
+from rest_framework.views import APIView  # lint-amnesty, pylint: disable=wrong-import-order
 from common.djangoapps.util.json_request import JsonResponse
 
 from lms.djangoapps.experiments import filters, serializers
@@ -28,10 +28,10 @@ User = get_user_model()  # pylint: disable=invalid-name
 
 class ExperimentCrossDomainSessionAuth(SessionAuthenticationAllowInactiveUser, SessionAuthenticationCrossDomainCsrf):
     """Session authentication that allows inactive users and cross-domain requests. """
-    pass
+    pass  # lint-amnesty, pylint: disable=unnecessary-pass
 
 
-class ExperimentDataViewSet(viewsets.ModelViewSet):
+class ExperimentDataViewSet(viewsets.ModelViewSet):  # lint-amnesty, pylint: disable=missing-class-docstring
     authentication_classes = (JwtAuthentication, ExperimentCrossDomainSessionAuth,)
     filter_backends = (DjangoFilterBackend,)
     filterset_class = filters.ExperimentDataFilter
@@ -42,14 +42,14 @@ class ExperimentDataViewSet(viewsets.ModelViewSet):
 
     def filter_queryset(self, queryset):
         queryset = queryset.filter(user=self.request.user)
-        return super(ExperimentDataViewSet, self).filter_queryset(queryset)
+        return super(ExperimentDataViewSet, self).filter_queryset(queryset)  # lint-amnesty, pylint: disable=super-with-arguments
 
     def get_serializer_class(self):
         if self.action == 'create':
             return serializers.ExperimentDataCreateSerializer
         return serializers.ExperimentDataSerializer
 
-    def create_or_update(self, request, *args, **kwargs):
+    def create_or_update(self, request, *args, **kwargs):  # lint-amnesty, pylint: disable=missing-function-docstring
         # If we have a primary key, treat this as a regular update request
         if self.kwargs.get('pk'):
             return self.update(request, *args, **kwargs)
@@ -67,14 +67,14 @@ class ExperimentDataViewSet(viewsets.ModelViewSet):
             except ExperimentData.DoesNotExist:
                 pass
 
-        self.action = 'create'
+        self.action = 'create'  # lint-amnesty, pylint: disable=attribute-defined-outside-init
         return self.create(request, *args, **kwargs)
 
     def _cache_users(self, usernames):
         users = User.objects.filter(username__in=usernames)
         self._cached_users = {user.username: user for user in users}
 
-    def _get_user(self, username):
+    def _get_user(self, username):  # lint-amnesty, pylint: disable=missing-function-docstring
         user = self._cached_users.get(username)
 
         if not user:
@@ -84,7 +84,7 @@ class ExperimentDataViewSet(viewsets.ModelViewSet):
         return user
 
 
-class ExperimentKeyValueViewSet(viewsets.ModelViewSet):
+class ExperimentKeyValueViewSet(viewsets.ModelViewSet):  # lint-amnesty, pylint: disable=missing-class-docstring
     authentication_classes = (JwtAuthentication, ExperimentCrossDomainSessionAuth,)
     filter_backends = (DjangoFilterBackend,)
     filterset_class = filters.ExperimentKeyValueFilter
@@ -93,7 +93,7 @@ class ExperimentKeyValueViewSet(viewsets.ModelViewSet):
     serializer_class = serializers.ExperimentKeyValueSerializer
 
 
-class UserMetaDataView(APIView):
+class UserMetaDataView(APIView):  # lint-amnesty, pylint: disable=missing-class-docstring
     authentication_classes = (JwtAuthentication, ExperimentCrossDomainSessionAuth,)
     permission_classes = (IsStaffOrReadOnlyForSelf,)
 

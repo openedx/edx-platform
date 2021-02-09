@@ -5,7 +5,7 @@ Transfer Student Management Command
 
 from textwrap import dedent
 
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.db import transaction
 from opaque_keys.edx.keys import CourseKey
 from six import text_type
@@ -18,7 +18,7 @@ class TransferStudentError(Exception):
     """
     Generic Error when handling student transfers.
     """
-    pass
+    pass  # lint-amnesty, pylint: disable=unnecessary-pass
 
 
 class Command(TrackedCommand):

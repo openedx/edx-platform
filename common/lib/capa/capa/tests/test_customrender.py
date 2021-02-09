@@ -1,4 +1,4 @@
-
+# lint-amnesty, pylint: disable=missing-module-docstring
 
 import unittest
 import xml.sax.saxutils as saxutils
@@ -17,7 +17,7 @@ def extract_context(xml):
     Given an xml element corresponding to the output of test_capa_system.render_template, get back the
     original context
     """
-    return eval(xml.text)
+    return eval(xml.text)  # lint-amnesty, pylint: disable=eval-used
 
 
 def quote_attr(s):
@@ -64,7 +64,7 @@ class MathRenderTest(unittest.TestCase):
     Make sure math renders properly.
     '''
 
-    def check_parse(self, latex_in, mathjax_out):
+    def check_parse(self, latex_in, mathjax_out):  # lint-amnesty, pylint: disable=missing-function-docstring
         xml_str = """<math>{tex}</math>""".format(tex=latex_in)
         element = etree.fromstring(xml_str)
 

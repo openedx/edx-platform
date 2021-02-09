@@ -26,7 +26,7 @@ class UserServiceTestCase(TestCase):
     Tests for the DjangoXBlockUserService.
     """
     def setUp(self):
-        super(UserServiceTestCase, self).setUp()
+        super(UserServiceTestCase, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.user = UserFactory(username="tester", email="test@tester.com")
         self.user.profile.name = "Test Tester"
         set_user_preference(self.user, 'pref-lang', 'en')
@@ -105,8 +105,7 @@ class UserServiceTestCase(TestCase):
         course_key = CourseKey.from_string('edX/toy/2012_Fall')
         anon_user_id = anonymous_id_for_user(
             user=self.user,
-            course_id=course_key,
-            save=True
+            course_id=course_key
         )
 
         django_user_service = DjangoXBlockUserService(self.user, user_is_staff=True)

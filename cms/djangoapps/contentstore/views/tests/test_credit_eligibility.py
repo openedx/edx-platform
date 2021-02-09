@@ -20,7 +20,7 @@ class CreditEligibilityTest(CourseTestCase):
     eligibility requirements.
     """
     def setUp(self):
-        super(CreditEligibilityTest, self).setUp()
+        super(CreditEligibilityTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.course = CourseFactory.create(org='edX', number='dummy', display_name='Credit Course')
         self.course_details_url = reverse_course_url('settings_handler', six.text_type(self.course.id))
 

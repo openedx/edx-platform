@@ -1,9 +1,9 @@
-"""
+"""  # lint-amnesty, pylint: disable=django-not-configured
 i18n utility functions
 """
 
 
-from django.utils.translation import ugettext as _, override
+from django.utils.translation import ugettext as _, override  # lint-amnesty, pylint: disable=unused-import
 from django.utils.formats import dateformat, get_format
 
 

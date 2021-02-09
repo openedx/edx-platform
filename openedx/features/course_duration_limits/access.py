@@ -42,7 +42,7 @@ class AuditExpiredError(AccessError):
                                                 ' for expired on {expiration_date}').format(
                 expiration_date=expiration_date
             )
-        super(AuditExpiredError, self).__init__(error_code, developer_message, user_message,
+        super(AuditExpiredError, self).__init__(error_code, developer_message, user_message,  # lint-amnesty, pylint: disable=super-with-arguments
                                                 additional_context_user_message)
 
 

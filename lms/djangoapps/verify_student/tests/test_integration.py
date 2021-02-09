@@ -23,7 +23,7 @@ class TestProfEdVerification(ModuleStoreTestCase):
     MIN_PRICE = 1438
 
     def setUp(self):
-        super(TestProfEdVerification, self).setUp()
+        super(TestProfEdVerification, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
 
         self.user = UserFactory.create(username="rusty", password="test")
         self.client.login(username="rusty", password="test")

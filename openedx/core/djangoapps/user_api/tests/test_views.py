@@ -1,40 +1,40 @@
 """Tests for the user API at the HTTP request level. """
 
 
-import json
-from unittest import skipUnless
+import json  # lint-amnesty, pylint: disable=unused-import
+from unittest import skipUnless  # lint-amnesty, pylint: disable=unused-import
 
 import ddt
-import httpretty
-import mock
+import httpretty  # lint-amnesty, pylint: disable=unused-import
+import mock  # lint-amnesty, pylint: disable=unused-import
 import six
-from django.conf import settings
-from django.contrib.auth.models import User
-from django.core import mail
-from django.test.client import RequestFactory
-from django.test.testcases import TransactionTestCase
+from django.conf import settings  # lint-amnesty, pylint: disable=unused-import
+from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user, unused-import
+from django.core import mail  # lint-amnesty, pylint: disable=unused-import
+from django.test.client import RequestFactory  # lint-amnesty, pylint: disable=unused-import
+from django.test.testcases import TransactionTestCase  # lint-amnesty, pylint: disable=unused-import
 from django.test.utils import override_settings
 from django.urls import reverse
 from opaque_keys.edx.keys import CourseKey
-from pytz import UTC, common_timezones_set
+from pytz import UTC, common_timezones_set  # lint-amnesty, pylint: disable=unused-import
 from six import text_type
 from six.moves import range
-from social_django.models import Partial, UserSocialAuth
+from social_django.models import Partial, UserSocialAuth  # lint-amnesty, pylint: disable=unused-import
 
 from openedx.core.djangoapps.django_comment_common import models
-from openedx.core.djangoapps.site_configuration.helpers import get_value
-from openedx.core.djangoapps.site_configuration.tests.test_util import with_site_configuration
+from openedx.core.djangoapps.site_configuration.helpers import get_value  # lint-amnesty, pylint: disable=unused-import
+from openedx.core.djangoapps.site_configuration.tests.test_util import with_site_configuration  # lint-amnesty, pylint: disable=unused-import
 from openedx.core.djangolib.testing.utils import CacheIsolationTestCase, skip_unless_lms
 from openedx.core.lib.api.test_utils import TEST_API_KEY, ApiTestCase
 from openedx.core.lib.time_zone_utils import get_display_time_zone
 from common.djangoapps.student.tests.factories import UserFactory
-from common.djangoapps.third_party_auth.tests.testutil import ThirdPartyAuthTestMixin, simulate_running_pipeline
-from common.djangoapps.third_party_auth.tests.utils import (
+from common.djangoapps.third_party_auth.tests.testutil import ThirdPartyAuthTestMixin, simulate_running_pipeline  # lint-amnesty, pylint: disable=unused-import
+from common.djangoapps.third_party_auth.tests.utils import (  # lint-amnesty, pylint: disable=unused-import
     ThirdPartyOAuthTestMixin,
     ThirdPartyOAuthTestMixinFacebook,
     ThirdPartyOAuthTestMixinGoogle
 )
-from common.djangoapps.util.password_policy_validators import (
+from common.djangoapps.util.password_policy_validators import (  # lint-amnesty, pylint: disable=unused-import
     create_validator_config,
     password_validators_instruction_texts,
     password_validators_restrictions
@@ -42,7 +42,7 @@ from common.djangoapps.util.password_policy_validators import (
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
-from ..accounts import (
+from ..accounts import (  # lint-amnesty, pylint: disable=unused-import
     EMAIL_MAX_LENGTH,
     EMAIL_MIN_LENGTH,
     NAME_MAX_LENGTH,
@@ -50,7 +50,7 @@ from ..accounts import (
     USERNAME_MAX_LENGTH,
     USERNAME_MIN_LENGTH
 )
-from ..accounts.api import get_account_settings
+from ..accounts.api import get_account_settings  # lint-amnesty, pylint: disable=unused-import
 from ..accounts.tests.retirement_helpers import (  # pylint: disable=unused-import
     RetirementTestCase,
     fake_requested_retirement,
@@ -58,8 +58,8 @@ from ..accounts.tests.retirement_helpers import (  # pylint: disable=unused-impo
 )
 from ..models import UserOrgTag
 from ..tests.factories import UserPreferenceFactory
-from ..tests.test_constants import SORTED_COUNTRIES
-from .test_helpers import TestCaseForm
+from ..tests.test_constants import SORTED_COUNTRIES  # lint-amnesty, pylint: disable=unused-import
+from .test_helpers import TestCaseForm  # lint-amnesty, pylint: disable=unused-import
 
 USER_LIST_URI = "/api/user/v1/users/"
 USER_PREFERENCE_LIST_URI = "/api/user/v1/user_prefs/"
@@ -94,7 +94,7 @@ class UserAPITestCase(ApiTestCase):
         six.assertCountEqual(
             self,
             list(user["preferences"].items()),
-            [(pref.key, pref.value) for pref in self.prefs if pref.user.id == user["id"]]
+            [(pref.key, pref.value) for pref in self.prefs if pref.user.id == user["id"]]  # lint-amnesty, pylint: disable=no-member
         )
         self.assertSelfReferential(user)
 
@@ -140,7 +140,7 @@ class UserApiTestCase(UserAPITestCase):
     Generalized test case class for specific implementations below
     """
     def setUp(self):
-        super(UserApiTestCase, self).setUp()
+        super(UserApiTestCase, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.users = [
             UserFactory.create(
                 email="test{0}@test.org".format(i),
@@ -164,7 +164,7 @@ class RoleTestCase(UserApiTestCase):
     LIST_URI = ROLE_LIST_URI + "?course_id=" + six.text_type(course_id)
 
     def setUp(self):
-        super(RoleTestCase, self).setUp()
+        super(RoleTestCase, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         (role, _) = models.Role.objects.get_or_create(
             name=models.FORUM_ROLE_MODERATOR,
             course_id=self.course_id
@@ -253,7 +253,7 @@ class UserViewSetTest(UserApiTestCase):
     LIST_URI = USER_LIST_URI
 
     def setUp(self):
-        super(UserViewSetTest, self).setUp()
+        super(UserViewSetTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.detail_uri = self.get_uri_for_user(self.users[0])
 
     # List view tests
@@ -353,7 +353,7 @@ class UserViewSetTest(UserApiTestCase):
                 "id": user.id,
                 "name": user.profile.name,
                 "username": user.username,
-                "preferences": dict([
+                "preferences": dict([  # lint-amnesty, pylint: disable=consider-using-dict-comprehension
                     (user_pref.key, user_pref.value)
                     for user_pref in self.prefs
                     if user_pref.user == user
@@ -373,7 +373,7 @@ class UserPreferenceViewSetTest(CacheIsolationTestCase, UserApiTestCase):
     ENABLED_CACHES = ['default']
 
     def setUp(self):
-        super(UserPreferenceViewSetTest, self).setUp()
+        super(UserPreferenceViewSetTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.detail_uri = self.get_uri_for_pref(self.prefs[0])
 
     # List view tests
@@ -495,7 +495,7 @@ class UserPreferenceViewSetTest(CacheIsolationTestCase, UserApiTestCase):
                     "id": pref.user.id,
                     "name": pref.user.profile.name,
                     "username": pref.user.username,
-                    "preferences": dict([
+                    "preferences": dict([  # lint-amnesty, pylint: disable=consider-using-dict-comprehension
                         (user_pref.key, user_pref.value)
                         for user_pref in self.prefs
                         if user_pref.user == pref.user
@@ -586,7 +586,7 @@ class UpdateEmailOptInTestCase(UserAPITestCase, SharedModuleStoreTestCase):
 
     def setUp(self):
         """ Create a course and user, then log in. """
-        super(UpdateEmailOptInTestCase, self).setUp()
+        super(UpdateEmailOptInTestCase, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.user = UserFactory.create(username=self.USERNAME, email=self.EMAIL, password=self.PASSWORD)
         self.client.login(username=self.USERNAME, password=self.PASSWORD)
 

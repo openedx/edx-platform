@@ -26,7 +26,7 @@ class CapaHtmlRenderTest(unittest.TestCase):
     """
 
     def setUp(self):
-        super(CapaHtmlRenderTest, self).setUp()
+        super(CapaHtmlRenderTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.capa_system = test_capa_system()
 
     def test_blank_problem(self):
@@ -308,7 +308,7 @@ class CapaHtmlRenderTest(unittest.TestCase):
         the_html = problem.get_html()
         self.assertRegex(the_html, r"<div>\s*</div>")
 
-    def _create_test_file(self, path, content_str):
+    def _create_test_file(self, path, content_str):  # lint-amnesty, pylint: disable=missing-function-docstring
         test_fp = self.capa_system.filestore.open(path, "w")
         test_fp.write(content_str)
         test_fp.close()

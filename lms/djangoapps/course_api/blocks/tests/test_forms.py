@@ -34,7 +34,7 @@ class TestBlockListGetForm(FormTestMixin, SharedModuleStoreTestCase):
         cls.course = CourseFactory.create()
 
     def setUp(self):
-        super(TestBlockListGetForm, self).setUp()
+        super(TestBlockListGetForm, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
 
         self.student = UserFactory.create()
         self.student2 = UserFactory.create()

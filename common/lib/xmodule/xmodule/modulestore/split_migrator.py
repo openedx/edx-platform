@@ -27,7 +27,7 @@ class SplitMigrator(object):
     name will be able to find the new elements.
     """
     def __init__(self, split_modulestore, source_modulestore):
-        super(SplitMigrator, self).__init__()
+        super(SplitMigrator, self).__init__()  # lint-amnesty, pylint: disable=super-with-arguments
         self.split_modulestore = split_modulestore
         self.source_modulestore = source_modulestore
 
@@ -50,7 +50,7 @@ class SplitMigrator(object):
         # layer and kvs's know how to store it.
         # locations are in location, children, conditionals, course.tab
 
-        # create the course: set fields to explicitly_set for each scope, id_root = new_course_locator, master_branch = 'production'
+        # create the course: set fields to explicitly_set for each scope, id_root = new_course_locator, master_branch = 'production'  # lint-amnesty, pylint: disable=line-too-long
         original_course = self.source_modulestore.get_course(source_course_key, **kwargs)
         if original_course is None:
             raise ItemNotFoundError(six.text_type(source_course_key))
@@ -94,7 +94,7 @@ class SplitMigrator(object):
         """
         course_version_locator = new_course.id.version_agnostic()
 
-        # iterate over published course elements. Wildcarding rather than descending b/c some elements are orphaned (e.g.,
+        # iterate over published course elements. Wildcarding rather than descending b/c some elements are orphaned (e.g.,  # lint-amnesty, pylint: disable=line-too-long
         # course about pages, conditionals)
         for module in self.source_modulestore.get_items(
             source_course_key, revision=ModuleStoreEnum.RevisionOption.published_only, **kwargs

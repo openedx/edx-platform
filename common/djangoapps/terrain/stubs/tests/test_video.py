@@ -33,7 +33,7 @@ class StubVideoServiceTest(unittest.TestCase):
         """
         Start the stub server.
         """
-        super(StubVideoServiceTest, self).setUp()
+        super(StubVideoServiceTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.server = VideoSourceHttpService()
         self.server.config['root_dir'] = '{}/data/video'.format(settings.TEST_ROOT)
         self.addCleanup(self.server.shutdown)

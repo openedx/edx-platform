@@ -125,7 +125,7 @@ class AwardProgramCertificatesTestCase(CatalogIntegrationMixin, CredentialsApiCo
     """
 
     def setUp(self):
-        super(AwardProgramCertificatesTestCase, self).setUp()
+        super(AwardProgramCertificatesTestCase, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.create_credentials_config()
         self.student = UserFactory.create(username='test-student')
         self.site = SiteFactory()
@@ -280,6 +280,29 @@ class AwardProgramCertificatesTestCase(CatalogIntegrationMixin, CredentialsApiCo
         self.assertFalse(mock_get_certified_programs.called)
         self.assertFalse(mock_award_program_certificate.called)
 
+    @mock.patch(TASKS_MODULE + '.get_credentials_api_client')
+    def test_failure_to_create_api_client_retries(
+        self,
+        mock_get_api_client,
+        mock_get_completed_programs,
+        mock_get_certified_programs,
+        mock_award_program_certificate
+    ):
+        """
+        Checks that we log an exception and retry if the API client isn't creating.
+        """
+        mock_get_api_client.side_effect = Exception('boom')
+        mock_get_completed_programs.return_value = {1: 1, 2: 2}
+        mock_get_certified_programs.return_value = [2]
+
+        with mock.patch(TASKS_MODULE + '.LOGGER.exception') as mock_exception:
+            with self.assertRaises(MaxRetriesExceededError):
+                tasks.award_program_certificates.delay(self.student.username).get()
+
+        self.assertTrue(mock_exception.called)
+        self.assertEqual(mock_get_api_client.call_count, tasks.MAX_RETRIES + 1)
+        self.assertFalse(mock_award_program_certificate.called)
+
     def _make_side_effect(self, side_effects):
         """
         DRY helper.  Returns a side effect function for use with mocks that
@@ -327,8 +350,8 @@ class AwardProgramCertificatesTestCase(CatalogIntegrationMixin, CredentialsApiCo
                 uuid=1,
                 username=self.student.username)
         )
-        mock_info.assert_any_call(mock.ANY, 1, self.student.username)
-        mock_info.assert_any_call(mock.ANY, 2, self.student.username)
+        mock_info.assert_any_call(f"Awarded certificate for program {1} to user {self.student.username}")
+        mock_info.assert_any_call(f"Awarded certificate for program {2} to user {self.student.username}")
 
     def test_retry_on_programs_api_errors(
         self,
@@ -431,7 +454,7 @@ class PostCourseCertificateTestCase(TestCase):
     Test the award_program_certificate function
     """
 
-    def setUp(self):
+    def setUp(self):  # lint-amnesty, pylint: disable=super-method-not-called
         self.student = UserFactory.create(username='test-student')
         self.course = CourseOverviewFactory.create(
             self_paced=True  # Any option to allow the certificate to be viewable for the course
@@ -487,7 +510,7 @@ class AwardCourseCertificatesTestCase(CredentialsApiConfigMixin, TestCase):
     """
 
     def setUp(self):
-        super(AwardCourseCertificatesTestCase, self).setUp()
+        super(AwardCourseCertificatesTestCase, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
 
         self.available_date = datetime.now(pytz.UTC) + timedelta(days=1)
         self.course = CourseOverviewFactory.create(
@@ -638,7 +661,7 @@ class RevokeProgramCertificatesTestCase(CatalogIntegrationMixin, CredentialsApiC
     """
 
     def setUp(self):
-        super(RevokeProgramCertificatesTestCase, self).setUp()
+        super(RevokeProgramCertificatesTestCase, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
 
         self.student = UserFactory.create(username='test-student')
         self.course_key = 'course-v1:testX+test101+2T2020'
@@ -781,8 +804,8 @@ class RevokeProgramCertificatesTestCase(CatalogIntegrationMixin, CredentialsApiC
                 uuid=1,
                 username=self.student.username)
         )
-        mock_info.assert_any_call(mock.ANY, 1, self.student.username)
-        mock_info.assert_any_call(mock.ANY, 2, self.student.username)
+        mock_info.assert_any_call(f"Revoked certificate for program {1} for user {self.student.username}")
+        mock_info.assert_any_call(f"Revoked certificate for program {2} for user {self.student.username}")
 
     def test_retry_on_credentials_api_errors(
         self,
@@ -865,3 +888,27 @@ class RevokeProgramCertificatesTestCase(CatalogIntegrationMixin, CredentialsApiC
         tasks.revoke_program_certificates.delay(self.student.username, self.course_key).get()
 
         self.assertEqual(mock_revoke_program_certificate.call_count, 2)
+
+    def test_get_api_client_failure_retries(
+        self,
+        mock_get_inverted_programs,
+        mock_get_certified_programs,
+        mock_revoke_program_certificate,
+    ):
+        """
+        Verify that a 404 error causes the task to fail but there is no retry.
+        """
+        mock_get_inverted_programs.return_value = self.inverted_programs
+        mock_get_certified_programs.return_value = [1, 2]
+
+        with mock.patch(
+            TASKS_MODULE + ".get_credentials_api_client"
+        ) as mock_get_api_client, mock.patch(
+            TASKS_MODULE + '.LOGGER.exception'
+        ) as mock_exception:
+            mock_get_api_client.side_effect = Exception("boom")
+            with self.assertRaises(MaxRetriesExceededError):
+                tasks.revoke_program_certificates.delay(self.student.username, self.course_key).get()
+        self.assertTrue(mock_exception.called)
+        self.assertEqual(mock_get_api_client.call_count, tasks.MAX_RETRIES + 1)
+        self.assertFalse(mock_revoke_program_certificate.called)

@@ -22,7 +22,7 @@ class TestImport(ModuleStoreTestCase):
     Unit tests for importing a course from command line
     """
 
-    def create_course_xml(self, content_dir, course_id):
+    def create_course_xml(self, content_dir, course_id):  # lint-amnesty, pylint: disable=missing-function-docstring
         directory = tempfile.mkdtemp(dir=content_dir)
         os.makedirs(os.path.join(directory, "course"))
         with open(os.path.join(directory, "course.xml"), "w+") as f:
@@ -37,7 +37,7 @@ class TestImport(ModuleStoreTestCase):
         """
         Build course XML for importing
         """
-        super(TestImport, self).setUp()
+        super(TestImport, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.content_dir = path(tempfile.mkdtemp())
         self.addCleanup(shutil.rmtree, self.content_dir)
 

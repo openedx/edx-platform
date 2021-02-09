@@ -152,7 +152,7 @@ class TestIDVerificationServiceUserStatus(TestCase):
     we just put everything inside of a frozen time
     """
     def setUp(self):
-        super(TestIDVerificationServiceUserStatus, self).setUp()
+        super(TestIDVerificationServiceUserStatus, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.user = UserFactory.create()
 
     def test_no_verification(self):

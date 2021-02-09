@@ -11,8 +11,8 @@ from datetime import timedelta
 
 import ddt
 from django.conf import settings
-from django.conf.urls import include, url
-from django.contrib.auth.models import User
+from django.conf.urls import include, url  # lint-amnesty, pylint: disable=unused-import
+from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.http import HttpResponse
 from django.test import TestCase
 from django.test.utils import override_settings
@@ -58,11 +58,11 @@ urlpatterns = [
 @ddt.ddt  # pylint: disable=missing-docstring
 @unittest.skipUnless(settings.FEATURES.get("ENABLE_OAUTH2_PROVIDER"), "OAuth2 not enabled")
 @override_settings(ROOT_URLCONF=__name__)
-class OAuth2AllowInActiveUsersTests(TestCase):
+class OAuth2AllowInActiveUsersTests(TestCase):  # lint-amnesty, pylint: disable=missing-class-docstring
     OAUTH2_BASE_TESTING_URL = '/oauth2-inactive-test/'
 
     def setUp(self):
-        super(OAuth2AllowInActiveUsersTests, self).setUp()
+        super(OAuth2AllowInActiveUsersTests, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.dot_adapter = adapters.DOTAdapter()
         self.csrf_client = APIClient(enforce_csrf_checks=True)
         self.username = 'john'
@@ -219,12 +219,12 @@ class OAuth2AllowInActiveUsersTests(TestCase):
         self.check_error_codes(response, status_code=status.HTTP_401_UNAUTHORIZED, error_code=token_error.error_code)
 
 
-class BearerAuthenticationTests(OAuth2AllowInActiveUsersTests):  # pylint: disable=test-inherits-tests
+class BearerAuthenticationTests(OAuth2AllowInActiveUsersTests):  # lint-amnesty, pylint: disable=missing-class-docstring, test-inherits-tests
 
     OAUTH2_BASE_TESTING_URL = '/oauth2-test/'
 
     def setUp(self):
-        super(BearerAuthenticationTests, self).setUp()
+        super(BearerAuthenticationTests, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         # Since this is testing back to previous version, user should be set to true
         self.user.is_active = True
         self.user.save()

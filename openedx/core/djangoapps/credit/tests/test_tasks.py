@@ -33,7 +33,7 @@ class TestTaskExecution(ModuleStoreTestCase):
         raise InvalidCreditRequirements
 
     def setUp(self):
-        super(TestTaskExecution, self).setUp()
+        super(TestTaskExecution, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
 
         self.course = CourseFactory.create(start=datetime(2015, 3, 1))
         self.section = ItemFactory.create(parent=self.course, category='chapter', display_name='Test Section')

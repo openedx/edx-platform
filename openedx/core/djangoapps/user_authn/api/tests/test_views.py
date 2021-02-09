@@ -24,7 +24,7 @@ class TPAContextViewTest(ThirdPartyAuthTestMixin, APITestCase):
         """
         Test Setup
         """
-        super(TPAContextViewTest, self).setUp()
+        super(TPAContextViewTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
 
         self.url = reverse('third_party_auth_context')
         self.query_params = {'redirect_to': '/dashboard'}

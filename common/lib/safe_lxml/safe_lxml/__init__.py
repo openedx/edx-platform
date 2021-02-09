@@ -1,4 +1,4 @@
-"""
+"""  # lint-amnesty, pylint: disable=django-not-configured
 Defuse vulnerabilities in XML packages.
 """
 

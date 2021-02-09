@@ -12,6 +12,7 @@ from datetime import datetime
 from functools import reduce
 
 import six
+from django.contrib.auth import get_user_model
 from lxml import etree
 from opaque_keys.edx.keys import UsageKey
 from pkg_resources import resource_string
@@ -24,9 +25,8 @@ from xblock.exceptions import NoSuchServiceError
 from xblock.fields import Boolean, Integer, List, Scope, String
 
 from edx_toggles.toggles import LegacyWaffleFlag
-from edx_toggles.toggles import WaffleFlag
+from edx_toggles.toggles import WaffleFlag  # lint-amnesty, pylint: disable=unused-import
 from lms.djangoapps.courseware.toggles import COURSEWARE_PROCTORING_IMPROVEMENTS
-from openedx.core.lib.graph_traversals import traverse_pre_order
 
 from .exceptions import NotFoundError
 from .fields import Date
@@ -57,7 +57,7 @@ TIMED_EXAM_GATING_WAFFLE_FLAG = LegacyWaffleFlag(
 )
 
 
-class SequenceFields(object):
+class SequenceFields(object):  # lint-amnesty, pylint: disable=missing-class-docstring
     has_children = True
     completion_mode = XBlockCompletionMode.AGGREGATOR
 
@@ -205,9 +205,9 @@ class SequenceModule(SequenceFields, ProctoringFields, XModule):
     js_module_name = "Sequence"
 
     def __init__(self, *args, **kwargs):
-        super(SequenceModule, self).__init__(*args, **kwargs)
+        super(SequenceModule, self).__init__(*args, **kwargs)  # lint-amnesty, pylint: disable=super-with-arguments
 
-        self.gated_sequence_fragment = None
+        self.gated_sequence_paywall = None
         # If position is specified in system, then use that instead.
         position = getattr(self.system, 'position', None)
         if position is not None:
@@ -224,7 +224,7 @@ class SequenceModule(SequenceFields, ProctoringFields, XModule):
         progress = reduce(Progress.add_counts, progresses, None)
         return progress
 
-    def handle_ajax(self, dispatch, data, view=STUDENT_VIEW):  # TODO: bounds checking
+    def handle_ajax(self, dispatch, data, view=STUDENT_VIEW):  # TODO: bounds checking  # lint-amnesty, pylint: disable=arguments-differ
         ''' get = request.POST instance '''
         if dispatch == 'goto_position':
             # set position to default value if either 'position' argument not
@@ -259,7 +259,7 @@ class SequenceModule(SequenceFields, ProctoringFields, XModule):
 
             if self._required_prereq():
                 if self.runtime.user_is_staff:
-                    banner_text = _('This subsection is unlocked for learners when they meet the prerequisite requirements.')
+                    banner_text = _('This subsection is unlocked for learners when they meet the prerequisite requirements.')  # lint-amnesty, pylint: disable=line-too-long
                 else:
                     # check if prerequisite has been met
                     prereq_met, prereq_meta_info = self._compute_is_prereq_met(True)
@@ -282,14 +282,7 @@ class SequenceModule(SequenceFields, ProctoringFields, XModule):
             datetime.now(UTC) < date
         )
 
-    def _get_user(self):
-        """
-        Return the current runtime Django user.
-        """
-        from django.contrib.auth.models import User
-        return User.objects.get(id=self.runtime.user_id)
-
-    def gate_sequence_if_it_is_a_timed_exam_and_contains_content_type_gated_problems(self):
+    def gate_entire_sequence_if_it_is_a_timed_exam_and_contains_content_type_gated_problems(self):
         """
         Problem:
         Content type gating for FBE (Feature Based Enrollments) previously only gated individual blocks.
@@ -302,7 +295,7 @@ class SequenceModule(SequenceFields, ProctoringFields, XModule):
         Gate the entire sequence when we think the above problem can occur.
 
         If:
-        1. This sequence is a timed exam
+        1. This sequence is a timed exam (this is currently being checked before calling)
         2. And this sequence contains problems which this user cannot load due to content type gating
         Then:
         We will gate access to the entire sequence.
@@ -312,55 +305,18 @@ class SequenceModule(SequenceFields, ProctoringFields, XModule):
         We are displaying the gating fragment within the sequence, as is done for gating for prereqs,
         rather than content type gating the entire sequence because that would remove the next/previous navigation.
 
-        When gated_sequence_fragment is not set to None, the sequence will be gated.
+        When gated_sequence_paywall is not set to None, the sequence will be gated.
 
         This functionality still needs to be replicated in the frontend-app-learning courseware MFE
         The ticket to track this is https://openedx.atlassian.net/browse/REV-1220
         Note that this will break compatability with using sequences outside of edx-platform
         but we are ok with this for now
         """
-        if not self.is_time_limited:
-            self.gated_sequence_fragment = None
-            return
-
-        try:
-            user = self._get_user()
-            course_id = self.runtime.course_id
-            content_type_gating_service = self.runtime.service(self, 'content_type_gating')
-            if not (content_type_gating_service and
-                    content_type_gating_service.enabled_for_enrollment(user=user, course_key=course_id)):
-                self.gated_sequence_fragment = None
-                return
-
-            def leaf_filter(block):
-                # This function is used to check if this is a leaf block
-                # Blocks with children are not currently gated by content type gating
-                # Other than the outer function here
-                return (
-                    block.location.block_type not in ('chapter', 'sequential', 'vertical') and
-                    not block.has_children
-                )
-
-            def get_children(parent):
-                # This function is used to get the children of a block in the traversal below
-                if parent.has_children:
-                    return parent.get_children()
-                else:
-                    return []
-
-            # If any block inside a timed exam has been gated by content type gating
-            # then gate the entire sequence.
-            # In order to avoid scope creep, we are not handling other potential causes
-            # of access failures as part of this work.
-            for block in traverse_pre_order(self, get_children, leaf_filter):
-                gate_fragment = content_type_gating_service.content_type_gate_for_block(user, block, course_id)
-                if gate_fragment is not None:
-                    self.gated_sequence_fragment = gate_fragment
-                    return
-                else:
-                    self.gated_sequence_fragment = None
-        except User.DoesNotExist:
-            self.gated_sequence_fragment = None
+        content_type_gating_service = self.runtime.service(self, 'content_type_gating')
+        if content_type_gating_service:
+            self.gated_sequence_paywall = content_type_gating_service.check_children_for_content_type_gating_paywall(
+                self, self.course_id
+            )
 
     def student_view(self, context):
         _ = self.runtime.service(self, "i18n").ugettext
@@ -369,13 +325,9 @@ class SequenceModule(SequenceFields, ProctoringFields, XModule):
         banner_text = None
         prereq_met = True
         prereq_meta_info = {}
-
-        if TIMED_EXAM_GATING_WAFFLE_FLAG.is_enabled():
-            self.gate_sequence_if_it_is_a_timed_exam_and_contains_content_type_gated_problems()
-
         if self._required_prereq():
             if self.runtime.user_is_staff:
-                banner_text = _('This subsection is unlocked for learners when they meet the prerequisite requirements.')
+                banner_text = _('This subsection is unlocked for learners when they meet the prerequisite requirements.')  # lint-amnesty, pylint: disable=line-too-long
             else:
                 # check if prerequisite has been met
                 prereq_met, prereq_meta_info = self._compute_is_prereq_met(True)
@@ -400,7 +352,7 @@ class SequenceModule(SequenceFields, ProctoringFields, XModule):
             prereq_met, prereq_meta_info = self._compute_is_prereq_met(True)
         return self._student_or_public_view(context or {}, prereq_met, prereq_meta_info, None, PUBLIC_VIEW)
 
-    def author_view(self, context):
+    def author_view(self, context):  # lint-amnesty, pylint: disable=missing-function-docstring
         context = context or {}
         context['exclude_units'] = True
         if 'position' in context:
@@ -414,11 +366,16 @@ class SequenceModule(SequenceFields, ProctoringFields, XModule):
         staff is masquerading.
         """
         _ = self.runtime.service(self, "i18n").ugettext
-        if self.is_time_limited and not self.gated_sequence_fragment:
-            special_exam_html = self._time_limited_student_view()
-            if special_exam_html:
-                banner_text = _("This exam is hidden from the learner.")
-                return banner_text, special_exam_html
+
+        if self.is_time_limited:
+            if TIMED_EXAM_GATING_WAFFLE_FLAG.is_enabled():
+                # set the self.gated_sequence_paywall variable
+                self.gate_entire_sequence_if_it_is_a_timed_exam_and_contains_content_type_gated_problems()
+            if self.gated_sequence_paywall is None:
+                special_exam_html = self._time_limited_student_view()
+                if special_exam_html:
+                    banner_text = _("This exam is hidden from the learner.")
+                    return banner_text, special_exam_html
 
     def _hidden_content_student_view(self, context):
         """
@@ -459,7 +416,7 @@ class SequenceModule(SequenceFields, ProctoringFields, XModule):
         # NOTE (CCB): We default to true to maintain the behavior in place prior to allowing anonymous access access.
         return context.get('user_authenticated', True)
 
-    def _get_render_metadata(self, context, display_items, prereq_met, prereq_meta_info, banner_text=None, view=STUDENT_VIEW, fragment=None):
+    def _get_render_metadata(self, context, display_items, prereq_met, prereq_meta_info, banner_text=None, view=STUDENT_VIEW, fragment=None):  # lint-amnesty, pylint: disable=line-too-long, missing-function-docstring
         if prereq_met and not self._is_gate_fulfilled():
             banner_text = _(
                 'This section is a prerequisite. You must complete this section in order to unlock additional content.'
@@ -482,10 +439,9 @@ class SequenceModule(SequenceFields, ProctoringFields, XModule):
             'show_completion': view != PUBLIC_VIEW,
             'gated_content': self._get_gated_content_info(prereq_met, prereq_meta_info),
             'sequence_name': self.display_name,
-            'exclude_units': context.get('exclude_units', False)
+            'exclude_units': context.get('exclude_units', False),
+            'gated_sequence_paywall': self.gated_sequence_paywall
         }
-        if self.gated_sequence_fragment:
-            params['gated_sequence_fragment'] = self.gated_sequence_fragment.content
 
         return params
 
@@ -500,7 +456,7 @@ class SequenceModule(SequenceFields, ProctoringFields, XModule):
         self._update_position(context, len(display_items))
 
         fragment = Fragment()
-        params = self._get_render_metadata(context, display_items, prereq_met, prereq_meta_info, banner_text, view, fragment)
+        params = self._get_render_metadata(context, display_items, prereq_met, prereq_meta_info, banner_text, view, fragment)  # lint-amnesty, pylint: disable=line-too-long
         fragment.add_content(self.system.render_template("seq_module.html", params))
 
         self._capture_full_seq_item_metrics(display_items)
@@ -654,7 +610,8 @@ class SequenceModule(SequenceFields, ProctoringFields, XModule):
             bookmarks_service = self.runtime.service(self, 'bookmarks')
         except NoSuchServiceError:
             bookmarks_service = None
-        context['username'] = self.runtime.service(self, 'user').get_current_user().opt_attrs.get(
+        user = self.runtime.service(self, 'user').get_current_user()
+        context['username'] = user.opt_attrs.get(
             'edx-platform.username')
         display_names = [
             self.get_parent().display_name_with_default,
@@ -683,6 +640,13 @@ class SequenceModule(SequenceFields, ProctoringFields, XModule):
                 content = rendered_item.content
             else:
                 content = ''
+
+            content_type_gating_service = self.runtime.service(self, 'content_type_gating')
+            contains_content_type_gated_content = False
+            if content_type_gating_service:
+                contains_content_type_gated_content = content_type_gating_service.check_children_for_content_type_gating_paywall(  # pylint:disable=line-too-long
+                    item, self.course_id
+                ) is not None
             iteminfo = {
                 'content': content,
                 'page_title': getattr(item, 'tooltip_title', ''),
@@ -690,7 +654,8 @@ class SequenceModule(SequenceFields, ProctoringFields, XModule):
                 'id': text_type(usage_id),
                 'bookmarked': is_bookmarked,
                 'path': " > ".join(display_names + [item.display_name_with_default]),
-                'graded': item.graded
+                'graded': item.graded,
+                'contains_content_type_gated_content': contains_content_type_gated_content,
             }
             if not render_items:
                 # The item url format can be defined in the template context like so:
@@ -812,7 +777,7 @@ class SequenceModule(SequenceFields, ProctoringFields, XModule):
                 'is_practice_exam': self.is_practice_exam,
                 'allow_proctoring_opt_out': self.allow_proctoring_opt_out,
                 'due_date': self.due,
-                'grace_period': self.graceperiod,
+                'grace_period': self.graceperiod,  # lint-amnesty, pylint: disable=no-member
                 'experimental_proctoring_features': COURSEWARE_PROCTORING_IMPROVEMENTS.is_enabled(course_id),
             }
 
@@ -865,13 +830,13 @@ class SequenceMixin(SequenceFields):
     converted from XModules which inherited from SequenceDescriptor.
     """
     @classmethod
-    def definition_from_xml(cls, xml_object, system):
+    def definition_from_xml(cls, xml_object, system):  # lint-amnesty, pylint: disable=missing-function-docstring
         children = []
         for child in xml_object:
             try:
                 child_block = system.process_xml(etree.tostring(child, encoding='unicode'))
                 children.append(child_block.scope_ids.usage_id)
-            except Exception as e:
+            except Exception as e:  # lint-amnesty, pylint: disable=broad-except
                 log.exception("Unable to load child when parsing Sequence. Continuing...")
                 if system.error_tracker is not None:
                     system.error_tracker(u"ERROR: {0}".format(e))
@@ -885,7 +850,7 @@ class SequenceMixin(SequenceFields):
         # return key/value fields in a Python dict object
         # values may be numeric / string or dict
         # default implementation is an empty dict
-        xblock_body = super(SequenceMixin, self).index_dictionary()
+        xblock_body = super(SequenceMixin, self).index_dictionary()  # lint-amnesty, pylint: disable=super-with-arguments
         html_body = {
             "display_name": self.display_name,
         }
@@ -925,7 +890,7 @@ class SequenceDescriptor(SequenceMixin, ProctoringFields, MakoModuleDescriptor, 
         """
         `is_entrance_exam` should not be editable in the Studio settings editor.
         """
-        non_editable_fields = super(SequenceDescriptor, self).non_editable_metadata_fields
+        non_editable_fields = super(SequenceDescriptor, self).non_editable_metadata_fields  # lint-amnesty, pylint: disable=super-with-arguments
         non_editable_fields.append(self.fields['is_entrance_exam'])  # pylint:disable=unsubscriptable-object
         return non_editable_fields
 

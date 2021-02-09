@@ -1,4 +1,4 @@
-"""
+"""  # lint-amnesty, pylint: disable=cyclic-import
 Tests for course_team reindex command.
 """
 
@@ -27,7 +27,7 @@ class ReindexCourseTeamTest(SharedModuleStoreTestCase):
         """
         Set up tests.
         """
-        super(ReindexCourseTeamTest, self).setUp()
+        super(ReindexCourseTeamTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
 
         self.team1 = CourseTeamFactory(course_id=COURSE_KEY1, team_id='team1')
         self.team2 = CourseTeamFactory(course_id=COURSE_KEY1, team_id='team2')

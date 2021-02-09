@@ -40,7 +40,7 @@ class TestDiscussionXBlock(XModuleRenderingTestBase):
         """
         Set up the xblock runtime, test course, discussion, and user.
         """
-        super(TestDiscussionXBlock, self).setUp()
+        super(TestDiscussionXBlock, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.patchers = []
         self.course_id = "test_course"
         self.runtime = self.new_module_runtime()
@@ -77,7 +77,7 @@ class TestDiscussionXBlock(XModuleRenderingTestBase):
         """
         Tears down any patchers added during tests.
         """
-        super(TestDiscussionXBlock, self).tearDown()
+        super(TestDiscussionXBlock, self).tearDown()  # lint-amnesty, pylint: disable=super-with-arguments
         for patcher in self.patchers:
             patcher.stop()
 
@@ -93,7 +93,7 @@ class TestGetDjangoUser(TestDiscussionXBlock):
         """
         Mock the user service and runtime.
         """
-        super(TestGetDjangoUser, self).setUp()
+        super(TestGetDjangoUser, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.django_user = object()
         self.user_service = mock.Mock()
         self.add_patcher(
@@ -107,7 +107,7 @@ class TestGetDjangoUser(TestDiscussionXBlock):
         of the user service.
         """
         actual_user = self.block.django_user
-        self.runtime.service.assert_called_once_with(
+        self.runtime.service.assert_called_once_with(  # lint-amnesty, pylint: disable=no-member
             self.block, 'user')
         self.assertEqual(actual_user, self.django_user)
 
@@ -129,7 +129,7 @@ class TestViews(TestDiscussionXBlock):
         """
         Mock the methods needed for these tests.
         """
-        super(TestViews, self).setUp()
+        super(TestViews, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.template_canary = u'canary'
         self.render_template = mock.Mock()
         self.render_template.return_value = self.template_canary

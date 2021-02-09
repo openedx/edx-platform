@@ -107,7 +107,7 @@ def _upload_sjson_file(subs_file, location, default_filename='subs_{}.srt.sjson'
     _upload_file(subs_file, location, filename)
 
 
-def _upload_file(subs_file, location, filename):
+def _upload_file(subs_file, location, filename):  # lint-amnesty, pylint: disable=missing-function-docstring
     mime_type = subs_file.content_type
     content_location = StaticContent.compute_location(
         location.course_key, filename
@@ -145,10 +145,10 @@ class BaseTestVideoXBlock(BaseTestXmodule):
             # a lot of tests code, parse and set the values as fields.
             fields_data = VideoBlock.parse_video_xml(data)
             kwargs.update(fields_data)
-        super(BaseTestVideoXBlock, self).initialize_module(**kwargs)
+        super(BaseTestVideoXBlock, self).initialize_module(**kwargs)  # lint-amnesty, pylint: disable=super-with-arguments
 
     def setUp(self):
-        super(BaseTestVideoXBlock, self).setUp()
+        super(BaseTestVideoXBlock, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.initialize_block(data=self.DATA, metadata=self.METADATA)
 
 
@@ -240,11 +240,11 @@ class TestVideo(BaseTestVideoXBlock):
 
     def tearDown(self):
         _clear_assets(self.item_descriptor.location)
-        super(TestVideo, self).tearDown()
+        super(TestVideo, self).tearDown()  # lint-amnesty, pylint: disable=super-with-arguments
 
 
 @ddt.ddt
-class TestTranscriptAvailableTranslationsDispatch(TestVideo):
+class TestTranscriptAvailableTranslationsDispatch(TestVideo):  # lint-amnesty, pylint: disable=test-inherits-tests
     """
     Test video handler that provide available translations info.
 
@@ -266,7 +266,7 @@ class TestTranscriptAvailableTranslationsDispatch(TestVideo):
     }
 
     def setUp(self):
-        super(TestTranscriptAvailableTranslationsDispatch, self).setUp()
+        super(TestTranscriptAvailableTranslationsDispatch, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.item_descriptor.render(STUDENT_VIEW)
         self.item = self.item_descriptor
         self.subs = {"start": [10], "end": [100], "text": ["Hi, welcome to Edx."]}
@@ -402,7 +402,7 @@ class TestTranscriptAvailableTranslationsDispatch(TestVideo):
 
 
 @ddt.ddt
-class TestTranscriptAvailableTranslationsBumperDispatch(TestVideo):
+class TestTranscriptAvailableTranslationsBumperDispatch(TestVideo):  # lint-amnesty, pylint: disable=test-inherits-tests
     """
     Test video handler that provide available translations info.
 
@@ -424,7 +424,7 @@ class TestTranscriptAvailableTranslationsBumperDispatch(TestVideo):
     }
 
     def setUp(self):
-        super(TestTranscriptAvailableTranslationsBumperDispatch, self).setUp()
+        super(TestTranscriptAvailableTranslationsBumperDispatch, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.item_descriptor.render(STUDENT_VIEW)
         self.item = self.item_descriptor
         self.dispatch = "available_translations/?is_bumper=1"
@@ -467,7 +467,7 @@ class TestTranscriptAvailableTranslationsBumperDispatch(TestVideo):
 
 
 @ddt.ddt
-class TestTranscriptDownloadDispatch(TestVideo):
+class TestTranscriptDownloadDispatch(TestVideo):  # lint-amnesty, pylint: disable=test-inherits-tests
     """
     Test video handler that provide translation transcripts.
 
@@ -490,7 +490,7 @@ class TestTranscriptDownloadDispatch(TestVideo):
     }
 
     def setUp(self):
-        super(TestTranscriptDownloadDispatch, self).setUp()
+        super(TestTranscriptDownloadDispatch, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.item_descriptor.render(STUDENT_VIEW)
         self.item = self.item_descriptor
 
@@ -575,7 +575,7 @@ class TestTranscriptDownloadDispatch(TestVideo):
 
 
 @ddt.ddt
-class TestTranscriptTranslationGetDispatch(TestVideo):
+class TestTranscriptTranslationGetDispatch(TestVideo):  # lint-amnesty, pylint: disable=test-inherits-tests
     """
     Test video handler that provide translation transcripts.
 
@@ -600,7 +600,7 @@ class TestTranscriptTranslationGetDispatch(TestVideo):
     }
 
     def setUp(self):
-        super(TestTranscriptTranslationGetDispatch, self).setUp()
+        super(TestTranscriptTranslationGetDispatch, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.item_descriptor.render(STUDENT_VIEW)
         self.item = self.item_descriptor
         self.item.video_bumper = {"transcripts": {"en": ""}}
@@ -855,7 +855,7 @@ class TestTranscriptTranslationGetDispatch(TestVideo):
         self.assertEqual(response.status_code, 404)
 
 
-class TestStudioTranscriptTranslationGetDispatch(TestVideo):
+class TestStudioTranscriptTranslationGetDispatch(TestVideo):  # lint-amnesty, pylint: disable=test-inherits-tests
     """
     Test Studio video handler that provide translation transcripts.
 
@@ -914,7 +914,7 @@ class TestStudioTranscriptTranslationGetDispatch(TestVideo):
 
 
 @ddt.ddt
-class TestStudioTranscriptTranslationPostDispatch(TestVideo):
+class TestStudioTranscriptTranslationPostDispatch(TestVideo):  # lint-amnesty, pylint: disable=test-inherits-tests
     """
     Test Studio video handler that provide translation transcripts.
 
@@ -1020,7 +1020,7 @@ class TestStudioTranscriptTranslationPostDispatch(TestVideo):
 
 
 @ddt.ddt
-class TestStudioTranscriptTranslationDeleteDispatch(TestVideo):
+class TestStudioTranscriptTranslationDeleteDispatch(TestVideo):  # lint-amnesty, pylint: disable=test-inherits-tests
     """
     Test studio video handler that provide translation transcripts.
 
@@ -1095,7 +1095,7 @@ class TestStudioTranscriptTranslationDeleteDispatch(TestVideo):
 
         # verify transcripts field
         self.assertNotEqual(self.item_descriptor.transcripts, {})
-        self.assertTrue(self.LANGUAGE_CODE_UK in self.item_descriptor.transcripts)
+        self.assertTrue(self.LANGUAGE_CODE_UK in self.item_descriptor.transcripts)  # lint-amnesty, pylint: disable=wrong-assert-type
 
         # make request and verify response
         response = self.item_descriptor.studio_transcript(request=request, dispatch='translation')
@@ -1123,7 +1123,7 @@ class TestStudioTranscriptTranslationDeleteDispatch(TestVideo):
         self.assertEqual(response.status_code, 200)
 
         # verify that srt file is deleted
-        self.assertTrue(self.LANGUAGE_CODE_EN not in self.item_descriptor.transcripts)
+        self.assertTrue(self.LANGUAGE_CODE_EN not in self.item_descriptor.transcripts)  # lint-amnesty, pylint: disable=wrong-assert-type
         self.assertFalse(_check_asset(self.item_descriptor.location, srt_file_name_en))
 
     def test_translation_delete_w_sub(self):
@@ -1135,7 +1135,7 @@ class TestStudioTranscriptTranslationDeleteDispatch(TestVideo):
         request = Request(self.REQUEST_META, body=request_body.encode('utf-8'))
 
         # sub should not be empy
-        self.assertFalse(self.item_descriptor.sub == u'')
+        self.assertFalse(self.item_descriptor.sub == u'')  # lint-amnesty, pylint: disable=wrong-assert-type
 
         # upload and verify that srt file exists in assets
         _upload_file(self.SRT_FILE, self.item_descriptor.location, sub_file_name)
@@ -1146,11 +1146,11 @@ class TestStudioTranscriptTranslationDeleteDispatch(TestVideo):
         self.assertEqual(response.status_code, 200)
 
         # verify that sub is empty and transcript is deleted also
-        self.assertTrue(self.item_descriptor.sub == u'')
+        self.assertTrue(self.item_descriptor.sub == u'')  # lint-amnesty, pylint: disable=wrong-assert-type
         self.assertFalse(_check_asset(self.item_descriptor.location, sub_file_name))
 
 
-class TestGetTranscript(TestVideo):
+class TestGetTranscript(TestVideo):  # lint-amnesty, pylint: disable=test-inherits-tests
     """
     Make sure that `get_transcript` method works correctly
     """
@@ -1172,7 +1172,7 @@ class TestGetTranscript(TestVideo):
     METADATA = {}
 
     def setUp(self):
-        super(TestGetTranscript, self).setUp()
+        super(TestGetTranscript, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.item_descriptor.render(STUDENT_VIEW)
         self.item = self.item_descriptor
 
@@ -1300,7 +1300,7 @@ class TestGetTranscript(TestVideo):
         self.srt_file.seek(0)
         _upload_file(self.srt_file, self.item_descriptor.location, u"塞.srt")
 
-        transcripts = self.item.get_transcripts_info()
+        transcripts = self.item.get_transcripts_info()  # lint-amnesty, pylint: disable=unused-variable
         text, filename, mime_type = get_transcript(self.item)
         expected_text = textwrap.dedent(u"""
         0
@@ -1317,7 +1317,7 @@ class TestGetTranscript(TestVideo):
         _upload_sjson_file(good_sjson, self.item.location)
         self.item.sub = _get_subs_id(good_sjson.name)
 
-        transcripts = self.item.get_transcripts_info()
+        transcripts = self.item.get_transcripts_info()  # lint-amnesty, pylint: disable=unused-variable
         with self.assertRaises(ValueError):
             get_transcript(self.item)
 
@@ -1338,6 +1338,6 @@ class TestGetTranscript(TestVideo):
         _upload_sjson_file(good_sjson, self.item.location)
         self.item.sub = _get_subs_id(good_sjson.name)
 
-        transcripts = self.item.get_transcripts_info()
+        transcripts = self.item.get_transcripts_info()  # lint-amnesty, pylint: disable=unused-variable
         with self.assertRaises(KeyError):
             get_transcript(self.item)

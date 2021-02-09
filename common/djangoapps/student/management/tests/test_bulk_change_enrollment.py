@@ -20,7 +20,7 @@ class BulkChangeEnrollmentTests(SharedModuleStoreTestCase):
     """Tests for the bulk_change_enrollment command."""
 
     def setUp(self):
-        super(BulkChangeEnrollmentTests, self).setUp()
+        super(BulkChangeEnrollmentTests, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.org = 'testX'
         self.course = CourseFactory.create(org=self.org)
         self.users = UserFactory.create_batch(5)

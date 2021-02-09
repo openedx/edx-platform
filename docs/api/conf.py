@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-  # lint-amnesty, pylint: disable=missing-module-docstring
 #
 # Configuration file for the Sphinx documentation builder.
 #
@@ -25,7 +25,7 @@ import edx_theme
 # -- Project information -----------------------------------------------------
 
 project = u'Open edX REST APIs'
-copyright = edx_theme.COPYRIGHT
+copyright = edx_theme.COPYRIGHT  # lint-amnesty, pylint: disable=redefined-builtin
 author = edx_theme.AUTHOR
 
 # The short X.Y version

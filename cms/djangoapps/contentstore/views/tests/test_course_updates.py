@@ -5,8 +5,8 @@ unit tests for course_info views and models.
 
 import json
 
-from django.test.utils import override_settings
-from mock import patch
+from django.test.utils import override_settings  # lint-amnesty, pylint: disable=unused-import
+from mock import patch  # lint-amnesty, pylint: disable=unused-import
 from opaque_keys.edx.keys import UsageKey
 
 from cms.djangoapps.contentstore.tests.test_course_settings import CourseTestCase
@@ -15,7 +15,7 @@ from openedx.core.lib.xblock_utils import get_course_update_items
 from xmodule.modulestore.django import modulestore
 
 
-class CourseUpdateTest(CourseTestCase):
+class CourseUpdateTest(CourseTestCase):  # lint-amnesty, pylint: disable=missing-class-docstring
 
     def create_update_url(self, provided_id=None, course_key=None):
         if course_key is None:
@@ -45,7 +45,7 @@ class CourseUpdateTest(CourseTestCase):
         )
         self.assertContains(resp, 'Course Updates', status_code=200)
 
-        init_content = '<iframe width="560" height="315" src="http://www.youtube.com/embed/RocY-Jd93XU" frameborder="0">'
+        init_content = '<iframe width="560" height="315" src="http://www.youtube.com/embed/RocY-Jd93XU" frameborder="0">'  # lint-amnesty, pylint: disable=line-too-long
         content = init_content + '</iframe>'
         payload = get_response(content, 'January 8, 2013')
         self.assertHTMLEqual(payload['content'], content)
@@ -223,7 +223,7 @@ class CourseUpdateTest(CourseTestCase):
         course_updates.data = 'bad news'
         modulestore().update_item(course_updates, self.user.id)
 
-        init_content = '<iframe width="560" height="315" src="http://www.youtube.com/embed/RocY-Jd93XU" frameborder="0">'
+        init_content = '<iframe width="560" height="315" src="http://www.youtube.com/embed/RocY-Jd93XU" frameborder="0">'  # lint-amnesty, pylint: disable=line-too-long
         content = init_content + '</iframe>'
         payload = {'content': content, 'date': 'January 8, 2013'}
 

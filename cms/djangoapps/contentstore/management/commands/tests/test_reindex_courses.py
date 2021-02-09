@@ -7,7 +7,7 @@ import six
 from django.core.management import CommandError, call_command
 from six import text_type
 
-from cms.djangoapps.contentstore.courseware_index import SearchIndexingError
+from cms.djangoapps.contentstore.courseware_index import SearchIndexingError  # lint-amnesty, pylint: disable=unused-import
 from cms.djangoapps.contentstore.management.commands.reindex_course import Command as ReindexCommand
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
@@ -20,7 +20,7 @@ class TestReindexCourse(ModuleStoreTestCase):
     """ Tests for course reindex command """
     def setUp(self):
         """ Setup method - create courses """
-        super(TestReindexCourse, self).setUp()
+        super(TestReindexCourse, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.store = modulestore()
         self.first_lib = LibraryFactory.create(
             org="test", library="lib1", display_name="run1", default_store=ModuleStoreEnum.Type.split

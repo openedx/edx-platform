@@ -138,7 +138,7 @@ class CourseListUserThrottle(UserRateThrottle):
         'staff': '40/minute',
     }
 
-    def check_for_switches(self):
+    def check_for_switches(self):  # lint-amnesty, pylint: disable=missing-function-docstring
         if USE_RATE_LIMIT_2_FOR_COURSE_LIST_API.is_enabled():
             self.THROTTLE_RATES = {
                 'user': '2/minute',
@@ -159,7 +159,7 @@ class CourseListUserThrottle(UserRateThrottle):
             self.rate = self.get_rate()
             self.num_requests, self.duration = self.parse_rate(self.rate)
 
-        return super(CourseListUserThrottle, self).allow_request(request, view)
+        return super(CourseListUserThrottle, self).allow_request(request, view)  # lint-amnesty, pylint: disable=super-with-arguments
 
 
 class LazyPageNumberPagination(NamespacedPageNumberPagination):
@@ -191,9 +191,9 @@ class LazyPageNumberPagination(NamespacedPageNumberPagination):
                 page_number=page_number, message=str(exc)
             )
             self.page.number = self.page.paginator.num_pages
-            raise NotFound(msg)
+            raise NotFound(msg)  # lint-amnesty, pylint: disable=raise-missing-from
 
-        return super(LazyPageNumberPagination, self).get_paginated_response(data)
+        return super(LazyPageNumberPagination, self).get_paginated_response(data)  # lint-amnesty, pylint: disable=super-with-arguments
 
     @function_trace('pagination_paginate_queryset')
     def paginate_queryset(self, queryset, request, view=None):
@@ -220,19 +220,19 @@ class LazyPageNumberPagination(NamespacedPageNumberPagination):
 
         with function_trace('pagination_paginate_queryset_get_page'):
             try:
-                self.page = paginator.page(page_number)
+                self.page = paginator.page(page_number)  # lint-amnesty, pylint: disable=attribute-defined-outside-init
             except InvalidPage as exc:
                 msg = self.invalid_page_message.format(
                     page_number=page_number, message=str(exc)
                 )
-                raise NotFound(msg)
+                raise NotFound(msg)  # lint-amnesty, pylint: disable=raise-missing-from
 
         with function_trace('pagination_paginate_queryset_get_num_pages'):
             if paginator.num_pages > 1 and self.template is not None:
                 # The browsable API should display pagination controls.
                 self.display_page_controls = True
 
-        self.request = request
+        self.request = request  # lint-amnesty, pylint: disable=attribute-defined-outside-init
 
         with function_trace('pagination_paginate_queryset_listify_page'):
             page_list = list(self.page)
@@ -347,7 +347,7 @@ class CourseIdListUserThrottle(UserRateThrottle):
             self.rate = self.get_rate()
             self.num_requests, self.duration = self.parse_rate(self.rate)
 
-        return super(CourseIdListUserThrottle, self).allow_request(request, view)
+        return super(CourseIdListUserThrottle, self).allow_request(request, view)  # lint-amnesty, pylint: disable=super-with-arguments
 
 
 @view_auth_classes()
@@ -434,7 +434,7 @@ class CourseIdListView(DeveloperErrorViewMixin, ListAPIView):
 
         This should be called once per GET request.
         """
-        return super(CourseIdListView, self).paginate_queryset(*args, **kwargs)
+        return super(CourseIdListView, self).paginate_queryset(*args, **kwargs)  # lint-amnesty, pylint: disable=super-with-arguments
 
     @function_trace('get_paginated_response')
     def get_paginated_response(self, *args, **kwargs):
@@ -446,7 +446,7 @@ class CourseIdListView(DeveloperErrorViewMixin, ListAPIView):
         means two GET requests and one function call per request. Otherwise, if
         the whole response fits in one page, this function never gets called.
         """
-        return super(CourseIdListView, self).get_paginated_response(*args, **kwargs)
+        return super(CourseIdListView, self).get_paginated_response(*args, **kwargs)  # lint-amnesty, pylint: disable=super-with-arguments
 
     @function_trace('filter_queryset')
     def filter_queryset(self, *args, **kwargs):
@@ -456,7 +456,7 @@ class CourseIdListView(DeveloperErrorViewMixin, ListAPIView):
 
         This should be called once per GET request.
         """
-        return super(CourseIdListView, self).filter_queryset(*args, **kwargs)
+        return super(CourseIdListView, self).filter_queryset(*args, **kwargs)  # lint-amnesty, pylint: disable=super-with-arguments
 
     @function_trace('get_serializer')
     def get_serializer(self, *args, **kwargs):
@@ -466,4 +466,4 @@ class CourseIdListView(DeveloperErrorViewMixin, ListAPIView):
 
         This should be called once per GET request.
         """
-        return super(CourseIdListView, self).get_serializer(*args, **kwargs)
+        return super(CourseIdListView, self).get_serializer(*args, **kwargs)  # lint-amnesty, pylint: disable=super-with-arguments

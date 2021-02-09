@@ -15,7 +15,7 @@ class TestHandlerUrl(TestCase):
     """Test the LMS handler_url"""
 
     def setUp(self):
-        super(TestHandlerUrl, self).setUp()
+        super(TestHandlerUrl, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.block = Mock()
 
     def test_trailing_characters(self):

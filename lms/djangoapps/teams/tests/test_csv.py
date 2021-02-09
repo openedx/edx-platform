@@ -2,7 +2,7 @@
 from csv import DictWriter, DictReader
 from io import BytesIO, StringIO, TextIOWrapper
 
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user, unused-import
 
 from lms.djangoapps.program_enrollments.tests.factories import ProgramEnrollmentFactory, ProgramCourseEnrollmentFactory
 from lms.djangoapps.teams import csv
@@ -252,7 +252,7 @@ class TeamMembershipImportManagerTests(TeamMembershipEventTestMixin, SharedModul
 
     def setUp(self):
         """ Initialize import manager """
-        super(TeamMembershipImportManagerTests, self).setUp()
+        super(TeamMembershipImportManagerTests, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.import_manager = csv.TeamMembershipImportManager(self.course)
         self.import_manager.teamset_ids = {ts.teamset_id for ts in self.course.teamsets}
 
@@ -261,10 +261,10 @@ class TeamMembershipImportManagerTests(TeamMembershipEventTestMixin, SharedModul
         Lodaing course teams shold get the users by team with only 2 queries
         1 for teams, 1 for user count
         """
-        team1 = CourseTeamFactory.create(course_id=self.course.id)
-        team2 = CourseTeamFactory.create(course_id=self.course.id)
-        team3 = CourseTeamFactory.create(course_id=self.course.id)
-        team4 = CourseTeamFactory.create(course_id=self.course.id)
+        team1 = CourseTeamFactory.create(course_id=self.course.id)  # lint-amnesty, pylint: disable=unused-variable
+        team2 = CourseTeamFactory.create(course_id=self.course.id)  # lint-amnesty, pylint: disable=unused-variable
+        team3 = CourseTeamFactory.create(course_id=self.course.id)  # lint-amnesty, pylint: disable=unused-variable
+        team4 = CourseTeamFactory.create(course_id=self.course.id)  # lint-amnesty, pylint: disable=unused-variable
 
         with self.assertNumQueries(2):
             self.import_manager.load_course_teams()
@@ -405,7 +405,7 @@ class TeamMembershipImportManagerTests(TeamMembershipEventTestMixin, SharedModul
             ['user', 'mode', 'teamset_1'],
             [user.username, mode, ''],
         ])
-        result = self.import_manager.set_team_memberships(csv_data)
+        result = self.import_manager.set_team_memberships(csv_data)  # lint-amnesty, pylint: disable=unused-variable
 
         # Then they are removed from the team and the correct events are issued
         self.assertFalse(CourseTeamMembership.is_user_on_team(user, team))
@@ -458,7 +458,7 @@ class TeamMembershipImportManagerTests(TeamMembershipEventTestMixin, SharedModul
             ['user', 'mode', 'teamset_1'],
             [user.username, mode, 'new_exciting_team'],
         ])
-        result = self.import_manager.set_team_memberships(csv_data)
+        result = self.import_manager.set_team_memberships(csv_data)  # lint-amnesty, pylint: disable=unused-variable
 
         # Then a new team is created
         self.assertEqual(CourseTeam.objects.all().count(), 1)

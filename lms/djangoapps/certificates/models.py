@@ -56,7 +56,7 @@ import six
 from config_models.models import ConfigurationModel
 from django.apps import apps
 from django.conf import settings
-from django.contrib.auth.models import User
+from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
 from django.db import models, transaction
 from django.db.models import Count
@@ -69,16 +69,17 @@ from model_utils.models import TimeStampedModel
 from opaque_keys.edx.django.models import CourseKeyField
 from simple_history.models import HistoricalRecords
 
+from common.djangoapps.course_modes.models import CourseMode
+from common.djangoapps.util.milestones_helpers import fulfill_course_milestone, is_prerequisite_courses_enabled
 from lms.djangoapps.badges.events.course_complete import course_badge_check
 from lms.djangoapps.badges.events.course_meta import completion_check, course_group_check
-from common.djangoapps.course_modes.models import CourseMode
 from lms.djangoapps.instructor_task.models import InstructorTask
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.signals.signals import COURSE_CERT_AWARDED, COURSE_CERT_CHANGED, COURSE_CERT_REVOKED
 from openedx.core.djangoapps.xmodule_django.models import NoneToEmptyManager
-from common.djangoapps.util.milestones_helpers import fulfill_course_milestone, is_prerequisite_courses_enabled
 
-LOGGER = logging.getLogger(__name__)
+log = logging.getLogger(__name__)
+User = get_user_model()
 
 
 class CertificateStatuses(object):
@@ -213,7 +214,7 @@ class EligibleCertificateManager(models.Manager):
         Return a queryset for `GeneratedCertificate` models, filtering out
         ineligible certificates.
         """
-        return super(EligibleCertificateManager, self).get_queryset().exclude(
+        return super().get_queryset().exclude(
             status__in=(CertificateStatuses.audit_passing, CertificateStatuses.audit_notpassing)
         )
 
@@ -232,7 +233,7 @@ class EligibleAvailableCertificateManager(EligibleCertificateManager):
         Return a queryset for `GeneratedCertificate` models, filtering out
         ineligible certificates and any linked to nonexistent courses.
         """
-        return super(EligibleAvailableCertificateManager, self).get_queryset().extra(
+        return super().get_queryset().extra(
             tables=['course_overviews_courseoverview'],
             where=['course_id = course_overviews_courseoverview.id']
         )
@@ -248,7 +249,7 @@ class GeneratedCertificate(models.Model):
     """
     # Import here instead of top of file since this module gets imported before
     # the course_modes app is loaded, resulting in a Django deprecation warning.
-    from common.djangoapps.course_modes.models import CourseMode
+    from common.djangoapps.course_modes.models import CourseMode  # pylint: disable=reimported
 
     # Only returns eligible certificates. This should be used in
     # preference to the default `objects` manager in most cases.
@@ -273,7 +274,7 @@ class GeneratedCertificate(models.Model):
         'executive-education'
     )
 
-    VERIFIED_CERTS_MODES = [CourseMode.VERIFIED, CourseMode.CREDIT_MODE, CourseMode.MASTERS, CourseMode.EXECUTIVE_EDUCATION]
+    VERIFIED_CERTS_MODES = [CourseMode.VERIFIED, CourseMode.CREDIT_MODE, CourseMode.MASTERS, CourseMode.EXECUTIVE_EDUCATION]  # pylint: disable=line-too-long
 
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     course_id = CourseKeyField(max_length=255, blank=True, default=None)
@@ -372,6 +373,11 @@ class GeneratedCertificate(models.Model):
             4 - grade = ''
             5 - status = 'unavailable'
         """
+        log.info('Marking certificate as unavailable for {user} : {course}'.format(
+            user=self.user.id,
+            course=self.course_id
+        ))
+
         self.verify_uuid = ''
         self.download_uuid = ''
         self.download_url = ''
@@ -390,6 +396,11 @@ class GeneratedCertificate(models.Model):
         """
         Invalidates a Generated Certificate by marking it as not passing
         """
+        log.info('Marking certificate as notpassing for {user} : {course}'.format(
+            user=self.user.id,
+            course=self.course_id
+        ))
+
         self.verify_uuid = ''
         self.download_uuid = ''
         self.download_url = ''
@@ -403,13 +414,13 @@ class GeneratedCertificate(models.Model):
         """
         return self.status == CertificateStatuses.downloadable
 
-    def save(self, *args, **kwargs):
+    def save(self, *args, **kwargs):  # pylint: disable=signature-differs
         """
         After the base save() method finishes, fire the COURSE_CERT_AWARDED
         signal iff we are saving a record of a learner passing the course.
         As well as the COURSE_CERT_CHANGED for any save event.
         """
-        super(GeneratedCertificate, self).save(*args, **kwargs)
+        super().save(*args, **kwargs)
         COURSE_CERT_CHANGED.send_robust(
             sender=self.__class__,
             user=self.user,
@@ -503,6 +514,13 @@ class CertificateInvalidation(TimeStampedModel):
     invalidated_by = models.ForeignKey(User, on_delete=models.CASCADE)
     notes = models.TextField(default=None, null=True)
     active = models.BooleanField(default=True)
+
+    # This is necessary because CMS does not install the certificates app, but
+    # this code is run when other models in this file are imported there (or in
+    # common code). Simple History will attempt to connect to the installed
+    # model in the certificates app, which will fail.
+    if 'certificates' in apps.app_configs:
+        history = HistoricalRecords()
 
     class Meta(object):
         app_label = "certificates"
@@ -619,7 +637,7 @@ def certificate_status(generated_certificate):
     """
     # Import here instead of top of file since this module gets imported before
     # the course_modes app is loaded, resulting in a Django deprecation warning.
-    from common.djangoapps.course_modes.models import CourseMode
+    from common.djangoapps.course_modes.models import CourseMode  # pylint: disable=redefined-outer-name, reimported
 
     if generated_certificate:
         cert_status = {
@@ -704,7 +722,7 @@ class ExampleCertificateSet(TimeStampedModel):
         """
         # Import here instead of top of file since this module gets imported before
         # the course_modes app is loaded, resulting in a Django deprecation warning.
-        from common.djangoapps.course_modes.models import CourseMode
+        from common.djangoapps.course_modes.models import CourseMode  # pylint: disable=redefined-outer-name, reimported
         cert_set = cls.objects.create(course_key=course_key)
 
         ExampleCertificate.objects.bulk_create([
@@ -969,8 +987,8 @@ class CertificateGenerationCourseSetting(TimeStampedModel):
         help_text=(
             u"Display estimated time to complete the course, which is equal to the maximum hours of effort per week "
             u"times the length of the course in weeks. This attribute will only be displayed in a certificate when the "
-            u"attributes 'Weeks to complete' and 'Max effort' have been provided for the course run and its certificate "
-            u"template includes Hours of Effort."
+            u"attributes 'Weeks to complete' and 'Max effort' have been provided for the course run and its "
+            u"certificate template includes Hours of Effort."
         )
     )
 
@@ -1079,8 +1097,8 @@ class CertificateHtmlViewConfiguration(ConfigurationModel):
         """
         try:
             json.loads(self.configuration)
-        except ValueError:
-            raise ValidationError('Must be valid JSON string.')
+        except ValueError as e:
+            raise ValidationError('Must be valid JSON string.') from e
 
     @classmethod
     def get_config(cls):
@@ -1205,10 +1223,10 @@ class CertificateTemplateAsset(TimeStampedModel):
         if self.pk is None:
             asset_image = self.asset
             self.asset = None
-            super(CertificateTemplateAsset, self).save(*args, **kwargs)
+            super().save(*args, **kwargs)
             self.asset = asset_image
 
-        super(CertificateTemplateAsset, self).save(*args, **kwargs)
+        super().save(*args, **kwargs)
 
     def __str__(self):
         return u'%s' % (self.asset.url, )

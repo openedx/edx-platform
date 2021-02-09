@@ -33,18 +33,18 @@ from opaque_keys.edx.locator import CourseLocator
 from six.moves import range
 
 from ..models import SEND_TO_LEARNERS, SEND_TO_MYSELF, SEND_TO_STAFF, CourseEmail, Optout
-from lms.djangoapps.bulk_email.tasks import _get_course_email_context
-from lms.djangoapps.instructor_task.models import InstructorTask
-from lms.djangoapps.instructor_task.subtasks import SubtaskStatus, update_subtask_status
-from lms.djangoapps.instructor_task.tasks import send_bulk_course_email
-from lms.djangoapps.instructor_task.tests.factories import InstructorTaskFactory
-from lms.djangoapps.instructor_task.tests.test_base import InstructorTaskCourseTestCase
-from xmodule.modulestore.tests.factories import CourseFactory
+from lms.djangoapps.bulk_email.tasks import _get_course_email_context  # lint-amnesty, pylint: disable=wrong-import-order
+from lms.djangoapps.instructor_task.models import InstructorTask  # lint-amnesty, pylint: disable=wrong-import-order
+from lms.djangoapps.instructor_task.subtasks import SubtaskStatus, update_subtask_status  # lint-amnesty, pylint: disable=wrong-import-order
+from lms.djangoapps.instructor_task.tasks import send_bulk_course_email  # lint-amnesty, pylint: disable=wrong-import-order
+from lms.djangoapps.instructor_task.tests.factories import InstructorTaskFactory  # lint-amnesty, pylint: disable=wrong-import-order
+from lms.djangoapps.instructor_task.tests.test_base import InstructorTaskCourseTestCase  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.tests.factories import CourseFactory  # lint-amnesty, pylint: disable=wrong-import-order
 
 
 class TestTaskFailure(Exception):
     """Dummy exception used for unit tests."""
-    pass
+    pass  # lint-amnesty, pylint: disable=unnecessary-pass
 
 
 def my_update_subtask_status(entry_id, current_task_id, new_subtask_status):
@@ -75,12 +75,12 @@ def my_update_subtask_status(entry_id, current_task_id, new_subtask_status):
         update_subtask_status(entry_id, current_task_id, new_subtask_status)
 
 
-@patch('lms.djangoapps.bulk_email.models.html_to_text', Mock(return_value='Mocking CourseEmail.text_message', autospec=True))
+@patch('lms.djangoapps.bulk_email.models.html_to_text', Mock(return_value='Mocking CourseEmail.text_message', autospec=True))  # lint-amnesty, pylint: disable=line-too-long
 class TestBulkEmailInstructorTask(InstructorTaskCourseTestCase):
     """Tests instructor task that send bulk email."""
 
     def setUp(self):
-        super(TestBulkEmailInstructorTask, self).setUp()
+        super(TestBulkEmailInstructorTask, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.initialize_course()
         self.instructor = self.create_instructor('instructor')
 

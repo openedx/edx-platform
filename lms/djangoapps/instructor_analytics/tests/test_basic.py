@@ -5,23 +5,23 @@ Tests for instructor.basic
 
 
 import ddt
-import datetime
-import json
+import datetime  # lint-amnesty, pylint: disable=unused-import, wrong-import-order
+import json  # lint-amnesty, pylint: disable=wrong-import-order
 
-import pytz
-from django.db.models import Q
-from django.urls import reverse
+import pytz  # lint-amnesty, pylint: disable=unused-import
+from django.db.models import Q  # lint-amnesty, pylint: disable=unused-import
+from django.urls import reverse  # lint-amnesty, pylint: disable=unused-import
 from edx_proctoring.api import create_exam
 from edx_proctoring.models import ProctoredExamStudentAttempt
 from mock import MagicMock, Mock, patch
 from opaque_keys.edx.locator import UsageKey
-from six import text_type
+from six import text_type  # lint-amnesty, pylint: disable=unused-import
 from six.moves import range, zip
 
-from common.djangoapps.course_modes.models import CourseMode
-from common.djangoapps.course_modes.tests.factories import CourseModeFactory
+from common.djangoapps.course_modes.models import CourseMode  # lint-amnesty, pylint: disable=unused-import
+from common.djangoapps.course_modes.tests.factories import CourseModeFactory  # lint-amnesty, pylint: disable=unused-import
 from lms.djangoapps.courseware.tests.factories import InstructorFactory
-from lms.djangoapps.instructor_analytics.basic import (
+from lms.djangoapps.instructor_analytics.basic import (  # lint-amnesty, pylint: disable=unused-import
     AVAILABLE_FEATURES,
     PROFILE_FEATURES,
     STUDENT_FEATURES,
@@ -36,7 +36,7 @@ from lms.djangoapps.instructor_analytics.basic import (
 )
 from openedx.core.djangoapps.course_groups.tests.helpers import CohortFactory
 from common.djangoapps.student.models import CourseEnrollment, CourseEnrollmentAllowed
-from common.djangoapps.student.roles import CourseSalesAdminRole
+from common.djangoapps.student.roles import CourseSalesAdminRole  # lint-amnesty, pylint: disable=unused-import
 from common.djangoapps.student.tests.factories import UserFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
@@ -47,7 +47,7 @@ class TestAnalyticsBasic(ModuleStoreTestCase):
     """ Test basic analytics functions. """
 
     def setUp(self):
-        super(TestAnalyticsBasic, self).setUp()
+        super(TestAnalyticsBasic, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.course_key = self.store.make_course_key('robot', 'course', 'id')
         self.users = tuple(UserFactory() for _ in range(30))
         self.ces = tuple(CourseEnrollment.enroll(user, self.course_key)

@@ -23,7 +23,7 @@ class DraftVersioningModuleStore(SplitMongoModuleStore, ModuleStoreDraftAndPubli
     A subclass of Split that supports a dual-branch fall-back versioning framework
         with a Draft branch that falls back to a Published branch.
     """
-    def create_course(self, org, course, run, user_id, skip_auto_publish=False, **kwargs):
+    def create_course(self, org, course, run, user_id, skip_auto_publish=False, **kwargs):  # lint-amnesty, pylint: disable=arguments-differ
         """
         Creates and returns the course.
 
@@ -38,7 +38,7 @@ class DraftVersioningModuleStore(SplitMongoModuleStore, ModuleStoreDraftAndPubli
         """
         master_branch = kwargs.pop('master_branch', ModuleStoreEnum.BranchName.draft)
         with self.bulk_operations(CourseLocator(org, course, run), ignore_case=True):
-            item = super(DraftVersioningModuleStore, self).create_course(
+            item = super(DraftVersioningModuleStore, self).create_course(  # lint-amnesty, pylint: disable=super-with-arguments
                 org, course, run, user_id, master_branch=master_branch, **kwargs
             )
             if master_branch == ModuleStoreEnum.BranchName.draft and not skip_auto_publish:
@@ -51,7 +51,7 @@ class DraftVersioningModuleStore(SplitMongoModuleStore, ModuleStoreDraftAndPubli
                 # in this; so, this manually calls the grandparent and above methods.
                 with self.branch_setting(ModuleStoreEnum.Branch.draft_preferred, item.id):
                     # NOTE: DO NOT CHANGE THE SUPER. See comment above
-                    super(SplitMongoModuleStore, self).create_course(
+                    super(SplitMongoModuleStore, self).create_course(  # lint-amnesty, pylint: disable=bad-super-call
                         org, course, run, user_id, runtime=item.runtime, **kwargs
                     )
 
@@ -59,7 +59,7 @@ class DraftVersioningModuleStore(SplitMongoModuleStore, ModuleStoreDraftAndPubli
 
     def get_course(self, course_id, depth=0, **kwargs):
         course_id = self._map_revision_to_branch(course_id)
-        return super(DraftVersioningModuleStore, self).get_course(course_id, depth=depth, **kwargs)
+        return super(DraftVersioningModuleStore, self).get_course(course_id, depth=depth, **kwargs)  # lint-amnesty, pylint: disable=super-with-arguments
 
     def get_library(self, library_id, depth=0, head_validation=True, **kwargs):
         if not head_validation and library_id.version_guid:
@@ -67,42 +67,42 @@ class DraftVersioningModuleStore(SplitMongoModuleStore, ModuleStoreDraftAndPubli
                 self, library_id, depth=depth, head_validation=head_validation, **kwargs
             )
         library_id = self._map_revision_to_branch(library_id)
-        return super(DraftVersioningModuleStore, self).get_library(library_id, depth=depth, **kwargs)
+        return super(DraftVersioningModuleStore, self).get_library(library_id, depth=depth, **kwargs)  # lint-amnesty, pylint: disable=super-with-arguments
 
-    def clone_course(self, source_course_id, dest_course_id, user_id, fields=None, revision=None, **kwargs):
+    def clone_course(self, source_course_id, dest_course_id, user_id, fields=None, revision=None, **kwargs):  # lint-amnesty, pylint: disable=arguments-differ
         """
         See :py:meth: xmodule.modulestore.split_mongo.split.SplitMongoModuleStore.clone_course
         """
         dest_course_id = self._map_revision_to_branch(dest_course_id, revision=revision)
-        return super(DraftVersioningModuleStore, self).clone_course(
+        return super(DraftVersioningModuleStore, self).clone_course(  # lint-amnesty, pylint: disable=super-with-arguments
             source_course_id, dest_course_id, user_id, fields=fields, **kwargs
         )
 
-    def get_course_summaries(self, **kwargs):
+    def get_course_summaries(self, **kwargs):  # lint-amnesty, pylint: disable=arguments-differ
         """
         Returns course summaries on the Draft or Published branch depending on the branch setting.
         """
         branch_setting = self.get_branch_setting()
         if branch_setting == ModuleStoreEnum.Branch.draft_preferred:
-            return super(DraftVersioningModuleStore, self).get_course_summaries(
+            return super(DraftVersioningModuleStore, self).get_course_summaries(  # lint-amnesty, pylint: disable=super-with-arguments
                 ModuleStoreEnum.BranchName.draft, **kwargs
             )
         elif branch_setting == ModuleStoreEnum.Branch.published_only:
-            return super(DraftVersioningModuleStore, self).get_course_summaries(
+            return super(DraftVersioningModuleStore, self).get_course_summaries(  # lint-amnesty, pylint: disable=super-with-arguments
                 ModuleStoreEnum.BranchName.published, **kwargs
             )
         else:
             raise InsufficientSpecificationError()
 
-    def get_courses(self, **kwargs):
+    def get_courses(self, **kwargs):  # lint-amnesty, pylint: disable=arguments-differ
         """
         Returns all the courses on the Draft or Published branch depending on the branch setting.
         """
         branch_setting = self.get_branch_setting()
         if branch_setting == ModuleStoreEnum.Branch.draft_preferred:
-            return super(DraftVersioningModuleStore, self).get_courses(ModuleStoreEnum.BranchName.draft, **kwargs)
+            return super(DraftVersioningModuleStore, self).get_courses(ModuleStoreEnum.BranchName.draft, **kwargs)  # lint-amnesty, pylint: disable=super-with-arguments
         elif branch_setting == ModuleStoreEnum.Branch.published_only:
-            return super(DraftVersioningModuleStore, self).get_courses(ModuleStoreEnum.BranchName.published, **kwargs)
+            return super(DraftVersioningModuleStore, self).get_courses(ModuleStoreEnum.BranchName.published, **kwargs)  # lint-amnesty, pylint: disable=super-with-arguments
         else:
             raise InsufficientSpecificationError()
 
@@ -117,14 +117,14 @@ class DraftVersioningModuleStore(SplitMongoModuleStore, ModuleStoreDraftAndPubli
             # version_agnostic b/c of above assumption in docstring
             self.publish(location.version_agnostic(), user_id, blacklist=EXCLUDE_ALL, **kwargs)
 
-    def copy_from_template(self, source_keys, dest_key, user_id, **kwargs):
+    def copy_from_template(self, source_keys, dest_key, user_id, **kwargs):  # lint-amnesty, pylint: disable=arguments-differ
         """
         See :py:meth `SplitMongoModuleStore.copy_from_template`
         """
         source_keys = [self._map_revision_to_branch(key) for key in source_keys]
         dest_key = self._map_revision_to_branch(dest_key)
         head_validation = kwargs.get('head_validation')
-        new_keys = super(DraftVersioningModuleStore, self).copy_from_template(
+        new_keys = super(DraftVersioningModuleStore, self).copy_from_template(  # lint-amnesty, pylint: disable=super-with-arguments
             source_keys, dest_key, user_id, head_validation
         )
         if dest_key.branch == ModuleStoreEnum.BranchName.draft:
@@ -141,14 +141,14 @@ class DraftVersioningModuleStore(SplitMongoModuleStore, ModuleStoreDraftAndPubli
                         keys_to_check.extend(children)
         return new_keys
 
-    def update_item(self, descriptor, user_id, allow_not_found=False, force=False, asides=None, **kwargs):
+    def update_item(self, descriptor, user_id, allow_not_found=False, force=False, asides=None, **kwargs):  # lint-amnesty, pylint: disable=arguments-differ
         old_descriptor_locn = descriptor.location
         descriptor.location = self._map_revision_to_branch(old_descriptor_locn)
         emit_signals = descriptor.location.branch == ModuleStoreEnum.BranchName.published \
             or descriptor.location.block_type in DIRECT_ONLY_CATEGORIES
 
         with self.bulk_operations(descriptor.location.course_key, emit_signals=emit_signals):
-            item = super(DraftVersioningModuleStore, self).update_item(
+            item = super(DraftVersioningModuleStore, self).update_item(  # lint-amnesty, pylint: disable=super-with-arguments
                 descriptor,
                 user_id,
                 allow_not_found=allow_not_found,
@@ -169,7 +169,7 @@ class DraftVersioningModuleStore(SplitMongoModuleStore, ModuleStoreDraftAndPubli
         emit_signals = course_key.branch == ModuleStoreEnum.BranchName.published \
             or block_type in DIRECT_ONLY_CATEGORIES
         with self.bulk_operations(course_key, emit_signals=emit_signals):
-            item = super(DraftVersioningModuleStore, self).create_item(
+            item = super(DraftVersioningModuleStore, self).create_item(  # lint-amnesty, pylint: disable=super-with-arguments
                 user_id, course_key, block_type, block_id=block_id,
                 definition_locator=definition_locator, fields=fields, asides=asides,
                 force=force, **kwargs
@@ -184,7 +184,7 @@ class DraftVersioningModuleStore(SplitMongoModuleStore, ModuleStoreDraftAndPubli
     ):
         parent_usage_key = self._map_revision_to_branch(parent_usage_key)
         with self.bulk_operations(parent_usage_key.course_key):
-            item = super(DraftVersioningModuleStore, self).create_child(
+            item = super(DraftVersioningModuleStore, self).create_child(  # lint-amnesty, pylint: disable=super-with-arguments
                 user_id, parent_usage_key, block_type, block_id=block_id,
                 fields=fields, asides=asides, **kwargs
             )
@@ -193,7 +193,7 @@ class DraftVersioningModuleStore(SplitMongoModuleStore, ModuleStoreDraftAndPubli
             self._auto_publish_no_children(parent_usage_key, item.location.block_type, user_id, **kwargs)
             return item
 
-    def delete_item(self, location, user_id, revision=None, skip_auto_publish=False, **kwargs):
+    def delete_item(self, location, user_id, revision=None, skip_auto_publish=False, **kwargs):  # lint-amnesty, pylint: disable=arguments-differ
         """
         Delete the given item from persistence. kwargs allow modulestore specific parameters.
 
@@ -218,7 +218,7 @@ class DraftVersioningModuleStore(SplitMongoModuleStore, ModuleStoreDraftAndPubli
         autopublish_parent = False
         with self.bulk_operations(location.course_key):
             if isinstance(location, LibraryUsageLocator):
-                branches_to_delete = [ModuleStoreEnum.BranchName.library]  # Libraries don't yet have draft/publish support
+                branches_to_delete = [ModuleStoreEnum.BranchName.library]  # Libraries don't yet have draft/publish support  # lint-amnesty, pylint: disable=line-too-long
             elif location.block_type in DIRECT_ONLY_CATEGORIES:
                 branches_to_delete = [ModuleStoreEnum.BranchName.published, ModuleStoreEnum.BranchName.draft]
             elif revision == ModuleStoreEnum.RevisionOption.all:
@@ -238,7 +238,7 @@ class DraftVersioningModuleStore(SplitMongoModuleStore, ModuleStoreDraftAndPubli
             self._flag_publish_event(location.course_key)
             for branch in branches_to_delete:
                 branched_location = location.for_branch(branch)
-                super(DraftVersioningModuleStore, self).delete_item(branched_location, user_id)
+                super(DraftVersioningModuleStore, self).delete_item(branched_location, user_id)  # lint-amnesty, pylint: disable=super-with-arguments
 
             if autopublish_parent:
                 self.publish(parent_loc.version_agnostic(), user_id, blacklist=EXCLUDE_ALL, **kwargs)
@@ -269,29 +269,29 @@ class DraftVersioningModuleStore(SplitMongoModuleStore, ModuleStoreDraftAndPubli
         else:
             raise UnsupportedRevisionError()
 
-    def has_item(self, usage_key, revision=None):
+    def has_item(self, usage_key, revision=None):  # lint-amnesty, pylint: disable=arguments-differ
         """
         Returns True if location exists in this ModuleStore.
         """
         usage_key = self._map_revision_to_branch(usage_key, revision=revision)
-        return super(DraftVersioningModuleStore, self).has_item(usage_key)
+        return super(DraftVersioningModuleStore, self).has_item(usage_key)  # lint-amnesty, pylint: disable=super-with-arguments
 
-    def get_item(self, usage_key, depth=0, revision=None, **kwargs):
+    def get_item(self, usage_key, depth=0, revision=None, **kwargs):  # lint-amnesty, pylint: disable=arguments-differ
         """
         Returns the item identified by usage_key and revision.
         """
         usage_key = self._map_revision_to_branch(usage_key, revision=revision)
-        return super(DraftVersioningModuleStore, self).get_item(usage_key, depth=depth, **kwargs)
+        return super(DraftVersioningModuleStore, self).get_item(usage_key, depth=depth, **kwargs)  # lint-amnesty, pylint: disable=super-with-arguments
 
-    def get_items(self, course_locator, revision=None, **kwargs):
+    def get_items(self, course_locator, revision=None, **kwargs):  # lint-amnesty, pylint: disable=arguments-differ
         """
         Returns a list of XModuleDescriptor instances for the matching items within the course with
         the given course_locator.
         """
         course_locator = self._map_revision_to_branch(course_locator, revision=revision)
-        return super(DraftVersioningModuleStore, self).get_items(course_locator, **kwargs)
+        return super(DraftVersioningModuleStore, self).get_items(course_locator, **kwargs)  # lint-amnesty, pylint: disable=super-with-arguments
 
-    def get_parent_location(self, location, revision=None, **kwargs):
+    def get_parent_location(self, location, revision=None, **kwargs):  # lint-amnesty, pylint: disable=arguments-differ
         '''
         Returns the given location's parent location in this course.
         Args:
@@ -306,7 +306,7 @@ class DraftVersioningModuleStore(SplitMongoModuleStore, ModuleStoreDraftAndPubli
         if revision == ModuleStoreEnum.RevisionOption.draft_preferred:
             revision = ModuleStoreEnum.RevisionOption.draft_only
         location = self._map_revision_to_branch(location, revision=revision)
-        return super(DraftVersioningModuleStore, self).get_parent_location(location, **kwargs)
+        return super(DraftVersioningModuleStore, self).get_parent_location(location, **kwargs)  # lint-amnesty, pylint: disable=super-with-arguments
 
     def get_block_original_usage(self, usage_key):
         """
@@ -315,18 +315,18 @@ class DraftVersioningModuleStore(SplitMongoModuleStore, ModuleStoreDraftAndPubli
         copy was inherited.
         """
         usage_key = self._map_revision_to_branch(usage_key)
-        return super(DraftVersioningModuleStore, self).get_block_original_usage(usage_key)
+        return super(DraftVersioningModuleStore, self).get_block_original_usage(usage_key)  # lint-amnesty, pylint: disable=super-with-arguments
 
     def get_orphans(self, course_key, **kwargs):
         course_key = self._map_revision_to_branch(course_key)
-        return super(DraftVersioningModuleStore, self).get_orphans(course_key, **kwargs)
+        return super(DraftVersioningModuleStore, self).get_orphans(course_key, **kwargs)  # lint-amnesty, pylint: disable=super-with-arguments
 
-    def fix_not_found(self, course_key, user_id):
+    def fix_not_found(self, course_key, user_id):  # lint-amnesty, pylint: disable=arguments-differ
         """
         Fix any children which point to non-existent blocks in the course's published and draft branches
         """
         for branch in [ModuleStoreEnum.RevisionOption.published_only, ModuleStoreEnum.RevisionOption.draft_only]:
-            super(DraftVersioningModuleStore, self).fix_not_found(
+            super(DraftVersioningModuleStore, self).fix_not_found(  # lint-amnesty, pylint: disable=super-with-arguments
                 self._map_revision_to_branch(course_key, branch),
                 user_id
             )
@@ -368,12 +368,12 @@ class DraftVersioningModuleStore(SplitMongoModuleStore, ModuleStoreDraftAndPubli
 
         return has_changes_subtree(BlockKey.from_usage_key(xblock.location))
 
-    def publish(self, location, user_id, blacklist=None, **kwargs):
+    def publish(self, location, user_id, blacklist=None, **kwargs):  # lint-amnesty, pylint: disable=arguments-differ
         """
         Publishes the subtree under location from the draft branch to the published branch
         Returns the newly published item.
         """
-        super(DraftVersioningModuleStore, self).copy(
+        super(DraftVersioningModuleStore, self).copy(  # lint-amnesty, pylint: disable=super-with-arguments
             user_id,
             # Directly using the replace function rather than the for_branch function
             # because for_branch obliterates the version_guid and will lead to missed version conflicts.
@@ -492,7 +492,7 @@ class DraftVersioningModuleStore(SplitMongoModuleStore, ModuleStoreDraftAndPubli
                 old_parent_location = original_parent_location.course_key.make_usage_key(block_key.type, block_key.id)
                 self.update_item_parent(item_location, original_parent_location, old_parent_location, user_id)
 
-    def force_publish_course(self, course_locator, user_id, commit=False):
+    def force_publish_course(self, course_locator, user_id, commit=False):  # lint-amnesty, pylint: disable=unused-argument
         """
         Helper method to forcefully publish a course,
         making the published branch point to the same structure as the draft branch.
@@ -514,19 +514,19 @@ class DraftVersioningModuleStore(SplitMongoModuleStore, ModuleStoreDraftAndPubli
                     return self.get_course_index(course_locator)['versions']
         return versions
 
-    def get_course_history_info(self, course_locator):
+    def get_course_history_info(self, course_locator):  # lint-amnesty, pylint: disable=arguments-differ
         """
         See :py:meth `xmodule.modulestore.split_mongo.split.SplitMongoModuleStore.get_course_history_info`
         """
         course_locator = self._map_revision_to_branch(course_locator)
-        return super(DraftVersioningModuleStore, self).get_course_history_info(course_locator)
+        return super(DraftVersioningModuleStore, self).get_course_history_info(course_locator)  # lint-amnesty, pylint: disable=super-with-arguments
 
     def get_course_successors(self, course_locator, version_history_depth=1):
         """
         See :py:meth `xmodule.modulestore.split_mongo.split.SplitMongoModuleStore.get_course_successors`
         """
         course_locator = self._map_revision_to_branch(course_locator)
-        return super(DraftVersioningModuleStore, self).get_course_successors(
+        return super(DraftVersioningModuleStore, self).get_course_successors(  # lint-amnesty, pylint: disable=super-with-arguments
             course_locator, version_history_depth=version_history_depth
         )
 
@@ -535,7 +535,7 @@ class DraftVersioningModuleStore(SplitMongoModuleStore, ModuleStoreDraftAndPubli
         See :py:meth `xmodule.modulestore.split_mongo.split.SplitMongoModuleStore.get_block_generations`
         """
         block_locator = self._map_revision_to_branch(block_locator)
-        return super(DraftVersioningModuleStore, self).get_block_generations(block_locator)
+        return super(DraftVersioningModuleStore, self).get_block_generations(block_locator)  # lint-amnesty, pylint: disable=super-with-arguments
 
     def has_published_version(self, xblock):
         """
@@ -550,7 +550,7 @@ class DraftVersioningModuleStore(SplitMongoModuleStore, ModuleStoreDraftAndPubli
         :param source: the location of the source (its revision must be None)
         """
         # This is a no-op in Split since a draft version of the data always remains
-        pass
+        pass  # lint-amnesty, pylint: disable=unnecessary-pass
 
     def _get_head(self, xblock, branch):
         """ Gets block at the head of specified branch """
@@ -592,7 +592,7 @@ class DraftVersioningModuleStore(SplitMongoModuleStore, ModuleStoreDraftAndPubli
                     # Importing the block and publishing the block links the draft & published blocks' version history.
                     draft_block = self.import_xblock(user_id, draft_course, block_type, block_id, fields,
                                                      runtime, **kwargs)
-                    return self.publish(draft_block.location.version_agnostic(), user_id, blacklist=EXCLUDE_ALL, **kwargs)
+                    return self.publish(draft_block.location.version_agnostic(), user_id, blacklist=EXCLUDE_ALL, **kwargs)  # lint-amnesty, pylint: disable=line-too-long
 
             # do the import
             partitioned_fields = self.partition_fields_by_scope(block_type, fields)
@@ -614,12 +614,12 @@ class DraftVersioningModuleStore(SplitMongoModuleStore, ModuleStoreDraftAndPubli
 
     @contract(asset_key='AssetKey')
     def find_asset_metadata(self, asset_key, **kwargs):
-        return super(DraftVersioningModuleStore, self).find_asset_metadata(
+        return super(DraftVersioningModuleStore, self).find_asset_metadata(  # lint-amnesty, pylint: disable=super-with-arguments
             self._map_revision_to_branch(asset_key), **kwargs
         )
 
     def get_all_asset_metadata(self, course_key, asset_type, start=0, maxresults=-1, sort=None, **kwargs):
-        return super(DraftVersioningModuleStore, self).get_all_asset_metadata(
+        return super(DraftVersioningModuleStore, self).get_all_asset_metadata(  # lint-amnesty, pylint: disable=super-with-arguments
             self._map_revision_to_branch(course_key), asset_type, start, maxresults, sort, **kwargs
         )
 
@@ -628,11 +628,11 @@ class DraftVersioningModuleStore(SplitMongoModuleStore, ModuleStoreDraftAndPubli
         Updates both the published and draft branches
         """
         # if one call gets an exception, don't do the other call but pass on the exception
-        super(DraftVersioningModuleStore, self)._update_course_assets(
+        super(DraftVersioningModuleStore, self)._update_course_assets(  # lint-amnesty, pylint: disable=super-with-arguments
             user_id, self._map_revision_to_branch(asset_key, ModuleStoreEnum.RevisionOption.published_only),
             update_function
         )
-        super(DraftVersioningModuleStore, self)._update_course_assets(
+        super(DraftVersioningModuleStore, self)._update_course_assets(  # lint-amnesty, pylint: disable=super-with-arguments
             user_id, self._map_revision_to_branch(asset_key, ModuleStoreEnum.RevisionOption.draft_only),
             update_function
         )
@@ -646,17 +646,17 @@ class DraftVersioningModuleStore(SplitMongoModuleStore, ModuleStoreDraftAndPubli
         for asset_md in asset_metadata_list:
             asset_key = asset_md.asset_id
             asset_md.asset_id = self._map_revision_to_branch(asset_key, ModuleStoreEnum.RevisionOption.published_only)
-        super(DraftVersioningModuleStore, self).save_asset_metadata_list(asset_metadata_list, user_id, import_only)
+        super(DraftVersioningModuleStore, self).save_asset_metadata_list(asset_metadata_list, user_id, import_only)  # lint-amnesty, pylint: disable=super-with-arguments
         for asset_md in asset_metadata_list:
             asset_key = asset_md.asset_id
             asset_md.asset_id = self._map_revision_to_branch(asset_key, ModuleStoreEnum.RevisionOption.draft_only)
-        super(DraftVersioningModuleStore, self).save_asset_metadata_list(asset_metadata_list, user_id, import_only)
+        super(DraftVersioningModuleStore, self).save_asset_metadata_list(asset_metadata_list, user_id, import_only)  # lint-amnesty, pylint: disable=super-with-arguments
         # Change each asset key back to its original state.
         for k in asset_keys:
             asset_md.asset_id = k
 
     def _find_course_asset(self, asset_key):
-        return super(DraftVersioningModuleStore, self)._find_course_asset(
+        return super(DraftVersioningModuleStore, self)._find_course_asset(  # lint-amnesty, pylint: disable=super-with-arguments
             self._map_revision_to_branch(asset_key)
         )
 
@@ -664,7 +664,7 @@ class DraftVersioningModuleStore(SplitMongoModuleStore, ModuleStoreDraftAndPubli
         """
         Split specific lookup
         """
-        return super(DraftVersioningModuleStore, self)._find_course_assets(
+        return super(DraftVersioningModuleStore, self)._find_course_assets(  # lint-amnesty, pylint: disable=super-with-arguments
             self._map_revision_to_branch(course_key)
         )
 
@@ -673,7 +673,7 @@ class DraftVersioningModuleStore(SplitMongoModuleStore, ModuleStoreDraftAndPubli
         Copies to and from both branches
         """
         for revision in [ModuleStoreEnum.RevisionOption.published_only, ModuleStoreEnum.RevisionOption.draft_only]:
-            super(DraftVersioningModuleStore, self).copy_all_asset_metadata(
+            super(DraftVersioningModuleStore, self).copy_all_asset_metadata(  # lint-amnesty, pylint: disable=super-with-arguments
                 self._map_revision_to_branch(source_course_key, revision),
                 self._map_revision_to_branch(dest_course_key, revision),
                 user_id

@@ -18,7 +18,7 @@ class SignatureValidator(RequestValidator):
     """
 
     def __init__(self, lti_consumer):
-        super(SignatureValidator, self).__init__()
+        super(SignatureValidator, self).__init__()  # lint-amnesty, pylint: disable=super-with-arguments
         self.endpoint = SignatureOnlyEndpoint(self)
         self.lti_consumer = lti_consumer
 
@@ -31,7 +31,7 @@ class SignatureValidator(RequestValidator):
     # on the platform.
     enforce_ssl = False
 
-    def check_client_key(self, key):
+    def check_client_key(self, key):  # lint-amnesty, pylint: disable=arguments-differ
         """
         Verify that the key supplied by the LTI consumer is valid for an LTI
         launch. This method is only concerned with the structure of the key;
@@ -141,13 +141,13 @@ class SignatureValidator(RequestValidator):
         """
         raise NotImplementedError
 
-    def dummy_access_token(self):
+    def dummy_access_token(self):  # lint-amnesty, pylint: disable=invalid-overridden-method
         """
         Unused abstract method from super class. See documentation in RequestValidator
         """
         raise NotImplementedError
 
-    def dummy_client(self):
+    def dummy_client(self):  # lint-amnesty, pylint: disable=invalid-overridden-method
         """
         Unused abstract method from super class. See documentation in RequestValidator
         """
@@ -172,7 +172,7 @@ class SignatureValidator(RequestValidator):
         """
         raise NotImplementedError
 
-    def dummy_request_token(self):
+    def dummy_request_token(self):  # lint-amnesty, pylint: disable=invalid-overridden-method
         """
         Unused abstract method from super class. See documentation in RequestValidator
         """

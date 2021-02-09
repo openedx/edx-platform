@@ -6,7 +6,7 @@ import time
 import unittest
 
 import ddt
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.core.management import call_command
 from django.db import IntegrityError, connection
 from django.db.transaction import TransactionManagementError, atomic
@@ -54,7 +54,7 @@ class TransactionManagersTestCase(TransactionTestCase):
         class RequestThread(threading.Thread):
             """ A thread which runs a dummy view."""
             def __init__(self, delay, **kwargs):
-                super(RequestThread, self).__init__(**kwargs)
+                super(RequestThread, self).__init__(**kwargs)  # lint-amnesty, pylint: disable=super-with-arguments
                 self.delay = delay
                 self.status = {}
 

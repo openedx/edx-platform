@@ -13,7 +13,7 @@ class TestDerivedSettings(TestCase):
     Test settings that are derived from other settings.
     """
     def setUp(self):
-        super(TestDerivedSettings, self).setUp()
+        super(TestDerivedSettings, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         clear_for_tests()
         self.module = sys.modules[__name__]
         self.module.SIMPLE_VALUE = 'paneer'

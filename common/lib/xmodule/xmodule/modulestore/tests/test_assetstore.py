@@ -36,7 +36,7 @@ class AssetStoreTestData(object):
     now = datetime.now(pytz.utc)
     user_id = 144
     if six.PY2:
-        user_id_long = long(user_id)
+        user_id_long = long(user_id)  # lint-amnesty, pylint: disable=undefined-variable
     else:
         user_id_long = int(user_id)
 
@@ -47,7 +47,6 @@ class AssetStoreTestData(object):
         'edited_by', 'edited_by_email', 'edited_on', 'created_by', 'created_by_email', 'created_on',
         'curr_version', 'prev_version'
     )
-    # pylint: disable=bad-continuation
     all_asset_data = (
         ('pic1.jpg', 'EKMND332DDBK', 'pix/archive', False,
             user_id_long, user_email, now + timedelta(seconds=10 * 1), user_id_long, user_email, now, '14', '13'),
@@ -76,8 +75,8 @@ class TestSortedAssetList(unittest.TestCase):
     """
 
     def setUp(self):
-        super(TestSortedAssetList, self).setUp()
-        asset_list = [dict(list(zip(AssetStoreTestData.asset_fields, asset))) for asset in AssetStoreTestData.all_asset_data]
+        super(TestSortedAssetList, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        asset_list = [dict(list(zip(AssetStoreTestData.asset_fields, asset))) for asset in AssetStoreTestData.all_asset_data]  # lint-amnesty, pylint: disable=line-too-long
         self.sorted_asset_list_by_filename = SortedAssetList(iterable=asset_list)
         self.sorted_asset_list_by_last_edit = SortedAssetList(iterable=asset_list, key=lambda x: x['edited_on'])
         self.course_key = CourseLocator('org', 'course', 'run')
@@ -108,7 +107,7 @@ class TestMongoAssetMetadataStorage(TestCase):
     }
 
     def setUp(self):
-        super(TestMongoAssetMetadataStorage, self).setUp()
+        super(TestMongoAssetMetadataStorage, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.addTypeEqualityFunc(datetime, self._compare_datetimes)
         self.addTypeEqualityFunc(AssetMetadata, self._compare_metadata)
 
@@ -124,9 +123,9 @@ class TestMongoAssetMetadataStorage(TestCase):
         """
         So we can use the below date comparison
         """
-        if type(mdata1) != type(mdata2):
+        if type(mdata1) != type(mdata2):  # lint-amnesty, pylint: disable=unidiomatic-typecheck
             self.fail(self._formatMessage(msg, u"{} is not same type as {}".format(mdata1, mdata2)))
-        for attr in mdata1.ATTRS_ALLOWED_TO_UPDATE:
+        for attr in mdata1.ATTRS_ALLOWED_TO_UPDATE:  # lint-amnesty, pylint: disable=redefined-outer-name
             self.assertEqual(getattr(mdata1, attr), getattr(mdata2, attr), msg)
 
     def _compare_datetimes(self, datetime1, datetime2, msg=None):
@@ -451,7 +450,6 @@ class TestMongoAssetMetadataStorage(TestCase):
         """
         getting all things which are of type other than 'asset'
         """
-        # pylint: disable=bad-continuation
         with storebuilder.build() as (__, store):
             course = CourseFactory.create(modulestore=store)
 
@@ -488,7 +486,6 @@ class TestMongoAssetMetadataStorage(TestCase):
         """
         Save a list of asset metadata all at once.
         """
-        # pylint: disable=bad-continuation
         with storebuilder.build() as (__, store):
             course = CourseFactory.create(modulestore=store)
 
@@ -528,7 +525,6 @@ class TestMongoAssetMetadataStorage(TestCase):
         """
         Save a list of asset metadata all at once - but with one asset's metadata from a different course.
         """
-        # pylint: disable=bad-continuation
         with storebuilder.build() as (__, store):
             course1 = CourseFactory.create(modulestore=store)
             course2 = CourseFactory.create(modulestore=store)

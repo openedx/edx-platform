@@ -64,11 +64,11 @@ class ChooseModeView(View):
         atomic() block is active, since that would break atomicity.
 
         """
-        return super(ChooseModeView, self).dispatch(*args, **kwargs)
+        return super(ChooseModeView, self).dispatch(*args, **kwargs)  # lint-amnesty, pylint: disable=super-with-arguments
 
     @method_decorator(login_required)
     @method_decorator(transaction.atomic)
-    def get(self, request, course_id, error=None):
+    def get(self, request, course_id, error=None):  # lint-amnesty, pylint: disable=too-many-statements
         """Displays the course mode choice page.
 
         Args:

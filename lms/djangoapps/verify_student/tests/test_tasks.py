@@ -1,3 +1,4 @@
+# lint-amnesty, pylint: disable=missing-module-docstring
 # Lots of patching to stub in our own settings, and HTTP posting
 import ddt
 import mock
@@ -14,7 +15,7 @@ LOGGER_NAME = 'lms.djangoapps.verify_student.tasks'
 
 @patch.dict(settings.VERIFY_STUDENT, FAKE_SETTINGS)
 @ddt.ddt
-class TestPhotoVerificationTasks(TestVerificationBase, MockS3BotoMixin, ModuleStoreTestCase):
+class TestPhotoVerificationTasks(TestVerificationBase, MockS3BotoMixin, ModuleStoreTestCase):  # lint-amnesty, pylint: disable=missing-class-docstring
 
     @mock.patch('lms.djangoapps.verify_student.tasks.log')
     def test_logs_for_retry_until_failure(self, mock_log):

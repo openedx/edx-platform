@@ -65,7 +65,7 @@ class CorsCSRFMiddleware(CsrfViewMiddleware, MiddlewareMixin):
         """Disable the middleware if the feature flag is disabled. """
         if not settings.FEATURES.get('ENABLE_CORS_HEADERS'):
             raise MiddlewareNotUsed()
-        super(CorsCSRFMiddleware, self).__init__(*args, **kwargs)
+        super(CorsCSRFMiddleware, self).__init__(*args, **kwargs)  # lint-amnesty, pylint: disable=super-with-arguments
 
     def process_view(self, request, callback, callback_args, callback_kwargs):
         """Skip the usual CSRF referer check if this is an allowed cross-domain request. """
@@ -74,7 +74,7 @@ class CorsCSRFMiddleware(CsrfViewMiddleware, MiddlewareMixin):
             return
 
         with skip_cross_domain_referer_check(request):
-            return super(CorsCSRFMiddleware, self).process_view(request, callback, callback_args, callback_kwargs)
+            return super(CorsCSRFMiddleware, self).process_view(request, callback, callback_args, callback_kwargs)  # lint-amnesty, pylint: disable=super-with-arguments
 
 
 class CsrfCrossDomainCookieMiddleware(MiddlewareMixin):
@@ -110,7 +110,7 @@ class CsrfCrossDomainCookieMiddleware(MiddlewareMixin):
                 "You must set `CROSS_DOMAIN_CSRF_COOKIE_DOMAIN` when "
                 "`FEATURES['ENABLE_CROSS_DOMAIN_CSRF_COOKIE']` is True."
             )
-        super(CsrfCrossDomainCookieMiddleware, self).__init__(*args, **kwargs)
+        super(CsrfCrossDomainCookieMiddleware, self).__init__(*args, **kwargs)  # lint-amnesty, pylint: disable=super-with-arguments
 
     def process_response(self, request, response):
         """Set the cross-domain CSRF cookie. """

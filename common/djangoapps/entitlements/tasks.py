@@ -1,11 +1,11 @@
-"""
+"""  # lint-amnesty, pylint: disable=django-not-configured
 This file contains celery tasks for entitlements-related functionality.
 """
 
 
 from celery import shared_task
 from celery.utils.log import get_task_logger
-from django.conf import settings
+from django.conf import settings  # lint-amnesty, pylint: disable=unused-import
 from edx_django_utils.monitoring import set_code_owner_attribute
 
 from common.djangoapps.entitlements.models import CourseEntitlement
@@ -19,11 +19,7 @@ LOGGER = get_task_logger(__name__)
 MAX_RETRIES = 11
 
 
-@shared_task(
-    bind=True,
-    ignore_result=True,
-    name='entitlements.expire_old_entitlements',
-)
+@shared_task(bind=True, ignore_result=True)
 @set_code_owner_attribute
 def expire_old_entitlements(self, start, end, logid='...'):
     """
@@ -65,4 +61,4 @@ def expire_old_entitlements(self, start, end, logid='...'):
         # The call above is idempotent, so retry at will
         raise self.retry(exc=exc, countdown=countdown, max_retries=MAX_RETRIES)
 
-    LOGGER.info('Successfully completed the task expire_old_entitlements after examining %d entries [%s]', entitlements.count(), logid)
+    LOGGER.info('Successfully completed the task expire_old_entitlements after examining %d entries [%s]', entitlements.count(), logid)  # lint-amnesty, pylint: disable=line-too-long

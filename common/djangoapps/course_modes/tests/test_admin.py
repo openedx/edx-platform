@@ -91,7 +91,7 @@ class AdminCourseModeFormTest(ModuleStoreTestCase):
         """
         Create a test course.
         """
-        super(AdminCourseModeFormTest, self).setUp()
+        super(AdminCourseModeFormTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.course = CourseFactory.create()
         CourseOverview.load_from_module_store(self.course.id)
 

@@ -52,7 +52,7 @@ class SysadminBaseTestCase(SharedModuleStoreTestCase):
 
     def setUp(self):
         """Setup test case by adding primary user."""
-        super(SysadminBaseTestCase, self).setUp()
+        super(SysadminBaseTestCase, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.user = UserFactory.create(username='test_user',
                                        email='test_user+sysadmin@edx.org',
                                        password='foo')
@@ -99,7 +99,7 @@ class SysadminBaseTestCase(SharedModuleStoreTestCase):
         Create a shell expansion of passed in parameter and iteratively
         remove them.  Must only expand to directories.
         """
-        for path in glob.glob(path):
+        for path in glob.glob(path):  # lint-amnesty, pylint: disable=redefined-argument-from-local
             shutil.rmtree(path)
 
     def _mkdir(self, path):
@@ -243,7 +243,7 @@ class TestSysAdminMongoCourseImport(SysadminBaseTestCase):
         date = CourseImportLog.objects.first().created.replace(tzinfo=UTC)
 
         for timezone in tz_names:
-            with (override_settings(TIME_ZONE=timezone)):
+            with (override_settings(TIME_ZONE=timezone)):  # lint-amnesty, pylint: disable=superfluous-parens
                 date_text = get_time_display(date, tz_format, settings.TIME_ZONE)
                 response = self.client.get(reverse('gitlogs'))
                 self.assertContains(response, date_text)

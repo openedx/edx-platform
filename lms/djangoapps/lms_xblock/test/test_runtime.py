@@ -29,19 +29,19 @@ class BlockMock(Mock):
         """
         A test handler method.
         """
-        pass
+        pass  # lint-amnesty, pylint: disable=unnecessary-pass
 
     def handler1(self, _context):
         """
         A test handler method.
         """
-        pass
+        pass  # lint-amnesty, pylint: disable=unnecessary-pass
 
     def handler_a(self, _context):
         """
         A test handler method.
         """
-        pass
+        pass  # lint-amnesty, pylint: disable=unnecessary-pass
 
     @property
     def location(self):
@@ -54,7 +54,7 @@ class TestHandlerUrl(TestCase):
     """Test the LMS handler_url"""
 
     def setUp(self):
-        super(TestHandlerUrl, self).setUp()
+        super(TestHandlerUrl, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.block = BlockMock(name='block', scope_ids=ScopeIds(None, None, None, 'dummy'))
         self.course_key = CourseLocator("org", "course", "run")
         self.runtime = LmsModuleSystem(
@@ -119,7 +119,7 @@ class TestUserServiceAPI(TestCase):
     """Test the user service interface"""
 
     def setUp(self):
-        super(TestUserServiceAPI, self).setUp()
+        super(TestUserServiceAPI, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.course_id = CourseLocator("org", "course", "run")
         self.user = UserFactory.create()
 
@@ -169,7 +169,7 @@ class TestBadgingService(ModuleStoreTestCase):
     """Test the badging service interface"""
 
     def setUp(self):
-        super(TestBadgingService, self).setUp()
+        super(TestBadgingService, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.course_id = CourseKey.from_string('course-v1:org+course+run')
 
         self.mock_block = Mock()
@@ -235,7 +235,7 @@ class TestI18nService(ModuleStoreTestCase):
 
     def setUp(self):
         """ Setting up tests """
-        super(TestI18nService, self).setUp()
+        super(TestI18nService, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.course = CourseFactory.create()
         self.test_language = 'dummy language'
         self.runtime = LmsModuleSystem(

@@ -19,7 +19,7 @@ class TestUserCalendarSyncConfig(SharedModuleStoreTestCase):
         cls.course_key = cls.course.id
 
     def setUp(self):
-        super(TestUserCalendarSyncConfig, self).setUp()
+        super(TestUserCalendarSyncConfig, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.user = UserFactory(password=TEST_PASSWORD)
 
     def test_is_enabled_for_course(self):

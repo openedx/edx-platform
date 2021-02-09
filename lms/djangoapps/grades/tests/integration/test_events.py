@@ -68,7 +68,7 @@ class GradesEventIntegrationTest(ProblemSubmissionTestMixin, SharedModuleStoreTe
 
     def setUp(self):
         self.reset_course()
-        super(GradesEventIntegrationTest, self).setUp()
+        super(GradesEventIntegrationTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.addCleanup(set_current_request, None)
         self.request = get_mock_request(UserFactory())
         self.student = self.request.user

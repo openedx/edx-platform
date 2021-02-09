@@ -39,7 +39,7 @@ class TestGitExport(CourseTestCase):
         """
         Create/reinitialize bare repo and folders needed
         """
-        super(TestGitExport, self).setUp()
+        super(TestGitExport, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
 
         if not os.path.isdir(git_export_utils.GIT_REPO_EXPORT_DIR):
             os.mkdir(git_export_utils.GIT_REPO_EXPORT_DIR)

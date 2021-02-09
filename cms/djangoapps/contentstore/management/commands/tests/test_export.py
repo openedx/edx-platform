@@ -39,7 +39,7 @@ class TestCourseExport(ModuleStoreTestCase):
     Test exporting a course
     """
     def setUp(self):
-        super(TestCourseExport, self).setUp()
+        super(TestCourseExport, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
 
         # Temp directories (temp_dir_1: relative path, temp_dir_2: absolute path)
         self.temp_dir_1 = mkdtemp()

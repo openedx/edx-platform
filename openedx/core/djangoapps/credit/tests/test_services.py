@@ -22,7 +22,7 @@ class CreditServiceTests(ModuleStoreTestCase):
     """
 
     def setUp(self):
-        super(CreditServiceTests, self).setUp()
+        super(CreditServiceTests, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
 
         self.service = CreditService()
         self.course = CourseFactory.create(org='edX', number='DemoX', display_name='Demo_Course')
@@ -202,7 +202,7 @@ class CreditServiceTests(ModuleStoreTestCase):
         )
 
         # mark the grade as satisfied
-        retval = self.service.set_credit_requirement_status(
+        retval = self.service.set_credit_requirement_status(  # lint-amnesty, pylint: disable=assignment-from-none
             self.user.id,
             self.course.id,
             'grade',
@@ -211,7 +211,7 @@ class CreditServiceTests(ModuleStoreTestCase):
         self.assertIsNone(retval)
 
         # remove the requirement status with the invalid user id
-        retval = self.service.remove_credit_requirement_status(
+        retval = self.service.remove_credit_requirement_status(  # lint-amnesty, pylint: disable=assignment-from-none
             0,
             self.course.id,
             'grade',
@@ -350,7 +350,7 @@ class CreditServiceTests(ModuleStoreTestCase):
         )
 
         # mark the grade as satisfied
-        retval = self.service.set_credit_requirement_status(
+        retval = self.service.set_credit_requirement_status(  # lint-amnesty, pylint: disable=assignment-from-none
             0,
             self.course.id,
             'grade',

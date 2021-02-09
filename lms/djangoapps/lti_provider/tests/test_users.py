@@ -5,7 +5,7 @@ Tests for the LTI user management functionality
 
 import string
 
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.core.exceptions import PermissionDenied
 from django.test import TestCase
 from django.test.client import RequestFactory
@@ -14,7 +14,7 @@ from six.moves import range
 
 from .. import users
 from ..models import LtiConsumer, LtiUser
-from common.djangoapps.student.tests.factories import UserFactory
+from common.djangoapps.student.tests.factories import UserFactory  # lint-amnesty, pylint: disable=wrong-import-order
 
 
 class UserManagementHelperTest(TestCase):
@@ -23,7 +23,7 @@ class UserManagementHelperTest(TestCase):
     """
 
     def setUp(self):
-        super(UserManagementHelperTest, self).setUp()
+        super(UserManagementHelperTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.request = RequestFactory().post('/')
         self.old_user = UserFactory.create()
         self.new_user = UserFactory.create()
@@ -66,7 +66,7 @@ class UserManagementHelperTest(TestCase):
             username = users.generate_random_edx_username()
             self.assertLessEqual(len(username), 30, 'Username too long')
             # Check that the username contains only allowable characters
-            for char in range(len(username)):
+            for char in range(len(username)):  # lint-amnesty, pylint: disable=consider-using-enumerate
                 self.assertIn(
                     username[char], string.ascii_letters + string.digits,
                     u"Username has forbidden character '{}'".format(username[char])
@@ -81,7 +81,7 @@ class AuthenticateLtiUserTest(TestCase):
     """
 
     def setUp(self):
-        super(AuthenticateLtiUserTest, self).setUp()
+        super(AuthenticateLtiUserTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.lti_consumer = LtiConsumer(
             consumer_name='TestConsumer',
             consumer_key='TestKey',
@@ -148,7 +148,7 @@ class CreateLtiUserTest(TestCase):
     """
 
     def setUp(self):
-        super(CreateLtiUserTest, self).setUp()
+        super(CreateLtiUserTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.lti_consumer = LtiConsumer(
             consumer_name='TestConsumer',
             consumer_key='TestKey',
@@ -185,7 +185,7 @@ class LtiBackendTest(TestCase):
     """
 
     def setUp(self):
-        super(LtiBackendTest, self).setUp()
+        super(LtiBackendTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.edx_user = UserFactory.create()
         self.edx_user.save()
         self.lti_consumer = LtiConsumer(

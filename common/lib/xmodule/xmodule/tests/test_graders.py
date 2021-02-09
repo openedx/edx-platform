@@ -368,7 +368,7 @@ class ShowCorrectnessTest(unittest.TestCase):
     """
 
     def setUp(self):
-        super(ShowCorrectnessTest, self).setUp()
+        super(ShowCorrectnessTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
 
         now = datetime.now(UTC)
         day_delta = timedelta(days=1)

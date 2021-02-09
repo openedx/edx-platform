@@ -25,10 +25,10 @@ from django.core.management.base import BaseCommand, CommandError
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
 from six import text_type
-
-from lms.djangoapps.certificates import api as certs_api
-from lms.djangoapps.certificates.models import CertificateStatuses, GeneratedCertificate
 from xmodule.modulestore.django import modulestore
+
+from lms.djangoapps.certificates.api import generate_user_certificates
+from lms.djangoapps.certificates.models import CertificateStatuses, GeneratedCertificate
 
 LOGGER = logging.getLogger(__name__)
 
@@ -64,12 +64,12 @@ class Command(BaseCommand):
         for course_key_str in options['course_key_list']:
             try:
                 only_course_keys.append(CourseKey.from_string(course_key_str))
-            except InvalidKeyError:
+            except InvalidKeyError as e:
                 raise CommandError(
                     u'"{course_key_str}" is not a valid course key.'.format(
                         course_key_str=course_key_str
                     )
-                )
+                ) from e
 
         if only_course_keys:
             LOGGER.info(
@@ -96,7 +96,7 @@ class Command(BaseCommand):
             course = self._load_course_with_cache(course_key, course_cache)
 
             if course is not None:
-                certs_api.generate_user_certificates(user, course_key, course=course)
+                generate_user_certificates(user, course_key, course=course)
                 resubmit_count += 1
                 LOGGER.info(
                     (

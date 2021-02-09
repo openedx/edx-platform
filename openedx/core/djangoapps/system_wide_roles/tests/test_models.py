@@ -13,7 +13,7 @@ class SystemWideRoleTests(TestCase):
     """ Tests for SystemWideRole in system_wide_roles app """
 
     def setUp(self):
-        super(SystemWideRoleTests, self).setUp()
+        super(SystemWideRoleTests, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.role = SystemWideRole.objects.create(name='TestRole')
 
     def test_str(self):
@@ -27,7 +27,7 @@ class SystemWideRoleAssignmentTests(TestCase):
     """ Tests for SystemWideRoleAssignment in system_wide_roles app """
 
     def setUp(self):
-        super(SystemWideRoleAssignmentTests, self).setUp()
+        super(SystemWideRoleAssignmentTests, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.user = UserFactory.create()
         self.role = SystemWideRole.objects.create(name='TestRole')
 

@@ -17,7 +17,7 @@ class BlockStructureAdmin(ConfigurationModelAdmin):
         """
         Excludes unused 'enabled field from super's list.
         """
-        displayable_field_names = super(BlockStructureAdmin, self).get_displayable_field_names()
+        displayable_field_names = super(BlockStructureAdmin, self).get_displayable_field_names()  # lint-amnesty, pylint: disable=super-with-arguments
         displayable_field_names.remove('enabled')
         return displayable_field_names
 

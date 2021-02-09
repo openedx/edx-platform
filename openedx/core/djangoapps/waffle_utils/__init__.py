@@ -1,4 +1,4 @@
-"""
+"""  # lint-amnesty, pylint: disable=django-not-configured
 Extra utilities for waffle: most classes are defined in edx_toggles.toggles (https://edx-toggles.readthedocs.io/), but
 we keep here some extra classes for usage within edx-platform. These classes cover course override use cases.
 """
@@ -196,6 +196,5 @@ class CourseWaffleFlag(LegacyWaffleFlag):
             )
         is_enabled_for_course = self._get_course_override_value(course_key)
         if is_enabled_for_course is not None:
-            self.set_monitor_value(is_enabled_for_course)
             return is_enabled_for_course
         return super().is_enabled()

@@ -21,7 +21,7 @@
     </div>
   % endif
   % endif
-  % if not gated_sequence_fragment:
+  % if not gated_sequence_paywall:
   <div class="sequence-nav">
     <button class="sequence-nav-button button-previous">
       <span class="icon fa fa-chevron-prev" aria-hidden="true"></span>
@@ -103,11 +103,11 @@
   % if not exclude_units:
   % if gated_content['gated']:
     <%include file="_gated_content.html" args="prereq_url=gated_content['prereq_url'], prereq_section_name=gated_content['prereq_section_name'], gated_section_name=gated_content['gated_section_name']"/>
-  % elif gated_sequence_fragment:
+  % elif gated_sequence_paywall:
     <h2 class="hd hd-2 unit-title">
         ${sequence_name}<span class="sr">${_("Content Locked")}</span>
     </h2>
-    ${gated_sequence_fragment | n, decode.utf8}
+    ${gated_sequence_paywall | n, decode.utf8}
   % else:
   <div class="sr-is-focusable" tabindex="-1"></div>
 

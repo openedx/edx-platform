@@ -88,7 +88,7 @@ class BasketsView(APIView):
                     u'Failed to handle marketing opt-in flag: user="%s", course="%s"', user.username, course_key
                 )
 
-    def post(self, request, *args, **kwargs):
+    def post(self, request, *args, **kwargs):  # lint-amnesty, pylint: disable=unused-argument
         """
         Attempt to enroll the user.
         """

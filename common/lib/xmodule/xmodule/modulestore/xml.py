@@ -1,6 +1,6 @@
+# lint-amnesty, pylint: disable=missing-module-docstring
 
-
-import codecs
+import codecs  # lint-amnesty, pylint: disable=unused-import
 import glob
 import hashlib
 import io
@@ -33,7 +33,7 @@ from xmodule.mako_module import MakoDescriptorSystem
 from xmodule.modulestore import COURSE_ROOT, LIBRARY_ROOT, ModuleStoreEnum, ModuleStoreReadBase
 from xmodule.modulestore.xml_exporter import DEFAULT_CONTENT_FIELDS
 from xmodule.tabs import CourseTabList
-from xmodule.x_module import (
+from xmodule.x_module import (  # lint-amnesty, pylint: disable=unused-import
     DEPRECATION_VSCOMPAT_EVENT,
     AsideKeyGenerator,
     OpaqueKeyReader,
@@ -52,8 +52,8 @@ etree.set_default_parser(edx_xml_parser)
 log = logging.getLogger(__name__)
 
 
-class ImportSystem(XMLParsingSystem, MakoDescriptorSystem):
-    def __init__(self, xmlstore, course_id, course_dir,
+class ImportSystem(XMLParsingSystem, MakoDescriptorSystem):  # lint-amnesty, pylint: disable=abstract-method, missing-class-docstring
+    def __init__(self, xmlstore, course_id, course_dir,  # lint-amnesty, pylint: disable=too-many-statements
                  error_tracker,
                  load_error_modules=True, target_course_id=None, **kwargs):
         """
@@ -71,7 +71,7 @@ class ImportSystem(XMLParsingSystem, MakoDescriptorSystem):
         self.load_error_modules = load_error_modules
         self.modulestore = xmlstore
 
-        def process_xml(xml):
+        def process_xml(xml):  # lint-amnesty, pylint: disable=too-many-statements
             """Takes an xml string, and returns a XBlock created from
             that xml.
             """
@@ -91,7 +91,7 @@ class ImportSystem(XMLParsingSystem, MakoDescriptorSystem):
 
                 attr = xml_data.attrib
                 tag = xml_data.tag
-                id = lambda x: x
+                id = lambda x: x  # lint-amnesty, pylint: disable=redefined-builtin
                 # Things to try to get a name, in order  (key, cleaning function, remove key after reading?)
                 lookups = [('url_name', id, False),
                            ('slug', id, True),
@@ -236,7 +236,7 @@ class ImportSystem(XMLParsingSystem, MakoDescriptorSystem):
 
         id_manager = CourseImportLocationManager(course_id, target_course_id)
 
-        super(ImportSystem, self).__init__(
+        super(ImportSystem, self).__init__(  # lint-amnesty, pylint: disable=super-with-arguments
             load_item=load_item,
             resources_fs=resources_fs,
             render_template=render_template,
@@ -249,7 +249,7 @@ class ImportSystem(XMLParsingSystem, MakoDescriptorSystem):
 
     # id_generator is ignored, because each ImportSystem is already local to
     # a course, and has it's own id_generator already in place
-    def add_node_as_child(self, block, node, id_generator):
+    def add_node_as_child(self, block, node, id_generator):  # lint-amnesty, pylint: disable=signature-differs
         child_block = self.process_xml(etree.tostring(node))
         block.children.append(child_block.scope_ids.usage_id)
 
@@ -260,7 +260,7 @@ class CourseLocationManager(OpaqueKeyReader, AsideKeyGenerator):
     based within a course
     """
     def __init__(self, course_id):
-        super(CourseLocationManager, self).__init__()
+        super(CourseLocationManager, self).__init__()  # lint-amnesty, pylint: disable=super-with-arguments
         self.course_id = course_id
         self.autogen_ids = itertools.count(0)
 
@@ -300,7 +300,7 @@ class CourseImportLocationManager(CourseLocationManager):
     see https://openedx.atlassian.net/browse/MA-417 as a pending TODO.
     """
     def __init__(self, course_id, target_course_id):
-        super(CourseImportLocationManager, self).__init__(course_id=course_id)
+        super(CourseImportLocationManager, self).__init__(course_id=course_id)  # lint-amnesty, pylint: disable=super-with-arguments
         self.target_course_id = target_course_id
 
 
@@ -328,7 +328,7 @@ class XMLModuleStore(ModuleStoreReadBase):
             source_dirs or course_ids (list of str): If specified, the list of source_dirs or course_ids to load.
                 Otherwise, load all courses. Note, providing both
         """
-        super(XMLModuleStore, self).__init__(**kwargs)
+        super(XMLModuleStore, self).__init__(**kwargs)  # lint-amnesty, pylint: disable=super-with-arguments
 
         self.data_dir = path(data_dir)
         self.modules = defaultdict(dict)  # course_id -> dict(location -> XBlock)
@@ -429,7 +429,7 @@ class XMLModuleStore(ModuleStoreReadBase):
         except (IOError, ValueError) as err:
             msg = "ERROR: loading courselike policy from {0}".format(policy_path)
             tracker(msg)
-            log.warning(msg + " " + str(err))
+            log.warning(msg + " " + str(err))  # lint-amnesty, pylint: disable=logging-not-lazy
         return {}
 
     def load_course(self, course_dir, course_ids, tracker, target_course_id=None):
@@ -587,7 +587,7 @@ class XMLModuleStore(ModuleStoreReadBase):
         # always used, preventing duplicate keys.
         return CourseKey.from_string('/'.join([org, course, url_name]))
 
-    def load_extra_content(self, system, course_descriptor, category, base_dir, course_dir, url_name):
+    def load_extra_content(self, system, course_descriptor, category, base_dir, course_dir, url_name):  # lint-amnesty, pylint: disable=missing-function-docstring
         self._load_extra_content(system, course_descriptor, category, base_dir, course_dir)
 
         # then look in a override folder based on the course run
@@ -670,7 +670,7 @@ class XMLModuleStore(ModuleStoreReadBase):
                             DictFieldData(data_content),
                         )
                         # VS[compat]:
-                        # Hack because we need to pull in the 'display_name' for static tabs (because we need to edit them)
+                        # Hack because we need to pull in the 'display_name' for static tabs (because we need to edit them)  # lint-amnesty, pylint: disable=line-too-long
                         # from the course policy
                         if category == "static_tab":
                             tab = CourseTabList.get_tab_by_slug(tab_list=course_descriptor.tabs, url_slug=slug)
@@ -692,7 +692,7 @@ class XMLModuleStore(ModuleStoreReadBase):
         """
         return usage_key in self.modules[usage_key.course_key]
 
-    def get_item(self, usage_key, depth=0, **kwargs):
+    def get_item(self, usage_key, depth=0, **kwargs):  # lint-amnesty, pylint: disable=arguments-differ
         """
         Returns an XBlock instance for the item for this UsageKey.
 
@@ -707,9 +707,9 @@ class XMLModuleStore(ModuleStoreReadBase):
         try:
             return self.modules[usage_key.course_key][usage_key]
         except KeyError:
-            raise ItemNotFoundError(usage_key)
+            raise ItemNotFoundError(usage_key)  # lint-amnesty, pylint: disable=raise-missing-from
 
-    def get_items(self, course_id, settings=None, content=None, revision=None, qualifiers=None, **kwargs):
+    def get_items(self, course_id, settings=None, content=None, revision=None, qualifiers=None, **kwargs):  # lint-amnesty, pylint: disable=arguments-differ
         """
         Returns:
             list of XModuleDescriptor instances for the matching items within the course with
@@ -816,7 +816,7 @@ class XMLModuleStore(ModuleStoreReadBase):
         block = self.get_item(location, 0)
         return block.parent
 
-    def get_modulestore_type(self, course_key=None):
+    def get_modulestore_type(self, course_key=None):  # lint-amnesty, pylint: disable=arguments-differ, unused-argument
         """
         Returns an enumeration-like type reflecting the type of this modulestore, per ModuleStoreEnum.Type
         Args:
@@ -844,7 +844,7 @@ class XMLModuleStore(ModuleStoreReadBase):
         return {'xml': True}
 
     @contextmanager
-    def branch_setting(self, branch_setting, course_id=None):
+    def branch_setting(self, branch_setting, course_id=None):  # lint-amnesty, pylint: disable=unused-argument
         """
         A context manager for temporarily setting the branch value for the store to the given branch_setting.
         """
@@ -860,7 +860,7 @@ class XMLModuleStore(ModuleStoreReadBase):
         log.warning("_find_course_asset request of XML modulestore - not implemented.")
         return (None, None)
 
-    def find_asset_metadata(self, asset_key, **kwargs):
+    def find_asset_metadata(self, asset_key, **kwargs):  # lint-amnesty, pylint: disable=useless-return
         """
         For now this is not implemented, but others should feel free to implement using the asset.json
         which export produces.
@@ -892,7 +892,7 @@ class LibraryXMLModuleStore(XMLModuleStore):
     parent_xml = LIBRARY_ROOT
 
     @staticmethod
-    def get_id(org, library, url_name):
+    def get_id(org, library, url_name):  # lint-amnesty, pylint: disable=arguments-differ
         """
         Create a LibraryLocator given an org and library. url_name is ignored, but left in
         for compatibility with the parent signature.

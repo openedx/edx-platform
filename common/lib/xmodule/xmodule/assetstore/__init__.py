@@ -18,7 +18,7 @@ new_contract('CourseKey', CourseKey)
 new_contract('datetime', datetime)
 new_contract('basestring', six.string_types[0])
 if six.PY2:
-    new_contract('long', long)
+    new_contract('long', long)  # lint-amnesty, pylint: disable=undefined-variable
 else:
     new_contract('long', int)
 new_contract('AssetElement', lambda x: isinstance(x, etree._Element) and x.tag == "asset")  # pylint: disable=protected-access
@@ -199,7 +199,7 @@ class AssetMetadata(object):
                     continue
                 elif tag == 'locked':
                     # Boolean.
-                    value = True if value == "true" else False
+                    value = True if value == "true" else False  # lint-amnesty, pylint: disable=simplifiable-if-expression
                 elif value == 'None':
                     # None.
                     value = None

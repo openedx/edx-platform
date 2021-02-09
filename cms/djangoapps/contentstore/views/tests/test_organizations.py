@@ -13,7 +13,7 @@ from common.djangoapps.student.tests.factories import UserFactory
 class TestOrganizationListing(TestCase):
     """Verify Organization listing behavior."""
     def setUp(self):
-        super(TestOrganizationListing, self).setUp()
+        super(TestOrganizationListing, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.staff = UserFactory(is_staff=True)
         self.client.login(username=self.staff.username, password='test')
         self.org_names_listing_url = reverse('organizations')

@@ -7,7 +7,7 @@ import logging
 
 from six import text_type
 
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.http import Http404
 
 from lms.djangoapps.bulk_email.models import Optout
@@ -18,8 +18,8 @@ from lms.djangoapps.discussion.notification_prefs.views import (
     UsernameDecryptionException,
 )
 
-from opaque_keys import InvalidKeyError
-from opaque_keys.edx.keys import CourseKey
+from opaque_keys import InvalidKeyError  # lint-amnesty, pylint: disable=wrong-import-order
+from opaque_keys.edx.keys import CourseKey  # lint-amnesty, pylint: disable=wrong-import-order
 
 
 log = logging.getLogger(__name__)
@@ -41,13 +41,13 @@ def opt_out_email_updates(request, token, course_id):
         course_key = CourseKey.from_string(course_id)
         course = get_course_by_id(course_key, depth=0)
     except UnicodeDecodeError:
-        raise Http404("base64url")
+        raise Http404("base64url")  # lint-amnesty, pylint: disable=raise-missing-from
     except UsernameDecryptionException as exn:
-        raise Http404(text_type(exn))
+        raise Http404(text_type(exn))  # lint-amnesty, pylint: disable=raise-missing-from
     except User.DoesNotExist:
-        raise Http404("username")
+        raise Http404("username")  # lint-amnesty, pylint: disable=raise-missing-from
     except InvalidKeyError:
-        raise Http404("course")
+        raise Http404("course")  # lint-amnesty, pylint: disable=raise-missing-from
 
     unsub_check = request.POST.get('unsubscribe', False)
     context = {

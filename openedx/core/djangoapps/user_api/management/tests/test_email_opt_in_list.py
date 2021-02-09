@@ -10,7 +10,7 @@ from collections import defaultdict
 
 import ddt
 import six
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.core.management import call_command
 from django.core.management.base import CommandError
 from six import text_type
@@ -50,7 +50,7 @@ class EmailOptInListTest(ModuleStoreTestCase):
     DEFAULT_DATETIME_STR = "2014-12-01 00:00:00"
 
     def setUp(self):
-        super(EmailOptInListTest, self).setUp()
+        super(EmailOptInListTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
 
         self.user = UserFactory.create(
             username=self.USER_USERNAME,
@@ -413,7 +413,7 @@ class EmailOptInListTest(ModuleStoreTestCase):
         try:
             with open(output_path) as output_file:
                 reader = csv.DictReader(output_file, fieldnames=self.OUTPUT_FIELD_NAMES)
-                rows = [row for row in reader]
+                rows = [row for row in reader]  # lint-amnesty, pylint: disable=unnecessary-comprehension
         except IOError:
             self.fail(u"Could not find or open output file at '{path}'".format(path=output_path))
 

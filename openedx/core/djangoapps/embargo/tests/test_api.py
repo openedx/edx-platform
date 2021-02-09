@@ -49,7 +49,7 @@ class EmbargoCheckAccessApiTests(ModuleStoreTestCase):
     ENABLED_CACHES = ['default', 'mongo_metadata_inheritance', 'loc_cache']
 
     def setUp(self):
-        super(EmbargoCheckAccessApiTests, self).setUp()
+        super(EmbargoCheckAccessApiTests, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.course = CourseFactory.create()
         self.user = UserFactory.create()
         self.restricted_course = RestrictedCourse.objects.create(course_key=self.course.id)
@@ -270,7 +270,7 @@ class EmbargoMessageUrlApiTests(UrlResetMixin, ModuleStoreTestCase):
 
     @patch.dict(settings.FEATURES, {'EMBARGO': True})
     def setUp(self):
-        super(EmbargoMessageUrlApiTests, self).setUp()
+        super(EmbargoMessageUrlApiTests, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.course = CourseFactory.create()
 
     @ddt.data(

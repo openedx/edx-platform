@@ -1,4 +1,4 @@
-"""Third party authentication. """
+"""Third party authentication. """  # lint-amnesty, pylint: disable=django-not-configured
 
 
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers

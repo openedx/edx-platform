@@ -166,9 +166,9 @@ class LmsModuleSystem(ModuleSystem):  # pylint: disable=abstract-method
         services['teams'] = TeamsService()
         services['teams_configuration'] = TeamsConfigurationService()
         services['call_to_action'] = CallToActionService()
-        super(LmsModuleSystem, self).__init__(**kwargs)
+        super(LmsModuleSystem, self).__init__(**kwargs)  # lint-amnesty, pylint: disable=super-with-arguments
 
-    def handler_url(self, *args, **kwargs):
+    def handler_url(self, *args, **kwargs):  # lint-amnesty, pylint: disable=signature-differs
         """
         Implement the XBlock runtime handler_url interface.
 
@@ -244,6 +244,6 @@ class LmsModuleSystem(ModuleSystem):  # pylint: disable=abstract-method
         # (see https://openedx.atlassian.net/browse/TE-811)
         return [
             aside_type
-            for aside_type in super(LmsModuleSystem, self).applicable_aside_types(block)
+            for aside_type in super(LmsModuleSystem, self).applicable_aside_types(block)  # lint-amnesty, pylint: disable=super-with-arguments
             if aside_type != 'acid_aside'
         ]

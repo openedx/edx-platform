@@ -33,8 +33,8 @@ ONE_HOUR_AGO = NOW - timedelta(hours=1)
 TWO_HOURS_AGO = NOW - timedelta(hours=2)
 
 
-def make_mock_responder(subscribed_thread_ids=None, thread_data=None, comment_data=None, per_page=1):
-    def mock_subscribed_threads(method, url, **kwargs):
+def make_mock_responder(subscribed_thread_ids=None, thread_data=None, comment_data=None, per_page=1):  # lint-amnesty, pylint: disable=missing-function-docstring
+    def mock_subscribed_threads(method, url, **kwargs):  # lint-amnesty, pylint: disable=unused-argument
         subscribed_thread_collection = [
             {'id': thread_id} for thread_id in subscribed_thread_ids
         ]
@@ -49,10 +49,10 @@ def make_mock_responder(subscribed_thread_ids=None, thread_data=None, comment_da
         }
         return mock.Mock(status_code=200, text=json.dumps(data), json=mock.Mock(return_value=data))
 
-    def mock_comment_find(method, url, **kwargs):
+    def mock_comment_find(method, url, **kwargs):  # lint-amnesty, pylint: disable=unused-argument
         return mock.Mock(status_code=200, text=json.dumps(comment_data), json=mock.Mock(return_value=comment_data))
 
-    def mock_thread_find(method, url, **kwargs):
+    def mock_thread_find(method, url, **kwargs):  # lint-amnesty, pylint: disable=unused-argument
         return mock.Mock(status_code=200, text=json.dumps(thread_data), json=mock.Mock(return_value=thread_data))
 
     def mock_request(method, url, **kwargs):
@@ -67,7 +67,7 @@ def make_mock_responder(subscribed_thread_ids=None, thread_data=None, comment_da
 
 
 @ddt.ddt
-class TaskTestCase(ModuleStoreTestCase):
+class TaskTestCase(ModuleStoreTestCase):  # lint-amnesty, pylint: disable=missing-class-docstring
 
     @classmethod
     @mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
@@ -106,7 +106,7 @@ class TaskTestCase(ModuleStoreTestCase):
         cls.create_thread_and_comments()
 
     @classmethod
-    def create_thread_and_comments(cls):
+    def create_thread_and_comments(cls):  # lint-amnesty, pylint: disable=missing-function-docstring
         cls.thread = {
             'id': cls.discussion_id,
             'course_id': six.text_type(cls.course.id),
@@ -156,7 +156,7 @@ class TaskTestCase(ModuleStoreTestCase):
         }
 
     def setUp(self):
-        super(TaskTestCase, self).setUp()
+        super(TaskTestCase, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.request_patcher = mock.patch('requests.request')
         self.mock_request = self.request_patcher.start()
 
@@ -168,7 +168,7 @@ class TaskTestCase(ModuleStoreTestCase):
         self.mock_permalink = self.permalink_patcher.start()
 
     def tearDown(self):
-        super(TaskTestCase, self).tearDown()
+        super(TaskTestCase, self).tearDown()  # lint-amnesty, pylint: disable=super-with-arguments
         self.request_patcher.stop()
         self.ace_send_patcher.stop()
         self.permalink_patcher.stop()
@@ -227,7 +227,7 @@ class TaskTestCase(ModuleStoreTestCase):
         else:
             self.assertFalse(self.mock_ace_send.called)
 
-    def _assert_rendered_email(self, message):
+    def _assert_rendered_email(self, message):  # lint-amnesty, pylint: disable=missing-function-docstring
         # check that we can actually render the message
         with emulate_http_request(
             site=message.context['site'], user=self.thread_author

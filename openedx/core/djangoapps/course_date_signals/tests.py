@@ -1,6 +1,7 @@
+# lint-amnesty, pylint: disable=missing-module-docstring
 from datetime import timedelta
 import ddt
-from unittest.mock import patch
+from unittest.mock import patch  # lint-amnesty, pylint: disable=wrong-import-order
 
 from openedx.core.djangoapps.course_date_signals.handlers import _gather_graded_items, _has_assignment_blocks
 from xmodule.modulestore.django import modulestore
@@ -10,7 +11,7 @@ from . import utils
 
 
 @ddt.ddt
-class SelfPacedDueDatesTests(ModuleStoreTestCase):
+class SelfPacedDueDatesTests(ModuleStoreTestCase):  # lint-amnesty, pylint: disable=missing-class-docstring
     def setUp(self):
         super().setUp()
         self.course = CourseFactory.create()
@@ -25,7 +26,7 @@ class SelfPacedDueDatesTests(ModuleStoreTestCase):
             (3, 'Section 3', timedelta(days=28)),
         ]
         with patch.object(utils, 'get_expected_duration', return_value=timedelta(weeks=4)):
-            actual = [(idx, section.display_name, offset) for (idx, section, offset) in utils.spaced_out_sections(self.course)]
+            actual = [(idx, section.display_name, offset) for (idx, section, offset) in utils.spaced_out_sections(self.course)]  # lint-amnesty, pylint: disable=line-too-long
 
         self.assertEqual(actual, expected_sections)
 
@@ -39,7 +40,7 @@ class SelfPacedDueDatesTests(ModuleStoreTestCase):
             (3, 'Section 3', timedelta(days=28)),
         ]
         with patch.object(utils, 'get_expected_duration', return_value=timedelta(weeks=4)):
-            actual = [(idx, section.display_name, offset) for (idx, section, offset) in utils.spaced_out_sections(self.course)]
+            actual = [(idx, section.display_name, offset) for (idx, section, offset) in utils.spaced_out_sections(self.course)]  # lint-amnesty, pylint: disable=line-too-long
 
         self.assertEqual(actual, expected_sections)
 

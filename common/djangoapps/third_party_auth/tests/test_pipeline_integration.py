@@ -2,7 +2,7 @@
 
 
 import datetime
-import unittest
+import unittest  # lint-amnesty, pylint: disable=unused-import
 
 import ddt
 import mock
@@ -27,7 +27,7 @@ class TestCase(testutil.TestCase, test.TestCase):
     """Base test case."""
 
     def setUp(self):
-        super(TestCase, self).setUp()
+        super(TestCase, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.enabled_provider = self.configure_google_provider(enabled=True)
 
 
@@ -35,7 +35,7 @@ class GetAuthenticatedUserTestCase(TestCase):
     """Tests for get_authenticated_user."""
 
     def setUp(self):
-        super(GetAuthenticatedUserTestCase, self).setUp()
+        super(GetAuthenticatedUserTestCase, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.user = social_models.DjangoStorage.user.create_user(username='username', password='password')
 
     def get_by_username(self, username):
@@ -75,7 +75,7 @@ class GetProviderUserStatesTestCase(TestCase):
     """Tests generation of ProviderUserStates."""
 
     def setUp(self):
-        super(GetProviderUserStatesTestCase, self).setUp()
+        super(GetProviderUserStatesTestCase, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.configure_google_provider(enabled=False)
         self.user = social_models.DjangoStorage.user.create_user(username='username', password='password')
 
@@ -129,7 +129,7 @@ class GetProviderUserStatesTestCase(TestCase):
 
         states = pipeline.get_provider_user_states(self.user)
 
-        self.assertEqual([], [x for x in social_models.DjangoStorage.user.objects.all()])
+        self.assertEqual([], [x for x in social_models.DjangoStorage.user.objects.all()])  # lint-amnesty, pylint: disable=unnecessary-comprehension
         self.assertEqual(2, len(states))
 
         google_state = [state for state in states if state.provider.provider_id == google_provider.provider_id][0]
@@ -217,7 +217,7 @@ class TestPipelineUtilityFunctions(TestCase):
     Test some of the isolated utility functions in the pipeline
     """
     def setUp(self):
-        super(TestPipelineUtilityFunctions, self).setUp()
+        super(TestPipelineUtilityFunctions, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.user = social_models.DjangoStorage.user.create_user(username='username', password='password')
         self.social_auth = social_models.UserSocialAuth.objects.create(
             user=self.user,
@@ -307,7 +307,7 @@ class EnsureUserInformationTestCase(TestCase):
     """Tests ensuring that we have the necessary user information to proceed with the pipeline."""
 
     def setUp(self):
-        super(EnsureUserInformationTestCase, self).setUp()
+        super(EnsureUserInformationTestCase, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.user = social_models.DjangoStorage.user.create_user(
             username='username',
             password='password',
@@ -325,12 +325,12 @@ class EnsureUserInformationTestCase(TestCase):
         based on the provider's setting for send_to_registration_first.
         """
 
-        provider = mock.MagicMock(
+        provider = mock.MagicMock(  # lint-amnesty, pylint: disable=redefined-outer-name
             send_to_registration_first=send_to_registration_first,
             skip_email_verification=False
         )
 
-        with mock.patch('common.djangoapps.third_party_auth.pipeline.provider.Registry.get_from_pipeline') as get_from_pipeline:
+        with mock.patch('common.djangoapps.third_party_auth.pipeline.provider.Registry.get_from_pipeline') as get_from_pipeline:  # lint-amnesty, pylint: disable=line-too-long
             get_from_pipeline.return_value = provider
             with mock.patch('social_core.pipeline.partial.partial_prepare') as partial_prepare:
                 partial_prepare.return_value = mock.MagicMock(token='')
@@ -363,7 +363,7 @@ class EnsureUserInformationTestCase(TestCase):
             send_to_registration_first=True,
             skip_email_verification=False
         )
-        with mock.patch('common.djangoapps.third_party_auth.pipeline.provider.Registry.get_from_pipeline') as get_from_pipeline:
+        with mock.patch('common.djangoapps.third_party_auth.pipeline.provider.Registry.get_from_pipeline') as get_from_pipeline:  # lint-amnesty, pylint: disable=line-too-long
             get_from_pipeline.return_value = saml_provider
             with mock.patch(
                 'common.djangoapps.third_party_auth.pipeline.provider.Registry.get_enabled_by_backend_name'
@@ -387,7 +387,7 @@ class UserDetailsForceSyncTestCase(TestCase):
     """Tests to ensure learner profile data is properly synced if the provider requires it."""
 
     def setUp(self):
-        super(UserDetailsForceSyncTestCase, self).setUp()
+        super(UserDetailsForceSyncTestCase, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.user = UserFactory.create()
         self.old_email = self.user.email
         self.old_username = self.user.username
@@ -404,7 +404,7 @@ class UserDetailsForceSyncTestCase(TestCase):
         self.strategy = mock.MagicMock()
         self.strategy.storage.user.changed.side_effect = lambda user: user.save()
 
-        get_from_pipeline = mock.patch('common.djangoapps.third_party_auth.pipeline.provider.Registry.get_from_pipeline')
+        get_from_pipeline = mock.patch('common.djangoapps.third_party_auth.pipeline.provider.Registry.get_from_pipeline')  # lint-amnesty, pylint: disable=line-too-long
         self.get_from_pipeline = get_from_pipeline.start()
         self.get_from_pipeline.return_value = mock.MagicMock(sync_learner_profile_data=True)
         self.addCleanup(get_from_pipeline.stop)
@@ -491,7 +491,7 @@ class SetIDVerificationStatusTestCase(TestCase):
     """Tests to ensure SSO ID Verification for the user is set if the provider requires it."""
 
     def setUp(self):
-        super(SetIDVerificationStatusTestCase, self).setUp()
+        super(SetIDVerificationStatusTestCase, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.user = UserFactory.create()
         self.provider_class_name = 'common.djangoapps.third_party_auth.models.SAMLProviderConfig'
         self.provider_slug = 'default'
@@ -501,7 +501,7 @@ class SetIDVerificationStatusTestCase(TestCase):
         self.strategy = mock.MagicMock()
         self.strategy.storage.user.changed.side_effect = lambda user: user.save()
 
-        get_from_pipeline = mock.patch('common.djangoapps.third_party_auth.pipeline.provider.Registry.get_from_pipeline')
+        get_from_pipeline = mock.patch('common.djangoapps.third_party_auth.pipeline.provider.Registry.get_from_pipeline')  # lint-amnesty, pylint: disable=line-too-long
         self.get_from_pipeline = get_from_pipeline.start()
         self.get_from_pipeline.return_value = mock.MagicMock(
             enable_sso_id_verification=True,
@@ -565,7 +565,7 @@ class SetIDVerificationStatusTestCase(TestCase):
             identity_provider_slug=self.provider_slug,
         )
 
-        with mock.patch('common.djangoapps.third_party_auth.pipeline.earliest_allowed_verification_date') as earliest_date:
+        with mock.patch('common.djangoapps.third_party_auth.pipeline.earliest_allowed_verification_date') as earliest_date:  # lint-amnesty, pylint: disable=line-too-long
             earliest_date.return_value = datetime.datetime.now(pytz.UTC) + datetime.timedelta(days=1)
             # Begin the pipeline.
             pipeline.set_id_verification_status(

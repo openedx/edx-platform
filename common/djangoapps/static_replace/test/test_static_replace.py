@@ -135,7 +135,7 @@ def test_mongo_filestore(mock_get_excluded_extensions, mock_get_base_url, mock_m
 @patch('common.djangoapps.static_replace.settings', autospec=True)
 @patch('xmodule.modulestore.django.modulestore', autospec=True)
 @patch('common.djangoapps.static_replace.staticfiles_storage', autospec=True)
-def test_data_dir_fallback(mock_storage, mock_modulestore, mock_settings):
+def test_data_dir_fallback(mock_storage, mock_modulestore, mock_settings):  # lint-amnesty, pylint: disable=unused-argument
     mock_modulestore.return_value = Mock(XMLModuleStore)
     mock_storage.url.side_effect = Exception
 
@@ -169,8 +169,8 @@ def test_static_url_with_query(mock_modulestore, mock_storage):
     mock_storage.exists.return_value = False
     mock_modulestore.return_value = Mock(MongoModuleStore)
 
-    pre_text = 'EMBED src ="/static/LAlec04_controller.swf?csConfigFile=/static/LAlec04_config.xml&name1=value1&name2=value2"'
-    post_text = 'EMBED src ="/c4x/org/course/asset/LAlec04_controller.swf?csConfigFile=%2Fc4x%2Forg%2Fcourse%2Fasset%2FLAlec04_config.xml&name1=value1&name2=value2"'
+    pre_text = 'EMBED src ="/static/LAlec04_controller.swf?csConfigFile=/static/LAlec04_config.xml&name1=value1&name2=value2"'  # lint-amnesty, pylint: disable=line-too-long
+    post_text = 'EMBED src ="/c4x/org/course/asset/LAlec04_controller.swf?csConfigFile=%2Fc4x%2Forg%2Fcourse%2Fasset%2FLAlec04_config.xml&name1=value1&name2=value2"'  # lint-amnesty, pylint: disable=line-too-long
     assert replace_static_urls(pre_text, DATA_DIRECTORY, COURSE_KEY) == post_text
 
 
@@ -189,13 +189,13 @@ def test_static_paths_out(mock_modulestore, mock_storage):
     mock_modulestore.return_value = Mock(MongoModuleStore)
 
     static_url = '/static/LAlec04_controller.swf?csConfigFile=/static/LAlec04_config.xml&name1=value1&name2=value2'
-    static_course_url = '/c4x/org/course/asset/LAlec04_controller.swf?csConfigFile=%2Fc4x%2Forg%2Fcourse%2Fasset%2FLAlec04_config.xml&name1=value1&name2=value2'
+    static_course_url = '/c4x/org/course/asset/LAlec04_controller.swf?csConfigFile=%2Fc4x%2Forg%2Fcourse%2Fasset%2FLAlec04_config.xml&name1=value1&name2=value2'  # lint-amnesty, pylint: disable=line-too-long
     raw_url = '/static/js/capa/protex/protex.nocache.js?raw'
     xblock_url = '/static/xblock/resources/babys_first.lil_xblock/public/images/pacifier.png'
     # xss-lint: disable=python-wrap-html
     pre_text = 'EMBED src ="{}" xblock={} text <tag a="{}"/><div class="'.format(static_url, xblock_url, raw_url)
     # xss-lint: disable=python-wrap-html
-    post_text = 'EMBED src ="{}" xblock={} text <tag a="{}"/><div class="'.format(static_course_url, xblock_url, raw_url)
+    post_text = 'EMBED src ="{}" xblock={} text <tag a="{}"/><div class="'.format(static_course_url, xblock_url, raw_url)  # lint-amnesty, pylint: disable=line-too-long
     static_paths = []
     assert replace_static_urls(pre_text, DATA_DIRECTORY, COURSE_KEY, static_paths_out=static_paths) == post_text
     assert static_paths == [(static_url, static_course_url), (raw_url, raw_url)]

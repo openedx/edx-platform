@@ -53,7 +53,7 @@ class TestSendCourseUpdate(ScheduleUpsellTestMixin, ScheduleSendEmailTestMixin, 
     queries_deadline_for_each_course = True
 
     def setUp(self):
-        super(TestSendCourseUpdate, self).setUp()
+        super(TestSendCourseUpdate, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.highlights_patcher = patch('openedx.core.djangoapps.schedules.resolvers.get_week_highlights')
         mock_highlights = self.highlights_patcher.start()
         mock_highlights.return_value = [u'Highlight {}'.format(num + 1) for num in range(3)]
@@ -90,7 +90,7 @@ class TestSendCourseUpdate(ScheduleUpsellTestMixin, ScheduleSendEmailTestMixin, 
 
     @ddt.data(
         ExperienceTest(experience=ScheduleExperience.EXPERIENCES.default, offset=expected_offsets[0], email_sent=False),
-        ExperienceTest(experience=ScheduleExperience.EXPERIENCES.course_updates, offset=expected_offsets[0], email_sent=True),
+        ExperienceTest(experience=ScheduleExperience.EXPERIENCES.course_updates, offset=expected_offsets[0], email_sent=True),  # lint-amnesty, pylint: disable=line-too-long
         ExperienceTest(experience=None, offset=expected_offsets[0], email_sent=False),
     )
     def test_schedule_in_different_experience(self, test_config):

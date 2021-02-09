@@ -10,7 +10,7 @@ from milestones.tests.utils import MilestonesTestCaseMixin
 from mock import Mock, patch
 
 from capa.tests.response_xml_factory import MultipleChoiceResponseXMLFactory
-from edx_toggles.toggles.testutils import override_waffle_flag
+from edx_toggles.toggles.testutils import override_waffle_flag  # lint-amnesty, pylint: disable=wrong-import-order
 from lms.djangoapps.courseware.entrance_exams import (
     course_has_entrance_exam,
     get_entrance_exam_content,
@@ -52,7 +52,7 @@ class EntranceExamTestCases(LoginEnrollmentTestCase, ModuleStoreTestCase, Milest
         """
         Test case scaffolding
         """
-        super(EntranceExamTestCases, self).setUp()
+        super(EntranceExamTestCases, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.course = CourseFactory.create(
             metadata={
                 'entrance_exam_enabled': True,

@@ -6,7 +6,7 @@ import json
 
 from rest_framework.reverse import reverse
 
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.test import TestCase
 
 from openedx.core.djangoapps.api_admin.tests import factories
@@ -21,7 +21,7 @@ class ApiAccessRequestViewTests(TestCase):
     """
     password = 'test'
 
-    def setUp(self):
+    def setUp(self):  # lint-amnesty, pylint: disable=super-method-not-called
         """
         Perform operations common to all test cases.
         """
@@ -47,8 +47,8 @@ class ApiAccessRequestViewTests(TestCase):
         Assert API response on `API Access Request` endpoint.
         """
         json_content = json.loads(api_response.content.decode('utf-8'))
-        self.assertEqual(api_response.status_code, 200)
-        self.assertEqual(json_content['count'], expected_results_count)
+        assert api_response.status_code == 200
+        assert json_content['count'] == expected_results_count
 
     def test_list_view_for_not_authenticated_user(self):
         """
@@ -66,7 +66,7 @@ class ApiAccessRequestViewTests(TestCase):
         self.client.logout()
 
         response = self.client.get(self.url)
-        self.assertEqual(response.status_code, 401)
+        assert response.status_code == 401
 
     def test_list_view_for_staff_user(self):
         """
@@ -94,5 +94,5 @@ class ApiAccessRequestViewTests(TestCase):
         self.update_user_and_re_login(is_staff=True)
 
         response = self.client.get(self.url + '?user__username={}'.format('non-existing-user-name'))
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
         self._assert_api_access_request_response(api_response=response, expected_results_count=0)

@@ -10,7 +10,7 @@ import mock
 from completion.test_utils import CompletionWaffleTestMixin, submit_completions_for_testing
 from django.conf import settings
 from django.test.client import RequestFactory
-from django.urls import reverse
+from django.urls import reverse  # lint-amnesty, pylint: disable=unused-import
 
 from lms.djangoapps.certificates.api import get_certificate_url
 from lms.djangoapps.certificates.tests.factories import (
@@ -131,7 +131,7 @@ class CourseApiTestViews(BaseCoursewareTests):
                                               'The audit track does not include a certificate.')
                     assert response.data['certificate_data']['msg'] == expected_audit_message
                     assert response.data['verify_identity_url'] is None
-                    assert response.data['verification_status'] is 'none'
+                    assert response.data['verification_status'] is 'none'  # lint-amnesty, pylint: disable=literal-comparison
                     assert response.data['linkedin_add_to_profile_url'] is None
                 else:
                     assert response.data['certificate_data']['cert_status'] == 'earned_but_not_available'
@@ -140,7 +140,7 @@ class CourseApiTestViews(BaseCoursewareTests):
                     )
                     # The response contains an absolute URL so this is only checking the path of the final
                     assert expected_verify_identity_url in response.data['verify_identity_url']
-                    assert response.data['verification_status'] is 'none'
+                    assert response.data['verification_status'] is 'none'  # lint-amnesty, pylint: disable=literal-comparison
 
                     request = RequestFactory().request()
                     cert_url = get_certificate_url(course_id=self.course.id, uuid=cert.verify_uuid)

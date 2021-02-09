@@ -34,7 +34,7 @@ class RestrictedApplication(models.Model):
     class Meta:
         app_label = 'oauth_dispatch'
 
-    def __str__(self):
+    def __str__(self):  # lint-amnesty, pylint: disable=invalid-str-returned
         """
         Return a unicode representation of this object
         """
@@ -104,7 +104,7 @@ class ApplicationAccess(models.Model):
         return cls.objects.get(application=application).filters
 
     @classmethod
-    def get_filter_values(cls, application, filter_name):
+    def get_filter_values(cls, application, filter_name):  # lint-amnesty, pylint: disable=missing-function-docstring
         filters = cls.get_filters(application=application)
         if filters:
             for filter_constraint in filters:

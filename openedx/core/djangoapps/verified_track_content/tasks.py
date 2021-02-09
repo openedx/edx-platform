@@ -5,9 +5,9 @@ Celery task for Automatic Verifed Track Cohorting MVP feature.
 
 import six
 
-from celery.task import task
+from celery import shared_task
 from celery.utils.log import get_task_logger
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from edx_django_utils.monitoring import set_code_owner_attribute
 from opaque_keys.edx.keys import CourseKey
 
@@ -17,7 +17,7 @@ from common.djangoapps.student.models import CourseEnrollment, CourseMode
 LOGGER = get_task_logger(__name__)
 
 
-@task(bind=True, default_retry_delay=60, max_retries=2)
+@shared_task(bind=True, default_retry_delay=60, max_retries=2)
 @set_code_owner_attribute
 def sync_cohort_with_mode(self, course_id, user_id, verified_cohort_name, default_cohort_name):
     """

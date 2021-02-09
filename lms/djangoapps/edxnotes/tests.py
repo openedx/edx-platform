@@ -30,15 +30,15 @@ from . import helpers
 from .decorators import edxnotes
 from .exceptions import EdxNotesParseError, EdxNotesServiceUnavailable
 from .plugins import EdxNotesTab
-from openedx.core.djangoapps.oauth_dispatch.jwt import create_jwt_for_user
-from openedx.core.djangoapps.oauth_dispatch.tests.factories import ApplicationFactory
-from openedx.core.djangoapps.user_api.models import RetirementState, UserRetirementStatus
-from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, SuperuserFactory, UserFactory
-from xmodule.modulestore import ModuleStoreEnum
-from xmodule.modulestore.django import modulestore
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
-from xmodule.tabs import CourseTab
+from openedx.core.djangoapps.oauth_dispatch.jwt import create_jwt_for_user  # lint-amnesty, pylint: disable=wrong-import-order
+from openedx.core.djangoapps.oauth_dispatch.tests.factories import ApplicationFactory  # lint-amnesty, pylint: disable=wrong-import-order
+from openedx.core.djangoapps.user_api.models import RetirementState, UserRetirementStatus  # lint-amnesty, pylint: disable=wrong-import-order
+from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, SuperuserFactory, UserFactory  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore import ModuleStoreEnum  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.tabs import CourseTab  # lint-amnesty, pylint: disable=wrong-import-order
 
 FEATURES = settings.FEATURES.copy()
 
@@ -100,14 +100,14 @@ class EdxNotesDecoratorTest(ModuleStoreTestCase):
     """
 
     def setUp(self):
-        super(EdxNotesDecoratorTest, self).setUp()
+        super(EdxNotesDecoratorTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
 
         ApplicationFactory(name="edx-notes")
         # Using old mongo because of locator comparison issues (see longer
         # note below in EdxNotesHelpersTest setUp.
         self.course = CourseFactory(edxnotes=True, default_store=ModuleStoreEnum.Type.mongo)
         self.user = UserFactory()
-        self.client.login(username=self.user.username, password=UserFactory._DEFAULT_PASSWORD)
+        self.client.login(username=self.user.username, password=UserFactory._DEFAULT_PASSWORD)  # lint-amnesty, pylint: disable=protected-access
         self.problem = TestProblem(self.course, self.user)
 
     @patch.dict("django.conf.settings.FEATURES", {'ENABLE_EDXNOTES': True})
@@ -205,7 +205,7 @@ class EdxNotesHelpersTest(ModuleStoreTestCase):
         """
         Setup a dummy course content.
         """
-        super(EdxNotesHelpersTest, self).setUp()
+        super(EdxNotesHelpersTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
 
         # There are many tests that are comparing locators as returned from helper methods. When using
         # the split modulestore, some of those locators have version and branch information, but the
@@ -241,7 +241,7 @@ class EdxNotesHelpersTest(ModuleStoreTestCase):
             self.child_html_module = self.store.get_item(self.child_html_module.location)
 
             self.user = UserFactory()
-            self.client.login(username=self.user.username, password=UserFactory._DEFAULT_PASSWORD)
+            self.client.login(username=self.user.username, password=UserFactory._DEFAULT_PASSWORD)  # lint-amnesty, pylint: disable=protected-access
 
         self.request = RequestFactory().request()
         self.request.user = self.user
@@ -978,23 +978,23 @@ class EdxNotesViewsTest(ModuleStoreTestCase):
     """
     def setUp(self):
         ApplicationFactory(name="edx-notes")
-        super(EdxNotesViewsTest, self).setUp()
+        super(EdxNotesViewsTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.course = CourseFactory(edxnotes=True)
         self.user = UserFactory()
-        CourseEnrollmentFactory(user=self.user, course_id=self.course.id)
-        self.client.login(username=self.user.username, password=UserFactory._DEFAULT_PASSWORD)
-        self.notes_page_url = reverse("edxnotes", args=[text_type(self.course.id)])
-        self.notes_url = reverse("notes", args=[text_type(self.course.id)])
-        self.get_token_url = reverse("get_token", args=[text_type(self.course.id)])
-        self.visibility_url = reverse("edxnotes_visibility", args=[text_type(self.course.id)])
+        CourseEnrollmentFactory(user=self.user, course_id=self.course.id)  # lint-amnesty, pylint: disable=no-member
+        self.client.login(username=self.user.username, password=UserFactory._DEFAULT_PASSWORD)  # lint-amnesty, pylint: disable=protected-access
+        self.notes_page_url = reverse("edxnotes", args=[text_type(self.course.id)])  # lint-amnesty, pylint: disable=no-member
+        self.notes_url = reverse("notes", args=[text_type(self.course.id)])  # lint-amnesty, pylint: disable=no-member
+        self.get_token_url = reverse("get_token", args=[text_type(self.course.id)])  # lint-amnesty, pylint: disable=no-member
+        self.visibility_url = reverse("edxnotes_visibility", args=[text_type(self.course.id)])  # lint-amnesty, pylint: disable=no-member
 
     def _get_course_module(self):
         """
         Returns the course module.
         """
-        field_data_cache = FieldDataCache([self.course], self.course.id, self.user)
+        field_data_cache = FieldDataCache([self.course], self.course.id, self.user)  # lint-amnesty, pylint: disable=no-member
         return get_module_for_descriptor(
-            self.user, MagicMock(), self.course, field_data_cache, self.course.id, course=self.course
+            self.user, MagicMock(), self.course, field_data_cache, self.course.id, course=self.course  # lint-amnesty, pylint: disable=no-member
         )
 
     def test_edxnotes_tab(self):
@@ -1030,7 +1030,7 @@ class EdxNotesViewsTest(ModuleStoreTestCase):
     # pylint: disable=unused-argument
     @patch.dict("django.conf.settings.FEATURES", {"ENABLE_EDXNOTES": True})
     @patch("lms.djangoapps.edxnotes.views.get_notes", return_value={'results': []})
-    @patch("lms.djangoapps.edxnotes.views.get_course_position", return_value={'display_name': 'Section 1', 'url': 'test_url'})
+    @patch("lms.djangoapps.edxnotes.views.get_course_position", return_value={'display_name': 'Section 1', 'url': 'test_url'})  # lint-amnesty, pylint: disable=line-too-long
     def test_edxnotes_html_tags_should_not_be_escaped(self, mock_get_notes, mock_position):
         """
         Tests that explicit html tags rendered correctly.
@@ -1167,7 +1167,7 @@ class EdxNotesRetireAPITest(ModuleStoreTestCase):
     """
     def setUp(self):
         ApplicationFactory(name="edx-notes")
-        super(EdxNotesRetireAPITest, self).setUp()
+        super(EdxNotesRetireAPITest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
 
         # setup relevant states
         RetirementState.objects.create(state_name='PENDING', state_execution_order=1)
@@ -1282,7 +1282,7 @@ class EdxNotesPluginTest(ModuleStoreTestCase):
     """
 
     def setUp(self):
-        super(EdxNotesPluginTest, self).setUp()
+        super(EdxNotesPluginTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.course = CourseFactory.create(edxnotes=True)
         self.user = UserFactory()
         CourseEnrollmentFactory.create(user=self.user, course_id=self.course.id)

@@ -26,7 +26,7 @@ class IgnoredFilesTestCase(unittest.TestCase):
     dict_list = [DOT_FILES_DICT, TILDA_FILES_DICT]
 
     def setUp(self):
-        super(IgnoredFilesTestCase, self).setUp()
+        super(IgnoredFilesTestCase, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         for dictionary in self.dict_list:
             self.addCleanup(remove_temp_files_from_list, list(dictionary.keys()), self.course_dir / "static")
             add_temp_files_from_dict(dictionary, self.course_dir / "static")

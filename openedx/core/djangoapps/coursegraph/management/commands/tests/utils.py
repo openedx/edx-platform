@@ -50,7 +50,7 @@ class MockTransaction(object):
         end = query.find("'")
         course_key = query[:end]
 
-        self.graph.nodes = set([
+        self.graph.nodes = set([  # lint-amnesty, pylint: disable=consider-using-set-comprehension
             node for node in self.graph.nodes if node['course_key'] != course_key
         ])
 

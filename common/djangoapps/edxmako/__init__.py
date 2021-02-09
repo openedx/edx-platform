@@ -1,4 +1,4 @@
-#   Copyright (c) 2008 Mikeal Rogers
+#   Copyright (c) 2008 Mikeal Rogers  # lint-amnesty, pylint: disable=django-not-configured, missing-module-docstring
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
 #   you may not use this file except in compliance with the License.
@@ -13,7 +13,7 @@
 #   limitations under the License.
 LOOKUP = {}
 
-from .paths import add_lookup, clear_lookups, lookup_template, save_lookups
+from .paths import add_lookup, clear_lookups, lookup_template, save_lookups  # lint-amnesty, pylint: disable=wrong-import-position
 
 
 class Engines(object):

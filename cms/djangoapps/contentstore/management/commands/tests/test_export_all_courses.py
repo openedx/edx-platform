@@ -21,8 +21,8 @@ class ExportAllCourses(ModuleStoreTestCase):
     """
     def setUp(self):
         """ Common setup. """
-        super(ExportAllCourses, self).setUp()
-        self.store = modulestore()._get_modulestore_by_type(ModuleStoreEnum.Type.mongo)
+        super(ExportAllCourses, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        self.store = modulestore()._get_modulestore_by_type(ModuleStoreEnum.Type.mongo)  # lint-amnesty, pylint: disable=protected-access
         self.temp_dir = mkdtemp()
         self.addCleanup(shutil.rmtree, self.temp_dir)
         self.first_course = CourseFactory.create(

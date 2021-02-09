@@ -7,7 +7,7 @@ from datetime import datetime
 from uuid import uuid4
 
 import pytz
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import models
 from django.dispatch import receiver
@@ -115,7 +115,7 @@ class CourseTeam(models.Model):
         return "{} in {}".format(self.name, self.course_id)
 
     def __repr__(self):
-        return (
+        return (  # lint-amnesty, pylint: disable=missing-format-attribute
             "<CourseTeam"
             " id={0.id}"
             " team_id={0.team_id}"
@@ -236,7 +236,7 @@ class CourseTeamMembership(models.Model):
         return "{} is member of {}".format(self.user.username, self.team)
 
     def __repr__(self):
-        return (
+        return (  # lint-amnesty, pylint: disable=missing-format-attribute
             "<CourseTeamMembership"
             " id={0.id}"
             " user_id={0.user.id}"
@@ -277,9 +277,9 @@ class CourseTeamMembership(models.Model):
                     raise ImmutableMembershipFieldException(
                         u"Field %r shouldn't change from %r to %r" % (name, current_value, value)
                     )
-        super(CourseTeamMembership, self).__setattr__(name, value)
+        super(CourseTeamMembership, self).__setattr__(name, value)  # lint-amnesty, pylint: disable=super-with-arguments
 
-    def save(self, *args, **kwargs):  # pylint: disable=arguments-differ
+    def save(self, *args, **kwargs):  # lint-amnesty, pylint: disable=arguments-differ, signature-differs
         """Customize save method to set the last_activity_at if it does not
         currently exist. Also resets the team's size if this model is
         being created.
@@ -289,13 +289,13 @@ class CourseTeamMembership(models.Model):
             should_reset_team_size = True
         if not self.last_activity_at:
             self.last_activity_at = datetime.utcnow().replace(tzinfo=pytz.utc)
-        super(CourseTeamMembership, self).save(*args, **kwargs)
+        super(CourseTeamMembership, self).save(*args, **kwargs)  # lint-amnesty, pylint: disable=super-with-arguments
         if should_reset_team_size:
             self.team.reset_team_size()
 
-    def delete(self, *args, **kwargs):  # pylint: disable=arguments-differ
+    def delete(self, *args, **kwargs):  # lint-amnesty, pylint: disable=arguments-differ, signature-differs
         """Recompute the related team's team_size after deleting a membership"""
-        super(CourseTeamMembership, self).delete(*args, **kwargs)
+        super(CourseTeamMembership, self).delete(*args, **kwargs)  # lint-amnesty, pylint: disable=super-with-arguments
         self.team.reset_team_size()
 
     @classmethod

@@ -1,3 +1,4 @@
+# lint-amnesty, pylint: disable=missing-module-docstring
 from contextlib import contextmanager
 
 from mock import patch

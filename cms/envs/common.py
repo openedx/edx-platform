@@ -48,6 +48,10 @@ from corsheaders.defaults import default_headers as corsheaders_default_headers
 from datetime import timedelta
 import lms.envs.common
 # Although this module itself may not use these imported variables, other dependent modules may.
+# Warning: Do NOT add any new variables to this list. This is incompatible with future plans to
+#   have more logical separation between LMS and Studio (CMS). It is also incompatible with the
+#   direction documented in OEP-45: Configuring and Operating Open edX:
+#   https://open-edx-proposals.readthedocs.io/en/latest/oep-0045-arch-ops-and-config.html
 from lms.envs.common import (
     USE_TZ, ALL_LANGUAGES, ASSET_IGNORE_REGEX,
     PARENTAL_CONSENT_AGE_LIMIT, REGISTRATION_EMAIL_PATTERNS_ALLOWED,
@@ -173,9 +177,9 @@ STUDIO_SHORT_NAME = _("Studio")
 FEATURES = {
     'GITHUB_PUSH': False,
 
-    # for consistency in user-experience, keep the value of the following 3 settings
-    # in sync with the ones in lms/envs/common.py
+    # See annotations in lms/envs/common.py for details.
     'ENABLE_DISCUSSION_SERVICE': True,
+    # See annotations in lms/envs/common.py for details.
     'ENABLE_TEXTBOOK': True,
 
     # When True, all courses will be active, regardless of start date
@@ -206,7 +210,14 @@ FEATURES = {
     # Turn off account locking if failed login attempts exceeds a limit
     'ENABLE_MAX_FAILED_LOGIN_ATTEMPTS': False,
 
-    # Allow editing of short description in course settings in cms
+    # .. toggle_name: FEATURES['EDITABLE_SHORT_DESCRIPTION']
+    # .. toggle_implementation: DjangoSetting
+    # .. toggle_default: True
+    # .. toggle_description: This feature flag allows editing of short descriptions on the Schedule & Details page in
+    #   Open edX Studio. Set to False if you want to disable the editing of the course short description.
+    # .. toggle_use_cases: open_edx
+    # .. toggle_creation_date: 2014-02-13
+    # .. toggle_tickets: https://github.com/edx/edx-platform/pull/2334
     'EDITABLE_SHORT_DESCRIPTION': True,
 
     # Hide any Personally Identifiable Information from application logs
@@ -225,9 +236,7 @@ FEATURES = {
     # Turn off Video Upload Pipeline through Studio, by default
     'ENABLE_VIDEO_UPLOAD_PIPELINE': False,
 
-    # let students save and manage their annotations
-    # for consistency in user-experience, keep the value of this feature flag
-    # in sync with the one in lms/envs/common.py
+    # See annotations in lms/envs/common.py for details.
     'ENABLE_EDXNOTES': False,
 
     # Toggle to enable coordination with the Publisher tool (keep in sync with lms/envs/common.py)
@@ -269,7 +278,15 @@ FEATURES = {
     # Enable content libraries (blockstore) indexing
     'ENABLE_CONTENT_LIBRARY_INDEX': False,
 
-    # Enable course reruns, which will always use the split modulestore
+    # .. toggle_name: FEATURES['ALLOW_COURSE_RERUNS']
+    # .. toggle_implementation: DjangoSetting
+    # .. toggle_default: True
+    # .. toggle_description: This will allow staff member to re-run the course from the studio home page and will
+    #   always use the split modulestore. When this is set to False, the Re-run Course link will not be available on
+    #   the studio home page.
+    # .. toggle_use_cases: open_edx
+    # .. toggle_creation_date: 2015-02-13
+    # .. toggle_tickets: https://github.com/edx/edx-platform/pull/6965
     'ALLOW_COURSE_RERUNS': True,
 
     # Certificates Web/HTML Views
@@ -338,6 +355,15 @@ FEATURES = {
     'ENABLE_READING_FROM_MULTIPLE_HISTORY_TABLES': True,
     'SHOW_FOOTER_LANGUAGE_SELECTOR': False,
     'ENABLE_ENROLLMENT_RESET': False,
+
+    # .. toggle_name: FEATURES['DISABLE_MOBILE_COURSE_AVAILABLE']
+    # .. toggle_implementation: DjangoSetting
+    # .. toggle_default: False
+    # .. toggle_description: Set to True to remove Mobile Course Available UI Flag from Studio's Advanced Settings
+    #   page else Mobile Course Available UI Flag will be available on Studio side.
+    # .. toggle_use_cases: open_edx
+    # .. toggle_creation_date: 2020-02-14
+    # .. toggle_tickets: https://github.com/edx/edx-platform/pull/23073
     'DISABLE_MOBILE_COURSE_AVAILABLE': False,
 
     # .. toggle_name: FEATURES['ENABLE_CHANGE_USER_PASSWORD_ADMIN']
@@ -388,7 +414,7 @@ FEATURES = {
     #        eg: '2020-09-01'
     # .. toggle_use_cases: temporary
     # .. toggle_creation_date: 2020-06-12
-    # .. toggle_target_removal_date: 2020-12-01
+    # .. toggle_target_removal_date: 2021-04-01
     # .. toggle_warnings: This can be removed once support is removed for deprecated
     #   course keys.
     # .. toggle_tickets: https://openedx.atlassian.net/browse/DEPR-58
@@ -1724,16 +1750,24 @@ ADVANCED_PROBLEM_TYPES = [
 ]
 
 ############### Settings for Retirement #####################
+# See annotations in lms/envs/common.py for details.
 RETIRED_USERNAME_PREFIX = 'retired__user_'
+# See annotations in lms/envs/common.py for details.
 RETIRED_EMAIL_PREFIX = 'retired__user_'
+# See annotations in lms/envs/common.py for details.
 RETIRED_EMAIL_DOMAIN = 'retired.invalid'
+# See annotations in lms/envs/common.py for details.
 RETIRED_USERNAME_FMT = lambda settings: settings.RETIRED_USERNAME_PREFIX + '{}'
+# See annotations in lms/envs/common.py for details.
 RETIRED_EMAIL_FMT = lambda settings: settings.RETIRED_EMAIL_PREFIX + '{}@' + settings.RETIRED_EMAIL_DOMAIN
 derived('RETIRED_USERNAME_FMT', 'RETIRED_EMAIL_FMT')
+# See annotations in lms/envs/common.py for details.
 RETIRED_USER_SALTS = ['abc', '123']
+# See annotations in lms/envs/common.py for details.
 RETIREMENT_SERVICE_WORKER_USERNAME = 'RETIREMENT_SERVICE_USER'
 
 # These states are the default, but are designed to be overridden in configuration.
+# See annotations in lms/envs/common.py for details.
 RETIREMENT_STATES = [
     'PENDING',
 

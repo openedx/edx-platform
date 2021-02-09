@@ -25,10 +25,10 @@ VERSION_GUID_DICT = {
 SAMPLE_GUIDS_LIST = ['SAMPLE_VERSION_GUID', 'SAMPLE_UNICODE_VERSION_GUID', 'BSON_OBJECTID']
 
 
-class TestBulkWriteMixin(unittest.TestCase):
+class TestBulkWriteMixin(unittest.TestCase):  # lint-amnesty, pylint: disable=missing-class-docstring
 
     def setUp(self):
-        super(TestBulkWriteMixin, self).setUp()
+        super(TestBulkWriteMixin, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.bulk = SplitBulkWriteMixin()
         self.bulk.SCHEMA_VERSION = 1
         self.clear_cache = self.bulk._clear_cache = Mock(name='_clear_cache')
@@ -53,7 +53,7 @@ class TestBulkWriteMixinPreviousTransaction(TestBulkWriteMixin):
     Verify that opening and closing a transaction doesn't affect later behaviour.
     """
     def setUp(self):
-        super(TestBulkWriteMixinPreviousTransaction, self).setUp()
+        super(TestBulkWriteMixinPreviousTransaction, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.bulk._begin_bulk_operation(self.course_key)
         self.bulk.insert_course_index(self.course_key, MagicMock('prev-index-entry'))
         self.bulk.update_structure(self.course_key, {'this': 'is', 'the': 'previous structure', '_id': ObjectId()})
@@ -185,13 +185,13 @@ class TestBulkWriteMixinClosed(TestBulkWriteMixin):
         self.bulk._begin_bulk_operation(self.course_key)
         self.conn.reset_mock()
         self.bulk.update_definition(self.course_key, self.definition)
-        self.bulk.insert_course_index(self.course_key, {'versions': {self.course_key.branch: self.definition['_id']}})
+        self.bulk.insert_course_index(self.course_key, {'versions': {self.course_key.branch: self.definition['_id']}})  # lint-amnesty, pylint: disable=no-member
         self.assertConnCalls()
         self.bulk._end_bulk_operation(self.course_key)
         self.assertConnCalls(
             call.insert_definition(self.definition, self.course_key),
             call.update_course_index(
-                {'versions': {self.course_key.branch: self.definition['_id']}},
+                {'versions': {self.course_key.branch: self.definition['_id']}},  # lint-amnesty, pylint: disable=no-member
                 from_index=original_index,
                 course_context=self.course_key
             )
@@ -205,7 +205,7 @@ class TestBulkWriteMixinClosed(TestBulkWriteMixin):
         self.bulk.update_definition(self.course_key.replace(branch='a'), self.definition)
         other_definition = {'another': 'definition', '_id': ObjectId()}
         self.bulk.update_definition(self.course_key.replace(branch='b'), other_definition)
-        self.bulk.insert_course_index(self.course_key, {'versions': {'a': self.definition['_id'], 'b': other_definition['_id']}})
+        self.bulk.insert_course_index(self.course_key, {'versions': {'a': self.definition['_id'], 'b': other_definition['_id']}})  # lint-amnesty, pylint: disable=line-too-long
         self.bulk._end_bulk_operation(self.course_key)
         six.assertCountEqual(
             self,
@@ -254,13 +254,13 @@ class TestBulkWriteMixinClosed(TestBulkWriteMixin):
         self.bulk._begin_bulk_operation(self.course_key)
         self.conn.reset_mock()
         self.bulk.update_structure(self.course_key, self.structure)
-        self.bulk.insert_course_index(self.course_key, {'versions': {self.course_key.branch: self.structure['_id']}})
+        self.bulk.insert_course_index(self.course_key, {'versions': {self.course_key.branch: self.structure['_id']}})  # lint-amnesty, pylint: disable=no-member
         self.assertConnCalls()
         self.bulk._end_bulk_operation(self.course_key)
         self.assertConnCalls(
             call.insert_structure(self.structure, self.course_key),
             call.update_course_index(
-                {'versions': {self.course_key.branch: self.structure['_id']}},
+                {'versions': {self.course_key.branch: self.structure['_id']}},  # lint-amnesty, pylint: disable=no-member
                 from_index=original_index,
                 course_context=self.course_key,
             )
@@ -274,7 +274,7 @@ class TestBulkWriteMixinClosed(TestBulkWriteMixin):
         self.bulk.update_structure(self.course_key.replace(branch='a'), self.structure)
         other_structure = {'another': 'structure', '_id': ObjectId()}
         self.bulk.update_structure(self.course_key.replace(branch='b'), other_structure)
-        self.bulk.insert_course_index(self.course_key, {'versions': {'a': self.structure['_id'], 'b': other_structure['_id']}})
+        self.bulk.insert_course_index(self.course_key, {'versions': {'a': self.structure['_id'], 'b': other_structure['_id']}})  # lint-amnesty, pylint: disable=line-too-long
         self.bulk._end_bulk_operation(self.course_key)
         six.assertCountEqual(
             self,
@@ -304,11 +304,11 @@ class TestBulkWriteMixinClosed(TestBulkWriteMixin):
         self.assertEqual(version_result, get_result)
 
 
-class TestBulkWriteMixinClosedAfterPrevTransaction(TestBulkWriteMixinClosed, TestBulkWriteMixinPreviousTransaction):
+class TestBulkWriteMixinClosedAfterPrevTransaction(TestBulkWriteMixinClosed, TestBulkWriteMixinPreviousTransaction):  # lint-amnesty, pylint: disable=test-inherits-tests
     """
     Test that operations on with a closed transaction aren't affected by a previously executed transaction
     """
-    pass
+    pass  # lint-amnesty, pylint: disable=unnecessary-pass
 
 
 @ddt.ddt
@@ -535,7 +535,7 @@ class TestBulkWriteMixinFindMethods(TestBulkWriteMixin):
         for structure in db_structures:
             if (
                 structure['previous_version'] in search_ids and  # We're searching for this document
-                not any(active.endswith(structure['_id']) for active in active_ids)  # This document doesn't match any active _ids
+                not any(active.endswith(structure['_id']) for active in active_ids)  # This document doesn't match any active _ids  # lint-amnesty, pylint: disable=line-too-long
             ):
                 self.assertIn(structure, results)
             else:
@@ -558,11 +558,11 @@ class TestBulkWriteMixinFindMethods(TestBulkWriteMixin):
         #   - non-matching documents in the cache
         #   - expected documents returned from the db
         #   - unexpected documents returned from the db
-        ('ov', 'bi', [{'original_version': 'ov', 'blocks': {'bi': {'edit_info': {'update_version': 'foo'}}}}], [], [], []),
-        ('ov', 'bi', [{'original_version': 'ov', 'blocks': {'bi': {'edit_info': {'update_version': 'foo'}}}, '_id': 'foo'}], [], [], [{'_id': 'foo'}]),
+        ('ov', 'bi', [{'original_version': 'ov', 'blocks': {'bi': {'edit_info': {'update_version': 'foo'}}}}], [], [], []),  # lint-amnesty, pylint: disable=line-too-long
+        ('ov', 'bi', [{'original_version': 'ov', 'blocks': {'bi': {'edit_info': {'update_version': 'foo'}}}, '_id': 'foo'}], [], [], [{'_id': 'foo'}]),  # lint-amnesty, pylint: disable=line-too-long
         ('ov', 'bi', [], [{'blocks': {'bi': {'edit_info': {'update_version': 'foo'}}}}], [], []),
         ('ov', 'bi', [], [{'original_version': 'ov'}], [], []),
-        ('ov', 'bi', [], [], [{'original_version': 'ov', 'blocks': {'bi': {'edit_info': {'update_version': 'foo'}}}}], []),
+        ('ov', 'bi', [], [], [{'original_version': 'ov', 'blocks': {'bi': {'edit_info': {'update_version': 'foo'}}}}], []),  # lint-amnesty, pylint: disable=line-too-long
         (
             'ov',
             'bi',
@@ -573,7 +573,7 @@ class TestBulkWriteMixinFindMethods(TestBulkWriteMixin):
         ),
     )
     @ddt.unpack
-    def test_find_ancestor_structures(self, original_version, block_id, active_match, active_unmatch, db_match, db_unmatch):
+    def test_find_ancestor_structures(self, original_version, block_id, active_match, active_unmatch, db_match, db_unmatch):  # lint-amnesty, pylint: disable=line-too-long
         for structure in active_match + active_unmatch + db_match + db_unmatch:
             structure.setdefault('_id', ObjectId())
 
@@ -595,7 +595,7 @@ class TestBulkWriteMixinOpen(TestBulkWriteMixin):
     """
 
     def setUp(self):
-        super(TestBulkWriteMixinOpen, self).setUp()
+        super(TestBulkWriteMixinOpen, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.bulk._begin_bulk_operation(self.course_key)
 
     @ddt.data(*SAMPLE_GUIDS_LIST)
@@ -758,8 +758,8 @@ class TestBulkWriteMixinOpen(TestBulkWriteMixin):
         self.conn.get_course_index.assert_called_once_with(self.course_key, ignore_case=False)
 
 
-class TestBulkWriteMixinOpenAfterPrevTransaction(TestBulkWriteMixinOpen, TestBulkWriteMixinPreviousTransaction):
+class TestBulkWriteMixinOpenAfterPrevTransaction(TestBulkWriteMixinOpen, TestBulkWriteMixinPreviousTransaction):  # lint-amnesty, pylint: disable=test-inherits-tests
     """
     Test that operations on with an open transaction aren't affected by a previously executed transaction
     """
-    pass
+    pass  # lint-amnesty, pylint: disable=unnecessary-pass

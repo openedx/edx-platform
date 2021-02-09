@@ -18,7 +18,7 @@ class TestHandleScoreChanged(ModuleStoreTestCase):
     """
 
     def setUp(self):
-        super(TestHandleScoreChanged, self).setUp()
+        super(TestHandleScoreChanged, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.course = CourseFactory.create(org='TestX', number='TS01', run='2016_Q1')
         self.user = UserFactory.create()
         self.subsection_grade = Mock()

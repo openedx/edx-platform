@@ -30,7 +30,7 @@ class TestRecalculateSubsectionGrades(HasCourseWithProblemsMixin, ModuleStoreTes
     """
 
     def setUp(self):
-        super(TestRecalculateSubsectionGrades, self).setUp()
+        super(TestRecalculateSubsectionGrades, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.command = recalculate_subsection_grades.Command()
 
     @patch('lms.djangoapps.grades.management.commands.recalculate_subsection_grades.Submission')
@@ -63,7 +63,7 @@ class TestRecalculateSubsectionGrades(HasCourseWithProblemsMixin, ModuleStoreTes
         id_mock.return_value.id = "ID"
         self._run_command_and_check_output(task_mock, ScoreDatabaseTableEnum.courseware_student_module)
 
-    def _run_command_and_check_output(self, task_mock, score_db_table, include_anonymous_id=False):
+    def _run_command_and_check_output(self, task_mock, score_db_table, include_anonymous_id=False):  # lint-amnesty, pylint: disable=missing-function-docstring
         self.command.handle(modified_start='2016-08-25 16:42', modified_end='2018-08-25 16:44')
         kwargs = {
             "user_id": "ID",

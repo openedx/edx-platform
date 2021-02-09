@@ -19,7 +19,7 @@ class TestXBlock:
     """
     An empty Xblock, to be used, when creating a block with mixins.
     """
-    pass
+    pass  # lint-amnesty, pylint: disable=unnecessary-pass
 
 
 @ddt.ddt
@@ -38,7 +38,7 @@ class TestInheritanceMixin(unittest.TestCase):
         self.xblock = runtime.construct_xblock_from_class(
             TestXBlock, ScopeIds('user', 'TestXBlock', 'def_id', 'usage_id')
         )
-        super(TestInheritanceMixin, self).setUp()
+        super(TestInheritanceMixin, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
 
     def add_submission_deadline_information(self, due_date, graceperiod, self_paced):
         """

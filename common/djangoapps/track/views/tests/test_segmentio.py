@@ -5,14 +5,14 @@ import json
 
 from dateutil import parser
 from ddt import data, ddt, unpack
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.test.utils import override_settings
 from mock import sentinel
 
 from openedx.core.lib.tests.assertions.events import assert_event_matches
 from common.djangoapps.track.middleware import TrackMiddleware
 from common.djangoapps.track.views import segmentio
-from common.djangoapps.track.views.tests.base import SEGMENTIO_TEST_ENDPOINT, SEGMENTIO_TEST_USER_ID, SegmentIOTrackingTestCaseBase
+from common.djangoapps.track.views.tests.base import SEGMENTIO_TEST_ENDPOINT, SEGMENTIO_TEST_USER_ID, SegmentIOTrackingTestCaseBase  # lint-amnesty, pylint: disable=line-too-long
 
 
 def expect_failure_with_message(message):
@@ -32,7 +32,7 @@ class SegmentIOTrackingTestCase(SegmentIOTrackingTestCaseBase):
     """
 
     def setUp(self):
-        super(SegmentIOTrackingTestCase, self).setUp()
+        super(SegmentIOTrackingTestCase, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
 
         User.objects.create(pk=SEGMENTIO_TEST_USER_ID, username=str(sentinel.username))
 
@@ -367,29 +367,29 @@ class SegmentIOTrackingTestCase(SegmentIOTrackingTestCaseBase):
         # Verify positive slide case. Verify slide to onSlideSeek. Verify
         # edx.video.seeked emitted from iOS v1.0.02 is changed to
         # edx.video.position.changed.
-        (1, 1, "seek_type", "slide", "onSlideSeek", "edx.video.seeked", "edx.video.position.changed", 'edx.mobileapp.iOS', '1.0.02'),
+        (1, 1, "seek_type", "slide", "onSlideSeek", "edx.video.seeked", "edx.video.position.changed", 'edx.mobileapp.iOS', '1.0.02'),  # lint-amnesty, pylint: disable=line-too-long
         # Verify negative slide case. Verify slide to onSlideSeek. Verify
         # edx.video.seeked to edx.video.position.changed.
-        (-2, -2, "seek_type", "slide", "onSlideSeek", "edx.video.seeked", "edx.video.position.changed", 'edx.mobileapp.iOS', '1.0.02'),
+        (-2, -2, "seek_type", "slide", "onSlideSeek", "edx.video.seeked", "edx.video.position.changed", 'edx.mobileapp.iOS', '1.0.02'),  # lint-amnesty, pylint: disable=line-too-long
         # Verify +30 is changed to -30 which is incorrectly emitted in iOS
         # v1.0.02. Verify skip to onSkipSeek
-        (30, -30, "seek_type", "skip", "onSkipSeek", "edx.video.position.changed", "edx.video.position.changed", 'edx.mobileapp.iOS', '1.0.02'),
+        (30, -30, "seek_type", "skip", "onSkipSeek", "edx.video.position.changed", "edx.video.position.changed", 'edx.mobileapp.iOS', '1.0.02'),  # lint-amnesty, pylint: disable=line-too-long
         # Verify the correct case of -30 is also handled as well. Verify skip
         # to onSkipSeek
-        (-30, -30, "seek_type", "skip", "onSkipSeek", "edx.video.position.changed", "edx.video.position.changed", 'edx.mobileapp.iOS', '1.0.02'),
+        (-30, -30, "seek_type", "skip", "onSkipSeek", "edx.video.position.changed", "edx.video.position.changed", 'edx.mobileapp.iOS', '1.0.02'),  # lint-amnesty, pylint: disable=line-too-long
         # Verify positive slide case where onSkipSeek is changed to
         # onSlideSkip. Verify edx.video.seeked emitted from Android v1.0.02 is
         # changed to edx.video.position.changed.
-        (1, 1, "type", "onSkipSeek", "onSlideSeek", "edx.video.seeked", "edx.video.position.changed", 'edx.mobileapp.android', '1.0.02'),
+        (1, 1, "type", "onSkipSeek", "onSlideSeek", "edx.video.seeked", "edx.video.position.changed", 'edx.mobileapp.android', '1.0.02'),  # lint-amnesty, pylint: disable=line-too-long
         # Verify positive slide case where onSkipSeek is changed to
         # onSlideSkip. Verify edx.video.seeked emitted from Android v1.0.02 is
         # changed to edx.video.position.changed.
-        (-2, -2, "type", "onSkipSeek", "onSlideSeek", "edx.video.seeked", "edx.video.position.changed", 'edx.mobileapp.android', '1.0.02'),
+        (-2, -2, "type", "onSkipSeek", "onSlideSeek", "edx.video.seeked", "edx.video.position.changed", 'edx.mobileapp.android', '1.0.02'),  # lint-amnesty, pylint: disable=line-too-long
         # Verify positive skip case where onSkipSeek is not changed and does
         # not become negative.
-        (30, 30, "type", "onSkipSeek", "onSkipSeek", "edx.video.position.changed", "edx.video.position.changed", 'edx.mobileapp.android', '1.0.02'),
+        (30, 30, "type", "onSkipSeek", "onSkipSeek", "edx.video.position.changed", "edx.video.position.changed", 'edx.mobileapp.android', '1.0.02'),  # lint-amnesty, pylint: disable=line-too-long
         # Verify positive skip case where onSkipSeek is not changed.
-        (-30, -30, "type", "onSkipSeek", "onSkipSeek", "edx.video.position.changed", "edx.video.position.changed", 'edx.mobileapp.android', '1.0.02')
+        (-30, -30, "type", "onSkipSeek", "onSkipSeek", "edx.video.position.changed", "edx.video.position.changed", 'edx.mobileapp.android', '1.0.02')  # lint-amnesty, pylint: disable=line-too-long
     )
     @unpack
     def test_previous_builds(self,

@@ -21,12 +21,12 @@ class RequestUtilTestCase(unittest.TestCase):
     Tests for request_utils module.
     """
     def setUp(self):
-        super(RequestUtilTestCase, self).setUp()
+        super(RequestUtilTestCase, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.old_site_name = settings.SITE_NAME
         self.old_allowed_hosts = settings.ALLOWED_HOSTS
 
     def tearDown(self):
-        super(RequestUtilTestCase, self).tearDown()
+        super(RequestUtilTestCase, self).tearDown()  # lint-amnesty, pylint: disable=super-with-arguments
         settings.SITE_NAME = self.old_site_name
         settings.ALLOWED_HOSTS = self.old_allowed_hosts
 

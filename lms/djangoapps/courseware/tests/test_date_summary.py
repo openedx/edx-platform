@@ -16,7 +16,7 @@ from pytz import utc
 
 from common.djangoapps.course_modes.models import CourseMode
 from common.djangoapps.course_modes.tests.factories import CourseModeFactory
-from freezegun import freeze_time
+from freezegun import freeze_time  # lint-amnesty, pylint: disable=wrong-import-order
 from lms.djangoapps.commerce.models import CommerceConfiguration
 from lms.djangoapps.course_home_api.toggles import COURSE_HOME_MICROFRONTEND, COURSE_HOME_MICROFRONTEND_DATES_TAB
 from lms.djangoapps.courseware.courses import get_course_date_blocks
@@ -53,16 +53,17 @@ from openedx.features.course_experience import (
 )
 from common.djangoapps.student.tests.factories import TEST_PASSWORD, CourseEnrollmentFactory, UserFactory
 from xmodule.modulestore import ModuleStoreEnum
-from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
+from xmodule.modulestore.tests.django_utils import TEST_DATA_SPLIT_MODULESTORE, SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 
 
 @ddt.ddt
 class CourseDateSummaryTest(SharedModuleStoreTestCase):
     """Tests for course date summary blocks."""
+    MODULESTORE = TEST_DATA_SPLIT_MODULESTORE
 
     def setUp(self):
-        super(CourseDateSummaryTest, self).setUp()
+        super(CourseDateSummaryTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         SelfPacedConfiguration.objects.create(enable_course_home_improvements=True)
 
     def make_request(self, user):
@@ -785,7 +786,7 @@ class TestDateAlerts(SharedModuleStoreTestCase):
     Unit tests for date alerts.
     """
     def setUp(self):
-        super(TestDateAlerts, self).setUp()
+        super(TestDateAlerts, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         with freeze_time('2017-07-01 09:00:00'):
             self.course = create_course_run(days_till_start=0)
             self.course.certificate_available_date = self.course.start + timedelta(days=21)
@@ -899,7 +900,7 @@ class TestScheduleOverrides(SharedModuleStoreTestCase):
     """ Tests for Schedule Overrides """
 
     def setUp(self):
-        super(TestScheduleOverrides, self).setUp()
+        super(TestScheduleOverrides, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
 
         patcher = patch('openedx.core.djangoapps.schedules.signals.get_current_site')
         mock_get_current_site = patcher.start()

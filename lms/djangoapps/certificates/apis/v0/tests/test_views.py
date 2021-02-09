@@ -3,8 +3,6 @@ Tests for the Certificate REST APIs.
 """
 
 
-from itertools import product
-
 import ddt
 import six
 from django.conf import settings
@@ -14,17 +12,17 @@ from freezegun import freeze_time
 from mock import patch
 from rest_framework import status
 from rest_framework.test import APITestCase
+from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
+from xmodule.modulestore.tests.factories import CourseFactory
 
 from common.djangoapps.course_modes.models import CourseMode
+from common.djangoapps.student.tests.factories import UserFactory
 from lms.djangoapps.certificates.apis.v0.views import CertificatesDetailView, CertificatesListView
 from lms.djangoapps.certificates.models import CertificateStatuses
 from lms.djangoapps.certificates.tests.factories import GeneratedCertificateFactory
 from openedx.core.djangoapps.content.course_overviews.tests.factories import CourseOverviewFactory
 from openedx.core.djangoapps.user_api.tests.factories import UserPreferenceFactory
 from openedx.core.djangoapps.user_authn.tests.utils import JWT_AUTH_TYPES, AuthAndScopesTestMixin, AuthType
-from common.djangoapps.student.tests.factories import UserFactory
-from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory
 
 
 @ddt.ddt
@@ -56,7 +54,7 @@ class CertificatesDetailRestApiTest(AuthAndScopesTestMixin, SharedModuleStoreTes
         freezer.start()
         self.addCleanup(freezer.stop)
 
-        super(CertificatesDetailRestApiTest, self).setUp()
+        super().setUp()
 
         self.cert = GeneratedCertificateFactory.create(
             user=self.student,
@@ -159,7 +157,7 @@ class CertificatesListRestApiTest(AuthAndScopesTestMixin, SharedModuleStoreTestC
         freezer.start()
         self.addCleanup(freezer.stop)
 
-        super(CertificatesListRestApiTest, self).setUp()
+        super().setUp()
 
         self.cert = GeneratedCertificateFactory.create(
             user=self.student,

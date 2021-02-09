@@ -166,7 +166,7 @@ class CourseHomePageTestCase(BaseCourseUpdatesTestCase):
         )
 
 
-class TestCourseHomePage(CourseHomePageTestCase):
+class TestCourseHomePage(CourseHomePageTestCase):  # lint-amnesty, pylint: disable=missing-class-docstring
     def test_welcome_message_when_unified(self):
         # Create a welcome message
         self.create_course_update(TEST_WELCOME_MESSAGE)
@@ -888,7 +888,7 @@ class CourseHomeFragmentViewTests(ModuleStoreTestCase):
     CREATE_USER = False
 
     def setUp(self):
-        super(CourseHomeFragmentViewTests, self).setUp()
+        super(CourseHomeFragmentViewTests, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         CommerceConfiguration.objects.create(checkout_on_ecommerce_service=True)
 
         end = now() + timedelta(days=30)
@@ -899,9 +899,9 @@ class CourseHomeFragmentViewTests(ModuleStoreTestCase):
         )
         self.url = course_home_url(self.course)
 
-        CourseMode.objects.create(course_id=self.course.id, mode_slug=CourseMode.AUDIT)
+        CourseMode.objects.create(course_id=self.course.id, mode_slug=CourseMode.AUDIT)  # lint-amnesty, pylint: disable=no-member
         self.verified_mode = CourseMode.objects.create(
-            course_id=self.course.id,
+            course_id=self.course.id,  # lint-amnesty, pylint: disable=no-member
             mode_slug=CourseMode.VERIFIED,
             min_price=100,
             expiration_datetime=end,
@@ -919,7 +919,7 @@ class CourseHomeFragmentViewTests(ModuleStoreTestCase):
         response = self.client.get(self.url)
         self.assertNotContains(response, 'section-upgrade')
 
-    def assert_upgrade_message_displayed(self):
+    def assert_upgrade_message_displayed(self):  # lint-amnesty, pylint: disable=missing-function-docstring
         response = self.client.get(self.url)
         self.assertContains(response, 'section-upgrade')
         url = EcommerceService().get_checkout_page_url(self.verified_mode.sku)
@@ -939,7 +939,7 @@ class CourseHomeFragmentViewTests(ModuleStoreTestCase):
         self.assert_upgrade_message_not_displayed()
 
     def test_no_upgrade_message_if_verified_track(self):
-        CourseEnrollment.enroll(self.user, self.course.id, CourseMode.VERIFIED)
+        CourseEnrollment.enroll(self.user, self.course.id, CourseMode.VERIFIED)  # lint-amnesty, pylint: disable=no-member
         self.assert_upgrade_message_not_displayed()
 
     def test_no_upgrade_message_if_upgrade_deadline_passed(self):
@@ -950,11 +950,11 @@ class CourseHomeFragmentViewTests(ModuleStoreTestCase):
     def test_no_upgrade_message_if_flag_disabled(self):
         self.flag.everyone = False
         self.flag.save()
-        CourseEnrollment.enroll(self.user, self.course.id, CourseMode.AUDIT)
+        CourseEnrollment.enroll(self.user, self.course.id, CourseMode.AUDIT)  # lint-amnesty, pylint: disable=no-member
         self.assert_upgrade_message_not_displayed()
 
     def test_display_upgrade_message_if_audit_and_deadline_not_passed(self):
-        CourseEnrollment.enroll(self.user, self.course.id, CourseMode.AUDIT)
+        CourseEnrollment.enroll(self.user, self.course.id, CourseMode.AUDIT)  # lint-amnesty, pylint: disable=no-member
         self.assert_upgrade_message_displayed()
 
     @mock.patch(

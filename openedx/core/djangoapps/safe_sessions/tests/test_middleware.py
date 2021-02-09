@@ -27,7 +27,7 @@ class TestSafeSessionProcessRequest(TestSafeSessionsLogMixin, TestCase):
     """
 
     def setUp(self):
-        super(TestSafeSessionProcessRequest, self).setUp()
+        super(TestSafeSessionProcessRequest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.user = UserFactory.create()
         self.addCleanup(set_current_request, None)
         self.request = get_mock_request()
@@ -130,7 +130,7 @@ class TestSafeSessionProcessResponse(TestSafeSessionsLogMixin, TestCase):
     """
 
     def setUp(self):
-        super(TestSafeSessionProcessResponse, self).setUp()
+        super(TestSafeSessionProcessResponse, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.user = UserFactory.create()
         self.addCleanup(set_current_request, None)
         self.request = get_mock_request()
@@ -235,7 +235,7 @@ class TestSafeSessionMiddleware(TestSafeSessionsLogMixin, TestCase):
     """
 
     def setUp(self):
-        super(TestSafeSessionMiddleware, self).setUp()
+        super(TestSafeSessionMiddleware, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.user = UserFactory.create()
         self.addCleanup(set_current_request, None)
         self.request = get_mock_request()

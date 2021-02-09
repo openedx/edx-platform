@@ -504,7 +504,7 @@ class GetUsersByExternalKeysTests(CacheIsolationTestCase):
         cls.user_2 = UserFactory(username='user-2')
 
     def setUp(self):
-        super(GetUsersByExternalKeysTests, self).setUp()
+        super(GetUsersByExternalKeysTests, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         catalog_org = CatalogOrganizationFactory.create(key=self.organization_key)
         program = ProgramFactory.create(
             uuid=self.program_uuid,

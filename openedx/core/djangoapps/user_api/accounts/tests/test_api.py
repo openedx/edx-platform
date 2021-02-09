@@ -11,7 +11,7 @@ import unicodedata
 import ddt
 from django.conf import settings
 from django.contrib.auth.hashers import make_password
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.http import HttpResponse
 from django.test import TestCase
 from django.test.client import RequestFactory
@@ -64,7 +64,7 @@ def mock_render_to_response(template_name):
     return HttpResponse(template_name)
 
 
-class CreateAccountMixin(object):
+class CreateAccountMixin(object):  # lint-amnesty, pylint: disable=missing-class-docstring
     def create_account(self, username, password, email):
         # pylint: disable=missing-docstring
         registration_url = reverse('user_api_registration')
@@ -80,7 +80,7 @@ class CreateAccountMixin(object):
 
 @skip_unless_lms
 @ddt.ddt
-@patch('common.djangoapps.student.views.management.render_to_response', Mock(side_effect=mock_render_to_response, autospec=True))
+@patch('common.djangoapps.student.views.management.render_to_response', Mock(side_effect=mock_render_to_response, autospec=True))  # lint-amnesty, pylint: disable=line-too-long
 class TestAccountApi(UserSettingsEventTestMixin, EmailTemplateTagMixin, CreateAccountMixin, RetirementTestCase):
     """
     These tests specifically cover the parts of the API methods that are not covered by test_views.py.
@@ -90,7 +90,7 @@ class TestAccountApi(UserSettingsEventTestMixin, EmailTemplateTagMixin, CreateAc
     password = "test"
 
     def setUp(self):
-        super(TestAccountApi, self).setUp()
+        super(TestAccountApi, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.request_factory = RequestFactory()
         self.table = "student_languageproficiency"
         self.user = UserFactory.create(password=self.password)
@@ -366,7 +366,7 @@ class TestAccountApi(UserSettingsEventTestMixin, EmailTemplateTagMixin, CreateAc
         self.assertIn("Full Name cannot contain the following characters: < >", field_errors["name"]["user_message"])
 
     @patch('django.core.mail.EmailMultiAlternatives.send')
-    @patch('common.djangoapps.student.views.management.render_to_string', Mock(side_effect=mock_render_to_string, autospec=True))
+    @patch('common.djangoapps.student.views.management.render_to_string', Mock(side_effect=mock_render_to_string, autospec=True))  # lint-amnesty, pylint: disable=line-too-long
     def test_update_sending_email_fails(self, send_mail):
         """Test what happens if all validation checks pass, but sending the email for email change fails."""
         send_mail.side_effect = [Exception, None]

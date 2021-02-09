@@ -72,7 +72,7 @@ class XBlockRuntime(RuntimeShim, Runtime):
     suppports_state_for_anonymous_users = True
 
     def __init__(self, system, user):
-        super(XBlockRuntime, self).__init__(
+        super(XBlockRuntime, self).__init__(  # lint-amnesty, pylint: disable=super-with-arguments
             id_reader=system.id_reader,
             mixins=(
                 LmsBlockMixin,  # Adds Non-deprecated LMS/Studio functionality
@@ -234,7 +234,7 @@ class XBlockRuntime(RuntimeShim, Runtime):
         # Otherwise, fall back to the base implementation which loads services
         # defined in the constructor:
         if service is None:
-            service = super(XBlockRuntime, self).service(block, service_name)
+            service = super(XBlockRuntime, self).service(block, service_name)  # lint-amnesty, pylint: disable=super-with-arguments
         return service
 
     def _init_field_data_for_block(self, block):
@@ -291,7 +291,7 @@ class XBlockRuntime(RuntimeShim, Runtime):
         # which create relative URLs (/static/studio/bundles/webpack-foo.js).
         # We want all resource URLs to be absolute, such as is done when
         # local_resource_url() is used.
-        fragment = super(XBlockRuntime, self).render(block, view_name, context)
+        fragment = super(XBlockRuntime, self).render(block, view_name, context)  # lint-amnesty, pylint: disable=super-with-arguments
         needs_fix = False
         for resource in fragment.resources:
             if resource.kind == 'url' and resource.data.startswith('/'):

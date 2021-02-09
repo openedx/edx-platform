@@ -4,17 +4,18 @@
 import copy
 import logging
 
-from django.contrib.auth.models import User
+from django.contrib.auth import get_user_model
 from django.core.management.base import BaseCommand
 from opaque_keys.edx.keys import CourseKey
 from six import text_type
+from xmodule.modulestore.django import modulestore
 
 from lms.djangoapps.badges.events.course_complete import get_completion_badge
 from lms.djangoapps.badges.utils import badges_enabled
 from lms.djangoapps.certificates.api import regenerate_user_certificates
-from xmodule.modulestore.django import modulestore
 
 LOGGER = logging.getLogger(__name__)
+User = get_user_model()
 
 
 class Command(BaseCommand):
@@ -101,7 +102,7 @@ class Command(BaseCommand):
                     LOGGER.info(u"Cleared badge for student %s.", student.id)
 
             # Add the certificate request to the queue
-            ret = regenerate_user_certificates(
+            regenerate_user_certificates(
                 student, course_id, course=course,
                 forced_grade=options['grade_value'],
                 template_file=options['template_file'],
@@ -111,12 +112,10 @@ class Command(BaseCommand):
             LOGGER.info(
                 (
                     u"Added a certificate regeneration task to the XQueue "
-                    u"for student %s in course '%s'. "
-                    u"The new certificate status is '%s'."
+                    u"for student %s in course '%s'."
                 ),
                 student.id,
-                text_type(course_id),
-                ret
+                text_type(course_id)
             )
 
         else:

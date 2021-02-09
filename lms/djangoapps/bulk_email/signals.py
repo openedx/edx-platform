@@ -12,7 +12,7 @@ from .models import Optout
 
 
 @receiver(USER_RETIRE_MAILINGS)
-def force_optout_all(sender, **kwargs):
+def force_optout_all(sender, **kwargs):  # lint-amnesty, pylint: disable=unused-argument
     """
     When a user is retired from all mailings this method will create an Optout
     row for any courses they may be enrolled in.

@@ -35,7 +35,7 @@ class CourseApiViewTestMixin(object):
     """
 
     def setUp(self):
-        super(CourseApiViewTestMixin, self).setUp()
+        super(CourseApiViewTestMixin, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.course = CourseFactory.create()
         self.course_mode = CourseMode.objects.create(
             course_id=self.course.id,
@@ -114,7 +114,7 @@ class CourseRetrieveUpdateViewTests(CourseApiViewTestMixin, ModuleStoreTestCase)
     }
 
     def setUp(self):
-        super(CourseRetrieveUpdateViewTests, self).setUp()
+        super(CourseRetrieveUpdateViewTests, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.path = reverse('commerce_api:v1:courses:retrieve_update', args=[six.text_type(self.course.id)])
         self.user = UserFactory.create()
         self.client.login(username=self.user.username, password=PASSWORD)
@@ -450,7 +450,7 @@ class OrderViewTests(UserMixin, TestCase):
     path = reverse_lazy(view_name, kwargs={'number': ORDER_NUMBER})
 
     def setUp(self):
-        super(OrderViewTests, self).setUp()
+        super(OrderViewTests, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self._login()
 
     def test_order_found(self):

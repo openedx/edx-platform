@@ -47,7 +47,7 @@ class Command(BaseCommand):
         try:
             result = CourseKey.from_string(raw_value)
         except InvalidKeyError:
-            raise CommandError(u"Invalid course_key: '%s'." % raw_value)
+            raise CommandError(u"Invalid course_key: '%s'." % raw_value)  # lint-amnesty, pylint: disable=raise-missing-from
 
         if not isinstance(result, CourseLocator):
             raise CommandError(u"Argument {0} is not a course key".format(raw_value))
@@ -64,8 +64,7 @@ class Command(BaseCommand):
         setup_option = options['setup']
         index_all_courses_option = all_option or setup_option
 
-        if (not len(course_ids) and not index_all_courses_option) or \
-                (len(course_ids) and index_all_courses_option):
+        if (not len(course_ids) and not index_all_courses_option) or (len(course_ids) and index_all_courses_option):  # lint-amnesty, pylint: disable=len-as-condition
             raise CommandError("reindex_course requires one or more <course_id>s OR the --all or --setup flags.")
 
         store = modulestore()
@@ -103,5 +102,5 @@ class Command(BaseCommand):
         for course_key in course_keys:
             try:
                 CoursewareSearchIndexer.do_course_reindex(store, course_key)
-            except Exception as exc:
+            except Exception as exc:  # lint-amnesty, pylint: disable=broad-except
                 logging.exception('Error indexing course %s due to the error: %s', course_key, exc)

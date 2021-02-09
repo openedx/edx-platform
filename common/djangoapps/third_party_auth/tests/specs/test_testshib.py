@@ -7,7 +7,7 @@ import datetime
 import json
 import logging
 import os
-import unittest
+import unittest  # lint-amnesty, pylint: disable=unused-import
 from unittest import skip
 
 import ddt
@@ -53,27 +53,27 @@ class SamlIntegrationTestUtilities(object):
     USER_USERNAME = "myself"
 
     def setUp(self):
-        super(SamlIntegrationTestUtilities, self).setUp()
-        self.enable_saml(
-            private_key=self._get_private_key(),
-            public_key=self._get_public_key(),
+        super(SamlIntegrationTestUtilities, self).setUp()  # lint-amnesty, pylint: disable=no-member, super-with-arguments
+        self.enable_saml(  # lint-amnesty, pylint: disable=no-member
+            private_key=self._get_private_key(),  # lint-amnesty, pylint: disable=no-member
+            public_key=self._get_public_key(),  # lint-amnesty, pylint: disable=no-member
             entity_id="https://saml.example.none",
         )
         # Mock out HTTP requests that may be made to TestShib:
         httpretty.enable()
         httpretty.reset()
-        self.addCleanup(httpretty.reset)
-        self.addCleanup(httpretty.disable)
+        self.addCleanup(httpretty.reset)  # lint-amnesty, pylint: disable=no-member
+        self.addCleanup(httpretty.disable)  # lint-amnesty, pylint: disable=no-member
 
         def metadata_callback(_request, _uri, headers):
             """ Return a cached copy of TestShib's metadata by reading it from disk """
-            return (200, headers, self.read_data_file('testshib_metadata.xml'))
+            return (200, headers, self.read_data_file('testshib_metadata.xml'))  # lint-amnesty, pylint: disable=no-member
 
         httpretty.register_uri(httpretty.GET, TESTSHIB_METADATA_URL, content_type='text/xml', body=metadata_callback)
 
         def cache_duration_metadata_callback(_request, _uri, headers):
             """Return a cached copy of TestShib's metadata with a cacheDuration attribute"""
-            return (200, headers, self.read_data_file('testshib_metadata_with_cache_duration.xml'))
+            return (200, headers, self.read_data_file('testshib_metadata_with_cache_duration.xml'))  # lint-amnesty, pylint: disable=no-member
 
         httpretty.register_uri(
             httpretty.GET,
@@ -86,14 +86,14 @@ class SamlIntegrationTestUtilities(object):
         # Doing this and freezing the time allows us to play back recorded request/response pairs
         uid_patch = patch('onelogin.saml2.utils.OneLogin_Saml2_Utils.generate_unique_id', return_value='TESTID')
         uid_patch.start()
-        self.addCleanup(uid_patch.stop)
+        self.addCleanup(uid_patch.stop)  # lint-amnesty, pylint: disable=no-member
         self._freeze_time(timestamp=1434326820)  # This is the time when the saved request/response was recorded.
 
     def _freeze_time(self, timestamp):
         """ Mock the current time for SAML, so we can replay canned requests/responses """
         now_patch = patch('onelogin.saml2.utils.OneLogin_Saml2_Utils.now', return_value=timestamp)
         now_patch.start()
-        self.addCleanup(now_patch.stop)
+        self.addCleanup(now_patch.stop)  # lint-amnesty, pylint: disable=no-member
 
     def _configure_testshib_provider(self, **kwargs):
         """ Enable and configure the TestShib SAML IdP as a third_party_auth provider """
@@ -114,28 +114,28 @@ class SamlIntegrationTestUtilities(object):
         saml_provider = self.configure_saml_provider(**kwargs)  # pylint: disable=no-member
 
         if fetch_metadata:
-            self.assertTrue(httpretty.is_enabled())
+            self.assertTrue(httpretty.is_enabled())  # lint-amnesty, pylint: disable=no-member
             num_total, num_skipped, num_attempted, num_updated, num_failed, failure_messages = fetch_saml_metadata()
             if assert_metadata_updates:
-                self.assertEqual(num_total, 1)
-                self.assertEqual(num_skipped, 0)
-                self.assertEqual(num_attempted, 1)
-                self.assertEqual(num_updated, 1)
-                self.assertEqual(num_failed, 0)
-                self.assertEqual(len(failure_messages), 0)
+                self.assertEqual(num_total, 1)  # lint-amnesty, pylint: disable=no-member
+                self.assertEqual(num_skipped, 0)  # lint-amnesty, pylint: disable=no-member
+                self.assertEqual(num_attempted, 1)  # lint-amnesty, pylint: disable=no-member
+                self.assertEqual(num_updated, 1)  # lint-amnesty, pylint: disable=no-member
+                self.assertEqual(num_failed, 0)  # lint-amnesty, pylint: disable=no-member
+                self.assertEqual(len(failure_messages), 0)  # lint-amnesty, pylint: disable=no-member
         return saml_provider
 
     def do_provider_login(self, provider_redirect_url):
         """ Mocked: the user logs in to TestShib and then gets redirected back """
         # The SAML provider (TestShib) will authenticate the user, then get the browser to POST a response:
-        self.assertTrue(provider_redirect_url.startswith(TESTSHIB_SSO_URL))
+        self.assertTrue(provider_redirect_url.startswith(TESTSHIB_SSO_URL))  # lint-amnesty, pylint: disable=no-member
 
         saml_response_xml = utils.read_and_pre_process_xml(
             os.path.join(os.path.dirname(os.path.dirname(__file__)), 'data', 'testshib_saml_response.xml')
         )
 
-        return self.client.post(
-            self.complete_url,
+        return self.client.post(  # lint-amnesty, pylint: disable=no-member
+            self.complete_url,  # lint-amnesty, pylint: disable=no-member
             content_type='application/x-www-form-urlencoded',
             data=utils.prepare_saml_response_from_xml(saml_response_xml),
         )
@@ -188,7 +188,7 @@ class TestShibIntegrationTest(SamlIntegrationTestUtilities, IntegrationTestMixin
         enterprise_customer = EnterpriseCustomerFactory()
         assert EnterpriseCustomerUser.objects.count() == 0, "Precondition check: no link records should exist"
         EnterpriseCustomerUser.objects.link_user(enterprise_customer, user.email)
-        self.assertTrue(
+        self.assertTrue(  # lint-amnesty, pylint: disable=wrong-assert-type
             EnterpriseCustomerUser.objects.filter(enterprise_customer=enterprise_customer, user_id=user.id).count() == 1
         )
         EnterpriseCustomerIdentityProvider.objects.get_or_create(enterprise_customer=enterprise_customer,
@@ -394,7 +394,7 @@ class SuccessFactorsIntegrationTest(SamlIntegrationTestUtilities, IntegrationTes
         """
         Mock out HTTP calls to various endpoints using httpretty.
         """
-        super(SuccessFactorsIntegrationTest, self).setUp()
+        super(SuccessFactorsIntegrationTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
 
         # Mock the call to the SAP SuccessFactors assertion endpoint
         SAPSF_ASSERTION_URL = 'http://successfactors.com/oauth/idp'
@@ -467,7 +467,7 @@ class SuccessFactorsIntegrationTest(SamlIntegrationTestUtilities, IntegrationTes
         Mock an error response when calling the OData API for user details.
         """
 
-        def callback(request, uri, headers):
+        def callback(request, uri, headers):  # lint-amnesty, pylint: disable=unused-argument
             """
             Return a 500 error when someone tries to call the URL.
             """

@@ -30,7 +30,7 @@ class TestInstructorAPIEnrollmentEmailLocalization(SharedModuleStoreTestCase):
         cls.course = CourseFactory.create()
 
     def setUp(self):
-        super(TestInstructorAPIEnrollmentEmailLocalization, self).setUp()
+        super(TestInstructorAPIEnrollmentEmailLocalization, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
 
         # Platform language is English, instructor's language is Chinese,
         # student's language is Esperanto, so the emails should all be sent in

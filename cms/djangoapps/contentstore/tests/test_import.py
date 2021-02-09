@@ -37,7 +37,7 @@ class ContentStoreImportTest(ModuleStoreTestCase):
     NOTE: refactor using CourseFactory so they do not.
     """
     def setUp(self):
-        super(ContentStoreImportTest, self).setUp()
+        super(ContentStoreImportTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
 
         self.client = Client()
         self.client.login(username=self.user.username, password=self.user_password)
@@ -48,7 +48,7 @@ class ContentStoreImportTest(ModuleStoreTestCase):
 
     def tearDown(self):
         self.task_patcher.stop()
-        super(ContentStoreImportTest, self).tearDown()
+        super(ContentStoreImportTest, self).tearDown()  # lint-amnesty, pylint: disable=super-with-arguments
 
     def load_test_import_course(self, target_id=None, create_if_not_present=True, module_store=None):
         '''
@@ -252,7 +252,7 @@ class ContentStoreImportTest(ModuleStoreTestCase):
             {"0": '9f0941d021414798836ef140fb5f6841', "1": '0faf29473cf1497baa33fcc828b179cd'},
         )
 
-    def _verify_split_test_import(self, target_course_name, source_course_name, split_test_name, groups_to_verticals):
+    def _verify_split_test_import(self, target_course_name, source_course_name, split_test_name, groups_to_verticals):  # lint-amnesty, pylint: disable=missing-function-docstring
         module_store = modulestore()
         target_id = module_store.make_course_key('testX', target_course_name, 'copy_run')
         import_course_from_xml(

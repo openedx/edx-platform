@@ -22,7 +22,7 @@ class TestRecalculateLearnerGrades(HasCourseWithProblemsMixin, ModuleStoreTestCa
     """
 
     def setUp(self):
-        super(TestRecalculateLearnerGrades, self).setUp()
+        super(TestRecalculateLearnerGrades, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.command = recalculate_learner_grades.Command()
 
         self.course1 = CourseFactory.create()

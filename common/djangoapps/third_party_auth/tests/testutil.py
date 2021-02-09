@@ -12,7 +12,7 @@ import django.test
 import mock
 import six
 from django.conf import settings
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.contrib.sites.models import Site
 from mako.template import Template
 from oauth2_provider.models import Application
@@ -64,11 +64,11 @@ class ThirdPartyAuthTestMixin(object):
         patch.start()
         self.addCleanup(patch.stop)
 
-        super(ThirdPartyAuthTestMixin, self).setUp(*args, **kwargs)
+        super(ThirdPartyAuthTestMixin, self).setUp(*args, **kwargs)  # lint-amnesty, pylint: disable=super-with-arguments
 
     def tearDown(self):
         config_cache.clear()
-        super(ThirdPartyAuthTestMixin, self).tearDown()
+        super(ThirdPartyAuthTestMixin, self).tearDown()  # lint-amnesty, pylint: disable=super-with-arguments
 
     def enable_saml(self, **kwargs):
         """ Enable SAML support (via SAMLConfiguration, not for any particular provider) """
@@ -186,7 +186,7 @@ class TestCase(ThirdPartyAuthTestMixin, CacheIsolationMixin, django.test.TestCas
     """Base class for auth test cases."""
 
     def setUp(self):  # pylint: disable=arguments-differ
-        super(TestCase, self).setUp()
+        super(TestCase, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         # Explicitly set a server name that is compatible with all our providers:
         # (The SAML lib we use doesn't like the default 'testserver' as a domain)
         self.hostname = 'example.none'
@@ -215,7 +215,7 @@ class SAMLTestCase(TestCase):
         if 'public_key' not in kwargs:
             kwargs['public_key'] = self._get_public_key()
         kwargs.setdefault('entity_id', "https://saml.example.none")
-        super(SAMLTestCase, self).enable_saml(**kwargs)
+        super(SAMLTestCase, self).enable_saml(**kwargs)  # lint-amnesty, pylint: disable=super-with-arguments
 
 
 @contextmanager

@@ -26,9 +26,9 @@ class GlobalStatusMessage(ConfigurationModel):
         blank=True,
         null=True,
         help_text=u'<p>The contents of this field will be displayed as a warning banner on all views.</p>'
-                  u'<p>To override the banner message for a specific course, refer to the Course Message configuration. '
+                  u'<p>To override the banner message for a specific course, refer to the Course Message configuration. '  # lint-amnesty, pylint: disable=line-too-long
                   u'Course Messages will only work if the global status message is enabled, so if you only want to add '
-                  u'a banner to specific courses without adding a global status message, you should add a global status '
+                  u'a banner to specific courses without adding a global status message, you should add a global status '  # lint-amnesty, pylint: disable=line-too-long
                   u'message with <strong>empty</strong> message text.</p>'
                   u'<p>Finally, disable the global status message by adding another empty message with "enabled" '
                   u'unchecked.</p>')

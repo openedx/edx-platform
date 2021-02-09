@@ -4,7 +4,7 @@ Test cases for create_sites_and_configurations command.
 
 
 import mock
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.contrib.sites.models import Site
 from django.core.management import CommandError, call_command
 from django.test import TestCase
@@ -54,7 +54,7 @@ def _get_sites(dns_name, devstack=False):
 class TestCreateSiteAndConfiguration(TestCase):
     """ Test the create_site_and_configuration command """
     def setUp(self):
-        super(TestCreateSiteAndConfiguration, self).setUp()
+        super(TestCreateSiteAndConfiguration, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
 
         self.dns_name = "dummy_dns"
         self.theme_path = "/dummyA/dummyB/"
@@ -79,7 +79,7 @@ class TestCreateSiteAndConfiguration(TestCase):
                     _generate_site_config(self.dns_name, site.name)
                 )
 
-    def _assert_service_user_is_valid(self, username):
+    def _assert_service_user_is_valid(self, username):  # lint-amnesty, pylint: disable=missing-function-docstring
         service_user = User.objects.filter(username=username)
         self.assertEqual(len(service_user), 1)
         self.assertTrue(service_user[0].is_active)

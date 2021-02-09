@@ -155,7 +155,7 @@ class TestLibraries(MixedSplitTestCase):
     def test_get_libraries(self):
         """ Test get_libraries() """
         libraries = [LibraryFactory.create(modulestore=self.store) for _ in range(3)]
-        lib_dict = dict([(lib.location.library_key, lib) for lib in libraries])
+        lib_dict = dict([(lib.location.library_key, lib) for lib in libraries])  # lint-amnesty, pylint: disable=consider-using-dict-comprehension
 
         lib_list = self.store.get_libraries()
 

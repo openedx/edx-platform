@@ -30,7 +30,7 @@ from xmodule.x_module import (
 )
 from xmodule.xml_module import XmlMixin
 
-from .capa_base import CapaMixin, ComplexEncoder, _
+from .capa_base import CapaMixin, ComplexEncoder, _  # lint-amnesty, pylint: disable=unused-import
 
 log = logging.getLogger("edx.courseware")
 
@@ -95,8 +95,8 @@ class ProblemBlock(
         ]
     }
 
-    def bind_for_student(self, *args, **kwargs):
-        super(ProblemBlock, self).bind_for_student(*args, **kwargs)
+    def bind_for_student(self, *args, **kwargs):  # lint-amnesty, pylint: disable=signature-differs
+        super(ProblemBlock, self).bind_for_student(*args, **kwargs)  # lint-amnesty, pylint: disable=super-with-arguments
 
         # Capa was an XModule. When bind_for_student() was called on it with a new runtime, a new CapaModule object
         # was initialized when XModuleDescriptor._xmodule() was called next. self.lcp was constructed in CapaModule
@@ -111,7 +111,7 @@ class ProblemBlock(
         # self.score is initialized in self.lcp but in this method is accessed before self.lcp so just call it first.
         try:
             self.lcp
-        except Exception as err:
+        except Exception as err:  # lint-amnesty, pylint: disable=broad-except
             html = self.handle_fatal_lcp_error(err if show_detailed_errors else None)
         else:
             html = self.get_html()
@@ -132,7 +132,7 @@ class ProblemBlock(
             return self.student_view(context)
         else:
             # Show a message that this content requires users to login/enroll.
-            return super(ProblemBlock, self).public_view(context)
+            return super(ProblemBlock, self).public_view(context)  # lint-amnesty, pylint: disable=super-with-arguments
 
     def author_view(self, context):
         """
@@ -163,7 +163,7 @@ class ProblemBlock(
           <other request-specific values here > }
         """
         # self.score is initialized in self.lcp but in this method is accessed before self.lcp so just call it first.
-        self.lcp
+        self.lcp  # lint-amnesty, pylint: disable=pointless-statement
         handlers = {
             'hint_button': self.hint_button,
             'problem_get': self.get_problem,
@@ -207,7 +207,7 @@ class ProblemBlock(
             _, _, traceback_obj = sys.exc_info()
             six.reraise(ProcessingError, ProcessingError(not_found_error_message), traceback_obj)
 
-        except Exception:
+        except Exception:  # lint-amnesty, pylint: disable=broad-except
             log.exception(
                 "Unknown error when dispatching %s to %s for user %s",
                 dispatch,
@@ -275,7 +275,7 @@ class ProblemBlock(
 
     @property
     def non_editable_metadata_fields(self):
-        non_editable_fields = super(ProblemBlock, self).non_editable_metadata_fields
+        non_editable_fields = super(ProblemBlock, self).non_editable_metadata_fields  # lint-amnesty, pylint: disable=super-with-arguments
         non_editable_fields.extend([
             ProblemBlock.due,
             ProblemBlock.graceperiod,
@@ -301,7 +301,7 @@ class ProblemBlock(
         """
         Return dictionary prepared with module content and type for indexing.
         """
-        xblock_body = super(ProblemBlock, self).index_dictionary()
+        xblock_body = super(ProblemBlock, self).index_dictionary()  # lint-amnesty, pylint: disable=super-with-arguments
 
         # Make optioninput's options index friendly by replacing the actual tag with the values
         capa_content = re.sub(r'<optioninput options="\(([^"]+)\)".*?>\s*|\S*<\/optioninput>', r'\1', self.data)

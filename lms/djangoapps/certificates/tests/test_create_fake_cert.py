@@ -8,8 +8,8 @@ from django.test import TestCase
 from opaque_keys.edx.locator import CourseLocator
 from six import text_type
 
-from lms.djangoapps.certificates.models import GeneratedCertificate
 from common.djangoapps.student.tests.factories import UserFactory
+from lms.djangoapps.certificates.models import GeneratedCertificate
 
 
 class CreateFakeCertTest(TestCase):
@@ -18,7 +18,7 @@ class CreateFakeCertTest(TestCase):
     COURSE_KEY = CourseLocator(org='edX', course='DemoX', run='Demo_Course')
 
     def setUp(self):
-        super(CreateFakeCertTest, self).setUp()
+        super().setUp()
         self.user = UserFactory.create(username=self.USERNAME)
 
     def test_create_fake_cert(self):

@@ -40,7 +40,7 @@ class BlockRecordListTestCase(TestCase):
     """
 
     def setUp(self):
-        super(BlockRecordListTestCase, self).setUp()
+        super(BlockRecordListTestCase, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.course_key = CourseLocator(
             org='some_org',
             course='some_course',
@@ -70,7 +70,7 @@ class GradesModelTestCase(TestCase):
     Base class for common setup of grades model tests.
     """
     def setUp(self):
-        super(GradesModelTestCase, self).setUp()
+        super(GradesModelTestCase, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.course_key = CourseLocator(
             org='some_org',
             course='some_course',
@@ -136,7 +136,7 @@ class VisibleBlocksTest(GradesModelTestCase):
     """
 
     def setUp(self):
-        super(VisibleBlocksTest, self).setUp()
+        super(VisibleBlocksTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.user_id = 12345
 
     def _create_block_record_list(self, blocks, user_id=None):
@@ -209,7 +209,7 @@ class PersistentSubsectionGradeTest(GradesModelTestCase):
     """
 
     def setUp(self):
-        super(PersistentSubsectionGradeTest, self).setUp()
+        super(PersistentSubsectionGradeTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.usage_key = BlockUsageLocator(
             course_key=self.course_key,
             block_type='subsection',
@@ -360,7 +360,7 @@ class PersistentCourseGradesTest(GradesModelTestCase):
     """
 
     def setUp(self):
-        super(PersistentCourseGradesTest, self).setUp()
+        super(PersistentCourseGradesTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.params = {
             "user_id": 12345,
             "course_id": self.course_key,

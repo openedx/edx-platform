@@ -1,4 +1,4 @@
-"""
+"""  # lint-amnesty, pylint: disable=django-not-configured
 Tests that verify that the admin view loads.
 
 This is not inside a django app because it is a global property of the system.
@@ -17,7 +17,7 @@ class TestAdminView(TestCase):
     Tests of the admin view
     """
     def setUp(self):
-        super(TestAdminView, self).setUp()
+        super(TestAdminView, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.client = Client()
 
     def test_admin_view_loads_for_is_staff(self):

@@ -41,7 +41,7 @@ def process_includes(fn):
 
                 # insert  new XML into tree in place of include
                 parent.insert(parent.index(next_include), incxml)
-            except Exception:
+            except Exception:  # lint-amnesty, pylint: disable=broad-except
                 # Log error
                 msg = "Error in problem xml include: %s" % (
                     etree.tostring(next_include, pretty_print=True))
@@ -65,7 +65,7 @@ def process_includes(fn):
     return from_xml
 
 
-class SemanticSectionDescriptor(XModuleDescriptor):
+class SemanticSectionDescriptor(XModuleDescriptor):  # lint-amnesty, pylint: disable=abstract-method, missing-class-docstring
     resources_dir = None
 
     @classmethod
@@ -89,7 +89,7 @@ class SemanticSectionDescriptor(XModuleDescriptor):
             return system.process_xml(etree.tostring(xml_object))
 
 
-class TranslateCustomTagDescriptor(XModuleDescriptor):
+class TranslateCustomTagDescriptor(XModuleDescriptor):  # lint-amnesty, pylint: disable=abstract-method, missing-class-docstring
     resources_dir = None
 
     @classmethod

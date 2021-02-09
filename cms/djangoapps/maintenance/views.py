@@ -84,7 +84,7 @@ class MaintenanceBaseView(View):
     template = 'maintenance/container.html'
 
     def __init__(self, view=None):
-        super(MaintenanceBaseView, self).__init__()
+        super(MaintenanceBaseView, self).__init__()  # lint-amnesty, pylint: disable=super-with-arguments
         self.context = {
             'view': view if view else '',
             'form_data': {},
@@ -142,7 +142,7 @@ class ForcePublishCourseView(MaintenanceBaseView):
     """
 
     def __init__(self):
-        super(ForcePublishCourseView, self).__init__(MAINTENANCE_VIEWS['force_publish_course'])
+        super(ForcePublishCourseView, self).__init__(MAINTENANCE_VIEWS['force_publish_course'])  # lint-amnesty, pylint: disable=super-with-arguments
         self.context.update({
             'current_versions': [],
             'updated_versions': [],
@@ -238,7 +238,7 @@ class AnnouncementBaseView(View):
 
     @method_decorator(require_global_staff)
     def dispatch(self, request, *args, **kwargs):
-        return super(AnnouncementBaseView, self).dispatch(request, *args, **kwargs)
+        return super(AnnouncementBaseView, self).dispatch(request, *args, **kwargs)  # lint-amnesty, pylint: disable=super-with-arguments
 
 
 class AnnouncementIndexView(ListView, MaintenanceBaseView):
@@ -251,10 +251,10 @@ class AnnouncementIndexView(ListView, MaintenanceBaseView):
     paginate_by = 8
 
     def __init__(self):
-        super(AnnouncementIndexView, self).__init__(MAINTENANCE_VIEWS['announcement_index'])
+        super(AnnouncementIndexView, self).__init__(MAINTENANCE_VIEWS['announcement_index'])  # lint-amnesty, pylint: disable=super-with-arguments
 
     def get_context_data(self, **kwargs):
-        context = super(AnnouncementIndexView, self).get_context_data(**kwargs)
+        context = super(AnnouncementIndexView, self).get_context_data(**kwargs)  # lint-amnesty, pylint: disable=super-with-arguments
         context['view'] = MAINTENANCE_VIEWS['announcement_index']
         return context
 
@@ -274,7 +274,7 @@ class AnnouncementEditView(UpdateView, AnnouncementBaseView):
     template_name = '/maintenance/_announcement_edit.html'
 
     def get_context_data(self, **kwargs):
-        context = super(AnnouncementEditView, self).get_context_data(**kwargs)
+        context = super(AnnouncementEditView, self).get_context_data(**kwargs)  # lint-amnesty, pylint: disable=super-with-arguments
         context['action_url'] = reverse('maintenance:announcement_edit', kwargs={'pk': context['announcement'].pk})
         return context
 
@@ -289,7 +289,7 @@ class AnnouncementCreateView(CreateView, AnnouncementBaseView):
     template_name = '/maintenance/_announcement_edit.html'
 
     def get_context_data(self, **kwargs):
-        context = super(AnnouncementCreateView, self).get_context_data(**kwargs)
+        context = super(AnnouncementCreateView, self).get_context_data(**kwargs)  # lint-amnesty, pylint: disable=super-with-arguments
         context['action_url'] = reverse('maintenance:announcement_create')
         return context
 

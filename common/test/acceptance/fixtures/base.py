@@ -6,7 +6,7 @@ Common code shared by course and library fixtures.
 import json
 
 import requests
-import six
+import six  # lint-amnesty, pylint: disable=unused-import
 from lazy import lazy
 
 from common.test.acceptance.fixtures import STUDIO_BASE_URL
@@ -16,7 +16,7 @@ class StudioApiLoginError(Exception):
     """
     Error occurred while logging in to the Studio API.
     """
-    pass
+    pass  # lint-amnesty, pylint: disable=unnecessary-pass
 
 
 class StudioApiFixture(object):
@@ -57,7 +57,7 @@ class StudioApiFixture(object):
         Log in as a staff user, then return the cookies for the session (as a dict)
         Raises a `StudioApiLoginError` if the login fails.
         """
-        return {key: val for key, val in self.session.cookies.items()}
+        return {key: val for key, val in self.session.cookies.items()}  # lint-amnesty, pylint: disable=unnecessary-comprehension
 
     @lazy
     def headers(self):
@@ -75,7 +75,7 @@ class FixtureError(Exception):
     """
     Error occurred while installing a course or library fixture.
     """
-    pass
+    pass  # lint-amnesty, pylint: disable=unnecessary-pass
 
 
 class XBlockContainerFixture(StudioApiFixture):
@@ -85,7 +85,7 @@ class XBlockContainerFixture(StudioApiFixture):
 
     def __init__(self):
         self.children = []
-        super(XBlockContainerFixture, self).__init__()
+        super(XBlockContainerFixture, self).__init__()  # lint-amnesty, pylint: disable=super-with-arguments
 
     def add_children(self, *args):
         """
@@ -133,7 +133,7 @@ class XBlockContainerFixture(StudioApiFixture):
             loc = response.json().get('locator')
             xblock_desc.locator = loc
         except ValueError:
-            raise FixtureError(u"Could not decode JSON from '{0}'".format(response.content))
+            raise FixtureError(u"Could not decode JSON from '{0}'".format(response.content))  # lint-amnesty, pylint: disable=raise-missing-from
 
         # Configure the XBlock
         response = self.session.post(

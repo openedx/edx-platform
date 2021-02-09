@@ -16,9 +16,9 @@ from opaque_keys.edx.django.models import CourseKeyField
 from opaque_keys.edx.keys import CourseKey, UsageKey
 from xblock.core import XBlock
 
-from common.djangoapps.course_modes.models import CourseMode
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
-from common.djangoapps.student.models import CourseAccessRole, CourseEnrollment
+from openedx.core.djangoapps.enrollments.api import is_enrollment_valid_for_proctoring
+from common.djangoapps.student.models import CourseAccessRole
 from common.djangoapps.student.roles import CourseRole, OrgRole
 from xmodule.course_module import CourseDescriptor
 from xmodule.error_module import ErrorBlock
@@ -36,13 +36,7 @@ def is_track_ok_for_exam(user, exam):
     Returns whether the user is in an appropriate enrollment mode
     """
     course_id = CourseKey.from_string(exam['course_id'])
-    mode, is_active = CourseEnrollment.enrollment_mode_for_user(user, course_id)
-    appropriate_modes = [
-        CourseMode.VERIFIED, CourseMode.MASTERS, CourseMode.PROFESSIONAL, CourseMode.EXECUTIVE_EDUCATION
-    ]
-    if exam.get('is_proctored') and settings.PROCTORING_BACKENDS.get(exam['backend'], {}).get('allow_honor_mode'):
-        appropriate_modes.append(CourseMode.HONOR)
-    return is_active and mode in appropriate_modes
+    return is_enrollment_valid_for_proctoring(user.username, course_id)
 
 
 # The edx_proctoring.api uses this permission to gate access to the
@@ -69,7 +63,7 @@ class HasAccessRule(Rule):
         return Q(pk__in=[])
 
 
-class StaffAccessExperiment(laboratory.Experiment):
+class StaffAccessExperiment(laboratory.Experiment):  # lint-amnesty, pylint: disable=missing-class-docstring
     def compare(self, control, candidate):
         return bool(control.value) == candidate.value
 
@@ -160,7 +154,7 @@ class HasStaffAccessToContent(Rule):
         return query
 
 
-class HasRolesRule(Rule):
+class HasRolesRule(Rule):  # lint-amnesty, pylint: disable=abstract-method, missing-class-docstring
     def __init__(self, *roles):
         self.roles = roles
 

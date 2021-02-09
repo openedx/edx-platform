@@ -8,7 +8,7 @@ from collections import Counter
 
 import six
 from django.conf import settings
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.core.exceptions import PermissionDenied
 from django.db.models.signals import post_save
 from django.dispatch import receiver
@@ -676,7 +676,7 @@ class IsStaffOrPrivilegedOrReadOnly(IsStaffOrReadOnly):
         return (
             has_discussion_privileges(request.user, obj.course_id) or
             IsCourseStaffInstructor.has_object_permission(self, request, view, obj) or
-            super(IsStaffOrPrivilegedOrReadOnly, self).has_object_permission(request, view, obj)
+            super(IsStaffOrPrivilegedOrReadOnly, self).has_object_permission(request, view, obj)  # lint-amnesty, pylint: disable=super-with-arguments
         )
 
 
@@ -1302,7 +1302,7 @@ class MembershipListView(ExpandableFieldViewMixin, GenericAPIView):
     permission_classes = (permissions.IsAuthenticated,)
     serializer_class = MembershipSerializer
 
-    def get(self, request):
+    def get(self, request):  # lint-amnesty, pylint: disable=too-many-statements
         """GET /api/team/v0/team_membership"""
         specified_username_or_team = False
         username = None
@@ -1564,14 +1564,14 @@ class MembershipDetailView(ExpandableFieldViewMixin, GenericAPIView):
         try:
             return CourseTeam.objects.get(team_id=team_id)
         except CourseTeam.DoesNotExist:
-            raise Http404
+            raise Http404  # lint-amnesty, pylint: disable=raise-missing-from
 
     def get_membership(self, username, team):
         """Returns the membership for the given user and team, or throws Http404 if it does not exist."""
         try:
             return CourseTeamMembership.objects.get(user__username=username, team=team)
         except CourseTeamMembership.DoesNotExist:
-            raise Http404
+            raise Http404  # lint-amnesty, pylint: disable=raise-missing-from
 
     def get(self, request, team_id, username):
         """GET /api/team/v0/team_membership/{team_id},{username}"""
@@ -1681,7 +1681,7 @@ class MembershipBulkManagementView(GenericAPIView):
         try:
             course_id = CourseKey.from_string(course_id_string)
         except InvalidKeyError:
-            raise Http404('Invalid course key: {}'.format(course_id_string))
+            raise Http404('Invalid course key: {}'.format(course_id_string))  # lint-amnesty, pylint: disable=raise-missing-from
         course_module = modulestore().get_course(course_id)
         if not course_module:
             raise Http404('Course not found: {}'.format(course_id))

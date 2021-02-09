@@ -33,8 +33,8 @@ class ThirdPartyOAuthTestMixin(ThirdPartyAuthTestMixin):
 
     CREATE_USER = True
 
-    def setUp(self):
-        super(ThirdPartyOAuthTestMixin, self).setUp()
+    def setUp(self):  # lint-amnesty, pylint: disable=arguments-differ
+        super(ThirdPartyOAuthTestMixin, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         if self.CREATE_USER:
             self.user = UserFactory()
             UserSocialAuth.objects.create(user=self.user, provider=self.BACKEND, uid=self.social_uid)
@@ -45,7 +45,7 @@ class ThirdPartyOAuthTestMixin(ThirdPartyAuthTestMixin):
             self.configure_facebook_provider(enabled=True, visible=True)
 
     def tearDown(self):
-        super(ThirdPartyOAuthTestMixin, self).tearDown()
+        super(ThirdPartyOAuthTestMixin, self).tearDown()  # lint-amnesty, pylint: disable=super-with-arguments
         Partial.objects.all().delete()
 
     def _create_client(self):

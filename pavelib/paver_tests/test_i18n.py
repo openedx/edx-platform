@@ -66,7 +66,7 @@ def do_nothing():
     """
     Don't do anything, for replacing prerequisite tasks we want to skip.
     """
-    pass
+    pass  # lint-amnesty, pylint: disable=unnecessary-pass
 
 
 class FindReleaseResourcesTest(unittest.TestCase):

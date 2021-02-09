@@ -120,7 +120,7 @@ class CourseFixture(XBlockContainerFixture):
         to enable entrance exam settings would be a dict like this {"entrance_exam_enabled": "true"}
         These have the same meaning as in the Studio restful API /course end-point.
         """
-        super(CourseFixture, self).__init__()
+        super(CourseFixture, self).__init__()  # lint-amnesty, pylint: disable=super-with-arguments
         self._course_dict = {
             'org': org,
             'number': number,
@@ -242,7 +242,7 @@ class CourseFixture(XBlockContainerFixture):
         try:
             course_outline_json = response.json()
         except ValueError:
-            raise FixtureError(
+            raise FixtureError(  # lint-amnesty, pylint: disable=raise-missing-from
                 u"Could not decode course outline as JSON: '{0}'".format(response)
             )
         return course_outline_json
@@ -290,7 +290,7 @@ class CourseFixture(XBlockContainerFixture):
             err = response.json().get('ErrMsg')
 
         except ValueError:
-            raise FixtureError(
+            raise FixtureError(  # lint-amnesty, pylint: disable=raise-missing-from
                 u"Could not parse response from course request as JSON: '{0}'".format(
                     response.content))
 
@@ -322,7 +322,7 @@ class CourseFixture(XBlockContainerFixture):
         try:
             details = response.json()
         except ValueError:
-            raise FixtureError(
+            raise FixtureError(  # lint-amnesty, pylint: disable=raise-missing-from
                 u"Could not decode course details as JSON: '{0}'".format(details)
             )
 
@@ -397,7 +397,7 @@ class CourseFixture(XBlockContainerFixture):
         for asset_name in self._assets:
             asset_file_path = test_dir + '/data/uploads/' + asset_name
 
-            asset_file = open(asset_file_path, mode='rb')  # pylint: disable=open-builtin
+            asset_file = open(asset_file_path, mode='rb')  # lint-amnesty, pylint: disable=bad-option-value, open-builtin
             files = {'file': (asset_name, asset_file, mimetypes.guess_type(asset_file_path)[0])}
 
             headers = {
@@ -447,5 +447,5 @@ class CourseFixture(XBlockContainerFixture):
         """
         Recursively create XBlock children.
         """
-        super(CourseFixture, self)._create_xblock_children(parent_loc, xblock_descriptions)
+        super(CourseFixture, self)._create_xblock_children(parent_loc, xblock_descriptions)  # lint-amnesty, pylint: disable=super-with-arguments
         self._publish_xblock(parent_loc)

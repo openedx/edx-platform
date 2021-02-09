@@ -45,7 +45,7 @@ class CourseEnrollmentPagination(CursorPagination):
         Return a response given serialized page data, optional status_code (defaults to 200),
         and kwargs. Each key-value pair of kwargs is added to the response data.
         """
-        resp = super(CourseEnrollmentPagination, self).get_paginated_response(data)
+        resp = super(CourseEnrollmentPagination, self).get_paginated_response(data)  # lint-amnesty, pylint: disable=super-with-arguments
 
         for (key, value) in kwargs.items():
             resp.data[key] = value
@@ -103,13 +103,13 @@ class GradeViewMixin(DeveloperErrorViewMixin):
         try:
             yield self._get_single_user(request, course_key)
         except USER_MODEL.DoesNotExist:
-            raise self.api_error(
+            raise self.api_error(  # lint-amnesty, pylint: disable=raise-missing-from
                 status_code=status.HTTP_404_NOT_FOUND,
                 developer_message='The user matching the requested username does not exist.',
                 error_code='user_does_not_exist'
             )
         except CourseEnrollment.DoesNotExist:
-            raise self.api_error(
+            raise self.api_error(  # lint-amnesty, pylint: disable=raise-missing-from
                 status_code=status.HTTP_404_NOT_FOUND,
                 developer_message='The user matching the requested username is not enrolled in this course',
                 error_code='user_not_enrolled'
@@ -181,6 +181,6 @@ class GradeViewMixin(DeveloperErrorViewMixin):
         """
         Ensures that the user is authenticated (e.g. not an AnonymousUser).
         """
-        super(GradeViewMixin, self).perform_authentication(request)
+        super(GradeViewMixin, self).perform_authentication(request)  # lint-amnesty, pylint: disable=super-with-arguments
         if request.user.is_anonymous:
             raise AuthenticationFailed

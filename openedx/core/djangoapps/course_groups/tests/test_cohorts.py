@@ -5,7 +5,7 @@ Tests for cohorts
 
 
 import ddt
-from django.contrib.auth.models import AnonymousUser, User
+from django.contrib.auth.models import AnonymousUser, User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.db import IntegrityError
 from django.http import Http404
 from django.test import TestCase
@@ -33,7 +33,7 @@ class TestCohortSignals(TestCase):
     """
 
     def setUp(self):
-        super(TestCohortSignals, self).setUp()
+        super(TestCohortSignals, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.course_key = CourseLocator("dummy", "dummy", "dummy")
 
     def test_cohort_added(self, mock_tracker):
@@ -143,7 +143,7 @@ class TestCohorts(ModuleStoreTestCase):
         """
         Make sure that course is reloaded every time--clear out the modulestore.
         """
-        super(TestCohorts, self).setUp()
+        super(TestCohorts, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.toy_course_key = ToyCourseFactory.create().id
 
     def _create_cohort(self, course_id, cohort_name, assignment_type):
@@ -713,7 +713,7 @@ class TestCohortsAndPartitionGroups(ModuleStoreTestCase):
         """
         Regenerate a test course and cohorts for each test
         """
-        super(TestCohortsAndPartitionGroups, self).setUp()
+        super(TestCohortsAndPartitionGroups, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
 
         self.test_course_key = ToyCourseFactory.create().id
         self.course = modulestore().get_course(self.test_course_key)
@@ -857,7 +857,7 @@ class TestUnregisteredLearnerCohortAssignments(TestCase):
     """
 
     def setUp(self):
-        super(TestUnregisteredLearnerCohortAssignments, self).setUp()
+        super(TestUnregisteredLearnerCohortAssignments, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.course_key = CourseKey.from_string('course-v1:edX+DemoX+Demo_Course')
         self.cohort = CourseUserGroup.objects.create(
             name="TestCohort",

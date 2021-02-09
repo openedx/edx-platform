@@ -15,7 +15,7 @@ from cryptography.hazmat.primitives.ciphers.algorithms import AES
 from cryptography.hazmat.primitives.ciphers.modes import CBC
 from cryptography.hazmat.primitives.padding import PKCS7
 from django.conf import settings
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.core.exceptions import PermissionDenied
 from django.http import Http404, HttpResponse
 from django.views.decorators.http import require_GET, require_POST
@@ -60,7 +60,7 @@ class UsernameCipher(object):
         return Cipher(AES(hash_.digest()), CBC(initialization_vector), backend=default_backend())
 
     @staticmethod
-    def encrypt(username):
+    def encrypt(username):  # lint-amnesty, pylint: disable=missing-function-docstring
         initialization_vector = os.urandom(AES_BLOCK_SIZE_BYTES)
 
         if not isinstance(initialization_vector, (bytes, bytearray)):
@@ -73,11 +73,11 @@ class UsernameCipher(object):
         return urlsafe_b64encode(initialization_vector + encryptor.update(padded) + encryptor.finalize()).decode()
 
     @staticmethod
-    def decrypt(token):
+    def decrypt(token):  # lint-amnesty, pylint: disable=missing-function-docstring
         try:
             base64_decoded = urlsafe_b64decode(token)
         except (TypeError, Error):
-            raise UsernameDecryptionException("base64url")
+            raise UsernameDecryptionException("base64url")  # lint-amnesty, pylint: disable=raise-missing-from
 
         if len(base64_decoded) < AES_BLOCK_SIZE_BYTES:
             raise UsernameDecryptionException("initialization_vector")
@@ -91,7 +91,7 @@ class UsernameCipher(object):
         try:
             decrypted = decryptor.update(aes_encrypted) + decryptor.finalize()
         except ValueError:
-            raise UsernameDecryptionException("aes")
+            raise UsernameDecryptionException("aes")  # lint-amnesty, pylint: disable=raise-missing-from
 
         try:
             unpadded = unpadder.update(decrypted) + unpadder.finalize()
@@ -99,7 +99,7 @@ class UsernameCipher(object):
                 raise UsernameDecryptionException("padding")
             return unpadded
         except ValueError:
-            raise UsernameDecryptionException("padding")
+            raise UsernameDecryptionException("padding")  # lint-amnesty, pylint: disable=raise-missing-from
 
 
 def enable_notifications(user):
@@ -168,7 +168,7 @@ def ajax_status(request):
         key=NOTIFICATION_PREF_KEY
     )
 
-    return HttpResponse(json.dumps({"status": len(qs)}), content_type="application/json")
+    return HttpResponse(json.dumps({"status": len(qs)}), content_type="application/json")  # lint-amnesty, pylint: disable=http-response-with-content-type-json, http-response-with-json-dumps
 
 
 @require_GET
@@ -189,11 +189,11 @@ def set_subscription(request, token, subscribe):
         username = UsernameCipher().decrypt(token.encode()).decode()
         user = User.objects.get(username=username)
     except UnicodeDecodeError:
-        raise Http404("base64url")
+        raise Http404("base64url")  # lint-amnesty, pylint: disable=raise-missing-from
     except UsernameDecryptionException as exn:
-        raise Http404(text_type(exn))
+        raise Http404(text_type(exn))  # lint-amnesty, pylint: disable=raise-missing-from
     except User.DoesNotExist:
-        raise Http404("username")
+        raise Http404("username")  # lint-amnesty, pylint: disable=raise-missing-from
 
     # Calling UserPreference directly because the fact that the user is passed in the token implies
     # that it may not match request.user.

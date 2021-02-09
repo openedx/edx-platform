@@ -35,7 +35,7 @@ class LibraryContentTest(MixedSplitTestCase):
     Base class for tests of LibraryContentBlock (library_content_block.py)
     """
     def setUp(self):
-        super(LibraryContentTest, self).setUp()
+        super(LibraryContentTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
 
         self.tools = LibraryToolsService(self.store, self.user_id)
         self.library = LibraryFactory.create(modulestore=self.store)
@@ -378,7 +378,7 @@ class TestLibraryContentBlockWithSearchIndex(LibraryContentBlockTestMixin, Libra
 
     def setUp(self):
         """ Sets up search engine mock """
-        super(TestLibraryContentBlockWithSearchIndex, self).setUp()
+        super(TestLibraryContentBlockWithSearchIndex, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         search_index_mock.search = Mock(side_effect=self._get_search_response)
 
 
@@ -418,7 +418,7 @@ class TestLibraryContentAnalytics(LibraryContentTest):
     """
 
     def setUp(self):
-        super(TestLibraryContentAnalytics, self).setUp()
+        super(TestLibraryContentAnalytics, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.publisher = Mock()
         self.lc_block.refresh_children()
         self.lc_block = self.store.get_item(self.lc_block.location)

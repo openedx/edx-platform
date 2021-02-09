@@ -365,7 +365,7 @@ def adapt_references(subtree, destination_course_key, export_fs):
                     field.write_to(subtree, field.read_from(subtree).map_into_course(destination_course_key))
             elif field_name == 'children':
                 # don't change the children field but do recurse over the children
-                [adapt_references(child, destination_course_key, export_fs) for child in subtree.get_children()]
+                [adapt_references(child, destination_course_key, export_fs) for child in subtree.get_children()]  # lint-amnesty, pylint: disable=expression-not-assigned
             elif isinstance(field, ReferenceList):
                 field.write_to(
                     subtree,
@@ -374,7 +374,7 @@ def adapt_references(subtree, destination_course_key, export_fs):
             elif isinstance(field, ReferenceValueDict):
                 field.write_to(
                     subtree, {
-                        key: ele.map_into_course(destination_course_key) for key, ele in six.iteritems(field.read_from(subtree))
+                        key: ele.map_into_course(destination_course_key) for key, ele in six.iteritems(field.read_from(subtree))  # lint-amnesty, pylint: disable=line-too-long
                     }
                 )
 
@@ -394,7 +394,7 @@ def _export_field_content(xblock_item, item_dir):
                                                    sort_keys=True, indent=4).encode('utf-8'))
 
 
-def export_extra_content(export_fs, modulestore, source_course_key, dest_course_key, category_type, dirname, file_suffix=''):
+def export_extra_content(export_fs, modulestore, source_course_key, dest_course_key, category_type, dirname, file_suffix=''):  # lint-amnesty, pylint: disable=line-too-long, missing-function-docstring
     items = modulestore.get_items(source_course_key, qualifiers={'category': category_type})
 
     if len(items) > 0:

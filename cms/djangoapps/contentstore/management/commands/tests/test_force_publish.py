@@ -78,7 +78,7 @@ class TestForcePublishModifications(ModuleStoreTestCase):
     """
 
     def setUp(self):
-        super(TestForcePublishModifications, self).setUp()
+        super(TestForcePublishModifications, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.course = CourseFactory.create(default_store=ModuleStoreEnum.Type.split)
         self.test_user_id = ModuleStoreEnum.UserID.test
         self.command = Command()

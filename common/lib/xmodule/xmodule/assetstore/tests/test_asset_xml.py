@@ -21,7 +21,7 @@ class TestAssetXml(unittest.TestCase):
     """
 
     def setUp(self):
-        super(TestAssetXml, self).setUp()
+        super(TestAssetXml, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
 
         xsd_filename = "assets.xsd"
 

@@ -8,7 +8,7 @@ import os
 import tarfile
 
 from django.conf import settings
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.core.exceptions import SuspiciousOperation
 from django.core.management.base import BaseCommand, CommandError
 from lxml import etree
@@ -52,7 +52,7 @@ class Command(BaseCommand):
         try:
             safetar_extractall(tar_file, course_dir.encode('utf-8'))
         except SuspiciousOperation as exc:
-            raise CommandError(u'\n=== Course import {0}: Unsafe tar file - {1}\n'.format(archive_path, exc.args[0]))
+            raise CommandError(u'\n=== Course import {0}: Unsafe tar file - {1}\n'.format(archive_path, exc.args[0]))  # lint-amnesty, pylint: disable=raise-missing-from
         finally:
             tar_file.close()
 

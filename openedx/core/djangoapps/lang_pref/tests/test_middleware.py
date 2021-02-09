@@ -33,7 +33,7 @@ class TestUserPreferenceMiddleware(CacheIsolationTestCase):
     """
 
     def setUp(self):
-        super(TestUserPreferenceMiddleware, self).setUp()
+        super(TestUserPreferenceMiddleware, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.middleware = LanguagePreferenceMiddleware()
         self.session_middleware = SessionMiddleware()
         self.user = UserFactory.create()

@@ -8,9 +8,9 @@ from web_fragments.fragment import Fragment
 from .x_module import DescriptorSystem, XModuleDescriptor, shim_xmodule_js
 
 
-class MakoDescriptorSystem(DescriptorSystem):
+class MakoDescriptorSystem(DescriptorSystem):  # lint-amnesty, pylint: disable=abstract-method
     def __init__(self, render_template, **kwargs):
-        super(MakoDescriptorSystem, self).__init__(**kwargs)
+        super(MakoDescriptorSystem, self).__init__(**kwargs)  # lint-amnesty, pylint: disable=super-with-arguments
 
         self.render_template = render_template
 
@@ -27,7 +27,7 @@ class MakoTemplateBlockBase(object):
     # pylint: disable=no-member
 
     def __init__(self, *args, **kwargs):
-        super(MakoTemplateBlockBase, self).__init__(*args, **kwargs)
+        super(MakoTemplateBlockBase, self).__init__(*args, **kwargs)  # lint-amnesty, pylint: disable=super-with-arguments
         if getattr(self.runtime, 'render_template', None) is None:
             raise TypeError(
                 '{runtime} must have a render_template function'

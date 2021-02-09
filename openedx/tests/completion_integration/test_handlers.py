@@ -47,7 +47,7 @@ class ScorableCompletionHandlerTestCase(CompletionSetUpMixin, TestCase):
     COMPLETION_SWITCH_ENABLED = True
 
     def setUp(self):
-        super(ScorableCompletionHandlerTestCase, self).setUp()
+        super(ScorableCompletionHandlerTestCase, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.block_key = self.context_key.make_usage_key(block_type='problem', block_id='red')
 
     def call_scorable_block_completion_handler(self, block_key, score_deleted=None):
@@ -143,7 +143,7 @@ class DisabledCompletionHandlerTestCase(CompletionSetUpMixin, TestCase):
     COMPLETION_SWITCH_ENABLED = False
 
     def setUp(self):
-        super(DisabledCompletionHandlerTestCase, self).setUp()
+        super(DisabledCompletionHandlerTestCase, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.block_key = self.context_key.make_usage_key(block_type='problem', block_id='red')
 
     def test_disabled_handler_does_not_submit_completion(self):

@@ -35,7 +35,7 @@ class TestRemoveSocialAuthUsersCommand(TestCase):
         cls.command = remove_social_auth_users.Command()
 
     def setUp(self):
-        super(TestRemoveSocialAuthUsersCommand, self).setUp()
+        super(TestRemoveSocialAuthUsersCommand, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.provider_hogwarts = SAMLProviderConfigFactory.create(slug='hogwarts')
         self.provider_durmstrang = SAMLProviderConfigFactory.create(slug='durmstrang')
 
@@ -47,7 +47,7 @@ class TestRemoveSocialAuthUsersCommand(TestCase):
         self.create_social_auth_entry(self.user_viktor, self.provider_durmstrang)
 
     @contextmanager
-    def _replace_stdin(self, text):
+    def _replace_stdin(self, text):  # lint-amnesty, pylint: disable=missing-function-docstring
         orig = sys.stdin
         sys.stdin = StringIO(text)
         yield

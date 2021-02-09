@@ -95,7 +95,7 @@ class InstructorTaskModuleSubmitTest(InstructorTaskModuleTestCase):
     """Tests API methods that involve the submission of module-based background tasks."""
 
     def setUp(self):
-        super(InstructorTaskModuleSubmitTest, self).setUp()
+        super(InstructorTaskModuleSubmitTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
 
         self.initialize_course()
         self.student = UserFactory.create(username="student", email="student@edx.org")
@@ -189,12 +189,12 @@ class InstructorTaskModuleSubmitTest(InstructorTaskModuleTestCase):
             task_function(self.create_task_request(self.instructor), location, **params)
 
 
-@patch('lms.djangoapps.bulk_email.models.html_to_text', Mock(return_value='Mocking CourseEmail.text_message', autospec=True))
+@patch('lms.djangoapps.bulk_email.models.html_to_text', Mock(return_value='Mocking CourseEmail.text_message', autospec=True))  # lint-amnesty, pylint: disable=line-too-long
 class InstructorTaskCourseSubmitTest(TestReportMixin, InstructorTaskCourseTestCase):
     """Tests API methods that involve the submission of course-based background tasks."""
 
     def setUp(self):
-        super(InstructorTaskCourseSubmitTest, self).setUp()
+        super(InstructorTaskCourseSubmitTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
 
         self.initialize_course()
         self.student = UserFactory.create(username="student", email="student@edx.org")

@@ -18,7 +18,7 @@ class ModuleIsolation(object):
         # Save all the names of all the imported modules.
         self.mods = set(sys.modules)
 
-    def clean_up(self):
+    def clean_up(self):  # lint-amnesty, pylint: disable=missing-function-docstring
         # Get a list of modules that didn't exist when we were created
         new_mods = [m for m in sys.modules if m not in self.mods]
         # and delete them all so another import will run code for real again.
@@ -26,10 +26,10 @@ class ModuleIsolation(object):
             del sys.modules[m]
 
 
-class TestLazyMod(unittest.TestCase):
+class TestLazyMod(unittest.TestCase):  # lint-amnesty, pylint: disable=missing-class-docstring
 
     def setUp(self):
-        super(TestLazyMod, self).setUp()
+        super(TestLazyMod, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         # Each test will remove modules that it imported.
         self.addCleanup(ModuleIsolation().clean_up)
 

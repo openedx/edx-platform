@@ -12,8 +12,8 @@ from datetime import datetime
 import pytz
 import six
 from django.conf import settings
-from django.contrib.auth.models import User
-from django.core.mail import send_mail
+from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
+from django.core.mail import send_mail  # lint-amnesty, pylint: disable=unused-import
 from django.template.loader import render_to_string
 from django.urls import reverse
 from django.utils.translation import override as override_language
@@ -43,7 +43,7 @@ from openedx.core.djangoapps.lang_pref import LANGUAGE_KEY
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.user_api.models import UserPreference
 from openedx.core.djangolib.markup import Text
-from common.djangoapps.student.models import CourseEnrollment, CourseEnrollmentAllowed, anonymous_id_for_user, is_email_retired
+from common.djangoapps.student.models import CourseEnrollment, CourseEnrollmentAllowed, anonymous_id_for_user, is_email_retired  # lint-amnesty, pylint: disable=line-too-long
 from common.djangoapps.track.event_transaction_utils import (
     create_new_event_transaction_id,
     get_event_transaction_id,

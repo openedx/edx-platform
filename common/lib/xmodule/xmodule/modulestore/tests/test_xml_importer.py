@@ -72,7 +72,7 @@ class ModuleStoreNoSettings(unittest.TestCase):
         Add cleanups
         """
         self.addCleanup(self.cleanup_modulestore)
-        super(ModuleStoreNoSettings, self).setUp()
+        super(ModuleStoreNoSettings, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
 
 
 #===========================================
@@ -95,7 +95,7 @@ def modulestore():
         options.update(ModuleStoreNoSettings.MODULESTORE['OPTIONS'])
         options['render_template'] = render_to_template_mock
 
-        # pylint: disable=star-args
+        # lint-amnesty, pylint: disable=bad-option-value, star-args
         ModuleStoreNoSettings.modulestore = class_(
             None,  # contentstore
             ModuleStoreNoSettings.MODULESTORE['DOC_STORE_CONFIG'],
@@ -141,7 +141,7 @@ class RemapNamespaceTest(ModuleStoreNoSettings):
         self.field_data = KvsFieldData(kvs=DictKeyValueStore())
         self.scope_ids = ScopeIds('Bob', 'stubxblock', '123', 'import')
         self.xblock = StubXBlock(self.runtime, self.field_data, self.scope_ids)
-        super(RemapNamespaceTest, self).setUp()
+        super(RemapNamespaceTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
 
     def test_remap_namespace_native_xblock(self):
 
@@ -254,7 +254,7 @@ class RemapNamespaceTest(ModuleStoreNoSettings):
 
         # clearing the dirty fields and removing value from cache will fetch the value from field-data.
         self.xblock._dirty_fields = {}  # pylint: disable=protected-access
-        self.xblock.fields['test_content_field']._del_cached_value(self.xblock)  # pylint: disable=protected-access
+        self.xblock.fields['test_content_field']._del_cached_value(self.xblock)  # lint-amnesty, pylint: disable=protected-access, unsubscriptable-object
         with self.assertRaises(TypeError):
             self.xblock.get_explicitly_set_fields_by_scope(scope=Scope.content)
 
@@ -298,7 +298,7 @@ class UpdateLocationTest(ModuleStoreNoSettings):
             BlockUsageLocator(CourseLocator('org', 'course', 'run'), 'mutablestubxblock', 'child2'),
         ]
 
-        super(UpdateLocationTest, self).setUp()
+        super(UpdateLocationTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
 
     def _check_explicitly_set(self, block, scope, expected_explicitly_set_fields, should_be_set=False):
         """ Gets fields that are explicitly set on block and checks if they are marked as explicitly set or not """
@@ -343,12 +343,12 @@ class UpdateLocationTest(ModuleStoreNoSettings):
 
         # Expect these fields pass "is_set_on" test
         for field in self.CONTENT_FIELDS + self.SETTINGS_FIELDS + self.CHILDREN_FIELDS:
-            self.assertTrue(new_version.fields[field].is_set_on(new_version))
+            self.assertTrue(new_version.fields[field].is_set_on(new_version))  # lint-amnesty, pylint: disable=unsubscriptable-object
 
 
-class StaticContentImporterTest(unittest.TestCase):
+class StaticContentImporterTest(unittest.TestCase):  # lint-amnesty, pylint: disable=missing-class-docstring
 
-    def setUp(self):
+    def setUp(self):  # lint-amnesty, pylint: disable=super-method-not-called
         self.course_data_path = path('/path')
         self.mocked_content_store = mock.Mock()
         self.static_content_importer = StaticContentImporter(

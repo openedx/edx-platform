@@ -41,7 +41,7 @@ class OverrideSubsectionGradeTests(ModuleStoreTestCase):
         cls.type_patcher.stop()
 
     def setUp(self):
-        super(OverrideSubsectionGradeTests, self).setUp()
+        super(OverrideSubsectionGradeTests, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.course = CourseFactory.create(org='edX', number='DemoX', display_name='Demo_Course', run='Spring2019')
         self.subsection = ItemFactory.create(parent=self.course, category="subsection", display_name="Subsection")
         self.grade = PersistentSubsectionGrade.update_or_create_grade(
@@ -57,7 +57,7 @@ class OverrideSubsectionGradeTests(ModuleStoreTestCase):
         )
 
     def tearDown(self):
-        super(OverrideSubsectionGradeTests, self).tearDown()
+        super(OverrideSubsectionGradeTests, self).tearDown()  # lint-amnesty, pylint: disable=super-with-arguments
         PersistentSubsectionGradeOverride.objects.all().delete()  # clear out all previous overrides
 
     @ddt.data(0.0, None, 3.0)

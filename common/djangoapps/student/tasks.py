@@ -8,7 +8,7 @@ import logging
 from celery.exceptions import MaxRetriesExceededError
 from celery import shared_task
 from django.conf import settings
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.contrib.sites.models import Site
 from edx_ace import ace
 from edx_ace.errors import RecoverableChannelDeliveryError
@@ -20,7 +20,7 @@ from openedx.core.lib.celery.task_utils import emulate_http_request
 log = logging.getLogger('edx.celery.task')
 
 
-@shared_task(bind=True, name='student.send_activation_email')
+@shared_task(bind=True)
 @set_code_owner_attribute
 def send_activation_email(self, msg_string, from_address=None):
     """
@@ -66,4 +66,4 @@ def send_activation_email(self, msg_string, from_address=None):
             from_address,
             dest_addr,
         )
-        raise Exception
+        raise Exception  # lint-amnesty, pylint: disable=raise-missing-from

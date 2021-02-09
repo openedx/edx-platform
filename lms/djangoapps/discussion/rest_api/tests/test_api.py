@@ -117,7 +117,7 @@ class GetCourseTest(ForumsEnableMixin, UrlResetMixin, SharedModuleStoreTestCase)
 
     @mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
     def setUp(self):
-        super(GetCourseTest, self).setUp()
+        super(GetCourseTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.user = UserFactory.create()
         CourseEnrollmentFactory.create(user=self.user, course_id=self.course.id)
         self.request = RequestFactory().get("/dummy")
@@ -161,7 +161,7 @@ class GetCourseTestBlackouts(ForumsEnableMixin, UrlResetMixin, ModuleStoreTestCa
 
     @mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
     def setUp(self):
-        super(GetCourseTestBlackouts, self).setUp()
+        super(GetCourseTestBlackouts, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.course = CourseFactory.create(org="x", course="y", run="z")
         self.user = UserFactory.create()
         CourseEnrollmentFactory.create(user=self.user, course_id=self.course.id)
@@ -201,7 +201,7 @@ class GetCourseTopicsTest(ForumsEnableMixin, UrlResetMixin, ModuleStoreTestCase)
     """Test for get_course_topics"""
     @mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
     def setUp(self):
-        super(GetCourseTopicsTest, self).setUp()
+        super(GetCourseTopicsTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.maxDiff = None  # pylint: disable=invalid-name
         self.partition = UserPartition(
             0,
@@ -581,7 +581,7 @@ class GetThreadListTest(ForumsEnableMixin, CommentsServiceMockMixin, UrlResetMix
 
     @mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
     def setUp(self):
-        super(GetThreadListTest, self).setUp()
+        super(GetThreadListTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         httpretty.reset()
         httpretty.enable()
         self.addCleanup(httpretty.reset)
@@ -645,7 +645,7 @@ class GetThreadListTest(ForumsEnableMixin, CommentsServiceMockMixin, UrlResetMix
 
     def test_get_threads_by_topic_id(self):
         self.get_thread_list([], topic_id_list=["topic_x", "topic_meow"])
-        self.assertEqual(urlparse(httpretty.last_request().path).path, "/api/v1/threads")
+        self.assertEqual(urlparse(httpretty.last_request().path).path, "/api/v1/threads")  # lint-amnesty, pylint: disable=no-member
         self.assert_last_query_params({
             "user_id": [six.text_type(self.user.id)],
             "course_id": [six.text_type(self.course.id)],
@@ -769,7 +769,7 @@ class GetThreadListTest(ForumsEnableMixin, CommentsServiceMockMixin, UrlResetMix
         role = Role.objects.create(name=role_name, course_id=cohort_course.id)
         role.users.set([self.user])
         self.get_thread_list([], course=cohort_course)
-        actual_has_group = "group_id" in httpretty.last_request().querystring
+        actual_has_group = "group_id" in httpretty.last_request().querystring  # lint-amnesty, pylint: disable=no-member
         expected_has_group = (course_is_cohorted and role_name == FORUM_ROLE_STUDENT)
         self.assertEqual(actual_has_group, expected_has_group)
 
@@ -856,7 +856,7 @@ class GetThreadListTest(ForumsEnableMixin, CommentsServiceMockMixin, UrlResetMix
             expected_result
         )
         self.assertEqual(
-            urlparse(httpretty.last_request().path).path,
+            urlparse(httpretty.last_request().path).path,  # lint-amnesty, pylint: disable=no-member
             "/api/v1/users/{}/subscribed_threads".format(self.user.id)
         )
         self.assert_last_query_params({
@@ -887,7 +887,7 @@ class GetThreadListTest(ForumsEnableMixin, CommentsServiceMockMixin, UrlResetMix
             expected_result
         )
         self.assertEqual(
-            urlparse(httpretty.last_request().path).path,
+            urlparse(httpretty.last_request().path).path,  # lint-amnesty, pylint: disable=no-member
             "/api/v1/threads"
         )
         self.assert_last_query_params({
@@ -928,7 +928,7 @@ class GetThreadListTest(ForumsEnableMixin, CommentsServiceMockMixin, UrlResetMix
         expected_result.update({"text_search_rewrite": None})
         self.assertEqual(result, expected_result)
         self.assertEqual(
-            urlparse(httpretty.last_request().path).path,
+            urlparse(httpretty.last_request().path).path,  # lint-amnesty, pylint: disable=no-member
             "/api/v1/threads"
         )
         self.assert_last_query_params({
@@ -959,7 +959,7 @@ class GetThreadListTest(ForumsEnableMixin, CommentsServiceMockMixin, UrlResetMix
         expected_result.update({"text_search_rewrite": None})
         self.assertEqual(result, expected_result)
         self.assertEqual(
-            urlparse(httpretty.last_request().path).path,
+            urlparse(httpretty.last_request().path).path,  # lint-amnesty, pylint: disable=no-member
             "/api/v1/threads"
         )
         self.assert_last_query_params({
@@ -998,7 +998,7 @@ class GetCommentListTest(ForumsEnableMixin, CommentsServiceMockMixin, SharedModu
 
     @mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
     def setUp(self):
-        super(GetCommentListTest, self).setUp()
+        super(GetCommentListTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         httpretty.reset()
         httpretty.enable()
         self.addCleanup(httpretty.reset)
@@ -1477,7 +1477,7 @@ class CreateThreadTest(
 
     @mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
     def setUp(self):
-        super(CreateThreadTest, self).setUp()
+        super(CreateThreadTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         httpretty.reset()
         httpretty.enable()
         self.addCleanup(httpretty.reset)
@@ -1513,7 +1513,7 @@ class CreateThreadTest(
         })
         self.assertEqual(actual, expected)
         self.assertEqual(
-            httpretty.last_request().parsed_body,
+            httpretty.last_request().parsed_body,  # lint-amnesty, pylint: disable=no-member
             {
                 "course_id": [six.text_type(self.course.id)],
                 "commentable_id": ["test_topic"],
@@ -1633,7 +1633,7 @@ class CreateThreadTest(
         try:
             create_thread(self.request, data)
             self.assertFalse(expected_error)
-            actual_post_data = httpretty.last_request().parsed_body
+            actual_post_data = httpretty.last_request().parsed_body  # lint-amnesty, pylint: disable=no-member
             if data_group_state == "group_is_set":
                 self.assertEqual(actual_post_data["group_id"], [str(data["group_id"])])
             elif data_group_state == "no_group_set" and course_is_cohorted and topic_is_cohorted:
@@ -1653,12 +1653,12 @@ class CreateThreadTest(
         self.assertEqual(result["following"], True)
         cs_request = httpretty.last_request()
         self.assertEqual(
-            urlparse(cs_request.path).path,
+            urlparse(cs_request.path).path,  # lint-amnesty, pylint: disable=no-member
             "/api/v1/users/{}/subscriptions".format(self.user.id)
         )
         self.assertEqual(cs_request.method, "POST")
         self.assertEqual(
-            cs_request.parsed_body,
+            cs_request.parsed_body,  # lint-amnesty, pylint: disable=no-member
             {"source_type": ["thread"], "source_id": ["test_id"]}
         )
 
@@ -1671,10 +1671,10 @@ class CreateThreadTest(
             result = create_thread(self.request, data)
         self.assertEqual(result["voted"], True)
         cs_request = httpretty.last_request()
-        self.assertEqual(urlparse(cs_request.path).path, "/api/v1/threads/test_id/votes")
+        self.assertEqual(urlparse(cs_request.path).path, "/api/v1/threads/test_id/votes")  # lint-amnesty, pylint: disable=no-member
         self.assertEqual(cs_request.method, "PUT")
         self.assertEqual(
-            cs_request.parsed_body,
+            cs_request.parsed_body,  # lint-amnesty, pylint: disable=no-member
             {"user_id": [str(self.user.id)], "value": ["up"]}
         )
 
@@ -1686,9 +1686,9 @@ class CreateThreadTest(
         result = create_thread(self.request, data)
         self.assertEqual(result["abuse_flagged"], True)
         cs_request = httpretty.last_request()
-        self.assertEqual(urlparse(cs_request.path).path, "/api/v1/threads/test_id/abuse_flag")
+        self.assertEqual(urlparse(cs_request.path).path, "/api/v1/threads/test_id/abuse_flag")  # lint-amnesty, pylint: disable=no-member
         self.assertEqual(cs_request.method, "PUT")
-        self.assertEqual(cs_request.parsed_body, {"user_id": [str(self.user.id)]})
+        self.assertEqual(cs_request.parsed_body, {"user_id": [str(self.user.id)]})  # lint-amnesty, pylint: disable=no-member
 
     def test_course_id_missing(self):
         with self.assertRaises(ValidationError) as assertion:
@@ -1741,7 +1741,7 @@ class CreateCommentTest(
 
     @mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
     def setUp(self):
-        super(CreateCommentTest, self).setUp()
+        super(CreateCommentTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         httpretty.reset()
         httpretty.enable()
         self.addCleanup(httpretty.reset)
@@ -1810,11 +1810,11 @@ class CreateCommentTest(
             "/api/v1/threads/test_thread/comments"
         )
         self.assertEqual(
-            urlparse(httpretty.last_request().path).path,
+            urlparse(httpretty.last_request().path).path,  # lint-amnesty, pylint: disable=no-member
             expected_url
         )
         self.assertEqual(
-            httpretty.last_request().parsed_body,
+            httpretty.last_request().parsed_body,  # lint-amnesty, pylint: disable=no-member
             {
                 "course_id": [six.text_type(self.course.id)],
                 "body": ["Test body"],
@@ -1875,7 +1875,7 @@ class CreateCommentTest(
         )
         try:
             create_comment(self.request, data)
-            self.assertEqual(httpretty.last_request().parsed_body["endorsed"], ["True"])
+            self.assertEqual(httpretty.last_request().parsed_body["endorsed"], ["True"])  # lint-amnesty, pylint: disable=no-member
             self.assertFalse(expected_error)
         except ValidationError:
             self.assertTrue(expected_error)
@@ -1889,10 +1889,10 @@ class CreateCommentTest(
             result = create_comment(self.request, data)
         self.assertEqual(result["voted"], True)
         cs_request = httpretty.last_request()
-        self.assertEqual(urlparse(cs_request.path).path, "/api/v1/comments/test_comment/votes")
+        self.assertEqual(urlparse(cs_request.path).path, "/api/v1/comments/test_comment/votes")  # lint-amnesty, pylint: disable=no-member
         self.assertEqual(cs_request.method, "PUT")
         self.assertEqual(
-            cs_request.parsed_body,
+            cs_request.parsed_body,  # lint-amnesty, pylint: disable=no-member
             {"user_id": [str(self.user.id)], "value": ["up"]}
         )
 
@@ -1904,9 +1904,9 @@ class CreateCommentTest(
         result = create_comment(self.request, data)
         self.assertEqual(result["abuse_flagged"], True)
         cs_request = httpretty.last_request()
-        self.assertEqual(urlparse(cs_request.path).path, "/api/v1/comments/test_comment/abuse_flag")
+        self.assertEqual(urlparse(cs_request.path).path, "/api/v1/comments/test_comment/abuse_flag")  # lint-amnesty, pylint: disable=no-member
         self.assertEqual(cs_request.method, "PUT")
-        self.assertEqual(cs_request.parsed_body, {"user_id": [str(self.user.id)]})
+        self.assertEqual(cs_request.parsed_body, {"user_id": [str(self.user.id)]})  # lint-amnesty, pylint: disable=no-member
 
     def test_thread_id_missing(self):
         with self.assertRaises(ValidationError) as assertion:
@@ -2006,7 +2006,7 @@ class UpdateThreadTest(
 
     @mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
     def setUp(self):
-        super(UpdateThreadTest, self).setUp()
+        super(UpdateThreadTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         httpretty.reset()
         httpretty.enable()
         self.addCleanup(httpretty.reset)
@@ -2060,7 +2060,7 @@ class UpdateThreadTest(
             "title": "Original Title",
         }))
         self.assertEqual(
-            httpretty.last_request().parsed_body,
+            httpretty.last_request().parsed_body,  # lint-amnesty, pylint: disable=no-member
             {
                 "course_id": [six.text_type(self.course.id)],
                 "commentable_id": ["original_topic"],
@@ -2174,7 +2174,7 @@ class UpdateThreadTest(
         data = {"following": new_following}
         result = update_thread(self.request, "test_thread", data)
         self.assertEqual(result["following"], new_following)
-        last_request_path = urlparse(httpretty.last_request().path).path
+        last_request_path = urlparse(httpretty.last_request().path).path  # lint-amnesty, pylint: disable=no-member
         subscription_url = "/api/v1/users/{}/subscriptions".format(self.user.id)
         if old_following == new_following:
             self.assertNotEqual(last_request_path, subscription_url)
@@ -2185,8 +2185,8 @@ class UpdateThreadTest(
                 "POST" if new_following else "DELETE"
             )
             request_data = (
-                httpretty.last_request().parsed_body if new_following else
-                parse_qs(urlparse(httpretty.last_request().path).query)
+                httpretty.last_request().parsed_body if new_following else  # lint-amnesty, pylint: disable=no-member
+                parse_qs(urlparse(httpretty.last_request().path).query)  # lint-amnesty, pylint: disable=no-member
             )
             request_data.pop("request_id", None)
             self.assertEqual(
@@ -2214,7 +2214,7 @@ class UpdateThreadTest(
         data = {"voted": new_vote_status}
         result = update_thread(self.request, "test_thread", data)
         self.assertEqual(result["voted"], new_vote_status)
-        last_request_path = urlparse(httpretty.last_request().path).path
+        last_request_path = urlparse(httpretty.last_request().path).path  # lint-amnesty, pylint: disable=no-member
         votes_url = "/api/v1/threads/test_thread/votes"
         if current_vote_status == new_vote_status:
             self.assertNotEqual(last_request_path, votes_url)
@@ -2225,8 +2225,8 @@ class UpdateThreadTest(
                 "PUT" if new_vote_status else "DELETE"
             )
             actual_request_data = (
-                httpretty.last_request().parsed_body if new_vote_status else
-                parse_qs(urlparse(httpretty.last_request().path).query)
+                httpretty.last_request().parsed_body if new_vote_status else  # lint-amnesty, pylint: disable=no-member
+                parse_qs(urlparse(httpretty.last_request().path).query)  # lint-amnesty, pylint: disable=no-member
             )
             actual_request_data.pop("request_id", None)
             expected_request_data = {"user_id": [str(self.user.id)]}
@@ -2340,7 +2340,7 @@ class UpdateThreadTest(
         data = {"abuse_flagged": new_flagged}
         result = update_thread(self.request, "test_thread", data)
         self.assertEqual(result["abuse_flagged"], new_flagged)
-        last_request_path = urlparse(httpretty.last_request().path).path
+        last_request_path = urlparse(httpretty.last_request().path).path  # lint-amnesty, pylint: disable=no-member
         flag_url = "/api/v1/threads/test_thread/abuse_flag"
         unflag_url = "/api/v1/threads/test_thread/abuse_unflag"
         if old_flagged == new_flagged:
@@ -2353,7 +2353,7 @@ class UpdateThreadTest(
             )
             self.assertEqual(httpretty.last_request().method, "PUT")
             self.assertEqual(
-                httpretty.last_request().parsed_body,
+                httpretty.last_request().parsed_body,  # lint-amnesty, pylint: disable=no-member
                 {"user_id": [str(self.user.id)]}
             )
 
@@ -2387,7 +2387,7 @@ class UpdateCommentTest(
 
     @mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
     def setUp(self):
-        super(UpdateCommentTest, self).setUp()
+        super(UpdateCommentTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
 
         httpretty.reset()
         httpretty.enable()
@@ -2464,7 +2464,7 @@ class UpdateCommentTest(
         }
         self.assertEqual(actual, expected)
         self.assertEqual(
-            httpretty.last_request().parsed_body,
+            httpretty.last_request().parsed_body,  # lint-amnesty, pylint: disable=no-member
             {
                 "body": ["Edited body"],
                 "course_id": [six.text_type(self.course.id)],
@@ -2625,7 +2625,7 @@ class UpdateCommentTest(
         result = update_comment(self.request, "test_comment", data)
         self.assertEqual(result["vote_count"], 1 if new_vote_status else 0)
         self.assertEqual(result["voted"], new_vote_status)
-        last_request_path = urlparse(httpretty.last_request().path).path
+        last_request_path = urlparse(httpretty.last_request().path).path  # lint-amnesty, pylint: disable=no-member
         votes_url = "/api/v1/comments/test_comment/votes"
         if current_vote_status == new_vote_status:
             self.assertNotEqual(last_request_path, votes_url)
@@ -2636,8 +2636,8 @@ class UpdateCommentTest(
                 "PUT" if new_vote_status else "DELETE"
             )
             actual_request_data = (
-                httpretty.last_request().parsed_body if new_vote_status else
-                parse_qs(urlparse(httpretty.last_request().path).query)
+                httpretty.last_request().parsed_body if new_vote_status else  # lint-amnesty, pylint: disable=no-member
+                parse_qs(urlparse(httpretty.last_request().path).query)  # lint-amnesty, pylint: disable=no-member
             )
             actual_request_data.pop("request_id", None)
             expected_request_data = {"user_id": [str(self.user.id)]}
@@ -2751,7 +2751,7 @@ class UpdateCommentTest(
         data = {"abuse_flagged": new_flagged}
         result = update_comment(self.request, "test_comment", data)
         self.assertEqual(result["abuse_flagged"], new_flagged)
-        last_request_path = urlparse(httpretty.last_request().path).path
+        last_request_path = urlparse(httpretty.last_request().path).path  # lint-amnesty, pylint: disable=no-member
         flag_url = "/api/v1/comments/test_comment/abuse_flag"
         unflag_url = "/api/v1/comments/test_comment/abuse_unflag"
         if old_flagged == new_flagged:
@@ -2764,7 +2764,7 @@ class UpdateCommentTest(
             )
             self.assertEqual(httpretty.last_request().method, "PUT")
             self.assertEqual(
-                httpretty.last_request().parsed_body,
+                httpretty.last_request().parsed_body,  # lint-amnesty, pylint: disable=no-member
                 {"user_id": [str(self.user.id)]}
             )
 
@@ -2787,7 +2787,7 @@ class DeleteThreadTest(
 
     @mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
     def setUp(self):
-        super(DeleteThreadTest, self).setUp()
+        super(DeleteThreadTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         httpretty.reset()
         httpretty.enable()
         self.addCleanup(httpretty.reset)
@@ -2819,7 +2819,7 @@ class DeleteThreadTest(
         with self.assert_signal_sent(api, 'thread_deleted', sender=None, user=self.user, exclude_args=('post',)):
             self.assertIsNone(delete_thread(self.request, self.thread_id))
         self.assertEqual(
-            urlparse(httpretty.last_request().path).path,
+            urlparse(httpretty.last_request().path).path,  # lint-amnesty, pylint: disable=no-member
             "/api/v1/threads/{}".format(self.thread_id)
         )
         self.assertEqual(httpretty.last_request().method, "DELETE")
@@ -2924,7 +2924,7 @@ class DeleteCommentTest(
 
     @mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
     def setUp(self):
-        super(DeleteCommentTest, self).setUp()
+        super(DeleteCommentTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         httpretty.reset()
         httpretty.enable()
         self.addCleanup(httpretty.reset)
@@ -2965,7 +2965,7 @@ class DeleteCommentTest(
         with self.assert_signal_sent(api, 'comment_deleted', sender=None, user=self.user, exclude_args=('post',)):
             self.assertIsNone(delete_comment(self.request, self.comment_id))
         self.assertEqual(
-            urlparse(httpretty.last_request().path).path,
+            urlparse(httpretty.last_request().path).path,  # lint-amnesty, pylint: disable=no-member
             "/api/v1/comments/{}".format(self.comment_id)
         )
         self.assertEqual(httpretty.last_request().method, "DELETE")
@@ -3078,7 +3078,7 @@ class RetrieveThreadTest(
 
     @mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
     def setUp(self):
-        super(RetrieveThreadTest, self).setUp()
+        super(RetrieveThreadTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         httpretty.reset()
         httpretty.enable()
         self.addCleanup(httpretty.reset)

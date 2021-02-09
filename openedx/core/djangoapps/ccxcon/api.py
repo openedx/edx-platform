@@ -6,7 +6,7 @@ Module containing API functions for the CCXCon
 import logging
 
 import six
-import six.moves.urllib.parse  # pylint: disable=import-error
+import six.moves.urllib.parse  # lint-amnesty, pylint: disable=import-error, wrong-import-order
 from django.core.exceptions import ValidationError
 from django.core.validators import URLValidator
 from django.http import Http404
@@ -149,7 +149,7 @@ def course_info_to_ccxcon(course_key):
     )
 
     if resp.status_code >= 500:
-        raise CCXConnServerError(u'Server returned error Status: %s, Content: %s', resp.status_code, resp.content)
+        raise CCXConnServerError(u'Server returned error Status: %s, Content: %s', resp.status_code, resp.content)  # lint-amnesty, pylint: disable=raising-format-tuple
     if resp.status_code >= 400:
         log.error(u"Error creating course on ccxcon. Status: %s, Content: %s", resp.status_code, resp.content)
     # this API performs a POST request both for POST and PATCH, but the POST returns 201 and the PATCH returns 200

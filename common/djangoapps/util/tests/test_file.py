@@ -52,7 +52,7 @@ class FilenameGeneratorTestCase(TestCase):
     NOW = datetime.strptime('1974-06-22T01:02:03', '%Y-%m-%dT%H:%M:%S').replace(tzinfo=UTC)
 
     def setUp(self):
-        super(FilenameGeneratorTestCase, self).setUp()
+        super(FilenameGeneratorTestCase, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         datetime_patcher = patch.object(
             common.djangoapps.util.file, 'datetime',
             Mock(wraps=datetime)
@@ -83,7 +83,7 @@ class StoreUploadedFileTestCase(TestCase):
     """
 
     def setUp(self):
-        super(StoreUploadedFileTestCase, self).setUp()
+        super(StoreUploadedFileTestCase, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.request = Mock(spec=HttpRequest)
         self.file_content = b"test file content"
         self.stored_file_name = None
@@ -91,7 +91,7 @@ class StoreUploadedFileTestCase(TestCase):
         self.default_max_size = 2000000
 
     def tearDown(self):
-        super(StoreUploadedFileTestCase, self).tearDown()
+        super(StoreUploadedFileTestCase, self).tearDown()  # lint-amnesty, pylint: disable=super-with-arguments
         if self.file_storage and self.stored_file_name:
             self.file_storage.delete(self.stored_file_name)
 
@@ -232,28 +232,28 @@ class TestUniversalNewlineIterator(TestCase):
     @ddt.data(1, 2, 999)
     def test_line_feeds(self, buffer_size):
         self.assertEqual(
-            [thing.decode('utf-8') for thing in UniversalNewlineIterator(StringIO(u'foo\nbar\n'), buffer_size=buffer_size)],
+            [thing.decode('utf-8') for thing in UniversalNewlineIterator(StringIO(u'foo\nbar\n'), buffer_size=buffer_size)],  # lint-amnesty, pylint: disable=line-too-long
             ['foo\n', 'bar\n']
         )
 
     @ddt.data(1, 2, 999)
     def test_carriage_returns(self, buffer_size):
         self.assertEqual(
-            [thing.decode('utf-8') for thing in UniversalNewlineIterator(StringIO(u'foo\rbar\r'), buffer_size=buffer_size)],
+            [thing.decode('utf-8') for thing in UniversalNewlineIterator(StringIO(u'foo\rbar\r'), buffer_size=buffer_size)],  # lint-amnesty, pylint: disable=line-too-long
             ['foo\n', 'bar\n']
         )
 
     @ddt.data(1, 2, 999)
     def test_carriage_returns_and_line_feeds(self, buffer_size):
         self.assertEqual(
-            [thing.decode('utf-8') for thing in UniversalNewlineIterator(StringIO(u'foo\r\nbar\r\n'), buffer_size=buffer_size)],
+            [thing.decode('utf-8') for thing in UniversalNewlineIterator(StringIO(u'foo\r\nbar\r\n'), buffer_size=buffer_size)],  # lint-amnesty, pylint: disable=line-too-long
             ['foo\n', 'bar\n']
         )
 
     @ddt.data(1, 2, 999)
     def test_no_trailing_newline(self, buffer_size):
         self.assertEqual(
-            [thing.decode('utf-8') for thing in UniversalNewlineIterator(StringIO(u'foo\nbar'), buffer_size=buffer_size)],
+            [thing.decode('utf-8') for thing in UniversalNewlineIterator(StringIO(u'foo\nbar'), buffer_size=buffer_size)],  # lint-amnesty, pylint: disable=line-too-long
             ['foo\n', 'bar']
         )
 
@@ -281,4 +281,4 @@ class TestUniversalNewlineIterator(TestCase):
     @ddt.data(1, 2, 999)
     def test_unicode_data(self, buffer_size):
         self.assertEqual([thing.decode('utf-8') if six.PY3 else thing for thing in
-                          UniversalNewlineIterator(StringIO(u'héllø wo®ld'), buffer_size=buffer_size)], [u'héllø wo®ld'])
+                          UniversalNewlineIterator(StringIO(u'héllø wo®ld'), buffer_size=buffer_size)], [u'héllø wo®ld'])  # lint-amnesty, pylint: disable=line-too-long

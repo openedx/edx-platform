@@ -6,7 +6,7 @@ Django models related to course groups functionality.
 import json
 import logging
 
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.core.exceptions import ValidationError
 from django.db import models, transaction
 from django.db.models.signals import pre_delete
@@ -84,10 +84,10 @@ class CohortMembership(models.Model):
     class Meta(object):
         unique_together = (('user', 'course_id'), )
 
-    def clean_fields(self, *args, **kwargs):
+    def clean_fields(self, *args, **kwargs):  # lint-amnesty, pylint: disable=signature-differs
         if self.course_id is None:
             self.course_id = self.course_user_group.course_id
-        super(CohortMembership, self).clean_fields(*args, **kwargs)
+        super(CohortMembership, self).clean_fields(*args, **kwargs)  # lint-amnesty, pylint: disable=super-with-arguments
 
     def clean(self):
         if self.course_user_group.group_type != CourseUserGroup.COHORT:
@@ -131,7 +131,7 @@ class CohortMembership(models.Model):
         self.full_clean(validate_unique=False)
 
         log.info(u"Saving CohortMembership for user '%s' in '%s'", self.user.id, self.course_id)
-        return super(CohortMembership, self).save(force_insert=force_insert,
+        return super(CohortMembership, self).save(force_insert=force_insert,  # lint-amnesty, pylint: disable=super-with-arguments
                                                   force_update=force_update,
                                                   using=using,
                                                   update_fields=update_fields)

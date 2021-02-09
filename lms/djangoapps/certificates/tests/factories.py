@@ -1,10 +1,13 @@
-# Factories are self documenting
+"""
+Certificates factories
+"""
 
 
 from uuid import uuid4
 
 from factory.django import DjangoModelFactory
 
+from common.djangoapps.student.models import LinkedInAddToProfileConfiguration
 from lms.djangoapps.certificates.models import (
     CertificateHtmlViewConfiguration,
     CertificateInvalidation,
@@ -12,11 +15,12 @@ from lms.djangoapps.certificates.models import (
     CertificateWhitelist,
     GeneratedCertificate
 )
-from common.djangoapps.student.models import LinkedInAddToProfileConfiguration
 
 
 class GeneratedCertificateFactory(DjangoModelFactory):
-
+    """
+    GeneratedCertificate factory
+    """
     class Meta(object):
         model = GeneratedCertificate
 
@@ -29,6 +33,9 @@ class GeneratedCertificateFactory(DjangoModelFactory):
 
 
 class CertificateWhitelistFactory(DjangoModelFactory):
+    """
+    CertificateWhitelist factory
+    """
 
     class Meta(object):
         model = CertificateWhitelist
@@ -39,6 +46,9 @@ class CertificateWhitelistFactory(DjangoModelFactory):
 
 
 class CertificateInvalidationFactory(DjangoModelFactory):
+    """
+    CertificateInvalidation factory
+    """
 
     class Meta(object):
         model = CertificateInvalidation
@@ -48,6 +58,9 @@ class CertificateInvalidationFactory(DjangoModelFactory):
 
 
 class CertificateHtmlViewConfigurationFactory(DjangoModelFactory):
+    """
+    CertificateHtmlViewConfiguration factory
+    """
 
     class Meta(object):
         model = CertificateHtmlViewConfiguration
@@ -82,6 +95,9 @@ class CertificateHtmlViewConfigurationFactory(DjangoModelFactory):
 
 
 class LinkedInAddToProfileConfigurationFactory(DjangoModelFactory):
+    """
+    LinkedInAddToProfileConfiguration factory
+    """
 
     class Meta(object):
         model = LinkedInAddToProfileConfiguration

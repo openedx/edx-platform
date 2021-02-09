@@ -55,14 +55,14 @@ class VerifiedUpgradeTool(CourseTool):
         return True
 
     @classmethod
-    def title(cls):
+    def title(cls):  # lint-amnesty, pylint: disable=arguments-differ
         """
         Returns the title of this tool.
         """
         return _('Upgrade to Verified')
 
     @classmethod
-    def icon_classes(cls):
+    def icon_classes(cls):  # lint-amnesty, pylint: disable=arguments-differ
         """
         Returns the icon classes needed to represent this tool.
         """

@@ -19,7 +19,7 @@ from openedx.core.djangoapps.django_comment_common.utils import get_course_discu
 from openedx.core.lib.cache_utils import request_cached
 
 
-def has_permission(user, permission, course_id=None):
+def has_permission(user, permission, course_id=None):  # lint-amnesty, pylint: disable=missing-function-docstring
     assert isinstance(course_id, (type(None), CourseKey))
     request_cache_dict = DEFAULT_REQUEST_CACHE.data
     cache_key = "django_comment_client.permissions.has_permission.all_permissions.{}.{}".format(

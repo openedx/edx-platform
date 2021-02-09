@@ -9,16 +9,17 @@ from mock import patch
 from opaque_keys.edx.locator import CourseLocator
 from six import text_type
 from six.moves import range
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory, check_mongo_calls
 
+from common.djangoapps.course_modes.models import CourseMode
+from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
 from lms.djangoapps.badges.events.course_complete import get_completion_badge
 from lms.djangoapps.badges.models import BadgeAssertion
 from lms.djangoapps.badges.tests.factories import BadgeAssertionFactory, CourseCompleteImageConfigurationFactory
-from common.djangoapps.course_modes.models import CourseMode
 from lms.djangoapps.certificates.models import CertificateStatuses, GeneratedCertificate
+from lms.djangoapps.certificates.tests.factories import GeneratedCertificateFactory
 from lms.djangoapps.grades.tests.utils import mock_passing_grade
-from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory, check_mongo_calls
 
 
 class CertificateManagementTest(ModuleStoreTestCase):
@@ -29,7 +30,7 @@ class CertificateManagementTest(ModuleStoreTestCase):
     command = 'resubmit_error_certificates'
 
     def setUp(self):
-        super(CertificateManagementTest, self).setUp()
+        super().setUp()
         self.user = UserFactory.create()
         self.courses = [
             CourseFactory.create()
@@ -50,7 +51,7 @@ class CertificateManagementTest(ModuleStoreTestCase):
         )
 
         # Create the certificate
-        GeneratedCertificate.eligible_certificates.create(
+        GeneratedCertificateFactory(
             user=user,
             course_id=course_key,
             status=status
@@ -160,13 +161,13 @@ class RegenerateCertificatesTest(CertificateManagementTest):
         """
         We just need one course here.
         """
-        super(RegenerateCertificatesTest, self).setUp()
+        super().setUp()
         self.course = self.courses[0]
 
     @ddt.data(True, False)
     @override_settings(CERT_QUEUE='test-queue')
     @patch.dict('django.conf.settings.FEATURES', {'ENABLE_OPENBADGES': True})
-    @patch('lms.djangoapps.certificates.api.XQueueCertInterface', spec=True)
+    @patch('lms.djangoapps.certificates.generation_handler.XQueueCertInterface', spec=True)
     def test_clear_badge(self, issue_badges, xqueue):
         """
         Given that I have a user with a badge
@@ -229,7 +230,7 @@ class UngenerateCertificatesTest(CertificateManagementTest):
         """
         We just need one course here.
         """
-        super(UngenerateCertificatesTest, self).setUp()
+        super().setUp()
         self.course = self.courses[0]
 
     @override_settings(CERT_QUEUE='test-queue')

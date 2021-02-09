@@ -32,7 +32,7 @@ class SpecialExamsOutlineProcessor(OutlineProcessor):
         """
         Check if special exams are enabled
         """
-        self.special_exams_enabled = settings.FEATURES.get('ENABLE_SPECIAL_EXAMS', False)
+        self.special_exams_enabled = settings.FEATURES.get('ENABLE_SPECIAL_EXAMS', False)  # lint-amnesty, pylint: disable=attribute-defined-outside-init
 
     def exam_data(self, pruned_course_outline: UserCourseOutlineData) -> SpecialExamAttemptData:
         """

@@ -5,7 +5,7 @@ Tests course_creators.admin.py.
 
 import mock
 from django.contrib.admin.sites import AdminSite
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.core import mail
 from django.http import HttpRequest
 from django.test import TestCase
@@ -29,7 +29,7 @@ class CourseCreatorAdminTest(TestCase):
 
     def setUp(self):
         """ Test case setup """
-        super(CourseCreatorAdminTest, self).setUp()
+        super(CourseCreatorAdminTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.user = User.objects.create_user('test_user', 'test_user+courses@edx.org', 'foo')
         self.table_entry = CourseCreator(user=self.user)
         self.table_entry.save()

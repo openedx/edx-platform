@@ -101,7 +101,7 @@ class CertChangedReceiverTest(TestCase):
     """
 
     def setUp(self):
-        super(CertChangedReceiverTest, self).setUp()
+        super(CertChangedReceiverTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.user = UserFactory.create(username=TEST_USERNAME)
 
     @property

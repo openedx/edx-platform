@@ -63,7 +63,7 @@ class LmsSearchResultProcessorTestCase(ModuleStoreTestCase):
         )
 
     def setUp(self):
-        super(LmsSearchResultProcessorTestCase, self).setUp()
+        super(LmsSearchResultProcessorTestCase, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.build_course()
 
     def test_url_parameter(self):

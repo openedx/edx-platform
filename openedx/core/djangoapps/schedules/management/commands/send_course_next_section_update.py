@@ -4,7 +4,7 @@ Management command to send Schedule course updates
 
 import datetime
 import pytz
-from textwrap import dedent
+from textwrap import dedent  # lint-amnesty, pylint: disable=wrong-import-order
 
 from django.contrib.sites.models import Site
 

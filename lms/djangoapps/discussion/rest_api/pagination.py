@@ -51,7 +51,7 @@ class DiscussionAPIPagination(NamespacedPageNumberPagination):
         self.base_url = request.build_absolute_uri()
         self.count = result_count
 
-        super(DiscussionAPIPagination, self).__init__()
+        super(DiscussionAPIPagination, self).__init__()  # lint-amnesty, pylint: disable=super-with-arguments
 
     def get_result_count(self):
         """

@@ -107,7 +107,7 @@ DEBUG_TOOLBAR_CONFIG = {
 }
 
 
-def should_show_debug_toolbar(request):
+def should_show_debug_toolbar(request):  # lint-amnesty, pylint: disable=missing-function-docstring
     # We always want the toolbar on devstack unless running tests from another Docker container
     hostname = request.get_host()
     if hostname.startswith('edx.devstack.studio:') or hostname.startswith('studio.devstack.edx:'):
@@ -195,7 +195,7 @@ JWT_AUTH.update({
     ),
 })
 
-# pylint: enable=unicode-format-string
+# pylint: enable=unicode-format-string  # lint-amnesty, pylint: disable=bad-option-value
 
 IDA_LOGOUT_URI_LIST = [
     'http://localhost:18130/logout/',  # ecommerce
@@ -240,6 +240,11 @@ CORS_ALLOW_HEADERS = corsheaders_default_headers + (
 ################### Special Exams (Proctoring) and Prereqs ###################
 FEATURES['ENABLE_SPECIAL_EXAMS'] = True
 FEATURES['ENABLE_PREREQUISITE_COURSES'] = True
+
+# Used in edx-proctoring for ID generation in lieu of SECRET_KEY - dummy value
+# (ref MST-637)
+PROCTORING_USER_OBFUSCATION_KEY = '85920908f28904ed733fe576320db18cabd7b6cd'
+
 
 # Don't tolerate deprecated edx-platform import usage in devstack.
 ERROR_ON_DEPRECATED_EDX_PLATFORM_IMPORTS = True

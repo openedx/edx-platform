@@ -56,7 +56,7 @@ class RenderXBlockTestMixin(six.with_metaclass(ABCMeta, object)):
         """
         Clear out the block to be requested/tested before each test.
         """
-        super(RenderXBlockTestMixin, self).setUp()
+        super(RenderXBlockTestMixin, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         # to adjust the block to be tested, update block_name_to_be_tested before calling setup_course.
         self.block_name_to_be_tested = 'html_block'
 
@@ -69,7 +69,7 @@ class RenderXBlockTestMixin(six.with_metaclass(ABCMeta, object)):
             usage_key: The course block usage key. This ensures that the positive and negative tests stay in sync.
             url_encoded_params: URL encoded parameters that should be appended to the requested URL.
         """
-        pass  # pragma: no cover
+        pass  # pragma: no cover  # lint-amnesty, pylint: disable=unnecessary-pass
 
     def login(self):
         """
@@ -273,9 +273,9 @@ class FieldOverrideTestMixin(object):
     """
 
     def setUp(self):
-        super(FieldOverrideTestMixin, self).setUp()
+        super(FieldOverrideTestMixin, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         OverrideModulestoreFieldData.provider_classes = None
 
     def tearDown(self):
-        super(FieldOverrideTestMixin, self).tearDown()
+        super(FieldOverrideTestMixin, self).tearDown()  # lint-amnesty, pylint: disable=super-with-arguments
         OverrideModulestoreFieldData.provider_classes = None

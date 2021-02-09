@@ -9,7 +9,7 @@ import logging
 
 from django.conf import settings
 from django.contrib.auth import login as django_login
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.core.exceptions import NON_FIELD_ERRORS, PermissionDenied
 from django.core.validators import ValidationError
 from django.db import transaction
@@ -463,11 +463,11 @@ class RegistrationView(APIView):
     @method_decorator(transaction.non_atomic_requests)
     @method_decorator(sensitive_post_parameters("password"))
     def dispatch(self, request, *args, **kwargs):
-        return super(RegistrationView, self).dispatch(request, *args, **kwargs)
+        return super(RegistrationView, self).dispatch(request, *args, **kwargs)  # lint-amnesty, pylint: disable=super-with-arguments
 
     @method_decorator(ensure_csrf_cookie)
     def get(self, request):
-        return HttpResponse(RegistrationFormFactory().get_registration_form(request).to_json(),
+        return HttpResponse(RegistrationFormFactory().get_registration_form(request).to_json(),  # lint-amnesty, pylint: disable=http-response-with-content-type-json
                             content_type="application/json")
 
     @method_decorator(csrf_exempt)
@@ -576,7 +576,7 @@ class RegistrationView(APIView):
             return
 
         try:
-            for field_key, errors in errors.items():
+            for field_key, errors in errors.items():  # lint-amnesty, pylint: disable=redefined-argument-from-local
                 for error in errors:
                     log.info(
                         'message=registration_failed, status_code=%d, agent="%s", field="%s", error="%s"',
@@ -587,7 +587,7 @@ class RegistrationView(APIView):
                     )
         except:  # pylint: disable=bare-except
             log.exception("Failed to log registration validation error")
-            pass
+            pass  # lint-amnesty, pylint: disable=unnecessary-pass
 
 
 # pylint: disable=line-too-long

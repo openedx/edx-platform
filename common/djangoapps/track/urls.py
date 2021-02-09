@@ -3,7 +3,7 @@ URLs for track app
 """
 
 
-from django.conf import settings
+from django.conf import settings  # lint-amnesty, pylint: disable=unused-import
 from django.conf.urls import url
 
 from . import views

@@ -95,7 +95,7 @@ class SplitTestFields(object):
     )
 
     user_partition_id = Integer(
-        help=_("The configuration defines how users are grouped for this content experiment. Caution: Changing the group configuration of a student-visible experiment will impact the experiment data."),
+        help=_("The configuration defines how users are grouped for this content experiment. Caution: Changing the group configuration of a student-visible experiment will impact the experiment data."),  # lint-amnesty, pylint: disable=line-too-long
         scope=Scope.content,
         display_name=_("Group Configuration"),
         default=no_partition_selected["value"],
@@ -226,7 +226,7 @@ class SplitTestBlock(
             child_descriptor = self.get_child_descriptor_by_location(child_location)
         else:
             # Oops.  Config error.
-            log.debug("configuration error in split test module: invalid group_id %r (not one of %r).  Showing error", str_group_id, list(self.group_id_to_child.keys()))
+            log.debug("configuration error in split test module: invalid group_id %r (not one of %r).  Showing error", str_group_id, list(self.group_id_to_child.keys()))  # lint-amnesty, pylint: disable=line-too-long
 
         if child_descriptor is None:
             # Peak confusion is great.  Now that we set child_descriptor,
@@ -381,7 +381,7 @@ class SplitTestBlock(
             return fragment
 
     @XBlock.handler
-    def log_child_render(self, request, suffix=''):
+    def log_child_render(self, request, suffix=''):  # lint-amnesty, pylint: disable=unused-argument
         """
         Record in the tracking logs which child was rendered
         """
@@ -453,7 +453,7 @@ class SplitTestBlock(
             try:
                 descriptor = system.process_xml(etree.tostring(child))
                 children.append(descriptor.scope_ids.usage_id)
-            except Exception:
+            except Exception:  # lint-amnesty, pylint: disable=broad-except
                 msg = "Unable to load child when parsing split_test module."
                 log.exception(msg)
                 system.error_tracker(msg)
@@ -477,7 +477,7 @@ class SplitTestBlock(
         """
         return True
 
-    def editor_saved(self, user, old_metadata, old_content):
+    def editor_saved(self, user, old_metadata, old_content):  # lint-amnesty, pylint: disable=unused-argument
         """
         Used to create default verticals for the groups.
 
@@ -530,7 +530,7 @@ class SplitTestBlock(
         Returns the partition that this split module is currently using, or None
         if the currently selected partition ID does not match any of the defined partitions.
         """
-        for user_partition in self.user_partitions:
+        for user_partition in self.user_partitions:  # lint-amnesty, pylint: disable=not-an-iterable
             if user_partition.id == self.user_partition_id:
                 return user_partition
 
@@ -620,7 +620,7 @@ class SplitTestBlock(
                 split_validation.add(
                     StudioValidationMessage(
                         StudioValidationMessage.ERROR,
-                        _(u"The experiment uses a deleted group configuration. Select a valid group configuration or delete this experiment.")
+                        _(u"The experiment uses a deleted group configuration. Select a valid group configuration or delete this experiment.")  # lint-amnesty, pylint: disable=line-too-long
                     )
                 )
             else:
@@ -673,7 +673,7 @@ class SplitTestBlock(
         return None
 
     @XBlock.handler
-    def add_missing_groups(self, request, suffix=''):
+    def add_missing_groups(self, request, suffix=''):  # lint-amnesty, pylint: disable=unused-argument
         """
         Create verticals for any missing groups in the split test instance.
 
@@ -695,7 +695,7 @@ class SplitTestBlock(
         return Response()
 
     @property
-    def group_configuration_url(self):
+    def group_configuration_url(self):  # lint-amnesty, pylint: disable=missing-function-docstring
         assert hasattr(self.system, 'modulestore') and hasattr(self.system.modulestore, 'get_course'), \
             "modulestore has to be available"
 

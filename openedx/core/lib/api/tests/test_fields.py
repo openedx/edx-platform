@@ -20,7 +20,7 @@ class AbsoluteURLFieldTests(TestCase):
     """ Tests for the AbsoluteURLField. """
 
     def setUp(self):
-        super(AbsoluteURLFieldTests, self).setUp()
+        super(AbsoluteURLFieldTests, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.field = AbsoluteURLField()
         self.field._context = {'request': MockRequest()}  # pylint:disable=protected-access
 

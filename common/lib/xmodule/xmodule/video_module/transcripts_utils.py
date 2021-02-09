@@ -72,7 +72,7 @@ def exception_decorator(func):
             return func(*args, **kwds)
         except (TranscriptsGenerationException, UnicodeDecodeError) as ex:
             log.exception(text_type(ex))
-            raise NotFoundError
+            raise NotFoundError  # lint-amnesty, pylint: disable=raise-missing-from
     return wrapper
 
 
@@ -156,7 +156,7 @@ def youtube_video_transcript_name(youtube_text_api):
     return None
 
 
-def get_transcripts_from_youtube(youtube_id, settings, i18n, youtube_transcript_name=''):
+def get_transcripts_from_youtube(youtube_id, settings, i18n, youtube_transcript_name=''):  # lint-amnesty, pylint: disable=redefined-outer-name
     """
     Gets transcripts from youtube for youtube_id.
 
@@ -204,7 +204,7 @@ def get_transcripts_from_youtube(youtube_id, settings, i18n, youtube_transcript_
     return {'start': sub_starts, 'end': sub_ends, 'text': sub_texts}
 
 
-def download_youtube_subs(youtube_id, video_descriptor, settings):
+def download_youtube_subs(youtube_id, video_descriptor, settings):  # lint-amnesty, pylint: disable=redefined-outer-name
     """
     Download transcripts from Youtube.
 
@@ -256,7 +256,7 @@ def generate_subs_from_source(speed_subs, subs_type, subs_filedata, item, langua
         msg = _("Something wrong with SubRip transcripts file during parsing. Inner message is {error_message}").format(
             error_message=text_type(ex)
         )
-        raise TranscriptsGenerationException(msg)
+        raise TranscriptsGenerationException(msg)  # lint-amnesty, pylint: disable=raise-missing-from
     if not srt_subs_obj:
         raise TranscriptsGenerationException(_("Something wrong with SubRip transcripts file during parsing."))
 
@@ -450,7 +450,7 @@ def manage_video_subtitles_save(item, user, old_metadata=None, generate_translat
                     {speed: subs_id for subs_id, speed in six.iteritems(youtube_speed_dict(item))},
                     lang,
                 )
-            except TranscriptException as ex:
+            except TranscriptException as ex:  # lint-amnesty, pylint: disable=unused-variable
                 pass
         if reraised_message:
             item.save_with_metadata(user)
@@ -488,7 +488,7 @@ def generate_sjson_for_all_speeds(item, user_filename, result_subs_dict, lang):
     try:
         srt_transcripts = contentstore().find(Transcript.asset_location(item.location, user_filename))
     except NotFoundError as ex:
-        raise TranscriptException(_("{exception_message}: Can't find uploaded transcripts: {user_filename}").format(
+        raise TranscriptException(_("{exception_message}: Can't find uploaded transcripts: {user_filename}").format(  # lint-amnesty, pylint: disable=raise-missing-from
             exception_message=text_type(ex),
             user_filename=user_filename
         ))
@@ -670,7 +670,7 @@ class Transcript(object):
                         error_handling=SubRipFile.ERROR_RAISE
                     )
                 except Error as ex:   # Base exception from pysrt
-                    raise TranscriptsGenerationException(text_type(ex))
+                    raise TranscriptsGenerationException(text_type(ex))  # lint-amnesty, pylint: disable=raise-missing-from
 
                 return json.dumps(generate_sjson_from_srt(srt_subs))
 
@@ -1011,7 +1011,7 @@ def get_transcript_from_blockstore(video_block, language, output_format, transcr
     try:
         content_binary = blockstore_cache.get_bundle_file_data_with_cache(bundle_uuid, path, bundle_version, draft_name)
     except blockstore_api.BundleFileNotFound:
-        raise NotFoundError("Transcript file '{}' missing for video XBlock {}".format(
+        raise NotFoundError("Transcript file '{}' missing for video XBlock {}".format(  # lint-amnesty, pylint: disable=raise-missing-from
             path,
             video_block.scope_ids.usage_id,
         ))

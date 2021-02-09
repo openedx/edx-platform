@@ -83,23 +83,23 @@ class SAMLAuthBackend(SAMLAuth):  # pylint: disable=abstract-method
             config["sp"].update(self.get_idp_setting(idp, "SP_EXTRA", {}))
             return config
         else:
-            return super(SAMLAuthBackend, self).generate_saml_config()
+            return super(SAMLAuthBackend, self).generate_saml_config()  # lint-amnesty, pylint: disable=super-with-arguments
 
     def get_user_id(self, details, response):
         """
         Calling the parent function and handling the exception properly.
         """
         try:
-            return super(SAMLAuthBackend, self).get_user_id(details, response)
+            return super(SAMLAuthBackend, self).get_user_id(details, response)  # lint-amnesty, pylint: disable=super-with-arguments
         except KeyError as ex:
             log.warning(
                 u'[THIRD_PARTY_AUTH] Error in SAML authentication flow. '
                 u'Provider: {idp_name}, Message: {message}'.format(
-                    message=ex.message,
+                    message=ex.message,  # lint-amnesty, pylint: disable=no-member
                     idp_name=response.get('idp_name')
                 )
             )
-            raise IncorrectConfigurationException(self)
+            raise IncorrectConfigurationException(self)  # lint-amnesty, pylint: disable=raise-missing-from
 
     def generate_metadata_xml(self, idp_name=None):  # pylint: disable=arguments-differ
         """
@@ -127,7 +127,7 @@ class SAMLAuthBackend(SAMLAuth):  # pylint: disable=abstract-method
             log.error('[THIRD_PARTY_AUTH] SAML authentication is not enabled')
             raise Http404
 
-        return super(SAMLAuthBackend, self).auth_url()
+        return super(SAMLAuthBackend, self).auth_url()  # lint-amnesty, pylint: disable=super-with-arguments
 
     def disconnect(self, *args, **kwargs):
         """
@@ -136,7 +136,7 @@ class SAMLAuthBackend(SAMLAuth):  # pylint: disable=abstract-method
         from openedx.features.enterprise_support.api import unlink_enterprise_user_from_idp
         user = kwargs.get('user', None)
         unlink_enterprise_user_from_idp(self.strategy.request, user, self.name)
-        return super(SAMLAuthBackend, self).disconnect(*args, **kwargs)
+        return super(SAMLAuthBackend, self).disconnect(*args, **kwargs)  # lint-amnesty, pylint: disable=super-with-arguments
 
     def _check_entitlements(self, idp, attributes):
         """
@@ -165,7 +165,7 @@ class SAMLAuthBackend(SAMLAuth):  # pylint: disable=abstract-method
         """
         # We only override this method so that we can add extra debugging when debug_mode is True
         # Note that auth_inst is instantiated just for the current HTTP request, then is destroyed
-        auth_inst = super(SAMLAuthBackend, self)._create_saml_auth(idp)
+        auth_inst = super(SAMLAuthBackend, self)._create_saml_auth(idp)  # lint-amnesty, pylint: disable=super-with-arguments
         from .models import SAMLProviderConfig
         if SAMLProviderConfig.current(idp.name).debug_mode:
 
@@ -207,7 +207,7 @@ class EdXSAMLIdentityProvider(SAMLIdentityProvider):
         Overrides `get_user_details` from the base class; retrieves those details,
         then updates the dict with values from whatever additional fields are desired.
         """
-        details = super(EdXSAMLIdentityProvider, self).get_user_details(attributes)
+        details = super(EdXSAMLIdentityProvider, self).get_user_details(attributes)  # lint-amnesty, pylint: disable=super-with-arguments
         extra_field_definitions = self.conf.get('extra_field_definitions', [])
         details.update({
             field['name']: attributes[field['urn']][0] if field['urn'] in attributes else None
@@ -382,7 +382,7 @@ class SapSuccessFactorsIdentityProvider(EdXSAMLIdentityProvider):
             )
             return missing
 
-    def log_bizx_api_exception(self, transaction_data, err):
+    def log_bizx_api_exception(self, transaction_data, err):  # lint-amnesty, pylint: disable=missing-function-docstring
         try:
             sys_msg = err.response.content
         except AttributeError:
@@ -476,7 +476,7 @@ class SapSuccessFactorsIdentityProvider(EdXSAMLIdentityProvider):
             return None
         return token_response.json()
 
-    def get_bizx_odata_api_client(self, user_id):
+    def get_bizx_odata_api_client(self, user_id):  # lint-amnesty, pylint: disable=missing-function-docstring
         session = requests.Session()
         access_token_data = self.generate_bizx_oauth_api_access_token(user_id)
         if not access_token_data:
@@ -492,7 +492,7 @@ class SapSuccessFactorsIdentityProvider(EdXSAMLIdentityProvider):
         of the info we need to do that, or if the request triggers an exception, then fail nicely by
         returning the basic user details we're able to extract from just the SAML response.
         """
-        basic_details = super(SapSuccessFactorsIdentityProvider, self).get_user_details(attributes)
+        basic_details = super(SapSuccessFactorsIdentityProvider, self).get_user_details(attributes)  # lint-amnesty, pylint: disable=super-with-arguments
         if self.invalid_configuration():
             return basic_details
         user_id = basic_details['username']

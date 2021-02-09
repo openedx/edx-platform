@@ -43,7 +43,7 @@ class CourseDetailGetForm(UsernameValidatorMixin, Form):
         try:
             return CourseKey.from_string(course_key_string)
         except InvalidKeyError:
-            raise ValidationError(u"'{}' is not a valid course key.".format(six.text_type(course_key_string)))
+            raise ValidationError(u"'{}' is not a valid course key.".format(six.text_type(course_key_string)))  # lint-amnesty, pylint: disable=raise-missing-from
 
 
 class CourseListGetForm(UsernameValidatorMixin, Form):
@@ -65,7 +65,7 @@ class CourseListGetForm(UsernameValidatorMixin, Form):
         """
         Return cleaned data, including additional filters.
         """
-        cleaned_data = super(CourseListGetForm, self).clean()
+        cleaned_data = super(CourseListGetForm, self).clean()  # lint-amnesty, pylint: disable=super-with-arguments
 
         # create a filter for all supported filter fields
         filter_ = dict()

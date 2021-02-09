@@ -26,7 +26,7 @@ from xmodule.course_module import Textbook
 from xmodule.modulestore import ModuleStoreEnum, prefer_xmodules
 from xmodule.modulestore.tests.sample_courses import TOY_BLOCK_INFO_TREE, default_block_info_tree
 from xmodule.tabs import CourseTab
-from xmodule.x_module import DEPRECATION_VSCOMPAT_EVENT
+from xmodule.x_module import DEPRECATION_VSCOMPAT_EVENT  # lint-amnesty, pylint: disable=unused-import
 
 
 LOG = logging.getLogger(__name__)
@@ -46,7 +46,7 @@ class XModuleFactoryLock(threading.local):
     will be called.
     """
     def __init__(self):
-        super(XModuleFactoryLock, self).__init__()
+        super(XModuleFactoryLock, self).__init__()  # lint-amnesty, pylint: disable=super-with-arguments
         self._enabled = False
 
     def enable(self):
@@ -86,7 +86,7 @@ class XModuleFactory(Factory):
         model = Dummy
 
     @lazy_attribute
-    def modulestore(self):
+    def modulestore(self):  # lint-amnesty, pylint: disable=missing-function-docstring
         msg = "XMODULE_FACTORY_LOCK not enabled. Please use ModuleStoreTestCase as your test baseclass."
         assert XMODULE_FACTORY_LOCK.is_enabled(), msg
 
@@ -107,7 +107,7 @@ class CourseFactory(XModuleFactory):
 
     # pylint: disable=unused-argument
     @classmethod
-    def _create(cls, target_class, **kwargs):
+    def _create(cls, target_class, **kwargs):  # lint-amnesty, pylint: disable=arguments-differ
         """
         Create and return a new course. For performance reasons, we do not emit
         signals during this process, but if you need signals to run, you can
@@ -260,7 +260,7 @@ class LibraryFactory(XModuleFactory):
 
     # pylint: disable=unused-argument
     @classmethod
-    def _create(cls, target_class, **kwargs):
+    def _create(cls, target_class, **kwargs):  # lint-amnesty, pylint: disable=arguments-differ
         """
         Create a library with a unique name and key.
         All class attributes (from this class and base classes) are automagically
@@ -291,18 +291,18 @@ class ItemFactory(XModuleFactory):
     descriptive_tag = None
 
     @lazy_attribute_sequence
-    def display_name(self, n):
+    def display_name(self, n):  # lint-amnesty, pylint: disable=missing-function-docstring
         if self.descriptive_tag:
             return "{} {} - {}".format(self.category, n, self.descriptive_tag)
         else:
             return "{} {}".format(self.category, n)
 
     @lazy_attribute
-    def location(self):
+    def location(self):  # lint-amnesty, pylint: disable=missing-function-docstring
         if self.display_name is None:
             dest_name = uuid4().hex
         else:
-            dest_name = self.display_name.replace(" ", "_")
+            dest_name = self.display_name.replace(" ", "_")  # lint-amnesty, pylint: disable=no-member
 
         new_location = self.parent_location.course_key.make_usage_key(
             self.category,
@@ -311,7 +311,7 @@ class ItemFactory(XModuleFactory):
         return new_location
 
     @lazy_attribute
-    def parent_location(self):
+    def parent_location(self):  # lint-amnesty, pylint: disable=missing-function-docstring
         default_location = getattr(last_course, 'loc', None)
         try:
             parent = self.parent
@@ -326,7 +326,7 @@ class ItemFactory(XModuleFactory):
         return parent.location
 
     @classmethod
-    def _create(cls, target_class, **kwargs):
+    def _create(cls, target_class, **kwargs):  # lint-amnesty, pylint: disable=arguments-differ, unused-argument
         """
         Uses ``**kwargs``:
 
@@ -363,6 +363,9 @@ class ItemFactory(XModuleFactory):
         location = kwargs.pop('location')
         user_id = kwargs.pop('user_id', ModuleStoreEnum.UserID.test)
         publish_item = kwargs.pop('publish_item', True)
+        has_score = kwargs.pop('has_score', None)
+        submission_start = kwargs.pop('submission_start', None)
+        submission_end = kwargs.pop('submission_end', None)
 
         # Remove the descriptive_tag, it's just for generating display_name,
         # and doesn't need to be passed into the object constructor
@@ -405,6 +408,13 @@ class ItemFactory(XModuleFactory):
                 fields=kwargs,
             )
 
+            if has_score:
+                module.has_score = has_score
+            if submission_start:
+                module.submission_start = submission_start
+            if submission_end:
+                module.submission_end = submission_end
+
             # VS[compat] cdodge: This is a hack because static_tabs also have references from the course module, so
             # if we add one then we need to also add it to the policy information (i.e. metadata)
             # we should remove this once we can break this reference from the course to static tabs
@@ -416,7 +426,7 @@ class ItemFactory(XModuleFactory):
                 store.update_item(course, user_id)
 
             # parent and publish the item, so it can be accessed
-            if 'detached' not in module._class_tags:
+            if 'detached' not in module._class_tags:  # lint-amnesty, pylint: disable=protected-access
                 parent.children.append(location)
                 store.update_item(parent, user_id)
                 if publish_item:
@@ -690,7 +700,7 @@ class CourseAboutFactory(XModuleFactory):
     """
 
     @classmethod
-    def _create(cls, target_class, **kwargs):  # pylint: disable=unused-argument
+    def _create(cls, target_class, **kwargs):  # lint-amnesty, pylint: disable=arguments-differ, unused-argument
         """
         Uses **kwargs:
 

@@ -27,7 +27,7 @@ class GradingPolicyTestMixin(object):
     view_name = None
 
     def setUp(self):
-        super(GradingPolicyTestMixin, self).setUp()
+        super(GradingPolicyTestMixin, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.create_user_and_access_token()
 
     def create_user_and_access_token(self):
@@ -36,7 +36,7 @@ class GradingPolicyTestMixin(object):
         self.access_token = AccessTokenFactory.create(user=self.user, application=self.oauth_client).token
 
     @classmethod
-    def create_course_data(cls):
+    def create_course_data(cls):  # lint-amnesty, pylint: disable=missing-function-docstring
         cls.invalid_course_id = 'foo/bar/baz'
         cls.course = CourseFactory.create(display_name='An Introduction to API Testing', raw_grader=cls.raw_grader)
         cls.course_id = six.text_type(cls.course.id)
@@ -188,7 +188,7 @@ class CourseGradingPolicyTests(GradingPolicyTestMixin, SharedModuleStoreTestCase
         """
         The view should return grading policy for a course.
         """
-        response = super(CourseGradingPolicyTests, self).test_get()
+        response = super(CourseGradingPolicyTests, self).test_get()  # lint-amnesty, pylint: disable=super-with-arguments
 
         expected = [
             {
@@ -240,7 +240,7 @@ class CourseGradingPolicyMissingFieldsTests(GradingPolicyTestMixin, SharedModule
         """
         The view should return grading policy for a course.
         """
-        response = super(CourseGradingPolicyMissingFieldsTests, self).test_get()
+        response = super(CourseGradingPolicyMissingFieldsTests, self).test_get()  # lint-amnesty, pylint: disable=super-with-arguments
 
         expected = [
             {

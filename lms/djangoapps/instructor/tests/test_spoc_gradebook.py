@@ -57,7 +57,7 @@ class TestGradebook(SharedModuleStoreTestCase):
             ]
 
     def setUp(self):
-        super(TestGradebook, self).setUp()
+        super(TestGradebook, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
 
         instructor = AdminFactory.create()
         self.client.login(username=instructor.username, password='test')

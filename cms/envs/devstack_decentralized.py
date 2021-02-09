@@ -150,7 +150,7 @@ JWT_AUTH.update({
     ),
 })
 
-# pylint: enable=unicode-format-string
+# pylint: enable=unicode-format-string  # lint-amnesty, pylint: disable=bad-option-value
 
 IDA_LOGOUT_URI_LIST = [
     'http://localhost:18130/logout/',  # ecommerce

@@ -299,21 +299,21 @@ class FieldData(object):
 
     def __getattr__(self, field_name):
         if self._is_own_field(field_name):
-            return super(FieldData, self).__getattr__(field_name)
+            return super(FieldData, self).__getattr__(field_name)  # lint-amnesty, pylint: disable=no-member, super-with-arguments
         try:
             return self.fields[field_name]
         except KeyError:
-            raise AttributeError(u"Field {0} does not exist".format(field_name))
+            raise AttributeError(u"Field {0} does not exist".format(field_name))  # lint-amnesty, pylint: disable=raise-missing-from
 
     def __setattr__(self, field_name, field_value):
         if self._is_own_field(field_name):
-            return super(FieldData, self).__setattr__(field_name, field_value)
+            return super(FieldData, self).__setattr__(field_name, field_value)  # lint-amnesty, pylint: disable=super-with-arguments
         else:
             self.fields[field_name] = field_value
 
     def __delattr__(self, field_name):
         if self._is_own_field(field_name):
-            return super(FieldData, self).__delattr__(field_name)
+            return super(FieldData, self).__delattr__(field_name)  # lint-amnesty, pylint: disable=super-with-arguments
         else:
             del self.fields[field_name]
 
@@ -329,7 +329,7 @@ class TransformerData(FieldData):
     """
     Data structure to encapsulate collected data for a transformer.
     """
-    pass
+    pass  # lint-amnesty, pylint: disable=unnecessary-pass
 
 
 class TransformerDataMap(dict):
@@ -383,10 +383,10 @@ class BlockData(FieldData):
     Data structure to encapsulate collected data for a single block.
     """
     def class_field_names(self):
-        return super(BlockData, self).class_field_names() + ['location', 'transformer_data']
+        return super(BlockData, self).class_field_names() + ['location', 'transformer_data']  # lint-amnesty, pylint: disable=super-with-arguments
 
     def __init__(self, usage_key):
-        super(BlockData, self).__init__()
+        super(BlockData, self).__init__()  # lint-amnesty, pylint: disable=super-with-arguments
 
         # Location (or usage key) of the block.
         self.location = usage_key
@@ -407,7 +407,7 @@ class BlockStructureBlockData(BlockStructure):
     VERSION = 2
 
     def __init__(self, root_block_usage_key):
-        super(BlockStructureBlockData, self).__init__(root_block_usage_key)
+        super(BlockStructureBlockData, self).__init__(root_block_usage_key)  # lint-amnesty, pylint: disable=super-with-arguments
 
         # Map of a block's usage key to its collected data, including
         # its xBlock fields and block-specific transformer data.
@@ -750,7 +750,7 @@ class BlockStructureBlockData(BlockStructure):
         its current version number.
         """
         if transformer.WRITE_VERSION == 0:
-            raise TransformerException(u'Version attributes are not set on transformer {0}.', transformer.name())
+            raise TransformerException(u'Version attributes are not set on transformer {0}.', transformer.name())  # lint-amnesty, pylint: disable=raising-format-tuple
         self.set_transformer_data(transformer, TRANSFORMER_VERSION_KEY, transformer.WRITE_VERSION)
 
     def _get_or_create_block(self, usage_key):
@@ -778,7 +778,7 @@ class BlockStructureModulestoreData(BlockStructureBlockData):
     interface and implementation of an xBlock.
     """
     def __init__(self, root_block_usage_key):
-        super(BlockStructureModulestoreData, self).__init__(root_block_usage_key)
+        super(BlockStructureModulestoreData, self).__init__(root_block_usage_key)  # lint-amnesty, pylint: disable=super-with-arguments
 
         # Map of a block's usage key to its instantiated xBlock.
         # dict {UsageKey: XBlock}

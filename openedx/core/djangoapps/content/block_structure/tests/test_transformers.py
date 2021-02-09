@@ -22,10 +22,10 @@ class TestBlockStructureTransformers(ChildrenMapTestMixin, TestCase):
         """
         Mock transformer that is not registered.
         """
-        pass
+        pass  # lint-amnesty, pylint: disable=unnecessary-pass
 
     def setUp(self):
-        super(TestBlockStructureTransformers, self).setUp()
+        super(TestBlockStructureTransformers, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.transformers = BlockStructureTransformers(usage_info=MagicMock())
         self.registered_transformers = [MockTransformer(), MockFilteringTransformer()]
 

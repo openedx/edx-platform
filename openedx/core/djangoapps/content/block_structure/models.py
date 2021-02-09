@@ -38,11 +38,19 @@ def _directory_name(data_usage_key):
     Returns the directory name for the given
     data_usage_key.
     """
+    # .. setting_name: BLOCK_STRUCTURES_SETTINGS['DIRECTORY_PREFIX']
+    # .. setting_default: ''
+    # .. setting_description: Specifies the path in storage where block structures would be saved,
+    #   for storage-backed block structure cache.
+    # .. setting_warnings: Depends on `BLOCK_STRUCTURES_SETTINGS['STORAGE_CLASS']` and on
+    #   `block_structure.storage_backing_for_cache`.
+    directory_prefix = settings.BLOCK_STRUCTURES_SETTINGS.get('DIRECTORY_PREFIX', '')
+
     # replace any '/' in the usage key so they aren't interpreted
     # as folder separators.
     encoded_usage_key = six.text_type(data_usage_key).replace('/', '_')
     return '{}{}'.format(
-        settings.BLOCK_STRUCTURES_SETTINGS.get('DIRECTORY_PREFIX', ''),
+        directory_prefix,
         encoded_usage_key,
     )
 
@@ -63,10 +71,21 @@ def _bs_model_storage():
     """
     Get django Storage object for BlockStructureModel.
     """
-    return get_storage(
-        settings.BLOCK_STRUCTURES_SETTINGS.get('STORAGE_CLASS'),
-        **settings.BLOCK_STRUCTURES_SETTINGS.get('STORAGE_KWARGS', {})
-    )
+    # .. setting_name: BLOCK_STRUCTURES_SETTINGS['STORAGE_CLASS']
+    # .. setting_default: None
+    # .. setting_description: Specifies the storage used for storage-backed block structure cache.
+    # .. setting_warnings: Depends on `block_structure.storage_backing_for_cache`.
+    storage_class = settings.BLOCK_STRUCTURES_SETTINGS.get('STORAGE_CLASS')
+
+    # .. setting_name: BLOCK_STRUCTURES_SETTINGS['STORAGE_KWARGS']
+    # .. setting_default: {}
+    # .. setting_description: Specifies the keyword arguments needed to setup the storage, which
+    #   would be used for storage-backed block structure cache.
+    # .. setting_warnings: Depends on `BLOCK_STRUCTURES_SETTINGS['STORAGE_CLASS']` and on
+    #   `block_structure.storage_backing_for_cache`.
+    storage_kwargs = settings.BLOCK_STRUCTURES_SETTINGS.get('STORAGE_KWARGS', {})
+
+    return get_storage(storage_class, **storage_kwargs)
 
 
 class CustomizableFileField(models.FileField):
@@ -83,10 +102,10 @@ class CustomizableFileField(models.FileField):
             storage=_bs_model_storage(),
             max_length=500,  # allocate enough for base path + prefix + usage_key + timestamp in filepath
         ))
-        super(CustomizableFileField, self).__init__(*args, **kwargs)
+        super(CustomizableFileField, self).__init__(*args, **kwargs)  # lint-amnesty, pylint: disable=super-with-arguments
 
-    def deconstruct(self):
-        name, path, args, kwargs = super(CustomizableFileField, self).deconstruct()
+    def deconstruct(self):  # lint-amnesty, pylint: disable=missing-function-docstring
+        name, path, args, kwargs = super(CustomizableFileField, self).deconstruct()  # lint-amnesty, pylint: disable=super-with-arguments
         del kwargs['upload_to']
         del kwargs['storage']
         del kwargs['max_length']
@@ -117,13 +136,13 @@ def _storage_error_handling(bs_model, operation, is_read_operation=False):
         yield
     except Exception as error:  # pylint: disable=broad-except
         log.exception(u'BlockStructure: Exception %s on store %s; %s.', error.__class__, operation, bs_model)
-        if isinstance(error, OSError) and error.errno in (errno.EACCES, errno.EPERM):  # pylint: disable=no-member
+        if isinstance(error, OSError) and error.errno in (errno.EACCES, errno.EPERM):  # lint-amnesty, pylint: disable=no-else-raise, no-member
             raise
         elif is_read_operation and isinstance(error, (IOError, SuspiciousOperation)):
             # May have been caused by one of the possible error
             # situations listed above.  Raise BlockStructureNotFound
             # so the block structure can be regenerated and restored.
-            raise BlockStructureNotFound(bs_model.data_usage_key)
+            raise BlockStructureNotFound(bs_model.data_usage_key)  # lint-amnesty, pylint: disable=raise-missing-from
         else:
             raise
 
@@ -197,7 +216,7 @@ class BlockStructureModel(TimeStampedModel):
             return cls.objects.get(data_usage_key=data_usage_key)
         except cls.DoesNotExist:
             log.info(u'BlockStructure: Not found in table; %s.', data_usage_key)
-            raise BlockStructureNotFound(data_usage_key)
+            raise BlockStructureNotFound(data_usage_key)  # lint-amnesty, pylint: disable=raise-missing-from
 
     @classmethod
     def update_or_create(cls, serialized_data, data_usage_key, **kwargs):
@@ -244,7 +263,7 @@ class BlockStructureModel(TimeStampedModel):
 
         try:
             all_files_by_date = sorted(cls._get_all_files(data_usage_key))
-            files_to_delete = all_files_by_date[:-num_to_keep] if num_to_keep > 0 else all_files_by_date
+            files_to_delete = all_files_by_date[:-num_to_keep] if num_to_keep > 0 else all_files_by_date  # lint-amnesty, pylint: disable=invalid-unary-operand-type
             cls._delete_files(files_to_delete)
             log.info(
                 u'BlockStructure: Deleted %d out of total %d files in store; data_usage_key: %s, num_to_keep: %d.',

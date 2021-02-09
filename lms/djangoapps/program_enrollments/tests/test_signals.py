@@ -127,7 +127,7 @@ class SocialAuthEnrollmentCompletionSignalTest(CacheIsolationTestCase):
         )
 
     def setUp(self):
-        super(SocialAuthEnrollmentCompletionSignalTest, self).setUp()
+        super(SocialAuthEnrollmentCompletionSignalTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         RequestCache.clear_all_namespaces()
         catalog_org = CatalogOrganizationFactory.create(key=self.organization.short_name)
         self.program_uuid = self._create_catalog_program(catalog_org)['uuid']

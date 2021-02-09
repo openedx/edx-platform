@@ -19,7 +19,7 @@ import six
 from six.moves import zip
 
 from common.djangoapps.course_modes.helpers import enrollment_mode_display
-from common.djangoapps.course_modes.models import CourseMode, Mode, get_cosmetic_display_price, invalidate_course_mode_cache
+from common.djangoapps.course_modes.models import CourseMode, Mode, get_cosmetic_display_price, invalidate_course_mode_cache  # lint-amnesty, pylint: disable=line-too-long
 from common.djangoapps.course_modes.tests.factories import CourseModeFactory
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
@@ -38,12 +38,12 @@ class CourseModeModelTest(TestCase):
     }
 
     def setUp(self):
-        super(CourseModeModelTest, self).setUp()
+        super(CourseModeModelTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.course_key = CourseLocator('Test', 'TestCourse', 'TestCourseRun')
         CourseMode.objects.all().delete()
 
     def tearDown(self):
-        super(CourseModeModelTest, self).tearDown()
+        super(CourseModeModelTest, self).tearDown()  # lint-amnesty, pylint: disable=super-with-arguments
         invalidate_course_mode_cache(sender=None)
 
     def create_mode(
@@ -524,7 +524,7 @@ class CourseModeModelTest(TestCase):
         self.assertEqual(CourseMode.is_masters_only(self.course_key), expected_is_masters_only)
 
 
-class TestCourseOverviewIntegration(ModuleStoreTestCase):
+class TestCourseOverviewIntegration(ModuleStoreTestCase):  # lint-amnesty, pylint: disable=missing-class-docstring
     def test_course_overview_version_update(self):
         course = CourseFactory.create()
         course_overview = CourseOverview.get_from_id(course.id)
@@ -537,7 +537,7 @@ class TestCourseOverviewIntegration(ModuleStoreTestCase):
         assert CourseMode.objects.filter(pk=course_mode.pk).exists()
 
 
-class TestDisplayPrices(ModuleStoreTestCase):
+class TestDisplayPrices(ModuleStoreTestCase):  # lint-amnesty, pylint: disable=missing-class-docstring
     @override_settings(PAID_COURSE_REGISTRATION_CURRENCY=["USD", "$"])
     def test_get_cosmetic_display_price(self):
         """

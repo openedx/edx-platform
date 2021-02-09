@@ -185,7 +185,7 @@ def user_organization_protection_status(user, course_key):
         else:
             return OrganizationProtectionStatus.unprotected
     else:
-        raise ValueError(
+        raise ValueError(  # lint-amnesty, pylint: disable=raising-format-tuple
             'Cannot check the org_protection status on a student [%s] not enrolled in course [%s]',
             user.id,
             course_key
@@ -349,7 +349,7 @@ def get_team_for_user_course_topic(user, course_id, topic_id):
     try:
         course_key = CourseKey.from_string(course_id)
     except InvalidKeyError:
-        raise ValueError(u"The supplied course id {course_id} is not valid.".format(
+        raise ValueError(u"The supplied course id {course_id} is not valid.".format(  # lint-amnesty, pylint: disable=raise-missing-from
             course_id=course_id
         ))
     try:
@@ -392,7 +392,7 @@ def anonymous_user_ids_for_team(user, team):
         ))
 
     return sorted([
-        anonymous_id_for_user(user=team_member, course_id=team.course_id, save=True)
+        anonymous_id_for_user(user=team_member, course_id=team.course_id)
         for team_member in team.users.all()
     ])
 

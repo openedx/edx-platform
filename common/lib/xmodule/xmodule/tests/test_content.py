@@ -100,7 +100,7 @@ class MockImage(Mock):
 
 
 @ddt.ddt
-class ContentTest(unittest.TestCase):
+class ContentTest(unittest.TestCase):  # lint-amnesty, pylint: disable=missing-class-docstring
 
     def test_thumbnail_none(self):
         # We had a bug where a thumbnail location of None was getting transformed into a Location tuple, with
@@ -222,6 +222,6 @@ class ContentTest(unittest.TestCase):
         """
         output_root = path(u'common/static/xmodule/descriptors/js')
         file_owners = _write_js(output_root, _list_descriptors(), 'get_studio_view_js')
-        js_file_paths = set(file_path for file_path in sum(list(file_owners.values()), []) if os.path.basename(file_path).startswith('000-'))
+        js_file_paths = set(file_path for file_path in sum(list(file_owners.values()), []) if os.path.basename(file_path).startswith('000-'))  # lint-amnesty, pylint: disable=line-too-long
         self.assertEqual(len(js_file_paths), 1)
         self.assertIn("XModule.Descriptor = (function() {", open(js_file_paths.pop()).read())

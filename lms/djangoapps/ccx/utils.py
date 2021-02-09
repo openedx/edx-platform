@@ -11,7 +11,7 @@ from contextlib import contextmanager
 from smtplib import SMTPException
 
 import pytz
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.core.exceptions import ValidationError
 from django.core.validators import validate_email
 from django.urls import reverse
@@ -226,7 +226,7 @@ def get_valid_student_with_email(identifier):
     try:
         validate_email(email)
     except ValidationError:
-        raise CCXUserValidationException(u'Could not find a user with name or email "{0}" '.format(identifier))
+        raise CCXUserValidationException(u'Could not find a user with name or email "{0}" '.format(identifier))  # lint-amnesty, pylint: disable=raise-missing-from
     return email, user
 
 
@@ -271,7 +271,7 @@ def ccx_students_enrolling_center(action, identifiers, email_students, course_ke
                 errors.append(error)
                 break
             enroll_email(course_key, email, auto_enroll=True, email_students=email_students, email_params=email_params)
-    elif action == 'Unenroll' or action == 'revoke':
+    elif action == 'Unenroll' or action == 'revoke':  # lint-amnesty, pylint: disable=consider-using-in
         for identifier in identifiers:
             try:
                 email, __ = get_valid_student_with_email(identifier)

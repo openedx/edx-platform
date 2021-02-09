@@ -25,7 +25,7 @@ class CourseDatesFragmentView(EdxFragmentView):
     """
     template_name = 'course_experience/course-dates-fragment.html'
 
-    def render_to_fragment(self, request, course_id=None, **kwargs):
+    def render_to_fragment(self, request, course_id=None, **kwargs):  # lint-amnesty, pylint: disable=arguments-differ
         """
         Render the course dates fragment.
         """
@@ -67,7 +67,7 @@ class CourseDatesFragmentMobileView(CourseDatesFragmentView):
     def get(self, request, *args, **kwargs):
         if not request.user.is_authenticated:
             raise Http404
-        return super(CourseDatesFragmentMobileView, self).get(request, *args, **kwargs)
+        return super(CourseDatesFragmentMobileView, self).get(request, *args, **kwargs)  # lint-amnesty, pylint: disable=super-with-arguments
 
     def css_dependencies(self):
         """

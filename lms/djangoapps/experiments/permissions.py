@@ -19,7 +19,7 @@ class IsStaffOrOwner(permissions.IsStaffOrOwner):
         # Non-staff users can only create data for themselves.
         if view.action == 'create':
             username = request.user.username
-            return super(IsStaffOrOwner, self).has_permission(request, view) or (
+            return super(IsStaffOrOwner, self).has_permission(request, view) or (  # lint-amnesty, pylint: disable=super-with-arguments
                 username == request.data.get('user', username))
 
         # The view will handle filtering for the current user

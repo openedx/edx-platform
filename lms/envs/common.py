@@ -112,8 +112,17 @@ FEATURES = {
     ## Doing so will cause all courses to be released on production
     'DISABLE_START_DATES': False,
 
-    # for consistency in user-experience, keep the value of the following 3 settings
-    # in sync with the corresponding ones in cms/envs/common.py
+    # .. toggle_name: FEATURES['ENABLE_DISCUSSION_SERVICE']
+    # .. toggle_implementation: DjangoSetting
+    # .. toggle_default: True
+    # .. toggle_description: When True, it will enable the Discussion tab in courseware for all courses. Setting this
+    #   to False will not contain inline discussion components and discussion tab in any courses.
+    # .. toggle_use_cases: open_edx
+    # .. toggle_creation_date: 2012-08-14
+    # .. toggle_warnings: If the discussion panel is present in the course and the value for this flag is False then,
+    #   attempting to expand those components will cause errors. So, this should only be set to False with an LMS that
+    #   is running courses that do not contain discussion components.
+    #   For consistency in user-experience, keep the value in sync with the setting of the same name in the CMS.
     'ENABLE_DISCUSSION_SERVICE': True,
 
     # .. toggle_name: FEATURES['ENABLE_TEXTBOOK']
@@ -123,7 +132,8 @@ FEATURES = {
     # .. toggle_use_cases: open_edx
     # .. toggle_creation_date: 2014-03-27
     # .. toggle_target_removal_date: None
-    # .. toggle_warnings: None
+    # .. toggle_warnings: For consistency in user-experience, keep the value in sync with the setting of the same name
+    #   in the CMS.
     # .. toggle_tickets: https://github.com/edx/edx-platform/pull/3064
     'ENABLE_TEXTBOOK': True,
 
@@ -159,7 +169,16 @@ FEATURES = {
     # .. toggle_tickets: https://github.com/edx/edx-platform/pull/14729
     'ENABLE_UNICODE_USERNAME': False,
 
-    'ENABLE_DJANGO_ADMIN_SITE': True,  # set true to enable django's admin site, even on prod (e.g. for course ops)
+    # .. toggle_name: FEATURES['ENABLE_DJANGO_ADMIN_SITE']
+    # .. toggle_implementation: DjangoSetting
+    # .. toggle_default: True
+    # .. toggle_description: Set to False if you want to disable Django's admin site.
+    # .. toggle_use_cases: open_edx
+    # .. toggle_creation_date: 2013-09-26
+    # .. toggle_warnings: It is not recommended to disable this feature as there are many settings available on
+    #  Django's admin site and will be inaccessible to the superuser.
+    # .. toggle_tickets: https://github.com/edx/edx-platform/pull/829
+    'ENABLE_DJANGO_ADMIN_SITE': True,
     'ENABLE_LMS_MIGRATION': False,
 
     # .. toggle_name: FEATURES['ENABLE_MASQUERADE']
@@ -185,7 +204,17 @@ FEATURES = {
     # .. toggle_tickets: None
     'ENABLE_SYSADMIN_DASHBOARD': False,  # sysadmin dashboard, to see what courses are loaded, to delete & load courses
 
-    'DISABLE_LOGIN_BUTTON': False,  # used in systems where login is automatic, eg MIT SSL
+    # .. toggle_name: FEATURES['DISABLE_LOGIN_BUTTON']
+    # .. toggle_implementation: DjangoSetting
+    # .. toggle_default: False
+    # .. toggle_description: Removes the display of the login button in the navigation bar.
+    #   Change is only at the UI level. Used in systems where login is automatic, eg MIT SSL
+    # .. toggle_use_cases: open_edx
+    # .. toggle_creation_date: 2013-12-03
+    # .. toggle_target_removal_date: None
+    # .. toggle_warnings: None
+    # .. toggle_tickets: None
+    'DISABLE_LOGIN_BUTTON': False,
 
     # .. toggle_name: FEATURES['ENABLE_OAUTH2_PROVIDER']
     # .. toggle_implementation: DjangoSetting
@@ -217,14 +246,35 @@ FEATURES = {
     'ENABLE_CORS_HEADERS': False,
 
     # Can be turned off if course lists need to be hidden. Effects views and templates.
+    # .. toggle_name: FEATURES['COURSES_ARE_BROWSABLE']
+    # .. toggle_implementation: DjangoSetting
+    # .. toggle_default: True
+    # .. toggle_description: When this is set to True, all the courses will be listed on the /courses page and Explore
+    #   Courses link will be visible. Set to False if courses list and Explore Courses link need to be hidden.
+    # .. toggle_use_cases: open_edx
+    # .. toggle_creation_date: 2013-09-28
+    # .. toggle_warnings: This Effects views and templates.
+    # .. toggle_tickets: https://github.com/edx/edx-platform/pull/1073
     'COURSES_ARE_BROWSABLE': True,
 
-    # Set to hide the courses list on the Learner Dashboard if they are not enrolled in
-    # any courses yet.
+    # .. toggle_name: FEATURES['HIDE_DASHBOARD_COURSES_UNTIL_ACTIVATED']
+    # .. toggle_implementation: DjangoSetting
+    # .. toggle_default: False
+    # .. toggle_description: When set, it hides the Courses list on the Learner Dashboard page if the learner has not
+    #   yet activated the account and not enrolled in any courses.
+    # .. toggle_use_cases: open_edx
+    # .. toggle_creation_date: 2018-05-18
+    # .. toggle_tickets: https://openedx.atlassian.net/browse/OSPR-1814
     'HIDE_DASHBOARD_COURSES_UNTIL_ACTIVATED': False,
 
-    # Give a UI to show a student's submission history in a problem by the
-    # Staff Debug tool.
+    # .. toggle_name: FEATURES['ENABLE_STUDENT_HISTORY_VIEW']
+    # .. toggle_implementation: DjangoSetting
+    # .. toggle_default: True
+    # .. toggle_description: This provides a UI to show a student's submission history in a problem by the Staff Debug
+    #   tool. Set to False if you want to hide Submission History from the courseware page.
+    # .. toggle_use_cases: open_edx
+    # .. toggle_creation_date: 2013-02-15
+    # .. toggle_tickets: https://github.com/edx/edx-platform/commit/8f17e6ae9ed76fa75b3caf867b65ccb632cb6870
     'ENABLE_STUDENT_HISTORY_VIEW': True,
 
     # Turn on a page that lets staff enter Python code to be run in the
@@ -380,9 +430,15 @@ FEATURES = {
     # Prevent concurrent logins per user
     'PREVENT_CONCURRENT_LOGINS': True,
 
-    # When a logged in user goes to the homepage ('/') should the user be
-    # redirected to the dashboard - this is default Open edX behavior. Set to
-    # False to not redirect the user
+    # .. toggle_name: FEATURES['ALWAYS_REDIRECT_HOMEPAGE_TO_DASHBOARD_FOR_AUTHENTICATED_USER']
+    # .. toggle_implementation: DjangoSetting
+    # .. toggle_default: True
+    # .. toggle_description: When a logged in user goes to the homepage ('/') the user will be redirected to the
+    #   dashboard page when this flag is set to True - this is default Open edX behavior. Set to False to not redirect
+    #   the user.
+    # .. toggle_use_cases: open_edx
+    # .. toggle_creation_date: 2014-09-16
+    # .. toggle_tickets: https://github.com/edx/edx-platform/pull/5220
     'ALWAYS_REDIRECT_HOMEPAGE_TO_DASHBOARD_FOR_AUTHENTICATED_USER': True,
 
     # .. toggle_name: FEATURES['ENABLE_COURSE_SORTING_BY_START_DATE']
@@ -430,10 +486,31 @@ FEATURES = {
     # Enable organizational email opt-in
     'ENABLE_MKTG_EMAIL_OPT_IN': False,
 
-    # Show the mobile app links in the footer
+    # .. toggle_name: FEATURES['ENABLE_FOOTER_MOBILE_APP_LINKS']
+    # .. toggle_implementation: DjangoSetting
+    # .. toggle_default: False
+    # .. toggle_description: Set to True if you want show the mobile app links (Apple App Store & Google Play Store) in
+    #   the footer.
+    # .. toggle_use_cases: open_edx
+    # .. toggle_creation_date: 2015-01-13
+    # .. toggle_warnings: If you set this to True then you should also set your mobile application's app store and play
+    #   store URLs in the MOBILE_STORE_URLS settings dictionary. These links are not part of the default theme. If you
+    #   want these links on your footer then you should use the edx.org theme.
+    # .. toggle_tickets: https://github.com/edx/edx-platform/pull/6588
     'ENABLE_FOOTER_MOBILE_APP_LINKS': False,
 
     # Let students save and manage their annotations
+    # .. toggle_name: FEATURES['ENABLE_EDXNOTES']
+    # .. toggle_implementation: SettingToggle
+    # .. toggle_default: False
+    # .. toggle_description: This toggle enables the students to save and manage their annotations in the
+    #   course using the notes service. The bulk of the actual work in storing the notes is done by
+    #   a separate service (see the edx-notes-api repo).
+    # .. toggle_warnings: Requires the edx-notes-api service properly running and to have configured the django settings
+    #   EDXNOTES_INTERNAL_API and EDXNOTES_PUBLIC_API. If you update this setting, also update it in Studio.
+    # .. toggle_use_cases: open_edx
+    # .. toggle_creation_date: 2015-01-04
+    # .. toggle_tickets: https://github.com/edx/edx-platform/pull/6321
     'ENABLE_EDXNOTES': False,
 
     # Toggle to enable coordination with the Publisher tool (keep in sync with cms/envs/common.py)
@@ -516,7 +593,17 @@ FEATURES = {
     # .. toggle_tickets: https://github.com/edx/edx-platform/pull/9744
     'ENABLE_SPECIAL_EXAMS': False,
 
-    # Enable OpenBadge support. See the BADGR_* settings later in this file.
+    # .. toggle_name: FEATURES['ENABLE_OPENBADGES']
+    # .. toggle_implementation: DjangoSetting
+    # .. toggle_default: False
+    # .. toggle_description: Enables support for the creation of OpenBadges as a method of awarding credentials.
+    # .. toggle_warnings: The following settings (all of which are in the same file) should be set or reviewed prior to
+    #    enabling this setting: BADGING_BACKEND, BADGR_API_TOKEN, BADGR_BASE_URL, BADGR_ISSUER_SLUG, BADGR_TIMEOUT.
+    #    Full guide for setting up OpenBadges available here:
+    #    https://edx.readthedocs.io/projects/edx-installing-configuring-and-running/en/latest/configuration/enable_badging.html  pylint: disable=line-too-long,useless-suppression
+    # .. toggle_use_cases: open_edx
+    # .. toggle_creation_date: 2015-04-30
+    # .. toggle_tickets: https://openedx.atlassian.net/browse/SOL-1325
     'ENABLE_OPENBADGES': False,
 
     # Enable LTI Provider feature.
@@ -579,10 +666,24 @@ FEATURES = {
     # See LEARNER-493
     'ENABLE_ONE_CLICK_PROGRAM_PURCHASE': False,
 
-    # Allow users to change their email address.
+    # .. toggle_name: FEATURES['ALLOW_EMAIL_ADDRESS_CHANGE']
+    # .. toggle_implementation: DjangoSetting
+    # .. toggle_default: True
+    # .. toggle_description: Allow users to change their email address on the Account Settings page. If this is
+    #   disabled, users will not be able to change their email address.
+    # .. toggle_use_cases: open_edx
+    # .. toggle_creation_date: 2017-06-26
+    # .. toggle_tickets: https://openedx.atlassian.net/browse/OSPR-1735
     'ALLOW_EMAIL_ADDRESS_CHANGE': True,
 
-    # Whether the bulk enrollment view is enabled.
+    # .. toggle_name: FEATURES['ENABLE_BULK_ENROLLMENT_VIEW']
+    # .. toggle_implementation: DjangoSetting
+    # .. toggle_default: False
+    # .. toggle_description: When set to True the bulk enrollment view is enabled and one can use it to enroll multiple
+    #   users in a course using bulk enrollment API endpoint (/api/bulk_enroll/v1/bulk_enroll).
+    # .. toggle_use_cases: open_edx
+    # .. toggle_creation_date: 2017-07-15
+    # .. toggle_tickets: https://github.com/edx/edx-platform/pull/15006
     'ENABLE_BULK_ENROLLMENT_VIEW': False,
 
     # Whether course goals is enabled.
@@ -611,7 +712,14 @@ FEATURES = {
     # Sets the default browser support. For more information go to http://browser-update.org/customize.html
     'UNSUPPORTED_BROWSER_ALERT_VERSIONS': "{i:10,f:-3,o:-3,s:-3,c:-3}",
 
-    # Whether to display the account deletion section the account settings page
+    # .. toggle_name: FEATURES['ENABLE_ACCOUNT_DELETION']
+    # .. toggle_implementation: DjangoSetting
+    # .. toggle_default: True
+    # .. toggle_description: Whether to display the account deletion section on Account Settings page. Set to False to
+    #   hide this section.
+    # .. toggle_use_cases: open_edx
+    # .. toggle_creation_date: 2018-06-01
+    # .. toggle_tickets: https://github.com/edx/edx-platform/pull/18298
     'ENABLE_ACCOUNT_DELETION': True,
 
     # Enable feature to remove enrollments and users. Used to reset state of master's integration environments
@@ -643,7 +751,7 @@ FEATURES = {
     #   rollout.
     'ENABLE_COURSEWARE_MICROFRONTEND': False,
 
-    # .. toggle_name: FEATURES['ENABLE_LOGISTRATION_MICROFRONTEND']
+    # .. toggle_name: FEATURES['ENABLE_AUTHN_MICROFRONTEND']
     # .. toggle_implementation: DjangoSetting
     # .. toggle_default: False
     # .. toggle_description: Supports staged rollout of a new micro-frontend-based implementation of the logistration.
@@ -651,9 +759,9 @@ FEATURES = {
     # .. toggle_creation_date: 2020-09-08
     # .. toggle_target_removal_date: None
     # .. toggle_tickets: 'https://github.com/edx/edx-platform/pull/24908'
-    # .. toggle_warnings: Also set settings.LOGISTRATION_MICROFRONTEND_URL for rollout. This temporary feature
+    # .. toggle_warnings: Also set settings.AUTHN_MICROFRONTEND_URL for rollout. This temporary feature
     # toggle does not have a target removal date.
-    'ENABLE_LOGISTRATION_MICROFRONTEND': False,
+    'ENABLE_AUTHN_MICROFRONTEND': False,
 
     ### ORA Feature Flags ###
     # .. toggle_name: FEATURES['ENABLE_ORA_ALL_FILE_URLS']
@@ -704,6 +812,17 @@ FEATURES = {
     # .. toggle_tickets: https://openedx.atlassian.net/browse/ENT-3818
     # .. toggle_warnings: None.
     'ENABLE_COURSE_ASSESSMENT_GRADE_CHANGE_SIGNAL': False,
+
+    # .. toggle_name: FEATURES['ALLOW_ADMIN_ENTERPRISE_COURSE_ENROLLMENT_DELETION']
+    # .. toggle_implementation: DjangoSetting
+    # .. toggle_default: False
+    # .. toggle_description: If true, allows for the deletion of EnterpriseCourseEnrollment records via Django Admin.
+    # .. toggle_use_cases: enterprise
+    # .. toggle_creation_date: 2021-01-27
+    # .. toggle_target_removal_date: None
+    # .. toggle_tickets: https://openedx.atlassian.net/browse/ENT-4022
+    # .. toggle_warnings: None.
+    'ALLOW_ADMIN_ENTERPRISE_COURSE_ENROLLMENT_DELETION': False,
 }
 
 # Specifies extra XBlock fields that should available when requested via the Course Blocks API
@@ -1049,6 +1168,11 @@ LOG_DIR = '/edx/var/log/edx'
 
 DATA_DIR = '/edx/var/edxapp/data'
 
+# .. setting_name: MAINTENANCE_BANNER_TEXT
+# .. setting_default: 'Sample banner message'
+# .. setting_description: Specifies the text that is rendered on the maintenance banner.
+# .. setting_warning: Depends on the `open_edx_util.display_maintenance_warning` waffle switch.
+#   The banner is only rendered when the switch is activated.
 MAINTENANCE_BANNER_TEXT = 'Sample banner message'
 
 GIT_REPO_DIR = '/edx/var/edxapp/course_repos'
@@ -1059,10 +1183,21 @@ DJFS = {
     'url_root': '/static/django-pyfs',
 }
 
+# Set certificate issued date format. It supports all formats supported by
+# `common.djangoapps.util.date_utils.strftime_localized`.
+CERTIFICATE_DATE_FORMAT = "%B %-d, %Y"
+
 ### Dark code. Should be enabled in local settings for devel.
 
 ENABLE_MULTICOURSE = False  # set to False to disable multicourse display (see lib.util.views.edXhome)
 
+# .. toggle_name: WIKI_ENABLED
+# .. toggle_implementation: DjangoSetting
+# .. toggle_default: True
+# .. toggle_description: This setting allows us to have a collaborative tool to contribute or
+#   modify content of course related materials.
+# .. toggle_use_cases: open_edx
+# .. toggle_creation_date: 2012-07-13
 WIKI_ENABLED = True
 
 ###
@@ -1197,7 +1332,12 @@ from xmodule.x_module import XModuleMixin
 # once the responsibility of XBlock creation is moved out of modulestore - cpennington
 XBLOCK_MIXINS = (LmsBlockMixin, InheritanceMixin, XModuleMixin, EditInfoMixin)
 
-# Allow any XBlock in the LMS
+# .. setting_name: XBLOCK_SELECT_FUNCTION
+# .. setting_default: prefer_xmodules
+# .. setting_description: Function used to select an XBlock from the python package EntryPoints.
+#     Some alternatives are `prefer_xmodules` and `default_select`. The `prefer_modules` function
+#     will choose the first "xmodule" if there is one, otherwise, it will act like `default_select`.
+#     The `default_select` function will simply choose the first match found.
 XBLOCK_SELECT_FUNCTION = prefer_xmodules
 
 # .. setting_name: XBLOCK_FIELD_DATA_WRAPPERS
@@ -1207,6 +1347,13 @@ XBLOCK_FIELD_DATA_WRAPPERS = ()
 
 XBLOCK_FS_STORAGE_BUCKET = None
 XBLOCK_FS_STORAGE_PREFIX = None
+
+# .. setting_name: XBLOCK_SETTINGS
+# .. setting_default: {}
+# .. setting_description: Dictionary containing server-wide configuration of XBlocks on a per-type basis.
+#     By default, keys should match the XBlock `block_settings_key` attribute/property. If the attribute/property
+#     is not defined, use the XBlock class name. Check `common.lib.xmodule.xmodule.services.SettingsService`
+#     for more reference.
 XBLOCK_SETTINGS = {}
 
 ############# ModuleStore Configuration ##########
@@ -1578,17 +1725,48 @@ SIMPLE_WIKI_REQUIRE_LOGIN_VIEW = False
 ################################# WIKI ###################################
 from lms.djangoapps.course_wiki import settings as course_wiki_settings  # pylint: disable=wrong-import-position
 
+# .. toggle_name: WIKI_ACCOUNT_HANDLING
+# .. toggle_implementation: DjangoSetting
+# .. toggle_default: False
+# .. toggle_description: We recommend you leave this as 'False' for an Open edX installation
+#   to get the proper behavior for register, login and logout. For the original docs see:
+#   https://github.com/edx/django-wiki/blob/edx_release/wiki/conf/settings.py
+# .. toggle_use_cases: open_edx
+# .. toggle_creation_date: 2012-08-13
 WIKI_ACCOUNT_HANDLING = False
 WIKI_EDITOR = 'lms.djangoapps.course_wiki.editors.CodeMirror'
 WIKI_SHOW_MAX_CHILDREN = 0  # We don't use the little menu that shows children of an article in the breadcrumb
-WIKI_ANONYMOUS = False  # Don't allow anonymous access until the styling is figured out
+# .. toggle_name: WIKI_ANONYMOUS
+# .. toggle_implementation: DjangoSetting
+# .. toggle_default: False
+# .. toggle_description: Enabling this allows access to anonymous users.
+#   For the original docs, see:
+#   https://github.com/edx/django-wiki/blob/edx_release/wiki/conf/settings.py
+# .. toggle_warnings: Setting allow anonymous access to `True` may have styling issues.
+# .. toggle_use_cases: open_edx
+# .. toggle_creation_date: 2012-08-21
+WIKI_ANONYMOUS = False
 
 WIKI_CAN_DELETE = course_wiki_settings.CAN_DELETE
 WIKI_CAN_MODERATE = course_wiki_settings.CAN_MODERATE
 WIKI_CAN_CHANGE_PERMISSIONS = course_wiki_settings.CAN_CHANGE_PERMISSIONS
 WIKI_CAN_ASSIGN = course_wiki_settings.CAN_ASSIGN
-
+# .. toggle_name: WIKI_USE_BOOTSTRAP_SELECT_WIDGET
+# .. toggle_implementation: DjangoSetting
+# .. toggle_default: False
+# .. toggle_description: Enabling this will use the bootstrap select widget.
+#   For the original docs, see:
+#   https://github.com/edx/django-wiki/blob/edx_release/wiki/conf/settings.py
+# .. toggle_use_cases: open_edx
+# .. toggle_creation_date: 2012-08-22
 WIKI_USE_BOOTSTRAP_SELECT_WIDGET = False
+# .. toggle_name: WIKI_LINK_LIVE_LOOKUPS
+# .. toggle_implementation: DjangoSetting
+# .. toggle_default: False
+# .. toggle_description: This setting is defined in the original docs:
+#   https://github.com/edx/django-wiki/blob/edx_release/wiki/conf/settings.py
+# .. toggle_use_cases: open_edx
+# .. toggle_creation_date: 2012-08-23
 WIKI_LINK_LIVE_LOOKUPS = False
 WIKI_LINK_DEFAULT_LEVEL = 2
 
@@ -1615,11 +1793,39 @@ PAID_COURSE_REGISTRATION_CURRENCY = ['usd', '$']
 ################################# EdxNotes config  #########################
 
 # Configure the LMS to use our stub EdxNotes implementation
+# .. setting_name: EDXNOTES_PUBLIC_API
+# .. setting_default: http://localhost:18120/api/v1
+# .. setting_description: Set the public API endpoint LMS will use in the frontend to
+#     interact with the edx_notes_api service.
+# .. setting_warning: This setting must be a publicly accessible endpoint. It is only used
+#     when the setting FEATURES['ENABLE_EDXNOTES'] is activated.
 EDXNOTES_PUBLIC_API = 'http://localhost:18120/api/v1'
+# .. setting_name: EDXNOTES_INTERNAL_API
+# .. setting_default: http://localhost:18120/api/v1
+# .. setting_description: Set the internal API endpoint LMS will use in the backend to
+#     interact with the edx_notes_api service.
+# .. setting_warning: Normally set to the same value of EDXNOTES_PUBLIC_API. It is not
+#     mandatory for this setting to be a publicly accessible endpoint, but to be accessible
+#     by the LMS service. It is only used when the setting FEATURES['ENABLE_EDXNOTES'] is
+#     activated.
 EDXNOTES_INTERNAL_API = 'http://localhost:18120/api/v1'
+# .. setting_name: EDXNOTES_CLIENT_NAME
+# .. setting_default: edx-notes
+# .. setting_description: Set the name of the Oauth client used by LMS to authenticate with
+#     the edx_notes_api service.
+# .. setting_warning: The Oauth client must be created in the platform Django admin in the
+#     path /admin/oauth2_provider/application/, setting the name field of the client as the
+#     value of this setting.
 EDXNOTES_CLIENT_NAME = "edx-notes"
-
+# .. setting_name: EDXNOTES_CONNECT_TIMEOUT
+# .. setting_default: 0.5
+# .. setting_description: Set the number of seconds LMS will wait to establish an internal
+#     connection to the edx_notes_api service.
 EDXNOTES_CONNECT_TIMEOUT = 0.5  # time in seconds
+# .. setting_name: EDXNOTES_READ_TIMEOUT
+# .. setting_default: 1.5
+# .. setting_description: Set the number of seconds LMS will wait for a response from the
+#     edx_notes_api service internal endpoint.
 EDXNOTES_READ_TIMEOUT = 1.5  # time in seconds
 
 ########################## Parental controls config  #######################
@@ -2347,21 +2553,47 @@ HEARTBEAT_CELERY_ROUTING_KEY = HIGH_PRIORITY_QUEUE
 
 ################################ Block Structures ###################################
 
+# .. setting_name: BLOCK_STRUCTURES_SETTINGS
+# .. setting_default: dict of settings
+# .. setting_description: Stores all the settings used by block structures and block structure
+#   related tasks. See BLOCK_STRUCTURES_SETTINGS[XXX] documentation for details of each setting.
+#   For more information, check https://openedx.atlassian.net/browse/TNL-5041.
 BLOCK_STRUCTURES_SETTINGS = dict(
-    # Delay, in seconds, after a new edit of a course is published
-    # before updating the block structures cache.  This is needed
-    # for a better chance at getting the latest changes when there
-    # are secondary reads in sharded mongoDB clusters. See TNL-5041
-    # for more info.
+    # .. setting_name: BLOCK_STRUCTURES_SETTINGS['COURSE_PUBLISH_TASK_DELAY']
+    # .. setting_default: 30
+    # .. setting_description: Delay, in seconds, after a new edit of a course is published before
+    #   updating the block structures cache. This is needed for a better chance at getting
+    #   the latest changes when there are secondary reads in sharded mongoDB clusters.
+    #   For more information, check https://openedx.atlassian.net/browse/TNL-5041.
     COURSE_PUBLISH_TASK_DELAY=30,
 
-    # Delay, in seconds, between retry attempts if a task fails.
+    # .. setting_name: BLOCK_STRUCTURES_SETTINGS['TASK_DEFAULT_RETRY_DELAY']
+    # .. setting_default: 30
+    # .. setting_description: Delay, in seconds, between retry attempts if a block structure task
+    #   fails. For more information, check https://openedx.atlassian.net/browse/TNL-5041.
     TASK_DEFAULT_RETRY_DELAY=30,
 
-    # Maximum number of retries per task.
+    # .. setting_name: BLOCK_STRUCTURES_SETTINGS['TASK_MAX_RETRIES']
+    # .. setting_default: 5
+    # .. setting_description: Maximum number of retries per block structure task.
+    #   If the maximum number of retries is exceeded, then you can attempt to either manually run
+    #   the celery task, or wait for it to be triggered again.
+    #   For more information, check https://openedx.atlassian.net/browse/TNL-5041.
     TASK_MAX_RETRIES=5,
 
-    # Backend storage options
+    # .. toggle_name: BLOCK_STRUCTURES_SETTINGS['PRUNING_ACTIVE']
+    # .. toggle_implementation: DjangoSetting
+    # .. toggle_default: False
+    # .. toggle_description: When `True`, only a specified number of versions of block structure
+    #   files are kept for each structure, and the rest are cleaned up. The number of versions that
+    #   are kept can be specified in the `BlockStructureConfiguration`, which can be edited in
+    #   Django Admin. The default number of versions that are kept is `5`.
+    # .. toggle_warnings: This toggle will likely be deprecated and removed.
+    #   The annotation will be updated with the DEPR ticket once that process has started.
+    # .. toggle_use_cases: temporary
+    # .. toggle_creation_date: 2018-03-22
+    # .. toggle_target_removal_date: 2018-06-22
+    # .. toggle_tickets: https://openedx.atlassian.net/browse/EDUCATOR-499
     PRUNING_ACTIVE=False,
 )
 
@@ -3044,14 +3276,38 @@ CERT_NAME_LONG = "Certificate of Achievement"
 
 #################### OpenBadges Settings #######################
 
+# .. setting_name: BADGING_BACKEND
+# .. setting_default: 'lms.djangoapps.badges.backends.badgr.BadgrBackend'
+# .. setting_description: The backend service class (or callable) for creating OpenBadges. It must implement
+#    the interface provided by lms.djangoapps.badges.backends.base.BadgeBackend
+# .. setting_warning: Review FEATURES['ENABLE_OPENBADGES'] for further context.
 BADGING_BACKEND = 'lms.djangoapps.badges.backends.badgr.BadgrBackend'
 
-# Be sure to set up images for course modes using the BadgeImageConfiguration model in the certificates app.
+# .. setting_name: BADGR_API_TOKEN
+# .. setting_default: None
+# .. setting_description: The API token string for Badgr. You should be able to create this via Badgr's settings. See
+#    https://github.com/concentricsky/badgr-server for details on setting up Badgr.
+# .. setting_warning: Review FEATURES['ENABLE_OPENBADGES'] for further context.
 BADGR_API_TOKEN = None
-# Do not add the trailing slash here.
+
+# .. setting_name: BADGR_BASE_URL
+# .. setting_default: 'http://localhost:8005'
+# .. setting_description: The base URL for the Badgr server.
+# .. setting_warning: DO NOT include a trailing slash. Review FEATURES['ENABLE_OPENBADGES'] for further context.
 BADGR_BASE_URL = "http://localhost:8005"
+
+# .. setting_name: BADGR_ISSUER_SLUG
+# .. setting_default: 'example-issuer'
+# .. setting_description: A string that is the slug for the Badgr issuer. The slug can be obtained from the URL of
+#    the Badgr Server page that displays the issuer. For example, in the URL
+#    http://exampleserver.com/issuer/test-issuer, the issuer slug is "test-issuer".
+# .. setting_warning: Review FEATURES['ENABLE_OPENBADGES'] for further context.
 BADGR_ISSUER_SLUG = "example-issuer"
-# Number of seconds to wait on the badging server when contacting it before giving up.
+
+# .. setting_name: BADGR_TIMEOUT
+# .. setting_default: 10
+# .. setting_description: Number of seconds to wait on the badging server when contacting it before giving up.
+# .. setting_warning: Review FEATURES['ENABLE_OPENBADGES'] for further context.
 BADGR_TIMEOUT = 10
 
 ###################### Grade Downloads ######################
@@ -3432,6 +3688,16 @@ COURSE_CATALOG_VISIBILITY_PERMISSION = 'see_exists'
 COURSE_ABOUT_VISIBILITY_PERMISSION = 'see_exists'
 
 DEFAULT_COURSE_VISIBILITY_IN_CATALOG = "both"
+
+# .. toggle_name: DEFAULT_MOBILE_AVAILABLE
+# .. toggle_implementation: DjangoSetting
+# .. toggle_default: False
+# .. toggle_description: This specifies if the courses are available for mobile by default. To make any individual
+#   course available for mobile one can set the value of Mobile Course Available to true in Advanced Settings from the
+#   studio when this is False.
+# .. toggle_use_cases: open_edx
+# .. toggle_creation_date: 2021-01-26
+# .. toggle_tickets: https://openedx.atlassian.net/browse/OSPR-1985
 DEFAULT_MOBILE_AVAILABLE = False
 
 # Enrollment API Cache Timeout
@@ -4009,16 +4275,74 @@ PASSWORD_RESET_IP_RATE = '1/m'
 PASSWORD_RESET_EMAIL_RATE = '2/h'
 
 ############### Settings for Retirement #####################
+# .. setting_name: RETIRED_USERNAME_PREFIX
+# .. setting_default: retired__user_
+# .. setting_description: Set the prefix part of hashed usernames for retired users. Used by the derived
+#     setting RETIRED_USERNAME_FMT.
 RETIRED_USERNAME_PREFIX = 'retired__user_'
+# .. setting_name: RETIRED_EMAIL_PREFIX
+# .. setting_default: retired__user_
+# .. setting_description: Set the prefix part of hashed emails for retired users. Used by the derived
+#     setting RETIRED_EMAIL_FMT.
 RETIRED_EMAIL_PREFIX = 'retired__user_'
+# .. setting_name: RETIRED_EMAIL_DOMAIN
+# .. setting_default: retired.invalid
+# .. setting_description: Set the domain part of hashed emails for retired users. Used by the derived
+#     setting RETIRED_EMAIL_FMT.
 RETIRED_EMAIL_DOMAIN = 'retired.invalid'
+# .. setting_name: RETIRED_USERNAME_FMT
+# .. setting_default: retired__user_{}
+# .. setting_description: Set the format a retired user username field gets transformed into, where {}
+#     is replaced with the hash of the original username. This is a derived setting that depends on
+#     RETIRED_USERNAME_PREFIX value.
 RETIRED_USERNAME_FMT = lambda settings: settings.RETIRED_USERNAME_PREFIX + '{}'
+# .. setting_name: RETIRED_EMAIL_FMT
+# .. setting_default: retired__user_{}@retired.invalid
+# .. setting_description: Set the format a retired user email field gets transformed into, where {} is
+#     replaced with the hash of the original email. This is a derived setting that depends on
+#     RETIRED_EMAIL_PREFIX and RETIRED_EMAIL_DOMAIN values.
 RETIRED_EMAIL_FMT = lambda settings: settings.RETIRED_EMAIL_PREFIX + '{}@' + settings.RETIRED_EMAIL_DOMAIN
 derived('RETIRED_USERNAME_FMT', 'RETIRED_EMAIL_FMT')
+# .. setting_name: RETIRED_USER_SALTS
+# .. setting_default: ['abc', '123']
+# .. setting_description: Set a list of salts used for hashing usernames and emails on users retirement.
+# .. setting_warning: Only the last item in this list is used as a salt for all new retirements, but
+#     historical salts are preserved in order to guarantee that all hashed usernames and emails can still
+#     be checked.
 RETIRED_USER_SALTS = ['abc', '123']
+# .. setting_name: RETIREMENT_SERVICE_WORKER_USERNAME
+# .. setting_default: RETIREMENT_SERVICE_USER
+# .. setting_description: Set the username of the retirement service worker user. Retirement scripts
+#     authenticate with LMS as this user with oauth client credentials.
 RETIREMENT_SERVICE_WORKER_USERNAME = 'RETIREMENT_SERVICE_USER'
 
 # These states are the default, but are designed to be overridden in configuration.
+# .. setting_name: RETIREMENT_STATES
+# .. setting_default:
+#     [
+#         'PENDING',
+#         'LOCKING_ACCOUNT',
+#         'LOCKING_COMPLETE',
+#         'RETIRING_FORUMS',
+#         'FORUMS_COMPLETE',
+#         'RETIRING_EMAIL_LISTS',
+#         'EMAIL_LISTS_COMPLETE',
+#         'RETIRING_ENROLLMENTS',
+#         'ENROLLMENTS_COMPLETE',
+#         'RETIRING_NOTES',
+#         'NOTES_COMPLETE',
+#         'RETIRING_LMS',
+#         'LMS_COMPLETE',
+#         'ERRORED',
+#         'ABORTED',
+#         'COMPLETE',
+#     ]
+# .. setting_description: Set a list that defines the name and order of states for the retirement
+#     workflow.
+# .. setting_warning: These states are stored in the database and it is the responsibility of the
+#     administrator to populate the state list since the states can vary across different installations.
+#     There must be, at minimum, a PENDING state at the beginning, and COMPLETED, ERRORED, and ABORTED
+#     states at the end of the list.
 RETIREMENT_STATES = [
     'PENDING',
 
@@ -4054,13 +4378,27 @@ USERNAME_REPLACEMENT_WORKER = "REPLACE WITH VALID USERNAME"
 # If running a Gradebook container locally,
 # modify lms/envs/private.py to give it a non-null value
 WRITABLE_GRADEBOOK_URL = None
-
+# .. setting_name: PROFILE_MICROFRONTEND_URL
+# .. setting_default: None
+# .. setting_description: Base URL of the micro-frontend-based profile page.
+# .. setting_warning: Also set site's ENABLE_PROFILE_MICROFRONTEND and
+#     learner_profile.redirect_to_microfrontend waffle flag
 PROFILE_MICROFRONTEND_URL = None
 ORDER_HISTORY_MICROFRONTEND_URL = None
+# .. setting_name: ACCOUNT_MICROFRONTEND_URL
+# .. setting_default: None
+# .. setting_description: Base URL of the micro-frontend-based account settings page.
+# .. setting_warning: Also set site's ENABLE_ACCOUNT_MICROFRONTEND and
+#     account.redirect_to_microfrontend waffle flag
 ACCOUNT_MICROFRONTEND_URL = None
-LOGISTRATION_MICROFRONTEND_URL = None
-LOGISTRATION_MICROFRONTEND_DOMAIN = None
+AUTHN_MICROFRONTEND_URL = None
+AUTHN_MICROFRONTEND_DOMAIN = None
 PROGRAM_CONSOLE_MICROFRONTEND_URL = None
+# .. setting_name: LEARNING_MICROFRONTEND_URL
+# .. setting_default: None
+# .. setting_description: Base URL of the micro-frontend-based courseware page.
+# .. setting_warning: Also set site's ENABLE_COURSEWARE_MICROFRONTEND or
+#     FEATURES['ENABLE_COURSEWARE_MICROFRONTEND'] and courseware.courseware_mfe waffle flag
 LEARNING_MICROFRONTEND_URL = None
 
 ############### Settings for the ace_common plugin #################

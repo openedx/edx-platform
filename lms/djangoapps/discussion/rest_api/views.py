@@ -5,8 +5,8 @@ Discussion API views
 
 import logging
 
-from django.conf import settings
-from django.contrib.auth.models import User
+from django.conf import settings  # lint-amnesty, pylint: disable=unused-import
+from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.core.exceptions import ValidationError
 from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthentication
 from edx_rest_framework_extensions.auth.session.authentication import SessionAuthenticationAllowInactiveUser
@@ -824,7 +824,7 @@ class CourseDiscussionSettingsAPIView(DeveloperErrorViewMixin, APIView):
         try:
             discussion_settings = set_course_discussion_settings(course_key, **settings_to_change)
         except ValueError as e:
-            raise ValidationError(text_type(e))
+            raise ValidationError(text_type(e))  # lint-amnesty, pylint: disable=raise-missing-from
 
         return Response(status=status.HTTP_204_NO_CONTENT)
 
@@ -937,7 +937,7 @@ class CourseDiscussionRolesAPIView(DeveloperErrorViewMixin, APIView):
         try:
             update_forum_role(course_id, user, rolename, action)
         except Role.DoesNotExist:
-            raise ValidationError(u"Role '{}' does not exist".format(rolename))
+            raise ValidationError(u"Role '{}' does not exist".format(rolename))  # lint-amnesty, pylint: disable=raise-missing-from
 
         role = form.cleaned_data['role']
         data = {'course_id': course_id, 'users': role.users.all()}

@@ -33,7 +33,7 @@ class MemoryCourseTagAPI(object):
 
     class BulkCourseTags(object):
         @classmethod
-        def is_prefetched(self, course_id):
+        def is_prefetched(self, course_id):  # lint-amnesty, pylint: disable=bad-classmethod-argument, unused-argument
             return False
 
 
@@ -46,7 +46,7 @@ class TestRandomUserPartitionScheme(PartitionTestCase):
     MOCK_COURSE_ID = "mock-course-id"
 
     def setUp(self):
-        super(TestRandomUserPartitionScheme, self).setUp()
+        super(TestRandomUserPartitionScheme, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         # Patch in a memory-based user service instead of using the persistent version
         course_tag_api = MemoryCourseTagAPI()
         self.user_service_patcher = patch(

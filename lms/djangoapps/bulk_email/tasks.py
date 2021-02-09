@@ -26,19 +26,19 @@ from boto.ses.exceptions import (
     SESLocalAddressCharacterError,
     SESMaxSendingRateExceededError
 )
-from celery import current_task, shared_task
-from celery.exceptions import RetryTaskError
-from celery.states import FAILURE, RETRY, SUCCESS
-from django.conf import settings
-from django.core.mail import EmailMultiAlternatives, get_connection
-from django.core.mail.message import forbid_multi_line_headers
-from django.urls import reverse
-from django.utils import timezone
-from django.utils.translation import override as override_language
-from django.utils.translation import ugettext as _
-from edx_django_utils.monitoring import set_code_owner_attribute
-from markupsafe import escape
-from six import text_type
+from celery import current_task, shared_task  # lint-amnesty, pylint: disable=import-error
+from celery.exceptions import RetryTaskError  # lint-amnesty, pylint: disable=import-error
+from celery.states import FAILURE, RETRY, SUCCESS  # lint-amnesty, pylint: disable=import-error
+from django.conf import settings  # lint-amnesty, pylint: disable=wrong-import-order
+from django.core.mail import EmailMultiAlternatives, get_connection  # lint-amnesty, pylint: disable=wrong-import-order
+from django.core.mail.message import forbid_multi_line_headers  # lint-amnesty, pylint: disable=wrong-import-order
+from django.urls import reverse  # lint-amnesty, pylint: disable=wrong-import-order
+from django.utils import timezone  # lint-amnesty, pylint: disable=wrong-import-order
+from django.utils.translation import override as override_language  # lint-amnesty, pylint: disable=wrong-import-order
+from django.utils.translation import ugettext as _  # lint-amnesty, pylint: disable=wrong-import-order
+from edx_django_utils.monitoring import set_code_owner_attribute  # lint-amnesty, pylint: disable=wrong-import-order
+from markupsafe import escape  # lint-amnesty, pylint: disable=wrong-import-order
+from six import text_type  # lint-amnesty, pylint: disable=wrong-import-order
 
 from lms.djangoapps.branding.api import get_logo_url_for_email
 from lms.djangoapps.bulk_email.models import CourseEmail, Optout
@@ -144,7 +144,7 @@ def perform_delegate_email_batches(entry_id, course_id, task_input, action_name)
     # code that doesn't need the entry_id.
     if course_id != entry.course_id:
         format_msg = u"Course id conflict: explicit value %r does not match task value %r"
-        log.warning(u"Task %s: " + format_msg, task_id, course_id, entry.course_id)
+        log.warning(u"Task %s: " + format_msg, task_id, course_id, entry.course_id)  # lint-amnesty, pylint: disable=logging-not-lazy
         raise ValueError(format_msg % (course_id, entry.course_id))
 
     # Fetch the CourseEmail.
@@ -172,7 +172,7 @@ def perform_delegate_email_batches(entry_id, course_id, task_input, action_name)
     # Sanity check that course for email_obj matches that of the task referencing it.
     if course_id != email_obj.course_id:
         format_msg = u"Course id conflict: explicit value %r does not match email value %r"
-        log.warning(u"Task %s: " + format_msg, task_id, course_id, email_obj.course_id)
+        log.warning(u"Task %s: " + format_msg, task_id, course_id, email_obj.course_id)  # lint-amnesty, pylint: disable=logging-not-lazy
         raise ValueError(format_msg % (course_id, email_obj.course_id))
 
     # Fetch the course object.
@@ -427,7 +427,7 @@ def _get_source_address(course_id, course_title, course_language, truncate=True)
     return from_addr
 
 
-def _send_course_email(entry_id, email_id, to_list, global_email_context, subtask_status):
+def _send_course_email(entry_id, email_id, to_list, global_email_context, subtask_status):  # lint-amnesty, pylint: disable=too-many-statements
     """
     Performs the email sending task.
 
@@ -590,7 +590,7 @@ def _send_course_email(entry_id, email_id, to_list, global_email_context, subtas
                     total_recipients,
                     email
                 )
-                if exc.smtp_code >= 400 and exc.smtp_code < 500:
+                if exc.smtp_code >= 400 and exc.smtp_code < 500:  # lint-amnesty, pylint: disable=no-else-raise
                     # This will cause the outer handler to catch the exception and retry the entire task.
                     raise exc
                 else:

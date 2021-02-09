@@ -19,12 +19,12 @@ from bok_choy.promise import EmptyPromise, Promise
 from bok_choy.web_app_test import WebAppTest
 from opaque_keys.edx.locator import CourseLocator
 from path import Path as path
-from pymongo import ASCENDING, MongoClient
+from pymongo import ASCENDING, MongoClient  # lint-amnesty, pylint: disable=unused-import
 from selenium.common.exceptions import StaleElementReferenceException
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support.select import Select
 from selenium.webdriver.support.ui import WebDriverWait
-from six.moves import range, zip
+from six.moves import range, zip  # lint-amnesty, pylint: disable=unused-import
 
 from capa.tests.response_xml_factory import MultipleChoiceResponseXMLFactory
 from common.test.acceptance.fixtures.course import XBlockFixtureDesc
@@ -342,7 +342,7 @@ class EventsTestMixin(TestCase):
     Helpers and setup for running tests that evaluate events emitted
     """
     def setUp(self):
-        super(EventsTestMixin, self).setUp()
+        super(EventsTestMixin, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         mongo_host = 'edx.devstack.mongo' if 'BOK_CHOY_HOSTNAME' in os.environ else 'localhost'
         self.event_collection = MongoClient(mongo_host)["test"]["events"]
         self.start_time = datetime.now()
@@ -354,14 +354,14 @@ class AcceptanceTest(WebAppTest):
     """
 
     def __init__(self, *args, **kwargs):
-        super(AcceptanceTest, self).__init__(*args, **kwargs)
+        super(AcceptanceTest, self).__init__(*args, **kwargs)  # lint-amnesty, pylint: disable=super-with-arguments
 
         # Use long messages so that failures show actual and expected values
         self.longMessage = True  # pylint: disable=invalid-name
 
     def tearDown(self):
         self._save_console_log()
-        super(AcceptanceTest, self).tearDown()
+        super(AcceptanceTest, self).tearDown()  # lint-amnesty, pylint: disable=super-with-arguments
 
     def _save_console_log(self):
         """
@@ -411,7 +411,7 @@ class UniqueCourseTest(AcceptanceTest):
     """
 
     def setUp(self):
-        super(UniqueCourseTest, self).setUp()
+        super(UniqueCourseTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
 
         self.course_info = {
             'org': 'test_org',
@@ -440,7 +440,7 @@ class YouTubeConfigError(Exception):
     """
     Error occurred while configuring YouTube Stub Server.
     """
-    pass
+    pass  # lint-amnesty, pylint: disable=unnecessary-pass
 
 
 class YouTubeStubConfig(object):

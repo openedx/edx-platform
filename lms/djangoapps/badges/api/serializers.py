@@ -3,7 +3,7 @@ Serializers for Badges
 """
 
 
-from rest_framework import serializers
+from rest_framework import serializers  # lint-amnesty, pylint: disable=import-error
 
 from lms.djangoapps.badges.models import BadgeAssertion, BadgeClass
 

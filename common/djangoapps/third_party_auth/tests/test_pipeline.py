@@ -2,7 +2,7 @@
 
 
 import json
-import unittest
+import unittest  # lint-amnesty, pylint: disable=unused-import
 
 import ddt
 import mock
@@ -63,7 +63,7 @@ class PipelineOverridesTest(SamlIntegrationTestUtilities, IntegrationTestMixin, 
     """
 
     def setUp(self):
-        super(PipelineOverridesTest, self).setUp()
+        super(PipelineOverridesTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.enable_saml()
         self.provider = self.configure_saml_provider(
             enabled=True,

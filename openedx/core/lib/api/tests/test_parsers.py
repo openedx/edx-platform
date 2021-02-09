@@ -18,7 +18,7 @@ class TestTypedFileUploadParser(APITestCase):
     """
 
     def setUp(self):
-        super(TestTypedFileUploadParser, self).setUp()
+        super(TestTypedFileUploadParser, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.parser = parsers.TypedFileUploadParser()
         self.request_factory = APIRequestFactory()
         upload_media_types = {'image/png', 'image/jpeg', 'application/octet-stream'}
@@ -86,8 +86,8 @@ class TestTypedFileUploadParser(APITestCase):
         context = {'view': self.view, 'request': request}
         with self.assertRaises(exceptions.ParseError) as err:
             self.parser.parse(stream=BytesIO(b'abcdefgh'), media_type='image/png', parser_context=context)
-            self.assertIn('developer_message', err.detail)
-            self.assertNotIn('user_message', err.detail)
+            self.assertIn('developer_message', err.detail)  # lint-amnesty, pylint: disable=no-member
+            self.assertNotIn('user_message', err.detail)  # lint-amnesty, pylint: disable=no-member
 
     def test_no_acceptable_types(self):
         """
@@ -105,5 +105,5 @@ class TestTypedFileUploadParser(APITestCase):
         context = {'view': view, 'request': request}
         with self.assertRaises(exceptions.UnsupportedMediaType) as err:
             self.parser.parse(stream=BytesIO(b'abcdefgh'), media_type='image/png', parser_context=context)
-            self.assertIn('developer_message', err.detail)
-            self.assertIn('user_message', err.detail)
+            self.assertIn('developer_message', err.detail)  # lint-amnesty, pylint: disable=no-member
+            self.assertIn('user_message', err.detail)  # lint-amnesty, pylint: disable=no-member

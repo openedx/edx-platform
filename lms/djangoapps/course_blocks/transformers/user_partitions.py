@@ -3,10 +3,10 @@ User Partitions Transformer
 """
 
 
-import six
+import six  # lint-amnesty, pylint: disable=unused-import
 
 from lms.djangoapps.courseware.access import has_access
-from openedx.core.djangoapps.content.block_structure.transformer import (
+from openedx.core.djangoapps.content.block_structure.transformer import (  # lint-amnesty, pylint: disable=unused-import
     BlockStructureTransformer,
     FilteringTransformerMixin
 )

@@ -8,7 +8,7 @@ import ddt
 import mock
 import six
 from django.conf import settings
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.test import TestCase
 from django.urls import reverse
 
@@ -278,7 +278,7 @@ class TestIndex(SiteMixin, TestCase):
 
     def setUp(self):
         """ Set up a user """
-        super(TestIndex, self).setUp()
+        super(TestIndex, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
 
         patcher = mock.patch("common.djangoapps.student.models.tracker")
         self.mock_tracker = patcher.start()

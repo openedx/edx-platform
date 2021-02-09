@@ -43,7 +43,7 @@ class InstructorServiceTests(SharedModuleStoreTestCase):
         cls.other_problem_urlname = six.text_type(cls.other_problem_location)
 
     def setUp(self):
-        super(InstructorServiceTests, self).setUp()
+        super(InstructorServiceTests, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
 
         self.student = UserFactory()
         CourseEnrollment.enroll(self.student, self.course.id)
@@ -94,7 +94,7 @@ class InstructorServiceTests(SharedModuleStoreTestCase):
         Negative test of trying to reset attempts with bad content_id
         """
 
-        result = self.service.delete_student_attempt(
+        result = self.service.delete_student_attempt(  # lint-amnesty, pylint: disable=assignment-from-none
             self.student.username,
             six.text_type(self.course.id),
             'foo/bar/baz',
@@ -107,7 +107,7 @@ class InstructorServiceTests(SharedModuleStoreTestCase):
         Negative test of trying to reset attempts with bad user identifier
         """
 
-        result = self.service.delete_student_attempt(
+        result = self.service.delete_student_attempt(  # lint-amnesty, pylint: disable=assignment-from-none
             'bad_student',
             six.text_type(self.course.id),
             'foo/bar/baz',
@@ -120,7 +120,7 @@ class InstructorServiceTests(SharedModuleStoreTestCase):
         Negative test of trying to reset attempts with bad user identifier
         """
 
-        result = self.service.delete_student_attempt(
+        result = self.service.delete_student_attempt(  # lint-amnesty, pylint: disable=assignment-from-none
             self.student.username,
             six.text_type(self.course.id),
             self.other_problem_urlname,

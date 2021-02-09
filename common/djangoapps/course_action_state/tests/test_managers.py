@@ -22,7 +22,7 @@ class TestCourseActionStateManagerBase(TestCase):
     Base class for testing Course Action State Managers.
     """
     def setUp(self):
-        super(TestCourseActionStateManagerBase, self).setUp()
+        super(TestCourseActionStateManagerBase, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.course_key = CourseLocator("test_org", "test_course_num", "test_run")
 
 

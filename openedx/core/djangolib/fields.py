@@ -1,4 +1,4 @@
-"""
+"""  # lint-amnesty, pylint: disable=django-not-configured
 Custom Django fields.
 """
 
@@ -48,7 +48,7 @@ class BigAutoField(models.AutoField):
         elif "postgres" in conn_module:
             return "bigserial"
         else:
-            return super(BigAutoField, self).db_type(connection)
+            return super(BigAutoField, self).db_type(connection)  # lint-amnesty, pylint: disable=super-with-arguments
 
     def rel_db_type(self, connection):
         """

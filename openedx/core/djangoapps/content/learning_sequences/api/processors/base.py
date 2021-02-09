@@ -6,7 +6,7 @@ import logging
 from datetime import datetime
 
 from django.contrib.auth import get_user_model
-from opaque_keys.edx.keys import CourseKey, UsageKey
+from opaque_keys.edx.keys import CourseKey, UsageKey  # lint-amnesty, pylint: disable=unused-import
 
 User = get_user_model()
 log = logging.getLogger(__name__)
@@ -57,9 +57,9 @@ class OutlineProcessor:
         tens of milliseconds, even on courses with hundreds of learning
         sequences.
         """
-        pass
+        pass  # lint-amnesty, pylint: disable=unnecessary-pass
 
-    def inaccessible_sequences(self, full_course_outline):
+    def inaccessible_sequences(self, full_course_outline):  # lint-amnesty, pylint: disable=unused-argument
         """
         Return a set/frozenset of Sequence UsageKeys that are not accessible.
 
@@ -68,7 +68,7 @@ class OutlineProcessor:
         """
         return frozenset()
 
-    def usage_keys_to_remove(self, full_course_outline):
+    def usage_keys_to_remove(self, full_course_outline):  # lint-amnesty, pylint: disable=unused-argument
         """
         Return a set/frozenset of UsageKeys to remove altogether.
 

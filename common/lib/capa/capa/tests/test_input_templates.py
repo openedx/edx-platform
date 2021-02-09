@@ -21,7 +21,7 @@ class TemplateError(Exception):
     """
     Error occurred while rendering a Mako template.
     """
-    pass
+    pass  # lint-amnesty, pylint: disable=unnecessary-pass
 
 
 class TemplateTestCase(unittest.TestCase):
@@ -51,7 +51,7 @@ class TemplateTestCase(unittest.TestCase):
         """
         Initialize the context.
         """
-        super(TemplateTestCase, self).setUp()
+        super(TemplateTestCase, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.context = {}
 
     def render_to_xml(self, context_dict):
@@ -64,7 +64,7 @@ class TemplateTestCase(unittest.TestCase):
         try:
             xml_str = capa_render_template(self.TEMPLATE_NAME, context_dict)
         except:
-            raise TemplateError(exceptions.text_error_template().render())
+            raise TemplateError(exceptions.text_error_template().render())  # lint-amnesty, pylint: disable=raise-missing-from
 
         # Attempt to construct an XML tree from the template
         # This makes it easy to use XPath to make assertions, rather
@@ -74,7 +74,7 @@ class TemplateTestCase(unittest.TestCase):
         try:
             xml = etree.fromstring("<test>" + xml_str + "</test>")
         except Exception as exc:
-            raise TemplateError("Could not parse XML from '{0}': {1}".format(
+            raise TemplateError("Could not parse XML from '{0}': {1}".format(  # lint-amnesty, pylint: disable=raise-missing-from
                                 xml_str, str(exc)))
         else:
             return xml
@@ -246,7 +246,7 @@ class ChoiceGroupTemplateTest(TemplateTestCase):
     TEMPLATE_NAME = 'choicegroup.html'
 
     def setUp(self):
-        super(ChoiceGroupTemplateTest, self).setUp()
+        super(ChoiceGroupTemplateTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         choices = [('1', 'choice 1'), ('2', 'choice 2'), ('3', 'choice 3')]
         self.context = {
             'id': '1',
@@ -493,7 +493,7 @@ class TextlineTemplateTest(TemplateTestCase):
     TEMPLATE_NAME = 'textline.html'
 
     def setUp(self):
-        super(TextlineTemplateTest, self).setUp()
+        super(TextlineTemplateTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.context = {
             'id': '1',
             'status': Status('correct'),
@@ -618,7 +618,7 @@ class FormulaEquationInputTemplateTest(TemplateTestCase):
     TEMPLATE_NAME = 'formulaequationinput.html'
 
     def setUp(self):
-        super(FormulaEquationInputTemplateTest, self).setUp()
+        super(FormulaEquationInputTemplateTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.context = {
             'id': 2,
             'value': 'PREFILLED_VALUE',
@@ -669,7 +669,7 @@ class AnnotationInputTemplateTest(TemplateTestCase):
     TEMPLATE_NAME = 'annotationinput.html'
 
     def setUp(self):
-        super(AnnotationInputTemplateTest, self).setUp()
+        super(AnnotationInputTemplateTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.context = {
             'id': 2,
             'value': '<p>Test value</p>',
@@ -797,7 +797,7 @@ class MathStringTemplateTest(TemplateTestCase):
     TEMPLATE_NAME = 'mathstring.html'
 
     def setUp(self):
-        super(MathStringTemplateTest, self).setUp()
+        super(MathStringTemplateTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.context = {'isinline': False, 'mathstr': '', 'tail': ''}
 
     def test_math_string_inline(self):
@@ -839,7 +839,7 @@ class OptionInputTemplateTest(TemplateTestCase):
     TEMPLATE_NAME = 'optioninput.html'
 
     def setUp(self):
-        super(OptionInputTemplateTest, self).setUp()
+        super(OptionInputTemplateTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.context = {
             'id': 2,
             'options': [],
@@ -900,7 +900,7 @@ class DragAndDropTemplateTest(TemplateTestCase):
     TEMPLATE_NAME = 'drag_and_drop_input.html'
 
     def setUp(self):
-        super(DragAndDropTemplateTest, self).setUp()
+        super(DragAndDropTemplateTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.context = {'id': 2,
                         'drag_and_drop_json': '',
                         'value': 0,
@@ -957,7 +957,7 @@ class ChoiceTextGroupTemplateTest(TemplateTestCase):
                              '1_choiceinput_1_textinput_0': '0'}
 
     def setUp(self):
-        super(ChoiceTextGroupTemplateTest, self).setUp()
+        super(ChoiceTextGroupTemplateTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         choices = [
             (
                 '1_choiceinput_0bc',
@@ -1133,7 +1133,7 @@ class ChemicalEquationTemplateTest(TemplateTestCase):
     TEMPLATE_NAME = 'chemicalequationinput.html'
 
     def setUp(self):
-        super(ChemicalEquationTemplateTest, self).setUp()
+        super(ChemicalEquationTemplateTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.context = {
             'id': '1',
             'status': Status('correct'),
@@ -1154,7 +1154,7 @@ class SchematicInputTemplateTest(TemplateTestCase):
     TEMPLATE_NAME = 'schematicinput.html'
 
     def setUp(self):
-        super(SchematicInputTemplateTest, self).setUp()
+        super(SchematicInputTemplateTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.context = {
             'id': '1',
             'status': Status('correct'),
@@ -1186,7 +1186,7 @@ class CodeinputTemplateTest(TemplateTestCase):
     TEMPLATE_NAME = 'codeinput.html'
 
     def setUp(self):
-        super(CodeinputTemplateTest, self).setUp()
+        super(CodeinputTemplateTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.context = {
             'id': '1',
             'status': Status('correct'),

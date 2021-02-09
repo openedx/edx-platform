@@ -1,4 +1,4 @@
-
+# lint-amnesty, pylint: disable=missing-module-docstring
 
 import functools
 
@@ -20,7 +20,7 @@ class ScheduleExperienceAdminInline(admin.StackedInline):
     model = models.ScheduleExperience
 
 
-def _set_experience(db_name, human_name, modeladmin, request, queryset):
+def _set_experience(db_name, human_name, modeladmin, request, queryset):  # lint-amnesty, pylint: disable=redefined-outer-name
     """
     A django action which will set all selected schedules to the supplied experience.
     The intended usage is with functools.partial to generate the action for each experience type
@@ -83,12 +83,12 @@ class CourseIdFilter(admin.SimpleListFilter):
     parameter_name = "course_id"
 
     def __init__(self, request, params, model, model_admin):
-        super(CourseIdFilter, self).__init__(request, params, model, model_admin)
+        super(CourseIdFilter, self).__init__(request, params, model, model_admin)  # lint-amnesty, pylint: disable=super-with-arguments
         self.unused_parameters = params.copy()
         self.unused_parameters.pop(self.parameter_name, None)
 
     def value(self):
-        value = super(CourseIdFilter, self).value()
+        value = super(CourseIdFilter, self).value()  # lint-amnesty, pylint: disable=super-with-arguments
         if value == "None" or value is None:
             return None
         else:
@@ -121,7 +121,7 @@ class CourseIdFilter(admin.SimpleListFilter):
 
 
 @admin.register(models.Schedule)
-class ScheduleAdmin(admin.ModelAdmin):
+class ScheduleAdmin(admin.ModelAdmin):  # lint-amnesty, pylint: disable=missing-class-docstring
     list_display = ('username', 'course_id', 'start_date', 'upgrade_deadline', 'experience_display')
     list_display_links = ('start_date', 'upgrade_deadline', 'experience_display')
     list_filter = (
@@ -160,12 +160,12 @@ class ScheduleAdmin(admin.ModelAdmin):
     course_id.short_description = _('Course ID')
 
     def get_queryset(self, request):
-        qs = super(ScheduleAdmin, self).get_queryset(request)
+        qs = super(ScheduleAdmin, self).get_queryset(request)  # lint-amnesty, pylint: disable=super-with-arguments
         qs = qs.select_related('enrollment', 'enrollment__user')
         return qs
 
 
-class ScheduleConfigAdminForm(forms.ModelForm):
+class ScheduleConfigAdminForm(forms.ModelForm):  # lint-amnesty, pylint: disable=missing-class-docstring
 
     def clean_hold_back_ratio(self):
         hold_back_ratio = self.cleaned_data["hold_back_ratio"]
@@ -175,7 +175,7 @@ class ScheduleConfigAdminForm(forms.ModelForm):
 
 
 @admin.register(models.ScheduleConfig)
-class ScheduleConfigAdmin(admin.ModelAdmin):
+class ScheduleConfigAdmin(admin.ModelAdmin):  # lint-amnesty, pylint: disable=missing-class-docstring
     search_fields = ('site',)
     list_display = (
         'site', 'create_schedules',

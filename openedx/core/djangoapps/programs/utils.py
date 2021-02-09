@@ -19,7 +19,7 @@ from django.utils.functional import cached_property
 from edx_rest_api_client.exceptions import SlumberBaseException
 from opaque_keys.edx.keys import CourseKey
 from pytz import utc
-from requests.exceptions import ConnectionError, Timeout
+from requests.exceptions import ConnectionError, Timeout  # lint-amnesty, pylint: disable=redefined-builtin
 from six.moves.urllib.parse import urljoin, urlparse, urlunparse  # pylint: disable=import-error
 
 from common.djangoapps.course_modes.api import get_paid_modes_for_course
@@ -627,7 +627,7 @@ class ProgramDataExtender(object):
 
         return courses_without_enrollments
 
-    def _collect_one_click_purchase_eligibility_data(self):
+    def _collect_one_click_purchase_eligibility_data(self):  # lint-amnesty, pylint: disable=too-many-statements
         """
         Extend the program data with data about learner's eligibility for one click purchase,
         discount data of the program and SKUs of seats that should be added to basket.
@@ -641,7 +641,7 @@ class ProgramDataExtender(object):
         skus = []
         bundle_variant = 'full'
 
-        if is_learner_eligible_for_one_click_purchase:
+        if is_learner_eligible_for_one_click_purchase:  # lint-amnesty, pylint: disable=too-many-nested-blocks
             courses = self.data['courses']
             if not self.user.is_anonymous:
                 courses = self._filter_out_courses_with_enrollments(courses)
@@ -791,7 +791,7 @@ class ProgramMarketingDataExtender(ProgramDataExtender):
         user (User): The user whose enrollments to inspect.
     """
     def __init__(self, program_data, user):
-        super(ProgramMarketingDataExtender, self).__init__(program_data, user)
+        super(ProgramMarketingDataExtender, self).__init__(program_data, user)  # lint-amnesty, pylint: disable=super-with-arguments
 
         # Aggregate list of instructors for the program keyed by name
         self.instructors = []
@@ -843,7 +843,7 @@ class ProgramMarketingDataExtender(ProgramDataExtender):
 
     def extend(self):
         """Execute extension handlers, returning the extended data."""
-        self.data.update(super(ProgramMarketingDataExtender, self).extend())
+        self.data.update(super(ProgramMarketingDataExtender, self).extend())  # lint-amnesty, pylint: disable=super-with-arguments
         return self.data
 
     @classmethod
@@ -865,11 +865,11 @@ class ProgramMarketingDataExtender(ProgramDataExtender):
         pages. The certificate URL is not needed when rendering
         the program marketing page.
         """
-        pass
+        pass  # lint-amnesty, pylint: disable=unnecessary-pass
 
     def _attach_course_run_upgrade_url(self, run_mode):
         if not self.user.is_anonymous:
-            super(ProgramMarketingDataExtender, self)._attach_course_run_upgrade_url(run_mode)
+            super(ProgramMarketingDataExtender, self)._attach_course_run_upgrade_url(run_mode)  # lint-amnesty, pylint: disable=super-with-arguments
         else:
             run_mode['upgrade_url'] = None
 
@@ -902,7 +902,7 @@ class ProgramMarketingDataExtender(ProgramDataExtender):
                     self.instructors.append(instructor)
 
 
-def is_user_enrolled_in_program_type(user, program_type_slug, paid_modes_only=False, enrollments=None, entitlements=None):
+def is_user_enrolled_in_program_type(user, program_type_slug, paid_modes_only=False, enrollments=None, entitlements=None):  # lint-amnesty, pylint: disable=line-too-long
     """
     This method will look at the learners Enrollments and Entitlements to determine
     if a learner is enrolled in a Program of the given type.

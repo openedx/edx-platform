@@ -12,7 +12,7 @@ from django.conf import settings
 from django.contrib.auth import authenticate
 from django.contrib.auth import login as django_login
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.contrib import admin
 from django.http import HttpRequest, HttpResponse, HttpResponseForbidden
 from django.shortcuts import redirect
@@ -33,7 +33,7 @@ from openedx.core.djangoapps.site_configuration import helpers as configuration_
 from openedx.core.djangoapps.user_authn.views.login_form import get_login_session_form
 from openedx.core.djangoapps.user_authn.cookies import get_response_with_refreshed_jwt_cookies, set_logged_in_cookies
 from openedx.core.djangoapps.user_authn.exceptions import AuthFailedError
-from openedx.core.djangoapps.user_authn.utils import should_redirect_to_logistration_mircrofrontend
+from openedx.core.djangoapps.user_authn.toggles import should_redirect_to_authn_microfrontend
 from openedx.core.djangoapps.util.user_messages import PageLevelMessages
 from openedx.core.djangoapps.user_authn.views.password_reset import send_password_reset_email_for_user
 from openedx.core.djangoapps.user_authn.toggles import is_require_third_party_auth_enabled
@@ -88,7 +88,7 @@ def _do_third_party_auth(request):
             )
         )
 
-        raise AuthFailedError(message, error_code='third-party-auth-with-no-linked-account')
+        raise AuthFailedError(message, error_code='third-party-auth-with-no-linked-account')  # lint-amnesty, pylint: disable=raise-missing-from
 
 
 def _get_user_by_email(request):
@@ -125,27 +125,25 @@ def _generate_locked_out_error_message():
     """
 
     locked_out_period_in_sec = settings.MAX_FAILED_LOGIN_ATTEMPTS_LOCKOUT_PERIOD_SECS
-    if not should_redirect_to_logistration_mircrofrontend:   # pylint: disable=no-else-raise
-        raise AuthFailedError(Text(_('To protect your account, it’s been temporarily '
-                                     'locked. Try again in {locked_out_period} minutes.'
-                                     '{li_start}To be on the safe side, you can reset your '
-                                     'password {link_start}here{link_end} before you try again.')).format(
-            link_start=HTML('<a http="#login" class="form-toggle" data-type="password-reset">'),
-            link_end=HTML('</a>'),
-            li_start=HTML('<li>'),
-            li_end=HTML('</li>'),
-            locked_out_period=int(locked_out_period_in_sec / 60)))
-    else:
-        raise AuthFailedError(Text(_('To protect your account, it’s been temporarily '
-                                     'locked. Try again in {locked_out_period} minutes.\n'
-                                     'To be on the safe side, you can reset your '
-                                     'password {link_start}here{link_end} before you try again.\n')).format(
-            link_start=HTML('<a href="/reset" >'),
-            link_end=HTML('</a>'),
-            locked_out_period=int(locked_out_period_in_sec / 60)))
+    error_message = Text(_('To protect your account, it’s been temporarily '
+                           'locked. Try again in {locked_out_period} minutes.'
+                           '{li_start}To be on the safe side, you can reset your '
+                           'password {link_start}here{link_end} before you try again.')).format(
+                               link_start=HTML('<a http="#login" class="form-toggle" data-type="password-reset">'),
+                               link_end=HTML('</a>'),
+                               li_start=HTML('<li>'),
+                               li_end=HTML('</li>'),
+                               locked_out_period=int(locked_out_period_in_sec / 60))
+    raise AuthFailedError(
+        error_message,
+        error_code='account-locked-out',
+        context={
+            'locked_out_period': int(locked_out_period_in_sec / 60)
+        }
+    )
 
 
-def _enforce_password_policy_compliance(request, user):
+def _enforce_password_policy_compliance(request, user):  # lint-amnesty, pylint: disable=missing-function-docstring
     try:
         password_policy_compliance.enforce_compliance_on_login(user, request.POST.get('password'))
     except password_policy_compliance.NonCompliantPasswordWarning as e:
@@ -155,7 +153,7 @@ def _enforce_password_policy_compliance(request, user):
         AUDIT_LOG.info("Password reset initiated for email %s.", user.email)
         send_password_reset_email_for_user(user, request)
         # Prevent the login attempt.
-        raise AuthFailedError(HTML(six.text_type(e)), error_code=e.__class__.__name__)
+        raise AuthFailedError(HTML(six.text_type(e)), error_code=e.__class__.__name__)  # lint-amnesty, pylint: disable=raise-missing-from
 
 
 def _log_and_raise_inactive_user_auth_error(unauthenticated_user):
@@ -210,7 +208,7 @@ def _authenticate_first_party(request, unauthenticated_user, third_party_auth_re
 
     # This occurs when there are too many attempts from the same IP address
     except RateLimitException:
-        raise AuthFailedError(_('Too many failed login attempts. Try again later.'))
+        raise AuthFailedError(_('Too many failed login attempts. Try again later.'))  # lint-amnesty, pylint: disable=raise-missing-from
 
 
 def _handle_failed_authentication(user, authenticated_user):
@@ -238,35 +236,29 @@ def _handle_failed_authentication(user, authenticated_user):
             if not LoginFailures.is_user_locked_out(user):
                 max_failures_allowed = settings.MAX_FAILED_LOGIN_ATTEMPTS_ALLOWED
                 remaining_attempts = max_failures_allowed - failure_count
-                if not should_redirect_to_logistration_mircrofrontend:  # pylint: disable=no-else-raise
-                    raise AuthFailedError(Text(_('Email or password is incorrect.'
-                                                 '{li_start}You have {remaining_attempts} more sign-in '
-                                                 'attempts before your account is temporarily locked.{li_end}'
-                                                 '{li_start}If you\'ve forgotten your password, click '
-                                                 '{link_start}here{link_end} to reset.{li_end}'
-                                                 ))
-                                          .format(
-                        link_start=HTML('<a http="#login" class="form-toggle" data-type="password-reset">'),
-                        link_end=HTML('</a>'),
-                        li_start=HTML('<li>'),
-                        li_end=HTML('</li>'),
-                        remaining_attempts=remaining_attempts))
-                else:
-                    raise AuthFailedError(Text(_('Email or password is incorrect.\n'
-                                                 'You have {remaining_attempts} more sign-in '
-                                                 'attempts before your account is temporarily locked.\n'
-                                                 'If you{quote}ve forgotten your password, click '
-                                                 '{link_start}here{link_end} to reset.\n'
-                                                 ))
-                                          .format(
-                        quote=HTML("'"),
-                        link_start=HTML('<a href="/reset" >'),
-                        link_end=HTML('</a>'),
-                        remaining_attempts=remaining_attempts))
-            else:
-                _generate_locked_out_error_message()
+                error_message = Text(_('Email or password is incorrect.'
+                                       '{li_start}You have {remaining_attempts} more sign-in '
+                                       'attempts before your account is temporarily locked.{li_end}'
+                                       '{li_start}If you\'ve forgotten your password, click '
+                                       '{link_start}here{link_end} to reset.{li_end}')).format(
+                                           link_start=HTML(
+                                               '<a http="#login" class="form-toggle" data-type="password-reset">'
+                                           ),
+                                           link_end=HTML('</a>'),
+                                           li_start=HTML('<li>'),
+                                           li_end=HTML('</li>'),
+                                           remaining_attempts=remaining_attempts)
+                raise AuthFailedError(
+                    error_message,
+                    error_code='failed-login-attempt',
+                    context={
+                        'remaining_attempts': remaining_attempts,
+                    }
+                )
 
-    raise AuthFailedError(_('Email or password is incorrect.'))
+            _generate_locked_out_error_message()
+
+    raise AuthFailedError(_('Email or password is incorrect.'), error_code='incorrect-email-or-password')
 
 
 def _handle_successful_authentication_and_login(user, request):
@@ -357,13 +349,13 @@ def _check_user_auth_flow(site, user):
             # we don't record their e-mail in case there is sensitive info accidentally
             # in there.
             set_custom_attribute('login_tpa_domain_shortcircuit_user_id', user.id)
-            log.warn("User %s has nonstandard e-mail. Shortcircuiting THIRD_PART_AUTH_ONLY_DOMAIN check.", user.id)
+            log.warn("User %s has nonstandard e-mail. Shortcircuiting THIRD_PART_AUTH_ONLY_DOMAIN check.", user.id)  # lint-amnesty, pylint: disable=deprecated-method
             return
         user_domain = email_parts[1].strip().lower()
 
         # If user belongs to allowed domain and not whitelisted then user must login through allowed domain SSO
         if user_domain == allowed_domain and not AllowedAuthUser.objects.filter(site=site, email=user.email).exists():
-            if not should_redirect_to_logistration_mircrofrontend():
+            if not should_redirect_to_authn_microfrontend():
                 msg = _create_message(site, None, allowed_domain)
             else:
                 root_url = configuration_helpers.get_value('LMS_ROOT_URL', settings.LMS_ROOT_URL)
@@ -412,7 +404,7 @@ def finish_auth(request):
     rate=settings.LOGISTRATION_RATELIMIT_RATE,
     method='POST',
     block=True
-)
+)  # lint-amnesty, pylint: disable=too-many-statements
 def login_user(request):
     """
     AJAX request to log in the user.
@@ -501,7 +493,7 @@ def login_user(request):
             running_pipeline = pipeline.get(request)
             redirect_url = pipeline.get_complete_url(backend_name=running_pipeline['backend'])
 
-        elif should_redirect_to_logistration_mircrofrontend():
+        elif should_redirect_to_authn_microfrontend():
             redirect_url = get_next_url_for_login_page(request, include_host=True)
 
         response = JsonResponse({
@@ -539,7 +531,7 @@ def login_user(request):
 # complexity.
 @csrf_exempt
 @require_http_methods(['POST'])
-def login_refresh(request):
+def login_refresh(request):  # lint-amnesty, pylint: disable=missing-function-docstring
     if not request.user.is_authenticated or request.user.is_anonymous:
         return JsonResponse('Unauthorized', status=401)
 
@@ -570,7 +562,7 @@ class LoginSessionView(APIView):
 
     @method_decorator(ensure_csrf_cookie)
     def get(self, request):
-        return HttpResponse(get_login_session_form(request).to_json(), content_type="application/json")
+        return HttpResponse(get_login_session_form(request).to_json(), content_type="application/json")  # lint-amnesty, pylint: disable=http-response-with-content-type-json
 
     @method_decorator(require_post_params(["email", "password"]))
     @method_decorator(csrf_protect)
@@ -591,7 +583,7 @@ class LoginSessionView(APIView):
 
     @method_decorator(sensitive_post_parameters("password"))
     def dispatch(self, request, *args, **kwargs):
-        return super(LoginSessionView, self).dispatch(request, *args, **kwargs)
+        return super(LoginSessionView, self).dispatch(request, *args, **kwargs)  # lint-amnesty, pylint: disable=super-with-arguments
 
 
 def _parse_analytics_param_for_course_id(request):

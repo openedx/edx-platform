@@ -34,7 +34,7 @@ class EdxRestApiClientTest(TestCase):
     ]
 
     def setUp(self):
-        super(EdxRestApiClientTest, self).setUp()
+        super(EdxRestApiClientTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.user = UserFactory()
 
     @httpretty.activate

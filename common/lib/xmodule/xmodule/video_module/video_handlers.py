@@ -98,7 +98,7 @@ class VideoStudentViewHandlers(object):
                     setattr(self, key, value)
 
                     if key == 'speed':
-                        self.global_speed = self.speed
+                        self.global_speed = self.speed  # lint-amnesty, pylint: disable=attribute-defined-outside-init
 
             return json.dumps({'success': True})
 
@@ -239,11 +239,11 @@ class VideoStudentViewHandlers(object):
         Return value: JSON response (200 on success, 400 for malformed data)
         """
         completion_service = self.runtime.service(self, 'completion')
-        if completion_service is None:
+        if completion_service is None:  # lint-amnesty, pylint: disable=no-else-raise
             raise JsonHandlerError(500, u"No completion service found")
         elif not completion_service.completion_tracking_enabled():
             raise JsonHandlerError(404, u"Completion tracking is not enabled and API calls are unexpected")
-        if not isinstance(data['completion'], (int, float)):
+        if not isinstance(data['completion'], (int, float)):  # lint-amnesty, pylint: disable=no-else-raise
             message = u"Invalid completion value {}. Must be a float in range [0.0, 1.0]"
             raise JsonHandlerError(400, message.format(data['completion']))
         elif not 0.0 <= data['completion'] <= 1.0:
@@ -322,8 +322,8 @@ class VideoStudentViewHandlers(object):
                 log.info("Video: transcript facilities are not available for given language.")
                 return Response(status=404)
 
-            if language != self.transcript_language:
-                self.transcript_language = language
+            if language != self.transcript_language:  # lint-amnesty, pylint: disable=access-member-before-definition
+                self.transcript_language = language  # lint-amnesty, pylint: disable=attribute-defined-outside-init
 
             try:
                 if is_bumper:
@@ -384,7 +384,7 @@ class VideoStudentViewHandlers(object):
         return response
 
     @XBlock.handler
-    def student_view_user_state(self, request, suffix=''):
+    def student_view_user_state(self, request, suffix=''):  # lint-amnesty, pylint: disable=unused-argument
         """
         Endpoint to get user-specific state, like current position and playback speed,
         without rendering the full student_view HTML. This is similar to student_view_state,
@@ -402,7 +402,7 @@ class VideoStudentViewHandlers(object):
         )
 
     @XBlock.handler
-    def yt_video_metadata(self, request, suffix=''):
+    def yt_video_metadata(self, request, suffix=''):  # lint-amnesty, pylint: disable=unused-argument
         """
         Endpoint to get YouTube metadata.
         This handler is only used in the Blockstore-based runtime. The old
@@ -447,7 +447,7 @@ class VideoStudioViewHandlers(object):
         elif (
             data['language_code'] != data['new_language_code'] and data['new_language_code'] in available_translations
         ):
-            error = _(u'A transcript with the "{language_code}" language code already exists.'.format(
+            error = _(u'A transcript with the "{language_code}" language code already exists.'.format(  # lint-amnesty, pylint: disable=translation-of-non-string
                 language_code=data['new_language_code']
             ))
         elif 'file' not in data:

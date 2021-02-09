@@ -6,8 +6,8 @@ neo4j, a graph database.
 
 import logging
 
-from celery import task
-from django.conf import settings
+from celery import shared_task
+from django.conf import settings  # lint-amnesty, pylint: disable=unused-import
 from django.utils import six, timezone
 from edx_django_utils.cache import RequestCache
 from edx_django_utils.monitoring import set_code_owner_attribute
@@ -247,7 +247,7 @@ def should_dump_course(course_key, graph):
     return last_this_command_was_run < course_last_published_date
 
 
-@task
+@shared_task
 @set_code_owner_attribute
 def dump_course_to_neo4j(course_key_string, credentials):
     """

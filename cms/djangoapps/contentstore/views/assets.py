@@ -150,7 +150,7 @@ def _assets_json(request, course_key):
 
     assets, total_count = _get_assets_for_page(course_key, query_options)
 
-    if request_options['requested_page'] > 0 and first_asset_to_display_index >= total_count and total_count > 0:
+    if request_options['requested_page'] > 0 and first_asset_to_display_index >= total_count and total_count > 0:  # lint-amnesty, pylint: disable=chained-comparison
         _update_options_to_requery_final_page(query_options, total_count)
         current_page = query_options['current_page']
         first_asset_to_display_index = _get_first_asset_index(current_page, requested_page_size)
@@ -432,7 +432,7 @@ def _upload_asset(request, course_key):
     })
 
 
-def _get_error_if_course_does_not_exist(course_key):
+def _get_error_if_course_does_not_exist(course_key):  # lint-amnesty, pylint: disable=missing-function-docstring
     try:
         modulestore().get_course(course_key)
     except ItemNotFoundError:
@@ -440,7 +440,7 @@ def _get_error_if_course_does_not_exist(course_key):
         return HttpResponseBadRequest()
 
 
-def _get_file_metadata_as_dictionary(upload_file):
+def _get_file_metadata_as_dictionary(upload_file):  # lint-amnesty, pylint: disable=missing-function-docstring
     # compute a 'filename' which is similar to the location formatting; we're
     # using the 'filename' nomenclature since we're using a FileSystem paradigm
     # here; we're just imposing the Location string formatting expectations to
@@ -564,15 +564,15 @@ def delete_asset(course_key, asset_key):
     del_cached_content(content.location)
 
 
-def _check_existence_and_get_asset_content(asset_key):
+def _check_existence_and_get_asset_content(asset_key):  # lint-amnesty, pylint: disable=missing-function-docstring
     try:
         content = contentstore().find(asset_key)
         return content
     except NotFoundError:
-        raise AssetNotFoundException
+        raise AssetNotFoundException  # lint-amnesty, pylint: disable=raise-missing-from
 
 
-def _delete_thumbnail(thumbnail_location, course_key, asset_key):
+def _delete_thumbnail(thumbnail_location, course_key, asset_key):  # lint-amnesty, pylint: disable=missing-function-docstring
     if thumbnail_location is not None:
 
         # We are ignoring the value of the thumbnail_location-- we only care whether

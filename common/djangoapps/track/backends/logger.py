@@ -28,7 +28,7 @@ class LoggerBackend(BaseBackend):
             been configured using the default python mechanisms.
 
         """
-        super(LoggerBackend, self).__init__(**kwargs)
+        super(LoggerBackend, self).__init__(**kwargs)  # lint-amnesty, pylint: disable=super-with-arguments
 
         self.event_logger = logging.getLogger(name)
 

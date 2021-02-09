@@ -15,7 +15,7 @@ from pytz import UTC
 from six import text_type
 
 from common.djangoapps.entitlements.utils import is_course_run_entitlement_fulfillable
-from openedx.core.constants import COURSE_PUBLISHED
+from openedx.core.constants import COURSE_PUBLISHED  # lint-amnesty, pylint: disable=unused-import
 from openedx.core.djangoapps.catalog.cache import (
     COURSE_PROGRAMS_CACHE_KEY_TPL,
     CATALOG_COURSE_PROGRAMS_CACHE_KEY_TPL,
@@ -424,7 +424,7 @@ def get_course_runs():
     return course_runs
 
 
-def get_course_runs_for_course(course_uuid):
+def get_course_runs_for_course(course_uuid):  # lint-amnesty, pylint: disable=missing-function-docstring
     user, catalog_integration = check_catalog_integration_and_get_user(error_message_field='Course runs')
     if user:
         api = create_catalog_api_client(user)
@@ -446,7 +446,7 @@ def get_course_runs_for_course(course_uuid):
         return []
 
 
-def get_owners_for_course(course_uuid):
+def get_owners_for_course(course_uuid):  # lint-amnesty, pylint: disable=missing-function-docstring
     user, catalog_integration = check_catalog_integration_and_get_user(error_message_field='Owners')
     if user:
         api = create_catalog_api_client(user)

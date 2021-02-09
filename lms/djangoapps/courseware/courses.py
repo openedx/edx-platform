@@ -73,7 +73,7 @@ log = logging.getLogger(__name__)
 # Used by get_course_assignments below. You shouldn't need to use this type directly.
 _Assignment = namedtuple(
     'Assignment', ['block_key', 'title', 'url', 'date', 'contains_gated_content', 'complete', 'past_due',
-                   'assignment_type', 'extra_info']
+                   'assignment_type', 'extra_info', 'first_component_block_id']
 )
 
 
@@ -109,7 +109,7 @@ def get_course_by_id(course_key, depth=0):
         raise Http404(u"Course not found: {}.".format(six.text_type(course_key)))
 
 
-def get_course_with_access(user, action, course_key, depth=0, check_if_enrolled=False, check_survey_complete=True, check_if_authenticated=False):
+def get_course_with_access(user, action, course_key, depth=0, check_if_enrolled=False, check_survey_complete=True, check_if_authenticated=False):  # lint-amnesty, pylint: disable=line-too-long
     """
     Given a course_key, look up the corresponding course descriptor,
     check that the user has the access to perform the specified action
@@ -128,7 +128,7 @@ def get_course_with_access(user, action, course_key, depth=0, check_if_enrolled=
       be plugged in as additional callback checks for different actions.
     """
     course = get_course_by_id(course_key, depth)
-    check_course_access_with_redirect(course, user, action, check_if_enrolled, check_survey_complete, check_if_authenticated)
+    check_course_access_with_redirect(course, user, action, check_if_enrolled, check_survey_complete, check_if_authenticated)  # lint-amnesty, pylint: disable=line-too-long
     return course
 
 
@@ -146,12 +146,12 @@ def get_course_overview_with_access(user, action, course_key, check_if_enrolled=
     try:
         course_overview = CourseOverview.get_from_id(course_key)
     except CourseOverview.DoesNotExist:
-        raise Http404("Course not found.")
+        raise Http404("Course not found.")  # lint-amnesty, pylint: disable=raise-missing-from
     check_course_access_with_redirect(course_overview, user, action, check_if_enrolled)
     return course_overview
 
 
-def check_course_access(course, user, action, check_if_enrolled=False, check_survey_complete=True, check_if_authenticated=False):
+def check_course_access(course, user, action, check_if_enrolled=False, check_survey_complete=True, check_if_authenticated=False):  # lint-amnesty, pylint: disable=line-too-long
     """
     Check that the user has the access to perform the specified action
     on the course (CourseDescriptor|CourseOverview).
@@ -197,7 +197,7 @@ def check_course_access(course, user, action, check_if_enrolled=False, check_sur
     return nonstaff_access_response
 
 
-def check_course_access_with_redirect(course, user, action, check_if_enrolled=False, check_survey_complete=True, check_if_authenticated=False):
+def check_course_access_with_redirect(course, user, action, check_if_enrolled=False, check_survey_complete=True, check_if_authenticated=False):  # lint-amnesty, pylint: disable=line-too-long
     """
     Check that the user has the access to perform the specified action
     on the course (CourseDescriptor|CourseOverview).
@@ -208,7 +208,7 @@ def check_course_access_with_redirect(course, user, action, check_if_enrolled=Fa
     request = get_current_request()
     check_content_start_date_for_masquerade_user(course.id, user, request, course.start)
 
-    access_response = check_course_access(course, user, action, check_if_enrolled, check_survey_complete, check_if_authenticated)
+    access_response = check_course_access(course, user, action, check_if_enrolled, check_survey_complete, check_if_authenticated)  # lint-amnesty, pylint: disable=line-too-long
 
     if not access_response:
         # Redirect if StartDateError
@@ -505,6 +505,7 @@ def get_course_assignment_date_blocks(course, user, request, num_return=None,
         date_block = CourseAssignmentDate(course, user)
         date_block.date = assignment.date
         date_block.contains_gated_content = assignment.contains_gated_content
+        date_block.first_component_block_id = assignment.first_component_block_id
         date_block.complete = assignment.complete
         date_block.assignment_type = assignment.assignment_type
         date_block.past_due = assignment.past_due
@@ -519,7 +520,7 @@ def get_course_assignment_date_blocks(course, user, request, num_return=None,
 
 
 @request_cached()
-def get_course_assignments(course_key, user, include_access=False):
+def get_course_assignments(course_key, user, include_access=False):  # lint-amnesty, pylint: disable=too-many-statements
     """
     Returns a list of assignment (at the subsection/sequential level) due dates for the given course.
 
@@ -534,11 +535,12 @@ def get_course_assignments(course_key, user, include_access=False):
 
     now = datetime.now(pytz.UTC)
     assignments = []
-    for section_key in block_data.get_children(course_usage_key):
+    for section_key in block_data.get_children(course_usage_key):  # lint-amnesty, pylint: disable=too-many-nested-blocks
         for subsection_key in block_data.get_children(section_key):
             due = block_data.get_xblock_field(subsection_key, 'due')
             graded = block_data.get_xblock_field(subsection_key, 'graded', False)
             if due and graded:
+                first_component_block_id = get_first_component_of_block(subsection_key, block_data)
                 contains_gated_content = include_access and block_data.get_xblock_field(
                     subsection_key, 'contains_gated_content', False)
                 title = block_data.get_xblock_field(subsection_key, 'display_name', _('Assignment'))
@@ -554,7 +556,8 @@ def get_course_assignments(course_key, user, include_access=False):
                 complete = is_block_structure_complete_for_assignments(block_data, subsection_key)
                 past_due = not complete and due < now
                 assignments.append(_Assignment(
-                    subsection_key, title, url, due, contains_gated_content, complete, past_due, assignment_type, None
+                    subsection_key, title, url, due, contains_gated_content,
+                    complete, past_due, assignment_type, None, first_component_block_id
                 ))
 
             # Load all dates for ORA blocks as separate assignments
@@ -586,7 +589,7 @@ def get_course_assignments(course_key, user, include_access=False):
                     block_title = block_data.get_xblock_field(descendent, 'title', _('Open Response Assessment'))
 
                     for assessment in all_assessments:
-                        due = parse_date(assessment.get('due')).replace(tzinfo=pytz.UTC) if assessment.get('due') else None
+                        due = parse_date(assessment.get('due')).replace(tzinfo=pytz.UTC) if assessment.get('due') else None  # lint-amnesty, pylint: disable=line-too-long
                         if due is None:
                             continue
 
@@ -606,12 +609,13 @@ def get_course_assignments(course_key, user, include_access=False):
                             assessment_type = assessment_name
                         title = "{} ({})".format(block_title, assessment_type)
                         url = ''
-                        start = parse_date(assessment.get('start')).replace(tzinfo=pytz.UTC) if assessment.get('start') else None
+                        start = parse_date(assessment.get('start')).replace(tzinfo=pytz.UTC) if assessment.get('start') else None  # lint-amnesty, pylint: disable=line-too-long
                         assignment_released = not start or start < now
                         if assignment_released:
                             url = reverse('jump_to', args=[course_key, descendent])
 
                         past_due = not complete and due and due < now
+                        first_component_block_id = str(descendent)
                         assignments.append(_Assignment(
                             descendent,
                             title,
@@ -621,10 +625,22 @@ def get_course_assignments(course_key, user, include_access=False):
                             complete,
                             past_due,
                             assignment_type,
-                            _("Open Response Assessment due dates are set by your instructor and can't be shifted.")
+                            _("Open Response Assessment due dates are set by your instructor and can't be shifted."),
+                            first_component_block_id,
                         ))
 
     return assignments
+
+
+def get_first_component_of_block(block_key, block_data):
+    """
+    This function returns the first leaf block of a section(block_key)
+    """
+    descendents = block_data.get_children(block_key)
+    if descendents:
+        return get_first_component_of_block(descendents[0], block_data)
+
+    return str(block_key)
 
 
 # TODO: Fix this such that these are pulled in as extra course-specific tabs.

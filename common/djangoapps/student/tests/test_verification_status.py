@@ -48,7 +48,7 @@ class TestCourseVerificationStatus(UrlResetMixin, ModuleStoreTestCase):
 
     def setUp(self):
         # Invoke UrlResetMixin
-        super(TestCourseVerificationStatus, self).setUp()
+        super(TestCourseVerificationStatus, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
 
         self.user = UserFactory(password="edx")
         self.course = CourseFactory.create()

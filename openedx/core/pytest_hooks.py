@@ -1,4 +1,4 @@
-"""
+"""  # lint-amnesty, pylint: disable=django-not-configured
 Module to put all pytest hooks that modify pytest behaviour
 """
 import os

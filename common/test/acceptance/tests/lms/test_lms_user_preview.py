@@ -24,7 +24,7 @@ class StaffViewTest(UniqueCourseTest):
     EMAIL = "johndoe@example.com"
 
     def setUp(self):
-        super(StaffViewTest, self).setUp()
+        super(StaffViewTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
 
         self.courseware_page = CoursewarePage(self.browser, self.course_id)
 
@@ -60,7 +60,7 @@ class CourseWithContentGroupsTest(StaffViewTest):
     """
 
     def setUp(self):
-        super(CourseWithContentGroupsTest, self).setUp()
+        super(CourseWithContentGroupsTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         # pylint: disable=protected-access
         self.course_fixture._update_xblock(self.course_fixture._course_location, {
             "metadata": {
@@ -96,10 +96,10 @@ class CourseWithContentGroupsTest(StaffViewTest):
             </problem>
         """)
 
-        self.alpha_text = "VISIBLE TO ALPHA"
-        self.beta_text = "VISIBLE TO BETA"
-        self.audit_text = "VISIBLE TO AUDIT"
-        self.everyone_text = "VISIBLE TO EVERYONE"
+        self.alpha_text = "VISIBLE TO ALPHA"  # lint-amnesty, pylint: disable=attribute-defined-outside-init
+        self.beta_text = "VISIBLE TO BETA"  # lint-amnesty, pylint: disable=attribute-defined-outside-init
+        self.audit_text = "VISIBLE TO AUDIT"  # lint-amnesty, pylint: disable=attribute-defined-outside-init
+        self.everyone_text = "VISIBLE TO EVERYONE"  # lint-amnesty, pylint: disable=attribute-defined-outside-init
 
         course_fixture.add_children(
             XBlockFixtureDesc('chapter', 'Test Section').add_children(

@@ -8,23 +8,22 @@ from uuid import uuid4
 
 import ddt
 import six
-
 from django.conf import settings
 from django.test.utils import override_settings
 from django.urls import reverse
 from mock import patch
 from opaque_keys.edx.keys import CourseKey
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from xmodule.modulestore.tests.factories import CourseFactory
 
-from lms.djangoapps.certificates import api
-from lms.djangoapps.certificates.models import CertificateInvalidation, CertificateStatuses, GeneratedCertificate
-from lms.djangoapps.certificates.tests.factories import CertificateInvalidationFactory
-from lms.djangoapps.grades.tests.utils import mock_passing_grade
-from openedx.core.djangoapps.content.course_overviews.tests.factories import CourseOverviewFactory
 from common.djangoapps.student.models import CourseEnrollment
 from common.djangoapps.student.roles import GlobalStaff, SupportStaffRole
 from common.djangoapps.student.tests.factories import UserFactory
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory
+from lms.djangoapps.certificates.api import regenerate_user_certificates
+from lms.djangoapps.certificates.models import CertificateInvalidation, CertificateStatuses, GeneratedCertificate
+from lms.djangoapps.certificates.tests.factories import CertificateInvalidationFactory, GeneratedCertificateFactory
+from lms.djangoapps.grades.tests.utils import mock_passing_grade
+from openedx.core.djangoapps.content.course_overviews.tests.factories import CourseOverviewFactory
 
 FEATURES_WITH_CERTS_ENABLED = settings.FEATURES.copy()
 FEATURES_WITH_CERTS_ENABLED['CERTIFICATES_HTML_VIEW'] = True
@@ -57,7 +56,7 @@ class CertificateSupportTestCase(ModuleStoreTestCase):
         Create a support team member and a student with a certificate.
         Log in as the support team member.
         """
-        super(CertificateSupportTestCase, self).setUp()
+        super().setUp()
         CourseFactory(
             org=CertificateSupportTestCase.EXISTED_COURSE_KEY_1.org,
             course=CertificateSupportTestCase.EXISTED_COURSE_KEY_1.course,
@@ -80,7 +79,7 @@ class CertificateSupportTestCase(ModuleStoreTestCase):
         )
 
         # Create certificates for the student
-        self.cert = GeneratedCertificate.eligible_certificates.create(
+        self.cert = GeneratedCertificateFactory(
             user=self.student,
             course_id=self.CERT_COURSE_KEY,
             grade=self.CERT_GRADE,
@@ -105,15 +104,16 @@ class CertificateSearchTests(CertificateSupportTestCase):
         """
         Create a course
         """
-        super(CertificateSearchTests, self).setUp()
+        super().setUp()
         self.course = CourseFactory(
             org=self.CERT_COURSE_KEY.org,
             course=self.CERT_COURSE_KEY.course,
             run=self.CERT_COURSE_KEY.run,
         )
         self.course.cert_html_view_enabled = True
+        self.course_key = self.course.id  # pylint: disable=no-member
 
-        #course certificate configurations
+        # Course certificate configurations
         certificates = [
             {
                 'id': 1,
@@ -127,10 +127,10 @@ class CertificateSearchTests(CertificateSupportTestCase):
         ]
 
         self.course.certificates = {'certificates': certificates}
-        self.course.save()
+        self.course.save()  # pylint: disable=no-member
         self.store.update_item(self.course, self.user.id)
         self.course_overview = CourseOverviewFactory(
-            id=self.course.id,
+            id=self.course_key,
             cert_html_view_enabled=True,
         )
 
@@ -215,7 +215,7 @@ class CertificateSearchTests(CertificateSupportTestCase):
 
     @override_settings(FEATURES=FEATURES_WITH_CERTS_ENABLED)
     def test_download_link(self):
-        self.cert.course_id = self.course.id
+        self.cert.course_id = self.course_key
         self.cert.download_url = ''
         self.cert.save()
 
@@ -253,12 +253,13 @@ class CertificateRegenerateTests(CertificateSupportTestCase):
         """
         Create a course and enroll the student in the course.
         """
-        super(CertificateRegenerateTests, self).setUp()
+        super().setUp()
         self.course = CourseFactory(
             org=self.CERT_COURSE_KEY.org,
             course=self.CERT_COURSE_KEY.course,
             run=self.CERT_COURSE_KEY.run,
         )
+        self.course_key = self.course.id  # pylint: disable=no-member
         CourseEnrollment.enroll(self.student, self.CERT_COURSE_KEY, self.CERT_MODE)
 
     @ddt.data(
@@ -293,7 +294,7 @@ class CertificateRegenerateTests(CertificateSupportTestCase):
         self.cert.save()
 
         response = self._regenerate(
-            course_key=self.course.id,
+            course_key=self.course_key,
             username=self.STUDENT_USERNAME,
         )
         self.assertEqual(response.status_code, 200)
@@ -316,8 +317,8 @@ class CertificateRegenerateTests(CertificateSupportTestCase):
         with mock_passing_grade(percent=0.75):
             with patch('common.djangoapps.course_modes.models.CourseMode.mode_for_course') as mock_mode_for_course:
                 mock_mode_for_course.return_value = 'honor'
-                api.regenerate_user_certificates(self.student, self.course.id,
-                                                 course=self.course)
+                regenerate_user_certificates(self.student, self.course_key,
+                                             course=self.course)
 
                 mock_generate_cert.assert_called()
 
@@ -371,8 +372,7 @@ class CertificateRegenerateTests(CertificateSupportTestCase):
         self.assertEqual(num_certs, 1)
 
     def test_regenerate_cert_with_invalidated_record(self):
-        """ If the certificate is marked as invalid, regenerate the certificate
-        and verify the invalidate entry is deactivated. """
+        """ If the certificate is marked as invalid, regenerate the certificate. """
 
         # mark certificate as invalid
         self._invalidate_certificate(self.cert)
@@ -388,7 +388,7 @@ class CertificateRegenerateTests(CertificateSupportTestCase):
             username=self.STUDENT_USERNAME
         )
         self.assertEqual(response.status_code, 200)
-        self.assertInvalidatedCertDoesNotExist()
+        self.assertInvalidatedCertExists()
 
         # Check that the user's certificate was updated
         # Since the student hasn't actually passed the course,
@@ -456,12 +456,13 @@ class CertificateGenerateTests(CertificateSupportTestCase):
         """
         Create a course and enroll the student in the course.
         """
-        super(CertificateGenerateTests, self).setUp()
+        super().setUp()
         self.course = CourseFactory(
             org=self.EXISTED_COURSE_KEY_2.org,
             course=self.EXISTED_COURSE_KEY_2.course,
             run=self.EXISTED_COURSE_KEY_2.run
         )
+        self.course_key = self.course.id  # pylint: disable=no-member
         CourseEnrollment.enroll(self.student, self.EXISTED_COURSE_KEY_2, self.CERT_MODE)
 
     @ddt.data(
@@ -492,7 +493,7 @@ class CertificateGenerateTests(CertificateSupportTestCase):
 
     def test_generate_certificate(self):
         response = self._generate(
-            course_key=self.course.id,
+            course_key=self.course_key,
             username=self.STUDENT_USERNAME,
         )
         self.assertEqual(response.status_code, 200)

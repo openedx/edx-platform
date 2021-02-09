@@ -31,7 +31,7 @@ class TestGraphTraversals(TestCase):
         #   e1  e2
         #       |
         #       f1
-        super(TestGraphTraversals, self).setUp()
+        super(TestGraphTraversals, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.parent_to_children_map = {
             'a1': ['b1'],
             'a2': ['b2'],

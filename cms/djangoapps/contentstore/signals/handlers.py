@@ -30,7 +30,7 @@ log = logging.getLogger(__name__)
 GRADING_POLICY_COUNTDOWN_SECONDS = 3600
 
 
-def locked(expiry_seconds, key):
+def locked(expiry_seconds, key):  # lint-amnesty, pylint: disable=missing-function-docstring
     def task_decorator(func):
         @wraps(func)
         def wrapper(*args, **kwargs):
@@ -64,13 +64,14 @@ def listen_for_course_publish(sender, course_key, **kwargs):  # pylint: disable=
     # to perform any 'on_publish' workflow
     on_course_publish(course_key)
 
+    # import here, because signal is registered at startup, but items in tasks are not yet able to be loaded
+    from cms.djangoapps.contentstore.tasks import update_outline_from_modulestore_task, update_search_index
+    update_outline_from_modulestore_task.delay(str(course_key))
+
     # Finally call into the course search subsystem
     # to kick off an indexing action
     if CoursewareSearchIndexer.indexing_is_enabled() and CourseAboutSearchIndexer.indexing_is_enabled():
-        # import here, because signal is registered at startup, but items in tasks are not yet able to be loaded
-        from cms.djangoapps.contentstore.tasks import update_search_index
-
-        update_search_index.delay(six.text_type(course_key), datetime.now(UTC).isoformat())
+        update_search_index.delay(str(course_key), datetime.now(UTC).isoformat())
 
 
 @receiver(SignalHandler.library_updated)

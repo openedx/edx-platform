@@ -59,7 +59,7 @@ new_contract('CourseKey', CourseKey)
 new_contract('AssetKey', AssetKey)
 new_contract('AssetMetadata', AssetMetadata)
 if six.PY2:
-    new_contract('long', long)
+    new_contract('long', long)  # lint-amnesty, pylint: disable=undefined-variable
 else:
     new_contract('long', int)
 new_contract('BlockUsageLocator', BlockUsageLocator)
@@ -95,7 +95,7 @@ class InvalidWriteError(Exception):
     Raised to indicate that writing to a particular key
     in the KeyValueStore is disabled
     """
-    pass
+    pass  # lint-amnesty, pylint: disable=unnecessary-pass
 
 
 class MongoKeyValueStore(InheritanceKeyValueStore):
@@ -104,7 +104,7 @@ class MongoKeyValueStore(InheritanceKeyValueStore):
     known to the MongoModuleStore (data, children, and metadata)
     """
     def __init__(self, data, parent, children, metadata):
-        super(MongoKeyValueStore, self).__init__()
+        super(MongoKeyValueStore, self).__init__()  # lint-amnesty, pylint: disable=super-with-arguments
         if not isinstance(data, dict):
             self._data = {'data': data}
         else:
@@ -176,7 +176,7 @@ class MongoKeyValueStore(InheritanceKeyValueStore):
         )
 
 
-class CachingDescriptorSystem(MakoDescriptorSystem, EditInfoRuntimeMixin):
+class CachingDescriptorSystem(MakoDescriptorSystem, EditInfoRuntimeMixin):  # lint-amnesty, pylint: disable=abstract-method
     """
     A system that has a cache of module json that it will use to load modules
     from, with a backup of calling to the underlying modulestore for more data
@@ -214,7 +214,7 @@ class CachingDescriptorSystem(MakoDescriptorSystem, EditInfoRuntimeMixin):
         id_manager = CourseLocationManager(course_key)
         kwargs.setdefault('id_reader', id_manager)
         kwargs.setdefault('id_generator', id_manager)
-        super(CachingDescriptorSystem, self).__init__(
+        super(CachingDescriptorSystem, self).__init__(  # lint-amnesty, pylint: disable=super-with-arguments
             field_data=None,
             load_item=self.load_item,
             **kwargs
@@ -228,7 +228,7 @@ class CachingDescriptorSystem(MakoDescriptorSystem, EditInfoRuntimeMixin):
         self.course_id = course_key
         self.cached_metadata = cached_metadata
 
-    def load_item(self, location, for_parent=None):
+    def load_item(self, location, for_parent=None):  # lint-amnesty, pylint: disable=method-hidden
         """
         Return an XModule instance for the specified location
         """
@@ -344,7 +344,7 @@ class CachingDescriptorSystem(MakoDescriptorSystem, EditInfoRuntimeMixin):
         key = UsageKey.from_string(ref_string)
         return key.replace(run=self.modulestore.fill_in_run(key.course_key).run)
 
-    def _convert_reference_fields_to_keys(self, class_, course_key, jsonfields):
+    def _convert_reference_fields_to_keys(self, class_, course_key, jsonfields):  # lint-amnesty, pylint: disable=unused-argument
         """
         Find all fields of type reference and convert the payload into UsageKeys
         :param class_: the XBlock class
@@ -473,7 +473,7 @@ class MongoBulkOpsRecord(BulkOpsRecord):
     Tracks whether there've been any writes per course and disables inheritance generation
     """
     def __init__(self):
-        super(MongoBulkOpsRecord, self).__init__()
+        super(MongoBulkOpsRecord, self).__init__()  # lint-amnesty, pylint: disable=super-with-arguments
         self.dirty = False
 
 
@@ -502,11 +502,11 @@ class MongoBulkOpsMixin(BulkOperationsMixin):
             bulk_ops_record.dirty = False  # brand spanking clean now
         return dirty
 
-    def _is_in_bulk_operation(self, course_id, ignore_case=False):
+    def _is_in_bulk_operation(self, course_id, ignore_case=False):  # lint-amnesty, pylint: disable=arguments-differ
         """
         Returns whether a bulk operation is in progress for the given course.
         """
-        return super(MongoBulkOpsMixin, self)._is_in_bulk_operation(
+        return super(MongoBulkOpsMixin, self)._is_in_bulk_operation(  # lint-amnesty, pylint: disable=super-with-arguments
             course_id.for_branch(None), ignore_case
         )
 
@@ -555,7 +555,7 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
         :param doc_store_config: must have a host, db, and collection entries. Other common entries: port, tz_aware.
         """
 
-        super(MongoModuleStore, self).__init__(contentstore=contentstore, **kwargs)
+        super(MongoModuleStore, self).__init__(contentstore=contentstore, **kwargs)  # lint-amnesty, pylint: disable=super-with-arguments
 
         def do_connection(
             db, collection, host, port=27017, tz_aware=True, user=None, password=None, asset_collection=None, **kwargs
@@ -617,7 +617,7 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
         If connections is True, then close the connection to the database as well.
         """
         # drop the assets
-        super(MongoModuleStore, self)._drop_database(database, collections, connections)
+        super(MongoModuleStore, self)._drop_database(database, collections, connections)  # lint-amnesty, pylint: disable=super-with-arguments
 
         connection = self.collection.database.client
 
@@ -770,7 +770,7 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
         course_id = self.fill_in_run(course_id)
         if not force_refresh:
             # see if we are first in the request cache (if present)
-            if self.request_cache is not None and six.text_type(course_id) in self.request_cache.data.get('metadata_inheritance', {}):
+            if self.request_cache is not None and six.text_type(course_id) in self.request_cache.data.get('metadata_inheritance', {}):  # lint-amnesty, pylint: disable=line-too-long
                 return self.request_cache.data['metadata_inheritance'][six.text_type(course_id)]
 
             # then look in any caching subsystem (e.g. memcached)
@@ -1102,7 +1102,7 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
         """
         return BlockUsageLocator(course_key, 'course', course_key.run)
 
-    def get_course(self, course_key, depth=0, **kwargs):
+    def get_course(self, course_key, depth=0, **kwargs):  # lint-amnesty, pylint: disable=arguments-differ
         """
         Get the course with the given courseid (org/course/run)
         """
@@ -1120,7 +1120,7 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
             return None
 
     @autoretry_read()
-    def has_course(self, course_key, ignore_case=False, **kwargs):
+    def has_course(self, course_key, ignore_case=False, **kwargs):  # lint-amnesty, pylint: disable=arguments-differ
         """
         Returns the course_id of the course if it was found, else None
         Note: we return the course_id instead of a boolean here since the found course may have
@@ -1164,7 +1164,7 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
         except ItemNotFoundError:
             return False
 
-    def get_item(self, usage_key, depth=0, using_descriptor_system=None, for_parent=None, **kwargs):
+    def get_item(self, usage_key, depth=0, using_descriptor_system=None, for_parent=None, **kwargs):  # lint-amnesty, pylint: disable=arguments-differ
         """
         Returns an XModuleDescriptor instance for the item at location.
 
@@ -1214,7 +1214,7 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
         ])
 
     @autoretry_read()
-    def get_items(
+    def get_items(  # lint-amnesty, pylint: disable=arguments-differ
             self,
             course_id,
             settings=None,
@@ -1286,7 +1286,7 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
         )
         return modules
 
-    def create_course(self, org, course, run, user_id, fields=None, **kwargs):
+    def create_course(self, org, course, run, user_id, fields=None, **kwargs):  # lint-amnesty, pylint: disable=arguments-differ
         """
         Creates and returns the course.
 
@@ -1323,7 +1323,7 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
             xblock = self.create_item(user_id, course_id, 'course', course_id.run, fields=fields, **kwargs)
 
             # create any other necessary things as a side effect
-            super(MongoModuleStore, self).create_course(
+            super(MongoModuleStore, self).create_course(  # lint-amnesty, pylint: disable=super-with-arguments
                 org, course, run, user_id, runtime=xblock.runtime, **kwargs
             )
 
@@ -1397,7 +1397,7 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
         xmodule.save()
         return xmodule
 
-    def create_item(self, user_id, course_key, block_type, block_id=None, **kwargs):
+    def create_item(self, user_id, course_key, block_type, block_id=None, **kwargs):  # lint-amnesty, pylint: disable=arguments-differ
         """
         Creates and saves a new item in a course.
 
@@ -1423,7 +1423,7 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
 
         return xblock
 
-    def create_child(self, user_id, parent_usage_key, block_type, block_id=None, **kwargs):
+    def create_child(self, user_id, parent_usage_key, block_type, block_id=None, **kwargs):  # lint-amnesty, pylint: disable=arguments-differ
         """
         Creates and saves a new xblock that as a child of the specified block
 
@@ -1453,7 +1453,7 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
             else:
                 parent.children.insert(kwargs.get('position'), xblock.location)
 
-            self.update_item(parent, user_id, child_update=True)
+            self.update_item(parent, user_id, child_update=True)  # lint-amnesty, pylint: disable=unexpected-keyword-arg
 
         return xblock
 
@@ -1500,7 +1500,7 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
             self._update_single_item(parent, update)
             self._update_ancestors(parent, update)
 
-    def update_item(self, xblock, user_id, allow_not_found=False, force=False, isPublish=False,
+    def update_item(self, xblock, user_id, allow_not_found=False, force=False, isPublish=False,  # lint-amnesty, pylint: disable=arguments-differ
                     is_publish_root=True):
         """
         Update the persisted version of xblock to reflect its current values.
@@ -1565,10 +1565,10 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
             self.refresh_cached_metadata_inheritance_tree(xblock.scope_ids.usage_id.course_key, xblock.runtime)
             # fire signal that we've written to DB
         except ItemNotFoundError:
-            if not allow_not_found:
+            if not allow_not_found:  # lint-amnesty, pylint: disable=no-else-raise
                 raise
             elif not self.has_course(course_key):
-                raise ItemNotFoundError(course_key)
+                raise ItemNotFoundError(course_key)  # lint-amnesty, pylint: disable=raise-missing-from
 
         return xblock
 
@@ -1638,7 +1638,7 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
         '''
         assert location.branch is None
         assert revision == ModuleStoreEnum.RevisionOption.published_only \
-            or revision == ModuleStoreEnum.RevisionOption.draft_preferred
+            or revision == ModuleStoreEnum.RevisionOption.draft_preferred  # lint-amnesty, pylint: disable=consider-using-in
 
         parent_cache = self._get_parent_cache(self.get_branch_setting())
         if parent_cache.has(six.text_type(location)):
@@ -1671,7 +1671,7 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
                     # no actual parent found
                     return cache_and_return(None)
 
-                if len(non_orphan_parents) > 1:
+                if len(non_orphan_parents) > 1:  # lint-amnesty, pylint: disable=no-else-raise
                     # should never have multiple PUBLISHED parents
                     raise ReferentialIntegrityError(
                         u"{} parents claim {}".format(len(parents), location)
@@ -1723,7 +1723,7 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
             return parent
         return None
 
-    def get_modulestore_type(self, course_key=None):
+    def get_modulestore_type(self, course_key=None):  # lint-amnesty, pylint: disable=arguments-differ, unused-argument
         """
         Returns an enumeration-like type reflecting the type of this modulestore per ModuleStoreEnum.Type
         Args:
@@ -1810,7 +1810,7 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
         doc_id = None if course_assets is None else course_assets['_id']
         if course_assets is None:
             # Check to see if the course is created in the course collection.
-            if self.get_course(course_key) is None:
+            if self.get_course(course_key) is None:  # lint-amnesty, pylint: disable=no-else-raise
                 raise ItemNotFoundError(course_key)
             else:
                 # Course exists, so create matching assets document.
@@ -1910,7 +1910,7 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
         self.asset_collection.insert_one(dest_assets)
 
     @contract(asset_key='AssetKey', attr_dict=dict, user_id='int|long')
-    def set_asset_metadata_attrs(self, asset_key, attr_dict, user_id):
+    def set_asset_metadata_attrs(self, asset_key, attr_dict, user_id):  # lint-amnesty, pylint: disable=arguments-differ
         """
         Add/set the given dict of attrs on the asset at the given location. Value can be any type which pymongo accepts.
 
@@ -1966,7 +1966,7 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
         return 1
 
     @contract(course_key='CourseKey', user_id='int|long')
-    def delete_all_asset_metadata(self, course_key, user_id):
+    def delete_all_asset_metadata(self, course_key, user_id):  # lint-amnesty, pylint: disable=unused-argument
         """
         Delete all of the assets which use this course_key as an identifier.
 
@@ -1991,7 +1991,7 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
             self.database.client.admin.command('ismaster')
             return {ModuleStoreEnum.Type.mongo: True}
         except pymongo.errors.ConnectionFailure:
-            raise HeartbeatFailure("Can't connect to {}".format(self.database.name), 'mongo')
+            raise HeartbeatFailure("Can't connect to {}".format(self.database.name), 'mongo')  # lint-amnesty, pylint: disable=raise-missing-from
 
     def ensure_indexes(self):
         """
@@ -2028,7 +2028,7 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
     def convert_to_draft(self, location, user_id):
         raise NotImplementedError()
 
-    def delete_item(self, location, user_id, **kwargs):
+    def delete_item(self, location, user_id, **kwargs):  # lint-amnesty, pylint: disable=arguments-differ
         raise NotImplementedError()
 
     def has_changes(self, xblock):

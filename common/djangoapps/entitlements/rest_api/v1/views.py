@@ -20,7 +20,7 @@ from common.djangoapps.course_modes.models import CourseMode
 from common.djangoapps.entitlements.rest_api.v1.filters import CourseEntitlementFilter
 from common.djangoapps.entitlements.rest_api.v1.permissions import IsAdminOrSupportOrAuthenticatedReadOnly
 from common.djangoapps.entitlements.rest_api.v1.serializers import CourseEntitlementSerializer
-from common.djangoapps.entitlements.models import CourseEntitlement, CourseEntitlementPolicy, CourseEntitlementSupportDetail
+from common.djangoapps.entitlements.models import CourseEntitlement, CourseEntitlementPolicy, CourseEntitlementSupportDetail  # lint-amnesty, pylint: disable=line-too-long
 from common.djangoapps.entitlements.utils import is_course_run_entitlement_fulfillable
 from openedx.core.djangoapps.catalog.utils import get_course_runs_for_course, get_owners_for_course
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
@@ -220,7 +220,7 @@ class EntitlementViewSet(viewsets.ModelViewSet):
             status=status.HTTP_201_CREATED, headers=headers
         )
 
-    def retrieve(self, request, *args, **kwargs):
+    def retrieve(self, request, *args, **kwargs):  # lint-amnesty, pylint: disable=unused-argument
         """
         Override the retrieve method to expire a record that is past the
         policy and is requested via the API before returning that record.
@@ -230,7 +230,7 @@ class EntitlementViewSet(viewsets.ModelViewSet):
         serializer = self.get_serializer(entitlement)
         return Response(serializer.data)
 
-    def list(self, request, *args, **kwargs):
+    def list(self, request, *args, **kwargs):  # lint-amnesty, pylint: disable=unused-argument
         """
         Override the list method to expire records that are past the
         policy and requested via the API before returning those records.
@@ -300,7 +300,7 @@ class EntitlementViewSet(viewsets.ModelViewSet):
                     )
             CourseEntitlementSupportDetail.objects.create(**support_detail)
 
-        return super(EntitlementViewSet, self).partial_update(request, *args, **kwargs)  # pylint: disable=no-member
+        return super(EntitlementViewSet, self).partial_update(request, *args, **kwargs)  # lint-amnesty, pylint: disable=no-member, super-with-arguments
 
 
 class EntitlementEnrollmentViewSet(viewsets.GenericViewSet):

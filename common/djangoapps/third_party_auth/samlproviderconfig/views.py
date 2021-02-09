@@ -95,7 +95,7 @@ class SAMLProviderConfigViewSet(PermissionRequiredMixin, SAMLProviderMixin, view
         try:
             enterprise_customer = EnterpriseCustomer.objects.get(pk=customer_uuid)
         except EnterpriseCustomer.DoesNotExist:
-            raise ValidationError('Enterprise customer not found at uuid: {}'.format(customer_uuid))
+            raise ValidationError('Enterprise customer not found at uuid: {}'.format(customer_uuid))  # lint-amnesty, pylint: disable=raise-missing-from
 
         # Create the samlproviderconfig model first
         serializer = self.get_serializer(data=request.data)

@@ -42,7 +42,7 @@ class BackpopulateProgramCredentialsTests(CatalogIntegrationMixin, CredentialsAp
     SAME_COURSE = 'same_course'
 
     def setUp(self):
-        super(BackpopulateProgramCredentialsTests, self).setUp()
+        super(BackpopulateProgramCredentialsTests, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
 
         self.alice = UserFactory()
         self.bob = UserFactory()

@@ -1,7 +1,7 @@
 """
 Encapsulates permissions checks for Course Blocks API
 """
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from opaque_keys.edx.keys import CourseKey
 
 from lms.djangoapps.courseware.access import has_access
@@ -9,7 +9,7 @@ from lms.djangoapps.courseware.access_response import AccessResponse
 from lms.djangoapps.courseware.access_utils import ACCESS_DENIED, ACCESS_GRANTED, check_public_access
 from lms.djangoapps.courseware.exceptions import CourseRunNotFound
 from lms.djangoapps.courseware.courses import get_course
-from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
+from openedx.core.djangoapps.content.course_overviews.models import CourseOverview  # lint-amnesty, pylint: disable=unused-import
 from common.djangoapps.student.models import CourseEnrollment
 from common.djangoapps.student.roles import CourseStaffRole
 from xmodule.course_module import COURSE_VISIBILITY_PUBLIC

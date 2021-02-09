@@ -68,7 +68,6 @@ def elasticsearch_test(func):
         def mock_perform(cls, filter_terms, text_search):
             # pylint: disable=no-member
             return SearchEngine.get_search_engine(cls.INDEX_NAME).search(
-                doc_type=cls.DOCUMENT_TYPE,
                 field_dictionary=filter_terms,
                 query_string=text_search,
                 size=MAX_SIZE

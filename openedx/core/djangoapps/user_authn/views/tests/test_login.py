@@ -11,14 +11,14 @@ import unicodedata
 import ddt
 import six
 from django.conf import settings
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.core import mail
 from django.core.cache import cache
 from django.http import HttpResponse
 from django.test.client import Client
 from django.test.utils import override_settings
 from django.urls import NoReverseMatch, reverse
-from edx_toggles.toggles.testutils import override_waffle_switch
+from edx_toggles.toggles.testutils import override_waffle_flag, override_waffle_switch
 from mock import Mock, patch
 from common.djangoapps.student.tests.factories import RegistrationFactory, UserFactory, UserProfileFactory
 
@@ -29,6 +29,7 @@ from openedx.core.djangoapps.password_policy.compliance import (
 from openedx.core.djangoapps.user_api.accounts import EMAIL_MIN_LENGTH, EMAIL_MAX_LENGTH
 from openedx.core.djangoapps.user_authn.cookies import jwt_cookies
 from openedx.core.djangoapps.user_authn.tests.utils import setup_login_oauth_client
+from openedx.core.djangoapps.user_authn.toggles import REDIRECT_TO_AUTHN_MICROFRONTEND
 from openedx.core.djangoapps.user_authn.views.login import (
     ENABLE_LOGIN_USING_THIRDPARTY_AUTH_ONLY,
     AllowedAuthUser,
@@ -55,7 +56,7 @@ class LoginTest(SiteMixin, CacheIsolationTestCase):
 
     def setUp(self):
         """Setup a test user along with its registration and profile"""
-        super(LoginTest, self).setUp()
+        super(LoginTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.user = self._create_user(self.username, self.user_email)
 
         RegistrationFactory(user=self.user)
@@ -79,8 +80,8 @@ class LoginTest(SiteMixin, CacheIsolationTestCase):
         self._assert_response(response, success=True)
         self._assert_audit_log(mock_audit_log, 'info', [u'Login success', self.user_email])
 
-    FEATURES_WITH_LOGIN_MFE_ENABLED = settings.FEATURES.copy()
-    FEATURES_WITH_LOGIN_MFE_ENABLED['ENABLE_LOGISTRATION_MICROFRONTEND'] = True
+    FEATURES_WITH_AUTHN_MFE_ENABLED = settings.FEATURES.copy()
+    FEATURES_WITH_AUTHN_MFE_ENABLED['ENABLE_AUTHN_MICROFRONTEND'] = True
 
     @patch.dict(settings.FEATURES, {
         "ENABLE_THIRD_PARTY_AUTH": True
@@ -157,7 +158,8 @@ class LoginTest(SiteMixin, CacheIsolationTestCase):
     )
     @ddt.unpack
     @override_settings(LOGIN_REDIRECT_WHITELIST=['openedx.service'])
-    @override_settings(FEATURES=FEATURES_WITH_LOGIN_MFE_ENABLED)
+    @override_settings(FEATURES=FEATURES_WITH_AUTHN_MFE_ENABLED)
+    @override_waffle_flag(REDIRECT_TO_AUTHN_MICROFRONTEND, active=True)
     @skip_unless_lms
     def test_login_success_with_redirect(self, next_url, course_id, expected_redirect):
         post_params = {}
@@ -817,7 +819,7 @@ class LoginSessionViewTest(ApiTestCase):
     PASSWORD = "password"
 
     def setUp(self):
-        super(LoginSessionViewTest, self).setUp()
+        super(LoginSessionViewTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.url = reverse("user_api_login_session")
 
     @ddt.data("get", "post")

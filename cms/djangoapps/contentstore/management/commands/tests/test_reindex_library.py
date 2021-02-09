@@ -20,7 +20,7 @@ class TestReindexLibrary(ModuleStoreTestCase):
     """ Tests for library reindex command """
     def setUp(self):
         """ Setup method - create libraries and courses """
-        super(TestReindexLibrary, self).setUp()
+        super(TestReindexLibrary, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.store = modulestore()
         self.first_lib = LibraryFactory.create(
             org="test", library="lib1", display_name="run1", default_store=ModuleStoreEnum.Type.split

@@ -200,7 +200,7 @@ class VideoBlock(
         # is enabled for this course
         return waffle_flags()[DEPRECATE_YOUTUBE].is_enabled(self.location.course_key)
 
-    def youtube_disabled_for_course(self):
+    def youtube_disabled_for_course(self):  # lint-amnesty, pylint: disable=missing-function-docstring
         if not self.location.context_key.is_course:
             return False  # Only courses have this flag
         request_cache = RequestCache('youtube_disabled_for_course')
@@ -266,7 +266,7 @@ class VideoBlock(
         shim_xmodule_js(fragment, 'Video')
         return fragment
 
-    def get_html(self, view=STUDENT_VIEW):
+    def get_html(self, view=STUDENT_VIEW):  # lint-amnesty, pylint: disable=arguments-differ, too-many-statements
 
         track_status = (self.download_track and self.track)
         transcript_download_format = self.transcript_download_format if not track_status else None
@@ -287,7 +287,7 @@ class VideoBlock(
         # If we have an edx_video_id, we prefer its values over what we store
         # internally for download links (source, html5_sources) and the youtube
         # stream.
-        if self.edx_video_id and edxval_api:
+        if self.edx_video_id and edxval_api:  # lint-amnesty, pylint: disable=too-many-nested-blocks
             try:
                 val_profiles = ["youtube", "desktop_webm", "desktop_mp4"]
 
@@ -361,11 +361,11 @@ class VideoBlock(
         cdn_exp_group = None
 
         if self.youtube_disabled_for_course():
-            self.youtube_streams = ''
+            self.youtube_streams = ''  # lint-amnesty, pylint: disable=attribute-defined-outside-init
         else:
             self.youtube_streams = youtube_streams or create_youtube_string(self)  # pylint: disable=W0201
 
-        settings_service = self.runtime.service(self, 'settings')
+        settings_service = self.runtime.service(self, 'settings')  # lint-amnesty, pylint: disable=unused-variable
 
         poster = None
         if edxval_api and self.edx_video_id:
@@ -467,7 +467,7 @@ class VideoBlock(
             'download_video_link': download_video_link,
             'track': track_url,
             'transcript_download_format': transcript_download_format,
-            'transcript_download_formats_list': self.fields['transcript_download_format'].values,
+            'transcript_download_formats_list': self.fields['transcript_download_format'].values,  # lint-amnesty, pylint: disable=unsubscriptable-object
             'license': getattr(self, "license", None),
         }
         return self.system.render_template('video.html', context)
@@ -478,7 +478,7 @@ class VideoBlock(
         is the override of the general XBlock method, and it will also ask
         its superclass to validate.
         """
-        validation = super(VideoBlock, self).validate()
+        validation = super(VideoBlock, self).validate()  # lint-amnesty, pylint: disable=super-with-arguments
         if not isinstance(validation, StudioValidation):
             validation = StudioValidation.copy(validation)
 
@@ -501,7 +501,7 @@ class VideoBlock(
             )
         return validation
 
-    def editor_saved(self, user, old_metadata, old_content):
+    def editor_saved(self, user, old_metadata, old_content):  # lint-amnesty, pylint: disable=unused-argument
         """
         Used to update video values during `self`:save method from CMS.
         old_metadata: dict, values of fields of `self` with scope=settings which were explicitly set by user.
@@ -564,7 +564,7 @@ class VideoBlock(
 
     @property
     def editable_metadata_fields(self):
-        editable_fields = super(VideoBlock, self).editable_metadata_fields
+        editable_fields = super(VideoBlock, self).editable_metadata_fields  # lint-amnesty, pylint: disable=super-with-arguments
 
         settings_service = self.runtime.service(self, 'settings')
         if settings_service:
@@ -619,9 +619,9 @@ class VideoBlock(
         video_block = runtime.construct_xblock_from_class(cls, keys)
         field_data = cls.parse_video_xml(node)
         for key, val in field_data.items():
-            if key not in cls.fields:
+            if key not in cls.fields:  # lint-amnesty, pylint: disable=unsupported-membership-test
                 continue  # parse_video_xml returns some old non-fields like 'source'
-            setattr(video_block, key, cls.fields[key].from_json(val))
+            setattr(video_block, key, cls.fields[key].from_json(val))  # lint-amnesty, pylint: disable=unsubscriptable-object
         # Don't use VAL in the new runtime:
         video_block.edx_video_id = None
         return video_block
@@ -666,7 +666,7 @@ class VideoBlock(
 
         return video
 
-    def definition_to_xml(self, resource_fs):
+    def definition_to_xml(self, resource_fs):  # lint-amnesty, pylint: disable=too-many-statements
         """
         Returns an xml string representing this module.
         """
@@ -690,7 +690,7 @@ class VideoBlock(
             # Mild workaround to ensure that tests pass -- if a field
             # is set to its default value, we don't write it out.
             if value:
-                if key in self.fields and self.fields[key].is_set_on(self):
+                if key in self.fields and self.fields[key].is_set_on(self):  # lint-amnesty, pylint: disable=unsubscriptable-object, unsupported-membership-test
                     try:
                         xml.set(key, six.text_type(value))
                     except UnicodeDecodeError:
@@ -788,7 +788,7 @@ class VideoBlock(
         """
         Extend context by data for transcript basic tab.
         """
-        _context = super(VideoBlock, self).get_context()
+        _context = super(VideoBlock, self).get_context()  # lint-amnesty, pylint: disable=super-with-arguments
 
         metadata_fields = copy.deepcopy(self.editable_metadata_fields)
 
@@ -925,7 +925,7 @@ class VideoBlock(
             field_data['transcripts'] = {tr.get('language'): tr.get('src') for tr in transcripts}
 
         for attr, value in xml.items():
-            if attr in compat_keys:
+            if attr in compat_keys:  # lint-amnesty, pylint: disable=consider-using-get
                 attr = compat_keys[attr]
             if attr in cls.metadata_to_strip + ('url_name', 'name'):
                 continue
@@ -940,12 +940,12 @@ class VideoBlock(
                         field_data['youtube_id_{0}'.format(normalized_speed.replace('.', '_'))] = youtube_id
             elif attr in conversions:
                 field_data[attr] = conversions[attr](value)
-            elif attr not in cls.fields:
+            elif attr not in cls.fields:  # lint-amnesty, pylint: disable=unsupported-membership-test
                 field_data.setdefault('xml_attributes', {})[attr] = value
             else:
                 # We export values with json.dumps (well, except for Strings, but
                 # for about a month we did it for Strings also).
-                field_data[attr] = deserialize_field(cls.fields[attr], value)
+                field_data[attr] = deserialize_field(cls.fields[attr], value)  # lint-amnesty, pylint: disable=unsubscriptable-object
 
         course_id = getattr(id_generator, 'target_course_id', None)
         # Update the handout location with current course_id
@@ -1016,7 +1016,7 @@ class VideoBlock(
         return edx_video_id
 
     def index_dictionary(self):
-        xblock_body = super(VideoBlock, self).index_dictionary()
+        xblock_body = super(VideoBlock, self).index_dictionary()  # lint-amnesty, pylint: disable=super-with-arguments
         video_body = {
             "display_name": self.display_name,
         }
@@ -1057,7 +1057,7 @@ class VideoBlock(
     @request_cached(
         request_cache_getter=lambda args, kwargs: args[1],
     )
-    def get_cached_val_data_for_course(cls, request_cache, video_profile_names, course_id):
+    def get_cached_val_data_for_course(cls, request_cache, video_profile_names, course_id):  # lint-amnesty, pylint: disable=unused-argument
         """
         Returns the VAL data for the requested video profiles for the given course.
         """

@@ -20,7 +20,7 @@ class TestBackfillSSOVerificationsCommand(TestCase):
     slug = 'test'
 
     def setUp(self):
-        super(TestBackfillSSOVerificationsCommand, self).setUp()
+        super(TestBackfillSSOVerificationsCommand, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.enable_saml()
         self.provider = self.configure_saml_provider(
             name="Test",
@@ -41,9 +41,9 @@ class TestBackfillSSOVerificationsCommand(TestCase):
             call_command('backfill_sso_verifications_for_old_account_links', '--provider-slug', 'gatech')
 
     def test_sso_updated_single_user(self):
-        self.assertTrue(SSOVerification.objects.count() == 0)
+        self.assertTrue(SSOVerification.objects.count() == 0)  # lint-amnesty, pylint: disable=wrong-assert-type
         call_command('backfill_sso_verifications_for_old_account_links', '--provider-slug', self.provider.provider_id)
-        self.assertTrue(SSOVerification.objects.count() > 0)
+        self.assertTrue(SSOVerification.objects.count() > 0)  # lint-amnesty, pylint: disable=wrong-assert-type
         self.assertEqual(SSOVerification.objects.get().user.id, self.user1.id)
 
     def test_performance(self):
@@ -54,7 +54,7 @@ class TestBackfillSSOVerificationsCommand(TestCase):
 
     def test_signal_called(self):
         with patch('openedx.core.djangoapps.signals.signals.LEARNER_NOW_VERIFIED.send_robust') as mock_signal:
-            call_command('backfill_sso_verifications_for_old_account_links', '--provider-slug', self.provider.provider_id)
+            call_command('backfill_sso_verifications_for_old_account_links', '--provider-slug', self.provider.provider_id)  # lint-amnesty, pylint: disable=line-too-long
         self.assertEqual(mock_signal.call_count, 1)
 
     def test_fine_with_multiple_verification_records(self):

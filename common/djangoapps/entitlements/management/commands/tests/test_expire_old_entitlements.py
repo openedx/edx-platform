@@ -1,4 +1,4 @@
-"""Test Entitlements models"""
+"""Test Entitlements models"""  # lint-amnesty, pylint: disable=django-not-configured
 
 
 import mock

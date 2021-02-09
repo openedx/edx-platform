@@ -14,6 +14,7 @@ from opaque_keys.edx.keys import CourseKey
 
 from common.djangoapps.course_modes.models import CourseMode
 from openedx.core.djangoapps.enrollments import errors
+from xmodule.modulestore.django import modulestore
 
 log = logging.getLogger(__name__)
 
@@ -264,7 +265,7 @@ def update_enrollment(
     if mode is not None:
         validate_course_mode(course_id, mode, is_active=is_active, include_expired=include_expired)
     enrollment = _data_api().update_course_enrollment(username, course_id, mode=mode, is_active=is_active)
-    if enrollment is None:
+    if enrollment is None:  # lint-amnesty, pylint: disable=no-else-raise
         msg = u"Course Enrollment not found for user {user} in course {course}".format(user=username, course=course_id)
         log.warning(msg)
         raise errors.EnrollmentNotFoundError(msg)
@@ -341,7 +342,7 @@ def get_course_enrollment_details(course_id, include_expired=False):
     except Exception:
         # Catch any unexpected errors during caching.
         log.exception(u"Error occurred while caching course enrollment details for course %s", course_id)
-        raise errors.CourseEnrollmentError(u"An unexpected error occurred while retrieving course enrollment details.")
+        raise errors.CourseEnrollmentError(u"An unexpected error occurred while retrieving course enrollment details.")  # lint-amnesty, pylint: disable=raise-missing-from
 
     return course_enrollment_details
 
@@ -494,6 +495,48 @@ def serialize_enrollments(enrollments):
     return _data_api().serialize_enrollments(enrollments)
 
 
+def is_enrollment_valid_for_proctoring(username, course_id):
+    """
+    Returns a boolean value regarding whether user's course enrollment is eligible for proctoring.
+
+    Returns false if:
+        * special exams aren't enabled
+        * the enrollment is not active
+        * proctored exams aren't enabled for the course
+        * the course mode is audit
+
+    Arguments:
+        * username (str): The user associated with the enrollment.
+        * course_id (str): The course id associated with the enrollment.
+    """
+    if not settings.FEATURES.get('ENABLE_SPECIAL_EXAMS'):
+        return False
+
+    # Verify that the learner's enrollment is active
+    enrollment = _data_api().get_course_enrollment(username, str(course_id))
+    if not enrollment or not enrollment['is_active']:
+        return False
+
+    # Check that the course has proctored exams enabled
+    course_module = modulestore().get_course(course_id)
+    if not course_module or not course_module.enable_proctored_exams:
+        return False
+
+    # Only allow verified modes
+    appropriate_modes = [
+        CourseMode.VERIFIED, CourseMode.MASTERS, CourseMode.PROFESSIONAL, CourseMode.EXECUTIVE_EDUCATION
+    ]
+
+    # If the proctoring provider allows learners in honor mode to take exams, include it
+    if settings.PROCTORING_BACKENDS.get(course_module.proctoring_provider, {}).get('allow_honor_mode'):
+        appropriate_modes.append(CourseMode.HONOR)
+
+    if enrollment['mode'] not in appropriate_modes:
+        return False
+
+    return True
+
+
 def _data_api():
     """Returns a Data API.
     This relies on Django settings to find the appropriate data API.
@@ -508,4 +551,4 @@ def _data_api():
         return importlib.import_module(api_path)
     except (ImportError, ValueError):
         log.exception(u"Could not load module at '{path}'".format(path=api_path))
-        raise errors.EnrollmentApiLoadError(api_path)
+        raise errors.EnrollmentApiLoadError(api_path)  # lint-amnesty, pylint: disable=raise-missing-from

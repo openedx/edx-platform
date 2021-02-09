@@ -3,7 +3,7 @@ Cohorts API serializers.
 """
 
 
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from rest_framework import serializers
 
 

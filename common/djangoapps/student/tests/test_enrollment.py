@@ -9,6 +9,7 @@ import ddt
 import six
 from django.conf import settings
 from django.urls import reverse
+from edx_toggles.toggles.testutils import override_waffle_flag
 from mock import patch
 
 from common.djangoapps.course_modes.models import CourseMode
@@ -23,11 +24,14 @@ from common.djangoapps.student.models import (
 from common.djangoapps.student.roles import CourseInstructorRole, CourseStaffRole
 from common.djangoapps.student.tests.factories import CourseEnrollmentAllowedFactory, UserFactory
 from common.djangoapps.util.testing import UrlResetMixin
+from lms.djangoapps.courseware.toggles import COURSEWARE_PROCTORING_IMPROVEMENTS
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory
+from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 
 
 @ddt.ddt
+@override_waffle_flag(COURSEWARE_PROCTORING_IMPROVEMENTS, active=True)
+@patch.dict('django.conf.settings.FEATURES', {'ENABLE_SPECIAL_EXAMS': True})
 @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
 class EnrollmentTest(UrlResetMixin, SharedModuleStoreTestCase):
     """
@@ -44,11 +48,17 @@ class EnrollmentTest(UrlResetMixin, SharedModuleStoreTestCase):
         super(EnrollmentTest, cls).setUpClass()
         cls.course = CourseFactory.create()
         cls.course_limited = CourseFactory.create()
+        cls.proctored_course = CourseFactory(
+            enable_proctored_exams=True, enable_timed_exams=True
+        )
+        cls.proctored_course_no_exam = CourseFactory(
+            enable_proctored_exams=True, enable_timed_exams=True
+        )
 
     @patch.dict(settings.FEATURES, {'EMBARGO': True})
     def setUp(self):
         """ Create a course and user, then log in. """
-        super(EnrollmentTest, self).setUp()
+        super(EnrollmentTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.user = UserFactory.create(username=self.USERNAME, email=self.EMAIL, password=self.PASSWORD)
         self.client.login(username=self.USERNAME, password=self.PASSWORD)
         self.course_limited.max_student_enrollments_allowed = 1
@@ -56,6 +66,21 @@ class EnrollmentTest(UrlResetMixin, SharedModuleStoreTestCase):
         self.urls = [
             reverse('course_modes_choose', kwargs={'course_id': six.text_type(self.course.id)})
         ]
+        # Set up proctored exam
+        self._create_proctored_exam(self.proctored_course)
+
+    def _create_proctored_exam(self, course):
+        """
+        Helper function to create a proctored exam for a given course
+        """
+        chapter = ItemFactory.create(
+            parent=course, category='chapter', display_name='Test Section', publish_item=True
+        )
+        ItemFactory.create(
+            parent=chapter, category='sequential', display_name='Test Proctored Exam',
+            graded=True, is_time_limited=True, default_time_limit_minutes=10,
+            is_proctored_exam=True, publish_item=True
+        )
 
     @ddt.data(
         # Default (no course modes in the database)
@@ -163,6 +188,85 @@ class EnrollmentTest(UrlResetMixin, SharedModuleStoreTestCase):
             mock_update_email_opt_in.assert_called_once_with(self.user, self.course.org, opt_in)
         else:
             self.assertFalse(mock_update_email_opt_in.called)
+
+    @ddt.data(
+        ('honor', False),
+        ('audit', False),
+        ('verified', True),
+        ('masters', True),
+        ('professional', True),
+        ('no-id-professional', False),
+        ('credit', False),
+        ('executive-education', True)
+    )
+    @ddt.unpack
+    def test_enroll_in_proctored_course(self, mode, email_sent):
+        """
+        When enrolling in a proctoring-enabled course in a verified mode, an email with proctoring
+        requirements should be sent. The email should not be sent for non-verified modes.
+        """
+        with patch(
+            'common.djangoapps.student.models.send_proctoring_requirements_email',
+            return_value=None
+        ) as mock_send_email:
+            # First enroll in a non-proctored course. This should not trigger the email.
+            CourseEnrollment.enroll(self.user, self.course.id, mode)
+            self.assertFalse(mock_send_email.called)
+            # Then, enroll in a proctored course, and assert that the email is sent only when
+            # enrolling in a verified mode.
+            CourseEnrollment.enroll(self.user, self.proctored_course.id, mode)  # pylint: disable=no-member
+            self.assertEqual(email_sent, mock_send_email.called)
+
+    def test_enroll_in_proctored_course_no_exam(self):
+        """
+        If a verified learner enrolls in a course that has proctoring enabled, but does not have
+        any proctored exams, they should not receive a proctoring requirements email.
+        """
+        with patch(
+            'common.djangoapps.student.models.send_proctoring_requirements_email',
+            return_value=None
+        ) as mock_send_email:
+            CourseEnrollment.enroll(
+                self.user, self.proctored_course_no_exam.id, 'verified'  # pylint: disable=no-member
+            )
+            self.assertFalse(mock_send_email.called)
+
+    @ddt.data('verified', 'masters', 'professional', 'executive-education')
+    def test_upgrade_proctoring_enrollment(self, mode):
+        """
+        When upgrading from audit in a course with proctored exams, an email with proctoring requirements
+        should be sent.
+        """
+        with patch(
+            'common.djangoapps.student.models.send_proctoring_requirements_email',
+            return_value=None
+        ) as mock_send_email:
+            enrollment = CourseEnrollment.enroll(
+                self.user, self.proctored_course.id, 'audit'  # pylint: disable=no-member
+            )
+            enrollment.update_enrollment(mode=mode)
+            self.assertTrue(mock_send_email.called)
+
+    @patch.dict(
+        'django.conf.settings.PROCTORING_BACKENDS', {'test_provider_honor_mode': {'allow_honor_mode': True}}
+    )
+    def test_enroll_in_proctored_course_honor_mode_allowed(self):
+        """
+        If the proctoring provider allows honor mode, send proctoring requirements email when learners
+        enroll in honor mode for a course with proctored exams.
+        """
+        with patch(
+            'common.djangoapps.student.models.send_proctoring_requirements_email',
+            return_value=None
+        ) as mock_send_email:
+            course_honor_mode = CourseFactory(
+                enable_proctored_exams=True,
+                enable_timed_exams=True,
+                proctoring_provider='test_provider_honor_mode',
+            )
+            self._create_proctored_exam(course_honor_mode)
+            CourseEnrollment.enroll(self.user, course_honor_mode.id, 'honor')  # pylint: disable=no-member
+            self.assertTrue(mock_send_email.called)
 
     @patch.dict(settings.FEATURES, {'EMBARGO': True})
     def test_embargo_restrict(self):

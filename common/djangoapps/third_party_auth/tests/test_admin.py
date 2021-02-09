@@ -3,7 +3,7 @@ Tests third_party_auth admin views
 """
 
 
-import unittest
+import unittest  # lint-amnesty, pylint: disable=unused-import
 
 from django.contrib.admin.sites import AdminSite
 from django.core.files.uploadedfile import SimpleUploadedFile

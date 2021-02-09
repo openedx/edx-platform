@@ -27,7 +27,7 @@ class RecoverAccountTests(TestCase):
     request_factory = RequestFactory()
 
     def setUp(self):
-        super(RecoverAccountTests, self).setUp()
+        super(RecoverAccountTests, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.user = UserFactory.create(username='amy', email='amy@edx.com', password='password')
 
     def _write_test_csv(self, csv, lines):

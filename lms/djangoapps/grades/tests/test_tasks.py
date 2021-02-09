@@ -23,7 +23,7 @@ from lms.djangoapps.grades.config.models import PersistentGradesEnabledFlag
 from lms.djangoapps.grades.config.waffle import ENFORCE_FREEZE_GRADE_AFTER_COURSE_END, waffle_flags
 from lms.djangoapps.grades.constants import ScoreDatabaseTableEnum
 from lms.djangoapps.grades.models import PersistentCourseGrade, PersistentSubsectionGrade
-from lms.djangoapps.grades.services import GradesService
+from lms.djangoapps.grades.services import GradesService  # lint-amnesty, pylint: disable=unused-import
 from lms.djangoapps.grades.signals.signals import PROBLEM_WEIGHTED_SCORE_CHANGED
 from lms.djangoapps.grades.tasks import (
     RECALCULATE_GRADE_DELAY_SECONDS,
@@ -115,7 +115,7 @@ class RecalculateSubsectionGradeTest(HasCourseWithProblemsMixin, ModuleStoreTest
     ENABLED_SIGNALS = ['course_published', 'pre_publish']
 
     def setUp(self):
-        super(RecalculateSubsectionGradeTest, self).setUp()
+        super(RecalculateSubsectionGradeTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.user = UserFactory()
         PersistentGradesEnabledFlag.objects.create(enabled_for_all_courses=True, enabled=True)
 
@@ -164,10 +164,10 @@ class RecalculateSubsectionGradeTest(HasCourseWithProblemsMixin, ModuleStoreTest
             self.assertEqual(mock_block_structure_create.call_count, 1)
 
     @ddt.data(
-        (ModuleStoreEnum.Type.mongo, 1, 36, True),
-        (ModuleStoreEnum.Type.mongo, 1, 36, False),
-        (ModuleStoreEnum.Type.split, 3, 36, True),
-        (ModuleStoreEnum.Type.split, 3, 36, False),
+        (ModuleStoreEnum.Type.mongo, 1, 38, True),
+        (ModuleStoreEnum.Type.mongo, 1, 38, False),
+        (ModuleStoreEnum.Type.split, 3, 38, True),
+        (ModuleStoreEnum.Type.split, 3, 38, False),
     )
     @ddt.unpack
     def test_query_counts(self, default_store, num_mongo_calls, num_sql_calls, create_multiple_subsections):
@@ -179,8 +179,8 @@ class RecalculateSubsectionGradeTest(HasCourseWithProblemsMixin, ModuleStoreTest
                     self._apply_recalculate_subsection_grade()
 
     @ddt.data(
-        (ModuleStoreEnum.Type.mongo, 1, 36),
-        (ModuleStoreEnum.Type.split, 3, 36),
+        (ModuleStoreEnum.Type.mongo, 1, 38),
+        (ModuleStoreEnum.Type.split, 3, 38),
     )
     @ddt.unpack
     def test_query_counts_dont_change_with_more_content(self, default_store, num_mongo_calls, num_sql_calls):
@@ -225,8 +225,8 @@ class RecalculateSubsectionGradeTest(HasCourseWithProblemsMixin, ModuleStoreTest
         )
 
     @ddt.data(
-        (ModuleStoreEnum.Type.mongo, 1, 19),
-        (ModuleStoreEnum.Type.split, 3, 19),
+        (ModuleStoreEnum.Type.mongo, 1, 21),
+        (ModuleStoreEnum.Type.split, 3, 21),
     )
     @ddt.unpack
     def test_persistent_grades_not_enabled_on_course(self, default_store, num_mongo_queries, num_sql_queries):
@@ -240,8 +240,8 @@ class RecalculateSubsectionGradeTest(HasCourseWithProblemsMixin, ModuleStoreTest
             self.assertEqual(len(PersistentSubsectionGrade.bulk_read_grades(self.user.id, self.course.id)), 0)
 
     @ddt.data(
-        (ModuleStoreEnum.Type.mongo, 1, 37),
-        (ModuleStoreEnum.Type.split, 3, 37),
+        (ModuleStoreEnum.Type.mongo, 1, 39),
+        (ModuleStoreEnum.Type.split, 3, 39),
     )
     @ddt.unpack
     def test_persistent_grades_enabled_on_course(self, default_store, num_mongo_queries, num_sql_queries):
@@ -411,7 +411,7 @@ class ComputeGradesForCourseTest(HasCourseWithProblemsMixin, ModuleStoreTestCase
     ENABLED_SIGNALS = ['course_published', 'pre_publish']
 
     def setUp(self):
-        super(ComputeGradesForCourseTest, self).setUp()
+        super(ComputeGradesForCourseTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.users = [UserFactory.create() for _ in range(12)]
         self.set_up_course()
         for user in self.users:
@@ -452,7 +452,7 @@ class RecalculateGradesForUserTest(HasCourseWithProblemsMixin, ModuleStoreTestCa
     Test recalculate_course_and_subsection_grades_for_user task.
     """
     def setUp(self):
-        super(RecalculateGradesForUserTest, self).setUp()
+        super(RecalculateGradesForUserTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.user = UserFactory.create()
         self.set_up_course()
         CourseEnrollment.enroll(self.user, self.course.id)
@@ -500,7 +500,7 @@ class FreezeGradingAfterCourseEndTest(HasCourseWithProblemsMixin, ModuleStoreTes
     Test enforce_freeze_grade_after_course_end waffle flag controlling grading tasks.
     """
     def setUp(self):
-        super(FreezeGradingAfterCourseEndTest, self).setUp()
+        super(FreezeGradingAfterCourseEndTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.users = [UserFactory.create() for _ in range(12)]
         self.user = self.users[0]
         self.freeze_grade_flag = waffle_flags()[ENFORCE_FREEZE_GRADE_AFTER_COURSE_END]
@@ -513,7 +513,7 @@ class FreezeGradingAfterCourseEndTest(HasCourseWithProblemsMixin, ModuleStoreTes
             mock_log.info.call_args_list[0][0][0]
         )
 
-    def _assert_for_freeze_grade_flag(
+    def _assert_for_freeze_grade_flag(  # lint-amnesty, pylint: disable=missing-function-docstring
         self,
         result,
         freeze_flag_value,
@@ -637,7 +637,7 @@ class FreezeGradingAfterCourseEndTest(HasCourseWithProblemsMixin, ModuleStoreTes
             CourseEnrollment.enroll(user, self.course.id)
 
         with override_waffle_flag(self.freeze_grade_flag, active=freeze_flag_value):
-            modified_datetime = datetime.utcnow().replace(tzinfo=pytz.UTC) - timedelta(days=1)
+            modified_datetime = datetime.utcnow().replace(tzinfo=pytz.UTC) - timedelta(days=1)  # lint-amnesty, pylint: disable=unused-variable
             with patch('lms.djangoapps.grades.tasks._has_db_updated_with_new_score') as mock_has_db_updated:
                 result = recalculate_subsection_grade_v3.apply_async(kwargs=self.recalculate_subsection_grade_kwargs)
                 self._assert_for_freeze_grade_flag(

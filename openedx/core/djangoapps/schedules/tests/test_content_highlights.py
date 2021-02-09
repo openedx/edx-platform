@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-  # lint-amnesty, pylint: disable=missing-module-docstring
 
 import datetime
 from unittest.mock import patch
@@ -19,7 +19,7 @@ from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 
 
 @skip_unless_lms
-class TestContentHighlights(ModuleStoreTestCase):
+class TestContentHighlights(ModuleStoreTestCase):  # lint-amnesty, pylint: disable=missing-class-docstring
     MODULESTORE = TEST_DATA_SPLIT_MODULESTORE
 
     def setUp(self):
@@ -98,7 +98,7 @@ class TestContentHighlights(ModuleStoreTestCase):
             self._create_chapter(display_name=u"Week 1")
             self._create_chapter(display_name=u"Week 2")
 
-        self.course = self.store.get_course(self.course_key)
+        self.course = self.store.get_course(self.course_key)  # lint-amnesty, pylint: disable=attribute-defined-outside-init
         self.assertEqual(len(self.course.get_children()), 2)
 
         self.assertFalse(course_has_highlights(self.course_key))

@@ -32,14 +32,14 @@ class CourseBookmarksTool(CourseTool):
         return CourseEnrollment.is_enrolled(request.user, course_key)
 
     @classmethod
-    def title(cls):
+    def title(cls):  # lint-amnesty, pylint: disable=arguments-differ
         """
         Returns the title of this tool.
         """
         return _('Bookmarks')
 
     @classmethod
-    def icon_classes(cls):
+    def icon_classes(cls):  # lint-amnesty, pylint: disable=arguments-differ
         """
         Returns the icon classes needed to represent this tool.
         """

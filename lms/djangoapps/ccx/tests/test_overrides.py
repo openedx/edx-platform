@@ -63,7 +63,7 @@ class TestFieldOverrides(FieldOverrideTestMixin, SharedModuleStoreTestCase):
         """
         Set up tests
         """
-        super(TestFieldOverrides, self).setUp()
+        super(TestFieldOverrides, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
 
         self.ccx = ccx = CustomCourseForEdX(
             course_id=self.course.id,

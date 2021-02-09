@@ -1,4 +1,8 @@
-from django.contrib.auth.models import User
+"""
+Views for SSO records.
+"""
+
+from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.db.models import Q
 from django.utils.decorators import method_decorator
 from rest_framework.generics import GenericAPIView
@@ -14,7 +18,7 @@ class SsoView(GenericAPIView):
     Returns a list of SSO records for a given user.
     """
     @method_decorator(require_support_permission)
-    def get(self, request, username_or_email):
+    def get(self, request, username_or_email):  # lint-amnesty, pylint: disable=missing-function-docstring
         try:
             user = User.objects.get(Q(username=username_or_email) | Q(email=username_or_email))
         except User.DoesNotExist:

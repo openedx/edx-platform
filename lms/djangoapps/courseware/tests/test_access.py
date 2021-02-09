@@ -11,7 +11,7 @@ import ddt
 import pytz
 import six
 from ccx_keys.locator import CCXLocator
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.test import TestCase
 from django.test.client import RequestFactory
 from django.urls import reverse
@@ -81,7 +81,7 @@ class CoachAccessTestCaseCCX(SharedModuleStoreTestCase, LoginEnrollmentTestCase)
         """
         Set up tests
         """
-        super(CoachAccessTestCaseCCX, self).setUp()
+        super(CoachAccessTestCaseCCX, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
 
         # Create ccx coach account
         self.coach = AdminFactory.create(password="test")
@@ -174,7 +174,7 @@ class AccessTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase, MilestonesTes
     }
 
     def setUp(self):
-        super(AccessTestCase, self).setUp()
+        super(AccessTestCase, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.course = CourseFactory.create(org='edX', course='toy', run='test_run')
         self.anonymous_user = AnonymousUserFactory()
         self.beta_user = BetaTesterFactory(course_key=self.course.id)
@@ -683,7 +683,7 @@ class UserRoleTestCase(TestCase):
     """
 
     def setUp(self):
-        super(UserRoleTestCase, self).setUp()
+        super(UserRoleTestCase, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.course_key = CourseLocator('edX', 'toy', '2012_Fall')
         self.anonymous_user = AnonymousUserFactory()
         self.student = UserFactory()
@@ -741,7 +741,7 @@ class CourseOverviewAccessTestCase(ModuleStoreTestCase):
     """
 
     def setUp(self):
-        super(CourseOverviewAccessTestCase, self).setUp()
+        super(CourseOverviewAccessTestCase, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
 
         today = datetime.datetime.now(pytz.UTC)
         last_week = today - datetime.timedelta(days=7)

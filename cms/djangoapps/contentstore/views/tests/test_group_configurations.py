@@ -267,7 +267,7 @@ class GroupConfigurationsListHandlerTestCase(CourseTestCase, GroupConfigurations
 
         # This creates a random UserPartition.
         self.course.user_partitions = [
-            UserPartition(0, 'First name', 'First description', [Group(0, 'Group A'), Group(1, 'Group B'), Group(2, 'Group C')]),
+            UserPartition(0, 'First name', 'First description', [Group(0, 'Group A'), Group(1, 'Group B'), Group(2, 'Group C')]),  # lint-amnesty, pylint: disable=line-too-long
         ]
         self.save_course()
 
@@ -873,7 +873,7 @@ class GroupConfigurationsUsageInfoTestCase(CourseTestCase, HelperMethods):
         ]
         self.store.update_item(self.course, ModuleStoreEnum.UserID.test)
 
-        __, split_test, problem = self._create_content_experiment(cid=0, name_suffix='0', group_id=3, cid_for_problem=1)
+        __, split_test, problem = self._create_content_experiment(cid=0, name_suffix='0', group_id=3, cid_for_problem=1)  # lint-amnesty, pylint: disable=unused-variable
 
         expected = {
             'id': 1,

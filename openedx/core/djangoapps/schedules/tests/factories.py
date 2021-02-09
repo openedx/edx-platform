@@ -18,7 +18,7 @@ class ScheduleExperienceFactory(factory.DjangoModelFactory):
     experience_type = models.ScheduleExperience.EXPERIENCES.default
 
 
-class ScheduleFactory(factory.DjangoModelFactory):
+class ScheduleFactory(factory.DjangoModelFactory):  # lint-amnesty, pylint: disable=missing-class-docstring
     class Meta(object):
         model = models.Schedule
 
@@ -28,7 +28,7 @@ class ScheduleFactory(factory.DjangoModelFactory):
     experience = factory.RelatedFactory(ScheduleExperienceFactory, 'schedule')
 
 
-class ScheduleConfigFactory(factory.DjangoModelFactory):
+class ScheduleConfigFactory(factory.DjangoModelFactory):  # lint-amnesty, pylint: disable=missing-class-docstring
     class Meta(object):
         model = models.ScheduleConfig
 

@@ -3,10 +3,10 @@ Common utilities for the course experience, including course outline.
 """
 
 
-from datetime import timedelta
+from datetime import timedelta  # lint-amnesty, pylint: disable=unused-import
 
 from completion.models import BlockCompletion
-from django.db.models import Q
+from django.db.models import Q  # lint-amnesty, pylint: disable=unused-import
 from django.utils import timezone
 from opaque_keys.edx.keys import CourseKey
 from six.moves import range
@@ -14,7 +14,7 @@ from six.moves import range
 from lms.djangoapps.course_api.blocks.api import get_blocks
 from lms.djangoapps.course_blocks.api import get_course_blocks
 from lms.djangoapps.course_blocks.utils import get_student_module_as_dict
-from lms.djangoapps.courseware.access import has_access
+from lms.djangoapps.courseware.access import has_access  # lint-amnesty, pylint: disable=unused-import
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.lib.cache_utils import request_cached
 from openedx.features.course_experience import RELATIVE_DATES_FLAG
@@ -23,7 +23,7 @@ from xmodule.modulestore.django import modulestore
 
 
 @request_cached()
-def get_course_outline_block_tree(request, course_id, user=None, allow_start_dates_in_future=False):
+def get_course_outline_block_tree(request, course_id, user=None, allow_start_dates_in_future=False):  # lint-amnesty, pylint: disable=too-many-statements
     """
     Returns the root block of the course outline, with children as blocks.
 
@@ -254,6 +254,18 @@ def get_resume_block(block):
     return block
 
 
+def get_start_block(block):
+    """
+    Gets the deepest block to use as the starting block.
+    """
+    if not block.get('children'):
+        return block
+
+    first_child = block['children'][0]
+
+    return get_start_block(first_child)
+
+
 def dates_banner_should_display(course_key, user):
     """
     Return whether or not the reset banner should display,
@@ -279,13 +291,6 @@ def dates_banner_should_display(course_key, user):
 
     # Only display the banner for enrolled users
     if not CourseEnrollment.is_enrolled(user, course_key):
-        return False, False
-
-    # Don't display the banner for course staff
-    is_course_staff = bool(
-        user and course_overview and has_access(user, 'staff', course_overview, course_overview.id)
-    )
-    if is_course_staff:
         return False, False
 
     # Don't display the banner if the course has ended

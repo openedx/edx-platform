@@ -10,7 +10,7 @@ import subprocess
 
 import six
 from django.conf import settings
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
 from six.moves.urllib.parse import urlparse
@@ -34,7 +34,7 @@ class GitExportError(Exception):
 
     def __init__(self, message):
         # Force the lazy i18n values to turn into actual unicode objects
-        super(GitExportError, self).__init__(six.text_type(message))
+        super(GitExportError, self).__init__(six.text_type(message))  # lint-amnesty, pylint: disable=super-with-arguments
 
     NO_EXPORT_DIR = _(u"GIT_REPO_EXPORT_DIR not set or path {0} doesn't exist, "
                       "please create it, or configure a different path with "
@@ -110,7 +110,7 @@ def export_to_git(course_id, repo, user='', rdir=None):
             branch = cmd_log(cmd, cwd).decode('utf-8').strip('\n')
         except subprocess.CalledProcessError as ex:
             log.exception(u'Failed to get branch: %r', ex.output)
-            raise GitExportError(GitExportError.DETACHED_HEAD)
+            raise GitExportError(GitExportError.DETACHED_HEAD)  # lint-amnesty, pylint: disable=raise-missing-from
 
         cmds = [
             ['git', 'remote', 'set-url', 'origin', repo],
@@ -129,7 +129,7 @@ def export_to_git(course_id, repo, user='', rdir=None):
             cmd_log(cmd, cwd)
         except subprocess.CalledProcessError as ex:
             log.exception(u'Failed to pull git repository: %r', ex.output)
-            raise GitExportError(GitExportError.CANNOT_PULL)
+            raise GitExportError(GitExportError.CANNOT_PULL)  # lint-amnesty, pylint: disable=raise-missing-from
 
     # export course as xml before commiting and pushing
     root_dir = os.path.dirname(rdirp)
@@ -139,7 +139,7 @@ def export_to_git(course_id, repo, user='', rdir=None):
                              root_dir, course_dir)
     except (EnvironmentError, AttributeError):
         log.exception('Failed export to xml')
-        raise GitExportError(GitExportError.XML_EXPORT_FAIL)
+        raise GitExportError(GitExportError.XML_EXPORT_FAIL)  # lint-amnesty, pylint: disable=raise-missing-from
 
     # Get current branch if not already set
     if not branch:
@@ -149,7 +149,7 @@ def export_to_git(course_id, repo, user='', rdir=None):
         except subprocess.CalledProcessError as ex:
             log.exception(u'Failed to get branch from freshly cloned repo: %r',
                           ex.output)
-            raise GitExportError(GitExportError.MISSING_BRANCH)
+            raise GitExportError(GitExportError.MISSING_BRANCH)  # lint-amnesty, pylint: disable=raise-missing-from
 
     # Now that we have fresh xml exported, set identity, add
     # everything to git, commit, and push to the right branch.
@@ -171,15 +171,15 @@ def export_to_git(course_id, repo, user='', rdir=None):
         cmd_log(['git', 'config', 'user.name', ident['name']], cwd)
     except subprocess.CalledProcessError as ex:
         log.exception(u'Error running git configure commands: %r', ex.output)
-        raise GitExportError(GitExportError.CONFIG_ERROR)
+        raise GitExportError(GitExportError.CONFIG_ERROR)  # lint-amnesty, pylint: disable=raise-missing-from
     try:
         cmd_log(['git', 'add', '.'], cwd)
         cmd_log(['git', 'commit', '-a', '-m', commit_msg], cwd)
     except subprocess.CalledProcessError as ex:
         log.exception(u'Unable to commit changes: %r', ex.output)
-        raise GitExportError(GitExportError.CANNOT_COMMIT)
+        raise GitExportError(GitExportError.CANNOT_COMMIT)  # lint-amnesty, pylint: disable=raise-missing-from
     try:
         cmd_log(['git', 'push', '-q', 'origin', branch], cwd)
     except subprocess.CalledProcessError as ex:
         log.exception(u'Error running git push command: %r', ex.output)
-        raise GitExportError(GitExportError.CANNOT_PUSH)
+        raise GitExportError(GitExportError.CANNOT_PUSH)  # lint-amnesty, pylint: disable=raise-missing-from

@@ -41,7 +41,7 @@ def decompress_string(value):
         zfile = gzip.GzipFile(fileobj=zbuf)
         ret = zfile.read()
         zfile.close()
-    except Exception as e:
+    except Exception as e:  # lint-amnesty, pylint: disable=broad-except
         logger.error('String decompression failed. There may be corrupted data in the database: %s', e)
         ret = value
     return ret

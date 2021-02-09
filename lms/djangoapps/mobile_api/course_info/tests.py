@@ -24,7 +24,7 @@ class TestUpdates(MobileAPITestCase, MobileAuthTestMixin, MobileCourseAccessTest
     REVERSE_INFO = {'name': 'course-updates-list', 'params': ['course_id', 'api_version']}
 
     def verify_success(self, response):
-        super(TestUpdates, self).verify_success(response)
+        super(TestUpdates, self).verify_success(response)  # lint-amnesty, pylint: disable=super-with-arguments
         self.assertEqual(response.data, [])
 
     @ddt.data(

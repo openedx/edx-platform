@@ -14,7 +14,7 @@ import pytz
 import six
 from consent.models import DataSharingConsent
 from django.conf import settings
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.contrib.sites.models import Site
 from django.core import mail
 from django.core.cache import cache
@@ -109,7 +109,7 @@ class TestAccountDeactivation(TestCase):
     """
 
     def setUp(self):
-        super(TestAccountDeactivation, self).setUp()
+        super(TestAccountDeactivation, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.test_user = UserFactory()
         self.url = reverse('accounts_deactivation', kwargs={'username': self.test_user.username})
 
@@ -180,7 +180,7 @@ class TestDeactivateLogout(RetirementTestCase):
     Tests the account deactivation/logout endpoint.
     """
     def setUp(self):
-        super(TestDeactivateLogout, self).setUp()
+        super(TestDeactivateLogout, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.test_password = 'password'
         self.test_user = UserFactory(password=self.test_password)
         UserSocialAuth.objects.create(
@@ -277,7 +277,7 @@ class TestPartnerReportingCleanup(ModuleStoreTestCase):
     """
 
     def setUp(self):
-        super(TestPartnerReportingCleanup, self).setUp()
+        super(TestPartnerReportingCleanup, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.test_superuser = SuperuserFactory()
         self.course = CourseFactory()
         self.course_awesome_org = CourseFactory(org='awesome_org')
@@ -389,7 +389,7 @@ class TestPartnerReportingPut(RetirementTestCase, ModuleStoreTestCase):
     """
 
     def setUp(self):
-        super(TestPartnerReportingPut, self).setUp()
+        super(TestPartnerReportingPut, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.test_superuser = SuperuserFactory()
         self.course = CourseFactory()
         self.course_awesome_org = CourseFactory(org='awesome_org')
@@ -468,8 +468,8 @@ class TestPartnerReportingPut(RetirementTestCase, ModuleStoreTestCase):
         # the orgs from our PUT operation, so this is the best way to make sure it's doing the right
         # thing.
         orgs = AccountRetirementPartnerReportView._get_orgs_for_user(user)  # pylint: disable=protected-access
-        self.assertTrue(len(orgs) == 1)
-        self.assertTrue('edX' in orgs)
+        self.assertTrue(len(orgs) == 1)  # lint-amnesty, pylint: disable=wrong-assert-type
+        self.assertTrue('edX' in orgs)  # lint-amnesty, pylint: disable=wrong-assert-type
 
         # PUT should succeed
         self.put_and_assert_status({'username': user.username})
@@ -496,7 +496,7 @@ class TestPartnerReportingList(ModuleStoreTestCase):
     ]
 
     def setUp(self):
-        super(TestPartnerReportingList, self).setUp()
+        super(TestPartnerReportingList, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.test_superuser = SuperuserFactory()
         self.course = CourseFactory()
         self.course_awesome_org = CourseFactory(org='awesome_org')
@@ -596,8 +596,8 @@ class TestPartnerReportingList(ModuleStoreTestCase):
         """
         Basic test to make sure that users in two different orgs are returned.
         """
-        user_dicts, users = self.create_partner_reporting_statuses()
-        additional_dicts, additional_users = self.create_partner_reporting_statuses(courses=(self.course_awesome_org,))
+        user_dicts, users = self.create_partner_reporting_statuses()  # lint-amnesty, pylint: disable=unused-variable
+        additional_dicts, additional_users = self.create_partner_reporting_statuses(courses=(self.course_awesome_org,))  # lint-amnesty, pylint: disable=unused-variable
         user_dicts += additional_dicts
 
         self.assert_status_and_user_list(user_dicts)
@@ -606,7 +606,7 @@ class TestPartnerReportingList(ModuleStoreTestCase):
         """
         Checks that only users in the correct is_being_processed state (False) are returned.
         """
-        user_dicts, users = self.create_partner_reporting_statuses()
+        user_dicts, users = self.create_partner_reporting_statuses()  # lint-amnesty, pylint: disable=unused-variable
 
         # These should not come back
         self.create_partner_reporting_statuses(courses=(self.course_awesome_org,), is_being_processed=True)
@@ -621,7 +621,7 @@ class TestPartnerReportingList(ModuleStoreTestCase):
         path = 'openedx.core.djangoapps.user_api.accounts.views.has_ever_consented_to_coaching'
         with mock.patch(path, return_value=True) as mock_has_ever_consented:
             user_dicts, users = self.create_partner_reporting_statuses(num=1)
-            external_id, created = ExternalId.add_new_user_id(
+            external_id, created = ExternalId.add_new_user_id(  # lint-amnesty, pylint: disable=unused-variable
                 user=users[0],
                 type_name=ExternalIdType.MICROBACHELORS_COACHING
             )
@@ -642,7 +642,7 @@ class TestPartnerReportingList(ModuleStoreTestCase):
         """
         path = 'openedx.core.djangoapps.user_api.accounts.views.has_ever_consented_to_coaching'
         with mock.patch(path, return_value=True) as mock_has_ever_consented:
-            user_dicts, users = self.create_partner_reporting_statuses(num=1)
+            user_dicts, users = self.create_partner_reporting_statuses(num=1)  # lint-amnesty, pylint: disable=unused-variable
 
             self.assert_status_and_user_list(user_dicts)
             mock_has_ever_consented.assert_called_once()
@@ -682,7 +682,7 @@ class TestPartnerReportingList(ModuleStoreTestCase):
         Checks that users are progressed to "is_being_processed" True upon being returned
         from this call.
         """
-        user_dicts, users = self.create_partner_reporting_statuses()
+        user_dicts, users = self.create_partner_reporting_statuses()  # lint-amnesty, pylint: disable=unused-variable
 
         # First time through we should get the users
         self.assert_status_and_user_list(user_dicts)
@@ -698,7 +698,7 @@ class TestAccountRetirementList(RetirementTestCase):
     """
 
     def setUp(self):
-        super(TestAccountRetirementList, self).setUp()
+        super(TestAccountRetirementList, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.test_superuser = SuperuserFactory()
         self.headers = build_jwt_headers(self.test_superuser)
         self.url = reverse('accounts_retirement_queue')
@@ -723,7 +723,7 @@ class TestAccountRetirementList(RetirementTestCase):
             try:
                 states_to_request = [s.state_name for s in states_to_request]
             except AttributeError:
-                states_to_request = states_to_request
+                states_to_request = states_to_request  # lint-amnesty, pylint: disable=self-assigning-variable
 
         data = {'cool_off_days': cool_off_days, 'states': states_to_request}
         response = self.client.get(self.url, data, **self.headers)
@@ -858,7 +858,7 @@ class TestAccountRetirementsByStatusAndDate(RetirementTestCase):
     """
 
     def setUp(self):
-        super(TestAccountRetirementsByStatusAndDate, self).setUp()
+        super(TestAccountRetirementsByStatusAndDate, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.test_superuser = SuperuserFactory()
         self.headers = build_jwt_headers(self.test_superuser)
         self.url = reverse('accounts_retirements_by_status_and_date')
@@ -952,7 +952,7 @@ class TestAccountRetirementsByStatusAndDate(RetirementTestCase):
         complete_state = RetirementState.objects.get(state_name='COMPLETE')
 
         # Create retirements for the last 10 days
-        for days_back in range(0, 10):
+        for days_back in range(0, 10):  # lint-amnesty, pylint: disable=simplifiable-range
             create_datetime = datetime.datetime.now(pytz.UTC) - datetime.timedelta(days=days_back)
             ret = create_retirement_status(UserFactory(), state=complete_state, create_datetime=create_datetime)
             retirements.append(self._retirement_to_dict(ret))
@@ -1005,7 +1005,7 @@ class TestAccountRetirementRetrieve(RetirementTestCase):
     Tests the account retirement retrieval endpoint.
     """
     def setUp(self):
-        super(TestAccountRetirementRetrieve, self).setUp()
+        super(TestAccountRetirementRetrieve, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.test_user = UserFactory()
         self.test_superuser = SuperuserFactory()
         self.url = reverse('accounts_retirement_retrieve', kwargs={'username': self.test_user.username})
@@ -1076,7 +1076,7 @@ class TestAccountRetirementCleanup(RetirementTestCase):
     Tests the account retirement cleanup endpoint.
     """
     def setUp(self):
-        super(TestAccountRetirementCleanup, self).setUp()
+        super(TestAccountRetirementCleanup, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.pending_state = RetirementState.objects.get(state_name='PENDING')
         self.complete_state = RetirementState.objects.get(state_name='COMPLETE')
         self.retirements = []
@@ -1153,7 +1153,7 @@ class TestAccountRetirementUpdate(RetirementTestCase):
     Tests the account retirement endpoint.
     """
     def setUp(self):
-        super(TestAccountRetirementUpdate, self).setUp()
+        super(TestAccountRetirementUpdate, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.pending_state = RetirementState.objects.get(state_name='PENDING')
         self.locking_state = RetirementState.objects.get(state_name='LOCKING_ACCOUNT')
 
@@ -1293,7 +1293,7 @@ class TestAccountRetirementPost(RetirementTestCase):
     Tests the account retirement endpoint.
     """
     def setUp(self):
-        super(TestAccountRetirementPost, self).setUp()
+        super(TestAccountRetirementPost, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
 
         self.test_user = UserFactory()
         self.test_superuser = SuperuserFactory()
@@ -1574,7 +1574,7 @@ class TestLMSAccountRetirementPost(RetirementTestCase, ModuleStoreTestCase):
     Tests the LMS account retirement (GDPR P2) endpoint.
     """
     def setUp(self):
-        super(TestLMSAccountRetirementPost, self).setUp()
+        super(TestLMSAccountRetirementPost, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.pii_standin = 'PII here'
         self.course = CourseFactory()
         self.test_user = UserFactory()
@@ -1602,14 +1602,14 @@ class TestLMSAccountRetirementPost(RetirementTestCase, ModuleStoreTestCase):
         ArticleRevision.objects.create(ip_address="ipaddresss", user=self.test_user, article=article)
 
         # ManualEnrollmentAudit setup
-        course_enrollment = CourseEnrollment.enroll(user=self.test_user, course_key=self.course.id)
+        course_enrollment = CourseEnrollment.enroll(user=self.test_user, course_key=self.course.id)  # lint-amnesty, pylint: disable=no-member
         ManualEnrollmentAudit.objects.create(
             enrollment=course_enrollment, reason=self.pii_standin, enrolled_email=self.pii_standin
         )
 
         # CreditRequest and CreditRequirementStatus setup
         provider = CreditProvider.objects.create(provider_id="Hogwarts")
-        credit_course = CreditCourse.objects.create(course_key=self.course.id)
+        credit_course = CreditCourse.objects.create(course_key=self.course.id)  # lint-amnesty, pylint: disable=no-member
         CreditRequest.objects.create(
             username=self.test_user.username,
             course=credit_course,

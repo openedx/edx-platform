@@ -64,7 +64,7 @@ class TestCourseOutlinePage(SharedModuleStoreTestCase, MasqueradeMixin):
     ENABLED_SIGNALS = ['course_published']
 
     @classmethod
-    def setUpClass(cls):
+    def setUpClass(cls):  # lint-amnesty, pylint: disable=super-method-not-called
         """
         Set up an array of various courses to be tested.
         """
@@ -77,7 +77,7 @@ class TestCourseOutlinePage(SharedModuleStoreTestCase, MasqueradeMixin):
             course = CourseFactory.create(self_paced=True)
             with cls.store.bulk_operations(course.id):
                 chapter = ItemFactory.create(category='chapter', parent_location=course.location)
-                sequential = ItemFactory.create(category='sequential', parent_location=chapter.location, graded=True, format="Homework")
+                sequential = ItemFactory.create(category='sequential', parent_location=chapter.location, graded=True, format="Homework")  # lint-amnesty, pylint: disable=line-too-long
                 vertical = ItemFactory.create(category='vertical', parent_location=sequential.location)
                 problem = ItemFactory.create(category='problem', parent_location=vertical.location)
             course.children = [chapter]
@@ -124,7 +124,7 @@ class TestCourseOutlinePage(SharedModuleStoreTestCase, MasqueradeMixin):
             cls.courses.append(course)
 
     @classmethod
-    def setUpTestData(cls):
+    def setUpTestData(cls):  # lint-amnesty, pylint: disable=super-method-not-called
         """Set up and enroll our fake user in the course."""
         cls.user = UserFactory(password=TEST_PASSWORD)
         for course in cls.courses:
@@ -138,7 +138,7 @@ class TestCourseOutlinePage(SharedModuleStoreTestCase, MasqueradeMixin):
         """
         Set up for the tests.
         """
-        super(TestCourseOutlinePage, self).setUp()
+        super(TestCourseOutlinePage, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.client.login(username=self.user.username, password=TEST_PASSWORD)
 
     @override_experiment_waffle_flag(RELATIVE_DATES_FLAG, active=True)
@@ -200,9 +200,8 @@ class TestCourseOutlinePage(SharedModuleStoreTestCase, MasqueradeMixin):
     @ddt.data(
         ([CourseMode.AUDIT, CourseMode.VERIFIED], CourseMode.AUDIT, False, True),
         ([CourseMode.AUDIT, CourseMode.VERIFIED], CourseMode.VERIFIED, False, True),
-        ([CourseMode.AUDIT, CourseMode.VERIFIED, CourseMode.MASTERS], CourseMode.MASTERS, False, True),
-        ([CourseMode.PROFESSIONAL], CourseMode.PROFESSIONAL, False, True),
-        ([CourseMode.AUDIT, CourseMode.VERIFIED], CourseMode.VERIFIED, True, False),
+        ([CourseMode.MASTERS], CourseMode.MASTERS, False, True),
+        ([CourseMode.PROFESSIONAL], CourseMode.PROFESSIONAL, True, True),  # staff accounts should also see the banner
     )
     @ddt.unpack
     def test_reset_course_deadlines_banner_shows_for_self_paced_course(
@@ -309,7 +308,7 @@ class TestCourseOutlinePageWithPrerequisites(SharedModuleStoreTestCase, Mileston
             cls.course, cls.course_blocks = cls.create_test_course()
 
     @classmethod
-    def setUpTestData(cls):
+    def setUpTestData(cls):  # lint-amnesty, pylint: disable=super-method-not-called
         """Set up and enroll our fake user in the course."""
         cls.user = UserFactory(password=TEST_PASSWORD)
         CourseEnrollment.enroll(cls.user, cls.course.id)
@@ -356,7 +355,7 @@ class TestCourseOutlinePageWithPrerequisites(SharedModuleStoreTestCase, Mileston
         """
         Set up for the tests.
         """
-        super(TestCourseOutlinePageWithPrerequisites, self).setUp()
+        super(TestCourseOutlinePageWithPrerequisites, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.client.login(username=self.user.username, password=TEST_PASSWORD)
 
     def setup_gated_section(self, gated_block, gating_block):
@@ -458,7 +457,7 @@ class TestCourseOutlineResumeCourse(SharedModuleStoreTestCase, CompletionWaffleT
             cls.course = cls.create_test_course()
 
     @classmethod
-    def setUpTestData(cls):
+    def setUpTestData(cls):  # lint-amnesty, pylint: disable=super-method-not-called
         """Set up and enroll our fake user in the course."""
         cls.user = UserFactory(password=TEST_PASSWORD)
         CourseEnrollment.enroll(cls.user, cls.course.id)
@@ -496,7 +495,7 @@ class TestCourseOutlineResumeCourse(SharedModuleStoreTestCase, CompletionWaffleT
         """
         Set up for the tests.
         """
-        super(TestCourseOutlineResumeCourse, self).setUp()
+        super(TestCourseOutlineResumeCourse, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.client.login(username=self.user.username, password=TEST_PASSWORD)
 
     def visit_sequential(self, course, chapter, sequential):
@@ -580,7 +579,8 @@ class TestCourseOutlineResumeCourse(SharedModuleStoreTestCase, CompletionWaffleT
         response = self.visit_course_home(course, start_count=1, resume_count=0)
         content = pq(response.content)
 
-        self.assertTrue(content('.action-resume-course').attr('href').endswith('/course/' + course.url_name))
+        vertical = course.children[0].children[0].children[0]
+        self.assertTrue(content('.action-resume-course').attr('href').endswith('/vertical/' + vertical.url_name))
 
     @override_settings(LMS_BASE='test_url:9999')
     def test_resume_course_with_completion_api(self):
@@ -680,7 +680,8 @@ class TestCourseOutlineResumeCourse(SharedModuleStoreTestCase, CompletionWaffleT
         CourseEnrollment.get_enrollment(self.user, course.id).delete()
         response = self.visit_course_home(course, start_count=1, resume_count=0)
         content = pq(response.content)
-        self.assertTrue(content('.action-resume-course').attr('href').endswith('/course/' + course.url_name))
+        vertical = course.children[0].children[0].children[0]
+        self.assertTrue(content('.action-resume-course').attr('href').endswith('/vertical/' + vertical.url_name))
 
     @override_waffle_switch(ENABLE_COMPLETION_TRACKING_SWITCH, active=True)
     def test_course_outline_auto_open(self):

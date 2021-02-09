@@ -7,7 +7,7 @@ import datetime
 
 import mock
 import pytz
-import six.moves.urllib.parse  # pylint: disable=import-error
+import six.moves.urllib.parse  # lint-amnesty, pylint: disable=import-error, wrong-import-order
 from opaque_keys.edx.keys import CourseKey
 from six.moves import range
 
@@ -83,7 +83,7 @@ class APIsTestCase(SharedModuleStoreTestCase):
         """
         Set up tests
         """
-        super(APIsTestCase, self).setUp()
+        super(APIsTestCase, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         # Create instructor account
         self.instructor = AdminFactory.create()
         # create an instance of modulestore

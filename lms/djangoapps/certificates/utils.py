@@ -22,6 +22,9 @@ log = logging.getLogger(__name__)
 def emit_certificate_event(event_name, user, course_id, course=None, event_data=None):
     """
     Emits certificate event.
+
+    Documentation (that is not up to date) for these events can be found here:
+    https://github.com/edx/edx-documentation/blob/master/en_us/data/source/internal_data_formats/tracking_logs/student_event_types.rst # pylint: disable=line-too-long
     """
     event_name = '.'.join(['edx', 'certificate', event_name])
     if course is None:

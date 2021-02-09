@@ -12,7 +12,7 @@ class CapaShuffleTest(unittest.TestCase):
     """Capa problem tests for shuffling and choice-name masking."""
 
     def setUp(self):
-        super(CapaShuffleTest, self).setUp()
+        super(CapaShuffleTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.system = test_capa_system()
 
     def test_shuffle_4_choices(self):
@@ -113,7 +113,7 @@ class CapaShuffleTest(unittest.TestCase):
         problem = new_loncapa_problem(xml_str, seed=0)  # yields: C E A B D F
         # Donut -> Zonut to show that there is not some hidden alphabetic ordering going on
         the_html = problem.get_html()
-        self.assertRegex(the_html, r"<div>.*\[.*'Chocolate'.*'Eggplant'.*'Apple'.*'Banana'.*'Zonut'.*'Filet Mignon'.*\].*</div>")
+        self.assertRegex(the_html, r"<div>.*\[.*'Chocolate'.*'Eggplant'.*'Apple'.*'Banana'.*'Zonut'.*'Filet Mignon'.*\].*</div>")  # lint-amnesty, pylint: disable=line-too-long
 
     def test_shuffle_false(self):
         xml_str = textwrap.dedent("""

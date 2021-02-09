@@ -17,7 +17,7 @@ from xmodule.modulestore.tests.factories import CourseFactory
 class ChangeEnrollmentTests(SharedModuleStoreTestCase):
     """ Test the enrollment change functionality of the change_enrollment script."""
     def setUp(self):
-        super(ChangeEnrollmentTests, self).setUp()
+        super(ChangeEnrollmentTests, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.course = CourseFactory.create()
         self.audit_mode = CourseModeFactory.create(
             course_id=self.course.id,

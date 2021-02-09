@@ -16,7 +16,7 @@ class TestCourseOverviewsApi(TestCase):
     """
 
     def setUp(self):
-        super(TestCourseOverviewsApi, self).setUp()
+        super(TestCourseOverviewsApi, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         for _ in range(3):
             CourseOverviewFactory.create()
 

@@ -104,23 +104,23 @@ class TestNonStaffErrorBlock(SetupTestErrorBlock):
         self.assertNotIn(str(descriptor), context_repr)
 
 
-class BrokenModule(XModule):
+class BrokenModule(XModule):  # lint-amnesty, pylint: disable=abstract-method
     def __init__(self, *args, **kwargs):
-        super(BrokenModule, self).__init__(*args, **kwargs)
+        super(BrokenModule, self).__init__(*args, **kwargs)  # lint-amnesty, pylint: disable=super-with-arguments
         raise Exception("This is a broken xmodule")
 
 
-class BrokenDescriptor(XModuleDescriptor):
+class BrokenDescriptor(XModuleDescriptor):  # lint-amnesty, pylint: disable=abstract-method
     module_class = BrokenModule
 
 
 class TestException(Exception):
     """An exception type to use to verify raises in tests"""
-    pass
+    pass  # lint-amnesty, pylint: disable=unnecessary-pass
 
 
 @unabc("Tests should not call {}")
-class TestRuntime(Runtime):
+class TestRuntime(Runtime):  # lint-amnesty, pylint: disable=abstract-method
     pass
 
 
@@ -148,7 +148,7 @@ class TestErrorBlockConstruction(unittest.TestCase):
         Test that when an XModule throws an block during __init__, we
         get an ErrorBlock back from XModuleDescriptor._xmodule
         """
-        module = self.descriptor._xmodule
+        module = self.descriptor._xmodule  # lint-amnesty, pylint: disable=protected-access
         self.assertIsInstance(module, ErrorBlock)
 
     @patch.object(ErrorBlock, '__init__', Mock(side_effect=TestException))
@@ -157,7 +157,7 @@ class TestErrorBlockConstruction(unittest.TestCase):
         Test that a broken block descriptor doesn't cause an infinite loop
         """
         with self.assertRaises(TestException):
-            module = self.descriptor._xmodule
+            module = self.descriptor._xmodule  # lint-amnesty, pylint: disable=protected-access, unused-variable
 
     @patch.object(ErrorBlock, '__init__', Mock(side_effect=TestException))
     def test_broken_error_block(self):
@@ -165,4 +165,4 @@ class TestErrorBlockConstruction(unittest.TestCase):
         Test that a broken block module doesn't cause an infinite loop
         """
         with self.assertRaises(TestException):
-            module = self.descriptor._xmodule
+            module = self.descriptor._xmodule  # lint-amnesty, pylint: disable=protected-access, unused-variable

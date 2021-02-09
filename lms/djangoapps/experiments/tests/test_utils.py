@@ -5,11 +5,11 @@ Tests of experiment functionality
 from datetime import timedelta
 from decimal import Decimal
 from django.utils.timezone import now
-from unittest import TestCase
+from unittest import TestCase  # lint-amnesty, pylint: disable=wrong-import-order
 
 from opaque_keys.edx.keys import CourseKey
 from lms.djangoapps.course_blocks.transformers.tests.helpers import ModuleStoreTestCase
-from lms.djangoapps.courseware import courses
+from lms.djangoapps.courseware import courses  # lint-amnesty, pylint: disable=unused-import
 from lms.djangoapps.experiments.utils import (
     get_course_entitlement_price_and_sku,
     get_experiment_user_metadata_context,
@@ -27,7 +27,7 @@ class ExperimentUtilsTests(ModuleStoreTestCase, TestCase):
     """
 
     def setUp(self):
-        super(ExperimentUtilsTests, self).setUp()
+        super(ExperimentUtilsTests, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
 
         # Create a course run
         self.run_a_price = '86.00'
@@ -100,7 +100,7 @@ class ExperimentUtilsTests(ModuleStoreTestCase, TestCase):
     def test_price_and_sku_from_course(self):
         entitlements = [self.entitlement_a]
         course_a = {'key': 'UQx+ENGYCAPx', 'entitlements': entitlements}
-        courses = [course_a]
+        courses = [course_a]  # lint-amnesty, pylint: disable=redefined-outer-name
 
         price, skus = get_program_price_and_skus(courses)
         expected_price = u'$199.23'
@@ -113,7 +113,7 @@ class ExperimentUtilsTests(ModuleStoreTestCase, TestCase):
         course_runs = [self.course_run_a]
         course_a = {'key': 'UQx+ENGY1x', 'course_runs': course_runs}
         course_b = {'key': 'UQx+ENGYCAPx', 'entitlements': entitlements}
-        courses = [course_a, course_b]
+        courses = [course_a, course_b]  # lint-amnesty, pylint: disable=redefined-outer-name
 
         price, skus = get_program_price_and_skus(courses)
         expected_price = u'$285.23'
@@ -123,9 +123,9 @@ class ExperimentUtilsTests(ModuleStoreTestCase, TestCase):
         self.assertIn(self.entitlement_a_sku, skus)
 
     def test_get_experiment_user_metadata_context(self):
-        course = CourseFactory.create(start=now() - timedelta(days=30), pacing_type="instructor_paced", course_duration=None, upgrade_price='Free',
-                                      upgrade_link=None, enrollment_mode=None, audit_access_deadline=None, program_key_fields=None, schedule_start=None,
-                                      enrollment_time=None, dynamic_upgrade_deadline=None, course_upgrade_deadline=None, course_key_fields={'org': 'org.0', 'course': 'course_0', 'run': 'Run_0'})
+        course = CourseFactory.create(start=now() - timedelta(days=30), pacing_type="instructor_paced", course_duration=None, upgrade_price='Free',  # lint-amnesty, pylint: disable=line-too-long
+                                      upgrade_link=None, enrollment_mode=None, audit_access_deadline=None, program_key_fields=None, schedule_start=None,  # lint-amnesty, pylint: disable=line-too-long
+                                      enrollment_time=None, dynamic_upgrade_deadline=None, course_upgrade_deadline=None, course_key_fields={'org': 'org.0', 'course': 'course_0', 'run': 'Run_0'})  # lint-amnesty, pylint: disable=line-too-long
         user = UserFactory()
         context = get_experiment_user_metadata_context(course, user)
         CourseEnrollmentFactory(course_id=course.id, user=user)

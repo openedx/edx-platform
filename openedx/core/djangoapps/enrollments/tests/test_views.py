@@ -171,7 +171,7 @@ class EnrollmentTest(EnrollmentTestMixin, ModuleStoreTestCase, APITestCase, Ente
 
     def setUp(self):
         """ Create a course and user, then log in. """
-        super(EnrollmentTest, self).setUp()
+        super(EnrollmentTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
 
         self.rate_limit_config = RateLimitConfiguration.current()
         self.rate_limit_config.enabled = False
@@ -1093,7 +1093,7 @@ class EnrollmentTest(EnrollmentTestMixin, ModuleStoreTestCase, APITestCase, Ente
             linked_enterprise_customer='this-is-a-real-uuid',
         )
         self.assertEqual(
-            httpretty.last_request().path,
+            httpretty.last_request().path,  # lint-amnesty, pylint: disable=no-member
             '/consent/api/v1/data_sharing_consent',
         )
         self.assertEqual(
@@ -1164,7 +1164,7 @@ class EnrollmentEmbargoTest(EnrollmentTestMixin, UrlResetMixin, ModuleStoreTestC
     @patch.dict(settings.FEATURES, {'EMBARGO': True})
     def setUp(self):
         """ Create a course and user, then log in. """
-        super(EnrollmentEmbargoTest, self).setUp()
+        super(EnrollmentEmbargoTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
 
         self.course = CourseFactory.create()
         # Load a CourseOverview. This initial load should result in a cache
@@ -1294,7 +1294,7 @@ class EnrollmentCrossDomainTest(ModuleStoreTestCase):
 
     def setUp(self):
         """ Create a course and user, then log in. """
-        super(EnrollmentCrossDomainTest, self).setUp()
+        super(EnrollmentCrossDomainTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.course = CourseFactory.create()
         self.user = UserFactory.create(username=self.USERNAME, email=self.EMAIL, password=self.PASSWORD)
 
@@ -1357,7 +1357,7 @@ class UnenrollmentTest(EnrollmentTestMixin, ModuleStoreTestCase):
 
     def setUp(self):
         """ Create a course and user, then log in. """
-        super(UnenrollmentTest, self).setUp()
+        super(UnenrollmentTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.superuser = SuperuserFactory()
         # Pass emit_signals when creating the course so it would be cached
         # as a CourseOverview. Enrollments require a cached CourseOverview.
@@ -1501,7 +1501,7 @@ class UserRoleTest(ModuleStoreTestCase):
 
     def setUp(self):
         """ Create a course and user, then log in. """
-        super(UserRoleTest, self).setUp()
+        super(UserRoleTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.course1 = CourseFactory.create(emit_signals=True, org="org1", course="course1", run="run1")
         self.course2 = CourseFactory.create(emit_signals=True, org="org2", course="course2", run="run2")
         self.user = UserFactory.create(
@@ -1602,7 +1602,7 @@ class CourseEnrollmentsApiListTest(APITestCase, ModuleStoreTestCase):
     CREATED_DATA = datetime.datetime(2018, 1, 1, 0, 0, 1, tzinfo=pytz.UTC)
 
     def setUp(self):
-        super(CourseEnrollmentsApiListTest, self).setUp()
+        super(CourseEnrollmentsApiListTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.rate_limit_config = RateLimitConfiguration.current()
         self.rate_limit_config.enabled = False
         self.rate_limit_config.save()

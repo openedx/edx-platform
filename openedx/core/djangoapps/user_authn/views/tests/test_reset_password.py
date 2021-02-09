@@ -11,7 +11,7 @@ from datetime import datetime, timedelta
 import ddt
 from django.conf import settings
 from django.contrib.auth.hashers import UNUSABLE_PASSWORD_PREFIX, make_password
-from django.contrib.auth.models import AnonymousUser, User
+from django.contrib.auth.models import AnonymousUser, User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.contrib.auth.tokens import default_token_generator
 from django.contrib.auth.views import INTERNAL_RESET_SESSION_TOKEN, PasswordResetConfirmView
 from django.contrib.sessions.middleware import SessionMiddleware
@@ -22,6 +22,7 @@ from django.test.client import RequestFactory
 from django.test.utils import override_settings
 from django.urls import reverse
 from django.utils.http import int_to_base36
+from edx_toggles.toggles.testutils import override_waffle_flag
 from freezegun import freeze_time
 from mock import Mock, patch
 from oauth2_provider import models as dot_models
@@ -36,6 +37,7 @@ from openedx.core.djangoapps.user_api.accounts import EMAIL_MAX_LENGTH, EMAIL_MI
 from openedx.core.djangoapps.user_authn.views.password_reset import (
     SETTING_CHANGE_INITIATED, password_reset, LogistrationPasswordResetView,
     PasswordResetConfirmWrapper)
+from openedx.core.djangoapps.user_authn.toggles import REDIRECT_TO_AUTHN_MICROFRONTEND
 from openedx.core.djangolib.testing.utils import CacheIsolationTestCase
 from common.djangoapps.student.tests.factories import TEST_PASSWORD, UserFactory
 from common.djangoapps.student.tests.test_configuration_overrides import fake_get_value
@@ -46,8 +48,8 @@ from common.djangoapps.util.password_policy_validators import create_validator_c
 from common.djangoapps.util.testing import EventTestMixin
 
 
-ENABLE_LOGISTRATION_MICROFRONTEND = settings.FEATURES.copy()
-ENABLE_LOGISTRATION_MICROFRONTEND['ENABLE_LOGISTRATION_MICROFRONTEND'] = True
+ENABLE_AUTHN_MICROFRONTEND = settings.FEATURES.copy()
+ENABLE_AUTHN_MICROFRONTEND['ENABLE_AUTHN_MICROFRONTEND'] = True
 
 
 def process_request(request):
@@ -69,7 +71,7 @@ class ResetPasswordTests(EventTestMixin, CacheIsolationTestCase):
     ENABLED_CACHES = ['default']
 
     def setUp(self):  # pylint: disable=arguments-differ
-        super(ResetPasswordTests, self).setUp('openedx.core.djangoapps.user_authn.views.password_reset.tracker')
+        super(ResetPasswordTests, self).setUp('openedx.core.djangoapps.user_authn.views.password_reset.tracker')  # lint-amnesty, pylint: disable=super-with-arguments
         self.user = UserFactory.create()
         self.user.is_active = False
         self.user.save()
@@ -241,7 +243,7 @@ class ResetPasswordTests(EventTestMixin, CacheIsolationTestCase):
 
         cache.clear()
 
-    def request_password_reset(self, status, new_ip=None):
+    def request_password_reset(self, status, new_ip=None):  # lint-amnesty, pylint: disable=missing-function-docstring
         extra_args = {}
         if new_ip:
             extra_args = {'REMOTE_ADDR': new_ip}
@@ -330,7 +332,8 @@ class ResetPasswordTests(EventTestMixin, CacheIsolationTestCase):
             SETTING_CHANGE_INITIATED, user_id=self.user.id, setting=u'password', old=None, new=None
         )
 
-    @override_settings(FEATURES=ENABLE_LOGISTRATION_MICROFRONTEND)
+    @override_settings(FEATURES=ENABLE_AUTHN_MICROFRONTEND)
+    @override_waffle_flag(REDIRECT_TO_AUTHN_MICROFRONTEND, active=True)
     @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', "Test only valid in LMS")
     @ddt.data(('Crazy Awesome Site', 'Crazy Awesome Site'), ('edX', 'edX'))
     @ddt.unpack
@@ -354,7 +357,7 @@ class ResetPasswordTests(EventTestMixin, CacheIsolationTestCase):
                 reset_msg = reset_msg.format(site_name)
 
                 self.assertIn(reset_msg, msg)
-                self.assertIn(settings.LOGISTRATION_MICROFRONTEND_URL, msg)
+                self.assertIn(settings.AUTHN_MICROFRONTEND_URL, msg)
 
                 sign_off = u"The {} Team".format(platform_name)
                 self.assertIn(sign_off, msg)
@@ -623,7 +626,7 @@ class PasswordResetViewTest(UserAPITestCase):
     """Tests of the user API's password reset endpoint. """
 
     def setUp(self):
-        super(PasswordResetViewTest, self).setUp()
+        super(PasswordResetViewTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.url = reverse("user_api_password_reset")
 
     @ddt.data("get", "post")
@@ -682,7 +685,7 @@ class PasswordResetTokenValidateViewTest(UserAPITestCase):
     """Tests of the user API's password reset endpoint. """
 
     def setUp(self):
-        super(PasswordResetTokenValidateViewTest, self).setUp()
+        super(PasswordResetTokenValidateViewTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.user = UserFactory.create()
         self.user.is_active = False
         self.user.save()
@@ -736,8 +739,8 @@ class ResetPasswordAPITests(EventTestMixin, CacheIsolationTestCase):
     request_factory = RequestFactory()
     ENABLED_CACHES = ['default']
 
-    def setUp(self):
-        super(ResetPasswordAPITests, self).setUp('openedx.core.djangoapps.user_authn.views.password_reset.tracker')
+    def setUp(self):  # lint-amnesty, pylint: disable=arguments-differ
+        super(ResetPasswordAPITests, self).setUp('openedx.core.djangoapps.user_authn.views.password_reset.tracker')  # lint-amnesty, pylint: disable=super-with-arguments
         self.user = UserFactory.create()
         self.user.save()
         self.token = default_token_generator.make_token(self.user)
@@ -821,12 +824,13 @@ class ResetPasswordAPITests(EventTestMixin, CacheIsolationTestCase):
             new=updated_user.email
         )
 
-    def test_password_reset_email_sent_on_account_recovery_email(self):
+    @ddt.data(True, False)
+    def test_password_reset_email_successfully_sent(self, is_account_recovery):
         """
         Test that with is_account_recovery query param available, password
         reset email is sent to newly updated email address.
         """
-        post_request = self.create_reset_request(self.uidb36, self.token, True)
+        post_request = self.create_reset_request(self.uidb36, self.token, is_account_recovery)
         post_request.user = AnonymousUser()
         post_request.site = Mock(domain='example.com')
         reset_view = LogistrationPasswordResetView.as_view()

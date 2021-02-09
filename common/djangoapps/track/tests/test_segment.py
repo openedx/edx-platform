@@ -16,7 +16,7 @@ class SegmentTrackTestCase(TestCase):
     """Ensure emitted events contain the expected context values."""
 
     def setUp(self):
-        super(SegmentTrackTestCase, self).setUp()
+        super(SegmentTrackTestCase, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.tracker = DjangoTracker()
         tracker.register_tracker(self.tracker)
         self.properties = {sentinel.key: sentinel.value}
@@ -43,7 +43,7 @@ class SegmentTrackTestCase(TestCase):
     def test_track_without_tracking_context(self):
         segment.track(sentinel.user_id, sentinel.name, self.properties)
         self.assertTrue(self.mock_segment_track.called)
-        args, kwargs = self.mock_segment_track.call_args
+        args, kwargs = self.mock_segment_track.call_args  # lint-amnesty, pylint: disable=unused-variable
         expected_segment_context = {}
         self.assertEqual((sentinel.user_id, sentinel.name, self.properties, expected_segment_context), args)
 
@@ -52,16 +52,16 @@ class SegmentTrackTestCase(TestCase):
         ({'ip': sentinel.ip}, {'ip': sentinel.provided_ip}, {'ip': sentinel.ip}),
         ({'agent': sentinel.agent}, {'userAgent': sentinel.provided_agent}, {'userAgent': sentinel.agent}),
         ({'path': sentinel.path}, {'page': {'path': sentinel.provided_path}}, {'page': {'path': sentinel.path}}),
-        ({'referer': sentinel.referer}, {'page': {'referrer': sentinel.provided_referer}}, {'page': {'referrer': sentinel.referer}}),
+        ({'referer': sentinel.referer}, {'page': {'referrer': sentinel.provided_referer}}, {'page': {'referrer': sentinel.referer}}),  # lint-amnesty, pylint: disable=line-too-long
         ({'page': sentinel.page}, {'page': {'url': sentinel.provided_page}}, {'page': {'url': sentinel.page}}),
-        ({'client_id': sentinel.client_id}, {'Google Analytics': {'clientId': sentinel.provided_client_id}}, {'Google Analytics': {'clientId': sentinel.client_id}}),
+        ({'client_id': sentinel.client_id}, {'Google Analytics': {'clientId': sentinel.provided_client_id}}, {'Google Analytics': {'clientId': sentinel.client_id}}),  # lint-amnesty, pylint: disable=line-too-long
     )
     @override_settings(LMS_SEGMENT_KEY="testkey")
     def test_track_context_with_stuff(self, tracking_context, provided_context, expected_segment_context):
         # Test first with tracking and no provided context.
         with self.tracker.context('test', tracking_context):
             segment.track(sentinel.user_id, sentinel.name, self.properties)
-        args, kwargs = self.mock_segment_track.call_args
+        args, kwargs = self.mock_segment_track.call_args  # lint-amnesty, pylint: disable=unused-variable
         self.assertEqual((sentinel.user_id, sentinel.name, self.properties, expected_segment_context), args)
 
         # Test with provided context and no tracking context.
@@ -98,7 +98,7 @@ class SegmentTrackTestCase(TestCase):
             segment.track(sentinel.user_id, sentinel.name, self.properties)
 
         self.assertTrue(self.mock_segment_track.called)
-        args, kwargs = self.mock_segment_track.call_args
+        args, kwargs = self.mock_segment_track.call_args  # lint-amnesty, pylint: disable=unused-variable
 
         expected_segment_context = {
             'ip': sentinel.ip,
@@ -119,7 +119,7 @@ class SegmentIdentifyTestCase(TestCase):
     """Ensure emitted events contain the fields legacy processors expect to find."""
 
     def setUp(self):
-        super(SegmentIdentifyTestCase, self).setUp()
+        super(SegmentIdentifyTestCase, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         patcher = patch('common.djangoapps.track.segment.analytics.identify')
         self.mock_segment_identify = patcher.start()
         self.addCleanup(patcher.stop)
@@ -138,7 +138,7 @@ class SegmentIdentifyTestCase(TestCase):
     def test_normal_call(self):
         segment.identify(sentinel.user_id, self.properties)
         self.assertTrue(self.mock_segment_identify.called)
-        args, kwargs = self.mock_segment_identify.call_args
+        args, kwargs = self.mock_segment_identify.call_args  # lint-amnesty, pylint: disable=unused-variable
         self.assertEqual((sentinel.user_id, self.properties, {}), args)
 
     @override_settings(LMS_SEGMENT_KEY="testkey")
@@ -146,5 +146,5 @@ class SegmentIdentifyTestCase(TestCase):
         provided_context = {sentinel.context_key: sentinel.context_value}
         segment.identify(sentinel.user_id, self.properties, provided_context)
         self.assertTrue(self.mock_segment_identify.called)
-        args, kwargs = self.mock_segment_identify.call_args
+        args, kwargs = self.mock_segment_identify.call_args  # lint-amnesty, pylint: disable=unused-variable
         self.assertEqual((sentinel.user_id, self.properties, provided_context), args)

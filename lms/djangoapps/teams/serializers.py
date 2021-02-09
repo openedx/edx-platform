@@ -7,7 +7,7 @@ from copy import deepcopy
 
 import six
 from django.conf import settings
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from django_countries import countries
 from rest_framework import serializers
 
@@ -135,7 +135,7 @@ class CourseTeamSerializerWithoutMembership(CourseTeamSerializer):
     """
 
     def __init__(self, *args, **kwargs):
-        super(CourseTeamSerializerWithoutMembership, self).__init__(*args, **kwargs)
+        super(CourseTeamSerializerWithoutMembership, self).__init__(*args, **kwargs)  # lint-amnesty, pylint: disable=super-with-arguments
         del self.fields['membership']
 
 
@@ -209,7 +209,7 @@ class BulkTeamCountTopicListSerializer(serializers.ListSerializer):  # pylint: d
 
     def to_representation(self, obj):  # pylint: disable=arguments-differ
         """Adds team_count to each topic. """
-        data = super(BulkTeamCountTopicListSerializer, self).to_representation(obj)
+        data = super(BulkTeamCountTopicListSerializer, self).to_representation(obj)  # lint-amnesty, pylint: disable=super-with-arguments
         add_team_count(
             self.context['request'].user,
             data,

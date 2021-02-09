@@ -7,7 +7,7 @@ from collections import OrderedDict
 from copy import deepcopy
 
 import six
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.urls import reverse
 from six.moves import range
 
@@ -45,7 +45,7 @@ class SurveyViewsTests(LoginEnrollmentTestCase, SharedModuleStoreTestCase, XssTe
         """
         Set up the test data used in the specific tests
         """
-        super(SurveyViewsTests, self).setUp()
+        super(SurveyViewsTests, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
 
         self.test_form = '<input name="field1"></input>'
         self.survey = SurveyForm.create(self.test_survey_name, self.test_form)

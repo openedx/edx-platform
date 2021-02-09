@@ -19,7 +19,7 @@ class LTI20RESTResultServiceTest(LogicTest):
     descriptor_class = LTIDescriptor
 
     def setUp(self):
-        super(LTI20RESTResultServiceTest, self).setUp()
+        super(LTI20RESTResultServiceTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.environ = {'wsgi.url_scheme': 'http', 'REQUEST_METHOD': 'POST'}
         self.system.get_real_user = Mock()
         self.system.publish = Mock()
@@ -253,7 +253,7 @@ class LTI20RESTResultServiceTest(LogicTest):
         self.assertEqual(response.status_code, 200)
         self.assertIsNone(self.xmodule.module_score)
         self.assertEqual(self.xmodule.score_comment, u"")
-        (_, evt_type, called_grade_obj), _ = self.system.publish.call_args
+        (_, evt_type, called_grade_obj), _ = self.system.publish.call_args  # lint-amnesty, pylint: disable=unpacking-non-sequence
         self.assertEqual(
             called_grade_obj,
             {'user_id': self.USER_STANDIN.id, 'value': None, 'max_value': None, 'score_deleted': True},
@@ -276,7 +276,7 @@ class LTI20RESTResultServiceTest(LogicTest):
         self.assertEqual(response.status_code, 200)
         self.assertIsNone(self.xmodule.module_score)
         self.assertEqual(self.xmodule.score_comment, u"")
-        (_, evt_type, called_grade_obj), _ = self.system.publish.call_args
+        (_, evt_type, called_grade_obj), _ = self.system.publish.call_args  # lint-amnesty, pylint: disable=unpacking-non-sequence
         self.assertEqual(
             called_grade_obj,
             {'user_id': self.USER_STANDIN.id, 'value': None, 'max_value': None, 'score_deleted': True},
@@ -295,7 +295,7 @@ class LTI20RESTResultServiceTest(LogicTest):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(self.xmodule.module_score, 0.1)
         self.assertEqual(self.xmodule.score_comment, u"ಠ益ಠ")
-        (_, evt_type, called_grade_obj), _ = self.system.publish.call_args
+        (_, evt_type, called_grade_obj), _ = self.system.publish.call_args  # lint-amnesty, pylint: disable=unpacking-non-sequence
         self.assertEqual(evt_type, 'grade')
         self.assertEqual(
             called_grade_obj,

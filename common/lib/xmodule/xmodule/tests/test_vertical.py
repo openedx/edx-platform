@@ -86,7 +86,7 @@ class BaseVerticalBlockTest(XModuleXmlImportTest):
     test_problem = 'Test Problem'
 
     def setUp(self):
-        super(BaseVerticalBlockTest, self).setUp()
+        super(BaseVerticalBlockTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         # construct module
         course = xml.CourseFactory.build()
         sequence = xml.SequenceFactory.build(parent=course)

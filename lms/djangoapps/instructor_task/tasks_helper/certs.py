@@ -5,15 +5,15 @@ Instructor tasks related to certificates.
 
 from time import time
 
-from django.contrib.auth.models import User
+from django.contrib.auth import get_user_model
 from django.db.models import Q
-
-from lms.djangoapps.certificates.api import generate_user_certificates
-from lms.djangoapps.certificates.models import CertificateStatuses, GeneratedCertificate
-from common.djangoapps.student.models import CourseEnrollment
 from xmodule.modulestore.django import modulestore
 
+from common.djangoapps.student.models import CourseEnrollment
+from lms.djangoapps.certificates.api import generate_user_certificates
+from lms.djangoapps.certificates.models import CertificateStatuses, GeneratedCertificate
 from .runner import TaskProgress
+User = get_user_model()
 
 
 def generate_students_certificates(
@@ -65,7 +65,7 @@ def generate_students_certificates(
         # Mark existing generated certificates as 'unavailable' before regenerating
         # We need to call this method after "students_require_certificate" otherwise "students_require_certificate"
         # would return no results.
-        invalidate_generated_certificates(course_id, students_to_generate_certs_for, statuses_to_regenerate)
+        _invalidate_generated_certificates(course_id, students_to_generate_certs_for, statuses_to_regenerate)
 
     task_progress.skipped = task_progress.total - len(students_require_certs)
 
@@ -122,7 +122,7 @@ def students_require_certificate(course_id, enrolled_students, statuses_to_regen
         return list(set(enrolled_students) - set(students_already_have_certs))
 
 
-def invalidate_generated_certificates(course_id, enrolled_students, certificate_statuses):
+def _invalidate_generated_certificates(course_id, enrolled_students, certificate_statuses):
     """
     Invalidate generated certificates for all enrolled students in the given course having status in
     'certificate_statuses'.

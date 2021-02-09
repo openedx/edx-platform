@@ -59,7 +59,7 @@ class LMSInstructorDashboardA11yTest(BaseInstructorDashboardTest):
     Instructor dashboard base accessibility test.
     """
     def setUp(self):
-        super(LMSInstructorDashboardA11yTest, self).setUp()
+        super(LMSInstructorDashboardA11yTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.course_fixture = CourseFixture(**self.course_info).install()
         self.log_in_as_instructor()
         self.instructor_dashboard_page = self.visit_instructor_dashboard()
@@ -82,7 +82,7 @@ class BulkEmailTest(BaseInstructorDashboardTest):
     shard = 23
 
     def setUp(self):
-        super(BulkEmailTest, self).setUp()
+        super(BulkEmailTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.course_fixture = CourseFixture(**self.course_info).install()
         self.log_in_as_instructor()
         instructor_dashboard_page = self.visit_instructor_dashboard()
@@ -114,7 +114,7 @@ class AutoEnrollmentWithCSVTest(BaseInstructorDashboardTest):
     """
 
     def setUp(self):
-        super(AutoEnrollmentWithCSVTest, self).setUp()
+        super(AutoEnrollmentWithCSVTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.course_fixture = CourseFixture(**self.course_info).install()
         self.log_in_as_instructor()
         instructor_dashboard_page = self.visit_instructor_dashboard()
@@ -141,7 +141,7 @@ class CertificatesTest(BaseInstructorDashboardTest):
     """
 
     def setUp(self):
-        super(CertificatesTest, self).setUp()
+        super(CertificatesTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.test_certificate_config = {
             'id': 1,
             'name': 'Certificate name',
@@ -194,7 +194,7 @@ class CertificateInvalidationTest(BaseInstructorDashboardTest):
         ).install()
 
     def setUp(self):
-        super(CertificateInvalidationTest, self).setUp()
+        super(CertificateInvalidationTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         # set same course number as we have in fixture json
         self.course_info['number'] = "335535897951379478207964576572017930000"
 

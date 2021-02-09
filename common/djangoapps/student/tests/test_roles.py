@@ -28,7 +28,7 @@ class RolesTestCase(TestCase):
     """
 
     def setUp(self):
-        super(RolesTestCase, self).setUp()
+        super(RolesTestCase, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.course_key = CourseKey.from_string('edX/toy/2012_Fall')
         self.course_loc = self.course_key.make_usage_key('course', '2012_Fall')
         self.anonymous_user = AnonymousUserFactory()
@@ -166,7 +166,7 @@ class RolesTestCase(TestCase):
 
 
 @ddt.ddt
-class RoleCacheTestCase(TestCase):
+class RoleCacheTestCase(TestCase):  # lint-amnesty, pylint: disable=missing-class-docstring
 
     IN_KEY = CourseKey.from_string('edX/toy/2012_Fall')
     NOT_IN_KEY = CourseKey.from_string('edX/toy/2013_Fall')
@@ -180,7 +180,7 @@ class RoleCacheTestCase(TestCase):
     )
 
     def setUp(self):
-        super(RoleCacheTestCase, self).setUp()
+        super(RoleCacheTestCase, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.user = UserFactory()
 
     @ddt.data(*ROLES)
@@ -198,6 +198,6 @@ class RoleCacheTestCase(TestCase):
 
     @ddt.data(*ROLES)
     @ddt.unpack
-    def test_empty_cache(self, role, target):
+    def test_empty_cache(self, role, target):  # lint-amnesty, pylint: disable=unused-argument
         cache = RoleCache(self.user)
         self.assertFalse(cache.has_role(*target))

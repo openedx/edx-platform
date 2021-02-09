@@ -3,7 +3,7 @@ Waffle flags for instructor dashboard.
 """
 
 from edx_toggles.toggles import LegacyWaffleFlag, LegacyWaffleFlagNamespace
-from openedx.core.djangoapps.waffle_utils import CourseWaffleFlag
+from openedx.core.djangoapps.waffle_utils import CourseWaffleFlag  # lint-amnesty, pylint: disable=unused-import
 
 WAFFLE_NAMESPACE = 'instructor'
 # Namespace for instructor waffle flags.

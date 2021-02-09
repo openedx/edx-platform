@@ -75,7 +75,7 @@ COMMON_TEST_DATA_ROOT = COMMON_ROOT / "test" / "data"
 FEATURES['ENABLE_EXPORT_GIT'] = True
 GIT_REPO_EXPORT_DIR = TEST_ROOT / "export_course_repos"
 
-# TODO (cpennington): We need to figure out how envs/test.py can inject things into common.py so that we don't have to repeat this sort of thing
+# TODO (cpennington): We need to figure out how envs/test.py can inject things into common.py so that we don't have to repeat this sort of thing  # lint-amnesty, pylint: disable=line-too-long
 STATICFILES_DIRS = [
     COMMON_ROOT / "static",
     PROJECT_ROOT / "static",
@@ -321,6 +321,10 @@ DEFAULT_MOBILE_AVAILABLE = True
 
 PROCTORING_SETTINGS = {}
 
+# Used in edx-proctoring for ID generation in lieu of SECRET_KEY - dummy value
+# (ref MST-637)
+PROCTORING_USER_OBFUSCATION_KEY = '85920908f28904ed733fe576320db18cabd7b6cd'
+
 ##### LOGISTRATION RATE LIMIT SETTINGS #####
 LOGISTRATION_RATELIMIT_RATE = '5/5m'
 LOGISTRATION_API_RATELIMIT = '5/m'
@@ -329,3 +333,6 @@ REGISTRATION_VALIDATION_RATELIMIT = '5/minute'
 
 # Don't tolerate deprecated edx-platform import usage in tests.
 ERROR_ON_DEPRECATED_EDX_PLATFORM_IMPORTS = True
+
+############### Settings for proctoring  ###############
+PROCTORING_USER_OBFUSCATION_KEY = 'test_key'

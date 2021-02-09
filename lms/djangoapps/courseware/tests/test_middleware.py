@@ -39,5 +39,5 @@ class CoursewareMiddlewareTestCase(SharedModuleStoreTestCase):
             request, exception
         )
         self.assertEqual(response.status_code, 302)
-        target_url = response._headers['location'][1]
+        target_url = response._headers['location'][1]  # lint-amnesty, pylint: disable=protected-access
         self.assertTrue(target_url.endswith(test_url))

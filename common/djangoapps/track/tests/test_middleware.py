@@ -4,7 +4,7 @@
 
 import ddt
 import six
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.contrib.sessions.middleware import SessionMiddleware
 from django.test import TestCase
 from django.test.client import RequestFactory
@@ -20,7 +20,7 @@ class TrackMiddlewareTestCase(TestCase):
     """  Class for checking tracking requests """
 
     def setUp(self):
-        super(TrackMiddlewareTestCase, self).setUp()
+        super(TrackMiddlewareTestCase, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.track_middleware = TrackMiddleware()
         self.request_factory = RequestFactory()
 

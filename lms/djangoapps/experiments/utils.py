@@ -12,7 +12,7 @@ from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
 
 from common.djangoapps.course_modes.models import format_course_price, get_cosmetic_verified_display_price, CourseMode
-from edx_toggles.toggles import LegacyWaffleFlag, LegacyWaffleFlagNamespace
+from edx_toggles.toggles import LegacyWaffleFlag, LegacyWaffleFlagNamespace  # lint-amnesty, pylint: disable=wrong-import-order
 from common.djangoapps.entitlements.models import CourseEntitlement
 from lms.djangoapps.commerce.utils import EcommerceService
 from lms.djangoapps.courseware.access import has_staff_access_to_preview_mode
@@ -271,7 +271,7 @@ def get_experiment_user_metadata_context(course, user):
     enrollment = None
     # TODO: clean up as part of REVO-28 (START)
     user_enrollments = None
-    audit_enrollments = None
+    audit_enrollments = None  # lint-amnesty, pylint: disable=unused-variable
     has_non_audit_enrollments = False
     context = {}
     if course is not None:

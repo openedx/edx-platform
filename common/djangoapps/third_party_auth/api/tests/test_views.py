@@ -49,7 +49,7 @@ class TpaAPITestCase(ThirdPartyAuthTestMixin, APITestCase):
 
     def setUp(self):  # pylint: disable=arguments-differ
         """ Create users for use in the tests """
-        super(TpaAPITestCase, self).setUp()
+        super(TpaAPITestCase, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
 
         google = self.configure_google_provider(enabled=True)
         self.configure_facebook_provider(enabled=True)
@@ -364,7 +364,7 @@ class TestThirdPartyAuthUserStatusView(ThirdPartyAuthTestMixin, APITestCase):
     """
 
     def setUp(self, *args, **kwargs):
-        super(TestThirdPartyAuthUserStatusView, self).setUp(*args, **kwargs)
+        super(TestThirdPartyAuthUserStatusView, self).setUp(*args, **kwargs)  # lint-amnesty, pylint: disable=super-with-arguments
         self.user = UserFactory.create(password=PASSWORD)
         self.google_provider = self.configure_google_provider(enabled=True, visible=True)
         self.url = reverse('third_party_auth_user_status_api')

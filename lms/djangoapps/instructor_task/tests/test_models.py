@@ -41,21 +41,21 @@ class ReportStoreTestMixin(object):
     """
 
     def setUp(self):
-        super(ReportStoreTestMixin, self).setUp()
+        super(ReportStoreTestMixin, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.course_id = CourseLocator(org="testx", course="coursex", run="runx")
 
     def create_report_store(self):
         """
         Subclasses should override this and return their report store.
         """
-        pass
+        pass  # lint-amnesty, pylint: disable=unnecessary-pass
 
     def test_links_for_order(self):
         """
         Test that ReportStore.links_for() returns file download links
         in reverse chronological order.
         """
-        report_store = self.create_report_store()
+        report_store = self.create_report_store()  # lint-amnesty, pylint: disable=assignment-from-no-return
         self.assertEqual(report_store.links_for(self.course_id), [])
 
         report_store.store(self.course_id, 'old_file', StringIO())

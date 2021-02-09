@@ -11,7 +11,7 @@ from django.urls import reverse
 
 from lms.djangoapps.bulk_email.models import Optout
 from lms.djangoapps.bulk_email.views import opt_out_email_updates
-from six import text_type
+from six import text_type  # lint-amnesty, pylint: disable=wrong-import-order
 
 from lms.djangoapps.discussion.notification_prefs.views import UsernameCipher
 from openedx.core.lib.tests import attr
@@ -28,7 +28,7 @@ class OptOutEmailUpdatesViewTest(ModuleStoreTestCase):
     Check the opt out email functionality.
     """
     def setUp(self):
-        super(OptOutEmailUpdatesViewTest, self).setUp()
+        super(OptOutEmailUpdatesViewTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.user = UserFactory.create(username="testuser1", email='test@example.com')
         self.course = CourseFactory.create(run='testcourse1', display_name='Test Course Title')
         self.token = UsernameCipher.encrypt('testuser1')

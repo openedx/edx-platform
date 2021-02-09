@@ -1,4 +1,4 @@
-"""
+"""  # lint-amnesty, pylint: disable=cyclic-import
 Separate integration test for Twitter which is an OAuth1 provider.
 """
 
@@ -7,11 +7,11 @@ from mock import patch
 from common.djangoapps.third_party_auth.tests.specs import base
 
 
-class TwitterIntegrationTest(base.Oauth2IntegrationTest):
+class TwitterIntegrationTest(base.Oauth2IntegrationTest):  # lint-amnesty, pylint: disable=test-inherits-tests
     """Integration tests for Twitter backend."""
 
     def setUp(self):
-        super(TwitterIntegrationTest, self).setUp()
+        super(TwitterIntegrationTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.provider = self.configure_twitter_provider(
             enabled=True,
             visible=True,

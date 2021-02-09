@@ -6,7 +6,7 @@ Test helpers for Comprehensive Theming.
 import six
 from django.conf import settings
 from django.test import TestCase, override_settings
-from edx_django_utils.cache import RequestCache
+from edx_django_utils.cache import RequestCache  # lint-amnesty, pylint: disable=unused-import
 from mock import Mock, patch
 
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers

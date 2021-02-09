@@ -52,9 +52,9 @@ class TestModuleSystem(ModuleSystem):  # pylint: disable=abstract-method
         kwargs.setdefault('id_reader', id_manager)
         kwargs.setdefault('id_generator', id_manager)
         kwargs.setdefault('services', {}).setdefault('field-data', DictFieldData({}))
-        super(TestModuleSystem, self).__init__(**kwargs)
+        super(TestModuleSystem, self).__init__(**kwargs)  # lint-amnesty, pylint: disable=super-with-arguments
 
-    def handler_url(self, block, handler, suffix='', query='', thirdparty=False):
+    def handler_url(self, block, handler, suffix='', query='', thirdparty=False):  # lint-amnesty, pylint: disable=arguments-differ
         return '{usage_id}/{handler}{suffix}?{query}'.format(
             usage_id=six.text_type(block.scope_ids.usage_id),
             handler=handler,
@@ -83,7 +83,7 @@ class TestModuleSystem(ModuleSystem):  # pylint: disable=abstract-method
         if hasattr(self, '_view_name'):
             orig_view_name = self._view_name
         self._view_name = None
-        rt_repr = super(TestModuleSystem, self).__repr__()
+        rt_repr = super(TestModuleSystem, self).__repr__()  # lint-amnesty, pylint: disable=super-with-arguments
         self._view_name = orig_view_name
         return rt_repr
 
@@ -182,7 +182,7 @@ def mock_render_template(*args, **kwargs):
     return pprint.pformat((args, kwargs)).encode().decode()
 
 
-class ModelsTest(unittest.TestCase):
+class ModelsTest(unittest.TestCase):  # lint-amnesty, pylint: disable=missing-class-docstring
 
     def test_load_class(self):
         vc = XModuleDescriptor.load_class('sequential')
@@ -196,7 +196,7 @@ class LogicTest(unittest.TestCase):
     raw_field_data = {}
 
     def setUp(self):
-        super(LogicTest, self).setUp()
+        super(LogicTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.system = get_test_system()
         self.descriptor = Mock(name="descriptor", url_name='', category='test')
 
@@ -262,7 +262,7 @@ class CourseComparisonTest(TestCase):
     """
 
     def setUp(self):
-        super(CourseComparisonTest, self).setUp()
+        super(CourseComparisonTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.field_exclusions = set()
         self.ignored_asset_keys = set()
 
@@ -362,8 +362,8 @@ class CourseComparisonTest(TestCase):
         # compare published
         with expected_store.branch_setting(ModuleStoreEnum.Branch.published_only, expected_course_key):
             with actual_store.branch_setting(ModuleStoreEnum.Branch.published_only, actual_course_key):
-                expected_items = expected_store.get_items(expected_course_key, revision=ModuleStoreEnum.RevisionOption.published_only)
-                actual_items = actual_store.get_items(actual_course_key, revision=ModuleStoreEnum.RevisionOption.published_only)
+                expected_items = expected_store.get_items(expected_course_key, revision=ModuleStoreEnum.RevisionOption.published_only)  # lint-amnesty, pylint: disable=line-too-long
+                actual_items = actual_store.get_items(actual_course_key, revision=ModuleStoreEnum.RevisionOption.published_only)  # lint-amnesty, pylint: disable=line-too-long
                 self.assertGreater(len(expected_items), 0)
                 self._assertCoursesEqual(expected_items, actual_items, actual_course_key)
 
@@ -384,7 +384,7 @@ class CourseComparisonTest(TestCase):
                     actual_items = actual_store.get_items(actual_course_key, revision=revision)
                     self._assertCoursesEqual(expected_items, actual_items, actual_course_key, expect_drafts=True)
 
-    def _assertCoursesEqual(self, expected_items, actual_items, actual_course_key, expect_drafts=False):
+    def _assertCoursesEqual(self, expected_items, actual_items, actual_course_key, expect_drafts=False):  # lint-amnesty, pylint: disable=unused-argument
         """
         Actual algorithm to compare courses.
         """
@@ -405,7 +405,7 @@ class CourseComparisonTest(TestCase):
             [key for key in actual_item_map.keys() if key[0] != 'course'],
         )
         for expected_item in expected_items:
-            actual_item_location = actual_course_key.make_usage_key(expected_item.category, expected_item.location.block_id)
+            actual_item_location = actual_course_key.make_usage_key(expected_item.category, expected_item.location.block_id)  # lint-amnesty, pylint: disable=line-too-long
             # split and old mongo use different names for the course root but we don't know which
             # modulestore actual's come from here; so, assume old mongo and if that fails, assume split
             if expected_item.location.block_type == 'course':
@@ -492,7 +492,7 @@ class CourseComparisonTest(TestCase):
         actual_thumbs = actual_store.get_all_content_thumbnails_for_course(actual_course_key)
         self._assertAssetsEqual(expected_course_key, expected_thumbs, actual_course_key, actual_thumbs)
 
-    def assertAssetsMetadataEqual(self, expected_modulestore, expected_course_key, actual_modulestore, actual_course_key):
+    def assertAssetsMetadataEqual(self, expected_modulestore, expected_course_key, actual_modulestore, actual_course_key):  # lint-amnesty, pylint: disable=line-too-long
         """
         Assert that the modulestore asset metdata for the ``expected_course_key`` and the ``actual_course_key``
         are equivalent.

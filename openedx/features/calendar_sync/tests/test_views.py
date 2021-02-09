@@ -25,7 +25,7 @@ class TestCalendarSyncView(SharedModuleStoreTestCase, TestCase):
         cls.course = CourseFactory.create()
 
     def setUp(self):
-        super(TestCalendarSyncView, self).setUp()
+        super(TestCalendarSyncView, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.user = self.create_user_for_course(self.course)
         self.client.login(username=self.user.username, password=TEST_PASSWORD)
         self.calendar_sync_url = reverse('openedx.calendar_sync', args=[self.course.id])

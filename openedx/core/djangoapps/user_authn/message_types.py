@@ -10,7 +10,7 @@ class PasswordReset(BaseMessageType):
     A message to the user with password reset link.
     """
     def __init__(self, *args, **kwargs):
-        super(PasswordReset, self).__init__(*args, **kwargs)
+        super(PasswordReset, self).__init__(*args, **kwargs)  # lint-amnesty, pylint: disable=super-with-arguments
 
         # pylint: disable=unsupported-assignment-operation
         self.options['transactional'] = True
@@ -22,5 +22,5 @@ class PasswordResetSuccess(BaseMessageType):
     """
 
     def __init__(self, *args, **kwargs):
-        super(PasswordResetSuccess, self).__init__(*args, **kwargs)
+        super(PasswordResetSuccess, self).__init__(*args, **kwargs)  # lint-amnesty, pylint: disable=super-with-arguments
         self.options['transactional'] = True

@@ -85,7 +85,7 @@ class DateSummary(object):
         """
         Registers any relevant course alerts given the current request.
         """
-        pass
+        pass  # lint-amnesty, pylint: disable=unnecessary-pass
 
     @property
     def date(self):
@@ -139,7 +139,7 @@ class DateSummary(object):
         # 'absolute'. For example, 'absolute' might be "Jan 01, 2020",
         # and if today were December 5th, 2020, 'relative' would be "1
         # month".
-        date_format = _(u"{relative} ago - {absolute}") if date_has_passed else _(u"in {relative} - {absolute}")
+        date_format = _(u"{relative} ago - {absolute}") if date_has_passed else _(u"in {relative} - {absolute}")  # lint-amnesty, pylint: disable=redefined-outer-name
         return date_format.format(
             relative=relative_date,
             absolute='{date}',
@@ -187,7 +187,7 @@ class DateSummary(object):
         locale = to_locale(get_language())
         return format_timedelta(self.date - self.current_time, locale=locale)
 
-    def date_html(self, date_format='shortDate'):
+    def date_html(self, date_format='shortDate'):  # lint-amnesty, pylint: disable=redefined-outer-name
         """
         Returns a representation of the date as HTML.
 
@@ -240,7 +240,7 @@ class TodaysDate(DateSummary):
 
     # The date is shown in the title, no need to display it again.
     def get_context(self):
-        context = super(TodaysDate, self).get_context()
+        context = super(TodaysDate, self).get_context()  # lint-amnesty, pylint: disable=no-member, super-with-arguments
         context['date'] = ''
         return context
 
@@ -388,6 +388,7 @@ class CourseAssignmentDate(DateSummary):
         self.assignment_link = ''
         self.assignment_title = None
         self.assignment_title_html = None
+        self.first_component_block_id = None
         self.contains_gated_content = False
         self.complete = None
         self.past_due = None
@@ -543,7 +544,7 @@ class VerifiedUpgradeDeadlineDate(DateSummary):
         return can_show_verified_upgrade(self.user, self.enrollment, self.course)
 
     @lazy
-    def date(self):
+    def date(self):  # lint-amnesty, pylint: disable=invalid-overridden-method
         if self.enrollment:
             return self.enrollment.upgrade_deadline
         else:
@@ -581,7 +582,7 @@ class VerifiedUpgradeDeadlineDate(DateSummary):
     def relative_datestring(self):
         dynamic_deadline = self._dynamic_deadline()
         if dynamic_deadline is None:
-            return super(VerifiedUpgradeDeadlineDate, self).relative_datestring
+            return super(VerifiedUpgradeDeadlineDate, self).relative_datestring  # lint-amnesty, pylint: disable=super-with-arguments
 
         if self.date is None or self.deadline_has_passed():
             return ' '
@@ -690,7 +691,7 @@ class VerificationDeadlineDate(DateSummary):
         )
 
     @lazy
-    def date(self):
+    def date(self):  # lint-amnesty, pylint: disable=invalid-overridden-method
         return VerificationDeadline.deadline_for_course(self.course_id)
 
     @property

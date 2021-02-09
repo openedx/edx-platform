@@ -7,7 +7,7 @@ import logging
 
 import six
 from celery import shared_task
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from edx_django_utils.monitoring import set_code_owner_attribute
 from opaque_keys.edx.keys import CourseKey, UsageKey
 

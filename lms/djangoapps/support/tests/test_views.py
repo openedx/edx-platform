@@ -12,7 +12,7 @@ from uuid import UUID, uuid4
 
 import ddt
 import six
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.db.models import signals
 from django.http import HttpResponse
 from django.urls import reverse
@@ -29,7 +29,7 @@ from lms.djangoapps.support.serializers import ProgramEnrollmentSerializer
 from lms.djangoapps.verify_student.models import VerificationDeadline
 from lms.djangoapps.verify_student.services import IDVerificationService
 from lms.djangoapps.verify_student.tests.factories import SSOVerificationFactory
-from common.djangoapps.student.models import ENROLLED_TO_ENROLLED, CourseEnrollment, CourseEnrollmentAttribute, ManualEnrollmentAudit
+from common.djangoapps.student.models import ENROLLED_TO_ENROLLED, CourseEnrollment, CourseEnrollmentAttribute, ManualEnrollmentAudit  # lint-amnesty, pylint: disable=line-too-long
 from common.djangoapps.student.roles import GlobalStaff, SupportStaffRole
 from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
 from common.djangoapps.third_party_auth.tests.factories import SAMLProviderConfigFactory
@@ -48,7 +48,7 @@ class SupportViewTestCase(ModuleStoreTestCase):
 
     def setUp(self):
         """Create a user and log in. """
-        super(SupportViewTestCase, self).setUp()
+        super(SupportViewTestCase, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.user = UserFactory(username=self.USERNAME, email=self.EMAIL, password=self.PASSWORD)
         self.course = CourseFactory.create()
         success = self.client.login(username=self.USERNAME, password=self.PASSWORD)
@@ -62,7 +62,7 @@ class SupportViewManageUserTests(SupportViewTestCase):
 
     def setUp(self):
         """Make the user support staff"""
-        super(SupportViewManageUserTests, self).setUp()
+        super(SupportViewManageUserTests, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         SupportStaffRole().add_users(self.user)
 
     def test_get_contact_us(self):
@@ -189,7 +189,7 @@ class SupportViewIndexTests(SupportViewTestCase):
 
     def setUp(self):
         """Make the user support staff. """
-        super(SupportViewIndexTests, self).setUp()
+        super(SupportViewIndexTests, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         SupportStaffRole().add_users(self.user)
 
     def test_index(self):
@@ -207,7 +207,7 @@ class SupportViewCertificatesTests(SupportViewTestCase):
     """
     def setUp(self):
         """Make the user support staff. """
-        super(SupportViewCertificatesTests, self).setUp()
+        super(SupportViewCertificatesTests, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         SupportStaffRole().add_users(self.user)
 
     def test_certificates_no_filter(self):
@@ -234,7 +234,7 @@ class SupportViewEnrollmentsTests(SharedModuleStoreTestCase, SupportViewTestCase
     """Tests for the enrollment support view."""
 
     def setUp(self):
-        super(SupportViewEnrollmentsTests, self).setUp()
+        super(SupportViewEnrollmentsTests, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         SupportStaffRole().add_users(self.user)
 
         self.course = CourseFactory(display_name=u'teꜱᴛ')
@@ -477,7 +477,7 @@ class SupportViewLinkProgramEnrollmentsTests(SupportViewTestCase):
 
     def setUp(self):
         """Make the user support staff. """
-        super(SupportViewLinkProgramEnrollmentsTests, self).setUp()
+        super(SupportViewLinkProgramEnrollmentsTests, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.url = reverse("support:link_program_enrollments")
         SupportStaffRole().add_users(self.user)
         self.program_uuid = str(uuid4())
@@ -645,7 +645,7 @@ class ProgramEnrollmentsInspectorViewTests(SupportViewTestCase):
     )
 
     def setUp(self):
-        super(ProgramEnrollmentsInspectorViewTests, self).setUp()
+        super(ProgramEnrollmentsInspectorViewTests, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.url = reverse("support:program_enrollments_inspector")
         SupportStaffRole().add_users(self.user)
         self.program_uuid = str(uuid4())
@@ -725,7 +725,7 @@ class ProgramEnrollmentsInspectorViewTests(SupportViewTestCase):
                         is_active=True
                     )
 
-                program_course_enrollment = ProgramCourseEnrollmentFactory.create(
+                program_course_enrollment = ProgramCourseEnrollmentFactory.create(  # lint-amnesty, pylint: disable=unused-variable
                     program_enrollment=program_enrollment,
                     course_key=course_id,
                     course_enrollment=course_enrollment,
@@ -962,11 +962,11 @@ class ProgramEnrollmentsInspectorViewTests(SupportViewTestCase):
         assert expected_error == render_call_dict['error']
 
 
-class SsoRecordsTests(SupportViewTestCase):
+class SsoRecordsTests(SupportViewTestCase):  # lint-amnesty, pylint: disable=missing-class-docstring
 
     def setUp(self):
         """Make the user support staff"""
-        super(SsoRecordsTests, self).setUp()
+        super(SsoRecordsTests, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         SupportStaffRole().add_users(self.user)
         self.student = UserFactory.create(username='student', email='test@example.com', password='test')
         self.url = reverse("support:sso_records", kwargs={'username_or_email': self.student.username})
@@ -994,7 +994,7 @@ class SsoRecordsTests(SupportViewTestCase):
         self.assertEqual(len(data), 0)
 
     def test_response(self):
-        user_social_auth = UserSocialAuth.objects.create(
+        user_social_auth = UserSocialAuth.objects.create(  # lint-amnesty, pylint: disable=unused-variable
             user=self.student,
             uid=self.student.email,
             provider='tpa-saml'

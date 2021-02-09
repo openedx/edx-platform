@@ -1,4 +1,4 @@
-"""
+"""  # lint-amnesty, pylint: disable=django-not-configured
 Contains tests for OAuth2 model-retirement methods.
 """
 
@@ -17,7 +17,7 @@ from common.djangoapps.student.tests.factories import UserFactory
 from ..oauth2_retirement_utils import retire_dot_oauth2_models
 
 
-class RetireDOTModelsTest(TestCase):
+class RetireDOTModelsTest(TestCase):  # lint-amnesty, pylint: disable=missing-class-docstring
 
     def test_delete_dot_models(self):
         user = UserFactory.create()

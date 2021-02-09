@@ -61,7 +61,7 @@ class AuthAndScopesTestMixin(object):
     user_password = 'test'
 
     def setUp(self):
-        super(AuthAndScopesTestMixin, self).setUp()
+        super(AuthAndScopesTestMixin, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.student = UserFactory.create(password=self.user_password)
         self.other_student = UserFactory.create(password=self.user_password)
         self.global_staff = UserFactory.create(password=self.user_password, is_staff=True)

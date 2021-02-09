@@ -21,12 +21,13 @@ from datetime import datetime, timedelta
 from functools import total_ordering
 from importlib import import_module
 from urllib.parse import urlencode
+import warnings
 
 import six
 from config_models.models import ConfigurationModel
 from django.apps import apps
 from django.conf import settings
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.contrib.auth.signals import user_logged_in, user_logged_out
 from django.contrib.sites.models import Site
 from django.core.cache import cache
@@ -58,28 +59,34 @@ from user_util import user_util
 
 import openedx.core.djangoapps.django_comment_common.comment_client as cc
 from common.djangoapps.course_modes.models import CourseMode, get_cosmetic_verified_display_price
+from common.djangoapps.student.emails import send_proctoring_requirements_email
+from common.djangoapps.student.email_helpers import (
+    generate_proctoring_requirements_email_context,
+    should_send_proctoring_requirements_email
+)
+from common.djangoapps.student.signals import ENROLL_STATUS_CHANGE, ENROLLMENT_TRACK_UPDATED, UNENROLL_DONE
+from common.djangoapps.track import contexts, segment
+from common.djangoapps.util.model_utils import emit_field_changed_events, get_changed_fields_dict
+from common.djangoapps.util.query import use_read_replica_if_available
 from lms.djangoapps.certificates.models import GeneratedCertificate
 from lms.djangoapps.courseware.models import (
     CourseDynamicUpgradeDeadlineConfiguration,
     DynamicUpgradeDeadlineConfiguration,
-    OrgDynamicUpgradeDeadlineConfiguration
+    OrgDynamicUpgradeDeadlineConfiguration,
 )
+from lms.djangoapps.courseware.toggles import COURSEWARE_PROCTORING_IMPROVEMENTS
 from lms.djangoapps.verify_student.models import SoftwareSecurePhotoVerification
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.enrollments.api import (
     _default_course_mode,
     get_enrollment_attributes,
-    set_enrollment_attributes
+    set_enrollment_attributes,
 )
 from openedx.core.djangoapps.signals.signals import USER_ACCOUNT_ACTIVATED
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.xmodule_django.models import NoneToEmptyManager
 from openedx.core.djangolib.model_mixins import DeletableByUserValue
 from openedx.core.toggles import ENTRANCE_EXAMS
-from common.djangoapps.student.signals import ENROLL_STATUS_CHANGE, ENROLLMENT_TRACK_UPDATED, UNENROLL_DONE
-from common.djangoapps.track import contexts, segment
-from common.djangoapps.util.model_utils import emit_field_changed_events, get_changed_fields_dict
-from common.djangoapps.util.query import use_read_replica_if_available
 
 log = logging.getLogger(__name__)
 AUDIT_LOG = logging.getLogger("audit")
@@ -147,12 +154,12 @@ class AnonymousUserId(models.Model):
     course_id = LearningContextKeyField(db_index=True, max_length=255, blank=True)
 
 
-def anonymous_id_for_user(user, course_id, save=True):
+def anonymous_id_for_user(user, course_id, save='DEPRECATED'):
     """
     Inputs:
         user: User model
         course_id: string or None
-        save:  Whether the id should be saved in an AnonymousUserId object, defaults to True
+        save: Deprecated and ignored: ID is always saved in an AnonymousUserId object
 
     Return a unique id for a (user, course_id) pair, suitable for inserting
     into e.g. personalized survey links.
@@ -162,73 +169,78 @@ def anonymous_id_for_user(user, course_id, save=True):
     else: create new anonymous_id, save it in AnonymousUserId, and return anonymous id
     """
 
-    # .. toggle_name: ANONYMOUS_USER_ID_REVERT_TO_STABLE_HASH
-    # .. toggle_implementation: SettingToggle
-    # .. toggle_default: False
-    # .. toggle_description: Used to make sure we can quickly revert back to old behaviour in case our refractoring
-    #   of anonymous_id_for_user function does not work as intended.  Our concern is that our refractoring adds a
-    #   database lookup on every call and we are worried this will cause preformance issues.
-    # .. toggle_use_cases: temporary
-    # .. toggle_creation_date: 2021-01-26
-    # .. toggle_target_removal_date: 2021-01-29
-    # .. toggle_tickets: https://openedx.atlassian.net/browse/ARCHBOM-1645
-    if getattr(settings, "ANONYMOUS_USER_ID_REVERT_TO_STABLE_HASH", False):
-        return deprecated_anonymous_id_for_user(user, course_id, save)
-
     # This part is for ability to get xblock instance in xblock_noauth handlers, where user is unauthenticated.
     assert user
+
+    if save != 'DEPRECATED':
+        warnings.warn(
+            "anonymous_id_for_user no longer accepts save param and now "
+            "always saves the ID in the database",
+            DeprecationWarning
+        )
 
     if user.is_anonymous:
         return None
 
     # ARCHBOM-1674: Get a sense of what fraction of anonymous_user_id calls are
     # cached, stored in the DB, or retrieved from the DB. This will help inform
-    # us on decisions about whether we can move to always save IDs,
-    # pregenerate them, use random instead of deterministic IDs, etc.
+    # us on decisions about whether we can
+    # pregenerate IDs, use random instead of deterministic IDs, etc.
     monitoring.increment('temp_anon_uid_v2.requested')
 
     cached_id = getattr(user, '_anonymous_id', {}).get(course_id)
     if cached_id is not None:
         monitoring.increment('temp_anon_uid_v2.returned_from_cache')
         return cached_id
-    # check if an anonymous id already exists for this user and course_id combination
+    # Check if an anonymous id already exists for this user and
+    # course_id combination. Prefer the one with the highest record ID
+    # (see below.)
     anonymous_user_ids = AnonymousUserId.objects.filter(user=user).filter(course_id=course_id).order_by('-id')
     if anonymous_user_ids:
         # If there are multiple anonymous_user_ids per user, course_id pair
-        # select the row which was created most recently
+        # select the row which was created most recently.
+        # There might be more than one if the Django SECRET_KEY had
+        # previously been rotated at a time before this function was
+        # changed to always save the generated IDs to the DB. In that
+        # case, just pick the one with the highest record ID, which is
+        # probably the most recently created one.
         anonymous_user_id = anonymous_user_ids[0].anonymous_user_id
         monitoring.increment('temp_anon_uid_v2.fetched_existing')
     else:
+        # Uses SECRET_KEY as a cryptographic pepper. This
+        # deterministic ID generation means that concurrent identical
+        # calls to this function return the same value -- no need for
+        # locking. (There may be a low level of integrity errors on
+        # creation as a result of concurrent duplicate row inserts.)
+        #
+        # Consequences for this function of SECRET_KEY exposure: Data
+        # researchers and other third parties receiving these
+        # anonymous user IDs would be able to identify users across
+        # courses, and predict the anonymous user IDs of all users
+        # (but not necessarily identify their accounts.)
+        #
+        # Rotation process of SECRET_KEY with respect to this
+        # function: Rotate at will, since the hashes are stored and
+        # will not change.
         # include the secret key as a salt, and to make the ids unique across different LMS installs.
         hasher = hashlib.shake_128()
-        # This is one of several uses of SECRET_KEY.
-        #
-        # Impact of exposure: If a person has the SECRET_KEY and a user's `id`
-        # they can correlate the users anonymous user IDs across any courses they have participated in.
-        #
-        # Rotation process: Can be rotated at will. There is a small chance (on the order of 1%) that
-        # any given new user will be assigned multiple anonymous user IDs during the period in which
-        # servers are configured with a mix of old and new keys.
         hasher.update(settings.SECRET_KEY.encode('utf8'))
         hasher.update(text_type(user.id).encode('utf8'))
         if course_id:
             hasher.update(text_type(course_id).encode('utf-8'))
         anonymous_user_id = hasher.hexdigest(16)  # pylint: disable=too-many-function-args
 
-        if save is True:
-            try:
-                AnonymousUserId.objects.create(
-                    user=user,
-                    course_id=course_id,
-                    anonymous_user_id=anonymous_user_id,
-                )
-                monitoring.increment('temp_anon_uid_v2.stored')
-            except IntegrityError:
-                # Another thread has already created this entry, so
-                # continue
-                monitoring.increment('temp_anon_uid_v2.store_db_error')
-        else:
-            monitoring.increment('temp_anon_uid_v2.computed_unsaved')
+        try:
+            AnonymousUserId.objects.create(
+                user=user,
+                course_id=course_id,
+                anonymous_user_id=anonymous_user_id,
+            )
+            monitoring.increment('temp_anon_uid_v2.stored')
+        except IntegrityError:
+            # Another thread has already created this entry, so
+            # continue
+            monitoring.increment('temp_anon_uid_v2.store_db_error')
 
     # cache the anonymous_id in the user object
     if not hasattr(user, '_anonymous_id'):
@@ -236,66 +248,6 @@ def anonymous_id_for_user(user, course_id, save=True):
     user._anonymous_id[course_id] = anonymous_user_id  # pylint: disable=protected-access
 
     return anonymous_user_id
-
-
-def deprecated_anonymous_id_for_user(user, course_id, save=True):
-    """
-    Return a unique id for a (user, course) pair, suitable for inserting
-    into e.g. personalized survey links.
-    If user is an `AnonymousUser`, returns `None`
-    Keyword arguments:
-    save -- Whether the id should be saved in an AnonymousUserId object.
-    """
-    # This part is for ability to get xblock instance in xblock_noauth handlers, where user is unauthenticated.
-    assert user
-
-    if user.is_anonymous:
-        return None
-
-    # ARCHBOM-1674: Get a sense of what fraction of anonymous_user_id calls are
-    # cached, stored in the DB, or retrieved from the DB. This will help inform
-    # us on decisions about whether we can move to always save IDs,
-    # pregenerate them, use random instead of deterministic IDs, etc.
-    monitoring.increment('temp_anon_uid_v1.requested')
-
-    cached_id = getattr(user, '_anonymous_id', {}).get(course_id)
-    if cached_id is not None:
-        monitoring.increment('temp_anon_uid_v1.returned_from_cache')
-        return cached_id
-
-    # include the secret key as a salt, and to make the ids unique across different LMS installs.
-    hasher = hashlib.md5()
-    hasher.update(settings.SECRET_KEY.encode('utf8'))
-    hasher.update(text_type(user.id).encode('utf8'))
-    if course_id:
-        hasher.update(text_type(course_id).encode('utf-8'))
-    digest = hasher.hexdigest()
-
-    if not hasattr(user, '_anonymous_id'):
-        user._anonymous_id = {}  # pylint: disable=protected-access
-
-    user._anonymous_id[course_id] = digest  # pylint: disable=protected-access
-
-    if save is False:
-        monitoring.increment('temp_anon_uid_v1.computed_unsaved')
-        return digest
-
-    try:
-        _, created = AnonymousUserId.objects.get_or_create(
-            user=user,
-            course_id=course_id,
-            anonymous_user_id=digest,
-        )
-        if created:
-            monitoring.increment('temp_anon_uid_v1.stored')
-        else:
-            monitoring.increment('temp_anon_uid_v1.computed_existing')
-    except IntegrityError:
-        # Another thread has already created this entry, so
-        # continue
-        monitoring.increment('temp_anon_uid_v1.store_db_error')
-
-    return digest
 
 
 def user_by_anonymous_id(uid):
@@ -810,7 +762,7 @@ def user_profile_pre_save_callback(sender, **kwargs):
     # Cache "old" field values on the model instance so that they can be
     # retrieved in the post_save callback when we emit an event with new and
     # old field values.
-    user_profile._changed_fields = get_changed_fields_dict(user_profile, sender)
+    user_profile._changed_fields = get_changed_fields_dict(user_profile, sender)  # lint-amnesty, pylint: disable=protected-access
 
 
 @receiver(post_save, sender=UserProfile)
@@ -834,7 +786,7 @@ def user_pre_save_callback(sender, **kwargs):
     private field on the current model for use in the post_save callback.
     """
     user = kwargs['instance']
-    user._changed_fields = get_changed_fields_dict(user, sender)
+    user._changed_fields = get_changed_fields_dict(user, sender)  # lint-amnesty, pylint: disable=protected-access
 
 
 @receiver(post_save, sender=User)
@@ -848,7 +800,7 @@ def user_post_save_callback(sender, **kwargs):
     """
     user = kwargs['instance']
 
-    changed_fields = user._changed_fields
+    changed_fields = user._changed_fields  # lint-amnesty, pylint: disable=protected-access
 
     if 'is_active' in changed_fields or 'email' in changed_fields:
         if user.is_active:
@@ -904,17 +856,23 @@ class UserSignupSource(models.Model):
     site = models.CharField(max_length=255, db_index=True)
 
 
-def unique_id_for_user(user, save=True):
+def unique_id_for_user(user, save='DEPRECATED'):
     """
     Return a unique id for a user, suitable for inserting into
     e.g. personalized survey links.
 
     Keyword arguments:
-    save -- Whether the id should be saved in an AnonymousUserId object.
+    save -- Deprecated and ignored: ID is always saved in an AnonymousUserId object
     """
+    if save != 'DEPRECATED':
+        warnings.warn(
+            "unique_id_for_user no longer accepts save param and now "
+            "always saves the ID in the database",
+            DeprecationWarning
+        )
     # Setting course_id to '' makes it not affect the generated hash,
     # and thus produce the old per-student anonymous id
-    return anonymous_id_for_user(user, None, save=save)
+    return anonymous_id_for_user(user, None)
 
 
 # TODO: Should be renamed to generic UserGroup, and possibly
@@ -1151,7 +1109,7 @@ class CourseEnrollmentManager(models.Manager):
         """
         max_enrollments = settings.FEATURES.get("MAX_ENROLLMENT_INSTR_BUTTONS")
 
-        enrollment_number = super(CourseEnrollmentManager, self).get_queryset().filter(
+        enrollment_number = super(CourseEnrollmentManager, self).get_queryset().filter(  # lint-amnesty, pylint: disable=super-with-arguments
             course_id=course_id,
             is_active=1
         )[:max_enrollments + 1].count()
@@ -1180,7 +1138,7 @@ class CourseEnrollmentManager(models.Manager):
         admins = CourseInstructorRole(course_locator).users_with_role()
         coaches = CourseCcxCoachRole(course_locator).users_with_role()
 
-        return super(CourseEnrollmentManager, self).get_queryset().filter(
+        return super(CourseEnrollmentManager, self).get_queryset().filter(  # lint-amnesty, pylint: disable=super-with-arguments
             course_id=course_id,
             is_active=1,
         ).exclude(user__in=staff).exclude(user__in=admins).exclude(user__in=coaches).count()
@@ -1224,7 +1182,7 @@ class CourseEnrollmentManager(models.Manager):
         """
         # Unfortunately, Django's "group by"-style queries look super-awkward
         query = use_read_replica_if_available(
-            super(CourseEnrollmentManager, self).get_queryset().filter(course_id=course_id, is_active=True).values(
+            super(CourseEnrollmentManager, self).get_queryset().filter(course_id=course_id, is_active=True).values(  # lint-amnesty, pylint: disable=super-with-arguments
                 'mode').order_by().annotate(Count('mode')))
         total = 0
         enroll_dict = defaultdict(int)
@@ -1307,7 +1265,7 @@ class CourseEnrollment(models.Model):
         ordering = ('user', 'course')
 
     def __init__(self, *args, **kwargs):
-        super(CourseEnrollment, self).__init__(*args, **kwargs)
+        super(CourseEnrollment, self).__init__(*args, **kwargs)  # lint-amnesty, pylint: disable=super-with-arguments
 
         # Private variable for storing course_overview to minimize calls to the database.
         # When the property .course_overview is accessed for the first time, this variable will be set.
@@ -1319,7 +1277,7 @@ class CourseEnrollment(models.Model):
         ).format(self.user, self.course_id, self.created, self.is_active)
 
     def save(self, force_insert=False, force_update=False, using=None, update_fields=None):
-        super(CourseEnrollment, self).save(force_insert=force_insert, force_update=force_update, using=using,
+        super(CourseEnrollment, self).save(force_insert=force_insert, force_update=force_update, using=using,  # lint-amnesty, pylint: disable=super-with-arguments
                                            update_fields=update_fields)
 
         # Delete the cached status hash, forcing the value to be recalculated the next time it is needed.
@@ -1463,6 +1421,12 @@ class CourseEnrollment(models.Model):
                 self.send_signal(EnrollStatusChange.unenroll)
 
         if mode_changed:
+            if COURSEWARE_PROCTORING_IMPROVEMENTS.is_enabled(self.course_id):
+                # If mode changed to one that requires proctoring, send proctoring requirements email
+                if should_send_proctoring_requirements_email(self.user.username, self.course_id):
+                    email_context = generate_proctoring_requirements_email_context(self.user, self.course_id)
+                    send_proctoring_requirements_email(context=email_context)
+
             # Only emit mode change events when the user's enrollment
             # mode has changed from its previous setting
             self.emit_event(EVENT_NAME_ENROLLMENT_MODE_CHANGED)
@@ -1581,7 +1545,7 @@ class CourseEnrollment(models.Model):
             # announced before the start of content creation.
             if check_access:
                 log.warning(u"User %s failed to enroll in non-existent course %s", user.username, text_type(course_key))
-                raise NonExistentCourseError
+                raise NonExistentCourseError  # lint-amnesty, pylint: disable=raise-missing-from
 
         if check_access:
             if cls.is_enrollment_closed(user, course) and not can_upgrade:
@@ -2073,9 +2037,9 @@ class CourseEnrollment(models.Model):
 
             log.debug(
                 'Schedules: Pulling upgrade deadline for CourseEnrollment %d from Schedule %d.',
-                self.id, self.schedule.id
+                self.id, self.schedule.id  # lint-amnesty, pylint: disable=no-member
             )
-            return self.schedule.upgrade_deadline
+            return self.schedule.upgrade_deadline  # lint-amnesty, pylint: disable=no-member
         except ObjectDoesNotExist:
             # NOTE: Schedule has a one-to-one mapping with CourseEnrollment. If no schedule is associated
             # with this enrollment, Django will raise an exception rather than return None.
@@ -2178,7 +2142,7 @@ class CourseEnrollment(models.Model):
         RequestCache(cls.MODE_CACHE_NAMESPACE).clear()
 
         records = cls.objects.filter(user__in=users, course_id=course_key).select_related('user')
-        cache = cls._get_mode_active_request_cache()
+        cache = cls._get_mode_active_request_cache()  # lint-amnesty, pylint: disable=redefined-outer-name
         for record in records:
             enrollment_state = CourseEnrollmentState(record.mode, record.is_active)
             cls._update_enrollment(cache, record.user.id, course_key, enrollment_state)
@@ -2207,7 +2171,7 @@ class CourseEnrollment(models.Model):
         cls._update_enrollment(cls._get_mode_active_request_cache(), user.id, course_key, enrollment_state)
 
     @classmethod
-    def _update_enrollment(cls, cache, user_id, course_key, enrollment_state):
+    def _update_enrollment(cls, cache, user_id, course_key, enrollment_state):  # lint-amnesty, pylint: disable=redefined-outer-name
         """
         Updates the cached value for the user's enrollment in the
         given cache.
@@ -2428,7 +2392,7 @@ class CourseAccessRole(models.Model):
         Overriding eq b/c the django impl relies on the primary key which requires fetch. sometimes we
         just want to compare roles w/o doing another fetch.
         """
-        return type(self) == type(other) and self._key == other._key  # pylint: disable=protected-access
+        return type(self) == type(other) and self._key == other._key  # lint-amnesty, pylint: disable=protected-access, unidiomatic-typecheck
 
     def __hash__(self):
         return hash(self._key)
@@ -2440,7 +2404,7 @@ class CourseAccessRole(models.Model):
         return self._key < other._key
 
     def __str__(self):
-        return "[CourseAccessRole] user: {}   role: {}   org: {}   course: {}".format(self.user.username, self.role, self.org, self.course_id)
+        return "[CourseAccessRole] user: {}   role: {}   org: {}   course: {}".format(self.user.username, self.role, self.org, self.course_id)  # lint-amnesty, pylint: disable=line-too-long
 
 
 #### Helper methods for use from python manage.py shell and other classes.
@@ -2482,7 +2446,7 @@ def get_user(email):
     return user, u_prof
 
 
-def user_info(email):
+def user_info(email):  # lint-amnesty, pylint: disable=missing-function-docstring
     user, u_prof = get_user(email)
     print("User id", user.id)
     print("Username", user.username)
@@ -2541,7 +2505,7 @@ DEFAULT_GROUPS = {
 }
 
 
-def add_user_to_default_group(user, group):
+def add_user_to_default_group(user, group):  # lint-amnesty, pylint: disable=missing-function-docstring
     try:
         utg = UserTestGroup.objects.get(name=group)
     except UserTestGroup.DoesNotExist:
@@ -2553,7 +2517,7 @@ def add_user_to_default_group(user, group):
     utg.save()
 
 
-def create_comments_service_user(user):
+def create_comments_service_user(user):  # lint-amnesty, pylint: disable=missing-function-docstring
     if not settings.FEATURES['ENABLE_DISCUSSION_SERVICE']:
         # Don't try--it won't work, and it will fill the logs with lots of errors
         return
@@ -2574,7 +2538,7 @@ def create_comments_service_user(user):
 
 
 @receiver(user_logged_in)
-def log_successful_login(sender, request, user, **kwargs):
+def log_successful_login(sender, request, user, **kwargs):  # lint-amnesty, pylint: disable=unused-argument
     """Handler to log when logins have occurred successfully."""
     if settings.FEATURES['SQUELCH_PII_IN_LOGS']:
         AUDIT_LOG.info(u"Login success - user.id: {0}".format(user.id))
@@ -2583,7 +2547,7 @@ def log_successful_login(sender, request, user, **kwargs):
 
 
 @receiver(user_logged_out)
-def log_successful_logout(sender, request, user, **kwargs):
+def log_successful_logout(sender, request, user, **kwargs):  # lint-amnesty, pylint: disable=unused-argument
     """Handler to log when logouts have occurred successfully."""
     if hasattr(request, 'user'):
         if settings.FEATURES['SQUELCH_PII_IN_LOGS']:
@@ -2594,7 +2558,7 @@ def log_successful_logout(sender, request, user, **kwargs):
 
 @receiver(user_logged_in)
 @receiver(user_logged_out)
-def enforce_single_login(sender, request, user, signal, **kwargs):
+def enforce_single_login(sender, request, user, signal, **kwargs):  # pylint: disable=unused-argument
     """
     Sets the current session id in the user profile,
     to prevent concurrent logins.
@@ -2796,7 +2760,7 @@ class LanguageField(models.CharField):
             'help_text',
             _("The ISO 639-1 language code for this language."),
         )
-        super(LanguageField, self).__init__(
+        super(LanguageField, self).__init__(  # lint-amnesty, pylint: disable=super-with-arguments
             max_length=16,
             choices=settings.ALL_LANGUAGES,
             help_text=help_text,
@@ -2982,7 +2946,7 @@ class RegistrationCookieConfiguration(ConfigurationModel):
         )
 
 
-class BulkUnenrollConfiguration(ConfigurationModel):
+class BulkUnenrollConfiguration(ConfigurationModel):  # lint-amnesty, pylint: disable=empty-docstring
     """
 
     """
@@ -3066,13 +3030,13 @@ class AccountRecoveryManager(models.Manager):
             AccountRecovery: AccountRecovery object with is_active=true
         """
         filters['is_active'] = True
-        return super(AccountRecoveryManager, self).get_queryset().get(**filters)
+        return super(AccountRecoveryManager, self).get_queryset().get(**filters)  # lint-amnesty, pylint: disable=super-with-arguments
 
     def activate(self):
         """
         Set is_active flag to True.
         """
-        super(AccountRecoveryManager, self).get_queryset().update(is_active=True)
+        super(AccountRecoveryManager, self).get_queryset().update(is_active=True)  # lint-amnesty, pylint: disable=super-with-arguments
 
 
 class AccountRecovery(models.Model):

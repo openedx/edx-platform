@@ -19,6 +19,7 @@ from django.test.client import RequestFactory
 from django.test.utils import override_settings
 from django.urls import reverse
 from django.utils.translation import ugettext as _
+from edx_toggles.toggles.testutils import override_waffle_flag
 from freezegun import freeze_time
 from pytz import UTC
 
@@ -26,6 +27,7 @@ from common.djangoapps.course_modes.models import CourseMode
 from lms.djangoapps.branding.api import get_privacy_url
 from openedx.core.djangoapps.site_configuration.tests.mixins import SiteMixin
 from openedx.core.djangoapps.theming.tests.test_util import with_comprehensive_theme_context
+from openedx.core.djangoapps.user_authn.toggles import REDIRECT_TO_AUTHN_MICROFRONTEND
 from openedx.core.djangoapps.user_authn.views.login_form import login_and_registration_form
 from openedx.core.djangolib.js_utils import dump_js_escaped_json
 from openedx.core.djangolib.markup import HTML, Text
@@ -47,7 +49,7 @@ class LoginAndRegistrationTest(ThirdPartyAuthTestMixin, UrlResetMixin, ModuleSto
 
     @mock.patch.dict(settings.FEATURES, {'EMBARGO': True})
     def setUp(self):  # pylint: disable=arguments-differ
-        super(LoginAndRegistrationTest, self).setUp()
+        super(LoginAndRegistrationTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
 
         # Several third party auth providers are created for these tests:
         self.google_provider = self.configure_google_provider(enabled=True, visible=True)
@@ -64,8 +66,8 @@ class LoginAndRegistrationTest(ThirdPartyAuthTestMixin, UrlResetMixin, ModuleSto
         )
         self.hidden_disabled_provider = self.configure_azure_ad_provider()
 
-    FEATURES_WITH_LOGIN_MFE_ENABLED = settings.FEATURES.copy()
-    FEATURES_WITH_LOGIN_MFE_ENABLED['ENABLE_LOGISTRATION_MICROFRONTEND'] = True
+    FEATURES_WITH_AUTHN_MFE_ENABLED = settings.FEATURES.copy()
+    FEATURES_WITH_AUTHN_MFE_ENABLED['ENABLE_AUTHN_MICROFRONTEND'] = True
 
     @ddt.data(
         ("signin_user", "/login"),
@@ -73,16 +75,21 @@ class LoginAndRegistrationTest(ThirdPartyAuthTestMixin, UrlResetMixin, ModuleSto
         ("password_assistance", "/reset"),
     )
     @ddt.unpack
-    @override_settings(FEATURES=FEATURES_WITH_LOGIN_MFE_ENABLED)
+    @override_settings(FEATURES=FEATURES_WITH_AUTHN_MFE_ENABLED)
     def test_logistration_mfe_redirects(self, url_name, path):
         """
         Test that if Logistration MFE is enabled, then we redirect to
         the correct URL.
         """
-        response = self.client.get(reverse(url_name))
 
-        self.assertEqual(response.url, settings.LOGISTRATION_MICROFRONTEND_URL + path)
-        self.assertEqual(response.status_code, 302)
+        # Test with setting enabled and waffle flag in-active, does not redirect
+        response = self.client.get(reverse(url_name))
+        self.assertContains(response, 'Sign in or Register')
+
+        # Test with setting enabled and waffle flag active, redirects to microfrontend
+        with override_waffle_flag(REDIRECT_TO_AUTHN_MICROFRONTEND, active=True):
+            response = self.client.get(reverse(url_name))
+            self.assertRedirects(response, settings.AUTHN_MICROFRONTEND_URL + path, fetch_redirect_response=False)
 
     @ddt.data(
         (
@@ -97,16 +104,17 @@ class LoginAndRegistrationTest(ThirdPartyAuthTestMixin, UrlResetMixin, ModuleSto
         )
     )
     @ddt.unpack
-    @override_settings(FEATURES=FEATURES_WITH_LOGIN_MFE_ENABLED)
+    @override_settings(FEATURES=FEATURES_WITH_AUTHN_MFE_ENABLED)
+    @override_waffle_flag(REDIRECT_TO_AUTHN_MICROFRONTEND, active=True)
     def test_logistration_redirect_params(self, url_name, path, query_params):
         """
         Test that if request is redirected to logistration MFE,
         query params are passed to the redirect url.
         """
-        expected_url = settings.LOGISTRATION_MICROFRONTEND_URL + path + '?' + urlencode(query_params)
+        expected_url = settings.AUTHN_MICROFRONTEND_URL + path + '?' + urlencode(query_params)
         response = self.client.get(reverse(url_name), query_params)
 
-        self.assertRedirects(response, expected_url, target_status_code=302)
+        self.assertRedirects(response, expected_url, fetch_redirect_response=False)
 
     @ddt.data(
         ("signin_user", "login"),
@@ -662,7 +670,7 @@ class AccountCreationTestCaseWithSiteOverrides(SiteMixin, TestCase):
 
     def setUp(self):
         """Set up the tests"""
-        super(AccountCreationTestCaseWithSiteOverrides, self).setUp()
+        super(AccountCreationTestCaseWithSiteOverrides, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
 
         # Set the feature flag ALLOW_PUBLIC_ACCOUNT_CREATION to False
         self.site_configuration_values = {

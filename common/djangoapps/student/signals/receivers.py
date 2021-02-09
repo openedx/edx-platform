@@ -12,7 +12,7 @@ from django.dispatch import receiver
 
 from lms.djangoapps.courseware.toggles import courseware_mfe_first_section_celebration_is_active
 from common.djangoapps.student.helpers import EMAIL_EXISTS_MSG_FMT, USERNAME_EXISTS_MSG_FMT, AccountValidationError
-from common.djangoapps.student.models import CourseEnrollment, CourseEnrollmentCelebration, is_email_retired, is_username_retired
+from common.djangoapps.student.models import CourseEnrollment, CourseEnrollmentCelebration, is_email_retired, is_username_retired  # lint-amnesty, pylint: disable=line-too-long
 
 
 @receiver(pre_save, sender=get_user_model())

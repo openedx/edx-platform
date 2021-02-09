@@ -57,7 +57,7 @@ class TestSubsectionGradeFactory(ProblemSubmissionTestMixin, GradeTestBase):
         """
         with mock_get_score(1, 2):
             with patch(
-                'openedx.core.djangoapps.signals.signals.COURSE_ASSESSMENT_GRADE_CHANGED.send_robust'
+                'openedx.core.djangoapps.signals.signals.COURSE_ASSESSMENT_GRADE_CHANGED.send'
             ) as mock_update_grades_signal:
                 grade = self.subsection_grade_factory.update(self.sequence)
         self.assert_grade(grade, 1, 2)

@@ -117,7 +117,7 @@ class StubHttpRequestHandler(BaseHTTPRequestHandler, object):
                 for key, list_val in post_dict.items()
             }
 
-        except:
+        except:  # lint-amnesty, pylint: disable=bare-except
             return dict()
 
     @lazy

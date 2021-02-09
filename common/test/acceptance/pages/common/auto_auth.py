@@ -45,7 +45,7 @@ class AutoAuthPage(PageObject):
 
         Note that "global staff" is NOT the same as course staff.
         """
-        super(AutoAuthPage, self).__init__(browser)
+        super(AutoAuthPage, self).__init__(browser)  # lint-amnesty, pylint: disable=super-with-arguments
 
         # This will eventually hold the details about the user account
         self._user_info = None

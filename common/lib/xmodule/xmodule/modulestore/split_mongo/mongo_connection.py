@@ -130,11 +130,11 @@ class QueryTimer(object):
         tagger = Tagger(self._sample_rate)
         metric_name = "{}.{}".format(self._metric_base, metric_name)
 
-        start = time()
+        start = time()  # lint-amnesty, pylint: disable=unused-variable
         try:
             yield tagger
         finally:
-            end = time()
+            end = time()  # lint-amnesty, pylint: disable=unused-variable
             tags = tagger.tags
             tags.append('course:{}'.format(course_context))
 
@@ -244,7 +244,7 @@ class CourseStructureCache(object):
                     return pickle.loads(pickled_data)
                 else:
                     return pickle.loads(pickled_data, encoding='latin-1')
-            except Exception:
+            except Exception:  # lint-amnesty, pylint: disable=broad-except
                 # The cached data is corrupt in some way, get rid of it.
                 log.warning("CourseStructureCache: Bad data in cache for %s", course_context)
                 self.cache.delete(key)
@@ -273,7 +273,7 @@ class MongoConnection(object):
     """
     def __init__(
         self, db, collection, host, port=27017, tz_aware=True, user=None, password=None,
-        asset_collection=None, retry_wait_time=0.1, **kwargs
+        asset_collection=None, retry_wait_time=0.1, **kwargs  # lint-amnesty, pylint: disable=unused-argument
     ):
         """
         Create & open the connection, authenticate, and provide pointers to the collections
@@ -301,7 +301,7 @@ class MongoConnection(object):
             self.database.client.admin.command('ismaster')
             return True
         except pymongo.errors.ConnectionFailure:
-            raise HeartbeatFailure("Can't connect to {}".format(self.database.name), 'mongo')
+            raise HeartbeatFailure("Can't connect to {}".format(self.database.name), 'mongo')  # lint-amnesty, pylint: disable=raise-missing-from
 
     def get_structure(self, key, course_context=None):
         """

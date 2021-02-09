@@ -141,11 +141,11 @@ class TestXMLModuleStore(TestCase):
         self.assertIn(shared_item_loc, other_parent.children)
 
 
-class TestModuleStoreIgnore(TestXMLModuleStore):
+class TestModuleStoreIgnore(TestXMLModuleStore):  # lint-amnesty, pylint: disable=missing-class-docstring, test-inherits-tests
     course_dir = DATA_DIR / "course_ignore"
 
     def setUp(self):
-        super(TestModuleStoreIgnore, self).setUp()
+        super(TestModuleStoreIgnore, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.addCleanup(remove_temp_files_from_list, list(TILDA_FILES_DICT.keys()), self.course_dir / "static")
         add_temp_files_from_dict(TILDA_FILES_DICT, self.course_dir / "static")
 

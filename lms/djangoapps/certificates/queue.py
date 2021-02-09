@@ -8,15 +8,17 @@ from uuid import uuid4
 
 import lxml.html
 import six
+from capa.xqueue_interface import XQueueInterface, make_hashkey, make_xheader
 from django.conf import settings
 from django.test.client import RequestFactory
 from django.urls import reverse
 from django.utils.encoding import python_2_unicode_compatible
 from lxml.etree import ParserError, XMLSyntaxError
 from requests.auth import HTTPBasicAuth
+from xmodule.modulestore.django import modulestore
 
-from capa.xqueue_interface import XQueueInterface, make_hashkey, make_xheader
 from common.djangoapps.course_modes.models import CourseMode
+from common.djangoapps.student.models import CourseEnrollment, UserProfile
 from lms.djangoapps.certificates.models import CertificateStatuses as status
 from lms.djangoapps.certificates.models import (
     CertificateWhitelist,
@@ -26,8 +28,6 @@ from lms.djangoapps.certificates.models import (
 )
 from lms.djangoapps.grades.api import CourseGradeFactory
 from lms.djangoapps.verify_student.services import IDVerificationService
-from common.djangoapps.student.models import CourseEnrollment, UserProfile
-from xmodule.modulestore.django import modulestore
 
 LOGGER = logging.getLogger(__name__)
 
@@ -39,7 +39,7 @@ class XQueueAddToQueueError(Exception):
     def __init__(self, error_code, error_msg):
         self.error_code = error_code
         self.error_msg = error_msg
-        super(XQueueAddToQueueError, self).__init__(six.text_type(self))
+        super().__init__(six.text_type(self))
 
     def __str__(self):
         return (
@@ -332,7 +332,7 @@ class XQueueCertInterface(object):
             mode_is_verified,
             generate_pdf
         )
-        cert, created = GeneratedCertificate.objects.get_or_create(user=student, course_id=course_id)
+        cert, __ = GeneratedCertificate.objects.get_or_create(user=student, course_id=course_id)
 
         cert.mode = cert_mode
         cert.user = student
