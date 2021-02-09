@@ -8,7 +8,7 @@ from django import forms
 from django.utils.translation import ugettext_lazy as _
 
 from common.djangoapps.student.models import UserProfile
-from openedx.adg.lms.applications.constants import MAXIMUM_AGE_LIMIT, MINIMUM_AGE_LIMIT, FILE_MAX_SIZE
+from openedx.adg.lms.applications.constants import FILE_MAX_SIZE, MAXIMUM_AGE_LIMIT, MINIMUM_AGE_LIMIT
 from openedx.adg.lms.applications.models import UserApplication
 from openedx.adg.lms.registration_extension.models import ExtendedUserProfile
 

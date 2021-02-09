@@ -7,10 +7,10 @@ import pytest
 from django.core.exceptions import ValidationError
 
 from openedx.adg.lms.applications.constants import (
+    FILE_MAX_SIZE,
     LOGO_IMAGE_MAX_SIZE,
     MAXIMUM_YEAR_OPTION,
-    MINIMUM_YEAR_OPTION,
-    FILE_MAX_SIZE
+    MINIMUM_YEAR_OPTION
 )
 from openedx.adg.lms.applications.helpers import (
     check_validations_for_current_record,
