@@ -2805,7 +2805,7 @@ class TestInstructorAPILevelsDataDump(SharedModuleStoreTestCase, LoginEnrollment
         # other users of the lms.
         with freeze_time(base_time + datetime.timedelta(minutes=1)):
             response = self.client.post(url, {})
-            assert response.status_code == 403
+            assert response.status_code == 429
 
         with freeze_time(base_time + datetime.timedelta(minutes=5)):
             response = self.client.post(url, {})

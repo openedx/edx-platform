@@ -9,11 +9,13 @@
 import mimetypes
 
 from django.conf import settings
-from django.http import Http404, HttpResponseNotFound, HttpResponseServerError
+from django.http import Http404, HttpResponse, HttpResponseNotFound, HttpResponseServerError
 from django.shortcuts import redirect
 from django.template import TemplateDoesNotExist
 from django.utils.safestring import mark_safe
 from django.views.decorators.csrf import ensure_csrf_cookie
+from django.views.defaults import permission_denied
+from ratelimit.exceptions import Ratelimited
 from mako.exceptions import TopLevelLookupException
 
 from common.djangoapps.edxmako.shortcuts import render_to_response, render_to_string
@@ -93,9 +95,29 @@ def render_press_release(request, slug):
 
 
 @fix_crum_request
+def render_403(request, exception=None):
+    """
+    Render the permission_denied template unless it's a ratelimit exception in which case use the rate limit template.
+    """
+    if isinstance(exception, Ratelimited):
+        return render_429(request, exception)
+
+    return permission_denied(request, exception)
+
+
+@fix_crum_request
 def render_404(request, exception):  # lint-amnesty, pylint: disable=unused-argument
     request.view_name = '404'
     return HttpResponseNotFound(render_to_string('static_templates/404.html', {}, request=request))
+
+
+@fix_crum_request
+def render_429(request, exception=None):  # lint-amnesty, pylint: disable=unused-argument
+    """
+    Render the rate limit template as an HttpResponse.
+    """
+    request.view_name = '429'
+    return HttpResponse(render_to_string('static_templates/429.html', {}, request=request), status=429)
 
 
 @fix_crum_request

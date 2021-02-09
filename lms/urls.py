@@ -7,6 +7,7 @@ from django.conf import settings
 from django.conf.urls import include, url
 from django.conf.urls.static import static
 from django.contrib.admin import autodiscover as django_autodiscover
+from django.urls import path
 from django.utils.translation import ugettext_lazy as _
 from django.views.generic.base import RedirectView
 from edx_api_doc_tools import make_docs_urls
@@ -69,7 +70,9 @@ if settings.DEBUG or settings.FEATURES.get('ENABLE_DJANGO_ADMIN_SITE'):
 # Custom error pages
 # These are used by Django to render these error codes. Do not remove.
 # pylint: disable=invalid-name
+handler403 = static_template_view_views.render_403
 handler404 = static_template_view_views.render_404
+handler429 = static_template_view_views.render_429
 handler500 = static_template_view_views.render_500
 
 notification_prefs_urls = [
@@ -198,6 +201,10 @@ urlpatterns = [
     ),
     url(r'^api/discounts/', include(('openedx.features.discounts.urls', 'openedx.features.discounts'),
                                     namespace='api_discounts')),
+    path('403', handler403),
+    path('404', handler404),
+    path('429', handler429),
+    path('500', handler500),
 ]
 
 if settings.FEATURES.get('ENABLE_MOBILE_REST_API'):
