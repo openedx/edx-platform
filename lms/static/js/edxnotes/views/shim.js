@@ -165,7 +165,7 @@
             .addField({
                 load: function(field, annotation) {
                     if (annotation.text) {
-                        $(field).html(HtmlUtils.HTML(Utils.nl2br(annotation.text)).toString());
+                        $(field).html(HtmlUtils.HTML(Utils.nl2br(Annotator.Util.escape(annotation.text))).toString());
                     } else {
                         // eslint-disable-next-line max-len
                         $(field).html(HtmlUtils.joinHtml(HtmlUtils.HTML('<i>'), _t('No Comment'), HtmlUtils.HTML('</i>')).toString());
