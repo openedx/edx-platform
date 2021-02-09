@@ -758,4 +758,10 @@ class RegistrationValidationView(APIView):
                 validation_decisions.update({
                     form_field_key: handler(self, request)
                 })
+
+        field_name = request.data.get('fieldName')  # adding field name for authn MFE use case
+        if field_name:
+            validation_decisions.update({
+                'fieldName': field_name
+            })
         return Response({"validation_decisions": validation_decisions})
