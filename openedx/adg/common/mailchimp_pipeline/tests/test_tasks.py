@@ -5,6 +5,7 @@ import pytest
 
 from common.djangoapps.student.tests.factories import UserFactory
 from openedx.adg.common.mailchimp_pipeline import tasks as mailchimp_tasks
+from openedx.adg.constants import MONTH_DAY_YEAR_FORMAT
 
 
 @pytest.mark.django_db
@@ -22,7 +23,7 @@ def test_task_send_user_info_to_mailchimp(mocker):
         'email_address': user_email,
         'status_if_new': 'subscribed',
         'merge_fields': {
-            'DATEREGIS': str(user.date_joined.strftime('%m/%d/%Y')),
+            'DATEREGIS': str(user.date_joined.strftime(MONTH_DAY_YEAR_FORMAT)),
             'USERNAME': user.username
         },
     }

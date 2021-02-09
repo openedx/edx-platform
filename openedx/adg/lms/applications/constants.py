@@ -1,6 +1,7 @@
 """
 Constants related to applications.
 """
+from collections import namedtuple
 from datetime import datetime
 
 from django.utils.translation import ugettext_lazy as _
@@ -14,6 +15,8 @@ MINIMUM_AGE_LIMIT = 21
 RESUME_FILE_MAX_SIZE = 4 * 1024 * 1024
 
 # Fieldset titles for application review admin page
+
+APPLICANT_INFO = _('APPLICANT INFORMATION')
 
 RESUME_AND_COVER_LETTER = _('RESUME & COVER LETTER')
 RESUME_ONLY = _('RESUME')
@@ -38,3 +41,30 @@ COVER_LETTER_FILE_DISPLAY = 'cover_letter_file_display'
 RESUME_DISPLAY = 'resume_display'
 COVER_LETTER_TEXT = 'cover_letter'
 PREREQUISITES = 'prerequisites'
+
+# Application listing page titles
+
+ALL_APPLICATIONS_TITLE = _('APPLICATIONS')
+OPEN_APPLICATIONS_TITLE = _('OPEN APPLICATIONS')
+WAITLISTED_APPLICATIONS_TITLE = _('WAITLISTED APPLICATIONS')
+ACCEPTED_APPLICATIONS_TITLE = _('ACCEPTED APPLICATIONS')
+
+STATUS_PARAM = 'status__exact'
+
+EMAIL_ADDRESS_HTML_FORMAT = '<a href="mailto:{email_address}">{email_address}</a>'
+LINKED_IN_PROFILE_HTML_FORMAT = '<a href={url}>{url}</a>'
+
+GENDER_MAP = {
+    'm': _('Man'),
+    'f': _('Woman'),
+    'o': _('Prefer not to answer')
+}
+
+DAY_MONTH_YEAR_FORMAT = '%d %B %Y'
+MONTH_NAME_DAY_YEAR_FORMAT = '%B %d, %Y'
+
+CourseScore = namedtuple('CourseScore', 'course_name course_percentage')
+
+APPLICATION_REVIEW_ERROR_MSG = _('Please make a decision before submitting.')
+
+HTML_FOR_EMBEDDED_FILE_VIEW = '<iframe src="{path_to_file}" style="width:889px; height:393px;"></iframe>'
