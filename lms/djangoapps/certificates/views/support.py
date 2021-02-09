@@ -201,7 +201,7 @@ def regenerate_certificate_for_user(request):
 
     # Attempt to regenerate certificates
     try:
-        certificate = regenerate_user_certificates(params["user"], params["course_key"], course=course)
+        regenerate_user_certificates(params["user"], params["course_key"], course=course)
     except:  # pylint: disable=bare-except
         # We are pessimistic about the kinds of errors that might get thrown by the
         # certificates API.  This may be overkill, but we're logging everything so we can
@@ -212,9 +212,6 @@ def regenerate_certificate_for_user(request):
             params["course_key"]
         )
         return HttpResponseServerError(_("An unexpected error occurred while regenerating certificates."))
-
-    # Deactivate certificate invalidation by setting active to False.
-    _deactivate_invalidation(certificate)
 
     log.info(
         u"Started regenerating certificates for user %s in course %s from the support page.",
@@ -275,25 +272,3 @@ def generate_certificate_for_user(request):
             specific_student_id=params["user"].id
         )
         return HttpResponse(200)
-
-
-def _deactivate_invalidation(certificate):
-    """
-    Deactivate certificate invalidation by setting active to False.
-
-    Arguments:
-        certificate : The student certificate object
-
-    Return:
-        None
-    """
-    try:
-        # Fetch CertificateInvalidation object
-        certificate_invalidation = CertificateInvalidation.objects.get(
-            generated_certificate=certificate,
-            active=True
-        )
-        # Deactivate certificate invalidation if it was fetched successfully.
-        certificate_invalidation.deactivate()
-    except CertificateInvalidation.DoesNotExist:
-        pass

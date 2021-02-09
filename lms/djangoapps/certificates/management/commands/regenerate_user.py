@@ -101,7 +101,7 @@ class Command(BaseCommand):
                     LOGGER.info(u"Cleared badge for student %s.", student.id)
 
             # Add the certificate request to the queue
-            ret = regenerate_user_certificates(
+            regenerate_user_certificates(
                 student, course_id, course=course,
                 forced_grade=options['grade_value'],
                 template_file=options['template_file'],
@@ -111,12 +111,10 @@ class Command(BaseCommand):
             LOGGER.info(
                 (
                     u"Added a certificate regeneration task to the XQueue "
-                    u"for student %s in course '%s'. "
-                    u"The new certificate status is '%s'."
+                    u"for student %s in course '%s'."
                 ),
                 student.id,
-                text_type(course_id),
-                ret
+                text_type(course_id)
             )
 
         else:

@@ -372,8 +372,7 @@ class CertificateRegenerateTests(CertificateSupportTestCase):
         self.assertEqual(num_certs, 1)
 
     def test_regenerate_cert_with_invalidated_record(self):
-        """ If the certificate is marked as invalid, regenerate the certificate
-        and verify the invalidate entry is deactivated. """
+        """ If the certificate is marked as invalid, regenerate the certificate. """
 
         # mark certificate as invalid
         self._invalidate_certificate(self.cert)
@@ -389,7 +388,7 @@ class CertificateRegenerateTests(CertificateSupportTestCase):
             username=self.STUDENT_USERNAME
         )
         self.assertEqual(response.status_code, 200)
-        self.assertInvalidatedCertDoesNotExist()
+        self.assertInvalidatedCertExists()
 
         # Check that the user's certificate was updated
         # Since the student hasn't actually passed the course,
