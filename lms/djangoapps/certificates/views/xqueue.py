@@ -6,14 +6,16 @@ Views used by XQueue certificate generation.
 import json
 import logging
 
-from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
+from django.contrib.auth import get_user_model
 from django.db import transaction
 from django.http import Http404, HttpResponse, HttpResponseForbidden
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
 from opaque_keys.edx.keys import CourseKey
+from xmodule.modulestore.django import modulestore
 
-from capa.xqueue_interface import XQUEUE_METRIC_NAME  # lint-amnesty, pylint: disable=unused-import
+from common.djangoapps.util.json_request import JsonResponse, JsonResponseBadRequest
+from common.djangoapps.util.request_rate_limiter import BadRequestRateLimiter
 from lms.djangoapps.certificates.api import generate_user_certificates
 from lms.djangoapps.certificates.models import (
     CertificateStatuses,
@@ -21,11 +23,9 @@ from lms.djangoapps.certificates.models import (
     GeneratedCertificate,
     certificate_status_for_student
 )
-from common.djangoapps.util.json_request import JsonResponse, JsonResponseBadRequest
-from common.djangoapps.util.request_rate_limiter import BadRequestRateLimiter
-from xmodule.modulestore.django import modulestore
 
 log = logging.getLogger(__name__)
+User = get_user_model()
 
 
 # Grades can potentially be written - if so, let grading manage the transaction.
@@ -51,8 +51,8 @@ def request_certificate(request):
                 log_msg = u'Grading and certification requested for user %s in course %s via /request_certificate call'
                 log.info(log_msg, username, course_key)
                 status = generate_user_certificates(student, course_key, course=course)
-            return HttpResponse(json.dumps({'add_status': status}), content_type='application/json')  # lint-amnesty, pylint: disable=http-response-with-content-type-json, http-response-with-json-dumps
-        return HttpResponse(json.dumps({'add_status': 'ERRORANONYMOUSUSER'}), content_type='application/json')  # lint-amnesty, pylint: disable=http-response-with-content-type-json, http-response-with-json-dumps
+            return HttpResponse(json.dumps({'add_status': status}), content_type='application/json')  # pylint: disable=http-response-with-content-type-json, http-response-with-json-dumps
+        return HttpResponse(json.dumps({'add_status': 'ERRORANONYMOUSUSER'}), content_type='application/json')  # pylint: disable=http-response-with-content-type-json, http-response-with-json-dumps
 
 
 @csrf_exempt
@@ -89,7 +89,7 @@ def update_certificate(request):
                 xqueue_header
             )
 
-            return HttpResponse(json.dumps({  # lint-amnesty, pylint: disable=http-response-with-content-type-json, http-response-with-json-dumps
+            return HttpResponse(json.dumps({  # pylint: disable=http-response-with-content-type-json, http-response-with-json-dumps
                 'return_code': 1,
                 'content': 'unable to lookup key'
             }), content_type='application/json')
@@ -121,7 +121,7 @@ def update_certificate(request):
                 log.critical(
                     u'Invalid state for cert update: %s', cert.status
                 )
-                return HttpResponse(  # lint-amnesty, pylint: disable=http-response-with-content-type-json, http-response-with-json-dumps
+                return HttpResponse(  # pylint: disable=http-response-with-content-type-json, http-response-with-json-dumps
                     json.dumps({
                         'return_code': 1,
                         'content': 'invalid cert status'
@@ -130,7 +130,7 @@ def update_certificate(request):
                 )
 
         cert.save()
-        return HttpResponse(json.dumps({'return_code': 0}),  # lint-amnesty, pylint: disable=http-response-with-content-type-json, http-response-with-json-dumps
+        return HttpResponse(json.dumps({'return_code': 0}),  # pylint: disable=http-response-with-content-type-json, http-response-with-json-dumps
                             content_type='application/json')
 
 
@@ -193,14 +193,14 @@ def update_example_certificate(request):
         uuid = xqueue_body.get('username')
         access_key = xqueue_header.get('lms_key')
         cert = ExampleCertificate.objects.get(uuid=uuid, access_key=access_key)
-    except ExampleCertificate.DoesNotExist:
+    except ExampleCertificate.DoesNotExist as e:
         # If we are unable to retrieve the record, it means the uuid or access key
         # were not valid.  This most likely means that the request is NOT coming
         # from the XQueue.  Return a 404 and increase the bad request counter
         # to protect against a DDOS attack.
         log.info(u"Could not find example certificate with uuid '%s' and access key '%s'", uuid, access_key)
         rate_limiter.tick_request_counter(request)
-        raise Http404  # lint-amnesty, pylint: disable=raise-missing-from
+        raise Http404 from e
 
     if 'error' in xqueue_body:
         # If an error occurs, save the error message so we can fix the issue.
