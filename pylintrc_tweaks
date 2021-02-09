@@ -14,6 +14,7 @@ disable+ =
     useless-object-inheritance,
     useless-suppression,
     cyclic-import,
+    logging-format-interpolation,
 
 [BASIC]
 attr-rgx = [a-z_][a-z0-9_]{2,40}$
