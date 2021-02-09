@@ -530,6 +530,16 @@ FEATURES = {
     'EXPOSE_CACHE_PROGRAMS_ENDPOINT': False,
 
     # Courseware search feature
+    # .. toggle_name: FEATURES['ENABLE_COURSEWARE_SEARCH']
+    # .. toggle_implementation: DjangoSetting
+    # .. toggle_default: False
+    # .. toggle_description: When enabled, this adds a Search the course widget on the course outline and courseware
+    #   pages for searching courseware data.
+    # .. toggle_use_cases: open_edx
+    # .. toggle_creation_date: 2015-01-29
+    # .. toggle_warnings: In order to get this working, your courses data should be indexed in Elasticsearch. You will
+    #   see the search widget on the courseware page only if the DISABLE_COURSE_OUTLINE_PAGE_FLAG is set.
+    # .. toggle_tickets: https://github.com/edx/edx-platform/pull/6506
     'ENABLE_COURSEWARE_SEARCH': False,
     'ENABLE_COURSEWARE_SEARCH_FOR_COURSE_STAFF': False,
 
