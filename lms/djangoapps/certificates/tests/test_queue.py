@@ -16,12 +16,12 @@ import six
 # and verify that items are being correctly added to the queue
 # in our `XQueueCertInterface` implementation.
 from capa.xqueue_interface import XQueueInterface
-from django.conf import settings
-from django.test import TestCase
-from django.test.utils import override_settings
-from mock import Mock, patch
-from opaque_keys.edx.locator import CourseLocator
-from testfixtures import LogCapture
+from django.conf import settings  # lint-amnesty, pylint: disable=wrong-import-order
+from django.test import TestCase  # lint-amnesty, pylint: disable=wrong-import-order
+from django.test.utils import override_settings  # lint-amnesty, pylint: disable=wrong-import-order
+from mock import Mock, patch  # lint-amnesty, pylint: disable=wrong-import-order
+from opaque_keys.edx.locator import CourseLocator  # lint-amnesty, pylint: disable=wrong-import-order
+from testfixtures import LogCapture  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 

@@ -19,15 +19,15 @@ from datetime import datetime, timedelta
 import ddt
 import unicodecsv
 from capa.tests.response_xml_factory import MultipleChoiceResponseXMLFactory
-from django.conf import settings
-from django.test.utils import override_settings
-from edx_django_utils.cache import RequestCache
-from freezegun import freeze_time
-from mock import ANY, MagicMock, Mock, patch
-from pytz import UTC
-from six import text_type
-from six.moves import range, zip
-from six.moves.urllib.parse import quote
+from django.conf import settings  # lint-amnesty, pylint: disable=wrong-import-order
+from django.test.utils import override_settings  # lint-amnesty, pylint: disable=wrong-import-order
+from edx_django_utils.cache import RequestCache  # lint-amnesty, pylint: disable=wrong-import-order
+from freezegun import freeze_time  # lint-amnesty, pylint: disable=wrong-import-order
+from mock import ANY, MagicMock, Mock, patch  # lint-amnesty, pylint: disable=wrong-import-order
+from pytz import UTC  # lint-amnesty, pylint: disable=wrong-import-order
+from six import text_type  # lint-amnesty, pylint: disable=wrong-import-order
+from six.moves import range, zip  # lint-amnesty, pylint: disable=wrong-import-order
+from six.moves.urllib.parse import quote  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory, check_mongo_calls
