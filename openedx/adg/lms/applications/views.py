@@ -299,8 +299,7 @@ class EducationAndExperienceView(RedirectToLoginOrRelevantPageMixin, TemplateVie
         Returns:
             Boolean, True or False.
         """
-        user = self.request.user
-        application_hub = user.application_hub if hasattr(user, 'application_hub') else None
+        application_hub = getattr(self.request.user, 'application_hub', None)
 
         return (
             application_hub and
