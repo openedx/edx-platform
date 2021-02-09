@@ -6,6 +6,7 @@ Course Home pages.
 
 
 from django.urls import reverse
+from django.utils.translation import ugettext as _
 from rest_framework import serializers
 
 
@@ -18,7 +19,8 @@ class CourseTabSerializer(serializers.Serializer):
     url = serializers.SerializerMethodField()
 
     def get_title(self, tab):
-        return tab.title or tab.get('name', '')
+        title = tab.title or tab.get('name', '')
+        return _(title)  # pylint: disable=translation-of-non-string
 
     def get_url(self, tab):
         request = self.context.get('request')
