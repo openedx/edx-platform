@@ -375,7 +375,9 @@ def test_get_redirects_after_login_for_education_experience_view(logged_in_clien
 
 @pytest.mark.django_db
 def test_education_experience_view_without_application_hub(user, logged_in_client):
-    """Test education experience view if application hub is not created for user"""
+    """
+    Test education experience view if application hub is not created for user
+    """
     user.application_hub.delete()
     response = logged_in_client.get(reverse('application_education_experience'))
     assert reverse('application_hub') in response.url
