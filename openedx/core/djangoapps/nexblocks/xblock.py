@@ -23,7 +23,7 @@ def _(text):
 
 @XBlock.needs("user")
 @XBlock.needs("i18n")
-class NexWrapperBlock(
+class NexBlockWrapperBlock(
     XBlock, StudioEditableXBlockMixin
 ):  # lint-amnesty, pylint: disable=abstract-method
     """
