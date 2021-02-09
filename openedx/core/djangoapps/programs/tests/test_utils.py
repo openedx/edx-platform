@@ -8,6 +8,7 @@ from collections import namedtuple
 from copy import deepcopy
 
 import ddt
+from edx_toggles.toggles.testutils import override_waffle_switch
 import httpretty
 import mock
 import six
@@ -18,7 +19,6 @@ from django.test.utils import override_settings
 from django.urls import reverse
 from pytz import utc
 from testfixtures import LogCapture
-from waffle.testutils import override_switch
 
 from common.djangoapps.course_modes.models import CourseMode
 from common.djangoapps.course_modes.tests.factories import CourseModeFactory
@@ -1473,7 +1473,7 @@ class TestProgramMarketingDataExtender(ModuleStoreTestCase):
         assert data['discount_data'] == mock_discount_data
 
     @httpretty.activate
-    @override_switch(ALWAYS_CALCULATE_PROGRAM_PRICE_AS_ANONYMOUS_USER.name, active=True)
+    @override_waffle_switch(ALWAYS_CALCULATE_PROGRAM_PRICE_AS_ANONYMOUS_USER, True)
     def test_fetching_program_price_when_forced_as_anonymous_user(self):
         """
         When all users are forced as anonymous, all requests to calculate the program
