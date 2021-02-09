@@ -262,7 +262,6 @@ class ContactInformationView(RedirectToLoginOrRelevantPageMixin, View):
                     'birth_month': extended_profile.birth_date.month,
                     'birth_year': extended_profile.birth_date.year,
                 })
-
         return context
 
 
@@ -290,6 +289,7 @@ class EducationAndExperienceView(RedirectToLoginOrRelevantPageMixin, TemplateVie
             'user_application_id': user_application.id,
             'is_work_experience_not_applicable': user_application.is_work_experience_not_applicable
         })
+
         return context
 
     def is_precondition_satisfied(self):
