@@ -7,6 +7,7 @@ from django.conf import settings
 
 from edx_toggles.toggles import WaffleFlag
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
+from openedx.core.djangoapps.theming.helpers import get_current_request
 
 # .. toggle_name: ENABLE_REQUIRE_THIRD_PARTY_AUTH
 # .. toggle_implementation: DjangoSetting
@@ -41,6 +42,10 @@ def should_redirect_to_authn_microfrontend():
     """
     Checks if login/registration should be done via MFE.
     """
+    request = get_current_request()
+    if request and request.GET.get('skip_authn_mfe'):
+        return False
+
     return configuration_helpers.get_value(
         'ENABLE_AUTHN_MICROFRONTEND', settings.FEATURES.get('ENABLE_AUTHN_MICROFRONTEND')
     ) and REDIRECT_TO_AUTHN_MICROFRONTEND.is_enabled()
