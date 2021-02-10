@@ -333,6 +333,9 @@ def test_update_is_work_experience_not_applicable_api_with_true(
     work_experience_not_applicable_api_data,
     login_client
 ):
+    """
+    Test the is_work_experience_not_applicable_api with true value
+    """
     is_work_experience_not_applicable_api_data = work_experience_not_applicable_api_data('true')
     url = reverse('applications:work_experience-update_is_not_applicable')
     response = login_client.patch(
@@ -348,6 +351,9 @@ def test_update_is_work_experience_not_applicable_api_with_false(
     work_experience_not_applicable_api_data,
     login_client
 ):
+    """
+    Test the is_work_experience_not_applicable_api with false value
+    """
     is_work_experience_not_applicable_api_data = work_experience_not_applicable_api_data('false')
     url = reverse('applications:work_experience-update_is_not_applicable')
     response = login_client.patch(

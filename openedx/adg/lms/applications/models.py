@@ -86,7 +86,8 @@ class ApplicationHub(TimeStampedModel):
         """
         Check if user has started the application or not
 
-        :return: True or False
+        Returns:
+            True or False.
         """
         return hasattr(self.user, 'application')
 
