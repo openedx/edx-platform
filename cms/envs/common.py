@@ -974,7 +974,19 @@ STATIC_URL_BASE = '/static/'
 
 X_FRAME_OPTIONS = 'DENY'
 
+# .. setting_name: GIT_REPO_EXPORT_DIR
+# .. setting_default: '/edx/var/edxapp/export_course_repos'
+# .. setting_description: When courses are exported to git, either with the export_git management command or the git
+#   export view from the studio (when FEATURES['ENABLE_EXPORT_GIT'] is True), they are stored in this directory, which
+#   must exist at the time of the export.
 GIT_REPO_EXPORT_DIR = '/edx/var/edxapp/export_course_repos'
+# .. setting_name: GIT_EXPORT_DEFAULT_IDENT
+# .. setting_default: {'name': 'STUDIO_EXPORT_TO_GIT', 'email': 'STUDIO_EXPORT_TO_GIT@example.com'}
+# .. setting_description: When courses are exported to git, commits are signed with this name/email git identity.
+GIT_EXPORT_DEFAULT_IDENT = {
+    'name': 'STUDIO_EXPORT_TO_GIT',
+    'email': 'STUDIO_EXPORT_TO_GIT@example.com'
+}
 
 # Email
 TECH_SUPPORT_EMAIL = 'technical@example.com'

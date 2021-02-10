@@ -22,9 +22,7 @@ from xmodule.modulestore.xml_exporter import export_course_to_xml
 log = logging.getLogger(__name__)
 
 GIT_REPO_EXPORT_DIR = getattr(settings, 'GIT_REPO_EXPORT_DIR', None)
-GIT_EXPORT_DEFAULT_IDENT = getattr(settings, 'GIT_EXPORT_DEFAULT_IDENT',
-                                   {'name': 'STUDIO_EXPORT_TO_GIT',
-                                    'email': 'STUDIO_EXPORT_TO_GIT@example.com'})
+GIT_EXPORT_DEFAULT_IDENT = settings.GIT_EXPORT_DEFAULT_IDENT
 
 
 class GitExportError(Exception):
@@ -34,7 +32,7 @@ class GitExportError(Exception):
 
     def __init__(self, message):
         # Force the lazy i18n values to turn into actual unicode objects
-        super(GitExportError, self).__init__(six.text_type(message))  # lint-amnesty, pylint: disable=super-with-arguments
+        super().__init__(six.text_type(message))
 
     NO_EXPORT_DIR = _(u"GIT_REPO_EXPORT_DIR not set or path {0} doesn't exist, "
                       "please create it, or configure a different path with "
@@ -110,7 +108,7 @@ def export_to_git(course_id, repo, user='', rdir=None):
             branch = cmd_log(cmd, cwd).decode('utf-8').strip('\n')
         except subprocess.CalledProcessError as ex:
             log.exception(u'Failed to get branch: %r', ex.output)
-            raise GitExportError(GitExportError.DETACHED_HEAD)  # lint-amnesty, pylint: disable=raise-missing-from
+            raise GitExportError(GitExportError.DETACHED_HEAD) from ex
 
         cmds = [
             ['git', 'remote', 'set-url', 'origin', repo],
@@ -129,7 +127,7 @@ def export_to_git(course_id, repo, user='', rdir=None):
             cmd_log(cmd, cwd)
         except subprocess.CalledProcessError as ex:
             log.exception(u'Failed to pull git repository: %r', ex.output)
-            raise GitExportError(GitExportError.CANNOT_PULL)  # lint-amnesty, pylint: disable=raise-missing-from
+            raise GitExportError(GitExportError.CANNOT_PULL) from ex
 
     # export course as xml before commiting and pushing
     root_dir = os.path.dirname(rdirp)
@@ -149,7 +147,7 @@ def export_to_git(course_id, repo, user='', rdir=None):
         except subprocess.CalledProcessError as ex:
             log.exception(u'Failed to get branch from freshly cloned repo: %r',
                           ex.output)
-            raise GitExportError(GitExportError.MISSING_BRANCH)  # lint-amnesty, pylint: disable=raise-missing-from
+            raise GitExportError(GitExportError.MISSING_BRANCH) from ex
 
     # Now that we have fresh xml exported, set identity, add
     # everything to git, commit, and push to the right branch.
@@ -171,15 +169,15 @@ def export_to_git(course_id, repo, user='', rdir=None):
         cmd_log(['git', 'config', 'user.name', ident['name']], cwd)
     except subprocess.CalledProcessError as ex:
         log.exception(u'Error running git configure commands: %r', ex.output)
-        raise GitExportError(GitExportError.CONFIG_ERROR)  # lint-amnesty, pylint: disable=raise-missing-from
+        raise GitExportError(GitExportError.CONFIG_ERROR) from ex
     try:
         cmd_log(['git', 'add', '.'], cwd)
         cmd_log(['git', 'commit', '-a', '-m', commit_msg], cwd)
     except subprocess.CalledProcessError as ex:
         log.exception(u'Unable to commit changes: %r', ex.output)
-        raise GitExportError(GitExportError.CANNOT_COMMIT)  # lint-amnesty, pylint: disable=raise-missing-from
+        raise GitExportError(GitExportError.CANNOT_COMMIT) from ex
     try:
         cmd_log(['git', 'push', '-q', 'origin', branch], cwd)
     except subprocess.CalledProcessError as ex:
         log.exception(u'Error running git push command: %r', ex.output)
-        raise GitExportError(GitExportError.CANNOT_PUSH)  # lint-amnesty, pylint: disable=raise-missing-from
+        raise GitExportError(GitExportError.CANNOT_PUSH) from ex
