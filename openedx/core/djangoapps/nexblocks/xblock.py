@@ -89,7 +89,11 @@ class NexBlockWrapperBlock(
 
         TODO
         """
-        return Fragment()
+        fragment = Fragment()
+        fragment.add_content(
+            f"<p>This will soon show a NexBlock of type <strong>{self.package}</strong><p>"
+        )
+        return fragment
 
     def author_view(self, context=None):  # pylint: disable=unused-argument
         """
@@ -97,4 +101,8 @@ class NexBlockWrapperBlock(
 
         TODO
         """
-        return Fragment()
+        fragment = Fragment()
+        fragment.add_content(
+            f"<p>This will soon show a NexBlock of type <strong>{self.package}</strong><p>"
+        )
+        return fragment
