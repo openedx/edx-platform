@@ -58,7 +58,8 @@ from lms.djangoapps.courseware.tests.helpers import get_expiration_banner_text
 from lms.djangoapps.courseware.testutils import RenderXBlockTestMixin
 from lms.djangoapps.courseware.toggles import (
     COURSEWARE_MICROFRONTEND_COURSE_TEAM_PREVIEW,
-    REDIRECT_TO_COURSEWARE_MICROFRONTEND
+    COURSEWARE_OPTIMIZED_RENDER_XBLOCK,
+    REDIRECT_TO_COURSEWARE_MICROFRONTEND,
 )
 from lms.djangoapps.courseware.url_helpers import get_microfrontend_url, get_redirect_url
 from lms.djangoapps.courseware.user_state_client import DjangoXBlockUserStateClient
@@ -3448,3 +3449,104 @@ class MFERedirectTests(BaseViewsTestCase):  # lint-amnesty, pylint: disable=miss
 
         with override_waffle_flag(REDIRECT_TO_COURSEWARE_MICROFRONTEND, active=True):
             assert self.client.get(lms_url).status_code == 200
+
+
+class ContentOptimizationTestCase(ModuleStoreTestCase):
+    """
+    Test our ability to make browser optimizations based on XBlock content.
+    """
+    def setUp(self):
+        super().setUp()
+        self.math_html_usage_keys = []
+
+        with self.store.default_store(ModuleStoreEnum.Type.split):
+            self.course = CourseFactory.create(display_name=u'teꜱᴛ course', run="Testing_course")
+            with self.store.bulk_operations(self.course.id):
+                chapter = ItemFactory.create(
+                    category='chapter',
+                    parent_location=self.course.location,
+                    display_name="Chapter 1",
+                )
+                section = ItemFactory.create(
+                    category='sequential',
+                    parent_location=chapter.location,
+                    due=datetime(2013, 9, 18, 11, 30, 00),
+                    display_name='Sequential 1',
+                    format='Homework'
+                )
+                self.math_vertical = ItemFactory.create(
+                    category='vertical',
+                    parent_location=section.location,
+                    display_name='Vertical with Mathjax HTML',
+                )
+                self.no_math_vertical = ItemFactory.create(
+                    category='vertical',
+                    parent_location=section.location,
+                    display_name='Vertical with No Mathjax HTML',
+                )
+                MATHJAX_TAG_PAIRS = [
+                    (r"\(", r"\)"),
+                    (r"\[", r"\]"),
+                    ("[mathjaxinline]", "[/mathjaxinline]"),
+                    ("[mathjax]", "[/mathjax]"),
+                ]
+                for (i, (start_tag, end_tag)) in enumerate(MATHJAX_TAG_PAIRS):
+                    math_html_block = ItemFactory.create(
+                        category='html',
+                        parent_location=self.math_vertical.location,
+                        display_name=f"HTML With Mathjax {i}",
+                        data=f"<p>Hello Math! {start_tag}x^2 + y^2{end_tag}</p>",
+                    )
+                    self.math_html_usage_keys.append(math_html_block.location)
+
+                self.html_without_mathjax = ItemFactory.create(
+                    category='html',
+                    parent_location=self.no_math_vertical.location,
+                    display_name="HTML Without Mathjax",
+                    data="<p>I talk about mathjax, but I have no actual Math!</p>",
+                )
+
+        self.course_key = self.course.id
+        self.user = UserFactory(username='staff_user', profile__country='AX', is_staff=True)
+        self.date = datetime(2013, 1, 22, tzinfo=UTC)
+        self.enrollment = CourseEnrollment.enroll(self.user, self.course_key)
+        self.enrollment.created = self.date
+        self.enrollment.save()
+
+    @override_waffle_flag(COURSEWARE_OPTIMIZED_RENDER_XBLOCK, True)
+    def test_mathjax_detection(self):
+        self.client.login(username=self.user.username, password=TEST_PASSWORD)
+
+        # Check the HTML blocks with Math
+        for usage_key in self.math_html_usage_keys:
+            url = reverse("render_xblock", kwargs={'usage_key_string': str(usage_key)})
+            response = self.client.get(url)
+            assert response.status_code == 200
+            assert b"MathJax.Hub.Config" in response.content
+
+        # Check the one without Math...
+        url = reverse("render_xblock", kwargs={
+            'usage_key_string': str(self.html_without_mathjax.location)
+        })
+        response = self.client.get(url)
+        assert response.status_code == 200
+        assert b"MathJax.Hub.Config" not in response.content
+
+        # The containing vertical should still return MathJax (for now)
+        url = reverse("render_xblock", kwargs={
+            'usage_key_string': str(self.no_math_vertical.location)
+        })
+        response = self.client.get(url)
+        assert response.status_code == 200
+        assert b"MathJax.Hub.Config" in response.content
+
+    @override_waffle_flag(COURSEWARE_OPTIMIZED_RENDER_XBLOCK, False)
+    def test_mathjax_detection_disabled(self):
+        """Check that we can disable optimizations."""
+        self.client.login(username=self.user.username, password=TEST_PASSWORD)
+        url = reverse("render_xblock", kwargs={
+            'usage_key_string': str(self.html_without_mathjax.location)
+        })
+        response = self.client.get(url)
+        assert response.status_code == 200
+        assert b"MathJax.Hub.Config" in response.content
