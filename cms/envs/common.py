@@ -166,7 +166,7 @@ FEATURES = {
 
     # for consistency in user-experience, keep the value of the following 3 settings
     # in sync with the ones in lms/envs/common.py
-    'ENABLE_DISCUSSION_SERVICE': True,
+    'ENABLE_DISCUSSION_SERVICE': False,
     'ENABLE_TEXTBOOK': True,
 
     # DO NOT SET TO True IN THIS FILE
@@ -597,7 +597,7 @@ LOCAL_LOGLEVEL = "INFO"
 
 MAINTENANCE_BANNER_TEXT = 'Sample banner message'
 
-WIKI_ENABLED = True
+WIKI_ENABLED = False
 
 CERT_QUEUE = 'certificates'
 # List of logout URIs for each IDA that the learner should be logged out of when they logout of

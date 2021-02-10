@@ -201,6 +201,13 @@ def get_course_progress_percentage(request, course_key):
     return format((total_completed_blocks/total_blocks)*100, '.0f') if total_blocks > 0 else total_blocks
 
 
+def get_rtl_class(course_name):
+    """
+    Figure out layout style class for course based on course name and its language
+    """
+    return 'rtl-content' if "(urdu)" in course_name.lower() or check_rtl_characters_in_string(course_name) else ""
+
+
 def check_rtl_characters_in_string(string):
     """"
     check if the string contains rtl character or not

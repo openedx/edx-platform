@@ -102,6 +102,8 @@ urlpatterns = [
     url(r'^dashboard/?$', branding_views.courses, name='dashboard'),
     url(r'^change_enrollment$', student_views.change_enrollment, name='change_enrollment'),
 
+    url(r'', include('openedx.features.pakx_features.urls')),
+
     # Event tracking endpoints
     url(r'', include('track.urls')),
 
