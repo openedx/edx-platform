@@ -6,6 +6,7 @@ Much of this file was broken out from views.py, previous history can be found th
 
 import json
 import logging
+import hashlib
 
 import six
 from django.conf import settings
@@ -103,10 +104,8 @@ def _get_user_by_email(request):
     try:
         return User.objects.get(email=email)
     except User.DoesNotExist:
-        if settings.FEATURES['SQUELCH_PII_IN_LOGS']:
-            AUDIT_LOG.warning(u"Login failed - Unknown user email")
-        else:
-            AUDIT_LOG.warning(u"Login failed - Unknown user email: {0}".format(email))
+        digest = hashlib.shake_128(email.encode('utf-8')).hexdigest(16)  # pylint: disable=too-many-function-args
+        AUDIT_LOG.warning(f"Login failed - Unknown user email {digest}")
 
 
 def _check_excessive_login_attempts(user):
@@ -161,15 +160,9 @@ def _log_and_raise_inactive_user_auth_error(unauthenticated_user):
     Depending on Django version we can get here a couple of ways, but this takes care of logging an auth attempt
     by an inactive user, re-sending the activation email, and raising an error with the correct message.
     """
-    if settings.FEATURES['SQUELCH_PII_IN_LOGS']:
-        AUDIT_LOG.warning(
-            u"Login failed - Account not active for user.id: {0}, resending activation".format(
-                unauthenticated_user.id)
-        )
-    else:
-        AUDIT_LOG.warning(u"Login failed - Account not active for user {0}, resending activation".format(
-            unauthenticated_user.username)
-        )
+    AUDIT_LOG.warning(
+        f"Login failed - Account not active for user.id: {unauthenticated_user.id}, resending activation"
+    )
 
     profile = UserProfile.objects.get(user=unauthenticated_user)
     compose_and_send_activation_email(unauthenticated_user, profile)
@@ -224,11 +217,8 @@ def _handle_failed_authentication(user, authenticated_user):
 
         # if we didn't find this username earlier, the account for this email
         # doesn't exist, and doesn't have a corresponding password
-        if settings.FEATURES['SQUELCH_PII_IN_LOGS']:
-            loggable_id = user.id if user else "<unknown>"
-            AUDIT_LOG.warning(u"Login failed - password for user.id: {0} is invalid".format(loggable_id))
-        else:
-            AUDIT_LOG.warning(u"Login failed - password for {0} is invalid".format(user.email))
+        loggable_id = user.id if user else "<unknown>"
+        AUDIT_LOG.warning(f"Login failed - password for user.id: {loggable_id} is invalid")
 
     if user and LoginFailures.is_feature_enabled():
         blocked_threshold, failure_count = LoginFailures.check_user_reset_password_threshold(user)

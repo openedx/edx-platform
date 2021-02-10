@@ -5,6 +5,7 @@ Tests for student activation and login
 
 
 import datetime
+import hashlib
 import json
 import unicodedata
 
@@ -200,6 +201,8 @@ class LoginTest(SiteMixin, CacheIsolationTestCase):
 
     def test_login_fail_no_user_exists(self):
         nonexistent_email = u'not_a_user@edx.org'
+        # pylint: disable=too-many-function-args
+        email_hash = hashlib.shake_128(nonexistent_email.encode('utf-8')).hexdigest(16)
         response, mock_audit_log = self._login_response(
             nonexistent_email,
             self.password,
@@ -207,7 +210,7 @@ class LoginTest(SiteMixin, CacheIsolationTestCase):
         self._assert_response(
             response, success=False, value=self.LOGIN_FAILED_WARNING, status_code=400
         )
-        self._assert_audit_log(mock_audit_log, 'warning', [u'Login failed', u'Unknown user email', nonexistent_email])
+        self._assert_audit_log(mock_audit_log, 'warning', [u'Login failed', u'Unknown user email', email_hash])
 
     @patch.dict("django.conf.settings.FEATURES", {'SQUELCH_PII_IN_LOGS': True})
     def test_login_fail_no_user_exists_no_pii(self):
@@ -227,16 +230,17 @@ class LoginTest(SiteMixin, CacheIsolationTestCase):
         )
         self._assert_response(response, success=False, value=self.LOGIN_FAILED_WARNING)
         self._assert_audit_log(mock_audit_log, 'warning',
-                               [u'Login failed', u'password for', self.user_email, u'invalid'])
+                               [u'Login failed', u'password for', str(self.user.id), u'invalid'])
 
     @patch.dict("django.conf.settings.FEATURES", {'SQUELCH_PII_IN_LOGS': True})
     def test_login_fail_wrong_password_no_pii(self):
         response, mock_audit_log = self._login_response(self.user_email, 'wrong_password')
         self._assert_response(response, success=False, value=self.LOGIN_FAILED_WARNING)
-        self._assert_audit_log(mock_audit_log, 'warning', [u'Login failed', u'password for', u'invalid'])
+        self._assert_audit_log(
+            mock_audit_log, 'warning', [u'Login failed', u'password for', str(self.user.id), u'invalid']
+        )
         self._assert_not_in_audit_log(mock_audit_log, 'warning', [self.user_email])
 
-    @patch.dict("django.conf.settings.FEATURES", {'SQUELCH_PII_IN_LOGS': True})
     def test_login_not_activated_no_pii(self):
         # De-activate the user
         self.user.is_active = False
@@ -273,22 +277,26 @@ class LoginTest(SiteMixin, CacheIsolationTestCase):
         the system does *not* send account activation email notification to the user.
         """
         nonexistent_email = 'incorrect@email.com'
+        # pylint: disable=too-many-function-args
+        email_hash = hashlib.shake_128(nonexistent_email.encode('utf-8')).hexdigest(16)
         self.user.is_active = False
         self.user.save()
         response, mock_audit_log = self._login_response(nonexistent_email, 'incorrect_password')
 
         self.assertFalse(mock_inactive_user_email_and_error.called)
         self._assert_response(response, success=False, value=self.LOGIN_FAILED_WARNING)
-        self._assert_audit_log(mock_audit_log, 'warning', [u'Login failed', u'Unknown user email', nonexistent_email])
+        self._assert_audit_log(mock_audit_log, 'warning', [u'Login failed', u'Unknown user email', email_hash])
 
     def test_login_unicode_email(self):
         unicode_email = self.user_email + six.unichr(40960)
+        # pylint: disable=too-many-function-args
+        email_hash = hashlib.shake_128(unicode_email.encode('utf-8')).hexdigest(16)
         response, mock_audit_log = self._login_response(
             unicode_email,
             self.password,
         )
         self._assert_response(response, success=False)
-        self._assert_audit_log(mock_audit_log, 'warning', [u'Login failed', unicode_email])
+        self._assert_audit_log(mock_audit_log, 'warning', [u'Login failed', email_hash])
 
     def test_login_unicode_password(self):
         unicode_password = self.password + six.unichr(1972)
@@ -298,7 +306,7 @@ class LoginTest(SiteMixin, CacheIsolationTestCase):
         )
         self._assert_response(response, success=False)
         self._assert_audit_log(mock_audit_log, 'warning',
-                               [u'Login failed', u'password for', self.user_email, u'invalid'])
+                               [u'Login failed', u'password for', str(self.user.id), u'invalid'])
 
     def test_logout_logging(self):
         response, _ = self._login_response(self.user_email, self.password)
