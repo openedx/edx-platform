@@ -126,7 +126,7 @@ class TestNotifyCredentials(TestCase):
     @mock.patch(COMMAND_MODULE + '.Command.send_notifications')
     def test_username_arg(self, mock_send):
         call_command(
-            Command(), '--start-date', '2017-02-01', '--end-date', '2017-02-02', '--username', self.user2.username
+            Command(), '--start-date', '2017-02-01', '--end-date', '2017-02-02', '--usernames', self.user2.username
         )
         self.assertTrue(mock_send.called)
         self.assertListEqual(list(mock_send.call_args[0][0]), [self.cert4])
@@ -134,7 +134,7 @@ class TestNotifyCredentials(TestCase):
         mock_send.reset_mock()
 
         call_command(
-            Command(), '--username', self.user2.username
+            Command(), '--usernames', self.user2.username
         )
         self.assertTrue(mock_send.called)
         self.assertListEqual(list(mock_send.call_args[0][0]), [self.cert4])
@@ -142,7 +142,7 @@ class TestNotifyCredentials(TestCase):
         mock_send.reset_mock()
 
         call_command(
-            Command(), '--start-date', '2017-02-01', '--end-date', '2017-02-02', '--username', self.user.username
+            Command(), '--start-date', '2017-02-01', '--end-date', '2017-02-02', '--usernames', self.user.username
         )
         self.assertTrue(mock_send.called)
         self.assertListEqual(list(mock_send.call_args[0][0]), [self.cert2])
@@ -150,11 +150,19 @@ class TestNotifyCredentials(TestCase):
         mock_send.reset_mock()
 
         call_command(
-            Command(), '--username', self.user2.username
+            Command(), '--usernames', self.user.username
         )
         self.assertTrue(mock_send.called)
-        self.assertListEqual(list(mock_send.call_args[0][0]), [self.cert4])
-        self.assertListEqual(list(mock_send.call_args[0][1]), [self.grade4])
+        self.assertListEqual(list(mock_send.call_args[0][0]), [self.cert1, self.cert2, self.cert3])
+        self.assertListEqual(list(mock_send.call_args[0][1]), [self.grade1, self.grade2, self.grade3])
+        mock_send.reset_mock()
+
+        call_command(
+            Command(), '--usernames', self.user.username, self.user2.username
+        )
+        self.assertTrue(mock_send.called)
+        self.assertListEqual(list(mock_send.call_args[0][0]), [self.cert1, self.cert2, self.cert4, self.cert3])
+        self.assertListEqual(list(mock_send.call_args[0][1]), [self.grade1, self.grade2, self.grade4, self.grade3])
         mock_send.reset_mock()
 
     @mock.patch(COMMAND_MODULE + '.Command.send_notifications')
