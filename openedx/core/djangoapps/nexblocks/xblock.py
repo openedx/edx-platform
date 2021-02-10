@@ -6,7 +6,7 @@ import logging
 
 from web_fragments.fragment import Fragment
 from xblock.core import XBlock
-from xblock.fields import Dict, Scope, String
+from xblock.fields import Boolean, Dict, Scope, String
 from xblockutils.resources import ResourceLoader
 from xblockutils.studio_editable import StudioEditableXBlockMixin
 
@@ -50,6 +50,14 @@ class NexBlockWrapperBlock(
         scope=Scope.settings,
         default="git+https://github.com/kdmccormick/nexblock-test-announcement.git",
     )
+    integrity_protected = Boolean(
+        display_name=_("Integrity-Protected?"),
+        help=_(
+            "Whether settings are restricted from user. Enabling this disables offline usage."
+        ),
+        scope=Scope.settings,
+        default=False,
+    )
     instance_data = Dict(
         display_name=_("Instance Data"),
         help=_("Instance-level settings for this NexBlock instance, as JSON."),
@@ -57,7 +65,12 @@ class NexBlockWrapperBlock(
         default={},
     )
 
-    editable_fields = ["display_name", "package", "instance_data"]
+    editable_fields = [
+        "display_name",
+        "package",
+        "integrity_protected",
+        "instance_data",
+    ]
 
     has_author_view = True  # Tells Studio to use author_view
 
