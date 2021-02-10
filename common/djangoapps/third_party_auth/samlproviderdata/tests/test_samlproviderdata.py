@@ -1,4 +1,3 @@
-import unittest
 import copy
 import pytz
 from uuid import uuid4
@@ -12,8 +11,6 @@ from rest_framework.test import APITestCase
 
 from enterprise.models import EnterpriseCustomer, EnterpriseCustomerIdentityProvider
 from enterprise.constants import ENTERPRISE_ADMIN_ROLE, ENTERPRISE_LEARNER_ROLE
-
-from common.djangoapps.third_party_auth.tests import testutil
 from common.djangoapps.third_party_auth.models import SAMLProviderData, SAMLProviderConfig
 from common.djangoapps.third_party_auth.tests.samlutils import set_jwt_cookie
 from common.djangoapps.third_party_auth.tests.utils import skip_unless_thirdpartyauth

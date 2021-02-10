@@ -37,17 +37,15 @@ from testfixtures import LogCapture
 from lms.djangoapps.bulk_email.models import BulkEmailFlag, CourseEmail, CourseEmailTemplate
 from common.djangoapps.course_modes.models import CourseMode
 from common.djangoapps.course_modes.tests.factories import CourseModeFactory
-from edx_toggles.toggles.testutils import override_waffle_flag  # lint-amnesty, pylint: disable=unused-import, wrong-import-order
 from lms.djangoapps.certificates.api import generate_user_certificates
 from lms.djangoapps.certificates.models import CertificateStatuses
 from lms.djangoapps.certificates.tests.factories import GeneratedCertificateFactory
 from lms.djangoapps.courseware.models import StudentModule
-from lms.djangoapps.courseware.tests.factories import (  # lint-amnesty, pylint: disable=unused-import
+from lms.djangoapps.courseware.tests.factories import (
     BetaTesterFactory,
     GlobalStaffFactory,
     InstructorFactory,
-    StaffFactory,
-    UserProfileFactory
+    StaffFactory
 )
 from lms.djangoapps.courseware.tests.helpers import LoginEnrollmentTestCase
 from lms.djangoapps.experiments.testutils import override_experiment_waffle_flag
@@ -88,14 +86,13 @@ from common.djangoapps.student.models import (
     get_retired_email_by_email,
     get_retired_username_by_username
 )
-from common.djangoapps.student.roles import (  # lint-amnesty, pylint: disable=unused-import
+from common.djangoapps.student.roles import (
     CourseBetaTesterRole,
     CourseDataResearcherRole,
     CourseFinanceAdminRole,
-    CourseInstructorRole,
-    CourseSalesAdminRole
+    CourseInstructorRole
 )
-from common.djangoapps.student.tests.factories import AdminFactory, UserFactory  # lint-amnesty, pylint: disable=unused-import
+from common.djangoapps.student.tests.factories import UserFactory
 from xmodule.fields import Date
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, SharedModuleStoreTestCase

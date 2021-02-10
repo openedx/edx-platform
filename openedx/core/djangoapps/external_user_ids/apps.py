@@ -13,4 +13,4 @@ class ExternalUserIDConfig(AppConfig):
     name = 'openedx.core.djangoapps.external_user_ids'
 
     def ready(self):
-        from . import signals  # pylint: disable=unused-import
+        pass

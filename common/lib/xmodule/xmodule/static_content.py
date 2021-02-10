@@ -306,7 +306,7 @@ def main():
         'openedx.core.djangoapps.video_pipeline',
     )
     try:
-        import edxval  # lint-amnesty, pylint: disable=unused-import
+        import edxval
         installed_apps += ('edxval',)
     except ImportError:
         pass

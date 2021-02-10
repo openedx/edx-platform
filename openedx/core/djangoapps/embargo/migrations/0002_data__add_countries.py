@@ -3,7 +3,7 @@
 
 # Converted from the original South migration 0003_add_countries.py
 
-from django.db import migrations, models
+from django.db import migrations
 from django_countries import countries
 
 

@@ -40,4 +40,3 @@ class DiscussionConfig(AppConfig):
         """
         Connect handlers to send notifications about discussions.
         """
-        from .signals import handlers  # pylint: disable=unused-import

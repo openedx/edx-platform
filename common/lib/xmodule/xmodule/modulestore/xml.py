@@ -1,6 +1,5 @@
 # lint-amnesty, pylint: disable=missing-module-docstring
 
-import codecs  # lint-amnesty, pylint: disable=unused-import
 import glob
 import hashlib
 import io
@@ -33,8 +32,7 @@ from xmodule.mako_module import MakoDescriptorSystem
 from xmodule.modulestore import COURSE_ROOT, LIBRARY_ROOT, ModuleStoreEnum, ModuleStoreReadBase
 from xmodule.modulestore.xml_exporter import DEFAULT_CONTENT_FIELDS
 from xmodule.tabs import CourseTabList
-from xmodule.x_module import (  # lint-amnesty, pylint: disable=unused-import
-    DEPRECATION_VSCOMPAT_EVENT,
+from xmodule.x_module import (
     AsideKeyGenerator,
     OpaqueKeyReader,
     XMLParsingSystem,

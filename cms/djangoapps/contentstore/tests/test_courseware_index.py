@@ -18,7 +18,7 @@ from mock import patch
 from pytz import UTC
 from search.search_engine_base import SearchEngine
 from six.moves import range
-from xblock.core import XBlock  # lint-amnesty, pylint: disable=unused-import
+from xblock.core import XBlock
 
 from cms.djangoapps.contentstore.courseware_index import (
     CourseAboutSearchIndexer,

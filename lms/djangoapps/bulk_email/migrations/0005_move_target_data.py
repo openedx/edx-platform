@@ -1,7 +1,7 @@
 # -*- coding: utf-
 
 
-from django.db import migrations, models
+from django.db import migrations
 from django.db.utils import DatabaseError
 
 from lms.djangoapps.bulk_email.models import EMAIL_TARGETS, SEND_TO_MYSELF

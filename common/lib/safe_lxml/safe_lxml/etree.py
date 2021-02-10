@@ -9,15 +9,11 @@ For processing xml always prefer this over using lxml.etree directly.
 
 # Names are imported into this module so that it can be a stand-in for
 # lxml.etree.  The names are not used here, so disable the pylint warning.
-# pylint: disable=unused-import, wildcard-import, unused-wildcard-import
+# pylint: disable= wildcard-import, unused-wildcard-import
 
 
 from lxml.etree import XMLParser as _XMLParser
 from lxml.etree import *  # lint-amnesty, pylint: disable=redefined-builtin
-from lxml.etree import _Element, _ElementTree
-
-# This should be imported after lxml.etree so that it overrides the following attributes.
-from defusedxml.lxml import XML, fromstring, parse
 
 
 class XMLParser(_XMLParser):  # pylint: disable=function-redefined

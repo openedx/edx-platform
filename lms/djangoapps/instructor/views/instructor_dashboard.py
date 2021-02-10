@@ -25,7 +25,6 @@ from mock import patch
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
 from six import text_type
-from six.moves.urllib.parse import urljoin  # lint-amnesty, pylint: disable=unused-import
 from xblock.field_data import DictFieldData
 from xblock.fields import ScopeIds
 

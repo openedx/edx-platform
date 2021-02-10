@@ -7,7 +7,7 @@ import six
 from django.core.management import CommandError, call_command
 from six import text_type
 
-from cms.djangoapps.contentstore.courseware_index import SearchIndexingError  # lint-amnesty, pylint: disable=unused-import
+from cms.djangoapps.contentstore.courseware_index import SearchIndexingError
 from cms.djangoapps.contentstore.management.commands.reindex_course import Command as ReindexCommand
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore

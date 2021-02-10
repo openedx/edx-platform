@@ -1,9 +1,6 @@
 """
 Test audit user's access to various content based on content-gating features.
 """
-
-
-import json
 import os
 from datetime import datetime, timedelta
 
@@ -35,8 +32,7 @@ from openedx.core.djangoapps.django_comment_common.models import (
     FORUM_ROLE_ADMINISTRATOR,
     FORUM_ROLE_COMMUNITY_TA,
     FORUM_ROLE_GROUP_MODERATOR,
-    FORUM_ROLE_MODERATOR,
-    Role
+    FORUM_ROLE_MODERATOR
 )
 from openedx.core.djangoapps.user_api.tests.factories import UserCourseTagFactory
 from openedx.core.djangoapps.util.testing import TestConditionalContent

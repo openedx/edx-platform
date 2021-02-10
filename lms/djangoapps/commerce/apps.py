@@ -16,4 +16,3 @@ class CommerceConfig(AppConfig):
         """
         Connect handlers to signals.
         """
-        from . import signals  # pylint: disable=unused-import

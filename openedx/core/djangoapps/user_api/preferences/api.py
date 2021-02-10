@@ -18,8 +18,7 @@ from openedx.core.lib.time_zone_utils import get_display_time_zone
 from common.djangoapps.student.models import User, UserProfile
 from common.djangoapps.track import segment
 
-from ..errors import (  # lint-amnesty, pylint: disable=unused-import
-    CountryCodeError,
+from ..errors import (
     PreferenceUpdateError,
     PreferenceValidationError,
     UserAPIInternalError,

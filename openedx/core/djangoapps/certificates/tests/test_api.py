@@ -1,12 +1,10 @@
 
 
-import itertools
 from contextlib import contextmanager
-from datetime import datetime, timedelta
+from datetime import datetime
 
 import ddt
 import pytz
-import waffle
 from django.test import TestCase
 from edx_toggles.toggles import LegacyWaffleSwitch
 from edx_toggles.toggles.testutils import override_waffle_switch

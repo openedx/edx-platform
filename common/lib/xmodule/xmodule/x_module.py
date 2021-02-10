@@ -308,9 +308,6 @@ def shim_xmodule_js(fragment, js_module_name):
     """
     Set up the XBlock -> XModule shim on the supplied :class:`web_fragments.fragment.Fragment`
     """
-    # Delay this import so that it is only used (and django settings are parsed) when
-    # they are required (rather than at startup)
-    import webpack_loader.utils  # lint-amnesty, pylint: disable=unused-import
 
     if not fragment.js_init_fn:
         fragment.initialize_js('XBlockToXModuleShim')

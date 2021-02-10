@@ -4,8 +4,6 @@
 
 import json
 import logging
-
-from ccx_keys.locator import CCXLocator
 from django.db import migrations
 from django.http import Http404
 

@@ -2,7 +2,6 @@
 
 
 import datetime
-import unittest  # lint-amnesty, pylint: disable=unused-import
 
 import ddt
 import mock

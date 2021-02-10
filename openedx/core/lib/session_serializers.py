@@ -2,7 +2,6 @@
 Custom session serializer to deal with going from python2 and python3.
 """
 import pickle
-import six  # lint-amnesty, pylint: disable=unused-import
 
 
 class PickleSerializer(object):

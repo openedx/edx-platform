@@ -21,4 +21,3 @@ class BlockStructureConfig(AppConfig):
 
         These happen at import time.  Hence the unused imports
         """
-        from . import signals, tasks  # lint-amnesty, pylint: disable=unused-import, unused-variable

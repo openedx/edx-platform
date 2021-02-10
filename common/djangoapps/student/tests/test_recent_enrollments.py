@@ -15,8 +15,6 @@ from pytz import UTC
 from six.moves import range, zip
 
 from common.test.utils import XssTestMixin
-from common.djangoapps.course_modes.tests.factories import CourseModeFactory  # lint-amnesty, pylint: disable=unused-import
-from openedx.core.djangoapps.site_configuration.tests.test_util import with_site_configuration_context  # lint-amnesty, pylint: disable=unused-import
 from common.djangoapps.student.models import CourseEnrollment, DashboardConfiguration
 from common.djangoapps.student.tests.factories import UserFactory
 from common.djangoapps.student.views import get_course_enrollments

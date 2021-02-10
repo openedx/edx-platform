@@ -2,8 +2,6 @@
 from contextlib import contextmanager
 from datetime import timedelta
 from unittest import mock
-
-from django.conf import settings
 from django.db import DEFAULT_DB_ALIAS
 from django.test import TestCase
 from django.utils.timezone import now

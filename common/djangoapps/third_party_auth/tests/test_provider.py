@@ -2,7 +2,6 @@
 
 
 import re
-import unittest  # lint-amnesty, pylint: disable=unused-import
 
 from django.contrib.sites.models import Site
 from django.db import connections, DEFAULT_DB_ALIAS

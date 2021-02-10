@@ -3,7 +3,7 @@
 
 from django.conf import settings
 from django.core.files import File
-from django.db import migrations, models
+from django.db import migrations
 
 # Converted from the original South migration 0002_default_rate_limit_config.py
 

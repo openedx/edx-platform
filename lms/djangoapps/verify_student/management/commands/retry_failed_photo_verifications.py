@@ -5,7 +5,6 @@ Django admin commands related to verify_student
 
 import logging
 from django.core.management.base import BaseCommand
-from django.core.management.base import CommandError  # lint-amnesty, pylint: disable=unused-import
 
 from lms.djangoapps.verify_student.models import SoftwareSecurePhotoVerification, SSPVerificationRetryConfig
 

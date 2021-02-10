@@ -7,9 +7,8 @@ import logging
 
 import pymongo
 from mongodb_proxy import MongoProxy
-from pymongo.read_preferences import (  # lint-amnesty, pylint: disable=unused-import
+from pymongo.read_preferences import (
     ReadPreference,
-    read_pref_mode_from_name,
     _MONGOS_MODES,
     _MODES
 )

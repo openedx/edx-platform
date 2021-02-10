@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 
-from django.db import migrations, models
+from django.db import migrations
 
 # We used to have a uniqueness constraint on auth_user.email:
 # https://github.com/edx/edx-platform/commit/c52727b0e0fb241d8211900975d3b69fe5a1bd57

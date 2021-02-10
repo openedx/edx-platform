@@ -5,8 +5,6 @@ The public API for certificates.
 
 import logging
 from datetime import datetime
-
-import six  # lint-amnesty, pylint: disable=unused-import
 from pytz import UTC
 
 from lms.djangoapps.certificates.models import CertificateStatuses, CertificateWhitelist

@@ -7,7 +7,7 @@ import functools
 import sys
 from contextlib import contextmanager
 
-import pytest  # lint-amnesty, pylint: disable=unused-import
+import pytest
 from django.dispatch import Signal
 from markupsafe import escape
 from mock import Mock, patch

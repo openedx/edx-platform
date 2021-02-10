@@ -4,10 +4,7 @@ Tests for experimentation views
 
 
 import unittest
-
-import six.moves.urllib.error
 import six.moves.urllib.parse
-import six.moves.urllib.request
 from datetime import timedelta
 from django.conf import settings
 from django.core.handlers.wsgi import WSGIRequest
@@ -19,7 +16,7 @@ from mock import patch  # lint-amnesty, pylint: disable=wrong-import-order
 from rest_framework.test import APITestCase  # lint-amnesty, pylint: disable=wrong-import-order
 
 from lms.djangoapps.experiments.factories import ExperimentDataFactory, ExperimentKeyValueFactory
-from lms.djangoapps.experiments.models import ExperimentData, ExperimentKeyValue  # lint-amnesty, pylint: disable=unused-import
+from lms.djangoapps.experiments.models import ExperimentData
 from lms.djangoapps.experiments.serializers import ExperimentDataSerializer
 from common.djangoapps.student.tests.factories import UserFactory
 

@@ -17,14 +17,14 @@ from django.contrib.sites.models import Site
 from django.core.validators import ValidationError, validate_email
 from django.db import transaction
 from django.db.models.signals import post_save
-from django.dispatch import Signal, receiver  # lint-amnesty, pylint: disable=unused-import
+from django.dispatch import receiver
 from django.http import Http404, HttpResponse, HttpResponseBadRequest, HttpResponseForbidden
 from django.shortcuts import redirect
 from django.template.context_processors import csrf
 from django.urls import reverse
 from django.utils.translation import ugettext as _
-from django.views.decorators.csrf import csrf_exempt, ensure_csrf_cookie  # lint-amnesty, pylint: disable=unused-import
-from django.views.decorators.http import require_GET, require_http_methods, require_POST  # lint-amnesty, pylint: disable=unused-import
+from django.views.decorators.csrf import ensure_csrf_cookie
+from django.views.decorators.http import require_GET, require_POST
 from edx_ace import ace
 from edx_ace.recipient import Recipient
 from edx_django_utils import monitoring as monitoring_utils
@@ -40,7 +40,7 @@ from common.djangoapps.track import views as track_views
 from lms.djangoapps.bulk_email.models import Optout
 from common.djangoapps.course_modes.models import CourseMode
 from lms.djangoapps.courseware.courses import get_courses, sort_by_announcement, sort_by_start_date
-from common.djangoapps.edxmako.shortcuts import marketing_link, render_to_response, render_to_string  # lint-amnesty, pylint: disable=unused-import
+from common.djangoapps.edxmako.shortcuts import marketing_link, render_to_response
 from common.djangoapps.entitlements.models import CourseEntitlement
 from openedx.core.djangoapps.ace_common.template_context import get_base_template_context
 from openedx.core.djangoapps.catalog.utils import get_programs_with_type
@@ -55,19 +55,15 @@ from openedx.core.djangolib.markup import HTML, Text
 from common.djangoapps.student.email_helpers import generate_activation_email_context
 from common.djangoapps.student.helpers import DISABLE_UNENROLL_CERT_STATES, cert_info
 from common.djangoapps.student.message_types import AccountActivation, EmailChange, EmailChangeConfirmation, RecoveryEmailCreate  # lint-amnesty, pylint: disable=line-too-long
-from common.djangoapps.student.models import (  # lint-amnesty, pylint: disable=unused-import
+from common.djangoapps.student.models import (
     AccountRecovery,
     CourseEnrollment,
     PendingEmailChange,
     PendingSecondaryEmailChange,
     Registration,
-    RegistrationCookieConfiguration,
-    UserAttribute,
     UserProfile,
     UserSignupSource,
-    UserStanding,
-    create_comments_service_user,
-    email_exists_or_retired
+    UserStanding
 )
 from common.djangoapps.student.signals import REFUND_ORDER
 from common.djangoapps.student.tasks import send_activation_email

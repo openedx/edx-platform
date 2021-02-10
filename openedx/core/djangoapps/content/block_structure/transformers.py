@@ -1,9 +1,6 @@
 """
 Module for a collection of BlockStructureTransformers.
 """
-
-
-import functools  # lint-amnesty, pylint: disable=unused-import
 from logging import getLogger
 
 from .exceptions import TransformerDataIncompatible, TransformerException

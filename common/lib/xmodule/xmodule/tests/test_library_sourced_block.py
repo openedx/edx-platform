@@ -1,15 +1,13 @@
 """
 Tests for Source from Library XBlock
 """
-from xblockutils.resources import ResourceLoader  # lint-amnesty, pylint: disable=unused-import
 
 from openedx.core.djangoapps.content_libraries.tests.base import ContentLibrariesRestApiTest
 from common.djangoapps.student.roles import CourseInstructorRole
-from cms.lib.xblock.runtime import handler_url  # lint-amnesty, pylint: disable=unused-import
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 from xmodule.tests import get_test_system
-from xmodule.x_module import AUTHOR_VIEW, STUDENT_VIEW  # lint-amnesty, pylint: disable=unused-import
+from xmodule.x_module import STUDENT_VIEW
 
 
 class LibrarySourcedBlockTestCase(ContentLibrariesRestApiTest):

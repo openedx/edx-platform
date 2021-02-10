@@ -5,8 +5,8 @@ unit tests for course_info views and models.
 
 import json
 
-from django.test.utils import override_settings  # lint-amnesty, pylint: disable=unused-import
-from mock import patch  # lint-amnesty, pylint: disable=unused-import
+from django.test.utils import override_settings
+from mock import patch
 from opaque_keys.edx.keys import UsageKey
 
 from cms.djangoapps.contentstore.tests.test_course_settings import CourseTestCase

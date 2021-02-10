@@ -2,9 +2,6 @@
 
 from django.apps import AppConfig
 from django.utils.translation import ugettext_lazy as _
-from edx_django_utils.plugins import PluginSignals  # lint-amnesty, pylint: disable=unused-import
-
-from openedx.core.djangoapps.plugins.constants import ProjectType  # lint-amnesty, pylint: disable=unused-import
 
 
 class SchedulesConfig(AppConfig):  # lint-amnesty, pylint: disable=missing-class-docstring
@@ -12,5 +9,4 @@ class SchedulesConfig(AppConfig):  # lint-amnesty, pylint: disable=missing-class
     verbose_name = _('Schedules')
 
     def ready(self):
-        # noinspection PyUnresolvedReferences
-        from . import signals, tasks  # lint-amnesty, pylint: disable=unused-import, unused-variable
+        pass

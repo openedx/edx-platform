@@ -16,7 +16,6 @@ from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from xblock.fields import Scope
 from xblock.runtime import KeyValueStore
-from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 
 from lms.djangoapps.courseware.access import is_mobile_available_for_user
 from lms.djangoapps.courseware.courses import get_current_child

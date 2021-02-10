@@ -2,7 +2,6 @@
 
 
 import logging
-import time  # pylint: disable=unused-import
 
 import six
 from django.contrib.auth import get_user_model

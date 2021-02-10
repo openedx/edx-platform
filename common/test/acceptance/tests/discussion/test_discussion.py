@@ -7,7 +7,7 @@ from uuid import uuid4
 
 import pytest
 
-from common.test.acceptance.fixtures.course import CourseFixture, XBlockFixtureDesc  # lint-amnesty, pylint: disable=unused-import
+from common.test.acceptance.fixtures.course import CourseFixture, XBlockFixtureDesc
 from common.test.acceptance.fixtures.discussion import (
     Comment,
     Response,

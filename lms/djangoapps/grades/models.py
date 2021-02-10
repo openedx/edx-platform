@@ -17,7 +17,6 @@ from hashlib import sha1
 
 import six
 from django.apps import apps
-from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user, unused-import
 from django.db import models
 from django.utils.encoding import python_2_unicode_compatible
 from django.utils.timezone import now
@@ -29,7 +28,7 @@ from simple_history.models import HistoricalRecords
 from six.moves import map
 
 from lms.djangoapps.courseware.fields import UnsignedBigIntAutoField
-from lms.djangoapps.grades import constants, events  # lint-amnesty, pylint: disable=unused-import
+from lms.djangoapps.grades import events
 from openedx.core.lib.cache_utils import get_cache
 
 log = logging.getLogger(__name__)

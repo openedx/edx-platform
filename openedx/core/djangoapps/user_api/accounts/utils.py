@@ -11,7 +11,6 @@ from completion.models import BlockCompletion
 from django.conf import settings
 from django.utils.translation import ugettext as _
 from six import text_type
-from six.moves import range  # lint-amnesty, pylint: disable=unused-import
 from six.moves.urllib.parse import urlparse  # pylint: disable=import-error
 
 from common.djangoapps.third_party_auth.config.waffle import ENABLE_MULTIPLE_SSO_ACCOUNTS_ASSOCIATION_TO_SAML_USER

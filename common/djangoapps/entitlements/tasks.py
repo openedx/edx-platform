@@ -5,7 +5,6 @@ This file contains celery tasks for entitlements-related functionality.
 
 from celery import shared_task
 from celery.utils.log import get_task_logger
-from django.conf import settings  # lint-amnesty, pylint: disable=unused-import
 from edx_django_utils.monitoring import set_code_owner_attribute
 
 from common.djangoapps.entitlements.models import CourseEntitlement

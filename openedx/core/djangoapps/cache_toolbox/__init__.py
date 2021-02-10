@@ -24,5 +24,3 @@ View/download code
 File a bug
   https://github.com/playfire/django-cache-toolbox/issues
 """
-
-from .model import cache_model

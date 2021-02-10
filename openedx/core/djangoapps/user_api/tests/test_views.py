@@ -1,65 +1,23 @@
 """Tests for the user API at the HTTP request level. """
 
-
-import json  # lint-amnesty, pylint: disable=unused-import
-from unittest import skipUnless  # lint-amnesty, pylint: disable=unused-import
-
 import ddt
-import httpretty  # lint-amnesty, pylint: disable=unused-import
-import mock  # lint-amnesty, pylint: disable=unused-import
 import six
-from django.conf import settings  # lint-amnesty, pylint: disable=unused-import
-from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user, unused-import
-from django.core import mail  # lint-amnesty, pylint: disable=unused-import
-from django.test.client import RequestFactory  # lint-amnesty, pylint: disable=unused-import
-from django.test.testcases import TransactionTestCase  # lint-amnesty, pylint: disable=unused-import
 from django.test.utils import override_settings
 from django.urls import reverse
 from opaque_keys.edx.keys import CourseKey
-from pytz import UTC, common_timezones_set  # lint-amnesty, pylint: disable=unused-import
+from pytz import common_timezones_set
 from six import text_type
 from six.moves import range
-from social_django.models import Partial, UserSocialAuth  # lint-amnesty, pylint: disable=unused-import
 
 from openedx.core.djangoapps.django_comment_common import models
-from openedx.core.djangoapps.site_configuration.helpers import get_value  # lint-amnesty, pylint: disable=unused-import
-from openedx.core.djangoapps.site_configuration.tests.test_util import with_site_configuration  # lint-amnesty, pylint: disable=unused-import
 from openedx.core.djangolib.testing.utils import CacheIsolationTestCase, skip_unless_lms
 from openedx.core.lib.api.test_utils import TEST_API_KEY, ApiTestCase
 from openedx.core.lib.time_zone_utils import get_display_time_zone
 from common.djangoapps.student.tests.factories import UserFactory
-from common.djangoapps.third_party_auth.tests.testutil import ThirdPartyAuthTestMixin, simulate_running_pipeline  # lint-amnesty, pylint: disable=unused-import
-from common.djangoapps.third_party_auth.tests.utils import (  # lint-amnesty, pylint: disable=unused-import
-    ThirdPartyOAuthTestMixin,
-    ThirdPartyOAuthTestMixinFacebook,
-    ThirdPartyOAuthTestMixinGoogle
-)
-from common.djangoapps.util.password_policy_validators import (  # lint-amnesty, pylint: disable=unused-import
-    create_validator_config,
-    password_validators_instruction_texts,
-    password_validators_restrictions
-)
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
-
-from ..accounts import (  # lint-amnesty, pylint: disable=unused-import
-    EMAIL_MAX_LENGTH,
-    EMAIL_MIN_LENGTH,
-    NAME_MAX_LENGTH,
-    USERNAME_BAD_LENGTH_MSG,
-    USERNAME_MAX_LENGTH,
-    USERNAME_MIN_LENGTH
-)
-from ..accounts.api import get_account_settings  # lint-amnesty, pylint: disable=unused-import
-from ..accounts.tests.retirement_helpers import (  # pylint: disable=unused-import
-    RetirementTestCase,
-    fake_requested_retirement,
-    setup_retirement_states,
-)
 from ..models import UserOrgTag
 from ..tests.factories import UserPreferenceFactory
-from ..tests.test_constants import SORTED_COUNTRIES  # lint-amnesty, pylint: disable=unused-import
-from .test_helpers import TestCaseForm  # lint-amnesty, pylint: disable=unused-import
 
 USER_LIST_URI = "/api/user/v1/users/"
 USER_PREFERENCE_LIST_URI = "/api/user/v1/user_prefs/"

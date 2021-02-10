@@ -15,9 +15,8 @@ from openedx.core.djangoapps.credit.models import (
     CreditRequirement,
     CreditRequirementStatus
 )
-from openedx.core.djangoapps.user_api.accounts.tests.retirement_helpers import (  # pylint: disable=unused-import
-    RetirementTestCase,
-    setup_retirement_states
+from openedx.core.djangoapps.user_api.accounts.tests.retirement_helpers import (
+    RetirementTestCase
 )
 from openedx.core.djangoapps.user_api.models import UserRetirementStatus
 from common.djangoapps.student.tests.factories import UserFactory

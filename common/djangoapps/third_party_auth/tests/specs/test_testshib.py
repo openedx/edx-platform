@@ -7,7 +7,6 @@ import datetime
 import json
 import logging
 import os
-import unittest  # lint-amnesty, pylint: disable=unused-import
 from unittest import skip
 
 import ddt

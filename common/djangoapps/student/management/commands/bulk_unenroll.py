@@ -4,7 +4,6 @@ Un-enroll Bulk users course wide as well as specified in csv
 import logging
 
 import unicodecsv
-from django.core.exceptions import ObjectDoesNotExist  # lint-amnesty, pylint: disable=unused-import
 from django.core.management.base import BaseCommand
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey

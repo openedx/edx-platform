@@ -38,7 +38,7 @@ When refering to XBlocks, we use the entry-point name. For example,
 # We intentionally define lots of variables that aren't used, and
 # want to import all variables from base settings files
 
-# pylint: disable=unused-import, useless-suppression, wrong-import-order, wrong-import-position
+# pylint: disable= useless-suppression, wrong-import-order, wrong-import-position
 
 import importlib.util
 import os
@@ -53,18 +53,6 @@ import lms.envs.common
 #   direction documented in OEP-45: Configuring and Operating Open edX:
 #   https://open-edx-proposals.readthedocs.io/en/latest/oep-0045-arch-ops-and-config.html
 from lms.envs.common import (
-    USE_TZ, ALL_LANGUAGES, ASSET_IGNORE_REGEX,
-    PARENTAL_CONSENT_AGE_LIMIT, REGISTRATION_EMAIL_PATTERNS_ALLOWED,
-    # The following PROFILE_IMAGE_* settings are included as they are
-    # indirectly accessed through the email opt-in API, which is
-    # technically accessible through the CMS via legacy URLs.
-    PROFILE_IMAGE_BACKEND, PROFILE_IMAGE_DEFAULT_FILENAME, PROFILE_IMAGE_DEFAULT_FILE_EXTENSION,
-    PROFILE_IMAGE_HASH_SEED, PROFILE_IMAGE_MIN_BYTES, PROFILE_IMAGE_MAX_BYTES, PROFILE_IMAGE_SIZES_MAP,
-    # The following setting is included as it is used to check whether to
-    # display credit eligibility table on the CMS or not.
-    COURSE_MODE_DEFAULTS, DEFAULT_COURSE_ABOUT_IMAGE_URL,
-
-    # User-uploaded content
     MEDIA_ROOT,
     MEDIA_URL,
 
@@ -72,50 +60,8 @@ from lms.envs.common import (
     _,
 
     # Django REST framework configuration
-    REST_FRAMEWORK,
-
-    STATICI18N_OUTPUT_DIR,
-
-    # Heartbeat
-    HEARTBEAT_CHECKS,
-    HEARTBEAT_EXTENDED_CHECKS,
-    HEARTBEAT_CELERY_TIMEOUT,
-    HEARTBEAT_CELERY_ROUTING_KEY,
-
-    # Default site to use if no site exists matching request headers
-    SITE_ID,
-
-    # constants for redirects app
-    REDIRECT_CACHE_TIMEOUT,
-    REDIRECT_CACHE_KEY_PREFIX,
-
-    # This is required for the migrations in oauth_dispatch.models
-    # otherwise it fails saying this attribute is not present in Settings
-    # Although Studio does not enable OAuth2 Provider capability, the new approach
-    # to generating test databases will discover and try to create all tables
-    # and this setting needs to be present
-    OAUTH2_PROVIDER_APPLICATION_MODEL,
-    JWT_AUTH,
-
-    USERNAME_REGEX_PARTIAL,
-    USERNAME_PATTERN,
-
-    # django-debug-toolbar
-    DEBUG_TOOLBAR_PATCH_SETTINGS,
-
-    COURSE_ENROLLMENT_MODES,
-    CONTENT_TYPE_GATE_GROUP_IDS,
-
-    DISABLE_ACCOUNT_ACTIVATION_REQUIREMENT_SWITCH,
-
-    GENERATE_PROFILE_SCORES,
-
-    # Enterprise service settings
-    ENTERPRISE_CATALOG_INTERNAL_ROOT_URL,
-
-    # Methods to derive settings
     _make_mako_template_dirs,
-    _make_locale_paths,
+    _make_locale_paths
 )
 from path import Path as path
 from django.urls import reverse_lazy
@@ -123,11 +69,6 @@ from django.urls import reverse_lazy
 from lms.djangoapps.lms_xblock.mixin import LmsBlockMixin
 from cms.lib.xblock.authoring_mixin import AuthoringMixin
 from xmodule.modulestore.edit_info import EditInfoMixin
-from openedx.core.djangoapps.theming.helpers_dirs import (
-    get_themes_unchecked,
-    get_theme_base_dirs_from_settings
-)
-from openedx.core.lib.license import LicenseMixin
 from openedx.core.lib.derived import derived, derived_collection_entry
 from openedx.core.release import doc_version
 
@@ -644,12 +585,6 @@ ELASTIC_SEARCH_CONFIG = [
         'port': 9200
     }
 ]
-
-# These are standard regexes for pulling out info like course_ids, usage_ids, etc.
-# They are used so that URLs with deprecated-format strings still work.
-from lms.envs.common import (
-    COURSE_KEY_PATTERN, COURSE_KEY_REGEX, COURSE_ID_PATTERN, USAGE_KEY_PATTERN, ASSET_KEY_PATTERN
-)
 
 ######################### CSRF #########################################
 

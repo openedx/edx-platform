@@ -5,15 +5,10 @@ This test file will verify proper password policy enforcement, which is an optio
 
 
 import json
-
-from django.contrib.auth.models import AnonymousUser  # lint-amnesty, pylint: disable=unused-import
 from django.test import TestCase
 from django.test.client import RequestFactory
 from django.test.utils import override_settings
 from django.urls import reverse
-from mock import patch  # lint-amnesty, pylint: disable=unused-import
-
-from openedx.core.djangoapps.site_configuration.tests.factories import SiteFactory  # lint-amnesty, pylint: disable=unused-import
 from common.djangoapps.util.password_policy_validators import create_validator_config
 
 

@@ -14,10 +14,8 @@ import ddt
 import pytz
 import six
 from bson import ObjectId
-from capa.tests.response_xml_factory import OptionResponseXMLFactory
 from completion.waffle import ENABLE_COMPLETION_TRACKING_SWITCH  # lint-amnesty, pylint: disable=wrong-import-order
 from completion.models import BlockCompletion  # lint-amnesty, pylint: disable=wrong-import-order
-from common.djangoapps.course_modes.models import CourseMode
 from django.conf import settings  # lint-amnesty, pylint: disable=wrong-import-order
 from django.contrib.auth.models import AnonymousUser  # lint-amnesty, pylint: disable=wrong-import-order
 from django.http import Http404, HttpResponse  # lint-amnesty, pylint: disable=wrong-import-order
@@ -28,7 +26,6 @@ from django.urls import reverse  # lint-amnesty, pylint: disable=wrong-import-or
 from edx_proctoring.api import create_exam, create_exam_attempt, update_attempt_status  # lint-amnesty, pylint: disable=wrong-import-order
 from edx_proctoring.runtime import set_runtime_service  # lint-amnesty, pylint: disable=wrong-import-order
 from edx_proctoring.tests.test_services import MockCertificateService, MockCreditService, MockGradesService  # lint-amnesty, pylint: disable=wrong-import-order
-from edx_toggles.toggles import LegacyWaffleSwitch  # lint-amnesty, pylint: disable=unused-import, wrong-import-order
 from edx_toggles.toggles.testutils import override_waffle_switch  # lint-amnesty, pylint: disable=wrong-import-order
 from edx_when.field_data import DateLookupFieldData  # lint-amnesty, pylint: disable=wrong-import-order
 from freezegun import freeze_time  # lint-amnesty, pylint: disable=wrong-import-order

@@ -9,7 +9,7 @@ import os
 
 if os.environ['EDX_PLATFORM_SETTINGS'] == 'devstack_docker':
     from lms.envs.devstack_docker import *  # lint-amnesty, pylint: disable=wildcard-import
-    from cms.envs.devstack_docker import (  # lint-amnesty, pylint: disable=unused-import
+    from cms.envs.devstack_docker import (
         ADVANCED_PROBLEM_TYPES,
         COURSE_IMPORT_EXPORT_STORAGE,
         LIBRARY_AUTHORING_MICROFRONTEND_URL,

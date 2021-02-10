@@ -7,7 +7,6 @@ Tests courseware views.py
 import html
 import itertools
 import json
-import unittest  # lint-amnesty, pylint: disable=unused-import
 from datetime import datetime, timedelta
 from uuid import uuid4
 

@@ -10,7 +10,7 @@ from django.test import TestCase
 from django.test.utils import override_settings
 from django.urls import reverse
 
-from lms.djangoapps.verify_student.models import ManualVerification, SoftwareSecurePhotoVerification, SSOVerification  # lint-amnesty, pylint: disable=unused-import
+from lms.djangoapps.verify_student.models import ManualVerification, SoftwareSecurePhotoVerification
 from lms.djangoapps.verify_student.tests.factories import SSOVerificationFactory
 from common.djangoapps.student.tests.factories import UserFactory
 

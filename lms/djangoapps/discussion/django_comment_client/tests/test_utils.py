@@ -4,11 +4,9 @@
 
 import datetime
 import json
-import sys
 
 import ddt
 import mock
-import pytest
 import six
 from django.test import RequestFactory, TestCase
 from django.urls import reverse

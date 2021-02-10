@@ -2,11 +2,7 @@
 Tests for third_party_auth decorators.
 """
 
-
-import unittest  # lint-amnesty, pylint: disable=unused-import
-
 import ddt
-from django.conf import settings  # lint-amnesty, pylint: disable=unused-import
 from django.http import HttpResponse
 from django.test import RequestFactory
 

@@ -23,7 +23,7 @@ from openedx.core.djangoapps.schedules.models import ScheduleExperience
 from openedx.core.djangoapps.schedules.utils import reset_self_paced_schedule
 from openedx.core.djangoapps.theming.helpers import get_current_site
 from common.djangoapps.student.models import CourseEnrollment
-from common.djangoapps.student.signals import ENROLL_STATUS_CHANGE, ENROLLMENT_TRACK_UPDATED  # lint-amnesty, pylint: disable=unused-import
+from common.djangoapps.student.signals import ENROLLMENT_TRACK_UPDATED
 from common.djangoapps.track import segment
 
 from .config import CREATE_SCHEDULE_WAFFLE_FLAG

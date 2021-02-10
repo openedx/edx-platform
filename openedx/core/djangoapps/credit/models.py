@@ -20,7 +20,6 @@ from django.core.validators import RegexValidator
 from django.db import IntegrityError, models, transaction
 from django.dispatch import receiver
 from django.utils.encoding import python_2_unicode_compatible
-from django.utils.translation import ugettext as _  # lint-amnesty, pylint: disable=unused-import
 from django.utils.translation import ugettext_lazy
 from edx_django_utils.cache import RequestCache
 from jsonfield.fields import JSONField

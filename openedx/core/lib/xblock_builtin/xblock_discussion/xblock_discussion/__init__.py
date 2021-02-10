@@ -6,7 +6,6 @@ Discussion XBlock
 import logging
 import six
 from six.moves import urllib
-from six.moves.urllib.parse import urlparse  # pylint: disable=import-error
 from django.contrib.staticfiles.storage import staticfiles_storage
 from django.urls import reverse
 from django.utils.translation import get_language_bidi

@@ -7,7 +7,6 @@ import datetime
 import ddt
 import mock
 from django.conf import settings
-from django.test import override_settings  # lint-amnesty, pylint: disable=unused-import
 from django.test.client import RequestFactory
 from django.urls import reverse
 from edx_toggles.toggles.testutils import override_waffle_flag

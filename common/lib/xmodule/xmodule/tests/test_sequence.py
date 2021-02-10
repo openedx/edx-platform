@@ -18,7 +18,6 @@ from six.moves import range
 from web_fragments.fragment import Fragment
 
 from edx_toggles.toggles.testutils import override_waffle_flag
-from common.djangoapps.student.tests.factories import UserFactory
 from openedx.features.content_type_gating.models import ContentTypeGatingConfig
 from xmodule.seq_module import TIMED_EXAM_GATING_WAFFLE_FLAG, SequenceModule
 from xmodule.tests import get_test_system

@@ -5,33 +5,21 @@ Views to show a course outline.
 
 import datetime
 import re
-import six  # lint-amnesty, pylint: disable=unused-import
 
 from completion.waffle import ENABLE_COMPLETION_TRACKING_SWITCH
 from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
-from django.db.models import Q  # lint-amnesty, pylint: disable=unused-import
-from django.shortcuts import redirect  # lint-amnesty, pylint: disable=unused-import
 from django.template.context_processors import csrf
 from django.template.loader import render_to_string
 from django.urls import reverse
-from django.utils import timezone  # lint-amnesty, pylint: disable=unused-import
-from django.views.decorators.csrf import ensure_csrf_cookie  # lint-amnesty, pylint: disable=unused-import
 import edx_when.api as edx_when_api
 from opaque_keys.edx.keys import CourseKey
 from pytz import UTC
 from waffle.models import Switch
 from web_fragments.fragment import Fragment
-
-from lms.djangoapps.courseware.access import has_access  # lint-amnesty, pylint: disable=unused-import
 from lms.djangoapps.courseware.courses import get_course_overview_with_access
 from lms.djangoapps.courseware.date_summary import verified_upgrade_deadline_link
-from lms.djangoapps.courseware.masquerade import setup_masquerade  # lint-amnesty, pylint: disable=unused-import
-from openedx.core.djangoapps.content.course_overviews.models import CourseOverview  # lint-amnesty, pylint: disable=unused-import
 from openedx.core.djangoapps.plugin_api.views import EdxFragmentView
-from openedx.core.djangoapps.schedules.utils import reset_self_paced_schedule  # lint-amnesty, pylint: disable=unused-import
-from openedx.features.course_experience import RELATIVE_DATES_FLAG  # lint-amnesty, pylint: disable=unused-import
 from openedx.features.course_experience.utils import dates_banner_should_display
-from openedx.features.content_type_gating.models import ContentTypeGatingConfig  # lint-amnesty, pylint: disable=unused-import
 from common.djangoapps.student.models import CourseEnrollment
 from common.djangoapps.util.milestones_helpers import get_course_content_milestones
 from xmodule.course_module import COURSE_VISIBILITY_PUBLIC
@@ -52,7 +40,6 @@ class CourseOutlineFragmentView(EdxFragmentView):
         Renders the course outline as a fragment.
         """
         from lms.urls import RESET_COURSE_DEADLINES_NAME
-        from openedx.features.course_experience.urls import COURSE_HOME_VIEW_NAME  # lint-amnesty, pylint: disable=unused-import
 
         course_key = CourseKey.from_string(course_id)
         course_overview = get_course_overview_with_access(

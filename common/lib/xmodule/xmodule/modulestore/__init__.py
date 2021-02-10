@@ -16,21 +16,14 @@ from operator import itemgetter
 import six
 from contracts import contract, new_contract
 from opaque_keys.edx.keys import AssetKey, CourseKey
-from opaque_keys.edx.locations import Location  # For import backwards compatibility
 from pytz import UTC
 from six.moves import range
 from sortedcontainers import SortedKeyList
 from xblock.core import XBlock
 from xblock.plugin import default_select
 from xblock.runtime import Mixologist
-
-# The below import is not used within this module, but ir is still needed becuase
-# other modules are imorting EdxJSONEncoder from here
-from openedx.core.lib.json_utils import EdxJSONEncoder
 from xmodule.assetstore import AssetMetadata
 from xmodule.errortracker import make_error_tracker
-
-from .exceptions import InsufficientSpecificationError, InvalidLocationError
 
 log = logging.getLogger('edx.modulestore')
 

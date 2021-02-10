@@ -6,17 +6,10 @@ Run like this:
     paver test_lib -l common/lib/xmodule
 
 """
-
-
-import inspect
 import json
 import os
 import pprint
-import sys
-import traceback
 import unittest
-from contextlib import contextmanager
-from functools import wraps
 
 import six
 from django.test import TestCase

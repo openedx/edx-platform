@@ -12,7 +12,6 @@ import uuid
 
 import markupsafe
 import six
-import webpack_loader.utils
 from contracts import contract
 from django.conf import settings
 from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
@@ -36,6 +35,7 @@ from xmodule.vertical_block import VerticalBlock
 from xmodule.x_module import (
     PREVIEW_VIEWS, STUDENT_VIEW, STUDIO_VIEW,
     XModule, XModuleDescriptor, shim_xmodule_js,
+
 )
 
 log = logging.getLogger(__name__)

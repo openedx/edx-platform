@@ -2,13 +2,9 @@
 Minimal Django settings for tests of common/lib.
 Required in Django 1.9+ due to imports of models in stock Django apps.
 """
-
-
-import sys  # lint-amnesty, pylint: disable=unused-import
 import tempfile
 
 from django.utils.translation import ugettext_lazy as _
-from path import Path  # lint-amnesty, pylint: disable=unused-import
 
 ALL_LANGUAGES = []
 

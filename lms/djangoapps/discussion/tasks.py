@@ -9,7 +9,6 @@ import logging
 import six
 from celery import shared_task
 from celery_utils.logged_task import LoggedTask
-from django.conf import settings  # lint-amnesty, pylint: disable=unused-import
 from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.contrib.sites.models import Site
 from edx_ace import ace

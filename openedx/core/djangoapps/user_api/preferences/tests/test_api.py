@@ -21,8 +21,7 @@ from common.djangoapps.student.tests.factories import UserFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
-from ...errors import (  # lint-amnesty, pylint: disable=unused-import
-    CountryCodeError,
+from ...errors import (
     PreferenceUpdateError,
     PreferenceValidationError,
     UserNotAuthorized,

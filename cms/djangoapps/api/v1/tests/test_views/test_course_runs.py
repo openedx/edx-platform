@@ -8,7 +8,6 @@ import pytz
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import RequestFactory, override_settings
 from django.urls import reverse
-from mock import patch  # lint-amnesty, pylint: disable=unused-import
 from opaque_keys.edx.keys import CourseKey
 from organizations.api import add_organization, get_course_organizations
 from rest_framework.test import APIClient

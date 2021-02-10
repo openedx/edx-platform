@@ -28,20 +28,8 @@ from .common import *
 
 # import settings from LMS for consistent behavior with CMS
 from lms.envs.test import (  # pylint: disable=wrong-import-order
-    COMPREHENSIVE_THEME_DIRS,
-    DEFAULT_FILE_STORAGE,
-    ECOMMERCE_API_URL,
-    ENABLE_COMPREHENSIVE_THEMING,
-    JWT_AUTH,
-    LOGIN_ISSUE_SUPPORT_LINK,
     MEDIA_ROOT,
-    MEDIA_URL,
-    PLATFORM_DESCRIPTION,
-    PLATFORM_NAME,
-    REGISTRATION_EXTRA_FIELDS,
-    GRADES_DOWNLOAD,
-    SITE_NAME,
-    WIKI_ENABLED
+    MEDIA_URL
 )
 
 

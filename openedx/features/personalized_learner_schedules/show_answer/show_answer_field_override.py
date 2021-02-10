@@ -3,9 +3,6 @@ FieldOverride that forces Show Answer values that use Past Due logic to
 new Show Answer values that remove the Past Due check (keeping the rest intact)
 """
 
-
-from django.conf import settings  # lint-amnesty, pylint: disable=unused-import
-
 from common.lib.xmodule.xmodule.capa_base import SHOWANSWER
 from lms.djangoapps.courseware.field_overrides import FieldOverrideProvider
 from openedx.features.course_experience import RELATIVE_DATES_FLAG

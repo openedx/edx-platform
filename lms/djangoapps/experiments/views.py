@@ -4,7 +4,6 @@ Experimentation views
 
 
 from django.contrib.auth import get_user_model
-from django.db import transaction  # lint-amnesty, pylint: disable=unused-import
 from django_filters.rest_framework import DjangoFilterBackend
 from django.http import Http404
 from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthentication
@@ -12,7 +11,6 @@ from edx_rest_framework_extensions.auth.session.authentication import SessionAut
 from lms.djangoapps.courseware import courses
 from opaque_keys.edx.keys import CourseKey  # lint-amnesty, pylint: disable=wrong-import-order
 from rest_framework import permissions, viewsets  # lint-amnesty, pylint: disable=wrong-import-order
-from rest_framework.response import Response  # lint-amnesty, pylint: disable=unused-import, wrong-import-order
 from rest_framework.views import APIView  # lint-amnesty, pylint: disable=wrong-import-order
 from common.djangoapps.util.json_request import JsonResponse
 

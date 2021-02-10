@@ -3,7 +3,7 @@
 
 # Converted from the original South migration 0002_enable_on_install.py
 #
-from django.db import migrations, models
+from django.db import migrations
 
 
 def create_dark_lang_config(apps, schema_editor):

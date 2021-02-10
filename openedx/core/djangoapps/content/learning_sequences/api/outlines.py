@@ -6,14 +6,11 @@ __init__.py imports from here, and is a more stable place to import from.
 import logging
 from collections import defaultdict
 from datetime import datetime
-from typing import Optional  # lint-amnesty, pylint: disable=unused-import
-
-import attr  # lint-amnesty, pylint: disable=unused-import
 from django.contrib.auth import get_user_model
 from django.db import transaction
-from edx_django_utils.cache import TieredCache, get_cache_key  # lint-amnesty, pylint: disable=unused-import
+from edx_django_utils.cache import TieredCache
 from edx_django_utils.monitoring import function_trace
-from opaque_keys.edx.keys import CourseKey, UsageKey  # lint-amnesty, pylint: disable=unused-import
+from opaque_keys.edx.keys import CourseKey
 
 from ..data import (
     CourseLearningSequenceData,
@@ -24,6 +21,7 @@ from ..data import (
     UserCourseOutlineData,
     UserCourseOutlineDetailsData,
     VisibilityData,
+
 )
 from ..models import (
     CourseSection,

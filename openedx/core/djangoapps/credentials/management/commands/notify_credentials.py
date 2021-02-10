@@ -30,7 +30,7 @@ from lms.djangoapps.certificates.api import get_recently_modified_certificates
 from lms.djangoapps.grades.api import get_recently_modified_grades
 from openedx.core.djangoapps.credentials.models import NotifyCredentialsConfig
 from lms.djangoapps.certificates.models import CertificateStatuses
-from openedx.core.djangoapps.credentials.signals import handle_cert_change, send_grade_if_interesting  # lint-amnesty, pylint: disable=unused-import
+from openedx.core.djangoapps.credentials.signals import send_grade_if_interesting
 from openedx.core.djangoapps.programs.signals import handle_course_cert_changed, handle_course_cert_awarded
 from openedx.core.djangoapps.site_configuration.models import SiteConfiguration
 

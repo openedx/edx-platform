@@ -1,8 +1,5 @@
 """Unit tests for settings.py."""
 
-
-import unittest  # lint-amnesty, pylint: disable=unused-import
-
 from mock import patch
 from common.djangoapps.third_party_auth import provider, settings
 from common.djangoapps.third_party_auth.tests import testutil

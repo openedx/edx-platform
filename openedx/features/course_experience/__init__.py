@@ -1,10 +1,7 @@
 """  # lint-amnesty, pylint: disable=django-not-configured
 Unified course experience settings and helper methods.
 """
-import crum
 from django.utils.translation import ugettext as _
-from edx_django_utils.monitoring import set_custom_attribute
-from waffle import flag_is_active
 
 from edx_toggles.toggles import LegacyWaffleFlag, LegacyWaffleFlagNamespace
 from lms.djangoapps.experiments.flags import ExperimentWaffleFlag

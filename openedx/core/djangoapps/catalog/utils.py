@@ -15,7 +15,6 @@ from pytz import UTC
 from six import text_type
 
 from common.djangoapps.entitlements.utils import is_course_run_entitlement_fulfillable
-from openedx.core.constants import COURSE_PUBLISHED  # lint-amnesty, pylint: disable=unused-import
 from openedx.core.djangoapps.catalog.cache import (
     COURSE_PROGRAMS_CACHE_KEY_TPL,
     CATALOG_COURSE_PROGRAMS_CACHE_KEY_TPL,

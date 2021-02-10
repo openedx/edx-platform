@@ -9,12 +9,9 @@ import logging
 from collections import OrderedDict
 from contextlib import contextmanager
 from datetime import datetime
-from io import StringIO  # lint-amnesty, pylint: disable=unused-import
 from tempfile import TemporaryFile
 from time import time
-from zipfile import ZipFile  # lint-amnesty, pylint: disable=unused-import
 import csv
-import os  # lint-amnesty, pylint: disable=unused-import
 import unicodecsv
 import six
 
@@ -37,6 +34,7 @@ from .utils import (
     UPDATE_STATUS_SUCCEEDED,
     upload_csv_to_report_store,
     upload_zip_to_report_store,
+
 )
 
 # define different loggers for use within tasks and on client side

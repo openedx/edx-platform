@@ -24,9 +24,6 @@ from openedx.features.course_duration_limits.access import get_user_course_durat
 from common.djangoapps.student.models import CourseEnrollment
 from xmodule.partitions.partitions_service import get_all_partitions_for_course, get_user_partition_groups
 
-# Import this for backwards compatibility (so that anyone importing this function from here doesn't break)
-from .stable_bucketing import stable_bucketing_hash_group  # pylint: disable=unused-import
-
 logger = logging.getLogger(__name__)
 
 

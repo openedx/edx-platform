@@ -8,7 +8,7 @@ from datetime import datetime
 
 import six
 from django.test import TestCase
-from mock import Mock, patch  # lint-amnesty, pylint: disable=unused-import
+from mock import Mock
 from opaque_keys.edx.locator import CourseLocator
 from stevedore.extension import Extension, ExtensionManager
 

@@ -32,7 +32,6 @@ from django.conf import settings
 from django.core.management.base import BaseCommand, CommandError
 from django.db import connections
 from django.utils import timezone
-from opaque_keys.edx.keys import CourseKey  # lint-amnesty, pylint: disable=unused-import
 import six
 from six import text_type
 from six.moves import range

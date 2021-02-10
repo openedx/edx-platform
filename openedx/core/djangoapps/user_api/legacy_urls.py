@@ -1,9 +1,6 @@
 """
 Defines the URL routes for this app.
 """
-
-
-from django.conf import settings  # lint-amnesty, pylint: disable=unused-import
 from django.conf.urls import include, url
 from rest_framework import routers
 

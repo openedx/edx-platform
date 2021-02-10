@@ -9,7 +9,7 @@ from unittest import TestCase  # lint-amnesty, pylint: disable=wrong-import-orde
 
 from opaque_keys.edx.keys import CourseKey
 from lms.djangoapps.course_blocks.transformers.tests.helpers import ModuleStoreTestCase
-from lms.djangoapps.courseware import courses  # lint-amnesty, pylint: disable=unused-import
+from lms.djangoapps.courseware import courses
 from lms.djangoapps.experiments.utils import (
     get_course_entitlement_price_and_sku,
     get_experiment_user_metadata_context,

@@ -6,22 +6,13 @@ Instructor tasks related to enrollments.
 import logging
 from datetime import datetime
 from time import time
-
-from django.conf import settings  # lint-amnesty, pylint: disable=unused-import
-from django.utils.translation import ugettext as _  # lint-amnesty, pylint: disable=unused-import
 from pytz import UTC
-from six import StringIO  # lint-amnesty, pylint: disable=unused-import
-
-from common.djangoapps.edxmako.shortcuts import render_to_string  # lint-amnesty, pylint: disable=unused-import
-from lms.djangoapps.courseware.courses import get_course_by_id  # lint-amnesty, pylint: disable=unused-import
 from lms.djangoapps.instructor_analytics.basic import enrolled_students_features, list_may_enroll
 from lms.djangoapps.instructor_analytics.csvs import format_dictlist
-from lms.djangoapps.instructor_task.models import ReportStore  # lint-amnesty, pylint: disable=unused-import
-from common.djangoapps.student.models import CourseAccessRole, CourseEnrollment  # lint-amnesty, pylint: disable=unused-import
-from common.djangoapps.util.file import course_filename_prefix_generator  # lint-amnesty, pylint: disable=unused-import
+from common.djangoapps.student.models import CourseEnrollment
 
 from .runner import TaskProgress
-from .utils import tracker_emit, upload_csv_to_report_store  # lint-amnesty, pylint: disable=unused-import
+from .utils import upload_csv_to_report_store
 
 TASK_LOG = logging.getLogger('edx.celery.task')
 FILTERED_OUT_ROLES = ['staff', 'instructor', 'finance_admin', 'sales_admin']

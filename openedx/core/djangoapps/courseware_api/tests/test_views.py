@@ -10,7 +10,6 @@ import mock
 from completion.test_utils import CompletionWaffleTestMixin, submit_completions_for_testing
 from django.conf import settings
 from django.test.client import RequestFactory
-from django.urls import reverse  # lint-amnesty, pylint: disable=unused-import
 
 from lms.djangoapps.certificates.api import get_certificate_url
 from lms.djangoapps.certificates.tests.factories import (

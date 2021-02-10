@@ -10,7 +10,6 @@ from django.conf import settings
 from django.test import RequestFactory, TestCase
 from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthentication
 from edx_rest_framework_extensions.auth.jwt.tests.utils import generate_jwt
-from mock import patch  # lint-amnesty, pylint: disable=unused-import
 from rest_framework.authentication import SessionAuthentication
 from rest_framework.response import Response
 from rest_framework.views import APIView

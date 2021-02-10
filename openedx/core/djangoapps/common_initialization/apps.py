@@ -11,8 +11,6 @@ class CommonInitializationConfig(AppConfig):  # lint-amnesty, pylint: disable=mi
     verbose_name = 'Common Initialization'
 
     def ready(self):
-        # Common settings validations for the LMS and CMS.
-        from . import checks  # lint-amnesty, pylint: disable=unused-import
         self._add_mimetypes()
 
     @staticmethod

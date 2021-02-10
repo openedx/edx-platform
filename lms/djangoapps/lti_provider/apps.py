@@ -14,5 +14,4 @@ class LtiProviderConfig(AppConfig):
     verbose_name = "LTI Provider"
 
     def ready(self):
-        # Import the tasks module to ensure that signal handlers are registered.
-        from . import signals  # pylint: disable=unused-import
+        pass

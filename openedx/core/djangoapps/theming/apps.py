@@ -19,5 +19,4 @@ class ThemingConfig(AppConfig):  # lint-amnesty, pylint: disable=missing-class-d
     verbose_name = "Theming"
 
     def ready(self):
-        # settings validations related to theming.
-        from . import checks  # lint-amnesty, pylint: disable=unused-import
+        pass

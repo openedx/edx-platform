@@ -5,8 +5,6 @@ Tests for helper functions.
 
 import json
 import re
-
-import ddt  # lint-amnesty, pylint: disable=unused-import
 import mock
 import pytest
 from django import forms

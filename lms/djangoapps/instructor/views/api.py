@@ -45,7 +45,6 @@ from submissions import api as sub_api  # installed from the edx-submissions rep
 
 from lms.djangoapps.instructor_analytics import basic as instructor_analytics_basic
 from lms.djangoapps.instructor_analytics import csvs as instructor_analytics_csvs
-from lms.djangoapps.instructor_analytics import distributions as instructor_analytics_distributions  # lint-amnesty, pylint: disable=unused-import
 from lms.djangoapps.bulk_email.api import is_bulk_email_feature_enabled
 from lms.djangoapps.bulk_email.models import CourseEmail
 from common.djangoapps.course_modes.models import CourseMode

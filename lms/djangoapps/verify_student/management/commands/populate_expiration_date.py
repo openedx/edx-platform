@@ -5,9 +5,6 @@ Django admin command to populate expiration_date for approved verifications in S
 
 import logging
 import time
-from datetime import timedelta  # lint-amnesty, pylint: disable=unused-import
-
-from django.conf import settings  # lint-amnesty, pylint: disable=unused-import
 from django.core.management.base import BaseCommand
 from django.db.models import F
 

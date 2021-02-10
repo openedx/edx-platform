@@ -13,7 +13,6 @@ from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imp
 from django.contrib.sites.models import Site  # lint-amnesty, pylint: disable=wrong-import-order
 from django.core.management.base import BaseCommand, CommandError  # lint-amnesty, pylint: disable=wrong-import-order
 from django.db.models import Q  # lint-amnesty, pylint: disable=wrong-import-order
-from django.urls import reverse  # lint-amnesty, pylint: disable=unused-import, wrong-import-order
 from django.utils.timezone import now  # lint-amnesty, pylint: disable=wrong-import-order
 from edx_ace import ace  # lint-amnesty, pylint: disable=wrong-import-order
 from edx_ace.recipient import Recipient  # lint-amnesty, pylint: disable=wrong-import-order
@@ -22,7 +21,6 @@ from common.djangoapps.util.query import use_read_replica_if_available
 
 from lms.djangoapps.verify_student.message_types import VerificationExpiry
 from lms.djangoapps.verify_student.models import ManualVerification, SoftwareSecurePhotoVerification, SSOVerification
-from lms.djangoapps.verify_student.services import IDVerificationService  # lint-amnesty, pylint: disable=unused-import
 from openedx.core.djangoapps.ace_common.template_context import get_base_template_context
 from openedx.core.djangoapps.lang_pref import LANGUAGE_KEY
 from openedx.core.djangoapps.user_api.preferences.api import get_user_preference

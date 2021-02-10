@@ -4,8 +4,6 @@ import datetime
 import logging
 
 import pytz
-from django.db.models import F, Subquery  # lint-amnesty, pylint: disable=unused-import
-from django.db.models.functions import Greatest  # lint-amnesty, pylint: disable=unused-import
 from django.db import transaction
 
 from openedx.core.djangoapps.schedules.models import Schedule

@@ -30,7 +30,7 @@ from xmodule.x_module import (
 )
 from xmodule.xml_module import XmlMixin
 
-from .capa_base import CapaMixin, ComplexEncoder, _  # lint-amnesty, pylint: disable=unused-import
+from .capa_base import CapaMixin, ComplexEncoder, _
 
 log = logging.getLogger("edx.courseware")
 

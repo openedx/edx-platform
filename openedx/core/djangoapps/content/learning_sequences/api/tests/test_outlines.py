@@ -10,15 +10,13 @@ from django.conf import settings
 from django.contrib.auth.models import AnonymousUser, User  # lint-amnesty, pylint: disable=imported-auth-user
 from edx_proctoring.exceptions import ProctoredExamNotFoundException
 from edx_when.api import set_dates_for_course
-from opaque_keys.edx.keys import CourseKey, UsageKey  # lint-amnesty, pylint: disable=unused-import
-from opaque_keys.edx.locator import BlockUsageLocator  # lint-amnesty, pylint: disable=unused-import
+from opaque_keys.edx.keys import CourseKey
 
 from edx_toggles.toggles.testutils import override_waffle_flag
 from lms.djangoapps.courseware.tests.factories import BetaTesterFactory
 from openedx.core.djangolib.testing.utils import CacheIsolationTestCase
 from openedx.features.course_experience import COURSE_ENABLE_UNENROLLED_ACCESS_FLAG
 from common.djangoapps.student.auth import user_has_role
-from common.djangoapps.student.models import CourseEnrollment  # lint-amnesty, pylint: disable=unused-import
 from common.djangoapps.student.roles import CourseBetaTesterRole
 
 from ...data import (
@@ -28,6 +26,7 @@ from ...data import (
     CourseVisibility,
     ExamData,
     VisibilityData,
+
 )
 from ..outlines import (
     get_course_outline,

@@ -13,5 +13,4 @@ class ProgramsConfig(AppConfig):
     name = u'openedx.core.djangoapps.programs'
 
     def ready(self):
-        # noinspection PyUnresolvedReferences
-        from . import signals, tasks  # lint-amnesty, pylint: disable=unused-import, unused-variable
+        pass

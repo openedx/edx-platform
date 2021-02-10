@@ -17,7 +17,6 @@ from lms.djangoapps.verify_student.tests.test_models import (
     mock_software_secure_post,
     mock_software_secure_post_error
 )
-from common.djangoapps.student.tests.factories import UserFactory  # lint-amnesty, pylint: disable=import-error, unused-import, useless-suppression
 
 LOGGER_NAME = 'retry_photo_verification'
 
