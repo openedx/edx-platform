@@ -48,3 +48,5 @@ tox                       # virtualenv management for tests
 tox-battery               # Makes tox aware of requirements file changes
 transifex-client          # Command-line interface for the Transifex localization service
 unidiff                   # Required by coverage_pytest_plugin
+pylint-pytest             # A Pylint plugin to suppress pytest-related false positives.
+
