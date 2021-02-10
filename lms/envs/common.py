@@ -1898,6 +1898,8 @@ MIDDLEWARE = [
 
     # Cookie monitoring
     'openedx.core.lib.request_utils.CookieMonitoringMiddleware',
+    # Temporary middleware to determine where 403s are coming from for /oauth2/exchange_access_token/
+    'openedx.core.lib.request_utils.Monitor403Middleware',
 
     'lms.djangoapps.mobile_api.middleware.AppVersionUpgrade',
     'openedx.core.djangoapps.header_control.middleware.HeaderControlMiddleware',

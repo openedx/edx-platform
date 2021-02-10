@@ -1,18 +1,24 @@
 """Tests for request_utils module."""
 
-
+import ddt
 import unittest
 from unittest.mock import Mock, patch, call
 
+import requests
 from django.conf import settings
-from django.core.exceptions import SuspiciousOperation
+from django.core.exceptions import PermissionDenied, SuspiciousOperation
+from django.http import HttpResponseForbidden
 from django.test.client import RequestFactory
+from django.test.utils import override_settings
+from rest_framework.exceptions import PermissionDenied as DRFPermissionDenied
+
 
 from openedx.core.lib.request_utils import (
     get_request_or_stub,
     course_id_from_url,
     safe_get_host,
     CookieMonitoringMiddleware,
+    Monitor403Middleware,
 )
 
 
@@ -203,3 +209,75 @@ class RequestUtilTestCase(unittest.TestCase):
             call('cookies.2.size', 10),
             call('cookies_total_size', 25),
         ], any_order=True)
+
+
+@ddt.ddt
+class TestMonitor403Middleware(unittest.TestCase):
+    """
+    Tests for Monitor403Middleware
+    """
+    @ddt.data(True, False)
+    def test_get_response(self, is_monitoring_enabled):
+        response = HttpResponseForbidden()
+        request = RequestFactory().get('/oauth2/exchange_access_token/google-oauth2/')
+
+        middleware = Monitor403Middleware(lambda _: response)
+
+        with patch('openedx.core.lib.request_utils.log') as mock_logger:
+            with override_settings(ENABLE_403_MONITORING=is_monitoring_enabled):
+                response = middleware(request)
+
+        if is_monitoring_enabled:
+            mock_logger.info.assert_called()
+        else:
+            mock_logger.info.assert_not_called()
+
+    @ddt.data(True, False)
+    def test_process_exception_requests_error(self, is_monitoring_enabled):
+        request = RequestFactory().get('/oauth2/exchange_access_token/google-oauth2/')
+        response = requests.models.Response()
+        response.status_code = 403
+
+        try:
+            raise requests.exceptions.HTTPError('mock error message', response=response)
+        except requests.exceptions.HTTPError as exception:
+            with patch('openedx.core.lib.request_utils.log') as mock_logger:
+                with override_settings(ENABLE_403_MONITORING=is_monitoring_enabled):
+                    Monitor403Middleware('mock-response').process_exception(request, exception)
+
+        if is_monitoring_enabled:
+            mock_logger.info.assert_called()
+        else:
+            mock_logger.info.assert_not_called()
+
+    @ddt.data(True, False)
+    def test_process_exception_django_error(self, is_monitoring_enabled):
+        request = RequestFactory().get('/oauth2/exchange_access_token/google-oauth2/')
+
+        try:
+            raise PermissionDenied()
+        except PermissionDenied as exception:
+            with patch('openedx.core.lib.request_utils.log') as mock_logger:
+                with override_settings(ENABLE_403_MONITORING=is_monitoring_enabled):
+                    Monitor403Middleware('mock-response').process_exception(request, exception)
+
+        if is_monitoring_enabled:
+            mock_logger.info.assert_called()
+        else:
+            mock_logger.info.assert_not_called()
+
+    @ddt.data(True, False)
+    def test_process_exception_drf_error(self, is_monitoring_enabled):
+        request = RequestFactory().get('/oauth2/exchange_access_token/google-oauth2/')
+
+        try:
+            raise DRFPermissionDenied()
+        except DRFPermissionDenied as exception:
+            with patch('openedx.core.lib.request_utils.log') as mock_logger:
+                with override_settings(ENABLE_403_MONITORING=is_monitoring_enabled):
+                    Monitor403Middleware('mock-response').process_exception(request, exception)
+
+        if is_monitoring_enabled:
+            mock_logger.info.assert_called()
+        else:
+            mock_logger.info.assert_not_called()

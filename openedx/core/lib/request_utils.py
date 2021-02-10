@@ -2,14 +2,20 @@
 
 import logging
 import re
+import sys
+import traceback
 
 import crum
 from django.conf import settings
+from django.core.exceptions import PermissionDenied
 from django.test.client import RequestFactory
 from django.utils.deprecation import MiddlewareMixin
 from edx_django_utils.monitoring import set_custom_attribute
+from edx_toggles.toggles import SettingToggle
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
+from requests import HTTPError
+from rest_framework.exceptions import PermissionDenied as DRFPermissionDenied
 from six.moves.urllib.parse import urlparse
 
 from edx_toggles.toggles import WaffleFlag
@@ -227,3 +233,68 @@ class CookieMonitoringMiddleware(MiddlewareMixin):
             set_custom_attribute(name_attribute, name)
             set_custom_attribute(size_attribute, size)
             log.debug('%s = %d', name, size)
+
+
+# .. toggle_name: ENABLE_403_MONITORING
+# .. toggle_implementation: SettingToggle
+# .. toggle_default: False
+# .. toggle_description: Temporary toggle to track down the source of 403s for /oauth2/exchange_access_token/.
+# .. toggle_use_cases: temporary
+# .. toggle_creation_date: 2021-02-09
+# .. toggle_target_removal_date: 2021-03-09
+# .. toggle_tickets: https://openedx.atlassian.net/browse/ARCHBOM-1667
+ENABLE_403_MONITORING = SettingToggle('ENABLE_403_MONITORING', default=False, module_name=__name__)
+
+
+class Monitor403Middleware:
+    """
+    Temporary middleware to determine where 403s are coming from for /oauth2/exchange_access_token/
+    """
+    def __init__(self, get_response):
+        self.get_response = get_response
+        # One-time configuration and initialization.
+
+    def __call__(self, request):
+        # Code to be executed for each request before
+        # the view (and later middleware) are called.
+        response = self.get_response(request)
+
+        if not ENABLE_403_MONITORING.is_enabled():
+            return response
+
+        if not (request and request.path and request.path.startswith('/oauth2/exchange_access_token/')):
+            return response
+
+        if response and response.status_code and response.status_code == 403:
+            stack_trace = ''.join(traceback.format_stack())
+            log.info("Monitor403Middleware: 403 response for %s\n%s", request.path, stack_trace)
+
+        return response
+
+    def process_exception(self, request, exception):
+        """
+        Log any 403 related exception on /oauth2/exchange_access_token/.
+        """
+        if not ENABLE_403_MONITORING.is_enabled() or not exception:
+            return None
+
+        if not (request and request.path and request.path.startswith('/oauth2/exchange_access_token/')):
+            return None
+
+        if (isinstance(exception, HTTPError) and exception.response.status_code == 403):
+            self._log_403_exception(request)
+            return None
+
+        if issubclass(exception.__class__, (PermissionDenied, DRFPermissionDenied)):
+            self._log_403_exception(request)
+            return None
+
+        return None
+
+    def _log_403_exception(self, request):
+        """
+        Performs the actual logging of the 403 exception.
+        """
+        exc_type, exc_value, exc_tb = sys.exc_info()
+        formatted_exception = ''.join(traceback.format_exception(exc_type, exc_value, exc_tb))
+        log.info("Monitor403Middleware: 403 for %s\n%s", request.path, formatted_exception)
