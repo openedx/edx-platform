@@ -524,9 +524,9 @@ def test_post_back_or_submit_written_application_cover_letter_view(button, templ
 @pytest.mark.parametrize(
     'cover_letter, attribute',
     [
-        (None, 'text-cover-letter'),
-        ('cover letter', 'text-cover-letter'),
-        (SimpleUploadedFile('cover_letter.png', b'<svg><rect width="50" height="100"/></svg>'), 'add-cover-letter')
+        (None, 'cover_letter'),
+        ('cover letter', 'cover_letter'),
+        (SimpleUploadedFile('cover_letter.png', b'<svg><rect width="50" height="100"/></svg>'), 'cover_letter_file')
     ],
     ids=['no_cover_letter', 'typed_cover_letter', 'cover_letter_file'])
 def test_post_with_no_cover_letter_typed_cover_letter_and_file_cover_letter_view(
@@ -542,7 +542,7 @@ def test_post_with_no_cover_letter_typed_cover_letter_and_file_cover_letter_view
     business_line = BusinessLineFactory()
     cover_letter_view_post_request.POST._mutable = True
 
-    if attribute == 'text-cover-letter':
+    if attribute == 'cover_letter':
         cover_letter_view_post_request.POST[attribute] = cover_letter
     else:
         cover_letter_view_post_request.FILES[attribute] = cover_letter
