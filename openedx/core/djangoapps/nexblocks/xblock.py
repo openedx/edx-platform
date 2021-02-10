@@ -29,10 +29,7 @@ class NexBlockWrapperBlock(
     """
     A block type to expose an instance of a NexBlock.
 
-    Settings-scoped fields ares stored authoritatively here (to allow editing
-    via Studio), but are pushed to NexBlockInstance data upon course publish,
-    so they are never read from here in an LMS context.
-
+    Instance data is stored here(to allow editing via Studio).
     Learner state is stored in NexBlockLearnerData model instead of in the XBlock.
 
     Usages of this block and instance of NexBlocks are related by the UUID.
