@@ -101,7 +101,12 @@ class NexBlockWrapperBlock(
         """
         fragment = Fragment()
         fragment.add_content(
-            f"<p>This will soon show a NexBlock of type <strong>{self.package}</strong><p>"
+            f'<div style="width: 100%">'
+            f'<p>This will soon show a NexBlock of type <strong>{self.package}</strong><p>'
+            f'<p>It will be rendered in an iframe, like the one below.</p>'
+            f'<p>For now, the iframe is rendering the Learning MFE.</p>'
+            f'<iframe style="width: 100%" src="http://localhost:2000/nexblock"></iframe>'
+            f'</div>'
         )
         return fragment
 
