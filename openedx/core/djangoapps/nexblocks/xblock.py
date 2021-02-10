@@ -3,7 +3,6 @@ Expose NexBlock instances in courseware through the NexWrapperBlock.
 """
 
 import logging
-from uuid import uuid4
 
 from web_fragments.fragment import Fragment
 from xblock.core import XBlock
@@ -38,17 +37,18 @@ class NexBlockWrapperBlock(
 
     Usages of this block and instance of NexBlocks are related by the UUID.
     """
+
     display_name = String(
         display_name=_("Display Name"),
         help=_("The display name for this component."),
         default="NexBlock",
-        scope=Scope.settings
+        scope=Scope.settings,
     )
     package = String(
         display_name=_("Package"),
         help=_("An npm-installable package of NexBlock code."),
         scope=Scope.settings,
-        default="git+https://github.com/kdmccormick/nexblock-test-announcement.git"
+        default="git+https://github.com/kdmccormick/nexblock-test-announcement.git",
     )
     instance_data = Dict(
         display_name=_("Instance Data"),
@@ -83,7 +83,7 @@ class NexBlockWrapperBlock(
             return None
         return user_service._django_user  # pylint: disable=protected-access
 
-    def student_view(self, context=None):
+    def student_view(self, context=None):  # pylint: disable=unused-argument
         """
         Renders student view for LMS.
 
@@ -98,4 +98,3 @@ class NexBlockWrapperBlock(
         TODO
         """
         return Fragment()
-
