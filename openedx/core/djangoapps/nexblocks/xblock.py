@@ -5,6 +5,7 @@ Expose NexBlock instances in courseware through the NexWrapperBlock.
 import logging
 from uuid import uuid4
 
+from web_fragments.fragment import Fragment
 from xblock.core import XBlock
 from xblock.fields import Dict, Scope, String
 from xblockutils.resources import ResourceLoader
@@ -37,48 +38,26 @@ class NexBlockWrapperBlock(
 
     Usages of this block and instance of NexBlocks are related by the UUID.
     """
-
+    display_name = String(
+        display_name=_("Display Name"),
+        help=_("The display name for this component."),
+        default="NexBlock",
+        scope=Scope.settings
+    )
     package = String(
-        display_name=_("NexBlock package"),
-        help=_("An npm-installable package name/path to NexBlock JS code"),
+        display_name=_("Package"),
+        help=_("An npm-installable package of NexBlock code."),
         scope=Scope.settings,
-    )
-    uuid = String(
-        display_name=_("Instance UUID"),
-        help=_(
-            "Globally unique ID of a this NexBlock instance. "
-            "Editing this will change the underlying instance"
-        ),
-        scope=Scope.settings,
-        default=str(uuid4()),
-    )
-    # TODO: do we need this?
-    # slug = String(
-    #     display_name=_("URL slug for block"),
-    #     help_text=_(
-    #         "URL-safe identifier for NexBlock. Alphanumeric, dashes, and underscores."
-    #     ),
-    #     scope=Scope.settings,
-    # )
-    display_name = Dict(
-        display_name=_("User-friendly display name of block"),
-        scope=Scope.settings,
+        default="git+https://github.com/kdmccormick/nexblock-test-announcement.git"
     )
     instance_data = Dict(
-        display_name=_("NexBlock instance data JSON"),
-        help=_("Settings for this instance of a NexBlock"),
+        display_name=_("Instance Data"),
+        help=_("Instance-level settings for this NexBlock instance, as JSON."),
         scope=Scope.settings,
         default={},
     )
-    # TODO: I think we can remove this.
-    # learner_data = Dict(
-    #    display_name=_("NexBlock learner data JSON"),
-    #    help=_("Data for this instance of a NexBlock for a particular learner"),
-    #    scope=Scope.user_state,
-    #    default={},
-    # )
 
-    editable_fields = ["package", "uuid", "slug", "display_name", "instance_data"]
+    editable_fields = ["display_name", "package", "instance_data"]
 
     has_author_view = True  # Tells Studio to use author_view
 
@@ -107,24 +86,16 @@ class NexBlockWrapperBlock(
     def student_view(self, context=None):
         """
         Renders student view for LMS.
+
+        TODO
         """
-        raise NotImplementedError
+        return Fragment()
 
     def author_view(self, context=None):  # pylint: disable=unused-argument
         """
-        Renders author view for Studio.
-        """
-        raise NotImplementedError
+        Renders preview view for Studio.
 
-    def student_view_data(self):
+        TODO
         """
-        Returns a JSON representation of the student_view of this XBlock.
-        """
-        raise NotImplementedError
+        return Fragment()
 
-    @classmethod
-    def parse_xml(cls, node, runtime, keys, id_generator):
-        """
-        Parses OLX into XBlock.
-        """
-        raise NotImplementedError
