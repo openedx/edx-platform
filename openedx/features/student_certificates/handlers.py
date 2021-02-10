@@ -8,7 +8,6 @@ from django.dispatch import receiver
 
 from common.lib.mandrill_client.client import MandrillClient
 from lms.djangoapps.certificates.models import GeneratedCertificate
-
 from openedx.features.student_certificates.models import CertificateVerificationKey
 from openedx.features.student_certificates.signals import USER_CERTIFICATE_DOWNLOADABLE
 from openedx.features.student_certificates.tasks import task_create_certificate_img_and_upload_to_s3

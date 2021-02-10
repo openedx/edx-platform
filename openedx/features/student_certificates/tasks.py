@@ -1,20 +1,19 @@
 """
 Tasks for the student_certificate application
 """
-from os import remove
 from logging import getLogger
+from os import remove
 
 import imgkit
-
-from django.conf import settings
 from celery.task import task
+from django.conf import settings
 
 from openedx.features.student_certificates.helpers import (
-    upload_to_s3,
-    get_certificate_url,
     get_certificate_image_name,
     get_certificate_image_path,
-    get_certificate_img_key
+    get_certificate_img_key,
+    get_certificate_url,
+    upload_to_s3
 )
 
 log = getLogger(__name__)

@@ -8,9 +8,9 @@ from django.urls import reverse
 
 from lms.djangoapps.certificates.models import GeneratedCertificate
 from openedx.features.student_certificates.constants import (
-    HEX_ROT_10_MAP,
+    CERTIFICATE_VERIFICATION_KEY_LENGTH,
     CERTIFICATE_VERIFICATION_SALT_CHARACTERS,
-    CERTIFICATE_VERIFICATION_KEY_LENGTH
+    HEX_ROT_10_MAP
 )
 
 

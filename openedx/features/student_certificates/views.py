@@ -10,9 +10,11 @@ from django.shortcuts import get_object_or_404
 from django.views.decorators.csrf import ensure_csrf_cookie
 
 from certificates import api as certs_api
-
 from courseware.courses import get_course
 from edxmako.shortcuts import render_to_response
+from lms.djangoapps.certificates.models import CertificateStatuses, GeneratedCertificate
+from lms.djangoapps.philu_api.helpers import get_course_custom_settings
+from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.features.student_certificates.constants import (
     COMPLETION_DATE_FORMAT,
     COURSE_URL_FMT,
@@ -26,11 +28,7 @@ from openedx.features.student_certificates.helpers import (
     get_pdf_data_by_certificate_uuid,
     get_philu_certificate_social_context
 )
-
 from openedx.features.student_certificates.models import CertificateVerificationKey
-from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
-from lms.djangoapps.certificates.models import CertificateStatuses, GeneratedCertificate
-from lms.djangoapps.philu_api.helpers import get_course_custom_settings
 
 
 @login_required

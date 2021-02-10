@@ -6,10 +6,10 @@ from importlib import import_module
 from io import BytesIO
 from logging import getLogger
 
-import boto
-from boto.s3.key import Key
 import img2pdf
 import requests
+from boto import connect_s3
+from boto.s3.key import Key
 from django.conf import settings
 from django.core.cache import cache
 from django.shortcuts import get_object_or_404
@@ -20,7 +20,6 @@ from lms.djangoapps.philu_api.helpers import get_course_custom_settings, get_soc
 from openedx.core.djangoapps.catalog.cache import PROGRAM_CACHE_KEY_TPL
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.credentials.utils import get_credentials
-from openedx.features.student_certificates.signals import USER_CERTIFICATE_DOWNLOADABLE
 from openedx.features.student_certificates.constants import (
     CERTIFICATE_PDF_NAME,
     COMPLETION_DATE_FORMAT,
@@ -30,6 +29,7 @@ from openedx.features.student_certificates.constants import (
     TMPDIR,
     TWITTER_META_TITLE_FMT
 )
+from openedx.features.student_certificates.signals import USER_CERTIFICATE_DOWNLOADABLE
 
 log = getLogger(__name__)
 
@@ -46,7 +46,7 @@ def upload_to_s3(file_path, s3_bucket, key_name):
     """
     aws_access_key_id = getattr(settings, 'AWS_ACCESS_KEY_ID', None)
     aws_secret_access_key = getattr(settings, 'AWS_SECRET_ACCESS_KEY', None)
-    conn = boto.connect_s3(
+    conn = connect_s3(
         aws_access_key_id=aws_access_key_id,
         aws_secret_access_key=aws_secret_access_key
     )
