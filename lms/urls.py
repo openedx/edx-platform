@@ -194,6 +194,13 @@ urlpatterns = [
 
     url(r'^dashboard/', include('lms.djangoapps.learner_dashboard.urls')),
     url(
+        r'^api/dashboard/',
+        include(
+            'lms.djangoapps.learner_dashboard.rest_api.urls',
+            namespace='dashboard_api',
+        ),
+    ),
+    url(
         r'^api/experiments/',
         include(
             ('lms.djangoapps.experiments.urls', 'lms.djangoapps.experiments'),
