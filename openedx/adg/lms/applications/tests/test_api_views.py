@@ -102,14 +102,19 @@ def login_client(request, client, user_instance):
 
 
 @pytest.fixture
-def work_experience_not_applicable_api_data():
+def work_experience_not_applicable_api(login_client):
     """
     Get is work experience not applicable data
     """
-    def is_work_experience_not_applicable_api_data(is_not_applicable='true'):
-        return {'is_work_experience_not_applicable': is_not_applicable}
+    def is_work_experience_not_applicable_api(is_not_applicable='true'):
+        url = reverse('applications:work_experience-update_is_not_applicable')
+        is_work_experience_not_applicable_api_data = {'is_work_experience_not_applicable': is_not_applicable}
+        response = login_client.patch(
+            url, data=json.dumps(is_work_experience_not_applicable_api_data), content_type=JSON_CONTENT_TYPE
+        )
+        return response
 
-    return is_work_experience_not_applicable_api_data
+    return is_work_experience_not_applicable_api
 
 
 @pytest.mark.django_db
@@ -328,35 +333,19 @@ def test_work_experience_api_delete(work_experience_data, login_client):
 
 
 @pytest.mark.django_db
-def test_update_is_work_experience_not_applicable_api_with_true(
-    work_experience_data,
-    work_experience_not_applicable_api_data,
-    login_client
-):
+def test_is_work_experience_not_applicable_api_with_true(work_experience_data, work_experience_not_applicable_api):
     """
     Test the is_work_experience_not_applicable_api with true value
     """
-    is_work_experience_not_applicable_api_data = work_experience_not_applicable_api_data('true')
-    url = reverse('applications:work_experience-update_is_not_applicable')
-    response = login_client.patch(
-        url, data=json.dumps(is_work_experience_not_applicable_api_data), content_type=JSON_CONTENT_TYPE
-    )
+    response = work_experience_not_applicable_api('true')
     assert response.status_code == status.HTTP_200_OK
     assert WorkExperience.objects.count() == 0
 
 
 @pytest.mark.django_db
-def test_update_is_work_experience_not_applicable_api_with_false(
-    user_application,
-    work_experience_not_applicable_api_data,
-    login_client
-):
+def test_is_work_experience_not_applicable_api_with_false(user_application, work_experience_not_applicable_api):
     """
     Test the is_work_experience_not_applicable_api with false value
     """
-    is_work_experience_not_applicable_api_data = work_experience_not_applicable_api_data('false')
-    url = reverse('applications:work_experience-update_is_not_applicable')
-    response = login_client.patch(
-        url, data=json.dumps(is_work_experience_not_applicable_api_data), content_type=JSON_CONTENT_TYPE
-    )
+    response = work_experience_not_applicable_api('false')
     assert response.status_code == status.HTTP_200_OK
