@@ -14,7 +14,7 @@ django==2.2.18            # via -c https://raw.githubusercontent.com/edx/edx-lin
 docutils==0.16            # via sphinx
 edx-sphinx-theme==2.0.0   # via -r requirements/edx/doc.in
 gitdb==4.0.5              # via gitpython
-gitpython==3.1.12         # via -r requirements/edx/doc.in
+gitpython==3.1.13         # via -r requirements/edx/doc.in
 idna==2.10                # via requests
 imagesize==1.2.0          # via sphinx
 jinja2==2.11.3            # via code-annotations, sphinx
