@@ -541,6 +541,18 @@ FEATURES = {
     #   see the search widget on the courseware page only if the DISABLE_COURSE_OUTLINE_PAGE_FLAG is set.
     # .. toggle_tickets: https://github.com/edx/edx-platform/pull/6506
     'ENABLE_COURSEWARE_SEARCH': False,
+
+    # .. toggle_name: FEATURES['ENABLE_COURSEWARE_SEARCH_FOR_COURSE_STAFF']
+    # .. toggle_implementation: DjangoSetting
+    # .. toggle_default: False
+    # .. toggle_description: When enabled, this adds a Search the course widget on the course outline and courseware
+    #   pages for searching courseware data but for course staff users only.
+    # .. toggle_use_cases: open_edx
+    # .. toggle_creation_date: 2019-12-06
+    # .. toggle_warnings: In order to get this working, your courses data should be indexed in Elasticsearch. If
+    #   ENABLE_COURSEWARE_SEARCH is enabled then the search widget will be visible to all learners and this flag's
+    #   value does not matter in that case. This flag is enabled in devstack by default.
+    # .. toggle_tickets: https://openedx.atlassian.net/browse/TNL-6931
     'ENABLE_COURSEWARE_SEARCH_FOR_COURSE_STAFF': False,
 
     # Dashboard search feature
