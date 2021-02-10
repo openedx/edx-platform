@@ -1,7 +1,8 @@
 """
 This file contains the test cases for views of the student_certificates app
 """
-import factory
+
+import factory  # pylint: disable=unused-import
 import mock
 from django.conf import settings
 from django.core.urlresolvers import reverse
@@ -23,13 +24,13 @@ from openedx.features.student_certificates.views import (
 )
 from student.tests.factories import CourseEnrollmentFactory
 from xmodule.modulestore import ModuleStoreEnum
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, SharedModuleStoreTestCase
+from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
 
 class GenerateStudentCertificateViewsTestCase(SharedModuleStoreTestCase):
     """
-        Tests for generating student course certificates.
+    Tests for generating student course certificates.
     """
     CUSTOM_FEATURES = settings.FEATURES.copy()
     CUSTOM_FEATURES['CERTIFICATES_HTML_VIEW'] = True
@@ -49,7 +50,9 @@ class GenerateStudentCertificateViewsTestCase(SharedModuleStoreTestCase):
         from openedx.features.course_card.tests.helpers import initialize_test_user
         cls.user = initialize_test_user(password=cls.password)
         cls.user.save()
-        cls.course_settings = CustomSettings(id=cls.course.id, course_short_id=1, course_open_date=get_current_utc_date())
+        cls.course_settings = CustomSettings(id=cls.course.id,
+                                             course_short_id=1,
+                                             course_open_date=get_current_utc_date())
         cls.course_settings.save()
 
         CourseEnrollmentFactory.create(
@@ -71,14 +74,12 @@ class GenerateStudentCertificateViewsTestCase(SharedModuleStoreTestCase):
 
         cls.factory = RequestFactory()
 
-    def setUp(self):
-        super(GenerateStudentCertificateViewsTestCase, self).setUp()
-
+    # pylint: disable=no-member
     @factory.django.mute_signals(signals.pre_save, signals.post_save)
     @mock.patch('openedx.features.student_certificates.views.render_to_response')
     def test_student_certificates(self, mock_method):
         """
-            Tests the flow of certificate generation.
+        Tests the flow of certificate generation.
         """
         expected_context = {
             'user_certificates': [
@@ -101,7 +102,7 @@ class GenerateStudentCertificateViewsTestCase(SharedModuleStoreTestCase):
     @mock.patch('openedx.features.student_certificates.views.render_to_response')
     def test_student_certificates_course_title_type_error(self, mock_method):
         """
-            Test certificate generation flow if certificate shows type error.
+        Test certificate generation flow if certificate shows type error.
         """
         self.course.certificates = {'certificates': {}}
         self.course.save()
@@ -128,7 +129,7 @@ class GenerateStudentCertificateViewsTestCase(SharedModuleStoreTestCase):
     @mock.patch('openedx.features.student_certificates.views.render_to_response')
     def test_student_certificates_course_title_index_error(self, mock_method):
         """
-            Test certificate generation flow if certificate object is not as it was expected.
+        Test certificate generation flow if certificate object is not as it was expected.
         """
         self.course.certificates = {'certificates': []}
         self.course.save()
@@ -156,7 +157,7 @@ class GenerateStudentCertificateViewsTestCase(SharedModuleStoreTestCase):
     @mock.patch('openedx.features.student_certificates.views.render_to_response')
     def test_student_certificates_html_certificate_enabled(self, mock_method):
         """
-            Test certificate generation flow if CERTIFICATES_HTML_VIEW is enabled in settings.FEATURES.
+        Test certificate generation flow if CERTIFICATES_HTML_VIEW is enabled in settings.FEATURES.
         """
 
         self.course.cert_html_view_enabled = True
@@ -183,7 +184,7 @@ class GenerateStudentCertificateViewsTestCase(SharedModuleStoreTestCase):
     @mock.patch('openedx.features.student_certificates.views.render_to_response')
     def test_shared_student_achievements(self, mock_method):
         """
-            Test certificate sharing web-view flow.
+        Test certificate sharing web-view flow.
         """
         request = HttpRequest()
         request.user = self.user
@@ -192,23 +193,25 @@ class GenerateStudentCertificateViewsTestCase(SharedModuleStoreTestCase):
             'meta_tags': {
                 'description': '',
                 'title': TWITTER_META_TITLE_FMT.format(course_name=self.course.display_name),
-                'image': 'https://s3.amazonaws.com/edxuploads/certificates_images/{0}.jpg'.format(self.certificate.verify_uuid),
+                'image': 'https://s3.amazonaws.com/edxuploads/certificates_images/{0}.jpg'.format(
+                    self.certificate.verify_uuid
+                ),
                 'robots': '',
                 'utm_params': {},
                 'keywords': ''
-                },
+            },
             'course_url': COURSE_URL_FMT.format(
-                base_url = settings.LMS_ROOT_URL,
-                course_url = 'courses',
-                course_id = self.course.id,
-                about_url = 'about'
+                base_url=settings.LMS_ROOT_URL,
+                course_url='courses',
+                course_id=self.course.id,
+                about_url='about'
             )
         }
         mock_method.assert_called_once_with('shared_certificate.html', expected_context)
 
     def test_shared_student_achievements_certificate_not_found(self):
         """
-            Test to check if the shared student certificate gives error on deleted/non-existing certificates or not.
+        Test to check if the shared student certificate gives error on deleted/non-existing certificates or not.
         """
         verify_uuid = self.certificate.verify_uuid
         self.certificate.delete()
@@ -218,6 +221,7 @@ class GenerateStudentCertificateViewsTestCase(SharedModuleStoreTestCase):
         with self.assertRaises(Http404):
             shared_student_achievements(request, verify_uuid)
 
+    # pylint: disable=no-member
     @factory.django.mute_signals(signals.pre_save, signals.post_save)
     @mock.patch('openedx.features.student_certificates.views.get_pdf_data_by_certificate_uuid')
     def test_download_certificate_pdf(self, mock_get_pdf_data_by_certificate_uuid):
@@ -228,10 +232,10 @@ class GenerateStudentCertificateViewsTestCase(SharedModuleStoreTestCase):
 
         mock_get_pdf_data_by_certificate_uuid.return_value = 'PDF Bytes data'
 
-        request = self.factory.get(reverse('download_certificate_pdf', args=(certificate_uuid, )))
+        request = self.factory.get(reverse('download_certificate_pdf', args=(certificate_uuid,)))
         request.user = self.user
         response = download_certificate_pdf(request, certificate_uuid)
 
         mock_get_pdf_data_by_certificate_uuid.assert_called_once_with(certificate_uuid)
 
-        self.assertEquals(response.get('Content-Disposition'),'attachment; filename="PhilanthropyUniversity_Run0.pdf"')
+        self.assertEquals(response.get('Content-Disposition'), 'attachment; filename="PhilanthropyUniversity_Run0.pdf"')
