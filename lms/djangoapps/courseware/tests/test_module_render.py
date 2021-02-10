@@ -1413,8 +1413,12 @@ class TestProctoringRendering(SharedModuleStoreTestCase):
         )
 
         if attempt_status:
-            create_exam_attempt(six.text_type(exam_id).encode('utf-8'), self.request.user.id, taking_as_proctored=True)
-            update_attempt_status(exam_id, self.request.user.id, attempt_status)
+            attempt_id = create_exam_attempt(
+                six.text_type(exam_id).encode('utf-8'),
+                self.request.user.id,
+                taking_as_proctored=True
+            )
+            update_attempt_status(attempt_id, attempt_status)
 
         return usage_key
 
