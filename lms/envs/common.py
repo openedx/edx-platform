@@ -609,7 +609,15 @@ FEATURES = {
     # Enable LTI Provider feature.
     'ENABLE_LTI_PROVIDER': False,
 
-    # Show the language selector in the header
+    # .. toggle_name: FEATURES['SHOW_HEADER_LANGUAGE_SELECTOR']
+    # .. toggle_implementation: DjangoSetting
+    # .. toggle_default: False
+    # .. toggle_description: When set to True, language selector will be visible in the header.
+    # .. toggle_use_cases: open_edx
+    # .. toggle_creation_date: 2017-05-25
+    # .. toggle_warnings: You should set the languages in the DarkLangConfig table to get this working. If you have
+    #   not set any languages in the DarkLangConfig table then the language selector will not be visible in the header.
+    # .. toggle_tickets: https://github.com/edx/edx-platform/pull/15133
     'SHOW_HEADER_LANGUAGE_SELECTOR': False,
 
     # At edX it's safe to assume that English transcripts are always available
