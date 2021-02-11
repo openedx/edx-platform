@@ -6,10 +6,11 @@ __init__.py imports from here, and is a more stable place to import from.
 import logging
 from collections import defaultdict
 from datetime import datetime
-from typing import Optional
+from typing import Optional, Type
 
 import attr
 from django.contrib.auth import get_user_model
+from django.contrib.auth.models import AbstractUser
 from django.db import transaction
 from edx_django_utils.cache import TieredCache, get_cache_key
 from edx_django_utils.monitoring import function_trace
@@ -41,7 +42,6 @@ from .processors.special_exams import SpecialExamsOutlineProcessor
 from .processors.visibility import VisibilityOutlineProcessor
 from .processors.enrollment import EnrollmentOutlineProcessor
 
-User = get_user_model()
 log = logging.getLogger(__name__)
 
 # Public API...
@@ -160,7 +160,7 @@ def _get_course_context_for_outline(course_key: CourseKey) -> CourseContext:
 
 
 def get_user_course_outline(course_key: CourseKey,
-                            user: User,
+                            user: AbstractUser,
                             at_time: datetime) -> UserCourseOutlineData:
     """
     Get an outline customized for a particular user at a particular time.
@@ -176,7 +176,7 @@ def get_user_course_outline(course_key: CourseKey,
 
 
 def get_user_course_outline_details(course_key: CourseKey,
-                                    user: User,
+                                    user: AbstractUser,
                                     at_time: datetime) -> UserCourseOutlineDetailsData:
     """
     Get an outline with supplementary data like scheduling information.
@@ -198,7 +198,7 @@ def get_user_course_outline_details(course_key: CourseKey,
 
 
 def _get_user_course_outline_and_processors(course_key: CourseKey,
-                                            user: User,
+                                            user: AbstractUser,
                                             at_time: datetime):
     full_course_outline = get_course_outline(course_key)
     user_can_see_all_content = can_see_all_content(user, course_key)

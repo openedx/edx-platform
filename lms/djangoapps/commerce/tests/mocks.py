@@ -3,7 +3,7 @@
 
 
 import json
-from typing import Dict
+from typing import Mapping, Sequence, Any
 
 import httpretty
 from django.conf import settings
@@ -21,7 +21,7 @@ class mock_ecommerce_api_endpoint(object):
     """
 
     # override this in subclasses.
-    default_response: Dict[str, str]
+    default_response: Any
 
     # override this in subclasses, using one of httpretty's method constants
     method: str
@@ -106,7 +106,7 @@ class mock_basket_order(mock_ecommerce_api_endpoint):
 class mock_create_refund(mock_ecommerce_api_endpoint):
     """ Mocks calls to E-Commerce API client refund creation method. """
 
-    default_response: List = []
+    default_response: Sequence = []
     method = httpretty.POST
 
     def get_path(self):
@@ -128,7 +128,7 @@ class mock_payment_processors(mock_ecommerce_api_endpoint):
 class mock_process_refund(mock_ecommerce_api_endpoint):
     """ Mocks calls to E-Commerce API client refund process method. """
 
-    default_response: List = []
+    default_response: Sequence = []
     method = httpretty.PUT
 
     def __init__(self, refund_id, **kwargs):
@@ -142,7 +142,7 @@ class mock_process_refund(mock_ecommerce_api_endpoint):
 class mock_order_endpoint(mock_ecommerce_api_endpoint):
     """ Mocks calls to E-Commerce API client basket order method. """
 
-    default_response: Dict[str, str] = {'number': 'EDX-100001'}
+    default_response: Mapping[str, str] = {'number': 'EDX-100001'}
     method = httpretty.GET
 
     def __init__(self, order_number, **kwargs):

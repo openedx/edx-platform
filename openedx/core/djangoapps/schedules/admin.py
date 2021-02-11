@@ -51,7 +51,7 @@ def _set_experience(db_name, human_name, modeladmin, request, queryset):
 experience_actions = []
 for (db_name, human_name) in models.ScheduleExperience.EXPERIENCES:
     partial = functools.partial(_set_experience, db_name, human_name)
-    partial.short_description = u"Convert the selected schedules to the {} experience".format(human_name)
+    partial.short_description = u"Convert the selected schedules to the {} experience".format(human_name)  # type: ignore
     partial.__name__ = "set_experience_to_{}".format(db_name)
     experience_actions.append(partial)
 
@@ -139,16 +139,16 @@ class ScheduleAdmin(admin.ModelAdmin):
     def deactivate_schedules(self, request, queryset):
         rows_updated = queryset.update(active=False)
         self.message_user(request, u"{} schedule(s) were deactivated".format(rows_updated))
-    deactivate_schedules.short_description = "Deactivate selected schedules"
+    deactivate_schedules.short_description = "Deactivate selected schedules"  # type: ignore
 
     def activate_schedules(self, request, queryset):
         rows_updated = queryset.update(active=True)
         self.message_user(request, u"{} schedule(s) were activated".format(rows_updated))
-    activate_schedules.short_description = "Activate selected schedules"
+    activate_schedules.short_description = "Activate selected schedules"  # type: ignore
 
     def experience_display(self, obj):
         return obj.experience.get_experience_type_display()
-    experience_display.short_descriptions = _('Experience')
+    experience_display.short_descriptions = _('Experience')  # type: ignore
 
     def username(self, obj):
         return format_html(
@@ -157,7 +157,7 @@ class ScheduleAdmin(admin.ModelAdmin):
             obj.enrollment.user.username
         )
 
-    username.short_description = _('Username')
+    username.short_description = _('Username')  # type: ignore
 
     def course_id(self, obj):
         return format_html(
@@ -168,7 +168,7 @@ class ScheduleAdmin(admin.ModelAdmin):
             obj.enrollment.course_id
         )
 
-    course_id.short_description = _('Course ID')
+    course_id.short_description = _('Course ID')  # type: ignore
 
     def get_queryset(self, request):
         qs = super(ScheduleAdmin, self).get_queryset(request)

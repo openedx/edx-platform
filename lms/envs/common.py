@@ -32,7 +32,7 @@ Longer TODO:
 import importlib.util
 import sys
 import os
-from typing import Dict, Any
+from typing import Dict, Any, Union, Sequence, Mapping, Tuple
 
 from corsheaders.defaults import default_headers as corsheaders_default_headers
 from path import Path as path
@@ -80,7 +80,7 @@ MANUAL_ENROLLMENT_ROLE_CHOICES = ['Learner', 'Support', 'Partner']
 
 # List of logout URIs for each IDA that the learner should be logged out of when they logout of the LMS. Only applies to
 # IDA for which the social auth flow uses DOT (Django OAuth Toolkit).
-IDA_LOGOUT_URI_LIST = []
+IDA_LOGOUT_URI_LIST: Sequence[str] = []
 
 # Features
 FEATURES = {
@@ -701,13 +701,13 @@ FEATURES = {
 # Specifies extra XBlock fields that should available when requested via the Course Blocks API
 # Should be a list of tuples of (block_type, field_name), where block_type can also be "*" for all block types.
 # e.g. COURSE_BLOCKS_API_EXTRA_FIELDS = [  ('course', 'other_course_settings'), ("problem", "weight")  ]
-COURSE_BLOCKS_API_EXTRA_FIELDS = []
+COURSE_BLOCKS_API_EXTRA_FIELDS: Sequence[Tuple[str, str]] = []
 
 
 ASSET_IGNORE_REGEX = r"(^\._.*$)|(^\.DS_Store$)|(^.*~$)"
 
 # Used for A/B testing
-DEFAULT_GROUPS = []
+DEFAULT_GROUPS: Sequence[str] = []
 
 # If this is true, random scores will be generated for the purpose of debugging the profile graphs
 GENERATE_PROFILE_SCORES = False
@@ -2305,7 +2305,7 @@ CELERY_CREATE_MISSING_QUEUES = True
 CELERY_DEFAULT_QUEUE = DEFAULT_PRIORITY_QUEUE
 CELERY_DEFAULT_ROUTING_KEY = DEFAULT_PRIORITY_QUEUE
 
-CELERY_QUEUES = [
+CELERY_QUEUES: Union[Sequence[str], Mapping[str, Mapping]] = [
     'edx.lms.core.default',
     'edx.lms.core.high',
     'edx.lms.core.high_mem'
@@ -3552,7 +3552,7 @@ CHECKPOINT_PATTERN = r'(?P<checkpoint_name>[^/]+)'
 # If using FEATURES['INDIVIDUAL_DUE_DATES'], you should add
 # 'lms.djangoapps.courseware.student_field_overrides.IndividualStudentOverrideProvider' to
 # this setting.
-FIELD_OVERRIDE_PROVIDERS = ()
+FIELD_OVERRIDE_PROVIDERS: Sequence[str] = ()
 
 # Modulestore-level field override providers. These field override providers don't
 # require student context.

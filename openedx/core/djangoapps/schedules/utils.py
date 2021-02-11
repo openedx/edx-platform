@@ -16,7 +16,7 @@ LOG = logging.getLogger(__name__)
 # TODO: consider using a LoggerAdapter instead of this mixin:
 # https://docs.python.org/2/library/logging.html#logging.LoggerAdapter
 class PrefixedDebugLoggerMixin(object):
-    log_prefix = None
+    log_prefix: str
 
     def __init__(self, *args, **kwargs):
         super(PrefixedDebugLoggerMixin, self).__init__(*args, **kwargs)

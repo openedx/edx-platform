@@ -71,11 +71,11 @@ def _pce_ce(pce):
         enrollment=enrollment, active_string=active_string
     )
 
-_pce_pe_id.short_description = "Program Enrollment"
-_pce_pe_user.short_description = "Pgm Enrollment: User"
-_pce_pe_external_user_key.short_description = "Pgm Enrollment: Ext User Key"
-_pce_pe_program_uuid.short_description = "Pgm Enrollment: Pgm UUID"
-_pce_ce.short_description = "Course Enrollment"
+_pce_pe_id.short_description = "Program Enrollment"  # type: ignore
+_pce_pe_user.short_description = "Pgm Enrollment: User"  # type: ignore
+_pce_pe_external_user_key.short_description = "Pgm Enrollment: Ext User Key"  # type: ignore
+_pce_pe_program_uuid.short_description = "Pgm Enrollment: Pgm UUID"  # type: ignore
+_pce_ce.short_description = "Course Enrollment"  # type: ignore
 
 
 class ProgramCourseEnrollmentAdmin(admin.ModelAdmin):
@@ -127,8 +127,8 @@ def _pending_role_assignment_external_user_key(pending_role_assignment):
     pce = pending_role_assignment.enrollment
     return _pce_pe_external_user_key(pce)
 
-_pending_role_assignment_enrollment_id.short_description = "Program Course Enrollment"
-_pending_role_assignment_external_user_key.short_description = "Pgm Enrollment: Ext User Key"
+_pending_role_assignment_enrollment_id.short_description = "Program Course Enrollment"  # type: ignore
+_pending_role_assignment_external_user_key.short_description = "Pgm Enrollment: Ext User Key"  # type: ignore
 
 
 class CourseAccessRoleAssignmentAdmin(admin.ModelAdmin):

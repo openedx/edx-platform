@@ -10,7 +10,7 @@ import shutil
 from collections import OrderedDict
 from tempfile import mkdtemp
 from uuid import uuid4
-from typing import Dict, Any
+from typing import Mapping, Any
 
 import ddt
 import six
@@ -76,7 +76,7 @@ TRANSCRIPT_FILE_SJSON_DATA = """{\n   "start": [10],\n   "end": [100],\n   "text
 
 
 class TestVideoYouTube(TestVideo):  # pylint: disable=test-inherits-tests
-    METADATA = {}
+    METADATA: Mapping[str, Any] = {}
 
     def test_video_constructor(self):
         """Make sure that all parameters extracted correctly from xml"""
@@ -158,7 +158,7 @@ class TestVideoNonYouTube(TestVideo):  # pylint: disable=test-inherits-tests
     MODEL_DATA = {
         'data': DATA,
     }
-    METADATA = {}
+    METADATA: Mapping[str, Any] = {}
 
     def test_video_constructor(self):
         """Make sure that if the 'youtube' attribute is omitted in XML, then
@@ -237,7 +237,7 @@ class TestGetHtmlMethod(BaseTestVideoXBlock):
     maxDiff = None
     CATEGORY = "video"
     DATA = SOURCE_XML
-    METADATA = {}
+    METADATA: Mapping[str, Any] = {}
 
     def setUp(self):
         super(TestGetHtmlMethod, self).setUp()
@@ -1214,7 +1214,7 @@ class TestVideoBlockInitialization(BaseTestVideoXBlock):
     """
     CATEGORY = "video"
     DATA = SOURCE_XML
-    METADATA = {}
+    METADATA: Mapping[str, Any] = {}
 
     def setUp(self):
         super(TestVideoBlockInitialization, self).setUp()
@@ -1316,7 +1316,7 @@ class TestEditorSavedMethod(BaseTestVideoXBlock):
     """
     CATEGORY = "video"
     DATA = SOURCE_XML
-    METADATA = {}
+    METADATA: Mapping[str, Any] = {}
 
     def setUp(self):
         super(TestEditorSavedMethod, self).setUp()
@@ -2145,7 +2145,7 @@ class TestVideoWithBumper(TestVideo):  # pylint: disable=test-inherits-tests
     Tests rendered content in presence of video bumper.
     """
     CATEGORY = "video"
-    METADATA = {}
+    METADATA: Mapping[str, Any] = {}
     # Use temporary FEATURES in this test without affecting the original
     FEATURES = dict(settings.FEATURES)
 
@@ -2277,7 +2277,7 @@ class TestAutoAdvanceVideo(TestVideo):
     """
     maxDiff = None
     CATEGORY = "video"
-    METADATA = {}
+    METADATA: Mapping[str, Any] = {}
     # Use temporary FEATURES in this test without affecting the original
     FEATURES = dict(settings.FEATURES)
 

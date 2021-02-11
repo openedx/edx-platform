@@ -1,13 +1,14 @@
 """ Password reset logic and views . """
 
 import logging
+from typing import Sequence, Type
 
 from django import forms
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.forms import PasswordResetForm, SetPasswordForm
 from django.contrib.auth.hashers import UNUSABLE_PASSWORD_PREFIX
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User, AbstractUser
 from django.contrib.auth.tokens import default_token_generator
 from django.contrib.auth.views import INTERNAL_RESET_SESSION_TOKEN, PasswordResetConfirmView
 from django.core.exceptions import ObjectDoesNotExist
@@ -183,7 +184,7 @@ class PasswordResetFormNoActive(PasswordResetForm):
     }
 
     is_account_recovery = True
-    users_cache = []
+    users_cache: Sequence[AbstractUser] = []
 
     def clean_email(self):
         """
@@ -230,7 +231,7 @@ class PasswordResetView(APIView):
 
     # This end-point is available to anonymous users,
     # so do not require authentication.
-    authentication_classes = []
+    authentication_classes: Sequence[Type] = []
 
     @method_decorator(ensure_csrf_cookie)
     def get(self, request):

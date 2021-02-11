@@ -43,7 +43,7 @@ When refering to XBlocks, we use the entry-point name. For example,
 import importlib.util
 import os
 import sys
-from typing import Dict, Any
+from typing import Dict, Any, TypedDict, List, Sequence, Optional, Mapping, Tuple, Union, MutableMapping
 
 from corsheaders.defaults import default_headers as corsheaders_default_headers
 from datetime import timedelta
@@ -414,11 +414,11 @@ ENABLE_JASMINE = False
 
 # List of logout URIs for each IDA that the learner should be logged out of when they logout of the LMS. Only applies to
 # IDA for which the social auth flow uses DOT (Django OAuth Toolkit).
-IDA_LOGOUT_URI_LIST = []
+IDA_LOGOUT_URI_LIST: Sequence[str] = []
 
 ############################# MICROFRONTENDS ###################################
-COURSE_AUTHORING_MICROFRONTEND_URL = None
-LIBRARY_AUTHORING_MICROFRONTEND_URL = None
+COURSE_AUTHORING_MICROFRONTEND_URL: Optional[str] = None
+LIBRARY_AUTHORING_MICROFRONTEND_URL: Optional[str] = None
 
 ############################# SOCIAL MEDIA SHARING #############################
 SOCIAL_SHARING_SETTINGS = {
@@ -430,7 +430,7 @@ SOCIAL_SHARING_SETTINGS = {
     'DASHBOARD_TWITTER': False
 }
 
-SOCIAL_MEDIA_FOOTER_URLS = {}
+SOCIAL_MEDIA_FOOTER_URLS: Mapping[str, str] = {}
 
 # This is just a placeholder image.
 # Site operators can customize this with their organization's image.
@@ -575,7 +575,7 @@ STATIC_ROOT_BASE = '/edx/var/edxapp/staticfiles'
 
 # License for serving content in China
 ICP_LICENSE = None
-ICP_LICENSE_INFO = {}
+ICP_LICENSE_INFO: Mapping[str, Any] = {}
 
 LOGGING_ENV = 'sandbox'
 
@@ -596,7 +596,7 @@ derived('FRONTEND_REGISTER_URL')
 LMS_ENROLLMENT_API_PATH = "/api/enrollment/v1/"
 ENTERPRISE_API_URL = LMS_INTERNAL_ROOT_URL + '/enterprise/api/v1/'
 ENTERPRISE_CONSENT_API_URL = LMS_INTERNAL_ROOT_URL + '/consent/api/v1/'
-ENTERPRISE_MARKETING_FOOTER_QUERY_PARAMS = {}
+ENTERPRISE_MARKETING_FOOTER_QUERY_PARAMS: Mapping[str, str] = {}
 
 # Public domain name of Studio (should be resolvable from the end-user's browser)
 CMS_BASE = 'localhost:18010'
@@ -638,7 +638,7 @@ CSRF_COOKIE_SECURE = False
 
 CROSS_DOMAIN_CSRF_COOKIE_DOMAIN = ''
 CROSS_DOMAIN_CSRF_COOKIE_NAME = ''
-CSRF_TRUSTED_ORIGINS = []
+CSRF_TRUSTED_ORIGINS: Sequence[str] = []
 
 #################### CAPA External Code Evaluation #############################
 XQUEUE_INTERFACE = {
@@ -737,7 +737,7 @@ MIDDLEWARE = [
     'openedx.core.djangoapps.site_configuration.middleware.SessionCookieDomainOverrideMiddleware',
 ]
 
-EXTRA_MIDDLEWARE_CLASSES = []
+EXTRA_MIDDLEWARE_CLASSES: Sequence[str] = []
 
 # Clickjacking protection can be disabled by setting this to 'ALLOW'
 X_FRAME_OPTIONS = 'DENY'
@@ -928,7 +928,7 @@ CODE_JAIL = {
 #       r"Harvard/XY123.1/.*"
 #   ]
 
-COURSES_WITH_UNSAFE_CODE = []
+COURSES_WITH_UNSAFE_CODE: Sequence[str] = []
 
 ############################ DJANGO_BUILTINS ################################
 # Change DEBUG in your environment settings files, not here
@@ -969,7 +969,7 @@ BUGS_EMAIL = 'bugs@example.com'
 SERVER_EMAIL = 'devops@example.com'
 UNIVERSITY_EMAIL = 'university@example.com'
 PRESS_EMAIL = 'press@example.com'
-ADMINS = []
+ADMINS: Sequence[Tuple[str, str]] = []
 MANAGERS = ADMINS
 
 # Initialize to 'release', but read from JSON in production.py
@@ -1023,7 +1023,33 @@ EMBARGO_SITE_REDIRECT_URL = None
 
 ############################### PIPELINE #######################################
 
-PIPELINE = {
+
+class MinimalCompileDefinition(TypedDict):
+    source_filenames: Sequence[str]
+    output_filename: str
+
+
+class CompileDefinition(MinimalCompileDefinition, total=False):
+    extra_context: Optional[Mapping[str, Any]]
+    test_order: int
+
+
+class MinimalPipelineDefinition(TypedDict):
+    PIPELINE_ENABLED: bool
+
+
+class PipelineDefinition(MinimalPipelineDefinition, total=False):
+    CSS_COMPRESSOR: Optional[str]
+    JS_COMPRESSOR: Optional[str]
+    DISABLE_WRAPPER: bool
+    UGLIFYJS_BINARY: str
+    COMPILERS: Sequence[str]
+    YUI_BINARY: str
+    JAVASCRIPT: Mapping[str, CompileDefinition]
+    STYLESHEETS: Mapping[str, CompileDefinition]
+
+
+PIPELINE: PipelineDefinition = {
     'PIPELINE_ENABLED': True,
     # Don't use compression by default
     'CSS_COMPRESSOR': None,
@@ -1037,7 +1063,7 @@ PIPELINE = {
 }
 
 STATICFILES_STORAGE = 'openedx.core.storage.ProductionStorage'
-STATICFILES_STORAGE_KWARGS = {}
+STATICFILES_STORAGE_KWARGS: Mapping[str, Any] = {}
 
 # List of finder classes that know how to find static files in various locations.
 # Note: the pipeline finder is included to be able to discover optimized files
@@ -1245,7 +1271,7 @@ CELERY_CREATE_MISSING_QUEUES = True
 CELERY_DEFAULT_QUEUE = DEFAULT_PRIORITY_QUEUE
 CELERY_DEFAULT_ROUTING_KEY = DEFAULT_PRIORITY_QUEUE
 
-CELERY_QUEUES = [
+CELERY_QUEUES: Union[Sequence[str], Mapping[str, Mapping[str, str]]] = [
     'edx.cms.core.default',
     'edx.cms.core.high',
 ]
@@ -1523,9 +1549,9 @@ EDXMKTG_LOGGED_IN_COOKIE_NAME = 'edxloggedin'
 EDXMKTG_USER_INFO_COOKIE_NAME = 'edx-user-info'
 EDXMKTG_USER_INFO_COOKIE_VERSION = 1
 
-MKTG_URLS = {}
-MKTG_URL_OVERRIDES = {}
-MKTG_URL_LINK_MAP = {
+MKTG_URLS: Mapping[str, str] = {}
+MKTG_URL_OVERRIDES: MutableMapping[str, str] = {}
+MKTG_URL_LINK_MAP: MutableMapping[str, str] = {
 
 }
 
@@ -1552,8 +1578,35 @@ TRACKING_BACKENDS = {
 # names/passwords.  Heartbeat events are likely not interesting.
 TRACKING_IGNORE_URL_PATTERNS = [r'^/event', r'^/login', r'^/heartbeat']
 
+
+class MinimalEventTrackingEngine(TypedDict):
+    ENGINE: str
+
+
+class EventTrackingEngine(MinimalEventTrackingEngine, total=False):
+    OPTIONS: Mapping[str, Any]
+
+
+class MinimalEventTrackingProcessorDef(TypedDict):
+    ENGINE: str
+
+
+class EventTrackingProcessorDef(MinimalEventTrackingProcessorDef, total=False):
+    OPTIONS: Mapping[str, Any]
+
+
+class EventTrackingBackendOptions(TypedDict):
+    backends: Mapping[str, EventTrackingEngine]
+    processors: Sequence[EventTrackingProcessorDef]
+
+
+class EventTrackingBackend(TypedDict):
+    ENGINE: str
+    OPTIONS: EventTrackingBackendOptions
+
+
 EVENT_TRACKING_ENABLED = True
-EVENT_TRACKING_BACKENDS = {
+EVENT_TRACKING_BACKENDS: Mapping[str, Mapping[str, Any]] = {
     'tracking_logs': {
         'ENGINE': 'eventtracking.backends.routing.RoutingBackend',
         'OPTIONS': {
@@ -1592,9 +1645,9 @@ EVENT_TRACKING_BACKENDS = {
         }
     }
 }
-EVENT_TRACKING_PROCESSORS = []
+EVENT_TRACKING_PROCESSORS: Sequence[EventTrackingProcessorDef] = []
 
-EVENT_TRACKING_SEGMENTIO_EMIT_WHITELIST = []
+EVENT_TRACKING_SEGMENTIO_EMIT_WHITELIST: Sequence[str] = []
 
 #### PASSWORD POLICY SETTINGS #####
 AUTH_PASSWORD_VALIDATORS = [
@@ -1669,10 +1722,13 @@ for app_name, insert_before in OPTIONAL_APPS:
         except ImportError:
             continue
 
-    try:
-        INSTALLED_APPS.insert(INSTALLED_APPS.index(insert_before), app_name)
-    except (IndexError, ValueError):
+    if insert_before is None:
         INSTALLED_APPS.append(app_name)
+    else:
+        try:
+            INSTALLED_APPS.insert(INSTALLED_APPS.index(insert_before), app_name)
+        except (IndexError, ValueError):
+            INSTALLED_APPS.append(app_name)
 
 
 ### External auth usage -- prefixes for ENROLLMENT_DOMAIN
@@ -1809,7 +1865,7 @@ ELASTIC_FIELD_MAPPINGS = {
     }
 }
 
-XBLOCK_SETTINGS = {}
+XBLOCK_SETTINGS: MutableMapping[str, Any] = {}
 XBLOCK_FS_STORAGE_BUCKET = None
 XBLOCK_FS_STORAGE_PREFIX = None
 
@@ -1830,13 +1886,13 @@ CREDIT_TASK_MAX_RETRIES = 5
 # or denied for credit.
 CREDIT_PROVIDER_TIMESTAMP_EXPIRATION = 15 * 60
 
-CREDIT_PROVIDER_SECRET_KEYS = {}
+CREDIT_PROVIDER_SECRET_KEYS: Mapping[str, Union[str, Sequence[str]]] = {}
 
 # dir containing all themes
-COMPREHENSIVE_THEME_DIRS = []
+COMPREHENSIVE_THEME_DIRS: Sequence[str] = []
 
 # Theme directory locale paths
-COMPREHENSIVE_THEME_LOCALE_PATHS = []
+COMPREHENSIVE_THEME_LOCALE_PATHS: Sequence[str] = []
 
 # Theme to use when no site or site theme is defined,
 # set to None if you want to use openedx theme
@@ -1852,7 +1908,20 @@ DATABASE_ROUTERS = [
 
 ############################ Cache Configuration ###############################
 
-CACHES = {
+
+class MinimalCacheDefinition(TypedDict):
+    LOCATION: Sequence[str]
+    BACKEND: str
+
+
+class CacheDefinition(MinimalCacheDefinition, total=False):
+    KEY_FUNCTION: str
+    KEY_PREFIX: str
+    TIMEOUT: Union[int, str]
+    VERSION: str
+
+
+CACHES: MutableMapping[str, CacheDefinition] = {
     'blockstore': {
         'KEY_PREFIX': 'blockstore',
         'KEY_FUNCTION': 'common.djangoapps.util.memcache.safe_key',
@@ -1952,12 +2021,12 @@ ENTERPRISE_ENROLLMENT_API_URL = LMS_ROOT_URL + LMS_ENROLLMENT_API_PATH
 ENTERPRISE_SERVICE_WORKER_USERNAME = 'enterprise_worker'
 ENTERPRISE_API_CACHE_TIMEOUT = 3600  # Value is in seconds
 # The default value of this needs to be a 16 character string
-ENTERPRISE_CUSTOMER_CATALOG_DEFAULT_CONTENT_FILTER = {}
+ENTERPRISE_CUSTOMER_CATALOG_DEFAULT_CONTENT_FILTER: Mapping[str, Union[str, Sequence[str]]] = {}
 
 # The setting key maps to the channel code (e.g. 'SAP' for success factors), Channel code is defined as
 # part of django model of each integrated channel in edx-enterprise.
 # The absence of a key/value pair translates to NO LIMIT on the number of "chunks" transmitted per cycle.
-INTEGRATED_CHANNELS_API_CHUNK_TRANSMISSION_LIMIT = {}
+INTEGRATED_CHANNELS_API_CHUNK_TRANSMISSION_LIMIT: Mapping[str, int] = {}
 
 BASE_COOKIE_DOMAIN = 'localhost'
 
@@ -1989,7 +2058,7 @@ OPENAPI_CACHE_TIMEOUT = 0
 ################# Mobile URLS ##########################
 
 # These are URLs to the app store for mobile.
-MOBILE_STORE_URLS: Dict[str, str] = {}
+MOBILE_STORE_URLS: Mapping[str, str] = {}
 
 ############################# Persistent Grades ####################################
 
@@ -2041,12 +2110,12 @@ VIDEO_IMAGE_ASPECT_RATIO_ERROR_MARGIN = 0.1
 ZENDESK_URL = ''
 ZENDESK_USER = ''
 ZENDESK_API_KEY = ''
-ZENDESK_CUSTOM_FIELDS: Dict[Any, Any] = {}
+ZENDESK_CUSTOM_FIELDS: Mapping[Any, Any] = {}
 ZENDESK_OAUTH_ACCESS_TOKEN = ''
 # A mapping of string names to Zendesk Group IDs
 # To get the IDs of your groups you can go to
 # {zendesk_url}/api/v2/groups.json
-ZENDESK_GROUP_ID_MAPPING: Dict[str, int] = {}
+ZENDESK_GROUP_ID_MAPPING: Mapping[str, int] = {}
 
 ############## Settings for Completion API #########################
 
@@ -2055,7 +2124,7 @@ ZENDESK_GROUP_ID_MAPPING: Dict[str, int] = {}
 COMPLETION_VIDEO_COMPLETE_PERCENTAGE = 0.95
 
 ############### Settings for edx-rbac  ###############
-SYSTEM_WIDE_ROLE_CLASSES = []
+SYSTEM_WIDE_ROLE_CLASSES: Sequence[str] = []
 
 ############## Installed Django Apps #########################
 
@@ -2104,9 +2173,9 @@ if FEATURES.get('ENABLE_CORS_HEADERS'):
         'use-jwt-cookie',
     )
 
-LOGIN_REDIRECT_WHITELIST = []
+LOGIN_REDIRECT_WHITELIST: Sequence[str] = []
 
-DEPRECATED_ADVANCED_COMPONENT_TYPES = []
+DEPRECATED_ADVANCED_COMPONENT_TYPES: Sequence[str] = []
 
 ########################## VIDEO IMAGE STORAGE ############################
 
@@ -2187,8 +2256,8 @@ SWIFT_TEMP_URL_DURATION = 1800  # seconds
 ############### The SAML private/public key values ################
 SOCIAL_AUTH_SAML_SP_PRIVATE_KEY = ""
 SOCIAL_AUTH_SAML_SP_PUBLIC_CERT = ""
-SOCIAL_AUTH_SAML_SP_PRIVATE_KEY_DICT = {}
-SOCIAL_AUTH_SAML_SP_PUBLIC_CERT_DICT = {}
+SOCIAL_AUTH_SAML_SP_PRIVATE_KEY_DICT: Mapping[str, str] = {}
+SOCIAL_AUTH_SAML_SP_PUBLIC_CERT_DICT: Mapping[str, str] = {}
 
 ############### Settings for facebook ##############################
 FACEBOOK_APP_ID = 'FACEBOOK_APP_ID'
@@ -2208,7 +2277,7 @@ PROCTORING_BACKENDS = {
     'null': {}
 }
 
-PROCTORING_SETTINGS = {}
+PROCTORING_SETTINGS: Mapping[str, Any] = {}
 
 ################## BLOCKSTORE RELATED SETTINGS  #########################
 BLOCKSTORE_PUBLIC_URL_ROOT = 'http://localhost:18250'
@@ -2222,7 +2291,7 @@ LEARNER_PORTAL_URL_ROOT = 'https://learner-portal-localhost:18000'
 
 ######################### MICROSITE ###############################
 MICROSITE_ROOT_DIR = '/edx/app/edxapp/edx-microsite'
-MICROSITE_CONFIGURATION = {}
+MICROSITE_CONFIGURATION: Mapping = {}
 
 ############################ JWT #################################
 JWT_ISSUER = 'http://127.0.0.1:8000/oauth2'
@@ -2249,7 +2318,7 @@ REGISTRATION_EXTRA_FIELDS = {
     'city': 'hidden',
     'country': 'hidden',
 }
-EDXAPP_PARSE_KEYS = {}
+EDXAPP_PARSE_KEYS: Mapping = {}
 
 ###################### DEPRECATED URLS ##########################
 

@@ -73,7 +73,7 @@ class BinnedSchedulesBaseResolver(PrefixedDebugLoggerMixin, RecipientResolver):
     bin_num = attr.ib()
     override_recipient_email = attr.ib(default=None)
 
-    schedule_date_field = None
+    schedule_date_field: str
     num_bins = DEFAULT_NUM_BINS
     experience_filter = (Q(experience__experience_type=ScheduleExperience.EXPERIENCES.default)
                          | Q(experience__isnull=True))

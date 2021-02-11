@@ -5,9 +5,11 @@ Test for lms courseware app, module data (runtime data storage for XBlocks)
 
 import json
 from functools import partial
+from typing import Type, Callable, Any
 
 from django.db import DatabaseError
 from django.test import TestCase
+from factory.django import DjangoModelFactory
 from mock import Mock, patch
 from xblock.core import XBlock
 from xblock.exceptions import KeyValueMultiSaveError
@@ -15,6 +17,7 @@ from xblock.fields import BlockScope, Scope, ScopeIds
 
 from lms.djangoapps.courseware.model_data import DjangoKeyValueStore, FieldDataCache, InvalidScopeError
 from lms.djangoapps.courseware.models import (
+    XBlockFieldBase,
     StudentModule,
     XModuleStudentInfoField,
     XModuleStudentPrefsField,
@@ -291,10 +294,10 @@ class StorageTestBase(object):
     # this base class -- pylint's static analysis can't keep up with it.
     # pylint: disable=no-member, not-callable
 
-    factory = None
+    factory: Type[DjangoModelFactory]
     scope = None
-    key_factory = None
-    storage_class = None
+    key_factory: Callable[[str], Any]
+    storage_class: Type[XBlockFieldBase]
 
     def setUp(self):
         field_storage = self.factory.create()

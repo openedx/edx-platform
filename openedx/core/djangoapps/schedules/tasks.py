@@ -4,8 +4,9 @@ import datetime
 import logging
 import six
 from six.moves import range
+from typing import Type
 
-from celery import task, current_app
+from celery import task, current_app, Task
 from celery_utils.logged_task import LoggedTask
 from celery_utils.persist_on_failure import LoggedPersistOnFailureTask
 from django.conf import settings
@@ -16,6 +17,7 @@ from django.db.utils import DatabaseError
 from edx_ace import ace
 from edx_ace.message import Message
 from edx_ace.utils.date import deserialize, serialize
+from edx_ace.recipient_resolver import RecipientResolver
 from edx_django_utils.monitoring import set_code_owner_attribute, set_custom_attribute
 from eventtracking import tracker
 from opaque_keys.edx.keys import CourseKey
@@ -66,10 +68,10 @@ class ScheduleMessageBaseTask(LoggedTask):
     """
     ignore_result = True
     routing_key = ROUTING_KEY
-    enqueue_config_var = None  # define in subclass
-    log_prefix = None
-    resolver = None  # define in subclass
-    async_send_task = None  # define in subclass
+    enqueue_config_var: str
+    log_prefix: str
+    resolver: Type[RecipientResolver]
+    async_send_task: Type[Task]
 
     @classmethod
     def log_debug(cls, message, *args, **kwargs):
@@ -98,7 +100,7 @@ class BinnedScheduleMessageBaseTask(ScheduleMessageBaseTask):
     for each Bin.
     """
     num_bins = resolvers.DEFAULT_NUM_BINS
-    task_instance = None
+    task_instance: Task
 
     @classmethod
     def enqueue(cls, site, current_date, day_offset, override_recipient_email=None):
@@ -188,7 +190,7 @@ class ScheduleRecurringNudge(BinnedScheduleMessageBaseTask):
         return message_types.RecurringNudge(abs(day_offset))
 # Save the task instance on the class object so that it's accessible via the cls argument to enqueue
 ScheduleRecurringNudge.task_instance = current_app.register_task(ScheduleRecurringNudge())
-ScheduleRecurringNudge = ScheduleRecurringNudge.task_instance
+ScheduleRecurringNudge = ScheduleRecurringNudge.task_instance  # type: ignore
 
 
 class ScheduleUpgradeReminder(BinnedScheduleMessageBaseTask):
@@ -202,7 +204,7 @@ class ScheduleUpgradeReminder(BinnedScheduleMessageBaseTask):
         return message_types.UpgradeReminder()
 # Save the task instance on the class object so that it's accessible via the cls argument to enqueue
 ScheduleUpgradeReminder.task_instance = current_app.register_task(ScheduleUpgradeReminder())
-ScheduleUpgradeReminder = ScheduleUpgradeReminder.task_instance
+ScheduleUpgradeReminder = ScheduleUpgradeReminder.task_instance  # type: ignore
 
 
 class ScheduleCourseUpdate(BinnedScheduleMessageBaseTask):
@@ -216,7 +218,7 @@ class ScheduleCourseUpdate(BinnedScheduleMessageBaseTask):
         return message_types.CourseUpdate()
 # Save the task instance on the class object so that it's accessible via the cls argument to enqueue
 ScheduleCourseUpdate.task_instance = current_app.register_task(ScheduleCourseUpdate())
-ScheduleCourseUpdate = ScheduleCourseUpdate.task_instance
+ScheduleCourseUpdate = ScheduleCourseUpdate.task_instance  # type: ignore
 
 
 class ScheduleCourseNextSectionUpdate(ScheduleMessageBaseTask):
@@ -224,7 +226,7 @@ class ScheduleCourseNextSectionUpdate(ScheduleMessageBaseTask):
     log_prefix = COURSE_NEXT_SECTION_UPDATE_LOG_PREFIX
     resolver = resolvers.CourseNextSectionUpdate
     async_send_task = _course_update_schedule_send
-    task_instance = None
+    task_instance: Task
 
     @classmethod
     def enqueue(cls, site, current_date, day_offset, override_recipient_email=None):
@@ -261,7 +263,7 @@ class ScheduleCourseNextSectionUpdate(ScheduleMessageBaseTask):
             ).send()
 # Save the task instance on the class object so that it's accessible via the cls argument to enqueue
 ScheduleCourseNextSectionUpdate.task_instance = current_app.register_task(ScheduleCourseNextSectionUpdate())
-ScheduleCourseNextSectionUpdate = ScheduleCourseNextSectionUpdate.task_instance
+ScheduleCourseNextSectionUpdate = ScheduleCourseNextSectionUpdate.task_instance  # type: ignore
 
 
 def _schedule_send(msg_str, site_id, delivery_config_var, log_prefix):

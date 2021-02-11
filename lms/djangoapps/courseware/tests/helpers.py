@@ -7,6 +7,7 @@ import ast
 import json
 from collections import OrderedDict
 from datetime import timedelta
+from typing import Mapping, Any
 
 import six
 from django.contrib import messages
@@ -56,7 +57,7 @@ class BaseTestXmodule(ModuleStoreTestCase):
     MODULESTORE = TEST_DATA_MONGO_MODULESTORE
 
     USER_COUNT = 2
-    COURSE_DATA = {}
+    COURSE_DATA: Mapping[str, Any] = {}
 
     # Data from YAML common/lib/xmodule/xmodule/templates/NAME/default.yaml
     CATEGORY = "vertical"
@@ -64,7 +65,7 @@ class BaseTestXmodule(ModuleStoreTestCase):
     # METADATA must be overwritten for every instance that uses it. Otherwise,
     # if we'll change it in the tests, it will be changed for all other instances
     # of parent class.
-    METADATA = {}
+    METADATA: Mapping[str, Any]
     MODEL_DATA = {'data': '<some_module></some_module>'}
 
     def new_module_runtime(self):

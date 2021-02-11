@@ -6,6 +6,7 @@ import json
 import os
 import tempfile
 import textwrap
+from typing import Mapping, Any
 from datetime import timedelta
 
 import ddt
@@ -137,7 +138,7 @@ class BaseTestVideoXBlock(BaseTestXmodule):
     """Base class for VideoXBlock tests."""
 
     CATEGORY = 'video'
-    METADATA: Dict[str, Any]
+    METADATA: Mapping[str, Any] = {}
 
     def initialize_block(self, data=None, **kwargs):
         """ Initialize an XBlock to run tests on. """
@@ -157,7 +158,7 @@ class TestVideo(BaseTestVideoXBlock):
     """Integration tests: web client + mongo."""
     CATEGORY = "video"
     DATA = SOURCE_XML
-    METADATA = {}
+    METADATA: Mapping[str, Any] = {}
 
     def test_handle_ajax_wrong_dispatch(self):
         responses = {
@@ -935,7 +936,7 @@ class TestStudioTranscriptTranslationPostDispatch(TestVideo):
         'data': DATA
     }
 
-    METADATA = {}
+    METADATA: Mapping[str, Any] = {}
 
     @ddt.data(
         {
@@ -1170,7 +1171,7 @@ class TestGetTranscript(TestVideo):
     MODEL_DATA = {
         'data': DATA
     }
-    METADATA = {}
+    METADATA: Mapping[str, Any] = {}
 
     def setUp(self):
         super(TestGetTranscript, self).setUp()

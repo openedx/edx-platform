@@ -7,6 +7,7 @@ import six
 from django.urls import reverse
 from mock import MagicMock
 from six import text_type
+from typing import Sequence
 
 from lms.djangoapps.courseware.model_data import FieldDataCache
 from lms.djangoapps.courseware.module_render import get_module_for_descriptor
@@ -24,9 +25,9 @@ class SplitTestBase(SharedModuleStoreTestCase):
     """
     __test__ = False
     COURSE_NUMBER = 'split-test-base'
-    ICON_CLASSES: List[str]
-    TOOLTIPS: List[List[str]]
-    VISIBLE_CONTENT: List[List[str]]
+    ICON_CLASSES: Sequence[str]
+    TOOLTIPS: Sequence[Sequence[str]]
+    VISIBLE_CONTENT: Sequence[Sequence[str]]
 
     @classmethod
     def setUpClass(cls):

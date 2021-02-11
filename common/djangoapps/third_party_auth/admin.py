@@ -103,7 +103,7 @@ class SAMLProviderConfigAdmin(KeyedConfigurationModelAdmin):
         update_url += '?source={}'.format(instance.pk)
         return format_html(u'<a href="{}">{}</a>', update_url, instance.name)
 
-    name_with_update_link.short_description = u'Name'
+    name_with_update_link.short_description = u'Name'  # type: ignore
 
     def has_data(self, inst):
         """ Do we have cached metadata for this SAML provider? """
@@ -111,8 +111,8 @@ class SAMLProviderConfigAdmin(KeyedConfigurationModelAdmin):
             return None  # N/A
         data = SAMLProviderData.current(inst.entity_id)
         return bool(data and data.is_valid())
-    has_data.short_description = u'Metadata Ready'
-    has_data.boolean = True
+    has_data.short_description = u'Metadata Ready'  # type: ignore
+    has_data.boolean = True  # type: ignore
 
     def mode(self, inst):
         """ Indicate if debug_mode is enabled or not"""

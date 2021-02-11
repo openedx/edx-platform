@@ -67,14 +67,13 @@ class IndexEvent(TypedDict):
     category: str
 
 
-@add_metaclass(ABCMeta)
 class SearchIndexerBase(object, metaclass=ABCMeta):
     """
     Base class to perform indexing for courseware or library search from different modulestores
     """
 
-    INDEX_NAME = None
-    ENABLE_INDEXING_KEY = None
+    INDEX_NAME: str
+    ENABLE_INDEXING_KEY: str
 
     INDEX_EVENT: IndexEvent
 
