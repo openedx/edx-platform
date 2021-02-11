@@ -12,6 +12,8 @@ from django.contrib.auth.decorators import login_required
 
 from xmodule.modulestore.django import modulestore
 
+from ...xblock import NexBlockWrapperBlock
+
 class NexBlockInstanceDataView(APIView):
     authentication_classes = (
         JwtAuthentication,
@@ -19,15 +21,11 @@ class NexBlockInstanceDataView(APIView):
     )
     permission_classes = (permissions.IsAuthenticated, )
 
-    def get(self, request):
-        usage_key = request.GET.get('usage_key')
+    def get(self, request, usage_id=None):
         try:
-            block = modulestore().get_item(UsageKey.from_string(usage_key))
-            if block.display_name == 'NexBlock':
-                if block.instance_data:
-                    return instance_data
-                else:
-                    return Response(status=status.HTTP_404_NOT_FOUND)
+            block = modulestore().get_item(UsageKey.from_string(usage_id))
+            if isinstance(block, NexBlockWrapperBlock):
+                return Response(data=block.instance_data)
             else:
                 message = 'Provided block is not a NexBlock'
                 return Response(status=status.HTTP_400_BAD_REQUEST, data={'message': message})
