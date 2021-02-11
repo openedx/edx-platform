@@ -9,6 +9,7 @@ locales:
     - en  # English - Source Language
     # - am  # Amharic
     - ar  # Arabic
+    - ar_SA  # Arabic (Saudi Arabia)
     # - az  # Azerbaijani
     # - bg_BG  # Bulgarian (Bulgaria)
     # - bn_BD  # Bengali (Bangladesh)
