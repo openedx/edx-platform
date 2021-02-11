@@ -1,10 +1,30 @@
 """
 Utility functions for event tracking processing.
+
+Used outside of this app by 'common/djangoapps/track/shim.py'.
+See the `DefaultMultipleSegmentClient` class
+
+
+
+TODO: Refactor to remove this module
+
+Why? The `utils` module is and anti-pattern. It encourages coincidental cohesion
+(loosely, non-specific grab-back bucketing
+of functionality). Yes, naming matters.
+
+Where? appsembler.eventracking.sites is a likely candidate as the purpose of the
+`get_site_config_for_event` is specific to sites.
 """
-
 from django.core.exceptions import MultipleObjectsReturned
+# from organizations.models import Organization, OrganizationCourse
 
-from . import exceptions
+from openedx.core.djangoapps.site_configuration.helpers import (
+    get_current_site_configuration
+)
+
+from openedx.core.djangoapps.appsembler.eventtracking.exceptions import (
+    EventProcessingError
+)
 
 
 def get_site_config_for_event(event_props):
@@ -13,37 +33,47 @@ def get_site_config_for_event(event_props):
     for evaluating and processing an event.
 
     Return a SiteConfiguration object if found; otherwise, None.
+
+    django.core.exceptions.AppRegistryNotReady: Apps aren't loaded yet
+
+    We get the site matching the org direcly from the organization object
+    instead of calling 'appsembler.sites.utils.get_site_by_organization'. The
+    problem is that importing 'appsembler.sites.utils' in this module at the
+    module level causes the following exception:
+
+        `django.core.exceptions.AppRegistryNotReady: Apps aren't loaded yet`
     """
-    from openedx.core.djangoapps.appsembler.sites import utils
-    from openedx.core.djangoapps.site_configuration import helpers
-    from organizations import models
 
     # try first via request obj in thread
-    site_configuration = helpers.get_current_site_configuration()
+    from organizations.models import Organization
+
+    site_configuration = get_current_site_configuration()
     if not site_configuration:
         try:
             if 'org' in event_props:
                 org_name = event_props['org']
-                org = models.Organization.objects.get(short_name=org_name)
+                org = Organization.objects.get(short_name=org_name)
             # try by OrganizationCourse relationship if event has a course_id property
             elif 'course_id' in event_props:
                 course_id = event_props['course_id']
                 # allow to fail if more than one Organization to avoid sharing data
-                orgcourse = models.OrganizationCourse.objects.get(course_id=args)
-                org = orgcourse.organization
+                org = Organization.objects.get(
+                    organizationcourse__course_id=str(course_id))
             else:
-                raise exceptions.EventProcessingError(
+                raise EventProcessingError(
                     "There isn't and org or course_id attribute set in the "
                     "segment event, so we couldn't determine the site."
                 )
-            site = utils.get_site_by_organization(org)
+            # Same logic as in 'appsembler.sites.utils.get_site_by_organization'
+            # See function docstring for additional comments
+            assert org.sites.count() == 1, 'Should have one and only one site.'
+            site = org.sites.all()[0]
             site_configuration = site.configuration
         except (
             AttributeError,
             TypeError,
             MultipleObjectsReturned,
-            models.Organization.DoesNotExist,
-            models.OrganizationCourse.DoesNotExist
+            Organization.DoesNotExist
         ) as e:
-            raise exceptions.EventProcessingError(e)
+            raise EventProcessingError(e)
     return site_configuration
