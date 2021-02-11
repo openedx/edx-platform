@@ -41,7 +41,6 @@ class CertificateVerificationKey(models.Model):
 
         Returns:
             str: Hash key to verify
-
         """
         key_in_hex = format(certificate.pk, 'x').upper()
         rotated_key = ''.join([HEX_ROT_10_MAP[x] for x in key_in_hex])

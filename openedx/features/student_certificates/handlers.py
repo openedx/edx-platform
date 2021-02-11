@@ -43,7 +43,6 @@ def send_email_user_certificate_downloadable(
 
     Returns:
         None
-
     """
     template = MandrillClient.DOWNLOAD_CERTIFICATE
 

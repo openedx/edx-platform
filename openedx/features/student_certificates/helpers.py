@@ -165,7 +165,6 @@ def get_philu_certificate_social_context(course, certificate):
 
     Returns:
         dict: Dictionary containing the urls (value) for different social sites (key)
-
     """
     custom_settings = get_course_custom_settings(course.id)
     meta_tags = custom_settings.get_course_meta_tags()
