@@ -42,11 +42,23 @@ class NexBlockWrapperBlock(
         default="NexBlock",
         scope=Scope.settings,
     )
-    package = String(
-        display_name=_("Package"),
-        help=_("An npm-installable package of NexBlock code."),
+    nexblock_remote_url = String(
+        display_name=_("NexBlock Remote URL"),
+        help=_("A path to a Webpack Federation remote that is hosting NexBlocks."),
         scope=Scope.settings,
-        default="git+https://github.com/kdmccormick/nexblock-test-announcement.git",
+        default="http://localhost:8080/remoteEntry.js",
+    )
+    nexblock_type = String(
+        display_name=_("NexBlock Type"),
+        help=_("Name of a NexBlock type."),
+        scope=Scope.settings,
+        default="Announcement",
+    )
+    instance_data = Dict(
+        display_name=_("Instance Data"),
+        help=_("Instance-level settings for this NexBlock instance, as JSON."),
+        scope=Scope.settings,
+        default={},
     )
     integrity_protected = Boolean(
         display_name=_("Integrity-Protected?"),
@@ -56,18 +68,13 @@ class NexBlockWrapperBlock(
         scope=Scope.settings,
         default=False,
     )
-    instance_data = Dict(
-        display_name=_("Instance Data"),
-        help=_("Instance-level settings for this NexBlock instance, as JSON."),
-        scope=Scope.settings,
-        default={},
-    )
 
     editable_fields = [
         "display_name",
-        "package",
-        "integrity_protected",
+        "nexblock_remote_url",
+        "nexblock_type",
         "instance_data",
+        "integrity_protected",
     ]
 
     has_author_view = True  # Tells Studio to use author_view
@@ -94,10 +101,8 @@ class NexBlockWrapperBlock(
             return None
         return user_service._django_user  # pylint: disable=protected-access
 
-    def student_view(self, context=None):  # pylint: disable=unused-argument
+    def _view(self):
         """
-        Renders student view for LMS.
-
         TODO
         """
         iframe_unique_id = f"nexblock-iframe-{uuid4()}"
@@ -106,7 +111,14 @@ class NexBlockWrapperBlock(
             height: 500px;
             border: none;
         """
-        renderer_url = "http://localhost:2000/nexblock"
+        mfe_root = "http://localhost:2000"
+        usage_id = str(self.scope_ids.usage_id)
+        renderer_url = (
+            f"{mfe_root}/nexblock"
+            f"?url={self.nexblock_remote_url}"
+            f"&view={self.nexblock_type}"
+            f"&usage_id={usage_id}"
+        )
         iframe_html = f"""
             <iframe class="nexblock-iframe"
                     id="{iframe_unique_id}"
@@ -118,6 +130,14 @@ class NexBlockWrapperBlock(
         fragment.add_content(iframe_html)
         return fragment
 
+    def student_view(self, context=None):  # pylint: disable=unused-argument
+        """
+        Renders student view for LMS.
+
+        TODO
+        """
+        return self._view()
+
     def author_view(self, context=None):  # pylint: disable=unused-argument
         """
         Renders preview view for Studio.
@@ -126,6 +146,6 @@ class NexBlockWrapperBlock(
         """
         fragment = Fragment()
         fragment.add_content(
-            f"<p>This will soon show a NexBlock of type <strong>{self.package}</strong><p>"
+            f"<p>This will soon show a NexBlock of type <strong>{self.nexblock_type}</strong><p>"
         )
         return fragment
