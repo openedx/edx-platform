@@ -1084,19 +1084,17 @@ class TestCourseExportImportProblem(CourseTestCase):
 
     @ddt.data(
         [
-            '<problem><pre><code>x=10 print("hello \n")</code></pre>'
-            '<pre><div><pre><code>x=10 print("hello \n")</code></pre></div></pre>'
+            '<problem><pre><code>x=10 print("hello")[]</code></pre>'
+            '<pre><div><pre><code>x=10 print("hello")</code></pre></div></pre>'
             '<multiplechoiceresponse></multiplechoiceresponse></problem>',
-
-            '<problem>\n  <pre>\n    <code>x=10 print("hello \n")</code>\n  </pre>\n  <pre>\n    <div>\n      <pre>\n '
-            '       <code>x=10 print("hello \n")</code>\n      </pre>\n    </div>\n  </pre>\n  '
-            '<multiplechoiceresponse/>\n</problem>\n'
+            '<problem>\n  <pre><code>x=10 print("hello")[]</code></pre>\n  '
+            '<pre>\n    <div>\n      <pre><code>x=10 print("hello")</code></pre>\n    </div>\n  '
+            '</pre>\n  <multiplechoiceresponse/>\n</problem>\n'
         ],
         [
             '<problem><pre><code>x=10 print("hello \n")</code></pre>'
             '<multiplechoiceresponse></multiplechoiceresponse></problem>',
-
-            '<problem>\n  <pre>\n    <code>x=10 print("hello \n")</code>\n  </pre>\n  '
+            '<problem>\n  <pre><code>x=10 print("hello \n")</code></pre>\n  '
             '<multiplechoiceresponse/>\n</problem>\n'
         ]
     )
