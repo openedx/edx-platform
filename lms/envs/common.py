@@ -692,7 +692,17 @@ FEATURES = {
     # Set to enable Enterprise integration
     'ENABLE_ENTERPRISE_INTEGRATION': False,
 
-    # Whether HTML XBlocks/XModules return HTML content with the Course Blocks API student_view_data
+    # .. toggle_name: FEATURES['ENABLE_HTML_XBLOCK_STUDENT_VIEW_DATA']
+    # .. toggle_implementation: DjangoSetting
+    # .. toggle_default: False
+    # .. toggle_description: Whether HTML Block returns HTML content with the Course Blocks API when the API
+    #   is called with student_view_data=html query parameter.
+    # .. toggle_warnings: Because the Course Blocks API caches its data, the cache must be cleared (e.g. by
+    #   re-publishing the course) for changes to this flag to take effect.
+    # .. toggle_use_cases: open_edx
+    # .. toggle_creation_date: 2017-08-28
+    # .. toggle_target_removal_date: None
+    # .. toggle_tickets: https://openedx.atlassian.net/browse/OSPR-1880
     'ENABLE_HTML_XBLOCK_STUDENT_VIEW_DATA': False,
 
     # .. toggle_name: FEATURES['ENABLE_CHANGE_USER_PASSWORD_ADMIN']
