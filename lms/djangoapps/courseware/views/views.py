@@ -33,7 +33,7 @@ from django.views.decorators.csrf import ensure_csrf_cookie
 from django.views.decorators.http import require_GET, require_http_methods, require_POST
 from django.views.generic import View
 from edx_django_utils import monitoring as monitoring_utils
-from edx_django_utils.monitoring import set_custom_attributes_for_course_key
+from edx_django_utils.monitoring import set_custom_attribute, set_custom_attributes_for_course_key
 from ipware.ip import get_ip
 from markupsafe import escape
 from opaque_keys import InvalidKeyError
@@ -135,6 +135,7 @@ from ..context_processor import user_timezone_locale_prefs
 from ..entrance_exams import user_can_skip_entrance_exam
 from ..module_render import get_module, get_module_by_usage_id, get_module_for_descriptor
 from ..tabs import _get_dynamic_tabs
+from ..toggles import COURSEWARE_OPTIMIZED_RENDER_XBLOCK
 
 log = logging.getLogger("edx.courseware")
 
@@ -1669,6 +1670,11 @@ def render_xblock(request, usage_key_string, check_if_enrolled=True):
     usage_key = usage_key.replace(course_key=modulestore().fill_in_run(usage_key.course_key))
     course_key = usage_key.course_key
 
+    # Gathering metrics to make performance measurements easier.
+    set_custom_attributes_for_course_key(course_key)
+    set_custom_attribute('usage_key', usage_key_string)
+    set_custom_attribute('block_type', usage_key.block_type)
+
     requested_view = request.GET.get('view', 'student_view')
     if requested_view != 'student_view' and requested_view != 'public_view':  # lint-amnesty, pylint: disable=consider-using-in
         return HttpResponseBadRequest(
@@ -1747,8 +1753,11 @@ def render_xblock(request, usage_key_string, check_if_enrolled=True):
                     )
                 )
 
+        fragment = block.render(requested_view, context=student_view_context)
+        optimization_flags = get_optimization_flags_for_content(block, fragment)
+
         context = {
-            'fragment': block.render(requested_view, context=student_view_context),
+            'fragment': fragment,
             'course': course,
             'disable_accordion': True,
             'allow_iframing': True,
@@ -1768,8 +1777,80 @@ def render_xblock(request, usage_key_string, check_if_enrolled=True):
             'is_learning_mfe': is_learning_mfe,
             'is_mobile_app': is_request_from_mobile_app(request),
             'reset_deadlines_url': reverse(RESET_COURSE_DEADLINES_NAME),
+
+            **optimization_flags,
         }
         return render_to_response('courseware/courseware-chromeless.html', context)
+
+
+def get_optimization_flags_for_content(block, fragment):
+    """
+    Return a dict with a set of display options appropriate for the block.
+
+    This is going to start in a very limited way.
+    """
+    safe_defaults = {
+        'enable_mathjax': True
+    }
+
+    # Only run our optimizations on the leaf HTML and ProblemBlock nodes. The
+    # mobile apps access these directly, and we don't have to worry about
+    # XBlocks that dynamically load content, like inline discussions.
+    usage_key = block.location
+
+    # For now, confine ourselves to optimizing just the HTMLBlock
+    if usage_key.block_type != 'html':
+        return safe_defaults
+
+    if not COURSEWARE_OPTIMIZED_RENDER_XBLOCK.is_enabled(usage_key.course_key):
+        return safe_defaults
+
+    inspector = XBlockContentInspector(block, fragment)
+    flags = dict(safe_defaults)
+    flags['enable_mathjax'] = inspector.has_mathjax_content()
+
+    return flags
+
+
+class XBlockContentInspector:
+    """
+    Class to inspect rendered XBlock content to determine dependencies.
+
+    A lot of content has been written with the assumption that certain
+    JavaScript and assets are available. This has caused us to continue to
+    include these assets in the render_xblock view, despite the fact that they
+    are not used by the vast majority of content.
+
+    In order to try to provide faster load times for most users on most content,
+    this class has the job of detecting certain patterns in XBlock content that
+    would imply these dependencies, so we know when to include them or not.
+    """
+    def __init__(self, block, fragment):
+        self.block = block
+        self.fragment = fragment
+
+    def has_mathjax_content(self):
+        """
+        Returns whether we detect any MathJax in the fragment.
+
+        Note that this only works for things that are rendered up front. If an
+        XBlock is capable of modifying the DOM afterwards to inject math content
+        into the page, this will not catch it.
+        """
+        # The following pairs are used to mark Mathjax syntax in XBlocks. There
+        # are other options for the wiki, but we don't worry about those here.
+        MATHJAX_TAG_PAIRS = [
+            (r"\(", r"\)"),
+            (r"\[", r"\]"),
+            ("[mathjaxinline]", "[/mathjaxinline]"),
+            ("[mathjax]", "[/mathjax]"),
+        ]
+        content = self.fragment.body_html()
+        for (start_tag, end_tag) in MATHJAX_TAG_PAIRS:
+            if start_tag in content and end_tag in content:
+                return True
+
+        return False
 
 
 # Translators: "percent_sign" is the symbol "%". "platform_name" is a

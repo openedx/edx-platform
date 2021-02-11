@@ -115,6 +115,21 @@ EXAM_RESUME_PROCTORING_IMPROVEMENTS = CourseWaffleFlag(
     WAFFLE_FLAG_NAMESPACE, 'exam_resume_proctoring_improvements', __name__
 )
 
+# .. toggle_name: courseware.optimized_render_xblock
+# .. toggle_implementation: CourseWaffleFlag
+# .. toggle_default: False
+# .. toggle_description: Waffle flag that determines whether we speed up the render_xblock for browsers by
+#   removing unnecessary JavaScript and CSS. It is possible that this could introduce edge cases with content
+#   that relies on these assets, so being a CourseWaffleFlag will give us the flexibility to exempt courses
+#   from these optimizations.
+# .. toggle_use_cases: temporary
+# .. toggle_creation_date: 2021-02-09
+# .. toggle_target_removal_date: 2021-05-01
+# .. toggle_warnings: None
+COURSEWARE_OPTIMIZED_RENDER_XBLOCK = CourseWaffleFlag(
+    WAFFLE_FLAG_NAMESPACE, 'optimized_render_xblock', __name__
+)
+
 
 def course_exit_page_is_active(course_key):
     return (
