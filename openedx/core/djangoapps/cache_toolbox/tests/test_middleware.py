@@ -29,7 +29,7 @@ class CachedAuthMiddlewareTestCase(TestCase):
         different URLconfs.
         """
         response = self.client.get(test_url)
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
         with patch.object(User, 'get_session_auth_hash', return_value='abc123'):
             response = self.client.get(test_url)
             self.assertRedirects(response, redirect_url, target_status_code=target_status_code)
