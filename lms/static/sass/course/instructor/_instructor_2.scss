@@ -2587,9 +2587,11 @@ input[name="subject"] {
 }
 
 .special-allowance-container,
+.student-onboarding-status-container,
 .student-proctored-exam-container {
   .allowance-table,
-  .exam-attempts-table {
+  .exam-attempts-table,
+  .onboarding-status-table {
     width: 100%;
 
     tr:nth-child(even) {
@@ -2598,7 +2600,8 @@ input[name="subject"] {
     }
 
     .allowance-headings,
-    .exam-attempt-headings {
+    .exam-attempt-headings,
+    .onboarding-status-headings {
       height: 40px;
       border-bottom: 1px solid #bebebe;
 
@@ -2718,7 +2721,8 @@ input[name="subject"] {
   }
 
   .exam-attempts-content,
-  .exam-allowances-content {
+  .exam-allowances-content,
+  .onboarding-status-content {
     padding-left: 0;
     padding-right: 0;
   }
@@ -2727,7 +2731,8 @@ input[name="subject"] {
     margin-top: -30px;
     margin-bottom: 20px;
 
-    .search-attempts {
+    .search-attempts,
+    .search-onboarding {
       border: 1px solid #ccc;
       display: inline-block;
       border-radius: 5px;
