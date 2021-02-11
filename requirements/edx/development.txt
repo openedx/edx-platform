@@ -130,7 +130,7 @@ edx-toggles==4.0.0        # via -r requirements/edx/testing.txt, edx-completion,
 edx-user-state-client==1.3.0  # via -r requirements/edx/testing.txt
 edx-when==2.0.0           # via -r requirements/edx/testing.txt, edx-proctoring
 edxval==2.0.1             # via -r requirements/edx/testing.txt
-elasticsearch==7.10.1     # via -r requirements/edx/testing.txt, edx-search
+elasticsearch==7.11.0     # via -r requirements/edx/testing.txt, edx-search
 enmerkar-underscore==2.0.0  # via -r requirements/edx/testing.txt
 enmerkar==0.7.1           # via -r requirements/edx/testing.txt, enmerkar-underscore
 event-tracking==1.0.4     # via -r requirements/edx/testing.txt, edx-event-routing-backends, edx-proctoring, edx-search
@@ -294,10 +294,10 @@ tableauserverclient==0.14.1  # via -r requirements/edx/testing.txt, edx-enterpri
 testfixtures==6.17.1      # via -r requirements/edx/testing.txt, edx-enterprise
 text-unidecode==1.3       # via -r requirements/edx/testing.txt, faker, python-slugify
 tincan==1.0.0             # via -r requirements/edx/testing.txt, edx-event-routing-backends
-toml==0.10.2              # via -r requirements/edx/testing.txt, pylint, pytest, tox
+toml==0.10.2              # via -r requirements/edx/testing.txt, pylint, pytest, tox, vulture
 tox-battery==0.6.1        # via -r requirements/edx/testing.txt
 tox==3.21.4               # via -r requirements/edx/testing.txt, tox-battery
-tqdm==4.56.1              # via -r requirements/edx/testing.txt, nltk
+tqdm==4.56.2              # via -r requirements/edx/testing.txt, nltk
 transifex-client==0.14.2  # via -r requirements/edx/testing.txt
 ua-parser==0.10.0         # via -r requirements/edx/testing.txt, django-cookies-samesite
 unicodecsv==0.14.1        # via -r requirements/edx/testing.txt, edx-enterprise
@@ -308,7 +308,7 @@ user-util==1.0.0          # via -r requirements/edx/testing.txt
 vine==1.3.0               # via -r requirements/edx/testing.txt, amqp, celery
 virtualenv==20.4.2        # via -r requirements/edx/testing.txt, tox
 voluptuous==0.12.1        # via -r requirements/edx/testing.txt, ora2
-vulture==1.6              # via -c requirements/edx/../constraints.txt, -r requirements/edx/development.in
+vulture==2.3              # via -r requirements/edx/development.in
 watchdog==1.0.2           # via -r requirements/edx/testing.txt
 web-fragments==1.0.0      # via -r requirements/edx/testing.txt, crowdsourcehinter-xblock, edx-sga, staff-graded-xblock, xblock, xblock-utils
 webencodings==0.5.1       # via -r requirements/edx/testing.txt, bleach, html5lib
