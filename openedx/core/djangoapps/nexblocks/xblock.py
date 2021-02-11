@@ -3,6 +3,7 @@ Expose NexBlock instances in courseware through the NexWrapperBlock.
 """
 
 import logging
+from uuid import uuid4
 
 from web_fragments.fragment import Fragment
 from xblock.core import XBlock
@@ -99,15 +100,22 @@ class NexBlockWrapperBlock(
 
         TODO
         """
+        iframe_unique_id = f"nexblock-iframe-{uuid4()}"
+        iframe_styles = """
+            width: 100%;
+            height: 500px;
+            border: none;
+        """
+        renderer_url = "http://localhost:2000/nexblock"
+        iframe_html = f"""
+            <iframe class="nexblock-iframe"
+                    id="{iframe_unique_id}"
+                    src="{renderer_url}"
+                    style="{iframe_styles}"
+            ></iframe>
+        """
         fragment = Fragment()
-        fragment.add_content(
-            f'<div style="width: 100%">'
-            f'<p>This will soon show a NexBlock of type <strong>{self.package}</strong><p>'
-            f'<p>It will be rendered in an iframe, like the one below.</p>'
-            f'<p>For now, the iframe is rendering the Learning MFE.</p>'
-            f'<iframe style="width: 100%" src="http://localhost:2000/nexblock"></iframe>'
-            f'</div>'
-        )
+        fragment.add_content(iframe_html)
         return fragment
 
     def author_view(self, context=None):  # pylint: disable=unused-argument
