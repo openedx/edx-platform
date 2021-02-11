@@ -1111,7 +1111,6 @@ class TestCourseExportImportProblem(CourseTestCase):
         self._setup_source_course_with_problem_content(problem_data)
 
         dest_course = CourseFactory.create(default_store=ModuleStoreEnum.Type.split)
-        # import pdb;pdb.set_trace()
         export_course_to_xml(
             self.store,
             contentstore(),
