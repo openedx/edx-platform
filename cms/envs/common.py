@@ -36,7 +36,6 @@ When refering to XBlocks, we use the entry-point name. For example,
 
 # We intentionally define lots of variables that aren't used, and
 # want to import all variables from base settings files
-
 # pylint: disable=unused-import, useless-suppression, wrong-import-order, wrong-import-position
 
 import importlib.util

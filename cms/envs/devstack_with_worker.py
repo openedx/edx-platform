@@ -11,9 +11,6 @@ In two separate processes on devstack:
     DJANGO_SETTINGS_MODULE=cms.envs.devstack_with_worker celery worker --app=cms.celery:APP
 """
 
-
-import os  # lint-amnesty, pylint: disable=unused-import
-
 # We intentionally define lots of variables that aren't used, and
 # want to import all variables from base settings files
 # pylint: disable=wildcard-import, unused-wildcard-import
