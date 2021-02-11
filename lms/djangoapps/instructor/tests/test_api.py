@@ -2803,7 +2803,9 @@ class TestInstructorAPILevelsDataDump(SharedModuleStoreTestCase, LoginEnrollment
         # depending on the number of enrollments in a course.  We are rate limiting it to
         # prevent too many concurrent calls which could result in a denial of service for
         # other users of the lms.
-        with freeze_time(base_time + datetime.timedelta(minutes=1)):
+        # Note: We use the base_time exactly so that we don't accidentally end up on the wrong
+        # side of the rate limit time chunking boundary.
+        with freeze_time(base_time):
             response = self.client.post(url, {})
             assert response.status_code == 429
 
