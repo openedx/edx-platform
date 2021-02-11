@@ -625,7 +625,14 @@ FEATURES = {
     # The default value in {lms,cms}/envs/common.py and xmodule/tests/test_video.py should be consistent.
     'FALLBACK_TO_ENGLISH_TRANSCRIPTS': True,
 
-    # Show the language selector in the footer
+    # .. toggle_name: FEATURES['SHOW_FOOTER_LANGUAGE_SELECTOR']
+    # .. toggle_implementation: DjangoSetting
+    # .. toggle_default: False
+    # .. toggle_description: When set to True, language selector will be visible in the footer.
+    # .. toggle_use_cases: open_edx
+    # .. toggle_creation_date: 2017-05-25
+    # .. toggle_warnings: LANGUAGE_COOKIE is required to use footer-language-selector, set it if it has not been set.
+    # .. toggle_tickets: https://github.com/edx/edx-platform/pull/15133
     'SHOW_FOOTER_LANGUAGE_SELECTOR': False,
 
     # .. toggle_name: FEATURES['ENABLE_CSMH_EXTENDED']
