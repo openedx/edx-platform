@@ -33,7 +33,7 @@ class RawMixin(object):
             if pre_tag_data:
                 matches = re.finditer(PRE_TAG_REGEX, data)
                 for match_num, match in enumerate(matches):
-                    data = re.sub(match.group(), pre_tag_data[match_num].decode(), data)
+                    data = re.sub(re.escape(match.group()), pre_tag_data[match_num].decode(), data)
             etree.XML(data)  # it just checks if generated string is valid xml
             return {'data': data}, []
         except etree.XMLSyntaxError:
