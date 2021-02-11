@@ -28,8 +28,9 @@ def generate_certificate_verification_key(instance, created, **_kwargs):
 
 
 @receiver(USER_CERTIFICATE_DOWNLOADABLE)
-def send_email_user_certificate_downloadable(sender, first_name, display_name, certificate_reverse_url, user_email,
-                                             *_args, **_kwargs):  # pylint: disable=unused-argument
+def send_email_user_certificate_downloadable(
+    sender, first_name, display_name, certificate_reverse_url, user_email, *args, **kwargs
+):  # pylint: disable=unused-argument
     """
     Send email containing course certificate to the specified user
 

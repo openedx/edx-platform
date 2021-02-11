@@ -1,5 +1,5 @@
 """
-This file contains the test cases for views of the student_certificates app
+This file contains the test cases for views of the student_certificates application.
 """
 
 import factory  # pylint: disable=unused-import
@@ -50,9 +50,9 @@ class GenerateStudentCertificateViewsTestCase(SharedModuleStoreTestCase):
         from openedx.features.course_card.tests.helpers import initialize_test_user
         cls.user = initialize_test_user(password=cls.password)
         cls.user.save()
-        cls.course_settings = CustomSettings(id=cls.course.id,
-                                             course_short_id=1,
-                                             course_open_date=get_current_utc_date())
+        cls.course_settings = CustomSettings(
+            id=cls.course.id, course_short_id=1, course_open_date=get_current_utc_date()
+        )
         cls.course_settings.save()
 
         CourseEnrollmentFactory.create(
