@@ -3973,6 +3973,13 @@ DATA_CONSENT_SHARE_CACHE_TIMEOUT = 8 * 60 * 60  # 8 hours
 ENTERPRISE_MARKETING_FOOTER_QUERY_PARAMS = {}
 ENTERPRISE_TAGLINE = ''
 
+ACTSTREAM_SETTINGS = {
+    # this is mostly a "hack" b/c django-activity-stream doesn't seem to support generic relations
+    # for models that use a uuid as its primary key; the tradeoff by disabling this setting is that
+    # we lose some performance optimizations that we'd otherwise get out-of-the-box.
+    'FETCH_RELATIONS': False,
+}
+
 ############## Settings for Course Enrollment Modes ######################
 # The min_price key refers to the minimum price allowed for an instance
 # of a particular type of course enrollment mode. This is not to be confused
