@@ -25,7 +25,7 @@ class SurveyGizmoClient(SurveyGizmo):
 
     def get_survey_responses(self, survey_id, survey_filters=None, page_no=1, results_per_page=500):
         """
-        Filters survey based on the provided survey filters.
+        Returns filtered surveys of the specific page.
         """
         surveys = self.api.surveyresponse.resultsperpage(results_per_page).page(page_no)  # pylint: disable=no-member
 
