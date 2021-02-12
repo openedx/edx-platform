@@ -29,6 +29,7 @@ class NexBlockInstanceDataView(APIView):
         """
         handle GET
         """
+        usage_id = usage_id.replace("%20", "+").replace(" ", "+")
         block = modulestore().get_item(UsageKey.from_string(usage_id))
         if isinstance(block, NexBlockWrapperBlock):
             return Response(data=block.instance_data)
