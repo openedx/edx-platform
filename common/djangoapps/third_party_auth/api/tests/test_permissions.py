@@ -54,7 +54,7 @@ class ThirdPartyAuthPermissionTest(TestCase):
     def test_anonymous_fails(self):
         request = self._create_request()
         response = self.SomeTpaClassView().dispatch(request)
-        self.assertEqual(response.status_code, 401)
+        assert response.status_code == 401
 
     @ddt.data(
         (True, False, 200),
@@ -68,7 +68,7 @@ class ThirdPartyAuthPermissionTest(TestCase):
         self._create_session(request, user)
 
         response = self.SomeTpaClassView().dispatch(request)
-        self.assertEqual(response.status_code, expected_status_code)
+        assert response.status_code == expected_status_code
 
     @ddt.data(
         # unrestricted (for example, jwt cookies)
@@ -97,7 +97,7 @@ class ThirdPartyAuthPermissionTest(TestCase):
         )
 
         response = self.SomeTpaClassView().dispatch(request)
-        self.assertEqual(response.status_code, expected_response)
+        assert response.status_code == expected_response
 
     @ddt.data(
         # valid scopes
@@ -152,4 +152,4 @@ class ThirdPartyAuthPermissionTest(TestCase):
         request = self._create_request(auth_header=auth_header)
 
         response = self.SomeTpaClassView().dispatch(request, provider_id='some_tpa_provider')
-        self.assertEqual(response.status_code, expected_response)
+        assert response.status_code == expected_response

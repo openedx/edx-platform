@@ -31,5 +31,5 @@ class GenericIntegrationTest(IntegrationTestMixin, testutil.TestCase):
         Mock logging in to the Dummy provider
         """
         # For the Dummy provider, the provider redirect URL is self.complete_url
-        self.assertEqual(provider_redirect_url, self.url_prefix + self.complete_url)
+        assert provider_redirect_url == (self.url_prefix + self.complete_url)
         return self.client.get(provider_redirect_url)

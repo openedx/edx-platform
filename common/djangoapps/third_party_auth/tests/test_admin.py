@@ -56,8 +56,8 @@ class Oauth2ProviderConfigAdminTest(testutil.TestCase):
 
         # Get the provider instance with active flag
         providers = OAuth2ProviderConfig.objects.all()
-        self.assertEqual(len(providers), 1)
-        self.assertEqual(providers[pcount].id, provider1.id)
+        assert len(providers) == 1
+        assert providers[pcount].id == provider1.id
 
         # Edit the provider via the admin edit link
         admin = OAuth2ProviderConfigAdmin(provider1, AdminSite())
@@ -77,14 +77,14 @@ class Oauth2ProviderConfigAdminTest(testutil.TestCase):
 
         # Post the edit form: expecting redirect
         response = self.client.post(update_url, post_data)
-        self.assertEqual(response.status_code, 302)
+        assert response.status_code == 302
 
         # Editing the existing provider creates a new provider instance
         providers = OAuth2ProviderConfig.objects.all()
-        self.assertEqual(len(providers), pcount + 2)
-        self.assertEqual(providers[pcount].id, provider1.id)
+        assert len(providers) == (pcount + 2)
+        assert providers[pcount].id == provider1.id
         provider2 = providers[pcount + 1]
 
         # Ensure the icon_image was preserved on the new provider instance
-        self.assertEqual(provider2.icon_image, provider1.icon_image)
-        self.assertEqual(provider2.name, post_data['name'])
+        assert provider2.icon_image == provider1.icon_image
+        assert provider2.name == post_data['name']

@@ -32,21 +32,11 @@ class TestUtils(TestCase):
         """
         # Create users from factory
         UserFactory(username='test_user', email='test_user@example.com')
-        self.assertTrue(
-            user_exists({'username': 'test_user', 'email': 'test_user@example.com'}),
-        )
-        self.assertTrue(
-            user_exists({'username': 'test_user'}),
-        )
-        self.assertTrue(
-            user_exists({'email': 'test_user@example.com'}),
-        )
-        self.assertFalse(
-            user_exists({'username': 'invalid_user'}),
-        )
-        self.assertTrue(
-            user_exists({'username': 'TesT_User'})
-        )
+        assert user_exists({'username': 'test_user', 'email': 'test_user@example.com'})
+        assert user_exists({'username': 'test_user'})
+        assert user_exists({'email': 'test_user@example.com'})
+        assert not user_exists({'username': 'invalid_user'})
+        assert user_exists({'username': 'TesT_User'})
 
     def test_convert_saml_slug_provider_id(self):
         """
@@ -55,13 +45,9 @@ class TestUtils(TestCase):
         provider_names = {'saml-samltest': 'samltest', 'saml-example': 'example'}
         for provider_id in provider_names:
             # provider_id -> slug
-            self.assertEqual(
-                convert_saml_slug_provider_id(provider_id), provider_names[provider_id]
-            )
+            assert convert_saml_slug_provider_id(provider_id) == provider_names[provider_id]
             # slug -> provider_id
-            self.assertEqual(
-                convert_saml_slug_provider_id(provider_names[provider_id]), provider_id
-            )
+            assert convert_saml_slug_provider_id(provider_names[provider_id]) == provider_id
 
     def test_get_user(self):
         """

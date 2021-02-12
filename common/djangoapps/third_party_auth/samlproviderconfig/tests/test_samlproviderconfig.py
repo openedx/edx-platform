@@ -91,13 +91,13 @@ class SAMLProviderConfigTests(APITestCase):
 
         response = self.client.get(url, format='json')
 
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        assert response.status_code == status.HTTP_200_OK
         results = response.data['results']
-        self.assertEqual(len(results), 1)
-        self.assertEqual(results[0]['entity_id'], SINGLE_PROVIDER_CONFIG['entity_id'])
-        self.assertEqual(results[0]['metadata_source'], SINGLE_PROVIDER_CONFIG['metadata_source'])
-        self.assertEqual(response.data['results'][0]['country'], SINGLE_PROVIDER_CONFIG['country'])
-        self.assertEqual(SAMLProviderConfig.objects.count(), 1)
+        assert len(results) == 1
+        assert results[0]['entity_id'] == SINGLE_PROVIDER_CONFIG['entity_id']
+        assert results[0]['metadata_source'] == SINGLE_PROVIDER_CONFIG['metadata_source']
+        assert response.data['results'][0]['country'] == SINGLE_PROVIDER_CONFIG['country']
+        assert SAMLProviderConfig.objects.count() == 1
 
     def test_get_one_config_by_enterprise_uuid_invalid_uuid(self):
         """
@@ -109,7 +109,7 @@ class SAMLProviderConfigTests(APITestCase):
 
         response = self.client.get(url, format='json')
 
-        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
 
     def test_get_one_config_by_enterprise_uuid_not_found(self):
         """
@@ -128,8 +128,8 @@ class SAMLProviderConfigTests(APITestCase):
 
         response = self.client.get(url, format='json')
 
-        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
-        self.assertEqual(SAMLProviderConfig.objects.count(), orig_count)
+        assert response.status_code == status.HTTP_404_NOT_FOUND
+        assert SAMLProviderConfig.objects.count() == orig_count
 
     def test_create_one_config(self):
         """
@@ -142,19 +142,14 @@ class SAMLProviderConfigTests(APITestCase):
 
         response = self.client.post(url, data)
 
-        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
-        self.assertEqual(SAMLProviderConfig.objects.count(), orig_count + 1)
+        assert response.status_code == status.HTTP_201_CREATED
+        assert SAMLProviderConfig.objects.count() == (orig_count + 1)
         provider_config = SAMLProviderConfig.objects.get(slug=SINGLE_PROVIDER_CONFIG_2['slug'])
-        self.assertEqual(provider_config.name, 'name-of-config-2')
-        self.assertEqual(provider_config.country, SINGLE_PROVIDER_CONFIG_2['country'])
+        assert provider_config.name == 'name-of-config-2'
+        assert provider_config.country == SINGLE_PROVIDER_CONFIG_2['country']
 
         # check association has also been created
-        self.assertTrue(
-            EnterpriseCustomerIdentityProvider.objects.filter(
-                provider_id=convert_saml_slug_provider_id(provider_config.slug)
-            ).exists(),
-            'Cannot find EnterpriseCustomer-->SAMLProviderConfig association'
-        )
+        assert EnterpriseCustomerIdentityProvider.objects.filter(provider_id=convert_saml_slug_provider_id(provider_config.slug)).exists(), 'Cannot find EnterpriseCustomer-->SAMLProviderConfig association'
 
     def test_create_one_config_fail_non_existent_enterprise_uuid(self):
         """
@@ -167,16 +162,11 @@ class SAMLProviderConfigTests(APITestCase):
 
         response = self.client.post(url, data)
 
-        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
-        self.assertEqual(SAMLProviderConfig.objects.count(), orig_count)
+        assert response.status_code == status.HTTP_403_FORBIDDEN
+        assert SAMLProviderConfig.objects.count() == orig_count
 
         # check association has NOT been created
-        self.assertFalse(
-            EnterpriseCustomerIdentityProvider.objects.filter(
-                provider_id=convert_saml_slug_provider_id(SINGLE_PROVIDER_CONFIG_2['slug'])
-            ).exists(),
-            'Did not expect to find EnterpriseCustomer-->SAMLProviderConfig association'
-        )
+        assert not EnterpriseCustomerIdentityProvider.objects.filter(provider_id=convert_saml_slug_provider_id(SINGLE_PROVIDER_CONFIG_2['slug'])).exists(), 'Did not expect to find EnterpriseCustomer-->SAMLProviderConfig association'
 
     def test_create_one_config_with_absent_enterprise_uuid(self):
         """
@@ -188,8 +178,8 @@ class SAMLProviderConfigTests(APITestCase):
 
         response = self.client.post(url, data)
 
-        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
-        self.assertEqual(SAMLProviderConfig.objects.count(), orig_count)
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        assert SAMLProviderConfig.objects.count() == orig_count
 
     def test_create_one_config_with_no_country_urn(self):
         """
@@ -206,9 +196,9 @@ class SAMLProviderConfigTests(APITestCase):
         }
 
         response = self.client.post(url, provider_config_no_country)
-        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        assert response.status_code == status.HTTP_201_CREATED
         provider_config = SAMLProviderConfig.objects.get(slug='test-slug-none')
-        self.assertEqual(provider_config.country, '')
+        assert provider_config.country == ''
 
     def test_create_one_config_with_empty_country_urn(self):
         """
@@ -226,9 +216,9 @@ class SAMLProviderConfigTests(APITestCase):
         }
 
         response = self.client.post(url, provider_config_blank_country)
-        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        assert response.status_code == status.HTTP_201_CREATED
         provider_config = SAMLProviderConfig.objects.get(slug='test-slug-empty')
-        self.assertEqual(provider_config.country, '')
+        assert provider_config.country == ''
 
     def test_unauthenticated_request_is_forbidden(self):
         self.client.logout()
@@ -237,12 +227,12 @@ class SAMLProviderConfigTests(APITestCase):
         url = '{}?{}'.format(urlbase, urlencode(query_kwargs))
         set_jwt_cookie(self.client, self.user, [(ENTERPRISE_LEARNER_ROLE, ENTERPRISE_ID)])
         response = self.client.get(url, format='json')
-        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        assert response.status_code == status.HTTP_403_FORBIDDEN
 
         self.client.logout()
         set_jwt_cookie(self.client, self.user, [(ENTERPRISE_ADMIN_ROLE, ENTERPRISE_ID_NON_EXISTENT)])
         response = self.client.get(url, format='json')
-        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        assert response.status_code == status.HTTP_403_FORBIDDEN
 
     def test_create_one_config_with_samlconfiguration(self):
         """
@@ -255,6 +245,6 @@ class SAMLProviderConfigTests(APITestCase):
 
         response = self.client.post(url, data)
 
-        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        assert response.status_code == status.HTTP_201_CREATED
         provider_config = SAMLProviderConfig.objects.get(slug=SINGLE_PROVIDER_CONFIG_3['slug'])
-        self.assertEqual(provider_config.saml_configuration, self.samlconfiguration)
+        assert provider_config.saml_configuration == self.samlconfiguration

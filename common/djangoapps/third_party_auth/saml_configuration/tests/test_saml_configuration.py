@@ -83,19 +83,19 @@ class SAMLConfigurationTests(APITestCase):
     def test_get_saml_configurations_successful(self):
         url = reverse('saml_configuration-list')
         response = self.client.get(url, format='json')
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        assert response.status_code == status.HTTP_200_OK
 
         # We ultimately just need ids and slugs, so let's just check those.
         results = response.data['results']
-        self.assertEqual(results[0]['id'], SAML_CONFIGURATIONS[0]['site'])
-        self.assertEqual(results[0]['slug'], SAML_CONFIGURATIONS[0]['slug'])
-        self.assertEqual(results[1]['id'], SAML_CONFIGURATIONS[1]['site'])
-        self.assertEqual(results[1]['slug'], SAML_CONFIGURATIONS[1]['slug'])
+        assert results[0]['id'] == SAML_CONFIGURATIONS[0]['site']
+        assert results[0]['slug'] == SAML_CONFIGURATIONS[0]['slug']
+        assert results[1]['id'] == SAML_CONFIGURATIONS[1]['site']
+        assert results[1]['slug'] == SAML_CONFIGURATIONS[1]['slug']
 
     def test_get_saml_configurations_noprivate(self):
         # Verify we have 3 saml configuration objects: 2 public, 1 private.
         total_object_count = SAMLConfiguration.objects.count()
-        self.assertEqual(total_object_count, 3)
+        assert total_object_count == 3
 
         url = reverse('saml_configuration-list')
         response = self.client.get(url, format='json')
@@ -103,10 +103,10 @@ class SAMLConfigurationTests(APITestCase):
         # We should only see 2 results, since 1 out of 3 are private
         # and our queryset only returns public configurations.
         results = response.data['results']
-        self.assertEqual(len(results), 2)
+        assert len(results) == 2
 
     def test_unauthenticated_user_get_saml_configurations(self):
         self.client.logout()
         url = reverse('saml_configuration-list')
         response = self.client.get(url, format='json')
-        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+        assert response.status_code == status.HTTP_401_UNAUTHORIZED

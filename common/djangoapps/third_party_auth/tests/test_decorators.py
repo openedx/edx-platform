@@ -48,11 +48,11 @@ class TestXFrameWhitelistDecorator(TestCase):
 
         response = mock_view(request)
 
-        self.assertEqual(response['X-Frame-Options'], expected_result)
+        assert response['X-Frame-Options'] == expected_result
 
     @ddt.data('http://localhost/login', 'http://not-a-real-domain.com', None)
     def test_feature_flag_off(self, url):
         with self.settings(FEATURES={'ENABLE_THIRD_PARTY_AUTH': False}):
             request = self.construct_request(url)
             response = mock_view(request)
-            self.assertEqual(response['X-Frame-Options'], 'DENY')
+            assert response['X-Frame-Options'] == 'DENY'

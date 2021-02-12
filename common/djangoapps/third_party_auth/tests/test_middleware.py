@@ -40,5 +40,5 @@ class ThirdPartyAuthMiddlewareTestCase(TestCase):
         )
         target_url = response.url
 
-        self.assertEqual(response.status_code, 302)
-        self.assertTrue(target_url.endswith(login_url))
+        assert response.status_code == 302
+        assert target_url.endswith(login_url)

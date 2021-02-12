@@ -114,21 +114,21 @@ class SamlIntegrationTestUtilities(object):
         saml_provider = self.configure_saml_provider(**kwargs)  # pylint: disable=no-member
 
         if fetch_metadata:
-            self.assertTrue(httpretty.is_enabled())  # lint-amnesty, pylint: disable=no-member
+            assert httpretty.is_enabled()  # lint-amnesty, pylint: disable=no-member
             num_total, num_skipped, num_attempted, num_updated, num_failed, failure_messages = fetch_saml_metadata()
             if assert_metadata_updates:
-                self.assertEqual(num_total, 1)  # lint-amnesty, pylint: disable=no-member
-                self.assertEqual(num_skipped, 0)  # lint-amnesty, pylint: disable=no-member
-                self.assertEqual(num_attempted, 1)  # lint-amnesty, pylint: disable=no-member
-                self.assertEqual(num_updated, 1)  # lint-amnesty, pylint: disable=no-member
-                self.assertEqual(num_failed, 0)  # lint-amnesty, pylint: disable=no-member
-                self.assertEqual(len(failure_messages), 0)  # lint-amnesty, pylint: disable=no-member
+                assert num_total == 1  # lint-amnesty, pylint: disable=no-member
+                assert num_skipped == 0  # lint-amnesty, pylint: disable=no-member
+                assert num_attempted == 1  # lint-amnesty, pylint: disable=no-member
+                assert num_updated == 1  # lint-amnesty, pylint: disable=no-member
+                assert num_failed == 0  # lint-amnesty, pylint: disable=no-member
+                assert len(failure_messages) == 0  # lint-amnesty, pylint: disable=no-member
         return saml_provider
 
     def do_provider_login(self, provider_redirect_url):
         """ Mocked: the user logs in to TestShib and then gets redirected back """
         # The SAML provider (TestShib) will authenticate the user, then get the browser to POST a response:
-        self.assertTrue(provider_redirect_url.startswith(TESTSHIB_SSO_URL))  # lint-amnesty, pylint: disable=no-member
+        assert provider_redirect_url.startswith(TESTSHIB_SSO_URL)  # lint-amnesty, pylint: disable=no-member
 
         saml_response_xml = utils.read_and_pre_process_xml(
             os.path.join(os.path.dirname(os.path.dirname(__file__)), 'data', 'testshib_saml_response.xml')
@@ -188,9 +188,8 @@ class TestShibIntegrationTest(SamlIntegrationTestUtilities, IntegrationTestMixin
         enterprise_customer = EnterpriseCustomerFactory()
         assert EnterpriseCustomerUser.objects.count() == 0, "Precondition check: no link records should exist"
         EnterpriseCustomerUser.objects.link_user(enterprise_customer, user.email)
-        self.assertTrue(  # lint-amnesty, pylint: disable=wrong-assert-type
-            EnterpriseCustomerUser.objects.filter(enterprise_customer=enterprise_customer, user_id=user.id).count() == 1
-        )
+        assert (EnterpriseCustomerUser.objects
+                .filter(enterprise_customer=enterprise_customer, user_id=user.id).count() == 1)
         EnterpriseCustomerIdentityProvider.objects.get_or_create(enterprise_customer=enterprise_customer,
                                                                  provider_id=self.provider.provider_id)
 
@@ -229,10 +228,8 @@ class TestShibIntegrationTest(SamlIntegrationTestUtilities, IntegrationTestMixin
                 redirect_field_name=auth.REDIRECT_FIELD_NAME,
                 request=request
             )
-            self.assertNotEqual(
-                EnterpriseCustomerUser.objects.filter(enterprise_customer=enterprise_customer, user_id=user.id).count(),
-                0
-            )
+            assert EnterpriseCustomerUser.objects\
+                .filter(enterprise_customer=enterprise_customer, user_id=user.id).count() != 0
 
             # Fire off the disconnect pipeline to unlink.
             self.assert_redirect_after_pipeline_completes(
@@ -247,10 +244,8 @@ class TestShibIntegrationTest(SamlIntegrationTestUtilities, IntegrationTestMixin
             # Now we expect to be in the unlinked state, with no backend entry.
             self.assert_account_settings_context_looks_correct(account_settings_context(request), linked=False)
             self.assert_social_auth_does_not_exist_for_user(user, strategy)
-            self.assertEqual(
-                EnterpriseCustomerUser.objects.filter(enterprise_customer=enterprise_customer, user_id=user.id).count(),
-                0
-            )
+            assert EnterpriseCustomerUser.objects\
+                .filter(enterprise_customer=enterprise_customer, user_id=user.id).count() == 0
 
     def get_response_data(self):
         """Gets dict (string -> object) of merged data about the user."""
@@ -269,8 +264,8 @@ class TestShibIntegrationTest(SamlIntegrationTestUtilities, IntegrationTestMixin
         # The user clicks on the TestShib button:
         try_login_response = self.client.get(testshib_login_url)
         # The user should be redirected to back to the login page:
-        self.assertEqual(try_login_response.status_code, 302)
-        self.assertEqual(try_login_response['Location'], self.login_page_url)
+        assert try_login_response.status_code == 302
+        assert try_login_response['Location'] == self.login_page_url
         # When loading the login page, the user will see an error message:
         response = self.client.get(self.login_page_url)
         self.assertContains(response, 'Authentication with TestShib is currently unavailable.')
@@ -294,12 +289,11 @@ class TestShibIntegrationTest(SamlIntegrationTestUtilities, IntegrationTestMixin
             user=self.user, provider=self.PROVIDER_BACKEND, uid__startswith=self.PROVIDER_IDP_SLUG
         )
         attributes = record.extra_data
-        self.assertEqual(
-            attributes.get("urn:oid:1.3.6.1.4.1.5923.1.1.1.9"), ["Member@testshib.org", "Staff@testshib.org"]
-        )
-        self.assertEqual(attributes.get("urn:oid:2.5.4.3"), ["Me Myself And I"])
-        self.assertEqual(attributes.get("urn:oid:0.9.2342.19200300.100.1.1"), ["myself"])
-        self.assertEqual(attributes.get("urn:oid:2.5.4.20"), ["555-5555"])  # Phone number
+        assert attributes.get('urn:oid:1.3.6.1.4.1.5923.1.1.1.9') == ['Member@testshib.org', 'Staff@testshib.org']
+        assert attributes.get('urn:oid:2.5.4.3') == ['Me Myself And I']
+        assert attributes.get('urn:oid:0.9.2342.19200300.100.1.1') == ['myself']
+        assert attributes.get('urn:oid:2.5.4.20') == ['555-5555']
+        # Phone number
 
     @ddt.data(True, False)
     def test_debug_mode_login(self, debug_mode_enabled):
@@ -310,30 +304,30 @@ class TestShibIntegrationTest(SamlIntegrationTestUtilities, IntegrationTestMixin
         if debug_mode_enabled:
             # We expect that test_login() does two full logins, and each attempt generates two
             # logs - one for the request and one for the response
-            self.assertEqual(mock_log.call_count, 4)
+            assert mock_log.call_count == 4
 
             expected_next_url = "/dashboard"
             (msg, action_type, idp_name, request_data, next_url, xml), _kwargs = mock_log.call_args_list[0]
-            self.assertTrue(msg.startswith(u"SAML login %s"))
-            self.assertEqual(action_type, "request")
-            self.assertEqual(idp_name, self.PROVIDER_IDP_SLUG)
+            assert msg.startswith(u'SAML login %s')
+            assert action_type == 'request'
+            assert idp_name == self.PROVIDER_IDP_SLUG
             self.assertDictContainsSubset(
                 {"idp": idp_name, "auth_entry": "login", "next": expected_next_url},
                 request_data
             )
-            self.assertEqual(next_url, expected_next_url)
-            self.assertIn('<samlp:AuthnRequest', xml)
+            assert next_url == expected_next_url
+            assert '<samlp:AuthnRequest' in xml
 
             (msg, action_type, idp_name, response_data, next_url, xml), _kwargs = mock_log.call_args_list[1]
-            self.assertTrue(msg.startswith(u"SAML login %s"))
-            self.assertEqual(action_type, "response")
-            self.assertEqual(idp_name, self.PROVIDER_IDP_SLUG)
+            assert msg.startswith(u'SAML login %s')
+            assert action_type == 'response'
+            assert idp_name == self.PROVIDER_IDP_SLUG
             self.assertDictContainsSubset({"RelayState": idp_name}, response_data)
-            self.assertIn('SAMLResponse', response_data)
-            self.assertEqual(next_url, expected_next_url)
-            self.assertIn('<saml2p:Response', xml)
+            assert 'SAMLResponse' in response_data
+            assert next_url == expected_next_url
+            assert '<saml2p:Response' in xml
         else:
-            self.assertFalse(mock_log.called)
+            assert not mock_log.called
 
     def test_configure_testshib_provider_with_cache_duration(self):
         """ Enable and configure the TestShib SAML IdP as a third_party_auth provider """
@@ -347,14 +341,14 @@ class TestShibIntegrationTest(SamlIntegrationTestUtilities, IntegrationTestMixin
         kwargs.setdefault('icon_class', 'fa-university')
         kwargs.setdefault('attr_email', 'urn:oid:1.3.6.1.4.1.5923.1.1.1.6')  # eduPersonPrincipalName
         self.configure_saml_provider(**kwargs)
-        self.assertTrue(httpretty.is_enabled())
+        assert httpretty.is_enabled()
         num_total, num_skipped, num_attempted, num_updated, num_failed, failure_messages = fetch_saml_metadata()
-        self.assertEqual(num_total, 1)
-        self.assertEqual(num_skipped, 0)
-        self.assertEqual(num_attempted, 1)
-        self.assertEqual(num_updated, 1)
-        self.assertEqual(num_failed, 0)
-        self.assertEqual(len(failure_messages), 0)
+        assert num_total == 1
+        assert num_skipped == 0
+        assert num_attempted == 1
+        assert num_updated == 1
+        assert num_failed == 0
+        assert len(failure_messages) == 0
 
     def test_login_with_testshib_provider_short_session_length(self):
         """
@@ -403,10 +397,10 @@ class SuccessFactorsIntegrationTest(SamlIntegrationTestUtilities, IntegrationTes
             """
             Return a fake assertion after checking that the input is what we expect.
             """
-            self.assertIn(b'private_key=fake_private_key_here', _request.body)
-            self.assertIn(b'user_id=myself', _request.body)
-            self.assertIn(b'token_url=http%3A%2F%2Fsuccessfactors.com%2Foauth%2Ftoken', _request.body)
-            self.assertIn(b'client_id=TatVotSEiCMteSNWtSOnLanCtBGwNhGB', _request.body)
+            assert b'private_key=fake_private_key_here' in _request.body
+            assert b'user_id=myself' in _request.body
+            assert b'token_url=http%3A%2F%2Fsuccessfactors.com%2Foauth%2Ftoken' in _request.body
+            assert b'client_id=TatVotSEiCMteSNWtSOnLanCtBGwNhGB' in _request.body
             return (200, headers, 'fake_saml_assertion')
 
         httpretty.register_uri(httpretty.POST, SAPSF_ASSERTION_URL, content_type='text/plain', body=assertion_callback)
@@ -428,10 +422,10 @@ class SuccessFactorsIntegrationTest(SamlIntegrationTestUtilities, IntegrationTes
             """
             Return a fake assertion after checking that the input is what we expect.
             """
-            self.assertIn(b'assertion=fake_saml_assertion', _request.body)
-            self.assertIn(b'company_id=NCC1701D', _request.body)
-            self.assertIn(b'grant_type=urn%3Aietf%3Aparams%3Aoauth%3Agrant-type%3Asaml2-bearer', _request.body)
-            self.assertIn(b'client_id=TatVotSEiCMteSNWtSOnLanCtBGwNhGB', _request.body)
+            assert b'assertion=fake_saml_assertion' in _request.body
+            assert b'company_id=NCC1701D' in _request.body
+            assert b'grant_type=urn%3Aietf%3Aparams%3Aoauth%3Agrant-type%3Asaml2-bearer' in _request.body
+            assert b'client_id=TatVotSEiCMteSNWtSOnLanCtBGwNhGB' in _request.body
             return (200, headers, '{"access_token": "faketoken"}')
 
         httpretty.register_uri(httpretty.POST, SAPSF_TOKEN_URL, content_type='application/json', body=token_callback)
@@ -444,7 +438,7 @@ class SuccessFactorsIntegrationTest(SamlIntegrationTestUtilities, IntegrationTes
 
         def user_callback(request, _uri, headers):
             auth_header = request.headers.get('Authorization')
-            self.assertEqual(auth_header, 'Bearer faketoken')
+            assert auth_header == 'Bearer faketoken'
             return (
                 200,
                 headers,
@@ -543,7 +537,7 @@ class SuccessFactorsIntegrationTest(SamlIntegrationTestUtilities, IntegrationTes
 
         def user_callback(request, _uri, headers):
             auth_header = request.headers.get('Authorization')
-            self.assertEqual(auth_header, 'Bearer faketoken')
+            assert auth_header == 'Bearer faketoken'
             return (
                 200,
                 headers,
@@ -714,13 +708,13 @@ class SuccessFactorsIntegrationTest(SamlIntegrationTestUtilities, IntegrationTes
         with LogCapture(level=logging.WARNING) as log_capture:
             self._test_register()
             logging_messages = str([log_msg.getMessage() for log_msg in log_capture.records]).replace('\\', '')
-            self.assertIn(odata_company_id, logging_messages)
-            self.assertIn(mocked_odata_api_url, logging_messages)
-            self.assertIn(self.USER_USERNAME, logging_messages)
-            self.assertIn("SAPSuccessFactors", logging_messages)
-            self.assertIn("Error message", logging_messages)
-            self.assertIn("System message", logging_messages)
-            self.assertIn("Headers", logging_messages)
+            assert odata_company_id in logging_messages
+            assert mocked_odata_api_url in logging_messages
+            assert self.USER_USERNAME in logging_messages
+            assert 'SAPSuccessFactors' in logging_messages
+            assert 'Error message' in logging_messages
+            assert 'System message' in logging_messages
+            assert 'Headers' in logging_messages
 
     @skip('Test not necessary for this subclass')
     def test_get_saml_idp_class_with_fake_identifier(self):

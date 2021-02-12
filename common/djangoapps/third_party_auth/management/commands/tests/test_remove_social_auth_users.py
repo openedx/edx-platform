@@ -7,6 +7,7 @@ import sys
 import unittest
 from contextlib import contextmanager
 from uuid import uuid4
+import pytest
 
 from django.conf import settings
 from django.core.management import call_command
@@ -69,16 +70,16 @@ class TestRemoveSocialAuthUsersCommand(TestCase):
         call_command(self.command, self.provider_hogwarts.slug, force=True)
 
         # user with input idp is removed, along with social auth entries
-        with self.assertRaises(User.DoesNotExist):
+        with pytest.raises(User.DoesNotExist):
             User.objects.get(username='harry')
-        with self.assertRaises(UserSocialAuth.DoesNotExist):
+        with pytest.raises(UserSocialAuth.DoesNotExist):
             self.find_user_social_auth_entry('harry')
 
         # other users intact
         self.user_fleur.refresh_from_db()
         self.user_viktor.refresh_from_db()
-        self.assertIsNotNone(self.user_fleur)
-        self.assertIsNotNone(self.user_viktor)
+        assert self.user_fleur is not None
+        assert self.user_viktor is not None
 
         # other social auth intact
         self.find_user_social_auth_entry(self.user_viktor.username)
@@ -96,9 +97,9 @@ class TestRemoveSocialAuthUsersCommand(TestCase):
         with self._replace_stdin('confirm'):
             call_command(self.command, self.provider_hogwarts.slug)
 
-        with self.assertRaises(User.DoesNotExist):
+        with pytest.raises(User.DoesNotExist):
             User.objects.get(username='harry')
-        with self.assertRaises(UserSocialAuth.DoesNotExist):
+        with pytest.raises(UserSocialAuth.DoesNotExist):
             self.find_user_social_auth_entry('harry')
 
     @override_settings(FEATURES=FEATURES_WITH_ENABLED)
@@ -109,8 +110,8 @@ class TestRemoveSocialAuthUsersCommand(TestCase):
                 call_command(self.command, self.provider_hogwarts.slug)
 
         # no users should be removed
-        self.assertEqual(len(User.objects.all()), 3)
-        self.assertEqual(len(UserSocialAuth.objects.all()), 2)
+        assert len(User.objects.all()) == 3
+        assert len(UserSocialAuth.objects.all()) == 2
 
     def test_feature_default_disabled(self):
         """ By default this command should not be enabled """
