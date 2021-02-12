@@ -307,7 +307,7 @@ def award_course_certificate(self, username, course_run_key):
     """
     def _retry_with_custom_exception(username, course_run_key, reason, countdown):
         exception = MaxRetriesExceededError(
-            f"Failed to revoke program certificate for user {username} for course {course_run_key}. Reason: {reason}"
+            f"Failed to award course certificate for user {username} for course {course_run_key}. Reason: {reason}"
         )
         return self.retry(
             exc=exception,
