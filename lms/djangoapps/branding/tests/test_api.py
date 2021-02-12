@@ -1,15 +1,16 @@
-# encoding: utf-8
 """Tests of Branding API """
 
 
-import mock
+from unittest import mock
+
 from django.conf import settings
 from django.test import TestCase
 from django.test.utils import override_settings
 from django.urls import reverse
 
+from openedx.core.djangoapps.site_configuration.tests.test_util import with_site_configuration
+
 from ..api import _footer_business_links, get_footer, get_home_url, get_logo_url
-from openedx.core.djangoapps.site_configuration.tests.test_util import with_site_configuration  # lint-amnesty, pylint: disable=wrong-import-order
 
 test_config_disabled_contact_us = {   # pylint: disable=invalid-name
     "CONTACT_US_ENABLE": False,
@@ -123,7 +124,7 @@ class TestFooter(TestCase):
             'connect_links': [
                 {'url': 'https://edx.org/edx-blog', 'name': 'blog', 'title': 'Blog'},
                 # pylint: disable=line-too-long
-                {'url': '{base_url}/support/contact_us'.format(base_url=settings.LMS_ROOT_URL), 'name': 'contact', 'title': 'Contact Us'},
+                {'url': f'{settings.LMS_ROOT_URL}/support/contact_us', 'name': 'contact', 'title': 'Contact Us'},
                 {'url': 'https://example.support.edx.org/hc/en-us', 'name': 'help-center', 'title': 'Help Center'},
                 {'url': 'https://edx.org/media-kit', 'name': 'media_kit', 'title': 'Media Kit'},
                 {'url': 'https://edx.org/donate', 'name': 'donate', 'title': 'Donate'}
@@ -138,8 +139,8 @@ class TestFooter(TestCase):
                  'title': 'Accessibility Policy'},
                 {'url': 'https://edx.org/sitemap', 'name': 'sitemap', 'title': 'Sitemap'},
                 {'name': 'media_kit',
-                 'title': u'Media Kit',
-                 'url': u'https://edx.org/media-kit'}
+                 'title': 'Media Kit',
+                 'url': 'https://edx.org/media-kit'}
             ],
             'social_links': [
                 {'url': '#', 'action': 'Like \xe9dX on Facebook', 'name': 'facebook',
