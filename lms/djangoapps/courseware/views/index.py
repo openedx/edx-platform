@@ -45,7 +45,7 @@ from openedx.features.course_experience import (
     RELATIVE_DATES_FLAG,
 )
 from openedx.features.course_experience.views.course_sock import CourseSockFragmentView
-from openedx.features.pakx_features.utils import check_rtl_characters_in_string
+from openedx.features.pakx_features.utils import get_rtl_class
 from openedx.features.course_experience.utils import get_course_outline_block_tree
 from openedx.features.enterprise_support.api import data_sharing_consent_required
 from student.models import CourseEnrollment
@@ -434,8 +434,8 @@ class CoursewareIndex(View):
         hide_course_navigation = settings.FEATURES.get('HIDE_COURSEWARE_NAVIGATION')
         staff_access = self.is_staff
         staff_title = self.course.display_name
-        rtl_class = 'rtl-content' if "(urdu)" in staff_title.lower() or\
-                                     check_rtl_characters_in_string(staff_title) else ""
+        rtl_class = get_rtl_class(staff_title)
+
 
         courseware_context = {
             'csrf': csrf(self.request)['csrf_token'],

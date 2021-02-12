@@ -93,7 +93,7 @@ FEATURES = {
 
     # for consistency in user-experience, keep the value of the following 3 settings
     # in sync with the corresponding ones in cms/envs/common.py
-    'ENABLE_DISCUSSION_SERVICE': True,
+    'ENABLE_DISCUSSION_SERVICE': False,
     'ENABLE_TEXTBOOK': True,
 
     # discussion home panel, which includes a subscription on/off setting for discussion digest emails.
@@ -850,7 +850,7 @@ DJFS = {
 
 ENABLE_MULTICOURSE = False  # set to False to disable multicourse display (see lib.util.views.edXhome)
 
-WIKI_ENABLED = True
+WIKI_ENABLED = False
 
 ###
 

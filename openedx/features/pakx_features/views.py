@@ -1,13 +1,18 @@
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.csrf import ensure_csrf_cookie
+from six import text_type
 
+from courseware.courses import get_course_with_access
+from lms.djangoapps.courseware.views.index import render_accordion
 from lms.djangoapps.courseware.courses import (
     get_courses,
     sort_by_announcement,
     sort_by_start_date
 )
 from edxmako.shortcuts import render_to_response
+from opaque_keys.edx.keys import CourseKey
+from openedx.features.course_experience.utils import get_course_outline_block_tree
 from openedx.core.djangoapps.catalog.utils import get_programs_with_type
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 
@@ -62,3 +67,19 @@ def courses(request):
             'section': 'in-progress'
         }
     )
+
+
+@ensure_csrf_cookie
+@login_required
+def overview_tab_view(request, course_id=None):
+    course_key = CourseKey.from_string(course_id)
+    course = get_course_with_access(request.user, 'load', course_key)
+    course_block_tree = get_course_outline_block_tree(
+        request, text_type(course_id), request.user, allow_start_dates_in_future=True
+    )
+    context = {
+        'user': request.user,
+        'course': course,
+        'accordion': render_accordion(request, course, course_block_tree, '', '')
+    }
+    return render_to_response('courseware/overview.html', context)

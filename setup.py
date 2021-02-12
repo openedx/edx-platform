@@ -6,7 +6,7 @@ from setuptools import setup
 
 setup(
     name="Open edX",
-    version="0.11",
+    version="0.12",
     install_requires=["setuptools"],
     requires=[],
     # NOTE: These are not the names we should be installing.  This tree should
@@ -18,6 +18,7 @@ setup(
     ],
     entry_points={
         "openedx.course_tab": [
+            "overview = openedx.features.pakx_features.tabs:OverviewTab",
             "ccx = lms.djangoapps.ccx.plugins:CcxCourseTab",
             "courseware = lms.djangoapps.courseware.tabs:CoursewareTab",
             "course_info = lms.djangoapps.courseware.tabs:CourseInfoTab",

@@ -1,6 +1,6 @@
 ## mako
 
-<%page args="active_page=None" expression_filter="h" />
+<%page args="active_page=None, accordion=None" expression_filter="h" />
 <%namespace name='static' file='/static_content.html'/>
 
 <%!
@@ -67,7 +67,7 @@ if course is not None:
                 tabs_tmpl = static.get_template_path('/courseware/tabs.html')
                 %>
                 <ol class="tabs course-tabs">
-                    <%include file="${tabs_tmpl}" args="tab_list=tab_list,active_page=active_page,default_tab=default_tab,tab_image=tab_image" />
+                    <%include file="${tabs_tmpl}" args="course_id=course.id, tab_list=tab_list,active_page=active_page,default_tab=default_tab,tab_image=tab_image" />
                     <%block name="extratabs" />
                 </ol>
             </div>
