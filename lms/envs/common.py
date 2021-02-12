@@ -4056,16 +4056,34 @@ PROGRAM_CERTIFICATES_ROUTING_KEY = 'edx.lms.core.default'
 # Default site to use if site matching request headers does not exist
 SITE_ID = 1
 
-# dir containing all themes
+# .. setting_name: COMPREHENSIVE_THEME_DIRS
+# .. setting_default: []
+# .. setting_description: A list of directories containing themes folders,
+#   each entry should be a full path to the directory containing the theme folder.
 COMPREHENSIVE_THEME_DIRS = []
 
-# Theme directory locale paths
+# .. setting_name: COMPREHENSIVE_THEME_LOCALE_PATHS
+# .. setting_default: []
+# .. setting_description: A list of the paths to themes locale directories e.g.
+#   "COMPREHENSIVE_THEME_LOCALE_PATHS" : ["/edx/src/edx-themes/conf/locale"].
 COMPREHENSIVE_THEME_LOCALE_PATHS = []
 
-# Theme to use when no site or site theme is defined,
-# set to None if you want to use openedx theme
+# .. setting_name: DEFAULT_SITE_THEME
+# .. setting_default: None
+# .. setting_description: Theme to use when no site or site theme is defined, for example
+#   "dark-theme". Set to None if you want to use openedx default theme.
+# .. setting_warning: The theme folder needs to be in 'edx-platform/themes' or define the path
+#   to the theme folder in COMPREHENSIVE_THEME_DIRS. To be effective, ENABLE_COMPREHENSIVE_THEMING
+#   has to be enabled.
 DEFAULT_SITE_THEME = None
 
+# .. toggle_name: ENABLE_COMPREHENSIVE_THEMING
+# .. toggle_implementation: DjangoSetting
+# .. toggle_default: False
+# .. toggle_description: When enabled, this toggle activates the use of the custom theme
+#   defined by DEFAULT_SITE_THEME.
+# .. toggle_use_cases: open_edx
+# .. toggle_creation_date: 2016-06-30
 ENABLE_COMPREHENSIVE_THEMING = False
 
 # API access management
