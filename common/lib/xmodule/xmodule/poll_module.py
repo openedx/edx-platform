@@ -14,8 +14,6 @@ from collections import OrderedDict
 from copy import deepcopy
 
 from pkg_resources import resource_string
-
-import six  # lint-amnesty, pylint: disable=unused-import
 from lxml import etree
 from openedx.core.djangolib.markup import Text, HTML
 from xblock.fields import Boolean, Dict, List, Scope, String  # lint-amnesty, pylint: disable=wrong-import-order

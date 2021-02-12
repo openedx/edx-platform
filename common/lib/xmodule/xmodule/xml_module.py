@@ -14,7 +14,7 @@ from xblock.fields import Dict, Scope, ScopeIds
 from xblock.runtime import KvsFieldData
 from xmodule.modulestore import EdxJSONEncoder
 from xmodule.modulestore.inheritance import InheritanceKeyValueStore, own_metadata
-from xmodule.x_module import DEPRECATION_VSCOMPAT_EVENT, XModuleDescriptor  # lint-amnesty, pylint: disable=unused-import
+from xmodule.x_module import XModuleDescriptor  # lint-amnesty, pylint: disable=unused-import
 
 log = logging.getLogger(__name__)
 
