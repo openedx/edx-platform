@@ -61,7 +61,7 @@ jobs:
         id: pylint-report
         continue-on-error: true
         run: |
-          pylint ${{ env.GIT_DIFF }} 2>&1 | tee report_pylint.txt
+          pylint --score=y ${{ env.GIT_DIFF }} 2>&1 | tee report_pylint.txt
 
           body=$(cat report_pylint.txt)
           body="${body//'%'/'%25'}"
