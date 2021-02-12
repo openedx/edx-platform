@@ -387,6 +387,18 @@ FEATURES = {
     ],
 
     # Turn off account locking if failed login attempts exceeds a limit
+    # .. toggle_name: FEATURES['ENABLE_MAX_FAILED_LOGIN_ATTEMPTS']
+    # .. toggle_implementation: DjangoSetting
+    # .. toggle_default: True
+    # .. toggle_description: This feature will keep track of the number of failed login attempts on a given user's
+    #   email. If the number of consecutive failed login attempts - without a successful login at some point - reaches
+    #   a configurable threshold (default 6), then the account will be locked for a configurable amount of seconds
+    #   (30 minutes) which will prevent additional login attempts until this time period has passed. If a user
+    #   successfully logs in, all the counter which tracks the number of failed attempts will be reset back to 0. If
+    #   set to False then account locking will be disabled for failed login attempts.
+    # .. toggle_use_cases: open_edx
+    # .. toggle_creation_date: 2014-01-30
+    # .. toggle_tickets: https://github.com/edx/edx-platform/pull/2331
     'ENABLE_MAX_FAILED_LOGIN_ATTEMPTS': True,
 
     # Hide any Personally Identifiable Information from application logs
@@ -3399,7 +3411,20 @@ FILE_UPLOAD_STORAGE_BUCKET_NAME = 'SET-ME-PLEASE (ex. bucket-name)'
 FILE_UPLOAD_STORAGE_PREFIX = 'submissions_attachments'
 
 ##### ACCOUNT LOCKOUT DEFAULT PARAMETERS #####
+# .. setting_name: MAX_FAILED_LOGIN_ATTEMPTS_ALLOWED
+# .. setting_default: 6
+# .. setting_description: Specifies the maximum failed login attempts allowed to users. Once the user reaches this
+#   failure threshold then the account will be locked for a configurable amount of seconds (30 minutes) which will
+#   prevent additional login attempts until this time period has passed. This setting is related with
+#   MAX_FAILED_LOGIN_ATTEMPTS_LOCKOUT_PERIOD_SECS and only used when ENABLE_MAX_FAILED_LOGIN_ATTEMPTS is enabled.
 MAX_FAILED_LOGIN_ATTEMPTS_ALLOWED = 6
+
+# .. setting_name: MAX_FAILED_LOGIN_ATTEMPTS_LOCKOUT_PERIOD_SECS
+# .. setting_default: 30 * 60
+# .. setting_description: Specifies the lockout period in seconds for consecutive failed login attempts. Once the user
+#   reaches the threshold of the login failure, then the account will be locked for the given amount of seconds
+#   (30 minutes) which will prevent additional login attempts until this time period has passed. This setting is
+#   related with MAX_FAILED_LOGIN_ATTEMPTS_ALLOWED and only used when ENABLE_MAX_FAILED_LOGIN_ATTEMPTS is enabled.
 MAX_FAILED_LOGIN_ATTEMPTS_LOCKOUT_PERIOD_SECS = 30 * 60
 
 
