@@ -7,7 +7,7 @@ import itertools
 import json
 import re
 import unittest
-from datetime import datetime, timedelta  # lint-amnesty, pylint: disable=unused-import
+from datetime import timedelta  # lint-amnesty, pylint: disable=unused-import
 
 import ddt
 import six
