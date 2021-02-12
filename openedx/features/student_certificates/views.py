@@ -1,26 +1,34 @@
+"""
+Views for the student_certificates application.
+"""
 from datetime import datetime
 
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.http import Http404, HttpResponse
-from django.shortcuts import get_object_or_404, redirect
+from django.shortcuts import get_object_or_404
 from django.views.decorators.csrf import ensure_csrf_cookie
 
 from certificates import api as certs_api
-from constants import COMPLETION_DATE_FORMAT, COURSE_URL_FMT, PDF_RESPONSE_HEADER, TWITTER_META_TITLE_FMT
 from courseware.courses import get_course
 from edxmako.shortcuts import render_to_response
-from helpers import (
+from lms.djangoapps.certificates.models import CertificateStatuses, GeneratedCertificate
+from lms.djangoapps.philu_api.helpers import get_course_custom_settings
+from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
+from openedx.features.student_certificates.constants import (
+    COMPLETION_DATE_FORMAT,
+    COURSE_URL_FMT,
+    PDF_RESPONSE_HEADER,
+    TWITTER_META_TITLE_FMT
+)
+from openedx.features.student_certificates.helpers import (
     get_certificate_image_url,
     get_certificate_pdf_name,
     get_credential_certificates,
     get_pdf_data_by_certificate_uuid,
     get_philu_certificate_social_context
 )
-from lms.djangoapps.certificates.models import CertificateStatuses, GeneratedCertificate
-from lms.djangoapps.philu_api.helpers import get_course_custom_settings
-from models import CertificateVerificationKey
-from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
+from openedx.features.student_certificates.models import CertificateVerificationKey
 
 
 @login_required
@@ -65,6 +73,7 @@ def student_certificates(request):
 
     user_certificates = get_credential_certificates(user)
 
+    # pylint: disable=no-member
     available_certificates = GeneratedCertificate.objects.filter(user=user, course_id__in=enrolled_course_ids).all()
 
     for certificate in available_certificates:
@@ -93,7 +102,7 @@ def student_certificates(request):
 
         try:
             completion_date = course.end
-        except Exception as ex:
+        except Exception as ex:  # pylint: disable=unused-variable, broad-except
             completion_date = datetime.now()
 
         try:
@@ -120,7 +129,7 @@ def student_certificates(request):
     return render_to_response('certificates.html', context)
 
 
-def shared_student_achievements(request, certificate_uuid):
+def shared_student_achievements(request, certificate_uuid):  # pylint: disable=unused-argument
     """
     Provides the User with the shared certificate page
 
@@ -151,10 +160,10 @@ def shared_student_achievements(request, certificate_uuid):
 
     context = {
         'course_url': COURSE_URL_FMT.format(
-            base_url = settings.LMS_ROOT_URL,
-            course_url = 'courses',
-            course_id = course.id,
-            about_url = 'about'
+            base_url=settings.LMS_ROOT_URL,
+            course_url='courses',
+            course_id=course.id,
+            about_url='about'
         ),
         'meta_tags': meta_tags,
     }
@@ -165,7 +174,7 @@ def shared_student_achievements(request, certificate_uuid):
 
 @login_required
 @ensure_csrf_cookie
-def download_certificate_pdf(request, certificate_uuid):
+def download_certificate_pdf(request, certificate_uuid):  # pylint: disable=unused-argument
     """
     Convert user certificate image on S3 bucket to PDF and download it for end user
     Arguments:
@@ -181,7 +190,7 @@ def download_certificate_pdf(request, certificate_uuid):
     return response
 
 
-def verify_certificate(request, key):
+def verify_certificate(request, key):  # pylint: disable=unused-argument
     """
     Provides verify certificate page
     Arguments:

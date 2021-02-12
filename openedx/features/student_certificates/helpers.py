@@ -1,32 +1,34 @@
+"""
+Helper methods to provide utility for student_certifications application.
+"""
 from datetime import datetime
 from importlib import import_module
 from io import BytesIO
 from logging import getLogger
 
-import boto
 import img2pdf
 import requests
+from boto import connect_s3
 from boto.s3.key import Key
 from django.conf import settings
 from django.core.cache import cache
 from django.shortcuts import get_object_or_404
 from django.urls import reverse
 
-from constants import (
+from lms.djangoapps.certificates.models import GeneratedCertificate
+from lms.djangoapps.philu_api.helpers import get_course_custom_settings, get_social_sharing_urls
+from openedx.core.djangoapps.catalog.cache import PROGRAM_CACHE_KEY_TPL
+from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
+from openedx.core.djangoapps.credentials.utils import get_credentials
+from openedx.features.student_certificates.constants import (
     CERTIFICATE_PDF_NAME,
     COMPLETION_DATE_FORMAT,
     CREDENTIALS_DATE_FORMAT,
     PREVIEW_CERTIFICATE_VERIFICATION_URL,
     SOCIAL_MEDIA_SHARE_URL_FMT,
     TMPDIR,
-    TWITTER_META_TITLE_FMT,
-    TWITTER_TWEET_TEXT_FMT
+    TWITTER_META_TITLE_FMT
 )
-from lms.djangoapps.certificates.models import GeneratedCertificate
-from lms.djangoapps.philu_api.helpers import get_course_custom_settings, get_social_sharing_urls
-from openedx.core.djangoapps.catalog.cache import PROGRAM_CACHE_KEY_TPL
-from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
-from openedx.core.djangoapps.credentials.utils import get_credentials
 from openedx.features.student_certificates.signals import USER_CERTIFICATE_DOWNLOADABLE
 
 log = getLogger(__name__)
@@ -44,7 +46,7 @@ def upload_to_s3(file_path, s3_bucket, key_name):
     """
     aws_access_key_id = getattr(settings, 'AWS_ACCESS_KEY_ID', None)
     aws_secret_access_key = getattr(settings, 'AWS_SECRET_ACCESS_KEY', None)
-    conn = boto.connect_s3(
+    conn = connect_s3(
         aws_access_key_id=aws_access_key_id,
         aws_secret_access_key=aws_secret_access_key
     )
@@ -118,6 +120,15 @@ def get_certificate_img_key(img_name):
 
 
 def get_credential_certificates(user):
+    """
+    Retrieve all the certificates for the specified user
+
+    Arguments:
+        user (User): User for which to fetch the certificates
+
+    Returns:
+        list: A list containing data for certificates
+    """
     certificates = []
     program_credentials = get_credentials(user, credential_type='program')
     for credential in program_credentials:
@@ -145,6 +156,16 @@ def get_credential_certificates(user):
 
 
 def get_philu_certificate_social_context(course, certificate):
+    """
+    Get course certificate urls for sharing on social sites
+
+    Arguments:
+         course (Course): Course which the urls are associated with
+         certificate (GeneratedCertificate): Certificate for which to generate social urls
+
+    Returns:
+        dict: Dictionary containing the urls (value) for different social sites (key)
+    """
     custom_settings = get_course_custom_settings(course.id)
     meta_tags = custom_settings.get_course_meta_tags()
 
@@ -215,6 +236,15 @@ def override_update_certificate_context(request, context, course, user_certifica
 
 
 def get_verification_url(user_certificate):
+    """
+    Get verification url for the given user certificate
+
+    Arguments:
+        user_certificate (GeneratedCertificate): User certificate to get the verification url for
+
+    Returns:
+        str: Url for verification of the specified certificate
+    """
     verification_url = PREVIEW_CERTIFICATE_VERIFICATION_URL
     if user_certificate.pk:
         verification_url = '{}{}'.format(

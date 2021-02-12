@@ -1,13 +1,20 @@
-import imgkit
-from os import remove
+"""
+Tasks for the student_certificate application
+"""
 from logging import getLogger
+from os import remove
 
-from django.conf import settings
+import imgkit
 from celery.task import task
+from django.conf import settings
 
-
-from helpers import upload_to_s3, get_certificate_url, get_certificate_image_name, \
-    get_certificate_image_path, get_certificate_img_key
+from openedx.features.student_certificates.helpers import (
+    get_certificate_image_name,
+    get_certificate_image_path,
+    get_certificate_img_key,
+    get_certificate_url,
+    upload_to_s3
+)
 
 log = getLogger(__name__)
 
@@ -33,8 +40,5 @@ def task_create_certificate_img_and_upload_to_s3(verify_uuid):
         # Deleting image from local
         remove(img_path)
         log.info('Certificate image removed from local for verify_uuid:{uuid}'.format(uuid=verify_uuid))
-    except Exception as ex:
+    except Exception as ex:  # pylint: disable=broad-except
         log.error('Certificate image creation task failed, Reason: %s', ex.message)
-
-
-

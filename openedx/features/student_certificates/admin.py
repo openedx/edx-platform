@@ -3,8 +3,8 @@ django admin pages for certificates models
 """
 from django.contrib import admin
 
-from lms.djangoapps.certificates.models import GeneratedCertificate
 from lms.djangoapps.certificates.admin import GeneratedCertificateAdmin
+from lms.djangoapps.certificates.models import GeneratedCertificate
 
 
 class GeneratedCertificateAdminCustom(GeneratedCertificateAdmin):

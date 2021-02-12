@@ -1,3 +1,6 @@
+"""
+Signals for the student_certificate application.
+"""
 from django.dispatch import Signal
 
 # Signal to send email to user when certificate is downloadable
