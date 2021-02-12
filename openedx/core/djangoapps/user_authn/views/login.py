@@ -7,6 +7,7 @@ Much of this file was broken out from views.py, previous history can be found th
 import json
 import logging
 import hashlib
+import re
 
 import six
 from django.conf import settings
@@ -41,7 +42,8 @@ from openedx.core.djangoapps.user_authn.toggles import is_require_third_party_au
 from openedx.core.djangoapps.user_authn.config.waffle import ENABLE_LOGIN_USING_THIRDPARTY_AUTH_ONLY
 from openedx.core.djangolib.markup import HTML, Text
 from openedx.core.lib.api.view_utils import require_post_params
-from common.djangoapps.student.helpers import get_next_url_for_login_page
+from openedx.features.enterprise_support.api import activate_learner_enterprise, get_enterprise_learner_data_from_api
+from common.djangoapps.student.helpers import get_next_url_for_login_page, get_redirect_url_with_host
 from common.djangoapps.student.models import LoginFailures, AllowedAuthUser, UserProfile
 from common.djangoapps.student.views import compose_and_send_activation_email
 from common.djangoapps.third_party_auth import pipeline, provider
@@ -387,6 +389,35 @@ def finish_auth(request):
     })
 
 
+def enterprise_selection_page(request, user, next_url):
+    """
+    Updates redirect url to enterprise selection page if user is associated
+    with multiple enterprises otherwise return the next url.
+
+    param:
+      next_url(string): The URL to redirect to after multiple enterprise selection or in case
+      the selection page is bypassed e.g when dealing with direct enrolment urls.
+    """
+    redirect_url = next_url
+
+    response = get_enterprise_learner_data_from_api(user)
+    if response and len(response) > 1:
+        redirect_url = '/enterprise/select/active/?success_url=' + next_url
+
+        # Check to see if next url has an enterprise in it. In this case if user is associated with
+        # that enterprise, activate that enterprise and bypass the selection page.
+        if re.match(r'/enterprise/.*/course/.*/enroll', next_url):
+            enterprise_in_url = next_url.split('/')[2]
+            for enterprise in response:
+                if enterprise_in_url == enterprise['enterprise_customer']['uuid']:
+                    is_activated_successfully = activate_learner_enterprise(request, user, enterprise_in_url)
+                    if is_activated_successfully:
+                        redirect_url = next_url
+                    break
+
+    return redirect_url
+
+
 @ensure_csrf_cookie
 @require_http_methods(['POST'])
 @ratelimit(
@@ -484,7 +515,11 @@ def login_user(request):
             redirect_url = pipeline.get_complete_url(backend_name=running_pipeline['backend'])
 
         elif should_redirect_to_authn_microfrontend():
-            redirect_url = get_next_url_for_login_page(request, include_host=True)
+            next_url, root_url = get_next_url_for_login_page(request, include_host=True)
+            redirect_url = get_redirect_url_with_host(
+                root_url,
+                enterprise_selection_page(request, possibly_authenticated_user, next_url)
+            )
 
         response = JsonResponse({
             'success': True,
