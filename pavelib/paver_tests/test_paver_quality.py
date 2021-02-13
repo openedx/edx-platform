@@ -8,6 +8,7 @@ import shutil
 import tempfile
 import textwrap
 import unittest
+import pytest
 
 from ddt import data, ddt, file_data, unpack
 from mock import MagicMock, mock_open, patch
@@ -35,14 +36,14 @@ class TestPaverQualityViolations(unittest.TestCase):
         with open(self.f.name, 'w') as f:
             f.write("hello")
         num = pavelib.quality._count_pylint_violations(f.name)  # pylint: disable=protected-access
-        self.assertEqual(num, 0)
+        assert num == 0
 
     def test_pylint_parser_pep8(self):
         # Pep8 violations should be ignored.
         with open(self.f.name, 'w') as f:
             f.write("foo/hello/test.py:304:15: E203 whitespace before ':'")
         num = pavelib.quality._count_pylint_violations(f.name)  # pylint: disable=protected-access
-        self.assertEqual(num, 0)
+        assert num == 0
 
     @file_data('pylint_test_list.json')
     def test_pylint_parser_count_violations(self, value):
@@ -54,13 +55,13 @@ class TestPaverQualityViolations(unittest.TestCase):
         with open(self.f.name, 'w') as f:
             f.write(value)
         num = pavelib.quality._count_pylint_violations(f.name)  # pylint: disable=protected-access
-        self.assertEqual(num, 1)
+        assert num == 1
 
     def test_pep8_parser(self):
         with open(self.f.name, 'w') as f:
             f.write("hello\nhithere")
         num = len(pavelib.quality._pep8_violations(f.name))  # pylint: disable=protected-access
-        self.assertEqual(num, 2)
+        assert num == 2
 
 
 @ddt
@@ -88,7 +89,7 @@ class TestPaverQualityOptions(unittest.TestCase):
                 self.__dict__ = d
         paver_options = PaverOptions(options)
         returned_values = pavelib.quality._parse_pylint_options(paver_options)  # pylint: disable=protected-access
-        self.assertEqual(returned_values, expected_values)
+        assert returned_values == expected_values
 
 
 class TestPaverReportViolationsCounts(unittest.TestCase):
@@ -111,13 +112,13 @@ class TestPaverReportViolationsCounts(unittest.TestCase):
         with open(self.f.name, 'w') as f:
             f.write("3000 violations found")
         actual_count = pavelib.quality._get_count_from_last_line(self.f.name, "eslint")  # pylint: disable=protected-access
-        self.assertEqual(actual_count, 3000)
+        assert actual_count == 3000
 
     def test_get_eslint_violations_no_number_found(self):
         with open(self.f.name, 'w') as f:
             f.write("Not expected string regex")
         actual_count = pavelib.quality._get_count_from_last_line(self.f.name, "eslint")  # pylint: disable=protected-access
-        self.assertEqual(actual_count, None)
+        assert actual_count is None
 
     def test_get_eslint_violations_count_truncated_report(self):
         """
@@ -126,7 +127,7 @@ class TestPaverReportViolationsCounts(unittest.TestCase):
         with open(self.f.name, 'w') as f:
             f.write("foo/bar/js/fizzbuzz.js: line 45, col 59, Missing semicolon.")
         actual_count = pavelib.quality._get_count_from_last_line(self.f.name, "eslint")  # pylint: disable=protected-access
-        self.assertEqual(actual_count, None)
+        assert actual_count is None
 
     def test_generic_value(self):
         """
@@ -135,7 +136,7 @@ class TestPaverReportViolationsCounts(unittest.TestCase):
         with open(self.f.name, 'w') as f:
             f.write("5.777 good to see you")
         actual_count = pavelib.quality._get_count_from_last_line(self.f.name, "foo")  # pylint: disable=protected-access
-        self.assertEqual(actual_count, 5)
+        assert actual_count == 5
 
     def test_generic_value_none_found(self):
         """
@@ -144,7 +145,7 @@ class TestPaverReportViolationsCounts(unittest.TestCase):
         with open(self.f.name, 'w') as f:
             f.write("hello 5.777 good to see you")
         actual_count = pavelib.quality._get_count_from_last_line(self.f.name, "foo")  # pylint: disable=protected-access
-        self.assertEqual(actual_count, None)
+        assert actual_count is None
 
     def test_get_xsslint_counts_happy(self):
         """
@@ -202,7 +203,7 @@ class TestPaverReportViolationsCounts(unittest.TestCase):
             f.write(report)
         count = pavelib.quality._get_xsscommitlint_count(self.f.name)  # pylint: disable=protected-access
 
-        self.assertEqual(count, 5)
+        assert count == 5
 
     def test_get_xsscommitlint_count_bad_counts(self):
         """
@@ -215,7 +216,7 @@ class TestPaverReportViolationsCounts(unittest.TestCase):
             f.write(report)
         count = pavelib.quality._get_xsscommitlint_count(self.f.name)  # pylint: disable=protected-access
 
-        self.assertIsNone(count)
+        assert count is None
 
     def test_get_xsscommitlint_count_no_files(self):
         """
@@ -229,7 +230,7 @@ class TestPaverReportViolationsCounts(unittest.TestCase):
             f.write(report)
         count = pavelib.quality._get_xsscommitlint_count(self.f.name)  # pylint: disable=protected-access
 
-        self.assertEqual(count, 0)
+        assert count == 0
 
 
 class TestPrepareReportDir(unittest.TestCase):
@@ -244,14 +245,14 @@ class TestPrepareReportDir(unittest.TestCase):
         self.addCleanup(os.removedirs, self.test_dir)
 
     def test_report_dir_with_files(self):
-        self.assertTrue(os.path.exists(self.test_file.name))
+        assert os.path.exists(self.test_file.name)
         pavelib.quality._prepare_report_dir(path(self.test_dir))  # pylint: disable=protected-access
-        self.assertFalse(os.path.exists(self.test_file.name))
+        assert not os.path.exists(self.test_file.name)
 
     def test_report_dir_without_files(self):
         os.remove(self.test_file.name)
         pavelib.quality._prepare_report_dir(path(self.test_dir))  # pylint: disable=protected-access
-        self.assertEqual(os.listdir(path(self.test_dir)), [])
+        assert os.listdir(path(self.test_dir)) == []
 
 
 class TestPaverRunQuality(PaverTestCase):
@@ -284,15 +285,15 @@ class TestPaverRunQuality(PaverTestCase):
         _mock_pylint_violations = MagicMock(return_value=(10000, ['some error']))
         with patch('pavelib.quality._get_pylint_violations', _mock_pylint_violations):
             with patch('pavelib.quality._parse_pylint_options', return_value=(0, 1000, 0, 0)):
-                with self.assertRaises(SystemExit):
+                with pytest.raises(SystemExit):
                     pavelib.quality.run_quality("")
 
         # Assert that _get_pylint_violations (which calls "pylint") is called once
-        self.assertEqual(_mock_pylint_violations.call_count, 1)
+        assert _mock_pylint_violations.call_count == 1
         # Assert that sh was called twice- once for diff quality with pylint
         # and once for diff quality with eslint. This means that in the event
         # of a diff-quality pylint failure, eslint is still called.
-        self.assertEqual(self._mock_paver_sh.call_count, 2)
+        assert self._mock_paver_sh.call_count == 2
 
     @patch(OPEN_BUILTIN, mock_open())
     def test_failure_on_diffquality_eslint(self):
@@ -303,7 +304,7 @@ class TestPaverRunQuality(PaverTestCase):
         self._mock_paver_sh.side_effect = fail_on_eslint
         _mock_pylint_violations = MagicMock(return_value=(0, []))
         with patch('pavelib.quality._get_pylint_violations', _mock_pylint_violations):
-            with self.assertRaises(SystemExit):
+            with pytest.raises(SystemExit):
                 pavelib.quality.run_quality("")
         print(self._mock_paver_sh.mock_calls)
 
@@ -312,7 +313,7 @@ class TestPaverRunQuality(PaverTestCase):
         # Assert that sh was called four times - once to get the comparison commit hash,
         # once to get the current commit hash, once for diff quality with pylint,
         # and once for diff quality with eslint
-        self.assertEqual(self._mock_paver_sh.call_count, 4)
+        assert self._mock_paver_sh.call_count == 4
 
     @patch(OPEN_BUILTIN, mock_open())
     def test_other_exception(self):
@@ -321,10 +322,10 @@ class TestPaverRunQuality(PaverTestCase):
         pylint should not be run
         """
         self._mock_paver_sh.side_effect = [Exception('unrecognized failure!'), 0]
-        with self.assertRaises(SystemExit):
+        with pytest.raises(SystemExit):
             pavelib.quality.run_quality("")
         # Test that pylint is NOT called by counting calls
-        self.assertEqual(self._mock_paver_sh.call_count, 1)
+        assert self._mock_paver_sh.call_count == 1
 
     @patch(OPEN_BUILTIN, mock_open())
     def test_no_diff_quality_failures(self):
@@ -334,7 +335,7 @@ class TestPaverRunQuality(PaverTestCase):
         # 6 for pylint on each of the system directories
         # 1 for diff_quality for pylint
         # 1 for diff_quality for eslint
-        self.assertEqual(self._mock_paver_sh.call_count, 8)
+        assert self._mock_paver_sh.call_count == 8
 
 
 class TestPaverRunDiffQuality(PaverTestCase):
@@ -359,7 +360,7 @@ class TestPaverRunDiffQuality(PaverTestCase):
         This bubbles up to paver with a subprocess return code error and should return False.
         """
         self._mock_paver_sh.side_effect = [BuildFailure('Subprocess return code: 1')]
-        self.assertEqual(pavelib.quality.run_diff_quality(""), False)
+        assert pavelib.quality.run_diff_quality('') is False
 
     @patch(OPEN_BUILTIN, mock_open())
     def test_other_failures(self):

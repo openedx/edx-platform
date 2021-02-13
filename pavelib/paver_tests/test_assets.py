@@ -77,7 +77,7 @@ class TestPaverAssetTasks(PaverTestCase):
                 'rtlcss cms/static/css/bootstrap/studio-main.css cms/static/css/bootstrap/studio-main-rtl.css'
             )
 
-        self.assertCountEqual(self.task_messages, expected_messages)
+        assert len(self.task_messages) == len(expected_messages)
 
 
 @ddt.ddt
@@ -194,7 +194,7 @@ class TestPaverThemeAssetTasks(PaverTestCase):
                 'rtlcss cms/static/css/bootstrap/studio-main.css cms/static/css/bootstrap/studio-main-rtl.css'
             )
 
-        self.assertCountEqual(self.task_messages, expected_messages)
+        assert len(self.task_messages) == len(expected_messages)
 
 
 class TestPaverWatchAssetTasks(TestCase):
@@ -236,14 +236,14 @@ class TestPaverWatchAssetTasks(TestCase):
                         'pavelib.assets.watch_assets',
                         options={"background": True},
                     )
-                    self.assertEqual(mock_register.call_count, 2)
-                    self.assertEqual(mock_webpack.call_count, 1)
+                    assert mock_register.call_count == 2
+                    assert mock_webpack.call_count == 1
 
                     sass_watcher_args = mock_register.call_args_list[0][0]
 
-                    self.assertIsInstance(sass_watcher_args[0], Observer)
-                    self.assertIsInstance(sass_watcher_args[1], list)
-                    self.assertCountEqual(sass_watcher_args[1], self.expected_sass_directories)
+                    assert isinstance(sass_watcher_args[0], Observer)
+                    assert isinstance(sass_watcher_args[1], list)
+                    assert len(sass_watcher_args[1]) == len(self.expected_sass_directories)
 
     def test_watch_theme_assets(self):
         """
@@ -268,13 +268,13 @@ class TestPaverWatchAssetTasks(TestCase):
                             "themes": [TEST_THEME_DIR.basename()]
                         },
                     )
-                    self.assertEqual(mock_register.call_count, 2)
-                    self.assertEqual(mock_webpack.call_count, 1)
+                    assert mock_register.call_count == 2
+                    assert mock_webpack.call_count == 1
 
                     sass_watcher_args = mock_register.call_args_list[0][0]
-                    self.assertIsInstance(sass_watcher_args[0], Observer)
-                    self.assertIsInstance(sass_watcher_args[1], list)
-                    self.assertCountEqual(sass_watcher_args[1], self.expected_sass_directories)
+                    assert isinstance(sass_watcher_args[0], Observer)
+                    assert isinstance(sass_watcher_args[1], list)
+                    assert len(sass_watcher_args[1]) == len(self.expected_sass_directories)
 
 
 @ddt.ddt
@@ -346,10 +346,10 @@ class TestCollectAssets(PaverTestCase):
         """
         for i, sys in enumerate(systems):
             msg = self.task_messages[i]
-            self.assertTrue(msg.startswith('python manage.py {}'.format(sys)))
-            self.assertIn(' collectstatic ', msg)
-            self.assertIn('--settings={}'.format(Env.DEVSTACK_SETTINGS), msg)
-            self.assertTrue(msg.endswith(' {}'.format(log_location)))
+            assert msg.startswith('python manage.py {}'.format(sys))
+            assert ' collectstatic ' in msg
+            assert '--settings={}'.format(Env.DEVSTACK_SETTINGS) in msg
+            assert msg.endswith(' {}'.format(log_location))
 
 
 @ddt.ddt

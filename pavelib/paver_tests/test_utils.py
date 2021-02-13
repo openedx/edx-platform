@@ -4,6 +4,7 @@ Tests for pavelib/utils/test/utils
 
 
 import unittest
+import pytest
 
 from mock import patch
 
@@ -32,17 +33,17 @@ class TestUtils(unittest.TestCase):
         _mock_subprocesss.return_value = "Mozilla Firefox {version}".format(
             version=test_version
         )
-        with self.assertRaises(Exception):
+        with pytest.raises(Exception):
             check_firefox_version()
 
     @patch('subprocess.check_output')
     def test_firefox_version_not_detected(self, _mock_subprocesss):
         _mock_subprocesss.return_value = "Mozilla Firefox"
-        with self.assertRaises(Exception):
+        with pytest.raises(Exception):
             check_firefox_version()
 
     @patch('subprocess.check_output')
     def test_firefox_version_bad(self, _mock_subprocesss):
         _mock_subprocesss.return_value = "garbage"
-        with self.assertRaises(Exception):
+        with pytest.raises(Exception):
             check_firefox_version()
