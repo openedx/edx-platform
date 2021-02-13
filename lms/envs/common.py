@@ -3974,9 +3974,10 @@ ENTERPRISE_MARKETING_FOOTER_QUERY_PARAMS = {}
 ENTERPRISE_TAGLINE = ''
 
 ACTSTREAM_SETTINGS = {
-    # this is mostly a "hack" b/c django-activity-stream doesn't seem to support generic relations
-    # for models that use a uuid as its primary key; the tradeoff by disabling this setting is that
-    # we lose some performance optimizations that we'd otherwise get out-of-the-box.
+    # django-activity-stream does not support generic relations for models that use a uuid
+    # as its primary key; the tradeoff by disabling this setting is that we lose performance 
+    # optimizations that we would otherwise get out-of-the-box.
+    # https://django-activity-stream.readthedocs.io/en/latest/configuration.html#fetch-relations
     'FETCH_RELATIONS': False,
 }
 
