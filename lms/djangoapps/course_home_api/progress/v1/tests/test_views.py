@@ -31,38 +31,38 @@ class ProgressTabTestViews(BaseCourseHomeTests):
     def test_get_authenticated_enrolled_user(self, enrollment_mode):
         CourseEnrollment.enroll(self.user, self.course.id, enrollment_mode)
         response = self.client.get(self.url)
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
 
         # Pulling out the courseware summary to check that the learner is able to see this info
-        self.assertIsNotNone(response.data['courseware_summary'])
+        assert response.data['courseware_summary'] is not None
         for chapter in response.data['courseware_summary']:
-            self.assertIsNotNone(chapter)
-        self.assertIn('settings/grading/' + str(self.course.id), response.data['studio_url'])
-        self.assertEqual(response.data['credit_support_url'], CREDIT_SUPPORT_URL)
-        self.assertIsNotNone(response.data['verification_data'])
-        self.assertEqual(response.data['verification_data']['status'], 'none')
+            assert chapter is not None
+        assert ('settings/grading/' + str(self.course.id)) in response.data['studio_url']
+        assert response.data['credit_support_url'] == CREDIT_SUPPORT_URL
+        assert response.data['verification_data'] is not None
+        assert response.data['verification_data']['status'] == 'none'
         if enrollment_mode == CourseMode.VERIFIED:
             ManualVerification.objects.create(user=self.user, status='approved')
             response = self.client.get(self.url)
-            self.assertEqual(response.data['verification_data']['status'], 'approved')
-            self.assertIsNone(response.data['certificate_data'])
+            assert response.data['verification_data']['status'] == 'approved'
+            assert response.data['certificate_data'] is None
         elif enrollment_mode == CourseMode.AUDIT:
-            self.assertEqual(response.data['certificate_data']['cert_status'], 'audit_passing')
+            assert response.data['certificate_data']['cert_status'] == 'audit_passing'
 
     def test_get_authenticated_user_not_enrolled(self):
         response = self.client.get(self.url)
         # expecting a redirect
-        self.assertEqual(response.status_code, 302)
+        assert response.status_code == 302
 
     def test_get_unauthenticated_user(self):
         self.client.logout()
         response = self.client.get(self.url)
-        self.assertEqual(response.status_code, 403)
+        assert response.status_code == 403
 
     def test_get_unknown_course(self):
         url = reverse('course-home-progress-tab', args=['course-v1:unknown+course+2T2020'])
         response = self.client.get(url)
-        self.assertEqual(response.status_code, 404)
+        assert response.status_code == 404
 
     def test_masquerade(self):
         user = UserFactory()
@@ -72,8 +72,8 @@ class ProgressTabTestViews(BaseCourseHomeTests):
         self.switch_to_staff()  # needed for masquerade
 
         # Sanity check on our normal user
-        self.assertIsNone(self.client.get(self.url).data['user_timezone'])
+        assert self.client.get(self.url).data['user_timezone'] is None
 
         # Now switch users and confirm we get a different result
         self.update_masquerade(username=user.username)
-        self.assertEqual(self.client.get(self.url).data['user_timezone'], 'Asia/Tokyo')
+        assert self.client.get(self.url).data['user_timezone'] == 'Asia/Tokyo'
