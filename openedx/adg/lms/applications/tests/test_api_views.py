@@ -101,6 +101,22 @@ def login_client(request, client, user_instance):
     return client
 
 
+@pytest.fixture
+def work_experience_not_applicable_api(login_client):
+    """
+    Get is work experience not applicable data
+    """
+    def is_work_experience_not_applicable_api(is_not_applicable='true'):
+        url = reverse('applications:work_experience-update_is_not_applicable')
+        is_work_experience_not_applicable_api_data = {'is_work_experience_not_applicable': is_not_applicable}
+        response = login_client.patch(
+            url, data=json.dumps(is_work_experience_not_applicable_api_data), content_type=JSON_CONTENT_TYPE
+        )
+        return response
+
+    return is_work_experience_not_applicable_api
+
+
 @pytest.mark.django_db
 def test_unauthenticated_education_api_call(education_data, client):
     """
@@ -314,3 +330,22 @@ def test_work_experience_api_delete(work_experience_data, login_client):
     url = reverse('applications_api:work_experience-detail', kwargs={'pk': work_experience.id})
     response = login_client.delete(url)
     assert response.status_code == status.HTTP_204_NO_CONTENT
+
+
+@pytest.mark.django_db
+def test_is_work_experience_not_applicable_api_with_true(work_experience_data, work_experience_not_applicable_api):
+    """
+    Test the is_work_experience_not_applicable_api with true value
+    """
+    response = work_experience_not_applicable_api('true')
+    assert response.status_code == status.HTTP_200_OK
+    assert WorkExperience.objects.count() == 0
+
+
+@pytest.mark.django_db
+def test_is_work_experience_not_applicable_api_with_false(user_application, work_experience_not_applicable_api):
+    """
+    Test the is_work_experience_not_applicable_api with false value
+    """
+    response = work_experience_not_applicable_api('false')
+    assert response.status_code == status.HTTP_200_OK

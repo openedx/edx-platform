@@ -58,7 +58,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2021-02-08 10:38+0000\n"
+"POT-Creation-Date: 2021-02-12 12:56+0000\n"
 "PO-Revision-Date: 2020-10-27 19:12+0000\n"
 "Last-Translator: Rana Waqar <rana.waqar@arbisoft.com>, 2020\n"
 "Language-Team: Arabic (https://www.transifex.com/philanthropy-u/teams/113553/ar/)\n"
@@ -4668,6 +4668,8 @@ msgstr ""
 #: cms/templates/course-create-rerun.html cms/templates/index.html
 #: cms/templates/manage_users.html cms/templates/manage_users_lib.html
 #: cms/templates/videos_index_pagination.html
+#: themes/edx-platform/adg/lms/templates/adg/lms/applications/education_form.html
+#: themes/edx-platform/adg/lms/templates/adg/lms/applications/work_experience_form.html
 msgid "Cancel"
 msgstr "إلغاء"
 
@@ -9652,6 +9654,10 @@ msgid "Cover Letter File"
 msgstr ""
 
 #: openedx/adg/lms/applications/models.py
+msgid "Work Experience Not Applicable"
+msgstr ""
+
+#: openedx/adg/lms/applications/models.py
 msgid "Open"
 msgstr "Open edX"
 
@@ -9717,7 +9723,7 @@ msgid "Doctoral Degree"
 msgstr "دكتوراه"
 
 #: openedx/adg/lms/applications/models.py
-#: themes/edx-platform/adg/lms/templates/adg/lms/applications/experience.html
+#: themes/edx-platform/adg/lms/templates/adg/lms/applications/education_form.html
 msgid "School / University"
 msgstr ""
 
@@ -9726,7 +9732,7 @@ msgid "Degree Received"
 msgstr "جرى تلقّي الإجابة."
 
 #: openedx/adg/lms/applications/models.py
-#: themes/edx-platform/adg/lms/templates/adg/lms/applications/experience.html
+#: themes/edx-platform/adg/lms/templates/adg/lms/applications/education_form.html
 msgid "Area of Study"
 msgstr ""
 
@@ -9739,7 +9745,7 @@ msgid "Current Position"
 msgstr "الموقع الحالي في الفيديو."
 
 #: openedx/adg/lms/applications/models.py
-#: themes/edx-platform/adg/lms/templates/adg/lms/applications/experience.html
+#: themes/edx-platform/adg/lms/templates/adg/lms/applications/work_experience_form.html
 msgid "Job Responsibilities"
 msgstr ""
 
@@ -13404,6 +13410,8 @@ msgstr "عرض"
 
 #: cms/templates/maintenance/_announcement_edit.html
 #: lms/templates/problem.html lms/templates/word_cloud.html
+#: themes/edx-platform/adg/lms/templates/adg/lms/applications/education_form.html
+#: themes/edx-platform/adg/lms/templates/adg/lms/applications/work_experience_form.html
 msgid "Save"
 msgstr "حفظ"
 
@@ -20527,12 +20535,10 @@ msgid "Day"
 msgstr ""
 
 #: themes/edx-platform/adg/lms/templates/adg/lms/applications/contact_info.html
-#: themes/edx-platform/adg/lms/templates/adg/lms/applications/experience.html
 msgid "Month"
 msgstr ""
 
 #: themes/edx-platform/adg/lms/templates/adg/lms/applications/contact_info.html
-#: themes/edx-platform/adg/lms/templates/adg/lms/applications/experience.html
 msgid "Year"
 msgstr ""
 
@@ -20553,7 +20559,7 @@ msgid "Add Resume"
 msgstr ""
 
 #: themes/edx-platform/adg/lms/templates/adg/lms/applications/contact_info.html
-#: themes/edx-platform/adg/lms/templates/adg/lms/applications/experience.html
+#: themes/edx-platform/adg/lms/templates/adg/lms/applications/education_experience.html
 msgid "Next"
 msgstr ""
 
@@ -20658,7 +20664,7 @@ msgid "Add cover letter"
 msgstr ""
 
 #: themes/edx-platform/adg/lms/templates/adg/lms/applications/cover_letter.html
-#: themes/edx-platform/adg/lms/templates/adg/lms/applications/experience.html
+#: themes/edx-platform/adg/lms/templates/adg/lms/applications/education_experience.html
 msgid "Back"
 msgstr ""
 
@@ -20666,45 +20672,39 @@ msgstr ""
 msgid "Submit & continue"
 msgstr ""
 
-#: themes/edx-platform/adg/lms/templates/adg/lms/applications/experience.html
+#: themes/edx-platform/adg/lms/templates/adg/lms/applications/education_experience.html
 msgid "Education"
 msgstr ""
 
-#: themes/edx-platform/adg/lms/templates/adg/lms/applications/experience.html
-msgid "Date Started"
+#: themes/edx-platform/adg/lms/templates/adg/lms/applications/education_experience.html
+msgid "ADD EDUCATION"
 msgstr ""
 
-#: themes/edx-platform/adg/lms/templates/adg/lms/applications/experience.html
-msgid "January"
-msgstr ""
-
-#: themes/edx-platform/adg/lms/templates/adg/lms/applications/experience.html
-msgid "1980"
-msgstr ""
-
-#: themes/edx-platform/adg/lms/templates/adg/lms/applications/experience.html
-msgid "Date Completed"
-msgstr ""
-
-#: themes/edx-platform/adg/lms/templates/adg/lms/applications/experience.html
-msgid "Add education"
-msgstr ""
-
-#: themes/edx-platform/adg/lms/templates/adg/lms/applications/experience.html
+#: themes/edx-platform/adg/lms/templates/adg/lms/applications/education_experience.html
 msgid "Work Experience"
 msgstr ""
 
-#: themes/edx-platform/adg/lms/templates/adg/lms/applications/experience.html
+#: themes/edx-platform/adg/lms/templates/adg/lms/applications/education_experience.html
 msgid "Not applicable; I do not have any work experience."
 msgstr ""
 
-#: themes/edx-platform/adg/lms/templates/adg/lms/applications/experience.html
-msgid "Please share some details about your role and work."
+#: themes/edx-platform/adg/lms/templates/adg/lms/applications/education_experience.html
+msgid "ADD EXPERIENCE"
 msgstr ""
 
-#: themes/edx-platform/adg/lms/templates/adg/lms/applications/experience.html
-msgid "Add experience"
+#: themes/edx-platform/adg/lms/templates/adg/lms/applications/education_form.html
+#: themes/edx-platform/adg/lms/templates/adg/lms/applications/work_experience_form.html
+msgid "Date Started"
 msgstr ""
+
+#: themes/edx-platform/adg/lms/templates/adg/lms/applications/education_form.html
+#: themes/edx-platform/adg/lms/templates/adg/lms/applications/work_experience_form.html
+msgid "Date Completed"
+msgstr ""
+
+#: themes/edx-platform/adg/lms/templates/adg/lms/applications/education_form.html
+msgid "Remove Degree"
+msgstr "أزل التحديد بعلامة"
 
 #: themes/edx-platform/adg/lms/templates/adg/lms/applications/header.html
 #: themes/edx-platform/adg/lms/templates/header/user_dropdown.html
@@ -20774,6 +20774,18 @@ msgstr ""
 
 #: themes/edx-platform/adg/lms/templates/adg/lms/applications/success.html
 msgid "You will receive a decision by email within two weeks of submission."
+msgstr ""
+
+#: themes/edx-platform/adg/lms/templates/adg/lms/applications/work_experience_form.html
+msgid "Please share some details about your role and work."
+msgstr ""
+
+#: themes/edx-platform/adg/lms/templates/adg/lms/applications/work_experience_form.html
+msgid "Remove Experience"
+msgstr ""
+
+#: themes/edx-platform/adg/lms/templates/adg/lms/common/select_options.html
+msgid "Select"
 msgstr ""
 
 #: themes/edx-platform/adg/lms/templates/courseware/course_about.html

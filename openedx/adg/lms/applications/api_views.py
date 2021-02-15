@@ -1,8 +1,14 @@
 """
 API views for applications app
 """
+import json
+
+from django.db import transaction
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import viewsets
+from rest_framework.decorators import action
+from rest_framework.response import Response
+from rest_framework.status import HTTP_200_OK
 
 from openedx.core.lib.api.view_utils import view_auth_classes
 
@@ -109,10 +115,28 @@ class WorkExperienceViewSet(ApplicationRequirementsViewSet):
 
     partial_update:
         Update an existing work experience record.
+        Update user work_experience is not applicable
 
     **Example Requests**
     PATCH /api/applications/work_experience/
+    PATCH /api/applications/work_experience/update_is_not_applicable/
 
     """
     queryset = WorkExperience.objects.all()
     serializer_class = WorkExperienceSerializer
+
+    @action(detail=False, methods=['patch'], url_name='update_is_not_applicable', url_path='update_is_not_applicable')
+    def update_is_work_experience_not_applicable(self, request):
+        """
+        Update is_work_experience_not_applicable to True or False and delete all existing work experience records
+        if update to True.
+        """
+        is_work_experience_not_applicable = json.loads(request.data.get('is_work_experience_not_applicable', 'false'))
+        user_application = request.user.application
+        user_application.is_work_experience_not_applicable = is_work_experience_not_applicable
+        with transaction.atomic():
+            user_application.save()
+            if is_work_experience_not_applicable:
+                user_application.applications_workexperiences.all().delete()
+
+        return Response({}, status=HTTP_200_OK)

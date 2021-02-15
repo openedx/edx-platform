@@ -8,14 +8,15 @@ import pytest
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import Client, RequestFactory
 from django.urls import reverse
-from rest_framework.status import HTTP_400_BAD_REQUEST
+from rest_framework.status import HTTP_200_OK, HTTP_400_BAD_REQUEST
 
 from common.djangoapps.student.tests.factories import UserFactory
 from openedx.adg.lms.applications.views import (
     ApplicationHubView,
     ApplicationSuccessView,
     ContactInformationView,
-    CoverLetterView
+    CoverLetterView,
+    EducationAndExperienceView
 )
 from openedx.adg.lms.registration_extension.tests.factories import ExtendedUserProfileFactory
 
@@ -358,6 +359,46 @@ def test_post_already_submitted_application_to_contact_information_view(post_req
     assert response.status_code == HTTP_400_BAD_REQUEST
 
 
+@pytest.mark.django_db
+def test_get_redirects_without_login_for_education_experience_view():
+    """
+    Test the case where an unauthenticated user is redirected to register page or not.
+    """
+    response = Client().get(reverse('application_education_experience'))
+    assert reverse('register_user') in response.url
+
+
+@pytest.mark.django_db
+def test_get_redirects_after_login_for_education_experience_view(logged_in_client):
+    """
+    Tests redirects of education experience view for authenticated users if pre condition does not satisfy.
+    """
+    response = logged_in_client.get(reverse('application_education_experience'))
+    assert reverse('application_hub') in response.url
+
+
+@pytest.mark.django_db
+def test_education_experience_view_without_application_hub(user, logged_in_client):
+    """
+    Test education experience view if application hub is not created for user
+    """
+    user.application_hub.delete()
+    response = logged_in_client.get(reverse('application_education_experience'))
+    assert reverse('application_hub') in response.url
+
+
+@pytest.mark.django_db
+def test_get_education_experience_view(request_factory, user):
+    """
+    Test education experience view if user is authenticated and precondition is satisfied.
+    """
+    UserApplicationFactory(user=user)
+    request = request_factory.get(reverse('application_education_experience'))
+    request.user = user
+    response = EducationAndExperienceView.as_view()(request)
+    assert response.status_code == HTTP_200_OK
+
+
 # ------- Application Cover Letter View tests below -------
 
 
@@ -499,7 +540,9 @@ def test_post_with_business_line_cover_letter_view(
 
 @pytest.mark.django_db
 @pytest.mark.parametrize(
-    'button, template', [('back', 'application_experience'), ('submit', 'application_hub')], ids=['back', 'submit']
+    'button, template',
+    [('back', 'application_education_experience'), ('submit', 'application_hub')],
+    ids=['back', 'submit']
 )
 def test_post_back_or_submit_written_application_cover_letter_view(button, template, cover_letter_view_post_request):
     # pylint: disable=protected-access
@@ -553,5 +596,5 @@ def test_post_with_no_cover_letter_typed_cover_letter_and_file_cover_letter_view
 
     response = CoverLetterView.as_view()(cover_letter_view_post_request)
 
-    assert response.get('Location') == reverse('application_experience')
+    assert response.get('Location') == reverse('application_education_experience')
     assert response.status_code == 302

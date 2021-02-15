@@ -61,7 +61,9 @@ def mark_objectives_complete(application_hub, objectives_completed):
     (['is_prerequisite_courses_passed', 'is_written_application_completed'], 1.0)
 ])
 def test_progress_of_objectives_completed_in_float_in_application_hub(
-    objectives_completed, expected_return_value, application_hub
+    objectives_completed,
+    expected_return_value,
+    application_hub
 ):
     """
     Test if the `percentage_of_objectives_completed` property is working as expected for all possible cases.
@@ -178,3 +180,11 @@ def test_submitted_applications_manager():
     actual_applications = list(UserApplication.submitted_applications.all())
 
     assert expected_applications == actual_applications
+
+
+@pytest.mark.django_db
+def test_is_written_application_started(application_hub):
+    """
+    Test application started method
+    """
+    assert not application_hub.is_written_application_started
