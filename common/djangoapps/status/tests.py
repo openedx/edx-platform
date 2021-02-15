@@ -38,25 +38,22 @@ class TestStatus(TestCase):
         """Test status messages in a variety of situations."""
 
         # When we don't have any data set.
-        self.assertEqual(get_site_status_msg(None), None)
-        self.assertEqual(get_site_status_msg(self.course_key), None)
+        assert get_site_status_msg(None) is None
+        assert get_site_status_msg(self.course_key) is None
 
         msg = GlobalStatusMessage.objects.create(message=test_global_message, enabled=True)
         msg.save()
 
-        self.assertEqual(get_site_status_msg(None), test_global_message)
+        assert get_site_status_msg(None) == test_global_message
 
         course_msg = CourseMessage.objects.create(
             global_message=msg, message=test_course_message, course_key=self.course_key
         )
         course_msg.save()
-        self.assertEqual(
-            get_site_status_msg(self.course_key),
-            u"{} <br /> {}".format(test_global_message, test_course_message)
-        )
+        assert get_site_status_msg(self.course_key) == u'{} <br /> {}'.format(test_global_message, test_course_message)
 
         msg = GlobalStatusMessage.objects.create(message="", enabled=False)
         msg.save()
 
-        self.assertEqual(get_site_status_msg(None), None)
-        self.assertEqual(get_site_status_msg(self.course_key), None)
+        assert get_site_status_msg(None) is None
+        assert get_site_status_msg(self.course_key) is None

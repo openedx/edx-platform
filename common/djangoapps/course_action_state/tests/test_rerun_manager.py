@@ -105,7 +105,7 @@ class TestCourseRerunStateManager(TestCase):
         )
         self.expected_rerun_state.pop('message')
         rerun = self.verify_rerun_state()
-        self.assertIn(text_type(exception), rerun.message)
+        assert text_type(exception) in rerun.message
 
         # dismiss ui and verify
         self.dismiss_ui_and_verify(rerun)
