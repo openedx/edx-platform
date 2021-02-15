@@ -7,7 +7,7 @@ Unit tests for handling email sending errors
 import json
 from itertools import cycle
 from smtplib import SMTPConnectError, SMTPDataError, SMTPServerDisconnected
-
+import pytest
 import ddt
 from celery.states import RETRY, SUCCESS
 from django.conf import settings
@@ -90,13 +90,13 @@ class TestEmailErrors(ModuleStoreTestCase):
             'message': 'test message for myself'
         }
         response = self.client.post(self.send_mail_url, test_email)
-        self.assertEqual(json.loads(response.content.decode('utf-8')), self.success_content)
+        assert json.loads(response.content.decode('utf-8')) == self.success_content
 
         # Test that we retry upon hitting a 4xx error
-        self.assertTrue(retry.called)
+        assert retry.called
         (__, kwargs) = retry.call_args
         exc = kwargs['exc']
-        self.assertIsInstance(exc, SMTPDataError)
+        assert isinstance(exc, SMTPDataError)
 
     @patch('lms.djangoapps.bulk_email.tasks.get_connection', autospec=True)
     @patch('lms.djangoapps.bulk_email.tasks.update_subtask_status')
@@ -120,16 +120,16 @@ class TestEmailErrors(ModuleStoreTestCase):
             'message': 'test message for all'
         }
         response = self.client.post(self.send_mail_url, test_email)
-        self.assertEqual(json.loads(response.content.decode('utf-8')), self.success_content)
+        assert json.loads(response.content.decode('utf-8')) == self.success_content
 
         # We shouldn't retry when hitting a 5xx error
-        self.assertFalse(retry.called)
+        assert not retry.called
         # Test that after the rejected email, the rest still successfully send
         ((_entry_id, _current_task_id, subtask_status), _kwargs) = result.call_args
-        self.assertEqual(subtask_status.skipped, 0)
+        assert subtask_status.skipped == 0
         expected_fails = int((settings.BULK_EMAIL_EMAILS_PER_TASK + 3) / 4.0)
-        self.assertEqual(subtask_status.failed, expected_fails)
-        self.assertEqual(subtask_status.succeeded, settings.BULK_EMAIL_EMAILS_PER_TASK - expected_fails)
+        assert subtask_status.failed == expected_fails
+        assert subtask_status.succeeded == (settings.BULK_EMAIL_EMAILS_PER_TASK - expected_fails)
 
     @patch('lms.djangoapps.bulk_email.tasks.get_connection', autospec=True)
     @patch('lms.djangoapps.bulk_email.tasks.send_course_email.retry')
@@ -145,12 +145,12 @@ class TestEmailErrors(ModuleStoreTestCase):
             'message': 'test message for myself'
         }
         response = self.client.post(self.send_mail_url, test_email)
-        self.assertEqual(json.loads(response.content.decode('utf-8')), self.success_content)
+        assert json.loads(response.content.decode('utf-8')) == self.success_content
 
-        self.assertTrue(retry.called)
+        assert retry.called
         (__, kwargs) = retry.call_args
         exc = kwargs['exc']
-        self.assertIsInstance(exc, SMTPServerDisconnected)
+        assert isinstance(exc, SMTPServerDisconnected)
 
     @patch('lms.djangoapps.bulk_email.tasks.get_connection', autospec=True)
     @patch('lms.djangoapps.bulk_email.tasks.send_course_email.retry')
@@ -167,12 +167,12 @@ class TestEmailErrors(ModuleStoreTestCase):
             'message': 'test message for myself'
         }
         response = self.client.post(self.send_mail_url, test_email)
-        self.assertEqual(json.loads(response.content.decode('utf-8')), self.success_content)
+        assert json.loads(response.content.decode('utf-8')) == self.success_content
 
-        self.assertTrue(retry.called)
+        assert retry.called
         (__, kwargs) = retry.call_args
         exc = kwargs['exc']
-        self.assertIsInstance(exc, SMTPConnectError)
+        assert isinstance(exc, SMTPConnectError)
 
     @patch('lms.djangoapps.bulk_email.tasks.SubtaskStatus.increment')
     @patch('lms.djangoapps.bulk_email.tasks.log')
@@ -184,13 +184,13 @@ class TestEmailErrors(ModuleStoreTestCase):
         course_id = self.course.id
         entry = InstructorTask.create(course_id, "task_type", "task_key", "task_input", self.instructor)
         task_input = {"email_id": -1}
-        with self.assertRaises(CourseEmail.DoesNotExist):
+        with pytest.raises(CourseEmail.DoesNotExist):
             perform_delegate_email_batches(entry.id, course_id, task_input, "action_name")
         ((log_str, __, email_id), __) = mock_log.warning.call_args
-        self.assertTrue(mock_log.warning.called)
-        self.assertIn('Failed to get CourseEmail with id', log_str)
-        self.assertEqual(email_id, -1)
-        self.assertFalse(result.called)
+        assert mock_log.warning.called
+        assert 'Failed to get CourseEmail with id' in log_str
+        assert email_id == (- 1)
+        assert not result.called
 
     def test_nonexistent_course(self):
         """
@@ -201,7 +201,7 @@ class TestEmailErrors(ModuleStoreTestCase):
         email.save()
         entry = InstructorTask.create(course_id, "task_type", "task_key", "task_input", self.instructor)
         task_input = {"email_id": email.id}
-        with self.assertRaises(CourseRunNotFound):
+        with pytest.raises(CourseRunNotFound):
             perform_delegate_email_batches(entry.id, course_id, task_input, "action_name")
 
     def test_nonexistent_to_option(self):
@@ -351,9 +351,9 @@ class TestEmailErrors(ModuleStoreTestCase):
         global_email_context = {'course_title': 'dummy course'}
         with patch('lms.djangoapps.instructor_task.subtasks.InstructorTask.save') as mock_task_save:
             mock_task_save.side_effect = DatabaseError
-            with self.assertRaises(DatabaseError):
+            with pytest.raises(DatabaseError):
                 send_course_email(entry_id, bogus_email_id, to_list, global_email_context, subtask_status.to_dict())
-            self.assertEqual(mock_task_save.call_count, MAX_DATABASE_LOCK_RETRIES)
+            assert mock_task_save.call_count == MAX_DATABASE_LOCK_RETRIES
 
     def test_send_email_undefined_email(self):
         # test at a lower level, to ensure that the course gets checked down below too.
@@ -365,7 +365,7 @@ class TestEmailErrors(ModuleStoreTestCase):
         initialize_subtask_info(entry, "emailed", 100, [subtask_id])
         subtask_status = SubtaskStatus.create(subtask_id)
         bogus_email_id = 1001
-        with self.assertRaises(CourseEmail.DoesNotExist):
+        with pytest.raises(CourseEmail.DoesNotExist):
             # we skip the call that updates subtask status, since we've not set up the InstructorTask
             # for the subtask, and it's not important to the test.
             with patch('lms.djangoapps.bulk_email.tasks.update_subtask_status'):

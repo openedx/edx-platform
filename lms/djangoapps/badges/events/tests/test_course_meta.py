@@ -51,7 +51,7 @@ class CourseEnrollmentBadgeTest(ModuleStoreTestCase):
         user = UserFactory()
         course = CourseFactory()
         CourseEnrollment.enroll(user, course_key=course.location.course_key)
-        self.assertFalse(user.badgeassertion_set.all())
+        assert not user.badgeassertion_set.all()
 
     @unpack
     @data((1, 3), (2, 5), (3, 8))
@@ -64,8 +64,8 @@ class CourseEnrollmentBadgeTest(ModuleStoreTestCase):
         for course in courses:
             CourseEnrollment.enroll(user, course_key=course.location.course_key)
         assertions = user.badgeassertion_set.all().order_by('id')
-        self.assertEqual(user.badgeassertion_set.all().count(), checkpoint)
-        self.assertEqual(assertions[checkpoint - 1].badge_class, self.badge_classes[checkpoint - 1])
+        assert user.badgeassertion_set.all().count() == checkpoint
+        assert assertions[(checkpoint - 1)].badge_class == self.badge_classes[(checkpoint - 1)]
 
 
 @ddt
@@ -104,7 +104,7 @@ class CourseCompletionBadgeTest(ModuleStoreTestCase):
         GeneratedCertificate(
             user=user, course_id=course.location.course_key, status=CertificateStatuses.downloadable
         ).save()
-        self.assertFalse(user.badgeassertion_set.all())
+        assert not user.badgeassertion_set.all()
 
     @unpack
     @data((1, 2), (2, 6), (3, 9))
@@ -119,8 +119,8 @@ class CourseCompletionBadgeTest(ModuleStoreTestCase):
                 user=user, course_id=course.location.course_key, status=CertificateStatuses.downloadable
             ).save()
         assertions = user.badgeassertion_set.all().order_by('id')
-        self.assertEqual(user.badgeassertion_set.all().count(), checkpoint)
-        self.assertEqual(assertions[checkpoint - 1].badge_class, self.badge_classes[checkpoint - 1])
+        assert user.badgeassertion_set.all().count() == checkpoint
+        assert assertions[(checkpoint - 1)].badge_class == self.badge_classes[(checkpoint - 1)]
 
 
 @patch.dict(settings.FEATURES, {'ENABLE_OPENBADGES': True})
@@ -161,7 +161,7 @@ class CourseGroupBadgeTest(ModuleStoreTestCase):
         GeneratedCertificate(
             user=user, course_id=course.location.course_key, status=CertificateStatuses.downloadable
         ).save()
-        self.assertFalse(user.badgeassertion_set.all())
+        assert not user.badgeassertion_set.all()
 
     def test_group_matches(self):
         """
@@ -176,9 +176,9 @@ class CourseGroupBadgeTest(ModuleStoreTestCase):
                 ).save()
                 # We don't award badges until all three are set.
                 if i + 1 == len(course_keys):
-                    self.assertTrue(badge_class.get_for_user(user))
+                    assert badge_class.get_for_user(user)
                 else:
-                    self.assertFalse(badge_class.get_for_user(user))
+                    assert not badge_class.get_for_user(user)
         classes = [badge.badge_class.id for badge in user.badgeassertion_set.all()]
         source_classes = [badge.id for badge in self.badge_classes]
-        self.assertEqual(classes, source_classes)
+        assert classes == source_classes

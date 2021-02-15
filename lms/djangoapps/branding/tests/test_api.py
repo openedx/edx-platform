@@ -34,11 +34,11 @@ class TestHeader(TestCase):
         with mock.patch('lms.djangoapps.branding.api.staticfiles_storage.url', return_value=cdn_url):
             logo_url = get_logo_url()
 
-        self.assertEqual(logo_url, cdn_url)
+        assert logo_url == cdn_url
 
     def test_home_url(self):
         expected_url = get_home_url()
-        self.assertEqual(reverse('dashboard'), expected_url)
+        assert reverse('dashboard') == expected_url
 
 
 class TestFooter(TestCase):
@@ -169,7 +169,7 @@ class TestFooter(TestCase):
                 'text': 'Take free online courses at edX.org',
             },
         }
-        self.assertEqual(actual_footer, expected_footer)
+        assert actual_footer == expected_footer
 
     @with_site_configuration(configuration=test_config_disabled_contact_us)
     def test_get_footer_disabled_contact_form(self):
@@ -177,8 +177,8 @@ class TestFooter(TestCase):
         Test retrieving the footer with disabled contact form.
         """
         actual_footer = get_footer(is_secure=True)
-        self.assertEqual(any(l['name'] == 'contact' for l in actual_footer['connect_links']), False)
-        self.assertEqual(any(l['name'] == 'contact' for l in actual_footer['navigation_links']), False)
+        assert any(((l['name'] == 'contact') for l in actual_footer['connect_links'])) is False
+        assert any(((l['name'] == 'contact') for l in actual_footer['navigation_links'])) is False
 
     @with_site_configuration(configuration=test_config_custom_url_contact_us)
     def test_get_footer_custom_contact_url(self):
@@ -187,13 +187,7 @@ class TestFooter(TestCase):
         """
         actual_footer = get_footer(is_secure=True)
         contact_us_link = [l for l in actual_footer['connect_links'] if l['name'] == 'contact'][0]
-        self.assertEqual(
-            contact_us_link['url'],
-            test_config_custom_url_contact_us['CONTACT_US_CUSTOM_LINK']
-        )
+        assert contact_us_link['url'] == test_config_custom_url_contact_us['CONTACT_US_CUSTOM_LINK']
 
         navigation_link_contact_us = [l for l in actual_footer['navigation_links'] if l['name'] == 'contact'][0]
-        self.assertEqual(
-            navigation_link_contact_us['url'],
-            test_config_custom_url_contact_us['CONTACT_US_CUSTOM_LINK']
-        )
+        assert navigation_link_contact_us['url'] == test_config_custom_url_contact_us['CONTACT_US_CUSTOM_LINK']
