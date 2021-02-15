@@ -18,8 +18,8 @@ class MarketingSiteViewTests(TestCase):
         Gets a view and tests that it exists.
         """
         resp = self.client.get(reverse(view_name))
-        self.assertEqual(resp.status_code, 200)
-        self.assertEqual(resp['Content-Type'], mimetype)
+        assert resp.status_code == 200
+        assert resp['Content-Type'] == mimetype
 
     def test_sitemap(self):
         """
@@ -69,8 +69,8 @@ class MarketingSiteViewTests(TestCase):
         """
         url = reverse('static_template_view.views.render_404')
         resp = self.client.get(url)
-        self.assertEqual(resp.status_code, 200)
-        self.assertEqual(resp['Content-Type'], 'text/html')
+        assert resp.status_code == 200
+        assert resp['Content-Type'] == 'text/html'
 
     def test_500(self):
         """
@@ -78,8 +78,8 @@ class MarketingSiteViewTests(TestCase):
         """
         url = reverse('static_template_view.views.render_500')
         resp = self.client.get(url)
-        self.assertEqual(resp.status_code, 500)
-        self.assertEqual(resp['Content-Type'], 'text/html; charset=utf-8')
+        assert resp.status_code == 500
+        assert resp['Content-Type'] == 'text/html; charset=utf-8'
 
         # check response with branding
         resp = self.client.get(url)

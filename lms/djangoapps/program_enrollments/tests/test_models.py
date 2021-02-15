@@ -4,7 +4,7 @@ Unit tests for ProgramEnrollment models.
 
 
 from uuid import UUID
-
+import pytest
 import ddt
 from django.db.utils import IntegrityError
 from django.test import TestCase
@@ -57,7 +57,7 @@ class ProgramEnrollmentModelTests(TestCase):
         """
         A record with the same (external_user_key, program_uuid, curriculum_uuid) cannot be duplicated.
         """
-        with self.assertRaises(IntegrityError):
+        with pytest.raises(IntegrityError):
             _ = ProgramEnrollmentFactory(
                 user=None,
                 external_user_key='abc',
@@ -70,7 +70,7 @@ class ProgramEnrollmentModelTests(TestCase):
         """
         A record with the same (user, program_uuid, curriculum_uuid) cannot be duplicated.
         """
-        with self.assertRaises(IntegrityError):
+        with pytest.raises(IntegrityError):
             _ = ProgramEnrollmentFactory(
                 user=self.user,
                 external_user_key=None,
@@ -90,29 +90,21 @@ class ProgramEnrollmentModelTests(TestCase):
         self.enrollment.save()
 
         # Ensure that all the records had values for external_user_key
-        self.assertEqual(self.enrollment.external_user_key, 'abc')
+        assert self.enrollment.external_user_key == 'abc'
 
-        self.assertTrue(self.enrollment.historical_records.all())
+        assert self.enrollment.historical_records.all()
         for record in self.enrollment.historical_records.all():
-            self.assertEqual(record.external_user_key, 'abc')
+            assert record.external_user_key == 'abc'
 
         ProgramEnrollment.retire_user(self.user.id)
         self.enrollment.refresh_from_db()
 
         # Ensure those values are retired
-        self.assertTrue(
-            self.enrollment.external_user_key.startswith(
-                'retired_external_key'
-            )
-        )
+        assert self.enrollment.external_user_key.startswith('retired_external_key')
 
-        self.assertTrue(self.enrollment.historical_records.all())
+        assert self.enrollment.historical_records.all()
         for record in self.enrollment.historical_records.all():
-            self.assertTrue(
-                record.external_user_key.startswith(
-                    'retired_external_key'
-                )
-            )
+            assert record.external_user_key.startswith('retired_external_key')
 
 
 @ddt.ddt
@@ -178,7 +170,7 @@ class ProgramCourseEnrollmentModelTests(TestCase):
         cannot be created.
         """
         pce = self._create_waiting_program_course_enrollment()
-        with self.assertRaises(IntegrityError):
+        with pytest.raises(IntegrityError):
             ProgramCourseEnrollmentFactory(
                 program_enrollment=pce.program_enrollment,
                 course_key=pce.course_key,
@@ -242,7 +234,7 @@ class CourseAccessRoleAssignmentTests(TestCase):
         """
         Multiple records with the same enrollment and role cannot be created
         """
-        with self.assertRaises(IntegrityError):
+        with pytest.raises(IntegrityError):
             CourseAccessRoleAssignmentFactory(
                 enrollment=self.program_course_enrollment,
                 role=ProgramCourseEnrollmentRoles.COURSE_STAFF,

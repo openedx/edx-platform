@@ -80,7 +80,7 @@ class TestLinkProgramEnrollmentsMixin(object):
         """
         if refresh:
             program_enrollment.refresh_from_db()
-        self.assertIsNone(program_enrollment.user)
+        assert program_enrollment.user is None
 
     def _assert_no_program_enrollment(self, user, program_uuid, refresh=True):
         """
@@ -88,7 +88,7 @@ class TestLinkProgramEnrollmentsMixin(object):
         """
         if refresh:
             user.refresh_from_db()
-        self.assertFalse(user.programenrollment_set.filter(program_uuid=program_uuid).exists())
+        assert not user.programenrollment_set.filter(program_uuid=program_uuid).exists()
 
     def _assert_program_enrollment(self, user, program_uuid, external_user_key, refresh=True):
         """
@@ -100,7 +100,7 @@ class TestLinkProgramEnrollmentsMixin(object):
         enrollment = user.programenrollment_set.get(
             program_uuid=program_uuid, external_user_key=external_user_key
         )
-        self.assertIsNotNone(enrollment)
+        assert enrollment is not None
 
     def _assert_user_enrolled_in_program_courses(self, user, program_uuid, *course_keys):
         """
@@ -121,9 +121,7 @@ class TestLinkProgramEnrollmentsMixin(object):
             program_course_enrollment.course_enrollment
             for program_course_enrollment in program_course_enrollments
         ]
-        self.assertTrue(
-            all(course_enrollment.is_active for course_enrollment in course_enrollments)
-        )
+        assert all((course_enrollment.is_active for course_enrollment in course_enrollments))
         self.assertCountEqual(
             course_keys,
             [course_enrollment.course.id for course_enrollment in course_enrollments]
@@ -177,14 +175,14 @@ class TestLinkProgramEnrollments(TestLinkProgramEnrollmentsMixin, TestCase):
         self._assert_program_enrollment(self.user_1, self.program, '0001')
 
         active_enrollment.refresh_from_db()
-        self.assertIsNotNone(active_enrollment.course_enrollment)
-        self.assertEqual(active_enrollment.course_enrollment.course.id, self.fruit_course)
-        self.assertTrue(active_enrollment.course_enrollment.is_active)
+        assert active_enrollment.course_enrollment is not None
+        assert active_enrollment.course_enrollment.course.id == self.fruit_course
+        assert active_enrollment.course_enrollment.is_active
 
         inactive_enrollment.refresh_from_db()
-        self.assertIsNotNone(inactive_enrollment.course_enrollment)
-        self.assertEqual(inactive_enrollment.course_enrollment.course.id, self.animal_course)
-        self.assertFalse(inactive_enrollment.course_enrollment.is_active)
+        assert inactive_enrollment.course_enrollment is not None
+        assert inactive_enrollment.course_enrollment.course.id == self.animal_course
+        assert not inactive_enrollment.course_enrollment.is_active
 
     def test_realize_course_access_roles(self):
         program_enrollment = self._create_waiting_enrollment(self.program, '0001')
@@ -440,13 +438,13 @@ class TestLinkProgramEnrollmentsErrors(TestLinkProgramEnrollmentsMixin, TestCase
                 '0002': self.user_2.username
             }
         )
-        self.assertIn(errors['0001'], 'NonExistentCourseError: ')
+        assert errors['0001'] in 'NonExistentCourseError: '
         self._assert_no_program_enrollment(self.user_1, self.program)
         self._assert_no_user(program_enrollment_1)
         course_enrollment_1.refresh_from_db()
-        self.assertIsNone(course_enrollment_1.course_enrollment)
+        assert course_enrollment_1.course_enrollment is None
         course_enrollment_2.refresh_from_db()
-        self.assertIsNone(course_enrollment_2.course_enrollment)
+        assert course_enrollment_2.course_enrollment is None
 
         self._assert_user_enrolled_in_program_courses(
             self.user_2, self.program, self.animal_course, self.fruit_course
@@ -468,7 +466,7 @@ class TestLinkProgramEnrollmentsErrors(TestLinkProgramEnrollmentsMixin, TestCase
             }
         )
 
-        self.assertEqual(len(errors), 1)
-        self.assertIn('UNIQUE constraint failed', errors['0001'])
+        assert len(errors) == 1
+        assert 'UNIQUE constraint failed' in errors['0001']
         self._assert_no_user(program_enrollment_1)
         self._assert_program_enrollment(self.user_2, self.program, '0002')

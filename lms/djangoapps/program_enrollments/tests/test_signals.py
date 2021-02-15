@@ -52,11 +52,11 @@ class ProgramEnrollmentRetireSignalTests(ModuleStoreTestCase):
         Assert that for the enrollment and all histories, external key is None
         """
         enrollment.refresh_from_db()
-        self.assertIsNotNone(enrollment.external_user_key)
-        self.assertTrue(enrollment.external_user_key.startswith('retired_external_key'))
+        assert enrollment.external_user_key is not None
+        assert enrollment.external_user_key.startswith('retired_external_key')
         for history_record in enrollment.historical_records.all():
-            self.assertIsNotNone(history_record.external_user_key)
-            self.assertTrue(history_record.external_user_key.startswith('retired_external_key'))
+            assert history_record.external_user_key is not None
+            assert history_record.external_user_key.startswith('retired_external_key')
 
     def test_retire_enrollment(self):
         """
@@ -162,15 +162,15 @@ class SocialAuthEnrollmentCompletionSignalTest(CacheIsolationTestCase):
     def _assert_program_enrollment_user(self, program_enrollment, user):
         """ validate program enrollment has a user """
         program_enrollment.refresh_from_db()
-        self.assertEqual(program_enrollment.user, user)
+        assert program_enrollment.user == user
 
     def _assert_program_course_enrollment(self, program_course_enrollment, mode=CourseMode.MASTERS):
         """ validate program course enrollment has a valid course enrollment """
         program_course_enrollment.refresh_from_db()
         student_course_enrollment = program_course_enrollment.course_enrollment
-        self.assertEqual(student_course_enrollment.user, self.user)
-        self.assertEqual(student_course_enrollment.course.id, program_course_enrollment.course_key)
-        self.assertEqual(student_course_enrollment.mode, mode)
+        assert student_course_enrollment.user == self.user
+        assert student_course_enrollment.course.id == program_course_enrollment.course_key
+        assert student_course_enrollment.mode == mode
 
     def test_update_social_auth(self):
         """
@@ -186,7 +186,7 @@ class SocialAuthEnrollmentCompletionSignalTest(CacheIsolationTestCase):
 
         # Not yet a thing, didn't match
         program_enrollment.refresh_from_db()
-        self.assertIsNone(program_enrollment.user)
+        assert program_enrollment.user is None
 
         user_social_auth.uid = '{0}:{1}'.format(self.provider_slug, self.external_id)
         user_social_auth.save()
@@ -249,14 +249,14 @@ class SocialAuthEnrollmentCompletionSignalTest(CacheIsolationTestCase):
         # update will create a second record
         self.provider_config.organization = None
         self.provider_config.save()
-        self.assertEqual(len(SAMLProviderConfig.objects.all()), 2)
+        assert len(SAMLProviderConfig.objects.all()) == 2
 
         UserSocialAuth.objects.create(
             user=self.user,
             uid='{0}:{1}'.format(self.provider_slug, self.external_id)
         )
         program_enrollment.refresh_from_db()
-        self.assertIsNone(program_enrollment.user)
+        assert program_enrollment.user is None
 
     def test_learner_already_enrolled_in_course(self):
         course_key = self.course_keys[0]
