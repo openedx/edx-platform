@@ -1,19 +1,17 @@
 """
 Tests for the CourseGradeFactory class.
 """
-
-
 import itertools
+from unittest.mock import patch
 
 import ddt
 from django.conf import settings
-from mock import patch
-from six import text_type
 from edx_toggles.toggles.testutils import override_waffle_switch
+
+from common.djangoapps.student.tests.factories import UserFactory
 from lms.djangoapps.courseware.access import has_access
 from lms.djangoapps.grades.config.tests.utils import persistent_grades_feature_flags
 from openedx.core.djangoapps.content.block_structure.factory import BlockStructureFactory
-from common.djangoapps.student.tests.factories import UserFactory
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
@@ -87,7 +85,7 @@ class TestCourseGradeFactory(GradeTestBase):
             _assert_section_order(course_grade)
 
         def _assert_grade_values(course_grade, expected_pass, expected_percent):
-            assert course_grade.letter_grade == (u'Pass' if expected_pass else None)
+            assert course_grade.letter_grade == ('Pass' if expected_pass else None)
             assert course_grade.percent == expected_percent
 
         def _assert_section_order(course_grade):
@@ -217,27 +215,27 @@ class TestCourseGradeFactory(GradeTestBase):
             'section_breakdown': [
                 {
                     'category': 'Homework',
-                    'detail': u'Homework 1 - Test Sequential X - 50% (1/2)',
-                    'label': u'HW 01',
+                    'detail': 'Homework 1 - Test Sequential X - 50% (1/2)',
+                    'label': 'HW 01',
                     'percent': 0.5
                 },
                 {
                     'category': 'Homework',
-                    'detail': u'Homework 2 - Test Sequential A - 0% (0/1)',
-                    'label': u'HW 02',
+                    'detail': 'Homework 2 - Test Sequential A - 0% (0/1)',
+                    'label': 'HW 02',
                     'percent': 0.0
                 },
                 {
                     'category': 'Homework',
-                    'detail': u'Homework Average = 25%',
-                    'label': u'HW Avg',
+                    'detail': 'Homework Average = 25%',
+                    'label': 'HW Avg',
                     'percent': 0.25,
                     'prominent': True
                 },
                 {
                     'category': 'NoCredit',
-                    'detail': u'NoCredit Average = 0%',
-                    'label': u'NC Avg',
+                    'detail': 'NoCredit Average = 0%',
+                    'label': 'NC Avg',
                     'percent': 0,
                     'prominent': True
                 },
@@ -255,7 +253,7 @@ class TestGradeIteration(SharedModuleStoreTestCase):
 
     @classmethod
     def setUpClass(cls):
-        super(TestGradeIteration, cls).setUpClass()
+        super().setUpClass()
         cls.course = CourseFactory.create(
             display_name=cls.COURSE_NAME,
             number=cls.COURSE_NUM
@@ -265,7 +263,7 @@ class TestGradeIteration(SharedModuleStoreTestCase):
         """
         Create a course and a handful of users to assign grades
         """
-        super(TestGradeIteration, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
 
         self.students = [
             UserFactory.create(username='student1'),
@@ -313,14 +311,14 @@ class TestGradeIteration(SharedModuleStoreTestCase):
 
         student1, student2, student3, student4, student5 = self.students
         mock_course_grade.side_effect = [
-            Exception(u"Error for {}.".format(student.username))
+            Exception(f"Error for {student.username}.")
             if student.username in ['student3', 'student4']
             else mock_course_grade.return_value
             for student in self.students
         ]
         with self.assertNumQueries(8):
             all_course_grades, all_errors = self._course_grades_and_errors_for(self.course, self.students)
-        assert {student: text_type(all_errors[student]) for student in all_errors} == {
+        assert {student: str(all_errors[student]) for student in all_errors} == {
             student3: 'Error for student3.',
             student4: 'Error for student4.'
         }

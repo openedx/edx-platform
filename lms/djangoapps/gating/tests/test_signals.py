@@ -3,10 +3,10 @@ Unit tests for gating.signals module
 """
 
 
-from mock import Mock, patch
+from unittest.mock import Mock, patch
 
-from lms.djangoapps.gating.signals import evaluate_subsection_gated_milestones
 from common.djangoapps.student.tests.factories import UserFactory
+from lms.djangoapps.gating.signals import evaluate_subsection_gated_milestones
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
@@ -18,7 +18,7 @@ class TestHandleScoreChanged(ModuleStoreTestCase):
     """
 
     def setUp(self):
-        super(TestHandleScoreChanged, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.course = CourseFactory.create(org='TestX', number='TS01', run='2016_Q1')
         self.user = UserFactory.create()
         self.subsection_grade = Mock()

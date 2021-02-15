@@ -8,11 +8,10 @@ import logging
 
 from django.core.management.base import BaseCommand
 
+from lms.djangoapps.grades import tasks
 from lms.djangoapps.grades.config.models import ComputeGradesSetting
 from openedx.core.lib.command_utils import get_mutually_exclusive_required_option, parse_course_keys
 from xmodule.modulestore.django import modulestore
-
-from lms.djangoapps.grades import tasks
 
 log = logging.getLogger(__name__)
 
@@ -107,7 +106,7 @@ class Command(BaseCommand):
             for task_arg_tuple in tasks._course_task_args(course_key, **options):  # lint-amnesty, pylint: disable=protected-access
                 all_args.append(task_arg_tuple)
 
-        all_args.sort(key=lambda x: hashlib.md5('{!r}'.format(x).encode('utf-8')).digest())
+        all_args.sort(key=lambda x: hashlib.md5(f'{x!r}'.encode('utf-8')).digest())
 
         for args in all_args:
             yield {

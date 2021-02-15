@@ -26,7 +26,7 @@ class GradingPolicySerializer(serializers.Serializer):
         # When the grader dictionary was missing keys, DRF v2 would default to None;
         # DRF v3 unhelpfully raises an exception.
         return dict(
-            super(GradingPolicySerializer, self).to_representation(  # lint-amnesty, pylint: disable=super-with-arguments
+            super().to_representation(
                 defaultdict(lambda: None, instance)
             )
         )

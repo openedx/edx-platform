@@ -3,10 +3,11 @@ Unit tests for gating.signals module
 """
 
 
+from unittest.mock import Mock, patch
+
 from ddt import data, ddt, unpack
 from milestones import api as milestones_api
 from milestones.tests.utils import MilestonesTestCaseMixin
-from mock import Mock, patch
 
 from lms.djangoapps.courseware.tests.helpers import LoginEnrollmentTestCase
 from lms.djangoapps.gating.api import evaluate_prerequisite
@@ -25,7 +26,7 @@ class GatingTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase):
         """
         Initial data setup
         """
-        super(GatingTestCase, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
 
         # create course
         self.course = CourseFactory.create(
@@ -65,7 +66,7 @@ class TestEvaluatePrerequisite(GatingTestCase, MilestonesTestCaseMixin):
     """
 
     def setUp(self):
-        super(TestEvaluatePrerequisite, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.user_dict = {'id': self.user.id}
         self.prereq_milestone = None
         self.subsection_grade = Mock(location=self.seq1.location, percent_graded=0.5)

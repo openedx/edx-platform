@@ -12,10 +12,10 @@ from rest_framework.exceptions import AuthenticationFailed
 from rest_framework.pagination import CursorPagination
 from rest_framework.response import Response
 
-from lms.djangoapps.grades.course_grade_factory import CourseGradeFactory
-from openedx.core.lib.api.view_utils import DeveloperErrorViewMixin
 from common.djangoapps.student.models import CourseEnrollment
 from common.djangoapps.util.query import use_read_replica_if_available
+from lms.djangoapps.grades.course_grade_factory import CourseGradeFactory
+from openedx.core.lib.api.view_utils import DeveloperErrorViewMixin
 
 USER_MODEL = get_user_model()
 
@@ -45,7 +45,7 @@ class CourseEnrollmentPagination(CursorPagination):
         Return a response given serialized page data, optional status_code (defaults to 200),
         and kwargs. Each key-value pair of kwargs is added to the response data.
         """
-        resp = super(CourseEnrollmentPagination, self).get_paginated_response(data)  # lint-amnesty, pylint: disable=super-with-arguments
+        resp = super().get_paginated_response(data)
 
         for (key, value) in kwargs.items():
             resp.data[key] = value
@@ -181,6 +181,6 @@ class GradeViewMixin(DeveloperErrorViewMixin):
         """
         Ensures that the user is authenticated (e.g. not an AnonymousUser).
         """
-        super(GradeViewMixin, self).perform_authentication(request)  # lint-amnesty, pylint: disable=super-with-arguments
+        super().perform_authentication(request)
         if request.user.is_anonymous:
             raise AuthenticationFailed

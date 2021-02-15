@@ -1,14 +1,14 @@
 # lint-amnesty, pylint: disable=missing-module-docstring
+from unittest.mock import patch
+
 import ddt
-import six
 from crum import set_current_request
 from django.conf import settings
-from mock import patch
-
 from edx_toggles.toggles.testutils import override_waffle_switch
-from openedx.core.djangolib.testing.utils import get_mock_request
+
 from common.djangoapps.student.models import CourseEnrollment
 from common.djangoapps.student.tests.factories import UserFactory
+from openedx.core.djangolib.testing.utils import get_mock_request
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 
@@ -38,7 +38,7 @@ class ZeroGradeTest(GradeTestBase):
             chapter_grades = ZeroCourseGrade(self.request.user, course_data).chapter_grades
             for chapter in chapter_grades:
                 for section in chapter_grades[chapter]['sections']:
-                    for score in six.itervalues(section.problem_scores):
+                    for score in section.problem_scores.values():
                         assert score.earned == 0
                         assert score.first_attempted is None
                     assert section.all_total.earned == 0
@@ -76,7 +76,7 @@ class TestScoreForModule(SharedModuleStoreTestCase):
 
     @classmethod
     def setUpClass(cls):
-        super(TestScoreForModule, cls).setUpClass()
+        super().setUpClass()
         cls.course = CourseFactory.create()
         with cls.store.bulk_operations(cls.course.id):
             cls.a = ItemFactory.create(parent=cls.course, category="chapter", display_name="a")
@@ -107,7 +107,7 @@ class TestScoreForModule(SharedModuleStoreTestCase):
 
     @classmethod
     def tearDownClass(cls):
-        super(TestScoreForModule, cls).tearDownClass()
+        super().tearDownClass()
         set_current_request(None)
 
     def test_score_chapter(self):

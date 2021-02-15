@@ -7,18 +7,20 @@ import itertools
 from collections import OrderedDict
 from contextlib import contextmanager
 from datetime import datetime, timedelta
-import pytest
+from unittest.mock import MagicMock, patch
 
 import ddt
+import pytest
 import pytz
-import six
 from django.conf import settings
 from django.db.utils import IntegrityError
 from django.utils import timezone
-from mock import MagicMock, patch
-from six.moves import range
-
 from edx_toggles.toggles.testutils import override_waffle_flag
+
+from common.djangoapps.student.models import CourseEnrollment, anonymous_id_for_user
+from common.djangoapps.student.tests.factories import UserFactory
+from common.djangoapps.track.event_transaction_utils import create_new_event_transaction_id, get_event_transaction_id
+from common.djangoapps.util.date_utils import to_timestamp
 from lms.djangoapps.grades import tasks
 from lms.djangoapps.grades.config.models import PersistentGradesEnabledFlag
 from lms.djangoapps.grades.config.waffle import ENFORCE_FREEZE_GRADE_AFTER_COURSE_END, waffle_flags
@@ -35,10 +37,6 @@ from lms.djangoapps.grades.tasks import (
     recalculate_subsection_grade_v3
 )
 from openedx.core.djangoapps.content.block_structure.exceptions import BlockStructureNotFound
-from common.djangoapps.student.models import CourseEnrollment, anonymous_id_for_user
-from common.djangoapps.student.tests.factories import UserFactory
-from common.djangoapps.track.event_transaction_utils import create_new_event_transaction_id, get_event_transaction_id
-from common.djangoapps.util.date_utils import to_timestamp
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
@@ -47,7 +45,7 @@ from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory, chec
 from .utils import mock_get_score
 
 
-class HasCourseWithProblemsMixin(object):
+class HasCourseWithProblemsMixin:
     """
     Mixin to provide tests with a sample course with graded subsections
     """
@@ -80,8 +78,8 @@ class HasCourseWithProblemsMixin(object):
             ('weighted_possible', 2.0),
             ('user_id', self.user.id),
             ('anonymous_user_id', 5),
-            ('course_id', six.text_type(self.course.id)),
-            ('usage_id', six.text_type(self.problem.location)),
+            ('course_id', str(self.course.id)),
+            ('usage_id', str(self.problem.location)),
             ('only_if_higher', None),
             ('modified', self.frozen_now_datetime),
             ('score_db_table', ScoreDatabaseTableEnum.courseware_student_module),
@@ -91,14 +89,14 @@ class HasCourseWithProblemsMixin(object):
 
         self.recalculate_subsection_grade_kwargs = OrderedDict([
             ('user_id', self.user.id),
-            ('course_id', six.text_type(self.course.id)),
-            ('usage_id', six.text_type(self.problem.location)),
+            ('course_id', str(self.course.id)),
+            ('usage_id', str(self.problem.location)),
             ('anonymous_user_id', 5),
             ('only_if_higher', None),
             ('expected_modified_time', self.frozen_now_timestamp),
             ('score_deleted', False),
-            ('event_transaction_id', six.text_type(get_event_transaction_id())),
-            ('event_transaction_type', u'edx.grades.problem.submitted'),
+            ('event_transaction_id', str(get_event_transaction_id())),
+            ('event_transaction_type', 'edx.grades.problem.submitted'),
             ('score_db_table', ScoreDatabaseTableEnum.courseware_student_module),
         ])
 
@@ -116,7 +114,7 @@ class RecalculateSubsectionGradeTest(HasCourseWithProblemsMixin, ModuleStoreTest
     ENABLED_SIGNALS = ['course_published', 'pre_publish']
 
     def setUp(self):
-        super(RecalculateSubsectionGradeTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.user = UserFactory()
         PersistentGradesEnabledFlag.objects.create(enabled_for_all_courses=True, enabled=True)
 
@@ -136,7 +134,7 @@ class RecalculateSubsectionGradeTest(HasCourseWithProblemsMixin, ModuleStoreTest
         self.set_up_course()
         send_args = self.problem_weighted_score_changed_kwargs
         local_task_args = self.recalculate_subsection_grade_kwargs.copy()
-        local_task_args['event_transaction_type'] = u'edx.grades.problem.submitted'
+        local_task_args['event_transaction_type'] = 'edx.grades.problem.submitted'
         local_task_args['force_update_subsections'] = False
         with self.mock_csm_get_score() and patch(
             'lms.djangoapps.grades.tasks.recalculate_subsection_grade_v3.apply_async',
@@ -304,7 +302,7 @@ class RecalculateSubsectionGradeTest(HasCourseWithProblemsMixin, ModuleStoreTest
                 recalculate_subsection_grade_v3.apply(kwargs=self.recalculate_subsection_grade_kwargs)
 
         self._assert_retry_called(mock_retry)
-        assert u'Grades: tasks._has_database_updated_with_new_score is False.' in mock_log.info.call_args_list[0][0][0]
+        assert 'Grades: tasks._has_database_updated_with_new_score is False.' in mock_log.info.call_args_list[0][0][0]
 
     @ddt.data(
         *itertools.product(
@@ -338,7 +336,7 @@ class RecalculateSubsectionGradeTest(HasCourseWithProblemsMixin, ModuleStoreTest
             self._assert_retry_not_called(mock_retry)
         else:
             self._assert_retry_called(mock_retry)
-            assert u'Grades: tasks._has_database_updated_with_new_score is False.'\
+            assert 'Grades: tasks._has_database_updated_with_new_score is False.'\
                    in mock_log.info.call_args_list[0][0][0]
 
     @patch('lms.djangoapps.grades.tasks.log')
@@ -407,7 +405,7 @@ class ComputeGradesForCourseTest(HasCourseWithProblemsMixin, ModuleStoreTestCase
     ENABLED_SIGNALS = ['course_published', 'pre_publish']
 
     def setUp(self):
-        super(ComputeGradesForCourseTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.users = [UserFactory.create() for _ in range(12)]
         self.set_up_course()
         for user in self.users:
@@ -417,7 +415,7 @@ class ComputeGradesForCourseTest(HasCourseWithProblemsMixin, ModuleStoreTestCase
     def test_behavior(self, batch_size):
         with mock_get_score(1, 2):
             result = compute_grades_for_course_v2.delay(
-                course_key=six.text_type(self.course.id),
+                course_key=str(self.course.id),
                 batch_size=batch_size,
                 offset=4,
             )
@@ -431,7 +429,7 @@ class ComputeGradesForCourseTest(HasCourseWithProblemsMixin, ModuleStoreTestCase
         for course_key, offset, batch_size in _course_task_args(
             batch_size=test_batch_size, course_key=self.course.id, from_settings=False
         ):
-            assert course_key == six.text_type(self.course.id)
+            assert course_key == str(self.course.id)
             assert batch_size == test_batch_size
             assert offset == offset_expected
             offset_expected += test_batch_size
@@ -442,7 +440,7 @@ class RecalculateGradesForUserTest(HasCourseWithProblemsMixin, ModuleStoreTestCa
     Test recalculate_course_and_subsection_grades_for_user task.
     """
     def setUp(self):
-        super(RecalculateGradesForUserTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.user = UserFactory.create()
         self.set_up_course()
         CourseEnrollment.enroll(self.user, self.course.id)
@@ -454,7 +452,7 @@ class RecalculateGradesForUserTest(HasCourseWithProblemsMixin, ModuleStoreTestCa
 
             kwargs = {
                 'user_id': self.user.id,
-                'course_key': six.text_type(self.course.id),
+                'course_key': str(self.course.id),
             }
 
             task_result = tasks.recalculate_course_and_subsection_grades_for_user.apply_async(kwargs=kwargs)
@@ -474,7 +472,7 @@ class RecalculateGradesForUserTest(HasCourseWithProblemsMixin, ModuleStoreTestCa
 
             kwargs = {
                 'user_id': self.user.id,
-                'course_key': six.text_type(self.course.id),
+                'course_key': str(self.course.id),
             }
 
             task_result = tasks.recalculate_course_and_subsection_grades_for_user.apply_async(kwargs=kwargs)
@@ -490,14 +488,14 @@ class FreezeGradingAfterCourseEndTest(HasCourseWithProblemsMixin, ModuleStoreTes
     Test enforce_freeze_grade_after_course_end waffle flag controlling grading tasks.
     """
     def setUp(self):
-        super(FreezeGradingAfterCourseEndTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.users = [UserFactory.create() for _ in range(12)]
         self.user = self.users[0]
         self.freeze_grade_flag = waffle_flags()[ENFORCE_FREEZE_GRADE_AFTER_COURSE_END]
 
     def _assert_log(self, mock_log, method_name):
         assert mock_log.info.called
-        log_message = u"Attempted {} for course '%s', but grades are frozen.".format(method_name)
+        log_message = "Attempted {} for course '%s', but grades are frozen.".format(method_name)
         assert log_message in mock_log.info.call_args_list[0][0][0]
 
     def _assert_for_freeze_grade_flag(  # lint-amnesty, pylint: disable=missing-function-docstring
@@ -536,7 +534,7 @@ class FreezeGradingAfterCourseEndTest(HasCourseWithProblemsMixin, ModuleStoreTes
             ) as mock_compute_grades:
                 result = compute_all_grades_for_course.apply_async(
                     kwargs={
-                        'course_key': six.text_type(self.course.id)
+                        'course_key': str(self.course.id)
                     }
                 )
                 self._assert_for_freeze_grade_flag(
@@ -567,7 +565,7 @@ class FreezeGradingAfterCourseEndTest(HasCourseWithProblemsMixin, ModuleStoreTes
                 with mock_get_score(1, 2):
                     result = compute_grades_for_course.apply_async(
                         kwargs={
-                            'course_key': six.text_type(self.course.id),
+                            'course_key': str(self.course.id),
                             'batch_size': 2,
                             'offset': 4,
                         }
@@ -597,7 +595,7 @@ class FreezeGradingAfterCourseEndTest(HasCourseWithProblemsMixin, ModuleStoreTes
                 factory = mock_factory.return_value
                 kwargs = {
                     'user_id': self.user.id,
-                    'course_key': six.text_type(self.course.id),
+                    'course_key': str(self.course.id),
                 }
 
                 result = tasks.recalculate_course_and_subsection_grades_for_user.apply_async(kwargs=kwargs)

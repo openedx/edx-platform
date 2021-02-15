@@ -10,13 +10,13 @@ from django.conf import settings
 from lazy import lazy
 from submissions import api as submissions_api
 
-from openedx.core.djangoapps.signals.signals import COURSE_ASSESSMENT_GRADE_CHANGED
+from common.djangoapps.student.models import anonymous_id_for_user
 from lms.djangoapps.courseware.model_data import ScoresClient
 from lms.djangoapps.grades.config import assume_zero_if_absent, should_persist_grades
 from lms.djangoapps.grades.models import PersistentSubsectionGrade
 from lms.djangoapps.grades.scores import possibly_scored
+from openedx.core.djangoapps.signals.signals import COURSE_ASSESSMENT_GRADE_CHANGED
 from openedx.core.lib.grade_utils import is_score_higher_or_equal
-from common.djangoapps.student.models import anonymous_id_for_user
 
 from .course_data import CourseData
 from .subsection_grade import CreateSubsectionGrade, ReadSubsectionGrade, ZeroSubsectionGrade
@@ -24,7 +24,7 @@ from .subsection_grade import CreateSubsectionGrade, ReadSubsectionGrade, ZeroSu
 log = getLogger(__name__)
 
 
-class SubsectionGradeFactory(object):
+class SubsectionGradeFactory:
     """
     Factory for Subsection Grades.
     """
@@ -44,7 +44,7 @@ class SubsectionGradeFactory(object):
         grade currently exists, even if the assume_zero_if_absent flag is enabled for the course.
         """
         self._log_event(
-            log.debug, u"create, read_only: {0}, subsection: {1}".format(read_only, subsection.location), subsection,
+            log.debug, f"create, read_only: {read_only}, subsection: {subsection.location}", subsection,
         )
 
         subsection_grade = self._get_bulk_cached_grade(subsection)
@@ -76,7 +76,7 @@ class SubsectionGradeFactory(object):
         """
         Updates the SubsectionGrade object for the student and subsection.
         """
-        self._log_event(log.debug, u"update, subsection: {}".format(subsection.location), subsection)
+        self._log_event(log.debug, f"update, subsection: {subsection.location}", subsection)
 
         calculated_grade = CreateSubsectionGrade(
             subsection, self.course_data.structure, self._submissions_scores, self._csm_scores,
@@ -173,7 +173,7 @@ class SubsectionGradeFactory(object):
         """
         Logs the given statement, for this instance.
         """
-        log_func(u"Grades: SGF.{}, course: {}, version: {}, edit: {}, user: {}".format(
+        log_func("Grades: SGF.{}, course: {}, version: {}, edit: {}, user: {}".format(
             log_statement,
             self.course_data.course_key,
             getattr(subsection, 'course_version', None),
