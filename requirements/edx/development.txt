@@ -222,7 +222,8 @@ pyjwt[crypto]==1.7.1      # via -r requirements/edx/testing.txt, drf-jwt, edx-re
 pylint-celery==0.3        # via -r requirements/edx/testing.txt, edx-lint
 pylint-django==2.4.2      # via -r requirements/edx/testing.txt, edx-lint
 pylint-plugin-utils==0.6  # via -r requirements/edx/testing.txt, pylint-celery, pylint-django
-pylint==2.6.0             # via -r requirements/edx/testing.txt, edx-lint, pylint-celery, pylint-django, pylint-plugin-utils
+pylint-pytest==0.3.0      # via -r requirements/edx/testing.txt
+pylint==2.6.0             # via -r requirements/edx/testing.txt, edx-lint, pylint-celery, pylint-django, pylint-plugin-utils, pylint-pytest
 pymongo==3.10.1           # via -c requirements/edx/../constraints.txt, -r requirements/edx/testing.txt, edx-opaque-keys, event-tracking, mongodbproxy, mongoengine
 pynliner==0.8.0           # via -r requirements/edx/testing.txt
 pyparsing==2.4.7          # via -r requirements/edx/testing.txt, chem, openedx-calc, packaging, pycontracts
@@ -237,7 +238,7 @@ pytest-json-report==1.2.4  # via -r requirements/edx/testing.txt
 pytest-metadata==1.8.0    # via -r requirements/edx/testing.txt, pytest-json-report
 pytest-randomly==3.5.0    # via -r requirements/edx/testing.txt
 pytest-xdist[psutil]==2.2.1  # via -r requirements/edx/testing.txt
-pytest==6.2.2             # via -r requirements/edx/testing.txt, pytest-attrib, pytest-cov, pytest-django, pytest-forked, pytest-json-report, pytest-metadata, pytest-randomly, pytest-xdist
+pytest==6.2.2             # via -r requirements/edx/testing.txt, pylint-pytest, pytest-attrib, pytest-cov, pytest-django, pytest-forked, pytest-json-report, pytest-metadata, pytest-randomly, pytest-xdist
 python-dateutil==2.4.0    # via -c requirements/edx/../constraints.txt, -r requirements/edx/testing.txt, analytics-python, botocore, edx-ace, edx-drf-extensions, edx-enterprise, edx-event-routing-backends, edx-proctoring, faker, freezegun, icalendar, ora2, xblock
 python-levenshtein==0.12.2  # via -r requirements/edx/testing.txt
 python-memcached==1.59    # via -r requirements/edx/testing.txt
