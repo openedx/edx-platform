@@ -11,7 +11,7 @@ from openedx.core.djangoapps.django_comment_common.models import CourseDiscussio
 from openedx.core.djangoapps.django_comment_common.utils import set_course_discussion_settings
 
 
-class GroupIdAssertionMixin(object):
+class GroupIdAssertionMixin:
     def _data_or_params_cs_request(self, mock_request):
         """
         Returns the data or params dict that `mock_request` was called with.

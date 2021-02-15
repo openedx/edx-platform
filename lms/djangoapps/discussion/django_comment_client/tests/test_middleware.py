@@ -3,7 +3,6 @@ import json
 
 import django.http
 from django.test import TestCase
-from six import text_type
 
 import lms.djangoapps.discussion.django_comment_client.middleware as middleware
 import openedx.core.djangoapps.django_comment_common.comment_client as comment_client
@@ -12,7 +11,7 @@ import openedx.core.djangoapps.django_comment_common.comment_client as comment_c
 class AjaxExceptionTestCase(TestCase):  # lint-amnesty, pylint: disable=missing-class-docstring
 
     def setUp(self):
-        super(AjaxExceptionTestCase, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.a = middleware.AjaxExceptionMiddleware()
         self.request1 = django.http.HttpRequest()
         self.request0 = django.http.HttpRequest()
@@ -26,12 +25,12 @@ class AjaxExceptionTestCase(TestCase):  # lint-amnesty, pylint: disable=missing-
         response1 = self.a.process_exception(self.request1, self.exception1)
         assert isinstance(response1, middleware.JsonError)
         assert self.exception1.status_code == response1.status_code
-        assert {'errors': json.loads(text_type(self.exception1))} == json.loads(response1.content.decode('utf-8'))
+        assert {'errors': json.loads(str(self.exception1))} == json.loads(response1.content.decode('utf-8'))
 
         response2 = self.a.process_exception(self.request1, self.exception2)
         assert isinstance(response2, middleware.JsonError)
         assert self.exception2.status_code == response2.status_code
-        assert {'errors': [text_type(self.exception2)]} == json.loads(response2.content.decode('utf-8'))
+        assert {'errors': [str(self.exception2)]} == json.loads(response2.content.decode('utf-8'))
 
         assert self.a.process_exception(self.request1, self.exception0) is None
         assert self.a.process_exception(self.request0, self.exception1) is None

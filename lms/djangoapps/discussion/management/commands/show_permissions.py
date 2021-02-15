@@ -20,16 +20,16 @@ class Command(BaseCommand):  # lint-amnesty, pylint: disable=missing-class-docst
             else:
                 user = User.objects.get(username=email_or_username)
         except User.DoesNotExist:
-            print(u'User {} does not exist. '.format(email_or_username))
+            print(f'User {email_or_username} does not exist. ')
             print('Available users: ')
             print(User.objects.all())
             return
 
         roles = user.roles.all()
-        print(u'{} has %d roles:'.format(user, len(roles)))
+        print('{} has %d roles:'.format(user, len(roles)))
         for role in roles:
-            print(u'\t{}'.format(role))
+            print(f'\t{role}')
 
         for role in roles:
-            print(u'{} has permissions: '.format(role))
+            print(f'{role} has permissions: ')
             print(role.permissions.all())

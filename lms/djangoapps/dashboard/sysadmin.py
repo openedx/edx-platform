@@ -2,8 +2,6 @@
 This module creates a sysadmin dashboard for managing and viewing
 courses.
 """
-
-
 import json
 import logging
 import os
@@ -26,18 +24,18 @@ from django.views.decorators.http import condition
 from django.views.generic.base import TemplateView
 from opaque_keys.edx.keys import CourseKey
 from path import Path as path
-from six import StringIO, text_type
+from six import StringIO
+from xmodule.modulestore.django import modulestore
 
 import lms.djangoapps.dashboard.git_import as git_import
-from common.djangoapps.track import views as track_views
-from lms.djangoapps.dashboard.git_import import GitImportError
-from lms.djangoapps.dashboard.models import CourseImportLog
 from common.djangoapps.edxmako.shortcuts import render_to_response
-from lms.djangoapps.courseware.courses import get_course_by_id
-from openedx.core.djangolib.markup import HTML
 from common.djangoapps.student.models import CourseEnrollment, Registration, UserProfile
 from common.djangoapps.student.roles import CourseInstructorRole, CourseStaffRole
-from xmodule.modulestore.django import modulestore
+from common.djangoapps.track import views as track_views
+from lms.djangoapps.courseware.courses import get_course_by_id
+from lms.djangoapps.dashboard.git_import import GitImportError
+from lms.djangoapps.dashboard.models import CourseImportLog
+from openedx.core.djangolib.markup import HTML
 
 log = logging.getLogger(__name__)
 
@@ -56,9 +54,9 @@ class SysadminDashboardView(TemplateView):
         warnings.warn("Sysadmin Dashboard is deprecated. See DEPR-118.", DeprecationWarning)
 
         self.def_ms = modulestore()
-        self.msg = u''
+        self.msg = ''
         self.datatable = []
-        super(SysadminDashboardView, self).__init__(**kwargs)  # lint-amnesty, pylint: disable=super-with-arguments
+        super().__init__(**kwargs)
 
     @method_decorator(ensure_csrf_cookie)
     @method_decorator(login_required)
@@ -66,7 +64,7 @@ class SysadminDashboardView(TemplateView):
                                     must_revalidate=True))
     @method_decorator(condition(etag_func=None))
     def dispatch(self, *args, **kwargs):
-        return super(SysadminDashboardView, self).dispatch(*args, **kwargs)  # lint-amnesty, pylint: disable=super-with-arguments
+        return super().dispatch(*args, **kwargs)
 
     def get_courses(self):
         """ Get an iterable list of courses."""
@@ -88,7 +86,7 @@ class Users(SysadminDashboardView):
         if not name:
             return _('Must provide full name')
 
-        msg = u''
+        msg = ''
         if not password:
             return _('Password must be supplied')
 
@@ -104,7 +102,7 @@ class Users(SysadminDashboardView):
         try:
             user.save()
         except IntegrityError:
-            msg += _(u'Oops, failed to create user {user}, {error}').format(
+            msg += _('Oops, failed to create user {user}, {error}').format(
                 user=user,
                 error="IntegrityError"
             )
@@ -117,7 +115,7 @@ class Users(SysadminDashboardView):
         profile.name = name
         profile.save()
 
-        msg += _(u'User {user} created successfully!').format(user=user)
+        msg += _('User {user} created successfully!').format(user=user)
         return msg
 
     def delete_user(self, uname):
@@ -129,19 +127,19 @@ class Users(SysadminDashboardView):
             try:
                 user = User.objects.get(email=uname)
             except User.DoesNotExist as err:
-                msg = _(u'Cannot find user with email address {email_addr}').format(email_addr=uname)
+                msg = _('Cannot find user with email address {email_addr}').format(email_addr=uname)
                 return msg
         else:
             try:
                 user = User.objects.get(username=uname)
             except User.DoesNotExist as err:
-                msg = _(u'Cannot find user with username {username} - {error}').format(
+                msg = _('Cannot find user with username {username} - {error}').format(
                     username=uname,
                     error=str(err)
                 )
                 return msg
         user.delete()
-        return _(u'Deleted user {username}').format(username=uname)
+        return _('Deleted user {username}').format(username=uname)
 
     def make_datatable(self):
         """
@@ -185,12 +183,12 @@ class Users(SysadminDashboardView):
             uname = request.POST.get('student_uname', '').strip()
             name = request.POST.get('student_fullname', '').strip()
             password = request.POST.get('student_password', '').strip()
-            self.msg = HTML(u'<h4>{0}</h4><p>{1}</p><hr />{2}').format(
+            self.msg = HTML('<h4>{0}</h4><p>{1}</p><hr />{2}').format(
                 _('Create User Results'),
                 self.create_user(uname, name, password), self.msg)
         elif action == 'del_user':
             uname = request.POST.get('student_uname', '').strip()
-            self.msg = HTML(u'<h4>{0}</h4><p>{1}</p><hr />{2}').format(
+            self.msg = HTML('<h4>{0}</h4><p>{1}</p><hr />{2}').format(
                 _('Delete User Results'), self.delete_user(uname), self.msg)
         context = {
             'datatable': self.make_datatable(),
@@ -222,14 +220,14 @@ class Courses(SysadminDashboardView):
                 return info
 
         cmd = ['git', 'log', '-1',
-               u'--format=format:{ "commit": "%H", "author": "%an %ae", "date": "%ad"}', ]
+               '--format=format:{ "commit": "%H", "author": "%an %ae", "date": "%ad"}', ]
         try:
             output_json = json.loads(subprocess.check_output(cmd, cwd=gdir).decode('utf-8'))
             info = [output_json['commit'],
                     output_json['date'],
                     output_json['author'], ]
         except OSError as error:
-            log.warning(text_type(u"Error fetching git data: %s - %s"), text_type(cdir), text_type(error))
+            log.warning("Error fetching git data: %s - %s", str(cdir), str(error))
         except (ValueError, subprocess.CalledProcessError):
             pass
 
@@ -251,9 +249,9 @@ class Courses(SysadminDashboardView):
         at debug level for display in template
         """
 
-        msg = u''
+        msg = ''
 
-        log.debug(u'Adding course using git repo %s', gitloc)
+        log.debug('Adding course using git repo %s', gitloc)
 
         # Grab logging output for debugging imports
         output = StringIO()
@@ -291,8 +289,8 @@ class Courses(SysadminDashboardView):
             msg_header = _('Added Course')
             color = 'blue'
 
-        msg = HTML(u"<h4 style='color:{0}'>{1}</h4>").format(color, msg_header)
-        msg += HTML(u"<pre>{0}</pre>").format(escape(ret))
+        msg = HTML("<h4 style='color:{0}'>{1}</h4>").format(color, msg_header)
+        msg += HTML("<pre>{0}</pre>").format(escape(ret))
         return msg
 
     def make_datatable(self, courses=None):
@@ -302,7 +300,7 @@ class Courses(SysadminDashboardView):
         courses = courses or self.get_courses()
         for course in courses:
             gdir = course.id.course
-            data.append([course.display_name, text_type(course.id)]
+            data.append([course.display_name, str(course.id)]
                         + self.git_info_for_course(gdir))
 
         return dict(header=[_('Course Name'),
@@ -357,7 +355,7 @@ class Courses(SysadminDashboardView):
                     course_found = True
                 except Exception as err:   # pylint: disable=broad-except
                     self.msg += _(  # lint-amnesty, pylint: disable=translation-of-non-string
-                        HTML(u'Error - cannot get course with ID {0}<br/><pre>{1}</pre>')
+                        HTML('Error - cannot get course with ID {0}<br/><pre>{1}</pre>')
                     ).format(
                         course_key,
                         escape(str(err))
@@ -368,8 +366,8 @@ class Courses(SysadminDashboardView):
                 self.def_ms.delete_course(course.id, request.user.id)
                 # don't delete user permission groups, though
                 self.msg += \
-                    HTML(u"<font color='red'>{0} {1} = {2} ({3})</font>").format(
-                        _('Deleted'), text_type(course.location), text_type(course.id), course.display_name)
+                    HTML("<font color='red'>{0} {1} = {2} ({3})</font>").format(
+                        _('Deleted'), str(course.location), str(course.id), course.display_name)
 
         context = {
             'datatable': self.make_datatable(list(courses.values())),
@@ -477,7 +475,7 @@ class GitLogs(TemplateView):
             cilset = CourseImportLog.objects.filter(
                 course_id=course_id
             ).order_by('-created')
-            log.debug(u'cilset length=%s', len(cilset))
+            log.debug('cilset length=%s', len(cilset))
 
         # Paginate the query set
         paginator = Paginator(cilset, page_size)
@@ -494,7 +492,7 @@ class GitLogs(TemplateView):
         mdb.close()
         context = {
             'logs': logs,
-            'course_id': text_type(course_id) if course_id else None,
+            'course_id': str(course_id) if course_id else None,
             'error_msg': error_msg,
             'page_size': page_size
         }

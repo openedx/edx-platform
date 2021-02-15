@@ -6,7 +6,6 @@ pertaining to new discussion forum comments.
 
 import logging
 
-import six
 from celery import shared_task
 from celery_utils.logged_task import LoggedTask
 from django.conf import settings  # lint-amnesty, pylint: disable=unused-import
@@ -21,6 +20,7 @@ from opaque_keys.edx.keys import CourseKey
 from six.moves.urllib.parse import urljoin
 
 import openedx.core.djangoapps.django_comment_common.comment_client as cc
+from common.djangoapps.track import segment
 from lms.djangoapps.discussion.django_comment_client.utils import (
     get_accessible_discussion_xblocks_by_course_id,
     permalink
@@ -30,7 +30,6 @@ from openedx.core.djangoapps.ace_common.template_context import get_base_templat
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.django_comment_common.models import DiscussionsIdMapping
 from openedx.core.lib.celery.task_utils import emulate_http_request
-from common.djangoapps.track import segment
 
 log = logging.getLogger(__name__)
 
@@ -51,7 +50,7 @@ def update_discussions_map(context):
     course_key = CourseKey.from_string(context['course_id'])
     discussion_blocks = get_accessible_discussion_xblocks_by_course_id(course_key, include_all=True)
     discussions_id_map = {
-        discussion_block.discussion_id: six.text_type(discussion_block.location)
+        discussion_block.discussion_id: str(discussion_block.location)
         for discussion_block in discussion_blocks
     }
     DiscussionsIdMapping.update_mapping(course_key, discussions_id_map)
@@ -76,7 +75,7 @@ def send_ace_message(context):  # lint-amnesty, pylint: disable=missing-function
                 _get_course_language(context['course_id']),
                 message_context
             )
-            log.info(u'Sending forum comment email notification with context %s', message_context)
+            log.info('Sending forum comment email notification with context %s', message_context)
             ace.send(message)
             _track_notification_sent(message, context)
 
@@ -89,10 +88,10 @@ def _track_notification_sent(message, context):
         'app_label': 'discussion',
         'name': 'responsenotification',  # This is 'Campaign' in GA
         'language': message.language,
-        'uuid': six.text_type(message.uuid),
-        'send_uuid': six.text_type(message.send_uuid),
+        'uuid': str(message.uuid),
+        'send_uuid': str(message.send_uuid),
         'thread_id': context['thread_id'],
-        'course_id': six.text_type(context['course_id']),
+        'course_id': str(context['course_id']),
         'thread_created_at': date.deserialize(context['thread_created_at']),
         'nonInteraction': 1,
     }

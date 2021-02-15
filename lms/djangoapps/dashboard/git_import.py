@@ -17,9 +17,9 @@ from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
 from opaque_keys.edx.locator import CourseLocator
 from six import StringIO
+from xmodule.util.sandboxing import DEFAULT_PYTHON_LIB_FILENAME
 
 from lms.djangoapps.dashboard.models import CourseImportLog
-from xmodule.util.sandboxing import DEFAULT_PYTHON_LIB_FILENAME
 
 log = logging.getLogger(__name__)
 
@@ -35,7 +35,7 @@ class GitImportError(Exception):
     def __init__(self, message=None):
         if message is None:
             message = self.MESSAGE
-        super(GitImportError, self).__init__(message)  # lint-amnesty, pylint: disable=super-with-arguments
+        super().__init__(message)
 
 
 class GitImportErrorNoDir(GitImportError):
@@ -43,11 +43,11 @@ class GitImportErrorNoDir(GitImportError):
     GitImportError when no directory exists at the specified path.
     """
     def __init__(self, repo_dir):
-        super(GitImportErrorNoDir, self).__init__(  # lint-amnesty, pylint: disable=super-with-arguments
+        super().__init__(
             _(
-                u"Path {0} doesn't exist, please create it, "
-                u"or configure a different path with "
-                u"GIT_REPO_DIR"
+                "Path {0} doesn't exist, please create it, "
+                "or configure a different path with "
+                "GIT_REPO_DIR"
             ).format(repo_dir)
         )
 
@@ -118,8 +118,8 @@ def cmd_log(cmd, cwd):
     """
     output = subprocess.check_output(cmd, cwd=cwd, stderr=subprocess.STDOUT).decode('utf-8')
 
-    log.debug(u'Command was: %r. Working directory was: %r', ' '.join(cmd), cwd)
-    log.debug(u'Command output was: %r', output)
+    log.debug('Command was: %r. Working directory was: %r', ' '.join(cmd), cwd)
+    log.debug('Command output was: %r', output)
     return output
 
 
@@ -135,15 +135,15 @@ def switch_branch(branch, rdir):
     try:
         cmd_log(['git', 'fetch', ], rdir)
     except subprocess.CalledProcessError as ex:
-        log.exception(u'Unable to fetch remote: %r', ex.output)
+        log.exception('Unable to fetch remote: %r', ex.output)
         raise GitImportErrorCannotBranch()  # lint-amnesty, pylint: disable=raise-missing-from
 
     # Check if the branch is available from the remote.
-    cmd = ['git', 'ls-remote', 'origin', '-h', 'refs/heads/{0}'.format(branch), ]
+    cmd = ['git', 'ls-remote', 'origin', '-h', f'refs/heads/{branch}', ]
     try:
         output = cmd_log(cmd, rdir)
     except subprocess.CalledProcessError as ex:
-        log.exception(u'Getting a list of remote branches failed: %r', ex.output)
+        log.exception('Getting a list of remote branches failed: %r', ex.output)
         raise GitImportErrorCannotBranch()  # lint-amnesty, pylint: disable=raise-missing-from
     if branch not in output:
         raise GitImportErrorRemoteBranchMissing()
@@ -152,7 +152,7 @@ def switch_branch(branch, rdir):
     try:
         output = cmd_log(cmd, rdir)
     except subprocess.CalledProcessError as ex:
-        log.exception(u'Getting a list of local branches failed: %r', ex.output)
+        log.exception('Getting a list of local branches failed: %r', ex.output)
         raise GitImportErrorCannotBranch()  # lint-amnesty, pylint: disable=raise-missing-from
     branches = []
     for line in output.split('\n'):
@@ -161,18 +161,18 @@ def switch_branch(branch, rdir):
     if branch not in branches:
         # Checkout with -b since it is remote only
         cmd = ['git', 'checkout', '--force', '--track',
-               '-b', branch, 'origin/{0}'.format(branch), ]
+               '-b', branch, f'origin/{branch}', ]
         try:
             cmd_log(cmd, rdir)
         except subprocess.CalledProcessError as ex:
-            log.exception(u'Unable to checkout remote branch: %r', ex.output)
+            log.exception('Unable to checkout remote branch: %r', ex.output)
             raise GitImportErrorCannotBranch()  # lint-amnesty, pylint: disable=raise-missing-from
     # Go ahead and reset hard to the newest version of the branch now that we know
     # it is local.
     try:
-        cmd_log(['git', 'reset', '--hard', 'origin/{0}'.format(branch), ], rdir)
+        cmd_log(['git', 'reset', '--hard', f'origin/{branch}', ], rdir)
     except subprocess.CalledProcessError as ex:
-        log.exception(u'Unable to reset to branch: %r', ex.output)
+        log.exception('Unable to reset to branch: %r', ex.output)
         raise GitImportErrorCannotBranch()  # lint-amnesty, pylint: disable=raise-missing-from
 
 
@@ -215,9 +215,9 @@ def add_repo(repo, rdir_in, branch=None):
         rdir = os.path.basename(rdir_in)
     else:
         rdir = repo.rsplit('/', 1)[-1].rsplit('.git', 1)[0]
-    log.debug(u'rdir = %s', rdir)
+    log.debug('rdir = %s', rdir)
 
-    rdirp = '{0}/{1}'.format(git_repo_dir, rdir)
+    rdirp = f'{git_repo_dir}/{rdir}'
     if os.path.exists(rdirp):
         log.info('directory already exists, doing a git pull instead '
                  'of git clone')
@@ -231,7 +231,7 @@ def add_repo(repo, rdir_in, branch=None):
     try:
         ret_git = cmd_log(cmd, cwd=cwd)
     except subprocess.CalledProcessError as ex:
-        log.exception(u'Error running git pull: %r', ex.output)
+        log.exception('Error running git pull: %r', ex.output)
         raise GitImportErrorCannotPull()  # lint-amnesty, pylint: disable=raise-missing-from
 
     if branch:
@@ -242,10 +242,10 @@ def add_repo(repo, rdir_in, branch=None):
     try:
         commit_id = cmd_log(cmd, cwd=rdirp)
     except subprocess.CalledProcessError as ex:
-        log.exception(u'Unable to get git log: %r', ex.output)
+        log.exception('Unable to get git log: %r', ex.output)
         raise GitImportErrorBadRepo()  # lint-amnesty, pylint: disable=raise-missing-from
 
-    ret_git += u'\nCommit ID: {0}'.format(commit_id)
+    ret_git += f'\nCommit ID: {commit_id}'
 
     # get branch
     cmd = ['git', 'symbolic-ref', '--short', 'HEAD', ]
@@ -254,10 +254,10 @@ def add_repo(repo, rdir_in, branch=None):
     except subprocess.CalledProcessError as ex:
         # I can't discover a way to excercise this, but git is complex
         # so still logging and raising here in case.
-        log.exception(u'Unable to determine branch: %r', ex.output)
+        log.exception('Unable to determine branch: %r', ex.output)
         raise GitImportErrorBadRepo()  # lint-amnesty, pylint: disable=raise-missing-from
 
-    ret_git += u'{0}Branch: {1}'.format('   \n', branch)
+    ret_git += '{}Branch: {}'.format('   \n', branch)
 
     # Get XML logging logger and capture debug to parse results
     output = StringIO()
@@ -306,8 +306,8 @@ def add_repo(repo, rdir_in, branch=None):
         # We want set course id in CourseImportLog as CourseLocator. So that in split module
         # environment course id remain consistent as CourseLocator instance.
         course_key = CourseLocator(*course_id)
-        cdir = '{0}/{1}'.format(git_repo_dir, course_key.course)
-        log.debug(u'Studio course dir = %s', cdir)
+        cdir = f'{git_repo_dir}/{course_key.course}'
+        log.debug('Studio course dir = %s', cdir)
 
         if os.path.exists(cdir) and not os.path.islink(cdir):
             log.debug('   -> exists, but is not symlink')
@@ -319,7 +319,7 @@ def add_repo(repo, rdir_in, branch=None):
                 log.exception('Failed to remove course directory')
 
         if not os.path.exists(cdir):
-            log.debug(u'   -> creating symlink between %s and %s', rdirp, cdir)
+            log.debug('   -> creating symlink between %s and %s', rdirp, cdir)
             try:
                 os.symlink(os.path.abspath(rdirp), os.path.abspath(cdir))
             except OSError:
@@ -348,5 +348,5 @@ def add_repo(repo, rdir_in, branch=None):
     )
     cil.save()
 
-    log.debug(u'saved CourseImportLog for %s', cil.course_id)
+    log.debug('saved CourseImportLog for %s', cil.course_id)
     mdb.close()

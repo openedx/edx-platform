@@ -19,7 +19,7 @@ class Command(BaseCommand):  # lint-amnesty, pylint: disable=missing-class-docst
 
         course = get_course(course_key)
         if not course:
-            raise CommandError(u'Invalid course id: {}'.format(course_id))
+            raise CommandError(f'Invalid course id: {course_id}')
 
         if course.discussion_link:
             self.stdout.write(course.discussion_link)

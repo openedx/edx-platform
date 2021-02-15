@@ -29,7 +29,7 @@ class DiscussionTab(TabFragmentViewMixin, EnrolledTab):
 
     @classmethod
     def is_enabled(cls, course, user=None):
-        if not super(DiscussionTab, cls).is_enabled(course, user):
+        if not super().is_enabled(course, user):
             return False
         # Disable the regular discussion tab if LTI-based external Discussion forum is enabled
         if DiscussionLtiCourseTab.is_enabled(course, user):

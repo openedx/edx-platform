@@ -10,7 +10,6 @@ from contextlib import closing
 from datetime import datetime
 
 import httpretty
-import six
 from PIL import Image
 from pytz import UTC
 
@@ -68,7 +67,7 @@ def _get_comment_callback(comment_data, thread_id, parent_id):
     return callback
 
 
-class CommentsServiceMockMixin(object):
+class CommentsServiceMockMixin:
     """Mixin with utility methods for mocking the comments service"""
     def register_get_threads_response(self, threads, page, num_pages):
         """Register a mock response for GET on the CS thread list endpoint"""
@@ -128,7 +127,7 @@ class CommentsServiceMockMixin(object):
         assert httpretty.is_enabled(), 'httpretty must be enabled to mock calls.'
         httpretty.register_uri(
             httpretty.GET,
-            "http://localhost:4567/api/v1/threads/{id}".format(id=thread_id),
+            f"http://localhost:4567/api/v1/threads/{thread_id}",
             body="",
             status=status_code
         )
@@ -152,9 +151,9 @@ class CommentsServiceMockMixin(object):
         specified.
         """
         if parent_id:
-            url = "http://localhost:4567/api/v1/comments/{}".format(parent_id)
+            url = f"http://localhost:4567/api/v1/comments/{parent_id}"
         else:
-            url = "http://localhost:4567/api/v1/threads/{}/comments".format(thread_id)
+            url = f"http://localhost:4567/api/v1/threads/{thread_id}/comments"
 
         assert httpretty.is_enabled(), 'httpretty must be enabled to mock calls.'
         httpretty.register_uri(
@@ -185,7 +184,7 @@ class CommentsServiceMockMixin(object):
         assert httpretty.is_enabled(), 'httpretty must be enabled to mock calls.'
         httpretty.register_uri(
             httpretty.GET,
-            "http://localhost:4567/api/v1/comments/{id}".format(id=comment_id),
+            f"http://localhost:4567/api/v1/comments/{comment_id}",
             body="",
             status=status_code
         )
@@ -208,7 +207,7 @@ class CommentsServiceMockMixin(object):
         assert httpretty.is_enabled(), 'httpretty must be enabled to mock calls.'
         httpretty.register_uri(
             httpretty.GET,
-            "http://localhost:4567/api/v1/users/{id}".format(id=user.id),
+            f"http://localhost:4567/api/v1/users/{user.id}",
             body=json.dumps({
                 "id": str(user.id),
                 "subscribed_thread_ids": subscribed_thread_ids or [],
@@ -222,7 +221,7 @@ class CommentsServiceMockMixin(object):
         assert httpretty.is_enabled(), 'httpretty must be enabled to mock calls.'
         httpretty.register_uri(
             httpretty.POST,
-            "http://localhost:4567/api/v1/users/{id}/retire".format(id=user.id),
+            f"http://localhost:4567/api/v1/users/{user.id}/retire",
             body=body,
             status=status
         )
@@ -231,7 +230,7 @@ class CommentsServiceMockMixin(object):
         assert httpretty.is_enabled(), 'httpretty must be enabled to mock calls.'
         httpretty.register_uri(
             httpretty.POST,
-            "http://localhost:4567/api/v1/users/{id}/replace_username".format(id=user.id),
+            f"http://localhost:4567/api/v1/users/{user.id}/replace_username",
             body=body,
             status=status
         )
@@ -241,7 +240,7 @@ class CommentsServiceMockMixin(object):
         assert httpretty.is_enabled(), 'httpretty must be enabled to mock calls.'
         httpretty.register_uri(
             httpretty.GET,
-            "http://localhost:4567/api/v1/users/{}/subscribed_threads".format(user.id),
+            f"http://localhost:4567/api/v1/users/{user.id}/subscribed_threads",
             body=json.dumps({
                 "collection": threads,
                 "page": page,
@@ -260,7 +259,7 @@ class CommentsServiceMockMixin(object):
         for method in [httpretty.POST, httpretty.DELETE]:
             httpretty.register_uri(
                 method,
-                "http://localhost:4567/api/v1/users/{id}/subscriptions".format(id=user.id),
+                f"http://localhost:4567/api/v1/users/{user.id}/subscriptions",
                 body=json.dumps({}),  # body is unused
                 status=200
             )
@@ -274,7 +273,7 @@ class CommentsServiceMockMixin(object):
         for method in [httpretty.PUT, httpretty.DELETE]:
             httpretty.register_uri(
                 method,
-                "http://localhost:4567/api/v1/threads/{}/votes".format(thread_id),
+                f"http://localhost:4567/api/v1/threads/{thread_id}/votes",
                 body=json.dumps({}),  # body is unused
                 status=200
             )
@@ -288,7 +287,7 @@ class CommentsServiceMockMixin(object):
         for method in [httpretty.PUT, httpretty.DELETE]:
             httpretty.register_uri(
                 method,
-                "http://localhost:4567/api/v1/comments/{}/votes".format(comment_id),
+                f"http://localhost:4567/api/v1/comments/{comment_id}/votes",
                 body=json.dumps({}),  # body is unused
                 status=200
             )
@@ -315,7 +314,7 @@ class CommentsServiceMockMixin(object):
         assert httpretty.is_enabled(), 'httpretty must be enabled to mock calls.'
         httpretty.register_uri(
             httpretty.POST,
-            "http://localhost:4567/api/v1/users/{id}/read".format(id=user.id),
+            f"http://localhost:4567/api/v1/users/{user.id}/read",
             params={'source_type': content_type, 'source_id': content_id},
             body=json.dumps({}),  # body is unused
             status=200
@@ -336,7 +335,7 @@ class CommentsServiceMockMixin(object):
         assert httpretty.is_enabled(), 'httpretty must be enabled to mock calls.'
         httpretty.register_uri(
             httpretty.DELETE,
-            "http://localhost:4567/api/v1/threads/{id}".format(id=thread_id),
+            f"http://localhost:4567/api/v1/threads/{thread_id}",
             body=json.dumps({}),  # body is unused
             status=200
         )
@@ -348,7 +347,7 @@ class CommentsServiceMockMixin(object):
         assert httpretty.is_enabled(), 'httpretty must be enabled to mock calls.'
         httpretty.register_uri(
             httpretty.DELETE,
-            "http://localhost:4567/api/v1/comments/{id}".format(id=comment_id),
+            f"http://localhost:4567/api/v1/comments/{comment_id}",
             body=json.dumps({}),  # body is unused
             status=200
         )
@@ -392,7 +391,7 @@ class CommentsServiceMockMixin(object):
             "voted": False,
             "vote_count": 0,
             "editable_fields": ["abuse_flagged", "following", "raw_body", "read", "title", "topic_id", "type", "voted"],
-            "course_id": six.text_type(self.course.id),
+            "course_id": str(self.course.id),
             "topic_id": "test_topic",
             "group_id": None,
             "group_name": None,
@@ -494,7 +493,7 @@ def make_paginated_api_response(results=None, count=0, num_pages=0, next_link=No
     }
 
 
-class ProfileImageTestMixin(object):
+class ProfileImageTestMixin:
     """
     Mixin with utility methods for user profile image
     """

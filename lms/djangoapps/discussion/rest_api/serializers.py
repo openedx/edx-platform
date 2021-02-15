@@ -9,6 +9,7 @@ from django.urls import reverse
 from rest_framework import serializers
 from six.moves.urllib.parse import urlencode, urlunparse
 
+from common.djangoapps.student.models import get_user_by_username_or_email
 from lms.djangoapps.discussion.django_comment_client.utils import (
     course_discussion_division_enabled,
     get_group_id_for_user,
@@ -34,7 +35,6 @@ from openedx.core.djangoapps.django_comment_common.models import (
     Role
 )
 from openedx.core.djangoapps.django_comment_common.utils import get_course_discussion_settings
-from common.djangoapps.student.models import get_user_by_username_or_email
 
 
 def get_context(course, request, thread=None):
@@ -103,10 +103,10 @@ class _ContentSerializer(serializers.Serializer):
     non_updatable_fields = set()
 
     def __init__(self, *args, **kwargs):
-        super(_ContentSerializer, self).__init__(*args, **kwargs)  # lint-amnesty, pylint: disable=super-with-arguments
+        super().__init__(*args, **kwargs)
 
         for field in self.non_updatable_fields:
-            setattr(self, "validate_{}".format(field), self._validate_non_updatable)
+            setattr(self, f"validate_{field}", self._validate_non_updatable)
 
     def _validate_non_updatable(self, value):
         """Ensure that a field is not edited in an update operation."""
@@ -223,7 +223,7 @@ class ThreadSerializer(_ContentSerializer):
     non_updatable_fields = NON_UPDATABLE_THREAD_FIELDS
 
     def __init__(self, *args, **kwargs):
-        super(ThreadSerializer, self).__init__(*args, **kwargs)  # lint-amnesty, pylint: disable=super-with-arguments
+        super().__init__(*args, **kwargs)
         # Compensate for the fact that some threads in the comments service do
         # not have the pinned field set
         if self.instance and self.instance.get("pinned") is None:
@@ -329,7 +329,7 @@ class CommentSerializer(_ContentSerializer):
 
     def __init__(self, *args, **kwargs):
         remove_fields = kwargs.pop('remove_fields', None)
-        super(CommentSerializer, self).__init__(*args, **kwargs)  # lint-amnesty, pylint: disable=super-with-arguments
+        super().__init__(*args, **kwargs)
 
         if remove_fields:
             # for multiple fields in a list
@@ -379,7 +379,7 @@ class CommentSerializer(_ContentSerializer):
 
     def to_representation(self, data):
         # pylint: disable=arguments-differ
-        data = super(CommentSerializer, self).to_representation(data)  # lint-amnesty, pylint: disable=super-with-arguments
+        data = super().to_representation(data)
 
         # Django Rest Framework v3 no longer includes None values
         # in the representation.  To maintain the previous behavior,
@@ -478,7 +478,7 @@ class DiscussionSettingsSerializer(serializers.Serializer):
     def __init__(self, *args, **kwargs):
         self.course = kwargs.pop('course')
         self.discussion_settings = kwargs.pop('discussion_settings')
-        super(DiscussionSettingsSerializer, self).__init__(*args, **kwargs)  # lint-amnesty, pylint: disable=super-with-arguments
+        super().__init__(*args, **kwargs)
 
     def validate(self, attrs):
         """
@@ -532,7 +532,7 @@ class DiscussionRolesSerializer(serializers.Serializer):
     user_id = serializers.CharField()
 
     def __init__(self, *args, **kwargs):
-        super(DiscussionRolesSerializer, self).__init__(*args, **kwargs)  # lint-amnesty, pylint: disable=super-with-arguments
+        super().__init__(*args, **kwargs)
         self.user = None
 
     def validate_user_id(self, user_id):  # lint-amnesty, pylint: disable=missing-function-docstring
@@ -540,7 +540,7 @@ class DiscussionRolesSerializer(serializers.Serializer):
             self.user = get_user_by_username_or_email(user_id)
             return user_id
         except DjangoUser.DoesNotExist:
-            raise ValidationError(u"'{}' is not a valid student identifier".format(user_id))  # lint-amnesty, pylint: disable=raise-missing-from
+            raise ValidationError(f"'{user_id}' is not a valid student identifier")  # lint-amnesty, pylint: disable=raise-missing-from
 
     def validate(self, attrs):
         """Validate the data at an object level."""
@@ -574,7 +574,7 @@ class DiscussionRolesMemberSerializer(serializers.Serializer):
     group_name = serializers.SerializerMethodField()
 
     def __init__(self, *args, **kwargs):
-        super(DiscussionRolesMemberSerializer, self).__init__(*args, **kwargs)  # lint-amnesty, pylint: disable=super-with-arguments
+        super().__init__(*args, **kwargs)
         self.course_discussion_settings = self.context['course_discussion_settings']
 
     def get_group_name(self, instance):

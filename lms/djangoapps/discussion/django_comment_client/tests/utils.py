@@ -3,8 +3,10 @@ Utilities for tests within the django_comment_client module.
 """
 
 
-from mock import patch
+from unittest.mock import patch
 
+from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
+from common.djangoapps.util.testing import UrlResetMixin
 from openedx.core.djangoapps.course_groups.tests.helpers import CohortFactory
 from openedx.core.djangoapps.django_comment_common.models import ForumsConfig, Role
 from openedx.core.djangoapps.django_comment_common.utils import (
@@ -13,20 +15,18 @@ from openedx.core.djangoapps.django_comment_common.utils import (
     set_course_discussion_settings
 )
 from openedx.core.lib.teams_config import TeamsConfig
-from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
-from common.djangoapps.util.testing import UrlResetMixin
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
 
-class ForumsEnableMixin(object):
+class ForumsEnableMixin:
     """
     Ensures that the forums are enabled for a given test class.
     """
     def setUp(self):
-        super(ForumsEnableMixin, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
 
         config = ForumsConfig.current()
         config.enabled = True
@@ -40,7 +40,7 @@ class CohortedTestCase(ForumsEnableMixin, UrlResetMixin, SharedModuleStoreTestCa
     @classmethod
     @patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
     def setUpClass(cls):
-        super(CohortedTestCase, cls).setUpClass()
+        super().setUpClass()
         cls.course = CourseFactory.create(
             cohort_config={
                 "cohorted": True,
@@ -61,7 +61,7 @@ class CohortedTestCase(ForumsEnableMixin, UrlResetMixin, SharedModuleStoreTestCa
 
     @patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
     def setUp(self):
-        super(CohortedTestCase, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
 
         seed_permissions_roles(self.course.id)
         self.student = UserFactory.create()
@@ -115,8 +115,8 @@ def config_course_discussions(
         division_scheme=CourseDiscussionSettings.COHORT,
     )
 
-    course.discussion_topics = dict((name, {"sort_key": "A", "id": to_id(name)})
-                                    for name in discussion_topics)
+    course.discussion_topics = {name: {"sort_key": "A", "id": to_id(name)}
+                                for name in discussion_topics}
     try:
         # Not implemented for XMLModulestore, which is used by test_cohorts.
         modulestore().update_item(course, ModuleStoreEnum.UserID.test)

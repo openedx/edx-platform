@@ -1,9 +1,6 @@
 # pylint: disable=consider-iterating-dictionary, missing-module-docstring
-
-
 import json
 
-import six
 from django.contrib.auth.models import AnonymousUser
 from django.core.exceptions import PermissionDenied
 from django.http import Http404
@@ -13,6 +10,8 @@ from django.test.utils import override_settings
 from django.urls import reverse
 from mock import patch
 
+from common.djangoapps.student.tests.factories import UserFactory
+from common.djangoapps.util.testing import UrlResetMixin
 from lms.djangoapps.discussion.notification_prefs import NOTIFICATION_PREF_KEY
 from lms.djangoapps.discussion.notification_prefs.views import (
     UsernameCipher,
@@ -22,8 +21,6 @@ from lms.djangoapps.discussion.notification_prefs.views import (
     set_subscription
 )
 from openedx.core.djangoapps.user_api.models import UserPreference
-from common.djangoapps.student.tests.factories import UserFactory
-from common.djangoapps.util.testing import UrlResetMixin
 
 
 @override_settings(SECRET_KEY="test secret key")
@@ -32,7 +29,7 @@ class NotificationPrefViewTest(UrlResetMixin, TestCase):  # lint-amnesty, pylint
 
     @patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
     def setUp(self):
-        super(NotificationPrefViewTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.user = UserFactory.create(username="testuser")
         # Tokens are intentionally hard-coded instead of computed to help us
         # avoid breaking existing links.
@@ -45,7 +42,7 @@ class NotificationPrefViewTest(UrlResetMixin, TestCase):  # lint-amnesty, pylint
             UserFactory.create(username="thisusernameissoveryverylong"):
             "AAAAAAAAAAAAAAAAAAAAAPECbYqPI7_W4mRF8LbTaHuHt3tNXPggZ1Bke-zDyEiZ",
             # Non-ASCII username
-            UserFactory.create(username=u"\u4e2d\u56fd"):
+            UserFactory.create(username="\u4e2d\u56fd"):
             "AAAAAAAAAAAAAAAAAAAAAMjfGAhZKIZsI3L-Z7nflTA="
         }
         self.request_factory = RequestFactory()
@@ -63,7 +60,7 @@ class NotificationPrefViewTest(UrlResetMixin, TestCase):  # lint-amnesty, pylint
         # now coerce username to utf-8 encoded str, since we test with non-ascii unicdoe above and
         # the unittest framework has hard time coercing to unicode.
         # decrypt also can't take a unicode input, so coerce its input to str
-        assert six.binary_type(user.username.encode('utf-8')) == UsernameCipher().decrypt(str(pref.value))
+        assert bytes(user.username.encode('utf-8')) == UsernameCipher().decrypt(str(pref.value))
 
     def assertNotPrefExists(self, user):
         """Ensure that the user does not have a persisted preference"""
@@ -189,7 +186,7 @@ class NotificationPrefViewTest(UrlResetMixin, TestCase):  # lint-amnesty, pylint
     def test_unsubscribe_invalid_token(self):
         def test_invalid_token(token, message):
             request = self.request_factory.get("dummy")
-            self.assertRaisesRegex(Http404, "^{}$".format(message), set_subscription, request, token, False)
+            self.assertRaisesRegex(Http404, f"^{message}$", set_subscription, request, token, False)
 
         # Invalid base64 encoding
         test_invalid_token("ZOMG INVALID BASE64 CHARS!!!", "base64url")
