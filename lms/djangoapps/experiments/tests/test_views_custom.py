@@ -29,7 +29,7 @@ class Rev934LoggedOutTests(APITestCase):  # lint-amnesty, pylint: disable=missin
 
         # Not-logged-in returns 401
         response = self.client.get(url)
-        self.assertEqual(response.status_code, 401)
+        assert response.status_code == 401
 
 
 class Rev934Tests(APITestCase, ModuleStoreTestCase):
@@ -50,28 +50,28 @@ class Rev934Tests(APITestCase, ModuleStoreTestCase):
     @override_waffle_flag(MOBILE_UPSELL_FLAG, active=False)
     def test_flag_off(self):
         response = self.client.get(self.url)
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
         expected = {
             'show_upsell': False,
             'upsell_flag': False,
         }
-        self.assertEqual(response.data, expected)
+        assert response.data == expected
 
     @override_waffle_flag(MOBILE_UPSELL_FLAG, active=True)
     def test_no_course_id(self):
         response = self.client.get(self.url)
-        self.assertEqual(response.status_code, 400)
+        assert response.status_code == 400
 
     @override_waffle_flag(MOBILE_UPSELL_FLAG, active=True)
     def test_bad_course_id(self):
         response = self.client.get(self.url, {'course_id': 'junk'})
-        self.assertEqual(response.status_code, 400)
+        assert response.status_code == 400
 
     @override_waffle_flag(MOBILE_UPSELL_FLAG, active=True)
     def test_simple_course(self):
         course = CourseFactory.create(start=now() - timedelta(days=30))
         response = self.client.get(self.url, {'course_id': str(course.id)})
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
         expected = {
             'show_upsell': False,
             'upsell_flag': True,
@@ -79,7 +79,7 @@ class Rev934Tests(APITestCase, ModuleStoreTestCase):
             'user_upsell': True,
             'basket_url': None,  # No verified mode means no basket link
         }
-        self.assertEqual(response.data, expected)
+        assert response.data == expected
 
     @override_waffle_flag(MOBILE_UPSELL_FLAG, active=True)
     def test_verified_course(self):
@@ -96,17 +96,17 @@ class Rev934Tests(APITestCase, ModuleStoreTestCase):
         )
 
         response = self.client.get(self.url, {'course_id': str(course.id)})
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
         result = response.data
-        self.assertIn('basket_url', result)
-        self.assertTrue(bool(result['basket_url']))
+        assert 'basket_url' in result
+        assert bool(result['basket_url'])
         expected = {
             'show_upsell': True,
             'price': u'$10',
             'basket_url': result['basket_url'],
             # Example basket_url: u'/verify_student/upgrade/org.0/course_0/test/'
         }
-        self.assertEqual(result, expected)
+        assert result == expected
 
     @override_waffle_flag(MOBILE_UPSELL_FLAG, active=True)
     def test_expired_verified_mode(self):
@@ -124,7 +124,7 @@ class Rev934Tests(APITestCase, ModuleStoreTestCase):
         )
 
         response = self.client.get(self.url, {'course_id': str(course.id)})
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
         expected = {
             'show_upsell': False,
             'upsell_flag': True,
@@ -132,7 +132,7 @@ class Rev934Tests(APITestCase, ModuleStoreTestCase):
             'user_upsell': True,
             'basket_url': None,  # Expired verified mode means no basket link
         }
-        self.assertEqual(response.data, expected)
+        assert response.data == expected
 
     @override_waffle_flag(MOBILE_UPSELL_FLAG, active=True)
     def test_not_started_course(self):
@@ -150,13 +150,13 @@ class Rev934Tests(APITestCase, ModuleStoreTestCase):
         )
 
         response = self.client.get(self.url, {'course_id': str(course.id)})
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
         expected = {
             'show_upsell': False,
             'upsell_flag': True,
             'course_running': False,
         }
-        self.assertEqual(response.data, expected)
+        assert response.data == expected
 
     @override_waffle_flag(MOBILE_UPSELL_FLAG, active=True)
     def test_ended_course(self):
@@ -174,13 +174,13 @@ class Rev934Tests(APITestCase, ModuleStoreTestCase):
         )
 
         response = self.client.get(self.url, {'course_id': str(course.id)})
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
         expected = {
             'show_upsell': False,
             'upsell_flag': True,
             'course_running': False,
         }
-        self.assertEqual(response.data, expected)
+        assert response.data == expected
 
     @override_waffle_flag(MOBILE_UPSELL_FLAG, active=True)
     def test_already_upgraded(self):
@@ -203,10 +203,10 @@ class Rev934Tests(APITestCase, ModuleStoreTestCase):
         )
 
         response = self.client.get(self.url, {'course_id': str(course.id)})
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
         result = response.data
-        self.assertIn('basket_url', result)
-        self.assertTrue(bool(result['basket_url']))
+        assert 'basket_url' in result
+        assert bool(result['basket_url'])
         expected = {
             'show_upsell': False,
             'upsell_flag': True,
@@ -215,4 +215,4 @@ class Rev934Tests(APITestCase, ModuleStoreTestCase):
             'basket_url': result['basket_url'],
             # Example basket_url: u'/verify_student/upgrade/org.0/course_0/test/'
         }
-        self.assertEqual(result, expected)
+        assert result == expected

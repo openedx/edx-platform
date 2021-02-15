@@ -91,8 +91,8 @@ class GradesAccessIntegrationTest(ProblemSubmissionTestMixin, SharedModuleStoreT
         course_structure = get_course_blocks(self.request.user, self.course.location)
         subsection_grade_factory = SubsectionGradeFactory(self.request.user, self.course, course_structure)
         grade = subsection_grade_factory.create(self.sequence, read_only=True)
-        self.assertEqual(grade.graded_total.earned, 4.0)
-        self.assertEqual(grade.graded_total.possible, 4.0)
+        assert grade.graded_total.earned == 4.0
+        assert grade.graded_total.possible == 4.0
 
         # set a block in the subsection to be visible to staff only
         with self.store.branch_setting(ModuleStoreEnum.Branch.draft_preferred):
@@ -103,10 +103,10 @@ class GradesAccessIntegrationTest(ProblemSubmissionTestMixin, SharedModuleStoreT
         course_structure = get_course_blocks(self.student, self.course.location)
 
         # ensure that problem_2 is not accessible for the student
-        self.assertNotIn(problem_2.location, course_structure)
+        assert problem_2.location not in course_structure
 
         # make sure we can still get the subsection grade
         subsection_grade_factory = SubsectionGradeFactory(self.student, self.course, course_structure)
         grade = subsection_grade_factory.create(self.sequence, read_only=True)
-        self.assertEqual(grade.graded_total.earned, 4.0)
-        self.assertEqual(grade.graded_total.possible, 4.0)
+        assert grade.graded_total.earned == 4.0
+        assert grade.graded_total.possible == 4.0

@@ -33,7 +33,7 @@ class TestHandleScoreChanged(ModuleStoreTestCase):
             course=self.course,
             subsection_grade=self.subsection_grade,
         )
-        self.assertTrue(mock_gating_milestone.called)
+        assert mock_gating_milestone.called
 
     @patch('lms.djangoapps.gating.api.gating_api.get_gating_milestone')
     def test_gating_disabled(self, mock_gating_milestone):
@@ -43,4 +43,4 @@ class TestHandleScoreChanged(ModuleStoreTestCase):
             course=self.course,
             subsection_grade=self.subsection_grade,
         )
-        self.assertFalse(mock_gating_milestone.called)
+        assert not mock_gating_milestone.called

@@ -146,19 +146,16 @@ class TestGatedContent(MilestonesTestCaseMixin, SharedModuleStoreTestCase):
         RequestCache.clear_all_namespaces()
 
         # access to gating content (seq1) remains constant
-        self.assertTrue(bool(has_access(user, 'load', self.seq1, self.course.id)))
+        assert bool(has_access(user, 'load', self.seq1, self.course.id))
 
         # access to gated content (seq2) remains constant, access is prevented in SeqModule loading
-        self.assertTrue(bool(has_access(user, 'load', self.seq2, self.course.id)))
+        assert bool(has_access(user, 'load', self.seq2, self.course.id))
 
     def assert_user_has_prereq_milestone(self, user, expected_has_milestone):
         """
         Verifies whether or not the user has the prereq milestone
         """
-        self.assertEqual(
-            milestones_api.user_has_milestone({'id': user.id}, self.prereq_milestone),
-            expected_has_milestone,
-        )
+        assert milestones_api.user_has_milestone({'id': user.id}, self.prereq_milestone) == expected_has_milestone
 
     def assert_course_grade(self, user, expected_percent):
         """
@@ -169,9 +166,9 @@ class TestGatedContent(MilestonesTestCaseMixin, SharedModuleStoreTestCase):
         """
         course_grade = CourseGradeFactory().read(user, self.course)
         for prob in [self.gating_prob1, self.gated_prob2, self.prob3]:
-            self.assertIn(prob.location, course_grade.problem_scores)
+            assert prob.location in course_grade.problem_scores
 
-        self.assertEqual(course_grade.percent, expected_percent)
+        assert course_grade.percent == expected_percent
 
     def test_gated_for_nonstaff(self):
         self.assert_user_has_prereq_milestone(self.non_staff_user, expected_has_milestone=False)

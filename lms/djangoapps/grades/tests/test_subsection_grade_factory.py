@@ -32,21 +32,15 @@ class TestSubsectionGradeFactory(ProblemSubmissionTestMixin, GradeTestBase):
         """
         Asserts that the given grade object has the expected score.
         """
-        self.assertEqual(
-            (grade.all_total.earned, grade.all_total.possible),
-            (expected_earned, expected_possible),
-        )
-        self.assertEqual(
-            (grade.graded_total.earned, grade.graded_total.possible),
-            (expected_earned, expected_possible),
-        )
+        assert (grade.all_total.earned, grade.all_total.possible) == (expected_earned, expected_possible)
+        assert (grade.graded_total.earned, grade.graded_total.possible) == (expected_earned, expected_possible)
 
     def test_create_zero(self):
         """
         Test that a zero grade is returned.
         """
         grade = self.subsection_grade_factory.create(self.sequence)
-        self.assertIsInstance(grade, ZeroSubsectionGrade)
+        assert isinstance(grade, ZeroSubsectionGrade)
         self.assert_grade(grade, 0.0, 1.0)
 
     @patch.dict(settings.FEATURES, {'ENABLE_COURSE_ASSESSMENT_GRADE_CHANGE_SIGNAL': True})
@@ -72,12 +66,12 @@ class TestSubsectionGradeFactory(ProblemSubmissionTestMixin, GradeTestBase):
         with mock_get_score(0, 0, None):
             self.subsection_grade_factory.update(self.sequence)
         # ensure no grades have been persisted
-        self.assertEqual(0, len(PersistentSubsectionGrade.objects.all()))
+        assert 0 == len(PersistentSubsectionGrade.objects.all())
 
         with mock_get_score(0, 0, None):
             self.subsection_grade_factory.update(self.sequence, score_deleted=True)
         # ensure a grade has been persisted
-        self.assertEqual(1, len(PersistentSubsectionGrade.objects.all()))
+        assert 1 == len(PersistentSubsectionGrade.objects.all())
 
     def test_update_if_higher_zero_denominator(self):
         """
@@ -131,7 +125,7 @@ class TestSubsectionGradeFactory(ProblemSubmissionTestMixin, GradeTestBase):
                 enabled_for_course=course_setting
             ):
                 self.subsection_grade_factory.create(self.sequence)
-        self.assertEqual(mock_read_saved_grade.called, feature_flag and course_setting)
+        assert mock_read_saved_grade.called == (feature_flag and course_setting)
 
     @ddt.data(
         (0, None),
@@ -153,8 +147,8 @@ class TestSubsectionGradeFactory(ProblemSubmissionTestMixin, GradeTestBase):
 
         # there should only be one persistent grade
         persistent_grade = PersistentSubsectionGrade.objects.first()
-        self.assertEqual(2, persistent_grade.earned_graded)
-        self.assertEqual(3, persistent_grade.possible_graded)
+        assert 2 == persistent_grade.earned_graded
+        assert 3 == persistent_grade.possible_graded
 
         # Now create the override
         PersistentSubsectionGradeOverride.update_or_create_override(

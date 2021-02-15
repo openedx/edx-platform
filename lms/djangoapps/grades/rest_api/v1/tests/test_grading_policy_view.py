@@ -95,7 +95,7 @@ class GradingPolicyTestMixin(object):
             reverse(self.view_name, kwargs={'course_id': course_id or self.course_id}),
             **headers
         )
-        self.assertEqual(response.status_code, expected_status_code)
+        assert response.status_code == expected_status_code
         return response
 
     def get_auth_header(self, user):

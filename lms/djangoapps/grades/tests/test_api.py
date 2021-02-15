@@ -75,9 +75,9 @@ class OverrideSubsectionGradeTests(ModuleStoreTestCase):
             self.course.id,
             self.subsection.location
         )
-        self.assertIsNotNone(override_obj)
-        self.assertEqual(override_obj.earned_graded_override, earned_graded)
-        self.assertEqual(override_obj.override_reason, 'Test Override Comment')
+        assert override_obj is not None
+        assert override_obj.earned_graded_override == earned_graded
+        assert override_obj.override_reason == 'Test Override Comment'
 
         for i in range(3):
             override_obj.override_reason = 'this field purposefully left blank'
@@ -98,15 +98,15 @@ class OverrideSubsectionGradeTests(ModuleStoreTestCase):
             self.subsection.location
         )
 
-        self.assertIsNotNone(override_obj)
-        self.assertEqual(override_obj.earned_graded_override, earned_graded)
-        self.assertEqual(override_obj.override_reason, 'Test Override Comment 2')
+        assert override_obj is not None
+        assert override_obj.earned_graded_override == earned_graded
+        assert override_obj.override_reason == 'Test Override Comment 2'
 
-        self.assertEqual(5, len(override_obj.history.all()))
+        assert 5 == len(override_obj.history.all())
         for history_entry in override_obj.history.all():
             if history_entry.override_reason.startswith('Test Override Comment'):
-                self.assertEqual(self.overriding_user, history_entry.history_user)
-                self.assertEqual(self.overriding_user.id, history_entry.history_user_id)
+                assert self.overriding_user == history_entry.history_user
+                assert self.overriding_user.id == history_entry.history_user_id
             else:
-                self.assertIsNone(history_entry.history_user)
-                self.assertIsNone(history_entry.history_user_id)
+                assert history_entry.history_user is None
+                assert history_entry.history_user_id is None
