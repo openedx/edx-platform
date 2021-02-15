@@ -27,7 +27,7 @@ class SAMLConfigurationViewSet(viewsets.ModelViewSet):
     serializer_class = SAMLConfigurationSerializer
     authentication_classes = (OAuth2AuthenticationAllowInactiveUser,)
     permission_classes = (IsAuthenticated, AMCAdminPermission)
-    filter_class = SAMLConfigurationFilter
+    filterset_class = SAMLConfigurationFilter
 
 
 class SAMLConfigurationSiteDetail(generics.RetrieveAPIView):
@@ -52,7 +52,7 @@ class SAMLProviderConfigViewSet(viewsets.ModelViewSet):
     serializer_class = SAMLProviderConfigSerializer
     authentication_classes = (OAuth2AuthenticationAllowInactiveUser,)
     permission_classes = (IsAuthenticated, AMCAdminPermission)
-    filter_class = SAMLProviderConfigFilter
+    filterset_class = SAMLProviderConfigFilter
 
 
 class SAMLProviderSiteDetail(generics.ListAPIView):
