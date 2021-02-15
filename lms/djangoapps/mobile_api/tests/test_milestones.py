@@ -141,4 +141,4 @@ class MobileAPIMilestonesMixin(object):
             self.api_response()
         else:
             response = self.api_response(expected_response_code=404)
-            self.assertEqual(response.data, MilestoneAccessError().to_json())
+            assert response.data == MilestoneAccessError().to_json()

@@ -141,10 +141,7 @@ class LtiLaunchTest(LtiTestMixin, TestCase):
         """
         for missing_param in views.REQUIRED_PARAMETERS:
             response = self.launch_with_missing_parameter(missing_param)
-            self.assertEqual(
-                response.status_code, 400,
-                'Launch should fail when parameter ' + missing_param + ' is missing'
-            )
+            assert response.status_code == 400, (('Launch should fail when parameter ' + missing_param) + ' is missing')
 
     def test_launch_with_disabled_feature_flag(self):
         """
@@ -154,7 +151,7 @@ class LtiLaunchTest(LtiTestMixin, TestCase):
         with patch.dict('django.conf.settings.FEATURES', {'ENABLE_LTI_PROVIDER': False}):
             request = build_launch_request()
             response = views.lti_launch(request, None, None)
-            self.assertEqual(response.status_code, 403)
+            assert response.status_code == 403
 
     def test_forbidden_if_signature_fails(self):
         """
@@ -165,8 +162,8 @@ class LtiLaunchTest(LtiTestMixin, TestCase):
 
         request = build_launch_request()
         response = views.lti_launch(request, None, None)
-        self.assertEqual(response.status_code, 403)
-        self.assertEqual(response.status_code, 403)
+        assert response.status_code == 403
+        assert response.status_code == 403
 
     @patch('lms.djangoapps.lti_provider.views.render_courseware')
     def test_lti_consumer_record_supplemented_with_guid(self, _render):
@@ -178,7 +175,7 @@ class LtiLaunchTest(LtiTestMixin, TestCase):
         consumer = models.LtiConsumer.objects.get(
             consumer_key=LTI_DEFAULT_PARAMS['oauth_consumer_key']
         )
-        self.assertEqual(consumer.instance_guid, u'consumer instance guid')
+        assert consumer.instance_guid == u'consumer instance guid'
 
 
 class LtiLaunchTestRender(LtiTestMixin, RenderXBlockTestMixin, ModuleStoreTestCase):

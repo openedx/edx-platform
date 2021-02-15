@@ -65,14 +65,14 @@ class TestAppVersionConfigModel(TestCase):
     )
     @ddt.unpack
     def test_no_configs_available(self, platform, version):
-        self.assertIsNone(AppVersionConfig.latest_version(platform))
-        self.assertIsNone(AppVersionConfig.last_supported_date(platform, version))
+        assert AppVersionConfig.latest_version(platform) is None
+        assert AppVersionConfig.last_supported_date(platform, version) is None
 
     @ddt.data(('ios', '6.6.6'), ('android', '8.8.8'))
     @ddt.unpack
     def test_latest_version(self, platform, latest_version):
         self.set_app_version_config()
-        self.assertEqual(latest_version, AppVersionConfig.latest_version(platform))
+        assert latest_version == AppVersionConfig.latest_version(platform)
 
     @ddt.data(
         ('ios', '3.3.3', datetime(9000, 1, 1, tzinfo=UTC)),
@@ -84,7 +84,7 @@ class TestAppVersionConfigModel(TestCase):
     @ddt.unpack
     def test_last_supported_date(self, platform, version, last_supported_date):
         self.set_app_version_config()
-        self.assertEqual(last_supported_date, AppVersionConfig.last_supported_date(platform, version))
+        assert last_supported_date == AppVersionConfig.last_supported_date(platform, version)
 
 
 class TestMobileApiConfig(TestCase):
@@ -96,22 +96,16 @@ class TestMobileApiConfig(TestCase):
         """Check that video_profiles config is returned in order as a list"""
         MobileApiConfig(video_profiles="mobile_low,mobile_high,youtube").save()
         video_profile_list = MobileApiConfig.get_video_profiles()
-        self.assertEqual(
-            video_profile_list,
-            [u'mobile_low', u'mobile_high', u'youtube']
-        )
+        assert video_profile_list == [u'mobile_low', u'mobile_high', u'youtube']
 
     def test_video_profile_list_with_whitespace(self):
         """Check video_profiles config with leading and trailing whitespace"""
         MobileApiConfig(video_profiles=" mobile_low , mobile_high,youtube ").save()
         video_profile_list = MobileApiConfig.get_video_profiles()
-        self.assertEqual(
-            video_profile_list,
-            [u'mobile_low', u'mobile_high', u'youtube']
-        )
+        assert video_profile_list == [u'mobile_low', u'mobile_high', u'youtube']
 
     def test_empty_video_profile(self):
         """Test an empty video_profile"""
         MobileApiConfig(video_profiles="").save()
         video_profile_list = MobileApiConfig.get_video_profiles()
-        self.assertEqual(video_profile_list, [])
+        assert video_profile_list == []

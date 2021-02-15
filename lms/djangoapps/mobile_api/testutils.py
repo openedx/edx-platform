@@ -89,7 +89,7 @@ class MobileAPITestCase(ModuleStoreTestCase, APITestCase):
         url = self.reverse_url(reverse_args, **kwargs)
         response = self.url_method(url, data=data, **kwargs)
         if expected_response_code is not None:
-            self.assertEqual(response.status_code, expected_response_code)
+            assert response.status_code == expected_response_code
         return response
 
     def reverse_url(self, reverse_args=None, **kwargs):
@@ -153,13 +153,13 @@ class MobileCourseAccessTestMixin(MobileAPIMilestonesMixin):
 
     def verify_success(self, response):
         """Base implementation of verifying a successful response."""
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
 
     def verify_failure(self, response, error_type=None):
         """Base implementation of verifying a failed response."""
-        self.assertEqual(response.status_code, 404)
+        assert response.status_code == 404
         if error_type:
-            self.assertEqual(response.data, error_type.to_json())
+            assert response.data == error_type.to_json()
 
     def init_course_access(self, course_id=None):
         """Base implementation of initializing the user for each test."""

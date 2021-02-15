@@ -31,15 +31,15 @@ class CommandArgsTestCase(TestCase):
     def test_course_keys(self):
         parser = self._get_arg_parser()
         args = parser.parse_args(['course-v1:edX+test_course+2525_fall', 'UBC/Law281/2015_T1'])
-        self.assertEqual(len(args.course_keys), 2)
+        assert len(args.course_keys) == 2
         key = args.course_keys[0]
-        self.assertIsInstance(key, CourseKey)
-        self.assertEqual(six.text_type(key), 'course-v1:edX+test_course+2525_fall')
+        assert isinstance(key, CourseKey)
+        assert six.text_type(key) == 'course-v1:edX+test_course+2525_fall'
 
     def test_no_course_keys(self):
         parser = self._get_arg_parser()
         args = parser.parse_args([])
-        self.assertEqual(args.course_keys, [])
+        assert args.course_keys == []
 
 
 class CommandExecutionTestCase(SharedModuleStoreTestCase):
@@ -105,11 +105,11 @@ class CommandExecutionTestCase(SharedModuleStoreTestCase):
             return mock_update.called
 
     def test_command_with_no_course_keys(self):
-        self.assertTrue(self._scores_sent_with_args(course_keys=[]))
+        assert self._scores_sent_with_args(course_keys=[])
 
     def test_command_with_course_key(self):
-        self.assertTrue(self._scores_sent_with_args(course_keys=[self.course_key]))
+        assert self._scores_sent_with_args(course_keys=[self.course_key])
 
     def test_command_with_wrong_course_key(self):
         fake_course_key = self.store.make_course_key(u'not', u'the', u'course')
-        self.assertFalse(self._scores_sent_with_args(course_keys=[fake_course_key]))
+        assert not self._scores_sent_with_args(course_keys=[fake_course_key])
