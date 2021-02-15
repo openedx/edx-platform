@@ -4,10 +4,12 @@ Tests of experiment functionality
 
 from datetime import timedelta
 from decimal import Decimal
-from django.utils.timezone import now
-from unittest import TestCase  # lint-amnesty, pylint: disable=wrong-import-order
+from unittest import TestCase
 
+from django.utils.timezone import now
 from opaque_keys.edx.keys import CourseKey
+
+from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
 from lms.djangoapps.course_blocks.transformers.tests.helpers import ModuleStoreTestCase
 from lms.djangoapps.courseware import courses  # lint-amnesty, pylint: disable=unused-import
 from lms.djangoapps.experiments.utils import (
@@ -17,7 +19,6 @@ from lms.djangoapps.experiments.utils import (
     get_unenrolled_courses,
     is_enrolled_in_course_run
 )
-from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
 from xmodule.modulestore.tests.factories import CourseFactory
 
 
@@ -27,7 +28,7 @@ class ExperimentUtilsTests(ModuleStoreTestCase, TestCase):
     """
 
     def setUp(self):
-        super(ExperimentUtilsTests, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
 
         # Create a course run
         self.run_a_price = '86.00'
@@ -103,7 +104,7 @@ class ExperimentUtilsTests(ModuleStoreTestCase, TestCase):
         courses = [course_a]  # lint-amnesty, pylint: disable=redefined-outer-name
 
         price, skus = get_program_price_and_skus(courses)
-        expected_price = u'$199.23'
+        expected_price = '$199.23'
         assert expected_price == price
         assert 1 == len(skus)
         assert self.entitlement_a_sku in skus
@@ -116,7 +117,7 @@ class ExperimentUtilsTests(ModuleStoreTestCase, TestCase):
         courses = [course_a, course_b]  # lint-amnesty, pylint: disable=redefined-outer-name
 
         price, skus = get_program_price_and_skus(courses)
-        expected_price = u'$285.23'
+        expected_price = '$285.23'
         assert expected_price == price
         assert 2 == len(skus)
         assert self.run_a_sku in skus

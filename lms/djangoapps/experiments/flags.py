@@ -10,9 +10,9 @@ import pytz
 from crum import get_current_request
 from edx_django_utils.cache import RequestCache
 
+from common.djangoapps.track import segment
 from lms.djangoapps.experiments.stable_bucketing import stable_bucketing_hash_group
 from openedx.core.djangoapps.waffle_utils import CourseWaffleFlag
-from common.djangoapps.track import segment
 
 log = logging.getLogger(__name__)
 
@@ -76,7 +76,7 @@ class ExperimentWaffleFlag(CourseWaffleFlag):
         self.num_buckets = num_buckets
         self.experiment_id = experiment_id
         self.bucket_flags = [
-            CourseWaffleFlag(waffle_namespace, '{}.{}'.format(flag_name, bucket), module_name)
+            CourseWaffleFlag(waffle_namespace, f'{flag_name}.{bucket}', module_name)
             for bucket in range(num_buckets)
         ]
         self.use_course_aware_bucketing = use_course_aware_bucketing
@@ -205,9 +205,9 @@ class ExperimentWaffleFlag(CourseWaffleFlag):
         # buckets for different course-runs.
         experiment_name = bucketing_group_name = self.name
         if course_key:
-            experiment_name += ".{}".format(course_key)
+            experiment_name += f".{course_key}"
         if course_key and self.use_course_aware_bucketing:
-            bucketing_group_name += ".{}".format(course_key)
+            bucketing_group_name += f".{course_key}"
 
         # Check if we have a cache for this request already
         request_cache = RequestCache('experiments')
@@ -239,7 +239,7 @@ class ExperimentWaffleFlag(CourseWaffleFlag):
                 bucketing_group_name, self.num_buckets, user
             )
 
-        session_key = 'tracked.{}'.format(experiment_name)
+        session_key = f'tracked.{experiment_name}'
         anonymous = not hasattr(request, 'user') or not request.user.id
         if (
                 track and hasattr(request, 'session') and

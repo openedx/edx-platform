@@ -4,25 +4,27 @@ Tests for experimentation views
 
 
 import unittest
+from datetime import timedelta
+from unittest.mock import patch
 
 import six.moves.urllib.error
 import six.moves.urllib.parse
 import six.moves.urllib.request
-from datetime import timedelta
 from django.conf import settings
 from django.core.handlers.wsgi import WSGIRequest
-from django.utils.timezone import now
 from django.test.utils import override_settings
 from django.urls import reverse
-from lms.djangoapps.course_blocks.transformers.tests.helpers import ModuleStoreTestCase
-from mock import patch  # lint-amnesty, pylint: disable=wrong-import-order
-from rest_framework.test import APITestCase  # lint-amnesty, pylint: disable=wrong-import-order
+from django.utils.timezone import now
+from rest_framework.test import APITestCase
 
-from lms.djangoapps.experiments.factories import ExperimentDataFactory, ExperimentKeyValueFactory
-from lms.djangoapps.experiments.models import ExperimentData, ExperimentKeyValue  # lint-amnesty, pylint: disable=unused-import
-from lms.djangoapps.experiments.serializers import ExperimentDataSerializer
 from common.djangoapps.student.tests.factories import UserFactory
-
+from lms.djangoapps.course_blocks.transformers.tests.helpers import ModuleStoreTestCase
+from lms.djangoapps.experiments.factories import ExperimentDataFactory, ExperimentKeyValueFactory
+from lms.djangoapps.experiments.models import (  # lint-amnesty, pylint: disable=unused-import
+    ExperimentData,
+    ExperimentKeyValue
+)
+from lms.djangoapps.experiments.serializers import ExperimentDataSerializer
 from xmodule.modulestore.tests.factories import CourseFactory
 
 CROSS_DOMAIN_REFERER = 'https://ecommerce.edx.org'
@@ -75,18 +77,18 @@ class ExperimentDataViewSetTests(APITestCase, ModuleStoreTestCase):  # lint-amne
         data = ExperimentDataFactory.create_batch(3, user=user, experiment_id=experiment_id)
 
         qs = six.moves.urllib.parse.urlencode({'experiment_id': experiment_id})
-        response = self.client.get('{url}?{qs}'.format(url=url, qs=qs))
+        response = self.client.get(f'{url}?{qs}')
         assert response.status_code == 200
         assert response.data['results'] == ExperimentDataSerializer(data, many=True).data
 
         datum = data[0]
         qs = six.moves.urllib.parse.urlencode({'key': datum.key})
-        response = self.client.get('{url}?{qs}'.format(url=url, qs=qs))
+        response = self.client.get(f'{url}?{qs}')
         assert response.status_code == 200
         assert response.data['results'] == ExperimentDataSerializer([datum], many=True).data
 
         qs = six.moves.urllib.parse.urlencode({'experiment_id': experiment_id, 'key': datum.key})
-        response = self.client.get('{url}?{qs}'.format(url=url, qs=qs))
+        response = self.client.get(f'{url}?{qs}')
         assert response.status_code == 200
         assert response.data['results'] == ExperimentDataSerializer([datum], many=True).data
 
@@ -197,7 +199,7 @@ class ExperimentCrossDomainTests(APITestCase):
     """Tests for handling cross-domain requests"""
 
     def setUp(self):
-        super(ExperimentCrossDomainTests, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.client = self.client_class(enforce_csrf_checks=True)
 
     @cross_domain_config

@@ -15,7 +15,7 @@ class ExperimentDataCreateSerializer(serializers.ModelSerializer):  # lint-amnes
     user = serializers.SlugRelatedField(slug_field='username', default=serializers.CurrentUserDefault(), required=False,
                                         queryset=User.objects.all())
 
-    class Meta(object):
+    class Meta:
         model = ExperimentData
         fields = ('id', 'experiment_id', 'user', 'key', 'value', 'created', 'modified',)
 
@@ -28,6 +28,6 @@ class ExperimentDataSerializer(serializers.ModelSerializer):
 
 
 class ExperimentKeyValueSerializer(serializers.ModelSerializer):
-    class Meta(object):
+    class Meta:
         model = ExperimentKeyValue
         fields = ('id', 'experiment_id', 'key', 'value', 'created', 'modified',)

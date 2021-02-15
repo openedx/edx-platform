@@ -6,18 +6,22 @@ This module contains signals needed for email integration
 import datetime
 import logging
 from random import randint
-from typing import Dict, Any, Optional, Tuple
+from typing import Any, Dict, Optional, Tuple
 
 import crum
 from celery.exceptions import TimeoutError as CeleryTimeoutError
 from django.conf import settings
 from django.dispatch import receiver
+from edx_toggles.toggles import LegacyWaffleSwitchNamespace
 from sailthru.sailthru_error import SailthruClientError
-from six import text_type
 
 from common.djangoapps import third_party_auth
 from common.djangoapps.course_modes.models import CourseMode
-from edx_toggles.toggles import LegacyWaffleSwitchNamespace  # lint-amnesty, pylint: disable=wrong-import-order
+from common.djangoapps.student.helpers import does_user_profile_exist
+from common.djangoapps.student.models import UserProfile
+from common.djangoapps.student.signals import SAILTHRU_AUDIT_PURCHASE
+from common.djangoapps.track import segment
+from common.djangoapps.util.model_utils import USER_FIELD_CHANGED, USER_FIELDS_CHANGED
 from lms.djangoapps.email_marketing.tasks import (
     get_email_cookies_via_sailthru,
     update_course_enrollment,
@@ -27,11 +31,6 @@ from lms.djangoapps.email_marketing.tasks import (
 from openedx.core.djangoapps.lang_pref import LANGUAGE_KEY
 from openedx.core.djangoapps.user_authn.cookies import CREATE_LOGON_COOKIE
 from openedx.core.djangoapps.user_authn.views.register import REGISTER_USER
-from common.djangoapps.student.helpers import does_user_profile_exist
-from common.djangoapps.student.signals import SAILTHRU_AUDIT_PURCHASE
-from common.djangoapps.student.models import UserProfile
-from common.djangoapps.track import segment
-from common.djangoapps.util.model_utils import USER_FIELD_CHANGED, USER_FIELDS_CHANGED
 
 from .models import EmailMarketingConfiguration
 
@@ -109,17 +108,17 @@ def add_email_marketing_cookies(sender, response=None, user=None,
         _log_sailthru_api_call_time(time_before_call)
 
     except CeleryTimeoutError as exc:
-        log.error(u"Timeout error while attempting to obtain cookie from Sailthru: %s", text_type(exc))
+        log.error("Timeout error while attempting to obtain cookie from Sailthru: %s", str(exc))
         return response
     except SailthruClientError as exc:
-        log.error(u"Exception attempting to obtain cookie from Sailthru: %s", text_type(exc))
+        log.error("Exception attempting to obtain cookie from Sailthru: %s", str(exc))
         return response
     except Exception:  # lint-amnesty, pylint: disable=broad-except
-        log.error(u"Exception Connecting to celery task for %s", user.email)
+        log.error("Exception Connecting to celery task for %s", user.email)
         return response
 
     if not cookie:
-        log.error(u"No cookie returned attempting to obtain cookie from Sailthru for %s", user.email)
+        log.error("No cookie returned attempting to obtain cookie from Sailthru for %s", user.email)
         return response
     else:
         response.set_cookie(
@@ -130,7 +129,7 @@ def add_email_marketing_cookies(sender, response=None, user=None,
             path='/',
             secure=request.is_secure()
         )
-        log.info(u"sailthru_hid cookie:%s successfully retrieved for user %s", cookie, user.email)
+        log.info("sailthru_hid cookie:%s successfully retrieved for user %s", cookie, user.email)
 
     return response
 
@@ -287,7 +286,7 @@ def _create_sailthru_user_vars(user, profile, registration=None):
 
         if profile.year_of_birth:
             sailthru_vars['year_of_birth'] = profile.year_of_birth
-        sailthru_vars['country'] = text_type(profile.country.code)
+        sailthru_vars['country'] = str(profile.country.code)
 
     if registration:
         sailthru_vars['activation_key'] = registration.activation_key
@@ -315,7 +314,7 @@ def _log_sailthru_api_call_time(time_before_call):
     time_after_call = datetime.datetime.now()
     delta_sailthru_api_call_time = time_after_call - time_before_call
 
-    log.info(u"Started at %s and ended at %s, time spent:%s milliseconds",
+    log.info("Started at %s and ended at %s, time spent:%s milliseconds",
              time_before_call.isoformat(' '),
              time_after_call.isoformat(' '),
              delta_sailthru_api_call_time.microseconds / 1000)
