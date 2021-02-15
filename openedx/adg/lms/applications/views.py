@@ -12,10 +12,11 @@ from rest_framework.status import HTTP_400_BAD_REQUEST
 
 from openedx.adg.lms.applications.forms import ExtendedUserProfileForm, UserApplicationForm, UserProfileForm
 from openedx.adg.lms.registration_extension.models import ExtendedUserProfile
+from openedx.adg.lms.utils.date_utils import month_choices, year_choices
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 
 from .helpers import send_application_submission_confirmation_email
-from .models import ApplicationHub, PrerequisiteCourse, UserApplication
+from .models import ApplicationHub, Education, PrerequisiteCourse, UserApplication
 
 
 class RedirectToLoginOrRelevantPageMixin(AccessMixin):
@@ -145,7 +146,7 @@ class ContactInformationView(RedirectToLoginOrRelevantPageMixin, View):
     View for the contact information of user application
     """
 
-    login_url = '/register'
+    login_url = reverse_lazy('register_user')
     template_name = 'adg/lms/applications/contact_info.html'
     user_profile_form = None
     extended_profile_form = None
@@ -204,7 +205,7 @@ class ContactInformationView(RedirectToLoginOrRelevantPageMixin, View):
 
             if self.application_form.cleaned_data.get('resume'):
                 return redirect(reverse_lazy('application_cover_letter'))
-            return redirect(reverse_lazy('application_experience'))
+            return redirect(reverse_lazy('application_education_experience'))
         return render(request, self.template_name, forms)
 
     def is_valid(self):
@@ -262,3 +263,52 @@ class ContactInformationView(RedirectToLoginOrRelevantPageMixin, View):
                     'birth_year': extended_profile.birth_date.year,
                 })
         return context
+
+
+class EducationAndExperienceView(RedirectToLoginOrRelevantPageMixin, TemplateView):
+    """
+    Education and Experience View
+    """
+
+    login_url = reverse_lazy('register_user')
+    template_name = 'adg/lms/applications/education_experience.html'
+
+    def get_context_data(self, **kwargs):
+        """
+        Context data to pre-fill forms and dropdown options.
+
+        Returns:
+            Dict.
+        """
+        context = super().get_context_data(**kwargs)
+        user_application = self.request.user.application
+        context.update({
+            'degree_types': Education.DEGREE_TYPES,
+            'month_choices': month_choices(),
+            'year_choices': year_choices(),
+            'user_application_id': user_application.id,
+            'is_work_experience_not_applicable': user_application.is_work_experience_not_applicable
+        })
+
+        return context
+
+    def is_precondition_satisfied(self):
+        """
+        Checks if a user's application is started but not completed.
+
+        Returns:
+            Boolean, True or False.
+        """
+        application_hub = getattr(self.request.user, 'application_hub', None)
+
+        return (
+            application_hub and
+            application_hub.is_written_application_started and
+            not application_hub.is_written_application_completed
+        )
+
+    def handle_no_permission(self):
+        """
+        Redirects to application hub.
+        """
+        return redirect('application_hub')
