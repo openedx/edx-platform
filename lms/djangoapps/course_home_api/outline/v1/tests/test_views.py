@@ -4,14 +4,16 @@ Tests for Outline Tab API in the Course Home API
 
 import itertools
 from datetime import datetime
+from unittest.mock import Mock, patch
 
 import ddt
-from edx_toggles.toggles.testutils import override_waffle_flag
 from django.conf import settings
 from django.urls import reverse
-from mock import Mock, patch
+from edx_toggles.toggles.testutils import override_waffle_flag
 
 from common.djangoapps.course_modes.models import CourseMode
+from common.djangoapps.student.models import CourseEnrollment
+from common.djangoapps.student.tests.factories import UserFactory
 from lms.djangoapps.course_home_api.tests.utils import BaseCourseHomeTests
 from lms.djangoapps.course_home_api.toggles import COURSE_HOME_MICROFRONTEND, COURSE_HOME_MICROFRONTEND_OUTLINE_TAB
 from lms.djangoapps.experiments.testutils import override_experiment_waffle_flag
@@ -20,11 +22,11 @@ from openedx.core.djangoapps.user_api.preferences.api import set_user_preference
 from openedx.core.djangoapps.user_api.tests.factories import UserCourseTagFactory
 from openedx.features.course_duration_limits.models import CourseDurationLimitConfig
 from openedx.features.course_experience import (
-    COURSE_ENABLE_UNENROLLED_ACCESS_FLAG, DISPLAY_COURSE_SOCK_FLAG, ENABLE_COURSE_GOALS,
+    COURSE_ENABLE_UNENROLLED_ACCESS_FLAG,
+    DISPLAY_COURSE_SOCK_FLAG,
+    ENABLE_COURSE_GOALS
 )
 from openedx.features.discounts.applicability import DISCOUNT_APPLICABILITY_FLAG
-from common.djangoapps.student.models import CourseEnrollment
-from common.djangoapps.student.tests.factories import UserFactory
 from xmodule.course_module import COURSE_VISIBILITY_PUBLIC, COURSE_VISIBILITY_PUBLIC_OUTLINE
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 

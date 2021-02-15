@@ -88,7 +88,7 @@ class HiddenContentTransformer(FilteringTransformerMixin, BlockStructureTransfor
             func_merge_ancestors=min,
         )
 
-        block_structure.request_xblock_fields(u'self_paced', u'end')
+        block_structure.request_xblock_fields('self_paced', 'end')
 
     def transform_block_filters(self, usage_info, block_structure):
         # Users with staff access bypass the Visibility check.

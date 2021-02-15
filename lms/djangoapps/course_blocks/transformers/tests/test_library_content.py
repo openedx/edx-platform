@@ -3,19 +3,18 @@ Tests for ContentLibraryTransformer.
 """
 
 
-from six.moves import range
-import mock
+from unittest import mock
 
+from common.djangoapps.student.tests.factories import CourseEnrollmentFactory
 from openedx.core.djangoapps.content.block_structure.api import clear_course_from_cache
 from openedx.core.djangoapps.content.block_structure.transformers import BlockStructureTransformers
-from common.djangoapps.student.tests.factories import CourseEnrollmentFactory
 
 from ...api import get_course_blocks
-from ..library_content import ContentLibraryTransformer, ContentLibraryOrderTransformer
+from ..library_content import ContentLibraryOrderTransformer, ContentLibraryTransformer
 from .helpers import CourseStructureTestCase
 
 
-class MockedModule(object):
+class MockedModule:
     """
     Object with mocked selected modules for user.
     """
@@ -36,7 +35,7 @@ class ContentLibraryTransformerTestCase(CourseStructureTestCase):
         """
         Setup course structure and create user for content library transformer test.
         """
-        super(ContentLibraryTransformerTestCase, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
 
         # Build course.
         self.course_hierarchy = self.get_course_hierarchy()
@@ -168,7 +167,7 @@ class ContentLibraryOrderTransformerTestCase(CourseStructureTestCase):
         """
         Setup course structure and create user for content library order transformer test.
         """
-        super(ContentLibraryOrderTransformerTestCase, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.course_hierarchy = self.get_course_hierarchy()
         self.blocks = self.build_course(self.course_hierarchy)
         self.course = self.blocks['course']

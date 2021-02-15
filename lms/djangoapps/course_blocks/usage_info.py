@@ -7,7 +7,7 @@ Transformers.
 from lms.djangoapps.courseware.access import _has_access_to_course
 
 
-class CourseUsageInfo(object):
+class CourseUsageInfo:
     '''
     A class object that encapsulates the course and user context to be
     used as currency across block structure transformers, by passing

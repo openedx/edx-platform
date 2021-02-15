@@ -3,6 +3,7 @@ Progress Tab Serializers
 """
 from rest_framework import serializers
 from rest_framework.reverse import reverse
+
 from lms.djangoapps.certificates.models import CertificateStatuses
 
 

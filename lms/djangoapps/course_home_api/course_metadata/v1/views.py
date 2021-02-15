@@ -2,6 +2,7 @@
 General view for the Course Home that contains metadata every page needs.
 """
 
+from opaque_keys.edx.keys import CourseKey
 from rest_framework.generics import RetrieveAPIView
 from rest_framework.response import Response
 
@@ -12,11 +13,11 @@ from edx_rest_framework_extensions.auth.session.authentication import SessionAut
 from openedx.core.lib.api.authentication import BearerAuthenticationAllowInactiveUser
 
 from common.djangoapps.student.models import CourseEnrollment
+from lms.djangoapps.course_api.api import course_detail
+from lms.djangoapps.course_home_api.course_metadata.v1.serializers import CourseHomeMetadataSerializer
 from lms.djangoapps.courseware.access import has_access
 from lms.djangoapps.courseware.masquerade import setup_masquerade
 from lms.djangoapps.courseware.tabs import get_course_tab_list
-from lms.djangoapps.course_api.api import course_detail
-from lms.djangoapps.course_home_api.course_metadata.v1.serializers import CourseHomeMetadataSerializer
 
 
 class CourseHomeMetadataView(RetrieveAPIView):
