@@ -19,12 +19,12 @@ from bok_choy.promise import EmptyPromise, Promise
 from bok_choy.web_app_test import WebAppTest
 from opaque_keys.edx.locator import CourseLocator
 from path import Path as path
-from pymongo import ASCENDING, MongoClient  # lint-amnesty, pylint: disable=unused-import
+from pymongo import MongoClient  # lint-amnesty, pylint: disable=unused-import
 from selenium.common.exceptions import StaleElementReferenceException
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support.select import Select
 from selenium.webdriver.support.ui import WebDriverWait
-from six.moves import range, zip  # lint-amnesty, pylint: disable=unused-import
+from six.moves import range  # lint-amnesty, pylint: disable=unused-import
 
 from capa.tests.response_xml_factory import MultipleChoiceResponseXMLFactory
 from common.test.acceptance.fixtures.course import XBlockFixtureDesc
