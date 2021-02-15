@@ -509,16 +509,19 @@ def login_user(request):
 
         _handle_successful_authentication_and_login(possibly_authenticated_user, request)
 
-        redirect_url = None  # The AJAX method calling should know the default destination upon success
-        if is_user_third_party_authenticated:
-            running_pipeline = pipeline.get(request)
-            redirect_url = pipeline.get_complete_url(backend_name=running_pipeline['backend'])
+        # The AJAX method calling should know the default destination upon success
+        redirect_url, finish_auth_url = None, ''
+        running_pipeline = pipeline.get(request)
+        if running_pipeline:
+            finish_auth_url = pipeline.get_complete_url(backend_name=running_pipeline['backend'])
 
+        if is_user_third_party_authenticated:
+            redirect_url = finish_auth_url
         elif should_redirect_to_authn_microfrontend():
             next_url, root_url = get_next_url_for_login_page(request, include_host=True)
             redirect_url = get_redirect_url_with_host(
                 root_url,
-                enterprise_selection_page(request, possibly_authenticated_user, next_url)
+                enterprise_selection_page(request, possibly_authenticated_user, finish_auth_url or next_url)
             )
 
         response = JsonResponse({
