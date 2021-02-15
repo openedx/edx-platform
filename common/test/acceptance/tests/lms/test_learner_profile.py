@@ -66,9 +66,9 @@ class LearnerProfileTestMixin(EventsTestMixin):
 
             # Verify the current setting is as expected
             if privacy == self.PRIVACY_PUBLIC:
-                self.assertEqual(profile_page.privacy, 'all_users')
+                assert profile_page.privacy == 'all_users'
             else:
-                self.assertEqual(profile_page.privacy, 'private')
+                assert profile_page.privacy == 'private'
 
             if privacy == self.PRIVACY_PUBLIC:
                 self.set_public_profile_fields_data(profile_page)
