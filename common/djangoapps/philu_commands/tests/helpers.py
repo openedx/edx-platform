@@ -12,7 +12,7 @@ from mock import Mock, patch
 
 from philu_commands.helpers import generate_course_structure, has_active_certificate
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory
+from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 
 
 class MockModuleStoreTest(object):
@@ -64,17 +64,19 @@ class TestHelpers(ModuleStoreTestCase):
         """
         Test 'has active certificates'
         """
-        does_not_have_cert = has_active_certificate(self.course)
-        self.assertEqual(does_not_have_cert, False)
-        certificates = {
-            'id': 1,
-            'name': 'Test Certificate',
-            'description': 'Test Description',
-            'course_title': 'course_title_Test',
-            'org_logo_path': '/t4x/orgX/testX/asset/org-logo-{}.png',
-            'version': 1,
-            'is_active': True
-        }
-        self.course.certificates = {'certificates': [certificates]}
-        has_certificate = has_active_certificate(self.course)
-        self.assertEqual(has_certificate, True)
+        has_certificate_1 = has_active_certificate(self.course)
+        self.assertEqual(has_certificate_1, False)
+        certificates = [
+            {
+                'id': i,
+                'name': 'Test Certificate ' + str(i),
+                'description': 'Test Description ' + str(i),
+                'course_title': 'course_title_Test ' + str(i),
+                'org_logo_path': '/t4x/orgX/testX/asset/org-logo-{}.png ' + str(i),
+                'version': i,
+                'is_active': True if i == 1 else False
+            } for i in xrange(2)
+        ]
+        self.course.certificates = {'certificates': certificates}
+        has_certificate_2 = has_active_certificate(self.course)
+        self.assertEqual(has_certificate_2, True)
