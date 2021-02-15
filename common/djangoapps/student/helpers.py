@@ -229,7 +229,7 @@ def get_redirect_url_with_host(root_url, redirect_to):
     """
     Adds host to the redirect url
     """
-    (scheme, netloc, path, query, fragment) = list(urllib.parse.urlsplit(redirect_to))
+    (_, netloc, path, query, fragment) = list(urllib.parse.urlsplit(redirect_to))
     if not netloc:
         parse_root_url = urllib.parse.urlsplit(root_url)
         redirect_to = urllib.parse.urlunsplit((parse_root_url.scheme, parse_root_url.netloc, path, query, fragment))

@@ -409,7 +409,7 @@ def enterprise_selection_page(request, user, next_url):
         if re.match(r'/enterprise/.*/course/.*/enroll', next_url):
             enterprise_in_url = next_url.split('/')[2]
             for enterprise in response:
-                if enterprise_in_url == enterprise['enterprise_customer']['uuid']:
+                if enterprise_in_url == str(enterprise['enterprise_customer']['uuid']):
                     is_activated_successfully = activate_learner_enterprise(request, user, enterprise_in_url)
                     if is_activated_successfully:
                         redirect_url = next_url

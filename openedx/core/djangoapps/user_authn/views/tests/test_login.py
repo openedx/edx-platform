@@ -41,7 +41,6 @@ from openedx.core.djangoapps.site_configuration.tests.mixins import SiteMixin
 from openedx.core.lib.api.test_utils import ApiTestCase
 from openedx.features.enterprise_support.tests.factories import EnterpriseCustomerUserFactory
 from common.djangoapps.util.password_policy_validators import DEFAULT_MAX_PASSWORD_LENGTH
-from waffle.testutils import override_switch
 
 
 @ddt.ddt
@@ -183,10 +182,7 @@ class LoginTest(SiteMixin, CacheIsolationTestCase):
 
     @ddt.data(('/dashboard', False), ('/enterprise/select/active/?success_url=/dashboard', True))
     @ddt.unpack
-    @patch.dict(settings.FEATURES, {
-        'ENABLE_AUTHN_MICROFRONTEND': True,
-        'ENABLE_ENTERPRISE_INTEGRATION': True,
-    })
+    @patch.dict(settings.FEATURES, {'ENABLE_AUTHN_MICROFRONTEND': True, 'ENABLE_ENTERPRISE_INTEGRATION': True})
     @override_settings(LOGIN_REDIRECT_WHITELIST=['openedx.service'])
     @override_waffle_flag(REDIRECT_TO_AUTHN_MICROFRONTEND, active=True)
     @patch('openedx.features.enterprise_support.api.EnterpriseApiClient')
@@ -233,20 +229,57 @@ class LoginTest(SiteMixin, CacheIsolationTestCase):
         self._assert_response(response, success=True)
         self._assert_redirect_url(response, settings.LMS_ROOT_URL + expected_redirect)
 
-    @patch.dict(settings.FEATURES, {
-        'ENABLE_AUTHN_MICROFRONTEND': True,
-        'ENABLE_ENTERPRISE_INTEGRATION': True,
-    })
-    @override_settings(LOGIN_REDIRECT_WHITELIST=['openedx.service'])
+    @ddt.data(('', True), ('/enterprise/select/active/?success_url=', False))
+    @ddt.unpack
+    @patch.dict(settings.FEATURES, {'ENABLE_AUTHN_MICROFRONTEND': True, 'ENABLE_ENTERPRISE_INTEGRATION': True})
     @override_waffle_flag(REDIRECT_TO_AUTHN_MICROFRONTEND, active=True)
     @patch('openedx.features.enterprise_support.api.EnterpriseApiClient')
+    @patch('openedx.core.djangoapps.user_authn.views.login.activate_learner_enterprise')
     @skip_unless_lms
-    def test_enterprise_in_url(self, mock_api_client_class):
+    def test_enterprise_in_url(
+        self, expected_redirect, is_successfully_activated, mock_activate_learner_enterprise, mock_api_client_class
+    ):
         """
         If user has multiple enterprises and the enterprise is present in url,
         activate that url
         """
-        pass
+        api_response = {}
+        enterprise_1 = EnterpriseCustomerUserFactory(user_id=self.user.id).enterprise_customer
+        enterprise_2 = EnterpriseCustomerUserFactory(user_id=self.user.id).enterprise_customer
+        api_response['results'] = [
+            {
+                "enterprise_customer": {
+                    "uuid": enterprise_1.uuid,
+                    "name": enterprise_1.name,
+                    "active": enterprise_1.active,
+                }
+            },
+            {
+                "enterprise_customer": {
+                    "uuid": enterprise_2.uuid,
+                    "name": enterprise_2.name,
+                    "active": enterprise_2.active,
+                }
+            }
+        ]
+
+        next_url = '/enterprise/{}/course/course_key/enroll/?catalog=catalog_uuid&utm_medium=enterprise'.format(
+            enterprise_1.uuid,
+        )
+
+        mock_client = mock_api_client_class.return_value
+        mock_client.fetch_enterprise_learner_data.return_value = api_response
+        mock_activate_learner_enterprise.return_value = is_successfully_activated
+
+        response, _ = self._login_response(
+            self.user.email,
+            self.password,
+            extra_post_params={'next': next_url},
+            HTTP_ACCEPT='*/*',
+        )
+
+        self._assert_response(response, success=True)
+        self._assert_redirect_url(response, settings.LMS_ROOT_URL + expected_redirect + next_url)
 
     @patch.dict("django.conf.settings.FEATURES", {'SQUELCH_PII_IN_LOGS': True})
     def test_login_success_no_pii(self):
