@@ -15,7 +15,12 @@ from openedx.core.djangoapps.content.course_overviews.models import CourseOvervi
 from openedx.core.lib.grade_utils import round_away_from_zero
 
 from .constants import ALLOWED_LOGO_EXTENSIONS, CourseScore
-from .helpers import max_year_value_validator, min_year_value_validator, validate_logo_size
+from .helpers import (
+    get_prerequisite_courses_for_user,
+    max_year_value_validator,
+    min_year_value_validator,
+    validate_logo_size
+)
 
 
 class ApplicationHub(TimeStampedModel):
@@ -199,10 +204,7 @@ class UserApplication(TimeStampedModel):
         Returns:
             list: Prereq course name and score pairs
         """
-        prereq_course_overviews = CourseOverview.objects.filter(
-            id__in=PrerequisiteCourse.objects.all().values_list('course', flat=True)
-        )
-
+        prereq_course_overviews = get_prerequisite_courses_for_user(self.user)
         scores_in_prereq_courses = []
 
         for course_overview in prereq_course_overviews:
@@ -311,9 +313,50 @@ class WorkExperience(UserStartAndEndDates):
         return ''
 
 
-class OpenPreRequisiteCourseManager(models.Manager):
+class PrerequisiteCourseGroupManager(models.Manager):
     """
     Manager which returns all open pre requisite entries
+    """
+
+    def get_queryset(self):
+        return super().get_queryset().filter(
+            is_prerequisite=True,
+            multilingual_courses__isnull=False
+        ).distinct()
+
+
+class MultilingualCourseGroup(models.Model):
+    """
+    Model for multilingual course groups
+    """
+
+    objects = models.Manager()
+    prerequisite_course_groups = PrerequisiteCourseGroupManager()
+    name = models.CharField(verbose_name=_('Course group name'), max_length=255, )
+    is_prerequisite = models.BooleanField(default=False, verbose_name=_('Is Prerequisite Course Group'), )
+
+    class Meta:
+        app_label = 'applications'
+
+    def multilingual_course_count(self):
+        return self.multilingual_courses.count()
+
+    def open_multilingual_courses_count(self):
+        return self.multilingual_courses(manager='open_multilingual_courses').count()  # pylint: disable=no-member
+
+    def course_keys(self):
+        return self.multilingual_courses(manager='open_multilingual_courses').all()  # pylint: disable=no-member
+
+    def is_course_exists(self, course):
+        return course in self.multilingual_courses.all()
+
+    def __str__(self):
+        return self.name
+
+
+class OpenMultilingualCourseManager(models.Manager):
+    """
+    Manager which returns all open multilingual entries
     """
 
     def get_queryset(self):
@@ -321,55 +364,46 @@ class OpenPreRequisiteCourseManager(models.Manager):
         return super().get_queryset().filter(
             course__start_date__lte=today,
             course__end_date__gte=today
-        ).prefetch_related('course').values_list('course', flat=True)
+        ).values_list('course', flat=True)
 
 
-class PrerequisiteCourseGroup(models.Model):
+class OpenPrerequisiteMultilingualCourseManager(models.Manager):
     """
-    Model for course groups, for multilingual prereq courses
+    Manager which returns all open multilingual prerequisite entries
     """
 
-    name = models.CharField(verbose_name=_('Course group name'), max_length=255, )
-
-    class Meta:
-        app_label = 'applications'
-
-    def prereq_course_count(self):
-        return self.prereq_courses.count()
-
-    def open_prereq_courses_count(self):
-        return self.prereq_courses(manager='open_prereq_course_manager').count()  # pylint: disable=no-member
-
-    def course_keys(self):
-        return self.prereq_courses(manager='open_prereq_course_manager').all()  # pylint: disable=no-member
-
-    @classmethod
-    def non_empty_prereq_course_groups(cls):
-        return cls.objects.filter(prereq_courses__isnull=False).distinct()
-
-    def __str__(self):
-        return self.name
+    def get_queryset(self):
+        today = datetime.now()
+        return super().get_queryset().filter(
+            multilingual_course_group__is_prerequisite=True,
+            course__start_date__lte=today,
+            course__end_date__gte=today
+        ).select_related('course')
 
 
-class PrerequisiteCourse(models.Model):
+class MultilingualCourse(models.Model):
     """
-    Model for multilingual prereq courses
+    Model for multilingual courses
     """
 
     objects = models.Manager()
-    open_prereq_course_manager = OpenPreRequisiteCourseManager()
+    open_multilingual_courses = OpenMultilingualCourseManager()
+    open_prerequisite_multilingual_courses = OpenPrerequisiteMultilingualCourseManager()
+
     course = models.OneToOneField(
         CourseOverview,
-        verbose_name=_('Multilingual version of a course'),
-        related_name='prereq_courses',
         on_delete=models.CASCADE,
+        related_name='multilingual_course',
+        verbose_name=_('Multilingual version of a course'),
     )
-    prereq_course_group = models.ForeignKey(
-        PrerequisiteCourseGroup, related_name='prereq_courses', on_delete=models.CASCADE
+    multilingual_course_group = models.ForeignKey(
+        MultilingualCourseGroup,
+        on_delete=models.CASCADE,
+        related_name='multilingual_courses',
     )
 
     class Meta:
-        unique_together = (('course', 'prereq_course_group',),)
+        unique_together = (('course', 'multilingual_course_group',),)
         app_label = 'applications'
 
     def __str__(self):

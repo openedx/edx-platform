@@ -1,13 +1,18 @@
 """
 Registering models for applications app.
 """
+from collections import defaultdict
+
 from django.contrib import admin
 from django.contrib.admin import AdminSite
+from django.core.exceptions import ValidationError
+from django.forms import BaseInlineFormSet
 from django.utils.html import format_html
 from django.utils.translation import ugettext_lazy as _
 
 from openedx.adg.constants import MONTH_DAY_YEAR_FORMAT
 from openedx.adg.lms.constants import SAUDI_NATIONAL_PROMPT
+from xmodule.modulestore.django import modulestore
 
 from .constants import (
     ACCEPTED_APPLICATIONS_TITLE,
@@ -51,8 +56,8 @@ from .models import (
     ApplicationHub,
     BusinessLine,
     Education,
-    PrerequisiteCourse,
-    PrerequisiteCourseGroup,
+    MultilingualCourse,
+    MultilingualCourseGroup,
     UserApplication,
     WorkExperience
 )
@@ -119,14 +124,54 @@ class WorkExperienceAdmin(admin.ModelAdmin):
     search_fields = ('name_of_organization', 'job_position_title',)
 
 
-class PrerequisiteCourseAdmin(admin.TabularInline):
-    model = PrerequisiteCourse
+class MultilingualCourseInlineFormset(BaseInlineFormSet):
+    """
+    Inline formset for multilingual courses
+    """
+
+    def clean(self):
+        super(MultilingualCourseInlineFormset, self).clean()
+
+        course_group_lang_count = defaultdict(lambda: 0)
+        store = modulestore()
+
+        for form in self.forms:
+            if not form.cleaned_data:
+                continue
+
+            course_info = store.get_course(form.instance.course.id)
+            if not course_info.language:
+                raise ValidationError(_('Please add language of the course from studio.'))
+
+            course_group_lang_count[course_info.language] += 1
+            if course_group_lang_count[course_info.language] > 1:
+                raise ValidationError(
+                    _(
+                        'You cannot add 2 or more courses with same language.'
+                        ' Add courses of different language or change language of a course from studio!'
+                    )
+                )
 
 
-@admin.register(PrerequisiteCourseGroup)
-class PrerequisiteCourseGroupAdmin(admin.ModelAdmin):
-    inlines = [PrerequisiteCourseAdmin, ]
-    list_display = ('name', 'prereq_course_count', 'open_prereq_courses_count',)
+class MultilingualCourseAdmin(admin.TabularInline):
+    """
+    Inline admin for Multilingual Courses
+    """
+
+    model = MultilingualCourse
+    formset = MultilingualCourseInlineFormset
+
+    def get_extra(self, request, obj=None, **kwargs):
+        """
+        Customized number of inline forms
+        """
+        return 0 if obj and obj.multilingual_courses.exists() else 2
+
+
+@admin.register(MultilingualCourseGroup)
+class MultilingualCourseGroupAdmin(admin.ModelAdmin):
+    inlines = (MultilingualCourseAdmin,)
+    list_display = ('name', 'multilingual_course_count', 'open_multilingual_courses_count')
 
 
 @admin.register(BusinessLine)
@@ -149,9 +194,6 @@ class ADGAdmin(AdminSite):
     site_header = _('Al-Dabbagh')
     site_title = site_header
     site_url = None
-
-
-adg_admin_site = ADGAdmin(name='adg_admin')
 
 
 class ApplicationReviewInline(admin.StackedInline):
@@ -605,4 +647,5 @@ class UserApplicationADGAdmin(admin.ModelAdmin):
         return False
 
 
+adg_admin_site = ADGAdmin(name='adg_admin')
 adg_admin_site.register(UserApplication, UserApplicationADGAdmin)

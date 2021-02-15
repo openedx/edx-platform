@@ -14,8 +14,8 @@ from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, U
 from openedx.adg.lms.applications.management.commands import update_is_prerequisite_courses_passed as command_module
 from openedx.adg.lms.applications.tests.factories import (
     ApplicationHubFactory,
-    PrerequisiteCourseFactory,
-    PrerequisiteCourseGroupFactory
+    MultilingualCourseFactory,
+    MultilingualCourseGroupFactory
 )
 
 
@@ -25,17 +25,17 @@ def create_prerequisite_course_group_with_course_enrollment(request):
     This fixture creates courses equal to the size of the boolean list and makes them prerequisite depending on the
     boolean value at each index
     """
-    course_groups = PrerequisiteCourseGroupFactory.create_batch(request.param)
+    course_groups = MultilingualCourseGroupFactory.create_batch(request.param)
 
     for course_group in course_groups:
         now = timezone.now()
         # Open prereq courses
-        PrerequisiteCourseFactory.create_batch(
-            2, course__start_date=now, course__end_date=now + timedelta(days=1), prereq_course_group=course_group
+        MultilingualCourseFactory.create_batch(
+            2, course__start_date=now, course__end_date=now + timedelta(days=1), multilingual_course_group=course_group
         )
         # Ended prereq course
-        PrerequisiteCourseFactory(
-            course__start_date=now + timedelta(days=2), course__end_date=now, prereq_course_group=course_group
+        MultilingualCourseFactory(
+            course__start_date=now + timedelta(days=2), course__end_date=now, multilingual_course_group=course_group
         )
     return course_groups
 
@@ -165,7 +165,9 @@ def test_get_users_with_active_course_enrollments_ignore_enrollment_in_closed_co
     users = UserFactory.create_batch(3)
     user_ids = get_user_ids(users)
     prereq_course_group = prereq_course_groups.pop()
-    closed_courses = prereq_course_group.prereq_courses(manager='objects').filter(course__end_date__lt=timezone.now())
+    closed_courses = prereq_course_group.multilingual_courses(
+        manager='objects'
+    ).filter(course__end_date__lt=timezone.now())
     CourseEnrollmentFactory(user=users[0], course_id=closed_courses[0].course_id, is_active=True)
 
     command = command_module.Command()

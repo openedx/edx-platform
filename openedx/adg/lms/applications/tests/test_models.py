@@ -1,7 +1,7 @@
 """
 Tests for all the models in applications app.
 """
-from datetime import date
+from datetime import date, datetime, timedelta
 
 import mock
 import pytest
@@ -9,11 +9,17 @@ import pytest
 from common.djangoapps.student.tests.factories import UserFactory
 from lms.djangoapps.grades.api import CourseGradeFactory
 from openedx.adg.lms.applications.constants import CourseScore
-from openedx.adg.lms.applications.models import UserApplication
+from openedx.adg.lms.applications.models import MultilingualCourse, UserApplication
+from openedx.core.djangoapps.content.course_overviews.tests.factories import CourseOverviewFactory
 from openedx.core.lib.grade_utils import round_away_from_zero
 
 from .constants import USERNAME
-from .factories import ApplicationHubFactory, PrerequisiteCourseFactory, UserApplicationFactory
+from .factories import (
+    ApplicationHubFactory,
+    MultilingualCourseFactory,
+    MultilingualCourseGroupFactory,
+    UserApplicationFactory
+)
 
 
 @pytest.mark.django_db
@@ -119,8 +125,8 @@ def test_prereq_course_scores(mock_read, user_application, percent):
     Test that the `prereq_course_scores` property returns the correct prerequisite course names and respective scores of
     the applicant in those courses, in the correct format.
     """
-    test_course_1 = PrerequisiteCourseFactory().course
-    test_course_2 = PrerequisiteCourseFactory().course
+    test_course_1 = MultilingualCourseFactory().course
+    test_course_2 = MultilingualCourseFactory().course
 
     course_grade = CourseGradeFactory()
     course_grade.percent = percent
@@ -132,7 +138,11 @@ def test_prereq_course_scores(mock_read, user_application, percent):
     course_score_2 = CourseScore(test_course_2.display_name, score)
 
     expected_prereq_course_scores = [course_score_1, course_score_2]
-    actual_prereq_course_scores = user_application.prereq_course_scores
+    with mock.patch(
+        'openedx.adg.lms.applications.models.get_prerequisite_courses_for_user'
+    ) as mock_get_prerequisite_courses_for_user:
+        mock_get_prerequisite_courses_for_user.return_value = [test_course_1, test_course_2]
+        actual_prereq_course_scores = user_application.prereq_course_scores
 
     assert expected_prereq_course_scores == actual_prereq_course_scores
 
@@ -188,3 +198,75 @@ def test_is_written_application_started(application_hub):
     Test application started method
     """
     assert not application_hub.is_written_application_started
+
+
+@pytest.mark.django_db
+def test_multilingual_course_count():
+    """
+    Test multilingual course count for a course group
+    """
+    course_group = MultilingualCourseFactory().multilingual_course_group
+    assert course_group.multilingual_course_count() == 1
+
+
+@pytest.mark.django_db
+def test_open_multilingual_courses_count():
+    """
+    Test open multilingual course count for a course group
+    """
+    current_time = datetime.now()
+    course = CourseOverviewFactory(
+        start_date=current_time - timedelta(days=1),
+        end_date=current_time + timedelta(days=1)
+    )
+    course_group = MultilingualCourseFactory(course=course).multilingual_course_group
+    assert course_group.open_multilingual_courses_count() == 1
+
+
+@pytest.mark.django_db
+def test_course_keys():
+    """
+    Test course keys of a course group
+    """
+    current_time = datetime.now()
+    course = CourseOverviewFactory(
+        start_date=current_time - timedelta(days=1),
+        end_date=current_time + timedelta(days=1)
+    )
+    course_group = MultilingualCourseFactory(course=course).multilingual_course_group
+    assert len(course_group.course_keys()) == 1
+
+
+@pytest.mark.django_db
+def test_is_course_exists_in_course_group():
+    """
+    Tests course exists in multilingual group.
+    """
+    multilingual_course = MultilingualCourseFactory()
+    course_group = multilingual_course.multilingual_course_group
+    assert course_group.is_course_exists(multilingual_course)
+
+
+@pytest.mark.django_db
+def test_course_does_not_exist_in_course_group():
+    """
+    Tests course does not exist in multilingual group.
+    """
+    multilingual_course = MultilingualCourseFactory()
+    course_group = MultilingualCourseGroupFactory()
+    assert not course_group.is_course_exists(multilingual_course)
+
+
+@pytest.mark.django_db
+def test_open_multilingual_prerequisite_courses():
+    """
+    Tests open multilingual prerequisite courses
+    """
+    current_time = datetime.now()
+    course = CourseOverviewFactory(
+        start_date=current_time - timedelta(days=1),
+        end_date=current_time + timedelta(days=1)
+    )
+    MultilingualCourseFactory(course=course)
+    MultilingualCourseGroupFactory(is_prerequisite=True)
+    assert MultilingualCourse.open_prerequisite_multilingual_courses.count() == 1

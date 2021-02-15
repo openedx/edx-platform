@@ -8,8 +8,8 @@ from openedx.adg.lms.applications.models import (
     ApplicationHub,
     BusinessLine,
     Education,
-    PrerequisiteCourse,
-    PrerequisiteCourseGroup,
+    MultilingualCourse,
+    MultilingualCourseGroup,
     UserApplication,
     WorkExperience
 )
@@ -89,24 +89,25 @@ class WorkExperienceFactory(factory.DjangoModelFactory):
     date_completed_year = 2020
 
 
-class PrerequisiteCourseGroupFactory(factory.DjangoModelFactory):
+class MultilingualCourseGroupFactory(factory.DjangoModelFactory):
     """
     Factory for Work experience model
     """
 
     name = factory.Sequence(lambda n: 'Course group #%s' % n)
+    is_prerequisite = True
 
     class Meta:
-        model = PrerequisiteCourseGroup
+        model = MultilingualCourseGroup
 
 
-class PrerequisiteCourseFactory(factory.DjangoModelFactory):
+class MultilingualCourseFactory(factory.DjangoModelFactory):
     """
-    Factory for Work experience model
+    Factory for Multilingual Course
     """
 
     course = factory.SubFactory(CourseOverviewFactory)
-    prereq_course_group = factory.SubFactory(PrerequisiteCourseGroupFactory)
+    multilingual_course_group = factory.SubFactory(MultilingualCourseGroupFactory)
 
     class Meta:
-        model = PrerequisiteCourse
+        model = MultilingualCourse

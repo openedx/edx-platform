@@ -9,7 +9,7 @@ from django.core.management.base import BaseCommand
 from django.db.models import Q
 
 from lms.djangoapps.grades.api import CourseGradeFactory
-from openedx.adg.lms.applications.models import ApplicationHub, PrerequisiteCourseGroup
+from openedx.adg.lms.applications.models import ApplicationHub, MultilingualCourseGroup
 
 logger = logging.getLogger(__name__)
 
@@ -20,7 +20,7 @@ class Command(BaseCommand):
     """
 
     def handle(self, *args, **kwargs):  # pylint: disable=unused-argument
-        prereq_course_groups = PrerequisiteCourseGroup.non_empty_prereq_course_groups()
+        prereq_course_groups = MultilingualCourseGroup.prerequisite_course_groups.all()
 
         if not prereq_course_groups:
             sys.exit('Exiting!!! No open pre-req courses found but there must be some pre-reqs. Please add from admin')

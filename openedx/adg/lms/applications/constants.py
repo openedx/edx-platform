@@ -68,3 +68,5 @@ CourseScore = namedtuple('CourseScore', 'course_name course_percentage')
 APPLICATION_REVIEW_ERROR_MSG = _('Please make a decision before submitting.')
 
 HTML_FOR_EMBEDDED_FILE_VIEW = '<iframe src="{path_to_file}" style="width:889px; height:393px;"></iframe>'
+
+DEFAULT_LANG_FOR_COURSES = 'en'
