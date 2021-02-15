@@ -15,17 +15,14 @@ from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
 
-class MockModuleStoreTest():
+class MockModuleStoreTest(object):
     """
     Class to mock modulestore class functions, e.g. bulk_operations
     """
-    def __init__(self, **kwargs):
-        pass
-
     def __enter__(self):
         pass
 
-    def __exit__(self, *args, **kwargs):
+    def __exit__(self, *args):
         pass
 
 
@@ -70,14 +67,14 @@ class TestHelpers(ModuleStoreTestCase):
         does_not_have_cert = has_active_certificate(self.course)
         self.assertEqual(does_not_have_cert, False)
         certificates = {
-                'id': 1,
-                'name': 'Test Certificate',
-                'description': 'Test Description',
-                'course_title': 'course_title_Test',
-                'org_logo_path': '/t4x/orgX/testX/asset/org-logo-{}.png',
-                'version': 1,
-                'is_active': True
-            }
+            'id': 1,
+            'name': 'Test Certificate',
+            'description': 'Test Description',
+            'course_title': 'course_title_Test',
+            'org_logo_path': '/t4x/orgX/testX/asset/org-logo-{}.png',
+            'version': 1,
+            'is_active': True
+        }
         self.course.certificates = {'certificates': [certificates]}
         has_certificate = has_active_certificate(self.course)
         self.assertEqual(has_certificate, True)
