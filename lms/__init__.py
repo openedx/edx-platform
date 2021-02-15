@@ -1,6 +1,7 @@
 """  # lint-amnesty, pylint: disable=django-not-configured
 Celery needs to be loaded when the cms modules are so that task
 registration and discovery can work correctly.
+
 """
 
 # We monkey patch Kombu's entrypoints listing because scanning through this
