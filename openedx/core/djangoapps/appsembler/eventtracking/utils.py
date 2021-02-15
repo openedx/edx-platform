@@ -16,7 +16,6 @@ Where? appsembler.eventracking.sites is a likely candidate as the purpose of the
 `get_site_config_for_event` is specific to sites.
 """
 from django.core.exceptions import MultipleObjectsReturned
-# from organizations.models import Organization, OrganizationCourse
 
 from openedx.core.djangoapps.site_configuration.helpers import (
     get_current_site_configuration
