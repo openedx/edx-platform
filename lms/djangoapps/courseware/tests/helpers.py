@@ -129,7 +129,7 @@ class BaseTestXmodule(ModuleStoreTestCase):
             for user in self.users
         ]
 
-        self.assertTrue(all(self.login_statuses))
+        assert all(self.login_statuses)
 
     def setUp(self):
         super(BaseTestXmodule, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
@@ -185,23 +185,16 @@ class LoginEnrollmentTestCase(TestCase):
         """
         make_request = getattr(self.client, method.lower())
         response = make_request(url, **kwargs)
-        self.assertEqual(
-            response.status_code, status_code,
-            u"{method} request to {url} returned status code {actual}, "
-            u"expected status code {expected}".format(
-                method=method, url=url,
-                actual=response.status_code, expected=status_code
-            )
-        )
+        assert response.status_code == status_code, u'{method} request to {url} returned status code {actual}, expected status code {expected}'.format(method=method, url=url, actual=response.status_code, expected=status_code)  # pylint: disable=line-too-long
         return response
 
     def assert_account_activated(self, url, method="GET", **kwargs):  # lint-amnesty, pylint: disable=missing-function-docstring
         make_request = getattr(self.client, method.lower())
         response = make_request(url, **kwargs)
         message_list = list(messages.get_messages(response.wsgi_request))
-        self.assertEqual(len(message_list), 1)
-        self.assertIn("success", message_list[0].tags)
-        self.assertIn("You have activated your account.", message_list[0].message)
+        assert len(message_list) == 1
+        assert 'success' in message_list[0].tags
+        assert 'You have activated your account.' in message_list[0].message
 
     # ============ User creation and login ==============
 
@@ -211,7 +204,7 @@ class LoginEnrollmentTestCase(TestCase):
         """
         resp = self.client.post(reverse('user_api_login_session'),
                                 {'email': email, 'password': password})
-        self.assertEqual(resp.status_code, 200)
+        assert resp.status_code == 200
 
     def logout(self):
         """
@@ -236,7 +229,7 @@ class LoginEnrollmentTestCase(TestCase):
         self.assert_request_status_code(200, url, method="POST", data=request_data)
         # Check both that the user is created, and inactive
         user = User.objects.get(email=email)
-        self.assertFalse(user.is_active)
+        assert not user.is_active
         return user
 
     def activate_user(self, email):
@@ -250,7 +243,7 @@ class LoginEnrollmentTestCase(TestCase):
         self.assert_account_activated(url)
         # Now make sure that the user is now actually activated
         user = User.objects.get(email=email)
-        self.assertTrue(user.is_active)
+        assert user.is_active
         # And return the user we fetched.
         return user
 
@@ -269,7 +262,7 @@ class LoginEnrollmentTestCase(TestCase):
         })
         result = resp.status_code == 200
         if verify:
-            self.assertTrue(result)
+            assert result
         return result
 
     def unenroll(self, course):
@@ -303,8 +296,8 @@ class CourseAccessTestMixin(TestCase):
             action (str): type of access to test.
             course (CourseDescriptor): a course.
         """
-        self.assertTrue(has_access(user, action, course))
-        self.assertTrue(has_access(user, action, CourseOverview.get_from_id(course.id)))
+        assert has_access(user, action, course)
+        assert has_access(user, action, CourseOverview.get_from_id(course.id))
 
     def assertCannotAccessCourse(self, user, action, course):
         """
@@ -324,8 +317,8 @@ class CourseAccessTestMixin(TestCase):
             them into one method with a boolean flag?), but it makes reading
             stack traces of failed tests easier to understand at a glance.
         """
-        self.assertFalse(has_access(user, action, course))
-        self.assertFalse(has_access(user, action, CourseOverview.get_from_id(course.id)))
+        assert not has_access(user, action, course)
+        assert not has_access(user, action, CourseOverview.get_from_id(course.id))
 
 
 class MasqueradeMixin:
@@ -369,8 +362,8 @@ class MasqueradeMixin:
             }),
             'application/json'
         )
-        self.assertEqual(response.status_code, 200)
-        self.assertTrue(response.json()['success'], response.json().get('error'))
+        assert response.status_code == 200
+        assert response.json()['success'], response.json().get('error')
         return response
 
 

@@ -122,4 +122,4 @@ class TestUserStateService(ModuleStoreTestCase):
         params.update(state_params)
         self._create_student_module({'key_1': 'value_1'})
         state = UserStateService().get_state_as_dict(**params)
-        self.assertFalse(state)
+        assert not state

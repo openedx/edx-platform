@@ -269,7 +269,7 @@ class TestSubmittingProblems(ModuleStoreTestCase, LoginEnrollmentTestCase, Probl
         """
         Assert that percent grade is as expected.
         """
-        self.assertEqual(self.get_course_grade().percent, percent)
+        assert self.get_course_grade().percent == percent
 
     def earned_hw_scores(self):
         """
@@ -316,7 +316,7 @@ class TestCourseGrades(TestSubmittingProblems):
         Submits correct answer to the problem.
         """
         resp = self.submit_question_answer('p1', {'2_1': 'Correct'})
-        self.assertEqual(resp.status_code, 200)
+        assert resp.status_code == 200
 
     def _verify_grade(self, expected_problem_score, expected_hw_grade):
         """
@@ -324,8 +324,8 @@ class TestCourseGrades(TestSubmittingProblems):
         """
         hw_grade = self.hw_grade('homework')
         problem_score = list(hw_grade.problem_scores.values())[0]
-        self.assertEqual((problem_score.earned, problem_score.possible), expected_problem_score)
-        self.assertEqual((hw_grade.graded_total.earned, hw_grade.graded_total.possible), expected_hw_grade)
+        assert (problem_score.earned, problem_score.possible) == expected_problem_score
+        assert (hw_grade.graded_total.earned, hw_grade.graded_total.possible) == expected_hw_grade
 
     def test_basic(self):
         self._submit_correct_answer()
@@ -452,12 +452,12 @@ class TestCourseGrader(TestSubmittingProblems):
         """Test problem for due date in the past"""
         self.basic_setup(late=True)
         resp = self.submit_question_answer('p1', {'2_1': 'Correct'})
-        self.assertEqual(resp.status_code, 200)
+        assert resp.status_code == 200
         err_msg = (
             "The state of this problem has changed since you loaded this page. "
             "Please refresh your page."
         )
-        self.assertEqual(json.loads(resp.content.decode('utf-8')).get("success"), err_msg)
+        assert json.loads(resp.content.decode('utf-8')).get('success') == err_msg
 
     def test_submission_reset(self):
         """Test problem ProcessingErrors due to resets"""
@@ -465,23 +465,23 @@ class TestCourseGrader(TestSubmittingProblems):
         resp = self.submit_question_answer('p1', {'2_1': 'Correct'})
         #  submit a second time to draw NotFoundError
         resp = self.submit_question_answer('p1', {'2_1': 'Correct'})
-        self.assertEqual(resp.status_code, 200)
+        assert resp.status_code == 200
         err_msg = (
             "The state of this problem has changed since you loaded this page. "
             "Please refresh your page."
         )
-        self.assertEqual(json.loads(resp.content.decode('utf-8')).get("success"), err_msg)
+        assert json.loads(resp.content.decode('utf-8')).get('success') == err_msg
 
     def test_submission_show_answer(self):
         """Test problem for ProcessingErrors due to showing answer"""
         self.basic_setup(showanswer=True)
         resp = self.show_question_answer('p1')
-        self.assertEqual(resp.status_code, 200)
+        assert resp.status_code == 200
         err_msg = (
             "The state of this problem has changed since you loaded this page. "
             "Please refresh your page."
         )
-        self.assertEqual(json.loads(resp.content.decode('utf-8')).get("success"), err_msg)
+        assert json.loads(resp.content.decode('utf-8')).get('success') == err_msg
 
     def test_show_answer_doesnt_write_to_csm(self):
         self.basic_setup()
@@ -494,14 +494,14 @@ class TestCourseGrader(TestSubmittingProblems):
         )
         # count how many state history entries there are
         baseline = BaseStudentModuleHistory.get_history(student_module)
-        self.assertEqual(len(baseline), 2)
+        assert len(baseline) == 2
 
         # now click "show answer"
         self.show_question_answer('p1')
 
         # check that we don't have more state history entries
         csmh = BaseStudentModuleHistory.get_history(student_module)
-        self.assertEqual(len(csmh), 2)
+        assert len(csmh) == 2
 
     def test_grade_with_collected_max_score(self):
         """
@@ -511,11 +511,7 @@ class TestCourseGrader(TestSubmittingProblems):
         self.basic_setup()
         self.submit_question_answer('p1', {'2_1': 'Correct'})
         self.look_at_question('p2')
-        self.assertTrue(
-            StudentModule.objects.filter(
-                module_state_key=self.problem_location('p2')
-            ).exists()
-        )
+        assert StudentModule.objects.filter(module_state_key=self.problem_location('p2')).exists()
 
         # problem isn't in the cache, but will be when graded
         self.check_grade_percent(0.33)
@@ -529,7 +525,7 @@ class TestCourseGrader(TestSubmittingProblems):
         """
         self.basic_setup()
         self.check_grade_percent(0)
-        self.assertEqual(self.get_course_grade().letter_grade, None)
+        assert self.get_course_grade().letter_grade is None
 
     def test_b_grade_exact(self):
         """
@@ -538,7 +534,7 @@ class TestCourseGrader(TestSubmittingProblems):
         self.basic_setup()
         self.submit_question_answer('p1', {'2_1': 'Correct'})
         self.check_grade_percent(0.33)
-        self.assertEqual(self.get_course_grade().letter_grade, 'B')
+        assert self.get_course_grade().letter_grade == 'B'
 
     def test_b_grade_above(self):
         """
@@ -548,7 +544,7 @@ class TestCourseGrader(TestSubmittingProblems):
         self.submit_question_answer('p1', {'2_1': 'Correct'})
         self.submit_question_answer('p2', {'2_1': 'Correct'})
         self.check_grade_percent(0.67)
-        self.assertEqual(self.get_course_grade().letter_grade, 'B')
+        assert self.get_course_grade().letter_grade == 'B'
 
     def test_a_grade(self):
         """
@@ -559,7 +555,7 @@ class TestCourseGrader(TestSubmittingProblems):
         self.submit_question_answer('p2', {'2_1': 'Correct'})
         self.submit_question_answer('p3', {'2_1': 'Correct'})
         self.check_grade_percent(1.0)
-        self.assertEqual(self.get_course_grade().letter_grade, 'A')
+        assert self.get_course_grade().letter_grade == 'A'
 
     def test_wrong_answers(self):
         """
@@ -570,7 +566,7 @@ class TestCourseGrader(TestSubmittingProblems):
         self.submit_question_answer('p2', {'2_1': 'Correct'})
         self.submit_question_answer('p3', {'2_1': 'Incorrect'})
         self.check_grade_percent(0.67)
-        self.assertEqual(self.get_course_grade().letter_grade, 'B')
+        assert self.get_course_grade().letter_grade == 'B'
 
     def test_submissions_api_overrides_scores(self):
         """
@@ -581,7 +577,7 @@ class TestCourseGrader(TestSubmittingProblems):
         self.submit_question_answer('p2', {'2_1': 'Correct'})
         self.submit_question_answer('p3', {'2_1': 'Incorrect'})
         self.check_grade_percent(0.67)
-        self.assertEqual(self.get_course_grade().letter_grade, 'B')
+        assert self.get_course_grade().letter_grade == 'B'
 
         student_item = {
             'student_id': anonymous_id_for_user(self.student_user, self.course.id),
@@ -592,7 +588,7 @@ class TestCourseGrader(TestSubmittingProblems):
         submission = submissions_api.create_submission(student_item, 'any answer')
         submissions_api.set_score(submission['uuid'], 1, 1)
         self.check_grade_percent(1.0)
-        self.assertEqual(self.get_course_grade().letter_grade, 'A')
+        assert self.get_course_grade().letter_grade == 'A'
 
     def test_submissions_api_anonymous_student_id(self):
         """
@@ -627,8 +623,9 @@ class TestCourseGrader(TestSubmittingProblems):
         # Get both parts correct
         self.submit_question_answer('H1P1', {'2_1': 'Correct', '2_2': 'Correct'})
         self.check_grade_percent(0.25)
-        self.assertEqual(self.earned_hw_scores(), [2.0])  # Order matters
-        self.assertEqual(self.score_for_hw('homework'), [2.0])
+        assert self.earned_hw_scores() == [2.0]
+        # Order matters
+        assert self.score_for_hw('homework') == [2.0]
 
     def test_weighted_exam(self):
         """
@@ -674,9 +671,10 @@ class TestCourseGrader(TestSubmittingProblems):
         self.dropping_setup()
         self.dropping_homework_stage1()
 
-        self.assertEqual(self.score_for_hw('homework1'), [1.0, 0.0])
-        self.assertEqual(self.score_for_hw('homework2'), [1.0, 1.0])
-        self.assertEqual(self.earned_hw_scores(), [1.0, 2.0, 0])  # Order matters
+        assert self.score_for_hw('homework1') == [1.0, 0.0]
+        assert self.score_for_hw('homework2') == [1.0, 1.0]
+        assert self.earned_hw_scores() == [1.0, 2.0, 0]
+        # Order matters
         self.check_grade_percent(0.75)
 
     def test_dropping_nochange(self):
@@ -687,10 +685,11 @@ class TestCourseGrader(TestSubmittingProblems):
         self.dropping_homework_stage1()
         self.submit_question_answer(self.hw3_names[0], {'2_1': 'Correct'})
 
-        self.assertEqual(self.score_for_hw('homework1'), [1.0, 0.0])
-        self.assertEqual(self.score_for_hw('homework2'), [1.0, 1.0])
-        self.assertEqual(self.score_for_hw('homework3'), [1.0, 0.0])
-        self.assertEqual(self.earned_hw_scores(), [1.0, 2.0, 1.0])  # Order matters
+        assert self.score_for_hw('homework1') == [1.0, 0.0]
+        assert self.score_for_hw('homework2') == [1.0, 1.0]
+        assert self.score_for_hw('homework3') == [1.0, 0.0]
+        assert self.earned_hw_scores() == [1.0, 2.0, 1.0]
+        # Order matters
         self.check_grade_percent(0.75)
 
     def test_dropping_all_correct(self):
@@ -704,8 +703,9 @@ class TestCourseGrader(TestSubmittingProblems):
             self.submit_question_answer(name, {'2_1': 'Correct'})
 
         self.check_grade_percent(1.0)
-        self.assertEqual(self.earned_hw_scores(), [1.0, 2.0, 2.0])  # Order matters
-        self.assertEqual(self.score_for_hw('homework3'), [1.0, 1.0])
+        assert self.earned_hw_scores() == [1.0, 2.0, 2.0]
+        # Order matters
+        assert self.score_for_hw('homework3') == [1.0, 1.0]
 
     @ddt.data(
         *CourseMode.CREDIT_ELIGIBLE_MODES
@@ -743,14 +743,14 @@ class TestCourseGrader(TestSubmittingProblems):
 
         # Credit requirement is not satisfied before passing grade
         req_status = get_credit_requirement_status(self.course.id, self.student_user.username, 'grade', 'grade')
-        self.assertEqual(req_status[0]["status"], None)
+        assert req_status[0]['status'] is None
 
         self.submit_question_answer('p1', {'2_1': 'Correct'})
         self.submit_question_answer('p2', {'2_1': 'Correct'})
 
         # Credit requirement is now satisfied after passing grade
         req_status = get_credit_requirement_status(self.course.id, self.student_user.username, 'grade', 'grade')
-        self.assertEqual(req_status[0]["status"], 'satisfied')
+        assert req_status[0]['status'] == 'satisfied'
 
 
 class ProblemWithUploadedFilesTest(TestSubmittingProblems):
@@ -794,15 +794,15 @@ class ProblemWithUploadedFilesTest(TestSubmittingProblems):
         with patch('lms.djangoapps.courseware.module_render.XQUEUE_INTERFACE.session') as mock_session:
             resp = self.submit_question_answer("the_problem", {'2_1': fileobjs})
 
-        self.assertEqual(resp.status_code, 200)
+        assert resp.status_code == 200
         json_resp = json.loads(resp.content.decode('utf-8'))
-        self.assertEqual(json_resp['success'], "incorrect")
+        assert json_resp['success'] == 'incorrect'
 
         # See how post got called.
         name, args, kwargs = mock_session.mock_calls[0]
-        self.assertEqual(name, "post")
-        self.assertEqual(len(args), 1)
-        self.assertTrue(args[0].endswith("/submit/"))
+        assert name == 'post'
+        assert len(args) == 1
+        assert args[0].endswith('/submit/')
         six.assertCountEqual(self, list(kwargs.keys()), ["files", "data", "timeout"])
         six.assertCountEqual(self, list(kwargs['files'].keys()), filenames.split())
 
@@ -986,7 +986,7 @@ class TestPythonGradedResponse(TestSubmittingProblems):
         resp = self.submit_question_answer(name, {'2_1': self.correct_responses[name]})
 
         respdata = json.loads(resp.content.decode('utf-8'))
-        self.assertEqual(respdata['success'], 'correct')
+        assert respdata['success'] == 'correct'
 
     def _check_incorrect(self, name):
         """
@@ -995,7 +995,7 @@ class TestPythonGradedResponse(TestSubmittingProblems):
         resp = self.submit_question_answer(name, {'2_1': self.incorrect_responses[name]})
 
         respdata = json.loads(resp.content.decode('utf-8'))
-        self.assertEqual(respdata['success'], 'incorrect')
+        assert respdata['success'] == 'incorrect'
 
     def _check_ireset(self, name):
         """
@@ -1009,7 +1009,7 @@ class TestPythonGradedResponse(TestSubmittingProblems):
         resp = self.submit_question_answer(name, {'2_1': self.correct_responses[name]})
 
         respdata = json.loads(resp.content.decode('utf-8'))
-        self.assertEqual(respdata['success'], 'correct')
+        assert respdata['success'] == 'correct'
 
     def test_schematic_correct(self):
         name = "schematic_problem"
@@ -1183,9 +1183,9 @@ class TestConditionalContent(TestSubmittingProblems):
         self.submit_question_answer('H2P1_GROUP0', {'2_1': 'Correct'})
         self.submit_question_answer('H2P2_GROUP0', {'2_1': 'Correct', '2_2': 'Incorrect', '2_3': 'Correct'})
 
-        self.assertEqual(self.score_for_hw('homework1'), [1.0])
-        self.assertEqual(self.score_for_hw('homework2'), [1.0, 2.0])
-        self.assertEqual(self.earned_hw_scores(), [1.0, 3.0])
+        assert self.score_for_hw('homework1') == [1.0]
+        assert self.score_for_hw('homework2') == [1.0, 2.0]
+        assert self.earned_hw_scores() == [1.0, 3.0]
 
         # Grade percent is .63. Here is the calculation:
         #   homework_1_score = 1.0 / 2
@@ -1202,9 +1202,9 @@ class TestConditionalContent(TestSubmittingProblems):
 
         self.submit_question_answer('H2P1_GROUP1', {'2_1': 'Correct'})
 
-        self.assertEqual(self.score_for_hw('homework1'), [1.0])
-        self.assertEqual(self.score_for_hw('homework2'), [1.0])
-        self.assertEqual(self.earned_hw_scores(), [1.0, 1.0])
+        assert self.score_for_hw('homework1') == [1.0]
+        assert self.score_for_hw('homework2') == [1.0]
+        assert self.earned_hw_scores() == [1.0, 1.0]
 
         # Grade percent is .75. Here is the calculation:
         #   homework_1_score = 1.0 / 2
@@ -1236,9 +1236,9 @@ class TestConditionalContent(TestSubmittingProblems):
         """
         self.split_one_group_no_problems_setup(self.user_partition_group_0)
 
-        self.assertEqual(self.score_for_hw('homework1'), [1.0])
-        self.assertEqual(self.score_for_hw('homework2'), [])
-        self.assertEqual(self.earned_hw_scores(), [1.0])
+        assert self.score_for_hw('homework1') == [1.0]
+        assert self.score_for_hw('homework2') == []
+        assert self.earned_hw_scores() == [1.0]
 
         # Grade percent is .25. Here is the calculation:
         #   homework_1_score = 1.0 / 2
@@ -1254,9 +1254,9 @@ class TestConditionalContent(TestSubmittingProblems):
 
         self.submit_question_answer('H2P1_GROUP1', {'2_1': 'Correct'})
 
-        self.assertEqual(self.score_for_hw('homework1'), [1.0])
-        self.assertEqual(self.score_for_hw('homework2'), [1.0])
-        self.assertEqual(self.earned_hw_scores(), [1.0, 1.0])
+        assert self.score_for_hw('homework1') == [1.0]
+        assert self.score_for_hw('homework2') == [1.0]
+        assert self.earned_hw_scores() == [1.0, 1.0]
 
         # Grade percent is .75. Here is the calculation.
         #   homework_1_score = 1.0 / 2
