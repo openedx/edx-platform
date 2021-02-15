@@ -219,13 +219,13 @@ class TaskTestCase(ModuleStoreTestCase):  # lint-amnesty, pylint: disable=missin
             })
             expected_recipient = Recipient(self.thread_author.username, self.thread_author.email)
             actual_message = self.mock_ace_send.call_args_list[0][0][0]
-            self.assertEqual(expected_message_context, actual_message.context)
-            self.assertEqual(expected_recipient, actual_message.recipient)
-            self.assertEqual(self.course.language, actual_message.language)
+            assert expected_message_context == actual_message.context
+            assert expected_recipient == actual_message.recipient
+            assert self.course.language == actual_message.language
             self._assert_rendered_email(actual_message)
 
         else:
-            self.assertFalse(self.mock_ace_send.called)
+            assert not self.mock_ace_send.called
 
     def _assert_rendered_email(self, message):  # lint-amnesty, pylint: disable=missing-function-docstring
         # check that we can actually render the message
@@ -257,8 +257,8 @@ class TaskTestCase(ModuleStoreTestCase):  # lint-amnesty, pylint: disable=missin
             'comment_id': comment_dict['id'],
             'thread_id': thread['id'],
         })
-        self.assertEqual(actual_result, False)
-        self.assertFalse(self.mock_ace_send.called)
+        assert actual_result is False
+        assert not self.mock_ace_send.called
 
     def test_subcomment_should_not_send_email(self):
         self.run_should_not_send_email_test(self.thread, self.subcomment)

@@ -45,37 +45,37 @@ class TestStudentModuleHistoryBackends(TestCase):
     def test_get_history_true_true(self):
         student_module = StudentModule.objects.all()
         history = BaseStudentModuleHistory.get_history(student_module)
-        self.assertEqual(len(history), 6)
-        self.assertEqual({'type': 'csmhe', 'order': 3}, json.loads(history[0].state))
-        self.assertEqual({'type': 'csmhe', 'order': 2}, json.loads(history[1].state))
-        self.assertEqual({'type': 'csmhe', 'order': 1}, json.loads(history[2].state))
-        self.assertEqual({'type': 'csmh', 'order': 3}, json.loads(history[3].state))
-        self.assertEqual({'type': 'csmh', 'order': 2}, json.loads(history[4].state))
-        self.assertEqual({'type': 'csmh', 'order': 1}, json.loads(history[5].state))
+        assert len(history) == 6
+        assert {'type': 'csmhe', 'order': 3} == json.loads(history[0].state)
+        assert {'type': 'csmhe', 'order': 2} == json.loads(history[1].state)
+        assert {'type': 'csmhe', 'order': 1} == json.loads(history[2].state)
+        assert {'type': 'csmh', 'order': 3} == json.loads(history[3].state)
+        assert {'type': 'csmh', 'order': 2} == json.loads(history[4].state)
+        assert {'type': 'csmh', 'order': 1} == json.loads(history[5].state)
 
     @patch.dict("django.conf.settings.FEATURES", {"ENABLE_CSMH_EXTENDED": True})
     @patch.dict("django.conf.settings.FEATURES", {"ENABLE_READING_FROM_MULTIPLE_HISTORY_TABLES": False})
     def test_get_history_true_false(self):
         student_module = StudentModule.objects.all()
         history = BaseStudentModuleHistory.get_history(student_module)
-        self.assertEqual(len(history), 3)
-        self.assertEqual({'type': 'csmhe', 'order': 3}, json.loads(history[0].state))
-        self.assertEqual({'type': 'csmhe', 'order': 2}, json.loads(history[1].state))
-        self.assertEqual({'type': 'csmhe', 'order': 1}, json.loads(history[2].state))
+        assert len(history) == 3
+        assert {'type': 'csmhe', 'order': 3} == json.loads(history[0].state)
+        assert {'type': 'csmhe', 'order': 2} == json.loads(history[1].state)
+        assert {'type': 'csmhe', 'order': 1} == json.loads(history[2].state)
 
     @patch.dict("django.conf.settings.FEATURES", {"ENABLE_CSMH_EXTENDED": False})
     @patch.dict("django.conf.settings.FEATURES", {"ENABLE_READING_FROM_MULTIPLE_HISTORY_TABLES": True})
     def test_get_history_false_true(self):
         student_module = StudentModule.objects.all()
         history = BaseStudentModuleHistory.get_history(student_module)
-        self.assertEqual(len(history), 3)
-        self.assertEqual({'type': 'csmh', 'order': 3}, json.loads(history[0].state))
-        self.assertEqual({'type': 'csmh', 'order': 2}, json.loads(history[1].state))
-        self.assertEqual({'type': 'csmh', 'order': 1}, json.loads(history[2].state))
+        assert len(history) == 3
+        assert {'type': 'csmh', 'order': 3} == json.loads(history[0].state)
+        assert {'type': 'csmh', 'order': 2} == json.loads(history[1].state)
+        assert {'type': 'csmh', 'order': 1} == json.loads(history[2].state)
 
     @patch.dict("django.conf.settings.FEATURES", {"ENABLE_CSMH_EXTENDED": False})
     @patch.dict("django.conf.settings.FEATURES", {"ENABLE_READING_FROM_MULTIPLE_HISTORY_TABLES": False})
     def test_get_history_false_false(self):
         student_module = StudentModule.objects.all()
         history = BaseStudentModuleHistory.get_history(student_module)
-        self.assertEqual(len(history), 0)
+        assert len(history) == 0

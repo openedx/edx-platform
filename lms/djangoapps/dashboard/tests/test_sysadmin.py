@@ -165,15 +165,15 @@ class TestSysAdminMongoCourseImport(SysadminBaseTestCase):
         self._mkdir(settings.GIT_REPO_DIR)
 
         def_ms = modulestore()
-        self.assertNotEqual('xml', def_ms.get_modulestore_type(None))
+        assert 'xml' != def_ms.get_modulestore_type(None)
 
         self._add_edx4edx()
         course = def_ms.get_course(CourseLocator('MITx', 'edx4edx', 'edx4edx'))
-        self.assertIsNotNone(course)
+        assert course is not None
 
         self._rm_edx4edx()
         course = def_ms.get_course(CourseLocator('MITx', 'edx4edx', 'edx4edx'))
-        self.assertIsNone(course)
+        assert course is None
 
     def test_course_info(self):
         """
@@ -333,22 +333,22 @@ class TestSysAdminMongoCourseImport(SysadminBaseTestCase):
                                       password='foo')
         response = self.client.get(reverse('gitlogs'))
         # Make sure our non privileged user doesn't have access to all logs
-        self.assertEqual(response.status_code, 404)
+        assert response.status_code == 404
         # Or specific logs
         response = self.client.get(reverse('gitlogs_detail', kwargs={
             'course_id': 'course-v1:MITx+edx4edx+edx4edx'
         }))
-        self.assertEqual(response.status_code, 404)
+        assert response.status_code == 404
 
         # Add user as staff in course team
         def_ms = modulestore()
         course = def_ms.get_course(CourseLocator('MITx', 'edx4edx', 'edx4edx'))
         CourseStaffRole(course.id).add_users(self.user)
 
-        self.assertTrue(CourseStaffRole(course.id).has_user(self.user))
+        assert CourseStaffRole(course.id).has_user(self.user)
         logged_in = self.client.login(username=self.user.username,
                                       password='foo')
-        self.assertTrue(logged_in)
+        assert logged_in
 
         response = self.client.get(
             reverse('gitlogs_detail', kwargs={

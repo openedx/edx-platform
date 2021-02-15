@@ -1,3 +1,4 @@
+import pytest
 """
 Provide tests for git_add_course management command.
 """
@@ -108,16 +109,16 @@ class TestGitAddCourse(SharedModuleStoreTestCase):
         """
         Various exit path tests for test_add_repo
         """
-        with self.assertRaises(GitImportErrorNoDir):
+        with pytest.raises(GitImportErrorNoDir):
             git_import.add_repo(self.TEST_REPO, None, None)
 
         os.mkdir(self.git_repo_dir)
         self.addCleanup(shutil.rmtree, self.git_repo_dir)
 
-        with self.assertRaises(GitImportErrorUrlBad):
+        with pytest.raises(GitImportErrorUrlBad):
             git_import.add_repo('foo', None, None)
 
-        with self.assertRaises(GitImportErrorCannotPull):
+        with pytest.raises(GitImportErrorCannotPull):
             git_import.add_repo('file:///foobar.git', None, None)
 
         # Test git repo that exists, but is "broken"
@@ -127,7 +128,7 @@ class TestGitAddCourse(SharedModuleStoreTestCase):
         subprocess.check_output(['git', '--bare', 'init', ], stderr=subprocess.STDOUT,
                                 cwd=bare_repo)
 
-        with self.assertRaises(GitImportErrorBadRepo):
+        with pytest.raises(GitImportErrorBadRepo):
             git_import.add_repo('file://{0}'.format(bare_repo), None, None)
 
     def test_detached_repo(self):
@@ -145,7 +146,7 @@ class TestGitAddCourse(SharedModuleStoreTestCase):
         subprocess.check_output(['git', 'checkout', 'HEAD~2', ],
                                 stderr=subprocess.STDOUT,
                                 cwd=repo_dir / 'edx4edx_lite')
-        with self.assertRaises(GitImportErrorCannotPull):
+        with pytest.raises(GitImportErrorCannotPull):
             git_import.add_repo(self.TEST_REPO, repo_dir / 'edx4edx_lite', None)
 
     def test_branching(self):
@@ -159,7 +160,7 @@ class TestGitAddCourse(SharedModuleStoreTestCase):
         self.addCleanup(shutil.rmtree, repo_dir)
 
         # Checkout non existent branch
-        with self.assertRaises(GitImportErrorRemoteBranchMissing):
+        with pytest.raises(GitImportErrorRemoteBranchMissing):
             git_import.add_repo(self.TEST_REPO, repo_dir / 'edx4edx_lite', 'asdfasdfasdf')
 
         # Checkout new branch
@@ -168,7 +169,7 @@ class TestGitAddCourse(SharedModuleStoreTestCase):
                             self.TEST_BRANCH)
         def_ms = modulestore()
         # Validate that it is different than master
-        self.assertIsNotNone(def_ms.get_course(self.TEST_BRANCH_COURSE))
+        assert def_ms.get_course(self.TEST_BRANCH_COURSE) is not None
 
         # Attempt to check out the same branch again to validate branch choosing
         # works
@@ -178,12 +179,12 @@ class TestGitAddCourse(SharedModuleStoreTestCase):
 
         # Delete to test branching back to master
         def_ms.delete_course(self.TEST_BRANCH_COURSE, ModuleStoreEnum.UserID.test)
-        self.assertIsNone(def_ms.get_course(self.TEST_BRANCH_COURSE))
+        assert def_ms.get_course(self.TEST_BRANCH_COURSE) is None
         git_import.add_repo(self.TEST_REPO,
                             repo_dir / 'edx4edx_lite',
                             'master')
-        self.assertIsNone(def_ms.get_course(self.TEST_BRANCH_COURSE))
-        self.assertIsNotNone(def_ms.get_course(CourseKey.from_string(self.TEST_COURSE)))
+        assert def_ms.get_course(self.TEST_BRANCH_COURSE) is None
+        assert def_ms.get_course(CourseKey.from_string(self.TEST_COURSE)) is not None
 
     def test_branch_exceptions(self):
         """
@@ -203,7 +204,7 @@ class TestGitAddCourse(SharedModuleStoreTestCase):
         self.addCleanup(shutil.rmtree, repo_dir)
 
         rdir = '{0}/bare'.format(repo_dir)
-        with self.assertRaises(GitImportErrorBadRepo):
+        with pytest.raises(GitImportErrorBadRepo):
             git_import.add_repo('file://{0}'.format(bare_repo), None, None)
 
         # Get logger for checking strings in logs
@@ -218,7 +219,7 @@ class TestGitAddCourse(SharedModuleStoreTestCase):
         try:
             git_import.switch_branch('master', rdir)
         except GitImportError:
-            self.assertIn('Unable to fetch remote', output.getvalue())
+            assert 'Unable to fetch remote' in output.getvalue()
         shutil.move('{0}/not_bare.git'.format(settings.TEST_ROOT), bare_repo)
         output.truncate(0)
 
@@ -227,6 +228,6 @@ class TestGitAddCourse(SharedModuleStoreTestCase):
             ['git', 'remote', 'rename', 'origin', 'blah', ],
             stderr=subprocess.STDOUT, cwd=rdir
         )
-        with self.assertRaises(GitImportError):
+        with pytest.raises(GitImportError):
             git_import.switch_branch('master', rdir)
-        self.assertIn('Getting a list of remote branches failed', output.getvalue())
+        assert 'Getting a list of remote branches failed' in output.getvalue()

@@ -24,21 +24,15 @@ class AjaxExceptionTestCase(TestCase):  # lint-amnesty, pylint: disable=missing-
 
     def test_process_exception(self):
         response1 = self.a.process_exception(self.request1, self.exception1)
-        self.assertIsInstance(response1, middleware.JsonError)
-        self.assertEqual(self.exception1.status_code, response1.status_code)
-        self.assertEqual(
-            {"errors": json.loads(text_type(self.exception1))},
-            json.loads(response1.content.decode('utf-8'))
-        )
+        assert isinstance(response1, middleware.JsonError)
+        assert self.exception1.status_code == response1.status_code
+        assert {'errors': json.loads(text_type(self.exception1))} == json.loads(response1.content.decode('utf-8'))
 
         response2 = self.a.process_exception(self.request1, self.exception2)
-        self.assertIsInstance(response2, middleware.JsonError)
-        self.assertEqual(self.exception2.status_code, response2.status_code)
-        self.assertEqual(
-            {"errors": [text_type(self.exception2)]},
-            json.loads(response2.content.decode('utf-8'))
-        )
+        assert isinstance(response2, middleware.JsonError)
+        assert self.exception2.status_code == response2.status_code
+        assert {'errors': [text_type(self.exception2)]} == json.loads(response2.content.decode('utf-8'))
 
-        self.assertIsNone(self.a.process_exception(self.request1, self.exception0))
-        self.assertIsNone(self.a.process_exception(self.request0, self.exception1))
-        self.assertIsNone(self.a.process_exception(self.request0, self.exception0))
+        assert self.a.process_exception(self.request1, self.exception0) is None
+        assert self.a.process_exception(self.request0, self.exception1) is None
+        assert self.a.process_exception(self.request0, self.exception0) is None
