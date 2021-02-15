@@ -190,7 +190,7 @@ class TestProctoringDashboardViews(SharedModuleStoreTestCase):
         self.instructor.save()
 
         response = self.client.get(self.url)
-        self.assertIn('data-enable-exam-resume-proctoring-improvements="True"', response.content.decode('utf-8'))
+        assert 'data-enable-exam-resume-proctoring-improvements="True"' in response.content.decode('utf-8')
 
     @override_waffle_flag(EXAM_RESUME_PROCTORING_IMPROVEMENTS, False)
     def test_exam_resume_proctoring_improvements_toggle_disabled(self):
@@ -203,7 +203,7 @@ class TestProctoringDashboardViews(SharedModuleStoreTestCase):
         self.instructor.save()
 
         response = self.client.get(self.url)
-        self.assertIn('data-enable-exam-resume-proctoring-improvements="False"', response.content.decode('utf-8'))
+        assert 'data-enable-exam-resume-proctoring-improvements="False"' in response.content.decode('utf-8')
 
     def test_review_dashboard(self):
         """

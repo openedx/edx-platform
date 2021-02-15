@@ -4,7 +4,7 @@ Tests for the InstructorService
 
 
 import json
-
+import pytest
 import mock
 import six
 from opaque_keys import InvalidKeyError
@@ -63,14 +63,8 @@ class InstructorServiceTests(SharedModuleStoreTestCase):
         """
 
         # make sure the attempt is there
-        self.assertEqual(
-            StudentModule.objects.filter(
-                student=self.module_to_reset.student,
-                course_id=self.course.id,
-                module_state_key=self.module_to_reset.module_state_key,
-            ).count(),
-            1
-        )
+        assert StudentModule.objects.filter(student=self.module_to_reset.student, course_id=self.course.id,
+                                            module_state_key=self.module_to_reset.module_state_key).count() == 1
 
         self.service.delete_student_attempt(
             self.student.username,
@@ -80,14 +74,8 @@ class InstructorServiceTests(SharedModuleStoreTestCase):
         )
 
         # make sure the module has been deleted
-        self.assertEqual(
-            StudentModule.objects.filter(
-                student=self.module_to_reset.student,
-                course_id=self.course.id,
-                module_state_key=self.module_to_reset.module_state_key,
-            ).count(),
-            0
-        )
+        assert StudentModule.objects.filter(student=self.module_to_reset.student, course_id=self.course.id,
+                                            module_state_key=self.module_to_reset.module_state_key).count() == 0
 
     def test_reset_bad_content_id(self):
         """
@@ -100,7 +88,7 @@ class InstructorServiceTests(SharedModuleStoreTestCase):
             'foo/bar/baz',
             requesting_user=self.student,
         )
-        self.assertIsNone(result)
+        assert result is None
 
     def test_reset_bad_user(self):
         """
@@ -113,7 +101,7 @@ class InstructorServiceTests(SharedModuleStoreTestCase):
             'foo/bar/baz',
             requesting_user=self.student,
         )
-        self.assertIsNone(result)
+        assert result is None
 
     def test_reset_non_existing_attempt(self):
         """
@@ -126,7 +114,7 @@ class InstructorServiceTests(SharedModuleStoreTestCase):
             self.other_problem_urlname,
             requesting_user=self.student,
         )
-        self.assertIsNone(result)
+        assert result is None
 
     def test_is_user_staff(self):
         """
@@ -136,7 +124,7 @@ class InstructorServiceTests(SharedModuleStoreTestCase):
             self.student,
             six.text_type(self.course.id)
         )
-        self.assertFalse(result)
+        assert not result
 
         # allow staff access to the student
         allow_access(self.course, self.student, 'staff')
@@ -144,7 +132,7 @@ class InstructorServiceTests(SharedModuleStoreTestCase):
             self.student,
             six.text_type(self.course.id)
         )
-        self.assertTrue(result)
+        assert result
 
     def test_report_suspicious_attempt(self):
         """
@@ -195,18 +183,18 @@ class InstructorServiceTests(SharedModuleStoreTestCase):
         Test that it returns the correct proctoring escalation email
         """
         email = self.service.get_proctoring_escalation_email(str(self.course.id))
-        self.assertEqual(email, self.email)
+        assert email == self.email
 
     def test_get_proctoring_escalation_email_no_course(self):
         """
         Test that it raises an exception if the course is not found
         """
-        with self.assertRaises(ObjectDoesNotExist):
+        with pytest.raises(ObjectDoesNotExist):
             self.service.get_proctoring_escalation_email('a/b/c')
 
     def test_get_proctoring_escalation_email_invalid_key(self):
         """
         Test that it raises an exception if the course_key is invalid
         """
-        with self.assertRaises(InvalidKeyError):
+        with pytest.raises(InvalidKeyError):
             self.service.get_proctoring_escalation_email('invalid key')

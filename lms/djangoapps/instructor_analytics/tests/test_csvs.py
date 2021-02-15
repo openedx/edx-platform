@@ -16,30 +16,28 @@ class TestAnalyticsCSVS(TestCase):
         datarows = []
 
         res = create_csv_response('robot.csv', header, datarows)
-        self.assertEqual(res['Content-Type'], 'text/csv')
-        self.assertEqual(res['Content-Disposition'], u'attachment; filename={0}'.format('robot.csv'))
-        self.assertEqual(res.content.strip().decode('utf-8'), '"Name","Email"')
+        assert res['Content-Type'] == 'text/csv'
+        assert res['Content-Disposition'] == u'attachment; filename={0}'.format('robot.csv')
+        assert res.content.strip().decode('utf-8') == '"Name","Email"'
 
     def test_create_csv_response(self):
         header = ['Name', 'Email']
         datarows = [['Jim', 'jim@edy.org'], ['Jake', 'jake@edy.org'], ['Jeeves', 'jeeves@edy.org']]
 
         res = create_csv_response('robot.csv', header, datarows)
-        self.assertEqual(res['Content-Type'], 'text/csv')
-        self.assertEqual(res['Content-Disposition'], u'attachment; filename={0}'.format('robot.csv'))
-        self.assertEqual(
-            res.content.strip().decode('utf-8'),
-            '"Name","Email"\r\n"Jim","jim@edy.org"\r\n"Jake","jake@edy.org"\r\n"Jeeves","jeeves@edy.org"'
-        )
+        assert res['Content-Type'] == 'text/csv'
+        assert res['Content-Disposition'] == u'attachment; filename={0}'.format('robot.csv')
+        assert res.content.strip().decode('utf-8') ==\
+               '"Name","Email"\r\n"Jim","jim@edy.org"\r\n"Jake","jake@edy.org"\r\n"Jeeves","jeeves@edy.org"'
 
     def test_create_csv_response_empty(self):
         header = []
         datarows = []
 
         res = create_csv_response('robot.csv', header, datarows)
-        self.assertEqual(res['Content-Type'], 'text/csv')
-        self.assertEqual(res['Content-Disposition'], u'attachment; filename={0}'.format('robot.csv'))
-        self.assertEqual(res.content.strip().decode('utf-8'), '')
+        assert res['Content-Type'] == 'text/csv'
+        assert res['Content-Disposition'] == u'attachment; filename={0}'.format('robot.csv')
+        assert res.content.strip().decode('utf-8') == ''
 
 
 class TestAnalyticsFormatDictlist(TestCase):
@@ -68,25 +66,23 @@ class TestAnalyticsFormatDictlist(TestCase):
         ideal_datarows = [['value-1,1', 'value-1,4'],
                           ['value-2,1', 'value-2,4']]
 
-        self.assertEqual(header, ideal_header)
-        self.assertEqual(datarows, ideal_datarows)
+        assert header == ideal_header
+        assert datarows == ideal_datarows
 
     def test_format_dictlist_empty(self):
         header, datarows = format_dictlist([], [])
-        self.assertEqual(header, [])
-        self.assertEqual(datarows, [])
+        assert header == []
+        assert datarows == []
 
     def test_create_csv_response(self):
         header = ['Name', 'Email']
         datarows = [['Jim', 'jim@edy.org'], ['Jake', 'jake@edy.org'], ['Jeeves', 'jeeves@edy.org']]
 
         res = create_csv_response('robot.csv', header, datarows)
-        self.assertEqual(res['Content-Type'], 'text/csv')
-        self.assertEqual(res['Content-Disposition'], u'attachment; filename={0}'.format('robot.csv'))
-        self.assertEqual(
-            res.content.strip().decode('utf-8'),
-            '"Name","Email"\r\n"Jim","jim@edy.org"\r\n"Jake","jake@edy.org"\r\n"Jeeves","jeeves@edy.org"'
-        )
+        assert res['Content-Type'] == 'text/csv'
+        assert res['Content-Disposition'] == u'attachment; filename={0}'.format('robot.csv')
+        assert res.content.strip().decode('utf-8') ==\
+               '"Name","Email"\r\n"Jim","jim@edy.org"\r\n"Jake","jake@edy.org"\r\n"Jeeves","jeeves@edy.org"'
 
 
 class TestAnalyticsFormatInstances(TestCase):
@@ -111,23 +107,19 @@ class TestAnalyticsFormatInstances(TestCase):
     def test_format_instances_response(self):
         features = ['a_var', 'c_var', 'd_var']
         header, datarows = format_instances(self.instances, features)
-        self.assertEqual(header, ['a_var', 'c_var', 'd_var'])
-        self.assertEqual(datarows, [[
-            'aval',
-            'cval',
-            'dval',
-        ] for _ in range(len(self.instances))])
+        assert header == ['a_var', 'c_var', 'd_var']
+        assert datarows == [['aval', 'cval', 'dval'] for _ in range(len(self.instances))]
 
     def test_format_instances_response_noinstances(self):
         features = ['a_var']
         header, datarows = format_instances([], features)
-        self.assertEqual(header, features)
-        self.assertEqual(datarows, [])
+        assert header == features
+        assert datarows == []
 
     def test_format_instances_response_nofeatures(self):
         header, datarows = format_instances(self.instances, [])
-        self.assertEqual(header, [])
-        self.assertEqual(datarows, [[] for _ in range(len(self.instances))])
+        assert header == []
+        assert datarows == [[] for _ in range(len(self.instances))]
 
     def test_format_instances_response_nonexistantfeature(self):
         with pytest.raises(AttributeError):

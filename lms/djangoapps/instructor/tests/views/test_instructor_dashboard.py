@@ -110,13 +110,13 @@ class TestInstructorDashboard(ModuleStoreTestCase, LoginEnrollmentTestCase, XssT
             tabs = get_course_tab_list(user, course)
             return len([tab for tab in tabs if tab.name == 'Instructor']) == 1
 
-        self.assertTrue(has_instructor_tab(self.instructor, self.course))
+        assert has_instructor_tab(self.instructor, self.course)
 
         staff = StaffFactory(course_key=self.course.id)
-        self.assertTrue(has_instructor_tab(staff, self.course))
+        assert has_instructor_tab(staff, self.course)
 
         student = UserFactory.create()
-        self.assertFalse(has_instructor_tab(student, self.course))
+        assert not has_instructor_tab(student, self.course)
 
         researcher = UserFactory.create()
         CourseAccessRoleFactory(
@@ -125,7 +125,7 @@ class TestInstructorDashboard(ModuleStoreTestCase, LoginEnrollmentTestCase, XssT
             role='data_researcher',
             org=self.course.id.org
         )
-        self.assertTrue(has_instructor_tab(researcher, self.course))
+        assert has_instructor_tab(researcher, self.course)
 
         org_researcher = UserFactory.create()
         CourseAccessRoleFactory(
@@ -134,7 +134,7 @@ class TestInstructorDashboard(ModuleStoreTestCase, LoginEnrollmentTestCase, XssT
             role='data_researcher',
             org=self.course.id.org
         )
-        self.assertTrue(has_instructor_tab(org_researcher, self.course))
+        assert has_instructor_tab(org_researcher, self.course)
 
     @ddt.data(
         ('staff', False, False),
@@ -210,25 +210,13 @@ class TestInstructorDashboard(ModuleStoreTestCase, LoginEnrollmentTestCase, XssT
         response = self.client.get(url)
         content = pq(response.content)
 
-        self.assertEqual(
-            display_name,
-            content('#field-course-display-name b').contents()[0].strip()
-        )
+        assert display_name == content('#field-course-display-name b').contents()[0].strip()
 
-        self.assertEqual(
-            run,
-            content('#field-course-name b').contents()[0].strip()
-        )
+        assert run == content('#field-course-name b').contents()[0].strip()
 
-        self.assertEqual(
-            number,
-            content('#field-course-number b').contents()[0].strip()
-        )
+        assert number == content('#field-course-number b').contents()[0].strip()
 
-        self.assertEqual(
-            org,
-            content('#field-course-organization b').contents()[0].strip()
-        )
+        assert org == content('#field-course-organization b').contents()[0].strip()
 
     @ddt.data(True, False)
     def test_membership_reason_field_visibility(self, enbale_reason_field):
@@ -394,10 +382,7 @@ class TestInstructorDashboard(ModuleStoreTestCase, LoginEnrollmentTestCase, XssT
         waffle_flag = waffle_flags()[WRITABLE_GRADEBOOK]
         with override_waffle_flag(waffle_flag, active=True):
             response = self.client.get(self.url)
-        self.assertNotIn(
-            TestInstructorDashboard.GRADEBOOK_LEARNER_COUNT_MESSAGE,
-            response.content.decode('utf-8')
-        )
+        assert TestInstructorDashboard.GRADEBOOK_LEARNER_COUNT_MESSAGE not in response.content.decode('utf-8')
         self.assertContains(response, 'View Gradebook')
 
     def test_course_name_xss(self):
@@ -466,7 +451,7 @@ class TestInstructorDashboard(ModuleStoreTestCase, LoginEnrollmentTestCase, XssT
 
         # link to dashboard shown
         expected_message = self.get_dashboard_enrollment_message()
-        self.assertIn(expected_message, response.content.decode(response.charset))
+        assert expected_message in response.content.decode(response.charset)
 
     @override_settings(ANALYTICS_DASHBOARD_URL='')
     @override_settings(ANALYTICS_DASHBOARD_NAME='')
@@ -491,7 +476,7 @@ class TestInstructorDashboard(ModuleStoreTestCase, LoginEnrollmentTestCase, XssT
 
         # link to dashboard shown
         expected_message = self.get_dashboard_analytics_message()
-        self.assertIn(expected_message, response.content.decode(response.charset))
+        assert expected_message in response.content.decode(response.charset)
 
     @ddt.data(
         (True, True, True),
@@ -512,9 +497,8 @@ class TestInstructorDashboard(ModuleStoreTestCase, LoginEnrollmentTestCase, XssT
 
             response = self.client.get(self.url)
 
-            self.assertEqual(expected_result,
-                             'CCX Coaches are able to create their own Custom Courses based on this course'
-                             in response.content.decode('utf-8'))
+            assert expected_result == ('CCX Coaches are able to create their own Custom Courses based on this course'
+                                       in response.content.decode('utf-8'))
 
     def test_grade_cutoffs(self):
         """
@@ -526,11 +510,11 @@ class TestInstructorDashboard(ModuleStoreTestCase, LoginEnrollmentTestCase, XssT
     @patch('lms.djangoapps.instructor.views.gradebook_api.MAX_STUDENTS_PER_PAGE_GRADE_BOOK', 2)
     def test_calculate_page_info(self):
         page = calculate_page_info(offset=0, total_students=2)
-        self.assertEqual(page["offset"], 0)
-        self.assertEqual(page["page_num"], 1)
-        self.assertEqual(page["next_offset"], None)
-        self.assertEqual(page["previous_offset"], None)
-        self.assertEqual(page["total_pages"], 1)
+        assert page['offset'] == 0
+        assert page['page_num'] == 1
+        assert page['next_offset'] is None
+        assert page['previous_offset'] is None
+        assert page['total_pages'] == 1
 
     @patch('lms.djangoapps.instructor.views.gradebook_api.render_to_response', intercept_renderer)
     @patch('lms.djangoapps.instructor.views.gradebook_api.MAX_STUDENTS_PER_PAGE_GRADE_BOOK', 1)
@@ -544,9 +528,9 @@ class TestInstructorDashboard(ModuleStoreTestCase, LoginEnrollmentTestCase, XssT
             kwargs={'course_id': self.course.id}
         )
         response = self.client.get(url)
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
         # Max number of student per page is one.  Patched setting MAX_STUDENTS_PER_PAGE_GRADE_BOOK = 1
-        self.assertEqual(len(response.mako_context['students']), 1)
+        assert len(response.mako_context['students']) == 1
 
     def test_open_response_assessment_page(self):
         """
@@ -583,7 +567,7 @@ class TestInstructorDashboard(ModuleStoreTestCase, LoginEnrollmentTestCase, XssT
         )
         response = self.client.get(self.url)
         # assert we don't get a 500 error
-        self.assertEqual(200, response.status_code)
+        assert 200 == response.status_code
 
 
 @ddt.ddt
@@ -678,4 +662,4 @@ class TestInstructorDashboardPerformance(ModuleStoreTestCase, LoginEnrollmentTes
         url = reverse('spoc_gradebook', kwargs={'course_id': self.course.id})
         with check_mongo_calls(9):
             response = self.client.get(url)
-            self.assertEqual(response.status_code, 200)
+            assert response.status_code == 200

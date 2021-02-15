@@ -82,8 +82,8 @@ class TestAnalyticsBasic(ModuleStoreTestCase):
         response = Mock(module_type='openassessment', student=Mock(username='staff'), state=payload_state)
 
         transformed_state = json.loads(get_response_state(response))
-        self.assertEqual(transformed_state['saved_files_descriptions'][0], files_descriptions)
-        self.assertEqual(transformed_state['saved_response']['parts'][0]['text'], saved_response)
+        assert transformed_state['saved_files_descriptions'][0] == files_descriptions
+        assert transformed_state['saved_response']['parts'][0]['text'] == saved_response
 
     def test_list_problem_responses(self):
         def result_factory(result_id):
@@ -120,20 +120,17 @@ class TestAnalyticsBasic(ModuleStoreTestCase):
                 )
 
                 # Check if list_problem_responses returned expected results:
-                self.assertEqual(len(problem_responses), len(mock_results))
+                assert len(problem_responses) == len(mock_results)
                 for mock_result in mock_results:
-                    self.assertIn(
-                        {'username': mock_result.student.username, 'state': mock_result.state},
-                        problem_responses
-                    )
+                    assert {'username': mock_result.student.username, 'state': mock_result.state} in problem_responses
 
     def test_enrolled_students_features_username(self):
-        self.assertIn('username', AVAILABLE_FEATURES)
+        assert 'username' in AVAILABLE_FEATURES
         userreports = enrolled_students_features(self.course_key, ['username'])
-        self.assertEqual(len(userreports), len(self.users))
+        assert len(userreports) == len(self.users)
         for userreport in userreports:
-            self.assertEqual(list(userreport.keys()), ['username'])
-            self.assertIn(userreport['username'], [user.username for user in self.users])
+            assert list(userreport.keys()) == ['username']
+            assert userreport['username'] in [user.username for user in self.users]
 
     def test_enrolled_students_features_keys(self):
         query_features = ('username', 'name', 'email', 'city', 'country',)
@@ -142,20 +139,20 @@ class TestAnalyticsBasic(ModuleStoreTestCase):
             user.profile.country = u"Tatooine {}".format(user.id)
             user.profile.save()
         for feature in query_features:
-            self.assertIn(feature, AVAILABLE_FEATURES)
+            assert feature in AVAILABLE_FEATURES
         with self.assertNumQueries(1):
             userreports = enrolled_students_features(self.course_key, query_features)
-        self.assertEqual(len(userreports), len(self.users))
+        assert len(userreports) == len(self.users)
 
         userreports = sorted(userreports, key=lambda u: u["username"])
         users = sorted(self.users, key=lambda u: u.username)
         for userreport, user in zip(userreports, users):
-            self.assertEqual(set(userreport.keys()), set(query_features))
-            self.assertEqual(userreport['username'], user.username)
-            self.assertEqual(userreport['email'], user.email)
-            self.assertEqual(userreport['name'], user.profile.name)
-            self.assertEqual(userreport['city'], user.profile.city)
-            self.assertEqual(userreport['country'], user.profile.country)
+            assert set(userreport.keys()) == set(query_features)
+            assert userreport['username'] == user.username
+            assert userreport['email'] == user.email
+            assert userreport['name'] == user.profile.name
+            assert userreport['city'] == user.profile.city
+            assert userreport['country'] == user.profile.country
 
     def test_enrolled_student_with_no_country_city(self):
         userreports = enrolled_students_features(self.course_key, ('username', 'city', 'country',))
@@ -163,8 +160,8 @@ class TestAnalyticsBasic(ModuleStoreTestCase):
             # This behaviour is somewhat inconsistent: None string fields
             # objects are converted to "None", but non-JSON serializable fields
             # are converted to an empty string.
-            self.assertEqual(userreport['city'], "None")
-            self.assertEqual(userreport['country'], "")
+            assert userreport['city'] == 'None'
+            assert userreport['country'] == ''
 
     def test_enrolled_students_meta_features_keys(self):
         """
@@ -173,11 +170,11 @@ class TestAnalyticsBasic(ModuleStoreTestCase):
         query_features = ('meta.position', 'meta.company')
         with self.assertNumQueries(1):
             userreports = enrolled_students_features(self.course_key, query_features)
-        self.assertEqual(len(userreports), len(self.users))
+        assert len(userreports) == len(self.users)
         for userreport in userreports:
-            self.assertEqual(set(userreport.keys()), set(query_features))
-            self.assertIn(userreport['meta.position'], [u"edX expert {}".format(user.id) for user in self.users])
-            self.assertIn(userreport['meta.company'], [u"Open edX Inc {}".format(user.id) for user in self.users])
+            assert set(userreport.keys()) == set(query_features)
+            assert userreport['meta.position'] in [u'edX expert {}'.format(user.id) for user in self.users]
+            assert userreport['meta.company'] in [u'Open edX Inc {}'.format(user.id) for user in self.users]
 
     def test_enrolled_students_enrollment_verification(self):
         """
@@ -185,13 +182,13 @@ class TestAnalyticsBasic(ModuleStoreTestCase):
         """
         query_features = ('enrollment_mode', 'verification_status')
         userreports = enrolled_students_features(self.course_key, query_features)
-        self.assertEqual(len(userreports), len(self.users))
+        assert len(userreports) == len(self.users)
         # by default all users should have "audit" as their enrollment mode
         # and "N/A" as their verification status
         for userreport in userreports:
-            self.assertEqual(set(userreport.keys()), set(query_features))
-            self.assertIn(userreport['enrollment_mode'], ["audit"])
-            self.assertIn(userreport['verification_status'], ["N/A"])
+            assert set(userreport.keys()) == set(query_features)
+            assert userreport['enrollment_mode'] in ['audit']
+            assert userreport['verification_status'] in ['N/A']
         # make sure that the user report respects whatever value
         # is returned by verification and enrollment code
         with patch("common.djangoapps.student.models.CourseEnrollment.enrollment_mode_for_user") as enrollment_patch:
@@ -201,11 +198,11 @@ class TestAnalyticsBasic(ModuleStoreTestCase):
                 enrollment_patch.return_value = ["verified"]
                 verify_patch.return_value = "dummy verification status"
                 userreports = enrolled_students_features(self.course_key, query_features)
-                self.assertEqual(len(userreports), len(self.users))
+                assert len(userreports) == len(self.users)
                 for userreport in userreports:
-                    self.assertEqual(set(userreport.keys()), set(query_features))
-                    self.assertIn(userreport['enrollment_mode'], ["verified"])
-                    self.assertIn(userreport['verification_status'], ["dummy verification status"])
+                    assert set(userreport.keys()) == set(query_features)
+                    assert userreport['enrollment_mode'] in ['verified']
+                    assert userreport['verification_status'] in ['dummy verification status']
 
     def test_enrolled_students_features_keys_cohorted(self):
         course = CourseFactory.create(org="test", course="course1", display_name="run1")
@@ -229,26 +226,26 @@ class TestAnalyticsBasic(ModuleStoreTestCase):
         # prefetch_related('course_groups').
         with self.assertNumQueries(2):
             userreports = enrolled_students_features(course.id, query_features)
-        self.assertEqual(len([r for r in userreports if r['username'] in cohorted_usernames]), len(cohorted_students))
-        self.assertEqual(len([r for r in userreports if r['username'] == non_cohorted_student.username]), 1)
+        assert len([r for r in userreports if r['username'] in cohorted_usernames]) == len(cohorted_students)
+        assert len([r for r in userreports if r['username'] == non_cohorted_student.username]) == 1
         for report in userreports:
-            self.assertEqual(set(report.keys()), set(query_features))
+            assert set(report.keys()) == set(query_features)
             if report['username'] in cohorted_usernames:
-                self.assertEqual(report['cohort'], cohort.name)
+                assert report['cohort'] == cohort.name
             else:
-                self.assertEqual(report['cohort'], '[unassigned]')
+                assert report['cohort'] == '[unassigned]'
 
     def test_available_features(self):
-        self.assertEqual(len(AVAILABLE_FEATURES), len(STUDENT_FEATURES + PROFILE_FEATURES))
-        self.assertEqual(set(AVAILABLE_FEATURES), set(STUDENT_FEATURES + PROFILE_FEATURES))
+        assert len(AVAILABLE_FEATURES) == len((STUDENT_FEATURES + PROFILE_FEATURES))
+        assert set(AVAILABLE_FEATURES) == set((STUDENT_FEATURES + PROFILE_FEATURES))
 
     def test_list_may_enroll(self):
         may_enroll = list_may_enroll(self.course_key, ['email'])
-        self.assertEqual(len(may_enroll), len(self.students_who_may_enroll) - len(self.users))
+        assert len(may_enroll) == (len(self.students_who_may_enroll) - len(self.users))
         email_adresses = [student.email for student in self.students_who_may_enroll]
         for student in may_enroll:
-            self.assertEqual(list(student.keys()), ['email'])
-            self.assertIn(student['email'], email_adresses)
+            assert list(student.keys()) == ['email']
+            assert student['email'] in email_adresses
 
     def test_get_student_exam_attempt_features(self):
         query_features = [
@@ -281,6 +278,6 @@ class TestAnalyticsBasic(ModuleStoreTestCase):
         )
 
         proctored_exam_attempts = get_proctored_exam_results(self.course_key, query_features)
-        self.assertEqual(len(proctored_exam_attempts), 3)
+        assert len(proctored_exam_attempts) == 3
         for proctored_exam_attempt in proctored_exam_attempts:
-            self.assertEqual(set(proctored_exam_attempt.keys()), set(query_features))
+            assert set(proctored_exam_attempt.keys()) == set(query_features)

@@ -367,8 +367,8 @@ class TestReportMixin(object):
             numeric_expected_rows = [self._extract_and_round_numeric_items(row) for row in expected_rows]
 
             if verify_order:
-                self.assertEqual(csv_rows, expected_rows)
-                self.assertEqual(numeric_csv_rows, numeric_expected_rows)
+                assert csv_rows == expected_rows
+                assert numeric_csv_rows == numeric_expected_rows
             else:
                 six.assertCountEqual(self, csv_rows, expected_rows)
                 six.assertCountEqual(self, numeric_csv_rows, numeric_expected_rows)
