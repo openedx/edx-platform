@@ -80,8 +80,8 @@ class TestSite(TestCase):
         saved in the UserSignupSource Table.
         """
         response = self.client.post(self.url, self.params)
-        self.assertEqual(response.status_code, 200)
-        self.assertGreater(len(UserSignupSource.objects.filter(site='openedx.localhost')), 0)
+        assert response.status_code == 200
+        assert len(UserSignupSource.objects.filter(site='openedx.localhost')) > 0
 
     def test_user_signup_from_non_configured_site(self):
         """
@@ -89,8 +89,8 @@ class TestSite(TestCase):
         in UserSignupSource Table.
         """
         response = self.client.post(self.url, self.params)
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(len(UserSignupSource.objects.filter(site='openedx.localhost')), 0)
+        assert response.status_code == 200
+        assert len(UserSignupSource.objects.filter(site='openedx.localhost')) == 0
 
     @mock.patch("openedx.core.djangoapps.site_configuration.helpers.get_value", fake_get_value)
     def test_user_signup_missing_enhanced_profile(self):
@@ -99,7 +99,7 @@ class TestSite(TestCase):
         profile information.
         """
         response = self.client.post(self.url, self.params)
-        self.assertEqual(response.status_code, 400)
+        assert response.status_code == 400
 
     @mock.patch("openedx.core.djangoapps.site_configuration.helpers.get_value", fake_get_value)
     def test_user_signup_including_enhanced_profile(self):
@@ -108,10 +108,10 @@ class TestSite(TestCase):
         profile information.
         """
         response = self.client.post(self.url, self.extended_params)
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
         user = User.objects.get(username=self.username)
         meta = json.loads(user.profile.meta)
-        self.assertEqual(meta['address1'], 'foo')
-        self.assertEqual(meta['state'], 'foo')
-        self.assertEqual(meta['company'], 'foo')
-        self.assertEqual(meta['title'], 'foo')
+        assert meta['address1'] == 'foo'
+        assert meta['state'] == 'foo'
+        assert meta['company'] == 'foo'
+        assert meta['title'] == 'foo'

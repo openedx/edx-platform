@@ -69,7 +69,7 @@ class TestStudentDashboardEmailView(SharedModuleStoreTestCase):
     def test_email_unauthorized(self):
         BulkEmailFlag.objects.create(enabled=True, require_course_email_auth=True)
         # Assert that instructor email is not enabled for this course
-        self.assertFalse(is_bulk_email_feature_enabled(self.course.id))
+        assert not is_bulk_email_feature_enabled(self.course.id)
         # Assert that the URL for the email view is not in the response
         # if this course isn't authorized
         response = self.client.get(self.url)
@@ -81,7 +81,7 @@ class TestStudentDashboardEmailView(SharedModuleStoreTestCase):
         cauth = CourseAuthorization(course_id=self.course.id, email_enabled=True)
         cauth.save()
         # Assert that instructor email is enabled for this course
-        self.assertTrue(is_bulk_email_feature_enabled(self.course.id))
+        assert is_bulk_email_feature_enabled(self.course.id)
         # Assert that the URL for the email view is not in the response
         # if this course isn't authorized
         response = self.client.get(self.url)
