@@ -109,7 +109,7 @@ edx-completion==4.0.3     # via -r requirements/edx/testing.txt
 edx-django-release-util==1.0.0  # via -r requirements/edx/testing.txt
 edx-django-sites-extensions==3.0.0  # via -r requirements/edx/testing.txt
 edx-django-utils==3.13.0  # via -r requirements/edx/testing.txt, django-config-models, edx-drf-extensions, edx-enterprise, edx-rest-api-client, edx-toggles, edx-when, ora2, super-csv
-edx-drf-extensions==6.4.0  # via -r requirements/edx/testing.txt, edx-completion, edx-enterprise, edx-organizations, edx-proctoring, edx-rbac, edx-when, edxval
+edx-drf-extensions==6.5.0  # via -r requirements/edx/testing.txt, edx-completion, edx-enterprise, edx-organizations, edx-proctoring, edx-rbac, edx-when, edxval
 edx-enterprise==3.17.25   # via -c requirements/edx/../constraints.txt, -r requirements/edx/testing.txt
 edx-event-routing-backends==4.0.1  # via -r requirements/edx/testing.txt
 edx-i18n-tools==0.5.3     # via -r requirements/edx/testing.txt, ora2
@@ -216,7 +216,7 @@ pycontracts==1.8.12       # via -r requirements/edx/testing.txt, edx-user-state-
 pycountry==20.7.3         # via -r requirements/edx/testing.txt
 pycparser==2.20           # via -r requirements/edx/testing.txt, cffi
 pycryptodomex==3.10.1     # via -r requirements/edx/testing.txt, edx-proctoring, lti-consumer-xblock, pyjwkest
-pygments==2.7.4           # via -r requirements/edx/testing.txt, diff-cover, sphinx
+pygments==2.8.0           # via -r requirements/edx/testing.txt, diff-cover, sphinx
 pyjwkest==1.4.2           # via -r requirements/edx/testing.txt, edx-drf-extensions, lti-consumer-xblock
 pyjwt[crypto]==1.7.1      # via -r requirements/edx/testing.txt, drf-jwt, edx-rest-api-client, social-auth-core
 pylint-celery==0.3        # via -r requirements/edx/testing.txt, edx-lint
