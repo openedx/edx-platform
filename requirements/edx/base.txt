@@ -98,7 +98,7 @@ edx-completion==4.0.3     # via -r requirements/edx/base.in
 edx-django-release-util==1.0.0  # via -r requirements/edx/base.in
 edx-django-sites-extensions==3.0.0  # via -r requirements/edx/base.in
 edx-django-utils==3.13.0  # via -r requirements/edx/base.in, django-config-models, edx-drf-extensions, edx-enterprise, edx-rest-api-client, edx-toggles, edx-when, ora2, super-csv
-edx-drf-extensions==6.4.0  # via -r requirements/edx/base.in, edx-completion, edx-enterprise, edx-organizations, edx-proctoring, edx-rbac, edx-when, edxval
+edx-drf-extensions==6.5.0  # via -r requirements/edx/base.in, edx-completion, edx-enterprise, edx-organizations, edx-proctoring, edx-rbac, edx-when, edxval
 edx-enterprise==3.17.25   # via -c requirements/edx/../constraints.txt, -r requirements/edx/base.in
 edx-event-routing-backends==4.0.1  # via -r requirements/edx/base.in
 edx-i18n-tools==0.5.3     # via ora2
@@ -179,7 +179,7 @@ pycontracts==1.8.12       # via -r requirements/edx/base.in, edx-user-state-clie
 pycountry==20.7.3         # via -r requirements/edx/base.in
 pycparser==2.20           # via -r requirements/edx/../edx-sandbox/shared.txt, cffi
 pycryptodomex==3.10.1     # via -r requirements/edx/base.in, edx-proctoring, lti-consumer-xblock, pyjwkest
-pygments==2.7.4           # via -r requirements/edx/base.in
+pygments==2.8.0           # via -r requirements/edx/base.in
 pyjwkest==1.4.2           # via -r requirements/edx/base.in, edx-drf-extensions, lti-consumer-xblock
 pyjwt[crypto]==1.7.1      # via -r requirements/edx/base.in, drf-jwt, edx-rest-api-client, social-auth-core
 pymongo==3.10.1           # via -c requirements/edx/../constraints.txt, -r requirements/edx/base.in, -r requirements/edx/paver.txt, edx-opaque-keys, event-tracking, mongodbproxy, mongoengine
