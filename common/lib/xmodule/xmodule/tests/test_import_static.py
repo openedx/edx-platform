@@ -47,10 +47,10 @@ class IgnoredFilesTestCase(unittest.TestCase):
         static_content_importer.import_static_content_directory()
         saved_static_content = [call[0][0] for call in content_store.save.call_args_list]
         name_val = {sc.name: sc.data for sc in saved_static_content}
-        self.assertIn("example.txt", name_val)
-        self.assertIn(".example.txt", name_val)
-        self.assertIn(b"GREEN", name_val["example.txt"])
-        self.assertIn(b"BLUE", name_val[".example.txt"])
-        self.assertNotIn("._example.txt", name_val)
-        self.assertNotIn(".DS_Store", name_val)
-        self.assertNotIn("example.txt~", name_val)
+        assert 'example.txt' in name_val
+        assert '.example.txt' in name_val
+        assert b'GREEN' in name_val['example.txt']
+        assert b'BLUE' in name_val['.example.txt']
+        assert '._example.txt' not in name_val
+        assert '.DS_Store' not in name_val
+        assert 'example.txt~' not in name_val

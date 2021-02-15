@@ -188,12 +188,12 @@ class CrossStoreXMLRoundtrip(CourseComparisonTest, PartitionTestCase):
 
                         source_course = source_store.get_course(source_course_key, depth=None, lazy=False)  # lint-amnesty, pylint: disable=no-member
 
-                        self.assertEqual(source_course.url_name, 'course')
+                        assert source_course.url_name == 'course'
 
                         export_dir_path = path(self.export_dir)
                         policy_dir = export_dir_path / 'exported_source_course' / 'policies' / source_course_key.run
                         policy_path = policy_dir / 'policy.json'
-                        self.assertTrue(os.path.exists(policy_path))
+                        assert os.path.exists(policy_path)
 
                         import_course_from_xml(
                             dest_store,
@@ -208,4 +208,4 @@ class CrossStoreXMLRoundtrip(CourseComparisonTest, PartitionTestCase):
 
                         dest_course = dest_store.get_course(dest_course_key, depth=None, lazy=False)  # lint-amnesty, pylint: disable=no-member
 
-                        self.assertEqual(dest_course.url_name, 'course')
+                        assert dest_course.url_name == 'course'

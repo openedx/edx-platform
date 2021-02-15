@@ -64,4 +64,4 @@ class TestInheritanceMixin(unittest.TestCase):
         confirm if the submission deadline has passed or not.
         """
         self.add_submission_deadline_information(due_date, graceperiod, self_paced)
-        self.assertEqual(is_past_deadline, self.xblock.has_deadline_passed())
+        assert is_past_deadline == self.xblock.has_deadline_passed()

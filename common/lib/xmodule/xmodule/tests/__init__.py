@@ -187,7 +187,7 @@ class ModelsTest(unittest.TestCase):  # lint-amnesty, pylint: disable=missing-cl
     def test_load_class(self):
         vc = XModuleDescriptor.load_class('sequential')
         vc_str = "<class 'xmodule.seq_module.SequenceDescriptor'>"
-        self.assertEqual(str(vc), vc_str)
+        assert str(vc) == vc_str
 
 
 class LogicTest(unittest.TestCase):
@@ -307,24 +307,18 @@ class CourseComparisonTest(TestCase):
         elif isinstance(reference_field, ReferenceValueDict):
             expected = {key: extract_key(val) for (key, val) in six.iteritems(expected)}
             actual = {key: extract_key(val) for (key, val) in six.iteritems(actual)}
-        self.assertEqual(
-            expected,
-            actual,
-            LazyFormat(
-                "Field {} doesn't match between usages {} and {}: {!r} != {!r}",
-                reference_field.name,
-                expected_block.scope_ids.usage_id,
-                actual_block.scope_ids.usage_id,
-                expected,
-                actual
-            )
-        )
+        assert expected == actual,\
+            LazyFormat("Field {} doesn't match between usages {} and {}: {!r} != {!r}",
+                       reference_field.name,
+                       expected_block.scope_ids.usage_id,
+                       actual_block.scope_ids.usage_id,
+                       expected, actual)
 
     def assertBlocksEqualByFields(self, expected_block, actual_block):
         """
         Compare block fields to check for equivalence.
         """
-        self.assertEqual(expected_block.fields, actual_block.fields)
+        assert expected_block.fields == actual_block.fields
         for field in expected_block.fields.values():
             self.assertFieldEqual(field, expected_block, actual_block)
 
@@ -337,18 +331,12 @@ class CourseComparisonTest(TestCase):
         else:
             expected = field.read_from(expected_block)
             actual = field.read_from(actual_block)
-            self.assertEqual(
-                expected,
-                actual,
-                LazyFormat(
-                    "Field {} doesn't match between usages {} and {}: {!r} != {!r}",
-                    field.name,
-                    expected_block.scope_ids.usage_id,
-                    actual_block.scope_ids.usage_id,
-                    expected,
-                    actual
-                )
-            )
+            assert expected == actual,\
+                LazyFormat("Field {} doesn't match between usages {} and {}: {!r} != {!r}",
+                           field.name,
+                           expected_block.scope_ids.usage_id,
+                           actual_block.scope_ids.usage_id,
+                           expected, actual)
 
     def assertCoursesEqual(self, expected_store, expected_course_key, actual_store, actual_course_key):
         """
@@ -364,7 +352,7 @@ class CourseComparisonTest(TestCase):
             with actual_store.branch_setting(ModuleStoreEnum.Branch.published_only, actual_course_key):
                 expected_items = expected_store.get_items(expected_course_key, revision=ModuleStoreEnum.RevisionOption.published_only)  # lint-amnesty, pylint: disable=line-too-long
                 actual_items = actual_store.get_items(actual_course_key, revision=ModuleStoreEnum.RevisionOption.published_only)  # lint-amnesty, pylint: disable=line-too-long
-                self.assertGreater(len(expected_items), 0)
+                assert len(expected_items) > 0
                 self._assertCoursesEqual(expected_items, actual_items, actual_course_key)
 
         # if the modulestore supports having a draft branch
@@ -389,7 +377,7 @@ class CourseComparisonTest(TestCase):
         Actual algorithm to compare courses.
         """
 
-        self.assertEqual(len(expected_items), len(actual_items))
+        assert len(expected_items) == len(actual_items)
 
         def map_key(usage_key):
             return (usage_key.block_type, usage_key.block_id)
@@ -416,11 +404,11 @@ class CourseComparisonTest(TestCase):
                 actual_item_location = actual_item_location.replace(name='course')
                 actual_item = actual_item_map.get(map_key(actual_item_location))
             # Formatting the message slows down tests of large courses significantly, so only do it if it would be used
-            self.assertIn(map_key(actual_item_location), list(actual_item_map.keys()))
+            assert map_key(actual_item_location) in list(actual_item_map.keys())
             if actual_item is None:
                 continue
             # compare fields
-            self.assertEqual(expected_item.fields, actual_item.fields)
+            assert expected_item.fields == actual_item.fields
             for field_name, field in six.iteritems(expected_item.fields):
                 if (expected_item.scope_ids.usage_id, field_name) in self.field_exclusions:
                     continue
@@ -431,7 +419,7 @@ class CourseComparisonTest(TestCase):
                     continue
                 self.assertFieldEqual(field, expected_item, actual_item)
             # compare children
-            self.assertEqual(expected_item.has_children, actual_item.has_children)
+            assert expected_item.has_children == actual_item.has_children
             if expected_item.has_children:
                 expected_children = [
                     (expected_item_child.location.block_type, expected_item_child.location.block_id)
@@ -443,7 +431,7 @@ class CourseComparisonTest(TestCase):
                     # get_children() rather than children to strip privates from public parents
                     for item_child in actual_item.get_children()
                 ]
-                self.assertEqual(expected_children, actual_children)
+                assert expected_children == actual_children
 
     def assertAssetEqual(self, expected_course_key, expected_asset, actual_course_key, actual_asset):
         """
@@ -457,20 +445,20 @@ class CourseComparisonTest(TestCase):
 
         expected_key = expected_asset.pop('asset_key')
         actual_key = actual_asset.pop('asset_key')
-        self.assertEqual(expected_key.map_into_course(actual_course_key), actual_key)
-        self.assertEqual(expected_key, actual_key.map_into_course(expected_course_key))
+        assert expected_key.map_into_course(actual_course_key) == actual_key
+        assert expected_key == actual_key.map_into_course(expected_course_key)
 
         expected_filename = expected_asset.pop('filename')
         actual_filename = actual_asset.pop('filename')
-        self.assertEqual(text_type(expected_key), expected_filename)
-        self.assertEqual(text_type(actual_key), actual_filename)
-        self.assertEqual(expected_asset, actual_asset)
+        assert text_type(expected_key) == expected_filename
+        assert text_type(actual_key) == actual_filename
+        assert expected_asset == actual_asset
 
     def _assertAssetsEqual(self, expected_course_key, expected_assets, actual_course_key, actual_assets):  # pylint: disable=invalid-name
         """
         Private helper method for assertAssetsEqual
         """
-        self.assertEqual(len(expected_assets), len(actual_assets))
+        assert len(expected_assets) == len(actual_assets)
 
         actual_assets_map = {asset['asset_key']: asset for asset in actual_assets}
         for expected_item in expected_assets:
@@ -486,7 +474,7 @@ class CourseComparisonTest(TestCase):
         expected_content, expected_count = expected_store.get_all_content_for_course(expected_course_key)
         actual_content, actual_count = actual_store.get_all_content_for_course(actual_course_key)
 
-        self.assertEqual(expected_count, actual_count)
+        assert expected_count == actual_count
         self._assertAssetsEqual(expected_course_key, expected_content, actual_course_key, actual_content)
         expected_thumbs = expected_store.get_all_content_thumbnails_for_course(expected_course_key)
         actual_thumbs = actual_store.get_all_content_thumbnails_for_course(actual_course_key)
@@ -503,10 +491,10 @@ class CourseComparisonTest(TestCase):
         actual_course_assets = actual_modulestore.get_all_asset_metadata(
             actual_course_key, None, sort=('displayname', ModuleStoreEnum.SortOrder.descending)
         )
-        self.assertEqual(len(expected_course_assets), len(actual_course_assets))
+        assert len(expected_course_assets) == len(actual_course_assets)
         for idx, __ in enumerate(expected_course_assets):
             for attr in AssetMetadata.ATTRS_ALLOWED_TO_UPDATE:
                 if attr in ('edited_on',):
                     # edited_on is updated upon import.
                     continue
-                self.assertEqual(getattr(expected_course_assets[idx], attr), getattr(actual_course_assets[idx], attr))
+                assert getattr(expected_course_assets[idx], attr) == getattr(actual_course_assets[idx], attr)

@@ -43,7 +43,7 @@ class FormulaTest(unittest.TestCase):  # lint-amnesty, pylint: disable=missing-c
         test = etree.tostring(xml)
 
         # success?
-        self.assertEqual(test.decode('utf-8'), expected)
+        assert test.decode('utf-8') == expected
 
     def test_fix_simple_superscripts(self):
         expr = '''
@@ -67,7 +67,7 @@ class FormulaTest(unittest.TestCase):  # lint-amnesty, pylint: disable=missing-c
         test = etree.tostring(xml)
 
         # success?
-        self.assertEqual(test.decode('utf-8'), expected)
+        assert test.decode('utf-8') == expected
 
     def test_fix_complex_superscripts(self):
         expr = '''
@@ -92,7 +92,7 @@ class FormulaTest(unittest.TestCase):  # lint-amnesty, pylint: disable=missing-c
         test = etree.tostring(xml)
 
         # success?
-        self.assertEqual(test.decode('utf-8'), expected)
+        assert test.decode('utf-8') == expected
 
     def test_fix_msubsup(self):
         expr = '''
@@ -114,4 +114,4 @@ class FormulaTest(unittest.TestCase):  # lint-amnesty, pylint: disable=missing-c
         test = etree.tostring(xml)
 
         # success?
-        self.assertEqual(test.decode('utf-8'), expected)
+        assert test.decode('utf-8') == expected

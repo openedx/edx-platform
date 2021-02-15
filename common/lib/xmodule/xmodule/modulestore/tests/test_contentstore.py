@@ -10,6 +10,7 @@ import unittest
 from tempfile import mkdtemp
 from uuid import uuid4
 
+import pytest
 import ddt
 import path
 from opaque_keys.edx.keys import AssetKey
@@ -101,7 +102,7 @@ class TestContentstore(unittest.TestCase):
         asset_key = self.course1_key.make_asset_key('asset', self.course1_files[0])
         self.contentstore.delete(asset_key)
 
-        with self.assertRaises(NotFoundError):
+        with pytest.raises(NotFoundError):
             self.contentstore.find(asset_key)
 
         # ensure deleting a non-existent file is a noop
@@ -114,17 +115,15 @@ class TestContentstore(unittest.TestCase):
         """
         self.set_up_assets(deprecated)
         asset_key = self.course1_key.make_asset_key('asset', self.course1_files[0])
-        self.assertIsNotNone(self.contentstore.find(asset_key), "Could not find {}".format(asset_key))
+        assert self.contentstore.find(asset_key) is not None, 'Could not find {}'.format(asset_key)
 
-        self.assertIsNotNone(self.contentstore.find(asset_key, as_stream=True), "Could not find {}".format(asset_key))
+        assert self.contentstore.find(asset_key, as_stream=True) is not None, 'Could not find {}'.format(asset_key)
 
         unknown_asset = self.course1_key.make_asset_key('asset', 'no_such_file.gif')
-        with self.assertRaises(NotFoundError):
+        with pytest.raises(NotFoundError):
             self.contentstore.find(unknown_asset)
-        self.assertIsNone(
-            self.contentstore.find(unknown_asset, throw_on_not_found=False),
-            "Found unknown asset {}".format(unknown_asset)
-        )
+        assert self.contentstore.find(unknown_asset, throw_on_not_found=False) is None,\
+            f'Found unknown asset {unknown_asset}'
 
     @ddt.data(True, False)
     def test_export_for_course(self, deprecated):
@@ -140,11 +139,11 @@ class TestContentstore(unittest.TestCase):
             )
             for filename in self.course1_files:
                 filepath = path.Path(root_dir / filename)
-                self.assertTrue(filepath.isfile(), "{} is not a file".format(filepath))
+                assert filepath.isfile(), '{} is not a file'.format(filepath)
             for filename in self.course2_files:
                 if filename not in self.course1_files:
                     filepath = path.Path(root_dir / filename)
-                    self.assertFalse(filepath.isfile(), "{} is unexpected exported a file".format(filepath))
+                    assert not filepath.isfile(), '{} is unexpected exported a file'.format(filepath)
         finally:
             shutil.rmtree(root_dir)
 
@@ -155,18 +154,18 @@ class TestContentstore(unittest.TestCase):
         """
         self.set_up_assets(deprecated)
         course1_assets, count = self.contentstore.get_all_content_for_course(self.course1_key)
-        self.assertEqual(count, len(self.course1_files), course1_assets)
+        assert count == len(self.course1_files), course1_assets
         for asset in course1_assets:
             parsed = AssetKey.from_string(asset['filename'])
-            self.assertIn(parsed.block_id, self.course1_files)
+            assert parsed.block_id in self.course1_files
 
         course1_assets, __ = self.contentstore.get_all_content_for_course(self.course1_key, 1, 1)
-        self.assertEqual(len(course1_assets), 1, course1_assets)
+        assert len(course1_assets) == 1, course1_assets
 
         fake_course = CourseLocator('test', 'fake', 'non')
         course_assets, count = self.contentstore.get_all_content_for_course(fake_course)
-        self.assertEqual(count, 0)
-        self.assertEqual(course_assets, [])
+        assert count == 0
+        assert course_assets == []
 
     @ddt.data(True, False)
     def test_attrs(self, deprecated):
@@ -178,7 +177,7 @@ class TestContentstore(unittest.TestCase):
             asset_key = self.course1_key.make_asset_key('asset', filename)
             prelocked = self.contentstore.get_attr(asset_key, 'locked', False)
             self.contentstore.set_attr(asset_key, 'locked', not prelocked)
-            self.assertEqual(self.contentstore.get_attr(asset_key, 'locked', False), not prelocked)
+            assert self.contentstore.get_attr(asset_key, 'locked', False) == (not prelocked)
 
     @ddt.data(True, False)
     def test_copy_assets(self, deprecated):
@@ -194,10 +193,10 @@ class TestContentstore(unittest.TestCase):
             source = self.contentstore.find(asset_key)
             copied = self.contentstore.find(dest_key)
             for propname in ['name', 'content_type', 'length', 'locked']:
-                self.assertEqual(getattr(source, propname), getattr(copied, propname))
+                assert getattr(source, propname) == getattr(copied, propname)
 
         __, count = self.contentstore.get_all_content_for_course(dest_course)
-        self.assertEqual(count, len(self.course1_files))
+        assert count == len(self.course1_files)
 
     @ddt.data(True, False)
     def test_copy_assets_with_duplicates(self, deprecated):
@@ -209,7 +208,7 @@ class TestContentstore(unittest.TestCase):
         self.contentstore.copy_all_course_assets(self.course1_key, dest_course)
 
         __, count = self.contentstore.get_all_content_for_course(dest_course)
-        self.assertEqual(count, 5)
+        assert count == 5
 
     @ddt.data(True, False)
     def test_delete_assets(self, deprecated):
@@ -219,7 +218,7 @@ class TestContentstore(unittest.TestCase):
         self.set_up_assets(deprecated)
         self.contentstore.delete_all_course_assets(self.course1_key)
         __, count = self.contentstore.get_all_content_for_course(self.course1_key)
-        self.assertEqual(count, 0)
+        assert count == 0
         # ensure it didn't remove any from other course
         __, count = self.contentstore.get_all_content_for_course(self.course2_key)
-        self.assertEqual(count, len(self.course2_files))
+        assert count == len(self.course2_files)

@@ -106,10 +106,10 @@ class ContentTest(unittest.TestCase):  # lint-amnesty, pylint: disable=missing-c
         # We had a bug where a thumbnail location of None was getting transformed into a Location tuple, with
         # all elements being None. It is important that the location be just None for rendering.
         content = StaticContent('loc', 'name', 'content_type', 'data', None, None, None)
-        self.assertIsNone(content.thumbnail_location)
+        assert content.thumbnail_location is None
 
         content = StaticContent('loc', 'name', 'content_type', 'data')
-        self.assertIsNone(content.thumbnail_location)
+        assert content.thumbnail_location is None
 
     @ddt.data(
         (u"monsters__.jpg", u"monsters__.jpg"),
@@ -123,11 +123,9 @@ class ContentTest(unittest.TestCase):  # lint-amnesty, pylint: disable=missing-c
         content = Content(AssetLocator(CourseLocator(u'mitX', u'800', u'ignore_run'), u'asset', original_filename),
                           None)
         (thumbnail_content, thumbnail_file_location) = content_store.generate_thumbnail(content)
-        self.assertIsNone(thumbnail_content)
-        self.assertEqual(
-            AssetLocator(CourseLocator(u'mitX', u'800', u'ignore_run'), u'thumbnail', thumbnail_filename),
-            thumbnail_file_location
-        )
+        assert thumbnail_content is None
+        assert AssetLocator(CourseLocator(u'mitX', u'800', u'ignore_run'), u'thumbnail', thumbnail_filename) ==\
+               thumbnail_file_location
 
     @patch('xmodule.contentstore.content.Image')
     def test_image_is_closed_when_generating_thumbnail(self, image_class_mock):
@@ -141,8 +139,8 @@ class ContentTest(unittest.TestCase):  # lint-amnesty, pylint: disable=missing-c
                           "image/jpeg")
         content.data = b'mock data'
         content_store.generate_thumbnail(content)
-        self.assertTrue(image_class_mock.open.called, "Image.open not called")
-        self.assertTrue(mock_image.close.called, "mock_image.close not called")
+        assert image_class_mock.open.called, 'Image.open not called'
+        assert mock_image.close.called, 'mock_image.close not called'
 
     def test_store_svg_as_thumbnail(self):
         # We had a bug that caused generate_thumbnail to attempt to pass SVG to PIL to generate a thumbnail.
@@ -154,11 +152,9 @@ class ContentTest(unittest.TestCase):  # lint-amnesty, pylint: disable=missing-c
                           'image/svg+xml')
         content.data = b'mock svg file'
         (thumbnail_content, thumbnail_file_location) = content_store.generate_thumbnail(content)
-        self.assertEqual(thumbnail_content.data.read(), b'mock svg file')
-        self.assertEqual(
-            AssetLocator(CourseLocator(u'mitX', u'800', u'ignore_run'), u'thumbnail', thumbnail_filename),
-            thumbnail_file_location
-        )
+        assert thumbnail_content.data.read() == b'mock svg file'
+        assert AssetLocator(CourseLocator(u'mitX', u'800', u'ignore_run'), u'thumbnail', thumbnail_filename) ==\
+               thumbnail_file_location
 
     def test_compute_location(self):
         # We had a bug that __ got converted into a single _. Make sure that substitution of INVALID_CHARS (like space)
@@ -166,19 +162,13 @@ class ContentTest(unittest.TestCase):  # lint-amnesty, pylint: disable=missing-c
         asset_location = StaticContent.compute_location(
             CourseKey.from_string('mitX/400/ignore'), 'subs__1eo_jXvZnE .srt.sjson'
         )
-        self.assertEqual(
-            AssetLocator(CourseLocator(u'mitX', u'400', u'ignore', deprecated=True),
-                         u'asset', u'subs__1eo_jXvZnE_.srt.sjson'),
-            asset_location
-        )
+        assert AssetLocator(CourseLocator(u'mitX', u'400', u'ignore', deprecated=True),
+                            u'asset', u'subs__1eo_jXvZnE_.srt.sjson') == asset_location
 
     def test_get_location_from_path(self):
         asset_location = StaticContent.get_location_from_path(u'/c4x/a/b/asset/images_course_image.jpg')
-        self.assertEqual(
-            AssetLocator(CourseLocator(u'a', u'b', None, deprecated=True),
-                         u'asset', u'images_course_image.jpg', deprecated=True),
-            asset_location
-        )
+        assert AssetLocator(CourseLocator(u'a', u'b', None, deprecated=True),
+                            u'asset', u'images_course_image.jpg', deprecated=True) == asset_location
 
     def test_static_content_stream_stream_data(self):
         """
@@ -193,7 +183,7 @@ class ContentTest(unittest.TestCase):  # lint-amnesty, pylint: disable=missing-c
         for chunck in stream:
             total_length += len(chunck)
 
-        self.assertEqual(total_length, static_content_stream.length)
+        assert total_length == static_content_stream.length
 
     def test_static_content_stream_stream_data_in_range(self):
         """
@@ -214,7 +204,7 @@ class ContentTest(unittest.TestCase):  # lint-amnesty, pylint: disable=missing-c
         for chunck in stream:
             total_length += len(chunck)
 
-        self.assertEqual(total_length, last_byte - first_byte + 1)
+        assert total_length == ((last_byte - first_byte) + 1)
 
     def test_static_content_write_js(self):
         """
@@ -223,5 +213,5 @@ class ContentTest(unittest.TestCase):  # lint-amnesty, pylint: disable=missing-c
         output_root = path(u'common/static/xmodule/descriptors/js')
         file_owners = _write_js(output_root, _list_descriptors(), 'get_studio_view_js')
         js_file_paths = set(file_path for file_path in sum(list(file_owners.values()), []) if os.path.basename(file_path).startswith('000-'))  # lint-amnesty, pylint: disable=line-too-long
-        self.assertEqual(len(js_file_paths), 1)
-        self.assertIn("XModule.Descriptor = (function() {", open(js_file_paths.pop()).read())
+        assert len(js_file_paths) == 1
+        assert 'XModule.Descriptor = (function() {' in open(js_file_paths.pop()).read()

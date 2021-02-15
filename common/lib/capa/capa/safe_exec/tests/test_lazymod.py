@@ -42,7 +42,7 @@ class TestLazyMod(unittest.TestCase):  # lint-amnesty, pylint: disable=missing-c
         assert module_name not in sys.modules
         colorsys = LazyModule(module_name)
         hsv = colorsys.rgb_to_hsv(.3, .4, .2)
-        self.assertEqual(hsv[0], 0.25)
+        assert hsv[0] == 0.25
 
     def test_dotted(self):
         # wsgiref is a module with submodules that is not already imported.
@@ -54,4 +54,4 @@ class TestLazyMod(unittest.TestCase):  # lint-amnesty, pylint: disable=missing-c
             del sys.modules[module_name]
         assert module_name not in sys.modules
         wsgiref_util = LazyModule(module_name)
-        self.assertEqual(wsgiref_util.guess_scheme({}), "http")
+        assert wsgiref_util.guess_scheme({}) == 'http'

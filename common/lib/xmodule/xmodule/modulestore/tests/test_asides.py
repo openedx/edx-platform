@@ -45,11 +45,11 @@ class TestAsidesXmlStore(TestCase):
                 Check whether block has the expected aside w/ its fields and then recurse to the block's children
                 """
                 asides = block.runtime.get_asides(block)
-                self.assertEqual(len(asides), 1, "Found {} asides but expected only test_aside".format(asides))
-                self.assertIsInstance(asides[0], AsideTestType)
+                assert len(asides) == 1, 'Found {} asides but expected only test_aside'.format(asides)
+                assert isinstance(asides[0], AsideTestType)
                 category = block.scope_ids.block_type
-                self.assertEqual(asides[0].data_field, "{} aside data".format(category))
-                self.assertEqual(asides[0].content, "{} Aside".format(category.capitalize()))
+                assert asides[0].data_field == '{} aside data'.format(category)
+                assert asides[0].content == '{} Aside'.format(category.capitalize())
 
                 for child in block.get_children():
                     check_block(child)

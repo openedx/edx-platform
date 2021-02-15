@@ -7,7 +7,7 @@ import importlib
 import os
 import unittest
 from uuid import uuid4
-
+import pytest
 import mock
 import six
 from opaque_keys.edx.keys import CourseKey
@@ -165,22 +165,16 @@ class RemapNamespaceTest(ModuleStoreNoSettings):
         )
 
         # Check the XBlock's location
-        self.assertEqual(new_version.location.course_key, target_location_namespace)
+        assert new_version.location.course_key == target_location_namespace
 
         # Check the values of the fields.
         # The content and settings fields should be preserved
-        self.assertEqual(new_version.test_content_field, 'Explicitly set')
-        self.assertEqual(new_version.test_settings_field, 'Explicitly set')
+        assert new_version.test_content_field == 'Explicitly set'
+        assert new_version.test_settings_field == 'Explicitly set'
 
         # Expect that these fields are marked explicitly set
-        self.assertIn(
-            'test_content_field',
-            new_version.get_explicitly_set_fields_by_scope(scope=Scope.content)
-        )
-        self.assertIn(
-            'test_settings_field',
-            new_version.get_explicitly_set_fields_by_scope(scope=Scope.settings)
-        )
+        assert 'test_content_field' in new_version.get_explicitly_set_fields_by_scope(scope=Scope.content)
+        assert 'test_settings_field' in new_version.get_explicitly_set_fields_by_scope(scope=Scope.settings)
 
     def test_remap_namespace_native_xblock_default_values(self):
 
@@ -203,18 +197,12 @@ class RemapNamespaceTest(ModuleStoreNoSettings):
 
         # Check the values of the fields.
         # The content and settings fields should be the default values
-        self.assertEqual(new_version.test_content_field, 'default value')
-        self.assertEqual(new_version.test_settings_field, 'default value')
+        assert new_version.test_content_field == 'default value'
+        assert new_version.test_settings_field == 'default value'
 
         # The fields should NOT appear in the explicitly set fields
-        self.assertNotIn(
-            'test_content_field',
-            new_version.get_explicitly_set_fields_by_scope(scope=Scope.content)
-        )
-        self.assertNotIn(
-            'test_settings_field',
-            new_version.get_explicitly_set_fields_by_scope(scope=Scope.settings)
-        )
+        assert 'test_content_field' not in new_version.get_explicitly_set_fields_by_scope(scope=Scope.content)
+        assert 'test_settings_field' not in new_version.get_explicitly_set_fields_by_scope(scope=Scope.settings)
 
     def test_remap_namespace_native_xblock_inherited_values(self):
 
@@ -234,12 +222,8 @@ class RemapNamespaceTest(ModuleStoreNoSettings):
         )
 
         # Inherited fields should NOT be explicitly set
-        self.assertNotIn(
-            'start', new_version.get_explicitly_set_fields_by_scope(scope=Scope.settings)
-        )
-        self.assertNotIn(
-            'graded', new_version.get_explicitly_set_fields_by_scope(scope=Scope.settings)
-        )
+        assert 'start' not in new_version.get_explicitly_set_fields_by_scope(scope=Scope.settings)
+        assert 'graded' not in new_version.get_explicitly_set_fields_by_scope(scope=Scope.settings)
 
     def test_xblock_invalid_field_value_type(self):
         # Setting the wrong field-value in Xblock-field will raise TypeError.
@@ -255,7 +239,7 @@ class RemapNamespaceTest(ModuleStoreNoSettings):
         # clearing the dirty fields and removing value from cache will fetch the value from field-data.
         self.xblock._dirty_fields = {}  # pylint: disable=protected-access
         self.xblock.fields['test_content_field']._del_cached_value(self.xblock)  # lint-amnesty, pylint: disable=protected-access, unsubscriptable-object
-        with self.assertRaises(TypeError):
+        with pytest.raises(TypeError):
             self.xblock.get_explicitly_set_fields_by_scope(scope=Scope.content)
 
 
@@ -326,15 +310,15 @@ class UpdateLocationTest(ModuleStoreNoSettings):
         new_version = self.xblock  # _update_module_location updates in-place
 
         # Check the XBlock's location
-        self.assertEqual(new_version.location, target_location)
+        assert new_version.location == target_location
 
         # Check the values of the fields.
         # The content, settings and children fields should be preserved
-        self.assertEqual(new_version.test_content_field, 'Explicitly set')
-        self.assertEqual(new_version.test_settings_field, 'Explicitly set')
-        self.assertEqual(new_version.test_mutable_content_field, [1, 2, 3])
-        self.assertEqual(new_version.test_mutable_settings_field, ["a", "s", "d"])
-        self.assertEqual(new_version.children, self.fake_children_locations)
+        assert new_version.test_content_field == 'Explicitly set'
+        assert new_version.test_settings_field == 'Explicitly set'
+        assert new_version.test_mutable_content_field == [1, 2, 3]
+        assert new_version.test_mutable_settings_field == ['a', 's', 'd']
+        assert new_version.children == self.fake_children_locations
 
         # Expect that these fields are marked explicitly set
         self._check_explicitly_set(new_version, Scope.content, self.CONTENT_FIELDS, should_be_set=True)
@@ -343,7 +327,7 @@ class UpdateLocationTest(ModuleStoreNoSettings):
 
         # Expect these fields pass "is_set_on" test
         for field in self.CONTENT_FIELDS + self.SETTINGS_FIELDS + self.CHILDREN_FIELDS:
-            self.assertTrue(new_version.fields[field].is_set_on(new_version))  # lint-amnesty, pylint: disable=unsubscriptable-object
+            assert new_version.fields[field].is_set_on(new_version)  # pylint: disable=unsubscriptable-object
 
 
 class StaticContentImporterTest(unittest.TestCase):  # lint-amnesty, pylint: disable=missing-class-docstring

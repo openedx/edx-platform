@@ -12,6 +12,7 @@ import unittest
 import zipfile
 from datetime import datetime
 
+import pytest
 import calc
 import mock
 import pyparsing
@@ -66,23 +67,23 @@ class ResponseTest(unittest.TestCase):
         input_dict = {'1_2_1': submission}
         correct_map = problem.grade_answers(input_dict)
         if msg is None:
-            self.assertEqual(correct_map.get_correctness('1_2_1'), expected_correctness)
+            assert correct_map.get_correctness('1_2_1') == expected_correctness
         else:
-            self.assertEqual(correct_map.get_correctness('1_2_1'), expected_correctness, msg)
+            assert correct_map.get_correctness('1_2_1') == expected_correctness, msg
 
     def assert_answer_format(self, problem):
         answers = problem.get_question_answers()
-        self.assertIsNotNone(answers['1_2_1'])
+        assert answers['1_2_1'] is not None
 
     # pylint: disable=missing-function-docstring
     def assert_multiple_grade(self, problem, correct_answers, incorrect_answers):
         for input_str in correct_answers:
             result = problem.grade_answers({'1_2_1': input_str}).get_correctness('1_2_1')
-            self.assertEqual(result, 'correct')
+            assert result == 'correct'
 
         for input_str in incorrect_answers:
             result = problem.grade_answers({'1_2_1': input_str}).get_correctness('1_2_1')
-            self.assertEqual(result, 'incorrect')
+            assert result == 'incorrect'
 
     def assert_multiple_partial(self, problem, correct_answers, incorrect_answers, partial_answers):
         """
@@ -91,15 +92,15 @@ class ResponseTest(unittest.TestCase):
         """
         for input_str in correct_answers:
             result = problem.grade_answers({'1_2_1': input_str}).get_correctness('1_2_1')
-            self.assertEqual(result, 'correct')
+            assert result == 'correct'
 
         for input_str in incorrect_answers:
             result = problem.grade_answers({'1_2_1': input_str}).get_correctness('1_2_1')
-            self.assertEqual(result, 'incorrect')
+            assert result == 'incorrect'
 
         for input_str in partial_answers:
             result = problem.grade_answers({'1_2_1': input_str}).get_correctness('1_2_1')
-            self.assertEqual(result, 'partially-correct')
+            assert result == 'partially-correct'
 
     def _get_random_number_code(self):
         """Returns code to be used to generate a random result."""
@@ -143,13 +144,13 @@ class MultiChoiceResponseTest(ResponseTest):  # pylint: disable=missing-class-do
         # Multiple Choice problems only allow one partial credit scheme.
         # Change this test if that changes.
         problem = self.build_problem(choices=[False, True, 'partial'], credit_type='points,points')
-        with self.assertRaises(LoncapaProblemError):
+        with pytest.raises(LoncapaProblemError):
             input_dict = {'1_2_1': 'choice_1'}
             problem.grade_answers(input_dict)
 
         # 'bongo' is not a valid grading scheme.
         problem = self.build_problem(choices=[False, True, 'partial'], credit_type='bongo')
-        with self.assertRaises(LoncapaProblemError):
+        with pytest.raises(LoncapaProblemError):
             input_dict = {'1_2_1': 'choice_1'}
             problem.grade_answers(input_dict)
 
@@ -163,13 +164,13 @@ class MultiChoiceResponseTest(ResponseTest):  # pylint: disable=missing-class-do
         # Ensure that we get the expected number of points
         # Using assertAlmostEqual to avoid floating point issues
         correct_map = problem.grade_answers({'1_2_1': 'choice_0'})
-        self.assertAlmostEqual(correct_map.get_npoints('1_2_1'), 1)
+        assert round(correct_map.get_npoints('1_2_1') - 1, 7) >= 0
 
         correct_map = problem.grade_answers({'1_2_1': 'choice_1'})
-        self.assertAlmostEqual(correct_map.get_npoints('1_2_1'), 0.6)
+        assert round(correct_map.get_npoints('1_2_1') - 0.6, 7) >= 0
 
         correct_map = problem.grade_answers({'1_2_1': 'choice_2'})
-        self.assertAlmostEqual(correct_map.get_npoints('1_2_1'), 0)
+        assert round(correct_map.get_npoints('1_2_1') - 0, 7) >= 0
 
     def test_contextualized_choices(self):
         script = textwrap.dedent("""
@@ -350,7 +351,7 @@ class SymbolicResponseTest(ResponseTest):  # pylint: disable=missing-class-docst
 
         # Should not allow multiple inputs, since we specify
         # only one "expect" value
-        with self.assertRaises(Exception):
+        with pytest.raises(Exception):
             self.build_problem(math_display=True, expect="2*x+3*y", num_inputs=3)
 
     def _assert_symbolic_grade(
@@ -375,9 +376,7 @@ class SymbolicResponseTest(ResponseTest):  # pylint: disable=missing-class-docst
 
             correct_map = problem.grade_answers(input_dict)
 
-            self.assertEqual(
-                correct_map.get_correctness('1_2_1'), expected_correctness
-            )
+            assert correct_map.get_correctness('1_2_1') == expected_correctness
 
 
 class OptionResponseTest(ResponseTest):  # pylint: disable=missing-class-docstring
@@ -423,8 +422,8 @@ class OptionResponseTest(ResponseTest):  # pylint: disable=missing-class-docstri
 
         input_dict = {'1_2_1': '1000'}
         correct_map = problem.grade_answers(input_dict)
-        self.assertEqual(correct_map.get_correctness('1_2_1'), 'correct')
-        self.assertEqual(correct_map.get_property('1_2_1', 'answervariable'), '$a')
+        assert correct_map.get_correctness('1_2_1') == 'correct'
+        assert correct_map.get_property('1_2_1', 'answervariable') == '$a'
 
 
 class FormulaResponseTest(ResponseTest):
@@ -480,14 +479,12 @@ class FormulaResponseTest(ResponseTest):
         # Expect to receive a hint  if we add an extra y
         input_dict = {'1_2_1': "x + 2*y + y"}
         correct_map = problem.grade_answers(input_dict)
-        self.assertEqual(correct_map.get_hint('1_2_1'),
-                         'Check the coefficient of y')
+        assert correct_map.get_hint('1_2_1') == 'Check the coefficient of y'
 
         # Expect to receive a hint if we leave out x
         input_dict = {'1_2_1': "2*y"}
         correct_map = problem.grade_answers(input_dict)
-        self.assertEqual(correct_map.get_hint('1_2_1'),
-                         'Try including the variable x')
+        assert correct_map.get_hint('1_2_1') == 'Try including the variable x'
 
     def test_script(self):
         """
@@ -574,8 +571,8 @@ class FormulaResponseTest(ResponseTest):
             tolerance="1%",
             answer="x"
         )
-        self.assertTrue(list(problem.responders.values())[0].validate_answer('14*x'))
-        self.assertFalse(list(problem.responders.values())[0].validate_answer('3*y+2*x'))
+        assert list(problem.responders.values())[0].validate_answer('14*x')
+        assert not list(problem.responders.values())[0].validate_answer('3*y+2*x')
 
 
 class StringResponseTest(ResponseTest):  # pylint: disable=missing-class-docstring
@@ -799,10 +796,10 @@ class StringResponseTest(ResponseTest):  # pylint: disable=missing-class-docstri
 
     def test_exception(self):
         problem = self.build_problem(answer="a2", case_sensitive=False, regexp=True, additional_answers=['?\\d?'])
-        with self.assertRaises(Exception) as cm:
+        with pytest.raises(Exception) as cm:
             self.assert_grade(problem, "a3", "correct")
         exception_message = text_type(cm.exception)
-        self.assertIn("nothing to repeat", exception_message)
+        assert 'nothing to repeat' in exception_message
 
     def test_hints(self):
 
@@ -818,24 +815,22 @@ class StringResponseTest(ResponseTest):  # pylint: disable=missing-class-docstri
         # We should get a hint for Wisconsin
         input_dict = {'1_2_1': 'Wisconsin'}
         correct_map = problem.grade_answers(input_dict)
-        self.assertEqual(correct_map.get_hint('1_2_1'),
-                         "The state capital of Wisconsin is Madison")
+        assert correct_map.get_hint('1_2_1') == 'The state capital of Wisconsin is Madison'
 
         # We should get a hint for Minnesota
         input_dict = {'1_2_1': 'Minnesota'}
         correct_map = problem.grade_answers(input_dict)
-        self.assertEqual(correct_map.get_hint('1_2_1'),
-                         "The state capital of Minnesota is St. Paul")
+        assert correct_map.get_hint('1_2_1') == 'The state capital of Minnesota is St. Paul'
 
         # We should NOT get a hint for Michigan (the correct answer)
         input_dict = {'1_2_1': 'Michigan'}
         correct_map = problem.grade_answers(input_dict)
-        self.assertEqual(correct_map.get_hint('1_2_1'), "")
+        assert correct_map.get_hint('1_2_1') == ''
 
         # We should NOT get a hint for any other string
         input_dict = {'1_2_1': 'California'}
         correct_map = problem.grade_answers(input_dict)
-        self.assertEqual(correct_map.get_hint('1_2_1'), "")
+        assert correct_map.get_hint('1_2_1') == ''
 
     def test_hints_regexp_and_answer_regexp(self):
         different_student_answers = [
@@ -867,38 +862,36 @@ class StringResponseTest(ResponseTest):  # pylint: disable=missing-class-docstri
         # We should get a hint for Wisconsin
         input_dict = {'1_2_1': 'Wisconsin'}
         correct_map = problem.grade_answers(input_dict)
-        self.assertEqual(correct_map.get_hint('1_2_1'),
-                         "The state capital of Wisconsin is Madison")
+        assert correct_map.get_hint('1_2_1') == 'The state capital of Wisconsin is Madison'
 
         # We should get a hint for Minnesota
         input_dict = {'1_2_1': 'Minnesota'}
         correct_map = problem.grade_answers(input_dict)
-        self.assertEqual(correct_map.get_hint('1_2_1'),
-                         "The state capital of Minnesota is St. Paul")
+        assert correct_map.get_hint('1_2_1') == 'The state capital of Minnesota is St. Paul'
 
         # We should NOT get a hint for Michigan (the correct answer)
         input_dict = {'1_2_1': 'Michigan'}
         correct_map = problem.grade_answers(input_dict)
-        self.assertEqual(correct_map.get_hint('1_2_1'), "")
+        assert correct_map.get_hint('1_2_1') == ''
 
         # We should NOT get a hint for any other string
         input_dict = {'1_2_1': 'California'}
         correct_map = problem.grade_answers(input_dict)
-        self.assertEqual(correct_map.get_hint('1_2_1'), "")
+        assert correct_map.get_hint('1_2_1') == ''
 
         # We should get the same hint for each answer
         for answer in different_student_answers:
             input_dict = {'1_2_1': answer}
             correct_map = problem.grade_answers(input_dict)
-            self.assertEqual(correct_map.get_hint('1_2_1'), "First letter of correct answer is M.")
+            assert correct_map.get_hint('1_2_1') == 'First letter of correct answer is M.'
 
         input_dict = {'1_2_1': '59'}
         correct_map = problem.grade_answers(input_dict)
-        self.assertEqual(correct_map.get_hint('1_2_1'), "Should not end with 9.")
+        assert correct_map.get_hint('1_2_1') == 'Should not end with 9.'
 
         input_dict = {'1_2_1': '57'}
         correct_map = problem.grade_answers(input_dict)
-        self.assertEqual(correct_map.get_hint('1_2_1'), "")
+        assert correct_map.get_hint('1_2_1') == ''
 
     def test_computed_hints(self):
         problem = self.build_problem(
@@ -914,7 +907,7 @@ class StringResponseTest(ResponseTest):  # pylint: disable=missing-class-docstri
 
         input_dict = {'1_2_1': 'Hello'}
         correct_map = problem.grade_answers(input_dict)
-        self.assertEqual(correct_map.get_hint('1_2_1'), "Hello??")
+        assert correct_map.get_hint('1_2_1') == 'Hello??'
 
     def test_hint_function_randomization(self):
         # The hint function should get the seed from the problem.
@@ -930,7 +923,7 @@ class StringResponseTest(ResponseTest):  # pylint: disable=missing-class-docstri
         )
         correct_map = problem.grade_answers({'1_2_1': '2'})
         hint = correct_map.get_hint('1_2_1')
-        self.assertEqual(hint, self._get_random_number_result(problem.seed))
+        assert hint == self._get_random_number_result(problem.seed)
 
     def test_empty_answer_graded_as_incorrect(self):
         """
@@ -971,7 +964,7 @@ class CodeResponseTest(ResponseTest):  # pylint: disable=missing-class-docstring
             cmap.update(CorrectMap(answer_id=answer_id, queuestate=None))
         self.problem.correct_map.update(cmap)
 
-        self.assertEqual(self.problem.is_queued(), False)
+        assert self.problem.is_queued() is False
 
         # Now we queue the LCP
         cmap = CorrectMap()
@@ -980,7 +973,7 @@ class CodeResponseTest(ResponseTest):  # pylint: disable=missing-class-docstring
             cmap.update(CorrectMap(answer_id=answer_ids[i], queuestate=queuestate))
         self.problem.correct_map.update(cmap)
 
-        self.assertEqual(self.problem.is_queued(), True)
+        assert self.problem.is_queued() is True
 
     def test_update_score(self):
         '''
@@ -1009,10 +1002,12 @@ class CodeResponseTest(ResponseTest):  # pylint: disable=missing-class-docstring
             self.problem.correct_map.update(old_cmap)  # Deep copy
 
             self.problem.update_score(xserver_msgs[correctness], queuekey=0)
-            self.assertEqual(self.problem.correct_map.get_dict(), old_cmap.get_dict())  # Deep comparison
+            assert self.problem.correct_map.get_dict() == old_cmap.get_dict()
+            # Deep comparison
 
             for answer_id in answer_ids:
-                self.assertTrue(self.problem.correct_map.is_queued(answer_id))  # Should be still queued, since message undelivered  # lint-amnesty, pylint: disable=line-too-long
+                assert self.problem.correct_map.is_queued(answer_id)
+                # Should be still queued, since message undelivered  # lint-amnesty, pylint: disable=line-too-long
 
         # Correct queuekey, state should be updated
         for correctness in ['correct', 'incorrect']:
@@ -1026,13 +1021,15 @@ class CodeResponseTest(ResponseTest):  # pylint: disable=missing-class-docstring
                 new_cmap.set(answer_id=answer_id, npoints=npoints, correctness=correctness, msg=grader_msg, queuestate=None)  # lint-amnesty, pylint: disable=line-too-long
 
                 self.problem.update_score(xserver_msgs[correctness], queuekey=1000 + i)
-                self.assertEqual(self.problem.correct_map.get_dict(), new_cmap.get_dict())
+                assert self.problem.correct_map.get_dict() == new_cmap.get_dict()
 
                 for j, test_id in enumerate(answer_ids):
                     if j == i:
-                        self.assertFalse(self.problem.correct_map.is_queued(test_id))  # Should be dequeued, message delivered  # lint-amnesty, pylint: disable=line-too-long
+                        assert not self.problem.correct_map.is_queued(test_id)
+                        # Should be dequeued, message delivered  # lint-amnesty, pylint: disable=line-too-long
                     else:
-                        self.assertTrue(self.problem.correct_map.is_queued(test_id))  # Should be queued, message undelivered  # lint-amnesty, pylint: disable=line-too-long
+                        assert self.problem.correct_map.is_queued(test_id)
+                        # Should be queued, message undelivered  # lint-amnesty, pylint: disable=line-too-long
 
     def test_recentmost_queuetime(self):
         '''
@@ -1046,7 +1043,7 @@ class CodeResponseTest(ResponseTest):  # pylint: disable=missing-class-docstring
             cmap.update(CorrectMap(answer_id=answer_id, queuestate=None))
         self.problem.correct_map.update(cmap)
 
-        self.assertEqual(self.problem.get_recentmost_queuetime(), None)
+        assert self.problem.get_recentmost_queuetime() is None
 
         # CodeResponse requires internal CorrectMap state. Build it now in the queued state
         cmap = CorrectMap()
@@ -1062,7 +1059,7 @@ class CodeResponseTest(ResponseTest):  # pylint: disable=missing-class-docstring
             datetime.strftime(latest_timestamp, dateformat), dateformat
         ).replace(tzinfo=UTC)
 
-        self.assertEqual(self.problem.get_recentmost_queuetime(), latest_timestamp)
+        assert self.problem.get_recentmost_queuetime() == latest_timestamp
 
     def test_convert_files_to_filenames(self):
         '''
@@ -1074,9 +1071,9 @@ class CodeResponseTest(ResponseTest):  # pylint: disable=missing-class-docstring
                                  '1_3_1': ['answer1', 'answer2', 'answer3'],
                                  '1_4_1': [fp, fp]}
             answers_converted = convert_files_to_filenames(answers_with_file)
-            self.assertEqual(answers_converted['1_2_1'], 'String-based answer')
-            self.assertEqual(answers_converted['1_3_1'], ['answer1', 'answer2', 'answer3'])
-            self.assertEqual(answers_converted['1_4_1'], [fp.name, fp.name])
+            assert answers_converted['1_2_1'] == 'String-based answer'
+            assert answers_converted['1_3_1'] == ['answer1', 'answer2', 'answer3']
+            assert answers_converted['1_4_1'] == [fp.name, fp.name]
 
     def test_parse_score_msg_of_responder(self):
         """
@@ -1116,7 +1113,7 @@ class CodeResponseTest(ResponseTest):  # pylint: disable=missing-class-docstring
                 self.problem.correct_map = CorrectMap()
                 self.problem.correct_map.update(old_cmap)
                 output = self.problem.update_score(xserver_msgs['correct'], queuekey=1000 + i)
-                self.assertEqual(output[answer_id]['msg'], grader_msg)
+                assert output[answer_id]['msg'] == grader_msg
 
         for grader_msg in invalid_grader_msgs:
             correct_score_msg = json.dumps({'correct': True, 'score': 1, 'msg': grader_msg})
@@ -1128,7 +1125,7 @@ class CodeResponseTest(ResponseTest):  # pylint: disable=missing-class-docstring
                 self.problem.correct_map.update(old_cmap)
 
                 output = self.problem.update_score(xserver_msgs['correct'], queuekey=1000 + i)
-                self.assertEqual(output[answer_id]['msg'], u'Invalid grader reply. Please contact the course staff.')
+                assert output[answer_id]['msg'] == u'Invalid grader reply. Please contact the course staff.'
 
 
 class ChoiceResponseTest(ResponseTest):  # pylint: disable=missing-class-docstring
@@ -1169,7 +1166,7 @@ class ChoiceResponseTest(ResponseTest):  # pylint: disable=missing-class-docstri
             choices=[False, False, True, True],
             credit_type='edc,halves,bongo'
         )
-        with self.assertRaises(LoncapaProblemError):
+        with pytest.raises(LoncapaProblemError):
             input_dict = {'1_2_1': 'choice_1'}
             problem.grade_answers(input_dict)
 
@@ -1179,7 +1176,7 @@ class ChoiceResponseTest(ResponseTest):  # pylint: disable=missing-class-docstri
             choices=[False, False, True, True],
             credit_type='bongo'
         )
-        with self.assertRaises(LoncapaProblemError):
+        with pytest.raises(LoncapaProblemError):
             input_dict = {'1_2_1': 'choice_1'}
             problem.grade_answers(input_dict)
 
@@ -1245,7 +1242,7 @@ class ChoiceResponseTest(ResponseTest):  # pylint: disable=missing-class-docstri
         )
 
         correct_map = problem.grade_answers({'1_2_1': 'choice_2'})
-        self.assertAlmostEqual(correct_map.get_npoints('1_2_1'), 0.75)
+        assert round(correct_map.get_npoints('1_2_1') - 0.75, 7) >= 0
 
         # Second: Halves grading style
         problem = self.build_problem(
@@ -1255,7 +1252,7 @@ class ChoiceResponseTest(ResponseTest):  # pylint: disable=missing-class-docstri
         )
 
         correct_map = problem.grade_answers({'1_2_1': 'choice_2'})
-        self.assertAlmostEqual(correct_map.get_npoints('1_2_1'), 0.5)
+        assert round(correct_map.get_npoints('1_2_1') - 0.5, 7) >= 0
 
         # Third: Halves grading style with more options
         problem = self.build_problem(
@@ -1265,7 +1262,7 @@ class ChoiceResponseTest(ResponseTest):  # pylint: disable=missing-class-docstri
         )
 
         correct_map = problem.grade_answers({'1_2_1': 'choice_2,choice4'})
-        self.assertAlmostEqual(correct_map.get_npoints('1_2_1'), 0.25)
+        assert round(correct_map.get_npoints('1_2_1') - 0.25, 7) >= 0
 
     def test_grade_with_no_checkbox_selected(self):
         """
@@ -1276,7 +1273,7 @@ class ChoiceResponseTest(ResponseTest):  # pylint: disable=missing-class-docstri
         )
 
         correct_map = problem.grade_answers({})
-        self.assertEqual(correct_map.get_correctness('1_2_1'), 'incorrect')
+        assert correct_map.get_correctness('1_2_1') == 'incorrect'
 
     def test_contextualized_choices(self):
         script = textwrap.dedent("""
@@ -1337,14 +1334,14 @@ class NumericalResponseTest(ResponseTest):  # pylint: disable=missing-class-docs
 
         # Assert primary answer is graded correctly.
         correct_map = problem.grade_answers({'1_2_1': primary_answer})
-        self.assertEqual(correct_map.get_correctness('1_2_1'), 'correct')
-        self.assertIn(primary_correcthint, correct_map.get_msg('1_2_1'))
+        assert correct_map.get_correctness('1_2_1') == 'correct'
+        assert primary_correcthint in correct_map.get_msg('1_2_1')
 
         # Assert additional answers are graded correct
         for answer, correcthint in additional_answers.items():
             correct_map = problem.grade_answers({'1_2_1': answer})
-            self.assertEqual(correct_map.get_correctness('1_2_1'), 'correct')
-            self.assertIn(correcthint, correct_map.get_msg('1_2_1'))
+            assert correct_map.get_correctness('1_2_1') == 'correct'
+            assert correcthint in correct_map.get_msg('1_2_1')
 
     def test_additional_answer_get_score(self):
         """
@@ -1355,15 +1352,15 @@ class NumericalResponseTest(ResponseTest):  # pylint: disable=missing-class-docs
 
         # Check primary answer.
         new_cmap = responder.get_score({'1_2_1': '100'})
-        self.assertEqual(new_cmap.get_correctness('1_2_1'), 'correct')
+        assert new_cmap.get_correctness('1_2_1') == 'correct'
 
         # Check additional answer.
         new_cmap = responder.get_score({'1_2_1': '1'})
-        self.assertEqual(new_cmap.get_correctness('1_2_1'), 'correct')
+        assert new_cmap.get_correctness('1_2_1') == 'correct'
 
         # Check any wrong answer.
         new_cmap = responder.get_score({'1_2_1': '2'})
-        self.assertEqual(new_cmap.get_correctness('1_2_1'), 'incorrect')
+        assert new_cmap.get_correctness('1_2_1') == 'incorrect'
 
     def test_grade_range_tolerance_partial_credit(self):
         problem_setup = [
@@ -1404,13 +1401,13 @@ class NumericalResponseTest(ResponseTest):  # pylint: disable=missing-class-docs
         # no complex number in range tolerance staff answer
         problem = self.build_problem(answer='[1j, 5]')
         input_dict = {'1_2_1': '3'}
-        with self.assertRaises(StudentInputError):
+        with pytest.raises(StudentInputError):
             problem.grade_answers(input_dict)
 
         # no complex numbers in student ansers to range tolerance problems
         problem = self.build_problem(answer='(1, 5)')
         input_dict = {'1_2_1': '1*J'}
-        with self.assertRaises(StudentInputError):
+        with pytest.raises(StudentInputError):
             problem.grade_answers(input_dict)
 
         # test isnan student input: no exception,
@@ -1419,16 +1416,16 @@ class NumericalResponseTest(ResponseTest):  # pylint: disable=missing-class-docs
         input_dict = {'1_2_1': ''}
         correct_map = problem.grade_answers(input_dict)
         correctness = correct_map.get_correctness('1_2_1')
-        self.assertEqual(correctness, 'incorrect')
+        assert correctness == 'incorrect'
 
         # test invalid range tolerance answer
-        with self.assertRaises(StudentInputError):
+        with pytest.raises(StudentInputError):
             problem = self.build_problem(answer='(1 5)')
 
         # test empty boundaries
         problem = self.build_problem(answer='(1, ]')
         input_dict = {'1_2_1': '3'}
-        with self.assertRaises(StudentInputError):
+        with pytest.raises(StudentInputError):
             problem.grade_answers(input_dict)
 
     def test_grade_exact(self):
@@ -1489,7 +1486,7 @@ class NumericalResponseTest(ResponseTest):  # pylint: disable=missing-class-docs
         # 'bongo' is not a valid grading scheme.
         problem = self.build_problem(answer=4, tolerance=0.1, credit_type='bongo')
         input_dict = {'1_2_1': '4'}
-        with self.assertRaises(LoncapaProblemError):
+        with pytest.raises(LoncapaProblemError):
             problem.grade_answers(input_dict)
 
     def test_grade_decimal_tolerance(self):
@@ -1556,7 +1553,7 @@ class NumericalResponseTest(ResponseTest):  # pylint: disable=missing-class-docs
         """See if division by zero is handled correctly."""
         problem = self.build_problem(answer="1")  # Answer doesn't matter
         input_dict = {'1_2_1': '1/0'}
-        with self.assertRaises(StudentInputError):
+        with pytest.raises(StudentInputError):
             problem.grade_answers(input_dict)
 
     def test_staff_inputs_expressions(self):
@@ -1662,15 +1659,15 @@ class NumericalResponseTest(ResponseTest):  # pylint: disable=missing-class-docs
         """Tests the answer compare function."""
         problem = self.build_problem(answer="42")
         responder = list(problem.responders.values())[0]
-        self.assertTrue(responder.compare_answer('48', '8*6'))
-        self.assertFalse(responder.compare_answer('48', '9*5'))
+        assert responder.compare_answer('48', '8*6')
+        assert not responder.compare_answer('48', '9*5')
 
     def test_validate_answer(self):
         """Tests the answer validation function."""
         problem = self.build_problem(answer="42")
         responder = list(problem.responders.values())[0]
-        self.assertTrue(responder.validate_answer('23.5'))
-        self.assertFalse(responder.validate_answer('fish'))
+        assert responder.validate_answer('23.5')
+        assert not responder.validate_answer('fish')
 
 
 class CustomResponseTest(ResponseTest):  # pylint: disable=missing-class-docstring
@@ -1704,11 +1701,11 @@ class CustomResponseTest(ResponseTest):  # pylint: disable=missing-class-docstri
 
         # Check that the message for the particular input was received
         input_msg = correctmap.get_msg('1_2_1')
-        self.assertEqual(input_msg, "Test Message")
+        assert input_msg == 'Test Message'
 
         # Check that the overall message (for the whole response) was received
         overall_msg = correctmap.get_overall_message()
-        self.assertEqual(overall_msg, "Overall message")
+        assert overall_msg == 'Overall message'
 
     def test_inline_randomization(self):
         # Make sure the seed from the problem gets fed into the script execution.
@@ -1719,7 +1716,7 @@ class CustomResponseTest(ResponseTest):  # pylint: disable=missing-class-docstri
         correctmap = problem.grade_answers(input_dict)
 
         input_msg = correctmap.get_msg('1_2_1')
-        self.assertEqual(input_msg, self._get_random_number_result(problem.seed))
+        assert input_msg == self._get_random_number_result(problem.seed)
 
     def test_function_code_single_input(self):
         # For function code, we pass in these arguments:
@@ -1754,9 +1751,9 @@ class CustomResponseTest(ResponseTest):  # pylint: disable=missing-class-docstri
         msg = correct_map.get_msg('1_2_1')
         npoints = correct_map.get_npoints('1_2_1')
 
-        self.assertEqual(correctness, 'correct')
-        self.assertEqual(msg, "Message text")
-        self.assertEqual(npoints, 1)
+        assert correctness == 'correct'
+        assert msg == 'Message text'
+        assert npoints == 1
 
         # Partially Credit answer
         input_dict = {'1_2_1': '21'}
@@ -1766,9 +1763,9 @@ class CustomResponseTest(ResponseTest):  # pylint: disable=missing-class-docstri
         msg = correct_map.get_msg('1_2_1')
         npoints = correct_map.get_npoints('1_2_1')
 
-        self.assertEqual(correctness, 'partially-correct')
-        self.assertEqual(msg, "Message text")
-        self.assertTrue(0 <= npoints <= 1)
+        assert correctness == 'partially-correct'
+        assert msg == 'Message text'
+        assert 0 <= npoints <= 1
 
         # Incorrect answer
         input_dict = {'1_2_1': '0'}
@@ -1778,9 +1775,9 @@ class CustomResponseTest(ResponseTest):  # pylint: disable=missing-class-docstri
         msg = correct_map.get_msg('1_2_1')
         npoints = correct_map.get_npoints('1_2_1')
 
-        self.assertEqual(correctness, 'incorrect')
-        self.assertEqual(msg, "Message text")
-        self.assertEqual(npoints, 0)
+        assert correctness == 'incorrect'
+        assert msg == 'Message text'
+        assert npoints == 0
 
     def test_function_code_single_input_decimal_score(self):
         # For function code, we pass in these arguments:
@@ -1817,20 +1814,20 @@ class CustomResponseTest(ResponseTest):  # pylint: disable=missing-class-docstri
         # Correct answer
         input_dict = {'1_2_1': '42'}
         correct_map = problem.grade_answers(input_dict)
-        self.assertEqual(correct_map.get_npoints('1_2_1'), 0.9)
-        self.assertEqual(correct_map.get_correctness('1_2_1'), 'correct')
+        assert correct_map.get_npoints('1_2_1') == 0.9
+        assert correct_map.get_correctness('1_2_1') == 'correct'
 
         # Incorrect answer
         input_dict = {'1_2_1': '43'}
         correct_map = problem.grade_answers(input_dict)
-        self.assertEqual(correct_map.get_npoints('1_2_1'), 0.1)
-        self.assertEqual(correct_map.get_correctness('1_2_1'), 'incorrect')
+        assert correct_map.get_npoints('1_2_1') == 0.1
+        assert correct_map.get_correctness('1_2_1') == 'incorrect'
 
         # Partially Correct answer
         input_dict = {'1_2_1': '21'}
         correct_map = problem.grade_answers(input_dict)
-        self.assertEqual(correct_map.get_npoints('1_2_1'), 0.5)
-        self.assertEqual(correct_map.get_correctness('1_2_1'), 'partially-correct')
+        assert correct_map.get_npoints('1_2_1') == 0.5
+        assert correct_map.get_correctness('1_2_1') == 'partially-correct'
 
     def test_script_context(self):
         # Ensure that python script variables can be used in the "expect" and "answer" fields,
@@ -1853,11 +1850,11 @@ class CustomResponseTest(ResponseTest):  # pylint: disable=missing-class-docstri
             correctmap = problem.grade_answers(input_dict)
 
             # CustomResponse also adds 'expect' to the problem context; check that directly first:
-            self.assertEqual(problem.context['expect'], '42')
+            assert problem.context['expect'] == '42'
 
             # Also make sure the problem was graded correctly:
             correctness = correctmap.get_correctness('1_2_1')
-            self.assertEqual(correctness, 'correct')
+            assert correctness == 'correct'
 
     def test_function_code_multiple_input_no_msg(self):
 
@@ -1885,32 +1882,32 @@ class CustomResponseTest(ResponseTest):  # pylint: disable=missing-class-docstri
         correct_map = problem.grade_answers(input_dict)
 
         correctness = correct_map.get_correctness('1_2_1')
-        self.assertEqual(correctness, 'correct')
+        assert correctness == 'correct'
 
         correctness = correct_map.get_correctness('1_2_2')
-        self.assertEqual(correctness, 'correct')
+        assert correctness == 'correct'
 
         # One answer incorrect -- expect both inputs marked partially correct
         input_dict = {'1_2_1': '0', '1_2_2': '42'}
         correct_map = problem.grade_answers(input_dict)
 
         correctness = correct_map.get_correctness('1_2_1')
-        self.assertEqual(correctness, 'partially-correct')
-        self.assertTrue(0 <= correct_map.get_npoints('1_2_1') <= 1)
+        assert correctness == 'partially-correct'
+        assert 0 <= correct_map.get_npoints('1_2_1') <= 1
 
         correctness = correct_map.get_correctness('1_2_2')
-        self.assertEqual(correctness, 'partially-correct')
-        self.assertTrue(0 <= correct_map.get_npoints('1_2_2') <= 1)
+        assert correctness == 'partially-correct'
+        assert 0 <= correct_map.get_npoints('1_2_2') <= 1
 
         # Both answers incorrect -- expect both inputs marked incorrect
         input_dict = {'1_2_1': '0', '1_2_2': '0'}
         correct_map = problem.grade_answers(input_dict)
 
         correctness = correct_map.get_correctness('1_2_1')
-        self.assertEqual(correctness, 'incorrect')
+        assert correctness == 'incorrect'
 
         correctness = correct_map.get_correctness('1_2_2')
-        self.assertEqual(correctness, 'incorrect')
+        assert correctness == 'incorrect'
 
     def test_function_code_multiple_inputs(self):
 
@@ -1950,25 +1947,25 @@ class CustomResponseTest(ResponseTest):  # pylint: disable=missing-class-docstri
         correct_map = problem.grade_answers(input_dict)
 
         # Expect that we receive the overall message (for the whole response)
-        self.assertEqual(correct_map.get_overall_message(), "Overall message")
+        assert correct_map.get_overall_message() == 'Overall message'
 
         # Expect that the inputs were graded individually
-        self.assertEqual(correct_map.get_correctness('1_2_1'), 'incorrect')
-        self.assertEqual(correct_map.get_correctness('1_2_2'), 'correct')
-        self.assertEqual(correct_map.get_correctness('1_2_3'), 'correct')
-        self.assertEqual(correct_map.get_correctness('1_2_4'), 'partially-correct')
+        assert correct_map.get_correctness('1_2_1') == 'incorrect'
+        assert correct_map.get_correctness('1_2_2') == 'correct'
+        assert correct_map.get_correctness('1_2_3') == 'correct'
+        assert correct_map.get_correctness('1_2_4') == 'partially-correct'
 
         # Expect that the inputs were given correct npoints
-        self.assertEqual(correct_map.get_npoints('1_2_1'), 0)
-        self.assertEqual(correct_map.get_npoints('1_2_2'), 1)
-        self.assertEqual(correct_map.get_npoints('1_2_3'), 1)
-        self.assertTrue(0 <= correct_map.get_npoints('1_2_4') <= 1)
+        assert correct_map.get_npoints('1_2_1') == 0
+        assert correct_map.get_npoints('1_2_2') == 1
+        assert correct_map.get_npoints('1_2_3') == 1
+        assert 0 <= correct_map.get_npoints('1_2_4') <= 1
 
         # Expect that we received messages for each individual input
-        self.assertEqual(correct_map.get_msg('1_2_1'), 'Feedback 1')
-        self.assertEqual(correct_map.get_msg('1_2_2'), 'Feedback 2')
-        self.assertEqual(correct_map.get_msg('1_2_3'), 'Feedback 3')
-        self.assertEqual(correct_map.get_msg('1_2_4'), 'Feedback 4')
+        assert correct_map.get_msg('1_2_1') == 'Feedback 1'
+        assert correct_map.get_msg('1_2_2') == 'Feedback 2'
+        assert correct_map.get_msg('1_2_3') == 'Feedback 3'
+        assert correct_map.get_msg('1_2_4') == 'Feedback 4'
 
     def test_function_code_multiple_inputs_decimal_score(self):
 
@@ -2008,16 +2005,16 @@ class CustomResponseTest(ResponseTest):  # pylint: disable=missing-class-docstri
         correct_map = problem.grade_answers(input_dict)
 
         # Expect that the inputs were graded individually
-        self.assertEqual(correct_map.get_correctness('1_2_1'), 'incorrect')
-        self.assertEqual(correct_map.get_correctness('1_2_2'), 'correct')
-        self.assertEqual(correct_map.get_correctness('1_2_3'), 'correct')
-        self.assertEqual(correct_map.get_correctness('1_2_4'), 'partially-correct')
+        assert correct_map.get_correctness('1_2_1') == 'incorrect'
+        assert correct_map.get_correctness('1_2_2') == 'correct'
+        assert correct_map.get_correctness('1_2_3') == 'correct'
+        assert correct_map.get_correctness('1_2_4') == 'partially-correct'
 
         # Expect that the inputs were given correct npoints
-        self.assertEqual(correct_map.get_npoints('1_2_1'), 0.1)
-        self.assertEqual(correct_map.get_npoints('1_2_2'), 0.9)
-        self.assertEqual(correct_map.get_npoints('1_2_3'), 0.9)
-        self.assertEqual(correct_map.get_npoints('1_2_4'), 0.7)
+        assert correct_map.get_npoints('1_2_1') == 0.1
+        assert correct_map.get_npoints('1_2_2') == 0.9
+        assert correct_map.get_npoints('1_2_3') == 0.9
+        assert correct_map.get_npoints('1_2_4') == 0.7
 
     def test_function_code_with_extra_args(self):
         script = textwrap.dedent("""\
@@ -2048,8 +2045,8 @@ class CustomResponseTest(ResponseTest):  # pylint: disable=missing-class-docstri
         correctness = correct_map.get_correctness('1_2_1')
         msg = correct_map.get_msg('1_2_1')
 
-        self.assertEqual(correctness, 'correct')
-        self.assertEqual(msg, "Message text")
+        assert correctness == 'correct'
+        assert msg == 'Message text'
 
         # Partially Correct answer
         input_dict = {'1_2_1': '21'}
@@ -2058,8 +2055,8 @@ class CustomResponseTest(ResponseTest):  # pylint: disable=missing-class-docstri
         correctness = correct_map.get_correctness('1_2_1')
         msg = correct_map.get_msg('1_2_1')
 
-        self.assertEqual(correctness, 'partially-correct')
-        self.assertEqual(msg, "Message text")
+        assert correctness == 'partially-correct'
+        assert msg == 'Message text'
 
         # Incorrect answer
         input_dict = {'1_2_1': '0'}
@@ -2068,8 +2065,8 @@ class CustomResponseTest(ResponseTest):  # pylint: disable=missing-class-docstri
         correctness = correct_map.get_correctness('1_2_1')
         msg = correct_map.get_msg('1_2_1')
 
-        self.assertEqual(correctness, 'incorrect')
-        self.assertEqual(msg, "Message text")
+        assert correctness == 'incorrect'
+        assert msg == 'Message text'
 
     def test_function_code_with_attempt_number(self):
         script = textwrap.dedent("""\
@@ -2098,8 +2095,8 @@ class CustomResponseTest(ResponseTest):  # pylint: disable=missing-class-docstri
         correctness = correct_map.get_correctness('1_2_1')
         msg = correct_map.get_msg('1_2_1')
 
-        self.assertEqual(correctness, 'correct')
-        self.assertEqual(msg, "This is attempt number 1")
+        assert correctness == 'correct'
+        assert msg == 'This is attempt number 1'
 
         # second attempt
         problem.context['attempt'] = 2
@@ -2108,8 +2105,8 @@ class CustomResponseTest(ResponseTest):  # pylint: disable=missing-class-docstri
         correctness = correct_map.get_correctness('1_2_1')
         msg = correct_map.get_msg('1_2_1')
 
-        self.assertEqual(correctness, 'correct')
-        self.assertEqual(msg, "This is attempt number 2")
+        assert correctness == 'correct'
+        assert msg == 'This is attempt number 2'
 
     def test_multiple_inputs_return_one_status(self):
         # When given multiple inputs, the 'answer_given' argument
@@ -2143,30 +2140,30 @@ class CustomResponseTest(ResponseTest):  # pylint: disable=missing-class-docstri
         correct_map = problem.grade_answers(input_dict)
 
         # Everything marked incorrect
-        self.assertEqual(correct_map.get_correctness('1_2_1'), 'incorrect')
-        self.assertEqual(correct_map.get_correctness('1_2_2'), 'incorrect')
-        self.assertEqual(correct_map.get_correctness('1_2_3'), 'incorrect')
+        assert correct_map.get_correctness('1_2_1') == 'incorrect'
+        assert correct_map.get_correctness('1_2_2') == 'incorrect'
+        assert correct_map.get_correctness('1_2_3') == 'incorrect'
 
         # Grade the inputs (one input partially correct)
         input_dict = {'1_2_1': '-1', '1_2_2': '2', '1_2_3': '3'}
         correct_map = problem.grade_answers(input_dict)
 
         # Everything marked partially correct
-        self.assertEqual(correct_map.get_correctness('1_2_1'), 'partially-correct')
-        self.assertEqual(correct_map.get_correctness('1_2_2'), 'partially-correct')
-        self.assertEqual(correct_map.get_correctness('1_2_3'), 'partially-correct')
+        assert correct_map.get_correctness('1_2_1') == 'partially-correct'
+        assert correct_map.get_correctness('1_2_2') == 'partially-correct'
+        assert correct_map.get_correctness('1_2_3') == 'partially-correct'
 
         # Grade the inputs (everything correct)
         input_dict = {'1_2_1': '1', '1_2_2': '2', '1_2_3': '3'}
         correct_map = problem.grade_answers(input_dict)
 
         # Everything marked incorrect
-        self.assertEqual(correct_map.get_correctness('1_2_1'), 'correct')
-        self.assertEqual(correct_map.get_correctness('1_2_2'), 'correct')
-        self.assertEqual(correct_map.get_correctness('1_2_3'), 'correct')
+        assert correct_map.get_correctness('1_2_1') == 'correct'
+        assert correct_map.get_correctness('1_2_2') == 'correct'
+        assert correct_map.get_correctness('1_2_3') == 'correct'
 
         # Message is interpreted as an "overall message"
-        self.assertEqual(correct_map.get_overall_message(), 'Message text')
+        assert correct_map.get_overall_message() == 'Message text'
 
     def test_script_exception_function(self):
 
@@ -2179,7 +2176,7 @@ class CustomResponseTest(ResponseTest):  # pylint: disable=missing-class-docstri
         problem = self.build_problem(script=script, cfn="check_func")
 
         # Expect that an exception gets raised when we check the answer
-        with self.assertRaises(ResponseError):
+        with pytest.raises(ResponseError):
             problem.grade_answers({'1_2_1': '42'})
 
     def test_script_exception_inline(self):
@@ -2189,7 +2186,7 @@ class CustomResponseTest(ResponseTest):  # pylint: disable=missing-class-docstri
         problem = self.build_problem(answer=script)
 
         # Expect that an exception gets raised when we check the answer
-        with self.assertRaises(ResponseError):
+        with pytest.raises(ResponseError):
             problem.grade_answers({'1_2_1': '42'})
 
     def test_invalid_dict_exception(self):
@@ -2203,7 +2200,7 @@ class CustomResponseTest(ResponseTest):  # pylint: disable=missing-class-docstri
         problem = self.build_problem(script=script, cfn="check_func")
 
         # Expect that an exception gets raised when we check the answer
-        with self.assertRaises(ResponseError):
+        with pytest.raises(ResponseError):
             problem.grade_answers({'1_2_1': '42'})
 
     def test_setup_randomization(self):
@@ -2212,7 +2209,7 @@ class CustomResponseTest(ResponseTest):  # pylint: disable=missing-class-docstri
             num = {code}
             """.format(code=self._get_random_number_code()))
         problem = self.build_problem(script=script)
-        self.assertEqual(problem.context['num'], self._get_random_number_result(problem.seed))
+        assert problem.context['num'] == self._get_random_number_result(problem.seed)
 
     def test_check_function_randomization(self):
         # The check function should get random-seeded from the problem.
@@ -2225,7 +2222,7 @@ class CustomResponseTest(ResponseTest):  # pylint: disable=missing-class-docstri
         input_dict = {'1_2_1': '42'}
         correct_map = problem.grade_answers(input_dict)
         msg = correct_map.get_msg('1_2_1')
-        self.assertEqual(msg, self._get_random_number_result(problem.seed))
+        assert msg == self._get_random_number_result(problem.seed)
 
     def test_random_isnt_none(self):
         # Bug LMS-500 says random.seed(10) fails with:
@@ -2243,7 +2240,7 @@ class CustomResponseTest(ResponseTest):  # pylint: disable=missing-class-docstri
             num = random.randint(0, 1e9)
             """)
         problem = self.build_problem(script=script)
-        self.assertEqual(problem.context['num'], num)
+        assert problem.context['num'] == num
 
     def test_module_imports_inline(self):
         '''
@@ -2322,7 +2319,7 @@ class CustomResponseTest(ResponseTest):  # pylint: disable=missing-class-docstri
         capa_system = test_capa_system()
         capa_system.get_python_lib_zip = lambda: zipstring.getvalue()  # lint-amnesty, pylint: disable=unnecessary-lambda
         problem = self.build_problem(script=script, capa_system=capa_system)
-        self.assertEqual(problem.context['num'], 17)
+        assert problem.context['num'] == 17
 
     def test_function_code_multiple_inputs_order(self):
         # Ensure that order must be correct according to sub-problem position
@@ -2378,18 +2375,18 @@ class CustomResponseTest(ResponseTest):  # pylint: disable=missing-class-docstri
 
         correct_map = problem.grade_answers(input_dict)
 
-        self.assertNotEqual(list(problem.student_answers.keys()), correct_order)
+        assert list(problem.student_answers.keys()) != correct_order
 
         # euqal to correct order after sorting at get_score
         self.assertListEqual(list(problem.responders.values())[0].context['idset'], correct_order)
 
-        self.assertEqual(correct_map.get_correctness('1_2_1'), 'correct')
-        self.assertEqual(correct_map.get_correctness('1_2_9'), 'correct')
-        self.assertEqual(correct_map.get_correctness('1_2_11'), 'incorrect')
+        assert correct_map.get_correctness('1_2_1') == 'correct'
+        assert correct_map.get_correctness('1_2_9') == 'correct'
+        assert correct_map.get_correctness('1_2_11') == 'incorrect'
 
-        self.assertEqual(correct_map.get_msg('1_2_1'), '1')
-        self.assertEqual(correct_map.get_msg('1_2_9'), '9')
-        self.assertEqual(correct_map.get_msg('1_2_11'), '11')
+        assert correct_map.get_msg('1_2_1') == '1'
+        assert correct_map.get_msg('1_2_9') == '9'
+        assert correct_map.get_msg('1_2_11') == '11'
 
 
 class SchematicResponseTest(ResponseTest):
@@ -2420,7 +2417,7 @@ class SchematicResponseTest(ResponseTest):
         # Expect that the problem is graded as true
         # (That is, our script verifies that the context
         # is what we expect)
-        self.assertEqual(correct_map.get_correctness('1_2_1'), 'correct')
+        assert correct_map.get_correctness('1_2_1') == 'correct'
 
     def test_check_function_randomization(self):
         # The check function should get a random seed from the problem.
@@ -2431,7 +2428,7 @@ class SchematicResponseTest(ResponseTest):
         input_dict = {'1_2_1': json.dumps(submission_dict)}
         correct_map = problem.grade_answers(input_dict)
 
-        self.assertEqual(correct_map.get_correctness('1_2_1'), 'correct')
+        assert correct_map.get_correctness('1_2_1') == 'correct'
 
     def test_script_exception(self):
         # Construct a script that will raise an exception
@@ -2439,7 +2436,7 @@ class SchematicResponseTest(ResponseTest):
         problem = self.build_problem(answer=script)
 
         # Expect that an exception gets raised when we check the answer
-        with self.assertRaises(ResponseError):
+        with pytest.raises(ResponseError):
             submission_dict = {'test': 'test'}
             input_dict = {'1_2_1': json.dumps(submission_dict)}
             problem.grade_answers(input_dict)
@@ -2476,10 +2473,9 @@ class AnnotationResponseTest(ResponseTest):  # lint-amnesty, pylint: disable=mis
             actual_correctness = correct_map.get_correctness(answer_id)
             actual_points = correct_map.get_npoints(answer_id)
 
-            self.assertEqual(expected_correctness, actual_correctness,
-                             msg="%s should be marked %s" % (answer_id, expected_correctness))
-            self.assertEqual(expected_points, actual_points,
-                             msg="%s should have %d points" % (answer_id, expected_points))
+            assert expected_correctness == actual_correctness,\
+                ('%s should be marked %s' % (answer_id, expected_correctness))
+            assert expected_points == actual_points, ('%s should have %d points' % (answer_id, expected_points))
 
 
 class ChoiceTextResponseTest(ResponseTest):
@@ -2654,7 +2650,7 @@ class ChoiceTextResponseTest(ResponseTest):
         """
         Test that build problem raises errors for invalid options
         """
-        with self.assertRaises(Exception):
+        with pytest.raises(Exception):
             self.build_problem(type="invalidtextgroup")
 
     def test_unchecked_input_not_validated(self):

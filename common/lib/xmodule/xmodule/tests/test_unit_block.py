@@ -72,7 +72,7 @@ class UnitBlockTests(XmlTest, unittest.TestCase):
         The unit XBlock is designed to hold other XBlocks, so check that its
         completion status is defined as the aggregation of its child blocks.
         """
-        self.assertEqual(XBlockCompletionMode.get_mode(UnitBlock), XBlockCompletionMode.AGGREGATOR)
+        assert XBlockCompletionMode.get_mode(UnitBlock) == XBlockCompletionMode.AGGREGATOR
 
     def assertXmlEqual(self, xml_str_a, xml_str_b):
         """
@@ -84,4 +84,4 @@ class UnitBlockTests(XmlTest, unittest.TestCase):
             xml_str = re.sub(r'(\s)\s+', r'\1', xml_str)
             xml_bytes = xml_str.encode('utf8')
             return minidom.parseString(xml_bytes).toprettyxml()
-        self.assertEqual(clean(xml_str_a), clean(xml_str_b))
+        assert clean(xml_str_a) == clean(xml_str_b)

@@ -51,7 +51,7 @@ class AnnotatableBlockTestCase(unittest.TestCase):  # lint-amnesty, pylint: disa
 
         actual_attr = self.annotatable._get_annotation_data_attr(0, el)  # lint-amnesty, pylint: disable=protected-access
 
-        self.assertIsInstance(actual_attr, dict)
+        assert isinstance(actual_attr, dict)
         self.assertDictEqual(expected_attr, actual_attr)
 
     def test_annotation_class_attr_default(self):
@@ -61,7 +61,7 @@ class AnnotatableBlockTestCase(unittest.TestCase):  # lint-amnesty, pylint: disa
         expected_attr = {'class': {'value': 'annotatable-span highlight'}}
         actual_attr = self.annotatable._get_annotation_class_attr(0, el)  # lint-amnesty, pylint: disable=protected-access
 
-        self.assertIsInstance(actual_attr, dict)
+        assert isinstance(actual_attr, dict)
         self.assertDictEqual(expected_attr, actual_attr)
 
     def test_annotation_class_attr_with_valid_highlight(self):
@@ -79,7 +79,7 @@ class AnnotatableBlockTestCase(unittest.TestCase):  # lint-amnesty, pylint: disa
             }
             actual_attr = self.annotatable._get_annotation_class_attr(0, el)  # lint-amnesty, pylint: disable=protected-access
 
-            self.assertIsInstance(actual_attr, dict)
+            assert isinstance(actual_attr, dict)
             self.assertDictEqual(expected_attr, actual_attr)
 
     def test_annotation_class_attr_with_invalid_highlight(self):
@@ -95,7 +95,7 @@ class AnnotatableBlockTestCase(unittest.TestCase):  # lint-amnesty, pylint: disa
             }
             actual_attr = self.annotatable._get_annotation_class_attr(0, el)  # lint-amnesty, pylint: disable=protected-access
 
-            self.assertIsInstance(actual_attr, dict)
+            assert isinstance(actual_attr, dict)
             self.assertDictEqual(expected_attr, actual_attr)
 
     def test_render_annotation(self):
@@ -105,33 +105,33 @@ class AnnotatableBlockTestCase(unittest.TestCase):  # lint-amnesty, pylint: disa
         actual_el = etree.fromstring('<annotation title="x" body="y" problem="0" highlight="yellow">z</annotation>')
         self.annotatable._render_annotation(0, actual_el)  # lint-amnesty, pylint: disable=protected-access
 
-        self.assertEqual(expected_el.tag, actual_el.tag)
-        self.assertEqual(expected_el.text, actual_el.text)
+        assert expected_el.tag == actual_el.tag
+        assert expected_el.text == actual_el.text
         self.assertDictEqual(dict(expected_el.attrib), dict(actual_el.attrib))
 
     def test_render_content(self):
         content = self.annotatable._render_content()  # lint-amnesty, pylint: disable=protected-access
         el = etree.fromstring(content)
 
-        self.assertEqual('div', el.tag, 'root tag is a div')
+        assert 'div' == el.tag, 'root tag is a div'
 
         expected_num_annotations = 5
         actual_num_annotations = el.xpath('count(//span[contains(@class,"annotatable-span")])')
-        self.assertEqual(expected_num_annotations, actual_num_annotations, 'check number of annotations')
+        assert expected_num_annotations == actual_num_annotations, 'check number of annotations'
 
     def test_get_html(self):
         context = self.annotatable.get_html()
         for key in ['display_name', 'element_id', 'content_html', 'instructions_html']:
-            self.assertIn(key, context)
+            assert key in context
 
     def test_extract_instructions(self):
         xmltree = etree.fromstring(self.sample_xml)
 
         expected_xml = u"<div>Read the text.</div>"
         actual_xml = self.annotatable._extract_instructions(xmltree)  # lint-amnesty, pylint: disable=protected-access
-        self.assertIsNotNone(actual_xml)
-        self.assertEqual(expected_xml.strip(), actual_xml.strip())
+        assert actual_xml is not None
+        assert expected_xml.strip() == actual_xml.strip()
 
         xmltree = etree.fromstring('<annotatable>foo</annotatable>')
         actual = self.annotatable._extract_instructions(xmltree)  # lint-amnesty, pylint: disable=protected-access
-        self.assertIsNone(actual)
+        assert actual is None
