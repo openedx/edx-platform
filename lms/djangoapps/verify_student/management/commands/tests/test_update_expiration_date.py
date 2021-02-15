@@ -46,7 +46,7 @@ class TestPopulateExpiryationDate(MockS3BotoMixin, TestCase):
         call_command('update_expiration_date')
         # Check that the `expiration_date` is not changed
         expiration_date = SoftwareSecurePhotoVerification.objects.get(pk=verification.pk).expiration_date
-        self.assertEqual(expiration_date, expected_date)
+        assert expiration_date == expected_date
 
     def test_expiration_date_updated(self):
         """
@@ -64,9 +64,9 @@ class TestPopulateExpiryationDate(MockS3BotoMixin, TestCase):
         call_command('update_expiration_date')
         updated_verification = SoftwareSecurePhotoVerification.objects.get(pk=verification.pk)
         # Check that the `expiration_date` is updated
-        self.assertEqual(updated_verification.expiration_date, expected_date)
+        assert updated_verification.expiration_date == expected_date
         # Check that the `expiry_date` is set to NULL
-        self.assertEqual(updated_verification.expiry_date, None)
+        assert updated_verification.expiry_date is None
 
     def test_expiration_date_updated_multiple_records(self):
         """
@@ -87,9 +87,9 @@ class TestPopulateExpiryationDate(MockS3BotoMixin, TestCase):
             expected_date = updated_verification.created_at + timedelta(
                 days=settings.VERIFY_STUDENT["DAYS_GOOD_FOR"])
             # Check that the `expiration_date` is updated
-            self.assertEqual(updated_verification.expiration_date, expected_date)
+            assert updated_verification.expiration_date == expected_date
             # Check that the `expiry_date` is set to NULL
-            self.assertEqual(updated_verification.expiry_date, None)
+            assert updated_verification.expiry_date is None
 
     def test_no_approved_verification_found(self):
         """

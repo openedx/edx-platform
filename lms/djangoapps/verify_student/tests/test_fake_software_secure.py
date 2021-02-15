@@ -46,7 +46,7 @@ class SoftwareSecureFakeViewDisabledTest(SoftwareSecureFakeViewTest):
             '/verify_student/software-secure-fake-response'
         )
 
-        self.assertEqual(response.status_code, 404)
+        assert response.status_code == 404
 
 
 class SoftwareSecureFakeViewEnabledTest(SoftwareSecureFakeViewTest):
@@ -66,7 +66,7 @@ class SoftwareSecureFakeViewEnabledTest(SoftwareSecureFakeViewTest):
         response = self.client.get(
             '/verify_student/software-secure-fake-response'
         )
-        self.assertEqual(response.status_code, 302)
+        assert response.status_code == 302
 
     def test_get_method(self):
         """

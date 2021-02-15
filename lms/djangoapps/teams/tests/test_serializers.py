@@ -55,19 +55,14 @@ class MembershipSerializerTestCase(SerializerTestCase):
             'request': RequestFactory().get('/api/team/v0/team_membership')
         }).data
         username = self.user.username
-        self.assertEqual(data['user'], {
-            'url': 'http://testserver/api/user/v1/accounts/' + username,
-            'username': username,
-            'profile_image': {
-                'image_url_full': 'http://testserver/static/default_500.png',
-                'image_url_large': 'http://testserver/static/default_120.png',
-                'image_url_medium': 'http://testserver/static/default_50.png',
-                'image_url_small': 'http://testserver/static/default_30.png',
-                'has_image': False
-            },
-            'account_privacy': 'private'
-        })
-        self.assertNotIn('membership', data['team'])
+        assert data['user'] == {'url': ('http://testserver/api/user/v1/accounts/' + username),
+                                'username': username,
+                                'profile_image': {'image_url_full': 'http://testserver/static/default_500.png',
+                                                  'image_url_large': 'http://testserver/static/default_120.png',
+                                                  'image_url_medium': 'http://testserver/static/default_50.png',
+                                                  'image_url_small': 'http://testserver/static/default_30.png',
+                                                  'has_image': False}, 'account_privacy': 'private'}
+        assert 'membership' not in data['team']
 
 
 class TopicSerializerTestCase(SerializerTestCase):
@@ -86,17 +81,8 @@ class TopicSerializerTestCase(SerializerTestCase):
                 self.course.teamsets[0].cleaned_data,
                 context={'course_id': self.course.id},
             )
-            self.assertEqual(
-                serializer.data,
-                {
-                    u'name': u'Tøpic',
-                    u'description': u'The bést topic!',
-                    u'id': u'0',
-                    u'team_count': 0,
-                    u'type': u'open',
-                    u'max_team_size': None
-                }
-            )
+            assert serializer.data == {u'name': u'Tøpic', u'description': u'The bést topic!', u'id': u'0',
+                                       u'team_count': 0, u'type': u'open', u'max_team_size': None}
 
     def test_topic_with_team_count(self):
         """
@@ -111,17 +97,8 @@ class TopicSerializerTestCase(SerializerTestCase):
                 self.course.teamsets[0].cleaned_data,
                 context={'course_id': self.course.id},
             )
-            self.assertEqual(
-                serializer.data,
-                {
-                    u'name': u'Tøpic',
-                    u'description': u'The bést topic!',
-                    u'id': u'0',
-                    u'team_count': 1,
-                    u'type': u'open',
-                    u'max_team_size': None
-                }
-            )
+            assert serializer.data == {u'name': u'Tøpic', u'description': u'The bést topic!', u'id': u'0',
+                                       u'team_count': 1, u'type': u'open', u'max_team_size': None}
 
     def test_scoped_within_course(self):
         """Verify that team count is scoped within a course."""
@@ -139,17 +116,8 @@ class TopicSerializerTestCase(SerializerTestCase):
                 self.course.teamsets[0].cleaned_data,
                 context={'course_id': self.course.id},
             )
-            self.assertEqual(
-                serializer.data,
-                {
-                    u'name': u'Tøpic',
-                    u'description': u'The bést topic!',
-                    u'id': u'0',
-                    u'team_count': 1,
-                    u'type': u'open',
-                    u'max_team_size': None
-                }
-            )
+            assert serializer.data == {u'name': u'Tøpic', u'description': u'The bést topic!', u'id': u'0',
+                                       u'team_count': 1, u'type': u'open', u'max_team_size': None}
 
 
 class BaseTopicSerializerTestCase(SerializerTestCase):
@@ -203,10 +171,8 @@ class BaseTopicSerializerTestCase(SerializerTestCase):
             ).page(1)
             # pylint: disable=not-callable
             serializer = self.serializer(instance=page, context={'course_id': self.course.id})
-            self.assertEqual(
-                serializer.data['results'],
-                [self._merge_dicts(topic, {u'team_count': num_teams_per_topic}) for topic in topics]
-            )
+            assert serializer.data['results'] ==\
+                   [self._merge_dicts(topic, {u'team_count': num_teams_per_topic}) for topic in topics]
 
     def test_no_topics(self):
         """
@@ -295,10 +261,8 @@ class BulkTeamCountTopicSerializerTestCase(BaseTopicSerializerTestCase):
                 },
                 many=True
             )
-            self.assertEqual(
-                serializer.data,
-                [self._merge_dicts(topic, {u'team_count': num_teams_per_topic}) for topic in topics]
-            )
+            assert serializer.data ==\
+                   [self._merge_dicts(topic, {u'team_count': num_teams_per_topic}) for topic in topics]
 
     def test_no_topics(self):
         """

@@ -5,6 +5,7 @@ Tests for the teams API at the HTTP request level.
 
 
 import itertools
+import pytest
 from contextlib import contextmanager
 from datetime import datetime
 
@@ -134,16 +135,16 @@ class CourseTeamTest(SharedModuleStoreTestCase):
 
     def test_add_user(self):
         """Test that we can add users with correct protection status to a team"""
-        self.assertIsNotNone(self.masters_team.add_user(self.masters_learner))
-        self.assertIsNotNone(self.audit_team.add_user(self.audit_learner))
+        assert self.masters_team.add_user(self.masters_learner) is not None
+        assert self.audit_team.add_user(self.audit_learner) is not None
 
     def test_add_user_bad_team_access(self):
         """Test that we are blocked from adding a user to a team of mixed enrollment types"""
 
-        with self.assertRaises(AddToIncompatibleTeamError):
+        with pytest.raises(AddToIncompatibleTeamError):
             self.audit_team.add_user(self.masters_learner)
 
-        with self.assertRaises(AddToIncompatibleTeamError):
+        with pytest.raises(AddToIncompatibleTeamError):
             self.masters_team.add_user(self.audit_learner)
 
 
@@ -189,31 +190,31 @@ class TeamMembershipTest(SharedModuleStoreTestCase):
     def test_membership_last_activity_set(self):
         current_last_activity = self.team_membership11.last_activity_at
         # Assert that the first save in the setUp sets a value.
-        self.assertIsNotNone(current_last_activity)
+        assert current_last_activity is not None
 
         self.team_membership11.save()
 
         # Verify that we only change the last activity_at when it doesn't
         # already exist.
-        self.assertEqual(self.team_membership11.last_activity_at, current_last_activity)
+        assert self.team_membership11.last_activity_at == current_last_activity
 
     def test_team_size_delete_membership(self):
         """Test that the team size field is correctly updated when deleting a
         team membership.
         """
-        self.assertEqual(self.team1.team_size, 2)
+        assert self.team1.team_size == 2
         self.team_membership11.delete()
         team = CourseTeam.objects.get(id=self.team1.id)
-        self.assertEqual(team.team_size, 1)
+        assert team.team_size == 1
 
     def test_team_size_create_membership(self):
         """Test that the team size field is correctly updated when creating a
         team membership.
         """
-        self.assertEqual(self.team1.team_size, 2)
+        assert self.team1.team_size == 2
         self.team1.add_user(self.user3)
         team = CourseTeam.objects.get(id=self.team1.id)
-        self.assertEqual(team.team_size, 3)
+        assert team.team_size == 3
 
     @ddt.data(
         (None, None, None, 3),
@@ -224,10 +225,9 @@ class TeamMembershipTest(SharedModuleStoreTestCase):
     )
     @ddt.unpack
     def test_get_memberships(self, username, course_ids, team_ids, expected_count):
-        self.assertEqual(
-            CourseTeamMembership.get_memberships(username=username, course_ids=course_ids, team_ids=team_ids).count(),
-            expected_count
-        )
+        assert CourseTeamMembership.get_memberships(username=username,
+                                                    course_ids=course_ids,
+                                                    team_ids=team_ids).count() == expected_count
 
     @ddt.data(
         ('user1', COURSE_KEY1, TEAMSET_1_ID, True),
@@ -240,10 +240,7 @@ class TeamMembershipTest(SharedModuleStoreTestCase):
     @ddt.unpack
     def test_user_in_team_for_course_teamset(self, username, course_id, teamset_id, expected_value):
         user = getattr(self, username)
-        self.assertEqual(
-            CourseTeamMembership.user_in_team_for_teamset(user, course_id, teamset_id),
-            expected_value
-        )
+        assert CourseTeamMembership.user_in_team_for_teamset(user, course_id, teamset_id) == expected_value
 
 
 @ddt.ddt
@@ -296,18 +293,18 @@ class TeamSignalsTest(EventTestMixin, SharedModuleStoreTestCase):
         team = CourseTeam.objects.get(id=self.team.id)
         team_membership = CourseTeamMembership.objects.get(id=self.team_membership.id)
         if should_update:
-            self.assertGreater(team.last_activity_at, team_last_activity)
-            self.assertGreater(team_membership.last_activity_at, team_membership_last_activity)
+            assert team.last_activity_at > team_last_activity
+            assert team_membership.last_activity_at > team_membership_last_activity
             now = datetime.utcnow().replace(tzinfo=pytz.utc)
-            self.assertGreater(now, team.last_activity_at)
-            self.assertGreater(now, team_membership.last_activity_at)
+            assert now > team.last_activity_at
+            assert now > team_membership.last_activity_at
             self.assert_event_emitted(
                 'edx.team.activity_updated',
                 team_id=team.team_id,
             )
         else:
-            self.assertEqual(team.last_activity_at, team_last_activity)
-            self.assertEqual(team_membership.last_activity_at, team_membership_last_activity)
+            assert team.last_activity_at == team_last_activity
+            assert team_membership.last_activity_at == team_membership_last_activity
             self.assert_no_events_were_emitted()
 
     @ddt.data(

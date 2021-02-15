@@ -42,12 +42,12 @@ class TestVerifyStudentUtils(unittest.TestCase):
         # No attempts in the query set, so should return None
         query = SoftwareSecurePhotoVerification.objects.filter(user=user)
         result = verification_for_datetime(now, query)
-        self.assertIs(result, None)
+        assert result is None
 
         # Should also return None if no deadline specified
         query = SoftwareSecurePhotoVerification.objects.filter(user=user)
         result = verification_for_datetime(None, query)
-        self.assertIs(result, None)
+        assert result is None
 
         # Make an attempt
         attempt = SoftwareSecurePhotoVerification.objects.create(user=user)
@@ -56,25 +56,25 @@ class TestVerifyStudentUtils(unittest.TestCase):
         before = attempt.created_at - timedelta(seconds=1)
         query = SoftwareSecurePhotoVerification.objects.filter(user=user)
         result = verification_for_datetime(before, query)
-        self.assertIs(result, None)
+        assert result is None
 
         # Immediately after the created date, should get the attempt
         after_created = attempt.created_at + timedelta(seconds=1)
         query = SoftwareSecurePhotoVerification.objects.filter(user=user)
         result = verification_for_datetime(after_created, query)
-        self.assertEqual(result, attempt)
+        assert result == attempt
 
         # If no deadline specified, should return first available
         query = SoftwareSecurePhotoVerification.objects.filter(user=user)
         result = verification_for_datetime(None, query)
-        self.assertEqual(result, attempt)
+        assert result == attempt
 
         # Immediately before the expiration date, should get the attempt
         expiration = attempt.expiration_datetime + timedelta(days=settings.VERIFY_STUDENT["DAYS_GOOD_FOR"])
         before_expiration = expiration - timedelta(seconds=1)
         query = SoftwareSecurePhotoVerification.objects.filter(user=user)
         result = verification_for_datetime(before_expiration, query)
-        self.assertEqual(result, attempt)
+        assert result == attempt
 
         # Immediately after the expiration date, should not get the attempt
         attempt.expiration_date = now - timedelta(seconds=1)
@@ -82,7 +82,7 @@ class TestVerifyStudentUtils(unittest.TestCase):
         after = now + timedelta(days=1)
         query = SoftwareSecurePhotoVerification.objects.filter(user=user)
         result = verification_for_datetime(after, query)
-        self.assertIs(result, None)
+        assert result is None
 
         # Create a second attempt in the same window
         second_attempt = SoftwareSecurePhotoVerification.objects.create(user=user)
@@ -91,7 +91,7 @@ class TestVerifyStudentUtils(unittest.TestCase):
         deadline = second_attempt.created_at + timedelta(days=1)
         query = SoftwareSecurePhotoVerification.objects.filter(user=user)
         result = verification_for_datetime(deadline, query)
-        self.assertEqual(result, second_attempt)
+        assert result == second_attempt
 
     @ddt.data(
         (False, False, False, None, None),
@@ -141,13 +141,13 @@ class TestVerifyStudentUtils(unittest.TestCase):
         )
 
         if not expected_verification:
-            self.assertEqual(most_recent, None)
+            assert most_recent is None
         elif expected_verification == 'photo':
-            self.assertEqual(most_recent, photo_verification)
+            assert most_recent == photo_verification
         elif expected_verification == 'sso':
-            self.assertEqual(most_recent, sso_verification)
+            assert most_recent == sso_verification
         else:
-            self.assertEqual(most_recent, manual_verification)
+            assert most_recent == manual_verification
 
     @mock.patch('lms.djangoapps.verify_student.utils.log')
     @mock.patch(
@@ -165,4 +165,4 @@ class TestVerifyStudentUtils(unittest.TestCase):
             user.username,
             'error'
         )
-        self.assertTrue(attempt.status, SoftwareSecurePhotoVerification.STATUS.must_retry)
+        assert attempt.status, SoftwareSecurePhotoVerification.STATUS.must_retry

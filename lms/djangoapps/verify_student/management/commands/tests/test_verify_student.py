@@ -42,8 +42,8 @@ class TestVerifyStudentCommand(MockS3BotoMixin, TestVerificationBase):
             self.create_upload_and_submit_attempt_for_user()
 
         # check to make sure we had two successes and two failures; otherwise we've got problems elsewhere
-        self.assertEqual(SoftwareSecurePhotoVerification.objects.filter(status="submitted").count(), 1)
-        self.assertEqual(SoftwareSecurePhotoVerification.objects.filter(status='must_retry').count(), 2)
+        assert SoftwareSecurePhotoVerification.objects.filter(status='submitted').count() == 1
+        assert SoftwareSecurePhotoVerification.objects.filter(status='must_retry').count() == 2
 
         with self.immediate_on_commit():
             call_command('retry_failed_photo_verifications')
