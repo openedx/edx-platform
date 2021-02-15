@@ -55,12 +55,8 @@ class TestUtils(TestCase):
         """
         # Create users from factory
         UserFactory(username='test_user', email='test_user@example.com')
-        self.assertTrue(
-            get_user_from_email({'email': 'test_user@example.com'}),
-        )
-        self.assertFalse(
-            get_user_from_email({'email': 'invalid@example.com'}),
-        )
+        assert get_user_from_email({'email': 'test_user@example.com'})
+        assert not get_user_from_email({'email': 'invalid@example.com'})
 
     def test_is_enterprise_customer_user(self):
         """
@@ -79,9 +75,5 @@ class TestUtils(TestCase):
             user_id=user.id,
         )
 
-        self.assertTrue(
-            is_enterprise_customer_user('the-provider', user),
-        )
-        self.assertFalse(
-            is_enterprise_customer_user('the-provider', other_user),
-        )
+        assert is_enterprise_customer_user('the-provider', user)
+        assert not is_enterprise_customer_user('the-provider', other_user)

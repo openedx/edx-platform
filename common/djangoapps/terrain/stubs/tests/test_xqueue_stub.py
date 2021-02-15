@@ -116,8 +116,8 @@ class StubXQueueServiceTest(unittest.TestCase):  # lint-amnesty, pylint: disable
 
             # Expect that we do NOT receive a response
             # and that an error message is logged
-            self.assertFalse(self.post.called)
-            self.assertTrue(logger.error.called)
+            assert not self.post.called
+            assert logger.error.called
 
     def _post_submission(self, callback_url, lms_key, queue_name, xqueue_body):  # lint-amnesty, pylint: disable=unused-argument
         """
@@ -144,7 +144,7 @@ class StubXQueueServiceTest(unittest.TestCase):  # lint-amnesty, pylint: disable
         resp = requests.post(self.url, data=grade_request)
 
         # Expect that the response is success
-        self.assertEqual(resp.status_code, 200)
+        assert resp.status_code == 200
 
         # Return back the header, so we can authenticate the response we receive
         return grade_request['xqueue_header']
@@ -167,9 +167,7 @@ class StubXQueueServiceTest(unittest.TestCase):  # lint-amnesty, pylint: disable
             'xqueue_body': expected_body,
         }
         # Check that the POST request was made with the correct params
-        self.assertEqual(self.post.call_args[1]['data']['xqueue_body'], expected_callback_dict['xqueue_body'])
-        self.assertEqual(
-            ast.literal_eval(self.post.call_args[1]['data']['xqueue_header']),
-            ast.literal_eval(expected_callback_dict['xqueue_header'])
-        )
-        self.assertEqual(self.post.call_args[0][0], callback_url)
+        assert self.post.call_args[1]['data']['xqueue_body'] == expected_callback_dict['xqueue_body']
+        assert ast.literal_eval(self.post.call_args[1]['data']['xqueue_header']) ==\
+               ast.literal_eval(expected_callback_dict['xqueue_header'])
+        assert self.post.call_args[0][0] == callback_url

@@ -27,25 +27,25 @@ class SegmentTrackTestCase(TestCase):
 
     def test_missing_key(self):
         segment.track(sentinel.user_id, sentinel.name, self.properties)
-        self.assertFalse(self.mock_segment_track.called)
+        assert not self.mock_segment_track.called
 
     @override_settings(LMS_SEGMENT_KEY=None)
     def test_null_key(self):
         segment.track(sentinel.user_id, sentinel.name, self.properties)
-        self.assertFalse(self.mock_segment_track.called)
+        assert not self.mock_segment_track.called
 
     @override_settings(LMS_SEGMENT_KEY="testkey")
     def test_missing_name(self):
         segment.track(sentinel.user_id, None, self.properties)
-        self.assertFalse(self.mock_segment_track.called)
+        assert not self.mock_segment_track.called
 
     @override_settings(LMS_SEGMENT_KEY="testkey")
     def test_track_without_tracking_context(self):
         segment.track(sentinel.user_id, sentinel.name, self.properties)
-        self.assertTrue(self.mock_segment_track.called)
+        assert self.mock_segment_track.called
         args, kwargs = self.mock_segment_track.call_args  # lint-amnesty, pylint: disable=unused-variable
         expected_segment_context = {}
-        self.assertEqual((sentinel.user_id, sentinel.name, self.properties, expected_segment_context), args)
+        assert (sentinel.user_id, sentinel.name, self.properties, expected_segment_context) == args
 
     @ddt.unpack
     @ddt.data(
@@ -62,19 +62,19 @@ class SegmentTrackTestCase(TestCase):
         with self.tracker.context('test', tracking_context):
             segment.track(sentinel.user_id, sentinel.name, self.properties)
         args, kwargs = self.mock_segment_track.call_args  # lint-amnesty, pylint: disable=unused-variable
-        self.assertEqual((sentinel.user_id, sentinel.name, self.properties, expected_segment_context), args)
+        assert (sentinel.user_id, sentinel.name, self.properties, expected_segment_context) == args
 
         # Test with provided context and no tracking context.
         segment.track(sentinel.user_id, sentinel.name, self.properties, provided_context)
         args, kwargs = self.mock_segment_track.call_args
-        self.assertEqual((sentinel.user_id, sentinel.name, self.properties, provided_context), args)
+        assert (sentinel.user_id, sentinel.name, self.properties, provided_context) == args
 
         # Test with provided context and also tracking context.
         with self.tracker.context('test', tracking_context):
             segment.track(sentinel.user_id, sentinel.name, self.properties, provided_context)
-        self.assertTrue(self.mock_segment_track.called)
+        assert self.mock_segment_track.called
         args, kwargs = self.mock_segment_track.call_args
-        self.assertEqual((sentinel.user_id, sentinel.name, self.properties, provided_context), args)
+        assert (sentinel.user_id, sentinel.name, self.properties, provided_context) == args
 
     @override_settings(LMS_SEGMENT_KEY="testkey")
     def test_track_with_standard_context(self):
@@ -97,7 +97,7 @@ class SegmentTrackTestCase(TestCase):
         with self.tracker.context('test', tracking_context):
             segment.track(sentinel.user_id, sentinel.name, self.properties)
 
-        self.assertTrue(self.mock_segment_track.called)
+        assert self.mock_segment_track.called
         args, kwargs = self.mock_segment_track.call_args  # lint-amnesty, pylint: disable=unused-variable
 
         expected_segment_context = {
@@ -112,7 +112,7 @@ class SegmentTrackTestCase(TestCase):
                 'url': 'https://hostname/this/is/a/path'  # Synthesized URL value.
             }
         }
-        self.assertEqual((sentinel.user_id, sentinel.name, self.properties, expected_segment_context), args)
+        assert (sentinel.user_id, sentinel.name, self.properties, expected_segment_context) == args
 
 
 class SegmentIdentifyTestCase(TestCase):
@@ -127,24 +127,24 @@ class SegmentIdentifyTestCase(TestCase):
 
     def test_missing_key(self):
         segment.identify(sentinel.user_id, self.properties)
-        self.assertFalse(self.mock_segment_identify.called)
+        assert not self.mock_segment_identify.called
 
     @override_settings(LMS_SEGMENT_KEY=None)
     def test_null_key(self):
         segment.identify(sentinel.user_id, self.properties)
-        self.assertFalse(self.mock_segment_identify.called)
+        assert not self.mock_segment_identify.called
 
     @override_settings(LMS_SEGMENT_KEY="testkey")
     def test_normal_call(self):
         segment.identify(sentinel.user_id, self.properties)
-        self.assertTrue(self.mock_segment_identify.called)
+        assert self.mock_segment_identify.called
         args, kwargs = self.mock_segment_identify.call_args  # lint-amnesty, pylint: disable=unused-variable
-        self.assertEqual((sentinel.user_id, self.properties, {}), args)
+        assert (sentinel.user_id, self.properties, {}) == args
 
     @override_settings(LMS_SEGMENT_KEY="testkey")
     def test_call_with_context(self):
         provided_context = {sentinel.context_key: sentinel.context_value}
         segment.identify(sentinel.user_id, self.properties, provided_context)
-        self.assertTrue(self.mock_segment_identify.called)
+        assert self.mock_segment_identify.called
         args, kwargs = self.mock_segment_identify.call_args  # lint-amnesty, pylint: disable=unused-variable
-        self.assertEqual((sentinel.user_id, self.properties, provided_context), args)
+        assert (sentinel.user_id, self.properties, provided_context) == args

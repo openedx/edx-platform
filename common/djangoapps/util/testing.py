@@ -89,7 +89,7 @@ class EventTestMixin(object):
         """
         Ensures no events were emitted since the last event related assertion.
         """
-        self.assertFalse(self.mock_tracker.emit.called)
+        assert not self.mock_tracker.emit.called
 
     def assert_event_emitted(self, event_name, **kwargs):
         """
@@ -109,7 +109,7 @@ class EventTestMixin(object):
         for call_args in self.mock_tracker.emit.call_args_list:
             if call_args[0][0] == event_name:
                 actual_count += 1
-        self.assertEqual(actual_count, expected_count)
+        assert actual_count == expected_count
 
     def reset_tracker(self):
         """
@@ -134,7 +134,7 @@ class PatchMediaTypeMixin(object):
             json.dumps({}),
             content_type=self.unsupported_media_type
         )
-        self.assertEqual(response.status_code, 415)
+        assert response.status_code == 415
 
 
 def patch_testcase():
