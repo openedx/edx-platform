@@ -2,7 +2,7 @@
 Test authorization functions
 """
 
-
+import pytest
 from django.contrib.auth.models import AnonymousUser
 from django.test import TestCase
 
@@ -26,23 +26,23 @@ class ViewCoursesForUsernameTestCase(CourseApiFactoryMixin, TestCase):
         cls.anonymous_user = AnonymousUser()
 
     def test_for_staff(self):
-        self.assertTrue(can_view_courses_for_username(self.staff_user, self.staff_user.username))
+        assert can_view_courses_for_username(self.staff_user, self.staff_user.username)
 
     def test_for_honor(self):
-        self.assertTrue(can_view_courses_for_username(self.honor_user, self.honor_user.username))
+        assert can_view_courses_for_username(self.honor_user, self.honor_user.username)
 
     def test_for_staff_as_honor(self):
-        self.assertTrue(can_view_courses_for_username(self.staff_user, self.honor_user.username))
+        assert can_view_courses_for_username(self.staff_user, self.honor_user.username)
 
     def test_for_honor_as_staff(self):
-        self.assertFalse(can_view_courses_for_username(self.honor_user, self.staff_user.username))
+        assert not can_view_courses_for_username(self.honor_user, self.staff_user.username)
 
     def test_for_none_as_staff(self):
-        with self.assertRaises(TypeError):
+        with pytest.raises(TypeError):
             can_view_courses_for_username(self.staff_user, None)
 
     def test_for_anonymous(self):
-        self.assertTrue(can_view_courses_for_username(self.anonymous_user, self.anonymous_user.username))
+        assert can_view_courses_for_username(self.anonymous_user, self.anonymous_user.username)
 
     def test_for_anonymous_as_honor(self):
-        self.assertFalse(can_view_courses_for_username(self.anonymous_user, self.honor_user.username))
+        assert not can_view_courses_for_username(self.anonymous_user, self.honor_user.username)

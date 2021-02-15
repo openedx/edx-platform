@@ -41,28 +41,23 @@ class TestStudentViewTransformer(ModuleStoreTestCase):
 
         # verify video data returned iff requested
         video_block_key = self.course_key.make_usage_key('video', 'sample_video')
-        self.assertEqual(
-            self.block_structure.get_transformer_block_field(
-                video_block_key, StudentViewTransformer, StudentViewTransformer.STUDENT_VIEW_DATA,
-            ) is not None,
-            'video' in requested_student_view_data
-        )
-        self.assertFalse(
-            self.block_structure.get_transformer_block_field(
-                video_block_key, StudentViewTransformer, StudentViewTransformer.STUDENT_VIEW_MULTI_DEVICE,
-            )
-        )
+        assert (self.block_structure
+                .get_transformer_block_field(video_block_key,
+                                             StudentViewTransformer,
+                                             StudentViewTransformer.STUDENT_VIEW_DATA) is not None) == \
+               ('video' in requested_student_view_data)
+
+        assert not self.block_structure\
+            .get_transformer_block_field(video_block_key, StudentViewTransformer,
+                                         StudentViewTransformer.STUDENT_VIEW_MULTI_DEVICE)
 
         # verify html data returned iff requested
         html_block_key = self.course_key.make_usage_key('html', 'toyhtml')
-        self.assertEqual(
-            self.block_structure.get_transformer_block_field(
-                html_block_key, StudentViewTransformer, StudentViewTransformer.STUDENT_VIEW_DATA,
-            ) is not None,
-            'html' in requested_student_view_data
-        )
-        self.assertTrue(
-            self.block_structure.get_transformer_block_field(
-                html_block_key, StudentViewTransformer, StudentViewTransformer.STUDENT_VIEW_MULTI_DEVICE,
-            )
-        )
+        assert (self.block_structure
+                .get_transformer_block_field(html_block_key, StudentViewTransformer,
+                                             StudentViewTransformer.STUDENT_VIEW_DATA) is not None) ==\
+               ('html' in requested_student_view_data)
+
+        assert self.block_structure\
+            .get_transformer_block_field(html_block_key, StudentViewTransformer,
+                                         StudentViewTransformer.STUDENT_VIEW_MULTI_DEVICE)

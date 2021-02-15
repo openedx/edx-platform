@@ -2,11 +2,10 @@
 Tests for Course API views.
 """
 
-
 from datetime import datetime
 from hashlib import md5
 from unittest import TestCase
-
+import pytest
 import ddt
 import six
 from six.moves import range
@@ -45,7 +44,7 @@ class CourseApiTestViewMixin(CourseApiFactoryMixin):
         """
         log in the specified user and set its is_active field
         """
-        self.assertTrue(self.client.login(username=requesting_user.username, password=TEST_PASSWORD))
+        assert self.client.login(username=requesting_user.username, password=TEST_PASSWORD)
         if make_inactive:
             requesting_user.is_active = False
             requesting_user.save()
@@ -67,7 +66,7 @@ class CourseApiTestViewMixin(CourseApiFactoryMixin):
         query_params = {}
         query_params.update(params or {})
         response = self.client.get(url or self.url, data=query_params)
-        self.assertEqual(response.status_code, expected_status_code)
+        assert response.status_code == expected_status_code
         return response
 
 
@@ -113,7 +112,7 @@ class CourseListViewTestCase(CourseApiTestViewMixin, SharedModuleStoreTestCase):
     def test_missing_username(self):
         self.setup_user(self.honor_user)
         response_to_missing_username = self.verify_response(expected_status_code=200)
-        self.assertIsNotNone(response_to_missing_username.data)
+        assert response_to_missing_username.data is not None
 
     def test_not_logged_in(self):
         self.client.logout()
@@ -126,10 +125,10 @@ class CourseListViewTestCase(CourseApiTestViewMixin, SharedModuleStoreTestCase):
         throttle.scope = user_scope
         try:
             rate_limit, __ = throttle.parse_rate(throttle.get_rate())
-            self.assertEqual(rate_limit, expected_rate)
-            self.assertFalse(throws_exception)
+            assert rate_limit == expected_rate
+            assert not throws_exception
         except ImproperlyConfigured:
-            self.assertTrue(throws_exception)
+            assert throws_exception
 
     @ddt.data(('staff', False, 40), ('user', False, 20), ('unknown', True, None))
     @ddt.unpack
@@ -175,20 +174,16 @@ class CourseListViewTestCaseMultipleCourses(CourseApiTestViewMixin, ModuleStoreT
             org=md5(self.course.org.encode('utf-8')).hexdigest()
         )
 
-        self.assertNotEqual(alternate_course.org, self.course.org)
+        assert alternate_course.org != self.course.org
 
         # No filtering.
         unfiltered_response = self.verify_response(params={'username': self.staff_user.username})
         for org in [self.course.org, alternate_course.org]:
-            self.assertTrue(
-                any(course['org'] == org for course in unfiltered_response.data['results'])
-            )
+            assert any(((course['org'] == org) for course in unfiltered_response.data['results']))
 
         # With filtering.
         filtered_response = self.verify_response(params={'org': self.course.org, 'username': self.staff_user.username})
-        self.assertTrue(
-            all(course['org'] == self.course.org for course in filtered_response.data['results'])
-        )
+        assert all(((course['org'] == self.course.org) for course in filtered_response.data['results']))
 
     def test_filter(self):
         self.setup_user(self.staff_user)
@@ -206,11 +201,7 @@ class CourseListViewTestCaseMultipleCourses(CourseApiTestViewMixin, ModuleStoreT
             if filter_:
                 params.update(filter_)
             response = self.verify_response(params=params)
-            self.assertEqual(
-                {course['course_id'] for course in response.data['results']},
-                {six.text_type(course.id) for course in expected_courses},
-                u"testing course_api.views.CourseListView with filter_={}".format(filter_),
-            )
+            assert {course['course_id'] for course in response.data['results']} == {six.text_type(course.id) for course in expected_courses}, f'testing course_api.views.CourseListView with filter_={filter_}'  # pylint: disable=line-too-long
 
 
 class CourseDetailViewTestCase(CourseApiTestViewMixin, SharedModuleStoreTestCase):
@@ -277,7 +268,7 @@ class CourseDetailViewTestCase(CourseApiTestViewMixin, SharedModuleStoreTestCase
         request.query_params = {}
         request.user = self.staff_user
         response = CourseDetailView().dispatch(request, course_key_string='a:b:c')
-        self.assertEqual(response.status_code, 400)
+        assert response.status_code == 400
 
 
 @override_settings(ELASTIC_FIELD_MAPPINGS={
@@ -350,19 +341,21 @@ class CourseListSearchViewTest(CourseApiTestViewMixin, ModuleStoreTestCase, Sear
         Test without search, should list all the courses.
         """
         res = self.verify_response()
-        self.assertIn('results', res.data)
-        self.assertNotEqual(res.data['results'], [])
-        self.assertEqual(res.data['pagination']['count'], 3)  # Should list all of the 3 courses
+        assert 'results' in res.data
+        assert res.data['results'] != []
+        assert res.data['pagination']['count'] == 3
+        # Should list all of the 3 courses
 
     def test_list_all_with_search_term(self):
         """
         Test with search, should list only the course that matches the search term.
         """
         res = self.verify_response(params={'search_term': 'unique search term'})
-        self.assertIn('results', res.data)
-        self.assertNotEqual(res.data['results'], [])
-        self.assertEqual(res.data['pagination']['count'], 1)
-        self.assertEqual(len(res.data['results']), 1)  # Should return a single course
+        assert 'results' in res.data
+        assert res.data['results'] != []
+        assert res.data['pagination']['count'] == 1
+        assert len(res.data['results']) == 1
+        # Should return a single course
 
     def test_too_many_courses(self):
         """
@@ -406,13 +399,10 @@ class CourseListSearchViewTest(CourseApiTestViewMixin, ModuleStoreTestCase, Sear
             with self.assertNumQueries(query_counts[page - 1]):
                 response = self.verify_response(params={'page': page, 'page_size': 30})
 
-                self.assertIn('results', response.data)
-                self.assertEqual(response.data['pagination']['count'], 303)
-                self.assertEqual(len(response.data['results']), 30 if page < 11 else 3)
-                self.assertEqual(
-                    [c['id'] for c in response.data['results']],
-                    ordered_course_ids[(page - 1) * 30:page * 30]
-                )
+                assert 'results' in response.data
+                assert response.data['pagination']['count'] == 303
+                assert len(response.data['results']) == (30 if (page < 11) else 3)
+                assert [c['id'] for c in response.data['results']] == ordered_course_ids[((page - 1) * 30):(page * 30)]
 
 
 class CourseIdListViewTestCase(CourseApiTestViewMixin, ModuleStoreTestCase):
@@ -438,7 +428,7 @@ class CourseIdListViewTestCase(CourseApiTestViewMixin, ModuleStoreTestCase):
         # Request the courses as the staff user with the different roles specified.
         for role in ('staff', 'instructor'):
             filtered_response = self.verify_response(params={'username': self.staff_user.username, 'role': role})
-            self.assertEqual(len(filtered_response.data['results']), 1)
+            assert len(filtered_response.data['results']) == 1
 
     def test_filter_by_roles_non_staff(self):
         """
@@ -449,7 +439,7 @@ class CourseIdListViewTestCase(CourseApiTestViewMixin, ModuleStoreTestCase):
         # Request the courses as the non-staff user with the different roles should *not* be allowed.
         for role in ('staff', 'instructor'):
             filtered_response = self.verify_response(params={'username': self.honor_user.username, 'role': role})
-            self.assertEqual(len(filtered_response.data['results']), 0)
+            assert len(filtered_response.data['results']) == 0
 
     def test_filter_by_roles_course_staff(self):
         """
@@ -476,23 +466,23 @@ class CourseIdListViewTestCase(CourseApiTestViewMixin, ModuleStoreTestCase):
             'username': course_staff_user.username,
             'role': 'staff'
         })
-        self.assertEqual(len(filtered_response.data['results']), 1)
-        self.assertTrue(filtered_response.data['results'][0].startswith(self.course.org))
+        assert len(filtered_response.data['results']) == 1
+        assert filtered_response.data['results'][0].startswith(self.course.org)
 
         # The course staff user does *not* have the course instructor role on any courses.
         filtered_response = self.verify_response(params={
             'username': course_staff_user.username,
             'role': 'instructor'
         })
-        self.assertEqual(len(filtered_response.data['results']), 0)
+        assert len(filtered_response.data['results']) == 0
 
         # The course instructor user only has the course instructor role on one course.
         filtered_response = self.verify_response(params={
             'username': course_instructor_user.username,
             'role': 'instructor'
         })
-        self.assertEqual(len(filtered_response.data['results']), 1)
-        self.assertTrue(filtered_response.data['results'][0].startswith(alternate_course1.org))
+        assert len(filtered_response.data['results']) == 1
+        assert filtered_response.data['results'][0].startswith(alternate_course1.org)
 
         # The course instructor user has the inferred course staff role on one course.
         self.setup_user(course_instructor_user)
@@ -500,8 +490,8 @@ class CourseIdListViewTestCase(CourseApiTestViewMixin, ModuleStoreTestCase):
             'username': course_instructor_user.username,
             'role': 'staff'
         })
-        self.assertEqual(len(filtered_response.data['results']), 1)
-        self.assertTrue(filtered_response.data['results'][0].startswith(alternate_course1.org))
+        assert len(filtered_response.data['results']) == 1
+        assert filtered_response.data['results'][0].startswith(alternate_course1.org)
 
         # The user with both instructor AND staff on a course has the inferred course staff role on that one course.
         self.setup_user(course_instructor_staff_user)
@@ -509,8 +499,8 @@ class CourseIdListViewTestCase(CourseApiTestViewMixin, ModuleStoreTestCase):
             'username': course_instructor_staff_user.username,
             'role': 'staff'
         })
-        self.assertEqual(len(filtered_response.data['results']), 1)
-        self.assertTrue(filtered_response.data['results'][0].startswith(alternate_course2.org))
+        assert len(filtered_response.data['results']) == 1
+        assert filtered_response.data['results'][0].startswith(alternate_course2.org)
 
     def test_no_libraries(self):
         """
@@ -531,8 +521,8 @@ class CourseIdListViewTestCase(CourseApiTestViewMixin, ModuleStoreTestCase):
             'username': course_staff_user.username,
             'role': 'staff'
         })
-        self.assertEqual(len(filtered_response.data['results']), 1)
-        self.assertTrue(filtered_response.data['results'][0].startswith(self.course.org))
+        assert len(filtered_response.data['results']) == 1
+        assert filtered_response.data['results'][0].startswith(self.course.org)
 
 
 class LazyPageNumberPaginationTestCase(TestCase):  # lint-amnesty, pylint: disable=missing-class-docstring
@@ -579,10 +569,10 @@ class LazyPageNumberPaginationTestCase(TestCase):  # lint-amnesty, pylint: disab
         request = RequestFactory().get('/endpoint', data={'page': 3, 'page_size': 5})
         request.query_params = {'page': 3, 'page_size': 5}
 
-        with self.assertRaises(Exception) as exc:
+        with pytest.raises(Exception) as exc:
             pagination = LazyPageNumberPagination()
             pagination.max_page_size = 5
             pagination.page_size = 5
             paginated_queryset = pagination.paginate_queryset(even_numbers_lazy_sequence, request)
             pagination.get_paginated_response(paginated_queryset)
-            self.assertIn('Invalid page', exc.exception)
+            assert 'Invalid page' in exc.exception

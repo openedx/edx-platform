@@ -54,8 +54,8 @@ class CertificatesModelTest(ModuleStoreTestCase, MilestonesTestCaseMixin):
         course = CourseFactory.create(org='edx', number='verified', display_name='Verified Course')
 
         certificate_status = certificate_status_for_student(student, course.id)
-        self.assertEqual(certificate_status['status'], CertificateStatuses.unavailable)
-        self.assertEqual(certificate_status['mode'], GeneratedCertificate.MODES.honor)
+        assert certificate_status['status'] == CertificateStatuses.unavailable
+        assert certificate_status['mode'] == GeneratedCertificate.MODES.honor
 
     @unpack
     @data(
@@ -78,14 +78,14 @@ class CertificatesModelTest(ModuleStoreTestCase, MilestonesTestCaseMixin):
             student, self.instructor_paced_course.id, grade,
             whitelisted, user_certificate=None
         )
-        self.assertEqual(certificate_info, output)
+        assert certificate_info == output
 
         # for self paced course
         certificate_info = certificate_info_for_user(
             student, self.self_paced_course.id, grade,
             whitelisted, user_certificate=None
         )
-        self.assertEqual(certificate_info, output)
+        assert certificate_info == output
 
     @unpack
     @data(
@@ -127,14 +127,14 @@ class CertificatesModelTest(ModuleStoreTestCase, MilestonesTestCaseMixin):
             student, self.instructor_paced_course.id, grade,
             whitelisted, certificate1
         )
-        self.assertEqual(certificate_info, output)
+        assert certificate_info == output
 
         # for self paced course
         certificate_info = certificate_info_for_user(
             student, self.self_paced_course.id, grade,
             whitelisted, certificate2
         )
-        self.assertEqual(certificate_info, output)
+        assert certificate_info == output
 
     @unpack
     @data(
@@ -154,7 +154,7 @@ class CertificatesModelTest(ModuleStoreTestCase, MilestonesTestCaseMixin):
             user, self.instructor_paced_course.id, grade,
             whitelisted, user_certificate=None
         )
-        self.assertEqual(certificate_info, output)
+        assert certificate_info == output
 
     def test_course_ids_with_certs_for_user(self):
         # Create one user with certs and one without
@@ -201,7 +201,7 @@ class CertificatesModelTest(ModuleStoreTestCase, MilestonesTestCaseMixin):
         set_prerequisite_courses(course.id, [six.text_type(pre_requisite_course.id)])
         # get milestones collected by user before completing the pre-requisite course
         completed_milestones = milestones_achieved_by_user(student, six.text_type(pre_requisite_course.id))
-        self.assertEqual(len(completed_milestones), 0)
+        assert len(completed_milestones) == 0
 
         GeneratedCertificateFactory.create(
             user=student,
@@ -211,8 +211,8 @@ class CertificatesModelTest(ModuleStoreTestCase, MilestonesTestCaseMixin):
         )
         # get milestones collected by user after user has completed the pre-requisite course
         completed_milestones = milestones_achieved_by_user(student, six.text_type(pre_requisite_course.id))
-        self.assertEqual(len(completed_milestones), 1)
-        self.assertEqual(completed_milestones[0]['namespace'], six.text_type(pre_requisite_course.id))
+        assert len(completed_milestones) == 1
+        assert completed_milestones[0]['namespace'] == six.text_type(pre_requisite_course.id)
 
     @patch.dict(settings.FEATURES, {'ENABLE_OPENBADGES': True})
     @patch('lms.djangoapps.badges.backends.badgr.BadgrBackend', spec=True)
@@ -229,4 +229,4 @@ class CertificatesModelTest(ModuleStoreTestCase, MilestonesTestCaseMixin):
         )
         cert.status = CertificateStatuses.downloadable
         cert.save()
-        self.assertTrue(handler.return_value.award.called)
+        assert handler.return_value.award.called
