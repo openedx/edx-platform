@@ -10,13 +10,18 @@ from django.views import View
 from django.views.generic import TemplateView
 from rest_framework.status import HTTP_400_BAD_REQUEST
 
-from openedx.adg.lms.applications.forms import ExtendedUserProfileForm, UserApplicationForm, UserProfileForm
+from openedx.adg.lms.applications.forms import (
+    ExtendedUserProfileForm,
+    UserApplicationCoverLetterForm,
+    UserApplicationForm,
+    UserProfileForm
+)
 from openedx.adg.lms.registration_extension.models import ExtendedUserProfile
 from openedx.adg.lms.utils.date_utils import month_choices, year_choices
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 
 from .helpers import send_application_submission_confirmation_email
-from .models import ApplicationHub, Education, PrerequisiteCourse, UserApplication
+from .models import ApplicationHub, BusinessLine, Education, PrerequisiteCourse, UserApplication
 
 
 class RedirectToLoginOrRelevantPageMixin(AccessMixin):
@@ -34,6 +39,29 @@ class RedirectToLoginOrRelevantPageMixin(AccessMixin):
         elif not self.is_precondition_satisfied():
             return self.handle_no_permission()
         return super().dispatch(request, *args, **kwargs)
+
+    def is_precondition_satisfied(self):
+        """
+        Checks if a written application is already submitted or not.
+
+        Returns:
+            bool: True if written application is not completed, False otherwise.
+        """
+        user_application_hub, _ = ApplicationHub.objects.get_or_create(user=self.request.user)
+
+        return not user_application_hub.is_written_application_completed
+
+    def handle_no_permission(self):
+        """
+        Redirects to application hub on get request or returns http 400 on post request.
+
+        Returns:
+            HttpResponse object.
+        """
+        if self.request.method == 'POST':
+            return HttpResponse(status=HTTP_400_BAD_REQUEST)
+        else:
+            return redirect('application_hub')
 
 
 class ApplicationHubView(RedirectToLoginOrRelevantPageMixin, View):
@@ -312,3 +340,77 @@ class EducationAndExperienceView(RedirectToLoginOrRelevantPageMixin, TemplateVie
         Redirects to application hub.
         """
         return redirect('application_hub')
+
+
+class CoverLetterView(RedirectToLoginOrRelevantPageMixin, View):
+    """
+    View enabling the user to select a Business Line and upload or write a cover letter.
+    """
+
+    template_name = 'adg/lms/applications/cover_letter.html'
+    login_url = reverse_lazy('register_user')
+
+    def get(self, request):
+        """
+        Send the context data for example a list of business lines and saved user_application.
+
+        Returns:
+            HttpResponse object.
+        """
+        try:
+            form = UserApplicationCoverLetterForm(instance=request.user.application)
+        except UserApplication.DoesNotExist:
+            form = None
+
+        return self.handle_rendering(request, form)
+
+    def post(self, request):
+        """
+        Submit user application and redirect to application hub, experience or contact depending upon button click and
+        existence of resume.
+
+        Returns:
+            HttpResponse object.
+        """
+        user_application, _ = UserApplication.objects.get_or_create(user=request.user)
+        form = UserApplicationCoverLetterForm(request.POST, request.FILES, instance=user_application)
+
+        if form.is_valid():
+            form.save_form(request.POST)
+        else:
+            return self.handle_rendering(request, form)
+
+        return self.handle_redirection(request, form, user_application)
+
+    def handle_rendering(self, request, form):
+        """
+        Create context and render cover letter template
+
+        Returns:
+            HttpResponse object.
+        """
+        context = {
+            'business_lines': BusinessLine.objects.all(),
+            'application_form': form,
+        }
+
+        return render(request, self.template_name, context)
+
+    def handle_redirection(self, request, form, application):
+        """
+        Redirects to contact template if resume exists otherwise to experience on clicking back button and to
+        application hub on clicking submit
+
+        Returns:
+            HttpResponse object.
+        """
+        if form.data.get('button_click') == 'back':
+            if application.resume:
+                return redirect('application_contact')
+
+            return redirect('application_education_experience')
+        else:
+            application_hub = request.user.application_hub
+            application_hub.set_is_written_application_completed()
+
+            return redirect('application_hub')

@@ -25,6 +25,7 @@
 #
 # Translators:
 # Rana Waqar <rana.waqar@arbisoft.com>, 2020
+# Imran Bashir <admin@omnipreneurshipacademy.com>, 2021
 #
 # #-#-#-#-#  mako-studio.po (0.1a)  #-#-#-#-#
 # edX translation file
@@ -58,7 +59,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2021-02-12 12:56+0000\n"
+"POT-Creation-Date: 2021-02-15 10:54+0000\n"
 "PO-Revision-Date: 2020-10-27 19:12+0000\n"
 "Last-Translator: Rana Waqar <rana.waqar@arbisoft.com>, 2020\n"
 "Language-Team: Arabic (https://www.transifex.com/philanthropy-u/teams/113553/ar/)\n"
@@ -9555,6 +9556,10 @@ msgstr "يُرجى إدخال اسم المستخدم"
 
 #: openedx/adg/lms/applications/forms.py
 msgid "Sorry, the age limit for the program is 21-60"
+msgstr ""
+
+#: openedx/adg/lms/applications/forms.py
+msgid "Either upload a cover letter file or type text"
 msgstr ""
 
 #: openedx/adg/lms/applications/helpers.py
@@ -20575,80 +20580,6 @@ msgid ""
 msgstr ""
 
 #: themes/edx-platform/adg/lms/templates/adg/lms/applications/cover_letter.html
-msgid "PETROMIN FUEL"
-msgstr ""
-
-#: themes/edx-platform/adg/lms/templates/adg/lms/applications/cover_letter.html
-msgid ""
-"Petromin has created a state-of-the-art gas station network in the Kingdom "
-"in order to enrich the customer experience, supported by innovative "
-"automotive services. With the establishment of Petromin fuel stations, we "
-"have created a one-stop destination for vehicle owners, allowing them a "
-"range of services including fuel refilling, car servicing at Petromin "
-"Express in less than 30 minutes, tire balance checking at Revolve that "
-"boasts of fully computerized equipment, and fixing electronic or AC problems"
-" at ‘Auto Care."
-msgstr ""
-
-#: themes/edx-platform/adg/lms/templates/adg/lms/applications/cover_letter.html
-msgid "PETROMIN EXPRESS"
-msgstr ""
-
-#: themes/edx-platform/adg/lms/templates/adg/lms/applications/cover_letter.html
-msgid ""
-"Petromin Express is the 5th largest oil lube network in the world with over "
-"than 700 outlets across KSA., It offers a range of service packages tailored"
-" to meet the needs of the customers. All of our outlets employ experienced "
-"technicians who are trained to serve all car brands with great care, while "
-"customers relax in the waiting area. Some of the service provided include: "
-"Oil change–synthetic & mineral packages, Filters-oil, air, cabin, "
-"Transmission fluid exchange, Power steering fluid exchange - to name a few."
-msgstr ""
-
-#: themes/edx-platform/adg/lms/templates/adg/lms/applications/cover_letter.html
-msgid "PETROMIN AUTOCARE"
-msgstr ""
-
-#: themes/edx-platform/adg/lms/templates/adg/lms/applications/cover_letter.html
-msgid ""
-"Petromin Auto Care is specialized in service & repairs for all car brands. "
-"There are more than 16 workshops of Petromin Auto Care across the kingdom, "
-"having professional trained technicians perform services and repairs as per "
-"approved standards with reasonable prices and a high quality multi-brand "
-"service centers."
-msgstr ""
-
-#: themes/edx-platform/adg/lms/templates/adg/lms/applications/cover_letter.html
-msgid "DUKAN"
-msgstr ""
-
-#: themes/edx-platform/adg/lms/templates/adg/lms/applications/cover_letter.html
-msgid ""
-"With a concept of providing “High quality products at a lower cost,” Dukan has been able to provide the Saudi middle-class customers with the opportunity to increase their savings through lower prices, without compromising quality.  "
-" "
-"Stores are situated in convenient locations, placed deep into residential neighborhoods in areas with high urbanization in order to provide easy accessibility to local communities addressing their daily needs."
-msgstr ""
-
-#: themes/edx-platform/adg/lms/templates/adg/lms/applications/cover_letter.html
-msgid ""
-"Stores are situated in convenient locations, placed deep into residential "
-"neighborhoods in areas with high urbanization in order to provide easy "
-"accessibility to local communities addressing their daily needs."
-msgstr ""
-
-#: themes/edx-platform/adg/lms/templates/adg/lms/applications/cover_letter.html
-msgid "PRIMO"
-msgstr ""
-
-#: themes/edx-platform/adg/lms/templates/adg/lms/applications/cover_letter.html
-msgid ""
-"A modernized three-in-one convenience store with more than 3,500 SKUs "
-"including local and imported products, as well as a partnerships with "
-"Starbucks and Munch bakery. Primo has 31 stores across the Kingdom, serving "
-"an average of 15,000 customers daily."
-msgstr ""
-
-#: themes/edx-platform/adg/lms/templates/adg/lms/applications/cover_letter.html
 msgid "Cover letter "
 msgstr ""
 
@@ -20660,8 +20591,8 @@ msgid ""
 msgstr ""
 
 #: themes/edx-platform/adg/lms/templates/adg/lms/applications/cover_letter.html
-msgid "Add cover letter"
-msgstr ""
+msgid "Add Cover Letter"
+msgstr "إضافة مختبرينَ للنسخة التجريبية"
 
 #: themes/edx-platform/adg/lms/templates/adg/lms/applications/cover_letter.html
 #: themes/edx-platform/adg/lms/templates/adg/lms/applications/education_experience.html

@@ -13,12 +13,12 @@ from django.utils.html import format_html
 from common.djangoapps.student.tests.factories import UserFactory
 from openedx.adg.lms.applications.constants import (
     COVER_LETTER_ONLY,
+    FILE_MAX_SIZE,
     HTML_FOR_EMBEDDED_FILE_VIEW,
     LOGO_IMAGE_MAX_SIZE,
     MAXIMUM_YEAR_OPTION,
     MINIMUM_YEAR_OPTION,
     MONTH_NAME_DAY_YEAR_FORMAT,
-    RESUME_FILE_MAX_SIZE,
     SCORES
 )
 from openedx.adg.lms.applications.helpers import (
@@ -185,16 +185,16 @@ def test_check_validations_for_past_record(date_attrs_with_expected_results):
 
 
 @pytest.mark.parametrize('size , expected', [
-    (RESUME_FILE_MAX_SIZE, None),
-    (RESUME_FILE_MAX_SIZE + 1, 'File size must not exceed 4.0 MB')
+    (FILE_MAX_SIZE, None),
+    (FILE_MAX_SIZE + 1, 'File size must not exceed 4.0 MB')
 ])
 def test_validate_file_size_with_valid_size(size, expected):
     """
-    Verify that file size up to max_size i.e. RESUME_FILE_MAX_SIZE is allowed
+    Verify that file size up to max_size i.e. FILE_MAX_SIZE is allowed
     """
     mocked_file = Mock()
     mocked_file.size = size
-    error = validate_file_size(mocked_file, RESUME_FILE_MAX_SIZE)
+    error = validate_file_size(mocked_file, FILE_MAX_SIZE)
     assert error == expected
 
 
