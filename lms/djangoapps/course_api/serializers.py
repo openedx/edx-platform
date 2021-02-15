@@ -4,14 +4,11 @@ Course API Serializers.  Representing course catalog data
 
 
 from edx_django_utils import monitoring as monitoring_utils
-import six.moves.urllib.error  # lint-amnesty, pylint: disable=wrong-import-order
 import six.moves.urllib.parse  # lint-amnesty, pylint: disable=wrong-import-order
-import six.moves.urllib.request  # lint-amnesty, pylint: disable=wrong-import-order
 from django.urls import reverse
 from rest_framework import serializers
 
 from openedx.core.djangoapps.models.course_details import CourseDetails
-from openedx.core.djangoapps.content.course_overviews.models import CourseOverview  # lint-amnesty, pylint: disable=unused-import
 from openedx.core.lib.api.fields import AbsoluteURLField
 
 
