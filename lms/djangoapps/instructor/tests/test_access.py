@@ -4,13 +4,12 @@ Test instructor.access
 
 
 import pytest
-from six.moves import range
 
+from common.djangoapps.student.roles import CourseBetaTesterRole, CourseCcxCoachRole, CourseStaffRole
+from common.djangoapps.student.tests.factories import UserFactory
 from lms.djangoapps.instructor.access import allow_access, list_with_level, revoke_access, update_forum_role
 from openedx.core.djangoapps.ace_common.tests.mixins import EmailTemplateTagMixin
 from openedx.core.djangoapps.django_comment_common.models import FORUM_ROLE_MODERATOR, Role
-from common.djangoapps.student.roles import CourseBetaTesterRole, CourseCcxCoachRole, CourseStaffRole
-from common.djangoapps.student.tests.factories import UserFactory
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
@@ -19,11 +18,11 @@ class TestInstructorAccessList(SharedModuleStoreTestCase):
     """ Test access listings. """
     @classmethod
     def setUpClass(cls):
-        super(TestInstructorAccessList, cls).setUpClass()
+        super().setUpClass()
         cls.course = CourseFactory.create()
 
     def setUp(self):
-        super(TestInstructorAccessList, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.instructors = [UserFactory.create() for _ in range(4)]
         for user in self.instructors:
             allow_access(self.course, user, 'instructor')
@@ -44,11 +43,11 @@ class TestInstructorAccessAllow(EmailTemplateTagMixin, SharedModuleStoreTestCase
     """ Test access allow. """
     @classmethod
     def setUpClass(cls):
-        super(TestInstructorAccessAllow, cls).setUpClass()
+        super().setUpClass()
         cls.course = CourseFactory.create()
 
     def setUp(self):
-        super(TestInstructorAccessAllow, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
 
         self.course = CourseFactory.create()
 
@@ -89,11 +88,11 @@ class TestInstructorAccessRevoke(SharedModuleStoreTestCase):
     """ Test access revoke. """
     @classmethod
     def setUpClass(cls):
-        super(TestInstructorAccessRevoke, cls).setUpClass()
+        super().setUpClass()
         cls.course = CourseFactory.create()
 
     def setUp(self):
-        super(TestInstructorAccessRevoke, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.staff = [UserFactory.create() for _ in range(4)]
         for user in self.staff:
             allow_access(self.course, user, 'staff')
@@ -128,11 +127,11 @@ class TestInstructorAccessForum(SharedModuleStoreTestCase):
     """
     @classmethod
     def setUpClass(cls):
-        super(TestInstructorAccessForum, cls).setUpClass()
+        super().setUpClass()
         cls.course = CourseFactory.create()
 
     def setUp(self):
-        super(TestInstructorAccessForum, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.mod_role = Role.objects.create(
             course_id=self.course.id,
             name=FORUM_ROLE_MODERATOR

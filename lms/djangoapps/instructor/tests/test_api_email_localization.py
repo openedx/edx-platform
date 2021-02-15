@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 Unit tests for the localization of emails sent by instructor.api methods.
 """
@@ -7,13 +6,12 @@ Unit tests for the localization of emails sent by instructor.api methods.
 from django.core import mail
 from django.test.utils import override_settings
 from django.urls import reverse
-from six import text_type
 
+from common.djangoapps.student.models import CourseEnrollment
+from common.djangoapps.student.tests.factories import UserFactory
 from lms.djangoapps.courseware.tests.factories import InstructorFactory
 from openedx.core.djangoapps.lang_pref import LANGUAGE_KEY
 from openedx.core.djangoapps.user_api.preferences.api import delete_user_preference, set_user_preference
-from common.djangoapps.student.models import CourseEnrollment
-from common.djangoapps.student.tests.factories import UserFactory
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
@@ -26,11 +24,11 @@ class TestInstructorAPIEnrollmentEmailLocalization(SharedModuleStoreTestCase):
 
     @classmethod
     def setUpClass(cls):
-        super(TestInstructorAPIEnrollmentEmailLocalization, cls).setUpClass()
+        super().setUpClass()
         cls.course = CourseFactory.create()
 
     def setUp(self):
-        super(TestInstructorAPIEnrollmentEmailLocalization, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
 
         # Platform language is English, instructor's language is Chinese,
         # student's language is Esperanto, so the emails should all be sent in
@@ -46,7 +44,7 @@ class TestInstructorAPIEnrollmentEmailLocalization(SharedModuleStoreTestCase):
         """
         Update the current student enrollment status.
         """
-        url = reverse('students_update_enrollment', kwargs={'course_id': text_type(self.course.id)})
+        url = reverse('students_update_enrollment', kwargs={'course_id': str(self.course.id)})
         args = {'identifiers': student_email, 'email_students': 'true', 'action': action, 'reason': 'testing'}
         response = self.client.post(url, args)
         return response
@@ -56,7 +54,7 @@ class TestInstructorAPIEnrollmentEmailLocalization(SharedModuleStoreTestCase):
         Check that the email outbox contains exactly one message for which both
         the message subject and body contain a certain Esperanto string.
         """
-        return self.check_outbox(u"Ýöü hävé ßéén")
+        return self.check_outbox("Ýöü hävé ßéén")
 
     def check_outbox(self, expected_message):
         """
@@ -82,7 +80,7 @@ class TestInstructorAPIEnrollmentEmailLocalization(SharedModuleStoreTestCase):
         self.check_outbox_is_esperanto()
 
     def test_set_beta_role(self):
-        url = reverse('bulk_beta_modify_access', kwargs={'course_id': text_type(self.course.id)})
+        url = reverse('bulk_beta_modify_access', kwargs={'course_id': str(self.course.id)})
         self.client.post(url, {'identifiers': self.student.email, 'action': 'add', 'email_students': 'true'})
 
         self.check_outbox_is_esperanto()

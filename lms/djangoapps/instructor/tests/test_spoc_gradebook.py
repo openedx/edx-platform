@@ -1,16 +1,12 @@
 """
 Tests of the instructor dashboard spoc gradebook
 """
-
-
 from django.urls import reverse
-from six import text_type
-from six.moves import range
 
 from capa.tests.response_xml_factory import StringResponseXMLFactory
+from common.djangoapps.student.tests.factories import AdminFactory, CourseEnrollmentFactory, UserFactory
 from lms.djangoapps.courseware.tests.factories import StudentModuleFactory
 from lms.djangoapps.grades.api import task_compute_all_grades_for_course
-from common.djangoapps.student.tests.factories import AdminFactory, CourseEnrollmentFactory, UserFactory
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 
@@ -27,7 +23,7 @@ class TestGradebook(SharedModuleStoreTestCase):
 
     @classmethod
     def setUpClass(cls):
-        super(TestGradebook, cls).setUpClass()
+        super().setUpClass()
 
         # Create a course with the desired grading policy (from our class attribute)
         kwargs = {}
@@ -57,7 +53,7 @@ class TestGradebook(SharedModuleStoreTestCase):
             ]
 
     def setUp(self):
-        super(TestGradebook, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
 
         instructor = AdminFactory.create()
         self.client.login(username=instructor.username, password='test')
@@ -75,11 +71,11 @@ class TestGradebook(SharedModuleStoreTestCase):
                     course_id=self.course.id,
                     module_state_key=item.location
                 )
-        task_compute_all_grades_for_course.apply_async(kwargs={'course_key': text_type(self.course.id)})
+        task_compute_all_grades_for_course.apply_async(kwargs={'course_key': str(self.course.id)})
 
         self.response = self.client.get(reverse(
             'spoc_gradebook',
-            args=(text_type(self.course.id),)
+            args=(str(self.course.id),)
         ))
 
         assert self.response.status_code == 200
@@ -92,7 +88,7 @@ class TestDefaultGradingPolicy(TestGradebook):
     """
     def test_all_users_listed(self):
         for user in self.users:
-            assert user.username in text_type(self.response.content, 'utf-8')
+            assert user.username in str(self.response.content, 'utf-8')
 
     def test_default_policy(self):
         # Default >= 50% passes, so Users 5-10 should be passing for Homework 1 [6]
@@ -135,10 +131,10 @@ class TestLetterCutoffPolicy(TestGradebook):
 
     def test_styles(self):
 
-        self.assertContains(self.response, u"grade_A {color:green;}")
-        self.assertContains(self.response, u"grade_B {color:Chocolate;}")
-        self.assertContains(self.response, u"grade_C {color:DarkSlateGray;}")
-        self.assertContains(self.response, u"grade_D {color:DarkSlateGray;}")
+        self.assertContains(self.response, "grade_A {color:green;}")
+        self.assertContains(self.response, "grade_B {color:Chocolate;}")
+        self.assertContains(self.response, "grade_C {color:DarkSlateGray;}")
+        self.assertContains(self.response, "grade_D {color:DarkSlateGray;}")
 
     def test_assigned_grades(self):
         # Users 9-10 have >= 90% on Homeworks [2]

@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 Unit tests for instructor.enrollment methods.
 """
@@ -6,25 +5,27 @@ Unit tests for instructor.enrollment methods.
 
 import json
 from abc import ABCMeta
-import pytest
+from unittest.mock import patch
+
 import ddt
-import six
+import pytest
 from ccx_keys.locator import CCXLocator
 from crum import set_current_request
 from django.conf import settings
 from django.utils.translation import get_language
 from django.utils.translation import override as override_language
-from mock import patch
 from opaque_keys.edx.locator import CourseLocator
-from six import text_type
 from submissions import api as sub_api
 
 from capa.tests.response_xml_factory import MultipleChoiceResponseXMLFactory
+from common.djangoapps.student.models import CourseEnrollment, CourseEnrollmentAllowed, anonymous_id_for_user
+from common.djangoapps.student.roles import CourseCcxCoachRole
+from common.djangoapps.student.tests.factories import AdminFactory, UserFactory
+from lms.djangoapps.ccx.tests.factories import CcxFactory
+from lms.djangoapps.course_blocks.api import get_course_blocks
 from lms.djangoapps.courseware.models import StudentModule
 from lms.djangoapps.grades.subsection_grade_factory import SubsectionGradeFactory
 from lms.djangoapps.grades.tests.utils import answer_problem
-from lms.djangoapps.ccx.tests.factories import CcxFactory
-from lms.djangoapps.course_blocks.api import get_course_blocks
 from lms.djangoapps.instructor.enrollment import (
     EmailEnrollmentState,
     enroll_email,
@@ -38,9 +39,6 @@ from lms.djangoapps.teams.models import CourseTeamMembership
 from lms.djangoapps.teams.tests.factories import CourseTeamFactory
 from openedx.core.djangoapps.ace_common.tests.mixins import EmailTemplateTagMixin
 from openedx.core.djangolib.testing.utils import CacheIsolationTestCase, get_mock_request
-from common.djangoapps.student.models import CourseEnrollment, CourseEnrollmentAllowed, anonymous_id_for_user
-from common.djangoapps.student.roles import CourseCcxCoachRole
-from common.djangoapps.student.tests.factories import AdminFactory, UserFactory
 from xmodule.modulestore.tests.django_utils import TEST_DATA_SPLIT_MODULESTORE, SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 
@@ -48,7 +46,7 @@ from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 class TestSettableEnrollmentState(CacheIsolationTestCase):
     """ Test the basis class for enrollment tests. """
     def setUp(self):
-        super(TestSettableEnrollmentState, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.course_key = CourseLocator('Robot', 'fAKE', 'C--se--ID')
 
     def test_mes_create(self):
@@ -67,7 +65,7 @@ class TestSettableEnrollmentState(CacheIsolationTestCase):
         assert mes == ees
 
 
-class TestEnrollmentChangeBase(six.with_metaclass(ABCMeta, CacheIsolationTestCase)):
+class TestEnrollmentChangeBase(CacheIsolationTestCase, metaclass=ABCMeta):
     """
     Test instructor enrollment administration against database effects.
 
@@ -77,7 +75,7 @@ class TestEnrollmentChangeBase(six.with_metaclass(ABCMeta, CacheIsolationTestCas
     """
 
     def setUp(self):
-        super(TestEnrollmentChangeBase, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.course_key = CourseLocator('Robot', 'fAKE', 'C--se--ID')
 
     def _run_state_change_test(self, before_ideal, after_ideal, action):
@@ -372,7 +370,7 @@ class TestInstructorEnrollmentStudentModule(SharedModuleStoreTestCase):
     """ Test student module manipulations. """
     @classmethod
     def setUpClass(cls):
-        super(TestInstructorEnrollmentStudentModule, cls).setUpClass()
+        super().setUpClass()
         cls.course = CourseFactory(
             name='fake',
             org='course',
@@ -403,7 +401,7 @@ class TestInstructorEnrollmentStudentModule(SharedModuleStoreTestCase):
             )
 
     def setUp(self):
-        super(TestInstructorEnrollmentStudentModule, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
 
         self.user = UserFactory()
 
@@ -482,8 +480,8 @@ class TestInstructorEnrollmentStudentModule(SharedModuleStoreTestCase):
         # Create a submission and score for the student using the submissions API
         student_item = {
             'student_id': anonymous_id_for_user(user, self.course_key),
-            'course_id': text_type(self.course_key),
-            'item_id': text_type(problem_location),
+            'course_id': str(self.course_key),
+            'item_id': str(problem_location),
             'item_type': 'openassessment'
         }
         submission = sub_api.create_submission(student_item, 'test answer')
@@ -708,7 +706,7 @@ class TestStudentModuleGrading(SharedModuleStoreTestCase):
     """
     @classmethod
     def setUpClass(cls):
-        super(TestStudentModuleGrading, cls).setUpClass()
+        super().setUpClass()
         cls.course = CourseFactory.create()
         cls.chapter = ItemFactory.create(
             parent=cls.course,
@@ -743,7 +741,7 @@ class TestStudentModuleGrading(SharedModuleStoreTestCase):
 
     @classmethod
     def tearDownClass(cls):
-        super(TestStudentModuleGrading, cls).tearDownClass()
+        super().tearDownClass()
         set_current_request(None)
 
     def _get_subsection_grade_and_verify(self, all_earned, all_possible, graded_earned, graded_possible):
@@ -780,7 +778,7 @@ class TestStudentModuleGrading(SharedModuleStoreTestCase):
         self._get_subsection_grade_and_verify(0, 1, 0, 1)
 
 
-class EnrollmentObjects(object):
+class EnrollmentObjects:
     """
     Container for enrollment objects.
 
@@ -856,13 +854,13 @@ class TestSendBetaRoleEmail(CacheIsolationTestCase):
     """
 
     def setUp(self):
-        super(TestSendBetaRoleEmail, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.user = UserFactory.create()
         self.email_params = {'course': 'Robot Super Course'}
 
     def test_bad_action(self):
         bad_action = 'beta_tester'
-        error_msg = u"Unexpected action received '{}' - expected 'add' or 'remove'".format(bad_action)
+        error_msg = f"Unexpected action received '{bad_action}' - expected 'add' or 'remove'"
         with self.assertRaisesRegex(ValueError, error_msg):
             send_beta_role_email(bad_action, self.user, self.email_params)
 
@@ -876,12 +874,12 @@ class TestGetEmailParamsCCX(SharedModuleStoreTestCase):
 
     @classmethod
     def setUpClass(cls):
-        super(TestGetEmailParamsCCX, cls).setUpClass()
+        super().setUpClass()
         cls.course = CourseFactory.create()
 
     @patch.dict('django.conf.settings.FEATURES', {'CUSTOM_COURSES_EDX': True})
     def setUp(self):
-        super(TestGetEmailParamsCCX, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.coach = AdminFactory.create()
         role = CourseCcxCoachRole(self.course.id)
         role.add_users(self.coach)
@@ -890,12 +888,12 @@ class TestGetEmailParamsCCX(SharedModuleStoreTestCase):
 
         # Explicitly construct what we expect the course URLs to be
         site = settings.SITE_NAME
-        self.course_url = u'https://{}/courses/{}/'.format(
+        self.course_url = 'https://{}/courses/{}/'.format(
             site,
             self.course_key
         )
         self.course_about_url = self.course_url + 'about'
-        self.registration_url = u'https://{}/register'.format(site)
+        self.registration_url = f'https://{site}/register'
 
     @patch.dict('django.conf.settings.FEATURES', {'CUSTOM_COURSES_EDX': True})
     def test_ccx_enrollment_email_params(self):
@@ -922,17 +920,17 @@ class TestGetEmailParams(SharedModuleStoreTestCase):
     """
     @classmethod
     def setUpClass(cls):
-        super(TestGetEmailParams, cls).setUpClass()
+        super().setUpClass()
         cls.course = CourseFactory.create()
 
         # Explicitly construct what we expect the course URLs to be
         site = settings.SITE_NAME
-        cls.course_url = u'https://{}/courses/{}/'.format(
+        cls.course_url = 'https://{}/courses/{}/'.format(
             site,
-            text_type(cls.course.id)
+            str(cls.course.id)
         )
         cls.course_about_url = cls.course_url + 'about'
-        cls.registration_url = u'https://{}/register'.format(site)
+        cls.registration_url = f'https://{site}/register'
 
     def test_normal_params(self):
         # For a normal site, what do we expect to get for the URLs?
@@ -967,14 +965,14 @@ class TestRenderMessageToString(EmailTemplateTagMixin, SharedModuleStoreTestCase
 
     @classmethod
     def setUpClass(cls):
-        super(TestRenderMessageToString, cls).setUpClass()
+        super().setUpClass()
         cls.course = CourseFactory.create()
         cls.subject_template = 'instructor/edx_ace/allowedenroll/email/subject.txt'
         cls.message_template = 'instructor/edx_ace/allowedenroll/email/body.txt'
 
     @patch.dict('django.conf.settings.FEATURES', {'CUSTOM_COURSES_EDX': True})
     def setUp(self):
-        super(TestRenderMessageToString, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         coach = AdminFactory.create()
         role = CourseCcxCoachRole(self.course.id)
         role.add_users(coach)
@@ -1034,7 +1032,7 @@ class TestRenderMessageToString(EmailTemplateTagMixin, SharedModuleStoreTestCase
         subject, message = self.get_subject_and_message('eo')
         language_after_rendering = get_language()
 
-        you_have_been_invited_in_esperanto = u"Ýöü hävé ßéén"
+        you_have_been_invited_in_esperanto = "Ýöü hävé ßéén"
         assert you_have_been_invited_in_esperanto in subject
         assert you_have_been_invited_in_esperanto in message
         assert settings.LANGUAGE_CODE == language_after_rendering
@@ -1062,7 +1060,7 @@ class TestRenderMessageToString(EmailTemplateTagMixin, SharedModuleStoreTestCase
         assert self.ccx.display_name in subject
         assert self.ccx.display_name in message
         site = settings.SITE_NAME
-        course_url = u'https://{}/courses/{}/'.format(
+        course_url = 'https://{}/courses/{}/'.format(
             site,
             self.course_key
         )
@@ -1100,7 +1098,7 @@ class TestRenderMessageToString(EmailTemplateTagMixin, SharedModuleStoreTestCase
         assert self.ccx.display_name in subject
         assert self.ccx.display_name in message
         site = settings.SITE_NAME
-        registration_url = u'https://{}/register'.format(site)
+        registration_url = f'https://{site}/register'
         assert registration_url in message
 
     @patch.dict('django.conf.settings.FEATURES', {'CUSTOM_COURSES_EDX': True})
