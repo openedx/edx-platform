@@ -521,7 +521,6 @@ def course_listing(request):
     org = request.GET.get('org', '') if optimization_enabled else None
     courses_iter, in_process_course_actions = get_courses_accessible_to_user(request, org)
     user = request.user
-    # import pdb;pdb.set_trace()
     libraries = []
     if not split_library_view_on_dashboard() and LIBRARIES_ENABLED:
         libraries = _accessible_libraries_iter(request.user)
