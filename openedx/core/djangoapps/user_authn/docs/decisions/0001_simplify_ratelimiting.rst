@@ -1,5 +1,5 @@
-Simplify Login Rate Limiting
-============================
+Simplify Login and Other Rate Limiting
+======================================
 
 Status
 ------
@@ -8,6 +8,11 @@ Accepted
 
 Context
 -------
+
+edx-platform currently uses multiple different ratelimiting tools currently
+which can lead to confusion and difficulty understand how endpoints are
+secured.  Consider the following case study in how our login endpoints are
+currently rate limitied.
 
 1st party vs 3rd party login
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -21,8 +26,6 @@ redirected to the LMS with a token from that third party which is exchanged for
 Login User View
 ~~~~~~~~~~~~~~~
 
-..
-    TODO: See if I can make this a link instead.
 The ``login_user`` view in ``views/login.py`` is called for both 1st and 3rd
 party login flows.  In the 3rd party login flow, it's called as the callback
 when redirected from the 3rd party login back to the LMS.
@@ -82,11 +85,18 @@ Decisions
 ---------
 
 * We will deprecate and remove the `django-ratelimit-backend`_ from
-  edx-platform.
+  edx-platform. This library is currently not being actively developed and is
+  looking for a new maintainer.  It is also very specific to rate limiting the
+  authentication backend and so can't easily be applied more generally.
 
-* For rate limiting in pure django views, we will use the `django-ratelimit`_ library.
+* For rate limiting in pure django views, we will use the `django-ratelimit`_
+  library. This library is well built for general use and can be easily used
+  multiple times for stacked rate limiting over multiple keys.  eg. limit by IP
+  or by user name.
 
-* For rate limiting in any DRF based views, we will use the `djangorestframework rate limiting`_
+* For rate limiting in any DRF based views, we will use the
+  `djangorestframework rate limiting`_ capabilities that are built in to the
+  framework.
 
 
 .. _django-ratelimit: https://django-ratelimit.readthedocs.io/en/stable/usage.html#usage-chapter
