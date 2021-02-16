@@ -62,13 +62,13 @@ class TestCohortOauth(SharedModuleStoreTestCase):
 
         # Non-staff users should not have access to the API
         response = self.client.get(path=path, **headers)
-        self.assertEqual(response.status_code, 403)
+        assert response.status_code == 403
 
         # Staff users should have access to the API
         user.is_staff = True
         user.save()
         response = self.client.get(path=path, **headers)
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
 
     def test_oauth_users(self):
         """ Verify the endpoint supports OAuth, and only allows authorization for staff users. """
@@ -86,13 +86,13 @@ class TestCohortOauth(SharedModuleStoreTestCase):
 
         # Non-staff users should not have access to the API
         response = self.client.post(path=path, data=data, **headers)
-        self.assertEqual(response.status_code, 403)
+        assert response.status_code == 403
 
         # Staff users should have access to the API
         user.is_staff = True
         user.save()
         response = self.client.post(path=path, data=data, **headers)
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
 
     def test_oauth_csv(self):
         """ Verify the endpoint supports OAuth, and only allows authorization for staff users. """
@@ -107,13 +107,13 @@ class TestCohortOauth(SharedModuleStoreTestCase):
 
         # Non-staff users should not have access to the API
         response = self.client.post(path=path, **headers)
-        self.assertEqual(response.status_code, 403)
+        assert response.status_code == 403
 
         # Staff users should have access to the API
         user.is_staff = True
         user.save()
         response = self.client.post(path=path, **headers)
-        self.assertEqual(response.status_code, 400)
+        assert response.status_code == 400
 
 
 @skip_unless_lms

@@ -106,9 +106,9 @@ class TestDumpToNeo4jCommandBase(SharedModuleStoreTestCase):
             number_rollbacks: number of commit rollbacks we expect
         """
         courses = set([node['course_key'] for node in mock_graph.nodes])  # lint-amnesty, pylint: disable=consider-using-set-comprehension
-        self.assertEqual(len(courses), number_of_courses)
-        self.assertEqual(mock_graph.number_commits, number_commits)
-        self.assertEqual(mock_graph.number_rollbacks, number_rollbacks)
+        assert len(courses) == number_of_courses
+        assert mock_graph.number_commits == number_commits
+        assert mock_graph.number_rollbacks == number_rollbacks
 
 
 @ddt.ddt
@@ -245,26 +245,26 @@ class TestModuleStoreSerializer(TestDumpToNeo4jCommandBase):
         Tests the serialize_item method.
         """
         fields, label = serialize_item(self.course)
-        self.assertEqual(label, "course")
-        self.assertIn("edited_on", list(fields.keys()))
-        self.assertIn("display_name", list(fields.keys()))
-        self.assertIn("org", list(fields.keys()))
-        self.assertIn("course", list(fields.keys()))
-        self.assertIn("run", list(fields.keys()))
-        self.assertIn("course_key", list(fields.keys()))
-        self.assertIn("location", list(fields.keys()))
-        self.assertIn("block_type", list(fields.keys()))
-        self.assertIn("detached", list(fields.keys()))
-        self.assertNotIn("checklist", list(fields.keys()))
+        assert label == 'course'
+        assert 'edited_on' in list(fields.keys())
+        assert 'display_name' in list(fields.keys())
+        assert 'org' in list(fields.keys())
+        assert 'course' in list(fields.keys())
+        assert 'run' in list(fields.keys())
+        assert 'course_key' in list(fields.keys())
+        assert 'location' in list(fields.keys())
+        assert 'block_type' in list(fields.keys())
+        assert 'detached' in list(fields.keys())
+        assert 'checklist' not in list(fields.keys())
 
     def test_serialize_course(self):
         """
         Tests the serialize_course method.
         """
         nodes, relationships = serialize_course(self.course.id)
-        self.assertEqual(len(nodes), 9)
+        assert len(nodes) == 9
         # the course has 7 "PARENT_OF" relationships and 3 "PRECEDES"
-        self.assertEqual(len(relationships), 10)
+        assert len(relationships) == 10
 
     def test_strip_version_and_branch(self):
         """
@@ -277,13 +277,13 @@ class TestModuleStoreSerializer(TestDumpToNeo4jCommandBase):
             'test_branch'
         ).for_version('test_version')
 
-        self.assertIsNotNone(location.branch)
-        self.assertIsNotNone(location.version_guid)
+        assert location.branch is not None
+        assert location.version_guid is not None
 
         stripped_location = strip_branch_and_version(location)
 
-        self.assertIsNone(stripped_location.branch)
-        self.assertIsNone(stripped_location.version_guid)
+        assert stripped_location.branch is None
+        assert stripped_location.version_guid is None
 
     @staticmethod
     def _extract_relationship_pairs(relationships, relationship_type):
@@ -325,7 +325,7 @@ class TestModuleStoreSerializer(TestDumpToNeo4jCommandBase):
         """
         relationship_pairs = self._extract_relationship_pairs(relationships, relationship_type)
         location_pair = self._extract_location_pair(xblock1, xblock2)
-        self.assertIn(location_pair, relationship_pairs)
+        assert location_pair in relationship_pairs
 
     def assertBlockPairIsNotRelationship(self, xblock1, xblock2, relationships, relationship_type):
         """
@@ -334,7 +334,7 @@ class TestModuleStoreSerializer(TestDumpToNeo4jCommandBase):
         """
         relationship_pairs = self._extract_relationship_pairs(relationships, relationship_type)
         location_pair = self._extract_location_pair(xblock1, xblock2)
-        self.assertNotIn(location_pair, relationship_pairs)
+        assert location_pair not in relationship_pairs
 
     def test_precedes_relationship(self):
         """
@@ -366,14 +366,14 @@ class TestModuleStoreSerializer(TestDumpToNeo4jCommandBase):
 
         # the html node should have 0 index, and the problem should have 1
         html_nodes = [node for node in nodes if node['block_type'] == 'html']
-        self.assertEqual(len(html_nodes), 1)
+        assert len(html_nodes) == 1
         problem_nodes = [node for node in nodes if node['block_type'] == 'problem']
-        self.assertEqual(len(problem_nodes), 1)
+        assert len(problem_nodes) == 1
         html_node = html_nodes[0]
         problem_node = problem_nodes[0]
 
-        self.assertEqual(html_node['index'], 0)
-        self.assertEqual(problem_node['index'], 1)
+        assert html_node['index'] == 0
+        assert problem_node['index'] == 1
 
     @ddt.data(
         (1, 1),
@@ -395,7 +395,7 @@ class TestModuleStoreSerializer(TestDumpToNeo4jCommandBase):
         Tests the coerce_types helper
         """
         coerced_value = coerce_types(original_value)
-        self.assertEqual(coerced_value, coerced_expected)
+        assert coerced_value == coerced_expected
 
     @mock.patch('openedx.core.djangoapps.coursegraph.tasks.NodeSelector')
     @mock.patch('openedx.core.djangoapps.coursegraph.tasks.authenticate_and_create_graph')
@@ -422,7 +422,7 @@ class TestModuleStoreSerializer(TestDumpToNeo4jCommandBase):
         # 9 nodes + 7 relationships from the first course
         # 2 nodes and no relationships from the second
 
-        self.assertEqual(len(mock_graph.nodes), 11)
+        assert len(mock_graph.nodes) == 11
         six.assertCountEqual(self, submitted, self.course_strings)
 
     @mock.patch('openedx.core.djangoapps.coursegraph.tasks.NodeSelector')
@@ -480,7 +480,7 @@ class TestModuleStoreSerializer(TestDumpToNeo4jCommandBase):
         submitted, __ = self.mss.dump_courses_to_neo4j(
             credentials, override_cache=override_cache
         )
-        self.assertEqual(len(submitted), expected_number_courses)
+        assert len(submitted) == expected_number_courses
 
     @mock.patch('openedx.core.djangoapps.coursegraph.tasks.NodeSelector')
     @mock.patch('openedx.core.djangoapps.coursegraph.tasks.authenticate_and_create_graph')
@@ -497,7 +497,7 @@ class TestModuleStoreSerializer(TestDumpToNeo4jCommandBase):
 
         # run once to warm the cache
         submitted, skipped = self.mss.dump_courses_to_neo4j(credentials)  # lint-amnesty, pylint: disable=unused-variable
-        self.assertEqual(len(submitted), len(self.course_strings))
+        assert len(submitted) == len(self.course_strings)
 
         # simulate one of the courses being published
         with override_waffle_switch(block_structure_config.STORAGE_BACKING_FOR_CACHE, True):
@@ -505,8 +505,8 @@ class TestModuleStoreSerializer(TestDumpToNeo4jCommandBase):
 
         # make sure only the published course was dumped
         submitted, __ = self.mss.dump_courses_to_neo4j(credentials)
-        self.assertEqual(len(submitted), 1)
-        self.assertEqual(submitted[0], six.text_type(self.course.id))
+        assert len(submitted) == 1
+        assert submitted[0] == six.text_type(self.course.id)
 
     @mock.patch('openedx.core.djangoapps.coursegraph.tasks.get_course_last_published')
     @mock.patch('openedx.core.djangoapps.coursegraph.tasks.get_command_last_run')
@@ -534,7 +534,4 @@ class TestModuleStoreSerializer(TestDumpToNeo4jCommandBase):
         mock_get_course_last_published.return_value = last_course_published
         mock_course_key = mock.Mock()
         mock_graph = mock.Mock()
-        self.assertEqual(
-            should_dump_course(mock_course_key, mock_graph),
-            should_dump,
-        )
+        assert should_dump_course(mock_course_key, mock_graph) == should_dump

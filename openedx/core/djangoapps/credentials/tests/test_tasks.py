@@ -2,7 +2,7 @@
 Test credentials tasks
 """
 
-
+import pytest
 import mock
 from django.conf import settings
 from django.test import TestCase, override_settings
@@ -39,11 +39,11 @@ class TestSendGradeToCredentialTask(TestCase):
 
         tasks.send_grade_to_credentials.delay('user', 'course-v1:org+course+run', True, 'A', 1.0).get()
 
-        self.assertEqual(mock_get_api_client.call_count, 1)
-        self.assertEqual(mock_get_api_client.call_args[0], (self.user,))
+        assert mock_get_api_client.call_count == 1
+        assert mock_get_api_client.call_args[0] == (self.user,)
         self.assertDictEqual(mock_get_api_client.call_args[1], {'org': 'org'})
 
-        self.assertEqual(api_client.grades.post.call_count, 1)
+        assert api_client.grades.post.call_count == 1
         self.assertDictEqual(api_client.grades.post.call_args[0][0], {
             'username': 'user',
             'course_run': 'course-v1:org+course+run',
@@ -60,5 +60,5 @@ class TestSendGradeToCredentialTask(TestCase):
 
         task = tasks.send_grade_to_credentials.delay('user', 'course-v1:org+course+run', True, 'A', 1.0)
 
-        self.assertRaises(Exception, task.get)
-        self.assertEqual(mock_get_api_client.call_count, tasks.MAX_RETRIES + 1)
+        pytest.raises(Exception, task.get)
+        assert mock_get_api_client.call_count == (tasks.MAX_RETRIES + 1)
