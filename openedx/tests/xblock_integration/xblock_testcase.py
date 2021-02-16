@@ -136,7 +136,7 @@ class XBlockEventTestMixin(object):
 
         """
         for event in self.events:
-            self.assertNotEqual(event['event_type'], event_type)
+            assert event['event_type'] != event_type
 
     def assert_event_published(self, event_type, event_fields=None):
         """
@@ -157,9 +157,7 @@ class XBlockEventTestMixin(object):
                         found = False
                 if found:
                     return
-        self.assertIn({'event_type': event_type,
-                       'event': event_fields},
-                      self.events)
+        assert {'event_type': event_type, 'event': event_fields} in self.events
 
     def reset_published_events(self):
         """
@@ -217,7 +215,7 @@ class GradePublishTestMixin(object):
 
         HACK: In the future, this should take a user ID and a block url_name.
         '''
-        self.assertEqual(grade, self.scores[-1]['score'])
+        assert grade == self.scores[(- 1)]['score']
 
 
 class XBlockScenarioTestCaseMixin(object):
