@@ -2980,7 +2980,7 @@ CREATE TABLE `django_migrations` (
   `name` varchar(255) NOT NULL,
   `applied` datetime(6) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=828 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=829 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `django_openid_auth_association`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -3608,6 +3608,7 @@ CREATE TABLE `enterprise_enterprisecustomeridentityprovider` (
   `modified` datetime(6) NOT NULL,
   `provider_id` varchar(50) NOT NULL,
   `enterprise_customer_id` char(32) NOT NULL,
+  `default_provider` tinyint(1) NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `provider_id` (`provider_id`),
   KEY `enterprise_enterprisecustom_enterprise_customer_id_40b39097` (`enterprise_customer_id`),
