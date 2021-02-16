@@ -31,8 +31,8 @@ class TestApps(TestCase):
         app.ready()
         config = settings.PASSWORD_POLICY_COMPLIANCE_ROLLOUT_CONFIG
 
-        self.assertEqual(mock_log.exception.call_count, 1)
-        self.assertIsNone(config['STAFF_USER_COMPLIANCE_DEADLINE'])
+        assert mock_log.exception.call_count == 1
+        assert config['STAFF_USER_COMPLIANCE_DEADLINE'] is None
 
-        self.assertIsInstance(config['GENERAL_USER_COMPLIANCE_DEADLINE'], datetime.datetime)
-        self.assertEqual(config['GENERAL_USER_COMPLIANCE_DEADLINE'], parse_date('2018-01-01 00:00:00+00:00'))
+        assert isinstance(config['GENERAL_USER_COMPLIANCE_DEADLINE'], datetime.datetime)
+        assert config['GENERAL_USER_COMPLIANCE_DEADLINE'] == parse_date('2018-01-01 00:00:00+00:00')

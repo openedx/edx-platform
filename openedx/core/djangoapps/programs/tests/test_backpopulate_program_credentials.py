@@ -289,8 +289,8 @@ class BackpopulateProgramCredentialsTests(CatalogIntegrationMixin, CredentialsAp
         passing_status = CertificateStatuses.downloadable
         failing_status = CertificateStatuses.notpassing
 
-        self.assertIn(passing_status, CertificateStatuses.PASSED_STATUSES)
-        self.assertNotIn(failing_status, CertificateStatuses.PASSED_STATUSES)
+        assert passing_status in CertificateStatuses.PASSED_STATUSES
+        assert failing_status not in CertificateStatuses.PASSED_STATUSES
 
         GeneratedCertificateFactory(
             user=self.alice,
@@ -382,7 +382,7 @@ class BackpopulateProgramCredentialsTests(CatalogIntegrationMixin, CredentialsAp
 
         call_command('backpopulate_program_credentials', commit=True)
 
-        self.assertTrue(mock_log.called)
+        assert mock_log.called
 
         calls = [
             mock.call(self.alice.username),

@@ -42,7 +42,7 @@ class LanguageApiTest(CacheIsolationTestCase):
         """
         with patch.dict('django.conf.settings.FEATURES', base_config):
             with with_site_configuration_context(configuration=site_config):
-                self.assertEqual(language_api.header_language_selector_is_enabled(), expected)
+                assert language_api.header_language_selector_is_enabled() == expected
 
     @ddt.data(
         # Should return the base config value
@@ -59,7 +59,7 @@ class LanguageApiTest(CacheIsolationTestCase):
         """
         with patch.dict('django.conf.settings.FEATURES', base_config):
             with with_site_configuration_context(configuration=site_config):
-                self.assertEqual(language_api.footer_language_selector_is_enabled(), expected)
+                assert language_api.footer_language_selector_is_enabled() == expected
 
     @ddt.data(*[
         ('en', [], [], []),
@@ -83,7 +83,7 @@ class LanguageApiTest(CacheIsolationTestCase):
                 enabled=True
             ).save()
             released_languages = language_api.released_languages()
-            self.assertEqual(released_languages, expected_languages)
+            assert released_languages == expected_languages
 
     @override_settings(ALL_LANGUAGES=[[u"cs", u"Czech"], [u"nl", u"Dutch"]])
     def test_all_languages(self):
@@ -93,12 +93,12 @@ class LanguageApiTest(CacheIsolationTestCase):
         with translation.override('fr'):
             all_languages = language_api.all_languages()
 
-        self.assertEqual(2, len(all_languages))
-        self.assertLess(all_languages[0][1], all_languages[1][1])
-        self.assertEqual("nl", all_languages[0][0])
-        self.assertEqual("cs", all_languages[1][0])
-        self.assertEqual(u"Hollandais", all_languages[0][1])
-        self.assertEqual(u"Tchèque", all_languages[1][1])
+        assert 2 == len(all_languages)
+        assert all_languages[0][1] < all_languages[1][1]
+        assert 'nl' == all_languages[0][0]
+        assert 'cs' == all_languages[1][0]
+        assert u'Hollandais' == all_languages[0][1]
+        assert u'Tchèque' == all_languages[1][1]
 
     def test_beta_languages(self):
         """
@@ -117,4 +117,4 @@ class LanguageApiTest(CacheIsolationTestCase):
 
             released_languages = language_api.released_languages()
             expected_languages = [EN, ES_419, LT_LT]
-            self.assertEqual(released_languages, expected_languages)
+            assert released_languages == expected_languages
