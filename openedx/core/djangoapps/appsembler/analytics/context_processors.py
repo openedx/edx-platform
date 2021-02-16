@@ -11,11 +11,9 @@ from openedx.core.djangoapps.appsembler.analytics.helpers import (
 
 def google_analytics(request):
     app_id = getattr(settings, 'GOOGLE_ANALYTICS_APP_ID', None)
-    show_app = True if app_id else False
-
     data = {
         'GOOGLE_ANALYTICS_APP_ID': app_id,
-        'SHOW_GOOGLE_ANALYTICS': show_app,
+        'SHOW_GOOGLE_ANALYTICS': bool(app_id),
     }
 
     user = request.user
@@ -29,22 +27,17 @@ def google_analytics(request):
 
 def mixpanel(request):
     app_id = getattr(settings, 'MIXPANEL_APP_ID', None)
-    show_app = True if app_id else False
     data = {
         'MIXPANEL_APP_ID': app_id,
-        'SHOW_MIXPANEL': show_app,
+        'SHOW_MIXPANEL': bool(app_id),
     }
     return data
 
 
 def hubspot(request):
     hubspot_portal_id = getattr(settings, 'HUBSPOT_PORTAL_ID', None)
-    if hubspot_portal_id and should_show_hubspot(request.user):
-        show_app = True
-    else:
-        show_app = False
     data = {
         'HUBSPOT_PORTAL_ID': hubspot_portal_id,
-        'SHOW_HUBSPOT': show_app,
+        'SHOW_HUBSPOT': bool(hubspot_portal_id) and should_show_hubspot(request.user),
     }
     return data
