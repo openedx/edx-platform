@@ -62,7 +62,7 @@ class TestMaintenanceBannerViewDecorator(TestCase):
         with override_waffle_switch(DISPLAY_MAINTENANCE_WARNING, active=display_warning):
             banner_added, _ = self.add_maintenance_banner()
 
-            self.assertEqual(display_warning, banner_added)
+            assert display_warning == banner_added
 
     @ddt.data(
         "If there's somethin' strange in your neighborhood, who ya gonna call?!"
@@ -77,5 +77,5 @@ class TestMaintenanceBannerViewDecorator(TestCase):
         with override_settings(MAINTENANCE_BANNER_TEXT=warning_message):
             banner_added, banner_message = self.add_maintenance_banner()
 
-            self.assertTrue(banner_added)
-            self.assertEqual(warning_message, banner_message)
+            assert banner_added
+            assert warning_message == banner_message

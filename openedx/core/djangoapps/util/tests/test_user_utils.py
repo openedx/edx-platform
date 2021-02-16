@@ -16,15 +16,15 @@ class SystemUserTestCase(unittest.TestCase):
         self.sysuser = SystemUser()
 
     def test_system_user_is_anonymous(self):
-        self.assertIsInstance(self.sysuser, AnonymousUser)
-        self.assertTrue(self.sysuser.is_anonymous)
-        self.assertIsNone(self.sysuser.id)
+        assert isinstance(self.sysuser, AnonymousUser)
+        assert self.sysuser.is_anonymous
+        assert self.sysuser.id is None
 
     def test_system_user_has_custom_unicode_representation(self):
-        self.assertNotEqual(six.text_type(self.sysuser), six.text_type(AnonymousUser()))
+        assert six.text_type(self.sysuser) != six.text_type(AnonymousUser())
 
     def test_system_user_is_not_staff(self):
-        self.assertFalse(self.sysuser.is_staff)
+        assert not self.sysuser.is_staff
 
     def test_system_user_is_not_superuser(self):
-        self.assertFalse(self.sysuser.is_superuser)
+        assert not self.sysuser.is_superuser
