@@ -18,7 +18,7 @@ class TestHashUtils(TestCase):
         make sure short token returns 32 size token
         """
         token = short_token()
-        self.assertEqual(len(token), 32)
+        assert len(token) == 32
 
     @ddt.data(0, 10, 30, 64)
     def test_create_hash256_of_size(self, size):
@@ -26,8 +26,8 @@ class TestHashUtils(TestCase):
         Test create hash256
         """
         token = create_hash256(size)
-        self.assertEqual(len(token), size)
+        assert len(token) == size
 
     def test_create_hash256_default(self):
         token = create_hash256()
-        self.assertIsNotNone(token)
+        assert token is not None

@@ -27,7 +27,7 @@ class TestRequestCachedDecorator(TestCase):
         """
         to_be_wrapped = Mock()
         to_be_wrapped.return_value = 42
-        self.assertEqual(to_be_wrapped.call_count, 0)
+        assert to_be_wrapped.call_count == 0
 
         def mock_wrapper(*args, **kwargs):
             """Simple wrapper to let us decorate our mock."""
@@ -35,12 +35,12 @@ class TestRequestCachedDecorator(TestCase):
 
         wrapped = request_cached()(mock_wrapper)  # lint-amnesty, pylint: disable=no-value-for-parameter
         result = wrapped()
-        self.assertEqual(result, 42)
-        self.assertEqual(to_be_wrapped.call_count, 1)
+        assert result == 42
+        assert to_be_wrapped.call_count == 1
 
         result = wrapped()
-        self.assertEqual(result, 42)
-        self.assertEqual(to_be_wrapped.call_count, 1)
+        assert result == 42
+        assert to_be_wrapped.call_count == 1
 
     def test_request_cached_with_caches_despite_changing_wrapped_result(self):
         """
@@ -48,7 +48,7 @@ class TestRequestCachedDecorator(TestCase):
         """
         to_be_wrapped = Mock()
         to_be_wrapped.side_effect = [1, 2, 3]
-        self.assertEqual(to_be_wrapped.call_count, 0)
+        assert to_be_wrapped.call_count == 0
 
         def mock_wrapper(*args, **kwargs):
             """Simple wrapper to let us decorate our mock."""
@@ -56,24 +56,24 @@ class TestRequestCachedDecorator(TestCase):
 
         wrapped = request_cached()(mock_wrapper)  # lint-amnesty, pylint: disable=no-value-for-parameter
         result = wrapped()
-        self.assertEqual(result, 1)
-        self.assertEqual(to_be_wrapped.call_count, 1)
+        assert result == 1
+        assert to_be_wrapped.call_count == 1
 
         result = wrapped()
-        self.assertEqual(result, 1)
-        self.assertEqual(to_be_wrapped.call_count, 1)
+        assert result == 1
+        assert to_be_wrapped.call_count == 1
 
         direct_result = mock_wrapper()
-        self.assertEqual(direct_result, 2)
-        self.assertEqual(to_be_wrapped.call_count, 2)
+        assert direct_result == 2
+        assert to_be_wrapped.call_count == 2
 
         result = wrapped()
-        self.assertEqual(result, 1)
-        self.assertEqual(to_be_wrapped.call_count, 2)
+        assert result == 1
+        assert to_be_wrapped.call_count == 2
 
         direct_result = mock_wrapper()
-        self.assertEqual(direct_result, 3)
-        self.assertEqual(to_be_wrapped.call_count, 3)
+        assert direct_result == 3
+        assert to_be_wrapped.call_count == 3
 
     def test_request_cached_with_changing_args(self):
         """
@@ -82,7 +82,7 @@ class TestRequestCachedDecorator(TestCase):
         """
         to_be_wrapped = Mock()
         to_be_wrapped.side_effect = [1, 2, 3, 4, 5, 6]
-        self.assertEqual(to_be_wrapped.call_count, 0)
+        assert to_be_wrapped.call_count == 0
 
         def mock_wrapper(*args, **kwargs):
             """Simple wrapper to let us decorate our mock."""
@@ -92,27 +92,27 @@ class TestRequestCachedDecorator(TestCase):
 
         # This will be a miss, and make an underlying call.
         result = wrapped(1)
-        self.assertEqual(result, 1)
-        self.assertEqual(to_be_wrapped.call_count, 1)
+        assert result == 1
+        assert to_be_wrapped.call_count == 1
 
         # This will be a miss, and make an underlying call.
         result = wrapped(2)
-        self.assertEqual(result, 2)
-        self.assertEqual(to_be_wrapped.call_count, 2)
+        assert result == 2
+        assert to_be_wrapped.call_count == 2
 
         # This is bypass of the decorator.
         direct_result = mock_wrapper(3)
-        self.assertEqual(direct_result, 3)
-        self.assertEqual(to_be_wrapped.call_count, 3)
+        assert direct_result == 3
+        assert to_be_wrapped.call_count == 3
 
         # These will be hits, and not make an underlying call.
         result = wrapped(1)
-        self.assertEqual(result, 1)
-        self.assertEqual(to_be_wrapped.call_count, 3)
+        assert result == 1
+        assert to_be_wrapped.call_count == 3
 
         result = wrapped(2)
-        self.assertEqual(result, 2)
-        self.assertEqual(to_be_wrapped.call_count, 3)
+        assert result == 2
+        assert to_be_wrapped.call_count == 3
 
     def test_request_cached_with_changing_kwargs(self):
         """
@@ -121,7 +121,7 @@ class TestRequestCachedDecorator(TestCase):
         """
         to_be_wrapped = Mock()
         to_be_wrapped.side_effect = [1, 2, 3, 4, 5, 6]
-        self.assertEqual(to_be_wrapped.call_count, 0)
+        assert to_be_wrapped.call_count == 0
 
         def mock_wrapper(*args, **kwargs):
             """Simple wrapper to let us decorate our mock."""
@@ -131,42 +131,42 @@ class TestRequestCachedDecorator(TestCase):
 
         # This will be a miss, and make an underlying call.
         result = wrapped(1, foo=1)
-        self.assertEqual(result, 1)
-        self.assertEqual(to_be_wrapped.call_count, 1)
+        assert result == 1
+        assert to_be_wrapped.call_count == 1
 
         # This will be a miss, and make an underlying call.
         result = wrapped(2, foo=2)
-        self.assertEqual(result, 2)
-        self.assertEqual(to_be_wrapped.call_count, 2)
+        assert result == 2
+        assert to_be_wrapped.call_count == 2
 
         # This is bypass of the decorator.
         direct_result = mock_wrapper(3, foo=3)
-        self.assertEqual(direct_result, 3)
-        self.assertEqual(to_be_wrapped.call_count, 3)
+        assert direct_result == 3
+        assert to_be_wrapped.call_count == 3
 
         # These will be hits, and not make an underlying call.
         result = wrapped(1, foo=1)
-        self.assertEqual(result, 1)
-        self.assertEqual(to_be_wrapped.call_count, 3)
+        assert result == 1
+        assert to_be_wrapped.call_count == 3
 
         result = wrapped(2, foo=2)
-        self.assertEqual(result, 2)
-        self.assertEqual(to_be_wrapped.call_count, 3)
+        assert result == 2
+        assert to_be_wrapped.call_count == 3
 
         # Since we're changing foo, this will be a miss.
         result = wrapped(2, foo=5)
-        self.assertEqual(result, 4)
-        self.assertEqual(to_be_wrapped.call_count, 4)
+        assert result == 4
+        assert to_be_wrapped.call_count == 4
 
         # Since we're adding bar, this will be a miss.
         result = wrapped(2, foo=1, bar=2)
-        self.assertEqual(result, 5)
-        self.assertEqual(to_be_wrapped.call_count, 5)
+        assert result == 5
+        assert to_be_wrapped.call_count == 5
 
         # Should be a hit, even when kwargs are in a different order
         result = wrapped(2, bar=2, foo=1)
-        self.assertEqual(result, 5)
-        self.assertEqual(to_be_wrapped.call_count, 5)
+        assert result == 5
+        assert to_be_wrapped.call_count == 5
 
     def test_request_cached_mixed_unicode_str_args(self):
         """
@@ -180,13 +180,13 @@ class TestRequestCachedDecorator(TestCase):
             assert isinstance(arg2, six.text_type), 'Second parameter has to be of type `unicode`'
             return True
 
-        self.assertTrue(dummy_function('Hello', u'World'), 'Should be callable with ASCII chars')
-        self.assertTrue(dummy_function('H∂llå', u'Wørld'), 'Should be callable with non-ASCII chars')
+        assert dummy_function('Hello', u'World'), 'Should be callable with ASCII chars'
+        assert dummy_function('H∂llå', u'Wørld'), 'Should be callable with non-ASCII chars'
 
         wrapped = request_cached()(dummy_function)  # lint-amnesty, pylint: disable=no-value-for-parameter
 
-        self.assertTrue(wrapped('Hello', u'World'), 'Wrapper should handle ASCII only chars')
-        self.assertTrue(wrapped('H∂llå', u'Wørld'), 'Wrapper should handle non-ASCII chars')
+        assert wrapped('Hello', u'World'), 'Wrapper should handle ASCII only chars'
+        assert wrapped('H∂llå', u'Wørld'), 'Wrapper should handle non-ASCII chars'
 
     def test_request_cached_with_none_result(self):
         """
@@ -196,7 +196,7 @@ class TestRequestCachedDecorator(TestCase):
         """
         to_be_wrapped = Mock()
         to_be_wrapped.side_effect = [None, None, None, 1, 1]
-        self.assertEqual(to_be_wrapped.call_count, 0)
+        assert to_be_wrapped.call_count == 0
 
         def mock_wrapper(*args, **kwargs):
             """Simple wrapper to let us decorate our mock."""
@@ -206,27 +206,27 @@ class TestRequestCachedDecorator(TestCase):
 
         # This will be a miss, and make an underlying call.
         result = wrapped(1)
-        self.assertEqual(result, None)
-        self.assertEqual(to_be_wrapped.call_count, 1)
+        assert result is None
+        assert to_be_wrapped.call_count == 1
 
         # This will be a miss, and make an underlying call.
         result = wrapped(2)
-        self.assertEqual(result, None)
-        self.assertEqual(to_be_wrapped.call_count, 2)
+        assert result is None
+        assert to_be_wrapped.call_count == 2
 
         # This is bypass of the decorator.
         direct_result = mock_wrapper(3)
-        self.assertEqual(direct_result, None)
-        self.assertEqual(to_be_wrapped.call_count, 3)
+        assert direct_result is None
+        assert to_be_wrapped.call_count == 3
 
         # These will be hits, and not make an underlying call.
         result = wrapped(1)
-        self.assertEqual(result, None)
-        self.assertEqual(to_be_wrapped.call_count, 3)
+        assert result is None
+        assert to_be_wrapped.call_count == 3
 
         result = wrapped(2)
-        self.assertEqual(result, None)
-        self.assertEqual(to_be_wrapped.call_count, 3)
+        assert result is None
+        assert to_be_wrapped.call_count == 3
 
     def test_request_cached_with_request_cache_getter(self):
         """
@@ -235,7 +235,7 @@ class TestRequestCachedDecorator(TestCase):
         """
         to_be_wrapped = Mock()
         to_be_wrapped.side_effect = [1, 2, 3]
-        self.assertEqual(to_be_wrapped.call_count, 0)
+        assert to_be_wrapped.call_count == 0
 
         def mock_wrapper(*args, **kwargs):
             """Simple wrapper to let us decorate our mock."""
@@ -246,22 +246,22 @@ class TestRequestCachedDecorator(TestCase):
 
         # This will be a miss, and make an underlying call.
         result = wrapped(1)
-        self.assertEqual(result, 1)
-        self.assertEqual(to_be_wrapped.call_count, 1)
+        assert result == 1
+        assert to_be_wrapped.call_count == 1
 
         # This will be a miss, and make an underlying call.
         result = wrapped(2)
-        self.assertEqual(result, 2)
-        self.assertEqual(to_be_wrapped.call_count, 2)
+        assert result == 2
+        assert to_be_wrapped.call_count == 2
 
         # These will be a hits, and not make an underlying call.
         result = wrapped(1)
-        self.assertEqual(result, 1)
-        self.assertEqual(to_be_wrapped.call_count, 2)
+        assert result == 1
+        assert to_be_wrapped.call_count == 2
 
         # Ensure the appropriate request cache was used
-        self.assertFalse(RequestCache().data)
-        self.assertTrue(RequestCache('test').data)
+        assert not RequestCache().data
+        assert RequestCache('test').data
 
     def test_request_cached_with_arg_map_function(self):
         """
@@ -270,7 +270,7 @@ class TestRequestCachedDecorator(TestCase):
         """
         to_be_wrapped = Mock()
         to_be_wrapped.side_effect = [1, 2, 3]
-        self.assertEqual(to_be_wrapped.call_count, 0)
+        assert to_be_wrapped.call_count == 0
 
         def mock_wrapper(*args, **kwargs):
             """Simple wrapper to let us decorate our mock."""
@@ -281,19 +281,19 @@ class TestRequestCachedDecorator(TestCase):
 
         # This will be a miss, and make an underlying call.
         result = wrapped(1)
-        self.assertEqual(result, 1)
-        self.assertEqual(to_be_wrapped.call_count, 1)
+        assert result == 1
+        assert to_be_wrapped.call_count == 1
 
         # This will be a miss, and make an underlying call.
         result = wrapped(2)
-        self.assertEqual(result, 2)
-        self.assertEqual(to_be_wrapped.call_count, 2)
+        assert result == 2
+        assert to_be_wrapped.call_count == 2
 
         # These will be a hits, and not make an underlying call.
         result = wrapped(1)
-        self.assertEqual(result, 1)
-        self.assertEqual(to_be_wrapped.call_count, 2)
+        assert result == 1
+        assert to_be_wrapped.call_count == 2
 
         result = wrapped(3)
-        self.assertEqual(result, 2)
-        self.assertEqual(to_be_wrapped.call_count, 2)
+        assert result == 2
+        assert to_be_wrapped.call_count == 2
