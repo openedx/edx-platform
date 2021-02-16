@@ -57,9 +57,9 @@ class UserAccountSettingsTest(TestCase):
         """
         Verify that social links are correctly validated and formatted.
         """
-        self.assertEqual(is_valid_expected, self.validate_social_link(platform_name, link_input))
+        assert is_valid_expected == self.validate_social_link(platform_name, link_input)
 
-        self.assertEqual(formatted_link_expected, format_social_link(platform_name, link_input))
+        assert formatted_link_expected == format_social_link(platform_name, link_input)
 
 
 @ddt.ddt
@@ -121,13 +121,12 @@ class CompletionUtilsTestCase(SharedModuleStoreTestCase, CompletionWaffleTestMix
         empty_block_url = retrieve_last_sitewide_block_completed(
             self.cruft_user
         )
-        self.assertEqual(
-            block_url,
-            u'test_url:9999/courses/{org}/{course}/{run}/jump_to/i4x://{org}/{course}/vertical/{vertical_id}'.format(
-                org=self.course.location.course_key.org,
-                course=self.course.location.course_key.course,
-                run=self.course.location.course_key.run,
-                vertical_id=self.vertical2.location.block_id,
-            )
-        )
-        self.assertEqual(empty_block_url, None)
+        assert block_url ==\
+               u'test_url:9999/courses/{org}/{course}/{run}/jump_to/i4x://{org}/{course}/vertical/{vertical_id}'.format(
+                   org=self.course.location.course_key.org,
+                   course=self.course.location.course_key.course,
+                   run=self.course.location.course_key.run,
+                   vertical_id=self.vertical2.location.block_id
+               )
+
+        assert empty_block_url is None

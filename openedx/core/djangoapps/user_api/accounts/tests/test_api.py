@@ -7,7 +7,7 @@ Most of the functionality is covered in test_views.py.
 
 import itertools
 import unicodedata
-
+import pytest
 import ddt
 from django.conf import settings
 from django.contrib.auth.hashers import make_password
@@ -75,7 +75,7 @@ class CreateAccountMixin(object):  # lint-amnesty, pylint: disable=missing-class
             'name': username,
             'honor_code': 'true',
         })
-        self.assertEqual(resp.status_code, 200)
+        assert resp.status_code == 200
 
 
 @skip_unless_lms
@@ -108,13 +108,13 @@ class TestAccountApi(UserSettingsEventTestMixin, EmailTemplateTagMixin, CreateAc
     def test_get_username_provided(self):
         """Test the difference in behavior when a username is supplied to get_account_settings."""
         account_settings = get_account_settings(self.default_request)[0]
-        self.assertEqual(self.user.username, account_settings["username"])
+        assert self.user.username == account_settings['username']
 
         account_settings = get_account_settings(self.default_request, usernames=[self.user.username])[0]
-        self.assertEqual(self.user.username, account_settings["username"])
+        assert self.user.username == account_settings['username']
 
         account_settings = get_account_settings(self.default_request, usernames=[self.different_user.username])[0]
-        self.assertEqual(self.different_user.username, account_settings["username"])
+        assert self.different_user.username == account_settings['username']
 
     def test_get_configuration_provided(self):
         """Test the difference in behavior when a configuration is supplied to get_account_settings."""
@@ -127,50 +127,50 @@ class TestAccountApi(UserSettingsEventTestMixin, EmailTemplateTagMixin, CreateAc
 
         # With default configuration settings, email is not shared with other (non-staff) users.
         account_settings = get_account_settings(self.default_request, [self.different_user.username])[0]
-        self.assertNotIn("email", account_settings)
+        assert 'email' not in account_settings
 
         account_settings = get_account_settings(
             self.default_request,
             [self.different_user.username],
             configuration=config,
         )[0]
-        self.assertEqual(self.different_user.email, account_settings["email"])
+        assert self.different_user.email == account_settings['email']
 
     def test_get_user_not_found(self):
         """Test that UserNotFound is thrown if there is no user with username."""
-        with self.assertRaises(UserNotFound):
+        with pytest.raises(UserNotFound):
             get_account_settings(self.default_request, usernames=["does_not_exist"])
 
         self.user.username = "does_not_exist"
         request = self.request_factory.get("/api/user/v1/accounts/")
         request.user = self.user
-        with self.assertRaises(UserNotFound):
+        with pytest.raises(UserNotFound):
             get_account_settings(request)
 
     def test_update_username_provided(self):
         """Test the difference in behavior when a username is supplied to update_account_settings."""
         update_account_settings(self.user, {"name": "Mickey Mouse"})
         account_settings = get_account_settings(self.default_request)[0]
-        self.assertEqual("Mickey Mouse", account_settings["name"])
+        assert 'Mickey Mouse' == account_settings['name']
 
         update_account_settings(self.user, {"name": "Donald Duck"}, username=self.user.username)
         account_settings = get_account_settings(self.default_request)[0]
-        self.assertEqual("Donald Duck", account_settings["name"])
+        assert 'Donald Duck' == account_settings['name']
 
-        with self.assertRaises(UserNotAuthorized):
+        with pytest.raises(UserNotAuthorized):
             update_account_settings(self.different_user, {"name": "Pluto"}, username=self.user.username)
 
     def test_update_non_existent_user(self):
-        with self.assertRaises(UserNotAuthorized):
+        with pytest.raises(UserNotAuthorized):
             update_account_settings(self.user, {}, username="does_not_exist")
 
         self.user.username = "does_not_exist"
-        with self.assertRaises(UserNotFound):
+        with pytest.raises(UserNotFound):
             update_account_settings(self.user, {})
 
     def test_get_empty_social_links(self):
         account_settings = get_account_settings(self.default_request)[0]
-        self.assertEqual(account_settings['social_links'], [])
+        assert account_settings['social_links'] == []
 
     def test_set_single_social_link(self):
         social_links = [
@@ -178,7 +178,7 @@ class TestAccountApi(UserSettingsEventTestMixin, EmailTemplateTagMixin, CreateAc
         ]
         update_account_settings(self.user, {"social_links": social_links})
         account_settings = get_account_settings(self.default_request)[0]
-        self.assertEqual(account_settings['social_links'], social_links)
+        assert account_settings['social_links'] == social_links
 
     def test_set_multiple_social_links(self):
         social_links = [
@@ -187,7 +187,7 @@ class TestAccountApi(UserSettingsEventTestMixin, EmailTemplateTagMixin, CreateAc
         ]
         update_account_settings(self.user, {"social_links": social_links})
         account_settings = get_account_settings(self.default_request)[0]
-        self.assertEqual(account_settings['social_links'], social_links)
+        assert account_settings['social_links'] == social_links
 
     def test_add_social_links(self):
         original_social_links = [
@@ -202,10 +202,8 @@ class TestAccountApi(UserSettingsEventTestMixin, EmailTemplateTagMixin, CreateAc
         update_account_settings(self.user, {"social_links": extra_social_links})
 
         account_settings = get_account_settings(self.default_request)[0]
-        self.assertEqual(
-            account_settings['social_links'],
-            sorted(original_social_links + extra_social_links, key=lambda s: s['platform']),
-        )
+        assert account_settings['social_links'] == \
+               sorted((original_social_links + extra_social_links), key=(lambda s: s['platform']))
 
     def test_replace_social_links(self):
         original_facebook_link = dict(platform="facebook", social_link="https://www.facebook.com/myself")
@@ -216,7 +214,7 @@ class TestAccountApi(UserSettingsEventTestMixin, EmailTemplateTagMixin, CreateAc
         update_account_settings(self.user, {"social_links": [modified_facebook_link]})
 
         account_settings = get_account_settings(self.default_request)[0]
-        self.assertEqual(account_settings['social_links'], [modified_facebook_link, original_twitter_link])
+        assert account_settings['social_links'] == [modified_facebook_link, original_twitter_link]
 
     def test_remove_social_link(self):
         original_facebook_link = dict(platform="facebook", social_link="https://www.facebook.com/myself")
@@ -227,13 +225,13 @@ class TestAccountApi(UserSettingsEventTestMixin, EmailTemplateTagMixin, CreateAc
         update_account_settings(self.user, {"social_links": [removed_facebook_link]})
 
         account_settings = get_account_settings(self.default_request)[0]
-        self.assertEqual(account_settings['social_links'], [original_twitter_link])
+        assert account_settings['social_links'] == [original_twitter_link]
 
     def test_unsupported_social_link_platform(self):
         social_links = [
             dict(platform="unsupported", social_link="https://www.unsupported.com/{}".format(self.user.username))
         ]
-        with self.assertRaises(AccountValidationError):
+        with pytest.raises(AccountValidationError):
             update_account_settings(self.user, {"social_links": social_links})
 
     def test_update_success_for_enterprise(self):
@@ -244,7 +242,7 @@ class TestAccountApi(UserSettingsEventTestMixin, EmailTemplateTagMixin, CreateAc
         }
         update_account_settings(self.user, successful_update)
         account_settings = get_account_settings(self.default_request)[0]
-        self.assertEqual(level_of_education, account_settings["level_of_education"])
+        assert level_of_education == account_settings['level_of_education']
 
     @patch('openedx.features.enterprise_support.api.enterprise_customer_for_request')
     @patch('openedx.features.enterprise_support.utils.third_party_auth.provider.Registry.get')
@@ -298,28 +296,26 @@ class TestAccountApi(UserSettingsEventTestMixin, EmailTemplateTagMixin, CreateAc
         with patch('openedx.core.djangoapps.user_api.accounts.api.student_views.do_email_change_request'):
             # expect field un-editability only when all of the following conditions are met
             if is_enterprise_user and is_synch_learner_profile_data and not user_fullname_editable:
-                with self.assertRaises(AccountValidationError) as validation_error:
+                with pytest.raises(AccountValidationError) as validation_error:
                     update_account_settings(self.user, update_data)
-                    field_errors = validation_error.exception.field_errors
-                    self.assertEqual(
-                        "This field is not editable via this API",
-                        field_errors[field_name_value[0]]["developer_message"],
-                    )
+                    field_errors = validation_error.value.field_errors
+                    assert 'This field is not editable via this API' ==\
+                           field_errors[field_name_value[0]]['developer_message']
             else:
                 update_account_settings(self.user, update_data)
                 account_settings = get_account_settings(self.default_request)[0]
                 if field_name_value[0] != "email":
-                    self.assertEqual(field_name_value[1], account_settings[field_name_value[0]])
+                    assert field_name_value[1] == account_settings[field_name_value[0]]
 
     def test_update_error_validating(self):
         """Test that AccountValidationError is thrown if incorrect values are supplied."""
-        with self.assertRaises(AccountValidationError):
+        with pytest.raises(AccountValidationError):
             update_account_settings(self.user, {"username": "not_allowed"})
 
-        with self.assertRaises(AccountValidationError):
+        with pytest.raises(AccountValidationError):
             update_account_settings(self.user, {"gender": "undecided"})
 
-        with self.assertRaises(AccountValidationError):
+        with pytest.raises(AccountValidationError):
             update_account_settings(
                 self.user,
                 {"profile_image": {"has_image": "not_allowed", "image_url": "not_allowed"}}
@@ -328,18 +324,18 @@ class TestAccountApi(UserSettingsEventTestMixin, EmailTemplateTagMixin, CreateAc
         # Check the various language_proficiencies validation failures.
         # language_proficiencies must be a list of dicts, each containing a
         # unique 'code' key representing the language code.
-        with self.assertRaises(AccountValidationError):
+        with pytest.raises(AccountValidationError):
             update_account_settings(
                 self.user,
                 {"language_proficiencies": "not_a_list"}
             )
-        with self.assertRaises(AccountValidationError):
+        with pytest.raises(AccountValidationError):
             update_account_settings(
                 self.user,
                 {"language_proficiencies": [{}]}
             )
 
-        with self.assertRaises(AccountValidationError):
+        with pytest.raises(AccountValidationError):
             update_account_settings(self.user, {"account_privacy": ""})
 
     def test_update_multiple_validation_errors(self):
@@ -353,17 +349,14 @@ class TestAccountApi(UserSettingsEventTestMixin, EmailTemplateTagMixin, CreateAc
             "name": "<p style=\"font-size:300px; color:green;\"></br>Name<input type=\"text\"></br>Content spoof"
         }
 
-        with self.assertRaises(AccountValidationError) as context_manager:
+        with pytest.raises(AccountValidationError) as context_manager:
             update_account_settings(self.user, naughty_update)
-        field_errors = context_manager.exception.field_errors
-        self.assertEqual(4, len(field_errors))
-        self.assertEqual("This field is not editable via this API", field_errors["username"]["developer_message"])
-        self.assertIn(
-            "Value \'undecided\' is not valid for field \'gender\'",
-            field_errors["gender"]["developer_message"]
-        )
-        self.assertIn("Valid e-mail address required.", field_errors["email"]["developer_message"])
-        self.assertIn("Full Name cannot contain the following characters: < >", field_errors["name"]["user_message"])
+        field_errors = context_manager.value.field_errors
+        assert 4 == len(field_errors)
+        assert 'This field is not editable via this API' == field_errors['username']['developer_message']
+        assert "Value 'undecided' is not valid for field 'gender'" in field_errors['gender']['developer_message']
+        assert 'Valid e-mail address required.' in field_errors['email']['developer_message']
+        assert 'Full Name cannot contain the following characters: < >' in field_errors['name']['user_message']
 
     @patch('django.core.mail.EmailMultiAlternatives.send')
     @patch('common.djangoapps.student.views.management.render_to_string', Mock(side_effect=mock_render_to_string, autospec=True))  # lint-amnesty, pylint: disable=line-too-long
@@ -376,13 +369,13 @@ class TestAccountApi(UserSettingsEventTestMixin, EmailTemplateTagMixin, CreateAc
         }
 
         with patch('crum.get_current_request', return_value=self.fake_request):
-            with self.assertRaises(AccountUpdateError) as context_manager:
+            with pytest.raises(AccountUpdateError) as context_manager:
                 update_account_settings(self.user, less_naughty_update)
-        self.assertIn("Error thrown from do_email_change_request", context_manager.exception.developer_message)
+        assert 'Error thrown from do_email_change_request' in context_manager.value.developer_message
 
         # Verify that the name change happened, even though the attempt to send the email failed.
         account_settings = get_account_settings(self.default_request)[0]
-        self.assertEqual("Mickey Mouse", account_settings["name"])
+        assert 'Mickey Mouse' == account_settings['name']
 
     @patch.dict(settings.FEATURES, dict(ALLOW_EMAIL_ADDRESS_CHANGE=False))
     def test_email_changes_disabled(self):
@@ -391,9 +384,9 @@ class TestAccountApi(UserSettingsEventTestMixin, EmailTemplateTagMixin, CreateAc
         """
         disabled_update = {"email": "valid@example.com"}
 
-        with self.assertRaises(AccountUpdateError) as context_manager:
+        with pytest.raises(AccountUpdateError) as context_manager:
             update_account_settings(self.user, disabled_update)
-        self.assertIn("Email address changes have been disabled", context_manager.exception.developer_message)
+        assert 'Email address changes have been disabled' in context_manager.value.developer_message
 
     @patch.dict(settings.FEATURES, dict(ALLOW_EMAIL_ADDRESS_CHANGE=True))
     def test_email_changes_blocked_on_retired_email(self):
@@ -429,13 +422,13 @@ class TestAccountApi(UserSettingsEventTestMixin, EmailTemplateTagMixin, CreateAc
             "email": "ok@sample.com"
         }
 
-        with self.assertRaises(AccountUpdateError) as context_manager:
+        with pytest.raises(AccountUpdateError) as context_manager:
             update_account_settings(self.user, update_will_fail)
-        self.assertIn("Error thrown when saving account updates", context_manager.exception.developer_message)
+        assert 'Error thrown when saving account updates' in context_manager.value.developer_message
 
         # Verify that no email change request was initiated.
         pending_change = PendingEmailChange.objects.filter(user=self.user)
-        self.assertEqual(0, len(pending_change))
+        assert 0 == len(pending_change)
 
     def test_language_proficiency_eventing(self):
         """
@@ -459,27 +452,27 @@ class TestAccountApi(UserSettingsEventTestMixin, EmailTemplateTagMixin, CreateAc
     def test_add_account_recovery(self):
         test_email = "test@example.com"
         pending_secondary_email_changes = PendingSecondaryEmailChange.objects.filter(user=self.user)
-        self.assertEqual(0, len(pending_secondary_email_changes))
+        assert 0 == len(pending_secondary_email_changes)
 
         account_recovery_objects = AccountRecovery.objects.filter(user=self.user)
-        self.assertEqual(0, len(account_recovery_objects))
+        assert 0 == len(account_recovery_objects)
 
         with patch('crum.get_current_request', return_value=self.fake_request):
             update = {"secondary_email": test_email}
             update_account_settings(self.user, update)
 
         pending_secondary_email_change = PendingSecondaryEmailChange.objects.get(user=self.user)
-        self.assertIsNot(pending_secondary_email_change, None)
-        self.assertEqual(pending_secondary_email_change.new_secondary_email, test_email)
+        assert pending_secondary_email_change is not None
+        assert pending_secondary_email_change.new_secondary_email == test_email
 
         activate_secondary_email(self.fake_request, pending_secondary_email_change.activation_key)
 
         pending_secondary_email_changes = PendingSecondaryEmailChange.objects.filter(user=self.user)
-        self.assertEqual(0, len(pending_secondary_email_changes))
+        assert 0 == len(pending_secondary_email_changes)
 
         account_recovery = AccountRecovery.objects.get(user=self.user)
-        self.assertIsNot(account_recovery, None)
-        self.assertEqual(account_recovery.secondary_email, test_email)
+        assert account_recovery is not None
+        assert account_recovery.secondary_email == test_email
 
     def test_change_country_removes_state(self):
         '''
@@ -489,14 +482,14 @@ class TestAccountApi(UserSettingsEventTestMixin, EmailTemplateTagMixin, CreateAc
         # First set the country and state
         update_account_settings(self.user, {"country": UserProfile.COUNTRY_WITH_STATES, "state": "MA"})
         account_settings = get_account_settings(self.default_request)[0]
-        self.assertEqual(account_settings['country'], UserProfile.COUNTRY_WITH_STATES)
-        self.assertEqual(account_settings['state'], 'MA')
+        assert account_settings['country'] == UserProfile.COUNTRY_WITH_STATES
+        assert account_settings['state'] == 'MA'
 
         # Change the country and check that state is removed
         update_account_settings(self.user, {"country": ""})
         account_settings = get_account_settings(self.default_request)[0]
-        self.assertEqual(account_settings['country'], None)
-        self.assertEqual(account_settings['state'], None)
+        assert account_settings['country'] is None
+        assert account_settings['state'] is None
 
 
 @patch('openedx.core.djangoapps.user_api.accounts.image_helpers._PROFILE_IMAGE_SIZES', [50, 10])
@@ -523,42 +516,38 @@ class AccountSettingsOnCreationTest(CreateAccountMixin, TestCase):
         account_settings = get_account_settings(request)[0]
 
         # Expect a date joined and last login field but remove it to simplify the following comparison
-        self.assertIsNotNone(account_settings['date_joined'])
-        self.assertIsNotNone(account_settings['last_login'])
+        assert account_settings['date_joined'] is not None
+        assert account_settings['last_login'] is not None
         del account_settings['date_joined']
         del account_settings['last_login']
 
         # Expect all the values to be defaulted
-        self.assertEqual(account_settings, {
-            'username': self.USERNAME,
-            'email': self.EMAIL,
-            'name': self.USERNAME,
-            'gender': None,
-            'goals': u'',
-            'is_active': False,
-            'level_of_education': None,
-            'mailing_address': u'',
-            'year_of_birth': None,
-            'country': None,
-            'state': None,
-            'social_links': [],
-            'bio': None,
-            'profile_image': {
-                'has_image': False,
-                'image_url_full': request.build_absolute_uri('/static/default_50.png'),
-                'image_url_small': request.build_absolute_uri('/static/default_10.png'),
-            },
-            'requires_parental_consent': True,
-            'language_proficiencies': [],
-            'account_privacy': PRIVATE_VISIBILITY,
-            'accomplishments_shared': False,
-            'extended_profile': [],
-            'secondary_email': None,
-            'secondary_email_enabled': None,
-            'time_zone': None,
-            'course_certificates': None,
-            'phone_number': None,
-        })
+        assert account_settings ==\
+               {'username': self.USERNAME,
+                'email': self.EMAIL,
+                'name': self.USERNAME,
+                'gender': None, 'goals': u'',
+                'is_active': False,
+                'level_of_education': None,
+                'mailing_address': u'',
+                'year_of_birth': None,
+                'country': None,
+                'state': None,
+                'social_links': [],
+                'bio': None,
+                'profile_image': {'has_image': False,
+                                  'image_url_full': request.build_absolute_uri('/static/default_50.png'),
+                                  'image_url_small': request.build_absolute_uri('/static/default_10.png')},
+                'requires_parental_consent': True,
+                'language_proficiencies': [],
+                'account_privacy': PRIVATE_VISIBILITY,
+                'accomplishments_shared': False,
+                'extended_profile': [],
+                'secondary_email': None,
+                'secondary_email_enabled': None,
+                'time_zone': None,
+                'course_certificates': None,
+                'phone_number': None}
 
     def test_normalize_password(self):
         """
@@ -573,4 +562,4 @@ class AccountSettingsOnCreationTest(CreateAccountMixin, TestCase):
         salt_val = user.password.split('$')[1]
 
         expected_user_password = make_password(unicodedata.normalize('NFKC', u'Ṗŕệṿïệẅ Ṯệẍt'), salt_val)
-        self.assertEqual(expected_user_password, user.password)
+        assert expected_user_password == user.password

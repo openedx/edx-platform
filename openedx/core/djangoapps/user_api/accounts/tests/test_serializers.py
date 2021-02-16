@@ -36,9 +36,9 @@ class UserReadOnlySerializerTest(TestCase):  # lint-amnesty, pylint: disable=mis
         """
         UserProfile.objects.create(user=self.user, name='test name')
         data = UserReadOnlySerializer(self.user, configuration=self.config, context={'request': self.request}).data
-        self.assertEqual(data['username'], self.user.username)
-        self.assertEqual(data['name'], 'test name')
-        self.assertEqual(data['email'], self.user.email)
+        assert data['username'] == self.user.username
+        assert data['name'] == 'test name'
+        assert data['email'] == self.user.email
 
     def test_user_no_profile(self):
         """
@@ -50,5 +50,5 @@ class UserReadOnlySerializerTest(TestCase):  # lint-amnesty, pylint: disable=mis
                 (LOGGER_NAME, 'WARNING', 'user profile for the user [test_user] does not exist')
             )
 
-        self.assertEqual(data['username'], self.user.username)
-        self.assertEqual(data['name'], None)
+        assert data['username'] == self.user.username
+        assert data['name'] is None

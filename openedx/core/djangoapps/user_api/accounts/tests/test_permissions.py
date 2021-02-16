@@ -20,7 +20,7 @@ class CanDeactivateUserTest(TestCase):
         self.request.user = SuperuserFactory()
 
         result = CanDeactivateUser().has_permission(self.request, None)
-        self.assertTrue(result)
+        assert result
 
     def test_api_permission_user_granted_permission(self):
         user = UserFactory()
@@ -34,12 +34,12 @@ class CanDeactivateUserTest(TestCase):
         self.request.user = user
 
         result = CanDeactivateUser().has_permission(self.request, None)
-        self.assertTrue(result)
+        assert result
 
     def test_api_permission_user_without_permission(self):
         self.request.user = UserFactory()
         result = CanDeactivateUser().has_permission(self.request, None)
-        self.assertFalse(result)
+        assert not result
 
 
 class CanRetireUserTest(TestCase):
@@ -53,7 +53,7 @@ class CanRetireUserTest(TestCase):
         self.request.user = SuperuserFactory()
 
         result = CanRetireUser().has_permission(self.request, None)
-        self.assertTrue(result)
+        assert result
 
     def test_api_permission_user_granted_permission(self):
         user = UserFactory()
@@ -61,9 +61,9 @@ class CanRetireUserTest(TestCase):
 
         with self.settings(RETIREMENT_SERVICE_WORKER_USERNAME=user.username):
             result = CanRetireUser().has_permission(self.request, None)
-            self.assertTrue(result)
+            assert result
 
     def test_api_permission_user_without_permission(self):
         self.request.user = UserFactory()
         result = CanRetireUser().has_permission(self.request, None)
-        self.assertFalse(result)
+        assert not result
