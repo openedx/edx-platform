@@ -42,7 +42,7 @@ class TestUtils(ApiTestCase):  # lint-amnesty, pylint: disable=missing-class-doc
             body=self.request_data['body'],
         )
 
-        self.assertEqual(status_code, 503)
+        assert status_code == 503
 
     @ddt.data(201, 400, 401, 403, 404, 500)
     def test_zendesk_status_codes(self, mock_code):
@@ -54,7 +54,7 @@ class TestUtils(ApiTestCase):  # lint-amnesty, pylint: disable=missing-class-doc
                 body=self.request_data['body'],
             )
 
-            self.assertEqual(status_code, mock_code)
+            assert status_code == mock_code
 
     def test_unexpected_error_pinging_zendesk(self):
         with patch('requests.post', side_effect=Exception("WHAMMY")):
@@ -64,7 +64,7 @@ class TestUtils(ApiTestCase):  # lint-amnesty, pylint: disable=missing-class-doc
                 subject=self.request_data['subject'],
                 body=self.request_data['body'],
             )
-            self.assertEqual(status_code, 500)
+            assert status_code == 500
 
     def test_financial_assistant_ticket(self):
         """ Test Financial Assistent request ticket. """
@@ -93,4 +93,4 @@ class TestUtils(ApiTestCase):  # lint-amnesty, pylint: disable=missing-class-doc
                         )
                     ),
                 )
-                self.assertEqual(status_code, 200)
+                assert status_code == 200

@@ -42,7 +42,7 @@ class TestAPIUtils(VideoPipelineMixin, TestCase):
         self.vem_pipeline_integration.save()
 
         __, is_updated = update_3rd_party_transcription_service_credentials()
-        self.assertFalse(is_updated)
+        assert not is_updated
 
     @ddt.data(
         {
@@ -67,8 +67,8 @@ class TestAPIUtils(VideoPipelineMixin, TestCase):
 
         # Making sure log.exception is not called.
         self.assertDictEqual(error_response, {})
-        self.assertFalse(mock_logger.exception.called)
-        self.assertTrue(is_updated)
+        assert not mock_logger.exception.called
+        assert is_updated
 
         mock_logger.info.assert_any_call('Sending transcript credentials to VEM for org: {} and provider: {}'.format(
             credentials_payload.get('org'), credentials_payload.get('provider')
@@ -93,7 +93,7 @@ class TestAPIUtils(VideoPipelineMixin, TestCase):
         error_response, is_updated = update_3rd_party_transcription_service_credentials(**credentials_payload)
 
         # Assert the results.
-        self.assertFalse(is_updated)
+        assert not is_updated
         self.assertDictEqual(error_response, json.loads(error_content))
         mock_logger.exception.assert_called_with(
             'Unable to update transcript credentials -- org={}, provider={}, response={}'.format(
