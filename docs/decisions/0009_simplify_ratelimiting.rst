@@ -76,7 +76,7 @@ part of the login flow.
   are to lock out the user for 30 minutes if 6 login failures occur over any
   period of time.
 
-  edx.org has this feature enabled.
+  edx.org has the ``MAX_FAILED_LOGIN_ATTEMPTS`` feature enabled.
 
 * `cloudflare rate limiting`_ - This is edx.org specific and not enabled by
   default for Open edX.
