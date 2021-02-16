@@ -1,7 +1,6 @@
 """
 Common utility methods for Mobile APIs.
 """
-from six.moves import map
 
 API_V05 = 'v0.5'
 API_V1 = 'v1'

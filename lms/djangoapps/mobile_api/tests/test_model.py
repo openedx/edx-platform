@@ -96,13 +96,13 @@ class TestMobileApiConfig(TestCase):
         """Check that video_profiles config is returned in order as a list"""
         MobileApiConfig(video_profiles="mobile_low,mobile_high,youtube").save()
         video_profile_list = MobileApiConfig.get_video_profiles()
-        assert video_profile_list == [u'mobile_low', u'mobile_high', u'youtube']
+        assert video_profile_list == ['mobile_low', 'mobile_high', 'youtube']
 
     def test_video_profile_list_with_whitespace(self):
         """Check video_profiles config with leading and trailing whitespace"""
         MobileApiConfig(video_profiles=" mobile_low , mobile_high,youtube ").save()
         video_profile_list = MobileApiConfig.get_video_profiles()
-        assert video_profile_list == [u'mobile_low', u'mobile_high', u'youtube']
+        assert video_profile_list == ['mobile_low', 'mobile_high', 'youtube']
 
     def test_empty_video_profile(self):
         """Test an empty video_profile"""

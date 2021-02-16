@@ -4,9 +4,9 @@ Tests for Version Based App Upgrade Middleware
 
 
 from datetime import datetime
+from unittest import mock
 
 import ddt
-import mock
 from django.core.cache import caches
 from django.http import HttpRequest, HttpResponse
 from pytz import UTC
@@ -25,7 +25,7 @@ class TestAppVersionUpgradeMiddleware(CacheIsolationTestCase):
     ENABLED_CACHES = ['default']
 
     def setUp(self):
-        super(TestAppVersionUpgradeMiddleware, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.middleware = AppVersionUpgrade()
         self.set_app_version_config()
 

@@ -6,7 +6,6 @@ Tests for course_info
 import ddt
 from django.conf import settings
 from milestones.tests.utils import MilestonesTestCaseMixin
-from six.moves import range
 
 from lms.djangoapps.mobile_api.testutils import MobileAPITestCase, MobileAuthTestMixin, MobileCourseAccessTestMixin
 from lms.djangoapps.mobile_api.utils import API_V1, API_V05
@@ -24,7 +23,7 @@ class TestUpdates(MobileAPITestCase, MobileAuthTestMixin, MobileCourseAccessTest
     REVERSE_INFO = {'name': 'course-updates-list', 'params': ['course_id', 'api_version']}
 
     def verify_success(self, response):
-        super(TestUpdates, self).verify_success(response)  # lint-amnesty, pylint: disable=super-with-arguments
+        super().verify_success(response)
         assert response.data == []
 
     @ddt.data(
@@ -67,7 +66,7 @@ class TestUpdates(MobileAPITestCase, MobileAuthTestMixin, MobileCourseAccessTest
             # old format stores the updates with the newest first
             for num in range(num_updates, 0, -1):
                 update_data += "<li><h2>Date" + str(num) + "</h2><a href=\"/static/\">Update" + str(num) + "</a></li>"
-            course_updates.data = u"<ol>" + update_data + "</ol>"
+            course_updates.data = "<ol>" + update_data + "</ol>"
         modulestore().update_item(course_updates, self.user.id)
 
         # call API
