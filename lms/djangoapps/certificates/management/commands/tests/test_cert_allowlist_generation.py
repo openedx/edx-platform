@@ -57,7 +57,7 @@ class CertAllowlistGenerationTests(ModuleStoreTestCase):
         """
         Verify command with a missing param
         """
-        with pytest.raises(CommandError, match="Error: the following arguments are required: -c/--course-key"):
+        with pytest.raises(CommandError, match="You must specify a course-key"):
             call_command("cert_allowlist_generation", "--u", self.user.username)
 
     def test_command_with_invalid_key(self):
