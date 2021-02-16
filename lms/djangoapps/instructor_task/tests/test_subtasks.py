@@ -3,22 +3,20 @@ Unit tests for instructor_task subtasks.
 """
 
 
+from unittest.mock import Mock, patch
 from uuid import uuid4
 
-from mock import Mock, patch
-from six.moves import range
-
+from common.djangoapps.student.models import CourseEnrollment
 from lms.djangoapps.instructor_task.subtasks import queue_subtasks_for_query
 from lms.djangoapps.instructor_task.tests.factories import InstructorTaskFactory
 from lms.djangoapps.instructor_task.tests.test_base import InstructorTaskCourseTestCase
-from common.djangoapps.student.models import CourseEnrollment
 
 
 class TestSubtasks(InstructorTaskCourseTestCase):
     """Tests for subtasks."""
 
     def setUp(self):
-        super(TestSubtasks, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.initialize_course()
 
     def _enroll_students_in_course(self, course_id, num_students):  # lint-amnesty, pylint: disable=unused-argument
@@ -26,7 +24,7 @@ class TestSubtasks(InstructorTaskCourseTestCase):
 
         for _ in range(num_students):
             random_id = uuid4().hex[:8]
-            self.create_student(username='student{0}'.format(random_id))
+            self.create_student(username=f'student{random_id}')
 
     def _queue_subtasks(self, create_subtask_fcn, items_per_task, initial_count, extra_count):
         """Queue subtasks while enrolling more students into course in the middle of the process."""

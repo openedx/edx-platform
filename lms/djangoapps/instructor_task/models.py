@@ -12,9 +12,6 @@ file and check it in at the same time as your model changes. To do that,
 ASSUMPTIONS: modules have unique IDs, even across different module_types
 
 """
-
-
-import codecs
 import csv
 import hashlib
 import json
@@ -22,7 +19,6 @@ import logging
 import os.path
 from uuid import uuid4
 
-import six
 from boto.exception import BotoServerError
 from django.conf import settings
 from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
@@ -31,7 +27,6 @@ from django.db import models, transaction
 from django.utils.encoding import python_2_unicode_compatible
 from django.utils.translation import ugettext as _
 from opaque_keys.edx.django.models import CourseKeyField
-from six import text_type
 
 from openedx.core.storage import get_storage
 
@@ -68,7 +63,7 @@ class InstructorTask(models.Model):
 
     .. no_pii:
     """
-    class Meta(object):
+    class Meta:
         app_label = "instructor_task"
 
     task_type = models.CharField(max_length=50, db_index=True)
@@ -84,17 +79,17 @@ class InstructorTask(models.Model):
     subtasks = models.TextField(blank=True)  # JSON dictionary
 
     def __repr__(self):
-        return 'InstructorTask<%r>' % ({
+        return 'InstructorTask<{!r}>'.format({
             'task_type': self.task_type,
             'course_id': self.course_id,
             'task_input': self.task_input,
             'task_id': self.task_id,
             'task_state': self.task_state,
             'task_output': self.task_output,
-        },)
+        })
 
     def __str__(self):
-        return six.text_type(repr(self))
+        return str(repr(self))
 
     @classmethod
     def create(cls, course_id, task_type, task_key, task_input, requester):
@@ -108,7 +103,7 @@ class InstructorTask(models.Model):
         # check length of task_input, and return an exception if it's too long
         if len(json_task_input) > TASK_INPUT_LENGTH:
             logger.error(
-                u'Task input longer than: `%s` for `%s` of course: `%s`',
+                'Task input longer than: `%s` for `%s` of course: `%s`',
                 TASK_INPUT_LENGTH,
                 task_type,
                 course_id
@@ -148,7 +143,7 @@ class InstructorTask(models.Model):
         # will fit in the column.  In the meantime, just return an exception.
         json_output = json.dumps(returned_result)
         if len(json_output) > 1023:
-            raise ValueError(u"Length of task output is too long: {0}".format(json_output))
+            raise ValueError(f"Length of task output is too long: {json_output}")
         return json_output
 
     @staticmethod
@@ -163,7 +158,7 @@ class InstructorTask(models.Model):
         Truncation is indicated by adding "..." to the end of the value.
         """
         tag = '...'
-        task_progress = {'exception': type(exception).__name__, 'message': text_type(exception)}
+        task_progress = {'exception': type(exception).__name__, 'message': str(exception)}
         if traceback_string is not None:
             # truncate any traceback that goes into the InstructorTask model:
             task_progress['traceback'] = traceback_string
@@ -193,7 +188,7 @@ class InstructorTask(models.Model):
         return json.dumps({'message': 'Task revoked before running'})
 
 
-class ReportStore(object):
+class ReportStore:
     """
     Simple abstraction layer that can fetch and store CSV files for reports
     download. Should probably refactor later to create a ReportFile object that
@@ -237,10 +232,7 @@ class ReportStore(object):
         compatibility.
         """
         for row in rows:
-            if six.PY2:
-                yield [six.text_type(item).encode('utf-8') for item in row]
-            else:
-                yield [six.text_type(item) for item in row]
+            yield [str(item) for item in row]
 
 
 class DjangoStorageReportStore(ReportStore):
@@ -281,13 +273,12 @@ class DjangoStorageReportStore(ReportStore):
         path = self.path_to(course_id, filename)
         # See https://github.com/boto/boto/issues/2868
         # Boto doesn't play nice with unicode in python3
-        if not six.PY2:
-            buff_contents = buff.read()
+        buff_contents = buff.read()
 
-            if not isinstance(buff_contents, bytes):
-                buff_contents = buff_contents.encode('utf-8')
+        if not isinstance(buff_contents, bytes):
+            buff_contents = buff_contents.encode('utf-8')
 
-            buff = ContentFile(buff_contents)
+        buff = ContentFile(buff_contents)
 
         self.storage.save(path, buff)
 
@@ -297,9 +288,6 @@ class DjangoStorageReportStore(ReportStore):
         strings), write the rows to the storage backend in csv format.
         """
         output_buffer = ContentFile('')
-        # Adding unicode signature (BOM) for MS Excel 2013 compatibility
-        if six.PY2:
-            output_buffer.write(codecs.BOM_UTF8)
         csvwriter = csv.writer(output_buffer)
         csvwriter.writerows(self._get_utf8_encoded_rows(rows))
         output_buffer.seek(0)
@@ -320,7 +308,7 @@ class DjangoStorageReportStore(ReportStore):
             return []
         except BotoServerError as ex:
             logger.error(
-                u'Fetching files failed for course: %s, status: %s, reason: %s',
+                'Fetching files failed for course: %s, status: %s, reason: %s',
                 course_id,
                 ex.status,
                 ex.reason
@@ -337,5 +325,5 @@ class DjangoStorageReportStore(ReportStore):
         """
         Return the full path to a given file for a given course.
         """
-        hashed_course_id = hashlib.sha1(text_type(course_id).encode('utf-8')).hexdigest()
+        hashed_course_id = hashlib.sha1(str(course_id).encode('utf-8')).hexdigest()
         return os.path.join(hashed_course_id, filename)

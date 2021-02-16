@@ -11,16 +11,15 @@ import json
 import logging
 import textwrap
 from collections import namedtuple
+from unittest.mock import patch
+
 import pytest
 import ddt
-import six
 from celery.states import FAILURE, SUCCESS
 from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.test.utils import override_settings
 from django.urls import reverse
 from mock import patch
-from six import text_type
-from six.moves import range
 
 from capa.responsetypes import StudentInputError
 from capa.tests.response_xml_factory import CodeResponseXMLFactory, CustomResponseXMLFactory
@@ -61,8 +60,7 @@ class TestIntegrationTask(InstructorTaskModuleTestCase):
         assert instructor_task.task_type == task_type
         task_input = json.loads(instructor_task.task_input)
         assert 'student' not in task_input
-        assert task_input['problem_url'] == text_type(InstructorTaskModuleTestCase.problem_location(problem_url_name))
-        # lint-amnesty, pylint: disable=line-too-long
+        assert task_input['problem_url'] == str(InstructorTaskModuleTestCase.problem_location(problem_url_name))
         status = json.loads(instructor_task.task_output)
         assert status['exception'] == 'ZeroDivisionError'
         assert status['message'] == expected_message
@@ -81,7 +79,7 @@ class TestRescoringTask(TestIntegrationTask):
     """
 
     def setUp(self):
-        super(TestRescoringTask, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
 
         self.initialize_course()
         self.create_instructor('instructor')
@@ -104,8 +102,8 @@ class TestRescoringTask(TestIntegrationTask):
         self.login_username(username)
         # make ajax call:
         modx_url = reverse('xblock_handler', kwargs={
-            'course_id': text_type(self.course.id),
-            'usage_id': quote_slashes(text_type(InstructorTaskModuleTestCase.problem_location(problem_url_name))),
+            'course_id': str(self.course.id),
+            'usage_id': quote_slashes(str(InstructorTaskModuleTestCase.problem_location(problem_url_name))),
             'handler': 'xmodule_handler',
             'suffix': 'problem_get',
         })
@@ -292,7 +290,7 @@ class TestRescoringTask(TestIntegrationTask):
         self.submit_student_answer('u1', problem_url_name, [OPTION_1, OPTION_1])
 
         # return an input error as if it were a numerical response, with an embedded unicode character:
-        expected_message = u"Could not interpret '2/3\u03a9' as a number"
+        expected_message = "Could not interpret '2/3\u03a9' as a number"
         with patch('capa.capa_problem.LoncapaProblem.get_grade_from_current_answers') as mock_rescore:
             mock_rescore.side_effect = StudentInputError(expected_message)
             instructor_task = self.submit_rescore_all_student_answers('instructor', problem_url_name)
@@ -304,8 +302,7 @@ class TestRescoringTask(TestIntegrationTask):
         assert instructor_task.task_type == 'rescore_problem'
         task_input = json.loads(instructor_task.task_input)
         assert 'student' not in task_input
-        assert task_input['problem_url'] == text_type(InstructorTaskModuleTestCase.problem_location(problem_url_name))
-        # lint-amnesty, pylint: disable=line-too-long
+        assert task_input['problem_url'] == str(InstructorTaskModuleTestCase.problem_location(problem_url_name))
         status = json.loads(instructor_task.task_output)
         assert status['attempted'] == 1
         assert status['succeeded'] == 0
@@ -359,7 +356,7 @@ class TestRescoringTask(TestIntegrationTask):
         to not-equals).
         """
         factory = CustomResponseXMLFactory()
-        script = textwrap.dedent(u"""
+        script = textwrap.dedent("""
                 def check_func(expect, answer_given):
                     expected = str(random.randint(0, 100))
                     return {'ok': answer_given %s expected, 'msg': expected}
@@ -405,7 +402,7 @@ class TestRescoringTask(TestIntegrationTask):
             module = self.get_student_module(user.username, descriptor)
             state = json.loads(module.state)
             correct_map = state['correct_map']
-            log.info(u"Correct Map: %s", correct_map)
+            log.info("Correct Map: %s", correct_map)
             # only one response, so pull it out:
             answer = list(correct_map.values())[0]['msg']
             self.submit_student_answer(user.username, problem_url_name, [answer, answer])
@@ -444,7 +441,7 @@ class TestResetAttemptsTask(TestIntegrationTask):
     userlist = ['u1', 'u2', 'u3', 'u4']
 
     def setUp(self):
-        super(TestResetAttemptsTask, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.initialize_course()
         self.create_instructor('instructor')
         for username in self.userlist:
@@ -513,7 +510,7 @@ class TestDeleteProblemTask(TestIntegrationTask):
     userlist = ['u1', 'u2', 'u3', 'u4']
 
     def setUp(self):
-        super(TestDeleteProblemTask, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
 
         self.initialize_course()
         self.create_instructor('instructor')
@@ -602,7 +599,7 @@ class TestGradeReportConditionalContent(TestReportMixin, TestConditionalContent,
 
         def user_partition_group(user):
             """Return a dict having single key with value equals to students group in partition"""
-            group_config_hdr_tpl = u'Experiment Group ({})'
+            group_config_hdr_tpl = 'Experiment Group ({})'
             return {
                 group_config_hdr_tpl.format(self.partition.name): self.partition.scheme.get_group_for_user(
                     self.course.id, user, self.partition
@@ -616,7 +613,7 @@ class TestGradeReportConditionalContent(TestReportMixin, TestConditionalContent,
                     grades,
                     user_partition_group(student)
                 )
-                for student_grades in students_grades for student, grades in six.iteritems(student_grades)
+                for student_grades in students_grades for student, grades in student_grades.items()
             ],
             ignore_other_columns=ignore_other_columns,
         )
@@ -644,14 +641,14 @@ class TestGradeReportConditionalContent(TestReportMixin, TestConditionalContent,
                 [
                     {
                         self.student_a: {
-                            u'Grade': '1.0',
-                            u'Homework': '1.0',
+                            'Grade': '1.0',
+                            'Homework': '1.0',
                         }
                     },
                     {
                         self.student_b: {
-                            u'Grade': '0.5',
-                            u'Homework': '0.5',
+                            'Grade': '0.5',
+                            'Homework': '0.5',
                         }
                     },
                 ],
@@ -677,14 +674,14 @@ class TestGradeReportConditionalContent(TestReportMixin, TestConditionalContent,
                 [
                     {
                         self.student_a: {
-                            u'Grade': '1.0',
-                            u'Homework': '1.0',
+                            'Grade': '1.0',
+                            'Homework': '1.0',
                         },
                     },
                     {
                         self.student_b: {
-                            u'Grade': '0.0',
-                            u'Homework': u'Not Attempted',
+                            'Grade': '0.0',
+                            'Homework': 'Not Attempted',
                         }
                     },
                 ],

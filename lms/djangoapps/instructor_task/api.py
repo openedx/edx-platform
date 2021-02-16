@@ -11,9 +11,9 @@ arguments.
 import hashlib
 from collections import Counter
 
-import six
 from celery.states import READY_STATES
 
+from common.djangoapps.util import milestones_helpers
 from lms.djangoapps.bulk_email.models import CourseEmail
 from lms.djangoapps.certificates.models import CertificateGenerationHistory
 from lms.djangoapps.instructor_task.api_helper import (
@@ -43,7 +43,6 @@ from lms.djangoapps.instructor_task.tasks import (
     reset_problem_attempts,
     send_bulk_course_email
 )
-from common.djangoapps.util import milestones_helpers
 from xmodule.modulestore.django import modulestore
 
 
@@ -310,8 +309,8 @@ def submit_bulk_course_email(request, course_key, email_id):
     targets = Counter([target.target_type for target in email_obj.targets.all()])
     targets = [
         target if count <= 1 else
-        u"{} {}".format(count, target)
-        for target, count in six.iteritems(targets)
+        f"{count} {target}"
+        for target, count in targets.items()
     ]
 
     task_type = 'bulk_course_email'

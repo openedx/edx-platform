@@ -4,18 +4,17 @@
 import pytest
 from django.test import TestCase
 from opaque_keys.edx.locator import CourseLocator
-from six.moves import range
 
-from lms.djangoapps.instructor_analytics.distributions import AVAILABLE_PROFILE_FEATURES, profile_distribution
 from common.djangoapps.student.models import CourseEnrollment
 from common.djangoapps.student.tests.factories import UserFactory
+from lms.djangoapps.instructor_analytics.distributions import AVAILABLE_PROFILE_FEATURES, profile_distribution
 
 
 class TestAnalyticsDistributions(TestCase):
     '''Test analytics distribution gathering.'''
 
     def setUp(self):
-        super(TestAnalyticsDistributions, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.course_id = CourseLocator('robot', 'course', 'id')
 
         self.users = [UserFactory(
@@ -78,7 +77,7 @@ class TestAnalyticsDistributionsNoData(TestCase):
     '''Test analytics distribution gathering.'''
 
     def setUp(self):
-        super(TestAnalyticsDistributionsNoData, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.course_id = CourseLocator('robot', 'course', 'id')
 
         self.users = [UserFactory(
