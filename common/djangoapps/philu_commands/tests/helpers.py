@@ -53,10 +53,17 @@ class TestHelpers(ModuleStoreTestCase):
             'structure': {
                 'blocks': {
                     u'i4x://org.0/course_0/course/Testing_course_1': {
-                        'block_type': 'course', 'graded': False, 'format': None,
+                        'block_type': 'course',
+                        'graded': False,
+                        'format': None,
                         'usage_key': u'i4x://org.0/course_0/course/Testing_course_1',
-                        'children': [], 'display_name': u'test course 1'}},
-                'root': u'i4x://org.0/course_0/course/Testing_course_1'}, 'discussion_id_map': {}
+                        'children': [],
+                        'display_name': u'test course 1'
+                    }
+                },
+                'root': u'i4x://org.0/course_0/course/Testing_course_1'
+            },
+            'discussion_id_map': {}
         }
         assert course_structure_data == expected_course_object
         ItemFactory.create(
@@ -68,34 +75,22 @@ class TestHelpers(ModuleStoreTestCase):
             discussion_target='Target Discussion',
         )
         course_structure_data_2 = generate_course_structure(self.course.id)
-        expected_course_object_2 = {
-            'structure': {
-                'blocks': {
-                    u'i4x://org.0/course_0/course/Testing_course_1': {
-                        'block_type': 'course',
-                        'graded': False,
-                        'format': None,
-                        'usage_key': u'i4x://org.0/course_0/course/Testing_course_1',
-                        'children': [
-                            u'i4x://org.0/course_0/discussion/discussion_1'],
-                        'display_name': u'test course 1'
-                    },
-                    u'i4x://org.0/course_0/discussion/discussion_1': {
-                        'block_type': u'discussion',
-                        'graded': False,
-                        'format': None,
-                        'usage_key': u'i4x://org.0/course_0/discussion/discussion_1',
-                        'children': [],
-                        'display_name': u'discussion 1'
-                    }
-                },
-                'root': u'i4x://org.0/course_0/course/Testing_course_1'
-            },
-            'discussion_id_map': {
-                u'test_discussion': u'i4x://org.0/course_0/discussion/discussion_1'
-            }
+        course_blocks = expected_course_object['structure']['blocks']
+        course_blocks[u'i4x://org.0/course_0/discussion/discussion_1'] = {
+            'block_type': u'discussion',
+            'graded': False,
+            'format': None,
+            'usage_key': u'i4x://org.0/course_0/discussion/discussion_1',
+            'children': [],
+            'display_name': u'discussion 1'
         }
-        assert course_structure_data_2 == expected_course_object_2
+        course_blocks[u'i4x://org.0/course_0/course/Testing_course_1']['children'] = [
+            u'i4x://org.0/course_0/discussion/discussion_1'
+        ]
+        expected_course_object['discussion_id_map'] = {
+            u'test_discussion': u'i4x://org.0/course_0/discussion/discussion_1'
+        }
+        assert course_structure_data_2 == expected_course_object
 
     def test_has_active_certificate(self):
         """
