@@ -483,10 +483,20 @@ def _accessible_courses_list_from_groups(request):
     courses_list = []
     course_keys = {}
 
+    user_global_orgs = set()
     for course_access in all_courses:
-        if course_access.course_id is None:
+        if course_access.course_id is not None:
+            course_keys[course_access.course_id] = course_access.course_id
+        elif course_access.org:
+            user_global_orgs.add(course_access.org)
+        else:
             raise AccessListFallback
-        course_keys[course_access.course_id] = course_access.course_id
+
+    if user_global_orgs:
+        # Getting courses from user global orgs
+        overviews = CourseOverview.get_all_courses(orgs=list(user_global_orgs))
+        overviews_course_keys = {overview.id: overview.id for overview in overviews}
+        course_keys.update(overviews_course_keys)
 
     course_keys = list(course_keys.values())
 
