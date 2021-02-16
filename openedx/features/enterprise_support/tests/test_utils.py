@@ -149,7 +149,7 @@ class TestEnterpriseUtils(TestCase):
         assert 'pied-piper' == actual_result['enterprise_name']
         expected_logo_url = branding_configuration.get('logo', '')
         assert expected_logo_url == actual_result['enterprise_logo_url']
-        self.assertIn('pied-piper', str(actual_result['enterprise_branded_welcome_string']))
+        assert 'pied-piper' in str(actual_result['enterprise_branded_welcome_string'])
 
     @ddt.data(
         ('notfoundpage', 0),
@@ -165,7 +165,7 @@ class TestEnterpriseUtils(TestCase):
             'openedx.features.enterprise_support.api.enterprise_customer_for_request'
         ) as mock_customer_request:
             self.client.get(resource)
-            self.assertEqual(mock_customer_request.call_count, expected_calls)
+            assert mock_customer_request.call_count == expected_calls
 
     @mock.patch('openedx.features.enterprise_support.utils.configuration_helpers.get_value')
     def test_enterprise_fields_only(self, mock_get_value):
@@ -202,21 +202,12 @@ class TestEnterpriseUtils(TestCase):
         # This will directly modify context
         update_third_party_auth_context_for_enterprise(request, context, enterprise_customer)
 
-        self.assertIn(
-            'We are sorry, you are not authorized',
-            str(context['data']['third_party_auth']['errorMessage'])
-        )
-        self.assertIn(
-            'Widget error.',
-            str(context['data']['third_party_auth']['errorMessage'])
-        )
+        assert 'We are sorry, you are not authorized' in str(context['data']['third_party_auth']['errorMessage'])
+        assert 'Widget error.' in str(context['data']['third_party_auth']['errorMessage'])
         assert [] == context['data']['third_party_auth']['providers']
         assert [] == context['data']['third_party_auth']['secondaryProviders']
-        self.assertFalse(context['data']['third_party_auth']['autoSubmitRegForm'])
-        self.assertIn(
-            'Just a couple steps',
-            str(context['data']['third_party_auth']['autoRegisterWelcomeMessage'])
-        )
+        assert not context['data']['third_party_auth']['autoSubmitRegForm']
+        assert 'Just a couple steps' in str(context['data']['third_party_auth']['autoRegisterWelcomeMessage'])
         assert 'Continue' == str(context['data']['third_party_auth']['registerFormSubmitButtonText'])
         mock_tpa.pipeline.get.assert_called_once_with(request)
 
@@ -423,11 +414,11 @@ class TestEnterpriseUtils(TestCase):
         request.GET = {'enterprise_customer': uuid.uuid4()}
 
         portal = get_enterprise_learner_portal(request)
-        self.assertIsNone(portal)
+        assert portal is None
 
     def test_get_enterprise_learner_generic_name_404_pages(self):
         request = mock.Mock(view_name='404')
-        self.assertIsNone(get_enterprise_learner_generic_name(request))
+        assert get_enterprise_learner_generic_name(request) is None
 
     @mock.patch('openedx.features.enterprise_support.api.enterprise_customer_for_request')
     def test_get_enterprise_learner_generic_name_with_replacement(self, mock_customer_for_request):
@@ -454,27 +445,27 @@ class TestEnterpriseUtils(TestCase):
             'django.core.cache.cache.set'
         ) as mock_cache_set:
             EnterpriseCustomerUserFactory.create(active=True, user_id=self.user.id)
-            self.assertTrue(is_enterprise_learner(self.user))
+            assert is_enterprise_learner(self.user)
 
-        self.assertTrue(mock_cache_set.called)
+        assert mock_cache_set.called
 
     def test_is_enterprise_learner_no_enterprise_user(self):
         with mock.patch(
             'django.core.cache.cache.set'
         ) as mock_cache_set:
-            self.assertFalse(is_enterprise_learner(self.user))
+            assert not is_enterprise_learner(self.user)
 
-        self.assertFalse(mock_cache_set.called)
+        assert not mock_cache_set.called
 
     @mock.patch('openedx.features.enterprise_support.utils.reverse')
     def test_get_enterprise_slug_login_url_no_reverse_match(self, mock_reverse):
         mock_reverse.side_effect = NoReverseMatch
-        self.assertIsNone(get_enterprise_slug_login_url())
+        assert get_enterprise_slug_login_url() is None
         mock_reverse.assert_called_once_with('enterprise_slug_login')
 
     @mock.patch('openedx.features.enterprise_support.utils.reverse')
     def test_get_enterprise_slug_login_url_with_match(self, mock_reverse):
-        self.assertIsNotNone(get_enterprise_slug_login_url())
+        assert get_enterprise_slug_login_url() is not None
         mock_reverse.assert_called_once_with('enterprise_slug_login')
 
     def test_fetch_enterprise_customer_by_id(self):
@@ -511,4 +502,4 @@ class TestEnterpriseUtils(TestCase):
             mock_tpa.pipeline.AUTH_ENTRY_LOGIN,
             redirect_url=redirect_url,
         )
-        self.assertFalse(mock_next_login_url.called)
+        assert not mock_next_login_url.called

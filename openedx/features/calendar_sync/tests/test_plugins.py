@@ -41,4 +41,4 @@ class TestCalendarSyncToggleTool(SharedModuleStoreTestCase):
         request.user = self.create_user_for_course(self.course, user_type)
         self.addCleanup(crum.set_current_request, None)
         crum.set_current_request(request)
-        self.assertEqual(CalendarSyncToggleTool.is_enabled(request, self.course.id), should_be_enabled)
+        assert CalendarSyncToggleTool.is_enabled(request, self.course.id) == should_be_enabled

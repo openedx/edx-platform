@@ -24,11 +24,11 @@ class TestUserCalendarSyncConfig(SharedModuleStoreTestCase):
 
     def test_is_enabled_for_course(self):
         # Calendar Sync Config does not exist and returns False
-        self.assertFalse(UserCalendarSyncConfig.is_enabled_for_course(self.user, self.course_key))
+        assert not UserCalendarSyncConfig.is_enabled_for_course(self.user, self.course_key)
 
         # Default value for enabled is False
         UserCalendarSyncConfig.objects.create(user=self.user, course_key=self.course_key)
-        self.assertFalse(UserCalendarSyncConfig.is_enabled_for_course(self.user, self.course_key))
+        assert not UserCalendarSyncConfig.is_enabled_for_course(self.user, self.course_key)
 
         UserCalendarSyncConfig.objects.filter(user=self.user, course_key=self.course_key).update(enabled=True)
-        self.assertTrue(UserCalendarSyncConfig.is_enabled_for_course(self.user, self.course_key))
+        assert UserCalendarSyncConfig.is_enabled_for_course(self.user, self.course_key)

@@ -43,4 +43,4 @@ class TestCourseBookmarksTool(SharedModuleStoreTestCase):
     def test_bookmarks_tool_is_enabled(self, user_type, should_be_enabled):
         request = RequestFactory().request()
         request.user = self.create_user_for_course(self.course, user_type)
-        self.assertEqual(CourseBookmarksTool.is_enabled(request, self.course.id), should_be_enabled)
+        assert CourseBookmarksTool.is_enabled(request, self.course.id) == should_be_enabled

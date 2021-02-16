@@ -228,7 +228,7 @@ class TestCourseHomePage(CourseHomePageTestCase):  # lint-amnesty, pylint: disab
         with override_flag(COURSE_PRE_START_ACCESS_FLAG.name, True):
             url = course_home_url(future_course)
             response = self.client.get(url)
-            self.assertEqual(response.status_code, 200)
+            assert response.status_code == 200
 
 
 @ddt.ddt
@@ -458,11 +458,7 @@ class TestCourseHomePageAccess(CourseHomePageTestCase):
         # ensure that the user who has indefinite access
         self.client.login(username=user.username, password=self.TEST_PASSWORD)
         response = self.client.get(url)
-        self.assertEqual(
-            response.status_code,
-            200,
-            "Should not expire access for user",
-        )
+        assert response.status_code == 200, 'Should not expire access for user'
 
     @mock.patch.dict(settings.FEATURES, {'DISABLE_START_DATES': False})
     @ddt.data(
@@ -492,11 +488,7 @@ class TestCourseHomePageAccess(CourseHomePageTestCase):
         # ensure that the user has indefinite access
         self.client.login(username=user.username, password=self.TEST_PASSWORD)
         response = self.client.get(url)
-        self.assertEqual(
-            response.status_code,
-            200,
-            "Should not expire access for user",
-        )
+        assert response.status_code == 200, 'Should not expire access for user'
 
     @ddt.data(
         FORUM_ROLE_COMMUNITY_TA,
@@ -518,11 +510,7 @@ class TestCourseHomePageAccess(CourseHomePageTestCase):
         # ensure the user has indefinite access
         self.client.login(username=user.username, password=self.TEST_PASSWORD)
         response = self.client.get(url)
-        self.assertEqual(
-            response.status_code,
-            200,
-            "Should not expire access for user"
-        )
+        assert response.status_code == 200, 'Should not expire access for user'
 
     @mock.patch.dict(settings.FEATURES, {'DISABLE_START_DATES': False})
     @ddt.data(
@@ -548,11 +536,7 @@ class TestCourseHomePageAccess(CourseHomePageTestCase):
         # ensure that the user who has indefinite access
         self.client.login(username=user.username, password=self.TEST_PASSWORD)
         response = self.client.get(url)
-        self.assertEqual(
-            response.status_code,
-            200,
-            "Should not expire access for user",
-        )
+        assert response.status_code == 200, 'Should not expire access for user'
 
     @mock.patch.dict(settings.FEATURES, {'DISABLE_START_DATES': False})
     def test_expired_course(self):
@@ -620,7 +604,7 @@ class TestCourseHomePageAccess(CourseHomePageTestCase):
         audit_only_course = CourseFactory.create()
         self.create_user_for_course(audit_only_course, CourseUserType.ENROLLED)
         response = self.client.get(course_home_url(audit_only_course))
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
         self.assertContains(response, TEST_COURSE_TOOLS)
         self.assertNotContains(response, TEST_BANNER_CLASS)
 
@@ -650,7 +634,7 @@ class TestCourseHomePageAccess(CourseHomePageTestCase):
 
         response = self.client.get(url)
 
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
 
     @mock.patch.dict(settings.FEATURES, {'DISABLE_START_DATES': False})
     @mock.patch("common.djangoapps.util.date_utils.strftime_localized")
@@ -683,7 +667,7 @@ class TestCourseHomePageAccess(CourseHomePageTestCase):
 
         url = course_home_url_from_string('not/a/course')
         response = self.client.get(url)
-        self.assertEqual(response.status_code, 404)
+        assert response.status_code == 404
 
     @override_waffle_flag(COURSE_PRE_START_ACCESS_FLAG, active=True)
     def test_masters_course_message(self):
@@ -935,7 +919,7 @@ class CourseHomeFragmentViewTests(ModuleStoreTestCase):
         self.assert_upgrade_message_not_displayed()
 
     def test_no_upgrade_message_if_not_enrolled(self):
-        self.assertEqual(len(CourseEnrollment.enrollments_for_user(self.user)), 0)
+        assert len(CourseEnrollment.enrollments_for_user(self.user)) == 0
         self.assert_upgrade_message_not_displayed()
 
     def test_no_upgrade_message_if_verified_track(self):

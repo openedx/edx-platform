@@ -39,10 +39,10 @@ class TestAccess(CacheIsolationTestCase):
 
     def assertDateInMessage(self, date, message):  # lint-amnesty, pylint: disable=missing-function-docstring
         # First, check that the formatted version is in there
-        self.assertIn(strftime_localized(date, 'SHORT_DATE'), message)
+        assert strftime_localized(date, 'SHORT_DATE') in message
 
         # But also that the machine-readable version is in there
-        self.assertIn('data-datetime="%s"' % date.isoformat(), message)
+        assert 'data-datetime="%s"' % date.isoformat() in message
 
     def test_get_access_expiration_data(self):
         enrollment = CourseEnrollmentFactory()
@@ -62,15 +62,16 @@ class TestAccess(CacheIsolationTestCase):
         )
 
         expiration_date = get_user_course_expiration_date(user, overview)
-        self.assertIsNotNone(expiration_date)
+        assert expiration_date is not None
 
         data = get_access_expiration_data(user, overview)
-        self.assertEqual(data, {
-            'expiration_date': expiration_date,
-            'masquerading_expired_course': False,
-            'upgrade_deadline': upgrade_deadline,
-            'upgrade_url': '/dashboard',
-        })
+        assert data == \
+               {
+                   'expiration_date': expiration_date,
+                   'masquerading_expired_course': False,
+                   'upgrade_deadline': upgrade_deadline,
+                   'upgrade_url': '/dashboard'
+               }
 
     @ddt.data(
         *itertools.product(
@@ -118,12 +119,12 @@ class TestAccess(CacheIsolationTestCase):
         )
 
         duration_limit_upgrade_deadline = get_user_course_expiration_date(enrollment.user, enrollment.course)
-        self.assertIsNotNone(duration_limit_upgrade_deadline)
+        assert duration_limit_upgrade_deadline is not None
 
         message = generate_course_expired_message(enrollment.user, enrollment.course)
 
         self.assertDateInMessage(duration_limit_upgrade_deadline, message)
-        self.assertIn('data-timezone="Asia/Tokyo"', message)
+        assert 'data-timezone="Asia/Tokyo"' in message
 
         soft_upgradeable = schedule_upgrade_deadline is not None and now < schedule_upgrade_deadline
         upgradeable = course_upgrade_deadline is None or now < course_upgrade_deadline
@@ -134,7 +135,7 @@ class TestAccess(CacheIsolationTestCase):
         elif upgradeable and has_upgrade_deadline:
             self.assertDateInMessage(course_upgrade_deadline, message)
         else:
-            self.assertNotIn("Upgrade by", message)
+            assert 'Upgrade by' not in message
 
     def test_schedule_start_date_in_past(self):
         """
@@ -164,5 +165,5 @@ class TestAccess(CacheIsolationTestCase):
         expected_course_expiration_date = content_availability_date + access_duration
 
         duration_limit_upgrade_deadline = get_user_course_expiration_date(enrollment.user, enrollment.course)
-        self.assertIsNotNone(duration_limit_upgrade_deadline)
-        self.assertEqual(duration_limit_upgrade_deadline, expected_course_expiration_date)
+        assert duration_limit_upgrade_deadline is not None
+        assert duration_limit_upgrade_deadline == expected_course_expiration_date
