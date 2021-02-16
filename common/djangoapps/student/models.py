@@ -552,6 +552,17 @@ class UserProfile(models.Model):
         choices=LEVEL_OF_EDUCATION_CHOICES
     )
     mailing_address = models.TextField(blank=True, null=True)
+    BLOOD_GROUP_CHOICES = (
+        (u'ap', ugettext_noop(u'A+')),
+        (u'an', ugettext_noop(u'A-')),
+        (u'bp', ugettext_noop(u'B+')),
+        (u'bn', ugettext_noop(u'B-')),
+        (u'abp', ugettext_noop(u'AB+')),
+        (u'abn', ugettext_noop(u'AB-')),
+        (u'op', ugettext_noop(u'O+')),
+        (u'on', ugettext_noop(u'O-')),
+    )
+    blood_group = models.TextField(max_length=3, blank=True, null=True, choices=BLOOD_GROUP_CHOICES)
     city = models.TextField(blank=True, null=True)
     country = CountryField(blank=True, null=True)
     COUNTRY_WITH_STATES = u'US'

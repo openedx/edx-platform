@@ -316,6 +316,7 @@ class RegistrationFormFactory(object):
         "terms_of_service",
         "profession",
         "specialty",
+        "blood_group"
     ]
 
     def _is_field_visible(self, field_name):
@@ -1033,6 +1034,29 @@ class RegistrationFormFactory(object):
             error_messages={
                 "required": error_msg
             },
+        )
+
+    def _add_blood_group_field(self, form_desc, required=True):
+        """Add a gender field to a form description.
+        Arguments:
+            form_desc: A form description
+        Keyword Arguments:
+            required (bool): Whether this field is required; defaults to True
+        """
+        # Translators: This label appears above a dropdown menu on the registration
+        # form used to select the user's gender.
+        blood_group_label = _(u"Blood Group")
+
+        # The labels are marked for translation in UserProfile model definition.
+        # pylint: disable=translation-of-non-string
+        options = [(name, _(label)) for name, label in UserProfile.BLOOD_GROUP_CHOICES]
+        form_desc.add_field(
+            "blood_group",
+            label=blood_group_label,
+            field_type="select",
+            options=options,
+            include_default_option=True,
+            required=required
         )
 
     def _apply_third_party_auth_overrides(self, request, form_desc):
