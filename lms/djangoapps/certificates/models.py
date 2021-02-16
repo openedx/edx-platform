@@ -1259,3 +1259,27 @@ def create_course_group_badge(sender, user, course_key, status, **kwargs):  # py
     Standard signal hook to create badges when a user has completed a prespecified set of courses.
     """
     course_group_check(user, course_key)
+
+
+class AllowListGenerationConfiguration(ConfigurationModel):
+    """
+    Manages configuration for a run of the cert_allowlist_generation management command.
+
+    .. no_pii:
+    """
+
+    class Meta(object):
+        app_label = 'certificates'
+        verbose_name = 'cert_allowlist_generation argument'
+
+    arguments = models.TextField(
+        blank=True,
+        help_text=(
+            "Arguments to be passted to cert_allowlist_generation management command. " +
+            "Specify like `-u edx verified -c course-v1:edX+DemoX+Demo_Course`"
+        ),
+        default='',
+    )
+
+    def __str__(self):
+        return str(self.arguments)

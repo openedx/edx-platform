@@ -13,6 +13,7 @@ from django.utils.safestring import mark_safe
 from organizations.api import get_organizations
 
 from lms.djangoapps.certificates.models import (
+    AllowListGenerationConfiguration,
     CertificateGenerationConfiguration,
     CertificateGenerationCourseSetting,
     CertificateHtmlViewConfiguration,
@@ -89,6 +90,10 @@ class CertificateGenerationCourseSettingAdmin(admin.ModelAdmin):
     search_fields = ('course_key',)
     show_full_result_count = False
 
+
+@admin.register(AllowListGenerationConfiguration)
+class AllowListGenerationConfigurationAdmin(ConfigurationModelAdmin):
+    pass
 
 admin.site.register(CertificateGenerationConfiguration)
 admin.site.register(CertificateGenerationCourseSetting, CertificateGenerationCourseSettingAdmin)
