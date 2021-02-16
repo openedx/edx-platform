@@ -30,6 +30,7 @@ from lms.djangoapps.courseware.courses import get_course_date_blocks, get_course
 from lms.djangoapps.courseware.date_summary import TodaysDate
 from lms.djangoapps.courseware.masquerade import setup_masquerade
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
+from openedx.core.lib.api.authentication import BearerAuthenticationAllowInactiveUser
 from openedx.features.course_duration_limits.access import get_access_expiration_data
 from openedx.features.course_experience import COURSE_ENABLE_UNENROLLED_ACCESS_FLAG
 from openedx.features.course_experience.course_tools import CourseToolsPluginManager
@@ -137,6 +138,12 @@ class OutlineTabView(RetrieveAPIView):
         * 404 if the course is not available or cannot be seen.
 
     """
+
+    authentication_classes = (
+        JwtAuthentication,
+        BearerAuthenticationAllowInactiveUser,
+        SessionAuthenticationAllowInactiveUser,
+    )
 
     serializer_class = OutlineTabSerializer
 
