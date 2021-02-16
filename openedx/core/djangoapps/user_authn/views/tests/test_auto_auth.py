@@ -12,6 +12,8 @@ from django.test.client import Client
 from mock import Mock, patch
 from opaque_keys.edx.locator import CourseLocator
 
+from common.djangoapps.student.models import CourseAccessRole, CourseEnrollment, UserProfile, anonymous_id_for_user
+from common.djangoapps.util.testing import UrlResetMixin
 from openedx.core.djangoapps.django_comment_common.models import (
     FORUM_ROLE_ADMINISTRATOR,
     FORUM_ROLE_MODERATOR,
@@ -19,8 +21,7 @@ from openedx.core.djangoapps.django_comment_common.models import (
     Role
 )
 from openedx.core.djangoapps.django_comment_common.utils import seed_permissions_roles
-from common.djangoapps.student.models import CourseAccessRole, CourseEnrollment, UserProfile, anonymous_id_for_user
-from common.djangoapps.util.testing import UrlResetMixin
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 
 
 class AutoAuthTestCase(UrlResetMixin, TestCase):
@@ -31,7 +32,7 @@ class AutoAuthTestCase(UrlResetMixin, TestCase):
 
 
 @ddt.ddt
-class AutoAuthEnabledTestCase(AutoAuthTestCase):
+class AutoAuthEnabledTestCase(AutoAuthTestCase, ModuleStoreTestCase):
     """
     Tests for the Auto auth view that we have for load testing.
     """
@@ -48,6 +49,8 @@ class AutoAuthEnabledTestCase(AutoAuthTestCase):
         # value affects the contents of urls.py,
         # so we need to call super.setUp() which reloads urls.py (because
         # of the UrlResetMixin)
+
+        self.CREATE_USER = False  # no need to add a user from modulestore setup
         super(AutoAuthEnabledTestCase, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.url = '/auto_auth'
         self.client = Client()
@@ -281,12 +284,14 @@ class AutoAuthEnabledTestCase(AutoAuthTestCase):
         """ Passing role names via the course_access_roles query string parameter should create CourseAccessRole
         objects associated with the user.
         """
+
         expected_roles = ['finance_admin', 'sales_admin']
         course_key = CourseLocator.from_string(self.COURSE_ID_SPLIT)
         params = {
             'course_id': str(course_key),
             'course_access_roles': ','.join(expected_roles)
         }
+
         response = self._auto_auth(params)
         user_info = json.loads(response.content.decode('utf-8'))
 
