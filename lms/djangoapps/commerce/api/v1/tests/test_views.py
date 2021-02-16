@@ -13,11 +13,13 @@ from django.contrib.auth.models import Permission
 from django.test import TestCase
 from django.test.utils import override_settings
 from django.urls import reverse, reverse_lazy
+from opaque_keys.edx.keys import CourseKey
 from rest_framework.utils.encoders import JSONEncoder
 
 from common.djangoapps.course_modes.models import CourseMode
+from common.djangoapps.course_modes.tests.factories import CourseModeFactory
 from lms.djangoapps.verify_student.models import VerificationDeadline
-from common.djangoapps.student.tests.factories import UserFactory
+from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
@@ -189,6 +191,29 @@ class CourseRetrieveUpdateViewTests(CourseApiViewTestMixin, ModuleStoreTestCase)
 
         # Verify the verification deadline is updated
         self.assertEqual(VerificationDeadline.deadline_for_course(self.course.id), verification_deadline)
+
+    def test_update_min_price(self):
+        """
+        Verify CourseMode objects can have min_price updated to a min_price type float via PUT on the API.
+        """
+        new_min_price = 50.00
+        course_mode_updated = CourseMode(
+            course_id=self.course_mode.course_id,
+            mode_slug=u'verified',
+            min_price=new_min_price,
+        )
+        updated_data = self._serialize_course(self.course, [course_mode_updated])
+
+        response = self.client.put(
+            self.path,
+            data=json.dumps(updated_data),
+            content_type=JSON_CONTENT_TYPE
+        )
+        self.assertEqual(response.status_code, 200)
+
+        response_updated = json.loads(response.content.decode('utf-8'))['modes']
+        self.assertEqual(response_updated[0]['price'], int(new_min_price))
+        self.assertIsInstance(response_updated[0]['price'], int)
 
     def test_update_invalid_dates(self):
         """

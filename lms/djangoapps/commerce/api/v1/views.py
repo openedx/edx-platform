@@ -12,6 +12,7 @@ from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthenticat
 from rest_framework.authentication import SessionAuthentication
 from rest_framework.generics import ListAPIView, RetrieveUpdateAPIView
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
 from rest_framework.views import APIView
 from openedx.core.lib.api.authentication import BearerAuthentication
 
@@ -23,7 +24,7 @@ from common.djangoapps.util.json_request import JsonResponse
 from ...utils import is_account_activation_requirement_disabled
 from .models import Course
 from .permissions import ApiKeyOrModelPermission, IsAuthenticatedOrActivationOverridden
-from .serializers import CourseSerializer
+from .serializers import CourseSerializer, CourseModeSerializer
 
 log = logging.getLogger(__name__)
 
@@ -67,6 +68,19 @@ class CourseRetrieveUpdateView(PutAsCreateMixin, RetrieveUpdateAPIView):
         # a CourseKey to a string, which is not desired.
         pass
 
+    def put(self, request, *args, **kwargs):
+        """
+        Performs a partial update of a Course/CourseMode instance.
+        """
+        course_mode = CourseMode.objects.filter(course_id=kwargs['course_id']).first()
+
+        if not isinstance(course_mode.min_price, int):
+            course_mode.min_price = int(course_mode.min_price)
+            serializer = CourseModeSerializer(course_mode, data=request.data, partial=True)
+            if serializer.is_valid(raise_exception=True):
+                serializer.save()
+                return Response(serializer.data)
+        return Response(request.data)
 
 class OrderView(APIView):
     """ Retrieve order details. """
