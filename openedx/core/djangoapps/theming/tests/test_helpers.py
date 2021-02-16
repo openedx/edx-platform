@@ -62,7 +62,7 @@ class TestHelpers(TestCase):
             override_value = 'testing'
             mock_get_value.return_value = {override_key: override_value}
             jwt_auth = configuration_helpers.get_value('JWT_AUTH')
-            self.assertEqual(jwt_auth[override_key], override_value)
+            assert jwt_auth[override_key] == override_value
 
     def test_is_comprehensive_theming_enabled(self):
         """
@@ -83,14 +83,14 @@ class TestHelpers(TestCase):
             "openedx.core.djangoapps.theming.helpers.current_request_has_associated_site_theme",
             Mock(return_value=True),
         ):
-            self.assertTrue(theming_helpers.is_comprehensive_theming_enabled())
+            assert theming_helpers.is_comprehensive_theming_enabled()
 
         # Theming is enabled, there is not a SiteTheme record
         with patch(
             "openedx.core.djangoapps.theming.helpers.current_request_has_associated_site_theme",
             Mock(return_value=False),
         ):
-            self.assertTrue(theming_helpers.is_comprehensive_theming_enabled())
+            assert theming_helpers.is_comprehensive_theming_enabled()
 
         with override_settings(ENABLE_COMPREHENSIVE_THEMING=False):
             # Theming is disabled, there is a SiteTheme record
@@ -98,14 +98,14 @@ class TestHelpers(TestCase):
                 "openedx.core.djangoapps.theming.helpers.current_request_has_associated_site_theme",
                 Mock(return_value=True),
             ):
-                self.assertFalse(theming_helpers.is_comprehensive_theming_enabled())
+                assert not theming_helpers.is_comprehensive_theming_enabled()
 
             # Theming is disabled, there is no SiteTheme record
             with patch(
                 "openedx.core.djangoapps.theming.helpers.current_request_has_associated_site_theme",
                 Mock(return_value=False),
             ):
-                self.assertFalse(theming_helpers.is_comprehensive_theming_enabled())
+                assert not theming_helpers.is_comprehensive_theming_enabled()
 
 
 @skip_unless_lms
@@ -118,7 +118,7 @@ class TestHelpersLMS(TestCase):
         Tests template paths are returned from enabled theme.
         """
         template_path = get_template_path_with_theme('header.html')
-        self.assertEqual(template_path, 'red-theme/lms/templates/header.html')
+        assert template_path == 'red-theme/lms/templates/header.html'
 
     @with_comprehensive_theme('red-theme')
     def test_get_template_path_with_theme_for_missing_template(self):
@@ -126,14 +126,14 @@ class TestHelpersLMS(TestCase):
         Tests default template paths are returned if template is not found in the theme.
         """
         template_path = get_template_path_with_theme('course.html')
-        self.assertEqual(template_path, 'course.html')
+        assert template_path == 'course.html'
 
     def test_get_template_path_with_theme_disabled(self):
         """
         Tests default template paths are returned when theme is non theme is enabled.
         """
         template_path = get_template_path_with_theme('header.html')
-        self.assertEqual(template_path, 'header.html')
+        assert template_path == 'header.html'
 
     @with_comprehensive_theme('red-theme')
     def test_strip_site_theme_templates_path_theme_enabled(self):
@@ -141,14 +141,14 @@ class TestHelpersLMS(TestCase):
         Tests site theme templates path is stripped from the given template path.
         """
         template_path = strip_site_theme_templates_path('/red-theme/lms/templates/header.html')
-        self.assertEqual(template_path, 'header.html')
+        assert template_path == 'header.html'
 
     def test_strip_site_theme_templates_path_theme_disabled(self):
         """
         Tests site theme templates path returned unchanged if no theme is applied.
         """
         template_path = strip_site_theme_templates_path('/red-theme/lms/templates/header.html')
-        self.assertEqual(template_path, '/red-theme/lms/templates/header.html')
+        assert template_path == '/red-theme/lms/templates/header.html'
 
 
 @skip_unless_cms
@@ -165,14 +165,14 @@ class TestHelpersCMS(TestCase):
         Tests default template paths are returned if template is not found in the theme.
         """
         template_path = get_template_path_with_theme('certificates.html')
-        self.assertEqual(template_path, 'certificates.html')
+        assert template_path == 'certificates.html'
 
     def test_get_template_path_with_theme_disabled(self):
         """
         Tests default template paths are returned when theme is non theme is enabled.
         """
         template_path = get_template_path_with_theme('login.html')
-        self.assertEqual(template_path, 'login.html')
+        assert template_path == 'login.html'
 
     @with_comprehensive_theme('red-theme')
     def test_strip_site_theme_templates_path_theme_enabled(self):
@@ -180,11 +180,11 @@ class TestHelpersCMS(TestCase):
         Tests site theme templates path is stripped from the given template path.
         """
         template_path = strip_site_theme_templates_path('/red-theme/cms/templates/login.html')
-        self.assertEqual(template_path, 'login.html')
+        assert template_path == 'login.html'
 
     def test_strip_site_theme_templates_path_theme_disabled(self):
         """
         Tests site theme templates path returned unchanged if no theme is applied.
         """
         template_path = strip_site_theme_templates_path('/red-theme/cms/templates/login.html')
-        self.assertEqual(template_path, '/red-theme/cms/templates/login.html')
+        assert template_path == '/red-theme/cms/templates/login.html'

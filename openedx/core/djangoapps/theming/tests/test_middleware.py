@@ -58,9 +58,9 @@ class TestCurrentSiteThemeMiddleware(TestCase):
         when there is no theme associated with the current site.
         """
         request = self.create_mock_get_request()
-        self.assertEqual(self.site_theme_middleware.process_request(request), None)
-        self.assertIsNotNone(request.site_theme)  # lint-amnesty, pylint: disable=no-member
-        self.assertEqual(request.site_theme.theme_dir_name, TEST_THEME_NAME)  # lint-amnesty, pylint: disable=no-member
+        assert self.site_theme_middleware.process_request(request) is None
+        assert request.site_theme is not None  # lint-amnesty, pylint: disable=no-member
+        assert request.site_theme.theme_dir_name == TEST_THEME_NAME  # lint-amnesty, pylint: disable=no-member
 
     @override_settings(DEFAULT_SITE_THEME=None)
     def test_default_site_theme_2(self):
@@ -69,8 +69,8 @@ class TestCurrentSiteThemeMiddleware(TestCase):
         the current site and DEFAULT_SITE_THEME is also None.
         """
         request = self.create_mock_get_request()
-        self.assertEqual(self.site_theme_middleware.process_request(request), None)
-        self.assertIsNone(request.site_theme)  # lint-amnesty, pylint: disable=no-member
+        assert self.site_theme_middleware.process_request(request) is None
+        assert request.site_theme is None  # lint-amnesty, pylint: disable=no-member
 
     def test_preview_theme(self):
         """
@@ -83,8 +83,8 @@ class TestCurrentSiteThemeMiddleware(TestCase):
 
         # Next request a page and verify that the theme is returned
         get_request = self.create_mock_get_request()
-        self.assertEqual(self.site_theme_middleware.process_request(get_request), None)
-        self.assertEqual(get_request.site_theme.theme_dir_name, TEST_THEME_NAME)  # lint-amnesty, pylint: disable=no-member
+        assert self.site_theme_middleware.process_request(get_request) is None
+        assert get_request.site_theme.theme_dir_name == TEST_THEME_NAME  # lint-amnesty, pylint: disable=no-member
 
         # Request to reset the theme
         post_request = RequestFactory().post('/test')
@@ -93,10 +93,10 @@ class TestCurrentSiteThemeMiddleware(TestCase):
 
         # Verify that no theme is returned now
         get_request = self.create_mock_get_request()
-        self.assertEqual(self.site_theme_middleware.process_request(get_request), None)
-        self.assertIsNone(get_request.site_theme)  # lint-amnesty, pylint: disable=no-member
+        assert self.site_theme_middleware.process_request(get_request) is None
+        assert get_request.site_theme is None  # lint-amnesty, pylint: disable=no-member
 
         # Verify that we can still force the theme with a querystring arg
         get_request = self.create_mock_get_request(qs_theme=TEST_THEME_NAME)
-        self.assertEqual(self.site_theme_middleware.process_request(get_request), None)
-        self.assertEqual(get_request.site_theme.theme_dir_name, TEST_THEME_NAME)  # lint-amnesty, pylint: disable=no-member
+        assert self.site_theme_middleware.process_request(get_request) is None
+        assert get_request.site_theme.theme_dir_name == TEST_THEME_NAME  # lint-amnesty, pylint: disable=no-member

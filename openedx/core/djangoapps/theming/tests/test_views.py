@@ -59,13 +59,13 @@ class TestThemingViews(TestCase):
         # Logged in non-global staff get a 404
         self.client.login(username=self.user.username, password=TEST_PASSWORD)
         response = self.client.get(THEMING_ADMIN_URL)
-        self.assertEqual(response.status_code, 404)
+        assert response.status_code == 404
 
         # Global staff can access the page
         global_staff = GlobalStaffFactory()
         self.client.login(username=global_staff.username, password=TEST_PASSWORD)
         response = self.client.get(THEMING_ADMIN_URL)
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
 
     def test_preview_theme(self):
         """
@@ -86,7 +86,7 @@ class TestThemingViews(TestCase):
 
         # Next request a page and verify that the correct theme has been chosen
         response = self.client.get(THEMING_ADMIN_URL)
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
         self.assertContains(
             response,
             u'<option value="{theme_name}" selected=selected>'.format(theme_name=TEST_THEME_NAME)
@@ -103,7 +103,7 @@ class TestThemingViews(TestCase):
 
         # Finally verify that the test theme is no longer selected
         response = self.client.get(THEMING_ADMIN_URL)
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
         self.assertContains(
             response,
             u'<option value="{theme_name}">'.format(theme_name=TEST_THEME_NAME)

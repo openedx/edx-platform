@@ -60,7 +60,7 @@ class TestUpgradeReminder(ScheduleSendEmailTestMixin, CacheIsolationTestCase):  
             bin_num=self._calculate_bin_for_user(schedule.enrollment.user),
         ))
 
-        self.assertEqual(mock_ace.send.called, not is_verified)
+        assert mock_ace.send.called == (not is_verified)
 
     def test_filter_out_verified_schedules(self):
         current_day, offset, target_day, upgrade_deadline = self._get_dates()  # lint-amnesty, pylint: disable=unused-variable
@@ -85,7 +85,7 @@ class TestUpgradeReminder(ScheduleSendEmailTestMixin, CacheIsolationTestCase):  
             ))
 
             messages = [Message.from_string(m) for m in sent_messages]
-            self.assertEqual(len(messages), 1)
+            assert len(messages) == 1
             message = messages[0]
             six.assertCountEqual(
                 self,
@@ -103,7 +103,7 @@ class TestUpgradeReminder(ScheduleSendEmailTestMixin, CacheIsolationTestCase):  
             site_id=self.site_config.site.id, target_day_str=serialize(target_day), day_offset=offset,
             bin_num=self._calculate_bin_for_user(schedule.enrollment.user),
         ))
-        self.assertEqual(mock_ace.send.called, False)
+        assert mock_ace.send.called is False
 
     @ddt.data(
         ExperienceTest(experience=ScheduleExperience.EXPERIENCES.default, offset=expected_offsets[0], email_sent=True),

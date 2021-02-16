@@ -17,10 +17,10 @@ class SystemWideRoleTests(TestCase):
         self.role = SystemWideRole.objects.create(name='TestRole')
 
     def test_str(self):
-        self.assertEqual(str(self.role), '<SystemWideRole TestRole>')
+        assert str(self.role) == '<SystemWideRole TestRole>'
 
     def test_repr(self):
-        self.assertEqual(repr(self.role), '<SystemWideRole TestRole>')
+        assert repr(self.role) == '<SystemWideRole TestRole>'
 
 
 class SystemWideRoleAssignmentTests(TestCase):
@@ -33,18 +33,10 @@ class SystemWideRoleAssignmentTests(TestCase):
 
     def test_str(self):
         role_assignment = SystemWideRoleAssignment.objects.create(role=self.role, user=self.user)
-        self.assertEqual(
-            str(role_assignment),
-            '<SystemWideRoleAssignment for User {user} assigned to role {role}>'.format(
-                user=self.user.id, role=self.role.name
-            )
-        )
+        assert str(role_assignment) == \
+               f'<SystemWideRoleAssignment for User {self.user.id} assigned to role {self.role.name}>'
 
     def test_repr(self):
         role_assignment = SystemWideRoleAssignment.objects.create(role=self.role, user=self.user)
-        self.assertEqual(
-            repr(role_assignment),
-            '<SystemWideRoleAssignment for User {user} assigned to role {role}>'.format(
-                user=self.user.id, role=self.role.name
-            )
-        )
+        assert repr(role_assignment) == \
+               f'<SystemWideRoleAssignment for User {self.user.id} assigned to role {self.role.name}>'

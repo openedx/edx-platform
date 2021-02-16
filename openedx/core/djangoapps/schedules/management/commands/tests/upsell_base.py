@@ -49,7 +49,7 @@ class ScheduleUpsellTestMixin(object):  # lint-amnesty, pylint: disable=missing-
                 site_id=self.site_config.site.id, target_day_str=serialize(target_day), day_offset=offset,
                 bin_num=self._calculate_bin_for_user(schedule.enrollment.user),
             ))
-        self.assertEqual(len(sent_messages), 1)
+        assert len(sent_messages) == 1
         return Message.from_string(sent_messages[0])
 
     def _contains_upsell(self, message):
@@ -83,7 +83,7 @@ class ScheduleUpsellTestMixin(object):  # lint-amnesty, pylint: disable=missing-
 
         found_upsell = self._contains_upsell(message)
         expect_upsell = enable_config and testcase.expect_upsell
-        self.assertEqual(found_upsell, expect_upsell)
+        assert found_upsell == expect_upsell
 
     @ddt.data('es', 'es-es', 'es-419')
     def test_upsell_translated(self, course_language):
@@ -96,7 +96,4 @@ class ScheduleUpsellTestMixin(object):  # lint-amnesty, pylint: disable=missing-
             mock_course_language.return_value = course_language
             message = self._send_message_task(schedule, offset, target_day)
 
-        self.assertEqual(
-            message.context['user_schedule_upgrade_deadline_time'],
-            u'8 de agosto de 2017',
-        )
+        assert message.context['user_schedule_upgrade_deadline_time'] == u'8 de agosto de 2017'
