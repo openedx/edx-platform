@@ -20,6 +20,7 @@ from django.test.client import Client
 from django.test.utils import override_settings
 from django.urls import NoReverseMatch, reverse
 from edx_toggles.toggles.testutils import override_waffle_flag, override_waffle_switch
+from freezegun import freeze_time
 from mock import Mock, patch
 from common.djangoapps.student.tests.factories import RegistrationFactory, UserFactory, UserProfileFactory
 
@@ -390,15 +391,40 @@ class LoginTest(SiteMixin, CacheIsolationTestCase):
         response, _audit_log = self._login_response(self.user_email, self.password)
         self._assert_response(response, success=True)
 
-    @override_settings(RATELIMIT_ENABLE=False)
-    def test_excessive_login_attempts(self):
-        # try logging in 30 times, the default limit in the number of failed
+    @patch('openedx.core.djangoapps.util.ratelimit.real_ip')
+    def test_excessive_login_attempts_by_email(self, real_ip_mock):
+        # try logging in 6 times, the defalutlimit for the number of failed
         # login attempts in one 5 minute period before the rate gets limited
-        for i in range(30):
-            password = u'test_password{0}'.format(i)
-            self._login_response(self.user_email, password)
-        # check to see if this response indicates that this was ratelimited
-        response, _audit_log = self._login_response(self.user_email, 'wrong_password')
+        # for a specific e-mail address.
+
+        # We freeze time to deal with the fact that rate limit time boundaries
+        # are not predictable and we don't want the test to be flaky.
+        with freeze_time():
+            for i in range(6):
+                password = u'test_password{0}'.format(i)
+                # Provide unique IPs so we don't get ip rate limited.
+                real_ip_mock.return_value = f'192.168.1.{i}'
+                self._login_response(self.user_email, password)
+            # check to see if this response indicates that this was ratelimited
+            response, _audit_log = self._login_response(self.user_email, 'wrong_password')
+        self._assert_response(response, success=False, value='Too many failed login attempts')
+
+    def test_excessive_login_attempts_by_ip(self):
+        # try logging in 5 times, the default limit for the number of failed
+        # login attempts in one 5 minute period before the rate gets limited
+        # from a specific ip address.
+
+        # We freeze time to deal with the fact that rate limit time boundaries
+        # are not predictable and we don't want the test to be flaky.
+        with freeze_time():
+            for i in range(5):
+                # provide different e-mail addresses so we don't get rate-limited
+                # by e-mail.
+                email = f'test_email{i}@example.com'
+                password = f'test_password{i}'
+                self._login_response(email, password)
+            # check to see if this response indicates that this was ratelimited
+            response, _audit_log = self._login_response(self.user_email, 'wrong_password')
         self._assert_response(response, success=False, value='Too many failed login attempts')
 
     @patch.dict("django.conf.settings.FEATURES", {"DISABLE_SET_JWT_COOKIES_FOR_TESTS": False})

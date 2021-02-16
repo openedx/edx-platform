@@ -25,7 +25,6 @@ from django.views.decorators.debug import sensitive_post_parameters
 from django.views.decorators.http import require_http_methods
 from edx_django_utils.monitoring import set_custom_attribute
 from ratelimit.decorators import ratelimit
-from ratelimitbackend.exceptions import RateLimitException
 from rest_framework.views import APIView
 
 from common.djangoapps.edxmako.shortcuts import render_to_response
@@ -180,6 +179,9 @@ def _authenticate_first_party(request, unauthenticated_user, third_party_auth_re
     """
     Use Django authentication on the given request, using rate limiting if configured
     """
+    should_be_rate_limited = getattr(request, 'limited', False)
+    if should_be_rate_limited:
+        raise AuthFailedError(_('Too many failed login attempts. Try again later.'))  # lint-amnesty, pylint: disable=raise-missing-from
 
     # If the user doesn't exist, we want to set the username to an invalid username so that authentication is guaranteed
     # to fail and we can take advantage of the ratelimited backend
@@ -191,17 +193,12 @@ def _authenticate_first_party(request, unauthenticated_user, third_party_auth_re
     if not third_party_auth_requested:
         _check_user_auth_flow(request.site, unauthenticated_user)
 
-    try:
-        password = normalize_password(request.POST['password'])
-        return authenticate(
-            username=username,
-            password=password,
-            request=request
-        )
-
-    # This occurs when there are too many attempts from the same IP address
-    except RateLimitException:
-        raise AuthFailedError(_('Too many failed login attempts. Try again later.'))  # lint-amnesty, pylint: disable=raise-missing-from
+    password = normalize_password(request.POST['password'])
+    return authenticate(
+        username=username,
+        password=password,
+        request=request
+    )
 
 
 def _handle_failed_authentication(user, authenticated_user):
@@ -390,10 +387,14 @@ def finish_auth(request):
 @ensure_csrf_cookie
 @require_http_methods(['POST'])
 @ratelimit(
+    key='openedx.core.djangoapps.util.ratelimit.request_post_email',
+    rate=settings.LOGISTRATION_PER_EMAIL_RATELIMIT_RATE,
+    method='POST',
+)  # lint-amnesty, pylint: disable=too-many-statements
+@ratelimit(
     key='openedx.core.djangoapps.util.ratelimit.real_ip',
     rate=settings.LOGISTRATION_RATELIMIT_RATE,
     method='POST',
-    block=True
 )  # lint-amnesty, pylint: disable=too-many-statements
 def login_user(request):
     """
