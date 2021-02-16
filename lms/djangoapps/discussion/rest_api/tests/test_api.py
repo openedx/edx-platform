@@ -38,7 +38,8 @@ from lms.djangoapps.discussion.rest_api.api import (
 from lms.djangoapps.discussion.rest_api.exceptions import (
     CommentNotFoundError,
     DiscussionDisabledError,
-    ThreadNotFoundError
+    ThreadNotFoundError,
+    DiscussionBlackOutException
 )
 from lms.djangoapps.discussion.rest_api.tests.utils import (
     CommentsServiceMockMixin,
@@ -88,6 +89,19 @@ def _discussion_disabled_course_for(user):
     return course_with_disabled_forums
 
 
+def _assign_role_to_user(user, course_id, role):
+    """
+    Unset the blackout period for course discussions.
+
+    Arguments:
+            user: User to assign role to
+            course_id: Course id of the course user will be assigned role in
+            role: Role assigned to user for course
+    """
+    role = Role.objects.create(name=role, course_id=course_id)
+    role.users.set([user])
+
+
 def _create_course_and_cohort_with_user_role(course_is_cohorted, user, role_name):
     """
     Creates a course with the value of `course_is_cohorted`, plus `always_cohort_inline_discussions`
@@ -101,9 +115,24 @@ def _create_course_and_cohort_with_user_role(course_is_cohorted, user, role_name
     )
     CourseEnrollmentFactory.create(user=user, course_id=cohort_course.id)
     cohort = CohortFactory.create(course_id=cohort_course.id, users=[user])
-    role = Role.objects.create(name=role_name, course_id=cohort_course.id)
-    role.users.set([user])
+    _assign_role_to_user(user=user, course_id=cohort_course.id, role=role_name)
+
     return [cohort_course, cohort]
+
+
+def _set_course_discussion_blackout(course, user_id):
+    """
+    Set the blackout period for course discussions.
+
+    Arguments:
+            course: Course for which blackout period is set
+            user_id: User id of user enrolled in the course
+    """
+    course.discussion_blackouts = [
+        datetime.now(UTC) - timedelta(days=3),
+        datetime.now(UTC) + timedelta(days=3)
+    ]
+    modulestore().update_item(course, user_id)
 
 
 @mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
@@ -766,8 +795,7 @@ class GetThreadListTest(ForumsEnableMixin, CommentsServiceMockMixin, UrlResetMix
         cohort_course = CourseFactory.create(cohort_config={"cohorted": course_is_cohorted})
         CourseEnrollmentFactory.create(user=self.user, course_id=cohort_course.id)
         CohortFactory.create(course_id=cohort_course.id, users=[self.user])
-        role = Role.objects.create(name=role_name, course_id=cohort_course.id)
-        role.users.set([self.user])
+        _assign_role_to_user(user=self.user, course_id=cohort_course.id, role=role_name)
         self.get_thread_list([], course=cohort_course)
         actual_has_group = "group_id" in httpretty.last_request().querystring  # lint-amnesty, pylint: disable=no-member
         expected_has_group = (course_is_cohorted and role_name == FORUM_ROLE_STUDENT)
@@ -1082,8 +1110,7 @@ class GetCommentListTest(ForumsEnableMixin, CommentsServiceMockMixin, SharedModu
         )
         CourseEnrollmentFactory.create(user=self.user, course_id=cohort_course.id)
         cohort = CohortFactory.create(course_id=cohort_course.id, users=[self.user])
-        role = Role.objects.create(name=role_name, course_id=cohort_course.id)
-        role.users.set([self.user])
+        _assign_role_to_user(user=self.user, course_id=cohort_course.id, role=role_name)
         thread = self.make_minimal_cs_thread({
             "course_id": six.text_type(cohort_course.id),
             "commentable_id": "test_topic",
@@ -1470,14 +1497,10 @@ class CreateThreadTest(
         'nonummy metus.'
     )
 
-    @classmethod
-    def setUpClass(cls):
-        super(CreateThreadTest, cls).setUpClass()
-        cls.course = CourseFactory.create()
-
     @mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
     def setUp(self):
         super(CreateThreadTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        self.course = CourseFactory.create()
         httpretty.reset()
         httpretty.enable()
         self.addCleanup(httpretty.reset)
@@ -1541,6 +1564,76 @@ class CreateThreadTest(
                 "body": "Test body",
                 "url": "",
                 "user_forums_roles": [FORUM_ROLE_STUDENT],
+                "user_course_roles": [],
+            }
+        )
+
+    def test_basic_in_blackout_period(self):
+        """
+        Test case when course is in blackout period and user does not have special privileges.
+        """
+        _set_course_discussion_blackout(course=self.course, user_id=self.user.id)
+
+        with self.assertRaises(DiscussionBlackOutException) as assertion:
+            create_thread(self.request, self.minimal_data)
+        self.assertEqual(assertion.exception.status_code, 403)
+        self.assertEqual(assertion.exception.detail, "Discussions are in blackout period.")
+
+    @mock.patch("eventtracking.tracker.emit")
+    def test_basic_in_blackout_period_with_user_access(self, mock_emit):
+        """
+        Test case when course is in blackout period and user has special privileges.
+        """
+        cs_thread = make_minimal_cs_thread({
+            "id": "test_id",
+            "username": self.user.username,
+            "read": True,
+        })
+        self.register_post_thread_response(cs_thread)
+
+        _set_course_discussion_blackout(course=self.course, user_id=self.user.id)
+
+        _assign_role_to_user(user=self.user, course_id=self.course.id, role=FORUM_ROLE_MODERATOR)
+
+        with self.assert_signal_sent(api, 'thread_created', sender=None, user=self.user, exclude_args=('post',)):
+            actual = create_thread(self.request, self.minimal_data)
+        expected = self.expected_thread_data({
+            "author_label": "Staff",
+            "id": "test_id",
+            "course_id": six.text_type(self.course.id),
+            "comment_list_url": "http://testserver/api/discussion/v1/comments/?thread_id=test_id",
+            "read": True,
+        })
+        self.assertEqual(actual, expected)
+        self.assertEqual(
+            httpretty.last_request().parsed_body,   # lint-amnesty, pylint: disable=no-member
+            {
+                "course_id": [six.text_type(self.course.id)],
+                "commentable_id": ["test_topic"],
+                "thread_type": ["discussion"],
+                "title": ["Test Title"],
+                "body": ["Test body"],
+                "user_id": [str(self.user.id)],
+            }
+        )
+        event_name, event_data = mock_emit.call_args[0]
+        self.assertEqual(event_name, "edx.forum.thread.created")
+        self.assertEqual(
+            event_data,
+            {
+                "commentable_id": "test_topic",
+                "group_id": None,
+                "thread_type": "discussion",
+                "title": "Test Title",
+                "title_truncated": False,
+                "anonymous": False,
+                "anonymous_to_peers": False,
+                "options": {"followed": False},
+                "id": "test_id",
+                "truncated": False,
+                "body": "Test body",
+                "url": "",
+                "user_forums_roles": [FORUM_ROLE_STUDENT, FORUM_ROLE_MODERATOR],
                 "user_course_roles": [],
             }
         )
@@ -1614,8 +1707,7 @@ class CreateThreadTest(
         CourseEnrollmentFactory.create(user=self.user, course_id=cohort_course.id)
         if course_is_cohorted:
             cohort = CohortFactory.create(course_id=cohort_course.id, users=[self.user])
-        role = Role.objects.create(name=role_name, course_id=cohort_course.id)
-        role.users.set([self.user])
+        _assign_role_to_user(user=self.user, course_id=cohort_course.id, role=role_name)
         self.register_post_thread_response({"username": self.user.username})
         data = self.minimal_data.copy()
         data["course_id"] = six.text_type(cohort_course.id)
@@ -1734,16 +1826,13 @@ class CreateCommentTest(
         MockSignalHandlerMixin
 ):
     """Tests for create_comment"""
-    @classmethod
-    def setUpClass(cls):
-        super(CreateCommentTest, cls).setUpClass()
-        cls.course = CourseFactory.create()
 
     @mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
     def setUp(self):
         super(CreateCommentTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         httpretty.reset()
         httpretty.enable()
+        self.course = CourseFactory.create()
         self.addCleanup(httpretty.reset)
         self.addCleanup(httpretty.disable)
         self.user = UserFactory.create()
@@ -1842,6 +1931,103 @@ class CreateCommentTest(
         self.assertEqual(actual_event_name, expected_event_name)
         self.assertEqual(actual_event_data, expected_event_data)
 
+    @ddt.data(None, "test_parent")
+    @mock.patch("eventtracking.tracker.emit")
+    def test_success_in_black_out_with_user_access(self, parent_id, mock_emit):
+        """
+        Test case when course is in blackout period and user has special privileges.
+        """
+        if parent_id:
+            self.register_get_comment_response({"id": parent_id, "thread_id": "test_thread"})
+        self.register_post_comment_response(
+            {
+                "id": "test_comment",
+                "username": self.user.username,
+                "created_at": "2015-05-27T00:00:00Z",
+                "updated_at": "2015-05-27T00:00:00Z",
+            },
+            thread_id="test_thread",
+            parent_id=parent_id
+        )
+        data = self.minimal_data.copy()
+        if parent_id:
+            data["parent_id"] = parent_id
+
+        _set_course_discussion_blackout(course=self.course, user_id=self.user.id)
+        _assign_role_to_user(user=self.user, course_id=self.course.id, role=FORUM_ROLE_MODERATOR)
+
+        with self.assert_signal_sent(api, 'comment_created', sender=None, user=self.user, exclude_args=('post',)):
+            actual = create_comment(self.request, data)
+        expected = {
+            "id": "test_comment",
+            "thread_id": "test_thread",
+            "parent_id": parent_id,
+            "author": self.user.username,
+            "author_label": "Staff",
+            "created_at": "2015-05-27T00:00:00Z",
+            "updated_at": "2015-05-27T00:00:00Z",
+            "raw_body": "Test body",
+            "rendered_body": "<p>Test body</p>",
+            "endorsed": False,
+            "endorsed_by": None,
+            "endorsed_by_label": None,
+            "endorsed_at": None,
+            "abuse_flagged": False,
+            "voted": False,
+            "vote_count": 0,
+            "children": [],
+            "editable_fields": ["abuse_flagged", "endorsed", "raw_body", "voted"],
+            "child_count": 0,
+        }
+        self.assertEqual(actual, expected)
+        expected_url = (
+            "/api/v1/comments/{}".format(parent_id) if parent_id else
+            "/api/v1/threads/test_thread/comments"
+        )
+        self.assertEqual(
+            urlparse(httpretty.last_request().path).path,   # lint-amnesty, pylint: disable=no-member
+            expected_url
+        )
+        self.assertEqual(
+            httpretty.last_request().parsed_body,           # lint-amnesty, pylint: disable=no-member
+            {
+                "course_id": [six.text_type(self.course.id)],
+                "body": ["Test body"],
+                "user_id": [str(self.user.id)]
+            }
+        )
+        expected_event_name = (
+            "edx.forum.comment.created" if parent_id else
+            "edx.forum.response.created"
+        )
+        expected_event_data = {
+            "discussion": {"id": "test_thread"},
+            "commentable_id": "test_topic",
+            "options": {"followed": False},
+            "id": "test_comment",
+            "truncated": False,
+            "body": "Test body",
+            "url": "",
+            "user_forums_roles": [FORUM_ROLE_STUDENT, FORUM_ROLE_MODERATOR],
+            "user_course_roles": [],
+        }
+        if parent_id:
+            expected_event_data["response"] = {"id": parent_id}
+        actual_event_name, actual_event_data = mock_emit.call_args[0]
+        self.assertEqual(actual_event_name, expected_event_name)
+        self.assertEqual(actual_event_data, expected_event_data)
+
+    def test_error_in_black_out(self):
+        """
+        Test case when course is in blackout period and user does not have special privileges.
+        """
+        _set_course_discussion_blackout(course=self.course, user_id=self.user.id)
+
+        with self.assertRaises(DiscussionBlackOutException) as assertion:
+            create_comment(self.request, self.minimal_data)
+        self.assertEqual(assertion.exception.status_code, 403)
+        self.assertEqual(assertion.exception.detail, "Discussions are in blackout period.")
+
     @ddt.data(
         *itertools.product(
             [
@@ -1856,8 +2042,7 @@ class CreateCommentTest(
     )
     @ddt.unpack
     def test_endorsed(self, role_name, is_thread_author, thread_type):
-        role = Role.objects.create(name=role_name, course_id=self.course.id)
-        role.users.set([self.user])
+        _assign_role_to_user(user=self.user, course_id=self.course.id, role=role_name)
         self.register_get_thread_response(
             make_minimal_cs_thread({
                 "id": "test_thread",
@@ -2139,8 +2324,7 @@ class UpdateThreadTest(
         FORUM_ROLE_STUDENT,
     )
     def test_author_only_fields(self, role_name):
-        role = Role.objects.create(name=role_name, course_id=self.course.id)
-        role.users.set([self.user])
+        _assign_role_to_user(user=self.user, course_id=self.course.id, role=role_name)
         self.register_thread({"user_id": str(self.user.id + 1)})
         data = {field: "edited" for field in ["topic_id", "title", "raw_body"]}
         data["type"] = "question"
@@ -2547,8 +2731,7 @@ class UpdateCommentTest(
     ))
     @ddt.unpack
     def test_raw_body_access(self, role_name, is_thread_author, is_comment_author):
-        role = Role.objects.create(name=role_name, course_id=self.course.id)
-        role.users.set([self.user])
+        _assign_role_to_user(user=self.user, course_id=self.course.id, role=role_name)
         self.register_comment(
             {"user_id": str(self.user.id if is_comment_author else (self.user.id + 1))},
             thread_overrides={
@@ -2579,8 +2762,7 @@ class UpdateCommentTest(
     ))
     @ddt.unpack
     def test_endorsed_access(self, role_name, is_thread_author, thread_type, is_comment_author):
-        role = Role.objects.create(name=role_name, course_id=self.course.id)
-        role.users.set([self.user])
+        _assign_role_to_user(user=self.user, course_id=self.course.id, role=role_name)
         self.register_comment(
             {"user_id": str(self.user.id if is_comment_author else (self.user.id + 1))},
             thread_overrides={
@@ -2853,8 +3035,7 @@ class DeleteThreadTest(
         FORUM_ROLE_STUDENT,
     )
     def test_non_author_delete_allowed(self, role_name):
-        role = Role.objects.create(name=role_name, course_id=self.course.id)
-        role.users.set([self.user])
+        _assign_role_to_user(user=self.user, course_id=self.course.id, role=role_name)
         self.register_thread({"user_id": str(self.user.id + 1)})
         expected_error = role_name == FORUM_ROLE_STUDENT
         try:
@@ -3004,8 +3185,7 @@ class DeleteCommentTest(
         FORUM_ROLE_STUDENT,
     )
     def test_non_author_delete_allowed(self, role_name):
-        role = Role.objects.create(name=role_name, course_id=self.course.id)
-        role.users.set([self.user])
+        _assign_role_to_user(user=self.user, course_id=self.course.id, role=role_name)
         self.register_comment_and_thread(
             overrides={"user_id": str(self.user.id + 1)}
         )

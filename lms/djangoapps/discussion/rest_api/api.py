@@ -26,12 +26,13 @@ from lms.djangoapps.discussion.django_comment_client.base.views import (
 from lms.djangoapps.discussion.django_comment_client.utils import (
     get_accessible_discussion_xblocks,
     get_group_id_for_user,
-    is_commentable_divided
+    is_commentable_divided,
 )
 from lms.djangoapps.discussion.rest_api.exceptions import (
     CommentNotFoundError,
+    ThreadNotFoundError,
     DiscussionDisabledError,
-    ThreadNotFoundError
+    DiscussionBlackOutException
 )
 from lms.djangoapps.discussion.rest_api.forms import CommentActionsForm, ThreadActionsForm
 from lms.djangoapps.discussion.rest_api.pagination import DiscussionAPIPagination
@@ -47,6 +48,7 @@ from lms.djangoapps.discussion.rest_api.serializers import (
     ThreadSerializer,
     get_context
 )
+from lms.djangoapps.discussion.rest_api.utils import discussion_open_for_user
 from openedx.core.djangoapps.django_comment_common.comment_client.comment import Comment
 from openedx.core.djangoapps.django_comment_common.comment_client.thread import Thread
 from openedx.core.djangoapps.django_comment_common.comment_client.utils import CommentClientRequestError
@@ -868,6 +870,9 @@ def create_thread(request, thread_data):
     except InvalidKeyError:
         raise ValidationError({"course_id": ["Invalid value."]})  # lint-amnesty, pylint: disable=raise-missing-from
 
+    if not discussion_open_for_user(course, user):
+        raise DiscussionBlackOutException
+
     context = get_context(course, request)
     _check_initializable_thread_fields(thread_data, context)
     discussion_settings = get_course_discussion_settings(course_key)
@@ -913,8 +918,12 @@ def create_comment(request, comment_data):
         raise ValidationError({"thread_id": ["This field is required."]})
     cc_thread, context = _get_thread_and_context(request, thread_id)
 
+    course = context["course"]
+    if not discussion_open_for_user(course, request.user):
+        raise DiscussionBlackOutException
+
     # if a thread is closed; no new comments could be made to it
-    if cc_thread['closed']:
+    if cc_thread["closed"]:
         raise PermissionDenied
 
     _check_initializable_comment_fields(comment_data, context)
@@ -928,7 +937,7 @@ def create_comment(request, comment_data):
     api_comment = serializer.data
     _do_extra_actions(api_comment, cc_comment, list(comment_data.keys()), actions_form, context, request)
 
-    track_comment_created_event(request, context["course"], cc_comment, cc_thread["commentable_id"], followed=False)
+    track_comment_created_event(request, course, cc_comment, cc_thread["commentable_id"], followed=False)
 
     return api_comment
 
