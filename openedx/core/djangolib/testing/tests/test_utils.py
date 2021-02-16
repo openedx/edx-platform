@@ -24,13 +24,13 @@ class TestGetMockRequest(TestCase):
 
     def test_mock_request_is_request(self):
         request = get_mock_request(USER_MODEL())
-        self.assertIsInstance(request, HttpRequest)
+        assert isinstance(request, HttpRequest)
 
     def test_user_is_attached_to_mock_request(self):
         user = USER_MODEL()
         request = get_mock_request(user)
-        self.assertIs(request.user, user)
+        assert request.user is user
 
     def test_mock_request_without_user(self):
         request = get_mock_request()
-        self.assertIsInstance(request.user, AnonymousUser)
+        assert isinstance(request.user, AnonymousUser)
