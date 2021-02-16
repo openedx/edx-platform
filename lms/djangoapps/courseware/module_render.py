@@ -96,7 +96,6 @@ from common.djangoapps.xblock_django.user_service import DjangoXBlockUserService
 from xmodule.contentstore.django import contentstore
 from xmodule.error_module import ErrorBlock, NonStaffErrorBlock
 from xmodule.exceptions import NotFoundError, ProcessingError
-from xmodule.lti_module import LTIModule
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError
 from xmodule.util.sandboxing import can_execute_unsafe_code, get_python_lib_zip
@@ -641,7 +640,7 @@ def get_module_system_for_user(
         field_data_cache_real_user = FieldDataCache.cache_for_descriptor_descendents(
             course_id,
             real_user,
-            module.descriptor,
+            module,
             asides=XBlockAsidesConfig.possible_asides(),
         )
         student_data_real_user = KvsFieldData(DjangoKeyValueStore(field_data_cache_real_user))
@@ -649,7 +648,7 @@ def get_module_system_for_user(
         (inner_system, inner_student_data) = get_module_system_for_user(
             user=real_user,
             student_data=student_data_real_user,  # These have implicit user bindings, rest of args considered not to
-            descriptor=module.descriptor,
+            descriptor=module,
             course_id=course_id,
             track_function=track_function,
             xqueue_callback_url_prefix=xqueue_callback_url_prefix,
@@ -663,7 +662,7 @@ def get_module_system_for_user(
             will_recheck_access=will_recheck_access,
         )
 
-        module.descriptor.bind_for_student(
+        module.bind_for_student(
             inner_system,
             real_user.id,
             [
@@ -673,10 +672,9 @@ def get_module_system_for_user(
             ],
         )
 
-        module.descriptor.scope_ids = (
-            module.descriptor.scope_ids._replace(user_id=real_user.id)
+        module.scope_ids = (
+            module.scope_ids._replace(user_id=real_user.id)
         )
-        module.scope_ids = module.descriptor.scope_ids  # this is needed b/c NamedTuples are immutable
         # now bind the module to the new ModuleSystem instance and vice-versa
         module.runtime = inner_system
         inner_system.xmodule_instance = module
@@ -757,9 +755,7 @@ def get_module_system_for_user(
     # As we have the time to manually test more modules, we can add to the list
     # of modules that get the per-course anonymized id.
     is_pure_xblock = isinstance(descriptor, XBlock) and not isinstance(descriptor, XModuleDescriptor)
-    module_class = getattr(descriptor, 'module_class', None)
-    is_lti_module = not is_pure_xblock and issubclass(module_class, LTIModule)
-    if (is_pure_xblock and not getattr(descriptor, 'requires_per_student_anonymous_id', False)) or is_lti_module:
+    if (is_pure_xblock and not getattr(descriptor, 'requires_per_student_anonymous_id', False)):
         anonymous_student_id = anonymous_id_for_user(user, course_id)
     else:
         anonymous_student_id = anonymous_id_for_user(user, None)

@@ -4,27 +4,30 @@
 
 import datetime
 import textwrap
+import unittest
 
 from mock import Mock
 from pytz import UTC
+from xblock.field_data import DictFieldData
 
 from xmodule.lti_2_util import LTIError
-from xmodule.lti_module import LTIDescriptor
+from xmodule.lti_module import LTIBlock
 
-from . import LogicTest
+from . import get_test_system
 
 
-class LTI20RESTResultServiceTest(LogicTest):
+class LTI20RESTResultServiceTest(unittest.TestCase):
     """Logic tests for LTI module. LTI2.0 REST ResultService"""
-    descriptor_class = LTIDescriptor
 
     def setUp(self):
         super(LTI20RESTResultServiceTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        self.system = get_test_system()
         self.environ = {'wsgi.url_scheme': 'http', 'REQUEST_METHOD': 'POST'}
         self.system.get_real_user = Mock()
         self.system.publish = Mock()
         self.system.rebind_noauth_module_to_user = Mock()
-        self.user_id = self.xmodule.runtime.anonymous_student_id
+
+        self.xmodule = LTIBlock(self.system, DictFieldData({}), Mock())
         self.lti_id = self.xmodule.lti_id
         self.xmodule.due = None
         self.xmodule.graceperiod = None
@@ -35,8 +38,8 @@ class LTI20RESTResultServiceTest(LogicTest):
         mocked_course = Mock(name='mocked_course', lti_passports=['lti_id:test_client:test_secret'])
         modulestore = Mock(name='modulestore')
         modulestore.get_course.return_value = mocked_course
-        runtime = Mock(name='runtime', modulestore=modulestore)
-        self.xmodule.descriptor.runtime = runtime
+        runtime = Mock(name='runtime', modulestore=modulestore, anonymous_student_id='student')
+        self.xmodule.runtime = runtime
         self.xmodule.lti_id = "lti_id"
 
         test_cases = (  # (before sanitize, after sanitize)

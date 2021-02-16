@@ -71,14 +71,27 @@ from pkg_resources import resource_string
 from pytz import UTC
 from six import text_type
 from webob import Response
+from web_fragments.fragment import Fragment
 from xblock.core import List, Scope, String, XBlock
 from xblock.fields import Boolean, Float
+from xmodule.mako_module import MakoTemplateBlockBase
 
 from openedx.core.djangolib.markup import HTML, Text
-from xmodule.editing_module import MetadataOnlyEditingDescriptor
-from xmodule.lti_2_util import LTI20ModuleMixin, LTIError
-from xmodule.raw_module import EmptyDataRawDescriptor
-from xmodule.x_module import XModule, module_attr
+from xmodule.editing_module import EditingMixin
+
+from xmodule.lti_2_util import LTI20BlockMixin, LTIError
+from xmodule.raw_module import EmptyDataRawMixin
+from xmodule.util.xmodule_django import add_webpack_to_fragment
+from xmodule.xml_module import XmlMixin
+from xmodule.x_module import (
+    HTMLSnippet,
+    ResourceTemplates,
+    shim_xmodule_js,
+    XModuleDescriptorToXBlockMixin,
+    XModuleMixin,
+    XModuleToXBlockMixin,
+)
+
 
 log = logging.getLogger(__name__)
 
@@ -256,7 +269,20 @@ class LTIFields(object):
     )
 
 
-class LTIModule(LTIFields, LTI20ModuleMixin, XModule):
+@XBlock.needs("i18n")
+class LTIBlock(
+    LTIFields,
+    LTI20BlockMixin,
+    EmptyDataRawMixin,
+    XmlMixin,
+    EditingMixin,
+    MakoTemplateBlockBase,
+    XModuleDescriptorToXBlockMixin,
+    XModuleToXBlockMixin,
+    HTMLSnippet,
+    ResourceTemplates,
+    XModuleMixin,
+):  # pylint: disable=abstract-method
     """
     THIS MODULE IS DEPRECATED IN FAVOR OF https://github.com/edx/xblock-lti-consumer
 
@@ -338,14 +364,50 @@ class LTIModule(LTIFields, LTI20ModuleMixin, XModule):
 
         Otherwise error message from LTI provider is generated.
     """
+    resources_dir = None
+    uses_xmodule_styles_setup = True
 
-    js = {
+    preview_view_js = {
         'js': [
             resource_string(__name__, 'js/src/lti/lti.js')
-        ]
+        ],
+        'xmodule_js': resource_string(__name__, 'js/src/xmodule.js'),
     }
-    css = {'scss': [resource_string(__name__, 'css/lti/lti.scss')]}
-    js_module_name = 'LTI'
+    preview_view_css = {
+        'scss': [
+            resource_string(__name__, 'css/lti/lti.scss')
+        ],
+    }
+
+    mako_template = 'widgets/metadata-only-edit.html'
+
+    studio_js_module_name = 'MetadataOnlyEditingDescriptor'
+    studio_view_js = {
+        'js': [
+            resource_string(__name__, 'js/src/raw/edit/metadata-only.js')
+        ],
+        'xmodule_js': resource_string(__name__, 'js/src/xmodule.js'),
+    }
+    studio_view_css = {
+        'scss': [],
+    }
+
+    def studio_view(self, _context):
+        """
+        Return the studio view.
+        """
+        context = MakoTemplateBlockBase.get_context(self)
+        # Add our specific template information (the raw data body)
+        context.update({'data': self.data})
+        fragment = Fragment(
+            self.system.render_template(self.mako_template, context)
+        )
+        add_webpack_to_fragment(fragment, 'LTIBlockStudio')
+        shim_xmodule_js(fragment, self.studio_js_module_name)
+        return fragment
+
+    def max_score(self):
+        return self.weight if self.has_score else None
 
     def get_input_fields(self):  # lint-amnesty, pylint: disable=missing-function-docstring
         # LTI provides a list of default parameters that might be passed as
@@ -449,11 +511,15 @@ class LTIModule(LTIFields, LTI20ModuleMixin, XModule):
             'accept_grades_past_due': self.accept_grades_past_due,
         }
 
-    def get_html(self):
+    def student_view(self, _context):
         """
-        Renders parameters to template.
+        Return the student view.
         """
-        return self.system.render_template('lti.html', self.get_context())
+        fragment = Fragment()
+        fragment.add_content(self.system.render_template('lti.html', self.get_context()))
+        add_webpack_to_fragment(fragment, 'LTIBlockPreview')
+        shim_xmodule_js(fragment, 'LTI')
+        return fragment
 
     @XBlock.handler
     def preview_handler(self, _, __):
@@ -533,7 +599,7 @@ class LTIModule(LTIFields, LTI20ModuleMixin, XModule):
         """
         Return course by course id.
         """
-        return self.descriptor.runtime.modulestore.get_course(self.course_id)
+        return self.runtime.modulestore.get_course(self.course_id)
 
     @property
     def context_id(self):
@@ -907,20 +973,3 @@ oauth_consumer_key="", oauth_signature="frVp4JuvT1mVXlxktiAUjQ7%2F1cw%3D"'}
         else:
             close_date = due_date
         return close_date is not None and datetime.datetime.now(UTC) > close_date
-
-
-class LTIDescriptor(LTIFields, MetadataOnlyEditingDescriptor, EmptyDataRawDescriptor):
-    """
-    Descriptor for LTI Xmodule.
-    """
-
-    def max_score(self):
-        return self.weight if self.has_score else None
-
-    module_class = LTIModule
-    resources_dir = None
-    grade_handler = module_attr('grade_handler')
-    preview_handler = module_attr('preview_handler')
-    lti_2_0_result_rest_handler = module_attr('lti_2_0_result_rest_handler')
-    clear_user_module_score = module_attr('clear_user_module_score')
-    get_outcome_service_url = module_attr('get_outcome_service_url')

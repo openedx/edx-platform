@@ -126,7 +126,7 @@ class TestLTI(BaseTestXmodule):
         self.assertEqual(generated_content.decode('utf-8'), expected_content)
 
 
-class TestLTIModuleListing(SharedModuleStoreTestCase):
+class TestLTIBlockListing(SharedModuleStoreTestCase):
     """
     a test for the rest endpoint that lists LTI modules in a course
     """
@@ -136,7 +136,7 @@ class TestLTIModuleListing(SharedModuleStoreTestCase):
 
     @classmethod
     def setUpClass(cls):
-        super(TestLTIModuleListing, cls).setUpClass()
+        super(TestLTIBlockListing, cls).setUpClass()
         cls.course = CourseFactory.create(display_name=cls.COURSE_NAME, number=cls.COURSE_SLUG)
         cls.chapter1 = ItemFactory.create(
             parent_location=cls.course.location,
