@@ -7,14 +7,11 @@ running state of a course.
 
 import csv
 import logging
-import os  # lint-amnesty, pylint: disable=unused-import
 from collections import OrderedDict
 from contextlib import contextmanager
 from datetime import datetime
-from io import StringIO  # lint-amnesty, pylint: disable=unused-import
 from tempfile import TemporaryFile
 from time import time
-from zipfile import ZipFile  # lint-amnesty, pylint: disable=unused-import
 
 from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.core.exceptions import ValidationError
@@ -29,7 +26,13 @@ from openedx.core.djangoapps.course_groups.cohorts import add_user_to_cohort
 from openedx.core.djangoapps.course_groups.models import CourseUserGroup
 
 from .runner import TaskProgress
-from .utils import UPDATE_STATUS_FAILED, UPDATE_STATUS_SUCCEEDED, upload_csv_to_report_store, upload_zip_to_report_store
+from .utils import (
+    UPDATE_STATUS_FAILED,
+    UPDATE_STATUS_SUCCEEDED,
+    upload_csv_to_report_store,
+    upload_zip_to_report_store,
+
+)
 
 # define different loggers for use within tasks and on client side
 TASK_LOG = logging.getLogger('edx.celery.task')

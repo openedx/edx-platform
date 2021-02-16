@@ -7,7 +7,6 @@ paths actually work.
 
 
 import json
-from functools import partial  # lint-amnesty, pylint: disable=unused-import
 from unittest.mock import MagicMock, Mock, patch
 from uuid import uuid4
 import pytest
@@ -30,8 +29,6 @@ from lms.djangoapps.instructor_task.tasks import (
     rescore_problem,
     reset_problem_attempts
 )
-from lms.djangoapps.instructor_task.tasks_helper.misc import \
-    upload_ora2_data  # lint-amnesty, pylint: disable=unused-import
 from lms.djangoapps.instructor_task.tests.factories import InstructorTaskFactory
 from lms.djangoapps.instructor_task.tests.test_base import InstructorTaskModuleTestCase
 from xmodule.modulestore.exceptions import ItemNotFoundError
