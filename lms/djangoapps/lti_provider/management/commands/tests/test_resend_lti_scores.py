@@ -3,14 +3,14 @@ Test lti_provider management commands.
 """
 
 
-import six
+from unittest.mock import patch
+
 from django.test import TestCase
-from mock import patch
 from opaque_keys.edx.keys import CourseKey, UsageKey
 
+from common.djangoapps.student.tests.factories import UserFactory
 from lms.djangoapps.lti_provider.management.commands import resend_lti_scores
 from lms.djangoapps.lti_provider.models import GradedAssignment, LtiConsumer, OutcomeService
-from common.djangoapps.student.tests.factories import UserFactory
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.utils import TEST_DATA_DIR
 from xmodule.modulestore.xml_importer import import_course_from_xml
@@ -34,7 +34,7 @@ class CommandArgsTestCase(TestCase):
         assert len(args.course_keys) == 2
         key = args.course_keys[0]
         assert isinstance(key, CourseKey)
-        assert six.text_type(key) == 'course-v1:edX+test_course+2525_fall'
+        assert str(key) == 'course-v1:edX+test_course+2525_fall'
 
     def test_no_course_keys(self):
         parser = self._get_arg_parser()
@@ -49,25 +49,25 @@ class CommandExecutionTestCase(SharedModuleStoreTestCase):
 
     @classmethod
     def setUpClass(cls):
-        super(CommandExecutionTestCase, cls).setUpClass()
-        cls.course_key = cls.store.make_course_key(u'edX', u'lti_provider', u'3000')
+        super().setUpClass()
+        cls.course_key = cls.store.make_course_key('edX', 'lti_provider', '3000')
         import_course_from_xml(
             cls.store,
-            u'test_user',
+            'test_user',
             TEST_DATA_DIR,
-            source_dirs=[u'simple'],
+            source_dirs=['simple'],
             static_content_store=None,
             target_id=cls.course_key,
             raise_on_failure=True,
             create_if_not_present=True,
         )
-        cls.lti_block = u'block-v1:edX+lti_provider+3000+type@chapter+block@chapter_2'
+        cls.lti_block = 'block-v1:edX+lti_provider+3000+type@chapter+block@chapter_2'
 
     def setUp(self):
-        super(CommandExecutionTestCase, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.user = UserFactory()
-        self.user2 = UserFactory(username=u'anotheruser')
-        self.client.login(username=self.user.username, password=u'test')
+        self.user2 = UserFactory(username='anotheruser')
+        self.client.login(username=self.user.username, password='test')
 
     def _configure_lti(self, usage_key):
         """
@@ -76,21 +76,21 @@ class CommandExecutionTestCase(SharedModuleStoreTestCase):
         consumer = LtiConsumer.objects.create()
         outcome_service = OutcomeService.objects.create(
             lti_consumer=consumer,
-            lis_outcome_service_url=u'https://lol.tools'
+            lis_outcome_service_url='https://lol.tools'
         )
         GradedAssignment.objects.create(
             user=self.user,
             course_key=self.course_key,
             usage_key=usage_key,
             outcome_service=outcome_service,
-            lis_result_sourcedid=u'abc',
+            lis_result_sourcedid='abc',
         )
         GradedAssignment.objects.create(
             user=self.user2,
             course_key=self.course_key,
             usage_key=usage_key,
             outcome_service=outcome_service,
-            lis_result_sourcedid=u'xyz',
+            lis_result_sourcedid='xyz',
         )
 
     def _scores_sent_with_args(self, *args, **kwargs):
@@ -111,5 +111,5 @@ class CommandExecutionTestCase(SharedModuleStoreTestCase):
         assert self._scores_sent_with_args(course_keys=[self.course_key])
 
     def test_command_with_wrong_course_key(self):
-        fake_course_key = self.store.make_course_key(u'not', u'the', u'course')
+        fake_course_key = self.store.make_course_key('not', 'the', 'course')
         assert not self._scores_sent_with_args(course_keys=[fake_course_key])

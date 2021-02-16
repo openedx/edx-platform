@@ -1,6 +1,3 @@
-# -*- coding: utf-8 -*-
-
-
 from openedx.core.lib.hash_utils import short_token
 from django.db import migrations, models
 

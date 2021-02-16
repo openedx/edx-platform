@@ -3,14 +3,15 @@ Tests for the LTI outcome service handlers, both in outcomes.py and in tasks.py
 """
 
 
+from unittest.mock import ANY, MagicMock, patch
+
 from django.test import TestCase
 from lxml import etree
-from mock import ANY, MagicMock, patch
 from opaque_keys.edx.locator import BlockUsageLocator, CourseLocator
 
 import lms.djangoapps.lti_provider.outcomes as outcomes
-from lms.djangoapps.lti_provider.models import GradedAssignment, LtiConsumer, OutcomeService
 from common.djangoapps.student.tests.factories import UserFactory
+from lms.djangoapps.lti_provider.models import GradedAssignment, LtiConsumer, OutcomeService
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory, check_mongo_calls
 
@@ -21,7 +22,7 @@ class StoreOutcomeParametersTest(TestCase):
     """
 
     def setUp(self):
-        super(StoreOutcomeParametersTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.user = UserFactory.create()
         self.course_key = CourseLocator(
             org='some_org',
@@ -135,7 +136,7 @@ class SignAndSendReplaceResultTest(TestCase):
     """
 
     def setUp(self):
-        super(SignAndSendReplaceResultTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.course_key = CourseLocator(
             org='some_org',
             course='some_course',
@@ -185,7 +186,7 @@ class XmlHandlingTest(TestCase):
     methods in outcomes.py
     """
 
-    response_xml = u"""
+    response_xml = """
         <imsx_POXEnvelopeResponse xmlns = "http://www.imsglobal.org/services/ltiv1p1/xsd/imsoms_v1p0">
           <imsx_POXHeader>
             <imsx_POXResponseHeaderInfo>
@@ -298,7 +299,7 @@ class TestAssignmentsForProblem(ModuleStoreTestCase):
     """
 
     def setUp(self):
-        super(TestAssignmentsForProblem, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.user = UserFactory.create()
         self.user_id = self.user.id
         self.outcome_service = self.create_outcome_service('outcomes')

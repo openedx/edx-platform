@@ -2,21 +2,23 @@
 Tests of the LMS XBlock Runtime and associated utilities
 """
 
+
+from unittest.mock import Mock, patch
+from urllib.parse import urlparse
+
 import pytest
 from ddt import data, ddt
 from django.conf import settings
 from django.test import TestCase
-from mock import Mock, patch
 from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locations import BlockUsageLocator, CourseLocator
-from six.moves.urllib.parse import urlparse
 from xblock.exceptions import NoSuchServiceError
 from xblock.fields import ScopeIds
 
+from common.djangoapps.student.tests.factories import UserFactory
 from lms.djangoapps.badges.tests.factories import BadgeClassFactory
 from lms.djangoapps.badges.tests.test_models import get_image
 from lms.djangoapps.lms_xblock.runtime import LmsModuleSystem
-from common.djangoapps.student.tests.factories import UserFactory
 from xmodule.modulestore.django import ModuleI18nService
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
@@ -54,7 +56,7 @@ class TestHandlerUrl(TestCase):
     """Test the LMS handler_url"""
 
     def setUp(self):
-        super(TestHandlerUrl, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.block = BlockMock(name='block', scope_ids=ScopeIds(None, None, None, 'dummy'))
         self.course_key = CourseLocator("org", "course", "run")
         self.runtime = LmsModuleSystem(
@@ -119,7 +121,7 @@ class TestUserServiceAPI(TestCase):
     """Test the user service interface"""
 
     def setUp(self):
-        super(TestUserServiceAPI, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.course_id = CourseLocator("org", "course", "run")
         self.user = UserFactory.create()
 
@@ -169,7 +171,7 @@ class TestBadgingService(ModuleStoreTestCase):
     """Test the badging service interface"""
 
     def setUp(self):
-        super(TestBadgingService, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.course_id = CourseKey.from_string('course-v1:org+course+run')
 
         self.mock_block = Mock()
@@ -235,7 +237,7 @@ class TestI18nService(ModuleStoreTestCase):
 
     def setUp(self):
         """ Setting up tests """
-        super(TestI18nService, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.course = CourseFactory.create()
         self.test_language = 'dummy language'
         self.runtime = LmsModuleSystem(

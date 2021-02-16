@@ -3,36 +3,36 @@ Tests for the LTI provider views
 """
 
 
-import six
+from unittest.mock import MagicMock, patch
+
 from django.test import TestCase
 from django.test.client import RequestFactory
 from django.urls import reverse
-from mock import MagicMock, patch
 from opaque_keys.edx.locator import BlockUsageLocator, CourseLocator
 
+from common.djangoapps.student.tests.factories import UserFactory
 from lms.djangoapps.courseware.testutils import RenderXBlockTestMixin
 from lms.djangoapps.lti_provider import models, views
-from common.djangoapps.student.tests.factories import UserFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 
 LTI_DEFAULT_PARAMS = {
-    'roles': u'Instructor,urn:lti:instrole:ims/lis/Administrator',
-    'context_id': u'lti_launch_context_id',
-    'oauth_version': u'1.0',
-    'oauth_consumer_key': u'consumer_key',
-    'oauth_signature': u'OAuth Signature',
-    'oauth_signature_method': u'HMAC-SHA1',
-    'oauth_timestamp': u'OAuth Timestamp',
-    'oauth_nonce': u'OAuth Nonce',
-    'user_id': u'LTI_User',
+    'roles': 'Instructor,urn:lti:instrole:ims/lis/Administrator',
+    'context_id': 'lti_launch_context_id',
+    'oauth_version': '1.0',
+    'oauth_consumer_key': 'consumer_key',
+    'oauth_signature': 'OAuth Signature',
+    'oauth_signature_method': 'HMAC-SHA1',
+    'oauth_timestamp': 'OAuth Timestamp',
+    'oauth_nonce': 'OAuth Nonce',
+    'user_id': 'LTI_User',
 }
 
 LTI_OPTIONAL_PARAMS = {
-    'context_title': u'context title',
-    'context_label': u'context label',
-    'lis_result_sourcedid': u'result sourcedid',
-    'lis_outcome_service_url': u'outcome service URL',
-    'tool_consumer_instance_guid': u'consumer instance guid'
+    'context_title': 'context title',
+    'context_label': 'context label',
+    'lis_result_sourcedid': 'result sourcedid',
+    'lis_outcome_service_url': 'outcome service URL',
+    'tool_consumer_instance_guid': 'consumer instance guid'
 }
 
 COURSE_KEY = CourseLocator(org='some_org', course='some_course', run='some_run')
@@ -62,13 +62,13 @@ def build_launch_request(extra_post_data=None, param_to_delete=None):
     return request
 
 
-class LtiTestMixin(object):
+class LtiTestMixin:
     """
     Mixin for LTI tests
     """
     @patch.dict('django.conf.settings.FEATURES', {'ENABLE_LTI_PROVIDER': True})
     def setUp(self):
-        super(LtiTestMixin, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         # Always accept the OAuth signature
         self.mock_verify = MagicMock(return_value=True)
         patcher = patch('lms.djangoapps.lti_provider.signature_validator.SignatureValidator.verify', self.mock_verify)
@@ -94,7 +94,7 @@ class LtiLaunchTest(LtiTestMixin, TestCase):
         Verifies that the LTI launch succeeds when passed a valid request.
         """
         request = build_launch_request()
-        views.lti_launch(request, six.text_type(COURSE_KEY), six.text_type(USAGE_KEY))
+        views.lti_launch(request, str(COURSE_KEY), str(USAGE_KEY))
         render.assert_called_with(request, USAGE_KEY)
 
     @patch('lms.djangoapps.lti_provider.views.render_courseware')
@@ -105,7 +105,7 @@ class LtiLaunchTest(LtiTestMixin, TestCase):
         Verifies that the LTI launch succeeds when passed a valid request.
         """
         request = build_launch_request(extra_post_data=LTI_OPTIONAL_PARAMS)
-        views.lti_launch(request, six.text_type(COURSE_KEY), six.text_type(USAGE_KEY))
+        views.lti_launch(request, str(COURSE_KEY), str(USAGE_KEY))
         store_params.assert_called_with(
             dict(list(ALL_PARAMS.items()) + list(LTI_OPTIONAL_PARAMS.items())),
             request.user,
@@ -122,8 +122,8 @@ class LtiLaunchTest(LtiTestMixin, TestCase):
         request = build_launch_request()
         views.lti_launch(
             request,
-            six.text_type(COURSE_PARAMS['course_key']),
-            six.text_type(COURSE_PARAMS['usage_key'])
+            str(COURSE_PARAMS['course_key']),
+            str(COURSE_PARAMS['usage_key'])
         )
         store_params.assert_called_with(ALL_PARAMS, request.user, self.consumer)
 
@@ -175,7 +175,7 @@ class LtiLaunchTest(LtiTestMixin, TestCase):
         consumer = models.LtiConsumer.objects.get(
             consumer_key=LTI_DEFAULT_PARAMS['oauth_consumer_key']
         )
-        assert consumer.instance_guid == u'consumer instance guid'
+        assert consumer.instance_guid == 'consumer instance guid'
 
 
 class LtiLaunchTestRender(LtiTestMixin, RenderXBlockTestMixin, ModuleStoreTestCase):
@@ -192,8 +192,8 @@ class LtiLaunchTestRender(LtiTestMixin, RenderXBlockTestMixin, ModuleStoreTestCa
         lti_launch_url = reverse(
             'lti_provider_launch',
             kwargs={
-                'course_id': six.text_type(self.course.id),
-                'usage_id': six.text_type(usage_key)
+                'course_id': str(self.course.id),
+                'usage_id': str(usage_key)
             }
         )
         if url_encoded_params:

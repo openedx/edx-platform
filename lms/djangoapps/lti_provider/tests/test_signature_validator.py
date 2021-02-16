@@ -3,10 +3,11 @@ Tests for the SignatureValidator class.
 """
 
 
+from unittest.mock import patch
+
 import ddt
 from django.test import TestCase
 from django.test.client import RequestFactory
-from mock import patch
 
 from lms.djangoapps.lti_provider.models import LtiConsumer
 from lms.djangoapps.lti_provider.signature_validator import SignatureValidator
@@ -30,7 +31,7 @@ class ClientKeyValidatorTest(TestCase):
     """
 
     def setUp(self):
-        super(ClientKeyValidatorTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.lti_consumer = get_lti_consumer()
 
     def test_valid_client_key(self):
@@ -60,7 +61,7 @@ class NonceValidatorTest(TestCase):
     """
 
     def setUp(self):
-        super(NonceValidatorTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.lti_consumer = get_lti_consumer()
 
     def test_valid_nonce(self):
@@ -91,7 +92,7 @@ class SignatureValidatorTest(TestCase):
     """
 
     def setUp(self):
-        super(SignatureValidatorTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.lti_consumer = get_lti_consumer()
 
     def test_get_existing_client_secret(self):
@@ -110,7 +111,7 @@ class SignatureValidatorTest(TestCase):
         Verify that the signature validaton library method is called using the
         correct parameters derived from the HttpRequest.
         """
-        body = u'oauth_signature_method=HMAC-SHA1&oauth_version=1.0'
+        body = 'oauth_signature_method=HMAC-SHA1&oauth_version=1.0'
         content_type = 'application/x-www-form-urlencoded'
         request = RequestFactory().post('/url', body, content_type=content_type)
         headers = {'Content-Type': content_type}
