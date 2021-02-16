@@ -29,7 +29,6 @@ from lms.djangoapps.email_marketing.tasks import (  # lint-amnesty, pylint: disa
     _get_list_from_email_marketing_provider,
     _get_or_create_user_list,
     get_email_cookies_via_sailthru,
-    update_course_enrollment,
     update_user,
     update_user_email
 )

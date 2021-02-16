@@ -4,12 +4,10 @@ Tests for experimentation views
 
 
 import unittest
-from datetime import timedelta
 from unittest.mock import patch
 
-import six.moves.urllib.error
 import six.moves.urllib.parse
-import six.moves.urllib.request
+from datetime import timedelta
 from django.conf import settings
 from django.core.handlers.wsgi import WSGIRequest
 from django.test.utils import override_settings
@@ -20,10 +18,7 @@ from rest_framework.test import APITestCase
 from common.djangoapps.student.tests.factories import UserFactory
 from lms.djangoapps.course_blocks.transformers.tests.helpers import ModuleStoreTestCase
 from lms.djangoapps.experiments.factories import ExperimentDataFactory, ExperimentKeyValueFactory
-from lms.djangoapps.experiments.models import (  # lint-amnesty, pylint: disable=unused-import
-    ExperimentData,
-    ExperimentKeyValue
-)
+from lms.djangoapps.experiments.models import ExperimentData  # lint-amnesty, pylint: disable=unused-import
 from lms.djangoapps.experiments.serializers import ExperimentDataSerializer
 from xmodule.modulestore.tests.factories import CourseFactory
 
