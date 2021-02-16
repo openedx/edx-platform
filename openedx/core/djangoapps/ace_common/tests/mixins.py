@@ -44,7 +44,7 @@ class QueryStringAssertionMixin(object):
             if expected_component == 'query':
                 self.assert_query_string_equal(expected_value, parsed_url.query)
             else:
-                self.assertEqual(expected_value, getattr(parsed_url, expected_component))
+                assert expected_value == getattr(parsed_url, expected_component)
 
     def assert_query_string_parameters_equal(self, url, **kwargs):
         """
@@ -61,7 +61,7 @@ class QueryStringAssertionMixin(object):
         parsed_url = urlparse(url)
         parsed_qs = parse_qs(parsed_url.query)
         for expected_key, expected_value in kwargs.items():
-            self.assertEqual(parsed_qs[expected_key], [str(expected_value)])
+            assert parsed_qs[expected_key] == [str(expected_value)]
 
 
 class EmailTemplateTagMixin(object):

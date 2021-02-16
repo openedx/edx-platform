@@ -304,29 +304,21 @@ class ChildrenMapTestMixin(object):
 
         for block_key, children in enumerate(children_map):
             # Verify presence
-            self.assertEqual(
-                self.block_key_factory(block_key) in block_structure,
-                block_key not in missing_blocks,
-                u'Expected presence in block_structure for block_key {} to match absence in missing_blocks.'.format(
-                    six.text_type(block_key)
-                ),
-            )
+            assert (self.block_key_factory(block_key) in block_structure) == (block_key not in missing_blocks),\
+                u'Expected presence in block_structure for block_key {} to match absence in missing_blocks.'\
+                .format(six.text_type(block_key))
 
             # Verify children
             if block_key not in missing_blocks:
-                self.assertEqual(
-                    set(block_structure.get_children(self.block_key_factory(block_key))),
-                    set(self.block_key_factory(child) for child in children),
-                )
+                assert set(block_structure.get_children(self.block_key_factory(block_key))) ==\
+                       set((self.block_key_factory(child) for child in children))
 
         # Verify parents
         parents_map = self.get_parents_map(children_map)
         for block_key, parents in enumerate(parents_map):
             if block_key not in missing_blocks:
-                self.assertEqual(
-                    set(block_structure.get_parents(self.block_key_factory(block_key))),
-                    set(self.block_key_factory(parent) for parent in parents),
-                )
+                assert set(block_structure.get_parents(self.block_key_factory(block_key))) ==\
+                       set((self.block_key_factory(parent) for parent in parents))
 
 
 class UsageKeyFactoryMixin(object):

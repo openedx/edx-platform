@@ -4,7 +4,7 @@ Tests for generate_course_blocks management command.
 
 
 import itertools
-
+import pytest
 import ddt
 from django.core.management.base import CommandError
 from mock import patch
@@ -42,28 +42,28 @@ class TestGenerateCourseBlocks(ModuleStoreTestCase):
         Assert courses don't exist in the course block cache.
         """
         for course_key in course_keys:
-            self.assertFalse(is_course_in_block_structure_cache(course_key, self.store))
+            assert not is_course_in_block_structure_cache(course_key, self.store)
 
     def _assert_courses_in_block_cache(self, *course_keys):
         """
         Assert courses exist in course block cache.
         """
         for course_key in course_keys:
-            self.assertTrue(is_course_in_block_structure_cache(course_key, self.store))
+            assert is_course_in_block_structure_cache(course_key, self.store)
 
     def _assert_courses_not_in_block_storage(self, *course_keys):
         """
         Assert courses don't exist in course block storage.
         """
         for course_key in course_keys:
-            self.assertFalse(is_course_in_block_structure_storage(course_key, self.store))
+            assert not is_course_in_block_structure_storage(course_key, self.store)
 
     def _assert_courses_in_block_storage(self, *course_keys):
         """
         Assert courses exist in course block storage.
         """
         for course_key in course_keys:
-            self.assertTrue(is_course_in_block_structure_storage(course_key, self.store))
+            assert is_course_in_block_structure_storage(course_key, self.store)
 
     def _assert_message_presence_in_logs(self, message, mock_log, expected_presence=True):
         """
@@ -71,9 +71,9 @@ class TestGenerateCourseBlocks(ModuleStoreTestCase):
         """
         message_present = any([message in call_args[0][0] for call_args in mock_log.warning.call_args_list])
         if expected_presence:
-            self.assertTrue(message_present)
+            assert message_present
         else:
-            self.assertFalse(message_present)
+            assert not message_present
 
     @ddt.data(True, False)
     def test_all_courses(self, force_update):
@@ -84,7 +84,7 @@ class TestGenerateCourseBlocks(ModuleStoreTestCase):
             'openedx.core.djangoapps.content.block_structure.factory.BlockStructureFactory.create_from_modulestore'
         ) as mock_update_from_store:
             self.command.handle(all_courses=True, force_update=force_update)
-            self.assertEqual(mock_update_from_store.call_count, self.num_courses if force_update else 0)
+            assert mock_update_from_store.call_count == (self.num_courses if force_update else 0)
 
     def test_one_course(self):
         self._assert_courses_not_in_block_cache(*self.course_keys)
@@ -121,23 +121,15 @@ class TestGenerateCourseBlocks(ModuleStoreTestCase):
 
                 self.command.handle(**command_options)
 
-                self.assertEqual(
-                    mock_tasks.update_course_in_cache_v2.apply_async.call_count,
-                    self.num_courses if enqueue_task and force_update else 0,
-                )
-                self.assertEqual(
-                    mock_tasks.get_course_in_cache_v2.apply_async.call_count,
-                    self.num_courses if enqueue_task and not force_update else 0,
-                )
+                assert mock_tasks.update_course_in_cache_v2.apply_async.call_count ==\
+                       (self.num_courses if (enqueue_task and force_update) else 0)
+                assert mock_tasks.get_course_in_cache_v2.apply_async.call_count ==\
+                       (self.num_courses if (enqueue_task and (not force_update)) else 0)
 
-                self.assertEqual(
-                    mock_api.update_course_in_cache.call_count,
-                    self.num_courses if not enqueue_task and force_update else 0,
-                )
-                self.assertEqual(
-                    mock_api.get_course_in_cache.call_count,
-                    self.num_courses if not enqueue_task and not force_update else 0,
-                )
+                assert mock_api.update_course_in_cache.call_count ==\
+                       (self.num_courses if ((not enqueue_task) and force_update) else 0)
+                assert mock_api.get_course_in_cache.call_count ==\
+                       (self.num_courses if (not enqueue_task and not force_update) else 0)
 
                 if enqueue_task:
                     if force_update:
@@ -146,21 +138,21 @@ class TestGenerateCourseBlocks(ModuleStoreTestCase):
                         task_action = mock_tasks.get_course_in_cache_v2
                     task_options = task_action.apply_async.call_args[1]
                     if routing_key:
-                        self.assertEqual(task_options['routing_key'], routing_key)
+                        assert task_options['routing_key'] == routing_key
                     else:
-                        self.assertNotIn('routing_key', task_options)
+                        assert 'routing_key' not in task_options
 
     @patch('openedx.core.djangoapps.content.block_structure.management.commands.generate_course_blocks.log')
     def test_not_found_key(self, mock_log):
         self.command.handle(courses=['fake/course/id'])
-        self.assertTrue(mock_log.exception.called)
+        assert mock_log.exception.called
 
     def test_invalid_key(self):
-        with self.assertRaises(CommandError):
+        with pytest.raises(CommandError):
             self.command.handle(courses=['not/found'])
 
     def test_no_params(self):
-        with self.assertRaises(CommandError):
+        with pytest.raises(CommandError):
             self.command.handle(all_courses=False)
 
     def test_no_course_mode(self):
