@@ -3,7 +3,6 @@
 
 import datetime
 import json
-import sys
 from unittest import mock
 from unittest.mock import Mock, patch
 
