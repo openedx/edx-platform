@@ -1,12 +1,9 @@
 """ Tests for the functionality in csv """
 from csv import DictReader, DictWriter
 from io import BytesIO, StringIO, TextIOWrapper
-
-from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user, unused-import
-
 from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
 from common.djangoapps.util.testing import EventTestMixin
-from lms.djangoapps.program_enrollments.tests.factories import ProgramCourseEnrollmentFactory, ProgramEnrollmentFactory
+from lms.djangoapps.program_enrollments.tests.factories import ProgramEnrollmentFactory, ProgramCourseEnrollmentFactory
 from lms.djangoapps.teams import csv
 from lms.djangoapps.teams.models import CourseTeam, CourseTeamMembership
 from lms.djangoapps.teams.tests.factories import CourseTeamFactory
