@@ -1274,7 +1274,10 @@ class AllowListGenerationConfiguration(ConfigurationModel):
 
     arguments = models.TextField(
         blank=True,
-        help_text='Useful for manually running a Jenkins job. Specify like "-u edx verified -c course-v1:edX+DemoX+Demo_Course."',
+        help_text=(
+            "Arguments to be passted to cert_allowlist_generation management command. " +
+            "Specify like `-u edx verified -c course-v1:edX+DemoX+Demo_Course`"
+        ),
         default='',
     )
 
