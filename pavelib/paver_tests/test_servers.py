@@ -1,6 +1,5 @@
 """Unit tests for the Paver server tasks."""
 
-
 import json
 
 import ddt
@@ -62,6 +61,7 @@ class TestPaverServerTasks(PaverTestCase):
     """
     Test the Paver server tasks.
     """
+
     @ddt.data(
         [{}],
         [{"settings": "aws"}],
@@ -158,7 +158,7 @@ class TestPaverServerTasks(PaverTestCase):
         """
         settings = options.get("settings", "devstack_with_worker")
         call_task("pavelib.servers.celery", options=options)
-        self.assertEqual(self.task_messages, [EXPECTED_CELERY_COMMAND.format(settings=settings)])
+        assert self.task_messages == [EXPECTED_CELERY_COMMAND.format(settings=settings)]
 
     @ddt.data(
         [{}],
@@ -173,13 +173,8 @@ class TestPaverServerTasks(PaverTestCase):
         call_task("pavelib.servers.update_db", options=options)
         # pylint: disable=line-too-long
         db_command = "NO_EDXAPP_SUDO=1 EDX_PLATFORM_SETTINGS_OVERRIDE={settings} /edx/bin/edxapp-migrate-{server} --traceback --pythonpath=. "
-        self.assertEqual(
-            self.task_messages,
-            [
-                db_command.format(server="lms", settings=settings),
-                db_command.format(server="cms", settings=settings),
-            ]
-        )
+        assert self.task_messages == [db_command.format(server='lms', settings=settings),
+                                      db_command.format(server='cms', settings=settings)]
 
     @ddt.data(
         ["lms", {}],
@@ -194,15 +189,9 @@ class TestPaverServerTasks(PaverTestCase):
         """
         settings = options.get("settings", Env.DEVSTACK_SETTINGS)
         call_task("pavelib.servers.check_settings", args=[system, settings])
-        self.assertEqual(
-            self.task_messages,
-            [
-                "echo 'import {system}.envs.{settings}' "
-                "| python manage.py {system} --settings={settings} shell --plain --pythonpath=.".format(
-                    system=system, settings=settings
-                ),
-            ]
-        )
+        assert self.task_messages ==\
+               ["echo 'import {system}.envs.{settings}' | python manage.py {system} "
+                "--settings={settings} shell --plain --pythonpath=.".format(system=system, settings=settings)]
 
     def verify_server_task(self, task_name, options, contracts_default=False):
         """
@@ -271,7 +260,7 @@ class TestPaverServerTasks(PaverTestCase):
         if not no_contracts:
             expected_run_server_command += " --contracts"
         expected_messages.append(expected_run_server_command)
-        self.assertEqual(self.task_messages, expected_messages)
+        assert self.task_messages == expected_messages
 
     def verify_run_all_servers_task(self, options):
         """
@@ -328,7 +317,7 @@ class TestPaverServerTasks(PaverTestCase):
             )
         )
         expected_messages.append(EXPECTED_CELERY_COMMAND.format(settings="devstack_with_worker"))
-        self.assertEqual(self.task_messages, expected_messages)
+        assert self.task_messages == expected_messages
 
     def expected_sass_commands(self, system=None, asset_settings="test_static_optimized"):
         """

@@ -92,7 +92,7 @@ class TestPaverDatabaseTasks(PaverTestCase):
         with patch.object(db_utils, 'get_file_from_s3', wraps=db_utils.get_file_from_s3) as _mock_get_file:
             database.update_local_bokchoy_db_from_s3()  # pylint: disable=no-value-for-parameter
             # Make sure that the local cache files are used - NOT downloaded from s3
-            self.assertFalse(_mock_get_file.called)
+            assert not _mock_get_file.called
         calls = [
             call('{}/scripts/reset-test-db.sh --calculate_migrations'.format(Env.REPO_ROOT)),
             call('{}/scripts/reset-test-db.sh --use-existing-db'.format(Env.REPO_ROOT))
@@ -191,4 +191,4 @@ class TestPaverDatabaseTasks(PaverTestCase):
             fingerprint_file.write(local_fingerprint)
 
         database.update_local_bokchoy_db_from_s3()  # pylint: disable=no-value-for-parameter
-        self.assertTrue(self.bucket.get_key(self.fingerprint_filename))
+        assert self.bucket.get_key(self.fingerprint_filename)

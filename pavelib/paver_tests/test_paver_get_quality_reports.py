@@ -23,7 +23,7 @@ class TestGetReportFiles(unittest.TestCase):
             ('/bar', ('/baz',), ('pylint.report',))
         ])
         reports = pavelib.quality.get_violations_reports("pylint")
-        self.assertEqual(len(reports), 2)
+        assert len(reports) == 2
 
     @patch('os.walk')
     def test_get_pep8_reports(self, my_mock):
@@ -32,7 +32,7 @@ class TestGetReportFiles(unittest.TestCase):
             ('/bar', ('/baz',), ('pep8.report',))
         ])
         reports = pavelib.quality.get_violations_reports("pep8")
-        self.assertEqual(len(reports), 2)
+        assert len(reports) == 2
 
     @patch('os.walk')
     def test_get_pep8_reports_noisy(self, my_mock):
@@ -45,4 +45,4 @@ class TestGetReportFiles(unittest.TestCase):
             ('/bar', ('/baz',), ('pep8.report',))
         ])
         reports = pavelib.quality.get_violations_reports("pep8")
-        self.assertEqual(len(reports), 2)
+        assert len(reports) == 2

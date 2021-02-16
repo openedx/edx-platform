@@ -66,7 +66,7 @@ class TestGenerate(TestCase):
         """
         filename = os.path.join(self.configuration.source_messages_dir, random_name())
         generate.merge(self.configuration, self.configuration.source_locale, target=filename)
-        self.assertTrue(os.path.exists(filename))
+        assert os.path.exists(filename)
         os.remove(filename)
 
     def test_main(self):
@@ -86,12 +86,9 @@ class TestGenerate(TestCase):
                 mofile = filename + '.mo'
                 path = os.path.join(self.configuration.get_messages_dir(locale), mofile)
                 exists = os.path.exists(path)
-                self.assertTrue(exists, msg='Missing file in locale %s: %s' % (locale, mofile))
-                self.assertGreaterEqual(
-                    datetime.fromtimestamp(os.path.getmtime(path), UTC),
-                    self.start_time,
-                    msg='File not recently modified: %s' % path
-                )
+                assert exists, ('Missing file in locale %s: %s' % (locale, mofile))
+                assert datetime.fromtimestamp(os.path.getmtime(path), UTC) >= \
+                       self.start_time, ('File not recently modified: %s' % path)
             # Segmenting means that the merge headers don't work they way they
             # used to, so don't make this check for now. I'm not sure if we'll
             # get the merge header back eventually, or delete this code eventually.
@@ -112,11 +109,7 @@ class TestGenerate(TestCase):
         pof = pofile(path)
         pattern = re.compile('^#-#-#-#-#', re.M)
         match = pattern.findall(pof.header)
-        self.assertEqual(
-            len(match),
-            3,
-            msg="Found %s (should be 3) merge comments in the header for %s" % (len(match), path)
-        )
+        assert len(match) == 3, ('Found %s (should be 3) merge comments in the header for %s' % (len(match), path))
 
 
 def random_name(size=6):

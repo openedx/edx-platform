@@ -5,6 +5,7 @@ Tests for Paver's PII checker task.
 import shutil
 import tempfile
 import unittest
+import pytest
 
 from mock import patch
 from path import Path as path
@@ -61,7 +62,7 @@ class TestPaverPIICheck(unittest.TestCase):
         ])
 
         mock_needs.return_value = 0
-        with self.assertRaises(SystemExit):
+        with pytest.raises(SystemExit):
             call_task('pavelib.quality.run_pii_check', options={"report_dir": str(self.report_dir)})
             self.assertRaises(BuildFailure)
         mock_calls = [str(call) for call in mock_paver_sh.mock_calls]
