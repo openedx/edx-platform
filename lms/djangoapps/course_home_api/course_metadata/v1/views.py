@@ -7,6 +7,10 @@ from rest_framework.response import Response
 
 from opaque_keys.edx.keys import CourseKey
 
+from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthentication
+from edx_rest_framework_extensions.auth.session.authentication import SessionAuthenticationAllowInactiveUser
+from openedx.core.lib.api.authentication import BearerAuthenticationAllowInactiveUser
+
 from common.djangoapps.student.models import CourseEnrollment
 from lms.djangoapps.courseware.access import has_access
 from lms.djangoapps.courseware.masquerade import setup_masquerade
@@ -49,6 +53,12 @@ class CourseHomeMetadataView(RetrieveAPIView):
         * 200 on success with above fields.
         * 404 if the course is not available or cannot be seen.
     """
+
+    authentication_classes = (
+        JwtAuthentication,
+        BearerAuthenticationAllowInactiveUser,
+        SessionAuthenticationAllowInactiveUser,
+    )
 
     serializer_class = CourseHomeMetadataSerializer
 
