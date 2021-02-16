@@ -2,6 +2,7 @@
 
 
 import six
+import pytest
 from contracts import new_contract
 from django.test import TestCase
 from opaque_keys.edx.locator import CourseLocator
@@ -51,8 +52,8 @@ class RoleAssignmentTest(TestCase):
             name="Student"
         )
 
-        self.assertEqual([student_role], list(self.staff_user.roles.all()))
-        self.assertEqual([student_role], list(self.student_user.roles.all()))
+        assert [student_role] == list(self.staff_user.roles.all())
+        assert [student_role] == list(self.student_user.roles.all())
 
     # The following was written on the assumption that unenrolling from a course
     # should remove all forum Roles for that student for that course. This is
@@ -82,9 +83,9 @@ class CourseDiscussionSettingsTest(ModuleStoreTestCase):
 
     def test_get_course_discussion_settings(self):
         discussion_settings = get_course_discussion_settings(self.course.id)
-        self.assertEqual(CourseDiscussionSettings.NONE, discussion_settings.division_scheme)
-        self.assertEqual([], discussion_settings.divided_discussions)
-        self.assertFalse(discussion_settings.always_divide_inline_discussions)
+        assert CourseDiscussionSettings.NONE == discussion_settings.division_scheme
+        assert [] == discussion_settings.divided_discussions
+        assert not discussion_settings.always_divide_inline_discussions
 
     def test_get_course_discussion_settings_legacy_settings(self):
         self.course.cohort_config = {
@@ -94,9 +95,9 @@ class CourseDiscussionSettingsTest(ModuleStoreTestCase):
         }
         modulestore().update_item(self.course, ModuleStoreEnum.UserID.system)
         discussion_settings = get_course_discussion_settings(self.course.id)
-        self.assertEqual(CourseDiscussionSettings.COHORT, discussion_settings.division_scheme)
-        self.assertEqual(['foo'], discussion_settings.divided_discussions)
-        self.assertTrue(discussion_settings.always_divide_inline_discussions)
+        assert CourseDiscussionSettings.COHORT == discussion_settings.division_scheme
+        assert ['foo'] == discussion_settings.divided_discussions
+        assert discussion_settings.always_divide_inline_discussions
 
     def test_get_course_discussion_settings_cohort_settings(self):
         CourseCohortsSettings.objects.get_or_create(
@@ -108,9 +109,9 @@ class CourseDiscussionSettingsTest(ModuleStoreTestCase):
             }
         )
         discussion_settings = get_course_discussion_settings(self.course.id)
-        self.assertEqual(CourseDiscussionSettings.COHORT, discussion_settings.division_scheme)
-        self.assertEqual(['foo', 'bar'], discussion_settings.divided_discussions)
-        self.assertTrue(discussion_settings.always_divide_inline_discussions)
+        assert CourseDiscussionSettings.COHORT == discussion_settings.division_scheme
+        assert ['foo', 'bar'] == discussion_settings.divided_discussions
+        assert discussion_settings.always_divide_inline_discussions
 
     def test_set_course_discussion_settings(self):
         set_course_discussion_settings(
@@ -120,9 +121,9 @@ class CourseDiscussionSettingsTest(ModuleStoreTestCase):
             always_divide_inline_discussions=True,
         )
         discussion_settings = get_course_discussion_settings(self.course.id)
-        self.assertEqual(CourseDiscussionSettings.ENROLLMENT_TRACK, discussion_settings.division_scheme)
-        self.assertEqual(['cohorted_topic'], discussion_settings.divided_discussions)
-        self.assertTrue(discussion_settings.always_divide_inline_discussions)
+        assert CourseDiscussionSettings.ENROLLMENT_TRACK == discussion_settings.division_scheme
+        assert ['cohorted_topic'] == discussion_settings.divided_discussions
+        assert discussion_settings.always_divide_inline_discussions
 
     def test_invalid_data_types(self):
         exception_msg_template = "Incorrect field type for `{}`. Type must be `{}`"
@@ -134,10 +135,7 @@ class CourseDiscussionSettingsTest(ModuleStoreTestCase):
         invalid_value = 3.14
 
         for field in fields:
-            with self.assertRaises(ValueError) as value_error:
+            with pytest.raises(ValueError) as value_error:
                 set_course_discussion_settings(self.course.id, **{field['name']: invalid_value})
 
-            self.assertEqual(
-                text_type(value_error.exception),
-                exception_msg_template.format(field['name'], field['type'].__name__)
-            )
+            assert text_type(value_error.value) == exception_msg_template.format(field['name'], field['type'].__name__)

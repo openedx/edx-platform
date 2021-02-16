@@ -31,11 +31,11 @@ class EnrollmentsServiceTests(ModuleStoreTestCase):
         Test that it returns a list of active enrollments
         """
         enrollments = self.service.get_active_enrollments_by_course(self.course.id)
-        self.assertEqual(len(enrollments), 3)
+        assert len(enrollments) == 3
         # At minimum, the function should return the user and mode tied to each enrollment
         for x in range(3):
-            self.assertEqual(enrollments[x].user.username, 'user{}'.format(x))
-            self.assertEqual(enrollments[x].mode, self.course_modes[x])
+            assert enrollments[x].user.username == 'user{}'.format(x)
+            assert enrollments[x].mode == self.course_modes[x]
 
     def test_get_active_enrollments_by_course_ignore_inactive(self):
         """
@@ -45,7 +45,7 @@ class EnrollmentsServiceTests(ModuleStoreTestCase):
         inactive_enrollment.is_active = False
         inactive_enrollment.save()
         enrollments = self.service.get_active_enrollments_by_course(self.course.id)
-        self.assertEqual(len(enrollments), 2)
+        assert len(enrollments) == 2
 
     def test_get_active_enrollments_no_enrollments(self):
         """
@@ -53,4 +53,4 @@ class EnrollmentsServiceTests(ModuleStoreTestCase):
         """
         new_course = CourseFactory()
         enrollments = self.service.get_active_enrollments_by_course(new_course.id)  # pylint: disable=no-member
-        self.assertEqual(len(enrollments), 0)
+        assert len(enrollments) == 0

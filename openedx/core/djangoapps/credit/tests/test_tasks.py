@@ -45,11 +45,11 @@ class TestTaskExecution(ModuleStoreTestCase):
         Test that credit requirements cannot be added for non credit course.
         """
         requirements = get_credit_requirements(self.course.id)
-        self.assertEqual(len(requirements), 0)
+        assert len(requirements) == 0
         on_course_publish(self.course.id)
 
         requirements = get_credit_requirements(self.course.id)
-        self.assertEqual(len(requirements), 0)
+        assert len(requirements) == 0
 
     def test_task_adding_requirements(self):
         """Test that credit requirements are added properly for credit course.
@@ -59,11 +59,11 @@ class TestTaskExecution(ModuleStoreTestCase):
         """
         self.add_credit_course(self.course.id)
         requirements = get_credit_requirements(self.course.id)
-        self.assertEqual(len(requirements), 0)
+        assert len(requirements) == 0
         on_course_publish(self.course.id)
 
         requirements = get_credit_requirements(self.course.id)
-        self.assertEqual(len(requirements), 1)
+        assert len(requirements) == 1
 
     def test_proctored_exam_requirements(self):
         """
@@ -82,16 +82,16 @@ class TestTaskExecution(ModuleStoreTestCase):
         )
 
         requirements = get_credit_requirements(self.course.id)
-        self.assertEqual(len(requirements), 0)
+        assert len(requirements) == 0
 
         on_course_publish(self.course.id)
 
         requirements = get_credit_requirements(self.course.id)
-        self.assertEqual(len(requirements), 2)
-        self.assertEqual(requirements[1]['namespace'], 'proctored_exam')
-        self.assertEqual(requirements[1]['name'], six.text_type(self.subsection.location))
-        self.assertEqual(requirements[1]['display_name'], 'A Proctored Exam')
-        self.assertEqual(requirements[1]['criteria'], {})
+        assert len(requirements) == 2
+        assert requirements[1]['namespace'] == 'proctored_exam'
+        assert requirements[1]['name'] == six.text_type(self.subsection.location)
+        assert requirements[1]['display_name'] == 'A Proctored Exam'
+        assert requirements[1]['criteria'] == {}
 
     def test_proctored_exam_filtering(self):
         """
@@ -110,19 +110,15 @@ class TestTaskExecution(ModuleStoreTestCase):
         )
 
         requirements = get_credit_requirements(self.course.id)
-        self.assertEqual(len(requirements), 0)
+        assert len(requirements) == 0
 
         on_course_publish(self.course.id)
 
         requirements = get_credit_requirements(self.course.id)
-        self.assertEqual(len(requirements), 1)
+        assert len(requirements) == 1
 
         # make sure we don't have a proctoring requirement
-        self.assertFalse([
-            requirement
-            for requirement in requirements
-            if requirement['namespace'] == 'proctored_exam'
-        ])
+        assert not [requirement for requirement in requirements if requirement['namespace'] == 'proctored_exam']
 
         create_exam(
             course_id=six.text_type(self.course.id),
@@ -136,14 +132,10 @@ class TestTaskExecution(ModuleStoreTestCase):
         on_course_publish(self.course.id)
 
         requirements = get_credit_requirements(self.course.id)
-        self.assertEqual(len(requirements), 1)
+        assert len(requirements) == 1
 
         # make sure we don't have a proctoring requirement
-        self.assertFalse([
-            requirement
-            for requirement in requirements
-            if requirement['namespace'] == 'proctored_exam'
-        ])
+        assert not [requirement for requirement in requirements if requirement['namespace'] == 'proctored_exam']
 
         # practice proctored exams aren't requirements
         create_exam(
@@ -159,14 +151,10 @@ class TestTaskExecution(ModuleStoreTestCase):
         on_course_publish(self.course.id)
 
         requirements = get_credit_requirements(self.course.id)
-        self.assertEqual(len(requirements), 1)
+        assert len(requirements) == 1
 
         # make sure we don't have a proctoring requirement
-        self.assertFalse([
-            requirement
-            for requirement in requirements
-            if requirement['namespace'] == 'proctored_exam'
-        ])
+        assert not [requirement for requirement in requirements if requirement['namespace'] == 'proctored_exam']
 
     @mock.patch(
         'openedx.core.djangoapps.credit.tasks.set_credit_requirements',
@@ -183,11 +171,11 @@ class TestTaskExecution(ModuleStoreTestCase):
         """
         self.add_credit_course(self.course.id)
         requirements = get_credit_requirements(self.course.id)
-        self.assertEqual(len(requirements), 0)
+        assert len(requirements) == 0
         on_course_publish(self.course.id)
 
         requirements = get_credit_requirements(self.course.id)
-        self.assertEqual(len(requirements), 0)
+        assert len(requirements) == 0
 
     def test_credit_requirement_blocks_ordering(self):
         """
@@ -206,25 +194,25 @@ class TestTaskExecution(ModuleStoreTestCase):
         )
 
         requirements = get_credit_requirements(self.course.id)
-        self.assertEqual(len(requirements), 0)
+        assert len(requirements) == 0
         on_course_publish(self.course.id)
 
         requirements = get_credit_requirements(self.course.id)
-        self.assertEqual(len(requirements), 2)
-        self.assertEqual(requirements[1]['namespace'], 'proctored_exam')
-        self.assertEqual(requirements[1]['name'], six.text_type(subsection.location))
-        self.assertEqual(requirements[1]['display_name'], 'A Proctored Exam')
-        self.assertEqual(requirements[1]['criteria'], {})
+        assert len(requirements) == 2
+        assert requirements[1]['namespace'] == 'proctored_exam'
+        assert requirements[1]['name'] == six.text_type(subsection.location)
+        assert requirements[1]['display_name'] == 'A Proctored Exam'
+        assert requirements[1]['criteria'] == {}
 
         # Primary sort is based on start date
         on_course_publish(self.course.id)
         requirements = get_credit_requirements(self.course.id)
         # grade requirement is added on publish of the requirements
-        self.assertEqual(len(requirements), 2)
+        assert len(requirements) == 2
         # check requirements are added in the desired order
         # 1st Minimum grade then the blocks with start date than other blocks
-        self.assertEqual(requirements[0]["display_name"], "Minimum Grade")
-        self.assertEqual(requirements[1]["display_name"], "A Proctored Exam")
+        assert requirements[0]['display_name'] == 'Minimum Grade'
+        assert requirements[1]['display_name'] == 'A Proctored Exam'
 
     def add_credit_course(self, course_key):
         """Add the course as a credit.

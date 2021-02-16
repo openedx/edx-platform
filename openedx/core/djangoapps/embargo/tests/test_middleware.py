@@ -59,7 +59,7 @@ class EmbargoMiddlewareAccessTests(UrlResetMixin, ModuleStoreTestCase):
         with restrict_course(self.course.id, access_point='courseware', disable_access_check=disable_access_check) as redirect_url:  # pylint: disable=line-too-long
             response = self.client.get(self.courseware_url)
             if disable_access_check:
-                self.assertEqual(response.status_code, 200)
+                assert response.status_code == 200
             else:
                 self.assertRedirects(response, redirect_url)
 
@@ -71,13 +71,13 @@ class EmbargoMiddlewareAccessTests(UrlResetMixin, ModuleStoreTestCase):
 
         # Expect that we can access courseware
         response = self.client.get(self.courseware_url)
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
 
     @patch.dict(settings.FEATURES, {'EMBARGO': True})
     def test_non_courseware_url(self):
         with restrict_course(self.course.id):
             response = self.client.get(self.non_courseware_url)
-            self.assertEqual(response.status_code, 200)
+            assert response.status_code == 200
 
     @patch.dict(settings.FEATURES, {'EMBARGO': True})
     @ddt.data(
@@ -111,7 +111,7 @@ class EmbargoMiddlewareAccessTests(UrlResetMixin, ModuleStoreTestCase):
         )
 
         if allow_access:
-            self.assertEqual(response.status_code, 200)
+            assert response.status_code == 200
         else:
             redirect_url = reverse(
                 'embargo:blocked_message',
@@ -149,7 +149,7 @@ class EmbargoMiddlewareAccessTests(UrlResetMixin, ModuleStoreTestCase):
             HTTP_X_FORWARDED_FOR="192.168.10.20",
             REMOTE_ADDR="192.168.10.20"
         )
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
 
     @patch.dict(settings.FEATURES, {'EMBARGO': True})
     def test_whitelist_ip_skips_country_access_checks(self):
@@ -172,4 +172,4 @@ class EmbargoMiddlewareAccessTests(UrlResetMixin, ModuleStoreTestCase):
         # Expect that we were still able to access the page,
         # even though we would have been blocked by country
         # access rules.
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
