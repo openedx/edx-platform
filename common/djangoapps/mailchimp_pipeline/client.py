@@ -1,3 +1,6 @@
+"""
+Client side logic for the mailchimp api
+"""
 import json
 import hashlib
 from requests import request
@@ -10,7 +13,9 @@ class MailChimpException(Exception):
 
 
 class Connection(object):
-    """ mailchimp api connection """
+    """
+    Mailchimp api connection
+    """
 
     output = "json"
     version = '3.0'
@@ -24,6 +29,16 @@ class Connection(object):
         self.root = '{}://{}.api.mailchimp.com/{}/'.format(proto, dc, self.version)
 
     def make_request(self, method="GET", path=None, **kwargs):
+        """
+        Make request for connection for the mailchimp api
+
+        Arguments:
+            method (str): Type of request i.e GET, POST etc
+            path (str): Path to be used in the request url
+
+        Returns:
+            JSON response for the made request
+        """
         if path:
             url = '{}{}'.format(self.root, path)
         else:
@@ -49,7 +64,7 @@ class Connection(object):
 
         try:
             response.raise_for_status()
-        except HTTPError, e:
+        except HTTPError, e:  # pylint: disable=unused-variable
             message = "Exception detail: %s, Errors: %s " % (response.json().get('detail', ''),
                                                              str(response.json().get('errors', '')))
             if response.json()['status'] == 404:
@@ -66,6 +81,10 @@ class Connection(object):
 
 
 class ChimpClient(object):
+    """
+    Mailchimp api client to make different requests
+    """
+
     def __init__(self):
         self.conn = Connection.get_connection()
 
@@ -93,4 +112,3 @@ class ChimpClient(object):
         path = '/lists/{list_id}/members/{subscriber_hash}'.format(list_id=list_id, subscriber_hash=email_hash)
 
         return self.conn.make_request(method="DELETE", path=path)
-

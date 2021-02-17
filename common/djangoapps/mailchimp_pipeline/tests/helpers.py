@@ -1,18 +1,19 @@
 """
-    Helper functions requried for tests
+Helper functions required for tests
 """
 import hashlib
-from django.conf import settings
 from datetime import datetime, timedelta
+
+from django.conf import settings
 from lms.djangoapps.onboarding.models import OrganizationPartner
 from lms.djangoapps.onboarding.tests.factories import OrganizationFactory
 
 
 def create_organization(user):
     """
-        create and return organziation with given user as an organization admin
-        :param user: organization admin user
-        :return: created organziation
+    create and return organization with given user as an organization admin
+    :param user: organization admin user
+    :return: created organization
     """
     organization = OrganizationFactory(
         admin=user,
@@ -22,11 +23,12 @@ def create_organization(user):
     organization.save()
     return organization
 
+
 def create_organization_partner_object(user):
     """
-        create and return organziation partner with given user as an organization admin
-        :param user: organization admin user
-        :return: created organziation partner
+    create and return organization partner with given user as an organization admin
+    :param user: organization admin user
+    :return: created organization partner
     """
     organization = create_organization(user)
     partner = OrganizationPartner(
@@ -38,12 +40,13 @@ def create_organization_partner_object(user):
     partner.save()
     return partner
 
+
 def generate_mailchimp_url(root_url, email):
     """
-        Convert email into encrypted email hash
-        :param root_url: MailChimp root URL
-        :param list_id: MailChimp users list_id
-        :return: hashed email
+    Convert email into encrypted email hash
+    :param root_url: MailChimp root URL
+    :param email: MailChimp user email
+    :return: formatted path with url and email hash
     """
     list_id = settings.MAILCHIMP_LEARNERS_LIST_ID
     hashlib_md = hashlib.md5()

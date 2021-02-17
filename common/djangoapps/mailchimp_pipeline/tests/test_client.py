@@ -1,8 +1,11 @@
+"""
+Tests for the client.py file of the mailchimp_pipeline app
+"""
 import json
 import requests
 from mock import ANY, patch
 from django.conf import settings
-from django.test import override_settings, TestCase
+from django.test import TestCase
 from student.tests.factories import UserFactory
 
 from mailchimp_pipeline.client import ChimpClient, Connection
@@ -11,7 +14,7 @@ from mailchimp_pipeline.tests.helpers import generate_mailchimp_url
 
 class MailchimpPipelineClientTestClass(TestCase):
     """
-        Tests for tasks ChimpClient and Connection
+    Tests for tasks ChimpClient and Connection
     """
 
     def setUp(self):
@@ -28,8 +31,8 @@ class MailchimpPipelineClientTestClass(TestCase):
 
     def test_get_list_members(self):
         """
-            Test if the get_list_members function is sending `GET` request to the exact
-            MailChimp URL
+        Test if the get_list_members function is sending `GET` request to the exact
+        MailChimp URL
         """
         self.client.get_list_members(self.mailchimp_list_id)
         expected_url = "{root_url}list/{list_id}/members/".format(
@@ -39,8 +42,8 @@ class MailchimpPipelineClientTestClass(TestCase):
 
     def test_delete_user_from_list(self):
         """
-            Test if the delete_user_from_list function is sending `DELETE` request to the exact
-            MailChimp URL
+        Test if the delete_user_from_list function is sending `DELETE` request to the exact
+        MailChimp URL
         """
         self.client.delete_user_from_list(self.mailchimp_list_id, self.user.email)
         expected_url = generate_mailchimp_url(self.mail_chimp_root_url, self.user.email)
@@ -49,8 +52,8 @@ class MailchimpPipelineClientTestClass(TestCase):
 
     def test_add_list_members_in_batch(self):
         """
-            Test if the add_list_members_in_batch function is sending `POST` request to the exact
-            MailChimp URL
+        Test if the add_list_members_in_batch function is sending `POST` request to the exact
+        MailChimp URL
         """
         data = {'data': 'some_data'}
         self.client.add_list_members_in_batch(self.mailchimp_list_id, data=data)
@@ -61,18 +64,19 @@ class MailchimpPipelineClientTestClass(TestCase):
 
     def test_make_request_for_empty_path(self):
         """
-            Test if the make_request function is sending `GET` request to the MailChimp root URL if a
-            given path is None
+        Test if the make_request function is sending `GET` request to the MailChimp root URL if a
+        given path is None
         """
         self.connection.make_request()
-        self.mock_request.assert_called_with('GET', url=self.mail_chimp_root_url, data={}, params=None, auth=ANY, headers=ANY)
+        self.mock_request.assert_called_with(
+            'GET', url=self.mail_chimp_root_url, data={}, params=None, auth=ANY, headers=ANY)
 
     def test_make_request_for_404_response_status(self):
         """
-            Test if the make_request function of client do not create exception and return None on
-            response status code of 404
+        Test if the make_request function of client do not create exception and return None on
+        response status code of 404
         """
         self.mock_request.return_value.status_code = 404
         self.mock_request.return_value.raise_for_status.side_effect = requests.exceptions.HTTPError
         self.mock_request.return_value.json.return_value = {"status": 404}
-        assert self.connection.make_request() == None
+        assert self.connection.make_request() is None
