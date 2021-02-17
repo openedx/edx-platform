@@ -45,7 +45,7 @@ from openedx.features.course_experience import (
     RELATIVE_DATES_FLAG,
 )
 from openedx.features.course_experience.views.course_sock import CourseSockFragmentView
-from openedx.features.pakx_features.utils import get_rtl_class
+from openedx.features.pakx.lms.overrides.utils import get_rtl_class
 from openedx.features.course_experience.utils import get_course_outline_block_tree
 from openedx.features.enterprise_support.api import data_sharing_consent_required
 from student.models import CourseEnrollment

@@ -590,6 +590,3 @@ PROCTORING_SETTINGS = {}
 ############### Settings for Django Rate limit #####################
 
 RATELIMIT_RATE = '2/m'
-
-###################### PakX Features ######################
-INSTALLED_APPS.append('openedx.features.pakx_features')

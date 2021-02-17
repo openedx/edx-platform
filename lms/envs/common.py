@@ -2567,6 +2567,15 @@ INSTALLED_APPS = [
     'rest_framework_jwt',
 ]
 
+######################### PAKX APPS #####################################
+
+PAKX_INSTALLED_APPS = [
+    # overrides app
+    'openedx.features.pakx.lms.overrides',
+]
+
+INSTALLED_APPS.extend(PAKX_INSTALLED_APPS)
+
 ######################### CSRF #########################################
 
 # Forwards-compatibility with Django 1.7

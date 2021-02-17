@@ -1497,6 +1497,15 @@ INSTALLED_APPS = [
     'rest_framework_jwt',
 ]
 
+######################### PAKX APPS #####################################
+
+PAKX_INSTALLED_APPS = [
+    # custom settings app
+    'openedx.features.pakx.cms.custom_settings',
+]
+
+INSTALLED_APPS.extend(PAKX_INSTALLED_APPS)
+
 
 ################# EDX MARKETING SITE ##################################
 

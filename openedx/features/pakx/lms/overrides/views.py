@@ -1,22 +1,19 @@
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.csrf import ensure_csrf_cookie
+from opaque_keys.edx.keys import CourseKey
 from six import text_type
 
 from courseware.courses import get_course_with_access
+from edxmako.shortcuts import render_to_response, render_to_string
+from lms.djangoapps.courseware.courses import get_courses, sort_by_announcement, sort_by_start_date
 from lms.djangoapps.courseware.views.index import render_accordion
-from lms.djangoapps.courseware.courses import (
-    get_courses,
-    sort_by_announcement,
-    sort_by_start_date
-)
-from edxmako.shortcuts import render_to_response
-from opaque_keys.edx.keys import CourseKey
-from openedx.features.course_experience.utils import get_course_outline_block_tree
 from openedx.core.djangoapps.catalog.utils import get_programs_with_type
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
+from openedx.features.course_experience.utils import get_course_outline_block_tree
+from openedx.features.pakx.cms.custom_settings.models import CourseOverviewContent
+from openedx.features.pakx.lms.overrides.utils import add_course_progress_and_resume_info_tags_to_enrolled_courses
 
-from openedx.features.pakx_features.utils import add_course_progress_and_resume_info_tags_to_enrolled_courses
 # Create your views here.
 
 
@@ -77,7 +74,9 @@ def overview_tab_view(request, course_id=None):
     course_block_tree = get_course_outline_block_tree(
         request, text_type(course_id), request.user, allow_start_dates_in_future=True
     )
+    course_overview_content = CourseOverviewContent.objects.filter(course_id=course_key).first()
     context = {
+        'course_overview':  course_overview_content.body_html if course_overview_content else None,
         'user': request.user,
         'course': course,
         'accordion': render_accordion(request, course, course_block_tree, '', '')

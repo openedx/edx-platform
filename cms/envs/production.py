@@ -541,5 +541,3 @@ plugin_settings.add_plugins(__name__, plugin_constants.ProjectType.CMS, plugin_c
 
 derive_settings(__name__)
 
-###################### PakX Features ######################
-INSTALLED_APPS.append('openedx.features.pakx_features')
