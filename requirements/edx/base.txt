@@ -110,7 +110,7 @@ edx-proctoring==3.4.0     # via -r requirements/edx/base.in, edx-proctoring-proc
 edx-rbac==1.4.1           # via edx-enterprise
 edx-rest-api-client==5.3.0  # via -r requirements/edx/base.in, edx-enterprise, edx-proctoring
 edx-search==3.0.0         # via -r requirements/edx/base.in
-edx-sga==0.15.0           # via -r requirements/edx/base.in
+edx-sga==0.16.0           # via -r requirements/edx/base.in
 edx-submissions==3.2.4    # via -r requirements/edx/base.in, ora2
 edx-tincan-py35==1.0.0    # via edx-enterprise
 edx-toggles==4.0.0        # via -r requirements/edx/base.in, edx-completion, edx-event-routing-backends, edxval, ora2
