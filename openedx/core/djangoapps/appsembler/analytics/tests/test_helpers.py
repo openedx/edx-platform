@@ -1,12 +1,12 @@
-"""
-Tests for the Appsembler Analytics app.
+"""Test the Appsembler Analytics app helpers module
 """
 
-from django.test import TestCase
-from openedx.core.djangoapps.appsembler.analytics.helpers import should_show_hubspot
-from openedx.core.djangoapps.appsembler.api.tests.factories import UserOrganizationMappingFactory
 from mock import patch, PropertyMock
 from django.contrib.auth.models import User
+from django.test import TestCase
+
+from openedx.core.djangoapps.appsembler.analytics.helpers import should_show_hubspot
+from openedx.core.djangoapps.appsembler.api.tests.factories import UserOrganizationMappingFactory
 
 
 @patch.object(User, 'is_authenticated', PropertyMock(return_value=True))
