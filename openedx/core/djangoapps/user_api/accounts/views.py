@@ -53,7 +53,6 @@ from openedx.core.lib.api.authentication import BearerAuthenticationAllowInactiv
 from openedx.core.lib.api.parsers import MergePatchParser
 from common.djangoapps.student.models import (  # lint-amnesty, pylint: disable=unused-import
     AccountRecovery,
-    CourseEnrollment,
     CourseEnrollmentAllowed,
     LoginFailures,
     ManualEnrollmentAudit,
