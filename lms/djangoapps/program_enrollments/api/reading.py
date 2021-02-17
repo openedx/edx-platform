@@ -9,9 +9,9 @@ from `lms.djangoapps.program_enrollments.api`.
 from organizations.models import Organization
 from social_django.models import UserSocialAuth
 
-from openedx.core.djangoapps.catalog.utils import get_programs
 from common.djangoapps.student.roles import CourseStaffRole
 from common.djangoapps.third_party_auth.models import SAMLProviderConfig
+from openedx.core.djangoapps.catalog.utils import get_programs
 
 from ..constants import ProgramCourseEnrollmentRoles
 from ..exceptions import (

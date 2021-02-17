@@ -13,10 +13,10 @@ class UserSocialAuthFactory(DjangoModelFactory):
     """
     Factory for UserSocialAuth records.
     """
-    class Meta(object):
+    class Meta:
         model = UserSocialAuth
     user = SubFactory(UserFactory)
     uid = LazyAttributeSequence(lambda o, n: '%s:%d' % (o.slug, n))
 
-    class Params(object):
+    class Params:
         slug = 'gatech'

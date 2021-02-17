@@ -3,10 +3,11 @@ Tests for the expire_waiting_enrollments management command.
 """
 
 
+from unittest.mock import patch
+
 import ddt
 from django.core.management import call_command
 from django.test import TestCase
-from mock import patch
 
 from lms.djangoapps.program_enrollments.management.commands import expire_waiting_enrollments
 
@@ -17,7 +18,7 @@ class TestExpireWaitingEnrollments(TestCase):
 
     @classmethod
     def setUpClass(cls):
-        super(TestExpireWaitingEnrollments, cls).setUpClass()
+        super().setUpClass()
         cls.command = expire_waiting_enrollments.Command()
 
     @ddt.data(90, None)
