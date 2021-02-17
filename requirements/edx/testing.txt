@@ -23,7 +23,7 @@ analytics-python==1.2.9   # via -r requirements/edx/base.txt
 aniso8601==8.1.1          # via -r requirements/edx/base.txt, edx-tincan-py35, tincan
 apipkg==1.5               # via execnet
 appdirs==1.4.4            # via -r requirements/edx/base.txt, fs, virtualenv
-astroid==2.5              # via pylint, pylint-celery
+astroid==2.4.2            # via pylint, pylint-celery
 attrs==20.3.0             # via -r requirements/edx/base.txt, edx-ace, pytest
 babel==2.9.0              # via -r requirements/edx/base.txt, enmerkar, enmerkar-underscore
 beautifulsoup4==4.9.3     # via -r requirements/edx/base.txt, -r requirements/edx/testing.in, pynliner
@@ -119,7 +119,7 @@ edx-proctoring==3.4.0     # via -r requirements/edx/base.txt, edx-proctoring-pro
 edx-rbac==1.4.1           # via -r requirements/edx/base.txt, edx-enterprise
 edx-rest-api-client==5.3.0  # via -r requirements/edx/base.txt, edx-enterprise, edx-proctoring
 edx-search==3.0.0         # via -r requirements/edx/base.txt
-edx-sga==0.15.0           # via -r requirements/edx/base.txt
+edx-sga==0.16.0           # via -r requirements/edx/base.txt
 edx-submissions==3.2.4    # via -r requirements/edx/base.txt, ora2
 edx-tincan-py35==1.0.0    # via -r requirements/edx/base.txt, edx-enterprise
 edx-toggles==4.0.0        # via -r requirements/edx/base.txt, edx-completion, edx-event-routing-backends, edxval, ora2
@@ -164,7 +164,7 @@ jsondiff==1.2.0           # via -r requirements/edx/base.txt, edx-enterprise
 jsonfield2==3.0.3         # via -c requirements/edx/../constraints.txt, -r requirements/edx/base.txt, edx-celeryutils, edx-enterprise, edx-event-routing-backends, edx-proctoring, edx-submissions, lti-consumer-xblock, ora2
 kombu==4.6.11             # via -r requirements/edx/base.txt, celery
 laboratory==1.0.2         # via -r requirements/edx/base.txt
-lazy-object-proxy==1.5.2  # via astroid
+lazy-object-proxy==1.4.3  # via astroid
 lazy==1.4                 # via -r requirements/edx/base.txt, acid-xblock, bok-choy, lti-consumer-xblock, ora2
 libsass==0.10.0           # via -r requirements/edx/base.txt, ora2
 loremipsum==1.0.5         # via -r requirements/edx/base.txt, ora2
@@ -213,7 +213,7 @@ pyjwt[crypto]==1.7.1      # via -r requirements/edx/base.txt, drf-jwt, edx-rest-
 pylint-celery==0.3        # via edx-lint
 pylint-django==2.4.2      # via edx-lint
 pylint-plugin-utils==0.6  # via pylint-celery, pylint-django
-pylint==2.6.0             # via edx-lint, pylint-celery, pylint-django, pylint-plugin-utils
+pylint==2.6.2             # via edx-lint, pylint-celery, pylint-django, pylint-plugin-utils
 pymongo==3.10.1           # via -c requirements/edx/../constraints.txt, -r requirements/edx/base.txt, edx-opaque-keys, event-tracking, mongodbproxy, mongoengine
 pynliner==0.8.0           # via -r requirements/edx/base.txt
 pyparsing==2.4.7          # via -r requirements/edx/base.txt, chem, openedx-calc, packaging, pycontracts
@@ -256,7 +256,7 @@ semantic-version==2.8.5   # via -r requirements/edx/base.txt, edx-drf-extensions
 shapely==1.7.1            # via -r requirements/edx/base.txt
 simplejson==3.17.2        # via -r requirements/edx/base.txt, sailthru-client, super-csv, xblock-utils
 singledispatch==3.4.0.3   # via -r requirements/edx/testing.in
-six==1.15.0               # via -r requirements/edx/base.txt, analytics-python, bleach, bok-choy, chem, codejail, crowdsourcehinter-xblock, cryptography, django-countries, django-simple-history, edx-ace, edx-bulk-grades, edx-ccx-keys, edx-django-release-util, edx-drf-extensions, edx-enterprise, edx-i18n-tools, edx-lint, edx-milestones, edx-rbac, event-tracking, freezegun, fs, fs-s3fs, html5lib, httpretty, isodate, libsass, mock, paver, pycontracts, pyjwkest, python-dateutil, python-memcached, python-swiftclient, singledispatch, social-auth-app-django, social-auth-core, stevedore, tox, transifex-client, virtualenv, xblock
+six==1.15.0               # via -r requirements/edx/base.txt, analytics-python, astroid, bleach, bok-choy, chem, codejail, crowdsourcehinter-xblock, cryptography, django-countries, django-simple-history, edx-ace, edx-bulk-grades, edx-ccx-keys, edx-django-release-util, edx-drf-extensions, edx-enterprise, edx-i18n-tools, edx-lint, edx-milestones, edx-rbac, event-tracking, freezegun, fs, fs-s3fs, html5lib, httpretty, isodate, libsass, mock, paver, pycontracts, pyjwkest, python-dateutil, python-memcached, python-swiftclient, singledispatch, social-auth-app-django, social-auth-core, stevedore, tox, transifex-client, virtualenv, xblock
 slumber==0.7.1            # via -r requirements/edx/base.txt, edx-bulk-grades, edx-enterprise, edx-rest-api-client
 smmap==3.0.5              # via gitdb
 social-auth-app-django==4.0.0  # via -r requirements/edx/base.txt
@@ -275,7 +275,7 @@ text-unidecode==1.3       # via -r requirements/edx/base.txt, faker, python-slug
 tincan==1.0.0             # via -r requirements/edx/base.txt, edx-event-routing-backends
 toml==0.10.2              # via pylint, pytest, tox
 tox-battery==0.6.1        # via -r requirements/edx/testing.in
-tox==3.21.4               # via -r requirements/edx/testing.in, tox-battery
+tox==3.22.0               # via -r requirements/edx/testing.in, tox-battery
 tqdm==4.56.2              # via -r requirements/edx/base.txt, nltk
 transifex-client==0.14.2  # via -r requirements/edx/testing.in
 ua-parser==0.10.0         # via -r requirements/edx/base.txt, django-cookies-samesite
