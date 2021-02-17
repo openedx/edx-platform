@@ -13,7 +13,7 @@ from lms.djangoapps.grades.api import CourseGradeFactory
 from openedx.core.djangoapps.catalog.utils import get_programs
 from openedx.core.djangoapps.credentials.models import CredentialsApiConfig
 
-from .helpers import is_learner_records_enabled, is_learner_records_enabled_for_org  # lint-amnesty, pylint: disable=unused-import
+from .helpers import is_learner_records_enabled_for_org  # lint-amnesty, pylint: disable=unused-import
 from .tasks.v1.tasks import send_grade_to_credentials
 
 log = getLogger(__name__)

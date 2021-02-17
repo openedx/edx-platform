@@ -12,7 +12,6 @@ from completion.test_utils import CompletionWaffleTestMixin, submit_completions_
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.test.client import RequestFactory
-from django.urls import reverse  # lint-amnesty, pylint: disable=unused-import
 
 from edx_toggles.toggles.testutils import override_waffle_flag
 from lms.djangoapps.certificates.api import get_certificate_url
