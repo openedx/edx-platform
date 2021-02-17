@@ -6,16 +6,37 @@ Status
 
 Accepted
 
+Decisions
+---------
+
+* We will deprecate and remove the `django-ratelimit-backend`_ from
+  edx-platform. This library is currently not being actively developed and is
+  looking for a new maintainer.  It is also very specific to rate limiting the
+  authentication backend and so can't easily be applied more generally.
+
+* For rate limiting in pure django views, we will use the `django-ratelimit`_
+  library. This library is well built for general use and can be easily used
+  multiple times for stacked rate limiting over multiple keys.  eg. limit by IP
+  or by user name.
+
+* For rate limiting in any DRF based views, we will use the
+  `djangorestframework rate limiting`_ capabilities that are built in to the
+  framework.
+
+
 Context
 -------
 
 edx-platform currently uses multiple different ratelimiting tools which can
-lead to confusion and difficulty understand how endpoints are secured.
+lead to confusion and difficulty understanding how endpoints are secured.
 Consider the following case study in how our login endpoints are currently rate
 limitied.
 
+Rate limiting Logins
+~~~~~~~~~~~~~~~~~~~~
+
 1st party vs 3rd party login
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 edx-platform allows for both 1st party auth, where you provide the LMS with
 your credentials and it gives you back some session tokens, and also 3rd party
@@ -24,7 +45,7 @@ redirected to the LMS with a token from that third party which is exchanged for
 1st party(LMS) session tokens.
 
 Login User View
-~~~~~~~~~~~~~~~
+^^^^^^^^^^^^^^^
 
 The ``login_user`` view in ``views/login.py`` is called for both 1st and 3rd
 party login flows.  In the 3rd party login flow, it's called as the callback
@@ -33,9 +54,6 @@ when redirected from the 3rd party login back to the LMS.
 Currently this view is accessed through two different endpoints.  It is
 currently a pass-through call for the ``/api/user/v1/account/login_session``
 using a DRF view.  It is also called directly at ``/login_ajax``
-
-Rate limiting Logins
-~~~~~~~~~~~~~~~~~~~~
 
 Currently there are five different rate limiting implementations in use as a
 part of the login flow.
@@ -81,22 +99,12 @@ part of the login flow.
 * `cloudflare rate limiting`_ - This is edx.org specific and not enabled by
   default for Open edX.
 
-Decisions
----------
+Ratelimiting other endpoints
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-* We will deprecate and remove the `django-ratelimit-backend`_ from
-  edx-platform. This library is currently not being actively developed and is
-  looking for a new maintainer.  It is also very specific to rate limiting the
-  authentication backend and so can't easily be applied more generally.
-
-* For rate limiting in pure django views, we will use the `django-ratelimit`_
-  library. This library is well built for general use and can be easily used
-  multiple times for stacked rate limiting over multiple keys.  eg. limit by IP
-  or by user name.
-
-* For rate limiting in any DRF based views, we will use the
-  `djangorestframework rate limiting`_ capabilities that are built in to the
-  framework.
+Other endpoints usually use only one of the above mentioned 3 libraries(drf,
+django-ratelimit, django-ratelimit-backend).  The decision below should clarify
+how and when we should be using different libraries.
 
 
 .. _django-ratelimit: https://django-ratelimit.readthedocs.io/en/stable/usage.html#usage-chapter
