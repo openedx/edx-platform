@@ -1046,5 +1046,27 @@ third
 </problem>\
 `);
     });
+
+    it('should throw error if an option does not have any text associated with it', function() {
+      let problemContent = `\
+>>The following languages are in the Indo-European family:||<<
+[ ]
+[x] Urdu
+[ ] Finnish\
+`
+      expect(function(){ MarkdownEditingDescriptor.markdownToXml(problemContent); }).toThrow(
+        new Error(gettext("One of the provided options doesn't have a valid text value"))
+      );
+
+      problemContent = `\
+>>The following languages are in the Indo-European family:||<<
+( )
+(x) Urdu
+( ) Finnish\
+`
+      expect(function(){ MarkdownEditingDescriptor.markdownToXml(problemContent); }).toThrow(
+        new Error(gettext("One of the provided options doesn't have a valid text value"))
+      );
+    });
   });
 });
