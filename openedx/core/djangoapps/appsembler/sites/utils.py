@@ -352,7 +352,14 @@ def get_branding_values_from_file():
     if not settings.ENABLE_COMPREHENSIVE_THEMING:
         return {}
 
-    site_theme = SiteTheme(site=Site.objects.get(id=settings.SITE_ID), theme_dir_name=settings.DEFAULT_SITE_THEME)
+    try:
+        default_site = Site.objects.get(id=settings.SITE_ID)
+    except Site.DoesNotExist:
+        # Empty values dictionary if the database isn't initialized yet.
+        # This unblocks migrations and other cases before having a default site.
+        return {}
+
+    site_theme = SiteTheme(site=default_site, theme_dir_name=settings.DEFAULT_SITE_THEME)
     theme = Theme(
         name=site_theme.theme_dir_name,
         theme_dir_name=site_theme.theme_dir_name,
@@ -391,7 +398,14 @@ def get_branding_labels_from_file(custom_branding=None):
 @beeline.traced(name="compile_sass")
 def compile_sass(sass_file, custom_branding=None):
     from openedx.core.djangoapps.theming.helpers import get_theme_base_dir, Theme
-    site_theme = SiteTheme(site=Site.objects.get(id=settings.SITE_ID), theme_dir_name=settings.DEFAULT_SITE_THEME)
+    try:
+        default_site = Site.objects.get(id=settings.SITE_ID)
+    except Site.DoesNotExist:
+        # Empty CSS output if the database isn't initialized yet.
+        # This unblocks migrations and other cases before having a default site.
+        return ''
+
+    site_theme = SiteTheme(site=default_site, theme_dir_name=settings.DEFAULT_SITE_THEME)
     theme = Theme(
         name=site_theme.theme_dir_name,
         theme_dir_name=site_theme.theme_dir_name,
