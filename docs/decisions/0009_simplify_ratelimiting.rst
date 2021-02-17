@@ -9,10 +9,10 @@ Accepted
 Context
 -------
 
-edx-platform currently uses multiple different ratelimiting tools currently
-which can lead to confusion and difficulty understand how endpoints are
-secured.  Consider the following case study in how our login endpoints are
-currently rate limitied.
+edx-platform currently uses multiple different ratelimiting tools which can
+lead to confusion and difficulty understand how endpoints are secured.
+Consider the following case study in how our login endpoints are currently rate
+limitied.
 
 1st party vs 3rd party login
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
