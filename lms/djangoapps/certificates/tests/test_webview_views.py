@@ -644,7 +644,8 @@ class CertificatesViewsTests(CommonCertificatesTestCase, CacheIsolationTestCase)
         response = self.client.get(test_url)
         self.assertContains(response, '<html class="no-js" lang="ar">')
 
-    @unittest.skipIf(settings.TAHOE_ALWAYS_SKIP_TEST, 'Failing test. Needs investigation to fix.')
+    @unittest.skipIf(settings.TAHOE_TEMP_MONKEYPATCHING_JUNIPER_TESTS,
+                     'Test fails. Investigated. Disabling for now.')
     @override_settings(FEATURES=FEATURES_WITH_CERTS_ENABLED)
     def test_html_view_for_non_viewable_certificate_and_for_student_user(self):
         """
@@ -1559,7 +1560,8 @@ class CertificateEventTests(CommonCertificatesTestCase, EventTrackingTestCase):
     """
     Test events emitted by certificate handling.
     """
-    @unittest.skipIf(settings.TAHOE_ALWAYS_SKIP_TEST, 'Test fails. Needs investigation to fix.')
+    @unittest.skipIf(settings.TAHOE_TEMP_MONKEYPATCHING_JUNIPER_TESTS,
+                     'Test fails. Investigated. Disabling for now.')
     @override_settings(FEATURES=FEATURES_WITH_CERTS_ENABLED)
     def test_certificate_evidence_event_emitted(self):
         self.client.logout()
@@ -1586,7 +1588,8 @@ class CertificateEventTests(CommonCertificatesTestCase, EventTrackingTestCase):
             actual_event['data']
         )
 
-    @unittest.skipIf(settings.TAHOE_ALWAYS_SKIP_TEST, 'Test fails. Needs investigation to fix.')
+    @unittest.skipIf(settings.TAHOE_TEMP_MONKEYPATCHING_JUNIPER_TESTS,
+                     'Test fails. Investigated. Disabling for now.')
     @override_settings(FEATURES=FEATURES_WITH_CERTS_ENABLED)
     def test_evidence_event_sent(self):
         self._add_course_certificates(count=1, signatory_count=2)
