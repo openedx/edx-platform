@@ -2,17 +2,18 @@
 Tests related to the signals.py file of the mailchimp_pipeline app
 """
 import json
-from mock import ANY, patch
+
 from django.conf import settings
 from django.test import TestCase
+from mock import ANY, patch
+
 from lms.djangoapps.onboarding.models import EmailPreference, GranteeOptIn
 from lms.djangoapps.onboarding.tests.factories import UserFactory
-
-from mailchimp_pipeline.helpers import get_org_data_for_mandrill
 from mailchimp_pipeline.client import Connection
+from mailchimp_pipeline.helpers import get_org_data_for_mandrill
 from mailchimp_pipeline.tests.helpers import (
-    create_organization_partner_object,
     create_organization,
+    create_organization_partner_object,
     generate_mailchimp_url
 )
 

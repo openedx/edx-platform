@@ -2,11 +2,13 @@
 Helpers to provide utility to the mailchimp_pipeline app
 """
 from datetime import datetime
+
 import pytz
+from opaque_keys.edx.keys import CourseKey
+
 from custom_settings.models import CustomSettings
 from enrollment.api import get_enrollments
-from opaque_keys.edx.keys import CourseKey
-from lms.djangoapps.onboarding.models import (FocusArea, OrgSector, )
+from lms.djangoapps.onboarding.models import FocusArea, OrgSector
 
 
 def is_active_enrollment(course_end_date):

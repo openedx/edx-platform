@@ -5,6 +5,7 @@ import hashlib
 from datetime import datetime, timedelta
 
 from django.conf import settings
+
 from lms.djangoapps.onboarding.models import OrganizationPartner
 from lms.djangoapps.onboarding.tests.factories import OrganizationFactory
 

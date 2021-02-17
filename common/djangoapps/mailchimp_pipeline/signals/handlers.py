@@ -4,17 +4,20 @@ Handlers and signals for Mailchimp pipeline
 from logging import getLogger
 
 from celery.task import task
-from common.lib.mandrill_client.client import MandrillClient
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.db.models.signals import post_save
 from django.dispatch import receiver
+
+from common.lib.mandrill_client.client import MandrillClient
 from lms.djangoapps.certificates import api as certificate_api
-from lms.djangoapps.onboarding.models import (
-    UserExtendedProfile, Organization, EmailPreference, GranteeOptIn)
+from lms.djangoapps.onboarding.models import EmailPreference, GranteeOptIn, Organization, UserExtendedProfile
 from mailchimp_pipeline.client import ChimpClient, MailChimpException
-from mailchimp_pipeline.helpers import get_org_data_for_mandrill, get_user_active_enrollements, \
-    get_enrollements_course_short_ids
+from mailchimp_pipeline.helpers import (
+    get_enrollements_course_short_ids,
+    get_org_data_for_mandrill,
+    get_user_active_enrollements
+)
 from mailchimp_pipeline.tasks import update_org_details_at_mailchimp
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from student.models import UserProfile

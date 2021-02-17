@@ -2,14 +2,15 @@
 Tests for the client.py file of the mailchimp_pipeline app
 """
 import json
+
 import requests
-from mock import ANY, patch
 from django.conf import settings
 from django.test import TestCase
-from student.tests.factories import UserFactory
+from mock import ANY, patch
 
 from mailchimp_pipeline.client import ChimpClient, Connection
 from mailchimp_pipeline.tests.helpers import generate_mailchimp_url
+from student.tests.factories import UserFactory
 
 
 class MailchimpPipelineClientTestClass(TestCase):

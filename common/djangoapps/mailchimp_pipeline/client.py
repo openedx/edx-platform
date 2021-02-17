@@ -1,11 +1,12 @@
 """
 Client side logic for the mailchimp api
 """
-import json
 import hashlib
+import json
+
+from django.conf import settings
 from requests import request
 from requests.exceptions import HTTPError
-from django.conf import settings
 
 
 class MailChimpException(Exception):

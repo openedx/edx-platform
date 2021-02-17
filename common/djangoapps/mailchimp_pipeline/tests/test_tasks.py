@@ -1,41 +1,40 @@
 """
 Tests related to tasks.py file of the mailchimp pipeline app
 """
+import json
 from datetime import datetime
 
-import json
-import requests
 import factory
-from mock import ANY, patch
+import requests
 from django.conf import settings
-from django.test import override_settings
 from django.db.models.signals import post_save
-from common.djangoapps.mailchimp_pipeline.tests.helpers import create_organization, generate_mailchimp_url
-from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
-from lms.djangoapps.onboarding.tests.factories import UserFactory
-from lms.djangoapps.onboarding.models import OrganizationMetricUpdatePrompt
-from lms.djangoapps.onboarding.models import FocusArea, OrgSector
-from lms.djangoapps.certificates import api as certificate_api
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory
-from student.models import CourseEnrollment
+from django.test import override_settings
+from mock import ANY, patch
 
-from mailchimp_pipeline.tasks import update_org_details_at_mailchimp, update_enrollments_completions_at_mailchimp
+from common.djangoapps.mailchimp_pipeline.tests.helpers import create_organization, generate_mailchimp_url
+from lms.djangoapps.certificates import api as certificate_api
+from lms.djangoapps.onboarding.models import FocusArea, OrganizationMetricUpdatePrompt, OrgSector
+from lms.djangoapps.onboarding.tests.factories import UserFactory
+from mailchimp_pipeline.client import Connection, MailChimpException
 from mailchimp_pipeline.helpers import (
     get_enrollements_course_short_ids,
     get_org_data_for_mandrill,
     get_user_active_enrollements
 )
-from mailchimp_pipeline.client import MailChimpException, Connection
 from mailchimp_pipeline.signals.handlers import (
+    send_user_course_completions_to_mailchimp,
+    send_user_enrollments_to_mailchimp,
     send_user_info_to_mailchimp,
     sync_metric_update_prompt_with_mail_chimp,
-    update_mailchimp,
-    send_user_enrollments_to_mailchimp,
     task_send_account_activation_email,
     task_send_user_info_to_mailchimp,
-    send_user_course_completions_to_mailchimp
+    update_mailchimp
 )
+from mailchimp_pipeline.tasks import update_enrollments_completions_at_mailchimp, update_org_details_at_mailchimp
+from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
+from student.models import CourseEnrollment
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from xmodule.modulestore.tests.factories import CourseFactory
 
 
 @override_settings(CELERY_TASK_ALWAYS_EAGER=True, CELERY_TASK_EAGER_PROPOGATES=True)
