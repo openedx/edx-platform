@@ -47,6 +47,7 @@ class EdlyUserProfile(models.Model):
     """
     user = models.OneToOneField(User, unique=True, db_index=True, related_name='edly_profile', on_delete=models.CASCADE)
     edly_sub_organizations = models.ManyToManyField(EdlySubOrganization)
+    course_activity_date = models.DateTimeField(blank=True, null=True)
 
     @property
     def get_linked_edly_sub_organizations(self):
