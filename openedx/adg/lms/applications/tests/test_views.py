@@ -83,6 +83,11 @@ def logged_in_client_fixture(user):
     return client
 
 
+@pytest.fixture
+def mock_get_prerequisite_courses_for_user(monkeypatch):
+    monkeypatch.setattr('openedx.adg.lms.applications.views.get_prerequisite_courses_for_user', lambda x: [])
+
+
 @pytest.mark.django_db
 def test_get_redirects_without_login_for_application_hub_view():
     """
@@ -102,17 +107,11 @@ def test_post_user_redirects_without_login_for_application_hub_view():
 
 
 @pytest.mark.django_db
-@mock.patch('openedx.adg.lms.applications.views.get_prerequisite_courses_for_user')
 @mock.patch('openedx.adg.lms.applications.views.render')
-def test_get_initial_application_state_for_application_hub_view(
-    mock_render,
-    mock_get_prerequisite_courses_for_user,
-    application_hub_view_get_request
-):
+def test_get_initial_application_state_for_application_hub_view(mock_render, application_hub_view_get_request):
     """
     Test the case where the user has not completed even a single objective of the application.
     """
-    mock_get_prerequisite_courses_for_user.return_value = []
     ApplicationHubView.as_view()(application_hub_view_get_request)
 
     expected_context = {
@@ -125,18 +124,13 @@ def test_get_initial_application_state_for_application_hub_view(
 
 
 @pytest.mark.django_db
-@mock.patch('openedx.adg.lms.applications.views.get_prerequisite_courses_for_user')
 @mock.patch('openedx.adg.lms.applications.views.render')
 def test_get_written_application_completed_state_for_application_hub_view(
-    mock_render,
-    mock_get_prerequisite_courses_for_user,
-    application_hub_view_get_request,
-
+    mock_render, application_hub_view_get_request,
 ):
     """
     Test the case where the user has completed the written application but not the pre_req courses.
     """
-    mock_get_prerequisite_courses_for_user.return_value = []
     ApplicationHubView.as_view()(application_hub_view_get_request)
 
     expected_context = {
@@ -149,17 +143,11 @@ def test_get_written_application_completed_state_for_application_hub_view(
 
 
 @pytest.mark.django_db
-@mock.patch('openedx.adg.lms.applications.views.get_prerequisite_courses_for_user')
 @mock.patch('openedx.adg.lms.applications.views.render')
-def test_get_pre_req_courses_passed_state_for_application_hub_view(
-    mock_render,
-    mock_get_prerequisite_courses_for_user,
-    application_hub_view_get_request,
-):
+def test_get_pre_req_courses_passed_state_for_application_hub_view(mock_render, application_hub_view_get_request):
     """
     Test the case where the user has completed the pre_req courses but not the written application.
     """
-    mock_get_prerequisite_courses_for_user.return_value = []
     ApplicationHubView.as_view()(application_hub_view_get_request)
 
     user = application_hub_view_get_request.user
@@ -174,19 +162,12 @@ def test_get_pre_req_courses_passed_state_for_application_hub_view(
 
 
 @pytest.mark.django_db
-@mock.patch('openedx.adg.lms.applications.views.get_prerequisite_courses_for_user')
 @mock.patch('openedx.adg.lms.applications.views.render')
-def test_get_complete_application_done_state_for_application_hub_view(
-    mock_render,
-    mock_get_prerequisite_courses_for_user,
-    application_hub_view_get_request,
-
-):
+def test_get_complete_application_done_state_for_application_hub_view(mock_render, application_hub_view_get_request):
     """
     Test the case where the user has completed both objectives i.e the pre_req courses and the
     written application.
     """
-    mock_get_prerequisite_courses_for_user.return_value = []
     ApplicationHubView.as_view()(application_hub_view_get_request)
 
     expected_context = {
