@@ -14,9 +14,7 @@ Where possible, seed data using public API methods (e.g. replace_course_outline
 from this app, edx-when's set_dates_for_course).
 """
 from datetime import datetime, timezone
-
-from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user, unused-import
-from opaque_keys.edx.keys import CourseKey, UsageKey  # lint-amnesty, pylint: disable=unused-import
+from opaque_keys.edx.keys import CourseKey  # lint-amnesty, pylint: disable=unused-import
 from rest_framework.test import APITestCase, APIClient
 
 from openedx.core.djangolib.testing.utils import CacheIsolationTestCase
