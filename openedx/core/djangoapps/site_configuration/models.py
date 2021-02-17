@@ -79,7 +79,7 @@ class SiteConfiguration(models.Model):
     def save(self, **kwargs):
         # When creating a new object, save default microsite values. Not implemented as a default method on the field
         # because it depends on other fields that should be already filled.
-        if not self.id:
+        if not self.site_values:
             self.site_values = self.get_initial_microsite_values()
 
         # fix for a bug with some pages requiring uppercase platform_name variable
