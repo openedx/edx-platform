@@ -8,12 +8,11 @@ from django.conf import settings
 from django.test.client import RequestFactory
 from django.utils.deprecation import MiddlewareMixin
 from edx_django_utils.monitoring import set_custom_attribute
-from edx_toggles.toggles import SettingToggle, WaffleFlag
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
-from rest_framework.views import exception_handler
 from six.moves.urllib.parse import urlparse
 
+from edx_toggles.toggles import WaffleFlag
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 
 # accommodates course api urls, excluding any course api routes that do not fall under v*/courses, such as v1/blocks.
@@ -228,29 +227,3 @@ class CookieMonitoringMiddleware(MiddlewareMixin):
             set_custom_attribute(name_attribute, name)
             set_custom_attribute(size_attribute, size)
             log.debug('%s = %d', name, size)
-
-# .. toggle_name: ENABLE_403_MONITORING
-# .. toggle_implementation: SettingToggle
-# .. toggle_default: False
-# .. toggle_description: Temporary toggle to track down the source of 403s for /oauth2/exchange_access_token/.
-# .. toggle_use_cases: temporary
-# .. toggle_creation_date: 2021-02-12
-# .. toggle_target_removal_date: 2021-03-12
-# .. toggle_tickets: https://openedx.atlassian.net/browse/ARCHBOM-1667
-ENABLE_403_MONITORING = SettingToggle('ENABLE_403_MONITORING', default=False, module_name=__name__)
-
-
-def custom_exception_handler(exc, context):
-    """ Enables monitoring of 403s for /oauth2/exchange_access_token/ to gather data. """
-    # Call REST framework's default exception handler first,
-    # to get the standard error response.
-    response = exception_handler(exc, context)
-
-    log_403s = ENABLE_403_MONITORING.is_enabled() and response.status_code == 403
-    log_403s = log_403s and 'request' in context and context['request'] and context['request'].path
-    log_403s = log_403s and context['request'].path.startswith('/oauth2/exchange_access_token/')
-    if log_403s:
-        set_custom_attribute('exchange_access_token_error', repr(exc))
-        log.info('Found 403 in %s', context['request'].path, exc_info=exc, stack_info=True)
-
-    return response
