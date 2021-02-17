@@ -10,7 +10,7 @@ from django.contrib.auth import get_user_model
 from django.views.decorators.clickjacking import xframe_options_exempt
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework import permissions
-from rest_framework.decorators import api_view, permission_classes, authentication_classes  # lint-amnesty, pylint: disable=unused-import
+from rest_framework.decorators import api_view, permission_classes  # lint-amnesty, pylint: disable=unused-import
 from rest_framework.exceptions import PermissionDenied, AuthenticationFailed
 from rest_framework.response import Response
 from xblock.django.request import DjangoWebobRequest, webob_to_django_response
@@ -22,6 +22,7 @@ from ..api import (
     get_handler_url as _get_handler_url,
     load_block,
     render_block_view as _render_block_view,
+
 )
 from ..utils import validate_secure_token_for_xblock_handler
 
