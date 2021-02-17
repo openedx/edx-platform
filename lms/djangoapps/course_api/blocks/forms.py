@@ -31,6 +31,7 @@ class BlockListGetForm(Form):
         choices=[(choice, choice) for choice in ['dict', 'list']],
     )
     student_view_data = MultiValueField(required=False)
+    student_view_data_context = MultiValueField(required=False)
     usage_key = CharField(required=True)
     username = CharField(required=False)
     block_types_filter = MultiValueField(required=False)
@@ -123,6 +124,15 @@ class BlockListGetForm(Form):
         if 'username' in self.data:
             return self.cleaned_data['username']
         return None
+
+    def clean_student_view_data_context(self):
+        student_view_data_context = {}
+        if self.cleaned_data.get('student_view_data.video.context'):
+            student_view_data_context['video'] = {
+                'profiles': ["mobile_low", "desktop_mp4", "desktop_webm", "mobile_high"]
+            }
+
+        return student_view_data_context
 
     def _clean_requested_user(self, cleaned_data, course_key):
         """
