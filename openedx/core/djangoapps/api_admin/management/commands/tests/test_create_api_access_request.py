@@ -7,8 +7,6 @@ from django.contrib.sites.models import Site
 from django.core.management import call_command
 from django.core.management.base import CommandError
 from django.test import TestCase
-
-from openedx.core.djangoapps.api_admin.management.commands import create_api_access_request
 from openedx.core.djangoapps.api_admin.models import ApiAccessConfig, ApiAccessRequest
 from common.djangoapps.student.tests.factories import UserFactory
 

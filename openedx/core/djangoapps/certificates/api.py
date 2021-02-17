@@ -5,7 +5,6 @@ The public API for certificates.
 
 import logging
 from datetime import datetime
-
 from pytz import UTC
 
 from lms.djangoapps.certificates.models import CertificateStatuses, CertificateWhitelist
