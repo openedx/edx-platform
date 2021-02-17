@@ -2,6 +2,7 @@
 <%!
 from django.utils.translation import ugettext as _
 from django.urls import reverse
+from django.utils.http import urlencode
 
 from openedx.core.djangolib.markup import HTML, Text
 from openedx.core.djangolib.js_utils import (
@@ -337,7 +338,7 @@ from openedx.core.djangolib.js_utils import (
             %else:
              <li class="libraries-tab ${ 'active' if active_tab == 'libraries' else ''}">
                 % if split_studio_home:
-                  <a href="${reverse('home_library')}">${_("Libraries")}</a>
+                  <a href="${ '%s?%s' % ( reverse('home_library') , urlencode(query_params)) }">${_("Libraries")}</a>
                 % else:
                   <a href="#" >${_("Libraries")}</a>
                 % endif
