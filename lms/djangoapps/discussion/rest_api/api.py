@@ -1105,7 +1105,7 @@ def get_response_comments(request, comment_id, page, page_size, requested_fields
         )
 
         comments_count = len(response_comments)
-        num_pages = (comments_count + page_size - 1) / page_size if comments_count else 1
+        num_pages = (comments_count + page_size - 1) // page_size if comments_count else 1
         paginator = DiscussionAPIPagination(request, page, num_pages, comments_count)
         return paginator.get_paginated_response(results)
     except CommentClientRequestError:
