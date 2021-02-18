@@ -32,7 +32,7 @@ Longer TODO:
 import importlib.util
 import sys
 import os
-from typing import Dict, Any, Union, Sequence, Mapping, Tuple
+from typing import Dict, Any, Union, Sequence, Mapping, Tuple, TypedDict
 
 from corsheaders.defaults import default_headers as corsheaders_default_headers
 from path import Path as path
@@ -935,8 +935,23 @@ CONTEXT_PROCESSORS = [
     'lms.djangoapps.mobile_api.context_processor.is_from_mobile_app'
 ]
 
+
+class OptionsDef(TypedDict, total=False):
+    loaders: Sequence[str]
+    context_processors: Sequence[str]
+    debug: bool
+
+
+class TemplateDef(TypedDict):
+    NAME: str
+    BACKEND: str
+    APP_DIRS: bool
+    DIRS: Sequence[Union[path, str]]
+    OPTIONS: OptionsDef
+
+
 # Django templating
-TEMPLATES = [
+TEMPLATES: Sequence[TemplateDef] = [
     {
         'NAME': 'django',
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
