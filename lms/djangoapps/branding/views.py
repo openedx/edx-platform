@@ -18,7 +18,7 @@ from django.views.decorators.csrf import ensure_csrf_cookie
 
 import branding.api as branding_api
 import lms.djangoapps.courseware.views.views as courseware_views
-from openedx.features.pakx_features import views as pakx_views
+from openedx.features.pakx.lms.overrides import views as pakx_views
 import student.views
 from edxmako.shortcuts import marketing_link, render_to_response
 from openedx.core.djangoapps.lang_pref.api import released_languages

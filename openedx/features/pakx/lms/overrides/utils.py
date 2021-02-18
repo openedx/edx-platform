@@ -1,18 +1,17 @@
 from re import search
-from six import text_type
-from django.db.models.functions import Coalesce
-from django.db.models import Sum, Case, When, IntegerField
 
-from opaque_keys.edx.keys import CourseKey
-from student.models import CourseEnrollment
 from completion.models import BlockCompletion
-from openedx.core.djangoapps.content.block_structure.api import get_course_in_cache
-from openedx.features.course_experience.utils import (get_course_outline_block_tree,
-                                                      get_resume_block)
+from django.db.models import Case, IntegerField, Sum, When
+from django.db.models.functions import Coalesce
+from opaque_keys.edx.keys import CourseKey
+from six import text_type
+
 from lms.djangoapps.course_api.blocks.serializers import BlockDictSerializer
 from lms.djangoapps.course_api.blocks.transformers.blocks_api import BlocksAPITransformer
+from openedx.core.djangoapps.content.block_structure.api import get_course_in_cache
 from openedx.core.djangoapps.content.block_structure.transformers import BlockStructureTransformers
-
+from openedx.features.course_experience.utils import get_course_outline_block_tree, get_resume_block
+from student.models import CourseEnrollment
 
 CORE_BLOCK_TYPES = ['html', 'video', 'problem']
 BLOCK_TYPES_TO_FILTER = ['course', 'chapter', 'sequential', 'vertical', 'discussion', 'openassessment']

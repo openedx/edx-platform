@@ -51,6 +51,7 @@ from openedx.core.djangoapps.user_authn.views.login import redirect_to_lms_login
 from openedx.core.djangoapps.user_authn.views.login_form import login_and_registration_form
 from openedx.core.djangoapps.verified_track_content import views as verified_track_content_views
 from openedx.features.enterprise_support.api import enterprise_enabled
+from openedx.features.pakx.lms.urls import pakx_url_patterns
 from static_template_view import views as static_template_view_views
 from staticbook import views as staticbook_views
 from student import views as student_views
@@ -101,8 +102,6 @@ urlpatterns = [
     # TODO: Move lms specific student views out of common code
     url(r'^dashboard/?$', branding_views.courses, name='dashboard'),
     url(r'^change_enrollment$', student_views.change_enrollment, name='change_enrollment'),
-
-    url(r'', include('openedx.features.pakx_features.urls')),
 
     # Event tracking endpoints
     url(r'', include('track.urls')),
@@ -176,6 +175,9 @@ urlpatterns = [
     url(r'^api/discounts/', include(('openedx.features.discounts.urls', 'openedx.features.discounts'),
                                     namespace='api_discounts')),
 ]
+
+# include all pakx lms urls
+urlpatterns.extend(pakx_url_patterns)
 
 if settings.FEATURES.get('ENABLE_MOBILE_REST_API'):
     urlpatterns += [
