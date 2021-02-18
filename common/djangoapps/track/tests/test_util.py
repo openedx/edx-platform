@@ -29,10 +29,10 @@ class TestDateTimeJSONEncoder(TestCase):  # lint-amnesty, pylint: disable=missin
         to_json = json.dumps(obj, cls=DateTimeJSONEncoder)
         from_json = json.loads(to_json)
 
-        self.assertEqual(from_json['number'], 100)
-        self.assertEqual(from_json['string'], 'hello')
-        self.assertEqual(from_json['object'], {'a': 1})
+        assert from_json['number'] == 100
+        assert from_json['string'] == 'hello'
+        assert from_json['object'] == {'a': 1}
 
-        self.assertEqual(from_json['a_datetime'], an_iso_datetime)
-        self.assertEqual(from_json['a_tz_datetime'], an_iso_datetime)
-        self.assertEqual(from_json['a_date'], an_iso_date)
+        assert from_json['a_datetime'] == an_iso_datetime
+        assert from_json['a_tz_datetime'] == an_iso_datetime
+        assert from_json['a_date'] == an_iso_date

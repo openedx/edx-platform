@@ -26,18 +26,18 @@ class MemcacheTest(TestCase):
 
     def test_safe_key(self):
         key = safe_key('test', 'prefix', 'version')
-        self.assertEqual(key, 'prefix:version:test')
+        assert key == 'prefix:version:test'
 
     def test_numeric_inputs(self):
 
         # Numeric key
-        self.assertEqual(safe_key(1, 'prefix', 'version'), 'prefix:version:1')
+        assert safe_key(1, 'prefix', 'version') == 'prefix:version:1'
 
         # Numeric prefix
-        self.assertEqual(safe_key('test', 5, 'version'), '5:version:test')
+        assert safe_key('test', 5, 'version') == '5:version:test'
 
         # Numeric version
-        self.assertEqual(safe_key('test', 'prefix', 5), 'prefix:5:test')
+        assert safe_key('test', 'prefix', 5) == 'prefix:5:test'
 
     def test_safe_key_long(self):
 
@@ -51,22 +51,21 @@ class MemcacheTest(TestCase):
             key = safe_key(key, '', '')
 
             # The key should now be valid
-            self.assertTrue(self._is_valid_key(key),
-                            msg="Failed for key length {0}".format(length))
+            assert self._is_valid_key(key), 'Failed for key length {0}'.format(length)
 
     def test_long_key_prefix_version(self):
 
         # Long key
         key = safe_key('a' * 300, 'prefix', 'version')
-        self.assertTrue(self._is_valid_key(key))
+        assert self._is_valid_key(key)
 
         # Long prefix
         key = safe_key('key', 'a' * 300, 'version')
-        self.assertTrue(self._is_valid_key(key))
+        assert self._is_valid_key(key)
 
         # Long version
         key = safe_key('key', 'prefix', 'a' * 300)
-        self.assertTrue(self._is_valid_key(key))
+        assert self._is_valid_key(key)
 
     def test_safe_key_unicode(self):
 
@@ -79,8 +78,7 @@ class MemcacheTest(TestCase):
             key = safe_key(key, '', '')
 
             # The key should now be valid
-            self.assertTrue(self._is_valid_key(key),
-                            msg="Failed for unicode character {0}".format(unicode_char))
+            assert self._is_valid_key(key), 'Failed for unicode character {0}'.format(unicode_char)
 
     def test_safe_key_prefix_unicode(self):
 
@@ -93,8 +91,7 @@ class MemcacheTest(TestCase):
             key = safe_key('test', prefix, '')
 
             # The key should now be valid
-            self.assertTrue(self._is_valid_key(key),
-                            msg="Failed for unicode character {0}".format(unicode_char))
+            assert self._is_valid_key(key), 'Failed for unicode character {0}'.format(unicode_char)
 
     def test_safe_key_version_unicode(self):
 
@@ -107,8 +104,7 @@ class MemcacheTest(TestCase):
             key = safe_key('test', '', version)
 
             # The key should now be valid
-            self.assertTrue(self._is_valid_key(key),
-                            msg="Failed for unicode character {0}".format(unicode_char))
+            assert self._is_valid_key(key), 'Failed for unicode character {0}'.format(unicode_char)
 
     def _is_valid_key(self, key):
         """

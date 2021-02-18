@@ -65,27 +65,27 @@ class MilestonesHelpersTestCase(ModuleStoreTestCase):
             'ENABLE_PREREQUISITE_COURSES': feature_flags[0],
             'MILESTONES_APP': feature_flags[1]
         }):
-            self.assertEqual(feature_flags[2], milestones_helpers.is_prerequisite_courses_enabled())
+            assert feature_flags[2] == milestones_helpers.is_prerequisite_courses_enabled()
 
     def test_add_milestone_returns_none_when_app_disabled(self):
         response = milestones_helpers.add_milestone(milestone_data=self.milestone)
-        self.assertIsNone(response)
+        assert response is None
 
     def test_get_milestones_returns_none_when_app_disabled(self):
         response = milestones_helpers.get_milestones(namespace="whatever")
-        self.assertEqual(len(response), 0)
+        assert len(response) == 0
 
     def test_get_milestone_relationship_types_returns_none_when_app_disabled(self):
         response = milestones_helpers.get_milestone_relationship_types()
-        self.assertEqual(len(response), 0)
+        assert len(response) == 0
 
     def test_add_course_milestone_returns_none_when_app_disabled(self):
         response = milestones_helpers.add_course_milestone(six.text_type(self.course.id), 'requires', self.milestone)
-        self.assertIsNone(response)
+        assert response is None
 
     def test_get_course_milestones_returns_none_when_app_disabled(self):
         response = milestones_helpers.get_course_milestones(six.text_type(self.course.id))
-        self.assertEqual(len(response), 0)
+        assert len(response) == 0
 
     def test_add_course_content_milestone_returns_none_when_app_disabled(self):
         response = milestones_helpers.add_course_content_milestone(
@@ -94,7 +94,7 @@ class MilestonesHelpersTestCase(ModuleStoreTestCase):
             'requires',
             self.milestone
         )
-        self.assertIsNone(response)
+        assert response is None
 
     def test_get_course_content_milestones_returns_none_when_app_disabled(self):
         response = milestones_helpers.get_course_content_milestones(
@@ -102,28 +102,28 @@ class MilestonesHelpersTestCase(ModuleStoreTestCase):
             'i4x://doesnt/matter/for/this/test',
             'requires'
         )
-        self.assertEqual(len(response), 0)
+        assert len(response) == 0
 
     def test_remove_content_references_returns_none_when_app_disabled(self):
         response = milestones_helpers.remove_content_references("i4x://any/content/id/will/do")
-        self.assertIsNone(response)
+        assert response is None
 
     def test_get_namespace_choices_returns_values_when_app_disabled(self):
         response = milestones_helpers.get_namespace_choices()
-        self.assertIn('ENTRANCE_EXAM', response)
+        assert 'ENTRANCE_EXAM' in response
 
     def test_get_course_milestones_fulfillment_paths_returns_none_when_app_disabled(self):
         response = milestones_helpers.get_course_milestones_fulfillment_paths(six.text_type(self.course.id), self.user)
-        self.assertIsNone(response)
+        assert response is None
 
     def test_add_user_milestone_returns_none_when_app_disabled(self):
         response = milestones_helpers.add_user_milestone(self.user, self.milestone)
-        self.assertIsNone(response)
+        assert response is None
 
     def test_get_service_returns_none_when_app_disabled(self):
         """MilestonesService is None when app disabled"""
         response = milestones_helpers.get_service()
-        self.assertIsNone(response)
+        assert response is None
 
     @patch.dict(settings.FEATURES, {'MILESTONES_APP': True})
     def test_any_unfulfilled_milestones(self):
@@ -134,9 +134,9 @@ class MilestonesHelpersTestCase(ModuleStoreTestCase):
         # Should not raise any exceptions
         milestones_helpers.any_unfulfilled_milestones(self.course.id, self.user['id'])
 
-        with self.assertRaises(InvalidCourseKeyException):
+        with pytest.raises(InvalidCourseKeyException):
             milestones_helpers.any_unfulfilled_milestones(None, self.user['id'])
-        with self.assertRaises(InvalidUserException):
+        with pytest.raises(InvalidUserException):
             milestones_helpers.any_unfulfilled_milestones(self.course.id, None)
 
     @patch.dict(settings.FEATURES, {'MILESTONES_APP': True})
