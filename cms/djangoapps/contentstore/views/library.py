@@ -188,6 +188,17 @@ def _create_library(request):
         library = request.json.get('number', None)
         if library is None:
             library = request.json['library']
+        # Allow user to create the library only if they belong to the organisation
+        if settings.FEATURES.get('RESTRICT_COURSE_CREATION_TO_ORG_ROLES'):
+            has_org_permission = has_studio_write_access(request.user, None, org)
+            if not has_org_permission:
+                log.exception(
+                    "User does not have the permission to create library in this organization."
+                    "User: {} Org: {} Library: {}".format(request.user.id, org, library)
+                )
+                return JsonResponseBadRequest({
+                    "ErrMsg": _(u"User does not have the permission to create library in this organization")
+                })
         store = modulestore()
         with store.default_store(ModuleStoreEnum.Type.split):
             new_lib = store.create_library(
