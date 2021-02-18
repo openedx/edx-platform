@@ -99,8 +99,8 @@ class ProgramListingPageA11yTest(ProgramPageBase):
 
         self.listing_page.visit()
 
-        self.assertTrue(self.listing_page.is_sidebar_present)
-        self.assertFalse(self.listing_page.are_cards_present)
+        assert self.listing_page.is_sidebar_present
+        assert not self.listing_page.are_cards_present
         self.listing_page.a11y_audit.check_for_accessibility_errors()
 
     def test_cards_a11y(self):
@@ -118,8 +118,8 @@ class ProgramListingPageA11yTest(ProgramPageBase):
 
         self.listing_page.visit()
 
-        self.assertTrue(self.listing_page.is_sidebar_present)
-        self.assertTrue(self.listing_page.are_cards_present)
+        assert self.listing_page.is_sidebar_present
+        assert self.listing_page.are_cards_present
         self.listing_page.a11y_audit.check_for_accessibility_errors()
 
 

@@ -148,16 +148,16 @@ class SubsectionGradingPolicyBase(ProgressPageBaseTest):
         Asserts that the given problem and section scores, and text,
         appear on the progress page.
         """
-        self.assertEqual(self._get_problem_scores(), problem_scores)
-        self.assertEqual(self._get_section_score(), section_score)
-        self.assertTrue(self.progress_page.text_on_page(text))  # lint-amnesty, pylint: disable=no-member
+        assert self._get_problem_scores() == problem_scores
+        assert self._get_section_score() == section_score
+        assert self.progress_page.text_on_page(text)  # lint-amnesty, pylint: disable=no-member
 
     def _check_tick_text(self, index, sr_text, label, label_hidden=True):
         """
         Check the label and sr text for a horizontal (X-axis) tick.
         """
-        self.assertEqual(sr_text, self.progress_page.x_tick_sr_text(index))
-        self.assertEqual([label, 'true' if label_hidden else None], self.progress_page.x_tick_label(index))
+        assert sr_text == self.progress_page.x_tick_sr_text(index)
+        assert [label, ('true' if label_hidden else None)] == self.progress_page.x_tick_label(index)
 
 
 class SubsectionGradingPolicyA11yTest(SubsectionGradingPolicyBase):
@@ -190,9 +190,9 @@ class SubsectionGradingPolicyA11yTest(SubsectionGradingPolicyBase):
             self.progress_page.a11y_audit.check_for_accessibility_errors()
 
             # Verify that y-Axis labels are aria-hidden
-            self.assertEqual(['100%', 'true'], self.progress_page.y_tick_label(0))
-            self.assertEqual(['0%', 'true'], self.progress_page.y_tick_label(1))
-            self.assertEqual(['Pass 50%', 'true'], self.progress_page.y_tick_label(2))
+            assert ['100%', 'true'] == self.progress_page.y_tick_label(0)
+            assert ['0%', 'true'] == self.progress_page.y_tick_label(1)
+            assert ['Pass 50%', 'true'] == self.progress_page.y_tick_label(2)
             # Verify x-Axis labels and sr-text
             self._check_tick_text(0, [u'Homework 1 - Test Subsection 1 - 50% (1/2)'], u'HW 01')
 
@@ -253,7 +253,7 @@ class SubsectionGradingPolicyA11yTest(SubsectionGradingPolicyBase):
 
             # Verify the overall score. The first element in the array is the sr-only text, and the
             # second is the total text (including the sr-only text).
-            self.assertEqual(['Overall Score', 'Overall Score\n2%'], self.progress_page.graph_overall_score())
+            assert ['Overall Score', 'Overall Score\n2%'] == self.progress_page.graph_overall_score()
 
 
 class ProgressPageA11yTest(ProgressPageBaseTest):

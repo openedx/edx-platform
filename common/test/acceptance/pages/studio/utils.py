@@ -69,14 +69,15 @@ def verify_ordering(test_class, page, expected_orderings):
                 blocks_checked.add(parent)
                 children = xblock.children
                 expected_length = len(expected_ordering.get(parent))
-                test_class.assertEqual(
-                    expected_length, len(children),
-                    u"Number of children incorrect for group {0}. Expected {1} but got {2}.".format(parent, expected_length, len(children)))  # lint-amnesty, pylint: disable=line-too-long
+                assert expected_length == \
+                       len(children), f'Number of children incorrect for group {parent}.' \
+                                      f' Expected {expected_length} but got {len(children)}.'
+
                 for idx, expected in enumerate(expected_ordering.get(parent)):
-                    test_class.assertEqual(expected, children[idx].name)
+                    assert expected == children[idx].name
                     blocks_checked.add(expected)
                 break
-    test_class.assertEqual(len(blocks_checked), len(xblocks))
+    assert len(blocks_checked) == len(xblocks)
 
 
 class HelpMixin(object):

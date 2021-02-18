@@ -39,7 +39,7 @@ class BaseDiscussionMixin(object):
             self.thread_ids.append(thread_id)
         thread_fixture = MultipleThreadFixture(threads)
         response = thread_fixture.push()
-        self.assertTrue(response.ok, "Failed to push discussion content")
+        assert response.ok, 'Failed to push discussion content'
 
 
 class CohortTestMixin(object):
@@ -68,7 +68,7 @@ class CohortTestMixin(object):
         url = LMS_BASE_URL + "/courses/" + course_fixture._course_key + '/cohorts/'  # lint-amnesty, pylint: disable=protected-access
         data = json.dumps({"name": cohort_name, 'assignment_type': 'manual'})
         response = course_fixture.session.post(url, data=data, headers=course_fixture.headers)
-        self.assertTrue(response.ok, "Failed to create cohort")
+        assert response.ok, 'Failed to create cohort'
         return response.json()['id']
 
     def add_user_to_cohort(self, course_fixture, username, cohort_id):
@@ -79,7 +79,7 @@ class CohortTestMixin(object):
         data = {"users": username}
         course_fixture.headers['Content-type'] = 'application/x-www-form-urlencoded'
         response = course_fixture.session.post(url, data=data, headers=course_fixture.headers)
-        self.assertTrue(response.ok, "Failed to add user to cohort")
+        assert response.ok, 'Failed to add user to cohort'
 
 
 class BaseDiscussionTestCase(UniqueCourseTest, ForumsConfigMixin):
