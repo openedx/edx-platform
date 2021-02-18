@@ -69,12 +69,12 @@ class TestActivateAccount(TestCase):
     def assert_no_tracking(self, mock_segment_identify):
         """ Assert that activate sets the flag but does not call segment. """
         # Ensure that the user starts inactive
-        self.assertFalse(self.user.is_active)
+        assert not self.user.is_active
 
         # Until you explicitly activate it
         self.registration.activate()
-        self.assertTrue(self.user.is_active)
-        self.assertFalse(mock_segment_identify.called)
+        assert self.user.is_active
+        assert not mock_segment_identify.called
 
     @patch('common.djangoapps.student.models.USER_ACCOUNT_ACTIVATED')
     def test_activation_signal(self, mock_signal):
@@ -122,7 +122,7 @@ class TestActivateAccount(TestCase):
 
     def _assert_user_active_state(self, expected_active_state):
         user = User.objects.get(username=self.user.username)
-        self.assertEqual(user.is_active, expected_active_state)
+        assert user.is_active == expected_active_state
 
     def test_account_activation_notification_on_logistration(self):
         """
@@ -168,12 +168,12 @@ class TestActivateAccount(TestCase):
 
         # Access activation link, the user is redirected to login page with success query param
         response = self.client.get(reverse('activate', args=[self.registration.activation_key]))
-        self.assertEqual(response.url, login_page_url + 'success')
+        assert response.url == (login_page_url + 'success')
 
         # Access activation link again, the user is redirected to login page with info query param
         response = self.client.get(reverse('activate', args=[self.registration.activation_key]))
-        self.assertEqual(response.url, login_page_url + 'info')
+        assert response.url == (login_page_url + 'info')
 
         # Open account activation page with an invalid activation link, the query param should contain error
         response = self.client.get(reverse('activate', args=[uuid4().hex]))
-        self.assertEqual(response.url, login_page_url + 'error')
+        assert response.url == (login_page_url + 'error')

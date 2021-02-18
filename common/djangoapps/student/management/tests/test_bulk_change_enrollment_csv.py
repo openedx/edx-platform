@@ -1,6 +1,7 @@
 # lint-amnesty, pylint: disable=missing-module-docstring
 
 import unittest
+import pytest
 from tempfile import NamedTemporaryFile
 
 import six
@@ -122,8 +123,8 @@ class BulkChangeEnrollmentCSVTests(SharedModuleStoreTestCase):
 
         for enrollment in self.enrollments:
             new_enrollment = CourseEnrollment.get_enrollment(user=enrollment.user, course_key=enrollment.course)
-            self.assertEqual(new_enrollment.is_active, True)
-            self.assertEqual(new_enrollment.mode, CourseMode.VERIFIED)
+            assert new_enrollment.is_active is True
+            assert new_enrollment.mode == CourseMode.VERIFIED
 
     @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
     def test_bulk_enrollment_from_config_model(self):
@@ -138,12 +139,12 @@ class BulkChangeEnrollmentCSVTests(SharedModuleStoreTestCase):
 
         for enrollment in self.enrollments:
             new_enrollment = CourseEnrollment.get_enrollment(user=enrollment.user, course_key=enrollment.course)
-            self.assertEqual(new_enrollment.is_active, True)
-            self.assertEqual(new_enrollment.mode, CourseMode.VERIFIED)
+            assert new_enrollment.is_active is True
+            assert new_enrollment.mode == CourseMode.VERIFIED
 
     @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
     def test_command_error_for_config_model(self):
         """ Test command error raised if file_from_database is required and the config model is not enabled"""
 
-        with self.assertRaises(CommandError):
+        with pytest.raises(CommandError):
             call_command("bulk_change_enrollment_csv", "--file_from_database")

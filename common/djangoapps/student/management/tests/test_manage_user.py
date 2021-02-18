@@ -5,7 +5,9 @@ Unit tests for user_management management commands.
 
 import itertools
 
+import pytest
 import ddt
+
 from django.contrib.auth.hashers import make_password
 from django.contrib.auth.models import Group, User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.core.management import CommandError, call_command
@@ -27,52 +29,52 @@ class TestManageUserCommand(TestCase):
         """
         Ensures that users are created if they don't exist and reused if they do.
         """
-        self.assertEqual([], list(User.objects.all()))
+        assert [] == list(User.objects.all())
         call_command('manage_user', TEST_USERNAME, TEST_EMAIL)
         user = User.objects.get(username=TEST_USERNAME)
-        self.assertEqual(user.username, TEST_USERNAME)
-        self.assertEqual(user.email, TEST_EMAIL)
-        self.assertIsNotNone(user.profile)
+        assert user.username == TEST_USERNAME
+        assert user.email == TEST_EMAIL
+        assert user.profile is not None
 
         # check idempotency
         call_command('manage_user', TEST_USERNAME, TEST_EMAIL)
-        self.assertEqual([(TEST_USERNAME, TEST_EMAIL)], [(u.username, u.email) for u in User.objects.all()])
+        assert [(TEST_USERNAME, TEST_EMAIL)] == [(u.username, u.email) for u in User.objects.all()]
 
     def test_remove(self):
         """
         Ensures that users are removed if they exist and exit cleanly otherwise.
         """
         User.objects.create(username=TEST_USERNAME, email=TEST_EMAIL)
-        self.assertEqual([(TEST_USERNAME, TEST_EMAIL)], [(u.username, u.email) for u in User.objects.all()])
+        assert [(TEST_USERNAME, TEST_EMAIL)] == [(u.username, u.email) for u in User.objects.all()]
         call_command('manage_user', TEST_USERNAME, TEST_EMAIL, '--remove')
-        self.assertEqual([], list(User.objects.all()))
+        assert [] == list(User.objects.all())
 
         # check idempotency
         call_command('manage_user', TEST_USERNAME, TEST_EMAIL, '--remove')
-        self.assertEqual([], list(User.objects.all()))
+        assert [] == list(User.objects.all())
 
     def test_unusable_password(self):
         """
         Ensure that a user's password is set to an unusable_password.
         """
         user = User.objects.create(username=TEST_USERNAME, email=TEST_EMAIL)
-        self.assertEqual([(TEST_USERNAME, TEST_EMAIL)], [(u.username, u.email) for u in User.objects.all()])
+        assert [(TEST_USERNAME, TEST_EMAIL)] == [(u.username, u.email) for u in User.objects.all()]
         user.set_password(generate_password())
         user.save()
 
         # Run once without passing --unusable-password and make sure the password is usable
         call_command('manage_user', TEST_USERNAME, TEST_EMAIL)
         user = User.objects.get(username=TEST_USERNAME, email=TEST_EMAIL)
-        self.assertTrue(user.has_usable_password())
+        assert user.has_usable_password()
 
         # Make sure the user now has an unusable_password
         call_command('manage_user', TEST_USERNAME, TEST_EMAIL, '--unusable-password')
         user = User.objects.get(username=TEST_USERNAME, email=TEST_EMAIL)
-        self.assertFalse(user.has_usable_password())
+        assert not user.has_usable_password()
 
         # check idempotency
         call_command('manage_user', TEST_USERNAME, TEST_EMAIL, '--unusable-password')
-        self.assertFalse(user.has_usable_password())
+        assert not user.has_usable_password()
 
     def test_initial_password_hash(self):
         """
@@ -82,14 +84,14 @@ class TestManageUserCommand(TestCase):
         initial_hash = make_password('hunter2')
 
         # Make sure the command aborts if the provided hash isn't a valid Django password hash
-        with self.assertRaises(CommandError) as exc_context:
+        with pytest.raises(CommandError) as exc_context:
             call_command('manage_user', TEST_USERNAME, TEST_EMAIL, '--initial-password-hash', 'invalid_hash')
-        self.assertIn('password hash', str(exc_context.exception).lower())
+        assert 'password hash' in str(exc_context.value).lower()
 
         # Make sure the hash gets set correctly for a new user
         call_command('manage_user', TEST_USERNAME, TEST_EMAIL, '--initial-password-hash', initial_hash)
         user = User.objects.get(username=TEST_USERNAME)
-        self.assertEqual(user.password, initial_hash)
+        assert user.password == initial_hash
 
         # Change the password
         new_hash = make_password('correct horse battery staple')
@@ -99,7 +101,7 @@ class TestManageUserCommand(TestCase):
         # Verify that calling manage_user again leaves the password untouched
         call_command('manage_user', TEST_USERNAME, TEST_EMAIL, '--initial-password-hash', initial_hash)
         user = User.objects.get(username=TEST_USERNAME)
-        self.assertEqual(user.password, new_hash)
+        assert user.password == new_hash
 
     def test_wrong_email(self):
         """
@@ -107,16 +109,16 @@ class TestManageUserCommand(TestCase):
         existing user account but the supplied email doesn't match.
         """
         User.objects.create(username=TEST_USERNAME, email=TEST_EMAIL)
-        with self.assertRaises(CommandError) as exc_context:
+        with pytest.raises(CommandError) as exc_context:
             call_command('manage_user', TEST_USERNAME, 'other@example.com')
-        self.assertIn('email addresses do not match', str(exc_context.exception).lower())
-        self.assertEqual([(TEST_USERNAME, TEST_EMAIL)], [(u.username, u.email) for u in User.objects.all()])
+        assert 'email addresses do not match' in str(exc_context.value).lower()
+        assert [(TEST_USERNAME, TEST_EMAIL)] == [(u.username, u.email) for u in User.objects.all()]
 
         # check that removal uses the same check
-        with self.assertRaises(CommandError) as exc_context:
+        with pytest.raises(CommandError) as exc_context:
             call_command('manage_user', TEST_USERNAME, 'other@example.com', '--remove')
-        self.assertIn('email addresses do not match', str(exc_context.exception).lower())
-        self.assertEqual([(TEST_USERNAME, TEST_EMAIL)], [(u.username, u.email) for u in User.objects.all()])
+        assert 'email addresses do not match' in str(exc_context.value).lower()
+        assert [(TEST_USERNAME, TEST_EMAIL)] == [(u.username, u.email) for u in User.objects.all()]
 
     def test_same_email_varied_case(self):
         """
@@ -126,7 +128,7 @@ class TestManageUserCommand(TestCase):
         User.objects.create(username=TEST_USERNAME, email=TEST_EMAIL.upper())
         call_command('manage_user', TEST_USERNAME, TEST_EMAIL.lower())
         user = User.objects.get(username=TEST_USERNAME)
-        self.assertEqual(user.email, TEST_EMAIL.upper())
+        assert user.email == TEST_EMAIL.upper()
 
     @ddt.data(*itertools.product([(True, True), (True, False), (False, True), (False, False)], repeat=2))
     @ddt.unpack
@@ -148,8 +150,8 @@ class TestManageUserCommand(TestCase):
         args = [opt for bit, opt in ((expected_staff, '--staff'), (expected_super, '--superuser')) if bit]
         call_command('manage_user', TEST_USERNAME, TEST_EMAIL, *args)
         user = User.objects.all().first()
-        self.assertEqual(user.is_staff, expected_staff)
-        self.assertEqual(user.is_superuser, expected_super)
+        assert user.is_staff == expected_staff
+        assert user.is_superuser == expected_super
 
     @ddt.data(*itertools.product(('', 'a', 'ab', 'abc'), repeat=2))
     @ddt.unpack
@@ -167,7 +169,7 @@ class TestManageUserCommand(TestCase):
 
         call_command('manage_user', TEST_USERNAME, TEST_EMAIL, '-g', *expected_groups)
         actual_groups = [group.name for group in user.groups.all()]
-        self.assertEqual(actual_groups, list(expected_groups))
+        assert actual_groups == list(expected_groups)
 
     def test_nonexistent_group(self):
         """
@@ -181,4 +183,4 @@ class TestManageUserCommand(TestCase):
 
         call_command('manage_user', TEST_USERNAME, TEST_EMAIL, '-g', 'b', 'c', 'd')
         actual_groups = [group.name for group in user.groups.all()]
-        self.assertEqual(actual_groups, ['b', 'c'])
+        assert actual_groups == ['b', 'c']

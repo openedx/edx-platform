@@ -53,7 +53,7 @@ class TestCourseVerificationStatus(UrlResetMixin, ModuleStoreTestCase):
         self.user = UserFactory(password="edx")
         self.course = CourseFactory.create()
         success = self.client.login(username=self.user.username, password="edx")
-        self.assertTrue(success, msg="Did not log in successfully")
+        assert success, 'Did not log in successfully'
         self.dashboard_url = reverse('dashboard')
 
     def test_enrolled_as_non_verified(self):
@@ -407,7 +407,7 @@ class TestCourseVerificationStatus(UrlResetMixin, ModuleStoreTestCase):
                 fail_msg = "Could not find any of these messages: {expected}".format(
                     expected=self.NOTIFICATION_MESSAGES[status]
                 )
-                self.assertTrue(found_msg, msg=fail_msg)
+                assert found_msg, fail_msg
         else:
             # Combine all possible messages into a single list
             all_messages = []

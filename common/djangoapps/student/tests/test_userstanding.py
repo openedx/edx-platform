@@ -65,25 +65,20 @@ class UserStandingTest(TestCase):
         response = self.admin_client.get(reverse('manage_user_standing'), {
             'user': self.admin,
         })
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
 
     @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
     def test_disable_account(self):
-        self.assertEqual(
-            UserStanding.objects.filter(user=self.good_user).count(), 0
-        )
+        assert UserStanding.objects.filter(user=self.good_user).count() == 0
         response = self.admin_client.post(reverse('disable_account_ajax'), {  # lint-amnesty, pylint: disable=unused-variable
             'username': self.good_user.username,
             'account_action': 'disable',
         })
-        self.assertEqual(
-            UserStanding.objects.get(user=self.good_user).account_status,
-            UserStanding.ACCOUNT_DISABLED
-        )
+        assert UserStanding.objects.get(user=self.good_user).account_status == UserStanding.ACCOUNT_DISABLED
 
     def test_disabled_account_403s(self):
         response = self.bad_user_client.get(self.some_url)
-        self.assertEqual(response.status_code, 403)
+        assert response.status_code == 403
 
     @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
     def test_reenable_account(self):
@@ -91,17 +86,14 @@ class UserStandingTest(TestCase):
             'username': self.bad_user.username,
             'account_action': 'reenable'
         })
-        self.assertEqual(
-            UserStanding.objects.get(user=self.bad_user).account_status,
-            UserStanding.ACCOUNT_ENABLED
-        )
+        assert UserStanding.objects.get(user=self.bad_user).account_status == UserStanding.ACCOUNT_ENABLED
 
     @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
     def test_non_staff_cant_access_disable_view(self):
         response = self.non_staff_client.get(reverse('manage_user_standing'), {
             'user': self.non_staff,
         })
-        self.assertEqual(response.status_code, 404)
+        assert response.status_code == 404
 
     @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
     def test_non_staff_cant_disable_account(self):
@@ -110,7 +102,5 @@ class UserStandingTest(TestCase):
             'user': self.non_staff,
             'account_action': 'disable'
         })
-        self.assertEqual(response.status_code, 404)
-        self.assertEqual(
-            UserStanding.objects.filter(user=self.good_user).count(), 0
-        )
+        assert response.status_code == 404
+        assert UserStanding.objects.filter(user=self.good_user).count() == 0
