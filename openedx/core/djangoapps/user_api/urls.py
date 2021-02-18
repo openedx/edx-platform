@@ -18,6 +18,7 @@ from .accounts.views import (
     LMSAccountRetirementView,
     UsernameReplacementView
 )
+from .accounts.userprofile_api import UserProfileAPIView
 from . import views as user_api_views
 from .models import UserPreference
 from .preferences.views import PreferencesDetailView, PreferencesView
@@ -167,6 +168,11 @@ urlpatterns = [
         r'^v1/accounts/replace_usernames/$',
         UsernameReplacementView.as_view(),
         name='username_replacement'
+    ),
+    url(
+        r'^v1/accounts/users_list/$',
+        UserProfileAPIView.as_view(),
+        name='users_list'
     ),
     url(
         r'^v1/preferences/{}$'.format(settings.USERNAME_PATTERN),
