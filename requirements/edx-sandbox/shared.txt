@@ -13,4 +13,4 @@ nltk==3.5                 # via -r requirements/edx-sandbox/shared.in
 pycparser==2.20           # via cffi
 regex==2020.11.13         # via nltk
 six==1.15.0               # via cryptography
-tqdm==4.56.2              # via nltk
+tqdm==4.57.0              # via nltk
