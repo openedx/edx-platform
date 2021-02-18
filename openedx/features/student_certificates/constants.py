@@ -1,4 +1,8 @@
+"""
+Constants related to student_certificates application.
+"""
 from string import ascii_uppercase
+
 from django.conf import settings
 
 TWITTER_TWEET_TEXT_FMT = 'I just completed @PhilanthropyUni\'s free online {course_name} ' \

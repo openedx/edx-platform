@@ -57,11 +57,11 @@ class GenerateStudentCertificateHelpersTestCase(SharedModuleStoreTestCase):
         current_context = get_philu_certificate_social_context(self.course, self.certificate)
         certificate_uuid = self.certificate.verify_uuid
 
-        self.assertTrue(certificate_uuid in current_context['twitter'])
-        self.assertTrue(certificate_uuid in current_context['facebook'])
-        self.assertTrue(certificate_uuid in current_context['email'])
-        self.assertTrue(certificate_uuid in current_context['linkedin'])
-        self.assertTrue(certificate_uuid in current_context['facebook_after_enroll'])
+        self.assertIn(certificate_uuid, current_context['twitter'])
+        self.assertIn(certificate_uuid, current_context['facebook'])
+        self.assertIn(certificate_uuid, current_context['email'])
+        self.assertIn(certificate_uuid, current_context['linkedin'])
+        self.assertIn(certificate_uuid, current_context['facebook_after_enroll'])
 
     def test_get_certificate_img_url(self):
         """

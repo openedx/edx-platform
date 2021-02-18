@@ -1,17 +1,23 @@
+"""
+PhilU overrides the courseware views
+"""
 import logging
-from certificates import api as certs_api
+
 from django.conf import settings
-from django.db import transaction
-from django.http import HttpResponse, HttpResponseBadRequest, Http404
-from django.views.decorators.http import require_POST
 from django.contrib.auth.models import User
-from opaque_keys.edx.keys import CourseKey
-from xmodule.modulestore.django import modulestore
+from django.db import transaction
+from django.http import Http404, HttpResponse, HttpResponseBadRequest
 from django.utils.translation import ugettext as _
-from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
+from django.views.decorators.http import require_POST
+from opaque_keys.edx.keys import CourseKey
+
+from certificates import api as certs_api
 from common.lib.mandrill_client.client import MandrillClient
 from lms.djangoapps.certificates.api import get_certificate_url
+from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.timed_notification.core import get_course_link
+from xmodule.modulestore.django import modulestore
+
 log = logging.getLogger("edx.courseware")
 
 
@@ -86,7 +92,7 @@ def generate_user_cert(request, course_id):
             {
                 'course_name': course.display_name,
                 'course_url': get_course_link(course_id=course.id),
-                'full_name': student.first_name + " " + student.last_name,
+                'full_name': student.first_name + ' ' + student.last_name,
                 'certificate_url': base_url + get_certificate_url(user_id=student.id, course_id=course.id),
                 'course_library_url': base_url + '/courses',
             }

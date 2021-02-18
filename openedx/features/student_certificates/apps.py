@@ -1,3 +1,6 @@
+"""
+Defines the app name and connects the signal handlers associated with the student_certificates application.
+"""
 from django.apps import AppConfig
 
 
@@ -8,4 +11,4 @@ class StudentCertificatesConfig(AppConfig):
         """
         Connect signal handlers.
         """
-        import openedx.features.student_certificates.handlers
+        import openedx.features.student_certificates.handlers  # pylint: disable=unused-variable

@@ -1,3 +1,6 @@
+"""
+PhilU overrides courseware tasks
+"""
 import json
 import logging
 
@@ -20,7 +23,7 @@ def task_correct_polls_data():
             json_state = json.loads(user_state)
             json_possible_choices = json_state["possible_choices"]
 
-            if type(json_possible_choices) is list:
+            if isinstance(json_possible_choices, list):
 
                 possible_choices = json.dumps(json_possible_choices)
                 json_state.update({"possible_choices": possible_choices})
@@ -29,5 +32,5 @@ def task_correct_polls_data():
                 module.save()
 
                 log.info('Module changed with id ' + str(module.id))
-        except Exception as ex:
+        except Exception as ex:  # pylint: disable=broad-except
             log.error('Code failed for ' + str(module.id) + ' and error is ' + str(ex.message))

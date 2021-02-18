@@ -1,5 +1,6 @@
-"""Client to communicate with discovery service from lms"""
-
+"""
+Client to communicate with discovery service from lms
+"""
 import json
 import logging
 
@@ -18,13 +19,20 @@ VERSION = 'v1'
 
 
 class DiscoveryClient(OAuthAPIClient):
+    """
+    Client to communicate with the edX course discovery service.
+    """
 
     def __init__(self):
         client = get_object_or_404(Client, name='discovery')
         super(DiscoveryClient, self).__init__(settings.LMS_ROOT_URL, client.client_id, client.client_secret)
         self._api_url = '{discovery_url}/api/{version}'.format(discovery_url=client.url, version=VERSION)
+        self.response = None
 
     def _get(self, path):
+        """
+        Sends GET request to discovery service at the given path.
+        """
         try:
             self.response = self.request('GET', '{api_url}{path}'.format(api_url=self._api_url, path=path))
         except RequestException as exc:
@@ -33,6 +41,12 @@ class DiscoveryClient(OAuthAPIClient):
         return self._handle_response()
 
     def _handle_response(self):
+        """
+        Handles response from the discovery service.
+        1. Returns json formatted response if response status is 200.
+        2. Raises permission denied if response status is 200.
+        3. Raises 404 if response status is 404
+        """
         status_code = self.response.status_code
         response_body = json.loads(self.response.text)
         if status_code == status.HTTP_200_OK:
