@@ -37,6 +37,10 @@ class CredentialsConfig(AppConfig):
                         PluginSignals.RECEIVER_FUNC_NAME: u'handle_cert_change',
                         PluginSignals.SIGNAL_PATH: u'openedx.core.djangoapps.signals.signals.COURSE_CERT_CHANGED',
                     },
+                    {
+                        PluginSignals.RECEIVER_FUNC_NAME: "listen_for_lms_retire",
+                        PluginSignals.SIGNAL_PATH: "openedx.core.djangoapps.user_api.accounts.signals.USER_RETIRE_LMS_MISC",
+                    }
                 ],
             },
         },

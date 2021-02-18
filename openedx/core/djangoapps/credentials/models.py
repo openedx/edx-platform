@@ -122,7 +122,9 @@ class NotifyCredentialsConfig(ConfigurationModel):
     """
     Manages configuration for a run of the notify_credentials management command.
 
-    .. no_pii:
+    .. pii: the arguments field may contains username of learners
+    .. pii_types: username
+    .. pii_retirement: local_api
     """
 
     class Meta(object):
@@ -137,3 +139,10 @@ class NotifyCredentialsConfig(ConfigurationModel):
 
     def __str__(self):
         return six.text_type(self.arguments)
+
+    @classmethod
+    def retire_user(cls, username):
+        """
+        Blanks out any arguments list that includes the username of a retiring user.
+        """
+        cls.objects.filter(arguments__includes=username).update(arguments="<Redacted for user retirement>")

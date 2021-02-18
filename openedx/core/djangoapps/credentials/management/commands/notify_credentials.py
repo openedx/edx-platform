@@ -97,6 +97,9 @@ class Command(BaseCommand):
             course-v1:edX+RecordsSelfPaced+1 for user 14
             course-v1:edX+RecordsSelfPaced+1 for user 17
             course-v1:edX+RecordsSelfPaced+1 for user 18
+
+    NOTE: If adding any additional PII fields, please update the retire_user
+    method on the model to filter on this new additional field.
     """
     help = (
         u"Simulate certificate/grade changes without actually modifying database "

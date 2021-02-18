@@ -11,7 +11,7 @@ from common.djangoapps.course_modes.models import CourseMode
 from lms.djangoapps.certificates.models import CertificateStatuses, GeneratedCertificate
 from lms.djangoapps.grades.api import CourseGradeFactory
 from openedx.core.djangoapps.catalog.utils import get_programs
-from openedx.core.djangoapps.credentials.models import CredentialsApiConfig
+from openedx.core.djangoapps.credentials.models import CredentialsApiConfig, NotifyCredentialsConfig
 
 from .helpers import is_learner_records_enabled, is_learner_records_enabled_for_org  # lint-amnesty, pylint: disable=unused-import
 from .tasks.v1.tasks import send_grade_to_credentials
@@ -160,3 +160,11 @@ def handle_cert_change(user, course_key, mode, status, **kwargs):
     Notifies the Credentials IDA about certain grades it needs for its records, when a cert changes.
     """
     send_grade_if_interesting(user, course_key, mode, status, None, None, verbose=kwargs.get('verbose', False))
+
+
+def listen_for_lms_retire(sender, **kwargs):  # pylint: disable=unused-argument
+    """
+    Listener for the USER_RETIRE_LMS_MISC signal, does user retirement
+    """
+    user = kwargs.get('user')
+    NotifyCredentialsConfig.retire_user(user.username)

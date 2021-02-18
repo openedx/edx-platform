@@ -23,6 +23,9 @@ class Command(BaseCommand):
 
     Example usage:
     ./manage.py lms cert_allowlist_generation -u edx verified -c course-v1:edX+DemoX+Demo_Course
+
+    NOTE: If adding any additional PII fields, please update the retire_user method on the model to filter on this new
+    additional field.
     """
 
     help = """

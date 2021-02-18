@@ -59,7 +59,7 @@ from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
 from django.db import models, transaction
-from django.db.models import Count
+from django.db.models import Count, Q
 from django.dispatch import receiver
 from django.utils.encoding import python_2_unicode_compatible
 from django.utils.translation import ugettext_lazy as _
@@ -1265,7 +1265,9 @@ class AllowListGenerationConfiguration(ConfigurationModel):
     """
     Manages configuration for a run of the cert_allowlist_generation management command.
 
-    .. no_pii:
+    .. pii: the arguments field contains either usernames or email addresses of learners
+    .. pii_types: username, email_address
+    .. pii_retirement: local_api
     """
 
     class Meta(object):
@@ -1283,3 +1285,12 @@ class AllowListGenerationConfiguration(ConfigurationModel):
 
     def __str__(self):
         return str(self.arguments)
+
+    @classmethod
+    def retire_user(cls, username, email):
+        """
+        Blanks out any arguments list that includes the username or email of a retiring user.
+        """
+        cls.objects.filter(
+            Q(arguments__includes=username) | Q(arguments__includes=email)
+        ).update(arguments="<Redacted for user retirement>")

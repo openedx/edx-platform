@@ -15,10 +15,11 @@ from lms.djangoapps.certificates.generation_handler import (
     is_using_certificate_allowlist_and_is_on_allowlist
 )
 from lms.djangoapps.certificates.models import (
+    AllowListGenerationConfiguration,
     CertificateGenerationCourseSetting,
     CertificateStatuses,
     CertificateWhitelist,
-    GeneratedCertificate
+    GeneratedCertificate,
 )
 from lms.djangoapps.certificates.tasks import CERTIFICATE_DELAY_SECONDS, generate_certificate
 from lms.djangoapps.grades.api import CourseGradeFactory
@@ -30,6 +31,7 @@ from openedx.core.djangoapps.signals.signals import (
     COURSE_GRADE_NOW_PASSED,
     LEARNER_NOW_VERIFIED
 )
+from openedx.core.djangoapps.user_api.accounts.signals import USER_RETIRE_LMS_MISC
 
 log = logging.getLogger(__name__)
 
@@ -129,6 +131,14 @@ def _listen_for_id_verification_status_changed(sender, user, **kwargs):  # pylin
                     course=enrollment.course_id,
                     status=expected_verification_status
                 ))
+
+@receiver(USER_RETIRE_LMS_MISC)
+def _listen_for_lms_retire(sender, **kwargs):  # pylint: disable=unused-argument
+    """
+    Listener for the USER_RETIRE_LMS_MISC signal, does user retirement
+    """
+    user = kwargs.get('user')
+    AllowListGenerationConfiguration.retire_user(user.username, user.email)
 
 
 def fire_ungenerated_certificate_task(user, course_key, expected_verification_status=None):
