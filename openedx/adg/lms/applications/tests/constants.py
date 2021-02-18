@@ -1,6 +1,12 @@
 """
 Constants for all the tests.
 """
+ADMIN_TYPE_SUPER_ADMIN = 'super_admin'
+ADMIN_TYPE_ADG_ADMIN = 'adg_admin'
+
+TITLE_BUSINESS_LINE_1 = 'test_business_line1'
+TITLE_BUSINESS_LINE_2 = 'test_business_line2'
+
 USERNAME = 'test'
 EMAIL = 'test@example.com'
 PASSWORD = 'edx'
@@ -19,3 +25,5 @@ TEST_COVER_LETTER_FILE = 'Test Cover Letter File'
 TEST_COVER_LETTER_TEXT = 'Test Cover Letter Text'
 
 FORMSET = 'test_formset'
+
+TEST_MESSAGE_FOR_APPLICANT = 'Test message for the applicant'

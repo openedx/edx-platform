@@ -64,14 +64,13 @@ def test_validate_logo_size_with_invalid_size():
     with pytest.raises(Exception):
         validate_logo_size(mocked_file)
 
-
-@patch('openedx.adg.lms.applications.helpers.send_mandrill_email')
-def test_send_application_submission_confirmation_email(mock_mandrill_email):
+@patch('openedx.adg.lms.applications.helpers.MandrillClient')
+def test_send_application_submission_confirmation_email(mocked_mandrill_client):
     """
     Check if the email is being sent correctly
     """
     send_application_submission_confirmation_email(EMAIL)
-    assert mock_mandrill_email.called
+    assert mocked_mandrill_client().send_mandrill_email.called
 
 
 def test_min_year_value_validator_invalid():

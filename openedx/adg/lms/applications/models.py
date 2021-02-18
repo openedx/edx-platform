@@ -3,7 +3,7 @@ All models for applications app
 """
 from datetime import date, datetime
 
-from django.contrib.auth.models import User
+from django.contrib.auth.models import Group, User
 from django.core.validators import FileExtensionValidator
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
@@ -97,6 +97,9 @@ class BusinessLine(TimeStampedModel):
         help_text=_('Accepted extensions: .png, .jpg, .svg'),
     )
     description = models.TextField(verbose_name=_('Description'), )
+    group = models.OneToOneField(
+       Group, related_name='business_line', on_delete=models.CASCADE, null=True
+    )
 
     class Meta:
         app_label = 'applications'
