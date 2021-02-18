@@ -2,7 +2,7 @@
 Tests for manager.py
 """
 
-
+import pytest
 import ddt
 import six
 from django.test import TestCase
@@ -126,7 +126,7 @@ class TestBlockStructureManager(UsageKeyFactoryMixin, ChildrenMapTestMixin, Test
         self.assert_block_structure(block_structure, self.children_map)
         TestTransformer1.assert_collected(block_structure)
         if expect_modulestore_called:
-            self.assertGreater(self.modulestore.get_items_call_count, 0)
+            assert self.modulestore.get_items_call_count > 0
         else:
             assert self.modulestore.get_items_call_count == 0
         expected_count = 1 if expect_cache_updated else 0
@@ -170,7 +170,7 @@ class TestBlockStructureManager(UsageKeyFactoryMixin, ChildrenMapTestMixin, Test
 
     def test_get_transformed_with_nonexistent_starting_block(self):
         with mock_registered_transformers(self.registered_transformers):
-            with self.assertRaises(UsageKeyNotInBlockStructure):
+            with pytest.raises(UsageKeyNotInBlockStructure):
                 self.bs_manager.get_transformed(self.transformers, starting_block_usage_key=100)
 
     def test_get_collected_cached(self):
@@ -181,7 +181,7 @@ class TestBlockStructureManager(UsageKeyFactoryMixin, ChildrenMapTestMixin, Test
     def test_get_collected_error_raised(self):
         with override_waffle_switch(RAISE_ERROR_WHEN_NOT_FOUND, active=True):
             with mock_registered_transformers(self.registered_transformers):
-                with self.assertRaises(BlockStructureNotFound):
+                with pytest.raises(BlockStructureNotFound):
                     self.bs_manager.get_collected()
 
     @ddt.data(True, False)

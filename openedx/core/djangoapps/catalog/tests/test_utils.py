@@ -88,7 +88,7 @@ class TestGetPrograms(CacheIsolationTestCase):
         # When called before UUIDs are cached, the function should return an
         # empty list and log a warning.
         with with_site_configuration_context(domain=self.site.name, configuration={'COURSE_CATALOG_API_URL': 'foo'}):
-            self.assertEqual(get_programs(site=self.site), [])
+            assert get_programs(site=self.site) == []
             mock_warning.assert_called_once_with(
                 u'Failed to get program UUIDs from the cache for site {}.'.format(self.site.domain)
             )
@@ -105,10 +105,8 @@ class TestGetPrograms(CacheIsolationTestCase):
 
         # The 2 cached programs should be returned while info and warning
         # messages should be logged for the missing one.
-        self.assertEqual(
-            set(program['uuid'] for program in actual_programs),
-            set(program['uuid'] for program in partial_programs.values())
-        )
+        assert set((program['uuid'] for program in actual_programs)) == \
+               set((program['uuid'] for program in partial_programs.values()))
         mock_info.assert_called_with('Failed to get details for 1 programs. Retrying.')
         mock_warning.assert_called_with(
             u'Failed to get details for program {uuid} from the cache.'.format(uuid=programs[2]['uuid'])
@@ -121,7 +119,7 @@ class TestGetPrograms(CacheIsolationTestCase):
         # the data itself.
         for program in actual_programs:
             key = PROGRAM_CACHE_KEY_TPL.format(uuid=program['uuid'])
-            self.assertEqual(program, partial_programs[key])
+            assert program == partial_programs[key]
 
         # Cache details for all 3 programs.
         all_programs = {
@@ -132,15 +130,13 @@ class TestGetPrograms(CacheIsolationTestCase):
         actual_programs = get_programs(site=self.site)
 
         # All 3 programs should be returned.
-        self.assertEqual(
-            set(program['uuid'] for program in actual_programs),
-            set(program['uuid'] for program in all_programs.values())
-        )
-        self.assertFalse(mock_warning.called)
+        assert set((program['uuid'] for program in actual_programs)) ==\
+               set((program['uuid'] for program in all_programs.values()))
+        assert not mock_warning.called
 
         for program in actual_programs:
             key = PROGRAM_CACHE_KEY_TPL.format(uuid=program['uuid'])
-            self.assertEqual(program, all_programs[key])
+            assert program == all_programs[key]
 
     @mock.patch(UTILS_MODULE + '.cache')
     def test_get_many_with_missing(self, mock_cache, mock_warning, mock_info):
@@ -169,22 +165,20 @@ class TestGetPrograms(CacheIsolationTestCase):
         # All 3 cached programs should be returned. An info message should be
         # logged about the one that was initially missing, but the code should
         # be able to stitch together all the details.
-            self.assertEqual(
-                set(program['uuid'] for program in actual_programs),
-                set(program['uuid'] for program in all_programs.values())
-            )
-            self.assertFalse(mock_warning.called)
+            assert set((program['uuid'] for program in actual_programs)) ==\
+                   set((program['uuid'] for program in all_programs.values()))
+            assert not mock_warning.called
             mock_info.assert_called_with('Failed to get details for 1 programs. Retrying.')
 
             for program in actual_programs:
                 key = PROGRAM_CACHE_KEY_TPL.format(uuid=program['uuid'])
-                self.assertEqual(program, all_programs[key])
+                assert program == all_programs[key]
 
     def test_get_one(self, mock_warning, _mock_info):
         expected_program = ProgramFactory()
         expected_uuid = expected_program['uuid']
 
-        self.assertEqual(get_programs(uuid=expected_uuid), None)
+        assert get_programs(uuid=expected_uuid) is None
         mock_warning.assert_called_once_with(
             u'Failed to get details for program {uuid} from the cache.'.format(uuid=expected_uuid)
         )
@@ -197,14 +191,14 @@ class TestGetPrograms(CacheIsolationTestCase):
         )
 
         actual_program = get_programs(uuid=expected_uuid)
-        self.assertEqual(actual_program, expected_program)
-        self.assertFalse(mock_warning.called)
+        assert actual_program == expected_program
+        assert not mock_warning.called
 
     def test_get_from_course(self, mock_warning, _mock_info):
         expected_program = ProgramFactory()
         expected_course = expected_program['courses'][0]['course_runs'][0]['key']
 
-        self.assertEqual(get_programs(course=expected_course), [])
+        assert get_programs(course=expected_course) == []
 
         cache.set(
             COURSE_PROGRAMS_CACHE_KEY_TPL.format(course_run_id=expected_course),
@@ -218,8 +212,8 @@ class TestGetPrograms(CacheIsolationTestCase):
         )
 
         actual_program = get_programs(course=expected_course)
-        self.assertEqual(actual_program, [expected_program])
-        self.assertFalse(mock_warning.called)
+        assert actual_program == [expected_program]
+        assert not mock_warning.called
 
     def test_get_via_uuids(self, mock_warning, _mock_info):
         first_program = ProgramFactory()
@@ -246,7 +240,7 @@ class TestGetPrograms(CacheIsolationTestCase):
         expected_program = ProgramFactory()
         expected_catalog_course = expected_program['courses'][0]
 
-        self.assertEqual(get_programs(catalog_course_uuid=expected_catalog_course['uuid']), [])
+        assert get_programs(catalog_course_uuid=expected_catalog_course['uuid']) == []
 
         cache.set(
             CATALOG_COURSE_PROGRAMS_CACHE_KEY_TPL.format(course_uuid=expected_catalog_course['uuid']),
@@ -261,8 +255,8 @@ class TestGetPrograms(CacheIsolationTestCase):
 
         actual_program = get_programs(catalog_course_uuid=expected_catalog_course['uuid'])
 
-        self.assertEqual(actual_program, [expected_program])
-        self.assertFalse(mock_warning.called)
+        assert actual_program == [expected_program]
+        assert not mock_warning.called
 
 
 @skip_unless_lms
@@ -286,7 +280,7 @@ class TestGetPathways(CacheIsolationTestCase):
 
         # When called before pathways are cached, the function should return an
         # empty list and log a warning.
-        self.assertEqual(get_pathways(self.site), [])
+        assert get_pathways(self.site) == []
         mock_warning.assert_called_once_with('Failed to get credit pathway ids from the cache.')
         mock_warning.reset_mock()
 
@@ -301,10 +295,8 @@ class TestGetPathways(CacheIsolationTestCase):
 
         # The 2 cached pathways should be returned while info and warning
         # messages should be logged for the missing one.
-        self.assertEqual(
-            set(pathway['id'] for pathway in actual_pathways),
-            set(pathway['id'] for pathway in partial_pathways.values())
-        )
+        assert set((pathway['id'] for pathway in actual_pathways)) ==\
+               set((pathway['id'] for pathway in partial_pathways.values()))
         mock_info.assert_called_with('Failed to get details for 1 pathways. Retrying.')
         mock_warning.assert_called_with(
             u'Failed to get details for credit pathway {id} from the cache.'.format(id=pathways[2]['id'])
@@ -317,7 +309,7 @@ class TestGetPathways(CacheIsolationTestCase):
         # the data itself.
         for pathway in actual_pathways:
             key = PATHWAY_CACHE_KEY_TPL.format(id=pathway['id'])
-            self.assertEqual(pathway, partial_pathways[key])
+            assert pathway == partial_pathways[key]
 
         # Cache details for all 3 pathways.
         all_pathways = {
@@ -328,15 +320,13 @@ class TestGetPathways(CacheIsolationTestCase):
         actual_pathways = get_pathways(self.site)
 
         # All 3 pathways should be returned.
-        self.assertEqual(
-            set(pathway['id'] for pathway in actual_pathways),
-            set(pathway['id'] for pathway in all_pathways.values())
-        )
-        self.assertFalse(mock_warning.called)
+        assert set((pathway['id'] for pathway in actual_pathways)) ==\
+               set((pathway['id'] for pathway in all_pathways.values()))
+        assert not mock_warning.called
 
         for pathway in actual_pathways:
             key = PATHWAY_CACHE_KEY_TPL.format(id=pathway['id'])
-            self.assertEqual(pathway, all_pathways[key])
+            assert pathway == all_pathways[key]
 
     @mock.patch(UTILS_MODULE + '.cache')
     def test_get_many_with_missing(self, mock_cache, mock_warning, mock_info):
@@ -364,22 +354,20 @@ class TestGetPathways(CacheIsolationTestCase):
         # All 3 cached pathways should be returned. An info message should be
         # logged about the one that was initially missing, but the code should
         # be able to stitch together all the details.
-        self.assertEqual(
-            set(pathway['id'] for pathway in actual_pathways),
-            set(pathway['id'] for pathway in all_pathways.values())
-        )
-        self.assertFalse(mock_warning.called)
+        assert set((pathway['id'] for pathway in actual_pathways)) ==\
+               set((pathway['id'] for pathway in all_pathways.values()))
+        assert not mock_warning.called
         mock_info.assert_called_with('Failed to get details for 1 pathways. Retrying.')
 
         for pathway in actual_pathways:
             key = PATHWAY_CACHE_KEY_TPL.format(id=pathway['id'])
-            self.assertEqual(pathway, all_pathways[key])
+            assert pathway == all_pathways[key]
 
     def test_get_one(self, mock_warning, _mock_info):
         expected_pathway = PathwayFactory()
         expected_id = expected_pathway['id']
 
-        self.assertEqual(get_pathways(self.site, pathway_id=expected_id), None)
+        assert get_pathways(self.site, pathway_id=expected_id) is None
         mock_warning.assert_called_once_with(
             u'Failed to get details for credit pathway {id} from the cache.'.format(id=expected_id)
         )
@@ -392,8 +380,8 @@ class TestGetPathways(CacheIsolationTestCase):
         )
 
         actual_pathway = get_pathways(self.site, pathway_id=expected_id)
-        self.assertEqual(actual_pathway, expected_pathway)
-        self.assertFalse(mock_warning.called)
+        assert actual_pathway == expected_pathway
+        assert not mock_warning.called
 
 
 @mock.patch(UTILS_MODULE + '.get_edx_api_data')
@@ -407,16 +395,16 @@ class TestGetProgramTypes(CatalogIntegrationMixin, TestCase):
 
         # Catalog integration is disabled.
         data = get_program_types()
-        self.assertEqual(data, [])
+        assert data == []
 
         catalog_integration = self.create_catalog_integration()
         UserFactory(username=catalog_integration.service_username)
         data = get_program_types()
-        self.assertEqual(data, program_types)
+        assert data == program_types
 
         program = program_types[0]
         data = get_program_types(name=program['name'])
-        self.assertEqual(data, program)
+        assert data == program
 
 
 @mock.patch(UTILS_MODULE + '.get_edx_api_data')
@@ -434,12 +422,12 @@ class TestGetCurrency(CatalogIntegrationMixin, TestCase):
 
         # Catalog integration is disabled.
         data = get_currency_data()
-        self.assertEqual(data, [])
+        assert data == []
 
         catalog_integration = self.create_catalog_integration()
         UserFactory(username=catalog_integration.service_username)
         data = get_currency_data()
-        self.assertEqual(data, currency_data)
+        assert data == currency_data
 
 
 @mock.patch(UTILS_MODULE + '.get_currency_data')
@@ -460,7 +448,7 @@ class TestGetLocalizedPriceText(TestCase):
             'country_code': 'CA'
         }
         expected_result = '$20 CAD'
-        self.assertEqual(get_localized_price_text(10, request), expected_result)
+        assert get_localized_price_text(10, request) == expected_result
 
 
 @skip_unless_lms
@@ -482,16 +470,16 @@ class TestGetCourseRuns(CatalogIntegrationMixin, CacheIsolationTestCase):
         args, kwargs = call_args
 
         for arg in (self.catalog_integration, 'course_runs'):
-            self.assertIn(arg, args)
+            assert arg in args
 
-        self.assertEqual(kwargs['api']._store['base_url'], self.catalog_integration.get_internal_api_url())  # pylint: disable=protected-access
+        assert kwargs['api']._store['base_url'] == self.catalog_integration.get_internal_api_url()  # pylint: disable=protected-access, line-too-long
 
         querystring = {
             'page_size': 20,
             'exclude_utm': 1,
         }
 
-        self.assertEqual(kwargs['querystring'], querystring)
+        assert kwargs['querystring'] == querystring
 
         return args, kwargs
 
@@ -503,8 +491,8 @@ class TestGetCourseRuns(CatalogIntegrationMixin, CacheIsolationTestCase):
         self.clear_caches()
 
         data = get_course_runs()
-        self.assertFalse(mock_get_edx_api_data.called)
-        self.assertEqual(data, [])
+        assert not mock_get_edx_api_data.called
+        assert data == []
 
     @mock.patch(UTILS_MODULE + '.logger.error')
     def test_service_user_missing(self, mock_log_error, mock_get_edx_api_data):
@@ -518,8 +506,8 @@ class TestGetCourseRuns(CatalogIntegrationMixin, CacheIsolationTestCase):
             u'Catalog service user with username [%s] does not exist. Course runs will not be retrieved.',
             catalog_integration.service_username,
         )
-        self.assertFalse(mock_get_edx_api_data.called)
-        self.assertEqual(data, [])
+        assert not mock_get_edx_api_data.called
+        assert data == []
 
     def test_get_course_runs(self, mock_get_edx_api_data):
         """
@@ -529,9 +517,9 @@ class TestGetCourseRuns(CatalogIntegrationMixin, CacheIsolationTestCase):
         mock_get_edx_api_data.return_value = catalog_course_runs
 
         data = get_course_runs()
-        self.assertTrue(mock_get_edx_api_data.called)
+        assert mock_get_edx_api_data.called
         self.assert_contract(mock_get_edx_api_data.call_args)
-        self.assertEqual(data, catalog_course_runs)
+        assert data == catalog_course_runs
 
     def test_get_course_runs_by_course(self, mock_get_edx_api_data):
         """
@@ -542,8 +530,8 @@ class TestGetCourseRuns(CatalogIntegrationMixin, CacheIsolationTestCase):
         mock_get_edx_api_data.return_value = catalog_course
 
         data = get_course_runs_for_course(course_uuid=str(catalog_course['uuid']))
-        self.assertTrue(mock_get_edx_api_data.called)
-        self.assertEqual(data, catalog_course_runs)
+        assert mock_get_edx_api_data.called
+        assert data == catalog_course_runs
 
 
 @skip_unless_lms
@@ -567,8 +555,8 @@ class TestGetCourseOwners(CatalogIntegrationMixin, TestCase):
         mock_get_edx_api_data.return_value = catalog_course
 
         data = get_owners_for_course(course_uuid=str(catalog_course['uuid']))
-        self.assertTrue(mock_get_edx_api_data.called)
-        self.assertEqual(data, catalog_course['owners'])
+        assert mock_get_edx_api_data.called
+        assert data == catalog_course['owners']
 
 
 @skip_unless_lms
@@ -602,7 +590,7 @@ class TestSessionEntitlement(CatalogIntegrationMixin, TestCase):
         )
 
         session_entitlements = get_visible_sessions_for_entitlement(entitlement)
-        self.assertEqual(session_entitlements, [catalog_course_run])
+        assert session_entitlements == [catalog_course_run]
 
     def test_get_visible_sessions_for_entitlement_expired_mode(self, mock_get_edx_api_data):
         """
@@ -627,7 +615,7 @@ class TestSessionEntitlement(CatalogIntegrationMixin, TestCase):
         )
 
         session_entitlements = get_visible_sessions_for_entitlement(entitlement)
-        self.assertEqual(session_entitlements, [catalog_course_run])
+        assert session_entitlements == [catalog_course_run]
 
     def test_unpublished_sessions_for_entitlement_when_enrolled(self, mock_get_edx_api_data):
         """
@@ -653,7 +641,7 @@ class TestSessionEntitlement(CatalogIntegrationMixin, TestCase):
         )
 
         session_entitlements = get_visible_sessions_for_entitlement(entitlement)
-        self.assertEqual(session_entitlements, [catalog_course_run])
+        assert session_entitlements == [catalog_course_run]
 
     def test_unpublished_sessions_for_entitlement(self, mock_get_edx_api_data):
         """
@@ -676,7 +664,7 @@ class TestSessionEntitlement(CatalogIntegrationMixin, TestCase):
         )
 
         session_entitlements = get_visible_sessions_for_entitlement(entitlement)
-        self.assertEqual(session_entitlements, [])
+        assert session_entitlements == []
 
 
 @skip_unless_lms
@@ -702,8 +690,8 @@ class TestGetCourseRunDetails(CatalogIntegrationMixin, TestCase):
         }
         mock_get_edx_api_data.return_value = course_run_details
         data = get_course_run_details(course_run['key'], ['content_language', 'weeks_to_complete', 'max_effort'])
-        self.assertTrue(mock_get_edx_api_data.called)
-        self.assertEqual(data, course_run_details)
+        assert mock_get_edx_api_data.called
+        assert data == course_run_details
 
 
 class TestProgramCourseRunCrawling(TestCase):
@@ -793,13 +781,13 @@ class TestProgramCourseRunCrawling(TestCase):
         program = {
             'title': 'notice that I do not have a curriculum',
         }
-        self.assertEqual([], child_programs(program))
+        assert [] == child_programs(program)
 
     def test_child_programs_no_children(self):
-        self.assertEqual([], child_programs(self.empty_program))
+        assert [] == child_programs(self.empty_program)
 
     def test_child_programs_one_child(self):
-        self.assertEqual([self.grandchild_1], child_programs(self.simple_program))
+        assert [self.grandchild_1] == child_programs(self.simple_program)
 
     def test_child_programs_many_children(self):
         expected_children = [
@@ -809,13 +797,13 @@ class TestProgramCourseRunCrawling(TestCase):
             self.grandchild_2,
             self.grandchild_3,
         ]
-        self.assertEqual(expected_children, child_programs(self.complex_program))
+        assert expected_children == child_programs(self.complex_program)
 
     def test_course_run_keys_for_program_no_courses(self):
-        self.assertEqual(set(), course_run_keys_for_program(self.empty_program))
+        assert set() == course_run_keys_for_program(self.empty_program)
 
     def test_course_run_keys_for_program_one_course(self):
-        self.assertEqual({'course-run-1'}, course_run_keys_for_program(self.simple_program))
+        assert {'course-run-1'} == course_run_keys_for_program(self.simple_program)
 
     def test_course_run_keys_for_program_many_courses(self):
         expected_course_runs = {
@@ -823,12 +811,12 @@ class TestProgramCourseRunCrawling(TestCase):
             'course-run-3',
             'course-run-4',
         }
-        self.assertEqual(expected_course_runs, course_run_keys_for_program(self.complex_program))
+        assert expected_course_runs == course_run_keys_for_program(self.complex_program)
 
     def test_is_course_run_in_program(self):
-        self.assertTrue(is_course_run_in_program('course-run-4', self.complex_program))
-        self.assertFalse(is_course_run_in_program('course-run-5', self.complex_program))
-        self.assertFalse(is_course_run_in_program('course-run-4', self.simple_program))
+        assert is_course_run_in_program('course-run-4', self.complex_program)
+        assert not is_course_run_in_program('course-run-5', self.complex_program)
+        assert not is_course_run_in_program('course-run-4', self.simple_program)
 
 
 @skip_unless_lms
@@ -913,33 +901,33 @@ class TestGetProgramsByType(CacheIsolationTestCase):
 
     def test_get_bachelors_programs(self):
         expected_programs = [self.bachelors_program]
-        self.assertEqual(expected_programs, get_programs_by_type(self.site, 'bachelors'))
-        self.assertEqual(expected_programs, get_programs_by_type_slug(self.site, 'bachelors'))
+        assert expected_programs == get_programs_by_type(self.site, 'bachelors')
+        assert expected_programs == get_programs_by_type_slug(self.site, 'bachelors')
 
     def test_get_no_such_type_programs(self):
         expected_programs = []
-        self.assertEqual(expected_programs, get_programs_by_type(self.site, 'doctorate'))
-        self.assertEqual(expected_programs, get_programs_by_type_slug(self.site, 'doctorate'))
+        assert expected_programs == get_programs_by_type(self.site, 'doctorate')
+        assert expected_programs == get_programs_by_type_slug(self.site, 'doctorate')
 
     def test_get_masters_programs_other_site(self):
         expected_programs = [self.masters_program_other_site]
-        self.assertEqual(expected_programs, get_programs_by_type(self.other_site, 'masters'))
-        self.assertEqual(expected_programs, get_programs_by_type_slug(self.other_site, 'masters'))
+        assert expected_programs == get_programs_by_type(self.other_site, 'masters')
+        assert expected_programs == get_programs_by_type_slug(self.other_site, 'masters')
 
     def test_get_programs_null_type(self):
         expected_programs = [self.no_type_program]
-        self.assertEqual(expected_programs, get_programs_by_type(self.site, None))
-        self.assertEqual(expected_programs, get_programs_by_type_slug(self.site, None))
+        assert expected_programs == get_programs_by_type(self.site, None)
+        assert expected_programs == get_programs_by_type_slug(self.site, None)
 
     def test_get_programs_false_type(self):
         expected_programs = []
-        self.assertEqual(expected_programs, get_programs_by_type(self.site, False))
-        self.assertEqual(expected_programs, get_programs_by_type_slug(self.site, False))
+        assert expected_programs == get_programs_by_type(self.site, False)
+        assert expected_programs == get_programs_by_type_slug(self.site, False)
 
     def test_normalize_program_type(self):
-        self.assertEqual('none', normalize_program_type(None))
-        self.assertEqual('false', normalize_program_type(False))
-        self.assertEqual('true', normalize_program_type(True))
-        self.assertEqual('', normalize_program_type(''))
-        self.assertEqual('masters', normalize_program_type('Masters'))
-        self.assertEqual('masters', normalize_program_type('masters'))
+        assert 'none' == normalize_program_type(None)
+        assert 'false' == normalize_program_type(False)
+        assert 'true' == normalize_program_type(True)
+        assert '' == normalize_program_type('')
+        assert 'masters' == normalize_program_type('Masters')
+        assert 'masters' == normalize_program_type('masters')

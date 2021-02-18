@@ -2,7 +2,7 @@
 Tests for block_structure/cache.py
 """
 
-
+import pytest
 import ddt
 from edx_toggles.toggles.testutils import override_waffle_switch
 
@@ -49,7 +49,7 @@ class TestBlockStructureStore(UsageKeyFactoryMixin, ChildrenMapTestMixin, CacheI
     @ddt.data(True, False)
     def test_get_none(self, with_storage_backing):
         with override_waffle_switch(STORAGE_BACKING_FOR_CACHE, active=with_storage_backing):
-            with self.assertRaises(BlockStructureNotFound):
+            with pytest.raises(BlockStructureNotFound):
                 self.store.get(self.block_structure.root_block_usage_key)
 
     @ddt.data(True, False)
@@ -57,7 +57,7 @@ class TestBlockStructureStore(UsageKeyFactoryMixin, ChildrenMapTestMixin, CacheI
         with override_waffle_switch(STORAGE_BACKING_FOR_CACHE, active=with_storage_backing):
             self.store.add(self.block_structure)
             stored_value = self.store.get(self.block_structure.root_block_usage_key)
-            self.assertIsNotNone(stored_value)
+            assert stored_value is not None
             self.assert_block_structure(stored_value, self.children_map)
 
     @ddt.data(True, False)
@@ -65,13 +65,13 @@ class TestBlockStructureStore(UsageKeyFactoryMixin, ChildrenMapTestMixin, CacheI
         with override_waffle_switch(STORAGE_BACKING_FOR_CACHE, active=with_storage_backing):
             self.store.add(self.block_structure)
             self.store.delete(self.block_structure.root_block_usage_key)
-            with self.assertRaises(BlockStructureNotFound):
+            with pytest.raises(BlockStructureNotFound):
                 self.store.get(self.block_structure.root_block_usage_key)
 
     def test_uncached_without_storage(self):
         self.store.add(self.block_structure)
         self.mock_cache.map.clear()
-        with self.assertRaises(BlockStructureNotFound):
+        with pytest.raises(BlockStructureNotFound):
             self.store.get(self.block_structure.root_block_usage_key)
 
     def test_uncached_with_storage(self):

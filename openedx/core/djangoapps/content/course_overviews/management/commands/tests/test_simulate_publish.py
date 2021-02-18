@@ -115,10 +115,10 @@ class TestSimulatePublish(SharedModuleStoreTestCase):
                 courses=[six.text_type(self.course_key_1), six.text_type(self.course_key_2)]
             )
         )
-        self.assertIn(self.course_key_1, self.received_1)
-        self.assertIn(self.course_key_2, self.received_1)
-        self.assertNotIn(self.course_key_3, self.received_1)
-        self.assertEqual(self.received_1, self.received_2)
+        assert self.course_key_1 in self.received_1
+        assert self.course_key_2 in self.received_1
+        assert self.course_key_3 not in self.received_1
+        assert self.received_1 == self.received_2
 
     def test_specific_receivers(self):
         """Test sending only to specific receivers."""
@@ -127,14 +127,14 @@ class TestSimulatePublish(SharedModuleStoreTestCase):
                 receivers=[name_from_fn(self.sample_receiver_1)]
             )
         )
-        self.assertIn(self.course_key_1, self.received_1)
-        self.assertIn(self.course_key_2, self.received_1)
-        self.assertIn(self.course_key_3, self.received_1)
-        self.assertEqual(self.received_2, [])
+        assert self.course_key_1 in self.received_1
+        assert self.course_key_2 in self.received_1
+        assert self.course_key_3 in self.received_1
+        assert self.received_2 == []
 
     def test_course_overviews(self):
         """Integration test with CourseOverviews."""
-        self.assertEqual(CourseOverview.objects.all().count(), 0)
+        assert CourseOverview.objects.all().count() == 0
         # pylint: disable=protected-access
         self.command.handle(
             **self.options(
@@ -143,9 +143,9 @@ class TestSimulatePublish(SharedModuleStoreTestCase):
                 ]
             )
         )
-        self.assertEqual(CourseOverview.objects.all().count(), 3)
-        self.assertEqual(self.received_1, [])
-        self.assertEqual(self.received_2, [])
+        assert CourseOverview.objects.all().count() == 3
+        assert self.received_1 == []
+        assert self.received_2 == []
 
     def sample_receiver_1(self, sender, course_key, **kwargs):  # pylint: disable=unused-argument
         """Custom receiver for testing."""
