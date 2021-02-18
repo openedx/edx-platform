@@ -1,9 +1,9 @@
-import pytest
 """
 Tests for the functionality and infrastructure of grades tasks.
 """
 
 
+import pytest
 import itertools
 from collections import OrderedDict
 from contextlib import contextmanager
@@ -338,7 +338,8 @@ class RecalculateSubsectionGradeTest(HasCourseWithProblemsMixin, ModuleStoreTest
             self._assert_retry_not_called(mock_retry)
         else:
             self._assert_retry_called(mock_retry)
-            assert u'Grades: tasks._has_database_updated_with_new_score is False.' in mock_log.info.call_args_list[0][0][0]
+            assert u'Grades: tasks._has_database_updated_with_new_score is False.'\
+                   in mock_log.info.call_args_list[0][0][0]
 
     @patch('lms.djangoapps.grades.tasks.log')
     @patch('lms.djangoapps.grades.tasks.recalculate_subsection_grade_v3.retry')

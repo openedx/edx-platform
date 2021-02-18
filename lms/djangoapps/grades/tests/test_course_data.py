@@ -1,9 +1,8 @@
-import pytest
 """
 Tests for CourseData utility class.
 """
 
-
+import pytest
 import six
 from mock import patch
 

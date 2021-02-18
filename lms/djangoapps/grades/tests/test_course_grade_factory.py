@@ -92,7 +92,10 @@ class TestCourseGradeFactory(GradeTestBase):
 
         def _assert_section_order(course_grade):
             sections = course_grade.chapter_grades[self.chapter.location]['sections']
-            assert [section.display_name for section in sections] == [self.sequence.display_name, self.sequence2.display_name]
+            assert [section.display_name for section in sections] == [
+                self.sequence.display_name,
+                self.sequence2.display_name
+            ]
 
         with self.assertNumQueries(3), mock_get_score(1, 2):
             _assert_read(expected_pass=False, expected_percent=0)  # start off with grade of 0
@@ -317,7 +320,10 @@ class TestGradeIteration(SharedModuleStoreTestCase):
         ]
         with self.assertNumQueries(8):
             all_course_grades, all_errors = self._course_grades_and_errors_for(self.course, self.students)
-        assert {student: text_type(all_errors[student]) for student in all_errors} == {student3: 'Error for student3.', student4: 'Error for student4.'}
+        assert {student: text_type(all_errors[student]) for student in all_errors} == {
+            student3: 'Error for student3.',
+            student4: 'Error for student4.'
+        }
 
         # But we should still have five gradesets
         assert len(all_course_grades) == 5

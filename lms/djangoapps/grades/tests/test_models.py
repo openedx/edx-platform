@@ -1,9 +1,9 @@
-import pytest
 """
 Unit tests for grades models.
 """
 
 
+import pytest
 import json
 from base64 import b64encode
 from collections import OrderedDict

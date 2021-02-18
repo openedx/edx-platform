@@ -43,8 +43,12 @@ class PersistentGradesFeatureFlagTests(TestCase):
             enabled_for_course=enabled_for_course_1
         ):
             assert PersistentGradesEnabledFlag.feature_enabled() == global_flag
-            assert PersistentGradesEnabledFlag.feature_enabled(self.course_id_1) == (global_flag and (enabled_for_all_courses or enabled_for_course_1))
-            assert PersistentGradesEnabledFlag.feature_enabled(self.course_id_2) == (global_flag and enabled_for_all_courses)
+            assert PersistentGradesEnabledFlag.feature_enabled(
+                self.course_id_1
+            ) == (global_flag and (enabled_for_all_courses or enabled_for_course_1))
+            assert PersistentGradesEnabledFlag.feature_enabled(
+                self.course_id_2
+            ) == (global_flag and enabled_for_all_courses)
 
     def test_enable_disable_course_flag(self):
         """

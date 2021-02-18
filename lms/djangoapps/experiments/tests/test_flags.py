@@ -117,7 +117,19 @@ class ExperimentWaffleFlagTests(SharedModuleStoreTestCase):
 
         # Now test that we only sent the signal once, and with the correct properties
         assert segment_mock.track.call_count == 1
-        assert segment_mock.track.call_args == ((), {'user_id': self.user.id, 'event_name': 'edx.bi.experiment.user.bucketed', 'properties': {'site': self.request.site.domain, 'app_label': 'experiments', 'experiment': 'test', 'bucket': 1, 'course_id': 'a/b/c', 'is_staff': self.user.is_staff, 'nonInteraction': 1}})
+        assert segment_mock.track.call_args == ((), {
+            'user_id': self.user.id,
+            'event_name': 'edx.bi.experiment.user.bucketed',
+            'properties': {
+                'site': self.request.site.domain,
+                'app_label': 'experiments',
+                'experiment': 'test',
+                'bucket': 1,
+                'course_id': 'a/b/c',
+                'is_staff': self.user.is_staff,
+                'nonInteraction': 1
+            }
+        })
 
     def test_caching(self):
         assert self.get_bucket(active=True) == 1

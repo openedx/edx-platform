@@ -1,9 +1,8 @@
-import pytest
 """
 Tests for the EdxNotes app.
 """
 
-
+import pytest
 import json
 from contextlib import contextmanager
 from datetime import datetime
@@ -864,7 +863,10 @@ class EdxNotesHelpersTest(ModuleStoreTestCase):
 
         mock_course_module.get_display_items.return_value = [mock_chapter]
 
-        assert helpers.get_course_position(mock_course_module) == {'display_name': 'Test Chapter Display Name', 'url': '/courses/{}/courseware/chapter_url_name/'.format(self.course.id)}
+        assert helpers.get_course_position(mock_course_module) == {
+            'display_name': 'Test Chapter Display Name',
+            'url': '/courses/{}/courseware/chapter_url_name/'.format(self.course.id)
+        }
 
     def test_get_course_position_no_section(self):
         """
@@ -892,7 +894,10 @@ class EdxNotesHelpersTest(ModuleStoreTestCase):
         mock_chapter.get_display_items.return_value = [mock_section]
         mock_section.get_display_items.return_value = [MagicMock()]
 
-        assert helpers.get_course_position(mock_course_module) == {'display_name': 'Test Section Display Name', 'url': '/courses/{}/courseware/chapter_url_name/section_url_name/'.format(self.course.id)}
+        assert helpers.get_course_position(mock_course_module) == {
+            'display_name': 'Test Section Display Name',
+            'url': '/courses/{}/courseware/chapter_url_name/section_url_name/'.format(self.course.id)
+        }
 
     def test_get_index(self):
         """
@@ -1022,7 +1027,10 @@ class EdxNotesViewsTest(ModuleStoreTestCase):
     # pylint: disable=unused-argument
     @patch.dict("django.conf.settings.FEATURES", {"ENABLE_EDXNOTES": True})
     @patch("lms.djangoapps.edxnotes.views.get_notes", return_value={'results': []})
-    @patch("lms.djangoapps.edxnotes.views.get_course_position", return_value={'display_name': 'Section 1', 'url': 'test_url'})  # lint-amnesty, pylint: disable=line-too-long
+    @patch("lms.djangoapps.edxnotes.views.get_course_position", return_value={
+        'display_name': 'Section 1',
+        'url': 'test_url'
+    })
     def test_edxnotes_html_tags_should_not_be_escaped(self, mock_get_notes, mock_position):
         """
         Tests that explicit html tags rendered correctly.

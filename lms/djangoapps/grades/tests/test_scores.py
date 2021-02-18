@@ -1,11 +1,10 @@
-import pytest
 """
 Tests for grades.scores module.
 """
 
-
-import itertools
 # pylint: disable=protected-access
+import pytest
+import itertools
 from collections import namedtuple
 
 import ddt

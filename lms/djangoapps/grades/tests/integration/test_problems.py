@@ -41,8 +41,7 @@ class TestMultipleProblemTypesSubsectionScores(SharedModuleStoreTestCase):
         cls.seq1 = chapter1.get_children()[0]
 
     def setUp(self):
-        super(TestMultipleProblemTypesSubsectionScores,
-              self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         password = u'test'
         self.student = UserFactory.create(is_staff=False, username=u'test_student', password=password)
         self.client.login(username=self.student.username, password=password)
@@ -274,7 +273,7 @@ class TestWeightedProblems(SharedModuleStoreTestCase):
         # verify all problem grades
         for problem in self.problems:
             problem_score = subsection_grade.problem_scores[problem.location]
-            assert isinstance(expected_score.first_attempted, problem_score.first_attempted)
+            assert isinstance(type(expected_score.first_attempted), type(problem_score.first_attempted))
             expected_score.first_attempted = problem_score.first_attempted
             assert problem_score == expected_score
 

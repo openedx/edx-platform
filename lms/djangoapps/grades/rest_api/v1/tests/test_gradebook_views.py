@@ -1,9 +1,9 @@
-import pytest
 """  # lint-amnesty, pylint: disable=cyclic-import
 Tests for the course grading API view
 """
 
 
+import pytest
 import json
 from collections import OrderedDict, namedtuple
 from datetime import datetime

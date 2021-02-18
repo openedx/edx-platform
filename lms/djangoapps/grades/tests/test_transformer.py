@@ -77,7 +77,8 @@ class GradesTransformerTestCase(CourseStructureTestCase):
         for field in expectations:
             # Append our custom message to the default assertEqual error message
             self.longMessage = True  # pylint: disable=invalid-name
-            assert expectations[field] == block_structure.get_xblock_field(usage_key, field), u'in field {},'.format(repr(field))
+            assert expectations[field] == block_structure.get_xblock_field(usage_key, field),\
+                u'in field {},'.format(repr(field))
         assert block_structure.get_xblock_field(usage_key, u'subtree_edited_on') is not None
 
     def assert_collected_transformer_block_fields(self, block_structure, usage_key, transformer_class, **expectations):
@@ -91,7 +92,9 @@ class GradesTransformerTestCase(CourseStructureTestCase):
         # Append our custom message to the default assertEqual error message
         self.longMessage = True
         for field in expectations:
-            assert expectations[field] == block_structure.get_transformer_block_field(usage_key, transformer_class, field), u'in {} and field {}'.format(transformer_class, repr(field))
+            assert expectations[field] == block_structure.get_transformer_block_field(
+                usage_key, transformer_class, field
+            ), u'in {} and field {}'.format(transformer_class, repr(field))
 
     def build_course_with_problems(self, data='<problem></problem>', metadata=None):
         """
@@ -344,7 +347,8 @@ class GradesTransformerTestCase(CourseStructureTestCase):
         problem_data = u'''
         <problem>
             <optionresponse>
-              <p>You can use this template as a guide to the simple editor markdown and OLX markup to use for dropdown problems. Edit this component to replace this template with your own assessment.</p>
+              <p>You can use this template as a guide to the simple editor markdown and OLX markup to use for dropdown
+               problems. Edit this component to replace this template with your own assessment.</p>
             <label>Add the question text, or prompt, here. This text is required.</label>
             <description>You can add an optional tip or note related to the prompt like this. </description>
             <optioninput>
@@ -376,7 +380,9 @@ class GradesTransformerTestCase(CourseStructureTestCase):
             blocks = self.build_course_with_problems()
         block_structure = get_course_blocks(self.student, blocks[u'course'].location, self.transformers)
         assert block_structure.get_xblock_field(blocks[u'course'].location, u'course_version') is not None
-        assert block_structure.get_xblock_field(blocks[u'problem'].location, u'course_version') == block_structure.get_xblock_field(blocks[u'course'].location, u'course_version')
+        assert block_structure.get_xblock_field(
+            blocks[u'problem'].location, u'course_version'
+        ) == block_structure.get_xblock_field(blocks[u'course'].location, u'course_version')
 
     def test_grading_policy_collected(self):
         # the calculated hash of the original and updated grading policies of the test course

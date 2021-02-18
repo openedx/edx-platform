@@ -183,7 +183,16 @@ class GradesServiceTests(ModuleStoreTestCase):
         assert override_obj.earned_all_override == override['earned_all']
         assert override_obj.earned_graded_override == override['earned_graded']
 
-        assert self.mock_signal.call_args == call(sender=None, user_id=self.user.id, course_id=six.text_type(self.course.id), usage_id=six.text_type(self.subsection.location), only_if_higher=False, modified=override_obj.modified, score_deleted=False, score_db_table=ScoreDatabaseTableEnum.overrides)
+        assert self.mock_signal.call_args == call(
+            sender=None,
+            user_id=self.user.id,
+            course_id=six.text_type(self.course.id),
+            usage_id=six.text_type(self.subsection.location),
+            only_if_higher=False,
+            modified=override_obj.modified,
+            score_deleted=False,
+            score_db_table=ScoreDatabaseTableEnum.overrides
+        )
 
     def test_override_subsection_grade_no_psg(self):
         """
@@ -220,7 +229,16 @@ class GradesServiceTests(ModuleStoreTestCase):
         assert override_obj.earned_all_override == earned_all_override
         assert override_obj.earned_graded_override == earned_graded_override
 
-        assert self.mock_signal.call_args == call(sender=None, user_id=self.user.id, course_id=six.text_type(self.course.id), usage_id=six.text_type(self.subsection_without_grade.location), only_if_higher=False, modified=override_obj.modified, score_deleted=False, score_db_table=ScoreDatabaseTableEnum.overrides)
+        assert self.mock_signal.call_args == call(
+            sender=None,
+            user_id=self.user.id,
+            course_id=six.text_type(self.course.id),
+            usage_id=six.text_type(self.subsection_without_grade.location),
+            nly_if_higher=False,
+            modified=override_obj.modified,
+            score_deleted=False,
+            score_db_table=ScoreDatabaseTableEnum.overrides
+        )
 
     @freeze_time('2017-01-01')
     def test_undo_override_subsection_grade(self):
@@ -238,7 +256,16 @@ class GradesServiceTests(ModuleStoreTestCase):
         override = self.service.get_subsection_grade_override(self.user.id, self.course.id, self.subsection.location)
         assert override is None
 
-        assert self.mock_signal.call_args == call(sender=None, user_id=self.user.id, course_id=six.text_type(self.course.id), usage_id=six.text_type(self.subsection.location), only_if_higher=False, modified=datetime.now().replace(tzinfo=pytz.UTC), score_deleted=True, score_db_table=ScoreDatabaseTableEnum.overrides)
+        assert self.mock_signal.call_args == call(
+            sender=None,
+            user_id=self.user.id,
+            course_id=six.text_type(self.course.id),
+            usage_id=six.text_type(self.subsection.location),
+            only_if_higher=False,
+            modified=datetime.now().replace(tzinfo=pytz.UTC),
+            score_deleted=True,
+            score_db_table=ScoreDatabaseTableEnum.overrides
+        )
 
     def test_undo_override_subsection_grade_across_features(self):
         """

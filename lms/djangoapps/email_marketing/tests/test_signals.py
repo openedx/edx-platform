@@ -131,8 +131,7 @@ class EmailMarketingTests(TestCase):
                                           'cookies': {'anonymous_interest': 'cookie_content'},
                                           'id': TEST_EMAIL,
                                           'vars': {'last_login_date': ANY}})
-        assert ('sailthru_hid' in response.cookies)
-        # lint-amnesty, pylint: disable=wrong-assert-type
+        assert 'sailthru_hid' in response.cookies
         assert response.cookies['sailthru_hid'].value == 'test_cookie'
 
     @patch('sailthru.sailthru_client.SailthruClient.api_post')
@@ -168,18 +167,15 @@ class EmailMarketingTests(TestCase):
         })
         mock_sailthru.return_value = SailthruResponse(JsonResponse({'keys': {'cookiexx': 'test_cookie'}}))
         add_email_marketing_cookies(None, response=response, user=self.user)
-        assert not ('sailthru_hid' in response.cookies)
-        # lint-amnesty, pylint: disable=wrong-assert-type
+        assert 'sailthru_hid' not in response.cookies
 
         mock_sailthru.return_value = SailthruResponse(JsonResponse({'error': "error", "errormsg": "errormsg"}))
         add_email_marketing_cookies(None, response=response, user=self.user)
-        assert not ('sailthru_hid' in response.cookies)
-        # lint-amnesty, pylint: disable=wrong-assert-type
+        assert 'sailthru_hid' not in response.cookies
 
         mock_sailthru.side_effect = SailthruClientError
         add_email_marketing_cookies(None, response=response, user=self.user)
-        assert not ('sailthru_hid' in response.cookies)
-        # lint-amnesty, pylint: disable=wrong-assert-type
+        assert 'sailthru_hid' not in response.cookies
 
     @patch('lms.djangoapps.email_marketing.tasks.log.error')
     @patch('lms.djangoapps.email_marketing.tasks.SailthruClient.api_post')
@@ -415,7 +411,9 @@ class EmailMarketingTests(TestCase):
         """Test fetch list data from sailthru"""
         mock_sailthru_client.api_get.return_value = \
             SailthruResponse(JsonResponse({'lists': [{'name': 'test1_user_list'}]}))
-        assert _get_list_from_email_marketing_provider(mock_sailthru_client) == {'test1_user_list': {'name': 'test1_user_list'}}
+        assert _get_list_from_email_marketing_provider(mock_sailthru_client) == {
+            'test1_user_list': {'name': 'test1_user_list'}
+        }
         mock_sailthru_client.api_get.assert_called_with("list", {})
 
     @patch('lms.djangoapps.email_marketing.tasks.SailthruClient')

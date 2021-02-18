@@ -1,11 +1,10 @@
-import pytest
 """
 Tests for compute_grades management command.
 """
 
 # pylint: disable=protected-access
 
-
+import pytest
 import ddt
 import six
 from six.moves import range

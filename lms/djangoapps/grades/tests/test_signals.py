@@ -1,9 +1,9 @@
-import pytest
 """
 Tests for the score change signals defined in the courseware models module.
 """
 
 
+import pytest
 import re
 from datetime import datetime
 
