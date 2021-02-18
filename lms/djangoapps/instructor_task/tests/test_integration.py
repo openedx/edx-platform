@@ -11,7 +11,7 @@ import json
 import logging
 import textwrap
 from collections import namedtuple
-
+import pytest
 import ddt
 import six
 from celery.states import FAILURE, SUCCESS
@@ -56,18 +56,19 @@ class TestIntegrationTask(InstructorTaskModuleTestCase):
     def _assert_task_failure(self, entry_id, task_type, problem_url_name, expected_message):
         """Confirm that expected values are stored in InstructorTask on task failure."""
         instructor_task = InstructorTask.objects.get(id=entry_id)
-        self.assertEqual(instructor_task.task_state, FAILURE)
-        self.assertEqual(instructor_task.requester.username, 'instructor')
-        self.assertEqual(instructor_task.task_type, task_type)
+        assert instructor_task.task_state == FAILURE
+        assert instructor_task.requester.username == 'instructor'
+        assert instructor_task.task_type == task_type
         task_input = json.loads(instructor_task.task_input)
-        self.assertNotIn('student', task_input)
-        self.assertEqual(task_input['problem_url'], text_type(InstructorTaskModuleTestCase.problem_location(problem_url_name)))  # lint-amnesty, pylint: disable=line-too-long
+        assert 'student' not in task_input
+        assert task_input['problem_url'] == text_type(InstructorTaskModuleTestCase.problem_location(problem_url_name))
+        # lint-amnesty, pylint: disable=line-too-long
         status = json.loads(instructor_task.task_output)
-        self.assertEqual(status['exception'], 'ZeroDivisionError')
-        self.assertEqual(status['message'], expected_message)
+        assert status['exception'] == 'ZeroDivisionError'
+        assert status['message'] == expected_message
         # check status returned:
         status = InstructorTaskModuleTestCase.get_task_status(instructor_task.task_id)
-        self.assertEqual(status['message'], expected_message)
+        assert status['message'] == expected_message
 
 
 @ddt.ddt
@@ -120,26 +121,24 @@ class TestRescoringTask(TestIntegrationTask):
         Values checked include the number of attempts, the score, and the max score for a problem.
         """
         module = self.get_student_module(user.username, descriptor)
-        self.assertEqual(module.grade, expected_score)
-        self.assertEqual(module.max_grade, expected_max_score)
+        assert module.grade == expected_score
+        assert module.max_grade == expected_max_score
         state = json.loads(module.state)
         attempts = state['attempts']
-        self.assertEqual(attempts, expected_attempts)
+        assert attempts == expected_attempts
         if attempts > 0:
-            self.assertIn('correct_map', state)
-            self.assertIn('student_answers', state)
-            self.assertGreater(len(state['correct_map']), 0)
-            self.assertGreater(len(state['student_answers']), 0)
+            assert 'correct_map' in state
+            assert 'student_answers' in state
+            assert len(state['correct_map']) > 0
+            assert len(state['student_answers']) > 0
 
         # assume only one problem in the subsection and the grades
         # are in sync.
         expected_subsection_grade = expected_score
 
         course_grade = CourseGradeFactory().read(user, self.course)
-        self.assertEqual(
-            course_grade.graded_subsections_by_format['Homework'][self.problem_section.location].graded_total.earned,
-            expected_subsection_grade,
-        )
+        assert course_grade.graded_subsections_by_format['Homework'][self.problem_section.location].graded_total.earned\
+               == expected_subsection_grade
 
     def submit_rescore_all_student_answers(self, instructor, problem_url_name, only_if_higher=False):
         """Submits the particular problem for rescoring"""
@@ -300,16 +299,17 @@ class TestRescoringTask(TestIntegrationTask):
 
         # check instructor_task returned
         instructor_task = InstructorTask.objects.get(id=instructor_task.id)
-        self.assertEqual(instructor_task.task_state, 'SUCCESS')
-        self.assertEqual(instructor_task.requester.username, 'instructor')
-        self.assertEqual(instructor_task.task_type, 'rescore_problem')
+        assert instructor_task.task_state == 'SUCCESS'
+        assert instructor_task.requester.username == 'instructor'
+        assert instructor_task.task_type == 'rescore_problem'
         task_input = json.loads(instructor_task.task_input)
-        self.assertNotIn('student', task_input)
-        self.assertEqual(task_input['problem_url'], text_type(InstructorTaskModuleTestCase.problem_location(problem_url_name)))  # lint-amnesty, pylint: disable=line-too-long
+        assert 'student' not in task_input
+        assert task_input['problem_url'] == text_type(InstructorTaskModuleTestCase.problem_location(problem_url_name))
+        # lint-amnesty, pylint: disable=line-too-long
         status = json.loads(instructor_task.task_output)
-        self.assertEqual(status['attempted'], 1)
-        self.assertEqual(status['succeeded'], 0)
-        self.assertEqual(status['total'], 1)
+        assert status['attempted'] == 1
+        assert status['succeeded'] == 0
+        assert status['total'] == 1
 
     def define_code_response_problem(self, problem_url_name):
         """
@@ -340,13 +340,13 @@ class TestRescoringTask(TestIntegrationTask):
         instructor_task = self.submit_rescore_all_student_answers('instructor', problem_url_name)
 
         instructor_task = InstructorTask.objects.get(id=instructor_task.id)
-        self.assertEqual(instructor_task.task_state, FAILURE)
+        assert instructor_task.task_state == FAILURE
         status = json.loads(instructor_task.task_output)
-        self.assertEqual(status['exception'], 'NotImplementedError')
-        self.assertEqual(status['message'], "Problem's definition does not support rescoring.")
+        assert status['exception'] == 'NotImplementedError'
+        assert status['message'] == "Problem's definition does not support rescoring."
 
         status = InstructorTaskModuleTestCase.get_task_status(instructor_task.task_id)
-        self.assertEqual(status['message'], "Problem's definition does not support rescoring.")
+        assert status['message'] == "Problem's definition does not support rescoring."
 
     def define_randomized_custom_response_problem(self, problem_url_name, redefine=False):
         """
@@ -476,12 +476,12 @@ class TestResetAttemptsTask(TestIntegrationTask):
                 self.submit_student_answer(username, problem_url_name, [OPTION_1, OPTION_1])
 
         for username in self.userlist:
-            self.assertEqual(self.get_num_attempts(username, descriptor), num_attempts)
+            assert self.get_num_attempts(username, descriptor) == num_attempts
 
         self.reset_problem_attempts('instructor', location)
 
         for username in self.userlist:
-            self.assertEqual(self.get_num_attempts(username, descriptor), 0)
+            assert self.get_num_attempts(username, descriptor) == 0
 
     def test_reset_failure(self):
         """Simulate a failure in resetting attempts on a problem"""
@@ -501,7 +501,7 @@ class TestResetAttemptsTask(TestIntegrationTask):
         location = self.problem_section.location
         instructor_task = self.reset_problem_attempts('instructor', location)
         instructor_task = InstructorTask.objects.get(id=instructor_task.id)
-        self.assertEqual(instructor_task.task_state, SUCCESS)
+        assert instructor_task.task_state == SUCCESS
 
 
 class TestDeleteProblemTask(TestIntegrationTask):
@@ -537,12 +537,12 @@ class TestDeleteProblemTask(TestIntegrationTask):
             self.submit_student_answer(username, problem_url_name, [OPTION_1, OPTION_1])
         # confirm that state exists:
         for username in self.userlist:
-            self.assertIsNotNone(self.get_student_module(username, descriptor))
+            assert self.get_student_module(username, descriptor) is not None
         # run delete task:
         self.delete_problem_state('instructor', location)
         # confirm that no state can be found:
         for username in self.userlist:
-            with self.assertRaises(StudentModule.DoesNotExist):
+            with pytest.raises(StudentModule.DoesNotExist):
                 self.get_student_module(username, descriptor)
 
     def test_delete_failure(self):
@@ -563,7 +563,7 @@ class TestDeleteProblemTask(TestIntegrationTask):
         location = self.problem_section.location
         instructor_task = self.delete_problem_state('instructor', location)
         instructor_task = InstructorTask.objects.get(id=instructor_task.id)
-        self.assertEqual(instructor_task.task_state, SUCCESS)
+        assert instructor_task.task_state == SUCCESS
 
 
 class TestGradeReportConditionalContent(TestReportMixin, TestConditionalContent, TestIntegrationTask):

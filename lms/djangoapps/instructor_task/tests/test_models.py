@@ -6,7 +6,7 @@ Tests for instructor_task/models.py.
 import copy
 import time
 from six import StringIO
-
+import pytest
 from django.conf import settings
 from django.test import SimpleTestCase, TestCase, override_settings
 from opaque_keys.edx.locator import CourseLocator
@@ -25,7 +25,7 @@ class TestInstructorTasksModel(TestCase):
         Test allowed length of task_input field
         """
         task_input = 's' * TASK_INPUT_LENGTH
-        with self.assertRaises(AttributeError):
+        with pytest.raises(AttributeError):
             InstructorTask.create(
                 course_id='dummy_course_id',
                 task_type='dummy type',
@@ -56,7 +56,7 @@ class ReportStoreTestMixin(object):
         in reverse chronological order.
         """
         report_store = self.create_report_store()  # lint-amnesty, pylint: disable=assignment-from-no-return
-        self.assertEqual(report_store.links_for(self.course_id), [])
+        assert report_store.links_for(self.course_id) == []
 
         report_store.store(self.course_id, 'old_file', StringIO())
         time.sleep(1)  # Ensure we have a unique timestamp.
@@ -64,10 +64,7 @@ class ReportStoreTestMixin(object):
         time.sleep(1)  # Ensure we have a unique timestamp.
         report_store.store(self.course_id, 'new_file', StringIO())
 
-        self.assertEqual(
-            [link[0] for link in report_store.links_for(self.course_id)],
-            ['new_file', 'middle_file', 'old_file']
-        )
+        assert [link[0] for link in report_store.links_for(self.course_id)] == ['new_file', 'middle_file', 'old_file']
 
 
 class LocalFSReportStoreTestCase(ReportStoreTestMixin, TestReportMixin, SimpleTestCase):
@@ -137,4 +134,4 @@ class TestS3ReportStorage(TestCase):
         }):
             report_store = ReportStore.from_config(config_name="FINANCIAL_REPORTS")
             # Make sure CUSTOM_DOMAIN from FINANCIAL_REPORTS is used to construct file url
-            self.assertIn("edx-financial-reports.s3.amazonaws.com", report_store.storage.url(""))
+            assert 'edx-financial-reports.s3.amazonaws.com' in report_store.storage.url('')

@@ -33,11 +33,11 @@ class TestInstructorAccessList(SharedModuleStoreTestCase):
 
     def test_list_instructors(self):
         instructors = list_with_level(self.course, 'instructor')
-        self.assertEqual(set(instructors), set(self.instructors))
+        assert set(instructors) == set(self.instructors)
 
     def test_list_beta(self):
         beta_testers = list_with_level(self.course, 'beta')
-        self.assertEqual(set(beta_testers), set(self.beta_testers))
+        assert set(beta_testers) == set(self.beta_testers)
 
 
 class TestInstructorAccessAllow(EmailTemplateTagMixin, SharedModuleStoreTestCase):
@@ -55,24 +55,24 @@ class TestInstructorAccessAllow(EmailTemplateTagMixin, SharedModuleStoreTestCase
     def test_allow(self):
         user = UserFactory()
         allow_access(self.course, user, 'staff')
-        self.assertTrue(CourseStaffRole(self.course.id).has_user(user))
+        assert CourseStaffRole(self.course.id).has_user(user)
 
     def test_allow_twice(self):
         user = UserFactory()
         allow_access(self.course, user, 'staff')
         allow_access(self.course, user, 'staff')
-        self.assertTrue(CourseStaffRole(self.course.id).has_user(user))
+        assert CourseStaffRole(self.course.id).has_user(user)
 
     def test_allow_ccx_coach(self):
         user = UserFactory()
         allow_access(self.course, user, 'ccx_coach')
-        self.assertTrue(CourseCcxCoachRole(self.course.id).has_user(user))
+        assert CourseCcxCoachRole(self.course.id).has_user(user)
 
     def test_allow_beta(self):
         """ Test allow beta against list beta. """
         user = UserFactory()
         allow_access(self.course, user, 'beta')
-        self.assertTrue(CourseBetaTesterRole(self.course.id).has_user(user))
+        assert CourseBetaTesterRole(self.course.id).has_user(user)
 
     def test_allow_badlevel(self):
         user = UserFactory()
@@ -104,17 +104,17 @@ class TestInstructorAccessRevoke(SharedModuleStoreTestCase):
     def test_revoke(self):
         user = self.staff[0]
         revoke_access(self.course, user, 'staff')
-        self.assertFalse(CourseStaffRole(self.course.id).has_user(user))
+        assert not CourseStaffRole(self.course.id).has_user(user)
 
     def test_revoke_twice(self):
         user = self.staff[0]
         revoke_access(self.course, user, 'staff')
-        self.assertFalse(CourseStaffRole(self.course.id).has_user(user))
+        assert not CourseStaffRole(self.course.id).has_user(user)
 
     def test_revoke_beta(self):
         user = self.beta_testers[0]
         revoke_access(self.course, user, 'beta')
-        self.assertFalse(CourseBetaTesterRole(self.course.id).has_user(user))
+        assert not CourseBetaTesterRole(self.course.id).has_user(user)
 
     def test_revoke_badrolename(self):
         user = UserFactory()
@@ -144,14 +144,14 @@ class TestInstructorAccessForum(SharedModuleStoreTestCase):
     def test_allow(self):
         user = UserFactory.create()
         update_forum_role(self.course.id, user, FORUM_ROLE_MODERATOR, 'allow')
-        self.assertIn(user, self.mod_role.users.all())
+        assert user in self.mod_role.users.all()
 
     def test_allow_twice(self):
         user = UserFactory.create()
         update_forum_role(self.course.id, user, FORUM_ROLE_MODERATOR, 'allow')
-        self.assertIn(user, self.mod_role.users.all())
+        assert user in self.mod_role.users.all()
         update_forum_role(self.course.id, user, FORUM_ROLE_MODERATOR, 'allow')
-        self.assertIn(user, self.mod_role.users.all())
+        assert user in self.mod_role.users.all()
 
     def test_allow_badrole(self):
         user = UserFactory.create()
@@ -161,19 +161,19 @@ class TestInstructorAccessForum(SharedModuleStoreTestCase):
     def test_revoke(self):
         user = self.moderators[0]
         update_forum_role(self.course.id, user, FORUM_ROLE_MODERATOR, 'revoke')
-        self.assertNotIn(user, self.mod_role.users.all())
+        assert user not in self.mod_role.users.all()
 
     def test_revoke_twice(self):
         user = self.moderators[0]
         update_forum_role(self.course.id, user, FORUM_ROLE_MODERATOR, 'revoke')
-        self.assertNotIn(user, self.mod_role.users.all())
+        assert user not in self.mod_role.users.all()
         update_forum_role(self.course.id, user, FORUM_ROLE_MODERATOR, 'revoke')
-        self.assertNotIn(user, self.mod_role.users.all())
+        assert user not in self.mod_role.users.all()
 
     def test_revoke_notallowed(self):
         user = UserFactory()
         update_forum_role(self.course.id, user, FORUM_ROLE_MODERATOR, 'revoke')
-        self.assertNotIn(user, self.mod_role.users.all())
+        assert user not in self.mod_role.users.all()
 
     def test_revoke_badrole(self):
         user = self.moderators[0]

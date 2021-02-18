@@ -4,7 +4,7 @@ Tests for failing old tasks
 
 
 from datetime import datetime
-
+import pytest
 import ddt
 import pytz
 from celery.states import FAILURE
@@ -84,9 +84,9 @@ class TestFailOldQueueingTasksCommand(InstructorTaskTestCase):
         )
 
         type_1_queueing, type_1_progress, type_2_queueing = self.get_tasks()
-        self.assertEqual(type_1_queueing.task_state, QUEUING)
-        self.assertEqual(type_2_queueing.task_state, QUEUING)
-        self.assertEqual(type_1_progress.task_state, PROGRESS)
+        assert type_1_queueing.task_state == QUEUING
+        assert type_2_queueing.task_state == QUEUING
+        assert type_1_progress.task_state == PROGRESS
 
     @ddt.data(
         ('2015-05-05', '2015-05-07', '2015-05-06', FAILURE),
@@ -105,9 +105,9 @@ class TestFailOldQueueingTasksCommand(InstructorTaskTestCase):
         call_command('fail_old_tasks', QUEUING, before=before, after=after)
 
         type_1_queueing, type_1_progress, type_2_queueing = self.get_tasks()
-        self.assertEqual(type_1_queueing.task_state, expected_state)
-        self.assertEqual(type_2_queueing.task_state, expected_state)
-        self.assertEqual(type_1_progress.task_state, PROGRESS)
+        assert type_1_queueing.task_state == expected_state
+        assert type_2_queueing.task_state == expected_state
+        assert type_1_progress.task_state == PROGRESS
 
     @ddt.data(
         (PROGRESS, QUEUING, FAILURE),
@@ -129,9 +129,9 @@ class TestFailOldQueueingTasksCommand(InstructorTaskTestCase):
         )
         type_1_queueing, type_1_progress, type_2_queueing = self.get_tasks()
 
-        self.assertEqual(type_1_queueing.task_state, expected_queueing_state)
-        self.assertEqual(type_2_queueing.task_state, expected_queueing_state)
-        self.assertEqual(type_1_progress.task_state, expected_progress_state)
+        assert type_1_queueing.task_state == expected_queueing_state
+        assert type_2_queueing.task_state == expected_queueing_state
+        assert type_1_progress.task_state == expected_progress_state
 
     def test_filter_by_task_type(self):
         """
@@ -147,10 +147,10 @@ class TestFailOldQueueingTasksCommand(InstructorTaskTestCase):
             task_type="type_1",
         )
         type_1_queueing, type_1_progress, type_2_queueing = self.get_tasks()
-        self.assertEqual(type_1_queueing.task_state, FAILURE)
+        assert type_1_queueing.task_state == FAILURE
         # the other type of task shouldn't be updated
-        self.assertEqual(type_2_queueing.task_state, QUEUING)
-        self.assertEqual(type_1_progress.task_state, PROGRESS)
+        assert type_2_queueing.task_state == QUEUING
+        assert type_1_progress.task_state == PROGRESS
 
     @ddt.data(
         ('2015-05-05', None),
@@ -162,7 +162,7 @@ class TestFailOldQueueingTasksCommand(InstructorTaskTestCase):
         Test that we get a CommandError when we don't supply before and after
         dates.
         """
-        with self.assertRaises(CommandError):
+        with pytest.raises(CommandError):
             call_command('fail_old_tasks', QUEUING, before=before, after=after)
 
     @ddt.data(
@@ -174,5 +174,5 @@ class TestFailOldQueueingTasksCommand(InstructorTaskTestCase):
         Test that the command will throw an error if called with a value
          that's neither 'QUEUING' nor 'PROGRESS'
         """
-        with self.assertRaises(CommandError):
+        with pytest.raises(CommandError):
             call_command('fail_old_tasks', task_type, before='2015-05-15', after='2015-05-05')

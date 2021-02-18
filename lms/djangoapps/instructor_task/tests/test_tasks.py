@@ -9,7 +9,7 @@ paths actually work.
 import json
 from functools import partial  # lint-amnesty, pylint: disable=unused-import
 from uuid import uuid4
-
+import pytest
 import ddt
 from celery.states import FAILURE, SUCCESS
 from django.utils.translation import ugettext_noop
@@ -109,19 +109,19 @@ class TestInstructorTasks(InstructorTaskModuleTestCase):
     def _test_missing_current_task(self, task_class):
         """Check that a task_class fails when celery doesn't provide a current_task."""
         task_entry = self._create_input_entry()
-        with self.assertRaises(ValueError):
+        with pytest.raises(ValueError):
             task_class(task_entry.id, self._get_xmodule_instance_args())
 
     def _test_undefined_course(self, task_class):
         """Run with celery, but with no course defined."""
         task_entry = self._create_input_entry(course_id="bogus/course/id")
-        with self.assertRaises(ItemNotFoundError):
+        with pytest.raises(ItemNotFoundError):
             self._run_task_with_mock_celery(task_class, task_entry.id, task_entry.task_id)
 
     def _test_undefined_problem(self, task_class):
         """Run with celery, but no problem defined."""
         task_entry = self._create_input_entry()
-        with self.assertRaises(ItemNotFoundError):
+        with pytest.raises(ItemNotFoundError):
             self._run_task_with_mock_celery(task_class, task_entry.id, task_entry.task_id)
 
     def _test_run_with_task(self, task_class, action_name, expected_num_succeeded,
@@ -134,16 +134,16 @@ class TestInstructorTasks(InstructorTaskModuleTestCase):
         expected_total = expected_total \
             if expected_total else expected_num_succeeded + expected_num_skipped
         # check return value
-        self.assertEqual(status.get('attempted'), expected_attempted)
-        self.assertEqual(status.get('succeeded'), expected_num_succeeded)
-        self.assertEqual(status.get('skipped'), expected_num_skipped)
-        self.assertEqual(status.get('total'), expected_total)
-        self.assertEqual(status.get('action_name'), action_name)
-        self.assertGreater(status.get('duration_ms'), 0)
+        assert status.get('attempted') == expected_attempted
+        assert status.get('succeeded') == expected_num_succeeded
+        assert status.get('skipped') == expected_num_skipped
+        assert status.get('total') == expected_total
+        assert status.get('action_name') == action_name
+        assert status.get('duration_ms') > 0
         # compare with entry in table:
         entry = InstructorTask.objects.get(id=task_entry.id)
-        self.assertEqual(json.loads(entry.task_output), status)
-        self.assertEqual(entry.task_state, SUCCESS)
+        assert json.loads(entry.task_output) == status
+        assert entry.task_state == SUCCESS
 
     def _test_run_with_no_state(self, task_class, action_name):
         """Run with no StudentModules defined for the current problem."""
@@ -186,20 +186,20 @@ class TestInstructorTasks(InstructorTaskModuleTestCase):
                                                student=student,
                                                module_state_key=self.location)
             state = json.loads(module.state)
-            self.assertEqual(state['attempts'], num_attempts)
+            assert state['attempts'] == num_attempts
 
     def _test_run_with_failure(self, task_class, expected_message):
         """Run a task and trigger an artificial failure with the given message."""
         task_entry = self._create_input_entry()
         self.define_option_problem(PROBLEM_URL_NAME)
-        with self.assertRaises(TestTaskFailure):
+        with pytest.raises(TestTaskFailure):
             self._run_task_with_mock_celery(task_class, task_entry.id, task_entry.task_id, expected_message)
         # compare with entry in table:
         entry = InstructorTask.objects.get(id=task_entry.id)
-        self.assertEqual(entry.task_state, FAILURE)
+        assert entry.task_state == FAILURE
         output = json.loads(entry.task_output)
-        self.assertEqual(output['exception'], 'TestTaskFailure')
-        self.assertEqual(output['message'], expected_message)
+        assert output['exception'] == 'TestTaskFailure'
+        assert output['message'] == expected_message
 
     def _test_run_with_long_error_msg(self, task_class):
         """
@@ -209,16 +209,16 @@ class TestInstructorTasks(InstructorTaskModuleTestCase):
         task_entry = self._create_input_entry()
         self.define_option_problem(PROBLEM_URL_NAME)
         expected_message = "x" * 1500
-        with self.assertRaises(TestTaskFailure):
+        with pytest.raises(TestTaskFailure):
             self._run_task_with_mock_celery(task_class, task_entry.id, task_entry.task_id, expected_message)
         # compare with entry in table:
         entry = InstructorTask.objects.get(id=task_entry.id)
-        self.assertEqual(entry.task_state, FAILURE)
-        self.assertGreater(1023, len(entry.task_output))
+        assert entry.task_state == FAILURE
+        assert 1023 > len(entry.task_output)
         output = json.loads(entry.task_output)
-        self.assertEqual(output['exception'], 'TestTaskFailure')
-        self.assertEqual(output['message'], expected_message[:len(output['message']) - 3] + "...")
-        self.assertNotIn('traceback', output)
+        assert output['exception'] == 'TestTaskFailure'
+        assert output['message'] == (expected_message[:(len(output['message']) - 3)] + '...')
+        assert 'traceback' not in output
 
     def _test_run_with_short_error_msg(self, task_class):
         """
@@ -229,16 +229,16 @@ class TestInstructorTasks(InstructorTaskModuleTestCase):
         task_entry = self._create_input_entry()
         self.define_option_problem(PROBLEM_URL_NAME)
         expected_message = "x" * 900
-        with self.assertRaises(TestTaskFailure):
+        with pytest.raises(TestTaskFailure):
             self._run_task_with_mock_celery(task_class, task_entry.id, task_entry.task_id, expected_message)
         # compare with entry in table:
         entry = InstructorTask.objects.get(id=task_entry.id)
-        self.assertEqual(entry.task_state, FAILURE)
-        self.assertGreater(1023, len(entry.task_output))
+        assert entry.task_state == FAILURE
+        assert 1023 > len(entry.task_output)
         output = json.loads(entry.task_output)
-        self.assertEqual(output['exception'], 'TestTaskFailure')
-        self.assertEqual(output['message'], expected_message)
-        self.assertEqual(output['traceback'][-3:], "...")
+        assert output['exception'] == 'TestTaskFailure'
+        assert output['message'] == expected_message
+        assert output['traceback'][(- 3):] == '...'
 
 
 class TestOverrideScoreInstructorTask(TestInstructorTasks):
@@ -247,13 +247,13 @@ class TestOverrideScoreInstructorTask(TestInstructorTasks):
         """
         Check & compare output of the task
         """
-        self.assertEqual(output.get('total'), expected_output.get('total'))
-        self.assertEqual(output.get('attempted'), expected_output.get('attempted'))
-        self.assertEqual(output.get('succeeded'), expected_output.get('succeeded'))
-        self.assertEqual(output.get('skipped'), expected_output.get('skipped'))
-        self.assertEqual(output.get('failed'), expected_output.get('failed'))
-        self.assertEqual(output.get('action_name'), expected_output.get('action_name'))
-        self.assertGreater(output.get('duration_ms'), expected_output.get('duration_ms', 0))
+        assert output.get('total') == expected_output.get('total')
+        assert output.get('attempted') == expected_output.get('attempted')
+        assert output.get('succeeded') == expected_output.get('succeeded')
+        assert output.get('skipped') == expected_output.get('skipped')
+        assert output.get('failed') == expected_output.get('failed')
+        assert output.get('action_name') == expected_output.get('action_name')
+        assert output.get('duration_ms') > expected_output.get('duration_ms', 0)
 
     def get_task_output(self, task_id):
         """Get and load instructor task output"""
@@ -298,14 +298,14 @@ class TestOverrideScoreInstructorTask(TestInstructorTasks):
                 'lms.djangoapps.instructor_task.tasks_helper.module_state.get_module_for_descriptor_internal'
         ) as mock_get_module:
             mock_get_module.return_value = mock_instance
-            with self.assertRaises(UpdateProblemModuleStateError):
+            with pytest.raises(UpdateProblemModuleStateError):
                 self._run_task_with_mock_celery(override_problem_score, task_entry.id, task_entry.task_id)
         # check values stored in table:
         entry = InstructorTask.objects.get(id=task_entry.id)
         output = json.loads(entry.task_output)
-        self.assertEqual(output['exception'], "UpdateProblemModuleStateError")
-        self.assertEqual(output['message'], "Scores cannot be overridden for this problem type.")
-        self.assertGreater(len(output['traceback']), 0)
+        assert output['exception'] == 'UpdateProblemModuleStateError'
+        assert output['message'] == 'Scores cannot be overridden for this problem type.'
+        assert len(output['traceback']) > 0
 
     def test_overriding_unaccessable(self):
         """
@@ -386,13 +386,13 @@ class TestRescoreInstructorTask(TestInstructorTasks):
         """
         Check & compare output of the task
         """
-        self.assertEqual(output.get('total'), expected_output.get('total'))
-        self.assertEqual(output.get('attempted'), expected_output.get('attempted'))
-        self.assertEqual(output.get('succeeded'), expected_output.get('succeeded'))
-        self.assertEqual(output.get('skipped'), expected_output.get('skipped'))
-        self.assertEqual(output.get('failed'), expected_output.get('failed'))
-        self.assertEqual(output.get('action_name'), expected_output.get('action_name'))
-        self.assertGreater(output.get('duration_ms'), expected_output.get('duration_ms', 0))
+        assert output.get('total') == expected_output.get('total')
+        assert output.get('attempted') == expected_output.get('attempted')
+        assert output.get('succeeded') == expected_output.get('succeeded')
+        assert output.get('skipped') == expected_output.get('skipped')
+        assert output.get('failed') == expected_output.get('failed')
+        assert output.get('action_name') == expected_output.get('action_name')
+        assert output.get('duration_ms') > expected_output.get('duration_ms', 0)
 
     def get_task_output(self, task_id):
         """Get and load instructor task output"""
@@ -430,17 +430,15 @@ class TestRescoreInstructorTask(TestInstructorTasks):
         del mock_instance.rescore
         with patch('lms.djangoapps.instructor_task.tasks_helper.module_state.get_module_for_descriptor_internal') as mock_get_module:  # lint-amnesty, pylint: disable=line-too-long
             mock_get_module.return_value = mock_instance
-            with self.assertRaises(UpdateProblemModuleStateError):
+            with pytest.raises(UpdateProblemModuleStateError):
                 self._run_task_with_mock_celery(rescore_problem, task_entry.id, task_entry.task_id)
         # check values stored in table:
         entry = InstructorTask.objects.get(id=task_entry.id)
         output = json.loads(entry.task_output)
-        self.assertEqual(output['exception'], "UpdateProblemModuleStateError")
-        self.assertEqual(output['message'], u"Specified module {0} of type {1} does not support rescoring.".format(
-            self.location,
-            mock_instance.__class__,
-        ))
-        self.assertGreater(len(output['traceback']), 0)
+        assert output['exception'] == 'UpdateProblemModuleStateError'
+        assert output['message'] == u'Specified module {0} of type {1} does not support rescoring.'\
+            .format(self.location, mock_instance.__class__)
+        assert len(output['traceback']) > 0
 
     def test_rescoring_unaccessable(self):
         """
@@ -553,7 +551,7 @@ class TestResetAttemptsInstructorTask(TestInstructorTasks):
                                                student=student,
                                                module_state_key=self.location)
             state = json.loads(module.state)
-            self.assertEqual(state['attempts'], initial_attempts)
+            assert state['attempts'] == initial_attempts
 
         if use_email:
             student_ident = students[3].email
@@ -563,16 +561,16 @@ class TestResetAttemptsInstructorTask(TestInstructorTasks):
 
         status = self._run_task_with_mock_celery(reset_problem_attempts, task_entry.id, task_entry.task_id)
         # check return value
-        self.assertEqual(status.get('attempted'), 1)
-        self.assertEqual(status.get('succeeded'), 1)
-        self.assertEqual(status.get('total'), 1)
-        self.assertEqual(status.get('action_name'), 'reset')
-        self.assertGreater(status.get('duration_ms'), 0)
+        assert status.get('attempted') == 1
+        assert status.get('succeeded') == 1
+        assert status.get('total') == 1
+        assert status.get('action_name') == 'reset'
+        assert status.get('duration_ms') > 0
 
         # compare with entry in table:
         entry = InstructorTask.objects.get(id=task_entry.id)
-        self.assertEqual(json.loads(entry.task_output), status)
-        self.assertEqual(entry.task_state, SUCCESS)
+        assert json.loads(entry.task_output) == status
+        assert entry.task_state == SUCCESS
         # check that the correct entry was reset
         for index, student in enumerate(students):
             module = StudentModule.objects.get(course_id=self.course.id,
@@ -580,9 +578,9 @@ class TestResetAttemptsInstructorTask(TestInstructorTasks):
                                                module_state_key=self.location)
             state = json.loads(module.state)
             if index == 3:
-                self.assertEqual(state['attempts'], 0)
+                assert state['attempts'] == 0
             else:
-                self.assertEqual(state['attempts'], initial_attempts)
+                assert state['attempts'] == initial_attempts
 
     def test_reset_with_student_username(self):
         self._test_reset_with_student(False)
@@ -628,7 +626,7 @@ class TestDeleteStateInstructorTask(TestInstructorTasks):
         self._test_run_with_task(delete_problem_state, 'deleted', num_students)
         # confirm that no state can be found anymore:
         for student in students:
-            with self.assertRaises(StudentModule.DoesNotExist):
+            with pytest.raises(StudentModule.DoesNotExist):
                 StudentModule.objects.get(course_id=self.course.id,
                                           student=student,
                                           module_state_key=self.location)

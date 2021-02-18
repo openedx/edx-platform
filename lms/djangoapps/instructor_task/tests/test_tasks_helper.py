@@ -106,9 +106,9 @@ class InstructorGradeReportTestCase(TestReportMixin, InstructorTaskCourseTestCas
             with report_store.storage.open(report_path) as csv_file:
                 for row in unicodecsv.DictReader(csv_file):
                     if row.get('Username') == username:
-                        self.assertEqual(row[column_header], expected_cell_content)
+                        assert row[column_header] == expected_cell_content
                         found_user = True
-            self.assertTrue(found_user)
+            assert found_user
 
 
 @ddt.ddt
@@ -150,7 +150,7 @@ class TestInstructorGradeReport(InstructorGradeReportTestCase):
         self.assertDictContainsSubset({'attempted': 1, 'succeeded': 0, 'failed': 1}, result)
 
         report_store = ReportStore.from_config(config_name='GRADES_DOWNLOAD')
-        self.assertTrue(any('grade_report_err' in item[0] for item in report_store.links_for(self.course.id)))
+        assert any((('grade_report_err' in item[0]) for item in report_store.links_for(self.course.id)))
 
     def test_cohort_data_in_grading(self):
         """
@@ -217,7 +217,7 @@ class TestInstructorGradeReport(InstructorGradeReportTestCase):
         )
 
         _groups = [group.name for group in self.course.user_partitions[0].groups]
-        self.assertEqual(_groups, user_groups)
+        assert _groups == user_groups
 
     def test_cohort_scheme_partition(self):
         """
@@ -517,7 +517,7 @@ class TestProblemResponsesReport(TestReportMixin, InstructorTaskModuleTestCase):
             usage_key_str_list=[str(self.course.location)],
         )
 
-        self.assertEqual(len(student_data), 4)
+        assert len(student_data) == 4
 
     @patch(
         'lms.djangoapps.instructor_task.tasks_helper.grades.list_problem_responses',
@@ -536,16 +536,15 @@ class TestProblemResponsesReport(TestReportMixin, InstructorTaskModuleTestCase):
                 course_key=self.course.id,
                 usage_key_str_list=[str(problem.location)],
             )
-        self.assertEqual(len(student_data), 1)
+        assert len(student_data) == 1
         self.assertDictContainsSubset({
             'username': 'student',
             'location': 'test_course > Section > Subsection > Problem1',
             'block_key': 'i4x://edx/1.23x/problem/Problem1',
             'title': 'Problem1',
         }, student_data[0])
-        self.assertIn('state', student_data[0])
-        self.assertEqual(student_data_keys_list,
-                         ['username', 'title', 'location', 'block_key', 'state'])
+        assert 'state' in student_data[0]
+        assert student_data_keys_list == ['username', 'title', 'location', 'block_key', 'state']
         mock_list_problem_responses.assert_called_with(self.course.id, ANY, ANY)
 
     @patch('xmodule.capa_module.ProblemBlock.generate_report_data', create=True)
@@ -567,7 +566,7 @@ class TestProblemResponsesReport(TestReportMixin, InstructorTaskModuleTestCase):
             course_key=self.course.id,
             usage_key_str_list=[str(self.course.location)],
         )
-        self.assertEqual(len(student_data), 2)
+        assert len(student_data) == 2
         self.assertDictContainsSubset({
             'username': 'student',
             'location': 'test_course > Section > Subsection > Problem1',
@@ -584,9 +583,8 @@ class TestProblemResponsesReport(TestReportMixin, InstructorTaskModuleTestCase):
             'some': 'state2',
             'more': 'state2!',
         }, student_data[1])
-        self.assertEqual(student_data[0]['state'], student_data[1]['state'])
-        self.assertEqual(student_data_keys_list,
-                         ['username', 'title', 'location', 'more', 'some', 'block_key', 'state'])
+        assert student_data[0]['state'] == student_data[1]['state']
+        assert student_data_keys_list == ['username', 'title', 'location', 'more', 'some', 'block_key', 'state']
 
     @patch('xmodule.capa_module.ProblemBlock.generate_report_data', create=True)
     def test_build_student_data_for_block_with_ordered_generate_report_data(self, mock_generate_report_data):
@@ -609,7 +607,7 @@ class TestProblemResponsesReport(TestReportMixin, InstructorTaskModuleTestCase):
             course_key=self.course.id,
             usage_key_str_list=[str(self.course.location)],
         )
-        self.assertEqual(len(student_data), 2)
+        assert len(student_data) == 2
         self.assertDictContainsSubset({
             'username': 'student',
             'location': 'test_course > Section > Subsection > Problem1',
@@ -626,9 +624,8 @@ class TestProblemResponsesReport(TestReportMixin, InstructorTaskModuleTestCase):
             'some': 'state2',
             'more': 'state2!',
         }, student_data[1])
-        self.assertEqual(student_data[0]['state'], student_data[1]['state'])
-        self.assertEqual(student_data_keys_list,
-                         ['username', 'title', 'location', 'some', 'more', 'block_key', 'state'])
+        assert student_data[0]['state'] == student_data[1]['state']
+        assert student_data_keys_list == ['username', 'title', 'location', 'some', 'more', 'block_key', 'state']
 
     def test_build_student_data_for_block_with_real_generate_report_data(self):
         """
@@ -642,7 +639,7 @@ class TestProblemResponsesReport(TestReportMixin, InstructorTaskModuleTestCase):
             course_key=self.course.id,
             usage_key_str_list=[str(self.course.location)],
         )
-        self.assertEqual(len(student_data), 1)
+        assert len(student_data) == 1
         self.assertDictContainsSubset({
             'username': 'student',
             'location': 'test_course > Section > Subsection > Problem1',
@@ -653,11 +650,9 @@ class TestProblemResponsesReport(TestReportMixin, InstructorTaskModuleTestCase):
             'Correct Answer': u'Option 1',
             'Question': u'The correct answer is Option 1',
         }, student_data[0])
-        self.assertIn('state', student_data[0])
-        self.assertEqual(student_data_keys_list,
-                         ['username', 'title', 'location',
-                          'Answer', 'Answer ID', 'Correct Answer', 'Question',
-                          'block_key', 'state'])
+        assert 'state' in student_data[0]
+        assert student_data_keys_list == ['username', 'title', 'location', 'Answer', 'Answer ID', 'Correct Answer',
+                                          'Question', 'block_key', 'state']
 
     def test_build_student_data_for_multiple_problems(self):
         """
@@ -672,7 +667,7 @@ class TestProblemResponsesReport(TestReportMixin, InstructorTaskModuleTestCase):
             course_key=self.course.id,
             usage_key_str_list=[str(problem1.location), str(problem2.location)],
         )
-        self.assertEqual(len(student_data), 2)
+        assert len(student_data) == 2
         for idx in range(1, 3):
             self.assertDictContainsSubset({
                 'username': 'student',
@@ -684,7 +679,7 @@ class TestProblemResponsesReport(TestReportMixin, InstructorTaskModuleTestCase):
                 'Correct Answer': u'Option 1',
                 'Question': u'The correct answer is Option 1',
             }, student_data[idx - 1])
-            self.assertIn('state', student_data[idx - 1])
+            assert 'state' in student_data[(idx - 1)]
 
     @ddt.data(
         (['problem'], 5),
@@ -717,7 +712,7 @@ class TestProblemResponsesReport(TestReportMixin, InstructorTaskModuleTestCase):
             usage_key_str_list=[str(self.course.location)],
             filter_types=filters,
         )
-        self.assertEqual(len(student_data), filtered_count)
+        assert len(student_data) == filtered_count
 
     @patch('lms.djangoapps.instructor_task.tasks_helper.grades.list_problem_responses')
     @patch('xmodule.capa_module.ProblemBlock.generate_report_data', create=True)
@@ -1076,7 +1071,7 @@ class TestProblemReportSplitTestContent(TestReportMixin, TestConditionalContent,
 
         with patch('lms.djangoapps.instructor_task.tasks_helper.runner._get_current_task'):
             ProblemGradeReport.generate(None, None, self.course.id, None, 'graded')
-        self.assertEqual(self.get_csv_row_with_headers(), header_row)
+        assert self.get_csv_row_with_headers() == header_row
 
 
 class TestProblemReportCohortedContent(TestReportMixin, ContentGroupTestCase, InstructorTaskModuleTestCase):
@@ -1125,10 +1120,10 @@ class TestProblemReportCohortedContent(TestReportMixin, ContentGroupTestCase, In
     def test_cohort_content(self):
         self.submit_student_answer(self.alpha_user.username, u'Problem0', ['Option 1', 'Option 1'])
         resp = self.submit_student_answer(self.alpha_user.username, u'Problem1', ['Option 1', 'Option 1'])
-        self.assertEqual(resp.status_code, 404)
+        assert resp.status_code == 404
 
         resp = self.submit_student_answer(self.beta_user.username, u'Problem0', ['Option 1', 'Option 2'])
-        self.assertEqual(resp.status_code, 404)
+        assert resp.status_code == 404
         self.submit_student_answer(self.beta_user.username, u'Problem1', ['Option 1', 'Option 2'])
 
         with patch('lms.djangoapps.instructor_task.tasks_helper.runner._get_current_task'):
@@ -1266,7 +1261,7 @@ class TestCourseSurveyReport(TestReportMixin, InstructorTaskCourseTestCase):
             # Removing unicode signature (BOM) from the beginning
             csv_file_data = csv_file_data.decode("utf-8-sig")
             for data in expected_data:
-                self.assertIn(data, csv_file_data)
+                assert data in csv_file_data
 
 
 @ddt.ddt
@@ -1286,7 +1281,7 @@ class TestStudentReport(TestReportMixin, InstructorTaskCourseTestCase):
         report_store = ReportStore.from_config(config_name='GRADES_DOWNLOAD')
         links = report_store.links_for(self.course.id)
 
-        self.assertEqual(len(links), 1)
+        assert len(links) == 1
         self.assertDictContainsSubset({'attempted': 1, 'succeeded': 1, 'failed': 0}, result)
 
     @ddt.data([u'student', u'student\xec'])
@@ -1348,9 +1343,9 @@ class TestTeamStudentReport(TestReportMixin, InstructorTaskCourseTestCase):
             with report_store.storage.open(report_path) as csv_file:
                 for row in unicodecsv.DictReader(csv_file):
                     if row.get('username') == username:
-                        self.assertEqual(row['team'], expected_team)
+                        assert row['team'] == expected_team
                         found_user = True
-            self.assertTrue(found_user)
+            assert found_user
 
     def test_team_column_no_teams(self):
         self._generate_and_verify_teams_column(self.student1.username, UNAVAILABLE)
@@ -1404,7 +1399,7 @@ class TestListMayEnroll(TestReportMixin, InstructorTaskCourseTestCase):
         report_store = ReportStore.from_config(config_name='GRADES_DOWNLOAD')
         links = report_store.links_for(self.course.id)
 
-        self.assertEqual(len(links), 1)
+        assert len(links) == 1
         self.assertDictContainsSubset({'attempted': 1, 'succeeded': 1, 'failed': 0}, result)
 
     def test_unicode_email_addresses(self):
@@ -1847,8 +1842,8 @@ class TestGradeReport(TestReportMixin, InstructorTaskModuleTestCase):
             with patch('lms.djangoapps.grades.course_data.get_course_blocks') as mock_course_blocks:
                 with patch('lms.djangoapps.grades.subsection_grade.get_score') as mock_get_score:
                     CourseGradeReport.generate(None, None, self.course.id, None, 'graded')
-                    self.assertFalse(mock_get_score.called)
-                    self.assertFalse(mock_course_blocks.called)
+                    assert not mock_get_score.called
+                    assert not mock_course_blocks.called
 
 
 @ddt.ddt
@@ -1919,9 +1914,9 @@ class TestGradeReportEnrollmentAndCertificateInfo(TestReportMixin, InstructorTas
                 for row in unicodecsv.DictReader(csv_file):
                     if row.get('Username') == username:
                         csv_row_data = [row[column] for column in self.columns_to_check]
-                        self.assertEqual(csv_row_data, expected_data)
+                        assert csv_row_data == expected_data
                         found_user = True
-            self.assertTrue(found_user)
+            assert found_user
 
     def _create_user_data(self,
                           user_enroll_mode,
@@ -2098,16 +2093,12 @@ class TestCertificateGeneration(InstructorTaskModuleTestCase):
         # the first 3 students (who were whitelisted) have passing
         # certificate statuses
         for student in students[:3]:
-            self.assertIn(
-                GeneratedCertificate.certificate_for_student(student, self.course.id).status,
-                CertificateStatuses.PASSED_STATUSES
-            )
+            assert GeneratedCertificate.certificate_for_student(student, self.course.id).status in\
+                   CertificateStatuses.PASSED_STATUSES
 
         # The last 2 students still don't have certs
         for student in students[3:]:
-            self.assertIsNone(
-                GeneratedCertificate.certificate_for_student(student, self.course.id)
-            )
+            assert GeneratedCertificate.certificate_for_student(student, self.course.id) is None
 
     @ddt.data(
         (CertificateStatuses.downloadable, 2),
@@ -2158,15 +2149,11 @@ class TestCertificateGeneration(InstructorTaskModuleTestCase):
         # the first 4 students have passing certificate statuses since
         # they either were whitelisted or had one before
         for student in students[:4]:
-            self.assertIn(
-                GeneratedCertificate.certificate_for_student(student, self.course.id).status,
-                CertificateStatuses.PASSED_STATUSES
-            )
+            assert GeneratedCertificate.certificate_for_student(student, self.course.id).status in\
+                   CertificateStatuses.PASSED_STATUSES
 
         # The last student still doesn't have a cert
-        self.assertIsNone(
-            GeneratedCertificate.certificate_for_student(students[4], self.course.id)
-        )
+        assert GeneratedCertificate.certificate_for_student(students[4], self.course.id) is None
 
     def test_certificate_generation_specific_student(self):
         """
@@ -2348,15 +2335,15 @@ class TestCertificateGeneration(InstructorTaskModuleTestCase):
 
         # Verify from results from database
         # Certificates are being generated for 2 white-listed students that had statuses in 'deleted'' and 'generating'
-        self.assertEqual(certificate_statuses.count(CertificateStatuses.generating), 2)
+        assert certificate_statuses.count(CertificateStatuses.generating) == 2
         # 5 students are skipped that had Certificate Status 'downloadable' and 'error'
-        self.assertEqual(certificate_statuses.count(CertificateStatuses.downloadable), 2)
-        self.assertEqual(certificate_statuses.count(CertificateStatuses.error), 3)
+        assert certificate_statuses.count(CertificateStatuses.downloadable) == 2
+        assert certificate_statuses.count(CertificateStatuses.error) == 3
 
         # grades will be '0.0' as students are either white-listed or ending in error
-        self.assertEqual(certificate_grades.count('0.0'), 5)
+        assert certificate_grades.count('0.0') == 5
         # grades will be '-1' for students that were skipped
-        self.assertEqual(certificate_grades.count(default_grade), 5)
+        assert certificate_grades.count(default_grade) == 5
 
     def test_certificate_regeneration_with_existing_unavailable_status(self):
         """
@@ -2448,21 +2435,21 @@ class TestCertificateGeneration(InstructorTaskModuleTestCase):
 
         # Verify from results from database
         # Certificates are being generated for 8 students that had statuses in 'downloadable', 'error' and 'generating'
-        self.assertEqual(certificate_statuses.count(CertificateStatuses.generating), 8)
+        assert certificate_statuses.count(CertificateStatuses.generating) == 8
         # 2 students are skipped that had Certificate Status 'unavailable'
-        self.assertEqual(certificate_statuses.count(CertificateStatuses.unavailable), 2)
+        assert certificate_statuses.count(CertificateStatuses.unavailable) == 2
 
         # grades will be '0.0' as students are white-listed and have not completed any tasks
-        self.assertEqual(certificate_grades.count('0.0'), 8)
+        assert certificate_grades.count('0.0') == 8
         # grades will be '-1' for students that have not been processed
-        self.assertEqual(certificate_grades.count(default_grade), 2)
+        assert certificate_grades.count(default_grade) == 2
 
         # Verify that students with status 'unavailable were skipped
         unavailable_certificates = \
             [cert for cert in generated_certificates
              if cert.status == CertificateStatuses.unavailable and cert.grade == default_grade]
 
-        self.assertEqual(len(unavailable_certificates), 2)
+        assert len(unavailable_certificates) == 2
 
     def test_certificate_regeneration_for_students(self):
         """
@@ -2589,7 +2576,7 @@ class TestInstructorOra2Report(SharedModuleStoreTestCase):
                 mock_current_task.return_value = self.current_task
 
                 response = upload_ora2_data(None, None, self.course.id, None, 'generated')
-                self.assertEqual(response, UPDATE_STATUS_FAILED)
+                assert response == UPDATE_STATUS_FAILED
 
     def test_report_stores_results(self):
         with ExitStack() as stack:
@@ -2618,7 +2605,7 @@ class TestInstructorOra2Report(SharedModuleStoreTestCase):
             course_id_string = quote(text_type(self.course.id).replace('/', '_'))
             filename = u'{}_ORA_data_{}.csv'.format(course_id_string, timestamp_str)
 
-            self.assertEqual(return_val, UPDATE_STATUS_SUCCEEDED)
+            assert return_val == UPDATE_STATUS_SUCCEEDED
             mock_store_rows.assert_called_once_with(self.course.id, filename, [test_header] + test_rows)
 
 
@@ -2648,7 +2635,7 @@ class TestInstructorOra2AttachmentsExport(SharedModuleStoreTestCase):
                 mock_collect_data.side_effect = KeyError
 
                 response = upload_ora2_submission_files(None, None, self.course.id, None, 'compressed')
-                self.assertEqual(response, UPDATE_STATUS_FAILED)
+                assert response == UPDATE_STATUS_FAILED
 
     def test_export_fails_if_error_on_create_zip_step(self):
         with ExitStack() as stack:
@@ -2667,7 +2654,7 @@ class TestInstructorOra2AttachmentsExport(SharedModuleStoreTestCase):
             create_zip_mock.side_effect = KeyError
 
             response = upload_ora2_submission_files(None, None, self.course.id, None, 'compressed')
-            self.assertEqual(response, UPDATE_STATUS_FAILED)
+            assert response == UPDATE_STATUS_FAILED
 
     def test_export_fails_if_error_on_upload_step(self):
         with ExitStack() as stack:
@@ -2689,7 +2676,7 @@ class TestInstructorOra2AttachmentsExport(SharedModuleStoreTestCase):
             upload_mock.side_effect = KeyError
 
             response = upload_ora2_submission_files(None, None, self.course.id, None, 'compressed')
-            self.assertEqual(response, UPDATE_STATUS_FAILED)
+            assert response == UPDATE_STATUS_FAILED
 
     def test_task_stores_zip_with_attachments(self):
         with ExitStack() as stack:
@@ -2714,4 +2701,4 @@ class TestInstructorOra2AttachmentsExport(SharedModuleStoreTestCase):
             mock_create_zip.assert_called_once()
             mock_store.assert_called_once()
 
-            self.assertEqual(response, UPDATE_STATUS_SUCCEEDED)
+            assert response == UPDATE_STATUS_SUCCEEDED
