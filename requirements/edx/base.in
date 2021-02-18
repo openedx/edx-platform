@@ -80,16 +80,16 @@ edx-django-release-util             # Release utils for the edx release pipeline
 edx-django-sites-extensions
 edx-django-utils>=3.12.0            # Utilities for cache, monitoring, and plugins; 3.12.0+ for set_code_owner_attribute method
 edx-drf-extensions
-edx-enterprise
+-e git+https://github.com/edx/edx-enterprise.git@2925474bc6b1b04e304ab727997409f040166740#egg=edx_enterprise
 edx-event-routing-backends
 edx-milestones
 edx-organizations
-edx-proctoring>=2.0.1
+-e git+https://github.com/edx/edx-proctoring.git@6f5a24398babd9e51db5a0af466cf35c3936c700#egg=edx_proctoring
 edx-proctoring-proctortrack==1.0.5  # Intentionally and permanently pinned to ensure code changes are reviewed
 edx-rest-api-client
 edx-search
 edx-sga
-edx-submissions
+-e git+https://github.com/edx/edx-submissions.git@d90c890ed19bfbbcd514e117177b4f0ab94f49e4#egg=edx-submissions
 edx-toggles                         # Feature toggles management
 edx-user-state-client
 edx-when
@@ -104,7 +104,7 @@ help-tokens
 html5lib                            # HTML parser, used for capa problems
 icalendar                           # .ics generator, used by calendar_sync
 ipaddress                           # Ip network support for Embargo feature
-jsonfield2                          # Django model field for validated JSON; used in several apps
+jsonfield                           # Django model field for validated JSON; used in several apps
 laboratory                          # Library for testing that code refactors/infrastructure changes produce identical results
 lti-consumer-xblock
 mailsnake                           # Needed for mailchimp (mailing djangoapp)

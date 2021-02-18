@@ -99,19 +99,19 @@ edx-django-release-util==1.0.0  # via -r requirements/edx/base.in
 edx-django-sites-extensions==3.0.0  # via -r requirements/edx/base.in
 edx-django-utils==3.15.0  # via -r requirements/edx/base.in, django-config-models, edx-drf-extensions, edx-enterprise, edx-rest-api-client, edx-toggles, edx-when, ora2, super-csv
 edx-drf-extensions==6.5.0  # via -r requirements/edx/base.in, edx-completion, edx-enterprise, edx-organizations, edx-proctoring, edx-rbac, edx-when, edxval
-edx-enterprise==3.18.6    # via -c requirements/edx/../constraints.txt, -r requirements/edx/base.in
-edx-event-routing-backends==4.0.1  # via -r requirements/edx/base.in
+-e git+https://github.com/edx/edx-enterprise.git@2925474bc6b1b04e304ab727997409f040166740#egg=edx-enterprise
+-e git+https://github.com/edx/event-routing-backends.git@6287eba75f5d9ad10ddcf58833f5cbeb5035861d#egg=edx-event-routing-backends
 edx-i18n-tools==0.5.3     # via ora2
 edx-milestones==0.3.0     # via -r requirements/edx/base.in
 edx-opaque-keys[django]==2.2.0  # via -r requirements/edx/paver.txt, edx-bulk-grades, edx-ccx-keys, edx-completion, edx-drf-extensions, edx-enterprise, edx-milestones, edx-organizations, edx-proctoring, edx-user-state-client, edx-when, lti-consumer-xblock, xmodule
 edx-organizations==6.9.0  # via -r requirements/edx/base.in
 edx-proctoring-proctortrack==1.0.5  # via -r requirements/edx/base.in
-edx-proctoring==3.7.12    # via -r requirements/edx/base.in, edx-proctoring-proctortrack
+-e git+https://github.com/edx/edx-proctoring.git@6f5a24398babd9e51db5a0af466cf35c3936c700#egg=edx_proctoring
 edx-rbac==1.4.1           # via edx-enterprise
 edx-rest-api-client==5.3.0  # via -r requirements/edx/base.in, edx-enterprise, edx-proctoring
 edx-search==3.0.0         # via -r requirements/edx/base.in
 edx-sga==0.16.0           # via -r requirements/edx/base.in
-edx-submissions==3.2.4    # via -r requirements/edx/base.in, ora2
+-e git+https://github.com/edx/edx-submissions.git@d90c890ed19bfbbcd514e117177b4f0ab94f49e4#egg=edx-submissions
 edx-tincan-py35==1.0.0    # via edx-enterprise
 edx-toggles==4.0.0        # via -r requirements/edx/base.in, edx-ace, edx-completion, edx-event-routing-backends, edxval, ora2
 edx-user-state-client==1.3.0  # via -r requirements/edx/base.in
@@ -145,7 +145,7 @@ laboratory==1.0.2         # via -r requirements/edx/base.in
 lazy==1.4                 # via -r requirements/edx/paver.txt, acid-xblock, lti-consumer-xblock, ora2
 libsass==0.10.0           # via -r requirements/edx/paver.txt, ora2
 loremipsum==1.0.5         # via ora2
-lti-consumer-xblock==2.7.1  # via -r requirements/edx/base.in
+-e git+https://github.com/edx/xblock-lti-consumer.git@5fb1002bc437f39eed342c63692f4e467866db9d#egg=lti-consumer-xblock
 lxml==4.5.0               # via -c requirements/edx/../constraints.txt, -r requirements/edx/../edx-sandbox/shared.txt, capa, edxval, lti-consumer-xblock, ora2, safe-lxml, xblock, xmlsec
 mailsnake==1.6.4          # via -r requirements/edx/base.in
 mako==1.1.4               # via -r requirements/edx/base.in, acid-xblock, lti-consumer-xblock, xblock-google-drive, xblock-utils
@@ -164,7 +164,7 @@ nodeenv==1.5.0            # via -r requirements/edx/base.in
 numpy==1.20.1             # via chem, openedx-calc, scipy
 oauthlib==3.0.1           # via -c requirements/edx/../constraints.txt, -r requirements/edx/base.in, django-oauth-toolkit, lti-consumer-xblock, requests-oauthlib, social-auth-core
 openedx-calc==2.0.1       # via -r requirements/edx/base.in
-ora2==3.4.0               # via -r requirements/edx/base.in
+-e git+https://github.com/edx/edx-ora2.git@6249353bdae0ed3fa705d00f0c2983fbb0cf7587#egg=edx-ora2
 packaging==20.9           # via bleach, drf-yasg
 path.py==12.5.0           # via edx-enterprise, edx-i18n-tools, ora2, staff-graded-xblock, xmodule
 path==13.1.0              # via -c requirements/edx/../constraints.txt, -r requirements/edx/paver.txt, path.py

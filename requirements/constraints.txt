@@ -31,7 +31,7 @@ django-storages<1.9
 # The team that owns this package will manually bump this package rather than having it pulled in automatically.
 # This is to allow them to better control its deployment and to do it in a process that works better
 # for them.
-edx-enterprise==3.18.6
+-e git+https://github.com/edx/edx-enterprise.git@2925474bc6b1b04e304ab727997409f040166740#egg=edx_enterprise
 
 # Upgrading to 2.12.0 breaks several test classes due to API changes, need to update our code accordingly
 factory-boy==2.8.1
@@ -50,9 +50,6 @@ joblib<0.15.0
 
 # Version 2.0.0 is giving incompatible versions errors on upgrade
 importlib-metadata==1.7.0
-
-# jsonfield2 3.1.0 drops support for python 3.5
-jsonfield2<3.1.0
 
 # kiwisolver 1.2.0 requires Python 3.6+
 kiwisolver<1.2.0
