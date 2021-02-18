@@ -5,6 +5,7 @@ Tests for basic common operations related to Course Action State managers
 
 from collections import namedtuple
 
+import pytest
 from ddt import data, ddt
 from django.test import TestCase
 from opaque_keys.edx.locations import CourseLocator
@@ -33,21 +34,19 @@ class TestCourseActionStateManager(TestCourseActionStateManagerBase):
     """
     @data(*COURSE_ACTION_STATES)
     def test_update_state_allow_not_found_is_false(self, action_class):
-        with self.assertRaises(CourseActionStateItemNotFoundError):
+        with pytest.raises(CourseActionStateItemNotFoundError):
             action_class.objects.update_state(self.course_key, "fake_state", allow_not_found=False)
 
     @data(*COURSE_ACTION_STATES)
     def test_update_state_allow_not_found(self, action_class):
         action_class.objects.update_state(self.course_key, "initial_state", allow_not_found=True)
-        self.assertIsNotNone(
-            action_class.objects.find_first(course_key=self.course_key)
-        )
+        assert action_class.objects.find_first(course_key=self.course_key) is not None
 
     @data(*COURSE_ACTION_STATES)
     def test_delete(self, action_class):
         obj = action_class.objects.update_state(self.course_key, "initial_state", allow_not_found=True)
         action_class.objects.delete(obj.id)
-        with self.assertRaises(CourseActionStateItemNotFoundError):
+        with pytest.raises(CourseActionStateItemNotFoundError):
             action_class.objects.find_first(course_key=self.course_key)
 
 
@@ -160,4 +159,4 @@ class TestCourseActionUIStateManager(TestCourseActionStateManagerBase):
             source_course_key=source_course_key,
         )
         found_action_state = CourseRerunState.objects.find_first(course_key=destination_course_key)
-        self.assertEqual(source_course_key, found_action_state.source_course_key)
+        assert source_course_key == found_action_state.source_course_key

@@ -7,6 +7,7 @@ from datetime import datetime, timedelta
 
 import mock
 import pytz
+import pytest
 from django.test import TestCase
 
 from common.djangoapps.entitlements import tasks
@@ -45,7 +46,7 @@ class TestExpireOldEntitlementsTask(TestCase):
         ) as mock_datetime:
             tasks.expire_old_entitlements.delay(1, 3).get()
 
-        self.assertEqual(mock_datetime.call_count, 2)
+        assert mock_datetime.call_count == 2
 
     def test_only_unexpired(self):
         """
@@ -62,7 +63,7 @@ class TestExpireOldEntitlementsTask(TestCase):
             tasks.expire_old_entitlements.delay(1, 3).get()
 
         # Make sure only the unexpired one gets used
-        self.assertEqual(mock_datetime.call_count, 1)
+        assert mock_datetime.call_count == 1
 
     def test_retry(self):
         """
@@ -78,8 +79,8 @@ class TestExpireOldEntitlementsTask(TestCase):
         ) as mock_datetime:
             task = tasks.expire_old_entitlements.delay(1, 2)
 
-        self.assertRaises(Exception, task.get)
-        self.assertEqual(mock_datetime.call_count, tasks.MAX_RETRIES + 1)
+        pytest.raises(Exception, task.get)
+        assert mock_datetime.call_count == (tasks.MAX_RETRIES + 1)
 
 
 @skip_unless_lms
@@ -95,10 +96,10 @@ class TestExpireOldEntitlementsTaskIntegration(TestCase):
         entitlement = make_entitlement()
 
         # Sanity check
-        self.assertIsNone(entitlement.expired_at)
+        assert entitlement.expired_at is None
 
         # Run enforcement
         tasks.expire_old_entitlements.delay(1, 2).get()
         entitlement.refresh_from_db()
 
-        self.assertIsNotNone(entitlement.expired_at)
+        assert entitlement.expired_at is not None

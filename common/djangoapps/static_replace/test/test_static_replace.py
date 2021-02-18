@@ -588,7 +588,7 @@ class CanonicalContentTest(SharedModuleStoreTestCase):
 
         with check_mongo_calls(mongo_calls):
             asset_path = StaticContent.get_canonicalized_asset_path(self.courses[prefix].id, start, base_url, exts)
-            self.assertIsNotNone(re.match(expected, asset_path))
+            assert re.match(expected, asset_path) is not None
 
     @ddt.data(
         # No leading slash.
@@ -784,4 +784,4 @@ class CanonicalContentTest(SharedModuleStoreTestCase):
 
         with check_mongo_calls(mongo_calls):
             asset_path = StaticContent.get_canonicalized_asset_path(self.courses[prefix].id, start, base_url, exts)
-            self.assertIsNotNone(re.match(expected, asset_path))
+            assert re.match(expected, asset_path) is not None

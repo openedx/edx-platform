@@ -24,22 +24,22 @@ class TestExpireOldEntitlementsCommand(TestCase):
         CourseEntitlementFactory.create()
 
         call_command('expire_old_entitlements')
-        self.assertEqual(mock_task.call_count, 0)
+        assert mock_task.call_count == 0
 
         call_command('expire_old_entitlements', commit=True)
-        self.assertEqual(mock_task.call_count, 1)
+        assert mock_task.call_count == 1
 
     def test_no_tasks_if_no_work(self, mock_task):
         """
         Verify that we never try to spin off a task if there are no database rows.
         """
         call_command('expire_old_entitlements', commit=True)
-        self.assertEqual(mock_task.call_count, 0)
+        assert mock_task.call_count == 0
 
         # Now confirm that the above test wasn't a fluke and we will create a task if there is work
         CourseEntitlementFactory.create()
         call_command('expire_old_entitlements', commit=True)
-        self.assertEqual(mock_task.call_count, 1)
+        assert mock_task.call_count == 1
 
     def test_pagination(self, mock_task):
         """
@@ -51,7 +51,7 @@ class TestExpireOldEntitlementsCommand(TestCase):
         call_command('expire_old_entitlements', commit=True, batch_size=2)
 
         args_list = mock_task.call_args_list
-        self.assertEqual(len(args_list), 3)
-        self.assertEqual(args_list[0][0], (1, 3))
-        self.assertEqual(args_list[1][0], (3, 5))
-        self.assertEqual(args_list[2][0], (5, 6))
+        assert len(args_list) == 3
+        assert args_list[0][0] == (1, 3)
+        assert args_list[1][0] == (3, 5)
+        assert args_list[2][0] == (5, 6)

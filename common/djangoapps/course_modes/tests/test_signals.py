@@ -59,13 +59,13 @@ class CourseModeSignalTest(ModuleStoreTestCase):
         _listen_for_course_publish('store', self.course.id)
         course_mode.refresh_from_db()
 
-        self.assertIsNone(course_mode.expiration_datetime)
+        assert course_mode.expiration_datetime is None
 
     @ddt.data(1, 14, 30)
     def test_verified_mode(self, verification_window):
         """ Verify signal updates expiration to configured time period before course end for verified mode. """
         course_mode, __ = self.create_mode('verified', 'verified', 10)
-        self.assertIsNone(course_mode.expiration_datetime)
+        assert course_mode.expiration_datetime is None
 
         with patch('common.djangoapps.course_modes.models.CourseModeExpirationConfig.current') as config:
             instance = config.return_value
@@ -74,14 +74,14 @@ class CourseModeSignalTest(ModuleStoreTestCase):
             _listen_for_course_publish('store', self.course.id)
             course_mode.refresh_from_db()
 
-            self.assertEqual(course_mode.expiration_datetime, self.end - timedelta(days=verification_window))
+            assert course_mode.expiration_datetime == (self.end - timedelta(days=verification_window))
 
     @ddt.data(1, 14, 30)
     def test_verified_mode_explicitly_set(self, verification_window):
         """ Verify signal does not update expiration for verified mode with explicitly set expiration. """
         course_mode, __ = self.create_mode('verified', 'verified', 10)
         course_mode.expiration_datetime_is_explicit = True
-        self.assertIsNone(course_mode.expiration_datetime)
+        assert course_mode.expiration_datetime is None
 
         with patch('common.djangoapps.course_modes.models.CourseModeExpirationConfig.current') as config:
             instance = config.return_value
@@ -90,7 +90,7 @@ class CourseModeSignalTest(ModuleStoreTestCase):
             _listen_for_course_publish('store', self.course.id)
             course_mode.refresh_from_db()
 
-            self.assertEqual(course_mode.expiration_datetime, self.end - timedelta(days=verification_window))
+            assert course_mode.expiration_datetime == (self.end - timedelta(days=verification_window))
 
     def test_masters_mode(self):
         # create an xblock with verified group access
