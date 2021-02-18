@@ -197,17 +197,14 @@ class SplitTestTransformerTestCase(CourseStructureTestCase):
             self.course.location,
             self.transformers,
         )
-        self.assertEqual(
-            set(block_structure1.get_block_keys()),
-            set(self.get_block_key_set(self.blocks, *expected_blocks)),
-        )
+        assert set(block_structure1.get_block_keys()) == set(self.get_block_key_set(self.blocks, *expected_blocks))
 
     def test_user_randomly_assigned(self):
         # user was randomly assigned to one of the groups
         user_groups = get_user_partition_groups(
             self.course.id, [self.split_test_user_partition], self.user, 'id'
         )
-        self.assertEqual(len(user_groups), 1)
+        assert len(user_groups) == 1
 
         # calling twice should result in the same block set
         block_structure1 = get_course_blocks(
@@ -221,7 +218,4 @@ class SplitTestTransformerTestCase(CourseStructureTestCase):
                 self.course.location,
                 self.transformers,
             )
-        self.assertEqual(
-            set(block_structure1.get_block_keys()),
-            set(block_structure2.get_block_keys()),
-        )
+        assert set(block_structure1.get_block_keys()) == set(block_structure2.get_block_keys())

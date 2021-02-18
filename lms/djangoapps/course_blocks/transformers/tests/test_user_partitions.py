@@ -475,10 +475,7 @@ class MergedGroupAccessTestData(UserPartitionTestMixin, CourseStructureTestCase)
         for partition_id, group_id in six.iteritems(user_partition_groups):
             user_partition_groups[partition_id] = self.groups[group_id - 1]
 
-        self.assertEqual(
-            merged_group_access.check_group_access(user_partition_groups),
-            expected_access,
-        )
+        assert merged_group_access.check_group_access(user_partition_groups) == expected_access
 
     @ddt.data(
         ([None], None),
@@ -493,7 +490,4 @@ class MergedGroupAccessTestData(UserPartitionTestMixin, CourseStructureTestCase)
     )
     @ddt.unpack
     def test_intersection_method(self, input_value, expected_result):
-        self.assertEqual(
-            _MergedGroupAccess._intersection(*input_value),
-            expected_result,
-        )
+        assert _MergedGroupAccess._intersection(*input_value) == expected_result

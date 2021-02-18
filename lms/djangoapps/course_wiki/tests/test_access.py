@@ -67,48 +67,48 @@ class TestWikiAccess(TestWikiAccessBase):
     def test_no_one_is_root_wiki_staff(self):
         all_course_staff = self.course_math101_staff + self.course_310b_staff + self.course_310b2_staff
         for course_staff in all_course_staff:
-            self.assertFalse(user_is_article_course_staff(course_staff, self.wiki.article))
+            assert not user_is_article_course_staff(course_staff, self.wiki.article)
 
     def test_course_staff_is_course_wiki_staff(self):
         for page in self.wiki_math101_pages:
             for course_staff in self.course_math101_staff:
-                self.assertTrue(user_is_article_course_staff(course_staff, page.article))
+                assert user_is_article_course_staff(course_staff, page.article)
 
         for page in self.wiki_math101b_pages:
             for course_staff in self.course_math101b_staff:
-                self.assertTrue(user_is_article_course_staff(course_staff, page.article))
+                assert user_is_article_course_staff(course_staff, page.article)
 
     def test_settings(self):
         for page in self.wiki_math101_pages:
             for course_staff in self.course_math101_staff:
-                self.assertTrue(settings.CAN_DELETE(page.article, course_staff))
-                self.assertTrue(settings.CAN_MODERATE(page.article, course_staff))
-                self.assertTrue(settings.CAN_CHANGE_PERMISSIONS(page.article, course_staff))
-                self.assertTrue(settings.CAN_ASSIGN(page.article, course_staff))
-                self.assertTrue(settings.CAN_ASSIGN_OWNER(page.article, course_staff))
+                assert settings.CAN_DELETE(page.article, course_staff)
+                assert settings.CAN_MODERATE(page.article, course_staff)
+                assert settings.CAN_CHANGE_PERMISSIONS(page.article, course_staff)
+                assert settings.CAN_ASSIGN(page.article, course_staff)
+                assert settings.CAN_ASSIGN_OWNER(page.article, course_staff)
 
         for page in self.wiki_math101b_pages:
             for course_staff in self.course_math101b_staff:
-                self.assertTrue(settings.CAN_DELETE(page.article, course_staff))
-                self.assertTrue(settings.CAN_MODERATE(page.article, course_staff))
-                self.assertTrue(settings.CAN_CHANGE_PERMISSIONS(page.article, course_staff))
-                self.assertTrue(settings.CAN_ASSIGN(page.article, course_staff))
-                self.assertTrue(settings.CAN_ASSIGN_OWNER(page.article, course_staff))
+                assert settings.CAN_DELETE(page.article, course_staff)
+                assert settings.CAN_MODERATE(page.article, course_staff)
+                assert settings.CAN_CHANGE_PERMISSIONS(page.article, course_staff)
+                assert settings.CAN_ASSIGN(page.article, course_staff)
+                assert settings.CAN_ASSIGN_OWNER(page.article, course_staff)
 
     def test_other_course_staff_is_not_course_wiki_staff(self):
         for page in self.wiki_math101_pages:
             for course_staff in self.course_math101b_staff:
-                self.assertFalse(user_is_article_course_staff(course_staff, page.article))
+                assert not user_is_article_course_staff(course_staff, page.article)
 
         for page in self.wiki_math101_pages:
             for course_staff in self.course_310b_staff:
-                self.assertFalse(user_is_article_course_staff(course_staff, page.article))
+                assert not user_is_article_course_staff(course_staff, page.article)
 
         for course_staff in self.course_310b_staff:
-            self.assertFalse(user_is_article_course_staff(course_staff, self.wiki_310b2.article))
+            assert not user_is_article_course_staff(course_staff, self.wiki_310b2.article)
 
         for course_staff in self.course_310b2_staff:
-            self.assertFalse(user_is_article_course_staff(course_staff, self.wiki_310b.article))
+            assert not user_is_article_course_staff(course_staff, self.wiki_310b.article)
 
 
 class TestWikiAccessForStudent(TestWikiAccessBase):
@@ -119,11 +119,11 @@ class TestWikiAccessForStudent(TestWikiAccessBase):
         self.student = UserFactory.create()
 
     def test_student_is_not_root_wiki_staff(self):
-        self.assertFalse(user_is_article_course_staff(self.student, self.wiki.article))
+        assert not user_is_article_course_staff(self.student, self.wiki.article)
 
     def test_student_is_not_course_wiki_staff(self):
         for page in self.wiki_math101_pages:
-            self.assertFalse(user_is_article_course_staff(self.student, page.article))
+            assert not user_is_article_course_staff(self.student, page.article)
 
 
 class TestWikiAccessForNumericalCourseNumber(TestWikiAccessBase):
@@ -142,7 +142,7 @@ class TestWikiAccessForNumericalCourseNumber(TestWikiAccessBase):
     def test_course_staff_is_course_wiki_staff_for_numerical_course_number(self):
         for page in self.wiki_200_pages:
             for course_staff in self.course_200_staff:
-                self.assertTrue(user_is_article_course_staff(course_staff, page.article))
+                assert user_is_article_course_staff(course_staff, page.article)
 
 
 class TestWikiAccessForOldFormatCourseStaffGroups(TestWikiAccessBase):
@@ -162,4 +162,4 @@ class TestWikiAccessForOldFormatCourseStaffGroups(TestWikiAccessBase):
     def test_course_staff_is_course_wiki_staff(self):
         for page in self.wiki_math101c_pages:
             for course_staff in self.course_math101c_staff:
-                self.assertTrue(user_is_article_course_staff(course_staff, page.article))
+                assert user_is_article_course_staff(course_staff, page.article)

@@ -35,7 +35,7 @@ class WikiTabTestCase(ModuleStoreTestCase):
         """
         settings.WIKI_ENABLED = True
         self.course.allow_public_wiki_access = True
-        self.assertIsNotNone(self.get_wiki_tab(self.user, self.course))
+        assert self.get_wiki_tab(self.user, self.course) is not None
 
     def test_wiki_enabled_and_not_public(self):
         """
@@ -43,23 +43,23 @@ class WikiTabTestCase(ModuleStoreTestCase):
         """
         settings.WIKI_ENABLED = True
         self.course.allow_public_wiki_access = False
-        self.assertIsNone(self.get_wiki_tab(self.user, self.course))
-        self.assertIsNotNone(self.get_wiki_tab(self.instructor, self.course))
+        assert self.get_wiki_tab(self.user, self.course) is None
+        assert self.get_wiki_tab(self.instructor, self.course) is not None
 
     def test_wiki_enabled_false(self):
         """Test wiki tab when Enabled setting is False"""
         settings.WIKI_ENABLED = False
-        self.assertIsNone(self.get_wiki_tab(self.user, self.course))
-        self.assertIsNone(self.get_wiki_tab(self.instructor, self.course))
+        assert self.get_wiki_tab(self.user, self.course) is None
+        assert self.get_wiki_tab(self.instructor, self.course) is None
 
     def test_wiki_visibility(self):
         """Test toggling of visibility of wiki tab"""
         settings.WIKI_ENABLED = True
         self.course.allow_public_wiki_access = True
         wiki_tab = self.get_wiki_tab(self.user, self.course)
-        self.assertIsNotNone(wiki_tab)
-        self.assertTrue(wiki_tab.is_hideable)
+        assert wiki_tab is not None
+        assert wiki_tab.is_hideable
         wiki_tab.is_hidden = True
-        self.assertTrue(wiki_tab['is_hidden'])
+        assert wiki_tab['is_hidden']
         wiki_tab['is_hidden'] = False
-        self.assertFalse(wiki_tab.is_hidden)
+        assert not wiki_tab.is_hidden

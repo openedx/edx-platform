@@ -44,25 +44,25 @@ class TestCourseGoalsAPI(EventTrackingTestCase, SharedModuleStoreTestCase):
     def test_add_valid_goal(self, ga_call):
         """ Ensures a correctly formatted post succeeds."""
         response = self.post_course_goal(valid=True, goal_key='certify')
-        self.assertEqual(self.get_event(-1)['name'], EVENT_NAME_ADDED)
+        assert self.get_event((- 1))['name'] == EVENT_NAME_ADDED
         ga_call.assert_called_with(self.user.id, EVENT_NAME_ADDED)
-        self.assertEqual(response.status_code, 201)
+        assert response.status_code == 201
 
         current_goals = CourseGoal.objects.filter(user=self.user, course_key=self.course.id)
-        self.assertEqual(len(current_goals), 1)
-        self.assertEqual(current_goals[0].goal_key, 'certify')
+        assert len(current_goals) == 1
+        assert current_goals[0].goal_key == 'certify'
 
     def test_add_invalid_goal(self):
         """ Ensures an incorrectly formatted post does not succeed. """
         response = self.post_course_goal(valid=False)
-        self.assertEqual(response.status_code, 400)
-        self.assertEqual(len(CourseGoal.objects.filter(user=self.user, course_key=self.course.id)), 0)
+        assert response.status_code == 400
+        assert len(CourseGoal.objects.filter(user=self.user, course_key=self.course.id)) == 0
 
     def test_add_without_goal_key(self):
         """ Ensures if no goal key provided, post does not succeed. """
 
         response = self.post_course_goal(goal_key=None)
-        self.assertEqual(len(CourseGoal.objects.filter(user=self.user, course_key=self.course.id)), 0)
+        assert len(CourseGoal.objects.filter(user=self.user, course_key=self.course.id)) == 0
         self.assertContains(
             response=response,
             text='Please provide a valid goal key from following options.',
@@ -76,12 +76,12 @@ class TestCourseGoalsAPI(EventTrackingTestCase, SharedModuleStoreTestCase):
         self.post_course_goal(valid=True, goal_key='explore')
         self.post_course_goal(valid=True, goal_key='certify')
         self.post_course_goal(valid=True, goal_key='unsure')
-        self.assertEqual(self.get_event(-1)['name'], EVENT_NAME_UPDATED)
+        assert self.get_event((- 1))['name'] == EVENT_NAME_UPDATED
 
         ga_call.assert_called_with(self.user.id, EVENT_NAME_UPDATED)
         current_goals = CourseGoal.objects.filter(user=self.user, course_key=self.course.id)
-        self.assertEqual(len(current_goals), 1)
-        self.assertEqual(current_goals[0].goal_key, 'unsure')
+        assert len(current_goals) == 1
+        assert current_goals[0].goal_key == 'unsure'
 
     def post_course_goal(self, valid=True, goal_key='certify'):
         """
