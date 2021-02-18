@@ -71,7 +71,7 @@ class CertAllowlistGenerationTests(ModuleStoreTestCase):
         """
         Test generation for 1 user
         """
-        call_command("cert_allowlist_generation", "--u", self.user.username, "--c", self.course_run_key)
+        call_command("cert_allowlist_generation", "--u", self.user.id, "--c", self.course_run_key)
 
     def test_successful_generation_multiple_users(self):
         """
@@ -79,9 +79,8 @@ class CertAllowlistGenerationTests(ModuleStoreTestCase):
         """
         call_command("cert_allowlist_generation",
                      "--u",
-                     self.user.username,
-                     self.user2.email,
-                     "invalid_user",
-                     " ",
+                     self.user.id,
+                     self.user2.id,
+                     "999999",  # non-existant userid
                      "--c",
                      self.course_run_key)
