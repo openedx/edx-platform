@@ -35,6 +35,12 @@ class AccessTokenExchangeBase(APIView):
     View for token exchange from 3rd party OAuth access token to 1st party
     OAuth access token.
     """
+    # Do not attempt to authenticate for the access token exchange.
+    # The request payload should have all that it needs, and
+    # SessionAuthentication can cause issues by doing a CSRF check and
+    # by setting the session cookie.
+    authentication_classes = []
+
     @method_decorator(csrf_exempt)
     @method_decorator(social_utils.psa("social:complete"))
     def dispatch(self, *args, **kwargs):  # pylint: disable=arguments-differ
