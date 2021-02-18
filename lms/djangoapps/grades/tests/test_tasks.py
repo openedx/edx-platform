@@ -7,6 +7,7 @@ import itertools
 from collections import OrderedDict
 from contextlib import contextmanager
 from datetime import datetime, timedelta
+import pytest
 
 import ddt
 import pytz
@@ -151,17 +152,17 @@ class RecalculateSubsectionGradeTest(HasCourseWithProblemsMixin, ModuleStoreTest
         """
         self.set_up_course()
         self._apply_recalculate_subsection_grade()
-        self.assertTrue(mock_subsection_signal.called)
+        assert mock_subsection_signal.called
 
     def test_block_structure_created_only_once(self):
         self.set_up_course()
-        self.assertTrue(PersistentGradesEnabledFlag.feature_enabled(self.course.id))
+        assert PersistentGradesEnabledFlag.feature_enabled(self.course.id)
         with patch(
             'openedx.core.djangoapps.content.block_structure.factory.BlockStructureFactory.create_from_store',
             side_effect=BlockStructureNotFound(self.course.location),
         ) as mock_block_structure_create:
             self._apply_recalculate_subsection_grade()
-            self.assertEqual(mock_block_structure_create.call_count, 1)
+            assert mock_block_structure_create.call_count == 1
 
     @ddt.data(
         (ModuleStoreEnum.Type.mongo, 1, 38, True),
@@ -173,7 +174,7 @@ class RecalculateSubsectionGradeTest(HasCourseWithProblemsMixin, ModuleStoreTest
     def test_query_counts(self, default_store, num_mongo_calls, num_sql_calls, create_multiple_subsections):
         with self.store.default_store(default_store):
             self.set_up_course(create_multiple_subsections=create_multiple_subsections)
-            self.assertTrue(PersistentGradesEnabledFlag.feature_enabled(self.course.id))
+            assert PersistentGradesEnabledFlag.feature_enabled(self.course.id)
             with check_mongo_calls(num_mongo_calls):
                 with self.assertNumQueries(num_sql_calls):
                     self._apply_recalculate_subsection_grade()
@@ -186,7 +187,7 @@ class RecalculateSubsectionGradeTest(HasCourseWithProblemsMixin, ModuleStoreTest
     def test_query_counts_dont_change_with_more_content(self, default_store, num_mongo_calls, num_sql_calls):
         with self.store.default_store(default_store):
             self.set_up_course(create_multiple_subsections=True)
-            self.assertTrue(PersistentGradesEnabledFlag.feature_enabled(self.course.id))
+            assert PersistentGradesEnabledFlag.feature_enabled(self.course.id)
 
             num_problems = 10
             for _ in range(num_problems):
@@ -214,7 +215,7 @@ class RecalculateSubsectionGradeTest(HasCourseWithProblemsMixin, ModuleStoreTest
 
         # Make sure the signal is sent for only the 2 accessible sequentials.
         self._apply_recalculate_subsection_grade()
-        self.assertEqual(mock_subsection_signal.call_count, 2)
+        assert mock_subsection_signal.call_count == 2
         sequentials_signalled = {
             args[1]['subsection_grade'].location
             for args in mock_subsection_signal.call_args_list
@@ -235,9 +236,9 @@ class RecalculateSubsectionGradeTest(HasCourseWithProblemsMixin, ModuleStoreTest
             with check_mongo_calls(num_mongo_queries):
                 with self.assertNumQueries(num_sql_queries):
                     self._apply_recalculate_subsection_grade()
-            with self.assertRaises(PersistentCourseGrade.DoesNotExist):
+            with pytest.raises(PersistentCourseGrade.DoesNotExist):
                 PersistentCourseGrade.read(self.user.id, self.course.id)
-            self.assertEqual(len(PersistentSubsectionGrade.bulk_read_grades(self.user.id, self.course.id)), 0)
+            assert len(PersistentSubsectionGrade.bulk_read_grades(self.user.id, self.course.id)) == 0
 
     @ddt.data(
         (ModuleStoreEnum.Type.mongo, 1, 39),
@@ -250,8 +251,8 @@ class RecalculateSubsectionGradeTest(HasCourseWithProblemsMixin, ModuleStoreTest
             with check_mongo_calls(num_mongo_queries):
                 with self.assertNumQueries(num_sql_queries):
                     self._apply_recalculate_subsection_grade()
-            self.assertIsNotNone(PersistentCourseGrade.read(self.user.id, self.course.id))
-            self.assertGreater(len(PersistentSubsectionGrade.bulk_read_grades(self.user.id, self.course.id)), 0)
+            assert PersistentCourseGrade.read(self.user.id, self.course.id) is not None
+            assert len(PersistentSubsectionGrade.bulk_read_grades(self.user.id, self.course.id)) > 0
 
     @patch('lms.djangoapps.grades.signals.signals.SUBSECTION_SCORE_CHANGED.send')
     @patch('lms.djangoapps.grades.subsection_grade_factory.SubsectionGradeFactory.update')
@@ -262,7 +263,7 @@ class RecalculateSubsectionGradeTest(HasCourseWithProblemsMixin, ModuleStoreTest
         self.set_up_course()
         mock_update.side_effect = [IntegrityError("WHAMMY"), None]
         self._apply_recalculate_subsection_grade()
-        self.assertEqual(mock_course_signal.call_count, 1)
+        assert mock_course_signal.call_count == 1
 
     @patch('lms.djangoapps.grades.tasks.recalculate_subsection_grade_v3.retry')
     @patch('lms.djangoapps.grades.subsection_grade_factory.SubsectionGradeFactory.update')
@@ -303,10 +304,7 @@ class RecalculateSubsectionGradeTest(HasCourseWithProblemsMixin, ModuleStoreTest
                 recalculate_subsection_grade_v3.apply(kwargs=self.recalculate_subsection_grade_kwargs)
 
         self._assert_retry_called(mock_retry)
-        self.assertIn(
-            u"Grades: tasks._has_database_updated_with_new_score is False.",
-            mock_log.info.call_args_list[0][0][0]
-        )
+        assert u'Grades: tasks._has_database_updated_with_new_score is False.' in mock_log.info.call_args_list[0][0][0]
 
     @ddt.data(
         *itertools.product(
@@ -340,10 +338,8 @@ class RecalculateSubsectionGradeTest(HasCourseWithProblemsMixin, ModuleStoreTest
             self._assert_retry_not_called(mock_retry)
         else:
             self._assert_retry_called(mock_retry)
-            self.assertIn(
-                u"Grades: tasks._has_database_updated_with_new_score is False.",
-                mock_log.info.call_args_list[0][0][0]
-            )
+            assert u'Grades: tasks._has_database_updated_with_new_score is False.'\
+                   in mock_log.info.call_args_list[0][0][0]
 
     @patch('lms.djangoapps.grades.tasks.log')
     @patch('lms.djangoapps.grades.tasks.recalculate_subsection_grade_v3.retry')
@@ -355,7 +351,7 @@ class RecalculateSubsectionGradeTest(HasCourseWithProblemsMixin, ModuleStoreTest
         self.set_up_course()
         mock_update.side_effect = Exception("General exception with no further detail!")
         self._apply_recalculate_subsection_grade()
-        self.assertIn("General exception with no further detail!", mock_log.info.call_args[0][0])
+        assert 'General exception with no further detail!' in mock_log.info.call_args[0][0]
         self._assert_retry_called(mock_retry)
 
     @patch('lms.djangoapps.grades.tasks.log')
@@ -368,7 +364,7 @@ class RecalculateSubsectionGradeTest(HasCourseWithProblemsMixin, ModuleStoreTest
         self.set_up_course()
         mock_update.side_effect = IntegrityError("race condition oh noes")
         self._apply_recalculate_subsection_grade()
-        self.assertFalse(mock_log.info.called)
+        assert not mock_log.info.called
         self._assert_retry_called(mock_retry)
 
     def _apply_recalculate_subsection_grade(
@@ -392,14 +388,14 @@ class RecalculateSubsectionGradeTest(HasCourseWithProblemsMixin, ModuleStoreTest
         Verifies the task was retried and with the correct
         number of arguments.
         """
-        self.assertTrue(mock_retry.called)
-        self.assertEqual(len(mock_retry.call_args[1]['kwargs']), len(self.recalculate_subsection_grade_kwargs))
+        assert mock_retry.called
+        assert len(mock_retry.call_args[1]['kwargs']) == len(self.recalculate_subsection_grade_kwargs)
 
     def _assert_retry_not_called(self, mock_retry):
         """
         Verifies the task was not retried.
         """
-        self.assertFalse(mock_retry.called)
+        assert not mock_retry.called
 
 
 @ddt.ddt
@@ -425,15 +421,9 @@ class ComputeGradesForCourseTest(HasCourseWithProblemsMixin, ModuleStoreTestCase
                 batch_size=batch_size,
                 offset=4,
             )
-        self.assertTrue(result.successful)
-        self.assertEqual(
-            PersistentCourseGrade.objects.filter(course_id=self.course.id).count(),
-            min(batch_size, 8)  # No more than 8 due to offset
-        )
-        self.assertEqual(
-            PersistentSubsectionGrade.objects.filter(course_id=self.course.id).count(),
-            min(batch_size, 8)  # No more than 8 due to offset
-        )
+        assert result.successful
+        assert PersistentCourseGrade.objects.filter(course_id=self.course.id).count() == min(batch_size, 8)
+        assert PersistentSubsectionGrade.objects.filter(course_id=self.course.id).count() == min(batch_size, 8)
 
     @ddt.data(*range(1, 12, 3))
     def test_course_task_args(self, test_batch_size):
@@ -441,9 +431,9 @@ class ComputeGradesForCourseTest(HasCourseWithProblemsMixin, ModuleStoreTestCase
         for course_key, offset, batch_size in _course_task_args(
             batch_size=test_batch_size, course_key=self.course.id, from_settings=False
         ):
-            self.assertEqual(course_key, six.text_type(self.course.id))
-            self.assertEqual(batch_size, test_batch_size)
-            self.assertEqual(offset, offset_expected)
+            assert course_key == six.text_type(self.course.id)
+            assert batch_size == test_batch_size
+            assert offset == offset_expected
             offset_expected += test_batch_size
 
 
@@ -491,7 +481,7 @@ class RecalculateGradesForUserTest(HasCourseWithProblemsMixin, ModuleStoreTestCa
             task_result.get()
 
             factory.read.assert_called_once_with(self.user, course_key=self.course.id)
-            self.assertFalse(factory.update.called)
+            assert not factory.update.called
 
 
 @ddt.ddt
@@ -506,12 +496,9 @@ class FreezeGradingAfterCourseEndTest(HasCourseWithProblemsMixin, ModuleStoreTes
         self.freeze_grade_flag = waffle_flags()[ENFORCE_FREEZE_GRADE_AFTER_COURSE_END]
 
     def _assert_log(self, mock_log, method_name):
-        self.assertTrue(mock_log.info.called)
+        assert mock_log.info.called
         log_message = u"Attempted {} for course '%s', but grades are frozen.".format(method_name)
-        self.assertIn(
-            log_message,
-            mock_log.info.call_args_list[0][0][0]
-        )
+        assert log_message in mock_log.info.call_args_list[0][0][0]
 
     def _assert_for_freeze_grade_flag(  # lint-amnesty, pylint: disable=missing-function-docstring
         self,
@@ -522,7 +509,7 @@ class FreezeGradingAfterCourseEndTest(HasCourseWithProblemsMixin, ModuleStoreTes
         mock_call,
         task_name
     ):
-        self.assertTrue(result.successful)
+        assert result.successful
         if freeze_flag_value and end_date_adjustment > 30:
             mock_call.assert_not_called()
             self._assert_log(mock_log, task_name)

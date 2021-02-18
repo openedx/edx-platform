@@ -52,7 +52,7 @@ class SingleUserGradesTests(GradeViewTestMixin, AuthAndScopesTestMixin, APITestC
             'course_id': str(self.course_key),
             'passed': False
         }]
-        self.assertEqual(response.data, expected_data)
+        assert response.data == expected_data
 
     def test_nonexistent_user(self):
         """
@@ -60,7 +60,7 @@ class SingleUserGradesTests(GradeViewTestMixin, AuthAndScopesTestMixin, APITestC
         """
         self.client.login(username=self.global_staff.username, password=self.password)
         resp = self.client.get(self.get_url('IDoNotExist'))
-        self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
+        assert resp.status_code == status.HTTP_404_NOT_FOUND
 
     def test_self_get_grade_not_enrolled(self):
         """
@@ -71,12 +71,9 @@ class SingleUserGradesTests(GradeViewTestMixin, AuthAndScopesTestMixin, APITestC
         unenrolled_user = UserFactory(password=self.password)
         self.client.login(username=unenrolled_user.username, password=self.password)
         resp = self.client.get(self.get_url(unenrolled_user.username))
-        self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
-        self.assertIn('error_code', resp.data)
-        self.assertEqual(
-            resp.data['error_code'],
-            'user_not_enrolled'
-        )
+        assert resp.status_code == status.HTTP_404_NOT_FOUND
+        assert 'error_code' in resp.data
+        assert resp.data['error_code'] == 'user_not_enrolled'
 
     def test_no_grade(self):
         """
@@ -84,7 +81,7 @@ class SingleUserGradesTests(GradeViewTestMixin, AuthAndScopesTestMixin, APITestC
         """
         self.client.login(username=self.student.username, password=self.password)
         resp = self.client.get(self.get_url(self.student.username))
-        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        assert resp.status_code == status.HTTP_200_OK
         expected_data = [{
             'username': self.student.username,
             'email': '',
@@ -94,7 +91,7 @@ class SingleUserGradesTests(GradeViewTestMixin, AuthAndScopesTestMixin, APITestC
             'letter_grade': None
         }]
 
-        self.assertEqual(resp.data, expected_data)
+        assert resp.data == expected_data
 
     def test_wrong_course_key(self):
         """
@@ -108,12 +105,9 @@ class SingleUserGradesTests(GradeViewTestMixin, AuthAndScopesTestMixin, APITestC
         with patch('opaque_keys.edx.keys.CourseKey.from_string', side_effect=mock_from_string):
             resp = self.client.get(self.get_url(self.student.username))
 
-        self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
-        self.assertIn('error_code', resp.data)
-        self.assertEqual(
-            resp.data['error_code'],
-            'invalid_course_key'
-        )
+        assert resp.status_code == status.HTTP_404_NOT_FOUND
+        assert 'error_code' in resp.data
+        assert resp.data['error_code'] == 'invalid_course_key'
 
     def test_course_does_not_exist(self):
         """
@@ -128,12 +122,9 @@ class SingleUserGradesTests(GradeViewTestMixin, AuthAndScopesTestMixin, APITestC
         )
         url = "{0}?username={1}".format(base_url, self.student.username)
         resp = self.client.get(url)
-        self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
-        self.assertIn('error_code', resp.data)
-        self.assertEqual(
-            resp.data['error_code'],
-            'course_does_not_exist'
-        )
+        assert resp.status_code == status.HTTP_404_NOT_FOUND
+        assert 'error_code' in resp.data
+        assert resp.data['error_code'] == 'course_does_not_exist'
 
     @ddt.data(
         ({'letter_grade': None, 'percent': 0.4, 'passed': False}),
@@ -154,7 +145,7 @@ class SingleUserGradesTests(GradeViewTestMixin, AuthAndScopesTestMixin, APITestC
             mock_grade.return_value = MagicMock(**grade_fields)
             resp = self.client.get(self.get_url(self.student.username))
 
-        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        assert resp.status_code == status.HTTP_200_OK
         expected_data = {
             'username': self.student.username,
             'email': '',
@@ -162,7 +153,7 @@ class SingleUserGradesTests(GradeViewTestMixin, AuthAndScopesTestMixin, APITestC
         }
 
         expected_data.update(grade)
-        self.assertEqual(resp.data, [expected_data])
+        assert resp.data == [expected_data]
 
 
 @ddt.ddt
@@ -193,39 +184,39 @@ class CourseGradesViewTest(GradeViewTestMixin, APITestCase):
 
     def test_anonymous(self):
         resp = self.client.get(self.get_url())
-        self.assertEqual(resp.status_code, status.HTTP_401_UNAUTHORIZED)
+        assert resp.status_code == status.HTTP_401_UNAUTHORIZED
 
     def test_student(self):
         self.client.login(username=self.student.username, password=self.password)
         resp = self.client.get(self.get_url())
-        self.assertEqual(resp.status_code, status.HTTP_403_FORBIDDEN)
+        assert resp.status_code == status.HTTP_403_FORBIDDEN
 
     def test_course_does_not_exist(self):
         self.client.login(username=self.global_staff.username, password=self.password)
         resp = self.client.get(
             self.get_url(course_key='course-v1:MITx+8.MechCX+2014_T1')
         )
-        self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
+        assert resp.status_code == status.HTTP_404_NOT_FOUND
 
     def test_course_no_enrollments(self):
         self.client.login(username=self.global_staff.username, password=self.password)
         resp = self.client.get(
             self.get_url(course_key=self.empty_course.id)
         )
-        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        assert resp.status_code == status.HTTP_200_OK
         expected_data = OrderedDict([
             ('next', None),
             ('previous', None),
             ('results', []),
         ])
-        self.assertEqual(expected_data, resp.data)
+        assert expected_data == resp.data
 
     def test_staff_can_get_all_grades(self):
         self.client.login(username=self.global_staff.username, password=self.password)
         resp = self.client.get(self.get_url())
 
         # this should have permission to access this API endpoint
-        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        assert resp.status_code == status.HTTP_200_OK
         expected_data = OrderedDict([
             ('next', None),
             ('previous', None),
@@ -265,4 +256,4 @@ class CourseGradesViewTest(GradeViewTestMixin, APITestCase):
             ]),
         ])
 
-        self.assertEqual(expected_data, resp.data)
+        assert expected_data == resp.data

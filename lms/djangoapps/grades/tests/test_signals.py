@@ -5,6 +5,7 @@ Tests for the score change signals defined in the courseware models module.
 
 import re
 from datetime import datetime
+import pytest
 
 import ddt
 import pytz
@@ -184,7 +185,7 @@ class ScoreChangedSignalRelayTest(TestCase):
             local_kwargs = SUBMISSION_KWARGS[kwargs].copy()
             del local_kwargs[missing]
 
-            with self.assertRaises(KeyError):
+            with pytest.raises(KeyError):
                 handler(None, **local_kwargs)
             self.signal_mock.assert_not_called()
 
@@ -255,6 +256,6 @@ class ScoreChangedSignalRelayTest(TestCase):
         """
         Tests that the disconnect context manager errors when given an invalid signal.
         """
-        with self.assertRaises(ValueError):
+        with pytest.raises(ValueError):
             with disconnect_submissions_signal_receiver(PROBLEM_RAW_SCORE_CHANGED):
                 pass

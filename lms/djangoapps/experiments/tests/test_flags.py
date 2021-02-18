@@ -53,14 +53,14 @@ class ExperimentWaffleFlagTests(SharedModuleStoreTestCase):
                 return self.flag.get_bucket(course_key=self.key, track=track)
 
     def test_basic_happy_path(self):
-        self.assertEqual(self.get_bucket(), 1)
+        assert self.get_bucket() == 1
 
     def test_no_request(self):
         set_current_request(None)
-        self.assertEqual(self.get_bucket(), 0)
+        assert self.get_bucket() == 0
 
     def test_not_enabled(self):
-        self.assertEqual(self.get_bucket(active=False), 0)
+        assert self.get_bucket(active=False) == 0
 
     @ddt.data(
         ('2012-01-06', None, 1),  # no enrollment, but start is in past (we allow normal bucketing in this case)
@@ -78,7 +78,7 @@ class ExperimentWaffleFlagTests(SharedModuleStoreTestCase):
             enrollment.save()
         if experiment_start:
             ExperimentKeyValueFactory(experiment_id=0, key='enrollment_start', value=experiment_start)
-        self.assertEqual(self.get_bucket(), expected_bucket)
+        assert self.get_bucket() == expected_bucket
 
     @ddt.data(
         ('2012-01-06', None, 0),  # no enrollment, but end is in past (we give bucket 0 in that case)
@@ -96,7 +96,7 @@ class ExperimentWaffleFlagTests(SharedModuleStoreTestCase):
             enrollment.save()
         if experiment_end:
             ExperimentKeyValueFactory(experiment_id=0, key='enrollment_end', value=experiment_end)
-        self.assertEqual(self.get_bucket(), expected_bucket)
+        assert self.get_bucket() == expected_bucket
 
     @ddt.data(
         (True, 0),
@@ -106,18 +106,18 @@ class ExperimentWaffleFlagTests(SharedModuleStoreTestCase):
     def test_forcing_bucket(self, active, expected_bucket):
         bucket_flag = CourseWaffleFlag('experiments', 'test.0', __name__)
         with override_waffle_flag(bucket_flag, active=active):
-            self.assertEqual(self.get_bucket(), expected_bucket)
+            assert self.get_bucket() == expected_bucket
 
     def test_tracking(self):
         # Run twice, with same request
         with patch('lms.djangoapps.experiments.flags.segment') as segment_mock:
-            self.assertEqual(self.get_bucket(track=True), 1)
+            assert self.get_bucket(track=True) == 1
             RequestCache.clear_all_namespaces()  # we want to force get_bucket to check session, not early exit
-            self.assertEqual(self.get_bucket(track=True), 1)
+            assert self.get_bucket(track=True) == 1
 
         # Now test that we only sent the signal once, and with the correct properties
-        self.assertEqual(segment_mock.track.call_count, 1)
-        self.assertEqual(segment_mock.track.call_args, ((), {
+        assert segment_mock.track.call_count == 1
+        assert segment_mock.track.call_args == ((), {
             'user_id': self.user.id,
             'event_name': 'edx.bi.experiment.user.bucketed',
             'properties': {
@@ -127,21 +127,22 @@ class ExperimentWaffleFlagTests(SharedModuleStoreTestCase):
                 'bucket': 1,
                 'course_id': 'a/b/c',
                 'is_staff': self.user.is_staff,
-                'nonInteraction': 1,
-            },
-        }))
+                'nonInteraction': 1
+            }
+        })
 
     def test_caching(self):
-        self.assertEqual(self.get_bucket(active=True), 1)
-        self.assertEqual(self.get_bucket(active=False), 1)  # still returns 1!
+        assert self.get_bucket(active=True) == 1
+        assert self.get_bucket(active=False) == 1
+        # still returns 1!
 
     def test_is_enabled(self):
         with patch('lms.djangoapps.experiments.flags.ExperimentWaffleFlag.get_bucket', return_value=1):
-            self.assertEqual(self.flag.is_enabled(self.key), True)
-            self.assertEqual(self.flag.is_enabled(), True)
+            assert self.flag.is_enabled(self.key) is True
+            assert self.flag.is_enabled() is True
         with patch('lms.djangoapps.experiments.flags.ExperimentWaffleFlag.get_bucket', return_value=0):
-            self.assertEqual(self.flag.is_enabled(self.key), False)
-            self.assertEqual(self.flag.is_enabled(), False)
+            assert self.flag.is_enabled(self.key) is False
+            assert self.flag.is_enabled() is False
 
     @ddt.data(
         (True, 1, 1),
@@ -153,17 +154,17 @@ class ExperimentWaffleFlagTests(SharedModuleStoreTestCase):
     # Test the override method
     def test_override_method(self, active, bucket_override, expected_bucket):
         with override_experiment_waffle_flag(self.flag, active=active, bucket=bucket_override):
-            self.assertEqual(self.flag.get_bucket(), expected_bucket)
-            self.assertEqual(self.flag.is_experiment_on(), active)
+            assert self.flag.get_bucket() == expected_bucket
+            assert self.flag.is_experiment_on() == active
 
     def test_app_label_experiment_name(self):
         # pylint: disable=protected-access
-        self.assertEqual("experiments", self.flag._app_label)
-        self.assertEqual("test", self.flag._experiment_name)
+        assert 'experiments' == self.flag._app_label
+        assert 'test' == self.flag._experiment_name
 
         flag = ExperimentWaffleFlag("namespace", "flag.name", __name__)
-        self.assertEqual("namespace", flag._app_label)
-        self.assertEqual("flag.name", flag._experiment_name)
+        assert 'namespace' == flag._app_label
+        assert 'flag.name' == flag._experiment_name
 
 
 class ExperimentWaffleFlagCourseAwarenessTest(SharedModuleStoreTestCase):

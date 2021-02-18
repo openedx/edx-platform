@@ -2,7 +2,7 @@
 Tests for CourseData utility class.
 """
 
-
+import pytest
 import six
 from mock import patch
 
@@ -56,7 +56,7 @@ class CourseDataTest(ModuleStoreTestCase):
                 if arg != kwarg and arg != "collected_block_structure":  # lint-amnesty, pylint: disable=consider-using-in
                     expected = self.expected_results[arg]
                     actual = getattr(course_data, arg)
-                    self.assertEqual(expected, actual)
+                    assert expected == actual
 
     def test_properties(self):
         expected_edited_on = getattr(  # lint-amnesty, pylint: disable=literal-used-as-attribute
@@ -71,30 +71,30 @@ class CourseDataTest(ModuleStoreTestCase):
             dict(course_key=self.course.id),
         ]:
             course_data = CourseData(self.user, **kwargs)
-            self.assertEqual(course_data.course_key, self.course.id)
-            self.assertEqual(course_data.location, self.course.location)
-            self.assertEqual(course_data.structure.root_block_usage_key, self.one_true_structure.root_block_usage_key)
-            self.assertEqual(course_data.course.id, self.course.id)
-            self.assertEqual(course_data.version, self.course.course_version)
-            self.assertEqual(course_data.edited_on, expected_edited_on)
-            self.assertIn(u'Course: course_key', six.text_type(course_data))
-            self.assertIn(u'Course: course_key', course_data.full_string())
+            assert course_data.course_key == self.course.id
+            assert course_data.location == self.course.location
+            assert course_data.structure.root_block_usage_key == self.one_true_structure.root_block_usage_key
+            assert course_data.course.id == self.course.id
+            assert course_data.version == self.course.course_version
+            assert course_data.edited_on == expected_edited_on
+            assert u'Course: course_key' in six.text_type(course_data)
+            assert u'Course: course_key' in course_data.full_string()
 
     def test_no_data(self):
-        with self.assertRaises(ValueError):
+        with pytest.raises(ValueError):
             _ = CourseData(self.user)
 
     @patch.dict('django.conf.settings.FEATURES', {'DISABLE_START_DATES': False})
     def test_full_string(self):
         empty_structure = get_course_blocks(self.user, self.course.location)
-        self.assertFalse(empty_structure)
+        assert not empty_structure
 
         # full_string retrieves value from collected_structure when structure is empty.
         course_data = CourseData(
             self.user, structure=empty_structure, collected_block_structure=self.collected_structure,
         )
-        self.assertIn(u'Course: course_key: {}, version:'.format(self.course.id), course_data.full_string())
+        assert u'Course: course_key: {}, version:'.format(self.course.id) in course_data.full_string()
 
         # full_string returns minimal value when structures aren't readily available.
         course_data = CourseData(self.user, course_key=self.course.id)
-        self.assertIn(u'empty course structure', course_data.full_string())
+        assert u'empty course structure' in course_data.full_string()

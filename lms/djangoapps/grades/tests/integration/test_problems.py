@@ -41,7 +41,7 @@ class TestMultipleProblemTypesSubsectionScores(SharedModuleStoreTestCase):
         cls.seq1 = chapter1.get_children()[0]
 
     def setUp(self):
-        super(TestMultipleProblemTypesSubsectionScores, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         password = u'test'
         self.student = UserFactory.create(is_staff=False, username=u'test_student', password=password)
         self.client.login(username=self.student.username, password=password)
@@ -79,8 +79,8 @@ class TestMultipleProblemTypesSubsectionScores(SharedModuleStoreTestCase):
         )
         score = subsection_factory.create(self.seq1)
 
-        self.assertEqual(score.all_total.earned, 0.0)
-        self.assertEqual(score.all_total.possible, self.ACTUAL_TOTAL_POSSIBLE)
+        assert score.all_total.earned == 0.0
+        assert score.all_total.possible == self.ACTUAL_TOTAL_POSSIBLE
 
         # Choose arbitrary, non-default values for earned and possible.
         earned_per_block = 3.0
@@ -93,8 +93,8 @@ class TestMultipleProblemTypesSubsectionScores(SharedModuleStoreTestCase):
                 itertools.repeat(mock_score.return_value)
             )
             score = subsection_factory.update(self.seq1)
-        self.assertEqual(score.all_total.earned, earned_per_block * block_count)
-        self.assertEqual(score.all_total.possible, possible_per_block * block_count)
+        assert score.all_total.earned == (earned_per_block * block_count)
+        assert score.all_total.possible == (possible_per_block * block_count)
 
 
 @ddt.ddt
@@ -191,8 +191,8 @@ class TestVariedMetadata(ProblemSubmissionTestMixin, ModuleStoreTestCase):
     def test_weight_metadata_alterations(self, alterations, expected_earned, expected_possible):
         self._add_problem_with_alterations(alterations)
         score = self._get_score()
-        self.assertEqual(score.all_total.earned, expected_earned)
-        self.assertEqual(score.all_total.possible, expected_possible)
+        assert score.all_total.earned == expected_earned
+        assert score.all_total.possible == expected_possible
 
     @ddt.data(
         ({u'graded': True}, 1.25, 2.5),
@@ -202,8 +202,8 @@ class TestVariedMetadata(ProblemSubmissionTestMixin, ModuleStoreTestCase):
     def test_graded_metadata_alterations(self, alterations, expected_earned, expected_possible):
         self._add_problem_with_alterations(alterations)
         score = self._get_score()
-        self.assertEqual(score.graded_total.earned, expected_earned)
-        self.assertEqual(score.graded_total.possible, expected_possible)
+        assert score.graded_total.earned == expected_earned
+        assert score.graded_total.possible == expected_possible
 
 
 @ddt.ddt
@@ -273,13 +273,13 @@ class TestWeightedProblems(SharedModuleStoreTestCase):
         # verify all problem grades
         for problem in self.problems:
             problem_score = subsection_grade.problem_scores[problem.location]
-            self.assertEqual(type(expected_score.first_attempted), type(problem_score.first_attempted))
+            assert isinstance(expected_score.first_attempted, type(problem_score.first_attempted))
             expected_score.first_attempted = problem_score.first_attempted
-            self.assertEqual(problem_score, expected_score)
+            assert problem_score == expected_score
 
         # verify subsection grades
-        self.assertEqual(subsection_grade.all_total.earned, expected_score.earned * len(self.problems))
-        self.assertEqual(subsection_grade.all_total.possible, expected_score.possible * len(self.problems))
+        assert subsection_grade.all_total.earned == (expected_score.earned * len(self.problems))
+        assert subsection_grade.all_total.possible == (expected_score.possible * len(self.problems))
 
     @ddt.data(
         *itertools.product(

@@ -25,12 +25,12 @@ class SubsectionGradeTest(GradeTestBase):  # lint-amnesty, pylint: disable=missi
                 self.subsection_grade_factory._submissions_scores,  # lint-amnesty, pylint: disable=protected-access
                 self.subsection_grade_factory._csm_scores,  # lint-amnesty, pylint: disable=protected-access
             )
-            self.assertEqual(PersistentSubsectionGrade.objects.count(), 0)
-            self.assertEqual(created_grade.percent_graded, expected_result)
+            assert PersistentSubsectionGrade.objects.count() == 0
+            assert created_grade.percent_graded == expected_result
 
             # save to db, and verify object is in database
             created_grade.update_or_create_model(self.request.user)
-            self.assertEqual(PersistentSubsectionGrade.objects.count(), 1)
+            assert PersistentSubsectionGrade.objects.count() == 1
 
             # read from db, and ensure output matches input
             saved_model = PersistentSubsectionGrade.read_grade(
@@ -43,10 +43,10 @@ class SubsectionGradeTest(GradeTestBase):  # lint-amnesty, pylint: disable=missi
                 self.subsection_grade_factory
             )
 
-            self.assertEqual(created_grade.url_name, read_grade.url_name)
+            assert created_grade.url_name == read_grade.url_name
             read_grade.all_total.first_attempted = created_grade.all_total.first_attempted = None
-            self.assertEqual(created_grade.all_total, read_grade.all_total)
-            self.assertEqual(created_grade.percent_graded, expected_result)
+            assert created_grade.all_total == read_grade.all_total
+            assert created_grade.percent_graded == expected_result
 
     def test_zero(self):
         with mock_get_score(1, 0):
@@ -56,4 +56,4 @@ class SubsectionGradeTest(GradeTestBase):  # lint-amnesty, pylint: disable=missi
                 self.subsection_grade_factory._submissions_scores,  # lint-amnesty, pylint: disable=protected-access
                 self.subsection_grade_factory._csm_scores,  # lint-amnesty, pylint: disable=protected-access
             )
-            self.assertEqual(grade.percent_graded, 0.0)
+            assert grade.percent_graded == 0.0

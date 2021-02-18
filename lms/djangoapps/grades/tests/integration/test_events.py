@@ -176,10 +176,7 @@ class GradesEventIntegrationTest(ProblemSubmissionTestMixin, SharedModuleStoreTe
 
         # make sure the tracker's context is updated with course info
         for args in events_tracker.get_tracker().context.call_args_list:
-            self.assertEqual(
-                args[0][1],
-                {'course_id': six.text_type(self.course.id), 'org_id': six.text_type(self.course.org)}
-            )
+            assert args[0][1] == {'course_id': six.text_type(self.course.id), 'org_id': six.text_type(self.course.org)}
 
         event_transaction_id = events_tracker.emit.mock_calls[0][1][1]['event_transaction_id']
         events_tracker.emit.assert_has_calls(

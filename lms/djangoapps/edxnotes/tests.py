@@ -2,11 +2,11 @@
 Tests for the EdxNotes app.
 """
 
-
 import json
 from contextlib import contextmanager
 from datetime import datetime
 from unittest import skipUnless
+import pytest
 
 import ddt
 import jwt
@@ -144,10 +144,7 @@ class EdxNotesDecoratorTest(ModuleStoreTestCase):
                 "eventStringLimit": settings.TRACK_MAX_EVENT / 6,
             },
         }
-        self.assertEqual(
-            problem.get_html(),
-            render_to_string("edxnotes_wrapper.html", expected_context),
-        )
+        assert problem.get_html() == render_to_string('edxnotes_wrapper.html', expected_context)
 
     @patch.dict("django.conf.settings.FEATURES", {"ENABLE_EDXNOTES": True})
     def test_edxnotes_disabled_if_edxnotes_flag_is_false(self):
@@ -156,28 +153,28 @@ class EdxNotesDecoratorTest(ModuleStoreTestCase):
         disabled for the course.
         """
         self.course.edxnotes = False
-        self.assertEqual("original_get_html", self.problem.get_html())
+        assert 'original_get_html' == self.problem.get_html()
 
     @patch.dict("django.conf.settings.FEATURES", {"ENABLE_EDXNOTES": False})
     def test_edxnotes_disabled(self):
         """
         Tests that get_html is not wrapped when feature flag is off.
         """
-        self.assertEqual("original_get_html", self.problem.get_html())
+        assert 'original_get_html' == self.problem.get_html()
 
     def test_edxnotes_studio(self):
         """
         Tests that get_html is not wrapped when problem is rendered in Studio.
         """
         self.problem.system.is_author_mode = True
-        self.assertEqual("original_get_html", self.problem.get_html())
+        assert 'original_get_html' == self.problem.get_html()
 
     def test_edxnotes_blockstore_runtime(self):
         """
         Tests that get_html is not wrapped when problem is rendered by Blockstore runtime.
         """
         del self.problem.descriptor.runtime.modulestore
-        self.assertEqual("original_get_html", self.problem.get_html())
+        assert 'original_get_html' == self.problem.get_html()
 
     def test_edxnotes_harvard_notes_enabled(self):
         """
@@ -185,7 +182,7 @@ class EdxNotesDecoratorTest(ModuleStoreTestCase):
         """
         self.course.advanced_modules = ["videoannotation", "imageannotation", "textannotation"]
         enable_edxnotes_for_the_course(self.course, self.user.id)
-        self.assertEqual("original_get_html", self.problem.get_html())
+        assert 'original_get_html' == self.problem.get_html()
 
     @patch.dict("django.conf.settings.FEATURES", {"ENABLE_EDXNOTES": True})
     def test_anonymous_user(self):
@@ -294,23 +291,23 @@ class EdxNotesHelpersTest(ModuleStoreTestCase):
 
         # url ends with "/"
         with patch_edxnotes_api_settings("http://example.com/"):
-            self.assertEqual("http://example.com/", get_endpoint_function())
+            assert 'http://example.com/' == get_endpoint_function()
 
         # url doesn't have "/" at the end
         with patch_edxnotes_api_settings("http://example.com"):
-            self.assertEqual("http://example.com/", get_endpoint_function())
+            assert 'http://example.com/' == get_endpoint_function()
 
         # url with path that starts with "/"
         with patch_edxnotes_api_settings("http://example.com"):
-            self.assertEqual("http://example.com/some_path/", get_endpoint_function("/some_path"))
+            assert 'http://example.com/some_path/' == get_endpoint_function('/some_path')
 
         # url with path without "/"
         with patch_edxnotes_api_settings("http://example.com"):
-            self.assertEqual("http://example.com/some_path/", get_endpoint_function("some_path/"))
+            assert 'http://example.com/some_path/' == get_endpoint_function('some_path/')
 
         # url is not configured
         with patch_edxnotes_api_settings(None):
-            self.assertRaises(ImproperlyConfigured, get_endpoint_function)
+            pytest.raises(ImproperlyConfigured, get_endpoint_function)
 
     @patch("lms.djangoapps.edxnotes.helpers.requests.get", autospec=True)
     def test_get_notes_correct_data(self, mock_get):
@@ -851,7 +848,7 @@ class EdxNotesHelpersTest(ModuleStoreTestCase):
         mock_course_module = MagicMock()
         mock_course_module.position = 3
         mock_course_module.get_display_items.return_value = []
-        self.assertIsNone(helpers.get_course_position(mock_course_module))
+        assert helpers.get_course_position(mock_course_module) is None
 
     def test_get_course_position_to_chapter(self):
         """
@@ -866,10 +863,10 @@ class EdxNotesHelpersTest(ModuleStoreTestCase):
 
         mock_course_module.get_display_items.return_value = [mock_chapter]
 
-        self.assertEqual(helpers.get_course_position(mock_course_module), {
+        assert helpers.get_course_position(mock_course_module) == {
             'display_name': 'Test Chapter Display Name',
-            'url': '/courses/{}/courseware/chapter_url_name/'.format(self.course.id),
-        })
+            'url': '/courses/{}/courseware/chapter_url_name/'.format(self.course.id)
+        }
 
     def test_get_course_position_no_section(self):
         """
@@ -877,7 +874,7 @@ class EdxNotesHelpersTest(ModuleStoreTestCase):
         """
         mock_course_module = MagicMock(id=self.course.id, position=None)
         mock_course_module.get_display_items.return_value = [MagicMock()]
-        self.assertIsNone(helpers.get_course_position(mock_course_module))
+        assert helpers.get_course_position(mock_course_module) is None
 
     def test_get_course_position_to_section(self):
         """
@@ -897,18 +894,18 @@ class EdxNotesHelpersTest(ModuleStoreTestCase):
         mock_chapter.get_display_items.return_value = [mock_section]
         mock_section.get_display_items.return_value = [MagicMock()]
 
-        self.assertEqual(helpers.get_course_position(mock_course_module), {
+        assert helpers.get_course_position(mock_course_module) == {
             'display_name': 'Test Section Display Name',
-            'url': '/courses/{}/courseware/chapter_url_name/section_url_name/'.format(self.course.id),
-        })
+            'url': '/courses/{}/courseware/chapter_url_name/section_url_name/'.format(self.course.id)
+        }
 
     def test_get_index(self):
         """
         Tests `get_index` method returns unit url.
         """
         children = self.sequential.children
-        self.assertEqual(0, helpers.get_index(text_type(self.vertical.location), children))
-        self.assertEqual(1, helpers.get_index(text_type(self.vertical_with_container.location), children))
+        assert 0 == helpers.get_index(text_type(self.vertical.location), children)
+        assert 1 == helpers.get_index(text_type(self.vertical_with_container.location), children)
 
     @ddt.unpack
     @ddt.data(
@@ -941,13 +938,13 @@ class EdxNotesHelpersTest(ModuleStoreTestCase):
             """
             # if api url is None then constructed url should also be None
             if expected is None:
-                self.assertEqual(expected, constructed)
+                assert expected == constructed
             else:
                 # constructed url should startswith notes view url instead of api view url
-                self.assertTrue(constructed.startswith(notes_url))
+                assert constructed.startswith(notes_url)
 
                 # constructed url should not contain extra params
-                self.assertNotIn('user', constructed)
+                assert 'user' not in constructed
 
                 # constructed url should only has these params if present in api url
                 allowed_params = ('page', 'page_size', 'text')
@@ -958,8 +955,8 @@ class EdxNotesHelpersTest(ModuleStoreTestCase):
 
                 # verify that constructed url has only correct params and params have correct values
                 for param, value in params.items():
-                    self.assertIn(param, allowed_params)
-                    self.assertIn('{}={}'.format(param, value[0]), expected)
+                    assert param in allowed_params
+                    assert '{}={}'.format(param, value[0]) in expected
 
         next_url, previous_url = helpers.construct_pagination_urls(
             self.request,
@@ -1006,15 +1003,15 @@ class EdxNotesViewsTest(ModuleStoreTestCase):
             tabs = get_course_tab_list(user, course)
             return len([tab for tab in tabs if tab.type == 'edxnotes']) == 1
 
-        self.assertFalse(has_notes_tab(self.user, self.course))
+        assert not has_notes_tab(self.user, self.course)
         enable_edxnotes_for_the_course(self.course, self.user.id)
         # disable course.edxnotes
         self.course.edxnotes = False
-        self.assertFalse(has_notes_tab(self.user, self.course))
+        assert not has_notes_tab(self.user, self.course)
 
         # reenable course.edxnotes
         self.course.edxnotes = True
-        self.assertTrue(has_notes_tab(self.user, self.course))
+        assert has_notes_tab(self.user, self.course)
 
     # pylint: disable=unused-argument
     @patch.dict("django.conf.settings.FEATURES", {"ENABLE_EDXNOTES": True})
@@ -1030,7 +1027,10 @@ class EdxNotesViewsTest(ModuleStoreTestCase):
     # pylint: disable=unused-argument
     @patch.dict("django.conf.settings.FEATURES", {"ENABLE_EDXNOTES": True})
     @patch("lms.djangoapps.edxnotes.views.get_notes", return_value={'results': []})
-    @patch("lms.djangoapps.edxnotes.views.get_course_position", return_value={'display_name': 'Section 1', 'url': 'test_url'})  # lint-amnesty, pylint: disable=line-too-long
+    @patch("lms.djangoapps.edxnotes.views.get_course_position", return_value={
+        'display_name': 'Section 1',
+        'url': 'test_url'
+    })
     def test_edxnotes_html_tags_should_not_be_escaped(self, mock_get_notes, mock_position):
         """
         Tests that explicit html tags rendered correctly.
@@ -1048,7 +1048,7 @@ class EdxNotesViewsTest(ModuleStoreTestCase):
         Tests that 404 status code is received if EdxNotes feature is disabled.
         """
         response = self.client.get(self.notes_page_url)
-        self.assertEqual(response.status_code, 404)
+        assert response.status_code == 404
 
     @patch.dict("django.conf.settings.FEATURES", {"ENABLE_EDXNOTES": True})
     @patch("lms.djangoapps.edxnotes.views.get_notes", autospec=True)
@@ -1059,8 +1059,8 @@ class EdxNotesViewsTest(ModuleStoreTestCase):
         mock_search.return_value = NOTES_VIEW_EMPTY_RESPONSE
         enable_edxnotes_for_the_course(self.course, self.user.id)
         response = self.client.get(self.notes_url, {"text": "test"})
-        self.assertEqual(json.loads(response.content.decode('utf-8')), NOTES_VIEW_EMPTY_RESPONSE)
-        self.assertEqual(response.status_code, 200)
+        assert json.loads(response.content.decode('utf-8')) == NOTES_VIEW_EMPTY_RESPONSE
+        assert response.status_code == 200
 
     @patch.dict("django.conf.settings.FEATURES", {"ENABLE_EDXNOTES": False})
     def test_search_notes_is_disabled(self):
@@ -1068,7 +1068,7 @@ class EdxNotesViewsTest(ModuleStoreTestCase):
         Tests that 404 status code is received if EdxNotes feature is disabled.
         """
         response = self.client.get(self.notes_url, {"text": "test"})
-        self.assertEqual(response.status_code, 404)
+        assert response.status_code == 404
 
     @patch.dict("django.conf.settings.FEATURES", {"ENABLE_EDXNOTES": True})
     @patch("lms.djangoapps.edxnotes.views.get_notes", autospec=True)
@@ -1099,7 +1099,7 @@ class EdxNotesViewsTest(ModuleStoreTestCase):
         Test generation of ID Token.
         """
         response = self.client.get(self.get_token_url)
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
         client = Application.objects.get(name='edx-notes')
         jwt.decode(response.content, client.client_secret, audience=client.client_id)
 
@@ -1110,7 +1110,7 @@ class EdxNotesViewsTest(ModuleStoreTestCase):
         """
         self.client.logout()
         response = self.client.get(self.get_token_url)
-        self.assertEqual(response.status_code, 302)
+        assert response.status_code == 302
 
     def test_edxnotes_visibility(self):
         """
@@ -1122,9 +1122,9 @@ class EdxNotesViewsTest(ModuleStoreTestCase):
             data=json.dumps({"visibility": False}),
             content_type="application/json",
         )
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
         course_module = self._get_course_module()
-        self.assertFalse(course_module.edxnotes_visibility)
+        assert not course_module.edxnotes_visibility
 
     @patch.dict("django.conf.settings.FEATURES", {"ENABLE_EDXNOTES": False})
     def test_edxnotes_visibility_if_feature_is_disabled(self):
@@ -1132,7 +1132,7 @@ class EdxNotesViewsTest(ModuleStoreTestCase):
         Tests that 404 response is received if EdxNotes feature is disabled.
         """
         response = self.client.post(self.visibility_url)
-        self.assertEqual(response.status_code, 404)
+        assert response.status_code == 404
 
     @patch.dict("django.conf.settings.FEATURES", {"ENABLE_EDXNOTES": True})
     def test_edxnotes_visibility_invalid_json(self):
@@ -1145,7 +1145,7 @@ class EdxNotesViewsTest(ModuleStoreTestCase):
             data="string",
             content_type="application/json",
         )
-        self.assertEqual(response.status_code, 400)
+        assert response.status_code == 400
 
     @patch.dict("django.conf.settings.FEATURES", {"ENABLE_EDXNOTES": True})
     def test_edxnotes_visibility_key_error(self):
@@ -1158,7 +1158,7 @@ class EdxNotesViewsTest(ModuleStoreTestCase):
             data=json.dumps({'test_key': 1}),
             content_type="application/json",
         )
-        self.assertEqual(response.status_code, 400)
+        assert response.status_code == 400
 
 
 class EdxNotesRetireAPITest(ModuleStoreTestCase):
@@ -1213,7 +1213,7 @@ class EdxNotesRetireAPITest(ModuleStoreTestCase):
             content_type='application/json',
             **headers
         )
-        self.assertEqual(response.status_code, 204)
+        assert response.status_code == 204
 
     def test_retire_user_normal_user_not_allowed(self):
         """
@@ -1226,7 +1226,7 @@ class EdxNotesRetireAPITest(ModuleStoreTestCase):
             content_type='application/json',
             **headers
         )
-        self.assertEqual(response.status_code, 403)
+        assert response.status_code == 403
 
     def test_retire_user_status_not_found(self):
         """
@@ -1239,7 +1239,7 @@ class EdxNotesRetireAPITest(ModuleStoreTestCase):
             content_type='application/json',
             **headers
         )
-        self.assertEqual(response.status_code, 404)
+        assert response.status_code == 404
 
     def test_retire_user_wrong_state(self):
         """
@@ -1256,7 +1256,7 @@ class EdxNotesRetireAPITest(ModuleStoreTestCase):
             content_type='application/json',
             **headers
         )
-        self.assertEqual(response.status_code, 405)
+        assert response.status_code == 405
 
     @patch("lms.djangoapps.edxnotes.helpers.delete_all_notes_for_user", autospec=True)
     def test_retire_user_downstream_unavailable(self, mock_delete_all_notes_for_user):
@@ -1271,7 +1271,7 @@ class EdxNotesRetireAPITest(ModuleStoreTestCase):
             content_type='application/json',
             **headers
         )
-        self.assertEqual(response.status_code, 500)
+        assert response.status_code == 500
 
 
 @skipUnless(settings.FEATURES["ENABLE_EDXNOTES"], "EdxNotes feature needs to be enabled.")
