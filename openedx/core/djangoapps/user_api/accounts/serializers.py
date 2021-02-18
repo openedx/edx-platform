@@ -11,6 +11,7 @@ from django.conf import settings
 from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.core.exceptions import ObjectDoesNotExist
 from django.urls import reverse
+from django_countries.serializers import CountryFieldMixin
 from rest_framework import serializers
 from six import text_type
 
@@ -215,6 +216,14 @@ class UserReadOnlySerializer(serializers.Serializer):  # lint-amnesty, pylint: d
             visible_serialized_account[field_name] = serialized_account.get(field_name, None)
 
         return visible_serialized_account
+
+
+class UserProfileSerializer(CountryFieldMixin, serializers.ModelSerializer):
+    class Meta:
+        model = UserProfile
+        fields = ('user', 'name', 'meta', 'courseware', 'language', 'location', 'year_of_birth', 'gender',
+                  'level_of_education', 'mailing_address', 'city', 'country', 'state', 'goals', 'allow_certificate',
+                  'bio', 'profile_image_uploaded_at', 'phone_number')
 
 
 class UserAccountDisableHistorySerializer(serializers.ModelSerializer):

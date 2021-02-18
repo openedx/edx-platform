@@ -27,7 +27,7 @@ class EmbargoMiddlewareAccessTests(UrlResetMixin, ModuleStoreTestCase):
     """Tests of embargo middleware country access rules.
 
     There are detailed unit tests for the rule logic in
-    `test_api.py`; here, we're mainly testing the integration
+    `userprofile_api.py`; here, we're mainly testing the integration
     with middleware
 
     """
