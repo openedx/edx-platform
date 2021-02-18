@@ -28,7 +28,7 @@ attrs==20.3.0             # via -r requirements/edx/base.txt, edx-ace, pytest
 babel==2.9.0              # via -r requirements/edx/base.txt, enmerkar, enmerkar-underscore
 beautifulsoup4==4.9.3     # via -r requirements/edx/base.txt, -r requirements/edx/testing.in, pynliner
 billiard==3.6.3.0         # via -r requirements/edx/base.txt, celery
-bleach==3.3.0             # via -r requirements/edx/base.txt, django-wiki, edx-enterprise, lti-consumer-xblock, ora2, xblock-poll
+bleach==3.3.0             # via -r requirements/edx/base.txt, django-wiki, edx-enterprise, lti-consumer-xblock, ora2, xblock-drag-and-drop-v2, xblock-poll
 bok-choy==1.1.1           # via -r requirements/edx/testing.in
 boto3==1.4.8              # via -r requirements/edx/base.txt, django-ses, fs-s3fs, ora2
 boto==2.39.0              # via -r requirements/edx/base.txt, edxval
@@ -161,7 +161,8 @@ jinja2==2.11.3            # via -r requirements/edx/base.txt, -r requirements/ed
 jmespath==0.10.0          # via -r requirements/edx/base.txt, boto3, botocore
 joblib==0.14.1            # via -c requirements/edx/../constraints.txt, -r requirements/edx/base.txt, nltk
 jsondiff==1.2.0           # via -r requirements/edx/base.txt, edx-enterprise
-jsonfield2==3.0.3         # via -c requirements/edx/../constraints.txt, -r requirements/edx/base.txt, edx-celeryutils, edx-enterprise, edx-event-routing-backends, edx-proctoring, edx-submissions, lti-consumer-xblock, ora2
+jsonfield2==4.0.0.post0   # via -r requirements/edx/base.txt, edx-celeryutils, edx-enterprise, edx-event-routing-backends, edx-proctoring, edx-submissions, lti-consumer-xblock, ora2
+jsonfield==3.1.0          # via -r requirements/edx/base.txt
 kombu==4.6.11             # via -r requirements/edx/base.txt, celery
 laboratory==1.0.2         # via -r requirements/edx/base.txt
 lazy-object-proxy==1.4.3  # via astroid
@@ -290,7 +291,7 @@ voluptuous==0.12.1        # via -r requirements/edx/base.txt, ora2
 watchdog==2.0.1           # via -r requirements/edx/base.txt
 web-fragments==1.0.0      # via -r requirements/edx/base.txt, crowdsourcehinter-xblock, edx-sga, staff-graded-xblock, xblock, xblock-utils
 webencodings==0.5.1       # via -r requirements/edx/base.txt, bleach, html5lib
-webob==1.8.6              # via -r requirements/edx/base.txt, xblock, xmodule
+webob==1.8.7              # via -r requirements/edx/base.txt, xblock, xmodule
 wrapt==1.11.2             # via -c requirements/edx/../constraints.txt, -r requirements/edx/base.txt, astroid
 git+https://github.com/edx-solutions/xblock-drag-and-drop-v2@v2.3.2#egg=xblock-drag-and-drop-v2==2.3.2  # via -r requirements/edx/base.txt
 git+https://github.com/open-craft/xblock-poll@922cd36fb1c3cfe00b4ce03b19a13185d136447d#egg=xblock-poll==1.10.2  # via -r requirements/edx/base.txt
