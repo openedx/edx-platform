@@ -2,7 +2,7 @@
 
 
 from collections import namedtuple
-
+import pytest
 import ddt
 from django.test import TestCase
 from django.test.client import RequestFactory
@@ -54,7 +54,7 @@ class TestRedirectUtils(TestCase):
         req = self.request.get('/login', HTTP_HOST=host)
         req.is_secure = lambda: req_is_secure
         actual_is_safe = self._is_safe_redirect(req, url)
-        self.assertEqual(actual_is_safe, expected_is_safe)
+        assert actual_is_safe == expected_is_safe
 
     @ddt.data(
         ('https://test.com/test', 'https://test.com/test', 'edx.org', True),
@@ -70,7 +70,7 @@ class TestRedirectUtils(TestCase):
         }
         req = self.request.get('/logout?{}'.format(urlencode(params)), HTTP_HOST=host)
         actual_is_safe = self._is_safe_redirect(req, redirect_url)
-        self.assertEqual(actual_is_safe, expected_is_safe)
+        assert actual_is_safe == expected_is_safe
 
 
 class GeneratePasswordTest(TestCase):
@@ -78,22 +78,22 @@ class GeneratePasswordTest(TestCase):
 
     def test_default_args(self):
         password = generate_password()
-        self.assertEqual(12, len(password))
-        self.assertTrue(any(c.isdigit for c in password))
-        self.assertTrue(any(c.isalpha for c in password))
+        assert 12 == len(password)
+        assert any((c.isdigit for c in password))
+        assert any((c.isalpha for c in password))
 
     def test_length(self):
         length = 25
-        self.assertEqual(length, len(generate_password(length=length)))
+        assert length == len(generate_password(length=length))
 
     def test_chars(self):
         char = '!'
         password = generate_password(length=12, chars=(char,))
 
-        self.assertTrue(any(c.isdigit for c in password))
-        self.assertTrue(any(c.isalpha for c in password))
-        self.assertEqual(char * 10, password[2:])
+        assert any((c.isdigit for c in password))
+        assert any((c.isalpha for c in password))
+        assert (char * 10) == password[2:]
 
     def test_min_length(self):
-        with self.assertRaises(ValueError):
+        with pytest.raises(ValueError):
             generate_password(length=7)
