@@ -273,7 +273,7 @@ class TestWeightedProblems(SharedModuleStoreTestCase):
         # verify all problem grades
         for problem in self.problems:
             problem_score = subsection_grade.problem_scores[problem.location]
-            assert isinstance(type(expected_score.first_attempted), type(problem_score.first_attempted))
+            assert isinstance(expected_score.first_attempted, type(problem_score.first_attempted))
             expected_score.first_attempted = problem_score.first_attempted
             assert problem_score == expected_score
 

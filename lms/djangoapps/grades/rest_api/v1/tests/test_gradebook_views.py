@@ -3,10 +3,10 @@ Tests for the course grading API view
 """
 
 
-import pytest
 import json
 from collections import OrderedDict, namedtuple
 from datetime import datetime
+import pytest
 
 import ddt
 from django.urls import reverse

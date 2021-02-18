@@ -3,9 +3,9 @@ Tests for grades.scores module.
 """
 
 # pylint: disable=protected-access
-import pytest
 import itertools
 from collections import namedtuple
+import pytest
 
 import ddt
 from django.test import TestCase

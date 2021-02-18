@@ -2,11 +2,11 @@
 Tests for the EdxNotes app.
 """
 
-import pytest
 import json
 from contextlib import contextmanager
 from datetime import datetime
 from unittest import skipUnless
+import pytest
 
 import ddt
 import jwt

@@ -234,7 +234,7 @@ class GradesServiceTests(ModuleStoreTestCase):
             user_id=self.user.id,
             course_id=six.text_type(self.course.id),
             usage_id=six.text_type(self.subsection_without_grade.location),
-            nly_if_higher=False,
+            only_if_higher=False,
             modified=override_obj.modified,
             score_deleted=False,
             score_db_table=ScoreDatabaseTableEnum.overrides

@@ -3,9 +3,9 @@ Tests for the score change signals defined in the courseware models module.
 """
 
 
-import pytest
 import re
 from datetime import datetime
+import pytest
 
 import ddt
 import pytz

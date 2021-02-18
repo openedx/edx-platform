@@ -3,12 +3,12 @@ Unit tests for grades models.
 """
 
 
-import pytest
 import json
 from base64 import b64encode
 from collections import OrderedDict
 from datetime import datetime
 from hashlib import sha1
+import pytest
 
 import ddt
 import pytz
