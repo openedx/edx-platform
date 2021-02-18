@@ -29,7 +29,7 @@ class TestFooter(CacheIsolationTestCase):
     def test_feature_flag(self, accepts):
         self._set_feature_flag(False)
         resp = self._get_footer(accepts=accepts)
-        self.assertEqual(resp.status_code, 404)
+        assert resp.status_code == 404
 
     @ddt.data(
         # Open source version
@@ -48,7 +48,7 @@ class TestFooter(CacheIsolationTestCase):
         with with_comprehensive_theme_context(theme):
             resp = self._get_footer(accepts=accepts)
 
-        self.assertEqual(resp["Content-Type"], content_type)
+        assert resp['Content-Type'] == content_type
         self.assertContains(resp, content)
 
     @mock.patch.dict(settings.FEATURES, {'ENABLE_FOOTER_MOBILE_APP_LINKS': True})
@@ -58,52 +58,52 @@ class TestFooter(CacheIsolationTestCase):
         with with_comprehensive_theme_context(theme):
             resp = self._get_footer()
 
-        self.assertEqual(resp.status_code, 200)
+        assert resp.status_code == 200
         json_data = json.loads(resp.content.decode('utf-8'))
-        self.assertTrue(isinstance(json_data, dict))
+        assert isinstance(json_data, dict)
 
         # Logo
-        self.assertIn("logo_image", json_data)
+        assert 'logo_image' in json_data
 
         # Links
-        self.assertIn("navigation_links", json_data)
+        assert 'navigation_links' in json_data
         for link in json_data["navigation_links"]:
-            self.assertIn("name", link)
-            self.assertIn("title", link)
-            self.assertIn("url", link)
+            assert 'name' in link
+            assert 'title' in link
+            assert 'url' in link
 
         # Social links
-        self.assertIn("social_links", json_data)
+        assert 'social_links' in json_data
         for link in json_data["social_links"]:
-            self.assertIn("name", link)
-            self.assertIn("title", link)
-            self.assertIn("url", link)
-            self.assertIn("icon-class", link)
-            self.assertIn("action", link)
+            assert 'name' in link
+            assert 'title' in link
+            assert 'url' in link
+            assert 'icon-class' in link
+            assert 'action' in link
 
         # Mobile links
-        self.assertIn("mobile_links", json_data)
+        assert 'mobile_links' in json_data
         for link in json_data["mobile_links"]:
-            self.assertIn("name", link)
-            self.assertIn("title", link)
-            self.assertIn("url", link)
-            self.assertIn("image", link)
+            assert 'name' in link
+            assert 'title' in link
+            assert 'url' in link
+            assert 'image' in link
 
         # Legal links
-        self.assertIn("legal_links", json_data)
+        assert 'legal_links' in json_data
         for link in json_data["legal_links"]:
-            self.assertIn("name", link)
-            self.assertIn("title", link)
-            self.assertIn("url", link)
+            assert 'name' in link
+            assert 'title' in link
+            assert 'url' in link
 
         # OpenEdX
-        self.assertIn("openedx_link", json_data)
-        self.assertIn("url", json_data["openedx_link"])
-        self.assertIn("title", json_data["openedx_link"])
-        self.assertIn("image", json_data["openedx_link"])
+        assert 'openedx_link' in json_data
+        assert 'url' in json_data['openedx_link']
+        assert 'title' in json_data['openedx_link']
+        assert 'image' in json_data['openedx_link']
 
         # Copyright
-        self.assertIn("copyright", json_data)
+        assert 'copyright' in json_data
 
     def test_absolute_urls_with_cdn(self):
         self._set_feature_flag(True)
@@ -117,13 +117,13 @@ class TestFooter(CacheIsolationTestCase):
         with mock.patch('lms.djangoapps.branding.api.staticfiles_storage.url', return_value=cdn_url):
             resp = self._get_footer()
 
-        self.assertEqual(resp.status_code, 200)
+        assert resp.status_code == 200
         json_data = json.loads(resp.content.decode('utf-8'))
 
-        self.assertEqual(json_data["logo_image"], cdn_url)
+        assert json_data['logo_image'] == cdn_url
 
         for link in json_data["mobile_links"]:
-            self.assertEqual(link["url"], cdn_url)
+            assert link['url'] == cdn_url
 
     @ddt.data(
         ("en", "registered trademarks"),
@@ -136,11 +136,11 @@ class TestFooter(CacheIsolationTestCase):
 
         # Load the footer with the specified language
         resp = self._get_footer(params={'language': language})
-        self.assertEqual(resp.status_code, 200)
+        assert resp.status_code == 200
         json_data = json.loads(resp.content.decode('utf-8'))
 
         # Verify that the translation occurred
-        self.assertIn(expected_copyright, json_data['copyright'])
+        assert expected_copyright in json_data['copyright']
 
     @ddt.data(
         # OpenEdX
@@ -227,7 +227,7 @@ class TestFooter(CacheIsolationTestCase):
             }
             resp = self._get_footer(accepts="text/html", params=params)
 
-        self.assertEqual(resp.status_code, 200)
+        assert resp.status_code == 200
 
         if include_language_selector:
             selected_language = language if language else 'en'
@@ -238,7 +238,7 @@ class TestFooter(CacheIsolationTestCase):
     def test_no_supported_accept_type(self):
         self._set_feature_flag(True)
         resp = self._get_footer(accepts="application/x-shockwave-flash")
-        self.assertEqual(resp.status_code, 406)
+        assert resp.status_code == 406
 
     def _set_feature_flag(self, enabled):
         """Enable or disable the feature flag for the branding API end-points. """
@@ -261,16 +261,16 @@ class TestFooter(CacheIsolationTestCase):
         """ Verify that the language selector is present and correctly configured."""
         # Verify the selector is included
         content = response.content.decode(response.charset)
-        self.assertIn('footer-language-selector', content)
+        assert 'footer-language-selector' in content
 
         # Verify the correct language is selected
-        self.assertIn(u'<option value="{}" selected="selected">'.format(selected_language), content)
+        assert u'<option value="{}" selected="selected">'.format(selected_language) in content
 
         # Verify the language choices
         for language in released_languages():
             if language.code == selected_language:
                 continue
-            self.assertIn(u'<option value="{}">'.format(language.code), content)
+            assert u'<option value="{}">'.format(language.code) in content
 
 
 class TestIndex(SiteMixin, TestCase):
@@ -289,7 +289,7 @@ class TestIndex(SiteMixin, TestCase):
     def test_index_does_not_redirect_without_site_override(self):
         """ Test index view does not redirect if MKTG_URLS['ROOT'] is not set """
         response = self.client.get(reverse("root"))
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
 
     def test_index_redirects_to_marketing_site_with_site_override(self):
         """ Test index view redirects if MKTG_URLS['ROOT'] is set in SiteConfiguration """
@@ -309,4 +309,4 @@ class TestIndex(SiteMixin, TestCase):
         self.use_site(self.site_other)
         self.client.login(username=self.user.username, password="password")
         response = self.client.get(reverse("dashboard"))
-        self.assertIn(self.site_configuration_other.site_values["MKTG_URLS"]["ROOT"], response.content.decode('utf-8'))
+        assert self.site_configuration_other.site_values['MKTG_URLS']['ROOT'] in response.content.decode('utf-8')
