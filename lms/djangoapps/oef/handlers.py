@@ -30,9 +30,10 @@ def update_oef_prompts(instance, **kwargs):
         oef_prompt.save()
     else:
         # ceate a new prompt and save it
-        prompt = OrganizationOefUpdatePrompt(responsible_user=responsible_user,
-                                             org=org,
-                                             latest_finish_date=finish_date,
-                                             year=year
-                                            )
+        prompt = OrganizationOefUpdatePrompt(
+            responsible_user=responsible_user,
+            org=org,
+            latest_finish_date=finish_date,
+            year=year
+        )
         prompt.save()

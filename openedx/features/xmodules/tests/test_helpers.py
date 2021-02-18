@@ -13,7 +13,7 @@ formatted_current_date = current_date.strftime(DATE_FORMAT)
 
 
 @pytest.mark.parametrize(
-   'due, module_category, expected_result', [
+    'due, module_category, expected_result', [
         (current_date, 'audio', None),
         (current_date, 'problem', formatted_current_date),
         (None, 'problem', None)

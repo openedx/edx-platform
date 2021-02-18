@@ -86,13 +86,17 @@ def generate_user_cert(request, course_id):
         # with a management command.  From the user's perspective,
         # it will appear that the certificate task was submitted successfully.
         base_url = settings.LMS_ROOT_URL
-        MandrillClient().send_mail(MandrillClient.COURSE_COMPLETION_TEMPLATE, student.email, {
-            'course_name': course.display_name,
-            'course_url': get_course_link(course_id=course.id),
-            'full_name': '{} {}'.format(student.first_name, student.last_name),
-            'certificate_url': base_url + get_certificate_url(user_id=student.id, course_id=course.id),
-            'course_library_url': base_url + '/courses',
-        })
+        MandrillClient().send_mail(
+            MandrillClient.COURSE_COMPLETION_TEMPLATE,
+            student.email,
+            {
+                'course_name': course.display_name,
+                'course_url': get_course_link(course_id=course.id),
+                'full_name': student.first_name + ' ' + student.last_name,
+                'certificate_url': base_url + get_certificate_url(user_id=student.id, course_id=course.id),
+                'course_library_url': base_url + '/courses',
+            }
+        )
         certs_api.generate_user_certificates(student, course.id, course=course, generation_mode='self')
         _track_successful_certificate_generation(student.id, course.id)
         return HttpResponse()

@@ -29,8 +29,7 @@ class BadgeHelperTestCases(ModuleStoreTestCase):
         super(BadgeHelperTestCases, self).setUp()
         self.user = UserFactory()
         self.course1 = CourseFactory(org="test1", number="123", run="1", display_name="ABC")
-        self.type_conversationalist = CONVERSATIONALIST[CONVERSATIONALIST_ENTRY_INDEX] # badge type
-
+        self.type_conversationalist = CONVERSATIONALIST[CONVERSATIONALIST_ENTRY_INDEX]  # badge type
 
     def test_populate_trophycase_with_empty_course_list(self):
         """
@@ -105,9 +104,13 @@ class BadgeHelperTestCases(ModuleStoreTestCase):
     @mock.patch('openedx.features.badging.helpers.badges.filter_earned_badge_by_joined_team')
     @mock.patch('openedx.features.badging.helpers.badges.is_teams_feature_enabled')
     @mock.patch('openedx.features.badging.helpers.badges.get_course_by_id')
-    def test_get_course_badges_successfully(self, mock_get_course_by_id,
-            mock_is_teams_feature_enabled, mock_filter_earned_badge_by_joined_team,
-            mock_add_badge_earned_date):  # pylint: disable=unused-argument
+    def test_get_course_badges_successfully(
+        self,
+        mock_get_course_by_id,
+        mock_is_teams_feature_enabled,
+        mock_filter_earned_badge_by_joined_team,
+        mock_add_badge_earned_date  # pylint: disable=unused-argument
+    ):
         """
         Create 1 course, 3 badges (1 team, 2 conversationalist), none of the badges are earned, to test success case
         :param mock_get_course_by_id: mock course id, because it is irrelevant here
@@ -164,9 +167,13 @@ class BadgeHelperTestCases(ModuleStoreTestCase):
     @mock.patch('openedx.features.badging.helpers.badges.filter_earned_badge_by_joined_team')
     @mock.patch('openedx.features.badging.helpers.badges.is_teams_feature_enabled')
     @mock.patch('openedx.features.badging.helpers.badges.get_course_by_id')
-    def test_get_course_badges_user_not_joined_any_course_team(self, mock_get_course_by_id,
-            mock_is_teams_feature_enabled, mock_filter_earned_badge_by_joined_team,
-            mock_add_badge_earned_date):  # pylint: disable=unused-argument
+    def test_get_course_badges_user_not_joined_any_course_team(
+        self,
+        mock_get_course_by_id,
+        mock_is_teams_feature_enabled,
+        mock_filter_earned_badge_by_joined_team,
+        mock_add_badge_earned_date  # pylint: disable=unused-argument
+    ):
         """
         Create 1 course, 1 conversationalist badge, to test course badges, when team feature is enabled but user
         has not joined any team in a course
@@ -290,7 +297,7 @@ class BadgeHelperTestCases(ModuleStoreTestCase):
         :return: None
         """
         course_team, earned_badges = badge_helpers.filter_earned_badge_by_joined_team(
-        self.user, self.course1, earned_badges=mock.ANY)
+            self.user, self.course1, earned_badges=mock.ANY)
 
         self.assertIsNone(course_team)
         self.assertEqual(earned_badges, list())

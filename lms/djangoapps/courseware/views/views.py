@@ -795,8 +795,8 @@ def course_about(request, course_id):
 
         if has_access(request.user, 'load', course):
             first_chapter_url, first_section = get_course_related_keys(request, course)
-            course_target = reverse('courseware_section', args=[course.id.to_deprecated_string(), 
-                                                        first_chapter_url, first_section])
+            course_target = reverse(
+                'courseware_section', args=[course.id.to_deprecated_string(), first_chapter_url, first_section])
         else:
             course_target = reverse('about_course', args=[text_type(course.id)])
 

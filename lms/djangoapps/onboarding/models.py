@@ -288,9 +288,10 @@ class OrganizationPartner(models.Model):
         """
 
         # Set unchecked partners end date to today
-        cls.objects.filter(organization=organization,
-            partner__in=removed_partners, end_date__gt=datetime.utcnow()).update(
-            end_date=datetime.now(utc))
+        cls.objects.filter(
+            organization=organization,
+            partner__in=removed_partners, end_date__gt=datetime.utcnow()
+        ).update(end_date=datetime.now(utc))
 
         # Mark removed partner affliation flag to False if not selected in any organization
         _removed_partners = PartnerNetwork.objects.filter(code__in=removed_partners)
@@ -301,8 +302,10 @@ class OrganizationPartner(models.Model):
                 partner.save()
 
         # Get already added partners for an organization
-        no_updated_selections = cls.objects.filter(organization=organization,
-            partner__in=partners, end_date__gt=datetime.utcnow()).values_list('partner', flat=True)
+        no_updated_selections = cls.objects.filter(
+            organization=organization,
+            partner__in=partners, end_date__gt=datetime.utcnow()
+        ).values_list('partner', flat=True)
 
         # Filter out new/reselected Partners
         new_selections = [p for p in partners if p not in no_updated_selections]
@@ -440,7 +443,7 @@ class UserExtendedProfile(TimeStampedModel):
         Return status for registration third step completion
         """
         return self.organization.org_type and self.organization.focus_area and self.organization.level_of_operation \
-               and self.organization.total_employees
+            and self.organization.total_employees
 
     def is_organization_details_filled(self):
         """

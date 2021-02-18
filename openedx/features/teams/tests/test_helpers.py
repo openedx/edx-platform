@@ -25,6 +25,7 @@ from xmodule.modulestore.tests.factories import CourseFactory
 
 USER_COUNTRY = 'US'
 
+
 class HelpersTestCase(ModuleStoreTestCase):
     """
     Tests for all helpers in teams module.

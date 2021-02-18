@@ -12,7 +12,7 @@ log = getLogger(__name__)
 
 class Command(BaseCommand):
     help = """
-    This command creates a CertificateVerificationKey object for all certificates that aren't linked with a 
+    This command creates a CertificateVerificationKey object for all certificates that aren't linked with a
     CertificateVerificationKey object.
 
     example:

@@ -10,7 +10,6 @@ class CourseDataExtraction(models.Model):
     class Meta:
         app_label = 'data_extract'
 
-
     course_id = models.CharField(max_length=255)
     emails = models.TextField()
 

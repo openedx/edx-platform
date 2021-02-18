@@ -15,7 +15,7 @@ log = getLogger(__name__)
 
 class Command(BaseCommand):
     help = """
-    This command picks all courses that end in the past 24 hours and archives the course discussion community for 
+    This command picks all courses that end in the past 24 hours and archives the course discussion community for
     it in nodebb (which archives all mini communities)
     example:
         manage.py ... archive_past_courses_communities

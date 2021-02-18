@@ -56,8 +56,8 @@ def register_notification_types(sender, **kwargs):  # pylint: disable=unused-arg
     This will be called automatically on the Notification subsystem startup
     """
     register_notification_type(
-            NotificationType(
-                name=EARNED_BADGE_NOTIFICATION_TYPE,
-                renderer=JSON_NOTIFICATION_RENDERER,
-            )
+        NotificationType(
+            name=EARNED_BADGE_NOTIFICATION_TYPE,
+            renderer=JSON_NOTIFICATION_RENDERER,
+        )
     )

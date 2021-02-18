@@ -39,4 +39,3 @@ class PartnerCommunityModelAdmin(admin.ModelAdmin):
 admin.site.register(Partner, PartnerAdmin)
 admin.site.register(PartnerCommunity, PartnerCommunityModelAdmin)
 admin.site.register(PartnerUser, PartnerUserModelAdmin)
-

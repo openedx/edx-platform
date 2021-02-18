@@ -139,4 +139,3 @@ class AccountCreationFormCustom(AccountCreationForm):
                     self.errors.update({'organization_type': [_('Organization type not provided for new organization'), ]})
 
         return self.cleaned_data
-

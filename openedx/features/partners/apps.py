@@ -9,4 +9,3 @@ class PartnersConfig(AppConfig):
         Connect handlers to Partners.
         """
         import handlers
-

@@ -151,4 +151,3 @@ class PartnerAccountCreationForm(forms.Form):
             'required': _('Country name is required'),
         },
     )
-

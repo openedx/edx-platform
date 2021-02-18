@@ -22,16 +22,22 @@ def expected_enrollments(request, mute_signals):  # pylint: disable=unused-argum
     """
     if request.param == 'on_demand_active_enrollments':
 
-        on_demand_courses = CourseOverviewFactory.create_batch(2, self_paced=True,
-            org=factory.Sequence('active-{0}'.format))
+        on_demand_courses = CourseOverviewFactory.create_batch(
+            2,
+            self_paced=True,
+            org=factory.Sequence('active-{0}'.format)
+        )
         enrollments = CourseEnrollmentFactory.create_batch(2, course_id=on_demand_courses[0].id)
         enrollments += CourseEnrollmentFactory.create_batch(3, course_id=on_demand_courses[1].id)
         return enrollments
 
     elif request.param == 'on_demand_inactive_enrollments':
 
-        on_demand_courses = CourseOverviewFactory.create_batch(2, self_paced=True,
-            org=factory.Sequence('inactive-{0}'.format))
+        on_demand_courses = CourseOverviewFactory.create_batch(
+            2,
+            self_paced=True,
+            org=factory.Sequence('inactive-{0}'.format)
+        )
         enrollments = CourseEnrollmentFactory.create_batch(2, course_id=on_demand_courses[0].id, is_active=False)
         enrollments += CourseEnrollmentFactory.create_batch(2, course_id=on_demand_courses[1].id, is_active=False)
         return enrollments
@@ -85,8 +91,11 @@ def test_autoscore_ondemand_course_ora_for_done_and_cancelled_workflow(mock_log_
     """
     Verify that ORA submissions which are already scored or cancelled are not auto scored.
     """
-    on_demand_courses = CourseOverviewFactory.create_batch(2, self_paced=True,
-        org=factory.Sequence('org-{0}'.format))
+    on_demand_courses = CourseOverviewFactory.create_batch(
+        2,
+        self_paced=True,
+        org=factory.Sequence('org-{0}'.format)
+    )
 
     # Create workflow and mark it done
     submission_1 = SubmissionFactory(

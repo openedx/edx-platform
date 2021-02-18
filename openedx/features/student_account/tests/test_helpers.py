@@ -109,6 +109,7 @@ class TestSaveUserUTMInfo(TestCase):
         save_user_utm_info(request, self.user)
         self.assertRaises(Exception, save_user_utm_info)
 
+
 @ddt
 class TestSetOptInAndAffiliateOrganization(TestCase):
     """

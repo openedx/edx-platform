@@ -15,7 +15,9 @@ class Command(BaseCommand):
         current_date = get_current_utc_date()
 
         # Select those prompts whose finish_date is at least a year back from now
-        prompts = OrganizationOefUpdatePrompt.objects.filter(latest_finish_date__lte=current_date.replace(year=current_date.year-1))
+        prompts = OrganizationOefUpdatePrompt.objects.filter(
+            latest_finish_date__lte=current_date.replace(year=current_date.year - 1)
+        )
         for prompt in prompts:
             finish_date = prompt.latest_finish_date
             updated_year = its_been_year(finish_date)

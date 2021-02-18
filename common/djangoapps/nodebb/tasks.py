@@ -128,6 +128,7 @@ def task_update_onboarding_surveys_status(username):
     status_code, response = NodeBBClient().users.update_onboarding_surveys_status(username=username)
     handle_response(task_update_onboarding_surveys_status, 'Update Onboarding Survery', status_code, response, username)
 
+
 @task(default_retry_delay=RETRY_DELAY, max_retries=None)
 def task_archive_community_on_nodebb(category_id):
     """

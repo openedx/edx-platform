@@ -22,6 +22,7 @@ def create_organization(user):
     organization.save()
     return organization
 
+
 def create_organization_partner_object(user):
     """
         create and return organziation partner with given user as an organization admin
@@ -37,6 +38,7 @@ def create_organization_partner_object(user):
     )
     partner.save()
     return partner
+
 
 def generate_mailchimp_url(root_url, email):
     """

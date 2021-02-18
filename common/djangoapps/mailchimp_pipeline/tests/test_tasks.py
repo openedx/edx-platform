@@ -95,7 +95,7 @@ class MailchimpPipelineTaskTestClass(ModuleStoreTestCase):
         """
         data = {'user_id': self.user.id, 'created': True}
         result = send_user_course_completions_to_mailchimp.delay(data)
-        assert result.successful() == True
+        assert result.successful()
         all_certs = certificate_api.get_certificates_for_user(self.user.username)
         completed_course_keys = [
             cert.get('course_key', '') for cert in all_certs if certificate_api.is_passing_status(cert['status'])]
@@ -179,7 +179,7 @@ class MailchimpPipelineTaskTestClass(ModuleStoreTestCase):
             'user_email': self.user.email
         }
         result = task_send_account_activation_email.delay(data)
-        assert result.successful() == True
+        assert result.successful()
         expected_context = {
             'first_name': data['first_name'],
             'activation_link': data['activation_link'],
@@ -196,7 +196,7 @@ class MailchimpPipelineTaskTestClass(ModuleStoreTestCase):
             'created': True
         }
         result = task_send_user_info_to_mailchimp.delay(data)
-        assert result.successful() == True
+        assert result.successful()
         expected_url = generate_mailchimp_url(self.mail_chimp_root_url, self.user.email)
         expected_data = {
             "merge_fields": {
@@ -239,7 +239,7 @@ class MailchimpPipelineTaskTestClass(ModuleStoreTestCase):
         result = update_org_details_at_mailchimp.delay(
             org_label, org_type, work_area, organization.id, self.mailchimp_list_id
         )
-        assert result.successful() == True
+        assert result.successful()
         expected_url = generate_mailchimp_url(self.mail_chimp_root_url, self.user.email)
         expected_data = {
             "merge_fields": {
@@ -290,7 +290,7 @@ class MailchimpPipelineTaskTestClass(ModuleStoreTestCase):
         all_certs = certificate_api.get_certificates_for_user(self.user.username)
 
         result = update_enrollments_completions_at_mailchimp.delay(self.mailchimp_list_id)
-        assert result.successful() == True
+        assert result.successful()
 
         expected_url = generate_mailchimp_url(self.mail_chimp_root_url, self.user.email)
         expected_data = {
