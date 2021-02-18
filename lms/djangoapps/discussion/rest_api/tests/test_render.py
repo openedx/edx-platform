@@ -29,7 +29,8 @@ class RenderBodyTest(TestCase):
     )
     @ddt.unpack
     def test_markdown_inline(self, delimiter, tag):
-        assert render_body(u'{delimiter}some text{delimiter}'.format(delimiter=delimiter)) == u'<p><{tag}>some text</{tag}></p>'.format(tag=tag)
+        assert render_body(u'{delimiter}some text{delimiter}'.format(delimiter=delimiter)) == \
+               u'<p><{tag}>some text</{tag}></p>'.format(tag=tag)
 
     @ddt.data(
         "b", "blockquote", "code", "del", "dd", "dl", "dt", "em", "h1", "h2", "h3", "i", "kbd",

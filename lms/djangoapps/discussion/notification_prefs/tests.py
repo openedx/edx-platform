@@ -141,7 +141,11 @@ class NotificationPrefViewTest(UrlResetMixin, TestCase):  # lint-amnesty, pylint
         other_user = UserFactory.create()
         request.user = other_user
         ajax_enable(request)
-        assert UserPreference.objects.get(user=self.user, key=NOTIFICATION_PREF_KEY).value != UserPreference.objects.get(user=other_user, key=NOTIFICATION_PREF_KEY).value
+        assert UserPreference.objects.get(
+            user=self.user, key=NOTIFICATION_PREF_KEY
+        ).value != UserPreference.objects.get(
+            user=other_user, key=NOTIFICATION_PREF_KEY
+        ).value
 
     # AJAX disable view
 

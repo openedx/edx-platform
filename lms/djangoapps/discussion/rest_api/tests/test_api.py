@@ -167,7 +167,14 @@ class GetCourseTest(ForumsEnableMixin, UrlResetMixin, SharedModuleStoreTestCase)
             get_course(self.request, _discussion_disabled_course_for(self.user).id)
 
     def test_basic(self):
-        assert get_course(self.request, self.course.id) == {'id': six.text_type(self.course.id), 'blackouts': [], 'thread_list_url': 'http://testserver/api/discussion/v1/threads/?course_id=x%2Fy%2Fz', 'following_thread_list_url': 'http://testserver/api/discussion/v1/threads/?course_id=x%2Fy%2Fz&following=True', 'topics_url': 'http://testserver/api/discussion/v1/course_topics/x/y/z'}
+        assert get_course(self.request, self.course.id) == {
+            'id': six.text_type(self.course.id),
+            'blackouts': [],
+            'thread_list_url': 'http://testserver/api/discussion/v1/threads/?course_id=x%2Fy%2Fz',
+            'following_thread_list_url':
+                'http://testserver/api/discussion/v1/threads/?course_id=x%2Fy%2Fz&following=True',
+            'topics_url': 'http://testserver/api/discussion/v1/course_topics/x/y/z'
+        }
 
 
 @ddt.ddt
@@ -194,7 +201,10 @@ class GetCourseTestBlackouts(ForumsEnableMixin, UrlResetMixin, ModuleStoreTestCa
         ]
         modulestore().update_item(self.course, self.user.id)
         result = get_course(self.request, self.course.id)
-        assert result['blackouts'] == [{'start': '2015-06-09T00:00:00Z', 'end': '2015-06-10T00:00:00Z'}, {'start': '2015-06-11T00:00:00Z', 'end': '2015-06-12T00:00:00Z'}]
+        assert result['blackouts'] == [
+            {'start': '2015-06-09T00:00:00Z', 'end': '2015-06-10T00:00:00Z'},
+            {'start': '2015-06-11T00:00:00Z', 'end': '2015-06-12T00:00:00Z'}
+        ]
 
     @ddt.data(None, "not a datetime", "2015", [])
     def test_blackout_errors(self, bad_value):
@@ -544,7 +554,35 @@ class GetCourseTopicsTest(ForumsEnableMixin, UrlResetMixin, ModuleStoreTestCase)
         self.make_discussion_xblock(topic_id_1, "test_category_1", "test_target_1")
         self.make_discussion_xblock(topic_id_2, "test_category_2", "test_target_2")
         actual = get_course_topics(self.request, self.course.id, {"topic_id_1", "topic_id_2"})
-        assert actual == {'non_courseware_topics': [], 'courseware_topics': [{'children': [{'children': [], 'id': 'topic_id_1', 'thread_list_url': 'http://testserver/api/discussion/v1/threads/?course_id=x%2Fy%2Fz&topic_id=topic_id_1', 'name': 'test_target_1'}], 'id': None, 'thread_list_url': 'http://testserver/api/discussion/v1/threads/?course_id=x%2Fy%2Fz&topic_id=topic_id_1', 'name': 'test_category_1'}, {'children': [{'children': [], 'id': 'topic_id_2', 'thread_list_url': 'http://testserver/api/discussion/v1/threads/?course_id=x%2Fy%2Fz&topic_id=topic_id_2', 'name': 'test_target_2'}], 'id': None, 'thread_list_url': 'http://testserver/api/discussion/v1/threads/?course_id=x%2Fy%2Fz&topic_id=topic_id_2', 'name': 'test_category_2'}]}
+        assert actual == {
+            'non_courseware_topics': [],
+            'courseware_topics': [
+                {'children': [
+                    {'children': [],
+                     'id': 'topic_id_1',
+                     'thread_list_url':
+                         'http://testserver/api/discussion/v1/threads/?course_id=x%2Fy%2Fz&topic_id=topic_id_1',
+                     'name': 'test_target_1'}
+                ],
+                    'id': None,
+                    'thread_list_url':
+                        'http://testserver/api/discussion/v1/threads/?course_id=x%2Fy%2Fz&topic_id=topic_id_1',
+                    'name': 'test_category_1'
+                },
+                {'children': [
+                    {'children': [],
+                     'id': 'topic_id_2',
+                     'thread_list_url':
+                         'http://testserver/api/discussion/v1/threads/?course_id=x%2Fy%2Fz&topic_id=topic_id_2',
+                     'name': 'test_target_2'}
+                ],
+                    'id': None,
+                    'thread_list_url':
+                        'http://testserver/api/discussion/v1/threads/?course_id=x%2Fy%2Fz&topic_id=topic_id_2',
+                    'name': 'test_category_2'
+                }
+            ]
+        }
 
 
 @ddt.ddt
@@ -607,12 +645,22 @@ class GetThreadListTest(ForumsEnableMixin, CommentsServiceMockMixin, UrlResetMix
             self.get_thread_list([], course=_discussion_disabled_course_for(self.user))
 
     def test_empty(self):
-        assert self.get_thread_list([], num_pages=0).data == {'pagination': {'next': None, 'previous': None, 'num_pages': 0, 'count': 0}, 'results': [], 'text_search_rewrite': None}
+        assert self.get_thread_list(
+            [], num_pages=0
+        ).data == {
+            'pagination': {
+                'next': None,
+                'previous': None,
+                'num_pages': 0,
+                'count': 0
+            },
+            'results': [],
+            'text_search_rewrite': None
+        }
 
     def test_get_threads_by_topic_id(self):
         self.get_thread_list([], topic_id_list=["topic_x", "topic_meow"])
-        assert urlparse(httpretty.last_request().path).path == '/api/v1/threads'
-        # lint-amnesty, pylint: disable=no-member
+        assert urlparse(httpretty.last_request().path).path == '/api/v1/threads'  # lint-amnesty, pylint: disable=no-member
         self.assert_last_query_params({
             "user_id": [six.text_type(self.user.id)],
             "course_id": [six.text_type(self.course.id)],
@@ -772,7 +820,13 @@ class GetThreadListTest(ForumsEnableMixin, CommentsServiceMockMixin, UrlResetMix
         )
         expected_result.update({"text_search_rewrite": text_search_rewrite})
         self.register_get_threads_search_response([], text_search_rewrite, num_pages=0)
-        assert get_thread_list(self.request, self.course.id, page=1, page_size=10, text_search='test search string').data == expected_result
+        assert get_thread_list(
+            self.request,
+            self.course.id,
+            page=1,
+            page_size=10,
+            text_search='test search string'
+        ).data == expected_result
         self.assert_last_query_params({
             "user_id": [six.text_type(self.user.id)],
             "course_id": [six.text_type(self.course.id)],
@@ -797,7 +851,9 @@ class GetThreadListTest(ForumsEnableMixin, CommentsServiceMockMixin, UrlResetMix
         )
         expected_result.update({"text_search_rewrite": None})
         assert result == expected_result
-        assert urlparse(httpretty.last_request().path).path == '/api/v1/users/{}/subscribed_threads'.format(self.user.id)
+        assert urlparse(
+            httpretty.last_request().path  # lint-amnesty, pylint: disable=no-member
+        ).path == '/api/v1/users/{}/subscribed_threads'.format(self.user.id)
         self.assert_last_query_params({
             "user_id": [six.text_type(self.user.id)],
             "course_id": [six.text_type(self.course.id)],
@@ -822,7 +878,7 @@ class GetThreadListTest(ForumsEnableMixin, CommentsServiceMockMixin, UrlResetMix
         )
         expected_result.update({"text_search_rewrite": None})
         assert result == expected_result
-        assert urlparse(httpretty.last_request().path).path == '/api/v1/threads'
+        assert urlparse(httpretty.last_request().path).path == '/api/v1/threads'  # lint-amnesty, pylint: disable=no-member
         self.assert_last_query_params({
             "user_id": [six.text_type(self.user.id)],
             "course_id": [six.text_type(self.course.id)],
@@ -860,7 +916,7 @@ class GetThreadListTest(ForumsEnableMixin, CommentsServiceMockMixin, UrlResetMix
         )
         expected_result.update({"text_search_rewrite": None})
         assert result == expected_result
-        assert urlparse(httpretty.last_request().path).path == '/api/v1/threads'
+        assert urlparse(httpretty.last_request().path).path == '/api/v1/threads'  # lint-amnesty, pylint: disable=no-member
         self.assert_last_query_params({
             "user_id": [six.text_type(self.user.id)],
             "course_id": [six.text_type(self.course.id)],
@@ -888,7 +944,7 @@ class GetThreadListTest(ForumsEnableMixin, CommentsServiceMockMixin, UrlResetMix
         )
         expected_result.update({"text_search_rewrite": None})
         assert result == expected_result
-        assert urlparse(httpretty.last_request().path).path == '/api/v1/threads'
+        assert urlparse(httpretty.last_request().path).path == '/api/v1/threads'  # lint-amnesty, pylint: disable=no-member
         self.assert_last_query_params({
             "user_id": [six.text_type(self.user.id)],
             "course_id": [six.text_type(self.course.id)],
@@ -1052,7 +1108,8 @@ class GetCommentListTest(ForumsEnableMixin, CommentsServiceMockMixin, SharedModu
         discussion_thread = self.make_minimal_cs_thread(
             {"thread_type": "discussion", "children": [], "resp_total": 0}
         )
-        assert self.get_comment_list(discussion_thread).data == make_paginated_api_response(results=[], count=0, num_pages=1, next_link=None, previous_link=None)
+        assert self.get_comment_list(discussion_thread).data == make_paginated_api_response(
+            results=[], count=0, num_pages=1, next_link=None, previous_link=None)
 
         question_thread = self.make_minimal_cs_thread({
             "thread_type": "question",
@@ -1060,8 +1117,10 @@ class GetCommentListTest(ForumsEnableMixin, CommentsServiceMockMixin, SharedModu
             "non_endorsed_responses": [],
             "non_endorsed_resp_total": 0
         })
-        assert self.get_comment_list(question_thread, endorsed=False).data == make_paginated_api_response(results=[], count=0, num_pages=1, next_link=None, previous_link=None)
-        assert self.get_comment_list(question_thread, endorsed=True).data == make_paginated_api_response(results=[], count=0, num_pages=1, next_link=None, previous_link=None)
+        assert self.get_comment_list(question_thread, endorsed=False).data == make_paginated_api_response(
+            results=[], count=0, num_pages=1, next_link=None, previous_link=None)
+        assert self.get_comment_list(question_thread, endorsed=True).data == make_paginated_api_response(
+            results=[], count=0, num_pages=1, next_link=None, previous_link=None)
 
     def test_basic_query_params(self):
         self.get_comment_list(
@@ -1273,8 +1332,12 @@ class GetCommentListTest(ForumsEnableMixin, CommentsServiceMockMixin, SharedModu
             actual = self.get_comment_list(thread, endorsed=True, page=page, page_size=page_size).data
             result_ids = [result["id"] for result in actual["results"]]
             assert result_ids == ['comment_{}'.format(i) for i in range(expected_start, expected_stop)]
-            assert actual['pagination']['next'] == ('http://testserver/test_path?page={}'.format(expected_next) if expected_next else None)
-            assert actual['pagination']['previous'] == ('http://testserver/test_path?page={}'.format(expected_prev) if expected_prev else None)
+            assert actual['pagination']['next'] == (
+                'http://testserver/test_path?page={}'.format(expected_next) if expected_next else None
+            )
+            assert actual['pagination']['previous'] == (
+                'http://testserver/test_path?page={}'.format(expected_prev) if expected_prev else None
+            )
 
         # Only page
         assert_page_correct(
@@ -1410,10 +1473,32 @@ class CreateThreadTest(
             "read": True,
         })
         assert actual == expected
-        assert httpretty.last_request().parsed_body == {'course_id': [six.text_type(self.course.id)], 'commentable_id': ['test_topic'], 'thread_type': ['discussion'], 'title': ['Test Title'], 'body': ['Test body'], 'user_id': [str(self.user.id)]}
+        assert httpretty.last_request().parsed_body == {   # lint-amnesty, pylint: disable=no-member
+            'course_id': [six.text_type(self.course.id)],
+            'commentable_id': ['test_topic'],
+            'thread_type': ['discussion'],
+            'title': ['Test Title'],
+            'body': ['Test body'],
+            'user_id': [str(self.user.id)]
+        }
         event_name, event_data = mock_emit.call_args[0]
         assert event_name == 'edx.forum.thread.created'
-        assert event_data == {'commentable_id': 'test_topic', 'group_id': None, 'thread_type': 'discussion', 'title': 'Test Title', 'title_truncated': False, 'anonymous': False, 'anonymous_to_peers': False, 'options': {'followed': False}, 'id': 'test_id', 'truncated': False, 'body': 'Test body', 'url': '', 'user_forums_roles': [FORUM_ROLE_STUDENT], 'user_course_roles': []}
+        assert event_data == {
+            'commentable_id': 'test_topic',
+            'group_id': None,
+            'thread_type': 'discussion',
+            'title': 'Test Title',
+            'title_truncated': False,
+            'anonymous': False,
+            'anonymous_to_peers': False,
+            'options': {'followed': False},
+            'id': 'test_id',
+            'truncated': False,
+            'body': 'Test body',
+            'url': '',
+            'user_forums_roles': [FORUM_ROLE_STUDENT],
+            'user_course_roles': []
+        }
 
     def test_basic_in_blackout_period(self):
         """
@@ -1500,7 +1585,22 @@ class CreateThreadTest(
             create_thread(self.request, data)
         event_name, event_data = mock_emit.call_args[0]
         assert event_name == 'edx.forum.thread.created'
-        assert event_data == {'commentable_id': 'test_topic', 'group_id': None, 'thread_type': 'discussion', 'title': self.LONG_TITLE[:1000], 'title_truncated': True, 'anonymous': False, 'anonymous_to_peers': False, 'options': {'followed': False}, 'id': 'test_id', 'truncated': False, 'body': 'Test body', 'url': '', 'user_forums_roles': [FORUM_ROLE_STUDENT], 'user_course_roles': []}
+        assert event_data == {
+            'commentable_id': 'test_topic',
+            'group_id': None,
+            'thread_type': 'discussion',
+            'title': self.LONG_TITLE[:1000],
+            'title_truncated': True,
+            'anonymous': False,
+            'anonymous_to_peers': False,
+            'options': {'followed': False},
+            'id': 'test_id',
+            'truncated': False,
+            'body': 'Test body',
+            'url': '',
+            'user_forums_roles': [FORUM_ROLE_STUDENT],
+            'user_course_roles': []
+        }
 
     @ddt.data(
         *itertools.product(
@@ -1573,9 +1673,9 @@ class CreateThreadTest(
         result = create_thread(self.request, data)
         assert result['following'] is True
         cs_request = httpretty.last_request()
-        assert urlparse(cs_request.path).path == '/api/v1/users/{}/subscriptions'.format(self.user.id)
+        assert urlparse(cs_request.path).path == '/api/v1/users/{}/subscriptions'.format(self.user.id)  # lint-amnesty, pylint: disable=no-member
         assert cs_request.method == 'POST'
-        assert cs_request.parsed_body == {'source_type': ['thread'], 'source_id': ['test_id']}
+        assert cs_request.parsed_body == {'source_type': ['thread'], 'source_id': ['test_id']}  # lint-amnesty, pylint: disable=no-member
 
     def test_voted(self):
         self.register_post_thread_response({"id": "test_id", "username": self.user.username})
@@ -1586,10 +1686,9 @@ class CreateThreadTest(
             result = create_thread(self.request, data)
         assert result['voted'] is True
         cs_request = httpretty.last_request()
-        assert urlparse(cs_request.path).path == '/api/v1/threads/test_id/votes'
-        # lint-amnesty, pylint: disable=no-member
+        assert urlparse(cs_request.path).path == '/api/v1/threads/test_id/votes'  # lint-amnesty, pylint: disable=no-member
         assert cs_request.method == 'PUT'
-        assert cs_request.parsed_body == {'user_id': [str(self.user.id)], 'value': ['up']}
+        assert cs_request.parsed_body == {'user_id': [str(self.user.id)], 'value': ['up']}  # lint-amnesty, pylint: disable=no-member
 
     def test_abuse_flagged(self):
         self.register_post_thread_response({"id": "test_id", "username": self.user.username})
@@ -1599,11 +1698,9 @@ class CreateThreadTest(
         result = create_thread(self.request, data)
         assert result['abuse_flagged'] is True
         cs_request = httpretty.last_request()
-        assert urlparse(cs_request.path).path == '/api/v1/threads/test_id/abuse_flag'
-        # lint-amnesty, pylint: disable=no-member
+        assert urlparse(cs_request.path).path == '/api/v1/threads/test_id/abuse_flag'  # lint-amnesty, pylint: disable=no-member
         assert cs_request.method == 'PUT'
-        assert cs_request.parsed_body == {'user_id': [str(self.user.id)]}
-        # lint-amnesty, pylint: disable=no-member
+        assert cs_request.parsed_body == {'user_id': [str(self.user.id)]}  # lint-amnesty, pylint: disable=no-member
 
     def test_course_id_missing(self):
         with pytest.raises(ValidationError) as assertion:
@@ -1721,8 +1818,12 @@ class CreateCommentTest(
             "/api/v1/comments/{}".format(parent_id) if parent_id else
             "/api/v1/threads/test_thread/comments"
         )
-        assert urlparse(httpretty.last_request().path).path == expected_url
-        assert httpretty.last_request().parsed_body == {'course_id': [six.text_type(self.course.id)], 'body': ['Test body'], 'user_id': [str(self.user.id)]}
+        assert urlparse(httpretty.last_request().path).path == expected_url  # lint-amnesty, pylint: disable=no-member
+        assert httpretty.last_request().parsed_body == {   # lint-amnesty, pylint: disable=no-member
+            'course_id': [six.text_type(self.course.id)],
+            'body': ['Test body'],
+            'user_id': [str(self.user.id)]
+        }
         expected_event_name = (
             "edx.forum.comment.created" if parent_id else
             "edx.forum.response.created"
@@ -1873,8 +1974,7 @@ class CreateCommentTest(
         )
         try:
             create_comment(self.request, data)
-            assert httpretty.last_request().parsed_body['endorsed'] == ['True']
-            # lint-amnesty, pylint: disable=no-member
+            assert httpretty.last_request().parsed_body['endorsed'] == ['True']  # lint-amnesty, pylint: disable=no-member
             assert not expected_error
         except ValidationError:
             assert expected_error
@@ -1888,10 +1988,9 @@ class CreateCommentTest(
             result = create_comment(self.request, data)
         assert result['voted'] is True
         cs_request = httpretty.last_request()
-        assert urlparse(cs_request.path).path == '/api/v1/comments/test_comment/votes'
-        # lint-amnesty, pylint: disable=no-member
+        assert urlparse(cs_request.path).path == '/api/v1/comments/test_comment/votes'  # lint-amnesty, pylint: disable=no-member
         assert cs_request.method == 'PUT'
-        assert cs_request.parsed_body == {'user_id': [str(self.user.id)], 'value': ['up']}
+        assert cs_request.parsed_body == {'user_id': [str(self.user.id)], 'value': ['up']}  # lint-amnesty, pylint: disable=no-member
 
     def test_abuse_flagged(self):
         self.register_post_comment_response({"id": "test_comment", "username": self.user.username}, "test_thread")
@@ -1901,11 +2000,9 @@ class CreateCommentTest(
         result = create_comment(self.request, data)
         assert result['abuse_flagged'] is True
         cs_request = httpretty.last_request()
-        assert urlparse(cs_request.path).path == '/api/v1/comments/test_comment/abuse_flag'
-        # lint-amnesty, pylint: disable=no-member
+        assert urlparse(cs_request.path).path == '/api/v1/comments/test_comment/abuse_flag'  # lint-amnesty, pylint: disable=no-member
         assert cs_request.method == 'PUT'
-        assert cs_request.parsed_body == {'user_id': [str(self.user.id)]}
-        # lint-amnesty, pylint: disable=no-member
+        assert cs_request.parsed_body == {'user_id': [str(self.user.id)]}  # lint-amnesty, pylint: disable=no-member
 
     def test_thread_id_missing(self):
         with pytest.raises(ValidationError) as assertion:
@@ -2051,8 +2148,26 @@ class UpdateThreadTest(
         with self.assert_signal_sent(api, 'thread_edited', sender=None, user=self.user, exclude_args=('post',)):
             actual = update_thread(self.request, "test_thread", {"raw_body": "Edited body"})
 
-        assert actual == self.expected_thread_data({'raw_body': 'Edited body', 'rendered_body': '<p>Edited body</p>', 'topic_id': 'original_topic', 'read': True, 'title': 'Original Title'})
-        assert httpretty.last_request().parsed_body == {'course_id': [six.text_type(self.course.id)], 'commentable_id': ['original_topic'], 'thread_type': ['discussion'], 'title': ['Original Title'], 'body': ['Edited body'], 'user_id': [str(self.user.id)], 'anonymous': ['False'], 'anonymous_to_peers': ['False'], 'closed': ['False'], 'pinned': ['False'], 'read': ['False']}
+        assert actual == self.expected_thread_data({
+            'raw_body': 'Edited body',
+            'rendered_body': '<p>Edited body</p>',
+            'topic_id': 'original_topic',
+            'read': True,
+            'title': 'Original Title'
+        })
+        assert httpretty.last_request().parsed_body == {  # lint-amnesty, pylint: disable=no-member
+            'course_id': [six.text_type(self.course.id)],
+            'commentable_id': ['original_topic'],
+            'thread_type': ['discussion'],
+            'title': ['Original Title'],
+            'body': ['Edited body'],
+            'user_id': [str(self.user.id)],
+            'anonymous': ['False'],
+            'anonymous_to_peers': ['False'],
+            'closed': ['False'],
+            'pinned': ['False'],
+            'read': ['False']
+        }
 
     def test_nonexistent_thread(self):
         self.register_get_thread_error_response("test_thread", 404)
@@ -2201,7 +2316,16 @@ class UpdateThreadTest(
 
             event_name, event_data = mock_emit.call_args[0]
             assert event_name == 'edx.forum.thread.voted'
-            assert event_data == {'undo_vote': (not new_vote_status), 'url': '', 'target_username': self.user.username, 'vote_value': 'up', 'user_forums_roles': [FORUM_ROLE_STUDENT], 'user_course_roles': [], 'commentable_id': 'original_topic', 'id': 'test_thread'}
+            assert event_data == {
+                'undo_vote': (not new_vote_status),
+                'url': '',
+                'target_username': self.user.username,
+                'vote_value': 'up',
+                'user_forums_roles': [FORUM_ROLE_STUDENT],
+                'user_course_roles': [],
+                'commentable_id': 'original_topic',
+                'id': 'test_thread'
+            }
 
     @ddt.data(*itertools.product([True, False], [True, False], [True, False]))
     @ddt.unpack
@@ -2302,7 +2426,7 @@ class UpdateThreadTest(
         else:
             assert last_request_path == (flag_url if new_flagged else unflag_url)
             assert httpretty.last_request().method == 'PUT'
-            assert httpretty.last_request().parsed_body == {'user_id': [str(self.user.id)]}
+            assert httpretty.last_request().parsed_body == {'user_id': [str(self.user.id)]}  # lint-amnesty, pylint: disable=no-member
 
     def test_invalid_field(self):
         self.register_thread()
@@ -2407,7 +2531,14 @@ class UpdateCommentTest(
             "child_count": 0,
         }
         assert actual == expected
-        assert httpretty.last_request().parsed_body == {'body': ['Edited body'], 'course_id': [six.text_type(self.course.id)], 'user_id': [str(self.user.id)], 'anonymous': ['False'], 'anonymous_to_peers': ['False'], 'endorsed': ['False']}
+        assert httpretty.last_request().parsed_body == {  # lint-amnesty, pylint: disable=no-member
+            'body': ['Edited body'],
+            'course_id': [six.text_type(self.course.id)],
+            'user_id': [str(self.user.id)],
+            'anonymous': ['False'],
+            'anonymous_to_peers': ['False'],
+            'endorsed': ['False']
+        }
 
     def test_nonexistent_comment(self):
         self.register_get_comment_error_response("test_comment", 404)
@@ -2571,7 +2702,16 @@ class UpdateCommentTest(
             event_name, event_data = mock_emit.call_args[0]
             assert event_name == 'edx.forum.response.voted'
 
-            assert event_data == {'undo_vote': (not new_vote_status), 'url': '', 'target_username': self.user.username, 'vote_value': 'up', 'user_forums_roles': [FORUM_ROLE_STUDENT], 'user_course_roles': [], 'commentable_id': 'dummy', 'id': 'test_comment'}
+            assert event_data == {
+                'undo_vote': (not new_vote_status),
+                'url': '',
+                'target_username': self.user.username,
+                'vote_value': 'up',
+                'user_forums_roles': [FORUM_ROLE_STUDENT],
+                'user_course_roles': [],
+                'commentable_id': 'dummy',
+                'id': 'test_comment'
+            }
 
     @ddt.data(*itertools.product([True, False], [True, False], [True, False]))
     @ddt.unpack
@@ -2671,7 +2811,7 @@ class UpdateCommentTest(
         else:
             assert last_request_path == (flag_url if new_flagged else unflag_url)
             assert httpretty.last_request().method == 'PUT'
-            assert httpretty.last_request().parsed_body == {'user_id': [str(self.user.id)]}
+            assert httpretty.last_request().parsed_body == {'user_id': [str(self.user.id)]}  # lint-amnesty, pylint: disable=no-member
 
 
 @ddt.ddt
@@ -2723,7 +2863,7 @@ class DeleteThreadTest(
         self.register_thread()
         with self.assert_signal_sent(api, 'thread_deleted', sender=None, user=self.user, exclude_args=('post',)):
             assert delete_thread(self.request, self.thread_id) is None
-        assert urlparse(httpretty.last_request().path).path == '/api/v1/threads/{}'.format(self.thread_id)
+        assert urlparse(httpretty.last_request().path).path == '/api/v1/threads/{}'.format(self.thread_id)  # lint-amnesty, pylint: disable=no-member
         assert httpretty.last_request().method == 'DELETE'
 
     def test_thread_id_not_found(self):
@@ -2865,7 +3005,7 @@ class DeleteCommentTest(
         self.register_comment_and_thread()
         with self.assert_signal_sent(api, 'comment_deleted', sender=None, user=self.user, exclude_args=('post',)):
             assert delete_comment(self.request, self.comment_id) is None
-        assert urlparse(httpretty.last_request().path).path == '/api/v1/comments/{}'.format(self.comment_id)
+        assert urlparse(httpretty.last_request().path).path == '/api/v1/comments/{}'.format(self.comment_id)  # lint-amnesty, pylint: disable=no-member
         assert httpretty.last_request().method == 'DELETE'
 
     def test_comment_id_not_found(self):
@@ -3009,7 +3149,10 @@ class RetrieveThreadTest(
 
     def test_basic(self):
         self.register_thread({"resp_total": 2})
-        assert get_thread(self.request, self.thread_id) == self.expected_thread_data({'response_count': 2, 'unread_comment_count': 1})
+        assert get_thread(self.request, self.thread_id) == self.expected_thread_data({
+            'response_count': 2,
+            'unread_comment_count': 1
+        })
         assert httpretty.last_request().method == 'GET'
 
     def test_thread_id_not_found(self):
@@ -3023,7 +3166,10 @@ class RetrieveThreadTest(
         CourseEnrollmentFactory.create(user=non_author_user, course_id=self.course.id)
         self.register_thread()
         self.request.user = non_author_user
-        assert get_thread(self.request, self.thread_id) == self.expected_thread_data({'editable_fields': ['abuse_flagged', 'following', 'read', 'voted'], 'unread_comment_count': 1})
+        assert get_thread(self.request, self.thread_id) == self.expected_thread_data({
+            'editable_fields': ['abuse_flagged', 'following', 'read', 'voted'],
+            'unread_comment_count': 1
+        })
         assert httpretty.last_request().method == 'GET'
 
     def test_not_enrolled_in_course(self):

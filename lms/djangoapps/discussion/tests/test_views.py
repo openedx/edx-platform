@@ -335,7 +335,12 @@ class SingleThreadTestCase(ForumsEnableMixin, ModuleStoreTestCase):  # lint-amne
         response_data = json.loads(response.content.decode('utf-8'))
         # strip_none is being used to perform the same transform that the
         # django view performs prior to writing thread data to the response
-        assert response_data['content'] == strip_none(make_mock_thread_data(course=self.course, text=text, thread_id=thread_id, num_children=1))
+        assert response_data['content'] == strip_none(make_mock_thread_data(
+            course=self.course,
+            text=text,
+            thread_id=thread_id,
+            num_children=1
+        ))
         mock_request.assert_called_with(
             "get",
             StringEndsWithMatcher(thread_id),  # url
@@ -368,7 +373,12 @@ class SingleThreadTestCase(ForumsEnableMixin, ModuleStoreTestCase):  # lint-amne
         response_data = json.loads(response.content.decode('utf-8'))
         # strip_none is being used to perform the same transform that the
         # django view performs prior to writing thread data to the response
-        assert response_data['content'] == strip_none(make_mock_thread_data(course=self.course, text=text, thread_id=thread_id, num_children=1))
+        assert response_data['content'] == strip_none(make_mock_thread_data(
+            course=self.course,
+            text=text,
+            thread_id=thread_id,
+            num_children=1
+        ))
         mock_request.assert_called_with(
             "get",
             StringEndsWithMatcher(thread_id),  # url
@@ -438,7 +448,7 @@ class SingleThreadTestCase(ForumsEnableMixin, ModuleStoreTestCase):  # lint-amne
             assert 'This is a private discussion. You do not have permissions to view this discussion' in html
 
 
-class AllowPlusOrMinusOneInt(int):
+class AllowPlusOrMinusOneInt(int):  # pylint: disable=eq-without-hash
     """
     A workaround for the fact that assertNumQueries doesn't let you
     specify a range or any tolerance. An 'int' that is 'equal to' its value,
@@ -574,7 +584,16 @@ class SingleCohortedThreadTestCase(CohortedTestCase):  # lint-amnesty, pylint: d
 
         assert response.status_code == 200
         response_data = json.loads(response.content.decode('utf-8'))
-        assert response_data['content'] == make_mock_thread_data(course=self.course, commentable_id='cohorted_topic', text=mock_text, thread_id=mock_thread_id, num_children=1, group_id=self.student_cohort.id, group_name=self.student_cohort.name, is_commentable_divided=True)
+        assert response_data['content'] == make_mock_thread_data(
+            course=self.course,
+            commentable_id='cohorted_topic',
+            text=mock_text,
+            thread_id=mock_thread_id,
+            num_children=1,
+            group_id=self.student_cohort.id,
+            group_name=self.student_cohort.name,
+            is_commentable_divided=True
+        )
 
     def test_html(self, mock_request):
         _mock_text, mock_thread_id = self._create_mock_cohorted_thread(mock_request)
@@ -648,7 +667,13 @@ class SingleThreadAccessTestCase(CohortedTestCase):  # lint-amnesty, pylint: dis
         assert resp.status_code == 200
 
     def test_student_different_cohort(self, mock_request):
-        pytest.raises(Http404, (lambda: self.call_view(mock_request, 'cohorted_topic', self.student, self.student_cohort.id, thread_group_id=self.moderator_cohort.id)))
+        pytest.raises(Http404, (lambda: self.call_view(
+            mock_request,
+            'cohorted_topic',
+            self.student,
+            self.student_cohort.id,
+            thread_group_id=self.moderator_cohort.id
+        )))
 
     def test_moderator_non_cohorted(self, mock_request):
         resp = self.call_view(mock_request, "non_cohorted_topic", self.moderator, self.moderator_cohort.id)
@@ -2060,7 +2085,10 @@ class CourseDiscussionsHandlerTestCase(DividedDiscussionsTestCase):
             expected_response_code=400,
             handler=views.course_discussions_settings_handler
         )
-        assert u'Incorrect field type for `{}`. Type must be `{}`'.format('always_divide_inline_discussions', bool.__name__) == response.get('error')
+        assert u'Incorrect field type for `{}`. Type must be `{}`'.format(
+            'always_divide_inline_discussions',
+            bool.__name__
+        ) == response.get('error')
 
     def test_available_schemes(self):
         # Cohorts disabled, single enrollment mode.

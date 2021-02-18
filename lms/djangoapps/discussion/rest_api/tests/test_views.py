@@ -663,7 +663,9 @@ class ThreadViewSetListTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase, Pro
             200,
             expected_response
         )
-        assert urlparse(httpretty.last_request().path).path == '/api/v1/users/{}/subscribed_threads'.format(self.user.id)
+        assert urlparse(
+            httpretty.last_request().path  # lint-amnesty, pylint: disable=no-member
+        ).path == '/api/v1/users/{}/subscribed_threads'.format(self.user.id)
 
     @ddt.data(False, "false", "0")
     def test_following_false(self, following):
@@ -858,7 +860,14 @@ class ThreadViewSetCreateTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
         assert response.status_code == 200
         response_data = json.loads(response.content.decode('utf-8'))
         assert response_data == self.expected_thread_data({'read': True})
-        assert httpretty.last_request().parsed_body == {'course_id': [text_type(self.course.id)], 'commentable_id': ['test_topic'], 'thread_type': ['discussion'], 'title': ['Test Title'], 'body': ['Test body'], 'user_id': [str(self.user.id)]}
+        assert httpretty.last_request().parsed_body == {  # lint-amnesty, pylint: disable=no-member
+            'course_id': [text_type(self.course.id)],
+            'commentable_id': ['test_topic'],
+            'thread_type': ['discussion'],
+            'title': ['Test Title'],
+            'body': ['Test body'],
+            'user_id': [str(self.user.id)]
+        }
 
     def test_error(self):
         request_data = {
@@ -903,8 +912,29 @@ class ThreadViewSetPartialUpdateTest(DiscussionAPIViewTestMixin, ModuleStoreTest
         response = self.request_patch(request_data)
         assert response.status_code == 200
         response_data = json.loads(response.content.decode('utf-8'))
-        assert response_data == self.expected_thread_data({'raw_body': 'Edited body', 'rendered_body': '<p>Edited body</p>', 'editable_fields': ['abuse_flagged', 'following', 'raw_body', 'read', 'title', 'topic_id', 'type', 'voted'], 'created_at': 'Test Created Date', 'updated_at': 'Test Updated Date', 'comment_count': 1, 'read': True, 'response_count': 2})
-        assert httpretty.last_request().parsed_body == {'course_id': [text_type(self.course.id)], 'commentable_id': ['test_topic'], 'thread_type': ['discussion'], 'title': ['Test Title'], 'body': ['Edited body'], 'user_id': [str(self.user.id)], 'anonymous': ['False'], 'anonymous_to_peers': ['False'], 'closed': ['False'], 'pinned': ['False'], 'read': ['True']}
+        assert response_data == self.expected_thread_data({
+            'raw_body': 'Edited body',
+            'rendered_body': '<p>Edited body</p>',
+            'editable_fields': ['abuse_flagged', 'following', 'raw_body', 'read', 'title', 'topic_id', 'type', 'voted'],
+            'created_at': 'Test Created Date',
+            'updated_at': 'Test Updated Date',
+            'comment_count': 1,
+            'read': True,
+            'response_count': 2
+        })
+        assert httpretty.last_request().parsed_body == {  # lint-amnesty, pylint: disable=no-member
+            'course_id': [text_type(self.course.id)],
+            'commentable_id': ['test_topic'],
+            'thread_type': ['discussion'],
+            'title': ['Test Title'],
+            'body': ['Edited body'],
+            'user_id': [str(self.user.id)],
+            'anonymous': ['False'],
+            'anonymous_to_peers': ['False'],
+            'closed': ['False'],
+            'pinned': ['False'],
+            'read': ['True']
+        }
 
     def test_error(self):
         self.register_get_user_response(self.user)
@@ -931,7 +961,13 @@ class ThreadViewSetPartialUpdateTest(DiscussionAPIViewTestMixin, ModuleStoreTest
         response = self.request_patch(request_data)
         assert response.status_code == 200
         response_data = json.loads(response.content.decode('utf-8'))
-        assert response_data == self.expected_thread_data({'read': True, 'closed': True, 'abuse_flagged': value, 'editable_fields': ['abuse_flagged', 'read'], 'comment_count': 1, 'unread_comment_count': 0})
+        assert response_data == self.expected_thread_data({
+            'read': True,
+            'closed': True,
+            'abuse_flagged': value,
+            'editable_fields': ['abuse_flagged', 'read'],
+            'comment_count': 1, 'unread_comment_count': 0
+        })
 
     @ddt.data(
         ("raw_body", "Edited body"),
@@ -956,7 +992,12 @@ class ThreadViewSetPartialUpdateTest(DiscussionAPIViewTestMixin, ModuleStoreTest
         response = self.request_patch(request_data)
         assert response.status_code == 200
         response_data = json.loads(response.content.decode('utf-8'))
-        assert response_data == self.expected_thread_data({'comment_count': 1, 'read': True, 'editable_fields': ['abuse_flagged', 'following', 'raw_body', 'read', 'title', 'topic_id', 'type', 'voted'], 'response_count': 2})
+        assert response_data == self.expected_thread_data({
+            'comment_count': 1,
+            'read': True,
+            'editable_fields': ['abuse_flagged', 'following', 'raw_body', 'read', 'title', 'topic_id', 'type', 'voted'],
+            'response_count': 2
+        })
 
     def test_patch_read_non_owner_user(self):
         self.register_get_user_response(self.user)
@@ -974,7 +1015,13 @@ class ThreadViewSetPartialUpdateTest(DiscussionAPIViewTestMixin, ModuleStoreTest
         response = self.request_patch(request_data)
         assert response.status_code == 200
         response_data = json.loads(response.content.decode('utf-8'))
-        assert response_data == self.expected_thread_data({'author': str(thread_owner_user.username), 'comment_count': 1, 'read': True, 'editable_fields': ['abuse_flagged', 'following', 'read', 'voted'], 'response_count': 2})
+        assert response_data == self.expected_thread_data({
+            'author': str(thread_owner_user.username),
+            'comment_count': 1,
+            'read': True,
+            'editable_fields': ['abuse_flagged', 'following', 'read', 'voted'],
+            'response_count': 2
+        })
 
 
 @httpretty.activate
@@ -1000,7 +1047,7 @@ class ThreadViewSetDeleteTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
         response = self.client.delete(self.url)
         assert response.status_code == 204
         assert response.content == b''
-        assert urlparse(httpretty.last_request().path).path == '/api/v1/threads/{}'.format(self.thread_id)
+        assert urlparse(httpretty.last_request().path).path == '/api/v1/threads/{}'.format(self.thread_id)  # lint-amnesty, pylint: disable=no-member
         assert httpretty.last_request().method == 'DELETE'
 
     def test_delete_nonexistent_thread(self):
@@ -1413,7 +1460,7 @@ class CommentViewSetDeleteTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
         response = self.client.delete(self.url)
         assert response.status_code == 204
         assert response.content == b''
-        assert urlparse(httpretty.last_request().path).path == '/api/v1/comments/{}'.format(self.comment_id)
+        assert urlparse(httpretty.last_request().path).path == '/api/v1/comments/{}'.format(self.comment_id)  # lint-amnesty, pylint: disable=no-member
         assert httpretty.last_request().method == 'DELETE'
 
     def test_delete_nonexistent_comment(self):
@@ -1468,8 +1515,12 @@ class CommentViewSetCreateTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
         assert response.status_code == 200
         response_data = json.loads(response.content.decode('utf-8'))
         assert response_data == expected_response_data
-        assert urlparse(httpretty.last_request().path).path == '/api/v1/threads/test_thread/comments'
-        assert httpretty.last_request().parsed_body == {'course_id': [text_type(self.course.id)], 'body': ['Test body'], 'user_id': [str(self.user.id)]}
+        assert urlparse(httpretty.last_request().path).path == '/api/v1/threads/test_thread/comments'  # lint-amnesty, pylint: disable=no-member
+        assert httpretty.last_request().parsed_body == {  # lint-amnesty, pylint: disable=no-member
+            'course_id': [text_type(self.course.id)],
+            'body': ['Test body'],
+            'user_id': [str(self.user.id)]
+        }
 
     def test_error(self):
         response = self.client.post(
@@ -1550,8 +1601,21 @@ class CommentViewSetPartialUpdateTest(DiscussionAPIViewTestMixin, ModuleStoreTes
         response = self.request_patch(request_data)
         assert response.status_code == 200
         response_data = json.loads(response.content.decode('utf-8'))
-        assert response_data == self.expected_response_data({'raw_body': 'Edited body', 'rendered_body': '<p>Edited body</p>', 'editable_fields': ['abuse_flagged', 'raw_body', 'voted'], 'created_at': 'Test Created Date', 'updated_at': 'Test Updated Date'})
-        assert httpretty.last_request().parsed_body == {'body': ['Edited body'], 'course_id': [text_type(self.course.id)], 'user_id': [str(self.user.id)], 'anonymous': ['False'], 'anonymous_to_peers': ['False'], 'endorsed': ['False']}
+        assert response_data == self.expected_response_data({
+            'raw_body': 'Edited body',
+            'rendered_body': '<p>Edited body</p>',
+            'editable_fields': ['abuse_flagged', 'raw_body', 'voted'],
+            'created_at': 'Test Created Date',
+            'updated_at': 'Test Updated Date'
+        })
+        assert httpretty.last_request().parsed_body == {  # lint-amnesty, pylint: disable=no-member
+            'body': ['Edited body'],
+            'course_id': [text_type(self.course.id)],
+            'user_id': [str(self.user.id)],
+            'anonymous': ['False'],
+            'anonymous_to_peers': ['False'],
+            'endorsed': ['False']
+        }
 
     def test_error(self):
         self.register_thread()
@@ -1578,7 +1642,10 @@ class CommentViewSetPartialUpdateTest(DiscussionAPIViewTestMixin, ModuleStoreTes
         response = self.request_patch(request_data)
         assert response.status_code == 200
         response_data = json.loads(response.content.decode('utf-8'))
-        assert response_data == self.expected_response_data({'abuse_flagged': value, 'editable_fields': ['abuse_flagged']})
+        assert response_data == self.expected_response_data({
+            'abuse_flagged': value,
+            'editable_fields': ['abuse_flagged']
+        })
 
     @ddt.data(
         ("raw_body", "Edited body"),

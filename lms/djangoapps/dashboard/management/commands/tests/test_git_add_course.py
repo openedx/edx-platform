@@ -1,9 +1,6 @@
-import pytest
 """
 Provide tests for git_add_course management command.
 """
-
-
 import logging
 import os
 import shutil
@@ -11,6 +8,7 @@ import subprocess
 import unittest
 from uuid import uuid4
 
+import pytest
 import six
 from django.conf import settings
 from django.core.management import call_command
@@ -32,7 +30,6 @@ from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.mongo_connection import MONGO_HOST, MONGO_PORT_NUM
-
 TEST_MONGODB_LOG = {
     'host': MONGO_HOST,
     'port': MONGO_PORT_NUM,
