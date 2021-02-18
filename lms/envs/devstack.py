@@ -398,6 +398,7 @@ if os.path.isfile(join(dirname(abspath(__file__)), 'private.py')):
 
 from .common import _make_mako_template_dirs
 ENABLE_COMPREHENSIVE_THEMING = True
+DEFAULT_SITE_THEME = 'edx-theme-codebase'
 COMPREHENSIVE_THEME_DIRS = [
     "/edx/var/edxapp/themes",
 ]
