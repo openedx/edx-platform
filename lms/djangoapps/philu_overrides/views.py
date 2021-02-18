@@ -10,6 +10,7 @@ from django.contrib.auth import authenticate, get_user_model, login
 from django.core.urlresolvers import reverse
 from django.http import Http404, HttpResponse, HttpResponseNotFound, HttpResponseServerError
 from django.shortcuts import redirect
+from django.template import TemplateDoesNotExist
 from django.utils.translation import ugettext as _
 from django.views.decorators.csrf import ensure_csrf_cookie
 from django.views.decorators.http import require_http_methods
@@ -19,7 +20,7 @@ from pytz import utc
 from ratelimitbackend.exceptions import RateLimitException
 from w3lib.url import url_query_cleaner
 
-import third_party_auth
+import openedx.core.djangoapps.external_auth.views
 from edxmako.shortcuts import marketing_link, render_to_response, render_to_string
 from lms.djangoapps.courseware.access import _can_enroll_courselike, has_access
 from lms.djangoapps.courseware.courses import get_course_by_id, get_courses, sort_by_announcement, sort_by_start_date
@@ -28,7 +29,7 @@ from lms.djangoapps.onboarding.helpers import get_alquity_community_url
 from lms.djangoapps.philu_api.helpers import get_course_custom_settings, get_social_sharing_urls
 from lms.djangoapps.philu_overrides.constants import ENROLL_SHARE_DESC_FORMAT, ENROLL_SHARE_TITLE_FORMAT
 from lms.djangoapps.philu_overrides.courseware.views.views import get_course_related_keys
-from openedx.core.djangoapps.catalog.utils import get_programs_with_type
+from openedx.core.djangoapps.catalog.utils import get_programs_with_type  # pylint: disable=ungrouped-imports
 from openedx.core.djangoapps.external_auth.models import ExternalAuthMap
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.theming.helpers import is_request_in_themed_site
@@ -43,6 +44,7 @@ from philu_overrides.helpers import (
     reactivation_email_for_user_custom
 )
 from student.models import CourseEnrollment, LoginFailures
+from third_party_auth import is_enabled as third_party_auth_enabled
 from third_party_auth import pipeline, provider
 from third_party_auth.decorators import xframe_allow_whitelisted
 from util.cache import cache_if_anonymous
@@ -97,12 +99,11 @@ def login_and_registration_form(request, initial_mode="login"):
         try:
             next_args = urlparse.parse_qs(urlparse.urlparse(redirect_to).query)
             provider_id = next_args['tpa_hint'][0]
-            if third_party_auth.provider.Registry.get(provider_id=provider_id):
+            if provider.Registry.get(provider_id=provider_id):
                 third_party_auth_hint = provider_id
                 initial_mode = "hinted_login"
         except (KeyError, ValueError, IndexError):
             pass
-
 
     # If this is a themed site, revert to the old login/registration pages.
     # We need to do this for now to support existing themes.
@@ -210,7 +211,7 @@ def courses_custom(request):
                     first_section
                 ])
 
-                course.course_target = access_link if access_link != None else first_target
+                course.course_target = access_link or first_target
             else:
                 course.course_target = '/courses/' + course.id.to_deprecated_string()
 
@@ -252,14 +253,15 @@ def courses(request):
 def render_404(request):
     try:
         return HttpResponseNotFound(render_to_string('custom_static_templates/404.html', {}, request=request))
-    except:
+    except TemplateDoesNotExist:
         return redirect("404/")
 
 
 def render_500(request):
     try:
-        return HttpResponseServerError(render_to_string('custom_static_templates/server-error.html', {}, request=request))
-    except:
+        render_server_error = render_to_string('custom_static_templates/server-error.html', {}, request=request)
+        return HttpResponseServerError(render_server_error)
+    except TemplateDoesNotExist:
         return redirect("500/")
 
 
@@ -274,7 +276,7 @@ def login_user_custom(request, error=""):  # pylint: disable=too-many-statements
     redirect_url = None
     response = None
     running_pipeline = None
-    third_party_auth_requested = third_party_auth.is_enabled() and pipeline.running(request)
+    third_party_auth_requested = third_party_auth_enabled() and pipeline.running(request)
     third_party_auth_successful = False
     trumped_by_first_party_auth = bool(request.POST.get('email')) or bool(request.POST.get('password'))
     user = None
@@ -370,7 +372,6 @@ def login_user_custom(request, error=""):  # pylint: disable=too-many-statements
                 "value": lockout_message,
             })  # TODO: this should be status code 429  # pylint: disable=fixme
 
-
     # if the user doesn't exist, we want to set the username to an invalid
     # username so that authentication is guaranteed to fail and we can take
     # advantage of the ratelimited backend
@@ -451,7 +452,7 @@ def login_user_custom(request, error=""):  # pylint: disable=too-many-statements
                 log.debug("Setting user session to never expire")
             else:
                 request.session.set_expiry(0)
-        except Exception as exc:  # pylint: disable=broad-except
+        except Exception as exc:
             AUDIT_LOG.critical("Login failed - Could not create session. Is memcached running?")
             log.critical("Login failed - Could not create session. Is memcached running?")
             log.exception(exc)
@@ -486,7 +487,7 @@ def login_user_custom(request, error=""):  # pylint: disable=too-many-statements
 
 @ensure_csrf_cookie
 @cache_if_anonymous('share_after_enroll',)
-def course_about(request, course_id):
+def course_about(request, course_id):  # pylint: disable=too-many-statements
     """
     Display the course's about page.
 
@@ -528,7 +529,7 @@ def course_about(request, course_id):
             raise Http404("Course not accessible: {}.".format(unicode(course.id)))
 
         # Note: this is a flow for payment for course registration, not the Verified Certificate flow.
-        # in_cart = False
+        in_cart = False
         reg_then_add_to_cart_link = ""
 
         _is_shopping_cart_enabled = is_shopping_cart_enabled()
@@ -548,16 +549,16 @@ def course_about(request, course_id):
         ecomm_service = EcommerceService()
         ecommerce_checkout = ecomm_service.is_enabled(request.user)
         ecommerce_checkout_link = ''
-        # ecommerce_bulk_checkout_link = ''
+        ecommerce_bulk_checkout_link = ''
         # professional_mode = None
         is_professional_mode = CourseMode.PROFESSIONAL in modes or CourseMode.NO_ID_PROFESSIONAL_MODE in modes
         if ecommerce_checkout and is_professional_mode:
             professional_mode = modes.get(CourseMode.PROFESSIONAL, '') or \
                 modes.get(CourseMode.NO_ID_PROFESSIONAL_MODE, '')
             if professional_mode.sku:
-                ecommerce_checkout_link = ecomm_service.checkout_page_url(professional_mode.sku)
+                ecommerce_checkout_link = ecomm_service.get_checkout_page_url(professional_mode.sku)
             if professional_mode.bulk_sku:
-                ecommerce_bulk_checkout_link = ecomm_service.checkout_page_url(professional_mode.bulk_sku)
+                ecommerce_bulk_checkout_link = ecomm_service.get_checkout_page_url(professional_mode.bulk_sku)
 
         # Find the minimum price for the course across all course modes
         registration_price = CourseMode.min_course_price_for_currency(
@@ -631,6 +632,8 @@ def course_about(request, course_id):
             'is_cosmetic_price_enabled': settings.FEATURES.get('ENABLE_COSMETIC_DISPLAY_PRICE'),
             'course_price': course_price,
             'reg_then_add_to_cart_link': reg_then_add_to_cart_link,
+            'in_cart': in_cart,
+            'ecommerce_bulk_checkout_link': ecommerce_bulk_checkout_link,
             'invitation_only': invitation_only,
             # We do not want to display the internal courseware header, which is used when the course is found in the
             # context. This value is therefor explicitly set to render the appropriate header.

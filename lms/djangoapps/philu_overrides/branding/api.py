@@ -15,12 +15,12 @@ the marketing site and blog).
 import logging
 import urlparse
 
-from branding.models import BrandingApiConfig
 from django.conf import settings
 from django.contrib.staticfiles.storage import staticfiles_storage
 from django.utils.translation import ugettext as _
-from edxmako.shortcuts import marketing_link
 
+from branding.models import BrandingApiConfig
+from edxmako.shortcuts import marketing_link
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 
 log = logging.getLogger("edx.footer")
@@ -32,7 +32,7 @@ def is_enabled():
     return BrandingApiConfig.current().enabled
 
 
-def get_auth_footer(is_secure=True):
+def get_auth_footer():
     """ Override default get_footer method & add link for after authentication pages"""
     return {
         "copyright": _auth_footer_copyright(),
@@ -43,7 +43,7 @@ def get_auth_footer(is_secure=True):
     }
 
 
-def get_non_auth_footer(is_secure=True):
+def get_non_auth_footer():
     """ Override default get_footer method """
 
     return {
@@ -132,7 +132,6 @@ def _footer_social_links():
 
 def _auth_footer_navigation_links():
     """Return the navigation links to display in the footer. """
-    platform_name = configuration_helpers.get_value('platform_name', settings.PLATFORM_NAME)
     return [
         {
             "name": link_name,
@@ -149,7 +148,6 @@ def _auth_footer_navigation_links():
 
 def _auth_footer_courses_communities_links():
     """Return the navigation links to display in the footer. """
-    platform_name = configuration_helpers.get_value('platform_name', settings.PLATFORM_NAME)
     return [
         {
             "name": link_name,
@@ -166,10 +164,8 @@ def _auth_footer_courses_communities_links():
     ]
 
 
-
 def _footer_navigation_links():
     """Return the navigation links to display in the footer. """
-    platform_name = configuration_helpers.get_value('platform_name', settings.PLATFORM_NAME)
     return [
         {
             "name": link_name,

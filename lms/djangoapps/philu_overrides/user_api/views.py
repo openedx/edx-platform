@@ -1,9 +1,12 @@
+"""
+Overriden `user_api` views
+"""
 import logging
 
 from django.utils.decorators import method_decorator
-from django.views.decorators.csrf import csrf_exempt, csrf_protect, ensure_csrf_cookie
+from django.views.decorators.csrf import csrf_protect
 
-from openedx.core.djangoapps.user_api.helpers import shim_student_view, require_post_params
+from openedx.core.djangoapps.user_api.helpers import require_post_params, shim_student_view
 from openedx.core.djangoapps.user_api.views import LoginSessionView
 
 log = logging.getLogger("edx.student")

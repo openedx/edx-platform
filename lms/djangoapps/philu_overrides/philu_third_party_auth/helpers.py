@@ -1,3 +1,6 @@
+"""
+PhilU third party auth helper methods
+"""
 from django.core.exceptions import ValidationError
 
 from student.forms import validate_username
