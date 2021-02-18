@@ -8,7 +8,6 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.http import Http404
 from django.shortcuts import redirect, render
 from django.urls import reverse
-from django.utils.translation import ugettext as _  # lint-amnesty, pylint: disable=unused-import
 from django.views.decorators.http import require_http_methods
 from django_countries import countries
 
@@ -20,7 +19,6 @@ from openedx.core.djangoapps.site_configuration import helpers as configuration_
 from openedx.core.djangoapps.user_api.accounts.api import get_account_settings
 from openedx.core.djangoapps.user_api.errors import UserNotAuthorized, UserNotFound
 from openedx.core.djangoapps.user_api.preferences.api import get_user_preferences
-from openedx.core.djangolib.markup import HTML, Text  # lint-amnesty, pylint: disable=unused-import
 from openedx.features.learner_profile.toggles import should_redirect_to_profile_microfrontend
 from openedx.features.learner_profile.views.learner_achievements import LearnerAchievementsFragmentView
 from common.djangoapps.student.models import User

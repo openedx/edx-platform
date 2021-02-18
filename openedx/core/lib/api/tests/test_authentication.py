@@ -11,7 +11,7 @@ from datetime import timedelta
 
 import ddt
 from django.conf import settings
-from django.conf.urls import include, url  # lint-amnesty, pylint: disable=unused-import
+from django.conf.urls import url
 from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.http import HttpResponse
 from django.test import TestCase
