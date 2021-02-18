@@ -1,0 +1,8 @@
+FROM edxops/edxapp:juniper.master
+
+RUN cd /edx/app/edxapp \
+    && git clone https://github.com/appsembler/edx-platform.git --branch main \
+    && bash -c 'cd edx-platform && source ../edxapp_env && paver install_prereqs' \
+    && rm -rf edx-platform
+
+WORKDIR /edx/app/edxapp/edx-platform
