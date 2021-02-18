@@ -4,15 +4,12 @@ Tests for OAuth token exchange views
 
 # pylint: disable=no-member
 
-
 import json
 import unittest
 from datetime import timedelta
-import pytest
 
 import ddt
 import httpretty
-import mock
 from django.conf import settings
 from django.test import TestCase
 from django.urls import reverse
@@ -22,7 +19,10 @@ from social_django.models import Partial
 
 from openedx.core.djangoapps.oauth_dispatch.tests import factories as dot_factories
 from common.djangoapps.student.tests.factories import UserFactory
-from common.djangoapps.third_party_auth.tests.utils import ThirdPartyOAuthTestMixinFacebook, ThirdPartyOAuthTestMixinGoogle  # lint-amnesty, pylint: disable=line-too-long
+from common.djangoapps.third_party_auth.tests.utils import (
+    ThirdPartyOAuthTestMixinFacebook,
+    ThirdPartyOAuthTestMixinGoogle,
+)
 
 from .mixins import DOTAdapterMixin
 from .utils import TPA_FEATURE_ENABLED, TPA_FEATURES_KEY, AccessTokenExchangeTestMixin
@@ -32,6 +32,12 @@ from .utils import TPA_FEATURE_ENABLED, TPA_FEATURES_KEY, AccessTokenExchangeTes
 class AccessTokenExchangeViewTest(AccessTokenExchangeTestMixin):
     """
     Mixin that defines test cases for AccessTokenExchangeView
+
+    Warning: This class was originally created to support multiple libraries,
+        but we currently only support django-oauth-toolkit (DOT). At this point,
+        the variety of mixins can be quite confusing and are no longer providing
+        any benefit, other than the potential for reintroducing another library
+        in the future.
     """
     def setUp(self):
         super(AccessTokenExchangeViewTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
@@ -66,11 +72,16 @@ class AccessTokenExchangeViewTest(AccessTokenExchangeTestMixin):
             actual_scopes = []
         assert set(actual_scopes) == set(expected_scopes)
         token = self.oauth2_adapter.get_access_token(token_string=content["access_token"])
-        assert token.user == self.user
         assert self.oauth2_adapter.get_client_for_token(token) == self.oauth_client
         assert set(self.oauth2_adapter.get_token_scope_names(token)) == set(expected_scopes)
 
     def test_single_access_token(self):
+        """
+        WARNING: This functionality and test doesn't work for DOT and is left over
+            from DOP. It is confusing what tests are run where, and this
+            complexity/confusion isn't needed now that we just have DOT.
+            See https://github.com/edx/edx-platform/blob/277d52982c49e5d50d7582acb874cd5050ae27f7/openedx/core/djangoapps/auth_exchange/tests/mixins.py#L65-L67
+        """
         def extract_token(response):
             """
             Returns the access token from the response payload.
@@ -100,21 +111,14 @@ class AccessTokenExchangeViewTest(AccessTokenExchangeTestMixin):
         response = self.client.post(url, self.data)
         assert response.status_code == 404
 
-    @pytest.mark.skip(reason="this is very entangled with dop use in third_party_auth")
-    def test_invalid_client(self):
-        """TODO(jinder): this test overwrites function of same name in mixin
-        Remove when dop has been removed from third party auth
-        (currently underlying code used dop adapter, which is no longer supported by auth_exchange)
+    def test_logged_in_user(self):
         """
-        pass  # lint-amnesty, pylint: disable=unnecessary-pass
-
-    @pytest.mark.skip(reason="this is very entangled with dop use in third_party_auth")
-    def test_missing_fields(self):
-        """TODO(jinder): this test overwrites function of same name in mixin
-        Remove when dop has been removed from third party auth
-        (currently underlying code used dop adapter, which is no longer supported by auth_exchange)
+        Test that a logged in user will not cause a CSRF failure.
         """
-        pass  # lint-amnesty, pylint: disable=unnecessary-pass
+        self.user = UserFactory.create(username='test', password='secret')
+        self.csrf_client.login(username='test', password='secret')
+        self._setup_provider_response(success=True)
+        self._assert_success(self.data, expected_scopes=[])
 
     def test_disabled_user(self):
         """

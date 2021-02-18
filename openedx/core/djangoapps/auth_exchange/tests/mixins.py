@@ -52,17 +52,3 @@ class DOTAdapterMixin(object):
         Return the set of keys provided when requesting an access token
         """
         return {'access_token', 'refresh_token', 'token_type', 'expires_in', 'scope'}
-
-    def test_get_method(self):
-        # Dispatch routes all get methods to DOP, so we test this on the view
-        request_factory = RequestFactory()
-        request = request_factory.get('/oauth2/exchange_access_token/')
-        request.session = {}
-        view = DOTAccessTokenExchangeView.as_view()
-        response = view(request, backend='facebook')
-        assert response.status_code == 400
-
-    @expectedFailure
-    def test_single_access_token(self):
-        # TODO: Single access tokens not supported yet for DOT (See MA-2122)
-        super(DOTAdapterMixin, self).test_single_access_token()  # lint-amnesty, pylint: disable=super-with-arguments
