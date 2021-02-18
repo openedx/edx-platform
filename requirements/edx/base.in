@@ -104,7 +104,7 @@ help-tokens
 html5lib                            # HTML parser, used for capa problems
 icalendar                           # .ics generator, used by calendar_sync
 ipaddress                           # Ip network support for Embargo feature
-jsonfield2                          # Django model field for validated JSON; used in several apps
+jsonfield                           # Django model field for validated JSON; used in several apps
 laboratory                          # Library for testing that code refactors/infrastructure changes produce identical results
 lti-consumer-xblock
 mailsnake                           # Needed for mailchimp (mailing djangoapp)

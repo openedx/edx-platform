@@ -57,9 +57,6 @@ joblib<0.15.0
 # Version 2.0.0 is giving incompatible versions errors on upgrade
 importlib-metadata==1.7.0
 
-# jsonfield2 3.1.0 drops support for python 3.5
-jsonfield2<3.1.0
-
 # kiwisolver 1.2.0 requires Python 3.6+
 kiwisolver<1.2.0
 
