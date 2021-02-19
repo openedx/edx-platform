@@ -78,31 +78,6 @@ class AccessTokenExchangeViewTest(AccessTokenExchangeTestMixin):
         assert self.oauth2_adapter.get_client_for_token(token) == self.oauth_client
         assert set(self.oauth2_adapter.get_token_scope_names(token)) == set(expected_scopes)
 
-    def test_single_access_token(self):
-        """
-        WARNING: This functionality and test doesn't work for DOT and is left over
-            from DOP. It is confusing what tests are run where, and this
-            complexity/confusion isn't needed now that we just have DOT.
-            See https://github.com/edx/edx-platform/blob/277d52982c49e5d50d7582acb874cd5050ae27f7/openedx/core/djangoapps/auth_exchange/tests/mixins.py#L65-L67
-        """
-        def extract_token(response):
-            """
-            Returns the access token from the response payload.
-            """
-            return json.loads(response.content.decode('utf-8'))["access_token"]
-
-        self._setup_provider_response(success=True)
-        for single_access_token in [True, False]:
-            with mock.patch(
-                "openedx.core.djangoapps.auth_exchange.views.constants.SINGLE_ACCESS_TOKEN",
-                single_access_token,
-            ):
-                first_response = self.client.post(self.url, self.data)
-                second_response = self.client.post(self.url, self.data)
-            assert first_response.status_code == 200
-            assert second_response.status_code == 200
-            assert (extract_token(first_response) == extract_token(second_response)) == single_access_token
-
     def test_get_method(self):
         response = self.client.get(self.url, self.data)
         assert response.status_code == 400
