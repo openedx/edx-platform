@@ -55,12 +55,15 @@ def plugin_settings(settings):
     aws_common.plugin_settings(settings)
 
     if settings.APPSEMBLER_FEATURES.get("TAHOE_ENABLE_DOMAIN_REDIRECT_MIDDLEWARE", True):
-        redir_middleware = settings.MIDDLEWARE_CLASSES.index(EDX_SITE_REDIRECT_MIDDLEWARE)
-        for tahoe_redir_middleware in (
-            'openedx.core.djangoapps.appsembler.sites.middleware.CustomDomainsRedirectMiddleware',
+        redir_middleware_index = settings.MIDDLEWARE_CLASSES.index(EDX_SITE_REDIRECT_MIDDLEWARE)
+        settings.MIDDLEWARE_CLASSES.insert(
+            redir_middleware_index,  # Insert after Django RedirectMiddleware
+            'openedx.core.djangoapps.appsembler.sites.middleware.CustomDomainsRedirectMiddleware'
+        )
+        settings.MIDDLEWARE_CLASSES.insert(
+            redir_middleware_index + 1,  # Insert after CustomDomainsRedirectMiddleware
             'openedx.core.djangoapps.appsembler.sites.middleware.RedirectMiddleware'
-        ):
-            settings.MIDDLEWARE_CLASSES.insert(redir_middleware, tahoe_redir_middleware)
+        )
 
         settings.TAHOE_MAIN_SITE_REDIRECT_URL = settings.ENV_TOKENS.get(
             'TAHOE_MAIN_SITE_REDIRECT_URL', TAHOE_MARKETING_SITE_URL
