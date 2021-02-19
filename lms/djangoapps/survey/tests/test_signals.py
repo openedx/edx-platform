@@ -25,7 +25,7 @@ class SurveyRetireSignalTests(ModuleStoreTestCase):
         _listen_for_lms_retire(sender=self.__class__, user=answer.user)
 
         # All values for this user should now be empty string
-        self.assertFalse(SurveyAnswer.objects.filter(user=answer.user).exclude(field_value='').exists())
+        assert not SurveyAnswer.objects.filter(user=answer.user).exclude(field_value='').exists()
 
     def test_success_no_answers(self):
         """
@@ -46,4 +46,4 @@ class SurveyRetireSignalTests(ModuleStoreTestCase):
         _listen_for_lms_retire(sender=self.__class__, user=answer.user)
 
         # All values for this user should still be here and just be an empty string
-        self.assertFalse(SurveyAnswer.objects.filter(user=answer.user).exclude(field_value='').exists())
+        assert not SurveyAnswer.objects.filter(user=answer.user).exclude(field_value='').exists()

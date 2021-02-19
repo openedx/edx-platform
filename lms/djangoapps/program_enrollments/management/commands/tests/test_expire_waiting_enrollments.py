@@ -2,7 +2,7 @@
 Tests for the expire_waiting_enrollments management command.
 """
 
-
+import pytest
 import ddt
 from django.core.management import call_command
 from django.test import TestCase
@@ -37,5 +37,5 @@ class TestExpireWaitingEnrollments(TestCase):
     @patch('lms.djangoapps.program_enrollments.tasks.expire_waiting_enrollments', autospec=True)
     def test_task_failure_fails_command(self, mock_task):
         mock_task.side_effect = Exception('BOOM!')
-        with self.assertRaises(Exception):
+        with pytest.raises(Exception):
             call_command('expire_waiting_enrollments')
