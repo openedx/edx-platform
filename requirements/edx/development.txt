@@ -21,7 +21,7 @@
 alabaster==0.7.12         # via sphinx
 amqp==2.6.1               # via -r requirements/edx/testing.txt, kombu
 analytics-python==1.2.9   # via -r requirements/edx/testing.txt
-aniso8601==8.1.1          # via -r requirements/edx/testing.txt, edx-tincan-py35, tincan
+aniso8601==9.0.0          # via -r requirements/edx/testing.txt, edx-tincan-py35, tincan
 apipkg==1.5               # via -r requirements/edx/testing.txt, execnet
 appdirs==1.4.4            # via -r requirements/edx/testing.txt, fs, virtualenv
 astroid==2.4.2            # via -r requirements/edx/testing.txt, pylint, pylint-celery
@@ -29,7 +29,7 @@ attrs==20.3.0             # via -r requirements/edx/testing.txt, edx-ace, jsonsc
 babel==2.9.0              # via -r requirements/edx/testing.txt, enmerkar, enmerkar-underscore, sphinx
 beautifulsoup4==4.9.3     # via -r requirements/edx/testing.txt, pynliner
 billiard==3.6.3.0         # via -r requirements/edx/testing.txt, celery
-bleach==3.3.0             # via -r requirements/edx/testing.txt, django-wiki, edx-enterprise, lti-consumer-xblock, ora2, xblock-poll
+bleach==3.3.0             # via -r requirements/edx/testing.txt, django-wiki, edx-enterprise, lti-consumer-xblock, ora2, xblock-drag-and-drop-v2, xblock-poll
 bok-choy==1.1.1           # via -r requirements/edx/testing.txt
 boto3==1.4.8              # via -r requirements/edx/testing.txt, django-ses, fs-s3fs, ora2
 boto==2.39.0              # via -r requirements/edx/testing.txt, edxval
@@ -312,7 +312,7 @@ vulture==2.3              # via -r requirements/edx/development.in
 watchdog==2.0.1           # via -r requirements/edx/testing.txt
 web-fragments==1.0.0      # via -r requirements/edx/testing.txt, crowdsourcehinter-xblock, edx-sga, staff-graded-xblock, xblock, xblock-utils
 webencodings==0.5.1       # via -r requirements/edx/testing.txt, bleach, html5lib
-webob==1.8.6              # via -r requirements/edx/testing.txt, xblock, xmodule
+webob==1.8.7              # via -r requirements/edx/testing.txt, xblock, xmodule
 wrapt==1.11.2             # via -c requirements/edx/../constraints.txt, -r requirements/edx/testing.txt, astroid
 git+https://github.com/edx-solutions/xblock-drag-and-drop-v2@v2.3.2#egg=xblock-drag-and-drop-v2==2.3.2  # via -r requirements/edx/testing.txt
 git+https://github.com/open-craft/xblock-poll@922cd36fb1c3cfe00b4ce03b19a13185d136447d#egg=xblock-poll==1.10.2  # via -r requirements/edx/testing.txt
