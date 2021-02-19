@@ -3,9 +3,11 @@ Tests for Edly Utils Functions.
 """
 import jwt
 import mock
+from urlparse import urljoin
 from mock import MagicMock
 
 import crum
+import ddt
 from django.conf import settings
 from django.contrib.auth.models import Group
 from django.core.exceptions import PermissionDenied, ValidationError
@@ -13,7 +15,9 @@ from django.http import HttpResponse
 from django.test import modify_settings
 from django.test.client import RequestFactory
 from edx_django_utils.cache import RequestCache
+from opaque_keys.edx.keys import CourseKey
 
+from openedx.core.djangoapps.content.course_overviews.tests.factories import CourseOverviewFactory
 from openedx.core.djangoapps.site_configuration.tests.factories import SiteConfigurationFactory
 from openedx.core.djangoapps.user_authn.cookies import standard_cookie_settings as cookie_settings
 from openedx.core.djangolib.testing.utils import skip_unless_cms
@@ -32,6 +36,8 @@ from openedx.features.edly.utils import (
     encode_edly_user_info_cookie,
     get_edly_sub_org_from_cookie,
     get_edx_org_from_cookie,
+    get_marketing_link,
+    is_course_org_same_as_site_org,
     set_global_course_creator_status,
     update_course_creator_status,
     user_has_edly_organization_access,
@@ -90,6 +96,7 @@ class UtilsTests(SharedModuleStoreTestCase):
             'edly-sub-org': 'cloud',
             'edx-org': 'cloudX'
         }
+        self.course = CourseOverviewFactory()
         RequestCache.clear_all_namespaces()
 
     def _get_stub_session(self, expire_at_browser_close=False, max_age=604800):
@@ -482,3 +489,66 @@ class UtilsTests(SharedModuleStoreTestCase):
                 }
             )
             site_configuration.clean()
+
+    def test_get_marketing_link_with_value(self):
+        """
+        Test marketing link value with name in marketing urls
+        """
+        marketing_urls = {
+            'ROOT': 'http://{}'.format(self.request.site.domain),
+            'PRIVACY': '/fake-privacy-path',
+            'TOS': '/fake-tos-path',
+        }
+        expected_privacy_marketing_link = urljoin(marketing_urls.get('ROOT'), marketing_urls.get('PRIVACY'))
+        privacy_marketing_link = get_marketing_link(marketing_urls, 'PRIVACY')
+        assert expected_privacy_marketing_link == privacy_marketing_link
+
+        expected_tos_marketing_link = urljoin(marketing_urls.get('ROOT'), marketing_urls.get('TOS'))
+        tos_marketing_link = get_marketing_link(marketing_urls, 'TOS')
+        assert expected_tos_marketing_link == tos_marketing_link
+
+    def test_get_marketing_link_without_value(self):
+        """
+        Test marketing link value without name in marketing urls
+        """
+        marketing_urls = {
+            'ROOT': 'http://{}'.format(self.request.site.domain),
+        }
+        expected_marketing_link = ''
+        marketing_link = get_marketing_link(marketing_urls, 'HONOR')
+        assert expected_marketing_link == marketing_link
+
+    @ddt.data(
+        ('edX', 'course-v1:edX+Test+Test_Course', True),
+        ('edly', 'course-v1:edX+Test+Test_Course', False),
+    )
+    @ddt.unpack
+    def test_is_course_org_same_as_site_org(self, edx_org_short_name, course_id, expected_response):
+        """
+        Test "is_course_org_same_as_site_org" for match & mismatch orgs.
+        """
+        EdlySubOrganizationFactory(
+            edx_organization=OrganizationFactory(short_name=edx_org_short_name),
+            lms_site=self.request.site
+        )
+        course_key = CourseKey.from_string(course_id)
+        course = CourseOverviewFactory.create(id=course_key)
+
+        assert expected_response == is_course_org_same_as_site_org(self.request.site, course.id)
+
+    def test_is_course_org_same_as_site_org_for_unlinked_site(self):
+        """
+        Test "is_course_org_same_as_site_org" when unlinked site is passed.
+        """
+        assert False == is_course_org_same_as_site_org(self.request.site, self.course.id)
+
+    def test_is_course_org_same_as_site_org_for_invalid_course_id(self):
+        """
+        Test "is_course_org_same_as_site_org" when invalid "course_id" passed.
+        """
+        EdlySubOrganizationFactory(
+            edx_organization=OrganizationFactory(short_name='edly'),
+            lms_site=self.request.site
+        )
+        course_id = CourseKey.from_string('course-v1:edX+Test+Test_Course')
+        assert False == is_course_org_same_as_site_org(self.request.site, course_id)
