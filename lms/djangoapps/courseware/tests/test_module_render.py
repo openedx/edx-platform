@@ -1225,27 +1225,6 @@ class TestProctoringRendering(SharedModuleStoreTestCase):
 
     @ddt.data(
         (
-            CourseMode.DEFAULT_MODE_SLUG,
-            True,
-            None,
-            'Try a proctored exam',
-            True
-        ),
-        (
-            CourseMode.DEFAULT_MODE_SLUG,
-            True,
-            'submitted',
-            'You have submitted this practice proctored exam',
-            False
-        ),
-        (
-            CourseMode.DEFAULT_MODE_SLUG,
-            True,
-            'error',
-            'There was a problem with your practice proctoring session',
-            True
-        ),
-        (
             CourseMode.VERIFIED,
             False,
             None,
