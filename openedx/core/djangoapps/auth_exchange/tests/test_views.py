@@ -75,6 +75,7 @@ class AccessTokenExchangeViewTest(AccessTokenExchangeTestMixin):
             actual_scopes = []
         assert set(actual_scopes) == set(expected_scopes)
         token = self.oauth2_adapter.get_access_token(token_string=content["access_token"])
+        assert token.user == self.user
         assert self.oauth2_adapter.get_client_for_token(token) == self.oauth_client
         assert set(self.oauth2_adapter.get_token_scope_names(token)) == set(expected_scopes)
 
