@@ -257,7 +257,7 @@ def email_marketing_user_fields_changed(
         if 'country' in fields:
             fields['country'] = str(fields['country'])
         if 'level_of_education' in fields and fields['level_of_education']:
-            fields['level_of_education'] = dict(UserProfile.LEVEL_OF_EDUCATION_CHOICES)[fields['level_of_education']]
+            fields['education'] = dict(UserProfile.LEVEL_OF_EDUCATION_CHOICES)[fields['level_of_education']]
         if 'year_of_birth' in fields:
             fields['yearOfBirth'] = fields.pop('year_of_birth')
         if 'mailing_address' in fields:
