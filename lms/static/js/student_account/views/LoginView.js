@@ -175,12 +175,16 @@
             },
 
             thirdPartyAuth: function(event) {
-                alert("SSO login is disabled at the moment")
+                this.showModel();
                 return
                 var providerUrl = $(event.currentTarget).data('provider-url') || '';
                 if (providerUrl) {
                     window.location.href = providerUrl;
                 }
+            },
+
+            showModel: function() {
+              $("#socialModal").modal("show");
             },
 
             saveSuccess: function() {
@@ -257,7 +261,8 @@
             clearAuthWarning: function() {
                 var query = '.' + this.authWarningJsHook;
                 this.clearFormFeedbackItems(query);
-            }
+            },
+
         });
     });
 }).call(this, define || RequireJS.define);
