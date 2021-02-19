@@ -1479,12 +1479,13 @@ class TestPhotoVerificationResultsCallback(ModuleStoreTestCase, TestVerification
         """
         return True
 
-    def _assert_verification_approved_email(self):
+    def _assert_verification_approved_email(self, expiration_date):
         """Check that a verification approved email was sent."""
         self.assertEqual(len(mail.outbox), 1)
         email = mail.outbox[0]
         self.assertEqual(email.subject, 'Your édX ID verification was approved!')
         self.assertIn('Your édX ID verification photos have been approved', email.body)
+        self.assertIn(expiration_date.strftime("%m/%d/%Y"), email.body)
 
     def _assert_verification_denied_email(self):
         """Check that a verification approved email was sent."""
@@ -1607,7 +1608,7 @@ class TestPhotoVerificationResultsCallback(ModuleStoreTestCase, TestVerification
         self.assertEqual(attempt.expiration_datetime.date(), expiration_datetime.date())
         self.assertIsNone(old_verification.expiry_email_date)
         self.assertEqual(response.content.decode('utf-8'), 'OK!')
-        self._assert_verification_approved_email()
+        self._assert_verification_approved_email(expiration_datetime.date())
 
     @patch(
         'lms.djangoapps.verify_student.ssencrypt.has_valid_signature',
@@ -1641,7 +1642,7 @@ class TestPhotoVerificationResultsCallback(ModuleStoreTestCase, TestVerification
         self.assertEqual(attempt.status, u'approved')
         self.assertEqual(attempt.expiration_datetime.date(), expiration_datetime.date())
         self.assertEqual(response.content.decode('utf-8'), 'OK!')
-        self._assert_verification_approved_email()
+        self._assert_verification_approved_email(expiration_datetime.date())
 
     @patch(
         'lms.djangoapps.verify_student.ssencrypt.has_valid_signature',
