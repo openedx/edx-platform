@@ -6,6 +6,10 @@ from os import path
 from openedx.core.djangoapps.appsembler.settings.settings import aws_common
 
 
+EDX_SITE_REDIRECT_MIDDLEWARE = "django_sites_extensions.middleware.RedirectMiddleware"
+TAHOE_MARKETING_SITE_URL = "https://appsembler.com/tahoe"
+
+
 def _add_theme_static_dirs(settings):
     """
     Appsembler Themes static files customizations.
@@ -49,6 +53,32 @@ def plugin_settings(settings):
     )
 
     aws_common.plugin_settings(settings)
+
+    if settings.APPSEMBLER_FEATURES.get("TAHOE_ENABLE_DOMAIN_REDIRECT_MIDDLEWARE", True):
+        redir_middleware_index = settings.MIDDLEWARE_CLASSES.index(EDX_SITE_REDIRECT_MIDDLEWARE)
+        settings.MIDDLEWARE_CLASSES.insert(
+            redir_middleware_index,  # Insert after Django RedirectMiddleware
+            'openedx.core.djangoapps.appsembler.sites.middleware.CustomDomainsRedirectMiddleware'
+        )
+        settings.MIDDLEWARE_CLASSES.insert(
+            redir_middleware_index + 1,  # Insert after CustomDomainsRedirectMiddleware
+            'openedx.core.djangoapps.appsembler.sites.middleware.RedirectMiddleware'
+        )
+
+        settings.TAHOE_MAIN_SITE_REDIRECT_URL = settings.ENV_TOKENS.get(
+            'TAHOE_MAIN_SITE_REDIRECT_URL', TAHOE_MARKETING_SITE_URL
+        )
+        # This is used in the appsembler_sites.middleware.RedirectMiddleware to exclude certain paths
+        # from the redirect mechanics.
+        settings.MAIN_SITE_REDIRECT_WHITELIST = [
+            'api',
+            'admin',
+            'oauth',
+            'status',
+            '/heartbeat',
+            '/accounts/manage_user_standing',
+            '/accounts/disable_account_ajax',
+        ]
 
     settings.LMS_BASE = settings.ENV_TOKENS.get('LMS_BASE')
 
@@ -98,18 +128,6 @@ def plugin_settings(settings):
 
     if settings.SENTRY_DSN:
         settings.RAVEN_CONFIG['tags']['app'] = 'lms'
-
-    # This is used in the appsembler_sites.middleware.RedirectMiddleware to exclude certain paths
-    # from the redirect mechanics.
-    settings.MAIN_SITE_REDIRECT_WHITELIST = [
-        'api',
-        'admin',
-        'oauth',
-        'status',
-        '/heartbeat',
-        '/accounts/manage_user_standing',
-        '/accounts/disable_account_ajax',
-    ]
 
     settings.USE_S3_FOR_CUSTOMER_THEMES = True
 

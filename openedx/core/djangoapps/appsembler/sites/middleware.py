@@ -2,8 +2,7 @@ import beeline
 import logging
 
 from django.conf import settings
-from django.core.cache import cache, caches
-from django.contrib.redirects.models import Redirect
+from django.core.cache import caches
 from django.shortcuts import redirect
 
 from openedx.core.djangoapps.appsembler.sites.models import AlternativeDomain
@@ -40,8 +39,7 @@ class CustomDomainsRedirectMiddleware(object):
 
 class RedirectMiddleware(object):
     """
-    Redirects requests for URLs persisted using the django.contrib.redirects.models.Redirect model.
-    With the exception of the main site.
+    Redirects requests for main site to Tahoe marketing page, except whitelisted.
     """
     def process_request(self, request):
         """
@@ -55,23 +53,12 @@ class RedirectMiddleware(object):
                 lambda p: p in request.path,
                 settings.MAIN_SITE_REDIRECT_WHITELIST))
             if (site.id == settings.SITE_ID) and not in_whitelist:
-                return redirect("https://appsembler.com/tahoe/")
+                return redirect(settings.TAHOE_MAIN_SITE_REDIRECT_URL)
         except Exception:
             # I'm not entirely sure this middleware get's called only in LMS or in other apps as well.
             # Soooo just in case
             beeline.add_trace_field("redirect_middleware_exception", True)
             pass
-        cache_key = '{prefix}-{site}'.format(prefix=settings.REDIRECT_CACHE_KEY_PREFIX, site=site.domain)
-        redirects = cache.get(cache_key)
-        if redirects is None:
-            redirects = {
-                django_redirect.old_path: django_redirect.new_path
-                for django_redirect in Redirect.objects.filter(site=site)
-            }
-            cache.set(cache_key, redirects, settings.REDIRECT_CACHE_TIMEOUT)
-        redirect_to = redirects.get(request.path)
-        if redirect_to:
-            return redirect(redirect_to, permanent=True)
 
 
 class LmsCurrentOrganizationMiddleware(object):
