@@ -159,7 +159,7 @@ class ConditionalBlockBasicTest(unittest.TestCase):
             for icon_class in ['other', 'problem', 'video']:
                 modules['source_module'].is_attempted = attempted
                 modules['child_module'].get_icon_class = lambda: icon_class  # lint-amnesty, pylint: disable=cell-var-from-loop
-                self.assertEqual(modules['cond_module'].get_icon_class(), icon_class)
+                assert modules['cond_module'].get_icon_class() == icon_class
 
     def test_get_html(self):
         modules = ConditionalFactory.create(self.test_system)
@@ -171,7 +171,7 @@ class ConditionalBlockBasicTest(unittest.TestCase):
             'element_id': u'i4x-edX-conditional_test-conditional-SampleConditional',
             'depends': u'i4x-edX-conditional_test-problem-SampleProblem',
         })
-        self.assertEqual(expected, html)
+        assert expected == html
 
     def test_handle_ajax(self):
         modules = ConditionalFactory.create(self.test_system)
@@ -180,7 +180,7 @@ class ConditionalBlockBasicTest(unittest.TestCase):
         ajax = json.loads(modules['cond_module'].handle_ajax('', ''))
         print("ajax: ", ajax)
         fragments = ajax['fragments']
-        self.assertFalse(any(['This is a secret' in item['content'] for item in fragments]))
+        assert not any([('This is a secret' in item['content']) for item in fragments])
 
         # now change state of the capa problem to make it completed
         modules['source_module'].is_attempted = "true"
@@ -188,7 +188,7 @@ class ConditionalBlockBasicTest(unittest.TestCase):
         modules['cond_module'].save()
         print("post-attempt ajax: ", ajax)
         fragments = ajax['fragments']
-        self.assertTrue(any(['This is a secret' in item['content'] for item in fragments]))
+        assert any([('This is a secret' in item['content']) for item in fragments])
 
     def test_error_as_source(self):
         '''
@@ -199,7 +199,7 @@ class ConditionalBlockBasicTest(unittest.TestCase):
         modules['cond_module'].save()
         ajax = json.loads(modules['cond_module'].handle_ajax('', ''))
         fragments = ajax['fragments']
-        self.assertFalse(any(['This is a secret' in item['content'] for item in fragments]))
+        assert not any([('This is a secret' in item['content']) for item in fragments])
 
     @patch('xmodule.conditional_module.log')
     def test_conditional_with_staff_only_source_module(self, mock_log):
@@ -211,8 +211,8 @@ class ConditionalBlockBasicTest(unittest.TestCase):
         cond_module.save()
         cond_module.is_attempted = "false"
         cond_module.handle_ajax('', '')
-        self.assertFalse(mock_log.warn.called)
-        self.assertIn(None, cond_module.get_required_blocks)
+        assert not mock_log.warn.called
+        assert None in cond_module.get_required_blocks
 
 
 class ConditionalBlockXmlTest(unittest.TestCase):
@@ -236,7 +236,7 @@ class ConditionalBlockXmlTest(unittest.TestCase):
         modulestore = XMLModuleStore(DATA_DIR, source_dirs=[name])
         courses = modulestore.get_courses()
         self.modulestore = modulestore  # lint-amnesty, pylint: disable=attribute-defined-outside-init
-        self.assertEqual(len(courses), 1)
+        assert len(courses) == 1
         return courses[0]
 
     @patch('xmodule.x_module.descriptor_global_local_resource_url')
@@ -285,7 +285,7 @@ class ConditionalBlockXmlTest(unittest.TestCase):
                 'depends': u'i4x-HarvardX-ER22x-problem-choiceprob'
             }
         )
-        self.assertEqual(html, html_expect)
+        assert html == html_expect
 
         gdi = module.get_display_items()
         print("gdi=", gdi)
@@ -294,7 +294,7 @@ class ConditionalBlockXmlTest(unittest.TestCase):
         module.save()
         print("ajax: ", ajax)
         fragments = ajax['fragments']
-        self.assertFalse(any(['This is a secret' in item['content'] for item in fragments]))
+        assert not any([('This is a secret' in item['content']) for item in fragments])
 
         # Now change state of the capa problem to make it completed
         inner_module = inner_get_module(location.replace(category="problem", name='choiceprob'))
@@ -306,7 +306,7 @@ class ConditionalBlockXmlTest(unittest.TestCase):
         module.save()
         print("post-attempt ajax: ", ajax)
         fragments = ajax['fragments']
-        self.assertTrue(any(['This is a secret' in item['content'] for item in fragments]))
+        assert any([('This is a secret' in item['content']) for item in fragments])
 
     maxDiff = None
 
@@ -331,12 +331,8 @@ class ConditionalBlockXmlTest(unittest.TestCase):
         )
 
         new_run = conditional.location.course_key.run  # lint-amnesty, pylint: disable=unused-variable
-        self.assertEqual(
-            conditional.sources_list[0],
-            BlockUsageLocator.from_string(
-                conditional.xml_attributes['sources']
-            ).replace(run=dummy_location.course_key.run)
-        )
+        assert conditional.sources_list[0] == BlockUsageLocator.from_string(conditional.xml_attributes['sources'])\
+            .replace(run=dummy_location.course_key.run)
 
     def test_conditional_module_parse_sources(self):
         dummy_system = Mock()
@@ -353,10 +349,8 @@ class ConditionalBlockXmlTest(unittest.TestCase):
             dummy_field_data,
             dummy_scope_ids,
         )
-        self.assertEqual(
-            conditional.parse_sources(conditional.xml_attributes),
-            ['i4x://HarvardX/ER22x/poll_question/T15_poll', 'i4x://HarvardX/ER22x/poll_question/T16_poll']
-        )
+        assert conditional.parse_sources(conditional.xml_attributes) == ['i4x://HarvardX/ER22x/poll_question/T15_poll',
+                                                                         'i4x://HarvardX/ER22x/poll_question/T16_poll']
 
     def test_conditional_module_parse_attr_values(self):
         root = '<conditional attempted="false"></conditional>'
@@ -369,7 +363,7 @@ class ConditionalBlockXmlTest(unittest.TestCase):
             'conditional_message': ''
         }
 
-        self.assertEqual(definition, expected_definition)
+        assert definition == expected_definition
 
     def test_presence_attributes_in_xml_attributes(self):
         modules = ConditionalFactory.create(self.test_system)
@@ -430,18 +424,18 @@ class ConditionalBlockStudioTest(XModuleXmlImportTest):
 
         context = create_studio_context(self.conditional, False)
         html = self.module_system.render(self.conditional, AUTHOR_VIEW, context).content
-        self.assertIn('This is a secret HTML', html)
+        assert 'This is a secret HTML' in html
 
         context = create_studio_context(self.sequence, True)
         html = self.module_system.render(self.conditional, AUTHOR_VIEW, context).content
-        self.assertNotIn('This is a secret HTML', html)
+        assert 'This is a secret HTML' not in html
 
     def test_non_editable_settings(self):
         """
         Test the settings that are marked as "non-editable".
         """
         non_editable_metadata_fields = self.conditional.non_editable_metadata_fields
-        self.assertIn(ConditionalBlock.due, non_editable_metadata_fields)
+        assert ConditionalBlock.due in non_editable_metadata_fields
 
     def test_validation_messages(self):
         """
@@ -449,10 +443,7 @@ class ConditionalBlockStudioTest(XModuleXmlImportTest):
         """
         self.conditional.sources_list = None
         validation = self.conditional.validate()
-        self.assertEqual(
-            validation.summary.text,
-            u"This component has no source components configured yet."
-        )
-        self.assertEqual(validation.summary.type, StudioValidationMessage.NOT_CONFIGURED)
-        self.assertEqual(validation.summary.action_class, 'edit-button')
-        self.assertEqual(validation.summary.action_label, u"Configure list of sources")
+        assert validation.summary.text == u'This component has no source components configured yet.'
+        assert validation.summary.type == StudioValidationMessage.NOT_CONFIGURED
+        assert validation.summary.action_class == 'edit-button'
+        assert validation.summary.action_label == u'Configure list of sources'

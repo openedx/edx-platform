@@ -24,6 +24,7 @@ import unittest
 import xml.sax.saxutils as saxutils
 from collections import OrderedDict
 
+import pytest
 import six
 from lxml import etree
 from lxml.html import fromstring
@@ -88,7 +89,7 @@ class OptionInputTest(unittest.TestCase):
             'describedby_html': DESCRIBEDBY.format(status_id='sky_input')
         }
 
-        self.assertEqual(context, expected)
+        assert context == expected
 
     def test_option_parsing(self):
         f = inputtypes.OptionInput.parse_options
@@ -98,7 +99,7 @@ class OptionInputTest(unittest.TestCase):
             Take list of options, confirm that output is in the silly doubled format
             """
             expected = [(o, o) for o in options]
-            self.assertEqual(f(input), expected)
+            assert f(input) == expected
 
         check("('a','b')", ['a', 'b'])
         check("('a', 'b')", ['a', 'b'])
@@ -159,7 +160,7 @@ class ChoiceGroupTest(unittest.TestCase):
             'describedby_html': DESCRIBEDBY.format(status_id='sky_input')
         }
 
-        self.assertEqual(context, expected)
+        assert context == expected
 
     def test_choicegroup(self):
         self.check_group('choicegroup', 'radio', '')
@@ -251,7 +252,7 @@ class JSInputTest(unittest.TestCase):
         }
         full_expected_context.update(expected_context)
 
-        self.assertEqual(full_expected_context, context)
+        assert full_expected_context == context
 
 
 class TextLineTest(unittest.TestCase):
@@ -288,7 +289,7 @@ class TextLineTest(unittest.TestCase):
             'response_data': RESPONSE_DATA,
             'describedby_html': DESCRIBEDBY.format(status_id=prob_id)
         }
-        self.assertEqual(context, expected)
+        assert context == expected
 
     def test_math_rendering(self):
         size = "42"
@@ -327,7 +328,7 @@ class TextLineTest(unittest.TestCase):
             'response_data': RESPONSE_DATA,
             'describedby_html': DESCRIBEDBY.format(status_id=prob_id)
         }
-        self.assertEqual(context, expected)
+        assert context == expected
 
     def test_trailing_text_rendering(self):
         size = "42"
@@ -372,7 +373,7 @@ class TextLineTest(unittest.TestCase):
                 'response_data': RESPONSE_DATA,
                 'describedby_html': TRAILING_TEXT_DESCRIBEDBY.format(trailing_text_id=prob_id, status_id=prob_id)
             }
-            self.assertEqual(context, expected)
+            assert context == expected
 
 
 class FileSubmissionTest(unittest.TestCase):
@@ -416,7 +417,7 @@ class FileSubmissionTest(unittest.TestCase):
             'describedby_html': DESCRIBEDBY.format(status_id=prob_id)
         }
 
-        self.assertEqual(context, expected)
+        assert context == expected
 
 
 class CodeInputTest(unittest.TestCase):
@@ -472,7 +473,7 @@ class CodeInputTest(unittest.TestCase):
             'describedby_html': DESCRIBEDBY.format(status_id=prob_id)
         }
 
-        self.assertEqual(context, expected)
+        assert context == expected
 
 
 class MatlabTest(unittest.TestCase):
@@ -534,7 +535,7 @@ class MatlabTest(unittest.TestCase):
             'describedby_html': HTML('aria-describedby="status_prob_1_2"')
         }
 
-        self.assertEqual(context, expected)
+        assert context == expected
 
     def test_rendering_with_state(self):
         state = {
@@ -569,7 +570,7 @@ class MatlabTest(unittest.TestCase):
             'describedby_html': DESCRIBEDBY.format(status_id=prob_id)
         }
 
-        self.assertEqual(context, expected)
+        assert context == expected
 
     def test_rendering_when_completed(self):
         for status in ['correct', 'incorrect']:
@@ -603,7 +604,7 @@ class MatlabTest(unittest.TestCase):
                 'describedby_html': DESCRIBEDBY.format(status_id=prob_id)
             }
 
-            self.assertEqual(context, expected)
+            assert context == expected
 
     @patch('capa.inputtypes.time.time', return_value=10)
     def test_rendering_while_queued(self, time):  # lint-amnesty, pylint: disable=unused-argument
@@ -637,7 +638,7 @@ class MatlabTest(unittest.TestCase):
             'describedby_html': DESCRIBEDBY.format(status_id=prob_id)
         }
 
-        self.assertEqual(context, expected)
+        assert context == expected
 
     def test_plot_data(self):
         data = {'submission': 'x = 1234;'}
@@ -645,19 +646,19 @@ class MatlabTest(unittest.TestCase):
 
         test_capa_system().xqueue['interface'].send_to_queue.assert_called_with(header=ANY, body=ANY)
 
-        self.assertTrue(response['success'])
-        self.assertIsNotNone(self.the_input.input_state['queuekey'])
-        self.assertEqual(self.the_input.input_state['queuestate'], 'queued')
+        assert response['success']
+        assert self.the_input.input_state['queuekey'] is not None
+        assert self.the_input.input_state['queuestate'] == 'queued'
 
     def test_plot_data_failure(self):
         data = {'submission': 'x = 1234;'}
         error_message = 'Error message!'
         test_capa_system().xqueue['interface'].send_to_queue.return_value = (1, error_message)
         response = self.the_input.handle_ajax("plot", data)
-        self.assertFalse(response['success'])
-        self.assertEqual(response['message'], error_message)
-        self.assertNotIn('queuekey', self.the_input.input_state)
-        self.assertNotIn('queuestate', self.the_input.input_state)
+        assert not response['success']
+        assert response['message'] == error_message
+        assert 'queuekey' not in self.the_input.input_state
+        assert 'queuestate' not in self.the_input.input_state
 
     @patch('capa.inputtypes.time.time', return_value=10)
     def test_ungraded_response_success(self, time):  # lint-amnesty, pylint: disable=unused-argument
@@ -674,9 +675,9 @@ class MatlabTest(unittest.TestCase):
         queue_msg = json.dumps({'msg': inner_msg})
 
         the_input.ungraded_response(queue_msg, queuekey)
-        self.assertIsNone(input_state['queuekey'])
-        self.assertIsNone(input_state['queuestate'])
-        self.assertEqual(input_state['queue_msg'], inner_msg)
+        assert input_state['queuekey'] is None
+        assert input_state['queuestate'] is None
+        assert input_state['queue_msg'] == inner_msg
 
     @patch('capa.inputtypes.time.time', return_value=10)
     def test_ungraded_response_key_mismatch(self, time):  # lint-amnesty, pylint: disable=unused-argument
@@ -693,9 +694,9 @@ class MatlabTest(unittest.TestCase):
         queue_msg = json.dumps({'msg': inner_msg})
 
         the_input.ungraded_response(queue_msg, 'abc')
-        self.assertEqual(input_state['queuekey'], queuekey)
-        self.assertEqual(input_state['queuestate'], 'queued')
-        self.assertNotIn('queue_msg', input_state)
+        assert input_state['queuekey'] == queuekey
+        assert input_state['queuestate'] == 'queued'
+        assert 'queue_msg' not in input_state
 
     @patch('capa.inputtypes.time.time', return_value=20)
     def test_matlab_response_timeout_not_exceeded(self, time):  # lint-amnesty, pylint: disable=unused-argument
@@ -704,7 +705,7 @@ class MatlabTest(unittest.TestCase):
         elt = etree.fromstring(self.xml)
 
         the_input = self.input_class(test_capa_system(), elt, state)
-        self.assertEqual(the_input.status, 'queued')
+        assert the_input.status == 'queued'
 
     @patch('capa.inputtypes.time.time', return_value=45)
     def test_matlab_response_timeout_exceeded(self, time):  # lint-amnesty, pylint: disable=unused-argument
@@ -713,8 +714,8 @@ class MatlabTest(unittest.TestCase):
         elt = etree.fromstring(self.xml)
 
         the_input = self.input_class(test_capa_system(), elt, state)
-        self.assertEqual(the_input.status, 'unsubmitted')
-        self.assertEqual(the_input.msg, 'No response from Xqueue within {} seconds. Aborted.'.format(XQUEUE_TIMEOUT))
+        assert the_input.status == 'unsubmitted'
+        assert the_input.msg == 'No response from Xqueue within {} seconds. Aborted.'.format(XQUEUE_TIMEOUT)
 
     @patch('capa.inputtypes.time.time', return_value=20)
     def test_matlab_response_migration_of_queuetime(self, time):  # lint-amnesty, pylint: disable=unused-argument
@@ -725,7 +726,7 @@ class MatlabTest(unittest.TestCase):
         elt = etree.fromstring(self.xml)
 
         the_input = self.input_class(test_capa_system(), elt, state)
-        self.assertEqual(the_input.status, 'unsubmitted')
+        assert the_input.status == 'unsubmitted'
 
     def test_matlab_api_key(self):
         """
@@ -741,8 +742,8 @@ class MatlabTest(unittest.TestCase):
 
         body = system.xqueue['interface'].send_to_queue.call_args[1]['body']
         payload = json.loads(body)
-        self.assertEqual('test_api_key', payload['token'])
-        self.assertEqual('2', payload['endpoint_version'])
+        assert 'test_api_key' == payload['token']
+        assert '2' == payload['endpoint_version']
 
     def test_get_html(self):
         # usual output
@@ -791,17 +792,17 @@ class MatlabTest(unittest.TestCase):
         audio_index = element_tags.index('audio')
 
         six.assertCountEqual(self, element_keys[audio_index], ['autobuffer', 'controls', 'autoplay', 'src'])
-        self.assertEqual(elements[audio_index].get('src'), 'data:audio/wav;base64=')
-        self.assertEqual(elements[audio_index].text, 'Audio is not supported on this browser.')
+        assert elements[audio_index].get('src') == 'data:audio/wav;base64='
+        assert elements[audio_index].text == 'Audio is not supported on this browser.'
         href_index = element_keys.index(['href'])
-        self.assertEqual(elements[href_index].get('href'), 'https://endpoint.mss-mathworks.com/media/filename.wav')
+        assert elements[href_index].get('href') == 'https://endpoint.mss-mathworks.com/media/filename.wav'
         id_index = element_keys.index(['id'])
-        self.assertEqual(elements[id_index].get('id'), 'mwAudioPlaceHolder')
+        assert elements[id_index].get('id') == 'mwAudioPlaceHolder'
         output_string = etree.tostring(output).decode('utf-8')
 
         # check that exception is raised during parsing for html.
         self.the_input.capa_system.render_template = lambda *args: "<aaa"
-        with self.assertRaises(etree.XMLSyntaxError):
+        with pytest.raises(etree.XMLSyntaxError):
             self.the_input.get_html()
 
         self.the_input.capa_system.render_template = old_render_template
@@ -886,7 +887,7 @@ class MatlabTest(unittest.TestCase):
             'response_data': {},
             'describedby_html': 'aria-describedby="status_{id}"'.format(id=prob_id)
         }
-        self.assertEqual(context, expected)
+        assert context == expected
         self.the_input.capa_system.render_template = DemoSystem().render_template
         self.the_input.get_html()  # Should not raise an exception
 
@@ -903,7 +904,7 @@ class MatlabTest(unittest.TestCase):
             }
             elt = etree.fromstring(self.xml)
             the_input = self.input_class(test_capa_system(), elt, state)
-            self.assertEqual(the_input.queue_msg, queue_msg)
+            assert the_input.queue_msg == queue_msg
 
     def test_matlab_queue_message_not_allowed_tag(self):
         """
@@ -918,7 +919,7 @@ class MatlabTest(unittest.TestCase):
         elt = etree.fromstring(self.xml)
         the_input = self.input_class(test_capa_system(), elt, state)
         expected = "&lt;script&gt;Test message&lt;/script&gt;"
-        self.assertEqual(the_input.queue_msg, expected)
+        assert the_input.queue_msg == expected
 
     def test_matlab_sanitize_msg(self):
         """
@@ -927,7 +928,7 @@ class MatlabTest(unittest.TestCase):
         not_allowed_tag = 'script'
         self.the_input.msg = "<{0}>Test message</{0}>".format(not_allowed_tag)
         expected = "&lt;script&gt;Test message&lt;/script&gt;"
-        self.assertEqual(self.the_input._get_render_context()['msg'], expected)  # pylint: disable=protected-access
+        assert self.the_input._get_render_context()['msg'] == expected  # pylint: disable=protected-access
 
 
 def html_tree_equal(received, expected):
@@ -996,7 +997,7 @@ class SchematicTest(unittest.TestCase):
             'describedby_html': DESCRIBEDBY.format(status_id=prob_id)
         }
 
-        self.assertEqual(context, expected)
+        assert context == expected
 
 
 class ImageInputTest(unittest.TestCase):
@@ -1041,7 +1042,7 @@ class ImageInputTest(unittest.TestCase):
             'describedby_html': DESCRIBEDBY.format(status_id=prob_id)
         }
 
-        self.assertEqual(context, expected)
+        assert context == expected
 
     def test_with_value(self):
         # Check that compensating for the dot size works properly.
@@ -1096,7 +1097,7 @@ class CrystallographyTest(unittest.TestCase):
             'describedby_html': DESCRIBEDBY.format(status_id=prob_id)
         }
 
-        self.assertEqual(context, expected)
+        assert context == expected
 
 
 class VseprTest(unittest.TestCase):
@@ -1143,7 +1144,7 @@ class VseprTest(unittest.TestCase):
             'describedby_html': DESCRIBEDBY.format(status_id=prob_id)
         }
 
-        self.assertEqual(context, expected)
+        assert context == expected
 
 
 class ChemicalEquationTest(unittest.TestCase):
@@ -1180,7 +1181,7 @@ class ChemicalEquationTest(unittest.TestCase):
             'response_data': RESPONSE_DATA,
             'describedby_html': DESCRIBEDBY.format(status_id=prob_id)
         }
-        self.assertEqual(context, expected)
+        assert context == expected
 
     def test_chemcalc_ajax_sucess(self):
         """
@@ -1189,24 +1190,24 @@ class ChemicalEquationTest(unittest.TestCase):
         data = {'formula': "H"}
         response = self.the_input.handle_ajax("preview_chemcalc", data)
 
-        self.assertIn('preview', response)
-        self.assertNotEqual(response['preview'], '')
-        self.assertEqual(response['error'], "")
+        assert 'preview' in response
+        assert response['preview'] != ''
+        assert response['error'] == ''
 
     def test_ajax_bad_method(self):
         """
         With a bad dispatch, we shouldn't receive anything
         """
         response = self.the_input.handle_ajax("obviously_not_real", {})
-        self.assertEqual(response, {})
+        assert response == {}
 
     def test_ajax_no_formula(self):
         """
         When we ask for a formula rendering, there should be an error if no formula
         """
         response = self.the_input.handle_ajax("preview_chemcalc", {})
-        self.assertIn('error', response)
-        self.assertEqual(response['error'], "No formula specified.")
+        assert 'error' in response
+        assert response['error'] == 'No formula specified.'
 
     def test_ajax_parse_err(self):
         """
@@ -1220,8 +1221,8 @@ class ChemicalEquationTest(unittest.TestCase):
                 {'formula': 'H2O + invalid chemistry'}
             )
 
-        self.assertIn('error', response)
-        self.assertIn("Couldn't parse formula", response['error'])
+        assert 'error' in response
+        assert "Couldn't parse formula" in response['error']
 
     @patch('capa.inputtypes.log')
     def test_ajax_other_err(self, mock_log):
@@ -1237,8 +1238,8 @@ class ChemicalEquationTest(unittest.TestCase):
         mock_log.warning.assert_called_once_with(
             "Error while previewing chemical formula", exc_info=True
         )
-        self.assertIn('error', response)
-        self.assertEqual(response['error'], "Error while rendering preview")
+        assert 'error' in response
+        assert response['error'] == 'Error while rendering preview'
 
 
 class FormulaEquationTest(unittest.TestCase):
@@ -1277,7 +1278,7 @@ class FormulaEquationTest(unittest.TestCase):
             'response_data': RESPONSE_DATA,
             'describedby_html': DESCRIBEDBY.format(status_id=prob_id)
         }
-        self.assertEqual(context, expected)
+        assert context == expected
 
     def test_trailing_text_rendering(self):
         """
@@ -1324,7 +1325,7 @@ class FormulaEquationTest(unittest.TestCase):
                 'describedby_html': TRAILING_TEXT_DESCRIBEDBY.format(trailing_text_id=prob_id, status_id=prob_id)
             }
 
-            self.assertEqual(context, expected)
+            assert context == expected
 
     def test_formcalc_ajax_sucess(self):
         """
@@ -1333,17 +1334,17 @@ class FormulaEquationTest(unittest.TestCase):
         data = {'formula': "x^2+1/2", 'request_start': 0}
         response = self.the_input.handle_ajax("preview_formcalc", data)
 
-        self.assertIn('preview', response)
-        self.assertNotEqual(response['preview'], '')
-        self.assertEqual(response['error'], "")
-        self.assertEqual(response['request_start'], data['request_start'])
+        assert 'preview' in response
+        assert response['preview'] != ''
+        assert response['error'] == ''
+        assert response['request_start'] == data['request_start']
 
     def test_ajax_bad_method(self):
         """
         With a bad dispatch, we shouldn't receive anything
         """
         response = self.the_input.handle_ajax("obviously_not_real", {})
-        self.assertEqual(response, {})
+        assert response == {}
 
     def test_ajax_no_formula(self):
         """
@@ -1353,8 +1354,8 @@ class FormulaEquationTest(unittest.TestCase):
             "preview_formcalc",
             {'request_start': 1, }
         )
-        self.assertIn('error', response)
-        self.assertEqual(response['error'], "No formula specified.")
+        assert 'error' in response
+        assert response['error'] == 'No formula specified.'
 
     def test_ajax_parse_err(self):
         """
@@ -1368,8 +1369,8 @@ class FormulaEquationTest(unittest.TestCase):
                 {'formula': 'x^2+1/2', 'request_start': 1, }
             )
 
-        self.assertIn('error', response)
-        self.assertEqual(response['error'], "Sorry, couldn't parse formula")
+        assert 'error' in response
+        assert response['error'] == "Sorry, couldn't parse formula"
 
     @patch('capa.inputtypes.log')
     def test_ajax_other_err(self, mock_log):
@@ -1385,8 +1386,8 @@ class FormulaEquationTest(unittest.TestCase):
         mock_log.warning.assert_called_once_with(
             "Error while previewing formula", exc_info=True
         )
-        self.assertIn('error', response)
-        self.assertEqual(response['error'], "Error while rendering preview")
+        assert 'error' in response
+        assert response['error'] == 'Error while rendering preview'
 
 
 class DragAndDropTest(unittest.TestCase):
@@ -1457,10 +1458,10 @@ class DragAndDropTest(unittest.TestCase):
 
         # as we are dumping 'draggables' dicts while dumping user_input, string
         # comparison will fail, as order of keys is random.
-        self.assertEqual(json.loads(context['drag_and_drop_json']), user_input)
+        assert json.loads(context['drag_and_drop_json']) == user_input
         context.pop('drag_and_drop_json')
         expected.pop('drag_and_drop_json')
-        self.assertEqual(context, expected)
+        assert context == expected
 
 
 class AnnotationInputTest(unittest.TestCase):
@@ -1591,7 +1592,7 @@ class TestChoiceText(unittest.TestCase):
         expected.update(state)
         the_input = lookup_tag(tag)(test_capa_system(), element, state)
         context = the_input._get_render_context()  # pylint: disable=protected-access
-        self.assertEqual(context, expected)
+        assert context == expected
 
     def test_radiotextgroup(self):
         """
@@ -1611,7 +1612,7 @@ class TestChoiceText(unittest.TestCase):
         """
         Test to ensure that an unrecognized inputtype tag causes an error
         """
-        with self.assertRaises(Exception):
+        with pytest.raises(Exception):
             self.check_group('invalid', 'choice', 'checkbox')
 
     def test_invalid_input_tag(self):
@@ -1632,8 +1633,8 @@ class TestStatus(unittest.TestCase):
         Test stringifing Status objects
         """
         statobj = inputtypes.Status('test')
-        self.assertEqual(str(statobj), 'test')
-        self.assertEqual(six.text_type(statobj), u'test')
+        assert str(statobj) == 'test'
+        assert six.text_type(statobj) == u'test'
 
     def test_classes(self):
         """
@@ -1648,7 +1649,7 @@ class TestStatus(unittest.TestCase):
         ]
         for status, classname in css_classes:
             statobj = inputtypes.Status(status)
-            self.assertEqual(statobj.classname, classname)
+            assert statobj.classname == classname
 
     def test_display_names(self):
         """
@@ -1665,7 +1666,7 @@ class TestStatus(unittest.TestCase):
         ]
         for status, display_name in names:
             statobj = inputtypes.Status(status)
-            self.assertEqual(statobj.display_name, display_name)
+            assert statobj.display_name == display_name
 
     def test_translated_names(self):
         """
@@ -1674,10 +1675,10 @@ class TestStatus(unittest.TestCase):
         func = lambda t: t.upper()
         # status is in the mapping
         statobj = inputtypes.Status('queued', func)
-        self.assertEqual(statobj.display_name, u'PROCESSING')
+        assert statobj.display_name == u'PROCESSING'
 
         # status is not in the mapping
         statobj = inputtypes.Status('test', func)
-        self.assertEqual(statobj.display_name, u'test')
-        self.assertEqual(str(statobj), 'test')
-        self.assertEqual(statobj.classname, 'test')
+        assert statobj.display_name == u'test'
+        assert str(statobj) == 'test'
+        assert statobj.classname == 'test'

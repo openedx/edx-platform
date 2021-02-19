@@ -91,7 +91,7 @@ class TemplateTestCase(unittest.TestCase):
         message = ("XML does not have %d match(es) for xpath '%s'\nXML: %s\nContext: %s"
                    % (exact_num, str(xpath), etree.tostring(xml_root), str(context_dict)))
 
-        self.assertEqual(len(xml_root.xpath(xpath)), exact_num, msg=message)
+        assert len(xml_root.xpath(xpath)) == exact_num, message
 
     def assert_no_xpath(self, xml_root, xpath, context_dict):
         """
@@ -117,12 +117,11 @@ class TemplateTestCase(unittest.TestCase):
         If no elements are found, the assertion fails.
         """
         element_list = xml_root.xpath(xpath)
-        self.assertGreater(len(element_list), 0, "Could not find element at '%s'\n%s" %
-                           (str(xpath), etree.tostring(xml_root)))
+        assert len(element_list) > 0, ("Could not find element at '%s'\n%s" % (str(xpath), etree.tostring(xml_root)))
         if exact:
-            self.assertEqual(text, element_list[0].text.strip())
+            assert text == element_list[0].text.strip()
         else:
-            self.assertIn(text, element_list[0].text.strip())
+            assert text in element_list[0].text.strip()
 
     def assert_description(self, describedby_xpaths):
         """
@@ -137,17 +136,17 @@ class TemplateTestCase(unittest.TestCase):
         descriptions = OrderedDict(
             (tag.get('id'), stringify_children(tag)) for tag in xml.xpath('//p[@class="question-description"]')
         )
-        self.assertEqual(self.DESCRIPTIONS, descriptions)
+        assert self.DESCRIPTIONS == descriptions
 
         # for each xpath verify that description_ids are set correctly
         for describedby_xpath in describedby_xpaths:
             describedbys = xml.xpath(describedby_xpath)
 
             # aria-describedby attributes must have ids
-            self.assertTrue(describedbys)
+            assert describedbys
 
             for describedby in describedbys:
-                self.assertEqual(describedby, self.DESCRIPTION_IDS)
+                assert describedby == self.DESCRIPTION_IDS
 
     def assert_describedby_attribute(self, describedby_xpaths):
         """
@@ -162,7 +161,7 @@ class TemplateTestCase(unittest.TestCase):
         # for each xpath verify that description_ids are set correctly
         for describedby_xpath in describedby_xpaths:
             describedbys = xml.xpath(describedby_xpath)
-            self.assertFalse(describedbys)
+            assert not describedbys
 
     def assert_status(self, status_div=False, status_class=False):
         """
@@ -234,8 +233,8 @@ class TemplateTestCase(unittest.TestCase):
                 self.assert_has_xpath(xml, "//*[@aria-label='%s']" % label['expected'], self.context)
             else:
                 element_list = xml.xpath(xpath)
-                self.assertEqual(len(element_list), 1)
-                self.assertEqual(stringify_children(element_list[0]), label['actual'])
+                assert len(element_list) == 1
+                assert stringify_children(element_list[0]) == label['actual']
 
 
 class ChoiceGroupTemplateTest(TemplateTestCase):

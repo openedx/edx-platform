@@ -30,7 +30,7 @@ class HelperTest(unittest.TestCase):
     '''
     def check(self, d):
         xml = etree.XML(test_capa_system().render_template('blah', d))
-        self.assertEqual(d, extract_context(xml))
+        assert d == extract_context(xml)
 
     def test_extract_context(self):
         self.check({})
@@ -51,12 +51,12 @@ class SolutionRenderTest(unittest.TestCase):
 
         renderer = lookup_tag('solution')(test_capa_system(), element)
 
-        self.assertEqual(renderer.id, 'solution_12')
+        assert renderer.id == 'solution_12'
 
         # Our test_capa_system "renders" templates to a div with the repr of the context.
         xml = renderer.get_html()
         context = extract_context(xml)
-        self.assertEqual(context, {'id': 'solution_12'})
+        assert context == {'id': 'solution_12'}
 
 
 class MathRenderTest(unittest.TestCase):
@@ -70,7 +70,7 @@ class MathRenderTest(unittest.TestCase):
 
         renderer = lookup_tag('math')(test_capa_system(), element)
 
-        self.assertEqual(renderer.mathstr, mathjax_out)
+        assert renderer.mathstr == mathjax_out
 
     def test_parsing(self):
         self.check_parse('$abc$', '[mathjaxinline]abc[/mathjaxinline]')

@@ -5,7 +5,7 @@ Test capa problem.
 
 import textwrap
 import unittest
-
+import pytest
 import ddt
 import six
 from lxml import etree
@@ -48,17 +48,9 @@ class CAPAProblemTest(unittest.TestCase):
         </problem>
         """.format(question=question)
         problem = new_loncapa_problem(xml)
-        self.assertEqual(
-            problem.problem_data,
-            {
-                '1_2_1':
-                {
-                    'label': question,
-                    'descriptions': {'description_1_1_1': 'Only the paranoid survive.'}
-                }
-            }
-        )
-        self.assertEqual(len(problem.tree.xpath('//label')), 0)
+        assert problem.problem_data ==\
+               {'1_2_1': {'label': question, 'descriptions': {'description_1_1_1': 'Only the paranoid survive.'}}}
+        assert len(problem.tree.xpath('//label')) == 0
 
     @ddt.unpack
     @ddt.data(
@@ -85,20 +77,8 @@ class CAPAProblemTest(unittest.TestCase):
         </problem>
         """.format(question, label_attr)
         problem = new_loncapa_problem(xml)
-        self.assertEqual(
-            problem.problem_data,
-            {
-                '1_2_1':
-                {
-                    'label': question,
-                    'descriptions': {}
-                }
-            }
-        )
-        self.assertEqual(
-            len(problem.tree.xpath("//*[normalize-space(text())='{}']".format(question))),
-            0
-        )
+        assert problem.problem_data == {'1_2_1': {'label': question, 'descriptions': {}}}
+        assert len(problem.tree.xpath("//*[normalize-space(text())='{}']".format(question))) == 0
 
     @ddt.unpack
     @ddt.data(
@@ -137,26 +117,10 @@ class CAPAProblemTest(unittest.TestCase):
         </problem>
         """.format(question1, question2)
         problem = new_loncapa_problem(xml)
-        self.assertEqual(
-            problem.problem_data,
-            {
-                '1_2_1':
-                {
-                    'label': question1,
-                    'descriptions': {}
-                },
-                '1_3_1':
-                {
-                    'label': question2,
-                    'descriptions': {}
-                }
-            }
-        )
+        assert problem.problem_data ==\
+               {'1_2_1': {'label': question1, 'descriptions': {}}, '1_3_1': {'label': question2, 'descriptions': {}}}
         for question in (question1, question2):
-            self.assertEqual(
-                len(problem.tree.xpath('//label[text()="{}"]'.format(question))),
-                0
-            )
+            assert len(problem.tree.xpath('//label[text()="{}"]'.format(question))) == 0
 
     def test_multiple_descriptions(self):
         """
@@ -176,19 +140,9 @@ class CAPAProblemTest(unittest.TestCase):
         </problem>
         """.format(desc1, desc2)
         problem = new_loncapa_problem(xml)
-        self.assertEqual(
-            problem.problem_data,
-            {
-                '1_2_1':
-                {
-                    'label': '___ requires sacrifices.',
-                    'descriptions': {
-                        'description_1_1_1': desc1,
-                        'description_1_1_2': desc2
-                    }
-                }
-            }
-        )
+        assert problem.problem_data ==\
+               {'1_2_1': {'label': '___ requires sacrifices.',
+                          'descriptions': {'description_1_1_1': desc1, 'description_1_1_2': desc2}}}
 
     def test_additional_answer_is_skipped_from_resulting_html(self):
         """Tests that additional_answer element is not present in transformed HTML"""
@@ -204,8 +158,8 @@ class CAPAProblemTest(unittest.TestCase):
         </problem>
         """
         problem = new_loncapa_problem(xml)
-        self.assertEqual(len(problem.extracted_tree.xpath('//additional_answer')), 0)
-        self.assertNotIn('additional_answer', problem.get_html())
+        assert len(problem.extracted_tree.xpath('//additional_answer')) == 0
+        assert 'additional_answer' not in problem.get_html()
 
     def test_non_accessible_inputtype(self):
         """
@@ -223,18 +177,9 @@ class CAPAProblemTest(unittest.TestCase):
         </problem>
         """.format(question, question)
         problem = new_loncapa_problem(xml)
-        self.assertEqual(
-            problem.problem_data,
-            {
-                '1_2_1':
-                {
-                    'label': question,
-                    'descriptions': {}
-                }
-            }
-        )
+        assert problem.problem_data == {'1_2_1': {'label': question, 'descriptions': {}}}
         # <p> tag with question text should not be deleted
-        self.assertEqual(problem.tree.xpath("string(p[text()='{}'])".format(question)), question)
+        assert problem.tree.xpath("string(p[text()='{}'])".format(question)) == question
 
     def test_label_is_empty_if_no_label_attribute(self):
         """
@@ -252,16 +197,7 @@ class CAPAProblemTest(unittest.TestCase):
         </problem>
         """.format(question)
         problem = new_loncapa_problem(xml)
-        self.assertEqual(
-            problem.problem_data,
-            {
-                '1_2_1':
-                {
-                    'label': '',
-                    'descriptions': {}
-                }
-            }
-        )
+        assert problem.problem_data == {'1_2_1': {'label': '', 'descriptions': {}}}
 
     def test_multiple_questions_problem(self):
         """
@@ -294,22 +230,12 @@ class CAPAProblemTest(unittest.TestCase):
         </problem>
         """
         problem = new_loncapa_problem(xml)
-        self.assertEqual(
-            problem.problem_data,
-            {
-                '1_2_1':
-                {
-                    'label': 'Select the correct synonym of paranoid?',
-                    'descriptions': {'description_1_1_1': 'Only the paranoid survive.'}
-                },
-                '1_3_1':
-                {
-                    'label': 'What Apple device competed with the portable CD player?',
-                    'descriptions': {'description_1_2_1': 'Device looks like an egg plant.'}
-                }
-            }
-        )
-        self.assertEqual(len(problem.tree.xpath('//label')), 0)
+        assert problem.problem_data ==\
+               {'1_2_1': {'label': 'Select the correct synonym of paranoid?',
+                          'descriptions': {'description_1_1_1': 'Only the paranoid survive.'}},
+                '1_3_1': {'label': 'What Apple device competed with the portable CD player?',
+                          'descriptions': {'description_1_2_1': 'Device looks like an egg plant.'}}}
+        assert len(problem.tree.xpath('//label')) == 0
 
     def test_question_title_not_removed_got_children(self):
         """
@@ -334,20 +260,8 @@ class CAPAProblemTest(unittest.TestCase):
         </problem>
         """.format(question)
         problem = new_loncapa_problem(xml)
-        self.assertEqual(
-            problem.problem_data,
-            {
-                '1_2_1':
-                {
-                    'label': '',
-                    'descriptions': {}
-                }
-            }
-        )
-        self.assertEqual(
-            len(problem.tree.xpath('//p/img')),
-            1
-        )
+        assert problem.problem_data == {'1_2_1': {'label': '', 'descriptions': {}}}
+        assert len(problem.tree.xpath('//p/img')) == 1
 
     @ddt.unpack
     @ddt.data(
@@ -371,23 +285,9 @@ class CAPAProblemTest(unittest.TestCase):
         """.format(group_label, input1_label, input2_label)
 
         problem = new_loncapa_problem(xml)
-        self.assertEqual(
-            problem.problem_data,
-            {
-                '1_2_1':
-                {
-                    'group_label': group_label,
-                    'label': input1_label,
-                    'descriptions': {}
-                },
-                '1_2_2':
-                {
-                    'group_label': group_label,
-                    'label': input2_label,
-                    'descriptions': {}
-                }
-            }
-        )
+        assert problem.problem_data ==\
+               {'1_2_1': {'group_label': group_label, 'label': input1_label, 'descriptions': {}},
+                '1_2_2': {'group_label': group_label, 'label': input2_label, 'descriptions': {}}}
 
     def test_single_inputtypes(self):
         """
@@ -411,11 +311,11 @@ class CAPAProblemTest(unittest.TestCase):
 
         # verify that only no multi input group div is present
         multi_inputs_group = problem_html.xpath('//div[@class="multi-inputs-group"]')
-        self.assertEqual(len(multi_inputs_group), 0)
+        assert len(multi_inputs_group) == 0
 
         # verify that question is rendered only once
         question = problem_html.xpath("//*[normalize-space(text())='{}']".format(question))
-        self.assertEqual(len(question), 1)
+        assert len(question) == 1
 
     def assert_question_tag(self, question1, question2, tag, label_attr=False):
         """
@@ -449,22 +349,9 @@ class CAPAProblemTest(unittest.TestCase):
             question2_label_attr=question2_label_attr,
         )
         problem = new_loncapa_problem(xml)
-        self.assertEqual(
-            problem.problem_data,
-            {
-                '1_2_1':
-                {
-                    'label': question1,
-                    'descriptions': {}
-                },
-                '1_3_1':
-                {
-                    'label': question2,
-                    'descriptions': {}
-                }
-            }
-        )
-        self.assertEqual(len(problem.tree.xpath('//{}'.format(tag))), 0)
+        assert problem.problem_data ==\
+               {'1_2_1': {'label': question1, 'descriptions': {}}, '1_3_1': {'label': question2, 'descriptions': {}}}
+        assert len(problem.tree.xpath('//{}'.format(tag))) == 0
 
     @ddt.unpack
     @ddt.data(
@@ -505,10 +392,10 @@ class CAPAProblemTest(unittest.TestCase):
             </optionresponse>
         </problem>
         """
-        with self.assertRaises(LoncapaProblemError):
+        with pytest.raises(LoncapaProblemError):
             new_loncapa_problem(xml.format(correctness=True))
         problem = new_loncapa_problem(xml.format(correctness=False))
-        self.assertIsNotNone(problem)
+        assert problem is not None
 
 
 @ddt.ddt
@@ -524,7 +411,7 @@ class CAPAMultiInputProblemTest(unittest.TestCase):
     def assert_problem_data(self, problem_data):
         """Verify problem data is in expected state"""
         for problem_value in six.viewvalues(problem_data):
-            self.assertIsInstance(problem_value['label'], Markup)
+            assert isinstance(problem_value['label'], Markup)
 
     def assert_problem_html(self, problem_html, group_label, *input_labels):
         """
@@ -541,24 +428,24 @@ class CAPAMultiInputProblemTest(unittest.TestCase):
         multi_inputs_group = html.xpath(
             '//div[@class="wrapper-problem-response"]/div[@class="multi-inputs-group"]'
         )
-        self.assertEqual(len(multi_inputs_group), 1)
+        assert len(multi_inputs_group) == 1
 
         if group_label is None:
             # if multi inputs group label is not present then there shouldn't be `aria-labelledby` attribute
-            self.assertEqual(multi_inputs_group[0].attrib.get('aria-labelledby'), None)
+            assert multi_inputs_group[0].attrib.get('aria-labelledby') is None
         else:
             # verify that multi input group label <p> tag exists and its
             # id matches with correct multi input group aria-labelledby
             multi_inputs_group_label_id = multi_inputs_group[0].attrib.get('aria-labelledby')
             multi_inputs_group_label = html.xpath('//p[@id="{}"]'.format(multi_inputs_group_label_id))
-            self.assertEqual(len(multi_inputs_group_label), 1)
-            self.assertEqual(multi_inputs_group_label[0].text, group_label)
+            assert len(multi_inputs_group_label) == 1
+            assert multi_inputs_group_label[0].text == group_label
 
         # verify that label for each input comes only once
         for input_label in input_labels:
             # normalize-space is used to remove whitespace around the text
             input_label_element = multi_inputs_group[0].xpath('//*[normalize-space(text())="{}"]'.format(input_label))
-            self.assertEqual(len(input_label_element), 1)
+            assert len(input_label_element) == 1
 
     @ddt.unpack
     @ddt.data(
@@ -646,13 +533,13 @@ class CAPAMultiInputProblemTest(unittest.TestCase):
         description_ids = multi_inputs_group.attrib.get('aria-describedby', '').split()
 
         # Verify that number of descriptions matches description_ids
-        self.assertEqual(len(description_ids), len(descriptions))
+        assert len(description_ids) == len(descriptions)
 
         # For each description, check its order and text is correct
         for index, description_id in enumerate(description_ids):
             description_element = multi_inputs_group.xpath('//p[@id="{}"]'.format(description_id))
-            self.assertEqual(len(description_element), 1)
-            self.assertEqual(description_element[0].text, descriptions[index])
+            assert len(description_element) == 1
+            assert description_element[0].text == descriptions[index]
 
 
 @ddt.ddt
@@ -678,7 +565,7 @@ class CAPAProblemReportHelpersTest(unittest.TestCase):
             }
         }
         with patch.object(problem, 'problem_data', mock_problem_data):
-            self.assertEqual(problem.find_question_label(answer_id), stripped_label)
+            assert problem.find_question_label(answer_id) == stripped_label
 
     @ddt.data(None, dict(), [None])
     def test_find_answer_test_not_implemented(self, current_answer):
@@ -718,7 +605,7 @@ class CAPAProblemReportHelpersTest(unittest.TestCase):
             </problem>
             """
         )
-        self.assertEqual(problem.find_answer_text(answer_id, choice_id), answer_text)
+        assert problem.find_answer_text(answer_id, choice_id) == answer_text
 
     @ddt.data(
         # Test for ChoiceResponse
@@ -756,7 +643,7 @@ class CAPAProblemReportHelpersTest(unittest.TestCase):
             </problem>
             """
         )
-        self.assertEqual(problem.find_correct_answer_text(answer_id), answer_text)
+        assert problem.find_correct_answer_text(answer_id) == answer_text
 
     def test_find_answer_text_textinput(self):
         problem = new_loncapa_problem(
@@ -768,7 +655,7 @@ class CAPAProblemReportHelpersTest(unittest.TestCase):
             </problem>
             """
         )
-        self.assertEqual(problem.find_answer_text('1_2_1', 'hide'), 'hide')
+        assert problem.find_answer_text('1_2_1', 'hide') == 'hide'
 
     def test_get_question_answer(self):
         problem = new_loncapa_problem(
@@ -789,4 +676,4 @@ class CAPAProblemReportHelpersTest(unittest.TestCase):
 
         # Ensure that the answer is a string so that the dict returned from this
         # function can eventualy be serialized to json without issues.
-        self.assertIsInstance(problem.get_question_answers()['1_solution_1'], six.text_type)
+        assert isinstance(problem.get_question_answers()['1_solution_1'], six.text_type)

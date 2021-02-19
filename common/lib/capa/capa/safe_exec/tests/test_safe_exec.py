@@ -26,19 +26,19 @@ class TestSafeExec(unittest.TestCase):  # lint-amnesty, pylint: disable=missing-
     def test_set_values(self):
         g = {}
         safe_exec("a = 17", g)
-        self.assertEqual(g['a'], 17)
+        assert g['a'] == 17
 
     def test_division(self):
         g = {}
         # Future division: 1/2 is 0.5.
         safe_exec("a = 1/2", g)
-        self.assertEqual(g['a'], 0.5)
+        assert g['a'] == 0.5
 
     def test_assumed_imports(self):
         g = {}
         # Math is always available.
         safe_exec("a = int(math.pi)", g)
-        self.assertEqual(g['a'], 3)
+        assert g['a'] == 3
 
     def test_random_seeding(self):
         g = {}
@@ -47,11 +47,11 @@ class TestSafeExec(unittest.TestCase):  # lint-amnesty, pylint: disable=missing-
 
         # Without a seed, the results are unpredictable
         safe_exec("rnums = [random.randint(0, 999) for _ in xrange(100)]", g)
-        self.assertNotEqual(g['rnums'], rnums)
+        assert g['rnums'] != rnums
 
         # With a seed, the results are predictable
         safe_exec("rnums = [random.randint(0, 999) for _ in xrange(100)]", g, random_seed=17)
-        self.assertEqual(g['rnums'], rnums)
+        assert g['rnums'] == rnums
 
     def test_random_is_still_importable(self):
         g = {}
@@ -63,7 +63,7 @@ class TestSafeExec(unittest.TestCase):  # lint-amnesty, pylint: disable=missing-
             "import random\n"
             "rnums = [random.randint(0, 999) for _ in xrange(100)]\n",
             g, random_seed=17)
-        self.assertEqual(g['rnums'], rnums)
+        assert g['rnums'] == rnums
 
     def test_python_lib(self):
         pylib = os.path.dirname(__file__) + "/test_files/pylib"
@@ -75,9 +75,9 @@ class TestSafeExec(unittest.TestCase):  # lint-amnesty, pylint: disable=missing-
 
     def test_raising_exceptions(self):
         g = {}
-        with self.assertRaises(SafeExecException) as cm:
+        with pytest.raises(SafeExecException) as cm:
             safe_exec("1/0", g)
-        self.assertIn("ZeroDivisionError", text_type(cm.exception))
+        assert 'ZeroDivisionError' in text_type(cm.exception)
 
 
 class TestSafeOrNot(unittest.TestCase):  # lint-amnesty, pylint: disable=missing-class-docstring
@@ -87,7 +87,7 @@ class TestSafeOrNot(unittest.TestCase):  # lint-amnesty, pylint: disable=missing
             pytest.skip()
 
         g = {}
-        with self.assertRaises(SafeExecException) as cm:
+        with pytest.raises(SafeExecException) as cm:
             safe_exec("import os; files = os.listdir('/')", g)
         assert "OSError" in text_type(cm.exception)
         assert "Permission denied" in text_type(cm.exception)
@@ -95,7 +95,7 @@ class TestSafeOrNot(unittest.TestCase):  # lint-amnesty, pylint: disable=missing
     def test_can_do_something_forbidden_if_run_unsafely(self):
         g = {}
         safe_exec("import os; files = os.listdir('/')", g, unsafely=True)
-        self.assertEqual(g['files'], os.listdir('/'))
+        assert g['files'] == os.listdir('/')
 
 
 class TestLimitConfiguration(unittest.TestCase):
@@ -199,16 +199,16 @@ class TestSafeExecCaching(unittest.TestCase):
 
         # Cache miss
         safe_exec("a = int(math.pi)", g, cache=DictCache(cache))
-        self.assertEqual(g['a'], 3)
+        assert g['a'] == 3
         # A result has been cached
-        self.assertEqual(list(cache.values())[0], (None, {'a': 3}))
+        assert list(cache.values())[0] == (None, {'a': 3})
 
         # Fiddle with the cache, then try it again.
         cache[list(cache.keys())[0]] = (None, {'a': 17})
 
         g = {}
         safe_exec("a = int(math.pi)", g, cache=DictCache(cache))
-        self.assertEqual(g['a'], 17)
+        assert g['a'] == 17
 
     def test_cache_large_code_chunk(self):
         # Caching used to die on memcache with more than 250 bytes of code.
@@ -218,7 +218,7 @@ class TestSafeExecCaching(unittest.TestCase):
         g = {}
         cache = {}
         safe_exec(code, g, cache=DictCache(cache))
-        self.assertEqual(g['a'], 12345)
+        assert g['a'] == 12345
 
     def test_cache_exceptions(self):
         # Used to be that running code that raised an exception didn't cache
@@ -226,28 +226,28 @@ class TestSafeExecCaching(unittest.TestCase):
         code = "1/0"
         g = {}
         cache = {}
-        with self.assertRaises(SafeExecException):
+        with pytest.raises(SafeExecException):
             safe_exec(code, g, cache=DictCache(cache))
 
         # The exception should be in the cache now.
-        self.assertEqual(len(cache), 1)
+        assert len(cache) == 1
         cache_exc_msg, cache_globals = list(cache.values())[0]  # lint-amnesty, pylint: disable=unused-variable
-        self.assertIn("ZeroDivisionError", cache_exc_msg)
+        assert 'ZeroDivisionError' in cache_exc_msg
 
         # Change the value stored in the cache, the result should change.
         cache[list(cache.keys())[0]] = ("Hey there!", {})
 
-        with self.assertRaises(SafeExecException):
+        with pytest.raises(SafeExecException):
             safe_exec(code, g, cache=DictCache(cache))
 
-        self.assertEqual(len(cache), 1)
+        assert len(cache) == 1
         cache_exc_msg, cache_globals = list(cache.values())[0]
-        self.assertEqual("Hey there!", cache_exc_msg)
+        assert 'Hey there!' == cache_exc_msg
 
         # Change it again, now no exception!
         cache[list(cache.keys())[0]] = (None, {'a': 17})
         safe_exec(code, g, cache=DictCache(cache))
-        self.assertEqual(g['a'], 17)
+        assert g['a'] == 17
 
     def test_unicode_submission(self):
         # Check that using non-ASCII unicode does not raise an encoding error.
@@ -288,8 +288,8 @@ class TestUpdateHash(unittest.TestCase):
             del d2[i]
 
         # Check that our dicts are equal, but with different key order.
-        self.assertEqual(d1, d2)
-        self.assertNotEqual(list(d1.keys()), list(d2.keys()))
+        assert d1 == d2
+        assert list(d1.keys()) != list(d2.keys())
 
         return d1, d2
 
@@ -298,19 +298,19 @@ class TestUpdateHash(unittest.TestCase):
         h10 = self.hash_obj(10)
         hs1 = self.hash_obj("1")
 
-        self.assertNotEqual(h1, h10)
-        self.assertNotEqual(h1, hs1)
+        assert h1 != h10
+        assert h1 != hs1
 
     def test_list_ordering(self):
         h1 = self.hash_obj({'a': [1, 2, 3]})
         h2 = self.hash_obj({'a': [3, 2, 1]})
-        self.assertNotEqual(h1, h2)
+        assert h1 != h2
 
     def test_dict_ordering(self):
         d1, d2 = self.equal_but_different_dicts()
         h1 = self.hash_obj(d1)
         h2 = self.hash_obj(d2)
-        self.assertEqual(h1, h2)
+        assert h1 == h2
 
     def test_deep_ordering(self):
         d1, d2 = self.equal_but_different_dicts()
@@ -318,7 +318,7 @@ class TestUpdateHash(unittest.TestCase):
         o2 = {'a': [1, 2, [d2], 3, 4]}
         h1 = self.hash_obj(o1)
         h2 = self.hash_obj(o2)
-        self.assertEqual(h1, h2)
+        assert h1 == h2
 
 
 class TestRealProblems(unittest.TestCase):  # lint-amnesty, pylint: disable=missing-class-docstring
@@ -386,4 +386,4 @@ class TestRealProblems(unittest.TestCase):  # lint-amnesty, pylint: disable=miss
             """)
         g = {}
         safe_exec(code, g)
-        self.assertIn("aVAP", g)
+        assert 'aVAP' in g

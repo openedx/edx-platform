@@ -48,11 +48,11 @@ class WordCloudBlockTest(TestCase):
             CourseLocator('org', 'course', 'run', branch='revision'), 'word_cloud', 'block_id'
         )
 
-        self.assertEqual(block.display_name, 'Favorite Fruits')
-        self.assertFalse(block.display_student_percents)
-        self.assertEqual(block.instructions, 'What are your favorite fruits?')
-        self.assertEqual(block.num_inputs, 3)
-        self.assertEqual(block.num_top_words, 100)
+        assert block.display_name == 'Favorite Fruits'
+        assert not block.display_student_percents
+        assert block.instructions == 'What are your favorite fruits?'
+        assert block.num_inputs == 3
+        assert block.num_top_words == 100
 
         node = etree.Element("unknown_root")
         # This will export the olx to a separate file.
@@ -60,7 +60,7 @@ class WordCloudBlockTest(TestCase):
         with runtime.export_fs.open(u'word_cloud/block_id.xml') as f:
             exported_xml = f.read()
 
-        self.assertEqual(exported_xml, original_xml)
+        assert exported_xml == original_xml
 
     def test_bad_ajax_request(self):
         """
@@ -86,9 +86,9 @@ class WordCloudBlockTest(TestCase):
 
         post_data = MultiDict(('student_words[]', word) for word in ['cat', 'cat', 'dog', 'sun'])
         response = json.loads(block.handle_ajax('submit', post_data))
-        self.assertEqual(response['status'], 'success')
-        self.assertEqual(response['submitted'], True)
-        self.assertEqual(response['total_count'], 22)
+        assert response['status'] == 'success'
+        assert response['submitted'] is True
+        assert response['total_count'] == 22
         self.assertDictEqual(
             response['student_words'],
             {'sun': 1, 'dog': 6, 'cat': 12}
@@ -103,7 +103,7 @@ class WordCloudBlockTest(TestCase):
              {'text': 'sun', 'size': 1, 'percent': 4.0}]
         )
 
-        self.assertEqual(100.0, sum(i['percent'] for i in response['top_words']))
+        assert 100.0 == sum((i['percent'] for i in response['top_words']))
 
     def test_indexibility(self):
         """
@@ -112,13 +112,7 @@ class WordCloudBlockTest(TestCase):
 
         module_system = get_test_system()
         block = WordCloudBlock(module_system, DictFieldData(self.raw_field_data), Mock())
-        self.assertEqual(
-            block.index_dictionary(),
-            {
-                'content_type': 'Word Cloud',
-                'content': {
-                    'display_name': 'Word Cloud Block',
-                    'instructions': 'Enter some random words that comes to your mind'
-                }
-            }
-        )
+        assert block.index_dictionary() ==\
+               {'content_type': 'Word Cloud',
+                'content': {'display_name': 'Word Cloud Block',
+                            'instructions': 'Enter some random words that comes to your mind'}}

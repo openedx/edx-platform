@@ -65,8 +65,8 @@ class CapaHtmlRenderTest(unittest.TestCase):
 
         # Expect that the include file was embedded in the problem
         test_element = rendered_html.find("test")
-        self.assertEqual(test_element.tag, "test")
-        self.assertEqual(test_element.text, "Test include")
+        assert test_element.tag == 'test'
+        assert test_element.text == 'Test include'
 
     def test_process_outtext(self):
         # Generate some XML with <startouttext /> and <endouttext />
@@ -85,7 +85,7 @@ class CapaHtmlRenderTest(unittest.TestCase):
         # Expect that the <startouttext /> and <endouttext />
         # were converted to <span></span> tags
         span_element = rendered_html.find('span')
-        self.assertEqual(span_element.text, 'Test text')
+        assert span_element.text == 'Test text'
 
     def test_anonymous_student_id(self):
         # make sure anonymous_student_id is rendered properly as a context variable
@@ -103,7 +103,7 @@ class CapaHtmlRenderTest(unittest.TestCase):
 
         # Expect that the anonymous_student_id was converted to "student"
         span_element = rendered_html.find('span')
-        self.assertEqual(span_element.text, 'Welcome student')
+        assert span_element.text == 'Welcome student'
 
     def test_render_script(self):
         # Generate some XML with a <script> tag
@@ -121,7 +121,7 @@ class CapaHtmlRenderTest(unittest.TestCase):
 
         # Expect that the script element has been removed from the rendered HTML
         script_element = rendered_html.find('script')
-        self.assertEqual(None, script_element)
+        assert script_element is None
 
     def test_render_javascript(self):
         # Generate some XML with a <script> tag
@@ -138,10 +138,7 @@ class CapaHtmlRenderTest(unittest.TestCase):
         rendered_html = etree.XML(problem.get_html())
 
         # expect the javascript is still present in the rendered html
-        self.assertIn(
-            "<script type=\"text/javascript\">function(){}</script>",
-            etree.tostring(rendered_html).decode('utf-8')
-        )
+        assert '<script type="text/javascript">function(){}</script>' in etree.tostring(rendered_html).decode('utf-8')
 
     def test_render_response_xml(self):
         # Generate some XML for a string response
@@ -162,23 +159,23 @@ class CapaHtmlRenderTest(unittest.TestCase):
         problem = new_loncapa_problem(xml_str, capa_system=the_system)
         rendered_html = etree.XML(problem.get_html())
         # Expect problem has been turned into a <div>
-        self.assertEqual(rendered_html.tag, "div")
+        assert rendered_html.tag == 'div'
 
         # Expect that the response has been turned into a <div> with correct attributes
         response_element = rendered_html.find('div')
 
-        self.assertEqual(response_element.tag, "div")
-        self.assertEqual(response_element.attrib["aria-label"], "Question 1")
+        assert response_element.tag == 'div'
+        assert response_element.attrib['aria-label'] == 'Question 1'
 
         # Expect that the response div.wrapper-problem-response
         # that contains a <div> for the textline
         textline_element = response_element.find('div')
-        self.assertEqual(textline_element.text, 'Input Template Render')
+        assert textline_element.text == 'Input Template Render'
 
         # Expect a child <div> for the solution
         # with the rendered template
         solution_element = rendered_html.xpath('//div[@class="input-template-render"]')[0]
-        self.assertEqual(solution_element.text, 'Input Template Render')
+        assert solution_element.text == 'Input Template Render'
 
         # Expect that the template renderer was called with the correct
         # arguments, once for the textline input and once for
@@ -208,10 +205,7 @@ class CapaHtmlRenderTest(unittest.TestCase):
             mock.call('solutionspan.html', expected_solution_context)
         ]
 
-        self.assertEqual(
-            the_system.render_template.call_args_list,
-            expected_calls
-        )
+        assert the_system.render_template.call_args_list == expected_calls
 
     def test_correct_aria_label(self):
         xml = """
@@ -233,8 +227,8 @@ class CapaHtmlRenderTest(unittest.TestCase):
         problem = new_loncapa_problem(xml)
         rendered_html = etree.XML(problem.get_html())
         response_elements = rendered_html.findall('div')
-        self.assertEqual(response_elements[0].attrib['aria-label'], 'Question 1')
-        self.assertEqual(response_elements[1].attrib['aria-label'], 'Question 2')
+        assert response_elements[0].attrib['aria-label'] == 'Question 1'
+        assert response_elements[1].attrib['aria-label'] == 'Question 2'
 
     def test_render_response_with_overall_msg(self):
         # CustomResponse script that sets an overall_message
@@ -261,16 +255,16 @@ class CapaHtmlRenderTest(unittest.TestCase):
         # Expect that there is a <div> within the response <div>
         # with css class response_message
         msg_div_element = rendered_html.find(".//div[@class='response_message']")
-        self.assertEqual(msg_div_element.tag, "div")
-        self.assertEqual(msg_div_element.get('class'), "response_message")
+        assert msg_div_element.tag == 'div'
+        assert msg_div_element.get('class') == 'response_message'
 
         # Expect that the <div> contains our message (as part of the XML tree)
         msg_p_elements = msg_div_element.findall('p')
-        self.assertEqual(msg_p_elements[0].tag, "p")
-        self.assertEqual(msg_p_elements[0].text, "Test message 1")
+        assert msg_p_elements[0].tag == 'p'
+        assert msg_p_elements[0].text == 'Test message 1'
 
-        self.assertEqual(msg_p_elements[1].tag, "p")
-        self.assertEqual(msg_p_elements[1].text, "Test message 2")
+        assert msg_p_elements[1].tag == 'p'
+        assert msg_p_elements[1].text == 'Test message 2'
 
     def test_substitute_python_vars(self):
         # Generate some XML with Python variables defined in a script
@@ -288,7 +282,7 @@ class CapaHtmlRenderTest(unittest.TestCase):
 
         # Expect that the variable $test has been replaced with its value
         span_element = rendered_html.find('span')
-        self.assertEqual(span_element.get('attr'), "TEST")
+        assert span_element.get('attr') == 'TEST'
 
     def test_xml_comments_and_other_odd_things(self):
         # Comments and processing instructions should be skipped.
