@@ -3,9 +3,10 @@ Tests for the rss_proxy views
 """
 
 
+from unittest.mock import Mock, patch
+
 from django.test import TestCase
 from django.urls import reverse
-from mock import Mock, patch
 
 from lms.djangoapps.rss_proxy.models import WhitelistedRssUrl
 
@@ -14,7 +15,7 @@ class RssProxyViewTests(TestCase):
     """ Tests for the rss_proxy views """
 
     def setUp(self):
-        super(RssProxyViewTests, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
 
         self.whitelisted_url1 = 'http://www.example.com'
         self.whitelisted_url2 = 'http://www.example.org'
@@ -45,7 +46,7 @@ class RssProxyViewTests(TestCase):
         Test the proxy view with a whitelisted URL
         """
         mock_requests_get.return_value = Mock(status_code=200, content=self.rss)
-        resp = self.client.get('%s?url=%s' % (reverse('rss_proxy:proxy'), self.whitelisted_url1))
+        resp = self.client.get('{}?url={}'.format(reverse('rss_proxy:proxy'), self.whitelisted_url1))
         assert resp.status_code == 200
         assert resp['Content-Type'] == 'application/xml'
         assert resp.content.decode('utf-8') == self.rss
@@ -56,7 +57,7 @@ class RssProxyViewTests(TestCase):
         Test the proxy view with a whitelisted URL that is not found
         """
         mock_requests_get.return_value = Mock(status_code=404)
-        resp = self.client.get('%s?url=%s' % (reverse('rss_proxy:proxy'), self.whitelisted_url2))
+        resp = self.client.get('{}?url={}'.format(reverse('rss_proxy:proxy'), self.whitelisted_url2))
         print(resp.status_code)
         print(resp.content)
         print(resp['Content-Type'])
@@ -68,5 +69,5 @@ class RssProxyViewTests(TestCase):
         """
         Test the proxy view with a non-whitelisted URL
         """
-        resp = self.client.get('%s?url=%s' % (reverse('rss_proxy:proxy'), self.non_whitelisted_url))
+        resp = self.client.get('{}?url={}'.format(reverse('rss_proxy:proxy'), self.non_whitelisted_url))
         assert resp.status_code == 404
