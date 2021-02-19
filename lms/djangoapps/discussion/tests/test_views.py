@@ -123,7 +123,7 @@ class ViewsExceptionTestCase(UrlResetMixin, ModuleStoreTestCase):  # lint-amnest
         url = reverse('user_profile',
                       kwargs={'course_id': text_type(self.course.id), 'user_id': '12345'})  # There is no user 12345
         response = self.client.get(url)
-        self.assertEqual(response.status_code, 404)
+        assert response.status_code == 404
 
     @patch('common.djangoapps.student.models.cc.User.from_django_user')
     @patch('common.djangoapps.student.models.cc.User.subscribed_threads')
@@ -140,7 +140,7 @@ class ViewsExceptionTestCase(UrlResetMixin, ModuleStoreTestCase):  # lint-amnest
         url = reverse('followed_threads',
                       kwargs={'course_id': text_type(self.course.id), 'user_id': '12345'})  # There is no user 12345
         response = self.client.get(url)
-        self.assertEqual(response.status_code, 404)
+        assert response.status_code == 404
 
 
 def make_mock_thread_data(  # lint-amnesty, pylint: disable=missing-function-docstring
@@ -331,14 +331,16 @@ class SingleThreadTestCase(ForumsEnableMixin, ModuleStoreTestCase):  # lint-amne
             "test_thread_id"
         )
 
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
         response_data = json.loads(response.content.decode('utf-8'))
         # strip_none is being used to perform the same transform that the
         # django view performs prior to writing thread data to the response
-        self.assertEqual(
-            response_data["content"],
-            strip_none(make_mock_thread_data(course=self.course, text=text, thread_id=thread_id, num_children=1))
-        )
+        assert response_data['content'] == strip_none(make_mock_thread_data(
+            course=self.course,
+            text=text,
+            thread_id=thread_id,
+            num_children=1
+        ))
         mock_request.assert_called_with(
             "get",
             StringEndsWithMatcher(thread_id),  # url
@@ -367,14 +369,16 @@ class SingleThreadTestCase(ForumsEnableMixin, ModuleStoreTestCase):  # lint-amne
             "dummy_discussion_id",
             "test_thread_id"
         )
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
         response_data = json.loads(response.content.decode('utf-8'))
         # strip_none is being used to perform the same transform that the
         # django view performs prior to writing thread data to the response
-        self.assertEqual(
-            response_data["content"],
-            strip_none(make_mock_thread_data(course=self.course, text=text, thread_id=thread_id, num_children=1))
-        )
+        assert response_data['content'] == strip_none(make_mock_thread_data(
+            course=self.course,
+            text=text,
+            thread_id=thread_id,
+            num_children=1
+        ))
         mock_request.assert_called_with(
             "get",
             StringEndsWithMatcher(thread_id),  # url
@@ -398,7 +402,7 @@ class SingleThreadTestCase(ForumsEnableMixin, ModuleStoreTestCase):  # lint-amne
             "dummy_discussion_id",
             "dummy_thread_id"
         )
-        self.assertEqual(response.status_code, 405)
+        assert response.status_code == 405
 
     def test_not_found(self, mock_request):
         request = RequestFactory().get("dummy_url")
@@ -437,17 +441,14 @@ class SingleThreadTestCase(ForumsEnableMixin, ModuleStoreTestCase):  # lint-amne
                     'thread_id': thread_id,
                 })
             )
-            self.assertEqual(response.status_code, 200)
-            self.assertEqual(response['Content-Type'], 'text/html; charset=utf-8')
+            assert response.status_code == 200
+            assert response['Content-Type'] == 'text/html; charset=utf-8'
             html = response.content.decode('utf-8')
             # Verify that the access denied error message is in the HTML
-            self.assertIn(
-                'This is a private discussion. You do not have permissions to view this discussion',
-                html
-            )
+            assert 'This is a private discussion. You do not have permissions to view this discussion' in html
 
 
-class AllowPlusOrMinusOneInt(int):
+class AllowPlusOrMinusOneInt(int):  # pylint: disable=eq-without-hash
     """
     A workaround for the fact that assertNumQueries doesn't let you
     specify a range or any tolerance. An 'int' that is 'equal to' its value,
@@ -535,11 +536,8 @@ class SingleThreadQueryCountTestCase(ForumsEnableMixin, ModuleStoreTestCase):
                     "dummy_discussion_id",
                     test_thread_id
                 )
-            self.assertEqual(response.status_code, 200)
-            self.assertEqual(
-                len(json.loads(response.content.decode('utf-8'))["content"]["children"]),
-                num_thread_responses
-            )
+            assert response.status_code == 200
+            assert len(json.loads(response.content.decode('utf-8'))['content']['children']) == num_thread_responses
 
         # Test uncached first, then cached now that the cache is warm.
         cached_calls = [
@@ -584,20 +582,17 @@ class SingleCohortedThreadTestCase(CohortedTestCase):  # lint-amnesty, pylint: d
             mock_thread_id
         )
 
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
         response_data = json.loads(response.content.decode('utf-8'))
-        self.assertEqual(
-            response_data["content"],
-            make_mock_thread_data(
-                course=self.course,
-                commentable_id="cohorted_topic",
-                text=mock_text,
-                thread_id=mock_thread_id,
-                num_children=1,
-                group_id=self.student_cohort.id,
-                group_name=self.student_cohort.name,
-                is_commentable_divided=True,
-            )
+        assert response_data['content'] == make_mock_thread_data(
+            course=self.course,
+            commentable_id='cohorted_topic',
+            text=mock_text,
+            thread_id=mock_thread_id,
+            num_children=1,
+            group_id=self.student_cohort.id,
+            group_name=self.student_cohort.name,
+            is_commentable_divided=True
         )
 
     def test_html(self, mock_request):
@@ -612,8 +607,8 @@ class SingleCohortedThreadTestCase(CohortedTestCase):  # lint-amnesty, pylint: d
             })
         )
 
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response['Content-Type'], 'text/html; charset=utf-8')
+        assert response.status_code == 200
+        assert response['Content-Type'] == 'text/html; charset=utf-8'
         html = response.content.decode('utf-8')
 
         # Verify that the group name is correctly included in the HTML
@@ -647,7 +642,7 @@ class SingleThreadAccessTestCase(CohortedTestCase):  # lint-amnesty, pylint: dis
 
     def test_student_non_cohorted(self, mock_request):
         resp = self.call_view(mock_request, "non_cohorted_topic", self.student, self.student_cohort.id)
-        self.assertEqual(resp.status_code, 200)
+        assert resp.status_code == 200
 
     def test_student_same_cohort(self, mock_request):
         resp = self.call_view(
@@ -657,7 +652,7 @@ class SingleThreadAccessTestCase(CohortedTestCase):  # lint-amnesty, pylint: dis
             self.student_cohort.id,
             thread_group_id=self.student_cohort.id
         )
-        self.assertEqual(resp.status_code, 200)
+        assert resp.status_code == 200
 
     # this test ensures that a thread response from the cs with group_id: null
     # behaves the same as a thread response without a group_id (see: TNL-444)
@@ -669,23 +664,20 @@ class SingleThreadAccessTestCase(CohortedTestCase):  # lint-amnesty, pylint: dis
             self.student_cohort.id,
             thread_group_id=None
         )
-        self.assertEqual(resp.status_code, 200)
+        assert resp.status_code == 200
 
     def test_student_different_cohort(self, mock_request):
-        self.assertRaises(
-            Http404,
-            lambda: self.call_view(
-                mock_request,
-                "cohorted_topic",
-                self.student,
-                self.student_cohort.id,
-                thread_group_id=self.moderator_cohort.id
-            )
-        )
+        pytest.raises(Http404, (lambda: self.call_view(
+            mock_request,
+            'cohorted_topic',
+            self.student,
+            self.student_cohort.id,
+            thread_group_id=self.moderator_cohort.id
+        )))
 
     def test_moderator_non_cohorted(self, mock_request):
         resp = self.call_view(mock_request, "non_cohorted_topic", self.moderator, self.moderator_cohort.id)
-        self.assertEqual(resp.status_code, 200)
+        assert resp.status_code == 200
 
     def test_moderator_same_cohort(self, mock_request):
         resp = self.call_view(
@@ -695,7 +687,7 @@ class SingleThreadAccessTestCase(CohortedTestCase):  # lint-amnesty, pylint: dis
             self.moderator_cohort.id,
             thread_group_id=self.moderator_cohort.id
         )
-        self.assertEqual(resp.status_code, 200)
+        assert resp.status_code == 200
 
     def test_moderator_different_cohort(self, mock_request):
         resp = self.call_view(
@@ -705,7 +697,7 @@ class SingleThreadAccessTestCase(CohortedTestCase):  # lint-amnesty, pylint: dis
             self.moderator_cohort.id,
             thread_group_id=self.student_cohort.id
         )
-        self.assertEqual(resp.status_code, 200)
+        assert resp.status_code == 200
 
     def test_private_team_thread(self, mock_request):
         CourseTeamFactory.create(discussion_topic_id='dummy_discussion_id')
@@ -720,11 +712,8 @@ class SingleThreadAccessTestCase(CohortedTestCase):  # lint-amnesty, pylint: dis
                 user_not_in_team,
                 ''
             )
-            self.assertEqual(403, response.status_code)
-            self.assertEqual(
-                views.TEAM_PERMISSION_MESSAGE,
-                response.content.decode('utf-8'),
-            )
+            assert 403 == response.status_code
+            assert views.TEAM_PERMISSION_MESSAGE == response.content.decode('utf-8')
 
 
 @patch('openedx.core.djangoapps.django_comment_common.comment_client.utils.requests.request', autospec=True)
@@ -801,7 +790,7 @@ class ForumFormDiscussionContentGroupTestCase(ForumsEnableMixin, ContentGroupTes
         cohorts and non-cohorted modules.
         """
         discussion_data = json.loads(response.content.decode('utf-8'))['discussion_data']
-        self.assertEqual(len(discussion_data), expected_discussion_threads)
+        assert len(discussion_data) == expected_discussion_threads
 
     def call_view(self, mock_request, user):  # lint-amnesty, pylint: disable=missing-function-docstring
         mock_request.side_effect = make_mock_request_impl(
@@ -880,9 +869,9 @@ class SingleThreadContentGroupTestCase(ForumsEnableMixin, UrlResetMixin, Content
             )
 
         if should_have_access:
-            self.assertEqual(call_single_thread().status_code, 200)
+            assert call_single_thread().status_code == 200
         else:
-            self.assertEqual(call_single_thread().status_code, 404)
+            assert call_single_thread().status_code == 404
 
     def test_staff_user(self, mock_request):
         """
@@ -1005,7 +994,7 @@ class InlineDiscussionContextTestCase(ForumsEnableMixin, ModuleStoreTestCase):  
         )
 
         json_response = json.loads(response.content.decode('utf-8'))
-        self.assertEqual(json_response['discussion_data'][0]['context'], ThreadContext.STANDALONE)
+        assert json_response['discussion_data'][0]['context'] == ThreadContext.STANDALONE
 
     def test_private_team_discussion(self, mock_request):
         # First set the team discussion to be private
@@ -1026,8 +1015,8 @@ class InlineDiscussionContextTestCase(ForumsEnableMixin, ModuleStoreTestCase):  
                 six.text_type(self.course.id),
                 self.discussion_topic_id,
             )
-            self.assertEqual(response.status_code, 403)
-            self.assertEqual(response.content.decode('utf-8'), views.TEAM_PERMISSION_MESSAGE)
+            assert response.status_code == 403
+            assert response.content.decode('utf-8') == views.TEAM_PERMISSION_MESSAGE
 
 
 @patch('openedx.core.djangoapps.django_comment_common.comment_client.utils.requests.request', autospec=True)
@@ -1219,14 +1208,14 @@ class UserProfileDiscussionGroupIdTestCase(CohortedTestCase, CohortedTopicGroupI
         )
         # Should never have a group_id if course_id was not included in the request.
         params_without_course_id = get_params_from_user_info_call(False)
-        self.assertNotIn("group_id", params_without_course_id)
+        assert 'group_id' not in params_without_course_id
 
         params_with_course_id = get_params_from_user_info_call(True)
         if expect_group_id_in_request:
-            self.assertIn("group_id", params_with_course_id)
-            self.assertEqual(group_id, params_with_course_id["group_id"])
+            assert 'group_id' in params_with_course_id
+            assert group_id == params_with_course_id['group_id']
         else:
-            self.assertNotIn("group_id", params_with_course_id)
+            assert 'group_id' not in params_with_course_id
 
     def test_group_id_passed_to_user_profile_student(self, mock_request):
         """
@@ -1376,7 +1365,7 @@ class InlineDiscussionTestCase(ForumsEnableMixin, ModuleStoreTestCase):  # lint-
         team.add_user(self.student)
 
         self.send_request(mock_request)
-        self.assertEqual(mock_request.call_args[1]['params']['context'], ThreadContext.STANDALONE)
+        assert mock_request.call_args[1]['params']['context'] == ThreadContext.STANDALONE
 
 
 @patch('requests.request', autospec=True)
@@ -1425,8 +1414,8 @@ class UserProfileTestCase(ForumsEnableMixin, UrlResetMixin, ModuleStoreTestCase)
 
     def check_html(self, mock_request, **params):  # lint-amnesty, pylint: disable=missing-function-docstring
         response = self.get_response(mock_request, params)
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response['Content-Type'], 'text/html; charset=utf-8')
+        assert response.status_code == 200
+        assert response['Content-Type'] == 'text/html; charset=utf-8'
         html = response.content.decode('utf-8')
         self.assertRegex(html, r'data-page="1"')
         self.assertRegex(html, r'data-num-pages="1"')
@@ -1442,19 +1431,16 @@ class UserProfileTestCase(ForumsEnableMixin, UrlResetMixin, ModuleStoreTestCase)
 
     def check_ajax(self, mock_request, **params):  # lint-amnesty, pylint: disable=missing-function-docstring
         response = self.get_response(mock_request, params, HTTP_X_REQUESTED_WITH="XMLHttpRequest")
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response['Content-Type'], 'application/json; charset=utf-8')
+        assert response.status_code == 200
+        assert response['Content-Type'] == 'application/json; charset=utf-8'
         response_data = json.loads(response.content.decode('utf-8'))
-        self.assertEqual(
-            sorted(response_data.keys()),
-            ["annotated_content_info", "discussion_data", "num_pages", "page"]
-        )
-        self.assertEqual(len(response_data['discussion_data']), 1)
-        self.assertEqual(response_data["page"], 1)
-        self.assertEqual(response_data["num_pages"], 1)
-        self.assertEqual(response_data['discussion_data'][0]['id'], self.TEST_THREAD_ID)
-        self.assertEqual(response_data['discussion_data'][0]['title'], self.TEST_THREAD_TEXT)
-        self.assertEqual(response_data['discussion_data'][0]['body'], self.TEST_THREAD_TEXT)
+        assert sorted(response_data.keys()) == ['annotated_content_info', 'discussion_data', 'num_pages', 'page']
+        assert len(response_data['discussion_data']) == 1
+        assert response_data['page'] == 1
+        assert response_data['num_pages'] == 1
+        assert response_data['discussion_data'][0]['id'] == self.TEST_THREAD_ID
+        assert response_data['discussion_data'][0]['title'] == self.TEST_THREAD_TEXT
+        assert response_data['discussion_data'][0]['body'] == self.TEST_THREAD_TEXT
 
     def test_html(self, mock_request):
         self.check_html(mock_request)
@@ -1470,7 +1456,7 @@ class UserProfileTestCase(ForumsEnableMixin, UrlResetMixin, ModuleStoreTestCase)
         unenrolled_user = UserFactory.create()
         request = RequestFactory().get("dummy_url")
         request.user = self.student
-        with self.assertRaises(Http404):
+        with pytest.raises(Http404):
             views.user_profile(
                 request,
                 text_type(self.course.id),
@@ -1480,7 +1466,7 @@ class UserProfileTestCase(ForumsEnableMixin, UrlResetMixin, ModuleStoreTestCase)
     def test_404_profiled_user(self, _mock_request):
         request = RequestFactory().get("dummy_url")
         request.user = self.student
-        with self.assertRaises(Http404):
+        with pytest.raises(Http404):
             views.user_profile(
                 request,
                 text_type(self.course.id),
@@ -1490,7 +1476,7 @@ class UserProfileTestCase(ForumsEnableMixin, UrlResetMixin, ModuleStoreTestCase)
     def test_404_course(self, _mock_request):
         request = RequestFactory().get("dummy_url")
         request.user = self.student
-        with self.assertRaises(Http404):
+        with pytest.raises(Http404):
             views.user_profile(
                 request,
                 "non/existent/course",
@@ -1508,7 +1494,7 @@ class UserProfileTestCase(ForumsEnableMixin, UrlResetMixin, ModuleStoreTestCase)
             text_type(self.course.id),
             self.profiled_user.id
         )
-        self.assertEqual(response.status_code, 405)
+        assert response.status_code == 405
 
 
 @patch('requests.request', autospec=True)
@@ -1528,9 +1514,7 @@ class CommentsServiceRequestHeadersTestCase(ForumsEnableMixin, UrlResetMixin, Mo
         self.course = CourseFactory.create(discussion_topics={'dummy discussion': {'id': 'dummy_discussion_id'}})
         self.student = UserFactory.create(username=username, password=password)
         CourseEnrollmentFactory.create(user=self.student, course_id=self.course.id)
-        self.assertTrue(
-            self.client.login(username=username, password=password)
-        )
+        assert self.client.login(username=username, password=password)
 
         self.addCleanup(translation.deactivate)
 
@@ -1544,7 +1528,7 @@ class CommentsServiceRequestHeadersTestCase(ForumsEnableMixin, UrlResetMixin, Mo
             timeout=ANY
         )
         for actual in mock_request.call_args_list:
-            self.assertEqual(expected, actual)
+            assert expected == actual
 
     def test_accept_language(self, mock_request):
         lang = "eo"
@@ -1602,10 +1586,10 @@ class InlineDiscussionUnicodeTestCase(ForumsEnableMixin, SharedModuleStoreTestCa
         response = views.inline_discussion(
             request, text_type(self.course.id), self.course.discussion_topics['General']['id']
         )
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
         response_data = json.loads(response.content.decode('utf-8'))
-        self.assertEqual(response_data["discussion_data"][0]["title"], text)
-        self.assertEqual(response_data["discussion_data"][0]["body"], text)
+        assert response_data['discussion_data'][0]['title'] == text
+        assert response_data['discussion_data'][0]['body'] == text
 
 
 class ForumFormDiscussionUnicodeTestCase(ForumsEnableMixin, SharedModuleStoreTestCase, UnicodeTestMixin):  # lint-amnesty, pylint: disable=missing-class-docstring
@@ -1631,10 +1615,10 @@ class ForumFormDiscussionUnicodeTestCase(ForumsEnableMixin, SharedModuleStoreTes
         request.META["HTTP_X_REQUESTED_WITH"] = "XMLHttpRequest"  # so request.is_ajax() == True
 
         response = views.forum_form_discussion(request, text_type(self.course.id))
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
         response_data = json.loads(response.content.decode('utf-8'))
-        self.assertEqual(response_data["discussion_data"][0]["title"], text)
-        self.assertEqual(response_data["discussion_data"][0]["body"], text)
+        assert response_data['discussion_data'][0]['title'] == text
+        assert response_data['discussion_data'][0]['body'] == text
 
 
 @ddt.ddt
@@ -1651,7 +1635,7 @@ class ForumDiscussionXSSTestCase(ForumsEnableMixin, UrlResetMixin, ModuleStoreTe
         self.course = CourseFactory.create()
         self.student = UserFactory.create(username=username, password=password)
         CourseEnrollmentFactory.create(user=self.student, course_id=self.course.id)
-        self.assertTrue(self.client.login(username=username, password=password))
+        assert self.client.login(username=username, password=password)
 
     @ddt.data('"><script>alert(1)</script>', '<script>alert(1)</script>', '</script><script>alert(1)</script>')
     @patch('common.djangoapps.student.models.cc.User.from_django_user')
@@ -1719,10 +1703,10 @@ class ForumDiscussionSearchUnicodeTestCase(ForumsEnableMixin, SharedModuleStoreT
         request.META["HTTP_X_REQUESTED_WITH"] = "XMLHttpRequest"  # so request.is_ajax() == True
 
         response = views.forum_form_discussion(request, text_type(self.course.id))
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
         response_data = json.loads(response.content.decode('utf-8'))
-        self.assertEqual(response_data["discussion_data"][0]["title"], text)
-        self.assertEqual(response_data["discussion_data"][0]["body"], text)
+        assert response_data['discussion_data'][0]['title'] == text
+        assert response_data['discussion_data'][0]['body'] == text
 
 
 class SingleThreadUnicodeTestCase(ForumsEnableMixin, SharedModuleStoreTestCase, UnicodeTestMixin):  # lint-amnesty, pylint: disable=missing-class-docstring
@@ -1749,10 +1733,10 @@ class SingleThreadUnicodeTestCase(ForumsEnableMixin, SharedModuleStoreTestCase, 
         request.META["HTTP_X_REQUESTED_WITH"] = "XMLHttpRequest"  # so request.is_ajax() == True
 
         response = views.single_thread(request, text_type(self.course.id), "dummy_discussion_id", thread_id)
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
         response_data = json.loads(response.content.decode('utf-8'))
-        self.assertEqual(response_data["content"]["title"], text)
-        self.assertEqual(response_data["content"]["body"], text)
+        assert response_data['content']['title'] == text
+        assert response_data['content']['body'] == text
 
 
 class UserProfileUnicodeTestCase(ForumsEnableMixin, SharedModuleStoreTestCase, UnicodeTestMixin):  # lint-amnesty, pylint: disable=missing-class-docstring
@@ -1778,10 +1762,10 @@ class UserProfileUnicodeTestCase(ForumsEnableMixin, SharedModuleStoreTestCase, U
         request.META["HTTP_X_REQUESTED_WITH"] = "XMLHttpRequest"  # so request.is_ajax() == True
 
         response = views.user_profile(request, text_type(self.course.id), str(self.student.id))
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
         response_data = json.loads(response.content.decode('utf-8'))
-        self.assertEqual(response_data["discussion_data"][0]["title"], text)
-        self.assertEqual(response_data["discussion_data"][0]["body"], text)
+        assert response_data['discussion_data'][0]['title'] == text
+        assert response_data['discussion_data'][0]['body'] == text
 
 
 class FollowedThreadsUnicodeTestCase(ForumsEnableMixin, SharedModuleStoreTestCase, UnicodeTestMixin):  # lint-amnesty, pylint: disable=missing-class-docstring
@@ -1807,10 +1791,10 @@ class FollowedThreadsUnicodeTestCase(ForumsEnableMixin, SharedModuleStoreTestCas
         request.META["HTTP_X_REQUESTED_WITH"] = "XMLHttpRequest"  # so request.is_ajax() == True
 
         response = views.followed_threads(request, text_type(self.course.id), str(self.student.id))
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
         response_data = json.loads(response.content.decode('utf-8'))
-        self.assertEqual(response_data["discussion_data"][0]["title"], text)
-        self.assertEqual(response_data["discussion_data"][0]["body"], text)
+        assert response_data['discussion_data'][0]['title'] == text
+        assert response_data['discussion_data'][0]['body'] == text
 
 
 class EnrollmentTestCase(ForumsEnableMixin, ModuleStoreTestCase):
@@ -1831,7 +1815,7 @@ class EnrollmentTestCase(ForumsEnableMixin, ModuleStoreTestCase):
         mock_request.side_effect = make_mock_request_impl(course=self.course, text='dummy')
         request = RequestFactory().get('dummy_url')
         request.user = self.student
-        with self.assertRaises(CourseAccessRedirect):
+        with pytest.raises(CourseAccessRedirect):
             views.forum_form_discussion(request, course_id=text_type(self.course.id))  # pylint: disable=no-value-for-parameter, unexpected-keyword-arg
 
 
@@ -1854,9 +1838,7 @@ class EnterpriseConsentTestCase(EnterpriseTestConsentRequired, ForumsEnableMixin
         self.course = CourseFactory.create(discussion_topics={'dummy discussion': {'id': self.discussion_id}})
         self.student = UserFactory.create(username=username, password=password)
         CourseEnrollmentFactory.create(user=self.student, course_id=self.course.id)
-        self.assertTrue(
-            self.client.login(username=username, password=password)
-        )
+        assert self.client.login(username=username, password=password)
 
         self.addCleanup(translation.deactivate)
 
@@ -1970,7 +1952,7 @@ class CourseDiscussionTopicsTestCase(DividedDiscussionsTestCase):
                 'children': [['Chapter', TYPE_SUBCATEGORY]]
             }
         }
-        self.assertEqual(response, expected_response)
+        assert response == expected_response
 
 
 class CourseDiscussionsHandlerTestCase(DividedDiscussionsTestCase):
@@ -2012,14 +1994,14 @@ class CourseDiscussionsHandlerTestCase(DividedDiscussionsTestCase):
 
         expected_response = self.get_expected_response()
 
-        self.assertEqual(response, expected_response)
+        assert response == expected_response
 
         expected_response['always_divide_inline_discussions'] = True
         response = self.patch_handler(
             self.course, data=expected_response, handler=course_discussions_settings_handler
         )
 
-        self.assertEqual(response, expected_response)
+        assert response == expected_response
 
     def test_update_course_wide_discussion_settings(self):
         """
@@ -2036,14 +2018,14 @@ class CourseDiscussionsHandlerTestCase(DividedDiscussionsTestCase):
         response = self.get_handler(self.course, handler=views.course_discussions_settings_handler)
 
         expected_response = self.get_expected_response()
-        self.assertEqual(response, expected_response)
+        assert response == expected_response
 
         expected_response['divided_course_wide_discussions'] = [topic_name_to_id(self.course, "Topic B")]
         response = self.patch_handler(
             self.course, data=expected_response, handler=views.course_discussions_settings_handler
         )
 
-        self.assertEqual(response, expected_response)
+        assert response == expected_response
 
     def test_update_inline_discussion_settings(self):
         """
@@ -2054,7 +2036,7 @@ class CourseDiscussionsHandlerTestCase(DividedDiscussionsTestCase):
         response = self.get_handler(self.course, handler=views.course_discussions_settings_handler)
 
         expected_response = self.get_expected_response()
-        self.assertEqual(response, expected_response)
+        assert response == expected_response
 
         RequestCache.clear_all_namespaces()
         now = datetime.now()
@@ -2073,7 +2055,7 @@ class CourseDiscussionsHandlerTestCase(DividedDiscussionsTestCase):
             self.course, data=expected_response, handler=views.course_discussions_settings_handler
         )
 
-        self.assertEqual(response, expected_response)
+        assert response == expected_response
 
     def test_get_settings(self):
         """
@@ -2089,7 +2071,7 @@ class CourseDiscussionsHandlerTestCase(DividedDiscussionsTestCase):
         expected_response['divided_course_wide_discussions'] = [topic_name_to_id(self.course, name)
                                                                 for name in divided_course_wide_discussions]
 
-        self.assertEqual(response, expected_response)
+        assert response == expected_response
 
     def test_update_settings_with_invalid_field_data_type(self):
         """
@@ -2103,11 +2085,10 @@ class CourseDiscussionsHandlerTestCase(DividedDiscussionsTestCase):
             expected_response_code=400,
             handler=views.course_discussions_settings_handler
         )
-        self.assertEqual(
-            u"Incorrect field type for `{}`. Type must be `{}`".format('always_divide_inline_discussions',
-                                                                       bool.__name__),
-            response.get("error")
-        )
+        assert u'Incorrect field type for `{}`. Type must be `{}`'.format(
+            'always_divide_inline_discussions',
+            bool.__name__
+        ) == response.get('error')
 
     def test_available_schemes(self):
         # Cohorts disabled, single enrollment mode.
@@ -2115,14 +2096,14 @@ class CourseDiscussionsHandlerTestCase(DividedDiscussionsTestCase):
         response = self.get_handler(self.course, handler=views.course_discussions_settings_handler)
         expected_response = self.get_expected_response()
         expected_response['available_division_schemes'] = []
-        self.assertEqual(response, expected_response)
+        assert response == expected_response
 
         # Add 2 enrollment modes
         CourseModeFactory.create(course_id=self.course.id, mode_slug=CourseMode.AUDIT)
         CourseModeFactory.create(course_id=self.course.id, mode_slug=CourseMode.VERIFIED)
         response = self.get_handler(self.course, handler=views.course_discussions_settings_handler)
         expected_response['available_division_schemes'] = [CourseDiscussionSettings.ENROLLMENT_TRACK]
-        self.assertEqual(response, expected_response)
+        assert response == expected_response
 
         # Enable cohorts
         config_course_cohorts(self.course, is_cohorted=True)
@@ -2130,7 +2111,7 @@ class CourseDiscussionsHandlerTestCase(DividedDiscussionsTestCase):
         expected_response['available_division_schemes'] = [
             CourseDiscussionSettings.COHORT, CourseDiscussionSettings.ENROLLMENT_TRACK
         ]
-        self.assertEqual(response, expected_response)
+        assert response == expected_response
 
 
 class DefaultTopicIdGetterTestCase(ModuleStoreTestCase):
@@ -2147,7 +2128,7 @@ class DefaultTopicIdGetterTestCase(ModuleStoreTestCase):
         course = CourseFactory.create(discussion_topics=discussion_topics)
         expected_id = None
         result = _get_discussion_default_topic_id(course)
-        self.assertEqual(expected_id, result)
+        assert expected_id == result
 
     def test_default_topic_id(self):
         discussion_topics = {
@@ -2162,7 +2143,7 @@ class DefaultTopicIdGetterTestCase(ModuleStoreTestCase):
         course = CourseFactory.create(discussion_topics=discussion_topics)
         expected_id = 'another_discussion_id'
         result = _get_discussion_default_topic_id(course)
-        self.assertEqual(expected_id, result)
+        assert expected_id == result
 
 
 class ThreadViewedEventTestCase(EventTestMixin, ForumsEnableMixin, UrlResetMixin, ModuleStoreTestCase):
@@ -2249,4 +2230,4 @@ class ThreadViewedEventTestCase(EventTestMixin, ForumsEnableMixin, UrlResetMixin
         self.assert_event_emission_count('edx.forum.thread.viewed', 1)
         _, event = self.get_latest_call_args()
         event_items = list(event.items())
-        self.assertTrue(kv_pair in event_items for kv_pair in expected_event_items)
+        assert ((kv_pair in event_items) for kv_pair in expected_event_items)

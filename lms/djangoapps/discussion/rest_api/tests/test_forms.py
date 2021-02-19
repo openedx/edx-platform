@@ -59,37 +59,28 @@ class ThreadListGetFormTest(FormTestMixin, PaginationTestMixin, TestCase):
 
     def test_basic(self):
         form = self.get_form(expected_valid=True)
-        self.assertEqual(
-            form.cleaned_data,
-            {
-                "course_id": CourseLocator.from_string("Foo/Bar/Baz"),
-                "page": 2,
-                "page_size": 13,
-                "topic_id": set(),
-                "text_search": "",
-                "following": None,
-                "view": "",
-                "order_by": "last_activity_at",
-                "order_direction": "desc",
-                "requested_fields": set(),
-            }
-        )
+        assert form.cleaned_data == {
+            'course_id': CourseLocator.from_string('Foo/Bar/Baz'),
+            'page': 2,
+            'page_size': 13,
+            'topic_id': set(),
+            'text_search': '',
+            'following': None,
+            'view': '',
+            'order_by': 'last_activity_at',
+            'order_direction': 'desc',
+            'requested_fields': set()
+        }
 
     def test_topic_id(self):
         self.form_data.setlist("topic_id", ["example topic_id", "example 2nd topic_id"])
         form = self.get_form(expected_valid=True)
-        self.assertEqual(
-            form.cleaned_data["topic_id"],
-            {"example topic_id", "example 2nd topic_id"},
-        )
+        assert form.cleaned_data['topic_id'] == {'example topic_id', 'example 2nd topic_id'}
 
     def test_text_search(self):
         self.form_data["text_search"] = "test search string"
         form = self.get_form(expected_valid=True)
-        self.assertEqual(
-            form.cleaned_data["text_search"],
-            "test search string",
-        )
+        assert form.cleaned_data['text_search'] == 'test search string'
 
     def test_missing_course_id(self):
         self.form_data.pop("course_id")
@@ -159,10 +150,7 @@ class ThreadListGetFormTest(FormTestMixin, PaginationTestMixin, TestCase):
     def test_requested_fields(self):
         self.form_data["requested_fields"] = "profile_image"
         form = self.get_form(expected_valid=True)
-        self.assertEqual(
-            form.cleaned_data["requested_fields"],
-            {"profile_image"},
-        )
+        assert form.cleaned_data['requested_fields'] == {'profile_image'}
 
 
 @ddt.ddt
@@ -181,16 +169,13 @@ class CommentListGetFormTest(FormTestMixin, PaginationTestMixin, TestCase):
 
     def test_basic(self):
         form = self.get_form(expected_valid=True)
-        self.assertEqual(
-            form.cleaned_data,
-            {
-                "thread_id": "deadbeef",
-                "endorsed": False,
-                "page": 2,
-                "page_size": 13,
-                "requested_fields": set(),
-            }
-        )
+        assert form.cleaned_data == {
+            'thread_id': 'deadbeef',
+            'endorsed': False,
+            'page': 2,
+            'page_size': 13,
+            'requested_fields': set()
+        }
 
     def test_missing_thread_id(self):
         self.form_data.pop("thread_id")
@@ -217,7 +202,4 @@ class CommentListGetFormTest(FormTestMixin, PaginationTestMixin, TestCase):
     def test_requested_fields(self):
         self.form_data["requested_fields"] = {"profile_image"}
         form = self.get_form(expected_valid=True)
-        self.assertEqual(
-            form.cleaned_data["requested_fields"],
-            {"profile_image"},
-        )
+        assert form.cleaned_data['requested_fields'] == {'profile_image'}

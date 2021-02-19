@@ -100,7 +100,7 @@ class SerializerTestMixin(ForumsEnableMixin, CommentsServiceMockMixin, UrlResetM
             self.make_cs_content({"anonymous": anonymous, "anonymous_to_peers": anonymous_to_peers})
         )
         actual_serialized_anonymous = serialized["author"] is None
-        self.assertEqual(actual_serialized_anonymous, expected_serialized_anonymous)
+        assert actual_serialized_anonymous == expected_serialized_anonymous
 
     @ddt.data(
         (FORUM_ROLE_ADMINISTRATOR, False, "Staff"),
@@ -128,17 +128,17 @@ class SerializerTestMixin(ForumsEnableMixin, CommentsServiceMockMixin, UrlResetM
         """
         self.create_role(role_name, [self.author])
         serialized = self.serialize(self.make_cs_content({"anonymous": anonymous}))
-        self.assertEqual(serialized["author_label"], expected_label)
+        assert serialized['author_label'] == expected_label
 
     def test_abuse_flagged(self):
         serialized = self.serialize(self.make_cs_content({"abuse_flaggers": [str(self.user.id)]}))
-        self.assertEqual(serialized["abuse_flagged"], True)
+        assert serialized['abuse_flagged'] is True
 
     def test_voted(self):
         thread_id = "test_thread"
         self.register_get_user_response(self.user, upvoted_ids=[thread_id])
         serialized = self.serialize(self.make_cs_content({"id": thread_id}))
-        self.assertEqual(serialized["voted"], True)
+        assert serialized['voted'] is True
 
 
 @ddt.ddt
@@ -188,7 +188,7 @@ class ThreadSerializerSerializationTest(SerializerTestMixin, SharedModuleStoreTe
             "pinned": True,
             "editable_fields": ["abuse_flagged", "following", "read", "voted"],
         })
-        self.assertEqual(self.serialize(thread), expected)
+        assert self.serialize(thread) == expected
 
         thread["thread_type"] = "question"
         expected.update({
@@ -201,7 +201,7 @@ class ThreadSerializerSerializationTest(SerializerTestMixin, SharedModuleStoreTe
                 "http://testserver/api/discussion/v1/comments/?thread_id=test_thread&endorsed=False"
             ),
         })
-        self.assertEqual(self.serialize(thread), expected)
+        assert self.serialize(thread) == expected
 
     def test_pinned_missing(self):
         """
@@ -212,34 +212,34 @@ class ThreadSerializerSerializationTest(SerializerTestMixin, SharedModuleStoreTe
         del thread_data["pinned"]
         self.register_get_thread_response(thread_data)
         serialized = self.serialize(thread_data)
-        self.assertEqual(serialized["pinned"], False)
+        assert serialized['pinned'] is False
 
     def test_group(self):
         self.course.cohort_config = {"cohorted": True}
         modulestore().update_item(self.course, ModuleStoreEnum.UserID.test)
         cohort = CohortFactory.create(course_id=self.course.id)
         serialized = self.serialize(self.make_cs_content({"group_id": cohort.id}))
-        self.assertEqual(serialized["group_id"], cohort.id)
-        self.assertEqual(serialized["group_name"], cohort.name)
+        assert serialized['group_id'] == cohort.id
+        assert serialized['group_name'] == cohort.name
 
     def test_following(self):
         thread_id = "test_thread"
         self.register_get_user_response(self.user, subscribed_thread_ids=[thread_id])
         serialized = self.serialize(self.make_cs_content({"id": thread_id}))
-        self.assertEqual(serialized["following"], True)
+        assert serialized['following'] is True
 
     def test_response_count(self):
         thread_data = self.make_cs_content({"resp_total": 2})
         self.register_get_thread_response(thread_data)
         serialized = self.serialize(thread_data)
-        self.assertEqual(serialized["response_count"], 2)
+        assert serialized['response_count'] == 2
 
     def test_response_count_missing(self):
         thread_data = self.make_cs_content({})
         del thread_data["resp_total"]
         self.register_get_thread_response(thread_data)
         serialized = self.serialize(thread_data)
-        self.assertNotIn("response_count", serialized)
+        assert 'response_count' not in serialized
 
 
 @ddt.ddt
@@ -313,7 +313,7 @@ class CommentSerializerTest(SerializerTestMixin, SharedModuleStoreTestCase):
             "editable_fields": ["abuse_flagged", "voted"],
             "child_count": 0,
         }
-        self.assertEqual(self.serialize(comment), expected)
+        assert self.serialize(comment) == expected
 
     @ddt.data(
         *itertools.product(
@@ -344,7 +344,7 @@ class CommentSerializerTest(SerializerTestMixin, SharedModuleStoreTestCase):
         )
         actual_endorser_anonymous = serialized["endorsed_by"] is None
         expected_endorser_anonymous = endorser_role_name == FORUM_ROLE_STUDENT and thread_anonymous
-        self.assertEqual(actual_endorser_anonymous, expected_endorser_anonymous)
+        assert actual_endorser_anonymous == expected_endorser_anonymous
 
     @ddt.data(
         (FORUM_ROLE_ADMINISTRATOR, "Staff"),
@@ -366,11 +366,11 @@ class CommentSerializerTest(SerializerTestMixin, SharedModuleStoreTestCase):
         """
         self.create_role(role_name, [self.endorser])
         serialized = self.serialize(self.make_cs_content(with_endorsement=True))
-        self.assertEqual(serialized["endorsed_by_label"], expected_label)
+        assert serialized['endorsed_by_label'] == expected_label
 
     def test_endorsed_at(self):
         serialized = self.serialize(self.make_cs_content(with_endorsement=True))
-        self.assertEqual(serialized["endorsed_at"], self.endorsed_at)
+        assert serialized['endorsed_at'] == self.endorsed_at
 
     def test_children(self):
         comment = self.make_cs_content({
@@ -393,12 +393,12 @@ class CommentSerializerTest(SerializerTestMixin, SharedModuleStoreTestCase):
             ],
         })
         serialized = self.serialize(comment)
-        self.assertEqual(serialized["children"][0]["id"], "test_child_1")
-        self.assertEqual(serialized["children"][0]["parent_id"], "test_root")
-        self.assertEqual(serialized["children"][1]["id"], "test_child_2")
-        self.assertEqual(serialized["children"][1]["parent_id"], "test_root")
-        self.assertEqual(serialized["children"][1]["children"][0]["id"], "test_grandchild")
-        self.assertEqual(serialized["children"][1]["children"][0]["parent_id"], "test_child_2")
+        assert serialized['children'][0]['id'] == 'test_child_1'
+        assert serialized['children'][0]['parent_id'] == 'test_root'
+        assert serialized['children'][1]['id'] == 'test_child_2'
+        assert serialized['children'][1]['parent_id'] == 'test_root'
+        assert serialized['children'][1]['children'][0]['id'] == 'test_grandchild'
+        assert serialized['children'][1]['children'][0]['parent_id'] == 'test_child_2'
 
 
 @ddt.ddt
@@ -458,69 +458,57 @@ class ThreadSerializerDeserializationTest(
             partial=(instance is not None),
             context=get_context(self.course, self.request)
         )
-        self.assertTrue(serializer.is_valid())
+        assert serializer.is_valid()
         serializer.save()
         return serializer.data
 
     def test_create_minimal(self):
         self.register_post_thread_response({"id": "test_id", "username": self.user.username})
         saved = self.save_and_reserialize(self.minimal_data)
-        self.assertEqual(
-            urlparse(httpretty.last_request().path).path,  # lint-amnesty, pylint: disable=no-member
-            "/api/v1/test_topic/threads"
-        )
-        self.assertEqual(
-            httpretty.last_request().parsed_body,  # lint-amnesty, pylint: disable=no-member
-            {
-                "course_id": [six.text_type(self.course.id)],
-                "commentable_id": ["test_topic"],
-                "thread_type": ["discussion"],
-                "title": ["Test Title"],
-                "body": ["Test body"],
-                "user_id": [str(self.user.id)],
-            }
-        )
-        self.assertEqual(saved["id"], "test_id")
+        assert urlparse(httpretty.last_request().path).path ==\
+               '/api/v1/test_topic/threads'  # lint-amnesty, pylint: disable=no-member
+        assert httpretty.last_request().parsed_body == {  # lint-amnesty, pylint: disable=no-member
+            'course_id': [six.text_type(self.course.id)],
+            'commentable_id': ['test_topic'],
+            'thread_type': ['discussion'],
+            'title': ['Test Title'],
+            'body': ['Test body'],
+            'user_id': [str(self.user.id)]
+        }
+        assert saved['id'] == 'test_id'
 
     def test_create_all_fields(self):
         self.register_post_thread_response({"id": "test_id", "username": self.user.username})
         data = self.minimal_data.copy()
         data["group_id"] = 42
         self.save_and_reserialize(data)
-        self.assertEqual(
-            httpretty.last_request().parsed_body,  # lint-amnesty, pylint: disable=no-member
-            {
-                "course_id": [six.text_type(self.course.id)],
-                "commentable_id": ["test_topic"],
-                "thread_type": ["discussion"],
-                "title": ["Test Title"],
-                "body": ["Test body"],
-                "user_id": [str(self.user.id)],
-                "group_id": ["42"],
-            }
-        )
+        assert httpretty.last_request().parsed_body == {  # lint-amnesty, pylint: disable=no-member
+            'course_id': [six.text_type(self.course.id)],
+            'commentable_id': ['test_topic'],
+            'thread_type': ['discussion'],
+            'title': ['Test Title'],
+            'body': ['Test body'],
+            'user_id': [str(self.user.id)],
+            'group_id': ['42']
+        }
 
     def test_create_missing_field(self):
         for field in self.minimal_data:
             data = self.minimal_data.copy()
             data.pop(field)
             serializer = ThreadSerializer(data=data)
-            self.assertFalse(serializer.is_valid())
-            self.assertEqual(
-                serializer.errors,
-                {field: ["This field is required."]}
-            )
+            assert not serializer.is_valid()
+            assert serializer.errors == {field: ['This field is required.']}
 
     @ddt.data("", " ")
     def test_create_empty_string(self, value):
         data = self.minimal_data.copy()
         data.update({field: value for field in ["topic_id", "title", "raw_body"]})
         serializer = ThreadSerializer(data=data, context=get_context(self.course, self.request))
-        self.assertFalse(serializer.is_valid())
-        self.assertEqual(
-            serializer.errors,
-            {field: ["This field may not be blank."] for field in ["topic_id", "title", "raw_body"]}
-        )
+        assert not serializer.is_valid()
+        assert serializer.errors == {
+            field: ['This field may not be blank.'] for field in ['topic_id', 'title', 'raw_body']
+        }
 
     def test_create_type(self):
         self.register_post_thread_response({"id": "test_id", "username": self.user.username})
@@ -530,27 +518,24 @@ class ThreadSerializerDeserializationTest(
 
         data["type"] = "invalid_type"
         serializer = ThreadSerializer(data=data)
-        self.assertFalse(serializer.is_valid())
+        assert not serializer.is_valid()
 
     def test_update_empty(self):
         self.register_put_thread_response(self.existing_thread.attributes)
         self.save_and_reserialize({}, self.existing_thread)
-        self.assertEqual(
-            httpretty.last_request().parsed_body,  # lint-amnesty, pylint: disable=no-member
-            {
-                "course_id": [six.text_type(self.course.id)],
-                "commentable_id": ["original_topic"],
-                "thread_type": ["discussion"],
-                "title": ["Original Title"],
-                "body": ["Original body"],
-                "anonymous": ["False"],
-                "anonymous_to_peers": ["False"],
-                "closed": ["False"],
-                "pinned": ["False"],
-                "user_id": [str(self.user.id)],
-                "read": ["False"],
-            }
-        )
+        assert httpretty.last_request().parsed_body == {  # lint-amnesty, pylint: disable=no-member
+            'course_id': [six.text_type(self.course.id)],
+            'commentable_id': ['original_topic'],
+            'thread_type': ['discussion'],
+            'title': ['Original Title'],
+            'body': ['Original body'],
+            'anonymous': ['False'],
+            'anonymous_to_peers': ['False'],
+            'closed': ['False'],
+            'pinned': ['False'],
+            'user_id': [str(self.user.id)],
+            'read': ['False']
+        }
 
     @ddt.data(True, False)
     def test_update_all(self, read):
@@ -563,24 +548,21 @@ class ThreadSerializerDeserializationTest(
             "read": read,
         }
         saved = self.save_and_reserialize(data, self.existing_thread)
-        self.assertEqual(
-            httpretty.last_request().parsed_body,  # lint-amnesty, pylint: disable=no-member
-            {
-                "course_id": [six.text_type(self.course.id)],
-                "commentable_id": ["edited_topic"],
-                "thread_type": ["question"],
-                "title": ["Edited Title"],
-                "body": ["Edited body"],
-                "anonymous": ["False"],
-                "anonymous_to_peers": ["False"],
-                "closed": ["False"],
-                "pinned": ["False"],
-                "user_id": [str(self.user.id)],
-                "read": [str(read)],
-            }
-        )
+        assert httpretty.last_request().parsed_body == {  # lint-amnesty, pylint: disable=no-member
+            'course_id': [six.text_type(self.course.id)],
+            'commentable_id': ['edited_topic'],
+            'thread_type': ['question'],
+            'title': ['Edited Title'],
+            'body': ['Edited body'],
+            'anonymous': ['False'],
+            'anonymous_to_peers': ['False'],
+            'closed': ['False'],
+            'pinned': ['False'],
+            'user_id': [str(self.user.id)],
+            'read': [str(read)]
+        }
         for key in data:
-            self.assertEqual(saved[key], data[key])
+            assert saved[key] == data[key]
 
     @ddt.data("", " ")
     def test_update_empty_string(self, value):
@@ -590,11 +572,10 @@ class ThreadSerializerDeserializationTest(
             partial=True,
             context=get_context(self.course, self.request)
         )
-        self.assertFalse(serializer.is_valid())
-        self.assertEqual(
-            serializer.errors,
-            {field: ["This field may not be blank."] for field in ["topic_id", "title", "raw_body"]}
-        )
+        assert not serializer.is_valid()
+        assert serializer.errors == {
+            field: ['This field may not be blank.'] for field in ['topic_id', 'title', 'raw_body']
+        }
 
     def test_update_course_id(self):
         serializer = ThreadSerializer(
@@ -603,11 +584,8 @@ class ThreadSerializerDeserializationTest(
             partial=True,
             context=get_context(self.course, self.request)
         )
-        self.assertFalse(serializer.is_valid())
-        self.assertEqual(
-            serializer.errors,
-            {"course_id": ["This field is not allowed in an update."]}
-        )
+        assert not serializer.is_valid()
+        assert serializer.errors == {'course_id': ['This field is not allowed in an update.']}
 
 
 @ddt.ddt
@@ -657,7 +635,7 @@ class CommentSerializerDeserializationTest(ForumsEnableMixin, CommentsServiceMoc
             partial=(instance is not None),
             context=context
         )
-        self.assertTrue(serializer.is_valid())
+        assert serializer.is_valid()
         serializer.save()
         return serializer.data
 
@@ -677,17 +655,14 @@ class CommentSerializerDeserializationTest(ForumsEnableMixin, CommentsServiceMoc
             "/api/v1/comments/{}".format(parent_id) if parent_id else
             "/api/v1/threads/test_thread/comments"
         )
-        self.assertEqual(urlparse(httpretty.last_request().path).path, expected_url)  # lint-amnesty, pylint: disable=no-member
-        self.assertEqual(
-            httpretty.last_request().parsed_body,  # lint-amnesty, pylint: disable=no-member
-            {
-                "course_id": [six.text_type(self.course.id)],
-                "body": ["Test body"],
-                "user_id": [str(self.user.id)],
-            }
-        )
-        self.assertEqual(saved["id"], "test_comment")
-        self.assertEqual(saved["parent_id"], parent_id)
+        assert urlparse(httpretty.last_request().path).path == expected_url  # lint-amnesty, pylint: disable=no-member
+        assert httpretty.last_request().parsed_body == {  # lint-amnesty, pylint: disable=no-member
+            'course_id': [six.text_type(self.course.id)],
+            'body': ['Test body'],
+            'user_id': [str(self.user.id)]
+        }
+        assert saved['id'] == 'test_comment'
+        assert saved['parent_id'] == parent_id
 
     def test_create_all_fields(self):
         data = self.minimal_data.copy()
@@ -700,15 +675,12 @@ class CommentSerializerDeserializationTest(ForumsEnableMixin, CommentsServiceMoc
             parent_id="test_parent"
         )
         self.save_and_reserialize(data)
-        self.assertEqual(
-            httpretty.last_request().parsed_body,  # lint-amnesty, pylint: disable=no-member
-            {
-                "course_id": [six.text_type(self.course.id)],
-                "body": ["Test body"],
-                "user_id": [str(self.user.id)],
-                "endorsed": ["True"],
-            }
-        )
+        assert httpretty.last_request().parsed_body == {  # lint-amnesty, pylint: disable=no-member
+            'course_id': [six.text_type(self.course.id)],
+            'body': ['Test body'],
+            'user_id': [str(self.user.id)],
+            'endorsed': ['True']
+        }
 
     def test_create_parent_id_nonexistent(self):
         self.register_get_comment_error_response("bad_parent", 404)
@@ -716,15 +688,10 @@ class CommentSerializerDeserializationTest(ForumsEnableMixin, CommentsServiceMoc
         data["parent_id"] = "bad_parent"
         context = get_context(self.course, self.request, make_minimal_cs_thread())
         serializer = CommentSerializer(data=data, context=context)
-        self.assertFalse(serializer.is_valid())
-        self.assertEqual(
-            serializer.errors,
-            {
-                "non_field_errors": [
-                    "parent_id does not identify a comment in the thread identified by thread_id."
-                ]
-            }
-        )
+        assert not serializer.is_valid()
+        assert serializer.errors == {
+            'non_field_errors': ['parent_id does not identify a comment in the thread identified by thread_id.']
+        }
 
     def test_create_parent_id_wrong_thread(self):
         self.register_get_comment_response({"thread_id": "different_thread", "id": "test_parent"})
@@ -732,15 +699,10 @@ class CommentSerializerDeserializationTest(ForumsEnableMixin, CommentsServiceMoc
         data["parent_id"] = "test_parent"
         context = get_context(self.course, self.request, make_minimal_cs_thread())
         serializer = CommentSerializer(data=data, context=context)
-        self.assertFalse(serializer.is_valid())
-        self.assertEqual(
-            serializer.errors,
-            {
-                "non_field_errors": [
-                    "parent_id does not identify a comment in the thread identified by thread_id."
-                ]
-            }
-        )
+        assert not serializer.is_valid()
+        assert serializer.errors == {
+            'non_field_errors': ['parent_id does not identify a comment in the thread identified by thread_id.']
+        }
 
     @ddt.data(None, -1, 0, 2, 5)
     def test_create_parent_id_too_deep(self, max_depth):
@@ -758,7 +720,7 @@ class CommentSerializerDeserializationTest(ForumsEnableMixin, CommentsServiceMoc
                 else:
                     data["parent_id"] = None
                 serializer = CommentSerializer(data=data, context=context)
-                self.assertTrue(serializer.is_valid(), serializer.errors)
+                assert serializer.is_valid(), serializer.errors
             if max_depth is not None:
                 if max_depth >= 0:
                     self.register_get_comment_response({
@@ -770,8 +732,8 @@ class CommentSerializerDeserializationTest(ForumsEnableMixin, CommentsServiceMoc
                 else:
                     data["parent_id"] = None
                 serializer = CommentSerializer(data=data, context=context)
-                self.assertFalse(serializer.is_valid())
-                self.assertEqual(serializer.errors, {"non_field_errors": ["Comment level is too deep."]})
+                assert not serializer.is_valid()
+                assert serializer.errors == {'non_field_errors': ['Comment level is too deep.']}
 
     def test_create_missing_field(self):
         for field in self.minimal_data:
@@ -781,11 +743,8 @@ class CommentSerializerDeserializationTest(ForumsEnableMixin, CommentsServiceMoc
                 data=data,
                 context=get_context(self.course, self.request, make_minimal_cs_thread())
             )
-            self.assertFalse(serializer.is_valid())
-            self.assertEqual(
-                serializer.errors,
-                {field: ["This field is required."]}
-            )
+            assert not serializer.is_valid()
+            assert serializer.errors == {field: ['This field is required.']}
 
     def test_create_endorsed(self):
         # TODO: The comments service doesn't populate the endorsement field on
@@ -794,34 +753,28 @@ class CommentSerializerDeserializationTest(ForumsEnableMixin, CommentsServiceMoc
         data = self.minimal_data.copy()
         data["endorsed"] = True
         saved = self.save_and_reserialize(data)
-        self.assertEqual(
-            httpretty.last_request().parsed_body,  # lint-amnesty, pylint: disable=no-member
-            {
-                "course_id": [six.text_type(self.course.id)],
-                "body": ["Test body"],
-                "user_id": [str(self.user.id)],
-                "endorsed": ["True"],
-            }
-        )
-        self.assertTrue(saved["endorsed"])
-        self.assertIsNone(saved["endorsed_by"])
-        self.assertIsNone(saved["endorsed_by_label"])
-        self.assertIsNone(saved["endorsed_at"])
+        assert httpretty.last_request().parsed_body == {  # lint-amnesty, pylint: disable=no-member
+            'course_id': [six.text_type(self.course.id)],
+            'body': ['Test body'],
+            'user_id': [str(self.user.id)],
+            'endorsed': ['True']
+        }
+        assert saved['endorsed']
+        assert saved['endorsed_by'] is None
+        assert saved['endorsed_by_label'] is None
+        assert saved['endorsed_at'] is None
 
     def test_update_empty(self):
         self.register_put_comment_response(self.existing_comment.attributes)
         self.save_and_reserialize({}, instance=self.existing_comment)
-        self.assertEqual(
-            httpretty.last_request().parsed_body,  # lint-amnesty, pylint: disable=no-member
-            {
-                "body": ["Original body"],
-                "course_id": [six.text_type(self.course.id)],
-                "user_id": [str(self.user.id)],
-                "anonymous": ["False"],
-                "anonymous_to_peers": ["False"],
-                "endorsed": ["False"],
-            }
-        )
+        assert httpretty.last_request().parsed_body == {  # lint-amnesty, pylint: disable=no-member
+            'body': ['Original body'],
+            'course_id': [six.text_type(self.course.id)],
+            'user_id': [str(self.user.id)],
+            'anonymous': ['False'],
+            'anonymous_to_peers': ['False'],
+            'endorsed': ['False']
+        }
 
     def test_update_all(self):
         cs_response_data = self.existing_comment.attributes.copy()
@@ -832,22 +785,19 @@ class CommentSerializerDeserializationTest(ForumsEnableMixin, CommentsServiceMoc
         self.register_put_comment_response(cs_response_data)
         data = {"raw_body": "Edited body", "endorsed": True}
         saved = self.save_and_reserialize(data, instance=self.existing_comment)
-        self.assertEqual(
-            httpretty.last_request().parsed_body,  # lint-amnesty, pylint: disable=no-member
-            {
-                "body": ["Edited body"],
-                "course_id": [six.text_type(self.course.id)],
-                "user_id": [str(self.user.id)],
-                "anonymous": ["False"],
-                "anonymous_to_peers": ["False"],
-                "endorsed": ["True"],
-                "endorsement_user_id": [str(self.user.id)],
-            }
-        )
+        assert httpretty.last_request().parsed_body == {  # lint-amnesty, pylint: disable=no-member
+            'body': ['Edited body'],
+            'course_id': [six.text_type(self.course.id)],
+            'user_id': [str(self.user.id)],
+            'anonymous': ['False'],
+            'anonymous_to_peers': ['False'],
+            'endorsed': ['True'],
+            'endorsement_user_id': [str(self.user.id)]
+        }
         for key in data:
-            self.assertEqual(saved[key], data[key])
-        self.assertEqual(saved["endorsed_by"], self.user.username)
-        self.assertEqual(saved["endorsed_at"], "2015-06-05T00:00:00Z")
+            assert saved[key] == data[key]
+        assert saved['endorsed_by'] == self.user.username
+        assert saved['endorsed_at'] == '2015-06-05T00:00:00Z'
 
     @ddt.data("", " ")
     def test_update_empty_raw_body(self, value):
@@ -857,11 +807,8 @@ class CommentSerializerDeserializationTest(ForumsEnableMixin, CommentsServiceMoc
             partial=True,
             context=get_context(self.course, self.request)
         )
-        self.assertFalse(serializer.is_valid())
-        self.assertEqual(
-            serializer.errors,
-            {"raw_body": ["This field may not be blank."]}
-        )
+        assert not serializer.is_valid()
+        assert serializer.errors == {'raw_body': ['This field may not be blank.']}
 
     @ddt.data("thread_id", "parent_id")
     def test_update_non_updatable(self, field):
@@ -871,8 +818,5 @@ class CommentSerializerDeserializationTest(ForumsEnableMixin, CommentsServiceMoc
             partial=True,
             context=get_context(self.course, self.request)
         )
-        self.assertFalse(serializer.is_valid())
-        self.assertEqual(
-            serializer.errors,
-            {field: ["This field is not allowed in an update."]}
-        )
+        assert not serializer.is_valid()
+        assert serializer.errors == {field: ['This field is not allowed in an update.']}

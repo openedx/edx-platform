@@ -1,3 +1,4 @@
+import pytest
 # pylint: skip-file
 # -*- coding: utf-8 -*-
 """Tests for django comment client views."""
@@ -363,11 +364,11 @@ class ViewsTestCaseMixin(object):
                 }),
                 data={"body": "foo", "title": "foo", "commentable_id": "some_topic"}
             )
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
         data = json.loads(response.content.decode('utf-8'))
-        self.assertEqual(data['body'], 'foo')
-        self.assertEqual(data['title'], 'foo')
-        self.assertEqual(data['commentable_id'], 'some_topic')
+        assert data['body'] == 'foo'
+        assert data['title'] == 'foo'
+        assert data['commentable_id'] == 'some_topic'
 
 
 @ddt.ddt
@@ -525,7 +526,7 @@ class ViewsTestCase(
                     kwargs={"course_id": six.text_type(self.course_id), "thread_id": 'i4x-MITx-999-course-Robot_Super_Course'}
                 )
             )
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
 
     def test_delete_thread(self, mock_request):
         self._set_mock_request_data(mock_request, {
@@ -542,8 +543,8 @@ class ViewsTestCase(
                 course_id=six.text_type(self.course.id),
                 thread_id=test_thread_id
             )
-        self.assertEqual(response.status_code, 200)
-        self.assertTrue(mock_request.called)
+        assert response.status_code == 200
+        assert mock_request.called
 
     def test_delete_comment(self, mock_request):
         self._set_mock_request_data(mock_request, {
@@ -560,11 +561,11 @@ class ViewsTestCase(
                 course_id=six.text_type(self.course.id),
                 comment_id=test_comment_id
             )
-        self.assertEqual(response.status_code, 200)
-        self.assertTrue(mock_request.called)
+        assert response.status_code == 200
+        assert mock_request.called
         args = mock_request.call_args[0]
-        self.assertEqual(args[0], "delete")
-        self.assertTrue(args[1].endswith("/{}".format(test_comment_id)))
+        assert args[0] == 'delete'
+        assert args[1].endswith('/{}'.format(test_comment_id))
 
     def _test_request_error(self, view_name, view_kwargs, data, mock_request):
         """
@@ -575,9 +576,9 @@ class ViewsTestCase(
         self._setup_mock_request(mock_request, include_depth=(view_name == "create_sub_comment"))
 
         response = self.client.post(reverse(view_name, kwargs=view_kwargs), data=data)
-        self.assertEqual(response.status_code, 400)
+        assert response.status_code == 400
         for call in mock_request.call_args_list:
-            self.assertEqual(call[0][0].lower(), "get")
+            assert call[0][0].lower() == 'get'
 
     def test_create_thread_no_title(self, mock_request):
         self._test_request_error(
@@ -669,7 +670,7 @@ class ViewsTestCase(
                 ),
                 data={"body": "body"}
             )
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
 
     def test_create_comment_no_body(self, mock_request):
         self._test_request_error(
@@ -731,7 +732,7 @@ class ViewsTestCase(
                 ),
                 data={"body": updated_body}
             )
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
         mock_request.assert_called_with(
             "put",
             "{prefix}/comments/{comment_id}".format(prefix=CS_PREFIX, comment_id=comment_id),
@@ -1052,7 +1053,7 @@ class ViewsTestCase(
                     kwargs={item_id: 'dummy', 'course_id': six.text_type(self.course_id)}
                 )
             )
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
 
     def test_endorse_comment(self, mock_request):
         self._setup_mock_request(mock_request)
@@ -1064,7 +1065,7 @@ class ViewsTestCase(
                     kwargs={'comment_id': 'dummy', 'course_id': six.text_type(self.course_id)}
                 )
             )
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
 
 
 @patch("openedx.core.djangoapps.django_comment_common.comment_client.utils.requests.request", autospec=True)
@@ -1102,7 +1103,7 @@ class ViewPermissionsTestCase(ForumsEnableMixin, UrlResetMixin, SharedModuleStor
         response = self.client.post(
             reverse("pin_thread", kwargs={"course_id": six.text_type(self.course.id), "thread_id": "dummy"})
         )
-        self.assertEqual(response.status_code, 401)
+        assert response.status_code == 401
 
     def test_pin_thread_as_moderator(self, mock_request):
         self._set_mock_request_data(mock_request, {})
@@ -1110,7 +1111,7 @@ class ViewPermissionsTestCase(ForumsEnableMixin, UrlResetMixin, SharedModuleStor
         response = self.client.post(
             reverse("pin_thread", kwargs={"course_id": six.text_type(self.course.id), "thread_id": "dummy"})
         )
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
 
     def test_un_pin_thread_as_student(self, mock_request):
         self._set_mock_request_data(mock_request, {})
@@ -1118,7 +1119,7 @@ class ViewPermissionsTestCase(ForumsEnableMixin, UrlResetMixin, SharedModuleStor
         response = self.client.post(
             reverse("un_pin_thread", kwargs={"course_id": six.text_type(self.course.id), "thread_id": "dummy"})
         )
-        self.assertEqual(response.status_code, 401)
+        assert response.status_code == 401
 
     def test_un_pin_thread_as_moderator(self, mock_request):
         self._set_mock_request_data(mock_request, {})
@@ -1126,7 +1127,7 @@ class ViewPermissionsTestCase(ForumsEnableMixin, UrlResetMixin, SharedModuleStor
         response = self.client.post(
             reverse("un_pin_thread", kwargs={"course_id": six.text_type(self.course.id), "thread_id": "dummy"})
         )
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
 
     def _set_mock_request_thread_and_comment(self, mock_request, thread_data, comment_data):
         def handle_request(*args, **kwargs):
@@ -1149,7 +1150,7 @@ class ViewPermissionsTestCase(ForumsEnableMixin, UrlResetMixin, SharedModuleStor
         response = self.client.post(
             reverse("endorse_comment", kwargs={"course_id": six.text_type(self.course.id), "comment_id": "dummy"})
         )
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
 
     def test_endorse_response_as_student(self, mock_request):
         self._set_mock_request_thread_and_comment(
@@ -1161,7 +1162,7 @@ class ViewPermissionsTestCase(ForumsEnableMixin, UrlResetMixin, SharedModuleStor
         response = self.client.post(
             reverse("endorse_comment", kwargs={"course_id": six.text_type(self.course.id), "comment_id": "dummy"})
         )
-        self.assertEqual(response.status_code, 401)
+        assert response.status_code == 401
 
     def test_endorse_response_as_student_question_author(self, mock_request):
         self._set_mock_request_thread_and_comment(
@@ -1173,7 +1174,7 @@ class ViewPermissionsTestCase(ForumsEnableMixin, UrlResetMixin, SharedModuleStor
         response = self.client.post(
             reverse("endorse_comment", kwargs={"course_id": six.text_type(self.course.id), "comment_id": "dummy"})
         )
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
 
 
 class CreateThreadUnicodeTestCase(
@@ -1210,10 +1211,10 @@ class CreateThreadUnicodeTestCase(
             request, course_id=six.text_type(self.course.id), commentable_id=u"non_tåem_dummy_id"
         )
 
-        self.assertEqual(response.status_code, 200)
-        self.assertTrue(mock_request.called)
-        self.assertEqual(mock_request.call_args[1]["data"]["body"], text)
-        self.assertEqual(mock_request.call_args[1]["data"]["title"], text)
+        assert response.status_code == 200
+        assert mock_request.called
+        assert mock_request.call_args[1]['data']['body'] == text
+        assert mock_request.call_args[1]['data']['title'] == text
 
 
 @disable_signal(views, 'thread_edited')
@@ -1253,12 +1254,12 @@ class UpdateThreadUnicodeTestCase(
         request.view_name = "update_thread"
         response = views.update_thread(request, course_id=six.text_type(self.course.id), thread_id="dummy_thread_id")
 
-        self.assertEqual(response.status_code, 200)
-        self.assertTrue(mock_request.called)
-        self.assertEqual(mock_request.call_args[1]["data"]["body"], text)
-        self.assertEqual(mock_request.call_args[1]["data"]["title"], text)
-        self.assertEqual(mock_request.call_args[1]["data"]["thread_type"], "question")
-        self.assertEqual(mock_request.call_args[1]["data"]["commentable_id"], "test_commentable")
+        assert response.status_code == 200
+        assert mock_request.called
+        assert mock_request.call_args[1]['data']['body'] == text
+        assert mock_request.call_args[1]['data']['title'] == text
+        assert mock_request.call_args[1]['data']['thread_type'] == 'question'
+        assert mock_request.call_args[1]['data']['commentable_id'] == 'test_commentable'
 
 
 @disable_signal(views, 'comment_created')
@@ -1301,9 +1302,9 @@ class CreateCommentUnicodeTestCase(
                 request, course_id=six.text_type(self.course.id), thread_id="dummy_thread_id"
             )
 
-            self.assertEqual(response.status_code, 200)
-            self.assertTrue(mock_request.called)
-            self.assertEqual(mock_request.call_args[1]["data"]["body"], text)
+            assert response.status_code == 200
+            assert mock_request.called
+            assert mock_request.call_args[1]['data']['body'] == text
         finally:
             del Thread.commentable_id
 
@@ -1341,9 +1342,9 @@ class UpdateCommentUnicodeTestCase(
         request.view_name = "update_comment"
         response = views.update_comment(request, course_id=six.text_type(self.course.id), comment_id="dummy_comment_id")
 
-        self.assertEqual(response.status_code, 200)
-        self.assertTrue(mock_request.called)
-        self.assertEqual(mock_request.call_args[1]["data"]["body"], text)
+        assert response.status_code == 200
+        assert mock_request.called
+        assert mock_request.call_args[1]['data']['body'] == text
 
 
 @disable_signal(views, 'comment_created')
@@ -1390,9 +1391,9 @@ class CreateSubCommentUnicodeTestCase(
                 request, course_id=six.text_type(self.course.id), comment_id="dummy_comment_id"
             )
 
-            self.assertEqual(response.status_code, 200)
-            self.assertTrue(mock_request.called)
-            self.assertEqual(mock_request.call_args[1]["data"]["body"], text)
+            assert response.status_code == 200
+            assert mock_request.called
+            assert mock_request.call_args[1]['data']['body'] == text
         finally:
             del Thread.commentable_id
 
@@ -1567,7 +1568,7 @@ class TeamsPermissionsTestCase(ForumsEnableMixin, UrlResetMixin, SharedModuleSto
             ),
             data={"body": "foo", "title": "foo", "commentable_id": commentable_id}
         )
-        self.assertEqual(response.status_code, status_code)
+        assert response.status_code == status_code
 
     @ddt.data(
         # Students can delete their own posts
@@ -1611,7 +1612,7 @@ class TeamsPermissionsTestCase(ForumsEnableMixin, UrlResetMixin, SharedModuleSto
             ),
             data={"body": "foo", "title": "foo"}
         )
-        self.assertEqual(response.status_code, status_code)
+        assert response.status_code == status_code
 
     @ddt.data(*ddt_permissions_args)
     @ddt.unpack
@@ -1632,7 +1633,7 @@ class TeamsPermissionsTestCase(ForumsEnableMixin, UrlResetMixin, SharedModuleSto
             ),
             data={"body": "foo", "title": "foo"}
         )
-        self.assertEqual(response.status_code, status_code)
+        assert response.status_code == status_code
 
     @ddt.data(*ddt_permissions_args)
     @ddt.unpack
@@ -1655,7 +1656,7 @@ class TeamsPermissionsTestCase(ForumsEnableMixin, UrlResetMixin, SharedModuleSto
             ),
             data={"body": "foo", "title": "foo"}
         )
-        self.assertEqual(response.status_code, status_code)
+        assert response.status_code == status_code
 
     @ddt.data(*ddt_permissions_args)
     @ddt.unpack
@@ -1676,7 +1677,7 @@ class TeamsPermissionsTestCase(ForumsEnableMixin, UrlResetMixin, SharedModuleSto
                     kwargs={"course_id": six.text_type(self.course.id), "comment_id": "dummy_comment"}
                 )
             )
-            self.assertEqual(response.status_code, status_code)
+            assert response.status_code == status_code
 
     @ddt.data(*ddt_permissions_args)
     @ddt.unpack
@@ -1698,7 +1699,7 @@ class TeamsPermissionsTestCase(ForumsEnableMixin, UrlResetMixin, SharedModuleSto
                     kwargs={"course_id": six.text_type(self.course.id), "thread_id": "dummy_thread"}
                 )
             )
-            self.assertEqual(response.status_code, status_code)
+            assert response.status_code == status_code
 
 
 TEAM_COMMENTABLE_ID = 'test-team-discussion'
@@ -1744,13 +1745,13 @@ class ForumEventTestCase(ForumsEnableMixin, SharedModuleStoreTestCase, MockReque
         views.create_comment(request, course_id=six.text_type(self.course.id), thread_id='test_thread_id')
 
         event_name, event = mock_emit.call_args[0]
-        self.assertEqual(event_name, 'edx.forum.response.created')
-        self.assertEqual(event['body'], "Test comment")
-        self.assertEqual(event['commentable_id'], 'test_commentable_id')
-        self.assertEqual(event['user_forums_roles'], ['Student'])
-        self.assertEqual(event['user_course_roles'], ['Wizard'])
-        self.assertEqual(event['discussion']['id'], 'test_thread_id')
-        self.assertEqual(event['options']['followed'], True)
+        assert event_name == 'edx.forum.response.created'
+        assert event['body'] == 'Test comment'
+        assert event['commentable_id'] == 'test_commentable_id'
+        assert event['user_forums_roles'] == ['Student']
+        assert event['user_course_roles'] == ['Wizard']
+        assert event['discussion']['id'] == 'test_thread_id'
+        assert event['options']['followed'] is True
 
     @patch('eventtracking.tracker.emit')
     @patch('openedx.core.djangoapps.django_comment_common.comment_client.utils.requests.request', autospec=True)
@@ -1771,13 +1772,13 @@ class ForumEventTestCase(ForumsEnableMixin, SharedModuleStoreTestCase, MockReque
         views.create_sub_comment(request, course_id=six.text_type(self.course.id), comment_id="dummy_comment_id")
 
         event_name, event = mock_emit.call_args[0]
-        self.assertEqual(event_name, "edx.forum.comment.created")
-        self.assertEqual(event['body'], 'Another comment')
-        self.assertEqual(event['discussion']['id'], 'test_thread_id')
-        self.assertEqual(event['response']['id'], 'test_response_id')
-        self.assertEqual(event['user_forums_roles'], ['Student'])
-        self.assertEqual(event['user_course_roles'], ['Wizard'])
-        self.assertEqual(event['options']['followed'], False)
+        assert event_name == 'edx.forum.comment.created'
+        assert event['body'] == 'Another comment'
+        assert event['discussion']['id'] == 'test_thread_id'
+        assert event['response']['id'] == 'test_response_id'
+        assert event['user_forums_roles'] == ['Student']
+        assert event['user_course_roles'] == ['Wizard']
+        assert event['options']['followed'] is False
 
     @patch('eventtracking.tracker.emit')
     @patch('openedx.core.djangoapps.django_comment_common.comment_client.utils.requests.request', autospec=True)
@@ -1820,8 +1821,8 @@ class ForumEventTestCase(ForumsEnableMixin, SharedModuleStoreTestCase, MockReque
         getattr(views, view_name)(request, course_id=six.text_type(self.course.id), **view_kwargs)
 
         name, event = mock_emit.call_args[0]
-        self.assertEqual(name, event_name)
-        self.assertEqual(event['team_id'], team.team_id)
+        assert name == event_name
+        assert event['team_id'] == team.team_id
 
     @ddt.data(
         ('vote_for_thread', 'thread_id', 'thread'),
@@ -1850,12 +1851,12 @@ class ForumEventTestCase(ForumsEnableMixin, SharedModuleStoreTestCase, MockReque
             kwargs.update(value='up')
         view_function(request, **kwargs)
 
-        self.assertTrue(mock_emit.called)
+        assert mock_emit.called
         event_name, event = mock_emit.call_args[0]
-        self.assertEqual(event_name, 'edx.forum.{}.voted'.format(obj_type))
-        self.assertEqual(event['target_username'], 'gumprecht')
-        self.assertEqual(event['undo_vote'], undo)
-        self.assertEqual(event['vote_value'], 'up')
+        assert event_name == 'edx.forum.{}.voted'.format(obj_type)
+        assert event['target_username'] == 'gumprecht'
+        assert event['undo_vote'] == undo
+        assert event['vote_value'] == 'up'
 
 
 class UsersEndpointTestCase(ForumsEnableMixin, SharedModuleStoreTestCase, MockRequestSetupMixin):
@@ -1897,55 +1898,52 @@ class UsersEndpointTestCase(ForumsEnableMixin, SharedModuleStoreTestCase, MockRe
     def test_finds_exact_match(self, mock_request):
         self.set_post_counts(mock_request)
         response = self.make_request(username="other")
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(
-            json.loads(response.content.decode('utf-8'))["users"],
-            [{"id": self.other_user.id, "username": self.other_user.username}]
-        )
+        assert response.status_code == 200
+        assert json.loads(response.content.decode('utf-8'))['users'] == [{'id': self.other_user.id, 'username': self.other_user.username}]
 
     @patch('openedx.core.djangoapps.django_comment_common.comment_client.utils.requests.request', autospec=True)
     def test_finds_no_match(self, mock_request):
         self.set_post_counts(mock_request)
         response = self.make_request(username="othor")
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(json.loads(response.content.decode('utf-8'))["users"], [])
+        assert response.status_code == 200
+        assert json.loads(response.content.decode('utf-8'))['users'] == []
 
     def test_requires_GET(self):
         response = self.make_request(method='post', username="other")
-        self.assertEqual(response.status_code, 405)
+        assert response.status_code == 405
 
     def test_requires_username_param(self):
         response = self.make_request()
-        self.assertEqual(response.status_code, 400)
+        assert response.status_code == 400
         content = json.loads(response.content.decode('utf-8'))
-        self.assertIn("errors", content)
-        self.assertNotIn("users", content)
+        assert 'errors' in content
+        assert 'users' not in content
 
     def test_course_does_not_exist(self):
         course_id = CourseKey.from_string("does/not/exist")
         response = self.make_request(course_id=course_id, username="other")
 
-        self.assertEqual(response.status_code, 404)
+        assert response.status_code == 404
         content = json.loads(response.content.decode('utf-8'))
-        self.assertIn("errors", content)
-        self.assertNotIn("users", content)
+        assert 'errors' in content
+        assert 'users' not in content
 
     def test_requires_requestor_enrolled_in_course(self):
         # unenroll self.student from the course.
         self.enrollment.delete()
 
         response = self.make_request(username="other")
-        self.assertEqual(response.status_code, 404)
+        assert response.status_code == 404
         content = json.loads(response.content.decode('utf-8'))
-        self.assertIn("errors", content)
-        self.assertNotIn("users", content)
+        assert 'errors' in content
+        assert 'users' not in content
 
     @patch('openedx.core.djangoapps.django_comment_common.comment_client.utils.requests.request', autospec=True)
     def test_requires_matched_user_has_forum_content(self, mock_request):
         self.set_post_counts(mock_request, 0, 0)
         response = self.make_request(username="other")
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(json.loads(response.content.decode('utf-8'))["users"], [])
+        assert response.status_code == 200
+        assert json.loads(response.content.decode('utf-8'))['users'] == []
 
 
 @ddt.ddt
@@ -1966,7 +1964,7 @@ class SegmentIOForumThreadViewedEventTestCase(SegmentIOTrackingTestCaseBase):
         middleware.process_request(request)
         try:
             response = segmentio.segmentio_event(request)
-            self.assertEqual(response.status_code, 200)
+            assert response.status_code == 200
         finally:
             middleware.process_response(request, None)
 
@@ -1981,8 +1979,8 @@ class SegmentIOForumThreadViewedEventTestCase(SegmentIOTrackingTestCaseBase):
         """
         self._raise_navigation_event('Forum: View Thread', include_name)
         event = self.get_event()
-        self.assertEqual(event['name'], 'edx.forum.thread.viewed')
-        self.assertEqual(event['event_type'], event['name'])
+        assert event['name'] == 'edx.forum.thread.viewed'
+        assert event['event_type'] == event['name']
 
     @ddt.data(True, False)
     def test_non_thread_viewed(self, include_name):
@@ -2095,7 +2093,7 @@ class ForumThreadViewedEventTransformerTestCase(ForumsEnableMixin, UrlResetMixin
 
     def test_missing_context(self):
         event = _create_event(include_context=False)
-        with self.assertRaises(EventEmissionExit):
+        with pytest.raises(EventEmissionExit):
             _get_transformed_event(event)
 
     def test_no_data(self):
@@ -2107,7 +2105,7 @@ class ForumThreadViewedEventTransformerTestCase(ForumsEnableMixin, UrlResetMixin
 
     def test_inner_context(self):
         _, event_trans = _create_and_transform_event(inner_context={})
-        self.assertNotIn('context', event_trans['event'])
+        assert 'context' not in event_trans['event']
 
     def test_non_thread_view(self):
         event = _create_event(
@@ -2116,7 +2114,7 @@ class ForumThreadViewedEventTransformerTestCase(ForumsEnableMixin, UrlResetMixin
             topic_id=self.DUMMY_CATEGORY_ID,
             thread_id=self.DUMMY_THREAD_ID,
         )
-        with self.assertRaises(EventEmissionExit):
+        with pytest.raises(EventEmissionExit):
             _get_transformed_event(event)
 
     def test_bad_field_types(self):
@@ -2133,19 +2131,19 @@ class ForumThreadViewedEventTransformerTestCase(ForumsEnableMixin, UrlResetMixin
     def test_bad_course_id(self):
         event, event_trans = _create_and_transform_event(course_id='non-existent-course-id')
         event_data = event_trans['event']
-        self.assertNotIn('category_id', event_data)
-        self.assertNotIn('category_name', event_data)
-        self.assertNotIn('url', event_data)
-        self.assertNotIn('user_forums_roles', event_data)
-        self.assertNotIn('user_course_roles', event_data)
+        assert 'category_id' not in event_data
+        assert 'category_name' not in event_data
+        assert 'url' not in event_data
+        assert 'user_forums_roles' not in event_data
+        assert 'user_course_roles' not in event_data
 
     def test_bad_username(self):
         event, event_trans = _create_and_transform_event(username='non-existent-username')
         event_data = event_trans['event']
-        self.assertNotIn('category_id', event_data)
-        self.assertNotIn('category_name', event_data)
-        self.assertNotIn('user_forums_roles', event_data)
-        self.assertNotIn('user_course_roles', event_data)
+        assert 'category_id' not in event_data
+        assert 'category_name' not in event_data
+        assert 'user_forums_roles' not in event_data
+        assert 'user_course_roles' not in event_data
 
     def test_bad_url(self):
         event, event_trans = _create_and_transform_event(
@@ -2153,7 +2151,7 @@ class ForumThreadViewedEventTransformerTestCase(ForumsEnableMixin, UrlResetMixin
             topic_id='malformed/commentable/id',
             thread_id='malformed/thread/id',
         )
-        self.assertNotIn('url', event_trans['event'])
+        assert 'url' not in event_trans['event']
 
     def test_renamed_fields(self):
         AUTHOR = 'joe-the-plumber'
@@ -2163,32 +2161,32 @@ class ForumThreadViewedEventTransformerTestCase(ForumsEnableMixin, UrlResetMixin
             thread_id=self.DUMMY_THREAD_ID,
             author=AUTHOR,
         )
-        self.assertEqual(event_trans['event']['commentable_id'], self.DUMMY_CATEGORY_ID)
-        self.assertEqual(event_trans['event']['id'], self.DUMMY_THREAD_ID)
-        self.assertEqual(event_trans['event']['target_username'], AUTHOR)
+        assert event_trans['event']['commentable_id'] == self.DUMMY_CATEGORY_ID
+        assert event_trans['event']['id'] == self.DUMMY_THREAD_ID
+        assert event_trans['event']['target_username'] == AUTHOR
 
     def test_titles(self):
 
         # No title
         _, event_1_trans = _create_and_transform_event()
-        self.assertNotIn('title', event_1_trans['event'])
-        self.assertNotIn('title_truncated', event_1_trans['event'])
+        assert 'title' not in event_1_trans['event']
+        assert 'title_truncated' not in event_1_trans['event']
 
         # Short title
         _, event_2_trans = _create_and_transform_event(
             action='!',
         )
-        self.assertIn('title', event_2_trans['event'])
-        self.assertIn('title_truncated', event_2_trans['event'])
-        self.assertFalse(event_2_trans['event']['title_truncated'])
+        assert 'title' in event_2_trans['event']
+        assert 'title_truncated' in event_2_trans['event']
+        assert not event_2_trans['event']['title_truncated']
 
         # Long title
         _, event_3_trans = _create_and_transform_event(
             action=('covfefe' * 200),
         )
-        self.assertIn('title', event_3_trans['event'])
-        self.assertIn('title_truncated', event_3_trans['event'])
-        self.assertTrue(event_3_trans['event']['title_truncated'])
+        assert 'title' in event_3_trans['event']
+        assert 'title_truncated' in event_3_trans['event']
+        assert event_3_trans['event']['title_truncated']
 
     @ddt.data(ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split)
     def test_urls(self, store):
@@ -2203,7 +2201,7 @@ class ForumThreadViewedEventTransformerTestCase(ForumsEnableMixin, UrlResetMixin
         expected_path = '/courses/{0}/discussion/forum/{1}/threads/{2}'.format(
             course.id, commentable_id, thread_id
         )
-        self.assertTrue(event_trans['event'].get('url').endswith(expected_path))
+        assert event_trans['event'].get('url').endswith(expected_path)
 
     def test_categories(self):
 
@@ -2213,8 +2211,8 @@ class ForumThreadViewedEventTransformerTestCase(ForumsEnableMixin, UrlResetMixin
             course_id=self.course.id,
             topic_id='non-existent-category-id',
         )
-        self.assertNotIn('category_id', event_trans_1['event'])
-        self.assertNotIn('category_name', event_trans_1['event'])
+        assert 'category_id' not in event_trans_1['event']
+        assert 'category_name' not in event_trans_1['event']
 
         # Good category
         _, event_trans_2 = _create_and_transform_event(
@@ -2222,9 +2220,9 @@ class ForumThreadViewedEventTransformerTestCase(ForumsEnableMixin, UrlResetMixin
             course_id=self.course.id,
             topic_id=self.category.discussion_id,
         )
-        self.assertEqual(event_trans_2['event'].get('category_id'), self.category.discussion_id)
+        assert event_trans_2['event'].get('category_id') == self.category.discussion_id
         full_category_name = u'{0} / {1}'.format(self.category.discussion_category, self.category.discussion_target)
-        self.assertEqual(event_trans_2['event'].get('category_name'), full_category_name)
+        assert event_trans_2['event'].get('category_name') == full_category_name
 
     def test_roles(self):
 
@@ -2232,24 +2230,24 @@ class ForumThreadViewedEventTransformerTestCase(ForumsEnableMixin, UrlResetMixin
         _, event_trans_1 = _create_and_transform_event(
             course_id=self.course.id,
         )
-        self.assertNotIn('user_forums_roles', event_trans_1['event'])
-        self.assertNotIn('user_course_roles', event_trans_1['event'])
+        assert 'user_forums_roles' not in event_trans_1['event']
+        assert 'user_course_roles' not in event_trans_1['event']
 
         # Student user
         _, event_trans_2 = _create_and_transform_event(
             course_id=self.course.id,
             username=self.student.username,
         )
-        self.assertEqual(event_trans_2['event'].get('user_forums_roles'), [FORUM_ROLE_STUDENT])
-        self.assertEqual(event_trans_2['event'].get('user_course_roles'), [])
+        assert event_trans_2['event'].get('user_forums_roles') == [FORUM_ROLE_STUDENT]
+        assert event_trans_2['event'].get('user_course_roles') == []
 
         # Course staff user
         _, event_trans_3 = _create_and_transform_event(
             course_id=self.course.id,
             username=self.staff.username,
         )
-        self.assertEqual(event_trans_3['event'].get('user_forums_roles'), [])
-        self.assertEqual(event_trans_3['event'].get('user_course_roles'), [CourseStaffRole.ROLE])
+        assert event_trans_3['event'].get('user_forums_roles') == []
+        assert event_trans_3['event'].get('user_course_roles') == [CourseStaffRole.ROLE]
 
     def test_teams(self):
 
@@ -2257,18 +2255,18 @@ class ForumThreadViewedEventTransformerTestCase(ForumsEnableMixin, UrlResetMixin
         _, event_trans_1 = _create_and_transform_event(
             course_id=self.course.id,
         )
-        self.assertNotIn('team_id', event_trans_1)
+        assert 'team_id' not in event_trans_1
 
         # Non-team category
         _, event_trans_2 = _create_and_transform_event(
             course_id=self.course.id,
             topic_id=self.CATEGORY_ID,
         )
-        self.assertNotIn('team_id', event_trans_2)
+        assert 'team_id' not in event_trans_2
 
         # Team category
         _, event_trans_3 = _create_and_transform_event(
             course_id=self.course.id,
             topic_id=self.TEAM_CATEGORY_ID,
         )
-        self.assertEqual(event_trans_3['event'].get('team_id'), self.team.team_id)
+        assert event_trans_3['event'].get('team_id') == self.team.team_id

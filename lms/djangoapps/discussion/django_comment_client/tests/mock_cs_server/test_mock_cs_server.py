@@ -57,4 +57,4 @@ class MockCommentServiceServerTest(unittest.TestCase):
         response_dict = json.loads(response.read())
 
         # You should have received the response specified in the setup above
-        self.assertEqual(response_dict, self.expected_response)
+        assert response_dict == self.expected_response

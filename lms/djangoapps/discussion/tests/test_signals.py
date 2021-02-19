@@ -41,7 +41,7 @@ class SendMessageHandlerTestCase(TestCase):  # lint-amnesty, pylint: disable=mis
     def test_comment_created_signal_message_not_sent_without_site(self, mock_send_message, mock_get_current_site):  # lint-amnesty, pylint: disable=unused-argument
         signals.comment_created.send(sender=self.sender, user=self.user, post=self.post)
 
-        self.assertFalse(mock_send_message.called)
+        assert not mock_send_message.called
 
     @mock.patch('lms.djangoapps.discussion.signals.handlers.get_current_site')
     @mock.patch('lms.djangoapps.discussion.signals.handlers.send_message')
@@ -49,7 +49,7 @@ class SendMessageHandlerTestCase(TestCase):  # lint-amnesty, pylint: disable=mis
         mock_get_current_site.return_value = self.site
         signals.comment_created.send(sender=self.sender, user=self.user, post=self.post)
 
-        self.assertFalse(mock_send_message.called)
+        assert not mock_send_message.called
 
     @mock.patch('lms.djangoapps.discussion.signals.handlers.get_current_site')
     @mock.patch('lms.djangoapps.discussion.signals.handlers.send_message')
@@ -63,7 +63,7 @@ class SendMessageHandlerTestCase(TestCase):  # lint-amnesty, pylint: disable=mis
         mock_get_current_site.return_value = self.site
         signals.comment_created.send(sender=self.sender, user=self.user, post=self.post)
 
-        self.assertFalse(mock_send_message.called)
+        assert not mock_send_message.called
 
 
 class CoursePublishHandlerTestCase(ModuleStoreTestCase):
@@ -78,7 +78,7 @@ class CoursePublishHandlerTestCase(ModuleStoreTestCase):
 
         # create course
         course = CourseFactory(emit_signals=True, **course_key_args)
-        self.assertEqual(course.id, course_key)
+        assert course.id == course_key
         self._assert_discussion_id_map(course_key, {})
 
         # create discussion block

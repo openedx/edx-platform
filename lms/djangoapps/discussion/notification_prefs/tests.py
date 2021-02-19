@@ -58,17 +58,16 @@ class NotificationPrefViewTest(UrlResetMixin, TestCase):  # lint-amnesty, pylint
     def assertPrefValid(self, user):
         """Ensure that the correct preference for the user is persisted"""
         pref = UserPreference.objects.get(user=user, key=NOTIFICATION_PREF_KEY)
-        self.assertTrue(pref)  # check exists and only 1 (.get)
+        assert pref
+        # check exists and only 1 (.get)
         # now coerce username to utf-8 encoded str, since we test with non-ascii unicdoe above and
         # the unittest framework has hard time coercing to unicode.
         # decrypt also can't take a unicode input, so coerce its input to str
-        self.assertEqual(six.binary_type(user.username.encode('utf-8')), UsernameCipher().decrypt(str(pref.value)))
+        assert six.binary_type(user.username.encode('utf-8')) == UsernameCipher().decrypt(str(pref.value))
 
     def assertNotPrefExists(self, user):
         """Ensure that the user does not have a persisted preference"""
-        self.assertFalse(
-            UserPreference.objects.filter(user=user, key=NOTIFICATION_PREF_KEY).exists()
-        )
+        assert not UserPreference.objects.filter(user=user, key=NOTIFICATION_PREF_KEY).exists()
 
     # AJAX status view
 
@@ -76,22 +75,22 @@ class NotificationPrefViewTest(UrlResetMixin, TestCase):  # lint-amnesty, pylint
         request = self.request_factory.get("dummy")
         request.user = self.user
         response = ajax_status(request)
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(json.loads(response.content.decode('utf-8')), {"status": 0})
+        assert response.status_code == 200
+        assert json.loads(response.content.decode('utf-8')) == {'status': 0}
 
     def test_ajax_status_get_1(self):
         self.create_prefs()
         request = self.request_factory.get("dummy")
         request.user = self.user
         response = ajax_status(request)
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(json.loads(response.content.decode('utf-8')), {"status": 1})
+        assert response.status_code == 200
+        assert json.loads(response.content.decode('utf-8')) == {'status': 1}
 
     def test_ajax_status_post(self):
         request = self.request_factory.post("dummy")
         request.user = self.user
         response = ajax_status(request)
-        self.assertEqual(response.status_code, 405)
+        assert response.status_code == 405
 
     def test_ajax_status_anon_user(self):
         request = self.request_factory.get("dummy")
@@ -104,7 +103,7 @@ class NotificationPrefViewTest(UrlResetMixin, TestCase):  # lint-amnesty, pylint
         request = self.request_factory.get("dummy")
         request.user = self.user
         response = ajax_enable(request)
-        self.assertEqual(response.status_code, 405)
+        assert response.status_code == 405
         self.assertNotPrefExists(self.user)
 
     def test_ajax_enable_anon_user(self):
@@ -121,7 +120,7 @@ class NotificationPrefViewTest(UrlResetMixin, TestCase):  # lint-amnesty, pylint
             request = self.request_factory.post("dummy")
             request.user = user
             response = ajax_enable(request)
-            self.assertEqual(response.status_code, 204)
+            assert response.status_code == 204
             self.assertPrefValid(user)
 
         for user in self.tokens.keys():
@@ -132,7 +131,7 @@ class NotificationPrefViewTest(UrlResetMixin, TestCase):  # lint-amnesty, pylint
         request = self.request_factory.post("dummy")
         request.user = self.user
         response = ajax_enable(request)
-        self.assertEqual(response.status_code, 204)
+        assert response.status_code == 204
         self.assertPrefValid(self.user)
 
     def test_ajax_enable_distinct_values(self):
@@ -142,10 +141,11 @@ class NotificationPrefViewTest(UrlResetMixin, TestCase):  # lint-amnesty, pylint
         other_user = UserFactory.create()
         request.user = other_user
         ajax_enable(request)
-        self.assertNotEqual(
-            UserPreference.objects.get(user=self.user, key=NOTIFICATION_PREF_KEY).value,
-            UserPreference.objects.get(user=other_user, key=NOTIFICATION_PREF_KEY).value
-        )
+        assert UserPreference.objects.get(
+            user=self.user, key=NOTIFICATION_PREF_KEY
+        ).value != UserPreference.objects.get(
+            user=other_user, key=NOTIFICATION_PREF_KEY
+        ).value
 
     # AJAX disable view
 
@@ -154,7 +154,7 @@ class NotificationPrefViewTest(UrlResetMixin, TestCase):  # lint-amnesty, pylint
         request = self.request_factory.get("dummy")
         request.user = self.user
         response = ajax_disable(request)
-        self.assertEqual(response.status_code, 405)
+        assert response.status_code == 405
         self.assertPrefValid(self.user)
 
     def test_ajax_disable_anon_user(self):
@@ -169,14 +169,14 @@ class NotificationPrefViewTest(UrlResetMixin, TestCase):  # lint-amnesty, pylint
         request = self.request_factory.post("dummy")
         request.user = self.user
         response = ajax_disable(request)
-        self.assertEqual(response.status_code, 204)
+        assert response.status_code == 204
         self.assertNotPrefExists(self.user)
 
     def test_ajax_disable_already_disabled(self):
         request = self.request_factory.post("dummy")
         request.user = self.user
         response = ajax_disable(request)
-        self.assertEqual(response.status_code, 204)
+        assert response.status_code == 204
         self.assertNotPrefExists(self.user)
 
     # Unsubscribe view
@@ -184,7 +184,7 @@ class NotificationPrefViewTest(UrlResetMixin, TestCase):  # lint-amnesty, pylint
     def test_unsubscribe_post(self):
         request = self.request_factory.post("dummy")
         response = set_subscription(request, "dummy", subscribe=False)
-        self.assertEqual(response.status_code, 405)
+        assert response.status_code == 405
 
     def test_unsubscribe_invalid_token(self):
         def test_invalid_token(token, message):
@@ -225,7 +225,7 @@ class NotificationPrefViewTest(UrlResetMixin, TestCase):  # lint-amnesty, pylint
             url = reverse('unsubscribe_forum_update', args=[self.tokens[user]])
 
             response = self.client.get(url)
-            self.assertEqual(response.status_code, 200)
+            assert response.status_code == 200
             self.assertNotPrefExists(user)
 
         for user in self.tokens.keys():
@@ -237,16 +237,16 @@ class NotificationPrefViewTest(UrlResetMixin, TestCase):  # lint-amnesty, pylint
         url = reverse('unsubscribe_forum_update', args=[self.tokens[self.user]])
         self.client.get(url)
         response = self.client.get(url)
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
         self.assertNotPrefExists(self.user)
 
     def test_resubscribe_success(self):
         def test_user(user):
             # start without a pref key
-            self.assertFalse(UserPreference.objects.filter(user=user, key=NOTIFICATION_PREF_KEY))
+            assert not UserPreference.objects.filter(user=user, key=NOTIFICATION_PREF_KEY)
             url = reverse('resubscribe_forum_update', args=[self.tokens[user]])
             response = self.client.get(url)
-            self.assertEqual(response.status_code, 200)
+            assert response.status_code == 200
             self.assertPrefValid(user)
 
         for user in self.tokens.keys():
