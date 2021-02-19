@@ -47,10 +47,10 @@ class TestGetCredentials(CredentialsApiConfigMixin, CacheIsolationTestCase):
             'only_visible': 'True',
         }
         cache_key = '{}.{}'.format(self.credentials_config.CACHE_KEY, self.user.username)
-        self.assertEqual(kwargs['querystring'], querystring)
-        self.assertEqual(kwargs['cache_key'], cache_key)
+        assert kwargs['querystring'] == querystring
+        assert kwargs['cache_key'] == cache_key
 
-        self.assertEqual(actual, expected)
+        assert actual == expected
 
     def test_get_one(self, mock_get_edx_api_data):
         expected = factories.UserCredential()
@@ -70,10 +70,10 @@ class TestGetCredentials(CredentialsApiConfigMixin, CacheIsolationTestCase):
             'program_uuid': program_uuid,
         }
         cache_key = '{}.{}.{}'.format(self.credentials_config.CACHE_KEY, self.user.username, program_uuid)
-        self.assertEqual(kwargs['querystring'], querystring)
-        self.assertEqual(kwargs['cache_key'], cache_key)
+        assert kwargs['querystring'] == querystring
+        assert kwargs['cache_key'] == cache_key
 
-        self.assertEqual(actual, expected)
+        assert actual == expected
 
     def test_type_filter(self, mock_get_edx_api_data):
         get_credentials(self.user, credential_type='program')
@@ -88,4 +88,4 @@ class TestGetCredentials(CredentialsApiConfigMixin, CacheIsolationTestCase):
             'only_visible': 'True',
             'type': 'program',
         }
-        self.assertEqual(kwargs['querystring'], querystring)
+        assert kwargs['querystring'] == querystring

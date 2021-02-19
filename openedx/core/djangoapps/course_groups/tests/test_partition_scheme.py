@@ -56,15 +56,10 @@ class TestCohortPartitionScheme(ModuleStoreTestCase):
         Utility for checking that our test student comes up as assigned to the
         specified partition (or, if None, no partition at all)
         """
-        self.assertEqual(
-            CohortPartitionScheme.get_group_for_user(
-                self.course_key,
-                self.student,
-                partition or self.user_partition,
-                use_cached=False
-            ),
-            group
-        )
+        assert CohortPartitionScheme.get_group_for_user(self.course_key,
+                                                        self.student,
+                                                        (partition or self.user_partition),
+                                                        use_cached=False) == group
 
     def test_student_cohort_assignment(self):
         """
@@ -228,7 +223,7 @@ class TestCohortPartitionScheme(ModuleStoreTestCase):
         # warning)
         with patch('openedx.core.djangoapps.course_groups.partition_scheme.log') as mock_log:
             self.assert_student_in_group(None, new_user_partition)
-            self.assertTrue(mock_log.warning.called)
+            assert mock_log.warning.called
             self.assertRegex(mock_log.warning.call_args[0][0], 'group not found')
 
     def test_missing_partition(self):
@@ -253,7 +248,7 @@ class TestCohortPartitionScheme(ModuleStoreTestCase):
         # scheme returns None (and logs a warning).
         with patch('openedx.core.djangoapps.course_groups.partition_scheme.log') as mock_log:
             self.assert_student_in_group(None, new_user_partition)
-            self.assertTrue(mock_log.warning.called)
+            assert mock_log.warning.called
             self.assertRegex(mock_log.warning.call_args[0][0], 'partition mismatch')
 
 
@@ -264,7 +259,7 @@ class TestExtension(django.test.TestCase):
     """
 
     def test_get_scheme(self):
-        self.assertEqual(UserPartition.get_scheme('cohort'), CohortPartitionScheme)
+        assert UserPartition.get_scheme('cohort') == CohortPartitionScheme
         with self.assertRaisesRegex(UserPartitionError, 'Unrecognized scheme'):
             UserPartition.get_scheme('other')
 
@@ -316,14 +311,14 @@ class TestGetCohortedUserPartition(ModuleStoreTestCase):
         self.course.user_partitions.append(self.random_user_partition)
         self.course.user_partitions.append(self.cohort_user_partition)
         self.course.user_partitions.append(self.second_cohort_user_partition)
-        self.assertEqual(self.cohort_user_partition, get_cohorted_user_partition(self.course))
+        assert self.cohort_user_partition == get_cohorted_user_partition(self.course)
 
     def test_no_cohort_user_partitions(self):
         """
         Test get_cohorted_user_partition returns None when there are no cohorted user partitions.
         """
         self.course.user_partitions.append(self.random_user_partition)
-        self.assertIsNone(get_cohorted_user_partition(self.course))
+        assert get_cohorted_user_partition(self.course) is None
 
 
 class TestMasqueradedGroup(StaffMasqueradeTestCase):
@@ -350,10 +345,7 @@ class TestMasqueradedGroup(StaffMasqueradeTestCase):
         )
 
         scheme = self.user_partition.scheme
-        self.assertEqual(
-            scheme.get_group_for_user(self.course.id, self.test_user, self.user_partition),
-            group
-        )
+        assert scheme.get_group_for_user(self.course.id, self.test_user, self.user_partition) == group
 
     def _verify_masquerade_for_all_groups(self):
         """

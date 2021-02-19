@@ -131,17 +131,17 @@ class ContentLibrariesTest(ContentLibrariesRestApiTest):
         lib = self._create_library(
             slug=slug, title="A Test Library", description="Just Testing", library_type=start_type,
         )
-        self.assertEqual(lib['type'], start_type)
+        assert lib['type'] == start_type
         for block_type, block_slug in xblock_specs:
             self._add_block_to_library(lib['id'], block_type, block_slug)
         self._commit_library_changes(lib['id'])
         result = self._update_library(lib['id'], type=target_type, expect_response=expect_response)
         if expect_response == 200:
-            self.assertEqual(result['type'], target_type)
-            self.assertIn('type', result)
+            assert result['type'] == target_type
+            assert 'type' in result
         else:
             lib = self._get_library(lib['id'])
-            self.assertEqual(lib['type'], start_type)
+            assert lib['type'] == start_type
 
     def test_no_convert_on_unpublished(self):
         """
@@ -153,7 +153,7 @@ class ContentLibrariesTest(ContentLibrariesRestApiTest):
         )
         self._add_block_to_library(lib['id'], "video", 'vid-block')
         result = self._update_library(lib['id'], type=VIDEO, expect_response=400)
-        self.assertIn('type', result)
+        assert 'type' in result
 
     def test_no_convert_on_pending_deletes(self):
         """
@@ -167,7 +167,7 @@ class ContentLibrariesTest(ContentLibrariesRestApiTest):
         self._commit_library_changes(lib['id'])
         self._delete_library_block(block['id'])
         result = self._update_library(lib['id'], type=VIDEO, expect_response=400)
-        self.assertIn('type', result)
+        assert 'type' in result
 
     def test_library_validation(self):
         """
@@ -195,30 +195,30 @@ class ContentLibrariesTest(ContentLibrariesRestApiTest):
                 lib1['has_unpublished_deletes'] = lib2['has_unpublished_deletes'] = None
 
             result = self._list_libraries()
-            self.assertEqual(len(result), 2)
-            self.assertIn(lib1, result)
-            self.assertIn(lib2, result)
+            assert len(result) == 2
+            assert lib1 in result
+            assert lib2 in result
             result = self._list_libraries({'pagination': 'true'})
-            self.assertEqual(len(result['results']), 2)
-            self.assertEqual(result['next'], None)
+            assert len(result['results']) == 2
+            assert result['next'] is None
 
             # Create another library which causes number of libraries to exceed the page size
             self._create_library(slug="some-slug-3", title="Existing Library")
             # Verify that if `pagination` param isn't sent, API still honors the max page size.
             # This is for maintaining compatibility with older non pagination-aware clients.
             result = self._list_libraries()
-            self.assertEqual(len(result), 2)
+            assert len(result) == 2
 
             # Pagination enabled:
             # Verify total elements and valid 'next' in page 1
             result = self._list_libraries({'pagination': 'true'})
-            self.assertEqual(len(result['results']), 2)
-            self.assertIn('page=2', result['next'])
-            self.assertIn('pagination=true', result['next'])
+            assert len(result['results']) == 2
+            assert 'page=2' in result['next']
+            assert 'pagination=true' in result['next']
             # Verify total elements and null 'next' in page 2
             result = self._list_libraries({'pagination': 'true', 'page': '2'})
-            self.assertEqual(len(result['results']), 1)
-            self.assertEqual(result['next'], None)
+            assert len(result['results']) == 1
+            assert result['next'] is None
 
     @ddt.data(True, False)
     def test_library_filters(self, is_indexing_enabled):
@@ -251,19 +251,17 @@ class ContentLibrariesTest(ContentLibrariesRestApiTest):
                 org=f'org-test-{suffix}',
             )
 
-            self.assertEqual(len(self._list_libraries()), 5)
-            self.assertEqual(len(self._list_libraries({'org': f'org-test-{suffix}'})), 2)
-            self.assertEqual(len(self._list_libraries({'text_search': f'test-lib-filter-{suffix}'})), 2)
-            self.assertEqual(len(self._list_libraries({'text_search': f'test-lib-filter-{suffix}', 'type': VIDEO})), 1)
-            self.assertEqual(len(self._list_libraries({'text_search': f'library-title-{suffix}'})), 4)
-            self.assertEqual(len(self._list_libraries({'text_search': f'library-title-{suffix}', 'type': VIDEO})), 2)
-            self.assertEqual(len(self._list_libraries({'text_search': f'bar-{suffix}'})), 2)
-            self.assertEqual(len(self._list_libraries({'text_search': f'org-test-{suffix}'})), 2)
-            self.assertEqual(
-                len(self._list_libraries({'org': f'org-test-{suffix}', 'text_search': f'library-title-{suffix}-4'})),
-                1,
-            )
-            self.assertEqual(len(self._list_libraries({'type': VIDEO})), 3)
+            assert len(self._list_libraries()) == 5
+            assert len(self._list_libraries({'org': f'org-test-{suffix}'})) == 2
+            assert len(self._list_libraries({'text_search': f'test-lib-filter-{suffix}'})) == 2
+            assert len(self._list_libraries({'text_search': f'test-lib-filter-{suffix}', 'type': VIDEO})) == 1
+            assert len(self._list_libraries({'text_search': f'library-title-{suffix}'})) == 4
+            assert len(self._list_libraries({'text_search': f'library-title-{suffix}', 'type': VIDEO})) == 2
+            assert len(self._list_libraries({'text_search': f'bar-{suffix}'})) == 2
+            assert len(self._list_libraries({'text_search': f'org-test-{suffix}'})) == 2
+            assert len(self._list_libraries({'org': f'org-test-{suffix}',
+                                             'text_search': f'library-title-{suffix}-4'})) == 1
+            assert len(self._list_libraries({'type': VIDEO})) == 3
 
     # General Content Library XBlock tests:
 
@@ -274,10 +272,10 @@ class ContentLibrariesTest(ContentLibrariesRestApiTest):
         """
         lib = self._create_library(slug="testlib1", title="A Test Library", description="Testing XBlocks")
         lib_id = lib["id"]
-        self.assertEqual(lib["has_unpublished_changes"], False)
+        assert lib['has_unpublished_changes'] is False
 
         # A library starts out empty:
-        self.assertEqual(self._get_library_blocks(lib_id), [])
+        assert self._get_library_blocks(lib_id) == []
 
         # Add a 'problem' XBlock to the library:
         block_data = self._add_block_to_library(lib_id, "problem", "problem1")
@@ -290,23 +288,23 @@ class ContentLibrariesTest(ContentLibrariesRestApiTest):
         block_id = block_data["id"]
         # Confirm that the result contains a definition key, but don't check its value,
         # which for the purposes of these tests is an implementation detail.
-        self.assertIn("def_key", block_data)
+        assert 'def_key' in block_data
 
         # now the library should contain one block and have unpublished changes:
-        self.assertEqual(self._get_library_blocks(lib_id), [block_data])
-        self.assertEqual(self._get_library(lib_id)["has_unpublished_changes"], True)
+        assert self._get_library_blocks(lib_id) == [block_data]
+        assert self._get_library(lib_id)['has_unpublished_changes'] is True
 
         # Publish the changes:
         self._commit_library_changes(lib_id)
-        self.assertEqual(self._get_library(lib_id)["has_unpublished_changes"], False)
+        assert self._get_library(lib_id)['has_unpublished_changes'] is False
         # And now the block information should also show that block has no unpublished changes:
         block_data["has_unpublished_changes"] = False
         self.assertDictContainsEntries(self._get_library_block(block_id), block_data)
-        self.assertEqual(self._get_library_blocks(lib_id), [block_data])
+        assert self._get_library_blocks(lib_id) == [block_data]
 
         # Now update the block's OLX:
         orig_olx = self._get_library_block_olx(block_id)
-        self.assertIn("<problem", orig_olx)
+        assert '<problem' in orig_olx
         new_olx = """
         <problem display_name="New Multi Choice Question" max_attempts="5">
             <multiplechoiceresponse>
@@ -323,7 +321,7 @@ class ContentLibrariesTest(ContentLibrariesRestApiTest):
         """.strip()
         self._set_library_block_olx(block_id, new_olx)
         # now reading it back, we should get that exact OLX (no change to whitespace etc.):
-        self.assertEqual(self._get_library_block_olx(block_id), new_olx)
+        assert self._get_library_block_olx(block_id) == new_olx
         # And the display name and "unpublished changes" status of the block should be updated:
         self.assertDictContainsEntries(self._get_library_block(block_id), {
             "display_name": "New Multi Choice Question",
@@ -332,27 +330,27 @@ class ContentLibrariesTest(ContentLibrariesRestApiTest):
 
         # Now view the XBlock's student_view (including draft changes):
         fragment = self._render_block_view(block_id, "student_view")
-        self.assertIn("resources", fragment)
-        self.assertIn("Blockstore is designed to store.", fragment["content"])
+        assert 'resources' in fragment
+        assert 'Blockstore is designed to store.' in fragment['content']
 
         # Also call a handler to make sure that's working:
         handler_url = self._get_block_handler_url(block_id, "xmodule_handler") + "problem_get"
         problem_get_response = self.client.get(handler_url)
-        self.assertEqual(problem_get_response.status_code, 200)
-        self.assertIn("You have used 0 of 5 attempts", problem_get_response.content.decode('utf-8'))
+        assert problem_get_response.status_code == 200
+        assert 'You have used 0 of 5 attempts' in problem_get_response.content.decode('utf-8')
 
         # Now delete the block:
-        self.assertEqual(self._get_library(lib_id)["has_unpublished_deletes"], False)
+        assert self._get_library(lib_id)['has_unpublished_deletes'] is False
         self._delete_library_block(block_id)
         # Confirm it's deleted:
         self._render_block_view(block_id, "student_view", expect_response=404)
         self._get_library_block(block_id, expect_response=404)
-        self.assertEqual(self._get_library(lib_id)["has_unpublished_deletes"], True)
+        assert self._get_library(lib_id)['has_unpublished_deletes'] is True
 
         # Now revert all the changes back until the last publish:
         self._revert_library_changes(lib_id)
-        self.assertEqual(self._get_library(lib_id)["has_unpublished_deletes"], False)
-        self.assertEqual(self._get_library_block_olx(block_id), orig_olx)
+        assert self._get_library(lib_id)['has_unpublished_deletes'] is False
+        assert self._get_library_block_olx(block_id) == orig_olx
 
         # fin
 
@@ -370,24 +368,24 @@ class ContentLibrariesTest(ContentLibrariesRestApiTest):
             self._add_block_to_library(lib["id"], "problem", "problem2", parent_block=block2["id"])
 
             result = self._get_library_blocks(lib["id"])
-            self.assertEqual(len(result), 2)
-            self.assertIn(block1, result)
+            assert len(result) == 2
+            assert block1 in result
 
             result = self._get_library_blocks(lib["id"], {'pagination': 'true'})
-            self.assertEqual(len(result['results']), 2)
-            self.assertEqual(result['next'], None)
+            assert len(result['results']) == 2
+            assert result['next'] is None
 
             self._add_block_to_library(lib["id"], "problem", "problem3")
             # Test pagination
             result = self._get_library_blocks(lib["id"])
-            self.assertEqual(len(result), 3)
+            assert len(result) == 3
             result = self._get_library_blocks(lib["id"], {'pagination': 'true'})
-            self.assertEqual(len(result['results']), 2)
-            self.assertIn('page=2', result['next'])
-            self.assertIn('pagination=true', result['next'])
+            assert len(result['results']) == 2
+            assert 'page=2' in result['next']
+            assert 'pagination=true' in result['next']
             result = self._get_library_blocks(lib["id"], {'pagination': 'true', 'page': '2'})
-            self.assertEqual(len(result['results']), 1)
-            self.assertEqual(result['next'], None)
+            assert len(result['results']) == 1
+            assert result['next'] is None
 
     @ddt.data(True, False)
     def test_library_blocks_filters(self, is_indexing_enabled):
@@ -404,19 +402,17 @@ class ContentLibrariesTest(ContentLibrariesRestApiTest):
 
             self._set_library_block_olx(block1["id"], "<problem display_name=\"DisplayName\"></problem>")
 
-            self.assertEqual(len(self._get_library_blocks(lib["id"])), 5)
-            self.assertEqual(len(self._get_library_blocks(lib["id"], {'text_search': 'Foo'})), 2)
-            self.assertEqual(len(self._get_library_blocks(lib["id"], {'text_search': 'Display'})), 1)
-            self.assertEqual(len(self._get_library_blocks(lib["id"], {'text_search': 'Video'})), 1)
-            self.assertEqual(len(self._get_library_blocks(lib["id"], {'text_search': 'Foo', 'block_type': 'video'})), 0)
-            self.assertEqual(len(self._get_library_blocks(lib["id"], {'text_search': 'Baz', 'block_type': 'video'})), 1)
-            self.assertEqual(len(
-                self._get_library_blocks(lib["id"], {'text_search': 'Baz', 'block_type': ['video', 'html']})),
-                2,
-            )
-            self.assertEqual(len(self._get_library_blocks(lib["id"], {'block_type': 'video'})), 1)
-            self.assertEqual(len(self._get_library_blocks(lib["id"], {'block_type': 'problem'})), 3)
-            self.assertEqual(len(self._get_library_blocks(lib["id"], {'block_type': 'squirrel'})), 0)
+            assert len(self._get_library_blocks(lib['id'])) == 5
+            assert len(self._get_library_blocks(lib['id'], {'text_search': 'Foo'})) == 2
+            assert len(self._get_library_blocks(lib['id'], {'text_search': 'Display'})) == 1
+            assert len(self._get_library_blocks(lib['id'], {'text_search': 'Video'})) == 1
+            assert len(self._get_library_blocks(lib['id'], {'text_search': 'Foo', 'block_type': 'video'})) == 0
+            assert len(self._get_library_blocks(lib['id'], {'text_search': 'Baz', 'block_type': 'video'})) == 1
+            assert len(self._get_library_blocks(lib['id'], {'text_search': 'Baz', 'block_type': ['video', 'html']})) ==\
+                   2
+            assert len(self._get_library_blocks(lib['id'], {'block_type': 'video'})) == 1
+            assert len(self._get_library_blocks(lib['id'], {'block_type': 'problem'})) == 3
+            assert len(self._get_library_blocks(lib['id'], {'block_type': 'squirrel'})) == 0
 
     @ddt.data(
         ('video-problem', VIDEO, 'problem', 400),
@@ -464,17 +460,14 @@ class ContentLibrariesTest(ContentLibrariesRestApiTest):
         """)
 
         # Check the resulting OLX of the unit:
-        self.assertEqual(self._get_library_block_olx(unit_block["id"]), (
-            '<unit xblock-family="xblock.v1">\n'
-            '  <xblock-include definition="html/html1"/>\n'
-            '  <xblock-include definition="problem/problem1"/>\n'
-            '</unit>\n'
-        ))
+        assert self._get_library_block_olx(unit_block['id']) ==\
+               '<unit xblock-family="xblock.v1">\n  <xblock-include definition="html/html1"/>\n' \
+               '  <xblock-include definition="problem/problem1"/>\n</unit>\n'
 
         # The unit can see and render its children:
         fragment = self._render_block_view(unit_block["id"], "student_view")
-        self.assertIn("Hello world", fragment["content"])
-        self.assertIn("What is an even number?", fragment["content"])
+        assert 'Hello world' in fragment['content']
+        assert 'What is an even number?' in fragment['content']
 
         # We cannot add a duplicate ID to the library, either at the top level or as a child:
         self._add_block_to_library(lib_id, "problem", "problem1", expect_response=400)
@@ -508,12 +501,12 @@ class ContentLibrariesTest(ContentLibrariesRestApiTest):
             lib = self._create_library(slug="permtest", title="Permission Test Library", description="Testing")
             lib_id = lib["id"]
             # By default, "public learning" and public read access are disallowed.
-            self.assertEqual(lib["allow_public_learning"], False)
-            self.assertEqual(lib["allow_public_read"], False)
+            assert lib['allow_public_learning'] is False
+            assert lib['allow_public_read'] is False
 
             # By default, the creator of a new library is the only admin
             data = self._get_library_team(lib_id)
-            self.assertEqual(len(data), 1)
+            assert len(data) == 1
             self.assertDictContainsEntries(data[0], {
                 "username": admin.username, "group_name": None, "access_level": "admin",
             })
@@ -528,7 +521,7 @@ class ContentLibrariesTest(ContentLibrariesRestApiTest):
             self._set_group_access_level(lib_id, group.name, access_level="author")
 
             team_response = self._get_library_team(lib_id)
-            self.assertEqual(len(team_response), 4)
+            assert len(team_response) == 4
             # We'll use this one later.
             reader_grant = {"username": reader.username, "group_name": None, "access_level": "read"}
             # The response should also always be sorted in a specific order (by username and group name):
@@ -552,9 +545,9 @@ class ContentLibrariesTest(ContentLibrariesRestApiTest):
             with self.as_user(user):
                 self._get_library(lib_id)
                 data = self._get_library_team(lib_id)
-                self.assertEqual(data, team_response)
+                assert data == team_response
                 data = self._get_user_access_level(lib_id, reader.username)
-                self.assertEqual(data, {**reader_grant, 'username': 'Reader', 'email': 'reader@example.com'})
+                assert data == {**reader_grant, 'username': 'Reader', 'email': 'reader@example.com'}
 
         # A user with only read permission can get data about the library but not the team:
         with self.as_user(reader):
@@ -586,8 +579,8 @@ class ContentLibrariesTest(ContentLibrariesRestApiTest):
         # Verify the permitted changes were made:
         with self.as_user(admin):
             data = self._get_library(lib_id)
-            self.assertEqual(data["description"], "Revised description")
-            self.assertEqual(data["title"], "New Library Title")
+            assert data['description'] == 'Revised description'
+            assert data['title'] == 'New Library Title'
 
         # Library XBlock editing ###############################################
 
@@ -723,26 +716,26 @@ class ContentLibrariesTest(ContentLibrariesRestApiTest):
 
         # The unit can see and render its children:
         fragment = self._render_block_view(unit_block["id"], "student_view")
-        self.assertIn("What is an odd number?", fragment["content"])
-        self.assertIn("What is an even number?", fragment["content"])
-        self.assertIn("What holds this XBlock?", fragment["content"])
+        assert 'What is an odd number?' in fragment['content']
+        assert 'What is an even number?' in fragment['content']
+        assert 'What holds this XBlock?' in fragment['content']
 
         # Also check the API for retrieving links:
         links_created = self._get_library_links(lib_id)
         links_created.sort(key=lambda link: link["id"])
-        self.assertEqual(len(links_created), 2)
+        assert len(links_created) == 2
 
-        self.assertEqual(links_created[0]["id"], "problem_bank")
-        self.assertEqual(links_created[0]["bundle_uuid"], bank_lib["bundle_uuid"])
-        self.assertEqual(links_created[0]["version"], 2)
-        self.assertEqual(links_created[0]["latest_version"], 2)
-        self.assertEqual(links_created[0]["opaque_key"], bank_lib_id)
+        assert links_created[0]['id'] == 'problem_bank'
+        assert links_created[0]['bundle_uuid'] == bank_lib['bundle_uuid']
+        assert links_created[0]['version'] == 2
+        assert links_created[0]['latest_version'] == 2
+        assert links_created[0]['opaque_key'] == bank_lib_id
 
-        self.assertEqual(links_created[1]["id"], "problem_bank_v1")
-        self.assertEqual(links_created[1]["bundle_uuid"], bank_lib["bundle_uuid"])
-        self.assertEqual(links_created[1]["version"], 1)
-        self.assertEqual(links_created[1]["latest_version"], 2)
-        self.assertEqual(links_created[1]["opaque_key"], bank_lib_id)
+        assert links_created[1]['id'] == 'problem_bank_v1'
+        assert links_created[1]['bundle_uuid'] == bank_lib['bundle_uuid']
+        assert links_created[1]['version'] == 1
+        assert links_created[1]['latest_version'] == 2
+        assert links_created[1]['opaque_key'] == bank_lib_id
 
     def test_library_blocks_limit(self):
         """
@@ -770,7 +763,7 @@ class ContentLibrariesTest(ContentLibrariesRestApiTest):
         lib = self._create_library(slug=slug, title='Test Block Types', library_type=library_type)
         types = self._get_library_block_types(lib['id'])
         if constrained:
-            self.assertEqual(len(types), 1)
-            self.assertEqual(types[0]['block_type'], library_type)
+            assert len(types) == 1
+            assert types[0]['block_type'] == library_type
         else:
-            self.assertGreater(len(types), 1)
+            assert len(types) > 1
