@@ -2,7 +2,7 @@
 Tests for Edly API serializers.
 """
 import json
-from urlparse import urljoin
+from urllib.parse import urljoin
 
 from mock import patch
 from django.core.validators import URLValidator
