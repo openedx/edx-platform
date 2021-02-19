@@ -48,7 +48,7 @@ class TestFooter(TestCase):
         Verify that the homepage, when accessed at edx.org, has the edX footer
         """
         resp = self.client.get('/')
-        self.assertEqual(resp.status_code, 200)
+        assert resp.status_code == 200
         self.assertContains(resp, 'footer-edx-v3')
 
     def test_openedx_footer(self):
@@ -57,7 +57,7 @@ class TestFooter(TestCase):
         edx.org, has the Open edX footer
         """
         resp = self.client.get('/')
-        self.assertEqual(resp.status_code, 200)
+        assert resp.status_code == 200
         self.assertContains(resp, 'footer-openedx')
 
     @with_comprehensive_theme("edx.org")

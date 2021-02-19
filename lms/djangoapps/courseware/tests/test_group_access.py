@@ -182,17 +182,15 @@ class GroupAccessTestCase(ModuleStoreTestCase):
         """
         DRY helper.
         """
-        self.assertIs(
-            bool(access.has_access(user, 'load', modulestore().get_item(block_location), self.course.id)),
-            is_accessible
-        )
+        assert bool(access.has_access(user, 'load', modulestore().get_item(block_location), self.course.id))\
+               is is_accessible
 
     def ensure_staff_access(self, block_location):
         """
         Another DRY helper.
         """
         block = modulestore().get_item(block_location)
-        self.assertTrue(access.has_access(self.staff, 'load', block, self.course.id))
+        assert access.has_access(self.staff, 'load', block, self.course.id)
 
     # NOTE: in all the tests that follow, `block_specified` and
     # `block_accessed` designate the place where group_access rules are

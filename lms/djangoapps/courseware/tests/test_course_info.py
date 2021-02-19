@@ -69,7 +69,7 @@ class CourseInfoTestCase(EnterpriseTestConsentRequired, LoginEnrollmentTestCase,
         self.enroll(self.course)
         url = reverse('info', args=[text_type(self.course.id)])
         resp = self.client.get(url)
-        self.assertNotIn(b"You are not currently enrolled in this course", resp.content)
+        assert b'You are not currently enrolled in this course' not in resp.content
 
     # TODO: LEARNER-611: If this is only tested under Course Info, does this need to move?
     @mock.patch('openedx.features.enterprise_support.api.enterprise_customer_for_request')
@@ -92,8 +92,8 @@ class CourseInfoTestCase(EnterpriseTestConsentRequired, LoginEnrollmentTestCase,
     def test_anonymous_user(self):
         url = reverse('info', args=[text_type(self.course.id)])
         resp = self.client.get(url)
-        self.assertEqual(resp.status_code, 200)
-        self.assertNotIn(b"OOGIE BLOOGIE", resp.content)
+        assert resp.status_code == 200
+        assert b'OOGIE BLOOGIE' not in resp.content
 
     def test_logged_in_not_enrolled(self):
         self.setup_user()
@@ -107,7 +107,7 @@ class CourseInfoTestCase(EnterpriseTestConsentRequired, LoginEnrollmentTestCase,
         enrollment_exists = CourseEnrollment.objects.filter(
             user=self.user, course_id=self.course.id
         ).exists()
-        self.assertFalse(enrollment_exists)
+        assert not enrollment_exists
 
     @mock.patch.dict(settings.FEATURES, {'DISABLE_START_DATES': False})
     def test_non_live_course(self):
@@ -152,7 +152,7 @@ class CourseInfoTestCase(EnterpriseTestConsentRequired, LoginEnrollmentTestCase,
         self.setup_user()
         url = reverse('info', args=['not/a/course'])
         response = self.client.get(url)
-        self.assertEqual(response.status_code, 404)
+        assert response.status_code == 404
 
 
 @override_waffle_flag(DISABLE_UNIFIED_COURSE_TAB_FLAG, active=True)
@@ -178,7 +178,7 @@ class CourseInfoLastAccessedTestCase(LoginEnrollmentTestCase, ModuleStoreTestCas
         url = reverse('info', args=(six.text_type(self.course.id),))
         response = self.client.get(url)
         content = pq(response.content)
-        self.assertEqual(content('.page-header-secondary a').length, 0)
+        assert content('.page-header-secondary a').length == 0
 
     def get_resume_course_url(self, course_info_url):
         """
@@ -210,17 +210,17 @@ class CourseInfoLastAccessedTestCase(LoginEnrollmentTestCase, ModuleStoreTestCas
 
         # Assuring a non-authenticated user cannot see the resume course button.
         resume_course_url = self.get_resume_course_url(info_url)
-        self.assertEqual(resume_course_url, None)
+        assert resume_course_url is None
 
         # Assuring an unenrolled user cannot see the resume course button.
         self.setup_user()
         resume_course_url = self.get_resume_course_url(info_url)
-        self.assertEqual(resume_course_url, None)
+        assert resume_course_url is None
 
         # Assuring an enrolled user can see the resume course button.
         self.enroll(self.course)
         resume_course_url = self.get_resume_course_url(info_url)
-        self.assertEqual(resume_course_url, section_url)
+        assert resume_course_url == section_url
 
 
 @override_waffle_flag(DISABLE_UNIFIED_COURSE_TAB_FLAG, active=True)
@@ -298,21 +298,12 @@ class CourseInfoTitleTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase):
 
         content = pq(response.content)
 
-        self.assertEqual(
-            expected_title,
-            content('.page-title').contents()[0].strip(),
-        )
+        assert expected_title == content('.page-title').contents()[0].strip()
 
         if expected_subtitle is None:
-            self.assertEqual(
-                [],
-                content('.page-subtitle'),
-            )
+            assert [] == content('.page-subtitle')
         else:
-            self.assertEqual(
-                expected_subtitle,
-                content('.page-subtitle').contents()[0].strip(),
-            )
+            assert expected_subtitle == content('.page-subtitle').contents()[0].strip()
 
 
 @override_waffle_flag(DISABLE_UNIFIED_COURSE_TAB_FLAG, active=True)
@@ -428,7 +419,7 @@ class SelfPacedCourseInfoTestCase(LoginEnrollmentTestCase, SharedModuleStoreTest
             with check_mongo_calls(mongo_queries):
                 with mock.patch("openedx.core.djangoapps.theming.helpers.get_current_site", return_value=None):
                     resp = self.client.get(url)
-        self.assertEqual(resp.status_code, 200)
+        assert resp.status_code == 200
 
     def test_num_queries_instructor_paced(self):
         # TODO: decrease query count as part of REVO-28

@@ -122,8 +122,8 @@ class TestNavigation(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
                 'chapter': 'Chrome',
                 'section': displayname,
             }))
-            self.assertEqual('course-tabs' in response.content.decode('utf-8'), tabs)
-            self.assertEqual('course-navigation' in response.content.decode('utf-8'), accordion)
+            assert ('course-tabs' in response.content.decode('utf-8')) == tabs
+            assert ('course-navigation' in response.content.decode('utf-8')) == accordion
 
         self.assertTabInactive('progress', response)
         self.assertTabActive('courseware', response)
@@ -148,7 +148,7 @@ class TestNavigation(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
 
         # make sure we can access courseware immediately
         resp = self.client.get(reverse('dashboard'))
-        self.assertEqual(resp.status_code, 200)
+        assert resp.status_code == 200
 
         # then wait a bit and see if we get timed out
         time.sleep(2)
