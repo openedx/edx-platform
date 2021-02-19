@@ -25,6 +25,6 @@ class TestMobileAPIDecorators(TestCase):
             """
             pass  # lint-amnesty, pylint: disable=unnecessary-pass
 
-        self.assertIn("Test docstring of decorated function.", decorated_func.__doc__)
-        self.assertEqual(decorated_func.__name__, "decorated_func")
-        self.assertTrue(decorated_func.__module__.endswith("test_decorator"))
+        assert 'Test docstring of decorated function.' in decorated_func.__doc__
+        assert decorated_func.__name__ == 'decorated_func'
+        assert decorated_func.__module__.endswith('test_decorator')

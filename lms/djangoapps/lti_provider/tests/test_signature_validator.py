@@ -38,7 +38,7 @@ class ClientKeyValidatorTest(TestCase):
         Verify that check_client_key succeeds with a valid key
         """
         key = self.lti_consumer.consumer_key
-        self.assertTrue(SignatureValidator(self.lti_consumer).check_client_key(key))
+        assert SignatureValidator(self.lti_consumer).check_client_key(key)
 
     @ddt.data(
         ('0123456789012345678901234567890123456789',),
@@ -50,7 +50,7 @@ class ClientKeyValidatorTest(TestCase):
         """
         Verify that check_client_key fails with a disallowed key
         """
-        self.assertFalse(SignatureValidator(self.lti_consumer).check_client_key(key))
+        assert not SignatureValidator(self.lti_consumer).check_client_key(key)
 
 
 @ddt.ddt
@@ -68,7 +68,7 @@ class NonceValidatorTest(TestCase):
         Verify that check_nonce succeeds with a key of maximum length
         """
         nonce = '0123456789012345678901234567890123456789012345678901234567890123'
-        self.assertTrue(SignatureValidator(self.lti_consumer).check_nonce(nonce))
+        assert SignatureValidator(self.lti_consumer).check_nonce(nonce)
 
     @ddt.data(
         ('01234567890123456789012345678901234567890123456789012345678901234',),
@@ -80,7 +80,7 @@ class NonceValidatorTest(TestCase):
         """
         Verify that check_nonce fails with badly formatted nonce
         """
-        self.assertFalse(SignatureValidator(self.lti_consumer).check_nonce(nonce))
+        assert not SignatureValidator(self.lti_consumer).check_nonce(nonce)
 
 
 class SignatureValidatorTest(TestCase):
@@ -101,7 +101,7 @@ class SignatureValidatorTest(TestCase):
         """
         key = self.lti_consumer.consumer_key
         secret = SignatureValidator(self.lti_consumer).get_client_secret(key, None)
-        self.assertEqual(secret, self.lti_consumer.consumer_secret)
+        assert secret == self.lti_consumer.consumer_secret
 
     @patch('oauthlib.oauth1.SignatureOnlyEndpoint.validate_request',
            return_value=(True, None))

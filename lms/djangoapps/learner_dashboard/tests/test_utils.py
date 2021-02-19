@@ -23,4 +23,4 @@ class TestUtils(TestCase):
         handles various url input
         """
         actual = utils.strip_course_id(path + six.text_type(utils.FAKE_COURSE_KEY))
-        self.assertEqual(actual, path)
+        assert actual == path
