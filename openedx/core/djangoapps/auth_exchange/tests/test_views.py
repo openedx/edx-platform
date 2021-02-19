@@ -60,7 +60,7 @@ class AccessTokenExchangeViewTest(AccessTokenExchangeTestMixin):
     def _assert_success(self, data, expected_scopes, expected_logged_in_user=None):
         response = self.csrf_client.post(self.url, data)
         if expected_logged_in_user:
-            # Ensure that safe sessions isn't blocking an intentional login
+            # Ensure that safe sessions isn't preventing an expected login
             assert expected_logged_in_user == response.wsgi_request.user
         assert response.status_code == 200
         assert response['Content-Type'] == 'application/json'

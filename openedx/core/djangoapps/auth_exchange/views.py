@@ -43,9 +43,9 @@ class AccessTokenExchangeBase(APIView):
     Note: This base class was originally created to support multiple libraries,
         but we currently only support django-oauth-toolkit (DOT).
     """
-    # No CSRF protection is required because this requires the token to be
-    #  exchanged. However, we include session authntication to ensure that if
-    #  the user is logged in, the user matches the one in the token.
+    # No CSRF protection is required because the provided 3rd party OAuth access
+    #  token is sufficient. However, we include session authentication to ensure
+    #  the session user and token user match, if there is a logged in user.
     authentication_classes = [CsrfExemptSessionAuthentication]
     allowed_methods = ['POST']
 
