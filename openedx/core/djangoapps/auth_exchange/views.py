@@ -16,6 +16,7 @@ from django.views.decorators.csrf import csrf_exempt
 from oauth2_provider import models as dot_models
 from oauth2_provider.views.base import TokenView as DOTAccessTokenView
 from rest_framework import permissions
+from rest_framework.authentication import SessionAuthentication
 from rest_framework.exceptions import AuthenticationFailed
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -26,6 +27,14 @@ from openedx.core.djangoapps.oauth_dispatch.api import create_dot_access_token
 from openedx.core.lib.api.authentication import BearerAuthenticationAllowInactiveUser
 
 
+class CsrfExemptSessionAuthentication(SessionAuthentication):
+    """
+    Class enables CSRF exempt Session Authentication.
+    """
+    def enforce_csrf(self, request):
+        return  # Skip the CSRF check
+
+
 class AccessTokenExchangeBase(APIView):
     """
     View for token exchange from 3rd party OAuth access token to 1st party
@@ -34,8 +43,10 @@ class AccessTokenExchangeBase(APIView):
     Note: This base class was originally created to support multiple libraries,
         but we currently only support django-oauth-toolkit (DOT).
     """
-    # No authentication is required, because the request payload has all it needs.
-    authentication_classes = []
+    # No CSRF protection is required because this requires the token to be
+    #  exchanged. However, we include session authntication to ensure that if
+    #  the user is logged in, the user matches the one in the token.
+    authentication_classes = [CsrfExemptSessionAuthentication]
     allowed_methods = ['POST']
 
     @method_decorator(social_utils.psa("social:complete"))
@@ -43,10 +54,7 @@ class AccessTokenExchangeBase(APIView):
         return super(AccessTokenExchangeBase, self).dispatch(*args, **kwargs)  # lint-amnesty, pylint: disable=super-with-arguments
 
     def get(self, request, _backend):
-        return Response(status=400, data={
-            'error': 'invalid_request',
-            'error_description': 'Only POST requests allowed.',
-        })
+        return self._get_invalid_request_response('Only POST requests allowed.')
 
     def post(self, request, _backend):
         """
@@ -58,6 +66,8 @@ class AccessTokenExchangeBase(APIView):
             return error_response
 
         user = form.cleaned_data["user"]
+        if request.user and not request.user.is_anonymous and request.user != user:
+            return self._get_invalid_request_response('session user and token user do not match')
         scope = form.cleaned_data["scope"]
         client = form.cleaned_data["client"]
         return self.exchange_access_token(request, user, scope, client)
@@ -69,6 +79,12 @@ class AccessTokenExchangeBase(APIView):
         """
         edx_access_token = self.create_access_token(request, user, scope, client)
         return self.access_token_response(edx_access_token)  # lint-amnesty, pylint: disable=no-member
+
+    def _get_invalid_request_response(self, description):
+        return Response(status=400, data={
+            'error': 'invalid_request',
+            'error_description': description,
+        })
 
 
 class DOTAccessTokenExchangeView(AccessTokenExchangeBase, DOTAccessTokenView):

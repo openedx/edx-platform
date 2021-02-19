@@ -57,8 +57,11 @@ class AccessTokenExchangeViewTest(AccessTokenExchangeTestMixin):
             expected_data['error_code'] = error_code
         assert json.loads(response.content.decode('utf-8')) == expected_data
 
-    def _assert_success(self, data, expected_scopes):
+    def _assert_success(self, data, expected_scopes, expected_logged_in_user=None):
         response = self.csrf_client.post(self.url, data)
+        if expected_logged_in_user:
+            # Ensure that safe sessions isn't blocking an intentional login
+            assert expected_logged_in_user == response.wsgi_request.user
         assert response.status_code == 200
         assert response['Content-Type'] == 'application/json'
         content = json.loads(response.content.decode('utf-8'))
@@ -111,14 +114,22 @@ class AccessTokenExchangeViewTest(AccessTokenExchangeTestMixin):
         response = self.client.post(url, self.data)
         assert response.status_code == 404
 
-    def test_logged_in_user(self):
+    def test_logged_in_user_matches_token(self):
         """
-        Test that a logged in user will not cause a CSRF failure.
+        Test that a logged in user succeeds without a CSRF permission denied.
+        """
+        self.csrf_client.login(username=self.user.username, password='secret')
+        self._setup_provider_response(success=True)
+        self._assert_success(self.data, expected_scopes=[], expected_logged_in_user=self.user)
+
+    def test_logged_in_user_does_not_match_token(self):
+        """
+        Test that a logged in user that doesn't match the user in the token fails.
         """
         self.user = UserFactory.create(username='test', password='secret')
         self.csrf_client.login(username='test', password='secret')
         self._setup_provider_response(success=True)
-        self._assert_success(self.data, expected_scopes=[])
+        self._assert_error(self.data, "invalid_request", "session user and token user do not match")
 
     def test_disabled_user(self):
         """
