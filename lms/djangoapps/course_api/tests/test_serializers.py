@@ -115,7 +115,7 @@ class TestCourseSerializer(CourseApiFactoryMixin, ModuleStoreTestCase):
             catalog_visibility=u'none'
         )
         result = self._get_result(course)
-        self.assertEqual(result['hidden'], True)
+        assert result['hidden'] is True
 
     def test_advertised_start(self):
         course = self.create_course(
@@ -124,16 +124,16 @@ class TestCourseSerializer(CourseApiFactoryMixin, ModuleStoreTestCase):
             advertised_start=u'The Ides of March'
         )
         result = self._get_result(course)
-        self.assertEqual(result['course_id'], u'edX/custom/2012_Fall')
-        self.assertEqual(result['start_type'], u'string')
-        self.assertEqual(result['start_display'], u'The Ides of March')
+        assert result['course_id'] == u'edX/custom/2012_Fall'
+        assert result['start_type'] == u'string'
+        assert result['start_display'] == u'The Ides of March'
 
     def test_empty_start(self):
         course = self.create_course(start=DEFAULT_START_DATE, course=u'custom')
         result = self._get_result(course)
-        self.assertEqual(result['course_id'], u'edX/custom/2012_Fall')
-        self.assertEqual(result['start_type'], u'empty')
-        self.assertIsNone(result['start_display'])
+        assert result['course_id'] == u'edX/custom/2012_Fall'
+        assert result['start_type'] == u'empty'
+        assert result['start_display'] is None
 
     @ddt.unpack
     @ddt.data(
@@ -143,7 +143,7 @@ class TestCourseSerializer(CourseApiFactoryMixin, ModuleStoreTestCase):
     def test_pacing(self, self_paced, expected_pacing):
         course = self.create_course(self_paced=self_paced)
         result = self._get_result(course)
-        self.assertEqual(result['pacing'], expected_pacing)
+        assert result['pacing'] == expected_pacing
 
 
 class TestCourseDetailSerializer(TestCourseSerializer):  # lint-amnesty, pylint: disable=test-inherits-tests
@@ -171,4 +171,4 @@ class TestCourseKeySerializer(TestCase):  # lint-amnesty, pylint: disable=missin
     def test_course_key_serializer(self):
         course_key = CourseLocator(org='org', course='course', run='2020_Q3')
         serializer = CourseKeySerializer(course_key)
-        self.assertEqual(serializer.data, str(course_key))
+        assert serializer.data == str(course_key)

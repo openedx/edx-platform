@@ -79,19 +79,15 @@ class CertificatesDetailRestApiTest(AuthAndScopesTestMixin, SharedModuleStoreTes
 
     def assert_success_response_for_student(self, response):
         """ This method is required by AuthAndScopesTestMixin. """
-        self.assertEqual(
-            response.data,
-            {
-                'username': self.student.username,
+        assert response.data ==\
+               {'username': self.student.username,
                 'status': CertificateStatuses.downloadable,
                 'is_passing': True,
                 'grade': '0.88',
                 'download_url': 'www.google.com',
                 'certificate_type': CourseMode.VERIFIED,
                 'course_id': six.text_type(self.course.id),
-                'created_date': self.now,
-            }
-        )
+                'created_date': self.now}
 
     def test_no_certificate(self):
         student_no_cert = UserFactory.create(password=self.user_password)
@@ -100,12 +96,9 @@ class CertificatesDetailRestApiTest(AuthAndScopesTestMixin, SharedModuleStoreTes
             requesting_user=student_no_cert,
             requested_user=student_no_cert,
         )
-        self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
-        self.assertIn('error_code', resp.data)
-        self.assertEqual(
-            resp.data['error_code'],
-            'no_certificate_for_user',
-        )
+        assert resp.status_code == status.HTTP_404_NOT_FOUND
+        assert 'error_code' in resp.data
+        assert resp.data['error_code'] == 'no_certificate_for_user'
 
     def test_no_certificate_configuration(self):
         """
@@ -119,12 +112,9 @@ class CertificatesDetailRestApiTest(AuthAndScopesTestMixin, SharedModuleStoreTes
             requesting_user=self.student,
             requested_user=self.student,
         )
-        self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
-        self.assertIn('error_code', resp.data)
-        self.assertEqual(
-            resp.data['error_code'],
-            'no_certificate_configuration_for_course',
-        )
+        assert resp.status_code == status.HTTP_404_NOT_FOUND
+        assert 'error_code' in resp.data
+        assert resp.data['error_code'] == 'no_certificate_configuration_for_course'
 
 
 @ddt.ddt
@@ -182,22 +172,17 @@ class CertificatesListRestApiTest(AuthAndScopesTestMixin, SharedModuleStoreTestC
 
     def assert_success_response_for_student(self, response, download_url='www.google.com'):
         """ This method is required by AuthAndScopesTestMixin. """
-        self.assertEqual(
-            response.data,
-            [{
-                'username': self.student.username,
-                'course_id': six.text_type(self.course.id),
-                'course_display_name': self.course.display_name,
-                'course_organization': self.course.org,
-                'certificate_type': CourseMode.VERIFIED,
-                'created_date': self.now,
-                'modified_date': self.now,
-                'status': CertificateStatuses.downloadable,
-                'is_passing': True,
-                'download_url': download_url,
-                'grade': '0.88',
-            }]
-        )
+        assert response.data ==\
+               [{'username': self.student.username,
+                 'course_id': six.text_type(self.course.id),
+                 'course_display_name': self.course.display_name,
+                 'course_organization': self.course.org,
+                 'certificate_type': CourseMode.VERIFIED,
+                 'created_date': self.now,
+                 'modified_date': self.now,
+                 'status': CertificateStatuses.downloadable,
+                 'is_passing': True,
+                 'download_url': download_url, 'grade': '0.88'}]
 
     @patch('edx_rest_framework_extensions.permissions.log')
     @ddt.data(*list(AuthType))
@@ -206,7 +191,7 @@ class CertificatesListRestApiTest(AuthAndScopesTestMixin, SharedModuleStoreTestC
         Returns 403 response for non-staff user on all auth types.
         """
         resp = self.get_response(auth_type, requesting_user=self.other_student)
-        self.assertEqual(resp.status_code, status.HTTP_403_FORBIDDEN)
+        assert resp.status_code == status.HTTP_403_FORBIDDEN
 
     @ddt.data(*list(AuthType))
     def test_another_user_with_certs_shared_public(self, auth_type):
@@ -224,8 +209,8 @@ class CertificatesListRestApiTest(AuthAndScopesTestMixin, SharedModuleStoreTestC
 
         resp = self.get_response(auth_type, requesting_user=self.global_staff)
 
-        self.assertEqual(resp.status_code, status.HTTP_200_OK)
-        self.assertEqual(len(resp.data), 1)
+        assert resp.status_code == status.HTTP_200_OK
+        assert len(resp.data) == 1
 
     def test_owner_can_access_its_certs(self):
         """
@@ -240,11 +225,11 @@ class CertificatesListRestApiTest(AuthAndScopesTestMixin, SharedModuleStoreTestC
         ).save()
 
         resp = self.get_response(AuthType.session, requesting_user=self.student)
-        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        assert resp.status_code == status.HTTP_200_OK
 
         # verifies that other than owner cert list api is not accessible
         resp = self.get_response(AuthType.session, requesting_user=self.other_student)
-        self.assertEqual(resp.status_code, status.HTTP_403_FORBIDDEN)
+        assert resp.status_code == status.HTTP_403_FORBIDDEN
 
     def test_public_profile_certs_is_accessible(self):
         """
@@ -259,13 +244,13 @@ class CertificatesListRestApiTest(AuthAndScopesTestMixin, SharedModuleStoreTestC
         ).save()
 
         resp = self.get_response(AuthType.session, requesting_user=self.student)
-        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        assert resp.status_code == status.HTTP_200_OK
 
         resp = self.get_response(AuthType.session, requesting_user=self.other_student)
-        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        assert resp.status_code == status.HTTP_200_OK
 
         resp = self.get_response(AuthType.session, requesting_user=self.global_staff)
-        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        assert resp.status_code == status.HTTP_200_OK
 
     @ddt.data(*list(AuthType))
     def test_another_user_with_certs_shared_custom(self, auth_type):
@@ -288,8 +273,8 @@ class CertificatesListRestApiTest(AuthAndScopesTestMixin, SharedModuleStoreTestC
 
         resp = self.get_response(auth_type, requesting_user=self.global_staff)
 
-        self.assertEqual(resp.status_code, status.HTTP_200_OK)
-        self.assertEqual(len(resp.data), 1)
+        assert resp.status_code == status.HTTP_200_OK
+        assert len(resp.data) == 1
 
     @patch('edx_rest_framework_extensions.permissions.log')
     @ddt.data(*JWT_AUTH_TYPES)
@@ -299,16 +284,16 @@ class CertificatesListRestApiTest(AuthAndScopesTestMixin, SharedModuleStoreTestC
         resp = self.get_response(AuthType.jwt, token=jwt_token)
 
         if auth_type == AuthType.jwt_restricted:
-            self.assertEqual(resp.status_code, status.HTTP_403_FORBIDDEN)
+            assert resp.status_code == status.HTTP_403_FORBIDDEN
             self._assert_in_log("JwtHasUserFilterForRequestedUser", mock_log.warning)
         else:
-            self.assertEqual(resp.status_code, status.HTTP_200_OK)
-            self.assertEqual(len(resp.data), 1)
+            assert resp.status_code == status.HTTP_200_OK
+            assert len(resp.data) == 1
 
     @patch('edx_rest_framework_extensions.permissions.log')
     @ddt.data(*JWT_AUTH_TYPES)
     def test_jwt_no_filter(self, auth_type, mock_log):
-        self.assertTrue(True)  # pylint: disable=redundant-unittest-assert
+        assert True  # pylint: disable=redundant-unittest-assert
 
     def test_no_certificate(self):
         student_no_cert = UserFactory.create(password=self.user_password)
@@ -317,8 +302,8 @@ class CertificatesListRestApiTest(AuthAndScopesTestMixin, SharedModuleStoreTestC
             requesting_user=self.global_staff,
             requested_user=student_no_cert,
         )
-        self.assertEqual(resp.status_code, status.HTTP_200_OK)
-        self.assertEqual(resp.data, [])
+        assert resp.status_code == status.HTTP_200_OK
+        assert resp.data == []
 
     def test_query_counts(self):
         # Test student with no certificates
@@ -329,8 +314,8 @@ class CertificatesListRestApiTest(AuthAndScopesTestMixin, SharedModuleStoreTestC
                 requesting_user=self.global_staff,
                 requested_user=student_no_cert,
             )
-            self.assertEqual(resp.status_code, status.HTTP_200_OK)
-            self.assertEqual(len(resp.data), 0)
+            assert resp.status_code == status.HTTP_200_OK
+            assert len(resp.data) == 0
 
         # Test student with 1 certificate
         with self.assertNumQueries(10):
@@ -339,8 +324,8 @@ class CertificatesListRestApiTest(AuthAndScopesTestMixin, SharedModuleStoreTestC
                 requesting_user=self.global_staff,
                 requested_user=self.student,
             )
-            self.assertEqual(resp.status_code, status.HTTP_200_OK)
-            self.assertEqual(len(resp.data), 1)
+            assert resp.status_code == status.HTTP_200_OK
+            assert len(resp.data) == 1
 
         # Test student with 2 certificates
         student_2_certs = UserFactory.create(password=self.user_password)
@@ -379,8 +364,8 @@ class CertificatesListRestApiTest(AuthAndScopesTestMixin, SharedModuleStoreTestC
                 requesting_user=self.global_staff,
                 requested_user=student_2_certs,
             )
-            self.assertEqual(resp.status_code, status.HTTP_200_OK)
-            self.assertEqual(len(resp.data), 2)
+            assert resp.status_code == status.HTTP_200_OK
+            assert len(resp.data) == 2
 
     @patch.dict(settings.FEATURES, {'CERTIFICATES_HTML_VIEW': True})
     def test_with_no_certificate_configuration(self):
@@ -396,8 +381,8 @@ class CertificatesListRestApiTest(AuthAndScopesTestMixin, SharedModuleStoreTestC
             requesting_user=self.global_staff,
             requested_user=self.student,
         )
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data, [])
+        assert response.status_code == status.HTTP_200_OK
+        assert response.data == []
 
         self.course_overview.has_any_active_web_certificate = True
         self.course_overview.save()
@@ -433,6 +418,6 @@ class CertificatesListRestApiTest(AuthAndScopesTestMixin, SharedModuleStoreTestC
             requesting_user=self.global_staff,
             requested_user=self.student,
         )
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        assert response.status_code == status.HTTP_200_OK
         self.assertContains(response, cert_for_deleted_course.download_url)
         self.assertContains(response, expected_course_name)

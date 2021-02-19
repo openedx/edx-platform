@@ -46,13 +46,13 @@ class AllowlistTests(EventTestMixin, ModuleStoreTestCase):
         )
 
         certs = GeneratedCertificate.objects.filter(user=u, course_id=key)
-        self.assertEqual(len(certs), 0)
+        assert len(certs) == 0
 
         generated_cert = generate_allowlist_certificate(u, key)
-        self.assertTrue(generated_cert.status, CertificateStatuses.downloadable)
+        assert generated_cert.status, CertificateStatuses.downloadable
 
         certs = GeneratedCertificate.objects.filter(user=u, course_id=key)
-        self.assertEqual(len(certs), 1)
+        assert len(certs) == 1
 
         self.assert_event_emitted(
             'edx.certificate.created',

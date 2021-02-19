@@ -91,7 +91,7 @@ class CertificateSupportTestCase(ModuleStoreTestCase):
 
         # Login as support staff
         success = self.client.login(username=self.SUPPORT_USERNAME, password=self.SUPPORT_PASSWORD)
-        self.assertTrue(success, msg="Couldn't log in as support staff")
+        assert success, "Couldn't log in as support staff"
 
 
 @ddt.ddt
@@ -144,7 +144,7 @@ class CertificateSearchTests(CertificateSupportTestCase):
         # Create a user and log in
         user = UserFactory(username="foo", password="foo")
         success = self.client.login(username="foo", password="foo")
-        self.assertTrue(success, msg="Could not log in")
+        assert success, 'Could not log in'
 
         # Assign the user to the role
         if role is not None:
@@ -156,7 +156,7 @@ class CertificateSearchTests(CertificateSupportTestCase):
         if has_access:
             self.assertContains(response, json.dumps([]))
         else:
-            self.assertEqual(response.status_code, 403)
+            assert response.status_code == 403
 
     @ddt.data(
         (CertificateSupportTestCase.STUDENT_USERNAME, True),
@@ -174,11 +174,11 @@ class CertificateSearchTests(CertificateSupportTestCase):
     def test_search(self, user_filter, expect_result, course_filter=None):
         response = self._search(user_filter, course_filter)
         if expect_result:
-            self.assertEqual(response.status_code, 200)
+            assert response.status_code == 200
             results = json.loads(response.content.decode('utf-8'))
-            self.assertEqual(len(results), 1)
+            assert len(results) == 1
         else:
-            self.assertEqual(response.status_code, 400)
+            assert response.status_code == 400
 
     def test_search_with_plus_sign(self):
         """
@@ -188,30 +188,30 @@ class CertificateSearchTests(CertificateSupportTestCase):
         self.student.save()
 
         response = self._search(self.student.email)
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
         results = json.loads(response.content.decode('utf-8'))
 
-        self.assertEqual(len(results), 1)
+        assert len(results) == 1
         retrieved_data = results[0]
-        self.assertEqual(retrieved_data["username"], self.STUDENT_USERNAME)
+        assert retrieved_data['username'] == self.STUDENT_USERNAME
 
     def test_results(self):
         response = self._search(self.STUDENT_USERNAME)
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
         results = json.loads(response.content.decode('utf-8'))
 
-        self.assertEqual(len(results), 1)
+        assert len(results) == 1
         retrieved_cert = results[0]
 
-        self.assertEqual(retrieved_cert["username"], self.STUDENT_USERNAME)
-        self.assertEqual(retrieved_cert["course_key"], six.text_type(self.CERT_COURSE_KEY))
-        self.assertEqual(retrieved_cert["created"], self.cert.created_date.isoformat())
-        self.assertEqual(retrieved_cert["modified"], self.cert.modified_date.isoformat())
-        self.assertEqual(retrieved_cert["grade"], six.text_type(self.CERT_GRADE))
-        self.assertEqual(retrieved_cert["status"], self.CERT_STATUS)
-        self.assertEqual(retrieved_cert["type"], self.CERT_MODE)
-        self.assertEqual(retrieved_cert["download_url"], self.CERT_DOWNLOAD_URL)
-        self.assertFalse(retrieved_cert["regenerate"])
+        assert retrieved_cert['username'] == self.STUDENT_USERNAME
+        assert retrieved_cert['course_key'] == six.text_type(self.CERT_COURSE_KEY)
+        assert retrieved_cert['created'] == self.cert.created_date.isoformat()
+        assert retrieved_cert['modified'] == self.cert.modified_date.isoformat()
+        assert retrieved_cert['grade'] == six.text_type(self.CERT_GRADE)
+        assert retrieved_cert['status'] == self.CERT_STATUS
+        assert retrieved_cert['type'] == self.CERT_MODE
+        assert retrieved_cert['download_url'] == self.CERT_DOWNLOAD_URL
+        assert not retrieved_cert['regenerate']
 
     @override_settings(FEATURES=FEATURES_WITH_CERTS_ENABLED)
     def test_download_link(self):
@@ -220,20 +220,16 @@ class CertificateSearchTests(CertificateSupportTestCase):
         self.cert.save()
 
         response = self._search(self.STUDENT_USERNAME)
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
         results = json.loads(response.content.decode('utf-8'))
 
-        self.assertEqual(len(results), 1)
+        assert len(results) == 1
         retrieved_cert = results[0]
 
-        self.assertEqual(
-            retrieved_cert["download_url"],
-            reverse(
-                'certificates:render_cert_by_uuid',
-                kwargs={"certificate_uuid": self.cert.verify_uuid}
-            )
-        )
-        self.assertTrue(retrieved_cert["regenerate"])
+        assert retrieved_cert['download_url'] ==\
+               reverse('certificates:render_cert_by_uuid',
+                       kwargs={'certificate_uuid': self.cert.verify_uuid})
+        assert retrieved_cert['regenerate']
 
     def _search(self, user_filter, course_filter=None):
         """Execute a search and return the response. """
@@ -272,7 +268,7 @@ class CertificateRegenerateTests(CertificateSupportTestCase):
         # Create a user and log in
         user = UserFactory(username="foo", password="foo")
         success = self.client.login(username="foo", password="foo")
-        self.assertTrue(success, msg="Could not log in")
+        assert success, 'Could not log in'
 
         # Assign the user to the role
         if role is not None:
@@ -284,9 +280,9 @@ class CertificateRegenerateTests(CertificateSupportTestCase):
         response = self._regenerate()
 
         if has_access:
-            self.assertEqual(response.status_code, 400)
+            assert response.status_code == 400
         else:
-            self.assertEqual(response.status_code, 403)
+            assert response.status_code == 403
 
     def test_regenerate_certificate(self):
         """Test web certificate regeneration."""
@@ -297,13 +293,13 @@ class CertificateRegenerateTests(CertificateSupportTestCase):
             course_key=self.course_key,
             username=self.STUDENT_USERNAME,
         )
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
 
         # Check that the user's certificate was updated
         # Since the student hasn't actually passed the course,
         # we'd expect that the certificate status will be "notpassing"
         cert = GeneratedCertificate.eligible_certificates.get(user=self.student)
-        self.assertEqual(cert.status, CertificateStatuses.notpassing)
+        assert cert.status == CertificateStatuses.notpassing
 
     @patch('lms.djangoapps.certificates.queue.XQueueCertInterface._generate_cert')
     def test_regenerate_certificate_for_honor_mode(self, mock_generate_cert):
@@ -325,25 +321,25 @@ class CertificateRegenerateTests(CertificateSupportTestCase):
     def test_regenerate_certificate_missing_params(self):
         # Missing username
         response = self._regenerate(course_key=self.CERT_COURSE_KEY)
-        self.assertEqual(response.status_code, 400)
+        assert response.status_code == 400
 
         # Missing course key
         response = self._regenerate(username=self.STUDENT_USERNAME)
-        self.assertEqual(response.status_code, 400)
+        assert response.status_code == 400
 
     def test_regenerate_no_such_user(self):
         response = self._regenerate(
             course_key=six.text_type(self.CERT_COURSE_KEY),
             username="invalid_username",
         )
-        self.assertEqual(response.status_code, 400)
+        assert response.status_code == 400
 
     def test_regenerate_no_such_course(self):
         response = self._regenerate(
             course_key=CourseKey.from_string("edx/invalid/course"),
             username=self.STUDENT_USERNAME
         )
-        self.assertEqual(response.status_code, 400)
+        assert response.status_code == 400
 
     def test_regenerate_user_is_not_enrolled(self):
         # Unenroll the user
@@ -354,7 +350,7 @@ class CertificateRegenerateTests(CertificateSupportTestCase):
             course_key=self.CERT_COURSE_KEY,
             username=self.STUDENT_USERNAME
         )
-        self.assertEqual(response.status_code, 400)
+        assert response.status_code == 400
 
     def test_regenerate_user_has_no_certificate(self):
         # Delete the user's certificate
@@ -365,11 +361,11 @@ class CertificateRegenerateTests(CertificateSupportTestCase):
             course_key=self.CERT_COURSE_KEY,
             username=self.STUDENT_USERNAME
         )
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
 
         # A new certificate is created
         num_certs = GeneratedCertificate.eligible_certificates.filter(user=self.student).count()
-        self.assertEqual(num_certs, 1)
+        assert num_certs == 1
 
     def test_regenerate_cert_with_invalidated_record(self):
         """ If the certificate is marked as invalid, regenerate the certificate. """
@@ -387,7 +383,7 @@ class CertificateRegenerateTests(CertificateSupportTestCase):
             course_key=self.CERT_COURSE_KEY,
             username=self.STUDENT_USERNAME
         )
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
         self.assertInvalidatedCertExists()
 
         # Check that the user's certificate was updated
@@ -419,31 +415,20 @@ class CertificateRegenerateTests(CertificateSupportTestCase):
         )
         # Invalidate user certificate
         certificate.invalidate()
-        self.assertFalse(certificate.is_valid())
+        assert not certificate.is_valid()
 
     def assertInvalidatedCertExists(self):
         """ Dry method to check certificate invalidated entry exists. """
-        self.assertTrue(
-            CertificateInvalidation.objects.filter(
-                generated_certificate__user=self.student, active=True
-            ).exists()
-        )
+        assert CertificateInvalidation.objects.filter(generated_certificate__user=self.student, active=True).exists()
 
     def assertInvalidatedCertDoesNotExist(self):
         """ Dry method to check certificate invalidated entry does not exists. """
-        self.assertFalse(
-            CertificateInvalidation.objects.filter(
-                generated_certificate__user=self.student, active=True
-            ).exists()
-        )
+        assert not CertificateInvalidation.objects\
+            .filter(generated_certificate__user=self.student, active=True).exists()
 
     def assertGeneratedCertExists(self, user, status):
         """ Dry method to check if certificate exists. """
-        self.assertTrue(
-            GeneratedCertificate.objects.filter(
-                user=user, status=status
-            ).exists()
-        )
+        assert GeneratedCertificate.objects.filter(user=user, status=status).exists()
 
 
 @ddt.ddt
@@ -475,7 +460,7 @@ class CertificateGenerateTests(CertificateSupportTestCase):
         # Create a user and log in
         user = UserFactory(username="foo", password="foo")
         success = self.client.login(username="foo", password="foo")
-        self.assertTrue(success, msg="Could not log in")
+        assert success, 'Could not log in'
 
         # Assign the user to the role
         if role is not None:
@@ -487,39 +472,39 @@ class CertificateGenerateTests(CertificateSupportTestCase):
         response = self._generate()
 
         if has_access:
-            self.assertEqual(response.status_code, 400)
+            assert response.status_code == 400
         else:
-            self.assertEqual(response.status_code, 403)
+            assert response.status_code == 403
 
     def test_generate_certificate(self):
         response = self._generate(
             course_key=self.course_key,
             username=self.STUDENT_USERNAME,
         )
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
 
     def test_generate_certificate_missing_params(self):
         # Missing username
         response = self._generate(course_key=self.EXISTED_COURSE_KEY_2)
-        self.assertEqual(response.status_code, 400)
+        assert response.status_code == 400
 
         # Missing course key
         response = self._generate(username=self.STUDENT_USERNAME)
-        self.assertEqual(response.status_code, 400)
+        assert response.status_code == 400
 
     def test_generate_no_such_user(self):
         response = self._generate(
             course_key=six.text_type(self.EXISTED_COURSE_KEY_2),
             username="invalid_username",
         )
-        self.assertEqual(response.status_code, 400)
+        assert response.status_code == 400
 
     def test_generate_no_such_course(self):
         response = self._generate(
             course_key=CourseKey.from_string("edx/invalid/course"),
             username=self.STUDENT_USERNAME
         )
-        self.assertEqual(response.status_code, 400)
+        assert response.status_code == 400
 
     def test_generate_user_is_not_enrolled(self):
         # Unenroll the user
@@ -530,7 +515,7 @@ class CertificateGenerateTests(CertificateSupportTestCase):
             course_key=self.EXISTED_COURSE_KEY_2,
             username=self.STUDENT_USERNAME
         )
-        self.assertEqual(response.status_code, 400)
+        assert response.status_code == 400
 
     def test_generate_user_has_no_certificate(self):
         # Delete the user's certificate
@@ -541,11 +526,11 @@ class CertificateGenerateTests(CertificateSupportTestCase):
             course_key=self.EXISTED_COURSE_KEY_2,
             username=self.STUDENT_USERNAME
         )
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
 
         # A new certificate is created
         num_certs = GeneratedCertificate.eligible_certificates.filter(user=self.student).count()
-        self.assertEqual(num_certs, 1)
+        assert num_certs == 1
 
     def _generate(self, course_key=None, username=None):
         """Call the generation end-point and return the response. """

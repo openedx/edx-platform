@@ -30,11 +30,11 @@ class CreateFakeCertTest(TestCase):
             grade='0.89'
         )
         cert = GeneratedCertificate.eligible_certificates.get(user=self.user, course_id=self.COURSE_KEY)
-        self.assertEqual(cert.status, 'downloadable')
-        self.assertEqual(cert.mode, 'verified')
-        self.assertEqual(cert.grade, '0.89')
-        self.assertEqual(cert.download_uuid, 'test')
-        self.assertEqual(cert.download_url, 'http://www.example.com')
+        assert cert.status == 'downloadable'
+        assert cert.mode == 'verified'
+        assert cert.grade == '0.89'
+        assert cert.download_uuid == 'test'
+        assert cert.download_url == 'http://www.example.com'
 
         # Cert already exists; modify it
         self._run_command(
@@ -43,7 +43,7 @@ class CreateFakeCertTest(TestCase):
             cert_mode='honor'
         )
         cert = GeneratedCertificate.eligible_certificates.get(user=self.user, course_id=self.COURSE_KEY)
-        self.assertEqual(cert.mode, 'honor')
+        assert cert.mode == 'honor'
 
     def test_too_few_args(self):
         if six.PY2:

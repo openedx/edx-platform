@@ -50,7 +50,7 @@ class CertificateServiceTests(ModuleStoreTestCase):
         Verify that CertificateService invalidates the user certificate
         """
         success = self.service.invalidate_certificate(self.user_id, self.course_id)
-        self.assertTrue(success)
+        assert success
 
         invalid_generated_certificate = GeneratedCertificate.objects.get(
             user=self.user_id,
@@ -86,7 +86,7 @@ class CertificateServiceTests(ModuleStoreTestCase):
             course_id=course_key
         )
         success = self.service.invalidate_certificate(u.id, course_key)
-        self.assertFalse(success)
+        assert not success
 
         cert = GeneratedCertificate.objects.get(user=u.id, course_id=course_key)
-        self.assertEqual(cert.status, CertificateStatuses.downloadable)
+        assert cert.status == CertificateStatuses.downloadable

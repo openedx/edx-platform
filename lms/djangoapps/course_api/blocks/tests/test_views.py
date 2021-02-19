@@ -81,7 +81,7 @@ class TestBlocksView(SharedModuleStoreTestCase):
         if params:
             self.query_params.update(params)
         response = self.client.get(url or self.url, self.query_params)
-        self.assertEqual(response.status_code, expected_status_code, str(response.content))
+        assert response.status_code == expected_status_code, str(response.content)
         if cacheable:
             assert response.get('Cache-Control', None) == 'max-age={}'.format(
                 settings.CACHE_MIDDLEWARE_SECONDS
@@ -122,7 +122,7 @@ class TestBlocksView(SharedModuleStoreTestCase):
             self.assert_in_iff('format', block_data, xblock.format is not None)
             self.assert_in_iff('due', block_data, xblock.due is not None)
             self.assert_true_iff(block_data['student_view_multi_device'], block_data['type'] == 'html')
-            self.assertNotIn('not_a_field', block_data)
+            assert 'not_a_field' not in block_data
 
             if xblock.has_children:
                 self.assertSetEqual(
@@ -140,9 +140,9 @@ class TestBlocksView(SharedModuleStoreTestCase):
             predicate - an expression, tested for truthiness
         """
         if predicate:
-            self.assertIn(member, container)
+            assert member in container
         else:
-            self.assertNotIn(member, container)
+            assert member not in container
 
     def assert_true_iff(self, expression, predicate):
         """
@@ -154,9 +154,9 @@ class TestBlocksView(SharedModuleStoreTestCase):
         """
 
         if predicate:
-            self.assertTrue(expression)
+            assert expression
         else:
-            self.assertFalse(expression)
+            assert not expression
 
     def test_not_authenticated_non_public_course_with_other_username(self):
         """
@@ -269,13 +269,13 @@ class TestBlocksView(SharedModuleStoreTestCase):
 
     def test_basic(self):
         response = self.verify_response()
-        self.assertEqual(response.data['root'], str(self.course_usage_key))
+        assert response.data['root'] == str(self.course_usage_key)
         self.verify_response_block_dict(response)
         for block_key_string, block_data in response.data['blocks'].items():
             block_key = deserialize_usage_key(block_key_string, self.course_key)
-            self.assertEqual(block_data['id'], block_key_string)
-            self.assertEqual(block_data['type'], block_key.block_type)
-            self.assertEqual(block_data['display_name'], self.store.get_item(block_key).display_name or '')
+            assert block_data['id'] == block_key_string
+            assert block_data['type'] == block_key.block_type
+            assert block_data['display_name'] == (self.store.get_item(block_key).display_name or '')
 
     def test_return_type_param(self):
         response = self.verify_response(params={'return_type': 'list'})
@@ -285,18 +285,9 @@ class TestBlocksView(SharedModuleStoreTestCase):
         response = self.verify_response(params={'block_counts': ['course', 'chapter']})
         self.verify_response_block_dict(response)
         for block_data in response.data['blocks'].values():
-            self.assertEqual(
-                block_data['block_counts']['course'],
-                1 if block_data['type'] == 'course' else 0,
-            )
-            self.assertEqual(
-                block_data['block_counts']['chapter'],
-                (
-                    1 if block_data['type'] == 'chapter' else
-                    5 if block_data['type'] == 'course' else
-                    0
-                )
-            )
+            assert block_data['block_counts']['course'] == (1 if (block_data['type'] == 'course') else 0)
+            assert block_data['block_counts']['chapter'] == (1 if (block_data['type'] == 'chapter') else
+                                                             (5 if (block_data['type'] == 'course') else 0))
 
     def test_student_view_data_param(self):
         response = self.verify_response(params={
@@ -360,10 +351,7 @@ class TestBlocksView(SharedModuleStoreTestCase):
         })
         self.verify_response_block_dict(response)
         for block_data in response.data['blocks'].values():
-            self.assertNotIn(
-                'other_course_settings',
-                block_data
-            )
+            assert 'other_course_settings' not in block_data
 
             self.assert_in_iff(
                 'course_visibility',
@@ -375,7 +363,7 @@ class TestBlocksView(SharedModuleStoreTestCase):
         response = self.verify_response(params={'nav_depth': 10})
         self.verify_response_block_dict(response)
         for block_data in response.data['blocks'].values():
-            self.assertIn('descendants', block_data)
+            assert 'descendants' in block_data
 
     def test_requested_fields_param(self):
         response = self.verify_response(
@@ -441,7 +429,7 @@ class TestBlocksInCourseView(TestBlocksView, CompletionWaffleTestMixin):  # pyli
         })
 
         completion = response.data['blocks'][str(block_usage_key)].get('completion')
-        self.assertTrue(completion)
+        assert completion
 
     def test_completion_all_course(self):
         for block in self.non_orphaned_raw_block_usage_keys:
@@ -452,7 +440,7 @@ class TestBlocksInCourseView(TestBlocksView, CompletionWaffleTestMixin):  # pyli
             'requested_fields': ['completion', 'children'],
         })
         for block_id in self.non_orphaned_block_usage_keys:
-            self.assertTrue(response.data['blocks'][block_id].get('completion'))
+            assert response.data['blocks'][block_id].get('completion')
 
     def test_completion_all_course_with_list_return_type(self):
         for block in self.non_orphaned_raw_block_usage_keys:
@@ -465,4 +453,4 @@ class TestBlocksInCourseView(TestBlocksView, CompletionWaffleTestMixin):  # pyli
         })
         for block in response.data:
             if block['block_id'] in self.non_orphaned_block_usage_keys:
-                self.assertTrue(block.get('completion'))
+                assert block.get('completion')
