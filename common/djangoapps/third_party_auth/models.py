@@ -25,6 +25,7 @@ from social_core.utils import module_member
 
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.theming.helpers import get_current_request
+from openedx.core.djangoapps.user_api.accounts import USERNAME_MAX_LENGTH
 from openedx.core.lib.hash_utils import create_hash256
 
 from .lti import LTI_PARAMS_KEY, LTIAuthBackend
@@ -68,7 +69,7 @@ def clean_json(value, of_type):
 
 def clean_username(username=''):
     """ Simple helper method to ensure a username is compatible with our system requirements. """
-    return re.sub(r'[^-\w]+', '_', username)[:30]
+    return re.sub(r'[^-\w]+', '_', username)[:USERNAME_MAX_LENGTH]
 
 
 class AuthNotConfigured(SocialAuthBaseException):
