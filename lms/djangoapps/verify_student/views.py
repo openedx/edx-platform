@@ -1118,8 +1118,8 @@ def results_callback(request):  # lint-amnesty, pylint: disable=too-many-stateme
         log.debug(u'Approving verification for {}'.format(receipt_id))
         attempt.approve()
 
-        expiry_date = datetime.date.today() + datetime.timedelta(days=settings.VERIFY_STUDENT["DAYS_GOOD_FOR"])
-        email_context = {'user': user, 'expiry_date': expiry_date.strftime("%m/%d/%Y")}
+        expiration_datetime = attempt.expiration_datetime.date()
+        email_context = {'user': user, 'expiration_datetime': expiration_datetime.strftime("%m/%d/%Y")}
         send_verification_approved_email(context=email_context)
 
     elif result == "FAIL":
