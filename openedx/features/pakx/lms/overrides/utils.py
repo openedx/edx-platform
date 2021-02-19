@@ -70,6 +70,7 @@ def add_course_progress_and_resume_info_tags_to_enrolled_courses(request, course
             course.has_visited_course = has_visited_course
             course.resume_course_title = resume_course_title
         course.enrolled = is_enrolled
+        course.dir = 'rtl' if check_rtl_characters_in_string(course.display_name) else ''
 
 
 def _accumulate_total_block_counts(total_block_type_counts):
@@ -215,6 +216,6 @@ def check_rtl_characters_in_string(string):
     :return: (bool) True | False i.e True if contains
     """
 
-    urdu_characters_pattern = r'[\u0600-\u06ff]'
-    matched_groups = search(urdu_characters_pattern, string)
+    rtl_range = r'[\u0600-\u06FF\u0750-\u077F\u0590-\u05FF\uFE70-\uFEFF]'
+    matched_groups = search(rtl_range, string)
     return matched_groups is not None
