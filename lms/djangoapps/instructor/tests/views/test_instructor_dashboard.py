@@ -245,53 +245,6 @@ class TestInstructorDashboard(ModuleStoreTestCase, LoginEnrollmentTestCase, XssT
         else:
             self.assertNotContains(response, reason_field)
 
-    def test_membership_site_configuration_role(self):
-        """
-        Verify that the role choices set via site configuration are loaded in the membership tab
-        of the instructor dashboard
-        """
-
-        configuration_values = {
-            "MANUAL_ENROLLMENT_ROLE_CHOICES": [
-                "role1",
-                "role2",
-            ]
-        }
-        site = Site.objects.first()
-        SiteConfiguration.objects.create(
-            site=site,
-            site_values=configuration_values,
-            enabled=True
-        )
-        url = reverse(
-            'instructor_dashboard',
-            kwargs={
-                'course_id': str(self.course_info.id)
-            }
-        )
-
-        response = self.client.get(url)
-        self.assertContains(response, '<option value="role1">role1</option>')
-        self.assertContains(response, '<option value="role2">role2</option>')
-
-    def test_membership_default_role(self):
-        """
-        Verify that in the absence of site configuration role choices, default values of role choices are loaded
-        in the membership tab of the instructor dashboard
-        """
-
-        url = reverse(
-            'instructor_dashboard',
-            kwargs={
-                'course_id': str(self.course_info.id)
-            }
-        )
-
-        response = self.client.get(url)
-        self.assertContains(response, '<option value="Learner">Learner</option>')
-        self.assertContains(response, '<option value="Support">Support</option>')
-        self.assertContains(response, '<option value="Partner">Partner</option>')
-
     def test_student_admin_staff_instructor(self):
         """
         Verify that staff users are not able to see course-wide options, while still
