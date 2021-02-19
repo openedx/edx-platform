@@ -46,23 +46,23 @@ class ExperimentUtilsTests(ModuleStoreTestCase, TestCase):
             'key': 'course-v1:DelftX+NGIx+RA0',
         }
         enrollment_ids = {CourseKey.from_string('course-v1:DelftX+NGIx+RA0')}
-        self.assertTrue(is_enrolled_in_course_run(course_run, enrollment_ids))
+        assert is_enrolled_in_course_run(course_run, enrollment_ids)
 
     def test_invalid_course_run_key_enrollment(self):
         course_run = {
             'key': 'cr_key',
         }
         enrollment_ids = {CourseKey.from_string('course-v1:DelftX+NGIx+RA0')}
-        self.assertFalse(is_enrolled_in_course_run(course_run, enrollment_ids))
+        assert not is_enrolled_in_course_run(course_run, enrollment_ids)
 
     def test_program_price_and_skus_for_empty_courses(self):
         price, skus = get_program_price_and_skus([])
-        self.assertEqual(None, price)
-        self.assertEqual(None, skus)
+        assert price is None
+        assert skus is None
 
     def test_unenrolled_courses_for_empty_courses(self):
         unenrolled_courses = get_unenrolled_courses([], [])
-        self.assertEqual([], unenrolled_courses)
+        assert [] == unenrolled_courses
 
     def test_unenrolled_courses_for_single_course(self):
         course = {'key': 'UQx+ENGY1x'}
@@ -71,22 +71,22 @@ class ExperimentUtilsTests(ModuleStoreTestCase, TestCase):
 
         unenrolled_courses = get_unenrolled_courses(courses_in_program, user_enrollments)
         expected_unenrolled_courses = [course]
-        self.assertEqual(expected_unenrolled_courses, unenrolled_courses)
+        assert expected_unenrolled_courses == unenrolled_courses
 
     def test_price_and_sku_from_empty_course(self):
         course = {}
 
         price, sku = get_course_entitlement_price_and_sku(course)
-        self.assertEqual(None, price)
-        self.assertEqual(None, sku)
+        assert price is None
+        assert sku is None
 
     def test_price_and_sku_from_entitlement(self):
         entitlements = [self.entitlement_a]
         course = {'key': 'UQx+ENGY1x', 'entitlements': entitlements}
 
         price, sku = get_course_entitlement_price_and_sku(course)
-        self.assertEqual(self.entitlement_a_price, price)
-        self.assertEqual(self.entitlement_a_sku, sku)
+        assert self.entitlement_a_price == price
+        assert self.entitlement_a_sku == sku
 
     def test_price_and_sku_from_course_run(self):
         course_runs = [self.course_run_a]
@@ -94,8 +94,8 @@ class ExperimentUtilsTests(ModuleStoreTestCase, TestCase):
 
         price, sku = get_course_entitlement_price_and_sku(course)
         expected_price = Decimal(self.run_a_price)
-        self.assertEqual(expected_price, price)
-        self.assertEqual(self.run_a_sku, sku)
+        assert expected_price == price
+        assert self.run_a_sku == sku
 
     def test_price_and_sku_from_course(self):
         entitlements = [self.entitlement_a]
@@ -104,9 +104,9 @@ class ExperimentUtilsTests(ModuleStoreTestCase, TestCase):
 
         price, skus = get_program_price_and_skus(courses)
         expected_price = u'$199.23'
-        self.assertEqual(expected_price, price)
-        self.assertEqual(1, len(skus))
-        self.assertIn(self.entitlement_a_sku, skus)
+        assert expected_price == price
+        assert 1 == len(skus)
+        assert self.entitlement_a_sku in skus
 
     def test_price_and_sku_from_multiple_courses(self):
         entitlements = [self.entitlement_a]
@@ -117,10 +117,10 @@ class ExperimentUtilsTests(ModuleStoreTestCase, TestCase):
 
         price, skus = get_program_price_and_skus(courses)
         expected_price = u'$285.23'
-        self.assertEqual(expected_price, price)
-        self.assertEqual(2, len(skus))
-        self.assertIn(self.run_a_sku, skus)
-        self.assertIn(self.entitlement_a_sku, skus)
+        assert expected_price == price
+        assert 2 == len(skus)
+        assert self.run_a_sku in skus
+        assert self.entitlement_a_sku in skus
 
     def test_get_experiment_user_metadata_context(self):
         course = CourseFactory.create(start=now() - timedelta(days=30), pacing_type="instructor_paced", course_duration=None, upgrade_price='Free',  # lint-amnesty, pylint: disable=line-too-long
@@ -155,4 +155,4 @@ class ExperimentUtilsTests(ModuleStoreTestCase, TestCase):
 
         user_metadata = context.get('user_metadata')
 
-        self.assertTrue(user_metadata, user_metadata_expected_result)
+        assert user_metadata, user_metadata_expected_result

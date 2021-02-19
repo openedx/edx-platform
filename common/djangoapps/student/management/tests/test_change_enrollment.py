@@ -56,10 +56,7 @@ class ChangeEnrollmentTests(SharedModuleStoreTestCase):
         user_ids = [u.id for u in self.users]
 
         # Verify users are not in honor mode yet
-        self.assertEqual(
-            len(CourseEnrollment.objects.filter(mode='honor', user_id__in=user_ids)),
-            0
-        )
+        assert len(CourseEnrollment.objects.filter(mode='honor', user_id__in=user_ids)) == 0
 
         noop = " --noop" if noop else ""
 
@@ -75,10 +72,7 @@ class ChangeEnrollmentTests(SharedModuleStoreTestCase):
         call_command('change_enrollment', *command_args.split(' '))
 
         # Verify correct number of users are now in honor mode
-        self.assertEqual(
-            len(CourseEnrollment.objects.filter(mode='honor', user_id__in=user_ids)),
-            expected_conversions
-        )
+        assert len(CourseEnrollment.objects.filter(mode='honor', user_id__in=user_ids)) == expected_conversions
 
         mock_logger.info.assert_called_with(
             'Successfully updated %i out of %i users',
@@ -99,10 +93,7 @@ class ChangeEnrollmentTests(SharedModuleStoreTestCase):
         real_user_ids = [u.id for u in self.users]
 
         # Verify users are not in honor mode yet
-        self.assertEqual(
-            len(CourseEnrollment.objects.filter(mode='honor', user_id__in=real_user_ids)),
-            0
-        )
+        assert len(CourseEnrollment.objects.filter(mode='honor', user_id__in=real_user_ids)) == 0
 
         command_args = '--course {course} --to honor --from audit --{method} {user_str}'.format(
             course=text_type(self.course.id),
@@ -113,10 +104,7 @@ class ChangeEnrollmentTests(SharedModuleStoreTestCase):
         call_command('change_enrollment', *command_args.split(' '))
 
         # Verify correct number of users are now in honor mode
-        self.assertEqual(
-            len(CourseEnrollment.objects.filter(mode='honor', user_id__in=real_user_ids)),
-            expected_success
-        )
+        assert len(CourseEnrollment.objects.filter(mode='honor', user_id__in=real_user_ids)) == expected_success
 
         mock_logger.info.assert_called_with(
             'user: [%s] reason: [%s] %s', fake_user, 'DoesNotExist', 'User matching query does not exist.'

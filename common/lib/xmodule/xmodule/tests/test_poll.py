@@ -33,9 +33,9 @@ class PollModuleTest(LogicTest):
         callback = response['callback']
 
         self.assertDictEqual(poll_answers, {'Yes': 1, 'Dont_know': 0, 'No': 1})
-        self.assertEqual(total, 2)
+        assert total == 2
         self.assertDictEqual(callback, {'objectName': 'Conditional'})
-        self.assertEqual(self.xmodule.poll_answer, 'No')
+        assert self.xmodule.poll_answer == 'No'
 
     def test_poll_export_with_unescaped_characters_xml(self):
         """
@@ -64,4 +64,4 @@ class PollModuleTest(LogicTest):
         # Extract texts of all children.
         child_texts = xml.xpath('//text()')
         # Last index of child_texts contains text of answer tag.
-        self.assertEqual(child_texts[-1], '< 18')
+        assert child_texts[(- 1)] == '< 18'

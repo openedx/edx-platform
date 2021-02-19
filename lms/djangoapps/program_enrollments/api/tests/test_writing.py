@@ -169,16 +169,16 @@ class WriteProgramCourseEnrollmentTest(EnrollmentTestMixin):
             program_enrollment__external_user_key=external_user_key,
             program_enrollment__program_uuid=self.program_uuid
         )
-        self.assertEqual(expected_status, enrollment.status)
-        self.assertEqual(self.course_id, enrollment.course_key)
+        assert expected_status == enrollment.status
+        assert self.course_id == enrollment.course_key
         course_enrollment = enrollment.course_enrollment
         if has_user:
-            self.assertIsNotNone(course_enrollment)
-            self.assertEqual(expected_status == 'active', course_enrollment.is_active)
-            self.assertEqual(self.course_id, course_enrollment.course_id)
-            self.assertEqual(mode, course_enrollment.mode)
+            assert course_enrollment is not None
+            assert (expected_status == 'active') == course_enrollment.is_active
+            assert self.course_id == course_enrollment.course_id
+            assert mode == course_enrollment.mode
         else:
-            self.assertIsNone(course_enrollment)
+            assert course_enrollment is None
 
     def setup_change_test_data(self, initial_statuses):
         """

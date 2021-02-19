@@ -6,7 +6,7 @@ well-formed and not-well-formed XML.
 
 import os.path
 from glob import glob
-
+import pytest
 from django.test import TestCase
 from mock import Mock, patch
 from opaque_keys.edx.keys import CourseKey
@@ -44,7 +44,7 @@ class TestXMLModuleStore(TestCase):
         # Ensure that there really is a non-ASCII character in the course.
         with open(os.path.join(DATA_DIR, "toy/sequential/vertical_sequential.xml"), 'rb') as xmlf:
             xml = xmlf.read()
-            with self.assertRaises(UnicodeDecodeError):
+            with pytest.raises(UnicodeDecodeError):
                 xml.decode('ascii')
 
         # Load the course, but don't make error modules.  This will succeed,
@@ -66,23 +66,23 @@ class TestXMLModuleStore(TestCase):
         store = XMLModuleStore(DATA_DIR, source_dirs=['toy', 'simple'])
         for course in store.get_courses():
             course_locations = store.get_courses_for_wiki(course.wiki_slug)
-            self.assertEqual(len(course_locations), 1)
-            self.assertIn(course.location.course_key, course_locations)
+            assert len(course_locations) == 1
+            assert course.location.course_key in course_locations
 
         course_locations = store.get_courses_for_wiki('no_such_wiki')
-        self.assertEqual(len(course_locations), 0)
+        assert len(course_locations) == 0
 
         # now set toy course to share the wiki with simple course
         toy_course = store.get_course(CourseKey.from_string('edX/toy/2012_Fall'))
         toy_course.wiki_slug = 'simple'
 
         course_locations = store.get_courses_for_wiki('toy')
-        self.assertEqual(len(course_locations), 0)
+        assert len(course_locations) == 0
 
         course_locations = store.get_courses_for_wiki('simple')
-        self.assertEqual(len(course_locations), 2)
+        assert len(course_locations) == 2
         for course_number in ['toy', 'simple']:
-            self.assertIn(CourseKey.from_string('/'.join(['edX', course_number, '2012_Fall'])), course_locations)
+            assert CourseKey.from_string('/'.join(['edX', course_number, '2012_Fall'])) in course_locations
 
     def test_has_course(self):
         """
@@ -106,7 +106,7 @@ class TestXMLModuleStore(TestCase):
             store.get_item(course.location)
 
         # XML store does NOT allow draft_preferred branch setting
-        with self.assertRaises(ValueError):
+        with pytest.raises(ValueError):
             with store.branch_setting(ModuleStoreEnum.Branch.draft_preferred, course.id):
                 # verify that the above context manager raises a ValueError
                 pass  # pragma: no cover
@@ -130,15 +130,15 @@ class TestXMLModuleStore(TestCase):
         shared_item_loc = course_key.make_usage_key('html', 'toyhtml')
         shared_item = store.get_item(shared_item_loc)
         parent = shared_item.get_parent()
-        self.assertIsNotNone(parent, "get_parent failed to return a value")
+        assert parent is not None, 'get_parent failed to return a value'
         parent_loc = course_key.make_usage_key('vertical', 'vertical_test')
-        self.assertEqual(parent.location, parent_loc)
-        self.assertIn(shared_item.location, [x.location for x in parent.get_children()])
+        assert parent.location == parent_loc
+        assert shared_item.location in [x.location for x in parent.get_children()]
         # ensure it's still a child of the other parent even tho it doesn't claim the other parent as its parent
         other_parent_loc = course_key.make_usage_key('vertical', 'zeta')
         other_parent = store.get_item(other_parent_loc)
         # children rather than get_children b/c the instance returned by get_children != shared_item
-        self.assertIn(shared_item_loc, other_parent.children)
+        assert shared_item_loc in other_parent.children
 
 
 class TestModuleStoreIgnore(TestXMLModuleStore):  # lint-amnesty, pylint: disable=missing-class-docstring, test-inherits-tests
@@ -156,5 +156,5 @@ class TestModuleStoreIgnore(TestXMLModuleStore):  # lint-amnesty, pylint: disabl
             'about', 'index',
         )
         about_module = modulestore.get_item(about_location)
-        self.assertIn("GREEN", about_module.data)
-        self.assertNotIn("RED", about_module.data)
+        assert 'GREEN' in about_module.data
+        assert 'RED' not in about_module.data

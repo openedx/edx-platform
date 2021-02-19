@@ -23,12 +23,12 @@ class GroupIdAssertionMixin(object):
             return call[1]["data"]
 
     def _assert_comments_service_called_with_group_id(self, mock_request, group_id):
-        self.assertTrue(mock_request.called)
-        self.assertEqual(self._data_or_params_cs_request(mock_request)["group_id"], group_id)
+        assert mock_request.called
+        assert self._data_or_params_cs_request(mock_request)['group_id'] == group_id
 
     def _assert_comments_service_called_without_group_id(self, mock_request):
-        self.assertTrue(mock_request.called)
-        self.assertNotIn("group_id", self._data_or_params_cs_request(mock_request))
+        assert mock_request.called
+        assert 'group_id' not in self._data_or_params_cs_request(mock_request)
 
     def _assert_html_response_contains_group_info(self, response):
         group_info = {"group_id": None, "group_name": None}
@@ -52,8 +52,8 @@ class GroupIdAssertionMixin(object):
         self._assert_thread_contains_group_info(thread)
 
     def _assert_thread_contains_group_info(self, thread):
-        self.assertEqual(thread['group_id'], self.student_cohort.id)
-        self.assertEqual(thread['group_name'], self.student_cohort.name)
+        assert thread['group_id'] == self.student_cohort.id
+        assert thread['group_name'] == self.student_cohort.name
 
 
 class CohortedTopicGroupIdTestMixin(GroupIdAssertionMixin):
@@ -103,7 +103,7 @@ class CohortedTopicGroupIdTestMixin(GroupIdAssertionMixin):
     def test_cohorted_topic_moderator_with_invalid_group_id(self, mock_request):
         invalid_id = self.student_cohort.id + self.moderator_cohort.id
         response = self.call_view(mock_request, "cohorted_topic", self.moderator, invalid_id)  # lint-amnesty, pylint: disable=assignment-from-no-return
-        self.assertEqual(response.status_code, 500)
+        assert response.status_code == 500
 
     def test_cohorted_topic_enrollment_track_invalid_group_id(self, mock_request):
         CourseModeFactory.create(course_id=self.course.id, mode_slug=CourseMode.AUDIT)
@@ -117,7 +117,7 @@ class CohortedTopicGroupIdTestMixin(GroupIdAssertionMixin):
 
         invalid_id = -1000
         response = self.call_view(mock_request, "cohorted_topic", self.moderator, invalid_id)  # lint-amnesty, pylint: disable=assignment-from-no-return
-        self.assertEqual(response.status_code, 500)
+        assert response.status_code == 500
 
 
 class NonCohortedTopicGroupIdTestMixin(GroupIdAssertionMixin):

@@ -22,4 +22,4 @@ class UpdateCourseInCacheTaskTest(ModuleStoreTestCase):
         """
         mock_update.side_effect = Exception("WHAMMY")
         update_course_in_cache_v2.apply(kwargs=dict(course_id="invalid_course_key raises exception 12345 meow"))
-        self.assertTrue(mock_retry.called)
+        assert mock_retry.called

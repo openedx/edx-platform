@@ -39,7 +39,7 @@ class LogoutTests(TestCase):
         # Logging out should remove the session variables, and send a list of logout URLs to the template.
         # The template will handle loading those URLs and redirecting the user. That functionality is not tested here.
         response = self.client.get(reverse('logout'), **logout_headers)
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
 
         return response
 
@@ -53,7 +53,7 @@ class LogoutTests(TestCase):
         }
         # Authenticate with OAuth to set the appropriate session values
         response = self.client.post(reverse('oauth2_provider:authorize'), data, follow=True)
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
 
     @ddt.data(
         ('%2Fcourses', 'testserver'),

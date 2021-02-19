@@ -92,7 +92,7 @@ class TestProgramListing(ProgramsApiConfigMixin, SharedModuleStoreTestCase):
         subset_keys = set(subset.keys())
         intersection = {key: superset[key] for key in superset_keys & subset_keys}
 
-        self.assertEqual(subset, intersection)
+        assert subset == intersection
 
     def test_login_required(self, mock_get_programs):
         """
@@ -112,7 +112,7 @@ class TestProgramListing(ProgramsApiConfigMixin, SharedModuleStoreTestCase):
         self.client.login(username=self.user.username, password=self.password)
 
         response = self.client.get(self.url)
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
 
     def test_404_if_disabled(self, _mock_get_programs):
         """
@@ -121,7 +121,7 @@ class TestProgramListing(ProgramsApiConfigMixin, SharedModuleStoreTestCase):
         self.create_programs_config(enabled=False)
 
         response = self.client.get(self.url)
-        self.assertEqual(response.status_code, 404)
+        assert response.status_code == 404
 
     def test_empty_state(self, mock_get_programs):
         """
@@ -191,7 +191,7 @@ class TestProgramListing(ProgramsApiConfigMixin, SharedModuleStoreTestCase):
             expected_program = self.data[index]
 
             expected_url = reverse('program_details_view', kwargs={'program_uuid': expected_program['uuid']})
-            self.assertEqual(actual_program['detail_url'], expected_url)
+            assert actual_program['detail_url'] == expected_url
 
 
 @skip_unless_lms
@@ -236,9 +236,7 @@ class TestProgramDetails(ProgramsApiConfigMixin, CatalogIntegrationMixin, Shared
     def assert_programs_tab_present(self, response):
         """Verify that the programs tab is present in the nav."""
         soup = BeautifulSoup(response.content, 'html.parser')
-        self.assertTrue(
-            any(soup.find_all('a', class_='tab-nav-link', href=reverse('program_listing_view')))
-        )
+        assert any(soup.find_all('a', class_='tab-nav-link', href=reverse('program_listing_view')))
 
     def assert_pathway_data_present(self, response):
         """ Verify that the correct pathway data is present. """
@@ -249,12 +247,12 @@ class TestProgramDetails(ProgramsApiConfigMixin, CatalogIntegrationMixin, Shared
         credit_pathways = load_serialized_data(response, 'creditPathways')
         if self.pathway_data['pathway_type'] == PathwayType.CREDIT.value:
             credit_pathway, = credit_pathways  # Verify that there is only one credit pathway
-            self.assertEqual(self.pathway_data, credit_pathway)
-            self.assertEqual([], industry_pathways)
+            assert self.pathway_data == credit_pathway
+            assert [] == industry_pathways
         elif self.pathway_data['pathway_type'] == PathwayType.INDUSTRY.value:
             industry_pathway, = industry_pathways  # Verify that there is only one industry pathway
-            self.assertEqual(self.pathway_data, industry_pathway)
-            self.assertEqual([], credit_pathways)
+            assert self.pathway_data == industry_pathway
+            assert [] == credit_pathways
 
     def test_login_required(self, mock_get_programs, mock_get_pathways):
         """
@@ -292,7 +290,7 @@ class TestProgramDetails(ProgramsApiConfigMixin, CatalogIntegrationMixin, Shared
         self.create_programs_config(enabled=False)
 
         response = self.client.get(self.url)
-        self.assertEqual(response.status_code, 404)
+        assert response.status_code == 404
 
     def test_404_if_no_data(self, mock_get_programs, _mock_get_pathways):
         """Verify that the page 404s if no program data is found."""
@@ -301,4 +299,4 @@ class TestProgramDetails(ProgramsApiConfigMixin, CatalogIntegrationMixin, Shared
         mock_get_programs.return_value = None
 
         response = self.client.get(self.url)
-        self.assertEqual(response.status_code, 404)
+        assert response.status_code == 404

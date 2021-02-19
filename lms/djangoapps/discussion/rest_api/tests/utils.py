@@ -359,7 +359,7 @@ class CommentsServiceMockMixin(object):
         """
         actual_params = dict(httpretty_request.querystring)
         actual_params.pop("request_id")  # request_id is random
-        self.assertEqual(actual_params, expected_params)
+        assert actual_params == expected_params
 
     def assert_last_query_params(self, expected_params):
         """
@@ -519,12 +519,12 @@ class ProfileImageTestMixin(object):
         """
         for size, name in get_profile_image_names(user.username).items():
             if exist:
-                self.assertTrue(storage.exists(name))
+                assert storage.exists(name)
                 with closing(Image.open(storage.path(name))) as img:
-                    self.assertEqual(img.size, (size, size))
-                    self.assertEqual(img.format, 'JPEG')
+                    assert img.size == (size, size)
+                    assert img.format == 'JPEG'
             else:
-                self.assertFalse(storage.exists(name))
+                assert not storage.exists(name)
 
     def get_expected_user_profile(self, username):
         """

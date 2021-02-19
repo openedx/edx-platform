@@ -281,15 +281,15 @@ class EntranceExamTestCases(LoginEnrollmentTestCase, ModuleStoreTestCase, Milest
         test get entrance exam content method
         """
         exam_chapter = get_entrance_exam_content(self.request.user, self.course)
-        self.assertEqual(exam_chapter.url_name, self.entrance_exam.url_name)
-        self.assertFalse(user_has_passed_entrance_exam(self.request.user, self.course))
+        assert exam_chapter.url_name == self.entrance_exam.url_name
+        assert not user_has_passed_entrance_exam(self.request.user, self.course)
 
         answer_entrance_exam_problem(self.course, self.request, self.problem_1)
         answer_entrance_exam_problem(self.course, self.request, self.problem_2)
 
         exam_chapter = get_entrance_exam_content(self.request.user, self.course)
-        self.assertEqual(exam_chapter, None)
-        self.assertTrue(user_has_passed_entrance_exam(self.request.user, self.course))
+        assert exam_chapter is None
+        assert user_has_passed_entrance_exam(self.request.user, self.course)
 
     def test_entrance_exam_requirement_message(self):
         """
@@ -331,7 +331,7 @@ class EntranceExamTestCases(LoginEnrollmentTestCase, ModuleStoreTestCase, Milest
             resp,
             u'To access course materials, you must score {}% or higher'.format(minimum_score_pct),
         )
-        self.assertIn(u'Your current score is 20%.', resp.content.decode(resp.charset))
+        assert u'Your current score is 20%.' in resp.content.decode(resp.charset)
 
     def test_entrance_exam_requirement_message_hidden(self):
         """
@@ -352,7 +352,7 @@ class EntranceExamTestCases(LoginEnrollmentTestCase, ModuleStoreTestCase, Milest
             }
         )
         resp = self.client.get(url)
-        self.assertEqual(resp.status_code, 200)
+        assert resp.status_code == 200
         self.assertNotContains(resp, 'To access course materials, you must score')
         self.assertNotContains(resp, 'You have passed the entrance exam.')
 
@@ -388,7 +388,7 @@ class EntranceExamTestCases(LoginEnrollmentTestCase, ModuleStoreTestCase, Milest
         chaos_user = UserFactory()
         locked_toc = self._return_table_of_contents()
         for toc_section in self.expected_locked_toc:
-            self.assertIn(toc_section, locked_toc)
+            assert toc_section in locked_toc
 
         # Set up the chaos user
         answer_entrance_exam_problem(self.course, self.request, self.problem_1, chaos_user)
@@ -398,7 +398,7 @@ class EntranceExamTestCases(LoginEnrollmentTestCase, ModuleStoreTestCase, Milest
         unlocked_toc = self._return_table_of_contents()
 
         for toc_section in self.expected_unlocked_toc:
-            self.assertIn(toc_section, unlocked_toc)
+            assert toc_section in unlocked_toc
 
     def test_skip_entrance_exam_gating(self):
         """
@@ -407,7 +407,7 @@ class EntranceExamTestCases(LoginEnrollmentTestCase, ModuleStoreTestCase, Milest
         # make sure toc is locked before allowing user to skip entrance exam
         locked_toc = self._return_table_of_contents()
         for toc_section in self.expected_locked_toc:
-            self.assertIn(toc_section, locked_toc)
+            assert toc_section in locked_toc
 
         # hit skip entrance exam api in instructor app
         instructor = InstructorFactory(course_key=self.course.id)
@@ -416,11 +416,11 @@ class EntranceExamTestCases(LoginEnrollmentTestCase, ModuleStoreTestCase, Milest
         response = self.client.post(url, {
             'unique_student_identifier': self.request.user.email,
         })
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
 
         unlocked_toc = self._return_table_of_contents()
         for toc_section in self.expected_unlocked_toc:
-            self.assertIn(toc_section, unlocked_toc)
+            assert toc_section in unlocked_toc
 
     def test_entrance_exam_gating_for_staff(self):
         """
@@ -437,7 +437,7 @@ class EntranceExamTestCases(LoginEnrollmentTestCase, ModuleStoreTestCase, Milest
         self.request.user = staff_user
         unlocked_toc = self._return_table_of_contents()
         for toc_section in self.expected_unlocked_toc:
-            self.assertIn(toc_section, unlocked_toc)
+            assert toc_section in unlocked_toc
 
     def test_courseware_page_access_without_passing_entrance_exam(self):
         """
@@ -508,14 +508,14 @@ class EntranceExamTestCases(LoginEnrollmentTestCase, ModuleStoreTestCase, Milest
         """
         Test can_skip_entrance_exam method with anonymous user
         """
-        self.assertFalse(user_can_skip_entrance_exam(self.anonymous_user, self.course))
+        assert not user_can_skip_entrance_exam(self.anonymous_user, self.course)
 
     def test_has_passed_entrance_exam_with_anonymous_user(self):
         """
         Test has_passed_entrance_exam method with anonymous user
         """
         self.request.user = self.anonymous_user
-        self.assertFalse(user_has_passed_entrance_exam(self.request.user, self.course))
+        assert not user_has_passed_entrance_exam(self.request.user, self.course)
 
     def test_course_has_entrance_exam_missing_exam_id(self):
         course = CourseFactory.create(
@@ -523,12 +523,12 @@ class EntranceExamTestCases(LoginEnrollmentTestCase, ModuleStoreTestCase, Milest
                 'entrance_exam_enabled': True,
             }
         )
-        self.assertFalse(course_has_entrance_exam(course))
+        assert not course_has_entrance_exam(course)
 
     def test_user_has_passed_entrance_exam_short_circuit_missing_exam(self):
         course = CourseFactory.create(
         )
-        self.assertTrue(user_has_passed_entrance_exam(self.request.user, course))
+        assert user_has_passed_entrance_exam(self.request.user, course)
 
     @patch.dict("django.conf.settings.FEATURES", {'ENABLE_MASQUERADE': False})
     def test_entrance_exam_xblock_response(self):
@@ -549,7 +549,7 @@ class EntranceExamTestCases(LoginEnrollmentTestCase, ModuleStoreTestCase, Milest
             'xmodule_handler',
             'problem_check',
         )
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
         self.assertContains(response, 'entrance_exam_passed')
 
     def _assert_chapter_loaded(self, course, chapter):
@@ -561,7 +561,7 @@ class EntranceExamTestCases(LoginEnrollmentTestCase, ModuleStoreTestCase, Milest
             kwargs={'course_id': six.text_type(course.id), 'chapter': chapter.url_name}
         )
         response = self.client.get(url)
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
 
     def _return_table_of_contents(self):
         """

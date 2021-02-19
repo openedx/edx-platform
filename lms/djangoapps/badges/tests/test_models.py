@@ -2,7 +2,7 @@
 Tests for the Badges app models.
 """
 
-
+import pytest
 from django.core.exceptions import ValidationError
 from django.core.files.images import ImageFile
 from django.core.files.storage import default_storage
@@ -49,19 +49,15 @@ class BadgeImageConfigurationTest(TestCase):
         Verify that creating two configurations as default is not permitted.
         """
         CourseCompleteImageConfiguration(mode='test', icon=get_image('good'), default=True).save()
-        self.assertRaises(
-            ValidationError,
-            CourseCompleteImageConfiguration(mode='test2', icon=get_image('good'), default=True).full_clean
-        )
+        pytest.raises(ValidationError, CourseCompleteImageConfiguration(mode='test2', icon=get_image('good'),
+                                                                        default=True).full_clean)
 
     def test_runs_validator(self):
         """
         Verify that the image validator is triggered when cleaning the model.
         """
-        self.assertRaises(
-            ValidationError,
-            CourseCompleteImageConfiguration(mode='test2', icon=get_image('unbalanced')).full_clean
-        )
+        pytest.raises(ValidationError, CourseCompleteImageConfiguration(mode='test2', icon=get_image('unbalanced'))
+                      .full_clean)
 
 
 class DummyBackend(object):
@@ -97,7 +93,7 @@ class BadgeClassTest(ModuleStoreTestCase):
         """
         Verify the BadgeClass fetches the backend properly.
         """
-        self.assertIsInstance(BadgeClass().backend, DummyBackend)
+        assert isinstance(BadgeClass().backend, DummyBackend)
 
     def test_get_badge_class_preexisting(self):
         """
@@ -110,11 +106,11 @@ class BadgeClassTest(ModuleStoreTestCase):
             criteria='test', display_name='Testola', image_file_handle=get_image('good')
         )
         # These defaults are set on the factory.
-        self.assertEqual(badge_class.criteria, 'https://example.com/syllabus')
-        self.assertEqual(badge_class.display_name, 'Test Badge')
-        self.assertEqual(badge_class.description, "Yay! It's a test badge.")
+        assert badge_class.criteria == 'https://example.com/syllabus'
+        assert badge_class.display_name == 'Test Badge'
+        assert badge_class.description == "Yay! It's a test badge."
         # File name won't always be the same.
-        self.assertEqual(badge_class.image.path, premade_badge_class.image.path)
+        assert badge_class.image.path == premade_badge_class.image.path
 
     def test_unique_for_course(self):
         """
@@ -131,8 +127,8 @@ class BadgeClassTest(ModuleStoreTestCase):
             criteria='test', display_name='Testola', image_file_handle=get_image('good'),
             course_id=course_key,
         )
-        self.assertNotEqual(badge_class.id, course_badge_class.id)
-        self.assertEqual(course_badge_class.id, premade_badge_class.id)
+        assert badge_class.id != course_badge_class.id
+        assert course_badge_class.id == premade_badge_class.id
 
     def test_get_badge_class_course_disabled(self):
         """
@@ -140,7 +136,7 @@ class BadgeClassTest(ModuleStoreTestCase):
         exception.
         """
         course_key = CourseFactory.create(metadata={'issue_badges': False}).location.course_key
-        with self.assertRaises(CourseBadgesDisabledError):
+        with pytest.raises(CourseBadgesDisabledError):
             BadgeClass.get_badge_class(
                 slug='test_slug', issuing_component='test_component', description='Attempted override',
                 criteria='test', display_name='Testola', image_file_handle=get_image('good'),
@@ -157,13 +153,13 @@ class BadgeClassTest(ModuleStoreTestCase):
             image_file_handle=get_image('good')
         )
         # This should have been saved before being passed back.
-        self.assertTrue(badge_class.id)
-        self.assertEqual(badge_class.slug, 'new_slug')
-        self.assertEqual(badge_class.issuing_component, 'new_component')
-        self.assertEqual(badge_class.description, 'This is a test')
-        self.assertEqual(badge_class.criteria, 'https://example.com/test_criteria')
-        self.assertEqual(badge_class.display_name, 'Super Badge')
-        self.assertTrue('good' in badge_class.image.name.rsplit('/', 1)[-1])  # lint-amnesty, pylint: disable=wrong-assert-type
+        assert badge_class.id
+        assert badge_class.slug == 'new_slug'
+        assert badge_class.issuing_component == 'new_component'
+        assert badge_class.description == 'This is a test'
+        assert badge_class.criteria == 'https://example.com/test_criteria'
+        assert badge_class.display_name == 'Super Badge'
+        assert 'good' in badge_class.image.name.rsplit('/', 1)[(- 1)]
 
     def test_get_badge_class_nocreate(self):
         """
@@ -172,19 +168,20 @@ class BadgeClassTest(ModuleStoreTestCase):
         badge_class = BadgeClass.get_badge_class(
             slug='new_slug', issuing_component='new_component', create=False
         )
-        self.assertIsNone(badge_class)
+        assert badge_class is None
         # Run this twice to verify there wasn't a background creation of the badge.
         badge_class = BadgeClass.get_badge_class(
             slug='new_slug', issuing_component='new_component', description=None,
             criteria=None, display_name=None,
             image_file_handle=None, create=False
         )
-        self.assertIsNone(badge_class)
+        assert badge_class is None
 
     def test_get_badge_class_image_validate(self):
         """
         Verify handing a broken image to get_badge_class raises a validation error upon creation.
         """
+        # TODO Test should be updated, this doc doesn't makes sense, the object eventually gets created
         self.assertRaises(
             ValidationError,
             BadgeClass.get_badge_class,
@@ -197,12 +194,9 @@ class BadgeClassTest(ModuleStoreTestCase):
         """
         Verify handing incomplete data for required fields when making a badge class raises an Integrity error.
         """
-        self.assertRaises(
-            IntegrityError,
-            BadgeClass.get_badge_class,
-            slug='new_slug', issuing_component='new_component',
-            image_file_handle=get_image('good')
-        )
+        image = get_image('good')
+        pytest.raises(IntegrityError, BadgeClass.get_badge_class, slug='new_slug', issuing_component='new_component',
+                      image_file_handle=image)
 
     def test_get_for_user(self):
         """
@@ -210,9 +204,9 @@ class BadgeClassTest(ModuleStoreTestCase):
         """
         user = UserFactory.create()
         badge_class = BadgeClassFactory.create()
-        self.assertFalse(badge_class.get_for_user(user))
+        assert not badge_class.get_for_user(user)
         assertion = BadgeAssertionFactory.create(badge_class=badge_class, user=user)
-        self.assertEqual(list(badge_class.get_for_user(user)), [assertion])
+        assert list(badge_class.get_for_user(user)) == [assertion]
 
     @override_settings(BADGING_BACKEND='lms.djangoapps.badges.backends.badgr.BadgrBackend', BADGR_API_TOKEN='test')
     @patch('lms.djangoapps.badges.backends.badgr.BadgrBackend.award')
@@ -223,20 +217,15 @@ class BadgeClassTest(ModuleStoreTestCase):
         user = UserFactory.create()
         badge_class = BadgeClassFactory.create()
         badge_class.award(user, evidence_url='http://example.com/evidence')
-        self.assertTrue(mock_award.called)
+        assert mock_award.called
         mock_award.assert_called_with(badge_class, user, evidence_url='http://example.com/evidence')
 
     def test_runs_validator(self):
         """
         Verify that the image validator is triggered when cleaning the model.
         """
-        self.assertRaises(
-            ValidationError,
-            BadgeClass(
-                slug='test', issuing_component='test2', criteria='test3',
-                description='test4', image=get_image('unbalanced')
-            ).full_clean
-        )
+        pytest.raises(ValidationError, BadgeClass(slug='test', issuing_component='test2', criteria='test3',
+                                                  description='test4', image=get_image('unbalanced')).full_clean)
 
 
 class BadgeAssertionTest(ModuleStoreTestCase):
@@ -262,12 +251,12 @@ class BadgeAssertionTest(ModuleStoreTestCase):
         assertions.sort()
         assertions_for_user = [badge.id for badge in BadgeAssertion.assertions_for_user(user)]
         assertions_for_user.sort()
-        self.assertEqual(assertions_for_user, assertions)
+        assert assertions_for_user == assertions
         course_scoped_assertions = [
             badge.id for badge in BadgeAssertion.assertions_for_user(user, course_id=course_key)
         ]
         course_scoped_assertions.sort()
-        self.assertEqual(course_scoped_assertions, course_assertions)
+        assert course_scoped_assertions == course_assertions
 
 
 class ValidBadgeImageTest(TestCase):

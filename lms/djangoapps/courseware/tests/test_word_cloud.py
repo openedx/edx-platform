@@ -86,12 +86,7 @@ class TestWordCloud(BaseTestXmodule):
         """
         users_state = self._get_users_state()
 
-        self.assertEqual(
-            ''.join(set([  # lint-amnesty, pylint: disable=consider-using-set-comprehension
-                        content['status']
-                        for _, content in users_state.items()
-                        ])),
-            'success')
+        assert ''.join({content['status'] for (_, content) in users_state.items()}) == 'success'
 
         # correct initial data:
         correct_initial_data = {
@@ -104,7 +99,7 @@ class TestWordCloud(BaseTestXmodule):
         }
 
         for _, response_content in users_state.items():
-            self.assertEqual(response_content, correct_initial_data)
+            assert response_content == correct_initial_data
 
     def test_post_words(self):
         """Students can submit data succesfully.
@@ -126,12 +121,7 @@ class TestWordCloud(BaseTestXmodule):
 
         users_state = self._post_words(input_words)
 
-        self.assertEqual(
-            ''.join(set([  # lint-amnesty, pylint: disable=consider-using-set-comprehension
-                        content['status']
-                        for _, content in users_state.items()
-                        ])),
-            'success')
+        assert ''.join({content['status'] for (_, content) in users_state.items()}) == 'success'
 
         correct_state = {}
         for index, user in enumerate(self.users):
@@ -174,23 +164,13 @@ class TestWordCloud(BaseTestXmodule):
         # 1.
         users_state = self._get_users_state()
 
-        self.assertEqual(
-            ''.join(set([  # lint-amnesty, pylint: disable=consider-using-set-comprehension
-                        content['status']
-                        for _, content in users_state.items()
-                        ])),
-            'success')
+        assert ''.join({content['status'] for (_, content) in users_state.items()}) == 'success'
 
         # 2.
         # Invcemental state per user.
         users_state_after_post = self._post_words(['word1', 'word2'])
 
-        self.assertEqual(
-            ''.join(set([  # lint-amnesty, pylint: disable=consider-using-set-comprehension
-                        content['status']
-                        for _, content in users_state_after_post.items()
-                        ])),
-            'success')
+        assert ''.join({content['status'] for (_, content) in users_state_after_post.items()}) == 'success'
 
         # Final state after all posts.
         users_state_before_fail = self._get_users_state()
@@ -199,12 +179,7 @@ class TestWordCloud(BaseTestXmodule):
         users_state_after_post = self._post_words(
             ['word1', 'word2', 'word3'])
 
-        self.assertEqual(
-            ''.join(set([  # lint-amnesty, pylint: disable=consider-using-set-comprehension
-                        content['status']
-                        for _, content in users_state_after_post.items()
-                        ])),
-            'fail')
+        assert ''.join({content['status'] for (_, content) in users_state_after_post.items()}) == 'fail'
 
         # 4.
         current_users_state = self._get_users_state()
@@ -216,12 +191,7 @@ class TestWordCloud(BaseTestXmodule):
 
         users_state = self._post_words(input_words)
 
-        self.assertEqual(
-            ''.join(set([  # lint-amnesty, pylint: disable=consider-using-set-comprehension
-                        content['status']
-                        for _, content in users_state.items()
-                        ])),
-            'success')
+        assert ''.join({content['status'] for (_, content) in users_state.items()}) == 'success'
 
         for user in self.users:
             self.assertListEqual(
@@ -238,7 +208,7 @@ class TestWordCloud(BaseTestXmodule):
         }
 
         status_codes = {response.status_code for response in responses.values()}
-        self.assertEqual(status_codes.pop(), 200)
+        assert status_codes.pop() == 200
 
         for user in self.users:
             self.assertDictEqual(
@@ -264,4 +234,4 @@ class TestWordCloud(BaseTestXmodule):
             'submitted': False,  # default value,
         }
 
-        self.assertEqual(fragment.content, self.runtime.render_template('word_cloud.html', expected_context))
+        assert fragment.content == self.runtime.render_template('word_cloud.html', expected_context)

@@ -6,6 +6,7 @@ Test the partitions and partitions service
 
 from datetime import datetime
 
+import pytest
 import six
 from django.test import TestCase
 from mock import Mock, patch  # lint-amnesty, pylint: disable=unused-import
@@ -31,14 +32,14 @@ class TestGroup(TestCase):
         test_id = 10
         name = "Grendel"
         group = Group(test_id, name)
-        self.assertEqual(group.id, test_id)
-        self.assertEqual(group.name, name)
+        assert group.id == test_id
+        assert group.name == name
 
     def test_string_id(self):
         test_id = "10"
         name = "Grendel"
         group = Group(test_id, name)
-        self.assertEqual(group.id, 10)
+        assert group.id == 10
 
     def test_to_json(self):
         test_id = 10
@@ -50,7 +51,7 @@ class TestGroup(TestCase):
             "name": name,
             "version": group.VERSION
         }
-        self.assertEqual(jsonified, act_jsonified)
+        assert jsonified == act_jsonified
 
     def test_from_json(self):
         test_id = 5
@@ -61,8 +62,8 @@ class TestGroup(TestCase):
             "version": Group.VERSION
         }
         group = Group.from_json(jsonified)
-        self.assertEqual(group.id, test_id)
-        self.assertEqual(group.name, name)
+        assert group.id == test_id
+        assert group.name == name
 
     def test_from_json_broken(self):
         test_id = 5
@@ -92,7 +93,7 @@ class TestGroup(TestCase):
             "programmer": "Cale"
         }
         group = Group.from_json(jsonified)
-        self.assertNotIn("programmer", group.to_json())
+        assert 'programmer' not in group.to_json()
 
 
 class MockUserPartitionScheme(object):
@@ -192,12 +193,12 @@ class TestUserPartition(PartitionTestCase):
             MockUserPartitionScheme(),
             self.TEST_PARAMETERS,
         )
-        self.assertEqual(user_partition.id, self.TEST_ID)
-        self.assertEqual(user_partition.name, self.TEST_NAME)
-        self.assertEqual(user_partition.description, self.TEST_DESCRIPTION)
-        self.assertEqual(user_partition.groups, self.TEST_GROUPS)
-        self.assertEqual(user_partition.scheme.name, self.TEST_SCHEME_NAME)
-        self.assertEqual(user_partition.parameters, self.TEST_PARAMETERS)
+        assert user_partition.id == self.TEST_ID
+        assert user_partition.name == self.TEST_NAME
+        assert user_partition.description == self.TEST_DESCRIPTION
+        assert user_partition.groups == self.TEST_GROUPS
+        assert user_partition.scheme.name == self.TEST_SCHEME_NAME
+        assert user_partition.parameters == self.TEST_PARAMETERS
 
     def test_string_id(self):
         user_partition = UserPartition(
@@ -208,7 +209,7 @@ class TestUserPartition(PartitionTestCase):
             MockUserPartitionScheme(),
             self.TEST_PARAMETERS,
         )
-        self.assertEqual(user_partition.id, 70)
+        assert user_partition.id == 70
 
     def test_to_json(self):
         jsonified = self.user_partition.to_json()
@@ -222,7 +223,7 @@ class TestUserPartition(PartitionTestCase):
             "scheme": self.TEST_SCHEME_NAME,
             "active": True,
         }
-        self.assertEqual(jsonified, act_jsonified)
+        assert jsonified == act_jsonified
 
     def test_from_json(self):
         jsonified = {
@@ -235,16 +236,16 @@ class TestUserPartition(PartitionTestCase):
             "scheme": "mock",
         }
         user_partition = UserPartition.from_json(jsonified)
-        self.assertEqual(user_partition.id, self.TEST_ID)
-        self.assertEqual(user_partition.name, self.TEST_NAME)
-        self.assertEqual(user_partition.description, self.TEST_DESCRIPTION)
-        self.assertEqual(user_partition.parameters, self.TEST_PARAMETERS)
+        assert user_partition.id == self.TEST_ID
+        assert user_partition.name == self.TEST_NAME
+        assert user_partition.description == self.TEST_DESCRIPTION
+        assert user_partition.parameters == self.TEST_PARAMETERS
 
         for act_group in user_partition.groups:
-            self.assertIn(act_group.id, [0, 1])
+            assert act_group.id in [0, 1]
             exp_group = self.TEST_GROUPS[act_group.id]
-            self.assertEqual(exp_group.id, act_group.id)
-            self.assertEqual(exp_group.name, act_group.name)
+            assert exp_group.id == act_group.id
+            assert exp_group.name == act_group.name
 
     def test_version_upgrade(self):
         # Test that version 1 partitions did not have a scheme specified
@@ -257,9 +258,9 @@ class TestUserPartition(PartitionTestCase):
             "version": 1,
         }
         user_partition = UserPartition.from_json(jsonified)
-        self.assertEqual(user_partition.scheme.name, "random")
-        self.assertEqual(user_partition.parameters, {})
-        self.assertTrue(user_partition.active)
+        assert user_partition.scheme.name == 'random'
+        assert user_partition.parameters == {}
+        assert user_partition.active
 
     def test_version_upgrade_2_to_3(self):
         # Test that version 3 user partition raises error if 'scheme' field is
@@ -287,9 +288,9 @@ class TestUserPartition(PartitionTestCase):
             "scheme": self.TEST_SCHEME_NAME,
         }
         user_partition = UserPartition.from_json(jsonified)
-        self.assertEqual(user_partition.scheme.name, self.TEST_SCHEME_NAME)
-        self.assertEqual(user_partition.parameters, {})
-        self.assertTrue(user_partition.active)
+        assert user_partition.scheme.name == self.TEST_SCHEME_NAME
+        assert user_partition.parameters == {}
+        assert user_partition.active
 
         # now test that parameters dict is present in response with same value
         # as provided
@@ -303,8 +304,8 @@ class TestUserPartition(PartitionTestCase):
             "scheme": self.TEST_SCHEME_NAME,
         }
         user_partition = UserPartition.from_json(jsonified)
-        self.assertEqual(user_partition.parameters, self.TEST_PARAMETERS)
-        self.assertTrue(user_partition.active)
+        assert user_partition.parameters == self.TEST_PARAMETERS
+        assert user_partition.active
 
     def test_from_json_broken(self):
         # Missing field
@@ -369,7 +370,7 @@ class TestUserPartition(PartitionTestCase):
             "programmer": "Cale",
         }
         user_partition = UserPartition.from_json(jsonified)
-        self.assertNotIn("programmer", user_partition.to_json())
+        assert 'programmer' not in user_partition.to_json()
 
         # No error on missing parameters key (which is optional)
         jsonified = {
@@ -381,7 +382,7 @@ class TestUserPartition(PartitionTestCase):
             "scheme": "mock",
         }
         user_partition = UserPartition.from_json(jsonified)
-        self.assertEqual(user_partition.parameters, {})
+        assert user_partition.parameters == {}
 
     def test_get_group(self):
         """
@@ -389,15 +390,9 @@ class TestUserPartition(PartitionTestCase):
         `group_id` parameter, or raises NoSuchUserPartitionGroupError when
         the lookup fails.
         """
-        self.assertEqual(
-            self.user_partition.get_group(self.TEST_GROUPS[0].id),
-            self.TEST_GROUPS[0]
-        )
-        self.assertEqual(
-            self.user_partition.get_group(self.TEST_GROUPS[1].id),
-            self.TEST_GROUPS[1]
-        )
-        with self.assertRaises(NoSuchUserPartitionGroupError):
+        assert self.user_partition.get_group(self.TEST_GROUPS[0].id) == self.TEST_GROUPS[0]
+        assert self.user_partition.get_group(self.TEST_GROUPS[1].id) == self.TEST_GROUPS[1]
+        with pytest.raises(NoSuchUserPartitionGroupError):
             self.user_partition.get_group(3)
 
     def test_forward_compatibility(self):
@@ -415,8 +410,8 @@ class TestUserPartition(PartitionTestCase):
             "additional_new_field": "foo",
         }
         partition = UserPartition.from_json(newer_version_json)
-        self.assertEqual(partition.id, self.TEST_ID)
-        self.assertEqual(partition.name, self.TEST_NAME)
+        assert partition.id == self.TEST_ID
+        assert partition.name == self.TEST_NAME
 
 
 class MockPartitionService(PartitionService):
@@ -506,10 +501,7 @@ class TestPartitionService(PartitionServiceBaseClass):
         # Make sure our partition services all return the right thing, but skip
         # ps_shared_cache_2 so we can see if its cache got updated anyway.
         for part_svc in [ps_shared_cache_1, ps_diff_cache, ps_uncached]:
-            self.assertEqual(
-                first_group.id,
-                part_svc.get_user_group_id_for_partition(self.user, user_partition_id)
-            )
+            assert first_group.id == part_svc.get_user_group_id_for_partition(self.user, user_partition_id)
 
         # Now select a new target group
         second_group = self.user_partition.groups[1]
@@ -519,23 +511,14 @@ class TestPartitionService(PartitionServiceBaseClass):
         # ps_shared_cache_2, which was never asked for the value the first time
         # Likewise, our separately cached piece should return the original answer
         for part_svc in [ps_shared_cache_1, ps_shared_cache_2, ps_diff_cache]:
-            self.assertEqual(
-                first_group.id,
-                part_svc.get_user_group_id_for_partition(self.user, user_partition_id)
-            )
+            assert first_group.id == part_svc.get_user_group_id_for_partition(self.user, user_partition_id)
 
         # Our uncached service should be accurate.
-        self.assertEqual(
-            second_group.id,
-            ps_uncached.get_user_group_id_for_partition(self.user, user_partition_id)
-        )
+        assert second_group.id == ps_uncached.get_user_group_id_for_partition(self.user, user_partition_id)
 
         # And a newly created service should see the right thing
         ps_new_cache = self._create_service(username, {})
-        self.assertEqual(
-            second_group.id,
-            ps_new_cache.get_user_group_id_for_partition(self.user, user_partition_id)
-        )
+        assert second_group.id == ps_new_cache.get_user_group_id_for_partition(self.user, user_partition_id)
 
     def test_get_group(self):
         """
@@ -546,12 +529,12 @@ class TestPartitionService(PartitionServiceBaseClass):
         # assign first group and verify that it is returned for the user
         self.user_partition.scheme.current_group = groups[0]
         group1 = self.partition_service.get_group(self.user, self.user_partition)
-        self.assertEqual(group1, groups[0])
+        assert group1 == groups[0]
 
         # switch to the second group and verify that it is returned for the user
         self.user_partition.scheme.current_group = groups[1]
         group2 = self.partition_service.get_group(self.user, self.user_partition)
-        self.assertEqual(group2, groups[1])
+        assert group2 == groups[1]
 
 
 class TestGetCourseUserPartitions(PartitionServiceBaseClass):
@@ -575,12 +558,12 @@ class TestGetCourseUserPartitions(PartitionServiceBaseClass):
         Test that the dynamic enrollment track scheme is added if there is no conflict with the user partition ID.
         """
         all_partitions = get_all_partitions_for_course(self.course)
-        self.assertEqual(2, len(all_partitions))
-        self.assertEqual(self.TEST_SCHEME_NAME, all_partitions[0].scheme.name)
+        assert 2 == len(all_partitions)
+        assert self.TEST_SCHEME_NAME == all_partitions[0].scheme.name
         enrollment_track_partition = all_partitions[1]
-        self.assertEqual(self.ENROLLMENT_TRACK_SCHEME_NAME, enrollment_track_partition.scheme.name)
-        self.assertEqual(six.text_type(self.course.id), enrollment_track_partition.parameters['course_id'])
-        self.assertEqual(ENROLLMENT_TRACK_PARTITION_ID, enrollment_track_partition.id)
+        assert self.ENROLLMENT_TRACK_SCHEME_NAME == enrollment_track_partition.scheme.name
+        assert six.text_type(self.course.id) == enrollment_track_partition.parameters['course_id']
+        assert ENROLLMENT_TRACK_PARTITION_ID == enrollment_track_partition.id
 
     def test_enrollment_track_partition_not_added_if_conflict(self):
         """
@@ -596,8 +579,8 @@ class TestGetCourseUserPartitions(PartitionServiceBaseClass):
         )
         self.course.user_partitions = [self.user_partition]
         all_partitions = get_all_partitions_for_course(self.course)
-        self.assertEqual(1, len(all_partitions))
-        self.assertEqual(self.TEST_SCHEME_NAME, all_partitions[0].scheme.name)
+        assert 1 == len(all_partitions)
+        assert self.TEST_SCHEME_NAME == all_partitions[0].scheme.name
 
     def test_enrollment_track_partition_not_added_if_disabled(self):
         """
@@ -605,8 +588,8 @@ class TestGetCourseUserPartitions(PartitionServiceBaseClass):
         """
         TestGetCourseUserPartitions._enable_enrollment_track_partition(False)
         all_partitions = get_all_partitions_for_course(self.course)
-        self.assertEqual(1, len(all_partitions))
-        self.assertEqual(self.TEST_SCHEME_NAME, all_partitions[0].scheme.name)
+        assert 1 == len(all_partitions)
+        assert self.TEST_SCHEME_NAME == all_partitions[0].scheme.name
 
     def test_filter_inactive_user_partitions(self):
         """
@@ -624,10 +607,10 @@ class TestGetCourseUserPartitions(PartitionServiceBaseClass):
         self.course.user_partitions = [self.user_partition]
 
         all_partitions = get_all_partitions_for_course(self.course, active_only=True)
-        self.assertEqual(1, len(all_partitions))
-        self.assertEqual(self.ENROLLMENT_TRACK_SCHEME_NAME, all_partitions[0].scheme.name)
+        assert 1 == len(all_partitions)
+        assert self.ENROLLMENT_TRACK_SCHEME_NAME == all_partitions[0].scheme.name
 
         all_partitions = get_all_partitions_for_course(self.course, active_only=False)
-        self.assertEqual(2, len(all_partitions))
-        self.assertEqual(self.TEST_SCHEME_NAME, all_partitions[0].scheme.name)
-        self.assertEqual(self.ENROLLMENT_TRACK_SCHEME_NAME, all_partitions[1].scheme.name)
+        assert 2 == len(all_partitions)
+        assert self.TEST_SCHEME_NAME == all_partitions[0].scheme.name
+        assert self.ENROLLMENT_TRACK_SCHEME_NAME == all_partitions[1].scheme.name

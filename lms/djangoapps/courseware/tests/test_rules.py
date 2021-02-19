@@ -61,7 +61,7 @@ class PermissionTests(ModuleStoreTestCase):
         has_perm = self.user.has_perm(
             'edx_proctoring.can_take_proctored_exam', {'course_id': str(self.course_id)}
         )
-        self.assertFalse(has_perm)
+        assert not has_perm
 
     @patch.dict(
         'django.conf.settings.PROCTORING_BACKENDS',
@@ -78,13 +78,6 @@ class PermissionTests(ModuleStoreTestCase):
             enable_proctored_exams=True, proctoring_provider='mock_proctoring_allow_honor_mode'
         )
         CourseEnrollment.enroll(self.user, course_allow_honor.id, mode='honor')
-        self.assertTrue(
-            self.user.has_perm(
-                'edx_proctoring.can_take_proctored_exam',
-                {
-                    'course_id': str(course_allow_honor.id),
-                    'backend': 'mock_proctoring_allow_honor_mode',
-                    'is_proctored': True,
-                },
-            )
-        )
+        assert self.user.has_perm('edx_proctoring.can_take_proctored_exam',
+                                  {'course_id': str(course_allow_honor.id),
+                                   'backend': 'mock_proctoring_allow_honor_mode', 'is_proctored': True})

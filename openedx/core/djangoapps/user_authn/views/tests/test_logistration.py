@@ -133,17 +133,17 @@ class LoginAndRegistrationTest(ThirdPartyAuthTestMixin, UrlResetMixin, ModuleSto
         login_url = reverse('signin_user')
         for _ in range(5):
             response = self.client.get(login_url)
-            self.assertEqual(response.status_code, 200)
+            assert response.status_code == 200
 
         # then the rate limiter should kick in and give a HttpForbidden response
         response = self.client.get(login_url)
-        self.assertEqual(response.status_code, 429)
+        assert response.status_code == 429
 
         # now reset the time to 6 mins from now in future in order to unblock
         reset_time = datetime.now(UTC) + timedelta(seconds=361)
         with freeze_time(reset_time):
             response = self.client.get(login_url)
-            self.assertEqual(response.status_code, 200)
+            assert response.status_code == 200
 
     @ddt.data("signin_user", "register_user")
     def test_login_and_registration_form_already_authenticated(self, url_name):
@@ -158,10 +158,10 @@ class LoginAndRegistrationTest(ThirdPartyAuthTestMixin, UrlResetMixin, ModuleSto
             'honor_code': 'true',
         }
         result = self.client.post(url, data=request_data)
-        self.assertEqual(result.status_code, 200)
+        assert result.status_code == 200
 
         result = self.client.login(username=self.USERNAME, password=self.PASSWORD)
-        self.assertTrue(result)
+        assert result
 
         # Verify that we're redirected to the dashboard
         response = self.client.get(reverse(url_name))
@@ -408,7 +408,7 @@ class LoginAndRegistrationTest(ThirdPartyAuthTestMixin, UrlResetMixin, ModuleSto
         tpa_hint = self.hidden_disabled_provider.provider_id
         params = [("next", "/courses/something/?tpa_hint={0}".format(tpa_hint))]
         response = self.client.get(reverse('signin_user'), params, HTTP_ACCEPT="text/html")
-        self.assertNotIn(response.content.decode('utf-8'), tpa_hint)
+        assert response.content.decode('utf-8') not in tpa_hint
 
     @ddt.data(
         ('signin_user', 'login'),
@@ -452,7 +452,7 @@ class LoginAndRegistrationTest(ThirdPartyAuthTestMixin, UrlResetMixin, ModuleSto
         tpa_hint = self.hidden_disabled_provider.provider_id
         params = [("next", "/courses/something/?tpa_hint={0}".format(tpa_hint))]
         response = self.client.get(reverse(url_name), params, HTTP_ACCEPT="text/html")
-        self.assertNotIn(response.content.decode('utf-8'), tpa_hint)
+        assert response.content.decode('utf-8') not in tpa_hint
 
     @override_settings(FEATURES=dict(settings.FEATURES, THIRD_PARTY_AUTH_HINT='oa2-google-oauth2'))
     @ddt.data(
@@ -541,11 +541,11 @@ class LoginAndRegistrationTest(ThirdPartyAuthTestMixin, UrlResetMixin, ModuleSto
         cookies[settings.ENTERPRISE_CUSTOMER_COOKIE_NAME] = 'test-enterprise-customer'
         response = self.client.get(reverse('signin_user'), HTTP_ACCEPT="text/html", cookies=cookies)
 
-        self.assertIn(settings.ENTERPRISE_CUSTOMER_COOKIE_NAME, response.cookies)
+        assert settings.ENTERPRISE_CUSTOMER_COOKIE_NAME in response.cookies
         enterprise_cookie = response.cookies[settings.ENTERPRISE_CUSTOMER_COOKIE_NAME]
 
-        self.assertEqual(enterprise_cookie['domain'], settings.BASE_COOKIE_DOMAIN)
-        self.assertEqual(enterprise_cookie.value, '')
+        assert enterprise_cookie['domain'] == settings.BASE_COOKIE_DOMAIN
+        assert enterprise_cookie.value == ''
 
     def test_login_registration_xframe_protected(self):
         resp = self.client.get(
@@ -554,7 +554,7 @@ class LoginAndRegistrationTest(ThirdPartyAuthTestMixin, UrlResetMixin, ModuleSto
             HTTP_REFERER="http://localhost/iframe"
         )
 
-        self.assertEqual(resp['X-Frame-Options'], 'DENY')
+        assert resp['X-Frame-Options'] == 'DENY'
 
         self.configure_lti_provider(name='Test', lti_hostname='localhost', lti_consumer_key='test_key', enabled=True)
 
@@ -563,7 +563,7 @@ class LoginAndRegistrationTest(ThirdPartyAuthTestMixin, UrlResetMixin, ModuleSto
             HTTP_REFERER="http://localhost/iframe"
         )
 
-        self.assertEqual(resp['X-Frame-Options'], 'ALLOW')
+        assert resp['X-Frame-Options'] == 'ALLOW'
 
     def _assert_third_party_auth_data(self, response, current_backend, current_provider, providers, expected_ec,
                                       add_user_details=False):
@@ -643,22 +643,22 @@ class LoginAndRegistrationTest(ThirdPartyAuthTestMixin, UrlResetMixin, ModuleSto
     def test_english_by_default(self):
         response = self.client.get(reverse('signin_user'), [], HTTP_ACCEPT="text/html")
 
-        self.assertEqual(response['Content-Language'], 'en')
+        assert response['Content-Language'] == 'en'
 
     def test_unsupported_language(self):
         response = self.client.get(reverse('signin_user'), [], HTTP_ACCEPT="text/html", HTTP_ACCEPT_LANGUAGE="ts-zx")
 
-        self.assertEqual(response['Content-Language'], 'en')
+        assert response['Content-Language'] == 'en'
 
     def test_browser_language(self):
         response = self.client.get(reverse('signin_user'), [], HTTP_ACCEPT="text/html", HTTP_ACCEPT_LANGUAGE="es")
 
-        self.assertEqual(response['Content-Language'], 'es-419')
+        assert response['Content-Language'] == 'es-419'
 
     def test_browser_language_dialent(self):
         response = self.client.get(reverse('signin_user'), [], HTTP_ACCEPT="text/html", HTTP_ACCEPT_LANGUAGE="es-es")
 
-        self.assertEqual(response['Content-Language'], 'es-es')
+        assert response['Content-Language'] == 'es-es'
 
 
 @skip_unless_lms

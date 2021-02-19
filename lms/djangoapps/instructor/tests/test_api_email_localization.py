@@ -63,9 +63,9 @@ class TestInstructorAPIEnrollmentEmailLocalization(SharedModuleStoreTestCase):
         Check that the email outbox contains exactly one message for which both
         the message subject and body contain a certain string.
         """
-        self.assertEqual(1, len(mail.outbox))
-        self.assertIn(expected_message, mail.outbox[0].subject)
-        self.assertIn(expected_message, mail.outbox[0].body)
+        assert 1 == len(mail.outbox)
+        assert expected_message in mail.outbox[0].subject
+        assert expected_message in mail.outbox[0].body
 
     def test_enroll(self):
         self.update_enrollement("enroll", self.student.email)

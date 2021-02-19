@@ -45,6 +45,8 @@ class CourseBlockSerializer(serializers.Serializer):
                 'description': description,
                 'display_name': display_name,
                 'due': block.get('due'),
+                'effort_activities': block.get('effort_activities'),
+                'effort_time': block.get('effort_time'),
                 'icon': icon,
                 'id': block_key,
                 'lms_web_url': block['lms_web_url'] if enable_links else None,

@@ -37,38 +37,38 @@ class ShortcutsTests(UrlResetMixin, TestCase):
             with patch.dict('django.conf.settings.FEATURES', {'ENABLE_MKTG_SITE': True}):
                 expected_link = 'https://dummy-root/about-us'
                 link = marketing_link('ABOUT')
-                self.assertEqual(link, expected_link)
+                assert link == expected_link
             # test marketing site off
             with patch.dict('django.conf.settings.FEATURES', {'ENABLE_MKTG_SITE': False}):
                 expected_link = reverse(self._get_test_url_name())
                 link = marketing_link('ABOUT')
-                self.assertEqual(link, expected_link)
+                assert link == expected_link
 
     @override_settings(MKTG_URLS={'ROOT': 'https://dummy-root', 'ABOUT': '/about-us'})
     def test_is_marketing_link_set(self):
         with override_settings(MKTG_URL_LINK_MAP={'ABOUT': self._get_test_url_name()}):
             # test marketing site on
             with patch.dict('django.conf.settings.FEATURES', {'ENABLE_MKTG_SITE': True}):
-                self.assertTrue(is_marketing_link_set('ABOUT'))
-                self.assertFalse(is_marketing_link_set('NOT_CONFIGURED'))
+                assert is_marketing_link_set('ABOUT')
+                assert not is_marketing_link_set('NOT_CONFIGURED')
             # test marketing site off
             with patch.dict('django.conf.settings.FEATURES', {'ENABLE_MKTG_SITE': False}):
-                self.assertTrue(is_marketing_link_set('ABOUT'))
-                self.assertFalse(is_marketing_link_set('NOT_CONFIGURED'))
+                assert is_marketing_link_set('ABOUT')
+                assert not is_marketing_link_set('NOT_CONFIGURED')
 
     @override_settings(MKTG_URLS={'ROOT': 'https://dummy-root', 'ABOUT': '/about-us'})
     def test_is_any_marketing_link_set(self):
         with override_settings(MKTG_URL_LINK_MAP={'ABOUT': self._get_test_url_name()}):
             # test marketing site on
             with patch.dict('django.conf.settings.FEATURES', {'ENABLE_MKTG_SITE': True}):
-                self.assertTrue(is_any_marketing_link_set(['ABOUT']))
-                self.assertTrue(is_any_marketing_link_set(['ABOUT', 'NOT_CONFIGURED']))
-                self.assertFalse(is_any_marketing_link_set(['NOT_CONFIGURED']))
+                assert is_any_marketing_link_set(['ABOUT'])
+                assert is_any_marketing_link_set(['ABOUT', 'NOT_CONFIGURED'])
+                assert not is_any_marketing_link_set(['NOT_CONFIGURED'])
             # test marketing site off
             with patch.dict('django.conf.settings.FEATURES', {'ENABLE_MKTG_SITE': False}):
-                self.assertTrue(is_any_marketing_link_set(['ABOUT']))
-                self.assertTrue(is_any_marketing_link_set(['ABOUT', 'NOT_CONFIGURED']))
-                self.assertFalse(is_any_marketing_link_set(['NOT_CONFIGURED']))
+                assert is_any_marketing_link_set(['ABOUT'])
+                assert is_any_marketing_link_set(['ABOUT', 'NOT_CONFIGURED'])
+                assert not is_any_marketing_link_set(['NOT_CONFIGURED'])
 
     def _get_test_url_name(self):  # lint-amnesty, pylint: disable=missing-function-docstring
         if settings.ROOT_URLCONF == 'lms.urls':
@@ -85,11 +85,11 @@ class ShortcutsTests(UrlResetMixin, TestCase):
         # test marketing site on
         with patch.dict('django.conf.settings.FEATURES', {'ENABLE_MKTG_SITE': True}):
             link = marketing_link('TOS')
-            self.assertEqual(link, expected_link)
+            assert link == expected_link
         # test marketing site off
         with patch.dict('django.conf.settings.FEATURES', {'ENABLE_MKTG_SITE': False}):
             link = marketing_link('TOS')
-            self.assertEqual(link, expected_link)
+            assert link == expected_link
 
     @override_settings(MKTG_URLS={'ROOT': 'https://dummy-root', 'TOS': '/tos'})
     @override_settings(MKTG_URL_OVERRIDES={'TOS': '123456'})
@@ -98,11 +98,11 @@ class ShortcutsTests(UrlResetMixin, TestCase):
         # test marketing site on
         with patch.dict('django.conf.settings.FEATURES', {'ENABLE_MKTG_SITE': True}):
             link = marketing_link('TOS')
-            self.assertEqual(link, expected_link)
+            assert link == expected_link
         # test marketing site off
         with patch.dict('django.conf.settings.FEATURES', {'ENABLE_MKTG_SITE': False}):
             link = marketing_link('TOS')
-            self.assertEqual(link, expected_link)
+            assert link == expected_link
 
     @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
     def test_link_map_url_reverse(self):
@@ -129,8 +129,8 @@ class AddLookupTests(TestCase):
     def test_with_package(self):
         add_lookup('test', 'management', __name__)
         dirs = LOOKUP['test'].directories
-        self.assertEqual(len(dirs), 1)
-        self.assertTrue(dirs[0].endswith('management'))
+        assert len(dirs) == 1
+        assert dirs[0].endswith('management')
 
 
 class MakoRequestContextTest(TestCase):
@@ -156,7 +156,7 @@ class MakoRequestContextTest(TestCase):
 
         with patch('common.djangoapps.edxmako.request_context.get_current_request', return_value=self.request):
             # requestcontext should not be None.
-            self.assertIsNotNone(get_template_request_context())
+            assert get_template_request_context() is not None
 
     def test_without_current_request(self):
         """
@@ -165,7 +165,7 @@ class MakoRequestContextTest(TestCase):
         """
         with patch('common.djangoapps.edxmako.request_context.get_current_request', return_value=None):
             # requestcontext should be None.
-            self.assertIsNone(get_template_request_context())
+            assert get_template_request_context() is None
 
     def test_request_context_caching(self):
         """
@@ -173,17 +173,17 @@ class MakoRequestContextTest(TestCase):
         """
         with patch('common.djangoapps.edxmako.request_context.get_current_request', return_value=None):
             # requestcontext should be None, because the cache isn't filled
-            self.assertIsNone(get_template_request_context())
+            assert get_template_request_context() is None
 
         with patch('common.djangoapps.edxmako.request_context.get_current_request', return_value=self.request):
             # requestcontext should not be None, and should fill the cache
-            self.assertIsNotNone(get_template_request_context())
+            assert get_template_request_context() is not None
 
         mock_get_current_request = Mock()
         with patch('common.djangoapps.edxmako.request_context.get_current_request'):
             with patch('common.djangoapps.edxmako.request_context.RequestContext.__init__') as mock_context_init:
                 # requestcontext should not be None, because the cache is filled
-                self.assertIsNotNone(get_template_request_context())
+                assert get_template_request_context() is not None
                 mock_context_init.assert_not_called()
         mock_get_current_request.assert_not_called()
 
@@ -191,7 +191,7 @@ class MakoRequestContextTest(TestCase):
 
         with patch('common.djangoapps.edxmako.request_context.get_current_request', return_value=None):
             # requestcontext should be None, because the cache isn't filled
-            self.assertIsNone(get_template_request_context())
+            assert get_template_request_context() is None
 
     @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
     def test_render_to_string_when_no_global_context_lms(self):
@@ -199,7 +199,7 @@ class MakoRequestContextTest(TestCase):
         Test render_to_string() when makomiddleware has not initialized
         the threadlocal REQUEST_CONTEXT.context. This is meant to run in LMS.
         """
-        self.assertIn("this module is temporarily unavailable", render_to_string("courseware/error-message.html", None))
+        assert 'this module is temporarily unavailable' in render_to_string('courseware/error-message.html', None)
 
     @unittest.skipUnless(settings.ROOT_URLCONF == 'cms.urls', 'Test only valid in cms')
     def test_render_to_string_when_no_global_context_cms(self):
@@ -207,4 +207,4 @@ class MakoRequestContextTest(TestCase):
         Test render_to_string() when makomiddleware has not initialized
         the threadlocal REQUEST_CONTEXT.context. This is meant to run in CMS.
         """
-        self.assertIn("We're having trouble rendering your component", render_to_string("html_error.html", None))
+        assert "We're having trouble rendering your component" in render_to_string('html_error.html', None)

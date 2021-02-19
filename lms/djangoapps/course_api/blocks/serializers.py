@@ -46,6 +46,8 @@ class SupportedFieldType(object):
 SUPPORTED_FIELDS = [
     SupportedFieldType('category', requested_field_name='type'),
     SupportedFieldType('display_name', default_value=''),
+    SupportedFieldType('effort_activities'),
+    SupportedFieldType('effort_time'),
     SupportedFieldType('graded'),
     SupportedFieldType('format'),
     SupportedFieldType('start'),

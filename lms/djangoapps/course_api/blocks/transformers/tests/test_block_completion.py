@@ -115,4 +115,4 @@ class BlockCompletionTransformerTestCase(TransformerRegistryTestMixin, Completio
         )
         completion_value = block_data.fields['completion']
 
-        self.assertEqual(completion_value, expected_value)
+        assert completion_value == expected_value

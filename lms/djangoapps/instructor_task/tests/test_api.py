@@ -2,7 +2,7 @@
 Test for LMS instructor background task queue management
 """
 
-
+import pytest
 import ddt
 from celery.states import FAILURE
 from mock import MagicMock, Mock, patch
@@ -60,7 +60,7 @@ class InstructorTaskReportTest(InstructorTaskTestCase):
             self._create_success_entry()
         progress_task_ids = [self._create_progress_entry().task_id for _ in range(1, 5)]
         task_ids = [instructor_task.task_id for instructor_task in get_running_instructor_tasks(TEST_COURSE_KEY)]
-        self.assertEqual(set(task_ids), set(progress_task_ids))
+        assert set(task_ids) == set(progress_task_ids)
 
     def test_get_instructor_task_history(self):
         # when fetching historical tasks, we get all tasks, including running tasks
@@ -71,7 +71,7 @@ class InstructorTaskReportTest(InstructorTaskTestCase):
             expected_ids.append(self._create_progress_entry().task_id)
         task_ids = [instructor_task.task_id for instructor_task
                     in get_instructor_task_history(TEST_COURSE_KEY, usage_key=self.problem_url)]
-        self.assertEqual(set(task_ids), set(expected_ids))
+        assert set(task_ids) == set(expected_ids)
         # make the same call using explicit task_type:
         task_ids = [instructor_task.task_id for instructor_task
                     in get_instructor_task_history(
@@ -79,7 +79,7 @@ class InstructorTaskReportTest(InstructorTaskTestCase):
                         usage_key=self.problem_url,
                         task_type='rescore_problem'
                     )]
-        self.assertEqual(set(task_ids), set(expected_ids))
+        assert set(task_ids) == set(expected_ids)
         # make the same call using a non-existent task_type:
         task_ids = [instructor_task.task_id for instructor_task
                     in get_instructor_task_history(
@@ -87,7 +87,7 @@ class InstructorTaskReportTest(InstructorTaskTestCase):
                         usage_key=self.problem_url,
                         task_type='dummy_type'
                     )]
-        self.assertEqual(set(task_ids), set())
+        assert set(task_ids) == set()
 
 
 @ddt.ddt
@@ -105,13 +105,13 @@ class InstructorTaskModuleSubmitTest(InstructorTaskModuleTestCase):
         # confirm that a rescore of a non-existent module returns an exception
         problem_url = InstructorTaskModuleTestCase.problem_location("NonexistentProblem")
         request = None
-        with self.assertRaises(ItemNotFoundError):
+        with pytest.raises(ItemNotFoundError):
             submit_rescore_problem_for_student(request, problem_url, self.student)
-        with self.assertRaises(ItemNotFoundError):
+        with pytest.raises(ItemNotFoundError):
             submit_rescore_problem_for_all_students(request, problem_url)
-        with self.assertRaises(ItemNotFoundError):
+        with pytest.raises(ItemNotFoundError):
             submit_reset_problem_attempts_for_all_students(request, problem_url)
-        with self.assertRaises(ItemNotFoundError):
+        with pytest.raises(ItemNotFoundError):
             submit_delete_problem_state_for_all_students(request, problem_url)
 
     def test_submit_nonrescorable_modules(self):
@@ -120,9 +120,9 @@ class InstructorTaskModuleSubmitTest(InstructorTaskModuleTestCase):
         # where we are creating real modules.)
         problem_url = self.problem_section.location
         request = None
-        with self.assertRaises(NotImplementedError):
+        with pytest.raises(NotImplementedError):
             submit_rescore_problem_for_student(request, problem_url, self.student)
-        with self.assertRaises(NotImplementedError):
+        with pytest.raises(NotImplementedError):
             submit_rescore_problem_for_all_students(request, problem_url)
 
     @ddt.data(
@@ -170,22 +170,22 @@ class InstructorTaskModuleSubmitTest(InstructorTaskModuleTestCase):
             error = Exception()
             apply_async.side_effect = error
 
-            with self.assertRaises(QueueConnectionError):
+            with pytest.raises(QueueConnectionError):
                 instructor_task = task_function(self.create_task_request(self.instructor), location, **params)
 
             most_recent_task = InstructorTask.objects.latest('id')
-            self.assertEqual(most_recent_task.task_state, FAILURE)
+            assert most_recent_task.task_state == FAILURE
 
         # successful submission
         instructor_task = task_function(self.create_task_request(self.instructor), location, **params)
-        self.assertEqual(instructor_task.task_type, expected_task_type)
+        assert instructor_task.task_type == expected_task_type
 
         # test resubmitting, by updating the existing record:
         instructor_task = InstructorTask.objects.get(id=instructor_task.id)
         instructor_task.task_state = PROGRESS
         instructor_task.save()
 
-        with self.assertRaises(AlreadyRunningError):
+        with pytest.raises(AlreadyRunningError):
             task_function(self.create_task_request(self.instructor), location, **params)
 
 
@@ -223,7 +223,7 @@ class InstructorTaskCourseSubmitTest(TestReportMixin, InstructorTaskCourseTestCa
         instructor_task = InstructorTask.objects.get(id=instructor_task.id)
         instructor_task.task_state = PROGRESS
         instructor_task.save()
-        with self.assertRaises(AlreadyRunningError):
+        with pytest.raises(AlreadyRunningError):
             api_call()
 
     def test_submit_bulk_email_all(self):
@@ -328,7 +328,7 @@ class InstructorTaskCourseSubmitTest(TestReportMixin, InstructorTaskCourseTestCa
         """
         Raises ValueError when student_set is 'specific_student' and 'specific_student_id' is None.
         """
-        with self.assertRaises(SpecificStudentIdMissingError):
+        with pytest.raises(SpecificStudentIdMissingError):
             generate_certificates_for_students(
                 self.create_task_request(self.instructor),
                 self.course.id,
@@ -352,7 +352,7 @@ class InstructorTaskCourseSubmitTest(TestReportMixin, InstructorTaskCourseTestCa
         )
 
         # Validate that record was added to CertificateGenerationHistory
-        self.assertTrue(certificate_generation_history.exists())
+        assert certificate_generation_history.exists()
 
         instructor_task = regenerate_certificates(
             self.create_task_request(self.instructor),
@@ -367,4 +367,4 @@ class InstructorTaskCourseSubmitTest(TestReportMixin, InstructorTaskCourseTestCa
         )
 
         # Validate that record was added to CertificateGenerationHistory
-        self.assertTrue(certificate_generation_history.exists())
+        assert certificate_generation_history.exists()

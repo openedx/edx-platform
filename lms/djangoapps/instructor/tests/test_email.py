@@ -51,14 +51,14 @@ class TestNewInstructorDashboardEmailViewMongoBacked(SharedModuleStoreTestCase):
         BulkEmailFlag.objects.create(enabled=True, require_course_email_auth=False)
         # Assert that instructor email is enabled for this course - since REQUIRE_COURSE_EMAIL_AUTH is False,
         # all courses should be authorized to use email.
-        self.assertTrue(is_bulk_email_feature_enabled(self.course.id))
+        assert is_bulk_email_feature_enabled(self.course.id)
         # Assert that the URL for the email view is in the response
         response = self.client.get(self.url)
         self.assertContains(response, self.email_link)
 
         send_to_label = '<div class="send_to_list">Send to:</div>'
         self.assertContains(response, send_to_label)
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
 
     # The course is Mongo-backed but the flag is disabled (should not work)
     def test_email_flag_false_mongo_true(self):
@@ -71,7 +71,7 @@ class TestNewInstructorDashboardEmailViewMongoBacked(SharedModuleStoreTestCase):
     def test_course_not_authorized(self):
         BulkEmailFlag.objects.create(enabled=True, require_course_email_auth=True)
         # Assert that instructor email is not enabled for this course
-        self.assertFalse(is_bulk_email_feature_enabled(self.course.id))
+        assert not is_bulk_email_feature_enabled(self.course.id)
         # Assert that the URL for the email view is not in the response
         response = self.client.get(self.url)
         self.assertNotContains(response, self.email_link)
@@ -80,7 +80,7 @@ class TestNewInstructorDashboardEmailViewMongoBacked(SharedModuleStoreTestCase):
     def test_course_authorized(self):
         BulkEmailFlag.objects.create(enabled=True, require_course_email_auth=True)
         # Assert that instructor email is not enabled for this course
-        self.assertFalse(is_bulk_email_feature_enabled(self.course.id))
+        assert not is_bulk_email_feature_enabled(self.course.id)
         # Assert that the URL for the email view is not in the response
         response = self.client.get(self.url)
         self.assertNotContains(response, self.email_link)
@@ -90,7 +90,7 @@ class TestNewInstructorDashboardEmailViewMongoBacked(SharedModuleStoreTestCase):
         cauth.save()
 
         # Assert that instructor email is enabled for this course
-        self.assertTrue(is_bulk_email_feature_enabled(self.course.id))
+        assert is_bulk_email_feature_enabled(self.course.id)
         # Assert that the URL for the email view is in the response
         response = self.client.get(self.url)
         self.assertContains(response, self.email_link)
@@ -103,8 +103,8 @@ class TestNewInstructorDashboardEmailViewMongoBacked(SharedModuleStoreTestCase):
         cauth.save()
 
         # Assert that this course is authorized for instructor email, but the feature is not enabled
-        self.assertFalse(is_bulk_email_feature_enabled(self.course.id))
-        self.assertTrue(is_bulk_email_enabled_for_course(self.course.id))
+        assert not is_bulk_email_feature_enabled(self.course.id)
+        assert is_bulk_email_enabled_for_course(self.course.id)
         # Assert that the URL for the email view IS NOT in the response
         response = self.client.get(self.url)
         self.assertNotContains(response, self.email_link)

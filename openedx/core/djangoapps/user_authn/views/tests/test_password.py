@@ -7,6 +7,7 @@ import logging
 import re
 from datetime import datetime, timedelta
 
+import pytest
 import ddt
 from django.conf import settings
 from django.contrib.auth import get_user_model
@@ -47,7 +48,7 @@ class TestRequestPasswordChange(CreateAccountMixin, TestCase):
     def test_request_password_change(self):
         # Create and activate an account
         self.create_account(self.USERNAME, self.PASSWORD, self.EMAIL)
-        self.assertEqual(len(mail.outbox), 1)
+        assert len(mail.outbox) == 1
 
         request = RequestFactory().post('/password')
         request.user = Mock()
@@ -58,27 +59,27 @@ class TestRequestPasswordChange(CreateAccountMixin, TestCase):
             request_password_change(self.EMAIL, self.IS_SECURE)
 
         # Verify that a new email message has been sent
-        self.assertEqual(len(mail.outbox), 2)
+        assert len(mail.outbox) == 2
 
         # Verify that the body of the message contains something that looks
         # like an activation link
         email_body = mail.outbox[0].body
         result = re.search(r'(?P<url>https?://[^\s]+)', email_body)
-        self.assertIsNot(result, None)
+        assert result is not None
 
     @skip_unless_lms
     def test_request_password_change_invalid_user(self):
-        with self.assertRaises(UserNotFound):
+        with pytest.raises(UserNotFound):
             request_password_change(self.EMAIL, self.IS_SECURE)
 
         # Verify that no email messages have been sent
-        self.assertEqual(len(mail.outbox), 0)
+        assert len(mail.outbox) == 0
 
     @skip_unless_lms
     def test_request_password_change_inactive_user(self):
         # Create an account, but do not activate it
         self.create_account(self.USERNAME, self.PASSWORD, self.EMAIL)
-        self.assertEqual(len(mail.outbox), 1)
+        assert len(mail.outbox) == 1
 
         request = RequestFactory().post('/password')
         request.user = Mock()
@@ -88,7 +89,7 @@ class TestRequestPasswordChange(CreateAccountMixin, TestCase):
             request_password_change(self.EMAIL, self.IS_SECURE)
 
         # Verify that the password change email was still sent
-        self.assertEqual(len(mail.outbox), 2)
+        assert len(mail.outbox) == 2
 
 
 @skip_unless_lms
@@ -112,7 +113,7 @@ class TestPasswordChange(CreateAccountMixin, CacheIsolationTestCase):
 
         self.create_account(self.USERNAME, self.OLD_PASSWORD, self.OLD_EMAIL)
         result = self.client.login(username=self.USERNAME, password=self.OLD_PASSWORD)
-        self.assertTrue(result)
+        assert result
         mail.outbox = []
         cache.clear()
 
@@ -120,20 +121,20 @@ class TestPasswordChange(CreateAccountMixin, CacheIsolationTestCase):
         # Request a password change while logged in, simulating
         # use of the password reset link from the account page
         response = self._change_password()
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
 
         # Check that an email was sent
-        self.assertEqual(len(mail.outbox), 1)
+        assert len(mail.outbox) == 1
 
         # Retrieve the activation link from the email body
         email_body = mail.outbox[0].body
         result = re.search(r'(?P<url>https?://[^\s]+)', email_body)
-        self.assertIsNot(result, None)
+        assert result is not None
         activation_link = result.group('url')
 
         # Visit the activation link
         response = self.client.get(activation_link)
-        self.assertEqual(response.status_code, 302)
+        assert response.status_code == 302
 
         # Visit the redirect link
         _ = self.client.get(response.url)
@@ -145,7 +146,7 @@ class TestPasswordChange(CreateAccountMixin, CacheIsolationTestCase):
             {'new_password1': self.NEW_PASSWORD, 'new_password2': self.NEW_PASSWORD},
             follow=True
         )
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
         self.assertContains(response, "Your password has been reset.")
 
         # Log the user out to clear session data
@@ -161,14 +162,14 @@ class TestPasswordChange(CreateAccountMixin, CacheIsolationTestCase):
         # Try reusing the activation link to change the password again
         # Visit the activation link again.
         response = self.client.get(activation_link)
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
         self.assertContains(response, "This password reset link is invalid. It may have been used already.")
 
         self.client.logout()
 
         # Verify that the old password cannot be used to log in
         result = self.client.login(username=self.USERNAME, password=self.OLD_PASSWORD)
-        self.assertFalse(result)
+        assert not result
 
         # Verify that the new password continues to be valid
         response = self.client.post(login_api_url, {'email': self.OLD_EMAIL, 'password': self.NEW_PASSWORD})
@@ -192,10 +193,10 @@ class TestPasswordChange(CreateAccountMixin, CacheIsolationTestCase):
 
         bad_email = 'doesnotexist@example.com'
         response = self._change_password(email=bad_email)
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
 
         # Check that an email was sent
-        self.assertEqual(len(mail.outbox), 1)
+        assert len(mail.outbox) == 1
 
         # Verify that the body contains the failed password reset message
         sent_message = mail.outbox[0]
@@ -220,27 +221,27 @@ class TestPasswordChange(CreateAccountMixin, CacheIsolationTestCase):
         # use of the password reset link from the login page
         if send_email:
             response = self._change_password(email=self.OLD_EMAIL)
-            self.assertEqual(response.status_code, 200)
+            assert response.status_code == 200
         else:
             # Don't send an email in the POST data, simulating
             # its (potentially accidental) omission in the POST
             # data sent from the login page
             response = self._change_password()
-            self.assertEqual(response.status_code, 400)
+            assert response.status_code == 400
 
     def test_access_token_invalidation_logged_out(self):
         self.client.logout()
         user = User.objects.get(email=self.OLD_EMAIL)
         self._create_dot_tokens(user)
         response = self._change_password(email=self.OLD_EMAIL)
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
         self._assert_access_token_destroyed(user)
 
     def test_access_token_invalidation_logged_in(self):
         user = User.objects.get(email=self.OLD_EMAIL)
         self._create_dot_tokens(user)
         response = self._change_password()
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
         self._assert_access_token_destroyed(user)
 
     def test_password_change_inactive_user(self):
@@ -256,8 +257,8 @@ class TestPasswordChange(CreateAccountMixin, CacheIsolationTestCase):
 
         # Expect that the activation email is still sent,
         # since the user may have lost the original activation email.
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(len(mail.outbox), 1)
+        assert response.status_code == 200
+        assert len(mail.outbox) == 1
 
     def test_password_change_no_user(self):
         # Log out the user created during test setup
@@ -266,7 +267,7 @@ class TestPasswordChange(CreateAccountMixin, CacheIsolationTestCase):
         with LogCapture(LOGGER_NAME, level=logging.INFO) as logger:
             # Send the view an email address not tied to any user
             response = self._change_password(email=self.NEW_EMAIL)
-            self.assertEqual(response.status_code, 200)
+            assert response.status_code == 200
 
             expected_logs = (
                 (LOGGER_NAME, 'INFO', 'Password reset initiated for email {}.'.format(self.NEW_EMAIL)),
@@ -284,14 +285,14 @@ class TestPasswordChange(CreateAccountMixin, CacheIsolationTestCase):
         self.client.logout()
         for status in [200, 403]:
             response = self._change_password(email=self.NEW_EMAIL)
-            self.assertEqual(response.status_code, status)
+            assert response.status_code == status
 
         # now reset the time to 1 min from now in future and change the email and
         # verify that it will allow another request from same IP
         reset_time = datetime.now(UTC) + timedelta(seconds=61)
         with freeze_time(reset_time):
             response = self._change_password(email=self.OLD_EMAIL)
-            self.assertEqual(response.status_code, 200)
+            assert response.status_code == 200
 
     @ddt.data(
         ('post', 'password_change_request', []),
@@ -303,7 +304,7 @@ class TestPasswordChange(CreateAccountMixin, CacheIsolationTestCase):
 
         for method in wrong_methods:
             response = getattr(self.client, method)(url)
-            self.assertEqual(response.status_code, 405)
+            assert response.status_code == 405
 
     def _change_password(self, email=None):
         """Request to change the user's password. """
@@ -325,5 +326,5 @@ class TestPasswordChange(CreateAccountMixin, CacheIsolationTestCase):
 
     def _assert_access_token_destroyed(self, user):
         """Assert all access tokens are destroyed."""
-        self.assertFalse(dot_access_token.objects.filter(user=user).exists())
-        self.assertFalse(dot_refresh_token.objects.filter(user=user).exists())
+        assert not dot_access_token.objects.filter(user=user).exists()
+        assert not dot_refresh_token.objects.filter(user=user).exists()

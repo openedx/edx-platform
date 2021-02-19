@@ -77,7 +77,7 @@ class TestLoginHelper(TestCase):
         req = self.request.get(settings.LOGIN_URL + "?next={url}".format(url=next_url), HTTP_HOST=host)
         req.META["HTTP_ACCEPT"] = http_accept
         next_page = get_next_url_for_login_page(req)
-        self.assertEqual(next_page, next_url)
+        assert next_page == next_url
 
     tpa_hint_test_cases = [
         # Test requests outside the TPA pipeline - tpa_hint should be added.
@@ -127,7 +127,7 @@ class TestLoginHelper(TestCase):
             req.META["HTTP_ACCEPT"] = "text/html"
             self._add_session(req)
             next_page = get_next_url_for_login_page(req)
-            self.assertEqual(next_page, expected_url)
+            assert next_page == expected_url
 
         with override_settings(FEATURES=dict(settings.FEATURES, THIRD_PARTY_AUTH_HINT=tpa_hint)):
             validate_login()
@@ -153,4 +153,4 @@ class TestLoginHelper(TestCase):
         with with_site_configuration_context(configuration=configuration_values):
             next_page = get_next_url_for_login_page(req)
 
-        self.assertEqual(next_page, expected_url)
+        assert next_page == expected_url

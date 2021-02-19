@@ -40,13 +40,13 @@ class RoleClassTestCase(ModuleStoreTestCase):
         # Roles with the same FORUM_ROLE in same class also receives the same
         # permission.
         # Is this desirable behavior?
-        self.assertTrue(self.student_role.has_permission("delete_thread"))
-        self.assertTrue(self.student_2_role.has_permission("delete_thread"))
-        self.assertFalse(self.TA_role.has_permission("delete_thread"))
+        assert self.student_role.has_permission('delete_thread')
+        assert self.student_2_role.has_permission('delete_thread')
+        assert not self.TA_role.has_permission('delete_thread')
 
     def test_inherit_permission(self):
         self.TA_role.inherit_permissions(self.student_role)
-        self.assertTrue(self.TA_role.has_permission("delete_thread"))
+        assert self.TA_role.has_permission('delete_thread')
         # Despite being from 2 different courses, TA_role_2 can still inherit
         # permissions from TA_role without error
         self.TA_role_2.inherit_permissions(self.TA_role)
@@ -62,4 +62,4 @@ class PermissionClassTestCase(TestCase):
         self.permission = models.Permission.objects.get_or_create(name="test")[0]
 
     def test_unicode(self):
-        self.assertEqual(str(self.permission), "test")
+        assert str(self.permission) == 'test'

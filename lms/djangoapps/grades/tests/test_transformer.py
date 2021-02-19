@@ -73,18 +73,13 @@ class GradesTransformerTestCase(CourseStructureTestCase):
         arguments representing XBlock fields, verify that the block structure
         has the specified values for each XBlock field.
         """
-        self.assertGreater(len(expectations), 0)
+        assert len(expectations) > 0
         for field in expectations:
             # Append our custom message to the default assertEqual error message
             self.longMessage = True  # pylint: disable=invalid-name
-            self.assertEqual(
-                expectations[field],
-                block_structure.get_xblock_field(usage_key, field),
-                msg=u'in field {},'.format(repr(field)),
-            )
-        self.assertIsNotNone(
-            block_structure.get_xblock_field(usage_key, u'subtree_edited_on'),
-        )
+            assert expectations[field] == block_structure.get_xblock_field(usage_key, field),\
+                u'in field {},'.format(repr(field))
+        assert block_structure.get_xblock_field(usage_key, u'subtree_edited_on') is not None
 
     def assert_collected_transformer_block_fields(self, block_structure, usage_key, transformer_class, **expectations):
         """
@@ -93,15 +88,13 @@ class GradesTransformerTestCase(CourseStructureTestCase):
         the block structure has the specified values for each transformer block
         field.
         """
-        self.assertGreater(len(expectations), 0)
+        assert len(expectations) > 0
         # Append our custom message to the default assertEqual error message
         self.longMessage = True
         for field in expectations:
-            self.assertEqual(
-                expectations[field],
-                block_structure.get_transformer_block_field(usage_key, transformer_class, field),
-                msg=u'in {} and field {}'.format(transformer_class, repr(field)),
-            )
+            assert expectations[field] == block_structure.get_transformer_block_field(
+                usage_key, transformer_class, field
+            ), u'in {} and field {}'.format(transformer_class, repr(field))
 
     def build_course_with_problems(self, data='<problem></problem>', metadata=None):
         """
@@ -223,7 +216,7 @@ class GradesTransformerTestCase(CourseStructureTestCase):
                 self.TRANSFORMER_CLASS_TO_TEST,
                 'subsections',
             )
-            self.assertEqual(actual_subsections, {blocks[sub].location for sub in expected_subsections})
+            assert actual_subsections == {blocks[sub].location for sub in expected_subsections}
 
     def test_unscored_block_collection(self):
         blocks = self.build_course_with_problems()
@@ -354,7 +347,8 @@ class GradesTransformerTestCase(CourseStructureTestCase):
         problem_data = u'''
         <problem>
             <optionresponse>
-              <p>You can use this template as a guide to the simple editor markdown and OLX markup to use for dropdown problems. Edit this component to replace this template with your own assessment.</p>
+              <p>You can use this template as a guide to the simple editor markdown and OLX markup to use for dropdown
+               problems. Edit this component to replace this template with your own assessment.</p>
             <label>Add the question text, or prompt, here. This text is required.</label>
             <description>You can add an optional tip or note related to the prompt like this. </description>
             <optioninput>
@@ -379,17 +373,16 @@ class GradesTransformerTestCase(CourseStructureTestCase):
     def test_course_version_not_collected_in_old_mongo(self):
         blocks = self.build_course_with_problems()
         block_structure = get_course_blocks(self.student, blocks[u'course'].location, self.transformers)
-        self.assertIsNone(block_structure.get_xblock_field(blocks[u'course'].location, u'course_version'))
+        assert block_structure.get_xblock_field(blocks[u'course'].location, u'course_version') is None
 
     def test_course_version_collected_in_split(self):
         with self.store.default_store(ModuleStoreEnum.Type.split):
             blocks = self.build_course_with_problems()
         block_structure = get_course_blocks(self.student, blocks[u'course'].location, self.transformers)
-        self.assertIsNotNone(block_structure.get_xblock_field(blocks[u'course'].location, u'course_version'))
-        self.assertEqual(
-            block_structure.get_xblock_field(blocks[u'problem'].location, u'course_version'),
-            block_structure.get_xblock_field(blocks[u'course'].location, u'course_version')
-        )
+        assert block_structure.get_xblock_field(blocks[u'course'].location, u'course_version') is not None
+        assert block_structure.get_xblock_field(
+            blocks[u'problem'].location, u'course_version'
+        ) == block_structure.get_xblock_field(blocks[u'course'].location, u'course_version')
 
     def test_grading_policy_collected(self):
         # the calculated hash of the original and updated grading policies of the test course
@@ -407,7 +400,7 @@ class GradesTransformerTestCase(CourseStructureTestCase):
         grading_policy_with_updates = course_block.grading_policy
         original_grading_policy = deepcopy(grading_policy_with_updates)
         for section in grading_policy_with_updates['GRADER']:
-            self.assertNotEqual(section['weight'], 0.25)
+            assert section['weight'] != 0.25
             section['weight'] = 0.25
 
         self._update_course_grading_policy(course_block, grading_policy_with_updates)

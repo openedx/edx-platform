@@ -48,7 +48,7 @@ class CertificateDisplayTestBase(SharedModuleStoreTestCase):
         super(CertificateDisplayTestBase, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.user = UserFactory.create(username=self.USERNAME, password=self.PASSWORD)
         result = self.client.login(username=self.USERNAME, password=self.PASSWORD)
-        self.assertTrue(result, msg="Could not log in")
+        assert result, 'Could not log in'
 
     def _check_linkedin_visibility(self, is_visible):
         """

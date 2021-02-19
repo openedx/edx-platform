@@ -4,7 +4,7 @@ Unit tests for program_course_enrollments tasks
 
 
 from datetime import timedelta
-
+import pytest
 from django.db.models.base import ObjectDoesNotExist
 from django.test import TestCase
 from django.utils import timezone
@@ -111,9 +111,9 @@ class ExpireWaitingEnrollmentsTest(TestCase):
                 ),
             )
 
-            self.assertIn('Removed 3 expired records:', log_capture.records[3].getMessage())
-            self.assertIn("program_enrollments.ProgramCourseEnrollment': 2", log_capture.records[3].getMessage())
-            self.assertIn("program_enrollments.ProgramEnrollment': 1", log_capture.records[3].getMessage())
+            assert 'Removed 3 expired records:' in log_capture.records[3].getMessage()
+            assert "program_enrollments.ProgramCourseEnrollment': 2" in log_capture.records[3].getMessage()
+            assert "program_enrollments.ProgramEnrollment': 1" in log_capture.records[3].getMessage()
 
         program_enrollments = ProgramEnrollment.objects.all()
         program_course_enrollments = ProgramCourseEnrollment.objects.all()
@@ -121,31 +121,29 @@ class ExpireWaitingEnrollmentsTest(TestCase):
         historical_program_course_enrollments = ProgramCourseEnrollment.historical_records.all()  # pylint: disable=no-member
 
         # assert expired records no longer exist
-        with self.assertRaises(ProgramEnrollment.DoesNotExist):
+        with pytest.raises(ProgramEnrollment.DoesNotExist):
             program_enrollments.get(external_user_key='student_expired_waiting')
-        self.assertEqual(len(program_course_enrollments), 4)
+        assert len(program_course_enrollments) == 4
 
         # assert fresh waiting records are not affected
         waiting_enrollment = program_enrollments.get(external_user_key='student_waiting')
-        self.assertEqual(len(waiting_enrollment.program_course_enrollments.all()), 2)
+        assert len(waiting_enrollment.program_course_enrollments.all()) == 2
 
         # assert actualized enrollments are not affected
         actualized_enrollment = program_enrollments.get(external_user_key='student_actualized')
-        self.assertEqual(len(actualized_enrollment.program_course_enrollments.all()), 2)
+        assert len(actualized_enrollment.program_course_enrollments.all()) == 2
 
         # assert expired historical records are also removed
-        with self.assertRaises(ObjectDoesNotExist):
+        with pytest.raises(ObjectDoesNotExist):
             historical_program_enrollments.get(external_user_key='student_expired_waiting')
-        self.assertEqual(
-            len(historical_program_course_enrollments.filter(program_enrollment_id=expired_program_enrollment.id)),
-            0
-        )
+        assert len(historical_program_course_enrollments
+                   .filter(program_enrollment_id=expired_program_enrollment.id)) == 0
 
         # assert other historical records are not affected
-        self.assertEqual(len(historical_program_enrollments), 2)
-        self.assertEqual(len(historical_program_course_enrollments), 4)
+        assert len(historical_program_enrollments) == 2
+        assert len(historical_program_course_enrollments) == 4
 
     def test_expire_none(self):
         """ Asserts no exceptions are thrown if no enrollments are found """
         expire_waiting_enrollments(60)
-        self.assertEqual(len(ProgramEnrollment.objects.all()), 0)
+        assert len(ProgramEnrollment.objects.all()) == 0

@@ -222,7 +222,4 @@ class MilestonesTransformerTestCase(CourseStructureTestCase, MilestonesTestCaseM
             self.course.location,
             self.transformers,
         )
-        self.assertEqual(
-            set(block_structure.get_block_keys()),
-            set(self.get_block_key_set(self.blocks, *expected_blocks)),
-        )
+        assert set(block_structure.get_block_keys()) == set(self.get_block_key_set(self.blocks, *expected_blocks))

@@ -72,8 +72,8 @@ class EventTrackingTestCase(TestCase):
 
     def assert_no_events_emitted(self):
         """Ensure no events were emitted at this point in the test."""
-        self.assertEqual(len(self.backend.events), 0)
+        assert len(self.backend.events) == 0
 
     def assert_events_emitted(self):
         """Ensure at least one event has been emitted at this point in the test."""
-        self.assertGreaterEqual(len(self.backend.events), 1)
+        assert len(self.backend.events) >= 1

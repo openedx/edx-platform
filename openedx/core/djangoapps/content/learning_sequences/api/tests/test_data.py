@@ -43,18 +43,16 @@ class TestCourseOutlineData(TestCase):
     def test_deprecated_course_key(self):
         """Old-Mongo style, "Org/Course/Run" keys are not supported."""
         old_course_key = CourseKey.from_string("OpenEdX/TestCourse/TestRun")
-        with self.assertRaises(ValueError):
+        with pytest.raises(ValueError):
             attr.evolve(self.course_outline, course_key=old_course_key)
 
     def test_sequence_building(self):
         """Make sure sequences were set correctly from sections data."""
         for section in self.course_outline.sections:
             for seq in section.sequences:
-                self.assertEqual(seq, self.course_outline.sequences[seq.usage_key])
-        self.assertEqual(
-            sum(len(section.sequences) for section in self.course_outline.sections),
-            len(self.course_outline.sequences),
-        )
+                assert seq == self.course_outline.sequences[seq.usage_key]
+        assert sum((len(section.sequences) for section in self.course_outline.sections)) ==\
+               len(self.course_outline.sequences)
 
     def test_duplicate_sequence(self):
         """We don't support DAGs. Sequences can only be in one Section."""
@@ -62,7 +60,7 @@ class TestCourseOutlineData(TestCase):
         section_with_dupe_seq = attr.evolve(
             self.course_outline.sections[1], title="Chapter 2 dupe",
         )
-        with self.assertRaises(ValueError):
+        with pytest.raises(ValueError):
             attr.evolve(
                 self.course_outline,
                 sections=self.course_outline.sections + [section_with_dupe_seq]
@@ -70,7 +68,7 @@ class TestCourseOutlineData(TestCase):
 
     def test_size(self):
         """Limit how large a CourseOutline is allowed to be."""
-        with self.assertRaises(ValueError):
+        with pytest.raises(ValueError):
             attr.evolve(
                 self.course_outline,
                 sections=generate_sections(self.course_key, [1001])

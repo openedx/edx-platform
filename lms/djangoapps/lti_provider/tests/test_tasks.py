@@ -133,4 +133,4 @@ class SendCompositeOutcomeTest(BaseOutcomeTest):
         tasks.send_composite_outcome(
             self.user.id, six.text_type(self.course_key), self.assignment.id, 1
         )
-        self.assertEqual(self.course_grade_mock.call_count, 0)
+        assert self.course_grade_mock.call_count == 0

@@ -6,6 +6,7 @@ Tests of modulestore semantics: How do the interfaces methods of ModuleStore rel
 import itertools
 from collections import namedtuple
 
+import pytest
 import ddt
 from mock import patch
 from xblock.core import XBlock, XBlockAside
@@ -79,12 +80,12 @@ class DirectOnlyCategorySemantics(PureModulestoreTestCase):
         """
         if draft is None or draft:
             with self.store.branch_setting(ModuleStoreEnum.Branch.draft_preferred):
-                with self.assertRaises(ItemNotFoundError):
+                with pytest.raises(ItemNotFoundError):
                     self.store.get_item(block_usage_key)
 
         if draft is None or not draft:
             with self.store.branch_setting(ModuleStoreEnum.Branch.published_only):
-                with self.assertRaises(ItemNotFoundError):
+                with pytest.raises(ItemNotFoundError):
                     self.store.get_item(block_usage_key)
 
     def assertBlockHasContent(self, block_usage_key, field_name, content,
@@ -108,22 +109,22 @@ class DirectOnlyCategorySemantics(PureModulestoreTestCase):
                 target_block = self.store.get_item(
                     block_usage_key,
                 )
-                self.assertEqual(content, target_block.fields[field_name].read_from(target_block))
+                assert content == target_block.fields[field_name].read_from(target_block)
                 if aside_field_name and aside_content:
                     aside = self._get_aside(target_block)
-                    self.assertIsNotNone(aside)
-                    self.assertEqual(aside_content, aside.fields[aside_field_name].read_from(aside))
+                    assert aside is not None
+                    assert aside_content == aside.fields[aside_field_name].read_from(aside)
 
         if draft is None or draft:
             with self.store.branch_setting(ModuleStoreEnum.Branch.draft_preferred):
                 target_block = self.store.get_item(
                     block_usage_key,
                 )
-                self.assertEqual(content, target_block.fields[field_name].read_from(target_block))
+                assert content == target_block.fields[field_name].read_from(target_block)
                 if aside_field_name and aside_content:
                     aside = self._get_aside(target_block)
-                    self.assertIsNotNone(aside)
-                    self.assertEqual(aside_content, aside.fields[aside_field_name].read_from(aside))
+                    assert aside is not None
+                    assert aside_content == aside.fields[aside_field_name].read_from(aside)
 
     def assertParentOf(self, parent_usage_key, child_usage_key, draft=None):
         """
@@ -142,14 +143,14 @@ class DirectOnlyCategorySemantics(PureModulestoreTestCase):
                 parent_block = self.store.get_item(
                     parent_usage_key,
                 )
-                self.assertIn(child_usage_key, parent_block.children)
+                assert child_usage_key in parent_block.children
 
         if draft is None or draft:
             with self.store.branch_setting(ModuleStoreEnum.Branch.draft_preferred):
                 parent_block = self.store.get_item(
                     parent_usage_key,
                 )
-                self.assertIn(child_usage_key, parent_block.children)
+                assert child_usage_key in parent_block.children
 
     def assertNotParentOf(self, parent_usage_key, child_usage_key, draft=None):
         """
@@ -168,14 +169,14 @@ class DirectOnlyCategorySemantics(PureModulestoreTestCase):
                 parent_block = self.store.get_item(
                     parent_usage_key,
                 )
-                self.assertNotIn(child_usage_key, parent_block.children)
+                assert child_usage_key not in parent_block.children
 
         if draft is None or draft:
             with self.store.branch_setting(ModuleStoreEnum.Branch.draft_preferred):
                 parent_block = self.store.get_item(
                     parent_usage_key,
                 )
-                self.assertNotIn(child_usage_key, parent_block.children)
+                assert child_usage_key not in parent_block.children
 
     def assertCoursePointsToBlock(self, block_usage_key, draft=None):
         """
@@ -215,7 +216,7 @@ class DirectOnlyCategorySemantics(PureModulestoreTestCase):
             expected_fields = CourseSummary.course_info_fields + ['id', 'location', 'has_ended']
             return all([hasattr(course_summary, field) for field in expected_fields])
 
-        self.assertTrue(all(verify_course_summery_fields(course_summary) for course_summary in course_summaries))
+        assert all((verify_course_summery_fields(course_summary) for course_summary in course_summaries))
 
     def is_detached(self, block_type):
         """
@@ -313,7 +314,7 @@ class DirectOnlyCategorySemantics(PureModulestoreTestCase):
             test_data = self.DATA_FIELDS[block_type]
 
             updated_field_value = test_data.updated
-            self.assertNotEqual(updated_field_value, block.fields[test_data.field_name].read_from(block))
+            assert updated_field_value != block.fields[test_data.field_name].read_from(block)
 
             block.fields[test_data.field_name].write_to(block, updated_field_value)
 
@@ -338,13 +339,13 @@ class DirectOnlyCategorySemantics(PureModulestoreTestCase):
             course_summaries = self.store.get_course_summaries()
 
             # Verify course summaries
-            self.assertEqual(len(course_summaries), 1)
+            assert len(course_summaries) == 1
 
             # Verify that all course summary objects have the required attributes.
             self.assertCourseSummaryFields(course_summaries)
 
             # Verify fetched accessible courses list is a list of CourseSummery instances
-            self.assertTrue(all(isinstance(course, CourseSummary) for course in course_summaries))
+            assert all((isinstance(course, CourseSummary) for course in course_summaries))
 
     @ddt.data(*itertools.product(['chapter', 'sequential'], [True, False]))
     @ddt.unpack
@@ -437,7 +438,7 @@ class TestSplitDirectOnlyCategorySemantics(DirectOnlyCategorySemantics):
         with self.store.branch_setting(ModuleStoreEnum.Branch.draft_preferred):
             block = self.store.get_item(block_usage_key)
             aside = self._get_aside(block)
-            self.assertIsNotNone(aside)
+            assert aside is not None
             aside.fields[self.ASIDE_DATA_FIELD.field_name].write_to(aside, self.ASIDE_DATA_FIELD.updated)
 
             self.store.update_item(block, ModuleStoreEnum.UserID.test, allow_not_found=True, asides=[aside])

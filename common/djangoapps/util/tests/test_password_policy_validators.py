@@ -4,6 +4,7 @@
 
 import unittest
 
+import pytest
 from ddt import data, ddt, unpack
 from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.core.exceptions import ValidationError
@@ -41,9 +42,9 @@ class PasswordPolicyValidatorsTestCase(unittest.TestCase):
         if msg is None:
             validate_password(password, user)
         else:
-            with self.assertRaises(ValidationError) as cm:
+            with pytest.raises(ValidationError) as cm:
                 validate_password(password, user)
-            self.assertIn(msg, ' '.join(cm.exception.messages))
+            assert msg in ' '.join(cm.value.messages)
 
     def test_unicode_password(self):
         """ Tests that validate_password enforces unicode """
@@ -51,8 +52,8 @@ class PasswordPolicyValidatorsTestCase(unittest.TestCase):
         byte_str = unicode_str.encode('utf-8')
 
         # Sanity checks and demonstration of why this test is useful
-        self.assertEqual(len(byte_str), 4)
-        self.assertEqual(len(unicode_str), 1)
+        assert len(byte_str) == 4
+        assert len(unicode_str) == 1
 
         # Test length check
         self.validation_errors_checker(byte_str, 'This password is too short. It must contain at least 2 characters.')
@@ -65,7 +66,7 @@ class PasswordPolicyValidatorsTestCase(unittest.TestCase):
         """ Tests that validate_password normalizes passwords """
         # s ̣ ̇ (s with combining dot below and combining dot above)
         not_normalized_password = u'\u0073\u0323\u0307'
-        self.assertEqual(len(not_normalized_password), 3)
+        assert len(not_normalized_password) == 3
 
         # When we normalize we expect the not_normalized password to fail
         # because it should be normalized to u'\u1E69' -> ṩ
@@ -98,7 +99,7 @@ class PasswordPolicyValidatorsTestCase(unittest.TestCase):
     def test_password_instructions(self, config, msg):
         """ Tests password instructions """
         with override_settings(AUTH_PASSWORD_VALIDATORS=config):
-            self.assertIn(msg, password_validators_instruction_texts())
+            assert msg in password_validators_instruction_texts()
 
     @data(
         (u'userna', u'username', 'test@example.com', 'The password is too similar to the username.'),

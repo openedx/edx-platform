@@ -6,6 +6,7 @@ Tests for the course grading API view
 import json
 from collections import OrderedDict, namedtuple
 from datetime import datetime
+import pytest
 
 import ddt
 from django.urls import reverse
@@ -208,32 +209,32 @@ class CourseGradingViewTest(SharedModuleStoreTestCase, APITestCase):
     def test_student_fails(self):
         self.client.login(username=self.student.username, password=self.password)
         resp = self.client.get(self.get_url(self.course_key))
-        self.assertEqual(resp.status_code, status.HTTP_403_FORBIDDEN)
+        assert resp.status_code == status.HTTP_403_FORBIDDEN
 
     def test_staff_succeeds(self):
         self.client.login(username=self.staff.username, password=self.password)
         resp = self.client.get(self.get_url(self.course_key))
-        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        assert resp.status_code == status.HTTP_200_OK
         expected_data = self._get_expected_data()
-        self.assertEqual(expected_data, resp.data)
+        assert expected_data == resp.data
 
     def test_staff_succeeds_graded_only(self):
         self.client.login(username=self.staff.username, password=self.password)
         resp = self.client.get(self.get_url(self.course_key), {'graded_only': True})
-        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        assert resp.status_code == status.HTTP_200_OK
         expected_data = self._get_expected_data()
         expected_data['subsections'] = [sub for sub in expected_data['subsections'] if sub['graded']]
-        self.assertEqual(expected_data, resp.data)
+        assert expected_data == resp.data
 
     def test_course_grade_frozen(self):
         with patch('lms.djangoapps.grades.rest_api.v1.gradebook_views.are_grades_frozen') as mock_frozen_grades:
             mock_frozen_grades.return_value = True
             self.client.login(username=self.staff.username, password=self.password)
             resp = self.client.get(self.get_url(self.course_key))
-            self.assertEqual(resp.status_code, status.HTTP_200_OK)
+            assert resp.status_code == status.HTTP_200_OK
             expected_data = self._get_expected_data()
             expected_data['grades_frozen'] = True
-            self.assertEqual(expected_data, resp.data)
+            assert expected_data == resp.data
 
 
 class GradebookViewTestBase(GradeViewTestMixin, APITestCase):
@@ -500,27 +501,27 @@ class GradebookViewTest(GradebookViewTestBase):
             ])
         ]
 
-        self.assertEqual(status.HTTP_200_OK, response.status_code)
+        assert status.HTTP_200_OK == response.status_code
         actual_data = dict(response.data)
-        self.assertIsNone(actual_data['next'])
-        self.assertIsNone(actual_data['previous'])
-        self.assertEqual(expected_results, actual_data['results'])
+        assert actual_data['next'] is None
+        assert actual_data['previous'] is None
+        assert expected_results == actual_data['results']
         # assert that the hidden subsection data is not represented in the response
         for actual_user_data in actual_data['results']:
             actual_subsection_display_names = [
                 item['subsection_name'] for item in actual_user_data['section_breakdown']
             ]
-            self.assertNotIn(self.hidden_subsection.display_name, actual_subsection_display_names)
+            assert self.hidden_subsection.display_name not in actual_subsection_display_names
 
     def _assert_empty_response(self, response):
         """
         Helper method for assertions about OK, empty responses.
         """
-        self.assertEqual(status.HTTP_200_OK, response.status_code)
+        assert status.HTTP_200_OK == response.status_code
         actual_data = dict(response.data)
-        self.assertIsNone(actual_data['next'])
-        self.assertIsNone(actual_data['previous'])
-        self.assertEqual([], actual_data['results'])
+        assert actual_data['next'] is None
+        assert actual_data['previous'] is None
+        assert [] == actual_data['results']
 
     def test_feature_not_enabled(self):
         self.client.login(username=self.global_staff.username, password=self.password)
@@ -528,18 +529,18 @@ class GradebookViewTest(GradebookViewTestBase):
             resp = self.client.get(
                 self.get_url(course_key=self.empty_course.id)
             )
-            self.assertEqual(status.HTTP_403_FORBIDDEN, resp.status_code)
+            assert status.HTTP_403_FORBIDDEN == resp.status_code
 
     def test_anonymous(self):
         with override_waffle_flag(self.waffle_flag, active=True):
             resp = self.client.get(self.get_url())
-            self.assertEqual(status.HTTP_401_UNAUTHORIZED, resp.status_code)
+            assert status.HTTP_401_UNAUTHORIZED == resp.status_code
 
     def test_student(self):
         self.client.login(username=self.student.username, password=self.password)
         with override_waffle_flag(self.waffle_flag, active=True):
             resp = self.client.get(self.get_url())
-            self.assertEqual(status.HTTP_403_FORBIDDEN, resp.status_code)
+            assert status.HTTP_403_FORBIDDEN == resp.status_code
 
     def test_course_does_not_exist(self):
         with override_waffle_flag(self.waffle_flag, active=True):
@@ -547,7 +548,7 @@ class GradebookViewTest(GradebookViewTestBase):
             resp = self.client.get(
                 self.get_url(course_key='course-v1:MITx+8.MechCX+2014_T1')
             )
-            self.assertEqual(status.HTTP_404_NOT_FOUND, resp.status_code)
+            assert status.HTTP_404_NOT_FOUND == resp.status_code
 
     def test_user_does_not_exist(self):
         with override_waffle_flag(self.waffle_flag, active=True):
@@ -555,7 +556,7 @@ class GradebookViewTest(GradebookViewTestBase):
             resp = self.client.get(
                 self.get_url(course_key=self.course.id, username='not-a-real-user')
             )
-            self.assertEqual(status.HTTP_404_NOT_FOUND, resp.status_code)
+            assert status.HTTP_404_NOT_FOUND == resp.status_code
 
     def test_user_not_enrolled(self):
         with override_waffle_flag(self.waffle_flag, active=True):
@@ -563,7 +564,7 @@ class GradebookViewTest(GradebookViewTestBase):
             resp = self.client.get(
                 self.get_url(course_key=self.empty_course.id, username=self.student.username)
             )
-            self.assertEqual(status.HTTP_404_NOT_FOUND, resp.status_code)
+            assert status.HTTP_404_NOT_FOUND == resp.status_code
 
     def test_course_no_enrollments(self):
         with override_waffle_flag(self.waffle_flag, active=True):
@@ -615,14 +616,14 @@ class GradebookViewTest(GradebookViewTestBase):
                     ('section_breakdown', self.expected_subsection_grades()),
                 ])
 
-                self.assertEqual(status.HTTP_200_OK, resp.status_code)
+                assert status.HTTP_200_OK == resp.status_code
                 actual_data = dict(resp.data)
-                self.assertEqual(expected_results, actual_data)
+                assert expected_results == actual_data
                 # assert that the hidden subsection data is not represented in the response
                 actual_subsection_display_names = [
                     item['subsection_name'] for item in actual_data['section_breakdown']
                 ]
-                self.assertNotIn(self.hidden_subsection.display_name, actual_subsection_display_names)
+                assert self.hidden_subsection.display_name not in actual_subsection_display_names
 
     @ddt.data(
         'login_staff',
@@ -698,9 +699,9 @@ class GradebookViewTest(GradebookViewTestBase):
                     ('section_breakdown', self.expected_subsection_grades()),
                 ])
 
-                self.assertEqual(status.HTTP_200_OK, resp.status_code)
+                assert status.HTTP_200_OK == resp.status_code
                 actual_data = dict(resp.data)
-                self.assertEqual(expected_results, actual_data)
+                assert expected_results == actual_data
 
     @ddt.data(
         ['login_staff', 4],
@@ -740,14 +741,14 @@ class GradebookViewTest(GradebookViewTestBase):
                     ]),
                 ]
 
-                self.assertEqual(status.HTTP_200_OK, resp.status_code)
+                assert status.HTTP_200_OK == resp.status_code
                 actual_data = dict(resp.data)
-                self.assertIsNone(actual_data['next'])
-                self.assertIsNone(actual_data['previous'])
-                self.assertEqual(expected_results, actual_data['results'])
+                assert actual_data['next'] is None
+                assert actual_data['previous'] is None
+                assert expected_results == actual_data['results']
 
-                self.assertEqual(actual_data['total_users_count'], num_enrollments)
-                self.assertEqual(actual_data['filtered_users_count'], 2)
+                assert actual_data['total_users_count'] == num_enrollments
+                assert actual_data['filtered_users_count'] == 2
 
     @ddt.data(
         ['login_staff', 4],
@@ -788,14 +789,14 @@ class GradebookViewTest(GradebookViewTestBase):
                     ]),
                 ]
 
-                self.assertEqual(status.HTTP_200_OK, resp.status_code)
+                assert status.HTTP_200_OK == resp.status_code
                 actual_data = dict(resp.data)
-                self.assertIsNone(actual_data['next'])
-                self.assertIsNone(actual_data['previous'])
-                self.assertEqual(expected_results, actual_data['results'])
+                assert actual_data['next'] is None
+                assert actual_data['previous'] is None
+                assert expected_results == actual_data['results']
 
-                self.assertEqual(actual_data['total_users_count'], num_enrollments)
-                self.assertEqual(actual_data['filtered_users_count'], 2)
+                assert actual_data['total_users_count'] == num_enrollments
+                assert actual_data['filtered_users_count'] == 2
 
     @ddt.data(
         ['login_staff', 4],
@@ -826,14 +827,14 @@ class GradebookViewTest(GradebookViewTestBase):
                     ]),
                 ]
 
-                self.assertEqual(status.HTTP_200_OK, resp.status_code)
+                assert status.HTTP_200_OK == resp.status_code
                 actual_data = dict(resp.data)
-                self.assertIsNone(actual_data['next'])
-                self.assertIsNone(actual_data['previous'])
-                self.assertEqual(expected_results, actual_data['results'])
+                assert actual_data['next'] is None
+                assert actual_data['previous'] is None
+                assert expected_results == actual_data['results']
 
-                self.assertEqual(actual_data['total_users_count'], num_enrollments)
-                self.assertEqual(actual_data['filtered_users_count'], 1)
+                assert actual_data['total_users_count'] == num_enrollments
+                assert actual_data['filtered_users_count'] == 1
 
     @ddt.data(
         ['login_staff', 4],
@@ -874,13 +875,13 @@ class GradebookViewTest(GradebookViewTestBase):
                     ]),
                 ]
 
-                self.assertEqual(status.HTTP_200_OK, resp.status_code)
+                assert status.HTTP_200_OK == resp.status_code
                 actual_data = dict(resp.data)
-                self.assertIsNone(actual_data['next'])
-                self.assertIsNone(actual_data['previous'])
-                self.assertEqual(expected_results, actual_data['results'])
-                self.assertEqual(actual_data['total_users_count'], num_enrollments)
-                self.assertEqual(actual_data['filtered_users_count'], 2)
+                assert actual_data['next'] is None
+                assert actual_data['previous'] is None
+                assert expected_results == actual_data['results']
+                assert actual_data['total_users_count'] == num_enrollments
+                assert actual_data['filtered_users_count'] == 2
 
     @ddt.data(
         'login_staff',
@@ -930,13 +931,13 @@ class GradebookViewTest(GradebookViewTestBase):
                     ]),
                 ]
 
-                self.assertEqual(status.HTTP_200_OK, resp.status_code)
+                assert status.HTTP_200_OK == resp.status_code
                 actual_data = dict(resp.data)
-                self.assertIsNone(actual_data['next'])
-                self.assertIsNone(actual_data['previous'])
-                self.assertEqual(expected_results, actual_data['results'])
-                self.assertEqual(actual_data['total_users_count'], num_enrollments)
-                self.assertEqual(actual_data['filtered_users_count'], 1)
+                assert actual_data['next'] is None
+                assert actual_data['previous'] is None
+                assert expected_results == actual_data['results']
+                assert actual_data['total_users_count'] == num_enrollments
+                assert actual_data['filtered_users_count'] == 1
 
     @ddt.data(
         'login_staff',
@@ -986,8 +987,8 @@ class GradebookViewTest(GradebookViewTestBase):
                 self._assert_data_all_users(resp)
                 actual_data = dict(resp.data)
 
-                self.assertEqual(actual_data['total_users_count'], num_enrollments)
-                self.assertEqual(actual_data['filtered_users_count'], num_filtered_enrollments)
+                assert actual_data['total_users_count'] == num_enrollments
+                assert actual_data['filtered_users_count'] == num_filtered_enrollments
 
     @ddt.data(
         'login_staff',
@@ -1031,12 +1032,12 @@ class GradebookViewTest(GradebookViewTestBase):
                 resp = self.client.get(
                     self.get_url(course_key=self.course.id) + query
                 )
-                self.assertEqual(status.HTTP_200_OK, resp.status_code)
+                assert status.HTTP_200_OK == resp.status_code
                 actual_data = dict(resp.data)
                 expected_page_size = page_size or CourseEnrollmentPagination.page_size
                 if expected_page_size > user_size:
                     expected_page_size = user_size
-                self.assertEqual(len(actual_data['results']), expected_page_size)
+                assert len(actual_data['results']) == expected_page_size
 
     @ddt.data(
         ['login_staff', 4],
@@ -1093,11 +1094,11 @@ class GradebookViewTest(GradebookViewTestBase):
                     ])
                 ]
 
-                self.assertEqual(status.HTTP_200_OK, resp.status_code)
+                assert status.HTTP_200_OK == resp.status_code
                 actual_data = dict(resp.data)
-                self.assertEqual(expected_results, actual_data['results'])
-                self.assertEqual(actual_data['total_users_count'], num_enrollments)
-                self.assertEqual(actual_data['filtered_users_count'], 2)
+                assert expected_results == actual_data['results']
+                assert actual_data['total_users_count'] == num_enrollments
+                assert actual_data['filtered_users_count'] == 2
 
     @ddt.data(
         ['login_staff', 4],
@@ -1146,11 +1147,11 @@ class GradebookViewTest(GradebookViewTestBase):
                     ]),
                 ]
 
-                self.assertEqual(status.HTTP_200_OK, resp.status_code)
+                assert status.HTTP_200_OK == resp.status_code
                 actual_data = dict(resp.data)
-                self.assertEqual(expected_results, actual_data['results'])
-                self.assertEqual(actual_data['total_users_count'], num_enrollments)
-                self.assertEqual(actual_data['filtered_users_count'], 1)
+                assert expected_results == actual_data['results']
+                assert actual_data['total_users_count'] == num_enrollments
+                assert actual_data['filtered_users_count'] == 1
 
     @ddt.data(
         ['login_staff', 4],
@@ -1210,11 +1211,11 @@ class GradebookViewTest(GradebookViewTestBase):
                     ])
                 ]
 
-                self.assertEqual(status.HTTP_200_OK, resp.status_code)
+                assert status.HTTP_200_OK == resp.status_code
                 actual_data = dict(resp.data)
-                self.assertEqual(expected_results, actual_data['results'])
-                self.assertEqual(actual_data['total_users_count'], num_enrollments)
-                self.assertEqual(actual_data['filtered_users_count'], num_enrollments)
+                assert expected_results == actual_data['results']
+                assert actual_data['total_users_count'] == num_enrollments
+                assert actual_data['filtered_users_count'] == num_enrollments
 
     @ddt.data(
         ['login_staff', 4],
@@ -1274,11 +1275,11 @@ class GradebookViewTest(GradebookViewTestBase):
                     ])
                 ]
 
-                self.assertEqual(status.HTTP_200_OK, resp.status_code)
+                assert status.HTTP_200_OK == resp.status_code
                 actual_data = dict(resp.data)
-                self.assertEqual(expected_results, actual_data['results'])
-                self.assertEqual(actual_data['total_users_count'], num_enrollments)
-                self.assertEqual(actual_data['filtered_users_count'], num_enrollments)
+                assert expected_results == actual_data['results']
+                assert actual_data['total_users_count'] == num_enrollments
+                assert actual_data['filtered_users_count'] == num_enrollments
 
 
 @ddt.ddt
@@ -1297,18 +1298,18 @@ class GradebookBulkUpdateViewTest(GradebookViewTestBase):
             resp = self.client.post(
                 self.get_url(course_key=self.empty_course.id)
             )
-            self.assertEqual(status.HTTP_403_FORBIDDEN, resp.status_code)
+            assert status.HTTP_403_FORBIDDEN == resp.status_code
 
     def test_anonymous(self):
         with override_waffle_flag(self.waffle_flag, active=True):
             resp = self.client.post(self.get_url())
-            self.assertEqual(status.HTTP_401_UNAUTHORIZED, resp.status_code)
+            assert status.HTTP_401_UNAUTHORIZED == resp.status_code
 
     def test_student(self):
         self.client.login(username=self.student.username, password=self.password)
         with override_waffle_flag(self.waffle_flag, active=True):
             resp = self.client.post(self.get_url())
-            self.assertEqual(status.HTTP_403_FORBIDDEN, resp.status_code)
+            assert status.HTTP_403_FORBIDDEN == resp.status_code
 
     def test_course_does_not_exist(self):
         with override_waffle_flag(self.waffle_flag, active=True):
@@ -1316,7 +1317,7 @@ class GradebookBulkUpdateViewTest(GradebookViewTestBase):
             resp = self.client.post(
                 self.get_url(course_key='course-v1:MITx+8.MechCX+2014_T1')
             )
-            self.assertEqual(status.HTTP_404_NOT_FOUND, resp.status_code)
+            assert status.HTTP_404_NOT_FOUND == resp.status_code
 
     @ddt.data(
         'login_staff',
@@ -1343,7 +1344,7 @@ class GradebookBulkUpdateViewTest(GradebookViewTestBase):
                     data=json.dumps(post_data),
                     content_type='application/json',
                 )
-                self.assertEqual(status.HTTP_403_FORBIDDEN, resp.status_code)
+                assert status.HTTP_403_FORBIDDEN == resp.status_code
 
     @ddt.data(
         'login_staff',
@@ -1376,8 +1377,8 @@ class GradebookBulkUpdateViewTest(GradebookViewTestBase):
                     'reason': 'CourseEnrollment matching query does not exist.',
                 },
             ]
-            self.assertEqual(status.HTTP_422_UNPROCESSABLE_ENTITY, resp.status_code)
-            self.assertEqual(expected_data, resp.data)
+            assert status.HTTP_422_UNPROCESSABLE_ENTITY == resp.status_code
+            assert expected_data == resp.data
 
     @ddt.data(
         'login_staff',
@@ -1409,8 +1410,8 @@ class GradebookBulkUpdateViewTest(GradebookViewTestBase):
                     'reason': 'User matching query does not exist.',
                 },
             ]
-            self.assertEqual(status.HTTP_422_UNPROCESSABLE_ENTITY, resp.status_code)
-            self.assertEqual(expected_data, resp.data)
+            assert status.HTTP_422_UNPROCESSABLE_ENTITY == resp.status_code
+            assert expected_data == resp.data
 
     @ddt.data(
         'login_staff',
@@ -1442,8 +1443,8 @@ class GradebookBulkUpdateViewTest(GradebookViewTestBase):
                     'reason': "<class 'opaque_keys.edx.locator.BlockUsageLocator'>: not-a-valid-usage-key",
                 },
             ]
-            self.assertEqual(status.HTTP_422_UNPROCESSABLE_ENTITY, resp.status_code)
-            self.assertEqual(expected_data, resp.data)
+            assert status.HTTP_422_UNPROCESSABLE_ENTITY == resp.status_code
+            assert expected_data == resp.data
 
     @ddt.data(
         'login_staff',
@@ -1480,8 +1481,8 @@ class GradebookBulkUpdateViewTest(GradebookViewTestBase):
                     'reason': 'usage_key {} does not exist in this course.'.format(usage_id),
                 },
             ]
-            self.assertEqual(status.HTTP_422_UNPROCESSABLE_ENTITY, resp.status_code)
-            self.assertEqual(expected_data, resp.data)
+            assert status.HTTP_422_UNPROCESSABLE_ENTITY == resp.status_code
+            assert expected_data == resp.data
 
     @ddt.data('login_staff', 'login_course_staff', 'login_course_admin')
     def test_override_is_created(self, login_method):
@@ -1534,8 +1535,8 @@ class GradebookBulkUpdateViewTest(GradebookViewTestBase):
                     'reason': None,
                 },
             ]
-            self.assertEqual(status.HTTP_202_ACCEPTED, resp.status_code)
-            self.assertEqual(expected_data, resp.data)
+            assert status.HTTP_202_ACCEPTED == resp.status_code
+            assert expected_data == resp.data
 
             second_post_data = [
                 {
@@ -1581,10 +1582,10 @@ class GradebookBulkUpdateViewTest(GradebookViewTestBase):
                 )
                 for field_name in expected_grade_overrides._fields:
                     expected_value = getattr(expected_grade_overrides, field_name)
-                    self.assertEqual(expected_value, getattr(grade.override, field_name + '_override'))
+                    assert expected_value == getattr(grade.override, (field_name + '_override'))
                 for field_name in expected_grades._fields:
                     expected_value = getattr(expected_grades, field_name)
-                    self.assertEqual(expected_value, getattr(grade, field_name))
+                    assert expected_value == getattr(grade, field_name)
 
     def test_update_failing_grade(self):
         """
@@ -1624,9 +1625,9 @@ class GradebookBulkUpdateViewTest(GradebookViewTestBase):
                 data=json.dumps(post_data),
                 content_type='application/json',
             )
-            self.assertEqual(status.HTTP_202_ACCEPTED, resp.status_code)
+            assert status.HTTP_202_ACCEPTED == resp.status_code
             cert = GeneratedCertificate.certificate_for_student(self.student, self.course.id)
-            self.assertEqual(cert.status, CertificateStatuses.notpassing)
+            assert cert.status == CertificateStatuses.notpassing
 
 
 @ddt.ddt
@@ -1700,7 +1701,7 @@ class SubsectionGradeViewTest(GradebookViewTestBase):
             graded_total=graded_total_mock
         )
         mocked_factory.return_value = mock_return_value
-        with self.assertRaises(PersistentSubsectionGrade.DoesNotExist):
+        with pytest.raises(PersistentSubsectionGrade.DoesNotExist):
             PersistentSubsectionGrade.objects.get(
                 user_id=user_no_grade.id,
                 course_id=self.usage_key.course_key,
@@ -1725,7 +1726,7 @@ class SubsectionGradeViewTest(GradebookViewTestBase):
             'subsection_id': text_type(self.usage_key),
             'history': []
         }
-        self.assertEqual(expected_data, resp.data)
+        assert expected_data == resp.data
 
     @ddt.data(
         'login_staff',
@@ -1754,7 +1755,7 @@ class SubsectionGradeViewTest(GradebookViewTestBase):
             'history': []
         }
 
-        self.assertEqual(expected_data, resp.data)
+        assert expected_data == resp.data
 
     @ddt.data(
         'login_staff',
@@ -1903,7 +1904,7 @@ class SubsectionGradeViewTest(GradebookViewTestBase):
             self.get_url(subsection_id='notAValidSubectionId')
         )
 
-        self.assertEqual(status.HTTP_404_NOT_FOUND, resp.status_code)
+        assert status.HTTP_404_NOT_FOUND == resp.status_code
 
     @ddt.data(
         'login_staff',
@@ -1915,7 +1916,7 @@ class SubsectionGradeViewTest(GradebookViewTestBase):
             self.get_url(subsection_id=self.usage_key, user_id='notAnIntegerUserId')
         )
 
-        self.assertEqual(status.HTTP_404_NOT_FOUND, resp.status_code)
+        assert status.HTTP_404_NOT_FOUND == resp.status_code
 
     @ddt.data(
         'login_staff',
@@ -1952,7 +1953,7 @@ class SubsectionGradeViewTest(GradebookViewTestBase):
             'history': []
         }
 
-        self.assertEqual(expected_data, resp.data)
+        assert expected_data == resp.data
 
     def test_with_unauthorized_user(self):
         student = UserFactory(username='dummy', password='test')
@@ -1962,7 +1963,7 @@ class SubsectionGradeViewTest(GradebookViewTestBase):
             self.get_url(subsection_id=self.usage_key)
         )
 
-        self.assertEqual(status.HTTP_403_FORBIDDEN, resp.status_code)
+        assert status.HTTP_403_FORBIDDEN == resp.status_code
 
     @patch.dict('django.conf.settings.FEATURES', {'DISABLE_START_DATES': False})
     def test_get_override_for_unreleased_block(self):
@@ -1994,4 +1995,4 @@ class SubsectionGradeViewTest(GradebookViewTestBase):
             'subsection_id': text_type(unreleased_subsection.location),
             'history': []
         }
-        self.assertEqual(expected_data, resp.data)
+        assert expected_data == resp.data

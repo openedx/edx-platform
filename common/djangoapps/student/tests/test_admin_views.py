@@ -7,6 +7,7 @@ Tests student admin.py
 import datetime
 
 import ddt
+import pytest
 import six
 from django.conf import settings  # lint-amnesty, pylint: disable=unused-import
 from django.contrib.admin.sites import AdminSite
@@ -186,7 +187,7 @@ class AdminUserPageTest(TestCase):
         Ensures that the username is not readonly, when admin creates new user.
         """
         request = Mock()
-        self.assertNotIn('username', self.admin.get_readonly_fields(request))
+        assert 'username' not in self.admin.get_readonly_fields(request)
 
     def test_username_is_readonly_for_user(self):
         """
@@ -201,7 +202,7 @@ class AdminUserPageTest(TestCase):
         """
         request = Mock()
         user = Mock()
-        self.assertIn('username', self.admin.get_readonly_fields(request, user))
+        assert 'username' in self.admin.get_readonly_fields(request, user)
 
 
 @ddt.ddt
@@ -237,7 +238,7 @@ class CourseEnrollmentAdminTest(SharedModuleStoreTestCase):
         All CourseEnrollmentAdmin views are disabled by default.
         """
         response = getattr(self.client, method)(url)
-        self.assertEqual(response.status_code, 403)
+        assert response.status_code == 403
 
     @ddt.data(*ADMIN_URLS)
     @ddt.unpack
@@ -247,7 +248,7 @@ class CourseEnrollmentAdminTest(SharedModuleStoreTestCase):
         """
         with override_waffle_switch(COURSE_ENROLLMENT_ADMIN_SWITCH, active=True):
             response = getattr(self.client, method)(url)
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
 
     def test_username_exact_match(self):
         """
@@ -261,14 +262,14 @@ class CourseEnrollmentAdminTest(SharedModuleStoreTestCase):
         search_url = '{}?q={}'.format(reverse('admin:student_courseenrollment_changelist'), self.user.username)
         with override_waffle_switch(COURSE_ENROLLMENT_ADMIN_SWITCH, active=True):
             response = self.client.get(search_url)
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
 
         # context['results'] is an array of arrays of HTML <td> elements to be rendered
-        self.assertEqual(len(response.context['results']), 2)
+        assert len(response.context['results']) == 2
         for idx, username in enumerate([self.user.username, user2.username]):
             # Locate the <td> column containing the username
             user_field = next(col for col in response.context['results'][idx] if "field-user" in col)
-            self.assertIn(username, user_field)
+            assert username in user_field
 
     def test_save_toggle_active(self):
         """
@@ -277,7 +278,7 @@ class CourseEnrollmentAdminTest(SharedModuleStoreTestCase):
         This test implicitly verifies that the POST parameters are handled correctly.
         """
         # is_active will change from True to False
-        self.assertTrue(self.course_enrollment.is_active)
+        assert self.course_enrollment.is_active
         data = {
             'user': six.text_type(self.course_enrollment.user.id),
             'course': six.text_type(self.course_enrollment.course.id),
@@ -290,10 +291,10 @@ class CourseEnrollmentAdminTest(SharedModuleStoreTestCase):
                 reverse('admin:student_courseenrollment_change', args=(self.course_enrollment.id, )),
                 data=data,
             )
-        self.assertEqual(response.status_code, 302)
+        assert response.status_code == 302
 
         self.course_enrollment.refresh_from_db()
-        self.assertFalse(self.course_enrollment.is_active)
+        assert not self.course_enrollment.is_active
 
     def test_save_invalid_course_id(self):
         """
@@ -307,7 +308,7 @@ class CourseEnrollmentAdminTest(SharedModuleStoreTestCase):
         }
 
         with override_waffle_switch(COURSE_ENROLLMENT_ADMIN_SWITCH, active=True):
-            with self.assertRaises(ValidationError):
+            with pytest.raises(ValidationError):
                 self.client.post(
                     reverse('admin:student_courseenrollment_change', args=(self.course_enrollment.id, )),
                     data=data,
@@ -344,16 +345,14 @@ class LoginFailuresAdminTest(TestCase):
         Test if `__str__` method behaves correctly for unicode username.
         It shouldn't raise `TypeError`.
         """
-        self.assertEqual(
-            str(LoginFailures.objects.get(user=self.user)), '§: 10 - {}'.format(self.user_lockout_until.isoformat())
-        )
-        self.assertEqual(str(LoginFailures.objects.get(user=self.user2)), 'Zażółć gęślą jaźń: 2 - -')
+        assert str(LoginFailures.objects.get(user=self.user)) == f'§: 10 - {self.user_lockout_until.isoformat()}'
+        assert str(LoginFailures.objects.get(user=self.user2)) == 'Zażółć gęślą jaźń: 2 - -'
 
     @override_settings(FEATURES={'ENABLE_MAX_FAILED_LOGIN_ATTEMPTS': True})
     def test_feature_enabled(self):
         url = reverse('admin:student_loginfailures_changelist')
         response = self.client.get(url)
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
 
     @ddt.data(
         reverse('admin:student_loginfailures_changelist'),
@@ -364,9 +363,9 @@ class LoginFailuresAdminTest(TestCase):
     def test_feature_disabled(self, url):
         """Test if feature is disabled there's no access to the admin module."""
         response = self.client.get(url)
-        self.assertEqual(response.status_code, 403)
+        assert response.status_code == 403
         response = self.client.post(url)
-        self.assertEqual(response.status_code, 403)
+        assert response.status_code == 403
 
     @override_settings(FEATURES={'ENABLE_MAX_FAILED_LOGIN_ATTEMPTS': True})
     def test_unlock_student_accounts(self):
@@ -381,7 +380,7 @@ class LoginFailuresAdminTest(TestCase):
             follow=True
         )
         count = LoginFailures.objects.count()
-        self.assertEqual(count, 0)
+        assert count == 0
 
     @override_settings(FEATURES={'ENABLE_MAX_FAILED_LOGIN_ATTEMPTS': True})
     def test_unlock_account(self):
@@ -393,7 +392,7 @@ class LoginFailuresAdminTest(TestCase):
             data={'_unlock': 1}
         )
         count = LoginFailures.objects.count()
-        self.assertEqual(count, start_count - 1)
+        assert count == (start_count - 1)
 
 
 class CourseEnrollmentAdminFormTest(SharedModuleStoreTestCase):
@@ -413,7 +412,7 @@ class CourseEnrollmentAdminFormTest(SharedModuleStoreTestCase):
         """
         Test CourseEnrollmentAdminForm creation.
         """
-        self.assertEqual(CourseEnrollment.objects.count(), 0)
+        assert CourseEnrollment.objects.count() == 0
 
         form = CourseEnrollmentForm({
             'user': self.user.id,
@@ -421,10 +420,10 @@ class CourseEnrollmentAdminFormTest(SharedModuleStoreTestCase):
             'is_active': True,
             'mode': 'audit',
         })
-        self.assertTrue(form.is_valid())
+        assert form.is_valid()
         enrollment = form.save()
-        self.assertEqual(CourseEnrollment.objects.count(), 1)
-        self.assertEqual(CourseEnrollment.objects.first(), enrollment)
+        assert CourseEnrollment.objects.count() == 1
+        assert CourseEnrollment.objects.first() == enrollment
 
     def test_admin_model_form_update(self):
         """
@@ -439,11 +438,11 @@ class CourseEnrollmentAdminFormTest(SharedModuleStoreTestCase):
             'mode': 'audit'},
             instance=enrollment
         )
-        self.assertTrue(form.is_valid())
+        assert form.is_valid()
         course_enrollment = form.save()
-        self.assertEqual(count, CourseEnrollment.objects.count())
-        self.assertFalse(course_enrollment.is_active)
-        self.assertEqual(enrollment.id, course_enrollment.id)
+        assert count == CourseEnrollment.objects.count()
+        assert not course_enrollment.is_active
+        assert enrollment.id == course_enrollment.id
 
 
 class AllowedAuthUserFormTest(SiteMixin, TestCase):
@@ -473,10 +472,10 @@ class AllowedAuthUserFormTest(SiteMixin, TestCase):
         instance = None
         form = AllowedAuthUserForm({'site': site.id, 'email': email})
         if is_valid_form:
-            self.assertTrue(form.is_valid())
+            assert form.is_valid()
             instance = form.save()
         else:
-            self.assertFalse(form.is_valid())
+            assert not form.is_valid()
             error = form.errors['email'][0]
         return error, instance
 
@@ -485,11 +484,8 @@ class AllowedAuthUserFormTest(SiteMixin, TestCase):
         Test form with wrong site's configuration.
         """
         error, _ = self._assert_form(self.site, self.valid_email)
-        self.assertEqual(
-            error,
-            "Please add a key/value 'THIRD_PARTY_AUTH_ONLY_DOMAIN/{site_email_domain}' in SiteConfiguration "
-            "model's site_values field."
-        )
+        assert error == "Please add a key/value 'THIRD_PARTY_AUTH_ONLY_DOMAIN/{site_email_domain}'" \
+                        " in SiteConfiguration model's site_values field."
 
     def test_form_with_invalid_domain_name(self):
         """
@@ -497,10 +493,7 @@ class AllowedAuthUserFormTest(SiteMixin, TestCase):
         """
         self._update_site_configuration()
         error, _ = self._assert_form(self.site, self.email_with_wrong_domain)
-        self.assertEqual(
-            error,
-            "Email doesn't have {email_domain_name} domain name.".format(email_domain_name=self.email_domain_name)
-        )
+        assert error == f"Email doesn't have {self.email_domain_name} domain name."
 
     def test_form_with_invalid_user(self):
         """
@@ -508,7 +501,7 @@ class AllowedAuthUserFormTest(SiteMixin, TestCase):
         """
         self._update_site_configuration()
         error, _ = self._assert_form(self.site, self.other_valid_email)
-        self.assertEqual(error, "User with this email doesn't exist in system.")
+        assert error == "User with this email doesn't exist in system."
 
     def test_form_creation(self):
         """
@@ -517,8 +510,8 @@ class AllowedAuthUserFormTest(SiteMixin, TestCase):
         self._update_site_configuration()
         _, allowed_auth_user = self._assert_form(self.site, self.valid_email, is_valid_form=True)
         db_allowed_auth_user = AllowedAuthUser.objects.all().first()
-        self.assertEqual(db_allowed_auth_user.site.id, allowed_auth_user.site.id)
-        self.assertEqual(db_allowed_auth_user.email, allowed_auth_user.email)
+        assert db_allowed_auth_user.site.id == allowed_auth_user.site.id
+        assert db_allowed_auth_user.email == allowed_auth_user.email
 
     def test_form_update(self):
         """
@@ -527,13 +520,13 @@ class AllowedAuthUserFormTest(SiteMixin, TestCase):
         self._update_site_configuration()
         UserFactory(email=self.other_valid_email)
         _, allowed_auth_user = self._assert_form(self.site, self.valid_email, is_valid_form=True)
-        self.assertEqual(AllowedAuthUser.objects.all().count(), 1)
+        assert AllowedAuthUser.objects.all().count() == 1
 
         # update the object with new instance.
         form = AllowedAuthUserForm({'site': self.site.id, 'email': self.other_valid_email}, instance=allowed_auth_user)
-        self.assertTrue(form.is_valid())
+        assert form.is_valid()
         form.save()
 
         db_allowed_auth_user = AllowedAuthUser.objects.all().first()
-        self.assertEqual(AllowedAuthUser.objects.all().count(), 1)
-        self.assertEqual(db_allowed_auth_user.email, self.other_valid_email)
+        assert AllowedAuthUser.objects.all().count() == 1
+        assert db_allowed_auth_user.email == self.other_valid_email

@@ -61,17 +61,17 @@ class AnonymousIndexPageTest(ModuleStoreTestCase):
         """
         self.client.logout()
         response = self.client.get(reverse('root'))
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
 
     @override_settings(FEATURES=FEATURES_WITH_STARTDATE)
     def test_anon_user_with_startdate_index(self):
         response = self.client.get('/')
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
 
     @override_settings(FEATURES=FEATURES_WO_STARTDATE)
     def test_anon_user_no_startdate_index(self):
         response = self.client.get('/')
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
 
     @override_settings(X_FRAME_OPTIONS='ALLOW')
     def test_allow_x_frame_options(self):
@@ -81,7 +81,7 @@ class AnonymousIndexPageTest(ModuleStoreTestCase):
 
         # check to see that the override value is honored
         resp = self.client.get('/')
-        self.assertEqual(resp['X-Frame-Options'], 'ALLOW')
+        assert resp['X-Frame-Options'] == 'ALLOW'
 
     def test_deny_x_frame_options(self):
         """
@@ -90,7 +90,7 @@ class AnonymousIndexPageTest(ModuleStoreTestCase):
 
         # check to see that the default setting is to DENY iframing
         resp = self.client.get('/')
-        self.assertEqual(resp['X-Frame-Options'], 'DENY')
+        assert resp['X-Frame-Options'] == 'DENY'
 
     def test_edge_redirect_to_login(self):
         """
@@ -105,9 +105,9 @@ class AnonymousIndexPageTest(ModuleStoreTestCase):
         response = index(request)
 
         # Response should be instance of HttpResponseRedirect.
-        self.assertIsInstance(response, HttpResponseRedirect)
+        assert isinstance(response, HttpResponseRedirect)
         # Location should be "/login".
-        self.assertEqual(response._headers.get("location")[1], "/login")  # pylint: disable=protected-access
+        assert response._headers.get('location')[1] == '/login'  # pylint: disable=protected-access
 
 
 class PreRequisiteCourseCatalog(ModuleStoreTestCase, LoginEnrollmentTestCase, MilestonesTestCaseMixin):
@@ -199,13 +199,13 @@ class IndexPageCourseCardsSortingTests(ModuleStoreTestCase):
         feature flag settings
         """
         response = self.client.get('/')
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
         # assert that the course discovery UI is not present
         self.assertNotContains(response, 'Search for a course')
 
         # check the /courses view
         response = self.client.get(reverse('courses'))
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
 
         # assert that the course discovery UI is not present
         self.assertNotContains(response, 'Search for a course')
@@ -223,13 +223,13 @@ class IndexPageCourseCardsSortingTests(ModuleStoreTestCase):
         feature flag settings
         """
         response = self.client.get('/')
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
         # assert that the course discovery UI is not present
         self.assertContains(response, 'Search for a course')
 
         # check the /courses view
         response = self.client.get(reverse('courses'))
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
 
         # assert that the course discovery UI is present
         self.assertContains(response, 'Search for a course')
@@ -241,25 +241,25 @@ class IndexPageCourseCardsSortingTests(ModuleStoreTestCase):
     @patch.dict('django.conf.settings.FEATURES', {'ENABLE_COURSE_DISCOVERY': False})
     def test_course_cards_sorted_by_default_sorting(self):
         response = self.client.get('/')
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
         ((template, context), _) = RENDER_MOCK.call_args  # pylint: disable=unpacking-non-sequence
-        self.assertEqual(template, 'index.html')
+        assert template == 'index.html'
 
         # by default the courses will be sorted by their creation dates, earliest first.
-        self.assertEqual(context['courses'][0].id, self.starting_earlier.id)
-        self.assertEqual(context['courses'][1].id, self.starting_later.id)
-        self.assertEqual(context['courses'][2].id, self.course_with_default_start_date.id)
+        assert context['courses'][0].id == self.starting_earlier.id
+        assert context['courses'][1].id == self.starting_later.id
+        assert context['courses'][2].id == self.course_with_default_start_date.id
 
         # check the /courses view
         response = self.client.get(reverse('courses'))
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
         ((template, context), _) = RENDER_MOCK.call_args  # pylint: disable=unpacking-non-sequence
-        self.assertEqual(template, 'courseware/courses.html')
+        assert template == 'courseware/courses.html'
 
         # by default the courses will be sorted by their creation dates, earliest first.
-        self.assertEqual(context['courses'][0].id, self.starting_earlier.id)
-        self.assertEqual(context['courses'][1].id, self.starting_later.id)
-        self.assertEqual(context['courses'][2].id, self.course_with_default_start_date.id)
+        assert context['courses'][0].id == self.starting_earlier.id
+        assert context['courses'][1].id == self.starting_later.id
+        assert context['courses'][2].id == self.course_with_default_start_date.id
 
     @patch('common.djangoapps.student.views.management.render_to_response', RENDER_MOCK)
     @patch('lms.djangoapps.courseware.views.views.render_to_response', RENDER_MOCK)
@@ -267,25 +267,25 @@ class IndexPageCourseCardsSortingTests(ModuleStoreTestCase):
     @patch.dict('django.conf.settings.FEATURES', {'ENABLE_COURSE_DISCOVERY': False})
     def test_course_cards_sorted_by_start_date_disabled(self):
         response = self.client.get('/')
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
         ((template, context), _) = RENDER_MOCK.call_args  # pylint: disable=unpacking-non-sequence
-        self.assertEqual(template, 'index.html')
+        assert template == 'index.html'
 
         # now the courses will be sorted by their announcement dates.
-        self.assertEqual(context['courses'][0].id, self.starting_later.id)
-        self.assertEqual(context['courses'][1].id, self.starting_earlier.id)
-        self.assertEqual(context['courses'][2].id, self.course_with_default_start_date.id)
+        assert context['courses'][0].id == self.starting_later.id
+        assert context['courses'][1].id == self.starting_earlier.id
+        assert context['courses'][2].id == self.course_with_default_start_date.id
 
         # check the /courses view as well
         response = self.client.get(reverse('courses'))
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
         ((template, context), _) = RENDER_MOCK.call_args  # pylint: disable=unpacking-non-sequence
-        self.assertEqual(template, 'courseware/courses.html')
+        assert template == 'courseware/courses.html'
 
         # now the courses will be sorted by their announcement dates.
-        self.assertEqual(context['courses'][0].id, self.starting_later.id)
-        self.assertEqual(context['courses'][1].id, self.starting_earlier.id)
-        self.assertEqual(context['courses'][2].id, self.course_with_default_start_date.id)
+        assert context['courses'][0].id == self.starting_later.id
+        assert context['courses'][1].id == self.starting_earlier.id
+        assert context['courses'][2].id == self.course_with_default_start_date.id
 
 
 class IndexPageProgramsTests(SiteMixin, ModuleStoreTestCase):
@@ -300,5 +300,5 @@ class IndexPageProgramsTests(SiteMixin, ModuleStoreTestCase):
         for url, dotted_path in views:
             with patch(dotted_path) as mock_get_programs_with_type:
                 response = self.client.get(url)
-                self.assertEqual(response.status_code, 200)
+                assert response.status_code == 200
                 mock_get_programs_with_type.assert_called_once()

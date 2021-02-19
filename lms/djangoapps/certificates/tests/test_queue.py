@@ -66,10 +66,10 @@ class XQueueCertInterfaceAddCertificateTest(ModuleStoreTestCase):
                 self.xqueue.add_cert(self.user, self.course.id)
 
         # Verify that the task was sent to the queue with the correct callback URL
-        self.assertTrue(mock_send.called)
+        assert mock_send.called
         __, kwargs = mock_send.call_args_list[0]
         actual_header = json.loads(kwargs['header'])
-        self.assertIn('https://edx.org/update_certificate?key=', actual_header['lms_callback_url'])
+        assert 'https://edx.org/update_certificate?key=' in actual_header['lms_callback_url']
 
     def test_no_create_action_in_queue_for_html_view_certs(self):
         """
@@ -80,10 +80,10 @@ class XQueueCertInterfaceAddCertificateTest(ModuleStoreTestCase):
                 self.xqueue.add_cert(self.user, self.course.id, generate_pdf=False)
 
         # Verify that add_cert method does not add message to queue
-        self.assertFalse(mock_send.called)
+        assert not mock_send.called
         certificate = GeneratedCertificate.eligible_certificates.get(user=self.user, course_id=self.course.id)
-        self.assertEqual(certificate.status, CertificateStatuses.downloadable)
-        self.assertIsNotNone(certificate.verify_uuid)
+        assert certificate.status == CertificateStatuses.downloadable
+        assert certificate.verify_uuid is not None
 
     @ddt.data('honor', 'audit')
     @override_settings(AUDIT_CERT_CUTOFF_DATE=datetime.now(pytz.UTC) - timedelta(days=1))
@@ -136,9 +136,9 @@ class XQueueCertInterfaceAddCertificateTest(ModuleStoreTestCase):
                 self.xqueue.add_cert(self.user_2, self.course.id)
 
         certificate = GeneratedCertificate.certificate_for_student(self.user_2, self.course.id)
-        self.assertIsNotNone(certificate)
-        self.assertEqual(certificate.mode, 'audit')
-        self.assertEqual(certificate.status, status)
+        assert certificate is not None
+        assert certificate.mode == 'audit'
+        assert certificate.status == status
 
     def add_cert_to_queue(self, mode):
         """
@@ -165,17 +165,17 @@ class XQueueCertInterfaceAddCertificateTest(ModuleStoreTestCase):
         template type.
         """
         # Verify that the task was sent to the queue with the correct callback URL
-        self.assertTrue(mock_send.called)
+        assert mock_send.called
         __, kwargs = mock_send.call_args_list[0]
 
         actual_header = json.loads(kwargs['header'])
-        self.assertIn('https://edx.org/update_certificate?key=', actual_header['lms_callback_url'])
+        assert 'https://edx.org/update_certificate?key=' in actual_header['lms_callback_url']
 
         body = json.loads(kwargs['body'])
-        self.assertIn(expected_template_name, body['template_pdf'])
+        assert expected_template_name in body['template_pdf']
 
         certificate = GeneratedCertificate.eligible_certificates.get(user=self.user_2, course_id=self.course.id)
-        self.assertEqual(certificate.mode, expected_mode)
+        assert certificate.mode == expected_mode
 
     def assert_ineligible_certificate_generated(self, mock_send, expected_mode):
         """
@@ -183,15 +183,15 @@ class XQueueCertInterfaceAddCertificateTest(ModuleStoreTestCase):
         correct mode.
         """
         # Ensure the certificate was not generated
-        self.assertFalse(mock_send.called)
+        assert not mock_send.called
 
         certificate = GeneratedCertificate.objects.get(
             user=self.user_2,
             course_id=self.course.id
         )
 
-        self.assertIn(certificate.status, (CertificateStatuses.audit_passing, CertificateStatuses.audit_notpassing))
-        self.assertEqual(certificate.mode, expected_mode)
+        assert certificate.status in (CertificateStatuses.audit_passing, CertificateStatuses.audit_notpassing)
+        assert certificate.mode == expected_mode
 
     @ddt.data(
         (CertificateStatuses.restricted, False),
@@ -216,9 +216,9 @@ class XQueueCertInterfaceAddCertificateTest(ModuleStoreTestCase):
         ):
             mock_send = self.add_cert_to_queue('verified')
             if should_generate:
-                self.assertTrue(mock_send.called)
+                assert mock_send.called
             else:
-                self.assertFalse(mock_send.called)
+                assert not mock_send.called
 
     @ddt.data(
         # Eligible and should stay that way
@@ -287,10 +287,7 @@ class XQueueCertInterfaceAddCertificateTest(ModuleStoreTestCase):
                 mock_send.return_value = (0, None)
                 self.xqueue.add_cert(self.user_2, self.course.id)
 
-        self.assertEqual(
-            GeneratedCertificate.objects.get(user=self.user_2, course_id=self.course.id).status,
-            expected_status
-        )
+        assert GeneratedCertificate.objects.get(user=self.user_2, course_id=self.course.id).status == expected_status
 
     def test_regen_cert_with_pdf_certificate(self):
         """
@@ -390,7 +387,7 @@ class XQueueCertInterfaceExampleCertificateTest(TestCase):
         self._assert_queue_task(mock_send, cert)
 
         # Verify the certificate status
-        self.assertEqual(cert.status, ExampleCertificate.STATUS_STARTED)
+        assert cert.status == ExampleCertificate.STATUS_STARTED
 
     def test_add_example_cert_error(self):
         cert = self._create_example_cert()
@@ -398,8 +395,8 @@ class XQueueCertInterfaceExampleCertificateTest(TestCase):
             self.xqueue.add_example_cert(cert)
 
         # Verify the error status of the certificate
-        self.assertEqual(cert.status, ExampleCertificate.STATUS_ERROR)
-        self.assertIn(self.ERROR_MSG, cert.error_reason)
+        assert cert.status == ExampleCertificate.STATUS_ERROR
+        assert self.ERROR_MSG in cert.error_reason
 
     def _create_example_cert(self):
         """Create an example certificate. """
@@ -434,11 +431,11 @@ class XQueueCertInterfaceExampleCertificateTest(TestCase):
             'example_certificate': True
         }
 
-        self.assertTrue(mock_send.called)
+        assert mock_send.called
 
         __, kwargs = mock_send.call_args_list[0]
         actual_header = json.loads(kwargs['header'])
         actual_body = json.loads(kwargs['body'])
 
-        self.assertEqual(expected_header, actual_header)
-        self.assertEqual(expected_body, actual_body)
+        assert expected_header == actual_header
+        assert expected_body == actual_body

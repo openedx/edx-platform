@@ -324,33 +324,21 @@ class BlockParentsMapTestCase(TransformerRegistryTestMixin, ModuleStoreTestCase)
             block_structure_result = xblock_key in block_structure
 
             # compare with expected value
-            self.assertEqual(
-                block_structure_result,
-                i in expected_accessible_blocks,
-                u"block_structure return value {0} not equal to expected value for block {1} for user {2}".format(
-                    block_structure_result, i, user.username
-                )
-            )
+            assert block_structure_result == (i in expected_accessible_blocks), \
+                f'block_structure return value {block_structure_result} not equal to expected value for block' \
+                f' {i} for user {user.username}'
 
             if blocks_with_differing_access:
                 # compare with has_access_result
                 has_access_result = bool(has_access(user, 'load', self.get_block(i), course_key=self.course.id))
                 if i in blocks_with_differing_access:
-                    self.assertNotEqual(
-                        block_structure_result,
-                        has_access_result,
-                        u"block structure ({0}) & has_access ({1}) results are equal for block {2} for user {3}".format(
-                            block_structure_result, has_access_result, i, user.username
-                        )
-                    )
+                    assert block_structure_result != has_access_result, \
+                        f'block structure ({block_structure_result}) & has_access ({has_access_result})' \
+                        f' results are equal for block {i} for user {user.username}'
                 else:
-                    self.assertEqual(
-                        block_structure_result,
-                        has_access_result,
-                        u"block structure ({0}) & has_access ({1}) results not equal for block {2} for user {3}".format(
-                            block_structure_result, has_access_result, i, user.username
-                        )
-                    )
+                    assert block_structure_result == has_access_result, \
+                        f'block structure ({block_structure_result}) & has_access ({has_access_result})' \
+                        f' results not equal for block {i} for user {user.username}'
 
         self.client.logout()
 

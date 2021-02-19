@@ -179,22 +179,19 @@ class GradesServiceTests(ModuleStoreTestCase):
             self.course.id,
             self.subsection.location
         )
-        self.assertIsNotNone(override_obj)
-        self.assertEqual(override_obj.earned_all_override, override['earned_all'])
-        self.assertEqual(override_obj.earned_graded_override, override['earned_graded'])
+        assert override_obj is not None
+        assert override_obj.earned_all_override == override['earned_all']
+        assert override_obj.earned_graded_override == override['earned_graded']
 
-        self.assertEqual(
-            self.mock_signal.call_args,
-            call(
-                sender=None,
-                user_id=self.user.id,
-                course_id=six.text_type(self.course.id),
-                usage_id=six.text_type(self.subsection.location),
-                only_if_higher=False,
-                modified=override_obj.modified,
-                score_deleted=False,
-                score_db_table=ScoreDatabaseTableEnum.overrides
-            )
+        assert self.mock_signal.call_args == call(
+            sender=None,
+            user_id=self.user.id,
+            course_id=six.text_type(self.course.id),
+            usage_id=six.text_type(self.subsection.location),
+            only_if_higher=False,
+            modified=override_obj.modified,
+            score_deleted=False,
+            score_db_table=ScoreDatabaseTableEnum.overrides
         )
 
     def test_override_subsection_grade_no_psg(self):
@@ -218,9 +215,9 @@ class GradesServiceTests(ModuleStoreTestCase):
             self.course.id,
             self.subsection_without_grade.location
         )
-        self.assertIsNotNone(subsection_grade)
-        self.assertEqual(0, subsection_grade.earned_all)
-        self.assertEqual(0, subsection_grade.earned_graded)
+        assert subsection_grade is not None
+        assert 0 == subsection_grade.earned_all
+        assert 0 == subsection_grade.earned_graded
 
         # Now assert things about the grade override
         override_obj = self.service.get_subsection_grade_override(
@@ -228,22 +225,19 @@ class GradesServiceTests(ModuleStoreTestCase):
             self.course.id,
             self.subsection_without_grade.location
         )
-        self.assertIsNotNone(override_obj)
-        self.assertEqual(override_obj.earned_all_override, earned_all_override)
-        self.assertEqual(override_obj.earned_graded_override, earned_graded_override)
+        assert override_obj is not None
+        assert override_obj.earned_all_override == earned_all_override
+        assert override_obj.earned_graded_override == earned_graded_override
 
-        self.assertEqual(
-            self.mock_signal.call_args,
-            call(
-                sender=None,
-                user_id=self.user.id,
-                course_id=six.text_type(self.course.id),
-                usage_id=six.text_type(self.subsection_without_grade.location),
-                only_if_higher=False,
-                modified=override_obj.modified,
-                score_deleted=False,
-                score_db_table=ScoreDatabaseTableEnum.overrides
-            )
+        assert self.mock_signal.call_args == call(
+            sender=None,
+            user_id=self.user.id,
+            course_id=six.text_type(self.course.id),
+            usage_id=six.text_type(self.subsection_without_grade.location),
+            only_if_higher=False,
+            modified=override_obj.modified,
+            score_deleted=False,
+            score_db_table=ScoreDatabaseTableEnum.overrides
         )
 
     @freeze_time('2017-01-01')
@@ -260,20 +254,17 @@ class GradesServiceTests(ModuleStoreTestCase):
         )
 
         override = self.service.get_subsection_grade_override(self.user.id, self.course.id, self.subsection.location)
-        self.assertIsNone(override)
+        assert override is None
 
-        self.assertEqual(
-            self.mock_signal.call_args,
-            call(
-                sender=None,
-                user_id=self.user.id,
-                course_id=six.text_type(self.course.id),
-                usage_id=six.text_type(self.subsection.location),
-                only_if_higher=False,
-                modified=datetime.now().replace(tzinfo=pytz.UTC),
-                score_deleted=True,
-                score_db_table=ScoreDatabaseTableEnum.overrides
-            )
+        assert self.mock_signal.call_args == call(
+            sender=None,
+            user_id=self.user.id,
+            course_id=six.text_type(self.course.id),
+            usage_id=six.text_type(self.subsection.location),
+            only_if_higher=False,
+            modified=datetime.now().replace(tzinfo=pytz.UTC),
+            score_deleted=True,
+            score_db_table=ScoreDatabaseTableEnum.overrides
         )
 
     def test_undo_override_subsection_grade_across_features(self):
@@ -294,7 +285,7 @@ class GradesServiceTests(ModuleStoreTestCase):
         )
 
         override = self.service.get_subsection_grade_override(self.user.id, self.course.id, self.subsection.location)
-        self.assertIsNotNone(override)
+        assert override is not None
 
     @freeze_time('2018-01-01')
     def test_undo_override_subsection_grade_without_grade(self):
@@ -313,11 +304,11 @@ class GradesServiceTests(ModuleStoreTestCase):
         except PersistentSubsectionGrade.DoesNotExist:
             assert False, 'Exception raised unexpectedly'
 
-        self.assertFalse(self.mock_signal.called)
+        assert not self.mock_signal.called
 
     def test_should_override_grade_on_rejected_exam(self):
-        self.assertTrue(self.service.should_override_grade_on_rejected_exam('course-v1:edX+DemoX+Demo_Course'))
+        assert self.service.should_override_grade_on_rejected_exam('course-v1:edX+DemoX+Demo_Course')
         self.mock_waffle_flags.return_value = {
             REJECTED_EXAM_OVERRIDES_GRADE: MockWaffleFlag(False)
         }
-        self.assertFalse(self.service.should_override_grade_on_rejected_exam('course-v1:edX+DemoX+Demo_Course'))
+        assert not self.service.should_override_grade_on_rejected_exam('course-v1:edX+DemoX+Demo_Course')

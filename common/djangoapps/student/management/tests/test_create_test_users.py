@@ -53,19 +53,19 @@ class CreateTestUsersTestCase(SharedModuleStoreTestCase):
         usernames = ['test_create_users_u1', 'test_create_users_u2']
 
         # Check users don't already exist
-        self.assertEqual(self.user_model.objects.filter(username__in=usernames).count(), 0)
+        assert self.user_model.objects.filter(username__in=usernames).count() == 0
 
         self.call_command(usernames)
 
         # Verify users were created, are active, and were created with default settings
         users = self.user_model.objects.filter(username__in=usernames).all()
-        self.assertEqual(len(users), len(usernames))
+        assert len(users) == len(usernames)
         for user in users:
-            self.assertTrue(user.is_active)
-            self.assertEqual(user.email, '{}@example.com'.format(user.username))
-            self.assertTrue(self.client.login(username=user.username, password='12345'))
+            assert user.is_active
+            assert user.email == '{}@example.com'.format(user.username)
+            assert self.client.login(username=user.username, password='12345')
 
-        self.assertFalse(CourseEnrollment.objects.filter(user__in=users).exists())
+        assert not CourseEnrollment.objects.filter(user__in=users).exists()
 
     def test_create_user__username_taken(self):
         """
@@ -86,11 +86,11 @@ class CreateTestUsersTestCase(SharedModuleStoreTestCase):
 
         # Check that the users exist and were enrolled in the course with the default settings
         users = self.user_model.objects.filter(username__in=usernames).all()
-        self.assertEqual(len(users), len(usernames))
+        assert len(users) == len(usernames)
         for user in users:
             enrollment = CourseEnrollment.get_enrollment(user, self.course.id)
-            self.assertEqual(enrollment.mode, 'audit')
-            self.assertFalse(CourseStaffRole(self.course.id).has_user(user))
+            assert enrollment.mode == 'audit'
+            assert not CourseStaffRole(self.course.id).has_user(user)
 
     def test_create_user_with_course__bad_course(self):
         """
@@ -100,9 +100,9 @@ class CreateTestUsersTestCase(SharedModuleStoreTestCase):
             self.call_command(['username1'], course='invalid_course_id')
 
         # Verify no users have been created
-        self.assertEqual(self.num_users_start, len(self.user_model.objects.all()))
+        assert self.num_users_start == len(self.user_model.objects.all())
         # Verify that no one is enrolled in the course
-        self.assertEqual(len(CourseEnrollment.objects.filter(course__id=self.course.id)), 0)
+        assert len(CourseEnrollment.objects.filter(course__id=self.course.id)) == 0
 
     def test_create_user__mode(self):
         """
@@ -115,7 +115,7 @@ class CreateTestUsersTestCase(SharedModuleStoreTestCase):
         # Verify enrollment
         user = self.user_model.objects.get(username='user1')
         enrollment = CourseEnrollment.get_enrollment(user, self.course.id)
-        self.assertEqual(enrollment.mode, 'verified')
+        assert enrollment.mode == 'verified'
 
     def test_create_user__mode__invalid(self):
         """
@@ -134,7 +134,7 @@ class CreateTestUsersTestCase(SharedModuleStoreTestCase):
         self.call_command([username], domain=domain)
 
         user = self.user_model.objects.get(username=username)
-        self.assertEqual(user.email, '{}@{}'.format(username, domain))
+        assert user.email == '{}@{}'.format(username, domain)
 
     def test_create_user__email_taken(self):
         """
@@ -142,7 +142,7 @@ class CreateTestUsersTestCase(SharedModuleStoreTestCase):
         """
         existing_username = 'some-username'
         self.user_model.objects.create_user(existing_username, 'taken_email@example.com', '12345')
-        with self.assertRaises(ValidationError):
+        with pytest.raises(ValidationError):
             self.call_command(['taken_email'], domain='example.com')
 
     def test_create_user__bad_domain(self):
@@ -150,9 +150,9 @@ class CreateTestUsersTestCase(SharedModuleStoreTestCase):
         Try to create a user with a bad email domain
         """
         username = 'user1'
-        with self.assertRaises(ValidationError):
+        with pytest.raises(ValidationError):
             self.call_command([username], domain='this-aint-no-domain')
-        self.assertFalse(self.user_model.objects.filter(username=username).exists())
+        assert not self.user_model.objects.filter(username=username).exists()
 
     def test_create_user__password(self):
         """
@@ -162,7 +162,7 @@ class CreateTestUsersTestCase(SharedModuleStoreTestCase):
         password = 'somepassword1234512341241234'
         self.call_command([username], password=password)
 
-        self.assertTrue(self.client.login(username=username, password=password))
+        assert self.client.login(username=username, password=password)
 
     def test_create_user__password__error(self):
         """
@@ -179,8 +179,8 @@ class CreateTestUsersTestCase(SharedModuleStoreTestCase):
 
         user = self.user_model.objects.get(username=username)
         enrollment = CourseEnrollment.get_enrollment(user, self.course.id)
-        self.assertEqual(enrollment.mode, 'audit')
-        self.assertTrue(CourseStaffRole(self.course.id).has_user(user))
+        assert enrollment.mode == 'audit'
+        assert CourseStaffRole(self.course.id).has_user(user)
 
     def test_create_user__course_staff__ignore_mode(self):
         """
@@ -191,8 +191,8 @@ class CreateTestUsersTestCase(SharedModuleStoreTestCase):
 
         user = self.user_model.objects.get(username=username)
         enrollment = CourseEnrollment.get_enrollment(user, self.course.id)
-        self.assertEqual(enrollment.mode, 'audit')
-        self.assertTrue(CourseStaffRole(self.course.id).has_user(user))
+        assert enrollment.mode == 'audit'
+        assert CourseStaffRole(self.course.id).has_user(user)
 
     def test_create_user__ignore_course_staff_and_mode_when_no_course(self):
         """
@@ -202,5 +202,5 @@ class CreateTestUsersTestCase(SharedModuleStoreTestCase):
         self.call_command([username], course_staff=True, mode='verified')
 
         user = self.user_model.objects.get(username=username)
-        self.assertFalse(CourseAccessRole.objects.filter(user=user).exists())
-        self.assertFalse(CourseEnrollment.objects.filter(user=user).exists())
+        assert not CourseAccessRole.objects.filter(user=user).exists()
+        assert not CourseEnrollment.objects.filter(user=user).exists()

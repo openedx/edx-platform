@@ -31,8 +31,8 @@ class TestMobilePlatform(TestCase):
     @ddt.unpack
     def test_platform_instance(self, user_agent, platform_name, version):
         platform = MobilePlatform.get_instance(user_agent)
-        self.assertEqual(platform_name, platform.NAME)
-        self.assertEqual(version, platform.version)
+        assert platform_name == platform.NAME
+        assert version == platform.version
 
     @ddt.data(
         ("Mozilla/5.0 (Linux; Android 5.1; Nexus 5 Build/LMY47I; wv) AppleWebKit/537.36 (KHTML, like Gecko) "
@@ -45,4 +45,4 @@ class TestMobilePlatform(TestCase):
         "edX/org.edx.mobile (0.1.5.2.5.1; OS Version 9.2 (Build 13C75))",
     )
     def test_non_mobile_app_requests(self, user_agent):
-        self.assertIsNone(MobilePlatform.get_instance(user_agent))
+        assert MobilePlatform.get_instance(user_agent) is None

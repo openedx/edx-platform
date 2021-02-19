@@ -50,10 +50,8 @@ class HtmlBlockCourseApiTestCase(unittest.TestCase):
         module = HtmlBlock(module_system, field_data, Mock())
 
         with override_settings(**settings):
-            self.assertEqual(module.student_view_data(), dict(
-                enabled=False,
-                message='To enable, set FEATURES["ENABLE_HTML_XBLOCK_STUDENT_VIEW_DATA"]',
-            ))
+            assert module.student_view_data() ==\
+                   dict(enabled=False, message='To enable, set FEATURES["ENABLE_HTML_XBLOCK_STUDENT_VIEW_DATA"]')
 
     @ddt.data(
         '<h1>Some content</h1>',  # Valid HTML
@@ -78,7 +76,7 @@ class HtmlBlockCourseApiTestCase(unittest.TestCase):
         field_data = DictFieldData({'data': html})
         module_system = get_test_system()
         module = HtmlBlock(module_system, field_data, Mock())
-        self.assertEqual(module.student_view_data(), dict(enabled=True, html=html))
+        assert module.student_view_data() == dict(enabled=True, html=html)
 
     @ddt.data(
         STUDENT_VIEW,
@@ -93,7 +91,7 @@ class HtmlBlockCourseApiTestCase(unittest.TestCase):
         module_system = get_test_system()
         module = HtmlBlock(module_system, field_data, Mock())
         rendered = module_system.render(module, view, {}).content
-        self.assertIn(html, rendered)
+        assert html in rendered
 
 
 class HtmlBlockSubstitutionTestCase(unittest.TestCase):  # lint-amnesty, pylint: disable=missing-class-docstring
@@ -103,7 +101,7 @@ class HtmlBlockSubstitutionTestCase(unittest.TestCase):  # lint-amnesty, pylint:
         field_data = DictFieldData({'data': sample_xml})
         module_system = get_test_system()
         module = HtmlBlock(module_system, field_data, Mock())
-        self.assertEqual(module.get_html(), str(module_system.anonymous_student_id))
+        assert module.get_html() == str(module_system.anonymous_student_id)
 
     def test_substitution_course_id(self):
         sample_xml = '''%%COURSE_ID%%'''
@@ -121,7 +119,7 @@ class HtmlBlockSubstitutionTestCase(unittest.TestCase):  # lint-amnesty, pylint:
             block_id='block_id'
         )
         module.scope_ids.usage_id = usage_key
-        self.assertEqual(module.get_html(), str(course_key))
+        assert module.get_html() == str(course_key)
 
     def test_substitution_without_magic_string(self):
         sample_xml = '''
@@ -132,7 +130,7 @@ class HtmlBlockSubstitutionTestCase(unittest.TestCase):  # lint-amnesty, pylint:
         field_data = DictFieldData({'data': sample_xml})
         module_system = get_test_system()
         module = HtmlBlock(module_system, field_data, Mock())
-        self.assertEqual(module.get_html(), sample_xml)
+        assert module.get_html() == sample_xml
 
     def test_substitution_without_anonymous_student_id(self):
         sample_xml = '''%%USER_ID%%'''
@@ -140,7 +138,7 @@ class HtmlBlockSubstitutionTestCase(unittest.TestCase):  # lint-amnesty, pylint:
         module_system = get_test_system()
         module_system.anonymous_student_id = None
         module = HtmlBlock(module_system, field_data, Mock())
-        self.assertEqual(module.get_html(), sample_xml)
+        assert module.get_html() == sample_xml
 
 
 class HtmlBlockIndexingTestCase(unittest.TestCase):
@@ -155,10 +153,8 @@ class HtmlBlockIndexingTestCase(unittest.TestCase):
             </html>
         '''
         descriptor = instantiate_descriptor(data=sample_xml)
-        self.assertEqual(descriptor.index_dictionary(), {
-            "content": {"html_content": " Hello World! ", "display_name": "Text"},
-            "content_type": "Text"
-        })
+        assert descriptor.index_dictionary() ==\
+               {'content': {'html_content': ' Hello World! ', 'display_name': 'Text'}, 'content_type': 'Text'}
 
     def test_index_dictionary_cdata_html_module(self):
         sample_xml_cdata = '''
@@ -168,10 +164,8 @@ class HtmlBlockIndexingTestCase(unittest.TestCase):
             </html>
         '''
         descriptor = instantiate_descriptor(data=sample_xml_cdata)
-        self.assertEqual(descriptor.index_dictionary(), {
-            "content": {"html_content": " This has CDATA in it. ", "display_name": "Text"},
-            "content_type": "Text"
-        })
+        assert descriptor.index_dictionary() ==\
+               {'content': {'html_content': ' This has CDATA in it. ', 'display_name': 'Text'}, 'content_type': 'Text'}
 
     def test_index_dictionary_multiple_spaces_html_module(self):
         sample_xml_tab_spaces = '''
@@ -180,10 +174,8 @@ class HtmlBlockIndexingTestCase(unittest.TestCase):
             </html>
         '''
         descriptor = instantiate_descriptor(data=sample_xml_tab_spaces)
-        self.assertEqual(descriptor.index_dictionary(), {
-            "content": {"html_content": " Text has spaces :) ", "display_name": "Text"},
-            "content_type": "Text"
-        })
+        assert descriptor.index_dictionary() ==\
+               {'content': {'html_content': ' Text has spaces :) ', 'display_name': 'Text'}, 'content_type': 'Text'}
 
     def test_index_dictionary_html_module_with_comment(self):
         sample_xml_comment = '''
@@ -193,10 +185,7 @@ class HtmlBlockIndexingTestCase(unittest.TestCase):
             </html>
         '''
         descriptor = instantiate_descriptor(data=sample_xml_comment)
-        self.assertEqual(descriptor.index_dictionary(), {
-            "content": {"html_content": " This has HTML comment in it. ", "display_name": "Text"},
-            "content_type": "Text"
-        })
+        assert descriptor.index_dictionary() == {'content': {'html_content': ' This has HTML comment in it. ', 'display_name': 'Text'}, 'content_type': 'Text'}  # pylint: disable=line-too-long
 
     def test_index_dictionary_html_module_with_both_comments_and_cdata(self):
         sample_xml_mix_comment_cdata = '''
@@ -209,10 +198,9 @@ class HtmlBlockIndexingTestCase(unittest.TestCase):
             </html>
         '''
         descriptor = instantiate_descriptor(data=sample_xml_mix_comment_cdata)
-        self.assertEqual(descriptor.index_dictionary(), {
-            "content": {"html_content": " This has HTML comment in it. HTML end. ", "display_name": "Text"},
-            "content_type": "Text"
-        })
+        assert descriptor.index_dictionary() ==\
+               {'content': {'html_content': ' This has HTML comment in it. HTML end. ',
+                            'display_name': 'Text'}, 'content_type': 'Text'}
 
     def test_index_dictionary_html_module_with_script_and_style_tags(self):
         sample_xml_style_script_tags = '''
@@ -229,10 +217,9 @@ class HtmlBlockIndexingTestCase(unittest.TestCase):
             </html>
         '''
         descriptor = instantiate_descriptor(data=sample_xml_style_script_tags)
-        self.assertEqual(descriptor.index_dictionary(), {
-            "content": {"html_content": " This has HTML comment in it. HTML end. ", "display_name": "Text"},
-            "content_type": "Text"
-        })
+        assert descriptor.index_dictionary() ==\
+               {'content': {'html_content': ' This has HTML comment in it. HTML end. ',
+                            'display_name': 'Text'}, 'content_type': 'Text'}
 
 
 class CourseInfoBlockTestCase(unittest.TestCase):

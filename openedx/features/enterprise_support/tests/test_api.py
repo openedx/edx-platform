@@ -20,6 +20,7 @@ from slumber.exceptions import HttpClientError
 from openedx.core.djangoapps.site_configuration.tests.factories import SiteFactory
 from openedx.core.djangolib.testing.utils import CacheIsolationTestCase, skip_unless_lms
 from openedx.features.enterprise_support.api import (
+    activate_learner_enterprise,
     _CACHE_MISS,
     ENTERPRISE_CUSTOMER_KEY_NAME,
     EnterpriseApiException,
@@ -381,6 +382,17 @@ class TestEnterpriseApi(EnterpriseServiceMockMixin, CacheIsolationTestCase):
         assert 'the-learner-data' == learner_data
         mock_api_client_class.assert_called_once_with(user=user)
         mock_client.fetch_enterprise_learner_data.assert_called_once_with(user)
+
+    def test_activate_learner_enterprise(self):
+        """
+        Test enterprise is activated successfully for user
+        """
+        request_mock = mock.MagicMock(session={}, user=self.user)
+        enterprise_customer_user = EnterpriseCustomerUserFactory(user_id=self.user.id)
+        enterprise_customer_uuid = enterprise_customer_user.enterprise_customer.uuid
+
+        activate_learner_enterprise(request_mock, self.user, enterprise_customer_uuid)
+        assert request_mock.session['enterprise_customer']['uuid'] == str(enterprise_customer_uuid)
 
     def test_get_enterprise_learner_data_from_db_no_data(self):
         assert [] == get_enterprise_learner_data_from_db(self.user)

@@ -20,15 +20,13 @@ class ResourceTemplatesTests(unittest.TestCase):
             'announcement.yaml',
             'anon_user_id.yaml'])
         got = set((t['template_id'] for t in TestClass.templates()))
-        self.assertEqual(expected, got)
+        assert expected == got
 
     def test_templates_no_suchdir(self):
-        self.assertEqual(len(TestClass2.templates()), 0)
+        assert len(TestClass2.templates()) == 0
 
     def test_get_template(self):
-        self.assertEqual(
-            TestClass.get_template('latex_html.yaml')['template_id'],
-            'latex_html.yaml')
+        assert TestClass.get_template('latex_html.yaml')['template_id'] == 'latex_html.yaml'
 
 
 class TestClass(ResourceTemplates):

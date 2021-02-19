@@ -85,10 +85,8 @@ class TestCCXModulestoreWrapper(SharedModuleStoreTestCase):
         """retrieving a course with a ccx key works"""
         expected = self.get_course(self.ccx_locator.to_course_locator())
         actual = self.get_course(self.ccx_locator)
-        self.assertEqual(
-            expected.location.course_key,
-            actual.location.course_key.to_course_locator())
-        self.assertEqual(expected.display_name, actual.display_name)
+        assert expected.location.course_key == actual.location.course_key.to_course_locator()
+        assert expected.display_name == actual.display_name
 
     def test_get_children(self):
         """the children of retrieved courses should be the same with course and ccx keys
@@ -104,9 +102,9 @@ class TestCCXModulestoreWrapper(SharedModuleStoreTestCase):
                 self.fail('course children exhausted before ccx children')
             if actual is None:
                 self.fail('ccx children exhausted before course children')
-            self.assertEqual(expected.display_name, actual.display_name)
-            self.assertEqual(expected.location.course_key, course_key)
-            self.assertEqual(actual.location.course_key, self.ccx_locator)
+            assert expected.display_name == actual.display_name
+            assert expected.location.course_key == course_key
+            assert actual.location.course_key == self.ccx_locator
 
     def test_has_item(self):
         """can verify that a location exists, using ccx block usage key"""
@@ -114,7 +112,7 @@ class TestCCXModulestoreWrapper(SharedModuleStoreTestCase):
             block_key = self.ccx_locator.make_usage_key(
                 item.location.block_type, item.location.block_id
             )
-            self.assertTrue(self.store.has_item(block_key))
+            assert self.store.has_item(block_key)
 
     def test_get_item(self):
         """can retrieve an item by a location key, using a ccx block usage key
@@ -127,8 +125,8 @@ class TestCCXModulestoreWrapper(SharedModuleStoreTestCase):
                 expected.location.block_type, expected.location.block_id
             )
             actual = self.store.get_item(block_key)
-            self.assertEqual(expected.display_name, actual.display_name)
-            self.assertEqual(expected.location, actual.location.to_block_locator())
+            assert expected.display_name == actual.display_name
+            assert expected.location == actual.location.to_block_locator()
 
     def test_publication_api(self):
         """verify that we can correctly discern a published item by ccx key"""
@@ -137,8 +135,8 @@ class TestCCXModulestoreWrapper(SharedModuleStoreTestCase):
                 block_key = self.ccx_locator.make_usage_key(
                     expected.location.block_type, expected.location.block_id
                 )
-                self.assertTrue(self.store.has_published_version(expected))
+                assert self.store.has_published_version(expected)
                 self.store.unpublish(block_key, self.user.id)
-                self.assertFalse(self.store.has_published_version(expected))
+                assert not self.store.has_published_version(expected)
                 self.store.publish(block_key, self.user.id)
-                self.assertTrue(self.store.has_published_version(expected))
+                assert self.store.has_published_version(expected)

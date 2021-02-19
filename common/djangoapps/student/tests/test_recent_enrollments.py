@@ -75,10 +75,10 @@ class TestRecentEnrollments(ModuleStoreTestCase, XssTestMixin):
 
         # get courses through iterating all courses
         courses_list = list(get_course_enrollments(self.student, None, []))
-        self.assertEqual(len(courses_list), 2)
+        assert len(courses_list) == 2
 
         recent_course_list = _get_recently_enrolled_courses(courses_list)
-        self.assertEqual(len(recent_course_list), 1)
+        assert len(recent_course_list) == 1
 
     def test_zero_second_delta(self):
         """
@@ -86,10 +86,10 @@ class TestRecentEnrollments(ModuleStoreTestCase, XssTestMixin):
         """
         self._configure_message_timeout(0)
         courses_list = list(get_course_enrollments(self.student, None, []))
-        self.assertEqual(len(courses_list), 2)
+        assert len(courses_list) == 2
 
         recent_course_list = _get_recently_enrolled_courses(courses_list)
-        self.assertEqual(len(recent_course_list), 0)
+        assert len(recent_course_list) == 0
 
     def test_enrollments_sorted_most_recent(self):
         """
@@ -114,15 +114,15 @@ class TestRecentEnrollments(ModuleStoreTestCase, XssTestMixin):
             courses.append(course)
 
         courses_list = list(get_course_enrollments(self.student, None, []))
-        self.assertEqual(len(courses_list), 6)
+        assert len(courses_list) == 6
 
         recent_course_list = _get_recently_enrolled_courses(courses_list)
-        self.assertEqual(len(recent_course_list), 5)
+        assert len(recent_course_list) == 5
 
-        self.assertEqual(recent_course_list[1].course.id, courses[0].id)
-        self.assertEqual(recent_course_list[2].course.id, courses[1].id)
-        self.assertEqual(recent_course_list[3].course.id, courses[2].id)
-        self.assertEqual(recent_course_list[4].course.id, courses[3].id)
+        assert recent_course_list[1].course.id == courses[0].id
+        assert recent_course_list[2].course.id == courses[1].id
+        assert recent_course_list[3].course.id == courses[2].id
+        assert recent_course_list[4].course.id == courses[3].id
 
         self.client.login(username=self.student.username, password=self.PASSWORD)
         response = self.client.get(reverse("dashboard"))
@@ -166,10 +166,10 @@ class TestRecentEnrollments(ModuleStoreTestCase, XssTestMixin):
 
         courses_enrollments = list(get_course_enrollments(self.student, None, []))
         courses_enrollments.sort(key=lambda x: x.created, reverse=True)
-        self.assertEqual(len(courses_enrollments), 3)
+        assert len(courses_enrollments) == 3
 
         recent_course_enrollments = _get_recently_enrolled_courses(courses_enrollments)
-        self.assertEqual(len(recent_course_enrollments), 2)
+        assert len(recent_course_enrollments) == 2
 
         self.assertContains(
             response,

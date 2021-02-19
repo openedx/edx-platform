@@ -2,6 +2,7 @@
 Test cases for catalog_integrations command.
 """
 
+import pytest
 from django.test import TestCase  # lint-amnesty, pylint: disable=unused-import
 from django.core.management import call_command, CommandError
 
@@ -18,14 +19,14 @@ class TestCreateCatalogIntegrations(CatalogIntegrationMixin, CacheIsolationTestC
         ''' Test that required values are supplied '''
 
         # test without service_username
-        with self.assertRaises(CommandError):
+        with pytest.raises(CommandError):
             call_command(
                 "create_catalog_integrations",
                 "--internal_api_url", self.catalog_integration_defaults['internal_api_url'],
             )
 
         # test without internal_api_url
-        with self.assertRaises(CommandError):
+        with pytest.raises(CommandError):
             call_command(
                 "create_catalog_integrations",
                 "--service_username", self.catalog_integration_defaults['service_username'],
@@ -46,24 +47,12 @@ class TestCreateCatalogIntegrations(CatalogIntegrationMixin, CacheIsolationTestC
         current = CatalogIntegration.current()
 
         # assert current has changed
-        self.assertNotEqual(
-            initial,
-            current
-        )
+        assert initial != current
 
-        self.assertEqual(
-            current.enabled,
-            False
-        )
-        self.assertEqual(
-            current.internal_api_url,
-            self.catalog_integration_defaults['internal_api_url']
-        )
+        assert current.enabled is False
+        assert current.internal_api_url == self.catalog_integration_defaults['internal_api_url']
 
-        self.assertEqual(
-            current.service_username,
-            self.catalog_integration_defaults['service_username']
-        )
+        assert current.service_username == self.catalog_integration_defaults['service_username']
 
     def test_with_optional(self):
         ''' Test with optionals arguments supplied'''
@@ -80,24 +69,12 @@ class TestCreateCatalogIntegrations(CatalogIntegrationMixin, CacheIsolationTestC
         current = CatalogIntegration.current()
 
         # assert current has changed
-        self.assertNotEqual(
-            initial,
-            current
-        )
+        assert initial != current
 
-        self.assertEqual(
-            current.enabled,
-            True
-        )
-        self.assertEqual(
-            current.internal_api_url,
-            self.catalog_integration_defaults['internal_api_url']
-        )
+        assert current.enabled is True
+        assert current.internal_api_url == self.catalog_integration_defaults['internal_api_url']
 
-        self.assertEqual(
-            current.service_username,
-            self.catalog_integration_defaults['service_username']
-        )
+        assert current.service_username == self.catalog_integration_defaults['service_username']
 
         # test with all args
         call_command(
@@ -113,35 +90,14 @@ class TestCreateCatalogIntegrations(CatalogIntegrationMixin, CacheIsolationTestC
         current = CatalogIntegration.current()
 
         # assert current has changed
-        self.assertNotEqual(
-            initial,
-            current
-        )
+        assert initial != current
 
-        self.assertEqual(
-            current.enabled,
-            True
-        )
-        self.assertEqual(
-            current.internal_api_url,
-            self.catalog_integration_defaults['internal_api_url']
-        )
+        assert current.enabled is True
+        assert current.internal_api_url == self.catalog_integration_defaults['internal_api_url']
 
-        self.assertEqual(
-            current.service_username,
-            self.catalog_integration_defaults['service_username']
-        )
+        assert current.service_username == self.catalog_integration_defaults['service_username']
 
-        self.assertEqual(
-            current.cache_ttl,
-            500
-        )
+        assert current.cache_ttl == 500
 
-        self.assertEqual(
-            current.long_term_cache_ttl,
-            500
-        )
-        self.assertEqual(
-            current.page_size,
-            500
-        )
+        assert current.long_term_cache_ttl == 500
+        assert current.page_size == 500

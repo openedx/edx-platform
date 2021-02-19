@@ -2,7 +2,7 @@
 
 
 from collections import namedtuple
-
+import pytest
 import ddt
 from django.test.utils import override_settings
 from mock import sentinel
@@ -247,7 +247,7 @@ class EventTransformerRegistryTestCase(EventTrackingTestCase):
     def test_event_registry_dispatch(self, event_name, expected_transformer):
         event = {'name': event_name}
         transformer = self.registry.create_transformer(event)
-        self.assertIsInstance(transformer, expected_transformer)
+        assert isinstance(transformer, expected_transformer)
 
     @ddt.data(
         'edx.ui.lms.sequence.next_selected.what',
@@ -256,7 +256,7 @@ class EventTransformerRegistryTestCase(EventTrackingTestCase):
     )
     def test_dispatch_to_nonexistent_events(self, event_name):
         event = {'name': event_name}
-        with self.assertRaises(KeyError):
+        with pytest.raises(KeyError):
             self.registry.create_transformer(event)
 
 
@@ -293,13 +293,13 @@ class PrefixedEventProcessorTestCase(EventTrackingTestCase):
         else:
             offset = -1
         if sequence_ddt.legacy_event_type:
-            self.assertEqual(result[u'event_type'], sequence_ddt.legacy_event_type)
-            self.assertEqual(result[u'event'][u'old'], sequence_ddt.current_tab)
-            self.assertEqual(result[u'event'][u'new'], sequence_ddt.current_tab + offset)
+            assert result[u'event_type'] == sequence_ddt.legacy_event_type
+            assert result[u'event'][u'old'] == sequence_ddt.current_tab
+            assert result[u'event'][u'new'] == (sequence_ddt.current_tab + offset)
         else:
-            self.assertNotIn(u'event_type', result)
-            self.assertNotIn(u'old', result[u'event'])
-            self.assertNotIn(u'new', result[u'event'])
+            assert u'event_type' not in result
+            assert u'old' not in result[u'event']
+            assert u'new' not in result[u'event']
 
     def test_sequence_tab_navigation(self):
         event_name = u'edx.ui.lms.sequence.tab_selected'
@@ -316,6 +316,6 @@ class PrefixedEventProcessorTestCase(EventTrackingTestCase):
 
         process_event_shim = PrefixedEventProcessor()
         result = process_event_shim(event)
-        self.assertEqual(result[u'event_type'], u'seq_goto')
-        self.assertEqual(result[u'event'][u'old'], 2)
-        self.assertEqual(result[u'event'][u'new'], 5)
+        assert result[u'event_type'] == u'seq_goto'
+        assert result[u'event'][u'old'] == 2
+        assert result[u'event'][u'new'] == 5

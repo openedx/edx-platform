@@ -35,10 +35,10 @@ class TestCourseGradeFactory(GradeTestBase):
         Asserts whether the given course_grade is as expected with
         zero values.
         """
-        self.assertIsInstance(course_grade, expected_grade_class)
-        self.assertIsNone(course_grade.letter_grade)
-        self.assertEqual(course_grade.percent, 0.0)
-        self.assertIsNotNone(course_grade.chapter_grades)
+        assert isinstance(course_grade, expected_grade_class)
+        assert course_grade.letter_grade is None
+        assert course_grade.percent == 0.0
+        assert course_grade.chapter_grades is not None
 
     def test_course_grade_no_access(self):
         """
@@ -46,12 +46,12 @@ class TestCourseGradeFactory(GradeTestBase):
         """
         invisible_course = CourseFactory.create(visible_to_staff_only=True)
         access = has_access(self.request.user, 'load', invisible_course)
-        self.assertEqual(access.has_access, False)
-        self.assertEqual(access.error_code, 'not_visible_to_user')
+        assert access.has_access is False
+        assert access.error_code == 'not_visible_to_user'
 
         # with self.assertNoExceptionRaised: <- this isn't a real method, it's an implicit assumption
         grade = CourseGradeFactory().read(self.request.user, invisible_course)
-        self.assertEqual(grade.percent, 0)
+        assert grade.percent == 0
 
     @patch.dict(settings.FEATURES, {'PERSISTENT_GRADES_ENABLED_FOR_ALL_TESTS': False})
     @ddt.data(
@@ -73,7 +73,7 @@ class TestCourseGradeFactory(GradeTestBase):
         ):
             with patch('lms.djangoapps.grades.models.PersistentCourseGrade.read') as mock_read_grade:
                 grade_factory.read(self.request.user, self.course)
-        self.assertEqual(mock_read_grade.called, feature_flag and course_setting)
+        assert mock_read_grade.called == (feature_flag and course_setting)
 
     def test_read_and_update(self):
         grade_factory = CourseGradeFactory()
@@ -87,20 +87,20 @@ class TestCourseGradeFactory(GradeTestBase):
             _assert_section_order(course_grade)
 
         def _assert_grade_values(course_grade, expected_pass, expected_percent):
-            self.assertEqual(course_grade.letter_grade, u'Pass' if expected_pass else None)
-            self.assertEqual(course_grade.percent, expected_percent)
+            assert course_grade.letter_grade == (u'Pass' if expected_pass else None)
+            assert course_grade.percent == expected_percent
 
         def _assert_section_order(course_grade):
             sections = course_grade.chapter_grades[self.chapter.location]['sections']
-            self.assertEqual(
-                [section.display_name for section in sections],
-                [self.sequence.display_name, self.sequence2.display_name]
-            )
+            assert [section.display_name for section in sections] == [
+                self.sequence.display_name,
+                self.sequence2.display_name
+            ]
 
         with self.assertNumQueries(3), mock_get_score(1, 2):
             _assert_read(expected_pass=False, expected_percent=0)  # start off with grade of 0
 
-        num_queries = 42
+        num_queries = 44
         with self.assertNumQueries(num_queries), mock_get_score(1, 2):
             grade_factory.update(self.request.user, self.course, force_update_subsections=True)
 
@@ -121,7 +121,7 @@ class TestCourseGradeFactory(GradeTestBase):
         with self.assertNumQueries(3):
             _assert_read(expected_pass=True, expected_percent=1.0)  # updated to grade of 1.0
 
-        num_queries = 30
+        num_queries = 28
         with self.assertNumQueries(num_queries), mock_get_score(0, 0):  # the subsection now is worth zero
             grade_factory.update(self.request.user, self.course, force_update_subsections=True)
 
@@ -138,7 +138,7 @@ class TestCourseGradeFactory(GradeTestBase):
             if create_if_needed or assume_zero_enabled:
                 self._assert_zero_grade(course_grade, ZeroCourseGrade if assume_zero_enabled else CourseGrade)
             else:
-                self.assertIsNone(course_grade)
+                assert course_grade is None
 
     def test_read_optimization(self):
         grade_factory = CourseGradeFactory()
@@ -146,14 +146,17 @@ class TestCourseGradeFactory(GradeTestBase):
             mocked_course_blocks.return_value = self.course_structure
             with mock_get_score(1, 2):
                 grade_factory.update(self.request.user, self.course, force_update_subsections=True)
-                self.assertEqual(mocked_course_blocks.call_count, 1)
+                assert mocked_course_blocks.call_count == 1
 
         with patch('lms.djangoapps.grades.course_data.get_course_blocks') as mocked_course_blocks:
             with patch('lms.djangoapps.grades.subsection_grade.get_score') as mocked_get_score:
                 course_grade = grade_factory.read(self.request.user, self.course)
-                self.assertEqual(course_grade.percent, 0.5)  # make sure it's not a zero-valued course grade
-                self.assertFalse(mocked_get_score.called)  # no calls to CSM/submissions tables
-                self.assertFalse(mocked_course_blocks.called)  # no user-specific transformer calculation
+                assert course_grade.percent == 0.5
+                # make sure it's not a zero-valued course grade
+                assert not mocked_get_score.called
+                # no calls to CSM/submissions tables
+                assert not mocked_course_blocks.called
+                # no user-specific transformer calculation
 
     def test_subsection_grade(self):
         grade_factory = CourseGradeFactory()
@@ -161,13 +164,13 @@ class TestCourseGradeFactory(GradeTestBase):
             grade_factory.update(self.request.user, self.course, force_update_subsections=True)
         course_grade = grade_factory.read(self.request.user, course_structure=self.course_structure)
         subsection_grade = course_grade.subsection_grade(self.sequence.location)
-        self.assertEqual(subsection_grade.percent_graded, 0.5)
+        assert subsection_grade.percent_graded == 0.5
 
     def test_subsection_type_graders(self):
         graders = CourseGrade.get_subsection_type_graders(self.course)
-        self.assertEqual(len(graders), 2)
-        self.assertEqual(graders["Homework"].type, "Homework")
-        self.assertEqual(graders["NoCredit"].min_count, 0)
+        assert len(graders) == 2
+        assert graders['Homework'].type == 'Homework'
+        assert graders['NoCredit'].min_count == 0
 
     def test_create_zero_subs_grade_for_nonzero_course_grade(self):
         subsection = self.course_structure[self.sequence.location]
@@ -176,8 +179,8 @@ class TestCourseGradeFactory(GradeTestBase):
         course_grade = CourseGradeFactory().update(self.request.user, self.course)
         subsection1_grade = course_grade.subsection_grades[self.sequence.location]
         subsection2_grade = course_grade.subsection_grades[self.sequence2.location]
-        self.assertIsInstance(subsection1_grade, ReadSubsectionGrade)
-        self.assertIsInstance(subsection2_grade, ZeroSubsectionGrade)
+        assert isinstance(subsection1_grade, ReadSubsectionGrade)
+        assert isinstance(subsection2_grade, ZeroSubsectionGrade)
 
     @ddt.data(True, False)
     def test_iter_force_update(self, force_update):
@@ -185,7 +188,7 @@ class TestCourseGradeFactory(GradeTestBase):
             set(CourseGradeFactory().iter(
                 users=[self.request.user], course=self.course, force_update=force_update,
             ))
-        self.assertEqual(mock_update.called, force_update)
+        assert mock_update.called == force_update
 
     def test_course_grade_summary(self):
         with mock_get_score(1, 2):
@@ -240,7 +243,7 @@ class TestCourseGradeFactory(GradeTestBase):
                 },
             ]
         }
-        self.assertEqual(expected_summary, actual_summary)
+        assert expected_summary == actual_summary
 
 
 class TestGradeIteration(SharedModuleStoreTestCase):
@@ -278,7 +281,7 @@ class TestGradeIteration(SharedModuleStoreTestCase):
         iterator, but it shouldn't error.
         """
         grade_results = list(CourseGradeFactory().iter([], self.course))
-        self.assertEqual(grade_results, [])
+        assert grade_results == []
 
     def test_all_empty_grades(self):
         """
@@ -290,12 +293,12 @@ class TestGradeIteration(SharedModuleStoreTestCase):
             wraps=BlockStructureFactory.create_from_store
         ) as mock_create_from_store:
             all_course_grades, all_errors = self._course_grades_and_errors_for(self.course, self.students)
-            self.assertEqual(mock_create_from_store.call_count, 1)
+            assert mock_create_from_store.call_count == 1
 
-        self.assertEqual(len(all_errors), 0)
+        assert len(all_errors) == 0
         for course_grade in all_course_grades.values():
-            self.assertIsNone(course_grade.letter_grade)
-            self.assertEqual(course_grade.percent, 0.0)
+            assert course_grade.letter_grade is None
+            assert course_grade.percent == 0.0
 
     @patch('lms.djangoapps.grades.course_grade_factory.CourseGradeFactory.read')
     def test_grading_exception(self, mock_course_grade):
@@ -317,25 +320,22 @@ class TestGradeIteration(SharedModuleStoreTestCase):
         ]
         with self.assertNumQueries(8):
             all_course_grades, all_errors = self._course_grades_and_errors_for(self.course, self.students)
-        self.assertEqual(
-            {student: text_type(all_errors[student]) for student in all_errors},
-            {
-                student3: "Error for student3.",
-                student4: "Error for student4.",
-            }
-        )
+        assert {student: text_type(all_errors[student]) for student in all_errors} == {
+            student3: 'Error for student3.',
+            student4: 'Error for student4.'
+        }
 
         # But we should still have five gradesets
-        self.assertEqual(len(all_course_grades), 5)
+        assert len(all_course_grades) == 5
 
         # Even though two will simply be empty
-        self.assertIsNone(all_course_grades[student3])
-        self.assertIsNone(all_course_grades[student4])
+        assert all_course_grades[student3] is None
+        assert all_course_grades[student4] is None
 
         # The rest will have grade information in them
-        self.assertIsNotNone(all_course_grades[student1])
-        self.assertIsNotNone(all_course_grades[student2])
-        self.assertIsNotNone(all_course_grades[student5])
+        assert all_course_grades[student1] is not None
+        assert all_course_grades[student2] is not None
+        assert all_course_grades[student5] is not None
 
     def _course_grades_and_errors_for(self, course, students):
         """

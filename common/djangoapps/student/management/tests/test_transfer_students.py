@@ -51,8 +51,8 @@ class TestTransferStudents(ModuleStoreTestCase):
         """
         Signal Receiver stub for testing that the unenroll signal was fired.
         """
-        self.assertFalse(self.signal_fired)
-        self.assertTrue(skip_refund)
+        assert not self.signal_fired
+        assert skip_refund
         self.signal_fired = True
 
     def test_transfer_students(self):
@@ -89,7 +89,7 @@ class TestTransferStudents(ModuleStoreTestCase):
             '--from', original_key,
             '--to', new_key_one, new_key_two,
         )
-        self.assertTrue(self.signal_fired)
+        assert self.signal_fired
 
         # Confirm the analytics event was emitted.
         self.mock_tracker.emit.assert_has_calls(
@@ -127,9 +127,9 @@ class TestTransferStudents(ModuleStoreTestCase):
         self.mock_tracker.reset_mock()
 
         # Confirm the enrollment mode is verified on the new courses, and enrollment is enabled as appropriate.
-        self.assertEqual((mode, False), CourseEnrollment.enrollment_mode_for_user(student, course.id))
-        self.assertEqual((mode, True), CourseEnrollment.enrollment_mode_for_user(student, new_course_one.id))
-        self.assertEqual((mode, True), CourseEnrollment.enrollment_mode_for_user(student, new_course_two.id))
+        assert (mode, False) == CourseEnrollment.enrollment_mode_for_user(student, course.id)
+        assert (mode, True) == CourseEnrollment.enrollment_mode_for_user(student, new_course_one.id)
+        assert (mode, True) == CourseEnrollment.enrollment_mode_for_user(student, new_course_two.id)
 
     def _create_course(self, course_location):
         """

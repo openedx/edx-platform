@@ -82,7 +82,7 @@ class TestGradebook(SharedModuleStoreTestCase):
             args=(text_type(self.course.id),)
         ))
 
-        self.assertEqual(self.response.status_code, 200)
+        assert self.response.status_code == 200
 
 
 class TestDefaultGradingPolicy(TestGradebook):
@@ -92,22 +92,22 @@ class TestDefaultGradingPolicy(TestGradebook):
     """
     def test_all_users_listed(self):
         for user in self.users:
-            self.assertIn(user.username, text_type(self.response.content, 'utf-8'))
+            assert user.username in text_type(self.response.content, 'utf-8')
 
     def test_default_policy(self):
         # Default >= 50% passes, so Users 5-10 should be passing for Homework 1 [6]
         # One use at the top of the page [1]
-        self.assertEqual(7, self.response.content.count(b'grade_Pass'))
+        assert 7 == self.response.content.count(b'grade_Pass')
 
         # Users 1-5 attempted Homework 1 (and get Fs) [4]
         # Users 1-10 attempted any homework (and get Fs) [10]
         # Users 4-10 scored enough to not get rounded to 0 for the class (and get Fs) [7]
         # One use at top of the page [1]
-        self.assertEqual(23, self.response.content.count(b'grade_F'))
+        assert 23 == self.response.content.count(b'grade_F')
 
         # All other grades are None [29 categories * 11 users - 27 non-empty grades = 292]
         # One use at the top of the page [1]
-        self.assertEqual(292, self.response.content.count(b'grade_None'))
+        assert 292 == self.response.content.count(b'grade_None')
 
 
 class TestLetterCutoffPolicy(TestGradebook):
@@ -144,29 +144,29 @@ class TestLetterCutoffPolicy(TestGradebook):
         # Users 9-10 have >= 90% on Homeworks [2]
         # Users 9-10 have >= 90% on the class [2]
         # One use at the top of the page [1]
-        self.assertEqual(5, self.response.content.count(b'grade_A'))
+        assert 5 == self.response.content.count(b'grade_A')
 
         # User 8 has 80 <= Homeworks < 90 [1]
         # User 8 has 80 <= class < 90 [1]
         # One use at the top of the page [1]
-        self.assertEqual(3, self.response.content.count(b'grade_B'))
+        assert 3 == self.response.content.count(b'grade_B')
 
         # User 7 has 70 <= Homeworks < 80 [1]
         # User 7 has 70 <= class < 80 [1]
         # One use at the top of the page [1]
-        self.assertEqual(3, self.response.content.count(b'grade_C'))
+        assert 3 == self.response.content.count(b'grade_C')
 
         # User 6 has 60 <= Homeworks < 70 [1]
         # User 6 has 60 <= class < 70 [1]
         # One use at the top of the page [1]
-        self.assertEqual(3, self.response.content.count(b'grade_C'))
+        assert 3 == self.response.content.count(b'grade_C')
 
         # Users 1-5 have 60% > grades > 0 on Homeworks [5]
         # Users 1-5 have 60% > grades > 0 on the class [5]
         # One use at top of the page [1]
-        self.assertEqual(11, self.response.content.count(b'grade_F'))
+        assert 11 == self.response.content.count(b'grade_F')
 
         # User 0 has 0 on Homeworks [1]
         # User 0 has 0 on the class [1]
         # One use at the top of the page [1]
-        self.assertEqual(3, self.response.content.count(b'grade_None'))
+        assert 3 == self.response.content.count(b'grade_None')

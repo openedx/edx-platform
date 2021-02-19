@@ -4,7 +4,7 @@ Tests for compute_grades management command.
 
 # pylint: disable=protected-access
 
-
+import pytest
 import ddt
 import six
 from six.moves import range
@@ -46,13 +46,10 @@ class TestComputeGrades(SharedModuleStoreTestCase):
 
     def test_specify_courses(self):
         courses = self.command._get_course_keys({'courses': [self.course_keys[0], self.course_keys[1], 'd/n/e']})
-        self.assertEqual(
-            [six.text_type(course) for course in courses],
-            [self.course_keys[0], self.course_keys[1], 'd/n/e'],
-        )
+        assert [six.text_type(course) for course in courses] == [self.course_keys[0], self.course_keys[1], 'd/n/e']
 
     def test_selecting_invalid_course(self):
-        with self.assertRaises(CommandError):
+        with pytest.raises(CommandError):
             self.command._get_course_keys({'courses': [self.course_keys[0], self.course_keys[1], 'badcoursekey']})
 
     def test_from_settings(self):
@@ -61,7 +58,7 @@ class TestComputeGrades(SharedModuleStoreTestCase):
         assert set(six.text_type(course) for course in courses) == set(self.course_keys)
         # test that --from_settings always uses the latest setting
         ComputeGradesSetting.objects.create(course_ids='badcoursekey')
-        with self.assertRaises(CommandError):
+        with pytest.raises(CommandError):
             self.command._get_course_keys({'from_settings': True})
 
     @ddt.data(True, False)

@@ -22,5 +22,5 @@ requests==2.25.1          # via -r requirements/edx/paver.in
 six==1.15.0               # via libsass, mock, paver, python-memcached, stevedore
 stevedore==1.32.0         # via -c requirements/edx/../constraints.txt, -r requirements/edx/paver.in, edx-opaque-keys
 urllib3==1.26.3           # via requests
-watchdog==2.0.0           # via -r requirements/edx/paver.in
+watchdog==2.0.1           # via -r requirements/edx/paver.in
 wrapt==1.11.2             # via -c requirements/edx/../constraints.txt, -r requirements/edx/paver.in

@@ -4,7 +4,7 @@ Tests for program enrollment reading Python API.
 
 
 from uuid import UUID
-
+import pytest
 import ddt
 from django.contrib.auth import get_user_model
 from django.core.cache import cache
@@ -557,7 +557,7 @@ class GetUsersByExternalKeysTests(CacheIsolationTestCase):
         not include the requested program uuid.
         """
         fake_program_uuid = UUID('80cc59e5-003e-4664-a582-48da44bc7e12')
-        with self.assertRaises(ProgramDoesNotExistException):
+        with pytest.raises(ProgramDoesNotExistException):
             get_users_by_external_keys(fake_program_uuid, [])
 
     def test_catalog_program_missing_org(self):
@@ -570,7 +570,7 @@ class GetUsersByExternalKeysTests(CacheIsolationTestCase):
             authoring_organizations=[]
         )
         cache.set(PROGRAM_CACHE_KEY_TPL.format(uuid=self.program_uuid), program, None)
-        with self.assertRaises(OrganizationDoesNotExistException):
+        with pytest.raises(OrganizationDoesNotExistException):
             get_users_by_external_keys(self.program_uuid, [])
 
     def test_lms_organization_not_found(self):
@@ -580,7 +580,7 @@ class GetUsersByExternalKeysTests(CacheIsolationTestCase):
         """
         organization = OrganizationFactory.create(short_name='some_other_org')
         SAMLProviderConfigFactory.create(organization=organization)
-        with self.assertRaises(OrganizationDoesNotExistException):
+        with pytest.raises(OrganizationDoesNotExistException):
             get_users_by_external_keys(self.program_uuid, [])
 
     def test_saml_provider_not_found(self):
@@ -589,7 +589,7 @@ class GetUsersByExternalKeysTests(CacheIsolationTestCase):
         program's organization.
         """
         OrganizationFactory.create(short_name=self.organization_key)
-        with self.assertRaises(ProviderDoesNotExistException):
+        with pytest.raises(ProviderDoesNotExistException):
             get_users_by_external_keys(self.program_uuid, [])
 
     def test_extra_saml_provider_disabled(self):
@@ -616,7 +616,7 @@ class GetUsersByExternalKeysTests(CacheIsolationTestCase):
         SAMLProviderConfigFactory.create(
             organization=organization, slug='foox', enabled=True
         )
-        with self.assertRaises(ProviderConfigurationException):
+        with pytest.raises(ProviderConfigurationException):
             get_users_by_external_keys(self.program_uuid, [])
 
 

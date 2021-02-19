@@ -98,7 +98,7 @@ class TestFieldOverrides(FieldOverrideTestMixin, SharedModuleStoreTestCase):
         ccx_start = datetime.datetime(2014, 12, 25, 00, 00, tzinfo=pytz.UTC)
         chapter = self.ccx_course.get_children()[0]
         override_field_for_ccx(self.ccx, chapter, 'start', ccx_start)
-        self.assertEqual(chapter.start, ccx_start)
+        assert chapter.start == ccx_start
 
     def test_override_num_queries_new_field(self):
         """
@@ -156,8 +156,8 @@ class TestFieldOverrides(FieldOverrideTestMixin, SharedModuleStoreTestCase):
         ccx_start = datetime.datetime(2014, 12, 25, 00, 00, tzinfo=pytz.UTC)
         chapter = self.ccx_course.get_children()[0]
         override_field_for_ccx(self.ccx, chapter, 'start', ccx_start)
-        self.assertEqual(chapter.get_children()[0].start, ccx_start)
-        self.assertEqual(chapter.get_children()[1].start, ccx_start)
+        assert chapter.get_children()[0].start == ccx_start
+        assert chapter.get_children()[1].start == ccx_start
 
     def test_override_is_inherited_even_if_set_in_mooc(self):
         """
@@ -170,4 +170,4 @@ class TestFieldOverrides(FieldOverrideTestMixin, SharedModuleStoreTestCase):
         chapter.display_name = 'itsme!'
         override_field_for_ccx(self.ccx, chapter, 'due', ccx_due)
         vertical = chapter.get_children()[0].get_children()[0]
-        self.assertEqual(vertical.due, ccx_due)
+        assert vertical.due == ccx_due

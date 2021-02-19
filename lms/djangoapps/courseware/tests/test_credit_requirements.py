@@ -69,7 +69,7 @@ class ProgressPageCreditRequirementsTest(SharedModuleStoreTestCase):
         self.user.profile.save()
 
         result = self.client.login(username=self.USERNAME, password=self.PASSWORD)
-        self.assertTrue(result, msg="Could not log in")
+        assert result, 'Could not log in'
 
         # Enroll the user in the course as "verified"
         self.enrollment = CourseEnrollmentFactory(

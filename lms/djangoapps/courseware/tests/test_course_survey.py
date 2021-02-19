@@ -101,7 +101,7 @@ class SurveyViewsTests(LoginEnrollmentTestCase, SharedModuleStoreTestCase, XssTe
                     kwargs={'course_id': six.text_type(course.id)}
                 )
             )
-            self.assertEqual(resp.status_code, 200)
+            assert resp.status_code == 200
 
     def test_visiting_course_without_survey(self):
         """
@@ -128,7 +128,7 @@ class SurveyViewsTests(LoginEnrollmentTestCase, SharedModuleStoreTestCase, XssTe
                 kwargs={'course_id': six.text_type(self.course.id)}
             )
         )
-        self.assertEqual(resp.status_code, 200)
+        assert resp.status_code == 200
 
     def test_visiting_course_with_existing_answers(self):
         """
@@ -138,7 +138,7 @@ class SurveyViewsTests(LoginEnrollmentTestCase, SharedModuleStoreTestCase, XssTe
             self.postback_url,
             self.student_answers
         )
-        self.assertEqual(resp.status_code, 200)
+        assert resp.status_code == 200
 
         self._assert_no_redirect(self.course)
 
@@ -154,7 +154,7 @@ class SurveyViewsTests(LoginEnrollmentTestCase, SharedModuleStoreTestCase, XssTe
             )
         )
 
-        self.assertEqual(resp.status_code, 200)
+        assert resp.status_code == 200
         expected = u'<input type="hidden" name="course_id" value="{course_id}" />'.format(
             course_id=six.text_type(self.course.id)
         )
@@ -175,7 +175,7 @@ class SurveyViewsTests(LoginEnrollmentTestCase, SharedModuleStoreTestCase, XssTe
             self.postback_url,
             answers
         )
-        self.assertEqual(resp.status_code, 200)
+        assert resp.status_code == 200
 
         self._assert_no_redirect(self.course)
 
@@ -186,7 +186,7 @@ class SurveyViewsTests(LoginEnrollmentTestCase, SharedModuleStoreTestCase, XssTe
         )
 
         for answer_obj in answer_objs:
-            self.assertEqual(answer_obj.course_key, self.course.id)
+            assert answer_obj.course_key == self.course.id
 
     def test_visiting_course_with_bogus_survey(self):
         """

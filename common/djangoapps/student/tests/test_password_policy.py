@@ -39,12 +39,10 @@ class TestPasswordPolicy(TestCase):
     def test_password_length_too_short(self):
         self.url_params['password'] = 'aaa'
         response = self.client.post(self.url, self.url_params)
-        self.assertEqual(response.status_code, 400)
+        assert response.status_code == 400
         obj = json.loads(response.content.decode('utf-8'))
-        self.assertEqual(
-            obj['password'][0]['user_message'],
-            "This password is too short. It must contain at least 6 characters.",
-        )
+        assert obj['password'][0]['user_message'] ==\
+               'This password is too short. It must contain at least 6 characters.'
 
     @override_settings(AUTH_PASSWORD_VALIDATORS=[
         create_validator_config('common.djangoapps.util.password_policy_validators.MinimumLengthValidator', {'min_length': 6})  # lint-amnesty, pylint: disable=line-too-long
@@ -52,9 +50,9 @@ class TestPasswordPolicy(TestCase):
     def test_password_length_long_enough(self):
         self.url_params['password'] = 'ThisIsALongerPassword'
         response = self.client.post(self.url, self.url_params)
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
         obj = json.loads(response.content.decode('utf-8'))
-        self.assertTrue(obj['success'])
+        assert obj['success']
 
     @override_settings(AUTH_PASSWORD_VALIDATORS=[
         create_validator_config('common.djangoapps.util.password_policy_validators.MaximumLengthValidator', {'max_length': 12})  # lint-amnesty, pylint: disable=line-too-long
@@ -62,12 +60,10 @@ class TestPasswordPolicy(TestCase):
     def test_password_length_too_long(self):
         self.url_params['password'] = 'ThisPasswordIsWayTooLong'
         response = self.client.post(self.url, self.url_params)
-        self.assertEqual(response.status_code, 400)
+        assert response.status_code == 400
         obj = json.loads(response.content.decode('utf-8'))
-        self.assertEqual(
-            obj['password'][0]['user_message'],
-            "This password is too long. It must contain no more than 12 characters.",
-        )
+        assert obj['password'][0]['user_message'] ==\
+               'This password is too long. It must contain no more than 12 characters.'
 
     @override_settings(AUTH_PASSWORD_VALIDATORS=[
         create_validator_config('common.djangoapps.util.password_policy_validators.UppercaseValidator', {'min_upper': 3})  # lint-amnesty, pylint: disable=line-too-long
@@ -75,12 +71,9 @@ class TestPasswordPolicy(TestCase):
     def test_password_not_enough_uppercase(self):
         self.url_params['password'] = 'thisshouldfail'
         response = self.client.post(self.url, self.url_params)
-        self.assertEqual(response.status_code, 400)
+        assert response.status_code == 400
         obj = json.loads(response.content.decode('utf-8'))
-        self.assertEqual(
-            obj['password'][0]['user_message'],
-            "This password must contain at least 3 uppercase letters.",
-        )
+        assert obj['password'][0]['user_message'] == 'This password must contain at least 3 uppercase letters.'
 
     @override_settings(AUTH_PASSWORD_VALIDATORS=[
         create_validator_config('common.djangoapps.util.password_policy_validators.UppercaseValidator', {'min_upper': 3})  # lint-amnesty, pylint: disable=line-too-long
@@ -88,9 +81,9 @@ class TestPasswordPolicy(TestCase):
     def test_password_enough_uppercase(self):
         self.url_params['password'] = 'ThisShouldPass'
         response = self.client.post(self.url, self.url_params)
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
         obj = json.loads(response.content.decode('utf-8'))
-        self.assertTrue(obj['success'])
+        assert obj['success']
 
     @override_settings(AUTH_PASSWORD_VALIDATORS=[
         create_validator_config('common.djangoapps.util.password_policy_validators.LowercaseValidator', {'min_lower': 3})  # lint-amnesty, pylint: disable=line-too-long
@@ -98,12 +91,9 @@ class TestPasswordPolicy(TestCase):
     def test_password_not_enough_lowercase(self):
         self.url_params['password'] = 'THISSHOULDFAIL'
         response = self.client.post(self.url, self.url_params)
-        self.assertEqual(response.status_code, 400)
+        assert response.status_code == 400
         obj = json.loads(response.content.decode('utf-8'))
-        self.assertEqual(
-            obj['password'][0]['user_message'],
-            "This password must contain at least 3 lowercase letters.",
-        )
+        assert obj['password'][0]['user_message'] == 'This password must contain at least 3 lowercase letters.'
 
     @override_settings(AUTH_PASSWORD_VALIDATORS=[
         create_validator_config('common.djangoapps.util.password_policy_validators.LowercaseValidator', {'min_lower': 3})  # lint-amnesty, pylint: disable=line-too-long
@@ -111,9 +101,9 @@ class TestPasswordPolicy(TestCase):
     def test_password_enough_lowercase(self):
         self.url_params['password'] = 'ThisShouldPass'
         response = self.client.post(self.url, self.url_params)
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
         obj = json.loads(response.content.decode('utf-8'))
-        self.assertTrue(obj['success'])
+        assert obj['success']
 
     @override_settings(AUTH_PASSWORD_VALIDATORS=[
         create_validator_config('common.djangoapps.util.password_policy_validators.PunctuationValidator', {'min_punctuation': 3})  # lint-amnesty, pylint: disable=line-too-long
@@ -121,12 +111,9 @@ class TestPasswordPolicy(TestCase):
     def test_not_enough_punctuations(self):
         self.url_params['password'] = 'thisshouldfail'
         response = self.client.post(self.url, self.url_params)
-        self.assertEqual(response.status_code, 400)
+        assert response.status_code == 400
         obj = json.loads(response.content.decode('utf-8'))
-        self.assertEqual(
-            obj['password'][0]['user_message'],
-            "This password must contain at least 3 punctuation marks.",
-        )
+        assert obj['password'][0]['user_message'] == 'This password must contain at least 3 punctuation marks.'
 
     @override_settings(AUTH_PASSWORD_VALIDATORS=[
         create_validator_config('common.djangoapps.util.password_policy_validators.PunctuationValidator', {'min_punctuation': 3})  # lint-amnesty, pylint: disable=line-too-long
@@ -134,9 +121,9 @@ class TestPasswordPolicy(TestCase):
     def test_enough_punctuations(self):
         self.url_params['password'] = 'Th!sSh.uldPa$*'
         response = self.client.post(self.url, self.url_params)
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
         obj = json.loads(response.content.decode('utf-8'))
-        self.assertTrue(obj['success'])
+        assert obj['success']
 
     @override_settings(AUTH_PASSWORD_VALIDATORS=[
         create_validator_config('common.djangoapps.util.password_policy_validators.NumericValidator', {'min_numeric': 3})  # lint-amnesty, pylint: disable=line-too-long
@@ -145,12 +132,9 @@ class TestPasswordPolicy(TestCase):
         # The unicode ២ is the number 2 in Khmer and the ٧ is the Arabic-Indic number 7
         self.url_params['password'] = u'thisShouldFail២٧'
         response = self.client.post(self.url, self.url_params)
-        self.assertEqual(response.status_code, 400)
+        assert response.status_code == 400
         obj = json.loads(response.content.decode('utf-8'))
-        self.assertEqual(
-            obj['password'][0]['user_message'],
-            "This password must contain at least 3 numbers.",
-        )
+        assert obj['password'][0]['user_message'] == 'This password must contain at least 3 numbers.'
 
     @override_settings(AUTH_PASSWORD_VALIDATORS=[
         create_validator_config('common.djangoapps.util.password_policy_validators.NumericValidator', {'min_numeric': 3})  # lint-amnesty, pylint: disable=line-too-long
@@ -159,9 +143,9 @@ class TestPasswordPolicy(TestCase):
         # The unicode ២ is the number 2 in Khmer
         self.url_params['password'] = u'thisShouldPass២33'
         response = self.client.post(self.url, self.url_params)
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
         obj = json.loads(response.content.decode('utf-8'))
-        self.assertTrue(obj['success'])
+        assert obj['success']
 
     @override_settings(AUTH_PASSWORD_VALIDATORS=[
         create_validator_config('common.djangoapps.util.password_policy_validators.AlphabeticValidator', {'min_alphabetic': 3})  # lint-amnesty, pylint: disable=line-too-long
@@ -169,12 +153,9 @@ class TestPasswordPolicy(TestCase):
     def test_not_enough_alphabetic_characters(self):
         self.url_params['password'] = '123456ab'
         response = self.client.post(self.url, self.url_params)
-        self.assertEqual(response.status_code, 400)
+        assert response.status_code == 400
         obj = json.loads(response.content.decode('utf-8'))
-        self.assertEqual(
-            obj['password'][0]['user_message'],
-            "This password must contain at least 3 letters.",
-        )
+        assert obj['password'][0]['user_message'] == 'This password must contain at least 3 letters.'
 
     @override_settings(AUTH_PASSWORD_VALIDATORS=[
         create_validator_config('common.djangoapps.util.password_policy_validators.AlphabeticValidator', {'min_alphabetic': 3})  # lint-amnesty, pylint: disable=line-too-long
@@ -182,9 +163,9 @@ class TestPasswordPolicy(TestCase):
     def test_enough_alphabetic_characters(self):
         self.url_params['password'] = u'𝒯𝓗Ï𝓼𝒫å𝓼𝓼𝔼𝓼'
         response = self.client.post(self.url, self.url_params)
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
         obj = json.loads(response.content.decode('utf-8'))
-        self.assertTrue(obj['success'])
+        assert obj['success']
 
     @override_settings(AUTH_PASSWORD_VALIDATORS=[
         create_validator_config('common.djangoapps.util.password_policy_validators.MinimumLengthValidator', {'min_length': 3}),  # lint-amnesty, pylint: disable=line-too-long
@@ -195,7 +176,7 @@ class TestPasswordPolicy(TestCase):
     def test_multiple_errors_fail(self):
         self.url_params['password'] = 'thisshouldfail'
         response = self.client.post(self.url, self.url_params)
-        self.assertEqual(response.status_code, 400)
+        assert response.status_code == 400
         obj = json.loads(response.content.decode('utf-8'))
         error_strings = [
             "This password must contain at least 3 uppercase letters.",
@@ -203,7 +184,7 @@ class TestPasswordPolicy(TestCase):
             "This password must contain at least 3 punctuation marks.",
         ]
         for i in range(3):
-            self.assertEqual(obj['password'][i]['user_message'], error_strings[i])
+            assert obj['password'][i]['user_message'] == error_strings[i]
 
     @override_settings(AUTH_PASSWORD_VALIDATORS=[
         create_validator_config('common.djangoapps.util.password_policy_validators.MinimumLengthValidator', {'min_length': 3}),  # lint-amnesty, pylint: disable=line-too-long
@@ -215,9 +196,9 @@ class TestPasswordPolicy(TestCase):
     def test_multiple_errors_pass(self):
         self.url_params['password'] = u'tH1s Sh0u!d P3#$!'
         response = self.client.post(self.url, self.url_params)
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
         obj = json.loads(response.content.decode('utf-8'))
-        self.assertTrue(obj['success'])
+        assert obj['success']
 
     @override_settings(AUTH_PASSWORD_VALIDATORS=[
         create_validator_config('django.contrib.auth.password_validation.CommonPasswordValidator')
@@ -225,12 +206,9 @@ class TestPasswordPolicy(TestCase):
     def test_common_password_fail(self):
         self.url_params['password'] = 'password'
         response = self.client.post(self.url, self.url_params)
-        self.assertEqual(response.status_code, 400)
+        assert response.status_code == 400
         obj = json.loads(response.content.decode('utf-8'))
-        self.assertEqual(
-            obj['password'][0]['user_message'],
-            "This password is too common.",
-        )
+        assert obj['password'][0]['user_message'] == 'This password is too common.'
 
     @override_settings(AUTH_PASSWORD_VALIDATORS=[
         create_validator_config('django.contrib.auth.password_validation.CommonPasswordValidator')
@@ -238,9 +216,9 @@ class TestPasswordPolicy(TestCase):
     def test_common_password_pass(self):
         self.url_params['password'] = 'this_is_ok'
         response = self.client.post(self.url, self.url_params)
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
         obj = json.loads(response.content.decode('utf-8'))
-        self.assertTrue(obj['success'])
+        assert obj['success']
 
     @override_settings(AUTH_PASSWORD_VALIDATORS=[
         create_validator_config('common.djangoapps.util.password_policy_validators.MinimumLengthValidator', {'min_length': 6}),  # lint-amnesty, pylint: disable=line-too-long
@@ -249,9 +227,9 @@ class TestPasswordPolicy(TestCase):
     def test_with_unicode(self):
         self.url_params['password'] = u'四節比分和七年前'
         response = self.client.post(self.url, self.url_params)
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
         obj = json.loads(response.content.decode('utf-8'))
-        self.assertTrue(obj['success'])
+        assert obj['success']
 
 
 class TestUsernamePasswordNonmatch(TestCase):
@@ -277,12 +255,9 @@ class TestUsernamePasswordNonmatch(TestCase):
         self.url_params['username'] = "foobar"
         self.url_params['password'] = "foobar"
         response = self.client.post(self.url, self.url_params)
-        self.assertEqual(response.status_code, 400)
+        assert response.status_code == 400
         obj = json.loads(response.content.decode('utf-8'))
-        self.assertEqual(
-            obj['password'][0]['user_message'],
-            "The password is too similar to the username.",
-        )
+        assert obj['password'][0]['user_message'] == 'The password is too similar to the username.'
 
     @override_settings(AUTH_PASSWORD_VALIDATORS=[
         create_validator_config('django.contrib.auth.password_validation.UserAttributeSimilarityValidator')
@@ -291,6 +266,6 @@ class TestUsernamePasswordNonmatch(TestCase):
         self.url_params['username'] = "foobar"
         self.url_params['password'] = "nonmatch"
         response = self.client.post(self.url, self.url_params)
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
         obj = json.loads(response.content.decode('utf-8'))
-        self.assertTrue(obj['success'])
+        assert obj['success']

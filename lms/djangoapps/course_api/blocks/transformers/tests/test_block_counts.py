@@ -41,13 +41,13 @@ class TestBlockCountsTransformer(ModuleStoreTestCase):
         )
 
         # verify count of chapters
-        self.assertEqual(block_counts_for_course.chapter, 2)
+        assert block_counts_for_course.chapter == 2
 
         # verify count of problems
-        self.assertEqual(block_counts_for_course.problem, 6)
-        self.assertEqual(block_counts_for_chapter_x.problem, 3)
+        assert block_counts_for_course.problem == 6
+        assert block_counts_for_chapter_x.problem == 3
 
         # verify other block types are not counted
         for block_type in ['course', 'html', 'video']:
-            self.assertFalse(hasattr(block_counts_for_course, block_type))
-            self.assertFalse(hasattr(block_counts_for_chapter_x, block_type))
+            assert not hasattr(block_counts_for_course, block_type)
+            assert not hasattr(block_counts_for_chapter_x, block_type)
