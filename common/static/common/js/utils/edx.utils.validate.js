@@ -21,7 +21,7 @@
                 var _fn = {
                     validate: {
 
-                        template: _.template('<li><%- content %></li>'),
+                        template: _.template('<li <%- suppressAttr %>><%- content %></li>'),
 
                         msg: {
                             email: gettext("The email address you've provided isn't formatted correctly."),
@@ -133,7 +133,8 @@
                                 context,
                                 content,
                                 customMsg,
-                                liveValidationMsg;
+                                liveValidationMsg,
+                                suppressAttr;
 
                             _.each(tests, function(value, key) {
                                 if (!value) {
@@ -159,8 +160,14 @@
                                         content = _.sprintf(_fn.validate.msg[key], context);
                                     }
 
+                                    suppressAttr = '';
+                                    if (['username', 'email'].indexOf($el.attr('name')) > -1) {
+                                        suppressAttr = 'data-hj-suppress';
+                                    }
+
                                     txt.push(_fn.validate.template({
-                                        content: content
+                                        content: content,
+                                        suppressAttr: suppressAttr
                                     }));
                                 }
                             });
