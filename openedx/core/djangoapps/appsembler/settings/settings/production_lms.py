@@ -109,6 +109,4 @@ def plugin_settings(settings):
         '/accounts/disable_account_ajax',
     ]
 
-    settings.USE_S3_FOR_CUSTOMER_THEMES = True
-
     _add_theme_static_dirs(settings)

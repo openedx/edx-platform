@@ -8,11 +8,8 @@ def plugin_settings(settings):
     """
     Appsembler LMS overrides for testing environment.
     """
-    settings.USE_S3_FOR_CUSTOMER_THEMES = False
-
     settings.AMC_APP_URL = 'http://localhost:13000'  # Tests needs this URL.
-    # TODO: Change to settings.AMC_APP_OAUTH2_CLIENT_ID = 'test-amc-app-oauth2-client-id'
-    settings.AMC_APP_OAUTH2_CLIENT_ID = settings.AMC_APP_URL
+    settings.AMC_APP_OAUTH2_CLIENT_ID = '6f2b93d5c02560c3f93f'  # dummy id
 
     # Allow enabling the APPSEMBLER_MULTI_TENANT_EMAILS when running unit tests via environment variables,
     # because it's disabled by default.
