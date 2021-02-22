@@ -12,7 +12,7 @@ from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthenticat
 from edx_rest_framework_extensions.auth.session.authentication import SessionAuthenticationAllowInactiveUser
 from openedx.core.lib.api.authentication import BearerAuthenticationAllowInactiveUser
 
-from common.djangoapps.student.models import CourseEnrollment
+from common.djangoapps.student.models import CourseEnrollment, UserCelebration
 from lms.djangoapps.course_api.api import course_detail
 from lms.djangoapps.course_home_api.course_metadata.v1.serializers import CourseHomeMetadataSerializer
 from lms.djangoapps.courseware.access import has_access
@@ -48,6 +48,7 @@ class CourseHomeMetadataView(RetrieveAPIView):
             title: (str) The title of the tab to display
             url: (str) The url to view the tab
         title: (str) The Course's display title
+        celebrations: (dict) a dict of celebration data
 
     **Returns**
 
@@ -77,7 +78,12 @@ class CourseHomeMetadataView(RetrieveAPIView):
 
         course = course_detail(request, request.user.username, course_key)
         user_is_enrolled = CourseEnrollment.is_enrolled(request.user, course_key_string)
-
+        browser_timezone = request.query_params.get('browser_timezone', None)
+        celebrations = {
+            'streak_length_to_celebrate': UserCelebration.perform_streak_updates(
+                request.user, course_key, browser_timezone
+            )
+        }
         data = {
             'course_id': course.id,
             'is_staff': has_access(request.user, 'staff', course_key).has_access,
@@ -88,6 +94,7 @@ class CourseHomeMetadataView(RetrieveAPIView):
             'title': course.display_name_with_default,
             'is_self_paced': getattr(course, 'self_paced', False),
             'is_enrolled': user_is_enrolled,
+            'celebrations': celebrations,
         }
         context = self.get_serializer_context()
         context['course'] = course
