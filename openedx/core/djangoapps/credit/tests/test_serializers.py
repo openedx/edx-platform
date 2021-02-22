@@ -1,6 +1,6 @@
 """ Tests for Credit API serializers. """
 
-
+import pytest
 import six
 from django.test import TestCase
 from django.test.utils import override_settings  # lint-amnesty, pylint: disable=unused-import
@@ -57,7 +57,7 @@ class CreditProviderCallbackSerializerTests(TestCase):
         provider_id = 'asu'
 
         serializer = serializers.CreditProviderCallbackSerializer()
-        with self.assertRaises(PermissionDenied):
+        with pytest.raises(PermissionDenied):
             serializer._check_keys_exist_for_provider(secret_key, provider_id)  # lint-amnesty, pylint: disable=protected-access
 
     def test_check_keys_exist_for_provider_list_no_keys(self):
@@ -71,7 +71,7 @@ class CreditProviderCallbackSerializerTests(TestCase):
         provider_id = 'asu'
 
         serializer = serializers.CreditProviderCallbackSerializer()
-        with self.assertRaises(PermissionDenied):
+        with pytest.raises(PermissionDenied):
             serializer._check_keys_exist_for_provider(secret_key, provider_id)  # lint-amnesty, pylint: disable=protected-access
 
     def test_check_keys_exist_for_provider_list_with_key_present(self):
@@ -101,7 +101,7 @@ class CreditProviderCallbackSerializerTests(TestCase):
         serializer = serializers.CreditProviderCallbackSerializer(
             data={'signature': sig}
         )
-        with self.assertRaises(PermissionDenied):
+        with pytest.raises(PermissionDenied):
             # The first arg here is key we have (that doesn't match the sig)
             serializer._compare_signatures('abcd1234', provider.provider_id)  # lint-amnesty, pylint: disable=protected-access
 
@@ -120,7 +120,7 @@ class CreditProviderCallbackSerializerTests(TestCase):
             data={'signature': sig}
         )
 
-        with self.assertRaises(PermissionDenied):
+        with pytest.raises(PermissionDenied):
             # The first arg here is the list of keys he have (that dont matcht the sig)
             serializer._compare_signatures(  # lint-amnesty, pylint: disable=protected-access
                 ['abcd1234', 'xyz789'],
