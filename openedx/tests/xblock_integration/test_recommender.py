@@ -184,7 +184,7 @@ class TestRecommender(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
         if xblock_name is None:
             xblock_name = TestRecommender.XBLOCK_NAMES[0]
         resp = json.loads(self.call_event(handler, resource, xblock_name).content)
-        self.assertEqual(resp[resp_key], resp_val)
+        assert resp[resp_key] == resp_val
         self.assert_request_status_code(200, self.course_url)
 
     def check_event_response_by_http_status(self, handler, resource, http_status_code, xblock_name=None):
@@ -195,7 +195,7 @@ class TestRecommender(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
         if xblock_name is None:
             xblock_name = TestRecommender.XBLOCK_NAMES[0]
         resp = self.call_event(handler, resource, xblock_name)
-        self.assertEqual(resp.status_code, http_status_code)
+        assert resp.status_code == http_status_code
         self.assert_request_status_code(200, self.course_url)
 
 
@@ -377,8 +377,8 @@ class TestRecommenderWithResources(TestRecommenderResourceBase):
         # Test
         resource['reason'] = 'reason 1'
         resp = json.loads(self.call_event('flag_resource', resource).content)
-        self.assertEqual(resp['oldReason'], 'reason 0')
-        self.assertEqual(resp['reason'], 'reason 1')
+        assert resp['oldReason'] == 'reason 0'
+        assert resp['reason'] == 'reason 1'
         self.assert_request_status_code(200, self.course_url)
 
     def test_flag_resources_in_different_xblocks(self):
@@ -401,8 +401,8 @@ class TestRecommenderWithResources(TestRecommenderResourceBase):
         # Test
         resp = json.loads(self.call_event('flag_resource', resource).content)
         # The second user won't see the reason provided by the first user
-        self.assertNotIn('oldReason', resp)
-        self.assertEqual(resp['reason'], 'reason 0')
+        assert 'oldReason' not in resp
+        assert resp['reason'] == 'reason 0'
         self.assert_request_status_code(200, self.course_url)
 
     def test_export_resources(self):
@@ -414,10 +414,10 @@ class TestRecommenderWithResources(TestRecommenderResourceBase):
         # Test
         resp = json.loads(self.call_event('export_resources', {}).content)
 
-        self.assertIn(self.resource_id_second, resp['export']['recommendations'])
-        self.assertNotIn(self.resource_id, resp['export']['recommendations'])
-        self.assertIn(self.resource_id_second, resp['export']['endorsed_recommendation_ids'])
-        self.assertIn(self.resource_id, resp['export']['removed_recommendations'])
+        assert self.resource_id_second in resp['export']['recommendations']
+        assert self.resource_id not in resp['export']['recommendations']
+        assert self.resource_id_second in resp['export']['endorsed_recommendation_ids']
+        assert self.resource_id in resp['export']['removed_recommendations']
         self.assert_request_status_code(200, self.course_url)
 
 
@@ -661,7 +661,7 @@ class TestRecommenderFileUploading(TestRecommender):
         f_handler.name = 'file' + test_case['suffixes']
         url = self.get_handler_url(event_name)
         resp = self.client.post(url, {'file': f_handler})
-        self.assertEqual(resp.status_code, test_case['status'])
+        assert resp.status_code == test_case['status']
 
     @data(
         {
