@@ -1000,10 +1000,8 @@ class CategoryMapTestCase(CategoryMapTestMixin, ModuleStoreTestCase):
             "Topic B": {"id": "Topic_B"},
             "Topic C": {"id": "Topic_C"}
         }
-        self.assertCountEqual(
-            utils.get_discussion_categories_ids(self.course, self.user),
-            ["Topic_A", "Topic_B", "Topic_C"]
-        )
+        assert len(utils.get_discussion_categories_ids(self.course, self.user)) ==\
+               len(["Topic_A", "Topic_B", "Topic_C"])
 
     def test_ids_inline(self):
         self.create_discussion("Chapter 1", "Discussion 1")
@@ -1012,10 +1010,8 @@ class CategoryMapTestCase(CategoryMapTestMixin, ModuleStoreTestCase):
         self.create_discussion("Chapter 2 / Section 1 / Subsection 1", "Discussion")
         self.create_discussion("Chapter 2 / Section 1 / Subsection 2", "Discussion")
         self.create_discussion("Chapter 3 / Section 1", "Discussion")
-        self.assertCountEqual(
-            utils.get_discussion_categories_ids(self.course, self.user),
-            ["discussion1", "discussion2", "discussion3", "discussion4", "discussion5", "discussion6"]
-        )
+        assert len(utils.get_discussion_categories_ids(self.course, self.user)) ==\
+               len(["discussion1", "discussion2", "discussion3", "discussion4", "discussion5", "discussion6"])
 
     def test_ids_mixed(self):
         self.course.discussion_topics = {
@@ -1026,10 +1022,8 @@ class CategoryMapTestCase(CategoryMapTestMixin, ModuleStoreTestCase):
         self.create_discussion("Chapter 1", "Discussion 1")
         self.create_discussion("Chapter 2", "Discussion")
         self.create_discussion("Chapter 2 / Section 1 / Subsection 1", "Discussion")
-        self.assertCountEqual(
-            utils.get_discussion_categories_ids(self.course, self.user),
-            ["Topic_A", "Topic_B", "Topic_C", "discussion1", "discussion2", "discussion3"]
-        )
+        assert len(utils.get_discussion_categories_ids(self.course, self.user)) ==\
+               len(["Topic_A", "Topic_B", "Topic_C", "discussion1", "discussion2", "discussion3"])
 
 
 class ContentGroupCategoryMapTestCase(CategoryMapTestMixin, ContentGroupTestCase):

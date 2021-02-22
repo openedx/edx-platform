@@ -7,6 +7,7 @@ import logging
 import os
 import subprocess
 import warnings
+from io import StringIO
 
 import mongoengine
 from django.conf import settings
@@ -24,7 +25,6 @@ from django.views.decorators.http import condition
 from django.views.generic.base import TemplateView
 from opaque_keys.edx.keys import CourseKey
 from path import Path as path
-from six import StringIO
 from xmodule.modulestore.django import modulestore
 
 import lms.djangoapps.dashboard.git_import as git_import
