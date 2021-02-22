@@ -7,6 +7,8 @@ from rest_framework import serializers
 
 from openedx.core.djangoapps.site_configuration.helpers import get_value_for_org
 
+from openedx.features.edly.utils import get_marketing_link
+
 
 class UserSiteSerializer(serializers.Serializer):
     """
@@ -58,8 +60,20 @@ class UserSiteSerializer(serializers.Serializer):
             'SITE_NAME',
             default=''
         )
-        protocol = 'https' if self.context['request'].is_secure() else 'http'
-        site_data['site_url'] = '{}://{}'.format(protocol, url) if url else ''
+        site_data['contact_email'] = get_value_for_org(
+            self.context['edly_sub_org_of_user'].edx_organization.short_name,
+            'contact_email',
+            default=''
+        )
+        marketing_urls = get_value_for_org(
+            self.context['edly_sub_org_of_user'].edx_organization.short_name,
+            'MKTG_URLS',
+            default={}
+        )
+        site_data['site_url'] = marketing_urls.get('ROOT')
+        site_data['tos'] = get_marketing_link(marketing_urls, 'TOS')
+        site_data['honor'] = get_marketing_link(marketing_urls, 'HONOR')
+        site_data['privacy'] = get_marketing_link(marketing_urls, 'PRIVACY')
         return site_data
 
     def get_mobile_enabled(self, obj):  # pylint: disable=unused-argument

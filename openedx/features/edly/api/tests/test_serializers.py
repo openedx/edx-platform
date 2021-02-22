@@ -2,6 +2,7 @@
 Tests for Edly API serializers.
 """
 import json
+from urllib.parse import urljoin
 
 from django.core.validators import URLValidator
 from django.core.exceptions import ValidationError
@@ -44,6 +45,13 @@ class UserSiteSerializerTests(TestCase):
             },
             'SITE_NAME': self.edly_sub_org_of_user.lms_site.domain,
             'course_org_filter': self.edly_sub_org_of_user.edx_organization.short_name,
+            'contact_email': 'fake@example.com',
+            'MKTG_URLS': {
+                'ROOT': 'fake-root-url',
+                'TOS': '/tos',
+                'HONOR': '/honor',
+                'PRIVACY': '/privacy',
+            },
         }
         self.site_configuration = SiteConfigurationFactory(
             site=self.edly_sub_org_of_user.lms_site,
@@ -110,9 +118,14 @@ class UserSiteSerializerTests(TestCase):
             assert color_value == serializer.data['site_data'].get(color_key)
 
         assert self.edly_sub_org_of_user.lms_site.name == serializer.data['site_data'].get('display_name')
+        assert self.test_site_configuration['contact_email'] == serializer.data['site_data'].get('contact_email')
 
-        expected_site_url = self.get_expected_url()
+        mktg_urls = self.test_site_configuration['MKTG_URLS']
+        expected_site_url = mktg_urls.get('ROOT')
         assert expected_site_url == serializer.data['site_data'].get('site_url')
+        assert urljoin(mktg_urls.get('ROOT'), mktg_urls.get('TOS')) == serializer.data['site_data'].get('tos')
+        assert urljoin(mktg_urls.get('ROOT'), mktg_urls.get('HONOR')) == serializer.data['site_data'].get('honor')
+        assert urljoin(mktg_urls.get('ROOT'), mktg_urls.get('PRIVACY')) == serializer.data['site_data'].get('privacy')
 
     def test_mobile_enabled(self):
         """

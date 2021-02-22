@@ -1,4 +1,5 @@
 import logging
+from urllib.parse import urljoin
 
 import jwt
 import waffle
@@ -9,7 +10,7 @@ from django.db.models import Q
 from django.forms.models import model_to_dict
 from django.utils.translation import ugettext_lazy as _
 
-from lms.djangoapps.branding.api import get_logo_url, get_privacy_url, get_tos_and_honor_code_url
+from lms.djangoapps.branding.api import get_privacy_url, get_tos_and_honor_code_url
 from openedx.core.djangoapps.site_configuration.helpers import get_current_site_configuration
 from openedx.features.edly.models import EdlyUserProfile, EdlySubOrganization
 from student import auth
@@ -365,7 +366,7 @@ def get_current_site_invalid_certificate_context(default_html_certificate_config
         return context
 
     context['platform_name'] = current_site_configuration.get_value('platform_name', settings.PLATFORM_NAME)
-    context['logo_src'] = get_logo_url()
+    context['logo_src'] = current_site_configuration.get_value('BRANDING', {}).get('logo', '')
     logo_redirect_url = settings.LMS_ROOT_URL
     context['logo_url'] = logo_redirect_url
     context['company_privacy_url'] = get_privacy_url()
@@ -405,3 +406,31 @@ def clean_django_settings_override(django_settings_override):
 
     if validation_errors:
         raise ValidationError(validation_errors)
+
+
+def get_marketing_link(marketing_urls, name):
+    """
+    Returns the correct URL for a link to the marketing site
+    """
+    if name in marketing_urls:
+        return urljoin(marketing_urls.get('ROOT'), marketing_urls.get(name))
+    else:
+        LOGGER.warning("Cannot find corresponding link for name: %s", name)
+        return ''
+
+
+def is_course_org_same_as_site_org(site, course_id):
+    """
+    Check if the course organization matches with the site organization.
+    """
+    try:
+        edly_sub_org = EdlySubOrganization.objects.get(lms_site=site)
+    except EdlySubOrganization.DoesNotExist:
+        LOGGER.info('No Edly sub organization found for site %s', site)
+        return False
+
+    if edly_sub_org.edx_organization.short_name == course_id.org:
+        return True
+
+    LOGGER.info('Course organization does not match site organization')
+    return False

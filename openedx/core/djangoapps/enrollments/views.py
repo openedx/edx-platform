@@ -35,6 +35,7 @@ from openedx.core.lib.api.permissions import ApiKeyHeaderPermission, ApiKeyHeade
 from openedx.core.lib.api.view_utils import DeveloperErrorViewMixin
 from openedx.core.lib.exceptions import CourseNotFoundError
 from openedx.core.lib.log_utils import audit_log
+from openedx.features.edly.utils import is_course_org_same_as_site_org
 from openedx.features.enterprise_support.api import (
     ConsentApiServiceClient,
     EnterpriseApiException,
@@ -724,6 +725,13 @@ class EnrollmentListView(APIView, ApiKeyPermissionMixIn):
                 data={
                     'message': u'The user {} does not exist.'.format(username)
                 }
+            )
+
+        course_org_same_as_site_org = is_course_org_same_as_site_org(request.site, course_id)
+        if not course_org_same_as_site_org:
+            return Response(
+                status=status.HTTP_400_BAD_REQUEST,
+                data={'message': u'The provided course {} is not found on this site.'.format(course_id)}
             )
 
         embargo_response = embargo_api.get_embargo_response(request, course_id, user)
