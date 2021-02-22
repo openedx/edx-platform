@@ -6,11 +6,11 @@ Test grading with access changes.
 from crum import set_current_request
 
 from capa.tests.response_xml_factory import MultipleChoiceResponseXMLFactory
-from lms.djangoapps.courseware.tests.test_submitting_problems import ProblemSubmissionTestMixin
-from lms.djangoapps.course_blocks.api import get_course_blocks
-from openedx.core.djangolib.testing.utils import get_mock_request
 from common.djangoapps.student.models import CourseEnrollment
 from common.djangoapps.student.tests.factories import UserFactory
+from lms.djangoapps.course_blocks.api import get_course_blocks
+from lms.djangoapps.courseware.tests.test_submitting_problems import ProblemSubmissionTestMixin
+from openedx.core.djangolib.testing.utils import get_mock_request
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
@@ -27,7 +27,7 @@ class GradesAccessIntegrationTest(ProblemSubmissionTestMixin, SharedModuleStoreT
 
     @classmethod
     def setUpClass(cls):
-        super(GradesAccessIntegrationTest, cls).setUpClass()
+        super().setUpClass()
         cls.store = modulestore()
         cls.course = CourseFactory.create()
         cls.chapter = ItemFactory.create(
@@ -69,13 +69,13 @@ class GradesAccessIntegrationTest(ProblemSubmissionTestMixin, SharedModuleStoreT
         )
 
     def setUp(self):
-        super(GradesAccessIntegrationTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.addCleanup(set_current_request, None)
         self.request = get_mock_request(UserFactory())
         self.student = self.request.user
         self.client.login(username=self.student.username, password="test")
         CourseEnrollment.enroll(self.student, self.course.id)
-        self.instructor = UserFactory.create(is_staff=True, username=u'test_instructor', password=u'test')
+        self.instructor = UserFactory.create(is_staff=True, username='test_instructor', password='test')
         self.refresh_course()
 
     def test_subsection_access_changed(self):

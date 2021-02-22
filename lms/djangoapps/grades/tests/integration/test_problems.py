@@ -5,14 +5,13 @@ import itertools
 import ddt
 import pytz
 from crum import set_current_request
-from six.moves import range
 
 from capa.tests.response_xml_factory import MultipleChoiceResponseXMLFactory
-from lms.djangoapps.courseware.tests.test_submitting_problems import ProblemSubmissionTestMixin
-from lms.djangoapps.course_blocks.api import get_course_blocks
-from openedx.core.djangolib.testing.utils import get_mock_request
 from common.djangoapps.student.models import CourseEnrollment
 from common.djangoapps.student.tests.factories import UserFactory
+from lms.djangoapps.course_blocks.api import get_course_blocks
+from lms.djangoapps.courseware.tests.test_submitting_problems import ProblemSubmissionTestMixin
+from openedx.core.djangolib.testing.utils import get_mock_request
 from xmodule.graders import ProblemScore
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, SharedModuleStoreTestCase
@@ -35,14 +34,14 @@ class TestMultipleProblemTypesSubsectionScores(SharedModuleStoreTestCase):
 
     @classmethod
     def setUpClass(cls):
-        super(TestMultipleProblemTypesSubsectionScores, cls).setUpClass()
+        super().setUpClass()
         cls.load_scoreable_course()
         chapter1 = cls.course.get_children()[0]
         cls.seq1 = chapter1.get_children()[0]
 
     def setUp(self):
         super().setUp()
-        password = u'test'
+        password = 'test'
         self.student = UserFactory.create(is_staff=False, username=u'test_student', password=password)
         self.client.login(username=self.student.username, password=password)
         self.addCleanup(set_current_request, None)
@@ -104,13 +103,13 @@ class TestVariedMetadata(ProblemSubmissionTestMixin, ModuleStoreTestCase):
     persisted score.
     """
     default_problem_metadata = {
-        u'graded': True,
-        u'weight': 2.5,
-        u'due': datetime.datetime(2099, 3, 15, 12, 30, 0, tzinfo=pytz.utc),
+        'graded': True,
+        'weight': 2.5,
+        'due': datetime.datetime(2099, 3, 15, 12, 30, 0, tzinfo=pytz.utc),
     }
 
     def setUp(self):
-        super(TestVariedMetadata, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.course = CourseFactory.create()
         with self.store.bulk_operations(self.course.id):
             self.chapter = ItemFactory.create(
@@ -129,7 +128,7 @@ class TestVariedMetadata(ProblemSubmissionTestMixin, ModuleStoreTestCase):
                 category='vertical',
                 display_name='Test Vertical 1'
             )
-        self.problem_xml = u'''
+        self.problem_xml = '''
             <problem url_name="capa-optionresponse">
               <optionresponse>
                 <optioninput options="('Correct', 'Incorrect')" correct="Correct"></optioninput>
@@ -171,7 +170,7 @@ class TestVariedMetadata(ProblemSubmissionTestMixin, ModuleStoreTestCase):
         two) is submitted.
         """
 
-        self.submit_question_answer(u'problem', {u'2_1': u'Correct'})
+        self.submit_question_answer('problem', {'2_1': 'Correct'})
         course_structure = get_course_blocks(self.request.user, self.course.location)
         subsection_factory = SubsectionGradeFactory(
             self.request.user,
@@ -182,10 +181,10 @@ class TestVariedMetadata(ProblemSubmissionTestMixin, ModuleStoreTestCase):
 
     @ddt.data(
         ({}, 1.25, 2.5),
-        ({u'weight': 27}, 13.5, 27),
-        ({u'weight': 1.0}, 0.5, 1.0),
-        ({u'weight': 0.0}, 0.0, 0.0),
-        ({u'weight': None}, 1.0, 2.0),
+        ({'weight': 27}, 13.5, 27),
+        ({'weight': 1.0}, 0.5, 1.0),
+        ({'weight': 0.0}, 0.0, 0.0),
+        ({'weight': None}, 1.0, 2.0),
     )
     @ddt.unpack
     def test_weight_metadata_alterations(self, alterations, expected_earned, expected_possible):
@@ -195,8 +194,8 @@ class TestVariedMetadata(ProblemSubmissionTestMixin, ModuleStoreTestCase):
         assert score.all_total.possible == expected_possible
 
     @ddt.data(
-        ({u'graded': True}, 1.25, 2.5),
-        ({u'graded': False}, 0.0, 0.0),
+        ({'graded': True}, 1.25, 2.5),
+        ({'graded': False}, 0.0, 0.0),
     )
     @ddt.unpack
     def test_graded_metadata_alterations(self, alterations, expected_earned, expected_possible):
@@ -214,7 +213,7 @@ class TestWeightedProblems(SharedModuleStoreTestCase):
 
     @classmethod
     def setUpClass(cls):
-        super(TestWeightedProblems, cls).setUpClass()
+        super().setUpClass()
         cls.course = CourseFactory.create()
         with cls.store.bulk_operations(cls.course.id):
             cls.chapter = ItemFactory.create(parent=cls.course, category="chapter", display_name="chapter")
@@ -227,13 +226,13 @@ class TestWeightedProblems(SharedModuleStoreTestCase):
                     ItemFactory.create(
                         parent=cls.vertical,
                         category="problem",
-                        display_name="problem_{}".format(i),
+                        display_name=f"problem_{i}",
                         data=problem_xml,
                     )
                 )
 
     def setUp(self):
-        super(TestWeightedProblems, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.user = UserFactory()
         self.addCleanup(set_current_request, None)
         self.request = get_mock_request(self.user)

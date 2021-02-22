@@ -6,12 +6,11 @@ Mixins classes being used by all test classes within this folder
 from datetime import datetime
 
 from pytz import UTC
-from six.moves import range
 
-from lms.djangoapps.courseware.tests.factories import GlobalStaffFactory
-from lms.djangoapps.program_enrollments.tests.factories import ProgramEnrollmentFactory, ProgramCourseEnrollmentFactory
-from openedx.core.djangoapps.content.course_overviews.tests.factories import CourseOverviewFactory
 from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
+from lms.djangoapps.courseware.tests.factories import GlobalStaffFactory
+from lms.djangoapps.program_enrollments.tests.factories import ProgramCourseEnrollmentFactory, ProgramEnrollmentFactory
+from openedx.core.djangoapps.content.course_overviews.tests.factories import CourseOverviewFactory
 from xmodule.modulestore.tests.django_utils import TEST_DATA_SPLIT_MODULESTORE, SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 
@@ -59,7 +58,7 @@ class GradeViewTestMixin(SharedModuleStoreTestCase):
 
     @classmethod
     def setUpClass(cls):
-        super(GradeViewTestMixin, cls).setUpClass()
+        super().setUpClass()
         cls.date = datetime(2013, 1, 22, tzinfo=UTC)
         cls.course = cls._create_test_course_with_default_grading_policy(
             display_name='test course', run="Testing_course"
@@ -89,7 +88,7 @@ class GradeViewTestMixin(SharedModuleStoreTestCase):
 
             program_enrollment = ProgramEnrollmentFactory(
                 user=user,
-                external_user_key='program_user_key_{}'.format(index),
+                external_user_key=f'program_user_key_{index}',
             )
 
             ProgramCourseEnrollmentFactory(
@@ -99,7 +98,7 @@ class GradeViewTestMixin(SharedModuleStoreTestCase):
             )
 
     def setUp(self):
-        super(GradeViewTestMixin, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.password = 'test'
         self.global_staff = GlobalStaffFactory.create()
         self.student = UserFactory(password=self.password, username='student', email='student@example.com')
@@ -143,19 +142,19 @@ class GradeViewTestMixin(SharedModuleStoreTestCase):
                     category='sequential',
                     parent_location=chapter.location,
                     due=datetime(2017, 12, 18, 11, 30, 00),
-                    display_name=u'Sequential {} {}'.format(grading_type, num),
+                    display_name=f'Sequential {grading_type} {num}',
                     format=grading_type,
                     graded=True,
                 )
                 vertical = ItemFactory.create(
                     category='vertical',
                     parent_location=section.location,
-                    display_name=u'Vertical {} {}'.format(grading_type, num),
+                    display_name=f'Vertical {grading_type} {num}',
                 )
                 ItemFactory.create(
                     category='problem',
                     parent_location=vertical.location,
-                    display_name=u'Problem {} {}'.format(grading_type, num),
+                    display_name=f'Problem {grading_type} {num}',
                 )
 
         return course

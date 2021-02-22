@@ -5,11 +5,11 @@ persistent grading feature.
 
 
 import itertools
+from unittest.mock import patch
 
 import ddt
 from django.conf import settings
 from django.test import TestCase
-from mock import patch
 from opaque_keys.edx.locator import CourseLocator
 
 from lms.djangoapps.grades.config.models import PersistentGradesEnabledFlag
@@ -25,7 +25,7 @@ class PersistentGradesFeatureFlagTests(TestCase):
     """
 
     def setUp(self):
-        super(PersistentGradesFeatureFlagTests, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.course_id_1 = CourseLocator(org="edx", course="course", run="run")
         self.course_id_2 = CourseLocator(org="edx", course="course2", run="run")
 

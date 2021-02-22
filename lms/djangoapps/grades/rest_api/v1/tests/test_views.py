@@ -4,18 +4,18 @@ Tests for v1 views
 
 
 from collections import OrderedDict
+from unittest.mock import MagicMock, patch
 
 import ddt
 from django.urls import reverse
-from mock import MagicMock, patch
 from opaque_keys import InvalidKeyError
 from rest_framework import status
 from rest_framework.test import APITestCase
 
+from common.djangoapps.student.tests.factories import UserFactory
 from lms.djangoapps.grades.rest_api.v1.tests.mixins import GradeViewTestMixin
 from lms.djangoapps.grades.rest_api.v1.views import CourseGradesView
 from openedx.core.djangoapps.user_authn.tests.utils import AuthAndScopesTestMixin
-from common.djangoapps.student.tests.factories import UserFactory
 
 
 @ddt.ddt
@@ -29,7 +29,7 @@ class SingleUserGradesTests(GradeViewTestMixin, AuthAndScopesTestMixin, APITestC
 
     @classmethod
     def setUpClass(cls):
-        super(SingleUserGradesTests, cls).setUpClass()
+        super().setUpClass()
         cls.namespaced_url = 'grades_api:v1:course_grades'
 
     def get_url(self, username):
@@ -40,7 +40,7 @@ class SingleUserGradesTests(GradeViewTestMixin, AuthAndScopesTestMixin, APITestC
                 'course_id': self.course_key,
             }
         )
-        return "{0}?username={1}".format(base_url, username)
+        return f"{base_url}?username={username}"
 
     def assert_success_response_for_student(self, response):
         """ This method is required by AuthAndScopesTestMixin. """
@@ -120,7 +120,7 @@ class SingleUserGradesTests(GradeViewTestMixin, AuthAndScopesTestMixin, APITestC
                 'course_id': 'course-v1:MITx+8.MechCX+2014_T1',
             }
         )
-        url = "{0}?username={1}".format(base_url, self.student.username)
+        url = f"{base_url}?username={self.student.username}"
         resp = self.client.get(url)
         assert resp.status_code == status.HTTP_404_NOT_FOUND
         assert 'error_code' in resp.data
@@ -166,7 +166,7 @@ class CourseGradesViewTest(GradeViewTestMixin, APITestCase):
 
     @classmethod
     def setUpClass(cls):
-        super(CourseGradesViewTest, cls).setUpClass()
+        super().setUpClass()
         cls.namespaced_url = 'grades_api:v1:course_grades'
 
     def get_url(self, course_key=None):

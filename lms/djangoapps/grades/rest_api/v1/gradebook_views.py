@@ -8,10 +8,9 @@ from collections import namedtuple
 from contextlib import contextmanager
 from functools import wraps
 
-import six
 from django.contrib.auth import get_user_model
 from django.core.cache import cache
-from django.db.models import Case, Exists, F, OuterRef, When, Q
+from django.db.models import Case, Exists, F, OuterRef, Q, When
 from django.urls import reverse
 from django.utils.translation import ugettext_lazy as _
 from opaque_keys import InvalidKeyError
@@ -22,21 +21,32 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from six import text_type
 
+from common.djangoapps.student.auth import has_course_author_access
+from common.djangoapps.student.models import CourseEnrollment
+from common.djangoapps.student.roles import BulkRoleCache
+from common.djangoapps.track.event_transaction_utils import (
+    create_new_event_transaction_id,
+    get_event_transaction_id,
+    get_event_transaction_type,
+    set_event_transaction_type
+)
+from common.djangoapps.util.date_utils import to_timestamp
+from lms.djangoapps.course_blocks.api import get_course_blocks
 from lms.djangoapps.courseware.courses import get_course_by_id
 from lms.djangoapps.grades.api import CourseGradeFactory, clear_prefetched_course_and_subsection_grades
 from lms.djangoapps.grades.api import constants as grades_constants
 from lms.djangoapps.grades.api import context as grades_context
 from lms.djangoapps.grades.api import events as grades_events
-from lms.djangoapps.grades.api import is_writable_gradebook_enabled, prefetch_course_and_subsection_grades
 from lms.djangoapps.grades.api import gradebook_can_see_bulk_management as can_see_bulk_management
+from lms.djangoapps.grades.api import is_writable_gradebook_enabled, prefetch_course_and_subsection_grades
 from lms.djangoapps.grades.course_data import CourseData
 from lms.djangoapps.grades.grade_utils import are_grades_frozen
 # TODO these imports break abstraction of the core Grades layer. This code needs
 # to be refactored so Gradebook views only access public Grades APIs.
 from lms.djangoapps.grades.models import (
-    PersistentSubsectionGrade,
-    PersistentSubsectionGradeOverride,
     PersistentCourseGrade,
+    PersistentSubsectionGrade,
+    PersistentSubsectionGradeOverride
 )
 from lms.djangoapps.grades.rest_api.serializers import (
     StudentGradebookEntrySerializer,
@@ -46,7 +56,6 @@ from lms.djangoapps.grades.rest_api.v1.utils import USER_MODEL, CourseEnrollment
 from lms.djangoapps.grades.subsection_grade import CreateSubsectionGrade
 from lms.djangoapps.grades.subsection_grade_factory import SubsectionGradeFactory
 from lms.djangoapps.grades.tasks import recalculate_subsection_grade_v3
-from lms.djangoapps.course_blocks.api import get_course_blocks
 from lms.djangoapps.program_enrollments.api import get_external_key_by_user_and_course
 from openedx.core.djangoapps.course_groups import cohorts
 from openedx.core.djangoapps.util.forms import to_bool
@@ -58,16 +67,6 @@ from openedx.core.lib.api.view_utils import (
     view_auth_classes
 )
 from openedx.core.lib.cache_utils import request_cached
-from common.djangoapps.student.auth import has_course_author_access
-from common.djangoapps.student.models import CourseEnrollment
-from common.djangoapps.student.roles import BulkRoleCache
-from common.djangoapps.track.event_transaction_utils import (
-    create_new_event_transaction_id,
-    get_event_transaction_id,
-    get_event_transaction_type,
-    set_event_transaction_type
-)
-from common.djangoapps.util.date_utils import to_timestamp
 from xmodule.modulestore.django import modulestore
 from xmodule.util.misc import get_default_short_labeler
 
@@ -326,7 +325,7 @@ class CourseGradingView(BaseCourseView):
                 'assignment_type': subsection.format,
                 'graded': subsection.graded,
                 'short_label': short_label,
-                'module_id': text_type(subsection.location),
+                'module_id': str(subsection.location),
                 'display_name': subsection.display_name,
             })
         return subsections
@@ -471,7 +470,7 @@ class GradebookView(GradeViewMixin, PaginatedAPIView):
                 'attempted': attempted,
                 'category': subsection_grade.format,
                 'label': short_label,
-                'module_id': text_type(subsection_grade.location),
+                'module_id': str(subsection_grade.location),
                 'percent': subsection_grade.percent_graded,
                 'score_earned': score_earned,
                 'score_possible': score_possible,
@@ -496,7 +495,7 @@ class GradebookView(GradeViewMixin, PaginatedAPIView):
         user_entry['section_breakdown'] = breakdown
         user_entry['progress_page_url'] = reverse(
             'student_progress',
-            kwargs=dict(course_id=text_type(course.id), student_id=user.id)
+            kwargs=dict(course_id=str(course.id), student_id=user.id)
         )
         user_entry['user_id'] = user.id
         user_entry['full_name'] = user.profile.name
@@ -813,7 +812,7 @@ class GradebookBulkUpdateView(GradeViewMixin, PaginatedAPIView):
                     user_id=requested_user_id,
                     usage_id=requested_usage_id,
                     success=False,
-                    reason=text_type(exc)
+                    reason=str(exc)
                 ))
                 continue
 
@@ -829,8 +828,8 @@ class GradebookBulkUpdateView(GradeViewMixin, PaginatedAPIView):
                     subsection_grade_model = self._create_subsection_grade(user, course, subsection)
                     # TODO: Remove as part of EDUCATOR-4602.
                     if str(course_key) == 'course-v1:UQx+BUSLEAD5x+2T2019':
-                        log.info(u'PersistentSubsectionGrade ***{}*** created for'
-                                 u' subsection ***{}*** in course ***{}*** for user ***{}***.'
+                        log.info('PersistentSubsectionGrade ***{}*** created for'
+                                 ' subsection ***{}*** in course ***{}*** for user ***{}***.'
                                  .format(subsection_grade_model, subsection.location, course, user.id))
                 else:
                     self._log_update_result(request.user, requested_user_id, requested_usage_id, success=False)
@@ -838,7 +837,7 @@ class GradebookBulkUpdateView(GradeViewMixin, PaginatedAPIView):
                         user_id=requested_user_id,
                         usage_id=requested_usage_id,
                         success=False,
-                        reason=u'usage_key {} does not exist in this course.'.format(usage_key)
+                        reason=f'usage_key {usage_key} does not exist in this course.'
                     ))
                     continue
 
@@ -850,13 +849,13 @@ class GradebookBulkUpdateView(GradeViewMixin, PaginatedAPIView):
                 )
                 result.append(GradebookUpdateResponseItem(
                     user_id=user.id,
-                    usage_id=text_type(usage_key),
+                    usage_id=str(usage_key),
                     success=True,
                     reason=None
                 ))
 
         status_code = status.HTTP_422_UNPROCESSABLE_ENTITY
-        if all((item.success for item in result)):
+        if all(item.success for item in result):
             status_code = status.HTTP_202_ACCEPTED
 
         return Response(
@@ -890,13 +889,13 @@ class GradebookBulkUpdateView(GradeViewMixin, PaginatedAPIView):
             kwargs=dict(
                 user_id=subsection_grade_model.user_id,
                 anonymous_user_id=None,
-                course_id=text_type(subsection_grade_model.course_id),
-                usage_id=text_type(subsection_grade_model.usage_key),
+                course_id=str(subsection_grade_model.course_id),
+                usage_id=str(subsection_grade_model.usage_key),
                 only_if_higher=False,
                 expected_modified_time=to_timestamp(override.modified),
                 score_deleted=False,
-                event_transaction_id=six.text_type(get_event_transaction_id()),
-                event_transaction_type=six.text_type(get_event_transaction_type()),
+                event_transaction_id=str(get_event_transaction_id()),
+                event_transaction_type=str(get_event_transaction_type()),
                 score_db_table=grades_constants.ScoreDatabaseTableEnum.overrides,
                 force_update_subsections=True,
             )
@@ -915,7 +914,7 @@ class GradebookBulkUpdateView(GradeViewMixin, PaginatedAPIView):
     ):
 
         log.info(
-            u'Grades: Bulk_Update, UpdatedByUser: %s, User: %s, Usage: %s, Grade: %s, GradeOverride: %s, Success: %s',
+            'Grades: Bulk_Update, UpdatedByUser: %s, User: %s, Usage: %s, Grade: %s, GradeOverride: %s, Success: %s',
             request_user.id,
             user_id,
             usage_id,

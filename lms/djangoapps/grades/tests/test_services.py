@@ -4,20 +4,16 @@ Grades Service Tests
 
 
 from datetime import datetime
+from unittest.mock import call, patch
 
 import ddt
 import pytz
-import six
 from freezegun import freeze_time
-from mock import call, patch
 
-from lms.djangoapps.grades.constants import GradeOverrideFeatureEnum
-from lms.djangoapps.grades.models import (
-    PersistentSubsectionGrade,
-    PersistentSubsectionGradeOverride
-)
-from lms.djangoapps.grades.services import GradesService
 from common.djangoapps.student.tests.factories import UserFactory
+from lms.djangoapps.grades.constants import GradeOverrideFeatureEnum
+from lms.djangoapps.grades.models import PersistentSubsectionGrade, PersistentSubsectionGradeOverride
+from lms.djangoapps.grades.services import GradesService
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 
@@ -25,7 +21,7 @@ from ..config.waffle import REJECTED_EXAM_OVERRIDES_GRADE
 from ..constants import ScoreDatabaseTableEnum
 
 
-class MockWaffleFlag(object):
+class MockWaffleFlag:
     """
     A Mock WaffleFlag object.
     """
@@ -44,7 +40,7 @@ class GradesServiceTests(ModuleStoreTestCase):
     """
 
     def setUp(self):
-        super(GradesServiceTests, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.service = GradesService()
         self.course = CourseFactory.create(org='edX', number='DemoX', display_name='Demo_Course', run='Spring2019')
         self.subsection = ItemFactory.create(parent=self.course, category="subsection", display_name="Subsection")
@@ -79,7 +75,7 @@ class GradesServiceTests(ModuleStoreTestCase):
         }
 
     def tearDown(self):
-        super(GradesServiceTests, self).tearDown()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().tearDown()
         PersistentSubsectionGradeOverride.objects.all().delete()  # clear out all previous overrides
         self.signal_patcher.stop()
         self.id_patcher.stop()
@@ -111,8 +107,8 @@ class GradesServiceTests(ModuleStoreTestCase):
         # test with id strings as parameters instead
         self.assertDictEqual(self.subsection_grade_to_dict(self.service.get_subsection_grade(
             user_id=self.user.id,
-            course_key_or_id=six.text_type(self.course.id),
-            usage_key_or_id=six.text_type(self.subsection.location)
+            course_key_or_id=str(self.course.id),
+            usage_key_or_id=str(self.subsection.location)
         )), {
             'earned_all': 6.0,
             'earned_graded': 5.0
@@ -140,7 +136,7 @@ class GradesServiceTests(ModuleStoreTestCase):
         # test with course key parameter as string instead
         self.assertDictEqual(self.subsection_grade_override_to_dict(self.service.get_subsection_grade_override(
             user_id=self.user.id,
-            course_key_or_id=six.text_type(self.course.id),
+            course_key_or_id=str(self.course.id),
             usage_key_or_id=self.subsection.location
         )), {
             'earned_all_override': override.earned_all_override,
@@ -186,8 +182,8 @@ class GradesServiceTests(ModuleStoreTestCase):
         assert self.mock_signal.call_args == call(
             sender=None,
             user_id=self.user.id,
-            course_id=six.text_type(self.course.id),
-            usage_id=six.text_type(self.subsection.location),
+            course_id=str(self.course.id),
+            usage_id=str(self.subsection.location),
             only_if_higher=False,
             modified=override_obj.modified,
             score_deleted=False,
@@ -232,8 +228,8 @@ class GradesServiceTests(ModuleStoreTestCase):
         assert self.mock_signal.call_args == call(
             sender=None,
             user_id=self.user.id,
-            course_id=six.text_type(self.course.id),
-            usage_id=six.text_type(self.subsection_without_grade.location),
+            course_id=str(self.course.id),
+            usage_id=str(self.subsection_without_grade.location),
             only_if_higher=False,
             modified=override_obj.modified,
             score_deleted=False,
@@ -259,8 +255,8 @@ class GradesServiceTests(ModuleStoreTestCase):
         assert self.mock_signal.call_args == call(
             sender=None,
             user_id=self.user.id,
-            course_id=six.text_type(self.course.id),
-            usage_id=six.text_type(self.subsection.location),
+            course_id=str(self.course.id),
+            usage_id=str(self.subsection.location),
             only_if_higher=False,
             modified=datetime.now().replace(tzinfo=pytz.UTC),
             score_deleted=True,

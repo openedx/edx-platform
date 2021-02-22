@@ -11,12 +11,12 @@ from edx_toggles.toggles.testutils import override_waffle_switch
 from milestones import api as milestones_api
 from milestones.tests.utils import MilestonesTestCaseMixin
 
+from common.djangoapps.student.tests.factories import UserFactory
 from lms.djangoapps.courseware.access import has_access
 from lms.djangoapps.grades.api import CourseGradeFactory
 from lms.djangoapps.grades.tests.utils import answer_problem
 from openedx.core.djangolib.testing.utils import get_mock_request
 from openedx.core.lib.gating import api as gating_api
-from common.djangoapps.student.tests.factories import UserFactory
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
@@ -31,11 +31,11 @@ class TestGatedContent(MilestonesTestCaseMixin, SharedModuleStoreTestCase):
 
     @classmethod
     def setUpClass(cls):
-        super(TestGatedContent, cls).setUpClass()
+        super().setUpClass()
         cls.set_up_course()
 
     def setUp(self):
-        super(TestGatedContent, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.setup_gating_milestone(50, 100)
         self.non_staff_user = UserFactory()
         self.staff_user = UserFactory(is_staff=True, is_superuser=True)

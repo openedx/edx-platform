@@ -3,13 +3,14 @@ Tests for the SubsectionGradeFactory class.
 """
 
 
+from unittest.mock import patch
+
 import ddt
 from django.conf import settings
-from mock import patch
 
+from common.djangoapps.student.tests.factories import UserFactory
 from lms.djangoapps.courseware.tests.test_submitting_problems import ProblemSubmissionTestMixin
 from lms.djangoapps.grades.config.tests.utils import persistent_grades_feature_flags
-from common.djangoapps.student.tests.factories import UserFactory
 
 from ..constants import GradeOverrideFeatureEnum
 from ..models import PersistentSubsectionGrade, PersistentSubsectionGradeOverride

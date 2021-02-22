@@ -1,15 +1,13 @@
 """ Tests calling the grades api directly """
 
 
-import ddt
-from mock import patch
+from unittest.mock import patch
 
-from lms.djangoapps.grades import api
-from lms.djangoapps.grades.models import (
-    PersistentSubsectionGrade,
-    PersistentSubsectionGradeOverride,
-)
+import ddt
+
 from common.djangoapps.student.tests.factories import UserFactory
+from lms.djangoapps.grades import api
+from lms.djangoapps.grades.models import PersistentSubsectionGrade, PersistentSubsectionGradeOverride
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 
@@ -22,7 +20,7 @@ class OverrideSubsectionGradeTests(ModuleStoreTestCase):
 
     @classmethod
     def setUpTestData(cls):
-        super(OverrideSubsectionGradeTests, cls).setUpTestData()
+        super().setUpTestData()
         cls.user = UserFactory()
         cls.overriding_user = UserFactory()
         cls.signal_patcher = patch('lms.djangoapps.grades.signals.signals.SUBSECTION_OVERRIDE_CHANGED.send')
@@ -35,13 +33,13 @@ class OverrideSubsectionGradeTests(ModuleStoreTestCase):
 
     @classmethod
     def tearDownClass(cls):
-        super(OverrideSubsectionGradeTests, cls).tearDownClass()
+        super().tearDownClass()
         cls.signal_patcher.stop()
         cls.id_patcher.stop()
         cls.type_patcher.stop()
 
     def setUp(self):
-        super(OverrideSubsectionGradeTests, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.course = CourseFactory.create(org='edX', number='DemoX', display_name='Demo_Course', run='Spring2019')
         self.subsection = ItemFactory.create(parent=self.course, category="subsection", display_name="Subsection")
         self.grade = PersistentSubsectionGrade.update_or_create_grade(
@@ -57,7 +55,7 @@ class OverrideSubsectionGradeTests(ModuleStoreTestCase):
         )
 
     def tearDown(self):
-        super(OverrideSubsectionGradeTests, self).tearDown()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().tearDown()
         PersistentSubsectionGradeOverride.objects.all().delete()  # clear out all previous overrides
 
     @ddt.data(0.0, None, 3.0)

@@ -4,16 +4,15 @@ Tests for recalculate_learner_grades management command.
 
 
 from tempfile import NamedTemporaryFile
+from unittest import mock
 
-import mock
-
+from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
 from lms.djangoapps.grades.management.commands import recalculate_learner_grades
 from lms.djangoapps.grades.tests.test_tasks import HasCourseWithProblemsMixin
-from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
-DATE_FORMAT = u"%Y-%m-%d %H:%M"
+DATE_FORMAT = "%Y-%m-%d %H:%M"
 
 
 class TestRecalculateLearnerGrades(HasCourseWithProblemsMixin, ModuleStoreTestCase):
@@ -22,7 +21,7 @@ class TestRecalculateLearnerGrades(HasCourseWithProblemsMixin, ModuleStoreTestCa
     """
 
     def setUp(self):
-        super(TestRecalculateLearnerGrades, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.command = recalculate_learner_grades.Command()
 
         self.course1 = CourseFactory.create()
@@ -50,7 +49,7 @@ class TestRecalculateLearnerGrades(HasCourseWithProblemsMixin, ModuleStoreTestCa
         with NamedTemporaryFile() as csv:
             csv.write(b"course_id,user_id\n")
             csv.writelines(
-                "{},{}\n".format(course, user).encode()
+                f"{course},{user}\n".encode()
                 for user, course in self.user_course_pairs
             )
             csv.seek(0)

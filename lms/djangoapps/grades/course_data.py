@@ -13,7 +13,7 @@ from .transformer import GradesTransformer
 
 
 @python_2_unicode_compatible
-class CourseData(object):
+class CourseData:
     """
     Utility access layer to intelligently get and cache the
     requested course data as long as at least one property is
@@ -108,15 +108,15 @@ class CourseData(object):
         """
         Return human-readable string representation.
         """
-        return u'Course: course_key: {}'.format(self.course_key)
+        return f'Course: course_key: {self.course_key}'
 
     def full_string(self):  # lint-amnesty, pylint: disable=missing-function-docstring
         if self.effective_structure:
-            return u'Course: course_key: {}, version: {}, edited_on: {}, grading_policy: {}'.format(
+            return 'Course: course_key: {}, version: {}, edited_on: {}, grading_policy: {}'.format(
                 self.course_key, self.version, self.edited_on, self.grading_policy_hash,
             )
         else:
-            return u'Course: course_key: {}, empty course structure'.format(self.course_key)
+            return f'Course: course_key: {self.course_key}, empty course structure'
 
     @property
     def effective_structure(self):

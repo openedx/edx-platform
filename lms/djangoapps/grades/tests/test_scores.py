@@ -27,7 +27,7 @@ def submission_value_repr(self):
     the "created_at" attribute that changes with each execution.  Needed for
     consistency of ddt-generated test methods across pytest-xdist workers.
     """
-    return u'<SubmissionValue exists={}>'.format(self.exists)
+    return f'<SubmissionValue exists={self.exists}>'
 
 
 def csm_value_repr(self):
@@ -36,7 +36,7 @@ def csm_value_repr(self):
     the "created" attribute that changes with each execution.  Needed for
     consistency of ddt-generated test methods across pytest-xdist workers.
     """
-    return u'<CSMValue exists={} raw_earned={}>'.format(self.exists, self.raw_earned)
+    return f'<CSMValue exists={self.exists} raw_earned={self.raw_earned}>'
 
 
 def expected_result_repr(self):
@@ -47,7 +47,7 @@ def expected_result_repr(self):
     """
     included = ('raw_earned', 'raw_possible', 'weighted_earned', 'weighted_possible', 'weight', 'graded')
     attributes = ['{}={}'.format(name, getattr(self, name)) for name in included]
-    return u'<ExpectedResult {}>'.format(' '.join(attributes))
+    return '<ExpectedResult {}>'.format(' '.join(attributes))
 
 
 class TestScoredBlockTypes(TestCase):
@@ -65,7 +65,7 @@ class TestScoredBlockTypes(TestCase):
         assert self.possibly_scored_block_types.issubset(scores._block_types_possibly_scored())
 
     def test_possibly_scored(self):
-        course_key = CourseLocator(u'org', u'course', u'run')
+        course_key = CourseLocator('org', 'course', 'run')
         for block_type in self.possibly_scored_block_types:
             usage_key = BlockUsageLocator(course_key, block_type, 'mock_block_id')
             assert scores.possibly_scored(usage_key)
@@ -77,7 +77,7 @@ class TestGetScore(TestCase):
     Tests for get_score
     """
     display_name = 'test_name'
-    course_key = CourseLocator(u'org', u'course', u'run')
+    course_key = CourseLocator('org', 'course', 'run')
     location = BlockUsageLocator(course_key, 'problem', 'mock_block_id')
 
     SubmissionValue = namedtuple('SubmissionValue', 'exists, points_earned, points_possible, created_at')
@@ -298,7 +298,7 @@ class TestInternalGetScoreFromBlock(TestCase):
     """
     Tests the internal helper method: _get_score_from_persisted_or_latest_block
     """
-    course_key = CourseLocator(u'org', u'course', u'run')
+    course_key = CourseLocator('org', 'course', 'run')
     location = BlockUsageLocator(course_key, 'problem', 'mock_block_id')
 
     def _create_block(self, raw_possible):

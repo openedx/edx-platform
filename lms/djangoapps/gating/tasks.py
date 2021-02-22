@@ -5,14 +5,13 @@ This file contains celery tasks related to course content gating.
 
 import logging
 
-import six
 from celery import shared_task
 from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from edx_django_utils.monitoring import set_code_owner_attribute
 from opaque_keys.edx.keys import CourseKey, UsageKey
 
-from lms.djangoapps.gating import api as gating_api
 from lms.djangoapps.course_blocks.api import get_course_blocks
+from lms.djangoapps.gating import api as gating_api
 from xmodule.modulestore.django import modulestore
 
 log = logging.getLogger(__name__)
@@ -34,7 +33,7 @@ def task_evaluate_subsection_completion_milestones(course_id, block_id, user_id)
         course = store.get_course(course_key)
         if not course or not course.enable_subsection_gating:
             log.debug(
-                u"Gating: ignoring evaluation of completion milestone because it disabled for course [%s]", course_id
+                "Gating: ignoring evaluation of completion milestone because it disabled for course [%s]", course_id
             )
         else:
             try:
@@ -44,12 +43,12 @@ def task_evaluate_subsection_completion_milestones(course_id, block_id, user_id)
                 subsection_block = _get_subsection_of_block(completed_block_usage_key, course_structure)
                 subsection = course_structure[subsection_block]
                 log.debug(
-                    u"Gating: Evaluating completion milestone for subsection [%s] and user [%s]",
-                    six.text_type(subsection.location), user.id
+                    "Gating: Evaluating completion milestone for subsection [%s] and user [%s]",
+                    str(subsection.location), user.id
                 )
                 gating_api.evaluate_prerequisite(course, subsection, user)
             except KeyError:
-                log.error(u"Gating: Given prerequisite subsection [%s] not found in course structure", block_id)
+                log.error("Gating: Given prerequisite subsection [%s] not found in course structure", block_id)
 
 
 def _get_subsection_of_block(usage_key, block_structure):
