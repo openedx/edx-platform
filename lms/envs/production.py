@@ -533,10 +533,10 @@ CELERY_BROKER_USER = AUTH_TOKENS.get("CELERY_BROKER_USER", "")
 CELERY_BROKER_PASSWORD = AUTH_TOKENS.get("CELERY_BROKER_PASSWORD", "")
 
 BROKER_URL = "{}://{}:{}@{}/{}".format(CELERY_BROKER_TRANSPORT,
-                                            CELERY_BROKER_USER,
-                                            CELERY_BROKER_PASSWORD,
-                                            CELERY_BROKER_HOSTNAME,
-                                            CELERY_BROKER_VHOST)
+                                       CELERY_BROKER_USER,
+                                       CELERY_BROKER_PASSWORD,
+                                       CELERY_BROKER_HOSTNAME,
+                                       CELERY_BROKER_VHOST)
 BROKER_USE_SSL = ENV_TOKENS.get('CELERY_BROKER_USE_SSL', False)
 
 BROKER_TRANSPORT_OPTIONS = {
