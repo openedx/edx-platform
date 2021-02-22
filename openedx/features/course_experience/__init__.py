@@ -72,7 +72,16 @@ COURSE_ENABLE_UNENROLLED_ACCESS_FLAG = CourseWaffleFlag(
     __name__,
 )
 
-# Waffle flag to enable relative dates for course content
+# .. toggle_name: course_experience.relative_dates
+# .. toggle_implementation: ExperimentWaffleFlag
+# .. toggle_default: False
+# .. toggle_description: Waffle flag to enable relative dates for course content. A 'Dates' tab will be visible in the
+#   course view showing key course dates.
+# .. toggle_use_cases: opt_in
+# .. toggle_creation_date: 2020-02-10
+# .. toggle_warnings: To set a relative due date for self-paced courses, the weeks_to_complete field for a course run
+#   needs to be set. Currently it can be set through the publisher app.
+# .. toggle_tickets: https://openedx.atlassian.net/browse/AA-27
 RELATIVE_DATES_FLAG = ExperimentWaffleFlag(WAFFLE_FLAG_NAMESPACE, 'relative_dates', __name__, experiment_id=17)
 
 # .. toggle_name: course_experience.calendar_sync
