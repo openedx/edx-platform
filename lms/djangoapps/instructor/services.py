@@ -12,17 +12,17 @@ from opaque_keys.edx.keys import CourseKey, UsageKey
 from opaque_keys.edx.locator import CourseLocator
 
 import lms.djangoapps.instructor.enrollment as enrollment
-from lms.djangoapps.courseware.models import StudentModule
-from lms.djangoapps.commerce.utils import create_zendesk_ticket
-from lms.djangoapps.instructor.views.tools import get_student_from_identifier
 from common.djangoapps.student import auth
 from common.djangoapps.student.roles import CourseStaffRole
+from lms.djangoapps.commerce.utils import create_zendesk_ticket
+from lms.djangoapps.courseware.models import StudentModule
+from lms.djangoapps.instructor.views.tools import get_student_from_identifier
 from xmodule.modulestore.django import modulestore
 
 log = logging.getLogger(__name__)
 
 
-class InstructorService(object):
+class InstructorService:
     """
     Instructor service for deleting the students attempt(s) of an exam. This service has been created
     for the edx_proctoring's dependency injection to cater for a requirement where edx_proctoring
@@ -49,7 +49,7 @@ class InstructorService(object):
         except ObjectDoesNotExist:
             err_msg = (
                 'Error occurred while attempting to reset student attempts for user '
-                u'{student_identifier} for content_id {content_id}. '
+                '{student_identifier} for content_id {content_id}. '
                 'User does not exist!'.format(
                     student_identifier=student_identifier,
                     content_id=content_id
@@ -62,7 +62,7 @@ class InstructorService(object):
             module_state_key = UsageKey.from_string(content_id)
         except InvalidKeyError:
             err_msg = (
-                u'Invalid content_id {content_id}!'.format(content_id=content_id)
+                f'Invalid content_id {content_id}!'
             )
             log.error(err_msg)
             return
@@ -79,7 +79,7 @@ class InstructorService(object):
             except (StudentModule.DoesNotExist, enrollment.sub_api.SubmissionError):
                 err_msg = (
                     'Error occurred while attempting to reset student attempts for user '
-                    u'{student_identifier} for content_id {content_id}.'.format(
+                    '{student_identifier} for content_id {content_id}.'.format(
                         student_identifier=student_identifier,
                         content_id=content_id
                     )
@@ -108,17 +108,17 @@ class InstructorService(object):
         if course.create_zendesk_tickets:
             requester_name = "edx-proctoring"
             email = "edx-proctoring@edx.org"
-            subject = _(u"Proctored Exam Review: {review_status}").format(review_status=review_status)
+            subject = _("Proctored Exam Review: {review_status}").format(review_status=review_status)
             body = _(
-                u"A proctored exam attempt for {exam_name} in {course_name} by username: {student_username} "
-                u"was reviewed as {review_status} by the proctored exam review provider.\n"
-                u"Review link: {review_url}"
+                "A proctored exam attempt for {exam_name} in {course_name} by username: {student_username} "
+                "was reviewed as {review_status} by the proctored exam review provider.\n"
+                "Review link: {review_url}"
             ).format(
                 exam_name=exam_name,
                 course_name=course.display_name,
                 student_username=student_username,
                 review_status=review_status,
-                review_url=review_url or u'not available',
+                review_url=review_url or 'not available',
             )
             tags = ["proctoring"]
             create_zendesk_ticket(requester_name, email, subject, body, tags)

@@ -1,22 +1,21 @@
 """
 Tests for the InstructorService
 """
-
-
 import json
+from unittest import mock
+
 import pytest
 import mock
 import six
+from django.core.exceptions import ObjectDoesNotExist
 from opaque_keys import InvalidKeyError
 
-from django.core.exceptions import ObjectDoesNotExist
-
+from common.djangoapps.student.models import CourseEnrollment
+from common.djangoapps.student.tests.factories import UserFactory
 from lms.djangoapps.courseware.models import StudentModule
 from lms.djangoapps.instructor.access import allow_access
 from lms.djangoapps.instructor.services import InstructorService
 from lms.djangoapps.instructor.tests.test_tools import msk_from_problem_urlname
-from common.djangoapps.student.models import CourseEnrollment
-from common.djangoapps.student.tests.factories import UserFactory
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
@@ -28,7 +27,7 @@ class InstructorServiceTests(SharedModuleStoreTestCase):
 
     @classmethod
     def setUpClass(cls):
-        super(InstructorServiceTests, cls).setUpClass()
+        super().setUpClass()
         cls.email = 'escalation@test.com'
         cls.course = CourseFactory.create(proctoring_escalation_email=cls.email)
         cls.problem_location = msk_from_problem_urlname(
@@ -39,11 +38,11 @@ class InstructorServiceTests(SharedModuleStoreTestCase):
             cls.course.id,
             'robot-some-other_problem-urlname'
         )
-        cls.problem_urlname = six.text_type(cls.problem_location)
-        cls.other_problem_urlname = six.text_type(cls.other_problem_location)
+        cls.problem_urlname = str(cls.problem_location)
+        cls.other_problem_urlname = str(cls.other_problem_location)
 
     def setUp(self):
-        super(InstructorServiceTests, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
 
         self.student = UserFactory()
         CourseEnrollment.enroll(self.student, self.course.id)
@@ -68,7 +67,7 @@ class InstructorServiceTests(SharedModuleStoreTestCase):
 
         self.service.delete_student_attempt(
             self.student.username,
-            six.text_type(self.course.id),
+            str(self.course.id),
             self.problem_urlname,
             requesting_user=self.student,
         )
@@ -84,7 +83,7 @@ class InstructorServiceTests(SharedModuleStoreTestCase):
 
         result = self.service.delete_student_attempt(  # lint-amnesty, pylint: disable=assignment-from-none
             self.student.username,
-            six.text_type(self.course.id),
+            str(self.course.id),
             'foo/bar/baz',
             requesting_user=self.student,
         )
@@ -97,7 +96,7 @@ class InstructorServiceTests(SharedModuleStoreTestCase):
 
         result = self.service.delete_student_attempt(  # lint-amnesty, pylint: disable=assignment-from-none
             'bad_student',
-            six.text_type(self.course.id),
+            str(self.course.id),
             'foo/bar/baz',
             requesting_user=self.student,
         )
@@ -110,7 +109,7 @@ class InstructorServiceTests(SharedModuleStoreTestCase):
 
         result = self.service.delete_student_attempt(  # lint-amnesty, pylint: disable=assignment-from-none
             self.student.username,
-            six.text_type(self.course.id),
+            str(self.course.id),
             self.other_problem_urlname,
             requesting_user=self.student,
         )
@@ -122,7 +121,7 @@ class InstructorServiceTests(SharedModuleStoreTestCase):
         """
         result = self.service.is_course_staff(
             self.student,
-            six.text_type(self.course.id)
+            str(self.course.id)
         )
         assert not result
 
@@ -130,7 +129,7 @@ class InstructorServiceTests(SharedModuleStoreTestCase):
         allow_access(self.course, self.student, 'staff')
         result = self.service.is_course_staff(
             self.student,
-            six.text_type(self.course.id)
+            str(self.course.id)
         )
         assert result
 
@@ -140,11 +139,11 @@ class InstructorServiceTests(SharedModuleStoreTestCase):
         """
         requester_name = "edx-proctoring"
         email = "edx-proctoring@edx.org"
-        subject = u"Proctored Exam Review: {review_status}".format(review_status="Suspicious")
+        subject = "Proctored Exam Review: {review_status}".format(review_status="Suspicious")
 
-        body = u"A proctored exam attempt for {exam_name} in {course_name} by username: {student_username} was " \
-               u"reviewed as {review_status} by the proctored exam review provider.\n" \
-               u"Review link: {url}"
+        body = "A proctored exam attempt for {exam_name} in {course_name} by username: {student_username} was " \
+               "reviewed as {review_status} by the proctored exam review provider.\n" \
+               "Review link: {url}"
         args = {
             'exam_name': 'test_exam',
             'student_username': 'test_student',
@@ -157,7 +156,7 @@ class InstructorServiceTests(SharedModuleStoreTestCase):
 
         with mock.patch("lms.djangoapps.instructor.services.create_zendesk_ticket") as mock_create_zendesk_ticket:
             self.service.send_support_notification(
-                course_id=six.text_type(self.course.id),
+                course_id=str(self.course.id),
                 exam_name=args['exam_name'],
                 student_username=args["student_username"],
                 review_status="Suspicious",
@@ -169,7 +168,7 @@ class InstructorServiceTests(SharedModuleStoreTestCase):
         args['url'] = 'http://review/url'
         with mock.patch("lms.djangoapps.instructor.services.create_zendesk_ticket") as mock_create_zendesk_ticket:
             self.service.send_support_notification(
-                course_id=six.text_type(self.course.id),
+                course_id=str(self.course.id),
                 exam_name=args['exam_name'],
                 student_username=args["student_username"],
                 review_status="Suspicious",

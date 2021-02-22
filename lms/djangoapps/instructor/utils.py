@@ -8,7 +8,7 @@ from lms.djangoapps.courseware.module_render import get_module
 from xmodule.modulestore.django import modulestore
 
 
-class DummyRequest(object):
+class DummyRequest:
     """Dummy request"""
 
     META = {}
