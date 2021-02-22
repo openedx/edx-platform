@@ -121,11 +121,11 @@ class TestAccountDeactivation(TestCase):
             expected_status(int): Expected request's response status.
             expected_activation_status(bool): Expected user has_usable_password attribute value.
         """
-        self.assertTrue(self.test_user.has_usable_password())
+        assert self.test_user.has_usable_password()
         response = self.client.post(self.url, **headers)
-        self.assertEqual(response.status_code, expected_status)
+        assert response.status_code == expected_status
         self.test_user.refresh_from_db()
-        self.assertEqual(self.test_user.has_usable_password(), expected_activation_status)
+        assert self.test_user.has_usable_password() == expected_activation_status
 
     def test_superuser_deactivates_user(self):
         """
@@ -148,7 +148,7 @@ class TestAccountDeactivation(TestCase):
         )
         user.user_permissions.add(permission)
         headers = build_jwt_headers(user)
-        self.assertTrue(self.test_user.has_usable_password())
+        assert self.test_user.has_usable_password()
         self.assert_activation_status(headers)
 
     def test_unauthorized_rejection(self):
@@ -210,22 +210,22 @@ class TestDeactivateLogout(RetirementTestCase):
         self.client.login(username=self.test_user.username, password=self.test_password)
         headers = build_jwt_headers(self.test_user)
         response = self.client.post(self.url, self.build_post(self.test_password), **headers)
-        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+        assert response.status_code == status.HTTP_204_NO_CONTENT
         # make sure the user model is as expected
         updated_user = User.objects.get(id=self.test_user.id)
-        self.assertEqual(get_retired_email_by_email(self.test_user.email), updated_user.email)
-        self.assertFalse(updated_user.has_usable_password())
-        self.assertEqual(list(UserSocialAuth.objects.filter(user=self.test_user)), [])
-        self.assertEqual(list(Registration.objects.filter(user=self.test_user)), [])
-        self.assertEqual(len(UserRetirementStatus.objects.filter(user_id=self.test_user.id)), 1)
+        assert get_retired_email_by_email(self.test_user.email) == updated_user.email
+        assert not updated_user.has_usable_password()
+        assert list(UserSocialAuth.objects.filter(user=self.test_user)) == []
+        assert list(Registration.objects.filter(user=self.test_user)) == []
+        assert len(UserRetirementStatus.objects.filter(user_id=self.test_user.id)) == 1
         # these retirement utils are tested elsewhere; just make sure we called them
         mock_retire_dot.assert_called_with(self.test_user)
         # make sure the user cannot log in
-        self.assertFalse(self.client.login(username=self.test_user.username, password=self.test_password))
+        assert not self.client.login(username=self.test_user.username, password=self.test_password)
         # make sure that an email has been sent
-        self.assertEqual(len(mail.outbox), 1)
+        assert len(mail.outbox) == 1
         # ensure that it's been sent to the correct email address
-        self.assertIn(self.test_user.email, mail.outbox[0].to)
+        assert self.test_user.email in mail.outbox[0].to
 
     def test_user_can_deactivate_secondary_email(self):
         """
@@ -235,15 +235,15 @@ class TestDeactivateLogout(RetirementTestCase):
         # Create secondary/recovery email for test user
         AccountRecoveryFactory(user=self.test_user)
         # Assert that there is an secondary/recovery email for test user
-        self.assertEqual(len(AccountRecovery.objects.filter(user_id=self.test_user.id)), 1)
+        assert len(AccountRecovery.objects.filter(user_id=self.test_user.id)) == 1
 
         self.client.login(username=self.test_user.username, password=self.test_password)
         headers = build_jwt_headers(self.test_user)
         response = self.client.post(self.url, self.build_post(self.test_password), **headers)
-        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+        assert response.status_code == status.HTTP_204_NO_CONTENT
 
         # Assert that there is no longer a secondary/recovery email for test user
-        self.assertEqual(len(AccountRecovery.objects.filter(user_id=self.test_user.id)), 0)
+        assert len(AccountRecovery.objects.filter(user_id=self.test_user.id)) == 0
 
     def test_password_mismatch(self):
         """
@@ -253,7 +253,7 @@ class TestDeactivateLogout(RetirementTestCase):
         self.client.login(username=self.test_user.username, password=self.test_password)
         headers = build_jwt_headers(self.test_user)
         response = self.client.post(self.url, self.build_post(self.test_password + "xxxx"), **headers)
-        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        assert response.status_code == status.HTTP_403_FORBIDDEN
 
     def test_called_twice(self):
         """
@@ -263,11 +263,11 @@ class TestDeactivateLogout(RetirementTestCase):
         self.client.login(username=self.test_user.username, password=self.test_password)
         headers = build_jwt_headers(self.test_user)
         response = self.client.post(self.url, self.build_post(self.test_password), **headers)
-        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+        assert response.status_code == status.HTTP_204_NO_CONTENT
         self.client.login(username=self.test_user.username, password=self.test_password)
         headers = build_jwt_headers(self.test_user)
         response = self.client.post(self.url, self.build_post(self.test_password), **headers)
-        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        assert response.status_code == status.HTTP_403_FORBIDDEN
 
 
 @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Account APIs are only supported in LMS')
@@ -320,8 +320,8 @@ class TestPartnerReportingCleanup(ModuleStoreTestCase):
         print(response)
         print(response.content)
 
-        self.assertEqual(response.status_code, expected_status)
-        self.assertEqual(UserRetirementPartnerReportingStatus.objects.all().count(), remaining_count)
+        assert response.status_code == expected_status
+        assert UserRetirementPartnerReportingStatus.objects.all().count() == remaining_count
 
     def test_success(self):
         """
@@ -405,7 +405,7 @@ class TestPartnerReportingPut(RetirementTestCase, ModuleStoreTestCase):
         Helper function for making a request to the retire subscriptions endpoint, and asserting the status.
         """
         response = self.client.put(self.url, json.dumps(data), **self.headers)
-        self.assertEqual(response.status_code, expected_status)
+        assert response.status_code == expected_status
         return response
 
     def test_success(self):
@@ -418,7 +418,7 @@ class TestPartnerReportingPut(RetirementTestCase, ModuleStoreTestCase):
             CourseEnrollment.enroll(user=retirement.user, course_key=course.id)
 
         self.put_and_assert_status({'username': retirement.original_username})
-        self.assertTrue(UserRetirementPartnerReportingStatus.objects.filter(user=retirement.user).exists())
+        assert UserRetirementPartnerReportingStatus.objects.filter(user=retirement.user).exists()
 
     def test_idempotent(self):
         """
@@ -436,7 +436,7 @@ class TestPartnerReportingPut(RetirementTestCase, ModuleStoreTestCase):
 
         # Try running our step again
         self.put_and_assert_status({'username': retirement.original_username})
-        self.assertTrue(UserRetirementPartnerReportingStatus.objects.filter(user=retirement.user).exists())
+        assert UserRetirementPartnerReportingStatus.objects.filter(user=retirement.user).exists()
 
     def test_unknown_user(self):
         """
@@ -462,20 +462,20 @@ class TestPartnerReportingPut(RetirementTestCase, ModuleStoreTestCase):
         enrollment = CourseEnrollment.enroll(user=user, course_key=CourseKey.from_string('edX/Test201/2018_Fall'))
 
         # Make sure the enrollment was created
-        self.assertTrue(enrollment.is_active)
+        assert enrollment.is_active
 
         # Make sure the correct org is found and returned from the low-level call. We don't get back
         # the orgs from our PUT operation, so this is the best way to make sure it's doing the right
         # thing.
         orgs = AccountRetirementPartnerReportView._get_orgs_for_user(user)  # pylint: disable=protected-access
-        self.assertTrue(len(orgs) == 1)  # lint-amnesty, pylint: disable=wrong-assert-type
-        self.assertTrue('edX' in orgs)  # lint-amnesty, pylint: disable=wrong-assert-type
+        assert len(orgs) == 1
+        assert 'edX' in orgs
 
         # PUT should succeed
         self.put_and_assert_status({'username': user.username})
 
         # Row should exist
-        self.assertTrue(UserRetirementPartnerReportingStatus.objects.filter(user=retirement.user).exists())
+        assert UserRetirementPartnerReportingStatus.objects.filter(user=retirement.user).exists()
 
 
 @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Account APIs are only supported in LMS')
@@ -565,13 +565,13 @@ class TestPartnerReportingList(ModuleStoreTestCase):
         is returned.
         """
         response = self.client.post(self.url, **self.headers)
-        self.assertEqual(response.status_code, expected_status)
+        assert response.status_code == expected_status
 
         returned_users = response.json()
         print(returned_users)
         print(expected_users)
 
-        self.assertEqual(len(expected_users), len(returned_users))
+        assert len(expected_users) == len(returned_users)
 
         # These sub-lists will fail assertCountEqual if they're out of order
         for expected_user in expected_users:
@@ -727,7 +727,7 @@ class TestAccountRetirementList(RetirementTestCase):
 
         data = {'cool_off_days': cool_off_days, 'states': states_to_request}
         response = self.client.get(self.url, data, **self.headers)
-        self.assertEqual(response.status_code, expected_status)
+        assert response.status_code == expected_status
         response_data = response.json()
 
         if expected_data:
@@ -762,8 +762,8 @@ class TestAccountRetirementList(RetirementTestCase):
             create_retirement_status(UserFactory(), state=RetirementState.objects.get(state_name=state))
         data = {'cool_off_days': 0, 'states': multiple_states}
         response = self.client.get(self.url, data, **self.headers)
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(len(response.json()), 2)
+        assert response.status_code == status.HTTP_200_OK
+        assert len(response.json()) == 2
 
     def test_users_exist(self):
         """
@@ -837,17 +837,17 @@ class TestAccountRetirementList(RetirementTestCase):
         All params are required, make sure that is enforced
         """
         response = self.client.get(self.url, **self.headers)
-        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
 
         response = self.client.get(self.url, {}, **self.headers)
-        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
 
         response = self.client.get(self.url, {'cool_off_days': 7}, **self.headers)
-        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
 
         RetirementState.objects.get(state_name='PENDING')
         response = self.client.get(self.url, {'states': ['PENDING']}, **self.headers)
-        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
 
 
 @ddt.ddt
@@ -896,7 +896,7 @@ class TestAccountRetirementsByStatusAndDate(RetirementTestCase):
         print(response.status_code)
         print(response)
 
-        self.assertEqual(response.status_code, expected_status)
+        assert response.status_code == expected_status
         response_data = response.json()
 
         if expected_data:
@@ -981,7 +981,7 @@ class TestAccountRetirementsByStatusAndDate(RetirementTestCase):
                     'state': 'COMPLETE'
                 }
                 response = self.client.get(self.url, data, **self.headers)
-                self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+                assert response.status_code == status.HTTP_400_BAD_REQUEST
 
     @ddt.data(
         {},
@@ -996,7 +996,7 @@ class TestAccountRetirementsByStatusAndDate(RetirementTestCase):
         All params are required, make sure that is enforced
         """
         response = self.client.get(self.url, request_data, **self.headers)
-        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
 
 
 @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Account APIs are only supported in LMS')
@@ -1021,7 +1021,7 @@ class TestAccountRetirementRetrieve(RetirementTestCase):
             self.url = reverse('accounts_retirement_retrieve', kwargs={'username': username_to_find})
 
         response = self.client.get(self.url, **self.headers)
-        self.assertEqual(response.status_code, expected_status)
+        assert response.status_code == expected_status
 
         if expected_data is not None:
             response_data = response.json()
@@ -1101,12 +1101,12 @@ class TestAccountRetirementCleanup(RetirementTestCase):
 
         response = self.client.post(self.url, json.dumps(data), **self.headers)
         print(response)
-        self.assertEqual(response.status_code, expected_status)
+        assert response.status_code == expected_status
         return response
 
     def test_simple_success(self):
         self.cleanup_and_assert_status()
-        self.assertFalse(UserRetirementStatus.objects.all())
+        assert not UserRetirementStatus.objects.all()
 
     def test_leaves_other_users(self):
         remaining_usernames = []
@@ -1119,10 +1119,8 @@ class TestAccountRetirementCleanup(RetirementTestCase):
 
         # Call should succeed and leave behind the local users in both states
         self.cleanup_and_assert_status()
-        self.assertEqual(
-            UserRetirementStatus.objects.filter(user__username__in=remaining_usernames).count(),
-            len(remaining_usernames)
-        )
+        assert UserRetirementStatus.objects.filter(user__username__in=remaining_usernames).count() ==\
+               len(remaining_usernames)
 
     def test_no_usernames(self):
         self.cleanup_and_assert_status(data={'usernames': []})
@@ -1172,7 +1170,7 @@ class TestAccountRetirementUpdate(RetirementTestCase):
             data['username'] = self.test_user.username
 
         response = self.client.patch(self.url, json.dumps(data), **self.headers)
-        self.assertEqual(response.status_code, expected_status)
+        assert response.status_code == expected_status
 
     def test_single_update(self):
         """
@@ -1183,9 +1181,9 @@ class TestAccountRetirementUpdate(RetirementTestCase):
 
         # Refresh the retirement object and confirm the messages and state are correct
         retirement = UserRetirementStatus.objects.get(id=self.retirement.id)
-        self.assertEqual(retirement.current_state, RetirementState.objects.get(state_name='LOCKING_ACCOUNT'))
-        self.assertEqual(retirement.last_state, RetirementState.objects.get(state_name='PENDING'))
-        self.assertIn('this should succeed', retirement.responses)
+        assert retirement.current_state == RetirementState.objects.get(state_name='LOCKING_ACCOUNT')
+        assert retirement.last_state == RetirementState.objects.get(state_name='PENDING')
+        assert 'this should succeed' in retirement.responses
 
     def test_move_through_process(self):
         """
@@ -1205,13 +1203,13 @@ class TestAccountRetirementUpdate(RetirementTestCase):
 
         # Refresh the retirement object and confirm the messages and state are correct
         retirement = UserRetirementStatus.objects.get(id=self.retirement.id)
-        self.assertEqual(retirement.current_state, RetirementState.objects.get(state_name='COMPLETE'))
-        self.assertEqual(retirement.last_state, RetirementState.objects.get(state_name='CREDENTIALS_COMPLETE'))
-        self.assertIn('accountlockstart', retirement.responses)
-        self.assertIn('accountlockcomplete', retirement.responses)
-        self.assertIn('retiringcredentials', retirement.responses)
-        self.assertIn('credentialsretired', retirement.responses)
-        self.assertIn('accountretirementcomplete', retirement.responses)
+        assert retirement.current_state == RetirementState.objects.get(state_name='COMPLETE')
+        assert retirement.last_state == RetirementState.objects.get(state_name='CREDENTIALS_COMPLETE')
+        assert 'accountlockstart' in retirement.responses
+        assert 'accountlockcomplete' in retirement.responses
+        assert 'retiringcredentials' in retirement.responses
+        assert 'credentialsretired' in retirement.responses
+        assert 'accountretirementcomplete' in retirement.responses
 
     def test_unknown_state(self):
         """
@@ -1382,7 +1380,7 @@ class TestAccountRetirementPost(RetirementTestCase):
         Helper function for making a request to the retire subscriptions endpoint, and asserting the status.
         """
         response = self.client.post(self.url, json.dumps(data), **self.headers)
-        self.assertEqual(response.status_code, expected_status)
+        assert response.status_code == expected_status
         return response
 
     def test_user_profile_pii_has_expected_values(self):
@@ -1398,14 +1396,14 @@ class TestAccountRetirementPost(RetirementTestCase):
             'bio': None,
             'phone_number': None,
         }
-        self.assertEqual(expected_user_profile_pii, USER_PROFILE_PII)
+        assert expected_user_profile_pii == USER_PROFILE_PII
 
     def test_retire_user_server_error_is_raised(self):
         path = 'openedx.core.djangoapps.user_api.models.UserRetirementStatus.get_retirement_for_retirement_action'
         with mock.patch(path, side_effect=Exception('Unexpected Exception')) as mock_get_retirement:
             data = {'username': self.test_user.username}
             response = self.post_and_assert_status(data, status.HTTP_500_INTERNAL_SERVER_ERROR)
-            self.assertEqual('Unexpected Exception', text_type(response.json()))
+            assert 'Unexpected Exception' == text_type(response.json())
             mock_get_retirement.assert_called_once_with(self.original_username)
 
     def test_retire_user_where_user_already_retired(self):
@@ -1413,13 +1411,13 @@ class TestAccountRetirementPost(RetirementTestCase):
         with mock.patch(path, return_value=True) as mock_is_username_retired:
             data = {'username': self.test_user.username}
             response = self.post_and_assert_status(data, status.HTTP_204_NO_CONTENT)
-            self.assertFalse(response.content)
+            assert not response.content
             mock_is_username_retired.assert_not_called()
 
     def test_retire_user_where_username_not_provided(self):
         response = self.post_and_assert_status({}, status.HTTP_404_NOT_FOUND)
         expected_response_message = {'message': text_type('The user was not specified.')}
-        self.assertEqual(expected_response_message, response.json())
+        assert expected_response_message == response.json()
 
     @mock.patch('openedx.core.djangoapps.user_api.accounts.views.get_profile_image_names')
     @mock.patch('openedx.core.djangoapps.user_api.accounts.views.remove_profile_images')
@@ -1437,33 +1435,31 @@ class TestAccountRetirementPost(RetirementTestCase):
             'username': self.retired_username,
         }
         for field, expected_value in iteritems(expected_user_values):
-            self.assertEqual(expected_value, getattr(self.test_user, field))
+            assert expected_value == getattr(self.test_user, field)
 
         for field, expected_value in iteritems(USER_PROFILE_PII):
-            self.assertEqual(expected_value, getattr(self.test_user.profile, field))
+            assert expected_value == getattr(self.test_user.profile, field)
 
-        self.assertIsNone(self.test_user.profile.profile_image_uploaded_at)
+        assert self.test_user.profile.profile_image_uploaded_at is None
         mock_get_profile_image_names.assert_called_once_with(self.original_username)
         mock_remove_profile_images.assert_called_once_with(
             mock_get_profile_image_names.return_value
         )
 
-        self.assertFalse(
-            SocialLink.objects.filter(user_profile=self.test_user.profile).exists()
-        )
+        assert not SocialLink.objects.filter(user_profile=self.test_user.profile).exists()
 
-        self.assertIsNone(cache.get(self.cache_key))
+        assert cache.get(self.cache_key) is None
 
         self._data_sharing_consent_assertions()
         self._sapsf_audit_assertions()
         self._pending_enterprise_customer_user_assertions()
         self._entitlement_support_detail_assertions()
 
-        self.assertFalse(PendingEmailChange.objects.filter(user=self.test_user).exists())
-        self.assertFalse(UserOrgTag.objects.filter(user=self.test_user).exists())
+        assert not PendingEmailChange.objects.filter(user=self.test_user).exists()
+        assert not UserOrgTag.objects.filter(user=self.test_user).exists()
 
-        self.assertFalse(CourseEnrollmentAllowed.objects.filter(email=self.original_email).exists())
-        self.assertFalse(UnregisteredLearnerCohortAssignments.objects.filter(email=self.original_email).exists())
+        assert not CourseEnrollmentAllowed.objects.filter(email=self.original_email).exists()
+        assert not UnregisteredLearnerCohortAssignments.objects.filter(email=self.original_email).exists()
 
     def test_retire_user_twice_idempotent(self):
         data = {'username': self.original_username}
@@ -1482,12 +1478,12 @@ class TestAccountRetirementPost(RetirementTestCase):
         AccountRetirementView.clear_pii_from_userprofile(self.test_user)
 
         for model_field, value_to_assign in iteritems(USER_PROFILE_PII):
-            self.assertEqual(value_to_assign, getattr(self.test_user.profile, model_field))
+            assert value_to_assign == getattr(self.test_user.profile, model_field)
 
         social_links = SocialLink.objects.filter(
             user_profile=self.test_user.profile
         )
-        self.assertFalse(social_links.exists())
+        assert not social_links.exists()
 
     @mock.patch('openedx.core.djangoapps.user_api.accounts.views.get_profile_image_names')
     @mock.patch('openedx.core.djangoapps.user_api.accounts.views.remove_profile_images')
@@ -1501,7 +1497,7 @@ class TestAccountRetirementPost(RetirementTestCase):
 
         self.test_user.profile.refresh_from_db()  # pylint: disable=no-member
 
-        self.assertIsNone(self.test_user.profile.profile_image_uploaded_at)
+        assert self.test_user.profile.profile_image_uploaded_at is None
         mock_get_profile_image_names.assert_called_once_with(self.test_user.username)
         mock_remove_profile_images.assert_called_once_with(
             mock_get_profile_image_names.return_value
@@ -1509,7 +1505,7 @@ class TestAccountRetirementPost(RetirementTestCase):
 
     def test_can_delete_user_profiles_country_cache(self):
         AccountRetirementView.delete_users_country_cache(self.test_user)
-        self.assertIsNone(cache.get(self.cache_key))
+        assert cache.get(self.cache_key) is None
 
     def test_can_retire_users_datasharingconsent(self):
         AccountRetirementView.retire_users_data_sharing_consent(self.test_user.username, self.retired_username)
@@ -1520,11 +1516,11 @@ class TestAccountRetirementPost(RetirementTestCase):
         Helper method for asserting that ``DataSharingConsent`` objects are retired.
         """
         self.consent.refresh_from_db()
-        self.assertEqual(self.retired_username, self.consent.username)
+        assert self.retired_username == self.consent.username
         test_users_data_sharing_consent = DataSharingConsent.objects.filter(
             username=self.original_username
         )
-        self.assertFalse(test_users_data_sharing_consent.exists())
+        assert not test_users_data_sharing_consent.exists()
 
     def test_can_retire_users_sap_success_factors_audits(self):
         AccountRetirementView.retire_sapsf_data_transmission(self.test_user)
@@ -1535,11 +1531,11 @@ class TestAccountRetirementPost(RetirementTestCase):
         Helper method for asserting that ``SapSuccessFactorsLearnerDataTransmissionAudit`` objects are retired.
         """
         self.sapsf_audit.refresh_from_db()
-        self.assertEqual('', self.sapsf_audit.sapsf_user_id)
+        assert '' == self.sapsf_audit.sapsf_user_id
         audits_for_original_user_id = SapSuccessFactorsLearnerDataTransmissionAudit.objects.filter(
             sapsf_user_id=self.test_user.id,
         )
-        self.assertFalse(audits_for_original_user_id.exists())
+        assert not audits_for_original_user_id.exists()
 
     def test_can_retire_user_from_pendingenterprisecustomeruser(self):
         AccountRetirementView.retire_user_from_pending_enterprise_customer_user(self.test_user, self.retired_email)
@@ -1550,11 +1546,11 @@ class TestAccountRetirementPost(RetirementTestCase):
         Helper method for asserting that ``PendingEnterpriseCustomerUser`` objects are retired.
         """
         self.pending_enterprise_user.refresh_from_db()
-        self.assertEqual(self.retired_email, self.pending_enterprise_user.user_email)
+        assert self.retired_email == self.pending_enterprise_user.user_email
         pending_enterprise_users = PendingEnterpriseCustomerUser.objects.filter(
             user_email=self.original_email
         )
-        self.assertFalse(pending_enterprise_users.exists())
+        assert not pending_enterprise_users.exists()
 
     def test_course_entitlement_support_detail_comments_are_retired(self):
         AccountRetirementView.retire_entitlement_support_detail(self.test_user)
@@ -1565,7 +1561,7 @@ class TestAccountRetirementPost(RetirementTestCase):
         Helper method for asserting that ``CourseEntitleSupportDetail`` objects are retired.
         """
         self.entitlement_support_detail.refresh_from_db()
-        self.assertEqual('', self.entitlement_support_detail.comments)
+        assert '' == self.entitlement_support_detail.comments
 
 
 @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Account APIs are only supported in LMS')
@@ -1643,14 +1639,14 @@ class TestLMSAccountRetirementPost(RetirementTestCase, ModuleStoreTestCase):
         Helper function for making a request to the retire subscriptions endpoint, and asserting the status.
         """
         response = self.client.post(self.url, json.dumps(data), **self.headers)
-        self.assertEqual(response.status_code, expected_status)
+        assert response.status_code == expected_status
         return response
 
     def test_retire_user(self):
         # check that rows that will not exist after retirement exist now
-        self.assertTrue(CreditRequest.objects.filter(username=self.test_user.username).exists())
-        self.assertTrue(CreditRequirementStatus.objects.filter(username=self.test_user.username).exists())
-        self.assertTrue(PendingNameChange.objects.filter(user=self.test_user).exists())
+        assert CreditRequest.objects.filter(username=self.test_user.username).exists()
+        assert CreditRequirementStatus.objects.filter(username=self.test_user.username).exists()
+        assert PendingNameChange.objects.filter(user=self.test_user).exists()
 
         retirement = UserRetirementStatus.get_retirement_for_retirement_action(self.test_user.username)
         data = {'username': self.original_username}
@@ -1658,29 +1654,26 @@ class TestLMSAccountRetirementPost(RetirementTestCase, ModuleStoreTestCase):
 
         self.test_user.refresh_from_db()
         self.test_user.profile.refresh_from_db()  # pylint: disable=no-member
-        self.assertEqual(RevisionPluginRevision.objects.get(user=self.test_user).ip_address, None)
-        self.assertEqual(ArticleRevision.objects.get(user=self.test_user).ip_address, None)
-        self.assertFalse(PendingNameChange.objects.filter(user=self.test_user).exists())
+        assert RevisionPluginRevision.objects.get(user=self.test_user).ip_address is None
+        assert ArticleRevision.objects.get(user=self.test_user).ip_address is None
+        assert not PendingNameChange.objects.filter(user=self.test_user).exists()
 
-        self.assertEqual(
-            ManualEnrollmentAudit.objects.get(
-                enrollment=CourseEnrollment.objects.get(user=self.test_user)
-            ).enrolled_email,
-            retirement.retired_email
-        )
-        self.assertFalse(CreditRequest.objects.filter(username=self.test_user.username).exists())
-        self.assertTrue(CreditRequest.objects.filter(username=retirement.retired_username).exists())
-        self.assertEqual(CreditRequest.objects.get(username=retirement.retired_username).parameters, {})
+        assert ManualEnrollmentAudit.objects\
+            .get(enrollment=CourseEnrollment.objects.get(user=self.test_user)).enrolled_email == \
+               retirement.retired_email
+        assert not CreditRequest.objects.filter(username=self.test_user.username).exists()
+        assert CreditRequest.objects.filter(username=retirement.retired_username).exists()
+        assert CreditRequest.objects.get(username=retirement.retired_username).parameters == {}
 
-        self.assertFalse(CreditRequirementStatus.objects.filter(username=self.test_user.username).exists())
-        self.assertTrue(CreditRequirementStatus.objects.filter(username=retirement.retired_username).exists())
-        self.assertEqual(CreditRequirementStatus.objects.get(username=retirement.retired_username).reason, {})
+        assert not CreditRequirementStatus.objects.filter(username=self.test_user.username).exists()
+        assert CreditRequirementStatus.objects.filter(username=retirement.retired_username).exists()
+        assert CreditRequirementStatus.objects.get(username=retirement.retired_username).reason == {}
 
         retired_api_access_request = ApiAccessRequest.objects.get(user=self.test_user)
-        self.assertEqual(retired_api_access_request.website, '')
-        self.assertEqual(retired_api_access_request.company_address, '')
-        self.assertEqual(retired_api_access_request.company_name, '')
-        self.assertEqual(retired_api_access_request.reason, '')
+        assert retired_api_access_request.website == ''
+        assert retired_api_access_request.company_address == ''
+        assert retired_api_access_request.company_name == ''
+        assert retired_api_access_request.reason == ''
 
     def test_retire_user_twice_idempotent(self):
         # check that a second call to the retire_misc endpoint will work

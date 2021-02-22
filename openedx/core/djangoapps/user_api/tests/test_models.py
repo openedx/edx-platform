@@ -2,7 +2,7 @@
 Test UserPreferenceModel and UserPreference events
 """
 
-
+import pytest
 from django.db import IntegrityError
 from django.test import TestCase
 
@@ -23,13 +23,7 @@ class UserPreferenceModelTest(ModuleStoreTestCase):
     def test_duplicate_user_key(self):
         user = UserFactory.create()
         UserPreferenceFactory.create(user=user, key="testkey", value="first")
-        self.assertRaises(
-            IntegrityError,
-            UserPreferenceFactory.create,
-            user=user,
-            key="testkey",
-            value="second"
-        )
+        pytest.raises(IntegrityError, UserPreferenceFactory.create)
 
     def test_arbitrary_values(self):
         user = UserFactory.create()
@@ -45,9 +39,9 @@ class UserPreferenceModelTest(ModuleStoreTestCase):
     def _create_and_assert(self, user, key, value):
         """Create a new preference and assert the values. """
         preference = UserPreferenceFactory.create(user=user, key=key, value=value)
-        self.assertEqual(preference.user, user)
-        self.assertEqual(preference.key, key)
-        self.assertEqual(preference.value, value)
+        assert preference.user == user
+        assert preference.key == key
+        assert preference.value == value
         return preference
 
     def test_create_user_course_tags(self):
@@ -55,29 +49,29 @@ class UserPreferenceModelTest(ModuleStoreTestCase):
         user = UserFactory.create()
         course = CourseFactory.create()
         tag = UserCourseTagFactory.create(user=user, course_id=course.id, key="testkey", value="foobar")
-        self.assertEqual(tag.user, user)
-        self.assertEqual(tag.course_id, course.id)
-        self.assertEqual(tag.key, "testkey")
-        self.assertEqual(tag.value, "foobar")
+        assert tag.user == user
+        assert tag.course_id == course.id
+        assert tag.key == 'testkey'
+        assert tag.value == 'foobar'
 
     def test_create_user_org_tags(self):
         """Create org specific user tags and confirm all properties are set """
         user = UserFactory.create()
         course = CourseFactory.create()
         tag = UserOrgTagFactory.create(user=user, org=course.id.org, key="testkey", value="foobar")
-        self.assertEqual(tag.user, user)
-        self.assertEqual(tag.org, course.id.org)
-        self.assertEqual(tag.key, "testkey")
-        self.assertEqual(tag.value, "foobar")
-        self.assertIsNotNone(tag.created)
-        self.assertIsNotNone(tag.modified)
+        assert tag.user == user
+        assert tag.org == course.id.org
+        assert tag.key == 'testkey'
+        assert tag.value == 'foobar'
+        assert tag.created is not None
+        assert tag.modified is not None
 
         # Modify the tag and save it. Check if the modified timestamp is updated.
         original_modified = tag.modified
         tag.value = "barfoo"
         tag.save()
-        self.assertEqual(tag.value, "barfoo")
-        self.assertNotEqual(original_modified, tag.modified)
+        assert tag.value == 'barfoo'
+        assert original_modified != tag.modified
 
     def test_retire_user_org_tags_by_user_value(self):
         """Create org specific user tags and confirm all properties are set """
@@ -85,11 +79,11 @@ class UserPreferenceModelTest(ModuleStoreTestCase):
         course = CourseFactory.create()
         UserOrgTagFactory.create(user=user, org=course.id.org, key="testkey", value="foobar")
         UserOrgTagFactory.create(user=user, org=course.id.org + "x", key="testkey", value="foobar")
-        self.assertEqual(len(UserOrgTag.objects.filter(user_id=user.id)), 2)
+        assert len(UserOrgTag.objects.filter(user_id=user.id)) == 2
         # Delete the tags by user value. Ensure the rows no longer exist.
         UserOrgTag.delete_by_user_value(user.id, "user_id")
 
-        self.assertEqual(len(UserOrgTag.objects.filter(user_id=user.id)), 0)
+        assert len(UserOrgTag.objects.filter(user_id=user.id)) == 0
 
     def test_retire_user_org_tags_only_deletes_user(self):
         """Create org specific user tags and confirm all properties are set """
@@ -101,7 +95,7 @@ class UserPreferenceModelTest(ModuleStoreTestCase):
         # Delete the tags by user value. Ensure the other user's row is still present.
         UserOrgTag.delete_by_user_value(user.id, "user_id")
 
-        self.assertEqual(len(UserOrgTag.objects.filter(user_id=other_user.id)), 1)
+        assert len(UserOrgTag.objects.filter(user_id=other_user.id)) == 1
 
     def test_get_value(self):
         """Verifies the behavior of get_value."""
@@ -113,15 +107,15 @@ class UserPreferenceModelTest(ModuleStoreTestCase):
         # does a round trip
         set_user_preference(user, key, value)
         pref = UserPreference.get_value(user, key)
-        self.assertEqual(pref, value)
+        assert pref == value
 
         # get preference for key that doesn't exist for user
         pref = UserPreference.get_value(user, 'testkey_none')
-        self.assertIsNone(pref)
+        assert pref is None
 
         # get default value for key that doesn't exist for user
         pref = UserPreference.get_value(user, 'testkey_none', 'default_value')
-        self.assertEqual('default_value', pref)
+        assert 'default_value' == pref
 
 
 class TestUserPreferenceEvents(UserSettingsEventTestMixin, TestCase):

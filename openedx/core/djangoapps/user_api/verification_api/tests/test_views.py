@@ -38,7 +38,7 @@ class VerificationStatusViewTestsMixin:
     def assert_path_not_found(self, path):
         """ Assert the path returns HTTP 404. """
         response = self.client.get(path)
-        self.assertEqual(response.status_code, 404)
+        assert response.status_code == 404
 
     def get_expected_response(self, *args, **kwargs):
         raise NotImplementedError
@@ -46,17 +46,17 @@ class VerificationStatusViewTestsMixin:
     def assert_verification_returned(self, verified=False):
         """ Assert the path returns HTTP 200 and returns appropriately-serialized data. """
         response = self.client.get(self.path)
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
         expected_expires = self.CREATED_AT + datetime.timedelta(settings.VERIFY_STUDENT['DAYS_GOOD_FOR'])
 
         expected = self.get_expected_response(verified=verified, expected_expires=expected_expires)
-        self.assertEqual(json.loads(response.content.decode('utf-8')), expected)
+        assert json.loads(response.content.decode('utf-8')) == expected
 
     def test_authentication_required(self):
         """ The endpoint should return HTTP 403 if the user is not authenticated. """
         self.client.logout()
         response = self.client.get(self.path)
-        self.assertEqual(response.status_code, 401)
+        assert response.status_code == 401
 
     def test_no_verifications(self):
         """ The endpoint should return HTTP 404 if the user has no verifications. """
@@ -81,7 +81,7 @@ class VerificationStatusViewTestsMixin:
         user = UserFactory()
         self.client.login(username=user.username, password=self.PASSWORD)
         response = self.client.get(self.path)
-        self.assertEqual(response.status_code, 403)
+        assert response.status_code == 403
 
     def test_non_existent_user(self):
         """ The endpoint should return HTTP 404 if the user does not exist. """
@@ -148,7 +148,7 @@ class VerificationsDetailsViewTests(VerificationStatusViewTestsMixin, TestCase):
         self.photo_verification.status = 'denied'
         self.photo_verification.save()
         response = self.client.get(self.path)
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
         expected_expires = self.CREATED_AT + datetime.timedelta(settings.VERIFY_STUDENT['DAYS_GOOD_FOR'])
 
         expected = [
@@ -177,7 +177,7 @@ class VerificationsDetailsViewTests(VerificationStatusViewTestsMixin, TestCase):
                 'receipt_id': None,
             },
         ]
-        self.assertEqual(json.loads(response.content.decode('utf-8')), expected)
+        assert json.loads(response.content.decode('utf-8')) == expected
 
     def test_multiple_verification_instances(self):
         self.sso_verification = SSOVerificationFactory(user=self.user, status='approved')  # lint-amnesty, pylint: disable=attribute-defined-outside-init
@@ -188,7 +188,7 @@ class VerificationsDetailsViewTests(VerificationStatusViewTestsMixin, TestCase):
             error_code='plain_code'
         )
         response = self.client.get(self.path)
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
         expected_expires = self.CREATED_AT + datetime.timedelta(settings.VERIFY_STUDENT['DAYS_GOOD_FOR'])
 
         expected = [
@@ -217,4 +217,4 @@ class VerificationsDetailsViewTests(VerificationStatusViewTestsMixin, TestCase):
                 'receipt_id': None,
             },
         ]
-        self.assertEqual(json.loads(response.content.decode('utf-8')), expected)
+        assert json.loads(response.content.decode('utf-8')) == expected

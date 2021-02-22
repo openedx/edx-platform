@@ -243,7 +243,7 @@ class EmailOptInListTest(ModuleStoreTestCase):
         # Expect that every enrollment shows up in the report
         output_emails = [row["email"] for row in output]
         for email in output_emails:
-            self.assertIn(email, output_emails)
+            assert email in output_emails
 
     def test_org_capitalization(self):
         # Lowercase some of the org names in the course IDs
@@ -302,12 +302,12 @@ class EmailOptInListTest(ModuleStoreTestCase):
         self._set_opt_in_pref(self.user, self.TEST_ORG, True)
 
         # Remove the user profile, and re-fetch user
-        self.assertTrue(hasattr(self.user, 'profile'))
+        assert hasattr(self.user, 'profile')
         self.user.profile.delete()
         user = User.objects.get(id=self.user.id)
 
         # Test that user do not have profile
-        self.assertFalse(hasattr(user, 'profile'))
+        assert not hasattr(user, 'profile')
 
         output = self._run_command(self.TEST_ORG)
         self._assert_output(output, (user, self.courses[0].id, True))
@@ -437,31 +437,19 @@ class EmailOptInListTest(ModuleStoreTestCase):
             AssertionError
 
         """
-        self.assertEqual(len(output), len(args) + 1)
+        assert len(output) == (len(args) + 1)
 
         # Check the header row
-        self.assertEqual({
-            "user_id": "user_id",
-            "username": "username",
-            "email": "email",
-            "full_name": "full_name",
-            "course_id": "course_id",
-            "is_opted_in_for_email": "is_opted_in_for_email",
-            "preference_set_datetime": "preference_set_datetime"
-        }, output[0])
+        assert {'user_id': 'user_id', 'username': 'username', 'email': 'email', 'full_name': 'full_name',
+                'course_id': 'course_id', 'is_opted_in_for_email': 'is_opted_in_for_email',
+                'preference_set_datetime': 'preference_set_datetime'} == output[0]
 
         # Check data rows
         for user, course_id, opt_in_pref in args:
-            self.assertIn({
-                "user_id": str(user.id),
-                "username": user.username,
-                "email": user.email if six.PY3 else user.email.encode('utf-8'),
-                "full_name": ((user.profile.name if six.PY3 else user.profile.name.encode('utf-8')) if
-                              hasattr(user, 'profile') else ''),
-                "course_id": text_type(course_id) if six.PY3 else text_type(course_id).encode('utf-8'),
-                "is_opted_in_for_email": text_type(opt_in_pref) if six.PY3 else text_type(opt_in_pref).encode('utf-8'),
-                "preference_set_datetime": (
-                    self._latest_pref_set_datetime(self.user)
-                    if kwargs.get("expect_pref_datetime", True)
-                    else self.DEFAULT_DATETIME_STR)
-            }, output[1:])
+            assert {'user_id': str(user.id), 'username': user.username, 'email': user.email,
+                    'full_name': (user.profile.name if hasattr(user, 'profile') else ''),
+                    'course_id': text_type(course_id),
+                    'is_opted_in_for_email': text_type(opt_in_pref),
+                    'preference_set_datetime':
+                        (self._latest_pref_set_datetime(self.user) if kwargs.get('expect_pref_datetime', True) else
+                         self.DEFAULT_DATETIME_STR)} in output[1:]

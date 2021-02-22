@@ -69,7 +69,7 @@ class TestRandomUserPartitionScheme(PartitionTestCase):
                 self.user,
                 self.user_partition
             )
-            self.assertEqual(group1_id, group2_id)
+            assert group1_id == group2_id
 
     def test_get_group_for_user_with_assign(self):
         """
@@ -82,12 +82,12 @@ class TestRandomUserPartitionScheme(PartitionTestCase):
             self.MOCK_COURSE_ID, self.user, self.user_partition, assign=False
         )
 
-        self.assertIsNone(group)
+        assert group is None
 
         # We should get a group automatically assigned to user
         group = RandomUserPartitionScheme.get_group_for_user(self.MOCK_COURSE_ID, self.user, self.user_partition)
 
-        self.assertIsNotNone(group)
+        assert group is not None
 
     def test_empty_partition(self):
         empty_partition = UserPartition(
@@ -104,7 +104,7 @@ class TestRandomUserPartitionScheme(PartitionTestCase):
     def test_user_in_deleted_group(self):
         # get a group assigned to the user - should be group 0 or 1
         old_group = RandomUserPartitionScheme.get_group_for_user(self.MOCK_COURSE_ID, self.user, self.user_partition)
-        self.assertIn(old_group.id, [0, 1])
+        assert old_group.id in [0, 1]
 
         # Change the group definitions! No more group 0 or 1
         groups = [Group(3, 'Group 3'), Group(4, 'Group 4')]
@@ -112,17 +112,17 @@ class TestRandomUserPartitionScheme(PartitionTestCase):
 
         # Now, get a new group using the same call - should be 3 or 4
         new_group = RandomUserPartitionScheme.get_group_for_user(self.MOCK_COURSE_ID, self.user, user_partition)
-        self.assertIn(new_group.id, [3, 4])
+        assert new_group.id in [3, 4]
 
         # We should get the same group over multiple calls
         new_group_2 = RandomUserPartitionScheme.get_group_for_user(self.MOCK_COURSE_ID, self.user, user_partition)
-        self.assertEqual(new_group, new_group_2)
+        assert new_group == new_group_2
 
     def test_change_group_name(self):
         # Changing the name of the group shouldn't affect anything
         # get a group assigned to the user - should be group 0 or 1
         old_group = RandomUserPartitionScheme.get_group_for_user(self.MOCK_COURSE_ID, self.user, self.user_partition)
-        self.assertIn(old_group.id, [0, 1])
+        assert old_group.id in [0, 1]
 
         # Change the group names
         groups = [Group(0, 'Group 0'), Group(1, 'Group 1')]
@@ -136,7 +136,7 @@ class TestRandomUserPartitionScheme(PartitionTestCase):
 
         # Now, get a new group using the same call
         new_group = RandomUserPartitionScheme.get_group_for_user(self.MOCK_COURSE_ID, self.user, user_partition)
-        self.assertEqual(old_group.id, new_group.id)
+        assert old_group.id == new_group.id
 
 
 class TestExtension(TestCase):
@@ -146,6 +146,6 @@ class TestExtension(TestCase):
     """
 
     def test_get_scheme(self):
-        self.assertEqual(UserPartition.get_scheme('random'), RandomUserPartitionScheme)
+        assert UserPartition.get_scheme('random') == RandomUserPartitionScheme
         with self.assertRaisesRegex(UserPartitionError, 'Unrecognized scheme'):
             UserPartition.get_scheme('other')

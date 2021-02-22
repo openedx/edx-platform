@@ -5,7 +5,7 @@ Unit tests for preference APIs.
 
 
 import datetime
-
+import pytest
 import ddt
 from dateutil.parser import parse as parse_datetime
 from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
@@ -63,26 +63,21 @@ class TestPreferenceAPI(CacheIsolationTestCase):
         """
         Verifies the basic behavior of get_user_preference.
         """
-        self.assertEqual(
-            get_user_preference(self.user, self.test_preference_key),
-            self.test_preference_value
-        )
-        self.assertEqual(
-            get_user_preference(self.staff_user, self.test_preference_key, username=self.user.username),
-            self.test_preference_value
-        )
+        assert get_user_preference(self.user, self.test_preference_key) == self.test_preference_value
+        assert get_user_preference(self.staff_user, self.test_preference_key, username=self.user.username) == \
+               self.test_preference_value
 
     def test_get_user_preference_errors(self):
         """
         Verifies that get_user_preference returns appropriate errors.
         """
-        with self.assertRaises(UserNotAuthorized):
+        with pytest.raises(UserNotAuthorized):
             get_user_preference(self.user, self.test_preference_key, username="no_such_user")
 
-        with self.assertRaises(UserNotFound):
+        with pytest.raises(UserNotFound):
             get_user_preference(self.no_such_user, self.test_preference_key)
 
-        with self.assertRaises(UserNotAuthorized):
+        with pytest.raises(UserNotAuthorized):
             get_user_preference(self.different_user, self.test_preference_key, username=self.user.username)
 
     def test_get_user_preferences(self):
@@ -92,20 +87,20 @@ class TestPreferenceAPI(CacheIsolationTestCase):
         expected_user_preferences = {
             self.test_preference_key: self.test_preference_value,
         }
-        self.assertEqual(get_user_preferences(self.user), expected_user_preferences)
-        self.assertEqual(get_user_preferences(self.staff_user, username=self.user.username), expected_user_preferences)
+        assert get_user_preferences(self.user) == expected_user_preferences
+        assert get_user_preferences(self.staff_user, username=self.user.username) == expected_user_preferences
 
     def test_get_user_preferences_errors(self):
         """
         Verifies that get_user_preferences returns appropriate errors.
         """
-        with self.assertRaises(UserNotAuthorized):
+        with pytest.raises(UserNotAuthorized):
             get_user_preferences(self.user, username="no_such_user")
 
-        with self.assertRaises(UserNotFound):
+        with pytest.raises(UserNotFound):
             get_user_preferences(self.no_such_user)
 
-        with self.assertRaises(UserNotAuthorized):
+        with pytest.raises(UserNotAuthorized):
             get_user_preferences(self.different_user, username=self.user.username)
 
     def test_set_user_preference(self):
@@ -115,79 +110,61 @@ class TestPreferenceAPI(CacheIsolationTestCase):
         test_key = u'ⓟⓡⓔⓕⓔⓡⓔⓝⓒⓔ_ⓚⓔⓨ'
         test_value = u'ǝnןɐʌ_ǝɔuǝɹǝɟǝɹd'
         set_user_preference(self.user, test_key, test_value)
-        self.assertEqual(get_user_preference(self.user, test_key), test_value)
+        assert get_user_preference(self.user, test_key) == test_value
         set_user_preference(self.user, test_key, "new_value", username=self.user.username)
-        self.assertEqual(get_user_preference(self.user, test_key), "new_value")
+        assert get_user_preference(self.user, test_key) == 'new_value'
 
     @patch('openedx.core.djangoapps.user_api.models.UserPreference.save')
     def test_set_user_preference_errors(self, user_preference_save):
         """
         Verifies that set_user_preference returns appropriate errors.
         """
-        with self.assertRaises(UserNotAuthorized):
+        with pytest.raises(UserNotAuthorized):
             set_user_preference(self.user, self.test_preference_key, "new_value", username="no_such_user")
 
-        with self.assertRaises(UserNotFound):
+        with pytest.raises(UserNotFound):
             set_user_preference(self.no_such_user, self.test_preference_key, "new_value")
 
-        with self.assertRaises(UserNotAuthorized):
+        with pytest.raises(UserNotAuthorized):
             set_user_preference(self.staff_user, self.test_preference_key, "new_value", username=self.user.username)
 
-        with self.assertRaises(UserNotAuthorized):
+        with pytest.raises(UserNotAuthorized):
             set_user_preference(self.different_user, self.test_preference_key, "new_value", username=self.user.username)
 
         too_long_key = "x" * 256
-        with self.assertRaises(PreferenceValidationError) as context_manager:
+        with pytest.raises(PreferenceValidationError) as context_manager:
             set_user_preference(self.user, too_long_key, "new_value")
-        errors = context_manager.exception.preference_errors
-        self.assertEqual(len(list(errors.keys())), 1)
-        self.assertEqual(
-            errors[too_long_key],
-            {
-                "developer_message": get_expected_validation_developer_message(too_long_key, "new_value"),
-                "user_message": get_expected_key_error_user_message(too_long_key, "new_value"),
-            }
-        )
+        errors = context_manager.value.preference_errors
+        assert len(list(errors.keys())) == 1
+        assert errors[too_long_key] ==\
+               {'developer_message': get_expected_validation_developer_message(too_long_key, 'new_value'),
+                'user_message': get_expected_key_error_user_message(too_long_key, 'new_value')}
 
         for empty_value in (None, "", "   "):
-            with self.assertRaises(PreferenceValidationError) as context_manager:
+            with pytest.raises(PreferenceValidationError) as context_manager:
                 set_user_preference(self.user, self.test_preference_key, empty_value)
-            errors = context_manager.exception.preference_errors
-            self.assertEqual(len(list(errors.keys())), 1)
-            self.assertEqual(
-                errors[self.test_preference_key],
-                {
-                    "developer_message": get_empty_preference_message(self.test_preference_key),
-                    "user_message": get_empty_preference_message(self.test_preference_key),
-                }
-            )
+            errors = context_manager.value.preference_errors
+            assert len(list(errors.keys())) == 1
+            assert errors[self.test_preference_key] ==\
+                   {'developer_message': get_empty_preference_message(self.test_preference_key),
+                    'user_message': get_empty_preference_message(self.test_preference_key)}
 
         user_preference_save.side_effect = [Exception, None]
-        with self.assertRaises(PreferenceUpdateError) as context_manager:
+        with pytest.raises(PreferenceUpdateError) as context_manager:
             set_user_preference(self.user, u"new_key_ȻħȺɍłɇs", u"new_value_ȻħȺɍłɇs")
-        self.assertEqual(
-            context_manager.exception.developer_message,
-            u"Save failed for user preference 'new_key_ȻħȺɍłɇs' with value 'new_value_ȻħȺɍłɇs': "
-        )
-        self.assertEqual(
-            context_manager.exception.user_message,
-            u"Save failed for user preference 'new_key_ȻħȺɍłɇs' with value 'new_value_ȻħȺɍłɇs'."
-        )
+        assert context_manager.value.developer_message ==\
+               u"Save failed for user preference 'new_key_ȻħȺɍłɇs' with value 'new_value_ȻħȺɍłɇs': "
+        assert context_manager.value.user_message ==\
+               u"Save failed for user preference 'new_key_ȻħȺɍłɇs' with value 'new_value_ȻħȺɍłɇs'."
 
     def test_update_user_preferences(self):
         """
         Verifies the basic behavior of update_user_preferences.
         """
         set_user_preference(self.user, self.test_preference_key, "new_value")
-        self.assertEqual(
-            get_user_preference(self.user, self.test_preference_key),
-            "new_value"
-        )
+        assert get_user_preference(self.user, self.test_preference_key) == 'new_value'
         set_user_preference(self.user, self.test_preference_key, "new_value", username=self.user.username)
-        self.assertEqual(
-            get_user_preference(self.user, self.test_preference_key),
-            "new_value"
-        )
+        assert get_user_preference(self.user, self.test_preference_key) == 'new_value'
 
     def test_update_user_preferences_with_username(self):
         """
@@ -198,10 +175,7 @@ class TestPreferenceAPI(CacheIsolationTestCase):
             self.test_preference_key: "new_value"
         }
         update_user_preferences(self.user, update_data, user=self.user.username)
-        self.assertEqual(
-            get_user_preference(self.user, self.test_preference_key),
-            "new_value"
-        )
+        assert get_user_preference(self.user, self.test_preference_key) == 'new_value'
 
     def test_update_user_preferences_with_user(self):
         """
@@ -212,10 +186,7 @@ class TestPreferenceAPI(CacheIsolationTestCase):
             self.test_preference_key: "new_value"
         }
         update_user_preferences(self.user, update_data, user=self.user)
-        self.assertEqual(
-            get_user_preference(self.user, self.test_preference_key),
-            "new_value"
-        )
+        assert get_user_preference(self.user, self.test_preference_key) == 'new_value'
 
     @patch('openedx.core.djangoapps.user_api.models.UserPreference.delete')
     @patch('openedx.core.djangoapps.user_api.models.UserPreference.save')
@@ -226,105 +197,81 @@ class TestPreferenceAPI(CacheIsolationTestCase):
         update_data = {
             self.test_preference_key: "new_value"
         }
-        with self.assertRaises(UserNotAuthorized):
+        with pytest.raises(UserNotAuthorized):
             update_user_preferences(self.user, update_data, user="no_such_user")
 
-        with self.assertRaises(UserNotFound):
+        with pytest.raises(UserNotFound):
             update_user_preferences(self.no_such_user, update_data)
 
-        with self.assertRaises(UserNotAuthorized):
+        with pytest.raises(UserNotAuthorized):
             update_user_preferences(self.staff_user, update_data, user=self.user.username)
 
-        with self.assertRaises(UserNotAuthorized):
+        with pytest.raises(UserNotAuthorized):
             update_user_preferences(self.different_user, update_data, user=self.user.username)
 
         too_long_key = "x" * 256
-        with self.assertRaises(PreferenceValidationError) as context_manager:
+        with pytest.raises(PreferenceValidationError) as context_manager:
             update_user_preferences(self.user, {too_long_key: "new_value"})
-        errors = context_manager.exception.preference_errors
-        self.assertEqual(len(list(errors.keys())), 1)
-        self.assertEqual(
-            errors[too_long_key],
-            {
-                "developer_message": get_expected_validation_developer_message(too_long_key, "new_value"),
-                "user_message": get_expected_key_error_user_message(too_long_key, "new_value"),
-            }
-        )
+        errors = context_manager.value.preference_errors
+        assert len(list(errors.keys())) == 1
+        assert errors[too_long_key] ==\
+               {'developer_message': get_expected_validation_developer_message(too_long_key, 'new_value'),
+                'user_message': get_expected_key_error_user_message(too_long_key, 'new_value')}
 
         for empty_value in ("", "   "):
-            with self.assertRaises(PreferenceValidationError) as context_manager:
+            with pytest.raises(PreferenceValidationError) as context_manager:
                 update_user_preferences(self.user, {self.test_preference_key: empty_value})
-            errors = context_manager.exception.preference_errors
-            self.assertEqual(len(list(errors.keys())), 1)
-            self.assertEqual(
-                errors[self.test_preference_key],
-                {
-                    "developer_message": get_empty_preference_message(self.test_preference_key),
-                    "user_message": get_empty_preference_message(self.test_preference_key),
-                }
-            )
+            errors = context_manager.value.preference_errors
+            assert len(list(errors.keys())) == 1
+            assert errors[self.test_preference_key] ==\
+                   {'developer_message': get_empty_preference_message(self.test_preference_key),
+                    'user_message': get_empty_preference_message(self.test_preference_key)}
 
         user_preference_save.side_effect = [Exception, None]
-        with self.assertRaises(PreferenceUpdateError) as context_manager:
+        with pytest.raises(PreferenceUpdateError) as context_manager:
             update_user_preferences(self.user, {self.test_preference_key: "new_value"})
-        self.assertEqual(
-            context_manager.exception.developer_message,
-            u"Save failed for user preference 'test_key' with value 'new_value': "
-        )
-        self.assertEqual(
-            context_manager.exception.user_message,
-            u"Save failed for user preference 'test_key' with value 'new_value'."
-        )
+        assert context_manager.value.developer_message ==\
+               u"Save failed for user preference 'test_key' with value 'new_value': "
+        assert context_manager.value.user_message ==\
+               u"Save failed for user preference 'test_key' with value 'new_value'."
 
         user_preference_delete.side_effect = [Exception, None]
-        with self.assertRaises(PreferenceUpdateError) as context_manager:
+        with pytest.raises(PreferenceUpdateError) as context_manager:
             update_user_preferences(self.user, {self.test_preference_key: None})
-        self.assertEqual(
-            context_manager.exception.developer_message,
-            u"Delete failed for user preference 'test_key': "
-        )
-        self.assertEqual(
-            context_manager.exception.user_message,
-            u"Delete failed for user preference 'test_key'."
-        )
+        assert context_manager.value.developer_message == u"Delete failed for user preference 'test_key': "
+        assert context_manager.value.user_message == u"Delete failed for user preference 'test_key'."
 
     def test_delete_user_preference(self):
         """
         Verifies the basic behavior of delete_user_preference.
         """
-        self.assertTrue(delete_user_preference(self.user, self.test_preference_key))
+        assert delete_user_preference(self.user, self.test_preference_key)
         set_user_preference(self.user, self.test_preference_key, self.test_preference_value)
-        self.assertTrue(delete_user_preference(self.user, self.test_preference_key, username=self.user.username))
-        self.assertFalse(delete_user_preference(self.user, "no_such_key"))
+        assert delete_user_preference(self.user, self.test_preference_key, username=self.user.username)
+        assert not delete_user_preference(self.user, 'no_such_key')
 
     @patch('openedx.core.djangoapps.user_api.models.UserPreference.delete')
     def test_delete_user_preference_errors(self, user_preference_delete):
         """
         Verifies that delete_user_preference returns appropriate errors.
         """
-        with self.assertRaises(UserNotAuthorized):
+        with pytest.raises(UserNotAuthorized):
             delete_user_preference(self.user, self.test_preference_key, username="no_such_user")
 
-        with self.assertRaises(UserNotFound):
+        with pytest.raises(UserNotFound):
             delete_user_preference(self.no_such_user, self.test_preference_key)
 
-        with self.assertRaises(UserNotAuthorized):
+        with pytest.raises(UserNotAuthorized):
             delete_user_preference(self.staff_user, self.test_preference_key, username=self.user.username)
 
-        with self.assertRaises(UserNotAuthorized):
+        with pytest.raises(UserNotAuthorized):
             delete_user_preference(self.different_user, self.test_preference_key, username=self.user.username)
 
         user_preference_delete.side_effect = [Exception, None]
-        with self.assertRaises(PreferenceUpdateError) as context_manager:
+        with pytest.raises(PreferenceUpdateError) as context_manager:
             delete_user_preference(self.user, self.test_preference_key)
-        self.assertEqual(
-            context_manager.exception.developer_message,
-            u"Delete failed for user preference 'test_key': "
-        )
-        self.assertEqual(
-            context_manager.exception.user_message,
-            u"Delete failed for user preference 'test_key'."
-        )
+        assert context_manager.value.developer_message == u"Delete failed for user preference 'test_key': "
+        assert context_manager.value.user_message == u"Delete failed for user preference 'test_key'."
 
 
 @ddt.ddt
@@ -346,7 +293,7 @@ class UpdateEmailOptInTests(ModuleStoreTestCase):
             'name': username,
             'honor_code': 'true',
         })
-        self.assertEqual(resp.status_code, 200)
+        assert resp.status_code == 200
 
     @ddt.data(
         # Check that a 27 year old can opt-in
@@ -380,7 +327,7 @@ class UpdateEmailOptInTests(ModuleStoreTestCase):
 
         update_email_opt_in(user, course.id.org, option)
         result_obj = UserOrgTag.objects.get(user=user, org=course.id.org, key='email-optin')
-        self.assertEqual(result_obj.value, expected_result)
+        assert result_obj.value == expected_result
 
     def test_update_email_optin_no_age_set(self):
         # Test that the API still works if no age is specified.
@@ -392,13 +339,13 @@ class UpdateEmailOptInTests(ModuleStoreTestCase):
 
         update_email_opt_in(user, course.id.org, True)
         result_obj = UserOrgTag.objects.get(user=user, org=course.id.org, key='email-optin')
-        self.assertEqual(result_obj.value, u"True")
+        assert result_obj.value == u'True'
 
     def test_update_email_optin_anonymous_user(self):
         """Verify that the API raises an exception for a user with no profile."""
         course = CourseFactory.create()
         no_profile_user, __ = User.objects.get_or_create(username="no_profile_user", password=self.PASSWORD)
-        with self.assertRaises(UserNotFound):
+        with pytest.raises(UserNotFound):
             update_email_opt_in(no_profile_user, course.id.org, True)
 
     @ddt.data(
@@ -432,7 +379,7 @@ class UpdateEmailOptInTests(ModuleStoreTestCase):
         update_email_opt_in(user, course.id.org, second_option)
 
         result_obj = UserOrgTag.objects.get(user=user, org=course.id.org, key='email-optin')
-        self.assertEqual(result_obj.value, expected_result)
+        assert result_obj.value == expected_result
 
     def _assert_is_datetime(self, timestamp):
         """
@@ -471,7 +418,7 @@ class CountryTimeZoneTest(CacheIsolationTestCase):
             for time_zone in expected_time_zones
         ]
         country_time_zones_dicts = get_country_time_zones(country_code)[:10]
-        self.assertEqual(country_time_zones_dicts, expected_dict)
+        assert country_time_zones_dicts == expected_dict
 
 
 def get_expected_validation_developer_message(preference_key, preference_value):
