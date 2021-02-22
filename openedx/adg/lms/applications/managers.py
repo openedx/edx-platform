@@ -19,7 +19,7 @@ class SubmittedApplicationsManager(Manager):
 
 class PrerequisiteCourseGroupManager(Manager):
     """
-    Manager which returns all open pre requisite entries
+    Manager which returns all non-empty pre requisite groups
     """
 
     def get_queryset(self):
@@ -31,7 +31,7 @@ class PrerequisiteCourseGroupManager(Manager):
 
 class OpenMultilingualCourseManager(Manager):
     """
-    Manager which returns all open multilingual entries
+    Manager which returns all open multilingual courses
     """
 
     def get_queryset(self):
