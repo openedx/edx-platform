@@ -26,6 +26,9 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
 
+      - name: Install pip
+        run: pip install -r requirements/pip.txt
+
       - name: make upgrade
         run: |
           cd $GITHUB_WORKSPACE
