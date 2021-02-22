@@ -40,7 +40,7 @@ class TestStorageLMS(TestCase):
         """
         Verify storage returns True on themed assets
         """
-        self.assertEqual(is_themed, self.storage.themed(asset, self.enabled_theme))
+        assert is_themed == self.storage.themed(asset, self.enabled_theme)
 
     @override_settings(DEBUG=True)
     @ddt.data(
@@ -61,7 +61,7 @@ class TestStorageLMS(TestCase):
             asset_url = re.sub(r"(\.\w+)(\.png|\.ico)$", r"\g<2>", asset_url)
             expected_url = self.storage.base_url + self.enabled_theme + "/" + asset
 
-            self.assertEqual(asset_url, expected_url)
+            assert asset_url == expected_url
 
     @override_settings(DEBUG=True)
     @ddt.data(
@@ -80,4 +80,4 @@ class TestStorageLMS(TestCase):
             returned_path = self.storage.path(asset)
             expected_path = self.themes_dir / self.enabled_theme / "lms/static/" / asset
 
-            self.assertEqual(expected_path, returned_path)
+            assert expected_path == returned_path

@@ -52,7 +52,7 @@ class ResetSelfPacedScheduleTests(SharedModuleStoreTestCase):  # lint-amnesty, p
             reset_self_paced_schedule(self.user, self.course.id, use_availability_date=False)
 
         self.schedule.refresh_from_db()
-        self.assertGreater(self.schedule.start_date, original_start)
+        assert self.schedule.start_date > original_start
 
     @ddt.data(
         (-1, 0),  # enrolled before course started (will reset to start date)
@@ -67,7 +67,7 @@ class ResetSelfPacedScheduleTests(SharedModuleStoreTestCase):  # lint-amnesty, p
             reset_self_paced_schedule(self.user, self.course.id, use_availability_date=True)
 
         self.schedule.refresh_from_db()
-        self.assertEqual(self.schedule.start_date.replace(microsecond=0), expected_start.replace(microsecond=0))
+        assert self.schedule.start_date.replace(microsecond=0) == expected_start.replace(microsecond=0)
 
     def test_safe_without_schedule(self):
         """ Just ensure that we don't raise exceptions or create any schedules """
@@ -77,4 +77,4 @@ class ResetSelfPacedScheduleTests(SharedModuleStoreTestCase):  # lint-amnesty, p
         reset_self_paced_schedule(self.user, self.course.id, use_availability_date=False)
         reset_self_paced_schedule(self.user, self.course.id, use_availability_date=True)
 
-        self.assertEqual(Schedule.objects.count(), 0)
+        assert Schedule.objects.count() == 0

@@ -255,7 +255,8 @@ class ResetScheduleTests(SharedModuleStoreTestCase):  # lint-amnesty, pylint: di
         CourseEnrollment.enroll(self.user, self.course.id, mode=CourseMode.VERIFIED)
 
         self.schedule.refresh_from_db()
-        self.assertGreater(self.schedule.start_date, original_start)  # should have been reset to current time
+        assert self.schedule.start_date > original_start
+        # should have been reset to current time
 
     def test_schedule_is_reset_to_availability_date(self):
         """ Test that a switch to audit enrollment resets to the availability date, not current time. """
@@ -264,14 +265,14 @@ class ResetScheduleTests(SharedModuleStoreTestCase):  # lint-amnesty, pylint: di
         # Switch to verified, confirm we change start date
         CourseEnrollment.enroll(self.user, self.course.id, mode=CourseMode.VERIFIED)
         self.schedule.refresh_from_db()
-        self.assertNotEqual(self.schedule.start_date, original_start)
+        assert self.schedule.start_date != original_start
 
         CourseEnrollment.unenroll(self.user, self.course.id)
 
         # Switch back to audit, confirm we change back to original availability date
         CourseEnrollment.enroll(self.user, self.course.id, mode=CourseMode.AUDIT)
         self.schedule.refresh_from_db()
-        self.assertEqual(self.schedule.start_date, original_start)
+        assert self.schedule.start_date == original_start
 
 
 def _create_course_run(self_paced=True, start_day_offset=-1):

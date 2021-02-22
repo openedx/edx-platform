@@ -164,7 +164,7 @@ class ScheduleSendEmailTestMixin(FilteredQueryCountMixin):  # lint-amnesty, pyli
             ScheduleConfigFactory.create(**schedule_config_kwargs)
 
     def test_command_task_binding(self):
-        self.assertEqual(self.command.async_send_task, self.task)
+        assert self.command.async_send_task == self.task
 
     def test_handle(self):
         with patch.object(self.command, 'async_send_task') as mock_send:
@@ -192,7 +192,7 @@ class ScheduleSendEmailTestMixin(FilteredQueryCountMixin):  # lint-amnesty, pyli
             (self.site_config.site.id, serialize(target_day), offset, self.task.num_bins - 1, None),
             retry=False,
         )
-        self.assertFalse(mock_ace.send.called)
+        assert not mock_ace.send.called
 
     @ddt.data(1, 10, 100)
     @patch.object(tasks, 'ace')
@@ -228,12 +228,12 @@ class ScheduleSendEmailTestMixin(FilteredQueryCountMixin):  # lint-amnesty, pyli
 
                 num_schedules = mock_attribute.call_args[0][1]
                 if b in bins_in_use:
-                    self.assertGreater(num_schedules, 0)
+                    assert num_schedules > 0
                 else:
-                    self.assertEqual(num_schedules, 0)
+                    assert num_schedules == 0
 
-            self.assertEqual(mock_schedule_send.apply_async.call_count, schedule_count)
-            self.assertFalse(mock_ace.send.called)
+            assert mock_schedule_send.apply_async.call_count == schedule_count
+            assert not mock_ace.send.called
 
     def test_no_course_overview(self):
         current_day, offset, target_day, upgrade_deadline = self._get_dates()  # lint-amnesty, pylint: disable=unused-variable
@@ -259,7 +259,7 @@ class ScheduleSendEmailTestMixin(FilteredQueryCountMixin):  # lint-amnesty, pyli
         # This happens 'transparently' because django generates an inner-join between
         # enrollment and course_overview, and thus will skip any rows where course_overview
         # is null.
-        self.assertEqual(mock_schedule_send.apply_async.call_count, 0)
+        assert mock_schedule_send.apply_async.call_count == 0
 
     @ddt.data(True, False)
     @patch.object(tasks, 'ace')
@@ -276,9 +276,9 @@ class ScheduleSendEmailTestMixin(FilteredQueryCountMixin):  # lint-amnesty, pyli
         mock_msg = Mock()
         self.deliver_task(self.site_config.site.id, mock_msg)
         if is_enabled:
-            self.assertTrue(mock_ace.send.called)
+            assert mock_ace.send.called
         else:
-            self.assertFalse(mock_ace.send.called)
+            assert not mock_ace.send.called
 
     @ddt.data(True, False)
     def test_enqueue_config(self, is_enabled):
@@ -293,9 +293,9 @@ class ScheduleSendEmailTestMixin(FilteredQueryCountMixin):  # lint-amnesty, pyli
             self.task.enqueue(self.site_config.site, current_datetime, 3)
 
         if is_enabled:
-            self.assertTrue(mock_apply_async.called)
+            assert mock_apply_async.called
         else:
-            self.assertFalse(mock_apply_async.called)
+            assert not mock_apply_async.called
 
     @patch.object(tasks, 'ace')
     @ddt.data(
@@ -338,8 +338,8 @@ class ScheduleSendEmailTestMixin(FilteredQueryCountMixin):  # lint-amnesty, pyli
                 site_id=this_config.site.id, target_day_str=serialize(target_day), day_offset=offset, bin_num=0
             ))
 
-        self.assertEqual(mock_schedule_send.apply_async.call_count, expected_message_count)
-        self.assertFalse(mock_ace.send.called)
+        assert mock_schedule_send.apply_async.call_count == expected_message_count
+        assert not mock_ace.send.called
 
     @ddt.data(True, False)
     def test_course_end(self, has_course_ended):
@@ -359,9 +359,9 @@ class ScheduleSendEmailTestMixin(FilteredQueryCountMixin):  # lint-amnesty, pyli
             ))
 
         if has_course_ended:
-            self.assertFalse(mock_schedule_send.apply_async.called)
+            assert not mock_schedule_send.apply_async.called
         else:
-            self.assertTrue(mock_schedule_send.apply_async.called)
+            assert mock_schedule_send.apply_async.called
 
     @patch.object(tasks, 'ace')
     def test_multiple_target_schedules(self, mock_ace):
@@ -386,8 +386,8 @@ class ScheduleSendEmailTestMixin(FilteredQueryCountMixin):  # lint-amnesty, pyli
                 ))
 
         expected_call_count = 1 if self.consolidates_emails_for_learner else num_courses
-        self.assertEqual(mock_schedule_send.apply_async.call_count, expected_call_count)
-        self.assertFalse(mock_ace.send.called)
+        assert mock_schedule_send.apply_async.call_count == expected_call_count
+        assert not mock_ace.send.called
 
     @ddt.data(
         1, 10
@@ -438,20 +438,20 @@ class ScheduleSendEmailTestMixin(FilteredQueryCountMixin):  # lint-amnesty, pyli
                         bin_num=self._calculate_bin_for_user(user),
                     ))
             num_expected_messages = 1 if self.consolidates_emails_for_learner else message_count
-            self.assertEqual(len(sent_messages), num_expected_messages)
+            assert len(sent_messages) == num_expected_messages
 
             with self.assertNumQueries(NUM_QUERIES_PER_MESSAGE_DELIVERY):
                 with patch('openedx.core.djangoapps.schedules.tasks.segment.track') as mock_segment_track:
                     with patch('edx_ace.channel.channels', return_value=channel_map):
                         self.deliver_task(*sent_messages[0])
-                        self.assertEqual(mock_segment_track.call_count, 1)
+                        assert mock_segment_track.call_count == 1
 
-            self.assertEqual(mock_channel.deliver.call_count, 1)
+            assert mock_channel.deliver.call_count == 1
             for (_name, (_msg, email), _kwargs) in mock_channel.deliver.mock_calls:
                 for template in attr.astuple(email):
-                    self.assertNotIn("TEMPLATE WARNING", template)
-                    self.assertNotIn("{{", template)
-                    self.assertNotIn("}}", template)
+                    assert 'TEMPLATE WARNING' not in template
+                    assert '{{' not in template
+                    assert '}}' not in template
 
             return mock_channel.deliver.mock_calls
 
@@ -473,11 +473,11 @@ class ScheduleSendEmailTestMixin(FilteredQueryCountMixin):  # lint-amnesty, pyli
                 bin_num=self._calculate_bin_for_user(schedule.enrollment.user),
             ))
 
-            self.assertEqual(mock_ace.send.called, test_config.email_sent)
+            assert mock_ace.send.called == test_config.email_sent
 
     @with_comprehensive_theme('red-theme')
     def test_templates_with_theme(self):
         calls_to_deliver = self._assert_template_for_offset(self.expected_offsets[0], 1)
 
         _name, (_msg, email), _kwargs = calls_to_deliver[0]
-        self.assertIn('TEST RED THEME MARKER', email.body_html)
+        assert 'TEST RED THEME MARKER' in email.body_html

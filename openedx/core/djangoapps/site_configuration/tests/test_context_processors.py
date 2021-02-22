@@ -27,7 +27,7 @@ class ContextProcessorTests(TestCase):
         request = RequestFactory().get('/')
         context = configuration_context(request)
 
-        self.assertEqual(context['platform_name'], PLATFORM_NAME)
+        assert context['platform_name'] == PLATFORM_NAME
 
     @with_site_configuration(configuration={"platform_name": "Testing Configuration Platform Name"})
     def test_configuration_platform_name(self):
@@ -36,4 +36,4 @@ class ContextProcessorTests(TestCase):
         """
         request = RequestFactory().get('/')
         context = configuration_context(request)
-        self.assertEqual(context['platform_name'], "Testing Configuration Platform Name")
+        assert context['platform_name'] == 'Testing Configuration Platform Name'

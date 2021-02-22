@@ -65,7 +65,7 @@ class TestBinnedSchedulesBaseResolver(SchedulesResolverTestMixin, TestCase):
         self.site_config.save()
         mock_query = Mock()
         result = self.resolver.filter_by_org(mock_query)
-        self.assertEqual(result, mock_query.filter.return_value)
+        assert result == mock_query.filter.return_value
         mock_query.filter.assert_called_once_with(enrollment__course__org=course_org_filter)
 
     @ddt.unpack
@@ -77,7 +77,7 @@ class TestBinnedSchedulesBaseResolver(SchedulesResolverTestMixin, TestCase):
         self.site_config.save()
         mock_query = Mock()
         result = self.resolver.filter_by_org(mock_query)
-        self.assertEqual(result, mock_query.filter.return_value)
+        assert result == mock_query.filter.return_value
         mock_query.filter.assert_called_once_with(enrollment__course__org__in=expected_org_list)
 
     @ddt.unpack
@@ -93,7 +93,7 @@ class TestBinnedSchedulesBaseResolver(SchedulesResolverTestMixin, TestCase):
         mock_query = Mock()
         result = self.resolver.filter_by_org(mock_query)
         mock_query.exclude.assert_called_once_with(enrollment__course__org__in=expected_org_list)
-        self.assertEqual(result, mock_query.exclude.return_value)
+        assert result == mock_query.exclude.return_value
 
 
 @skip_unless_lms
@@ -147,14 +147,14 @@ class TestCourseUpdateResolver(SchedulesResolverTestMixin, ModuleStoreTestCase):
             'week_highlights': ['good stuff'],
             'week_num': 1,
         }
-        self.assertEqual(schedules, [(self.user, None, expected_context)])
+        assert schedules == [(self.user, None, expected_context)]
 
     @override_waffle_flag(COURSE_UPDATE_WAFFLE_FLAG, True)
     @override_switch('schedules.course_update_show_unsubscribe', True)
     def test_schedule_context_show_unsubscribe(self):
         resolver = self.create_resolver()
         schedules = list(resolver.schedules_for_bin())
-        self.assertIn('optout', schedules[0][2]['unsubscribe_url'])
+        assert 'optout' in schedules[0][2]['unsubscribe_url']
 
     @override_waffle_flag(COURSE_UPDATE_WAFFLE_FLAG, True)
     def test_get_schedules_with_target_date_by_bin_and_orgs_filter_inactive_users(self):
@@ -162,11 +162,11 @@ class TestCourseUpdateResolver(SchedulesResolverTestMixin, ModuleStoreTestCase):
         resolver = self.create_resolver()
         schedules = resolver.get_schedules_with_target_date_by_bin_and_orgs()
 
-        self.assertEqual(schedules.count(), 1)
+        assert schedules.count() == 1
         self.user.is_active = False
         self.user.save()
         schedules = resolver.get_schedules_with_target_date_by_bin_and_orgs()
-        self.assertEqual(schedules.count(), 0)
+        assert schedules.count() == 0
 
 
 @skip_unless_lms
@@ -240,14 +240,14 @@ class TestCourseNextSectionUpdateResolver(SchedulesResolverTestMixin, ModuleStor
             'week_highlights': ['good stuff 2'],
             'week_num': 2,
         }
-        self.assertEqual(schedules, [(self.user, None, expected_context)])
+        assert schedules == [(self.user, None, expected_context)]
 
     @override_waffle_flag(COURSE_UPDATE_WAFFLE_FLAG, True)
     @override_switch('schedules.course_update_show_unsubscribe', True)
     def test_schedule_context_show_unsubscribe(self):
         resolver = self.create_resolver()
         schedules = list(resolver.get_schedules())
-        self.assertIn('optout', schedules[0][2]['unsubscribe_url'])
+        assert 'optout' in schedules[0][2]['unsubscribe_url']
 
     @override_waffle_flag(COURSE_UPDATE_WAFFLE_FLAG, True)
     def test_schedule_context_error(self):
