@@ -1,3 +1,6 @@
+# -*- coding: utf-8 -*-
+
+
 import django.utils.timezone
 import model_utils.fields
 from django.conf import settings
@@ -25,6 +28,6 @@ class Migration(migrations.Migration):
         ),
         migrations.AlterUniqueTogether(
             name='userattribute',
-            unique_together={('user', 'name')},
+            unique_together=set([('user', 'name')]),
         ),
     ]
