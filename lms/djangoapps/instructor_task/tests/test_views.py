@@ -1,15 +1,13 @@
-
 """
 Test for LMS instructor background task views.
 """
 
 
 import json
+from unittest.mock import Mock, patch
 
 from celery.states import FAILURE, PENDING, REVOKED, SUCCESS
 from django.http import QueryDict
-from mock import Mock, patch
-from six.moves import range
 
 from lms.djangoapps.instructor_task.models import PROGRESS
 from lms.djangoapps.instructor_task.tests.test_base import (
@@ -368,7 +366,7 @@ class InstructorTaskReportTest(InstructorTaskTestCase):
     def test_get_info_for_broken_output(self):
         # check for non-JSON task_output
         instructor_task = self._create_success_entry()
-        instructor_task.task_output = u"{ bad"
+        instructor_task.task_output = "{ bad"
         succeeded, message = get_task_completion_info(instructor_task)
         assert not succeeded
         assert message == 'No parsable status information available'
@@ -384,7 +382,7 @@ class InstructorTaskReportTest(InstructorTaskTestCase):
     def test_get_info_for_broken_input(self):
         # check for non-JSON task_input, but then just ignore it
         instructor_task = self._create_success_entry()
-        instructor_task.task_input = u"{ bad"
+        instructor_task.task_input = "{ bad"
         succeeded, message = get_task_completion_info(instructor_task)
         assert not succeeded
         assert message == 'Status: rescored 2 of 3 (out of 5)'

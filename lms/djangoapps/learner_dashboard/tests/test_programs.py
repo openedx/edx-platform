@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 Unit tests covering the program listing and detail pages.
 """
@@ -6,16 +5,16 @@ Unit tests covering the program listing and detail pages.
 
 import json
 import re
+from unittest import mock
+from urllib.parse import urljoin
 from uuid import uuid4
 
-import mock
-import six
-from six.moves.urllib.parse import urljoin
 from bs4 import BeautifulSoup
 from django.conf import settings
 from django.test import override_settings
 from django.urls import reverse, reverse_lazy
 
+from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
 from lms.envs.test import CREDENTIALS_PUBLIC_SERVICE_URL
 from openedx.core.djangoapps.catalog.constants import PathwayType
 from openedx.core.djangoapps.catalog.tests.factories import (
@@ -27,7 +26,6 @@ from openedx.core.djangoapps.catalog.tests.factories import (
 from openedx.core.djangoapps.catalog.tests.mixins import CatalogIntegrationMixin
 from openedx.core.djangoapps.programs.tests.mixins import ProgramsApiConfigMixin
 from openedx.core.djangolib.testing.utils import skip_unless_lms
-from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory as ModuleStoreCourseFactory
 
@@ -39,7 +37,7 @@ def load_serialized_data(response, key):
     """
     Extract and deserialize serialized data from the response.
     """
-    pattern = re.compile(u'{key}: (?P<data>\\[.*\\])'.format(key=key))
+    pattern = re.compile(f'{key}: (?P<data>\\[.*\\])')
     match = pattern.search(response.content.decode('utf-8'))
     serialized = match.group('data')
 
@@ -57,10 +55,10 @@ class TestProgramListing(ProgramsApiConfigMixin, SharedModuleStoreTestCase):
 
     @classmethod
     def setUpClass(cls):
-        super(TestProgramListing, cls).setUpClass()
+        super().setUpClass()
 
         cls.course = ModuleStoreCourseFactory()
-        course_run = CourseRunFactory(key=six.text_type(cls.course.id))  # lint-amnesty, pylint: disable=no-member
+        course_run = CourseRunFactory(key=str(cls.course.id))  # lint-amnesty, pylint: disable=no-member
         course = CourseFactory(course_runs=[course_run])
 
         cls.first_program = ProgramFactory(courses=[course])
@@ -69,7 +67,7 @@ class TestProgramListing(ProgramsApiConfigMixin, SharedModuleStoreTestCase):
         cls.data = sorted([cls.first_program, cls.second_program], key=cls.program_sort_key)
 
     def setUp(self):
-        super(TestProgramListing, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
 
         self.user = UserFactory()
         self.client.login(username=self.user.username, password=self.password)
@@ -205,10 +203,10 @@ class TestProgramDetails(ProgramsApiConfigMixin, CatalogIntegrationMixin, Shared
 
     @classmethod
     def setUpClass(cls):
-        super(TestProgramDetails, cls).setUpClass()
+        super().setUpClass()
 
         modulestore_course = ModuleStoreCourseFactory()
-        course_run = CourseRunFactory(key=six.text_type(modulestore_course.id))  # lint-amnesty, pylint: disable=no-member
+        course_run = CourseRunFactory(key=str(modulestore_course.id))  # lint-amnesty, pylint: disable=no-member
         course = CourseFactory(course_runs=[course_run])
 
         cls.program_data = ProgramFactory(uuid=cls.program_uuid, courses=[course])
@@ -218,7 +216,7 @@ class TestProgramDetails(ProgramsApiConfigMixin, CatalogIntegrationMixin, Shared
         del cls.pathway_data['programs']  # lint-amnesty, pylint: disable=unsupported-delete-operation
 
     def setUp(self):
-        super(TestProgramDetails, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
 
         self.user = UserFactory()
         self.client.login(username=self.user.username, password=self.password)
@@ -228,7 +226,7 @@ class TestProgramDetails(ProgramsApiConfigMixin, CatalogIntegrationMixin, Shared
         self.assertContains(response, 'programData')
         self.assertContains(response, 'urls')
         self.assertContains(response,
-                            u'"program_record_url": "{}/records/programs/'.format(CREDENTIALS_PUBLIC_SERVICE_URL))
+                            f'"program_record_url": "{CREDENTIALS_PUBLIC_SERVICE_URL}/records/programs/')
         self.assertContains(response, 'program_listing_url')
         self.assertContains(response, self.program_data['title'])
         self.assert_programs_tab_present(response)

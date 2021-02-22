@@ -5,14 +5,14 @@ Tests for instructor_task/models.py.
 
 import copy
 import time
-from six import StringIO
+from io import StringIO
 import pytest
 from django.conf import settings
 from django.test import SimpleTestCase, TestCase, override_settings
 from opaque_keys.edx.locator import CourseLocator
 
 from common.test.utils import MockS3BotoMixin
-from lms.djangoapps.instructor_task.models import InstructorTask, ReportStore, TASK_INPUT_LENGTH
+from lms.djangoapps.instructor_task.models import TASK_INPUT_LENGTH, InstructorTask, ReportStore
 from lms.djangoapps.instructor_task.tests.test_base import TestReportMixin
 
 
@@ -35,13 +35,13 @@ class TestInstructorTasksModel(TestCase):
             )
 
 
-class ReportStoreTestMixin(object):
+class ReportStoreTestMixin:
     """
     Mixin for report store tests.
     """
 
     def setUp(self):
-        super(ReportStoreTestMixin, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.course_id = CourseLocator(org="testx", course="coursex", run="runx")
 
     def create_report_store(self):

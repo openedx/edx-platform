@@ -7,12 +7,14 @@ from time import time
 
 from django.contrib.auth import get_user_model
 from django.db.models import Q
-from xmodule.modulestore.django import modulestore
 
 from common.djangoapps.student.models import CourseEnrollment
 from lms.djangoapps.certificates.api import generate_user_certificates
 from lms.djangoapps.certificates.models import CertificateStatuses, GeneratedCertificate
+from xmodule.modulestore.django import modulestore
+
 from .runner import TaskProgress
+
 User = get_user_model()
 
 

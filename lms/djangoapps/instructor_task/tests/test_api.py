@@ -2,16 +2,16 @@
 Test for LMS instructor background task queue management
 """
 
+from unittest.mock import MagicMock, Mock, patch
+
 import pytest
 import ddt
 from celery.states import FAILURE
-from mock import MagicMock, Mock, patch
-from six.moves import range
 
-from lms.djangoapps.bulk_email.models import SEND_TO_LEARNERS, SEND_TO_MYSELF, SEND_TO_STAFF, CourseEmail
 from common.test.utils import normalize_repr
-from lms.djangoapps.courseware.tests.factories import UserFactory
+from lms.djangoapps.bulk_email.models import SEND_TO_LEARNERS, SEND_TO_MYSELF, SEND_TO_STAFF, CourseEmail
 from lms.djangoapps.certificates.models import CertificateGenerationHistory, CertificateStatuses
+from lms.djangoapps.courseware.tests.factories import UserFactory
 from lms.djangoapps.instructor_task.api import (
     SpecificStudentIdMissingError,
     generate_certificates_for_students,
@@ -95,7 +95,7 @@ class InstructorTaskModuleSubmitTest(InstructorTaskModuleTestCase):
     """Tests API methods that involve the submission of module-based background tasks."""
 
     def setUp(self):
-        super(InstructorTaskModuleSubmitTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
 
         self.initialize_course()
         self.student = UserFactory.create(username="student", email="student@edx.org")
@@ -194,7 +194,7 @@ class InstructorTaskCourseSubmitTest(TestReportMixin, InstructorTaskCourseTestCa
     """Tests API methods that involve the submission of course-based background tasks."""
 
     def setUp(self):
-        super(InstructorTaskCourseSubmitTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
 
         self.initialize_course()
         self.student = UserFactory.create(username="student", email="student@edx.org")
@@ -269,7 +269,7 @@ class InstructorTaskCourseSubmitTest(TestReportMixin, InstructorTaskCourseTestCa
         api_call = lambda: submit_cohort_students(
             self.create_task_request(self.instructor),
             self.course.id,
-            file_name=u'filename.csv'
+            file_name='filename.csv'
         )
         self._test_resubmission(api_call)
 

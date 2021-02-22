@@ -23,7 +23,7 @@ class TestFailOldQueueingTasksCommand(InstructorTaskTestCase):
     """
 
     def setUp(self):
-        super(TestFailOldQueueingTasksCommand, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
 
         type_1_queueing = InstructorTaskFactory.create(
             task_state=QUEUING,

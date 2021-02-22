@@ -8,14 +8,13 @@ paths actually work.
 
 import json
 from functools import partial  # lint-amnesty, pylint: disable=unused-import
+from unittest.mock import MagicMock, Mock, patch
 from uuid import uuid4
 import pytest
 import ddt
 from celery.states import FAILURE, SUCCESS
 from django.utils.translation import ugettext_noop
-from mock import MagicMock, Mock, patch
 from opaque_keys.edx.keys import i4xEncoder
-from six.moves import range
 
 from common.djangoapps.course_modes.models import CourseMode
 from lms.djangoapps.courseware.models import StudentModule
@@ -31,7 +30,8 @@ from lms.djangoapps.instructor_task.tasks import (
     rescore_problem,
     reset_problem_attempts
 )
-from lms.djangoapps.instructor_task.tasks_helper.misc import upload_ora2_data  # lint-amnesty, pylint: disable=unused-import
+from lms.djangoapps.instructor_task.tasks_helper.misc import \
+    upload_ora2_data  # lint-amnesty, pylint: disable=unused-import
 from lms.djangoapps.instructor_task.tests.factories import InstructorTaskFactory
 from lms.djangoapps.instructor_task.tests.test_base import InstructorTaskModuleTestCase
 from xmodule.modulestore.exceptions import ItemNotFoundError
@@ -52,7 +52,7 @@ class TestInstructorTasks(InstructorTaskModuleTestCase):
     """
 
     def setUp(self):
-        super(TestInstructorTasks, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.initialize_course()
         self.instructor = self.create_instructor('instructor')
         self.location = self.problem_location(PROBLEM_URL_NAME)
@@ -436,8 +436,10 @@ class TestRescoreInstructorTask(TestInstructorTasks):
         entry = InstructorTask.objects.get(id=task_entry.id)
         output = json.loads(entry.task_output)
         assert output['exception'] == 'UpdateProblemModuleStateError'
-        assert output['message'] == u'Specified module {0} of type {1} does not support rescoring.'\
-            .format(self.location, mock_instance.__class__)
+        assert output['message'] == 'Specified module {} of type {} does not support rescoring.'.format(
+            self.location,
+            mock_instance.__class__,
+        )
         assert len(output['traceback']) > 0
 
     def test_rescoring_unaccessable(self):
