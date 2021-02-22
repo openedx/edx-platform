@@ -12,9 +12,9 @@ from django.shortcuts import render
 from opaque_keys.edx.keys import CourseKey
 from w3lib.url import add_or_replace_parameter
 
-from common.djangoapps.nodebb.helpers import get_all_course_progress, get_course_related_tabs
-from common.djangoapps.nodebb.models import DiscussionCommunity, TeamGroupChat
 from nodebb.constants import COMMUNITY_ID_SPLIT_INDEX, COMMUNITY_URL_SPLIT_CHAR, CONVERSATIONALIST_ENTRY_INDEX
+from nodebb.helpers import get_all_course_progress, get_course_related_tabs
+from nodebb.models import DiscussionCommunity, TeamGroupChat
 from openedx.features.badging.constants import CONVERSATIONALIST
 from openedx.features.badging.models import Badge
 from openedx.features.course_card.helpers import get_related_card_id

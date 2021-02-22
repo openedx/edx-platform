@@ -17,7 +17,6 @@ from nodebb.tasks import (
 )
 from openedx.core.djangoapps.xmodule_django.models import CourseKeyField
 
-
 log = getLogger(__name__)
 
 

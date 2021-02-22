@@ -2,18 +2,17 @@
 Tests for Nodebb app
 """
 import mock
-
 from django.test import TestCase
 from requests.exceptions import ConnectionError
 
 from common.lib.nodebb_client.client import NodeBBClient
-from common.djangoapps.nodebb.tasks import (
-    task_create_user_on_nodebb,
-    task_update_user_profile_on_nodebb,
-    task_delete_user_on_nodebb,
+from nodebb.tasks import (
     task_activate_user_on_nodebb,
+    task_create_user_on_nodebb,
+    task_delete_user_on_nodebb,
     task_join_group_on_nodebb,
-    task_update_onboarding_surveys_status
+    task_update_onboarding_surveys_status,
+    task_update_user_profile_on_nodebb
 )
 
 
