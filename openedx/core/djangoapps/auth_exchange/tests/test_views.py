@@ -81,31 +81,24 @@ class AccessTokenExchangeViewTest(AccessTokenExchangeTestMixin):
 
     def test_get_method(self):
         response = self.client.get(self.url, self.data)
-        assert response.status_code == 400
-        assert json.loads(response.content.decode('utf-8')) ==\
-               {'error': 'invalid_request', 'error_description': 'Only POST requests allowed.'}
+        assert response.status_code == 405
+        assert json.loads(response.content.decode('utf-8')) == {'detail': 'Method "GET" not allowed.'}
 
     def test_invalid_provider(self):
         url = reverse("exchange_access_token", kwargs={"backend": "invalid"})
         response = self.client.post(url, self.data)
         assert response.status_code == 404
 
-    def test_logged_in_user_matches_token(self):
+    def test_logged_in_user_without_csrf_error(self):
         """
         Test that a logged in user succeeds without a CSRF permission denied.
-        """
-        self.csrf_client.login(username=self.user.username, password='secret')
-        self._setup_provider_response(success=True)
-        self._assert_success(self.data, expected_scopes=[], expected_logged_in_user=self.user)
 
-    def test_logged_in_user_does_not_match_token(self):
+        Note: The logged in user does not match the user of the token, but that is not
+            being treated as an error.
         """
-        Test that a logged in user that doesn't match the user in the token fails.
-        """
-        self.user = UserFactory.create(username='test', password='secret')
         self.csrf_client.login(username='test', password='secret')
         self._setup_provider_response(success=True)
-        self._assert_error(self.data, "invalid_request", "session user and token user do not match")
+        self._assert_success(self.data, expected_scopes=[], expected_logged_in_user=self.user)
 
     def test_disabled_user(self):
         """

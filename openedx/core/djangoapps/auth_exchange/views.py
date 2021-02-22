@@ -16,7 +16,6 @@ from django.views.decorators.csrf import csrf_exempt
 from oauth2_provider import models as dot_models
 from oauth2_provider.views.base import TokenView as DOTAccessTokenView
 from rest_framework import permissions
-from rest_framework.authentication import SessionAuthentication
 from rest_framework.exceptions import AuthenticationFailed
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -25,14 +24,6 @@ from openedx.core.djangoapps.auth_exchange.forms import AccessTokenExchangeForm
 from openedx.core.djangoapps.oauth_dispatch import adapters
 from openedx.core.djangoapps.oauth_dispatch.api import create_dot_access_token
 from openedx.core.lib.api.authentication import BearerAuthenticationAllowInactiveUser
-
-
-class CsrfExemptSessionAuthentication(SessionAuthentication):
-    """
-    Class enables CSRF exempt Session Authentication.
-    """
-    def enforce_csrf(self, request):
-        return  # Skip the CSRF check
 
 
 class AccessTokenExchangeBase(APIView):
@@ -44,17 +35,13 @@ class AccessTokenExchangeBase(APIView):
         but we currently only support django-oauth-toolkit (DOT).
     """
     # No CSRF protection is required because the provided 3rd party OAuth access
-    #  token is sufficient. However, we include session authentication to ensure
-    #  the session user and token user match, if there is a logged in user.
-    authentication_classes = [CsrfExemptSessionAuthentication]
+    #  token is sufficient
+    authentication_classes = []
     allowed_methods = ['POST']
 
     @method_decorator(social_utils.psa("social:complete"))
     def dispatch(self, *args, **kwargs):  # pylint: disable=arguments-differ
         return super(AccessTokenExchangeBase, self).dispatch(*args, **kwargs)  # lint-amnesty, pylint: disable=super-with-arguments
-
-    def get(self, request, _backend):
-        return self._get_invalid_request_response('Only POST requests allowed.')
 
     def post(self, request, _backend):
         """
@@ -66,8 +53,6 @@ class AccessTokenExchangeBase(APIView):
             return error_response
 
         user = form.cleaned_data["user"]
-        if request.user and not request.user.is_anonymous and request.user != user:
-            return self._get_invalid_request_response('session user and token user do not match')
         scope = form.cleaned_data["scope"]
         client = form.cleaned_data["client"]
         return self.exchange_access_token(request, user, scope, client)
