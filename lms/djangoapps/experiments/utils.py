@@ -6,14 +6,14 @@ Utilities to facilitate experimentation
 import logging
 from decimal import Decimal
 
-import six
 from django.utils.timezone import now
+from edx_toggles.toggles import LegacyWaffleFlag, LegacyWaffleFlagNamespace
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
 
-from common.djangoapps.course_modes.models import format_course_price, get_cosmetic_verified_display_price, CourseMode
-from edx_toggles.toggles import LegacyWaffleFlag, LegacyWaffleFlagNamespace  # lint-amnesty, pylint: disable=wrong-import-order
+from common.djangoapps.course_modes.models import CourseMode, format_course_price, get_cosmetic_verified_display_price
 from common.djangoapps.entitlements.models import CourseEntitlement
+from common.djangoapps.student.models import CourseEnrollment
 from lms.djangoapps.commerce.utils import EcommerceService
 from lms.djangoapps.courseware.access import has_staff_access_to_preview_mode
 from lms.djangoapps.courseware.utils import can_show_verified_upgrade, verified_upgrade_deadline_link
@@ -21,7 +21,6 @@ from openedx.core.djangoapps.catalog.utils import get_programs
 from openedx.core.djangoapps.django_comment_common.models import Role
 from openedx.core.djangoapps.schedules.models import Schedule
 from openedx.features.course_duration_limits.access import get_user_course_duration, get_user_course_expiration_date
-from common.djangoapps.student.models import CourseEnrollment
 from xmodule.partitions.partitions_service import get_all_partitions_for_course, get_user_partition_groups
 
 # Import this for backwards compatibility (so that anyone importing this function from here doesn't break)
@@ -31,7 +30,7 @@ logger = logging.getLogger(__name__)
 
 
 # TODO: clean up as part of REVEM-199 (START)
-experiments_namespace = LegacyWaffleFlagNamespace(name=u'experiments')
+experiments_namespace = LegacyWaffleFlagNamespace(name='experiments')
 
 # .. toggle_name: experiments.add_programs
 # .. toggle_implementation: WaffleFlag
@@ -44,7 +43,7 @@ experiments_namespace = LegacyWaffleFlagNamespace(name=u'experiments')
 # .. toggle_warnings: This temporary feature toggle does not have a target removal date.
 PROGRAM_INFO_FLAG = LegacyWaffleFlag(
     waffle_namespace=experiments_namespace,
-    flag_name=u'add_programs',
+    flag_name='add_programs',
     module_name=__name__,
 )
 
@@ -57,7 +56,7 @@ PROGRAM_INFO_FLAG = LegacyWaffleFlag(
 # .. toggle_target_removal_date: None
 # .. toggle_tickets: REVEM-118
 # .. toggle_warnings: This temporary feature toggle does not have a target removal date.
-DASHBOARD_INFO_FLAG = LegacyWaffleFlag(experiments_namespace, u'add_dashboard_info', __name__)
+DASHBOARD_INFO_FLAG = LegacyWaffleFlag(experiments_namespace, 'add_dashboard_info', __name__)
 # TODO END: clean up as part of REVEM-199 (End)
 
 # TODO: Clean up as part of REV-1205 (START)
@@ -72,7 +71,7 @@ DASHBOARD_INFO_FLAG = LegacyWaffleFlag(experiments_namespace, u'add_dashboard_in
 # .. toggle_warnings: This temporary feature toggle does not have a target removal date.
 UPSELL_TRACKING_FLAG = LegacyWaffleFlag(
     waffle_namespace=experiments_namespace,
-    flag_name=u'add_upsell_tracking',
+    flag_name='add_upsell_tracking',
     module_name=__name__,
 )
 # TODO END: Clean up as part of REV-1205 (End)
@@ -88,13 +87,13 @@ def check_and_get_upgrade_link_and_date(user, enrollment=None, course=None):
     otherwise, returns None for both the link and date.
     """
     if enrollment is None and course is None:
-        logger.warning(u'Must specify either an enrollment or a course')
+        logger.warning('Must specify either an enrollment or a course')
         return (None, None, None)
 
     if enrollment:
         if course and enrollment.course_id != course.id:
-            logger.warning(u'{} refers to a different course than {} which was supplied. Enrollment course id={}, '
-                           u'repr={!r}, deprecated={}. Course id={}, repr={!r}, deprecated={}.'
+            logger.warning('{} refers to a different course than {} which was supplied. Enrollment course id={}, '
+                           'repr={!r}, deprecated={}. Course id={}, repr={!r}, deprecated={}.'
                            .format(enrollment,
                                    course,
                                    enrollment.course_id,
@@ -108,15 +107,15 @@ def check_and_get_upgrade_link_and_date(user, enrollment=None, course=None):
             return (None, None, None)
 
         if enrollment.user_id != user.id:
-            logger.warning(u'{} refers to a different user than {} which was supplied. '
-                           u'Enrollment user id={}, repr={!r}. '
-                           u'User id={}, repr={!r}.'.format(enrollment,
-                                                            user,
-                                                            enrollment.user_id,
-                                                            enrollment.user_id,
-                                                            user.id,
-                                                            user.id,
-                                                            )
+            logger.warning('{} refers to a different user than {} which was supplied. '
+                           'Enrollment user id={}, repr={!r}. '
+                           'User id={}, repr={!r}.'.format(enrollment,
+                                                           user,
+                                                           enrollment.user_id,
+                                                           enrollment.user_id,
+                                                           user.id,
+                                                           user.id,
+                                                           )
                            )
             return (None, None, None)
 
@@ -154,7 +153,7 @@ def get_program_price_and_skus(courses):
         skus = None
     else:
         program_price = format_course_price(program_price)
-        program_price = six.text_type(program_price)
+        program_price = str(program_price)
 
     return program_price, skus
 
@@ -237,7 +236,7 @@ def is_enrolled_in_course_run(course_run, enrollment_course_ids):
         return course_run_key in enrollment_course_ids
     except InvalidKeyError:
         logger.warning(
-            u'Unable to determine if user was enrolled since the course key {} is invalid'.format(key)
+            f'Unable to determine if user was enrolled since the course key {key} is invalid'
         )
         return False  # Invalid course run key. Assume user is not enrolled.
 
@@ -373,8 +372,8 @@ def get_experiment_user_metadata_context(course, user):
             }
 
             if not context.get('course_id'):
-                user_metadata['course_id'] = six.text_type(course_key)
-        elif isinstance(course_key, six.string_types):
+                user_metadata['course_id'] = str(course_key)
+        elif isinstance(course_key, str):
             user_metadata['course_id'] = course_key
 
     context['user_metadata'] = user_metadata
@@ -411,7 +410,7 @@ def get_base_experiment_metadata_context(course, user, enrollment, user_enrollme
 
     return {
         'upgrade_link': upgrade_link,
-        'upgrade_price': six.text_type(get_cosmetic_verified_display_price(course)),
+        'upgrade_price': str(get_cosmetic_verified_display_price(course)),
         'enrollment_mode': enrollment_mode,
         'enrollment_time': enrollment_time,
         'schedule_start': schedule_start,

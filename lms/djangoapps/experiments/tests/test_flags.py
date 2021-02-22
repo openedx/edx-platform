@@ -2,23 +2,24 @@
 Tests for experimentation feature flags
 """
 
+from unittest.mock import patch
+
 import ddt
 import pytz
 from crum import set_current_request
 from dateutil import parser
 from django.test.client import RequestFactory
 from edx_django_utils.cache import RequestCache
-from mock import patch
+from edx_toggles.toggles.testutils import override_waffle_flag
 from opaque_keys.edx.keys import CourseKey
 
-from edx_toggles.toggles.testutils import override_waffle_flag
-from lms.djangoapps.experiments.testutils import override_experiment_waffle_flag
+from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
 from lms.djangoapps.experiments.factories import ExperimentKeyValueFactory
 from lms.djangoapps.experiments.flags import ExperimentWaffleFlag
+from lms.djangoapps.experiments.testutils import override_experiment_waffle_flag
 from openedx.core.djangoapps.site_configuration.tests.factories import SiteFactory
 from openedx.core.djangoapps.waffle_utils import CourseWaffleFlag
 from openedx.core.djangoapps.waffle_utils.models import WaffleFlagCourseOverrideModel
-from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 
 

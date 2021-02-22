@@ -1,25 +1,29 @@
-# -*- coding: utf-8 -*-
-
 """Tests of email marketing signal handlers."""
 
 
 import datetime
 import logging
+from unittest.mock import ANY, Mock, patch
 
 import ddt
-import six
 from django.conf import settings
 from django.contrib.auth.models import AnonymousUser
 from django.contrib.sites.models import Site
 from django.test import TestCase
 from django.test.client import RequestFactory
 from freezegun import freeze_time
-from mock import ANY, Mock, patch
 from opaque_keys.edx.keys import CourseKey
 from sailthru.sailthru_error import SailthruClientError
 from sailthru.sailthru_response import SailthruResponse
 from testfixtures import LogCapture
 
+from common.djangoapps.student.models import Registration, User
+from common.djangoapps.student.tests.factories import (  # lint-amnesty, pylint: disable=unused-import
+    CourseEnrollmentFactory,
+    UserFactory,
+    UserProfileFactory
+)
+from common.djangoapps.util.json_request import JsonResponse
 from lms.djangoapps.email_marketing.tasks import (  # lint-amnesty, pylint: disable=unused-import
     _create_user_list,
     _get_list_from_email_marketing_provider,
@@ -30,9 +34,6 @@ from lms.djangoapps.email_marketing.tasks import (  # lint-amnesty, pylint: disa
     update_user_email
 )
 from openedx.core.djangoapps.lang_pref import LANGUAGE_KEY
-from common.djangoapps.student.models import Registration, User
-from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory, UserProfileFactory  # lint-amnesty, pylint: disable=unused-import
-from common.djangoapps.util.json_request import JsonResponse
 
 from ..models import EmailMarketingConfiguration
 from ..signals import (
@@ -92,7 +93,7 @@ class EmailMarketingTests(TestCase):
 
         self.site = Site.objects.get_current()
         self.request.site = self.site
-        super(EmailMarketingTests, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
 
     @freeze_time(datetime.datetime.now())
     @patch('lms.djangoapps.email_marketing.signals.crum.get_current_request')
@@ -118,7 +119,7 @@ class EmailMarketingTests(TestCase):
                     'Started at {start} and ended at {end}, time spent:{delta} milliseconds'.format(
                         start=datetime.datetime.now().isoformat(' '),
                         end=datetime.datetime.now().isoformat(' '),
-                        delta=0 if six.PY2 else 0.0)
+                        delta=0.0)
                  ),
                 (LOGGER_NAME, 'INFO',
                     'sailthru_hid cookie:{cookies[cookie]} successfully retrieved for user {user}'.format(
@@ -561,7 +562,7 @@ class EmailMarketingTests(TestCase):
         assert not mock_update_user.called
 
 
-class MockSailthruResponse(object):
+class MockSailthruResponse:
     """
     Mock object for SailthruResponse
     """
@@ -584,7 +585,7 @@ class MockSailthruResponse(object):
         return MockSailthruError(self.error, self.code)
 
 
-class MockSailthruError(object):
+class MockSailthruError:
     """
     Mock object for Sailthru Error
     """
@@ -612,7 +613,7 @@ class SailthruTests(TestCase):
     """
 
     def setUp(self):
-        super(SailthruTests, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.user = UserFactory()
         self.course_id = CourseKey.from_string('edX/toy/2012_Fall')
         self.course_url = 'http://lms.testserver.fake/courses/edX/toy/2012_Fall/info'
@@ -664,6 +665,6 @@ class SailthruTests(TestCase):
         while sending it to sail through.
         """
         switch.return_value = True
-        self.user.email = u'tèst@edx.org'
+        self.user.email = 'tèst@edx.org'
         update_sailthru(None, self.user, 'audit', str(self.course_id))
         assert mock_sailthru_purchase.called
