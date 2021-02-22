@@ -27,7 +27,7 @@ class Command(BaseCommand):
     """
     Example usage:
         $ ./manage.py lms generate_course_blocks --all_courses --settings=devstack
-        $ ./manage.py lms generate_course_blocks 'edX/DemoX/Demo_Course' --settings=devstack
+        $ ./manage.py lms generate_course_blocks --courses 'edX/DemoX/Demo_Course' --settings=devstack
     """
     args = u'<course_id course_id ...>'
     help = u'Generates and stores course blocks for one or more courses.'
