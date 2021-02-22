@@ -9,7 +9,6 @@ from rest_framework.generics import GenericAPIView
 from rest_framework.response import Response
 from scipy import stats
 
-from cms.djangoapps.contentstore.views.item import highlights_setting
 from openedx.core.lib.api.view_utils import DeveloperErrorViewMixin, view_auth_classes
 from openedx.core.lib.cache_utils import request_cached
 from openedx.core.lib.graph_traversals import traverse_pre_order
@@ -149,7 +148,7 @@ class CourseQualityView(DeveloperErrorViewMixin, GenericAPIView):
             total_visible=len(visible_sections),
             number_with_highlights=len(sections_with_highlights),
             highlights_active_for_course=course.highlights_enabled_for_messaging,
-            highlights_enabled=highlights_setting.is_enabled(),
+            highlights_enabled=True,  # used to be controlled by a waffle switch, now just always enabled
         )
 
     def _subsections_quality(self, course, request):  # lint-amnesty, pylint: disable=missing-function-docstring

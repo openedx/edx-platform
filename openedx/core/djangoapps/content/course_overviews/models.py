@@ -12,7 +12,9 @@ from config_models.models import ConfigurationModel
 from django.conf import settings
 from django.db import models, transaction
 from django.db.models import Q
-from django.db.models.fields import BooleanField, DateTimeField, DecimalField, FloatField, IntegerField, TextField
+from django.db.models.fields import (
+    BooleanField, DateTimeField, DecimalField, FloatField, IntegerField, NullBooleanField, TextField
+)
 from django.db.models.signals import post_save, post_delete
 from django.db.utils import IntegrityError
 from django.template import defaultfilters
@@ -126,6 +128,9 @@ class CourseOverview(TimeStampedModel):
     marketing_url = TextField(null=True)
     eligible_for_financial_aid = BooleanField(default=True)
 
+    # Course highlight info, used to guide course update emails
+    has_highlights = NullBooleanField(default=None)  # if None, you have to look up the answer yourself
+
     language = TextField(null=True)
 
     history = HistoricalRecords()
@@ -228,6 +233,8 @@ class CourseOverview(TimeStampedModel):
         course_overview.effort = CourseDetails.fetch_about_attribute(course.id, 'effort')
         course_overview.course_video_url = CourseDetails.fetch_video_url(course.id)
         course_overview.self_paced = course.self_paced
+
+        course_overview.has_highlights = cls._get_course_has_highlights(course)
 
         if not CatalogIntegration.is_enabled():
             course_overview.language = course.language
@@ -412,6 +419,12 @@ class CourseOverview(TimeStampedModel):
                 except CourseOverview.DoesNotExist:
                     overviews[course_id] = None
         return overviews
+
+    @classmethod
+    def _get_course_has_highlights(cls, course):
+        # Avoid circular import here
+        from openedx.core.djangoapps.schedules.content_highlights import course_has_highlights
+        return course_has_highlights(course)
 
     def clean_id(self, padding_char='='):
         """

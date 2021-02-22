@@ -4,7 +4,6 @@ CourseEnrollment related signal handlers.
 
 import datetime
 import logging
-import random
 
 import six
 from django.db.models.signals import post_save
@@ -18,16 +17,13 @@ from lms.djangoapps.courseware.models import (
     OrgDynamicUpgradeDeadlineConfiguration
 )
 from openedx.core.djangoapps.content.course_overviews.signals import COURSE_START_DATE_CHANGED
-from openedx.core.djangoapps.schedules.content_highlights import course_has_highlights
+from openedx.core.djangoapps.schedules.content_highlights import course_has_highlights_from_store
 from openedx.core.djangoapps.schedules.models import ScheduleExperience
 from openedx.core.djangoapps.schedules.utils import reset_self_paced_schedule
-from openedx.core.djangoapps.theming.helpers import get_current_site
 from common.djangoapps.student.models import CourseEnrollment
-from common.djangoapps.student.signals import ENROLL_STATUS_CHANGE, ENROLLMENT_TRACK_UPDATED  # lint-amnesty, pylint: disable=unused-import
-from common.djangoapps.track import segment
+from common.djangoapps.student.signals import ENROLLMENT_TRACK_UPDATED
 
-from .config import CREATE_SCHEDULE_WAFFLE_FLAG
-from .models import Schedule, ScheduleConfig
+from .models import Schedule
 from .tasks import update_course_schedules
 
 log = logging.getLogger(__name__)
@@ -139,39 +135,6 @@ def _get_upgrade_deadline_delta_setting(course_id):  # lint-amnesty, pylint: dis
     return delta
 
 
-def _should_randomly_suppress_schedule_creation(  # lint-amnesty, pylint: disable=missing-function-docstring
-    schedule_config,
-    enrollment,
-    upgrade_deadline,
-    experience_type,
-    content_availability_date,
-):
-    # The hold back ratio is always between 0 and 1. A value of 0 indicates that schedules should be created for all
-    # schedules. A value of 1 indicates that no schedules should be created for any enrollments. A value of 0.2 would
-    # mean that 20% of enrollments should *not* be given schedules.
-
-    # This allows us to measure the impact of the dynamic schedule experience by comparing this "control" group that
-    # does not receive any of benefits of the feature against the group that does.
-    if random.random() < schedule_config.hold_back_ratio:
-        log.debug('Schedules: Enrollment held back from dynamic schedule experiences.')
-        upgrade_deadline_str = None
-        if upgrade_deadline:
-            upgrade_deadline_str = upgrade_deadline.isoformat()
-        segment.track(
-            user_id=enrollment.user.id,
-            event_name='edx.bi.schedule.suppressed',
-            properties={
-                'course_id': six.text_type(enrollment.course_id),
-                'experience_type': experience_type,
-                'upgrade_deadline': upgrade_deadline_str,
-                'content_availability_date': content_availability_date.isoformat(),
-            }
-        )
-        return True
-
-    return False
-
-
 def _create_schedule(enrollment, enrollment_created):
     """
     Checks configuration and creates Schedule with ScheduleExperience for this enrollment.
@@ -180,33 +143,11 @@ def _create_schedule(enrollment, enrollment_created):
         # only create schedules when enrollment records are created
         return
 
-    current_site = get_current_site()
-    if current_site is None:
-        log.debug('Schedules: No current site')
-        return
-
-    schedule_config = ScheduleConfig.current(current_site)
-    if (
-        not schedule_config.create_schedules and
-        not CREATE_SCHEDULE_WAFFLE_FLAG.is_enabled(enrollment.course_id)
-    ):
-        log.debug('Schedules: Creation not enabled for this course or for this site')
-        return
-
     # This represents the first date at which the learner can access the content. This will be the latter of
     # either the enrollment date or the course's start date.
     content_availability_date = max(enrollment.created, enrollment.course_overview.start)
     upgrade_deadline = _calculate_upgrade_deadline(enrollment.course_id, content_availability_date)
     experience_type = _get_experience_type(enrollment)
-
-    if _should_randomly_suppress_schedule_creation(
-            schedule_config,
-            enrollment,
-            upgrade_deadline,
-            experience_type,
-            content_availability_date,
-    ):
-        return
 
     schedule = Schedule.objects.create(
         enrollment=enrollment,
@@ -229,7 +170,11 @@ def _get_experience_type(enrollment):
 
     Schedules will receive the Course Updates experience if the course has any section highlights defined.
     """
-    if course_has_highlights(enrollment.course_id):
+    has_highlights = enrollment.course_overview.has_highlights
+    if has_highlights is None:  # old course that doesn't have this info cached in the overview
+        has_highlights = course_has_highlights_from_store(enrollment.course_id)
+
+    if has_highlights:
         return ScheduleExperience.EXPERIENCES.course_updates
     else:
         return ScheduleExperience.EXPERIENCES.default
