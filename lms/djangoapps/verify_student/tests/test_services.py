@@ -1,9 +1,9 @@
-# -*- coding: utf-8 -*-
 """
 Tests for the service classes in verify_student.
 """
 
 from datetime import datetime, timedelta
+from unittest.mock import patch
 
 import ddt
 from django.conf import settings
@@ -11,7 +11,6 @@ from django.test import TestCase
 from django.utils.timezone import now
 from django.utils.translation import ugettext as _
 from freezegun import freeze_time
-from mock import patch
 from pytz import utc
 
 from common.djangoapps.student.tests.factories import UserFactory
@@ -121,7 +120,7 @@ class TestIDVerificationService(ModuleStoreTestCase):
         Test for the path to the IDV flow with no course key given
         """
         path = IDVerificationService.get_verify_location()
-        expected_path = '{}/id-verification'.format(settings.ACCOUNT_MICROFRONTEND_URL)
+        expected_path = f'{settings.ACCOUNT_MICROFRONTEND_URL}/id-verification'
         assert path == expected_path
 
     def test_get_verify_location_from_course_id(self):
@@ -130,7 +129,7 @@ class TestIDVerificationService(ModuleStoreTestCase):
         """
         course = CourseFactory.create(org='Robot', number='999', display_name='Test Course')
         path = IDVerificationService.get_verify_location(course.id)
-        expected_path = '{}/id-verification'.format(settings.ACCOUNT_MICROFRONTEND_URL)
+        expected_path = f'{settings.ACCOUNT_MICROFRONTEND_URL}/id-verification'
         assert path == (expected_path + '?course_id=Robot/999/Test_Course')
 
     def test_get_verify_location_from_string(self):
@@ -138,7 +137,7 @@ class TestIDVerificationService(ModuleStoreTestCase):
         Test for the path to the IDV flow with a course key string
         """
         path = IDVerificationService.get_verify_location('course-v1:edX+DemoX+Demo_Course')
-        expected_path = '{}/id-verification'.format(settings.ACCOUNT_MICROFRONTEND_URL)
+        expected_path = f'{settings.ACCOUNT_MICROFRONTEND_URL}/id-verification'
         assert path == (expected_path + '?course_id=course-v1%3AedX%2BDemoX%2BDemo_Course')
 
 
@@ -152,7 +151,7 @@ class TestIDVerificationServiceUserStatus(TestCase):
     we just put everything inside of a frozen time
     """
     def setUp(self):
-        super(TestIDVerificationServiceUserStatus, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.user = UserFactory.create()
 
     def test_no_verification(self):
@@ -250,7 +249,7 @@ class TestIDVerificationServiceUserStatus(TestCase):
             frozen_datetime.move_to('2016-07-11')
             expected_status = {
                 'status': 'expired',
-                'error': _(u"Your {platform_name} verification has expired.").format(
+                'error': _("Your {platform_name} verification has expired.").format(
                     platform_name=configuration_helpers.get_value('platform_name', settings.PLATFORM_NAME)
                 ),
                 'should_display': True,

@@ -91,7 +91,7 @@ def send_verification_status_email(context):
         msg.content_subtype = 'html'
         msg.send(fail_silently=False)
     except SMTPException:
-        log.warning(u"Failure in sending verification status e-mail to %s", dest_addr)
+        log.warning("Failure in sending verification status e-mail to %s", dest_addr)
 
 
 @shared_task(
