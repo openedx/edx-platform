@@ -46,7 +46,7 @@ def send_composite_outcome(user_id, course_id, assignment_id, version):
     assignment = GradedAssignment.objects.get(id=assignment_id)
     if version != assignment.version_number:
         log.info(
-            u"Score passback for GradedAssignment %s skipped. More recent score available.",
+            "Score passback for GradedAssignment %s skipped. More recent score available.",
             assignment.id
         )
         return
