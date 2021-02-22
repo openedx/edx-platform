@@ -3,15 +3,16 @@ Unit tests for course_goals.api methods.
 """
 
 
-import mock
+from unittest import mock
+
 from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.test.utils import override_settings
 from django.urls import reverse
 from rest_framework.test import APIClient
 
-from lms.djangoapps.course_goals.models import CourseGoal
 from common.djangoapps.student.models import CourseEnrollment
 from common.djangoapps.track.tests import EventTrackingTestCase
+from lms.djangoapps.course_goals.models import CourseGoal
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
@@ -27,7 +28,7 @@ class TestCourseGoalsAPI(EventTrackingTestCase, SharedModuleStoreTestCase):
 
     def setUp(self):
         # Create a course with a verified track
-        super(TestCourseGoalsAPI, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.course = CourseFactory.create(emit_signals=True)
 
         self.user = User.objects.create_user('john', 'lennon@thebeatles.com', 'password')

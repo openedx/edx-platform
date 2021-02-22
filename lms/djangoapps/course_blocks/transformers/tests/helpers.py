@@ -3,15 +3,13 @@ Test helpers for testing course block transformers.
 """
 
 
-import six
-from six.moves import range
-from mock import patch
+from unittest.mock import patch
 
 from common.djangoapps.course_modes.models import CourseMode
+from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
 from lms.djangoapps.courseware.access import has_access
 from openedx.core.djangoapps.content.block_structure.tests.helpers import clear_registered_transformers_cache
 from openedx.core.djangoapps.content.block_structure.transformers import BlockStructureTransformers
-from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
@@ -20,13 +18,13 @@ from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 from ...api import get_course_blocks
 
 
-class TransformerRegistryTestMixin(object):
+class TransformerRegistryTestMixin:
     """
     Mixin that overrides the TransformerRegistry so that it returns
     TRANSFORMER_CLASS_TO_TEST as a registered transformer.
     """
     def setUp(self):
-        super(TransformerRegistryTestMixin, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.patcher = patch(
             'openedx.core.djangoapps.content.block_structure.transformer_registry.'
             'TransformerRegistry.get_registered_transformers'
@@ -48,7 +46,7 @@ class CourseStructureTestCase(TransformerRegistryTestMixin, ModuleStoreTestCase)
         """
         Create users.
         """
-        super(CourseStructureTestCase, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         # Set up users.
         self.password = 'test'
         self.user = UserFactory.create(password=self.password)
@@ -60,7 +58,7 @@ class CourseStructureTestCase(TransformerRegistryTestMixin, ModuleStoreTestCase)
         course structures for the given block type and block reference
         string.
         """
-        return '{}_{}'.format(block_type, block_ref)
+        return f'{block_type}_{block_ref}'
 
     def build_xblock(self, block_hierarchy, block_map, parent):
         """
@@ -77,7 +75,7 @@ class CourseStructureTestCase(TransformerRegistryTestMixin, ModuleStoreTestCase)
         block_type = block_hierarchy['#type']
         block_ref = block_hierarchy['#ref']
         factory = (CourseFactory if block_type == 'course' else ItemFactory)
-        kwargs = {key: value for key, value in six.iteritems(block_hierarchy) if key[0] != '#'}
+        kwargs = {key: value for key, value in block_hierarchy.items() if key[0] != '#'}
 
         if block_type != 'course':
             kwargs['category'] = block_type
@@ -199,7 +197,7 @@ class CourseStructureTestCase(TransformerRegistryTestMixin, ModuleStoreTestCase)
         Returns: set[UsageKey]
         """
         xblocks = (blocks[ref] for ref in refs)
-        return set([xblock.location for xblock in xblocks])  # lint-amnesty, pylint: disable=consider-using-set-comprehension
+        return {xblock.location for xblock in xblocks}  # lint-amnesty, pylint: disable=consider-using-set-comprehension
 
 
 class BlockParentsMapTestCase(TransformerRegistryTestMixin, ModuleStoreTestCase):
@@ -221,7 +219,7 @@ class BlockParentsMapTestCase(TransformerRegistryTestMixin, ModuleStoreTestCase)
     parents_map = [[], [0], [0], [1], [1], [2], [2, 4]]
 
     def setUp(self):
-        super(BlockParentsMapTestCase, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
 
         # create the course
         self.course = CourseFactory.create()

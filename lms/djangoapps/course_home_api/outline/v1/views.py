@@ -2,6 +2,8 @@
 Outline Tab Views
 """
 
+from completion.exceptions import UnavailableCompletionData
+from completion.utilities import get_key_to_last_completed_block
 from django.http.response import Http404
 from django.urls import reverse
 from django.utils.translation import gettext as _
@@ -15,14 +17,20 @@ from rest_framework.generics import RetrieveAPIView
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
-from completion.exceptions import UnavailableCompletionData
-from completion.utilities import get_key_to_last_completed_block
 from common.djangoapps.course_modes.models import CourseMode
-from lms.djangoapps.course_goals.api import (add_course_goal, get_course_goal, get_course_goal_text,
-                                             has_course_goal_permission, valid_course_goals_ordered)
+from common.djangoapps.student.models import CourseEnrollment
+from lms.djangoapps.course_goals.api import (
+    add_course_goal,
+    get_course_goal,
+    get_course_goal_text,
+    has_course_goal_permission,
+    valid_course_goals_ordered
+)
 from lms.djangoapps.course_home_api.outline.v1.serializers import OutlineTabSerializer
-from lms.djangoapps.course_home_api.toggles import (course_home_mfe_dates_tab_is_active,
-                                                    course_home_mfe_outline_tab_is_active)
+from lms.djangoapps.course_home_api.toggles import (
+    course_home_mfe_dates_tab_is_active,
+    course_home_mfe_outline_tab_is_active
+)
 from lms.djangoapps.course_home_api.utils import get_microfrontend_url
 from lms.djangoapps.courseware.access import has_access
 from lms.djangoapps.courseware.context_processor import user_timezone_locale_prefs
@@ -35,11 +43,11 @@ from openedx.features.course_duration_limits.access import get_access_expiration
 from openedx.features.course_experience import COURSE_ENABLE_UNENROLLED_ACCESS_FLAG
 from openedx.features.course_experience.course_tools import CourseToolsPluginManager
 from openedx.features.course_experience.course_updates import (
-    dismiss_current_update_for_user, get_current_update_for_user,
+    dismiss_current_update_for_user,
+    get_current_update_for_user
 )
 from openedx.features.course_experience.utils import get_course_outline_block_tree, get_start_block
 from openedx.features.discounts.utils import generate_offer_data
-from common.djangoapps.student.models import CourseEnrollment
 from xmodule.course_module import COURSE_VISIBILITY_PUBLIC, COURSE_VISIBILITY_PUBLIC_OUTLINE
 from xmodule.modulestore.django import modulestore
 

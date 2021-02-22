@@ -6,7 +6,6 @@ Tests for HiddenContentTransformer.
 from datetime import timedelta
 
 import ddt
-import six
 from django.utils.timezone import now
 
 from ..hidden_content import HiddenContentTransformer
@@ -21,7 +20,7 @@ class HiddenContentTransformerTestCase(BlockParentsMapTestCase):
     TRANSFORMER_CLASS_TO_TEST = HiddenContentTransformer
     ALL_BLOCKS = {0, 1, 2, 3, 4, 5, 6}
 
-    class DueDateType(object):
+    class DueDateType:
         """
         Use constant enum types for deterministic ddt test method names (rather than dynamically generated timestamps)
         """
@@ -71,7 +70,7 @@ class HiddenContentTransformerTestCase(BlockParentsMapTestCase):
             hide_due_values,
             expected_visible_blocks,
     ):
-        for idx, due_date_type in six.iteritems(hide_due_values):
+        for idx, due_date_type in hide_due_values.items():
             block = self.get_block(idx)
             block.due = self.DueDateType.due(due_date_type)
             block.hide_after_due = True

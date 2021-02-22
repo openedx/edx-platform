@@ -4,13 +4,12 @@ Tests for the Course Home Course Metadata API in the Course Home API
 
 
 import ddt
-
 from django.urls import reverse
 
 from common.djangoapps.course_modes.models import CourseMode
-from lms.djangoapps.course_home_api.tests.utils import BaseCourseHomeTests
 from common.djangoapps.student.models import CourseEnrollment
 from common.djangoapps.student.tests.factories import UserFactory
+from lms.djangoapps.course_home_api.tests.utils import BaseCourseHomeTests
 
 
 @ddt.ddt
