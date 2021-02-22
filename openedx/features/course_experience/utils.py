@@ -187,6 +187,8 @@ def get_course_outline_block_tree(request, course_id, user=None, allow_start_dat
         'course',
         'chapter',
         'sequential',
+        'problemset',  # Semantic alias to 'sequential'; functionally equivalent.
+        'videosequence',  # Semantic alias to 'sequential'; functionally equivalent.
         'vertical',
         'html',
         'problem',
