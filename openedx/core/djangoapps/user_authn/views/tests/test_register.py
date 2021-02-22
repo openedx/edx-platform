@@ -1169,23 +1169,9 @@ class RegistrationViewTestV1(ThirdPartyAuthTestMixin, UserAPITestCase):
         # Verify that all fields render in the correct order
         form_desc = json.loads(response.content.decode('utf-8'))
         field_names = [field["name"] for field in form_desc["fields"]]
-        assert field_names == [
-            "email",
-            "name",
-            "username",
-            "password",
-            "favorite_movie",
-            "favorite_editor",
-            "city",
-            "state",
-            "country",
-            "gender",
-            "year_of_birth",
-            "level_of_education",
-            "mailing_address",
-            "goals",
-            "honor_code",
-        ]
+        assert field_names == ['email', 'name', 'username', 'password', 'favorite_movie', 'favorite_editor',
+                               'city', 'state', 'country', 'gender', 'year_of_birth', 'level_of_education',
+                               'mailing_address', 'goals', 'honor_code']
 
     @override_settings(
         REGISTRATION_EXTRA_FIELDS={
@@ -1232,21 +1218,8 @@ class RegistrationViewTestV1(ThirdPartyAuthTestMixin, UserAPITestCase):
         # Verify that all fields render in the correct order
         form_desc = json.loads(response.content.decode('utf-8'))
         field_names = [field["name"] for field in form_desc["fields"]]
-        assert field_names == [
-            "name",
-            "username",
-            "email",
-            "password",
-            "city",
-            "state",
-            "country",
-            "gender",
-            "year_of_birth",
-            "level_of_education",
-            "mailing_address",
-            "goals",
-            "honor_code",
-        ]
+        assert field_names == ['name', 'username', 'email', 'password', 'city', 'state', 'country', 'gender',
+                               'year_of_birth', 'level_of_education', 'mailing_address', 'goals', 'honor_code']
 
     @override_settings(
         REGISTRATION_EXTRA_FIELDS={
@@ -1286,24 +1259,9 @@ class RegistrationViewTestV1(ThirdPartyAuthTestMixin, UserAPITestCase):
         # Verify that all fields render in the correct order
         form_desc = json.loads(response.content.decode('utf-8'))
         field_names = [field["name"] for field in form_desc["fields"]]
-        assert field_names == [
-            "email",
-            "name",
-            "username",
-            "password",
-            "favorite_movie",
-            "favorite_editor",
-
-            "city",
-            "state",
-            "country",
-            "gender",
-            "year_of_birth",
-            "level_of_education",
-            "mailing_address",
-            "goals",
-            "honor_code",
-        ]
+        assert field_names == ['email', 'name', 'username', 'password', 'favorite_movie', 'favorite_editor', 'city',
+                               'state', 'country', 'gender', 'year_of_birth', 'level_of_education',
+                               'mailing_address', 'goals', 'honor_code']
 
     def test_register(self):
         # Create a new registration
@@ -1426,8 +1384,8 @@ class RegistrationViewTestV1(ThirdPartyAuthTestMixin, UserAPITestCase):
         sent_email = mail.outbox[0]
         assert sent_email.to == [self.EMAIL]
         assert sent_email.subject ==\
-               "Action Required: Activate your {platform} account".format(platform=settings.PLATFORM_NAME)
-        assert "high-quality {platform} courses".format(platform=settings.PLATFORM_NAME) in sent_email.body
+               u'Action Required: Activate your {platform} account'.format(platform=settings.PLATFORM_NAME)
+        assert u'high-quality {platform} courses'.format(platform=settings.PLATFORM_NAME) in sent_email.body
 
     @ddt.data(
         {"email": ""},
@@ -1668,20 +1626,12 @@ class RegistrationViewTestV1(ThirdPartyAuthTestMixin, UserAPITestCase):
         """
         Assert that the actual field and the expected field values match.
         """
-        self.assertIsNot(
-            actual_field, None,
-            msg=u"Could not find field {name}".format(name=expected_field["name"])
-        )
+        assert actual_field is not None, "Could not find field {name}".format(name=expected_field["name"])
 
         for key in expected_field:
-            self.assertEqual(
-                actual_field[key], expected_field[key],
-                msg=u"Expected {expected} for {key} but got {actual} instead".format(
-                    key=key,
-                    actual=actual_field[key],
-                    expected=expected_field[key]
-                )
-            )
+            assert actual_field[key] == expected_field[key], \
+                "Expected {expected} for {key} but got {actual} instead".format(
+                    key=key, actual=actual_field[key], expected=expected_field[key])
 
     def _populate_always_present_fields(self, field):
         """
@@ -1800,24 +1750,9 @@ class RegistrationViewTestV2(RegistrationViewTestV1):
         form_desc = json.loads(response.content.decode('utf-8'))
         field_names = [field["name"] for field in form_desc["fields"]]
 
-        assert field_names == [
-            "email",
-            "name",
-            "username",
-            "password",
-            "favorite_movie",
-            "favorite_editor",
-            "confirm_email",
-            "city",
-            "state",
-            "country",
-            "gender",
-            "year_of_birth",
-            "level_of_education",
-            "mailing_address",
-            "goals",
-            "honor_code",
-        ]
+        assert field_names == ['email', 'name', 'username', 'password', 'favorite_movie', 'favorite_editor',
+                               'confirm_email', 'city', 'state', 'country', 'gender', 'year_of_birth',
+                               'level_of_education', 'mailing_address', 'goals', 'honor_code']
 
     @override_settings(
         REGISTRATION_EXTRA_FIELDS={
@@ -1864,22 +1799,10 @@ class RegistrationViewTestV2(RegistrationViewTestV1):
         # Verify that all fields render in the correct order
         form_desc = json.loads(response.content.decode('utf-8'))
         field_names = [field["name"] for field in form_desc["fields"]]
-        assert field_names == [
-            "name",
-            "username",
-            "email",
-            "confirm_email",
-            "password",
-            "city",
-            "state",
-            "country",
-            "gender",
-            "year_of_birth",
-            "level_of_education",
-            "mailing_address",
-            "goals",
-            "honor_code",
-        ]
+        assert field_names == ['name', 'username', 'email', 'confirm_email',
+                               'password', 'city', 'state', 'country',
+                               'gender', 'year_of_birth', 'level_of_education',
+                               'mailing_address', 'goals', 'honor_code']
 
     @override_settings(
         REGISTRATION_EXTRA_FIELDS={
@@ -1903,24 +1826,10 @@ class RegistrationViewTestV2(RegistrationViewTestV1):
         # Verify that all fields render in the correct order
         form_desc = json.loads(response.content.decode('utf-8'))
         field_names = [field["name"] for field in form_desc["fields"]]
-        assert field_names == [
-            "email",
-            "name",
-            "username",
-            "password",
-            "favorite_movie",
-            "favorite_editor",
-            "confirm_email",
-            "city",
-            "state",
-            "country",
-            "gender",
-            "year_of_birth",
-            "level_of_education",
-            "mailing_address",
-            "goals",
-            "honor_code",
-        ]
+        assert field_names ==\
+               ['email', 'name', 'username', 'password', 'favorite_movie', 'favorite_editor', 'confirm_email',
+                'city', 'state', 'country', 'gender', 'year_of_birth', 'level_of_education', 'mailing_address',
+                'goals', 'honor_code']
 
     def test_registration_form_confirm_email(self):
         self._assert_reg_field(
@@ -2090,7 +1999,7 @@ class ThirdPartyRegistrationTestMixin(ThirdPartyOAuthTestMixin, CacheIsolationTe
     def _verify_user_existence(self, user_exists, social_link_exists, user_is_active=None, username=None):
         """Verifies whether the user object exists."""
         users = User.objects.filter(username=(username if username else "test_username"))
-        self.assertEqual(users.exists(), user_exists)
+        assert users.exists() == user_exists
         if user_exists:
             assert users[0].is_active == user_is_active
             self.assertEqual(
@@ -2417,6 +2326,6 @@ class RegistrationValidationViewTests(test_utils.ApiTestCase):
         """
         for _ in range(int(settings.REGISTRATION_VALIDATION_RATELIMIT.split('/')[0])):
             response = self.request_without_auth('post', self.path)
-            self.assertNotEqual(response.status_code, 403)
+            assert response.status_code != 403
         response = self.request_without_auth('post', self.path)
         assert response.status_code == 403
