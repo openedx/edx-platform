@@ -6,12 +6,12 @@ define([
 ],
     function(Backbone, $, tmp, AjaxHelpers) {
         'use strict';
-        var StaffDebug = window.StaffDebug;
+        var courseId = 'edX/Open_DemoX/edx_demo_course';
+        var locationName = 'test_loc';
+        var location = 'i4x://edX/Open_DemoX/edx_demo_course/problem/test_loc';
+        var staffDebugActions = window.StaffDebugActions(courseId, locationName, location);
 
         describe('StaffDebugActions', function() {
-            var courseId = 'edX/Open_DemoX/edx_demo_course';
-            var location = 'i4x://edX/Open_DemoX/edx_demo_course/problem/test_loc';
-            var locationName = 'test_loc';
             var usernameFixtureID = 'sd_fu_' + locationName;
             var $usernameFixture = $('<input>', {id: usernameFixtureID, placeholder: 'userman'});
             var scoreFixtureID = 'sd_fs_' + locationName;
@@ -25,21 +25,14 @@ define([
 
             describe('getURL ', function() {
                 it('defines url to courseware ajax entry point', function() {
-                    expect(StaffDebug.getURL('course-v1:edX+Open_DemoX:edx_demo_course', 'rescore_problem'))
-                      .toBe('/courses/course-v1:edX+Open_DemoX:edx_demo_course/instructor/api/rescore_problem');
-                });
-            });
-
-            describe('getURL ', function() {
-                it('defines url to courseware ajax entry point for deprecated courses', function() {
-                    expect(StaffDebug.getURL(courseId, 'rescore_problem'))
+                    expect(staffDebugActions.getURL('rescore_problem'))
                       .toBe('/courses/edX/Open_DemoX/edx_demo_course/instructor/api/rescore_problem');
                 });
             });
 
             describe('sanitizeString', function() {
                 it('escapes escapable characters in a string', function() {
-                    expect(StaffDebug.sanitizeString('.*+?^:${}()|]['))
+                    expect(staffDebugActions.sanitizeString('.*+?^:${}()|]['))
                       .toBe('\\.\\*\\+\\?\\^\\:\\$\\{\\}\\(\\)\\|\\]\\[');
                 });
             });
@@ -47,33 +40,33 @@ define([
             describe('getUser', function() {
                 it('gets the placeholder username if input field is empty', function() {
                     $('body').append($usernameFixture);
-                    expect(StaffDebug.getUser(locationName)).toBe('userman');
+                    expect(staffDebugActions.getUser()).toBe('userman');
                     $('#' + usernameFixtureID).remove();
                 });
                 it('gets a filled in name if there is one', function() {
                     $('body').append($usernameFixture);
                     $('#' + usernameFixtureID).val('notuserman');
-                    expect(StaffDebug.getUser(locationName)).toBe('notuserman');
+                    expect(staffDebugActions.getUser()).toBe('notuserman');
 
                     $('#' + usernameFixtureID).val('');
                     $('#' + usernameFixtureID).remove();
                 });
                 it('gets the placeholder name if the id has escapable characters', function() {
                     $('body').append($escapableFixture);
-                    expect(StaffDebug.getUser('test.*+?^:${}()|][loc')).toBe('userman');
+                    expect(staffDebugActions.getUser('test.*+?^:${}()|][loc')).toBe('userman');
                     $("input[id^='sd_fu_']").remove();
                 });
             });
             describe('getScore', function() {
                 it('gets the placeholder score if input field is empty', function() {
                     $('body').append($scoreFixture);
-                    expect(StaffDebug.getScore(locationName)).toBe('0');
+                    expect(staffDebugActions.getScore()).toBe('0');
                     $('#' + scoreFixtureID).remove();
                 });
                 it('gets a filled in score if there is one', function() {
                     $('body').append($scoreFixture);
                     $('#' + scoreFixtureID).val('1');
-                    expect(StaffDebug.getScore(locationName)).toBe('1');
+                    expect(staffDebugActions.getScore()).toBe('1');
 
                     $('#' + scoreFixtureID).val('');
                     $('#' + scoreFixtureID).remove();
@@ -84,11 +77,9 @@ define([
                     $('body').append($escapableResultArea);
                     var requests = AjaxHelpers.requests(this);
                     var action = {
-                        courseId: courseId,
-                        locationName: esclocationName,
                         success_msg: 'Successfully reset the attempts for user userman'
                     };
-                    StaffDebug.doInstructorDashAction(action);
+                    staffDebugActions.doInstructorDashAction(action);
                     AjaxHelpers.respondWithJson(requests, action);
                     expect($('#idash_msg').text()).toBe('Successfully reset the attempts for user userman');
                     $('#result_' + locationName).remove();
@@ -99,11 +90,9 @@ define([
                     $('body').append($escapableResultArea);
                     var requests = AjaxHelpers.requests(this);
                     var action = {
-                        courseId: courseId,
-                        locationName: esclocationName,
                         error_msg: 'Failed to reset attempts for user.'
                     };
-                    StaffDebug.doInstructorDashAction(action);
+                    staffDebugActions.doInstructorDashAction(action);
                     AjaxHelpers.respondWithTextError(requests);
                     expect($('#idash_msg').text()).toBe('Failed to reset attempts for user. Unknown Error Occurred.');
                     $('#result_' + locationName).remove();
@@ -114,7 +103,7 @@ define([
                     $('body').append($usernameFixture);
 
                     spyOn($, 'ajax');
-                    StaffDebug.reset(courseId, locationName, location);
+                    staffDebugActions.reset();
 
                     expect($.ajax.calls.mostRecent().args[0].type).toEqual('POST');
                     expect($.ajax.calls.mostRecent().args[0].data).toEqual({
@@ -135,7 +124,7 @@ define([
                     $('body').append($usernameFixture);
 
                     spyOn($, 'ajax');
-                    StaffDebug.deleteStudentState(courseId, locationName, location);
+                    staffDebugActions.deleteStudentState();
 
                     expect($.ajax.calls.mostRecent().args[0].type).toEqual('POST');
                     expect($.ajax.calls.mostRecent().args[0].data).toEqual({
@@ -157,7 +146,7 @@ define([
                     $('body').append($usernameFixture);
 
                     spyOn($, 'ajax');
-                    StaffDebug.rescore(courseId, locationName, location);
+                    staffDebugActions.rescore();
 
                     expect($.ajax.calls.mostRecent().args[0].type).toEqual('POST');
                     expect($.ajax.calls.mostRecent().args[0].data).toEqual({
@@ -178,7 +167,7 @@ define([
                     $('body').append($usernameFixture);
 
                     spyOn($, 'ajax');
-                    StaffDebug.rescoreIfHigher(courseId, locationName, location);
+                    staffDebugActions.rescoreIfHigher();
 
                     expect($.ajax.calls.mostRecent().args[0].type).toEqual('POST');
                     expect($.ajax.calls.mostRecent().args[0].data).toEqual({
@@ -200,7 +189,7 @@ define([
                     $('body').append($scoreFixture);
                     $('#' + scoreFixtureID).val('1');
                     spyOn($, 'ajax');
-                    StaffDebug.overrideScore(courseId, locationName, location);
+                    staffDebugActions.overrideScore();
 
                     expect($.ajax.calls.mostRecent().args[0].type).toEqual('POST');
                     expect($.ajax.calls.mostRecent().args[0].data).toEqual({
