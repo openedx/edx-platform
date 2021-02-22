@@ -11,6 +11,7 @@ from django.shortcuts import get_object_or_404, render_to_response
 from django.utils.translation import ugettext as _
 from django.utils.translation import ugettext_noop
 from django_countries import countries
+from edx_rest_framework_extensions.paginators import DefaultPagination, paginate_search_results
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
 from rest_framework import permissions, status
@@ -24,7 +25,7 @@ from rest_framework_oauth.authentication import OAuth2Authentication
 from courseware.courses import get_course_with_access, has_access
 from django_comment_client.utils import has_discussion_privileges
 from lms.djangoapps.teams.models import CourseTeam, CourseTeamMembership
-from edx_rest_framework_extensions.paginators import DefaultPagination, paginate_search_results
+from nodebb.models import TeamGroupChat
 from openedx.core.lib.api.parsers import MergePatchParser
 from openedx.core.lib.api.permissions import IsStaffOrReadOnly
 from openedx.core.lib.api.view_utils import (
@@ -33,6 +34,9 @@ from openedx.core.lib.api.view_utils import (
     add_serializer_errors,
     build_api_error
 )
+from openedx.features.badging.models import UserBadge
+from openedx.features.teams.mixins import AllowInActiveUserAuthMixin
+from openedx.features.teams.serializers import CustomCourseTeamCreationSerializer
 from student.models import CourseAccessRole, CourseEnrollment
 from student.roles import CourseStaffRole
 from util.model_utils import truncate_fields
@@ -48,8 +52,6 @@ from .serializers import (
     TopicSerializer,
     add_team_count
 )
-from openedx.features.teams.serializers import CustomCourseTeamCreationSerializer
-from openedx.features.teams.mixins import AllowInActiveUserAuthMixin
 from .utils import emit_team_event
 
 TEAM_MEMBERSHIPS_PER_PAGE = 2
@@ -1246,6 +1248,8 @@ class MembershipDetailView(AllowInActiveUserAuthMixin, ExpandableFieldViewMixin,
             if 'admin' in request.query_params:
                 removal_method = 'removed_by_admin'
             membership.delete()
+            team_group = TeamGroupChat.objects.filter(team_id=team.id).first()
+            UserBadge.objects.filter(community_id=team_group.room_id).delete()
             emit_team_event(
                 'edx.team.learner_removed',
                 team.course_id,
