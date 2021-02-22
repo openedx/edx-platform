@@ -3,13 +3,12 @@
 """
 from django.db import models
 from model_utils.models import TimeStampedModel
-from django.conf import settings
 
 from lms.djangoapps.teams.models import CourseTeam
 from openedx.core.djangoapps.xmodule_django.models import CourseKeyField
 
 
-class DiscussionCommunity(TimeStampedModel):
+class DiscussionCommunity(TimeStampedModel):  # pylint: disable=model-missing-unicode
     """
         Model to store each course related communities
     """
@@ -21,7 +20,7 @@ class DiscussionCommunity(TimeStampedModel):
         return "%s" % self.community_url
 
 
-class TeamGroupChat(TimeStampedModel):
+class TeamGroupChat(TimeStampedModel):  # pylint: disable=model-missing-unicode
     """
         Model to store team related group chats/discussion categories
     """

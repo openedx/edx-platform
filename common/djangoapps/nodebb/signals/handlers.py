@@ -1,3 +1,6 @@
+"""
+Handlers for Nodebb app
+"""
 from logging import getLogger
 
 from crum import get_current_request
@@ -8,7 +11,7 @@ from django.dispatch import receiver
 from common.lib.nodebb_client.client import NodeBBClient
 from lms.djangoapps.certificates.models import GeneratedCertificate
 from lms.djangoapps.onboarding.helpers import COUNTRIES
-from lms.djangoapps.onboarding.models import EmailPreference, FocusArea, Organization, UserExtendedProfile
+from lms.djangoapps.onboarding.models import FocusArea, Organization, UserExtendedProfile
 from lms.djangoapps.teams.models import CourseTeam, CourseTeamMembership
 from mailchimp_pipeline.signals.handlers import (
     send_user_course_completions_to_mailchimp,
@@ -28,20 +31,18 @@ from nodebb.tasks import (
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.signals.signals import COURSE_CERT_AWARDED
 from openedx.features.badging.models import UserBadge
-from student.models import ENROLL_STATUS_CHANGE, CourseEnrollment, EnrollStatusChange, UserProfile
+from student.models import CourseEnrollment, UserProfile
 from util.model_utils import get_changed_fields_dict
-from xmodule.modulestore.django import modulestore
+
 
 log = getLogger(__name__)
 
 
 def log_action_response(user, status_code, response_body):
     if status_code != 200:
-        log.error("Error: Can not update user(%s) on nodebb due to %s" %
-                  (user.username, response_body))
+        log.error("Error: Can not update user(%s) on nodebb due to %s", user.username, response_body)
     else:
-        log.info('Success: User(%s) has been updated on nodebb' %
-                 user.username)
+        log.info('Success: User(%s) has been updated on nodebb', user.username)
 
 
 @receiver(COURSE_CERT_AWARDED, sender=GeneratedCertificate)
@@ -57,11 +58,14 @@ def user_profile_pre_save_callback(sender, **kwargs):
     private field on the current model for use in the post_save callback.
     """
     user_profile = kwargs['instance']
-    user_profile._updated_fields = get_changed_fields_dict(user_profile, sender)
+    user_profile._updated_fields = get_changed_fields_dict(user_profile, sender)  # pylint: disable=protected-access
 
 
 @receiver(post_save, sender=UserProfile)
-def sync_user_profile_info_with_nodebb(sender, instance, **kwargs):
+def sync_user_profile_info_with_nodebb(sender, instance, **kwargs):  # pylint: disable=unused-argument
+    """
+    Updates city, country, year_of_birth and language fields if any of them are updated for a user
+    """
     updated_fields = getattr(instance, '_updated_fields', {})
 
     relevant_signal_fields = ['city', 'country', 'year_of_birth', 'language']
@@ -81,7 +85,11 @@ def sync_user_profile_info_with_nodebb(sender, instance, **kwargs):
 
 
 @receiver(post_save, sender=UserExtendedProfile)
-def sync_extended_profile_info_with_nodebb(sender, instance, **kwargs):
+def sync_extended_profile_info_with_nodebb(sender, instance, **kwargs):  # pylint: disable=unused-argument
+    """
+    Updates country_of_employment, city_of_employment, interests, function_areas and organization fields if any of the
+    first four fields mentioned are updated for a user
+    """
     request = get_current_request()
 
     user = instance.user
@@ -111,7 +119,7 @@ def sync_extended_profile_info_with_nodebb(sender, instance, **kwargs):
 
 
 @receiver(post_save, sender=Organization)
-def sync_organization_info_with_nodebb(sender, instance, created, **kwargs):  # pylint: disable=unused-argument, invalid-name
+def sync_organization_info_with_nodebb(sender, instance, created, **kwargs):  # pylint: disable=unused-argument
     """
     Sync information b/w NodeBB User Profile and Edx User Profile
     """
@@ -176,7 +184,7 @@ def update_user_profile_on_nodebb(sender, instance, created, **kwargs):
 
 
 @receiver(post_delete, sender=User)
-def delete_user_from_nodebb(sender, **kwargs):
+def delete_user_from_nodebb(sender, **kwargs):  # pylint: disable=unused-argument
     """
     Delete User from NodeBB when deleted at edx (either deleted via admin-panel OR user is under age)
     """
@@ -186,7 +194,7 @@ def delete_user_from_nodebb(sender, **kwargs):
 
 
 @receiver(pre_save, sender=User, dispatch_uid='activate_deactivate_user_on_nodebb')
-def activate_deactivate_user_on_nodebb(sender, instance, **kwargs):
+def activate_deactivate_user_on_nodebb(sender, instance, **kwargs):  # pylint: disable=unused-argument
     """
     Activate or Deactivate a user on nodebb whenever user's active state changes on edx platform
     """
@@ -198,7 +206,7 @@ def activate_deactivate_user_on_nodebb(sender, instance, **kwargs):
 
 
 @receiver(post_save, sender=CourseOverview, dispatch_uid="nodebb.signals.handlers.create_category_on_nodebb")
-def create_category_on_nodebb(instance, **kwargs):
+def create_category_on_nodebb(instance, **kwargs):  # pylint: disable=unused-argument
     """
     Create a community on NodeBB if it's already not exists
     """
@@ -209,12 +217,12 @@ def create_category_on_nodebb(instance, **kwargs):
     When ever a course created CourseOverviews's post_save triggered twice
     On the base of function call trace we allow one of those whose 5th function
     in trace is '_listen_for_course_publish'
-    """
+    """  # pylint: disable=pointless-string-statement
     import inspect
     curframe = inspect.currentframe()
     main_triggerer_function = inspect.getouterframes(curframe)[5][3]
 
-    if not community_exists and main_triggerer_function is '_listen_for_course_publish':
+    if not community_exists and main_triggerer_function == '_listen_for_course_publish':
         community_name = '%s-%s-%s-%s' % (instance.display_name,
                                           instance.id.org, instance.id.course, instance.id.run)
         status_code, response_body = NodeBBClient().categories.create(
@@ -222,20 +230,20 @@ def create_category_on_nodebb(instance, **kwargs):
 
         if status_code != 200:
             log.error(
-                "Error: Can't create nodebb cummunity for the given course %s due to %s" % (
-                    community_name, response_body
-                )
+                "Error: Can't create nodebb cummunity for the given course %s due to %s",
+                community_name,
+                response_body
             )
         else:
             DiscussionCommunity.objects.create(
                 course_id=instance.id,
                 community_url=response_body.get('categoryData', {}).get('slug')
             )
-            log.info('Success: Community created for course %s' % instance.id)
+            log.info('Success: Community created for course %s', instance.id)
 
 
 @receiver(post_save, sender=CourseEnrollment)
-def manage_membership_on_nodebb_group(instance, **kwargs):  # pylint: disable=unused-argument
+def manage_membership_on_nodebb_group(instance, **kwargs):
     """
     Automatically join or unjoin a group on NodeBB [related to that course] on student enrollment
     Why we can't listen ENROLL_STATUS_CHANGE here?
@@ -259,7 +267,7 @@ def manage_membership_on_nodebb_group(instance, **kwargs):  # pylint: disable=un
 
 
 @receiver(pre_delete, sender=CourseTeam, dispatch_uid="nodebb.signals.handlers.delete_groupchat_on_nodebb")
-def delete_groupchat_on_nodebb(sender, instance, **kwargs):
+def delete_groupchat_on_nodebb(sender, instance, **kwargs):  # pylint: disable=unused-argument
     """
     Delete group on NodeBB whenever a team is deleted
     """
@@ -271,19 +279,16 @@ def delete_groupchat_on_nodebb(sender, instance, **kwargs):
 
         if status_code != 200:
             log.error(
-                "Error: Can't delete nodebb group for the given course %s due to %s" % (
-                    instance.course_id, response_body
-                )
+                "Error: Can't delete nodebb group for the given course %s due to %s", instance.course_id, response_body
             )
         else:
             team_group_chat.delete()
-            log.info("Successfully deleted group chat for course %s" %
-                     instance.course_id)
+            log.info("Successfully deleted group chat for course %s", instance.course_id)
 
 
 # TODO: following method is obsolete
 @receiver(post_save, sender=CourseTeamMembership, dispatch_uid="nodebb.signals.handlers.join_groupchat_on_nodebb")
-def join_groupchat_on_nodebb(sender, instance, created, **kwargs):
+def join_groupchat_on_nodebb(sender, instance, created, **kwargs):  # pylint: disable=unused-argument
     """
     Join group on NodeBB whenever a new member joins a team
     """
@@ -297,18 +302,18 @@ def join_groupchat_on_nodebb(sender, instance, created, **kwargs):
 
         if status_code != 200:
             log.error(
-                'Error: Can not join the group, user (%s, %s) due to %s' % (
-                    instance.team.name, instance.user, response_body
-                )
+                'Error: Can not join the group, user (%s, %s) due to %s',
+                instance.team.name,
+                instance.user,
+                response_body
             )
         else:
-            log.info('Success: User have joined the group %s successfully' %
-                     instance.team.name)
+            log.info('Success: User have joined the group %s successfully', instance.team.name)
 
 
 # TODO: following method is obsolete
 @receiver(post_delete, sender=CourseTeamMembership, dispatch_uid="nodebb.signals.handlers.leave_groupchat_on_nodebb")
-def leave_groupchat_on_nodebb(sender, instance, **kwargs):
+def leave_groupchat_on_nodebb(sender, instance, **kwargs):  # pylint: disable=unused-argument
     """
     Leave group on NodeBB whenever a member leaves a team
     """
@@ -322,17 +327,17 @@ def leave_groupchat_on_nodebb(sender, instance, **kwargs):
 
         if status_code != 200:
             log.error(
-                'Error: Can not unjoin the group, user (%s, %s) due to %s' % (
-                    instance.team.name, instance.user, response_body
-                )
+                'Error: Can not unjoin the group, user (%s, %s) due to %s',
+                instance.team.name,
+                instance.user,
+                response_body
             )
         else:
-            log.info('Success: User have unjoined the group %s successfully' %
-                     instance.team.name)
+            log.info('Success: User have unjoined the group %s successfully', instance.team.name)
 
 
 @receiver(post_save, sender=CourseTeam, dispatch_uid="nodebb.signals.handlers.create_update_team_subcategory_on_nodebb")
-def create_update_team_subcategory_on_nodebb(sender, instance, created, **kwargs):
+def create_update_team_subcategory_on_nodebb(sender, instance, created, **kwargs):  # pylint: disable=unused-argument
     """
     Create subcategory on NodeBB whenever a new team is created
     OR
@@ -346,23 +351,31 @@ def create_update_team_subcategory_on_nodebb(sender, instance, created, **kwargs
 
         if status_code != 200:
             log.error(
-                "Error: Can't create nodebb subcategory for the given course team %s due to %s" % (
-                    instance.name, response_body
-                )
+                "Error: Can't create nodebb subcategory for the given course team %s due to %s",
+                instance.name,
+                response_body
             )
         else:
             TeamGroupChat.objects.create(
                 team_id=instance.id, slug=response_body['categoryData']['slug'],
                 room_id=response_body['categoryData']['cid']
             )
-            log.info("Successfully created subcategory for course team %s" %
-                     instance.name)
+            log.info("Successfully created subcategory for course team %s", instance.name)
     else:
         # TODO: NodeBB client doesn't have update category method
         pass
 
 
 def _get_team_subcategory_data(instance):
+    """
+    Returns information of a subcategory for the given course team
+
+    Arguments:
+        instance: CourseTeam object
+
+    Returns:
+        dict
+    """
     subcategory_info = {
         'name': '{}-{}'.format(instance.name, instance.id),
         'label': instance.name,
@@ -372,8 +385,10 @@ def _get_team_subcategory_data(instance):
     return subcategory_info
 
 
-@receiver(post_save, sender=CourseTeamMembership, dispatch_uid="nodebb.signals.handlers.join_team_subcategory_on_nodebb")
-def join_team_subcategory_on_nodebb(sender, instance, created, **kwargs):
+@receiver(
+    post_save, sender=CourseTeamMembership, dispatch_uid="nodebb.signals.handlers.join_team_subcategory_on_nodebb"
+)
+def join_team_subcategory_on_nodebb(sender, instance, created, **kwargs):  # pylint: disable=unused-argument
     """
     Join team subcategory on NodeBB whenever a new member joins a team
     """
@@ -387,18 +402,20 @@ def join_team_subcategory_on_nodebb(sender, instance, created, **kwargs):
 
         if status_code != 200:
             log.error(
-                'Error: Can not join team subcategory, user (%s, %s) due to %s' % (
-                    instance.team.name, instance.user.username, response_body
-                )
+                'Error: Can not join team subcategory, user (%s, %s) due to %s',
+                instance.team.name,
+                instance.user.username,
+                response_body
             )
         else:
             UserBadge.assign_missing_team_badges(instance.user.id, instance.team.id)
-            log.info('Success: User has joined team subcategory %s successfully' %
-                     instance.team.name)
+            log.info('Success: User has joined team subcategory %s successfully', instance.team.name)
 
 
-@receiver(post_delete, sender=CourseTeamMembership, dispatch_uid="nodebb.signals.handlers.leave_team_subcategory_on_nodebb")
-def leave_team_subcategory_on_nodebb(sender, instance, **kwargs):
+@receiver(
+    post_delete, sender=CourseTeamMembership, dispatch_uid="nodebb.signals.handlers.leave_team_subcategory_on_nodebb"
+)
+def leave_team_subcategory_on_nodebb(sender, instance, **kwargs):  # pylint: disable=unused-argument
     """
     Leave team subcategory on NodeBB whenever a member leaves a shootingteam
     """
@@ -412,17 +429,17 @@ def leave_team_subcategory_on_nodebb(sender, instance, **kwargs):
 
         if status_code != 200:
             log.error(
-                'Error: Can not leave team subcategory, user (%s, %s) due to %s' % (
-                    instance.team.name, instance.user.username, response_body
-                )
+                'Error: Can not leave team subcategory, user (%s, %s) due to %s',
+                instance.team.name,
+                instance.user.username,
+                response_body
             )
         else:
-            log.info('Success: User has left team subcategory %s successfully' %
-                     instance.team.name)
+            log.info('Success: User has left team subcategory %s successfully', instance.team.name)
 
 
 @receiver(pre_delete, sender=CourseTeam, dispatch_uid="nodebb.signals.handlers.delete_team_subcategory_on_nodebb")
-def delete_team_subcategory_on_nodebb(sender, instance, **kwargs):
+def delete_team_subcategory_on_nodebb(sender, instance, **kwargs):  # pylint: disable=unused-argument
     """
     Delete team subcategory on NodeBB whenever a team is deleted
     """
@@ -434,11 +451,10 @@ def delete_team_subcategory_on_nodebb(sender, instance, **kwargs):
 
         if status_code != 200:
             log.error(
-                "Error: Can't delete nodebb team subcategory for the given course %s due to %s" % (
-                    instance.course_id, response_body
-                )
+                "Error: Can't delete nodebb team subcategory for the given course %s due to %s",
+                instance.course_id,
+                response_body
             )
         else:
             team_group_chat.delete()
-            log.info("Successfully deleted team subcategory chat for course %s" %
-                     instance.course_id)
+            log.info("Successfully deleted team subcategory chat for course %s", instance.course_id)

@@ -1,6 +1,9 @@
+"""
+Admin configuration for Discussion Community model.
+"""
 from django.contrib import admin
 
-from models import DiscussionCommunity
+from common.djangoapps.nodebb.models import DiscussionCommunity
 
 
 class DiscussionCommunityAdmin(admin.ModelAdmin):

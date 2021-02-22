@@ -1,14 +1,27 @@
+"""
+Tests for Nodebb app
+"""
 import mock
 
 from django.test import TestCase
 from requests.exceptions import ConnectionError
 
 from common.lib.nodebb_client.client import NodeBBClient
-from tasks import (task_create_user_on_nodebb, task_update_user_profile_on_nodebb, task_delete_user_on_nodebb,
-                   task_activate_user_on_nodebb, task_join_group_on_nodebb, task_update_onboarding_surveys_status)
+from common.djangoapps.nodebb.tasks import (
+    task_create_user_on_nodebb,
+    task_update_user_profile_on_nodebb,
+    task_delete_user_on_nodebb,
+    task_activate_user_on_nodebb,
+    task_join_group_on_nodebb,
+    task_update_onboarding_surveys_status
+)
 
 
 class NodeBBUserCreationTestCase(TestCase):
+    """
+    Test Class to test Nodebb app
+    """
+
     def test_user_creation(self):
         username = "testuser"
         try:
@@ -59,7 +72,7 @@ class NodeBBUserCreationTestCase(TestCase):
         active = True
         try:
             with mock.patch('common.lib.nodebb_client.users.ForumUser.activate', side_effect=ConnectionError):
-                NodeBBClient().users.activate(
+                NodeBBClient().users.activate(  # pylint: disable=unexpected-keyword-arg
                     username=username,
                     active=active,
                     kwargs={}
@@ -76,7 +89,7 @@ class NodeBBUserCreationTestCase(TestCase):
         try:
             with mock.patch('common.lib.nodebb_client.users.ForumUser.join', side_effect=ConnectionError):
                 with self.assertRaises(ConnectionError):
-                    NodeBBClient().users.join(
+                    NodeBBClient().users.join(  # pylint: disable=unexpected-keyword-arg
                         category_id=category_id,
                         username=username,
                         kwargs={}

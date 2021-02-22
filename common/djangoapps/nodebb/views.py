@@ -2,27 +2,22 @@
 Views handling read (GET) requests for the Discussion tab and inline discussions.
 """
 
-import json
 import logging
-from w3lib.url import add_or_replace_parameter
 
-from django.http import HttpResponseRedirect
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
-from django.shortcuts import render
 from django.core.urlresolvers import reverse
-from openedx.features.course_card.helpers import get_related_card_id
+from django.http import HttpResponseRedirect
+from django.shortcuts import render
 from opaque_keys.edx.keys import CourseKey
+from w3lib.url import add_or_replace_parameter
 
-from helpers import get_course_related_tabs, get_all_course_progress
-from models import DiscussionCommunity, TeamGroupChat
-from openedx.features.badging.models import Badge
+from common.djangoapps.nodebb.helpers import get_all_course_progress, get_course_related_tabs
+from common.djangoapps.nodebb.models import DiscussionCommunity, TeamGroupChat
+from nodebb.constants import COMMUNITY_ID_SPLIT_INDEX, COMMUNITY_URL_SPLIT_CHAR, CONVERSATIONALIST_ENTRY_INDEX
 from openedx.features.badging.constants import CONVERSATIONALIST
-from nodebb.constants import (
-    COMMUNITY_ID_SPLIT_INDEX,
-    COMMUNITY_URL_SPLIT_CHAR,
-    CONVERSATIONALIST_ENTRY_INDEX
-)
+from openedx.features.badging.models import Badge
+from openedx.features.course_card.helpers import get_related_card_id
 
 log = logging.getLogger("edx.nodebb")
 

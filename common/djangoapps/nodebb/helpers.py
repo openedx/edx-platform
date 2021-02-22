@@ -1,19 +1,23 @@
+"""
+Helpers for Nodebb app
+"""
 import collections
+from logging import getLogger
 
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.urlresolvers import reverse
 
 from courseware.tabs import get_course_tab_list
 from lms.djangoapps.grades.course_grade_factory import CourseGradeFactory
-from openedx.core.djangoapps.xmodule_django.models import CourseKeyField
 from nodebb.models import DiscussionCommunity, TeamGroupChat
 from nodebb.tasks import (
-    task_update_onboarding_surveys_status,
+    task_activate_user_on_nodebb,
     task_archive_community_on_nodebb,
-    task_activate_user_on_nodebb
+    task_update_onboarding_surveys_status
 )
+from openedx.core.djangoapps.xmodule_django.models import CourseKeyField
 
-from logging import getLogger
+
 log = getLogger(__name__)
 
 
@@ -25,7 +29,7 @@ def get_course_related_tabs(request, course):
     course_tabs = get_course_tab_list(request, course)
 
     tabs_dict = collections.OrderedDict()
-    for idx, tab in enumerate(course_tabs):
+    for idx, tab in enumerate(course_tabs): # pylint: disable=unused-variable
         tab_name = tab.name.lower()
         tab_link = tab.link_func(course, reverse)
 
@@ -132,6 +136,15 @@ def set_user_activation_status_on_nodebb(username, is_active):
 
 
 def archive_course_community(course_id):
+    """
+    Marks the community of a course as archived or simply returns if community does not exist
+
+    Arguments:
+        course_id: id of the course of which the community is to be archived
+
+    Returns:
+        None
+    """
     community = DiscussionCommunity.objects.filter(course_id=course_id).first()
 
     if not community or not community.community_url:

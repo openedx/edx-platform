@@ -1,3 +1,6 @@
+"""
+Basic Configuration for Nodebb app
+"""
 from django.apps import AppConfig
 
 
@@ -8,4 +11,4 @@ class NodebbConfig(AppConfig):
         """
         Connect signal handlers.
         """
-        import nodebb.signals.handlers
+        import nodebb.signals.handlers  # pylint: disable=unused-variable
