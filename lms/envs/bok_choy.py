@@ -22,8 +22,6 @@ from path import Path as path
 from openedx.core.release import RELEASE_LINE
 from xmodule.modulestore.modulestore_settings import update_module_store_settings
 
-from .production import *  # pylint: disable=wildcard-import, unused-wildcard-import, wrong-import-position
-
 CONFIG_ROOT = path(__file__).abspath().dirname()
 TEST_ROOT = CONFIG_ROOT.dirname().dirname() / "test_root"
 
@@ -39,6 +37,7 @@ os.environ['LMS_CFG'] = str.format("{config_root}/{service_variant}.yml",
 os.environ['REVISION_CFG'] = f"{CONFIG_ROOT}/revisions.yml"
 
 
+from .production import *  # pylint: disable=wildcard-import, unused-wildcard-import, wrong-import-position
 
 ######################### Testing overrides ####################################
 
