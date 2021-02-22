@@ -9,8 +9,8 @@ define([
         var StaffDebug = window.StaffDebug;
 
         describe('StaffDebugActions', function() {
-            var courseId = 'edX/Open_DemoX/edx_demo_course';
-            var location = 'i4x://edX/Open_DemoX/edx_demo_course/problem/test_loc';
+            var courseId = 'course-v1:edX+DemoX+1';
+            var location = 'block-v1:edX+DemoX+1+type@problem+block@9518dd51055b40cd82feb01502644c89';
             var locationName = 'test_loc';
             var usernameFixtureID = 'sd_fu_' + locationName;
             var $usernameFixture = $('<input>', {id: usernameFixtureID, placeholder: 'userman'});
@@ -25,15 +25,15 @@ define([
 
             describe('getURL ', function() {
                 it('defines url to courseware ajax entry point', function() {
-                    expect(StaffDebug.getURL('course-v1:edX+Open_DemoX:edx_demo_course', 'rescore_problem'))
-                      .toBe('/courses/course-v1:edX+Open_DemoX:edx_demo_course/instructor/api/rescore_problem');
+                    expect(StaffDebug.getURL(courseId, 'rescore_problem'))
+                      .toBe('/courses/course-v1:edX+DemoX+1/instructor/api/rescore_problem');
                 });
             });
 
             describe('getURL ', function() {
                 it('defines url to courseware ajax entry point for deprecated courses', function() {
-                    expect(StaffDebug.getURL(courseId, 'rescore_problem'))
-                      .toBe('/courses/edX/Open_DemoX/edx_demo_course/instructor/api/rescore_problem');
+                    expect(StaffDebug.getURL('edX/DemoX/1', 'rescore_problem'))
+                      .toBe('/courses/edX/DemoX/1/instructor/api/rescore_problem');
                 });
             });
 
@@ -125,7 +125,7 @@ define([
                         score: undefined
                     });
                     expect($.ajax.calls.mostRecent().args[0].url).toEqual(
-                        '/instructor/api/reset_student_attempts'
+                        '/courses/course-v1:edX+DemoX+1/instructor/api/reset_student_attempts'
                     );
                     $('#' + usernameFixtureID).remove();
                 });
@@ -146,7 +146,7 @@ define([
                         score: undefined
                     });
                     expect($.ajax.calls.mostRecent().args[0].url).toEqual(
-                        '/instructor/api/reset_student_attempts'
+                        '/courses/course-v1:edX+DemoX+1/instructor/api/reset_student_attempts'
                     );
 
                     $('#' + usernameFixtureID).remove();
@@ -168,7 +168,7 @@ define([
                         score: undefined
                     });
                     expect($.ajax.calls.mostRecent().args[0].url).toEqual(
-                        '/instructor/api/rescore_problem'
+                        '/courses/course-v1:edX+DemoX+1/instructor/api/rescore_problem'
                     );
                     $('#' + usernameFixtureID).remove();
                 });
@@ -189,7 +189,7 @@ define([
                         score: undefined
                     });
                     expect($.ajax.calls.mostRecent().args[0].url).toEqual(
-                        '/instructor/api/rescore_problem'
+                        '/courses/course-v1:edX+DemoX+1/instructor/api/rescore_problem'
                     );
                     $('#' + usernameFixtureID).remove();
                 });
@@ -211,7 +211,7 @@ define([
                         score: '1'
                     });
                     expect($.ajax.calls.mostRecent().args[0].url).toEqual(
-                        '/instructor/api/override_problem_score'
+                        '/courses/course-v1:edX+DemoX+1/instructor/api/override_problem_score'
                     );
                     $('#' + usernameFixtureID).remove();
                 });
