@@ -43,9 +43,7 @@ class AppVersionConfig(models.Model):
 
     .. no_pii:
     """
-    PLATFORM_CHOICES = tuple(
-        [(platform, platform) for platform in sorted(PLATFORM_CLASSES.keys())]
-    )
+    PLATFORM_CHOICES = tuple((platform, platform) for platform in sorted(PLATFORM_CLASSES.keys()))
 
     platform = models.CharField(max_length=50, choices=PLATFORM_CHOICES, blank=False)
     version = models.CharField(

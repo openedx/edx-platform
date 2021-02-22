@@ -1284,7 +1284,7 @@ class ChoiceResponseTest(ResponseTest):  # pylint: disable=missing-class-docstri
             ok0 = c % 2 == 0 # check remainder modulo 2
             ok1 = c % 3 == 0 # check remainder modulo 3
             ok2 = c % 5 == 0 # check remainder modulo 5
-            ok3 = not any([ok0, ok1, ok2])
+            ok3 = not any((ok0, ok1, ok2))
         """)
         choices = ["$ok0", "$ok1", "$ok2", "$ok3"]
         problem = self.build_problem(script=script,

@@ -214,9 +214,9 @@ class DirectOnlyCategorySemantics(PureModulestoreTestCase):
         def verify_course_summery_fields(course_summary):
             """ Verify that every `course_summary` object has all the required fields """
             expected_fields = CourseSummary.course_info_fields + ['id', 'location', 'has_ended']
-            return all([hasattr(course_summary, field) for field in expected_fields])
+            return all(hasattr(course_summary, field) for field in expected_fields)
 
-        assert all((verify_course_summery_fields(course_summary) for course_summary in course_summaries))
+        assert all(verify_course_summery_fields(course_summary) for course_summary in course_summaries)
 
     def is_detached(self, block_type):
         """
@@ -236,7 +236,7 @@ class DirectOnlyCategorySemantics(PureModulestoreTestCase):
         field_data = KvsFieldData(key_store)
 
         aside = AsideTest(scope_ids=scope_ids, runtime=TestRuntime(services={'field-data': field_data}))
-        aside.fields[self.ASIDE_DATA_FIELD.field_name].write_to(aside, self.ASIDE_DATA_FIELD.initial)
+        aside.fields[self.ASIDE_DATA_FIELD.field_name].write_to(aside, self.ASIDE_DATA_FIELD.initial)  # pylint: disable=unsubscriptable-object
         return [aside]
 
     def _get_aside(self, block):

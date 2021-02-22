@@ -293,10 +293,10 @@ class PartialDictMatcher:  # lint-amnesty, pylint: disable=missing-class-docstri
         self.expected_values = expected_values
 
     def __eq__(self, other):
-        return all([
+        return all(
             key in other and other[key] == value
             for key, value in self.expected_values.items()
-        ])
+        )
 
 
 @patch('requests.request', autospec=True)

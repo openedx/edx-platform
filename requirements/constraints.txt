@@ -123,3 +123,6 @@ edx-bulk-grades<0.8.5
 
 # python3-saml==1.10.0 version started breaking a11y tests
 python3-saml<1.10.0
+
+# edx-proctoring>3.5.0 causes test failures
+edx-proctoring==3.5.0

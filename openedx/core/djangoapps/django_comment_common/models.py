@@ -158,7 +158,7 @@ def permission_blacked_out(course, role_names, permission_name):
     return (
         not course.forum_posts_allowed and
         role_names == {FORUM_ROLE_STUDENT} and
-        any([permission_name.startswith(prefix) for prefix in ['edit', 'update', 'create']])
+        any(permission_name.startswith(prefix) for prefix in ['edit', 'update', 'create'])
     )
 
 

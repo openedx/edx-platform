@@ -56,7 +56,7 @@ def set_input_value_and_save(page, css, value):
     page.wait_for_ajax()
 
 
-def verify_ordering(test_class, page, expected_orderings):
+def verify_ordering(test_class, page, expected_orderings):  # pylint: disable=unused-argument
     """
     Verifies the expected ordering of xblocks on the page.
     """

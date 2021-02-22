@@ -173,7 +173,7 @@ class DiscussionsConfigurationModelTest(TestCase):
         assert not configuration.enabled
         assert configuration.lti_configuration is None
         actual_url = configuration.plugin_configuration.get('url')
-        expected_url = self.configuration_with_values.plugin_configuration.get('url')
+        expected_url = self.configuration_with_values.plugin_configuration.get('url')  # pylint: disable=no-member
         assert actual_url == expected_url
         assert configuration.provider_type == self.configuration_with_values.provider_type
 

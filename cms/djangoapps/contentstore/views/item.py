@@ -1332,7 +1332,7 @@ def create_xblock_info(xblock, data=None, metadata=None, include_ancestor_info=F
                 xblock_info['staff_only_message'] = True
             elif child_info and child_info['children']:
                 xblock_info['staff_only_message'] = all(
-                    [child['staff_only_message'] for child in child_info['children']]
+                    child['staff_only_message'] for child in child_info['children']
                 )
             else:
                 xblock_info['staff_only_message'] = False

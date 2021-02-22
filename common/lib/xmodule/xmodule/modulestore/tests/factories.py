@@ -626,7 +626,7 @@ def mongo_uses_error_check(store):
     Does mongo use the error check as a separate message?
     """
     if hasattr(store, 'modulestores'):
-        return any([mongo_uses_error_check(substore) for substore in store.modulestores])
+        return any(mongo_uses_error_check(substore) for substore in store.modulestores)
     return False
 
 

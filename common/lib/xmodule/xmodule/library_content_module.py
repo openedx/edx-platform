@@ -228,7 +228,7 @@ class LibraryContentBlock(
                 raise NotImplementedError("Unsupported mode.")
             selected_keys |= added_block_keys
 
-        if any([invalid_block_keys, overlimit_block_keys, added_block_keys]):
+        if any((invalid_block_keys, overlimit_block_keys, added_block_keys)):
             selected = list(selected_keys)
             random.shuffle(selected)
 

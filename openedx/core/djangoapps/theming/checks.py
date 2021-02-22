@@ -55,7 +55,7 @@ def check_comprehensive_theme_settings(app_configs, **kwargs):  # lint-amnesty, 
                     id='openedx.core.djangoapps.theming.E004',
                 )
             )
-        if not all([isinstance(theme_dir, six.string_types) for theme_dir in theme_dirs]):
+        if not all(isinstance(theme_dir, six.string_types) for theme_dir in theme_dirs):
             errors.append(
                 Error(
                     "COMPREHENSIVE_THEME_DIRS must contain only strings.",
@@ -63,7 +63,7 @@ def check_comprehensive_theme_settings(app_configs, **kwargs):  # lint-amnesty, 
                     id='openedx.core.djangoapps.theming.E005',
                 )
             )
-        if not all([theme_dir.startswith("/") for theme_dir in theme_dirs]):
+        if not all(theme_dir.startswith("/") for theme_dir in theme_dirs):
             errors.append(
                 Error(
                     "COMPREHENSIVE_THEME_DIRS must contain only absolute paths to themes dirs.",
@@ -71,7 +71,7 @@ def check_comprehensive_theme_settings(app_configs, **kwargs):  # lint-amnesty, 
                     id='openedx.core.djangoapps.theming.E006',
                 )
             )
-        if not all([os.path.isdir(theme_dir) for theme_dir in theme_dirs]):
+        if not all(os.path.isdir(theme_dir) for theme_dir in theme_dirs):
             errors.append(
                 Error(
                     "COMPREHENSIVE_THEME_DIRS must contain valid paths.",

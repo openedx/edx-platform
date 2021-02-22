@@ -141,7 +141,7 @@ def get_course_outline_block_tree(request, course_id, user=None, allow_start_dat
         is_scored = block.get('has_score', False) and block.get('weight', 1) > 0
         # Use a list comprehension to force the recursion over all children, rather than just stopping
         # at the first child that is scored.
-        children_scored = any([recurse_mark_scored(child) for child in block.get('children', [])])
+        children_scored = any(recurse_mark_scored(child) for child in block.get('children', []))
         if is_scored or children_scored:
             block['scored'] = True
             return True

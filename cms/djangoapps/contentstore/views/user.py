@@ -177,7 +177,7 @@ def _course_team_user(request, course_key, email):
                 role_added = True
             else:
                 return permissions_error_response
-        elif role.has_user(user, check_user_activation=False):
+        elif role.has_user(user, check_user_activation=False):  # pylint: disable=no-value-for-parameter
             # Remove the user from this old role:
             old_roles.add(role)
 

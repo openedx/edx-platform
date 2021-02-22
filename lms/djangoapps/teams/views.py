@@ -159,7 +159,7 @@ class TeamsDashboardView(GenericAPIView):
                 'organization_protection_status': organization_protection_status
             },
         )
-        topics_data["sort_order"] = sort_order
+        topics_data["sort_order"] = sort_order  # pylint: disable=unsupported-assignment-operation
 
         filter_query = {
             'membership__user': user,

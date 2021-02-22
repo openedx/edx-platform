@@ -52,7 +52,7 @@ class JwtHasTpaProviderFilterForRequestedProvider(BasePermission):
 # TODO: Remove ApiKeyHeaderPermission. Check deprecated_api_key_header custom attribute for active usage.
 _NOT_JWT_RESTRICTED_TPA_PERMISSIONS = (
     C(NotJwtRestrictedApplication) &
-    (C(IsSuperuser) | ApiKeyHeaderPermission | C(IsStaff))
+    (C(IsSuperuser) | ApiKeyHeaderPermission | C(IsStaff))  # pylint: disable=unsupported-binary-operation
 )
 _JWT_RESTRICTED_TPA_PERMISSIONS = (
     C(JwtRestrictedApplication) &

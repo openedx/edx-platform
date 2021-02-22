@@ -69,7 +69,7 @@ class TestGenerateCourseBlocks(ModuleStoreTestCase):
         """
         Asserts that the logger was called with the given message.
         """
-        message_present = any([message in call_args[0][0] for call_args in mock_log.warning.call_args_list])
+        message_present = any(message in call_args[0][0] for call_args in mock_log.warning.call_args_list)
         if expected_presence:
             assert message_present
         else:

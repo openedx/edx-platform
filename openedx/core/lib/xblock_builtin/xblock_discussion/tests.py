@@ -160,7 +160,7 @@ class DiscussionXBlockImportExportTests(TestCase):
         target_node = etree.Element('dummy')
 
         block = DiscussionXBlock(self.runtime_mock, scope_ids=self.keys, field_data=DictFieldData({}))
-        discussion_id_field = block.fields['discussion_id']
+        discussion_id_field = block.fields['discussion_id']  # pylint: disable=unsubscriptable-object
 
         # precondition checks - discussion_id does not have a value and uses UNIQUE_ID
         self.assertEqual(
