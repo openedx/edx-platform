@@ -13,24 +13,23 @@ Test utilities for mobile API tests:
 
 
 import datetime
+from unittest.mock import patch
 
 import ddt
 import pytz
-import six
 from django.conf import settings
 from django.urls import reverse
 from django.utils import timezone
-from mock import patch
 from opaque_keys.edx.keys import CourseKey
 from rest_framework.test import APITestCase
 
+from common.djangoapps.student import auth
+from common.djangoapps.student.models import CourseEnrollment
 from lms.djangoapps.courseware.access_response import MobileAvailabilityError, StartDateError, VisibilityError
 from lms.djangoapps.courseware.tests.factories import UserFactory
 from lms.djangoapps.mobile_api.models import IgnoreMobileAvailableFlagConfig
 from lms.djangoapps.mobile_api.tests.test_milestones import MobileAPIMilestonesMixin
 from lms.djangoapps.mobile_api.utils import API_V1
-from common.djangoapps.student import auth
-from common.djangoapps.student.models import CourseEnrollment
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
@@ -43,7 +42,7 @@ class MobileAPITestCase(ModuleStoreTestCase, APITestCase):
     They may also override any of the methods defined in this class to control the behavior of the TestMixins.
     """
     def setUp(self):
-        super(MobileAPITestCase, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.course = CourseFactory.create(
             mobile_available=True,
             static_asset_path="needed_for_split",
@@ -57,7 +56,7 @@ class MobileAPITestCase(ModuleStoreTestCase, APITestCase):
         IgnoreMobileAvailableFlagConfig(enabled=False).save()
 
     def tearDown(self):
-        super(MobileAPITestCase, self).tearDown()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().tearDown()
         self.logout()
 
     def login(self):
@@ -96,7 +95,7 @@ class MobileAPITestCase(ModuleStoreTestCase, APITestCase):
         """Base implementation that returns URL for endpoint that's being tested."""
         reverse_args = reverse_args or {}
         if 'course_id' in self.REVERSE_INFO['params']:
-            reverse_args.update({'course_id': six.text_type(kwargs.get('course_id', self.course.id))})
+            reverse_args.update({'course_id': str(kwargs.get('course_id', self.course.id))})
         if 'username' in self.REVERSE_INFO['params']:
             reverse_args.update({'username': kwargs.get('username', self.user.username)})
         if 'api_version' in self.REVERSE_INFO['params']:
@@ -108,7 +107,7 @@ class MobileAPITestCase(ModuleStoreTestCase, APITestCase):
         return self.client.get(url, data=data)
 
 
-class MobileAuthTestMixin(object):
+class MobileAuthTestMixin:
     """
     Test Mixin for testing APIs decorated with mobile_view.
     """

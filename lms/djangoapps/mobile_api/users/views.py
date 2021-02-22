@@ -3,9 +3,9 @@ Views for user API
 """
 
 
-import six
-from completion.utilities import get_key_to_last_completed_block
 from completion.exceptions import UnavailableCompletionData
+from completion.utilities import get_key_to_last_completed_block
+from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.contrib.auth.signals import user_logged_in
 from django.shortcuts import redirect
 from django.utils import dateparse
@@ -16,17 +16,16 @@ from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from xblock.fields import Scope
 from xblock.runtime import KeyValueStore
-from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 
+from common.djangoapps.student.models import CourseEnrollment, User  # lint-amnesty, pylint: disable=reimported
 from lms.djangoapps.courseware.access import is_mobile_available_for_user
+from lms.djangoapps.courseware.access_utils import ACCESS_GRANTED
 from lms.djangoapps.courseware.courses import get_current_child
 from lms.djangoapps.courseware.model_data import FieldDataCache
 from lms.djangoapps.courseware.module_render import get_module_for_descriptor
 from lms.djangoapps.courseware.views.index import save_positions_recursively_up
-from lms.djangoapps.courseware.access_utils import ACCESS_GRANTED
-from lms.djangoapps.mobile_api.utils import API_V05, API_V1
+from lms.djangoapps.mobile_api.utils import API_V1, API_V05
 from openedx.features.course_duration_limits.access import check_course_expired
-from common.djangoapps.student.models import CourseEnrollment, User  # lint-amnesty, pylint: disable=reimported
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError
 
@@ -72,7 +71,7 @@ class UserDetail(generics.RetrieveAPIView):
     lookup_field = 'username'
 
     def get_serializer_context(self):
-        context = super(UserDetail, self).get_serializer_context()  # lint-amnesty, pylint: disable=super-with-arguments
+        context = super().get_serializer_context()
         context['api_version'] = self.kwargs.get('api_version')
         return context
 
@@ -152,7 +151,7 @@ class UserCourseStatus(views.APIView):
         Returns the course status
         """
         path = self._last_visited_module_path(request, course)
-        path_ids = [six.text_type(module.location) for module in path]
+        path_ids = [str(module.location) for module in path]
         return Response({
             "last_visited_module_id": path_ids[0],
             "last_visited_module_path": path_ids,
@@ -312,7 +311,7 @@ class UserCourseEnrollmentsList(generics.ListAPIView):
         return check_org is None or (check_org.lower() == course_org.lower())
 
     def get_serializer_context(self):
-        context = super(UserCourseEnrollmentsList, self).get_serializer_context()  # lint-amnesty, pylint: disable=super-with-arguments
+        context = super().get_serializer_context()
         context['api_version'] = self.kwargs.get('api_version')
         return context
 
