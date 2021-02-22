@@ -1,22 +1,21 @@
-# -*- coding: utf-8 -*-
 """
 Tests for Python APIs of the Teams app
 """
 
+from unittest import mock
 from uuid import uuid4
 
 import ddt
-import mock
 from opaque_keys.edx.keys import CourseKey
 
 from common.djangoapps.course_modes.models import CourseMode
+from common.djangoapps.student.models import AnonymousUserId, CourseEnrollment
+from common.djangoapps.student.roles import CourseStaffRole
+from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
 from lms.djangoapps.teams import api as teams_api
 from lms.djangoapps.teams.models import CourseTeam
 from lms.djangoapps.teams.tests.factories import CourseTeamFactory
 from openedx.core.lib.teams_config import TeamsConfig, TeamsetType
-from common.djangoapps.student.models import CourseEnrollment, AnonymousUserId
-from common.djangoapps.student.roles import CourseStaffRole
-from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
@@ -36,7 +35,7 @@ class PythonAPITests(SharedModuleStoreTestCase):
     """
     @classmethod
     def setUpClass(cls):
-        super(PythonAPITests, cls).setUpClass()
+        super().setUpClass()
         cls.user1 = UserFactory.create(username='user1')
         cls.user2 = UserFactory.create(username='user2')
         cls.user3 = UserFactory.create(username='user3')
@@ -231,7 +230,7 @@ class TeamAccessTests(SharedModuleStoreTestCase):
     """
     @classmethod
     def setUpClass(cls):
-        super(TeamAccessTests, cls).setUpClass()
+        super().setUpClass()
         cls.user_audit = UserFactory.create(username='user_audit')
         cls.user_staff = UserFactory.create(username='user_staff')
         cls.user_masters = UserFactory.create(username='user_masters')
