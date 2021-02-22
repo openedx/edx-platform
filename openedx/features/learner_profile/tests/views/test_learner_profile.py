@@ -68,45 +68,29 @@ class LearnerProfileViewTest(SiteMixin, UrlResetMixin, ModuleStoreTestCase):
 
         context = learner_profile_context(request, self.USERNAME, self.user.is_staff)
 
-        self.assertEqual(
-            context['data']['default_public_account_fields'],
-            settings.ACCOUNT_VISIBILITY_CONFIGURATION['public_fields']
-        )
+        assert context['data']['default_public_account_fields'] == \
+               settings.ACCOUNT_VISIBILITY_CONFIGURATION['public_fields']
 
-        self.assertEqual(
-            context['data']['accounts_api_url'],
-            reverse("accounts_api", kwargs={'username': self.user.username})
-        )
+        assert context['data']['accounts_api_url'] == \
+               reverse('accounts_api', kwargs={'username': self.user.username})
 
-        self.assertEqual(
-            context['data']['preferences_api_url'],
-            reverse('preferences_api', kwargs={'username': self.user.username})
-        )
+        assert context['data']['preferences_api_url'] == \
+               reverse('preferences_api', kwargs={'username': self.user.username})
 
-        self.assertEqual(
-            context['data']['profile_image_upload_url'],
-            reverse("profile_image_upload", kwargs={'username': self.user.username})
-        )
+        assert context['data']['profile_image_upload_url'] == \
+               reverse('profile_image_upload', kwargs={'username': self.user.username})
 
-        self.assertEqual(
-            context['data']['profile_image_remove_url'],
-            reverse('profile_image_remove', kwargs={'username': self.user.username})
-        )
+        assert context['data']['profile_image_remove_url'] == \
+               reverse('profile_image_remove', kwargs={'username': self.user.username})
 
-        self.assertEqual(
-            context['data']['profile_image_max_bytes'],
-            settings.PROFILE_IMAGE_MAX_BYTES
-        )
+        assert context['data']['profile_image_max_bytes'] == settings.PROFILE_IMAGE_MAX_BYTES
 
-        self.assertEqual(
-            context['data']['profile_image_min_bytes'],
-            settings.PROFILE_IMAGE_MIN_BYTES
-        )
+        assert context['data']['profile_image_min_bytes'] == settings.PROFILE_IMAGE_MIN_BYTES
 
-        self.assertEqual(context['data']['account_settings_page_url'], reverse('account_settings'))
+        assert context['data']['account_settings_page_url'] == reverse('account_settings')
 
         for attribute in self.CONTEXT_DATA:
-            self.assertIn(attribute, context['data'])
+            assert attribute in context['data']
 
     def test_view(self):
         """
@@ -149,7 +133,7 @@ class LearnerProfileViewTest(SiteMixin, UrlResetMixin, ModuleStoreTestCase):
         """
         profile_path = reverse('learner_profile', kwargs={'username': "no_such_user"})
         response = self.client.get(path=profile_path)
-        self.assertEqual(404, response.status_code)
+        assert 404 == response.status_code
 
     def _create_certificate(self, course_key=None, enrollment_mode=CourseMode.HONOR, status='downloadable'):
         """Simulate that the user has a generated certificate. """
@@ -189,7 +173,7 @@ class LearnerProfileViewTest(SiteMixin, UrlResetMixin, ModuleStoreTestCase):
         cert.save()
 
         # Ensure that this test is actually using both passing and non-passing certs.
-        self.assertEqual(is_passing_status(cert.status), is_passed_status)
+        assert is_passing_status(cert.status) == is_passed_status
 
         response = self.client.get('/u/{username}'.format(username=self.user.username))
 
@@ -261,15 +245,15 @@ class LearnerProfileViewTest(SiteMixin, UrlResetMixin, ModuleStoreTestCase):
         user_is_staff = True
         context = learner_profile_context(request, profile_username, user_is_staff)
 
-        self.assertIn('achievements_fragment', context)
+        assert 'achievements_fragment' in context
 
         user_is_staff = False
         context = learner_profile_context(request, profile_username, user_is_staff)
-        self.assertNotIn('achievements_fragment', context)
+        assert 'achievements_fragment' not in context
 
         profile_username = self.user.username
         context = learner_profile_context(request, profile_username, user_is_staff)
-        self.assertIn('achievements_fragment', context)
+        assert 'achievements_fragment' in context
 
     @mock.patch.dict(settings.FEATURES, {'CERTIFICATES_HTML_VIEW': True})
     def test_certificate_visibility_with_no_cert_config(self):

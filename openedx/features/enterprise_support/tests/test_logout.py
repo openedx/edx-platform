@@ -55,7 +55,7 @@ class EnterpriseLogoutTests(EnterpriseServiceMockMixin, CacheIsolationTestCase, 
             logout_path=reverse('logout'),
             redirect_url=redirect_url
         )
-        self.assertTrue(enterprise_enabled())
+        assert enterprise_enabled()
         response = self.client.get(url, HTTP_HOST='testserver')
         expected = {
             'enterprise_target': enterprise_target,

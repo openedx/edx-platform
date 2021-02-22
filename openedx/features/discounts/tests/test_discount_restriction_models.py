@@ -37,10 +37,7 @@ class TestDiscountRestrictionConfig(CacheIsolationTestCase):
         )
         course_key = self.course_overview.id
 
-        self.assertEqual(
-            disabled,
-            DiscountRestrictionConfig.current(course_key=course_key).disabled
-        )
+        assert disabled == DiscountRestrictionConfig.current(course_key=course_key).disabled
 
     @ddt.data(
         # Generate all combinations of setting each configuration level to True/False/None
@@ -88,10 +85,10 @@ class TestDiscountRestrictionConfig(CacheIsolationTestCase):
         expected_org_setting = self._resolve_settings([global_setting, site_setting, org_setting])
         expected_course_setting = self._resolve_settings([global_setting, site_setting, org_setting, course_setting])
 
-        self.assertEqual(expected_global_setting, DiscountRestrictionConfig.current().disabled)
-        self.assertEqual(expected_site_setting, DiscountRestrictionConfig.current(site=test_site_cfg.site).disabled)
-        self.assertEqual(expected_org_setting, DiscountRestrictionConfig.current(org=test_course.org).disabled)
-        self.assertEqual(expected_course_setting, DiscountRestrictionConfig.current(course_key=test_course.id).disabled)
+        assert expected_global_setting == DiscountRestrictionConfig.current().disabled
+        assert expected_site_setting == DiscountRestrictionConfig.current(site=test_site_cfg.site).disabled
+        assert expected_org_setting == DiscountRestrictionConfig.current(org=test_course.org).disabled
+        assert expected_course_setting == DiscountRestrictionConfig.current(course_key=test_course.id).disabled
 
     def _resolve_settings(self, settings):
         if all(setting is None for setting in settings):

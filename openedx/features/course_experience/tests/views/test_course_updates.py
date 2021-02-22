@@ -36,7 +36,7 @@ class TestCourseUpdatesPage(BaseCourseUpdatesTestCase):
         self.create_course_update('Second Message')
         url = course_updates_url(self.course)
         response = self.client.get(url)
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
         self.assertContains(response, 'First Message')
         self.assertContains(response, 'Second Message')
 

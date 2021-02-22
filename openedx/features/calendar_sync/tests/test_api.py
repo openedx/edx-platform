@@ -24,17 +24,17 @@ class TestCalendarSyncAPI(SharedModuleStoreTestCase):
         self.user = UserFactory(password=TEST_PASSWORD)
 
     def test_subscribe_to_calendar(self):
-        self.assertEqual(UserCalendarSyncConfig.objects.count(), 0)
+        assert UserCalendarSyncConfig.objects.count() == 0
         subscribe_user_to_calendar(self.user, self.course_key)
-        self.assertEqual(UserCalendarSyncConfig.objects.count(), 1)
-        self.assertTrue(UserCalendarSyncConfig.is_enabled_for_course(self.user, self.course_key))
+        assert UserCalendarSyncConfig.objects.count() == 1
+        assert UserCalendarSyncConfig.is_enabled_for_course(self.user, self.course_key)
 
     def test_unsubscribe_to_calendar(self):
-        self.assertEqual(UserCalendarSyncConfig.objects.count(), 0)
+        assert UserCalendarSyncConfig.objects.count() == 0
         unsubscribe_user_to_calendar(self.user, self.course_key)
-        self.assertEqual(UserCalendarSyncConfig.objects.count(), 0)
+        assert UserCalendarSyncConfig.objects.count() == 0
 
         UserCalendarSyncConfig.objects.create(user=self.user, course_key=self.course_key, enabled=True)
-        self.assertTrue(UserCalendarSyncConfig.is_enabled_for_course(self.user, self.course_key))
+        assert UserCalendarSyncConfig.is_enabled_for_course(self.user, self.course_key)
         unsubscribe_user_to_calendar(self.user, self.course_key)
-        self.assertFalse(UserCalendarSyncConfig.is_enabled_for_course(self.user, self.course_key))
+        assert not UserCalendarSyncConfig.is_enabled_for_course(self.user, self.course_key)

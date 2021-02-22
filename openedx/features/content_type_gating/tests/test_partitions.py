@@ -32,21 +32,21 @@ class TestContentTypeGatingPartition(CacheIsolationTestCase):
 
         with patch('openedx.features.content_type_gating.partitions.ContentTypeGatingPartitionScheme.create_user_partition') as mock_create:
             partition = create_content_gating_partition(mock_course)
-            self.assertEqual(partition, mock_create.return_value)
+            assert partition == mock_create.return_value
 
     def test_create_content_gating_partition_override_only(self):
         mock_course = Mock(id=self.course_key, user_partitions={})
         ContentTypeGatingConfig.objects.create(enabled=False, studio_override_enabled=True)
 
         partition = create_content_gating_partition(mock_course)
-        self.assertIsNotNone(partition)
+        assert partition is not None
 
     def test_create_content_gating_partition_disabled(self):
         mock_course = Mock(id=self.course_key, user_partitions={})
         ContentTypeGatingConfig.objects.create(enabled=False, studio_override_enabled=False)
 
         partition = create_content_gating_partition(mock_course)
-        self.assertIsNone(partition)
+        assert partition is None
 
     def test_create_content_gating_partition_no_scheme_installed(self):
         mock_course = Mock(id=self.course_key, user_partitions={})
@@ -55,7 +55,7 @@ class TestContentTypeGatingPartition(CacheIsolationTestCase):
         with patch('openedx.features.content_type_gating.partitions.UserPartition.get_scheme', side_effect=UserPartitionError):
             partition = create_content_gating_partition(mock_course)
 
-        self.assertIsNone(partition)
+        assert partition is None
 
     def test_create_content_gating_partition_partition_id_used(self):
         mock_course = Mock(id=self.course_key, user_partitions={Mock(name='partition', id=CONTENT_GATING_PARTITION_ID): object()})
@@ -64,7 +64,7 @@ class TestContentTypeGatingPartition(CacheIsolationTestCase):
         with patch('openedx.features.content_type_gating.partitions.LOG') as mock_log:
             partition = create_content_gating_partition(mock_course)
             mock_log.warning.assert_called()
-        self.assertIsNone(partition)
+        assert partition is None
 
     def test_access_denied_fragment_for_masquerading(self):
         """
@@ -93,7 +93,7 @@ class TestContentTypeGatingPartition(CacheIsolationTestCase):
         ):
             fragment = partition.access_denied_fragment(mock_block, global_staff, LIMITED_ACCESS, [FULL_ACCESS])
 
-        self.assertIsNotNone(fragment)
+        assert fragment is not None
 
     def test_access_denied_fragment_for_full_access_users(self):
         """
@@ -115,9 +115,9 @@ class TestContentTypeGatingPartition(CacheIsolationTestCase):
             return_value=mock_request
         ):
             fragment = partition.access_denied_fragment(mock_block, global_staff, FULL_ACCESS, 'test_allowed_group')
-            self.assertIsNone(fragment)
+            assert fragment is None
             message = partition.access_denied_message(mock_block.scope_ids.usage_id, global_staff, FULL_ACCESS, 'test_allowed_group')
-            self.assertIsNone(message)
+            assert message is None
 
     def test_access_denied_fragment_for_null_request(self):
         """
@@ -142,4 +142,4 @@ class TestContentTypeGatingPartition(CacheIsolationTestCase):
         ):
             fragment = partition.access_denied_fragment(mock_block, global_staff, LIMITED_ACCESS, [FULL_ACCESS])
 
-        self.assertIsNotNone(fragment)
+        assert fragment is not None

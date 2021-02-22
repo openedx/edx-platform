@@ -54,7 +54,7 @@ class TestApplicability(ModuleStoreTestCase):
     def test_can_receive_discount(self):
         # Right now, no one should be able to receive the discount
         applicability = can_receive_discount(user=self.user, course=self.course)
-        self.assertEqual(applicability, False)
+        assert applicability is False
 
     @override_waffle_flag(DISCOUNT_APPLICABILITY_FLAG, active=True)
     def test_can_receive_discount_course_requirements(self):
@@ -68,22 +68,22 @@ class TestApplicability(ModuleStoreTestCase):
         )
 
         applicability = can_receive_discount(user=self.user, course=self.course)
-        self.assertEqual(applicability, True)
+        assert applicability is True
 
         no_verified_mode_course = CourseFactory(end=now() + timedelta(days=30))
         applicability = can_receive_discount(user=self.user, course=no_verified_mode_course)
-        self.assertEqual(applicability, False)
+        assert applicability is False
 
         course_that_has_ended = CourseFactory(end=now() - timedelta(days=30))
         applicability = can_receive_discount(user=self.user, course=course_that_has_ended)
-        self.assertEqual(applicability, False)
+        assert applicability is False
 
         disabled_course = CourseFactory()
         CourseModeFactory.create(course_id=disabled_course.id, mode_slug='verified')  # lint-amnesty, pylint: disable=no-member
         disabled_course_overview = CourseOverview.get_from_id(disabled_course.id)  # lint-amnesty, pylint: disable=no-member
         DiscountRestrictionConfig.objects.create(disabled=True, course=disabled_course_overview)
         applicability = can_receive_discount(user=self.user, course=disabled_course)
-        self.assertEqual(applicability, False)
+        assert applicability is False
 
     @ddt.data(*(
         [[]] +
@@ -149,7 +149,7 @@ class TestApplicability(ModuleStoreTestCase):
         )
 
         applicability = can_receive_discount(user=self.user, course=self.course)
-        self.assertEqual(applicability, False)
+        assert applicability is False
 
     @override_waffle_flag(DISCOUNT_APPLICABILITY_FLAG, active=True)
     def test_holdback_denies_discount(self):
