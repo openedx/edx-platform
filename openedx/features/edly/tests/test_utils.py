@@ -1,9 +1,9 @@
 """
 Tests for Edly Utils Functions.
 """
+from urllib.parse import urljoin
 import jwt
 import mock
-from urllib.parse import urljoin
 from mock import MagicMock
 
 import crum
@@ -541,7 +541,7 @@ class UtilsTests(SharedModuleStoreTestCase):
         """
         Test "is_course_org_same_as_site_org" when unlinked site is passed.
         """
-        assert False == is_course_org_same_as_site_org(self.request.site, self.course.id)
+        assert not is_course_org_same_as_site_org(self.request.site, self.course.id)
 
     def test_is_course_org_same_as_site_org_for_invalid_course_id(self):
         """
@@ -552,4 +552,4 @@ class UtilsTests(SharedModuleStoreTestCase):
             lms_site=self.request.site
         )
         course_id = CourseKey.from_string('course-v1:edX+Test+Test_Course')
-        assert False == is_course_org_same_as_site_org(self.request.site, course_id)
+        assert not is_course_org_same_as_site_org(self.request.site, course_id)

@@ -8,7 +8,6 @@ from django.contrib.auth.models import Group
 from django.core.exceptions import PermissionDenied, ValidationError
 from django.db.models import Q
 from django.forms.models import model_to_dict
-from django.urls import reverse
 from django.utils.translation import ugettext_lazy as _
 
 from lms.djangoapps.branding.api import get_privacy_url, get_tos_and_honor_code_url
