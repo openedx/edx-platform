@@ -12,7 +12,7 @@ from lms.djangoapps.discussion.rest_api.render import render_body
 
 def _add_p_tags(raw_body):
     """Return raw_body surrounded by p tags"""
-    return "<p>{raw_body}</p>".format(raw_body=raw_body)
+    return f"<p>{raw_body}</p>"
 
 
 @ddt.ddt
@@ -29,8 +29,8 @@ class RenderBodyTest(TestCase):
     )
     @ddt.unpack
     def test_markdown_inline(self, delimiter, tag):
-        assert render_body(u'{delimiter}some text{delimiter}'.format(delimiter=delimiter)) == \
-               u'<p><{tag}>some text</{tag}></p>'.format(tag=tag)
+        assert render_body('{delimiter}some text{delimiter}'.format(delimiter=delimiter)) == \
+               '<p><{tag}>some text</{tag}></p>'.format(tag=tag)
 
     @ddt.data(
         "b", "blockquote", "code", "del", "dd", "dl", "dt", "em", "h1", "h2", "h3", "i", "kbd",
@@ -44,14 +44,14 @@ class RenderBodyTest(TestCase):
 
     @ddt.data("br", "hr")
     def test_selfclosing_tag(self, tag):
-        raw_body = "<{tag}>".format(tag=tag)
+        raw_body = f"<{tag}>"
         is_inline_tag = tag == "br"
         rendered_body = _add_p_tags(raw_body) if is_inline_tag else raw_body
         assert render_body(raw_body) == rendered_body
 
     @ddt.data("http", "https", "ftp")
     def test_allowed_a_tag(self, protocol):
-        raw_body = '<a href="{protocol}://foo" title="bar">baz</a>'.format(protocol=protocol)
+        raw_body = f'<a href="{protocol}://foo" title="bar">baz</a>'
         assert render_body(raw_body) == _add_p_tags(raw_body)
 
     def test_disallowed_a_tag(self):
@@ -75,7 +75,7 @@ class RenderBodyTest(TestCase):
 
     @ddt.data("p", "br", "li", "hr")  # img is tested above
     def test_allowed_unpaired_tags(self, tag):
-        raw_body = "foo<{tag}>bar".format(tag=tag)
+        raw_body = f"foo<{tag}>bar"
         assert render_body(raw_body) == _add_p_tags(raw_body)
 
     def test_unpaired_start_tag(self):

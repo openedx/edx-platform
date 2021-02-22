@@ -15,7 +15,7 @@ class MockCommentServiceServerTest(unittest.TestCase):
     '''
 
     def setUp(self):
-        super(MockCommentServiceServerTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
 
         # This is a test of the test setup,
         # so it does not need to run as part of the unit test suite
@@ -44,8 +44,8 @@ class MockCommentServiceServerTest(unittest.TestCase):
         of how you would create a new user
         """
         # Send a request
-        values = {'username': u'user100',
-                  'external_id': '4', 'email': u'user100@edx.org'}
+        values = {'username': 'user100',
+                  'external_id': '4', 'email': 'user100@edx.org'}
         data = json.dumps(values)
         headers = {'Content-Type': 'application/json', 'Content-Length': len(data), 'X-Edx-Api-Key': 'TEST_API_KEY'}
         req = six.moves.urllib.request.Request(self.server_url + '/api/v1/users/4', data, headers)  # lint-amnesty, pylint: disable=undefined-variable

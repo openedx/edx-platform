@@ -1,8 +1,6 @@
 """
 Provide tests for sysadmin dashboard feature in sysadmin.py
 """
-
-
 import glob
 import os
 import re
@@ -18,18 +16,16 @@ from django.test.utils import override_settings
 from django.urls import reverse
 from opaque_keys.edx.locator import CourseLocator
 from pytz import UTC
-from six import text_type
-from six.moves import range
-
-from lms.djangoapps.dashboard.git_import import GitImportErrorNoDir
-from lms.djangoapps.dashboard.models import CourseImportLog
-from openedx.core.djangolib.markup import Text
-from common.djangoapps.student.roles import CourseStaffRole, GlobalStaff
-from common.djangoapps.student.tests.factories import UserFactory
-from common.djangoapps.util.date_utils import DEFAULT_DATE_TIME_FORMAT, get_time_display
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import TEST_DATA_SPLIT_MODULESTORE, SharedModuleStoreTestCase
 from xmodule.modulestore.tests.mongo_connection import MONGO_HOST, MONGO_PORT_NUM
+
+from common.djangoapps.student.roles import CourseStaffRole, GlobalStaff
+from common.djangoapps.student.tests.factories import UserFactory
+from common.djangoapps.util.date_utils import DEFAULT_DATE_TIME_FORMAT, get_time_display
+from lms.djangoapps.dashboard.git_import import GitImportErrorNoDir
+from lms.djangoapps.dashboard.models import CourseImportLog
+from openedx.core.djangolib.markup import Text
 
 TEST_MONGODB_LOG = {
     'host': MONGO_HOST,
@@ -52,7 +48,7 @@ class SysadminBaseTestCase(SharedModuleStoreTestCase):
 
     def setUp(self):
         """Setup test case by adding primary user."""
-        super(SysadminBaseTestCase, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.user = UserFactory.create(username='test_user',
                                        email='test_user+sysadmin@edx.org',
                                        password='foo')
@@ -73,7 +69,7 @@ class SysadminBaseTestCase(SharedModuleStoreTestCase):
     def _rm_edx4edx(self):
         """Deletes the sample course from the XML store"""
         def_ms = modulestore()
-        course_path = '{0}/edx4edx_lite'.format(
+        course_path = '{}/edx4edx_lite'.format(
             os.path.abspath(settings.DATA_DIR))
         try:
             # using XML store
@@ -86,11 +82,11 @@ class SysadminBaseTestCase(SharedModuleStoreTestCase):
         response = self.client.post(
             reverse('sysadmin_courses'),
             {
-                'course_id': text_type(course.id),
+                'course_id': str(course.id),
                 'action': 'del_course',
             }
         )
-        self.addCleanup(self._rm_glob, '{0}_deleted_*'.format(course_path))
+        self.addCleanup(self._rm_glob, f'{course_path}_deleted_*')
 
         return response
 
@@ -112,7 +108,7 @@ class SysadminBaseTestCase(SharedModuleStoreTestCase):
 
 @override_settings(
     MONGODB_LOG=TEST_MONGODB_LOG,
-    GIT_REPO_DIR=settings.TEST_ROOT / "course_repos_{}".format(uuid4().hex)
+    GIT_REPO_DIR=settings.TEST_ROOT / f"course_repos_{uuid4().hex}"
 )
 @unittest.skipUnless(settings.FEATURES.get('ENABLE_SYSADMIN_DASHBOARD'),
                      "ENABLE_SYSADMIN_DASHBOARD not set")
@@ -124,7 +120,7 @@ class TestSysAdminMongoCourseImport(SysadminBaseTestCase):
     @classmethod
     def tearDownClass(cls):
         """Delete mongo log entries after test."""
-        super(TestSysAdminMongoCourseImport, cls).tearDownClass()
+        super().tearDownClass()
         try:
             mongoengine.connect(TEST_MONGODB_LOG['db'])
             CourseImportLog.objects.all().delete()
@@ -153,7 +149,7 @@ class TestSysAdminMongoCourseImport(SysadminBaseTestCase):
 
         # Create git loaded course
         response = self._add_edx4edx()
-        self.assertContains(response, Text(text_type(GitImportErrorNoDir(settings.GIT_REPO_DIR))))
+        self.assertContains(response, Text(str(GitImportErrorNoDir(settings.GIT_REPO_DIR))))
 
     def test_mongo_course_add_delete(self):
         """
@@ -182,7 +178,7 @@ class TestSysAdminMongoCourseImport(SysadminBaseTestCase):
         # Regex of first 3 columns of course information table row for
         # test course loaded from git. Would not have sha1 if
         # git_info_for_course failed.
-        table_re = re.compile(u"""
+        table_re = re.compile("""
             <tr>\\s+
             <td>edX\\sAuthor\\sCourse</td>\\s+  # expected test git course name
             <td>course-v1:MITx\\+edx4edx\\+edx4edx</td>\\s+  # expected test git course_id
@@ -314,7 +310,7 @@ class TestSysAdminMongoCourseImport(SysadminBaseTestCase):
                     page
                 )
             )
-            self.assertContains(response, u'Page {} of 2'.format(expected))
+            self.assertContains(response, f'Page {expected} of 2')
 
         CourseImportLog.objects.delete()
 

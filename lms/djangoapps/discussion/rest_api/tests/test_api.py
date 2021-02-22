@@ -5,19 +5,20 @@ Tests for Discussion API internal interface
 
 import itertools
 from datetime import datetime, timedelta
-import pytest
+from unittest import mock
+
 import ddt
 import httpretty
-import mock
-import six
+import pytest
 from django.core.exceptions import ValidationError
 from django.test.client import RequestFactory
 from opaque_keys.edx.locator import CourseLocator
 from pytz import UTC
 from rest_framework.exceptions import PermissionDenied
-from six.moves import range
 from six.moves.urllib.parse import parse_qs, urlencode, urlparse, urlunparse
 
+from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
+from common.djangoapps.util.testing import UrlResetMixin
 from common.test.utils import MockSignalHandlerMixin, disable_signal
 from lms.djangoapps.courseware.tests.factories import BetaTesterFactory, StaffFactory
 from lms.djangoapps.discussion.django_comment_client.tests.utils import ForumsEnableMixin
@@ -57,8 +58,6 @@ from openedx.core.djangoapps.django_comment_common.models import (
     Role
 )
 from openedx.core.lib.exceptions import CourseNotFoundError, PageNotFoundError
-from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
-from common.djangoapps.util.testing import UrlResetMixin
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, SharedModuleStoreTestCase
@@ -141,12 +140,12 @@ class GetCourseTest(ForumsEnableMixin, UrlResetMixin, SharedModuleStoreTestCase)
 
     @classmethod
     def setUpClass(cls):
-        super(GetCourseTest, cls).setUpClass()
+        super().setUpClass()
         cls.course = CourseFactory.create(org="x", course="y", run="z")
 
     @mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
     def setUp(self):
-        super(GetCourseTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.user = UserFactory.create()
         CourseEnrollmentFactory.create(user=self.user, course_id=self.course.id)
         self.request = RequestFactory().get("/dummy")
@@ -168,7 +167,7 @@ class GetCourseTest(ForumsEnableMixin, UrlResetMixin, SharedModuleStoreTestCase)
 
     def test_basic(self):
         assert get_course(self.request, self.course.id) == {
-            'id': six.text_type(self.course.id),
+            'id': str(self.course.id),
             'blackouts': [],
             'thread_list_url': 'http://testserver/api/discussion/v1/threads/?course_id=x%2Fy%2Fz',
             'following_thread_list_url':
@@ -186,7 +185,7 @@ class GetCourseTestBlackouts(ForumsEnableMixin, UrlResetMixin, ModuleStoreTestCa
 
     @mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
     def setUp(self):
-        super(GetCourseTestBlackouts, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.course = CourseFactory.create(org="x", course="y", run="z")
         self.user = UserFactory.create()
         CourseEnrollmentFactory.create(user=self.user, course_id=self.course.id)
@@ -223,7 +222,7 @@ class GetCourseTopicsTest(ForumsEnableMixin, UrlResetMixin, ModuleStoreTestCase)
     """Test for get_course_topics"""
     @mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
     def setUp(self):
-        super(GetCourseTopicsTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.maxDiff = None  # pylint: disable=invalid-name
         self.partition = UserPartition(
             0,
@@ -266,7 +265,7 @@ class GetCourseTopicsTest(ForumsEnableMixin, UrlResetMixin, ModuleStoreTestCase)
         """
         path = "http://testserver/api/discussion/v1/threads/"
         topic_ids_to_query = [("topic_id", topic_id) for topic_id in topic_id_list]
-        query_list = [("course_id", six.text_type(self.course.id))] + topic_ids_to_query
+        query_list = [("course_id", str(self.course.id))] + topic_ids_to_query
         return urlunparse(("", "", path, "", urlencode(query_list), ""))
 
     def get_course_topics(self):
@@ -592,12 +591,12 @@ class GetThreadListTest(ForumsEnableMixin, CommentsServiceMockMixin, UrlResetMix
 
     @classmethod
     def setUpClass(cls):
-        super(GetThreadListTest, cls).setUpClass()
+        super().setUpClass()
         cls.course = CourseFactory.create()
 
     @mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
     def setUp(self):
-        super(GetThreadListTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         httpretty.reset()
         httpretty.enable()
         self.addCleanup(httpretty.reset)
@@ -662,8 +661,8 @@ class GetThreadListTest(ForumsEnableMixin, CommentsServiceMockMixin, UrlResetMix
         self.get_thread_list([], topic_id_list=["topic_x", "topic_meow"])
         assert urlparse(httpretty.last_request().path).path == '/api/v1/threads'  # lint-amnesty, pylint: disable=no-member
         self.assert_last_query_params({
-            "user_id": [six.text_type(self.user.id)],
-            "course_id": [six.text_type(self.course.id)],
+            "user_id": [str(self.user.id)],
+            "course_id": [str(self.course.id)],
             "sort_key": ["activity"],
             "page": ["1"],
             "per_page": ["1"],
@@ -673,8 +672,8 @@ class GetThreadListTest(ForumsEnableMixin, CommentsServiceMockMixin, UrlResetMix
     def test_basic_query_params(self):
         self.get_thread_list([], page=6, page_size=14)
         self.assert_last_query_params({
-            "user_id": [six.text_type(self.user.id)],
-            "course_id": [six.text_type(self.course.id)],
+            "user_id": [str(self.user.id)],
+            "course_id": [str(self.course.id)],
             "sort_key": ["activity"],
             "page": ["6"],
             "per_page": ["14"],
@@ -686,7 +685,7 @@ class GetThreadListTest(ForumsEnableMixin, CommentsServiceMockMixin, UrlResetMix
         source_threads = [
             make_minimal_cs_thread({
                 "id": "test_thread_id_0",
-                "course_id": six.text_type(self.course.id),
+                "course_id": str(self.course.id),
                 "commentable_id": "topic_x",
                 "username": self.author.username,
                 "user_id": str(self.author.id),
@@ -702,7 +701,7 @@ class GetThreadListTest(ForumsEnableMixin, CommentsServiceMockMixin, UrlResetMix
             }),
             make_minimal_cs_thread({
                 "id": "test_thread_id_1",
-                "course_id": six.text_type(self.course.id),
+                "course_id": str(self.course.id),
                 "commentable_id": "topic_y",
                 "group_id": self.cohort.id,
                 "username": self.author.username,
@@ -828,8 +827,8 @@ class GetThreadListTest(ForumsEnableMixin, CommentsServiceMockMixin, UrlResetMix
             text_search='test search string'
         ).data == expected_result
         self.assert_last_query_params({
-            "user_id": [six.text_type(self.user.id)],
-            "course_id": [six.text_type(self.course.id)],
+            "user_id": [str(self.user.id)],
+            "course_id": [str(self.course.id)],
             "sort_key": ["activity"],
             "page": ["1"],
             "per_page": ["10"],
@@ -853,10 +852,10 @@ class GetThreadListTest(ForumsEnableMixin, CommentsServiceMockMixin, UrlResetMix
         assert result == expected_result
         assert urlparse(
             httpretty.last_request().path  # lint-amnesty, pylint: disable=no-member
-        ).path == '/api/v1/users/{}/subscribed_threads'.format(self.user.id)
+        ).path == f"/api/v1/users/{self.user.id}/subscribed_threads"
         self.assert_last_query_params({
-            "user_id": [six.text_type(self.user.id)],
-            "course_id": [six.text_type(self.course.id)],
+            "user_id": [str(self.user.id)],
+            "course_id": [str(self.course.id)],
             "sort_key": ["activity"],
             "page": ["1"],
             "per_page": ["11"],
@@ -880,8 +879,8 @@ class GetThreadListTest(ForumsEnableMixin, CommentsServiceMockMixin, UrlResetMix
         assert result == expected_result
         assert urlparse(httpretty.last_request().path).path == '/api/v1/threads'  # lint-amnesty, pylint: disable=no-member
         self.assert_last_query_params({
-            "user_id": [six.text_type(self.user.id)],
-            "course_id": [six.text_type(self.course.id)],
+            "user_id": [str(self.user.id)],
+            "course_id": [str(self.course.id)],
             "sort_key": ["activity"],
             "page": ["1"],
             "per_page": ["11"],
@@ -918,8 +917,8 @@ class GetThreadListTest(ForumsEnableMixin, CommentsServiceMockMixin, UrlResetMix
         assert result == expected_result
         assert urlparse(httpretty.last_request().path).path == '/api/v1/threads'  # lint-amnesty, pylint: disable=no-member
         self.assert_last_query_params({
-            "user_id": [six.text_type(self.user.id)],
-            "course_id": [six.text_type(self.course.id)],
+            "user_id": [str(self.user.id)],
+            "course_id": [str(self.course.id)],
             "sort_key": [cc_query],
             "page": ["1"],
             "per_page": ["11"],
@@ -946,8 +945,8 @@ class GetThreadListTest(ForumsEnableMixin, CommentsServiceMockMixin, UrlResetMix
         assert result == expected_result
         assert urlparse(httpretty.last_request().path).path == '/api/v1/threads'  # lint-amnesty, pylint: disable=no-member
         self.assert_last_query_params({
-            "user_id": [six.text_type(self.user.id)],
-            "course_id": [six.text_type(self.course.id)],
+            "user_id": [str(self.user.id)],
+            "course_id": [str(self.course.id)],
             "sort_key": ["activity"],
             "page": ["1"],
             "per_page": ["11"],
@@ -976,12 +975,12 @@ class GetCommentListTest(ForumsEnableMixin, CommentsServiceMockMixin, SharedModu
 
     @classmethod
     def setUpClass(cls):
-        super(GetCommentListTest, cls).setUpClass()
+        super().setUpClass()
         cls.course = CourseFactory.create()
 
     @mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
     def setUp(self):
-        super(GetCommentListTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         httpretty.reset()
         httpretty.enable()
         self.addCleanup(httpretty.reset)
@@ -1000,7 +999,7 @@ class GetCommentListTest(ForumsEnableMixin, CommentsServiceMockMixin, SharedModu
         already in overrides.
         """
         overrides = overrides.copy() if overrides else {}
-        overrides.setdefault("course_id", six.text_type(self.course.id))
+        overrides.setdefault("course_id", str(self.course.id))
         return make_minimal_cs_thread(overrides)
 
     def get_comment_list(self, thread, endorsed=None, page=1, page_size=1):
@@ -1031,7 +1030,7 @@ class GetCommentListTest(ForumsEnableMixin, CommentsServiceMockMixin, SharedModu
         with pytest.raises(DiscussionDisabledError):
             self.get_comment_list(
                 self.make_minimal_cs_thread(
-                    overrides={"course_id": six.text_type(disabled_course.id)}
+                    overrides={"course_id": str(disabled_course.id)}
                 )
             )
 
@@ -1067,7 +1066,7 @@ class GetCommentListTest(ForumsEnableMixin, CommentsServiceMockMixin, SharedModu
         cohort = CohortFactory.create(course_id=cohort_course.id, users=[self.user])
         _assign_role_to_user(user=self.user, course_id=cohort_course.id, role=role_name)
         thread = self.make_minimal_cs_thread({
-            "course_id": six.text_type(cohort_course.id),
+            "course_id": str(cohort_course.id),
             "commentable_id": "test_topic",
             "group_id": (
                 None if thread_group_state == "no_group" else
@@ -1319,7 +1318,7 @@ class GetCommentListTest(ForumsEnableMixin, CommentsServiceMockMixin, SharedModu
         thread = self.make_minimal_cs_thread({
             "thread_type": "question",
             "endorsed_responses": [make_minimal_cs_comment({
-                "id": "comment_{}".format(i),
+                "id": f"comment_{i}",
                 "username": self.user.username
             }) for i in range(10)]
         })
@@ -1331,12 +1330,12 @@ class GetCommentListTest(ForumsEnableMixin, CommentsServiceMockMixin, SharedModu
             """
             actual = self.get_comment_list(thread, endorsed=True, page=page, page_size=page_size).data
             result_ids = [result["id"] for result in actual["results"]]
-            assert result_ids == ['comment_{}'.format(i) for i in range(expected_start, expected_stop)]
+            assert result_ids == [f"comment_{i}" for i in range(expected_start, expected_stop)]
             assert actual['pagination']['next'] == (
-                'http://testserver/test_path?page={}'.format(expected_next) if expected_next else None
+                f"http://testserver/test_path?page={expected_next}" if expected_next else None
             )
             assert actual['pagination']['previous'] == (
-                'http://testserver/test_path?page={}'.format(expected_prev) if expected_prev else None
+                f"http://testserver/test_path?page={expected_prev}" if expected_prev else None
             )
 
         # Only page
@@ -1437,7 +1436,7 @@ class CreateThreadTest(
 
     @mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
     def setUp(self):
-        super(CreateThreadTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.course = CourseFactory.create()
         httpretty.reset()
         httpretty.enable()
@@ -1449,7 +1448,7 @@ class CreateThreadTest(
         self.request.user = self.user
         CourseEnrollmentFactory.create(user=self.user, course_id=self.course.id)
         self.minimal_data = {
-            "course_id": six.text_type(self.course.id),
+            "course_id": str(self.course.id),
             "topic_id": "test_topic",
             "type": "discussion",
             "title": "Test Title",
@@ -1468,13 +1467,13 @@ class CreateThreadTest(
             actual = create_thread(self.request, self.minimal_data)
         expected = self.expected_thread_data({
             "id": "test_id",
-            "course_id": six.text_type(self.course.id),
+            "course_id": str(self.course.id),
             "comment_list_url": "http://testserver/api/discussion/v1/comments/?thread_id=test_id",
             "read": True,
         })
         assert actual == expected
         assert httpretty.last_request().parsed_body == {   # lint-amnesty, pylint: disable=no-member
-            'course_id': [six.text_type(self.course.id)],
+            'course_id': [str(self.course.id)],
             'commentable_id': ['test_topic'],
             'thread_type': ['discussion'],
             'title': ['Test Title'],
@@ -1532,7 +1531,7 @@ class CreateThreadTest(
         expected = self.expected_thread_data({
             "author_label": "Staff",
             "id": "test_id",
-            "course_id": six.text_type(self.course.id),
+            "course_id": str(self.course.id),
             "comment_list_url": "http://testserver/api/discussion/v1/comments/?thread_id=test_id",
             "read": True,
         })
@@ -1540,7 +1539,7 @@ class CreateThreadTest(
         self.assertEqual(
             httpretty.last_request().parsed_body,   # lint-amnesty, pylint: disable=no-member
             {
-                "course_id": [six.text_type(self.course.id)],
+                "course_id": [str(self.course.id)],
                 "commentable_id": ["test_topic"],
                 "thread_type": ["discussion"],
                 "title": ["Test Title"],
@@ -1639,7 +1638,7 @@ class CreateThreadTest(
         _assign_role_to_user(user=self.user, course_id=cohort_course.id, role=role_name)
         self.register_post_thread_response({"username": self.user.username})
         data = self.minimal_data.copy()
-        data["course_id"] = six.text_type(cohort_course.id)
+        data["course_id"] = str(cohort_course.id)
         if data_group_state == "group_is_none":
             data["group_id"] = None
         elif data_group_state == "group_is_set":
@@ -1663,7 +1662,7 @@ class CreateThreadTest(
                 assert 'group_id' not in actual_post_data
         except ValidationError as ex:
             if not expected_error:
-                self.fail(u"Unexpected validation error: {}".format(ex))
+                self.fail(f"Unexpected validation error: {ex}")
 
     def test_following(self):
         self.register_post_thread_response({"id": "test_id", "username": self.user.username})
@@ -1673,7 +1672,7 @@ class CreateThreadTest(
         result = create_thread(self.request, data)
         assert result['following'] is True
         cs_request = httpretty.last_request()
-        assert urlparse(cs_request.path).path == '/api/v1/users/{}/subscriptions'.format(self.user.id)  # lint-amnesty, pylint: disable=no-member
+        assert urlparse(cs_request.path).path == f"/api/v1/users/{self.user.id}/subscriptions"  # lint-amnesty, pylint: disable=no-member
         assert cs_request.method == 'POST'
         assert cs_request.parsed_body == {'source_type': ['thread'], 'source_id': ['test_id']}  # lint-amnesty, pylint: disable=no-member
 
@@ -1723,7 +1722,7 @@ class CreateThreadTest(
 
     def test_discussions_disabled(self):
         disabled_course = _discussion_disabled_course_for(self.user)
-        self.minimal_data["course_id"] = six.text_type(disabled_course.id)
+        self.minimal_data["course_id"] = str(disabled_course.id)
         with pytest.raises(DiscussionDisabledError):
             create_thread(self.request, self.minimal_data)
 
@@ -1746,10 +1745,14 @@ class CreateCommentTest(
         MockSignalHandlerMixin
 ):
     """Tests for create_comment"""
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        cls.course = CourseFactory.create()
 
     @mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
     def setUp(self):
-        super(CreateCommentTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         httpretty.reset()
         httpretty.enable()
         self.course = CourseFactory.create()
@@ -1763,7 +1766,7 @@ class CreateCommentTest(
         self.register_get_thread_response(
             make_minimal_cs_thread({
                 "id": "test_thread",
-                "course_id": six.text_type(self.course.id),
+                "course_id": str(self.course.id),
                 "commentable_id": "test_topic",
             })
         )
@@ -1815,12 +1818,12 @@ class CreateCommentTest(
         }
         assert actual == expected
         expected_url = (
-            "/api/v1/comments/{}".format(parent_id) if parent_id else
+            f"/api/v1/comments/{parent_id}" if parent_id else
             "/api/v1/threads/test_thread/comments"
         )
         assert urlparse(httpretty.last_request().path).path == expected_url  # lint-amnesty, pylint: disable=no-member
         assert httpretty.last_request().parsed_body == {   # lint-amnesty, pylint: disable=no-member
-            'course_id': [six.text_type(self.course.id)],
+            'course_id': [str(self.course.id)],
             'body': ['Test body'],
             'user_id': [str(self.user.id)]
         }
@@ -1905,7 +1908,7 @@ class CreateCommentTest(
         self.assertEqual(
             httpretty.last_request().parsed_body,           # lint-amnesty, pylint: disable=no-member
             {
-                "course_id": [six.text_type(self.course.id)],
+                "course_id": [str(self.course.id)],
                 "body": ["Test body"],
                 "user_id": [str(self.user.id)]
             }
@@ -1960,7 +1963,7 @@ class CreateCommentTest(
         self.register_get_thread_response(
             make_minimal_cs_thread({
                 "id": "test_thread",
-                "course_id": six.text_type(self.course.id),
+                "course_id": str(self.course.id),
                 "thread_type": thread_type,
                 "user_id": str(self.user.id) if is_thread_author else str(self.user.id + 1),
             })
@@ -2031,7 +2034,7 @@ class CreateCommentTest(
         self.register_get_thread_response(
             make_minimal_cs_thread({
                 "id": "test_thread",
-                "course_id": six.text_type(disabled_course.id),
+                "course_id": str(disabled_course.id),
                 "commentable_id": "test_topic",
             })
         )
@@ -2055,7 +2058,7 @@ class CreateCommentTest(
         cohort_course, cohort = _create_course_and_cohort_with_user_role(course_is_cohorted, self.user, role_name)
         self.register_get_thread_response(make_minimal_cs_thread({
             "id": "cohort_thread",
-            "course_id": six.text_type(cohort_course.id),
+            "course_id": str(cohort_course.id),
             "group_id": (
                 None if thread_group_state == "no_group" else
                 cohort.id if thread_group_state == "match_group" else
@@ -2097,12 +2100,12 @@ class UpdateThreadTest(
     """Tests for update_thread"""
     @classmethod
     def setUpClass(cls):
-        super(UpdateThreadTest, cls).setUpClass()
+        super().setUpClass()
         cls.course = CourseFactory.create()
 
     @mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
     def setUp(self):
-        super(UpdateThreadTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         httpretty.reset()
         httpretty.enable()
         self.addCleanup(httpretty.reset)
@@ -2122,7 +2125,7 @@ class UpdateThreadTest(
         """
         cs_data = make_minimal_cs_thread({
             "id": "test_thread",
-            "course_id": six.text_type(self.course.id),
+            "course_id": str(self.course.id),
             "commentable_id": "original_topic",
             "username": self.user.username,
             "user_id": str(self.user.id),
@@ -2156,7 +2159,7 @@ class UpdateThreadTest(
             'title': 'Original Title'
         })
         assert httpretty.last_request().parsed_body == {  # lint-amnesty, pylint: disable=no-member
-            'course_id': [six.text_type(self.course.id)],
+            'course_id': [str(self.course.id)],
             'commentable_id': ['original_topic'],
             'thread_type': ['discussion'],
             'title': ['Original Title'],
@@ -2187,7 +2190,7 @@ class UpdateThreadTest(
 
     def test_discussions_disabled(self):
         disabled_course = _discussion_disabled_course_for(self.user)
-        self.register_thread(overrides={"course_id": six.text_type(disabled_course.id)})
+        self.register_thread(overrides={"course_id": str(disabled_course.id)})
         with pytest.raises(DiscussionDisabledError):
             update_thread(self.request, "test_thread", {})
 
@@ -2207,7 +2210,7 @@ class UpdateThreadTest(
     def test_group_access(self, role_name, course_is_cohorted, thread_group_state):
         cohort_course, cohort = _create_course_and_cohort_with_user_role(course_is_cohorted, self.user, role_name)
         self.register_thread({
-            "course_id": six.text_type(cohort_course.id),
+            "course_id": str(cohort_course.id),
             "group_id": (
                 None if thread_group_state == "no_group" else
                 cohort.id if thread_group_state == "match_group" else
@@ -2264,7 +2267,7 @@ class UpdateThreadTest(
         result = update_thread(self.request, "test_thread", data)
         assert result['following'] == new_following
         last_request_path = urlparse(httpretty.last_request().path).path  # lint-amnesty, pylint: disable=no-member
-        subscription_url = "/api/v1/users/{}/subscriptions".format(self.user.id)
+        subscription_url = f"/api/v1/users/{self.user.id}/subscriptions"
         if old_following == new_following:
             assert last_request_path != subscription_url
         else:
@@ -2450,12 +2453,12 @@ class UpdateCommentTest(
 
     @classmethod
     def setUpClass(cls):
-        super(UpdateCommentTest, cls).setUpClass()
+        super().setUpClass()
         cls.course = CourseFactory.create()
 
     @mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
     def setUp(self):
-        super(UpdateCommentTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
 
         httpretty.reset()
         httpretty.enable()
@@ -2479,7 +2482,7 @@ class UpdateCommentTest(
 
         cs_thread_data = make_minimal_cs_thread({
             "id": "test_thread",
-            "course_id": six.text_type(course.id)
+            "course_id": str(course.id)
         })
         cs_thread_data.update(thread_overrides or {})
         self.register_get_thread_response(cs_thread_data)
@@ -2533,7 +2536,7 @@ class UpdateCommentTest(
         assert actual == expected
         assert httpretty.last_request().parsed_body == {  # lint-amnesty, pylint: disable=no-member
             'body': ['Edited body'],
-            'course_id': [six.text_type(self.course.id)],
+            'course_id': [str(self.course.id)],
             'user_id': [str(self.user.id)],
             'anonymous': ['False'],
             'anonymous_to_peers': ['False'],
@@ -2581,7 +2584,7 @@ class UpdateCommentTest(
             {"thread_id": "test_thread"},
             thread_overrides={
                 "id": "test_thread",
-                "course_id": six.text_type(cohort_course.id),
+                "course_id": str(cohort_course.id),
                 "group_id": (
                     None if thread_group_state == "no_group" else
                     cohort.id if thread_group_state == "match_group" else
@@ -2827,12 +2830,12 @@ class DeleteThreadTest(
     """Tests for delete_thread"""
     @classmethod
     def setUpClass(cls):
-        super(DeleteThreadTest, cls).setUpClass()
+        super().setUpClass()
         cls.course = CourseFactory.create()
 
     @mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
     def setUp(self):
-        super(DeleteThreadTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         httpretty.reset()
         httpretty.enable()
         self.addCleanup(httpretty.reset)
@@ -2852,7 +2855,7 @@ class DeleteThreadTest(
         """
         cs_data = make_minimal_cs_thread({
             "id": self.thread_id,
-            "course_id": six.text_type(self.course.id),
+            "course_id": str(self.course.id),
             "user_id": str(self.user.id),
         })
         cs_data.update(overrides or {})
@@ -2863,7 +2866,7 @@ class DeleteThreadTest(
         self.register_thread()
         with self.assert_signal_sent(api, 'thread_deleted', sender=None, user=self.user, exclude_args=('post',)):
             assert delete_thread(self.request, self.thread_id) is None
-        assert urlparse(httpretty.last_request().path).path == '/api/v1/threads/{}'.format(self.thread_id)  # lint-amnesty, pylint: disable=no-member
+        assert urlparse(httpretty.last_request().path).path == f"/api/v1/threads/{self.thread_id}"  # lint-amnesty, pylint: disable=no-member
         assert httpretty.last_request().method == 'DELETE'
 
     def test_thread_id_not_found(self):
@@ -2884,7 +2887,7 @@ class DeleteThreadTest(
 
     def test_discussions_disabled(self):
         disabled_course = _discussion_disabled_course_for(self.user)
-        self.register_thread(overrides={"course_id": six.text_type(disabled_course.id)})
+        self.register_thread(overrides={"course_id": str(disabled_course.id)})
         with pytest.raises(DiscussionDisabledError):
             delete_thread(self.request, self.thread_id)
 
@@ -2928,7 +2931,7 @@ class DeleteThreadTest(
         """
         cohort_course, cohort = _create_course_and_cohort_with_user_role(course_is_cohorted, self.user, role_name)
         self.register_thread({
-            "course_id": six.text_type(cohort_course.id),
+            "course_id": str(cohort_course.id),
             "group_id": (
                 None if thread_group_state == "no_group" else
                 cohort.id if thread_group_state == "match_group" else
@@ -2960,12 +2963,12 @@ class DeleteCommentTest(
     """Tests for delete_comment"""
     @classmethod
     def setUpClass(cls):
-        super(DeleteCommentTest, cls).setUpClass()
+        super().setUpClass()
         cls.course = CourseFactory.create()
 
     @mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
     def setUp(self):
-        super(DeleteCommentTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         httpretty.reset()
         httpretty.enable()
         self.addCleanup(httpretty.reset)
@@ -2986,7 +2989,7 @@ class DeleteCommentTest(
         """
         cs_thread_data = make_minimal_cs_thread({
             "id": self.thread_id,
-            "course_id": six.text_type(self.course.id)
+            "course_id": str(self.course.id)
         })
         cs_thread_data.update(thread_overrides or {})
         self.register_get_thread_response(cs_thread_data)
@@ -3005,7 +3008,7 @@ class DeleteCommentTest(
         self.register_comment_and_thread()
         with self.assert_signal_sent(api, 'comment_deleted', sender=None, user=self.user, exclude_args=('post',)):
             assert delete_comment(self.request, self.comment_id) is None
-        assert urlparse(httpretty.last_request().path).path == '/api/v1/comments/{}'.format(self.comment_id)  # lint-amnesty, pylint: disable=no-member
+        assert urlparse(httpretty.last_request().path).path == f"/api/v1/comments/{self.comment_id}"  # lint-amnesty, pylint: disable=no-member
         assert httpretty.last_request().method == 'DELETE'
 
     def test_comment_id_not_found(self):
@@ -3029,8 +3032,8 @@ class DeleteCommentTest(
     def test_discussions_disabled(self):
         disabled_course = _discussion_disabled_course_for(self.user)
         self.register_comment_and_thread(
-            thread_overrides={"course_id": six.text_type(disabled_course.id)},
-            overrides={"course_id": six.text_type(disabled_course.id)}
+            thread_overrides={"course_id": str(disabled_course.id)},
+            overrides={"course_id": str(disabled_course.id)}
         )
         with pytest.raises(DiscussionDisabledError):
             delete_comment(self.request, self.comment_id)
@@ -3079,7 +3082,7 @@ class DeleteCommentTest(
         self.register_comment_and_thread(
             overrides={"thread_id": "test_thread"},
             thread_overrides={
-                "course_id": six.text_type(cohort_course.id),
+                "course_id": str(cohort_course.id),
                 "group_id": (
                     None if thread_group_state == "no_group" else
                     cohort.id if thread_group_state == "match_group" else
@@ -3110,12 +3113,12 @@ class RetrieveThreadTest(
     """Tests for get_thread"""
     @classmethod
     def setUpClass(cls):
-        super(RetrieveThreadTest, cls).setUpClass()
+        super().setUpClass()
         cls.course = CourseFactory.create()
 
     @mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
     def setUp(self):
-        super(RetrieveThreadTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         httpretty.reset()
         httpretty.enable()
         self.addCleanup(httpretty.reset)
@@ -3135,7 +3138,7 @@ class RetrieveThreadTest(
         """
         cs_data = make_minimal_cs_thread({
             "id": self.thread_id,
-            "course_id": six.text_type(self.course.id),
+            "course_id": str(self.course.id),
             "commentable_id": "test_topic",
             "username": self.user.username,
             "user_id": str(self.user.id),
@@ -3202,7 +3205,7 @@ class RetrieveThreadTest(
         """
         cohort_course, cohort = _create_course_and_cohort_with_user_role(course_is_cohorted, self.user, role_name)
         self.register_thread({
-            "course_id": six.text_type(cohort_course.id),
+            "course_id": str(cohort_course.id),
             "group_id": (
                 None if thread_group_state == "no_group" else
                 cohort.id if thread_group_state == "match_group" else

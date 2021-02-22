@@ -1,6 +1,4 @@
 """Views for discussion forums."""
-
-
 import functools
 import json
 import logging
@@ -18,10 +16,10 @@ from django.views.decorators import csrf
 from django.views.decorators.clickjacking import xframe_options_exempt
 from django.views.decorators.http import require_GET, require_POST
 from opaque_keys.edx.keys import CourseKey
-from six import text_type
 
 import lms.djangoapps.discussion.django_comment_client.settings as cc_settings
 import openedx.core.djangoapps.django_comment_common.comment_client as cc
+from common.djangoapps.util.file import store_uploaded_file
 from lms.djangoapps.courseware.access import has_access
 from lms.djangoapps.courseware.courses import get_course_by_id, get_course_overview_with_access, get_course_with_access
 from lms.djangoapps.courseware.exceptions import CourseAccessRedirect
@@ -57,7 +55,6 @@ from openedx.core.djangoapps.django_comment_common.signals import (
     thread_voted
 )
 from openedx.core.djangoapps.django_comment_common.utils import ThreadContext
-from common.djangoapps.util.file import store_uploaded_file
 
 log = logging.getLogger(__name__)
 
@@ -237,7 +234,7 @@ def create_thread(request, course_id, commentable_id):
     Given a course and commentable ID, create the thread
     """
 
-    log.debug(u"Creating new thread in %r, id %r", course_id, commentable_id)
+    log.debug("Creating new thread in %r, id %r", course_id, commentable_id)
     course_key = CourseKey.from_string(course_id)
     course = get_course_with_access(request.user, 'load', course_key)
     post = request.POST
@@ -262,7 +259,7 @@ def create_thread(request, course_id, commentable_id):
         'anonymous': anonymous,
         'anonymous_to_peers': anonymous_to_peers,
         'commentable_id': commentable_id,
-        'course_id': text_type(course_key),
+        'course_id': str(course_key),
         'user_id': user.id,
         'thread_type': post["thread_type"],
         'body': post["body"],
@@ -380,7 +377,7 @@ def _create_comment(request, course_key, thread_id=None, parent_id=None):
         anonymous=anonymous,
         anonymous_to_peers=anonymous_to_peers,
         user_id=user.id,
-        course_id=text_type(course_key),
+        course_id=str(course_key),
         thread_id=thread_id,
         parent_id=parent_id,
         body=post["body"]
@@ -771,10 +768,10 @@ def upload(request, course_id):  # ajax upload file to a question or answer  # l
         )
 
     except exceptions.PermissionDenied as err:
-        error = six.text_type(err)
+        error = str(err)
     except Exception as err:      # pylint: disable=broad-except
         print(err)
-        logging.critical(six.text_type(err))
+        logging.critical(str(err))
         error = _('Error uploading file. Please contact the site administrator. Thank you.')
 
     if error == '':

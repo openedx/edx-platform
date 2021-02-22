@@ -5,7 +5,7 @@ from openedx.core.djangoapps.django_comment_common.models import Permission, Rol
 
 
 class RoleFactory(DjangoModelFactory):  # lint-amnesty, pylint: disable=missing-class-docstring
-    class Meta(object):
+    class Meta:
         model = Role
 
     name = 'Student'
@@ -13,7 +13,7 @@ class RoleFactory(DjangoModelFactory):  # lint-amnesty, pylint: disable=missing-
 
 
 class PermissionFactory(DjangoModelFactory):
-    class Meta(object):
+    class Meta:
         model = Permission
 
     name = 'create_comment'
