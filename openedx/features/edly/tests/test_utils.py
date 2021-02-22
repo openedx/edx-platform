@@ -73,6 +73,7 @@ def mock_render_to_string(template_name, context):
         ]
     }
 )
+@ddt.ddt
 class UtilsTests(SharedModuleStoreTestCase):
     """
     Tests for utility methods.
