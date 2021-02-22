@@ -45,8 +45,8 @@ class UserSiteSerializerTests(TestCase):
             },
             'SITE_NAME': self.edly_sub_org_of_user.lms_site.domain,
             'course_org_filter': self.edly_sub_org_of_user.edx_organization.short_name,
-            'contact_email':'fake@example.com',
-            'MKTG_URLS':{
+            'contact_email': 'fake@example.com',
+            'MKTG_URLS': {
                 'ROOT': 'fake-root-url',
                 'TOS': '/tos',
                 'HONOR': '/honor',

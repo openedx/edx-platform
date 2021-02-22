@@ -418,6 +418,7 @@ def get_marketing_link(marketing_urls, name):
         LOGGER.warning("Cannot find corresponding link for name: %s", name)
         return ''
 
+
 def is_course_org_same_as_site_org(site, course_id):
     """
     Check if the course organization matches with the site organization.
