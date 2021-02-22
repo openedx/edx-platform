@@ -13,7 +13,6 @@ from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imp
 from django.test import TestCase
 from django.urls import reverse
 
-from openedx.core.djangolib.testing.utils import skip_unless_lms
 from common.djangoapps.student.models import (
     _get_all_retired_emails_by_email,
     _get_all_retired_usernames_by_username,
@@ -25,6 +24,7 @@ from common.djangoapps.student.models import (
     is_username_retired
 )
 from common.djangoapps.student.tests.factories import UserFactory
+from openedx.core.djangolib.testing.utils import skip_unless_lms
 
 # Tell pytest it's ok to user the Django db
 pytestmark = pytest.mark.django_db
@@ -270,7 +270,7 @@ class TestRegisterRetiredUsername(TestCase):
     INVALID_ERR_MSG = ('It looks like', 'belongs to an existing account. Try again with a different username.')
 
     def setUp(self):
-        super(TestRegisterRetiredUsername, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.url = reverse('user_api_registration')
         self.url_params = {
             'username': 'username',

@@ -1,10 +1,10 @@
 """ Test the change_enrollment command line script."""
 
 
+from unittest.mock import patch
+
 import ddt
 from django.core.management import call_command
-from mock import patch
-from six import text_type
 
 from common.djangoapps.course_modes.tests.factories import CourseModeFactory
 from common.djangoapps.student.models import CourseEnrollment
@@ -17,7 +17,7 @@ from xmodule.modulestore.tests.factories import CourseFactory
 class ChangeEnrollmentTests(SharedModuleStoreTestCase):
     """ Test the enrollment change functionality of the change_enrollment script."""
     def setUp(self):
-        super(ChangeEnrollmentTests, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.course = CourseFactory.create()
         self.audit_mode = CourseModeFactory.create(
             course_id=self.course.id,
@@ -63,7 +63,7 @@ class ChangeEnrollmentTests(SharedModuleStoreTestCase):
         # Hack around call_command bugs dealing with required options see:
         # https://stackoverflow.com/questions/32036562/call-command-argument-is-required
         command_args = '--course {course} --to honor --from audit --{method} {user_str}{noop}'.format(
-            course=text_type(self.course.id),
+            course=str(self.course.id),
             noop=noop,
             method=method,
             user_str=user_str
@@ -96,7 +96,7 @@ class ChangeEnrollmentTests(SharedModuleStoreTestCase):
         assert len(CourseEnrollment.objects.filter(mode='honor', user_id__in=real_user_ids)) == 0
 
         command_args = '--course {course} --to honor --from audit --{method} {user_str}'.format(
-            course=text_type(self.course.id),
+            course=str(self.course.id),
             method=method,
             user_str=user_str
         )

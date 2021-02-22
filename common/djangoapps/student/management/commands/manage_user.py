@@ -5,14 +5,14 @@ Django users, set/unset permission bits, and associate groups by name.
 
 
 from django.contrib.auth import get_user_model
-from django.contrib.auth.hashers import is_password_usable, identify_hasher
+from django.contrib.auth.hashers import identify_hasher, is_password_usable
 from django.contrib.auth.models import Group
 from django.core.management.base import BaseCommand, CommandError
 from django.db import transaction
 from django.utils.translation import gettext as _
 
-from openedx.core.djangoapps.user_authn.utils import generate_password
 from common.djangoapps.student.models import UserProfile
+from openedx.core.djangoapps.user_authn.utils import generate_password
 
 
 def is_valid_django_hash(encoded):
@@ -100,7 +100,7 @@ class Command(BaseCommand):  # lint-amnesty, pylint: disable=missing-class-docst
         if created:
             if initial_password_hash:
                 if not (is_password_usable(initial_password_hash) and is_valid_django_hash(initial_password_hash)):
-                    raise CommandError('The password hash provided for user {} is invalid.'.format(username))
+                    raise CommandError(f'The password hash provided for user {username} is invalid.')
                 user.password = initial_password_hash
             else:
                 # Set the password to a random, unknown, but usable password

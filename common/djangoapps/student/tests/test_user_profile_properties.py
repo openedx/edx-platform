@@ -2,14 +2,15 @@
 
 
 import datetime
-import pytest
+
 import ddt
+import pytest
 from django.core.cache import cache
 from django.core.exceptions import ValidationError
 
-from openedx.core.djangolib.testing.utils import CacheIsolationTestCase
 from common.djangoapps.student.models import UserProfile
 from common.djangoapps.student.tests.factories import UserFactory
+from openedx.core.djangolib.testing.utils import CacheIsolationTestCase
 
 
 @ddt.ddt
@@ -21,7 +22,7 @@ class UserProfilePropertiesTest(CacheIsolationTestCase):
     ENABLED_CACHES = ['default']
 
     def setUp(self):
-        super(UserProfilePropertiesTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.user = UserFactory.create(password=self.password)
         self.profile = self.user.profile
 

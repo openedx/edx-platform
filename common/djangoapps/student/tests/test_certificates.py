@@ -3,21 +3,22 @@
 
 import datetime
 import unittest
+from unittest.mock import patch
 
 import ddt
 from django.conf import settings
 from django.test.utils import override_settings
 from django.urls import reverse
-from mock import patch
 from pytz import UTC
 
 from common.djangoapps.course_modes.models import CourseMode
+from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
 from lms.djangoapps.certificates.api import get_certificate_url
 from lms.djangoapps.certificates.models import CertificateStatuses
 from lms.djangoapps.certificates.tests.factories import (
-    GeneratedCertificateFactory, LinkedInAddToProfileConfigurationFactory
+    GeneratedCertificateFactory,
+    LinkedInAddToProfileConfigurationFactory
 )
-from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
@@ -37,7 +38,7 @@ class CertificateDisplayTestBase(SharedModuleStoreTestCase):
 
     @classmethod
     def setUpClass(cls):
-        super(CertificateDisplayTestBase, cls).setUpClass()
+        super().setUpClass()
         cls.course = CourseFactory()
         cls.course.certificates_display_behavior = "early_with_info"
 
@@ -45,7 +46,7 @@ class CertificateDisplayTestBase(SharedModuleStoreTestCase):
             cls.store.update_item(cls.course, cls.USERNAME)
 
     def setUp(self):
-        super(CertificateDisplayTestBase, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.user = UserFactory.create(username=self.USERNAME, password=self.PASSWORD)
         result = self.client.login(username=self.USERNAME, password=self.PASSWORD)
         assert result, 'Could not log in'
@@ -56,9 +57,9 @@ class CertificateDisplayTestBase(SharedModuleStoreTestCase):
         """
         response = self.client.get(reverse('dashboard'))
         if is_visible:
-            self.assertContains(response, u'Add Certificate to LinkedIn Profile')
+            self.assertContains(response, 'Add Certificate to LinkedIn Profile')
         else:
-            self.assertNotContains(response, u'Add Certificate to LinkedIn Profile')
+            self.assertNotContains(response, 'Add Certificate to LinkedIn Profile')
 
     def _create_certificate(self, enrollment_mode, download_url=DOWNLOAD_URL):
         """Simulate that the user has a generated certificate. """
@@ -80,7 +81,7 @@ class CertificateDisplayTestBase(SharedModuleStoreTestCase):
         Inspect the dashboard to see if a certificate can be downloaded.
         """
         response = self.client.get(reverse('dashboard'))
-        self.assertContains(response, u'Download Your ID Verified')
+        self.assertContains(response, 'Download Your ID Verified')
         self.assertContains(response, self.DOWNLOAD_URL)
 
     def _check_can_download_certificate_no_id(self):
@@ -89,8 +90,8 @@ class CertificateDisplayTestBase(SharedModuleStoreTestCase):
         is present
         """
         response = self.client.get(reverse('dashboard'))
-        self.assertContains(response, u'Download')
-        self.assertContains(response, u'(PDF)')
+        self.assertContains(response, 'Download')
+        self.assertContains(response, '(PDF)')
         self.assertContains(response, self.DOWNLOAD_URL)
 
     def _check_can_not_download_certificate(self):
@@ -98,9 +99,9 @@ class CertificateDisplayTestBase(SharedModuleStoreTestCase):
         Make sure response does not have any of the download certificate buttons
         """
         response = self.client.get(reverse('dashboard'))
-        self.assertNotContains(response, u'View Test_Certificate')
-        self.assertNotContains(response, u'Download Your Test_Certificate (PDF)')
-        self.assertNotContains(response, u'Download Test_Certificate (PDF)')
+        self.assertNotContains(response, 'View Test_Certificate')
+        self.assertNotContains(response, 'Download Your Test_Certificate (PDF)')
+        self.assertNotContains(response, 'Download Test_Certificate (PDF)')
         self.assertNotContains(response, self.DOWNLOAD_URL)
 
 
@@ -115,7 +116,7 @@ class CertificateDashboardMessageDisplayTest(CertificateDisplayTestBase):
 
     @classmethod
     def setUpClass(cls):
-        super(CertificateDashboardMessageDisplayTest, cls).setUpClass()
+        super().setUpClass()
         cls.course.certificates_display_behavior = "end"
         cls.course.save()
         cls.store.update_item(cls.course, cls.USERNAME)
@@ -124,11 +125,11 @@ class CertificateDashboardMessageDisplayTest(CertificateDisplayTestBase):
         response = self.client.get(reverse('dashboard'))
 
         if certificate_available_date is None:
-            self.assertNotContains(response, u"Your certificate will be available on")
-            self.assertNotContains(response, u"View Test_Certificate")
+            self.assertNotContains(response, "Your certificate will be available on")
+            self.assertNotContains(response, "View Test_Certificate")
         elif datetime.datetime.now(UTC) < certificate_available_date:
-            self.assertContains(response, u"Your certificate will be available on")
-            self.assertNotContains(response, u"View Test_Certificate")
+            self.assertContains(response, "Your certificate will be available on")
+            self.assertNotContains(response, "View Test_Certificate")
         else:
             self._check_can_download_certificate()
 
@@ -188,7 +189,7 @@ class CertificateDisplayTest(CertificateDisplayTestBase):
         response = self.client.get(reverse('dashboard'))
         self.assertContains(
             response,
-            u'do not have a current verified identity with {platform_name}'
+            'do not have a current verified identity with {platform_name}'
             .format(platform_name=settings.PLATFORM_NAME))
 
     def test_post_to_linkedin_visibility(self):
@@ -218,7 +219,7 @@ class CertificateDisplayTestHtmlView(CertificateDisplayTestBase):
 
     @classmethod
     def setUpClass(cls):
-        super(CertificateDisplayTestHtmlView, cls).setUpClass()
+        super().setUpClass()
         cls.course.cert_html_view_enabled = True
         cls.course.save()
         cls.store.update_item(cls.course, cls.USERNAME)
@@ -246,7 +247,7 @@ class CertificateDisplayTestLinkedHtmlView(CertificateDisplayTestBase):
 
     @classmethod
     def setUpClass(cls):
-        super(CertificateDisplayTestLinkedHtmlView, cls).setUpClass()
+        super().setUpClass()
         cls.course.cert_html_view_enabled = True
 
         certificates = [
@@ -274,5 +275,5 @@ class CertificateDisplayTestLinkedHtmlView(CertificateDisplayTestBase):
 
         response = self.client.get(reverse('dashboard'))
 
-        self.assertContains(response, u'View Test_Certificate')
+        self.assertContains(response, 'View Test_Certificate')
         self.assertContains(response, test_url)

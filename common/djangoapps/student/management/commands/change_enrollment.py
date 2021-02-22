@@ -7,10 +7,9 @@ from django.core.management.base import BaseCommand, CommandError
 from django.db import transaction
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
-from six import text_type
 
-from openedx.core.djangoapps.credit.email_utils import get_credit_provider_attribute_values
 from common.djangoapps.student.models import CourseEnrollment, CourseEnrollmentAttribute, User
+from openedx.core.djangoapps.credit.email_utils import get_credit_provider_attribute_values
 
 logger = logging.getLogger(__name__)  # pylint: disable=invalid-name
 
@@ -155,4 +154,4 @@ class Command(BaseCommand):  # lint-amnesty, pylint: disable=missing-class-docst
         if len(error_users) > 0:
             logger.info('The following %i user(s) not saved:', len(error_users))
             for user, error in error_users:
-                logger.info('user: [%s] reason: [%s] %s', user, type(error).__name__, text_type(error))
+                logger.info('user: [%s] reason: [%s] %s', user, type(error).__name__, str(error))

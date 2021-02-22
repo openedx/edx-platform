@@ -5,19 +5,21 @@ by reversing group name formats.
 
 
 import unittest
+from unittest import mock
 
-import mock
-import six
 from django.conf import settings
 from django.test.client import Client
 from milestones.tests.utils import MilestonesTestCaseMixin
 
-from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
-from common.djangoapps.student.models import CourseEnrollment, DashboardConfiguration  # lint-amnesty, pylint: disable=unused-import
+from common.djangoapps.student.models import (  # lint-amnesty, pylint: disable=unused-import
+    CourseEnrollment,
+    DashboardConfiguration
+)
 from common.djangoapps.student.roles import GlobalStaff
 from common.djangoapps.student.tests.factories import UserFactory
 from common.djangoapps.student.views import get_course_enrollments
 from common.djangoapps.util.milestones_helpers import get_pre_requisite_courses_not_completed, set_prerequisite_courses
+from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from xmodule.error_module import ErrorBlock
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
@@ -35,7 +37,7 @@ class TestCourseListing(ModuleStoreTestCase, MilestonesTestCaseMixin):
         """
         Add a student & teacher
         """
-        super(TestCourseListing, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
 
         self.student = UserFactory()
         self.teacher = UserFactory()
@@ -65,7 +67,7 @@ class TestCourseListing(ModuleStoreTestCase, MilestonesTestCaseMixin):
         Reverse the setup
         """
         self.client.logout()
-        super(TestCourseListing, self).tearDown()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().tearDown()
 
     @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
     def test_get_course_list(self):
@@ -153,8 +155,8 @@ class TestCourseListing(ModuleStoreTestCase, MilestonesTestCaseMixin):
         self._create_course_with_access_groups(pre_requisite_course_location2)
         # create a course with pre_requisite_courses
         pre_requisite_courses = [
-            six.text_type(pre_requisite_course_location),
-            six.text_type(pre_requisite_course_location2),
+            str(pre_requisite_course_location),
+            str(pre_requisite_course_location2),
         ]
         course_location = self.store.make_course_key('Org1', 'Course1', 'Run1')
         self._create_course_with_access_groups(course_location, {

@@ -2,17 +2,16 @@
 
 
 from datetime import datetime, timedelta
-import pytest
 
+import pytest
 from django.core.management import call_command
 from opaque_keys import InvalidKeyError
-from six import text_type
 from testfixtures import LogCapture
 
 from common.djangoapps.course_modes.tests.factories import CourseMode
-from openedx.core.djangoapps.credit.models import CreditCourse, CreditEligibility
 from common.djangoapps.student.models import CourseEnrollment, User
 from common.djangoapps.student.tests.factories import UserFactory
+from openedx.core.djangoapps.credit.models import CreditCourse, CreditEligibility
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
@@ -25,7 +24,7 @@ class ChangeEligibilityDeadlineTests(SharedModuleStoreTestCase):
 
     def setUp(self):
         """ Initial set up for tests """
-        super(ChangeEligibilityDeadlineTests, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.course = CourseFactory.create()
 
         self.enrolled_user = UserFactory.create(username='amy', email='amy@pond.com', password='password')
@@ -41,7 +40,7 @@ class ChangeEligibilityDeadlineTests(SharedModuleStoreTestCase):
 
     def test_invalid_command_arguments(self):
         """ Test command with invalid arguments """
-        course_id_str = text_type(self.course.id)
+        course_id_str = str(self.course.id)
         username = self.enrolled_user.username
 
         # Incorrect username
@@ -79,7 +78,7 @@ class ChangeEligibilityDeadlineTests(SharedModuleStoreTestCase):
         default value which is one month from today. It then continues to run the code
         to change eligibility deadline.
         """
-        course_key = text_type(self.course.id)
+        course_key = str(self.course.id)
         username = self.enrolled_user.username
 
         # Test Date set prior to today
@@ -90,12 +89,12 @@ class ChangeEligibilityDeadlineTests(SharedModuleStoreTestCase):
             )
             logger.check(
                 (LOGGER_NAME, 'WARNING', 'Invalid date or date not provided. Setting deadline to one month from now'),
-                (LOGGER_NAME, 'INFO', 'Successfully updated credit eligibility deadline for {}'.format(username))
+                (LOGGER_NAME, 'INFO', f'Successfully updated credit eligibility deadline for {username}')
             )
 
     def test_valid_command_arguments(self):
         """ Test command with valid arguments """
-        course_key = text_type(self.course.id)
+        course_key = str(self.course.id)
         username = self.enrolled_user.username
         new_deadline = datetime.utcnow() + timedelta(days=30)
 

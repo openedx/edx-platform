@@ -11,11 +11,11 @@ import unittest
 from django.conf import settings
 from django.urls import reverse
 
+from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
 # This import is for an lms djangoapp.
 # Its testcases are only run under lms.
 from lms.djangoapps.bulk_email.api import is_bulk_email_feature_enabled
 from lms.djangoapps.bulk_email.models import BulkEmailFlag, CourseAuthorization
-from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
@@ -27,11 +27,11 @@ class TestStudentDashboardEmailView(SharedModuleStoreTestCase):
     """
     @classmethod
     def setUpClass(cls):
-        super(TestStudentDashboardEmailView, cls).setUpClass()
+        super().setUpClass()
         cls.course = CourseFactory.create()
 
     def setUp(self):
-        super(TestStudentDashboardEmailView, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
 
         # Create student account
         student = UserFactory.create()
@@ -51,7 +51,7 @@ class TestStudentDashboardEmailView(SharedModuleStoreTestCase):
         )
 
     def tearDown(self):
-        super(TestStudentDashboardEmailView, self).tearDown()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().tearDown()
         BulkEmailFlag.objects.all().delete()
 
     def test_email_flag_true(self):

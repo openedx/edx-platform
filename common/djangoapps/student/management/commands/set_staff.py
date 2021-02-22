@@ -4,7 +4,6 @@ import re
 
 from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.core.management.base import BaseCommand
-from six import text_type
 
 
 class Command(BaseCommand):  # lint-amnesty, pylint: disable=missing-class-docstring
@@ -39,10 +38,10 @@ class Command(BaseCommand):  # lint-amnesty, pylint: disable=missing-class-docst
                     v.is_staff = True
 
                 v.save()
-                print('Modified {} sucessfully.'.format(user))
+                print(f'Modified {user} sucessfully.')
 
             except Exception as err:  # pylint: disable=broad-except
                 print("Error modifying user with identifier {}: {}: {}".format(user, type(err).__name__,
-                                                                               text_type(err)))
+                                                                               str(err)))
 
         print('Complete!')

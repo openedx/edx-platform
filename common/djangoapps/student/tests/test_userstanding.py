@@ -18,7 +18,7 @@ class UserStandingTest(TestCase):
     """test suite for user standing view for enabling and disabling accounts"""
 
     def setUp(self):
-        super(UserStandingTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         # create users
         self.bad_user = UserFactory.create(
             username='bad_user',

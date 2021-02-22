@@ -4,25 +4,22 @@ Python APIs exposed by the student app to other in-process apps.
 """
 
 
-from django.contrib.auth import get_user_model
 from django.conf import settings
+from django.contrib.auth import get_user_model
 
+from common.djangoapps.student.models_api import ALLOWEDTOENROLL_TO_ENROLLED as _ALLOWEDTOENROLL_TO_ENROLLED
+from common.djangoapps.student.models_api import ALLOWEDTOENROLL_TO_UNENROLLED as _ALLOWEDTOENROLL_TO_UNENROLLED
+from common.djangoapps.student.models_api import DEFAULT_TRANSITION_STATE as _DEFAULT_TRANSITION_STATE
+from common.djangoapps.student.models_api import ENROLLED_TO_ENROLLED as _ENROLLED_TO_ENROLLED
+from common.djangoapps.student.models_api import ENROLLED_TO_UNENROLLED as _ENROLLED_TO_UNENROLLED
+from common.djangoapps.student.models_api import UNENROLLED_TO_ALLOWEDTOENROLL as _UNENROLLED_TO_ALLOWEDTOENROLL
+from common.djangoapps.student.models_api import UNENROLLED_TO_ENROLLED as _UNENROLLED_TO_ENROLLED
+from common.djangoapps.student.models_api import UNENROLLED_TO_UNENROLLED as _UNENROLLED_TO_UNENROLLED
 from common.djangoapps.student.models_api import create_manual_enrollment_audit as _create_manual_enrollment_audit
 from common.djangoapps.student.models_api import get_course_access_role
 from common.djangoapps.student.models_api import get_course_enrollment as _get_course_enrollment
-from common.djangoapps.student.models_api import (
-    ENROLLED_TO_ENROLLED as _ENROLLED_TO_ENROLLED,
-    ENROLLED_TO_UNENROLLED as _ENROLLED_TO_UNENROLLED,
-    UNENROLLED_TO_ENROLLED as _UNENROLLED_TO_ENROLLED,
-    UNENROLLED_TO_UNENROLLED as _UNENROLLED_TO_UNENROLLED,
-    UNENROLLED_TO_ALLOWEDTOENROLL as _UNENROLLED_TO_ALLOWEDTOENROLL,
-    ALLOWEDTOENROLL_TO_ENROLLED as _ALLOWEDTOENROLL_TO_ENROLLED,
-    ALLOWEDTOENROLL_TO_UNENROLLED as _ALLOWEDTOENROLL_TO_UNENROLLED,
-    DEFAULT_TRANSITION_STATE as _DEFAULT_TRANSITION_STATE,
-)
 from common.djangoapps.student.roles import REGISTERED_ACCESS_ROLES as _REGISTERED_ACCESS_ROLES
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
-
 
 # This is done so that if these strings change within the app, we can keep exported constants the same
 ENROLLED_TO_ENROLLED = _ENROLLED_TO_ENROLLED
@@ -75,9 +72,9 @@ def create_manual_enrollment_audit(
     know about model level code.
     """
     if role and role not in MANUAL_ENROLLMENT_ROLE_CHOICES:
-        raise ValueError("Role `{}` not in allowed roles: `{}".format(role, MANUAL_ENROLLMENT_ROLE_CHOICES))
+        raise ValueError(f"Role `{role}` not in allowed roles: `{MANUAL_ENROLLMENT_ROLE_CHOICES}")
     if transition_state not in TRANSITION_STATES:
-        raise ValueError("State `{}` not in allow states: `{}`".format(transition_state, TRANSITION_STATES))
+        raise ValueError(f"State `{transition_state}` not in allow states: `{TRANSITION_STATES}`")
 
     User = get_user_model()
     try:

@@ -5,9 +5,8 @@ Unit tests for user_management management commands.
 
 import itertools
 
-import pytest
 import ddt
-
+import pytest
 from django.contrib.auth.hashers import make_password
 from django.contrib.auth.models import Group, User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.core.management import CommandError, call_command

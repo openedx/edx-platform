@@ -4,18 +4,16 @@ Tests for student enrollment.
 
 
 import unittest
-import pytest
+from unittest.mock import patch
 
 import ddt
-import six
+import pytest
 from django.conf import settings
 from django.urls import reverse
 from edx_toggles.toggles.testutils import override_waffle_flag
-from mock import patch
 
 from common.djangoapps.course_modes.models import CourseMode
 from common.djangoapps.course_modes.tests.factories import CourseModeFactory
-from openedx.core.djangoapps.embargo.test_utils import restrict_course
 from common.djangoapps.student.models import (
     SCORE_RECALCULATION_DELAY_ON_ENROLLMENT_UPDATE,
     CourseEnrollment,
@@ -26,6 +24,7 @@ from common.djangoapps.student.roles import CourseInstructorRole, CourseStaffRol
 from common.djangoapps.student.tests.factories import CourseEnrollmentAllowedFactory, UserFactory
 from common.djangoapps.util.testing import UrlResetMixin
 from lms.djangoapps.courseware.toggles import COURSEWARE_PROCTORING_IMPROVEMENTS
+from openedx.core.djangoapps.embargo.test_utils import restrict_course
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 
@@ -46,7 +45,7 @@ class EnrollmentTest(UrlResetMixin, SharedModuleStoreTestCase):
 
     @classmethod
     def setUpClass(cls):
-        super(EnrollmentTest, cls).setUpClass()
+        super().setUpClass()
         cls.course = CourseFactory.create()
         cls.course_limited = CourseFactory.create()
         cls.proctored_course = CourseFactory(
@@ -59,13 +58,13 @@ class EnrollmentTest(UrlResetMixin, SharedModuleStoreTestCase):
     @patch.dict(settings.FEATURES, {'EMBARGO': True})
     def setUp(self):
         """ Create a course and user, then log in. """
-        super(EnrollmentTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.user = UserFactory.create(username=self.USERNAME, email=self.EMAIL, password=self.PASSWORD)
         self.client.login(username=self.USERNAME, password=self.PASSWORD)
         self.course_limited.max_student_enrollments_allowed = 1
         self.store.update_item(self.course_limited, self.user.id)
         self.urls = [
-            reverse('course_modes_choose', kwargs={'course_id': six.text_type(self.course.id)})
+            reverse('course_modes_choose', kwargs={'course_id': str(self.course.id)})
         ]
         # Set up proctored exam
         self._create_proctored_exam(self.proctored_course)
@@ -123,7 +122,7 @@ class EnrollmentTest(UrlResetMixin, SharedModuleStoreTestCase):
         # (otherwise, use an empty string, which the JavaScript client
         # interprets as a redirect to the dashboard)
         full_url = (
-            reverse(next_url, kwargs={'course_id': six.text_type(self.course.id)})
+            reverse(next_url, kwargs={'course_id': str(self.course.id)})
             if next_url else next_url
         )
 
@@ -372,7 +371,7 @@ class EnrollmentTest(UrlResetMixin, SharedModuleStoreTestCase):
 
         """
         if course_id is None:
-            course_id = six.text_type(self.course.id)
+            course_id = str(self.course.id)
 
         params = {
             'enrollment_action': action,

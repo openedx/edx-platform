@@ -15,9 +15,9 @@ from completion.utilities import get_key_to_last_completed_block
 from django.conf import settings
 from django.contrib.auth import load_backend
 from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
-from django.core.exceptions import PermissionDenied, ObjectDoesNotExist
+from django.core.exceptions import ObjectDoesNotExist, PermissionDenied
 from django.core.validators import ValidationError
-from django.db import IntegrityError, transaction, ProgrammingError
+from django.db import IntegrityError, ProgrammingError, transaction
 from django.urls import NoReverseMatch, reverse
 from django.utils.translation import ugettext as _
 from pytz import UTC
@@ -214,7 +214,7 @@ def check_verify_status_by_course(user, course_enrollments):
                 }
 
     if recent_verification_datetime:
-        for key, value in iteritems(status_by_course):  # pylint: disable=unused-variable
+        for key, value in status_by_course.items():  # pylint: disable=unused-variable
             status_by_course[key]['verification_good_until'] = recent_verification_datetime.strftime("%m/%d/%Y")
 
     return status_by_course
@@ -270,8 +270,8 @@ def get_next_url_for_login_page(request, include_host=False):
                     redirect_to = reverse(login_redirect_url)
                 except NoReverseMatch:
                     log.warning(
-                        u'Default redirect after login doesn\'t exist: %(login_redirect_url)r. '
-                        u'Check the value set on DEFAULT_REDIRECT_AFTER_LOGIN configuration variable.',
+                        'Default redirect after login doesn\'t exist: %(login_redirect_url)r. '
+                        'Check the value set on DEFAULT_REDIRECT_AFTER_LOGIN configuration variable.',
                         {"login_redirect_url": login_redirect_url}
                     )
 
@@ -283,7 +283,7 @@ def get_next_url_for_login_page(request, include_host=False):
         elif settings.ROOT_URLCONF == 'cms.urls':
             redirect_to = reverse('home')
             scheme = "https" if settings.HTTPS == "on" else "http"
-            root_url = '{}://{}'.format(scheme, settings.CMS_BASE)
+            root_url = f'{scheme}://{settings.CMS_BASE}'
 
     if any(param in request_params for param in POST_AUTH_PARAMS):
         # Before we redirect to next/dashboard, we need to handle auto-enrollment:
@@ -351,14 +351,14 @@ def _get_redirect_to(request_host, request_headers, request_params, request_is_h
         )
         if not safe_redirect:
             log.warning(
-                u"Unsafe redirect parameter detected after login page: '%(redirect_to)s'",
+                "Unsafe redirect parameter detected after login page: '%(redirect_to)s'",
                 {"redirect_to": redirect_to}
             )
             redirect_to = None
         elif not accepts_text_html:
             log.info(
-                u"Redirect to non html content '%(content_type)s' detected from '%(user_agent)s'"
-                u" after login page: '%(redirect_to)s'",
+                "Redirect to non html content '%(content_type)s' detected from '%(user_agent)s'"
+                " after login page: '%(redirect_to)s'",
                 {
                     "redirect_to": redirect_to, "content_type": header_accept,
                     "user_agent": request_headers.get('HTTP_USER_AGENT', '')
@@ -367,13 +367,13 @@ def _get_redirect_to(request_host, request_headers, request_params, request_is_h
             redirect_to = None
         elif mime_type:
             log.warning(
-                u"Redirect to url path with specified filed type '%(mime_type)s' not allowed: '%(redirect_to)s'",
+                "Redirect to url path with specified filed type '%(mime_type)s' not allowed: '%(redirect_to)s'",
                 {"redirect_to": redirect_to, "mime_type": mime_type}
             )
             redirect_to = None
         elif settings.STATIC_URL in redirect_to:
             log.warning(
-                u"Redirect to static content detected after login page: '%(redirect_to)s'",
+                "Redirect to static content detected after login page: '%(redirect_to)s'",
                 {"redirect_to": redirect_to}
             )
             redirect_to = None
@@ -383,7 +383,7 @@ def _get_redirect_to(request_host, request_headers, request_params, request_is_h
             for theme in themes:
                 if theme.theme_dir_name in next_path:
                     log.warning(
-                        u"Redirect to theme content detected after login page: '%(redirect_to)s'",
+                        "Redirect to theme content detected after login page: '%(redirect_to)s'",
                         {"redirect_to": redirect_to}
                     )
                     redirect_to = None
@@ -421,7 +421,7 @@ def authenticate_new_user(request, username, password):
     backend = load_backend(NEW_USER_AUTH_BACKEND)
     user = backend.authenticate(request=request, username=username, password=password)
     if not user:
-        log.warning("Unable to authenticate user: {username}".format(username=username))
+        log.warning(f"Unable to authenticate user: {username}")
     user.backend = NEW_USER_AUTH_BACKEND
     return user
 
@@ -431,7 +431,7 @@ class AccountValidationError(Exception):
     Used in account creation views to raise exceptions with details about specific invalid fields
     """
     def __init__(self, message, field):
-        super(AccountValidationError, self).__init__(message)  # lint-amnesty, pylint: disable=super-with-arguments
+        super().__init__(message)
         self.field = field
 
 
@@ -548,7 +548,7 @@ def _cert_info(user, course_overview, cert_status):
                 status_dict['status'] = 'unavailable'
         elif 'download_url' not in cert_status:
             log.warning(
-                u"User %s has a downloadable cert for %s, but no download url",
+                "User %s has a downloadable cert for %s, but no download url",
                 user.username,
                 course_overview.id
             )
@@ -586,7 +586,7 @@ def _cert_info(user, course_overview, cert_status):
             if all(grade is None for grade in grades_input)
             else max(filter(lambda x: x is not None, grades_input))
         )
-        status_dict['grade'] = text_type(max_grade)
+        status_dict['grade'] = str(max_grade)
 
     return status_dict
 
@@ -678,7 +678,7 @@ def do_create_account(form, custom_form=None):
     try:
         profile.save()
     except Exception:
-        log.exception("UserProfile creation failed for user {id}.".format(id=user.id))
+        log.exception(f"UserProfile creation failed for user {user.id}.")
         raise
 
     return user, profile, registration

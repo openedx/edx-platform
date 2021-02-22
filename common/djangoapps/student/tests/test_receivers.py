@@ -1,13 +1,14 @@
 """ Tests for student signal receivers. """
 
 from edx_toggles.toggles.testutils import override_waffle_flag
+
+from common.djangoapps.student.models import CourseEnrollmentCelebration
+from common.djangoapps.student.tests.factories import CourseEnrollmentFactory
 from lms.djangoapps.courseware.toggles import (
     COURSEWARE_MICROFRONTEND_PROGRESS_MILESTONES,
     COURSEWARE_MICROFRONTEND_PROGRESS_MILESTONES_FIRST_SECTION_CELEBRATION,
     REDIRECT_TO_COURSEWARE_MICROFRONTEND
 )
-from common.djangoapps.student.models import CourseEnrollmentCelebration
-from common.djangoapps.student.tests.factories import CourseEnrollmentFactory
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 
 

@@ -8,7 +8,6 @@ import six
 from django.test import TestCase
 from opaque_keys.edx.keys import CourseKey
 
-from lms.djangoapps.courseware.tests.factories import InstructorFactory, StaffFactory, UserFactory
 from common.djangoapps.student.roles import (
     CourseBetaTesterRole,
     CourseInstructorRole,
@@ -20,6 +19,7 @@ from common.djangoapps.student.roles import (
     RoleCache
 )
 from common.djangoapps.student.tests.factories import AnonymousUserFactory
+from lms.djangoapps.courseware.tests.factories import InstructorFactory, StaffFactory, UserFactory
 
 
 class RolesTestCase(TestCase):
@@ -28,7 +28,7 @@ class RolesTestCase(TestCase):
     """
 
     def setUp(self):
-        super(RolesTestCase, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.course_key = CourseKey.from_string('edX/toy/2012_Fall')
         self.course_loc = self.course_key.make_usage_key('course', '2012_Fall')
         self.anonymous_user = AnonymousUserFactory()
@@ -156,7 +156,7 @@ class RoleCacheTestCase(TestCase):  # lint-amnesty, pylint: disable=missing-clas
     )
 
     def setUp(self):
-        super(RoleCacheTestCase, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.user = UserFactory()
 
     @ddt.data(*ROLES)
