@@ -28,7 +28,7 @@ def get_course_related_tabs(request, course):
     course_tabs = get_course_tab_list(request, course)
 
     tabs_dict = collections.OrderedDict()
-    for idx, tab in enumerate(course_tabs): # pylint: disable=unused-variable
+    for idx, tab in enumerate(course_tabs):  # pylint: disable=unused-variable
         tab_name = tab.name.lower()
         tab_link = tab.link_func(course, reverse)
 
