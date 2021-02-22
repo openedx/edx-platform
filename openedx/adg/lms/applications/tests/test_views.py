@@ -83,11 +83,6 @@ def logged_in_client_fixture(user):
     return client
 
 
-@pytest.fixture
-def mock_get_prerequisite_courses_for_user(monkeypatch):
-    monkeypatch.setattr('openedx.adg.lms.applications.views.get_prerequisite_courses_for_user', lambda x: [])
-
-
 @pytest.mark.django_db
 def test_get_redirects_without_login_for_application_hub_view():
     """
