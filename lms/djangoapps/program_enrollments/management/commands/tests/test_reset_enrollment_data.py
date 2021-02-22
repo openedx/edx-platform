@@ -12,11 +12,11 @@ from django.core.management.base import CommandError
 from django.test import TestCase
 from six import StringIO
 
+from common.djangoapps.student.models import CourseEnrollment
+from common.djangoapps.student.tests.factories import UserFactory
 from lms.djangoapps.program_enrollments.management.commands import reset_enrollment_data
 from lms.djangoapps.program_enrollments.models import ProgramCourseEnrollment, ProgramEnrollment
 from lms.djangoapps.program_enrollments.tests.factories import ProgramCourseEnrollmentFactory, ProgramEnrollmentFactory
-from common.djangoapps.student.models import CourseEnrollment
-from common.djangoapps.student.tests.factories import UserFactory
 
 
 class TestResetEnrollmentData(TestCase):
@@ -24,12 +24,12 @@ class TestResetEnrollmentData(TestCase):
 
     @classmethod
     def setUpClass(cls):
-        super(TestResetEnrollmentData, cls).setUpClass()
+        super().setUpClass()
         cls.command = reset_enrollment_data.Command()
         cls.program_uuid = uuid4()
 
     def setUp(self):
-        super(TestResetEnrollmentData, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.user = UserFactory()
 
     @contextmanager
@@ -105,6 +105,6 @@ class TestResetEnrollmentData(TestCase):
         alt_user = UserFactory()
         self._create_program_and_course_enrollment(alt_program_uuid, alt_user)
 
-        call_command(self.command, '{},{}'.format(self.program_uuid, alt_program_uuid), force=True)
+        call_command(self.command, f'{self.program_uuid},{alt_program_uuid}', force=True)
 
         self._validate_enrollments_count(0)

@@ -3,7 +3,8 @@ Test signal handlers for program_enrollments
 """
 
 
-import mock
+from unittest import mock
+
 import pytest
 from django.core.cache import cache
 from edx_django_utils.cache import RequestCache
@@ -13,6 +14,10 @@ from social_django.models import UserSocialAuth
 from testfixtures import LogCapture
 
 from common.djangoapps.course_modes.models import CourseMode
+from common.djangoapps.student.models import CourseEnrollmentException
+from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
+from common.djangoapps.third_party_auth.models import SAMLProviderConfig
+from common.djangoapps.third_party_auth.tests.factories import SAMLProviderConfigFactory
 from lms.djangoapps.program_enrollments.signals import _listen_for_lms_retire, logger
 from lms.djangoapps.program_enrollments.tests.factories import ProgramCourseEnrollmentFactory, ProgramEnrollmentFactory
 from openedx.core.djangoapps.catalog.cache import PROGRAM_CACHE_KEY_TPL
@@ -22,10 +27,6 @@ from openedx.core.djangoapps.content.course_overviews.models import CourseOvervi
 from openedx.core.djangoapps.content.course_overviews.tests.factories import CourseOverviewFactory
 from openedx.core.djangoapps.user_api.accounts.tests.retirement_helpers import fake_completed_retirement
 from openedx.core.djangolib.testing.utils import CacheIsolationTestCase
-from common.djangoapps.student.models import CourseEnrollmentException
-from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
-from common.djangoapps.third_party_auth.models import SAMLProviderConfig
-from common.djangoapps.third_party_auth.tests.factories import SAMLProviderConfigFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 
 
@@ -107,7 +108,7 @@ class SocialAuthEnrollmentCompletionSignalTest(CacheIsolationTestCase):
 
     @classmethod
     def setUpClass(cls):
-        super(SocialAuthEnrollmentCompletionSignalTest, cls).setUpClass()
+        super().setUpClass()
 
         cls.external_id = '0000'
         cls.provider_slug = 'uox'
@@ -127,7 +128,7 @@ class SocialAuthEnrollmentCompletionSignalTest(CacheIsolationTestCase):
         )
 
     def setUp(self):
-        super(SocialAuthEnrollmentCompletionSignalTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         RequestCache.clear_all_namespaces()
         catalog_org = CatalogOrganizationFactory.create(key=self.organization.short_name)
         self.program_uuid = self._create_catalog_program(catalog_org)['uuid']
@@ -181,14 +182,14 @@ class SocialAuthEnrollmentCompletionSignalTest(CacheIsolationTestCase):
 
         user_social_auth = UserSocialAuth.objects.create(
             user=self.user,
-            uid='{0}:{1}'.format(self.provider_slug, 'gobbledegook')
+            uid='{}:{}'.format(self.provider_slug, 'gobbledegook')
         )
 
         # Not yet a thing, didn't match
         program_enrollment.refresh_from_db()
         assert program_enrollment.user is None
 
-        user_social_auth.uid = '{0}:{1}'.format(self.provider_slug, self.external_id)
+        user_social_auth.uid = f'{self.provider_slug}:{self.external_id}'
         user_social_auth.save()
 
         # now we see the enrollments realized
@@ -202,7 +203,7 @@ class SocialAuthEnrollmentCompletionSignalTest(CacheIsolationTestCase):
 
         UserSocialAuth.objects.create(
             user=self.user,
-            uid='{0}:{1}'.format(self.provider_slug, self.external_id)
+            uid=f'{self.provider_slug}:{self.external_id}'
         )
 
         self._assert_program_enrollment_user(program_enrollment, self.user)
@@ -226,19 +227,19 @@ class SocialAuthEnrollmentCompletionSignalTest(CacheIsolationTestCase):
 
         UserSocialAuth.objects.create(
             user=UserFactory.create(),
-            uid='{0}:{1}'.format('not_used', self.external_id),
+            uid='{}:{}'.format('not_used', self.external_id),
         )
 
         UserSocialAuth.objects.create(
             user=self.user,
-            uid='{0}:{1}'.format(self.provider_slug, self.external_id),
+            uid=f'{self.provider_slug}:{self.external_id}',
         )
         self._assert_program_enrollment_user(uox_program_enrollment, self.user)
 
         aiu_user = UserFactory.create()
         UserSocialAuth.objects.create(
             user=aiu_user,
-            uid='{0}:{1}'.format('aiu', self.external_id),
+            uid='{}:{}'.format('aiu', self.external_id),
         )
         self._assert_program_enrollment_user(aiu_program_enrollment, aiu_user)
 
@@ -253,7 +254,7 @@ class SocialAuthEnrollmentCompletionSignalTest(CacheIsolationTestCase):
 
         UserSocialAuth.objects.create(
             user=self.user,
-            uid='{0}:{1}'.format(self.provider_slug, self.external_id)
+            uid=f'{self.provider_slug}:{self.external_id}'
         )
         program_enrollment.refresh_from_db()
         assert program_enrollment.user is None
@@ -268,7 +269,7 @@ class SocialAuthEnrollmentCompletionSignalTest(CacheIsolationTestCase):
 
         UserSocialAuth.objects.create(
             user=self.user,
-            uid='{0}:{1}'.format(self.provider_slug, self.external_id)
+            uid=f'{self.provider_slug}:{self.external_id}'
         )
 
         self._assert_program_enrollment_user(program_enrollment, self.user)
@@ -286,7 +287,7 @@ class SocialAuthEnrollmentCompletionSignalTest(CacheIsolationTestCase):
 
         UserSocialAuth.objects.create(
             user=self.user,
-            uid='{0}:{1}'.format(self.provider_slug, self.external_id)
+            uid=f'{self.provider_slug}:{self.external_id}'
         )
 
         self._assert_program_enrollment_user(program_enrollment, self.user)
@@ -297,7 +298,7 @@ class SocialAuthEnrollmentCompletionSignalTest(CacheIsolationTestCase):
         """
         UserSocialAuth.objects.create(
             user=self.user,
-            uid='{0}:{1}'.format(self.provider_slug, self.external_id)
+            uid=f'{self.provider_slug}:{self.external_id}'
         )
 
     def test_create_social_auth_provider_has_no_organization(self):
@@ -307,7 +308,7 @@ class SocialAuthEnrollmentCompletionSignalTest(CacheIsolationTestCase):
         provider = SAMLProviderConfigFactory.create()
         UserSocialAuth.objects.create(
             user=self.user,
-            uid='{0}:{1}'.format(provider.slug, self.external_id)
+            uid=f'{provider.slug}:{self.external_id}'
         )
 
     def test_create_social_auth_non_saml_provider(self):
@@ -352,7 +353,7 @@ class SocialAuthEnrollmentCompletionSignalTest(CacheIsolationTestCase):
         with LogCapture(logger.name) as log:
             UserSocialAuth.objects.create(
                 user=self.user,
-                uid='{0}:{1}'.format(self.provider_slug, self.external_id)
+                uid=f'{self.provider_slug}:{self.external_id}'
             )
             error_template = (
                 'Failed to complete waiting enrollments for organization={}.'
@@ -375,7 +376,7 @@ class SocialAuthEnrollmentCompletionSignalTest(CacheIsolationTestCase):
             with pytest.raises(CourseEnrollmentException):
                 UserSocialAuth.objects.create(
                     user=self.user,
-                    uid='{0}:{1}'.format(self.provider_slug, self.external_id)
+                    uid=f'{self.provider_slug}:{self.external_id}'
                 )
 
     def test_log_on_unexpected_exception(self):
@@ -391,7 +392,7 @@ class SocialAuthEnrollmentCompletionSignalTest(CacheIsolationTestCase):
                 with self.assertRaisesRegex(Exception, 'unexpected error'):
                     UserSocialAuth.objects.create(
                         user=self.user,
-                        uid='{0}:{1}'.format(self.provider_slug, self.external_id),
+                        uid=f'{self.provider_slug}:{self.external_id}',
                     )
                 error_template = 'Unable to link waiting enrollments for user {}, social auth creation failed: {}'
                 log.check_present(

@@ -17,6 +17,9 @@ from opaque_keys.edx.keys import CourseKey
 from organizations.tests.factories import OrganizationFactory
 
 from common.djangoapps.course_modes.models import CourseMode
+from common.djangoapps.student.roles import CourseStaffRole
+from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
+from common.djangoapps.third_party_auth.tests.factories import SAMLProviderConfigFactory
 from lms.djangoapps.program_enrollments.constants import ProgramCourseEnrollmentRoles
 from lms.djangoapps.program_enrollments.constants import ProgramCourseOperationStatuses as CourseStatuses
 from lms.djangoapps.program_enrollments.constants import ProgramEnrollmentStatuses as PEStatuses
@@ -32,9 +35,6 @@ from openedx.core.djangoapps.catalog.tests.factories import OrganizationFactory 
 from openedx.core.djangoapps.catalog.tests.factories import ProgramFactory
 from openedx.core.djangoapps.content.course_overviews.tests.factories import CourseOverviewFactory
 from openedx.core.djangolib.testing.utils import CacheIsolationTestCase
-from common.djangoapps.student.roles import CourseStaffRole
-from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
-from common.djangoapps.third_party_auth.tests.factories import SAMLProviderConfigFactory
 
 from ..writing import write_program_course_enrollments, write_program_enrollments
 
@@ -56,7 +56,7 @@ class EnrollmentTestMixin(CacheIsolationTestCase):
         """
         Set up test data
         """
-        super(EnrollmentTestMixin, cls).setUpClass()
+        super().setUpClass()
         catalog_org = CatalogOrganizationFactory.create(key=cls.organization_key)
         cls.program = ProgramFactory.create(
             uuid=cls.program_uuid,
@@ -66,7 +66,7 @@ class EnrollmentTestMixin(CacheIsolationTestCase):
         SAMLProviderConfigFactory.create(organization=organization)
 
         catalog_course_id_str = 'course-v1:edX+ToyX'
-        course_run_id_str = '{}+Toy_Course'.format(catalog_course_id_str)
+        course_run_id_str = f'{catalog_course_id_str}+Toy_Course'
         cls.course_id = CourseKey.from_string(course_run_id_str)
         CourseOverviewFactory(id=cls.course_id)
         course_run = CourseRunFactory(key=course_run_id_str)
@@ -75,7 +75,7 @@ class EnrollmentTestMixin(CacheIsolationTestCase):
         cls.student_2 = UserFactory(username='student-2')
 
     def setUp(self):
-        super(EnrollmentTestMixin, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         cache.set(PROGRAM_CACHE_KEY_TPL.format(uuid=self.program_uuid), self.program, None)
 
     def create_program_enrollment(self, external_user_key, user=False):

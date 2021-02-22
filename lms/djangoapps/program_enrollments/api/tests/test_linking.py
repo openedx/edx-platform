@@ -3,23 +3,23 @@ Tests for account linking Python API.
 """
 
 
+from unittest.mock import patch
 from uuid import uuid4
 
-from unittest.mock import patch
 from django.test import TestCase
 from edx_django_utils.cache import RequestCache
 from opaque_keys.edx.keys import CourseKey
 from testfixtures import LogCapture
 
+from common.djangoapps.student.api import get_course_access_role
+from common.djangoapps.student.roles import CourseStaffRole
+from common.djangoapps.student.tests.factories import CourseAccessRoleFactory, UserFactory
 from lms.djangoapps.program_enrollments.tests.factories import (
     CourseAccessRoleAssignmentFactory,
     ProgramCourseEnrollmentFactory,
     ProgramEnrollmentFactory
 )
 from openedx.core.djangoapps.content.course_overviews.tests.factories import CourseOverviewFactory
-from common.djangoapps.student.api import get_course_access_role
-from common.djangoapps.student.roles import CourseStaffRole
-from common.djangoapps.student.tests.factories import CourseAccessRoleFactory, UserFactory
 
 from ..linking import (
     NO_LMS_USER_TEMPLATE,
@@ -31,7 +31,7 @@ from ..linking import (
 LOG_PATH = 'lms.djangoapps.program_enrollments.api.linking'
 
 
-class TestLinkProgramEnrollmentsMixin(object):
+class TestLinkProgramEnrollmentsMixin:
     """ Utility methods and test data for testing linking """
 
     @classmethod

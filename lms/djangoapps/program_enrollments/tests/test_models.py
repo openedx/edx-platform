@@ -12,8 +12,8 @@ from edx_django_utils.cache import RequestCache
 from opaque_keys.edx.keys import CourseKey
 
 from common.djangoapps.course_modes.models import CourseMode
-from openedx.core.djangoapps.content.course_overviews.tests.factories import CourseOverviewFactory
 from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
+from openedx.core.djangoapps.content.course_overviews.tests.factories import CourseOverviewFactory
 
 from ..constants import ProgramCourseEnrollmentRoles
 from ..models import ProgramEnrollment
@@ -28,7 +28,7 @@ class ProgramEnrollmentModelTests(TestCase):
         """
         Set up the test data used in the specific tests
         """
-        super(ProgramEnrollmentModelTests, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.user = UserFactory(username="rocko")
         self.program_uuid = UUID("88888888-4444-2222-1111-000000000000")
         self.other_program_uuid = UUID("88888888-4444-3333-1111-000000000000")
@@ -116,7 +116,7 @@ class ProgramCourseEnrollmentModelTests(TestCase):
         """
         Set up test data
         """
-        super(ProgramCourseEnrollmentModelTests, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         RequestCache.clear_all_namespaces()
         self.user = UserFactory(username="rocko")
         self.program_uuid = UUID("88888888-4444-2222-1111-000000000000")
@@ -208,7 +208,7 @@ class CourseAccessRoleAssignmentTests(TestCase):
     Tests for the CourseAccessRoleAssignment model.
     """
     def setUp(self):
-        super(CourseAccessRoleAssignmentTests, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.program_course_enrollment = ProgramCourseEnrollmentFactory()
         self.pending_role_assignment = CourseAccessRoleAssignmentFactory(
             enrollment=self.program_course_enrollment,

@@ -5,10 +5,10 @@ Unit tests for ProgramEnrollment views.
 import json
 from collections import OrderedDict, defaultdict
 from datetime import datetime, timedelta
+from unittest import mock
 from uuid import UUID, uuid4
 
 import ddt
-import mock
 from django.conf import settings
 from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.core.cache import cache
@@ -20,12 +20,14 @@ from opaque_keys.edx.keys import CourseKey
 from organizations.tests.factories import OrganizationFactory as LMSOrganizationFactory
 from rest_framework import status
 from rest_framework.test import APITestCase
-from six import text_type
-from six.moves import range, zip
 from social_django.models import UserSocialAuth
 
-from lms.djangoapps.bulk_email.models import BulkEmailFlag, Optout
 from common.djangoapps.course_modes.models import CourseMode
+from common.djangoapps.student.models import CourseEnrollment
+from common.djangoapps.student.roles import CourseStaffRole
+from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
+from common.djangoapps.third_party_auth.tests.factories import SAMLProviderConfigFactory
+from lms.djangoapps.bulk_email.models import BulkEmailFlag, Optout
 from lms.djangoapps.certificates.models import CertificateStatuses
 from lms.djangoapps.certificates.tests.factories import GeneratedCertificateFactory
 from lms.djangoapps.courseware.tests.factories import GlobalStaffFactory, InstructorFactory
@@ -50,10 +52,6 @@ from openedx.core.djangoapps.catalog.tests.factories import (
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.content.course_overviews.tests.factories import CourseOverviewFactory
 from openedx.core.djangolib.testing.utils import CacheIsolationMixin
-from common.djangoapps.student.models import CourseEnrollment
-from common.djangoapps.student.roles import CourseStaffRole
-from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
-from common.djangoapps.third_party_auth.tests.factories import SAMLProviderConfigFactory
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory as ModulestoreCourseFactory
 from xmodule.modulestore.tests.factories import ItemFactory
@@ -102,7 +100,7 @@ class EnrollmentsDataMixin(ProgramCacheMixin):
 
     @classmethod
     def setUpClass(cls):
-        super(EnrollmentsDataMixin, cls).setUpClass()
+        super().setUpClass()
         cls.start_cache_isolation()
         cls.organization_key = "testorg"
         cls.catalog_org = OrganizationFactory(key=cls.organization_key)
@@ -114,7 +112,7 @@ class EnrollmentsDataMixin(ProgramCacheMixin):
         inactive_curriculum_uuid = UUID('cccccccc-1111-2222-3333-444444444444')
 
         catalog_course_id_str = 'course-v1:edX+ToyX'
-        course_run_id_str = '{}+Toy_Course'.format(catalog_course_id_str)
+        course_run_id_str = f'{catalog_course_id_str}+Toy_Course'
         cls.course_id = CourseKey.from_string(course_run_id_str)
         CourseOverviewFactory(id=cls.course_id)
         course_run = CourseRunFactory(key=course_run_id_str)
@@ -137,12 +135,12 @@ class EnrollmentsDataMixin(ProgramCacheMixin):
         cls.global_staff = GlobalStaffFactory(username='global-staff', password=cls.password)
 
     def setUp(self):
-        super(EnrollmentsDataMixin, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.set_program_in_catalog_cache(self.program_uuid, self.program)
 
     @classmethod
     def tearDownClass(cls):
-        super(EnrollmentsDataMixin, cls).tearDownClass()
+        super().tearDownClass()
         cls.end_cache_isolation()
 
     def get_url(self, program_uuid=None, course_id=None):
@@ -219,7 +217,7 @@ class ProgramEnrollmentsGetTests(EnrollmentsDataMixin, APITestCase):
         Helper method for creating program enrollment records.
         """
         for i in range(2):
-            user_key = 'user-{}'.format(i)
+            user_key = f'user-{i}'
             ProgramEnrollmentFactory.create(
                 program_uuid=self.program_uuid,
                 curriculum_uuid=self.curriculum_uuid,
@@ -229,11 +227,11 @@ class ProgramEnrollmentsGetTests(EnrollmentsDataMixin, APITestCase):
             )
 
         for i in range(2, 4):
-            user_key = 'user-{}'.format(i)
+            user_key = f'user-{i}'
             ProgramEnrollmentFactory.create(
                 program_uuid=self.program_uuid,
                 curriculum_uuid=self.curriculum_uuid,
-                user=UserFactory.create(username='student-{}'.format(i), email='email-{}'.format(i)),
+                user=UserFactory.create(username=f'student-{i}', email=f'email-{i}'),
                 external_user_key=user_key,
             )
 
@@ -286,19 +284,19 @@ class ProgramEnrollmentsGetTests(EnrollmentsDataMixin, APITestCase):
             'results': [
                 {
                     'student_key': 'user-0', 'status': 'pending', 'account_exists': False,
-                    'curriculum_uuid': text_type(self.curriculum_uuid), 'username': "", 'email': ""
+                    'curriculum_uuid': str(self.curriculum_uuid), 'username': "", 'email': ""
                 },
                 {
                     'student_key': 'user-1', 'status': 'pending', 'account_exists': False,
-                    'curriculum_uuid': text_type(self.curriculum_uuid), 'username': "", 'email': ""
+                    'curriculum_uuid': str(self.curriculum_uuid), 'username': "", 'email': ""
                 },
                 {
                     'student_key': 'user-2', 'status': 'enrolled', 'account_exists': True,
-                    'curriculum_uuid': text_type(self.curriculum_uuid), 'username': "student-2", 'email': "email-2"
+                    'curriculum_uuid': str(self.curriculum_uuid), 'username': "student-2", 'email': "email-2"
                 },
                 {
                     'student_key': 'user-3', 'status': 'enrolled', 'account_exists': True,
-                    'curriculum_uuid': text_type(self.curriculum_uuid), 'username': "student-3", 'email': "email-3"
+                    'curriculum_uuid': str(self.curriculum_uuid), 'username': "student-3", 'email': "email-3"
                 },
             ],
         }
@@ -315,11 +313,11 @@ class ProgramEnrollmentsGetTests(EnrollmentsDataMixin, APITestCase):
         expected_results = [
             {
                 'student_key': 'user-0', 'status': 'pending', 'account_exists': False,
-                'curriculum_uuid': text_type(self.curriculum_uuid), 'username': "", 'email': ""
+                'curriculum_uuid': str(self.curriculum_uuid), 'username': "", 'email': ""
             },
             {
                 'student_key': 'user-1', 'status': 'pending', 'account_exists': False,
-                'curriculum_uuid': text_type(self.curriculum_uuid), 'username': "", 'email': ""
+                'curriculum_uuid': str(self.curriculum_uuid), 'username': "", 'email': ""
             },
         ]
         assert expected_results == response.data['results']
@@ -334,11 +332,11 @@ class ProgramEnrollmentsGetTests(EnrollmentsDataMixin, APITestCase):
         next_expected_results = [
             {
                 'student_key': 'user-2', 'status': 'enrolled', 'account_exists': True,
-                'curriculum_uuid': text_type(self.curriculum_uuid), 'username': "student-2", 'email': "email-2"
+                'curriculum_uuid': str(self.curriculum_uuid), 'username': "student-2", 'email': "email-2"
             },
             {
                 'student_key': 'user-3', 'status': 'enrolled', 'account_exists': True,
-                'curriculum_uuid': text_type(self.curriculum_uuid), 'username': "student-3", 'email': "email-3"
+                'curriculum_uuid': str(self.curriculum_uuid), 'username': "student-3", 'email': "email-3"
             },
         ]
         assert next_expected_results == next_response.data['results']
@@ -456,12 +454,12 @@ class ProgramEnrollmentsPostTests(ProgramEnrollmentsWriteMixin, APITestCase):
     add_uuid = True
 
     def setUp(self):
-        super(ProgramEnrollmentsPostTests, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.request = self.client.post
         self.client.login(username=self.global_staff.username, password='password')
 
     def tearDown(self):
-        super(ProgramEnrollmentsPostTests, self).tearDown()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().tearDown()
         ProgramEnrollment.objects.all().delete()
 
     def test_successful_program_enrollments_no_existing_user(self):
@@ -522,7 +520,7 @@ class ProgramEnrollmentsPostTests(ProgramEnrollmentsWriteMixin, APITestCase):
         post_data = [
             {
                 'status': 'enrolled',
-                REQUEST_STUDENT_KEY: 'abc{}'.format(i),
+                REQUEST_STUDENT_KEY: f'abc{i}',
                 'curriculum_uuid': str(self.curriculum_uuid)
             } for i in range(3)
         ]
@@ -538,7 +536,7 @@ class ProgramEnrollmentsPostTests(ProgramEnrollmentsWriteMixin, APITestCase):
         assert response.status_code == 200
 
         for i in range(3):
-            enrollment = ProgramEnrollment.objects.get(external_user_key='abc{}'.format(i))
+            enrollment = ProgramEnrollment.objects.get(external_user_key=f'abc{i}')
 
             assert enrollment.program_uuid == self.program_uuid
             assert enrollment.status == 'enrolled'
@@ -554,7 +552,7 @@ class ProgramEnrollmentsPatchTests(ProgramEnrollmentsWriteMixin, APITestCase):
     add_uuid = False
 
     def setUp(self):
-        super(ProgramEnrollmentsPatchTests, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.request = self.client.patch
         self.client.login(username=self.global_staff.username, password=self.password)
 
@@ -570,7 +568,7 @@ class ProgramEnrollmentsPatchTests(ProgramEnrollmentsWriteMixin, APITestCase):
     def test_successfully_patched_program_enrollment(self):
         enrollments = {}
         for i in range(4):
-            user_key = 'user-{}'.format(i)
+            user_key = f'user-{i}'
             instance = ProgramEnrollment.objects.create(
                 program_uuid=self.program_uuid,
                 curriculum_uuid=self.curriculum_uuid,
@@ -612,7 +610,7 @@ class ProgramEnrollmentsPatchTests(ProgramEnrollmentsWriteMixin, APITestCase):
     def test_duplicate_enrollment_record_changed(self):
         enrollments = {}
         for i in range(4):
-            user_key = 'user-{}'.format(i)
+            user_key = f'user-{i}'
             instance = ProgramEnrollment.objects.create(
                 program_uuid=self.program_uuid,
                 curriculum_uuid=self.curriculum_uuid,
@@ -649,7 +647,7 @@ class ProgramEnrollmentsPatchTests(ProgramEnrollmentsWriteMixin, APITestCase):
     def test_partially_valid_enrollment_record_changed(self):
         enrollments = {}
         for i in range(4):
-            user_key = 'user-{}'.format(i)
+            user_key = f'user-{i}'
             instance = ProgramEnrollment.objects.create(
                 program_uuid=self.program_uuid,
                 curriculum_uuid=self.curriculum_uuid,
@@ -693,7 +691,7 @@ class ProgramEnrollmentsPutTests(ProgramEnrollmentsWriteMixin, APITestCase):
     add_uuid = True
 
     def setUp(self):
-        super(ProgramEnrollmentsPutTests, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.request = self.client.put
         self.client.login(username=self.global_staff.username, password='password')
 
@@ -770,16 +768,16 @@ class ProgramCourseEnrollmentsMixin(EnrollmentsDataMixin):
 
     @classmethod
     def setUpClass(cls):
-        super(ProgramCourseEnrollmentsMixin, cls).setUpClass()
+        super().setUpClass()
         cls.start_cache_isolation()
 
     @classmethod
     def tearDownClass(cls):
         cls.end_cache_isolation()
-        super(ProgramCourseEnrollmentsMixin, cls).tearDownClass()
+        super().tearDownClass()
 
     def setUp(self):
-        super(ProgramCourseEnrollmentsMixin, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.default_url = self.get_url(course_id=self.course_id)
         self.log_in_staff()
 
@@ -971,11 +969,11 @@ class ProgramCourseEnrollmentsGetTests(EnrollmentsDataMixin, APITestCase):
             'results': [
                 {
                     'student_key': 'user-0', 'status': 'active', 'account_exists': True,
-                    'curriculum_uuid': text_type(self.curriculum_uuid), 'course_staff': True
+                    'curriculum_uuid': str(self.curriculum_uuid), 'course_staff': True
                 },
                 {
                     'student_key': 'user-0', 'status': 'inactive', 'account_exists': False,
-                    'curriculum_uuid': text_type(self.other_curriculum_uuid), 'course_staff': True
+                    'curriculum_uuid': str(self.other_curriculum_uuid), 'course_staff': True
                 },
             ],
         }
@@ -992,7 +990,7 @@ class ProgramCourseEnrollmentsGetTests(EnrollmentsDataMixin, APITestCase):
         expected_results = [
             {
                 'student_key': 'user-0', 'status': 'active', 'account_exists': True,
-                'curriculum_uuid': text_type(self.curriculum_uuid), 'course_staff': True
+                'curriculum_uuid': str(self.curriculum_uuid), 'course_staff': True
             },
         ]
         assert expected_results == response.data['results']
@@ -1007,7 +1005,7 @@ class ProgramCourseEnrollmentsGetTests(EnrollmentsDataMixin, APITestCase):
         next_expected_results = [
             {
                 'student_key': 'user-0', 'status': 'inactive', 'account_exists': False,
-                'curriculum_uuid': text_type(self.other_curriculum_uuid), 'course_staff': True
+                'curriculum_uuid': str(self.other_curriculum_uuid), 'course_staff': True
             },
         ]
         assert next_expected_results == next_response.data['results']
@@ -1128,7 +1126,7 @@ class MultiprogramEnrollmentsTest(EnrollmentsDataMixin, APITestCase):
     """ Tests for the Multiple Program with same course scenario """
     @classmethod
     def setUpClass(cls):
-        super(MultiprogramEnrollmentsTest, cls).setUpClass()
+        super().setUpClass()
         cls.another_curriculum_uuid = UUID('bbbbbbbb-8888-9999-7777-666666666666')
         cls.another_curriculum = CurriculumFactory(
             uuid=cls.another_curriculum_uuid,
@@ -1144,7 +1142,7 @@ class MultiprogramEnrollmentsTest(EnrollmentsDataMixin, APITestCase):
         cls.user = UserFactory.create(username='multiprogram_user')
 
     def setUp(self):
-        super(MultiprogramEnrollmentsTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.set_program_in_catalog_cache(self.another_program_uuid, self.another_program)
         self.client.login(username=self.global_staff.username, password=self.password)
 
@@ -1217,7 +1215,7 @@ class MultiprogramEnrollmentsTest(EnrollmentsDataMixin, APITestCase):
         )
         UserSocialAuth.objects.create(
             user=self.user,
-            uid='{0}:{1}'.format(self.organization_key, self.external_user_key),
+            uid=f'{self.organization_key}:{self.external_user_key}',
             provider=self.organization_key
         )
 
@@ -1278,8 +1276,8 @@ class MultiprogramEnrollmentsTest(EnrollmentsDataMixin, APITestCase):
         )
         assert response.status_code == 422
         mock_log.error.assert_called_with(
-            u'Detected conflicting active ProgramCourseEnrollment. This is happening on'
-            u' The program_uuid [{}] with course_key [{}] for external_user_key [{}]'.format(
+            'Detected conflicting active ProgramCourseEnrollment. This is happening on'
+            ' The program_uuid [{}] with course_key [{}] for external_user_key [{}]'.format(
                 self.another_program_uuid,
                 self.course_id,
                 self.external_user_key
@@ -1441,7 +1439,7 @@ class UserProgramReadOnlyAccessGetTests(EnrollmentsDataMixin, APITestCase):
 
     @classmethod
     def setUpClass(cls):
-        super(UserProgramReadOnlyAccessGetTests, cls).setUpClass()
+        super().setUpClass()
 
         cls.mock_program_data = [
             {'uuid': cls.program_uuid_tmpl.format(11), 'marketing_slug': 'garbage-program', 'type': 'masters'},
@@ -1505,7 +1503,7 @@ class UserProgramReadOnlyAccessGetTests(EnrollmentsDataMixin, APITestCase):
         """
         course_key_to_create = CourseKey.from_string(course_key_string)
         CourseOverviewFactory(id=course_key_to_create)
-        CourseRunFactory.create(key=text_type(course_key_to_create))
+        CourseRunFactory.create(key=str(course_key_to_create))
         CourseEnrollmentFactory.create(course_id=course_key_to_create, user=user)
         CourseStaffRole(course_key_to_create).add_users(user)
         return course_key_to_create
@@ -1578,7 +1576,7 @@ class UserProgramReadOnlyAccessGetTests(EnrollmentsDataMixin, APITestCase):
             curriculum_uuid=self.curriculum_uuid,
             user=self.student,
             status='enrolled',
-            external_user_key='user-{}'.format(self.student.id),
+            external_user_key=f'user-{self.student.id}',
         )
 
         self.client.login(username=self.student.username, password=self.password)
@@ -1613,7 +1611,7 @@ class UserProgramReadOnlyAccessGetTests(EnrollmentsDataMixin, APITestCase):
                 curriculum_uuid=self.curriculum_uuid,
                 user=self.student,
                 status='pending',
-                external_user_key='user-{}'.format(self.student.id),
+                external_user_key=f'user-{self.student.id}',
             )
         self.client.login(username=self.student.username, password=self.password)
 
@@ -1645,14 +1643,14 @@ class ProgramCourseEnrollmentOverviewGetTests(
 
     @classmethod
     def setUpClass(cls):
-        super(ProgramCourseEnrollmentOverviewGetTests, cls).setUpClass()
+        super().setUpClass()
 
         cls.program_uuid = '00000000-1111-2222-3333-444444444444'
         cls.curriculum_uuid = 'aaaaaaaa-1111-2222-3333-444444444444'
         cls.other_curriculum_uuid = 'bbbbbbbb-1111-2222-3333-444444444444'
 
         cls.course_id = CourseKey.from_string('course-v1:edX+ToyX+Toy_Course')
-        cls.course_run = CourseRunFactory.create(key=text_type(cls.course_id))
+        cls.course_run = CourseRunFactory.create(key=str(cls.course_id))
         cls.course = CourseFactory.create(course_runs=[cls.course_run])
 
         cls.username = 'student'
@@ -1786,7 +1784,7 @@ class ProgramCourseEnrollmentOverviewGetTests(
         Helper method to create another course, an overview for it,
         add it to the program, and re-load the cache.
         """
-        other_course_run = CourseRunFactory.create(key=text_type(course_run_key))
+        other_course_run = CourseRunFactory.create(key=str(course_run_key))
         other_course = CourseFactory.create(course_runs=[other_course_run])
         program['courses'].append(other_course)
         self.set_program_in_catalog_cache(program['uuid'], program)
@@ -1815,9 +1813,9 @@ class ProgramCourseEnrollmentOverviewGetTests(
 
         assert status.HTTP_200_OK == response_status_code
         actual_course_run_ids = {run['course_run_id'] for run in response_course_runs}
-        expected_course_run_ids = {text_type(self.course_id)}
+        expected_course_run_ids = {str(self.course_id)}
         if other_enrollment_active:
-            expected_course_run_ids.add(text_type(other_course_key))
+            expected_course_run_ids.add(str(other_course_key))
         assert expected_course_run_ids == actual_course_run_ids
 
     @patch_resume_url
@@ -2097,7 +2095,7 @@ class ProgramCourseEnrollmentOverviewGetTests(
     def test_course_run_url(self):
         self.log_in()
 
-        course_run_url = 'http://testserver/courses/{}/course/'.format(text_type(self.course_id))
+        course_run_url = 'http://testserver/courses/{}/course/'.format(str(self.course_id))
 
         response_status_code, response_course_runs = self.get_status_and_course_runs()
         assert status.HTTP_200_OK == response_status_code
@@ -2130,8 +2128,8 @@ class ProgramCourseEnrollmentOverviewGetTests(
 
         course_run_overview = response_course_runs[0]
 
-        assert course_run_overview['course_run_id'] == text_type(self.course_id)
-        assert course_run_overview['display_name'] == '{} Course'.format(text_type(self.course_id))
+        assert course_run_overview['course_run_id'] == str(self.course_id)
+        assert course_run_overview['display_name'] == '{} Course'.format(str(self.course_id))
 
     def test_emails_enabled(self):
         self.log_in()
@@ -2365,7 +2363,7 @@ class EnrollmentDataResetViewTests(ProgramCacheMixin, APITestCase):
     )
 
     def setUp(self):
-        super(EnrollmentDataResetViewTests, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.start_cache_isolation()
 
         self.organization = LMSOrganizationFactory(short_name='uox')
@@ -2383,7 +2381,7 @@ class EnrollmentDataResetViewTests(ProgramCacheMixin, APITestCase):
 
     def tearDown(self):
         self.end_cache_isolation()
-        super(EnrollmentDataResetViewTests, self).tearDown()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().tearDown()
 
     @patch_call_command
     def test_feature_disabled_by_default(self, mock_call_command):
