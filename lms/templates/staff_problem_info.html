@@ -76,7 +76,7 @@ ${block_content | n, decode.utf8}
         <label for="sd_fs_${location.block_id}"> / ${max_problem_score}</label>
       </div>
       % endif
-      <div data-location="${location}" data-location-name="${location.block_id}">
+      <div data-location="${location}" data-location-name="${location.block_id}" data-course-id="${location.course_key}">
         [
         % if can_reset_attempts:
         <button type="button" class="btn-link staff-debug-reset">${_('Reset Learner\'s Attempts to Zero')}</button>
