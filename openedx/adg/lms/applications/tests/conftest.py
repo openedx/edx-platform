@@ -16,7 +16,7 @@ from openedx.adg.lms.applications.constants import ADG_ADMIN_GROUP_NAME
 from openedx.adg.lms.applications.models import UserApplication
 
 from .constants import ADMIN_TYPE_SUPER_ADMIN, TITLE_BUSINESS_LINE_1, TITLE_BUSINESS_LINE_2
-from .factories import BusinessLineFactory, EducationFactory, UserApplicationFactory, WorkExperienceFactory
+from .factories import EducationFactory, UserApplicationFactory, WorkExperienceFactory
 
 
 @pytest.fixture
@@ -53,11 +53,13 @@ def education_inline():
 def work_experience_inline():
     return WorkExperienceInline(UserApplication, adg_admin_site)
 
+
 @pytest.fixture
 def user_applications_with_different_business_lines():
     UserApplicationFactory(business_line__title=TITLE_BUSINESS_LINE_1)
     UserApplicationFactory(business_line__title=TITLE_BUSINESS_LINE_2)
     return UserApplication.objects.all()
+
 
 @pytest.fixture
 def admin_user(admin_type):

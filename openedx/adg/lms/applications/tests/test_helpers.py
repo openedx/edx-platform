@@ -64,6 +64,7 @@ def test_validate_logo_size_with_invalid_size():
     with pytest.raises(Exception):
         validate_logo_size(mocked_file)
 
+
 @patch('openedx.adg.lms.applications.helpers.MandrillClient')
 def test_send_application_submission_confirmation_email(mocked_mandrill_client):
     """

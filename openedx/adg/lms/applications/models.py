@@ -108,7 +108,7 @@ class BusinessLine(TimeStampedModel):
     )
     description = models.TextField(verbose_name=_('Description'), )
     group = models.OneToOneField(
-       Group, related_name='business_line', on_delete=models.CASCADE, null=True
+        Group, related_name='business_line', on_delete=models.CASCADE, null=True
     )
 
     class Meta:

@@ -224,7 +224,7 @@ def test_changeform_view_post_with_status(
     """
     Test the overridden changeform_view.
 
-    Test that if a POST request is made with internal note and status, the application should be updated, saved  and
+    Test that if a POST request is made with internal note and status, the application should be updated, saved and
     an application status email should be sent to the applicant.
     """
     application_id = user_application.id
