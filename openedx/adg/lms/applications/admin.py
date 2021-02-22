@@ -160,18 +160,23 @@ class MultilingualCourseAdmin(admin.TabularInline):
 
     model = MultilingualCourse
     formset = MultilingualCourseInlineFormset
+    MULTILINGUAL_COURSE_INLINE_FORMS_EMPTY_GROUP = 2
+    MULTILINGUAL_COURSE_INLINE_FORMS_NON_EMPTY_GROUP = 0
 
     def get_extra(self, request, obj=None, **kwargs):
         """
         Customized number of inline forms
         """
-        return 0 if obj and obj.multilingual_courses.exists() else 2
+        if obj and obj.multilingual_courses.exists():
+            return self.MULTILINGUAL_COURSE_INLINE_FORMS_NON_EMPTY_GROUP
+        else:
+            return self.MULTILINGUAL_COURSE_INLINE_FORMS_EMPTY_GROUP
 
 
 @admin.register(MultilingualCourseGroup)
 class MultilingualCourseGroupAdmin(admin.ModelAdmin):
     inlines = (MultilingualCourseAdmin,)
-    list_display = ('name', 'multilingual_course_count', 'open_multilingual_courses_count')
+    list_display = ('name', 'is_prerequisite', 'multilingual_course_count', 'open_multilingual_courses_count')
 
 
 @admin.register(BusinessLine)

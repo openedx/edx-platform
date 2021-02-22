@@ -127,7 +127,7 @@ def test_get_users_with_active_course_enrollments_enroll_users_in_open_courses(p
     users = UserFactory.create_batch(3)
     user_ids = get_user_ids(users)
     prereq_course_group = prereq_course_groups.pop()
-    open_course_keys = prereq_course_group.course_keys()
+    open_course_keys = prereq_course_group.open_multilingual_course_keys()
     CourseEnrollmentFactory(user=users[0], course_id=open_course_keys[0], is_active=True)
     CourseEnrollmentFactory(user=users[0], course_id=open_course_keys[1], is_active=True)
     CourseEnrollmentFactory(user=users[1], course_id=open_course_keys[0], is_active=True)
@@ -147,7 +147,7 @@ def test_get_users_with_active_course_enrollments_ignore_inactive_enrollment_in_
     users = UserFactory.create_batch(3)
     user_ids = get_user_ids(users)
     prereq_course_group = prereq_course_groups.pop()
-    open_course_keys = prereq_course_group.course_keys()
+    open_course_keys = prereq_course_group.open_multilingual_course_keys()
     CourseEnrollmentFactory(user=users[0], course_id=open_course_keys[0], is_active=False)
 
     command = command_module.Command()

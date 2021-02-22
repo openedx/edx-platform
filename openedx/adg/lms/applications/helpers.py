@@ -262,10 +262,6 @@ def get_prerequisite_courses_for_user(user):
         If user has not enrolled in any of the courses of a prerequisite
         group then find a course with preferred language.
 
-    3. Any course regardless of enrollment and language
-        If user has not enrolled in prerequisite group and preferred language course
-        does not exist in the group then return the first course of the group.
-
     Args:
         user (User): user for which we need to find the prerequisite courses
 
@@ -275,46 +271,19 @@ def get_prerequisite_courses_for_user(user):
     from .models import MultilingualCourseGroup
 
     prerequisite_course_groups = MultilingualCourseGroup.prerequisite_course_groups.all()
-    user_enrolled_multilingual_prereq_courses = get_user_enrolled_multilingual_prereq_courses(user)
 
     prerequisite_courses_for_user = []
     for course_group in prerequisite_course_groups:
-        is_user_enrolled_in_group = False
-        for multilingual_prereq_course in user_enrolled_multilingual_prereq_courses:
-            if course_group.is_course_exists(multilingual_prereq_course):
-                prerequisite_courses_for_user.append(multilingual_prereq_course.course)
-                is_user_enrolled_in_group = True
-                break
-
-        if not is_user_enrolled_in_group:
-            preferred_multilingual_course = (
-                get_preferred_lang_course(user, course_group) or course_group.multilingual_courses.first()
-            )
-            prerequisite_courses_for_user.append(preferred_multilingual_course.course)
+        prerequisite_courses_for_user.append(
+            course_group.get_user_enrolled_course(user) or get_preferred_lang_course(user, course_group)
+        )
     return prerequisite_courses_for_user
-
-
-def get_user_enrolled_multilingual_prereq_courses(user):
-    """
-    Filters multilingual prerequisite courses in which user has enrolled.
-
-    Args:
-        user (User): user for which prerequisite enrollments will be checked.
-
-    Returns:
-        queryset: Multilingual courses in which user has enrolled.
-    """
-    from .models import MultilingualCourse
-
-    return MultilingualCourse.open_prerequisite_multilingual_courses.filter(
-        course__courseenrollment__user=user,
-        course__courseenrollment__is_active=True
-    )
 
 
 def get_preferred_lang_course(user, course_group):
     """
-    Return course with preferred language.
+    Return course with preferred language. If course with preferred lang
+    is not found then return the first course from the group.
 
     Args:
         user (User): user object
@@ -329,5 +298,6 @@ def get_preferred_lang_course(user, course_group):
     for multilingual_course in course_group.multilingual_courses.all():
         course_info = store.get_course(multilingual_course.course.id)
         if course_info.language == user_preferred_lang:
-            return multilingual_course
-    return None
+            return multilingual_course.course
+
+    return course_group.multilingual_courses.first().course

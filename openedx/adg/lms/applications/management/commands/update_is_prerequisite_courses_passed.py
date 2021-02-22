@@ -71,7 +71,7 @@ class Command(BaseCommand):
         Returns:
             A querySet for users who should be checked for the update
         """
-        course_keys = prereq_course_group.course_keys()
+        course_keys = prereq_course_group.open_multilingual_course_keys()
         return User.objects.filter(
             id__in=users_to_be_checked_for_update,
             courseenrollment__course__in=course_keys,
@@ -117,7 +117,7 @@ class Command(BaseCommand):
         Returns:
             boolean, True if the course is failed otherwise False
         """
-        course_keys = prereq_course_group.course_keys()
+        course_keys = prereq_course_group.open_multilingual_course_keys()
 
         for course_key in course_keys:
             course_grade = CourseGradeFactory().read(user, course_key=course_key)

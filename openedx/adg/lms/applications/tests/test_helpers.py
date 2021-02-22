@@ -29,7 +29,6 @@ from openedx.adg.lms.applications.helpers import (
     get_embedded_view_html,
     get_extra_context_for_application_review_page,
     get_prerequisite_courses_for_user,
-    get_user_enrolled_multilingual_prereq_courses,
     is_displayable_on_browser,
     max_year_value_validator,
     min_year_value_validator,
@@ -347,19 +346,3 @@ def test_get_enrolled_prerequisites_for_user():
     MultilingualCourseFactory(course=course)
     CourseEnrollmentFactory(course=course, user=user, is_active=True)
     assert len(get_prerequisite_courses_for_user(user)) == 1
-
-
-@pytest.mark.django_db
-def test_get_user_enrolled_multilingual_prereq_courses():
-    """
-    Test user enrolled multilingual prerequisite courses
-    """
-    user = UserFactory()
-    current_time = datetime.now()
-    course = CourseOverviewFactory(
-        start_date=current_time - timedelta(days=1),
-        end_date=current_time + timedelta(days=1)
-    )
-    MultilingualCourseFactory(course=course)
-    CourseEnrollmentFactory(course=course, user=user, is_active=True)
-    assert len(get_user_enrolled_multilingual_prereq_courses(user)) == 1

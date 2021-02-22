@@ -9,7 +9,7 @@ import pytest
 from common.djangoapps.student.tests.factories import UserFactory
 from lms.djangoapps.grades.api import CourseGradeFactory
 from openedx.adg.lms.applications.constants import CourseScore
-from openedx.adg.lms.applications.models import MultilingualCourse, UserApplication
+from openedx.adg.lms.applications.models import UserApplication
 from openedx.core.djangoapps.content.course_overviews.tests.factories import CourseOverviewFactory
 from openedx.core.lib.grade_utils import round_away_from_zero
 
@@ -224,7 +224,7 @@ def test_open_multilingual_courses_count():
 
 
 @pytest.mark.django_db
-def test_course_keys():
+def test_open_multilingual_course_keys():
     """
     Test course keys of a course group
     """
@@ -234,17 +234,17 @@ def test_course_keys():
         end_date=current_time + timedelta(days=1)
     )
     course_group = MultilingualCourseFactory(course=course).multilingual_course_group
-    assert len(course_group.course_keys()) == 1
+    assert len(course_group.open_multilingual_course_keys()) == 1
 
 
 @pytest.mark.django_db
-def test_is_course_exists_in_course_group():
+def test_does_course_exist_in_course_group():
     """
     Tests course exists in multilingual group.
     """
     multilingual_course = MultilingualCourseFactory()
     course_group = multilingual_course.multilingual_course_group
-    assert course_group.is_course_exists(multilingual_course)
+    assert course_group.does_course_exist(multilingual_course)
 
 
 @pytest.mark.django_db
@@ -254,19 +254,4 @@ def test_course_does_not_exist_in_course_group():
     """
     multilingual_course = MultilingualCourseFactory()
     course_group = MultilingualCourseGroupFactory()
-    assert not course_group.is_course_exists(multilingual_course)
-
-
-@pytest.mark.django_db
-def test_open_multilingual_prerequisite_courses():
-    """
-    Tests open multilingual prerequisite courses
-    """
-    current_time = datetime.now()
-    course = CourseOverviewFactory(
-        start_date=current_time - timedelta(days=1),
-        end_date=current_time + timedelta(days=1)
-    )
-    MultilingualCourseFactory(course=course)
-    MultilingualCourseGroupFactory(is_prerequisite=True)
-    assert MultilingualCourse.open_prerequisite_multilingual_courses.count() == 1
+    assert not course_group.does_course_exist(multilingual_course)

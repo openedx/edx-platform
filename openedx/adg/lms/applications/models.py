@@ -1,7 +1,7 @@
 """
 All models for applications app
 """
-from datetime import date, datetime
+from datetime import date
 
 from django.contrib.auth.models import User
 from django.core.validators import FileExtensionValidator
@@ -21,6 +21,7 @@ from .helpers import (
     min_year_value_validator,
     validate_logo_size
 )
+from .managers import OpenMultilingualCourseManager, PrerequisiteCourseGroupManager, SubmittedApplicationsManager
 
 
 class ApplicationHub(TimeStampedModel):
@@ -118,15 +119,6 @@ class BusinessLine(TimeStampedModel):
 
     def __str__(self):
         return '{}'.format(self.title)
-
-
-class SubmittedApplicationsManager(models.Manager):
-    """
-    Manager which returns all user applications which have been submitted successfully.
-    """
-
-    def get_queryset(self):
-        return super().get_queryset().filter(user__application_hub__is_application_submitted=True)
 
 
 class UserApplication(TimeStampedModel):
@@ -313,18 +305,6 @@ class WorkExperience(UserStartAndEndDates):
         return ''
 
 
-class PrerequisiteCourseGroupManager(models.Manager):
-    """
-    Manager which returns all open pre requisite entries
-    """
-
-    def get_queryset(self):
-        return super().get_queryset().filter(
-            is_prerequisite=True,
-            multilingual_courses__isnull=False
-        ).distinct()
-
-
 class MultilingualCourseGroup(models.Model):
     """
     Model for multilingual course groups
@@ -341,44 +321,37 @@ class MultilingualCourseGroup(models.Model):
     def multilingual_course_count(self):
         return self.multilingual_courses.count()
 
+    # pylint: disable=no-member
     def open_multilingual_courses_count(self):
-        return self.multilingual_courses(manager='open_multilingual_courses').count()  # pylint: disable=no-member
+        return self.multilingual_courses(manager='open_multilingual_courses').count()
 
-    def course_keys(self):
-        return self.multilingual_courses(manager='open_multilingual_courses').all()  # pylint: disable=no-member
+    def open_multilingual_course_keys(self):
+        return self.multilingual_courses(manager='open_multilingual_courses').values_list('course', flat=True)
 
-    def is_course_exists(self, course):
-        return course in self.multilingual_courses.all()
+    def get_user_enrolled_course(self, user):
+        """
+        Finds user enrolled course of current course group.
+
+        Args:
+            user (User): user for which enrolled course needs to be returned
+
+        Returns:
+            CourseOverview: Enrolled multilingual course or None
+        """
+        enrolled_multilingual_course = self.multilingual_courses(
+            manager='open_multilingual_courses'
+        ).filter(
+            course__courseenrollment__user=user,
+            course__courseenrollment__is_active=True
+        ).first()
+        return enrolled_multilingual_course.course if enrolled_multilingual_course else None
+    # pylint: enable=no-member
+
+    def does_course_exist(self, multilingual_course):
+        return self.multilingual_courses.filter(course=multilingual_course.course).exists()
 
     def __str__(self):
         return self.name
-
-
-class OpenMultilingualCourseManager(models.Manager):
-    """
-    Manager which returns all open multilingual entries
-    """
-
-    def get_queryset(self):
-        today = datetime.now()
-        return super().get_queryset().filter(
-            course__start_date__lte=today,
-            course__end_date__gte=today
-        ).values_list('course', flat=True)
-
-
-class OpenPrerequisiteMultilingualCourseManager(models.Manager):
-    """
-    Manager which returns all open multilingual prerequisite entries
-    """
-
-    def get_queryset(self):
-        today = datetime.now()
-        return super().get_queryset().filter(
-            multilingual_course_group__is_prerequisite=True,
-            course__start_date__lte=today,
-            course__end_date__gte=today
-        ).select_related('course')
 
 
 class MultilingualCourse(models.Model):
@@ -388,12 +361,12 @@ class MultilingualCourse(models.Model):
 
     objects = models.Manager()
     open_multilingual_courses = OpenMultilingualCourseManager()
-    open_prerequisite_multilingual_courses = OpenPrerequisiteMultilingualCourseManager()
 
     course = models.OneToOneField(
         CourseOverview,
         on_delete=models.CASCADE,
         related_name='multilingual_course',
+        unique=True,
         verbose_name=_('Multilingual version of a course'),
     )
     multilingual_course_group = models.ForeignKey(
@@ -403,7 +376,6 @@ class MultilingualCourse(models.Model):
     )
 
     class Meta:
-        unique_together = (('course', 'multilingual_course_group',),)
         app_label = 'applications'
 
     def __str__(self):
