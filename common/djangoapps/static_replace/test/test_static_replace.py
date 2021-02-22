@@ -2,7 +2,9 @@
 
 
 import re
+from io import BytesIO
 from unittest.mock import Mock, patch
+from urllib.parse import parse_qsl, urlparse, urlunparse
 
 import ddt
 import pytest
@@ -10,8 +12,6 @@ from django.test import override_settings
 from django.utils.http import urlencode, urlquote
 from opaque_keys.edx.keys import CourseKey
 from PIL import Image
-from io import BytesIO
-from urllib.parse import parse_qsl, urlparse, urlunparse
 
 from common.djangoapps.static_replace import (
     _url_replace_regex,
