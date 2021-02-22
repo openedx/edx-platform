@@ -4,6 +4,7 @@ Tests of the LMS XBlock Mixin
 """
 
 import ddt
+from xblock.validation import ValidationMessage
 
 from lms.djangoapps.lms_xblock.mixin import (
     INVALID_USER_PARTITION_GROUP_VALIDATION_COMPONENT,
@@ -12,7 +13,6 @@ from lms.djangoapps.lms_xblock.mixin import (
     INVALID_USER_PARTITION_VALIDATION_UNIT,
     NONSENSICAL_ACCESS_RESTRICTION
 )
-from xblock.validation import ValidationMessage
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.tests.django_utils import TEST_DATA_MIXED_MODULESTORE, ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory, ToyCourseFactory
