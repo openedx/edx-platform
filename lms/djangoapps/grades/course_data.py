@@ -23,7 +23,7 @@ class CourseData:
     cache during its lifecycle.
     """
     def __init__(self, user, course=None, collected_block_structure=None, structure=None, course_key=None):
-        if not any([course, collected_block_structure, structure, course_key]):
+        if not any((course, collected_block_structure, structure, course_key)):
             raise ValueError(
                 "You must specify one of course, collected_block_structure, structure, or course_key to this method."
             )

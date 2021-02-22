@@ -1,9 +1,9 @@
 # lint-amnesty, pylint: disable=missing-module-docstring
 
 import unittest
-import pytest
 from tempfile import NamedTemporaryFile
 
+import pytest
 import six
 from django.conf import settings
 from django.core.files.uploadedfile import SimpleUploadedFile
@@ -13,12 +13,10 @@ from testfixtures import LogCapture
 
 from common.djangoapps.course_modes.models import CourseMode
 from common.djangoapps.course_modes.tests.factories import CourseModeFactory
-from common.djangoapps.student.models import CourseEnrollment
+from common.djangoapps.student.models import BulkChangeEnrollmentConfiguration, CourseEnrollment
 from common.djangoapps.student.tests.factories import UserFactory
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
-
-from common.djangoapps.student.models import BulkChangeEnrollmentConfiguration
 
 LOGGER_NAME = 'common.djangoapps.student.management.commands.bulk_change_enrollment_csv'
 

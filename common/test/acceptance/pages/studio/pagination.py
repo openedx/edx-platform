@@ -18,10 +18,7 @@ class PaginatedMixin(object):
 
         To specify a specific arrow, pass an iterable with a single element, 'next' or 'previous'.
         """
-        return all([
-            self.q(css=u'nav.%s * .%s-page-link.is-disabled' % (position, arrow))
-            for arrow in arrows
-        ])
+        return all(self.q(css=u'nav.%s * .%s-page-link.is-disabled' % (position, arrow)) for arrow in arrows)
 
     def move_back(self, position):
         """

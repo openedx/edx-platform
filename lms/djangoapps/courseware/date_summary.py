@@ -491,11 +491,11 @@ class CertificateAvailableDate(DateSummary):
 
     @property
     def has_certificate_modes(self):
-        return any([
+        return any(
             mode.slug for mode in CourseMode.modes_for_course(
                 course_id=self.course.id, include_expired=True
             ) if mode.slug != CourseMode.AUDIT
-        ])
+        )
 
     def register_alerts(self, request, course):
         """

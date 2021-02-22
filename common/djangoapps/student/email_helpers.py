@@ -72,6 +72,6 @@ def should_send_proctoring_requirements_email(username, course_id):
         settings={'is_time_limited': True}
     )
 
-    has_proctored_exam = any([exam.is_proctored_exam for exam in timed_exams])
+    has_proctored_exam = any(exam.is_proctored_exam for exam in timed_exams)
 
     return has_proctored_exam

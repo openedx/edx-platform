@@ -725,7 +725,7 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
                 results_by_url[location_url].setdefault('definition', {})['children'] = set(total_children)
             else:
                 results_by_url[location_url] = result
-            if location.block_type == 'course':
+            if location.block_type == 'course':  # pylint: disable=no-member
                 root = location_url
 
         # now traverse the tree and compute down the inherited metadata

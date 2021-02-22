@@ -120,7 +120,7 @@ def get_task_completion_info(instructor_task):  # lint-amnesty, pylint: disable=
     if instructor_task.task_state in [FAILURE, REVOKED]:
         return (succeeded, task_output.get('message', _('No message provided')))
 
-    if any([key not in task_output for key in ['action_name', 'attempted', 'total']]):
+    if any(key not in task_output for key in ['action_name', 'attempted', 'total']):
         fmt = _("Invalid task_output information found for instructor_task {0}: {1}")
         log.warning(fmt.format(instructor_task.task_id, instructor_task.task_output))
         return (succeeded, _("No progress status information available"))

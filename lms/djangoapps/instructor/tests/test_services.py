@@ -5,8 +5,6 @@ import json
 from unittest import mock
 
 import pytest
-import mock
-import six
 from django.core.exceptions import ObjectDoesNotExist
 from opaque_keys import InvalidKeyError
 

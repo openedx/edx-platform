@@ -164,7 +164,7 @@ class UserMessageCollection():
             """
             Returns the user message type associated with a level.
             """
-            for __, type in UserMessageType.__members__.items():  # lint-amnesty, pylint: disable=redefined-builtin
+            for __, type in UserMessageType.__members__.items():  # lint-amnesty, pylint: disable=redefined-builtin, no-member
                 if type.value is level:
                     return type
             raise Exception(u'Unable to find UserMessageType for level {level}'.format(level=level))

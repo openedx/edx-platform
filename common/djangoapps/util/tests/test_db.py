@@ -100,21 +100,21 @@ class TransactionManagersTestCase(TransactionTestCase):
         if connection.vendor != 'mysql':
             raise unittest.SkipTest('Only works on MySQL.')
 
-        outer_atomic()(do_nothing)()
+        outer_atomic()(do_nothing)()  # pylint: disable=not-callable
 
         with atomic():
-            atomic()(do_nothing)()
+            atomic()(do_nothing)()  # pylint: disable=not-callable
 
         with outer_atomic():
-            atomic()(do_nothing)()
+            atomic()(do_nothing)()  # pylint: disable=not-callable
 
         with self.assertRaisesRegex(TransactionManagementError, 'Cannot be inside an atomic block.'):
             with atomic():
-                outer_atomic()(do_nothing)()
+                outer_atomic()(do_nothing)()  # pylint: disable=not-callable
 
         with self.assertRaisesRegex(TransactionManagementError, 'Cannot be inside an atomic block.'):
             with outer_atomic():
-                outer_atomic()(do_nothing)()
+                outer_atomic()(do_nothing)()  # pylint: disable=not-callable
 
     def test_named_outer_atomic_nesting(self):
         """
@@ -124,44 +124,44 @@ class TransactionManagersTestCase(TransactionTestCase):
         if connection.vendor != 'mysql':
             raise unittest.SkipTest('Only works on MySQL.')
 
-        outer_atomic(name='abc')(do_nothing)()
+        outer_atomic(name='abc')(do_nothing)()  # pylint: disable=not-callable
 
         with atomic():
-            outer_atomic(name='abc')(do_nothing)()
+            outer_atomic(name='abc')(do_nothing)()  # pylint: disable=not-callable
 
         with enable_named_outer_atomic('abc'):
 
-            outer_atomic(name='abc')(do_nothing)()  # Not nested.
+            outer_atomic(name='abc')(do_nothing)()  # pylint: disable=not-callable  # Not nested.
 
             with atomic():
-                outer_atomic(name='pqr')(do_nothing)()  # Not enabled.
+                outer_atomic(name='pqr')(do_nothing)()  # pylint: disable=not-callable  # Not enabled.
 
             with self.assertRaisesRegex(TransactionManagementError, 'Cannot be inside an atomic block.'):
                 with atomic():
-                    outer_atomic(name='abc')(do_nothing)()
+                    outer_atomic(name='abc')(do_nothing)()  # pylint: disable=not-callable
 
         with enable_named_outer_atomic('abc', 'def'):
 
-            outer_atomic(name='def')(do_nothing)()  # Not nested.
+            outer_atomic(name='def')(do_nothing)()  # pylint: disable=not-callable  # Not nested.
 
             with atomic():
-                outer_atomic(name='pqr')(do_nothing)()  # Not enabled.
+                outer_atomic(name='pqr')(do_nothing)()  # pylint: disable=not-callable  # Not enabled.
 
             with self.assertRaisesRegex(TransactionManagementError, 'Cannot be inside an atomic block.'):
                 with atomic():
-                    outer_atomic(name='def')(do_nothing)()
+                    outer_atomic(name='def')(do_nothing)()  # pylint: disable=not-callable
 
             with self.assertRaisesRegex(TransactionManagementError, 'Cannot be inside an atomic block.'):
                 with outer_atomic():
-                    outer_atomic(name='def')(do_nothing)()
+                    outer_atomic(name='def')(do_nothing)()  # pylint: disable=not-callable
 
             with self.assertRaisesRegex(TransactionManagementError, 'Cannot be inside an atomic block.'):
                 with atomic():
-                    outer_atomic(name='abc')(do_nothing)()
+                    outer_atomic(name='abc')(do_nothing)()  # pylint: disable=not-callable
 
             with self.assertRaisesRegex(TransactionManagementError, 'Cannot be inside an atomic block.'):
                 with outer_atomic():
-                    outer_atomic(name='abc')(do_nothing)()
+                    outer_atomic(name='abc')(do_nothing)()  # pylint: disable=not-callable
 
 
 @ddt.ddt

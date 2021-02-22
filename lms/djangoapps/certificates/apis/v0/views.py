@@ -159,7 +159,7 @@ class CertificatesListView(APIView):
                 permissions.JwtHasUserFilterForRequestedUser
             )
         ),
-        (C(permissions.IsStaff) | IsOwnerOrPublicCertificates),
+        (C(permissions.IsStaff) | IsOwnerOrPublicCertificates),  # pylint: disable=unsupported-binary-operation
     )
 
     required_scopes = ['certificates:read']

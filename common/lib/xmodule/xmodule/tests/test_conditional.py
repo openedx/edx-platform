@@ -180,7 +180,7 @@ class ConditionalBlockBasicTest(unittest.TestCase):
         ajax = json.loads(modules['cond_module'].handle_ajax('', ''))
         print("ajax: ", ajax)
         fragments = ajax['fragments']
-        assert not any([('This is a secret' in item['content']) for item in fragments])
+        assert not any(('This is a secret' in item['content']) for item in fragments)
 
         # now change state of the capa problem to make it completed
         modules['source_module'].is_attempted = "true"
@@ -188,7 +188,7 @@ class ConditionalBlockBasicTest(unittest.TestCase):
         modules['cond_module'].save()
         print("post-attempt ajax: ", ajax)
         fragments = ajax['fragments']
-        assert any([('This is a secret' in item['content']) for item in fragments])
+        assert any(('This is a secret' in item['content']) for item in fragments)
 
     def test_error_as_source(self):
         '''
@@ -199,7 +199,7 @@ class ConditionalBlockBasicTest(unittest.TestCase):
         modules['cond_module'].save()
         ajax = json.loads(modules['cond_module'].handle_ajax('', ''))
         fragments = ajax['fragments']
-        assert not any([('This is a secret' in item['content']) for item in fragments])
+        assert not any(('This is a secret' in item['content']) for item in fragments)
 
     @patch('xmodule.conditional_module.log')
     def test_conditional_with_staff_only_source_module(self, mock_log):
@@ -294,7 +294,7 @@ class ConditionalBlockXmlTest(unittest.TestCase):
         module.save()
         print("ajax: ", ajax)
         fragments = ajax['fragments']
-        assert not any([('This is a secret' in item['content']) for item in fragments])
+        assert not any(('This is a secret' in item['content']) for item in fragments)
 
         # Now change state of the capa problem to make it completed
         inner_module = inner_get_module(location.replace(category="problem", name='choiceprob'))
@@ -306,7 +306,7 @@ class ConditionalBlockXmlTest(unittest.TestCase):
         module.save()
         print("post-attempt ajax: ", ajax)
         fragments = ajax['fragments']
-        assert any([('This is a secret' in item['content']) for item in fragments])
+        assert any(('This is a secret' in item['content']) for item in fragments)
 
     maxDiff = None
 

@@ -9,8 +9,6 @@ import unittest
 from unittest import mock
 
 import pytest
-import mock
-import six
 from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.core.exceptions import MultipleObjectsReturned
 from django.test import TestCase

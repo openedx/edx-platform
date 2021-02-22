@@ -9,7 +9,6 @@ from django.conf import settings
 from django.db.models import BooleanField, IntegerField, TextField
 from django.utils.encoding import python_2_unicode_compatible
 from opaque_keys.edx.django.models import CourseKeyField
-from six import text_type
 
 from openedx.core.lib.cache_utils import request_cached
 

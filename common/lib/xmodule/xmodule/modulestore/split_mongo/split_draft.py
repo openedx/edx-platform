@@ -361,7 +361,7 @@ class DraftVersioningModuleStore(SplitMongoModuleStore, ModuleStoreDraftAndPubli
             # check the children in the draft
             if 'children' in draft_block.fields:
                 return any(
-                    [has_changes_subtree(child_block_id) for child_block_id in draft_block.fields['children']]
+                    has_changes_subtree(child_block_id) for child_block_id in draft_block.fields['children']
                 )
 
             return False

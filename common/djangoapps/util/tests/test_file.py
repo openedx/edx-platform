@@ -9,7 +9,6 @@ from datetime import datetime
 from io import StringIO
 import pytest
 import ddt
-import six
 from django.core import exceptions
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.http import HttpRequest
