@@ -25,7 +25,6 @@ class BadgeViewsTestCases(ModuleStoreTestCase):
         self.user = UserFactory()
         self.client.login(username=self.user.username, password='test')
 
-
     @classmethod
     def setUpClass(cls):
         super(BadgeViewsTestCases, cls).setUpClass()
@@ -64,7 +63,7 @@ class BadgeViewsTestCases(ModuleStoreTestCase):
         UserBadgeFactory(user=any_other_user, course_id=CourseKeyField.Empty, badge=badge2)
 
         mock_populate_trophycase.return_value = dict()
-        response = self.client.get(reverse('trophycase'), data={'json':True}, follow=True)
+        response = self.client.get(reverse('trophycase'), data={'json': True}, follow=True)
         self.assertEqual(response.status_code, 200)
         mock_populate_trophycase.assert_called_once_with(self.user, mock.ANY, [user_badge])
 

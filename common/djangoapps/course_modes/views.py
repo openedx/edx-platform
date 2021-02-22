@@ -118,8 +118,9 @@ class ChooseModeView(View):
             course_target = reverse('about_course', args=[unicode(course_id)])
         else:
             first_chapter_url, first_section = get_course_related_keys(request, course)
-            course_target = reverse('courseware_section', args=[course.id.to_deprecated_string(), first_chapter_url,
-                                                            first_section])
+            course_target = reverse(
+                'courseware_section', args=[course.id.to_deprecated_string(), first_chapter_url, first_section]
+            )
 
         # If there isn't a verified mode available, then there's nothing
         # to do on this page.  Send the user to the dashboard.

@@ -54,11 +54,11 @@ class PytestWorkerManager():
                     KeyName=key_name,
                     NetworkInterfaces=[
                         {
-                        'AssociatePublicIpAddress': True,
-                        'DeviceIndex': 0,
-                        'DeleteOnTermination': True,
-                        'Groups': security_group_ids,
-                        'SubnetId': subnet,
+                            'AssociatePublicIpAddress': True,
+                            'DeviceIndex': 0,
+                            'DeleteOnTermination': True,
+                            'Groups': security_group_ids,
+                            'SubnetId': subnet,
                         },
                     ],
                     TagSpecifications=[

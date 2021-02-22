@@ -4,6 +4,7 @@ from django.conf import settings
 from oef.models import OefSurvey, TopicQuestion, OptionLevel, OrganizationOefScore, Instruction
 from oef.messages import NON_APPLICABLE_OEF, PENDING_DRAFT
 
+
 def get_user_survey_status(user, create_new_survey=True):
     """
     This function determines, whether a user is

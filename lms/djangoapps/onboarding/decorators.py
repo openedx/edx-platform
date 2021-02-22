@@ -34,8 +34,8 @@ def can_save_org_details(function):
     def wrap(request, *args, **kwargs):
         user_extended_profile = request.user.extended_profile
 
-        if can_access_org_page(user_extended_profile) and \
-                        user_extended_profile.organization.org_type == PartnerNetwork.NON_PROFIT_ORG_TYPE_CODE:
+        if (can_access_org_page(user_extended_profile) and
+                user_extended_profile.organization.org_type == PartnerNetwork.NON_PROFIT_ORG_TYPE_CODE):
             return function(request, *args, **kwargs)
         else:
             raise PermissionDenied

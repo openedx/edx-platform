@@ -25,7 +25,7 @@ class CourseOverviewAdmin(admin.ModelAdmin):
     ]
 
     search_fields = ['id', 'display_name']
-    
+
     def course_short_id(self, obj):
 
         from lms.djangoapps.philu_api.helpers import get_course_custom_settings

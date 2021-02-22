@@ -1,6 +1,10 @@
+"""
+PhilU third party auth context processors
+"""
 import json
 
 from openedx.core.djangoapps.user_authn.views.login_form import _third_party_auth_context
+
 from .helpers import normalize_pipeline_kwargs
 
 
@@ -22,7 +26,7 @@ def get_third_party_auth_urls(request):
         if utm_params:
             try:
                 third_party_form_fields['utm_params'] = json.loads(utm_params)
-            except:
+            except:  # pylint: disable=bare-except
                 third_party_form_fields['utm_params'] = {}
 
     return {

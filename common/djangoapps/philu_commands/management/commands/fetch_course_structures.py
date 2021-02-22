@@ -39,9 +39,9 @@ class Command(BaseCommand):
             course_structures.append(course_structure)
 
         if course_structures:
-            print('-'*80)
+            print('-' * 80)
             print('Course structures for given course ids: ')
             print(json.dumps(course_structures))
-            print('-'*80)
+            print('-' * 80)
         else:
             log.error('All course ids provided are invalid')

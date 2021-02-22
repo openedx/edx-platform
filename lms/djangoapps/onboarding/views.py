@@ -138,8 +138,7 @@ def user_info(request):
         'is_under_age': is_under_age,
         'non_profile_organization': Organization.is_non_profit(user_extended_profile),
         'is_poc': is_poc,
-        'is_first_user': user_extended_profile.is_first_signup_in_org \
-            if user_extended_profile.organization else False,
+        'is_first_user': user_extended_profile.is_first_signup_in_org if user_extended_profile.organization else False,
         'google_place_api_key': settings.GOOGLE_PLACE_API_KEY,
         'org_url': reverse('get_organizations'),
         'reset_org': reset_org,

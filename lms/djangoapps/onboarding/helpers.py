@@ -7840,7 +7840,7 @@ def oef_eligible_first_learner(user_extended_profile):
     :return: True if user is first learner & not submitted OEF yet & organization admin not set
     """
     return user_extended_profile.is_first_signup_in_org and not user_extended_profile.has_submitted_oef() \
-           and not user_extended_profile.organization.admin
+        and not user_extended_profile.organization.admin
 
 
 def get_str_match_ratio(str1, str2):

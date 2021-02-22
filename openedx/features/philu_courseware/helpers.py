@@ -22,7 +22,6 @@ def get_nth_chapter_link(course, chapter_index=0):
     if not course_chapters:
         log.info("%s Course dont have any chapters", course.display_name)
 
-
     try:
         chapter = course_chapters[0].children[chapter_index]
     except IndexError:

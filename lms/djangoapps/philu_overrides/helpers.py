@@ -1,8 +1,12 @@
+"""
+Helper methods for `philu_overrides` app
+"""
 import json
 from datetime import datetime
 
 import pytz
 from django.urls import reverse
+from django.utils.translation import ugettext_lazy as _
 
 from common.lib.mandrill_client.client import MandrillClient
 from lms.djangoapps.courseware.courses import get_course_by_id
@@ -24,11 +28,22 @@ def get_course_details(course_id):
 
 
 def send_account_activation_email(request, registration, user):
+    """
+    Send account activation email to user
+
+    Arguments:
+        request (HttpRequest): HttpRequest object
+        registration (Registration): Registration object
+        user (User): User object
+
+    Returns:
+        None
+    """
     activation_link = '{protocol}://{site}/activate/{key}'.format(
-            protocol='https' if request.is_secure() else 'http',
-            site=safe_get_host(request),
-            key=registration.activation_key
-        )
+        protocol='https' if request.is_secure() else 'http',
+        site=safe_get_host(request),
+        key=registration.activation_key
+    )
 
     context = {
         'first_name': user.first_name,
@@ -51,13 +66,9 @@ def reactivation_email_for_user_custom(request, user):
 def has_access_custom(course):
     """ User can enroll if current time is between enrollment start and end date """
     current_time = datetime.utcnow().replace(tzinfo=utc)
-    if not course.enrollment_start or not course.enrollment_end:
-        return False
 
-    if course.enrollment_start < current_time < course.enrollment_end:
-        return True
-    else:
-        return False
+    return (course.enrollment_start and course.enrollment_end and
+            course.enrollment_start < current_time < course.enrollment_end)
 
 
 def get_course_next_classes(request, course):
@@ -141,8 +152,6 @@ def get_user_current_enrolled_class(request, course):
     => end date > today
     => user is enrolled
     """
-    from datetime import datetime
-    from django.core.urlresolvers import reverse
     from opaque_keys.edx.locations import SlashSeparatedCourseKey
     from lms.djangoapps.philu_overrides.courseware.views.views import get_course_related_keys
     from student.models import CourseEnrollment
@@ -172,6 +181,16 @@ def get_user_current_enrolled_class(request, course):
 
 
 def get_course_current_class(all_course_reruns, current_time):
+    """
+    Method to get ongoing course
+
+    Arguments:
+        all_course_reruns (list): List of course reruns key
+        current_time (datetime): Current time
+
+    Returns:
+        CourseOverview object or None
+    """
     from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
     from openedx.features.course_card.helpers import get_course_open_date
     course = CourseOverview.objects.select_related('image_set').filter(
@@ -188,7 +207,7 @@ def get_course_current_class(all_course_reruns, current_time):
 
 
 def is_user_enrolled_in_any_class(course_current_class, course_next_classes):
-    next_reg_classes = filter(lambda next_class: next_class['registered'], course_next_classes)
+    next_reg_classes = [next_class for next_class in course_next_classes if next_class['registered']]
     return bool(course_current_class or next_reg_classes)
 
 
@@ -211,7 +230,7 @@ def get_next_url_for_login_page_override(request):
     specified.
     """
     import urllib
-    from django.core.urlresolvers import reverse, NoReverseMatch
+    from django.core.urlresolvers import NoReverseMatch
     from django.utils import http
     from lms.djangoapps.onboarding.helpers import get_alquity_community_url
     import logging
@@ -227,7 +246,6 @@ def get_next_url_for_login_page_override(request):
 
     if redirect_to == 'alquity' and request.path == '/login':
         return get_alquity_community_url()
-
 
     # if we get a redirect parameter, make sure it's safe. If it's not, drop the
     # parameter.

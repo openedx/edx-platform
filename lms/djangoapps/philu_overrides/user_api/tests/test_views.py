@@ -3,15 +3,15 @@
 import json
 from unittest import skipUnless
 
-
 import ddt
 import factory
 from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.db.models.signals import post_save
+
+from common.djangoapps.util.password_policy_validators import DEFAULT_MAX_PASSWORD_LENGTH
 from lms.djangoapps.onboarding.tests.factories import UserFactory
-from openedx.core.djangoapps.user_api.accounts import (EMAIL_MAX_LENGTH, EMAIL_MIN_LENGTH, PASSWORD_MAX_LENGTH,
-                                                       PASSWORD_MIN_LENGTH)
+from openedx.core.djangoapps.user_api.accounts import EMAIL_MAX_LENGTH, EMAIL_MIN_LENGTH
 from openedx.core.lib.api.test_utils import ApiTestCase
 
 
@@ -84,8 +84,7 @@ class LoginSessionViewTest(ApiTestCase):
                 "placeholder": "",
                 "instructions": "",
                 "restrictions": {
-                    "min_length": PASSWORD_MIN_LENGTH,
-                    "max_length": PASSWORD_MAX_LENGTH
+                    "max_length": DEFAULT_MAX_PASSWORD_LENGTH,
                 },
                 "errorMessages": {},
                 "supplementalText": "",
@@ -196,4 +195,3 @@ class LoginSessionViewTest(ApiTestCase):
         # Missing both email and password
         response = self.client.post(self.url, {})
         self.assertHttpBadRequest(response)
-

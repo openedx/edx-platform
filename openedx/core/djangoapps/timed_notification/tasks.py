@@ -80,4 +80,3 @@ def task_course_notifications():
             log.info("Finishing celery task")
 
     log.info("Emailing Task Completed")
-
