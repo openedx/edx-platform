@@ -21,7 +21,7 @@ class TestSafeSessionsLogMixin(object):
         """
         with patch('openedx.core.djangoapps.safe_sessions.middleware.log.' + log_level) as mock_log:
             yield
-            self.assertTrue(mock_log.called)
+            assert mock_log.called
             self.assertRegex(mock_log.call_args_list[0][0][0], log_string)
 
     @contextmanager
@@ -51,7 +51,7 @@ class TestSafeSessionsLogMixin(object):
         """
         with patch('openedx.core.djangoapps.safe_sessions.middleware.log.warning') as mock_log:
             yield
-            self.assertFalse(mock_log.called)
+            assert not mock_log.called
 
     @contextmanager
     def assert_no_error_logged(self):
@@ -60,7 +60,7 @@ class TestSafeSessionsLogMixin(object):
         """
         with patch('openedx.core.djangoapps.safe_sessions.middleware.log.error') as mock_log:
             yield
-            self.assertFalse(mock_log.called)
+            assert not mock_log.called
 
     @contextmanager
     def assert_signature_error_logged(self, sig_error_string):

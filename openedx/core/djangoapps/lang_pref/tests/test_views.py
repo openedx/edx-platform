@@ -30,11 +30,11 @@ class TestLangPrefView(TestCase):
         # test language session updating correctly.
         self.request.session[LANGUAGE_SESSION_KEY] = 'ar'
         response = self.client.patch(reverse("session_language"), json.dumps({'pref-lang': 'eo'}))
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
         self.client.get('/')
-        self.assertEqual(get_language(), 'eo')
+        assert get_language() == 'eo'
 
         response = self.client.patch(reverse("session_language"), json.dumps({'pref-lang': 'en'}))
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
         self.client.get('/')
-        self.assertEqual(get_language(), 'en')
+        assert get_language() == 'en'

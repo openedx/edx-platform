@@ -6,7 +6,7 @@ Unit tests for SafeCookieData
 
 import itertools
 from time import time
-
+import pytest
 import ddt
 import six
 from django.test import TestCase
@@ -48,25 +48,25 @@ class TestSafeCookieData(TestSafeSessionsLogMixin, TestCase):
     def test_success(self, session_id, user_id):
         # create and verify
         safe_cookie_data_1 = SafeCookieData.create(session_id, user_id)
-        self.assertTrue(safe_cookie_data_1.verify(user_id))
+        assert safe_cookie_data_1.verify(user_id)
 
         # serialize
         serialized_value = six.text_type(safe_cookie_data_1)
 
         # parse and verify
         safe_cookie_data_2 = SafeCookieData.parse(serialized_value)
-        self.assertTrue(safe_cookie_data_2.verify(user_id))
+        assert safe_cookie_data_2.verify(user_id)
 
         # compare
         self.assert_cookie_data_equal(safe_cookie_data_1, safe_cookie_data_2)
 
     def test_version(self):
-        self.assertEqual(self.safe_cookie_data.version, SafeCookieData.CURRENT_VERSION)
+        assert self.safe_cookie_data.version == SafeCookieData.CURRENT_VERSION
 
     def test_serialize(self):
         serialized_value = six.text_type(self.safe_cookie_data)
         for field_value in six.itervalues(self.safe_cookie_data.__dict__):
-            self.assertIn(six.text_type(field_value), serialized_value)
+            assert six.text_type(field_value) in serialized_value
 
     #---- Test Parse ----#
 
@@ -87,14 +87,14 @@ class TestSafeCookieData(TestSafeSessionsLogMixin, TestCase):
     @ddt.data('1', '1|s', '1|s|k', '1|s|k|sig|extra', '73453', 's90sfs')
     def test_parse_error(self, serialized_value):
         with self.assert_parse_error():
-            with self.assertRaises(SafeCookieError):
+            with pytest.raises(SafeCookieError):
                 SafeCookieData.parse(serialized_value)
 
     @ddt.data(0, 2, -1, 'invalid_version')
     def test_parse_invalid_version(self, version):
         serialized_value = '{}|session_id|key_salt|signature'.format(version)
         with self.assert_logged(r"SafeCookieData version .* is not supported."):
-            with self.assertRaises(SafeCookieError):
+            with pytest.raises(SafeCookieError):
                 SafeCookieData.parse(serialized_value)
 
     #---- Test Create ----#
@@ -102,19 +102,19 @@ class TestSafeCookieData(TestSafeSessionsLogMixin, TestCase):
     @ddt.data(None, '')
     def test_create_invalid_session_id(self, session_id):
         with self.assert_invalid_session_id():
-            with self.assertRaises(SafeCookieError):
+            with pytest.raises(SafeCookieError):
                 SafeCookieData.create(session_id, self.user_id)
 
     @ddt.data(None, '')
     def test_create_no_user_id(self, user_id):
         with self.assert_logged('SafeCookieData received empty user_id', 'debug'):
             safe_cookie_data = SafeCookieData.create(self.session_id, user_id)
-            self.assertTrue(safe_cookie_data.verify(user_id))
+            assert safe_cookie_data.verify(user_id)
 
     #---- Test Verify ----#
 
     def test_verify_success(self):
-        self.assertTrue(self.safe_cookie_data.verify(self.user_id))
+        assert self.safe_cookie_data.verify(self.user_id)
 
     #- Test verify: expiration -#
 
@@ -122,20 +122,20 @@ class TestSafeCookieData(TestSafeSessionsLogMixin, TestCase):
         three_weeks_from_now = time() + 60 * 60 * 24 * 7 * 3
         with patch('time.time', return_value=three_weeks_from_now):
             with self.assert_signature_error_logged('Signature age'):
-                self.assertFalse(self.safe_cookie_data.verify(self.user_id))
+                assert not self.safe_cookie_data.verify(self.user_id)
 
     #- Test verify: incorrect user -#
 
     @ddt.data(None, 'invalid_user_id', -1)
     def test_verify_incorrect_user_id(self, user_id):
         with self.assert_incorrect_user_logged():
-            self.assertFalse(self.safe_cookie_data.verify(user_id))
+            assert not self.safe_cookie_data.verify(user_id)
 
     @ddt.data('version', 'session_id')
     def test_verify_incorrect_field_value(self, field_name):
         setattr(self.safe_cookie_data, field_name, 'incorrect_cookie_value')
         with self.assert_incorrect_user_logged():
-            self.assertFalse(self.safe_cookie_data.verify(self.user_id))
+            assert not self.safe_cookie_data.verify(self.user_id)
 
     #- Test verify: incorrect signature -#
 
@@ -143,12 +143,12 @@ class TestSafeCookieData(TestSafeSessionsLogMixin, TestCase):
         another_cookie_data = SafeCookieData.create(self.session_id, self.user_id)  # different key_salt and expiration
         self.safe_cookie_data.signature = another_cookie_data.signature
         with self.assert_incorrect_signature_logged():
-            self.assertFalse(self.safe_cookie_data.verify(self.user_id))
+            assert not self.safe_cookie_data.verify(self.user_id)
 
     def test_verify_incorrect_key_salt(self):
         self.safe_cookie_data.key_salt = 'incorrect_cookie_value'
         with self.assert_incorrect_signature_logged():
-            self.assertFalse(self.safe_cookie_data.verify(self.user_id))
+            assert not self.safe_cookie_data.verify(self.user_id)
 
     @ddt.data(
         *itertools.product(
@@ -170,30 +170,26 @@ class TestSafeCookieData(TestSafeSessionsLogMixin, TestCase):
             self.safe_cookie_data.signature, start, start + length
         )
         with self.assert_incorrect_signature_logged():
-            self.assertFalse(self.safe_cookie_data.verify(self.user_id))
+            assert not self.safe_cookie_data.verify(self.user_id)
 
     #- Test verify: corrupt signature -#
 
     def test_verify_corrupt_signature(self):
         self.safe_cookie_data.signature = 'corrupt_signature'
         with self.assert_signature_error_logged('No .* found in value'):
-            self.assertFalse(self.safe_cookie_data.verify(self.user_id))
+            assert not self.safe_cookie_data.verify(self.user_id)
 
     #---- Test Digest ----#
 
     def test_digest_success(self):
         # Should return the same digest twice.
-        self.assertEqual(
-            self.safe_cookie_data._compute_digest(self.user_id),
-            self.safe_cookie_data._compute_digest(self.user_id),
-        )
+        assert self.safe_cookie_data._compute_digest(self.user_id) == \
+               self.safe_cookie_data._compute_digest(self.user_id)
 
     @ddt.data('another_user', 0, None)
     def test_digest_incorrect_user(self, incorrect_user):
-        self.assertNotEqual(
-            self.safe_cookie_data._compute_digest(self.user_id),
-            self.safe_cookie_data._compute_digest(incorrect_user)
-        )
+        assert self.safe_cookie_data._compute_digest(self.user_id) !=\
+               self.safe_cookie_data._compute_digest(incorrect_user)
 
     @ddt.data(
         *itertools.product(
@@ -205,7 +201,4 @@ class TestSafeCookieData(TestSafeSessionsLogMixin, TestCase):
     def test_digest_incorrect_field_value(self, field_name, incorrect_field_value):
         digest = self.safe_cookie_data._compute_digest(self.user_id)
         setattr(self.safe_cookie_data, field_name, incorrect_field_value)
-        self.assertNotEqual(
-            digest,
-            self.safe_cookie_data._compute_digest(self.user_id)
-        )
+        assert digest != self.safe_cookie_data._compute_digest(self.user_id)
