@@ -7,10 +7,10 @@ This file contains implementation override of SearchFilterGenerator which will a
 import six
 from search.filter_generator import SearchFilterGenerator
 
+from common.djangoapps.student.models import CourseEnrollment
 from openedx.core.djangoapps.course_groups.partition_scheme import CohortPartitionScheme
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.user_api.partition_schemes import RandomUserPartitionScheme
-from common.djangoapps.student.models import CourseEnrollment
 
 INCLUDE_SCHEMES = [CohortPartitionScheme, RandomUserPartitionScheme, ]
 SCHEME_SUPPORTS_ASSIGNMENT = [RandomUserPartitionScheme, ]
@@ -29,12 +29,12 @@ class LmsSearchFilterGenerator(SearchFilterGenerator):
 
     def field_dictionary(self, **kwargs):
         """ add course if provided otherwise add courses in which the user is enrolled in """
-        field_dictionary = super(LmsSearchFilterGenerator, self).field_dictionary(**kwargs)  # lint-amnesty, pylint: disable=super-with-arguments
+        field_dictionary = super().field_dictionary(**kwargs)
         if not kwargs.get('user'):
             field_dictionary['course'] = []
         elif not kwargs.get('course_id'):
             user_enrollments = self._enrollments_for_user(kwargs['user'])
-            field_dictionary['course'] = [six.text_type(enrollment.course_id) for enrollment in user_enrollments]
+            field_dictionary['course'] = [str(enrollment.course_id) for enrollment in user_enrollments]
 
         # if we have an org filter, only include results for this org filter
         course_org_filter = configuration_helpers.get_current_site_orgs()
@@ -47,7 +47,7 @@ class LmsSearchFilterGenerator(SearchFilterGenerator):
         """
             Exclude any courses defined outside the current org.
         """
-        exclude_dictionary = super(LmsSearchFilterGenerator, self).exclude_dictionary(**kwargs)  # lint-amnesty, pylint: disable=super-with-arguments
+        exclude_dictionary = super().exclude_dictionary(**kwargs)
         course_org_filter = configuration_helpers.get_current_site_orgs()
         # If we have a course filter we are ensuring that we only get those courses above
         if not course_org_filter:
