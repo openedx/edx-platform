@@ -132,6 +132,8 @@ class EffortEstimationTransformer(BlockStructureTransformer):
             'course': self._estimate_children_effort,
             'html': self._estimate_html_effort,
             'sequential': self._estimate_children_effort,
+            'problemset': self._estimate_children_effort,
+            'videosequence': self._estimate_children_effort,
             'vertical': self._estimate_vertical_effort,
             'video': self._estimate_video_effort,
         }
