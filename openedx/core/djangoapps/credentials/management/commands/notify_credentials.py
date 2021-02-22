@@ -162,7 +162,7 @@ class Command(BaseCommand):
             help='Send program award notifications with course notification tasks',
         )
         parser.add_argument(
-            '--usernames',
+            '--user_ids',
             default=None,
             nargs='+',
             help='Run the command for the given user or list of users',
@@ -190,7 +190,7 @@ class Command(BaseCommand):
 
         log.info(
             u"notify_credentials starting, dry-run=%s, site=%s, delay=%d seconds, page_size=%d, "
-            u"from=%s, to=%s, notify_programs=%s, usernames=%s, execution=%s",
+            u"from=%s, to=%s, notify_programs=%s, user_ids=%s, execution=%s",
             options['dry_run'],
             options['site'],
             options['delay'],
@@ -198,7 +198,7 @@ class Command(BaseCommand):
             options['start_date'] if options['start_date'] else 'NA',
             options['end_date'] if options['end_date'] else 'NA',
             options['notify_programs'],
-            options['usernames'],
+            options['user_ids'],
             'auto' if options['auto'] else 'manual',
         )
 
@@ -208,16 +208,16 @@ class Command(BaseCommand):
             log.error(u'No site configuration found for site %s', options['site'])
 
         course_keys = self.get_course_keys(options['courses'])
-        if not (course_keys or options['start_date'] or options['end_date'] or options['usernames']):
-            raise CommandError('You must specify a filter (e.g. --courses= or --start-date or --usernames)')
+        if not (course_keys or options['start_date'] or options['end_date'] or options['user_ids']):
+            raise CommandError('You must specify a filter (e.g. --courses= or --start-date or --user_ids)')
 
         certs = get_recently_modified_certificates(
-            course_keys, options['start_date'], options['end_date'], options['usernames']
+            course_keys, options['start_date'], options['end_date'], options['user_ids']
         )
 
         users = None
-        if options['usernames']:
-            users = User.objects.filter(username__in=options['usernames'])
+        if options['user_ids']:
+            users = User.objects.filter(id__in=options['user_ids'])
         grades = get_recently_modified_grades(
             course_keys, options['start_date'], options['end_date'], users
         )

@@ -22,7 +22,7 @@ class Command(BaseCommand):
     Management command to generate allowlist certificates for one or more users in a given course run.
 
     Example usage:
-    ./manage.py lms cert_allowlist_generation -u edx verified -c course-v1:edX+DemoX+Demo_Course
+    ./manage.py lms cert_allowlist_generation -u 123 verified -c course-v1:edX+DemoX+Demo_Course
     """
 
     help = """
@@ -35,7 +35,7 @@ class Command(BaseCommand):
             nargs="+",
             metavar='USER',
             dest='user',
-            help='user or space-separated list of users for whom to generate allowlist certificates'
+            help='user_id or space-separated list of user_ids for whom to generate allowlist certificates'
         )
         parser.add_argument(
             '-c', '--course-key',
@@ -80,8 +80,12 @@ class Command(BaseCommand):
 
         # Loop over each user, and ask that a cert be generated for them
         users_str = options['user']
-        for user_identifier in users_str:
-            user = _get_user_from_identifier(user_identifier)
+        for user_id in users_str:
+            user = None
+            try:
+                user = User.objects.get(id=user_id)
+            except User.DoesNotExist:
+                log.warning('User {user} could not be found'.format(user=user_id))
             if user is not None:
                 log.info(
                     'Calling generate_allowlist_certificate_task for {user} : {course}'.format(
@@ -89,18 +93,3 @@ class Command(BaseCommand):
                         course=course_key
                     ))
                 generate_allowlist_certificate_task(user, course_key)
-
-
-def _get_user_from_identifier(identifier):
-    """
-    Using the string identifier, fetch the relevant user object from database
-    """
-    try:
-        if '@' in identifier:
-            user = User.objects.get(email=identifier)
-        else:
-            user = User.objects.get(username=identifier)
-        return user
-    except User.DoesNotExist:
-        log.warning('User {user} could not be found'.format(user=identifier))
-        return None
