@@ -1776,19 +1776,18 @@ class TestInstructorAPIEnrollment(SharedModuleStoreTestCase, LoginEnrollmentTest
         )
         assert course_enrollment.mode == CourseMode.DEFAULT_MODE_SLUG
 
-    def test_role_and_reason_are_persisted(self):
+    def test_reason_is_persisted(self):
         """
-        test that role and reason fields are persisted in the database
+        test that reason field is persisted in the database
         """
         paid_course = self.create_paid_course()
         url = reverse('students_update_enrollment', kwargs={'course_id': str(paid_course.id)})
         params = {'identifiers': self.notregistered_email, 'action': 'enroll', 'email_students': False,
-                  'auto_enroll': False, 'reason': 'testing', 'role': 'Learner'}
+                  'auto_enroll': False, 'reason': 'testing'}
         response = self.client.post(url, params)
 
         manual_enrollment = ManualEnrollmentAudit.objects.first()
         assert manual_enrollment.reason == 'testing'
-        assert manual_enrollment.role == 'Learner'
         assert response.status_code == 200
 
     def _change_student_enrollment(self, user, course, action):

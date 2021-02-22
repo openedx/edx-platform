@@ -649,17 +649,6 @@ def students_update_enrollment(request, course_id):  # lint-amnesty, pylint: dis
     auto_enroll = _get_boolean_param(request, 'auto_enroll')
     email_students = _get_boolean_param(request, 'email_students')
     reason = request.POST.get('reason')
-    role = request.POST.get('role')
-
-    allowed_role_choices = configuration_helpers.get_value('MANUAL_ENROLLMENT_ROLE_CHOICES',
-                                                           settings.MANUAL_ENROLLMENT_ROLE_CHOICES)
-    if role and role not in allowed_role_choices:
-        return JsonResponse(
-            {
-                'action': action,
-                'results': [{'error': True, 'message': 'Not a valid role choice'}],
-                'auto_enroll': auto_enroll,
-            }, status=400)
 
     enrollment_obj = None
     state_transition = DEFAULT_TRANSITION_STATE
@@ -752,7 +741,7 @@ def students_update_enrollment(request, course_id):  # lint-amnesty, pylint: dis
 
         else:
             ManualEnrollmentAudit.create_manual_enrollment_audit(
-                request.user, email, state_transition, reason, enrollment_obj, role
+                request.user, email, state_transition, reason, enrollment_obj
             )
             results.append({
                 'identifier': identifier,
