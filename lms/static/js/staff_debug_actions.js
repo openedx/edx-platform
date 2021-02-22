@@ -157,24 +157,44 @@ $(document).ready(function() {
 
     var $mainContainer = $('#main');
     $mainContainer.on('click', '.staff-debug-reset', function() {
-        StaffDebug.reset($(this).parent().data('course-id'), $(this).parent().data('location-name'), $(this).parent().data('location'));
+        StaffDebug.reset(
+            $(this).parent().data('course-id'),
+            $(this).parent().data('location-name'),
+            $(this).parent().data('location')
+        );
         return false;
     });
     $mainContainer.on('click', '.staff-debug-sdelete', function() {
-        StaffDebug.deleteStudentState($(this).parent().data('course-id'), $(this).parent().data('location-name'), $(this).parent().data('location'));
+        StaffDebug.deleteStudentState(
+            $(this).parent().data('course-id'),
+            $(this).parent().data('location-name'),
+            $(this).parent().data('location')
+        );
         return false;
     });
     $mainContainer.on('click', '.staff-debug-rescore', function() {
-        StaffDebug.rescore($(this).parent().data('course-id'), $(this).parent().data('location-name'), $(this).parent().data('location'));
+        StaffDebug.rescore(
+            $(this).parent().data('course-id'),
+            $(this).parent().data('location-name'),
+            $(this).parent().data('location')
+        );
         return false;
     });
     $mainContainer.on('click', '.staff-debug-rescore-if-higher', function() {
-        StaffDebug.rescoreIfHigher($(this).parent().data('course-id'), $(this).parent().data('location-name'), $(this).parent().data('location'));
+        StaffDebug.rescoreIfHigher(
+            $(this).parent().data('course-id'),
+            $(this).parent().data('location-name'),
+            $(this).parent().data('location')
+        );
         return false;
     });
 
     $mainContainer.on('click', '.staff-debug-override-score', function() {
-        StaffDebug.overrideScore($(this).parent().data('course-id'), $(this).parent().data('location-name'), $(this).parent().data('location'));
+        StaffDebug.overrideScore(
+            $(this).parent().data('course-id'),
+            $(this).parent().data('location-name'),
+            $(this).parent().data('location')
+        );
         return false;
     });
 });
