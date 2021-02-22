@@ -9,8 +9,8 @@ from django.http import HttpResponseForbidden
 from django.utils.deprecation import MiddlewareMixin
 from django.utils.translation import ugettext as _
 
-from openedx.core.djangolib.markup import HTML, Text
 from common.djangoapps.student.models import UserStanding
+from openedx.core.djangolib.markup import HTML, Text
 
 
 class UserStandingMiddleware(MiddlewareMixin):
@@ -33,7 +33,7 @@ class UserStandingMiddleware(MiddlewareMixin):
                     'this was done in error, please contact us at '
                     '{support_email}'
                 )).format(
-                    support_email=HTML(u'<a href="mailto:{address}?subject={subject_line}">{address}</a>').format(
+                    support_email=HTML('<a href="mailto:{address}?subject={subject_line}">{address}</a>').format(
                         address=settings.DEFAULT_FEEDBACK_EMAIL,
                         subject_line=_('Disabled Account'),
                     ),

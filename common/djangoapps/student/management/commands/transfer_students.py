@@ -8,7 +8,6 @@ from textwrap import dedent
 from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.db import transaction
 from opaque_keys.edx.keys import CourseKey
-from six import text_type
 
 from common.djangoapps.student.models import CourseEnrollment
 from common.djangoapps.track.management.tracked_command import TrackedCommand
@@ -56,7 +55,7 @@ class Command(TrackedCommand):
 
         for user in source_students:
             with transaction.atomic():
-                print('Moving {}.'.format(user.username))
+                print(f'Moving {user.username}.')
                 # Find the old enrollment.
                 enrollment = CourseEnrollment.objects.get(
                     user=user,
@@ -67,14 +66,14 @@ class Command(TrackedCommand):
                 mode = enrollment.mode
                 old_is_active = enrollment.is_active
                 CourseEnrollment.unenroll(user, source_key, skip_refund=True)
-                print('Unenrolled {} from {}'.format(user.username, text_type(source_key)))
+                print('Unenrolled {} from {}'.format(user.username, str(source_key)))
 
                 for dest_key in dest_keys:
                     if CourseEnrollment.is_enrolled(user, dest_key):
                         # Un Enroll from source course but don't mess
                         # with the enrollment in the destination course.
                         msg = 'Skipping {}, already enrolled in destination course {}'
-                        print(msg.format(user.username, text_type(dest_key)))
+                        print(msg.format(user.username, str(dest_key)))
                     else:
                         new_enrollment = CourseEnrollment.enroll(user, dest_key, mode=mode)
 

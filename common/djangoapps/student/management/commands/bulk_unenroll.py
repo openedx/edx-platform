@@ -8,7 +8,8 @@ from django.core.exceptions import ObjectDoesNotExist  # lint-amnesty, pylint: d
 from django.core.management.base import BaseCommand
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
-from common.djangoapps.student.models import CourseEnrollment, BulkUnenrollConfiguration
+
+from common.djangoapps.student.models import BulkUnenrollConfiguration, CourseEnrollment
 
 logger = logging.getLogger(__name__)  # pylint: disable=invalid-name
 
@@ -70,7 +71,7 @@ class Command(BaseCommand):
         try:
             course_key = CourseKey.from_string(course_id)
         except InvalidKeyError:
-            msg = 'Invalid course id {}, skipping un-enrollement.'.format(course_id)
+            msg = f'Invalid course id {course_id}, skipping un-enrollement.'
             logger.warning(msg)
             return
 
@@ -78,7 +79,7 @@ class Command(BaseCommand):
         if username:
             enrollments = enrollments.filter(user__username=username)
 
-        logger.info("Processing [{}] with [{}] enrollments.".format(course_id, enrollments.count()))
+        logger.info(f"Processing [{course_id}] with [{enrollments.count()}] enrollments.")
 
         if self.commit:
             for enrollment in enrollments:

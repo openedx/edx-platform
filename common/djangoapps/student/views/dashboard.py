@@ -21,11 +21,22 @@ from opaque_keys.edx.keys import CourseKey
 from pytz import UTC
 from six import iteritems, text_type
 
-from lms.djangoapps.bulk_email.api import is_bulk_email_feature_enabled
-from lms.djangoapps.bulk_email.models import Optout
 from common.djangoapps.course_modes.models import CourseMode
 from common.djangoapps.edxmako.shortcuts import render_to_response, render_to_string
 from common.djangoapps.entitlements.models import CourseEntitlement
+from common.djangoapps.student.api import COURSE_DASHBOARD_PLUGIN_VIEW_NAME
+from common.djangoapps.student.helpers import cert_info, check_verify_status_by_course, get_resume_urls_for_enrollments
+from common.djangoapps.student.models import (
+    AccountRecovery,
+    CourseEnrollment,
+    CourseEnrollmentAttribute,
+    DashboardConfiguration,
+    PendingSecondaryEmailChange,
+    UserProfile
+)
+from common.djangoapps.util.milestones_helpers import get_pre_requisite_courses_not_completed
+from lms.djangoapps.bulk_email.api import is_bulk_email_feature_enabled
+from lms.djangoapps.bulk_email.models import Optout
 from lms.djangoapps.commerce.utils import EcommerceService
 from lms.djangoapps.courseware.access import has_access
 from lms.djangoapps.experiments.utils import get_dashboard_course_info, get_experiment_user_metadata_context
@@ -47,22 +58,11 @@ from openedx.features.enterprise_support.api import (
     get_dashboard_consent_notification,
     get_enterprise_learner_portal_enabled_message
 )
-from common.djangoapps.student.api import COURSE_DASHBOARD_PLUGIN_VIEW_NAME
-from common.djangoapps.student.helpers import cert_info, check_verify_status_by_course, get_resume_urls_for_enrollments
-from common.djangoapps.student.models import (
-    AccountRecovery,
-    CourseEnrollment,
-    CourseEnrollmentAttribute,
-    DashboardConfiguration,
-    PendingSecondaryEmailChange,
-    UserProfile
-)
-from common.djangoapps.util.milestones_helpers import get_pre_requisite_courses_not_completed
 from xmodule.modulestore.django import modulestore
 
 log = logging.getLogger("edx.student")
 
-experiments_namespace = LegacyWaffleFlagNamespace(name=u'student.experiments')
+experiments_namespace = LegacyWaffleFlagNamespace(name='student.experiments')
 
 
 def get_org_black_and_whitelist_for_site():
@@ -402,10 +402,10 @@ def _credit_statuses(user, course_enrollments):
 
     statuses = {}
     for eligibility in credit_api.get_eligibilities_for_user(user.username):
-        course_key = CourseKey.from_string(text_type(eligibility["course_key"]))
+        course_key = CourseKey.from_string(str(eligibility["course_key"]))
         providers_names = get_credit_provider_attribute_values(course_key, 'display_name')
         status = {
-            "course_key": text_type(course_key),
+            "course_key": str(course_key),
             "eligible": True,
             "deadline": eligibility["deadline"],
             "purchased": course_key in credit_enrollments,
@@ -425,10 +425,10 @@ def _credit_statuses(user, course_enrollments):
             if provider_id is None:
                 status["error"] = True
                 log.error(
-                    u"Could not find credit provider associated with credit enrollment "
-                    u"for user %s in course %s.  The user will not be able to see their "
-                    u"credit request status on the student dashboard.  This attribute should "
-                    u"have been set when the user purchased credit in the course.",
+                    "Could not find credit provider associated with credit enrollment "
+                    "for user %s in course %s.  The user will not be able to see their "
+                    "credit request status on the student dashboard.  This attribute should "
+                    "have been set when the user purchased credit in the course.",
                     user.id, course_key
                 )
             else:
@@ -440,8 +440,8 @@ def _credit_statuses(user, course_enrollments):
                 if not status["provider_name"] and not status["provider_status_url"]:
                     status["error"] = True
                     log.error(
-                        u"Could not find credit provider info for [%s] in [%s]. The user will not "
-                        u"be able to see their credit request status on the student dashboard.",
+                        "Could not find credit provider info for [%s] in [%s]. The user will not "
+                        "be able to see their credit request status on the student dashboard.",
                         provider_id, provider_info_by_id
                     )
 
@@ -548,7 +548,7 @@ def student_dashboard(request):  # lint-amnesty, pylint: disable=too-many-statem
             mode.slug: mode
             for mode in modes
         }
-        for course_id, modes in iteritems(unexpired_course_modes)
+        for course_id, modes in unexpired_course_modes.items()
     }
 
     # Check to see if the student has recently enrolled in a course.
@@ -638,7 +638,7 @@ def student_dashboard(request):  # lint-amnesty, pylint: disable=too-many-statem
     inverted_programs = meter.invert_programs()
 
     urls, programs_data = {}, {}
-    bundles_on_dashboard_flag = LegacyWaffleFlag(experiments_namespace, u'bundles_on_dashboard', __name__)
+    bundles_on_dashboard_flag = LegacyWaffleFlag(experiments_namespace, 'bundles_on_dashboard', __name__)
 
     # TODO: Delete this code and the relevant HTML code after testing LEARNER-3072 is complete
     if bundles_on_dashboard_flag.is_enabled() and inverted_programs and list(inverted_programs.items()):

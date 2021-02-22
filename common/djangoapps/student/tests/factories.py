@@ -12,8 +12,6 @@ from factory.django import DjangoModelFactory
 from opaque_keys.edx.keys import CourseKey
 from pytz import UTC
 
-from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
-from openedx.core.djangoapps.content.course_overviews.tests.factories import CourseOverviewFactory
 from common.djangoapps.student.models import (
     AccountRecovery,
     CourseAccessRole,
@@ -26,6 +24,8 @@ from common.djangoapps.student.models import (
     UserProfile,
     UserStanding
 )
+from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
+from openedx.core.djangoapps.content.course_overviews.tests.factories import CourseOverviewFactory
 
 # Factories are self documenting
 
@@ -33,15 +33,15 @@ TEST_PASSWORD = 'test'
 
 
 class GroupFactory(DjangoModelFactory):  # lint-amnesty, pylint: disable=missing-class-docstring
-    class Meta(object):
+    class Meta:
         model = Group
         django_get_or_create = ('name', )
 
-    name = factory.Sequence(u'group{0}'.format)
+    name = factory.Sequence('group{}'.format)
 
 
 class UserStandingFactory(DjangoModelFactory):  # lint-amnesty, pylint: disable=missing-class-docstring
-    class Meta(object):
+    class Meta:
         model = UserStanding
 
     user = None
@@ -50,38 +50,38 @@ class UserStandingFactory(DjangoModelFactory):  # lint-amnesty, pylint: disable=
 
 
 class UserProfileFactory(DjangoModelFactory):  # lint-amnesty, pylint: disable=missing-class-docstring
-    class Meta(object):
+    class Meta:
         model = UserProfile
         django_get_or_create = ('user', )
 
     user = None
-    name = factory.LazyAttribute(u'{0.user.first_name} {0.user.last_name}'.format)
+    name = factory.LazyAttribute('{0.user.first_name} {0.user.last_name}'.format)
     level_of_education = None
-    gender = u'm'
+    gender = 'm'
     mailing_address = None
-    goals = u'Learn a lot'
+    goals = 'Learn a lot'
     allow_certificate = True
 
 
 class RegistrationFactory(DjangoModelFactory):  # lint-amnesty, pylint: disable=missing-class-docstring
-    class Meta(object):
+    class Meta:
         model = Registration
 
     user = None
-    activation_key = six.text_type(uuid4().hex)
+    activation_key = str(uuid4().hex)
 
 
 class UserFactory(DjangoModelFactory):  # lint-amnesty, pylint: disable=missing-class-docstring
-    class Meta(object):
+    class Meta:
         model = User
         django_get_or_create = ('email', 'username')
 
     _DEFAULT_PASSWORD = 'test'
 
-    username = factory.Sequence(u'robot{0}'.format)
-    email = factory.Sequence(u'robot+test+{0}@edx.org'.format)
+    username = factory.Sequence('robot{}'.format)
+    email = factory.Sequence('robot+test+{}@edx.org'.format)
     password = factory.PostGenerationMethodCall('set_password', _DEFAULT_PASSWORD)
-    first_name = factory.Sequence(u'Robot{0}'.format)
+    first_name = factory.Sequence('Robot{}'.format)
     last_name = 'Test'
     is_staff = False
     is_active = True
@@ -104,7 +104,7 @@ class UserFactory(DjangoModelFactory):  # lint-amnesty, pylint: disable=missing-
         if extracted is None:
             return
 
-        if isinstance(extracted, six.string_types):
+        if isinstance(extracted, str):
             extracted = [extracted]
 
         for group_name in extracted:
@@ -112,7 +112,7 @@ class UserFactory(DjangoModelFactory):  # lint-amnesty, pylint: disable=missing-
 
 
 class AnonymousUserFactory(factory.Factory):
-    class Meta(object):
+    class Meta:
         model = AnonymousUser
 
 
@@ -125,7 +125,7 @@ class SuperuserFactory(UserFactory):
 
 
 class CourseEnrollmentFactory(DjangoModelFactory):  # lint-amnesty, pylint: disable=missing-class-docstring
-    class Meta(object):
+    class Meta:
         model = CourseEnrollment
 
     user = factory.SubFactory(UserFactory)
@@ -147,7 +147,7 @@ class CourseEnrollmentFactory(DjangoModelFactory):  # lint-amnesty, pylint: disa
                 # foreign key constraint to CourseEnrollment.
                 del kwargs['course_id']
 
-                if isinstance(course_id, six.string_types):
+                if isinstance(course_id, str):
                     course_id = CourseKey.from_string(course_id)
                     course_kwargs.setdefault('id', course_id)
 
@@ -174,7 +174,7 @@ class CourseEnrollmentCelebrationFactory(DjangoModelFactory):
 
 
 class CourseAccessRoleFactory(DjangoModelFactory):  # lint-amnesty, pylint: disable=missing-class-docstring
-    class Meta(object):
+    class Meta:
         model = CourseAccessRole
 
     user = factory.SubFactory(UserFactory)
@@ -183,7 +183,7 @@ class CourseAccessRoleFactory(DjangoModelFactory):  # lint-amnesty, pylint: disa
 
 
 class CourseEnrollmentAllowedFactory(DjangoModelFactory):  # lint-amnesty, pylint: disable=missing-class-docstring
-    class Meta(object):
+    class Meta:
         model = CourseEnrollmentAllowed
 
     email = 'test@edx.org'
@@ -197,23 +197,23 @@ class PendingEmailChangeFactory(DjangoModelFactory):
     new_email: sequence of new+email+{}@edx.org
     activation_key: sequence of integers, padded to 30 characters
     """
-    class Meta(object):
+    class Meta:
         model = PendingEmailChange
 
     user = factory.SubFactory(UserFactory)
-    new_email = factory.Sequence(u'new+email+{0}@edx.org'.format)
-    activation_key = factory.Sequence(u'{:0<30d}'.format)
+    new_email = factory.Sequence('new+email+{}@edx.org'.format)
+    activation_key = factory.Sequence('{:0<30d}'.format)
 
 
 class ContentTypeFactory(DjangoModelFactory):
-    class Meta(object):
+    class Meta:
         model = ContentType
 
     app_label = factory.Faker('app_name')
 
 
 class PermissionFactory(DjangoModelFactory):  # lint-amnesty, pylint: disable=missing-class-docstring
-    class Meta(object):
+    class Meta:
         model = Permission
 
     codename = factory.Faker('codename')
@@ -221,10 +221,10 @@ class PermissionFactory(DjangoModelFactory):  # lint-amnesty, pylint: disable=mi
 
 
 class AccountRecoveryFactory(DjangoModelFactory):  # lint-amnesty, pylint: disable=missing-class-docstring
-    class Meta(object):
+    class Meta:
         model = AccountRecovery
         django_get_or_create = ('user',)
 
     user = None
-    secondary_email = factory.Sequence(u'robot+test+recovery+{0}@edx.org'.format)
+    secondary_email = factory.Sequence('robot+test+recovery+{}@edx.org'.format)
     is_active = True

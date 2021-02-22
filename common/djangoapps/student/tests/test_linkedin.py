@@ -1,10 +1,9 @@
-# -*- coding: utf-8 -*-
 """Tests for LinkedIn Add to Profile configuration. """
 
 
 from urllib.parse import quote
-import ddt
 
+import ddt
 from django.conf import settings
 from django.test import TestCase
 
@@ -60,7 +59,7 @@ class LinkedInAddToProfileUrlTests(TestCase):
         assert 'https://www.linkedin.com/profile/add?startTask=CERTIFICATION_NAME' in actual_url
         assert f'&name={quote(settings.PLATFORM_NAME.encode("utf-8"))}+{expected_cert_name}' in actual_url
         assert '&certUrl={cert_url}'.format(cert_url=quote(self.CERT_URL, safe='')) in actual_url
-        assert '&organizationId={org_id}'.format(org_id=config.company_identifier) in actual_url
+        assert f'&organizationId={config.company_identifier}' in actual_url
 
     @ddt.data(
         ('honor', 'Honor+Code+Credential+for+Test+Course+%E2%98%83'),
@@ -95,4 +94,4 @@ class LinkedInAddToProfileUrlTests(TestCase):
             assert 'https://www.linkedin.com/profile/add?startTask=CERTIFICATION_NAME' in actual_url
             assert f'&name={quote(settings.PLATFORM_NAME.encode("utf-8"))}+{expected_cert_name}' in actual_url
             assert '&certUrl={cert_url}'.format(cert_url=quote(self.CERT_URL, safe='')) in actual_url
-            assert '&organizationId={org_id}'.format(org_id=config.company_identifier) in actual_url
+            assert f'&organizationId={config.company_identifier}' in actual_url

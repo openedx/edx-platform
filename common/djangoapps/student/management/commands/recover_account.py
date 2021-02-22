@@ -4,14 +4,14 @@ Management command to recover learners accounts
 
 import logging
 from os import path
-import unicodecsv
 
-from django.db.models import Q
+import unicodecsv
+from django.conf import settings
+from django.contrib.auth import get_user_model
+from django.contrib.auth.tokens import default_token_generator
 from django.contrib.sites.models import Site
 from django.core.management.base import BaseCommand, CommandError
-from django.contrib.auth import get_user_model
-from django.conf import settings
-from django.contrib.auth.tokens import default_token_generator
+from django.db.models import Q
 from django.urls import reverse
 from django.utils.http import int_to_base36
 from edx_ace import ace

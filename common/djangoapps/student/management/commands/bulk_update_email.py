@@ -7,9 +7,8 @@ import csv
 import logging
 from os import path
 
-from django.core.management.base import BaseCommand, CommandError
-
 from django.contrib.auth import get_user_model
+from django.core.management.base import BaseCommand, CommandError
 
 logger = logging.getLogger('common.djangoapps.student.management.commands.bulk_update_email')
 
@@ -44,7 +43,7 @@ class Command(BaseCommand):
         if not path.isfile(file_path):
             raise CommandError('File not found.')
 
-        with open(file_path, 'r') as csv_file:
+        with open(file_path) as csv_file:
             csv_reader = csv.reader(csv_file)
 
             email_mappings = [

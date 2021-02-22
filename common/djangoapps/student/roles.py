@@ -8,12 +8,11 @@ import logging
 from abc import ABCMeta, abstractmethod
 from collections import defaultdict
 
-import six
 from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from opaque_keys.edx.django.models import CourseKeyField
 
-from openedx.core.lib.cache_utils import get_cache
 from common.djangoapps.student.models import CourseAccessRole
+from openedx.core.lib.cache_utils import get_cache
 
 log = logging.getLogger(__name__)
 
@@ -33,13 +32,13 @@ def register_access_role(cls):
         role_name = cls.ROLE
         REGISTERED_ACCESS_ROLES[role_name] = cls
     except AttributeError:
-        log.exception(u"Unable to register Access Role with attribute 'ROLE'.")
+        log.exception("Unable to register Access Role with attribute 'ROLE'.")
     return cls
 
 
-class BulkRoleCache(object):  # lint-amnesty, pylint: disable=missing-class-docstring
-    CACHE_NAMESPACE = u"student.roles.BulkRoleCache"
-    CACHE_KEY = u'roles_by_user'
+class BulkRoleCache:  # lint-amnesty, pylint: disable=missing-class-docstring
+    CACHE_NAMESPACE = "student.roles.BulkRoleCache"
+    CACHE_KEY = 'roles_by_user'
 
     @classmethod
     def prefetch(cls, users):  # lint-amnesty, pylint: disable=missing-function-docstring
@@ -58,7 +57,7 @@ class BulkRoleCache(object):  # lint-amnesty, pylint: disable=missing-class-docs
         return get_cache(cls.CACHE_NAMESPACE)[cls.CACHE_KEY][user.id]
 
 
-class RoleCache(object):
+class RoleCache:
     """
     A cache of the CourseAccessRoles held by a particular user
     """
@@ -82,7 +81,7 @@ class RoleCache(object):
         )
 
 
-class AccessRole(six.with_metaclass(ABCMeta, object)):
+class AccessRole(metaclass=ABCMeta):
     """
     Object representing a role with particular access to a resource
     """
@@ -150,7 +149,7 @@ class RoleBase(AccessRole):
         an org. Provide org and course if constrained to a course. Although, you should use the subclasses
         for all of these.
         """
-        super(RoleBase, self).__init__()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().__init__()
 
         self.org = org
         self.course_key = course_key
@@ -229,14 +228,14 @@ class CourseRole(RoleBase):
         Args:
             course_key (CourseKey)
         """
-        super(CourseRole, self).__init__(role, course_key.org, course_key)  # lint-amnesty, pylint: disable=super-with-arguments
+        super().__init__(role, course_key.org, course_key)
 
     @classmethod
     def course_group_already_exists(self, course_key):  # lint-amnesty, pylint: disable=bad-classmethod-argument
         return CourseAccessRole.objects.filter(org=course_key.org, course_id=course_key).exists()
 
     def __repr__(self):
-        return '<{}: course_key={}>'.format(self.__class__.__name__, self.course_key)
+        return f'<{self.__class__.__name__}: course_key={self.course_key}>'
 
 
 class OrgRole(RoleBase):
@@ -244,7 +243,7 @@ class OrgRole(RoleBase):
     A named role in a particular org independent of course
     """
     def __repr__(self):
-        return '<{}>'.format(self.__class__.__name__)
+        return f'<{self.__class__.__name__}>'
 
 
 @register_access_role
@@ -253,7 +252,7 @@ class CourseStaffRole(CourseRole):
     ROLE = 'staff'
 
     def __init__(self, *args, **kwargs):
-        super(CourseStaffRole, self).__init__(self.ROLE, *args, **kwargs)  # lint-amnesty, pylint: disable=super-with-arguments
+        super().__init__(self.ROLE, *args, **kwargs)
 
 
 @register_access_role
@@ -262,7 +261,7 @@ class CourseInstructorRole(CourseRole):
     ROLE = 'instructor'
 
     def __init__(self, *args, **kwargs):
-        super(CourseInstructorRole, self).__init__(self.ROLE, *args, **kwargs)  # lint-amnesty, pylint: disable=super-with-arguments
+        super().__init__(self.ROLE, *args, **kwargs)
 
 
 @register_access_role
@@ -271,7 +270,7 @@ class CourseFinanceAdminRole(CourseRole):
     ROLE = 'finance_admin'
 
     def __init__(self, *args, **kwargs):
-        super(CourseFinanceAdminRole, self).__init__(self.ROLE, *args, **kwargs)  # lint-amnesty, pylint: disable=super-with-arguments
+        super().__init__(self.ROLE, *args, **kwargs)
 
 
 @register_access_role
@@ -280,7 +279,7 @@ class CourseSalesAdminRole(CourseRole):
     ROLE = 'sales_admin'
 
     def __init__(self, *args, **kwargs):
-        super(CourseSalesAdminRole, self).__init__(self.ROLE, *args, **kwargs)  # lint-amnesty, pylint: disable=super-with-arguments
+        super().__init__(self.ROLE, *args, **kwargs)
 
 
 @register_access_role
@@ -289,7 +288,7 @@ class CourseBetaTesterRole(CourseRole):
     ROLE = 'beta_testers'
 
     def __init__(self, *args, **kwargs):
-        super(CourseBetaTesterRole, self).__init__(self.ROLE, *args, **kwargs)  # lint-amnesty, pylint: disable=super-with-arguments
+        super().__init__(self.ROLE, *args, **kwargs)
 
 
 @register_access_role
@@ -301,7 +300,7 @@ class LibraryUserRole(CourseRole):
     ROLE = 'library_user'
 
     def __init__(self, *args, **kwargs):
-        super(LibraryUserRole, self).__init__(self.ROLE, *args, **kwargs)  # lint-amnesty, pylint: disable=super-with-arguments
+        super().__init__(self.ROLE, *args, **kwargs)
 
 
 class CourseCcxCoachRole(CourseRole):
@@ -309,7 +308,7 @@ class CourseCcxCoachRole(CourseRole):
     ROLE = 'ccx_coach'
 
     def __init__(self, *args, **kwargs):
-        super(CourseCcxCoachRole, self).__init__(self.ROLE, *args, **kwargs)  # lint-amnesty, pylint: disable=super-with-arguments
+        super().__init__(self.ROLE, *args, **kwargs)
 
 
 @register_access_role
@@ -318,19 +317,19 @@ class CourseDataResearcherRole(CourseRole):
     ROLE = 'data_researcher'
 
     def __init__(self, *args, **kwargs):
-        super(CourseDataResearcherRole, self).__init__(self.ROLE, *args, **kwargs)  # lint-amnesty, pylint: disable=super-with-arguments
+        super().__init__(self.ROLE, *args, **kwargs)
 
 
 class OrgStaffRole(OrgRole):
     """An organization staff member"""
     def __init__(self, *args, **kwargs):
-        super(OrgStaffRole, self).__init__('staff', *args, **kwargs)  # lint-amnesty, pylint: disable=super-with-arguments
+        super().__init__('staff', *args, **kwargs)
 
 
 class OrgInstructorRole(OrgRole):
     """An organization instructor"""
     def __init__(self, *args, **kwargs):
-        super(OrgInstructorRole, self).__init__('instructor', *args, **kwargs)  # lint-amnesty, pylint: disable=super-with-arguments
+        super().__init__('instructor', *args, **kwargs)
 
 
 class OrgLibraryUserRole(OrgRole):
@@ -341,7 +340,7 @@ class OrgLibraryUserRole(OrgRole):
     ROLE = LibraryUserRole.ROLE
 
     def __init__(self, *args, **kwargs):
-        super(OrgLibraryUserRole, self).__init__(self.ROLE, *args, **kwargs)  # lint-amnesty, pylint: disable=super-with-arguments
+        super().__init__(self.ROLE, *args, **kwargs)
 
 
 class OrgDataResearcherRole(OrgRole):
@@ -349,7 +348,7 @@ class OrgDataResearcherRole(OrgRole):
     ROLE = 'data_researcher'
 
     def __init__(self, *args, **kwargs):
-        super(OrgDataResearcherRole, self).__init__(self.ROLE, *args, **kwargs)  # lint-amnesty, pylint: disable=super-with-arguments
+        super().__init__(self.ROLE, *args, **kwargs)
 
 
 @register_access_role
@@ -361,7 +360,7 @@ class CourseCreatorRole(RoleBase):
     ROLE = "course_creator_group"
 
     def __init__(self, *args, **kwargs):
-        super(CourseCreatorRole, self).__init__(self.ROLE, *args, **kwargs)  # lint-amnesty, pylint: disable=super-with-arguments
+        super().__init__(self.ROLE, *args, **kwargs)
 
 
 @register_access_role
@@ -372,10 +371,10 @@ class SupportStaffRole(RoleBase):
     ROLE = "support"
 
     def __init__(self, *args, **kwargs):
-        super(SupportStaffRole, self).__init__(self.ROLE, *args, **kwargs)  # lint-amnesty, pylint: disable=super-with-arguments
+        super().__init__(self.ROLE, *args, **kwargs)
 
 
-class UserBasedRole(object):
+class UserBasedRole:
     """
     Backward mapping: given a user, manipulate the courses and roles
     """

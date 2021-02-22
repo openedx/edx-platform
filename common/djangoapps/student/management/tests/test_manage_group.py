@@ -4,9 +4,9 @@ Unit tests for user_management management commands.
 
 
 import sys
-import pytest
-import ddt
 
+import ddt
+import pytest
 from django.contrib.auth.models import Group, Permission
 from django.contrib.contenttypes.models import ContentType
 from django.core.management import CommandError, call_command

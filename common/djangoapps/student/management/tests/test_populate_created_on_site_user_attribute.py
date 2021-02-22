@@ -3,18 +3,17 @@ Unittests for populate_created_on_site_user_attribute management command.
 """
 
 
-import ddt
-import mock
-import pytest
+from unittest import mock
 
+import ddt
+import pytest
 from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.core.management import CommandError, call_command
 from django.test import TestCase
-from six.moves import range
 
-from openedx.core.djangoapps.site_configuration.tests.mixins import SiteMixin
 from common.djangoapps.student.models import Registration, UserAttribute
 from common.djangoapps.student.tests.factories import UserFactory
+from openedx.core.djangoapps.site_configuration.tests.mixins import SiteMixin
 
 CREATED_ON_SITE = 'created_on_site'
 
@@ -26,7 +25,7 @@ class TestPopulateUserAttribute(SiteMixin, TestCase):
     """
 
     def setUp(self):
-        super(TestPopulateUserAttribute, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
 
         self._create_sample_data()
         self.users = User.objects.all()
@@ -106,7 +105,7 @@ class TestPopulateUserAttribute(SiteMixin, TestCase):
         user = self.users[0]
         call_command(
             "populate_created_on_site_user_attribute",
-            "--users", '9{id}'.format(id=user.id),  # invalid id
+            "--users", f'9{user.id}',  # invalid id
             "--site-domain", self.site.domain
         )
         assert UserAttribute.get_user_attribute(user, CREATED_ON_SITE) is None
@@ -114,7 +113,7 @@ class TestPopulateUserAttribute(SiteMixin, TestCase):
         register_user = self.registered_users[0]
         call_command(
             "populate_created_on_site_user_attribute",
-            "--activation-keys", "invalid-{key}".format(key=register_user.activation_key),  # invalid key
+            "--activation-keys", f"invalid-{register_user.activation_key}",  # invalid key
             "--site-domain", self.site.domain
         )
         assert UserAttribute.get_user_attribute(register_user.user, CREATED_ON_SITE) is None

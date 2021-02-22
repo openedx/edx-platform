@@ -5,8 +5,8 @@ This file contains celery tasks for sending email
 
 import logging
 
-from celery.exceptions import MaxRetriesExceededError
 from celery import shared_task
+from celery.exceptions import MaxRetriesExceededError
 from django.conf import settings
 from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.contrib.sites.models import Site
@@ -14,6 +14,7 @@ from edx_ace import ace
 from edx_ace.errors import RecoverableChannelDeliveryError
 from edx_ace.message import Message
 from edx_django_utils.monitoring import set_code_owner_attribute
+
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.lib.celery.task_utils import emulate_http_request
 

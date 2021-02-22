@@ -12,15 +12,16 @@ from django.urls import reverse
 from django.utils.timezone import now
 from opaque_keys.edx import locator
 from pytz import UTC
-from six.moves import range, zip
 
-from common.test.utils import XssTestMixin
-from common.djangoapps.course_modes.tests.factories import CourseModeFactory  # lint-amnesty, pylint: disable=unused-import
-from openedx.core.djangoapps.site_configuration.tests.test_util import with_site_configuration_context  # lint-amnesty, pylint: disable=unused-import
+from common.djangoapps.course_modes.tests.factories import \
+    CourseModeFactory  # lint-amnesty, pylint: disable=unused-import
 from common.djangoapps.student.models import CourseEnrollment, DashboardConfiguration
 from common.djangoapps.student.tests.factories import UserFactory
 from common.djangoapps.student.views import get_course_enrollments
 from common.djangoapps.student.views.dashboard import _get_recently_enrolled_courses
+from common.test.utils import XssTestMixin
+from openedx.core.djangoapps.site_configuration.tests.test_util import \
+    with_site_configuration_context  # lint-amnesty, pylint: disable=unused-import
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
@@ -37,7 +38,7 @@ class TestRecentEnrollments(ModuleStoreTestCase, XssTestMixin):
         """
         Add a student
         """
-        super(TestRecentEnrollments, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.student = UserFactory()
         self.student.set_password(self.PASSWORD)
         self.student.save()
@@ -104,9 +105,9 @@ class TestRecentEnrollments(ModuleStoreTestCase, XssTestMixin):
         courses = []
         for idx, seconds_past in zip(list(range(2, 6)), [5, 10, 15, 20]):
             course_location = locator.CourseLocator(
-                'Org{num}'.format(num=idx),
-                'Course{num}'.format(num=idx),
-                'Run{num}'.format(num=idx)
+                f'Org{idx}',
+                f'Course{idx}',
+                f'Run{idx}'
             )
             course, enrollment = self._create_course_and_enrollment(course_location)
             enrollment.created = now() - datetime.timedelta(seconds=seconds_past)
@@ -130,7 +131,7 @@ class TestRecentEnrollments(ModuleStoreTestCase, XssTestMixin):
         # verify recent enrollment message
         self.assertContains(
             response,
-            'Thank you for enrolling in:'.format(course_name=self.course.display_name)
+            f'Thank you for enrolling in:'
         )
         self.assertContains(
             response,
@@ -146,7 +147,7 @@ class TestRecentEnrollments(ModuleStoreTestCase, XssTestMixin):
         response = self.client.get(reverse("dashboard"))
         self.assertContains(
             response,
-            "Thank you for enrolling in {course_name}".format(course_name=self.course.display_name)
+            f"Thank you for enrolling in {self.course.display_name}"
         )
 
     def test_dashboard_rendering_with_two_courses(self):
@@ -173,7 +174,7 @@ class TestRecentEnrollments(ModuleStoreTestCase, XssTestMixin):
 
         self.assertContains(
             response,
-            "Thank you for enrolling in:".format(course_name=self.course.display_name)
+            f"Thank you for enrolling in:"
         )
         self.assertContains(
             response,

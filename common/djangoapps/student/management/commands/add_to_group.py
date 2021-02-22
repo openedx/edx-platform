@@ -25,7 +25,7 @@ class Command(BaseCommand):  # lint-amnesty, pylint: disable=missing-class-docst
     def print_groups(self):
         print('Groups available:')
         for group in Group.objects.all().distinct():
-            print('   {}'.format(group.name))
+            print(f'   {group.name}')
 
     def handle(self, *args, **options):
         if options['list']:
@@ -47,7 +47,7 @@ class Command(BaseCommand):  # lint-amnesty, pylint: disable=missing-class-docst
                 group = Group(name=group_name)
                 group.save()
             else:
-                raise CommandError('Group {} does not exist'.format(group_name))  # lint-amnesty, pylint: disable=raise-missing-from
+                raise CommandError(f'Group {group_name} does not exist')  # lint-amnesty, pylint: disable=raise-missing-from
 
         if options['remove']:
             user.groups.remove(group)

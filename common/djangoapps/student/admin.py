@@ -19,11 +19,10 @@ from django.http.request import QueryDict
 from django.urls import reverse
 from django.utils.translation import ngettext
 from django.utils.translation import ugettext_lazy as _
+from edx_toggles.toggles import WaffleSwitch
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
 
-from edx_toggles.toggles import WaffleSwitch
-from openedx.core.lib.courses import clean_course_id
 from common.djangoapps.student.models import (
     AccountRecovery,
     AccountRecoveryConfiguration,
@@ -45,6 +44,7 @@ from common.djangoapps.student.models import (
     UserTestGroup
 )
 from common.djangoapps.student.roles import REGISTERED_ACCESS_ROLES
+from openedx.core.lib.courses import clean_course_id
 from xmodule.modulestore.django import modulestore
 
 User = get_user_model()  # pylint:disable=invalid-name
@@ -61,7 +61,7 @@ User = get_user_model()  # pylint:disable=invalid-name
 COURSE_ENROLLMENT_ADMIN_SWITCH = WaffleSwitch('student.courseenrollment_admin', __name__)
 
 
-class _Check(object):
+class _Check:
     """
     A method decorator that pre-emptively returns false if a feature is disabled.
     Otherwise, it returns the return value of the decorated method.
@@ -128,7 +128,7 @@ class DisableEnrollmentAdminMixin:
 class CourseAccessRoleForm(forms.ModelForm):
     """Form for adding new Course Access Roles view the Django Admin Panel."""
 
-    class Meta(object):
+    class Meta:
         model = CourseAccessRole
         fields = '__all__'
 
@@ -152,7 +152,7 @@ class CourseAccessRoleForm(forms.ModelForm):
             org_name = self.cleaned_data.get('course_id').org
             if org.lower() != org_name.lower():
                 raise forms.ValidationError(
-                    u"Org name {} is not valid. Valid name is {}.".format(
+                    "Org name {} is not valid. Valid name is {}.".format(
                         org, org_name
                     )
                 )
@@ -168,7 +168,7 @@ class CourseAccessRoleForm(forms.ModelForm):
             user = User.objects.get(email=email)
         except Exception:
             raise forms.ValidationError(  # lint-amnesty, pylint: disable=raise-missing-from
-                u"Email does not exist. Could not find {email}. Please re-enter email address".format(
+                "Email does not exist. Could not find {email}. Please re-enter email address".format(
                     email=email
                 )
             )
@@ -179,7 +179,7 @@ class CourseAccessRoleForm(forms.ModelForm):
         """
         Checking the course already exists in db.
         """
-        cleaned_data = super(CourseAccessRoleForm, self).clean()  # lint-amnesty, pylint: disable=super-with-arguments
+        cleaned_data = super().clean()
         if not self.errors:
             if CourseAccessRole.objects.filter(
                     user=cleaned_data.get("email"),
@@ -192,7 +192,7 @@ class CourseAccessRoleForm(forms.ModelForm):
         return cleaned_data
 
     def __init__(self, *args, **kwargs):
-        super(CourseAccessRoleForm, self).__init__(*args, **kwargs)  # lint-amnesty, pylint: disable=super-with-arguments
+        super().__init__(*args, **kwargs)
         if self.instance.user_id:
             self.fields['email'].initial = self.instance.user.email
 
@@ -219,14 +219,14 @@ class CourseAccessRoleAdmin(admin.ModelAdmin):
 
     def save_model(self, request, obj, form, change):
         obj.user = form.cleaned_data['email']
-        super(CourseAccessRoleAdmin, self).save_model(request, obj, form, change)  # lint-amnesty, pylint: disable=super-with-arguments
+        super().save_model(request, obj, form, change)
 
 
 @admin.register(LinkedInAddToProfileConfiguration)
 class LinkedInAddToProfileConfigurationAdmin(admin.ModelAdmin):
     """Admin interface for the LinkedIn Add to Profile configuration. """
 
-    class Meta(object):
+    class Meta:
         model = LinkedInAddToProfileConfiguration
 
 
@@ -243,7 +243,7 @@ class CourseEnrollmentForm(forms.ModelForm):
                 raise forms.ValidationError("Cannot make a valid CourseKey from id {}!".format(args_copy['course']))  # lint-amnesty, pylint: disable=raise-missing-from
             args = [args_copy]
 
-        super(CourseEnrollmentForm, self).__init__(*args, **kwargs)  # lint-amnesty, pylint: disable=super-with-arguments
+        super().__init__(*args, **kwargs)
 
         if self.data.get('course'):
             try:
@@ -259,15 +259,15 @@ class CourseEnrollmentForm(forms.ModelForm):
         try:
             course_key = CourseKey.from_string(course_id)
         except InvalidKeyError:
-            raise forms.ValidationError("Cannot make a valid CourseKey from id {}!".format(course_id))  # lint-amnesty, pylint: disable=raise-missing-from
+            raise forms.ValidationError(f"Cannot make a valid CourseKey from id {course_id}!")  # lint-amnesty, pylint: disable=raise-missing-from
 
         if not modulestore().has_course(course_key):
-            raise forms.ValidationError("Cannot find course with id {} in the modulestore".format(course_id))
+            raise forms.ValidationError(f"Cannot find course with id {course_id} in the modulestore")
 
         return course_key
 
     def save(self, *args, **kwargs):  # lint-amnesty, pylint: disable=signature-differs, unused-argument
-        course_enrollment = super(CourseEnrollmentForm, self).save(commit=False)  # lint-amnesty, pylint: disable=super-with-arguments
+        course_enrollment = super().save(commit=False)
         user = self.cleaned_data['user']
         course_overview = self.cleaned_data['course']
         enrollment = CourseEnrollment.get_or_create_enrollment(user, course_overview.id)
@@ -290,7 +290,7 @@ class CourseEnrollmentAdmin(DisableEnrollmentAdminMixin, admin.ModelAdmin):
     form = CourseEnrollmentForm
 
     def get_search_results(self, request, queryset, search_term):
-        qs, use_distinct = super(CourseEnrollmentAdmin, self).get_search_results(request, queryset, search_term)  # lint-amnesty, pylint: disable=super-with-arguments
+        qs, use_distinct = super().get_search_results(request, queryset, search_term)
 
         # annotate each enrollment with whether the username was an
         # exact match for the search term
@@ -305,7 +305,7 @@ class CourseEnrollmentAdmin(DisableEnrollmentAdminMixin, admin.ModelAdmin):
         return qs, use_distinct
 
     def queryset(self, request):
-        return super(CourseEnrollmentAdmin, self).queryset(request).select_related('user')  # lint-amnesty, pylint: disable=no-member, super-with-arguments
+        return super().queryset(request).select_related('user')  # lint-amnesty, pylint: disable=no-member, super-with-arguments
 
 
 class UserProfileInline(admin.StackedInline):
@@ -331,7 +331,7 @@ class UserChangeForm(BaseUserChangeForm):
     last_name = forms.CharField(max_length=30, required=False)
 
     def __init__(self, *args, **kwargs):
-        super(UserChangeForm, self).__init__(*args, **kwargs)  # lint-amnesty, pylint: disable=super-with-arguments
+        super().__init__(*args, **kwargs)
 
         if not settings.FEATURES.get('ENABLE_CHANGE_USER_PASSWORD_ADMIN'):
             self.fields["password"] = ReadOnlyPasswordHashField(
@@ -353,7 +353,7 @@ class UserAdmin(BaseUserAdmin):
         Allows editing the users while skipping the username check, so we can have Unicode username with no problems.
         The username is marked read-only when editing existing users regardless of `ENABLE_UNICODE_USERNAME`, to simplify the bokchoy tests.  # lint-amnesty, pylint: disable=line-too-long
         """
-        django_readonly = super(UserAdmin, self).get_readonly_fields(request, obj)  # lint-amnesty, pylint: disable=super-with-arguments
+        django_readonly = super().get_readonly_fields(request, obj)
         if obj:
             return django_readonly + ('username',)
         return django_readonly
@@ -367,7 +367,7 @@ class UserAttributeAdmin(admin.ModelAdmin):
     raw_id_fields = ('user',)
     search_fields = ('name', 'value', 'user__username',)
 
-    class Meta(object):
+    class Meta:
         model = UserAttribute
 
 
@@ -377,7 +377,7 @@ class CourseEnrollmentAllowedAdmin(admin.ModelAdmin):
     list_display = ('email', 'course_id', 'auto_enroll',)
     search_fields = ('email', 'course_id',)
 
-    class Meta(object):
+    class Meta:
         model = CourseEnrollmentAllowed
 
 
@@ -395,35 +395,35 @@ class LoginFailuresAdmin(admin.ModelAdmin):
         """
         Only enabled if feature is enabled.
         """
-        return super(LoginFailuresAdmin, self).has_module_permission(request)  # lint-amnesty, pylint: disable=super-with-arguments
+        return super().has_module_permission(request)
 
     @_Check.is_enabled(LoginFailures.is_feature_enabled)
     def has_view_permission(self, request, obj=None):
         """
         Only enabled if feature is enabled.
         """
-        return super(LoginFailuresAdmin, self).has_view_permission(request, obj)  # lint-amnesty, pylint: disable=super-with-arguments
+        return super().has_view_permission(request, obj)
 
     @_Check.is_enabled(LoginFailures.is_feature_enabled)
     def has_delete_permission(self, request, obj=None):
         """
         Only enabled if feature is enabled.
         """
-        return super(LoginFailuresAdmin, self).has_delete_permission(request, obj)  # lint-amnesty, pylint: disable=super-with-arguments
+        return super().has_delete_permission(request, obj)
 
     @_Check.is_enabled(LoginFailures.is_feature_enabled)
     def has_change_permission(self, request, obj=None):
         """
         Only enabled if feature is enabled.
         """
-        return super(LoginFailuresAdmin, self).has_change_permission(request, obj)  # lint-amnesty, pylint: disable=super-with-arguments
+        return super().has_change_permission(request, obj)
 
     @_Check.is_enabled(LoginFailures.is_feature_enabled)
     def has_add_permission(self, request):
         """
         Only enabled if feature is enabled.
         """
-        return super(LoginFailuresAdmin, self).has_add_permission(request)  # lint-amnesty, pylint: disable=super-with-arguments
+        return super().has_add_permission(request)
 
     def unlock_student_accounts(self, request, queryset):
         """
@@ -456,13 +456,13 @@ class LoginFailuresAdmin(admin.ModelAdmin):
                 self.unlock_student(request, object_id=object_id)
                 url = reverse('admin:student_loginfailures_changelist', current_app=self.admin_site.name)
                 return HttpResponseRedirect(url)
-        return super(LoginFailuresAdmin, self).change_view(request, object_id, form_url, extra_context)  # lint-amnesty, pylint: disable=super-with-arguments
+        return super().change_view(request, object_id, form_url, extra_context)
 
     def get_actions(self, request):
         """
         Get actions for model admin and remove delete action.
         """
-        actions = super(LoginFailuresAdmin, self).get_actions(request)  # lint-amnesty, pylint: disable=super-with-arguments
+        actions = super().get_actions(request)
         if 'delete_selected' in actions:
             del actions['delete_selected']
         return actions
@@ -480,7 +480,7 @@ class LoginFailuresAdmin(admin.ModelAdmin):
 class AllowedAuthUserForm(forms.ModelForm):
     """Model Form for AllowedAuthUser model's admin interface."""
 
-    class Meta(object):
+    class Meta:
         model = AllowedAuthUser
         fields = ('site', 'email', )
 
@@ -499,7 +499,7 @@ class AllowedAuthUserForm(forms.ModelForm):
             )
         elif email_domain != allowed_site_email_domain:
             raise forms.ValidationError(
-                _("Email doesn't have {domain_name} domain name.".format(domain_name=allowed_site_email_domain))  # lint-amnesty, pylint: disable=translation-of-non-string
+                _(f"Email doesn't have {allowed_site_email_domain} domain name.")  # lint-amnesty, pylint: disable=translation-of-non-string
             )
         elif not User.objects.filter(email=email).exists():
             raise forms.ValidationError(_("User with this email doesn't exist in system."))
@@ -515,7 +515,7 @@ class AllowedAuthUserAdmin(admin.ModelAdmin):
     search_fields = ('email',)
     ordering = ('-created',)
 
-    class Meta(object):
+    class Meta:
         model = AllowedAuthUser
 
 
@@ -526,7 +526,7 @@ class CourseEnrollmentCelebrationAdmin(DisableEnrollmentAdminMixin, admin.ModelA
     list_display = ('id', 'course', 'user', 'celebrate_first_section')
     search_fields = ('enrollment__course__id', 'enrollment__user__username')
 
-    class Meta(object):
+    class Meta:
         model = CourseEnrollmentCelebration
 
     def course(self, obj):

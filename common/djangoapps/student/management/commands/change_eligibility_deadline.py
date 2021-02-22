@@ -9,8 +9,8 @@ from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
 
 from common.djangoapps.course_modes.models import CourseMode
-from openedx.core.djangoapps.credit.models import CreditEligibility
 from common.djangoapps.student.models import CourseEnrollment, User
+from openedx.core.djangoapps.credit.models import CreditEligibility
 
 logger = logging.getLogger(__name__)  # pylint: disable=invalid-name
 
@@ -65,14 +65,14 @@ class Command(BaseCommand):  # lint-amnesty, pylint: disable=missing-class-docst
         try:
             user = User.objects.get(username=username)
         except User.DoesNotExist:
-            logger.exception('Invalid or non-existent username {}'.format(username))
+            logger.exception(f'Invalid or non-existent username {username}')
             raise
 
         try:
             course_key = CourseKey.from_string(course_id)
             CourseEnrollment.objects.get(user=user, course_id=course_key, mode=CourseMode.CREDIT_MODE)
         except InvalidKeyError:
-            logger.exception('Invalid or non-existent course id {}'.format(course_id))
+            logger.exception(f'Invalid or non-existent course id {course_id}')
             raise
         except CourseEnrollment.DoesNotExist:
             logger.exception('No enrollment found in database for {username} in course {course_id}'
@@ -89,7 +89,7 @@ class Command(BaseCommand):  # lint-amnesty, pylint: disable=missing-class-docst
             expected_date = datetime.utcnow() + timedelta(days=DEFAULT_DAYS)
 
         self.update_credit_eligibility_deadline(username, course_key, expected_date)
-        logger.info("Successfully updated credit eligibility deadline for {}".format(username))
+        logger.info(f"Successfully updated credit eligibility deadline for {username}")
 
     def update_credit_eligibility_deadline(self, username, course_key, new_deadline):
         """ Update Credit Eligibility new_deadline for a specific user """

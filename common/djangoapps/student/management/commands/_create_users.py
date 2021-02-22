@@ -1,10 +1,9 @@
 """ Shared behavior between create_test_users and create_random_users """
-from xmodule.modulestore.django import modulestore
-
-from lms.djangoapps.instructor.access import allow_access
-from openedx.core.djangoapps.user_authn.views.registration_form import AccountCreationForm
 from common.djangoapps.student.helpers import do_create_account
 from common.djangoapps.student.models import CourseEnrollment
+from lms.djangoapps.instructor.access import allow_access
+from openedx.core.djangoapps.user_authn.views.registration_form import AccountCreationForm
+from xmodule.modulestore.django import modulestore
 
 
 def create_users(
@@ -34,6 +33,6 @@ def create_users(
                 allow_access(course, user, 'staff', send_email=False)
 
         if course_key and course_staff:
-            print('Created user {} as course staff'.format(user.username))
+            print(f'Created user {user.username} as course staff')
         else:
-            print('Created user {}'.format(user.username))
+            print(f'Created user {user.username}')

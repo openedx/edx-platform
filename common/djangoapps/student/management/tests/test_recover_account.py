@@ -3,19 +3,18 @@ Test cases for recover account management command
 """
 import re
 from tempfile import NamedTemporaryFile
+
 import pytest
 import six
-
-from django.core import mail
 from django.contrib.auth import get_user_model
-from django.core.management import call_command, CommandError
+from django.core import mail
 from django.core.files.uploadedfile import SimpleUploadedFile
-from django.test import TestCase, RequestFactory
-
+from django.core.management import CommandError, call_command
+from django.test import RequestFactory, TestCase
 from testfixtures import LogCapture
-from common.djangoapps.student.tests.factories import UserFactory
 
 from common.djangoapps.student.models import AccountRecoveryConfiguration
+from common.djangoapps.student.tests.factories import UserFactory
 
 LOGGER_NAME = 'common.djangoapps.student.management.commands.recover_account'
 
@@ -28,7 +27,7 @@ class RecoverAccountTests(TestCase):
     request_factory = RequestFactory()
 
     def setUp(self):
-        super(RecoverAccountTests, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.user = UserFactory.create(username='amy', email='amy@edx.com', password='password')
 
     def _write_test_csv(self, csv, lines):
@@ -48,7 +47,7 @@ class RecoverAccountTests(TestCase):
 
         with NamedTemporaryFile() as csv:
             csv = self._write_test_csv(csv, lines=['amy,amy@edx.com,amy@newemail.com\n'])
-            call_command("recover_account", "--csv_file_path={}".format(csv.name))
+            call_command("recover_account", f"--csv_file_path={csv.name}")
 
             assert len(mail.outbox) == 1
 
@@ -85,7 +84,7 @@ class RecoverAccountTests(TestCase):
                                'exception was User matching query does not exist.'
 
             with LogCapture(LOGGER_NAME) as log:
-                call_command("recover_account", "--csv_file_path={}".format(csv.name))
+                call_command("recover_account", f"--csv_file_path={csv.name}")
 
                 log.check_present(
                     (LOGGER_NAME, 'ERROR', expected_message)
@@ -101,7 +100,7 @@ class RecoverAccountTests(TestCase):
             expected_message = "Successfully updated ['amy@newemail.com'] accounts. Failed to update [] accounts"
 
             with LogCapture(LOGGER_NAME) as log:
-                call_command("recover_account", "--csv_file_path={}".format(csv.name))
+                call_command("recover_account", f"--csv_file_path={csv.name}")
 
                 log.check_present(
                     (LOGGER_NAME, 'INFO', expected_message)
