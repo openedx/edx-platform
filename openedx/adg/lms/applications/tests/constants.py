@@ -1,6 +1,8 @@
 """
 Constants for all the tests.
 """
+from django.urls import reverse
+
 ADMIN_TYPE_SUPER_ADMIN = 'super_admin'
 ADMIN_TYPE_ADG_ADMIN = 'adg_admin'
 
@@ -25,5 +27,11 @@ TEST_COVER_LETTER_FILE = 'Test Cover Letter File'
 TEST_COVER_LETTER_TEXT = 'Test Cover Letter Text'
 
 FORMSET = 'test_formset'
+
+COVER_LETTER_REDIRECT_URL = '{register}?next={next}'.format(
+    register=reverse('register_user'),
+    next=reverse('application_cover_letter')
+)
+MOCK_FILE_PATH = 'dummy_file.pdf'
 
 TEST_MESSAGE_FOR_APPLICANT = 'Test message for the applicant'

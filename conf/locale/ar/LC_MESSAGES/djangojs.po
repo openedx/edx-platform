@@ -34,8 +34,8 @@
 # EdX Team <info@edx.org>, 2021.
 #
 # Translators:
+# Rana Waqar <rana.waqar@arbisoft.com>, 2020
 # Imran Bashir <admin@omnipreneurshipacademy.com>, 2021
-# Rana Waqar <rana.waqar@arbisoft.com>, 2021
 #
 # #-#-#-#-#  underscore-studio.po (0.1a)  #-#-#-#-#
 # edX translation file
@@ -51,7 +51,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2021-02-08 13:14+0000\n"
+"POT-Creation-Date: 2021-02-15 11:19+0000\n"
 "PO-Revision-Date: 2020-10-27 19:11+0000\n"
 "Last-Translator: Imran Bashir <admin@omnipreneurshipacademy.com>, 2021\n"
 "Language-Team: Arabic (https://www.transifex.com/philanthropy-u/teams/113553/ar/)\n"
@@ -123,6 +123,7 @@ msgstr "حذف"
 #: common/static/common/js/components/utils/view_utils.js
 #: lms/static/js/Markdown.Editor.js
 #: lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
+#: themes/edx-platform/adg/lms/static/js/applications/education_experience.js
 #: cms/templates/js/add-xblock-component-menu-problem.underscore
 #: cms/templates/js/add-xblock-component-menu.underscore
 #: cms/templates/js/certificate-editor.underscore
@@ -227,6 +228,7 @@ msgstr "غير معروف "
 
 #: cms/static/js/views/manage_users_and_roles.js
 #: lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
+#: themes/edx-platform/adg/lms/static/js/applications/education_experience.js
 msgid "Are you sure?"
 msgstr "هل أنت واثق؟"
 
@@ -5813,6 +5815,15 @@ msgstr ""
 msgid "Phone number field can not exceed 15 digits."
 msgstr ""
 
+#: themes/edx-platform/adg/lms/static/js/applications/education_experience.js
+msgid ""
+"It will remove your existing work experiences, Do you want to continue?"
+msgstr ""
+
+#: themes/edx-platform/adg/lms/static/js/applications/education_experience.js
+msgid "Continue"
+msgstr ""
+
 #: cms/static/cms/js/main.js
 msgid "Studio's having trouble saving your work"
 msgstr ""
@@ -9752,7 +9763,7 @@ msgstr ""
 
 #: themes/edx-platform/adg/lms/templates/student_account/register.underscore
 msgid "Already have an account?"
-msgstr "هل لديك حساب مسبقاً؟"
+msgstr "هل لديك حساب {platformName} مسبقاً؟"
 
 #: themes/edx-platform/adg/lms/templates/student_account/register.underscore
 msgid "Start learning with the Omnipreneurship Academy!"

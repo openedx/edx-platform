@@ -10,9 +10,9 @@ from django.utils.translation import ugettext_lazy as _
 from common.djangoapps.student.models import UserProfile
 from openedx.adg.lms.applications.constants import (
     APPLICATION_REVIEW_ERROR_MSG,
+    FILE_MAX_SIZE,
     MAXIMUM_AGE_LIMIT,
-    MINIMUM_AGE_LIMIT,
-    RESUME_FILE_MAX_SIZE
+    MINIMUM_AGE_LIMIT
 )
 from openedx.adg.lms.applications.models import UserApplication
 from openedx.adg.lms.registration_extension.models import ExtendedUserProfile
@@ -92,7 +92,7 @@ class UserApplicationForm(forms.ModelForm):
         """
         resume = self.cleaned_data.get('resume')
         if resume:
-            error = validate_file_size(resume, RESUME_FILE_MAX_SIZE)
+            error = validate_file_size(resume, FILE_MAX_SIZE)
             if error:
                 raise forms.ValidationError(error)
         return resume
@@ -136,3 +136,44 @@ class UserApplicationAdminForm(forms.ModelForm):
         super(UserApplicationAdminForm, self).clean()
         if 'status' not in self.request.POST:
             raise forms.ValidationError(APPLICATION_REVIEW_ERROR_MSG)
+
+
+class UserApplicationCoverLetterForm(forms.ModelForm):
+    """
+    User Application Form for Cover Letter Page
+    """
+
+    class Meta:
+        model = UserApplication
+        fields = ['business_line', 'cover_letter_file', 'cover_letter']
+
+    def clean_cover_letter_file(self):
+        """
+        Validate cover letter file size is less than maximum allowed size
+        """
+        cover_letter_file = self.cleaned_data.get('cover_letter_file')
+        if cover_letter_file:
+            error = validate_file_size(cover_letter_file, FILE_MAX_SIZE)
+            if error:
+                raise forms.ValidationError(error)
+        return cover_letter_file
+
+    def clean(self):
+        """
+        In addition to pre-defined validation it validates that either cover letter file or text is sent
+        """
+        super().clean()
+
+        if 'cover_letter_file' in self.changed_data and self.cleaned_data.get('cover_letter'):
+            self.add_error('cover_letter_file', _('Either upload a cover letter file or type text'))
+
+    def save_form(self, post_data):
+        """
+        Before saving user application it checks if the cover letter file needs to be deleted if user has removed it
+        """
+        instance = self.save(commit=False)
+
+        if 'cover_letter_file' in post_data and 'cover_letter' in post_data:
+            instance.cover_letter_file.delete()
+
+        instance.save()

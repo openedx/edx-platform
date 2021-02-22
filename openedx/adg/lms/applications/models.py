@@ -81,6 +81,16 @@ class ApplicationHub(TimeStampedModel):
         self.submission_date = date.today()
         self.save()
 
+    @property
+    def is_written_application_started(self):
+        """
+        Check if user has started the application or not
+
+        Returns:
+            True or False.
+        """
+        return hasattr(self.user, 'application')
+
     def __str__(self):
         return 'User {user_id}, application status id={id}'.format(user_id=self.user.id, id=self.id)
 
@@ -139,6 +149,10 @@ class UserApplication(TimeStampedModel):
         help_text=_('Accepted extensions: .pdf, .doc, .jpg, .png'),
     )
     cover_letter = models.TextField(blank=True, verbose_name=_('Cover Letter'), )
+    is_work_experience_not_applicable = models.BooleanField(
+        verbose_name=_('Work Experience Not Applicable'),
+        default=False
+    )
 
     OPEN = 'open'
     WAITLIST = 'waitlist'
