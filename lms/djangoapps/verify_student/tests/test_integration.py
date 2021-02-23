@@ -57,4 +57,4 @@ class TestProfEdVerification(ModuleStoreTestCase):
 
         # For professional ed courses, expect that the student is NOT enrolled
         # automatically in the course.
-        self.assertFalse(CourseEnrollment.is_enrolled(self.user, self.course_key))
+        assert not CourseEnrollment.is_enrolled(self.user, self.course_key)

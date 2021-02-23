@@ -76,11 +76,11 @@ class TestSendVerificationExpiryEmail(MockS3BotoMixin, TestCase):
         call_command('send_verification_expiry_email')
 
         # Check that only one email is sent
-        self.assertEqual(len(mail.outbox), 1)
+        assert len(mail.outbox) == 1
 
         # Verify that the email is not sent to the out of range verification
         expiry_email_date = SoftwareSecurePhotoVerification.objects.get(pk=verification.pk).expiry_email_date
-        self.assertIsNone(expiry_email_date)
+        assert expiry_email_date is None
 
     def test_expiry_email_date_range(self):
         """
@@ -99,7 +99,7 @@ class TestSendVerificationExpiryEmail(MockS3BotoMixin, TestCase):
 
         # Check that email is sent even if the verification is not in expiration_date range but matches
         # the criteria to resend email
-        self.assertEqual(len(mail.outbox), 1)
+        assert len(mail.outbox) == 1
 
     def test_most_recent_verification(self):
         """
@@ -116,7 +116,7 @@ class TestSendVerificationExpiryEmail(MockS3BotoMixin, TestCase):
 
         # Check that the expiry_email_date is not set for the outdated verification
         expiry_email_date = SoftwareSecurePhotoVerification.objects.get(pk=outdated_verification.pk).expiry_email_date
-        self.assertIsNone(expiry_email_date)
+        assert expiry_email_date is None
 
     def test_send_verification_expiry_email(self):
         """
@@ -132,8 +132,8 @@ class TestSendVerificationExpiryEmail(MockS3BotoMixin, TestCase):
 
         expected_date = now()
         attempt = SoftwareSecurePhotoVerification.objects.get(user_id=verification.user_id)
-        self.assertEqual(attempt.expiry_email_date.date(), expected_date.date())
-        self.assertEqual(len(mail.outbox), 1)
+        assert attempt.expiry_email_date.date() == expected_date.date()
+        assert len(mail.outbox) == 1
 
     def test_verification_expiry_email_not_sent_valid_ssov(self):
         """
@@ -145,7 +145,7 @@ class TestSendVerificationExpiryEmail(MockS3BotoMixin, TestCase):
         SSOVerification.objects.create(user=expired_ssp_verification.user, status='approved')
 
         call_command('send_verification_expiry_email')
-        self.assertEqual(len(mail.outbox), 0)
+        assert len(mail.outbox) == 0
 
     def test_verification_expiry_email_not_sent_valid_manual_verification(self):
         """
@@ -157,7 +157,7 @@ class TestSendVerificationExpiryEmail(MockS3BotoMixin, TestCase):
         ManualVerification.objects.create(user=expired_ssp_verification.user, status='approved')
 
         call_command('send_verification_expiry_email')
-        self.assertEqual(len(mail.outbox), 0)
+        assert len(mail.outbox) == 0
 
     def test_email_already_sent(self):
         """
@@ -173,7 +173,7 @@ class TestSendVerificationExpiryEmail(MockS3BotoMixin, TestCase):
 
         call_command('send_verification_expiry_email')
 
-        self.assertEqual(len(mail.outbox), 0)
+        assert len(mail.outbox) == 0
 
     def test_no_verification_found(self):
         """
@@ -214,7 +214,7 @@ class TestSendVerificationExpiryEmail(MockS3BotoMixin, TestCase):
                  u"This was a dry run, no email was sent. For the actual run email would have been sent "
                  u"to {} learner(s)".format(count)
                  ))
-        self.assertEqual(len(mail.outbox), 0)
+        assert len(mail.outbox) == 0
 
     def test_not_enrolled_in_verified_course(self):
         """
@@ -235,8 +235,8 @@ class TestSendVerificationExpiryEmail(MockS3BotoMixin, TestCase):
         # check that after sending the default number of emails, the expiry_email_date is set to none for a
         # user who is not enrolled in verified track
         attempt = SoftwareSecurePhotoVerification.objects.get(pk=verification.id)
-        self.assertEqual(len(mail.outbox), 1)
-        self.assertIsNone(attempt.expiry_email_date)
+        assert len(mail.outbox) == 1
+        assert attempt.expiry_email_date is None
 
     def test_number_of_emails_sent(self):
         """
@@ -264,8 +264,8 @@ class TestSendVerificationExpiryEmail(MockS3BotoMixin, TestCase):
                 break
 
         # expiry_email_date set to None means it no longer will be filtered hence no emails will be sent in future
-        self.assertIsNone(SoftwareSecurePhotoVerification.objects.get(pk=verification.id).expiry_email_date)
-        self.assertEqual(len(mail.outbox), self.default_no_of_emails)
+        assert SoftwareSecurePhotoVerification.objects.get(pk=verification.id).expiry_email_date is None
+        assert len(mail.outbox) == self.default_no_of_emails
 
     @override_settings(VERIFICATION_EXPIRY_EMAIL={'RESEND_DAYS': 15, 'DAYS_RANGE': 1, 'DEFAULT_EMAILS': 0})
     def test_command_error(self):
@@ -299,6 +299,6 @@ class TestSendVerificationExpiryEmail(MockS3BotoMixin, TestCase):
 
         for verification in verifications:
             verification.refresh_from_db()
-        self.assertIsNone(verifications[0].expiry_email_date)
-        self.assertIsNotNone(verifications[1].expiry_email_date)
-        self.assertEqual(mock_ace.send.call_count, 2)
+        assert verifications[0].expiry_email_date is None
+        assert verifications[1].expiry_email_date is not None
+        assert mock_ace.send.call_count == 2

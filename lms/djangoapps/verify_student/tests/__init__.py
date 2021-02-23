@@ -44,21 +44,21 @@ class TestVerificationBase(TestCase):
         """
         # Not active before the created date
         before = attempt.created_at - timedelta(minutes=1)
-        self.assertFalse(attempt.active_at_datetime(before))
+        assert not attempt.active_at_datetime(before)
 
         # Active immediately after created date
         after_created = attempt.created_at + timedelta(seconds=1)
-        self.assertTrue(attempt.active_at_datetime(after_created))
+        assert attempt.active_at_datetime(after_created)
 
         # Active immediately before expiration date
         expiration = attempt.expiration_datetime
         before_expiration = expiration - timedelta(seconds=1)
-        self.assertTrue(attempt.active_at_datetime(before_expiration))
+        assert attempt.active_at_datetime(before_expiration)
 
         # Not active after the expiration date
         attempt.expiration_date = now() - timedelta(days=1)
         attempt.save()
-        self.assertFalse(attempt.active_at_datetime(now()))
+        assert not attempt.active_at_datetime(now())
 
     def submit_attempt(self, attempt):
         with self.immediate_on_commit():

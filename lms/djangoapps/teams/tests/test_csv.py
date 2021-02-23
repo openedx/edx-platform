@@ -128,24 +128,18 @@ class TeamMembershipCsvTests(SharedModuleStoreTestCase):
     def test_get_headers(self):
         # pylint: disable=protected-access
         headers = csv._get_team_membership_csv_headers(self.course)
-        self.assertEqual(
-            headers,
-            ['user', 'mode', 'teamset_1', 'teamset_2', 'teamset_3', 'teamset_4']
-        )
+        assert headers == ['user', 'mode', 'teamset_1', 'teamset_2', 'teamset_3', 'teamset_4']
 
     def test_get_headers_no_teamsets(self):
         # pylint: disable=protected-access
         headers = csv._get_team_membership_csv_headers(self.course_no_teamsets)
-        self.assertEqual(
-            headers,
-            ['user', 'mode']
-        )
+        assert headers == ['user', 'mode']
 
     def test_lookup_team_membership_data(self):
         with self.assertNumQueries(3):
             # pylint: disable=protected-access
             data = csv._lookup_team_membership_data(self.course)
-        self.assertEqual(len(data), 5)
+        assert len(data) == 5
         self.assert_teamset_membership(data[0], 'user1', 'audit', 'team_1_1', 'team_2_2', 'team_3_1')
         self.assert_teamset_membership(data[1], 'user2', 'verified', 'team_1_1', 'team_2_2', 'team_3_1')
         self.assert_teamset_membership(data[2], 'user3', 'honors', None, 'team_2_1', 'team_3_1')
@@ -167,11 +161,11 @@ class TeamMembershipCsvTests(SharedModuleStoreTestCase):
             -mode
             -team name for teamset_(123)
         """
-        self.assertEqual(user_row['user'], expected_username)
-        self.assertEqual(user_row['mode'], expected_mode)
-        self.assertEqual(user_row.get('teamset_1'), expected_teamset_1_team)
-        self.assertEqual(user_row.get('teamset_2'), expected_teamset_2_team)
-        self.assertEqual(user_row.get('teamset_3'), expected_teamset_3_team)
+        assert user_row['user'] == expected_username
+        assert user_row['mode'] == expected_mode
+        assert user_row.get('teamset_1') == expected_teamset_1_team
+        assert user_row.get('teamset_2') == expected_teamset_2_team
+        assert user_row.get('teamset_3') == expected_teamset_3_team
 
     def test_load_team_membership_csv(self):
         expected_csv_headers = ['user', 'mode', 'teamset_1', 'teamset_2', 'teamset_3', 'teamset_4']
@@ -196,7 +190,7 @@ class TeamMembershipCsvTests(SharedModuleStoreTestCase):
         self._add_blanks_to_expected_data(expected_data, expected_csv_headers)
 
         reader = csv_export(self.course)
-        self.assertEqual(expected_csv_headers, reader.fieldnames)
+        assert expected_csv_headers == reader.fieldnames
         self.assertDictEqual(expected_data, _user_keyed_dict(reader))
 
     def _add_blanks_to_expected_data(self, expected_data, headers):
@@ -281,7 +275,7 @@ class TeamMembershipImportManagerTests(TeamMembershipEventTestMixin, SharedModul
 
         self.import_manager.add_user_to_team(row)
         team = CourseTeam.objects.get(team_id__startswith='new_protected_team')
-        self.assertTrue(team.organization_protected)
+        assert team.organization_protected
         self.assert_learner_added_emitted(team.team_id, masters_learner.id)
 
     def test_add_user_to_new_unprotected_team(self):
@@ -296,7 +290,7 @@ class TeamMembershipImportManagerTests(TeamMembershipEventTestMixin, SharedModul
 
         self.import_manager.add_user_to_team(row)
         team = CourseTeam.objects.get(team_id__startswith='new_unprotected_team')
-        self.assertFalse(team.organization_protected)
+        assert not team.organization_protected
         self.assert_learner_added_emitted(team.team_id, audit_learner.id)
 
     def test_team_removals_are_scoped_correctly(self):
@@ -316,7 +310,7 @@ class TeamMembershipImportManagerTests(TeamMembershipEventTestMixin, SharedModul
         )
         course_2_team.add_user(audit_learner)
 
-        self.assertTrue(CourseTeamMembership.is_user_on_team(audit_learner, course_1_team))
+        assert CourseTeamMembership.is_user_on_team(audit_learner, course_1_team)
 
         # When I try to remove them from the team
         row = {
@@ -327,7 +321,7 @@ class TeamMembershipImportManagerTests(TeamMembershipEventTestMixin, SharedModul
         self.import_manager.remove_user_from_team_for_reassignment(row)
 
         # They are successfully removed from the team
-        self.assertFalse(CourseTeamMembership.is_user_on_team(audit_learner, course_1_team))
+        assert not CourseTeamMembership.is_user_on_team(audit_learner, course_1_team)
         self.assert_learner_removed_emitted(course_1_team.team_id, audit_learner.id)
 
     def test_user_moved_to_another_team(self):
@@ -343,8 +337,8 @@ class TeamMembershipImportManagerTests(TeamMembershipEventTestMixin, SharedModul
         csv_row = _csv_dict_row(audit_learner, 'audit', teamset_1=team_2.name)
         csv_import(self.course, [csv_row])
 
-        self.assertFalse(CourseTeamMembership.is_user_on_team(audit_learner, team_1))
-        self.assertTrue(CourseTeamMembership.is_user_on_team(audit_learner, team_2))
+        assert not CourseTeamMembership.is_user_on_team(audit_learner, team_1)
+        assert CourseTeamMembership.is_user_on_team(audit_learner, team_2)
 
         self.assert_learner_removed_emitted(team_1.team_id, audit_learner.id)
         self.assert_learner_added_emitted(team_2.team_id, audit_learner.id)
@@ -380,16 +374,13 @@ class TeamMembershipImportManagerTests(TeamMembershipEventTestMixin, SharedModul
         result = self.import_manager.set_team_memberships(csv_data)
 
         # Then the import fails with no events emitted and a "team is full" error
-        self.assertFalse(result)
+        assert not result
         self.assert_no_events_were_emitted()
-        self.assertEqual(
-            self.import_manager.validation_errors[0],
-            'New membership for team team_1 would exceed max size of 3.'
-        )
+        assert self.import_manager.validation_errors[0] == 'New membership for team team_1 would exceed max size of 3.'
 
         # Confirm that memberships were not altered
         for i in range(2):
-            self.assertTrue(CourseTeamMembership.is_user_on_team(user, team))
+            assert CourseTeamMembership.is_user_on_team(user, team)
 
     def test_remove_from_team(self):
         # Given a user already in a course and on a team
@@ -398,7 +389,7 @@ class TeamMembershipImportManagerTests(TeamMembershipEventTestMixin, SharedModul
         CourseEnrollmentFactory.create(user=user, course_id=self.course.id, mode=mode)
         team = CourseTeamFactory(course_id=self.course.id, name='team_1', topic_id='teamset_1')
         team.add_user(user)
-        self.assertTrue(CourseTeamMembership.is_user_on_team(user, team))
+        assert CourseTeamMembership.is_user_on_team(user, team)
 
         # When I try to remove them from the team
         csv_data = self._csv_reader_from_array([
@@ -408,7 +399,7 @@ class TeamMembershipImportManagerTests(TeamMembershipEventTestMixin, SharedModul
         result = self.import_manager.set_team_memberships(csv_data)  # lint-amnesty, pylint: disable=unused-variable
 
         # Then they are removed from the team and the correct events are issued
-        self.assertFalse(CourseTeamMembership.is_user_on_team(user, team))
+        assert not CourseTeamMembership.is_user_on_team(user, team)
         self.assert_learner_removed_emitted(team.team_id, user.id)
 
     def test_switch_memberships(self):
@@ -435,15 +426,15 @@ class TeamMembershipImportManagerTests(TeamMembershipEventTestMixin, SharedModul
         result = self.import_manager.set_team_memberships(csv_data)
 
         # Then membership size is calculated correctly, import finishes w/out error
-        self.assertTrue(result)
+        assert result
 
         # ... and the users are assigned to the correct teams
         team_1 = CourseTeam.objects.get(course_id=self.course.id, topic_id='teamset_1', name='team_1')
-        self.assertTrue(CourseTeamMembership.is_user_on_team(users[4], team_1))
+        assert CourseTeamMembership.is_user_on_team(users[4], team_1)
         self.assert_learner_added_emitted(team_1.team_id, users[4].id)
 
         team_2 = CourseTeam.objects.get(course_id=self.course.id, topic_id='teamset_1', name='team_2')
-        self.assertTrue(CourseTeamMembership.is_user_on_team(users[0], team_2))
+        assert CourseTeamMembership.is_user_on_team(users[0], team_2)
         self.assert_learner_added_emitted(team_2.team_id, users[0].id)
 
     def test_create_new_team_from_import(self):
@@ -453,7 +444,7 @@ class TeamMembershipImportManagerTests(TeamMembershipEventTestMixin, SharedModul
         CourseEnrollmentFactory.create(user=user, course_id=self.course.id, mode=mode)
 
         # When I add them to a team that does not exist
-        self.assertEqual(CourseTeam.objects.all().count(), 0)
+        assert CourseTeam.objects.all().count() == 0
         csv_data = self._csv_reader_from_array([
             ['user', 'mode', 'teamset_1'],
             [user.username, mode, 'new_exciting_team'],
@@ -461,11 +452,11 @@ class TeamMembershipImportManagerTests(TeamMembershipEventTestMixin, SharedModul
         result = self.import_manager.set_team_memberships(csv_data)  # lint-amnesty, pylint: disable=unused-variable
 
         # Then a new team is created
-        self.assertEqual(CourseTeam.objects.all().count(), 1)
+        assert CourseTeam.objects.all().count() == 1
 
         # ... and the user is assigned to the team
         new_team = CourseTeam.objects.get(topic_id='teamset_1', name='new_exciting_team')
-        self.assertTrue(CourseTeamMembership.is_user_on_team(user, new_team))
+        assert CourseTeamMembership.is_user_on_team(user, new_team)
         self.assert_learner_added_emitted(new_team.team_id, user.id)
 
     # Team protection status tests
@@ -475,7 +466,7 @@ class TeamMembershipImportManagerTests(TeamMembershipEventTestMixin, SharedModul
         masters_learner = self._create_and_enroll_test_user('masters_learner', mode='masters')
 
         # When I attempt to add them to the same team
-        self.assertEqual(CourseTeam.objects.all().count(), 0)
+        assert CourseTeam.objects.all().count() == 0
         csv_data = self._csv_reader_from_array([
             ['user', 'mode', 'teamset_1'],
             [verified_learner.username, 'verified', 'new_exciting_team'],
@@ -484,13 +475,11 @@ class TeamMembershipImportManagerTests(TeamMembershipEventTestMixin, SharedModul
         result = self.import_manager.set_team_memberships(csv_data)
 
         # The import fails with "mixed users" error and no team was created
-        self.assertFalse(result)
+        assert not result
         self.assert_no_events_were_emitted()
-        self.assertEqual(
-            self.import_manager.validation_errors[0],
-            'Team new_exciting_team cannot have Master’s track users mixed with users in other tracks.'
-        )
-        self.assertEqual(CourseTeam.objects.all().count(), 0)
+        assert self.import_manager.validation_errors[0] ==\
+               'Team new_exciting_team cannot have Master’s track users mixed with users in other tracks.'
+        assert CourseTeam.objects.all().count() == 0
 
     def test_add_incompatible_mode_to_existing_unprotected_team_fails(self):
         # Given an existing unprotected team
@@ -507,13 +496,11 @@ class TeamMembershipImportManagerTests(TeamMembershipEventTestMixin, SharedModul
         result = self.import_manager.set_team_memberships(csv_data)
 
         # The import fails with "mixed users" error and learner not added to team
-        self.assertFalse(result)
+        assert not result
         self.assert_no_events_were_emitted()
-        self.assertEqual(
-            self.import_manager.validation_errors[0],
-            'Team unprotected_team cannot have Master’s track users mixed with users in other tracks.'
-        )
-        self.assertFalse(CourseTeamMembership.is_user_on_team(masters_learner, unprotected_team))
+        assert self.import_manager.validation_errors[0] ==\
+               'Team unprotected_team cannot have Master’s track users mixed with users in other tracks.'
+        assert not CourseTeamMembership.is_user_on_team(masters_learner, unprotected_team)
 
     def test_add_incompatible_mode_to_existing_protected_team_fails(self):
         # Given an existing protected team
@@ -535,13 +522,11 @@ class TeamMembershipImportManagerTests(TeamMembershipEventTestMixin, SharedModul
         result = self.import_manager.set_team_memberships(csv_data)
 
         # The import fails with "mixed users" error and learner not added to team
-        self.assertFalse(result)
+        assert not result
         self.assert_no_events_were_emitted()
-        self.assertEqual(
-            self.import_manager.validation_errors[0],
-            'Team protected_team cannot have Master’s track users mixed with users in other tracks.'
-        )
-        self.assertFalse(CourseTeamMembership.is_user_on_team(verified_learner, protected_team))
+        assert self.import_manager.validation_errors[0] ==\
+               'Team protected_team cannot have Master’s track users mixed with users in other tracks.'
+        assert not CourseTeamMembership.is_user_on_team(verified_learner, protected_team)
 
     def _create_and_enroll_test_user(self, username, course_id=None, mode="audit"):
         """
@@ -628,10 +613,10 @@ class ExternalKeyCsvTests(TeamMembershipEventTestMixin, SharedModuleStoreTestCas
                 )
 
     def assert_user_on_team(self, user):
-        self.assertTrue(CourseTeamMembership.is_user_on_team(user, self.team))
+        assert CourseTeamMembership.is_user_on_team(user, self.team)
 
     def assert_user_not_on_team(self, user):
-        self.assertFalse(CourseTeamMembership.is_user_on_team(user, self.team))
+        assert not CourseTeamMembership.is_user_on_team(user, self.team)
 
     def test_add_user_to_team_with_external_key(self):
         # Make a new user with an external_user_key who is enrolled in the course and program, with an external_key,
@@ -661,7 +646,7 @@ class ExternalKeyCsvTests(TeamMembershipEventTestMixin, SharedModuleStoreTestCas
         Assert that the four test users should be listed as members of the team,
         and user_in_program should be identified by their external_user_key
         """
-        self.assertEqual(len(data), 4)
+        assert len(data) == 4
         expected_data = {
             user_identifier: _csv_dict_row(user_identifier, 'audit', teamset_id=self.team.name)
             for user_identifier in [

@@ -50,7 +50,7 @@ class TestPopulateExpiryDate(MockS3BotoMixin, TestCase):
         # Check that the expiry_date for approved verification is not changed when it is already present
         verification_expiry_date = SoftwareSecurePhotoVerification.objects.get(pk=verification.pk).expiry_date
 
-        self.assertEqual(verification_expiry_date, expiry_date)
+        assert verification_expiry_date == expiry_date
 
     def test_recent_approved_verification(self):
         """
@@ -74,7 +74,7 @@ class TestPopulateExpiryDate(MockS3BotoMixin, TestCase):
 
         # Check that the expiry_date date set for verification is not for the outdated approved verification
         expiry_date = SoftwareSecurePhotoVerification.objects.get(pk=outdated_verification.pk).expiry_date
-        self.assertIsNone(expiry_date)
+        assert expiry_date is None
 
     def test_approved_verification_expiry_date(self):
         """
@@ -102,7 +102,7 @@ class TestPopulateExpiryDate(MockS3BotoMixin, TestCase):
 
         # Confirm that expiry_date set for approved verification is correct
         approved_verification = SoftwareSecurePhotoVerification.objects.get(pk=approved_verification.pk)
-        self.assertEqual(approved_verification.expiry_date, expected_date)
+        assert approved_verification.expiry_date == expected_date
 
     def test_no_approved_verification_found(self):
         """
