@@ -27,6 +27,9 @@ def get_faked_settings():
     settings.AMC_APP_URL = ''
     settings.AMC_APP_OAUTH2_CLIENT_ID = ''
     settings.APPSEMBLER_FEATURES = {}
+    settings.MIDDLEWARE = [
+        'django.contrib.sites.middleware.CurrentSiteMiddleware',
+    ]
     settings.STATICFILES_DIRS = []
     settings.CACHES = {}
     settings.ENABLE_COMPREHENSIVE_THEMING = True

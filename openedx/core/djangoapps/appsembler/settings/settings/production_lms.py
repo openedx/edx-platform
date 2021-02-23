@@ -104,7 +104,6 @@ def plugin_settings(settings):
         'openedx.core.djangoapps.appsembler.sites.middleware.RedirectMiddleware',
     ] + settings.MIDDLEWARE[_after_site_mdlwr:]
 
-
     # This is used in the appsembler_sites.middleware.RedirectMiddleware to exclude certain paths
     # from the redirect mechanics.
     settings.MAIN_SITE_REDIRECT_WHITELIST = [
