@@ -231,10 +231,7 @@ class SiteConfiguration(models.Model):
 
     def get_customer_themes_storage(self):
         storage_class = get_storage_class(settings.DEFAULT_FILE_STORAGE)
-        storage_options = {}
-        if not settings.DEBUG:  # Use a separate directory in production
-            storage_options['location'] = 'customer_themes'
-        return storage_class(**storage_options)
+        return storage_class(**settings.CUSTOMER_THEMES_BACKEND_OPTIONS)
 
     def delete_css_override(self):
         css_file = self.get_value('css_overrides_file')

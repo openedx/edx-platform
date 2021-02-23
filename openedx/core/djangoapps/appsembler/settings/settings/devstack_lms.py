@@ -21,7 +21,7 @@ def plugin_settings(settings):
     settings.ALTERNATE_QUEUE_ENVS = ['cms']
 
     if settings.ENABLE_COMPREHENSIVE_THEMING:
-        assert len(settings.COMPREHENSIVE_THEME_DIRS) == 1, (
+        assert len(settings.COMPREHENSIVE_THEME_DIRS), (
             'Tahoe supports a single theme, please double check that '
             'you have only one directory in the `COMPREHENSIVE_THEME_DIRS` setting.'
         )

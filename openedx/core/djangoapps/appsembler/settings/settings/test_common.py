@@ -20,6 +20,7 @@ def plugin_settings(settings):
     settings.TAHOE_TEMP_MONKEYPATCHING_JUNIPER_TESTS = True  # see ./common.py
 
     settings.TAHOE_ENABLE_CUSTOM_ERROR_VIEW = False  # see ./common.py
+    settings.CUSTOMER_THEMES_BACKEND_OPTIONS = {}
 
     # Permanently skip some tests that we're unable or don't want to fix
     # yet, this allows us to revisit those tests if needed

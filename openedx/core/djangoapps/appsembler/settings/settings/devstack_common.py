@@ -31,6 +31,8 @@ def plugin_settings(settings):
         'django_extensions',
     )
 
+    settings.CUSTOMER_THEMES_BACKEND_OPTIONS = {}
+
     # Those are usually hardcoded in devstack.py for some reason
     settings.LMS_BASE = settings.ENV_TOKENS.get('LMS_BASE')
     settings.LMS_ROOT_URL = settings.ENV_TOKENS.get('LMS_ROOT_URL')
