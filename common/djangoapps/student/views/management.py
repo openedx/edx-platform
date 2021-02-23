@@ -94,6 +94,7 @@ REGISTRATION_UTM_PARAMETERS = {
     'utm_content': 'registration_utm_content',
 }
 REGISTRATION_UTM_CREATED_AT = 'registration_utm_created_at'
+USER_ACCOUNT_ACTIVATED = 'edx.user.account.activated'
 
 
 def csrf_token(context):
@@ -528,6 +529,13 @@ def activate_account(request, key):
             registration.activate()
             # Success message for logged in users.
             message = _('{html_start}Success{html_end} You have activated your account.')
+
+            tracker.emit(
+                USER_ACCOUNT_ACTIVATED,
+                {
+                    "user_id": registration.user.id,
+                }
+            )
 
             if not request.user.is_authenticated:
                 # Success message for logged out users
