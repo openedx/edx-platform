@@ -1,6 +1,3 @@
-# -*- coding: utf-8 -*-
-
-
 import re
 
 import django.core.validators
@@ -17,6 +14,6 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='coursemodesarchive',
             name='suggested_prices',
-            field=models.CharField(default=u'', max_length=255, blank=True, validators=[django.core.validators.RegexValidator(re.compile('^[\\d,]+\\Z'), 'Enter only digits separated by commas.', 'invalid')]),
+            field=models.CharField(default='', max_length=255, blank=True, validators=[django.core.validators.RegexValidator(re.compile('^[\\d,]+\\Z'), 'Enter only digits separated by commas.', 'invalid')]),
         ),
     ]
