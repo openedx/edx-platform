@@ -2084,6 +2084,7 @@ CREATE TABLE `course_overviews_courseoverview` (
   `end_date` datetime(6) DEFAULT NULL,
   `start_date` datetime(6) DEFAULT NULL,
   `banner_image_url` longtext NOT NULL,
+  `has_highlights` tinyint(1) DEFAULT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -2190,6 +2191,7 @@ CREATE TABLE `course_overviews_historicalcourseoverview` (
   `end_date` datetime(6) DEFAULT NULL,
   `start_date` datetime(6) DEFAULT NULL,
   `banner_image_url` longtext NOT NULL,
+  `has_highlights` tinyint(1) DEFAULT NULL,
   PRIMARY KEY (`history_id`),
   KEY `course_overviews_his_history_user_id_e21063d9_fk_auth_user` (`history_user_id`),
   KEY `course_overviews_historicalcourseoverview_id_647043f0` (`id`),
@@ -2994,7 +2996,7 @@ CREATE TABLE `django_migrations` (
   `name` varchar(255) NOT NULL,
   `applied` datetime(6) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=836 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=837 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `django_openid_auth_association`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
