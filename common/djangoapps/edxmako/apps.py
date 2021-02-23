@@ -5,6 +5,7 @@ Configuration for the edxmako Django application.
 
 from django.apps import AppConfig
 from django.conf import settings
+
 from . import add_lookup, clear_lookups
 
 

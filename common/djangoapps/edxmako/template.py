@@ -17,7 +17,6 @@ from django.conf import settings
 from django.template import Context, engines, Origin
 from edx_django_utils.cache import RequestCache
 from mako.template import Template as MakoTemplate
-from six import text_type
 
 from . import Engines, LOOKUP
 from .request_context import get_template_request_context
@@ -122,4 +121,4 @@ class Template(object):
         """
         for key in KEY_CSRF_TOKENS:
             if key in context_dictionary:
-                context_dictionary[key] = text_type(context_dictionary[key])
+                context_dictionary[key] = str(context_dictionary[key])
