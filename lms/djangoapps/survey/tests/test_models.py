@@ -4,8 +4,9 @@ Python tests for the Survey models
 
 
 from collections import OrderedDict
-import pytest
+
 import ddt
+import pytest
 import six
 from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.core.exceptions import ValidationError
@@ -26,7 +27,7 @@ class SurveyModelsTests(TestCase):
         """
         Set up the test data used in the specific tests
         """
-        super(SurveyModelsTests, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.client = Client()
 
         # Create two accounts
@@ -96,7 +97,7 @@ class SurveyModelsTests(TestCase):
         """
         survey = self._create_test_survey()
         assert survey is not None
-        assert six.text_type(survey) == self.test_survey_name
+        assert str(survey) == self.test_survey_name
 
     def test_create_form_with_malformed_html(self):
         """
@@ -189,7 +190,7 @@ class SurveyModelsTests(TestCase):
 
         for answer_obj in answer_objs:
             if course_id:
-                assert six.text_type(answer_obj.course_key) == course_id
+                assert str(answer_obj.course_key) == course_id
             else:
                 assert answer_obj.course_key is None
 

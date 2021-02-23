@@ -1,22 +1,20 @@
-# -*- coding: utf-8 -*-
 """
 Tests for any Teams app services
 """
 
 
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-from openedx.core.djangoapps.catalog.tests.factories import CourseRunFactory
 from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
-
 from lms.djangoapps.teams.services import TeamsService
 from lms.djangoapps.teams.tests.factories import CourseTeamFactory
+from openedx.core.djangoapps.catalog.tests.factories import CourseRunFactory
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 
 
 class TeamsServiceTests(ModuleStoreTestCase):
     """ Tests for the TeamsService """
 
     def setUp(self):
-        super(TeamsServiceTests, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.course_run = CourseRunFactory.create()
         self.course_key = self.course_run['key']
         self.team = CourseTeamFactory.create(course_id=self.course_key)

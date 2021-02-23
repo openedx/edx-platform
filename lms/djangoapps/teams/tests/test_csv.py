@@ -1,16 +1,16 @@
 """ Tests for the functionality in csv """
-from csv import DictWriter, DictReader
+from csv import DictReader, DictWriter
 from io import BytesIO, StringIO, TextIOWrapper
 
 from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user, unused-import
 
-from lms.djangoapps.program_enrollments.tests.factories import ProgramEnrollmentFactory, ProgramCourseEnrollmentFactory
+from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
+from common.djangoapps.util.testing import EventTestMixin
+from lms.djangoapps.program_enrollments.tests.factories import ProgramCourseEnrollmentFactory, ProgramEnrollmentFactory
 from lms.djangoapps.teams import csv
 from lms.djangoapps.teams.models import CourseTeam, CourseTeamMembership
 from lms.djangoapps.teams.tests.factories import CourseTeamFactory
 from openedx.core.lib.teams_config import TeamsConfig
-from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
-from common.djangoapps.util.testing import EventTestMixin
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
@@ -72,13 +72,13 @@ class TeamMembershipCsvTests(SharedModuleStoreTestCase):
     @classmethod
     def setUpClass(cls):
         # pylint: disable=no-member
-        super(TeamMembershipCsvTests, cls).setUpClass()
+        super().setUpClass()
         teams_config = TeamsConfig({
             'team_sets': [
                 {
-                    'id': 'teamset_{}'.format(i),
-                    'name': 'teamset_{}_name'.format(i),
-                    'description': 'teamset_{}_desc'.format(i),
+                    'id': f'teamset_{i}',
+                    'name': f'teamset_{i}_name',
+                    'description': f'teamset_{i}_desc',
                 }
                 for i in [1, 2, 3, 4]
             ]
@@ -231,7 +231,7 @@ class TeamMembershipImportManagerTests(TeamMembershipEventTestMixin, SharedModul
     """ Tests for TeamMembershipImportManager """
     @classmethod
     def setUpClass(cls):
-        super(TeamMembershipImportManagerTests, cls).setUpClass()
+        super().setUpClass()
         teams_config = TeamsConfig({
             'team_sets': [{
                 'id': 'teamset_1',
@@ -246,7 +246,7 @@ class TeamMembershipImportManagerTests(TeamMembershipEventTestMixin, SharedModul
 
     def setUp(self):
         """ Initialize import manager """
-        super(TeamMembershipImportManagerTests, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.import_manager = csv.TeamMembershipImportManager(self.course)
         self.import_manager.teamset_ids = {ts.teamset_id for ts in self.course.teamsets}
 
@@ -347,7 +347,7 @@ class TeamMembershipImportManagerTests(TeamMembershipEventTestMixin, SharedModul
         # Given a bunch of students enrolled in a course
         users = []
         for i in range(5):
-            user = UserFactory.create(username='max_size_{id}'.format(id=i))
+            user = UserFactory.create(username=f'max_size_{i}')
             CourseEnrollmentFactory.create(user=user, course_id=self.course.id, mode='audit')
             users.append(user)
 
@@ -406,7 +406,7 @@ class TeamMembershipImportManagerTests(TeamMembershipEventTestMixin, SharedModul
         # Given a bunch of students enrolled in a course
         users = []
         for i in range(5):
-            user = UserFactory.create(username='learner_{id}'.format(id=i))
+            user = UserFactory.create(username=f'learner_{i}')
             CourseEnrollmentFactory.create(user=user, course_id=self.course.id, mode='audit')
             users.append(user)
 
@@ -547,7 +547,7 @@ class TeamMembershipImportManagerTests(TeamMembershipEventTestMixin, SharedModul
         Example:
             [['header1', 'header2'], ['r1:c1', 'r1:c2'], ['r2:c2', 'r3:c3'] ... ]
         """
-        return DictReader((','.join(row) for row in rows))
+        return DictReader(','.join(row) for row in rows)
 
 
 class ExternalKeyCsvTests(TeamMembershipEventTestMixin, SharedModuleStoreTestCase):

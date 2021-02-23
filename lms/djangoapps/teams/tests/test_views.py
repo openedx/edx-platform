@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 Tests for the teams API at the HTTP request level.
 """
@@ -7,32 +6,31 @@ Tests for the teams API at the HTTP request level.
 import json
 import unittest
 from datetime import datetime
+from unittest.mock import patch
 from uuid import UUID
 
 import ddt
 import pytz
 from dateutil import parser
 from django.conf import settings
-from django.db.models.signals import post_save
 from django.core.files.uploadedfile import SimpleUploadedFile
+from django.db.models.signals import post_save
 from django.urls import reverse
 from django.utils import translation
 from elasticsearch.exceptions import ConnectionError  # lint-amnesty, pylint: disable=redefined-builtin
-from mock import patch
 from rest_framework.test import APIClient, APITestCase
 from search.search_engine_base import SearchEngine
-from six.moves import range
 
-from common.test.utils import skip_signal
 from common.djangoapps.course_modes.models import CourseMode
+from common.djangoapps.student.models import CourseEnrollment
+from common.djangoapps.student.tests.factories import AdminFactory, CourseEnrollmentFactory, UserFactory
+from common.djangoapps.util.testing import EventTestMixin
+from common.test.utils import skip_signal
 from lms.djangoapps.courseware.tests.factories import StaffFactory
+from lms.djangoapps.program_enrollments.tests.factories import ProgramEnrollmentFactory
 from openedx.core.djangoapps.django_comment_common.models import FORUM_ROLE_COMMUNITY_TA, Role
 from openedx.core.djangoapps.django_comment_common.utils import seed_permissions_roles
 from openedx.core.lib.teams_config import TeamsConfig
-from common.djangoapps.student.models import CourseEnrollment
-from lms.djangoapps.program_enrollments.tests.factories import ProgramEnrollmentFactory
-from common.djangoapps.student.tests.factories import AdminFactory, CourseEnrollmentFactory, UserFactory
-from common.djangoapps.util.testing import EventTestMixin
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 
@@ -50,15 +48,15 @@ class TestDashboard(SharedModuleStoreTestCase):
 
     @classmethod
     def setUpClass(cls):
-        super(TestDashboard, cls).setUpClass()
+        super().setUpClass()
         cls.course = CourseFactory.create(
             teams_configuration=TeamsConfig({
                 "max_team_size": 10,
                 "topics": [
                     {
-                        "name": u"Topic {}".format(topic_id),
+                        "name": f"Topic {topic_id}",
                         "id": topic_id,
-                        "description": u"Description for topic {}".format(topic_id)
+                        "description": f"Description for topic {topic_id}"
                     }
                     for topic_id in range(cls.NUM_TOPICS)
                 ]
@@ -69,7 +67,7 @@ class TestDashboard(SharedModuleStoreTestCase):
         """
         Set up tests
         """
-        super(TestDashboard, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         # will be assigned to self.client by default
         self.user = UserFactory.create(password=self.test_password)
         self.teams_url = reverse('teams_dashboard', args=[self.course.id])
@@ -79,7 +77,7 @@ class TestDashboard(SharedModuleStoreTestCase):
         dashboard, and is redirected to the login page."""
         anonymous_client = APIClient()
         response = anonymous_client.get(self.teams_url)
-        redirect_url = '{0}?next={1}'.format(settings.LOGIN_URL, self.teams_url)
+        redirect_url = f'{settings.LOGIN_URL}?next={self.teams_url}'
         self.assertRedirects(response, redirect_url)
 
     def test_not_enrolled_not_staff(self):
@@ -132,7 +130,7 @@ class TestDashboard(SharedModuleStoreTestCase):
         # Create some teams
         for topic_id in range(self.NUM_TOPICS):
             team = CourseTeamFactory.create(
-                name=u"Team for topic {}".format(topic_id),
+                name=f"Team for topic {topic_id}",
                 course_id=self.course.id,
                 topic_id=topic_id,
             )
@@ -305,34 +303,34 @@ class TeamAPITestCase(APITestCase, SharedModuleStoreTestCase):
     @classmethod
     def setUpClass(cls):
         # pylint: disable=super-method-not-called
-        with super(TeamAPITestCase, cls).setUpClassAndTestData():
+        with super().setUpClassAndTestData():
             base_topics = [{
-                'id': 'topic_{}'.format(i), 'name': name,
-                'description': u'Description for topic {}.'.format(i),
+                'id': f'topic_{i}', 'name': name,
+                'description': f'Description for topic {i}.',
                 'max_team_size': 3
-            } for i, name in enumerate([u'Sólar power', 'Wind Power', 'Nuclear Power', 'Coal Power'])]
+            } for i, name in enumerate(['Sólar power', 'Wind Power', 'Nuclear Power', 'Coal Power'])]
             base_topics.append(
                 {
                     'id': 'private_topic_1_id',
                     'name': 'private_topic_1_name',
-                    'description': u'Description for topic private topic 1.',
-                    'type': u'private_managed'
+                    'description': 'Description for topic private topic 1.',
+                    'type': 'private_managed'
                 }
             )
             base_topics.append(
                 {
                     'id': 'private_topic_2_id',
                     'name': 'private_topic_2_name',
-                    'description': u'Description for topic private topic 2.',
-                    'type': u'private_managed'
+                    'description': 'Description for topic private topic 2.',
+                    'type': 'private_managed'
                 }
             )
             base_topics.append(
                 {
                     'id': 'private_topic_no_teams',
                     'name': 'private_topic_no_teams_name',
-                    'description': u'Description for topic private_topic_no_teams.',
-                    'type': u'private_managed'
+                    'description': 'Description for topic private_topic_no_teams.',
+                    'type': 'private_managed'
                 }
             )
             teams_configuration_1 = TeamsConfig({
@@ -377,7 +375,7 @@ class TeamAPITestCase(APITestCase, SharedModuleStoreTestCase):
 
     @classmethod
     def setUpTestData(cls):
-        super(TeamAPITestCase, cls).setUpTestData()
+        super().setUpTestData()
         cls.topics_count = 6
         cls.users = {
             'staff': AdminFactory.create(password=cls.test_password),
@@ -439,7 +437,7 @@ class TeamAPITestCase(APITestCase, SharedModuleStoreTestCase):
             dispatch_uid='teams.signals.course_team_post_save_callback'
         ):
             cls.solar_team = CourseTeamFactory.create(
-                name=u'Sólar team',
+                name='Sólar team',
                 course_id=cls.test_course_1.id,
                 topic_id='topic_0'
             )
@@ -472,8 +470,8 @@ class TeamAPITestCase(APITestCase, SharedModuleStoreTestCase):
                 topic_id='topic_7'
             )
             cls.chinese_team = CourseTeamFactory.create(
-                name=u'著文企臺個',
-                description=u'共樣地面較，件展冷不護者這與民教過住意，國制銀產物助音是勢一友',
+                name='著文企臺個',
+                description='共樣地面較，件展冷不護者這與民教過住意，國制銀產物助音是勢一友',
                 country='CN',
                 language='zh_HANS',
                 course_id=cls.test_course_2.id,
@@ -773,7 +771,7 @@ class TestListTeamsAPI(EventTestMixin, TeamAPITestCase):
     """Test cases for the team listing API endpoint."""
 
     def setUp(self):  # pylint: disable=arguments-differ
-        super(TestListTeamsAPI, self).setUp('lms.djangoapps.teams.utils.tracker')  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp('lms.djangoapps.teams.utils.tracker')
 
     @ddt.data(
         (None, 401),
@@ -808,27 +806,27 @@ class TestListTeamsAPI(EventTestMixin, TeamAPITestCase):
         self.verify_names(
             {'course_id': str(self.test_course_2.id)},
             200,
-            ['Another Team', 'Public Profile Team', 'Search', u'著文企臺個'],
+            ['Another Team', 'Public Profile Team', 'Search', '著文企臺個'],
             user='staff'
         )
 
     def test_filter_topic_id(self):
-        self.verify_names({'course_id': str(self.test_course_1.id), 'topic_id': 'topic_0'}, 200, [u'Sólar team'])
+        self.verify_names({'course_id': str(self.test_course_1.id), 'topic_id': 'topic_0'}, 200, ['Sólar team'])
 
     def test_filter_username(self):
         self.verify_names({'course_id': str(self.test_course_1.id),
-                           'username': 'student_enrolled'}, 200, [u'Sólar team'])
+                           'username': 'student_enrolled'}, 200, ['Sólar team'])
         self.verify_names({'course_id': str(self.test_course_1.id), 'username': 'staff'}, 200, [])
 
     @ddt.data(
-        (None, 200, ['Nuclear Team', u'Sólar team', 'Wind Team']),
-        ('name', 200, ['Nuclear Team', u'Sólar team', 'Wind Team']),
+        (None, 200, ['Nuclear Team', 'Sólar team', 'Wind Team']),
+        ('name', 200, ['Nuclear Team', 'Sólar team', 'Wind Team']),
         # Note that "Nuclear Team" and "Solar team" have the same open_slots.
         # "Solar team" comes first due to secondary sort by last_activity_at.
-        ('open_slots', 200, ['Wind Team', u'Sólar team', 'Nuclear Team']),
+        ('open_slots', 200, ['Wind Team', 'Sólar team', 'Nuclear Team']),
         # Note that "Wind Team" and "Nuclear Team" have the same last_activity_at.
         # "Wind Team" comes first due to secondary sort by open_slots.
-        ('last_activity_at', 200, [u'Sólar team', 'Wind Team', 'Nuclear Team']),
+        ('last_activity_at', 200, ['Sólar team', 'Wind Team', 'Nuclear Team']),
     )
     @ddt.unpack
     def test_order_by(self, field, status, names):
@@ -841,7 +839,7 @@ class TestListTeamsAPI(EventTestMixin, TeamAPITestCase):
             sender=CourseTeam,
             dispatch_uid='teams.signals.course_team_post_save_callback'
         ):
-            solar_team = self.test_team_name_id_map[u'Sólar team']
+            solar_team = self.test_team_name_id_map['Sólar team']
             solar_team.last_activity_at = datetime.utcnow().replace(tzinfo=pytz.utc)
             solar_team.save()
 
@@ -969,7 +967,7 @@ class TestListTeamsAPI(EventTestMixin, TeamAPITestCase):
         ('Island', ['Search']),
         ('not-a-query', []),
         ('team', ['Another Team', 'Public Profile Team']),
-        (u'著文企臺個', [u'著文企臺個']),
+        ('著文企臺個', ['著文企臺個']),
     )
     @ddt.unpack
     def test_text_search(self, text_search, expected_team_names):
@@ -1017,7 +1015,7 @@ class TestListTeamsAPI(EventTestMixin, TeamAPITestCase):
 
     def test_delete_removed_from_search(self):
         team = CourseTeamFactory.create(
-            name=u'zoinks',
+            name='zoinks',
             course_id=self.test_course_1.id,
             topic_id='topic_0'
         )
@@ -1073,7 +1071,7 @@ class TestCreateTeamAPI(EventTestMixin, TeamAPITestCase):
     """Test cases for the team creation endpoint."""
 
     def setUp(self):  # pylint: disable=arguments-differ
-        super(TestCreateTeamAPI, self).setUp('lms.djangoapps.teams.utils.tracker')  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp('lms.djangoapps.teams.utils.tracker')
 
     @ddt.data(
         (None, 401),
@@ -1378,7 +1376,7 @@ class TestDeleteTeamAPI(EventTestMixin, TeamAPITestCase):
     """Test cases for the team delete endpoint."""
 
     def setUp(self):  # pylint: disable=arguments-differ
-        super(TestDeleteTeamAPI, self).setUp('lms.djangoapps.teams.utils.tracker')  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp('lms.djangoapps.teams.utils.tracker')
 
     @ddt.data(
         ('staff', 204),
@@ -1494,7 +1492,7 @@ class TestUpdateTeamAPI(EventTestMixin, TeamAPITestCase):
     """Test cases for the team update endpoint."""
 
     def setUp(self):  # pylint: disable=arguments-differ
-        super(TestUpdateTeamAPI, self).setUp('lms.djangoapps.teams.utils.tracker')  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp('lms.djangoapps.teams.utils.tracker')
 
     @ddt.data(
         (None, 401),
@@ -1732,11 +1730,11 @@ class TestListTopicsAPI(TeamAPITestCase):
         self.get_topics_list(400)
 
     @ddt.data(
-        (None, 200, ['Coal Power', 'Nuclear Power', u'Sólar power', 'Wind Power'], 'name'),
-        ('name', 200, ['Coal Power', 'Nuclear Power', u'Sólar power', 'Wind Power'], 'name'),
+        (None, 200, ['Coal Power', 'Nuclear Power', 'Sólar power', 'Wind Power'], 'name'),
+        ('name', 200, ['Coal Power', 'Nuclear Power', 'Sólar power', 'Wind Power'], 'name'),
         # Note that "Nuclear Power" will have 2 teams. "Coal Power" "Wind Power" and "Solar Power"
         # all have 1 team. The secondary sort is alphabetical by name.
-        ('team_count', 200, ['Nuclear Power', 'Coal Power', u'Sólar power', 'Wind Power'], 'team_count'),
+        ('team_count', 200, ['Nuclear Power', 'Coal Power', 'Sólar power', 'Wind Power'], 'team_count'),
         ('no_such_field', 400, [], None),
     )
     @ddt.unpack
@@ -1749,11 +1747,11 @@ class TestListTopicsAPI(TeamAPITestCase):
         ):
             # Add a team to "Nuclear Power", so it has two teams
             CourseTeamFactory.create(
-                name=u'Nuclear Team 1', course_id=self.test_course_1.id, topic_id='topic_2'
+                name='Nuclear Team 1', course_id=self.test_course_1.id, topic_id='topic_2'
             )
             # Add a team to "Coal Power", so it has one team, same as "Wind" and "Solar"
             CourseTeamFactory.create(
-                name=u'Coal Team 1', course_id=self.test_course_1.id, topic_id='topic_3'
+                name='Coal Team 1', course_id=self.test_course_1.id, topic_id='topic_3'
             )
         data = {'course_id': str(self.test_course_1.id)}
         if field:
@@ -1778,16 +1776,16 @@ class TestListTopicsAPI(TeamAPITestCase):
             # Add two wind teams, a solar team and a coal team, to bring the totals to
             # Wind: 3 Solar: 2 Coal: 1, Nuclear: 1
             CourseTeamFactory.create(
-                name=u'Wind Team 1', course_id=self.test_course_1.id, topic_id='topic_1'
+                name='Wind Team 1', course_id=self.test_course_1.id, topic_id='topic_1'
             )
             CourseTeamFactory.create(
-                name=u'Wind Team 2', course_id=self.test_course_1.id, topic_id='topic_1'
+                name='Wind Team 2', course_id=self.test_course_1.id, topic_id='topic_1'
             )
             CourseTeamFactory.create(
-                name=u'Solar Team 1', course_id=self.test_course_1.id, topic_id='topic_0'
+                name='Solar Team 1', course_id=self.test_course_1.id, topic_id='topic_0'
             )
             CourseTeamFactory.create(
-                name=u'Coal Team 1', course_id=self.test_course_1.id, topic_id='topic_3'
+                name='Coal Team 1', course_id=self.test_course_1.id, topic_id='topic_3'
             )
 
         # Wind power has the most teams, followed by Solar
@@ -1800,7 +1798,7 @@ class TestListTopicsAPI(TeamAPITestCase):
             },
             user='student_enrolled'
         )
-        assert ['Wind Power', u'Sólar power'] == [topic['name'] for topic in topics['results']]
+        assert ['Wind Power', 'Sólar power'] == [topic['name'] for topic in topics['results']]
 
         # Coal and Nuclear are tied, so they are alphabetically sorted.
         topics = self.get_topics_list(
@@ -2085,7 +2083,7 @@ class TestListMembershipAPI(TeamAPITestCase):
     @ddt.data(
         ('student_enrolled_both_courses_other_team', 'TestX/TS101/Test_Course', 200, 'Nuclear Team'),
         ('student_enrolled_both_courses_other_team', 'MIT/6.002x/Circuits', 200, 'Another Team'),
-        ('student_enrolled', 'TestX/TS101/Test_Course', 200, u'Sólar team'),
+        ('student_enrolled', 'TestX/TS101/Test_Course', 200, 'Sólar team'),
         ('student_enrolled', 'MIT/6.002x/Circuits', 400, ''),
     )
     @ddt.unpack
@@ -2288,7 +2286,7 @@ class TestCreateMembershipAPI(EventTestMixin, TeamAPITestCase):
     """Test cases for the membership creation endpoint."""
 
     def setUp(self):  # pylint: disable=arguments-differ
-        super(TestCreateMembershipAPI, self).setUp('lms.djangoapps.teams.utils.tracker')  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp('lms.djangoapps.teams.utils.tracker')
 
     @ddt.data(
         (None, 401),
@@ -2577,7 +2575,7 @@ class TestDeleteMembershipAPI(EventTestMixin, TeamAPITestCase):
     """Test cases for the membership deletion endpoint."""
 
     def setUp(self):  # pylint: disable=arguments-differ
-        super(TestDeleteMembershipAPI, self).setUp('lms.djangoapps.teams.utils.tracker')  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp('lms.djangoapps.teams.utils.tracker')
 
     @ddt.data(
         (None, 401),
@@ -2933,9 +2931,9 @@ class TestBulkMembershipManagement(TeamAPITestCase):
         self.create_and_enroll_student(username=masters_username_b, mode=CourseMode.MASTERS)
 
         csv_content = 'user,mode,topic_1' + '\n'
-        csv_content += '{},audit,team wind power'.format(audit_username) + '\n'
-        csv_content += '{},masters,team wind power'.format(masters_username_a) + '\n'
-        csv_content += '{},masters,team wind power'.format(masters_username_b) + '\n'
+        csv_content += f'{audit_username},audit,team wind power' + '\n'
+        csv_content += f'{masters_username_a},masters,team wind power' + '\n'
+        csv_content += f'{masters_username_b},masters,team wind power' + '\n'
         csv_file = SimpleUploadedFile('test_file.csv', csv_content.encode('utf8'), content_type='text/csv')
         self.client.login(username=self.users['course_staff'].username, password=self.users['course_staff'].password)
         response = self.make_call(reverse(
@@ -2955,7 +2953,7 @@ class TestBulkMembershipManagement(TeamAPITestCase):
         for name_enum in enumerate(['a', 'b', 'c', 'd', 'e', 'f', 'g']):
             username = 'user_{}'.format(name_enum[1])
             self.create_and_enroll_student(username=username, mode=CourseMode.MASTERS)
-            csv_content += '{},masters,{},{}'.format(username, team1, team2) + '\n'
+            csv_content += f'{username},masters,{team1},{team2}' + '\n'
 
         csv_file = SimpleUploadedFile('test_file.csv', csv_content.encode('utf8'), content_type='text/csv')
         self.client.login(username=self.users['course_staff'].username, password=self.users['course_staff'].password)
@@ -2975,8 +2973,8 @@ class TestBulkMembershipManagement(TeamAPITestCase):
         topic_0_id = 'topic_0'
         assert CourseTeamMembership.objects.filter(user_id=self.users[username].id, team__topic_id=topic_0_id).exists()
 
-        csv_content = 'user,mode,{},topic_1'.format(topic_0_id) + '\n'
-        csv_content += '{},audit'.format(username)
+        csv_content = f'user,mode,{topic_0_id},topic_1' + '\n'
+        csv_content += f'{username},audit'
         csv_file = SimpleUploadedFile('test_file.csv', csv_content.encode('utf8'), content_type='text/csv')
         self.client.login(username=self.users['course_staff'].username, password=self.users['course_staff'].password)
         self.make_call(
@@ -2998,8 +2996,8 @@ class TestBulkMembershipManagement(TeamAPITestCase):
         windpower_team_name = 'team wind power'
         assert CourseTeamMembership.objects\
             .filter(user_id=self.users[username].id, team__topic_id=topic_0_id, team__name=windpower_team_name).exists()
-        csv_content = 'user,mode,{}'.format(topic_0_id) + '\n'
-        csv_content += '{0},audit,{1}'.format(username, nuclear_team_name)
+        csv_content = f'user,mode,{topic_0_id}' + '\n'
+        csv_content += f'{username},audit,{nuclear_team_name}'
         csv_file = SimpleUploadedFile('test_file.csv', csv_content.encode('utf8'), content_type='text/csv')
         self.client.login(username=self.users['course_staff'].username, password=self.users['course_staff'].password)
         self.make_call(
@@ -3024,8 +3022,8 @@ class TestBulkMembershipManagement(TeamAPITestCase):
         topic_0_id = 'topic_0'
         nuclear_team_name = 'team wind power'
         assert len(CourseTeamMembership.objects.filter(user_id=self.users[username].id, team__topic_id=topic_0_id)) == 1
-        csv_content = 'user,mode,{}'.format(topic_0_id) + '\n'
-        csv_content += '{0},audit,{1}'.format(username, nuclear_team_name)
+        csv_content = f'user,mode,{topic_0_id}' + '\n'
+        csv_content += f'{username},audit,{nuclear_team_name}'
         csv_file = SimpleUploadedFile('test_file.csv', csv_content.encode('utf8'), content_type='text/csv')
         self.client.login(username=self.users['course_staff'].username,
                           password=self.users['course_staff'].password)
@@ -3078,7 +3076,7 @@ class TestBulkMembershipManagement(TeamAPITestCase):
         team_name = '著文企臺個'
         user_name = '著著文企臺個文企臺個'
         self.create_and_enroll_student(username=user_name)
-        csv_content += '{},audit,{}'.format(user_name, team_name)
+        csv_content += f'{user_name},audit,{team_name}'
         csv_file = SimpleUploadedFile('test_file.csv', csv_content.encode('utf8'), content_type='text/csv')
         self.client.login(username=self.users['course_staff'].username, password=self.users['course_staff'].password)
         self.make_call(
@@ -3099,8 +3097,8 @@ class TestBulkMembershipManagement(TeamAPITestCase):
         masters_a = 'masters_a'
         team = self.wind_team
         self.create_and_enroll_student(username=masters_a, mode=CourseMode.MASTERS)
-        csv_content = 'user,mode,{}'.format(team.topic_id) + '\n'
-        csv_content += 'masters_a, masters,{}'.format(team.name)
+        csv_content = f'user,mode,{team.topic_id}' + '\n'
+        csv_content += f'masters_a, masters,{team.name}'
         csv_file = SimpleUploadedFile('test_file.csv', csv_content.encode('utf8'), content_type='text/csv')
         self.client.login(username=self.users['course_staff'].username, password=self.users['course_staff'].password)
 
