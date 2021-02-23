@@ -131,7 +131,7 @@ class TestRecentEnrollments(ModuleStoreTestCase, XssTestMixin):
         # verify recent enrollment message
         self.assertContains(
             response,
-            f'Thank you for enrolling in:'
+            'Thank you for enrolling in:'.format(course_name=self.course.display_name)
         )
         self.assertContains(
             response,
@@ -174,7 +174,7 @@ class TestRecentEnrollments(ModuleStoreTestCase, XssTestMixin):
 
         self.assertContains(
             response,
-            f"Thank you for enrolling in:"
+            "Thank you for enrolling in:".format(course_name=self.course.display_name)
         )
         self.assertContains(
             response,
