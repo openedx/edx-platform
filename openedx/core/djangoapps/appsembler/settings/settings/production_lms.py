@@ -97,6 +97,14 @@ def plugin_settings(settings):
     settings.ACCESS_CONTROL_BACKENDS = settings.ENV_TOKENS.get('ACCESS_CONTROL_BACKENDS', {})
     settings.LMS_SEGMENT_SITE = settings.AUTH_TOKENS.get('SEGMENT_SITE')
 
+    _after_site_mdlwr = settings.MIDDLEWARE.index('django.contrib.sites.middleware.CurrentSiteMiddleware') + 1
+    settings.MIDDLEWARE = settings.MIDDLEWARE[:_after_site_mdlwr] + [
+        # Allows us to define redirects via Django admin
+        'openedx.core.djangoapps.appsembler.sites.middleware.CustomDomainsRedirectMiddleware',
+        'openedx.core.djangoapps.appsembler.sites.middleware.RedirectMiddleware',
+    ] + settings.MIDDLEWARE[_after_site_mdlwr:]
+
+
     # This is used in the appsembler_sites.middleware.RedirectMiddleware to exclude certain paths
     # from the redirect mechanics.
     settings.MAIN_SITE_REDIRECT_WHITELIST = [
