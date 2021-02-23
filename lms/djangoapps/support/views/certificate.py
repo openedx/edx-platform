@@ -1,10 +1,11 @@
 """
 Certificate tool in the student support app.
 """
-from urllib.parse import quote_plus, unquote
+
 
 from django.utils.decorators import method_decorator
 from django.views.generic import View
+from six.moves.urllib.parse import quote_plus, unquote
 
 from common.djangoapps.edxmako.shortcuts import render_to_response
 from lms.djangoapps.support.decorators import require_support_permission

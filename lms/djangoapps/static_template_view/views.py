@@ -15,13 +15,13 @@ from django.template import TemplateDoesNotExist
 from django.utils.safestring import mark_safe
 from django.views.decorators.csrf import ensure_csrf_cookie
 from django.views.defaults import permission_denied
-from mako.exceptions import TopLevelLookupException
 from ratelimit.exceptions import Ratelimited
+from mako.exceptions import TopLevelLookupException
 
 from common.djangoapps.edxmako.shortcuts import render_to_response, render_to_string
+from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from common.djangoapps.util.cache import cache_if_anonymous
 from common.djangoapps.util.views import fix_crum_request
-from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 
 valid_templates = []
 
