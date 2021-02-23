@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 """
 This is the default template for our main set of AWS servers.
 
@@ -41,7 +43,7 @@ def get_env_setting(setting):
     try:
         return os.environ[setting]
     except KeyError:
-        error_msg = "Set the %s env variable" % setting
+        error_msg = u"Set the %s env variable" % setting
         raise ImproperlyConfigured(error_msg)  # lint-amnesty, pylint: disable=raise-missing-from
 
 ################################ ALWAYS THE SAME ##############################
@@ -133,11 +135,11 @@ CELERYD_PREFETCH_MULTIPLIER = 1
 
 QUEUE_VARIANT = CONFIG_PREFIX.lower()
 
-CELERY_DEFAULT_EXCHANGE = f'edx.{QUEUE_VARIANT}core'
+CELERY_DEFAULT_EXCHANGE = 'edx.{0}core'.format(QUEUE_VARIANT)
 
-HIGH_PRIORITY_QUEUE = f'edx.{QUEUE_VARIANT}core.high'
-DEFAULT_PRIORITY_QUEUE = f'edx.{QUEUE_VARIANT}core.default'
-HIGH_MEM_QUEUE = f'edx.{QUEUE_VARIANT}core.high_mem'
+HIGH_PRIORITY_QUEUE = 'edx.{0}core.high'.format(QUEUE_VARIANT)
+DEFAULT_PRIORITY_QUEUE = 'edx.{0}core.default'.format(QUEUE_VARIANT)
+HIGH_MEM_QUEUE = 'edx.{0}core.high_mem'.format(QUEUE_VARIANT)
 
 CELERY_DEFAULT_QUEUE = DEFAULT_PRIORITY_QUEUE
 CELERY_DEFAULT_ROUTING_KEY = DEFAULT_PRIORITY_QUEUE
@@ -358,7 +360,7 @@ if "TRACKING_IGNORE_URL_PATTERNS" in ENV_TOKENS:
 SSL_AUTH_EMAIL_DOMAIN = ENV_TOKENS.get("SSL_AUTH_EMAIL_DOMAIN", "MIT.EDU")
 SSL_AUTH_DN_FORMAT_STRING = ENV_TOKENS.get(
     "SSL_AUTH_DN_FORMAT_STRING",
-    "/C=US/ST=Massachusetts/O=Massachusetts Institute of Technology/OU=Client CA v1/CN={0}/emailAddress={1}"
+    u"/C=US/ST=Massachusetts/O=Massachusetts Institute of Technology/OU=Client CA v1/CN={0}/emailAddress={1}"
 )
 
 # Video Caching. Pairing country codes with CDN URLs.
@@ -532,11 +534,11 @@ CELERY_BROKER_VHOST = ENV_TOKENS.get("CELERY_BROKER_VHOST", "")
 CELERY_BROKER_USER = AUTH_TOKENS.get("CELERY_BROKER_USER", "")
 CELERY_BROKER_PASSWORD = AUTH_TOKENS.get("CELERY_BROKER_PASSWORD", "")
 
-BROKER_URL = "{}://{}:{}@{}/{}".format(CELERY_BROKER_TRANSPORT,
-                                       CELERY_BROKER_USER,
-                                       CELERY_BROKER_PASSWORD,
-                                       CELERY_BROKER_HOSTNAME,
-                                       CELERY_BROKER_VHOST)
+BROKER_URL = "{0}://{1}:{2}@{3}/{4}".format(CELERY_BROKER_TRANSPORT,
+                                            CELERY_BROKER_USER,
+                                            CELERY_BROKER_PASSWORD,
+                                            CELERY_BROKER_HOSTNAME,
+                                            CELERY_BROKER_VHOST)
 BROKER_USE_SSL = ENV_TOKENS.get('CELERY_BROKER_USE_SSL', False)
 
 BROKER_TRANSPORT_OPTIONS = {
