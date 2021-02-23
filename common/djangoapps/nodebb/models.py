@@ -8,7 +8,7 @@ from lms.djangoapps.teams.models import CourseTeam
 from openedx.core.djangoapps.xmodule_django.models import CourseKeyField
 
 
-class DiscussionCommunity(TimeStampedModel):  # pylint: disable=model-missing-unicode
+class DiscussionCommunity(TimeStampedModel):
     """
         Model to store each course related communities
     """
@@ -19,8 +19,11 @@ class DiscussionCommunity(TimeStampedModel):  # pylint: disable=model-missing-un
     def __str__(self):
         return "%s" % self.community_url
 
+    def __unicode__(self):
+        return u'DiscussionCommunity: course_id: {}, community_url: {}'.format(self.course_id, self.community_url)
 
-class TeamGroupChat(TimeStampedModel):  # pylint: disable=model-missing-unicode
+
+class TeamGroupChat(TimeStampedModel):
     """
         Model to store team related group chats/discussion categories
     """
@@ -31,3 +34,6 @@ class TeamGroupChat(TimeStampedModel):  # pylint: disable=model-missing-unicode
 
     def __str__(self):
         return "%s" % self.room_id
+
+    def __unicode__(self):
+        return u'TeamGroupChat: team: {}, room_id: {}, slug: {}'.format(self.team, self.room_id, self.slug)

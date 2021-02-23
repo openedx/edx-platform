@@ -1,5 +1,5 @@
 """
-Admin configuration for Discussion Community model.
+Admin site for nodebb application.
 """
 from django.contrib import admin
 

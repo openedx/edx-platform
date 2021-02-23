@@ -34,6 +34,7 @@ from openedx.features.badging.models import UserBadge
 from student.models import CourseEnrollment, UserProfile
 from util.model_utils import get_changed_fields_dict
 
+
 log = getLogger(__name__)
 
 

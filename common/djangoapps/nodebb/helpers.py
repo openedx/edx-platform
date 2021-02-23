@@ -17,6 +17,7 @@ from nodebb.tasks import (
 )
 from openedx.core.djangoapps.xmodule_django.models import CourseKeyField
 
+
 log = getLogger(__name__)
 
 
@@ -28,7 +29,7 @@ def get_course_related_tabs(request, course):
     course_tabs = get_course_tab_list(request, course)
 
     tabs_dict = collections.OrderedDict()
-    for idx, tab in enumerate(course_tabs):  # pylint: disable=unused-variable
+    for tab in course_tabs:
         tab_name = tab.name.lower()
         tab_link = tab.link_func(course, reverse)
 
