@@ -7,8 +7,8 @@ Taken from: https://celery.readthedocs.org/en/latest/django/first-steps-with-dja
 
 import os
 
+from openedx.core.lib.celery import APP  # pylint: disable=wrong-import-position,unused-import
 
 # Set the default Django settings module for the 'celery' program
 # and then instantiate the Celery singleton.
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'lms.envs.production')
-from openedx.core.lib.celery import APP  # pylint: disable=wrong-import-position,unused-import

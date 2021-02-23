@@ -70,7 +70,7 @@ class XBlockValidationTest(LmsXBlockMixinTestCase):
     Unit tests for XBlock validation
     """
     def setUp(self):
-        super(XBlockValidationTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.build_course()
 
     def verify_validation_message(self, message, expected_message, expected_message_type):
@@ -280,7 +280,7 @@ class OpenAssessmentBlockMixinTestCase(ModuleStoreTestCase):
     """
 
     def setUp(self):
-        super(OpenAssessmentBlockMixinTestCase, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.course = CourseFactory.create()
         self.section = ItemFactory.create(parent=self.course, category='chapter', display_name='Test Section')
         self.open_assessment = ItemFactory.create(
@@ -378,7 +378,7 @@ def ddt_named(parent, child):
     Helper to get more readable dynamically-generated test names from ddt.
     """
     args = RenamedTuple([parent, child])
-    args.__name__ = 'parent_{}_child_{}'.format(parent, child)      # pylint: disable=attribute-defined-outside-init
+    args.__name__ = f'parent_{parent}_child_{child}'      # pylint: disable=attribute-defined-outside-init
     return args
 
 
@@ -406,7 +406,7 @@ class XBlockMergedGroupAccessTest(LmsXBlockMixinTestCase):
     )
 
     def setUp(self):
-        super(XBlockMergedGroupAccessTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.build_course()
 
     def verify_group_access(self, block_location, expected_dict):

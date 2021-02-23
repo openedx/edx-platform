@@ -3,7 +3,6 @@ Tests for the lms_result_processor
 """
 
 
-import six
 import pytest
 
 from lms.djangoapps.courseware.tests.factories import UserFactory
@@ -64,7 +63,7 @@ class LmsSearchResultProcessorTestCase(ModuleStoreTestCase):
         )
 
     def setUp(self):
-        super(LmsSearchResultProcessorTestCase, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.build_course()
 
     def test_url_parameter(self):
@@ -76,15 +75,15 @@ class LmsSearchResultProcessorTestCase(ModuleStoreTestCase):
 
         srp = LmsSearchResultProcessor(
             {
-                "course": six.text_type(self.course.id),
-                "id": six.text_type(self.html.scope_ids.usage_id),
+                "course": str(self.course.id),
+                "id": str(self.html.scope_ids.usage_id),
                 "content": {"text": "This is the html text"}
             },
             "test"
         )
 
-        assert srp.url == '/courses/{}/jump_to/{}'.format(six.text_type(self.course.id),
-                                                          six.text_type(self.html.scope_ids.usage_id))
+        assert srp.url == '/courses/{}/jump_to/{}'.format(str(self.course.id),
+                                                          str(self.html.scope_ids.usage_id))
 
     def test_should_remove(self):
         """
@@ -92,8 +91,8 @@ class LmsSearchResultProcessorTestCase(ModuleStoreTestCase):
         """
         srp = LmsSearchResultProcessor(
             {
-                "course": six.text_type(self.course.id),
-                "id": six.text_type(self.html.scope_ids.usage_id),
+                "course": str(self.course.id),
+                "id": str(self.html.scope_ids.usage_id),
                 "content": {"text": "This is html test text"}
             },
             "test"
