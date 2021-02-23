@@ -12,8 +12,8 @@ from mock import patch
 from six.moves.urllib.parse import urlencode
 
 from lms.djangoapps.courseware.field_overrides import OverrideModulestoreFieldData
-from lms.djangoapps.courseware.url_helpers import get_redirect_url
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
+from openedx.features.course_experience.url_helpers import get_legacy_courseware_url
 from common.djangoapps.student.tests.factories import AdminFactory, CourseEnrollmentFactory, UserFactory
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
@@ -175,7 +175,7 @@ class RenderXBlockTestMixin(six.with_metaclass(ABCMeta, object)):
             self.setup_user(admin=True, enroll=True, login=True)
 
             with check_mongo_calls(mongo_calls):
-                url = get_redirect_url(self.course.id, self.block_to_be_tested.location)
+                url = get_legacy_courseware_url(self.course.id, self.block_to_be_tested.location)
                 response = self.client.get(url)
                 expected_elements = self.block_specific_chrome_html_elements + self.COURSEWARE_CHROME_HTML_ELEMENTS
                 for chrome_element in expected_elements:

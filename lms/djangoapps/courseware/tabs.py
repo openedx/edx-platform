@@ -12,9 +12,9 @@ from django.utils.translation import ugettext_noop
 from lms.djangoapps.courseware.access import has_access
 from lms.djangoapps.courseware.entrance_exams import user_can_skip_entrance_exam
 from lms.djangoapps.course_home_api.toggles import course_home_mfe_dates_tab_is_active, course_home_mfe_outline_tab_is_active  # lint-amnesty, pylint: disable=line-too-long
-from lms.djangoapps.course_home_api.utils import get_microfrontend_url
 from openedx.core.lib.course_tabs import CourseTabPluginManager
 from openedx.features.course_experience import RELATIVE_DATES_FLAG, DISABLE_UNIFIED_COURSE_TAB_FLAG, default_course_url_name  # lint-amnesty, pylint: disable=line-too-long
+from openedx.features.course_experience.url_helpers import get_learning_mfe_home_url
 from common.djangoapps.student.models import CourseEnrollment
 from xmodule.tabs import CourseTab, CourseTabList, course_reverse_func_from_name_func, key_checker
 
@@ -44,7 +44,7 @@ class CoursewareTab(EnrolledTab):
     def __init__(self, tab_dict):
         def link_func(course, reverse_func):
             if course_home_mfe_outline_tab_is_active(course.id):
-                return get_microfrontend_url(course_key=course.id, view_name='home')
+                return get_learning_mfe_home_url(course_key=course.id, view_name='home')
             else:
                 reverse_name_func = lambda course: default_course_url_name(course.id)
                 url_func = course_reverse_func_from_name_func(reverse_name_func)
@@ -326,7 +326,7 @@ class DatesTab(EnrolledTab):
     def __init__(self, tab_dict):
         def link_func(course, reverse_func):
             if course_home_mfe_dates_tab_is_active(course.id):
-                return get_microfrontend_url(course_key=course.id, view_name=self.view_name)
+                return get_learning_mfe_home_url(course_key=course.id, view_name=self.view_name)
             else:
                 return reverse_func(self.view_name, args=[six.text_type(course.id)])
 
