@@ -5,7 +5,8 @@ import copy
 import logging
 
 from django.contrib.auth import get_user_model
-from django.core.management.base import BaseCommand
+from django.core.management.base import BaseCommand, CommandError
+from django.db.models import Q
 from opaque_keys.edx.keys import CourseKey
 from six import text_type
 from xmodule.modulestore.django import modulestore
@@ -76,10 +77,10 @@ class Command(BaseCommand):
         course_id = CourseKey.from_string(options['course'])
         user = options['username']
 
-        if '@' in user:
-            student = User.objects.get(email=user, courseenrollment__course_id=course_id)
-        else:
-            student = User.objects.get(username=user, courseenrollment__course_id=course_id)
+        kwargs = (Q(username=user) | Q(email=user)) & Q(courseenrollment__course_id=course_id)
+        student = User.objects.filter(kwargs).first()
+        if not student:
+            raise CommandError("User {} does not exist.".format(user))
 
         course = modulestore().get_course(course_id, depth=2)
 

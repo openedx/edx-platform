@@ -3,6 +3,7 @@
 
 from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.core.management.base import BaseCommand
+from django.db.models import Q
 
 
 class Command(BaseCommand):  # lint-amnesty, pylint: disable=missing-class-docstring
@@ -14,19 +15,15 @@ class Command(BaseCommand):  # lint-amnesty, pylint: disable=missing-class-docst
 
     def handle(self, *args, **options):
         email_or_username = options['email_or_username']
-        try:
-            if '@' in email_or_username:
-                user = User.objects.get(email=email_or_username)
-            else:
-                user = User.objects.get(username=email_or_username)
-        except User.DoesNotExist:
-            print(u'User {} does not exist. '.format(email_or_username))
+        user = User.objects.filter(Q(username=email_or_username) | Q(email=email_or_username)).first()
+        if not user:
+            print('User {} does not exist. '.format(email_or_username))
             print('Available users: ')
             print(User.objects.all())
             return
 
         roles = user.roles.all()
-        print(u'{} has %d roles:'.format(user, len(roles)))
+        print(u'{} has {} roles:'.format(user, len(roles)))
         for role in roles:
             print(u'\t{}'.format(role))
 

@@ -2,6 +2,7 @@
 
 from django.contrib.auth.models import Group, User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.core.management.base import BaseCommand, CommandError
+from django.db.models import Q
 
 
 class Command(BaseCommand):  # lint-amnesty, pylint: disable=missing-class-docstring
@@ -35,10 +36,9 @@ class Command(BaseCommand):  # lint-amnesty, pylint: disable=missing-class-docst
         name_or_email = options['name_or_email']
         group_name = options['group_name']
 
-        if '@' in name_or_email:
-            user = User.objects.get(email=name_or_email)
-        else:
-            user = User.objects.get(username=name_or_email)
+        user = User.objects.filter(Q(username=name_or_email) | Q(email=name_or_email)).first()
+        if not user:
+            raise CommandError("User {} does not exist.".format(name_or_email))
 
         try:
             group = Group.objects.get(name=group_name)

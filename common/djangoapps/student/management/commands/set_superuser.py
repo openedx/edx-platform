@@ -2,7 +2,8 @@
 
 
 from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
-from django.core.management.base import BaseCommand
+from django.core.management.base import BaseCommand, CommandError
+from django.db.models import Q
 from six import text_type
 
 
@@ -28,10 +29,9 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         for user in options['users']:
             try:
-                if '@' in user:
-                    userobj = User.objects.get(email=user)
-                else:
-                    userobj = User.objects.get(username=user)
+                userobj = User.objects.filter(Q(username=user) | Q(email=user)).first()
+                if not userobj:
+                    raise CommandError("User {} does not exist.".format(user))
 
                 if options['unset']:
                     userobj.is_superuser = False
@@ -39,7 +39,7 @@ class Command(BaseCommand):
                     userobj.is_superuser = True
 
                 userobj.save()
-                print('Modified {} sucessfully.'.format(user))
+                print('Modified {} successfully.'.format(user))
 
             except Exception as err:  # pylint: disable=broad-except
                 print("Error modifying user with identifier {}: {}: {}".format(user, type(err).__name__,

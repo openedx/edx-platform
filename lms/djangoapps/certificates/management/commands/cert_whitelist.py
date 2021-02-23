@@ -6,6 +6,7 @@ user/course
 
 from django.contrib.auth import get_user_model
 from django.core.management.base import BaseCommand, CommandError
+from django.db.models import Q
 from opaque_keys.edx.keys import CourseKey
 
 from lms.djangoapps.certificates.models import CertificateWhitelist
@@ -18,11 +19,9 @@ def get_user_from_identifier(identifier):
      This function takes the string identifier and fetch relevant user object from database
     """
     identifier = identifier.strip()
-    if '@' in identifier:
-        user = User.objects.get(email=identifier)
-    else:
-        user = User.objects.get(username=identifier)
-    return user
+    user = User.objects.filter(Q(username=identifier) | Q(email=identifier)).first()
+    if not user:
+        raise CommandError("User {} does not exist.".format(identifier))
 
 
 class Command(BaseCommand):

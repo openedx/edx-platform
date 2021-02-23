@@ -7,6 +7,7 @@ import shlex
 
 from django.contrib.auth import get_user_model
 from django.core.management.base import BaseCommand, CommandError
+from django.db.models import Q
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
 
@@ -95,12 +96,7 @@ def _get_user_from_identifier(identifier):
     """
     Using the string identifier, fetch the relevant user object from database
     """
-    try:
-        if '@' in identifier:
-            user = User.objects.get(email=identifier)
-        else:
-            user = User.objects.get(username=identifier)
-        return user
-    except User.DoesNotExist:
-        log.warning('User {user} could not be found'.format(user=identifier))
-        return None
+    user = User.objects.filter(Q(username=identifier) | Q(email=identifier)).first()
+    if not user:
+        log.warning('User {user} could not be found.'.format(user=identifier))
+    return user
