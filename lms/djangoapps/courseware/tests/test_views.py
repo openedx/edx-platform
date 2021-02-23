@@ -7,7 +7,6 @@ Tests courseware views.py
 import html
 import itertools
 import json
-import unittest  # lint-amnesty, pylint: disable=unused-import
 from datetime import datetime, timedelta
 from uuid import uuid4
 
@@ -60,6 +59,7 @@ from lms.djangoapps.courseware.toggles import (
     COURSEWARE_MICROFRONTEND_COURSE_TEAM_PREVIEW,
     COURSEWARE_OPTIMIZED_RENDER_XBLOCK,
     REDIRECT_TO_COURSEWARE_MICROFRONTEND,
+
 )
 from lms.djangoapps.courseware.url_helpers import get_microfrontend_url, get_redirect_url
 from lms.djangoapps.courseware.user_state_client import DjangoXBlockUserStateClient
