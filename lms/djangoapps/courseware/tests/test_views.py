@@ -1408,7 +1408,7 @@ class ProgressPageTests(ProgressPageBaseTests):
             self.assertContains(resp, u"Download Your Certificate")
 
     @ddt.data(
-        (True, 55),
+        (True, 54),
         (False, 54),
     )
     @ddt.unpack

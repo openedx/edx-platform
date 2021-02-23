@@ -7,7 +7,6 @@ schedule experience built on the Schedules app.
 import logging
 
 from openedx.core.djangoapps.course_date_signals.utils import spaced_out_sections
-from openedx.core.djangoapps.schedules.config import COURSE_UPDATE_WAFFLE_FLAG
 from openedx.core.djangoapps.schedules.exceptions import CourseUpdateDoesNotExist
 from openedx.core.lib.request_utils import get_request_or_stub
 from xmodule.modulestore.django import modulestore
@@ -15,16 +14,16 @@ from xmodule.modulestore.django import modulestore
 log = logging.getLogger(__name__)
 
 
-def course_has_highlights(course_key):
+def course_has_highlights(course):
     """
     Does the course have any highlights for any section/week in it?
     This ignores access checks, since highlights may be lurking in currently
     inaccessible content.
-    """
-    try:
-        course = _get_course_with_highlights(course_key)
 
-    except CourseUpdateDoesNotExist:
+    Arguments:
+        course (CourseDescriptor): course object to check
+    """
+    if not course.highlights_enabled_for_messaging:
         return False
 
     else:
@@ -36,10 +35,26 @@ def course_has_highlights(course_key):
 
         if not highlights_are_available:
             log.warning(
-                'Course team enabled highlights and provided no highlights in {}'.format(course_key)
+                'Course team enabled highlights and provided no highlights in {}'.format(course.id)
             )
 
         return highlights_are_available
+
+
+def course_has_highlights_from_store(course_key):
+    """
+    Does the course have any highlights for any section/week in it?
+    This ignores access checks, since highlights may be lurking in currently
+    inaccessible content.
+
+    Arguments:
+        course_key (CourseKey): course to lookup from the modulestore
+    """
+    try:
+        course = _get_course_descriptor(course_key)
+    except CourseUpdateDoesNotExist:
+        return False
+    return course_has_highlights(course)
 
 
 def get_week_highlights(user, course_key, week_num):
@@ -76,11 +91,6 @@ def get_next_section_highlights(user, course_key, start_date, target_date):
 
 def _get_course_with_highlights(course_key):
     """ Gets Course descriptor iff highlights are enabled for the course """
-    if not COURSE_UPDATE_WAFFLE_FLAG.is_enabled(course_key):
-        raise CourseUpdateDoesNotExist(
-            '{} Course Update Messages waffle flag is disabled.'.format(course_key)
-        )
-
     course_descriptor = _get_course_descriptor(course_key)
     if not course_descriptor.highlights_enabled_for_messaging:
         raise CourseUpdateDoesNotExist(

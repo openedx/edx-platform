@@ -4,7 +4,7 @@ Tests for schedules resolvers
 
 
 import datetime
-from unittest.mock import Mock, patch
+from unittest.mock import Mock
 
 import ddt
 from django.test import TestCase
@@ -12,8 +12,6 @@ from django.test.utils import override_settings
 from testfixtures import LogCapture
 from waffle.testutils import override_switch
 
-from edx_toggles.toggles.testutils import override_waffle_flag
-from openedx.core.djangoapps.schedules.config import COURSE_UPDATE_WAFFLE_FLAG
 from openedx.core.djangoapps.schedules.models import Schedule
 from openedx.core.djangoapps.schedules.resolvers import (
     LOG,
@@ -111,9 +109,7 @@ class TestCourseUpdateResolver(SchedulesResolverTestMixin, ModuleStoreTestCase):
         """
         Creates a CourseUpdateResolver with an enrollment to schedule.
         """
-        with patch('openedx.core.djangoapps.schedules.signals.get_current_site') as mock_get_current_site:
-            mock_get_current_site.return_value = self.site_config.site
-            enrollment = CourseEnrollmentFactory(course_id=self.course.id, user=self.user, mode='audit')
+        enrollment = CourseEnrollmentFactory(course_id=self.course.id, user=self.user, mode='audit')
 
         return CourseUpdateResolver(
             async_send_task=Mock(name='async_send_task'),
@@ -125,7 +121,6 @@ class TestCourseUpdateResolver(SchedulesResolverTestMixin, ModuleStoreTestCase):
 
     @override_settings(CONTACT_MAILING_ADDRESS='123 Sesame Street')
     @override_settings(LOGO_URL_PNG='https://www.logo.png')
-    @override_waffle_flag(COURSE_UPDATE_WAFFLE_FLAG, True)
     def test_schedule_context(self):
         resolver = self.create_resolver()
         schedules = list(resolver.schedules_for_bin())
@@ -149,14 +144,12 @@ class TestCourseUpdateResolver(SchedulesResolverTestMixin, ModuleStoreTestCase):
         }
         assert schedules == [(self.user, None, expected_context)]
 
-    @override_waffle_flag(COURSE_UPDATE_WAFFLE_FLAG, True)
     @override_switch('schedules.course_update_show_unsubscribe', True)
     def test_schedule_context_show_unsubscribe(self):
         resolver = self.create_resolver()
         schedules = list(resolver.schedules_for_bin())
         assert 'optout' in schedules[0][2]['unsubscribe_url']
 
-    @override_waffle_flag(COURSE_UPDATE_WAFFLE_FLAG, True)
     def test_get_schedules_with_target_date_by_bin_and_orgs_filter_inactive_users(self):
         """Tests that schedules of inactive users are excluded"""
         resolver = self.create_resolver()
@@ -194,9 +187,7 @@ class TestCourseNextSectionUpdateResolver(SchedulesResolverTestMixin, ModuleStor
         """
         Creates a CourseNextSectionUpdateResolver with an enrollment to schedule.
         """
-        with patch('openedx.core.djangoapps.schedules.signals.get_current_site') as mock_get_current_site:
-            mock_get_current_site.return_value = self.site_config.site
-            CourseEnrollmentFactory(course_id=self.course.id, user=self.user, mode='audit')
+        CourseEnrollmentFactory(course_id=self.course.id, user=self.user, mode='audit')
 
         # Need to update the user's schedule so the due date for the chapter we want
         # matches with the user's schedule and the target date. The numbers are based on the
@@ -214,7 +205,6 @@ class TestCourseNextSectionUpdateResolver(SchedulesResolverTestMixin, ModuleStor
 
     @override_settings(CONTACT_MAILING_ADDRESS='123 Sesame Street')
     @override_settings(LOGO_URL_PNG='https://www.logo.png')
-    @override_waffle_flag(COURSE_UPDATE_WAFFLE_FLAG, True)
     def test_schedule_context(self):
         resolver = self.create_resolver()
         # using this to make sure the select_related stays intact
@@ -242,14 +232,12 @@ class TestCourseNextSectionUpdateResolver(SchedulesResolverTestMixin, ModuleStor
         }
         assert schedules == [(self.user, None, expected_context)]
 
-    @override_waffle_flag(COURSE_UPDATE_WAFFLE_FLAG, True)
     @override_switch('schedules.course_update_show_unsubscribe', True)
     def test_schedule_context_show_unsubscribe(self):
         resolver = self.create_resolver()
         schedules = list(resolver.get_schedules())
         assert 'optout' in schedules[0][2]['unsubscribe_url']
 
-    @override_waffle_flag(COURSE_UPDATE_WAFFLE_FLAG, True)
     def test_schedule_context_error(self):
         resolver = self.create_resolver(user_start_date_offset=29)
         with LogCapture(LOG.name) as log_capture:
@@ -258,7 +246,6 @@ class TestCourseNextSectionUpdateResolver(SchedulesResolverTestMixin, ModuleStor
                            'There are no more highlights for {}'.format(self.course.id))
             log_capture.check_present((LOG.name, 'WARNING', log_message))
 
-    @override_waffle_flag(COURSE_UPDATE_WAFFLE_FLAG, True)
     def test_no_updates_if_course_ended(self):
         self.course.end = self.yesterday
         self.course = self.update_course(self.course, self.user.id)

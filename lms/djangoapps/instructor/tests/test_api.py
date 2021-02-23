@@ -22,8 +22,6 @@ from django.http import HttpRequest, HttpResponse
 from django.test import RequestFactory, TestCase
 from django.urls import reverse as django_reverse
 from django.utils.translation import ugettext as _
-from edx_toggles.toggles.testutils import \
-    override_waffle_flag  # lint-amnesty, pylint: disable=unused-import, wrong-import-order
 from edx_when.api import get_dates_for_course, get_overrides_for_user, set_date_for_block
 from freezegun import freeze_time
 from opaque_keys.edx.keys import CourseKey
@@ -48,28 +46,23 @@ from common.djangoapps.student.models import (
     get_retired_email_by_email,
     get_retired_username_by_username
 )
-from common.djangoapps.student.roles import (  # lint-amnesty, pylint: disable=unused-import
+from common.djangoapps.student.roles import (
     CourseBetaTesterRole,
     CourseDataResearcherRole,
     CourseFinanceAdminRole,
     CourseInstructorRole,
-    CourseSalesAdminRole
 )
-from common.djangoapps.student.tests.factories import (  # lint-amnesty, pylint: disable=unused-import
-    AdminFactory,
-    UserFactory
-)
+from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
 from lms.djangoapps.bulk_email.models import BulkEmailFlag, CourseEmail, CourseEmailTemplate
 from lms.djangoapps.certificates.api import generate_user_certificates
 from lms.djangoapps.certificates.models import CertificateStatuses
 from lms.djangoapps.certificates.tests.factories import GeneratedCertificateFactory
 from lms.djangoapps.courseware.models import StudentModule
-from lms.djangoapps.courseware.tests.factories import (  # lint-amnesty, pylint: disable=unused-import
+from lms.djangoapps.courseware.tests.factories import (
     BetaTesterFactory,
     GlobalStaffFactory,
     InstructorFactory,
     StaffFactory,
-    UserProfileFactory
 )
 from lms.djangoapps.courseware.tests.helpers import LoginEnrollmentTestCase
 from lms.djangoapps.experiments.testutils import override_experiment_waffle_flag
@@ -89,7 +82,6 @@ from openedx.core.djangoapps.course_date_signals.handlers import extract_dates
 from openedx.core.djangoapps.course_groups.cohorts import set_course_cohorted
 from openedx.core.djangoapps.django_comment_common.models import FORUM_ROLE_COMMUNITY_TA
 from openedx.core.djangoapps.django_comment_common.utils import seed_permissions_roles
-from openedx.core.djangoapps.schedules.tests.factories import ScheduleFactory
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.site_configuration.tests.mixins import SiteMixin
 from openedx.core.lib.teams_config import TeamsConfig
@@ -3905,8 +3897,8 @@ class TestDueDateExtensions(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
 
         self.user1 = user1
         self.user2 = user2
-        ScheduleFactory.create(enrollment__user=self.user1, enrollment__course_id=self.course.id)
-        ScheduleFactory.create(enrollment__user=self.user2, enrollment__course_id=self.course.id)
+        CourseEnrollmentFactory.create(user=self.user1, course_id=self.course.id)
+        CourseEnrollmentFactory.create(user=self.user2, course_id=self.course.id)
         self.instructor = InstructorFactory(course_key=self.course.id)
         self.client.login(username=self.instructor.username, password='test')
         extract_dates(None, self.course.id)
@@ -4076,8 +4068,8 @@ class TestDueDateExtensionsDeletedDate(ModuleStoreTestCase, LoginEnrollmentTestC
 
         self.user1 = user1
         self.user2 = user2
-        ScheduleFactory.create(enrollment__user=self.user1, enrollment__course_id=self.course.id)
-        ScheduleFactory.create(enrollment__user=self.user2, enrollment__course_id=self.course.id)
+        CourseEnrollmentFactory.create(user=self.user1, course_id=self.course.id)
+        CourseEnrollmentFactory.create(user=self.user2, course_id=self.course.id)
         self.instructor = InstructorFactory(course_key=self.course.id)
         self.client.login(username=self.instructor.username, password='test')
         extract_dates(None, self.course.id)
