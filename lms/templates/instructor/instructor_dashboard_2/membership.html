@@ -13,6 +13,17 @@ from openedx.core.djangolib.markup import HTML, Text
         <textarea rows="6" name="student-ids" placeholder="${_("Email Addresses/Usernames")}" spellcheck="false"></textarea>
     </label>
 
+    <div class="role">
+        <label>
+            ${_("Role of the users being enrolled.")}
+            <select name="role">
+                % for role in section_data['enrollment_role_choices']:
+                  <option value="${role}">${role}</option>
+                % endfor
+            </select>
+        </label>
+    </div>
+
     % if section_data['is_reason_field_enabled']:
         <label>
             ${_("Enter the reason why the students are to be manually enrolled or unenrolled.")}
