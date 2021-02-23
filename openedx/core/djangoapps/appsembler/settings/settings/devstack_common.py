@@ -18,7 +18,7 @@ def plugin_settings(settings):
         settings.AMC_APP_URL = 'http://localhost:13000'
 
     if not settings.AMC_APP_OAUTH2_CLIENT_ID:
-        settings.AMC_APP_OAUTH2_CLIENT_ID = 'dev-amc-app-oauth2-client-id'
+        settings.AMC_APP_OAUTH2_CLIENT_ID = '6f2b93d5c02560c3f93f'
 
     # Disable caching in dev environment
     if not settings.FEATURES.get('ENABLE_DEVSTACK_CACHES', False):
@@ -30,6 +30,8 @@ def plugin_settings(settings):
     settings.INSTALLED_APPS += (
         'django_extensions',
     )
+
+    settings.CUSTOMER_THEMES_BACKEND_OPTIONS = {}
 
     # Those are usually hardcoded in devstack.py for some reason
     settings.LMS_BASE = settings.ENV_TOKENS.get('LMS_BASE')

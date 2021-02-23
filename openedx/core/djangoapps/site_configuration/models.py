@@ -8,9 +8,7 @@ from logging import getLogger
 import os
 
 from django.conf import settings
-from django.core.files.storage import get_storage_class
 from django.contrib.sites.models import Site
-from django.contrib.staticfiles.templatetags.staticfiles import static
 from django.core.files.storage import get_storage_class
 from django.db import models
 from django.db.models.signals import post_save
@@ -213,28 +211,13 @@ class SiteConfiguration(models.Model):
                     )
                 )
 
-        if settings.USE_S3_FOR_CUSTOMER_THEMES:
-            storage_class = get_storage_class(settings.DEFAULT_FILE_STORAGE)
-            storage = storage_class(
-                location="customer_themes",
-            )
-            with storage.open(file_name, 'w') as f:
-                f.write(css_output)
-        else:
-            theme_folder = os.path.join(settings.COMPREHENSIVE_THEME_DIRS[0], 'customer_themes')
-            theme_file = os.path.join(theme_folder, file_name)
-            with open(theme_file, 'w') as f:
-                f.write(css_output)
+        storage = self.get_customer_themes_storage()
+        with storage.open(file_name, 'w') as f:
+            f.write(css_output)
 
     def get_css_url(self):
-        if settings.USE_S3_FOR_CUSTOMER_THEMES:
-            kwargs = {
-                'location': "customer_themes",
-            }
-            storage = get_storage_class()(**kwargs)
-            return storage.url(self.get_value('css_overrides_file'))
-        else:
-            return static("customer_themes/{}".format(self.get_value('css_overrides_file')))
+        storage = self.get_customer_themes_storage()
+        return storage.url(self.get_value('css_overrides_file'))
 
     def set_sass_variables(self, entries):
         """
@@ -246,19 +229,17 @@ class SiteConfiguration(models.Model):
                 new_value = (var_name, [entries[var_name], entries[var_name]])
                 self.sass_variables[index] = new_value
 
+    def get_customer_themes_storage(self):
+        storage_class = get_storage_class(settings.DEFAULT_FILE_STORAGE)
+        return storage_class(**settings.CUSTOMER_THEMES_BACKEND_OPTIONS)
+
     def delete_css_override(self):
         css_file = self.get_value('css_overrides_file')
         if css_file:
             try:
-                if settings.USE_S3_FOR_CUSTOMER_THEMES:
-                    kwargs = {
-                        'location': "customer_themes",
-                    }
-                    storage = get_storage_class()(**kwargs)
-                    storage.delete(self.get_value('css_overrides_file'))
-                else:
-                    os.remove(os.path.join(settings.COMPREHENSIVE_THEME_DIRS[0], css_file))
-            except OSError:
+                storage = self.get_customer_themes_storage()
+                storage.delete(self.get_value('css_overrides_file'))
+            except Exception:  # pylint: disable=broad-except  # noqa
                 logger.warning("Can't delete CSS file {}".format(css_file))
 
     def _formatted_sass_variables(self):

@@ -101,9 +101,7 @@ def get_amc_oauth_app():
     """
     Return the AMC OAuth2 Client model instance.
     """
-    # TODO: Temp. hack to override AMC_APP_URL with client ID
-    return Application.objects.get(client_id=settings.AMC_APP_URL)
-    # TODO: Change to Application.objects.get(client_id=settings.AMC_APP_OAUTH2_CLIENT_ID)
+    return Application.objects.get(client_id=settings.AMC_APP_OAUTH2_CLIENT_ID)
 
 
 @beeline.traced(name="get_amc_tokens")
@@ -143,28 +141,23 @@ def reset_amc_tokens(user, access_token=None, refresh_token=None):
     """
     app = get_amc_oauth_app()
     one_year_ahead = timezone.now() + timedelta(days=settings.OAUTH_EXPIRE_CONFIDENTIAL_CLIENT_DAYS)
-    try:
-        access = AccessToken.objects.get(user=user, application=app)
-    except AccessToken.DoesNotExist:
-        access = AccessToken.objects.create(
-            user=user,
-            application=app,
-            expires=one_year_ahead,
-        )
+
+    access, _created = AccessToken.objects.get_or_create(
+        user=user,
+        application=app,
+        defaults={'expires': one_year_ahead}
+    )
 
     access.expires = one_year_ahead
     if access_token:
         access.token = access_token
     access.save()
 
-    try:
-        refresh = RefreshToken.objects.get(user=user, access_token=access, application=app)
-    except RefreshToken.DoesNotExist:
-        refresh = RefreshToken.objects.create(
-            user=user,
-            application=app,
-            access_token=access,
-        )
+    refresh, _created = RefreshToken.objects.get_or_create(
+        user=user,
+        access_token=access,
+        application=app,
+    )
 
     if refresh_token:
         refresh.token = refresh_token
