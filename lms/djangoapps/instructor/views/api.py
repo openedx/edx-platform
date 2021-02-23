@@ -2045,6 +2045,24 @@ def export_ora2_data(request, course_id):
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @require_course_permission(permissions.CAN_RESEARCH)
 @common_exceptions_400
+def export_ora2_summary(request, course_id):
+    """
+    Pushes a Celery task which will aggregate a summary students' progress in ora2 tasks for a course into a .csv
+    """
+    course_key = CourseKey.from_string(course_id)
+    report_type = _('ORA summary')
+    task_api.submit_export_ora2_summary(request, course_key)
+    success_status = SUCCESS_MESSAGE_TEMPLATE.format(report_type=report_type)
+
+    return JsonResponse({"status": success_status})
+
+
+@transaction.non_atomic_requests
+@require_POST
+@ensure_csrf_cookie
+@cache_control(no_cache=True, no_store=True, must_revalidate=True)
+@require_course_permission(permissions.CAN_RESEARCH)
+@common_exceptions_400
 def export_ora2_submission_files(request, course_id):
     """
     Pushes a Celery task which will download and compress all submission
