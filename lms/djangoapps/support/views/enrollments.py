@@ -2,6 +2,8 @@
 Support tool for changing course enrollments.
 """
 
+
+import six
 from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.db import transaction
 from django.db.models import Q
@@ -12,16 +14,10 @@ from django.views.generic import View
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
 from rest_framework.generics import GenericAPIView
+from six import text_type
 
 from common.djangoapps.course_modes.models import CourseMode
 from common.djangoapps.edxmako.shortcuts import render_to_response
-from common.djangoapps.student.models import (  # lint-amnesty, pylint: disable=line-too-long
-    ENROLLED_TO_ENROLLED,
-    CourseEnrollment,
-    CourseEnrollmentAttribute,
-    ManualEnrollmentAudit
-)
-from common.djangoapps.util.json_request import JsonResponse
 from lms.djangoapps.support.decorators import require_support_permission
 from lms.djangoapps.support.serializers import ManualEnrollmentSerializer
 from lms.djangoapps.verify_student.models import VerificationDeadline
@@ -29,6 +25,8 @@ from openedx.core.djangoapps.credit.email_utils import get_credit_provider_attri
 from openedx.core.djangoapps.enrollments.api import get_enrollments, update_enrollment
 from openedx.core.djangoapps.enrollments.errors import CourseModeNotFoundError
 from openedx.core.djangoapps.enrollments.serializers import ModeSerializer
+from common.djangoapps.student.models import ENROLLED_TO_ENROLLED, CourseEnrollment, CourseEnrollmentAttribute, ManualEnrollmentAudit  # lint-amnesty, pylint: disable=line-too-long
+from common.djangoapps.util.json_request import JsonResponse
 
 
 class EnrollmentSupportView(View):
@@ -93,19 +91,19 @@ class EnrollmentSupportListView(GenericAPIView):
             reason = request.data['reason']
             enrollment = CourseEnrollment.objects.get(user=user, course_id=course_key)
             if enrollment.mode != old_mode:
-                return HttpResponseBadRequest('User {username} is not enrolled with mode {old_mode}.'.format(
+                return HttpResponseBadRequest(u'User {username} is not enrolled with mode {old_mode}.'.format(
                     username=user.username,
                     old_mode=old_mode
                 ))
         except KeyError as err:
-            return HttpResponseBadRequest('The field {} is required.'.format(str(err)))
+            return HttpResponseBadRequest(u'The field {} is required.'.format(text_type(err)))
         except InvalidKeyError:
-            return HttpResponseBadRequest('Could not parse course key.')
+            return HttpResponseBadRequest(u'Could not parse course key.')
         except (CourseEnrollment.DoesNotExist, User.DoesNotExist):
             return HttpResponseBadRequest(
-                'Could not find enrollment for user {username} in course {course}.'.format(
+                u'Could not find enrollment for user {username} in course {course}.'.format(
                     username=username_or_email,
-                    course=str(course_key)
+                    course=six.text_type(course_key)
                 )
             )
         try:
@@ -132,7 +130,7 @@ class EnrollmentSupportListView(GenericAPIView):
                     )
                 return JsonResponse(ManualEnrollmentSerializer(instance=manual_enrollment).data)
         except CourseModeNotFoundError as err:
-            return HttpResponseBadRequest(str(err))
+            return HttpResponseBadRequest(text_type(err))
 
     @staticmethod
     def include_verified_mode_info(enrollment_data, course_key):
