@@ -4,14 +4,10 @@ Serializers for use in the support app.
 import json
 
 from django.urls import reverse
-
 from rest_framework import serializers
 
 from common.djangoapps.student.models import CourseEnrollment, ManualEnrollmentAudit
-from lms.djangoapps.program_enrollments.models import (
-    ProgramEnrollment,
-    ProgramCourseEnrollment,
-)
+from lms.djangoapps.program_enrollments.models import ProgramCourseEnrollment, ProgramEnrollment
 from openedx.core.djangoapps.catalog.utils import get_programs_by_uuids
 from openedx.features.course_experience import default_course_url_name
 
@@ -23,7 +19,7 @@ class ManualEnrollmentSerializer(serializers.ModelSerializer):
     """Serializes a manual enrollment audit object."""
     enrolled_by = serializers.SlugRelatedField(slug_field='email', read_only=True, default='')
 
-    class Meta(object):
+    class Meta:
         model = ManualEnrollmentAudit
         fields = ('enrolled_by', 'time_stamp', 'reason')
 
@@ -34,7 +30,7 @@ class CourseEnrollmentSerializer(serializers.Serializer):
     is_active = serializers.BooleanField()
     mode = serializers.CharField()
 
-    class Meta(object):
+    class Meta:
         model = CourseEnrollment
 
 
@@ -47,7 +43,7 @@ class ProgramCourseEnrollmentSerializer(serializers.Serializer):
     course_enrollment = CourseEnrollmentSerializer()
     course_url = serializers.SerializerMethodField()
 
-    class Meta(object):
+    class Meta:
         model = ProgramCourseEnrollment
 
     def get_course_url(self, obj):
@@ -65,7 +61,7 @@ class ProgramEnrollmentSerializer(serializers.Serializer):
     program_course_enrollments = ProgramCourseEnrollmentSerializer(many=True)
     program_name = serializers.SerializerMethodField()
 
-    class Meta(object):
+    class Meta:
         model = ProgramEnrollment
 
     def get_program_name(self, obj):
