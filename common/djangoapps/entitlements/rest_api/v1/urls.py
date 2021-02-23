@@ -19,7 +19,7 @@ app_name = 'v1'
 urlpatterns = [
     url(r'', include(router.urls)),
     url(
-        r'entitlements/(?P<uuid>{regex})/enrollments$'.format(regex=EntitlementViewSet.ENTITLEMENT_UUID4_REGEX),
+        fr'entitlements/(?P<uuid>{EntitlementViewSet.ENTITLEMENT_UUID4_REGEX})/enrollments$',
         ENROLLMENTS_VIEW,
         name='enrollments'
     )

@@ -17,16 +17,20 @@ from rest_framework.authentication import SessionAuthentication
 from rest_framework.response import Response
 
 from common.djangoapps.course_modes.models import CourseMode
+from common.djangoapps.entitlements.models import (  # lint-amnesty, pylint: disable=line-too-long
+    CourseEntitlement,
+    CourseEntitlementPolicy,
+    CourseEntitlementSupportDetail
+)
 from common.djangoapps.entitlements.rest_api.v1.filters import CourseEntitlementFilter
 from common.djangoapps.entitlements.rest_api.v1.permissions import IsAdminOrSupportOrAuthenticatedReadOnly
 from common.djangoapps.entitlements.rest_api.v1.serializers import CourseEntitlementSerializer
-from common.djangoapps.entitlements.models import CourseEntitlement, CourseEntitlementPolicy, CourseEntitlementSupportDetail  # lint-amnesty, pylint: disable=line-too-long
 from common.djangoapps.entitlements.utils import is_course_run_entitlement_fulfillable
+from common.djangoapps.student.models import AlreadyEnrolledError, CourseEnrollment, CourseEnrollmentException
 from openedx.core.djangoapps.catalog.utils import get_course_runs_for_course, get_owners_for_course
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.cors_csrf.authentication import SessionAuthenticationCrossDomainCsrf
 from openedx.core.djangoapps.user_api.preferences.api import update_email_opt_in
-from common.djangoapps.student.models import AlreadyEnrolledError, CourseEnrollment, CourseEnrollmentException
 
 log = logging.getLogger(__name__)
 
@@ -273,7 +277,7 @@ class EntitlementViewSet(viewsets.ModelViewSet):
             entitlement = CourseEntitlement.objects.get(uuid=entitlement_uuid)
         except CourseEntitlement.DoesNotExist:
             return HttpResponseBadRequest(
-                u'Could not find entitlement {entitlement_uuid} to update'.format(
+                'Could not find entitlement {entitlement_uuid} to update'.format(
                     entitlement_uuid=entitlement_uuid
                 )
             )
@@ -295,12 +299,12 @@ class EntitlementViewSet(viewsets.ModelViewSet):
                     support_detail['unenrolled_run'] = CourseOverview.objects.get(id=unenrolled_run_course_key)
                 except (InvalidKeyError, CourseOverview.DoesNotExist) as error:
                     return HttpResponseBadRequest(
-                        u'Error raised while trying to unenroll user {user} from course run {course_id}: {error}'
+                        'Error raised while trying to unenroll user {user} from course run {course_id}: {error}'
                         .format(user=entitlement.user.username, course_id=unenrolled_run_id, error=error)
                     )
             CourseEntitlementSupportDetail.objects.create(**support_detail)
 
-        return super(EntitlementViewSet, self).partial_update(request, *args, **kwargs)  # lint-amnesty, pylint: disable=no-member, super-with-arguments
+        return super().partial_update(request, *args, **kwargs)  # lint-amnesty, pylint: disable=no-member, super-with-arguments
 
 
 class EntitlementEnrollmentViewSet(viewsets.GenericViewSet):
@@ -417,7 +421,7 @@ class EntitlementEnrollmentViewSet(viewsets.GenericViewSet):
             return Response(
                 status=status.HTTP_400_BAD_REQUEST,
                 data={
-                    'message': 'Invalid {course_id}'.format(course_id=course_run_id)
+                    'message': f'Invalid {course_run_id}'
                 }
             )
 
