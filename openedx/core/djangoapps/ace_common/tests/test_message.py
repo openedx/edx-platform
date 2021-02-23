@@ -25,6 +25,6 @@ class TestAbsoluteUrl(TestCase):  # lint-amnesty, pylint: disable=missing-class-
         """
         with patch("openedx.core.djangoapps.site_configuration.helpers.get_value", return_value=from_address):
             ace_message_type = BaseMessageType()
-            self.assertEqual('from_address' in ace_message_type.options, has_from_address)
+            assert ('from_address' in ace_message_type.options) == has_from_address
             if from_address:
-                self.assertEqual(ace_message_type.options.get('from_address'), from_address)
+                assert ace_message_type.options.get('from_address') == from_address

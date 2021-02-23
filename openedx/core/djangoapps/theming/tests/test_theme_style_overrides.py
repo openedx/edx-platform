@@ -39,7 +39,7 @@ class TestComprehensiveThemeLMS(TestCase):
         Test that theme footer is used instead of default footer.
         """
         resp = self.client.get('/')
-        self.assertEqual(resp.status_code, 200)
+        assert resp.status_code == 200
         # This string comes from header.html of test-theme
         self.assertContains(resp, "This is a footer for test-theme.")
 
@@ -64,7 +64,7 @@ class TestComprehensiveThemeLMS(TestCase):
         Test that theme logo is used instead of default logo.
         """
         result = staticfiles.finders.find('test-theme/images/logo.png')
-        self.assertEqual(result, settings.TEST_THEME / 'lms/static/images/logo.png')
+        assert result == (settings.TEST_THEME / 'lms/static/images/logo.png')
 
     @with_comprehensive_theme("test-theme")
     def test_override_block_in_parent(self):
@@ -74,7 +74,7 @@ class TestComprehensiveThemeLMS(TestCase):
         self._login()
         dashboard_url = reverse('dashboard')
         resp = self.client.get(dashboard_url)
-        self.assertEqual(resp.status_code, 200)
+        assert resp.status_code == 200
         # This string comes from the 'pagetitle' block of the overriding theme.
         self.assertContains(resp, "Overridden Title!")
 
@@ -86,7 +86,7 @@ class TestComprehensiveThemeLMS(TestCase):
         self._login()
         dashboard_url = reverse('dashboard')
         resp = self.client.get(dashboard_url)
-        self.assertEqual(resp.status_code, 200)
+        assert resp.status_code == 200
         # This string comes from the 'bodyextra' block of the overriding theme.
         self.assertContains(resp, "Overriden Body Extra!")
 
@@ -98,7 +98,7 @@ class TestComprehensiveThemeLMS(TestCase):
         self._login()
         dashboard_url = reverse('dashboard')
         resp = self.client.get(dashboard_url)
-        self.assertEqual(resp.status_code, 200)
+        assert resp.status_code == 200
         # This string comes from the default dashboard.html template.
         self.assertContains(resp, "Explore courses")
 
@@ -110,7 +110,7 @@ class TestComprehensiveThemeLMS(TestCase):
         self._login()
         courses_url = reverse('courses')
         resp = self.client.get(courses_url)
-        self.assertEqual(resp.status_code, 200)
+        assert resp.status_code == 200
         # The courses.html template includes the error-message.html template.
         # Verify that the error message is included in the output.
         self.assertContains(resp, "this module is temporarily unavailable")
@@ -123,7 +123,7 @@ class TestComprehensiveThemeLMS(TestCase):
         self._login()
         courses_url = reverse('courses')
         resp = self.client.get(courses_url)
-        self.assertEqual(resp.status_code, 200)
+        assert resp.status_code == 200
         # The courses.html template includes the info.html file, which is overriden in the theme.
         self.assertContains(resp, "This overrides the courseware/info.html template.")
 
@@ -136,7 +136,7 @@ class TestComprehensiveThemeLMS(TestCase):
         self._login()
         courses_url = reverse('courses')
         resp = self.client.get(courses_url)
-        self.assertEqual(resp.status_code, 200)
+        assert resp.status_code == 200
         # The courses.html template includes the test-theme.custom.html file.
         # Verify its contents are present in the output.
         self.assertContains(resp, "This is a custom template.")
@@ -162,7 +162,7 @@ class TestComprehensiveThemeDisabledLMS(TestCase):
         Test that default logo is picked in case of no comprehensive theme.
         """
         result = staticfiles.finders.find('images/logo.png')
-        self.assertEqual(result, settings.REPO_ROOT / 'lms/static/images/logo.png')
+        assert result == (settings.REPO_ROOT / 'lms/static/images/logo.png')
 
 
 @skip_unless_lms
@@ -188,7 +188,7 @@ class TestStanfordTheme(TestCase):
         Test stanford theme footer.
         """
         resp = self.client.get('/')
-        self.assertEqual(resp.status_code, 200)
+        assert resp.status_code == 200
         # This string comes from header.html of test-theme
         self.assertContains(resp, "footer overrides for stanford theme go here")
 
@@ -198,7 +198,7 @@ class TestStanfordTheme(TestCase):
         Test custom logo.
         """
         result = staticfiles.finders.find('stanford-style/images/logo.png')
-        self.assertEqual(result, settings.REPO_ROOT / 'themes/stanford-style/lms/static/images/logo.png')
+        assert result == (settings.REPO_ROOT / 'themes/stanford-style/lms/static/images/logo.png')
 
     @with_comprehensive_theme("stanford-style")
     def test_favicon_image(self):
@@ -206,7 +206,7 @@ class TestStanfordTheme(TestCase):
         Test correct favicon for custom theme.
         """
         result = staticfiles.finders.find('stanford-style/images/favicon.ico')
-        self.assertEqual(result, settings.REPO_ROOT / 'themes/stanford-style/lms/static/images/favicon.ico')
+        assert result == (settings.REPO_ROOT / 'themes/stanford-style/lms/static/images/favicon.ico')
 
     @with_comprehensive_theme("stanford-style")
     def test_index_page(self):
@@ -214,6 +214,6 @@ class TestStanfordTheme(TestCase):
         Test custom theme overrides for index page.
         """
         resp = self.client.get('/')
-        self.assertEqual(resp.status_code, 200)
+        assert resp.status_code == 200
         # This string comes from header.html of test-theme
         self.assertContains(resp, "Free courses from <strong>Stanford</strong>")

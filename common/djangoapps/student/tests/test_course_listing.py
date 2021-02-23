@@ -77,13 +77,13 @@ class TestCourseListing(ModuleStoreTestCase, MilestonesTestCaseMixin):
 
         # get dashboard
         courses_list = list(get_course_enrollments(self.student, None, []))
-        self.assertEqual(len(courses_list), 1)
-        self.assertEqual(courses_list[0].course_id, course_location)
+        assert len(courses_list) == 1
+        assert courses_list[0].course_id == course_location
 
         CourseEnrollment.unenroll(self.student, course_location)
         # get dashboard
         courses_list = list(get_course_enrollments(self.student, None, []))
-        self.assertEqual(len(courses_list), 0)
+        assert len(courses_list) == 0
 
     @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
     def test_get_limited_number_of_courses_using_config(self):
@@ -95,12 +95,12 @@ class TestCourseListing(ModuleStoreTestCase, MilestonesTestCaseMixin):
 
         # get dashboard
         courses_list = list(get_course_enrollments(self.student, None, []))
-        self.assertEqual(len(courses_list), 2)
+        assert len(courses_list) == 2
 
         with self.settings(DASHBOARD_COURSE_LIMIT=1):
             course_limit = settings.DASHBOARD_COURSE_LIMIT
             courses_list = list(get_course_enrollments(self.student, None, [], course_limit))
-            self.assertEqual(len(courses_list), 1)
+            assert len(courses_list) == 1
 
     def test_errored_course_regular_access(self):
         """
@@ -112,13 +112,13 @@ class TestCourseListing(ModuleStoreTestCase, MilestonesTestCaseMixin):
         self._create_course_with_access_groups(course_key, default_store=ModuleStoreEnum.Type.mongo)
 
         with mock.patch('xmodule.modulestore.mongo.base.MongoKeyValueStore', mock.Mock(side_effect=Exception)):
-            self.assertIsInstance(modulestore().get_course(course_key), ErrorBlock)
+            assert isinstance(modulestore().get_course(course_key), ErrorBlock)
 
             # Invalidate (e.g., delete) the corresponding CourseOverview, forcing get_course to be called.
             CourseOverview.objects.filter(id=course_key).delete()
 
             courses_list = list(get_course_enrollments(self.student, None, []))
-            self.assertEqual(courses_list, [])
+            assert courses_list == []
 
     def test_course_listing_errored_deleted_courses(self):
         """
@@ -135,8 +135,8 @@ class TestCourseListing(ModuleStoreTestCase, MilestonesTestCaseMixin):
         mongo_store.delete_course(course_location, ModuleStoreEnum.UserID.test)
 
         courses_list = list(get_course_enrollments(self.student, None, []))
-        self.assertEqual(len(courses_list), 1, courses_list)
-        self.assertEqual(courses_list[0].course_id, good_location)
+        assert len(courses_list) == 1, courses_list
+        assert courses_list[0].course_id == good_location
 
     @mock.patch.dict("django.conf.settings.FEATURES", {'ENABLE_PREREQUISITE_COURSES': True})
     def test_course_listing_has_pre_requisite_courses(self):
@@ -172,4 +172,4 @@ class TestCourseListing(ModuleStoreTestCase, MilestonesTestCaseMixin):
             self.student,
             courses_having_prerequisites
         )
-        self.assertEqual(len(courses_requirements_not_met[course_location]['courses']), len(pre_requisite_courses))
+        assert len(courses_requirements_not_met[course_location]['courses']) == len(pre_requisite_courses)

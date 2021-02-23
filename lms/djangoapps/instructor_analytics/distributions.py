@@ -1,4 +1,4 @@
-u"""
+"""
 Profile Distributions
 
 Aggregate sums for values of fields in students profiles.
@@ -39,7 +39,7 @@ DISPLAY_NAMES = {
 }
 
 
-class ProfileDistribution(object):
+class ProfileDistribution:
     """
     Container for profile distribution data
 
@@ -96,7 +96,7 @@ def profile_distribution(course_id, feature):
 
     if feature not in AVAILABLE_PROFILE_FEATURES:
         raise ValueError(
-            u"unsupported feature requested for distribution u'{}'".format(
+            "unsupported feature requested for distribution u'{}'".format(
                 feature)
         )
 
@@ -152,8 +152,7 @@ def profile_distribution(course_id, feature):
         # query_distribution is of the form [{'featureval': 'value1', 'featureval__count': 4},
         #    {'featureval': 'value2', 'featureval__count': 2}, ...]
 
-        distribution = dict((vald[feature], vald[feature + '__count'])
-                            for vald in query_distribution)
+        distribution = {vald[feature]: vald[feature + '__count'] for vald in query_distribution}
         # distribution is of the form {'value1': 4, 'value2': 2, ...}
 
         # change none to no_data for valid json key

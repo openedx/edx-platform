@@ -6,7 +6,7 @@ from setuptools import setup
 
 setup(
     name="Open edX",
-    version="0.12",
+    version='0.13',
     install_requires=["setuptools"],
     requires=[],
     # NOTE: These are not the names we should be installing.  This tree should
@@ -69,6 +69,7 @@ setup(
             "content_type_gate = openedx.features.content_type_gating.block_transformers:ContentTypeGateTransformer",
             "access_denied_message_filter = lms.djangoapps.course_blocks.transformers.access_denied_filter:AccessDeniedMessageFilterTransformer",  # lint-amnesty, pylint: disable=line-too-long
             "open_assessment_transformer = lms.djangoapps.courseware.transformers:OpenAssessmentDateTransformer",
+            'effort_estimation = openedx.features.effort_estimation.api:EffortEstimationTransformer',
         ],
         "openedx.ace.policy": [
             "bulk_email_optout = lms.djangoapps.bulk_email.policies:CourseEmailOptout"

@@ -2,7 +2,7 @@
 
 import base64
 from datetime import datetime, timedelta
-
+import pytest
 import ddt
 import mock
 import requests.exceptions
@@ -110,22 +110,22 @@ class TestPhotoVerification(TestVerificationBase, MockS3BotoMixin, ModuleStoreTe
         """
         user = UserFactory.create()
         attempt = SoftwareSecurePhotoVerification(user=user)
-        self.assertEqual(attempt.status, PhotoVerification.STATUS.created)
+        assert attempt.status == PhotoVerification.STATUS.created
 
         # These should all fail because we're in the wrong starting state.
-        self.assertRaises(VerificationException, attempt.submit)
-        self.assertRaises(VerificationException, attempt.approve)
-        self.assertRaises(VerificationException, attempt.deny)
-        self.assertRaises(VerificationException, attempt.mark_must_retry)
-        self.assertRaises(VerificationException, attempt.mark_submit)
+        pytest.raises(VerificationException, attempt.submit)
+        pytest.raises(VerificationException, attempt.approve)
+        pytest.raises(VerificationException, attempt.deny)
+        pytest.raises(VerificationException, attempt.mark_must_retry)
+        pytest.raises(VerificationException, attempt.mark_submit)
 
         # Now let's fill in some values so that we can pass the mark_ready() call
         attempt.mark_ready()
-        self.assertEqual(attempt.status, PhotoVerification.STATUS.ready)
+        assert attempt.status == PhotoVerification.STATUS.ready
 
         # ready (can't approve or deny unless it's "submitted")
-        self.assertRaises(VerificationException, attempt.approve)
-        self.assertRaises(VerificationException, attempt.deny)
+        pytest.raises(VerificationException, attempt.approve)
+        pytest.raises(VerificationException, attempt.deny)
         attempt.mark_must_retry()
         attempt.mark_submit()
 
@@ -152,17 +152,17 @@ class TestPhotoVerification(TestVerificationBase, MockS3BotoMixin, ModuleStoreTe
         attempt.approve()
 
         # approved
-        self.assertRaises(VerificationException, attempt.submit)
-        self.assertRaises(VerificationException, attempt.mark_must_retry)
-        self.assertRaises(VerificationException, attempt.mark_submit)
+        pytest.raises(VerificationException, attempt.submit)
+        pytest.raises(VerificationException, attempt.mark_must_retry)
+        pytest.raises(VerificationException, attempt.mark_submit)
         attempt.approve()  # no-op
         attempt.system_error("System error")  # no-op, something processed it without error
         attempt.deny(DENY_ERROR_MSG)
 
         # denied
-        self.assertRaises(VerificationException, attempt.submit)
-        self.assertRaises(VerificationException, attempt.mark_must_retry)
-        self.assertRaises(VerificationException, attempt.mark_submit)
+        pytest.raises(VerificationException, attempt.submit)
+        pytest.raises(VerificationException, attempt.mark_must_retry)
+        pytest.raises(VerificationException, attempt.mark_submit)
         attempt.deny(DENY_ERROR_MSG)  # no-op
         attempt.system_error("System error")  # no-op, something processed it without error
         attempt.approve()
@@ -183,23 +183,23 @@ class TestPhotoVerification(TestVerificationBase, MockS3BotoMixin, ModuleStoreTe
 
         user.profile.name = u"Rusty \u01B4"
 
-        self.assertEqual(u"Clyde \u01B4", attempt.name)
+        assert u'Clyde ƴ' == attempt.name
 
     def test_submissions(self):
         """Test that we set our status correctly after a submission."""
         # Basic case, things go well.
         attempt = self.create_upload_and_submit_attempt_for_user()
-        self.assertEqual(attempt.status, PhotoVerification.STATUS.submitted)
+        assert attempt.status == PhotoVerification.STATUS.submitted
 
         # We post, but Software Secure doesn't like what we send for some reason
         with patch('lms.djangoapps.verify_student.tasks.requests.post', new=mock_software_secure_post_error):
             attempt = self.create_upload_and_submit_attempt_for_user()
-            self.assertEqual(attempt.status, PhotoVerification.STATUS.must_retry)
+            assert attempt.status == PhotoVerification.STATUS.must_retry
 
         # We try to post, but run into an error (in this case a network connection error)
         with patch('lms.djangoapps.verify_student.tasks.requests.post', new=mock_software_secure_post_unavailable):
             attempt = self.create_upload_and_submit_attempt_for_user()
-            self.assertEqual(attempt.status, PhotoVerification.STATUS.must_retry)
+            assert attempt.status == PhotoVerification.STATUS.must_retry
 
     @mock.patch.dict(settings.FEATURES, {'AUTOMATIC_VERIFY_STUDENT_IDENTITY_FOR_TESTING': True})
     def test_submission_while_testing_flag_is_true(self):
@@ -208,7 +208,7 @@ class TestPhotoVerification(TestVerificationBase, MockS3BotoMixin, ModuleStoreTe
         is enabled.
         """
         attempt = self.create_upload_and_submit_attempt_for_user()
-        self.assertEqual(attempt.photo_id_key, "fake-photo-id-key")
+        assert attempt.photo_id_key == 'fake-photo-id-key'
 
     # pylint: disable=line-too-long
     def test_parse_error_msg_success(self):
@@ -217,10 +217,7 @@ class TestPhotoVerification(TestVerificationBase, MockS3BotoMixin, ModuleStoreTe
         attempt.status = PhotoVerification.STATUS.denied
         attempt.error_msg = '[{"userPhotoReasons": ["Face out of view"]}, {"photoIdReasons": ["Photo hidden/No photo", "ID name not provided"]}]'
         parsed_error_msg = attempt.parsed_error_msg()
-        self.assertEqual(
-            sorted(parsed_error_msg),
-            sorted(['id_image_missing_name', 'user_image_not_clear', 'id_image_not_clear'])
-        )
+        assert sorted(parsed_error_msg) == sorted(['id_image_missing_name', 'user_image_not_clear', 'id_image_not_clear'])
 
     @ddt.data(
         'Not Provided',
@@ -230,7 +227,7 @@ class TestPhotoVerification(TestVerificationBase, MockS3BotoMixin, ModuleStoreTe
     def test_parse_error_msg_failure(self, msg):
         user = UserFactory.create()
         attempt = SoftwareSecurePhotoVerification.objects.create(user=user, status='denied', error_msg=msg)
-        self.assertEqual(attempt.parsed_error_msg(), [])
+        assert attempt.parsed_error_msg() == []
 
     def test_active_at_datetime(self):
         user = UserFactory.create()
@@ -246,7 +243,7 @@ class TestPhotoVerification(TestVerificationBase, MockS3BotoMixin, ModuleStoreTe
 
         # No initial verification for the user
         result = SoftwareSecurePhotoVerification.get_initial_verification(user=user)
-        self.assertIs(result, None)
+        assert result is None
 
         # Make an initial verification with 'photo_id_key'
         attempt = SoftwareSecurePhotoVerification(user=user, photo_id_key="dummy_photo_id_key")
@@ -256,7 +253,7 @@ class TestPhotoVerification(TestVerificationBase, MockS3BotoMixin, ModuleStoreTe
         # Check that method 'get_initial_verification' returns the correct
         # initial verification attempt
         first_result = SoftwareSecurePhotoVerification.get_initial_verification(user=user)
-        self.assertIsNotNone(first_result)
+        assert first_result is not None
 
         # Now create a second verification without 'photo_id_key'
         attempt = SoftwareSecurePhotoVerification(user=user)
@@ -266,14 +263,14 @@ class TestPhotoVerification(TestVerificationBase, MockS3BotoMixin, ModuleStoreTe
         # Test method 'get_initial_verification' still returns the correct
         # initial verification attempt which have 'photo_id_key' set
         second_result = SoftwareSecurePhotoVerification.get_initial_verification(user=user)
-        self.assertIsNotNone(second_result)
-        self.assertEqual(second_result, first_result)
+        assert second_result is not None
+        assert second_result == first_result
 
         # Test method 'get_initial_verification' returns None after expiration
         expired_future = now() + timedelta(days=(FAKE_SETTINGS['DAYS_GOOD_FOR'] + 1))
         with freeze_time(expired_future):
             third_result = SoftwareSecurePhotoVerification.get_initial_verification(user)
-            self.assertIsNone(third_result)
+            assert third_result is None
 
         # Test method 'get_initial_verification' returns correct attempt after system expiration,
         # but within earliest allowed override.
@@ -281,8 +278,8 @@ class TestPhotoVerification(TestVerificationBase, MockS3BotoMixin, ModuleStoreTe
         earliest_allowed = now() - timedelta(days=1)
         with freeze_time(expired_future):
             fourth_result = SoftwareSecurePhotoVerification.get_initial_verification(user, earliest_allowed)
-            self.assertIsNotNone(fourth_result)
-            self.assertEqual(fourth_result, first_result)
+            assert fourth_result is not None
+            assert fourth_result == first_result
 
     def test_retire_user(self):
         """
@@ -301,20 +298,20 @@ class TestPhotoVerification(TestVerificationBase, MockS3BotoMixin, ModuleStoreTe
         attempt.approve()
 
         # Validate data before retirement
-        self.assertEqual(attempt.name, user.profile.name)
-        self.assertEqual(attempt.photo_id_image_url, 'https://example.com/test/image/img.jpg')
-        self.assertEqual(attempt.face_image_url, 'https://example.com/test/face/img.jpg')
-        self.assertEqual(attempt.photo_id_key, 'there_was_an_attempt')
+        assert attempt.name == user.profile.name
+        assert attempt.photo_id_image_url == 'https://example.com/test/image/img.jpg'
+        assert attempt.face_image_url == 'https://example.com/test/face/img.jpg'
+        assert attempt.photo_id_key == 'there_was_an_attempt'
 
         # Retire User
         attempt_again = SoftwareSecurePhotoVerification(user=user)
-        self.assertTrue(attempt_again.retire_user(user_id=user.id))
+        assert attempt_again.retire_user(user_id=user.id)
 
         # Validate data after retirement
-        self.assertEqual(attempt_again.name, '')
-        self.assertEqual(attempt_again.face_image_url, '')
-        self.assertEqual(attempt_again.photo_id_image_url, '')
-        self.assertEqual(attempt_again.photo_id_key, '')
+        assert attempt_again.name == ''
+        assert attempt_again.face_image_url == ''
+        assert attempt_again.photo_id_image_url == ''
+        assert attempt_again.photo_id_key == ''
 
     def test_retire_nonuser(self):
         """
@@ -324,10 +321,10 @@ class TestPhotoVerification(TestVerificationBase, MockS3BotoMixin, ModuleStoreTe
         attempt = SoftwareSecurePhotoVerification(user=user)
 
         # User with no records in table
-        self.assertFalse(attempt.retire_user(user_id=user.id))
+        assert not attempt.retire_user(user_id=user.id)
 
         # No user
-        self.assertFalse(attempt.retire_user(user_id=47))
+        assert not attempt.retire_user(user_id=47)
 
     def test_get_recent_verification(self):
         """Test that method 'get_recent_verification' of model
@@ -348,8 +345,8 @@ class TestPhotoVerification(TestVerificationBase, MockS3BotoMixin, ModuleStoreTe
         # Test method 'get_recent_verification' returns the most recent
         # verification attempt based on updated_at
         recent_verification = SoftwareSecurePhotoVerification.get_recent_verification(user=user)
-        self.assertIsNotNone(recent_verification)
-        self.assertEqual(recent_verification.id, attempt.id)
+        assert recent_verification is not None
+        assert recent_verification.id == attempt.id
 
     def test_no_approved_verification(self):
         """Test that method 'get_recent_verification' of model
@@ -360,7 +357,7 @@ class TestPhotoVerification(TestVerificationBase, MockS3BotoMixin, ModuleStoreTe
         SoftwareSecurePhotoVerification(user=user)
 
         result = SoftwareSecurePhotoVerification.get_recent_verification(user=user)
-        self.assertIs(result, None)
+        assert result is None
 
     def test_update_expiry_email_date_for_user(self):
         """Test that method update_expiry_email_date_for_user of
@@ -374,12 +371,12 @@ class TestPhotoVerification(TestVerificationBase, MockS3BotoMixin, ModuleStoreTe
         verification.status = PhotoVerification.STATUS.approved
         verification.save()
 
-        self.assertIsNone(verification.expiry_email_date)
+        assert verification.expiry_email_date is None
 
         SoftwareSecurePhotoVerification.update_expiry_email_date_for_user(user, email_config)
         result = SoftwareSecurePhotoVerification.get_recent_verification(user=user)
 
-        self.assertIsNotNone(result.expiry_email_date)
+        assert result.expiry_email_date is not None
 
     def test_expiration_date_null(self):
         """
@@ -391,10 +388,7 @@ class TestPhotoVerification(TestVerificationBase, MockS3BotoMixin, ModuleStoreTe
         verification.expiration_date = None
         verification.save()
 
-        self.assertEqual(
-            verification.expiration_datetime,
-            verification.created_at + timedelta(days=FAKE_SETTINGS["DAYS_GOOD_FOR"])
-        )
+        assert verification.expiration_datetime == (verification.created_at + timedelta(days=FAKE_SETTINGS['DAYS_GOOD_FOR']))
 
     def test_deprecated_expiry_date(self):
         """
@@ -404,20 +398,14 @@ class TestPhotoVerification(TestVerificationBase, MockS3BotoMixin, ModuleStoreTe
         with freeze_time(now()):
             verification = SoftwareSecurePhotoVerification(user=user)
             # First, assert that expiration_date is set correctly
-            self.assertEqual(
-                verification.expiration_datetime,
-                now() + timedelta(days=FAKE_SETTINGS["DAYS_GOOD_FOR"])
-            )
+            assert verification.expiration_datetime == (now() + timedelta(days=FAKE_SETTINGS['DAYS_GOOD_FOR']))
             verification.expiry_date = now() + timedelta(days=10)
             # Then, assert that expiration_datetime favors expiry_date's value if set
-            self.assertEqual(
-                verification.expiration_datetime,
-                now() + timedelta(days=10)
-            )
+            assert verification.expiration_datetime == (now() + timedelta(days=10))
 
     def test_get_verification_from_receipt(self):
         result = SoftwareSecurePhotoVerification.get_verification_from_receipt('')
-        self.assertIs(result, None)
+        assert result is None
 
         user = UserFactory.create()
         attempt = SoftwareSecurePhotoVerification(user=user)
@@ -425,7 +413,7 @@ class TestPhotoVerification(TestVerificationBase, MockS3BotoMixin, ModuleStoreTe
         attempt.save()
         receipt_id = attempt.receipt_id
         result = SoftwareSecurePhotoVerification.get_verification_from_receipt(receipt_id)
-        self.assertIsNotNone(result)
+        assert result is not None
 
 
 class SSOVerificationTest(TestVerificationBase):

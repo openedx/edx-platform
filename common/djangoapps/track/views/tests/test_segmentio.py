@@ -39,7 +39,7 @@ class SegmentIOTrackingTestCase(SegmentIOTrackingTestCaseBase):
     def test_get_request(self):
         request = self.request_factory.get(SEGMENTIO_TEST_ENDPOINT)
         response = segmentio.segmentio_event(request)
-        self.assertEqual(response.status_code, 405)
+        assert response.status_code == 405
         self.assert_no_events_emitted()
 
     @override_settings(
@@ -48,19 +48,19 @@ class SegmentIOTrackingTestCase(SegmentIOTrackingTestCaseBase):
     def test_no_secret_config(self):
         request = self.request_factory.post(SEGMENTIO_TEST_ENDPOINT)
         response = segmentio.segmentio_event(request)
-        self.assertEqual(response.status_code, 401)
+        assert response.status_code == 401
         self.assert_no_events_emitted()
 
     def test_no_secret_provided(self):
         request = self.request_factory.post(SEGMENTIO_TEST_ENDPOINT)
         response = segmentio.segmentio_event(request)
-        self.assertEqual(response.status_code, 401)
+        assert response.status_code == 401
         self.assert_no_events_emitted()
 
     def test_secret_mismatch(self):
         request = self.create_request(key='y')
         response = segmentio.segmentio_event(request)
-        self.assertEqual(response.status_code, 401)
+        assert response.status_code == 401
         self.assert_no_events_emitted()
 
     @data('identify', 'Group', 'Alias', 'Page', 'identify', 'screen')
@@ -130,7 +130,7 @@ class SegmentIOTrackingTestCase(SegmentIOTrackingTestCaseBase):
         self.assert_no_events_emitted()
         try:
             response = segmentio.segmentio_event(request)
-            self.assertEqual(response.status_code, 200)
+            assert response.status_code == 200
 
             expected_event = {
                 'accept_language': '',
@@ -252,7 +252,7 @@ class SegmentIOTrackingTestCase(SegmentIOTrackingTestCaseBase):
             content_type='application/json'
         )
         response = segmentio.segmentio_event(request)
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
         self.assert_events_emitted()
 
     def test_hiding_failure(self):
@@ -263,7 +263,7 @@ class SegmentIOTrackingTestCase(SegmentIOTrackingTestCaseBase):
         )
 
         response = segmentio.segmentio_event(request)
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
         self.assert_no_events_emitted()
 
     @data(
@@ -310,7 +310,7 @@ class SegmentIOTrackingTestCase(SegmentIOTrackingTestCaseBase):
         middleware.process_request(request)
         try:
             response = segmentio.segmentio_event(request)
-            self.assertEqual(response.status_code, 200)
+            assert response.status_code == 200
 
             expected_event = {
                 'accept_language': '',
@@ -443,7 +443,7 @@ class SegmentIOTrackingTestCase(SegmentIOTrackingTestCaseBase):
         middleware.process_request(request)
         try:
             response = segmentio.segmentio_event(request)
-            self.assertEqual(response.status_code, 200)
+            assert response.status_code == 200
 
             expected_event = {
                 'accept_language': '',

@@ -23,7 +23,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
 from django.views.generic.base import View
 from edx_rest_api_client.exceptions import SlumberBaseException
-from ipware.ip import get_ip
+from ipware.ip import get_client_ip
 from opaque_keys.edx.keys import CourseKey
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -243,7 +243,7 @@ class PayAndVerifyView(View):
         redirect_url = embargo_api.redirect_if_blocked(
             course_key,
             user=request.user,
-            ip_address=get_ip(request),
+            ip_address=get_client_ip(request)[0],
             url=request.path
         )
         if redirect_url:
@@ -1118,8 +1118,8 @@ def results_callback(request):  # lint-amnesty, pylint: disable=too-many-stateme
         log.debug(u'Approving verification for {}'.format(receipt_id))
         attempt.approve()
 
-        expiry_date = datetime.date.today() + datetime.timedelta(days=settings.VERIFY_STUDENT["DAYS_GOOD_FOR"])
-        email_context = {'user': user, 'expiry_date': expiry_date.strftime("%m/%d/%Y")}
+        expiration_datetime = attempt.expiration_datetime.date()
+        email_context = {'user': user, 'expiration_datetime': expiration_datetime.strftime("%m/%d/%Y")}
         send_verification_approved_email(context=email_context)
 
     elif result == "FAIL":

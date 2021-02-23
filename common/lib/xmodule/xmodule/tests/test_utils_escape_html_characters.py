@@ -19,7 +19,7 @@ class UtilHtmlEscapeTests(TestCase):
 
             This is a paragraph.
             """
-        self.assertEqual(escape_html_characters(html_content), self.final_content)
+        assert escape_html_characters(html_content) == self.final_content
 
     def test_escape_cdata_comments(self):
         html_content = """
@@ -39,7 +39,7 @@ class UtilHtmlEscapeTests(TestCase):
 
             This is a paragraph.
             """
-        self.assertEqual(escape_html_characters(html_content), self.final_content)
+        assert escape_html_characters(html_content) == self.final_content
 
     def test_escape_non_breaking_space(self):
         html_content = """
@@ -60,4 +60,4 @@ class UtilHtmlEscapeTests(TestCase):
             ]]>
             This is a paragraph.&nbsp;
         """
-        self.assertEqual(escape_html_characters(html_content), self.final_content)
+        assert escape_html_characters(html_content) == self.final_content

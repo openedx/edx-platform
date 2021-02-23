@@ -65,11 +65,11 @@ class PipelineRenderTest(TestCase):
         with self.settings(PIPELINE=pipeline):
             # Verify the default behavior
             css_include = compressed_css('style-main-v1')
-            self.assertIn(u'lms-main-v1.css', css_include)
+            assert u'lms-main-v1.css' in css_include
 
             # Verify that raw keyword causes raw URLs to be emitted
             css_include = compressed_css('style-main-v1', raw=True)
-            self.assertIn(u'lms-main-v1.css?raw', css_include)
+            assert u'lms-main-v1.css?raw' in css_include
 
     @patch('django.contrib.staticfiles.storage.staticfiles_storage.exists', return_value=True)
     @patch('common.djangoapps.static_replace.try_staticfiles_lookup', side_effect=mock_staticfiles_lookup)
@@ -83,10 +83,10 @@ class PipelineRenderTest(TestCase):
         pipeline['PIPELINE_ENABLED'] = True
         with self.settings(PIPELINE=pipeline):
             js_include = compressed_js('base_application')
-            self.assertIn(u'lms-base-application.js', js_include)
+            assert u'lms-base-application.js' in js_include
 
         # Verify that multiple JS files are rendered with the pipeline disabled
         pipeline['PIPELINE_ENABLED'] = False
         with self.settings(PIPELINE=pipeline):
             js_include = compressed_js('base_application')
-            self.assertIn(u'/static/js/src/logger.js', js_include)
+            assert u'/static/js/src/logger.js' in js_include

@@ -12,6 +12,7 @@ file and check it in at the same time as your model changes. To do that,
 """
 
 
+import crum
 import hashlib
 import json
 import logging
@@ -50,7 +51,7 @@ from eventtracking import tracker
 from model_utils.models import TimeStampedModel
 from opaque_keys.edx.django.models import CourseKeyField, LearningContextKeyField
 from opaque_keys.edx.keys import CourseKey
-from pytz import UTC
+from pytz import UTC, timezone
 from simple_history.models import HistoricalRecords
 from six import text_type
 from six.moves import range
@@ -74,7 +75,10 @@ from lms.djangoapps.courseware.models import (
     DynamicUpgradeDeadlineConfiguration,
     OrgDynamicUpgradeDeadlineConfiguration,
 )
-from lms.djangoapps.courseware.toggles import COURSEWARE_PROCTORING_IMPROVEMENTS
+from lms.djangoapps.courseware.toggles import (
+    courseware_mfe_streak_celebration_is_active,
+    COURSEWARE_PROCTORING_IMPROVEMENTS,
+)
 from lms.djangoapps.verify_student.models import SoftwareSecurePhotoVerification
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.enrollments.api import (
@@ -3116,6 +3120,135 @@ class AccountRecoveryConfiguration(ConfigurationModel):
     )
 
 
+class UserCelebration(TimeStampedModel):
+    """
+    Keeps track of how we've celebrated a user's progress on the platform.
+    This class is for course agnostic celebrations (not specific to a particular enrollment).
+    CourseEnrollmentCelebration is for celebrations that happen separately for each separate course.
+
+    .. no_pii:
+    """
+    user = models.OneToOneField(User, models.CASCADE, related_name='celebration')
+    # The last_day_of_streak and streak_length fields are used to
+    # control celebration of the streak feature.
+    # A streak is when a learner visits the learning MFE N days in a row.
+    # The business logic of streaks for a 3 day streak and 1 day break is the following:
+    # 1. Each streak should be celebrated exactly once, once the learner has completed the streak.
+    # 2. If a learner misses enough days to count as a break, the streak resets back to 0.
+    # 3. The streak is measured against the learner's configured timezone
+    # 4. We keep track of the total length of the streak, so there is a possibility in the future
+    # to add multiple celebrations for longer streaks.
+    # 5. We keep track of the longest_ever_streak field for potential future use for badging purposes.
+    last_day_of_streak = models.DateField(default=None, null=True, blank=True)
+    streak_length = models.IntegerField(default=0)
+    longest_ever_streak = models.IntegerField(default=0)
+    STREAK_LENGTHS_TO_CELEBRATE = [3]
+    STREAK_BREAK_LENGTH = 1
+
+    def __str__(self):
+        return (
+            '[UserCelebration] user: {}; last_day_of_streak {}; streak_length {}; longest_ever_streak {};'
+        ).format(self.user.username, self.last_day_of_streak, self.streak_length, self.longest_ever_streak)
+
+    @classmethod
+    def _get_now(cls, browser_timezone):
+        """ Retrieve the value for the current datetime in the user's timezone
+
+        Once a user visits the learning MFE, their streak will not increment until midnight in their timezone.
+        The decision was to use the user's timezone and not UTC, to make each day of the streak more closely
+        correspond to separate days for the user.
+        The learning MFE passes in the browser timezone which is used as a fallback option if the user's timezone
+        in their account is not set.
+        UTC is used as a final fallback if neither timezone is set.
+        """
+        # importing here to avoid a circular import
+        from lms.djangoapps.courseware.context_processor import user_timezone_locale_prefs
+        user_timezone_locale = user_timezone_locale_prefs(crum.get_current_request())
+        user_timezone = timezone(user_timezone_locale['user_timezone'] or browser_timezone or str(UTC))
+        return user_timezone.localize(datetime.now())
+
+    def _calculate_streak_updates(self, today):
+        """ Calculate the updates that should be applied to the streak fields of the provided celebration
+        A streak is incremented once for each day that a learner accesses the learning MFE.
+        A break is the amount of time that needs to pass before we stop incrementing the
+        existing streak and start a brand new streak.
+        See the UserCelebrationTests class for examples that should help clarify this behavior.
+        """
+        last_day_of_streak = self.last_day_of_streak
+        streak_length = self.streak_length
+        streak_length_to_celebrate = None
+
+        first_ever_streak = last_day_of_streak is None
+        break_length = timedelta(days=self.STREAK_BREAK_LENGTH)
+        should_start_new_streak = last_day_of_streak and last_day_of_streak + break_length < today
+        already_updated_streak_today = last_day_of_streak == today
+
+        last_day_of_streak = today
+        if first_ever_streak or should_start_new_streak:
+            # Start new streak
+            streak_length = 1
+        elif not already_updated_streak_today:
+            streak_length += 1
+            if streak_length in self.STREAK_LENGTHS_TO_CELEBRATE:
+                # Celebrate if we didn't already celebrate today
+                streak_length_to_celebrate = streak_length
+
+        return last_day_of_streak, streak_length, streak_length_to_celebrate
+
+    def _update_streak(self, last_day_of_streak, streak_length):
+        """ Update the celebration with the new streak data """
+        # If anything needs to be updated, update the celebration in the database
+        if last_day_of_streak != self.last_day_of_streak:
+            self.last_day_of_streak = last_day_of_streak
+            self.streak_length = streak_length
+            if self.longest_ever_streak < streak_length:
+                self.longest_ever_streak = streak_length
+
+            self.save()
+
+    @classmethod
+    def _get_celebration(cls, user, course_key):
+        """ Retrieve (or create) the celebration for the provided user and course_key """
+        try:
+            # The UI for celebrations is only supported on the MFE right now, so don't turn on
+            # celebrations unless this enrollment's course is MFE-enabled and has milestones enabled.
+            if not courseware_mfe_streak_celebration_is_active(course_key):
+                return None
+            return user.celebration
+        except (cls.DoesNotExist, User.celebration.RelatedObjectDoesNotExist):  # pylint: disable=no-member
+            celebration, _ = UserCelebration.objects.get_or_create(user=user)
+            return celebration
+
+    @classmethod
+    def perform_streak_updates(cls, user, course_key, browser_timezone=None):
+        """ Determine if the user should see a streak celebration and
+            return the length of the streak the user should celebrate.
+            Also update the streak data that is stored in the database."""
+        # importing here to avoid a circular import
+        from lms.djangoapps.courseware.masquerade import is_masquerading_as_specific_student
+        if not user or user.is_anonymous:
+            return None
+
+        if is_masquerading_as_specific_student(user, course_key):
+            return None
+
+        celebration = cls._get_celebration(user, course_key)
+
+        if not celebration:
+            return None
+
+        today = cls._get_now(browser_timezone).date()
+
+        # pylint: disable=protected-access
+        last_day_of_streak, streak_length, streak_length_to_celebrate = \
+            celebration._calculate_streak_updates(today)
+        # pylint: enable=protected-access
+
+        cls._update_streak(celebration, last_day_of_streak, streak_length)
+
+        return streak_length_to_celebrate
+
+
 class CourseEnrollmentCelebration(TimeStampedModel):
     """
     Keeps track of how we've celebrated a user's course progress.
@@ -3138,7 +3271,7 @@ class CourseEnrollmentCelebration(TimeStampedModel):
 
     def __str__(self):
         return (
-            "[CourseEnrollmentCelebration] course: {}; user: {}; first_section: {}"
+            '[CourseEnrollmentCelebration] course: {}; user: {}; first_section: {};'
         ).format(self.enrollment.course.id, self.enrollment.user.username, self.celebrate_first_section)
 
     @staticmethod

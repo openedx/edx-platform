@@ -55,15 +55,9 @@ class TestSyncCourseRunsCommand(ModuleStoreTestCase):
             updated_course_overview_value = getattr(updated_course_overview, course_overview_field_name)
 
             # course overview value matches catalog value
-            self.assertEqual(
-                updated_course_overview_value,
-                self.catalog_course_run.get(catalog_field_name),  # lint-amnesty, pylint: disable=no-member
-            )
+            assert updated_course_overview_value == self.catalog_course_run.get(catalog_field_name)  # pylint: disable=no-member, line-too-long
             # new value doesn't match old value
-            self.assertNotEqual(
-                updated_course_overview_value,
-                previous_course_overview_value,
-            )
+            assert updated_course_overview_value != previous_course_overview_value
 
     @mock.patch(COMMAND_MODULE + '.log.info')
     def test_course_overview_does_not_exist(self, mock_log_info, mock_catalog_course_runs):
@@ -80,7 +74,7 @@ class TestSyncCourseRunsCommand(ModuleStoreTestCase):
             nonexistent_course_run['key'],
         )
         updated_marketing_url = CourseOverview.objects.get(id=self.course.id).marketing_url
-        self.assertEqual(updated_marketing_url, 'test_marketing_url')
+        assert updated_marketing_url == 'test_marketing_url'
 
     @mock.patch(COMMAND_MODULE + '.log.info')
     def test_starting_and_ending_logs(self, mock_log_info, mock_catalog_course_runs):

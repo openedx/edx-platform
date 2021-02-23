@@ -321,8 +321,8 @@ class TestViewAuth(EnterpriseTestConsentRequired, ModuleStoreTestCase, LoginEnro
         self.course = self.update_course(self.course, self.user.id)
         self.test_course = self.update_course(self.test_course, self.user.id)
 
-        self.assertFalse(self.course.has_started())
-        self.assertFalse(self.test_course.has_started())
+        assert not self.course.has_started()
+        assert not self.test_course.has_started()
 
         # First, try with an enrolled student
         self.login(self.enrolled_user)
@@ -400,18 +400,18 @@ class TestViewAuth(EnterpriseTestConsentRequired, ModuleStoreTestCase, LoginEnro
 
         # First, try with an enrolled student
         self.login(self.unenrolled_user)
-        self.assertFalse(self.enroll(self.course))
-        self.assertTrue(self.enroll(self.test_course))
+        assert not self.enroll(self.course)
+        assert self.enroll(self.test_course)
 
         # Then, try as an instructor
         self.logout()
         self.login(self.instructor_user)
-        self.assertTrue(self.enroll(self.course))
+        assert self.enroll(self.course)
 
         # Then, try as global staff
         self.logout()
         self.login(self.global_staff_user)
-        self.assertTrue(self.enroll(self.course))
+        assert self.enroll(self.course)
 
 
 class TestBetatesterAccess(ModuleStoreTestCase, CourseAccessTestMixin):
@@ -436,7 +436,7 @@ class TestBetatesterAccess(ModuleStoreTestCase, CourseAccessTestMixin):
         """
         Check that beta-test access works for courses.
         """
-        self.assertFalse(self.course.has_started())  # lint-amnesty, pylint: disable=no-member
+        assert not self.course.has_started()  # lint-amnesty, pylint: disable=no-member
         self.assertCannotAccessCourse(self.normal_student, 'load', self.course)
         self.assertCanAccessCourse(self.beta_tester, 'load', self.course)
 
@@ -446,7 +446,7 @@ class TestBetatesterAccess(ModuleStoreTestCase, CourseAccessTestMixin):
         Check that beta-test access works for content.
         """
         # student user shouldn't see it
-        self.assertFalse(has_access(self.normal_student, 'load', self.content, self.course.id))  # lint-amnesty, pylint: disable=no-member
+        assert not has_access(self.normal_student, 'load', self.content, self.course.id)  # lint-amnesty, pylint: disable=no-member, line-too-long
 
         # now the student should see it
-        self.assertTrue(has_access(self.beta_tester, 'load', self.content, self.course.id))  # lint-amnesty, pylint: disable=no-member
+        assert has_access(self.beta_tester, 'load', self.content, self.course.id)  # lint-amnesty, pylint: disable=no-member, line-too-long

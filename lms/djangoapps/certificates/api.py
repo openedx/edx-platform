@@ -19,6 +19,7 @@ from organizations.api import get_course_organization_id
 from lms.djangoapps.branding import api as branding_api
 from lms.djangoapps.certificates.generation_handler import (
     is_using_certificate_allowlist_and_is_on_allowlist as _is_using_certificate_allowlist_and_is_on_allowlist,
+    generate_allowlist_certificate_task as _generate_allowlist_certificate_task,
     generate_user_certificates as _generate_user_certificates,
     regenerate_user_certificates as _regenerate_user_certificates
 )
@@ -159,7 +160,7 @@ def get_certificates_for_user_by_course_keys(user, course_keys):
     }
 
 
-def get_recently_modified_certificates(course_keys=None, start_date=None, end_date=None, usernames=None):
+def get_recently_modified_certificates(course_keys=None, start_date=None, end_date=None, user_ids=None):
     """
     Returns a QuerySet of GeneratedCertificate objects filtered by the input
     parameters and ordered by modified_date.
@@ -175,8 +176,8 @@ def get_recently_modified_certificates(course_keys=None, start_date=None, end_da
     if end_date:
         cert_filter_args['modified_date__lte'] = end_date
 
-    if usernames:
-        cert_filter_args['user__username__in'] = usernames
+    if user_ids:
+        cert_filter_args['user__id__in'] = user_ids
 
     return GeneratedCertificate.objects.filter(**cert_filter_args).order_by('modified_date')
 
@@ -189,6 +190,10 @@ def generate_user_certificates(student, course_key, course=None, insecure=False,
 def regenerate_user_certificates(student, course_key, course=None,
                                  forced_grade=None, template_file=None, insecure=False):
     return _regenerate_user_certificates(student, course_key, course, forced_grade, template_file, insecure)
+
+
+def generate_allowlist_certificate_task(user, course_key):
+    return _generate_allowlist_certificate_task(user, course_key)
 
 
 def certificate_downloadable_status(student, course_key):

@@ -5,22 +5,23 @@ Tests for Discussion API views
 
 import json
 from datetime import datetime
+from unittest import mock
 
 import ddt
 import httpretty
-import mock
 from django.urls import reverse
 from opaque_keys.edx.keys import CourseKey
 from pytz import UTC
 from rest_framework.parsers import JSONParser
 from rest_framework.test import APIClient, APITestCase
-from six import text_type
-from six.moves import range
 from six.moves.urllib.parse import urlparse
 
-from common.test.utils import disable_signal
 from common.djangoapps.course_modes.models import CourseMode
 from common.djangoapps.course_modes.tests.factories import CourseModeFactory
+from common.djangoapps.student.models import get_retired_username_by_username
+from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, SuperuserFactory, UserFactory
+from common.djangoapps.util.testing import PatchMediaTypeMixin, UrlResetMixin
+from common.test.utils import disable_signal
 from lms.djangoapps.discussion.django_comment_client.tests.utils import (
     ForumsEnableMixin,
     config_course_discussions,
@@ -38,12 +39,9 @@ from openedx.core.djangoapps.course_groups.tests.helpers import config_course_co
 from openedx.core.djangoapps.django_comment_common.models import CourseDiscussionSettings, Role
 from openedx.core.djangoapps.django_comment_common.utils import seed_permissions_roles
 from openedx.core.djangoapps.oauth_dispatch.jwt import create_jwt_for_user
-from openedx.core.djangoapps.oauth_dispatch.tests.factories import ApplicationFactory, AccessTokenFactory
+from openedx.core.djangoapps.oauth_dispatch.tests.factories import AccessTokenFactory, ApplicationFactory
 from openedx.core.djangoapps.user_api.accounts.image_helpers import get_profile_image_storage
 from openedx.core.djangoapps.user_api.models import RetirementState, UserRetirementStatus
-from common.djangoapps.student.models import get_retired_username_by_username
-from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, SuperuserFactory, UserFactory
-from common.djangoapps.util.testing import PatchMediaTypeMixin, UrlResetMixin
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
@@ -61,7 +59,7 @@ class DiscussionAPIViewTestMixin(ForumsEnableMixin, CommentsServiceMockMixin, Ur
 
     @mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
     def setUp(self):
-        super(DiscussionAPIViewTestMixin, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.maxDiff = None  # pylint: disable=invalid-name
         self.course = CourseFactory.create(
             org="x",
@@ -82,9 +80,9 @@ class DiscussionAPIViewTestMixin(ForumsEnableMixin, CommentsServiceMockMixin, Ur
         """
         Assert that the response has the given status code and parsed content
         """
-        self.assertEqual(response.status_code, expected_status)
+        assert response.status_code == expected_status
         parsed_content = json.loads(response.content.decode('utf-8'))
-        self.assertEqual(parsed_content, expected_content)
+        assert parsed_content == expected_content
 
     def register_thread(self, overrides=None):
         """
@@ -92,7 +90,7 @@ class DiscussionAPIViewTestMixin(ForumsEnableMixin, CommentsServiceMockMixin, Ur
         """
         cs_thread = make_minimal_cs_thread({
             "id": "test_thread",
-            "course_id": text_type(self.course.id),
+            "course_id": str(self.course.id),
             "commentable_id": "test_topic",
             "username": self.user.username,
             "user_id": str(self.user.id),
@@ -110,7 +108,7 @@ class DiscussionAPIViewTestMixin(ForumsEnableMixin, CommentsServiceMockMixin, Ur
         """
         cs_comment = make_minimal_cs_comment({
             "id": "test_comment",
-            "course_id": text_type(self.course.id),
+            "course_id": str(self.course.id),
             "thread_id": "test_thread",
             "username": self.user.username,
             "user_id": str(self.user.id),
@@ -139,8 +137,8 @@ class DiscussionAPIViewTestMixin(ForumsEnableMixin, CommentsServiceMockMixin, Ur
 class CourseViewTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
     """Tests for CourseView"""
     def setUp(self):
-        super(CourseViewTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
-        self.url = reverse("discussion_course", kwargs={"course_id": text_type(self.course.id)})
+        super().setUp()
+        self.url = reverse("discussion_course", kwargs={"course_id": str(self.course.id)})
 
     def test_404(self):
         response = self.client.get(
@@ -158,7 +156,7 @@ class CourseViewTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
             response,
             200,
             {
-                "id": text_type(self.course.id),
+                "id": str(self.course.id),
                 "blackouts": [],
                 "thread_list_url": "http://testserver/api/discussion/v1/threads/?course_id=x%2Fy%2Fz",
                 "following_thread_list_url": (
@@ -174,7 +172,7 @@ class CourseViewTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
 class RetireViewTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
     """Tests for CourseView"""
     def setUp(self):
-        super(RetireViewTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         RetirementState.objects.create(state_name='PENDING', state_execution_order=1)
         self.retire_forums_state = RetirementState.objects.create(state_name='RETIRE_FORUMS', state_execution_order=11)
 
@@ -190,10 +188,10 @@ class RetireViewTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
         """
         Assert that the response has the given status code and content
         """
-        self.assertEqual(response.status_code, expected_status)
+        assert response.status_code == expected_status
 
         if expected_content:
-            self.assertEqual(response.content.decode('utf-8'), expected_content)
+            assert response.content.decode('utf-8') == expected_content
 
     def build_jwt_headers(self, user):
         """
@@ -248,7 +246,7 @@ class RetireViewTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
 class ReplaceUsernamesViewTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
     """Tests for ReplaceUsernamesView"""
     def setUp(self):
-        super(ReplaceUsernamesViewTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.client_user = UserFactory()
         self.client_user.username = "test_replace_username_service_worker"
         self.new_username = "test_username_replacement"
@@ -258,10 +256,10 @@ class ReplaceUsernamesViewTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
         """
         Assert that the response has the given status code and content
         """
-        self.assertEqual(response.status_code, expected_status)
+        assert response.status_code == expected_status
 
         if expected_content:
-            self.assertEqual(text_type(response.content), expected_content)
+            assert str(response.content) == expected_content
 
     def build_jwt_headers(self, user):
         """
@@ -288,7 +286,7 @@ class ReplaceUsernamesViewTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
             "username_mappings": mapping_data
         }
         response = self.call_api(self.client_user, data)
-        self.assertEqual(response.status_code, 400)
+        assert response.status_code == 400
 
     def test_auth(self):
         """ Verify the endpoint only works with the service worker """
@@ -301,16 +299,16 @@ class ReplaceUsernamesViewTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
 
         # Test unauthenticated
         response = self.client.post(self.url, data)
-        self.assertEqual(response.status_code, 401)
+        assert response.status_code == 401
 
         # Test non-service worker
         random_user = UserFactory()
         response = self.call_api(random_user, data)
-        self.assertEqual(response.status_code, 403)
+        assert response.status_code == 403
 
         # Test service worker
         response = self.call_api(self.client_user, data)
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
 
     def test_basic(self):
         """ Check successful replacement """
@@ -325,8 +323,8 @@ class ReplaceUsernamesViewTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
         }
         self.register_get_username_replacement_response(self.user)
         response = self.call_api(self.client_user, data)
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.data, expected_response)
+        assert response.status_code == 200
+        assert response.data == expected_response
 
     def test_not_authenticated(self):
         """
@@ -342,8 +340,8 @@ class CourseTopicsViewTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
     Tests for CourseTopicsView
     """
     def setUp(self):
-        super(CourseTopicsViewTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
-        self.url = reverse("course_topics", kwargs={"course_id": text_type(self.course.id)})
+        super().setUp()
+        self.url = reverse("course_topics", kwargs={"course_id": str(self.course.id)})
 
     def create_course(self, modules_count, module_store, topics):
         """
@@ -358,15 +356,15 @@ class CourseTopicsViewTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
             discussion_topics=topics
         )
         CourseEnrollmentFactory.create(user=self.user, course_id=course.id)
-        course_url = reverse("course_topics", kwargs={"course_id": text_type(course.id)})
+        course_url = reverse("course_topics", kwargs={"course_id": str(course.id)})
         # add some discussion xblocks
         for i in range(modules_count):
             ItemFactory.create(
                 parent_location=course.location,
                 category='discussion',
-                discussion_id='id_module_{}'.format(i),
-                discussion_category='Category {}'.format(i),
-                discussion_target='Discussion {}'.format(i),
+                discussion_id=f'id_module_{i}',
+                discussion_category=f'Category {i}',
+                discussion_target=f'Discussion {i}',
                 publish_item=False,
             )
         return course_url
@@ -433,7 +431,7 @@ class CourseTopicsViewTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
         """
         topic_id = "courseware-topic-id"
         self.make_discussion_xblock(topic_id, "test_category", "test_target")
-        url = "{}?topic_id=invalid_topic_id".format(self.url)
+        url = f"{self.url}?topic_id=invalid_topic_id"
         response = self.client.get(url)
         self.assert_response_correct(
             response,
@@ -449,7 +447,7 @@ class CourseTopicsViewTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
         topic_id_2 = "topic_id_2"
         self.make_discussion_xblock(topic_id_1, "test_category_1", "test_target_1")
         self.make_discussion_xblock(topic_id_2, "test_category_2", "test_target_2")
-        url = "{}?topic_id=topic_id_1,topic_id_2".format(self.url)
+        url = f"{self.url}?topic_id=topic_id_1,topic_id_2"
         response = self.client.get(url)
         self.assert_response_correct(
             response,
@@ -495,7 +493,7 @@ class CourseTopicsViewTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
 class ThreadViewSetListTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase, ProfileImageTestMixin):
     """Tests for ThreadViewSet list"""
     def setUp(self):
-        super(ThreadViewSetListTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.author = UserFactory.create()
         self.url = reverse("thread-list")
 
@@ -505,7 +503,7 @@ class ThreadViewSetListTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase, Pro
         """
         thread = make_minimal_cs_thread({
             "id": "test_thread",
-            "course_id": text_type(self.course.id),
+            "course_id": str(self.course.id),
             "commentable_id": "test_topic",
             "user_id": str(self.user.id),
             "username": self.user.username,
@@ -530,7 +528,7 @@ class ThreadViewSetListTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase, Pro
         )
 
     def test_404(self):
-        response = self.client.get(self.url, {"course_id": text_type("non/existent/course")})
+        response = self.client.get(self.url, {"course_id": "non/existent/course"})
         self.assert_response_correct(
             response,
             404,
@@ -553,7 +551,7 @@ class ThreadViewSetListTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase, Pro
             "editable_fields": ["abuse_flagged", "following", "read", "voted"],
         })]
         self.register_get_threads_response(source_threads, page=1, num_pages=2)
-        response = self.client.get(self.url, {"course_id": text_type(self.course.id), "following": ""})
+        response = self.client.get(self.url, {"course_id": str(self.course.id), "following": ""})
         expected_response = make_paginated_api_response(
             results=expected_threads,
             count=1,
@@ -568,8 +566,8 @@ class ThreadViewSetListTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase, Pro
             expected_response
         )
         self.assert_last_query_params({
-            "user_id": [text_type(self.user.id)],
-            "course_id": [text_type(self.course.id)],
+            "user_id": [str(self.user.id)],
+            "course_id": [str(self.course.id)],
             "sort_key": ["activity"],
             "page": ["1"],
             "per_page": ["10"],
@@ -583,13 +581,13 @@ class ThreadViewSetListTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase, Pro
         self.client.get(
             self.url,
             {
-                "course_id": text_type(self.course.id),
+                "course_id": str(self.course.id),
                 "view": query,
             }
         )
         self.assert_last_query_params({
-            "user_id": [text_type(self.user.id)],
-            "course_id": [text_type(self.course.id)],
+            "user_id": [str(self.user.id)],
+            "course_id": [str(self.course.id)],
             "sort_key": ["activity"],
             "page": ["1"],
             "per_page": ["10"],
@@ -601,7 +599,7 @@ class ThreadViewSetListTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase, Pro
         self.register_get_threads_response([], page=1, num_pages=1)
         response = self.client.get(
             self.url,
-            {"course_id": text_type(self.course.id), "page": "18", "page_size": "4"}
+            {"course_id": str(self.course.id), "page": "18", "page_size": "4"}
         )
         self.assert_response_correct(
             response,
@@ -609,8 +607,8 @@ class ThreadViewSetListTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase, Pro
             {"developer_message": "Page not found (No results on this page)."}
         )
         self.assert_last_query_params({
-            "user_id": [text_type(self.user.id)],
-            "course_id": [text_type(self.course.id)],
+            "user_id": [str(self.user.id)],
+            "course_id": [str(self.course.id)],
             "sort_key": ["activity"],
             "page": ["18"],
             "per_page": ["4"],
@@ -621,7 +619,7 @@ class ThreadViewSetListTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase, Pro
         self.register_get_threads_search_response([], None, num_pages=0)
         response = self.client.get(
             self.url,
-            {"course_id": text_type(self.course.id), "text_search": "test search string"}
+            {"course_id": str(self.course.id), "text_search": "test search string"}
         )
 
         expected_response = make_paginated_api_response(
@@ -634,8 +632,8 @@ class ThreadViewSetListTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase, Pro
             expected_response
         )
         self.assert_last_query_params({
-            "user_id": [text_type(self.user.id)],
-            "course_id": [text_type(self.course.id)],
+            "user_id": [str(self.user.id)],
+            "course_id": [str(self.course.id)],
             "sort_key": ["activity"],
             "page": ["1"],
             "per_page": ["10"],
@@ -649,7 +647,7 @@ class ThreadViewSetListTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase, Pro
         response = self.client.get(
             self.url,
             {
-                "course_id": text_type(self.course.id),
+                "course_id": str(self.course.id),
                 "following": following,
             }
         )
@@ -663,17 +661,16 @@ class ThreadViewSetListTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase, Pro
             200,
             expected_response
         )
-        self.assertEqual(
-            urlparse(httpretty.last_request().path).path,  # lint-amnesty, pylint: disable=no-member
-            "/api/v1/users/{}/subscribed_threads".format(self.user.id)
-        )
+        assert urlparse(
+            httpretty.last_request().path  # lint-amnesty, pylint: disable=no-member
+        ).path == f"/api/v1/users/{self.user.id}/subscribed_threads"
 
     @ddt.data(False, "false", "0")
     def test_following_false(self, following):
         response = self.client.get(
             self.url,
             {
-                "course_id": text_type(self.course.id),
+                "course_id": str(self.course.id),
                 "following": following,
             }
         )
@@ -689,7 +686,7 @@ class ThreadViewSetListTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase, Pro
         response = self.client.get(
             self.url,
             {
-                "course_id": text_type(self.course.id),
+                "course_id": str(self.course.id),
                 "following": "invalid-boolean",
             }
         )
@@ -721,13 +718,13 @@ class ThreadViewSetListTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase, Pro
         self.client.get(
             self.url,
             {
-                "course_id": text_type(self.course.id),
+                "course_id": str(self.course.id),
                 "order_by": http_query,
             }
         )
         self.assert_last_query_params({
-            "user_id": [text_type(self.user.id)],
-            "course_id": [text_type(self.course.id)],
+            "user_id": [str(self.user.id)],
+            "course_id": [str(self.course.id)],
             "page": ["1"],
             "per_page": ["10"],
             "sort_key": [cc_query],
@@ -744,13 +741,13 @@ class ThreadViewSetListTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase, Pro
         self.client.get(
             self.url,
             {
-                "course_id": text_type(self.course.id),
+                "course_id": str(self.course.id),
                 "order_direction": "desc",
             }
         )
         self.assert_last_query_params({
-            "user_id": [text_type(self.user.id)],
-            "course_id": [text_type(self.course.id)],
+            "user_id": [str(self.user.id)],
+            "course_id": [str(self.course.id)],
             "sort_key": ["activity"],
             "page": ["1"],
             "per_page": ["10"],
@@ -763,7 +760,7 @@ class ThreadViewSetListTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase, Pro
         self.register_get_user_response(self.user)
         self.register_get_threads_search_response([], None, num_pages=0)
         response = self.client.get(self.url, {
-            "course_id": text_type(self.course.id),
+            "course_id": str(self.course.id),
             "text_search": "test search string",
             "topic_id": "topic1, topic2",
         })
@@ -796,15 +793,15 @@ class ThreadViewSetListTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase, Pro
 
         response = self.client.get(
             self.url,
-            {"course_id": text_type(self.course.id), "requested_fields": "profile_image"},
+            {"course_id": str(self.course.id), "requested_fields": "profile_image"},
         )
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
         response_threads = json.loads(response.content.decode('utf-8'))['results']
 
         for response_thread in response_threads:
             expected_profile_data = self.get_expected_user_profile(response_thread['author'])
             response_users = response_thread['users']
-            self.assertEqual(expected_profile_data, response_users[response_thread['author']])
+            assert expected_profile_data == response_users[response_thread['author']]
 
     def test_profile_image_requested_field_anonymous_user(self):
         """
@@ -821,12 +818,12 @@ class ThreadViewSetListTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase, Pro
 
         response = self.client.get(
             self.url,
-            {"course_id": text_type(self.course.id), "requested_fields": "profile_image"},
+            {"course_id": str(self.course.id), "requested_fields": "profile_image"},
         )
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
         response_thread = json.loads(response.content.decode('utf-8'))['results'][0]
-        self.assertIsNone(response_thread['author'])
-        self.assertEqual({}, response_thread['users'])
+        assert response_thread['author'] is None
+        assert {} == response_thread['users']
 
 
 @httpretty.activate
@@ -835,7 +832,7 @@ class ThreadViewSetListTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase, Pro
 class ThreadViewSetCreateTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
     """Tests for ThreadViewSet create"""
     def setUp(self):
-        super(ThreadViewSetCreateTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.url = reverse("thread-list")
 
     def test_basic(self):
@@ -847,7 +844,7 @@ class ThreadViewSetCreateTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
         })
         self.register_post_thread_response(cs_thread)
         request_data = {
-            "course_id": text_type(self.course.id),
+            "course_id": str(self.course.id),
             "topic_id": "test_topic",
             "type": "discussion",
             "title": "Test Title",
@@ -858,20 +855,17 @@ class ThreadViewSetCreateTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
             json.dumps(request_data),
             content_type="application/json"
         )
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
         response_data = json.loads(response.content.decode('utf-8'))
-        self.assertEqual(response_data, self.expected_thread_data({"read": True}))
-        self.assertEqual(
-            httpretty.last_request().parsed_body,  # lint-amnesty, pylint: disable=no-member
-            {
-                "course_id": [text_type(self.course.id)],
-                "commentable_id": ["test_topic"],
-                "thread_type": ["discussion"],
-                "title": ["Test Title"],
-                "body": ["Test body"],
-                "user_id": [str(self.user.id)],
-            }
-        )
+        assert response_data == self.expected_thread_data({'read': True})
+        assert httpretty.last_request().parsed_body == {  # lint-amnesty, pylint: disable=no-member
+            'course_id': [str(self.course.id)],
+            'commentable_id': ['test_topic'],
+            'thread_type': ['discussion'],
+            'title': ['Test Title'],
+            'body': ['Test body'],
+            'user_id': [str(self.user.id)]
+        }
 
     def test_error(self):
         request_data = {
@@ -888,9 +882,9 @@ class ThreadViewSetCreateTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
         expected_response_data = {
             "field_errors": {"course_id": {"developer_message": "This field is required."}}
         }
-        self.assertEqual(response.status_code, 400)
+        assert response.status_code == 400
         response_data = json.loads(response.content.decode('utf-8'))
-        self.assertEqual(response_data, expected_response_data)
+        assert response_data == expected_response_data
 
 
 @ddt.ddt
@@ -901,7 +895,7 @@ class ThreadViewSetPartialUpdateTest(DiscussionAPIViewTestMixin, ModuleStoreTest
     """Tests for ThreadViewSet partial_update"""
     def setUp(self):
         self.unsupported_media_type = JSONParser.media_type
-        super(ThreadViewSetPartialUpdateTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.url = reverse("thread-detail", kwargs={"thread_id": "test_thread"})
 
     def test_basic(self):
@@ -914,39 +908,31 @@ class ThreadViewSetPartialUpdateTest(DiscussionAPIViewTestMixin, ModuleStoreTest
         })
         request_data = {"raw_body": "Edited body"}
         response = self.request_patch(request_data)
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
         response_data = json.loads(response.content.decode('utf-8'))
-        self.assertEqual(
-            response_data,
-            self.expected_thread_data({
-                "raw_body": "Edited body",
-                "rendered_body": "<p>Edited body</p>",
-                "editable_fields": [
-                    "abuse_flagged", "following", "raw_body", "read", "title", "topic_id", "type", "voted"
-                ],
-                "created_at": "Test Created Date",
-                "updated_at": "Test Updated Date",
-                "comment_count": 1,
-                "read": True,
-                "response_count": 2,
-            })
-        )
-        self.assertEqual(
-            httpretty.last_request().parsed_body,  # lint-amnesty, pylint: disable=no-member
-            {
-                "course_id": [text_type(self.course.id)],
-                "commentable_id": ["test_topic"],
-                "thread_type": ["discussion"],
-                "title": ["Test Title"],
-                "body": ["Edited body"],
-                "user_id": [str(self.user.id)],
-                "anonymous": ["False"],
-                "anonymous_to_peers": ["False"],
-                "closed": ["False"],
-                "pinned": ["False"],
-                "read": ["True"],
-            }
-        )
+        assert response_data == self.expected_thread_data({
+            'raw_body': 'Edited body',
+            'rendered_body': '<p>Edited body</p>',
+            'editable_fields': ['abuse_flagged', 'following', 'raw_body', 'read', 'title', 'topic_id', 'type', 'voted'],
+            'created_at': 'Test Created Date',
+            'updated_at': 'Test Updated Date',
+            'comment_count': 1,
+            'read': True,
+            'response_count': 2
+        })
+        assert httpretty.last_request().parsed_body == {  # lint-amnesty, pylint: disable=no-member
+            'course_id': [str(self.course.id)],
+            'commentable_id': ['test_topic'],
+            'thread_type': ['discussion'],
+            'title': ['Test Title'],
+            'body': ['Edited body'],
+            'user_id': [str(self.user.id)],
+            'anonymous': ['False'],
+            'anonymous_to_peers': ['False'],
+            'closed': ['False'],
+            'pinned': ['False'],
+            'read': ['True']
+        }
 
     def test_error(self):
         self.register_get_user_response(self.user)
@@ -956,9 +942,9 @@ class ThreadViewSetPartialUpdateTest(DiscussionAPIViewTestMixin, ModuleStoreTest
         expected_response_data = {
             "field_errors": {"title": {"developer_message": "This field may not be blank."}}
         }
-        self.assertEqual(response.status_code, 400)
+        assert response.status_code == 400
         response_data = json.loads(response.content.decode('utf-8'))
-        self.assertEqual(response_data, expected_response_data)
+        assert response_data == expected_response_data
 
     @ddt.data(
         ("abuse_flagged", True),
@@ -971,19 +957,15 @@ class ThreadViewSetPartialUpdateTest(DiscussionAPIViewTestMixin, ModuleStoreTest
         self.register_flag_response("thread", "test_thread")
         request_data = {field: value}
         response = self.request_patch(request_data)
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
         response_data = json.loads(response.content.decode('utf-8'))
-        self.assertEqual(
-            response_data,
-            self.expected_thread_data({
-                "read": True,
-                "closed": True,
-                "abuse_flagged": value,
-                "editable_fields": ["abuse_flagged", "read"],
-                "comment_count": 1,
-                "unread_comment_count": 0,
-            })
-        )
+        assert response_data == self.expected_thread_data({
+            'read': True,
+            'closed': True,
+            'abuse_flagged': value,
+            'editable_fields': ['abuse_flagged', 'read'],
+            'comment_count': 1, 'unread_comment_count': 0
+        })
 
     @ddt.data(
         ("raw_body", "Edited body"),
@@ -997,7 +979,7 @@ class ThreadViewSetPartialUpdateTest(DiscussionAPIViewTestMixin, ModuleStoreTest
         self.register_flag_response("thread", "test_thread")
         request_data = {field: value}
         response = self.request_patch(request_data)
-        self.assertEqual(response.status_code, 400)
+        assert response.status_code == 400
 
     def test_patch_read_owner_user(self):
         self.register_get_user_response(self.user)
@@ -1006,19 +988,14 @@ class ThreadViewSetPartialUpdateTest(DiscussionAPIViewTestMixin, ModuleStoreTest
         request_data = {"read": True}
 
         response = self.request_patch(request_data)
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
         response_data = json.loads(response.content.decode('utf-8'))
-        self.assertEqual(
-            response_data,
-            self.expected_thread_data({
-                "comment_count": 1,
-                "read": True,
-                "editable_fields": [
-                    "abuse_flagged", "following", "raw_body", "read", "title", "topic_id", "type", "voted"
-                ],
-                "response_count": 2,
-            })
-        )
+        assert response_data == self.expected_thread_data({
+            'comment_count': 1,
+            'read': True,
+            'editable_fields': ['abuse_flagged', 'following', 'raw_body', 'read', 'title', 'topic_id', 'type', 'voted'],
+            'response_count': 2
+        })
 
     def test_patch_read_non_owner_user(self):
         self.register_get_user_response(self.user)
@@ -1034,20 +1011,15 @@ class ThreadViewSetPartialUpdateTest(DiscussionAPIViewTestMixin, ModuleStoreTest
 
         request_data = {"read": True}
         response = self.request_patch(request_data)
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
         response_data = json.loads(response.content.decode('utf-8'))
-        self.assertEqual(
-            response_data,
-            self.expected_thread_data({
-                "author": str(thread_owner_user.username),
-                "comment_count": 1,
-                "read": True,
-                "editable_fields": [
-                    "abuse_flagged", "following", "read", "voted"
-                ],
-                "response_count": 2,
-            })
-        )
+        assert response_data == self.expected_thread_data({
+            'author': str(thread_owner_user.username),
+            'comment_count': 1,
+            'read': True,
+            'editable_fields': ['abuse_flagged', 'following', 'read', 'voted'],
+            'response_count': 2
+        })
 
 
 @httpretty.activate
@@ -1056,7 +1028,7 @@ class ThreadViewSetPartialUpdateTest(DiscussionAPIViewTestMixin, ModuleStoreTest
 class ThreadViewSetDeleteTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
     """Tests for ThreadViewSet delete"""
     def setUp(self):
-        super(ThreadViewSetDeleteTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.url = reverse("thread-detail", kwargs={"thread_id": "test_thread"})
         self.thread_id = "test_thread"
 
@@ -1064,25 +1036,22 @@ class ThreadViewSetDeleteTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
         self.register_get_user_response(self.user)
         cs_thread = make_minimal_cs_thread({
             "id": self.thread_id,
-            "course_id": text_type(self.course.id),
+            "course_id": str(self.course.id),
             "username": self.user.username,
             "user_id": str(self.user.id),
         })
         self.register_get_thread_response(cs_thread)
         self.register_delete_thread_response(self.thread_id)
         response = self.client.delete(self.url)
-        self.assertEqual(response.status_code, 204)
-        self.assertEqual(response.content, b"")
-        self.assertEqual(
-            urlparse(httpretty.last_request().path).path,  # lint-amnesty, pylint: disable=no-member
-            "/api/v1/threads/{}".format(self.thread_id)
-        )
-        self.assertEqual(httpretty.last_request().method, "DELETE")
+        assert response.status_code == 204
+        assert response.content == b''
+        assert urlparse(httpretty.last_request().path).path == f"/api/v1/threads/{self.thread_id}"  # lint-amnesty, pylint: disable=no-member
+        assert httpretty.last_request().method == 'DELETE'
 
     def test_delete_nonexistent_thread(self):
         self.register_get_thread_error_response(self.thread_id, 404)
         response = self.client.delete(self.url)
-        self.assertEqual(response.status_code, 404)
+        assert response.status_code == 404
 
 
 @ddt.ddt
@@ -1091,7 +1060,7 @@ class ThreadViewSetDeleteTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
 class CommentViewSetListTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase, ProfileImageTestMixin):
     """Tests for CommentViewSet list"""
     def setUp(self):
-        super(CommentViewSetListTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.author = UserFactory.create()
         self.url = reverse("comment-list")
         self.thread_id = "test_thread"
@@ -1121,7 +1090,7 @@ class CommentViewSetListTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase, Pr
         already in overrides.
         """
         overrides = overrides.copy() if overrides else {}
-        overrides.setdefault("course_id", text_type(self.course.id))
+        overrides.setdefault("course_id", str(self.course.id))
         return make_minimal_cs_thread(overrides)
 
     def expected_response_comment(self, overrides=None):
@@ -1184,7 +1153,7 @@ class CommentViewSetListTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase, Pr
         })]
         self.register_get_thread_response({
             "id": self.thread_id,
-            "course_id": text_type(self.course.id),
+            "course_id": str(self.course.id),
             "thread_type": "discussion",
             "children": source_comments,
             "resp_total": 100,
@@ -1221,7 +1190,7 @@ class CommentViewSetListTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase, Pr
         self.register_get_user_response(self.user)
         self.register_get_thread_response(make_minimal_cs_thread({
             "id": self.thread_id,
-            "course_id": text_type(self.course.id),
+            "course_id": str(self.course.id),
             "thread_type": "discussion",
             "resp_total": 10,
         }))
@@ -1277,7 +1246,7 @@ class CommentViewSetListTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase, Pr
             "endorsed": endorsed,
         })
         parsed_content = json.loads(response.content.decode('utf-8'))
-        self.assertEqual(parsed_content["results"][0]["id"], comment_id)
+        assert parsed_content['results'][0]['id'] == comment_id
 
     def test_question_invalid_endorsed(self):
         response = self.client.get(self.url, {
@@ -1330,7 +1299,7 @@ class CommentViewSetListTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase, Pr
         })
         thread = self.make_minimal_cs_thread({
             "id": self.thread_id,
-            "course_id": text_type(self.course.id),
+            "course_id": str(self.course.id),
             "thread_type": "discussion",
             "children": [response_1, response_2],
             "resp_total": 2,
@@ -1365,7 +1334,7 @@ class CommentViewSetListTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase, Pr
         source_comments = [self.create_source_comment()]
         self.register_get_thread_response({
             "id": self.thread_id,
-            "course_id": text_type(self.course.id),
+            "course_id": str(self.course.id),
             "thread_type": "discussion",
             "children": source_comments,
             "resp_total": 100,
@@ -1374,12 +1343,12 @@ class CommentViewSetListTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase, Pr
         self.create_profile_image(self.user, get_profile_image_storage())
 
         response = self.client.get(self.url, {"thread_id": self.thread_id, "requested_fields": "profile_image"})
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
         response_comments = json.loads(response.content.decode('utf-8'))['results']
         for response_comment in response_comments:
             expected_profile_data = self.get_expected_user_profile(response_comment['author'])
             response_users = response_comment['users']
-            self.assertEqual(expected_profile_data, response_users[response_comment['author']])
+            assert expected_profile_data == response_users[response_comment['author']]
 
     def test_profile_image_requested_field_endorsed_comments(self):
         """
@@ -1417,14 +1386,14 @@ class CommentViewSetListTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase, Pr
             "endorsed": True,
             "requested_fields": "profile_image",
         })
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
         response_comments = json.loads(response.content.decode('utf-8'))['results']
         for response_comment in response_comments:
             expected_author_profile_data = self.get_expected_user_profile(response_comment['author'])
             expected_endorser_profile_data = self.get_expected_user_profile(response_comment['endorsed_by'])
             response_users = response_comment['users']
-            self.assertEqual(expected_author_profile_data, response_users[response_comment['author']])
-            self.assertEqual(expected_endorser_profile_data, response_users[response_comment['endorsed_by']])
+            assert expected_author_profile_data == response_users[response_comment['author']]
+            assert expected_endorser_profile_data == response_users[response_comment['endorsed_by']]
 
     def test_profile_image_request_for_null_endorsed_by(self):
         """
@@ -1450,13 +1419,13 @@ class CommentViewSetListTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase, Pr
             "endorsed": True,
             "requested_fields": "profile_image",
         })
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
         response_comments = json.loads(response.content.decode('utf-8'))['results']
         for response_comment in response_comments:
             expected_author_profile_data = self.get_expected_user_profile(response_comment['author'])
             response_users = response_comment['users']
-            self.assertEqual(expected_author_profile_data, response_users[response_comment['author']])
-            self.assertNotIn(response_comment['endorsed_by'], response_users)
+            assert expected_author_profile_data == response_users[response_comment['author']]
+            assert response_comment['endorsed_by'] not in response_users
 
 
 @httpretty.activate
@@ -1466,7 +1435,7 @@ class CommentViewSetDeleteTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
     """Tests for ThreadViewSet delete"""
 
     def setUp(self):
-        super(CommentViewSetDeleteTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.url = reverse("comment-detail", kwargs={"comment_id": "test_comment"})
         self.comment_id = "test_comment"
 
@@ -1474,7 +1443,7 @@ class CommentViewSetDeleteTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
         self.register_get_user_response(self.user)
         cs_thread = make_minimal_cs_thread({
             "id": "test_thread",
-            "course_id": text_type(self.course.id),
+            "course_id": str(self.course.id),
         })
         self.register_get_thread_response(cs_thread)
         cs_comment = make_minimal_cs_comment({
@@ -1487,18 +1456,15 @@ class CommentViewSetDeleteTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
         self.register_get_comment_response(cs_comment)
         self.register_delete_comment_response(self.comment_id)
         response = self.client.delete(self.url)
-        self.assertEqual(response.status_code, 204)
-        self.assertEqual(response.content, b"")
-        self.assertEqual(
-            urlparse(httpretty.last_request().path).path,  # lint-amnesty, pylint: disable=no-member
-            "/api/v1/comments/{}".format(self.comment_id)
-        )
-        self.assertEqual(httpretty.last_request().method, "DELETE")
+        assert response.status_code == 204
+        assert response.content == b''
+        assert urlparse(httpretty.last_request().path).path == f"/api/v1/comments/{self.comment_id}"  # lint-amnesty, pylint: disable=no-member
+        assert httpretty.last_request().method == 'DELETE'
 
     def test_delete_nonexistent_comment(self):
         self.register_get_comment_error_response(self.comment_id, 404)
         response = self.client.delete(self.url)
-        self.assertEqual(response.status_code, 404)
+        assert response.status_code == 404
 
 
 @httpretty.activate
@@ -1507,7 +1473,7 @@ class CommentViewSetDeleteTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
 class CommentViewSetCreateTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
     """Tests for CommentViewSet create"""
     def setUp(self):
-        super(CommentViewSetCreateTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.url = reverse("comment-list")
 
     def test_basic(self):
@@ -1544,21 +1510,15 @@ class CommentViewSetCreateTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
             json.dumps(request_data),
             content_type="application/json"
         )
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
         response_data = json.loads(response.content.decode('utf-8'))
-        self.assertEqual(response_data, expected_response_data)
-        self.assertEqual(
-            urlparse(httpretty.last_request().path).path,  # lint-amnesty, pylint: disable=no-member
-            "/api/v1/threads/test_thread/comments"
-        )
-        self.assertEqual(
-            httpretty.last_request().parsed_body,  # lint-amnesty, pylint: disable=no-member
-            {
-                "course_id": [text_type(self.course.id)],
-                "body": ["Test body"],
-                "user_id": [str(self.user.id)],
-            }
-        )
+        assert response_data == expected_response_data
+        assert urlparse(httpretty.last_request().path).path == '/api/v1/threads/test_thread/comments'  # lint-amnesty, pylint: disable=no-member
+        assert httpretty.last_request().parsed_body == {  # lint-amnesty, pylint: disable=no-member
+            'course_id': [str(self.course.id)],
+            'body': ['Test body'],
+            'user_id': [str(self.user.id)]
+        }
 
     def test_error(self):
         response = self.client.post(
@@ -1569,9 +1529,9 @@ class CommentViewSetCreateTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
         expected_response_data = {
             "field_errors": {"thread_id": {"developer_message": "This field is required."}}
         }
-        self.assertEqual(response.status_code, 400)
+        assert response.status_code == 400
         response_data = json.loads(response.content.decode('utf-8'))
-        self.assertEqual(response_data, expected_response_data)
+        assert response_data == expected_response_data
 
     def test_closed_thread(self):
         self.register_get_user_response(self.user)
@@ -1586,7 +1546,7 @@ class CommentViewSetCreateTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
             json.dumps(request_data),
             content_type="application/json"
         )
-        self.assertEqual(response.status_code, 403)
+        assert response.status_code == 403
 
 
 @ddt.ddt
@@ -1596,7 +1556,7 @@ class CommentViewSetPartialUpdateTest(DiscussionAPIViewTestMixin, ModuleStoreTes
     """Tests for CommentViewSet partial_update"""
     def setUp(self):
         self.unsupported_media_type = JSONParser.media_type
-        super(CommentViewSetPartialUpdateTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         httpretty.reset()
         httpretty.enable()
         self.addCleanup(httpretty.reset)
@@ -1637,29 +1597,23 @@ class CommentViewSetPartialUpdateTest(DiscussionAPIViewTestMixin, ModuleStoreTes
         self.register_comment({"created_at": "Test Created Date", "updated_at": "Test Updated Date"})
         request_data = {"raw_body": "Edited body"}
         response = self.request_patch(request_data)
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
         response_data = json.loads(response.content.decode('utf-8'))
-        self.assertEqual(
-            response_data,
-            self.expected_response_data({
-                "raw_body": "Edited body",
-                "rendered_body": "<p>Edited body</p>",
-                "editable_fields": ["abuse_flagged", "raw_body", "voted"],
-                "created_at": "Test Created Date",
-                "updated_at": "Test Updated Date",
-            })
-        )
-        self.assertEqual(
-            httpretty.last_request().parsed_body,  # lint-amnesty, pylint: disable=no-member
-            {
-                "body": ["Edited body"],
-                "course_id": [text_type(self.course.id)],
-                "user_id": [str(self.user.id)],
-                "anonymous": ["False"],
-                "anonymous_to_peers": ["False"],
-                "endorsed": ["False"],
-            }
-        )
+        assert response_data == self.expected_response_data({
+            'raw_body': 'Edited body',
+            'rendered_body': '<p>Edited body</p>',
+            'editable_fields': ['abuse_flagged', 'raw_body', 'voted'],
+            'created_at': 'Test Created Date',
+            'updated_at': 'Test Updated Date'
+        })
+        assert httpretty.last_request().parsed_body == {  # lint-amnesty, pylint: disable=no-member
+            'body': ['Edited body'],
+            'course_id': [str(self.course.id)],
+            'user_id': [str(self.user.id)],
+            'anonymous': ['False'],
+            'anonymous_to_peers': ['False'],
+            'endorsed': ['False']
+        }
 
     def test_error(self):
         self.register_thread()
@@ -1669,9 +1623,9 @@ class CommentViewSetPartialUpdateTest(DiscussionAPIViewTestMixin, ModuleStoreTes
         expected_response_data = {
             "field_errors": {"raw_body": {"developer_message": "This field may not be blank."}}
         }
-        self.assertEqual(response.status_code, 400)
+        assert response.status_code == 400
         response_data = json.loads(response.content.decode('utf-8'))
-        self.assertEqual(response_data, expected_response_data)
+        assert response_data == expected_response_data
 
     @ddt.data(
         ("abuse_flagged", True),
@@ -1684,15 +1638,12 @@ class CommentViewSetPartialUpdateTest(DiscussionAPIViewTestMixin, ModuleStoreTes
         self.register_flag_response("comment", "test_comment")
         request_data = {field: value}
         response = self.request_patch(request_data)
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
         response_data = json.loads(response.content.decode('utf-8'))
-        self.assertEqual(
-            response_data,
-            self.expected_response_data({
-                "abuse_flagged": value,
-                "editable_fields": ["abuse_flagged"],
-            })
-        )
+        assert response_data == self.expected_response_data({
+            'abuse_flagged': value,
+            'editable_fields': ['abuse_flagged']
+        })
 
     @ddt.data(
         ("raw_body", "Edited body"),
@@ -1705,7 +1656,7 @@ class CommentViewSetPartialUpdateTest(DiscussionAPIViewTestMixin, ModuleStoreTes
         self.register_comment()
         request_data = {field: value}
         response = self.request_patch(request_data)
-        self.assertEqual(response.status_code, 400)
+        assert response.status_code == 400
 
 
 @httpretty.activate
@@ -1713,7 +1664,7 @@ class CommentViewSetPartialUpdateTest(DiscussionAPIViewTestMixin, ModuleStoreTes
 class ThreadViewSetRetrieveTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase, ProfileImageTestMixin):
     """Tests for ThreadViewSet Retrieve"""
     def setUp(self):
-        super(ThreadViewSetRetrieveTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.url = reverse("thread-detail", kwargs={"thread_id": "test_thread"})
         self.thread_id = "test_thread"
 
@@ -1721,7 +1672,7 @@ class ThreadViewSetRetrieveTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase,
         self.register_get_user_response(self.user)
         cs_thread = make_minimal_cs_thread({
             "id": self.thread_id,
-            "course_id": text_type(self.course.id),
+            "course_id": str(self.course.id),
             "commentable_id": "test_topic",
             "username": self.user.username,
             "user_id": str(self.user.id),
@@ -1730,17 +1681,14 @@ class ThreadViewSetRetrieveTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase,
         })
         self.register_get_thread_response(cs_thread)
         response = self.client.get(self.url)
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(
-            json.loads(response.content.decode('utf-8')),
-            self.expected_thread_data({"unread_comment_count": 1})
-        )
-        self.assertEqual(httpretty.last_request().method, "GET")
+        assert response.status_code == 200
+        assert json.loads(response.content.decode('utf-8')) == self.expected_thread_data({'unread_comment_count': 1})
+        assert httpretty.last_request().method == 'GET'
 
     def test_retrieve_nonexistent_thread(self):
         self.register_get_thread_error_response(self.thread_id, 404)
         response = self.client.get(self.url)
-        self.assertEqual(response.status_code, 404)
+        assert response.status_code == 404
 
     def test_profile_image_requested_field(self):
         """
@@ -1749,17 +1697,17 @@ class ThreadViewSetRetrieveTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase,
         self.register_get_user_response(self.user)
         cs_thread = make_minimal_cs_thread({
             "id": self.thread_id,
-            "course_id": text_type(self.course.id),
+            "course_id": str(self.course.id),
             "username": self.user.username,
             "user_id": str(self.user.id),
         })
         self.register_get_thread_response(cs_thread)
         self.create_profile_image(self.user, get_profile_image_storage())
         response = self.client.get(self.url, {"requested_fields": "profile_image"})
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
         expected_profile_data = self.get_expected_user_profile(self.user.username)
         response_users = json.loads(response.content.decode('utf-8'))['users']
-        self.assertEqual(expected_profile_data, response_users[self.user.username])
+        assert expected_profile_data == response_users[self.user.username]
 
 
 @httpretty.activate
@@ -1767,7 +1715,7 @@ class ThreadViewSetRetrieveTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase,
 class CommentViewSetRetrieveTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase, ProfileImageTestMixin):
     """Tests for CommentViewSet Retrieve"""
     def setUp(self):
-        super(CommentViewSetRetrieveTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.url = reverse("comment-detail", kwargs={"comment_id": "test_comment"})
         self.thread_id = "test_thread"
         self.comment_id = "test_comment"
@@ -1779,7 +1727,7 @@ class CommentViewSetRetrieveTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase
         return make_minimal_cs_comment({
             "id": comment_id,
             "parent_id": parent_id,
-            "course_id": text_type(self.course.id),
+            "course_id": str(self.course.id),
             "thread_id": self.thread_id,
             "thread_type": "discussion",
             "username": self.user.username,
@@ -1796,7 +1744,7 @@ class CommentViewSetRetrieveTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase
         cs_comment = self.make_comment_data(self.comment_id, None, [cs_comment_child])
         cs_thread = make_minimal_cs_thread({
             "id": self.thread_id,
-            "course_id": text_type(self.course.id),
+            "course_id": str(self.course.id),
             "children": [cs_comment],
         })
         self.register_get_thread_response(cs_thread)
@@ -1825,13 +1773,13 @@ class CommentViewSetRetrieveTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase
         }
 
         response = self.client.get(self.url)
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(json.loads(response.content.decode('utf-8'))['results'][0], expected_response_data)
+        assert response.status_code == 200
+        assert json.loads(response.content.decode('utf-8'))['results'][0] == expected_response_data
 
     def test_retrieve_nonexistent_comment(self):
         self.register_get_comment_error_response(self.comment_id, 404)
         response = self.client.get(self.url)
-        self.assertEqual(response.status_code, 404)
+        assert response.status_code == 404
 
     def test_pagination(self):
         """
@@ -1844,7 +1792,7 @@ class CommentViewSetRetrieveTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase
         cs_comment = self.make_comment_data(self.comment_id, None, [cs_comment_child])
         cs_thread = make_minimal_cs_thread({
             "id": self.thread_id,
-            "course_id": text_type(self.course.id),
+            "course_id": str(self.course.id),
             "children": [cs_comment],
         })
         self.register_get_thread_response(cs_thread)
@@ -1868,7 +1816,7 @@ class CommentViewSetRetrieveTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase
         cs_comment = self.make_comment_data(self.comment_id, None, [cs_comment_child])
         cs_thread = make_minimal_cs_thread({
             'id': self.thread_id,
-            'course_id': text_type(self.course.id),
+            'course_id': str(self.course.id),
             'children': [cs_comment],
         })
         self.register_get_thread_response(cs_thread)
@@ -1876,13 +1824,13 @@ class CommentViewSetRetrieveTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase
         self.create_profile_image(self.user, get_profile_image_storage())
 
         response = self.client.get(self.url, {'requested_fields': 'profile_image'})
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
         response_comments = json.loads(response.content.decode('utf-8'))['results']
 
         for response_comment in response_comments:
             expected_profile_data = self.get_expected_user_profile(response_comment['author'])
             response_users = response_comment['users']
-            self.assertEqual(expected_profile_data, response_users[response_comment['author']])
+            assert expected_profile_data == response_users[response_comment['author']]
 
 
 @ddt.ddt
@@ -1892,7 +1840,7 @@ class CourseDiscussionSettingsAPIViewTest(APITestCase, UrlResetMixin, ModuleStor
     """
     @mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
     def setUp(self):
-        super(CourseDiscussionSettingsAPIViewTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.course = CourseFactory.create(
             org="x",
             course="y",
@@ -1900,7 +1848,7 @@ class CourseDiscussionSettingsAPIViewTest(APITestCase, UrlResetMixin, ModuleStor
             start=datetime.now(UTC),
             discussion_topics={"Test Topic": {"id": "test_topic"}}
         )
-        self.path = reverse('discussion_course_settings', kwargs={'course_id': text_type(self.course.id)})
+        self.path = reverse('discussion_course_settings', kwargs={'course_id': str(self.course.id)})
         self.password = 'edx'
         self.user = UserFactory(username='staff', password=self.password, is_staff=True)
 
@@ -1944,12 +1892,12 @@ class CourseDiscussionSettingsAPIViewTest(APITestCase, UrlResetMixin, ModuleStor
     def _get_expected_response(self):
         """Return the default expected response before any changes to the discussion settings."""
         return {
-            u'always_divide_inline_discussions': False,
-            u'divided_inline_discussions': [],
-            u'divided_course_wide_discussions': [],
-            u'id': 1,
-            u'division_scheme': u'cohort',
-            u'available_division_schemes': [u'cohort']
+            'always_divide_inline_discussions': False,
+            'divided_inline_discussions': [],
+            'divided_course_wide_discussions': [],
+            'id': 1,
+            'division_scheme': 'cohort',
+            'available_division_schemes': ['cohort']
         }
 
     def patch_request(self, data, headers=None):
@@ -1959,14 +1907,14 @@ class CourseDiscussionSettingsAPIViewTest(APITestCase, UrlResetMixin, ModuleStor
     def _assert_current_settings(self, expected_response):
         """Validate the current discussion settings against the expected response."""
         response = self.client.get(self.path)
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
         content = json.loads(response.content.decode('utf-8'))
-        self.assertEqual(content, expected_response)
+        assert content == expected_response
 
     def _assert_patched_settings(self, data, expected_response):
         """Validate the patched settings against the expected response."""
         response = self.patch_request(data)
-        self.assertEqual(response.status_code, 204)
+        assert response.status_code == 204
         self._assert_current_settings(expected_response)
 
     @ddt.data('get', 'patch')
@@ -1974,7 +1922,7 @@ class CourseDiscussionSettingsAPIViewTest(APITestCase, UrlResetMixin, ModuleStor
         """Test and verify that authentication is required for this endpoint."""
         self.client.logout()
         response = getattr(self.client, method)(self.path)
-        self.assertEqual(response.status_code, 401)
+        assert response.status_code == 401
 
     @ddt.data(
         {'is_staff': False, 'get_status': 403, 'put_status': 403},
@@ -1988,12 +1936,12 @@ class CourseDiscussionSettingsAPIViewTest(APITestCase, UrlResetMixin, ModuleStor
         self.client.logout()
 
         response = self.client.get(self.path, **headers)
-        self.assertEqual(response.status_code, get_status)
+        assert response.status_code == get_status
 
         response = self.patch_request(
             {'always_divide_inline_discussions': True}, headers
         )
-        self.assertEqual(response.status_code, put_status)
+        assert response.status_code == put_status
 
     def test_non_existent_course_id(self):
         """Test the response when this endpoint is passed a non-existent course id."""
@@ -2003,14 +1951,14 @@ class CourseDiscussionSettingsAPIViewTest(APITestCase, UrlResetMixin, ModuleStor
                 'course_id': 'a/b/c'
             })
         )
-        self.assertEqual(response.status_code, 404)
+        assert response.status_code == 404
 
     def test_get_settings(self):
         """Test the current discussion settings against the expected response."""
         divided_inline_discussions, divided_course_wide_discussions = self._create_divided_discussions()
         self._login_as_staff()
         response = self.client.get(self.path)
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
         expected_response = self._get_expected_response()
         expected_response['divided_course_wide_discussions'] = [
             topic_name_to_id(self.course, name) for name in divided_course_wide_discussions
@@ -2019,7 +1967,7 @@ class CourseDiscussionSettingsAPIViewTest(APITestCase, UrlResetMixin, ModuleStor
             topic_name_to_id(self.course, name) for name in divided_inline_discussions
         ]
         content = json.loads(response.content.decode('utf-8'))
-        self.assertEqual(content, expected_response)
+        assert content == expected_response
 
     def test_available_schemes(self):
         """Test the available division schemes against the expected response."""
@@ -2045,10 +1993,10 @@ class CourseDiscussionSettingsAPIViewTest(APITestCase, UrlResetMixin, ModuleStor
         """Test the response status code on sending a PATCH request with an empty body or missing fields."""
         self._login_as_staff()
         response = self.patch_request("")
-        self.assertEqual(response.status_code, 400)
+        assert response.status_code == 400
 
         response = self.patch_request({})
-        self.assertEqual(response.status_code, 400)
+        assert response.status_code == 400
 
     @ddt.data(
         {'abc': 123},
@@ -2061,7 +2009,7 @@ class CourseDiscussionSettingsAPIViewTest(APITestCase, UrlResetMixin, ModuleStor
         """Test the response status code on sending a PATCH request with parameters having incorrect types."""
         self._login_as_staff()
         response = self.patch_request(body)
-        self.assertEqual(response.status_code, 400)
+        assert response.status_code == 400
 
     def test_update_always_divide_inline_discussion_settings(self):
         """Test whether the 'always_divide_inline_discussions' setting is updated."""
@@ -2135,7 +2083,7 @@ class CourseDiscussionRolesAPIViewTest(APITestCase, UrlResetMixin, ModuleStoreTe
     """
     @mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
     def setUp(self):
-        super(CourseDiscussionRolesAPIViewTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.course = CourseFactory.create(
             org="x",
             course="y",
@@ -2150,7 +2098,7 @@ class CourseDiscussionRolesAPIViewTest(APITestCase, UrlResetMixin, ModuleStoreTe
     @mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
     def path(self, course_id=None, role=None):
         """Return the URL path to the endpoint based on the provided arguments."""
-        course_id = text_type(self.course.id) if course_id is None else course_id
+        course_id = str(self.course.id) if course_id is None else course_id
         role = 'Moderator' if role is None else role
         return reverse(
             'discussion_course_roles',
@@ -2194,17 +2142,17 @@ class CourseDiscussionRolesAPIViewTest(APITestCase, UrlResetMixin, ModuleStoreTe
         """Test and verify that authentication is required for this endpoint."""
         self.client.logout()
         response = getattr(self.client, method)(self.path())
-        self.assertEqual(response.status_code, 401)
+        assert response.status_code == 401
 
     def test_oauth(self):
         """Test that OAuth authentication works for this endpoint."""
         oauth_headers = self._get_oauth_headers(self.user)
         self.client.logout()
         response = self.client.get(self.path(), **oauth_headers)
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
         body = {'user_id': 'staff', 'action': 'allow'}
         response = self.client.post(self.path(), body, format='json', **oauth_headers)
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
 
     @ddt.data(
         {'username': 'u1', 'is_staff': False, 'expected_status': 403},
@@ -2216,10 +2164,10 @@ class CourseDiscussionRolesAPIViewTest(APITestCase, UrlResetMixin, ModuleStoreTe
         UserFactory(username=username, password='edx', is_staff=is_staff)
         self.client.login(username=username, password='edx')
         response = self.client.get(self.path())
-        self.assertEqual(response.status_code, expected_status)
+        assert response.status_code == expected_status
 
         response = self.client.post(self.path(), {'user_id': username, 'action': 'allow'}, format='json')
-        self.assertEqual(response.status_code, expected_status)
+        assert response.status_code == expected_status
 
     def test_non_existent_course_id(self):
         """Test the response when the endpoint URL contains a non-existent course id."""
@@ -2227,10 +2175,10 @@ class CourseDiscussionRolesAPIViewTest(APITestCase, UrlResetMixin, ModuleStoreTe
         path = self.path(course_id='a/b/c')
         response = self.client.get(path)
 
-        self.assertEqual(response.status_code, 404)
+        assert response.status_code == 404
 
         response = self.client.post(path)
-        self.assertEqual(response.status_code, 404)
+        assert response.status_code == 404
 
     def test_non_existent_course_role(self):
         """Test the response when the endpoint URL contains a non-existent role."""
@@ -2238,10 +2186,10 @@ class CourseDiscussionRolesAPIViewTest(APITestCase, UrlResetMixin, ModuleStoreTe
         path = self.path(role='A')
         response = self.client.get(path)
 
-        self.assertEqual(response.status_code, 400)
+        assert response.status_code == 400
 
         response = self.client.post(path)
-        self.assertEqual(response.status_code, 400)
+        assert response.status_code == 400
 
     @ddt.data(
         {'role': 'Moderator', 'count': 0},
@@ -2259,22 +2207,22 @@ class CourseDiscussionRolesAPIViewTest(APITestCase, UrlResetMixin, ModuleStoreTe
         self._login_as_staff()
         response = self.client.get(self.path(role=role))
 
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
 
         content = json.loads(response.content.decode('utf-8'))
-        self.assertEqual(content['course_id'], 'x/y/z')
-        self.assertEqual(len(content['results']), count)
+        assert content['course_id'] == 'x/y/z'
+        assert len(content['results']) == count
         expected_fields = ('username', 'email', 'first_name', 'last_name', 'group_name')
         for item in content['results']:
             for expected_field in expected_fields:
-                self.assertIn(expected_field, item)
-        self.assertEqual(content['division_scheme'], 'cohort')
+                assert expected_field in item
+        assert content['division_scheme'] == 'cohort'
 
     def test_post_missing_body(self):
         """Test the response with a POST request without a body."""
         self._login_as_staff()
         response = self.client.post(self.path())
-        self.assertEqual(response.status_code, 400)
+        assert response.status_code == 400
 
     @ddt.data(
         {'a': 1},
@@ -2288,10 +2236,10 @@ class CourseDiscussionRolesAPIViewTest(APITestCase, UrlResetMixin, ModuleStoreTe
         """
         self._login_as_staff()
         response = self.client.post(self.path(), body)
-        self.assertEqual(response.status_code, 400)
+        assert response.status_code == 400
 
         response = self.client.post(self.path(), body, format='json')
-        self.assertEqual(response.status_code, 400)
+        assert response.status_code == 400
 
     @ddt.data(
         {'action': 'allow', 'user_in_role': False},
@@ -2309,7 +2257,7 @@ class CourseDiscussionRolesAPIViewTest(APITestCase, UrlResetMixin, ModuleStoreTe
             self._add_users_to_role(users, role)
 
         response = self.post(role, user.username, action)
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
         content = json.loads(response.content.decode('utf-8'))
         assertion = self.assertTrue if action == 'allow' else self.assertFalse
         assertion(any(user.username in x['username'] for x in content['results']))

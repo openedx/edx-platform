@@ -13,7 +13,7 @@ from .transformer import GradesTransformer
 
 
 @python_2_unicode_compatible
-class CourseData(object):
+class CourseData:
     """
     Utility access layer to intelligently get and cache the
     requested course data as long as at least one property is
@@ -23,7 +23,7 @@ class CourseData(object):
     cache during its lifecycle.
     """
     def __init__(self, user, course=None, collected_block_structure=None, structure=None, course_key=None):
-        if not any([course, collected_block_structure, structure, course_key]):
+        if not any((course, collected_block_structure, structure, course_key)):
             raise ValueError(
                 "You must specify one of course, collected_block_structure, structure, or course_key to this method."
             )
@@ -108,15 +108,15 @@ class CourseData(object):
         """
         Return human-readable string representation.
         """
-        return u'Course: course_key: {}'.format(self.course_key)
+        return f'Course: course_key: {self.course_key}'
 
     def full_string(self):  # lint-amnesty, pylint: disable=missing-function-docstring
         if self.effective_structure:
-            return u'Course: course_key: {}, version: {}, edited_on: {}, grading_policy: {}'.format(
+            return 'Course: course_key: {}, version: {}, edited_on: {}, grading_policy: {}'.format(
                 self.course_key, self.version, self.edited_on, self.grading_policy_hash,
             )
         else:
-            return u'Course: course_key: {}, empty course structure'.format(self.course_key)
+            return f'Course: course_key: {self.course_key}, empty course structure'
 
     @property
     def effective_structure(self):

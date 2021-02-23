@@ -69,7 +69,7 @@ class TestOptoutCourseEmails(ModuleStoreTestCase):
         # This is a checkbox, so on the post of opting out (that is, an Un-check of the box),
         # the Post that is sent will not contain 'receive_emails'
         response = self.client.post(url, {'course_id': text_type(self.course.id)})
-        self.assertEqual(json.loads(response.content.decode('utf-8')), {'success': True})
+        assert json.loads(response.content.decode('utf-8')) == {'success': True}
 
         self.client.logout()
 
@@ -83,11 +83,11 @@ class TestOptoutCourseEmails(ModuleStoreTestCase):
             'message': 'test message for all'
         }
         response = self.client.post(self.send_mail_url, test_email)
-        self.assertEqual(json.loads(response.content.decode('utf-8')), self.success_content)
+        assert json.loads(response.content.decode('utf-8')) == self.success_content
 
         # Assert that self.student.email not in mail.to, outbox should only contain "myself" target
-        self.assertEqual(len(mail.outbox), 1)
-        self.assertEqual(mail.outbox[0].to[0], self.instructor.email)
+        assert len(mail.outbox) == 1
+        assert mail.outbox[0].to[0] == self.instructor.email
 
     def test_optout_using_unsubscribe_link_in_email(self):
         """
@@ -100,7 +100,7 @@ class TestOptoutCourseEmails(ModuleStoreTestCase):
         unsubscribe_link = get_unsubscribed_link(self.student.username, text_type(self.course.id))
         response = self.client.post(unsubscribe_link, {'unsubscribe': True})
 
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
         self.assertContains(response, 'You have successfully unsubscribed from')
 
         test_email = {
@@ -110,8 +110,8 @@ class TestOptoutCourseEmails(ModuleStoreTestCase):
             'message': 'test message for all'
         }
         response = self.client.post(self.send_mail_url, test_email)
-        self.assertEqual(json.loads(response.content.decode('utf-8')), self.success_content)
-        self.assertEqual(len(mail.outbox), 1)
+        assert json.loads(response.content.decode('utf-8')) == self.success_content
+        assert len(mail.outbox) == 1
 
     def test_optin_course(self):
         """
@@ -119,11 +119,11 @@ class TestOptoutCourseEmails(ModuleStoreTestCase):
         """
         url = reverse('change_email_settings')
         response = self.client.post(url, {'course_id': text_type(self.course.id), 'receive_emails': 'on'})
-        self.assertEqual(json.loads(response.content.decode('utf-8')), {'success': True})
+        assert json.loads(response.content.decode('utf-8')) == {'success': True}
 
         self.client.logout()
 
-        self.assertTrue(CourseEnrollment.is_enrolled(self.student, self.course.id))
+        assert CourseEnrollment.is_enrolled(self.student, self.course.id)
 
         self.client.login(username=self.instructor.username, password="test")
         self.navigate_to_email_view()
@@ -135,13 +135,13 @@ class TestOptoutCourseEmails(ModuleStoreTestCase):
             'message': 'test message for all'
         }
         response = self.client.post(self.send_mail_url, test_email)
-        self.assertEqual(json.loads(response.content.decode('utf-8')), self.success_content)
+        assert json.loads(response.content.decode('utf-8')) == self.success_content
 
         # Assert that self.student.email in mail.to, along with "myself" target
-        self.assertEqual(len(mail.outbox), 2)
+        assert len(mail.outbox) == 2
         sent_addresses = [message.to[0] for message in mail.outbox]
-        self.assertIn(self.student.email, sent_addresses)
-        self.assertIn(self.instructor.email, sent_addresses)
+        assert self.student.email in sent_addresses
+        assert self.instructor.email in sent_addresses
 
 
 @patch('lms.djangoapps.bulk_email.models.html_to_text', Mock(return_value='Mocking CourseEmail.text_message', autospec=True))  # lint-amnesty, pylint: disable=line-too-long
@@ -173,7 +173,7 @@ class TestACEOptoutCourseEmails(ModuleStoreTestCase):
             post_data['receive_emails'] = 'on'
 
         response = self.client.post(url, post_data)
-        self.assertEqual(json.loads(response.content.decode('utf-8')), {'success': True})
+        assert json.loads(response.content.decode('utf-8')) == {'success': True}
 
     def test_policy_optedout(self):
         """
@@ -182,7 +182,7 @@ class TestACEOptoutCourseEmails(ModuleStoreTestCase):
         self._set_email_optout(True)
 
         channel_mods = self.policy.check(self.create_test_message())
-        self.assertEqual(channel_mods, PolicyResult(deny={ChannelType.EMAIL}))
+        assert channel_mods == PolicyResult(deny={ChannelType.EMAIL})
 
     def create_test_message(self):
         return Message(
@@ -202,7 +202,7 @@ class TestACEOptoutCourseEmails(ModuleStoreTestCase):
         Make sure the policy allows ACE emails if the user is opted-in.
         """
         channel_mods = self.policy.check(self.create_test_message())
-        self.assertEqual(channel_mods, PolicyResult(deny=set()))
+        assert channel_mods == PolicyResult(deny=set())
 
     def test_policy_no_course_id(self):
         """
@@ -211,4 +211,4 @@ class TestACEOptoutCourseEmails(ModuleStoreTestCase):
         message = self.create_test_message()
         message.context = {}
         channel_mods = self.policy.check(message)
-        self.assertEqual(channel_mods, PolicyResult(deny=set()))
+        assert channel_mods == PolicyResult(deny=set())

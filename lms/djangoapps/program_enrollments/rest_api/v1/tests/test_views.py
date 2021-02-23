@@ -5,10 +5,10 @@ Unit tests for ProgramEnrollment views.
 import json
 from collections import OrderedDict, defaultdict
 from datetime import datetime, timedelta
+from unittest import mock
 from uuid import UUID, uuid4
 
 import ddt
-import mock
 from django.conf import settings
 from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.core.cache import cache
@@ -20,12 +20,14 @@ from opaque_keys.edx.keys import CourseKey
 from organizations.tests.factories import OrganizationFactory as LMSOrganizationFactory
 from rest_framework import status
 from rest_framework.test import APITestCase
-from six import text_type
-from six.moves import range, zip
 from social_django.models import UserSocialAuth
 
-from lms.djangoapps.bulk_email.models import BulkEmailFlag, Optout
 from common.djangoapps.course_modes.models import CourseMode
+from common.djangoapps.student.models import CourseEnrollment
+from common.djangoapps.student.roles import CourseStaffRole
+from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
+from common.djangoapps.third_party_auth.tests.factories import SAMLProviderConfigFactory
+from lms.djangoapps.bulk_email.models import BulkEmailFlag, Optout
 from lms.djangoapps.certificates.models import CertificateStatuses
 from lms.djangoapps.certificates.tests.factories import GeneratedCertificateFactory
 from lms.djangoapps.courseware.tests.factories import GlobalStaffFactory, InstructorFactory
@@ -50,10 +52,6 @@ from openedx.core.djangoapps.catalog.tests.factories import (
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.content.course_overviews.tests.factories import CourseOverviewFactory
 from openedx.core.djangolib.testing.utils import CacheIsolationMixin
-from common.djangoapps.student.models import CourseEnrollment
-from common.djangoapps.student.roles import CourseStaffRole
-from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
-from common.djangoapps.third_party_auth.tests.factories import SAMLProviderConfigFactory
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory as ModulestoreCourseFactory
 from xmodule.modulestore.tests.factories import ItemFactory
@@ -102,7 +100,7 @@ class EnrollmentsDataMixin(ProgramCacheMixin):
 
     @classmethod
     def setUpClass(cls):
-        super(EnrollmentsDataMixin, cls).setUpClass()
+        super().setUpClass()
         cls.start_cache_isolation()
         cls.organization_key = "testorg"
         cls.catalog_org = OrganizationFactory(key=cls.organization_key)
@@ -114,7 +112,7 @@ class EnrollmentsDataMixin(ProgramCacheMixin):
         inactive_curriculum_uuid = UUID('cccccccc-1111-2222-3333-444444444444')
 
         catalog_course_id_str = 'course-v1:edX+ToyX'
-        course_run_id_str = '{}+Toy_Course'.format(catalog_course_id_str)
+        course_run_id_str = f'{catalog_course_id_str}+Toy_Course'
         cls.course_id = CourseKey.from_string(course_run_id_str)
         CourseOverviewFactory(id=cls.course_id)
         course_run = CourseRunFactory(key=course_run_id_str)
@@ -137,12 +135,12 @@ class EnrollmentsDataMixin(ProgramCacheMixin):
         cls.global_staff = GlobalStaffFactory(username='global-staff', password=cls.password)
 
     def setUp(self):
-        super(EnrollmentsDataMixin, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.set_program_in_catalog_cache(self.program_uuid, self.program)
 
     @classmethod
     def tearDownClass(cls):
-        super(EnrollmentsDataMixin, cls).tearDownClass()
+        super().tearDownClass()
         cls.end_cache_isolation()
 
     def get_url(self, program_uuid=None, course_id=None):
@@ -219,7 +217,7 @@ class ProgramEnrollmentsGetTests(EnrollmentsDataMixin, APITestCase):
         Helper method for creating program enrollment records.
         """
         for i in range(2):
-            user_key = 'user-{}'.format(i)
+            user_key = f'user-{i}'
             ProgramEnrollmentFactory.create(
                 program_uuid=self.program_uuid,
                 curriculum_uuid=self.curriculum_uuid,
@@ -229,11 +227,11 @@ class ProgramEnrollmentsGetTests(EnrollmentsDataMixin, APITestCase):
             )
 
         for i in range(2, 4):
-            user_key = 'user-{}'.format(i)
+            user_key = f'user-{i}'
             ProgramEnrollmentFactory.create(
                 program_uuid=self.program_uuid,
                 curriculum_uuid=self.curriculum_uuid,
-                user=UserFactory.create(username='student-{}'.format(i), email='email-{}'.format(i)),
+                user=UserFactory.create(username=f'student-{i}', email=f'email-{i}'),
                 external_user_key=user_key,
             )
 
@@ -286,19 +284,19 @@ class ProgramEnrollmentsGetTests(EnrollmentsDataMixin, APITestCase):
             'results': [
                 {
                     'student_key': 'user-0', 'status': 'pending', 'account_exists': False,
-                    'curriculum_uuid': text_type(self.curriculum_uuid), 'username': "", 'email': ""
+                    'curriculum_uuid': str(self.curriculum_uuid), 'username': "", 'email': ""
                 },
                 {
                     'student_key': 'user-1', 'status': 'pending', 'account_exists': False,
-                    'curriculum_uuid': text_type(self.curriculum_uuid), 'username': "", 'email': ""
+                    'curriculum_uuid': str(self.curriculum_uuid), 'username': "", 'email': ""
                 },
                 {
                     'student_key': 'user-2', 'status': 'enrolled', 'account_exists': True,
-                    'curriculum_uuid': text_type(self.curriculum_uuid), 'username': "student-2", 'email': "email-2"
+                    'curriculum_uuid': str(self.curriculum_uuid), 'username': "student-2", 'email': "email-2"
                 },
                 {
                     'student_key': 'user-3', 'status': 'enrolled', 'account_exists': True,
-                    'curriculum_uuid': text_type(self.curriculum_uuid), 'username': "student-3", 'email': "email-3"
+                    'curriculum_uuid': str(self.curriculum_uuid), 'username': "student-3", 'email': "email-3"
                 },
             ],
         }
@@ -315,11 +313,11 @@ class ProgramEnrollmentsGetTests(EnrollmentsDataMixin, APITestCase):
         expected_results = [
             {
                 'student_key': 'user-0', 'status': 'pending', 'account_exists': False,
-                'curriculum_uuid': text_type(self.curriculum_uuid), 'username': "", 'email': ""
+                'curriculum_uuid': str(self.curriculum_uuid), 'username': "", 'email': ""
             },
             {
                 'student_key': 'user-1', 'status': 'pending', 'account_exists': False,
-                'curriculum_uuid': text_type(self.curriculum_uuid), 'username': "", 'email': ""
+                'curriculum_uuid': str(self.curriculum_uuid), 'username': "", 'email': ""
             },
         ]
         assert expected_results == response.data['results']
@@ -334,11 +332,11 @@ class ProgramEnrollmentsGetTests(EnrollmentsDataMixin, APITestCase):
         next_expected_results = [
             {
                 'student_key': 'user-2', 'status': 'enrolled', 'account_exists': True,
-                'curriculum_uuid': text_type(self.curriculum_uuid), 'username': "student-2", 'email': "email-2"
+                'curriculum_uuid': str(self.curriculum_uuid), 'username': "student-2", 'email': "email-2"
             },
             {
                 'student_key': 'user-3', 'status': 'enrolled', 'account_exists': True,
-                'curriculum_uuid': text_type(self.curriculum_uuid), 'username': "student-3", 'email': "email-3"
+                'curriculum_uuid': str(self.curriculum_uuid), 'username': "student-3", 'email': "email-3"
             },
         ]
         assert next_expected_results == next_response.data['results']
@@ -375,12 +373,12 @@ class ProgramEnrollmentsWriteMixin(EnrollmentsDataMixin):
         self.client.logout()
         request_data = [self.student_enrollment('enrolled')]
         response = self.request(self.get_url(), json.dumps(request_data), content_type='application/json')
-        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+        assert response.status_code == status.HTTP_401_UNAUTHORIZED
 
     def test_enrollment_payload_limit(self):
         request_data = [self.student_enrollment('enrolled') for _ in range(MAX_ENROLLMENT_RECORDS + 1)]
         response = self.request(self.get_url(), json.dumps(request_data), content_type='application/json')
-        self.assertEqual(response.status_code, status.HTTP_413_REQUEST_ENTITY_TOO_LARGE)
+        assert response.status_code == status.HTTP_413_REQUEST_ENTITY_TOO_LARGE
 
     def test_duplicate_enrollment(self):
         request_data = [
@@ -390,8 +388,8 @@ class ProgramEnrollmentsWriteMixin(EnrollmentsDataMixin):
 
         response = self.request(self.get_url(), json.dumps(request_data), content_type='application/json')
 
-        self.assertEqual(response.status_code, status.HTTP_422_UNPROCESSABLE_ENTITY)
-        self.assertEqual(response.data, {'001': 'duplicated'})
+        assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
+        assert response.data == {'001': 'duplicated'}
 
     def test_unprocessable_enrollment(self):
         response = self.request(
@@ -399,7 +397,7 @@ class ProgramEnrollmentsWriteMixin(EnrollmentsDataMixin):
             json.dumps([{'status': 'enrolled'}]),
             content_type='application/json'
         )
-        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
 
     def test_program_unauthorized(self):
         student = UserFactory.create(password='password')
@@ -407,7 +405,7 @@ class ProgramEnrollmentsWriteMixin(EnrollmentsDataMixin):
 
         request_data = [self.student_enrollment('enrolled')]
         response = self.request(self.get_url(), json.dumps(request_data), content_type='application/json')
-        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        assert response.status_code == status.HTTP_403_FORBIDDEN
 
     def test_program_not_found(self):
         post_data = [self.student_enrollment('enrolled')]
@@ -417,7 +415,7 @@ class ProgramEnrollmentsWriteMixin(EnrollmentsDataMixin):
             json.dumps(post_data),
             content_type='application/json'
         )
-        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+        assert response.status_code == status.HTTP_404_NOT_FOUND
 
     @ddt.data(
         [{'status': 'pending'}],
@@ -431,7 +429,7 @@ class ProgramEnrollmentsWriteMixin(EnrollmentsDataMixin):
 
         response = self.request(url, json.dumps(enrollments), content_type='application/json')
 
-        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
 
     def test_extra_field(self):
         self.student_enrollment('pending', 'learner-01', prepare_student=True)
@@ -441,7 +439,7 @@ class ProgramEnrollmentsWriteMixin(EnrollmentsDataMixin):
         with _patch_get_users:
             url = self.get_url()
             response = self.request(url, json.dumps(enrollments), content_type='application/json')
-        self.assertEqual(200, response.status_code)
+        assert 200 == response.status_code
         self.assertDictEqual(
             response.data,
             {'learner-01': 'enrolled'}
@@ -456,12 +454,12 @@ class ProgramEnrollmentsPostTests(ProgramEnrollmentsWriteMixin, APITestCase):
     add_uuid = True
 
     def setUp(self):
-        super(ProgramEnrollmentsPostTests, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.request = self.client.post
         self.client.login(username=self.global_staff.username, password='password')
 
     def tearDown(self):
-        super(ProgramEnrollmentsPostTests, self).tearDown()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().tearDown()
         ProgramEnrollment.objects.all().delete()
 
     def test_successful_program_enrollments_no_existing_user(self):
@@ -481,16 +479,16 @@ class ProgramEnrollmentsPostTests(ProgramEnrollmentsWriteMixin, APITestCase):
         with _patch_get_users:
             response = self.client.post(url, json.dumps(post_data), content_type='application/json')
 
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
 
         for i in range(4):
             enrollment = ProgramEnrollment.objects.get(external_user_key=external_user_keys[i])
 
-            self.assertEqual(enrollment.external_user_key, external_user_keys[i])
-            self.assertEqual(enrollment.program_uuid, self.program_uuid)
-            self.assertEqual(enrollment.status, statuses[i])
-            self.assertEqual(enrollment.curriculum_uuid, curriculum_uuids[i])
-            self.assertIsNone(enrollment.user)
+            assert enrollment.external_user_key == external_user_keys[i]
+            assert enrollment.program_uuid == self.program_uuid
+            assert enrollment.status == statuses[i]
+            assert enrollment.curriculum_uuid == curriculum_uuids[i]
+            assert enrollment.user is None
 
     def test_successful_program_enrollments_existing_user(self):
         post_data = [
@@ -510,19 +508,19 @@ class ProgramEnrollmentsPostTests(ProgramEnrollmentsWriteMixin, APITestCase):
             response = self.client.post(
                 url, json.dumps(post_data), content_type='application/json'
             )
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
         enrollment = ProgramEnrollment.objects.get(external_user_key='abc1')
-        self.assertEqual(enrollment.external_user_key, 'abc1')
-        self.assertEqual(enrollment.program_uuid, self.program_uuid)
-        self.assertEqual(enrollment.status, 'enrolled')
-        self.assertEqual(enrollment.curriculum_uuid, self.curriculum_uuid)
-        self.assertEqual(enrollment.user, user)
+        assert enrollment.external_user_key == 'abc1'
+        assert enrollment.program_uuid == self.program_uuid
+        assert enrollment.status == 'enrolled'
+        assert enrollment.curriculum_uuid == self.curriculum_uuid
+        assert enrollment.user == user
 
     def test_program_enrollments_no_idp(self):
         post_data = [
             {
                 'status': 'enrolled',
-                REQUEST_STUDENT_KEY: 'abc{}'.format(i),
+                REQUEST_STUDENT_KEY: f'abc{i}',
                 'curriculum_uuid': str(self.curriculum_uuid)
             } for i in range(3)
         ]
@@ -535,15 +533,15 @@ class ProgramEnrollmentsPostTests(ProgramEnrollmentsWriteMixin, APITestCase):
         ):
             response = self.client.post(url, json.dumps(post_data), content_type='application/json')
 
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
 
         for i in range(3):
-            enrollment = ProgramEnrollment.objects.get(external_user_key='abc{}'.format(i))
+            enrollment = ProgramEnrollment.objects.get(external_user_key=f'abc{i}')
 
-            self.assertEqual(enrollment.program_uuid, self.program_uuid)
-            self.assertEqual(enrollment.status, 'enrolled')
-            self.assertEqual(enrollment.curriculum_uuid, self.curriculum_uuid)
-            self.assertIsNone(enrollment.user)
+            assert enrollment.program_uuid == self.program_uuid
+            assert enrollment.status == 'enrolled'
+            assert enrollment.curriculum_uuid == self.curriculum_uuid
+            assert enrollment.user is None
 
 
 @ddt.ddt
@@ -554,7 +552,7 @@ class ProgramEnrollmentsPatchTests(ProgramEnrollmentsWriteMixin, APITestCase):
     add_uuid = False
 
     def setUp(self):
-        super(ProgramEnrollmentsPatchTests, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.request = self.client.patch
         self.client.login(username=self.global_staff.username, password=self.password)
 
@@ -570,7 +568,7 @@ class ProgramEnrollmentsPatchTests(ProgramEnrollmentsWriteMixin, APITestCase):
     def test_successfully_patched_program_enrollment(self):
         enrollments = {}
         for i in range(4):
-            user_key = 'user-{}'.format(i)
+            user_key = f'user-{i}'
             instance = ProgramEnrollment.objects.create(
                 program_uuid=self.program_uuid,
                 curriculum_uuid=self.curriculum_uuid,
@@ -612,7 +610,7 @@ class ProgramEnrollmentsPatchTests(ProgramEnrollmentsWriteMixin, APITestCase):
     def test_duplicate_enrollment_record_changed(self):
         enrollments = {}
         for i in range(4):
-            user_key = 'user-{}'.format(i)
+            user_key = f'user-{i}'
             instance = ProgramEnrollment.objects.create(
                 program_uuid=self.program_uuid,
                 curriculum_uuid=self.curriculum_uuid,
@@ -643,16 +641,13 @@ class ProgramEnrollmentsPatchTests(ProgramEnrollmentsWriteMixin, APITestCase):
         for user_key, enrollment in enrollments.items():
             assert expected_statuses[user_key] == enrollment.status
 
-        self.assertEqual(response.status_code, status.HTTP_207_MULTI_STATUS)
-        self.assertEqual(response.data, {
-            'user-1': 'duplicated',
-            'user-2': 'enrolled',
-        })
+        assert response.status_code == status.HTTP_207_MULTI_STATUS
+        assert response.data == {'user-1': 'duplicated', 'user-2': 'enrolled'}
 
     def test_partially_valid_enrollment_record_changed(self):
         enrollments = {}
         for i in range(4):
-            user_key = 'user-{}'.format(i)
+            user_key = f'user-{i}'
             instance = ProgramEnrollment.objects.create(
                 program_uuid=self.program_uuid,
                 curriculum_uuid=self.curriculum_uuid,
@@ -683,12 +678,9 @@ class ProgramEnrollmentsPatchTests(ProgramEnrollmentsWriteMixin, APITestCase):
         for user_key, enrollment in enrollments.items():
             assert expected_statuses[user_key] == enrollment.status
 
-        self.assertEqual(response.status_code, status.HTTP_207_MULTI_STATUS)
-        self.assertEqual(response.data, {
-            'user-1': 'invalid-status',
-            'user-3': 'canceled',
-            'user-who-is-not-in-program': 'not-in-program',
-        })
+        assert response.status_code == status.HTTP_207_MULTI_STATUS
+        assert response.data ==\
+               {'user-1': 'invalid-status', 'user-3': 'canceled', 'user-who-is-not-in-program': 'not-in-program'}
 
 
 @ddt.ddt
@@ -699,7 +691,7 @@ class ProgramEnrollmentsPutTests(ProgramEnrollmentsWriteMixin, APITestCase):
     add_uuid = True
 
     def setUp(self):
-        super(ProgramEnrollmentsPutTests, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.request = self.client.put
         self.client.login(username=self.global_staff.username, password='password')
 
@@ -731,10 +723,10 @@ class ProgramEnrollmentsPutTests(ProgramEnrollmentsWriteMixin, APITestCase):
             response = self.client.put(
                 url, json.dumps(request_data), content_type='application/json'
             )
-        self.assertEqual(200, response.status_code)
-        self.assertEqual(5, len(response.data))
+        assert 200 == response.status_code
+        assert 5 == len(response.data)
         for response_status in response.data.values():
-            self.assertEqual(response_status, ProgramStatuses.ENROLLED)
+            assert response_status == ProgramStatuses.ENROLLED
 
     def test_half_create_modify(self):
         request_data = [
@@ -759,10 +751,10 @@ class ProgramEnrollmentsPutTests(ProgramEnrollmentsWriteMixin, APITestCase):
             response = self.client.put(
                 url, json.dumps(request_data), content_type='application/json'
             )
-        self.assertEqual(200, response.status_code)
-        self.assertEqual(4, len(response.data))
+        assert 200 == response.status_code
+        assert 4 == len(response.data)
         for response_status in response.data.values():
-            self.assertEqual(response_status, ProgramStatuses.ENROLLED)
+            assert response_status == ProgramStatuses.ENROLLED
 
 
 @ddt.ddt
@@ -776,16 +768,16 @@ class ProgramCourseEnrollmentsMixin(EnrollmentsDataMixin):
 
     @classmethod
     def setUpClass(cls):
-        super(ProgramCourseEnrollmentsMixin, cls).setUpClass()
+        super().setUpClass()
         cls.start_cache_isolation()
 
     @classmethod
     def tearDownClass(cls):
         cls.end_cache_isolation()
-        super(ProgramCourseEnrollmentsMixin, cls).tearDownClass()
+        super().tearDownClass()
 
     def setUp(self):
-        super(ProgramCourseEnrollmentsMixin, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.default_url = self.get_url(course_id=self.course_id)
         self.log_in_staff()
 
@@ -793,19 +785,19 @@ class ProgramCourseEnrollmentsMixin(EnrollmentsDataMixin):
         self.client.logout()
         request_data = [self.learner_enrollment("learner-1")]
         response = self.request(self.default_url, request_data)
-        self.assertEqual(401, response.status_code)
+        assert 401 == response.status_code
 
     def test_403_forbidden(self):
         self.client.logout()
         self.log_in_non_staff()
         request_data = [self.learner_enrollment("learner-1")]
         response = self.request(self.default_url, request_data)
-        self.assertEqual(403, response.status_code)
+        assert 403 == response.status_code
 
     def test_413_payload_too_large(self):
         request_data = [self.learner_enrollment(str(i)) for i in range(30)]
         response = self.request(self.default_url, request_data)
-        self.assertEqual(413, response.status_code)
+        assert 413 == response.status_code
 
     def test_404_not_found(self):
         nonexistant_course_key = CourseKey.from_string("course-v1:fake+fake+fake")
@@ -817,14 +809,14 @@ class ProgramCourseEnrollmentsMixin(EnrollmentsDataMixin):
         request_data = [self.learner_enrollment("learner-1")]
         for path_404 in paths:
             response = self.request(path_404, request_data)
-            self.assertEqual(404, response.status_code)
+            assert 404 == response.status_code
 
     def test_404_no_curriculum(self):
         with mock.patch.dict(self.program, curricula=[]):
             self.set_program_in_catalog_cache(self.program_uuid, self.program)
             request_data = [self.learner_enrollment("learner-1")]
             response = self.request(self.default_url, request_data)
-            self.assertEqual(404, response.status_code)
+            assert 404 == response.status_code
 
     @ddt.data(
         [{'status': 'active'}],
@@ -835,7 +827,7 @@ class ProgramCourseEnrollmentsMixin(EnrollmentsDataMixin):
     )
     def test_422_unprocessable_entity_bad_data(self, request_data):
         response = self.request(self.default_url, request_data)
-        self.assertEqual(response.status_code, 400)
+        assert response.status_code == 400
 
     @ddt.data(
         [{'status': 'pending'}],
@@ -846,7 +838,7 @@ class ProgramCourseEnrollmentsMixin(EnrollmentsDataMixin):
         request_data = [self.learner_enrollment('learner-1')]
         request_data.extend(bad_records)
         response = self.request(self.default_url, request_data)
-        self.assertEqual(response.status_code, 400)
+        assert response.status_code == 400
 
     def test_extra_field(self):
         enrollment = self.learner_enrollment('learner-1', 'inactive')
@@ -859,7 +851,7 @@ class ProgramCourseEnrollmentsMixin(EnrollmentsDataMixin):
             return_value=mock_write_response,
         ):
             response = self.request(self.default_url, request_data)
-            self.assertEqual(200, response.status_code)
+            assert 200 == response.status_code
             self.assertDictEqual(
                 mock_write_response,
                 response.data,
@@ -880,7 +872,7 @@ class ProgramCourseEnrollmentsMixin(EnrollmentsDataMixin):
             return_value=mock_write_response,
         ):
             response = self.request(self.default_url, request_data)
-            self.assertEqual(207, response.status_code)
+            assert 207 == response.status_code
             self.assertDictEqual(
                 {'learner-1': CourseStatuses.ACTIVE, 'learner-2': CourseStatuses.NOT_IN_PROGRAM},
                 response.data
@@ -977,11 +969,11 @@ class ProgramCourseEnrollmentsGetTests(EnrollmentsDataMixin, APITestCase):
             'results': [
                 {
                     'student_key': 'user-0', 'status': 'active', 'account_exists': True,
-                    'curriculum_uuid': text_type(self.curriculum_uuid), 'course_staff': True
+                    'curriculum_uuid': str(self.curriculum_uuid), 'course_staff': True
                 },
                 {
                     'student_key': 'user-0', 'status': 'inactive', 'account_exists': False,
-                    'curriculum_uuid': text_type(self.other_curriculum_uuid), 'course_staff': True
+                    'curriculum_uuid': str(self.other_curriculum_uuid), 'course_staff': True
                 },
             ],
         }
@@ -998,7 +990,7 @@ class ProgramCourseEnrollmentsGetTests(EnrollmentsDataMixin, APITestCase):
         expected_results = [
             {
                 'student_key': 'user-0', 'status': 'active', 'account_exists': True,
-                'curriculum_uuid': text_type(self.curriculum_uuid), 'course_staff': True
+                'curriculum_uuid': str(self.curriculum_uuid), 'course_staff': True
             },
         ]
         assert expected_results == response.data['results']
@@ -1013,7 +1005,7 @@ class ProgramCourseEnrollmentsGetTests(EnrollmentsDataMixin, APITestCase):
         next_expected_results = [
             {
                 'student_key': 'user-0', 'status': 'inactive', 'account_exists': False,
-                'curriculum_uuid': text_type(self.other_curriculum_uuid), 'course_staff': True
+                'curriculum_uuid': str(self.other_curriculum_uuid), 'course_staff': True
             },
         ]
         assert next_expected_results == next_response.data['results']
@@ -1050,7 +1042,7 @@ class ProgramCourseEnrollmentsPostTests(ProgramCourseEnrollmentsMixin, APITestCa
             return_value=mock_write_response,
         ) as mock_write:
             response = self.request(self.default_url, post_data)
-            self.assertEqual(200, response.status_code)
+            assert 200 == response.status_code
             self.assertDictEqual(
                 mock_write_response,
                 response.data,
@@ -1078,7 +1070,7 @@ class ProgramCourseEnrollmentsPostTests(ProgramCourseEnrollmentsMixin, APITestCa
             return_value=mock_write_response,
         ):
             response = self.request(self.default_url, post_data)
-            self.assertEqual(422, response.status_code)
+            assert 422 == response.status_code
             self.assertDictEqual({'learner-1': CourseStatuses.CONFLICT}, response.data)
 
 
@@ -1095,7 +1087,7 @@ class ProgramCourseEnrollmentsModifyMixin(ProgramCourseEnrollmentsMixin):
             return_value=mock_write_response,
         ) as mock_write:
             response = self.request(self.default_url, request_data)
-            self.assertEqual(200, response.status_code)
+            assert 200 == response.status_code
             self.assertDictEqual(
                 mock_write_response,
                 response.data,
@@ -1134,7 +1126,7 @@ class MultiprogramEnrollmentsTest(EnrollmentsDataMixin, APITestCase):
     """ Tests for the Multiple Program with same course scenario """
     @classmethod
     def setUpClass(cls):
-        super(MultiprogramEnrollmentsTest, cls).setUpClass()
+        super().setUpClass()
         cls.another_curriculum_uuid = UUID('bbbbbbbb-8888-9999-7777-666666666666')
         cls.another_curriculum = CurriculumFactory(
             uuid=cls.another_curriculum_uuid,
@@ -1150,7 +1142,7 @@ class MultiprogramEnrollmentsTest(EnrollmentsDataMixin, APITestCase):
         cls.user = UserFactory.create(username='multiprogram_user')
 
     def setUp(self):
-        super(MultiprogramEnrollmentsTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.set_program_in_catalog_cache(self.another_program_uuid, self.another_program)
         self.client.login(username=self.global_staff.username, password=self.password)
 
@@ -1223,7 +1215,7 @@ class MultiprogramEnrollmentsTest(EnrollmentsDataMixin, APITestCase):
         )
         UserSocialAuth.objects.create(
             user=self.user,
-            uid='{0}:{1}'.format(self.organization_key, self.external_user_key),
+            uid=f'{self.organization_key}:{self.external_user_key}',
             provider=self.organization_key
         )
 
@@ -1232,28 +1224,28 @@ class MultiprogramEnrollmentsTest(EnrollmentsDataMixin, APITestCase):
         response = self.write_program_enrollment(
             'post', self.program_uuid, self.curriculum_uuid, 'enrolled', existing_user
         )
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        assert response.status_code == status.HTTP_200_OK
         response = self.write_program_course_enrollment(
             'post', self.program_uuid, self.course_id, 'active'
         )
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        assert response.status_code == status.HTTP_200_OK
 
         response = self.write_program_enrollment(
             'put', self.program_uuid, self.curriculum_uuid, 'canceled', existing_user
         )
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        assert response.status_code == status.HTTP_200_OK
         response = self.write_program_course_enrollment(
             'put', self.program_uuid, self.course_id, 'inactive'
         )
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        assert response.status_code == status.HTTP_200_OK
 
         response = self.write_program_enrollment(
             'post', self.another_program_uuid, self.another_curriculum_uuid, 'enrolled', existing_user
         )
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        assert response.status_code == status.HTTP_200_OK
         response = self.write_program_course_enrollment(
             'post', self.another_program_uuid, self.course_id, 'active')
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        assert response.status_code == status.HTTP_200_OK
 
         if not existing_user:
             self.link_user_social_auth()
@@ -1261,7 +1253,7 @@ class MultiprogramEnrollmentsTest(EnrollmentsDataMixin, APITestCase):
                 program_enrollment__external_user_key=self.external_user_key,
                 program_enrollment__program_uuid=self.another_program_uuid
             )
-            self.assertIsNotNone(program_course_enrollment.program_enrollment.user)
+            assert program_course_enrollment.program_enrollment.user is not None
 
     @ddt.data(True, False)
     @mock.patch('lms.djangoapps.program_enrollments.api.writing.logger')
@@ -1269,23 +1261,23 @@ class MultiprogramEnrollmentsTest(EnrollmentsDataMixin, APITestCase):
         response = self.write_program_enrollment(
             'post', self.program_uuid, self.curriculum_uuid, 'enrolled', existing_user
         )
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        assert response.status_code == status.HTTP_200_OK
         response = self.write_program_course_enrollment(
             'post', self.program_uuid, self.course_id, 'active'
         )
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        assert response.status_code == status.HTTP_200_OK
 
         response = self.write_program_enrollment(
             'post', self.another_program_uuid, self.another_curriculum_uuid, 'enrolled', existing_user
         )
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        assert response.status_code == status.HTTP_200_OK
         response = self.write_program_course_enrollment(
             'post', self.another_program_uuid, self.course_id, 'active'
         )
-        self.assertEqual(response.status_code, 422)
+        assert response.status_code == 422
         mock_log.error.assert_called_with(
-            u'Detected conflicting active ProgramCourseEnrollment. This is happening on'
-            u' The program_uuid [{}] with course_key [{}] for external_user_key [{}]'.format(
+            'Detected conflicting active ProgramCourseEnrollment. This is happening on'
+            ' The program_uuid [{}] with course_key [{}] for external_user_key [{}]'.format(
                 self.another_program_uuid,
                 self.course_id,
                 self.external_user_key
@@ -1304,28 +1296,28 @@ class ProgramCourseGradesGetTests(EnrollmentsDataMixin, APITestCase):
     def test_401_if_unauthenticated(self):
         url = self.get_url(course_id=self.course_id)
         response = self.client.get(url)
-        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+        assert response.status_code == status.HTTP_401_UNAUTHORIZED
 
     def test_403_if_not_staff(self):
         self.log_in_non_staff()
         url = self.get_url(course_id=self.course_id)
         response = self.client.get(url)
-        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        assert response.status_code == status.HTTP_403_FORBIDDEN
 
     def test_404_not_found(self):
         fake_program_uuid = UUID(self.program_uuid_tmpl.format(99))
         self.log_in_staff()
         url = self.get_url(program_uuid=fake_program_uuid, course_id=self.course_id)
         response = self.client.get(url)
-        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+        assert response.status_code == status.HTTP_404_NOT_FOUND
 
     def test_204_no_grades_to_return(self):
         self.log_in_staff()
         url = self.get_url(course_id=self.course_id)
         with self.patch_grades_with({}):
             response = self.client.get(url)
-        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
-        self.assertEqual(response.data['results'], [])
+        assert response.status_code == status.HTTP_204_NO_CONTENT
+        assert response.data['results'] == []
 
     def test_200_grades_with_no_exceptions(self):
         other_student = UserFactory.create(username='other_student')
@@ -1345,7 +1337,7 @@ class ProgramCourseGradesGetTests(EnrollmentsDataMixin, APITestCase):
         url = self.get_url(course_id=self.course_id)
         with self.patch_grades_with(mock_grades_by_user):
             response = self.client.get(url)
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        assert response.status_code == status.HTTP_200_OK
         expected_results = [
             {
                 'student_key': 'student-key',
@@ -1360,7 +1352,7 @@ class ProgramCourseGradesGetTests(EnrollmentsDataMixin, APITestCase):
                 'letter_grade': 'F',
             },
         ]
-        self.assertEqual(response.data['results'], expected_results)
+        assert response.data['results'] == expected_results
 
     def test_207_grades_with_some_exceptions(self):
         other_student = UserFactory.create(username='other_student')
@@ -1377,7 +1369,7 @@ class ProgramCourseGradesGetTests(EnrollmentsDataMixin, APITestCase):
         url = self.get_url(course_id=self.course_id)
         with self.patch_grades_with(mock_grades_by_user):
             response = self.client.get(url)
-        self.assertEqual(response.status_code, status.HTTP_207_MULTI_STATUS)
+        assert response.status_code == status.HTTP_207_MULTI_STATUS
         expected_results = [
             {
                 'student_key': 'student-key',
@@ -1390,7 +1382,7 @@ class ProgramCourseGradesGetTests(EnrollmentsDataMixin, APITestCase):
                 'letter_grade': 'F',
             },
         ]
-        self.assertEqual(response.data['results'], expected_results)
+        assert response.data['results'] == expected_results
 
     def test_422_grades_with_only_exceptions(self):
         other_student = UserFactory.create(username='other_student')
@@ -1404,7 +1396,7 @@ class ProgramCourseGradesGetTests(EnrollmentsDataMixin, APITestCase):
         url = self.get_url(course_id=self.course_id)
         with self.patch_grades_with(mock_grades_by_user):
             response = self.client.get(url)
-        self.assertEqual(response.status_code, status.HTTP_422_UNPROCESSABLE_ENTITY)
+        assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
         expected_results = [
             {
                 'student_key': 'student-key',
@@ -1415,7 +1407,7 @@ class ProgramCourseGradesGetTests(EnrollmentsDataMixin, APITestCase):
                 'error': 'Timeout',
             },
         ]
-        self.assertEqual(response.data['results'], expected_results)
+        assert response.data['results'] == expected_results
 
     @staticmethod
     def patch_grades_with(grades_by_user):
@@ -1447,7 +1439,7 @@ class UserProgramReadOnlyAccessGetTests(EnrollmentsDataMixin, APITestCase):
 
     @classmethod
     def setUpClass(cls):
-        super(UserProgramReadOnlyAccessGetTests, cls).setUpClass()
+        super().setUpClass()
 
         cls.mock_program_data = [
             {'uuid': cls.program_uuid_tmpl.format(11), 'marketing_slug': 'garbage-program', 'type': 'masters'},
@@ -1511,7 +1503,7 @@ class UserProgramReadOnlyAccessGetTests(EnrollmentsDataMixin, APITestCase):
         """
         course_key_to_create = CourseKey.from_string(course_key_string)
         CourseOverviewFactory(id=course_key_to_create)
-        CourseRunFactory.create(key=text_type(course_key_to_create))
+        CourseRunFactory.create(key=str(course_key_to_create))
         CourseEnrollmentFactory.create(course_id=course_key_to_create, user=user)
         CourseStaffRole(course_key_to_create).add_users(user)
         return course_key_to_create
@@ -1584,7 +1576,7 @@ class UserProgramReadOnlyAccessGetTests(EnrollmentsDataMixin, APITestCase):
             curriculum_uuid=self.curriculum_uuid,
             user=self.student,
             status='enrolled',
-            external_user_key='user-{}'.format(self.student.id),
+            external_user_key=f'user-{self.student.id}',
         )
 
         self.client.login(username=self.student.username, password=self.password)
@@ -1619,7 +1611,7 @@ class UserProgramReadOnlyAccessGetTests(EnrollmentsDataMixin, APITestCase):
                 curriculum_uuid=self.curriculum_uuid,
                 user=self.student,
                 status='pending',
-                external_user_key='user-{}'.format(self.student.id),
+                external_user_key=f'user-{self.student.id}',
             )
         self.client.login(username=self.student.username, password=self.password)
 
@@ -1651,14 +1643,14 @@ class ProgramCourseEnrollmentOverviewGetTests(
 
     @classmethod
     def setUpClass(cls):
-        super(ProgramCourseEnrollmentOverviewGetTests, cls).setUpClass()
+        super().setUpClass()
 
         cls.program_uuid = '00000000-1111-2222-3333-444444444444'
         cls.curriculum_uuid = 'aaaaaaaa-1111-2222-3333-444444444444'
         cls.other_curriculum_uuid = 'bbbbbbbb-1111-2222-3333-444444444444'
 
         cls.course_id = CourseKey.from_string('course-v1:edX+ToyX+Toy_Course')
-        cls.course_run = CourseRunFactory.create(key=text_type(cls.course_id))
+        cls.course_run = CourseRunFactory.create(key=str(cls.course_id))
         cls.course = CourseFactory.create(course_runs=[cls.course_run])
 
         cls.username = 'student'
@@ -1792,7 +1784,7 @@ class ProgramCourseEnrollmentOverviewGetTests(
         Helper method to create another course, an overview for it,
         add it to the program, and re-load the cache.
         """
-        other_course_run = CourseRunFactory.create(key=text_type(course_run_key))
+        other_course_run = CourseRunFactory.create(key=str(course_run_key))
         other_course = CourseFactory.create(course_runs=[other_course_run])
         program['courses'].append(other_course)
         self.set_program_in_catalog_cache(program['uuid'], program)
@@ -1819,20 +1811,20 @@ class ProgramCourseEnrollmentOverviewGetTests(
         self.log_in()
         response_status_code, response_course_runs = self.get_status_and_course_runs()
 
-        self.assertEqual(status.HTTP_200_OK, response_status_code)
+        assert status.HTTP_200_OK == response_status_code
         actual_course_run_ids = {run['course_run_id'] for run in response_course_runs}
-        expected_course_run_ids = {text_type(self.course_id)}
+        expected_course_run_ids = {str(self.course_id)}
         if other_enrollment_active:
-            expected_course_run_ids.add(text_type(other_course_key))
-        self.assertEqual(expected_course_run_ids, actual_course_run_ids)
+            expected_course_run_ids.add(str(other_course_key))
+        assert expected_course_run_ids == actual_course_run_ids
 
     @patch_resume_url
     def test_blank_resume_url_omitted(self, mock_get_resume_urls):
         self.log_in()
         mock_get_resume_urls.return_value = {self.course_id: ''}
         response_status_code, response_course_runs = self.get_status_and_course_runs()
-        self.assertEqual(status.HTTP_200_OK, response_status_code)
-        self.assertNotIn('resume_course_run_url', response_course_runs[0])
+        assert status.HTTP_200_OK == response_status_code
+        assert 'resume_course_run_url' not in response_course_runs[0]
 
     @patch_resume_url
     def test_relative_resume_url_becomes_absolute(self, mock_get_resume_urls):
@@ -1840,10 +1832,10 @@ class ProgramCourseEnrollmentOverviewGetTests(
         resume_url = '/resume-here'
         mock_get_resume_urls.return_value = {self.course_id: resume_url}
         response_status_code, response_course_runs = self.get_status_and_course_runs()
-        self.assertEqual(status.HTTP_200_OK, response_status_code)
+        assert status.HTTP_200_OK == response_status_code
         response_resume_url = response_course_runs[0]['resume_course_run_url']
-        self.assertTrue(response_resume_url.startswith("http://testserver"))
-        self.assertTrue(response_resume_url.endswith(resume_url))
+        assert response_resume_url.startswith('http://testserver')
+        assert response_resume_url.endswith(resume_url)
 
     @patch_resume_url
     def test_absolute_resume_url_stays_absolute(self, mock_get_resume_urls):
@@ -1851,15 +1843,15 @@ class ProgramCourseEnrollmentOverviewGetTests(
         resume_url = 'http://www.resume.com/'
         mock_get_resume_urls.return_value = {self.course_id: resume_url}
         response_status_code, response_course_runs = self.get_status_and_course_runs()
-        self.assertEqual(status.HTTP_200_OK, response_status_code)
+        assert status.HTTP_200_OK == response_status_code
         response_resume_url = response_course_runs[0]['resume_course_run_url']
-        self.assertEqual(response_resume_url, resume_url)
+        assert response_resume_url == resume_url
 
     def test_no_url_without_certificate(self):
         self.log_in()
         response_status_code, response_course_runs = self.get_status_and_course_runs()
-        self.assertEqual(status.HTTP_200_OK, response_status_code)
-        self.assertNotIn('certificate_download_url', response_course_runs[0])
+        assert status.HTTP_200_OK == response_status_code
+        assert 'certificate_download_url' not in response_course_runs[0]
 
     def test_relative_certificate_url_becomes_absolute(self):
         self.log_in()
@@ -1867,10 +1859,10 @@ class ProgramCourseEnrollmentOverviewGetTests(
             download_url=self.relative_certificate_download_url
         )
         response_status_code, response_course_runs = self.get_status_and_course_runs()
-        self.assertEqual(status.HTTP_200_OK, response_status_code)
+        assert status.HTTP_200_OK == response_status_code
         response_url = response_course_runs[0]['certificate_download_url']
-        self.assertTrue(response_url.startswith("http://testserver"))
-        self.assertTrue(response_url.endswith(self.relative_certificate_download_url))
+        assert response_url.startswith('http://testserver')
+        assert response_url.endswith(self.relative_certificate_download_url)
 
     def test_absolute_certificate_url_stays_absolute(self):
         self.log_in()
@@ -1878,15 +1870,15 @@ class ProgramCourseEnrollmentOverviewGetTests(
             download_url=self.absolute_certificate_download_url
         )
         response_status_code, response_course_runs = self.get_status_and_course_runs()
-        self.assertEqual(status.HTTP_200_OK, response_status_code)
+        assert status.HTTP_200_OK == response_status_code
         response_url = response_course_runs[0]['certificate_download_url']
-        self.assertEqual(response_url, self.absolute_certificate_download_url)
+        assert response_url == self.absolute_certificate_download_url
 
     def test_no_due_dates(self):
         self.log_in()
 
         response_status_code, response_course_runs = self.get_status_and_course_runs()
-        self.assertEqual(status.HTTP_200_OK, response_status_code)
+        assert status.HTTP_200_OK == response_status_code
         assert [] == response_course_runs[0]['due_dates']
 
     @ddt.data(
@@ -1943,7 +1935,7 @@ class ProgramCourseEnrollmentOverviewGetTests(
 
             self.log_in()
             response_status_code, response_course_runs = self.get_status_and_course_runs()
-            self.assertEqual(status.HTTP_200_OK, response_status_code)
+            assert status.HTTP_200_OK == response_status_code
 
             block_data = [
                 {
@@ -1975,7 +1967,7 @@ class ProgramCourseEnrollmentOverviewGetTests(
 
             if course_in_progress:
                 for block in block_data:
-                    self.assertIn(block, due_dates)
+                    assert block in due_dates
             else:
                 assert due_dates == []
 
@@ -1990,8 +1982,8 @@ class ProgramCourseEnrollmentOverviewGetTests(
         mock_has_ended.return_value = True
 
         response_status_code, response_course_runs = self.get_status_and_course_runs()
-        self.assertEqual(status.HTTP_200_OK, response_status_code)
-        self.assertEqual(CourseRunProgressStatuses.COMPLETED, response_course_runs[0]['course_run_status'])
+        assert status.HTTP_200_OK == response_status_code
+        assert CourseRunProgressStatuses.COMPLETED == response_course_runs[0]['course_run_status']
 
     @mock.patch.object(CourseOverview, 'has_ended')
     @mock.patch.object(CourseOverview, 'has_started')
@@ -2006,8 +1998,8 @@ class ProgramCourseEnrollmentOverviewGetTests(
         mock_has_ended.return_value = False
 
         response_status_code, response_course_runs = self.get_status_and_course_runs()
-        self.assertEqual(status.HTTP_200_OK, response_status_code)
-        self.assertEqual(CourseRunProgressStatuses.IN_PROGRESS, response_course_runs[0]['course_run_status'])
+        assert status.HTTP_200_OK == response_status_code
+        assert CourseRunProgressStatuses.IN_PROGRESS == response_course_runs[0]['course_run_status']
 
     @mock.patch.object(CourseOverview, 'has_ended')
     @mock.patch.object(CourseOverview, 'has_started')
@@ -2022,8 +2014,8 @@ class ProgramCourseEnrollmentOverviewGetTests(
         mock_has_ended.return_value = False
 
         response_status_code, response_course_runs = self.get_status_and_course_runs()
-        self.assertEqual(status.HTTP_200_OK, response_status_code)
-        self.assertEqual(CourseRunProgressStatuses.UPCOMING, response_course_runs[0]['course_run_status'])
+        assert status.HTTP_200_OK == response_status_code
+        assert CourseRunProgressStatuses.UPCOMING == response_course_runs[0]['course_run_status']
 
     @mock.patch.object(CourseOverview, 'has_ended')
     def test_course_run_status_self_paced_completed(self, mock_has_ended):
@@ -2037,8 +2029,8 @@ class ProgramCourseEnrollmentOverviewGetTests(
         mock_has_ended.return_value = True
 
         response_status_code, response_course_runs = self.get_status_and_course_runs()
-        self.assertEqual(status.HTTP_200_OK, response_status_code)
-        self.assertEqual(CourseRunProgressStatuses.COMPLETED, response_course_runs[0]['course_run_status'])
+        assert status.HTTP_200_OK == response_status_code
+        assert CourseRunProgressStatuses.COMPLETED == response_course_runs[0]['course_run_status']
 
         # course run has not ended and user has earned a passing certificate more than 30 days ago
         certificate = self.create_generated_certificate()
@@ -2047,15 +2039,15 @@ class ProgramCourseEnrollmentOverviewGetTests(
         mock_has_ended.return_value = False
 
         response_status_code, response_course_runs = self.get_status_and_course_runs()
-        self.assertEqual(status.HTTP_200_OK, response_status_code)
-        self.assertEqual(CourseRunProgressStatuses.COMPLETED, response_course_runs[0]['course_run_status'])
+        assert status.HTTP_200_OK == response_status_code
+        assert CourseRunProgressStatuses.COMPLETED == response_course_runs[0]['course_run_status']
 
         # course run has ended and user has earned a passing certificate
         mock_has_ended.return_value = True
 
         response_status_code, response_course_runs = self.get_status_and_course_runs()
-        self.assertEqual(status.HTTP_200_OK, response_status_code)
-        self.assertEqual(CourseRunProgressStatuses.COMPLETED, response_course_runs[0]['course_run_status'])
+        assert status.HTTP_200_OK == response_status_code
+        assert CourseRunProgressStatuses.COMPLETED == response_course_runs[0]['course_run_status']
 
     @mock.patch.object(CourseOverview, 'has_ended')
     @mock.patch.object(CourseOverview, 'has_started')
@@ -2071,8 +2063,8 @@ class ProgramCourseEnrollmentOverviewGetTests(
         mock_has_ended.return_value = False
 
         response_status_code, response_course_runs = self.get_status_and_course_runs()
-        self.assertEqual(status.HTTP_200_OK, response_status_code)
-        self.assertEqual(CourseRunProgressStatuses.IN_PROGRESS, response_course_runs[0]['course_run_status'])
+        assert status.HTTP_200_OK == response_status_code
+        assert CourseRunProgressStatuses.IN_PROGRESS == response_course_runs[0]['course_run_status']
 
         # course run has not ended and user has earned a passing certificate fewer than 30 days ago
         certificate = self.create_generated_certificate()
@@ -2080,8 +2072,8 @@ class ProgramCourseEnrollmentOverviewGetTests(
         certificate.save()
 
         response_status_code, response_course_runs = self.get_status_and_course_runs()
-        self.assertEqual(status.HTTP_200_OK, response_status_code)
-        self.assertEqual(CourseRunProgressStatuses.IN_PROGRESS, response_course_runs[0]['course_run_status'])
+        assert status.HTTP_200_OK == response_status_code
+        assert CourseRunProgressStatuses.IN_PROGRESS == response_course_runs[0]['course_run_status']
 
     @mock.patch.object(CourseOverview, 'has_ended')
     @mock.patch.object(CourseOverview, 'has_started')
@@ -2097,83 +2089,83 @@ class ProgramCourseEnrollmentOverviewGetTests(
         mock_has_ended.return_value = False
 
         response_status_code, response_course_runs = self.get_status_and_course_runs()
-        self.assertEqual(status.HTTP_200_OK, response_status_code)
-        self.assertEqual(CourseRunProgressStatuses.UPCOMING, response_course_runs[0]['course_run_status'])
+        assert status.HTTP_200_OK == response_status_code
+        assert CourseRunProgressStatuses.UPCOMING == response_course_runs[0]['course_run_status']
 
     def test_course_run_url(self):
         self.log_in()
 
-        course_run_url = 'http://testserver/courses/{}/course/'.format(text_type(self.course_id))
+        course_run_url = 'http://testserver/courses/{}/course/'.format(str(self.course_id))
 
         response_status_code, response_course_runs = self.get_status_and_course_runs()
-        self.assertEqual(status.HTTP_200_OK, response_status_code)
-        self.assertEqual(course_run_url, response_course_runs[0]['course_run_url'])
+        assert status.HTTP_200_OK == response_status_code
+        assert course_run_url == response_course_runs[0]['course_run_url']
 
     def test_course_run_dates(self):
         self.log_in()
 
         response_status_code, response_course_runs = self.get_status_and_course_runs()
-        self.assertEqual(status.HTTP_200_OK, response_status_code)
+        assert status.HTTP_200_OK == response_status_code
 
         course_run_overview = response_course_runs[0]
 
-        self.assertEqual(course_run_overview['start_date'], '2018-12-31T00:00:00Z')
-        self.assertEqual(course_run_overview['end_date'], '2019-01-02T00:00:00Z')
+        assert course_run_overview['start_date'] == '2018-12-31T00:00:00Z'
+        assert course_run_overview['end_date'] == '2019-01-02T00:00:00Z'
 
         # course run end date may not exist
         self.course_overview.end = None
         self.course_overview.save()
 
         response_status_code, response_course_runs = self.get_status_and_course_runs()
-        self.assertEqual(status.HTTP_200_OK, response_status_code)
-        self.assertEqual(response_course_runs[0]['end_date'], None)
+        assert status.HTTP_200_OK == response_status_code
+        assert response_course_runs[0]['end_date'] is None
 
     def test_course_run_id_and_display_name(self):
         self.log_in()
 
         response_status_code, response_course_runs = self.get_status_and_course_runs()
-        self.assertEqual(status.HTTP_200_OK, response_status_code)
+        assert status.HTTP_200_OK == response_status_code
 
         course_run_overview = response_course_runs[0]
 
-        self.assertEqual(course_run_overview['course_run_id'], text_type(self.course_id))
-        self.assertEqual(course_run_overview['display_name'], "{} Course".format(text_type(self.course_id)))
+        assert course_run_overview['course_run_id'] == str(self.course_id)
+        assert course_run_overview['display_name'] == '{} Course'.format(str(self.course_id))
 
     def test_emails_enabled(self):
         self.log_in()
 
         # by default, BulkEmailFlag is not enabled, so 'emails_enabled' won't be in the response
         response_status_code, response_course_runs = self.get_status_and_course_runs()
-        self.assertEqual(status.HTTP_200_OK, response_status_code)
-        self.assertNotIn('emails_enabled', response_course_runs[0])
+        assert status.HTTP_200_OK == response_status_code
+        assert 'emails_enabled' not in response_course_runs[0]
 
         with mock.patch.object(BulkEmailFlag, 'feature_enabled', return_value=True):
             response_status_code, response_course_runs = self.get_status_and_course_runs()
-            self.assertEqual(status.HTTP_200_OK, response_status_code)
-            self.assertTrue(response_course_runs[0]['emails_enabled'])
+            assert status.HTTP_200_OK == response_status_code
+            assert response_course_runs[0]['emails_enabled']
 
             Optout.objects.create(
                 user=self.student,
                 course_id=self.course_id
             )
             response_status_code, response_course_runs = self.get_status_and_course_runs()
-            self.assertEqual(status.HTTP_200_OK, response_status_code)
-            self.assertFalse(response_course_runs[0]['emails_enabled'])
+            assert status.HTTP_200_OK == response_status_code
+            assert not response_course_runs[0]['emails_enabled']
 
     def test_micromasters_title(self):
         self.log_in()
 
         response_status_code, response_course_runs = self.get_status_and_course_runs()
-        self.assertEqual(status.HTTP_200_OK, response_status_code)
-        self.assertNotIn('micromasters_title', response_course_runs[0])
+        assert status.HTTP_200_OK == response_status_code
+        assert 'micromasters_title' not in response_course_runs[0]
 
         self.program['type'] = 'MicroMasters'
         # update the program in the catalog cache
         self.set_program_in_catalog_cache(self.program_uuid, self.program)
 
         response_status_code, response_course_runs = self.get_status_and_course_runs()
-        self.assertEqual(status.HTTP_200_OK, response_status_code)
-        self.assertIn('micromasters_title', response_course_runs[0])
+        assert status.HTTP_200_OK == response_status_code
+        assert 'micromasters_title' in response_course_runs[0]
 
 
 @ddt.ddt
@@ -2371,7 +2363,7 @@ class EnrollmentDataResetViewTests(ProgramCacheMixin, APITestCase):
     )
 
     def setUp(self):
-        super(EnrollmentDataResetViewTests, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.start_cache_isolation()
 
         self.organization = LMSOrganizationFactory(short_name='uox')
@@ -2389,12 +2381,12 @@ class EnrollmentDataResetViewTests(ProgramCacheMixin, APITestCase):
 
     def tearDown(self):
         self.end_cache_isolation()
-        super(EnrollmentDataResetViewTests, self).tearDown()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().tearDown()
 
     @patch_call_command
     def test_feature_disabled_by_default(self, mock_call_command):
         response = self.request(self.organization.short_name)
-        self.assertEqual(response.status_code, status.HTTP_501_NOT_IMPLEMENTED)
+        assert response.status_code == status.HTTP_501_NOT_IMPLEMENTED
         mock_call_command.assert_has_calls([])
 
     @override_settings(FEATURES=FEATURES_WITH_ENABLED)
@@ -2403,7 +2395,7 @@ class EnrollmentDataResetViewTests(ProgramCacheMixin, APITestCase):
         student = UserFactory.create(username='student', password='password')
         self.client.login(username=student.username, password='password')
         response = self.request(self.organization.short_name)
-        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        assert response.status_code == status.HTTP_403_FORBIDDEN
         mock_call_command.assert_has_calls([])
 
     @override_settings(FEATURES=FEATURES_WITH_ENABLED)
@@ -2413,7 +2405,7 @@ class EnrollmentDataResetViewTests(ProgramCacheMixin, APITestCase):
         self.set_org_in_catalog_cache(self.organization, programs)
 
         response = self.request(self.organization.short_name)
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        assert response.status_code == status.HTTP_200_OK
         mock_call_command.assert_has_calls([
             mock.call(self.reset_users_cmd, self.provider.slug, force=True),
             mock.call(self.reset_enrollments_cmd, ','.join(programs), force=True),
@@ -2427,7 +2419,7 @@ class EnrollmentDataResetViewTests(ProgramCacheMixin, APITestCase):
         self.set_org_in_catalog_cache(organization, programs)
 
         response = self.request(organization.short_name)
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        assert response.status_code == status.HTTP_200_OK
         mock_call_command.assert_has_calls([
             mock.call(self.reset_enrollments_cmd, ','.join(programs), force=True),
         ])
@@ -2436,7 +2428,7 @@ class EnrollmentDataResetViewTests(ProgramCacheMixin, APITestCase):
     @patch_call_command
     def test_organization_not_found(self, mock_call_command):
         response = self.request('yyz')
-        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+        assert response.status_code == status.HTTP_404_NOT_FOUND
         mock_call_command.assert_has_calls([])
 
     @override_settings(FEATURES=FEATURES_WITH_ENABLED)
@@ -2446,7 +2438,7 @@ class EnrollmentDataResetViewTests(ProgramCacheMixin, APITestCase):
         self.set_org_in_catalog_cache(self.organization, programs)
 
         response = self.request(self.organization.short_name)
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        assert response.status_code == status.HTTP_200_OK
         mock_call_command.assert_has_calls([
             mock.call(self.reset_users_cmd, self.provider.slug, force=True),
         ])
@@ -2458,5 +2450,5 @@ class EnrollmentDataResetViewTests(ProgramCacheMixin, APITestCase):
             reverse('programs_api:v1:reset_enrollment_data'),
             format='json',
         )
-        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
         mock_call_command.assert_has_calls([])

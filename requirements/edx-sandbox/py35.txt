@@ -20,7 +20,7 @@ matplotlib==2.2.4         # via -c requirements/edx-sandbox/../constraints.txt, 
 mpmath==1.2.1             # via sympy
 networkx==2.2             # via -r requirements/edx-sandbox/py35.in
 nltk==3.5                 # via -r requirements/edx-sandbox/shared.txt, chem
-numpy==1.16.5             # via -c requirements/edx-sandbox/../constraints.txt, -r requirements/edx-sandbox/py35.in, chem, matplotlib, openedx-calc, scipy
+numpy==1.16.5             # via -r requirements/edx-sandbox/py35.in, chem, matplotlib, openedx-calc
 openedx-calc==1.0.9       # via -r requirements/edx-sandbox/py35.in
 pycparser==2.20           # via -r requirements/edx-sandbox/shared.txt, cffi
 pyparsing==2.2.0          # via -r requirements/edx-sandbox/py35.in, chem, matplotlib, openedx-calc
@@ -28,10 +28,10 @@ python-dateutil==2.4.0    # via -c requirements/edx-sandbox/../constraints.txt, 
 pytz==2021.1              # via matplotlib
 random2==1.0.1            # via -r requirements/edx-sandbox/py35.in
 regex==2020.11.13         # via -r requirements/edx-sandbox/shared.txt, nltk
-scipy==1.2.1              # via -c requirements/edx-sandbox/../constraints.txt, -r requirements/edx-sandbox/py35.in, chem, openedx-calc
+scipy==1.2.1              # via -r requirements/edx-sandbox/py35.in, chem, openedx-calc
 six==1.15.0               # via -r requirements/edx-sandbox/shared.txt, chem, cryptography, cycler, matplotlib, openedx-calc, python-dateutil
 sympy==1.6.2              # via -c requirements/edx-sandbox/../constraints.txt, -r requirements/edx-sandbox/py35.in, symmath
-tqdm==4.56.2              # via -r requirements/edx-sandbox/shared.txt, nltk
+tqdm==4.57.0              # via -r requirements/edx-sandbox/shared.txt, nltk
 
 # The following packages are considered to be unsafe in a requirements file:
 # setuptools

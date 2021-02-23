@@ -141,7 +141,7 @@ def get_course_outline_block_tree(request, course_id, user=None, allow_start_dat
         is_scored = block.get('has_score', False) and block.get('weight', 1) > 0
         # Use a list comprehension to force the recursion over all children, rather than just stopping
         # at the first child that is scored.
-        children_scored = any([recurse_mark_scored(child) for child in block.get('children', [])])
+        children_scored = any(recurse_mark_scored(child) for child in block.get('children', []))
         if is_scored or children_scored:
             block['scored'] = True
             return True
@@ -205,17 +205,19 @@ def get_course_outline_block_tree(request, course_id, user=None, allow_start_dat
         nav_depth=3,
         requested_fields=[
             'children',
-            'display_name',
-            'type',
-            'start',
             'contains_gated_content',
+            'display_name',
             'due',
+            'effort_activities',
+            'effort_time',
+            'format',
             'graded',
             'has_score',
-            'weight',
-            'special_exam_info',
             'show_gated_sections',
-            'format'
+            'special_exam_info',
+            'start',
+            'type',
+            'weight',
         ],
         block_types_filter=block_types_filter,
         allow_start_dates_in_future=allow_start_dates_in_future,

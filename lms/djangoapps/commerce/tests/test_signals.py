@@ -6,7 +6,7 @@ Tests for signal handling in commerce djangoapp.
 
 import base64
 import json
-
+import pytest
 import ddt
 import httpretty
 import mock
@@ -79,7 +79,7 @@ class TestRefundSignal(TestCase):
         """
         with mock.patch('lms.djangoapps.commerce.signals.refund_seat') as mock_refund_seat:
             self.send_signal()
-            self.assertFalse(mock_refund_seat.called)
+            assert not mock_refund_seat.called
 
     @mock.patch('lms.djangoapps.commerce.signals.refund_seat')
     def test_receiver(self, mock_refund_seat):
@@ -92,14 +92,14 @@ class TestRefundSignal(TestCase):
         of any reliable / sane way to do this.
         """
         self.send_signal()
-        self.assertTrue(mock_refund_seat.called)
-        self.assertEqual(mock_refund_seat.call_args[0], (self.course_enrollment,))
+        assert mock_refund_seat.called
+        assert mock_refund_seat.call_args[0] == (self.course_enrollment,)
 
         # if the course_enrollment is not refundable, we should not try to initiate a refund.
         mock_refund_seat.reset_mock()
         self.course_enrollment.refundable = mock.Mock(return_value=False)
         self.send_signal()
-        self.assertFalse(mock_refund_seat.called)
+        assert not mock_refund_seat.called
 
     @mock.patch('lms.djangoapps.commerce.signals.refund_seat')
     @mock.patch('lms.djangoapps.commerce.signals.get_request_user', return_value=None)
@@ -109,28 +109,28 @@ class TestRefundSignal(TestCase):
         """
         # no HTTP request/user: auth to commerce service as the unenrolled student.
         self.send_signal()
-        self.assertTrue(mock_refund_seat.called)
-        self.assertEqual(mock_refund_seat.call_args[0], (self.course_enrollment,))
+        assert mock_refund_seat.called
+        assert mock_refund_seat.call_args[0] == (self.course_enrollment,)
 
         # HTTP user is the student: auth to commerce service as the unenrolled student.
         mock_get_request_user.return_value = self.student
         mock_refund_seat.reset_mock()
         self.send_signal()
-        self.assertTrue(mock_refund_seat.called)
-        self.assertEqual(mock_refund_seat.call_args[0], (self.course_enrollment,))
+        assert mock_refund_seat.called
+        assert mock_refund_seat.call_args[0] == (self.course_enrollment,)
 
         # HTTP user is another user: auth to commerce service as the requester.
         mock_get_request_user.return_value = self.requester
         mock_refund_seat.reset_mock()
         self.send_signal()
-        self.assertTrue(mock_refund_seat.called)
-        self.assertEqual(mock_refund_seat.call_args[0], (self.course_enrollment,))
+        assert mock_refund_seat.called
+        assert mock_refund_seat.call_args[0] == (self.course_enrollment,)
 
         # HTTP user is another server (AnonymousUser): do not try to initiate a refund at all.
         mock_get_request_user.return_value = AnonymousUser()
         mock_refund_seat.reset_mock()
         self.send_signal()
-        self.assertFalse(mock_refund_seat.called)
+        assert not mock_refund_seat.called
 
     @mock.patch('lms.djangoapps.commerce.signals.log.exception')
     def test_error_logging(self, mock_log_exception):
@@ -140,7 +140,7 @@ class TestRefundSignal(TestCase):
         """
         with mock_create_refund(status=500):
             self.send_signal()
-            self.assertTrue(mock_log_exception.called)
+            assert mock_log_exception.called
 
     @mock.patch('lms.djangoapps.commerce.utils._send_refund_notification')
     def test_notification_when_approval_fails(self, mock_send_notification):
@@ -154,7 +154,7 @@ class TestRefundSignal(TestCase):
             with mock_process_refund(refund_id, reset_on_exit=False):
                 with mock_process_refund(failed_refund_id, status=500, reset_on_exit=False):
                     self.send_signal()
-                    self.assertTrue(mock_send_notification.called)
+                    assert mock_send_notification.called
                     mock_send_notification.assert_called_with(self.course_enrollment.user, [failed_refund_id])
 
     @mock.patch('lms.djangoapps.commerce.utils._send_refund_notification')
@@ -168,7 +168,7 @@ class TestRefundSignal(TestCase):
 
         with mock_create_refund(status=201, response=[refund_id]):
             self.send_signal()
-            self.assertTrue(mock_send_notification.called)
+            assert mock_send_notification.called
             mock_send_notification.assert_called_with(self.course_enrollment.user, [refund_id])
 
     @mock.patch('lms.djangoapps.commerce.utils._send_refund_notification')
@@ -181,7 +181,7 @@ class TestRefundSignal(TestCase):
         with mock_create_refund(status=201, response=[refund_id]):
             with mock_process_refund(refund_id, reset_on_exit=False):
                 self.send_signal()
-                self.assertFalse(mock_send_notification.called)
+                assert not mock_send_notification.called
 
                 last_request = httpretty.last_request()
                 self.assertDictEqual(json.loads(last_request.body.decode('utf8')), {'action': 'approve_payment_only'})
@@ -194,7 +194,7 @@ class TestRefundSignal(TestCase):
         """
         with mock_create_refund(status=200, response=[]):
             self.send_signal()
-            self.assertFalse(mock_send_notification.called)
+            assert not mock_send_notification.called
 
     @mock.patch('lms.djangoapps.commerce.utils._send_refund_notification')
     @ddt.data(
@@ -215,7 +215,7 @@ class TestRefundSignal(TestCase):
         self.course_enrollment.mode = mode
         with mock_create_refund(status=200, response=[1, 2, 3]):
             self.send_signal()
-            self.assertFalse(mock_send_notification.called)
+            assert not mock_send_notification.called
 
     @mock.patch('lms.djangoapps.commerce.utils._send_refund_notification', side_effect=Exception("Splat!"))
     @mock.patch('lms.djangoapps.commerce.utils.log.warning')
@@ -226,8 +226,8 @@ class TestRefundSignal(TestCase):
         """
         with mock_create_refund(status=200, response=[1, 2, 3]):
             self.send_signal()
-            self.assertTrue(mock_send_notification.called)
-            self.assertTrue(mock_log_warning.called)
+            assert mock_send_notification.called
+            assert mock_log_warning.called
 
     @mock.patch('openedx.core.djangoapps.theming.helpers.is_request_in_themed_site', return_value=True)
     def test_notification_themed_site(self, mock_is_request_in_themed_site):  # pylint: disable=unused-argument
@@ -235,7 +235,7 @@ class TestRefundSignal(TestCase):
         Ensure the notification function raises an Exception if used in the
         context of themed site.
         """
-        with self.assertRaises(NotImplementedError):
+        with pytest.raises(NotImplementedError):
             _send_refund_notification(self.course_enrollment.user, [1, 2, 3])
 
     @ddt.data('email@example.com', 'üñîcode.email@example.com')
@@ -274,8 +274,8 @@ class TestRefundSignal(TestCase):
         """ Verify the Zendesk API is not called if the settings are not all set. """
         with mock.patch('requests.post') as mock_post:
             success = self.call_create_zendesk_ticket()
-            self.assertFalse(success)
-            self.assertFalse(mock_post.called)
+            assert not success
+            assert not mock_post.called
 
     def test_create_zendesk_ticket_request_error(self):
         """
@@ -285,8 +285,8 @@ class TestRefundSignal(TestCase):
         """
         with mock.patch('requests.post', side_effect=Timeout) as mock_post:
             success = self.call_create_zendesk_ticket()
-            self.assertFalse(success)
-            self.assertTrue(mock_post.called)
+            assert not success
+            assert mock_post.called
 
     @httpretty.activate
     def test_create_zendesk_ticket(self):
@@ -299,7 +299,7 @@ class TestRefundSignal(TestCase):
         body = 'I want a refund!'
         tags = ['auto_refund']
         ticket_created = self.call_create_zendesk_ticket(name, email, subject, body, tags)
-        self.assertTrue(ticket_created)
+        assert ticket_created
         last_request = httpretty.last_request()
 
         # Verify the headers

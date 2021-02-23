@@ -4,22 +4,21 @@ Tests for reset_grades management command.
 
 
 from datetime import datetime
+from unittest.mock import MagicMock, patch
 
 import ddt
-import six
 from django.conf import settings
-from mock import MagicMock, patch
 from opaque_keys.edx.keys import CourseKey
 from pytz import utc
 
+from common.djangoapps.track.event_transaction_utils import get_event_transaction_id
+from common.djangoapps.util.date_utils import to_timestamp
 from lms.djangoapps.grades.constants import ScoreDatabaseTableEnum
 from lms.djangoapps.grades.management.commands import recalculate_subsection_grades
 from lms.djangoapps.grades.tests.test_tasks import HasCourseWithProblemsMixin
-from common.djangoapps.track.event_transaction_utils import get_event_transaction_id
-from common.djangoapps.util.date_utils import to_timestamp
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 
-DATE_FORMAT = u"%Y-%m-%d %H:%M"
+DATE_FORMAT = "%Y-%m-%d %H:%M"
 
 
 @patch.dict(settings.FEATURES, {'PERSISTENT_GRADES_ENABLED_FOR_ALL_TESTS': False})
@@ -30,7 +29,7 @@ class TestRecalculateSubsectionGrades(HasCourseWithProblemsMixin, ModuleStoreTes
     """
 
     def setUp(self):
-        super(TestRecalculateSubsectionGrades, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.command = recalculate_subsection_grades.Command()
 
     @patch('lms.djangoapps.grades.management.commands.recalculate_subsection_grades.Submission')
@@ -67,13 +66,13 @@ class TestRecalculateSubsectionGrades(HasCourseWithProblemsMixin, ModuleStoreTes
         self.command.handle(modified_start='2016-08-25 16:42', modified_end='2018-08-25 16:44')
         kwargs = {
             "user_id": "ID",
-            "course_id": u'course-v1:x+y+z',
-            "usage_id": u'abc',
+            "course_id": 'course-v1:x+y+z',
+            "usage_id": 'abc',
             "only_if_higher": False,
             "expected_modified_time": to_timestamp(utc.localize(datetime.strptime('2016-08-23 16:43', DATE_FORMAT))),
             "score_deleted": False,
-            "event_transaction_id": six.text_type(get_event_transaction_id()),
-            "event_transaction_type": u'edx.grades.problem.submitted',
+            "event_transaction_id": str(get_event_transaction_id()),
+            "event_transaction_type": 'edx.grades.problem.submitted',
             "score_db_table": score_db_table,
         }
 

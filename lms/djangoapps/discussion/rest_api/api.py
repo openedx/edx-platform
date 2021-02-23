@@ -7,7 +7,6 @@ import itertools
 from collections import defaultdict
 from enum import Enum
 
-import six
 from django.core.exceptions import ValidationError
 from django.http import Http404
 from django.urls import reverse
@@ -64,11 +63,12 @@ from openedx.core.djangoapps.django_comment_common.signals import (
 )
 from openedx.core.djangoapps.django_comment_common.utils import get_course_discussion_settings
 from openedx.core.djangoapps.user_api.accounts.api import get_account_settings
-from openedx.core.djangoapps.user_api.accounts.views import AccountViewSet  # lint-amnesty, pylint: disable=unused-import
+from openedx.core.djangoapps.user_api.accounts.views import \
+    AccountViewSet  # lint-amnesty, pylint: disable=unused-import
 from openedx.core.lib.exceptions import CourseNotFoundError, DiscussionNotFoundError, PageNotFoundError
 
 
-class DiscussionTopic(object):
+class DiscussionTopic:
     """
     Class for discussion topic structure
     """
@@ -103,7 +103,7 @@ def _get_course(course_key, user):
         # Raise course not found if the user cannot access the course
         # since it doesn't make sense to redirect an API.
         raise CourseNotFoundError("Course not found.")  # lint-amnesty, pylint: disable=raise-missing-from
-    if not any([tab.type == 'discussion' and tab.is_enabled(course, user) for tab in course.tabs]):
+    if not any(tab.type == 'discussion' and tab.is_enabled(course, user) for tab in course.tabs):
         raise DiscussionDisabledError("Discussion is disabled for the course.")
     return course
 
@@ -177,7 +177,7 @@ def get_thread_list_url(request, course_key, topic_id_list=None, following=False
     """
     path = reverse("thread-list")
     query_list = (
-        [("course_id", six.text_type(course_key))] +
+        [("course_id", str(course_key))] +
         [("topic_id", topic_id) for topic_id in topic_id_list or []] +
         ([("following", following)] if following else [])
     )
@@ -228,7 +228,7 @@ def get_course(request, course_key):
 
     course = _get_course(course_key, request.user)
     return {
-        "id": six.text_type(course_key),
+        "id": str(course_key),
         "blackouts": [
             {
                 "start": _format_datetime(blackout["start"]),
@@ -369,7 +369,7 @@ def get_course_topics(request, course_key, topic_ids=None):
         not_found_topic_ids = topic_ids - (existing_courseware_topic_ids | existing_non_courseware_topic_ids)
         if not_found_topic_ids:
             raise DiscussionNotFoundError(
-                u"Discussion not found for '{}'.".format(", ".join(str(id) for id in not_found_topic_ids))
+                "Discussion not found for '{}'.".format(", ".join(str(id) for id in not_found_topic_ids))
             )
 
     return {
@@ -576,18 +576,18 @@ def get_thread_list(
     if order_by not in cc_map:
         raise ValidationError({
             "order_by":
-                [u"Invalid value. '{}' must be 'last_activity_at', 'comment_count', or 'vote_count'".format(order_by)]
+                [f"Invalid value. '{order_by}' must be 'last_activity_at', 'comment_count', or 'vote_count'"]
         })
     if order_direction != "desc":
         raise ValidationError({
-            "order_direction": [u"Invalid value. '{}' must be 'desc'".format(order_direction)]
+            "order_direction": [f"Invalid value. '{order_direction}' must be 'desc'"]
         })
 
     course = _get_course(course_key, request.user)
     context = get_context(course, request)
 
     query_params = {
-        "user_id": six.text_type(request.user.id),
+        "user_id": str(request.user.id),
         "group_id": (
             None if context["is_requester_privileged"] else
             get_group_id_for_user(request.user, get_course_discussion_settings(course.id))
@@ -603,13 +603,13 @@ def get_thread_list(
             query_params[view] = "true"
         else:
             ValidationError({
-                "view": [u"Invalid value. '{}' must be 'unread' or 'unanswered'".format(view)]
+                "view": [f"Invalid value. '{view}' must be 'unread' or 'unanswered'"]
             })
 
     if following:
         paginated_results = context["cc_requester"].subscribed_threads(query_params)
     else:
-        query_params["course_id"] = six.text_type(course.id)
+        query_params["course_id"] = str(course.id)
         query_params["commentable_ids"] = ",".join(topic_id_list) if topic_id_list else None
         query_params["text"] = text_search
         paginated_results = Thread.search(query_params)
@@ -1046,7 +1046,7 @@ def get_thread(request, thread_id, requested_fields=None):
         thread_id,
         retrieve_kwargs={
             "with_responses": True,
-            "user_id": six.text_type(request.user.id),
+            "user_id": str(request.user.id),
         }
     )
     return _serialize_discussion_entities(request, context, [cc_thread], requested_fields, DiscussionEntity.thread)[0]
@@ -1105,7 +1105,7 @@ def get_response_comments(request, comment_id, page, page_size, requested_fields
         )
 
         comments_count = len(response_comments)
-        num_pages = (comments_count + page_size - 1) / page_size if comments_count else 1
+        num_pages = (comments_count + page_size - 1) // page_size if comments_count else 1
         paginator = DiscussionAPIPagination(request, page, num_pages, comments_count)
         return paginator.get_paginated_response(results)
     except CommentClientRequestError:

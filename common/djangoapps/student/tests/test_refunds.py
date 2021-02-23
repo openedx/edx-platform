@@ -69,7 +69,7 @@ class RefundableTest(SharedModuleStoreTestCase):
     def test_refundable(self, cutoff_date):
         """ Assert base case is refundable"""
         cutoff_date.return_value = datetime.now(pytz.UTC) + timedelta(days=1)
-        self.assertTrue(self.enrollment.refundable())
+        assert self.enrollment.refundable()
 
     @patch('common.djangoapps.student.models.CourseEnrollment.refund_cutoff_date')
     def test_refundable_expired_verification(self, cutoff_date):
@@ -77,7 +77,7 @@ class RefundableTest(SharedModuleStoreTestCase):
         cutoff_date.return_value = datetime.now(pytz.UTC) + timedelta(days=1)
         self.verified_mode.expiration_datetime = datetime.now(pytz.UTC) - timedelta(days=1)
         self.verified_mode.save()
-        self.assertTrue(self.enrollment.refundable())
+        assert self.enrollment.refundable()
 
     @patch('common.djangoapps.student.models.CourseEnrollment.refund_cutoff_date')
     def test_refundable_when_certificate_exists(self, cutoff_date):
@@ -85,7 +85,7 @@ class RefundableTest(SharedModuleStoreTestCase):
 
         cutoff_date.return_value = datetime.now(pytz.UTC) + timedelta(days=1)
 
-        self.assertTrue(self.enrollment.refundable())
+        assert self.enrollment.refundable()
 
         GeneratedCertificateFactory.create(
             user=self.user,
@@ -94,33 +94,28 @@ class RefundableTest(SharedModuleStoreTestCase):
             mode='verified'
         )
 
-        self.assertFalse(self.enrollment.refundable())
-        self.assertFalse(
-            self.enrollment.refundable(
-                user_already_has_certs_for=GeneratedCertificate.course_ids_with_certs_for_user(self.user)
-            )
-        )
+        assert not self.enrollment.refundable()
+        assert not self.enrollment.\
+            refundable(user_already_has_certs_for=GeneratedCertificate.course_ids_with_certs_for_user(self.user))
 
         # Assert that can_refund overrides this and allows refund
         self.enrollment.can_refund = True
-        self.assertTrue(self.enrollment.refundable())
-        self.assertTrue(
-            self.enrollment.refundable(
-                user_already_has_certs_for=GeneratedCertificate.course_ids_with_certs_for_user(self.user)
-            )
+        assert self.enrollment.refundable()
+        assert self.enrollment.refundable(
+            user_already_has_certs_for=GeneratedCertificate.course_ids_with_certs_for_user(self.user)
         )
 
     @patch('common.djangoapps.student.models.CourseEnrollment.refund_cutoff_date')
     def test_refundable_with_cutoff_date(self, cutoff_date):
         """ Assert enrollment is refundable before cutoff and not refundable after."""
         cutoff_date.return_value = datetime.now(pytz.UTC) + timedelta(days=1)
-        self.assertTrue(self.enrollment.refundable())
+        assert self.enrollment.refundable()
 
         cutoff_date.return_value = datetime.now(pytz.UTC) - timedelta(minutes=5)
-        self.assertFalse(self.enrollment.refundable())
+        assert not self.enrollment.refundable()
 
         cutoff_date.return_value = datetime.now(pytz.UTC) + timedelta(minutes=5)
-        self.assertTrue(self.enrollment.refundable())
+        assert self.enrollment.refundable()
 
     @ddt.data(
         (timedelta(days=1), timedelta(days=2), timedelta(days=2), 14),
@@ -161,10 +156,7 @@ class RefundableTest(SharedModuleStoreTestCase):
         with patch('common.djangoapps.student.models.EnrollmentRefundConfiguration.current') as config:
             instance = config.return_value
             instance.refund_window = refund_period
-            self.assertEqual(
-                self.enrollment.refund_cutoff_date(),
-                expected_date + refund_period
-            )
+            assert self.enrollment.refund_cutoff_date() == (expected_date + refund_period)
 
             expected_date_placed_attr = {
                 "namespace": "order",
@@ -172,14 +164,11 @@ class RefundableTest(SharedModuleStoreTestCase):
                 "value": date_placed,
             }
 
-            self.assertIn(
-                expected_date_placed_attr,
-                CourseEnrollmentAttribute.get_enrollment_attributes(self.enrollment)
-            )
+            assert expected_date_placed_attr in CourseEnrollmentAttribute.get_enrollment_attributes(self.enrollment)
 
     def test_refund_cutoff_date_no_attributes(self):
         """ Assert that the None is returned when no order number attribute is found."""
-        self.assertIsNone(self.enrollment.refund_cutoff_date())
+        assert self.enrollment.refund_cutoff_date() is None
 
     @patch('openedx.core.djangoapps.commerce.utils.ecommerce_api_client')
     def test_refund_cutoff_date_with_date_placed_attr(self, mock_ecommerce_api_client):
@@ -200,10 +189,7 @@ class RefundableTest(SharedModuleStoreTestCase):
         )
 
         refund_config = EnrollmentRefundConfiguration.current()
-        self.assertEqual(
-            self.enrollment.refund_cutoff_date(),
-            order_date + refund_config.refund_window
-        )
+        assert self.enrollment.refund_cutoff_date() == (order_date + refund_config.refund_window)
         mock_ecommerce_api_client.assert_not_called()
 
     @httpretty.activate
@@ -232,4 +218,4 @@ class RefundableTest(SharedModuleStoreTestCase):
 
         self.client.login(username=self.user.username, password=self.USER_PASSWORD)
         resp = self.client.post(reverse('dashboard', args=[]))
-        self.assertEqual(resp.status_code, 200)
+        assert resp.status_code == 200

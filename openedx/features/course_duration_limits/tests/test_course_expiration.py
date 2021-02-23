@@ -67,7 +67,7 @@ class CourseExpirationTestCase(ModuleStoreTestCase, MasqueradeMixin):
         """Tests that verified enrollments do not have an expiration"""
         CourseEnrollment.enroll(self.user, self.course.id, CourseMode.VERIFIED)
         result = get_user_course_expiration_date(self.user, CourseOverview.get_from_id(self.course.id))
-        self.assertEqual(result, None)
+        assert result is None
 
     @mock.patch("openedx.core.djangoapps.course_date_signals.utils.get_course_run_details")
     @ddt.data(
@@ -106,7 +106,7 @@ class CourseExpirationTestCase(ModuleStoreTestCase, MasqueradeMixin):
             self.user,
             CourseOverview.get_from_id(self.course.id),
         )
-        self.assertEqual(result, enrollment.created + access_duration)
+        assert result == (enrollment.created + access_duration)
 
     @mock.patch("openedx.core.djangoapps.course_date_signals.utils.get_course_run_details")
     def test_content_availability_date(self, mock_get_course_run_details):
@@ -129,7 +129,7 @@ class CourseExpirationTestCase(ModuleStoreTestCase, MasqueradeMixin):
             self.user,
             CourseOverview.get_from_id(past_course.id),
         )
-        self.assertEqual(result, None)
+        assert result is None
 
         add_course_mode(past_course, mode_slug=CourseMode.AUDIT)
         add_course_mode(past_course, upgrade_deadline_expired=False)
@@ -138,7 +138,7 @@ class CourseExpirationTestCase(ModuleStoreTestCase, MasqueradeMixin):
             CourseOverview.get_from_id(past_course.id),
         )
         content_availability_date = enrollment.created
-        self.assertEqual(result, content_availability_date + access_duration)
+        assert result == (content_availability_date + access_duration)
 
         # Content availability date is course start date
         start_date = now() + timedelta(weeks=10)
@@ -153,7 +153,7 @@ class CourseExpirationTestCase(ModuleStoreTestCase, MasqueradeMixin):
             self.user,
             CourseOverview.get_from_id(future_course.id),
         )
-        self.assertEqual(result, None)
+        assert result is None
 
         add_course_mode(future_course, mode_slug=CourseMode.AUDIT)
         add_course_mode(future_course, upgrade_deadline_expired=False)
@@ -162,7 +162,7 @@ class CourseExpirationTestCase(ModuleStoreTestCase, MasqueradeMixin):
             CourseOverview.get_from_id(future_course.id),
         )
         content_availability_date = start_date.replace(microsecond=0)
-        self.assertEqual(result, content_availability_date + access_duration)
+        assert result == (content_availability_date + access_duration)
 
     @mock.patch("openedx.core.djangoapps.course_date_signals.utils.get_course_run_details")
     def test_expired_upgrade_deadline(self, mock_get_course_run_details):
@@ -187,7 +187,7 @@ class CourseExpirationTestCase(ModuleStoreTestCase, MasqueradeMixin):
             CourseOverview.get_from_id(course.id),
         )
         content_availability_date = enrollment.created
-        self.assertEqual(result, content_availability_date + access_duration)
+        assert result == (content_availability_date + access_duration)
 
     @mock.patch("openedx.core.djangoapps.course_date_signals.utils.get_course_run_details")
     @ddt.data(
@@ -238,7 +238,7 @@ class CourseExpirationTestCase(ModuleStoreTestCase, MasqueradeMixin):
 
         course_home_url = reverse('openedx.course_experience.course_home', args=[six.text_type(self.course.id)])
         response = self.client.get(course_home_url, follow=True)
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
         six.assertCountEqual(self, response.redirect_chain, [])
         banner_text = 'You lose all access to this course, including your progress,'
         if show_expiration_banner:
@@ -275,7 +275,7 @@ class CourseExpirationTestCase(ModuleStoreTestCase, MasqueradeMixin):
 
         course_home_url = reverse('openedx.course_experience.course_home', args=[six.text_type(self.course.id)])
         response = self.client.get(course_home_url, follow=True)
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
         six.assertCountEqual(self, response.redirect_chain, [])
         banner_text = 'You lose all access to this course, including your progress,'
         self.assertNotContains(response, banner_text)
@@ -311,7 +311,7 @@ class CourseExpirationTestCase(ModuleStoreTestCase, MasqueradeMixin):
 
         course_home_url = reverse('openedx.course_experience.course_home', args=[six.text_type(self.course.id)])
         response = self.client.get(course_home_url, follow=True)
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
         six.assertCountEqual(self, response.redirect_chain, [])
         banner_text = 'This learner does not have access to this course. Their access expired on'
         self.assertContains(response, banner_text)
@@ -362,7 +362,7 @@ class CourseExpirationTestCase(ModuleStoreTestCase, MasqueradeMixin):
 
         course_home_url = reverse('openedx.course_experience.course_home', args=[six.text_type(self.course.id)])
         response = self.client.get(course_home_url, follow=True)
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
         six.assertCountEqual(self, response.redirect_chain, [])
         banner_text = 'This learner does not have access to this course. Their access expired on'
         self.assertNotContains(response, banner_text)
@@ -411,7 +411,7 @@ class CourseExpirationTestCase(ModuleStoreTestCase, MasqueradeMixin):
 
         course_home_url = reverse('openedx.course_experience.course_home', args=[six.text_type(self.course.id)])
         response = self.client.get(course_home_url, follow=True)
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
         six.assertCountEqual(self, response.redirect_chain, [])
         banner_text = 'This learner does not have access to this course. Their access expired on'
         self.assertNotContains(response, banner_text)

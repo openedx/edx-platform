@@ -26,7 +26,7 @@ class EdxNotesTab(EnrolledTab):
             course (CourseDescriptor): the course using the feature
             user (User): the user interacting with the course
         """
-        if not super(EdxNotesTab, cls).is_enabled(course, user=user):
+        if not super().is_enabled(course, user=user):
             return False
 
         if not settings.FEATURES.get("ENABLE_EDXNOTES"):

@@ -29,7 +29,7 @@ from edx_ace import ace
 from edx_ace.recipient import Recipient
 from edx_django_utils import monitoring as monitoring_utils
 from eventtracking import tracker
-from ipware.ip import get_ip
+from ipware.ip import get_client_ip
 # Note that this lives in LMS, so this dependency should be refactored.
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
@@ -340,7 +340,7 @@ def change_enrollment(request, check_access=True):
         # or if the user is enrolling in a country in which the course
         # is not available.
         redirect_url = embargo_api.redirect_if_blocked(
-            course_id, user=user, ip_address=get_ip(request),
+            course_id, user=user, ip_address=get_client_ip(request)[0],
             url=request.path
         )
         if redirect_url:

@@ -5,7 +5,7 @@ Tests for testing the modulestore settings migration code.
 
 import copy
 from unittest import TestCase
-
+import pytest
 import ddt
 
 from openedx.core.lib.tempdir import mkdtemp_clean
@@ -124,7 +124,7 @@ class ModuleStoreSettingsMigration(TestCase):
         """
         store_fields = ["OPTIONS", "DOC_STORE_CONFIG"]
         for field in store_fields:
-            self.assertEqual(store_setting1[field], store_setting2[field])
+            assert store_setting1[field] == store_setting2[field]
 
     def assertMigrated(self, old_setting):
         """
@@ -135,11 +135,11 @@ class ModuleStoreSettingsMigration(TestCase):
         new_mixed_setting = convert_module_store_setting_if_needed(copy.deepcopy(old_setting))
 
         # check whether the configuration is encapsulated within Mixed.
-        self.assertEqual(new_mixed_setting["default"]["ENGINE"], "xmodule.modulestore.mixed.MixedModuleStore")
+        assert new_mixed_setting['default']['ENGINE'] == 'xmodule.modulestore.mixed.MixedModuleStore'
 
         # check whether the stores are in an ordered list
         new_stores = get_mixed_stores(new_mixed_setting)
-        self.assertIsInstance(new_stores, list)
+        assert isinstance(new_stores, list)
 
         return new_mixed_setting, new_stores[0]
 
@@ -151,9 +151,9 @@ class ModuleStoreSettingsMigration(TestCase):
         split_settings = [store for store in stores if store['ENGINE'].endswith('.DraftVersioningModuleStore')]
         if len(split_settings):  # lint-amnesty, pylint: disable=len-as-condition
             # there should only be one setting for split
-            self.assertEqual(len(split_settings), 1)
+            assert len(split_settings) == 1
             # verify name
-            self.assertEqual(split_settings[0]['NAME'], 'split')
+            assert split_settings[0]['NAME'] == 'split'
             # verify split config settings equal those of mongo
             self.assertStoreValuesEqual(
                 split_settings[0],
@@ -165,28 +165,28 @@ class ModuleStoreSettingsMigration(TestCase):
         old_setting = self.OLD_CONFIG
         new_mixed_setting, new_default_store_setting = self.assertMigrated(old_setting)
         self.assertStoreValuesEqual(new_default_store_setting, old_setting["default"])
-        self.assertEqual(new_default_store_setting["ENGINE"], old_setting["default"]["ENGINE"])
-        self.assertFalse(self.is_split_configured(new_mixed_setting))
+        assert new_default_store_setting['ENGINE'] == old_setting['default']['ENGINE']
+        assert not self.is_split_configured(new_mixed_setting)
 
     def test_convert_from_old_mongo_to_draft_store(self):
         old_setting = self.OLD_CONFIG_WITH_DIRECT_MONGO
         new_mixed_setting, new_default_store_setting = self.assertMigrated(old_setting)
         self.assertStoreValuesEqual(new_default_store_setting, old_setting["default"])
-        self.assertEqual(new_default_store_setting["ENGINE"], "xmodule.modulestore.mongo.draft.DraftModuleStore")
-        self.assertTrue(self.is_split_configured(new_mixed_setting))
+        assert new_default_store_setting['ENGINE'] == 'xmodule.modulestore.mongo.draft.DraftModuleStore'
+        assert self.is_split_configured(new_mixed_setting)
 
     def test_convert_from_dict_to_list(self):
         old_mixed_setting = self.OLD_MIXED_CONFIG_WITH_DICT
         new_mixed_setting, new_default_store_setting = self.assertMigrated(old_mixed_setting)
-        self.assertEqual(new_default_store_setting["ENGINE"], "the_default_store")
-        self.assertTrue(self.is_split_configured(new_mixed_setting))
+        assert new_default_store_setting['ENGINE'] == 'the_default_store'
+        assert self.is_split_configured(new_mixed_setting)
 
         # exclude split when comparing old and new, since split was added as part of the migration
         new_stores = [store for store in get_mixed_stores(new_mixed_setting) if store['NAME'] != 'split']
         old_stores = get_mixed_stores(self.OLD_MIXED_CONFIG_WITH_DICT)
 
         # compare each store configured in mixed
-        self.assertEqual(len(new_stores), len(old_stores))
+        assert len(new_stores) == len(old_stores)
         for new_store in new_stores:
             self.assertStoreValuesEqual(new_store, old_stores[new_store['NAME']])
 
@@ -194,16 +194,16 @@ class ModuleStoreSettingsMigration(TestCase):
         # make sure there is no migration done on an already updated config
         old_mixed_setting = self.ALREADY_UPDATED_MIXED_CONFIG
         new_mixed_setting, new_default_store_setting = self.assertMigrated(old_mixed_setting)  # lint-amnesty, pylint: disable=unused-variable
-        self.assertTrue(self.is_split_configured(new_mixed_setting))
-        self.assertEqual(old_mixed_setting, new_mixed_setting)
+        assert self.is_split_configured(new_mixed_setting)
+        assert old_mixed_setting == new_mixed_setting
 
     @ddt.data('draft', 'split')
     def test_update_settings(self, default_store):
         mixed_setting = self.ALREADY_UPDATED_MIXED_CONFIG
         update_module_store_settings(mixed_setting, default_store=default_store)
-        self.assertEqual(get_mixed_stores(mixed_setting)[0]['NAME'], default_store)
+        assert get_mixed_stores(mixed_setting)[0]['NAME'] == default_store
 
     def test_update_settings_error(self):
         mixed_setting = self.ALREADY_UPDATED_MIXED_CONFIG
-        with self.assertRaises(Exception):
+        with pytest.raises(Exception):
             update_module_store_settings(mixed_setting, default_store='non-existent store')

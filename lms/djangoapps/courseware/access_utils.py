@@ -8,7 +8,6 @@ from datetime import datetime, timedelta
 from logging import getLogger
 
 from django.conf import settings
-from django.utils.translation import ugettext as _  # lint-amnesty, pylint: disable=unused-import
 from pytz import UTC
 from lms.djangoapps.courseware.access_response import (
     AccessResponse,

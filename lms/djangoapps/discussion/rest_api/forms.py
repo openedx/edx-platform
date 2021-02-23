@@ -11,7 +11,6 @@ from django.forms import BooleanField, CharField, ChoiceField, Form, IntegerFiel
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locator import CourseLocator
-from six import text_type
 
 from lms.djangoapps.courseware.courses import get_course_with_access
 from openedx.core.djangoapps.django_comment_common.models import (
@@ -75,7 +74,7 @@ class ThreadListGetForm(_PaginationForm):
         try:
             return CourseLocator.from_string(value)
         except InvalidKeyError:
-            raise ValidationError(u"'{}' is not a valid course id".format(value))  # lint-amnesty, pylint: disable=raise-missing-from
+            raise ValidationError(f"'{value}' is not a valid course id")  # lint-amnesty, pylint: disable=raise-missing-from
 
     def clean_following(self):
         """Validate following"""
@@ -86,13 +85,13 @@ class ThreadListGetForm(_PaginationForm):
             return value
 
     def clean(self):
-        cleaned_data = super(ThreadListGetForm, self).clean()  # lint-amnesty, pylint: disable=super-with-arguments
+        cleaned_data = super().clean()
         exclusive_params_count = sum(
             1 for param in self.EXCLUSIVE_PARAMS if cleaned_data.get(param)
         )
         if exclusive_params_count > 1:
             raise ValidationError(
-                u"The following query parameters are mutually exclusive: {}".format(
+                "The following query parameters are mutually exclusive: {}".format(
                     ", ".join(self.EXCLUSIVE_PARAMS)
                 )
             )
@@ -143,7 +142,7 @@ class CourseDiscussionSettingsForm(Form):
 
     def __init__(self, *args, **kwargs):
         self.request_user = kwargs.pop('request_user')
-        super(CourseDiscussionSettingsForm, self).__init__(*args, **kwargs)  # lint-amnesty, pylint: disable=super-with-arguments
+        super().__init__(*args, **kwargs)
 
     def clean_course_id(self):
         """Validate the 'course_id' value"""
@@ -154,7 +153,7 @@ class CourseDiscussionSettingsForm(Form):
             self.cleaned_data['course_key'] = course_key
             return course_id
         except InvalidKeyError:
-            raise ValidationError(u"'{}' is not a valid course key".format(text_type(course_id)))  # lint-amnesty, pylint: disable=raise-missing-from
+            raise ValidationError("'{}' is not a valid course key".format(str(course_id)))  # lint-amnesty, pylint: disable=raise-missing-from
 
 
 class CourseDiscussionRolesForm(CourseDiscussionSettingsForm):
@@ -168,7 +167,7 @@ class CourseDiscussionRolesForm(CourseDiscussionSettingsForm):
     )
     rolename = ChoiceField(
         choices=ROLE_CHOICES,
-        error_messages={u"invalid_choice": u"Role '%(value)s' does not exist"}
+        error_messages={"invalid_choice": "Role '%(value)s' does not exist"}
     )
 
     def clean_rolename(self):
@@ -179,7 +178,7 @@ class CourseDiscussionRolesForm(CourseDiscussionSettingsForm):
             try:
                 role = Role.objects.get(name=rolename, course_id=course_id)
             except Role.DoesNotExist:
-                raise ValidationError(u"Role '{}' does not exist".format(rolename))  # lint-amnesty, pylint: disable=raise-missing-from
+                raise ValidationError(f"Role '{rolename}' does not exist")  # lint-amnesty, pylint: disable=raise-missing-from
 
             self.cleaned_data['role'] = role
             return rolename

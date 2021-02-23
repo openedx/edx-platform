@@ -92,14 +92,14 @@ class BlockNavigationTransformerCourseTestCase(ModuleStoreTestCase):
         BlockNavigationTransformer.collect(block_structure)
         block_structure._collect_requested_xblock_fields()
 
-        self.assertIn(chapter_x_key, block_structure)
+        assert chapter_x_key in block_structure
 
         # transform phase
         BlockDepthTransformer().transform(usage_info=None, block_structure=block_structure)
         BlockNavigationTransformer(0).transform(usage_info=None, block_structure=block_structure)
         block_structure._prune_unreachable()
 
-        self.assertIn(chapter_x_key, block_structure)
+        assert chapter_x_key in block_structure
 
         course_descendants = block_structure.get_transformer_block_field(
             course_usage_key,
@@ -114,7 +114,7 @@ class BlockNavigationTransformerCourseTestCase(ModuleStoreTestCase):
                 course_key.make_usage_key('vertical', 'vertical_y1a'),
                 course_key.make_usage_key('problem', 'problem_y1a_1'),
         ]:
-            self.assertIn(six.text_type(block_key), course_descendants)
+            assert six.text_type(block_key) in course_descendants
 
         # chapter_x and its descendants should not be included
         for block_key in [
@@ -123,4 +123,4 @@ class BlockNavigationTransformerCourseTestCase(ModuleStoreTestCase):
                 course_key.make_usage_key('vertical', 'vertical_x1a'),
                 course_key.make_usage_key('problem', 'problem_x1a_1'),
         ]:
-            self.assertNotIn(six.text_type(block_key), course_descendants)
+            assert six.text_type(block_key) not in course_descendants

@@ -35,9 +35,9 @@ class CapaShuffleTest(unittest.TestCase):
         self.assertRegex(the_html, r"<div>.*\[.*'Banana'.*'Apple'.*'Chocolate'.*'Donut'.*\].*</div>")
         # Check that choice name masking is enabled and that unmasking works
         response = list(problem.responders.values())[0]
-        self.assertFalse(response.has_mask())
-        self.assertEqual(response.unmask_order(), ['choice_1', 'choice_0', 'choice_2', 'choice_3'])
-        self.assertEqual(the_html, problem.get_html(), 'should be able to call get_html() twice')
+        assert not response.has_mask()
+        assert response.unmask_order() == ['choice_1', 'choice_0', 'choice_2', 'choice_3']
+        assert the_html == problem.get_html(), 'should be able to call get_html() twice'
 
     def test_shuffle_custom_names(self):
         xml_str = textwrap.dedent("""
@@ -56,9 +56,9 @@ class CapaShuffleTest(unittest.TestCase):
         # B A C D
         # Check that the custom name= names come through
         response = list(problem.responders.values())[0]
-        self.assertFalse(response.has_mask())
-        self.assertTrue(response.has_shuffle())
-        self.assertEqual(response.unmask_order(), ['choice_0', 'choice_aaa', 'choice_1', 'choice_ddd'])
+        assert not response.has_mask()
+        assert response.has_shuffle()
+        assert response.unmask_order() == ['choice_0', 'choice_aaa', 'choice_1', 'choice_ddd']
 
     def test_shuffle_different_seed(self):
         xml_str = textwrap.dedent("""
@@ -91,9 +91,9 @@ class CapaShuffleTest(unittest.TestCase):
         the_html = problem.get_html()
         self.assertRegex(the_html, r"<div>.*\[.*'Apple'.*\].*</div>")
         response = list(problem.responders.values())[0]
-        self.assertFalse(response.has_mask())
-        self.assertTrue(response.has_shuffle())
-        self.assertEqual(response.unmask_order(), ['choice_0'])
+        assert not response.has_mask()
+        assert response.has_shuffle()
+        assert response.unmask_order() == ['choice_0']
 
     def test_shuffle_6_choices(self):
         xml_str = textwrap.dedent("""
@@ -132,8 +132,8 @@ class CapaShuffleTest(unittest.TestCase):
         the_html = problem.get_html()
         self.assertRegex(the_html, r"<div>.*\[.*'Apple'.*'Banana'.*'Chocolate'.*'Donut'.*\].*</div>")
         response = list(problem.responders.values())[0]
-        self.assertFalse(response.has_mask())
-        self.assertFalse(response.has_shuffle())
+        assert not response.has_mask()
+        assert not response.has_shuffle()
 
     def test_shuffle_fixed_head_end(self):
         xml_str = textwrap.dedent("""
@@ -275,18 +275,18 @@ class CapaShuffleTest(unittest.TestCase):
         """)
         problem = new_loncapa_problem(xml_str, seed=0)
         orig_html = problem.get_html()
-        self.assertEqual(orig_html, problem.get_html(), 'should be able to call get_html() twice')
+        assert orig_html == problem.get_html(), 'should be able to call get_html() twice'
         html = orig_html.replace('\n', ' ')  # avoid headaches with .* matching
         print(html)
         self.assertRegex(html, r"<div>.*\[.*'Banana'.*'Apple'.*'Chocolate'.*'Donut'.*\].*</div>.*" +
                          r"<div>.*\[.*'C'.*'A'.*'D'.*'B'.*\].*</div>")
         # Look at the responses in their authored order
         responses = sorted(list(problem.responders.values()), key=lambda resp: int(resp.id[resp.id.rindex('_') + 1:]))
-        self.assertFalse(responses[0].has_mask())
-        self.assertTrue(responses[0].has_shuffle())
-        self.assertTrue(responses[1].has_shuffle())
-        self.assertEqual(responses[0].unmask_order(), ['choice_1', 'choice_0', 'choice_2', 'choice_3'])
-        self.assertEqual(responses[1].unmask_order(), ['choice_2', 'choice_0', 'choice_3', 'choice_1'])
+        assert not responses[0].has_mask()
+        assert responses[0].has_shuffle()
+        assert responses[1].has_shuffle()
+        assert responses[0].unmask_order() == ['choice_1', 'choice_0', 'choice_2', 'choice_3']
+        assert responses[1].unmask_order() == ['choice_2', 'choice_0', 'choice_3', 'choice_1']
 
     def test_shuffle_not_with_answerpool(self):
         """Raise error if shuffle and answer-pool are both used."""

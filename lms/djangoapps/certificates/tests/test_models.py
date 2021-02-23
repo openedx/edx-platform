@@ -2,7 +2,7 @@
 
 
 import json
-
+import pytest
 import ddt
 from django.conf import settings
 from django.core.exceptions import ValidationError
@@ -63,28 +63,20 @@ class ExampleCertificateTest(TestCase):
             ExampleCertificate.STATUS_SUCCESS,
             download_url=self.DOWNLOAD_URL
         )
-        self.assertEqual(
-            self.cert.status_dict,
-            {
-                'description': self.DESCRIPTION,
+        assert self.cert.status_dict ==\
+               {'description': self.DESCRIPTION,
                 'status': ExampleCertificate.STATUS_SUCCESS,
-                'download_url': self.DOWNLOAD_URL
-            }
-        )
+                'download_url': self.DOWNLOAD_URL}
 
     def test_update_status_error(self):
         self.cert.update_status(
             ExampleCertificate.STATUS_ERROR,
             error_reason=self.ERROR_REASON
         )
-        self.assertEqual(
-            self.cert.status_dict,
-            {
-                'description': self.DESCRIPTION,
+        assert self.cert.status_dict ==\
+               {'description': self.DESCRIPTION,
                 'status': ExampleCertificate.STATUS_ERROR,
-                'error_reason': self.ERROR_REASON
-            }
-        )
+                'error_reason': self.ERROR_REASON}
 
     def test_update_status_invalid(self):
         with self.assertRaisesRegex(ValueError, 'status'):
@@ -96,12 +88,12 @@ class ExampleCertificateTest(TestCase):
 
         # Verify that the "latest" status is None
         result = ExampleCertificateSet.latest_status(self.COURSE_KEY)
-        self.assertIs(result, None)
+        assert result is None
 
     def test_latest_status_is_course_specific(self):
         other_course = CourseLocator(org='other', course='other', run='other')
         result = ExampleCertificateSet.latest_status(other_course)
-        self.assertIs(result, None)
+        assert result is None
 
 
 class CertificateHtmlViewConfigurationTest(TestCase):
@@ -126,14 +118,14 @@ class CertificateHtmlViewConfigurationTest(TestCase):
         Tests creation of configuration.
         """
         self.config.save()
-        self.assertEqual(self.config.configuration, self.configuration_string)
+        assert self.config.configuration == self.configuration_string
 
     def test_clean_bad_json(self):
         """
         Tests if bad JSON string was given.
         """
         self.config = CertificateHtmlViewConfiguration(configuration='{"bad":"test"')
-        self.assertRaises(ValidationError, self.config.clean)
+        pytest.raises(ValidationError, self.config.clean)
 
     def test_get(self):
         """
@@ -150,7 +142,7 @@ class CertificateHtmlViewConfigurationTest(TestCase):
                 "logo_src": "http://www.edx.org/static/images/honor-logo.png"
             }
         }
-        self.assertEqual(self.config.get_config(), expected_config)
+        assert self.config.get_config() == expected_config
 
     def test_get_not_enabled_returns_blank(self):
         """
@@ -158,7 +150,7 @@ class CertificateHtmlViewConfigurationTest(TestCase):
         """
         self.config.enabled = False
         self.config.save()
-        self.assertEqual(len(self.config.get_config()), 0)
+        assert len(self.config.get_config()) == 0
 
     @override_settings(FEATURES=FEATURES_INVALID_FILE_PATH)
     def test_get_no_database_no_file(self):
@@ -167,7 +159,7 @@ class CertificateHtmlViewConfigurationTest(TestCase):
         """
         self.config.configuration = ''
         self.config.save()
-        self.assertEqual(self.config.get_config(), {})
+        assert self.config.get_config() == {}
 
 
 class CertificateTemplateAssetTest(TestCase):
@@ -182,19 +174,19 @@ class CertificateTemplateAssetTest(TestCase):
             'picture1.jpg',
             b'these are the file contents!')).save()
         certificate_template_asset = CertificateTemplateAsset.objects.get(id=1)
-        self.assertEqual(certificate_template_asset.asset, 'certificate_template_assets/1/picture1.jpg')
+        assert certificate_template_asset.asset == 'certificate_template_assets/1/picture1.jpg'
 
         # Now save asset with same file again, New file will be uploaded after deleting the old one with the same name.
         certificate_template_asset.asset = SimpleUploadedFile('picture1.jpg', b'file contents')
         certificate_template_asset.save()
-        self.assertEqual(certificate_template_asset.asset, 'certificate_template_assets/1/picture1.jpg')
+        assert certificate_template_asset.asset == 'certificate_template_assets/1/picture1.jpg'
 
         # Now replace the asset with another file
         certificate_template_asset.asset = SimpleUploadedFile('picture2.jpg', b'file contents')
         certificate_template_asset.save()
 
         certificate_template_asset = CertificateTemplateAsset.objects.get(id=1)
-        self.assertEqual(certificate_template_asset.asset, 'certificate_template_assets/1/picture2.jpg')
+        assert certificate_template_asset.asset == 'certificate_template_assets/1/picture2.jpg'
 
 
 class EligibleCertificateManagerTest(SharedModuleStoreTestCase):
@@ -229,13 +221,8 @@ class EligibleCertificateManagerTest(SharedModuleStoreTestCase):
         certificates marked as ineligible, and that the default object
         manager for GeneratedCertificate does not filter them out.
         """
-        self.assertEqual(list(
-            GeneratedCertificate.eligible_available_certificates.filter(user=self.user)), [self.eligible_cert]
-        )
-        self.assertEqual(
-            list(GeneratedCertificate.objects.filter(user=self.user)),
-            [self.eligible_cert, self.ineligible_cert]
-        )
+        assert list(GeneratedCertificate.eligible_available_certificates.filter(user=self.user)) == [self.eligible_cert]
+        assert list(GeneratedCertificate.objects.filter(user=self.user)) == [self.eligible_cert, self.ineligible_cert]
 
     def test_filter_certificates_for_nonexistent_courses(self):
         """
@@ -243,9 +230,7 @@ class EligibleCertificateManagerTest(SharedModuleStoreTestCase):
         certificates for courses with no CourseOverview.
         """
         self.course1.delete()
-        self.assertFalse(GeneratedCertificate.eligible_available_certificates.filter(
-            user=self.user)
-        )
+        assert not GeneratedCertificate.eligible_available_certificates.filter(user=self.user)
 
 
 @ddt.ddt
@@ -286,10 +271,7 @@ class TestCertificateGenerationHistory(TestCase):
             instructor_task=instructor_task,
             is_regeneration=is_regeneration,
         )
-        self.assertEqual(
-            certificate_generation_history.get_certificate_generation_candidates(),
-            expected
-        )
+        assert certificate_generation_history.get_certificate_generation_candidates() == expected
 
     @ddt.data((True, "regenerated"), (False, "generated"))
     @ddt.unpack
@@ -307,10 +289,7 @@ class TestCertificateGenerationHistory(TestCase):
             instructor_task=instructor_task,
             is_regeneration=is_regeneration,
         )
-        self.assertEqual(
-            certificate_generation_history.get_task_name(),
-            expected
-        )
+        assert certificate_generation_history.get_task_name() == expected
 
 
 class CertificateInvalidationTest(SharedModuleStoreTestCase):
@@ -332,9 +311,7 @@ class CertificateInvalidationTest(SharedModuleStoreTestCase):
     def test_is_certificate_invalid_method(self):
         """ Verify that method return false if certificate is valid. """
 
-        self.assertFalse(
-            CertificateInvalidation.has_certificate_invalidation(self.user, self.course_id)
-        )
+        assert not CertificateInvalidation.has_certificate_invalidation(self.user, self.course_id)
 
     def test_is_certificate_invalid_with_invalid_cert(self):
         """ Verify that method return true if certificate is invalid. """
@@ -345,18 +322,14 @@ class CertificateInvalidationTest(SharedModuleStoreTestCase):
         )
         # Invalidate user certificate
         self.certificate.invalidate()
-        self.assertTrue(
-            CertificateInvalidation.has_certificate_invalidation(self.user, self.course_id)
-        )
+        assert CertificateInvalidation.has_certificate_invalidation(self.user, self.course_id)
 
         # mark the entry as in-active.
         invalid_cert.active = False
         invalid_cert.save()
 
         # After making the certificate valid method will return false.
-        self.assertFalse(
-            CertificateInvalidation.has_certificate_invalidation(self.user, self.course_id)
-        )
+        assert not CertificateInvalidation.has_certificate_invalidation(self.user, self.course_id)
 
     @patch('openedx.core.djangoapps.programs.tasks.revoke_program_certificates.delay')
     @patch(
@@ -368,5 +341,5 @@ class CertificateInvalidationTest(SharedModuleStoreTestCase):
         # Invalidate user certificate
         self.certificate.invalidate()
 
-        self.assertEqual(mock_revoke_task.call_count, 1)
-        self.assertEqual(mock_revoke_task.call_args[0], (self.user.username, self.course_id))
+        assert mock_revoke_task.call_count == 1
+        assert mock_revoke_task.call_args[0] == (self.user.username, self.course_id)

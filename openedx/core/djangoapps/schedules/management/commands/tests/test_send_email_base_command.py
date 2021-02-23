@@ -39,7 +39,7 @@ class TestSendEmailBaseCommand(CacheIsolationTestCase):  # lint-amnesty, pylint:
     def test_weeks_option(self):
         with patch.object(self.command, 'enqueue') as enqueue:
             self.command.handle(site_domain_name=self.site.domain, date='2017-09-29', weeks=12)
-            self.assertEqual(enqueue.call_count, 12)
+            assert enqueue.call_count == 12
 
     def test_send_emails(self):
         with patch.multiple(
@@ -50,8 +50,8 @@ class TestSendEmailBaseCommand(CacheIsolationTestCase):  # lint-amnesty, pylint:
             arg = Mock(name='arg')
             kwarg = Mock(name='kwarg')
             self.command.send_emails(arg, kwarg=kwarg)
-            self.assertFalse(arg.called)
-            self.assertFalse(kwarg.called)
+            assert not arg.called
+            assert not kwarg.called
 
             for offset in self.command.offsets:
                 self.command.enqueue.assert_any_call(offset, arg, kwarg=kwarg)  # lint-amnesty, pylint: disable=no-member

@@ -99,11 +99,8 @@ class ContentLibraryRuntimeTest(ContentLibraryContentTestMixin, TestCase):
         # Load both blocks:
         unit_block = xblock_api.load_block(unit_block_key, self.student_a)
         unit_block2 = xblock_api.load_block(unit_block2_key, self.student_a)
-        self.assertEqual(
-            library_api.get_library_block_olx(unit_block_key),
-            library_api.get_library_block_olx(unit_block2_key),
-        )
-        self.assertNotEqual(unit_block.children, unit_block2.children)
+        assert library_api.get_library_block_olx(unit_block_key) == library_api.get_library_block_olx(unit_block2_key)
+        assert unit_block.children != unit_block2.children
 
     def test_has_score(self):
         """
@@ -116,10 +113,12 @@ class ContentLibraryRuntimeTest(ContentLibraryContentTestMixin, TestCase):
         unit_block = xblock_api.load_block(unit_block_key, self.student_a)
         problem_block = xblock_api.load_block(problem_block_key, self.student_a)
 
-        self.assertFalse(hasattr(UnitBlock, 'has_score'))  # The block class doesn't declare 'has_score'
-        self.assertEqual(unit_block.has_score, False)  # But it gets added by the runtime and defaults to False
+        assert not hasattr(UnitBlock, 'has_score')
+        # The block class doesn't declare 'has_score'
+        assert unit_block.has_score is False
+        # But it gets added by the runtime and defaults to False
         # And problems do have has_score True:
-        self.assertEqual(problem_block.has_score, True)
+        assert problem_block.has_score is True
 
     @skip_unless_cms  # creating child blocks only works properly in Studio
     def test_xblock_metadata(self):
@@ -154,23 +153,24 @@ class ContentLibraryRuntimeTest(ContentLibraryContentTestMixin, TestCase):
             URL_BLOCK_METADATA_URL.format(block_key=unit_block_key),
             {"include": "children,editable_children"},
         )
-        self.assertEqual(metadata_view_result.data["children"], [str(problem_key)])
-        self.assertEqual(metadata_view_result.data["editable_children"], [str(problem_key)])
+        assert metadata_view_result.data['children'] == [str(problem_key)]
+        assert metadata_view_result.data['editable_children'] == [str(problem_key)]
 
         # Check the metadata API for the problem:
         metadata_view_result = client.get(
             URL_BLOCK_METADATA_URL.format(block_key=problem_key),
             {"include": "student_view_data,index_dictionary"},
         )
-        self.assertEqual(metadata_view_result.data["block_id"], str(problem_key))
-        self.assertEqual(metadata_view_result.data["display_name"], "New Multi Choice Question")
-        self.assertNotIn("children", metadata_view_result.data)
-        self.assertNotIn("editable_children", metadata_view_result.data)
+        assert metadata_view_result.data['block_id'] == str(problem_key)
+        assert metadata_view_result.data['display_name'] == 'New Multi Choice Question'
+        assert 'children' not in metadata_view_result.data
+        assert 'editable_children' not in metadata_view_result.data
         self.assertDictContainsSubset({
             "content_type": "CAPA",
             "problem_types": ["multiplechoiceresponse"],
         }, metadata_view_result.data["index_dictionary"])
-        self.assertEqual(metadata_view_result.data["student_view_data"], None)  # Capa doesn't provide student_view_data
+        assert metadata_view_result.data['student_view_data'] is None
+        # Capa doesn't provide student_view_data
 
 
 @requires_blockstore
@@ -197,11 +197,11 @@ class ContentLibraryXBlockUserStateTest(ContentLibraryContentTestMixin, TestCase
 
         block_alice = xblock_api.load_block(block_usage_key, self.student_a)
 
-        self.assertEqual(block_alice.scope_ids.user_id, self.student_a.id)
-        self.assertEqual(block_alice.user_str, 'default value')
-        self.assertEqual(block_alice.uss_str, 'default value')
-        self.assertEqual(block_alice.pref_str, 'default value')
-        self.assertEqual(block_alice.user_info_str, 'default value')
+        assert block_alice.scope_ids.user_id == self.student_a.id
+        assert block_alice.user_str == 'default value'
+        assert block_alice.uss_str == 'default value'
+        assert block_alice.pref_str == 'default value'
+        assert block_alice.user_info_str == 'default value'
 
     @XBlock.register_temp_plugin(UserStateTestBlock, UserStateTestBlock.BLOCK_TYPE)
     def test_modify_state_directly(self):
@@ -226,30 +226,30 @@ class ContentLibraryXBlockUserStateTest(ContentLibraryContentTestMixin, TestCase
         # Now load it back and expect the same field data:
         block1_alice = xblock_api.load_block(block1_usage_key, self.student_a)
 
-        self.assertEqual(block1_alice.scope_ids.user_id, self.student_a.id)
-        self.assertEqual(block1_alice.user_str, 'Alice was here')
-        self.assertEqual(block1_alice.uss_str, 'Alice was here (USS)')
-        self.assertEqual(block1_alice.pref_str, 'Alice was here (prefs)')
-        self.assertEqual(block1_alice.user_info_str, 'Alice was here (user info)')
+        assert block1_alice.scope_ids.user_id == self.student_a.id
+        assert block1_alice.user_str == 'Alice was here'
+        assert block1_alice.uss_str == 'Alice was here (USS)'
+        assert block1_alice.pref_str == 'Alice was here (prefs)'
+        assert block1_alice.user_info_str == 'Alice was here (user info)'
 
         # Now load a different block for Alice:
         block2_alice = xblock_api.load_block(block2_usage_key, self.student_a)
         # User state should be default:
-        self.assertEqual(block2_alice.user_str, 'default value')
+        assert block2_alice.user_str == 'default value'
         # User state summary should be default:
-        self.assertEqual(block2_alice.uss_str, 'default value')
+        assert block2_alice.uss_str == 'default value'
         # But prefs and user info should be shared:
-        self.assertEqual(block2_alice.pref_str, 'Alice was here (prefs)')
-        self.assertEqual(block2_alice.user_info_str, 'Alice was here (user info)')
+        assert block2_alice.pref_str == 'Alice was here (prefs)'
+        assert block2_alice.user_info_str == 'Alice was here (user info)'
 
         # Now load the first block, block1, for Bob:
         block1_bob = xblock_api.load_block(block1_usage_key, self.student_b)
 
-        self.assertEqual(block1_bob.scope_ids.user_id, self.student_b.id)
-        self.assertEqual(block1_bob.user_str, 'default value')
-        self.assertEqual(block1_bob.uss_str, 'Alice was here (USS)')
-        self.assertEqual(block1_bob.pref_str, 'default value')
-        self.assertEqual(block1_bob.user_info_str, 'default value')
+        assert block1_bob.scope_ids.user_id == self.student_b.id
+        assert block1_bob.user_str == 'default value'
+        assert block1_bob.uss_str == 'Alice was here (USS)'
+        assert block1_bob.pref_str == 'default value'
+        assert block1_bob.user_info_str == 'default value'
 
     @XBlock.register_temp_plugin(UserStateTestBlock, UserStateTestBlock.BLOCK_TYPE)
     def test_state_for_anonymous_users(self):
@@ -273,7 +273,7 @@ class ContentLibraryXBlockUserStateTest(ContentLibraryContentTestMixin, TestCase
             url = url_result.data["handler_url"]
             data_json = json.dumps(data) if data else None
             response = getattr(client, method)(url, data_json, content_type="application/json")
-            self.assertEqual(response.status_code, 200)
+            assert response.status_code == 200
             return response.json()
 
         # Now client1 sets all the fields via a handler:
@@ -286,33 +286,33 @@ class ContentLibraryXBlockUserStateTest(ContentLibraryContentTestMixin, TestCase
 
         # Now load it back and expect the same data:
         data = call_handler(client1, block1_usage_key, "get_user_state", "get")
-        self.assertEqual(data["user_str"], "1 was here")
-        self.assertEqual(data["uss_str"], "1 was here (USS)")
-        self.assertEqual(data["pref_str"], "1 was here (prefs)")
-        self.assertEqual(data["user_info_str"], "1 was here (user info)")
+        assert data['user_str'] == '1 was here'
+        assert data['uss_str'] == '1 was here (USS)'
+        assert data['pref_str'] == '1 was here (prefs)'
+        assert data['user_info_str'] == '1 was here (user info)'
 
         # Now load a different XBlock and expect only pref_str and user_info_str to be set:
         data = call_handler(client1, block2_usage_key, "get_user_state", "get")
-        self.assertEqual(data["user_str"], "default value")
-        self.assertEqual(data["uss_str"], "default value")
-        self.assertEqual(data["pref_str"], "1 was here (prefs)")
-        self.assertEqual(data["user_info_str"], "1 was here (user info)")
+        assert data['user_str'] == 'default value'
+        assert data['uss_str'] == 'default value'
+        assert data['pref_str'] == '1 was here (prefs)'
+        assert data['user_info_str'] == '1 was here (user info)'
 
         # Now a different anonymous user loading the first block should see only the uss_str set:
         data = call_handler(client2, block1_usage_key, "get_user_state", "get")
-        self.assertEqual(data["user_str"], "default value")
-        self.assertEqual(data["uss_str"], "1 was here (USS)")
-        self.assertEqual(data["pref_str"], "default value")
-        self.assertEqual(data["user_info_str"], "default value")
+        assert data['user_str'] == 'default value'
+        assert data['uss_str'] == '1 was here (USS)'
+        assert data['pref_str'] == 'default value'
+        assert data['user_info_str'] == 'default value'
 
         # The "user state summary" should not be shared between registered and anonymous users:
         client_registered = APIClient()
         client_registered.login(username=self.student_a.username, password='edx')
         data = call_handler(client_registered, block1_usage_key, "get_user_state", "get")
-        self.assertEqual(data["user_str"], "default value")
-        self.assertEqual(data["uss_str"], "default value")
-        self.assertEqual(data["pref_str"], "default value")
-        self.assertEqual(data["user_info_str"], "default value")
+        assert data['user_str'] == 'default value'
+        assert data['uss_str'] == 'default value'
+        assert data['pref_str'] == 'default value'
+        assert data['user_info_str'] == 'default value'
 
     def test_views_for_anonymous_users(self):
         """
@@ -330,14 +330,14 @@ class ContentLibraryXBlockUserStateTest(ContentLibraryContentTestMixin, TestCase
         public_view_result = anon_client.get(
             URL_BLOCK_RENDER_VIEW.format(block_key=block_usage_key, view_name='public_view'),
         )
-        self.assertEqual(public_view_result.status_code, 200)
-        self.assertIn("Hello world", public_view_result.data["content"])
+        assert public_view_result.status_code == 200
+        assert 'Hello world' in public_view_result.data['content']
 
         # Try to view the student_view:
         public_view_result = anon_client.get(
             URL_BLOCK_RENDER_VIEW.format(block_key=block_usage_key, view_name='student_view'),
         )
-        self.assertEqual(public_view_result.status_code, 403)
+        assert public_view_result.status_code == 403
 
     @XBlock.register_temp_plugin(UserStateTestBlock, UserStateTestBlock.BLOCK_TYPE)
     def test_independent_instances(self):
@@ -359,14 +359,14 @@ class ContentLibraryXBlockUserStateTest(ContentLibraryContentTestMixin, TestCase
         # block.
 
         block_instance1.user_str = 'changed to this'
-        self.assertNotEqual(block_instance1.user_str, block_instance2.user_str)
+        assert block_instance1.user_str != block_instance2.user_str
 
         block_instance1.save()
-        self.assertNotEqual(block_instance1.user_str, block_instance2.user_str)
+        assert block_instance1.user_str != block_instance2.user_str
 
         block_instance2 = block_instance1.runtime.get_block(block_usage_key)
         # Now they should be equal, because we've saved and re-loaded instance2:
-        self.assertEqual(block_instance1.user_str, block_instance2.user_str)
+        assert block_instance1.user_str == block_instance2.user_str
 
     @skip_unless_lms  # Scores are only used in the LMS
     def test_scores_persisted(self):
@@ -399,14 +399,14 @@ class ContentLibraryXBlockUserStateTest(ContentLibraryContentTestMixin, TestCase
         client.login(username=self.student_a.username, password='edx')
         student_view_result = client.get(URL_BLOCK_RENDER_VIEW.format(block_key=block_id, view_name='student_view'))
         problem_key = "input_{}_2_1".format(block_id)
-        self.assertIn(problem_key, student_view_result.data["content"])
+        assert problem_key in student_view_result.data['content']
 
         # And submit a wrong answer:
         result = client.get(URL_BLOCK_GET_HANDLER_URL.format(block_key=block_id, handler_name='xmodule_handler'))
         problem_check_url = result.data["handler_url"] + 'problem_check'
 
         submit_result = client.post(problem_check_url, data={problem_key: "choice_3"})
-        self.assertEqual(submit_result.status_code, 200)
+        assert submit_result.status_code == 200
         submit_data = json.loads(submit_result.content.decode('utf-8'))
         self.assertDictContainsSubset({
             "current_score": 0,
@@ -417,12 +417,12 @@ class ContentLibraryXBlockUserStateTest(ContentLibraryContentTestMixin, TestCase
         # Now test that the score is also persisted in StudentModule:
         # If we add a REST API to get an individual block's score, that should be checked instead of StudentModule.
         sm = get_score(self.student_a, block_id)
-        self.assertEqual(sm.grade, 0)
-        self.assertEqual(sm.max_grade, 1)
+        assert sm.grade == 0
+        assert sm.max_grade == 1
 
         # And submit a correct answer:
         submit_result = client.post(problem_check_url, data={problem_key: "choice_1"})
-        self.assertEqual(submit_result.status_code, 200)
+        assert submit_result.status_code == 200
         submit_data = json.loads(submit_result.content.decode('utf-8'))
         self.assertDictContainsSubset({
             "current_score": 1,
@@ -432,8 +432,8 @@ class ContentLibraryXBlockUserStateTest(ContentLibraryContentTestMixin, TestCase
         # Now test that the score is also updated in StudentModule:
         # If we add a REST API to get an individual block's score, that should be checked instead of StudentModule.
         sm = get_score(self.student_a, block_id)
-        self.assertEqual(sm.grade, 1)
-        self.assertEqual(sm.max_grade, 1)
+        assert sm.grade == 1
+        assert sm.max_grade == 1
 
     @skip_unless_lms
     def test_i18n(self):
@@ -469,14 +469,14 @@ class ContentLibraryXBlockUserStateTest(ContentLibraryContentTestMixin, TestCase
 
         # View the problem without specifying a language
         default_public_view = client.get(URL_BLOCK_RENDER_VIEW.format(block_key=block_id, view_name='public_view'))
-        self.assertIn("Submit", default_public_view.data["content"])
-        self.assertNotIn("Süßmït", default_public_view.data["content"])
+        assert 'Submit' in default_public_view.data['content']
+        assert 'Süßmït' not in default_public_view.data['content']
 
         # View the problem and request the dummy language
         dummy_public_view = client.get(URL_BLOCK_RENDER_VIEW.format(block_key=block_id, view_name='public_view'),
                                        HTTP_ACCEPT_LANGUAGE='eo')
-        self.assertIn("Süßmït", dummy_public_view.data["content"])
-        self.assertNotIn("Submit", dummy_public_view.data["content"])
+        assert 'Süßmït' in dummy_public_view.data['content']
+        assert 'Submit' not in dummy_public_view.data['content']
 
 
 @requires_blockstore
@@ -518,7 +518,7 @@ class ContentLibraryXBlockCompletionTest(ContentLibraryContentTestMixin, Complet
             return service.get_completions([block_id])[block_id]
 
         # At first the block is not completed
-        self.assertEqual(get_block_completion_status(), 0)
+        assert get_block_completion_status() == 0
 
         # Now call the 'publish_completion' handler:
         client = APIClient()
@@ -528,7 +528,7 @@ class ContentLibraryXBlockCompletionTest(ContentLibraryContentTestMixin, Complet
 
         # This will test the 'completion' service and the completion event handler:
         result2 = client.post(publish_completion_url, {"completion": 1.0}, format='json')
-        self.assertEqual(result2.status_code, 200)
+        assert result2.status_code == 200
 
         # Now the block is completed
-        self.assertEqual(get_block_completion_status(), 1)
+        assert get_block_completion_status() == 1

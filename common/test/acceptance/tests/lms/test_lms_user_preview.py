@@ -49,7 +49,7 @@ class StaffViewTest(UniqueCourseTest):
         """
         self.courseware_page.visit()
         staff_page = StaffCoursewarePage(self.browser, self.course_id)
-        self.assertEqual(staff_page.staff_view_mode, 'Staff')
+        assert staff_page.staff_view_mode == 'Staff'
         return staff_page
 
 

@@ -565,7 +565,7 @@ class TestProblemTypeAccess(SharedModuleStoreTestCase, MasqueradeMixin):
         )
         self.client.login(username=self.users[user].username, password=TEST_PASSWORD)
         response = self.client.post(url)
-        self.assertEqual(response.status_code, status_code)
+        assert response.status_code == status_code
 
     @ddt.data(
         InstructorFactory,
@@ -684,9 +684,9 @@ class TestProblemTypeAccess(SharedModuleStoreTestCase, MasqueradeMixin):
         block_view_url = reverse('render_xblock', kwargs={'usage_key_string': six.text_type(block.scope_ids.usage_id)})
         response = self.client.get(block_view_url)
         if is_gated:
-            self.assertEqual(response.status_code, 404)
+            assert response.status_code == 404
         else:
-            self.assertEqual(response.status_code, 200)
+            assert response.status_code == 200
 
     @ddt.data(
         InstructorFactory,
@@ -721,7 +721,7 @@ class TestProblemTypeAccess(SharedModuleStoreTestCase, MasqueradeMixin):
         block = self.blocks_dict['problem']
         block_view_url = reverse('render_xblock', kwargs={'usage_key_string': six.text_type(block.scope_ids.usage_id)})
         response = self.client.get(block_view_url)
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
 
     @ddt.data(
         FORUM_ROLE_COMMUNITY_TA,
@@ -1154,20 +1154,10 @@ class TestContentTypeGatingService(ModuleStoreTestCase):
         )
 
         # The method returns a content type gate for blocks that should be gated
-        self.assertIn(
-            'content-paywall',
-            ContentTypeGatingService()._content_type_gate_for_block(
-                self.user, blocks_dict['graded_1'], course['course'].id
-            ).content
-        )
+        assert 'content-paywall' in ContentTypeGatingService()._content_type_gate_for_block(self.user, blocks_dict['graded_1'], course['course'].id).content
 
         # The method returns None for blocks that should not be gated
-        self.assertEquals(
-            None,
-            ContentTypeGatingService()._content_type_gate_for_block(
-                self.user, blocks_dict['not_graded_1'], course['course'].id
-            )
-        )
+        assert ContentTypeGatingService()._content_type_gate_for_block(self.user, blocks_dict['not_graded_1'], course['course'].id) is None
 
     @patch.object(ContentTypeGatingService, '_get_user', return_value=UserFactory.build())
     def test_check_children_for_content_type_gating_paywall(self, mocked_user):  # pylint: disable=unused-argument
@@ -1187,12 +1177,7 @@ class TestContentTypeGatingService(ModuleStoreTestCase):
         )
 
         # The method returns a content type gate for blocks that should be gated
-        self.assertEquals(
-            None,
-            ContentTypeGatingService().check_children_for_content_type_gating_paywall(
-                blocks_dict['vertical'], course['course'].id
-            )
-        )
+        assert ContentTypeGatingService().check_children_for_content_type_gating_paywall(blocks_dict['vertical'], course['course'].id) is None
 
         blocks_dict['graded_1'] = ItemFactory.create(
             parent=blocks_dict['vertical'],
@@ -1202,9 +1187,4 @@ class TestContentTypeGatingService(ModuleStoreTestCase):
         )
 
         # The method returns None for blocks that should not be gated
-        self.assertIn(
-            'content-paywall',
-            ContentTypeGatingService().check_children_for_content_type_gating_paywall(
-                blocks_dict['vertical'], course['course'].id
-            )
-        )
+        assert 'content-paywall' in ContentTypeGatingService().check_children_for_content_type_gating_paywall(blocks_dict['vertical'], course['course'].id)

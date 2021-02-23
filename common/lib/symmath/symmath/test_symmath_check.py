@@ -32,7 +32,7 @@ class SymmathCheckTest(TestCase):  # lint-amnesty, pylint: disable=missing-class
 
         # Expect that the exact same symbolic string is marked correct
         result = symmath_check(expected_str, expected_str, dynamath=[dynamath])
-        self.assertTrue('ok' in result and result['ok'])
+        assert (('ok' in result) and result['ok'])
 
     def test_symmath_check_equivalent_symbols(self):
         expected_str = "x+2*y"
@@ -52,7 +52,7 @@ class SymmathCheckTest(TestCase):  # lint-amnesty, pylint: disable=missing-class
 
         # Expect that equivalent symbolic strings are marked correct
         result = symmath_check(expected_str, input_str, dynamath=[dynamath])
-        self.assertTrue('ok' in result and result['ok'])
+        assert (('ok' in result) and result['ok'])
 
     def test_symmath_check_different_symbols(self):
         expected_str = "0"
@@ -70,8 +70,8 @@ class SymmathCheckTest(TestCase):  # lint-amnesty, pylint: disable=missing-class
 
         # Expect that an incorrect response is marked incorrect
         result = symmath_check(expected_str, input_str, dynamath=[dynamath])
-        self.assertTrue('ok' in result and not result['ok'])
-        self.assertNotIn('fail', result['msg'])
+        assert (('ok' in result) and (not result['ok']))
+        assert 'fail' not in result['msg']
 
     def _symmath_check_numbers(self, number_list):  # lint-amnesty, pylint: disable=missing-function-docstring
 
@@ -81,11 +81,9 @@ class SymmathCheckTest(TestCase):  # lint-amnesty, pylint: disable=missing-class
             expect = n
             ans = n
             result = symmath_check(str(expect), str(ans))
-            self.assertTrue('ok' in result and result['ok'],
-                            "%f should == %f" % (expect, ans))
+            assert (('ok' in result) and result['ok']), ('%f should == %f' % (expect, ans))
 
             # Change expect so that it != ans
             expect += 0.1
             result = symmath_check(str(expect), str(ans))
-            self.assertTrue('ok' in result and not result['ok'],
-                            "%f should != %f" % (expect, ans))
+            assert (('ok' in result) and (not result['ok'])), ('%f should != %f' % (expect, ans))

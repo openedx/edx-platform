@@ -2,23 +2,20 @@
 Progress Tab Views
 """
 
+from edx_django_utils import monitoring as monitoring_utils
+from opaque_keys.edx.keys import CourseKey
 from rest_framework.generics import RetrieveAPIView
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
-from edx_django_utils import monitoring as monitoring_utils
-from opaque_keys.edx.keys import CourseKey
-
-from lms.djangoapps.course_home_api.progress.v1.serializers import ProgressTabSerializer
-
+import lms.djangoapps.course_blocks.api as course_blocks_api
 from common.djangoapps.student.models import CourseEnrollment
 from lms.djangoapps.course_api.blocks.transformers.blocks_api import BlocksAPITransformer
+from lms.djangoapps.course_home_api.progress.v1.serializers import ProgressTabSerializer
+from lms.djangoapps.courseware.access import has_access
 from lms.djangoapps.courseware.context_processor import user_timezone_locale_prefs
 from lms.djangoapps.courseware.courses import get_course_with_access, get_studio_url
 from lms.djangoapps.courseware.masquerade import setup_masquerade
-from lms.djangoapps.courseware.access import has_access
-
-import lms.djangoapps.course_blocks.api as course_blocks_api
 from lms.djangoapps.courseware.views.views import credit_course_requirements, get_cert_data
 from lms.djangoapps.grades.api import CourseGradeFactory
 from lms.djangoapps.verify_student.services import IDVerificationService

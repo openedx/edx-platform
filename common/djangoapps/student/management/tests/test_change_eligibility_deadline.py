@@ -2,6 +2,7 @@
 
 
 from datetime import datetime, timedelta
+import pytest
 
 from django.core.management import call_command
 from opaque_keys import InvalidKeyError
@@ -44,29 +45,29 @@ class ChangeEligibilityDeadlineTests(SharedModuleStoreTestCase):
         username = self.enrolled_user.username
 
         # Incorrect username
-        with self.assertRaises(User.DoesNotExist):
+        with pytest.raises(User.DoesNotExist):
             call_command('change_eligibility_deadline',
                          *command_args.format(username='XYZ', course=course_id_str, date='2018-12-30').split(' ')
                          )
         # Incorrect course id
-        with self.assertRaises(InvalidKeyError):
+        with pytest.raises(InvalidKeyError):
             call_command('change_eligibility_deadline',
                          *command_args.format(username=username, course='XYZ', date='2018-12-30').split(' ')
                          )
         # Student not enrolled
-        with self.assertRaises(CourseEnrollment.DoesNotExist):
+        with pytest.raises(CourseEnrollment.DoesNotExist):
             unenrolled_user = UserFactory.create()
             call_command('change_eligibility_deadline',
                          *command_args.format(username=unenrolled_user.username, course=course_id_str,
                                               date='2018-12-30').split(' ')
                          )
         # Date format Invalid
-        with self.assertRaises(ValueError):
+        with pytest.raises(ValueError):
             call_command('change_eligibility_deadline',
                          *command_args.format(username=username, course=course_id_str, date='30-12-2018').split(' ')
                          )
         # Date not provided
-        with self.assertRaises(KeyError):
+        with pytest.raises(KeyError):
             call_command('change_eligibility_deadline',
                          *command_args.format(username=username, course=course_id_str,).split(' '))
 
@@ -105,4 +106,4 @@ class ChangeEligibilityDeadlineTests(SharedModuleStoreTestCase):
         credit_eligibility = CreditEligibility.objects.get(username=username,
                                                            course__course_key=self.course.id)
         credit_deadline = credit_eligibility.deadline.date()
-        self.assertEqual(credit_deadline, new_deadline.date())
+        assert credit_deadline == new_deadline.date()

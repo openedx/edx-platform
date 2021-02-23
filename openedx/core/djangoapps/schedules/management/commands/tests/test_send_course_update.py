@@ -72,7 +72,7 @@ class TestSendCourseUpdate(ScheduleUpsellTestMixin, ScheduleSendEmailTestMixin, 
             ItemFactory.create(parent=course, category='chapter', highlights=[u'highlights'])
 
         enrollment = CourseEnrollmentFactory(course_id=course.id, user=self.user, mode=u'audit')
-        self.assertEqual(enrollment.schedule.get_experience_type(), ScheduleExperience.EXPERIENCES.course_updates)
+        assert enrollment.schedule.get_experience_type() == ScheduleExperience.EXPERIENCES.course_updates
 
         _, offset, target_day, _ = self._get_dates(offset=self.expected_offsets[0])
         enrollment.schedule.start_date = target_day
@@ -109,7 +109,7 @@ class TestSendCourseUpdate(ScheduleUpsellTestMixin, ScheduleSendEmailTestMixin, 
                 bin_num=self._calculate_bin_for_user(enrollment.user),
             ))
 
-            self.assertTrue(mock_ace.send.called)
+            assert mock_ace.send.called
 
     @override_waffle_flag(COURSE_UPDATE_WAFFLE_FLAG, True)
     @patch('openedx.core.djangoapps.schedules.signals.get_current_site')
@@ -126,4 +126,4 @@ class TestSendCourseUpdate(ScheduleUpsellTestMixin, ScheduleSendEmailTestMixin, 
             day_offset=offset,
             bin_num=self._calculate_bin_for_user(enrollment.user),
         ))
-        self.assertEqual(u'{} Weekly Update'.format(enrollment.course.display_name), mail.outbox[0].subject)
+        assert u'{} Weekly Update'.format(enrollment.course.display_name) == mail.outbox[0].subject

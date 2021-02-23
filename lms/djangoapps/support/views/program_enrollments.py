@@ -13,6 +13,7 @@ from django.views.generic import View
 from social_django.models import UserSocialAuth
 
 from common.djangoapps.edxmako.shortcuts import render_to_response
+from common.djangoapps.third_party_auth.models import SAMLProviderConfig
 from lms.djangoapps.program_enrollments.api import (
     fetch_program_enrollments_by_student,
     get_users_by_external_keys_and_org_key,
@@ -24,12 +25,8 @@ from lms.djangoapps.program_enrollments.exceptions import (
     ProviderDoesNotExistException
 )
 from lms.djangoapps.support.decorators import require_support_permission
-from lms.djangoapps.support.serializers import (
-    ProgramEnrollmentSerializer,
-    serialize_user_info
-)
+from lms.djangoapps.support.serializers import ProgramEnrollmentSerializer, serialize_user_info
 from lms.djangoapps.verify_student.services import IDVerificationService
-from common.djangoapps.third_party_auth.models import SAMLProviderConfig
 
 TEMPLATE_PATH = 'support/link_program_enrollments.html'
 DATETIME_FORMAT = '%Y-%m-%dT%H:%M:%S'
@@ -94,7 +91,7 @@ class LinkProgramEnrollmentSupportView(View):
             program_uuid = UUID(program_uuid_string)
         except ValueError:
             return [], [
-                "Supplied program UUID '{}' is not a valid UUID.".format(program_uuid_string)
+                f"Supplied program UUID '{program_uuid_string}' is not a valid UUID."
             ]
         reader = csv.DictReader(
             linkage_text.splitlines(), fieldnames=('external_key', 'username')
@@ -213,7 +210,7 @@ class ProgramEnrollmentsInspectorView(View):
             result['id_verification'] = IDVerificationService.user_status(user)
             return result, ''
         except User.DoesNotExist:
-            return {}, 'Could not find edx account with {}'.format(username_or_email)
+            return {}, f'Could not find edx account with {username_or_email}'
 
     def _get_external_user_info(self, external_user_key, org_key, idp_provider=None):
         """

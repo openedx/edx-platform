@@ -81,7 +81,7 @@ class TestCourseSharingLinks(ModuleStoreTestCase):
             enable_social_sharing=enable_social_sharing,
             enable_mktg_site=enable_mktg_site,
         )
-        self.assertEqual(actual_course_sharing_link, expected_course_sharing_link)
+        assert actual_course_sharing_link == expected_course_sharing_link
 
     @ddt.data(
         (['social_sharing_url'], 'test_marketing_url'),
@@ -106,7 +106,7 @@ class TestCourseSharingLinks(ModuleStoreTestCase):
             enable_social_sharing=True,
             enable_mktg_site=True,
         )
-        self.assertEqual(actual_course_sharing_link, expected_course_sharing_link)
+        assert actual_course_sharing_link == expected_course_sharing_link
 
     @ddt.data(
         (True, 'test_social_sharing_url'),
@@ -126,4 +126,4 @@ class TestCourseSharingLinks(ModuleStoreTestCase):
             enable_mktg_site=True,
             use_overview=False,
         )
-        self.assertEqual(actual_course_sharing_link, expected_course_sharing_link)
+        assert actual_course_sharing_link == expected_course_sharing_link

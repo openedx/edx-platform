@@ -24,16 +24,16 @@ class TestCredentialsApiConfig(CredentialsApiConfigMixin, TestCase):
         credentials_config = self.create_credentials_config()
 
         expected = '{root}/api/{version}/'.format(root=CREDENTIALS_INTERNAL_SERVICE_URL.strip('/'), version=API_VERSION)
-        self.assertEqual(credentials_config.get_internal_api_url_for_org('nope'), expected)
+        assert credentials_config.get_internal_api_url_for_org('nope') == expected
 
         expected = '{root}/api/{version}/'.format(root=CREDENTIALS_INTERNAL_SERVICE_URL.strip('/'), version=API_VERSION)
-        self.assertEqual(credentials_config.internal_api_url, expected)
+        assert credentials_config.internal_api_url == expected
 
         expected = '{root}/api/{version}/'.format(root=CREDENTIALS_INTERNAL_SERVICE_URL.strip('/'), version=API_VERSION)
-        self.assertEqual(credentials_config.get_internal_api_url_for_org('nope'), expected)
+        assert credentials_config.get_internal_api_url_for_org('nope') == expected
 
         expected = '{root}/api/{version}/'.format(root=CREDENTIALS_PUBLIC_SERVICE_URL.strip('/'), version=API_VERSION)
-        self.assertEqual(credentials_config.public_api_url, expected)
+        assert credentials_config.public_api_url == expected
 
     def test_is_learner_issuance_enabled(self):
         """
@@ -41,10 +41,10 @@ class TestCredentialsApiConfig(CredentialsApiConfigMixin, TestCase):
         when configuration is enabled and all required configuration is provided.
         """
         credentials_config = self.create_credentials_config(enabled=False)
-        self.assertFalse(credentials_config.is_learner_issuance_enabled)
+        assert not credentials_config.is_learner_issuance_enabled
 
         credentials_config = self.create_credentials_config(enable_learner_issuance=False)
-        self.assertFalse(credentials_config.is_learner_issuance_enabled)
+        assert not credentials_config.is_learner_issuance_enabled
 
         credentials_config = self.create_credentials_config()
-        self.assertTrue(credentials_config.is_learner_issuance_enabled)
+        assert credentials_config.is_learner_issuance_enabled

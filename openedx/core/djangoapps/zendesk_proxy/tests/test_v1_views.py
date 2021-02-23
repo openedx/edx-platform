@@ -57,33 +57,21 @@ class ZendeskProxyTestCase(ApiTestCase):
             )
             self.assertHttpCreated(response)
             (mock_args, mock_kwargs) = mock_post.call_args
-            self.assertEqual(mock_args, ('https://www.superrealurlsthataredefinitelynotfake.com/api/v2/tickets.json',))
+            assert mock_args == ('https://www.superrealurlsthataredefinitelynotfake.com/api/v2/tickets.json',)
             six.assertCountEqual(self, mock_kwargs.keys(), ['headers', 'data'])
-            self.assertEqual(
-                mock_kwargs['headers'],
-                {
-                    'content-type': 'application/json',
-                    'Authorization': 'Bearer abcdefghijklmnopqrstuvwxyz1234567890'
-                }
-            )
-            self.assertEqual(
-                json.loads(mock_kwargs['data']),
-                {
-                    'ticket': {
-                        'comment': {
-                            'body': "Help! I'm trapped in a unit test factory and I can't get out!",
-                            'uploads': None,
-                        },
-                        'custom_fields': [{'id': '001', 'value': 'demo-course'}],
-                        'requester': {
-                            'email': self.user.email,
-                            'name': self.user.username
-                        },
-                        'subject': 'Python Unit Test Help Request',
-                        'tags': ['python_unit_test'],
+            assert mock_kwargs['headers'] == {
+                'content-type': 'application/json', 'Authorization': 'Bearer abcdefghijklmnopqrstuvwxyz1234567890'
+            }
+            assert json.loads(mock_kwargs['data']) == {
+                'ticket': {
+                    'comment': {
+                        'body': "Help! I'm trapped in a unit test factory and I can't get out!", 'uploads': None
                     },
+                    'custom_fields': [{'id': '001', 'value': 'demo-course'}],
+                    'requester': {'email': self.user.email, 'name': self.user.username},
+                    'subject': 'Python Unit Test Help Request', 'tags': ['python_unit_test']
                 }
-            )
+            }
 
     @ddt.data('subject', 'tags')
     def test_bad_request(self, key_to_delete):
@@ -115,4 +103,4 @@ class ZendeskProxyTestCase(ApiTestCase):
         for _ in range(ZendeskProxyThrottle().num_requests):
             self.request_without_auth('post', self.url)
         response = self.request_without_auth('post', self.url)
-        self.assertEqual(response.status_code, 429)
+        assert response.status_code == 429

@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 Unit tests covering the program listing and detail pages.
 """
@@ -6,16 +5,16 @@ Unit tests covering the program listing and detail pages.
 
 import json
 import re
+from unittest import mock
+from urllib.parse import urljoin
 from uuid import uuid4
 
-import mock
-import six
-from six.moves.urllib.parse import urljoin
 from bs4 import BeautifulSoup
 from django.conf import settings
 from django.test import override_settings
 from django.urls import reverse, reverse_lazy
 
+from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
 from lms.envs.test import CREDENTIALS_PUBLIC_SERVICE_URL
 from openedx.core.djangoapps.catalog.constants import PathwayType
 from openedx.core.djangoapps.catalog.tests.factories import (
@@ -27,7 +26,6 @@ from openedx.core.djangoapps.catalog.tests.factories import (
 from openedx.core.djangoapps.catalog.tests.mixins import CatalogIntegrationMixin
 from openedx.core.djangoapps.programs.tests.mixins import ProgramsApiConfigMixin
 from openedx.core.djangolib.testing.utils import skip_unless_lms
-from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory as ModuleStoreCourseFactory
 
@@ -39,7 +37,7 @@ def load_serialized_data(response, key):
     """
     Extract and deserialize serialized data from the response.
     """
-    pattern = re.compile(u'{key}: (?P<data>\\[.*\\])'.format(key=key))
+    pattern = re.compile(f'{key}: (?P<data>\\[.*\\])')
     match = pattern.search(response.content.decode('utf-8'))
     serialized = match.group('data')
 
@@ -57,10 +55,10 @@ class TestProgramListing(ProgramsApiConfigMixin, SharedModuleStoreTestCase):
 
     @classmethod
     def setUpClass(cls):
-        super(TestProgramListing, cls).setUpClass()
+        super().setUpClass()
 
         cls.course = ModuleStoreCourseFactory()
-        course_run = CourseRunFactory(key=six.text_type(cls.course.id))  # lint-amnesty, pylint: disable=no-member
+        course_run = CourseRunFactory(key=str(cls.course.id))  # lint-amnesty, pylint: disable=no-member
         course = CourseFactory(course_runs=[course_run])
 
         cls.first_program = ProgramFactory(courses=[course])
@@ -69,7 +67,7 @@ class TestProgramListing(ProgramsApiConfigMixin, SharedModuleStoreTestCase):
         cls.data = sorted([cls.first_program, cls.second_program], key=cls.program_sort_key)
 
     def setUp(self):
-        super(TestProgramListing, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
 
         self.user = UserFactory()
         self.client.login(username=self.user.username, password=self.password)
@@ -92,7 +90,7 @@ class TestProgramListing(ProgramsApiConfigMixin, SharedModuleStoreTestCase):
         subset_keys = set(subset.keys())
         intersection = {key: superset[key] for key in superset_keys & subset_keys}
 
-        self.assertEqual(subset, intersection)
+        assert subset == intersection
 
     def test_login_required(self, mock_get_programs):
         """
@@ -112,7 +110,7 @@ class TestProgramListing(ProgramsApiConfigMixin, SharedModuleStoreTestCase):
         self.client.login(username=self.user.username, password=self.password)
 
         response = self.client.get(self.url)
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
 
     def test_404_if_disabled(self, _mock_get_programs):
         """
@@ -121,7 +119,7 @@ class TestProgramListing(ProgramsApiConfigMixin, SharedModuleStoreTestCase):
         self.create_programs_config(enabled=False)
 
         response = self.client.get(self.url)
-        self.assertEqual(response.status_code, 404)
+        assert response.status_code == 404
 
     def test_empty_state(self, mock_get_programs):
         """
@@ -191,7 +189,7 @@ class TestProgramListing(ProgramsApiConfigMixin, SharedModuleStoreTestCase):
             expected_program = self.data[index]
 
             expected_url = reverse('program_details_view', kwargs={'program_uuid': expected_program['uuid']})
-            self.assertEqual(actual_program['detail_url'], expected_url)
+            assert actual_program['detail_url'] == expected_url
 
 
 @skip_unless_lms
@@ -205,10 +203,10 @@ class TestProgramDetails(ProgramsApiConfigMixin, CatalogIntegrationMixin, Shared
 
     @classmethod
     def setUpClass(cls):
-        super(TestProgramDetails, cls).setUpClass()
+        super().setUpClass()
 
         modulestore_course = ModuleStoreCourseFactory()
-        course_run = CourseRunFactory(key=six.text_type(modulestore_course.id))  # lint-amnesty, pylint: disable=no-member
+        course_run = CourseRunFactory(key=str(modulestore_course.id))  # lint-amnesty, pylint: disable=no-member
         course = CourseFactory(course_runs=[course_run])
 
         cls.program_data = ProgramFactory(uuid=cls.program_uuid, courses=[course])
@@ -218,7 +216,7 @@ class TestProgramDetails(ProgramsApiConfigMixin, CatalogIntegrationMixin, Shared
         del cls.pathway_data['programs']  # lint-amnesty, pylint: disable=unsupported-delete-operation
 
     def setUp(self):
-        super(TestProgramDetails, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
 
         self.user = UserFactory()
         self.client.login(username=self.user.username, password=self.password)
@@ -228,7 +226,7 @@ class TestProgramDetails(ProgramsApiConfigMixin, CatalogIntegrationMixin, Shared
         self.assertContains(response, 'programData')
         self.assertContains(response, 'urls')
         self.assertContains(response,
-                            u'"program_record_url": "{}/records/programs/'.format(CREDENTIALS_PUBLIC_SERVICE_URL))
+                            f'"program_record_url": "{CREDENTIALS_PUBLIC_SERVICE_URL}/records/programs/')
         self.assertContains(response, 'program_listing_url')
         self.assertContains(response, self.program_data['title'])
         self.assert_programs_tab_present(response)
@@ -236,9 +234,7 @@ class TestProgramDetails(ProgramsApiConfigMixin, CatalogIntegrationMixin, Shared
     def assert_programs_tab_present(self, response):
         """Verify that the programs tab is present in the nav."""
         soup = BeautifulSoup(response.content, 'html.parser')
-        self.assertTrue(
-            any(soup.find_all('a', class_='tab-nav-link', href=reverse('program_listing_view')))
-        )
+        assert any(soup.find_all('a', class_='tab-nav-link', href=reverse('program_listing_view')))
 
     def assert_pathway_data_present(self, response):
         """ Verify that the correct pathway data is present. """
@@ -249,12 +245,12 @@ class TestProgramDetails(ProgramsApiConfigMixin, CatalogIntegrationMixin, Shared
         credit_pathways = load_serialized_data(response, 'creditPathways')
         if self.pathway_data['pathway_type'] == PathwayType.CREDIT.value:
             credit_pathway, = credit_pathways  # Verify that there is only one credit pathway
-            self.assertEqual(self.pathway_data, credit_pathway)
-            self.assertEqual([], industry_pathways)
+            assert self.pathway_data == credit_pathway
+            assert [] == industry_pathways
         elif self.pathway_data['pathway_type'] == PathwayType.INDUSTRY.value:
             industry_pathway, = industry_pathways  # Verify that there is only one industry pathway
-            self.assertEqual(self.pathway_data, industry_pathway)
-            self.assertEqual([], credit_pathways)
+            assert self.pathway_data == industry_pathway
+            assert [] == credit_pathways
 
     def test_login_required(self, mock_get_programs, mock_get_pathways):
         """
@@ -292,7 +288,7 @@ class TestProgramDetails(ProgramsApiConfigMixin, CatalogIntegrationMixin, Shared
         self.create_programs_config(enabled=False)
 
         response = self.client.get(self.url)
-        self.assertEqual(response.status_code, 404)
+        assert response.status_code == 404
 
     def test_404_if_no_data(self, mock_get_programs, _mock_get_pathways):
         """Verify that the page 404s if no program data is found."""
@@ -301,4 +297,4 @@ class TestProgramDetails(ProgramsApiConfigMixin, CatalogIntegrationMixin, Shared
         mock_get_programs.return_value = None
 
         response = self.client.get(self.url)
-        self.assertEqual(response.status_code, 404)
+        assert response.status_code == 404

@@ -19,7 +19,7 @@ class CacheCheckMixin(object):
     def check_caches(self, key):
         """Check that caches are empty, and add values."""
         for cache in caches.all():
-            self.assertIsNone(cache.get(key))
+            assert cache.get(key) is None
             cache.set(key, "Not None")
 
 

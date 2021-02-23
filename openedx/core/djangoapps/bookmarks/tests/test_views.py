@@ -43,7 +43,7 @@ class BookmarksViewsTestsBase(BookmarksTestsBase, BookmarkApiEventTestMixin):
         """
         url = url + '?' + query_parameters if query_parameters else url
         response = client.get(url)
-        self.assertEqual(expected_status, response.status_code)
+        assert expected_status == response.status_code
         return response
 
     def send_post(self, client, url, data, content_type='application/json', expected_status=201):
@@ -51,7 +51,7 @@ class BookmarksViewsTestsBase(BookmarksTestsBase, BookmarkApiEventTestMixin):
         Helper method for sending a POST to the server. Verifies the expected status and returns the response.
         """
         response = client.post(url, data=json.dumps(data), content_type=content_type)
-        self.assertEqual(expected_status, response.status_code)
+        assert expected_status == response.status_code
         return response
 
     def send_delete(self, client, url, expected_status=204):
@@ -59,7 +59,7 @@ class BookmarksViewsTestsBase(BookmarksTestsBase, BookmarkApiEventTestMixin):
         Helper method for sending a DELETE to the server. Verifies the expected status and returns the response.
         """
         response = client.delete(url)
-        self.assertEqual(expected_status, response.status_code)
+        assert expected_status == response.status_code
         return response
 
 
@@ -104,9 +104,9 @@ class BookmarksListViewTests(BookmarksViewsTestsBase):
         )
         bookmarks_data = response.data['results']
 
-        self.assertEqual(len(bookmarks_data), len(bookmarks))
-        self.assertEqual(response.data['count'], len(bookmarks))
-        self.assertEqual(response.data['num_pages'], 1)
+        assert len(bookmarks_data) == len(bookmarks)
+        assert response.data['count'] == len(bookmarks)
+        assert response.data['num_pages'] == 1
 
         # As bookmarks are sorted by -created so we will compare in that order.
         self.assert_bookmark_data_is_valid(bookmarks[-1], bookmarks_data[0], check_optional_fields=check_all_fields)
@@ -147,11 +147,11 @@ class BookmarksListViewTests(BookmarksViewsTestsBase):
         bookmarks_data = response.data['results']
 
         # Pagination assertions.
-        self.assertEqual(response.data['count'], bookmarks_count)
-        self.assertIn('page=2&page_size={}'.format(page_size), response.data['next'])
-        self.assertEqual(response.data['num_pages'], bookmarks_count / page_size)
+        assert response.data['count'] == bookmarks_count
+        assert 'page=2&page_size={}'.format(page_size) in response.data['next']
+        assert response.data['num_pages'] == (bookmarks_count / page_size)
 
-        self.assertEqual(len(bookmarks_data), min(bookmarks_count, page_size))
+        assert len(bookmarks_data) == min(bookmarks_count, page_size)
         self.assert_bookmark_data_is_valid(bookmarks[-1], bookmarks_data[0])
 
         self.assert_bookmark_event_emitted(
@@ -177,8 +177,8 @@ class BookmarksListViewTests(BookmarksViewsTestsBase):
         )
         bookmarks_data = response.data['results']
 
-        self.assertEqual(len(bookmarks_data), 0)
-        self.assertFalse(mock_tracker.emit.called)
+        assert len(bookmarks_data) == 0
+        assert not mock_tracker.emit.called
 
     @patch('eventtracking.tracker.emit')
     def test_get_all_bookmarks_when_course_id_not_given(self, mock_tracker):
@@ -191,7 +191,7 @@ class BookmarksListViewTests(BookmarksViewsTestsBase):
             url=reverse('bookmarks')
         )
         bookmarks_data = response.data['results']
-        self.assertEqual(len(bookmarks_data), 5)
+        assert len(bookmarks_data) == 5
         self.assert_bookmark_data_is_valid(self.other_bookmark_1, bookmarks_data[0])
         self.assert_bookmark_data_is_valid(self.bookmark_4, bookmarks_data[1])
         self.assert_bookmark_data_is_valid(self.bookmark_3, bookmarks_data[2])
@@ -236,12 +236,12 @@ class BookmarksListViewTests(BookmarksViewsTestsBase):
         )
 
         # Assert Newly created bookmark.
-        self.assertEqual(response.data['id'], '%s,%s' % (self.user.username, six.text_type(self.vertical_2.location)))
-        self.assertEqual(response.data['course_id'], self.course_id)
-        self.assertEqual(response.data['usage_id'], six.text_type(self.vertical_2.location))
-        self.assertIsNotNone(response.data['created'])
-        self.assertEqual(len(response.data['path']), 2)
-        self.assertEqual(response.data['display_name'], self.vertical_2.display_name)
+        assert response.data['id'] == ('%s,%s' % (self.user.username, six.text_type(self.vertical_2.location)))
+        assert response.data['course_id'] == self.course_id
+        assert response.data['usage_id'] == six.text_type(self.vertical_2.location)
+        assert response.data['created'] is not None
+        assert len(response.data['path']) == 2
+        assert response.data['display_name'] == self.vertical_2.display_name
 
     def test_post_bookmark_with_invalid_data(self):
         """
@@ -258,7 +258,7 @@ class BookmarksListViewTests(BookmarksViewsTestsBase):
             data={'usage_id': 'invalid'},
             expected_status=400
         )
-        self.assertEqual(response.data['user_message'], u'An error has occurred. Please try again.')
+        assert response.data['user_message'] == u'An error has occurred. Please try again.'
 
         # Send data without usage_id.
         response = self.send_post(
@@ -267,8 +267,8 @@ class BookmarksListViewTests(BookmarksViewsTestsBase):
             data={'course_id': 'invalid'},
             expected_status=400
         )
-        self.assertEqual(response.data['user_message'], u'An error has occurred. Please try again.')
-        self.assertEqual(response.data['developer_message'], u'Parameter usage_id not provided.')
+        assert response.data['user_message'] == u'An error has occurred. Please try again.'
+        assert response.data['developer_message'] == u'Parameter usage_id not provided.'
 
         # Send empty data dictionary.
         with self.assertNumQueries(9):  # No queries for bookmark table.
@@ -278,8 +278,8 @@ class BookmarksListViewTests(BookmarksViewsTestsBase):
                 data={},
                 expected_status=400
             )
-        self.assertEqual(response.data['user_message'], u'An error has occurred. Please try again.')
-        self.assertEqual(response.data['developer_message'], u'No data provided.')
+        assert response.data['user_message'] == u'An error has occurred. Please try again.'
+        assert response.data['developer_message'] == u'No data provided.'
 
     def test_post_bookmark_for_non_existing_block(self):
         """
@@ -291,14 +291,9 @@ class BookmarksListViewTests(BookmarksViewsTestsBase):
             data={'usage_id': 'i4x://arbi/100/html/340ef1771a094090ad260ec940d04a21'},
             expected_status=400
         )
-        self.assertEqual(
-            response.data['user_message'],
-            u'An error has occurred. Please try again.'
-        )
-        self.assertEqual(
-            response.data['developer_message'],
-            u'Block with usage_id: i4x://arbi/100/html/340ef1771a094090ad260ec940d04a21 not found.'
-        )
+        assert response.data['user_message'] == u'An error has occurred. Please try again.'
+        assert response.data['developer_message'] ==\
+               u'Block with usage_id: i4x://arbi/100/html/340ef1771a094090ad260ec940d04a21 not found.'
 
     @patch('django.conf.settings.MAX_BOOKMARKS_PER_COURSE', 5)
     def test_post_bookmark_when_max_bookmarks_already_exist(self):
@@ -314,24 +309,20 @@ class BookmarksListViewTests(BookmarksViewsTestsBase):
             data={'usage_id': six.text_type(blocks[-1].location)},
             expected_status=400
         )
-        self.assertEqual(
-            response.data['user_message'],
-            u'You can create up to {0} bookmarks.'
-            u' You must remove some bookmarks before you can add new ones.'.format(max_bookmarks)
-        )
-        self.assertEqual(
-            response.data['developer_message'],
-            u'You can create up to {0} bookmarks.'
-            u' You must remove some bookmarks before you can add new ones.'.format(max_bookmarks)
-        )
+        assert response.data['user_message'] == u'You can create up to {0} bookmarks.' \
+                                                u' You must remove some bookmarks before you can add new ones.'\
+            .format(max_bookmarks)
+        assert response.data['developer_message'] == u'You can create up to {0} bookmarks.' \
+                                                     u' You must remove some bookmarks before you can add new ones.'\
+            .format(max_bookmarks)
 
     def test_unsupported_methods(self):
         """
         Test that DELETE and PUT are not supported.
         """
         self.client.login(username=self.user.username, password=self.TEST_PASSWORD)
-        self.assertEqual(405, self.client.put(reverse('bookmarks')).status_code)
-        self.assertEqual(405, self.client.delete(reverse('bookmarks')).status_code)
+        assert 405 == self.client.put(reverse('bookmarks')).status_code
+        assert 405 == self.client.delete(reverse('bookmarks')).status_code
 
     @patch('eventtracking.tracker.emit')
     @ddt.unpack
@@ -397,7 +388,7 @@ class BookmarksDetailViewTests(BookmarksViewsTestsBase):
             query_parameters=query_params
         )
         data = response.data
-        self.assertIsNotNone(data)
+        assert data is not None
         self.assert_bookmark_data_is_valid(self.bookmark_1, data, check_optional_fields=check_optional_fields)
 
     def test_get_bookmark_that_belongs_to_other_user(self):
@@ -438,14 +429,10 @@ class BookmarksDetailViewTests(BookmarksViewsTestsBase):
             ),
             expected_status=404
         )
-        self.assertEqual(
-            response.data['user_message'],
-            'Bookmark with usage_id: i4x://arbi/100/html/340ef1771a0940 does not exist.'
-        )
-        self.assertEqual(
-            response.data['developer_message'],
-            'Bookmark with usage_id: i4x://arbi/100/html/340ef1771a0940 does not exist.'
-        )
+        assert response.data['user_message'] ==\
+               'Bookmark with usage_id: i4x://arbi/100/html/340ef1771a0940 does not exist.'
+        assert response.data['developer_message'] ==\
+               'Bookmark with usage_id: i4x://arbi/100/html/340ef1771a0940 does not exist.'
 
     def test_get_bookmark_with_invalid_usage_id(self):
         """
@@ -459,7 +446,7 @@ class BookmarksDetailViewTests(BookmarksViewsTestsBase):
             ),
             expected_status=404
         )
-        self.assertEqual(response.data['user_message'], u'Invalid usage_id: i4x.')
+        assert response.data['user_message'] == u'Invalid usage_id: i4x.'
 
     def test_anonymous_access(self):
         """
@@ -484,7 +471,7 @@ class BookmarksDetailViewTests(BookmarksViewsTestsBase):
         query_parameters = 'course_id={}'.format(six.moves.urllib.parse.quote(self.course_id))
         response = self.send_get(client=self.client, url=reverse('bookmarks'), query_parameters=query_parameters)
         bookmarks_data = response.data['results']
-        self.assertEqual(len(bookmarks_data), 4)
+        assert len(bookmarks_data) == 4
 
         self.send_delete(
             client=self.client,
@@ -496,7 +483,7 @@ class BookmarksDetailViewTests(BookmarksViewsTestsBase):
         response = self.send_get(client=self.client, url=reverse('bookmarks'), query_parameters=query_parameters)
         bookmarks_data = response.data['results']
 
-        self.assertEqual(len(bookmarks_data), 3)
+        assert len(bookmarks_data) == 3
 
     def test_delete_bookmark_that_belongs_to_other_user(self):
         """
@@ -523,14 +510,10 @@ class BookmarksDetailViewTests(BookmarksViewsTestsBase):
             ),
             expected_status=404
         )
-        self.assertEqual(
-            response.data['user_message'],
-            u'Bookmark with usage_id: i4x://arbi/100/html/340ef1771a0940 does not exist.'
-        )
-        self.assertEqual(
-            response.data['developer_message'],
-            'Bookmark with usage_id: i4x://arbi/100/html/340ef1771a0940 does not exist.'
-        )
+        assert response.data['user_message'] ==\
+               u'Bookmark with usage_id: i4x://arbi/100/html/340ef1771a0940 does not exist.'
+        assert response.data['developer_message'] ==\
+               'Bookmark with usage_id: i4x://arbi/100/html/340ef1771a0940 does not exist.'
 
     def test_delete_bookmark_with_invalid_usage_id(self):
         """
@@ -544,7 +527,7 @@ class BookmarksDetailViewTests(BookmarksViewsTestsBase):
             ),
             expected_status=404
         )
-        self.assertEqual(response.data['user_message'], u'Invalid usage_id: i4x.')
+        assert response.data['user_message'] == u'Invalid usage_id: i4x.'
 
     def test_unsupported_methods(self):
         """
@@ -552,5 +535,5 @@ class BookmarksDetailViewTests(BookmarksViewsTestsBase):
         """
         url = reverse('bookmarks_detail', kwargs={'username': self.user.username, 'usage_id': 'i4x'})
         self.client.login(username=self.user.username, password=self.TEST_PASSWORD)
-        self.assertEqual(405, self.client.put(url).status_code)
-        self.assertEqual(405, self.client.post(url).status_code)
+        assert 405 == self.client.put(url).status_code
+        assert 405 == self.client.post(url).status_code

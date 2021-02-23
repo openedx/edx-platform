@@ -340,10 +340,7 @@ class TestStudentView(XBlockWrapperTestMixin, TestCase):
         """
         Assert that both student_view and get_html render the same.
         """
-        self.assertEqual(
-            descriptor._xmodule.get_html(),
-            descriptor.render(STUDENT_VIEW).content
-        )
+        assert descriptor._xmodule.get_html() == descriptor.render(STUDENT_VIEW).content
 
 
 class TestStudioView(XBlockWrapperTestMixin, TestCase):
@@ -367,7 +364,7 @@ class TestStudioView(XBlockWrapperTestMixin, TestCase):
         """
         html = descriptor.get_html()
         rendered_content = descriptor.render(STUDIO_VIEW).content
-        self.assertEqual(html, rendered_content)
+        assert html == rendered_content
 
 
 @ddt.ddt
@@ -392,8 +389,8 @@ class TestXModuleHandler(TestCase):
 
     def test_xmodule_handler_return_value(self):
         response = self.module.xmodule_handler(self.request)
-        self.assertIsInstance(response, webob.Response)
-        self.assertEqual(response.body.decode('utf-8'), '{}')
+        assert isinstance(response, webob.Response)
+        assert response.body.decode('utf-8') == '{}'
 
     @ddt.data(
         u'{"test_key": "test_value"}',
@@ -407,8 +404,8 @@ class TestXModuleHandler(TestCase):
 
         self.module.handle_ajax = Mock(return_value=response_data)
         response = self.module.xmodule_handler(self.request)
-        self.assertIsInstance(response, webob.Response)
-        self.assertEqual(response.body.decode('utf-8'), '{"test_key": "test_value"}')
+        assert isinstance(response, webob.Response)
+        assert response.body.decode('utf-8') == '{"test_key": "test_value"}'
 
 
 class TestXmlExport(XBlockWrapperTestMixin, TestCase):
@@ -430,8 +427,8 @@ class TestXmlExport(XBlockWrapperTestMixin, TestCase):
 
         xmodule_node = etree.fromstring(descriptor.export_to_xml(xmodule_api_fs))
 
-        self.assertEqual(list(xmodule_api_fs.walk()), list(xblock_api_fs.walk()))
-        self.assertEqual(etree.tostring(xmodule_node), etree.tostring(xblock_node))
+        assert list(xmodule_api_fs.walk()) == list(xblock_api_fs.walk())
+        assert etree.tostring(xmodule_node) == etree.tostring(xblock_node)
 
 
 class TestPublicView(XBlockWrapperTestMixin, TestCase):
@@ -453,12 +450,6 @@ class TestPublicView(XBlockWrapperTestMixin, TestCase):
         Assert that public_view contains correct message.
         """
         if descriptor.display_name:
-            self.assertIn(
-                descriptor.display_name,
-                descriptor.render(PUBLIC_VIEW).content
-            )
+            assert descriptor.display_name in descriptor.render(PUBLIC_VIEW).content
         else:
-            self.assertIn(
-                "This content is only accessible",
-                descriptor.render(PUBLIC_VIEW).content
-            )
+            assert 'This content is only accessible' in descriptor.render(PUBLIC_VIEW).content

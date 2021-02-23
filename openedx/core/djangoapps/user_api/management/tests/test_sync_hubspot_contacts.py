@@ -69,7 +69,7 @@ class TestHubspotSyncCommand(TestCase):
         sync_site = patch.object(sync_command, '_sync_site')
         mock_sync_site = sync_site.start()
         call_command('sync_hubspot_contacts')
-        self.assertFalse(mock_sync_site.called, "_sync_site should not be called")
+        assert not mock_sync_site.called, '_sync_site should not be called'
         sync_site.stop()
         # put values back
         self.hubspot_site_config.site_values = orig_values
@@ -84,8 +84,9 @@ class TestHubspotSyncCommand(TestCase):
         out = StringIO()
         call_command('sync_hubspot_contacts', '--initial-sync-days=7', '--batch-size=2', stdout=out)
         output = out.getvalue()
-        self.assertIn('Successfully synced users', output)
-        self.assertEqual(mock_sync_with_hubspot.call_count, 4)  # 4 requests of batch (2, 2, 2, 1), total 7 contacts
+        assert 'Successfully synced users' in output
+        assert mock_sync_with_hubspot.call_count == 4
+        # 4 requests of batch (2, 2, 2, 1), total 7 contacts
         sync_with_hubspot.stop()
 
     def test_command_without_initial_sync_days(self):
@@ -97,6 +98,6 @@ class TestHubspotSyncCommand(TestCase):
         out = StringIO()
         call_command('sync_hubspot_contacts', '--batch-size=3', stdout=out)
         output = out.getvalue()
-        self.assertIn('Successfully synced users', output)
-        self.assertEqual(mock_sync_with_hubspot.call_count, 1)
+        assert 'Successfully synced users' in output
+        assert mock_sync_with_hubspot.call_count == 1
         sync_with_hubspot.stop()

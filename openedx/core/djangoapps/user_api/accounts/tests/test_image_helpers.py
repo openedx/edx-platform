@@ -39,27 +39,20 @@ class ProfileImageUrlTestCase(TestCase):
         """
         Verify correct url structure.
         """
-        self.assertEqual(
-            actual_url,
-            'http://example-storage.com/profile-images/{name}_{size}.jpg?v={version}'.format(
-                name=expected_name, size=expected_pixels, version=expected_version
-            )
-        )
+        assert actual_url == 'http://example-storage.com/profile-images/{name}_{size}.jpg?v={version}'\
+            .format(name=expected_name, size=expected_pixels, version=expected_version)
 
     def verify_default_url(self, actual_url, expected_pixels):
         """
         Verify correct url structure for a default profile image.
         """
-        self.assertEqual(
-            actual_url,
-            '/static/default_{size}.png'.format(size=expected_pixels)
-        )
+        assert actual_url == '/static/default_{size}.png'.format(size=expected_pixels)
 
     def verify_urls(self, actual_urls, expected_name, is_default=False):
         """
         Verify correct url dictionary structure.
         """
-        self.assertEqual(set(TEST_SIZES.keys()), set(actual_urls.keys()))
+        assert set(TEST_SIZES.keys()) == set(actual_urls.keys())
         for size_display_name, url in actual_urls.items():
             if is_default:
                 self.verify_default_url(url, TEST_SIZES[size_display_name])

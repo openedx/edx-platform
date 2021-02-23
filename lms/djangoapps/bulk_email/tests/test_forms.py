@@ -29,37 +29,35 @@ class CourseAuthorizationFormTest(ModuleStoreTestCase):
 
     def test_authorize_mongo_course(self):
         # Initially course shouldn't be authorized
-        self.assertFalse(is_bulk_email_feature_enabled(self.course.id))
+        assert not is_bulk_email_feature_enabled(self.course.id)
         # Test authorizing the course, which should totally work
         form_data = {'course_id': text_type(self.course.id), 'email_enabled': True}
         form = CourseAuthorizationAdminForm(data=form_data)
         # Validation should work
-        self.assertTrue(form.is_valid())
+        assert form.is_valid()
         form.save()
         # Check that this course is authorized
-        self.assertTrue(is_bulk_email_feature_enabled(self.course.id))
+        assert is_bulk_email_feature_enabled(self.course.id)
 
     def test_repeat_course(self):
         # Initially course shouldn't be authorized
-        self.assertFalse(is_bulk_email_feature_enabled(self.course.id))
+        assert not is_bulk_email_feature_enabled(self.course.id)
         # Test authorizing the course, which should totally work
         form_data = {'course_id': text_type(self.course.id), 'email_enabled': True}
         form = CourseAuthorizationAdminForm(data=form_data)
         # Validation should work
-        self.assertTrue(form.is_valid())
+        assert form.is_valid()
         form.save()
         # Check that this course is authorized
-        self.assertTrue(is_bulk_email_feature_enabled(self.course.id))
+        assert is_bulk_email_feature_enabled(self.course.id)
 
         # Now make a new course authorization with the same course id that tries to turn email off
         form_data = {'course_id': text_type(self.course.id), 'email_enabled': False}
         form = CourseAuthorizationAdminForm(data=form_data)
         # Validation should not work because course_id field is unique
-        self.assertFalse(form.is_valid())
-        self.assertEqual(
-            "Course authorization with this Course id already exists.",
-            form._errors['course_id'][0]  # pylint: disable=protected-access
-        )
+        assert not form.is_valid()
+        assert 'Course authorization with this Course id already exists.' == form._errors['course_id'][0]  # pylint: disable=protected-access, line-too-long
+
         with self.assertRaisesRegex(
             ValueError,
             "The CourseAuthorization could not be created because the data didn't validate."
@@ -67,7 +65,7 @@ class CourseAuthorizationFormTest(ModuleStoreTestCase):
             form.save()
 
         # Course should still be authorized (invalid attempt had no effect)
-        self.assertTrue(is_bulk_email_feature_enabled(self.course.id))
+        assert is_bulk_email_feature_enabled(self.course.id)
 
     def test_form_typo(self):
         # Munge course id
@@ -76,11 +74,11 @@ class CourseAuthorizationFormTest(ModuleStoreTestCase):
         form_data = {'course_id': text_type(bad_id), 'email_enabled': True}
         form = CourseAuthorizationAdminForm(data=form_data)
         # Validation shouldn't work
-        self.assertFalse(form.is_valid())
+        assert not form.is_valid()
 
         msg = u'Course not found.'
         msg += u' Entered course id was: "{0}".'.format(text_type(bad_id))
-        self.assertEqual(msg, form._errors['course_id'][0])  # pylint: disable=protected-access
+        assert msg == form._errors['course_id'][0]  # pylint: disable=protected-access
 
         with self.assertRaisesRegex(
             ValueError,
@@ -92,11 +90,11 @@ class CourseAuthorizationFormTest(ModuleStoreTestCase):
         form_data = {'course_id': "asd::**!@#$%^&*())//foobar!!", 'email_enabled': True}
         form = CourseAuthorizationAdminForm(data=form_data)
         # Validation shouldn't work
-        self.assertFalse(form.is_valid())
+        assert not form.is_valid()
 
         msg = u'Course id invalid.'
         msg += u' Entered course id was: "asd::**!@#$%^&*())//foobar!!".'
-        self.assertEqual(msg, form._errors['course_id'][0])  # pylint: disable=protected-access
+        assert msg == form._errors['course_id'][0]  # pylint: disable=protected-access
 
         with self.assertRaisesRegex(
             ValueError,
@@ -109,10 +107,10 @@ class CourseAuthorizationFormTest(ModuleStoreTestCase):
         form_data = {'course_id': self.course.id.run, 'email_enabled': True}
         form = CourseAuthorizationAdminForm(data=form_data)
         # Validation shouldn't work
-        self.assertFalse(form.is_valid())
+        assert not form.is_valid()
 
         error_msg = form._errors['course_id'][0]  # pylint: disable=protected-access
-        self.assertIn(u'Entered course id was: "{0}".'.format(self.course.id.run), error_msg)
+        assert u'Entered course id was: "{0}".'.format(self.course.id.run) in error_msg
 
         with self.assertRaisesRegex(
             ValueError,
@@ -135,7 +133,7 @@ class CourseEmailTemplateFormTest(ModuleStoreTestCase):
             'name': ''
         }
         form = CourseEmailTemplateForm(form_data)
-        self.assertFalse(form.is_valid())
+        assert not form.is_valid()
 
     def test_missing_message_body_in_plain(self):
         """
@@ -148,7 +146,7 @@ class CourseEmailTemplateFormTest(ModuleStoreTestCase):
             'name': ''
         }
         form = CourseEmailTemplateForm(form_data)
-        self.assertFalse(form.is_valid())
+        assert not form.is_valid()
 
     def test_blank_name_is_null(self):
         """
@@ -161,13 +159,13 @@ class CourseEmailTemplateFormTest(ModuleStoreTestCase):
             'name': ''
         }
         form = CourseEmailTemplateForm(form_data)
-        self.assertTrue(form.is_valid())
+        assert form.is_valid()
         form.save()
 
         # now inspect the database and make sure the blank name was stored as a NULL
         # Note this will throw an exception if it is not found
         cet = CourseEmailTemplate.objects.get(name=None)
-        self.assertIsNotNone(cet)
+        assert cet is not None
 
     def test_name_with_only_spaces_is_null(self):
         """
@@ -180,13 +178,13 @@ class CourseEmailTemplateFormTest(ModuleStoreTestCase):
             'name': '   '
         }
         form = CourseEmailTemplateForm(form_data)
-        self.assertTrue(form.is_valid())
+        assert form.is_valid()
         form.save()
 
         # now inspect the database and make sure the whitespace only name was stored as a NULL
         # Note this will throw an exception if it is not found
         cet = CourseEmailTemplate.objects.get(name=None)
-        self.assertIsNotNone(cet)
+        assert cet is not None
 
     def test_name_with_spaces_is_trimmed(self):
         """
@@ -199,13 +197,13 @@ class CourseEmailTemplateFormTest(ModuleStoreTestCase):
             'name': ' foo  '
         }
         form = CourseEmailTemplateForm(form_data)
-        self.assertTrue(form.is_valid())
+        assert form.is_valid()
         form.save()
 
         # now inspect the database and make sure the name is properly
         # stripped
         cet = CourseEmailTemplate.objects.get(name='foo')
-        self.assertIsNotNone(cet)
+        assert cet is not None
 
     def test_non_blank_name(self):
         """
@@ -218,13 +216,13 @@ class CourseEmailTemplateFormTest(ModuleStoreTestCase):
             'name': 'foo'
         }
         form = CourseEmailTemplateForm(form_data)
-        self.assertTrue(form.is_valid())
+        assert form.is_valid()
         form.save()
 
         # now inspect the database and make sure the blank name was stored as a NULL
         # Note this will throw an exception if it is not found
         cet = CourseEmailTemplate.objects.get(name='foo')
-        self.assertIsNotNone(cet)
+        assert cet is not None
 
     def test_duplicate_name(self):
         """
@@ -239,12 +237,12 @@ class CourseEmailTemplateFormTest(ModuleStoreTestCase):
             'name': 'foo'
         }
         form = CourseEmailTemplateForm(form_data)
-        self.assertTrue(form.is_valid())
+        assert form.is_valid()
         form.save()
 
         # try to submit form with the same name
         form = CourseEmailTemplateForm(form_data)
-        self.assertFalse(form.is_valid())
+        assert not form.is_valid()
 
         # try again with a name with extra whitespace
         # this should fail as we strip the whitespace away
@@ -254,7 +252,7 @@ class CourseEmailTemplateFormTest(ModuleStoreTestCase):
             'name': '  foo '
         }
         form = CourseEmailTemplateForm(form_data)
-        self.assertFalse(form.is_valid())
+        assert not form.is_valid()
 
         # then try a different name
         form_data = {
@@ -263,8 +261,8 @@ class CourseEmailTemplateFormTest(ModuleStoreTestCase):
             'name': 'bar'
         }
         form = CourseEmailTemplateForm(form_data)
-        self.assertTrue(form.is_valid())
+        assert form.is_valid()
         form.save()
 
         form = CourseEmailTemplateForm(form_data)
-        self.assertFalse(form.is_valid())
+        assert not form.is_valid()

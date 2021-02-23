@@ -95,7 +95,7 @@ class Command(BaseCommand):
                              email=email,
                              slug=slug
                          ))
-            auth.uid = '{slug}:{uid}'.format(slug=slug, uid=uid)
+            auth.uid = f'{slug}:{uid}'
             auth.save()
 
         not_previously_linked, updated, duplicated_in_mapping = \

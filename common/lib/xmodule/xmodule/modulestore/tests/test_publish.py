@@ -13,6 +13,7 @@ from contextlib import contextmanager
 from shutil import rmtree
 from tempfile import mkdtemp
 
+import pytest
 import ddt
 import six
 from six.moves import range
@@ -136,7 +137,7 @@ class TestPublish(SplitWMongoCourseBootstrapper):
 
         # verify status
         item = self.draft_mongo.get_item(vert_location, 0)
-        self.assertFalse(getattr(item, 'is_draft', False), "Item was published. Draft should not exist")
+        assert not getattr(item, 'is_draft', False), 'Item was published. Draft should not exist'
         # however, children are still draft, but I'm not sure that's by design
 
         # delete the draft version of the discussion
@@ -144,8 +145,8 @@ class TestPublish(SplitWMongoCourseBootstrapper):
         self.draft_mongo.delete_item(location, self.user_id)
 
         draft_vert = self.draft_mongo.get_item(vert_location, 0)
-        self.assertTrue(getattr(draft_vert, 'is_draft', False), "Deletion didn't convert parent to draft")
-        self.assertNotIn(location, draft_vert.children)
+        assert getattr(draft_vert, 'is_draft', False), "Deletion didn't convert parent to draft"
+        assert location not in draft_vert.children
         # move the other child
         other_child_loc = self.old_course_key.make_usage_key('html', block_id='Html2')
         draft_vert.children.remove(other_child_loc)
@@ -156,12 +157,12 @@ class TestPublish(SplitWMongoCourseBootstrapper):
         # publish
         self.draft_mongo.publish(vert_location, self.user_id)
         item = self.draft_mongo.get_item(draft_vert.location, revision=ModuleStoreEnum.RevisionOption.published_only)
-        self.assertNotIn(location, item.children)
-        self.assertIsNone(self.draft_mongo.get_parent_location(location))
-        with self.assertRaises(ItemNotFoundError):
+        assert location not in item.children
+        assert self.draft_mongo.get_parent_location(location) is None
+        with pytest.raises(ItemNotFoundError):
             self.draft_mongo.get_item(location)
-        self.assertNotIn(other_child_loc, item.children)
-        self.assertTrue(self.draft_mongo.has_item(other_child_loc), "Oops, lost moved item")
+        assert other_child_loc not in item.children
+        assert self.draft_mongo.has_item(other_child_loc), 'Oops, lost moved item'
 
 
 class DraftPublishedOpTestCourseSetup(unittest.TestCase):
@@ -305,10 +306,7 @@ class OLXFormatChecker(unittest.TestCase):
         self._ensure_exported()
 
         block_path = os.path.join(self.root_export_dir, self.export_dir)  # pylint: disable=no-member
-        self.assertTrue(
-            os.path.isdir(block_path),
-            msg='{} is not a dir.'.format(block_path)
-        )
+        assert os.path.isdir(block_path), '{} is not a dir.'.format(block_path)
         return block_path
 
     def _get_block_type_path(self, course_export_dir, block_type, draft):
@@ -335,10 +333,7 @@ class OLXFormatChecker(unittest.TestCase):
 
         block_file = self._get_block_filename(block_id)
         block_file_path = os.path.join(block_subdir_path, block_file)
-        self.assertTrue(
-            os.path.isfile(block_file_path),
-            msg='{} is not an existing file.'.format(block_file_path)
-        )
+        assert os.path.isfile(block_file_path), '{} is not an existing file.'.format(block_file_path)
         with open(block_file_path, "r") as file_handle:
             return file_handle.read()
 
@@ -350,7 +345,7 @@ class OLXFormatChecker(unittest.TestCase):
             element (ElementTree.Element): the element to check.
             tag (str): The tag to validate.
         """
-        self.assertEqual(element.tag, tag)
+        assert element.tag == tag
 
     def assertElementAttrsSubset(self, element, attrs):
         """
@@ -395,10 +390,7 @@ class OLXFormatChecker(unittest.TestCase):
         is_draft = kwargs.pop('draft', False)
         block_path = self._get_block_type_path(course_export_dir, block_type, is_draft)
         block_file_path = os.path.join(block_path, self._get_block_filename(block_id))
-        self.assertFalse(
-            os.path.exists(block_file_path),
-            msg='{} exists but should not!'.format(block_file_path)
-        )
+        assert not os.path.exists(block_file_path), '{} exists but should not!'.format(block_file_path)
 
     def assertParentReferences(self, element, course_key, parent_type, parent_id, index_in_children_list):
         """
@@ -458,7 +450,7 @@ class OLXFormatChecker(unittest.TestCase):
         """
         for block_data in block_list:
             block_params = self.course_db.get(block_data)
-            self.assertIsNotNone(block_params)
+            assert block_params is not None
             (block_type, block_id) = block_data
             if draft:
                 element = self.parse_olx(block_type, block_id, draft=True)
@@ -691,7 +683,7 @@ class ElementalPublishingTests(DraftPublishedOpBaseTestSetup):
             # In Split, you cannot publish an item whose parents are unpublished.
             # Split will raise an exception when the item's parent(s) aren't found
             # in the published branch.
-            with self.assertRaises(ItemNotFoundError):
+            with pytest.raises(ItemNotFoundError):
                 self.publish((('html', 'html00'),))
 
     @ddt.data(*MODULESTORE_SETUPS)
@@ -839,7 +831,7 @@ class ElementalUnpublishingTests(DraftPublishedOpBaseTestSetup):
             # The unit is a draft.
             self.assertOLXIsDraftOnly(block_list_to_unpublish)
             # Since there's no published version, attempting an unpublish throws an exception.
-            with self.assertRaises(ItemNotFoundError):
+            with pytest.raises(ItemNotFoundError):
                 self.unpublish(block_list_to_unpublish)
 
     @ddt.data(*MODULESTORE_SETUPS)
@@ -887,7 +879,7 @@ class ElementalUnpublishingTests(DraftPublishedOpBaseTestSetup):
             # The vertical is a draft.
             self.assertOLXIsDraftOnly(block_list_to_unpublish)
             # Since there's no published version, attempting an unpublish throws an exception.
-            with self.assertRaises(ItemNotFoundError):
+            with pytest.raises(ItemNotFoundError):
                 self.unpublish(block_list_to_unpublish)
 
     @ddt.data(*MODULESTORE_SETUPS)
@@ -939,7 +931,7 @@ class ElementalUnpublishingTests(DraftPublishedOpBaseTestSetup):
             block_list_to_unpublish = (
                 ('sequential', 'sequential03'),
             )
-            with self.assertRaises(InvalidVersionError):
+            with pytest.raises(InvalidVersionError):
                 self.unpublish(block_list_to_unpublish)
 
 
@@ -983,7 +975,7 @@ class ElementalDeleteItemTests(DraftPublishedOpBaseTestSetup):
                 if revision in (ModuleStoreEnum.RevisionOption.published_only, ModuleStoreEnum.RevisionOption.all):
                     # Split throws an exception when trying to delete an item from the published branch
                     # that isn't yet published.
-                    with self.assertRaises(ValueError):
+                    with pytest.raises(ValueError):
                         self.delete_item(block_list_to_delete, revision=revision)
                 else:
                     self.delete_item(block_list_to_delete, revision=revision)
@@ -1060,7 +1052,7 @@ class ElementalDeleteItemTests(DraftPublishedOpBaseTestSetup):
                 # MODULESTORE_DIFFERENCE:
                 # Split throws an exception when trying to delete an item from the published branch
                 # that isn't yet published.
-                with self.assertRaises(ValueError):
+                with pytest.raises(ValueError):
                     self.delete_item(block_list_to_delete, revision=revision)
             else:
                 self.delete_item(block_list_to_delete, revision=revision)
@@ -1190,7 +1182,7 @@ class ElementalConvertToDraftTests(DraftPublishedOpBaseTestSetup):
             elif self.is_old_mongo_modulestore:
                 # Old Mongo:
                 # Direct-only categories are never allowed to be converted to draft.
-                with self.assertRaises(InvalidVersionError):
+                with pytest.raises(InvalidVersionError):
                     self.convert_to_draft(block_list_to_convert)
             else:
                 raise Exception("Must test either Old Mongo or Split modulestore!")
@@ -1212,7 +1204,7 @@ class ElementalRevertToPublishedTests(DraftPublishedOpBaseTestSetup):
             self.assertOLXIsDraftOnly(block_list_to_revert)
             # Now, without publishing anything first, revert the same vertical to published.
             # Since no published version exists, an exception is raised.
-            with self.assertRaises(InvalidVersionError):
+            with pytest.raises(InvalidVersionError):
                 self.revert_to_published(block_list_to_revert)
 
     @ddt.data(*MODULESTORE_SETUPS)

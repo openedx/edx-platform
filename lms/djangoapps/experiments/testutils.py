@@ -1,7 +1,6 @@
 # lint-amnesty, pylint: disable=missing-module-docstring
 from contextlib import contextmanager
-
-from mock import patch
+from unittest.mock import patch
 
 from edx_toggles.toggles.testutils import override_waffle_flag
 

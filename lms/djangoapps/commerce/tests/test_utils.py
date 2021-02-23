@@ -49,7 +49,7 @@ class AuditLogTests(TestCase):
         # Verify that the logged message contains comma-separated
         # key-value pairs ordered alphabetically by key.
         message = 'foo: bar="baz", qux="quux"'
-        self.assertTrue(mock_log.info.called_with(message))
+        assert mock_log.info.called_with(message)
 
 
 @ddt.ddt
@@ -66,13 +66,13 @@ class EcommerceServiceTests(TestCase):
     def test_is_enabled(self):
         """Verify that is_enabled() returns True when ecomm checkout is enabled. """
         is_enabled = EcommerceService().is_enabled(self.user)
-        self.assertTrue(is_enabled)
+        assert is_enabled
 
         config = CommerceConfiguration.current()
         config.checkout_on_ecommerce_service = False
         config.save()
         is_not_enabled = EcommerceService().is_enabled(self.user)
-        self.assertFalse(is_not_enabled)
+        assert not is_not_enabled
 
     @override_switch(settings.DISABLE_ACCOUNT_ACTIVATION_REQUIREMENT_SWITCH, active=True)
     def test_is_enabled_activation_requirement_disabled(self):
@@ -80,25 +80,25 @@ class EcommerceServiceTests(TestCase):
         self.user.is_active = False
         self.user.save()
         is_enabled = EcommerceService().is_enabled(self.user)
-        self.assertTrue(is_enabled)
+        assert is_enabled
 
     @patch('openedx.core.djangoapps.theming.helpers.is_request_in_themed_site')
     def test_is_enabled_for_sites(self, is_site):
         """Verify that is_enabled() returns True if used for a site."""
         is_site.return_value = True
         is_enabled = EcommerceService().is_enabled(self.user)
-        self.assertTrue(is_enabled)
+        assert is_enabled
 
     @override_settings(ECOMMERCE_PUBLIC_URL_ROOT='http://ecommerce_url')
     def test_ecommerce_url_root(self):
         """Verify that the proper root URL is returned."""
-        self.assertEqual(EcommerceService().ecommerce_url_root, 'http://ecommerce_url')
+        assert EcommerceService().ecommerce_url_root == 'http://ecommerce_url'
 
     @override_settings(ECOMMERCE_PUBLIC_URL_ROOT='http://ecommerce_url')
     def test_get_absolute_ecommerce_url(self):
         """Verify that the proper URL is returned."""
         url = EcommerceService().get_absolute_ecommerce_url('/test_basket/')
-        self.assertEqual(url, 'http://ecommerce_url/test_basket/')
+        assert url == 'http://ecommerce_url/test_basket/'
 
     @override_settings(ECOMMERCE_PUBLIC_URL_ROOT='http://ecommerce_url')
     def test_get_receipt_page_url(self):
@@ -106,14 +106,14 @@ class EcommerceServiceTests(TestCase):
         order_number = 'ORDER1'
         url = EcommerceService().get_receipt_page_url(order_number)
         expected_url = 'http://ecommerce_url/checkout/receipt/?order_number={}'.format(order_number)
-        self.assertEqual(url, expected_url)
+        assert url == expected_url
 
     @override_settings(ECOMMERCE_PUBLIC_URL_ROOT='http://ecommerce_url')
     def test_get_order_dashboard_url(self):
         """Verify that the proper order dashboard url is returned."""
         url = EcommerceService().get_order_dashboard_url()
         expected_url = 'http://ecommerce_url/dashboard/orders/'
-        self.assertEqual(url, expected_url)
+        assert url == expected_url
 
     @override_settings(ECOMMERCE_PUBLIC_URL_ROOT='http://ecommerce_url')
     @ddt.data(
@@ -146,7 +146,7 @@ class EcommerceServiceTests(TestCase):
                 expected_url=expected_url,
                 program_uuid=program_uuid
             )
-        self.assertEqual(url, expected_url)
+        assert url == expected_url
 
     @override_settings(ECOMMERCE_PUBLIC_URL_ROOT='http://ecommerce_url')
     @ddt.data(
@@ -178,7 +178,7 @@ class EcommerceServiceTests(TestCase):
             skus=urlencode(query, doseq=True),
         )
 
-        self.assertEqual(url, expected_url)
+        assert url == expected_url
 
 
 @ddt.ddt
@@ -375,4 +375,4 @@ class RefundUtilMethodTests(ModuleStoreTestCase):
         enrollment = CourseEnrollment.get_or_create_enrollment(self.user, course_id)
 
         assert refund_success
-        self.assertEqual(enrollment.mode, new_mode)
+        assert enrollment.mode == new_mode

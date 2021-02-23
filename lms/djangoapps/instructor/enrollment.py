@@ -10,7 +10,6 @@ import logging
 from datetime import datetime
 
 import pytz
-import six
 from django.conf import settings
 from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.core.mail import send_mail  # lint-amnesty, pylint: disable=unused-import
@@ -20,11 +19,21 @@ from django.utils.translation import override as override_language
 from edx_ace import ace
 from edx_ace.recipient import Recipient
 from eventtracking import tracker
-from six import text_type
 from submissions import api as sub_api  # installed from the edx-submissions repository
 from submissions.models import score_set
 
 from common.djangoapps.course_modes.models import CourseMode
+from common.djangoapps.student.models import (  # lint-amnesty, pylint: disable=line-too-long
+    CourseEnrollment,
+    CourseEnrollmentAllowed,
+    anonymous_id_for_user,
+    is_email_retired
+)
+from common.djangoapps.track.event_transaction_utils import (
+    create_new_event_transaction_id,
+    get_event_transaction_id,
+    set_event_transaction_type
+)
 from lms.djangoapps.courseware.models import StudentModule
 from lms.djangoapps.grades.api import constants as grades_constants
 from lms.djangoapps.grades.api import disconnect_submissions_signal_receiver
@@ -43,19 +52,13 @@ from openedx.core.djangoapps.lang_pref import LANGUAGE_KEY
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.user_api.models import UserPreference
 from openedx.core.djangolib.markup import Text
-from common.djangoapps.student.models import CourseEnrollment, CourseEnrollmentAllowed, anonymous_id_for_user, is_email_retired  # lint-amnesty, pylint: disable=line-too-long
-from common.djangoapps.track.event_transaction_utils import (
-    create_new_event_transaction_id,
-    get_event_transaction_id,
-    set_event_transaction_type
-)
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError
 
 log = logging.getLogger(__name__)
 
 
-class EmailEnrollmentState(object):
+class EmailEnrollmentState:
     """ Store the complete enrollment state of an email in a class """
     def __init__(self, course_id, email):
         # N.B. retired users are not a concern here because they should be
@@ -221,7 +224,7 @@ def send_beta_role_email(action, user, email_params):
         email_params['email_address'] = user.email
         email_params['full_name'] = user.profile.name
     else:
-        raise ValueError(u"Unexpected action received '{}' - expected 'add' or 'remove'".format(action))
+        raise ValueError(f"Unexpected action received '{action}' - expected 'add' or 'remove'")
     trying_to_add_inactive_user = not user.is_active and action == 'add'
     if not trying_to_add_inactive_user:
         send_mail_to_student(user.email, email_params, language=get_user_email_language(user))
@@ -267,8 +270,8 @@ def reset_student_attempts(course_id, student, module_state_key, requesting_user
                 with disconnect_submissions_signal_receiver(score_set):
                     clear_student_state(
                         user_id=user_id,
-                        course_id=six.text_type(course_id),
-                        item_id=six.text_type(module_state_key),
+                        course_id=str(course_id),
+                        item_id=str(module_state_key),
                         requesting_user_id=requesting_user_id
                     )
                 submission_cleared = True
@@ -277,7 +280,7 @@ def reset_student_attempts(course_id, student, module_state_key, requesting_user
             selected_teamset_id = getattr(block, 'selected_teamset_id', None)
     except ItemNotFoundError:
         block = None
-        log.warning(u"Could not find %s in modulestore when attempting to reset attempts.", module_state_key)
+        log.warning("Could not find %s in modulestore when attempting to reset attempts.", module_state_key)
 
     # Reset the student's score in the submissions API, if xblock.clear_student_state has not done so already.
     # We need to do this before retrieving the `StudentModule` model, because a score may exist with no student module.
@@ -287,8 +290,8 @@ def reset_student_attempts(course_id, student, module_state_key, requesting_user
     if delete_module and not submission_cleared:
         sub_api.reset_score(
             user_id,
-            text_type(course_id),
-            text_type(module_state_key),
+            str(course_id),
+            str(module_state_key),
         )
 
     def _reset_or_delete_module(studentmodule):
@@ -297,14 +300,14 @@ def reset_student_attempts(course_id, student, module_state_key, requesting_user
             create_new_event_transaction_id()
             set_event_transaction_type(grades_events.STATE_DELETED_EVENT_TYPE)
             tracker.emit(
-                six.text_type(grades_events.STATE_DELETED_EVENT_TYPE),
+                str(grades_events.STATE_DELETED_EVENT_TYPE),
                 {
-                    'user_id': six.text_type(student.id),
-                    'course_id': six.text_type(course_id),
-                    'problem_id': six.text_type(module_state_key),
-                    'instructor_id': six.text_type(requesting_user.id),
-                    'event_transaction_id': six.text_type(get_event_transaction_id()),
-                    'event_transaction_type': six.text_type(grades_events.STATE_DELETED_EVENT_TYPE),
+                    'user_id': str(student.id),
+                    'course_id': str(course_id),
+                    'problem_id': str(module_state_key),
+                    'instructor_id': str(requesting_user.id),
+                    'event_transaction_id': str(get_event_transaction_id()),
+                    'event_transaction_type': str(grades_events.STATE_DELETED_EVENT_TYPE),
                 }
             )
             if not submission_cleared:
@@ -376,8 +379,8 @@ def _fire_score_changed_for_block(
                 raw_possible=max_score,
                 weight=getattr(block, 'weight', None),
                 user_id=student.id,
-                course_id=six.text_type(course_id),
-                usage_id=six.text_type(module_state_key),
+                course_id=str(course_id),
+                usage_id=str(module_state_key),
                 score_deleted=True,
                 only_if_higher=False,
                 modified=datetime.now().replace(tzinfo=pytz.UTC),
@@ -394,7 +397,7 @@ def get_email_params(course, auto_enroll, secure=True, course_key=None, display_
     """
 
     protocol = 'https' if secure else 'http'
-    course_key = course_key or text_type(course.id)
+    course_key = course_key or str(course.id)
     display_name = display_name or Text(course.display_name_with_default)
 
     stripped_site_name = configuration_helpers.get_value(
@@ -403,12 +406,12 @@ def get_email_params(course, auto_enroll, secure=True, course_key=None, display_
     )
     # TODO: Use request.build_absolute_uri rather than '{proto}://{site}{path}'.format
     # and check with the Services team that this works well with microsites
-    registration_url = u'{proto}://{site}{path}'.format(
+    registration_url = '{proto}://{site}{path}'.format(
         proto=protocol,
         site=stripped_site_name,
         path=reverse('register_user')
     )
-    course_url = u'{proto}://{site}{path}'.format(
+    course_url = '{proto}://{site}{path}'.format(
         proto=protocol,
         site=stripped_site_name,
         path=reverse('course_root', kwargs={'course_id': course_key})
@@ -417,7 +420,7 @@ def get_email_params(course, auto_enroll, secure=True, course_key=None, display_
     # We can't get the url to the course's About page if the marketing site is enabled.
     course_about_url = None
     if not settings.FEATURES.get('ENABLE_MKTG_SITE', False):
-        course_about_url = u'{proto}://{site}{path}'.format(
+        course_about_url = '{proto}://{site}{path}'.format(
             proto=protocol,
             site=stripped_site_name,
             path=reverse('about_course', kwargs={'course_id': course_key})

@@ -47,6 +47,9 @@ LMS_BASE = 'localhost:18000'
 LMS_ROOT_URL = 'http://{}'.format(LMS_BASE)
 FEATURES['PREVIEW_LMS_BASE'] = "preview." + LMS_BASE
 
+FRONTEND_LOGIN_URL = LMS_ROOT_URL + '/login'
+FRONTEND_LOGOUT_URL = LMS_ROOT_URL + '/logout'
+FRONTEND_REGISTER_URL = LMS_ROOT_URL + '/register'
 ########################### PIPELINE #################################
 
 # Skip packaging and optimization in development

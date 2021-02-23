@@ -34,7 +34,7 @@ from django.views.decorators.http import require_GET, require_http_methods, requ
 from django.views.generic import View
 from edx_django_utils import monitoring as monitoring_utils
 from edx_django_utils.monitoring import set_custom_attribute, set_custom_attributes_for_course_key
-from ipware.ip import get_ip
+from ipware.ip import get_client_ip
 from markupsafe import escape
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey, UsageKey
@@ -1911,7 +1911,7 @@ def financial_assistance_request(request):
         goals = data['goals']
         effort = data['effort']
         marketing_permission = data['mktg-permission']
-        ip_address = get_ip(request)
+        ip_address = get_client_ip(request)[0]
     except ValueError:
         # Thrown if JSON parsing fails
         return HttpResponseBadRequest(u'Could not parse request JSON.')

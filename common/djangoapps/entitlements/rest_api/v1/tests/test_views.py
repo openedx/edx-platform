@@ -387,7 +387,7 @@ class EntitlementViewSetTest(ModuleStoreTestCase):
         assert response.status_code == 201
 
         result_obj = UserOrgTag.objects.get(user=self.user, org=org, key='email-optin')
-        self.assertEqual(result_obj.value, u"True")
+        assert result_obj.value == u'True'
 
     @patch("common.djangoapps.entitlements.rest_api.v1.views.get_owners_for_course")
     def test_email_opt_in_multiple_orgs(self, mock_get_owners):
@@ -407,9 +407,9 @@ class EntitlementViewSetTest(ModuleStoreTestCase):
         assert response.status_code == 201
 
         result_obj = UserOrgTag.objects.get(user=self.user, org=org_1, key='email-optin')
-        self.assertEqual(result_obj.value, u"True")
+        assert result_obj.value == u'True'
         result_obj = UserOrgTag.objects.get(user=self.user, org=org_2, key='email-optin')
-        self.assertEqual(result_obj.value, u"True")
+        assert result_obj.value == u'True'
 
     def test_add_entitlement_with_support_detail(self):
         """

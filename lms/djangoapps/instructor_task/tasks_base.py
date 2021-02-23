@@ -51,7 +51,7 @@ class BaseInstructorTask(Task):  # lint-amnesty, pylint: disable=abstract-method
         This is JSON-serialized and stored in the task_output column of the InstructorTask entry.
 
         """
-        TASK_LOG.debug(u'Task %s: success returned with progress: %s', task_id, task_progress)
+        TASK_LOG.debug('Task %s: success returned with progress: %s', task_id, task_progress)
         # We should be able to find the InstructorTask object to update
         # based on the task_id here, without having to dig into the
         # original args to the task.  On the other hand, the entry_id
@@ -84,16 +84,16 @@ class BaseInstructorTask(Task):  # lint-amnesty, pylint: disable=abstract-method
         Note that there is no way to record progress made within the task (e.g. attempted,
         succeeded, etc.) when such failures occur.
         """
-        TASK_LOG.debug(u'Task %s: failure returned', task_id)
+        TASK_LOG.debug('Task %s: failure returned', task_id)
         entry_id = args[0]
         try:
             entry = InstructorTask.objects.get(pk=entry_id)
         except InstructorTask.DoesNotExist:
             # if the InstructorTask object does not exist, then there's no point
             # trying to update it.
-            TASK_LOG.error(u"Task (%s) has no InstructorTask object for id %s", task_id, entry_id)
+            TASK_LOG.error("Task (%s) has no InstructorTask object for id %s", task_id, entry_id)
         else:
-            TASK_LOG.warning(u"Task (%s) failed", task_id, exc_info=True)
+            TASK_LOG.warning("Task (%s) failed", task_id, exc_info=True)
             entry.task_output = InstructorTask.create_output_for_failure(einfo.exception, einfo.traceback)
             entry.task_state = FAILURE
             entry.save_now()

@@ -49,21 +49,21 @@ class CompletionBatchTestCase(CompletionWaffleTestMixin, ModuleStoreTestCase):
             org='TestX', number='101', display_name='Test',
             default_store=ModuleStoreEnum.Type.split,
         )
-        self.assertEqual(six.text_type(self.course.id), self.COURSE_KEY)
+        assert six.text_type(self.course.id) == self.COURSE_KEY
         self.problem = ItemFactory.create(
             parent=self.course, category="problem", display_name="Test Problem", publish_item=False,
         )
-        self.assertEqual(six.text_type(self.problem.location), self.BLOCK_KEY)
+        assert six.text_type(self.problem.location) == self.BLOCK_KEY
         # And an old mongo course:
         self.course_deprecated = CourseFactory.create(
             org='TestX', number='201', display_name='Test',
             default_store=ModuleStoreEnum.Type.mongo,
         )
-        self.assertEqual(six.text_type(self.course_deprecated.id), self.COURSE_KEY_DEPRECATED)
+        assert six.text_type(self.course_deprecated.id) == self.COURSE_KEY_DEPRECATED
         self.problem_deprecated = ItemFactory.create(
             parent=self.course_deprecated, category="problem", display_name="Test Problem",
         )
-        self.assertEqual(six.text_type(self.problem_deprecated.location), self.BLOCK_KEY_DEPRECATED)
+        assert six.text_type(self.problem_deprecated.location) == self.BLOCK_KEY_DEPRECATED
 
         # Create users
         self.staff_user = UserFactory(is_staff=True)
@@ -84,11 +84,12 @@ class CompletionBatchTestCase(CompletionWaffleTestMixin, ModuleStoreTestCase):
         """
         with override_waffle_switch(ENABLE_COMPLETION_TRACKING_SWITCH, False):
             response = self.client.post(self.url, {'username': self.ENROLLED_USERNAME}, format='json')
-        self.assertEqual(response.data, {
-            "detail":
-                "BlockCompletion.objects.submit_batch_completion should not be called when the feature is disabled."
-        })
-        self.assertEqual(response.status_code, 400)
+        assert response.data == \
+               {
+                   'detail': 'BlockCompletion.objects.submit_batch_completion'
+                             ' should not be called when the feature is disabled.'
+               }
+        assert response.status_code == 400
 
     @ddt.data(
         # Valid submission
@@ -208,8 +209,8 @@ class CompletionBatchTestCase(CompletionWaffleTestMixin, ModuleStoreTestCase):
         Test the batch submission response for student users.
         """
         response = self.client.post(self.url, payload, format='json')
-        self.assertEqual(response.data, expected_data)
-        self.assertEqual(response.status_code, expected_status)
+        assert response.data == expected_data
+        assert response.status_code == expected_status
 
     @ddt.data(
         # Staff can submit completion on behalf of other users
@@ -269,5 +270,5 @@ class CompletionBatchTestCase(CompletionWaffleTestMixin, ModuleStoreTestCase):
         """
         self.client.force_authenticate(user=self.staff_user)
         response = self.client.post(self.url, payload, format='json')
-        self.assertEqual(response.data, expected_data)
-        self.assertEqual(response.status_code, expected_status)
+        assert response.data == expected_data
+        assert response.status_code == expected_status

@@ -3,7 +3,6 @@ Subclass of oauthlib's RequestValidator that checks an OAuth signature.
 """
 
 
-import six
 from oauthlib.oauth1 import RequestValidator, SignatureOnlyEndpoint
 
 
@@ -18,7 +17,7 @@ class SignatureValidator(RequestValidator):
     """
 
     def __init__(self, lti_consumer):
-        super(SignatureValidator, self).__init__()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().__init__()
         self.endpoint = SignatureOnlyEndpoint(self)
         self.lti_consumer = lti_consumer
 
@@ -99,7 +98,7 @@ class SignatureValidator(RequestValidator):
         :return: True if the signature matches, False if it does not.
         """
 
-        method = six.text_type(request.method)
+        method = str(request.method)
         url = request.build_absolute_uri()
         body = request.body
 

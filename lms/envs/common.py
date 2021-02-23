@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 This is the common settings file, intended to set sane defaults. If you have a
 piece of configuration that's dependent on a set of feature flags being set,
@@ -30,29 +29,43 @@ Longer TODO:
 
 
 import importlib.util
-import sys
 import os
+import sys
+################################## TEMPLATE CONFIGURATION #####################################
+# Mako templating
+import tempfile  # pylint: disable=wrong-import-position,wrong-import-order
 
 from corsheaders.defaults import default_headers as corsheaders_default_headers
-from path import Path as path
 from django.utils.translation import ugettext_lazy as _
+from edx_django_utils.plugins import (  # pylint: disable=wrong-import-position,wrong-import-order
+    add_plugins,
+    get_plugin_apps
+)
 from enterprise.constants import (
     ENTERPRISE_ADMIN_ROLE,
     ENTERPRISE_CATALOG_ADMIN_ROLE,
     ENTERPRISE_DASHBOARD_ADMIN_ROLE,
     ENTERPRISE_ENROLLMENT_API_ADMIN_ROLE,
-    ENTERPRISE_REPORTING_CONFIG_ADMIN_ROLE,
-    ENTERPRISE_OPERATOR_ROLE
+    ENTERPRISE_OPERATOR_ROLE,
+    ENTERPRISE_REPORTING_CONFIG_ADMIN_ROLE
 )
+from path import Path as path
 
-from openedx.core.constants import COURSE_KEY_REGEX, COURSE_KEY_PATTERN, COURSE_ID_PATTERN
-from openedx.core.djangoapps.theming.helpers_dirs import (
-    get_themes_unchecked,
-    get_theme_base_dirs_from_settings
-)
-from openedx.core.lib.derived import derived, derived_collection_entry
-from openedx.core.release import doc_version
+################################# WIKI ###################################
+from lms.djangoapps.course_wiki import settings as course_wiki_settings  # pylint: disable=wrong-import-position
 from lms.djangoapps.lms_xblock.mixin import LmsBlockMixin
+from openedx.core.constants import COURSE_ID_PATTERN, COURSE_KEY_PATTERN, COURSE_KEY_REGEX
+from openedx.core.djangoapps.plugins.constants import ProjectType, SettingsType  # pylint: disable=wrong-import-position
+from openedx.core.djangoapps.theming.helpers_dirs import get_theme_base_dirs_from_settings, get_themes_unchecked
+from openedx.core.lib.derived import derived, derived_collection_entry
+from openedx.core.lib.rooted_paths import rooted_glob  # pylint: disable=wrong-import-position
+from openedx.core.release import doc_version
+from xmodule.modulestore import prefer_xmodules
+# Import after sys.path fixup
+# pylint: disable=wrong-import-position
+from xmodule.modulestore.edit_info import EditInfoMixin
+from xmodule.modulestore.inheritance import InheritanceMixin
+from xmodule.x_module import XModuleMixin
 
 ################################### FEATURES ###################################
 # .. setting_name: PLATFORM_NAME
@@ -542,10 +555,41 @@ FEATURES = {
     'EXPOSE_CACHE_PROGRAMS_ENDPOINT': False,
 
     # Courseware search feature
+    # .. toggle_name: FEATURES['ENABLE_COURSEWARE_SEARCH']
+    # .. toggle_implementation: DjangoSetting
+    # .. toggle_default: False
+    # .. toggle_description: When enabled, this adds a Search the course widget on the course outline and courseware
+    #   pages for searching courseware data.
+    # .. toggle_use_cases: open_edx
+    # .. toggle_creation_date: 2015-01-29
+    # .. toggle_warnings: In order to get this working, your courses data should be indexed in Elasticsearch. You will
+    #   see the search widget on the courseware page only if the DISABLE_COURSE_OUTLINE_PAGE_FLAG is set.
+    # .. toggle_tickets: https://github.com/edx/edx-platform/pull/6506
     'ENABLE_COURSEWARE_SEARCH': False,
+
+    # .. toggle_name: FEATURES['ENABLE_COURSEWARE_SEARCH_FOR_COURSE_STAFF']
+    # .. toggle_implementation: DjangoSetting
+    # .. toggle_default: False
+    # .. toggle_description: When enabled, this adds a Search the course widget on the course outline and courseware
+    #   pages for searching courseware data but for course staff users only.
+    # .. toggle_use_cases: open_edx
+    # .. toggle_creation_date: 2019-12-06
+    # .. toggle_warnings: In order to get this working, your courses data should be indexed in Elasticsearch. If
+    #   ENABLE_COURSEWARE_SEARCH is enabled then the search widget will be visible to all learners and this flag's
+    #   value does not matter in that case. This flag is enabled in devstack by default.
+    # .. toggle_tickets: https://openedx.atlassian.net/browse/TNL-6931
     'ENABLE_COURSEWARE_SEARCH_FOR_COURSE_STAFF': False,
 
     # Dashboard search feature
+    # .. toggle_name: FEATURES['ENABLE_DASHBOARD_SEARCH']
+    # .. toggle_implementation: DjangoSetting
+    # .. toggle_default: False
+    # .. toggle_description: When enabled, this adds a Search Your Courses widget on the dashboard page for searching
+    #   courseware data.
+    # .. toggle_use_cases: open_edx
+    # .. toggle_creation_date: 2015-01-29
+    # .. toggle_warnings: In order to get this working, your courses data should be indexed in Elasticsearch.
+    # .. toggle_tickets: https://github.com/edx/edx-platform/pull/6506
     'ENABLE_DASHBOARD_SEARCH': False,
 
     # log all information from cybersource callbacks
@@ -1044,9 +1088,6 @@ OAUTH_EXPIRE_PUBLIC_CLIENT_DAYS = 30
 TPA_PROVIDER_BURST_THROTTLE = '10/min'
 TPA_PROVIDER_SUSTAINED_THROTTLE = '50/hr'
 
-################################## TEMPLATE CONFIGURATION #####################################
-# Mako templating
-import tempfile  # pylint: disable=wrong-import-position,wrong-import-order
 MAKO_MODULE_DIR = os.path.join(tempfile.gettempdir(), 'mako_lms')
 MAKO_TEMPLATE_DIRS_BASE = [
     PROJECT_ROOT / 'templates',
@@ -1241,13 +1282,13 @@ WIKI_ENABLED = True
 
 COURSE_MODE_DEFAULTS = {
     'bulk_sku': None,
-    'currency': u'usd',
+    'currency': 'usd',
     'description': None,
     'expiration_datetime': None,
     'min_price': 0,
-    'name': _(u'Audit'),
+    'name': _('Audit'),
     'sku': None,
-    'slug': u'audit',
+    'slug': 'audit',
     'suggested_prices': '',
 }
 
@@ -1264,7 +1305,7 @@ USAGE_ID_PATTERN = r'(?P<usage_id>(?:i4x://?[^/]+/[^/]+/[^/]+/[^@]+(?:@[^/]+)?)|
 # However, backward compatibility with Ficus older releases is still maintained (space is still not valid)
 # in the AccountCreationForm and the user_api through the ENABLE_UNICODE_USERNAME feature flag.
 USERNAME_REGEX_PARTIAL = r'[\w .@_+-]+'
-USERNAME_PATTERN = r'(?P<username>{regex})'.format(regex=USERNAME_REGEX_PARTIAL)
+USERNAME_PATTERN = fr'(?P<username>{USERNAME_REGEX_PARTIAL})'
 
 
 ############################## EVENT TRACKING #################################
@@ -1356,12 +1397,6 @@ COURSE_LISTINGS = {}
 
 ############# XBlock Configuration ##########
 
-# Import after sys.path fixup
-# pylint: disable=wrong-import-position
-from xmodule.modulestore.edit_info import EditInfoMixin
-from xmodule.modulestore.inheritance import InheritanceMixin
-from xmodule.modulestore import prefer_xmodules
-from xmodule.x_module import XModuleMixin
 # pylint: enable=wrong-import-position
 
 # These are the Mixins that should be added to every XBlock.
@@ -1623,87 +1658,87 @@ LANGUAGE_COOKIE = "openedx-language-preference"
 
 # Sourced from http://www.localeplanet.com/icu/ and wikipedia
 LANGUAGES = [
-    ('en', u'English'),
-    ('rtl', u'Right-to-Left Test Language'),
-    ('eo', u'Dummy Language (Esperanto)'),  # Dummy languaged used for testing
-    ('fake2', u'Fake translations'),        # Another dummy language for testing (not pushed to prod)
+    ('en', 'English'),
+    ('rtl', 'Right-to-Left Test Language'),
+    ('eo', 'Dummy Language (Esperanto)'),  # Dummy languaged used for testing
+    ('fake2', 'Fake translations'),        # Another dummy language for testing (not pushed to prod)
 
-    ('am', u'አማርኛ'),  # Amharic
-    ('ar', u'العربية'),  # Arabic
-    ('az', u'azərbaycanca'),  # Azerbaijani
-    ('bg-bg', u'български (България)'),  # Bulgarian (Bulgaria)
-    ('bn-bd', u'বাংলা (বাংলাদেশ)'),  # Bengali (Bangladesh)
-    ('bn-in', u'বাংলা (ভারত)'),  # Bengali (India)
-    ('bs', u'bosanski'),  # Bosnian
-    ('ca', u'Català'),  # Catalan
-    ('ca@valencia', u'Català (València)'),  # Catalan (Valencia)
-    ('cs', u'Čeština'),  # Czech
-    ('cy', u'Cymraeg'),  # Welsh
-    ('da', u'dansk'),  # Danish
-    ('de-de', u'Deutsch (Deutschland)'),  # German (Germany)
-    ('el', u'Ελληνικά'),  # Greek
-    ('en-uk', u'English (United Kingdom)'),  # English (United Kingdom)
-    ('en@lolcat', u'LOLCAT English'),  # LOLCAT English
-    ('en@pirate', u'Pirate English'),  # Pirate English
-    ('es-419', u'Español (Latinoamérica)'),  # Spanish (Latin America)
-    ('es-ar', u'Español (Argentina)'),  # Spanish (Argentina)
-    ('es-ec', u'Español (Ecuador)'),  # Spanish (Ecuador)
-    ('es-es', u'Español (España)'),  # Spanish (Spain)
-    ('es-mx', u'Español (México)'),  # Spanish (Mexico)
-    ('es-pe', u'Español (Perú)'),  # Spanish (Peru)
-    ('et-ee', u'Eesti (Eesti)'),  # Estonian (Estonia)
-    ('eu-es', u'euskara (Espainia)'),  # Basque (Spain)
-    ('fa', u'فارسی'),  # Persian
-    ('fa-ir', u'فارسی (ایران)'),  # Persian (Iran)
-    ('fi-fi', u'Suomi (Suomi)'),  # Finnish (Finland)
-    ('fil', u'Filipino'),  # Filipino
-    ('fr', u'Français'),  # French
-    ('gl', u'Galego'),  # Galician
-    ('gu', u'ગુજરાતી'),  # Gujarati
-    ('he', u'עברית'),  # Hebrew
-    ('hi', u'हिन्दी'),  # Hindi
-    ('hr', u'hrvatski'),  # Croatian
-    ('hu', u'magyar'),  # Hungarian
-    ('hy-am', u'Հայերեն (Հայաստան)'),  # Armenian (Armenia)
-    ('id', u'Bahasa Indonesia'),  # Indonesian
-    ('it-it', u'Italiano (Italia)'),  # Italian (Italy)
-    ('ja-jp', u'日本語 (日本)'),  # Japanese (Japan)
-    ('kk-kz', u'қазақ тілі (Қазақстан)'),  # Kazakh (Kazakhstan)
-    ('km-kh', u'ភាសាខ្មែរ (កម្ពុជា)'),  # Khmer (Cambodia)
-    ('kn', u'ಕನ್ನಡ'),  # Kannada
-    ('ko-kr', u'한국어 (대한민국)'),  # Korean (Korea)
-    ('lt-lt', u'Lietuvių (Lietuva)'),  # Lithuanian (Lithuania)
-    ('ml', u'മലയാളം'),  # Malayalam
-    ('mn', u'Монгол хэл'),  # Mongolian
-    ('mr', u'मराठी'),  # Marathi
-    ('ms', u'Bahasa Melayu'),  # Malay
-    ('nb', u'Norsk bokmål'),  # Norwegian Bokmål
-    ('ne', u'नेपाली'),  # Nepali
-    ('nl-nl', u'Nederlands (Nederland)'),  # Dutch (Netherlands)
-    ('or', u'ଓଡ଼ିଆ'),  # Oriya
-    ('pl', u'Polski'),  # Polish
-    ('pt-br', u'Português (Brasil)'),  # Portuguese (Brazil)
-    ('pt-pt', u'Português (Portugal)'),  # Portuguese (Portugal)
-    ('ro', u'română'),  # Romanian
-    ('ru', u'Русский'),  # Russian
-    ('si', u'සිංහල'),  # Sinhala
-    ('sk', u'Slovenčina'),  # Slovak
-    ('sl', u'Slovenščina'),  # Slovenian
-    ('sq', u'shqip'),  # Albanian
-    ('sr', u'Српски'),  # Serbian
-    ('sv', u'svenska'),  # Swedish
-    ('sw', u'Kiswahili'),  # Swahili
-    ('ta', u'தமிழ்'),  # Tamil
-    ('te', u'తెలుగు'),  # Telugu
-    ('th', u'ไทย'),  # Thai
-    ('tr-tr', u'Türkçe (Türkiye)'),  # Turkish (Turkey)
-    ('uk', u'Українська'),  # Ukranian
-    ('ur', u'اردو'),  # Urdu
-    ('vi', u'Tiếng Việt'),  # Vietnamese
-    ('uz', u'Ўзбек'),  # Uzbek
-    ('zh-cn', u'中文 (简体)'),  # Chinese (China)
-    ('zh-hk', u'中文 (香港)'),  # Chinese (Hong Kong)
-    ('zh-tw', u'中文 (台灣)'),  # Chinese (Taiwan)
+    ('am', 'አማርኛ'),  # Amharic
+    ('ar', 'العربية'),  # Arabic
+    ('az', 'azərbaycanca'),  # Azerbaijani
+    ('bg-bg', 'български (България)'),  # Bulgarian (Bulgaria)
+    ('bn-bd', 'বাংলা (বাংলাদেশ)'),  # Bengali (Bangladesh)
+    ('bn-in', 'বাংলা (ভারত)'),  # Bengali (India)
+    ('bs', 'bosanski'),  # Bosnian
+    ('ca', 'Català'),  # Catalan
+    ('ca@valencia', 'Català (València)'),  # Catalan (Valencia)
+    ('cs', 'Čeština'),  # Czech
+    ('cy', 'Cymraeg'),  # Welsh
+    ('da', 'dansk'),  # Danish
+    ('de-de', 'Deutsch (Deutschland)'),  # German (Germany)
+    ('el', 'Ελληνικά'),  # Greek
+    ('en-uk', 'English (United Kingdom)'),  # English (United Kingdom)
+    ('en@lolcat', 'LOLCAT English'),  # LOLCAT English
+    ('en@pirate', 'Pirate English'),  # Pirate English
+    ('es-419', 'Español (Latinoamérica)'),  # Spanish (Latin America)
+    ('es-ar', 'Español (Argentina)'),  # Spanish (Argentina)
+    ('es-ec', 'Español (Ecuador)'),  # Spanish (Ecuador)
+    ('es-es', 'Español (España)'),  # Spanish (Spain)
+    ('es-mx', 'Español (México)'),  # Spanish (Mexico)
+    ('es-pe', 'Español (Perú)'),  # Spanish (Peru)
+    ('et-ee', 'Eesti (Eesti)'),  # Estonian (Estonia)
+    ('eu-es', 'euskara (Espainia)'),  # Basque (Spain)
+    ('fa', 'فارسی'),  # Persian
+    ('fa-ir', 'فارسی (ایران)'),  # Persian (Iran)
+    ('fi-fi', 'Suomi (Suomi)'),  # Finnish (Finland)
+    ('fil', 'Filipino'),  # Filipino
+    ('fr', 'Français'),  # French
+    ('gl', 'Galego'),  # Galician
+    ('gu', 'ગુજરાતી'),  # Gujarati
+    ('he', 'עברית'),  # Hebrew
+    ('hi', 'हिन्दी'),  # Hindi
+    ('hr', 'hrvatski'),  # Croatian
+    ('hu', 'magyar'),  # Hungarian
+    ('hy-am', 'Հայերեն (Հայաստան)'),  # Armenian (Armenia)
+    ('id', 'Bahasa Indonesia'),  # Indonesian
+    ('it-it', 'Italiano (Italia)'),  # Italian (Italy)
+    ('ja-jp', '日本語 (日本)'),  # Japanese (Japan)
+    ('kk-kz', 'қазақ тілі (Қазақстан)'),  # Kazakh (Kazakhstan)
+    ('km-kh', 'ភាសាខ្មែរ (កម្ពុជា)'),  # Khmer (Cambodia)
+    ('kn', 'ಕನ್ನಡ'),  # Kannada
+    ('ko-kr', '한국어 (대한민국)'),  # Korean (Korea)
+    ('lt-lt', 'Lietuvių (Lietuva)'),  # Lithuanian (Lithuania)
+    ('ml', 'മലയാളം'),  # Malayalam
+    ('mn', 'Монгол хэл'),  # Mongolian
+    ('mr', 'मराठी'),  # Marathi
+    ('ms', 'Bahasa Melayu'),  # Malay
+    ('nb', 'Norsk bokmål'),  # Norwegian Bokmål
+    ('ne', 'नेपाली'),  # Nepali
+    ('nl-nl', 'Nederlands (Nederland)'),  # Dutch (Netherlands)
+    ('or', 'ଓଡ଼ିଆ'),  # Oriya
+    ('pl', 'Polski'),  # Polish
+    ('pt-br', 'Português (Brasil)'),  # Portuguese (Brazil)
+    ('pt-pt', 'Português (Portugal)'),  # Portuguese (Portugal)
+    ('ro', 'română'),  # Romanian
+    ('ru', 'Русский'),  # Russian
+    ('si', 'සිංහල'),  # Sinhala
+    ('sk', 'Slovenčina'),  # Slovak
+    ('sl', 'Slovenščina'),  # Slovenian
+    ('sq', 'shqip'),  # Albanian
+    ('sr', 'Српски'),  # Serbian
+    ('sv', 'svenska'),  # Swedish
+    ('sw', 'Kiswahili'),  # Swahili
+    ('ta', 'தமிழ்'),  # Tamil
+    ('te', 'తెలుగు'),  # Telugu
+    ('th', 'ไทย'),  # Thai
+    ('tr-tr', 'Türkçe (Türkiye)'),  # Turkish (Turkey)
+    ('uk', 'Українська'),  # Ukranian
+    ('ur', 'اردو'),  # Urdu
+    ('vi', 'Tiếng Việt'),  # Vietnamese
+    ('uz', 'Ўзбек'),  # Uzbek
+    ('zh-cn', '中文 (简体)'),  # Chinese (China)
+    ('zh-hk', '中文 (香港)'),  # Chinese (Hong Kong)
+    ('zh-tw', '中文 (台灣)'),  # Chinese (Taiwan)
 ]
 
 LANGUAGE_DICT = dict(LANGUAGES)
@@ -1759,8 +1794,6 @@ AWS_S3_CUSTOM_DOMAIN = "SET-ME-PLEASE (ex. bucket-name.s3.amazonaws.com)"
 SIMPLE_WIKI_REQUIRE_LOGIN_EDIT = True
 SIMPLE_WIKI_REQUIRE_LOGIN_VIEW = False
 
-################################# WIKI ###################################
-from lms.djangoapps.course_wiki import settings as course_wiki_settings  # pylint: disable=wrong-import-position
 
 # .. toggle_name: WIKI_ACCOUNT_HANDLING
 # .. toggle_implementation: DjangoSetting
@@ -2060,7 +2093,6 @@ STATICFILES_FINDERS = [
     'pipeline.finders.PipelineFinder',
 ]
 
-from openedx.core.lib.rooted_paths import rooted_glob  # pylint: disable=wrong-import-position
 
 courseware_js = [
     'js/ajax-error.js',
@@ -2979,6 +3011,7 @@ INSTALLED_APPS = [
     'openedx.features.course_duration_limits',
     'openedx.features.content_type_gating',
     'openedx.features.discounts',
+    'openedx.features.effort_estimation',
 
     'lms.djangoapps.experiments',
 
@@ -3045,7 +3078,6 @@ REST_FRAMEWORK = {
     'DEFAULT_RENDERER_CLASSES': (
         'rest_framework.renderers.JSONRenderer',
     ),
-    'EXCEPTION_HANDLER': 'openedx.core.lib.request_utils.custom_exception_handler',
     'PAGE_SIZE': 10,
     'URL_FORMAT_OVERRIDE': None,
     'DEFAULT_THROTTLE_RATES': {
@@ -3141,28 +3173,28 @@ SOCIAL_MEDIA_FOOTER_DISPLAY = {
         # translate this the way that Facebook advertises in your language.
         "title": _("Facebook"),
         "icon": "fa-facebook-square",
-        "action": _(u"Like {platform_name} on Facebook")
+        "action": _("Like {platform_name} on Facebook")
     },
     "twitter": {
         # Translators: This is the website name of www.twitter.com.  Please
         # translate this the way that Twitter advertises in your language.
         "title": _("Twitter"),
         "icon": "fa-twitter-square",
-        "action": _(u"Follow {platform_name} on Twitter")
+        "action": _("Follow {platform_name} on Twitter")
     },
     "linkedin": {
         # Translators: This is the website name of www.linkedin.com.  Please
         # translate this the way that LinkedIn advertises in your language.
         "title": _("LinkedIn"),
         "icon": "fa-linkedin-square",
-        "action": _(u"Follow {platform_name} on LinkedIn")
+        "action": _("Follow {platform_name} on LinkedIn")
     },
     "instagram": {
         # Translators: This is the website name of www.instagram.com.  Please
         # translate this the way that Instagram advertises in your language.
         "title": _("Instagram"),
         "icon": "fa-instagram",
-        "action": _(u"Follow {platform_name} on Instagram")
+        "action": _("Follow {platform_name} on Instagram")
     },
     "tumblr": {
         # Translators: This is the website name of www.tumblr.com.  Please
@@ -3181,7 +3213,7 @@ SOCIAL_MEDIA_FOOTER_DISPLAY = {
         # translate this the way that Reddit advertises in your language.
         "title": _("Reddit"),
         "icon": "fa-reddit-square",
-        "action": _(u"Subscribe to the {platform_name} subreddit"),
+        "action": _("Subscribe to the {platform_name} subreddit"),
     },
     "vk": {
         # Translators: This is the website name of https://vk.com.  Please
@@ -3200,7 +3232,7 @@ SOCIAL_MEDIA_FOOTER_DISPLAY = {
         # translate this the way that YouTube advertises in your language.
         "title": _("Youtube"),
         "icon": "fa-youtube-square",
-        "action": _(u"Subscribe to the {platform_name} YouTube channel")
+        "action": _("Subscribe to the {platform_name} YouTube channel")
     }
 }
 
@@ -3471,192 +3503,192 @@ VIDEO_TRANSCRIPTS_MAX_AGE = 31536000
 # Note that this is used as the set of choices to the `code` field of the
 # `LanguageProficiency` model.
 ALL_LANGUAGES = [
-    [u"aa", u"Afar"],
-    [u"ab", u"Abkhazian"],
-    [u"af", u"Afrikaans"],
-    [u"ak", u"Akan"],
-    [u"sq", u"Albanian"],
-    [u"am", u"Amharic"],
-    [u"ar", u"Arabic"],
-    [u"an", u"Aragonese"],
-    [u"hy", u"Armenian"],
-    [u"as", u"Assamese"],
-    [u"av", u"Avaric"],
-    [u"ae", u"Avestan"],
-    [u"ay", u"Aymara"],
-    [u"az", u"Azerbaijani"],
-    [u"ba", u"Bashkir"],
-    [u"bm", u"Bambara"],
-    [u"eu", u"Basque"],
-    [u"be", u"Belarusian"],
-    [u"bn", u"Bengali"],
-    [u"bh", u"Bihari languages"],
-    [u"bi", u"Bislama"],
-    [u"bs", u"Bosnian"],
-    [u"br", u"Breton"],
-    [u"bg", u"Bulgarian"],
-    [u"my", u"Burmese"],
-    [u"ca", u"Catalan"],
-    [u"ch", u"Chamorro"],
-    [u"ce", u"Chechen"],
-    [u"zh", u"Chinese"],
-    [u"zh_HANS", u"Simplified Chinese"],
-    [u"zh_HANT", u"Traditional Chinese"],
-    [u"cu", u"Church Slavic"],
-    [u"cv", u"Chuvash"],
-    [u"kw", u"Cornish"],
-    [u"co", u"Corsican"],
-    [u"cr", u"Cree"],
-    [u"cs", u"Czech"],
-    [u"da", u"Danish"],
-    [u"dv", u"Divehi"],
-    [u"nl", u"Dutch"],
-    [u"dz", u"Dzongkha"],
-    [u"en", u"English"],
-    [u"eo", u"Esperanto"],
-    [u"et", u"Estonian"],
-    [u"ee", u"Ewe"],
-    [u"fo", u"Faroese"],
-    [u"fj", u"Fijian"],
-    [u"fi", u"Finnish"],
-    [u"fr", u"French"],
-    [u"fy", u"Western Frisian"],
-    [u"ff", u"Fulah"],
-    [u"ka", u"Georgian"],
-    [u"de", u"German"],
-    [u"gd", u"Gaelic"],
-    [u"ga", u"Irish"],
-    [u"gl", u"Galician"],
-    [u"gv", u"Manx"],
-    [u"el", u"Greek"],
-    [u"gn", u"Guarani"],
-    [u"gu", u"Gujarati"],
-    [u"ht", u"Haitian"],
-    [u"ha", u"Hausa"],
-    [u"he", u"Hebrew"],
-    [u"hz", u"Herero"],
-    [u"hi", u"Hindi"],
-    [u"ho", u"Hiri Motu"],
-    [u"hr", u"Croatian"],
-    [u"hu", u"Hungarian"],
-    [u"ig", u"Igbo"],
-    [u"is", u"Icelandic"],
-    [u"io", u"Ido"],
-    [u"ii", u"Sichuan Yi"],
-    [u"iu", u"Inuktitut"],
-    [u"ie", u"Interlingue"],
-    [u"ia", u"Interlingua"],
-    [u"id", u"Indonesian"],
-    [u"ik", u"Inupiaq"],
-    [u"it", u"Italian"],
-    [u"jv", u"Javanese"],
-    [u"ja", u"Japanese"],
-    [u"kl", u"Kalaallisut"],
-    [u"kn", u"Kannada"],
-    [u"ks", u"Kashmiri"],
-    [u"kr", u"Kanuri"],
-    [u"kk", u"Kazakh"],
-    [u"km", u"Central Khmer"],
-    [u"ki", u"Kikuyu"],
-    [u"rw", u"Kinyarwanda"],
-    [u"ky", u"Kirghiz"],
-    [u"kv", u"Komi"],
-    [u"kg", u"Kongo"],
-    [u"ko", u"Korean"],
-    [u"kj", u"Kuanyama"],
-    [u"ku", u"Kurdish"],
-    [u"lo", u"Lao"],
-    [u"la", u"Latin"],
-    [u"lv", u"Latvian"],
-    [u"li", u"Limburgan"],
-    [u"ln", u"Lingala"],
-    [u"lt", u"Lithuanian"],
-    [u"lb", u"Luxembourgish"],
-    [u"lu", u"Luba-Katanga"],
-    [u"lg", u"Ganda"],
-    [u"mk", u"Macedonian"],
-    [u"mh", u"Marshallese"],
-    [u"ml", u"Malayalam"],
-    [u"mi", u"Maori"],
-    [u"mr", u"Marathi"],
-    [u"ms", u"Malay"],
-    [u"mg", u"Malagasy"],
-    [u"mt", u"Maltese"],
-    [u"mn", u"Mongolian"],
-    [u"na", u"Nauru"],
-    [u"nv", u"Navajo"],
-    [u"nr", u"Ndebele, South"],
-    [u"nd", u"Ndebele, North"],
-    [u"ng", u"Ndonga"],
-    [u"ne", u"Nepali"],
-    [u"nn", u"Norwegian Nynorsk"],
-    [u"nb", u"Bokmål, Norwegian"],
-    [u"no", u"Norwegian"],
-    [u"ny", u"Chichewa"],
-    [u"oc", u"Occitan"],
-    [u"oj", u"Ojibwa"],
-    [u"or", u"Oriya"],
-    [u"om", u"Oromo"],
-    [u"os", u"Ossetian"],
-    [u"pa", u"Panjabi"],
-    [u"fa", u"Persian"],
-    [u"pi", u"Pali"],
-    [u"pl", u"Polish"],
-    [u"pt", u"Portuguese"],
-    [u"ps", u"Pushto"],
-    [u"qu", u"Quechua"],
-    [u"rm", u"Romansh"],
-    [u"ro", u"Romanian"],
-    [u"rn", u"Rundi"],
-    [u"ru", u"Russian"],
-    [u"sg", u"Sango"],
-    [u"sa", u"Sanskrit"],
-    [u"si", u"Sinhala"],
-    [u"sk", u"Slovak"],
-    [u"sl", u"Slovenian"],
-    [u"se", u"Northern Sami"],
-    [u"sm", u"Samoan"],
-    [u"sn", u"Shona"],
-    [u"sd", u"Sindhi"],
-    [u"so", u"Somali"],
-    [u"st", u"Sotho, Southern"],
-    [u"es", u"Spanish"],
-    [u"sc", u"Sardinian"],
-    [u"sr", u"Serbian"],
-    [u"ss", u"Swati"],
-    [u"su", u"Sundanese"],
-    [u"sw", u"Swahili"],
-    [u"sv", u"Swedish"],
-    [u"ty", u"Tahitian"],
-    [u"ta", u"Tamil"],
-    [u"tt", u"Tatar"],
-    [u"te", u"Telugu"],
-    [u"tg", u"Tajik"],
-    [u"tl", u"Tagalog"],
-    [u"th", u"Thai"],
-    [u"bo", u"Tibetan"],
-    [u"ti", u"Tigrinya"],
-    [u"to", u"Tonga (Tonga Islands)"],
-    [u"tn", u"Tswana"],
-    [u"ts", u"Tsonga"],
-    [u"tk", u"Turkmen"],
-    [u"tr", u"Turkish"],
-    [u"tw", u"Twi"],
-    [u"ug", u"Uighur"],
-    [u"uk", u"Ukrainian"],
-    [u"ur", u"Urdu"],
-    [u"uz", u"Uzbek"],
-    [u"ve", u"Venda"],
-    [u"vi", u"Vietnamese"],
-    [u"vo", u"Volapük"],
-    [u"cy", u"Welsh"],
-    [u"wa", u"Walloon"],
-    [u"wo", u"Wolof"],
-    [u"xh", u"Xhosa"],
-    [u"yi", u"Yiddish"],
-    [u"yo", u"Yoruba"],
-    [u"za", u"Zhuang"],
-    [u"zu", u"Zulu"]
+    ["aa", "Afar"],
+    ["ab", "Abkhazian"],
+    ["af", "Afrikaans"],
+    ["ak", "Akan"],
+    ["sq", "Albanian"],
+    ["am", "Amharic"],
+    ["ar", "Arabic"],
+    ["an", "Aragonese"],
+    ["hy", "Armenian"],
+    ["as", "Assamese"],
+    ["av", "Avaric"],
+    ["ae", "Avestan"],
+    ["ay", "Aymara"],
+    ["az", "Azerbaijani"],
+    ["ba", "Bashkir"],
+    ["bm", "Bambara"],
+    ["eu", "Basque"],
+    ["be", "Belarusian"],
+    ["bn", "Bengali"],
+    ["bh", "Bihari languages"],
+    ["bi", "Bislama"],
+    ["bs", "Bosnian"],
+    ["br", "Breton"],
+    ["bg", "Bulgarian"],
+    ["my", "Burmese"],
+    ["ca", "Catalan"],
+    ["ch", "Chamorro"],
+    ["ce", "Chechen"],
+    ["zh", "Chinese"],
+    ["zh_HANS", "Simplified Chinese"],
+    ["zh_HANT", "Traditional Chinese"],
+    ["cu", "Church Slavic"],
+    ["cv", "Chuvash"],
+    ["kw", "Cornish"],
+    ["co", "Corsican"],
+    ["cr", "Cree"],
+    ["cs", "Czech"],
+    ["da", "Danish"],
+    ["dv", "Divehi"],
+    ["nl", "Dutch"],
+    ["dz", "Dzongkha"],
+    ["en", "English"],
+    ["eo", "Esperanto"],
+    ["et", "Estonian"],
+    ["ee", "Ewe"],
+    ["fo", "Faroese"],
+    ["fj", "Fijian"],
+    ["fi", "Finnish"],
+    ["fr", "French"],
+    ["fy", "Western Frisian"],
+    ["ff", "Fulah"],
+    ["ka", "Georgian"],
+    ["de", "German"],
+    ["gd", "Gaelic"],
+    ["ga", "Irish"],
+    ["gl", "Galician"],
+    ["gv", "Manx"],
+    ["el", "Greek"],
+    ["gn", "Guarani"],
+    ["gu", "Gujarati"],
+    ["ht", "Haitian"],
+    ["ha", "Hausa"],
+    ["he", "Hebrew"],
+    ["hz", "Herero"],
+    ["hi", "Hindi"],
+    ["ho", "Hiri Motu"],
+    ["hr", "Croatian"],
+    ["hu", "Hungarian"],
+    ["ig", "Igbo"],
+    ["is", "Icelandic"],
+    ["io", "Ido"],
+    ["ii", "Sichuan Yi"],
+    ["iu", "Inuktitut"],
+    ["ie", "Interlingue"],
+    ["ia", "Interlingua"],
+    ["id", "Indonesian"],
+    ["ik", "Inupiaq"],
+    ["it", "Italian"],
+    ["jv", "Javanese"],
+    ["ja", "Japanese"],
+    ["kl", "Kalaallisut"],
+    ["kn", "Kannada"],
+    ["ks", "Kashmiri"],
+    ["kr", "Kanuri"],
+    ["kk", "Kazakh"],
+    ["km", "Central Khmer"],
+    ["ki", "Kikuyu"],
+    ["rw", "Kinyarwanda"],
+    ["ky", "Kirghiz"],
+    ["kv", "Komi"],
+    ["kg", "Kongo"],
+    ["ko", "Korean"],
+    ["kj", "Kuanyama"],
+    ["ku", "Kurdish"],
+    ["lo", "Lao"],
+    ["la", "Latin"],
+    ["lv", "Latvian"],
+    ["li", "Limburgan"],
+    ["ln", "Lingala"],
+    ["lt", "Lithuanian"],
+    ["lb", "Luxembourgish"],
+    ["lu", "Luba-Katanga"],
+    ["lg", "Ganda"],
+    ["mk", "Macedonian"],
+    ["mh", "Marshallese"],
+    ["ml", "Malayalam"],
+    ["mi", "Maori"],
+    ["mr", "Marathi"],
+    ["ms", "Malay"],
+    ["mg", "Malagasy"],
+    ["mt", "Maltese"],
+    ["mn", "Mongolian"],
+    ["na", "Nauru"],
+    ["nv", "Navajo"],
+    ["nr", "Ndebele, South"],
+    ["nd", "Ndebele, North"],
+    ["ng", "Ndonga"],
+    ["ne", "Nepali"],
+    ["nn", "Norwegian Nynorsk"],
+    ["nb", "Bokmål, Norwegian"],
+    ["no", "Norwegian"],
+    ["ny", "Chichewa"],
+    ["oc", "Occitan"],
+    ["oj", "Ojibwa"],
+    ["or", "Oriya"],
+    ["om", "Oromo"],
+    ["os", "Ossetian"],
+    ["pa", "Panjabi"],
+    ["fa", "Persian"],
+    ["pi", "Pali"],
+    ["pl", "Polish"],
+    ["pt", "Portuguese"],
+    ["ps", "Pushto"],
+    ["qu", "Quechua"],
+    ["rm", "Romansh"],
+    ["ro", "Romanian"],
+    ["rn", "Rundi"],
+    ["ru", "Russian"],
+    ["sg", "Sango"],
+    ["sa", "Sanskrit"],
+    ["si", "Sinhala"],
+    ["sk", "Slovak"],
+    ["sl", "Slovenian"],
+    ["se", "Northern Sami"],
+    ["sm", "Samoan"],
+    ["sn", "Shona"],
+    ["sd", "Sindhi"],
+    ["so", "Somali"],
+    ["st", "Sotho, Southern"],
+    ["es", "Spanish"],
+    ["sc", "Sardinian"],
+    ["sr", "Serbian"],
+    ["ss", "Swati"],
+    ["su", "Sundanese"],
+    ["sw", "Swahili"],
+    ["sv", "Swedish"],
+    ["ty", "Tahitian"],
+    ["ta", "Tamil"],
+    ["tt", "Tatar"],
+    ["te", "Telugu"],
+    ["tg", "Tajik"],
+    ["tl", "Tagalog"],
+    ["th", "Thai"],
+    ["bo", "Tibetan"],
+    ["ti", "Tigrinya"],
+    ["to", "Tonga (Tonga Islands)"],
+    ["tn", "Tswana"],
+    ["ts", "Tsonga"],
+    ["tk", "Turkmen"],
+    ["tr", "Turkish"],
+    ["tw", "Twi"],
+    ["ug", "Uighur"],
+    ["uk", "Ukrainian"],
+    ["ur", "Urdu"],
+    ["uz", "Uzbek"],
+    ["ve", "Venda"],
+    ["vi", "Vietnamese"],
+    ["vo", "Volapük"],
+    ["cy", "Welsh"],
+    ["wa", "Walloon"],
+    ["wo", "Wolof"],
+    ["xh", "Xhosa"],
+    ["yi", "Yiddish"],
+    ["yo", "Yoruba"],
+    ["za", "Zhuang"],
+    ["zu", "Zulu"]
 ]
 
 
@@ -3873,7 +3905,7 @@ ECOMMERCE_SERVICE_WORKER_USERNAME = 'ecommerce_worker'
 ECOMMERCE_API_SIGNING_KEY = 'SET-ME-PLEASE'
 
 COURSE_CATALOG_URL_ROOT = 'http://localhost:8008'
-COURSE_CATALOG_API_URL = '{}/api/v1'.format(COURSE_CATALOG_URL_ROOT)
+COURSE_CATALOG_API_URL = f'{COURSE_CATALOG_URL_ROOT}/api/v1'
 
 CREDENTIALS_INTERNAL_SERVICE_URL = 'http://localhost:8005'
 CREDENTIALS_PUBLIC_SERVICE_URL = 'http://localhost:8005'
@@ -4203,17 +4235,17 @@ ENTERPRISE_ALL_SERVICE_USERNAMES = [
 # which are not provided by the Enterprise service. These settings provide base values
 # for those features.
 
-ENTERPRISE_PLATFORM_WELCOME_TEMPLATE = _(u'Welcome to {platform_name}.')
+ENTERPRISE_PLATFORM_WELCOME_TEMPLATE = _('Welcome to {platform_name}.')
 ENTERPRISE_SPECIFIC_BRANDED_WELCOME_TEMPLATE = _(
-    u'You have left the {start_bold}{enterprise_name}{end_bold} website and are now on the {platform_name} site. '
-    u'{enterprise_name} has partnered with {platform_name} to offer you high-quality, always available learning '
-    u'programs to help you advance your knowledge and career. '
-    u'{line_break}Please note that {platform_name} has a different {privacy_policy_link_start}Privacy Policy'
-    u'{privacy_policy_link_end} from {enterprise_name}.'
+    'You have left the {start_bold}{enterprise_name}{end_bold} website and are now on the {platform_name} site. '
+    '{enterprise_name} has partnered with {platform_name} to offer you high-quality, always available learning '
+    'programs to help you advance your knowledge and career. '
+    '{line_break}Please note that {platform_name} has a different {privacy_policy_link_start}Privacy Policy'
+    '{privacy_policy_link_end} from {enterprise_name}.'
 )
 ENTERPRISE_PROXY_LOGIN_WELCOME_TEMPLATE = _(
-    u'{start_bold}{enterprise_name}{end_bold} has partnered with {start_bold}{platform_name}{end_bold} '
-    u'to offer you high-quality learning opportunities from the world\'s best institutions and universities.'
+    '{start_bold}{enterprise_name}{end_bold} has partnered with {start_bold}{platform_name}{end_bold} '
+    'to offer you high-quality learning opportunities from the world\'s best institutions and universities.'
 )
 ENTERPRISE_TAGLINE = ''
 ENTERPRISE_EXCLUDED_REGISTRATION_FIELDS = {
@@ -4513,8 +4545,6 @@ SYSTEM_WIDE_ROLE_CLASSES = []
 
 ############## Plugin Django Apps #########################
 
-from edx_django_utils.plugins import get_plugin_apps, add_plugins  # pylint: disable=wrong-import-position,wrong-import-order
-from openedx.core.djangoapps.plugins.constants import ProjectType, SettingsType  # pylint: disable=wrong-import-position
 INSTALLED_APPS.extend(get_plugin_apps(ProjectType.LMS))
 add_plugins(__name__, ProjectType.LMS, SettingsType.COMMON)
 

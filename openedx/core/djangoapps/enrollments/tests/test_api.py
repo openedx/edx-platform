@@ -56,13 +56,13 @@ class EnrollmentTest(CacheIsolationTestCase):
         fake_data_api.add_course(self.COURSE_ID, course_modes=course_modes)
         # Enroll in the course and verify the URL we get sent to
         result = api.add_enrollment(self.USERNAME, self.COURSE_ID, mode=mode)
-        self.assertIsNotNone(result)
-        self.assertEqual(result['student'], self.USERNAME)
-        self.assertEqual(result['course']['course_id'], self.COURSE_ID)
-        self.assertEqual(result['mode'], mode)
+        assert result is not None
+        assert result['student'] == self.USERNAME
+        assert result['course']['course_id'] == self.COURSE_ID
+        assert result['mode'] == mode
 
         get_result = api.get_enrollment(self.USERNAME, self.COURSE_ID)
-        self.assertEqual(result, get_result)
+        assert result == get_result
 
     @ddt.data(
         ([CourseMode.DEFAULT_MODE_SLUG, 'verified', 'credit'], CourseMode.DEFAULT_MODE_SLUG),
@@ -78,10 +78,10 @@ class EnrollmentTest(CacheIsolationTestCase):
             mock_modes_for_course.return_value = mock_course_modes
             # Enroll in the course and verify the URL we get sent to
             result = api.add_enrollment(self.USERNAME, self.COURSE_ID)
-            self.assertIsNotNone(result)
-            self.assertEqual(result['student'], self.USERNAME)
-            self.assertEqual(result['course']['course_id'], self.COURSE_ID)
-            self.assertEqual(result['mode'], expected_mode)
+            assert result is not None
+            assert result['student'] == self.USERNAME
+            assert result['course']['course_id'] == self.COURSE_ID
+            assert result['mode'] == expected_mode
 
     @ddt.data(
         ['professional'],
@@ -122,18 +122,18 @@ class EnrollmentTest(CacheIsolationTestCase):
         fake_data_api.add_course(self.COURSE_ID, course_modes=course_modes)
         # Enroll in the course and verify the URL we get sent to
         result = api.add_enrollment(self.USERNAME, self.COURSE_ID, mode=mode)
-        self.assertIsNotNone(result)
-        self.assertEqual(result['student'], self.USERNAME)
-        self.assertEqual(result['course']['course_id'], self.COURSE_ID)
-        self.assertEqual(result['mode'], mode)
-        self.assertTrue(result['is_active'])
+        assert result is not None
+        assert result['student'] == self.USERNAME
+        assert result['course']['course_id'] == self.COURSE_ID
+        assert result['mode'] == mode
+        assert result['is_active']
 
         result = api.update_enrollment(self.USERNAME, self.COURSE_ID, mode=mode, is_active=False)
-        self.assertIsNotNone(result)
-        self.assertEqual(result['student'], self.USERNAME)
-        self.assertEqual(result['course']['course_id'], self.COURSE_ID)
-        self.assertEqual(result['mode'], mode)
-        self.assertFalse(result['is_active'])
+        assert result is not None
+        assert result['student'] == self.USERNAME
+        assert result['course']['course_id'] == self.COURSE_ID
+        assert result['mode'] == mode
+        assert not result['is_active']
 
     def test_unenroll_not_enrolled_in_course(self):
         # Add a fake course enrollment information to the fake data API
@@ -161,12 +161,9 @@ class EnrollmentTest(CacheIsolationTestCase):
             fake_data_api.add_course(enrollment['course_id'], course_modes=enrollment['course_modes'])
             api.add_enrollment(self.USERNAME, enrollment['course_id'], enrollment['mode'])
         result = api.get_enrollments(self.USERNAME)
-        self.assertEqual(len(enrollments), len(result))
+        assert len(enrollments) == len(result)
         for result_enrollment in result:
-            self.assertIn(
-                result_enrollment['course']['course_id'],
-                [enrollment['course_id'] for enrollment in enrollments]
-            )
+            assert result_enrollment['course']['course_id'] in [enrollment['course_id'] for enrollment in enrollments]
 
     def test_update_enrollment(self):
         # Add fake course enrollment information to the fake data API
@@ -174,13 +171,13 @@ class EnrollmentTest(CacheIsolationTestCase):
         # Enroll in the course and verify the URL we get sent to
         result = api.add_enrollment(self.USERNAME, self.COURSE_ID, mode='audit')
         get_result = api.get_enrollment(self.USERNAME, self.COURSE_ID)
-        self.assertEqual(result, get_result)
+        assert result == get_result
 
         result = api.update_enrollment(self.USERNAME, self.COURSE_ID, mode='honor')
-        self.assertEqual('honor', result['mode'])
+        assert 'honor' == result['mode']
 
         result = api.update_enrollment(self.USERNAME, self.COURSE_ID, mode='verified')
-        self.assertEqual('verified', result['mode'])
+        assert 'verified' == result['mode']
 
     def test_update_enrollment_attributes(self):
         # Add fake course enrollment information to the fake data API
@@ -188,7 +185,7 @@ class EnrollmentTest(CacheIsolationTestCase):
         # Enroll in the course and verify the URL we get sent to
         result = api.add_enrollment(self.USERNAME, self.COURSE_ID, mode='audit')
         get_result = api.get_enrollment(self.USERNAME, self.COURSE_ID)
-        self.assertEqual(result, get_result)
+        assert result == get_result
 
         enrollment_attributes = [
             {
@@ -201,16 +198,16 @@ class EnrollmentTest(CacheIsolationTestCase):
         result = api.update_enrollment(
             self.USERNAME, self.COURSE_ID, mode='credit', enrollment_attributes=enrollment_attributes
         )
-        self.assertEqual('credit', result['mode'])
+        assert 'credit' == result['mode']
         attributes = api.get_enrollment_attributes(self.USERNAME, self.COURSE_ID)
-        self.assertEqual(enrollment_attributes[0], attributes[0])
+        assert enrollment_attributes[0] == attributes[0]
 
     def test_get_course_details(self):
         # Add a fake course enrollment information to the fake data API
         fake_data_api.add_course(self.COURSE_ID, course_modes=['honor', 'verified', 'audit'])
         result = api.get_course_enrollment_details(self.COURSE_ID)
-        self.assertEqual(result['course_id'], self.COURSE_ID)
-        self.assertEqual(3, len(result['course_modes']))
+        assert result['course_id'] == self.COURSE_ID
+        assert 3 == len(result['course_modes'])
 
     @override_settings(ENROLLMENT_DATA_API='foo.bar.biz.baz')
     def test_data_api_config_error(self):
@@ -230,15 +227,15 @@ class EnrollmentTest(CacheIsolationTestCase):
         cached_details = api.get_course_enrollment_details(self.COURSE_ID)
 
         # The data matches
-        self.assertEqual(len(details['course_modes']), 3)
-        self.assertEqual(details, cached_details)
+        assert len(details['course_modes']) == 3
+        assert details == cached_details
 
     def test_update_enrollment_expired_mode_with_error(self):
         """ Verify that if verified mode is expired and include expire flag is
         false then enrollment cannot be updated. """
         self.assert_add_modes_with_enrollment('audit')
         # On updating enrollment mode to verified it should the raise the error.
-        with self.assertRaises(CourseModeNotFoundError):
+        with pytest.raises(CourseModeNotFoundError):
             self.assert_update_enrollment(mode='verified', include_expired=False)
 
     def test_update_enrollment_with_expired_mode(self):
@@ -261,7 +258,7 @@ class EnrollmentTest(CacheIsolationTestCase):
         fake_data_api.add_course(self.COURSE_ID, course_modes=['honor', 'verified', 'audit'])
         result = api.add_enrollment(self.USERNAME, self.COURSE_ID, mode=enrollment_mode)
         get_result = api.get_enrollment(self.USERNAME, self.COURSE_ID)
-        self.assertEqual(result, get_result)
+        assert result == get_result
         # set the course verify mode as expire.
         fake_data_api.set_expired_mode(self.COURSE_ID)
 
@@ -271,13 +268,13 @@ class EnrollmentTest(CacheIsolationTestCase):
         result = api.update_enrollment(
             self.USERNAME, self.COURSE_ID, mode=mode, is_active=is_active, include_expired=include_expired
         )
-        self.assertEqual(mode, result['mode'])
-        self.assertIsNotNone(result)
-        self.assertEqual(result['student'], self.USERNAME)
-        self.assertEqual(result['course']['course_id'], self.COURSE_ID)
-        self.assertEqual(result['mode'], mode)
+        assert mode == result['mode']
+        assert result is not None
+        assert result['student'] == self.USERNAME
+        assert result['course']['course_id'] == self.COURSE_ID
+        assert result['mode'] == mode
 
         if is_active:
-            self.assertTrue(result['is_active'])
+            assert result['is_active']
         else:
-            self.assertFalse(result['is_active'])
+            assert not result['is_active']

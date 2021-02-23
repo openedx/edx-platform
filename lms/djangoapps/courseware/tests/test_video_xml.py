@@ -45,10 +45,7 @@ class VideoBlockLogicTest(TestCase):
         """Test parsing old-style Youtube ID strings into a dict."""
         youtube_str = '0.75:jNCf2gIqpeE,1.00:ZwkTiUPN0mg,1.25:rsq9auxASqI,1.50:kMyNdzVHHgg'
         output = VideoBlock._parse_youtube(youtube_str)
-        self.assertEqual(output, {'0.75': 'jNCf2gIqpeE',
-                                  '1.00': 'ZwkTiUPN0mg',
-                                  '1.25': 'rsq9auxASqI',
-                                  '1.50': 'kMyNdzVHHgg'})
+        assert output == {'0.75': 'jNCf2gIqpeE', '1.00': 'ZwkTiUPN0mg', '1.25': 'rsq9auxASqI', '1.50': 'kMyNdzVHHgg'}
 
     def test_parse_youtube_one_video(self):
         """
@@ -57,10 +54,7 @@ class VideoBlockLogicTest(TestCase):
         """
         youtube_str = '0.75:jNCf2gIqpeE'
         output = VideoBlock._parse_youtube(youtube_str)
-        self.assertEqual(output, {'0.75': 'jNCf2gIqpeE',
-                                  '1.00': '',
-                                  '1.25': '',
-                                  '1.50': ''})
+        assert output == {'0.75': 'jNCf2gIqpeE', '1.00': '', '1.25': '', '1.50': ''}
 
     def test_parse_youtube_key_format(self):
         """
@@ -68,18 +62,11 @@ class VideoBlockLogicTest(TestCase):
         """
         youtube_str = '1.00:p2Q6BrNhdh8'
         youtube_str_hack = '1.0:p2Q6BrNhdh8'
-        self.assertEqual(
-            VideoBlock._parse_youtube(youtube_str),
-            VideoBlock._parse_youtube(youtube_str_hack)
-        )
+        assert VideoBlock._parse_youtube(youtube_str) == VideoBlock._parse_youtube(youtube_str_hack)
 
     def test_parse_youtube_empty(self):
         """
         Some courses have empty youtube attributes, so we should handle
         that well.
         """
-        self.assertEqual(VideoBlock._parse_youtube(''),
-                         {'0.75': '',
-                          '1.00': '',
-                          '1.25': '',
-                          '1.50': ''})
+        assert VideoBlock._parse_youtube('') == {'0.75': '', '1.00': '', '1.25': '', '1.50': ''}

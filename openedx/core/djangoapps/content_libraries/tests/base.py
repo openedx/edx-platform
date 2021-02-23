@@ -138,7 +138,7 @@ class ContentLibrariesRestApiTest(APITestCase):
         Like python 2's assertDictContainsSubset, but with the arguments in the
         correct order.
         """
-        self.assertGreaterEqual(big_dict.items(), subset_dict.items())
+        assert big_dict.items() >= subset_dict.items()
 
     # API helpers
 
@@ -147,10 +147,8 @@ class ContentLibrariesRestApiTest(APITestCase):
         Call a REST API
         """
         response = getattr(self.client, method)(url, data, format="json")
-        self.assertEqual(
-            response.status_code, expect_response,
-            "Unexpected response code {}:\n{}".format(response.status_code, getattr(response, 'data', '(no data)')),
-        )
+        assert response.status_code == expect_response,\
+            'Unexpected response code {}:\n{}'.format(response.status_code, getattr(response, 'data', '(no data)'))
         return response.data
 
     @contextmanager
@@ -323,10 +321,8 @@ class ContentLibrariesRestApiTest(APITestCase):
         file_handle = BytesIO(content)
         url = URL_LIB_BLOCK_ASSET_FILE.format(block_key=block_key, file_name=file_name)
         response = self.client.put(url, data={"content": file_handle})
-        self.assertEqual(
-            response.status_code, expect_response,
-            "Unexpected response code {}:\n{}".format(response.status_code, getattr(response, 'data', '(no data)')),
-        )
+        assert response.status_code == expect_response,\
+            'Unexpected response code {}:\n{}'.format(response.status_code, getattr(response, 'data', '(no data)'))
 
     def _delete_library_block_asset(self, block_key, file_name, expect_response=200):
         """ Delete a static asset file. """

@@ -10,12 +10,12 @@ from .views import CourseHandoutsList, CourseUpdatesList
 
 urlpatterns = [
     url(
-        r'^{}/handouts$'.format(settings.COURSE_ID_PATTERN),
+        fr'^{settings.COURSE_ID_PATTERN}/handouts$',
         CourseHandoutsList.as_view(),
         name='course-handouts-list'
     ),
     url(
-        r'^{}/updates$'.format(settings.COURSE_ID_PATTERN),
+        fr'^{settings.COURSE_ID_PATTERN}/updates$',
         CourseUpdatesList.as_view(),
         name='course-updates-list'
     ),

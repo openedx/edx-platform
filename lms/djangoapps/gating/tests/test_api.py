@@ -3,10 +3,11 @@ Unit tests for gating.signals module
 """
 
 
+from unittest.mock import Mock, patch
+
 from ddt import data, ddt, unpack
 from milestones import api as milestones_api
 from milestones.tests.utils import MilestonesTestCaseMixin
-from mock import Mock, patch
 
 from lms.djangoapps.courseware.tests.helpers import LoginEnrollmentTestCase
 from lms.djangoapps.gating.api import evaluate_prerequisite
@@ -25,7 +26,7 @@ class GatingTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase):
         """
         Initial data setup
         """
-        super(GatingTestCase, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
 
         # create course
         self.course = CourseFactory.create(
@@ -65,7 +66,7 @@ class TestEvaluatePrerequisite(GatingTestCase, MilestonesTestCaseMixin):
     """
 
     def setUp(self):
-        super(TestEvaluatePrerequisite, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.user_dict = {'id': self.user.id}
         self.prereq_milestone = None
         self.subsection_grade = Mock(location=self.seq1.location, percent_graded=0.5)
@@ -99,7 +100,7 @@ class TestEvaluatePrerequisite(GatingTestCase, MilestonesTestCaseMixin):
         self.subsection_grade.percent_graded = module_score / 100.0
 
         evaluate_prerequisite(self.course, self.subsection_grade, self.user)
-        self.assertEqual(milestones_api.user_has_milestone(self.user_dict, self.prereq_milestone), result)
+        assert milestones_api.user_has_milestone(self.user_dict, self.prereq_milestone) == result
 
     @patch('openedx.core.lib.gating.api.get_subsection_completion_percentage')
     @patch('openedx.core.lib.gating.api._get_minimum_required_percentage')
@@ -112,16 +113,16 @@ class TestEvaluatePrerequisite(GatingTestCase, MilestonesTestCaseMixin):
         mock_min_score.return_value = 100, 100
 
         evaluate_prerequisite(self.course, self.subsection_grade, self.user)
-        self.assertEqual(milestones_api.user_has_milestone(self.user_dict, self.prereq_milestone), result)
+        assert milestones_api.user_has_milestone(self.user_dict, self.prereq_milestone) == result
 
     @patch('openedx.core.lib.gating.api.get_subsection_grade_percentage')
     def test_no_prerequisites(self, mock_score):
         evaluate_prerequisite(self.course, self.subsection_grade, self.user)
-        self.assertFalse(mock_score.called)
+        assert not mock_score.called
 
     @patch('openedx.core.lib.gating.api.get_subsection_grade_percentage')
     def test_no_gated_content(self, mock_score):
         gating_api.add_prerequisite(self.course.id, self.seq1.location)
 
         evaluate_prerequisite(self.course, self.subsection_grade, self.user)
-        self.assertFalse(mock_score.called)
+        assert not mock_score.called

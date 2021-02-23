@@ -27,19 +27,19 @@ class UserPrefContextProcessorUnitTest(ModuleStoreTestCase):
     def test_anonymous_user(self):
         self.request.user = AnonymousUser()
         context = user_timezone_locale_prefs(self.request)
-        self.assertIsNone(context['user_timezone'])
-        self.assertIsNone(context['user_language'])
+        assert context['user_timezone'] is None
+        assert context['user_language'] is None
 
     def test_no_timezone_preference(self):
         set_user_preference(self.user, 'pref-lang', 'en')
         context = user_timezone_locale_prefs(self.request)
-        self.assertIsNone(context['user_timezone'])
-        self.assertIsNotNone(context['user_language'])
-        self.assertEqual(context['user_language'], 'en')
+        assert context['user_timezone'] is None
+        assert context['user_language'] is not None
+        assert context['user_language'] == 'en'
 
     def test_no_language_preference(self):
         set_user_preference(self.user, 'time_zone', 'Asia/Tokyo')
         context = user_timezone_locale_prefs(self.request)
-        self.assertIsNone(context['user_language'])
-        self.assertIsNotNone(context['user_timezone'])
-        self.assertEqual(context['user_timezone'], 'Asia/Tokyo')
+        assert context['user_language'] is None
+        assert context['user_timezone'] is not None
+        assert context['user_timezone'] == 'Asia/Tokyo'

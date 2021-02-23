@@ -25,4 +25,4 @@ class TestClearRequestCache(TestCase):
     @override_settings(CLEAR_REQUEST_CACHE_ON_TASK_COMPLETION=True)
     def test_clear_cache_celery(self):
         self._dummy_task.apply(args=(self,)).get()
-        self.assertFalse(self._get_cache().get_cached_response("cache_key").is_found)
+        assert not self._get_cache().get_cached_response('cache_key').is_found

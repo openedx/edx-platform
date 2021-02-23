@@ -34,7 +34,7 @@ from django.core.exceptions import MiddlewareNotUsed
 from django.urls import reverse
 from django.utils.deprecation import MiddlewareMixin
 from django.shortcuts import redirect
-from ipware.ip import get_ip
+from ipware.ip import get_client_ip
 
 from openedx.core.lib.request_utils import course_id_from_url
 
@@ -83,7 +83,7 @@ class EmbargoMiddleware(MiddlewareMixin):
             if pattern.match(request.path) is not None:
                 return None
 
-        ip_address = get_ip(request)
+        ip_address = get_client_ip(request)[0]
         ip_filter = IPFilter.current()
 
         if ip_filter.enabled and ip_address in ip_filter.blacklist_ips:

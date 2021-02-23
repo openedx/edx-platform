@@ -4,15 +4,12 @@ Tests for OAuth token exchange views
 
 # pylint: disable=no-member
 
-
 import json
 import unittest
 from datetime import timedelta
-import pytest
 
 import ddt
 import httpretty
-import mock
 from django.conf import settings
 from django.test import TestCase
 from django.urls import reverse
@@ -22,7 +19,10 @@ from social_django.models import Partial
 
 from openedx.core.djangoapps.oauth_dispatch.tests import factories as dot_factories
 from common.djangoapps.student.tests.factories import UserFactory
-from common.djangoapps.third_party_auth.tests.utils import ThirdPartyOAuthTestMixinFacebook, ThirdPartyOAuthTestMixinGoogle  # lint-amnesty, pylint: disable=line-too-long
+from common.djangoapps.third_party_auth.tests.utils import (
+    ThirdPartyOAuthTestMixinFacebook,
+    ThirdPartyOAuthTestMixinGoogle,
+)
 
 from .mixins import DOTAdapterMixin
 from .utils import TPA_FEATURE_ENABLED, TPA_FEATURES_KEY, AccessTokenExchangeTestMixin
@@ -32,6 +32,12 @@ from .utils import TPA_FEATURE_ENABLED, TPA_FEATURES_KEY, AccessTokenExchangeTes
 class AccessTokenExchangeViewTest(AccessTokenExchangeTestMixin):
     """
     Mixin that defines test cases for AccessTokenExchangeView
+
+    Warning: This class was originally created to support multiple libraries,
+        but we currently only support django-oauth-toolkit (DOT). At this point,
+        the variety of mixins can be quite confusing and are no longer providing
+        any benefit, other than the potential for reintroducing another library
+        in the future.
     """
     def setUp(self):
         super(AccessTokenExchangeViewTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
@@ -51,8 +57,11 @@ class AccessTokenExchangeViewTest(AccessTokenExchangeTestMixin):
             expected_data['error_code'] = error_code
         assert json.loads(response.content.decode('utf-8')) == expected_data
 
-    def _assert_success(self, data, expected_scopes):
+    def _assert_success(self, data, expected_scopes, expected_logged_in_user=None):
         response = self.csrf_client.post(self.url, data)
+        if expected_logged_in_user:
+            # Ensure that safe sessions isn't preventing an expected login
+            assert expected_logged_in_user == response.wsgi_request.user
         assert response.status_code == 200
         assert response['Content-Type'] == 'application/json'
         content = json.loads(response.content.decode('utf-8'))
@@ -70,51 +79,26 @@ class AccessTokenExchangeViewTest(AccessTokenExchangeTestMixin):
         assert self.oauth2_adapter.get_client_for_token(token) == self.oauth_client
         assert set(self.oauth2_adapter.get_token_scope_names(token)) == set(expected_scopes)
 
-    def test_single_access_token(self):
-        def extract_token(response):
-            """
-            Returns the access token from the response payload.
-            """
-            return json.loads(response.content.decode('utf-8'))["access_token"]
-
-        self._setup_provider_response(success=True)
-        for single_access_token in [True, False]:
-            with mock.patch(
-                "openedx.core.djangoapps.auth_exchange.views.constants.SINGLE_ACCESS_TOKEN",
-                single_access_token,
-            ):
-                first_response = self.client.post(self.url, self.data)
-                second_response = self.client.post(self.url, self.data)
-            assert first_response.status_code == 200
-            assert second_response.status_code == 200
-            assert (extract_token(first_response) == extract_token(second_response)) == single_access_token
-
     def test_get_method(self):
         response = self.client.get(self.url, self.data)
-        assert response.status_code == 400
-        assert json.loads(response.content.decode('utf-8')) ==\
-               {'error': 'invalid_request', 'error_description': 'Only POST requests allowed.'}
+        assert response.status_code == 405
+        assert json.loads(response.content.decode('utf-8')) == {'detail': 'Method "GET" not allowed.'}
 
     def test_invalid_provider(self):
         url = reverse("exchange_access_token", kwargs={"backend": "invalid"})
         response = self.client.post(url, self.data)
         assert response.status_code == 404
 
-    @pytest.mark.skip(reason="this is very entangled with dop use in third_party_auth")
-    def test_invalid_client(self):
-        """TODO(jinder): this test overwrites function of same name in mixin
-        Remove when dop has been removed from third party auth
-        (currently underlying code used dop adapter, which is no longer supported by auth_exchange)
+    def test_logged_in_user_without_csrf_error(self):
         """
-        pass  # lint-amnesty, pylint: disable=unnecessary-pass
+        Test that a logged in user succeeds without a CSRF permission denied.
 
-    @pytest.mark.skip(reason="this is very entangled with dop use in third_party_auth")
-    def test_missing_fields(self):
-        """TODO(jinder): this test overwrites function of same name in mixin
-        Remove when dop has been removed from third party auth
-        (currently underlying code used dop adapter, which is no longer supported by auth_exchange)
+        Note: The logged in user does not match the user of the token, but that is not
+            being treated as an error.
         """
-        pass  # lint-amnesty, pylint: disable=unnecessary-pass
+        self.csrf_client.login(username='test', password='secret')
+        self._setup_provider_response(success=True)
+        self._assert_success(self.data, expected_scopes=[], expected_logged_in_user=self.user)
 
     def test_disabled_user(self):
         """

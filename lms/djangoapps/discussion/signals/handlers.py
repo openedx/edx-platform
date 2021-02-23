@@ -5,7 +5,6 @@ Signal handlers related to discussions.
 
 import logging
 
-import six
 from django.conf import settings
 from django.dispatch import receiver
 from opaque_keys.edx.locator import LibraryLocator
@@ -33,7 +32,7 @@ def update_discussions_on_course_publish(sender, course_key, **kwargs):  # pylin
         return
 
     context = {
-        'course_id': six.text_type(course_key),
+        'course_id': str(course_key),
     }
     tasks.update_discussions_map.apply_async(
         args=[context],
@@ -45,16 +44,16 @@ def update_discussions_on_course_publish(sender, course_key, **kwargs):  # pylin
 def send_discussion_email_notification(sender, user, post, **kwargs):  # lint-amnesty, pylint: disable=missing-function-docstring, unused-argument
     current_site = get_current_site()
     if current_site is None:
-        log.info(u'Discussion: No current site, not sending notification about post: %s.', post.id)
+        log.info('Discussion: No current site, not sending notification about post: %s.', post.id)
         return
 
     try:
         if not current_site.configuration.get_value(ENABLE_FORUM_NOTIFICATIONS_FOR_SITE_KEY, False):
-            log_message = u'Discussion: notifications not enabled for site: %s. Not sending message about post: %s.'
+            log_message = 'Discussion: notifications not enabled for site: %s. Not sending message about post: %s.'
             log.info(log_message, current_site, post.id)
             return
     except SiteConfiguration.DoesNotExist:
-        log_message = u'Discussion: No SiteConfiguration for site %s. Not sending message about post: %s.'
+        log_message = 'Discussion: No SiteConfiguration for site %s. Not sending message about post: %s.'
         log.info(log_message, current_site, post.id)
         return
 
@@ -64,7 +63,7 @@ def send_discussion_email_notification(sender, user, post, **kwargs):  # lint-am
 def send_message(comment, site):  # lint-amnesty, pylint: disable=missing-function-docstring
     thread = comment.thread
     context = {
-        'course_id': six.text_type(thread.course_id),
+        'course_id': str(thread.course_id),
         'comment_id': comment.id,
         'comment_body': comment.body,
         'comment_author_id': comment.user_id,

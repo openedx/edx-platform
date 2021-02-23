@@ -6,7 +6,7 @@ too.
 
 import unittest
 from datetime import datetime, timedelta
-
+import pytest
 import ddt
 import pytz
 import six
@@ -83,16 +83,14 @@ class TestSortedAssetList(unittest.TestCase):
 
     def test_exception_on_bad_sort(self):
         asset_key = self.course_key.make_asset_key('asset', 'pic1.jpg')
-        with self.assertRaises(IncorrectlySortedList):
+        with pytest.raises(IncorrectlySortedList):
             __ = self.sorted_asset_list_by_last_edit.find(asset_key)
 
     def test_find(self):
         asset_key = self.course_key.make_asset_key('asset', 'asset.txt')
-        self.assertEqual(self.sorted_asset_list_by_filename.find(asset_key), 0)
+        assert self.sorted_asset_list_by_filename.find(asset_key) == 0
         asset_key_last = self.course_key.make_asset_key('asset', 'weather_patterns.bmp')
-        self.assertEqual(
-            self.sorted_asset_list_by_filename.find(asset_key_last), len(AssetStoreTestData.all_asset_data) - 1
-        )
+        assert self.sorted_asset_list_by_filename.find(asset_key_last) == (len(AssetStoreTestData.all_asset_data) - 1)
 
 
 @attr('mongo')
@@ -126,7 +124,7 @@ class TestMongoAssetMetadataStorage(TestCase):
         if type(mdata1) != type(mdata2):  # lint-amnesty, pylint: disable=unidiomatic-typecheck
             self.fail(self._formatMessage(msg, u"{} is not same type as {}".format(mdata1, mdata2)))
         for attr in mdata1.ATTRS_ALLOWED_TO_UPDATE:  # lint-amnesty, pylint: disable=redefined-outer-name
-            self.assertEqual(getattr(mdata1, attr), getattr(mdata2, attr), msg)
+            assert getattr(mdata1, attr) == getattr(mdata2, attr), msg
 
     def _compare_datetimes(self, datetime1, datetime2, msg=None):
         """
@@ -188,9 +186,9 @@ class TestMongoAssetMetadataStorage(TestCase):
             store.save_asset_metadata(new_asset_md, ModuleStoreEnum.UserID.test)
             # Find the asset's metadata and confirm it's the same.
             found_asset_md = store.find_asset_metadata(new_asset_loc)
-            self.assertIsNotNone(found_asset_md)
-            self.assertEqual(new_asset_md, found_asset_md)
-            self.assertEqual(len(store.get_all_asset_metadata(course.id, 'asset')), 1)
+            assert found_asset_md is not None
+            assert new_asset_md == found_asset_md
+            assert len(store.get_all_asset_metadata(course.id, 'asset')) == 1
 
     @ddt.data(*MODULESTORE_SETUPS)
     def test_delete(self, storebuilder):
@@ -201,13 +199,13 @@ class TestMongoAssetMetadataStorage(TestCase):
             course = CourseFactory.create(modulestore=store)
             new_asset_loc = course.id.make_asset_key('asset', 'burnside.jpg')
             # Attempt to delete an asset that doesn't exist.
-            self.assertEqual(store.delete_asset_metadata(new_asset_loc, ModuleStoreEnum.UserID.test), 0)
-            self.assertEqual(len(store.get_all_asset_metadata(course.id, 'asset')), 0)
+            assert store.delete_asset_metadata(new_asset_loc, ModuleStoreEnum.UserID.test) == 0
+            assert len(store.get_all_asset_metadata(course.id, 'asset')) == 0
 
             new_asset_md = self._make_asset_metadata(new_asset_loc)
             store.save_asset_metadata(new_asset_md, ModuleStoreEnum.UserID.test)
-            self.assertEqual(store.delete_asset_metadata(new_asset_loc, ModuleStoreEnum.UserID.test), 1)
-            self.assertEqual(len(store.get_all_asset_metadata(course.id, 'asset')), 0)
+            assert store.delete_asset_metadata(new_asset_loc, ModuleStoreEnum.UserID.test) == 1
+            assert len(store.get_all_asset_metadata(course.id, 'asset')) == 0
 
     @ddt.data(*MODULESTORE_SETUPS)
     def test_find_non_existing_assets(self, storebuilder):
@@ -219,7 +217,7 @@ class TestMongoAssetMetadataStorage(TestCase):
             new_asset_loc = course.id.make_asset_key('asset', 'burnside.jpg')
             # Find existing asset metadata.
             asset_md = store.find_asset_metadata(new_asset_loc)
-            self.assertIsNone(asset_md)
+            assert asset_md is None
 
     @ddt.data(*MODULESTORE_SETUPS)
     def test_get_all_non_existing_assets(self, storebuilder):
@@ -230,7 +228,7 @@ class TestMongoAssetMetadataStorage(TestCase):
             course = CourseFactory.create(modulestore=store)
             # Find existing asset metadata.
             asset_md = store.get_all_asset_metadata(course.id, 'asset')
-            self.assertEqual(asset_md, [])
+            assert asset_md == []
 
     @ddt.data(*MODULESTORE_SETUPS)
     def test_find_assets_in_non_existent_course(self, storebuilder):
@@ -244,9 +242,9 @@ class TestMongoAssetMetadataStorage(TestCase):
             ))
             new_asset_loc = fake_course_id.make_asset_key('asset', 'burnside.jpg')
             # Find asset metadata from non-existent course.
-            with self.assertRaises(ItemNotFoundError):
+            with pytest.raises(ItemNotFoundError):
                 store.find_asset_metadata(new_asset_loc)
-            with self.assertRaises(ItemNotFoundError):
+            with pytest.raises(ItemNotFoundError):
                 store.get_all_asset_metadata(fake_course_id, 'asset')
 
     @ddt.data(*MODULESTORE_SETUPS)
@@ -260,11 +258,11 @@ class TestMongoAssetMetadataStorage(TestCase):
             new_asset_md = self._make_asset_metadata(new_asset_loc)
             # Add asset metadata.
             store.save_asset_metadata(new_asset_md, ModuleStoreEnum.UserID.test)
-            self.assertEqual(len(store.get_all_asset_metadata(course.id, 'asset')), 1)
+            assert len(store.get_all_asset_metadata(course.id, 'asset')) == 1
             # Add *the same* asset metadata.
             store.save_asset_metadata(new_asset_md, ModuleStoreEnum.UserID.test)
             # Still one here?
-            self.assertEqual(len(store.get_all_asset_metadata(course.id, 'asset')), 1)
+            assert len(store.get_all_asset_metadata(course.id, 'asset')) == 1
 
     @ddt.data(*MODULESTORE_SETUPS)
     def test_different_asset_types(self, storebuilder):
@@ -277,8 +275,8 @@ class TestMongoAssetMetadataStorage(TestCase):
             new_asset_md = self._make_asset_metadata(new_asset_loc)
             # Add asset metadata.
             store.save_asset_metadata(new_asset_md, ModuleStoreEnum.UserID.test)
-            self.assertEqual(len(store.get_all_asset_metadata(course.id, 'vrml')), 1)
-            self.assertEqual(len(store.get_all_asset_metadata(course.id, 'asset')), 0)
+            assert len(store.get_all_asset_metadata(course.id, 'vrml')) == 1
+            assert len(store.get_all_asset_metadata(course.id, 'asset')) == 0
 
     @ddt.data(*MODULESTORE_SETUPS)
     def test_asset_types_with_other_field_names(self, storebuilder):
@@ -291,10 +289,10 @@ class TestMongoAssetMetadataStorage(TestCase):
             new_asset_md = self._make_asset_metadata(new_asset_loc)
             # Add asset metadata.
             store.save_asset_metadata(new_asset_md, ModuleStoreEnum.UserID.test)
-            self.assertEqual(len(store.get_all_asset_metadata(course.id, 'course_id')), 1)
-            self.assertEqual(len(store.get_all_asset_metadata(course.id, 'asset')), 0)
+            assert len(store.get_all_asset_metadata(course.id, 'course_id')) == 1
+            assert len(store.get_all_asset_metadata(course.id, 'asset')) == 0
             all_assets = store.get_all_asset_metadata(course.id, 'course_id')
-            self.assertEqual(all_assets[0].asset_id.path, new_asset_loc.path)
+            assert all_assets[0].asset_id.path == new_asset_loc.path
 
     @ddt.data(*MODULESTORE_SETUPS)
     def test_lock_unlock_assets(self, storebuilder):
@@ -312,13 +310,13 @@ class TestMongoAssetMetadataStorage(TestCase):
             store.set_asset_metadata_attr(new_asset_loc, "locked", not locked_state, ModuleStoreEnum.UserID.test)
             # Find the same course and check its locked status.
             updated_asset_md = store.find_asset_metadata(new_asset_loc)
-            self.assertIsNotNone(updated_asset_md)
-            self.assertEqual(updated_asset_md.locked, not locked_state)
+            assert updated_asset_md is not None
+            assert updated_asset_md.locked == (not locked_state)
             # Now flip it back.
             store.set_asset_metadata_attr(new_asset_loc, "locked", locked_state, ModuleStoreEnum.UserID.test)
             reupdated_asset_md = store.find_asset_metadata(new_asset_loc)
-            self.assertIsNotNone(reupdated_asset_md)
-            self.assertEqual(reupdated_asset_md.locked, locked_state)
+            assert reupdated_asset_md is not None
+            assert reupdated_asset_md.locked == locked_state
 
     ALLOWED_ATTRS = (
         ('pathname', '/new/path'),
@@ -359,9 +357,9 @@ class TestMongoAssetMetadataStorage(TestCase):
                 store.set_asset_metadata_attr(new_asset_loc, attribute, value, ModuleStoreEnum.UserID.test)
                 # Find the same course asset and check its changed attribute.
                 updated_asset_md = store.find_asset_metadata(new_asset_loc)
-                self.assertIsNotNone(updated_asset_md)
-                self.assertIsNotNone(getattr(updated_asset_md, attribute, None))
-                self.assertEqual(getattr(updated_asset_md, attribute, None), value)
+                assert updated_asset_md is not None
+                assert getattr(updated_asset_md, attribute, None) is not None
+                assert getattr(updated_asset_md, attribute, None) == value
 
     @ddt.data(*MODULESTORE_SETUPS)
     def test_set_disallowed_attrs(self, storebuilder):
@@ -379,10 +377,10 @@ class TestMongoAssetMetadataStorage(TestCase):
                 store.set_asset_metadata_attr(new_asset_loc, attribute, value, ModuleStoreEnum.UserID.test)
                 # Find the same course and check its changed attribute.
                 updated_asset_md = store.find_asset_metadata(new_asset_loc)
-                self.assertIsNotNone(updated_asset_md)
-                self.assertIsNotNone(getattr(updated_asset_md, attribute, None))
+                assert updated_asset_md is not None
+                assert getattr(updated_asset_md, attribute, None) is not None
                 # Make sure that the attribute is unchanged from its original value.
-                self.assertEqual(getattr(updated_asset_md, attribute, None), original_attr_val)
+                assert getattr(updated_asset_md, attribute, None) == original_attr_val
 
     @ddt.data(*MODULESTORE_SETUPS)
     def test_set_unknown_attrs(self, storebuilder):
@@ -399,10 +397,10 @@ class TestMongoAssetMetadataStorage(TestCase):
                 store.set_asset_metadata_attr(new_asset_loc, attribute, value, ModuleStoreEnum.UserID.test)
                 # Find the same course and check its changed attribute.
                 updated_asset_md = store.find_asset_metadata(new_asset_loc)
-                self.assertIsNotNone(updated_asset_md)
+                assert updated_asset_md is not None
                 # Make sure the unknown field was *not* added.
-                with self.assertRaises(AttributeError):
-                    self.assertEqual(getattr(updated_asset_md, attribute), value)
+                with pytest.raises(AttributeError):
+                    assert getattr(updated_asset_md, attribute) == value
 
     @ddt.data(*MODULESTORE_SETUPS)
     def test_save_one_different_asset(self, storebuilder):
@@ -416,9 +414,9 @@ class TestMongoAssetMetadataStorage(TestCase):
                 self._make_asset_metadata(asset_key)
             )
             store.save_asset_metadata(new_asset_thumbnail, ModuleStoreEnum.UserID.test)
-            self.assertEqual(len(store.get_all_asset_metadata(course.id, 'different')), 1)
-            self.assertEqual(store.delete_asset_metadata(asset_key, ModuleStoreEnum.UserID.test), 1)
-            self.assertEqual(len(store.get_all_asset_metadata(course.id, 'different')), 0)
+            assert len(store.get_all_asset_metadata(course.id, 'different')) == 1
+            assert store.delete_asset_metadata(asset_key, ModuleStoreEnum.UserID.test) == 1
+            assert len(store.get_all_asset_metadata(course.id, 'different')) == 0
 
     @ddt.data(*MODULESTORE_SETUPS)
     def test_find_different(self, storebuilder):
@@ -433,17 +431,17 @@ class TestMongoAssetMetadataStorage(TestCase):
             )
             store.save_asset_metadata(new_asset_thumbnail, ModuleStoreEnum.UserID.test)
 
-            self.assertIsNotNone(store.find_asset_metadata(asset_key))
+            assert store.find_asset_metadata(asset_key) is not None
             unknown_asset_key = course.id.make_asset_key('different', 'nosuchfile.jpg')
-            self.assertIsNone(store.find_asset_metadata(unknown_asset_key))
+            assert store.find_asset_metadata(unknown_asset_key) is None
 
     def _check_asset_values(self, assets, orig):
         """
         Check asset type/path values.
         """
         for idx, asset in enumerate(orig):
-            self.assertEqual(assets[idx].asset_id.asset_type, asset[0])
-            self.assertEqual(assets[idx].asset_id.path, asset[1])
+            assert assets[idx].asset_id.asset_type == asset[0]
+            assert assets[idx].asset_id.path == asset[1]
 
     @ddt.data(*MODULESTORE_SETUPS)
     def test_get_multiple_types(self, storebuilder):
@@ -468,17 +466,17 @@ class TestMongoAssetMetadataStorage(TestCase):
                 ('asset', self.regular_assets),
             ):
                 assets = store.get_all_asset_metadata(course.id, asset_type)
-                self.assertEqual(len(assets), len(asset_list))
+                assert len(assets) == len(asset_list)
                 self._check_asset_values(assets, asset_list)
 
-            self.assertEqual(len(store.get_all_asset_metadata(course.id, 'not_here')), 0)
-            self.assertEqual(len(store.get_all_asset_metadata(course.id, None)), 4)
+            assert len(store.get_all_asset_metadata(course.id, 'not_here')) == 0
+            assert len(store.get_all_asset_metadata(course.id, None)) == 4
 
             assets = store.get_all_asset_metadata(
                 course.id, None, start=0, maxresults=-1,
                 sort=('displayname', ModuleStoreEnum.SortOrder.ascending)
             )
-            self.assertEqual(len(assets), len(self.alls))
+            assert len(assets) == len(self.alls)
             self._check_asset_values(assets, self.alls)
 
     @ddt.data(*MODULESTORE_SETUPS)
@@ -507,17 +505,17 @@ class TestMongoAssetMetadataStorage(TestCase):
                 ('asset', self.regular_assets),
             ):
                 assets = store.get_all_asset_metadata(course.id, asset_type)
-                self.assertEqual(len(assets), len(asset_list))
+                assert len(assets) == len(asset_list)
                 self._check_asset_values(assets, asset_list)
 
-            self.assertEqual(len(store.get_all_asset_metadata(course.id, 'not_here')), 0)
-            self.assertEqual(len(store.get_all_asset_metadata(course.id, None)), 4)
+            assert len(store.get_all_asset_metadata(course.id, 'not_here')) == 0
+            assert len(store.get_all_asset_metadata(course.id, None)) == 4
 
             assets = store.get_all_asset_metadata(
                 course.id, None, start=0, maxresults=-1,
                 sort=('displayname', ModuleStoreEnum.SortOrder.ascending)
             )
-            self.assertEqual(len(assets), len(self.alls))
+            assert len(assets) == len(self.alls)
             self._check_asset_values(assets, self.alls)
 
     @ddt.data(*MODULESTORE_SETUPS)
@@ -549,17 +547,17 @@ class TestMongoAssetMetadataStorage(TestCase):
                 ('vrml', self.vrmls),
             ):
                 assets = store.get_all_asset_metadata(course1.id, asset_type)
-                self.assertEqual(len(assets), len(asset_list))
+                assert len(assets) == len(asset_list)
                 self._check_asset_values(assets, asset_list)
 
-            self.assertEqual(len(store.get_all_asset_metadata(course1.id, 'asset')), 0)
-            self.assertEqual(len(store.get_all_asset_metadata(course1.id, None)), 3)
+            assert len(store.get_all_asset_metadata(course1.id, 'asset')) == 0
+            assert len(store.get_all_asset_metadata(course1.id, None)) == 3
 
             assets = store.get_all_asset_metadata(
                 course1.id, None, start=0, maxresults=-1,
                 sort=('displayname', ModuleStoreEnum.SortOrder.ascending)
             )
-            self.assertEqual(len(assets), len(self.differents + self.vrmls))
+            assert len(assets) == len((self.differents + self.vrmls))
             self._check_asset_values(assets, self.differents + self.vrmls)
 
     @ddt.data(*MODULESTORE_SETUPS)
@@ -575,7 +573,7 @@ class TestMongoAssetMetadataStorage(TestCase):
             )
             store.save_asset_metadata(new_asset_thumbnail, ModuleStoreEnum.UserID.test)
 
-            self.assertEqual(len(store.get_all_asset_metadata(course.id, 'different')), 1)
+            assert len(store.get_all_asset_metadata(course.id, 'different')) == 1
 
     @ddt.data(*MODULESTORE_SETUPS)
     def test_get_all_assets_with_paging(self, storebuilder):
@@ -617,38 +615,38 @@ class TestMongoAssetMetadataStorage(TestCase):
                     )
                     num_expected_results = sort_test[2][i]
                     expected_filename = sort_test[1][2 * i]
-                    self.assertEqual(len(asset_page), num_expected_results)
-                    self.assertEqual(asset_page[0].asset_id.path, expected_filename)
+                    assert len(asset_page) == num_expected_results
+                    assert asset_page[0].asset_id.path == expected_filename
                     if num_expected_results == 2:
                         expected_filename = sort_test[1][(2 * i) + 1]
-                        self.assertEqual(asset_page[1].asset_id.path, expected_filename)
+                        assert asset_page[1].asset_id.path == expected_filename
 
             # Now fetch everything.
             asset_page = store.get_all_asset_metadata(
                 course2.id, 'asset', start=0, sort=('displayname', ModuleStoreEnum.SortOrder.ascending)
             )
-            self.assertEqual(len(asset_page), 5)
-            self.assertEqual(asset_page[0].asset_id.path, 'code.tgz')
-            self.assertEqual(asset_page[1].asset_id.path, 'demo.swf')
-            self.assertEqual(asset_page[2].asset_id.path, 'dog.png')
-            self.assertEqual(asset_page[3].asset_id.path, 'roman_history.pdf')
-            self.assertEqual(asset_page[4].asset_id.path, 'weather_patterns.bmp')
+            assert len(asset_page) == 5
+            assert asset_page[0].asset_id.path == 'code.tgz'
+            assert asset_page[1].asset_id.path == 'demo.swf'
+            assert asset_page[2].asset_id.path == 'dog.png'
+            assert asset_page[3].asset_id.path == 'roman_history.pdf'
+            assert asset_page[4].asset_id.path == 'weather_patterns.bmp'
 
             # Some odd conditions.
             asset_page = store.get_all_asset_metadata(
                 course2.id, 'asset', start=100, sort=('uploadDate', ModuleStoreEnum.SortOrder.ascending)
             )
-            self.assertEqual(len(asset_page), 0)
+            assert len(asset_page) == 0
             asset_page = store.get_all_asset_metadata(
                 course2.id, 'asset', start=3, maxresults=0,
                 sort=('displayname', ModuleStoreEnum.SortOrder.ascending)
             )
-            self.assertEqual(len(asset_page), 0)
+            assert len(asset_page) == 0
             asset_page = store.get_all_asset_metadata(
                 course2.id, 'asset', start=3, maxresults=-12345,
                 sort=('displayname', ModuleStoreEnum.SortOrder.descending)
             )
-            self.assertEqual(len(asset_page), 2)
+            assert len(asset_page) == 2
 
     @ddt.data('XML_MODULESTORE_BUILDER', 'MIXED_MODULESTORE_BUILDER')
     def test_xml_not_yet_implemented(self, storebuilderName):
@@ -659,8 +657,8 @@ class TestMongoAssetMetadataStorage(TestCase):
         with storebuilder.build(contentstore=None) as (__, store):
             course_key = store.make_course_key("org", "course", "run")
             asset_key = course_key.make_asset_key('asset', 'foo.jpg')
-            self.assertEqual(store.find_asset_metadata(asset_key), None)
-            self.assertEqual(store.get_all_asset_metadata(course_key, 'asset'), [])
+            assert store.find_asset_metadata(asset_key) is None
+            assert store.get_all_asset_metadata(course_key, 'asset') == []
 
     @ddt.data(*MODULESTORE_SETUPS)
     def test_copy_all_assets_same_modulestore(self, storebuilder):
@@ -671,16 +669,16 @@ class TestMongoAssetMetadataStorage(TestCase):
             course1 = CourseFactory.create(modulestore=store)
             course2 = CourseFactory.create(modulestore=store)
             self.setup_assets(course1.id, None, store)
-            self.assertEqual(len(store.get_all_asset_metadata(course1.id, 'asset')), 2)
-            self.assertEqual(len(store.get_all_asset_metadata(course2.id, 'asset')), 0)
+            assert len(store.get_all_asset_metadata(course1.id, 'asset')) == 2
+            assert len(store.get_all_asset_metadata(course2.id, 'asset')) == 0
             store.copy_all_asset_metadata(course1.id, course2.id, ModuleStoreEnum.UserID.test * 101)
-            self.assertEqual(len(store.get_all_asset_metadata(course1.id, 'asset')), 2)
+            assert len(store.get_all_asset_metadata(course1.id, 'asset')) == 2
             all_assets = store.get_all_asset_metadata(
                 course2.id, 'asset', sort=('displayname', ModuleStoreEnum.SortOrder.ascending)
             )
-            self.assertEqual(len(all_assets), 2)
-            self.assertEqual(all_assets[0].asset_id.path, 'pic1.jpg')
-            self.assertEqual(all_assets[1].asset_id.path, 'shout.ogg')
+            assert len(all_assets) == 2
+            assert all_assets[0].asset_id.path == 'pic1.jpg'
+            assert all_assets[1].asset_id.path == 'shout.ogg'
 
     @ddt.data(*MODULESTORE_SETUPS)
     def test_copy_all_assets_from_course_with_no_assets(self, storebuilder):
@@ -691,12 +689,12 @@ class TestMongoAssetMetadataStorage(TestCase):
             course1 = CourseFactory.create(modulestore=store)
             course2 = CourseFactory.create(modulestore=store)
             store.copy_all_asset_metadata(course1.id, course2.id, ModuleStoreEnum.UserID.test * 101)
-            self.assertEqual(len(store.get_all_asset_metadata(course1.id, 'asset')), 0)
-            self.assertEqual(len(store.get_all_asset_metadata(course2.id, 'asset')), 0)
+            assert len(store.get_all_asset_metadata(course1.id, 'asset')) == 0
+            assert len(store.get_all_asset_metadata(course2.id, 'asset')) == 0
             all_assets = store.get_all_asset_metadata(
                 course2.id, 'asset', sort=('displayname', ModuleStoreEnum.SortOrder.ascending)
             )
-            self.assertEqual(len(all_assets), 0)
+            assert len(all_assets) == 0
 
     @ddt.data(
         ('mongo', 'split'),
@@ -714,12 +712,12 @@ class TestMongoAssetMetadataStorage(TestCase):
             with mixed_store.default_store(to_store):
                 course2 = CourseFactory.create(modulestore=mixed_store)
             self.setup_assets(course1.id, None, mixed_store)
-            self.assertEqual(len(mixed_store.get_all_asset_metadata(course1.id, 'asset')), 2)
-            self.assertEqual(len(mixed_store.get_all_asset_metadata(course2.id, 'asset')), 0)
+            assert len(mixed_store.get_all_asset_metadata(course1.id, 'asset')) == 2
+            assert len(mixed_store.get_all_asset_metadata(course2.id, 'asset')) == 0
             mixed_store.copy_all_asset_metadata(course1.id, course2.id, ModuleStoreEnum.UserID.test * 102)
             all_assets = mixed_store.get_all_asset_metadata(
                 course2.id, 'asset', sort=('displayname', ModuleStoreEnum.SortOrder.ascending)
             )
-            self.assertEqual(len(all_assets), 2)
-            self.assertEqual(all_assets[0].asset_id.path, 'pic1.jpg')
-            self.assertEqual(all_assets[1].asset_id.path, 'shout.ogg')
+            assert len(all_assets) == 2
+            assert all_assets[0].asset_id.path == 'pic1.jpg'
+            assert all_assets[1].asset_id.path == 'shout.ogg'

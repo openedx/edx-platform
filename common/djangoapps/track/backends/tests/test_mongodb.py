@@ -25,7 +25,7 @@ class TestMongoBackend(TestCase):  # lint-amnesty, pylint: disable=missing-class
 
         calls = self.backend.collection.insert.mock_calls
 
-        self.assertEqual(len(calls), 2)
+        assert len(calls) == 2
 
         # Unpack the arguments and check if the events were used
         # as the first argument to collection.insert
@@ -34,5 +34,5 @@ class TestMongoBackend(TestCase):  # lint-amnesty, pylint: disable=missing-class
             _, args, _ = call
             return args[0]
 
-        self.assertEqual(events[0], first_argument(calls[0]))
-        self.assertEqual(events[1], first_argument(calls[1]))
+        assert events[0] == first_argument(calls[0])
+        assert events[1] == first_argument(calls[1])

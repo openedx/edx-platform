@@ -3,8 +3,6 @@ Unit tests for the IdentityServer3 OAuth2 Backend
 """
 import json
 import ddt
-import pytest  # pylint: disable=unused-import
-
 from common.djangoapps.third_party_auth.identityserver3 import IdentityServer3
 from common.djangoapps.third_party_auth.tests import testutil
 from common.djangoapps.third_party_auth.tests.utils import skip_unless_thirdpartyauth

@@ -27,12 +27,13 @@ from rest_framework.generics import GenericAPIView
 from rest_framework.response import Response
 from rest_framework.reverse import reverse
 from rest_framework.views import APIView
-from openedx.core.lib.api.authentication import BearerAuthentication
 
+from common.djangoapps.student.models import CourseAccessRole, CourseEnrollment
+from common.djangoapps.util.model_utils import truncate_fields
 from lms.djangoapps.courseware.courses import get_course_with_access, has_access
 from lms.djangoapps.discussion.django_comment_client.utils import has_discussion_privileges
 from lms.djangoapps.teams.models import CourseTeam, CourseTeamMembership
-from openedx.core.lib.teams_config import TeamsetType
+from openedx.core.lib.api.authentication import BearerAuthentication
 from openedx.core.lib.api.parsers import MergePatchParser
 from openedx.core.lib.api.permissions import IsCourseStaffInstructor, IsStaffOrReadOnly
 from openedx.core.lib.api.view_utils import (
@@ -41,16 +42,15 @@ from openedx.core.lib.api.view_utils import (
     add_serializer_errors,
     build_api_error
 )
-from common.djangoapps.student.models import CourseAccessRole, CourseEnrollment
-from common.djangoapps.util.model_utils import truncate_fields
+from openedx.core.lib.teams_config import TeamsetType
 from xmodule.modulestore.django import modulestore
 
 from . import is_feature_enabled
 from .api import (
     OrganizationProtectionStatus,
     add_team_count,
-    can_user_modify_team,
     can_user_create_team_in_topic,
+    can_user_modify_team,
     get_assignments_for_team,
     has_course_staff_privileges,
     has_specific_team_access,
@@ -58,7 +58,7 @@ from .api import (
     has_team_api_access,
     user_organization_protection_status
 )
-from .csv import load_team_membership_csv, TeamMembershipImportManager
+from .csv import TeamMembershipImportManager, load_team_membership_csv
 from .errors import AlreadyOnTeamInTeamset, ElasticSearchConnectionError, NotEnrolledInCourseForTeam
 from .search_indexes import CourseTeamIndexer
 from .serializers import (
@@ -68,8 +68,8 @@ from .serializers import (
     MembershipSerializer,
     TopicSerializer
 )
-from .utils import emit_team_event
 from .toggles import are_team_submissions_enabled
+from .utils import emit_team_event
 
 TEAM_MEMBERSHIPS_PER_PAGE = 5
 TOPICS_PER_PAGE = 12
@@ -87,8 +87,8 @@ def team_post_save_callback(sender, instance, **kwargs):  # pylint: disable=unus
         for field in changed_fields:
             if field not in instance.FIELD_BLACKLIST:
                 truncated_fields = truncate_fields(
-                    six.text_type(changed_fields[field]),
-                    six.text_type(getattr(instance, field))
+                    str(changed_fields[field]),
+                    str(getattr(instance, field))
                 )
                 truncated_fields['team_id'] = instance.team_id
                 truncated_fields['team_id'] = instance.team_id
@@ -159,7 +159,7 @@ class TeamsDashboardView(GenericAPIView):
                 'organization_protection_status': organization_protection_status
             },
         )
-        topics_data["sort_order"] = sort_order
+        topics_data["sort_order"] = sort_order  # pylint: disable=unsupported-assignment-operation
 
         filter_query = {
             'membership__user': user,
@@ -412,7 +412,7 @@ class TeamsListView(ExpandableFieldViewMixin, GenericAPIView):
             course_module = modulestore().get_course(course_key)
         except InvalidKeyError:
             error = build_api_error(
-                ugettext_noop(u"The supplied course id {course_id} is not valid."),
+                ugettext_noop("The supplied course id {course_id} is not valid."),
                 course_id=course_id_string,
             )
             return Response(error, status=status.HTTP_400_BAD_REQUEST)
@@ -439,7 +439,7 @@ class TeamsListView(ExpandableFieldViewMixin, GenericAPIView):
         if topic_id is not None:
             if topic_id not in course_module.teamsets_by_id:
                 error = build_api_error(
-                    ugettext_noop(u'The supplied topic id {topic_id} is not valid'),
+                    ugettext_noop('The supplied topic id {topic_id} is not valid'),
                     topic_id=topic_id
                 )
                 return Response(error, status=status.HTTP_400_BAD_REQUEST)
@@ -514,14 +514,14 @@ class TeamsListView(ExpandableFieldViewMixin, GenericAPIView):
         if order_by_input not in ordering_schemes:
             return Response(
                 {
-                    'developer_message': u"unsupported order_by value {ordering}".format(
+                    'developer_message': "unsupported order_by value {ordering}".format(
                         ordering=order_by_input,
                     ),
                     # Translators: 'ordering' is a string describing a way
                     # of ordering a list. For example, {ordering} may be
                     # 'name', indicating that the user wants to sort the
                     # list by lower case name.
-                    'user_message': _(u"The ordering {ordering} is not supported").format(
+                    'user_message': _("The ordering {ordering} is not supported").format(
                         ordering=order_by_input,
                     ),
                 },
@@ -548,7 +548,7 @@ class TeamsListView(ExpandableFieldViewMixin, GenericAPIView):
                 return Response(status=status.HTTP_404_NOT_FOUND)
         except InvalidKeyError:
             field_errors['course_id'] = build_api_error(
-                ugettext_noop(u'The supplied course_id {course_id} is not valid.'),
+                ugettext_noop('The supplied course_id {course_id} is not valid.'),
                 course_id=course_id
             )
             return Response({
@@ -558,7 +558,7 @@ class TeamsListView(ExpandableFieldViewMixin, GenericAPIView):
         topic_id = request.data.get('topic_id')
         if not topic_id:
             field_errors['topic_id'] = build_api_error(
-                ugettext_noop(u'topic_id is required'),
+                ugettext_noop('topic_id is required'),
                 course_id=course_id
             )
             return Response({
@@ -596,7 +596,7 @@ class TeamsListView(ExpandableFieldViewMixin, GenericAPIView):
             return Response(error_message, status=status.HTTP_400_BAD_REQUEST)
 
         data = request.data.copy()
-        data['course_id'] = six.text_type(course_key)
+        data['course_id'] = str(course_key)
 
         organization_protection_status = user_organization_protection_status(request.user, course_key)
         if organization_protection_status != OrganizationProtectionStatus.protection_exempt:
@@ -676,7 +676,7 @@ class IsStaffOrPrivilegedOrReadOnly(IsStaffOrReadOnly):
         return (
             has_discussion_privileges(request.user, obj.course_id) or
             IsCourseStaffInstructor.has_object_permission(self, request, view, obj) or
-            super(IsStaffOrPrivilegedOrReadOnly, self).has_object_permission(request, view, obj)  # lint-amnesty, pylint: disable=super-with-arguments
+            super().has_object_permission(request, view, obj)
         )
 
 
@@ -814,7 +814,7 @@ class TeamsDetailView(ExpandableFieldViewMixin, RetrievePatchAPIView):
 
         # Note: also deletes all team memberships associated with this team
         team.delete()
-        log.info(u'user %d deleted team %s', request.user.id, team_id)
+        log.info('user %d deleted team %s', request.user.id, team_id)
         emit_team_event('edx.team.deleted', team.course_id, {
             'team_id': team_id,
         })
@@ -983,7 +983,7 @@ class TopicListView(GenericAPIView):
             return Response({
                 'field_errors': {
                     'course_id': build_api_error(
-                        ugettext_noop(u"The supplied course id {course_id} is not valid."),
+                        ugettext_noop("The supplied course id {course_id} is not valid."),
                         course_id=course_id_string
                     )
                 }
@@ -1005,12 +1005,12 @@ class TopicListView(GenericAPIView):
         ordering = request.query_params.get('order_by', 'name')
         if ordering not in ['name', 'team_count']:
             return Response({
-                'developer_message': u"unsupported order_by value {ordering}".format(ordering=ordering),
+                'developer_message': f"unsupported order_by value {ordering}",
                 # Translators: 'ordering' is a string describing a way
                 # of ordering a list. For example, {ordering} may be
                 # 'name', indicating that the user wants to sort the
                 # list by lower case name.
-                'user_message': _(u"The ordering {ordering} is not supported").format(ordering=ordering),
+                'user_message': _("The ordering {ordering} is not supported").format(ordering=ordering),
             }, status=status.HTTP_400_BAD_REQUEST)
 
         # Always sort alphabetically, as it will be used as secondary sort
@@ -1636,7 +1636,7 @@ class MembershipBulkManagementView(GenericAPIView):
         filename = "team-membership_{}_{}_{}.csv".format(
             self.course.id.org, self.course.id.course, self.course.id.run
         )
-        response['Content-Disposition'] = 'attachment; filename="{}"'.format(filename)
+        response['Content-Disposition'] = f'attachment; filename="{filename}"'
         load_team_membership_csv(self.course, response)
         return response
 
@@ -1651,7 +1651,7 @@ class MembershipBulkManagementView(GenericAPIView):
         team_import_manager.set_team_membership_from_csv(inputfile_handle)
 
         if team_import_manager.import_succeeded:
-            msg = "{} learners were affected.".format(team_import_manager.number_of_learners_assigned)
+            msg = f"{team_import_manager.number_of_learners_assigned} learners were affected."
             return JsonResponse({'message': msg}, status=status.HTTP_201_CREATED)
         else:
             return JsonResponse({
@@ -1681,8 +1681,8 @@ class MembershipBulkManagementView(GenericAPIView):
         try:
             course_id = CourseKey.from_string(course_id_string)
         except InvalidKeyError:
-            raise Http404('Invalid course key: {}'.format(course_id_string))  # lint-amnesty, pylint: disable=raise-missing-from
+            raise Http404(f'Invalid course key: {course_id_string}')  # lint-amnesty, pylint: disable=raise-missing-from
         course_module = modulestore().get_course(course_id)
         if not course_module:
-            raise Http404('Course not found: {}'.format(course_id))
+            raise Http404(f'Course not found: {course_id}')
         return course_module

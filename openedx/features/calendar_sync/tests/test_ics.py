@@ -98,7 +98,7 @@ END:VCALENDAR
         generated = [
             file.decode('utf8').replace('\r\n', '\n') for file in sorted(self.generate_ics(*assignments).values())
         ]
-        self.assertEqual(len(generated), len(assignments))
+        assert len(generated) == len(assignments)
         self.assertListEqual(generated, list(self.expected_ics(*assignments)))
 
     def test_generate_ics_for_user_course(self):

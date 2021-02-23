@@ -6,7 +6,7 @@ Tests for util.date_utils
 
 import unittest
 from datetime import datetime, timedelta, tzinfo
-
+import pytest
 import ddt
 from markupsafe import Markup
 from mock import patch
@@ -135,8 +135,8 @@ class StrftimeLocalizedTest(unittest.TestCase):
     def test_usual_strftime_behavior(self, fmt_expected):
         (fmt, expected) = fmt_expected
         dtime = datetime(2013, 2, 14, 16, 41, 17)
-        self.assertEqual(expected, strftime_localized(dtime, fmt))
-        self.assertEqual(expected, dtime.strftime(fmt))
+        assert expected == strftime_localized(dtime, fmt)
+        assert expected == dtime.strftime(fmt)
 
     @ddt.data(
         ("SHORT_DATE", "Feb 14, 2013"),
@@ -148,7 +148,7 @@ class StrftimeLocalizedTest(unittest.TestCase):
     def test_shortcuts(self, fmt_expected):
         (fmt, expected) = fmt_expected
         dtime = datetime(2013, 2, 14, 16, 41, 17)
-        self.assertEqual(expected, strftime_localized(dtime, fmt))
+        assert expected == strftime_localized(dtime, fmt)
 
     @patch('common.djangoapps.util.date_utils.pgettext', fake_pgettext(translations={
         ("abbreviated month name", "Feb"): "XXfebXX",
@@ -167,7 +167,7 @@ class StrftimeLocalizedTest(unittest.TestCase):
     def test_translated_words(self, fmt_expected):
         (fmt, expected) = fmt_expected
         dtime = datetime(2013, 2, 14, 16, 41, 17)
-        self.assertEqual(expected, strftime_localized(dtime, fmt))
+        assert expected == strftime_localized(dtime, fmt)
 
     @patch('common.djangoapps.util.date_utils.ugettext', fake_ugettext(translations={
         "SHORT_DATE_FORMAT": "date(%Y.%m.%d)",
@@ -187,7 +187,7 @@ class StrftimeLocalizedTest(unittest.TestCase):
     def test_translated_formats(self, fmt_expected):
         (fmt, expected) = fmt_expected
         dtime = datetime(2013, 2, 14, 16, 41, 17)
-        self.assertEqual(expected, strftime_localized(dtime, fmt))
+        assert expected == strftime_localized(dtime, fmt)
 
     @patch('common.djangoapps.util.date_utils.ugettext', fake_ugettext(translations={
         "SHORT_DATE_FORMAT": "oops date(%Y.%x.%d)",
@@ -200,7 +200,7 @@ class StrftimeLocalizedTest(unittest.TestCase):
     def test_recursion_protection(self, fmt_expected):
         (fmt, expected) = fmt_expected
         dtime = datetime(2013, 2, 14, 16, 41, 17)
-        self.assertEqual(expected, strftime_localized(dtime, fmt))
+        assert expected == strftime_localized(dtime, fmt)
 
     @ddt.data(
         "%",
@@ -209,7 +209,7 @@ class StrftimeLocalizedTest(unittest.TestCase):
     )
     def test_invalid_format_strings(self, fmt):
         dtime = datetime(2013, 2, 14, 16, 41, 17)
-        with self.assertRaises(ValueError):
+        with pytest.raises(ValueError):
             strftime_localized(dtime, fmt)
 
 
@@ -227,7 +227,7 @@ class StrftimeLocalizedHtmlTest(unittest.TestCase):
         with patch('common.djangoapps.util.date_utils.user_timezone_locale_prefs',
                    return_value={'user_timezone': timezone}):
             html = strftime_localized_html(dtime, 'SHORT_DATE')
-        self.assertIsInstance(html, Markup)
+        assert isinstance(html, Markup)
         self.assertRegex(html,
                          '<span class="localized-datetime" data-format="shortDate" data-timezone="%s" ' % timezone +
                          '\\s*data-datetime="2013-02-14T16:41:17" data-language="en">Feb 14, 2013</span>')

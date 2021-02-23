@@ -6,7 +6,7 @@ Tests for the CORS CSRF middleware
 from mock import patch, Mock
 import ddt
 import six
-
+import pytest
 from django.test import TestCase
 from django.test.utils import override_settings
 from django.core.exceptions import MiddlewareNotUsed, ImproperlyConfigured
@@ -44,8 +44,8 @@ class TestCorsMiddlewareProcessRequest(TestCase):
         with patch.object(CsrfViewMiddleware, 'process_view') as mock_method:
             res = self.middleware.process_view(request, None, None, None)
 
-        self.assertIsNone(res)
-        self.assertFalse(mock_method.called)
+        assert res is None
+        assert not mock_method.called
 
     def check_enabled(self, request):
         """
@@ -55,15 +55,15 @@ class TestCorsMiddlewareProcessRequest(TestCase):
             """
             Check that the request doesn't pass (yet) the `is_secure()` test
             """
-            self.assertFalse(request.is_secure())
+            assert not request.is_secure()
             return SENTINEL
 
         with patch.object(CsrfViewMiddleware, 'process_view') as mock_method:
             mock_method.side_effect = cb_check_req_is_secure_false
             res = self.middleware.process_view(request, None, None, None)
 
-        self.assertIs(res, SENTINEL)
-        self.assertTrue(request.is_secure())
+        assert res is SENTINEL
+        assert request.is_secure()
 
     @override_settings(CORS_ORIGIN_WHITELIST=['foo.com'])
     def test_enabled(self):
@@ -75,7 +75,7 @@ class TestCorsMiddlewareProcessRequest(TestCase):
         CORS_ORIGIN_WHITELIST=['foo.com']
     )
     def test_disabled_no_cors_headers(self):
-        with self.assertRaises(MiddlewareNotUsed):
+        with pytest.raises(MiddlewareNotUsed):
             CorsCSRFMiddleware()
 
     @override_settings(CORS_ORIGIN_WHITELIST=['bar.com'])
@@ -119,7 +119,7 @@ class TestCsrfCrossDomainCookieMiddleware(TestCase):
 
     @override_settings(FEATURES={'ENABLE_CROSS_DOMAIN_CSRF_COOKIE': False})
     def test_disabled_by_feature_flag(self):
-        with self.assertRaises(MiddlewareNotUsed):
+        with pytest.raises(MiddlewareNotUsed):
             CsrfCrossDomainCookieMiddleware()
 
     @ddt.data('CROSS_DOMAIN_CSRF_COOKIE_NAME', 'CROSS_DOMAIN_CSRF_COOKIE_DOMAIN')
@@ -132,7 +132,7 @@ class TestCsrfCrossDomainCookieMiddleware(TestCase):
         del settings[missing_setting]
 
         with override_settings(**settings):
-            with self.assertRaises(ImproperlyConfigured):
+            with pytest.raises(ImproperlyConfigured):
                 CsrfCrossDomainCookieMiddleware()
 
     @override_settings(
@@ -262,7 +262,7 @@ class TestCsrfCrossDomainCookieMiddleware(TestCase):
     def _assert_cookie_sent(self, response, is_set):
         """Check that the cross-domain CSRF cookie was sent. """
         if is_set:
-            self.assertIn(self.COOKIE_NAME, response.cookies)
+            assert self.COOKIE_NAME in response.cookies
             cookie_header = six.text_type(response.cookies[self.COOKIE_NAME])
             # lint-amnesty, pylint: disable=bad-option-value, unicode-format-string
             expected = six.u('Set-Cookie: {name}={value}; Domain={domain};').format(
@@ -270,8 +270,8 @@ class TestCsrfCrossDomainCookieMiddleware(TestCase):
                 value=self.COOKIE_VALUE,
                 domain=self.COOKIE_DOMAIN
             )
-            self.assertIn(expected, cookie_header)
+            assert expected in cookie_header
             # added lower function because in python 3 the value of cookie_header has Secure and secure in python 2
-            self.assertIn('Max-Age=31449600; Path=/; secure'.lower(), cookie_header.lower())
+            assert 'Max-Age=31449600; Path=/; secure'.lower() in cookie_header.lower()
         else:
-            self.assertNotIn(self.COOKIE_NAME, response.cookies)
+            assert self.COOKIE_NAME not in response.cookies

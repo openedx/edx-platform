@@ -423,6 +423,9 @@
                     $label.addClass(indicator);
                     $req.addClass(indicator);
                     $icon.addClass(indicator + ' ' + icon);
+                    if (['username', 'email'].indexOf($el.attr('name')) > -1) {
+                        $tip.addClass(' data-hj-suppress');
+                    }
                     $tip.text(msg);
                 },
 

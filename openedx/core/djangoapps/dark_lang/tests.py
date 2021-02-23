@@ -69,7 +69,7 @@ class DarkLangMiddlewareTests(CacheIsolationTestCase):
         )
 
         # Process it through the Middleware to ensure the language is available as expected.
-        self.assertIsNone(DarkLangMiddleware().process_request(request))
+        assert DarkLangMiddleware().process_request(request) is None
         return request
 
     def assertAcceptEquals(self, value, request):
@@ -77,10 +77,7 @@ class DarkLangMiddlewareTests(CacheIsolationTestCase):
         Assert that the HTML_ACCEPT_LANGUAGE header in request
         is equal to value
         """
-        self.assertEqual(
-            value,
-            request.META.get('HTTP_ACCEPT_LANGUAGE', UNSET)
-        )
+        assert value == request.META.get('HTTP_ACCEPT_LANGUAGE', UNSET)
 
     def test_empty_accept(self):
         self.assertAcceptEquals(UNSET, self.process_middleware_request())
@@ -230,17 +227,14 @@ class DarkLangMiddlewareTests(CacheIsolationTestCase):
 
         self.assertAcceptEquals(
             'es-419;q=1.0',
-            self.process_middleware_request(accept=b'{};q=1.0, pt;q=0.5'.format(latin_america_code))
+            self.process_middleware_request(accept=b'{};q=1.0, pt;q=0.5'.format(latin_america_code))  # pylint:disable=no-member
         )
 
     def assert_session_lang_equals(self, value, session):
         """
         Assert that the LANGUAGE_SESSION_KEY set in session is equal to value
         """
-        self.assertEqual(
-            value,
-            session.get(LANGUAGE_SESSION_KEY, UNSET)
-        )
+        assert value == session.get(LANGUAGE_SESSION_KEY, UNSET)
 
     def _post_set_preview_lang(self, preview_language):
         """

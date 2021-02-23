@@ -1,6 +1,3 @@
-# -*- coding: utf-8 -*-
-
-
 import django.utils.timezone
 import model_utils.fields
 from django.db import migrations, models
@@ -33,6 +30,6 @@ class Migration(migrations.Migration):
         ),
         migrations.AlterUniqueTogether(
             name='persistentcoursegrade',
-            unique_together=set([('course_id', 'user_id')]),
+            unique_together={('course_id', 'user_id')},
         ),
     ]

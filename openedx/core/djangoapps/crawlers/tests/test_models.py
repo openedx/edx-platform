@@ -28,7 +28,7 @@ class CrawlersConfigTest(TestCase):  # lint-amnesty, pylint: disable=missing-cla
         """
         fake_request = HttpRequest()
         fake_request.META['HTTP_USER_AGENT'] = req_user_agent
-        self.assertFalse(CrawlersConfig.is_crawler(fake_request))
+        assert not CrawlersConfig.is_crawler(fake_request)
 
     @ddt.data(
         u"edX-downloader",
@@ -40,4 +40,4 @@ class CrawlersConfigTest(TestCase):  # lint-amnesty, pylint: disable=missing-cla
         """
         fake_request = HttpRequest()
         fake_request.META['HTTP_USER_AGENT'] = req_user_agent
-        self.assertTrue(CrawlersConfig.is_crawler(fake_request))
+        assert CrawlersConfig.is_crawler(fake_request)

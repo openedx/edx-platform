@@ -55,9 +55,9 @@ class WikiRedirectTestCase(EnterpriseTestConsentRequired, LoginEnrollmentTestCas
         redirected_to = referer.replace("progress", "wiki/some/fake/wiki/page/")
 
         resp = self.client.get(destination, HTTP_REFERER=referer)
-        self.assertEqual(resp.status_code, 302)
+        assert resp.status_code == 302
 
-        self.assertEqual(resp['Location'], redirected_to)
+        assert resp['Location'] == redirected_to
 
         # Now we test that the student will be redirected away from that page if the course doesn't exist
         # We do this in the same test because we want to make sure the redirected_to is constructed correctly
@@ -65,8 +65,8 @@ class WikiRedirectTestCase(EnterpriseTestConsentRequired, LoginEnrollmentTestCas
         bad_course_wiki_page = redirected_to.replace(self.toy.location.course, "bad_course")
 
         resp = self.client.get(bad_course_wiki_page, HTTP_REFERER=referer)
-        self.assertEqual(resp.status_code, 302)
-        self.assertEqual(resp['Location'], destination)
+        assert resp.status_code == 302
+        assert resp['Location'] == destination
 
     @patch.dict("django.conf.settings.FEATURES", {'ALLOW_WIKI_ROOT_ACCESS': False})
     def test_wiki_no_root_access(self):
@@ -82,7 +82,7 @@ class WikiRedirectTestCase(EnterpriseTestConsentRequired, LoginEnrollmentTestCas
         destination = reverse("wiki:get", kwargs={'path': 'some/fake/wiki/page/'})
 
         resp = self.client.get(destination, HTTP_REFERER=referer)
-        self.assertEqual(resp.status_code, 403)
+        assert resp.status_code == 403
 
     def create_course_page(self, course):
         """
@@ -99,8 +99,8 @@ class WikiRedirectTestCase(EnterpriseTestConsentRequired, LoginEnrollmentTestCas
 
         ending_location = resp.redirect_chain[-1][0]
 
-        self.assertEqual(ending_location, course_wiki_page)
-        self.assertEqual(resp.status_code, 200)
+        assert ending_location == course_wiki_page
+        assert resp.status_code == 200
 
         self.has_course_navigator(resp)
         self.assertContains(resp, u'<h3 class="entry-title">{}</h3>'.format(course.display_name_with_default))
@@ -147,14 +147,12 @@ class WikiRedirectTestCase(EnterpriseTestConsentRequired, LoginEnrollmentTestCas
 
         # When not enrolled, we should get a 302
         resp = self.client.get(course_wiki_page, follow=False, HTTP_REFERER=referer)
-        self.assertEqual(resp.status_code, 302)
+        assert resp.status_code == 302
 
         # and end up at the course about page
         resp = self.client.get(course_wiki_page, follow=True, HTTP_REFERER=referer)
         target_url, __ = resp.redirect_chain[-1]
-        self.assertTrue(
-            target_url.endswith(reverse('about_course', args=[text_type(self.toy.id)]))
-        )
+        assert target_url.endswith(reverse('about_course', args=[text_type(self.toy.id)]))
 
     @patch.dict("django.conf.settings.FEATURES", {'ALLOW_WIKI_ROOT_ACCESS': True})
     def test_redirect_when_not_logged_in(self):
@@ -167,12 +165,12 @@ class WikiRedirectTestCase(EnterpriseTestConsentRequired, LoginEnrollmentTestCas
 
         # When not logged in, we should get a 302
         resp = self.client.get(course_wiki_page, follow=False)
-        self.assertEqual(resp.status_code, 302)
+        assert resp.status_code == 302
 
         # and end up at the login page
         resp = self.client.get(course_wiki_page, follow=True)
         target_url, __ = resp.redirect_chain[-1]
-        self.assertIn(reverse('signin_user'), target_url)
+        assert reverse('signin_user') in target_url
 
     @patch.dict("django.conf.settings.FEATURES", {'ALLOW_WIKI_ROOT_ACCESS': True})
     def test_create_wiki_with_long_course_id(self):
@@ -189,7 +187,8 @@ class WikiRedirectTestCase(EnterpriseTestConsentRequired, LoginEnrollmentTestCas
         # This is how wiki_slug is generated in cms/djangoapps/contentstore/views/course.py.
         wiki_slug = "{0}.{1}.{2}".format(org, course, display_name)
 
-        self.assertEqual(len(org + course + display_name), 65)  # sanity check
+        assert len(((org + course) + display_name)) == 65
+        # sanity check
 
         course = CourseFactory.create(org=org, course=course, display_name=display_name, wiki_slug=wiki_slug)
 
@@ -201,7 +200,7 @@ class WikiRedirectTestCase(EnterpriseTestConsentRequired, LoginEnrollmentTestCas
         referer = reverse("courseware", kwargs={'course_id': text_type(course.id)})
 
         resp = self.client.get(course_wiki_page, follow=True, HTTP_REFERER=referer)
-        self.assertEqual(resp.status_code, 200)
+        assert resp.status_code == 200
 
     @patch.dict("django.conf.settings.FEATURES", {'ALLOW_WIKI_ROOT_ACCESS': True})
     @patch('openedx.features.enterprise_support.api.enterprise_customer_for_request')

@@ -43,19 +43,19 @@ class UserAssertionTestCase(UrlResetMixin, ModuleStoreTestCase, ApiTestCase):
         """
         Check a JSON response against a known badge class.
         """
-        self.assertEqual(badge_class.issuing_component, json_class['issuing_component'])
-        self.assertEqual(badge_class.slug, json_class['slug'])
-        self.assertIn(badge_class.image.url, json_class['image_url'])
-        self.assertEqual(badge_class.description, json_class['description'])
-        self.assertEqual(badge_class.criteria, json_class['criteria'])
-        self.assertEqual(badge_class.course_id and six.text_type(badge_class.course_id), json_class['course_id'])
+        assert badge_class.issuing_component == json_class['issuing_component']
+        assert badge_class.slug == json_class['slug']
+        assert badge_class.image.url in json_class['image_url']
+        assert badge_class.description == json_class['description']
+        assert badge_class.criteria == json_class['criteria']
+        assert (badge_class.course_id and six.text_type(badge_class.course_id)) == json_class['course_id']
 
     def check_assertion_structure(self, assertion, json_assertion):
         """
         Check a JSON response against a known assertion object.
         """
-        self.assertEqual(assertion.image_url, json_assertion['image_url'])
-        self.assertEqual(assertion.assertion_url, json_assertion['assertion_url'])
+        assert assertion.image_url == json_assertion['image_url']
+        assert assertion.assertion_url == json_assertion['assertion_url']
         self.check_class_structure(assertion.badge_class, json_assertion['badge_class'])
 
     def get_course_id(self, wildcard, badge_class):
@@ -105,7 +105,7 @@ class TestUserBadgeAssertions(UserAssertionTestCase):
         for dummy in range(3):
             self.create_badge_class(False)
         response = self.get_json(self.url())
-        self.assertEqual(len(response['results']), 4)
+        assert len(response['results']) == 4
 
     def test_assertion_structure(self):
         badge_class = self.create_badge_class(False)
@@ -134,10 +134,10 @@ class TestUserCourseBadgeAssertions(UserAssertionTestCase):
         for dummy in range(6):
             BadgeAssertionFactory.create(badge_class=badge_class)
         response = self.get_json(self.url(), data={'course_id': str(course_key)})
-        self.assertEqual(len(response['results']), 3)
+        assert len(response['results']) == 3
         unused_course = CourseFactory.create()
         response = self.get_json(self.url(), data={'course_id': str(unused_course.location.course_key)})
-        self.assertEqual(len(response['results']), 0)
+        assert len(response['results']) == 0
 
     def test_assertion_structure(self):
         """
@@ -187,14 +187,14 @@ class TestUserBadgeAssertionsByClass(UserAssertionTestCase):
             expected_length = 4
         else:
             expected_length = 3
-        self.assertEqual(len(response['results']), expected_length)
+        assert len(response['results']) == expected_length
         unused_class = self.create_badge_class(check_course, slug='unused_slug', issuing_component='unused_component')
 
         response = self.get_json(
             self.url(),
             data=self.get_qs_args(check_course, wildcard, unused_class),
         )
-        self.assertEqual(len(response['results']), 0)
+        assert len(response['results']) == 0
 
     def check_badge_class_assertion(self, check_course, wildcard, badge_class):
         """

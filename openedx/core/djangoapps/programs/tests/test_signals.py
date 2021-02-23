@@ -62,7 +62,7 @@ class CertAwardedReceiverTest(TestCase):
         known to take place inside the function.
         """
         COURSE_CERT_AWARDED.send(**self.signal_kwargs)
-        self.assertEqual(mock_is_learner_issuance_enabled.call_count, 1)
+        assert mock_is_learner_issuance_enabled.call_count == 1
 
     def test_programs_disabled(self, mock_is_learner_issuance_enabled, mock_task):
         """
@@ -70,8 +70,8 @@ class CertAwardedReceiverTest(TestCase):
         configuration is not enabled.
         """
         handle_course_cert_awarded(**self.signal_kwargs)
-        self.assertEqual(mock_is_learner_issuance_enabled.call_count, 1)
-        self.assertEqual(mock_task.call_count, 0)
+        assert mock_is_learner_issuance_enabled.call_count == 1
+        assert mock_task.call_count == 0
 
     def test_programs_enabled(self, mock_is_learner_issuance_enabled, mock_task):
         """
@@ -82,9 +82,9 @@ class CertAwardedReceiverTest(TestCase):
 
         handle_course_cert_awarded(**self.signal_kwargs)
 
-        self.assertEqual(mock_is_learner_issuance_enabled.call_count, 1)
-        self.assertEqual(mock_task.call_count, 1)
-        self.assertEqual(mock_task.call_args[0], (TEST_USERNAME,))
+        assert mock_is_learner_issuance_enabled.call_count == 1
+        assert mock_task.call_count == 1
+        assert mock_task.call_args[0] == (TEST_USERNAME,)
 
 
 # The credentials app isn't installed for the CMS.
@@ -127,7 +127,7 @@ class CertChangedReceiverTest(TestCase):
         known to take place inside the function.
         """
         COURSE_CERT_CHANGED.send(**self.signal_kwargs)
-        self.assertEqual(mock_is_learner_issuance_enabled.call_count, 2)
+        assert mock_is_learner_issuance_enabled.call_count == 2
 
     def test_credentials_disabled(self, mock_is_learner_issuance_enabled, mock_task):
         """
@@ -135,8 +135,8 @@ class CertChangedReceiverTest(TestCase):
         configuration is not enabled.
         """
         handle_course_cert_changed(**self.signal_kwargs)
-        self.assertEqual(mock_is_learner_issuance_enabled.call_count, 1)
-        self.assertEqual(mock_task.call_count, 0)
+        assert mock_is_learner_issuance_enabled.call_count == 1
+        assert mock_task.call_count == 0
 
     def test_credentials_enabled(self, mock_is_learner_issuance_enabled, mock_task):
         """
@@ -147,9 +147,9 @@ class CertChangedReceiverTest(TestCase):
 
         handle_course_cert_changed(**self.signal_kwargs)
 
-        self.assertEqual(mock_is_learner_issuance_enabled.call_count, 1)
-        self.assertEqual(mock_task.call_count, 1)
-        self.assertEqual(mock_task.call_args[0], (TEST_USERNAME, str(TEST_COURSE_KEY)))
+        assert mock_is_learner_issuance_enabled.call_count == 1
+        assert mock_task.call_count == 1
+        assert mock_task.call_args[0] == (TEST_USERNAME, str(TEST_COURSE_KEY))
 
     def test_records_enabled(self, mock_is_learner_issuance_enabled, mock_task):
         mock_is_learner_issuance_enabled.return_value = True
@@ -160,14 +160,14 @@ class CertChangedReceiverTest(TestCase):
 
         # Correctly sent
         handle_course_cert_changed(**self.signal_kwargs)
-        self.assertTrue(mock_task.called)
+        assert mock_task.called
         mock_task.reset_mock()
 
         # Correctly not sent
         site_config.site_values['ENABLE_LEARNER_RECORDS'] = False
         site_config.save()
         handle_course_cert_changed(**self.signal_kwargs)
-        self.assertFalse(mock_task.called)
+        assert not mock_task.called
 
 
 # The credentials app isn't installed for the CMS.
@@ -206,7 +206,7 @@ class CertRevokedReceiverTest(TestCase):
         known to take place inside the function.
         """
         COURSE_CERT_REVOKED.send(**self.signal_kwargs)
-        self.assertEqual(mock_is_learner_issuance_enabled.call_count, 1)
+        assert mock_is_learner_issuance_enabled.call_count == 1
 
     def test_programs_disabled(self, mock_is_learner_issuance_enabled, mock_task):
         """
@@ -214,8 +214,8 @@ class CertRevokedReceiverTest(TestCase):
         configuration is not enabled.
         """
         handle_course_cert_revoked(**self.signal_kwargs)
-        self.assertEqual(mock_is_learner_issuance_enabled.call_count, 1)
-        self.assertEqual(mock_task.call_count, 0)
+        assert mock_is_learner_issuance_enabled.call_count == 1
+        assert mock_task.call_count == 0
 
     def test_programs_enabled(self, mock_is_learner_issuance_enabled, mock_task):
         """
@@ -226,9 +226,9 @@ class CertRevokedReceiverTest(TestCase):
 
         handle_course_cert_revoked(**self.signal_kwargs)
 
-        self.assertEqual(mock_is_learner_issuance_enabled.call_count, 1)
-        self.assertEqual(mock_task.call_count, 1)
-        self.assertEqual(mock_task.call_args[0], (TEST_USERNAME, TEST_COURSE_KEY))
+        assert mock_is_learner_issuance_enabled.call_count == 1
+        assert mock_task.call_count == 1
+        assert mock_task.call_args[0] == (TEST_USERNAME, TEST_COURSE_KEY)
 
 
 @skip_unless_lms
@@ -263,7 +263,7 @@ class CourseCertAvailableDateChangedReceiverTest(TestCase):
         known to take place inside the function.
         """
         COURSE_CERT_DATE_CHANGE.send(**self.signal_kwargs)
-        self.assertEqual(mock_is_learner_issuance_enabled.call_count, 1)
+        assert mock_is_learner_issuance_enabled.call_count == 1
 
     def test_programs_disabled(self, mock_is_learner_issuance_enabled, mock_task):
         """
@@ -271,8 +271,8 @@ class CourseCertAvailableDateChangedReceiverTest(TestCase):
         configuration is not enabled.
         """
         handle_course_cert_date_change(**self.signal_kwargs)
-        self.assertEqual(mock_is_learner_issuance_enabled.call_count, 1)
-        self.assertEqual(mock_task.call_count, 0)
+        assert mock_is_learner_issuance_enabled.call_count == 1
+        assert mock_task.call_count == 0
 
     def test_programs_enabled(self, mock_is_learner_issuance_enabled, mock_task):
         """
@@ -283,5 +283,5 @@ class CourseCertAvailableDateChangedReceiverTest(TestCase):
 
         handle_course_cert_date_change(**self.signal_kwargs)
 
-        self.assertEqual(mock_is_learner_issuance_enabled.call_count, 1)
-        self.assertEqual(mock_task.call_count, 1)
+        assert mock_is_learner_issuance_enabled.call_count == 1
+        assert mock_task.call_count == 1

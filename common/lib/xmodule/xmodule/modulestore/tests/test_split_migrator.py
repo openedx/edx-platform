@@ -165,7 +165,7 @@ class TestMigration(SplitWMongoCourseBootstrapper):
 
     def compare_dags(self, presplit, presplit_dag_root, split_dag_root, published):  # lint-amnesty, pylint: disable=missing-function-docstring
         if split_dag_root.category != 'course':
-            self.assertEqual(presplit_dag_root.location.block_id, split_dag_root.location.block_id)
+            assert presplit_dag_root.location.block_id == split_dag_root.location.block_id
         # compare all fields but references
         for name, field in six.iteritems(presplit_dag_root.fields):
             # fields generated from UNIQUE_IDs are unique to an XBlock's scope,
@@ -176,23 +176,11 @@ class TestMigration(SplitWMongoCourseBootstrapper):
                 field_generated_from_unique_id or isinstance(field, (Reference, ReferenceList, ReferenceValueDict))
             )
             if should_check_field:
-                self.assertEqual(
-                    getattr(presplit_dag_root, name),
-                    getattr(split_dag_root, name),
-                    u"{}/{}: {} != {}".format(
-                        split_dag_root.location, name, getattr(presplit_dag_root, name), getattr(split_dag_root, name)
-                    )
-                )
+                assert getattr(presplit_dag_root, name) == getattr(split_dag_root, name), f'{split_dag_root.location}/{name}: {getattr(presplit_dag_root, name)} != {getattr(split_dag_root, name)}'  # pylint: disable=line-too-long
 
         # compare children
         if presplit_dag_root.has_children:
-            self.assertEqual(
-                # need get_children to filter out drafts
-                len(presplit_dag_root.get_children()), len(split_dag_root.children),
-                u"{0.category} '{0.display_name}': children  {1} != {2}".format(
-                    presplit_dag_root, presplit_dag_root.children, split_dag_root.children
-                )
-            )
+            assert len(presplit_dag_root.get_children()) == len(split_dag_root.children), f"{presplit_dag_root.category} '{presplit_dag_root.display_name}': children  {presplit_dag_root.children} != {split_dag_root.children}"  # pylint: disable=line-too-long
             for pre_child, split_child in zip(presplit_dag_root.get_children(), split_dag_root.get_children()):
                 self.compare_dags(presplit, pre_child, split_child, published)
 

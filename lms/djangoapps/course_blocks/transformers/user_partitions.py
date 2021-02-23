@@ -3,12 +3,9 @@ User Partitions Transformer
 """
 
 
-import six  # lint-amnesty, pylint: disable=unused-import
-
 from lms.djangoapps.courseware.access import has_access
 from openedx.core.djangoapps.content.block_structure.transformer import (  # lint-amnesty, pylint: disable=unused-import
-    BlockStructureTransformer,
-    FilteringTransformerMixin
+    BlockStructureTransformer
 )
 from xmodule.partitions.partitions_service import (
     get_all_partitions_for_course,
@@ -131,7 +128,7 @@ class UserPartitionTransformer(BlockStructureTransformer):
                     )
 
 
-class _MergedGroupAccess(object):
+class _MergedGroupAccess:
     """
     A class object to represent the computed access value for a block,
     merged from the inherited values from its ancestors.

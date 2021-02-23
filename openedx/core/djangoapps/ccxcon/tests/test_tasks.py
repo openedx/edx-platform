@@ -37,10 +37,10 @@ class CCXConTaskTestCase(TestCase):
         course_id = u'course-v1:OrgFoo+CN199+CR-FALL01'
         tasks.update_ccxcon.delay(course_id)
 
-        self.assertEqual(mock_citc.call_count, 6)
+        assert mock_citc.call_count == 6
         course_key = CourseKey.from_string(course_id)
         for call in mock_citc.call_args_list:
             c_args, c_kwargs = call
-            self.assertEqual(c_kwargs, {})
-            self.assertEqual(len(c_args), 1)
-            self.assertEqual(c_args[0], course_key)
+            assert c_kwargs == {}
+            assert len(c_args) == 1
+            assert c_args[0] == course_key

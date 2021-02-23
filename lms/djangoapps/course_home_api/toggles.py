@@ -3,6 +3,7 @@ Toggles for course home experience.
 """
 
 from edx_toggles.toggles import LegacyWaffleFlagNamespace
+
 from lms.djangoapps.experiments.flags import ExperimentWaffleFlag
 from openedx.core.djangoapps.waffle_utils import CourseWaffleFlag
 

@@ -23,4 +23,4 @@ class TestCalendarSyncInit(TestCase):
         expected = '{user_id}.{block_key}.{date_type}@{hostname}'.format(
             user_id=self.user.id, block_key=block_key, date_type=date_type, hostname=hostname
         )
-        self.assertEqual(event_id, expected)
+        assert event_id == expected

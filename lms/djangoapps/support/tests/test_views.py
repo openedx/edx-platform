@@ -1,4 +1,3 @@
-# coding: UTF-8
 """
 Tests for support views.
 """
@@ -8,31 +7,35 @@ import itertools
 import json
 import re
 from datetime import datetime, timedelta
+from unittest.mock import patch
 from uuid import UUID, uuid4
 
 import ddt
-import six
 from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.db.models import signals
 from django.http import HttpResponse
 from django.urls import reverse
-from mock import patch
 from organizations.tests.factories import OrganizationFactory
 from pytz import UTC
 from social_django.models import UserSocialAuth
 
-from common.test.utils import disable_signal
 from common.djangoapps.course_modes.models import CourseMode
 from common.djangoapps.course_modes.tests.factories import CourseModeFactory
+from common.djangoapps.student.models import (  # lint-amnesty, pylint: disable=line-too-long
+    ENROLLED_TO_ENROLLED,
+    CourseEnrollment,
+    CourseEnrollmentAttribute,
+    ManualEnrollmentAudit
+)
+from common.djangoapps.student.roles import GlobalStaff, SupportStaffRole
+from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
+from common.djangoapps.third_party_auth.tests.factories import SAMLProviderConfigFactory
+from common.test.utils import disable_signal
 from lms.djangoapps.program_enrollments.tests.factories import ProgramCourseEnrollmentFactory, ProgramEnrollmentFactory
 from lms.djangoapps.support.serializers import ProgramEnrollmentSerializer
 from lms.djangoapps.verify_student.models import VerificationDeadline
 from lms.djangoapps.verify_student.services import IDVerificationService
 from lms.djangoapps.verify_student.tests.factories import SSOVerificationFactory
-from common.djangoapps.student.models import ENROLLED_TO_ENROLLED, CourseEnrollment, CourseEnrollmentAttribute, ManualEnrollmentAudit  # lint-amnesty, pylint: disable=line-too-long
-from common.djangoapps.student.roles import GlobalStaff, SupportStaffRole
-from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
-from common.djangoapps.third_party_auth.tests.factories import SAMLProviderConfigFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
@@ -48,11 +51,11 @@ class SupportViewTestCase(ModuleStoreTestCase):
 
     def setUp(self):
         """Create a user and log in. """
-        super(SupportViewTestCase, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.user = UserFactory(username=self.USERNAME, email=self.EMAIL, password=self.PASSWORD)
         self.course = CourseFactory.create()
         success = self.client.login(username=self.USERNAME, password=self.PASSWORD)
-        self.assertTrue(success, msg="Could not log in")
+        assert success, 'Could not log in'
 
 
 class SupportViewManageUserTests(SupportViewTestCase):
@@ -62,7 +65,7 @@ class SupportViewManageUserTests(SupportViewTestCase):
 
     def setUp(self):
         """Make the user support staff"""
-        super(SupportViewManageUserTests, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         SupportStaffRole().add_users(self.user)
 
     def test_get_contact_us(self):
@@ -71,7 +74,7 @@ class SupportViewManageUserTests(SupportViewTestCase):
         """
         url = reverse('support:contact_us')
         response = self.client.get(url)
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
 
     def test_get_password_assistance(self):
         """
@@ -79,7 +82,7 @@ class SupportViewManageUserTests(SupportViewTestCase):
         """
         url = '/password_assistance'
         response = self.client.get(url)
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
 
     def test_get_support_form(self):
         """
@@ -87,7 +90,7 @@ class SupportViewManageUserTests(SupportViewTestCase):
         """
         url = reverse('support:manage_user')
         response = self.client.get(url)
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
 
     def test_get_form_with_user_info(self):
         """
@@ -97,7 +100,7 @@ class SupportViewManageUserTests(SupportViewTestCase):
         url = reverse('support:manage_user_detail') + self.user.username
         response = self.client.get(url)
         data = json.loads(response.content.decode('utf-8'))
-        self.assertEqual(data['username'], self.user.username)
+        assert data['username'] == self.user.username
 
     def test_disable_user_account(self):
         """
@@ -112,9 +115,9 @@ class SupportViewManageUserTests(SupportViewTestCase):
             'comment': 'Test comment'
         })
         data = json.loads(response.content.decode('utf-8'))
-        self.assertEqual(data['success_msg'], 'User Disabled Successfully')
+        assert data['success_msg'] == 'User Disabled Successfully'
         test_user = User.objects.get(username=test_user.username, email=test_user.email)
-        self.assertEqual(test_user.has_usable_password(), False)
+        assert test_user.has_usable_password() is False
 
 
 @ddt.ddt
@@ -149,9 +152,9 @@ class SupportViewAccessTests(SupportViewTestCase):
         response = self.client.get(url)
 
         if has_access:
-            self.assertEqual(response.status_code, 200)
+            assert response.status_code == 200
         else:
-            self.assertEqual(response.status_code, 403)
+            assert response.status_code == 403
 
     @ddt.data(
         "support:index",
@@ -189,7 +192,7 @@ class SupportViewIndexTests(SupportViewTestCase):
 
     def setUp(self):
         """Make the user support staff. """
-        super(SupportViewIndexTests, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         SupportStaffRole().add_users(self.user)
 
     def test_index(self):
@@ -207,7 +210,7 @@ class SupportViewCertificatesTests(SupportViewTestCase):
     """
     def setUp(self):
         """Make the user support staff. """
-        super(SupportViewCertificatesTests, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         SupportStaffRole().add_users(self.user)
 
     def test_certificates_no_filter(self):
@@ -223,10 +226,10 @@ class SupportViewCertificatesTests(SupportViewTestCase):
 
     def test_certificates_along_with_course_filter(self):
         # Check that an initial filter is passed to the JavaScript client.
-        url = reverse("support:certificates") + "?user=student@example.com&course_id=" + six.text_type(self.course.id)
+        url = reverse("support:certificates") + "?user=student@example.com&course_id=" + str(self.course.id)
         response = self.client.get(url)
         self.assertContains(response, "userFilter: 'student@example.com'")
-        self.assertContains(response, "courseFilter: '" + six.text_type(self.course.id) + "'")
+        self.assertContains(response, "courseFilter: '" + str(self.course.id) + "'")
 
 
 @ddt.ddt
@@ -234,10 +237,10 @@ class SupportViewEnrollmentsTests(SharedModuleStoreTestCase, SupportViewTestCase
     """Tests for the enrollment support view."""
 
     def setUp(self):
-        super(SupportViewEnrollmentsTests, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         SupportStaffRole().add_users(self.user)
 
-        self.course = CourseFactory(display_name=u'teꜱᴛ')
+        self.course = CourseFactory(display_name='teꜱᴛ')
         self.student = UserFactory.create(username='student', email='test@example.com', password='test')
 
         for mode in (
@@ -261,7 +264,7 @@ class SupportViewEnrollmentsTests(SharedModuleStoreTestCase, SupportViewTestCase
         Assert that the student's enrollment has the correct mode.
         """
         enrollment = CourseEnrollment.get_enrollment(self.student, self.course.id)
-        self.assertEqual(enrollment.mode, mode)
+        assert enrollment.mode == mode
 
     @ddt.data('username', 'email')
     def test_get_enrollments(self, search_string_type):
@@ -270,23 +273,19 @@ class SupportViewEnrollmentsTests(SharedModuleStoreTestCase, SupportViewTestCase
             kwargs={'username_or_email': getattr(self.student, search_string_type)}
         )
         response = self.client.get(url)
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
         data = json.loads(response.content.decode('utf-8'))
-        self.assertEqual(len(data), 1)
+        assert len(data) == 1
         self.assertDictContainsSubset({
             'mode': CourseMode.AUDIT,
             'manual_enrollment': {},
             'user': self.student.username,
-            'course_id': six.text_type(self.course.id),
+            'course_id': str(self.course.id),
             'is_active': True,
             'verified_upgrade_deadline': None,
         }, data[0])
-        self.assertEqual(
-            {CourseMode.VERIFIED, CourseMode.AUDIT, CourseMode.HONOR,
-             CourseMode.NO_ID_PROFESSIONAL_MODE, CourseMode.PROFESSIONAL,
-             CourseMode.CREDIT_MODE},
-            {mode['slug'] for mode in data[0]['course_modes']}
-        )
+        assert {CourseMode.VERIFIED, CourseMode.AUDIT, CourseMode.HONOR, CourseMode.NO_ID_PROFESSIONAL_MODE,
+                CourseMode.PROFESSIONAL, CourseMode.CREDIT_MODE} == {mode['slug'] for mode in data[0]['course_modes']}
 
     def test_get_manual_enrollment_history(self):
         ManualEnrollmentAudit.create_manual_enrollment_audit(
@@ -297,7 +296,7 @@ class SupportViewEnrollmentsTests(SharedModuleStoreTestCase, SupportViewTestCase
             CourseEnrollment.objects.get(course_id=self.course.id, user=self.student)
         )
         response = self.client.get(self.url)
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
         self.assertDictContainsSubset({
             'enrolled_by': self.user.email,
             'reason': 'Financial Assistance',
@@ -306,19 +305,19 @@ class SupportViewEnrollmentsTests(SharedModuleStoreTestCase, SupportViewTestCase
     @disable_signal(signals, 'post_save')
     @ddt.data('username', 'email')
     def test_change_enrollment(self, search_string_type):
-        self.assertIsNone(ManualEnrollmentAudit.get_manual_enrollment_by_email(self.student.email))
+        assert ManualEnrollmentAudit.get_manual_enrollment_by_email(self.student.email) is None
         url = reverse(
             'support:enrollment_list',
             kwargs={'username_or_email': getattr(self.student, search_string_type)}
         )
         response = self.client.post(url, data={
-            'course_id': six.text_type(self.course.id),
+            'course_id': str(self.course.id),
             'old_mode': CourseMode.AUDIT,
             'new_mode': CourseMode.VERIFIED,
             'reason': 'Financial Assistance'
         })
-        self.assertEqual(response.status_code, 200)
-        self.assertIsNotNone(ManualEnrollmentAudit.get_manual_enrollment_by_email(self.student.email))
+        assert response.status_code == 200
+        assert ManualEnrollmentAudit.get_manual_enrollment_by_email(self.student.email) is not None
         self.assert_enrollment(CourseMode.VERIFIED)
 
     @ddt.data(
@@ -351,12 +350,10 @@ class SupportViewEnrollmentsTests(SharedModuleStoreTestCase, SupportViewTestCase
             data['course_id'] = str(self.course.id)
         response = self.client.post(self.url, data)
 
-        self.assertEqual(response.status_code, 400)
-        self.assertIsNotNone(
-            re.match(error_message, response.content.decode('utf-8').replace("'", '').replace('"', ''))
-        )
+        assert response.status_code == 400
+        assert re.match(error_message, response.content.decode('utf-8').replace("'", '').replace('"', '')) is not None
         self.assert_enrollment(CourseMode.AUDIT)
-        self.assertIsNone(ManualEnrollmentAudit.get_manual_enrollment_by_email(self.student.email))
+        assert ManualEnrollmentAudit.get_manual_enrollment_by_email(self.student.email) is None
 
     @disable_signal(signals, 'post_save')
     @ddt.data('honor', 'audit', 'verified', 'professional', 'no-id-professional', 'credit')
@@ -387,7 +384,7 @@ class SupportViewEnrollmentsTests(SharedModuleStoreTestCase, SupportViewTestCase
     def test_update_enrollments_with_expired_mode(self, search_string_type):
         """ Verify that enrollment can be updated to verified mode. """
         self.set_course_end_date_and_expiry()
-        self.assertIsNone(ManualEnrollmentAudit.get_manual_enrollment_by_email(self.student.email))
+        assert ManualEnrollmentAudit.get_manual_enrollment_by_email(self.student.email) is None
         self.assert_update_enrollment(search_string_type, CourseMode.VERIFIED)
 
     def _assert_generated_modes(self, response):
@@ -408,24 +405,18 @@ class SupportViewEnrollmentsTests(SharedModuleStoreTestCase, SupportViewTestCase
                 'description': mode.description
             })
 
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
         data = json.loads(response.content.decode('utf-8'))
-        self.assertEqual(len(data), 1)
+        assert len(data) == 1
 
-        self.assertEqual(
-            modes_data,
-            data[0]['course_modes']
-        )
+        assert modes_data == data[0]['course_modes']
 
-        self.assertEqual(
-            {CourseMode.VERIFIED, CourseMode.AUDIT, CourseMode.NO_ID_PROFESSIONAL_MODE,
-             CourseMode.PROFESSIONAL, CourseMode.HONOR, CourseMode.CREDIT_MODE},
-            {mode['slug'] for mode in data[0]['course_modes']}
-        )
+        assert {CourseMode.VERIFIED, CourseMode.AUDIT, CourseMode.NO_ID_PROFESSIONAL_MODE, CourseMode.PROFESSIONAL,
+                CourseMode.HONOR, CourseMode.CREDIT_MODE} == {mode['slug'] for mode in data[0]['course_modes']}
 
     def assert_update_enrollment(self, search_string_type, new_mode):
         """ Dry method to update the enrollment and assert response."""
-        self.assertIsNone(ManualEnrollmentAudit.get_manual_enrollment_by_email(self.student.email))
+        assert ManualEnrollmentAudit.get_manual_enrollment_by_email(self.student.email) is None
         url = reverse(
             'support:enrollment_list',
             kwargs={'username_or_email': getattr(self.student, search_string_type)}
@@ -433,22 +424,22 @@ class SupportViewEnrollmentsTests(SharedModuleStoreTestCase, SupportViewTestCase
 
         with patch('lms.djangoapps.support.views.enrollments.get_credit_provider_attribute_values') as mock_method:
             credit_provider = (
-                [u'Arizona State University'], 'You are now eligible for credit from Arizona State University'
+                ['Arizona State University'], 'You are now eligible for credit from Arizona State University'
             )
             mock_method.return_value = credit_provider
             response = self.client.post(url, data={
-                'course_id': six.text_type(self.course.id),
+                'course_id': str(self.course.id),
                 'old_mode': CourseMode.AUDIT,
                 'new_mode': new_mode,
                 'reason': 'Financial Assistance'
             })
 
-        self.assertEqual(response.status_code, 200)
-        self.assertIsNotNone(ManualEnrollmentAudit.get_manual_enrollment_by_email(self.student.email))
+        assert response.status_code == 200
+        assert ManualEnrollmentAudit.get_manual_enrollment_by_email(self.student.email) is not None
         self.assert_enrollment(new_mode)
         if new_mode == 'credit':
             enrollment_attr = CourseEnrollmentAttribute.objects.first()
-            self.assertEqual(enrollment_attr.value, six.text_type(credit_provider[0]))
+            assert enrollment_attr.value == str(credit_provider[0])
 
     def set_course_end_date_and_expiry(self):
         """ Set the course-end date and expire its verified mode."""
@@ -477,7 +468,7 @@ class SupportViewLinkProgramEnrollmentsTests(SupportViewTestCase):
 
     def setUp(self):
         """Make the user support staff. """
-        super(SupportViewLinkProgramEnrollmentsTests, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.url = reverse("support:link_program_enrollments")
         SupportStaffRole().add_users(self.user)
         self.program_uuid = str(uuid4())
@@ -499,7 +490,7 @@ class SupportViewLinkProgramEnrollmentsTests(SupportViewTestCase):
         Test the view without mocking out the rendering like the rest of the tests.
         """
         response = self.client.get(self.url)
-        content = six.text_type(response.content, encoding='utf-8')
+        content = str(response.content, encoding='utf-8')
         assert '"programUUID": ""' in content
         assert '"text": ""' in content
 
@@ -509,7 +500,7 @@ class SupportViewLinkProgramEnrollmentsTests(SupportViewTestCase):
             'program_uuid': 'notauuid',
             'text': self.text,
         })
-        msg = u"Supplied program UUID 'notauuid' is not a valid UUID."
+        msg = "Supplied program UUID 'notauuid' is not a valid UUID."
         render_call_dict = mocked_render.call_args[0][1]
         assert render_call_dict['errors'] == [msg]
 
@@ -522,9 +513,9 @@ class SupportViewLinkProgramEnrollmentsTests(SupportViewTestCase):
     @ddt.unpack
     def test_missing_parameter(self, program_uuid, text, mocked_render):
         error = (
-            u"You must provide both a program uuid "
-            u"and a series of lines with the format "
-            u"'external_user_key,lms_username'."
+            "You must provide both a program uuid "
+            "and a series of lines with the format "
+            "'external_user_key,lms_username'."
         )
         self.client.post(self.url, data={
             'program_uuid': program_uuid,
@@ -560,7 +551,7 @@ class SupportViewLinkProgramEnrollmentsTests(SupportViewTestCase):
             'program_uuid': self.program_uuid,
             'text': text,
         })
-        msg = u"All linking lines must be in the format 'external_user_key,lms_username'"
+        msg = "All linking lines must be in the format 'external_user_key,lms_username'"
         render_call_dict = mocked_render.call_args[0][1]
         assert render_call_dict['errors'] == [msg]
 
@@ -622,14 +613,14 @@ class SupportViewLinkProgramEnrollmentsTests(SupportViewTestCase):
         })
         render_call_dict = mocked_render.call_args[0][1]
         if username:
-            expected_success = "('{}', '{}')".format(external_user_key, username)
+            expected_success = f"('{external_user_key}', '{username}')"
             assert render_call_dict['successes'] == [expected_success]
             program_enrollment.refresh_from_db()
             assert program_enrollment.user == linked_user
             program_course_enrollment.refresh_from_db()
             assert program_course_enrollment.course_enrollment.user == linked_user
         else:
-            error = u"All linking lines must be in the format 'external_user_key,lms_username'"
+            error = "All linking lines must be in the format 'external_user_key,lms_username'"
             assert render_call_dict['errors'] == [error]
 
 
@@ -645,7 +636,7 @@ class ProgramEnrollmentsInspectorViewTests(SupportViewTestCase):
     )
 
     def setUp(self):
-        super(ProgramEnrollmentsInspectorViewTests, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.url = reverse("support:program_enrollments_inspector")
         SupportStaffRole().add_users(self.user)
         self.program_uuid = str(uuid4())
@@ -671,7 +662,7 @@ class ProgramEnrollmentsInspectorViewTests(SupportViewTestCase):
 
     def test_initial_rendering(self):
         response = self.client.get(self.url)
-        content = six.text_type(response.content, encoding='utf-8')
+        content = str(response.content, encoding='utf-8')
         expected_organization_serialized = '"orgKeys": {}'.format(
             json.dumps(sorted(self.org_key_list))
         )
@@ -693,7 +684,7 @@ class ProgramEnrollmentsInspectorViewTests(SupportViewTestCase):
         if org_key and external_user_key:
             user_social_auth = UserSocialAuth.objects.create(
                 user=user,
-                uid='{0}:{1}'.format(org_key, external_user_key),
+                uid=f'{org_key}:{external_user_key}',
                 provider='tpa-saml'
             )
             user_info['sso_list'] = [{
@@ -966,7 +957,7 @@ class SsoRecordsTests(SupportViewTestCase):  # lint-amnesty, pylint: disable=mis
 
     def setUp(self):
         """Make the user support staff"""
-        super(SsoRecordsTests, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         SupportStaffRole().add_users(self.user)
         self.student = UserFactory.create(username='student', email='test@example.com', password='test')
         self.url = reverse("support:sso_records", kwargs={'username_or_email': self.student.username})
@@ -984,14 +975,14 @@ class SsoRecordsTests(SupportViewTestCase):  # lint-amnesty, pylint: disable=mis
     def test_empty_response(self):
         response = self.client.get(self.url)
         data = json.loads(response.content.decode('utf-8'))
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(len(data), 0)
+        assert response.status_code == 200
+        assert len(data) == 0
 
     def test_user_does_not_exist(self):
         response = self.client.get(reverse("support:sso_records", kwargs={'username_or_email': 'wrong_username'}))
         data = json.loads(response.content.decode('utf-8'))
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(len(data), 0)
+        assert response.status_code == 200
+        assert len(data) == 0
 
     def test_response(self):
         user_social_auth = UserSocialAuth.objects.create(  # lint-amnesty, pylint: disable=unused-variable
@@ -1001,6 +992,6 @@ class SsoRecordsTests(SupportViewTestCase):  # lint-amnesty, pylint: disable=mis
         )
         response = self.client.get(self.url)
         data = json.loads(response.content.decode('utf-8'))
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(len(data), 1)
+        assert response.status_code == 200
+        assert len(data) == 1
         self.assertContains(response, '"uid": "test@example.com"')

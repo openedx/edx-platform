@@ -21,7 +21,7 @@ import shutil
 import unittest
 from tempfile import mkdtemp
 from uuid import uuid4
-
+import pytest
 import ddt
 import httpretty
 import six
@@ -125,10 +125,7 @@ class VideoBlockTest(unittest.TestCase):
         """Test parsing old-style Youtube ID strings into a dict."""
         youtube_str = '0.75:jNCf2gIqpeE,1.00:ZwkTiUPN0mg,1.25:rsq9auxASqI,1.50:kMyNdzVHHgg'
         output = VideoBlock._parse_youtube(youtube_str)
-        self.assertEqual(output, {'0.75': 'jNCf2gIqpeE',
-                                  '1.00': 'ZwkTiUPN0mg',
-                                  '1.25': 'rsq9auxASqI',
-                                  '1.50': 'kMyNdzVHHgg'})
+        assert output == {'0.75': 'jNCf2gIqpeE', '1.00': 'ZwkTiUPN0mg', '1.25': 'rsq9auxASqI', '1.50': 'kMyNdzVHHgg'}
 
     def test_parse_youtube_one_video(self):
         """
@@ -137,35 +134,23 @@ class VideoBlockTest(unittest.TestCase):
         """
         youtube_str = '0.75:jNCf2gIqpeE'
         output = VideoBlock._parse_youtube(youtube_str)
-        self.assertEqual(output, {'0.75': 'jNCf2gIqpeE',
-                                  '1.00': '',
-                                  '1.25': '',
-                                  '1.50': ''})
+        assert output == {'0.75': 'jNCf2gIqpeE', '1.00': '', '1.25': '', '1.50': ''}
 
     def test_parse_youtube_invalid(self):
         """Ensure that ids that are invalid return an empty dict"""
         # invalid id
         youtube_str = 'thisisaninvalidid'
         output = VideoBlock._parse_youtube(youtube_str)
-        self.assertEqual(output, {'0.75': '',
-                                  '1.00': '',
-                                  '1.25': '',
-                                  '1.50': ''})
+        assert output == {'0.75': '', '1.00': '', '1.25': '', '1.50': ''}
         # another invalid id
         youtube_str = ',::,:,,'
         output = VideoBlock._parse_youtube(youtube_str)
-        self.assertEqual(output, {'0.75': '',
-                                  '1.00': '',
-                                  '1.25': '',
-                                  '1.50': ''})
+        assert output == {'0.75': '', '1.00': '', '1.25': '', '1.50': ''}
 
         # and another one, partially invalid
         youtube_str = '0.75_BAD!!!,1.0:AXdE34_U,1.25:KLHF9K_Y,1.5:VO3SxfeD,'
         output = VideoBlock._parse_youtube(youtube_str)
-        self.assertEqual(output, {'0.75': '',
-                                  '1.00': 'AXdE34_U',
-                                  '1.25': 'KLHF9K_Y',
-                                  '1.50': 'VO3SxfeD'})
+        assert output == {'0.75': '', '1.00': 'AXdE34_U', '1.25': 'KLHF9K_Y', '1.50': 'VO3SxfeD'}
 
     def test_parse_youtube_key_format(self):
         """
@@ -173,23 +158,14 @@ class VideoBlockTest(unittest.TestCase):
         """
         youtube_str = '1.00:p2Q6BrNhdh8'
         youtube_str_hack = '1.0:p2Q6BrNhdh8'
-        self.assertEqual(
-            VideoBlock._parse_youtube(youtube_str),
-            VideoBlock._parse_youtube(youtube_str_hack)
-        )
+        assert VideoBlock._parse_youtube(youtube_str) == VideoBlock._parse_youtube(youtube_str_hack)
 
     def test_parse_youtube_empty(self):
         """
         Some courses have empty youtube attributes, so we should handle
         that well.
         """
-        self.assertEqual(
-            VideoBlock._parse_youtube(''),
-            {'0.75': '',
-             '1.00': '',
-             '1.25': '',
-             '1.50': ''}
-        )
+        assert VideoBlock._parse_youtube('') == {'0.75': '', '1.00': '', '1.25': '', '1.50': ''}
 
 
 class VideoBlockTestBase(unittest.TestCase):
@@ -213,9 +189,9 @@ class VideoBlockTestBase(unittest.TestCase):
         for attr in ['tag', 'attrib', 'text', 'tail']:
             expected_attr = getattr(expected, attr)
             actual_attr = getattr(xml, attr)
-            self.assertEqual(expected_attr, actual_attr)
+            assert expected_attr == actual_attr
 
-        self.assertEqual(get_child_tags(expected), get_child_tags(xml))
+        assert get_child_tags(expected) == get_child_tags(xml)
         for left, right in zip(expected, xml):
             self.assertXmlEqual(left, right)
 
@@ -234,7 +210,7 @@ class TestCreateYoutubeString(VideoBlockTestBase):
         self.descriptor.youtube_id_1_25 = '1EeWXzPdhSA'
         self.descriptor.youtube_id_1_5 = 'rABDYkeK0x8'
         expected = "0.75:izygArpw-Qo,1.00:p2Q6BrNhdh8,1.25:1EeWXzPdhSA,1.50:rABDYkeK0x8"
-        self.assertEqual(create_youtube_string(self.descriptor), expected)
+        assert create_youtube_string(self.descriptor) == expected
 
     def test_create_youtube_string_missing(self):
         """
@@ -244,7 +220,7 @@ class TestCreateYoutubeString(VideoBlockTestBase):
         self.descriptor.youtube_id_1_0 = 'p2Q6BrNhdh8'
         self.descriptor.youtube_id_1_25 = '1EeWXzPdhSA'
         expected = "0.75:izygArpw-Qo,1.00:p2Q6BrNhdh8,1.25:1EeWXzPdhSA"
-        self.assertEqual(create_youtube_string(self.descriptor), expected)
+        assert create_youtube_string(self.descriptor) == expected
 
 
 class TestCreateYouTubeUrl(VideoBlockTestBase):
@@ -271,7 +247,7 @@ class VideoBlockImportTestCase(TestCase):
         Assert that `video` has the correct attributes. `attrs` is a map of {metadata_field: value}.
         """
         for key, value in attrs.items():
-            self.assertEqual(getattr(video, key), value)
+            assert getattr(video, key) == value
 
     def test_constructor(self):
         sample_xml = '''
@@ -636,13 +612,13 @@ class VideoBlockImportTestCase(TestCase):
         """
         def mock_val_import(xml, edx_video_id, resource_fs, static_dir, external_transcripts, course_id):
             """Mock edxval.api.import_from_xml"""
-            self.assertEqual(xml.tag, 'video_asset')
-            self.assertEqual(dict(list(xml.items())), {'mock_attr': ''})
-            self.assertEqual(edx_video_id, 'test_edx_video_id')
-            self.assertEqual(static_dir, EXPORT_IMPORT_STATIC_DIR)
-            self.assertIsNotNone(resource_fs)
-            self.assertEqual(external_transcripts, {u'en': [u'subs_3_yD_cEKoCk.srt.sjson']})
-            self.assertEqual(course_id, 'test_course_id')
+            assert xml.tag == 'video_asset'
+            assert dict(list(xml.items())) == {'mock_attr': ''}
+            assert edx_video_id == 'test_edx_video_id'
+            assert static_dir == EXPORT_IMPORT_STATIC_DIR
+            assert resource_fs is not None
+            assert external_transcripts == {u'en': [u'subs_3_yD_cEKoCk.srt.sjson']}
+            assert course_id == 'test_course_id'
             return edx_video_id
 
         edx_video_id = 'test_edx_video_id'
@@ -686,7 +662,7 @@ class VideoBlockImportTestCase(TestCase):
                 <video_asset client_video_id="test_client_video_id" duration="-1"/>
             </video>
         """
-        with self.assertRaises(mock_val_api.ValCannotCreateError):
+        with pytest.raises(mock_val_api.ValCannotCreateError):
             VideoBlock.from_xml(xml_data, module_system, id_generator=Mock())
 
 
@@ -811,7 +787,7 @@ class VideoExportTestCase(VideoBlockTestBase):
         xml = self.descriptor.definition_to_xml(self.file_system)
         # Check that download_video field is also set to default (False) in xml for backward compatibility
         expected = '<video url_name="SampleProblem"/>\n'
-        self.assertEqual(expected, etree.tostring(xml, pretty_print=True).decode('utf-8'))
+        assert expected == etree.tostring(xml, pretty_print=True).decode('utf-8')
 
     @patch('xmodule.video_module.video_module.edxval_api', None)
     def test_export_to_xml_with_transcripts_as_none(self):
@@ -821,7 +797,7 @@ class VideoExportTestCase(VideoBlockTestBase):
         self.descriptor.transcripts = None
         xml = self.descriptor.definition_to_xml(self.file_system)
         expected = b'<video url_name="SampleProblem"/>\n'
-        self.assertEqual(expected, etree.tostring(xml, pretty_print=True))
+        assert expected == etree.tostring(xml, pretty_print=True)
 
     @patch('xmodule.video_module.video_module.edxval_api', None)
     def test_export_to_xml_invalid_characters_in_attributes(self):
@@ -831,7 +807,7 @@ class VideoExportTestCase(VideoBlockTestBase):
         """
         self.descriptor.display_name = 'Display\x1eName'
         xml = self.descriptor.definition_to_xml(self.file_system)
-        self.assertEqual(xml.get('display_name'), 'DisplayName')
+        assert xml.get('display_name') == 'DisplayName'
 
     @patch('xmodule.video_module.video_module.edxval_api', None)
     def test_export_to_xml_unicode_characters(self):
@@ -840,7 +816,7 @@ class VideoExportTestCase(VideoBlockTestBase):
         """
         self.descriptor.display_name = u'这是文'
         xml = self.descriptor.definition_to_xml(self.file_system)
-        self.assertEqual(xml.get('display_name'), u'\u8fd9\u662f\u6587')
+        assert xml.get('display_name') == u'这是文'
 
 
 @ddt.ddt
@@ -889,7 +865,7 @@ class VideoBlockStudentViewDataTestCase(unittest.TestCase):
         descriptor = instantiate_descriptor(**field_data)
         descriptor.runtime.course_id = MagicMock()
         student_view_data = descriptor.student_view_data()
-        self.assertEqual(student_view_data, expected_student_view_data)
+        assert student_view_data == expected_student_view_data
 
     @patch('xmodule.video_module.video_module.HLSPlaybackEnabledFlag.feature_enabled', Mock(return_value=True))
     @patch('xmodule.video_module.transcripts_utils.get_available_transcript_languages', Mock(return_value=['es']))
@@ -987,10 +963,7 @@ class VideoBlockIndexingTestCase(unittest.TestCase):
             </video>
         '''
         descriptor = instantiate_descriptor(data=xml_data)
-        self.assertEqual(descriptor.index_dictionary(), {
-            "content": {"display_name": "Test Video"},
-            "content_type": "Video"
-        })
+        assert descriptor.index_dictionary() == {'content': {'display_name': 'Test Video'}, 'content_type': 'Video'}
 
     @httpretty.activate
     def test_video_with_youtube_subs_index_dictionary(self):
@@ -1022,13 +995,8 @@ class VideoBlockIndexingTestCase(unittest.TestCase):
         descriptor = instantiate_descriptor(data=xml_data_sub)
         subs = download_youtube_subs(yt_subs_id, descriptor, settings)
         save_subs_to_store(json.loads(subs), yt_subs_id, descriptor)
-        self.assertEqual(descriptor.index_dictionary(), {
-            "content": {
-                "display_name": "Test Video",
-                "transcript_en": YOUTUBE_SUBTITLES
-            },
-            "content_type": "Video"
-        })
+        assert descriptor.index_dictionary() ==\
+               {'content': {'display_name': 'Test Video', 'transcript_en': YOUTUBE_SUBTITLES}, 'content_type': 'Video'}
 
     @httpretty.activate
     def test_video_with_subs_and_transcript_index_dictionary(self):
@@ -1063,14 +1031,10 @@ class VideoBlockIndexingTestCase(unittest.TestCase):
         subs = download_youtube_subs(yt_subs_id, descriptor, settings)
         save_subs_to_store(json.loads(subs), yt_subs_id, descriptor)
         save_to_store(SRT_FILEDATA, "subs_grmtran1.srt", 'text/srt', descriptor.location)
-        self.assertEqual(descriptor.index_dictionary(), {
-            "content": {
-                "display_name": "Test Video",
-                "transcript_en": YOUTUBE_SUBTITLES,
-                "transcript_ge": "sprechen sie deutsch? Ja, ich spreche Deutsch",
-            },
-            "content_type": "Video"
-        })
+        assert descriptor.index_dictionary() ==\
+               {'content': {'display_name': 'Test Video', 'transcript_en': YOUTUBE_SUBTITLES,
+                            'transcript_ge': 'sprechen sie deutsch? Ja, ich spreche Deutsch'},
+                'content_type': 'Video'}
 
     def test_video_with_multiple_transcripts_index_dictionary(self):
         """
@@ -1096,14 +1060,10 @@ class VideoBlockIndexingTestCase(unittest.TestCase):
         descriptor = instantiate_descriptor(data=xml_data_transcripts)
         save_to_store(SRT_FILEDATA, "subs_grmtran1.srt", 'text/srt', descriptor.location)
         save_to_store(CRO_SRT_FILEDATA, "subs_croatian1.srt", 'text/srt', descriptor.location)
-        self.assertEqual(descriptor.index_dictionary(), {
-            "content": {
-                "display_name": "Test Video",
-                "transcript_ge": "sprechen sie deutsch? Ja, ich spreche Deutsch",
-                "transcript_hr": "Dobar dan! Kako ste danas?"
-            },
-            "content_type": "Video"
-        })
+        assert descriptor.index_dictionary() ==\
+               {'content': {'display_name': 'Test Video',
+                            'transcript_ge': 'sprechen sie deutsch? Ja, ich spreche Deutsch',
+                            'transcript_hr': 'Dobar dan! Kako ste danas?'}, 'content_type': 'Video'}
 
     def test_video_with_multiple_transcripts_translation_retrieval(self):
         """
@@ -1128,7 +1088,7 @@ class VideoBlockIndexingTestCase(unittest.TestCase):
 
         descriptor = instantiate_descriptor(data=xml_data_transcripts)
         translations = descriptor.available_translations(descriptor.get_transcripts_info())
-        self.assertEqual(sorted(translations), sorted(['hr', 'ge']))
+        assert sorted(translations) == sorted(['hr', 'ge'])
 
     def test_video_with_no_transcripts_translation_retrieval(self):
         """
@@ -1138,13 +1098,13 @@ class VideoBlockIndexingTestCase(unittest.TestCase):
         """
         descriptor = instantiate_descriptor(data=None)
         translations_with_fallback = descriptor.available_translations(descriptor.get_transcripts_info())
-        self.assertEqual(translations_with_fallback, ['en'])
+        assert translations_with_fallback == ['en']
 
         with patch.dict(settings.FEATURES, FALLBACK_TO_ENGLISH_TRANSCRIPTS=False):
             # Some organizations don't have English transcripts for all videos
             # This feature makes it configurable
             translations_no_fallback = descriptor.available_translations(descriptor.get_transcripts_info())
-            self.assertEqual(translations_no_fallback, [])
+            assert translations_no_fallback == []
 
     @override_settings(ALL_LANGUAGES=ALL_LANGUAGES)
     def test_video_with_language_do_not_have_transcripts_translation(self):
@@ -1168,7 +1128,7 @@ class VideoBlockIndexingTestCase(unittest.TestCase):
         '''
         descriptor = instantiate_descriptor(data=xml_data_transcripts)
         translations = descriptor.available_translations(descriptor.get_transcripts_info(), verify_assets=False)
-        self.assertNotEqual(translations, ['ur'])
+        assert translations != ['ur']
 
     def assert_validation_message(self, validation, expected_msg):
         """
@@ -1178,12 +1138,11 @@ class VideoBlockIndexingTestCase(unittest.TestCase):
             validation (StudioValidation): A validation object.
             expected_msg (string): An expected validation message.
         """
-        self.assertFalse(validation.empty)  # Validation contains some warning/message
-        self.assertTrue(validation.summary)
-        self.assertEqual(StudioValidationMessage.WARNING, validation.summary.type)
-        self.assertIn(
-            expected_msg, validation.summary.text.replace('Urdu, Esperanto', 'Esperanto, Urdu')
-        )
+        assert not validation.empty
+        # Validation contains some warning/message
+        assert validation.summary
+        assert StudioValidationMessage.WARNING == validation.summary.type
+        assert expected_msg in validation.summary.text.replace('Urdu, Esperanto', 'Esperanto, Urdu')
 
     @ddt.data(
         (
@@ -1227,4 +1186,4 @@ class VideoBlockIndexingTestCase(unittest.TestCase):
         descriptor.transcripts = None
         response = descriptor.get_transcripts_info()
         expected = {'transcripts': {}, 'sub': ''}
-        self.assertEqual(expected, response)
+        assert expected == response

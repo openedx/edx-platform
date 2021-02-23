@@ -93,8 +93,8 @@ class TPAContextViewTest(ThirdPartyAuthTestMixin, APITestCase):
         is returned.
         """
         response = self.client.get(self.url)
-        self.assertEqual(response.status_code, 400)
-        self.assertEqual(response.data, {'message': 'Request missing required parameter: redirect_to'})
+        assert response.status_code == 400
+        assert response.data == {'message': 'Request missing required parameter: redirect_to'}
 
     @patch.dict(settings.FEATURES, {'ENABLE_THIRD_PARTY_AUTH': False})
     def test_no_third_party_auth_providers(self):
@@ -103,8 +103,8 @@ class TPAContextViewTest(ThirdPartyAuthTestMixin, APITestCase):
         the provider information
         """
         response = self.client.get(self.url, self.query_params)
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.data, self.get_context())
+        assert response.status_code == 200
+        assert response.data == self.get_context()
 
     def test_third_party_auth_providers(self):
         """
@@ -115,8 +115,8 @@ class TPAContextViewTest(ThirdPartyAuthTestMixin, APITestCase):
             'next': self.query_params['redirect_to']
         }
 
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.data, self.get_context(params))
+        assert response.status_code == 200
+        assert response.data == self.get_context(params)
 
     @ddt.data(
         ('google-oauth2', 'Google', False),
@@ -139,8 +139,8 @@ class TPAContextViewTest(ThirdPartyAuthTestMixin, APITestCase):
         with simulate_running_pipeline(pipeline_target, current_backend, email=email):
             response = self.client.get(self.url, self.query_params)
 
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.data, self.get_context(params, current_provider, current_backend, add_user_details))
+        assert response.status_code == 200
+        assert response.data == self.get_context(params, current_provider, current_backend, add_user_details)
 
     def test_tpa_hint(self):
         """
@@ -164,4 +164,4 @@ class TPAContextViewTest(ThirdPartyAuthTestMixin, APITestCase):
         })
 
         response = self.client.get(self.url, self.query_params)
-        self.assertEqual(response.data['providers'], provider_data)
+        assert response.data['providers'] == provider_data

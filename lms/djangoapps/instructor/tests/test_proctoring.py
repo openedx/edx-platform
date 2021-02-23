@@ -2,16 +2,16 @@
 Unit tests for Edx Proctoring feature flag in new instructor dashboard.
 """
 
+from unittest.mock import patch
+
 import ddt
 from django.apps import apps
 from django.conf import settings
 from django.urls import reverse
-from mock import patch
-from six import text_type
-
 from edx_proctoring.api import create_exam
 from edx_proctoring.backends.tests.test_backend import TestBackendProvider
 from edx_toggles.toggles.testutils import override_waffle_flag
+
 from common.djangoapps.student.roles import CourseInstructorRole, CourseStaffRole
 from common.djangoapps.student.tests.factories import AdminFactory
 from lms.djangoapps.courseware.toggles import EXAM_RESUME_PROCTORING_IMPROVEMENTS
@@ -28,12 +28,12 @@ class TestProctoringDashboardViews(SharedModuleStoreTestCase):
 
     @classmethod
     def setUpClass(cls):
-        super(TestProctoringDashboardViews, cls).setUpClass()
+        super().setUpClass()
         button = '<button type="button" class="btn-link special_exams" data-section="special_exams">Special Exams</button>'  # lint-amnesty, pylint: disable=line-too-long
         cls.proctoring_link = button
 
     def setUp(self):
-        super(TestProctoringDashboardViews, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
 
         # Create instructor account
         self.instructor = AdminFactory.create()
@@ -43,7 +43,7 @@ class TestProctoringDashboardViews(SharedModuleStoreTestCase):
         """
         Create URL for instructor dashboard
         """
-        self.url = reverse('instructor_dashboard', kwargs={'course_id': text_type(course.id)})  # lint-amnesty, pylint: disable=attribute-defined-outside-init
+        self.url = reverse('instructor_dashboard', kwargs={'course_id': str(course.id)})  # lint-amnesty, pylint: disable=attribute-defined-outside-init
 
     def setup_course(self, enable_proctored_exams, enable_timed_exams):
         """
@@ -190,7 +190,7 @@ class TestProctoringDashboardViews(SharedModuleStoreTestCase):
         self.instructor.save()
 
         response = self.client.get(self.url)
-        self.assertIn('data-enable-exam-resume-proctoring-improvements="True"', response.content.decode('utf-8'))
+        assert 'data-enable-exam-resume-proctoring-improvements="True"' in response.content.decode('utf-8')
 
     @override_waffle_flag(EXAM_RESUME_PROCTORING_IMPROVEMENTS, False)
     def test_exam_resume_proctoring_improvements_toggle_disabled(self):
@@ -203,7 +203,7 @@ class TestProctoringDashboardViews(SharedModuleStoreTestCase):
         self.instructor.save()
 
         response = self.client.get(self.url)
-        self.assertIn('data-enable-exam-resume-proctoring-improvements="False"', response.content.decode('utf-8'))
+        assert 'data-enable-exam-resume-proctoring-improvements="False"' in response.content.decode('utf-8')
 
     def test_review_dashboard(self):
         """

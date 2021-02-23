@@ -45,11 +45,11 @@ class TestIDVerificationService(ModuleStoreTestCase):
         for status in ["created", "ready", "denied", "submitted", "must_retry"]:
             attempt.status = status
             attempt.save()
-            self.assertFalse(IDVerificationService.user_is_verified(user), status)
+            assert not IDVerificationService.user_is_verified(user), status
 
         attempt.status = "approved"
         attempt.save()
-        self.assertTrue(IDVerificationService.user_is_verified(user), attempt.status)
+        assert IDVerificationService.user_is_verified(user), attempt.status
 
     def test_user_has_valid_or_pending(self):
         """
@@ -63,14 +63,14 @@ class TestIDVerificationService(ModuleStoreTestCase):
         for status in ["created", "ready", "denied"]:
             attempt.status = status
             attempt.save()
-            self.assertFalse(IDVerificationService.user_has_valid_or_pending(user), status)
+            assert not IDVerificationService.user_has_valid_or_pending(user), status
 
         # Any of these, and we are. Note the benefit of the doubt we're giving
         # -- must_retry, and submitted both count until we hear otherwise
         for status in ["submitted", "must_retry", "approved"]:
             attempt.status = status
             attempt.save()
-            self.assertTrue(IDVerificationService.user_has_valid_or_pending(user), status)
+            assert IDVerificationService.user_has_valid_or_pending(user), status
 
     @ddt.unpack
     @ddt.data(
@@ -92,7 +92,7 @@ class TestIDVerificationService(ModuleStoreTestCase):
             mock_verification.return_value = status
 
             status = IDVerificationService.verification_status_for_user(user, enrollment_mode)
-            self.assertEqual(status, output)
+            assert status == output
 
     def test_get_verified_user_ids(self):
         """
@@ -114,7 +114,7 @@ class TestIDVerificationService(ModuleStoreTestCase):
         ]))
         expected_user_ids = {user_a.id, user_b.id, user_c.id}
 
-        self.assertEqual(expected_user_ids, verified_user_ids)
+        assert expected_user_ids == verified_user_ids
 
     def test_get_verify_location_no_course_key(self):
         """
@@ -122,7 +122,7 @@ class TestIDVerificationService(ModuleStoreTestCase):
         """
         path = IDVerificationService.get_verify_location()
         expected_path = '{}/id-verification'.format(settings.ACCOUNT_MICROFRONTEND_URL)
-        self.assertEqual(path, expected_path)
+        assert path == expected_path
 
     def test_get_verify_location_from_course_id(self):
         """
@@ -131,7 +131,7 @@ class TestIDVerificationService(ModuleStoreTestCase):
         course = CourseFactory.create(org='Robot', number='999', display_name='Test Course')
         path = IDVerificationService.get_verify_location(course.id)
         expected_path = '{}/id-verification'.format(settings.ACCOUNT_MICROFRONTEND_URL)
-        self.assertEqual(path, expected_path + '?course_id=Robot/999/Test_Course')
+        assert path == (expected_path + '?course_id=Robot/999/Test_Course')
 
     def test_get_verify_location_from_string(self):
         """
@@ -139,7 +139,7 @@ class TestIDVerificationService(ModuleStoreTestCase):
         """
         path = IDVerificationService.get_verify_location('course-v1:edX+DemoX+Demo_Course')
         expected_path = '{}/id-verification'.format(settings.ACCOUNT_MICROFRONTEND_URL)
-        self.assertEqual(path, expected_path + '?course_id=course-v1%3AedX%2BDemoX%2BDemo_Course')
+        assert path == (expected_path + '?course_id=course-v1%3AedX%2BDemoX%2BDemo_Course')
 
 
 @patch.dict(settings.VERIFY_STUDENT, FAKE_SETTINGS)

@@ -9,7 +9,6 @@ import datetime
 import json
 import logging
 
-import six
 from django.conf import settings
 from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.core.exceptions import ObjectDoesNotExist
@@ -18,16 +17,15 @@ from django.db.models import Count, Q  # lint-amnesty, pylint: disable=unused-im
 from django.urls import reverse
 from edx_proctoring.api import get_exam_violation_report
 from opaque_keys.edx.keys import CourseKey, UsageKey
-from six import text_type
 
 import xmodule.graders as xmgraders
-from lms.djangoapps.courseware.models import StudentModule
+from common.djangoapps.student.models import CourseEnrollment, CourseEnrollmentAllowed
 from lms.djangoapps.certificates.models import CertificateStatuses, GeneratedCertificate
+from lms.djangoapps.courseware.models import StudentModule
 from lms.djangoapps.grades.api import context as grades_context
 from lms.djangoapps.verify_student.services import IDVerificationService
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangolib.markup import HTML, Text
-from common.djangoapps.student.models import CourseEnrollment, CourseEnrollmentAllowed
 
 log = logging.getLogger(__name__)
 
@@ -68,7 +66,7 @@ def issued_certificates(course_key, features):
     ]
     """
 
-    report_run_date = datetime.date.today().strftime(u"%B %d, %Y")
+    report_run_date = datetime.date.today().strftime("%B %d, %Y")
     certificate_features = [x for x in CERTIFICATE_FEATURES if x in features]
     generated_certificates = list(GeneratedCertificate.eligible_certificates.filter(
         course_id=course_key,
@@ -117,7 +115,7 @@ def enrolled_students_features(course_key, features):
             DjangoJSONEncoder().default(attr)
             return attr
         except TypeError:
-            return six.text_type(attr)
+            return str(attr)
 
     def extract_student(student, features):
         """ convert student to dictionary """
@@ -133,12 +131,10 @@ def enrolled_students_features(course_key, features):
                 meta_key = feature.split('.')[1]
                 meta_features.append((feature, meta_key))
 
-        student_dict = dict((feature, extract_attr(student, feature))
-                            for feature in student_features)
+        student_dict = {feature: extract_attr(student, feature) for feature in student_features}
         profile = student.profile
         if profile is not None:
-            profile_dict = dict((feature, extract_attr(profile, feature))
-                                for feature in profile_features)
+            profile_dict = {feature: extract_attr(profile, feature) for feature in profile_features}
             student_dict.update(profile_dict)
 
             # now fetch the requested meta fields
@@ -196,7 +192,7 @@ def list_may_enroll(course_key, features):
         """
         Build dict containing information about a single student.
         """
-        return dict((feature, getattr(student, feature)) for feature in features)
+        return {feature: getattr(student, feature) for feature in features}
 
     return [extract_student(student, features) for student in may_enroll_and_unenrolled]
 
@@ -211,18 +207,18 @@ def get_proctored_exam_results(course_key, features):
         """
         Build dict containing information about a single student exam_attempt.
         """
-        proctored_exam = dict(
-            (feature, exam_attempt.get(feature)) for feature in features if feature in exam_attempt
-        )
+        proctored_exam = {
+            feature: exam_attempt.get(feature) for feature in features if feature in exam_attempt
+        }
 
         for status in comment_statuses:
             comment_list = exam_attempt.get(
-                u'{status} Comments'.format(status=status),
+                f'{status} Comments',
                 []
             )
             proctored_exam.update({
-                u'{status} Count'.format(status=status): len(comment_list),
-                u'{status} Comments'.format(status=status): '; '.join(comment_list),
+                f'{status} Count': len(comment_list),
+                f'{status} Comments': '; '.join(comment_list),
             })
         try:
             proctored_exam['track'] = course_enrollments[exam_attempt['user_id']]
@@ -267,7 +263,7 @@ def coupon_codes_features(features, coupons_list, course_id):
         """
         coupon_features = [x for x in COUPON_FEATURES if x in features]
 
-        coupon_dict = dict((feature, getattr(coupon, feature)) for feature in coupon_features)
+        coupon_dict = {feature: getattr(coupon, feature) for feature in coupon_features}
         coupon_redemptions = coupon.couponredemption_set.filter(
             order__status="purchased"
         )
@@ -297,7 +293,7 @@ def coupon_codes_features(features, coupons_list, course_id):
         # They have not been redeemed yet
 
         coupon_dict['expiration_date'] = coupon.display_expiry_date
-        coupon_dict['course_id'] = text_type(coupon_dict['course_id'])
+        coupon_dict['course_id'] = str(coupon_dict['course_id'])
         return coupon_dict
     return [extract_coupon(coupon, features) for coupon in coupons_list]
 
@@ -371,8 +367,8 @@ def get_response_state(response):
     except TypeError:
         username = response.student.username
         err_msg = (
-            u'Error occurred while attempting to load learner state '
-            u'{username} for state {state}.'.format(
+            'Error occurred while attempting to load learner state '
+            '{username} for state {state}.'.format(
                 username=username,
                 state=problem_state
             )
@@ -426,7 +422,7 @@ def course_registration_features(features, registration_codes, csv_type):
         site_name = configuration_helpers.get_value('SITE_NAME', settings.SITE_NAME)
         registration_features = [x for x in COURSE_REGISTRATION_FEATURES if x in features]
 
-        course_registration_dict = dict((feature, getattr(registration_code, feature)) for feature in registration_features)  # lint-amnesty, pylint: disable=line-too-long
+        course_registration_dict = {feature: getattr(registration_code, feature) for feature in registration_features}  # lint-amnesty, pylint: disable=line-too-long
         course_registration_dict['company_name'] = None
         if registration_code.invoice_item:
             course_registration_dict['company_name'] = registration_code.invoice_item.invoice.company_name
@@ -454,7 +450,7 @@ def course_registration_features(features, registration_codes, csv_type):
             except ObjectDoesNotExist:
                 pass
 
-        course_registration_dict['course_id'] = text_type(course_registration_dict['course_id'])
+        course_registration_dict['course_id'] = str(course_registration_dict['course_id'])
         return course_registration_dict
     return [extract_course_registration(code, features, csv_type) for code in registration_codes]
 
@@ -477,26 +473,26 @@ def dump_grading_context(course):
         msg += '\n'
         msg += "Graded sections:\n"
         for subgrader, category, weight in course.grader.subgraders:
-            msg += u"  subgrader=%s, type=%s, category=%s, weight=%s\n"\
+            msg += "  subgrader=%s, type=%s, category=%s, weight=%s\n"\
                 % (subgrader.__class__, subgrader.type, category, weight)
             subgrader.index = 1
             graders[subgrader.type] = subgrader
     msg += hbar
-    msg += u"Listing grading context for course %s\n" % text_type(course.id)
+    msg += "Listing grading context for course %s\n" % str(course.id)
 
     gcontext = grades_context.grading_context_for_course(course)
     msg += "graded sections:\n"
 
     msg += '%s\n' % list(gcontext['all_graded_subsections_by_type'].keys())
     for (gsomething, gsvals) in gcontext['all_graded_subsections_by_type'].items():
-        msg += u"--> Section %s:\n" % (gsomething)
+        msg += "--> Section %s:\n" % (gsomething)
         for sec in gsvals:
             sdesc = sec['subsection_block']
             frmat = getattr(sdesc, 'format', None)
             aname = ''
             if frmat in graders:
                 gform = graders[frmat]
-                aname = u'%s %02d' % (gform.short_label, gform.index)
+                aname = '%s %02d' % (gform.short_label, gform.index)
                 gform.index += 1
             elif sdesc.display_name in graders:
                 gform = graders[sdesc.display_name]
@@ -504,7 +500,7 @@ def dump_grading_context(course):
             notes = ''
             if getattr(sdesc, 'score_by_attempt', False):
                 notes = ', score by attempt!'
-            msg += u"      %s (format=%s, Assignment=%s%s)\n"\
+            msg += "      %s (format=%s, Assignment=%s%s)\n"\
                 % (sdesc.display_name, frmat, aname, notes)
     msg += "all graded blocks:\n"
     msg += "length=%d\n" % gcontext['count_all_graded_blocks']

@@ -65,12 +65,12 @@ class TestGlobalAnnouncements(TestCase):
         url = reverse("announcements:page", kwargs={"page": 1})
         response = self.client.get(url)
         data = json.loads(response.content.decode('utf-8'))
-        self.assertEqual(data['num_pages'], 1)
+        assert data['num_pages'] == 1
         ## double the number of announcements to verify the number of pages increases
         self.setUpTestData()
         response = self.client.get(url)
         data = json.loads(response.content.decode('utf-8'))
-        self.assertEqual(data['num_pages'], 2)
+        assert data['num_pages'] == 2
 
     def test_active(self):
         """

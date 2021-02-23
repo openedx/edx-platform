@@ -45,4 +45,4 @@ class TestCourseDatesFragmentView(ModuleStoreTestCase):
 
         self.client.logout()
         response = self.client.get(self.dates_fragment_url)
-        self.assertEqual(response.status_code, 404)
+        assert response.status_code == 404

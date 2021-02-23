@@ -72,8 +72,8 @@ class UpdateExampleCertificateViewTest(CacheIsolationTestCase):
         self._assert_response(response)
 
         self.cert = ExampleCertificate.objects.get()
-        self.assertEqual(self.cert.status, ExampleCertificate.STATUS_SUCCESS)
-        self.assertEqual(self.cert.download_url, self.DOWNLOAD_URL)
+        assert self.cert.status == ExampleCertificate.STATUS_SUCCESS
+        assert self.cert.download_url == self.DOWNLOAD_URL
 
     def test_update_example_certificate_invalid_key(self):
         payload = {
@@ -86,15 +86,15 @@ class UpdateExampleCertificateViewTest(CacheIsolationTestCase):
             })
         }
         response = self.client.post(self.url, data=payload)
-        self.assertEqual(response.status_code, 404)
+        assert response.status_code == 404
 
     def test_update_example_certificate_error(self):
         response = self._post_to_view(self.cert, error_reason=self.ERROR_REASON)
         self._assert_response(response)
 
         self.cert = ExampleCertificate.objects.get()
-        self.assertEqual(self.cert.status, ExampleCertificate.STATUS_ERROR)
-        self.assertEqual(self.cert.error_reason, self.ERROR_REASON)
+        assert self.cert.status == ExampleCertificate.STATUS_ERROR
+        assert self.cert.error_reason == self.ERROR_REASON
 
     @ddt.data('xqueue_header', 'xqueue_body')
     def test_update_example_certificate_invalid_params(self, missing_param):
@@ -110,7 +110,7 @@ class UpdateExampleCertificateViewTest(CacheIsolationTestCase):
         del payload[missing_param]
 
         response = self.client.post(self.url, data=payload)
-        self.assertEqual(response.status_code, 400)
+        assert response.status_code == 400
 
     def test_update_example_certificate_missing_download_url(self):
         payload = {
@@ -122,7 +122,7 @@ class UpdateExampleCertificateViewTest(CacheIsolationTestCase):
             })
         }
         response = self.client.post(self.url, data=payload)
-        self.assertEqual(response.status_code, 400)
+        assert response.status_code == 400
 
     def test_update_example_certificate_non_json_param(self):
         payload = {
@@ -130,11 +130,11 @@ class UpdateExampleCertificateViewTest(CacheIsolationTestCase):
             'xqueue_body': '{/invalid'
         }
         response = self.client.post(self.url, data=payload)
-        self.assertEqual(response.status_code, 400)
+        assert response.status_code == 400
 
     def test_unsupported_http_method(self):
         response = self.client.get(self.url)
-        self.assertEqual(response.status_code, 405)
+        assert response.status_code == 405
 
     def test_bad_request_rate_limiting(self):
         payload = {
@@ -156,7 +156,7 @@ class UpdateExampleCertificateViewTest(CacheIsolationTestCase):
 
         # The final status code should indicate that the rate
         # limit was exceeded.
-        self.assertEqual(response.status_code, 403)
+        assert response.status_code == 403
 
     def _post_to_view(self, cert, download_url=None, error_reason=None):
         """Simulate a callback from the XQueue to the example certificate end-point. """
@@ -179,8 +179,8 @@ class UpdateExampleCertificateViewTest(CacheIsolationTestCase):
     def _assert_response(self, response):
         """Check the response from the callback end-point. """
         content = json.loads(response.content.decode('utf-8'))
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(content['return_code'], 0)
+        assert response.status_code == 200
+        assert content['return_code'] == 0
 
 
 class CertificatesViewsSiteTests(ModuleStoreTestCase):

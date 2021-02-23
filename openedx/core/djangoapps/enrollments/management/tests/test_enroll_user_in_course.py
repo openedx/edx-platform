@@ -4,7 +4,7 @@
 import unittest
 from uuid import uuid4
 import ddt
-
+import pytest
 from django.conf import settings
 from django.core.management import call_command
 from django.core.management.base import CommandError
@@ -51,7 +51,7 @@ class EnrollManagementCommandTest(SharedModuleStoreTestCase):
         )
 
         user_enroll = get_enrollment(self.username, self.course_id)
-        self.assertTrue(user_enroll['is_active'])
+        assert user_enroll['is_active']
 
     def test_enroll_user_twice(self):
         """
@@ -72,7 +72,7 @@ class EnrollManagementCommandTest(SharedModuleStoreTestCase):
         # Second run does not impact the first run (i.e., the
         # user is still enrolled, no exception was raised, etc)
         user_enroll = get_enrollment(self.username, self.course_id)
-        self.assertTrue(user_enroll['is_active'])
+        assert user_enroll['is_active']
 
     @ddt.data(['--email', 'foo'], ['--course', 'bar'], ['--bad-param', 'baz'])
     def test_not_enough_args(self, arg):
@@ -83,7 +83,7 @@ class EnrollManagementCommandTest(SharedModuleStoreTestCase):
 
         command_args = arg
 
-        with self.assertRaises(CommandError):
+        with pytest.raises(CommandError):
             call_command(
                 'enroll_user_in_course',
                 *command_args

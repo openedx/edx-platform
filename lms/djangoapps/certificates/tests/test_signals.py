@@ -21,7 +21,7 @@ from lms.djangoapps.certificates.models import (
     CertificateStatuses,
     GeneratedCertificate
 )
-from lms.djangoapps.certificates.signals import fire_ungenerated_certificate_task
+from lms.djangoapps.certificates.signals import _fire_ungenerated_certificate_task
 from lms.djangoapps.certificates.tasks import CERTIFICATE_DELAY_SECONDS
 from lms.djangoapps.certificates.tests.factories import CertificateWhitelistFactory
 from lms.djangoapps.certificates.tests.factories import GeneratedCertificateFactory
@@ -49,15 +49,15 @@ class SelfGeneratedCertsSignalTest(ModuleStoreTestCase):
         according to course-pacing.
         """
         course = CourseFactory.create(self_paced=False, emit_signals=True)
-        self.assertFalse(cert_generation_enabled(course.id))
+        assert not cert_generation_enabled(course.id)
 
         course.self_paced = True
         self.store.update_item(course, self.user.id)
-        self.assertTrue(cert_generation_enabled(course.id))
+        assert cert_generation_enabled(course.id)
 
         course.self_paced = False
         self.store.update_item(course, self.user.id)
-        self.assertFalse(cert_generation_enabled(course.id))
+        assert not cert_generation_enabled(course.id)
 
 
 class WhitelistGeneratedCertificatesTest(ModuleStoreTestCase):
@@ -152,15 +152,14 @@ class WhitelistGeneratedCertificatesTest(ModuleStoreTestCase):
                 'lms.djangoapps.certificates.signals.generate_allowlist_certificate_task',
                 return_value=None
             ) as mock_generate_allowlist_task:
-                CertificateWhitelistFactory(
-                    user=self.user,
-                    course_id=self.ip_course.id,
-                    whitelist=True
-                )
-
-                fire_ungenerated_certificate_task(self.user, self.ip_course.id)
-                mock_generate_certificate_apply_async.assert_not_called()
-                mock_generate_allowlist_task.assert_called_with(self.user, self.ip_course.id)
+                with override_waffle_switch(AUTO_CERTIFICATE_GENERATION_SWITCH, active=True):
+                    CertificateWhitelistFactory(
+                        user=self.user,
+                        course_id=self.ip_course.id,
+                        whitelist=True
+                    )
+                    mock_generate_certificate_apply_async.assert_not_called()
+                    mock_generate_allowlist_task.assert_called_with(self.user, self.ip_course.id)
 
     def test_fire_task_allowlist_disabled(self):
         """
@@ -174,21 +173,20 @@ class WhitelistGeneratedCertificatesTest(ModuleStoreTestCase):
                 'lms.djangoapps.certificates.signals.generate_allowlist_certificate_task',
                 return_value=None
             ) as mock_generate_allowlist_task:
-                CertificateWhitelistFactory(
-                    user=self.user,
-                    course_id=self.ip_course.id,
-                    whitelist=True
-                )
-
-                fire_ungenerated_certificate_task(self.user, self.ip_course.id)
-                mock_generate_certificate_apply_async.assert_called_with(
-                    countdown=CERTIFICATE_DELAY_SECONDS,
-                    kwargs={
-                        'student': six.text_type(self.user.id),
-                        'course_key': six.text_type(self.ip_course.id),
-                    }
-                )
-                mock_generate_allowlist_task.assert_not_called()
+                with override_waffle_switch(AUTO_CERTIFICATE_GENERATION_SWITCH, active=True):
+                    CertificateWhitelistFactory(
+                        user=self.user,
+                        course_id=self.ip_course.id,
+                        whitelist=True
+                    )
+                    mock_generate_certificate_apply_async.assert_called_with(
+                        countdown=CERTIFICATE_DELAY_SECONDS,
+                        kwargs={
+                            'student': six.text_type(self.user.id),
+                            'course_key': six.text_type(self.ip_course.id),
+                        }
+                    )
+                    mock_generate_allowlist_task.assert_not_called()
 
 
 class PassingGradeCertsTest(ModuleStoreTestCase):
@@ -280,6 +278,44 @@ class PassingGradeCertsTest(ModuleStoreTestCase):
                 grade_factory.update(self.user, self.course)
                 mock_generate_certificate_apply_async.assert_not_called()
 
+    @override_waffle_flag(CERTIFICATES_USE_ALLOWLIST, active=True)
+    def test_passing_grade_allowlist(self):
+        with override_waffle_switch(AUTO_CERTIFICATE_GENERATION_SWITCH, active=True):
+            # User who is not on the allowlist
+            GeneratedCertificateFactory(
+                user=self.user,
+                course_id=self.course.id,
+                status=CertificateStatuses.error
+            )
+            with mock_passing_grade():
+                with mock.patch(
+                    'lms.djangoapps.certificates.signals.generate_allowlist_certificate_task',
+                    return_value=None
+                ) as mock_allowlist_task:
+                    CourseGradeFactory().update(self.user, self.course)
+                    mock_allowlist_task.assert_not_called()
+
+            # User who is on the allowlist
+            u = UserFactory.create()
+            c = CourseFactory()
+            course_key = c.id  # pylint: disable=no-member
+            CertificateWhitelistFactory(
+                user=u,
+                course_id=course_key
+            )
+            GeneratedCertificateFactory(
+                user=u,
+                course_id=course_key,
+                status=CertificateStatuses.error
+            )
+            with mock_passing_grade():
+                with mock.patch(
+                    'lms.djangoapps.certificates.signals.generate_allowlist_certificate_task',
+                    return_value=None
+                ) as mock_allowlist_task:
+                    CourseGradeFactory().update(u, c)
+                    mock_allowlist_task.assert_called_with(u, course_key)
+
 
 @ddt.ddt
 class FailingGradeCertsTest(ModuleStoreTestCase):
@@ -335,7 +371,7 @@ class FailingGradeCertsTest(ModuleStoreTestCase):
         )
         CourseGradeFactory().update(self.user, self.course)
         cert = GeneratedCertificate.certificate_for_student(self.user, self.course.id)
-        self.assertEqual(cert.status, expected_status)
+        assert cert.status == expected_status
 
     @override_waffle_flag(CERTIFICATES_USE_ALLOWLIST, active=True)
     def test_failing_grade_allowlist(self):
@@ -347,7 +383,7 @@ class FailingGradeCertsTest(ModuleStoreTestCase):
         )
         CourseGradeFactory().update(self.user, self.course)
         cert = GeneratedCertificate.certificate_for_student(self.user, self.course.id)
-        self.assertEqual(cert.status, CertificateStatuses.notpassing)
+        assert cert.status == CertificateStatuses.notpassing
 
         # User who is on the allowlist
         u = UserFactory.create()
@@ -364,7 +400,7 @@ class FailingGradeCertsTest(ModuleStoreTestCase):
         )
         CourseGradeFactory().update(u, c)
         cert = GeneratedCertificate.certificate_for_student(u, course_key)
-        self.assertEqual(cert.status, CertificateStatuses.downloadable)
+        assert cert.status == CertificateStatuses.downloadable
 
 
 class LearnerTrackChangeCertsTest(ModuleStoreTestCase):
@@ -437,6 +473,47 @@ class LearnerTrackChangeCertsTest(ModuleStoreTestCase):
                     }
                 )
 
+    @override_waffle_flag(CERTIFICATES_USE_ALLOWLIST, active=True)
+    def test_id_verification_allowlist(self):
+        # User is not on the allowlist
+        with mock.patch(
+            'lms.djangoapps.certificates.signals.generate_allowlist_certificate_task',
+            return_value=None
+        ) as mock_allowlist_task:
+            with override_waffle_switch(AUTO_CERTIFICATE_GENERATION_SWITCH, active=True):
+                attempt = SoftwareSecurePhotoVerification.objects.create(
+                    user=self.user_two,
+                    status='submitted'
+                )
+                attempt.approve()
+                mock_allowlist_task.assert_not_called()
+
+        # User is on the allowlist
+        with mock.patch(
+            'lms.djangoapps.certificates.signals.generate_allowlist_certificate_task',
+            return_value=None
+        ) as mock_allowlist_task:
+            with override_waffle_switch(AUTO_CERTIFICATE_GENERATION_SWITCH, active=True):
+                u = UserFactory.create()
+                c = CourseFactory()
+                course_key = c.id  # pylint: disable=no-member
+                CourseEnrollmentFactory(
+                    user=u,
+                    course_id=course_key,
+                    is_active=True,
+                    mode='verified'
+                )
+                CertificateWhitelistFactory(
+                    user=u,
+                    course_id=course_key
+                )
+                attempt = SoftwareSecurePhotoVerification.objects.create(
+                    user=u,
+                    status='submitted'
+                )
+                attempt.approve()
+                mock_allowlist_task.assert_called_with(u, course_key)
+
 
 @ddt.ddt
 class CertificateGenerationTaskTest(ModuleStoreTestCase):
@@ -475,6 +552,6 @@ class CertificateGenerationTaskTest(ModuleStoreTestCase):
             return_value=None
         ) as mock_generate_certificate_apply_async:
             with override_waffle_switch(AUTO_CERTIFICATE_GENERATION_SWITCH, active=True):
-                fire_ungenerated_certificate_task(self.user, self.course.id)
+                _fire_ungenerated_certificate_task(self.user, self.course.id)
                 task_created = mock_generate_certificate_apply_async.called
-                self.assertEqual(task_created, should_create)
+                assert task_created == should_create

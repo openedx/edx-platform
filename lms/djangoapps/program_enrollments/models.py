@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 Django model specifications for the Program Enrollments API
 """
@@ -28,7 +27,7 @@ class ProgramEnrollment(TimeStampedModel):
     """
     STATUS_CHOICES = ProgramEnrollmentStatuses.__MODEL_CHOICES__
 
-    class Meta(object):
+    class Meta:
         app_label = "program_enrollments"
 
         # A student enrolled in a given (program, curriculum) should always
@@ -82,7 +81,7 @@ class ProgramEnrollment(TimeStampedModel):
         return True
 
     def __str__(self):
-        return '[ProgramEnrollment id={}]'.format(self.id)
+        return f'[ProgramEnrollment id={self.id}]'
 
     def __repr__(self):
         return (  # lint-amnesty, pylint: disable=missing-format-attribute
@@ -106,7 +105,7 @@ class ProgramCourseEnrollment(TimeStampedModel):
     """
     STATUS_CHOICES = ProgramCourseEnrollmentStatuses.__MODEL_CHOICES__
 
-    class Meta(object):
+    class Meta:
         app_label = "program_enrollments"
 
         # For each program enrollment, there may be only one
@@ -138,7 +137,7 @@ class ProgramCourseEnrollment(TimeStampedModel):
         return self.status == ProgramCourseEnrollmentStatuses.ACTIVE
 
     def __str__(self):
-        return '[ProgramCourseEnrollment id={}]'.format(self.id)
+        return f'[ProgramCourseEnrollment id={self.id}]'
 
     def __repr__(self):
         return (  # lint-amnesty, pylint: disable=missing-format-attribute
@@ -158,14 +157,14 @@ class CourseAccessRoleAssignment(TimeStampedModel):
 
     .. no_pii:
     """
-    class Meta(object):
+    class Meta:
         unique_together = ('role', 'enrollment')
 
     role = models.CharField(max_length=64, choices=ProgramCourseEnrollmentRoles.__MODEL_CHOICES__)
     enrollment = models.ForeignKey(ProgramCourseEnrollment, on_delete=models.CASCADE)
 
     def __str__(self):
-        return '[CourseAccessRoleAssignment id={}]'.format(self.id)
+        return f'[CourseAccessRoleAssignment id={self.id}]'
 
     def __repr__(self):
         return (  # lint-amnesty, pylint: disable=missing-format-attribute

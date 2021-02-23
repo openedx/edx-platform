@@ -32,13 +32,10 @@ class TestLongUsernameEmail(TestCase):  # lint-amnesty, pylint: disable=missing-
         response = self.client.post(self.url, self.url_params)
 
         # Status code should be 400.
-        self.assertEqual(response.status_code, 400)
+        assert response.status_code == 400
 
         obj = json.loads(response.content.decode('utf-8'))
-        self.assertEqual(
-            obj['username'][0]['user_message'],
-            USERNAME_BAD_LENGTH_MSG,
-        )
+        assert obj['username'][0]['user_message'] == USERNAME_BAD_LENGTH_MSG
 
     def test_spoffed_name(self):
         """
@@ -46,7 +43,7 @@ class TestLongUsernameEmail(TestCase):  # lint-amnesty, pylint: disable=missing-
         """
         self.url_params['name'] = '<p style="font-size:300px; color:green;"></br>Name<input type="text"></br>Content spoof'  # lint-amnesty, pylint: disable=line-too-long
         response = self.client.post(self.url, self.url_params)
-        self.assertEqual(response.status_code, 400)
+        assert response.status_code == 400
 
     def test_long_email(self):
         """
@@ -57,13 +54,10 @@ class TestLongUsernameEmail(TestCase):  # lint-amnesty, pylint: disable=missing-
         response = self.client.post(self.url, self.url_params)
 
         # Assert that we get error when email has more than 254 characters.
-        self.assertGreater(len(self.url_params['email']), 254)
+        assert len(self.url_params['email']) > 254
 
         # Status code should be 400.
-        self.assertEqual(response.status_code, 400)
+        assert response.status_code == 400
 
         obj = json.loads(response.content.decode('utf-8'))
-        self.assertEqual(
-            obj['email'][0]['user_message'],
-            "Email cannot be more than 254 characters long",
-        )
+        assert obj['email'][0]['user_message'] == 'Email cannot be more than 254 characters long'

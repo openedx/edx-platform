@@ -6,8 +6,6 @@ The following are currently implemented:
     2. LoginWithAccessTokenView:
        1st party (open-edx) OAuth 2.0 access token -> session cookie
 """
-import logging
-
 import django.contrib.auth as auth
 import social_django.utils as social_utils
 from django.conf import settings
@@ -27,24 +25,23 @@ from openedx.core.djangoapps.oauth_dispatch import adapters
 from openedx.core.djangoapps.oauth_dispatch.api import create_dot_access_token
 from openedx.core.lib.api.authentication import BearerAuthenticationAllowInactiveUser
 
-log = logging.getLogger(__name__)
-
 
 class AccessTokenExchangeBase(APIView):
     """
     View for token exchange from 3rd party OAuth access token to 1st party
     OAuth access token.
+
+    Note: This base class was originally created to support multiple libraries,
+        but we currently only support django-oauth-toolkit (DOT).
     """
-    @method_decorator(csrf_exempt)
+    # No CSRF protection is required because the provided 3rd party OAuth access
+    #  token is sufficient
+    authentication_classes = []
+    allowed_methods = ['POST']
+
     @method_decorator(social_utils.psa("social:complete"))
     def dispatch(self, *args, **kwargs):  # pylint: disable=arguments-differ
         return super(AccessTokenExchangeBase, self).dispatch(*args, **kwargs)  # lint-amnesty, pylint: disable=super-with-arguments
-
-    def get(self, request, _backend):
-        """
-        Pass through GET requests without the _backend
-        """
-        return super(AccessTokenExchangeBase, self).get(request)  # lint-amnesty, pylint: disable=no-member, super-with-arguments
 
     def post(self, request, _backend):
         """
@@ -53,13 +50,6 @@ class AccessTokenExchangeBase(APIView):
         form = AccessTokenExchangeForm(request=request, oauth2_adapter=self.oauth2_adapter, data=request.POST)  # lint-amnesty, pylint: disable=no-member
         if not form.is_valid():
             error_response = self.error_response(form.errors)  # pylint: disable=no-member
-            if error_response.status_code == 403:
-                log.info('message=login_filed_1, status="%d", user="%s" ,agent="%s", error_response"%s"',
-                         error_response.status_code,
-                         request.user,
-                         request.META.get('HTTP_USER_AGENT', ''),
-                         error_response.data
-                         )
             return error_response
 
         user = form.cleaned_data["user"]
@@ -72,9 +62,14 @@ class AccessTokenExchangeBase(APIView):
         Exchange third party credentials for an edx access token, and return a
         serialized access token response.
         """
-
         edx_access_token = self.create_access_token(request, user, scope, client)
         return self.access_token_response(edx_access_token)  # lint-amnesty, pylint: disable=no-member
+
+    def _get_invalid_request_response(self, description):
+        return Response(status=400, data={
+            'error': 'invalid_request',
+            'error_description': description,
+        })
 
 
 class DOTAccessTokenExchangeView(AccessTokenExchangeBase, DOTAccessTokenView):
@@ -85,12 +80,6 @@ class DOTAccessTokenExchangeView(AccessTokenExchangeBase, DOTAccessTokenView):
     """
 
     oauth2_adapter = adapters.DOTAdapter()
-
-    def get(self, request, _backend):
-        return Response(status=400, data={
-            'error': 'invalid_request',
-            'error_description': 'Only POST requests allowed.',
-        })
 
     def create_access_token(self, request, user, scopes, client):
         """

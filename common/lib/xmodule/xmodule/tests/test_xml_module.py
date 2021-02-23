@@ -131,8 +131,8 @@ class InheritingFieldDataTest(unittest.TestCase):
         Test that the Blocks with nothing set with return the fields' defaults.
         """
         block = self.get_a_block()
-        self.assertEqual(block.inherited, "the default")
-        self.assertEqual(block.not_inherited, "nothing")
+        assert block.inherited == 'the default'
+        assert block.not_inherited == 'nothing'
 
     def test_set_value(self):
         """
@@ -141,8 +141,8 @@ class InheritingFieldDataTest(unittest.TestCase):
         block = self.get_a_block()
         block.inherited = "Changed!"
         block.not_inherited = "New Value!"
-        self.assertEqual(block.inherited, "Changed!")
-        self.assertEqual(block.not_inherited, "New Value!")
+        assert block.inherited == 'Changed!'
+        assert block.not_inherited == 'New Value!'
 
     def test_inherited(self):
         """
@@ -150,11 +150,11 @@ class InheritingFieldDataTest(unittest.TestCase):
         """
         parent_block = self.get_a_block(usage_id=self.get_usage_id("course", "parent"))
         parent_block.inherited = "Changed!"
-        self.assertEqual(parent_block.inherited, "Changed!")
+        assert parent_block.inherited == 'Changed!'
 
         child = self.get_a_block(usage_id=self.get_usage_id("vertical", "child"))
         child.parent = parent_block.location
-        self.assertEqual(child.inherited, "Changed!")
+        assert child.inherited == 'Changed!'
 
     def test_inherited_across_generations(self):
         """
@@ -162,12 +162,12 @@ class InheritingFieldDataTest(unittest.TestCase):
         """
         parent = self.get_a_block(usage_id=self.get_usage_id("course", "parent"))
         parent.inherited = "Changed!"
-        self.assertEqual(parent.inherited, "Changed!")
+        assert parent.inherited == 'Changed!'
         for child_num in range(10):
             usage_id = self.get_usage_id("vertical", "child_{}".format(child_num))
             child = self.get_a_block(usage_id=usage_id)
             child.parent = parent.location
-            self.assertEqual(child.inherited, "Changed!")
+            assert child.inherited == 'Changed!'
 
     def test_not_inherited(self):
         """
@@ -175,11 +175,11 @@ class InheritingFieldDataTest(unittest.TestCase):
         """
         parent = self.get_a_block(usage_id=self.get_usage_id("course", "parent"))
         parent.not_inherited = "Changed!"
-        self.assertEqual(parent.not_inherited, "Changed!")
+        assert parent.not_inherited == 'Changed!'
 
         child = self.get_a_block(usage_id=self.get_usage_id("vertical", "child"))
         child.parent = parent.location
-        self.assertEqual(child.not_inherited, "nothing")
+        assert child.not_inherited == 'nothing'
 
     def test_non_defaults_inherited_across_lib(self):
         """
@@ -192,7 +192,7 @@ class InheritingFieldDataTest(unittest.TestCase):
             fields=dict(inherited="changed!"),
             defaults=dict(inherited="parent's default"),
         )
-        self.assertEqual(parent_block.inherited, "changed!")
+        assert parent_block.inherited == 'changed!'
 
         child = self.get_block_using_split_kvs(
             block_type="problem",
@@ -201,7 +201,7 @@ class InheritingFieldDataTest(unittest.TestCase):
             defaults={},
         )
         child.parent = parent_block.location
-        self.assertEqual(child.inherited, "changed!")
+        assert child.inherited == 'changed!'
 
     def test_defaults_not_inherited_across_lib(self):
         """
@@ -214,7 +214,7 @@ class InheritingFieldDataTest(unittest.TestCase):
             fields=dict(inherited="changed!"),
             defaults=dict(inherited="parent's default"),
         )
-        self.assertEqual(parent_block.inherited, "changed!")
+        assert parent_block.inherited == 'changed!'
 
         child = self.get_block_using_split_kvs(
             block_type="library_content",
@@ -223,7 +223,7 @@ class InheritingFieldDataTest(unittest.TestCase):
             defaults=dict(inherited="child's default"),
         )
         child.parent = parent_block.location
-        self.assertEqual(child.inherited, "child's default")
+        assert child.inherited == "child's default"
 
 
 class EditableMetadataFieldsTest(unittest.TestCase):
@@ -232,7 +232,7 @@ class EditableMetadataFieldsTest(unittest.TestCase):
         editable_fields = self.get_xml_editable_fields(DictFieldData({}))
         # Tests that the xblock fields (currently tags and name) get filtered out.
         # Also tests that xml_attributes is filtered out of XmlDescriptor.
-        self.assertEqual(1, len(editable_fields), editable_fields)
+        assert 1 == len(editable_fields), editable_fields
         self.assert_field_values(
             editable_fields, 'display_name', XModuleMixin.display_name,
             explicitly_set=False, value=None, default_value=None
@@ -249,7 +249,7 @@ class EditableMetadataFieldsTest(unittest.TestCase):
     def test_integer_field(self):
         descriptor = self.get_descriptor(DictFieldData({'max_attempts': '7'}))
         editable_fields = descriptor.editable_metadata_fields
-        self.assertEqual(8, len(editable_fields))
+        assert 8 == len(editable_fields)
         self.assert_field_values(
             editable_fields, 'max_attempts', TestFields.max_attempts,
             explicitly_set=True, value=7, default_value=1000, type='Integer',
@@ -355,17 +355,17 @@ class EditableMetadataFieldsTest(unittest.TestCase):
                             type='Generic', options=[]):  # lint-amnesty, pylint: disable=redefined-builtin
         test_field = editable_fields[name]
 
-        self.assertEqual(field.name, test_field['field_name'])
-        self.assertEqual(field.display_name, test_field['display_name'])
-        self.assertEqual(field.help, test_field['help'])
+        assert field.name == test_field['field_name']
+        assert field.display_name == test_field['display_name']
+        assert field.help == test_field['help']
 
-        self.assertEqual(field.to_json(value), test_field['value'])
-        self.assertEqual(field.to_json(default_value), test_field['default_value'])
+        assert field.to_json(value) == test_field['value']
+        assert field.to_json(default_value) == test_field['default_value']
 
-        self.assertEqual(options, test_field['options'])
-        self.assertEqual(type, test_field['type'])
+        assert options == test_field['options']
+        assert type == test_field['type']
 
-        self.assertEqual(explicitly_set, test_field['explicitly_set'])
+        assert explicitly_set == test_field['explicitly_set']
 
 
 class TestSerialize(unittest.TestCase):

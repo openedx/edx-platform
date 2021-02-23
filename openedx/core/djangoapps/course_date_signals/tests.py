@@ -28,7 +28,7 @@ class SelfPacedDueDatesTests(ModuleStoreTestCase):  # lint-amnesty, pylint: disa
         with patch.object(utils, 'get_expected_duration', return_value=timedelta(weeks=4)):
             actual = [(idx, section.display_name, offset) for (idx, section, offset) in utils.spaced_out_sections(self.course)]  # lint-amnesty, pylint: disable=line-too-long
 
-        self.assertEqual(actual, expected_sections)
+        assert actual == expected_sections
 
     def test_hidden_sections(self):
         for _ in range(2):
@@ -42,7 +42,7 @@ class SelfPacedDueDatesTests(ModuleStoreTestCase):  # lint-amnesty, pylint: disa
         with patch.object(utils, 'get_expected_duration', return_value=timedelta(weeks=4)):
             actual = [(idx, section.display_name, offset) for (idx, section, offset) in utils.spaced_out_sections(self.course)]  # lint-amnesty, pylint: disable=line-too-long
 
-        self.assertEqual(actual, expected_sections)
+        assert actual == expected_sections
 
     def test_dates_for_ungraded_assignments(self):
         """
@@ -53,7 +53,7 @@ class SelfPacedDueDatesTests(ModuleStoreTestCase):  # lint-amnesty, pylint: disa
             sequence = ItemFactory(parent=self.course, category="sequential")
             vertical = ItemFactory(parent=sequence, category="vertical")
             sequence = modulestore().get_item(sequence.location)
-            self.assertEqual(_has_assignment_blocks(sequence), False)
+            assert _has_assignment_blocks(sequence) is False
 
             # Ungraded problems do not count as assignment blocks
             ItemFactory.create(
@@ -63,7 +63,7 @@ class SelfPacedDueDatesTests(ModuleStoreTestCase):  # lint-amnesty, pylint: disa
                 weight=0,
             )
             sequence = modulestore().get_item(sequence.location)
-            self.assertEqual(_has_assignment_blocks(sequence), False)
+            assert _has_assignment_blocks(sequence) is False
             ItemFactory.create(
                 parent=vertical,
                 category='problem',
@@ -71,7 +71,7 @@ class SelfPacedDueDatesTests(ModuleStoreTestCase):  # lint-amnesty, pylint: disa
                 weight=1,
             )
             sequence = modulestore().get_item(sequence.location)
-            self.assertEqual(_has_assignment_blocks(sequence), False)
+            assert _has_assignment_blocks(sequence) is False
 
             # Method will return true after adding a graded, scored assignment block
             ItemFactory.create(
@@ -81,7 +81,7 @@ class SelfPacedDueDatesTests(ModuleStoreTestCase):  # lint-amnesty, pylint: disa
                 weight=1,
             )
             sequence = modulestore().get_item(sequence.location)
-            self.assertEqual(_has_assignment_blocks(sequence), True)
+            assert _has_assignment_blocks(sequence) is True
 
     def test_sequence_with_graded_and_ungraded_assignments(self):
         """

@@ -9,19 +9,18 @@ import json
 import os
 import shutil
 from tempfile import mkdtemp
+from unittest.mock import Mock, patch
 from uuid import uuid4
 
-import six
 import unicodecsv
 from celery.states import FAILURE, SUCCESS
 from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.urls import reverse
-from mock import Mock, patch
 from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locations import Location
-from six import text_type
 
 from capa.tests.response_xml_factory import OptionResponseXMLFactory
+from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
 from lms.djangoapps.courseware.model_data import StudentModule
 from lms.djangoapps.courseware.tests.tests import LoginEnrollmentTestCase
 from lms.djangoapps.instructor_task.api_helper import encode_problem_and_student_input
@@ -30,7 +29,6 @@ from lms.djangoapps.instructor_task.tests.factories import InstructorTaskFactory
 from lms.djangoapps.instructor_task.views import instructor_task_status
 from openedx.core.djangolib.testing.utils import CacheIsolationTestCase
 from openedx.core.lib.url_utils import quote_slashes
-from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
@@ -55,7 +53,7 @@ class InstructorTaskTestCase(CacheIsolationTestCase):
     Tests API and view methods that involve the reporting of status for background tasks.
     """
     def setUp(self):
-        super(InstructorTaskTestCase, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
 
         self.student = UserFactory.create(username="student", email="student@edx.org")
         self.instructor = UserFactory.create(username="instructor", email="instructor@edx.org")
@@ -155,7 +153,7 @@ class InstructorTaskCourseTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase)
     @staticmethod
     def get_user_email(username):
         """Generate email address based on username"""
-        return u'{0}@test.com'.format(username)
+        return f'{username}@test.com'
 
     def login_username(self, username):
         """Login the user, given the `username`."""
@@ -222,7 +220,7 @@ class InstructorTaskModuleTestCase(InstructorTaskCourseTestCase):
         Returns the factory args for the option problem type.
         """
         return {
-            'question_text': u'The correct answer is {0}'.format(correct_answer),
+            'question_text': f'The correct answer is {correct_answer}',
             'options': [OPTION_1, OPTION_2],
             'correct_option': correct_answer,
             'num_responses': num_responses,
@@ -275,9 +273,9 @@ class InstructorTaskModuleTestCase(InstructorTaskCourseTestCase):
             # URL, modified so that it can be easily stored in html, prepended with "input-" and
             # appended with a sequence identifier for the particular response the input goes to.
             course_key = self.course.id
-            return u'input_i4x-{0}-{1}-problem-{2}_{3}'.format(
-                course_key.org.replace(u'.', u'_'),
-                course_key.course.replace(u'.', u'_'),
+            return 'input_i4x-{}-{}-problem-{}_{}'.format(
+                course_key.org.replace('.', '_'),
+                course_key.course.replace('.', '_'),
                 problem_url_name,
                 response_id
             )
@@ -287,9 +285,9 @@ class InstructorTaskModuleTestCase(InstructorTaskCourseTestCase):
         self.login_username(username)
         # make ajax call:
         modx_url = reverse('xblock_handler', kwargs={
-            'course_id': text_type(self.course.id),
+            'course_id': str(self.course.id),
             'usage_id': quote_slashes(
-                text_type(InstructorTaskModuleTestCase.problem_location(problem_url_name, self.course.id))
+                str(InstructorTaskModuleTestCase.problem_location(problem_url_name, self.course.id))
             ),
             'handler': 'xmodule_handler',
             'suffix': 'problem_check',
@@ -297,12 +295,12 @@ class InstructorTaskModuleTestCase(InstructorTaskCourseTestCase):
 
         # assign correct identifier to each response.
         resp = self.client.post(modx_url, {
-            get_input_id(u'{}_1').format(index): response for index, response in enumerate(responses, 2)
+            get_input_id('{}_1').format(index): response for index, response in enumerate(responses, 2)
         })
         return resp
 
 
-class TestReportMixin(object):
+class TestReportMixin:
     """
     Cleans up after tests that place files in the reports directory.
     """
@@ -314,7 +312,7 @@ class TestReportMixin(object):
             if os.path.exists(self.tmp_dir):
                 shutil.rmtree(self.tmp_dir)
 
-        super(TestReportMixin, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
 
         # Ensure that working with the temp directories in tests is thread safe
         # by creating a unique temporary directory for each testcase.
@@ -367,11 +365,11 @@ class TestReportMixin(object):
             numeric_expected_rows = [self._extract_and_round_numeric_items(row) for row in expected_rows]
 
             if verify_order:
-                self.assertEqual(csv_rows, expected_rows)
-                self.assertEqual(numeric_csv_rows, numeric_expected_rows)
+                assert csv_rows == expected_rows
+                assert numeric_csv_rows == numeric_expected_rows
             else:
-                six.assertCountEqual(self, csv_rows, expected_rows)
-                six.assertCountEqual(self, numeric_csv_rows, numeric_expected_rows)
+                self.assertCountEqual(csv_rows, expected_rows)
+                self.assertCountEqual(numeric_csv_rows, numeric_expected_rows)
 
     @staticmethod
     def _extract_and_round_numeric_items(dictionary):

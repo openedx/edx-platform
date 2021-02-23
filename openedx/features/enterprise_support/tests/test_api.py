@@ -1,11 +1,10 @@
 """
 Test the enterprise support APIs.
 """
-
-
 import ddt
 import httpretty
 import mock
+import pytest
 from consent.models import DataSharingConsent
 from django.conf import settings
 from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
@@ -14,20 +13,23 @@ from django.http import HttpResponseRedirect
 from django.test.utils import override_settings
 from django.urls import reverse
 from edx_django_utils.cache import get_cache_key
+from enterprise.models import EnterpriseCustomerUser  # lint-amnesty, pylint: disable=wrong-import-order
 from six.moves.urllib.parse import parse_qs
 from slumber.exceptions import HttpClientError
 
+from common.djangoapps.student.tests.factories import UserFactory
 from openedx.core.djangoapps.site_configuration.tests.factories import SiteFactory
 from openedx.core.djangolib.testing.utils import CacheIsolationTestCase, skip_unless_lms
 from openedx.features.enterprise_support.api import (
+    activate_learner_enterprise,
     _CACHE_MISS,
     ENTERPRISE_CUSTOMER_KEY_NAME,
-    EnterpriseApiException,
-    add_enterprise_customer_to_session,
     ConsentApiClient,
     ConsentApiServiceClient,
     EnterpriseApiClient,
+    EnterpriseApiException,
     EnterpriseApiServiceClient,
+    add_enterprise_customer_to_session,
     consent_needed_for_course,
     data_sharing_consent_required,
     enterprise_customer_for_request,
@@ -42,18 +44,15 @@ from openedx.features.enterprise_support.api import (
     get_enterprise_learner_data_from_db,
     get_enterprise_learner_portal_enabled_message,
     insert_enterprise_pipeline_elements,
-    unlink_enterprise_user_from_idp,
+    unlink_enterprise_user_from_idp
 )
 from openedx.features.enterprise_support.tests import FEATURES_WITH_ENTERPRISE_ENABLED
 from openedx.features.enterprise_support.tests.factories import (
     EnterpriseCustomerIdentityProviderFactory,
-    EnterpriseCustomerUserFactory,
+    EnterpriseCustomerUserFactory
 )
 from openedx.features.enterprise_support.tests.mixins.enterprise import EnterpriseServiceMockMixin
 from openedx.features.enterprise_support.utils import clear_data_consent_share_cache
-from common.djangoapps.student.tests.factories import UserFactory
-
-from enterprise.models import EnterpriseCustomerUser  # lint-amnesty, pylint: disable=wrong-import-order
 
 
 class MockEnrollment(mock.MagicMock):
@@ -94,7 +93,7 @@ class TestEnterpriseApi(EnterpriseServiceMockMixin, CacheIsolationTestCase):
 
         mocked_jwt_builder.assert_called_once_with(enterprise_service_user)
         # pylint: disable=protected-access
-        self.assertEqual(enterprise_api_service_client.client._store['session'].auth.token, 'test-token')
+        assert enterprise_api_service_client.client._store['session'].auth.token == 'test-token'
 
     def _assert_api_client_with_user(self, api_client, mocked_jwt_builder):
         """
@@ -111,7 +110,7 @@ class TestEnterpriseApi(EnterpriseServiceMockMixin, CacheIsolationTestCase):
 
         mocked_jwt_builder.assert_called_once_with(dummy_enterprise_user)
         # pylint: disable=protected-access
-        self.assertEqual(enterprise_api_service_client.client._store['session'].auth.token, 'test-token')
+        assert enterprise_api_service_client.client._store['session'].auth.token == 'test-token'
         return enterprise_api_service_client
 
     def _assert_get_enterprise_customer(self, api_client, enterprise_api_data_for_mock):
@@ -131,12 +130,12 @@ class TestEnterpriseApi(EnterpriseServiceMockMixin, CacheIsolationTestCase):
         DRY method to verify that get enterprise customer response is cached.
         """
         cached_enterprise_customer = cache.get(cache_key)
-        self.assertIsNone(cached_enterprise_customer)
+        assert cached_enterprise_customer is None
 
         enterprise_customer = api_client.get_enterprise_customer(enterprise_customer_data['uuid'])
-        self.assertEqual(enterprise_customer_data, enterprise_customer)
+        assert enterprise_customer_data == enterprise_customer
         cached_enterprise_customer = cache.get(cache_key)
-        self.assertEqual(cached_enterprise_customer, enterprise_customer)
+        assert cached_enterprise_customer == enterprise_customer
 
     @httpretty.activate
     @mock.patch('openedx.features.enterprise_support.api.create_jwt_for_user')
@@ -187,7 +186,7 @@ class TestEnterpriseApi(EnterpriseServiceMockMixin, CacheIsolationTestCase):
         consent_granted = True
 
         if should_raise_http_error:
-            with self.assertRaises(EnterpriseApiException):
+            with pytest.raises(EnterpriseApiException):
                 api_client.post_enterprise_course_enrollment(username, course_id, consent_granted)
         else:
             api_client.post_enterprise_course_enrollment(username, course_id, consent_granted)
@@ -205,8 +204,8 @@ class TestEnterpriseApi(EnterpriseServiceMockMixin, CacheIsolationTestCase):
         mock_request = mock.Mock()
 
         actual_result = enterprise_customer_from_api(mock_request)
-        self.assertIsNone(actual_result)
-        self.assertFalse(mock_client_class.called)
+        assert actual_result is None
+        assert not mock_client_class.called
 
     @httpretty.activate
     @mock.patch('openedx.features.enterprise_support.api.create_jwt_for_user')
@@ -255,26 +254,26 @@ class TestEnterpriseApi(EnterpriseServiceMockMixin, CacheIsolationTestCase):
 
         # test that consent is not required for a non-enterprise customer
         self.mock_consent_not_required(user.username, course_id, ec_uuid)
-        self.assertFalse(consent_needed_for_course(request, user, course_id))
+        assert not consent_needed_for_course(request, user, course_id)
 
         # test required and missing consent for example now he becomes a enterprise customer
         self.mock_consent_missing(user.username, course_id, ec_uuid)
         # still result should be False as it has been stored in cache "Not to show consent", so it will confirm that
         # cache is working fine
-        self.assertFalse(consent_needed_for_course(request, user, course_id))
+        assert not consent_needed_for_course(request, user, course_id)
         # Removing cache
         clear_data_consent_share_cache(user.id, course_id)
         # Now test again
-        self.assertTrue(consent_needed_for_course(request, user, course_id))
+        assert consent_needed_for_course(request, user, course_id)
 
         # test after consent permission is granted
         self.mock_consent_get(user.username, course_id, ec_uuid)
-        self.assertFalse(consent_needed_for_course(request, user, course_id))
+        assert not consent_needed_for_course(request, user, course_id)
 
         # test when the enrollment already exists without a consent record existing.
         clear_data_consent_share_cache(user.id, course_id)
         self.mock_consent_missing(user.username, course_id, ec_uuid)
-        self.assertFalse(consent_needed_for_course(request, user, course_id, enrollment_exists=True))
+        assert not consent_needed_for_course(request, user, course_id, enrollment_exists=True)
 
     @httpretty.activate
     @mock.patch('openedx.features.enterprise_support.api.get_enterprise_learner_data_from_db')
@@ -294,7 +293,7 @@ class TestEnterpriseApi(EnterpriseServiceMockMixin, CacheIsolationTestCase):
 
         # test that consent is not required for a non-enterprise customer
         self.mock_consent_not_required(user.username, course_id, ec_uuid)
-        self.assertFalse(consent_needed_for_course(request, user, course_id))
+        assert not consent_needed_for_course(request, user, course_id)
 
     @httpretty.activate
     @mock.patch('enterprise.models.EnterpriseCustomer.catalog_contains_course')
@@ -312,13 +311,13 @@ class TestEnterpriseApi(EnterpriseServiceMockMixin, CacheIsolationTestCase):
         )
         data_sharing_consent.save()
         consent_required = get_consent_required_courses(user, [course_id])
-        self.assertIn(course_id, consent_required)
+        assert course_id in consent_required
 
         # now grant consent and call our method again
         data_sharing_consent.granted = True
         data_sharing_consent.save()
         consent_required = get_consent_required_courses(user, [course_id])
-        self.assertNotIn(course_id, consent_required)
+        assert course_id not in consent_required
 
     def test_consent_not_required_for_non_enterprise_user(self):
         user = UserFactory()
@@ -335,9 +334,9 @@ class TestEnterpriseApi(EnterpriseServiceMockMixin, CacheIsolationTestCase):
         mock_endpoint = getattr(api_client.client, 'enterprise-learner')
 
         user = mock.Mock(is_authenticated=False)
-        self.assertIsNone(api_client.fetch_enterprise_learner_data(user))
+        assert api_client.fetch_enterprise_learner_data(user) is None
 
-        self.assertFalse(mock_endpoint.called)
+        assert not mock_endpoint.called
 
     @mock.patch('openedx.features.enterprise_support.api.create_jwt_for_user')
     def test_fetch_enterprise_learner_data(self, mock_jwt_builder):
@@ -364,7 +363,7 @@ class TestEnterpriseApi(EnterpriseServiceMockMixin, CacheIsolationTestCase):
 
         user = mock.Mock(is_authenticated=True, username='spongebob')
 
-        self.assertIsNone(api_client.fetch_enterprise_learner_data(user))
+        assert api_client.fetch_enterprise_learner_data(user) is None
 
         mock_endpoint.return_value.get.assert_called_once_with(username=user.username)
 
@@ -381,6 +380,17 @@ class TestEnterpriseApi(EnterpriseServiceMockMixin, CacheIsolationTestCase):
         assert 'the-learner-data' == learner_data
         mock_api_client_class.assert_called_once_with(user=user)
         mock_client.fetch_enterprise_learner_data.assert_called_once_with(user)
+
+    def test_activate_learner_enterprise(self):
+        """
+        Test enterprise is activated successfully for user
+        """
+        request_mock = mock.MagicMock(session={}, user=self.user)
+        enterprise_customer_user = EnterpriseCustomerUserFactory(user_id=self.user.id)
+        enterprise_customer_uuid = enterprise_customer_user.enterprise_customer.uuid
+
+        activate_learner_enterprise(request_mock, self.user, enterprise_customer_uuid)
+        assert request_mock.session['enterprise_customer']['uuid'] == str(enterprise_customer_uuid)
 
     def test_get_enterprise_learner_data_from_db_no_data(self):
         assert [] == get_enterprise_learner_data_from_db(self.user)
@@ -418,7 +428,7 @@ class TestEnterpriseApi(EnterpriseServiceMockMixin, CacheIsolationTestCase):
         # expected enterprise customer against the requesting user.
         self.mock_get_enterprise_customer('real-ent-uuid', {'real': 'enterprisecustomer'}, 200)
         enterprise_customer = enterprise_customer_for_request(dummy_request)
-        self.assertEqual(enterprise_customer, {'real': 'enterprisecustomer'})
+        assert enterprise_customer == {'real': 'enterprisecustomer'}
 
         httpretty.reset()
 
@@ -427,7 +437,7 @@ class TestEnterpriseApi(EnterpriseServiceMockMixin, CacheIsolationTestCase):
         del dummy_request.session['enterprise_customer']
         self.mock_get_enterprise_customer('real-ent-uuid', {'detail': 'Not found.'}, 404)
         enterprise_customer = enterprise_customer_for_request(dummy_request)
-        self.assertIsNone(enterprise_customer)
+        assert enterprise_customer is None
 
         httpretty.reset()
 
@@ -443,7 +453,7 @@ class TestEnterpriseApi(EnterpriseServiceMockMixin, CacheIsolationTestCase):
             user=self.user
         )
         enterprise_customer = enterprise_customer_for_request(mock_request)
-        self.assertEqual(enterprise_customer, {'real': 'enterprisecustomer'})
+        assert enterprise_customer == {'real': 'enterprisecustomer'}
 
         # Verify that the method `enterprise_customer_for_request` returns
         # expected enterprise customer against the requesting user even if
@@ -456,7 +466,7 @@ class TestEnterpriseApi(EnterpriseServiceMockMixin, CacheIsolationTestCase):
             user=self.user
         )
         enterprise_customer = enterprise_customer_for_request(mock_request)
-        self.assertEqual(enterprise_customer, {'real': 'enterprisecustomer'})
+        assert enterprise_customer == {'real': 'enterprisecustomer'}
 
         # Verify that the method `enterprise_customer_for_request` returns
         # expected enterprise customer against the requesting user if
@@ -470,7 +480,7 @@ class TestEnterpriseApi(EnterpriseServiceMockMixin, CacheIsolationTestCase):
             user=self.user
         )
         enterprise_customer = enterprise_customer_for_request(mock_request)
-        self.assertEqual(enterprise_customer, {'real': 'enterprisecustomer'})
+        assert enterprise_customer == {'real': 'enterprisecustomer'}
 
         # Verify that we can still get enterprise customer from enterprise
         # learner API even if we are unable to get it from preferred sources,
@@ -485,7 +495,7 @@ class TestEnterpriseApi(EnterpriseServiceMockMixin, CacheIsolationTestCase):
             site=1
         )
         enterprise_customer = enterprise_customer_for_request(mock_request)
-        self.assertEqual(enterprise_customer, {'real': 'enterprisecustomer'})
+        assert enterprise_customer == {'real': 'enterprisecustomer'}
 
     def test_enterprise_customer_for_request_with_session(self):
         """
@@ -499,10 +509,10 @@ class TestEnterpriseApi(EnterpriseServiceMockMixin, CacheIsolationTestCase):
                 'openedx.features.enterprise_support.api.enterprise_customer_from_api',
                 return_value=enterprise_data
         ):
-            self.assertEqual(dummy_request.session.get('enterprise_customer'), None)
+            assert dummy_request.session.get('enterprise_customer') is None
             enterprise_customer = enterprise_customer_for_request(dummy_request)
-            self.assertEqual(enterprise_customer, enterprise_data)
-            self.assertEqual(dummy_request.session.get('enterprise_customer'), enterprise_data)
+            assert enterprise_customer == enterprise_data
+            assert dummy_request.session.get('enterprise_customer') == enterprise_data
 
         # Verify enterprise customer data fetched from session for subsequent calls
         with mock.patch(
@@ -513,9 +523,9 @@ class TestEnterpriseApi(EnterpriseServiceMockMixin, CacheIsolationTestCase):
                 return_value=enterprise_data
         ) as mock_enterprise_customer_from_session:
             enterprise_customer = enterprise_customer_for_request(dummy_request)
-            self.assertEqual(enterprise_customer, enterprise_data)
-            self.assertEqual(mock_enterprise_customer_from_api.called, False)
-            self.assertEqual(mock_enterprise_customer_from_session.called, True)
+            assert enterprise_customer == enterprise_data
+            assert mock_enterprise_customer_from_api.called is False
+            assert mock_enterprise_customer_from_session.called is True
 
         # Verify enterprise customer data fetched from session for subsequent calls
         # with unauthenticated user in SAML case
@@ -529,9 +539,9 @@ class TestEnterpriseApi(EnterpriseServiceMockMixin, CacheIsolationTestCase):
             return_value=enterprise_data
         ) as mock_enterprise_customer_from_session:
             enterprise_customer = enterprise_customer_for_request(dummy_request)
-            self.assertEqual(enterprise_customer, enterprise_data)
-            self.assertEqual(mock_enterprise_customer_from_api.called, False)
-            self.assertEqual(mock_enterprise_customer_from_session.called, True)
+            assert enterprise_customer == enterprise_data
+            assert mock_enterprise_customer_from_api.called is False
+            assert mock_enterprise_customer_from_session.called is True
 
     def check_data_sharing_consent(self, consent_required=False, consent_url=None):
         """
@@ -554,12 +564,12 @@ class TestEnterpriseApi(EnterpriseServiceMockMixin, CacheIsolationTestCase):
         # If consent required, then the response should be a redirect to the consent URL, and the view function would
         # not be called.
         if consent_required:
-            self.assertIsInstance(response, HttpResponseRedirect)
-            self.assertEqual(response.url, consent_url)  # pylint: disable=no-member
+            assert isinstance(response, HttpResponseRedirect)
+            assert response.url == consent_url  # pylint: disable=no-member
 
         # Otherwise, the view function should have been called with the expected arguments.
         else:
-            self.assertEqual(response, (args, kwargs))
+            assert response == (args, kwargs)
 
     @mock.patch('openedx.features.enterprise_support.api.enterprise_enabled')
     @mock.patch('openedx.features.enterprise_support.api.consent_needed_for_course')
@@ -654,7 +664,7 @@ class TestEnterpriseApi(EnterpriseServiceMockMixin, CacheIsolationTestCase):
 
         actual_url = get_enterprise_consent_url(request_mock, course_id, return_to=return_to)
         actual_url_args = parse_qs(actual_url.split('/enterprise/grant_data_sharing_permissions?')[1])
-        self.assertEqual(actual_url_args, expected_url_args)
+        assert actual_url_args == expected_url_args
 
     @ddt.data(
         (False, {'real': 'enterprise', 'uuid': ''}, 'course', [], [], "", ""),
@@ -734,13 +744,13 @@ class TestEnterpriseApi(EnterpriseServiceMockMixin, CacheIsolationTestCase):
         )
 
         if notification_message and notification_title:
-            self.assertIn(notification_title, notification_string)
-            self.assertIn(notification_message, notification_string)
+            assert notification_title in notification_string
+            assert notification_message in notification_string
         elif expected_substrings:
             for substr in expected_substrings:
-                self.assertIn(substr, notification_string)
+                assert substr in notification_string
         else:
-            self.assertEqual(notification_string, '')
+            assert notification_string == ''
 
     @override_settings(FEATURES=dict(ENABLE_ENTERPRISE_INTEGRATION=False))
     def test_utils_with_enterprise_disabled(self):
@@ -748,21 +758,22 @@ class TestEnterpriseApi(EnterpriseServiceMockMixin, CacheIsolationTestCase):
         Test that disabling the enterprise integration flag causes
         the utilities to return the expected default values.
         """
-        self.assertFalse(enterprise_enabled())
-        self.assertEqual(insert_enterprise_pipeline_elements(None), None)
+        assert not enterprise_enabled()
+        assert insert_enterprise_pipeline_elements(None) is None
 
     def test_utils_with_enterprise_enabled(self):
         """
         Test that enabling enterprise integration (which is currently on by default) causes the
         the utilities to return the expected values.
         """
-        self.assertTrue(enterprise_enabled())
+        assert enterprise_enabled()
         pipeline = ['abc', 'social_core.pipeline.social_auth.load_extra_data', 'def']
         insert_enterprise_pipeline_elements(pipeline)
-        self.assertEqual(pipeline, ['abc',
-                                    'enterprise.tpa_pipeline.handle_enterprise_logistration',
-                                    'social_core.pipeline.social_auth.load_extra_data',
-                                    'def'])
+        assert pipeline == \
+               [
+                   'abc', 'enterprise.tpa_pipeline.handle_enterprise_logistration',
+                   'social_core.pipeline.social_auth.load_extra_data', 'def'
+               ]
 
     @mock.patch('openedx.features.enterprise_support.api.get_enterprise_learner_data_from_db')
     def test_enterprise_learner_portal_message_cache_miss_no_customer(self, mock_learner_data_from_db):
@@ -775,7 +786,7 @@ class TestEnterpriseApi(EnterpriseServiceMockMixin, CacheIsolationTestCase):
         mock_learner_data_from_db.return_value = None
 
         actual_result = get_enterprise_learner_portal_enabled_message(mock_request)
-        self.assertIsNone(actual_result)
+        assert actual_result is None
         mock_learner_data_from_db.assert_called_once_with(mock_request.user)
 
     @mock.patch('openedx.features.enterprise_support.api.get_enterprise_learner_data_from_db')
@@ -800,8 +811,8 @@ class TestEnterpriseApi(EnterpriseServiceMockMixin, CacheIsolationTestCase):
         ]
 
         actual_result = get_enterprise_learner_portal_enabled_message(mock_request)
-        self.assertIn('custom dashboard for learning', actual_result)
-        self.assertIn('Best Corp', actual_result)
+        assert 'custom dashboard for learning' in actual_result
+        assert 'Best Corp' in actual_result
         mock_learner_data_from_db.assert_called_once_with(mock_request.user)
         # assert we cached the enterprise customer data in the request session after fetching it
         assert mock_request.session.get(ENTERPRISE_CUSTOMER_KEY_NAME) == mock_enterprise_customer
@@ -817,8 +828,8 @@ class TestEnterpriseApi(EnterpriseServiceMockMixin, CacheIsolationTestCase):
         })
 
         actual_result = get_enterprise_learner_portal_enabled_message(mock_request)
-        self.assertIsNone(actual_result)
-        self.assertFalse(mock_learner_data_from_db.called)
+        assert actual_result is None
+        assert not mock_learner_data_from_db.called
 
     @ddt.data(True, False)
     @mock.patch('openedx.features.enterprise_support.api.get_enterprise_learner_data_from_db')
@@ -843,11 +854,11 @@ class TestEnterpriseApi(EnterpriseServiceMockMixin, CacheIsolationTestCase):
 
         actual_result = get_enterprise_learner_portal_enabled_message(mock_request)
         if not enable_learner_portal:
-            self.assertIsNone(actual_result)
+            assert actual_result is None
         else:
-            self.assertIn('custom dashboard for learning', actual_result)
-            self.assertIn('Best Corp', actual_result)
-            self.assertFalse(mock_learner_data_from_db.called)
+            assert 'custom dashboard for learning' in actual_result
+            assert 'Best Corp' in actual_result
+            assert not mock_learner_data_from_db.called
 
     @mock.patch('openedx.features.enterprise_support.api.get_partial_pipeline', return_value=None)
     def test_customer_uuid_for_request_sso_provider_id_customer_exists(self, mock_partial_pipeline):
@@ -862,9 +873,9 @@ class TestEnterpriseApi(EnterpriseServiceMockMixin, CacheIsolationTestCase):
         actual_uuid = enterprise_customer_uuid_for_request(mock_request)
 
         expected_uuid = mock_customer.uuid
-        self.assertEqual(expected_uuid, actual_uuid)
+        assert expected_uuid == actual_uuid
         mock_partial_pipeline.assert_called_once_with(mock_request)
-        self.assertNotIn(ENTERPRISE_CUSTOMER_KEY_NAME, mock_request.session)
+        assert ENTERPRISE_CUSTOMER_KEY_NAME not in mock_request.session
 
     @mock.patch('openedx.features.enterprise_support.api.get_enterprise_learner_data_from_db')
     @mock.patch('openedx.features.enterprise_support.api.get_partial_pipeline', return_value=None)
@@ -885,9 +896,9 @@ class TestEnterpriseApi(EnterpriseServiceMockMixin, CacheIsolationTestCase):
 
         actual_uuid = enterprise_customer_uuid_for_request(mock_request)
 
-        self.assertEqual(actual_uuid, enterprise_customer_uuid)
+        assert actual_uuid == enterprise_customer_uuid
         mock_partial_pipeline.assert_called_once_with(mock_request)
-        self.assertIn(ENTERPRISE_CUSTOMER_KEY_NAME, mock_request.session)
+        assert ENTERPRISE_CUSTOMER_KEY_NAME in mock_request.session
 
     @mock.patch('openedx.features.enterprise_support.api.get_partial_pipeline', return_value=None)
     def test_enterprise_uuid_for_request_from_query_params(self, mock_partial_pipeline):
@@ -900,9 +911,9 @@ class TestEnterpriseApi(EnterpriseServiceMockMixin, CacheIsolationTestCase):
 
         actual_uuid = enterprise_customer_uuid_for_request(mock_request)
 
-        self.assertEqual(expected_uuid, actual_uuid)
+        assert expected_uuid == actual_uuid
         mock_partial_pipeline.assert_called_once_with(mock_request)
-        self.assertNotIn(ENTERPRISE_CUSTOMER_KEY_NAME, mock_request.session)
+        assert ENTERPRISE_CUSTOMER_KEY_NAME not in mock_request.session
 
     @mock.patch('openedx.features.enterprise_support.api.get_partial_pipeline', return_value=None)
     def test_enterprise_uuid_for_request_from_cookies(self, mock_partial_pipeline):
@@ -915,9 +926,9 @@ class TestEnterpriseApi(EnterpriseServiceMockMixin, CacheIsolationTestCase):
 
         actual_uuid = enterprise_customer_uuid_for_request(mock_request)
 
-        self.assertEqual(expected_uuid, actual_uuid)
+        assert expected_uuid == actual_uuid
         mock_partial_pipeline.assert_called_once_with(mock_request)
-        self.assertNotIn(ENTERPRISE_CUSTOMER_KEY_NAME, mock_request.session)
+        assert ENTERPRISE_CUSTOMER_KEY_NAME not in mock_request.session
 
     @mock.patch('openedx.features.enterprise_support.api.get_partial_pipeline', return_value=None)
     def test_enterprise_uuid_for_request_from_session(self, mock_partial_pipeline):
@@ -930,9 +941,9 @@ class TestEnterpriseApi(EnterpriseServiceMockMixin, CacheIsolationTestCase):
 
         actual_uuid = enterprise_customer_uuid_for_request(mock_request)
 
-        self.assertEqual(expected_uuid, actual_uuid)
+        assert expected_uuid == actual_uuid
         mock_partial_pipeline.assert_called_once_with(mock_request)
-        self.assertEqual({'uuid': expected_uuid}, mock_request.session.get(ENTERPRISE_CUSTOMER_KEY_NAME))
+        assert {'uuid': expected_uuid} == mock_request.session.get(ENTERPRISE_CUSTOMER_KEY_NAME)
 
     @mock.patch('openedx.features.enterprise_support.api.get_enterprise_learner_data_from_db')
     @mock.patch('openedx.features.enterprise_support.api.get_partial_pipeline', return_value=None)
@@ -949,10 +960,10 @@ class TestEnterpriseApi(EnterpriseServiceMockMixin, CacheIsolationTestCase):
         actual_uuid = enterprise_customer_uuid_for_request(mock_request)
 
         expected_uuid = 'my-uuid'
-        self.assertEqual(expected_uuid, actual_uuid)
+        assert expected_uuid == actual_uuid
         mock_partial_pipeline.assert_called_once_with(mock_request)
         mock_data_from_db.assert_called_once_with(mock_request.user)
-        self.assertEqual({'uuid': 'my-uuid'}, mock_request.session[ENTERPRISE_CUSTOMER_KEY_NAME])
+        assert {'uuid': 'my-uuid'} == mock_request.session[ENTERPRISE_CUSTOMER_KEY_NAME]
 
     @ddt.data(True, False)
     @mock.patch('openedx.features.enterprise_support.api.get_enterprise_learner_data_from_db', return_value=None)
@@ -972,15 +983,15 @@ class TestEnterpriseApi(EnterpriseServiceMockMixin, CacheIsolationTestCase):
 
         actual_uuid = enterprise_customer_uuid_for_request(mock_request)
 
-        self.assertIsNone(actual_uuid)
+        assert actual_uuid is None
         mock_partial_pipeline.assert_called_once_with(mock_request)
 
         if is_user_authenticated:
             mock_data_from_db.assert_called_once_with(mock_request.user)
-            self.assertIsNone(mock_request.session[ENTERPRISE_CUSTOMER_KEY_NAME])
+            assert mock_request.session[ENTERPRISE_CUSTOMER_KEY_NAME] is None
         else:
-            self.assertFalse(mock_data_from_db.called)
-            self.assertNotIn(ENTERPRISE_CUSTOMER_KEY_NAME, mock_request.session)
+            assert not mock_data_from_db.called
+            assert ENTERPRISE_CUSTOMER_KEY_NAME not in mock_request.session
 
     def test_enterprise_customer_from_session(self):
         mock_request = mock.Mock(
@@ -997,13 +1008,13 @@ class TestEnterpriseApi(EnterpriseServiceMockMixin, CacheIsolationTestCase):
 
         # set enterprise customer info with authenticate user
         add_enterprise_customer_to_session(mock_request, enterprise_customer)
-        self.assertEqual(mock_request.session[ENTERPRISE_CUSTOMER_KEY_NAME], enterprise_customer)
+        assert mock_request.session[ENTERPRISE_CUSTOMER_KEY_NAME] == enterprise_customer
 
         # Now try to set info with un-authenticated user
         mock_request.user.is_authenticated = False
         add_enterprise_customer_to_session(mock_request, None)
         # verify that existing session value should not be updated for un-authenticate user
-        self.assertEqual(mock_request.session[ENTERPRISE_CUSTOMER_KEY_NAME], enterprise_customer)
+        assert mock_request.session[ENTERPRISE_CUSTOMER_KEY_NAME] == enterprise_customer
 
     def test_get_consent_notification_data_no_overrides(self):
         enterprise_customer = {
@@ -1013,8 +1024,8 @@ class TestEnterpriseApi(EnterpriseServiceMockMixin, CacheIsolationTestCase):
 
         title_template, message_template = get_consent_notification_data(enterprise_customer)
 
-        self.assertIsNone(title_template)
-        self.assertIsNone(message_template)
+        assert title_template is None
+        assert message_template is None
 
     @mock.patch('openedx.features.enterprise_support.api.DataSharingConsentTextOverrides')
     def test_get_consent_notification_data(self, mock_override_model):

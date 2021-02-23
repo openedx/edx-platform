@@ -18,6 +18,7 @@ Or for more details::
 
 """
 import csv
+
 import click
 
 
@@ -54,7 +55,7 @@ def main(unmapped_csv):
     Script removes duplicates in addition to providing sorted list of plain app names.
 
     """
-    with open(unmapped_csv, 'r') as file:
+    with open(unmapped_csv) as file:
         csv_data = file.read()
     reader = csv.DictReader(csv_data.splitlines())
 

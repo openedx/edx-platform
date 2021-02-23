@@ -225,6 +225,18 @@ def check_verify_status_by_course(user, course_enrollments):
 POST_AUTH_PARAMS = ('course_id', 'enrollment_action', 'course_mode', 'email_opt_in', 'purchase_workflow')
 
 
+def get_redirect_url_with_host(root_url, redirect_to):
+    """
+    Adds host to the redirect url
+    """
+    (_, netloc, path, query, fragment) = list(urllib.parse.urlsplit(redirect_to))
+    if not netloc:
+        parse_root_url = urllib.parse.urlsplit(root_url)
+        redirect_to = urllib.parse.urlunsplit((parse_root_url.scheme, parse_root_url.netloc, path, query, fragment))
+
+    return redirect_to
+
+
 def get_next_url_for_login_page(request, include_host=False):
     """
     Determine the URL to redirect to following login/registration/third_party_auth
@@ -283,13 +295,6 @@ def get_next_url_for_login_page(request, include_host=False):
         # be saved in the session as part of the pipeline state. That URL will take priority
         # over this one.
 
-    if include_host:
-        (scheme, netloc, path, query, fragment) = list(urllib.parse.urlsplit(redirect_to))
-        if not netloc:
-            parse_root_url = urllib.parse.urlsplit(root_url)
-            redirect_to = urllib.parse.urlunsplit((parse_root_url.scheme, parse_root_url.netloc,
-                                                   path, query, fragment))
-
     # Append a tpa_hint query parameter, if one is configured
     tpa_hint = configuration_helpers.get_value(
         "THIRD_PARTY_AUTH_HINT",
@@ -305,6 +310,9 @@ def get_next_url_for_login_page(request, include_host=False):
             params['tpa_hint'] = [tpa_hint]
             query = urllib.parse.urlencode(params, doseq=True)
             redirect_to = urllib.parse.urlunsplit((scheme, netloc, path, query, fragment))
+
+    if include_host:
+        return redirect_to, root_url
 
     return redirect_to
 

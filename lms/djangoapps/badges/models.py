@@ -76,6 +76,7 @@ class BadgeClass(models.Model):
             cls, slug, issuing_component, display_name=None, description=None, criteria=None, image_file_handle=None,
             mode='', course_id=None, create=True
     ):
+        # TODO method should be renamed to getorcreate instead
         """
         Looks up a badge class by its slug, issuing component, and course_id and returns it should it exist.
         If it does not exist, and create is True, creates it according to the arguments. Otherwise, returns None.

@@ -51,7 +51,7 @@ class TestLibraryRoot(MixedSplitTestCase):
         # Patch the HTML block to always render "Hello world"
 
         result = library.render(AUTHOR_VIEW, context)
-        self.assertIn(message, result.content)
+        assert message in result.content
 
     def test_library_author_view_with_paging(self):
         """
@@ -81,7 +81,7 @@ class TestLibraryRoot(MixedSplitTestCase):
             result = library.render(AUTHOR_VIEW, context)
 
             for expected_block in expected_blocks:
-                self.assertIn(expected_block.data, result.content)
+                assert expected_block.data in result.content
 
         render_and_check_contents(0, 3)
         render_and_check_contents(1, 3)

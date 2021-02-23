@@ -39,8 +39,8 @@ class TestTrackerInstantiation(TestCase):
         options = {'flag': True}
         backend = self.get_backend(name, options)
 
-        self.assertIsInstance(backend, DummyBackend)
-        self.assertTrue(backend.flag)
+        assert isinstance(backend, DummyBackend)
+        assert backend.flag
 
     def test_instatiate_backends_with_invalid_values(self):
         def get_invalid_backend(name, parameters):
@@ -69,11 +69,11 @@ class TestTrackerDjangoInstantiation(TestCase):
 
         backends = self._reload_backends()
 
-        self.assertEqual(len(backends), 1)
+        assert len(backends) == 1
 
         tracker.send({})
 
-        self.assertEqual(list(backends.values())[0].count, 1)
+        assert list(backends.values())[0].count == 1
 
     @override_settings(TRACKING_BACKENDS=MULTI_SETTINGS.copy())
     def test_django_multi_settings(self):
@@ -81,14 +81,14 @@ class TestTrackerDjangoInstantiation(TestCase):
 
         backends = list(self._reload_backends().values())
 
-        self.assertEqual(len(backends), 2)
+        assert len(backends) == 2
 
         event_count = 10
         for _ in range(event_count):
             tracker.send({})
 
-        self.assertEqual(backends[0].count, event_count)
-        self.assertEqual(backends[1].count, event_count)
+        assert backends[0].count == event_count
+        assert backends[1].count == event_count
 
     @override_settings(TRACKING_BACKENDS=MULTI_SETTINGS.copy())
     def test_django_remove_settings(self):
@@ -98,7 +98,7 @@ class TestTrackerDjangoInstantiation(TestCase):
 
         backends = self._reload_backends()
 
-        self.assertEqual(len(backends), 1)
+        assert len(backends) == 1
 
     def _reload_backends(self):  # lint-amnesty, pylint: disable=missing-function-docstring
         # pylint: disable=protected-access

@@ -2,7 +2,7 @@
 Tests for `field_overrides` module.
 """
 import unittest
-
+import pytest
 from django.test.utils import override_settings
 from xblock.field_data import DictFieldData
 
@@ -84,49 +84,49 @@ class OverrideFieldDataTests(OverrideFieldBase):
 
     def test_get(self):
         data = self.make_one()
-        self.assertEqual(data.get('block', 'foo'), 'fu')
-        self.assertEqual(data.get('block', 'bees'), 'knees')
+        assert data.get('block', 'foo') == 'fu'
+        assert data.get('block', 'bees') == 'knees'
         with disable_overrides():
-            self.assertEqual(data.get('block', 'foo'), 'bar')
+            assert data.get('block', 'foo') == 'bar'
 
     def test_set(self):
         data = self.make_one()
         data.set('block', 'foo', 'yowza')
-        self.assertEqual(data.get('block', 'foo'), 'fu')
+        assert data.get('block', 'foo') == 'fu'
         with disable_overrides():
-            self.assertEqual(data.get('block', 'foo'), 'yowza')
+            assert data.get('block', 'foo') == 'yowza'
 
     def test_delete(self):
         data = self.make_one()
         data.delete('block', 'foo')
-        self.assertEqual(data.get('block', 'foo'), 'fu')
+        assert data.get('block', 'foo') == 'fu'
         with disable_overrides():
             # Since field_data is responsible for attribute access, you'd
             # expect it to raise AttributeError. In fact, it raises KeyError,
             # so we check for that.
-            with self.assertRaises(KeyError):
+            with pytest.raises(KeyError):
                 data.get('block', 'foo')
 
     def test_has(self):
         data = self.make_one()
-        self.assertTrue(data.has('block', 'foo'))
-        self.assertTrue(data.has('block', 'bees'))
-        self.assertTrue(data.has('block', 'oh'))
+        assert data.has('block', 'foo')
+        assert data.has('block', 'bees')
+        assert data.has('block', 'oh')
         with disable_overrides():
-            self.assertFalse(data.has('block', 'oh'))
+            assert not data.has('block', 'oh')
 
     def test_many(self):
         data = self.make_one()
         data.set_many('block', {'foo': 'baz', 'ah': 'ic'})
-        self.assertEqual(data.get('block', 'foo'), 'fu')
-        self.assertEqual(data.get('block', 'ah'), 'ic')
+        assert data.get('block', 'foo') == 'fu'
+        assert data.get('block', 'ah') == 'ic'
         with disable_overrides():
-            self.assertEqual(data.get('block', 'foo'), 'baz')
+            assert data.get('block', 'foo') == 'baz'
 
     @override_settings(FIELD_OVERRIDE_PROVIDERS=())
     def test_no_overrides_configured(self):
         data = self.make_one()
-        self.assertIsInstance(data, DictFieldData)
+        assert isinstance(data, DictFieldData)
 
 
 @override_settings(
@@ -142,7 +142,7 @@ class OverrideModulestoreFieldDataTests(FieldOverrideTestMixin, OverrideFieldDat
     @override_settings(MODULESTORE_FIELD_OVERRIDE_PROVIDERS=[])
     def test_no_overrides_configured(self):
         data = self.make_one()
-        self.assertIsInstance(data, DictFieldData)
+        assert isinstance(data, DictFieldData)
 
 
 class ResolveDottedTests(unittest.TestCase):
@@ -151,18 +151,15 @@ class ResolveDottedTests(unittest.TestCase):
     """
 
     def test_bad_sub_import(self):
-        with self.assertRaises(ImportError):
+        with pytest.raises(ImportError):
             resolve_dotted('lms.djangoapps.courseware.tests.test_foo')
 
     def test_bad_import(self):
-        with self.assertRaises(ImportError):
+        with pytest.raises(ImportError):
             resolve_dotted('nosuchpackage')
 
     def test_import_something_that_isnt_already_loaded(self):
-        self.assertEqual(
-            resolve_dotted('lms.djangoapps.courseware.tests.animport.SOMENAME'),
-            'bar'
-        )
+        assert resolve_dotted('lms.djangoapps.courseware.tests.animport.SOMENAME') == 'bar'
 
 
 def inject_field_overrides(blocks, course, user):

@@ -48,7 +48,7 @@ class CreditCourseDashboardTest(ModuleStoreTestCase):
         # Create a user and log in
         self.user = UserFactory.create(username=self.USERNAME, password=self.PASSWORD)
         result = self.client.login(username=self.USERNAME, password=self.PASSWORD)
-        self.assertTrue(result, msg="Could not log in")
+        assert result, 'Could not log in'
 
         # Create a course and configure it as a credit course
         self.course = CourseFactory()

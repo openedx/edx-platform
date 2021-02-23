@@ -47,8 +47,8 @@ class LibrarySourcedBlockTestCase(ContentLibrariesRestApiTest):
 
         # Check if student_view renders the children correctly
         res = self.get_block_view(self.source_block, STUDENT_VIEW)
-        self.assertIn('Student Preview Test 1', res)
-        self.assertIn('Student Preview Test 2', res)
+        assert 'Student Preview Test 1' in res
+        assert 'Student Preview Test 2' in res
 
     def test_block_limits(self):
         # Create a blockstore content library
@@ -59,8 +59,8 @@ class LibrarySourcedBlockTestCase(ContentLibrariesRestApiTest):
         # Import the html blocks from the library to the course
         post_data = {"values": {"source_block_ids": blocks}, "defaults": ["display_name"]}
         res = self.client.post(self.submit_url, data=post_data, format='json')
-        self.assertEqual(res.status_code, 400)
-        self.assertEqual(res.json()['error']['messages'][0]['text'], "A maximum of 10 components may be added.")
+        assert res.status_code == 400
+        assert res.json()['error']['messages'][0]['text'] == 'A maximum of 10 components may be added.'
 
     def get_block_view(self, block, view, context=None):
         """

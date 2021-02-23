@@ -90,7 +90,7 @@ class CommandsTestBase(SharedModuleStoreTestCase):
         dumped_courses = output.strip().split('\n')
         course_ids = {text_type(course_id) for course_id in self.loaded_courses}
         dumped_ids = set(dumped_courses)
-        self.assertEqual(course_ids, dumped_ids)
+        assert course_ids == dumped_ids
 
     def test_correct_course_structure_metadata(self):
         course_id = text_type(self.test_course_key)
@@ -103,7 +103,7 @@ class CommandsTestBase(SharedModuleStoreTestCase):
             self.fail(exception)
 
         dump = json.loads(output)
-        self.assertGreater(len(list(dump.values())), 0)
+        assert len(list(dump.values())) > 0
 
     def test_dump_course_structure(self):
         args = [text_type(self.test_course_key)]
@@ -115,23 +115,23 @@ class CommandsTestBase(SharedModuleStoreTestCase):
         # check that all elements in the course structure have metadata,
         # but not inherited metadata:
         for element in six.itervalues(dump):
-            self.assertIn('metadata', element)
-            self.assertIn('children', element)
-            self.assertIn('category', element)
-            self.assertNotIn('inherited_metadata', element)
+            assert 'metadata' in element
+            assert 'children' in element
+            assert 'category' in element
+            assert 'inherited_metadata' not in element
 
         # Check a few elements in the course dump
         test_course_key = self.test_course_key
         parent_id = text_type(test_course_key.make_usage_key('chapter', 'Overview'))
-        self.assertEqual(dump[parent_id]['category'], 'chapter')
-        self.assertEqual(len(dump[parent_id]['children']), 3)
+        assert dump[parent_id]['category'] == 'chapter'
+        assert len(dump[parent_id]['children']) == 3
 
         child_id = dump[parent_id]['children'][1]
-        self.assertEqual(dump[child_id]['category'], 'videosequence')
-        self.assertEqual(len(dump[child_id]['children']), 2)
+        assert dump[child_id]['category'] == 'videosequence'
+        assert len(dump[child_id]['children']) == 2
 
         video_id = text_type(test_course_key.make_usage_key('video', 'Welcome'))
-        self.assertEqual(dump[video_id]['category'], 'video')
+        assert dump[video_id]['category'] == 'video'
         video_metadata = dump[video_id]['metadata']
         video_metadata.pop('edx_video_id', None)
         six.assertCountEqual(
@@ -139,11 +139,11 @@ class CommandsTestBase(SharedModuleStoreTestCase):
             list(video_metadata.keys()),
             ['youtube_id_0_75', 'youtube_id_1_0', 'youtube_id_1_25', 'youtube_id_1_5']
         )
-        self.assertIn('youtube_id_1_0', dump[video_id]['metadata'])
+        assert 'youtube_id_1_0' in dump[video_id]['metadata']
 
         # Check if there are the right number of elements
 
-        self.assertEqual(len(dump), 17)
+        assert len(dump) == 17
 
     def test_dump_inherited_course_structure(self):
         args = [text_type(self.test_course_key)]
@@ -153,12 +153,12 @@ class CommandsTestBase(SharedModuleStoreTestCase):
         # check that all elements in the course structure have inherited metadata,
         # and that it contains a particular value as well:
         for element in six.itervalues(dump):
-            self.assertIn('metadata', element)
-            self.assertIn('children', element)
-            self.assertIn('category', element)
-            self.assertIn('inherited_metadata', element)
+            assert 'metadata' in element
+            assert 'children' in element
+            assert 'category' in element
+            assert 'inherited_metadata' in element
             # ... but does not contain inherited metadata containing a default value:
-            self.assertNotIn('due', element['inherited_metadata'])
+            assert 'due' not in element['inherited_metadata']
 
     def test_dump_inherited_course_structure_with_defaults(self):
         args = [text_type(self.test_course_key)]
@@ -168,25 +168,25 @@ class CommandsTestBase(SharedModuleStoreTestCase):
         # check that all elements in the course structure have inherited metadata,
         # and that it contains a particular value as well:
         for element in six.itervalues(dump):
-            self.assertIn('metadata', element)
-            self.assertIn('children', element)
-            self.assertIn('category', element)
-            self.assertIn('inherited_metadata', element)
+            assert 'metadata' in element
+            assert 'children' in element
+            assert 'category' in element
+            assert 'inherited_metadata' in element
             # ... and contains inherited metadata containing a default value:
-            self.assertIsNone(element['inherited_metadata']['due'])
+            assert element['inherited_metadata']['due'] is None
 
     def test_export_discussion_ids(self):
         output = self.call_command('dump_course_structure', text_type(self.course.id))
         dump = json.loads(output)
         dumped_id = dump[text_type(self.discussion.location)]['metadata']['discussion_id']
-        self.assertEqual(dumped_id, self.discussion.discussion_id)
+        assert dumped_id == self.discussion.discussion_id
 
     def test_export_discussion_id_custom_id(self):
         output = self.call_command('dump_course_structure', text_type(self.test_course_key))
         dump = json.loads(output)
         discussion_key = text_type(self.test_course_key.make_usage_key('discussion', 'custom_id'))
         dumped_id = dump[text_type(discussion_key)]['metadata']['discussion_id']
-        self.assertEqual(dumped_id, "custom")
+        assert dumped_id == 'custom'
 
     def check_export_file(self, tar_file):  # pylint: disable=missing-function-docstring
         names = tar_file.getnames()

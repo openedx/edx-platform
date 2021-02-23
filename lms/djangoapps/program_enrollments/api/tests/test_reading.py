@@ -4,7 +4,7 @@ Tests for program enrollment reading Python API.
 
 
 from uuid import UUID
-
+import pytest
 import ddt
 from django.contrib.auth import get_user_model
 from django.core.cache import cache
@@ -14,6 +14,9 @@ from organizations.tests.factories import OrganizationFactory
 from social_django.models import UserSocialAuth
 
 from common.djangoapps.course_modes.models import CourseMode
+from common.djangoapps.student.roles import CourseStaffRole
+from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
+from common.djangoapps.third_party_auth.tests.factories import SAMLProviderConfigFactory
 from lms.djangoapps.program_enrollments.constants import ProgramCourseEnrollmentStatuses as PCEStatuses
 from lms.djangoapps.program_enrollments.constants import ProgramEnrollmentStatuses as PEStatuses
 from lms.djangoapps.program_enrollments.exceptions import (
@@ -33,9 +36,6 @@ from openedx.core.djangoapps.catalog.tests.factories import OrganizationFactory 
 from openedx.core.djangoapps.catalog.tests.factories import ProgramFactory
 from openedx.core.djangoapps.content.course_overviews.tests.factories import CourseOverviewFactory
 from openedx.core.djangolib.testing.utils import CacheIsolationTestCase
-from common.djangoapps.student.roles import CourseStaffRole
-from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
-from common.djangoapps.third_party_auth.tests.factories import SAMLProviderConfigFactory
 
 from ..reading import (
     fetch_program_course_enrollments,
@@ -78,7 +78,7 @@ class ProgramEnrollmentReadingTests(TestCase):
 
     @classmethod
     def setUpTestData(cls):
-        super(ProgramEnrollmentReadingTests, cls).setUpTestData()
+        super().setUpTestData()
         cls.user_0 = UserFactory(username=cls.username_0)  # No enrollments
         cls.user_1 = UserFactory(username=cls.username_1)
         cls.user_2 = UserFactory(username=cls.username_2)
@@ -495,7 +495,7 @@ class GetUsersByExternalKeysTests(CacheIsolationTestCase):
 
     @classmethod
     def setUpTestData(cls):
-        super(GetUsersByExternalKeysTests, cls).setUpTestData()
+        super().setUpTestData()
         cls.program_uuid = UUID('e7a82f8d-d485-486b-b733-a28222af92bf')
         cls.organization_key = 'ufo'
         cls.external_user_id = '1234'
@@ -504,7 +504,7 @@ class GetUsersByExternalKeysTests(CacheIsolationTestCase):
         cls.user_2 = UserFactory(username='user-2')
 
     def setUp(self):
-        super(GetUsersByExternalKeysTests, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         catalog_org = CatalogOrganizationFactory.create(key=self.organization_key)
         program = ProgramFactory.create(
             uuid=self.program_uuid,
@@ -518,7 +518,7 @@ class GetUsersByExternalKeysTests(CacheIsolationTestCase):
         """
         UserSocialAuth.objects.create(
             user=user,
-            uid='{0}:{1}'.format(provider.slug, external_id),
+            uid=f'{provider.slug}:{external_id}',
             provider=provider.backend_name,
         )
 
@@ -557,7 +557,7 @@ class GetUsersByExternalKeysTests(CacheIsolationTestCase):
         not include the requested program uuid.
         """
         fake_program_uuid = UUID('80cc59e5-003e-4664-a582-48da44bc7e12')
-        with self.assertRaises(ProgramDoesNotExistException):
+        with pytest.raises(ProgramDoesNotExistException):
             get_users_by_external_keys(fake_program_uuid, [])
 
     def test_catalog_program_missing_org(self):
@@ -570,7 +570,7 @@ class GetUsersByExternalKeysTests(CacheIsolationTestCase):
             authoring_organizations=[]
         )
         cache.set(PROGRAM_CACHE_KEY_TPL.format(uuid=self.program_uuid), program, None)
-        with self.assertRaises(OrganizationDoesNotExistException):
+        with pytest.raises(OrganizationDoesNotExistException):
             get_users_by_external_keys(self.program_uuid, [])
 
     def test_lms_organization_not_found(self):
@@ -580,7 +580,7 @@ class GetUsersByExternalKeysTests(CacheIsolationTestCase):
         """
         organization = OrganizationFactory.create(short_name='some_other_org')
         SAMLProviderConfigFactory.create(organization=organization)
-        with self.assertRaises(OrganizationDoesNotExistException):
+        with pytest.raises(OrganizationDoesNotExistException):
             get_users_by_external_keys(self.program_uuid, [])
 
     def test_saml_provider_not_found(self):
@@ -589,7 +589,7 @@ class GetUsersByExternalKeysTests(CacheIsolationTestCase):
         program's organization.
         """
         OrganizationFactory.create(short_name=self.organization_key)
-        with self.assertRaises(ProviderDoesNotExistException):
+        with pytest.raises(ProviderDoesNotExistException):
             get_users_by_external_keys(self.program_uuid, [])
 
     def test_extra_saml_provider_disabled(self):
@@ -616,7 +616,7 @@ class GetUsersByExternalKeysTests(CacheIsolationTestCase):
         SAMLProviderConfigFactory.create(
             organization=organization, slug='foox', enabled=True
         )
-        with self.assertRaises(ProviderConfigurationException):
+        with pytest.raises(ProviderConfigurationException):
             get_users_by_external_keys(self.program_uuid, [])
 
 
@@ -637,7 +637,7 @@ class IsCourseStaffEnrollmentTest(TestCase):
 
     @classmethod
     def setUpTestData(cls):
-        super(IsCourseStaffEnrollmentTest, cls).setUpTestData()
+        super().setUpTestData()
         cls.user_0 = UserFactory(username=cls.username_0)  # No enrollments
         CourseOverviewFactory(id=cls.course_key_p)
         CourseOverviewFactory(id=cls.course_key_q)

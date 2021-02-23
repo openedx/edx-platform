@@ -3,14 +3,15 @@ Tests for the LTI outcome service handlers, both in outcomes.py and in tasks.py
 """
 
 
+from unittest.mock import ANY, MagicMock, patch
+
 from django.test import TestCase
 from lxml import etree
-from mock import ANY, MagicMock, patch
 from opaque_keys.edx.locator import BlockUsageLocator, CourseLocator
 
 import lms.djangoapps.lti_provider.outcomes as outcomes
-from lms.djangoapps.lti_provider.models import GradedAssignment, LtiConsumer, OutcomeService
 from common.djangoapps.student.tests.factories import UserFactory
+from lms.djangoapps.lti_provider.models import GradedAssignment, LtiConsumer, OutcomeService
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory, check_mongo_calls
 
@@ -21,7 +22,7 @@ class StoreOutcomeParametersTest(TestCase):
     """
 
     def setUp(self):
-        super(StoreOutcomeParametersTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.user = UserFactory.create()
         self.course_key = CourseLocator(
             org='some_org',
@@ -61,9 +62,9 @@ class StoreOutcomeParametersTest(TestCase):
         assignment = GradedAssignment.objects.get(
             lis_result_sourcedid=params['lis_result_sourcedid']
         )
-        self.assertEqual(assignment.course_key, self.course_key)
-        self.assertEqual(assignment.usage_key, self.usage_key)
-        self.assertEqual(assignment.user, self.user)
+        assert assignment.course_key == self.course_key
+        assert assignment.usage_key == self.usage_key
+        assert assignment.user == self.user
 
     def test_outcome_service_created(self):
         params = self.get_valid_request_params()
@@ -72,7 +73,7 @@ class StoreOutcomeParametersTest(TestCase):
         outcome = OutcomeService.objects.get(
             lti_consumer=self.consumer
         )
-        self.assertEqual(outcome.lti_consumer, self.consumer)
+        assert outcome.lti_consumer == self.consumer
 
     def test_graded_assignment_references_outcome_service(self):
         params = self.get_valid_request_params()
@@ -84,7 +85,7 @@ class StoreOutcomeParametersTest(TestCase):
         assignment = GradedAssignment.objects.get(
             lis_result_sourcedid=params['lis_result_sourcedid']
         )
-        self.assertEqual(assignment.outcome_service, outcome)
+        assert assignment.outcome_service == outcome
 
     def test_no_duplicate_graded_assignments(self):
         params = self.get_valid_request_params()
@@ -95,7 +96,7 @@ class StoreOutcomeParametersTest(TestCase):
         assignments = GradedAssignment.objects.filter(
             lis_result_sourcedid=params['lis_result_sourcedid']
         )
-        self.assertEqual(len(assignments), 1)
+        assert len(assignments) == 1
 
     def test_no_duplicate_outcome_services(self):
         params = self.get_valid_request_params()
@@ -106,7 +107,7 @@ class StoreOutcomeParametersTest(TestCase):
         outcome_services = OutcomeService.objects.filter(
             lti_consumer=self.consumer
         )
-        self.assertEqual(len(outcome_services), 1)
+        assert len(outcome_services) == 1
 
     def test_no_db_update_for_ungraded_assignment(self):
         params = self.get_valid_request_params()
@@ -125,8 +126,8 @@ class StoreOutcomeParametersTest(TestCase):
         del params['tool_consumer_instance_guid']
         with self.assertNumQueries(8):
             outcomes.store_outcome_parameters(params, self.user, self.consumer)
-        self.assertEqual(GradedAssignment.objects.count(), 1)
-        self.assertEqual(OutcomeService.objects.count(), 1)
+        assert GradedAssignment.objects.count() == 1
+        assert OutcomeService.objects.count() == 1
 
 
 class SignAndSendReplaceResultTest(TestCase):
@@ -135,7 +136,7 @@ class SignAndSendReplaceResultTest(TestCase):
     """
 
     def setUp(self):
-        super(SignAndSendReplaceResultTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.course_key = CourseLocator(
             org='some_org',
             course='some_course',
@@ -176,7 +177,7 @@ class SignAndSendReplaceResultTest(TestCase):
             auth=ANY,
             headers={'content-type': 'application/xml'}
         )
-        self.assertEqual(response, 'response')
+        assert response == 'response'
 
 
 class XmlHandlingTest(TestCase):
@@ -185,7 +186,7 @@ class XmlHandlingTest(TestCase):
     methods in outcomes.py
     """
 
-    response_xml = u"""
+    response_xml = """
         <imsx_POXEnvelopeResponse xmlns = "http://www.imsglobal.org/services/ltiv1p1/xsd/imsoms_v1p0">
           <imsx_POXHeader>
             <imsx_POXResponseHeaderInfo>
@@ -218,8 +219,8 @@ class XmlHandlingTest(TestCase):
             '//ns:imsx_messageIdentifier',
             namespaces={'ns': 'http://www.imsglobal.org/services/ltiv1p1/xsd/imsoms_v1p0'}
         )
-        self.assertEqual(len(message_id), 1)
-        self.assertEqual(message_id[0].text, 'random_uuid')
+        assert len(message_id) == 1
+        assert message_id[0].text == 'random_uuid'
 
     def test_replace_result_sourced_id(self):
         xml = outcomes.generate_replace_result_xml(self.result_id, self.score)
@@ -229,8 +230,8 @@ class XmlHandlingTest(TestCase):
             'ns:resultRecord/ns:sourcedGUID/ns:sourcedId',
             namespaces={'ns': 'http://www.imsglobal.org/services/ltiv1p1/xsd/imsoms_v1p0'}
         )
-        self.assertEqual(len(sourced_id), 1)
-        self.assertEqual(sourced_id[0].text, 'result_id')
+        assert len(sourced_id) == 1
+        assert sourced_id[0].text == 'result_id'
 
     def test_replace_result_score(self):
         xml = outcomes.generate_replace_result_xml(self.result_id, self.score)
@@ -240,8 +241,8 @@ class XmlHandlingTest(TestCase):
             'ns:resultRecord/ns:result/ns:resultScore/ns:textString',
             namespaces={'ns': 'http://www.imsglobal.org/services/ltiv1p1/xsd/imsoms_v1p0'}
         )
-        self.assertEqual(len(xml_score), 1)
-        self.assertEqual(xml_score[0].text, '0.25')
+        assert len(xml_score) == 1
+        assert xml_score[0].text == '0.25'
 
     def create_response_object(
             self, status, xml,
@@ -258,16 +259,16 @@ class XmlHandlingTest(TestCase):
     def test_response_with_correct_xml(self):
         xml = self.response_xml
         response = self.create_response_object(200, xml)
-        self.assertTrue(outcomes.check_replace_result_response(response))
+        assert outcomes.check_replace_result_response(response)
 
     def test_response_with_bad_status_code(self):
         response = self.create_response_object(500, '')
-        self.assertFalse(outcomes.check_replace_result_response(response))
+        assert not outcomes.check_replace_result_response(response)
 
     def test_response_with_invalid_xml(self):
         xml = '<badly>formatted</xml>'
         response = self.create_response_object(200, xml)
-        self.assertFalse(outcomes.check_replace_result_response(response))
+        assert not outcomes.check_replace_result_response(response)
 
     def test_response_with_multiple_status_fields(self):
         response = self.create_response_object(
@@ -275,21 +276,21 @@ class XmlHandlingTest(TestCase):
             major_code='<imsx_codeMajor>success</imsx_codeMajor>'
                        '<imsx_codeMajor>failure</imsx_codeMajor>'
         )
-        self.assertFalse(outcomes.check_replace_result_response(response))
+        assert not outcomes.check_replace_result_response(response)
 
     def test_response_with_no_status_field(self):
         response = self.create_response_object(
             200, self.response_xml,
             major_code=''
         )
-        self.assertFalse(outcomes.check_replace_result_response(response))
+        assert not outcomes.check_replace_result_response(response)
 
     def test_response_with_failing_status_field(self):
         response = self.create_response_object(
             200, self.response_xml,
             major_code='<imsx_codeMajor>failure</imsx_codeMajor>'
         )
-        self.assertFalse(outcomes.check_replace_result_response(response))
+        assert not outcomes.check_replace_result_response(response)
 
 
 class TestAssignmentsForProblem(ModuleStoreTestCase):
@@ -298,7 +299,7 @@ class TestAssignmentsForProblem(ModuleStoreTestCase):
     """
 
     def setUp(self):
-        super(TestAssignmentsForProblem, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.user = UserFactory.create()
         self.user_id = self.user.id
         self.outcome_service = self.create_outcome_service('outcomes')
@@ -366,14 +367,14 @@ class TestAssignmentsForProblem(ModuleStoreTestCase):
         )
         lti_consumer_second.save()
         count = LtiConsumer.objects.count()
-        self.assertEqual(count, 3)
+        assert count == 3
 
     def test_with_no_graded_assignments(self):
         with check_mongo_calls(3):
             assignments = outcomes.get_assignments_for_problem(
                 self.unit, self.user_id, self.course.id
             )
-        self.assertEqual(len(assignments), 0)
+        assert len(assignments) == 0
 
     def test_with_graded_unit(self):
         self.create_graded_assignment(self.unit, 'graded_unit', self.outcome_service)
@@ -381,8 +382,8 @@ class TestAssignmentsForProblem(ModuleStoreTestCase):
             assignments = outcomes.get_assignments_for_problem(
                 self.unit, self.user_id, self.course.id
             )
-        self.assertEqual(len(assignments), 1)
-        self.assertEqual(assignments[0].lis_result_sourcedid, 'graded_unit')
+        assert len(assignments) == 1
+        assert assignments[0].lis_result_sourcedid == 'graded_unit'
 
     def test_with_graded_vertical(self):
         self.create_graded_assignment(self.vertical, 'graded_vertical', self.outcome_service)
@@ -390,8 +391,8 @@ class TestAssignmentsForProblem(ModuleStoreTestCase):
             assignments = outcomes.get_assignments_for_problem(
                 self.unit, self.user_id, self.course.id
             )
-        self.assertEqual(len(assignments), 1)
-        self.assertEqual(assignments[0].lis_result_sourcedid, 'graded_vertical')
+        assert len(assignments) == 1
+        assert assignments[0].lis_result_sourcedid == 'graded_vertical'
 
     def test_with_graded_unit_and_vertical(self):
         self.create_graded_assignment(self.unit, 'graded_unit', self.outcome_service)
@@ -400,9 +401,9 @@ class TestAssignmentsForProblem(ModuleStoreTestCase):
             assignments = outcomes.get_assignments_for_problem(
                 self.unit, self.user_id, self.course.id
             )
-        self.assertEqual(len(assignments), 2)
-        self.assertEqual(assignments[0].lis_result_sourcedid, 'graded_unit')
-        self.assertEqual(assignments[1].lis_result_sourcedid, 'graded_vertical')
+        assert len(assignments) == 2
+        assert assignments[0].lis_result_sourcedid == 'graded_unit'
+        assert assignments[1].lis_result_sourcedid == 'graded_vertical'
 
     def test_with_unit_used_twice(self):
         self.create_graded_assignment(self.unit, 'graded_unit', self.outcome_service)
@@ -411,9 +412,9 @@ class TestAssignmentsForProblem(ModuleStoreTestCase):
             assignments = outcomes.get_assignments_for_problem(
                 self.unit, self.user_id, self.course.id
             )
-        self.assertEqual(len(assignments), 2)
-        self.assertEqual(assignments[0].lis_result_sourcedid, 'graded_unit')
-        self.assertEqual(assignments[1].lis_result_sourcedid, 'graded_unit2')
+        assert len(assignments) == 2
+        assert assignments[0].lis_result_sourcedid == 'graded_unit'
+        assert assignments[1].lis_result_sourcedid == 'graded_unit2'
 
     def test_with_unit_graded_for_different_user(self):
         self.create_graded_assignment(self.unit, 'graded_unit', self.outcome_service)
@@ -422,7 +423,7 @@ class TestAssignmentsForProblem(ModuleStoreTestCase):
             assignments = outcomes.get_assignments_for_problem(
                 self.unit, other_user.id, self.course.id
             )
-        self.assertEqual(len(assignments), 0)
+        assert len(assignments) == 0
 
     def test_with_unit_graded_for_multiple_consumers(self):
         other_outcome_service = self.create_outcome_service('second_consumer')
@@ -432,8 +433,8 @@ class TestAssignmentsForProblem(ModuleStoreTestCase):
             assignments = outcomes.get_assignments_for_problem(
                 self.unit, self.user_id, self.course.id
             )
-        self.assertEqual(len(assignments), 2)
-        self.assertEqual(assignments[0].lis_result_sourcedid, 'graded_unit')
-        self.assertEqual(assignments[1].lis_result_sourcedid, 'graded_unit2')
-        self.assertEqual(assignments[0].outcome_service, self.outcome_service)
-        self.assertEqual(assignments[1].outcome_service, other_outcome_service)
+        assert len(assignments) == 2
+        assert assignments[0].lis_result_sourcedid == 'graded_unit'
+        assert assignments[1].lis_result_sourcedid == 'graded_unit2'
+        assert assignments[0].outcome_service == self.outcome_service
+        assert assignments[1].outcome_service == other_outcome_service

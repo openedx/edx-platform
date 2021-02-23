@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 ProgramEnrollment Views
 """
@@ -18,6 +17,8 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
+from common.djangoapps.student.roles import CourseInstructorRole, CourseStaffRole, UserBasedRole
+from common.djangoapps.util.query import read_replica_or_default
 from lms.djangoapps.program_enrollments.api import (
     fetch_program_course_enrollments,
     fetch_program_enrollments,
@@ -43,8 +44,6 @@ from openedx.core.djangoapps.catalog.utils import (
 )
 from openedx.core.lib.api.authentication import BearerAuthenticationAllowInactiveUser
 from openedx.core.lib.api.view_utils import DeveloperErrorViewMixin, PaginatedAPIView
-from common.djangoapps.student.roles import CourseInstructorRole, CourseStaffRole, UserBasedRole
-from common.djangoapps.util.query import read_replica_or_default
 
 from .constants import ENABLE_ENROLLMENT_RESET_FLAG, MAX_ENROLLMENT_RECORDS
 from .serializers import (
@@ -72,7 +71,7 @@ from .utils import (
 )
 
 
-class EnrollmentWriteMixin(object):
+class EnrollmentWriteMixin:
     """
     Common functionality for viewsets with enrollment-writing POST/PATCH/PUT methods.
 
@@ -992,7 +991,7 @@ class EnrollmentDataResetView(APIView):
         try:
             organization = Organization.objects.get(short_name=org_key)
         except Organization.DoesNotExist:
-            return Response('organization {} not found'.format(org_key), status.HTTP_404_NOT_FOUND)
+            return Response(f'organization {org_key} not found', status.HTTP_404_NOT_FOUND)
 
         try:
             provider = get_saml_provider_for_organization(organization)

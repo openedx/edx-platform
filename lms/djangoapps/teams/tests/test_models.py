@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 Tests for the teams API at the HTTP request level.
 """
@@ -7,14 +6,16 @@ Tests for the teams API at the HTTP request level.
 import itertools
 from contextlib import contextmanager
 from datetime import datetime
+from unittest.mock import Mock
 
 import ddt
+import pytest
 import pytz
-import six
-from mock import Mock, patch  # lint-amnesty, pylint: disable=unused-import
 from opaque_keys.edx.keys import CourseKey
 
 from common.djangoapps.course_modes.models import CourseMode
+from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
+from common.djangoapps.util.testing import EventTestMixin
 from lms.djangoapps.teams import TEAM_DISCUSSION_CONTEXT
 from lms.djangoapps.teams.errors import AddToIncompatibleTeamError
 from lms.djangoapps.teams.models import CourseTeam, CourseTeamMembership
@@ -31,9 +32,6 @@ from openedx.core.djangoapps.django_comment_common.signals import (
     thread_voted
 )
 from openedx.core.lib.teams_config import TeamsConfig
-from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
-from common.djangoapps.util.testing import EventTestMixin
-
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
@@ -64,7 +62,7 @@ class TestModelStrings(SharedModuleStoreTestCase):
     """
     @classmethod
     def setUpClass(cls):
-        super(TestModelStrings, cls).setUpClass()
+        super().setUpClass()
         cls.course_id = "edx/the-course/1"
         cls.course1 = create_course(CourseKey.from_string(cls.course_id), TEAMS_CONFIG_1)
         cls.user = UserFactory.create(username="the-user")
@@ -89,7 +87,7 @@ class TestModelStrings(SharedModuleStoreTestCase):
         )
 
     def test_team_text(self):
-        assert six.text_type(self.team) == (
+        assert str(self.team) == (
             "The Team in edx/the-course/1"
         )
 
@@ -99,7 +97,7 @@ class TestModelStrings(SharedModuleStoreTestCase):
         )
 
     def test_team_membership_text_type(self):
-        assert six.text_type(self.team_membership) == (
+        assert str(self.team_membership) == (
             "the-user is member of The Team in edx/the-course/1"
         )
 
@@ -109,7 +107,7 @@ class CourseTeamTest(SharedModuleStoreTestCase):
 
     @classmethod
     def setUpClass(cls):
-        super(CourseTeamTest, cls).setUpClass()
+        super().setUpClass()
         cls.course_id = "edx/the-course/1"
         cls.course1 = create_course(CourseKey.from_string(cls.course_id), TEAMS_CONFIG_1)
 
@@ -134,16 +132,16 @@ class CourseTeamTest(SharedModuleStoreTestCase):
 
     def test_add_user(self):
         """Test that we can add users with correct protection status to a team"""
-        self.assertIsNotNone(self.masters_team.add_user(self.masters_learner))
-        self.assertIsNotNone(self.audit_team.add_user(self.audit_learner))
+        assert self.masters_team.add_user(self.masters_learner) is not None
+        assert self.audit_team.add_user(self.audit_learner) is not None
 
     def test_add_user_bad_team_access(self):
         """Test that we are blocked from adding a user to a team of mixed enrollment types"""
 
-        with self.assertRaises(AddToIncompatibleTeamError):
+        with pytest.raises(AddToIncompatibleTeamError):
             self.audit_team.add_user(self.masters_learner)
 
-        with self.assertRaises(AddToIncompatibleTeamError):
+        with pytest.raises(AddToIncompatibleTeamError):
             self.masters_team.add_user(self.audit_learner)
 
 
@@ -153,7 +151,7 @@ class TeamMembershipTest(SharedModuleStoreTestCase):
 
     @classmethod
     def setUpClass(cls):
-        super(TeamMembershipTest, cls).setUpClass()
+        super().setUpClass()
         create_course(COURSE_KEY1, TEAMS_CONFIG_1)
         create_course(COURSE_KEY2, TEAMS_CONFIG_2)
 
@@ -161,7 +159,7 @@ class TeamMembershipTest(SharedModuleStoreTestCase):
         """
         Set up tests.
         """
-        super(TeamMembershipTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
 
         self.user1 = UserFactory.create(username='user1')
         self.user2 = UserFactory.create(username='user2')
@@ -189,31 +187,31 @@ class TeamMembershipTest(SharedModuleStoreTestCase):
     def test_membership_last_activity_set(self):
         current_last_activity = self.team_membership11.last_activity_at
         # Assert that the first save in the setUp sets a value.
-        self.assertIsNotNone(current_last_activity)
+        assert current_last_activity is not None
 
         self.team_membership11.save()
 
         # Verify that we only change the last activity_at when it doesn't
         # already exist.
-        self.assertEqual(self.team_membership11.last_activity_at, current_last_activity)
+        assert self.team_membership11.last_activity_at == current_last_activity
 
     def test_team_size_delete_membership(self):
         """Test that the team size field is correctly updated when deleting a
         team membership.
         """
-        self.assertEqual(self.team1.team_size, 2)
+        assert self.team1.team_size == 2
         self.team_membership11.delete()
         team = CourseTeam.objects.get(id=self.team1.id)
-        self.assertEqual(team.team_size, 1)
+        assert team.team_size == 1
 
     def test_team_size_create_membership(self):
         """Test that the team size field is correctly updated when creating a
         team membership.
         """
-        self.assertEqual(self.team1.team_size, 2)
+        assert self.team1.team_size == 2
         self.team1.add_user(self.user3)
         team = CourseTeam.objects.get(id=self.team1.id)
-        self.assertEqual(team.team_size, 3)
+        assert team.team_size == 3
 
     @ddt.data(
         (None, None, None, 3),
@@ -224,10 +222,9 @@ class TeamMembershipTest(SharedModuleStoreTestCase):
     )
     @ddt.unpack
     def test_get_memberships(self, username, course_ids, team_ids, expected_count):
-        self.assertEqual(
-            CourseTeamMembership.get_memberships(username=username, course_ids=course_ids, team_ids=team_ids).count(),
-            expected_count
-        )
+        assert CourseTeamMembership.get_memberships(username=username,
+                                                    course_ids=course_ids,
+                                                    team_ids=team_ids).count() == expected_count
 
     @ddt.data(
         ('user1', COURSE_KEY1, TEAMSET_1_ID, True),
@@ -240,10 +237,7 @@ class TeamMembershipTest(SharedModuleStoreTestCase):
     @ddt.unpack
     def test_user_in_team_for_course_teamset(self, username, course_id, teamset_id, expected_value):
         user = getattr(self, username)
-        self.assertEqual(
-            CourseTeamMembership.user_in_team_for_teamset(user, course_id, teamset_id),
-            expected_value
-        )
+        assert CourseTeamMembership.user_in_team_for_teamset(user, course_id, teamset_id) == expected_value
 
 
 @ddt.ddt
@@ -266,7 +260,7 @@ class TeamSignalsTest(EventTestMixin, SharedModuleStoreTestCase):
 
     def setUp(self):  # pylint: disable=arguments-differ
         """Create a user with a team to test signals."""
-        super(TeamSignalsTest, self).setUp('lms.djangoapps.teams.utils.tracker')  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp('lms.djangoapps.teams.utils.tracker')
         self.user = UserFactory.create(username="user")
         self.moderator = UserFactory.create(username="moderator")
         self.team = CourseTeamFactory(discussion_topic_id=self.DISCUSSION_TOPIC_ID)
@@ -296,18 +290,18 @@ class TeamSignalsTest(EventTestMixin, SharedModuleStoreTestCase):
         team = CourseTeam.objects.get(id=self.team.id)
         team_membership = CourseTeamMembership.objects.get(id=self.team_membership.id)
         if should_update:
-            self.assertGreater(team.last_activity_at, team_last_activity)
-            self.assertGreater(team_membership.last_activity_at, team_membership_last_activity)
+            assert team.last_activity_at > team_last_activity
+            assert team_membership.last_activity_at > team_membership_last_activity
             now = datetime.utcnow().replace(tzinfo=pytz.utc)
-            self.assertGreater(now, team.last_activity_at)
-            self.assertGreater(now, team_membership.last_activity_at)
+            assert now > team.last_activity_at
+            assert now > team_membership.last_activity_at
             self.assert_event_emitted(
                 'edx.team.activity_updated',
                 team_id=team.team_id,
             )
         else:
-            self.assertEqual(team.last_activity_at, team_last_activity)
-            self.assertEqual(team_membership.last_activity_at, team_membership_last_activity)
+            assert team.last_activity_at == team_last_activity
+            assert team_membership.last_activity_at == team_membership_last_activity
             self.assert_no_events_were_emitted()
 
     @ddt.data(

@@ -4,29 +4,41 @@ import hashlib
 
 import ddt
 import factory
+import mock
 import pytz
+from crum import set_current_request
 from django.contrib.auth.models import AnonymousUser, User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.core.cache import cache
 from django.db.models import signals
 from django.db.models.functions import Lower
 from django.test import TestCase
+from freezegun import freeze_time
 from opaque_keys.edx.keys import CourseKey
+from pytz import UTC
 
+from edx_toggles.toggles.testutils import override_waffle_flag
 from common.djangoapps.course_modes.models import CourseMode
 from common.djangoapps.course_modes.tests.factories import CourseModeFactory
 from lms.djangoapps.courseware.models import DynamicUpgradeDeadlineConfiguration
+from lms.djangoapps.courseware.toggles import (
+    COURSEWARE_MICROFRONTEND_PROGRESS_MILESTONES,
+    COURSEWARE_MICROFRONTEND_PROGRESS_MILESTONES_STREAK_CELEBRATION,
+    REDIRECT_TO_COURSEWARE_MICROFRONTEND
+)
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.schedules.models import Schedule
 from openedx.core.djangoapps.schedules.tests.factories import ScheduleFactory
+from openedx.core.djangoapps.user_api.preferences.api import set_user_preference
 from openedx.core.djangolib.testing.utils import skip_unless_lms
 from common.djangoapps.student.models import (
     ALLOWEDTOENROLL_TO_ENROLLED,
     AccountRecovery,
     CourseEnrollment,
     CourseEnrollmentAllowed,
+    UserCelebration,
     ManualEnrollmentAudit,
     PendingEmailChange,
-    PendingNameChange
+    PendingNameChange,
 )
 from common.djangoapps.student.tests.factories import AccountRecoveryFactory, CourseEnrollmentFactory, UserFactory
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
@@ -49,19 +61,19 @@ class CourseEnrollmentTests(SharedModuleStoreTestCase):  # lint-amnesty, pylint:
         username = 'test-user'
         user = UserFactory(username=username)
         expected = 'enrollment_status_hash_' + username
-        self.assertEqual(CourseEnrollment.enrollment_status_hash_cache_key(user), expected)
+        assert CourseEnrollment.enrollment_status_hash_cache_key(user) == expected
 
     def assert_enrollment_status_hash_cached(self, user, expected_value):
-        self.assertEqual(cache.get(CourseEnrollment.enrollment_status_hash_cache_key(user)), expected_value)
+        assert cache.get(CourseEnrollment.enrollment_status_hash_cache_key(user)) == expected_value
 
     def test_generate_enrollment_status_hash(self):
         """ Verify the method returns a hash of a user's current enrollments. """
         # Return None for anonymous users
-        self.assertIsNone(CourseEnrollment.generate_enrollment_status_hash(AnonymousUser()))
+        assert CourseEnrollment.generate_enrollment_status_hash(AnonymousUser()) is None
 
         # No enrollments
         expected = hashlib.md5(self.user.username.encode('utf-8')).hexdigest()  # lint-amnesty, pylint: disable=no-member
-        self.assertEqual(CourseEnrollment.generate_enrollment_status_hash(self.user), expected)
+        assert CourseEnrollment.generate_enrollment_status_hash(self.user) == expected
         self.assert_enrollment_status_hash_cached(self.user, expected)
 
         # No active enrollments
@@ -69,7 +81,7 @@ class CourseEnrollmentTests(SharedModuleStoreTestCase):  # lint-amnesty, pylint:
         course_id = self.course.id  # pylint: disable=no-member
         enrollment = CourseEnrollmentFactory.create(user=self.user, course_id=course_id, mode=enrollment_mode,
                                                     is_active=False)
-        self.assertEqual(CourseEnrollment.generate_enrollment_status_hash(self.user), expected)
+        assert CourseEnrollment.generate_enrollment_status_hash(self.user) == expected
         self.assert_enrollment_status_hash_cached(self.user, expected)
 
         # One active enrollment
@@ -79,7 +91,7 @@ class CourseEnrollmentTests(SharedModuleStoreTestCase):  # lint-amnesty, pylint:
             username=self.user.username, course_id=str(course_id).lower(), mode=enrollment_mode.lower()
         )
         expected = hashlib.md5(expected.encode('utf-8')).hexdigest()
-        self.assertEqual(CourseEnrollment.generate_enrollment_status_hash(self.user), expected)
+        assert CourseEnrollment.generate_enrollment_status_hash(self.user) == expected
         self.assert_enrollment_status_hash_cached(self.user, expected)
 
         # Multiple enrollments
@@ -90,13 +102,13 @@ class CourseEnrollmentTests(SharedModuleStoreTestCase):  # lint-amnesty, pylint:
             '{course_id}={mode}'.format(course_id=str(enrollment.course_id).lower(), mode=enrollment.mode.lower()) for
             enrollment in enrollments]
         expected = hashlib.md5('&'.join(hash_elements).encode('utf-8')).hexdigest()
-        self.assertEqual(CourseEnrollment.generate_enrollment_status_hash(self.user), expected)
+        assert CourseEnrollment.generate_enrollment_status_hash(self.user) == expected
         self.assert_enrollment_status_hash_cached(self.user, expected)
 
     def test_save_deletes_cached_enrollment_status_hash(self):
         """ Verify the method deletes the cached enrollment status hash for the user. """
         # There should be no cached value for a new user with no enrollments.
-        self.assertIsNone(cache.get(CourseEnrollment.enrollment_status_hash_cache_key(self.user)))
+        assert cache.get(CourseEnrollment.enrollment_status_hash_cache_key(self.user)) is None
 
         # Generating a status hash should cache the generated value.
         status_hash = CourseEnrollment.generate_enrollment_status_hash(self.user)
@@ -104,7 +116,7 @@ class CourseEnrollmentTests(SharedModuleStoreTestCase):  # lint-amnesty, pylint:
 
         # Modifying enrollments should delete the cached value.
         CourseEnrollmentFactory.create(user=self.user)
-        self.assertIsNone(cache.get(CourseEnrollment.enrollment_status_hash_cache_key(self.user)))
+        assert cache.get(CourseEnrollment.enrollment_status_hash_cache_key(self.user)) is None
 
     def test_users_enrolled_in_active_only(self):
         """CourseEnrollment.users_enrolled_in should return only Users with active enrollments when
@@ -113,7 +125,7 @@ class CourseEnrollmentTests(SharedModuleStoreTestCase):  # lint-amnesty, pylint:
         CourseEnrollmentFactory.create(user=self.user_2, course_id=self.course.id, is_active=False)  # lint-amnesty, pylint: disable=no-member
 
         active_enrolled_users = list(CourseEnrollment.objects.users_enrolled_in(self.course.id))  # lint-amnesty, pylint: disable=no-member
-        self.assertEqual([self.user], active_enrolled_users)
+        assert [self.user] == active_enrolled_users
 
     def test_users_enrolled_in_all(self):
         """CourseEnrollment.users_enrolled_in should return active and inactive users when
@@ -139,8 +151,8 @@ class CourseEnrollmentTests(SharedModuleStoreTestCase):  # lint-amnesty, pylint:
             expiration_datetime=datetime.datetime.now(pytz.UTC) + datetime.timedelta(days=1)
         )
         enrollment = CourseEnrollmentFactory(course_id=course.id, mode=CourseMode.AUDIT)
-        self.assertEqual(Schedule.objects.all().count(), 0)
-        self.assertEqual(enrollment.upgrade_deadline, course_mode.expiration_datetime)
+        assert Schedule.objects.all().count() == 0
+        assert enrollment.upgrade_deadline == course_mode.expiration_datetime
 
     @skip_unless_lms
     # NOTE: We mute the post_save signal to prevent Schedules from being created for new enrollments
@@ -164,14 +176,14 @@ class CourseEnrollmentTests(SharedModuleStoreTestCase):  # lint-amnesty, pylint:
         # The schedule's upgrade deadline should be used if a schedule exists
         DynamicUpgradeDeadlineConfiguration.objects.create(enabled=True)
         schedule = ScheduleFactory(enrollment=enrollment)
-        self.assertEqual(enrollment.upgrade_deadline, schedule.upgrade_deadline)
+        assert enrollment.upgrade_deadline == schedule.upgrade_deadline
 
     @skip_unless_lms
     @ddt.data(*(set(CourseMode.ALL_MODES) - set(CourseMode.AUDIT_MODES)))
     def test_upgrade_deadline_for_non_upgradeable_enrollment(self, mode):
         """ The property should return None if an upgrade cannot be upgraded. """
         enrollment = CourseEnrollmentFactory(course_id=self.course.id, mode=mode)  # lint-amnesty, pylint: disable=no-member
-        self.assertIsNone(enrollment.upgrade_deadline)
+        assert enrollment.upgrade_deadline is None
 
     @skip_unless_lms
     def test_upgrade_deadline_instructor_paced(self):
@@ -186,8 +198,8 @@ class CourseEnrollmentTests(SharedModuleStoreTestCase):  # lint-amnesty, pylint:
         enrollment = CourseEnrollmentFactory(course_id=course.id, mode=CourseMode.AUDIT)
         DynamicUpgradeDeadlineConfiguration.objects.create(enabled=True)
         ScheduleFactory(enrollment=enrollment)
-        self.assertIsNotNone(enrollment.schedule)
-        self.assertEqual(enrollment.upgrade_deadline, course_upgrade_deadline)
+        assert enrollment.schedule is not None
+        assert enrollment.upgrade_deadline == course_upgrade_deadline
 
     @skip_unless_lms
     def test_upgrade_deadline_with_schedule_and_professional_mode(self):
@@ -204,8 +216,8 @@ class CourseEnrollmentTests(SharedModuleStoreTestCase):  # lint-amnesty, pylint:
         enrollment = CourseEnrollmentFactory(course_id=course.id, mode=CourseMode.AUDIT)
         DynamicUpgradeDeadlineConfiguration.objects.create(enabled=True)
         ScheduleFactory(enrollment=enrollment)
-        self.assertIsNotNone(enrollment.schedule)
-        self.assertIsNone(enrollment.upgrade_deadline)
+        assert enrollment.schedule is not None
+        assert enrollment.upgrade_deadline is None
 
     @skip_unless_lms
     # NOTE: We mute the post_save signal to prevent Schedules from being created for new enrollments
@@ -236,12 +248,222 @@ class CourseEnrollmentTests(SharedModuleStoreTestCase):  # lint-amnesty, pylint:
         # Re-fetch the CourseOverview record.
         # As a side effect, this will recreate the record, and update the version.
         course_overview_new = CourseOverview.get_from_id(course.id)
-        self.assertEqual(course_overview_new.version, CourseOverview.VERSION)
+        assert course_overview_new.version == CourseOverview.VERSION
 
         # Ensure that the enrollment record was unchanged during this re-creation
         enrollment_refetched = CourseEnrollment.objects.filter(id=enrollment.id)
-        self.assertTrue(enrollment_refetched.exists())
-        self.assertEqual(enrollment_refetched.all()[0], enrollment)
+        assert enrollment_refetched.exists()
+        assert enrollment_refetched.all()[0] == enrollment
+
+
+@override_waffle_flag(REDIRECT_TO_COURSEWARE_MICROFRONTEND, active=True)
+@override_waffle_flag(COURSEWARE_MICROFRONTEND_PROGRESS_MILESTONES, active=True)
+@override_waffle_flag(COURSEWARE_MICROFRONTEND_PROGRESS_MILESTONES_STREAK_CELEBRATION, active=True)
+class UserCelebrationTests(SharedModuleStoreTestCase):
+    """
+    Tests for User Celebrations like the streak celebration
+    """
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        cls.course = CourseFactory()
+        cls.course_key = cls.course.id  # pylint: disable=no-member
+
+    def setUp(self):
+        super().setUp()
+        self.user = UserFactory()
+        self.request = mock.Mock()
+        self.request.user = self.user
+        CourseEnrollmentFactory(course_id=self.course_key)
+        UserCelebration.STREAK_LENGTHS_TO_CELEBRATE = [3]
+        UserCelebration.STREAK_BREAK_LENGTH = 1
+        self.STREAK_LENGTH_TO_CELEBRATE = UserCelebration.STREAK_LENGTHS_TO_CELEBRATE[0]
+        self.STREAK_BREAK_LENGTH = UserCelebration.STREAK_BREAK_LENGTH
+        set_current_request(self.request)
+        self.addCleanup(set_current_request, None)
+
+    def test_first_check_streak_celebration(self):
+        STREAK_LENGTH_TO_CELEBRATE = UserCelebration.perform_streak_updates(self.user, self.course_key)
+        today = datetime.datetime.now(UTC).date()
+        assert self.user.celebration.streak_length == 1
+        assert self.user.celebration.last_day_of_streak == today
+        assert STREAK_LENGTH_TO_CELEBRATE is None
+
+    # pylint: disable=line-too-long
+    def test_celebrate_only_once_in_continuous_streak(self):
+        """
+        Sample run for a 3 day streak and 1 day break. See last column for explanation.
+        +---------+---------------------+--------------------+-------------------------+------------------+------------------+
+        | today   | streak_length       | last_day_of_streak | streak_length_to_celebrate | Note                             |
+        +---------+---------------------+--------------------+-------------------------+------------------+------------------+
+        | 2/4/21  | 1                   | 2/4/21             | None                    | Day 1 of Streak                     |
+        | 2/5/21  | 2                   | 2/5/21             | None                    | Day 2 of Streak                     |
+        | 2/6/21  | 3                   | 2/6/21             | 3                       | Completed 3 Day Streak so we should celebrate |
+        | 2/7/21  | 4                   | 2/7/21             | None                    | Day 4 of Streak                     |
+        | 2/8/21  | 5                   | 2/8/21             | None                    | Day 5 of Streak                     |
+        | 2/9/21  | 6                   | 2/9/21             | None                    | Day 6 of Streak                     |
+        +---------+---------------------+--------------------+-------------------------+------------------+------------------+
+        """
+        now = datetime.datetime.now(UTC)
+        for i in range(1, (self.STREAK_LENGTH_TO_CELEBRATE * 2) + 1):
+            with freeze_time(now + datetime.timedelta(days=i)):
+                STREAK_LENGTH_TO_CELEBRATE = UserCelebration.perform_streak_updates(self.user, self.course_key)
+                assert bool(STREAK_LENGTH_TO_CELEBRATE) == (i == self.STREAK_LENGTH_TO_CELEBRATE)
+
+    # pylint: disable=line-too-long
+    def test_longest_streak_updates_correctly(self):
+        """
+        Sample run for a 3 day streak and 1 day break. See last column for explanation.
+        +---------+---------------------+--------------------+-------------------------+------------------+---------------------+
+        | today   | streak_length       | last_day_of_streak | streak_length_to_celebrate | Note                                |
+        +---------+---------------------+--------------------+-------------------------+------------------+---------------------+
+        | 2/4/21  | 1                   | 2/4/21             | None                    | longest_streak_ever is 1               |
+        | 2/5/21  | 2                   | 2/5/21             | None                    | longest_streak_ever is 2               |
+        | 2/6/21  | 3                   | 2/6/21             | 3                       | longest_streak_ever is 3               |
+        | 2/7/21  | 4                   | 2/7/21             | None                    | longest_streak_ever is 4               |
+        | 2/8/21  | 5                   | 2/8/21             | None                    | longest_streak_ever is 5               |
+        | 2/9/21  | 6                   | 2/9/21             | None                    | longest_streak_ever is 6               |
+        +---------+---------------------+--------------------+-------------------------+------------------+---------------------+
+        """
+        now = datetime.datetime.now(UTC)
+        for i in range(1, (self.STREAK_LENGTH_TO_CELEBRATE * 2) + 1):
+            with freeze_time(now + datetime.timedelta(days=i)):
+                UserCelebration.perform_streak_updates(self.user, self.course_key)
+                assert self.user.celebration.longest_ever_streak == i
+
+    # pylint: disable=line-too-long
+    def test_celebrate_only_once_with_multiple_calls_on_the_same_day(self):
+        """
+        Sample run for a 3 day streak and 1 day break. See last column for explanation.
+        +---------+---------------------+--------------------+-------------------------+------------------+----------------------------+
+        | today   | streak_length       | last_day_of_streak | streak_length_to_celebrate | Note                                       |
+        +---------+---------------------+--------------------+-------------------------+------------------+----------------------------+
+        | 2/4/21  | 1                   | 2/4/21             | None                    | Day 1 of Streak                               |
+        | 2/4/21  | 1                   | 2/4/21             | None                    | Day 1 of Streak                               |
+        | 2/5/21  | 2                   | 2/5/21             | None                    | Day 2 of Streak                               |
+        | 2/5/21  | 2                   | 2/5/21             | None                    | Day 2 of Streak                               |
+        | 2/6/21  | 3                   | 2/6/21             | 3                       | Completed 3 Day Streak so we should celebrate |
+        | 2/6/21  | 3                   | 2/6/21             | None                    | Already celebrated this streak.               |
+        +---------+---------------------+--------------------+-------------------------+------------------+----------------------------+
+        """
+        now = datetime.datetime.now(UTC)
+        for i in range(1, self.STREAK_LENGTH_TO_CELEBRATE + 1):
+            with freeze_time(now + datetime.timedelta(days=i)):
+                streak_length_to_celebrate = UserCelebration.perform_streak_updates(self.user, self.course_key)
+                assert bool(streak_length_to_celebrate) == (i == self.STREAK_LENGTH_TO_CELEBRATE)
+                streak_length_to_celebrate = UserCelebration.perform_streak_updates(self.user, self.course_key)
+                assert streak_length_to_celebrate is None
+
+    def test_celebration_with_user_passed_in_timezone(self):
+        """
+        Check that the _get_now method uses the user's timezone from the browser if none is configured
+        """
+        now = UserCelebration._get_now('Asia/Tokyo')  # pylint: disable=protected-access
+        assert str(now.tzinfo) == 'Asia/Tokyo'
+
+    def test_celebration_with_user_configured_timezone(self):
+        """
+        Check that the _get_now method uses the user's configured timezone
+        over the browser timezone that is passed in as a parameter
+        """
+        set_user_preference(self.user, 'time_zone', 'Asia/Tokyo')
+        now = UserCelebration._get_now('America/New_York')  # pylint: disable=protected-access
+        assert str(now.tzinfo) == 'Asia/Tokyo'
+
+    # pylint: disable=line-too-long
+    def test_celebrate_twice_with_broken_streak_in_between(self):
+        """
+        Sample run for a 3 day streak and 1 day break. See last column for explanation.
+        +---------+---------------------+--------------------+-------------------------+------------------+-----------------------------------------------+
+        | today   | streak_length       | last_day_of_streak | streak_length_to_celebrate | Note                                |
+        +---------+---------------------+--------------------+-------------------------+------------------+-----------------------------------------------+
+        | 2/4/21  | 1                   | 2/4/21             | None                    | Day 1 of Streak                               |
+        | 2/5/21  | 2                   | 2/5/21             | None                    | Day 2 of Streak                               |
+        | 2/6/21  | 3                   | 2/6/21             | 3                       | Completed 3 Day Streak so we should celebrate |
+          No Accesses on 2/7/21
+        | 2/8/21  | 1                   | 2/8/21             | None                    | Day 1 of Streak                               |
+        | 2/9/21  | 2                   | 2/9/21             | None                    | Day 2 of Streak                               |
+        | 2/10/21 | 3                   | 2/10/21            | 3                       | Completed 3 Day Streak so we should celebrate |
+        +---------+---------------------+--------------------+-------------------------+------------------+-----------------------------------------------+
+        """
+        now = datetime.datetime.now(UTC)
+        for i in range(1, self.STREAK_LENGTH_TO_CELEBRATE + self.STREAK_BREAK_LENGTH + self.STREAK_LENGTH_TO_CELEBRATE + 1):
+            with freeze_time(now + datetime.timedelta(days=i)):
+                if self.STREAK_LENGTH_TO_CELEBRATE < i <= self.STREAK_LENGTH_TO_CELEBRATE + self.STREAK_BREAK_LENGTH:
+                    # Don't make any checks during the break
+                    continue
+                streak_length_to_celebrate = UserCelebration.perform_streak_updates(self.user, self.course_key)
+                if i <= self.STREAK_LENGTH_TO_CELEBRATE:
+                    assert bool(streak_length_to_celebrate) == (i == self.STREAK_LENGTH_TO_CELEBRATE)
+                else:
+                    assert bool(streak_length_to_celebrate) == (i == self.STREAK_LENGTH_TO_CELEBRATE + self.STREAK_BREAK_LENGTH + self.STREAK_LENGTH_TO_CELEBRATE)
+
+    # pylint: disable=line-too-long
+    def test_streak_resets_if_day_is_missed(self):
+        """
+        Sample run for a 3 day streak and 1 day break with the learner coming back every other day.
+        Therefore the streak keeps resetting.
+        +---------+---------------------+--------------------+-------------------------+------------------+-----------------------------------------------+
+        | today   | streak_length       | last_day_of_streak | streak_length_to_celebrate | Note                                          |
+        +---------+---------------------+--------------------+-------------------------+------------------+-----------------------------------------------+
+        | 2/4/21  | 1                   | 2/4/21             | None                    | Day 1 of Streak                               |
+          No Accesses on 2/5/21
+        | 2/6/21  | 1                   | 2/6/21             | None                    | Day 2 of streak was missed, so streak resets  |
+          No Accesses on 2/7/21
+        | 2/8/21  | 1                   | 2/8/21             | None                    | Day 2 of streak was missed, so streak resets  |
+          No Accesses on 2/9/21
+        | 2/10/21 | 1                   | 2/10/21            | None                    | Day 2 of streak was missed, so streak resets  |
+          No Accesses on 2/11/21
+        | 2/12/21 | 1                   | 2/12/21            | None                    | Day 2 of streak was missed, so streak resets  |
+        +---------+---------------------+--------------------+-------------------------+------------------+-----------------------------------------------+
+        """
+        now = datetime.datetime.now(UTC)
+        for i in range(1, self.STREAK_LENGTH_TO_CELEBRATE * 3 + 1, 2):
+            with freeze_time(now + datetime.timedelta(days=i)):
+                streak_length_to_celebrate = UserCelebration.perform_streak_updates(self.user, self.course_key)
+                assert self.user.celebration.last_day_of_streak == (now + datetime.timedelta(days=i)).date()
+                assert streak_length_to_celebrate is None
+
+    # pylint: disable=line-too-long
+    def test_streak_does_not_reset_if_day_is_missed_with_longer_break(self):
+        """
+        Sample run for a 3 day streak with the learner coming back every other day.
+        See last column for explanation.
+        +---------+---------------------+--------------------+-------------------------+------------------+
+        | today   | streak_length       | last_day_of_streak | streak_length_to_celebrate | Note          |
+        +---------+---------------------+--------------------+-------------------------+------------------+
+        | 2/4/21  | 1                   | 2/4/21             | None                    | Day 1 of Streak  |
+          No Accesses on 2/5/21
+        | 2/6/21  | 2                   | 2/6/21             | None                    | Day 2 of Streak  |
+          No Accesses on 2/7/21
+        | 2/8/21  | 3                   | 2/8/21             | 3                       | Day 3 of streak  |
+          No Accesses on 2/9/21
+        | 2/10/21 | 4                   | 2/10/21            | None                    | Day 4 of streak  |
+          No Accesses on 2/11/21
+        | 2/12/21 | 5                   | 2/12/21            | None                    | Day 5 of streak  |
+        +---------+---------------------+--------------------+-------------------------+------------------+
+        """
+        UserCelebration.STREAK_BREAK_LENGTH = 2
+        now = datetime.datetime.now(UTC)
+        for i in range(1, self.STREAK_LENGTH_TO_CELEBRATE * 3 + 1, 2):
+            with freeze_time(now + datetime.timedelta(days=i)):
+                streak_length_to_celebrate = UserCelebration.perform_streak_updates(self.user, self.course_key)
+                assert bool(streak_length_to_celebrate) == (i == 5)
+
+    def test_streak_masquerade(self):
+        """ Don't update streak data when masquerading as a specific student """
+        # Update streak data when not masquerading
+        with mock.patch.object(UserCelebration, '_update_streak') as update_streak_mock:
+            for _ in range(1, self.STREAK_LENGTH_TO_CELEBRATE + 1):
+                UserCelebration.perform_streak_updates(self.user, self.course_key)
+                update_streak_mock.assert_called()
+
+        # Don't update streak data when masquerading as a specific student
+        with mock.patch('lms.djangoapps.courseware.masquerade.is_masquerading_as_specific_student', return_value=True):
+            with mock.patch.object(UserCelebration, '_update_streak') as update_streak_mock:
+                for _ in range(1, self.STREAK_LENGTH_TO_CELEBRATE + 1):
+                    UserCelebration.perform_streak_updates(self.user, self.course_key)
+                    update_streak_mock.assert_not_called()
 
 
 class PendingNameChangeTests(SharedModuleStoreTestCase):
@@ -260,17 +482,17 @@ class PendingNameChangeTests(SharedModuleStoreTestCase):
             new_name='New Name PII',
             rationale='for testing!'
         )
-        self.assertEqual(1, len(PendingNameChange.objects.all()))
+        assert 1 == len(PendingNameChange.objects.all())
 
     def test_delete_by_user_removes_pending_name_change(self):
         record_was_deleted = PendingNameChange.delete_by_user_value(self.user, field='user')
-        self.assertTrue(record_was_deleted)
-        self.assertEqual(0, len(PendingNameChange.objects.all()))
+        assert record_was_deleted
+        assert 0 == len(PendingNameChange.objects.all())
 
     def test_delete_by_user_no_effect_for_user_with_no_name_change(self):
         record_was_deleted = PendingNameChange.delete_by_user_value(self.user2, field='user')
-        self.assertFalse(record_was_deleted)
-        self.assertEqual(1, len(PendingNameChange.objects.all()))
+        assert not record_was_deleted
+        assert 1 == len(PendingNameChange.objects.all())
 
 
 class PendingEmailChangeTests(SharedModuleStoreTestCase):
@@ -292,13 +514,13 @@ class PendingEmailChangeTests(SharedModuleStoreTestCase):
 
     def test_delete_by_user_removes_pending_email_change(self):
         record_was_deleted = PendingEmailChange.delete_by_user_value(self.user, field='user')
-        self.assertTrue(record_was_deleted)
-        self.assertEqual(0, len(PendingEmailChange.objects.all()))
+        assert record_was_deleted
+        assert 0 == len(PendingEmailChange.objects.all())
 
     def test_delete_by_user_no_effect_for_user_with_no_email_change(self):
         record_was_deleted = PendingEmailChange.delete_by_user_value(self.user2, field='user')
-        self.assertFalse(record_was_deleted)
-        self.assertEqual(1, len(PendingEmailChange.objects.all()))
+        assert not record_was_deleted
+        assert 1 == len(PendingEmailChange.objects.all())
 
 
 class TestCourseEnrollmentAllowed(TestCase):  # lint-amnesty, pylint: disable=missing-class-docstring
@@ -319,22 +541,22 @@ class TestCourseEnrollmentAllowed(TestCase):  # lint-amnesty, pylint: disable=mi
             value=self.email,
             field='email'
         )
-        self.assertTrue(is_successful)
+        assert is_successful
         user_search_results = CourseEnrollmentAllowed.objects.filter(
             email=self.email
         )
-        self.assertFalse(user_search_results)
+        assert not user_search_results
 
     def test_retiring_nonexistent_user_doesnt_modify_records(self):
         is_successful = CourseEnrollmentAllowed.delete_by_user_value(
             value='nonexistentlearner@example.com',
             field='email'
         )
-        self.assertFalse(is_successful)
+        assert not is_successful
         user_search_results = CourseEnrollmentAllowed.objects.filter(
             email=self.email
         )
-        self.assertTrue(user_search_results.exists())
+        assert user_search_results.exists()
 
 
 class TestManualEnrollmentAudit(SharedModuleStoreTestCase):
@@ -373,16 +595,12 @@ class TestManualEnrollmentAudit(SharedModuleStoreTestCase):
             self.instructor, self.user.email, ALLOWEDTOENROLL_TO_ENROLLED,
             'manually enrolling unenrolled user again', other_enrollment
         )
-        self.assertTrue(ManualEnrollmentAudit.objects.filter(enrollment=enrollment).exists())
+        assert ManualEnrollmentAudit.objects.filter(enrollment=enrollment).exists()
         # retire the ManualEnrollmentAudit objects associated with the above enrollments
         ManualEnrollmentAudit.retire_manual_enrollments(user=self.user, retired_email="xxx")
-        self.assertTrue(ManualEnrollmentAudit.objects.filter(enrollment=enrollment).exists())
-        self.assertFalse(ManualEnrollmentAudit.objects.filter(enrollment=enrollment).exclude(
-            enrolled_email="xxx"
-        ))
-        self.assertFalse(ManualEnrollmentAudit.objects.filter(enrollment=enrollment).exclude(
-            reason=""
-        ))
+        assert ManualEnrollmentAudit.objects.filter(enrollment=enrollment).exists()
+        assert not ManualEnrollmentAudit.objects.filter(enrollment=enrollment).exclude(enrolled_email='xxx')
+        assert not ManualEnrollmentAudit.objects.filter(enrollment=enrollment).exclude(reason='')
 
 
 class TestAccountRecovery(TestCase):
@@ -439,9 +657,9 @@ class TestUserPostSaveCallback(SharedModuleStoreTestCase):
         actual_student = User.objects.get(email=student.email)
         actual_cea = CourseEnrollmentAllowed.objects.get(email=student.email)
 
-        self.assertEqual(actual_course_enrollment.mode, mode)
-        self.assertEqual(actual_student.is_active, True)
-        self.assertEqual(actual_cea.user, student)
+        assert actual_course_enrollment.mode == mode
+        assert actual_student.is_active is True
+        assert actual_cea.user == student
 
     def test_not_enrolled_student_is_enrolled(self):
         """
@@ -464,9 +682,9 @@ class TestUserPostSaveCallback(SharedModuleStoreTestCase):
         actual_student = User.objects.get(email=student.email)
         actual_cea = CourseEnrollmentAllowed.objects.get(email=student.email)
 
-        self.assertEqual(actual_course_enrollment.mode, u"audit")
-        self.assertEqual(actual_student.is_active, True)
-        self.assertEqual(actual_cea.user, student)
+        assert actual_course_enrollment.mode == u'audit'
+        assert actual_student.is_active is True
+        assert actual_cea.user == student
 
     def test_verified_student_not_downgraded_when_changing_email(self):
         """
@@ -488,8 +706,8 @@ class TestUserPostSaveCallback(SharedModuleStoreTestCase):
         actual_course_enrollment = CourseEnrollment.objects.get(user=student, course_id=self.course.id)
         actual_student = User.objects.get(email=student.email)
 
-        self.assertEqual(actual_course_enrollment.mode, u"verified")
-        self.assertEqual(actual_student.is_active, True)
+        assert actual_course_enrollment.mode == u'verified'
+        assert actual_student.is_active is True
 
     def _set_up_invited_student(self, course, active=False, enrolled=True, course_mode=''):
         """
