@@ -1,6 +1,8 @@
 # lint-amnesty, pylint: disable=missing-module-docstring
 from django.apps import AppConfig
+from django.conf import settings
 from django.utils.translation import ugettext_lazy as _
+from edx_proctoring.runtime import set_runtime_service
 
 
 class LearningSequencesConfig(AppConfig):  # lint-amnesty, pylint: disable=missing-class-docstring
@@ -10,4 +12,7 @@ class LearningSequencesConfig(AppConfig):  # lint-amnesty, pylint: disable=missi
     def ready(self):
         # Register celery workers
         # from .tasks import ls_listen_for_course_publish  # pylint: disable=unused-variable
-        pass
+
+        if settings.FEATURES.get('ENABLE_SPECIAL_EXAMS'):
+            from .services import LearningSequencesRuntimeService
+            set_runtime_service('learning_sequences', LearningSequencesRuntimeService())
