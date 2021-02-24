@@ -1,11 +1,10 @@
 """
 Tasks to synchronize users with NodeBB
 """
+from celery.task import task
 from celery.utils.log import get_task_logger
-
 from django.conf import settings
 from django.contrib.auth.models import User
-from celery.task import task
 
 from common.lib.nodebb_client.client import NodeBBClient
 
@@ -28,13 +27,13 @@ def handle_response(caller, task_name, status_code, response, username=None):
         user_message = ' task for user: {}'.format(username)
 
     if status_code >= 500:
-        print('Retrying: {}{}'.format(task_name, user_message))
+        print('Retrying: {}{}'.format(task_name, user_message))  # pylint: disable=superfluous-parens
         caller.retry()
     elif status_code >= 400:
         print('Failure: {}{}, status_code: {}, response: {}'
               .format(task_name, user_message, status_code, response))
     elif 200 <= status_code < 300:
-        print('Success: {}{}'.format(task_name, user_message))
+        print('Success: {}{}'.format(task_name, user_message))  # pylint: disable=superfluous-parens
 
 
 @task(default_retry_delay=RETRY_DELAY, max_retries=None, routing_key=settings.HIGH_PRIORITY_QUEUE)
@@ -108,7 +107,13 @@ def task_join_group_on_nodebb(category_id, username):
     Celery task to join user to a community on NodeBB
     """
     status_code, response = NodeBBClient().users.join(category_id=category_id, username=username)
-    handle_response(task_join_group_on_nodebb, 'Join user in category with id {}'.format(category_id), status_code, response, username)
+    handle_response(
+        task_join_group_on_nodebb,
+        'Join user in category with id {}'.format(category_id),
+        status_code,
+        response,
+        username
+    )
 
 
 @task(default_retry_delay=RETRY_DELAY, max_retries=None)
@@ -117,7 +122,13 @@ def task_un_join_group_on_nodebb(category_id, username):
     Celery task to join user to a community on NodeBB
     """
     status_code, response = NodeBBClient().users.un_join(category_id=category_id, username=username)
-    handle_response(task_un_join_group_on_nodebb, 'Removed user from category with id {}'.format(category_id), status_code, response, username)
+    handle_response(
+        task_un_join_group_on_nodebb,
+        'Removed user from category with id {}'.format(category_id),
+        status_code,
+        response,
+        username
+    )
 
 
 @task(default_retry_delay=RETRY_DELAY, max_retries=None)

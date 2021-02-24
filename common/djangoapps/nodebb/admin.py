@@ -1,6 +1,9 @@
+"""
+Admin site for nodebb application.
+"""
 from django.contrib import admin
 
-from models import DiscussionCommunity
+from nodebb.models import DiscussionCommunity
 
 
 class DiscussionCommunityAdmin(admin.ModelAdmin):

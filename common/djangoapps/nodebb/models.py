@@ -3,7 +3,6 @@
 """
 from django.db import models
 from model_utils.models import TimeStampedModel
-from django.conf import settings
 
 from lms.djangoapps.teams.models import CourseTeam
 from openedx.core.djangoapps.xmodule_django.models import CourseKeyField
@@ -20,6 +19,9 @@ class DiscussionCommunity(TimeStampedModel):
     def __str__(self):
         return "%s" % self.community_url
 
+    def __unicode__(self):
+        return u'DiscussionCommunity: course_id: {}, community_url: {}'.format(self.course_id, self.community_url)
+
 
 class TeamGroupChat(TimeStampedModel):
     """
@@ -32,3 +34,6 @@ class TeamGroupChat(TimeStampedModel):
 
     def __str__(self):
         return "%s" % self.room_id
+
+    def __unicode__(self):
+        return u'TeamGroupChat: team: {}, room_id: {}, slug: {}'.format(self.team, self.room_id, self.slug)
