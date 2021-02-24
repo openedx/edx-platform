@@ -4,10 +4,10 @@ Unit tests for stub LTI implementation.
 
 
 import unittest
+from unittest.mock import Mock, patch
 
 import requests
-import six
-from mock import Mock, patch
+from urllib.request import urlopen
 
 from common.djangoapps.terrain.stubs.lti import StubLtiService
 
@@ -20,9 +20,9 @@ class StubLtiServiceTest(unittest.TestCase):
     Used for lettuce BDD tests in lms/courseware/features/lti.feature
     """
     def setUp(self):
-        super(StubLtiServiceTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.server = StubLtiService()
-        self.uri = 'http://127.0.0.1:{}/'.format(self.server.port)
+        self.uri = f'http://127.0.0.1:{self.server.port}/'
         self.launch_uri = self.uri + 'correct_lti_endpoint'
         self.addCleanup(self.server.shutdown)
         self.payload = {
@@ -74,7 +74,7 @@ class StubLtiServiceTest(unittest.TestCase):
         grade_uri = self.uri + 'grade'
         with patch('common.djangoapps.terrain.stubs.lti.requests.post') as mocked_post:
             mocked_post.return_value = Mock(content='Test response', status_code=200)
-            response = six.moves.urllib.request.urlopen(grade_uri, data=b'')
+            response = urlopen(grade_uri, data=b'')
             assert b'Test response' in response.read()
 
     @patch('common.djangoapps.terrain.stubs.lti.signature.verify_hmac_sha1', return_value=True)
@@ -84,7 +84,7 @@ class StubLtiServiceTest(unittest.TestCase):
         grade_uri = self.uri + 'lti2_outcome'
         with patch('common.djangoapps.terrain.stubs.lti.requests.put') as mocked_put:
             mocked_put.return_value = Mock(status_code=200)
-            response = six.moves.urllib.request.urlopen(grade_uri, data=b'')
+            response = urlopen(grade_uri, data=b'')
             assert b'LTI consumer (edX) responded with HTTP 200' in response.read()
 
     @patch('common.djangoapps.terrain.stubs.lti.signature.verify_hmac_sha1', return_value=True)
@@ -94,5 +94,5 @@ class StubLtiServiceTest(unittest.TestCase):
         grade_uri = self.uri + 'lti2_delete'
         with patch('common.djangoapps.terrain.stubs.lti.requests.put') as mocked_put:
             mocked_put.return_value = Mock(status_code=200)
-            response = six.moves.urllib.request.urlopen(grade_uri, data=b'')
+            response = urlopen(grade_uri, data=b'')
             assert b'LTI consumer (edX) responded with HTTP 200' in response.read()

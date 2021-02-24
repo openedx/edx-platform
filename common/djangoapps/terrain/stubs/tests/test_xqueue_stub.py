@@ -6,14 +6,14 @@ Unit tests for stub XQueue implementation.
 import ast
 import json
 import unittest
+from unittest import mock
 
-import mock
 import requests
 
 from ..xqueue import StubXQueueService
 
 
-class FakeTimer(object):
+class FakeTimer:
     """
     Fake timer implementation that executes immediately.
     """
@@ -27,9 +27,9 @@ class FakeTimer(object):
 class StubXQueueServiceTest(unittest.TestCase):  # lint-amnesty, pylint: disable=missing-class-docstring
 
     def setUp(self):
-        super(StubXQueueServiceTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.server = StubXQueueService()
-        self.url = "http://127.0.0.1:{0}/xqueue/submit".format(self.server.port)
+        self.url = f"http://127.0.0.1:{self.server.port}/xqueue/submit"
         self.addCleanup(self.server.shutdown)
 
         # Patch the timer async calls
