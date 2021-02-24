@@ -115,7 +115,7 @@ edx-milestones==0.3.0     # via -r requirements/edx/base.txt
 edx-opaque-keys[django]==2.2.0  # via -r requirements/edx/base.txt, edx-bulk-grades, edx-ccx-keys, edx-completion, edx-drf-extensions, edx-enterprise, edx-milestones, edx-organizations, edx-proctoring, edx-user-state-client, edx-when, lti-consumer-xblock, xmodule
 edx-organizations==6.9.0  # via -r requirements/edx/base.txt
 edx-proctoring-proctortrack==1.0.5  # via -r requirements/edx/base.txt
-edx-proctoring==3.6.2     # via -r requirements/edx/base.txt, edx-proctoring-proctortrack
+edx-proctoring==3.6.3     # via -r requirements/edx/base.txt, edx-proctoring-proctortrack
 edx-rbac==1.4.1           # via -r requirements/edx/base.txt, edx-enterprise
 edx-rest-api-client==5.3.0  # via -r requirements/edx/base.txt, edx-enterprise, edx-proctoring
 edx-search==3.0.0         # via -r requirements/edx/base.txt
@@ -213,7 +213,7 @@ pyjwt[crypto]==1.7.1      # via -r requirements/edx/base.txt, drf-jwt, edx-rest-
 pylint-celery==0.3        # via edx-lint
 pylint-django==2.4.2      # via edx-lint
 pylint-plugin-utils==0.6  # via pylint-celery, pylint-django
-pylint==2.7.0             # via edx-lint, pylint-celery, pylint-django, pylint-plugin-utils
+pylint==2.7.1             # via edx-lint, pylint-celery, pylint-django, pylint-plugin-utils
 pymongo==3.10.1           # via -c requirements/edx/../constraints.txt, -r requirements/edx/base.txt, edx-opaque-keys, event-tracking, mongodbproxy, mongoengine
 pynliner==0.8.0           # via -r requirements/edx/base.txt
 pyparsing==2.4.7          # via -r requirements/edx/base.txt, chem, openedx-calc, packaging, pycontracts
