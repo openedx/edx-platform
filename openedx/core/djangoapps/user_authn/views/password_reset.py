@@ -26,6 +26,7 @@ from edx_ace.recipient import Recipient
 from eventtracking import tracker
 from ratelimit.decorators import ratelimit
 from rest_framework.response import Response
+from rest_framework.throttling import AnonRateThrottle
 from rest_framework.views import APIView
 
 from common.djangoapps.edxmako.shortcuts import render_to_string
@@ -642,7 +643,35 @@ def password_change_request_handler(request):
         return HttpResponseBadRequest(_("No email address provided."))
 
 
+def _get_rate(rate):
+    """
+    Given the request rate string, return a two tuple of:
+    <allowed number of requests>, <period of time in seconds>
+    """
+
+    requests, duration = rate.split('/')
+    num_requests = int(requests)
+    num = int(duration[:-1] if duration[:-1] else 1)
+    symbol = duration[-1:]
+    duration = {'s': 1, 'm': 60, 'h': 3600, 'd': 86400}[symbol] * num
+    return (num_requests, duration)
+
+
+class ResetTokenValidationThrottle(AnonRateThrottle):
+    """
+    Setting rate limit for token validation
+    """
+    rate = settings.RESET_PASSWORD_TOKEN_VALIDATE_API_RATELIMIT
+
+    def parse_rate(self, rate):
+        return _get_rate(rate)
+
+
 class PasswordResetTokenValidation(APIView):  # lint-amnesty, pylint: disable=missing-class-docstring
+    """
+    API to validate generated password reset token
+    """
+    throttle_classes = [ResetTokenValidationThrottle]
 
     def post(self, request):
         """ HTTP end-point to validate password reset token. """
@@ -668,7 +697,21 @@ class PasswordResetTokenValidation(APIView):  # lint-amnesty, pylint: disable=mi
         return Response({'is_valid': is_valid})
 
 
+class PasswordResetThrottle(AnonRateThrottle):
+    """
+    Setting rate limit for password reset
+    """
+    rate = settings.RESET_PASSWORD_API_RATELIMIT
+
+    def parse_rate(self, rate):
+        return _get_rate(rate)
+
+
 class LogistrationPasswordResetView(APIView):  # lint-amnesty, pylint: disable=missing-class-docstring
+    """
+    API to update new password credentials for a correct token
+    """
+    throttle_classes = [PasswordResetThrottle]
 
     def post(self, request, **kwargs):
         """ Reset learner password using passed token and new credentials """
