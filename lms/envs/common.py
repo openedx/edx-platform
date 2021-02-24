@@ -321,7 +321,17 @@ FEATURES = {
 
     'DISABLE_AUDIT_CERTIFICATES': False,  # Toggle to disable audit certificates
 
-    # for acceptance and load testing
+    # .. toggle_name: FEATURES['AUTOMATIC_AUTH_FOR_TESTING']
+    # .. toggle_implementation: DjangoSetting
+    # .. toggle_default: False
+    # .. toggle_description: Set to True to perform acceptance and load test. Auto auth view is responsible for load
+    #   testing and is controlled by this feature flag. Auto-auth causes issues in Bok Choy tests because it resets the
+    #   requesting user. Session verification (of CacheBackedAuthenticationMiddleware) is a security feature, but it
+    #   can be turned off by enabling this feature flag.
+    # .. toggle_use_cases: open_edx
+    # .. toggle_creation_date: 2013-07-25
+    # .. toggle_warnings: If this has been set to True then the account activation email will be skipped.
+    # .. toggle_tickets: https://github.com/edx/edx-platform/pull/417
     'AUTOMATIC_AUTH_FOR_TESTING': False,
 
     # .. toggle_name: FEATURES['RESTRICT_AUTOMATIC_AUTH']
