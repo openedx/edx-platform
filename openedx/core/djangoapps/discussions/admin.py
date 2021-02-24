@@ -3,6 +3,7 @@ Customize the django admin experience
 """
 from django.contrib import admin
 from django.contrib.admin import SimpleListFilter
+from lti_consumer.models import LtiConfiguration
 from simple_history.admin import SimpleHistoryAdmin
 
 from openedx.core.djangoapps.config_model_utils.admin import StackedConfigModelAdmin
@@ -25,6 +26,11 @@ class DiscussionsConfigurationAdmin(SimpleHistoryAdmin):
         'enabled',
         'provider_type',
     )
+
+    def formfield_for_foreignkey(self, db_field, request, **kwargs):
+        if db_field.name == 'lti_configuration':
+            kwargs['queryset'] = LtiConfiguration.objects.filter(config_id__isnull=False)
+        return super().formfield_for_foreignkey(db_field, request, **kwargs)
 
 
 class AllowListFilter(SimpleListFilter):
