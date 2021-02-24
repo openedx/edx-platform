@@ -967,7 +967,7 @@ def course_about(request, course_id):
             'active_reg_button': active_reg_button,
             'is_shib_course': is_shib_course,
             # We do not want to display the internal courseware header, which is used when the course is found in the
-            # context. This value is therefor explicitly set to render the appropriate header.
+            # context. This value is therefore explicitly set to render the appropriate header.
             'disable_courseware_header': True,
             'pre_requisite_courses': pre_requisite_courses,
             'course_image_urls': overview.image_urls,
@@ -1568,6 +1568,12 @@ def generate_user_cert(request, course_id):
     course = modulestore().get_course(course_key, depth=2)
     if not course:
         return HttpResponseBadRequest(_("Course is not valid"))
+
+    if certs_api.is_using_certificate_allowlist_and_is_on_allowlist(student, course_key):
+        log.info(f'{course_key} is using allowlist certificates, and the user {student.id} is on its allowlist. '
+                 f'Attempt will be made to generate an allowlist certificate.')
+        certs_api.generate_allowlist_certificate_task(student, course_key)
+        return HttpResponse()
 
     if not is_course_passed(student, course):
         log.info(u"User %s has not passed the course: %s", student.username, course_id)

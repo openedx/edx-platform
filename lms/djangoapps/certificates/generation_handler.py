@@ -72,7 +72,7 @@ def can_generate_allowlist_certificate(user, course_key):
     Check if an allowlist certificate can be generated (created if it doesn't already exist, or updated if it does
     exist) for this user, in this course run.
     """
-    if not _is_using_certificate_allowlist(course_key):
+    if not is_using_certificate_allowlist(course_key):
         # This course run is not using the allowlist feature
         log.info(
             '{course} is not using the certificate allowlist. Certificate cannot be generated.'.format(
@@ -130,10 +130,10 @@ def is_using_certificate_allowlist_and_is_on_allowlist(user, course_key):
     1) the course run is using the allowlist, and
     2) if the user is on the allowlist for this course run
     """
-    return _is_using_certificate_allowlist(course_key) and _is_on_certificate_allowlist(user, course_key)
+    return is_using_certificate_allowlist(course_key) and _is_on_certificate_allowlist(user, course_key)
 
 
-def _is_using_certificate_allowlist(course_key):
+def is_using_certificate_allowlist(course_key):
     """
     Check if the course run is using the allowlist, aka V2 of certificate whitelisting
     """
@@ -193,6 +193,12 @@ def generate_user_certificates(student, course_key, course=None, insecure=False,
         forced_grade - a string indicating to replace grade parameter. if present grading
                        will be skipped.
     """
+    if is_using_certificate_allowlist_and_is_on_allowlist(student, course_key):
+        # Note that this will launch an asynchronous task, and so cannot return the certificate status. This is a
+        # change from the older certificate code that tries to immediately create a cert.
+        log.info(f'{course_key} is using allowlist certificates, and the user {student.id} is on its allowlist. '
+                 f'Attempt will be made to regenerate an allowlist certificate.')
+        return generate_allowlist_certificate_task(student, course_key)
 
     if not course:
         course = modulestore().get_course(course_key, depth=0)

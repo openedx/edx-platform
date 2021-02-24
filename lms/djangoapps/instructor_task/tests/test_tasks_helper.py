@@ -21,6 +21,7 @@ import unicodecsv
 from django.conf import settings
 from django.test.utils import override_settings
 from edx_django_utils.cache import RequestCache
+from edx_toggles.toggles.testutils import override_waffle_flag
 from freezegun import freeze_time
 from pytz import UTC
 
@@ -29,6 +30,7 @@ from capa.tests.response_xml_factory import MultipleChoiceResponseXMLFactory
 from common.djangoapps.course_modes.models import CourseMode
 from common.djangoapps.student.models import CourseEnrollment, CourseEnrollmentAllowed
 from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
+from lms.djangoapps.certificates.generation_handler import CERTIFICATES_USE_ALLOWLIST
 from lms.djangoapps.certificates.models import CertificateStatuses, GeneratedCertificate
 from lms.djangoapps.certificates.tests.factories import CertificateWhitelistFactory, GeneratedCertificateFactory
 from lms.djangoapps.courseware.models import StudentModule
@@ -37,7 +39,10 @@ from lms.djangoapps.grades.models import PersistentCourseGrade, PersistentSubsec
 from lms.djangoapps.grades.subsection_grade import CreateSubsectionGrade
 from lms.djangoapps.grades.transformer import GradesTransformer
 from lms.djangoapps.instructor_analytics.basic import UNAVAILABLE, list_problem_responses
-from lms.djangoapps.instructor_task.tasks_helper.certs import generate_students_certificates
+from lms.djangoapps.instructor_task.tasks_helper.certs import (
+    generate_students_certificates,
+    _invalidate_generated_certificates
+)
 from lms.djangoapps.instructor_task.tasks_helper.enrollments import upload_may_enroll_csv, upload_students_csv
 from lms.djangoapps.instructor_task.tasks_helper.grades import (
     ENROLLED_IN_COURSE,
@@ -2025,11 +2030,11 @@ class TestCertificateGeneration(InstructorTaskModuleTestCase):
             'action_name': 'certificates generated',
             'total': 10,
             'attempted': 8,
-            'succeeded': 5,
-            'failed': 3,
+            'succeeded': 0,
+            'failed': 0,
             'skipped': 2
         }
-        with self.assertNumQueries(141):
+        with self.assertNumQueries(157):
             self.assertCertificatesGenerated(task_input, expected_results)
 
         expected_results = {
@@ -2076,7 +2081,7 @@ class TestCertificateGeneration(InstructorTaskModuleTestCase):
             'action_name': 'certificates generated',
             'total': 3,
             'attempted': 3,
-            'succeeded': 3,
+            'succeeded': 0,
             'failed': 0,
             'skipped': 0
         }
@@ -2129,7 +2134,7 @@ class TestCertificateGeneration(InstructorTaskModuleTestCase):
             'action_name': 'certificates generated',
             'total': expected_certs,
             'attempted': expected_certs,
-            'succeeded': expected_certs,
+            'succeeded': 0,
             'failed': 0,
             'skipped': 0
         }
@@ -2161,7 +2166,7 @@ class TestCertificateGeneration(InstructorTaskModuleTestCase):
             'action_name': 'certificates generated',
             'total': 1,
             'attempted': 1,
-            'succeeded': 1,
+            'succeeded': 0,
             'failed': 0,
             'skipped': 0,
         }
@@ -2182,7 +2187,7 @@ class TestCertificateGeneration(InstructorTaskModuleTestCase):
             'total': 1,
             'attempted': 1,
             'succeeded': 0,
-            'failed': 1,
+            'failed': 0,
             'skipped': 0,
         }
         self.assertCertificatesGenerated(task_input, expected_results)
@@ -2234,7 +2239,7 @@ class TestCertificateGeneration(InstructorTaskModuleTestCase):
             'action_name': 'certificates generated',
             'total': 10,
             'attempted': 5,
-            'succeeded': 5,
+            'succeeded': 0,
             'failed': 0,
             'skipped': 5
         }
@@ -2310,8 +2315,8 @@ class TestCertificateGeneration(InstructorTaskModuleTestCase):
             'action_name': 'certificates generated',
             'total': 10,
             'attempted': 5,
-            'succeeded': 2,
-            'failed': 3,
+            'succeeded': 0,
+            'failed': 0,
             'skipped': 5
         }
 
@@ -2407,7 +2412,7 @@ class TestCertificateGeneration(InstructorTaskModuleTestCase):
             'action_name': 'certificates generated',
             'total': 10,
             'attempted': 8,
-            'succeeded': 8,
+            'succeeded': 0,
             'failed': 0,
             'skipped': 2
         }
@@ -2498,12 +2503,44 @@ class TestCertificateGeneration(InstructorTaskModuleTestCase):
             'action_name': 'certificates generated',
             'total': 7,
             'attempted': 7,
-            'succeeded': 7,
+            'succeeded': 0,
             'failed': 0,
             'skipped': 0,
         }
 
         self.assertCertificatesGenerated(task_input, expected_results)
+
+    @override_waffle_flag(CERTIFICATES_USE_ALLOWLIST, active=True)
+    def test_invalidation(self):
+        # Create students
+        students = self._create_students(2)
+        s1 = students[0]
+        s2 = students[1]
+
+        # Generate certificates
+        for s in students:
+            GeneratedCertificateFactory.create(
+                user=s,
+                course_id=self.course.id,
+                status=CertificateStatuses.downloadable,
+                mode='verified'
+            )
+
+        # Whitelist a student
+        CertificateWhitelistFactory.create(user=s1, course_id=self.course.id)
+
+        statuses = [CertificateStatuses.downloadable]
+        _invalidate_generated_certificates(self.course.id, students, statuses)
+
+        certs = GeneratedCertificate.objects.filter(user=s1, course_id=self.course.id)
+        assert certs.count() == 1
+        downloadable_cert = certs.first()
+        assert downloadable_cert.status == CertificateStatuses.downloadable
+
+        certs = GeneratedCertificate.objects.filter(user=s2, course_id=self.course.id)
+        assert certs.count() == 1
+        invalidated_cert = certs.first()
+        assert invalidated_cert.status == CertificateStatuses.unavailable
 
     def assertCertificatesGenerated(self, task_input, expected_results):
         """
