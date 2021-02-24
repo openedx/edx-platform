@@ -176,8 +176,9 @@ class CoursewareIndex(View):
         # DENY: feature disabled globally
         if not settings.FEATURES.get('ENABLE_COURSEWARE_MICROFRONTEND'):
             return
-        # DENY: staff access
-        if self.is_staff:
+        # DENY: global staff are not automatically redirected,
+        #       allowing them to debug/develop in both experiences.
+        if self.request.user.is_staff:
             return
         # DENY: Old Mongo courses, until removed from platform
         if self.course_key.deprecated:

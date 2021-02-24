@@ -3394,17 +3394,19 @@ class MFERedirectTests(BaseViewsTestCase):  # lint-amnesty, pylint: disable=miss
         with override_waffle_flag(REDIRECT_TO_COURSEWARE_MICROFRONTEND, active=True):
             assert self.client.get(lms_url).url == mfe_url
 
-    def test_staff_no_redirect(self):
-        lms_url, mfe_url = self._get_urls()  # lint-amnesty, pylint: disable=unused-variable
+    def test_course_staff_redirect(self):
+        lms_url, mfe_url = self._get_urls()
 
         # course staff will not redirect
         course_staff = UserFactory.create(is_staff=False)
         CourseStaffRole(self.course_key).add_users(course_staff)
         self.client.login(username=course_staff.username, password='test')
 
-        assert self.client.get(lms_url).status_code == 200
         with override_waffle_flag(REDIRECT_TO_COURSEWARE_MICROFRONTEND, active=True):
-            assert self.client.get(lms_url).status_code == 200
+            assert self.client.get(lms_url).url == mfe_url
+
+    def test_global_staff_no_redirect(self):
+        lms_url, _mfe_url = self._get_urls()
 
         # global staff will never be redirected
         self._create_global_staff_user()
@@ -3418,7 +3420,7 @@ class MFERedirectTests(BaseViewsTestCase):  # lint-amnesty, pylint: disable=miss
         self.section2.is_time_limited = True
         self.store.update_item(self.section2, self.user.id)
 
-        lms_url, mfe_url = self._get_urls()  # lint-amnesty, pylint: disable=unused-variable
+        lms_url, _mfe_url = self._get_urls()
 
         with override_waffle_flag(REDIRECT_TO_COURSEWARE_MICROFRONTEND, active=True):
             assert self.client.get(lms_url).status_code == 200
