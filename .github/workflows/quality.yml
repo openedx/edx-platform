@@ -38,7 +38,7 @@ jobs:
         with:
           path: /opt/hostedtoolcache/Python/
           key: |
-            ${{ hashFiles('requirements/edx/base.txt') }}-${{ hashFiles('requirements/philu/testing.txt') }}-${{
+            ${{ hashFiles('requirements/edx/testing.txt') }}-${{ hashFiles('requirements/philu/testing.txt') }}-${{
             hashFiles('philu_actions/scripts/dependency_downloader.sh') }}
         if: env.GIT_DIFF
 
@@ -112,11 +112,9 @@ jobs:
         if: env.GIT_DIFF
 
       - name: Post report on PR
-        uses: peter-evans/commit-comment@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        uses: mshick/add-pr-comment@v1
         with:
-          body: |
+          message: |
             **pylint:** ${{ steps.pylint-report.outputs.icon }}
             **pycodestyle:** ${{ steps.pycodestyle-report.outputs.icon }}
             **iSort:** ${{ steps.isort-report.outputs.icon }}
@@ -131,15 +129,17 @@ jobs:
 
             ${{ steps.isort-report.outputs.title }}
             ${{ steps.isort-report.outputs.body }}
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+          repo-token-user-login: 'github-actions[bot]'
         if: env.GIT_DIFF
 
       - name: No py file, post comment on PR
-        uses: peter-evans/commit-comment@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        uses: mshick/add-pr-comment@v1
         with:
-          body: |
+          message: |
             No python file in PR. **Looks good** :+1:
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+          repo-token-user-login: 'github-actions[bot]'
         if: env.GIT_DIFF == ''
 
       - name: Check on failures
