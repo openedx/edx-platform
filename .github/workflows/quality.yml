@@ -97,7 +97,7 @@ jobs:
         id: isort-report
         continue-on-error: true
         run: |
-          isort ${{ env.GIT_DIFF }} -c 2>&1 | tee report_isort.txt
+          isort -ns ${{ env.GIT_DIFF }} -c 2>&1 | tee report_isort.txt
 
           body=$(cat report_isort.txt)
           body="${body//'%'/'%25'}"
