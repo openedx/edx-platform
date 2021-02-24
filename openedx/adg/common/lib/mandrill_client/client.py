@@ -23,7 +23,7 @@ class MandrillClient(object):
     VERIFY_CHANGE_USER_EMAIL = 'adg-verify-email-address-change-step-2'
     APPLICATION_SUBMISSION_CONFIRMATION = 'adg-application-submission-confirmation-1'
     APPLICATION_WAITLISTED = 'adg-waitlisted-application'
-    APPLICATION_ACCEPTED = 'adg-accepted-application-professional-and-forma'
+    APPLICATION_ACCEPTED = 'adg-application-accepted'
 
     def __init__(self):
         self.mandrill_client = mandrill.Mandrill(settings.MANDRILL_API_KEY)

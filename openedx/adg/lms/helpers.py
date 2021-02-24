@@ -13,4 +13,4 @@ def get_user_first_name(user):
         (str) first name of the user
 
     """
-    return user.first_name or user.profile.full_name.split()[0]
+    return user.first_name or user.profile.name.split()[0]
