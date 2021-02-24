@@ -31,6 +31,10 @@ if 'TOXENV' in os.environ:
 else:
     PYTHON_REQ_FILES = ['requirements/edx/development.txt']
 
+PRIVATE_REQS = 'requirements/pakx/base.txt'
+if os.path.exists(PRIVATE_REQS):
+    PYTHON_REQ_FILES.append(PRIVATE_REQS)
+
 # Developers can have private requirements, for local copies of github repos,
 # or favorite debugging tools, etc.
 PRIVATE_REQS = 'requirements/private.txt'
