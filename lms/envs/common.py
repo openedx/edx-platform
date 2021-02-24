@@ -806,19 +806,6 @@ FEATURES = {
     # .. toggle_tickets: 'https://github.com/edx/edx-platform/pull/21616'
     'ENABLE_CHANGE_USER_PASSWORD_ADMIN': False,
 
-    # .. toggle_name: FEATURES['ENABLE_COURSEWARE_MICROFRONTEND']
-    # .. toggle_implementation: DjangoSetting
-    # .. toggle_default: False
-    # .. toggle_description: Set to True to enable the Courseware MFE at the platform level for global staff (see
-    #   REDIRECT_TO_COURSEWARE_MICROFRONTEND for course rollout)
-    # .. toggle_use_cases: open_edx
-    # .. toggle_creation_date: 2020-03-05
-    # .. toggle_target_removal_date: None
-    # .. toggle_tickets: DEPR-109
-    # .. toggle_warnings: Also set settings.LEARNING_MICROFRONTEND_URL and see REDIRECT_TO_COURSEWARE_MICROFRONTEND for
-    #   rollout.
-    'ENABLE_COURSEWARE_MICROFRONTEND': False,
-
     # .. toggle_name: FEATURES['ENABLE_AUTHN_MICROFRONTEND']
     # .. toggle_implementation: DjangoSetting
     # .. toggle_default: False
@@ -4500,9 +4487,15 @@ PROGRAM_CONSOLE_MICROFRONTEND_URL = None
 # .. setting_name: LEARNING_MICROFRONTEND_URL
 # .. setting_default: None
 # .. setting_description: Base URL of the micro-frontend-based courseware page.
-# .. setting_warning: Also set site's ENABLE_COURSEWARE_MICROFRONTEND or
-#     FEATURES['ENABLE_COURSEWARE_MICROFRONTEND'] and courseware.courseware_mfe waffle flag
 LEARNING_MICROFRONTEND_URL = None
+
+# @@TODO document
+LEARNING_MICROFRONTEND_ENABLED = True
+LEARNING_MICROFRONTEND_INCLUSIONS = []
+LEARNING_MICROFRONTEND_EXCLUSIONS = []
+LEARNING_MICROFRONTEND_PREVIEW_ENABLED = []
+LEARNING_MICROFRONTEND_PREVIEW_INCLUSIONS = []
+LEARNING_MICROFRONTEND_PREVIEW_EXCLUSIONS = []
 
 ############### Settings for the ace_common plugin #################
 ACE_ENABLED_CHANNELS = ['django_email']

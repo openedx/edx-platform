@@ -3,8 +3,7 @@
 from edx_toggles.toggles.testutils import override_waffle_flag
 from lms.djangoapps.courseware.toggles import (
     COURSEWARE_MICROFRONTEND_PROGRESS_MILESTONES,
-    COURSEWARE_MICROFRONTEND_PROGRESS_MILESTONES_FIRST_SECTION_CELEBRATION,
-    REDIRECT_TO_COURSEWARE_MICROFRONTEND
+    COURSEWARE_MICROFRONTEND_PROGRESS_MILESTONES_FIRST_SECTION_CELEBRATION
 )
 from common.djangoapps.student.models import CourseEnrollmentCelebration
 from common.djangoapps.student.tests.factories import CourseEnrollmentFactory
@@ -15,7 +14,6 @@ class ReceiversTest(SharedModuleStoreTestCase):
     """
     Tests for dashboard utility functions
     """
-    @override_waffle_flag(REDIRECT_TO_COURSEWARE_MICROFRONTEND, active=True)
     @override_waffle_flag(COURSEWARE_MICROFRONTEND_PROGRESS_MILESTONES, active=True)
     @override_waffle_flag(COURSEWARE_MICROFRONTEND_PROGRESS_MILESTONES_FIRST_SECTION_CELEBRATION, active=True)
     def test_celebration_created(self):

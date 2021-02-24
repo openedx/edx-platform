@@ -1,43 +1,13 @@
 """
 Toggles for courseware in-course experience.
 """
-
+from django.conf import settings
 from edx_toggles.toggles import LegacyWaffleFlagNamespace
+
 from openedx.core.djangoapps.waffle_utils import CourseWaffleFlag
 
 # Namespace for courseware waffle flags.
 WAFFLE_FLAG_NAMESPACE = LegacyWaffleFlagNamespace(name='courseware')
-
-# .. toggle_name: courseware.courseware_mfe
-# .. toggle_implementation: CourseWaffleFlag
-# .. toggle_default: False
-# .. toggle_description: Waffle flag to redirect to another learner profile experience. Supports staged rollout to
-#   students for a new micro-frontend-based implementation of the courseware page.
-# .. toggle_use_cases: temporary, open_edx
-# .. toggle_creation_date: 2020-01-29
-# .. toggle_target_removal_date: 2020-12-31
-# .. toggle_warnings: Also set settings.LEARNING_MICROFRONTEND_URL and
-#   ENABLE_COURSEWARE_MICROFRONTEND.
-# .. toggle_tickets: DEPR-109
-REDIRECT_TO_COURSEWARE_MICROFRONTEND = CourseWaffleFlag(
-    WAFFLE_FLAG_NAMESPACE, 'courseware_mfe', __name__
-)
-
-# .. toggle_name: courseware.microfrontend_course_team_preview
-# .. toggle_implementation: CourseWaffleFlag
-# .. toggle_default: False
-# .. toggle_description: Waffle flag to display a link for the new learner experience to course teams without
-#   redirecting students. Supports staged rollout to course teams of a new micro-frontend-based implementation of the
-#   courseware page.
-# .. toggle_use_cases: temporary, open_edx
-# .. toggle_creation_date: 2020-03-09
-# .. toggle_target_removal_date: 2020-12-31
-# .. toggle_warnings: Also set settings.LEARNING_MICROFRONTEND_URL and
-#   ENABLE_COURSEWARE_MICROFRONTEND.
-# .. toggle_tickets: DEPR-109
-COURSEWARE_MICROFRONTEND_COURSE_TEAM_PREVIEW = CourseWaffleFlag(
-    WAFFLE_FLAG_NAMESPACE, 'microfrontend_course_team_preview', __name__
-)
 
 # Waffle flag to enable the course exit page in the learning MFE.
 #
@@ -49,7 +19,7 @@ COURSEWARE_MICROFRONTEND_COURSE_TEAM_PREVIEW = CourseWaffleFlag(
 # .. toggle_use_cases: open_edx, temporary
 # .. toggle_creation_date: 2020-10-02
 # .. toggle_target_removal_date: None
-# .. toggle_warnings: Also set settings.LEARNING_MICROFRONTEND_URL and ENABLE_COURSEWARE_MICROFRONTEND.
+# .. toggle_warnings: Also set settings.LEARNING_MICROFRONTEND_URL.
 # .. toggle_tickets: AA-188
 COURSEWARE_MICROFRONTEND_COURSE_EXIT_PAGE = CourseWaffleFlag(
     WAFFLE_FLAG_NAMESPACE, 'microfrontend_course_exit_page', __name__
@@ -63,7 +33,7 @@ COURSEWARE_MICROFRONTEND_COURSE_EXIT_PAGE = CourseWaffleFlag(
 # .. toggle_use_cases: temporary, open_edx
 # .. toggle_creation_date: 2020-10-07
 # .. toggle_target_removal_date: none
-# .. toggle_warnings: Also set settings.LEARNING_MICROFRONTEND_URL and ENABLE_COURSEWARE_MICROFRONTEND.
+# .. toggle_warnings: Also set settings.LEARNING_MICROFRONTEND_URL.
 # .. toggle_tickets: AA-371
 COURSEWARE_MICROFRONTEND_PROGRESS_MILESTONES = CourseWaffleFlag(
     WAFFLE_FLAG_NAMESPACE, 'mfe_progress_milestones', __name__
@@ -78,7 +48,7 @@ COURSEWARE_MICROFRONTEND_PROGRESS_MILESTONES = CourseWaffleFlag(
 # .. toggle_use_cases: temporary, open_edx
 # .. toggle_creation_date: 2020-10-07
 # .. toggle_target_removal_date: None
-# .. toggle_warnings: Also set settings.LEARNING_MICROFRONTEND_URL and ENABLE_COURSEWARE_MICROFRONTEND and
+# .. toggle_warnings: Also set settings.LEARNING_MICROFRONTEND_URL and
 #   COURSEWARE_MICROFRONTEND_PROGRESS_MILESTONES.
 # .. toggle_tickets: AA-371
 COURSEWARE_MICROFRONTEND_PROGRESS_MILESTONES_FIRST_SECTION_CELEBRATION = CourseWaffleFlag(
@@ -94,7 +64,7 @@ COURSEWARE_MICROFRONTEND_PROGRESS_MILESTONES_FIRST_SECTION_CELEBRATION = CourseW
 # .. toggle_use_cases: temporary, open_edx
 # .. toggle_creation_date: 2021-02-16
 # .. toggle_target_removal_date: None
-# .. toggle_warnings: Also set settings.LEARNING_MICROFRONTEND_URL and ENABLE_COURSEWARE_MICROFRONTEND and
+# .. toggle_warnings: Also set settings.LEARNING_MICROFRONTEND_URL and
 #   COURSEWARE_MICROFRONTEND_PROGRESS_MILESTONES.
 # .. toggle_tickets: AA-304
 COURSEWARE_MICROFRONTEND_PROGRESS_MILESTONES_STREAK_CELEBRATION = CourseWaffleFlag(
@@ -147,16 +117,88 @@ COURSEWARE_OPTIMIZED_RENDER_XBLOCK = CourseWaffleFlag(
 )
 
 
-def course_exit_page_is_active(course_key):
+def courseware_mfe_is_active(course_key):
+    """
+    Return whether courseware should be hosted on the Learning MFE
+    (as opposed to the Legacy Experience) for a particular course run.
+
+    We `getattr` the settings instead of referencing them directly because
+    certain Studio code paths call these functions. We're not yet sure whether
+    it would make sense to define the LEARNING_MICROFRONTEND_* settings for
+    Studio as well, so for now, let's just have fallbacks if the settings
+    are missing.
+    """
+    if course_key.deprecated:
+        return False
+    if str(course_key) in getattr(settings, 'LEARNING_MICROFRONTEND_INCLUSIONS', []):
+        return True
+    if str(course_key) in getattr(settings, 'LEARNING_MICROFRONTEND_EXCLUSIONS', []):
+        return False
+    return bool(getattr(settings, 'LEARNING_MICROFRONTEND_ENABLED', True))
+
+
+def courseware_educator_preview_is_active(course_key):
+    """
+    Return whether courseware preview mode is active for educators
+    for a particular course run.
+
+    When active, course staff will be able to toggle their view between the
+    old (Legacy) and new (MFE) learning experiences as they please.
+    This shouldn't affect what learners see.
+
+    We `getattr` the settings instead of referencing them directly because
+    certain Studio code paths call these functions. We're not yet sure whether
+    it would make sense to define the LEARNING_MICROFRONTEND_* settings for
+    Studio as well, so for now, let's just have fallbacks if the settings
+    are missing.
+    """
+    if course_key.deprecated:
+        return False
+    if str(course_key) in getattr(settings, 'LEARNING_MICROFRONTEND_PREVIEW_INCLUSIONS', []):
+        return True
+    if str(course_key) in getattr(settings, 'LEARNING_MICROFRONTEND_PREVIEW_EXCLUSIONS', []):
+        return False
+    return bool(getattr(settings, 'LEARNING_MICROFRONTEND_PREVIEW_ENABLED', False))
+
+
+def courseware_mfe_is_visible(course_key, *, is_global_staff=False, is_course_staff=False):
+    """
+    Return whether MFE courseware is visible at all for a course run.
+    """
+    # Everyone can see the MFE experience if it's active.
+    if courseware_mfe_is_active(course_key):
+        return True
+    # Course staff can see the MFE if educator preview is active.
+    if is_course_staff and courseware_educator_preview_is_active(course_key):
+        return True
+    # Global staff can always see the MFE experience (unless it's Old Mongo)
+    return is_global_staff and not course_key.deprecated
+
+
+def courseware_legacy_is_visible(course_key, *, is_global_staff=False, is_course_staff=False):
+    """
+    Return whether Legacy courseware is visible at all for a course run.
+    """
+    # Everyone can see Legacy if the Learning MFE isn't active.
+    if not courseware_mfe_is_active(course_key):
+        return True
+    # Course staff can see Legacy if educator preview is active.
+    if is_course_staff and courseware_educator_preview_is_active(course_key):
+        return True
+    # Global staff can always see the legacy experience.
+    return is_global_staff
+
+
+def courseware_mfe_exit_page_is_active(course_key):
     return (
-        REDIRECT_TO_COURSEWARE_MICROFRONTEND.is_enabled(course_key) and
+        courseware_mfe_is_active(course_key) and
         COURSEWARE_MICROFRONTEND_COURSE_EXIT_PAGE.is_enabled(course_key)
     )
 
 
 def courseware_mfe_first_section_celebration_is_active(course_key):
     return (
-        REDIRECT_TO_COURSEWARE_MICROFRONTEND.is_enabled(course_key) and
+        courseware_mfe_is_active(course_key) and
         COURSEWARE_MICROFRONTEND_PROGRESS_MILESTONES.is_enabled(course_key) and
         COURSEWARE_MICROFRONTEND_PROGRESS_MILESTONES_FIRST_SECTION_CELEBRATION.is_enabled(course_key)
     )
@@ -164,7 +206,7 @@ def courseware_mfe_first_section_celebration_is_active(course_key):
 
 def courseware_mfe_streak_celebration_is_active(course_key):
     return (
-        REDIRECT_TO_COURSEWARE_MICROFRONTEND.is_enabled(course_key) and
+        courseware_mfe_is_active(course_key) and
         COURSEWARE_MICROFRONTEND_PROGRESS_MILESTONES.is_enabled(course_key) and
         COURSEWARE_MICROFRONTEND_PROGRESS_MILESTONES_STREAK_CELEBRATION.is_enabled(course_key)
     )

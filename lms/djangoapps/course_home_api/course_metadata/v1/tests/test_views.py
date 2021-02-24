@@ -10,7 +10,6 @@ from common.djangoapps.course_modes.models import CourseMode
 from lms.djangoapps.courseware.toggles import (
     COURSEWARE_MICROFRONTEND_PROGRESS_MILESTONES,
     COURSEWARE_MICROFRONTEND_PROGRESS_MILESTONES_STREAK_CELEBRATION,
-    REDIRECT_TO_COURSEWARE_MICROFRONTEND
 )
 from common.djangoapps.student.models import CourseEnrollment
 from common.djangoapps.student.tests.factories import UserFactory
@@ -18,7 +17,6 @@ from lms.djangoapps.course_home_api.tests.utils import BaseCourseHomeTests
 
 
 @ddt.ddt
-@override_waffle_flag(REDIRECT_TO_COURSEWARE_MICROFRONTEND, active=True)
 @override_waffle_flag(COURSEWARE_MICROFRONTEND_PROGRESS_MILESTONES, active=True)
 @override_waffle_flag(COURSEWARE_MICROFRONTEND_PROGRESS_MILESTONES_STREAK_CELEBRATION, active=True)
 class CourseHomeMetadataTests(BaseCourseHomeTests):
