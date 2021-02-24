@@ -18,7 +18,7 @@ from openedx.core.djangoapps.site_configuration import helpers as configuration_
 from common.djangoapps.student.models import User
 
 from .models import ManualVerification, SoftwareSecurePhotoVerification, SSOVerification
-from .utils import earliest_allowed_verification_date, most_recent_verification, active_verifications  # lint-amnesty, pylint: disable=unused-import
+from .utils import most_recent_verification
 
 log = logging.getLogger(__name__)
 
@@ -67,6 +67,31 @@ class IDVerificationService(object):
         expiration_datetime = cls.get_expiration_datetime(user, ['approved'])
         if expiration_datetime:
             return expiration_datetime >= now()
+        return False
+
+    @classmethod
+    def user_has_ever_been_verified(cls, user):
+        """
+        Return whether or not a user has ever satisfactorily proved their identity (has had an approved verification)
+        of any kind.
+        """
+        if not user:
+            log.warning('No user provided. Verification attempts cannot be checked.')
+            return False
+
+        if SoftwareSecurePhotoVerification.objects.filter(user=user, status='approved').exists():
+            log.info(f'User {user.id} has an approved SoftwareSecurePhotoVerification')
+            return True
+
+        if SSOVerification.objects.filter(user=user, status='approved').exists():
+            log.info(f'User {user.id} has an approved SSOVerification')
+            return True
+
+        if ManualVerification.objects.filter(user=user, status='approved').exists():
+            log.info(f'User {user.id} has an approved ManualVerification')
+            return True
+
+        log.info(f'User {user.id} has no approved verifications')
         return False
 
     @classmethod

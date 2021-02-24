@@ -31,7 +31,7 @@ from openedx.core.djangoapps.certificates.config import waffle
 
 log = logging.getLogger(__name__)
 
-ID_VERIFIED_METHOD = 'lms.djangoapps.verify_student.services.IDVerificationService.user_is_verified'
+ID_VERIFIED_METHOD = 'lms.djangoapps.verify_student.services.IDVerificationService.user_has_ever_been_verified'
 AUTO_GENERATION_NAMESPACE = waffle.WAFFLE_NAMESPACE
 AUTO_GENERATION_NAME = waffle.AUTO_CERTIFICATE_GENERATION
 AUTO_GENERATION_SWITCH_NAME = '{}.{}'.format(AUTO_GENERATION_NAMESPACE, AUTO_GENERATION_NAME)

@@ -102,11 +102,8 @@ def can_generate_allowlist_certificate(user, course_key):
         ))
         return False
 
-    if not IDVerificationService.user_is_verified(user):
-        log.info(
-            '{user} does not have a verified id. Certificate cannot be generated.'.format(
-                user=user.id
-            ))
+    if not IDVerificationService.user_has_ever_been_verified(user):
+        log.info(f'{user.id} has not ever had a verified id. Certificate cannot be generated.')
         return False
 
     if not _is_on_certificate_allowlist(user, course_key):
