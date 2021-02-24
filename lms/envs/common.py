@@ -94,6 +94,16 @@ FEATURES = {
     # .. toggle_warnings: None
     # .. toggle_tickets: https://github.com/edx/edx-platform/pull/2425
     'DISPLAY_DEBUG_INFO_TO_STAFF': True,
+
+    # .. toggle_name: FEATURES['DISPLAY_HISTOGRAMS_TO_STAFF']
+    # .. toggle_implementation: DjangoSetting
+    # .. toggle_default: False
+    # .. toggle_description: This displays histograms in the Staff Debug Info panel to course staff.
+    # .. toggle_use_cases: open_edx
+    # .. toggle_creation_date: 2014-02-13
+    # .. toggle_warnings: Generating histograms requires scanning the courseware_studentmodule table on each view. This
+    #   can make staff access to courseware very slow on large courses.
+    # .. toggle_tickets: https://github.com/edx/edx-platform/pull/2425
     'DISPLAY_HISTOGRAMS_TO_STAFF': False,  # For large courses this slows down courseware access for staff.
 
     'REROUTE_ACTIVATION_EMAIL': False,  # nonempty string = address for all activation emails
