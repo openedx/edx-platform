@@ -374,6 +374,17 @@ FEATURES = {
     'ENABLE_COSMETIC_DISPLAY_PRICE': False,
 
     # Automatically approve student identity verification attempts
+    # .. toggle_name: FEATURES['AUTOMATIC_VERIFY_STUDENT_IDENTITY_FOR_TESTING']
+    # .. toggle_implementation: DjangoSetting
+    # .. toggle_default: False
+    # .. toggle_description: If set to True, then we want to skip posting anything to Software Secure. Bypass posting
+    #   anything to Software Secure if the auto verify feature for testing is enabled. We actually don't even create
+    #   the message because that would require encryption and message signing that rely on settings.VERIFY_STUDENT
+    #   values that aren't set in dev. So we just pretend like we successfully posted and automatically approve student
+    #   identity verification attempts.
+    # .. toggle_use_cases: open_edx
+    # .. toggle_creation_date: 2013-10-03
+    # .. toggle_tickets: https://github.com/edx/edx-platform/pull/1184
     'AUTOMATIC_VERIFY_STUDENT_IDENTITY_FOR_TESTING': False,
 
     # Maximum number of rows to include in the csv file for downloading problem responses.
