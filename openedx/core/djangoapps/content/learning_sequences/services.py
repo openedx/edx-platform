@@ -3,10 +3,10 @@ Learning Sequences Runtime Service
 """
 
 
-from .api.outlines import get_user_course_outline_details
+from .api import get_user_course_outline_details
 
 
-class LearningSequencesRuntimeService(object):
+class LearningSequencesRuntimeService():
     """
     Provides functions of the public API as a class injected into edx-proctoring
     """
