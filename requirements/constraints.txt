@@ -103,9 +103,6 @@ zipp==1.0.0
 # Matplotlib 3.1 requires Python 3.6
 matplotlib<3.1
 
-# geoip2 requires Python 3.6
-geoip2<4.0.1
-
 # tests failing for pymongo==3.11
 pymongo<3.11
 
