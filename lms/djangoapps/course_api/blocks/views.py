@@ -226,7 +226,6 @@ class BlocksView(DeveloperErrorViewMixin, ListAPIView):
                     params.cleaned_data['requested_fields'],
                     params.cleaned_data.get('block_counts', []),
                     params.cleaned_data.get('student_view_data', []),
-                    params.cleaned_data.get('student_view_data_context', {}),
                     params.cleaned_data['return_type'],
                     params.cleaned_data.get('block_types_filter', None),
                     hide_access_denials=hide_access_denials,
