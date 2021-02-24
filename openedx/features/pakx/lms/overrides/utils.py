@@ -14,7 +14,10 @@ from openedx.features.course_experience.utils import get_course_outline_block_tr
 from student.models import CourseEnrollment
 
 CORE_BLOCK_TYPES = ['html', 'video', 'problem']
-BLOCK_TYPES_TO_FILTER = ['course', 'chapter', 'sequential', 'vertical', 'discussion', 'openassessment']
+BLOCK_TYPES_TO_FILTER = [
+    'course', 'chapter', 'sequential', 'vertical', 'discussion', 'openassessment', 'pb-mcq', 'pb-answer', 'pb-choice',
+    'pb-message'
+]
 
 
 def _get_resume_course_info(request, course_id, are_future_start_dates_allowed=False):
