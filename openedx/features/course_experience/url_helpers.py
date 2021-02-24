@@ -1,8 +1,9 @@
 """
-Module to define url helpers functions
+Helper functions for logic related to learning (courseare & course home) URLs.
+
+Centralizdd in openedx/features/course_experience instead of lms/djangoapps/courseware
+because the Studio course outline may need these utilities.
 """
-
-
 import six
 from django.conf import settings
 from django.urls import reverse
@@ -12,12 +13,13 @@ from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.search import navigation_index, path_to_location
 
 
-def get_redirect_url(course_key, usage_key, request=None):
-    """ Returns the redirect url back to courseware
+def get_legacy_courseware_url(course_key, usage_key, request=None):
+    """
+    Return a str with the URL for the specified legacy (LMS-rendered) coursweare content.
 
     Args:
         course_id(str): Course Id string
-        location(str): The location id of course component
+        usage_key(str): The location id of course component
 
     Raises:
         ItemNotFoundError if no data at the location or NoPathToItem if location not in any class
@@ -55,9 +57,9 @@ def get_redirect_url(course_key, usage_key, request=None):
     return redirect_url
 
 
-def get_microfrontend_url(course_key, sequence_key=None, unit_key=None):
+def get_learning_mfe_courseware_url(course_key, sequence_key=None, unit_key=None):
     """
-    Return a str with the URL for the specified content in the Courseware MFE.
+    Return a str with the URL for the specified coursweare content in the Learning MFE.
 
     The micro-frontend determines the user's position in the vertical via
     a separate API call, so all we need here is the course_key, section, and
@@ -74,7 +76,7 @@ def get_microfrontend_url(course_key, sequence_key=None, unit_key=None):
 
     We're building a URL like this:
 
-    http://localhost:2000/course-v1:edX+DemoX+Demo_Course/block-v1:edX+DemoX+Demo_Course+type@sequential+block@19a30717eff543078a5d94ae9d6c18a5/block-v1:edX+DemoX+Demo_Course+type@vertical+block@4a1bba2a403f40bca5ec245e945b0d76
+    http://localhost:2000/course/course-v1:edX+DemoX+Demo_Course/block-v1:edX+DemoX+Demo_Course+type@sequential+block@19a30717eff543078a5d94ae9d6c18a5/block-v1:edX+DemoX+Demo_Course+type@vertical+block@4a1bba2a403f40bca5ec245e945b0d76
 
     `course_key`, `sequence_key`, and `unit_key` can be either OpaqueKeys or
     strings. They're only ever used to concatenate a URL string.
@@ -88,3 +90,32 @@ def get_microfrontend_url(course_key, sequence_key=None, unit_key=None):
             mfe_link += '/{}'.format(unit_key)
 
     return mfe_link
+
+
+def get_learning_mfe_home_url(course_key, view_name=None):
+    """
+    Given a course run key and view name, return the appropriate course home (MFE) URL.
+
+    We're building a URL like this:
+
+    http://localhost:2000/course/course-v1:edX+DemoX+Demo_Course/dates
+
+    `course_key` can be either an OpaqueKey or a string.
+    `view_name` is an optional string.
+    """
+    mfe_link = f'{settings.LEARNING_MICROFRONTEND_URL}/course/{course_key}'
+
+    if view_name:
+        mfe_link += f'/{view_name}'
+
+    return mfe_link
+
+
+def is_request_from_learning_mfe(request):
+    """
+    Returns whether the given request was made by the frontend-app-learning MFE.
+    """
+    return (
+        settings.LEARNING_MICROFRONTEND_URL and
+        request.META.get('HTTP_REFERER', '').startswith(settings.LEARNING_MICROFRONTEND_URL)
+    )

@@ -61,7 +61,6 @@ from lms.djangoapps.courseware.toggles import (
     REDIRECT_TO_COURSEWARE_MICROFRONTEND,
 
 )
-from lms.djangoapps.courseware.url_helpers import get_microfrontend_url, get_redirect_url
 from lms.djangoapps.courseware.user_state_client import DjangoXBlockUserStateClient
 from lms.djangoapps.courseware.views.index import show_courseware_mfe_link
 from lms.djangoapps.experiments.testutils import override_experiment_waffle_flag
@@ -88,6 +87,7 @@ from openedx.features.course_experience import (
     RELATIVE_DATES_FLAG
 )
 from openedx.features.course_experience.tests.views.helpers import add_course_mode
+from openedx.features.course_experience.url_helpers import get_learning_mfe_courseware_url, get_legacy_courseware_url
 from openedx.features.enterprise_support.tests.mixins.enterprise import EnterpriseTestConsentRequired
 from common.djangoapps.student.models import CourseEnrollment
 from common.djangoapps.student.roles import CourseStaffRole
@@ -258,7 +258,7 @@ class TestJumpTo(ModuleStoreTestCase):
         )
         expected_url += "?{}".format(urlencode({'activate_block_id': six.text_type(staff_only_vertical.location)}))
 
-        assert expected_url == get_redirect_url(course_key, usage_key, request)
+        assert expected_url == get_legacy_courseware_url(course_key, usage_key, request)
 
 
 @ddt.ddt
@@ -548,9 +548,9 @@ class ViewsTestCase(BaseViewsTestCase):
 
     def test_get_redirect_url(self):
         # test the course location
-        assert u'/courses/{course_key}/courseware?{activate_block_id}'.format(course_key=text_type(self.course_key), activate_block_id=urlencode({'activate_block_id': text_type(self.course.location)})) == get_redirect_url(self.course_key, self.course.location)  # pylint: disable=line-too-long
+        assert u'/courses/{course_key}/courseware?{activate_block_id}'.format(course_key=text_type(self.course_key), activate_block_id=urlencode({'activate_block_id': text_type(self.course.location)})) == get_legacy_courseware_url(self.course_key, self.course.location)  # pylint: disable=line-too-long
         # test a section location
-        assert u'/courses/{course_key}/courseware/Chapter_1/Sequential_1/?{activate_block_id}'.format(course_key=text_type(self.course_key), activate_block_id=urlencode({'activate_block_id': text_type(self.section.location)})) == get_redirect_url(self.course_key, self.section.location)  # pylint: disable=line-too-long
+        assert u'/courses/{course_key}/courseware/Chapter_1/Sequential_1/?{activate_block_id}'.format(course_key=text_type(self.course_key), activate_block_id=urlencode({'activate_block_id': text_type(self.section.location)})) == get_legacy_courseware_url(self.course_key, self.section.location)  # pylint: disable=line-too-long
 
     def test_invalid_course_id(self):
         response = self.client.get('/courses/MITx/3.091X/')
@@ -3349,16 +3349,16 @@ class TestShowCoursewareMFE(TestCase):
         course_key = CourseKey.from_string("course-v1:OpenEdX+MFE+2020")
         section_key = UsageKey.from_string("block-v1:OpenEdX+MFE+2020+type@sequential+block@Introduction")
         unit_id = "block-v1:OpenEdX+MFE+2020+type@vertical+block@Getting_To_Know_You"
-        assert get_microfrontend_url(course_key) == (
+        assert get_learning_mfe_courseware_url(course_key) == (
             'https://learningmfe.openedx.org'
             '/course/course-v1:OpenEdX+MFE+2020'
         )
-        assert get_microfrontend_url(course_key, section_key, '') == (
+        assert get_learning_mfe_courseware_url(course_key, section_key, '') == (
             'https://learningmfe.openedx.org'
             '/course/course-v1:OpenEdX+MFE+2020'
             '/block-v1:OpenEdX+MFE+2020+type@sequential+block@Introduction'
         )
-        assert get_microfrontend_url(course_key, section_key, unit_id) == (
+        assert get_learning_mfe_courseware_url(course_key, section_key, unit_id) == (
             'https://learningmfe.openedx.org'
             '/course/course-v1:OpenEdX+MFE+2020'
             '/block-v1:OpenEdX+MFE+2020+type@sequential+block@Introduction'

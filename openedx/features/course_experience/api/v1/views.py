@@ -21,7 +21,6 @@ from opaque_keys.edx.keys import CourseKey
 
 from lms.djangoapps.course_api.api import course_detail
 from lms.djangoapps.course_home_api.toggles import course_home_mfe_dates_tab_is_active
-from lms.djangoapps.course_home_api.utils import get_microfrontend_url
 from lms.djangoapps.courseware.access import has_access
 from lms.djangoapps.courseware.courses import get_course_with_access
 from lms.djangoapps.courseware.masquerade import is_masquerading, setup_masquerade
@@ -29,6 +28,7 @@ from lms.djangoapps.courseware.masquerade import is_masquerading, setup_masquera
 from openedx.core.djangoapps.schedules.utils import reset_self_paced_schedule
 from openedx.core.lib.api.authentication import BearerAuthenticationAllowInactiveUser
 from openedx.features.course_experience.api.v1.serializers import CourseDeadlinesMobileSerializer
+from openedx.features.course_experience.url_helpers import get_learning_mfe_home_url
 from openedx.features.course_experience.utils import dates_banner_should_display
 
 log = logging.getLogger(__name__)
@@ -91,7 +91,7 @@ def reset_course_deadlines(request):
             tracker.emit('edx.ui.lms.reset_deadlines.clicked', research_event_data)
 
         if course_home_mfe_dates_tab_is_active(course_key):
-            body_link = get_microfrontend_url(course_key=str(course_key), view_name='dates')
+            body_link = get_learning_mfe_home_url(course_key=str(course_key), view_name='dates')
         else:
             body_link = '{}{}'.format(settings.LMS_ROOT_URL, reverse('dates', args=[str(course_key)]))
 
