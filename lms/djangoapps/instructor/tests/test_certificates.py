@@ -743,6 +743,40 @@ class CertificateExceptionViewInstructorApiTest(SharedModuleStoreTestCase):
                'Certificate exception (user={user}) does not exist in certificate white list.' \
                ' Please refresh the page and try again.'.format(user=self.certificate_exception['user_name'])
 
+    def test_certificate_invalidation_already_exists(self):
+        """
+        Test to confirm an error message is raised when generating a certificate exception for a learner that already
+        has an active certificate invalidation.
+        """
+        # generate a certificate for the test learner in our course
+        generated_certificate = GeneratedCertificateFactory.create(
+            user=self.user,
+            course_id=self.course.id,
+            status=CertificateStatuses.downloadable,
+            mode='honor',
+        )
+
+        # create a certificate invalidation tied to the generated certificate
+        CertificateInvalidationFactory.create(
+            generated_certificate=generated_certificate,
+            invalidated_by=self.global_staff,
+        )
+
+        # attempt to add learner to the allowlist, expect an error
+        response = self.client.post(
+            self.url,
+            data=json.dumps(self.certificate_exception),
+            content_type='application/json',
+            REQUEST_METHOD='POST'
+        )
+
+        res_json = json.loads(response.content.decode('utf-8'))
+        assert response.status_code == 400
+        assert res_json['message'] == (
+            f"Student {self.user.username} is already on the certificate invalidation list and cannot be added to "
+            "the certificate exception list."
+        )
+
 
 @override_settings(CERT_QUEUE='certificates')
 @ddt.ddt
@@ -996,6 +1030,30 @@ class TestCertificatesInstructorApiBulkWhiteListExceptions(SharedModuleStoreTest
         data = json.loads(response.content.decode('utf-8'))
         assert len(data['general_errors']) == 1
         assert len(data['success']) == 0
+
+    def test_certificate_invalidation_already_exists(self):
+        """
+        Test to confirm an error message is raised when generating a certificate exception for a learner appears in the
+        CSV file who has an active certificate invalidation.
+        """
+        # generate a certificate for the test learner in our course
+        generated_certificate = GeneratedCertificateFactory.create(
+            user=self.enrolled_user_1,
+            course_id=self.course.id,
+            status=CertificateStatuses.downloadable,
+            mode='honor',
+        )
+
+        CertificateInvalidationFactory.create(
+            generated_certificate=generated_certificate,
+            invalidated_by=self.global_staff,
+        )
+
+        # attempt to add learner to the allowlist, expect an error
+        csv_content = b"test_student1@example.com,notes"
+        data = self.upload_file(csv_content=csv_content)
+        assert len(data['row_errors']['user_on_certificate_invalidation_list']) == 1
+        assert data['row_errors']['user_on_certificate_invalidation_list'][0] == 'user "TestStudent1" in row# 1'
 
     def upload_file(self, csv_content):
         """
@@ -1272,3 +1330,26 @@ class CertificateInvalidationViewTests(SharedModuleStoreTestCase):
 
         # Assert Error Message
         assert res_json['message'] == 'Certificate Invalidation does not exist, Please refresh the page and try again.'
+
+    def test_learner_already_on_certificate_exception_list(self):
+        """
+        Test to make sure we don't allow a single to learner to appear on both the certificate exception and
+        invalidation lists.
+        """
+        # add test learner to the allowlist
+        CertificateWhitelistFactory.create(user=self.enrolled_user_1, course_id=self.course.id)
+
+        # now try and add them to the invalidation list, expect an error
+        response = self.client.post(
+            self.url,
+            data=json.dumps(self.certificate_invalidation_data),
+            content_type='application/json',
+        )
+
+        res_json = json.loads(response.content.decode('utf-8'))
+        assert response.status_code == 400
+        assert res_json['message'] == (
+            f"The student {self.enrolled_user_1.username} appears on the Certificate Exception list in course "
+            f"{self.course.id}. Please remove them from the Certificate Exception list before attempting to "
+            "invalidate their certificate."
+        )
