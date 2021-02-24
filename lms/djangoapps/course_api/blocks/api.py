@@ -26,7 +26,6 @@ def get_blocks(
         requested_fields=None,
         block_counts=None,
         student_view_data=None,
-        student_view_data_context=None,
         return_type='dict',
         block_types_filter=None,
         hide_access_denials=False,
@@ -53,8 +52,6 @@ def get_blocks(
             return an aggregate count of blocks.
         student_view_data (list): Optional list of names of block types for
             which blocks to return their student_view_data.
-        student_view_data_context (dict): Optional dict of keys of block types with values
-            as the context we want to send to that xblcok.
         return_type (string): Possible values are 'dict' or 'list'. Indicates
             the format for returning the blocks.
         block_types_filter (list): Optional list of block type names used to filter
@@ -105,7 +102,6 @@ def get_blocks(
         BlocksAPITransformer(
             block_counts,
             student_view_data,
-            student_view_data_context,
             depth,
             nav_depth
         )
