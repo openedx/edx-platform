@@ -35,11 +35,9 @@ class BlocksAPITransformer(BlockStructureTransformer):
     STUDENT_VIEW_DATA = 'student_view_data'
     STUDENT_VIEW_MULTI_DEVICE = 'student_view_multi_device'
 
-    def __init__(self, block_types_to_count, requested_student_view_data,
-                 requested_student_view_data_context, depth=None, nav_depth=None):
+    def __init__(self, block_types_to_count, requested_student_view_data, depth=None, nav_depth=None):
         self.block_types_to_count = block_types_to_count
         self.requested_student_view_data = requested_student_view_data
-        self.requested_student_view_data_context = requested_student_view_data_context
         self.depth = depth
         self.nav_depth = nav_depth
 
@@ -69,8 +67,7 @@ class BlocksAPITransformer(BlockStructureTransformer):
         """
         Mutates block_structure based on the given usage_info.
         """
-        StudentViewTransformer(self.requested_student_view_data,
-                               self.requested_student_view_data_context).transform(usage_info, block_structure)
+        StudentViewTransformer(self.requested_student_view_data).transform(usage_info, block_structure)
         BlockCountsTransformer(self.block_types_to_count).transform(usage_info, block_structure)
         BlockDepthTransformer(self.depth).transform(usage_info, block_structure)
         BlockNavigationTransformer(self.nav_depth).transform(usage_info, block_structure)
