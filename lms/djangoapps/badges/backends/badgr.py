@@ -3,16 +3,22 @@ Badge Awarding backend for Badgr-Server.
 """
 
 
+import base64
+import datetime
+import json
 import hashlib
 import logging
 import mimetypes
 
 import requests
+from cryptography.fernet import Fernet
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 from eventtracking import tracker
 from lazy import lazy  # lint-amnesty, pylint: disable=no-name-in-module
 from requests.packages.urllib3.exceptions import HTTPError  # lint-amnesty, pylint: disable=import-error
+
+from edx_django_utils.cache import TieredCache
 
 from lms.djangoapps.badges.backends.base import BadgeBackend
 from lms.djangoapps.badges.models import BadgeAssertion
@@ -29,8 +35,17 @@ class BadgrBackend(BadgeBackend):
 
     def __init__(self):
         super().__init__()
-        if not settings.BADGR_API_TOKEN:
-            raise ImproperlyConfigured("BADGR_API_TOKEN not set.")
+        if None in (settings.BADGR_USERNAME,
+                    settings.BADGR_PASSWORD,
+                    settings.BADGR_TOKENS_CACHE_KEY,
+                    settings.BADGR_ISSUER_SLUG,
+                    settings.BADGR_BASE_URL):
+            error_msg = (
+                "One or more of the required settings are not defined. "
+                "Required settings: BADGR_USERNAME, BADGR_PASSWORD, "
+                "BADGR_TOKENS_CACHE_KEY, BADGR_ISSUER_SLUG, BADGR_BASE_URL.")
+            LOGGER.error(error_msg)
+            raise ImproperlyConfigured(error_msg)
 
     @lazy
     def _base_url(self):
@@ -166,11 +181,107 @@ class BadgrBackend(BadgeBackend):
         return assertion
 
     @staticmethod
-    def _get_headers():
+    def _fernet_setup():
+        """
+        Set up the Fernet class for encrypting/decrypting tokens.
+        Fernet keys must always be URL-safe base64 encoded 32-byte binary
+        strings. Use the SECRET_KEY for creating the encryption key.
+        """
+        fernet_key = base64.urlsafe_b64encode(
+            settings.SECRET_KEY.ljust(64).encode('utf-8')[:32]
+        )
+        return Fernet(fernet_key)
+
+    def _encrypt_token(self, token):
+        """
+        Encrypt a token
+        """
+        fernet = self._fernet_setup()
+        return fernet.encrypt(token.encode('utf-8'))
+
+    def _decrypt_token(self, token):
+        """
+        Decrypt a token
+        """
+        fernet = self._fernet_setup()
+        return fernet.decrypt(token).decode()
+
+    def _get_and_cache_oauth_tokens(self, refresh_token=None):
+        """
+        Get or renew OAuth tokens. If a refresh_token is provided,
+        use it to renew tokens, otherwise create new ones.
+        Once tokens are created/renewed, encrypt the values and cache them.
+        """
+        data = {
+            'username': settings.BADGR_USERNAME,
+            'password': settings.BADGR_PASSWORD,
+        }
+        if refresh_token:
+            data = {
+                'grant_type': 'refresh_token',
+                'refresh_token': refresh_token
+            }
+
+        oauth_url = "{}/o/token".format(settings.BADGR_BASE_URL)
+
+        response = requests.post(
+            oauth_url, data=data, timeout=settings.BADGR_TIMEOUT
+        )
+        self._log_if_raised(response, data)
+        try:
+            data = response.json()
+            result = {
+                'access_token': self._encrypt_token(data['access_token']),
+                'refresh_token': self._encrypt_token(data['refresh_token']),
+                'expires_at': datetime.datetime.utcnow() + datetime.timedelta(
+                    seconds=data['expires_in'])
+            }
+            # The refresh_token is long-lived, we want to be able to retrieve
+            # it from cache as long as possible.
+            # Set the cache timeout to None so the cache key never expires
+            # (https://docs.djangoproject.com/en/2.2/topics/cache/#cache-arguments)
+            TieredCache.set_all_tiers(
+                settings.BADGR_TOKENS_CACHE_KEY, result, None)
+            return result
+        except (KeyError, json.decoder.JSONDecodeError) as json_error:
+            raise requests.RequestException(response=response) from json_error
+
+    def _get_access_token(self):
+        """
+        Get an access token from cache if one is present and valid. If a
+        token is cached but expired, renew it. If all fails or a token has
+        not yet been cached, create a new one.
+        """
+        tokens = {}
+        cached_response = TieredCache.get_cached_response(
+            settings.BADGR_TOKENS_CACHE_KEY)
+        if cached_response.is_found:
+            cached_tokens = cached_response.value
+            # add a 5 seconds buffer to the cutoff timestamp to make sure
+            # the token will not expire while in use
+            expiry_cutoff = (
+                datetime.datetime.utcnow() + datetime.timedelta(seconds=5))
+            if cached_tokens.get('expires_at') > expiry_cutoff:
+                tokens = cached_tokens
+            else:
+                # renew the tokens with the cached `refresh_token`
+                refresh_token = self._decrypt_token(cached_tokens.get(
+                    'refresh_token'))
+                tokens = self._get_and_cache_oauth_tokens(
+                    refresh_token=refresh_token)
+
+        # if no tokens are cached or something went wrong with
+        # retreiving/renewing them, go and create new tokens
+        if not tokens:
+            tokens = self._get_and_cache_oauth_tokens()
+        return self._decrypt_token(tokens.get('access_token'))
+
+    def _get_headers(self):
         """
         Headers to send along with the request-- used for authentication.
         """
-        return {'Authorization': f'Token {settings.BADGR_API_TOKEN}'}
+        access_token = self._get_access_token()
+        return {'Authorization': u'Bearer {}'.format(access_token)}
 
     def _ensure_badge_created(self, badge_class):
         """

@@ -209,7 +209,11 @@ class BadgeClassTest(ModuleStoreTestCase):
         assertion = BadgeAssertionFactory.create(badge_class=badge_class, user=user)
         assert list(badge_class.get_for_user(user)) == [assertion]
 
-    @override_settings(BADGING_BACKEND='lms.djangoapps.badges.backends.badgr.BadgrBackend', BADGR_API_TOKEN='test')
+    @override_settings(
+        BADGING_BACKEND='lms.djangoapps.badges.backends.badgr.BadgrBackend',
+        BADGR_USERNAME='example@example.com',
+        BADGR_PASSWORD='password',
+        BADGR_TOKENS_CACHE_KEY='badgr-test-cache-key')
     @patch('lms.djangoapps.badges.backends.badgr.BadgrBackend.award')
     def test_award(self, mock_award):
         """
