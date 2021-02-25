@@ -77,7 +77,7 @@ class Command(BaseCommand):
         course_id = CourseKey.from_string(options['course'])
         user = options['username']
 
-        kwargs = (Q(username=user) | Q(email=user)), Q(courseenrollment__course_id=course_id)
+        kwargs = (Q(username=user) | Q(email=user)) & Q(courseenrollment__course_id=course_id)
         student = User.objects.filter(kwargs).first()
         if not student:
             raise CommandError(f"User {user} does not exist.")
