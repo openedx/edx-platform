@@ -17,7 +17,6 @@ from textwrap import dedent
 from django.contrib.auth import get_user_model
 from django.core.management.base import BaseCommand
 from opaque_keys.edx.keys import CourseKey
-from six import text_type
 
 from lms.djangoapps.certificates.models import CertificateStatuses, GeneratedCertificate
 
@@ -104,18 +103,18 @@ class Command(BaseCommand):
 
         if created:
             LOGGER.info(
-                u"Created certificate for user %s in course %s "
-                u"with mode %s, status %s, "
-                u"and grade %s",
-                user.id, text_type(course_key),
+                "Created certificate for user %s in course %s "
+                "with mode %s, status %s, "
+                "and grade %s",
+                user.id, str(course_key),
                 cert_mode, status, grade
             )
 
         else:
             LOGGER.info(
-                u"Updated certificate for user %s in course %s "
-                u"with mode %s, status %s, "
-                u"and grade %s",
-                user.id, text_type(course_key),
+                "Updated certificate for user %s in course %s "
+                "with mode %s, status %s, "
+                "and grade %s",
+                user.id, str(course_key),
                 cert_mode, status, grade
             )

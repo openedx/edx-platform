@@ -9,12 +9,11 @@ cannot be generated, a message is logged and no further action is taken.
 import logging
 
 from edx_toggles.toggles import LegacyWaffleFlagNamespace
-from xmodule.modulestore.django import modulestore
 
 from common.djangoapps.student.models import CourseEnrollment
 from lms.djangoapps.certificates.models import (
-    CertificateStatuses,
     CertificateInvalidation,
+    CertificateStatuses,
     CertificateWhitelist,
     GeneratedCertificate
 )
@@ -25,6 +24,7 @@ from lms.djangoapps.instructor.access import list_with_level
 from lms.djangoapps.verify_student.services import IDVerificationService
 from openedx.core.djangoapps.certificates.api import auto_certificate_generation_enabled
 from openedx.core.djangoapps.waffle_utils import CourseWaffleFlag
+from xmodule.modulestore.django import modulestore
 
 log = logging.getLogger(__name__)
 
@@ -52,11 +52,11 @@ def generate_allowlist_certificate_task(user, course_key):
     """
     if not can_generate_allowlist_certificate(user, course_key):
         log.info(
-            'Cannot generate an allowlist certificate for {user} : {course}'.format(user=user.id, course=course_key))
+            f'Cannot generate an allowlist certificate for {user.id} : {course_key}')
         return False
 
     log.info(
-        'About to create an allowlist certificate task for {user} : {course}'.format(user=user.id, course=course_key))
+        f'About to create an allowlist certificate task for {user.id} : {course_key}')
 
     kwargs = {
         'student': str(user.id),

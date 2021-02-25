@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 Certificates are created for a student and an offering of a course.
 
@@ -52,7 +51,6 @@ import logging
 import os
 import uuid
 
-import six
 from config_models.models import ConfigurationModel
 from django.apps import apps
 from django.conf import settings
@@ -82,7 +80,7 @@ log = logging.getLogger(__name__)
 User = get_user_model()
 
 
-class CertificateStatuses(object):
+class CertificateStatuses:
     """
     Enum for certificate statuses
     """
@@ -121,7 +119,7 @@ class CertificateStatuses(object):
         return status in cls.PASSED_STATUSES
 
 
-class CertificateSocialNetworks(object):
+class CertificateSocialNetworks:
     """
     Enum for certificate social networks
     """
@@ -140,7 +138,7 @@ class CertificateWhitelist(models.Model):
 
     .. no_pii:
     """
-    class Meta(object):
+    class Meta:
         app_label = "certificates"
 
     objects = NoneToEmptyManager()
@@ -187,12 +185,12 @@ class CertificateWhitelist(models.Model):
             result.append({
                 'id': item.id,
                 'user_id': item.user.id,
-                'user_name': six.text_type(item.user.username),
-                'user_email': six.text_type(item.user.email),
-                'course_id': six.text_type(item.course_id),
-                'created': item.created.strftime(u"%B %d, %Y"),
-                'certificate_generated': certificate_generated and certificate_generated.strftime(u"%B %d, %Y"),
-                'notes': six.text_type(item.notes or ''),
+                'user_name': str(item.user.username),
+                'user_email': str(item.user.email),
+                'course_id': str(item.course_id),
+                'created': item.created.strftime("%B %d, %Y"),
+                'certificate_generated': certificate_generated and certificate_generated.strftime("%B %d, %Y"),
+                'notes': str(item.notes or ''),
             })
         return result
 
@@ -284,7 +282,7 @@ class GeneratedCertificate(models.Model):
     grade = models.CharField(max_length=5, blank=True, default='')
     key = models.CharField(max_length=32, blank=True, default='')
     distinction = models.BooleanField(default=False)
-    status = models.CharField(max_length=32, default=u'unavailable')
+    status = models.CharField(max_length=32, default='unavailable')
     mode = models.CharField(max_length=32, choices=MODES, default=MODES.honor)
     name = models.CharField(blank=True, max_length=255)
     created_date = models.DateTimeField(auto_now_add=True)
@@ -297,7 +295,7 @@ class GeneratedCertificate(models.Model):
     if 'certificates' in apps.app_configs:
         history = HistoricalRecords()
 
-    class Meta(object):
+    class Meta:
         unique_together = (('user', 'course_id'),)
         app_label = "certificates"
 
@@ -495,11 +493,11 @@ class CertificateGenerationHistory(TimeStampedModel):
         else:
             return _("All learners")
 
-    class Meta(object):
+    class Meta:
         app_label = "certificates"
 
     def __str__(self):
-        return u"certificates %s by %s on %s for %s" % \
+        return "certificates %s by %s on %s for %s" % \
                ("regenerated" if self.is_regeneration else "generated", self.generated_by, self.created, self.course_id)
 
 
@@ -522,11 +520,11 @@ class CertificateInvalidation(TimeStampedModel):
     if 'certificates' in apps.app_configs:
         history = HistoricalRecords()
 
-    class Meta(object):
+    class Meta:
         app_label = "certificates"
 
     def __str__(self):
-        return u"Certificate %s, invalidated by %s on %s." % \
+        return "Certificate %s, invalidated by %s on %s." % \
                (self.generated_certificate, self.invalidated_by, self.created)
 
     def deactivate(self):
@@ -560,7 +558,7 @@ class CertificateInvalidation(TimeStampedModel):
                 'id': certificate_invalidation.id,
                 'user': certificate_invalidation.generated_certificate.user.username,
                 'invalidated_by': certificate_invalidation.invalidated_by.username,
-                u'created': certificate_invalidation.created.strftime(u"%B %d, %Y"),
+                'created': certificate_invalidation.created.strftime("%B %d, %Y"),
                 'notes': certificate_invalidation.notes,
             })
         return data
@@ -704,7 +702,7 @@ class ExampleCertificateSet(TimeStampedModel):
     """
     course_key = CourseKeyField(max_length=255, db_index=True)
 
-    class Meta(object):
+    class Meta:
         get_latest_by = 'created'
         app_label = "certificates"
 
@@ -764,16 +762,15 @@ class ExampleCertificateSet(TimeStampedModel):
 
         """
         queryset = (ExampleCertificate.objects).select_related('example_cert_set').filter(example_cert_set=self)
-        for cert in queryset:
-            yield cert
+        yield from queryset
 
     @staticmethod
     def _template_for_mode(mode_slug, course_key):
         """Calculate the template PDF based on the course mode. """
         return (
-            u"certificate-template-{key.org}-{key.course}-verified.pdf".format(key=course_key)
+            "certificate-template-{key.org}-{key.course}-verified.pdf".format(key=course_key)
             if mode_slug == 'verified'
-            else u"certificate-template-{key.org}-{key.course}.pdf".format(key=course_key)
+            else "certificate-template-{key.org}-{key.course}.pdf".format(key=course_key)
         )
 
 
@@ -802,25 +799,25 @@ class ExampleCertificate(TimeStampedModel):
 
     .. no_pii:
     """
-    class Meta(object):
+    class Meta:
         app_label = "certificates"
 
     # Statuses
-    STATUS_STARTED = u'started'
-    STATUS_SUCCESS = u'success'
-    STATUS_ERROR = u'error'
+    STATUS_STARTED = 'started'
+    STATUS_SUCCESS = 'success'
+    STATUS_ERROR = 'error'
 
     # Dummy full name for the generated certificate
-    EXAMPLE_FULL_NAME = u'John Doë'
+    EXAMPLE_FULL_NAME = 'John Doë'
 
     example_cert_set = models.ForeignKey(ExampleCertificateSet, on_delete=models.CASCADE)
 
     description = models.CharField(
         max_length=255,
         help_text=_(
-            u"A human-readable description of the example certificate.  "
-            u"For example, 'verified' or 'honor' to differentiate between "
-            u"two types of certificates."
+            "A human-readable description of the example certificate.  "
+            "For example, 'verified' or 'honor' to differentiate between "
+            "two types of certificates."
         )
     )
 
@@ -833,9 +830,9 @@ class ExampleCertificate(TimeStampedModel):
         db_index=True,
         unique=True,
         help_text=_(
-            u"A unique identifier for the example certificate.  "
-            u"This is used when we receive a response from the queue "
-            u"to determine which example certificate was processed."
+            "A unique identifier for the example certificate.  "
+            "This is used when we receive a response from the queue "
+            "to determine which example certificate was processed."
         )
     )
 
@@ -844,22 +841,22 @@ class ExampleCertificate(TimeStampedModel):
         default=_make_uuid,
         db_index=True,
         help_text=_(
-            u"An access key for the example certificate.  "
-            u"This is used when we receive a response from the queue "
-            u"to validate that the sender is the same entity we asked "
-            u"to generate the certificate."
+            "An access key for the example certificate.  "
+            "This is used when we receive a response from the queue "
+            "to validate that the sender is the same entity we asked "
+            "to generate the certificate."
         )
     )
 
     full_name = models.CharField(
         max_length=255,
         default=EXAMPLE_FULL_NAME,
-        help_text=_(u"The full name that will appear on the certificate.")
+        help_text=_("The full name that will appear on the certificate.")
     )
 
     template = models.CharField(
         max_length=255,
-        help_text=_(u"The template file to use when generating the certificate.")
+        help_text=_("The template file to use when generating the certificate.")
     )
 
     # Outputs from certificate generation
@@ -867,24 +864,24 @@ class ExampleCertificate(TimeStampedModel):
         max_length=255,
         default=STATUS_STARTED,
         choices=(
-            (STATUS_STARTED, u'Started'),
-            (STATUS_SUCCESS, u'Success'),
-            (STATUS_ERROR, u'Error')
+            (STATUS_STARTED, 'Started'),
+            (STATUS_SUCCESS, 'Success'),
+            (STATUS_ERROR, 'Error')
         ),
-        help_text=_(u"The status of the example certificate.")
+        help_text=_("The status of the example certificate.")
     )
 
     error_reason = models.TextField(
         null=True,
         default=None,
-        help_text=_(u"The reason an error occurred during certificate generation.")
+        help_text=_("The reason an error occurred during certificate generation.")
     )
 
     download_url = models.CharField(
         max_length=255,
         null=True,
         default=None,
-        help_text=_(u"The download URL for the generated certificate.")
+        help_text=_("The download URL for the generated certificate.")
     )
 
     def update_status(self, status, error_reason=None, download_url=None):
@@ -910,7 +907,7 @@ class ExampleCertificate(TimeStampedModel):
 
         """
         if status not in [self.STATUS_SUCCESS, self.STATUS_ERROR]:
-            msg = u"Invalid status: must be either '{success}' or '{error}'.".format(
+            msg = "Invalid status: must be either '{success}' or '{error}'.".format(
                 success=self.STATUS_SUCCESS,
                 error=self.STATUS_ERROR
             )
@@ -969,30 +966,30 @@ class CertificateGenerationCourseSetting(TimeStampedModel):
     self_generation_enabled = models.BooleanField(
         default=False,
         help_text=(
-            u"Allow students to generate their own certificates for the course. "
-            u"Enabling this does NOT affect usage of the management command used "
-            u"for batch certificate generation."
+            "Allow students to generate their own certificates for the course. "
+            "Enabling this does NOT affect usage of the management command used "
+            "for batch certificate generation."
         )
     )
     language_specific_templates_enabled = models.BooleanField(
         default=False,
         help_text=(
-            u"Render translated certificates rather than using the platform's "
-            u"default language. Available translations are controlled by the "
-            u"certificate template."
+            "Render translated certificates rather than using the platform's "
+            "default language. Available translations are controlled by the "
+            "certificate template."
         )
     )
     include_hours_of_effort = models.NullBooleanField(
         default=None,
         help_text=(
-            u"Display estimated time to complete the course, which is equal to the maximum hours of effort per week "
-            u"times the length of the course in weeks. This attribute will only be displayed in a certificate when the "
-            u"attributes 'Weeks to complete' and 'Max effort' have been provided for the course run and its "
-            u"certificate template includes Hours of Effort."
+            "Display estimated time to complete the course, which is equal to the maximum hours of effort per week "
+            "times the length of the course in weeks. This attribute will only be displayed in a certificate when the "
+            "attributes 'Weeks to complete' and 'Max effort' have been provided for the course run and its "
+            "certificate template includes Hours of Effort."
         )
     )
 
-    class Meta(object):
+    class Meta:
         get_latest_by = 'created'
         app_label = "certificates"
 
@@ -1088,7 +1085,7 @@ class CertificateHtmlViewConfiguration(ConfigurationModel):
         app_label = "certificates"
 
     configuration = models.TextField(
-        help_text=u"Certificate HTML View Parameters (JSON)"
+        help_text="Certificate HTML View Parameters (JSON)"
     )
 
     def clean(self):
@@ -1124,22 +1121,22 @@ class CertificateTemplate(TimeStampedModel):
     """
     name = models.CharField(
         max_length=255,
-        help_text=_(u'Name of template.'),
+        help_text=_('Name of template.'),
     )
     description = models.CharField(
         max_length=255,
         null=True,
         blank=True,
-        help_text=_(u'Description and/or admin notes.'),
+        help_text=_('Description and/or admin notes.'),
     )
     template = models.TextField(
-        help_text=_(u'Django template HTML.'),
+        help_text=_('Django template HTML.'),
     )
     organization_id = models.IntegerField(
         null=True,
         blank=True,
         db_index=True,
-        help_text=_(u'Organization of template.'),
+        help_text=_('Organization of template.'),
     )
     course_key = CourseKeyField(
         max_length=255,
@@ -1153,24 +1150,24 @@ class CertificateTemplate(TimeStampedModel):
         default=GeneratedCertificate.MODES.honor,
         null=True,
         blank=True,
-        help_text=_(u'The course mode for this template.'),
+        help_text=_('The course mode for this template.'),
     )
     is_active = models.BooleanField(
-        help_text=_(u'On/Off switch.'),
+        help_text=_('On/Off switch.'),
         default=False,
     )
     language = models.CharField(
         max_length=2,
         blank=True,
         null=True,
-        help_text=u'Only certificates for courses in the selected language will be rendered using this template. '
-                  u'Course language is determined by the first two letters of the language code.'
+        help_text='Only certificates for courses in the selected language will be rendered using this template. '
+                  'Course language is determined by the first two letters of the language code.'
     )
 
     def __str__(self):
-        return u'%s' % (self.name, )
+        return f'{self.name}'
 
-    class Meta(object):
+    class Meta:
         get_latest_by = 'created'
         unique_together = (('organization_id', 'course_key', 'mode', 'language'),)
         app_label = "certificates"
@@ -1204,18 +1201,18 @@ class CertificateTemplateAsset(TimeStampedModel):
         max_length=255,
         null=True,
         blank=True,
-        help_text=_(u'Description of the asset.'),
+        help_text=_('Description of the asset.'),
     )
     asset = models.FileField(
         max_length=255,
         upload_to=template_assets_path,
-        help_text=_(u'Asset file. It could be an image or css file.'),
+        help_text=_('Asset file. It could be an image or css file.'),
     )
     asset_slug = models.SlugField(
         max_length=255,
         unique=True,
         null=True,
-        help_text=_(u'Asset\'s unique slug. We can reference the asset in templates using this value.'),
+        help_text=_('Asset\'s unique slug. We can reference the asset in templates using this value.'),
     )
 
     def save(self, *args, **kwargs):
@@ -1229,9 +1226,9 @@ class CertificateTemplateAsset(TimeStampedModel):
         super().save(*args, **kwargs)
 
     def __str__(self):
-        return u'%s' % (self.asset.url, )
+        return f'{self.asset.url}'
 
-    class Meta(object):
+    class Meta:
         get_latest_by = 'created'
         app_label = "certificates"
 
