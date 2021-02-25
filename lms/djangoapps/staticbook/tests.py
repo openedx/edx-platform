@@ -4,11 +4,11 @@ Test the lms/staticbook views.
 
 
 import textwrap
+from unittest import mock
+
 import pytest
-import mock
 import requests
 from django.urls import NoReverseMatch, reverse
-from six import text_type
 
 from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
@@ -50,7 +50,7 @@ class StaticBookTest(ModuleStoreTestCase):
     """
 
     def __init__(self, *args, **kwargs):
-        super(StaticBookTest, self).__init__(*args, **kwargs)  # lint-amnesty, pylint: disable=super-with-arguments
+        super().__init__(*args, **kwargs)
         self.course = None
 
     def make_course(self, **kwargs):
@@ -69,7 +69,7 @@ class StaticBookTest(ModuleStoreTestCase):
         Automatically provides the course id.
 
         """
-        kwargs['course_id'] = text_type(self.course.id)
+        kwargs['course_id'] = str(self.course.id)
         url = reverse(url_name, kwargs=kwargs)
         return url
 
