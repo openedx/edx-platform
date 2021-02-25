@@ -107,7 +107,7 @@ edx-django-release-util==1.0.0  # via -r requirements/edx/base.txt
 edx-django-sites-extensions==3.0.0  # via -r requirements/edx/base.txt
 edx-django-utils==3.13.0  # via -r requirements/edx/base.txt, django-config-models, edx-drf-extensions, edx-enterprise, edx-rest-api-client, edx-toggles, edx-when, ora2, super-csv
 edx-drf-extensions==6.5.0  # via -r requirements/edx/base.txt, edx-completion, edx-enterprise, edx-organizations, edx-proctoring, edx-rbac, edx-when, edxval
-edx-enterprise==3.17.42   # via -c requirements/edx/../constraints.txt, -r requirements/edx/base.txt
+edx-enterprise==3.17.43   # via -c requirements/edx/../constraints.txt, -r requirements/edx/base.txt
 edx-event-routing-backends==4.0.1  # via -r requirements/edx/base.txt
 edx-i18n-tools==0.5.3     # via -r requirements/edx/base.txt, -r requirements/edx/testing.in, ora2
 edx-lint==4.0.1           # via -r requirements/edx/testing.in
