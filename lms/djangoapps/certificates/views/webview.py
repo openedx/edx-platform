@@ -608,6 +608,8 @@ def render_html_view(request, course_id, certificate=None):
         context.update(get_certificate_header_context(is_secure=request.is_secure()))
         context.update(get_certificate_footer_context())
 
+        context.update(get_current_site_invalid_certificate_context(configuration))
+
         # Append/Override the existing view context values with any course-specific static values from Advanced Settings
         context.update(course.cert_html_view_overrides)
 
