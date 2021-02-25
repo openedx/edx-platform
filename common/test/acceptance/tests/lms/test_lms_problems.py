@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 Bok choy acceptance tests for problems in the LMS
 """
@@ -20,10 +19,10 @@ class ProblemsTest(UniqueCourseTest):
     """
 
     def setUp(self):
-        super(ProblemsTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
 
         self.username = "test_student_{uuid}".format(uuid=self.unique_id[0:8])
-        self.email = "{username}@example.com".format(username=self.username)
+        self.email = f"{self.username}@example.com"
         self.password = "keep it secret; keep it safe."
 
         self.xqueue_grade_response = None
@@ -63,7 +62,7 @@ class ProblemsTest(UniqueCourseTest):
         return XBlockFixtureDesc('sequential', 'Test Subsection')
 
 
-class CAPAProblemA11yBaseTestMixin(object):
+class CAPAProblemA11yBaseTestMixin:
     """Base TestCase Class to verify CAPA problem accessibility."""
 
     def test_a11y(self):

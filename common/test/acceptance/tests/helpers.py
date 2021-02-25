@@ -4,7 +4,6 @@ Test helper functions and base classes.
 
 
 import functools
-import io
 import json
 import os
 import sys
@@ -12,7 +11,6 @@ from datetime import datetime
 from unittest import SkipTest, TestCase
 
 import requests
-import six
 from bok_choy.javascript import js_defined
 from bok_choy.page_object import XSS_INJECTION
 from bok_choy.promise import EmptyPromise, Promise
@@ -24,7 +22,6 @@ from selenium.common.exceptions import StaleElementReferenceException
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support.select import Select
 from selenium.webdriver.support.ui import WebDriverWait
-from six.moves import range  # lint-amnesty, pylint: disable=unused-import
 
 from capa.tests.response_xml_factory import MultipleChoiceResponseXMLFactory
 from common.test.acceptance.fixtures.course import XBlockFixtureDesc
@@ -52,7 +49,7 @@ def skip_if_browser(browser):
         @functools.wraps(test_function)
         def wrapper(self, *args, **kwargs):
             if self.browser.name == browser:
-                raise SkipTest(u'Skipping as this test will not work with {}'.format(browser))
+                raise SkipTest(f'Skipping as this test will not work with {browser}')
             test_function(self, *args, **kwargs)
         return wrapper
     return decorator
@@ -80,7 +77,7 @@ def is_youtube_available():
         'transcript': 'http://video.google.com/timedtext?lang=en&v=3_yD_cEKoCk',
     }
 
-    for url in six.itervalues(youtube_api_urls):
+    for url in youtube_api_urls.values():
         try:
             response = requests.get(url, allow_redirects=False)
         except requests.exceptions.ConnectionError:
@@ -96,7 +93,7 @@ def is_focused_on_element(browser, selector):
     """
     Check if the focus is on the element that matches the selector.
     """
-    return browser.execute_script(u"return $('{}').is(':focus')".format(selector))
+    return browser.execute_script(f"return $('{selector}').is(':focus')")
 
 
 def load_data_str(rel_path):
@@ -153,7 +150,7 @@ def disable_css_animations(page):
     """
     Disable CSS3 animations, transitions, transforms.
     """
-    page.browser.execute_script(u"""
+    page.browser.execute_script("""
         var id = 'no-transitions';
 
         // if styles were already added, just do nothing.
@@ -230,7 +227,7 @@ def select_option_by_text(select_browser_query, option_text, focus_out=False):
         except StaleElementReferenceException:
             return False
 
-    msg = u'Selected option {}'.format(option_text)
+    msg = f'Selected option {option_text}'
     EmptyPromise(lambda: select_option(select_browser_query, option_text), msg).fulfill()
 
 
@@ -307,8 +304,8 @@ def create_multiple_choice_xml(correct_choice=2, num_choices=4):
     choices = [False for _ in range(num_choices)]
     choices[correct_choice] = True
 
-    choice_names = ['choice_{}'.format(index) for index in range(num_choices)]
-    question_text = u'The correct answer is Choice {}'.format(correct_choice)
+    choice_names = [f'choice_{index}' for index in range(num_choices)]
+    question_text = f'The correct answer is Choice {correct_choice}'
 
     return MultipleChoiceResponseXMLFactory().build_xml(
         question_text=question_text,
@@ -342,7 +339,7 @@ class EventsTestMixin(TestCase):
     Helpers and setup for running tests that evaluate events emitted
     """
     def setUp(self):
-        super(EventsTestMixin, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         mongo_host = 'edx.devstack.mongo' if 'BOK_CHOY_HOSTNAME' in os.environ else 'localhost'
         self.event_collection = MongoClient(mongo_host)["test"]["events"]
         self.start_time = datetime.now()
@@ -354,14 +351,14 @@ class AcceptanceTest(WebAppTest):
     """
 
     def __init__(self, *args, **kwargs):
-        super(AcceptanceTest, self).__init__(*args, **kwargs)  # lint-amnesty, pylint: disable=super-with-arguments
+        super().__init__(*args, **kwargs)
 
         # Use long messages so that failures show actual and expected values
         self.longMessage = True  # pylint: disable=invalid-name
 
     def tearDown(self):
         self._save_console_log()
-        super(AcceptanceTest, self).tearDown()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().tearDown()
 
     def _save_console_log(self):
         """
@@ -393,10 +390,10 @@ class AcceptanceTest(WebAppTest):
             if log_dir and not os.path.exists(log_dir):
                 os.makedirs(log_dir)
 
-            log_path = os.path.join(log_dir, '{}_browser.log'.format(self.id()))
-            with io.open(log_path, 'w') as browser_log:
+            log_path = os.path.join(log_dir, f'{self.id()}_browser.log')
+            with open(log_path, 'w') as browser_log:
                 for (message, url, line_no, col_no, stack) in logs:
-                    browser_log.write(u"{}:{}:{}: {}\n    {}\n".format(
+                    browser_log.write("{}:{}:{}: {}\n    {}\n".format(
                         url,
                         line_no,
                         col_no,
@@ -411,7 +408,7 @@ class UniqueCourseTest(AcceptanceTest):
     """
 
     def setUp(self):
-        super(UniqueCourseTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
 
         self.course_info = {
             'org': 'test_org',
@@ -433,7 +430,7 @@ class UniqueCourseTest(AcceptanceTest):
             self.course_info['run'],
             deprecated=(default_store == 'draft')
         )
-        return six.text_type(course_key)
+        return str(course_key)
 
 
 class YouTubeConfigError(Exception):
@@ -443,14 +440,14 @@ class YouTubeConfigError(Exception):
     pass  # lint-amnesty, pylint: disable=unnecessary-pass
 
 
-class YouTubeStubConfig(object):
+class YouTubeStubConfig:
     """
     Configure YouTube Stub Server.
     """
 
     YOUTUBE_HOSTNAME = os.environ.get('BOK_CHOY_HOSTNAME', '127.0.0.1')
     PORT = 9080
-    URL = 'http://{}:{}/'.format(YOUTUBE_HOSTNAME, PORT)
+    URL = f'http://{YOUTUBE_HOSTNAME}:{PORT}/'
 
     @classmethod
     def configure(cls, config):
@@ -471,7 +468,7 @@ class YouTubeStubConfig(object):
 
         if not response.ok:
             raise YouTubeConfigError(
-                u'YouTube Server Configuration Failed. URL {0}, Configuration Data: {1}, Status was {2}'.format(
+                'YouTube Server Configuration Failed. URL {}, Configuration Data: {}, Status was {}'.format(
                     youtube_stub_config_url, config, response.status_code))
 
     @classmethod
@@ -489,7 +486,7 @@ class YouTubeStubConfig(object):
 
         if not response.ok:
             raise YouTubeConfigError(
-                u'YouTube Server Configuration Failed. URL: {0} Status was {1}'.format(
+                'YouTube Server Configuration Failed. URL: {} Status was {}'.format(
                     youtube_stub_config_url, response.status_code))
 
     @classmethod
@@ -533,7 +530,7 @@ def create_user_partition_json(partition_id, name, description, groups, scheme="
     Helper method to create user partition JSON. If scheme is not supplied, "random" is used.
     """
     # All that is persisted about a scheme is its name.
-    class MockScheme(object):
+    class MockScheme:
         name = scheme
 
     return UserPartition(

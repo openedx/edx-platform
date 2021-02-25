@@ -12,7 +12,6 @@ from bok_choy.javascript import js_defined, wait_for_js
 from bok_choy.promise import EmptyPromise, Promise
 from selenium.webdriver.common.action_chains import ActionChains
 from selenium.webdriver.common.keys import Keys
-from six.moves import range
 
 from common.test.acceptance.pages.common.utils import sync_on_notification  # lint-amnesty, pylint: disable=no-name-in-module
 from common.test.acceptance.pages.lms.video.video import VideoPage
@@ -108,12 +107,12 @@ class VideoComponentPage(VideoPage):
     @wait_for_js
     def is_browser_on_page(self):
         return (
-            self.q(css='div{0}'.format(CLASS_SELECTORS['video_xmodule'])).present or
-            self.q(css='div{0}'.format(CLASS_SELECTORS['xblock'])).present
+            self.q(css='div{}'.format(CLASS_SELECTORS['video_xmodule'])).present or
+            self.q(css='div{}'.format(CLASS_SELECTORS['xblock'])).present
         )
 
     def get_element_selector(self, class_name, vertical=False):
-        return super(VideoComponentPage, self).get_element_selector(class_name, vertical=vertical)  # lint-amnesty, pylint: disable=super-with-arguments
+        return super().get_element_selector(class_name, vertical=vertical)
 
     def _wait_for(self, check_func, desc, result=False, timeout=30):
         """
@@ -271,7 +270,7 @@ class VideoComponentPage(VideoPage):
         Download handout at `url`
         """
         kwargs = dict()
-        session_id = [{i['name']: i['value']} for i in self.browser.get_cookies() if i['name'] == u'sessionid']
+        session_id = [{i['name']: i['value']} for i in self.browser.get_cookies() if i['name'] == 'sessionid']
         if session_id:
             kwargs.update({
                 'cookies': session_id[0]
@@ -332,7 +331,7 @@ class VideoComponentPage(VideoPage):
             line_number (int): caption line number
 
         """
-        caption_line_selector = u".subtitles li span[data-index='{index}']".format(index=line_number - 1)
+        caption_line_selector = ".subtitles li span[data-index='{index}']".format(index=line_number - 1)
         self.q(css=caption_line_selector).results[0].send_keys(Keys.ENTER)
 
     def is_caption_line_focused(self, line_number):
@@ -343,7 +342,7 @@ class VideoComponentPage(VideoPage):
             line_number (int): caption line number
 
         """
-        caption_line_selector = u".subtitles li span[data-index='{index}']".format(index=line_number - 1)
+        caption_line_selector = ".subtitles li span[data-index='{index}']".format(index=line_number - 1)
         caption_container = self.q(css=caption_line_selector).results[0].find_element_by_xpath('..')
         return 'focused' in caption_container.get_attribute('class').split()
 
@@ -441,9 +440,9 @@ class VideoComponentPage(VideoPage):
                     field_id = self.q(css=query).nth(index).attrs('for')[0]
                     break
 
-            self.q(css='#{}'.format(field_id)).fill(field_value)
+            self.q(css=f'#{field_id}').fill(field_value)
         elif field_type == 'select':
-            self.q(css=u'select[name="{0}"] option[value="{1}"]'.format(field_name, field_value)).first.click()
+            self.q(css=f'select[name="{field_name}"] option[value="{field_value}"]').first.click()
 
     def verify_field_value(self, field_name, field_value):
         """
@@ -491,7 +490,7 @@ class VideoComponentPage(VideoPage):
 
         """
         translations_items = '.wrapper-translations-settings .list-settings-item'
-        language_selector = translations_items + u' select option[value="{}"]'.format(language_code)
+        language_selector = translations_items + f' select option[value="{language_code}"]'
         self.q(css=language_selector).nth(index).click()
 
     def upload_translation(self, transcript_name, language_code):
@@ -547,7 +546,7 @@ class VideoComponentPage(VideoPage):
 
         """
         mime_type = 'application/x-subrip'
-        lang_code = '?language_code={}'.format(language_code)
+        lang_code = f'?language_code={language_code}'
         link = [link for link in self.q(css='.download-action').attrs('href') if lang_code in link]
         result, headers, content = self._get_transcript(link[0])  # lint-amnesty, pylint: disable=no-member
 
@@ -579,7 +578,7 @@ class VideoComponentPage(VideoPage):
         As all the captions lines are exactly same so only getting partial lines will work.
         """
         self.wait_for_captions()  # lint-amnesty, pylint: disable=no-member
-        selector = u'.subtitles li:nth-child({})'
+        selector = '.subtitles li:nth-child({})'
         return ' '.join([self.q(css=selector.format(i)).text[0] for i in range(1, 6)])
 
     def set_url_field(self, url, field_number):
@@ -611,7 +610,7 @@ class VideoComponentPage(VideoPage):
         """
         if message_type == 'status':
             self.wait_for_element_visibility(CLASS_SELECTORS[message_type],
-                                             u'{} message is Visible'.format(message_type.title()))
+                                             f'{message_type.title()} message is Visible')
 
         return self.q(css=CLASS_SELECTORS[message_type]).text[0]
 
@@ -657,7 +656,7 @@ class VideoComponentPage(VideoPage):
         """
         Clear video url fields.
         """
-        script = u"""
+        script = """
         $('{selector}')
             .prop('disabled', false)
             .removeClass('is-disabled')

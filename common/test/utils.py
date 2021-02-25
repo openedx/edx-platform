@@ -6,6 +6,7 @@ General testing utilities.
 import functools
 import sys
 from contextlib import contextmanager
+
 from django.dispatch import Signal
 from markupsafe import escape
 from mock import Mock, patch
@@ -19,7 +20,7 @@ def nostderr():
     """
     savestderr = sys.stderr
 
-    class Devnull(object):
+    class Devnull:
         """ /dev/null incarnation as output-stream-like object """
         def write(self, _):
             """ Write method - just does nothing"""
@@ -32,7 +33,7 @@ def nostderr():
         sys.stderr = savestderr
 
 
-class XssTestMixin(object):
+class XssTestMixin:
     """
     Mixin for testing XSS vulnerabilities.
     """
@@ -60,7 +61,7 @@ def disable_signal(module, signal):
     return patch.object(module, signal, new=Signal())
 
 
-class MockSignalHandlerMixin(object):
+class MockSignalHandlerMixin:
     """Mixin for testing sending of signals."""
 
     @contextmanager
@@ -114,12 +115,12 @@ def skip_signal(signal, **kwargs):
         signal.connect(**kwargs)
 
 
-class MockS3BotoMixin(object):
+class MockS3BotoMixin:
     """
     TestCase mixin that mocks the S3BotoStorage save method and s3 connection.
     """
     def setUp(self):
-        super(MockS3BotoMixin, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self._mocked_connection = patch('boto.connect_s3', return_value=Mock())
         self.mocked_connection = self._mocked_connection.start()
 
@@ -129,16 +130,16 @@ class MockS3BotoMixin(object):
     def tearDown(self):
         self._mocked_connection.stop()
         self.patcher.stop()
-        super(MockS3BotoMixin, self).tearDown()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().tearDown()
 
 
-class reprwrapper(object):
+class reprwrapper:
     """
     Wrapper class for functions that need a normalized string representation.
     """
     def __init__(self, func):
         self._func = func
-        self.repr = u'Func: {}'.format(func.__name__)
+        self.repr = f'Func: {func.__name__}'
         functools.update_wrapper(self, func)
 
     def __call__(self, *args, **kw):

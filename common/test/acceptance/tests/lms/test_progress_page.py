@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 End-to-end tests for the LMS that utilize the
 progress page.
@@ -7,7 +6,6 @@ progress page.
 
 from contextlib import contextmanager
 
-from six.moves import range
 
 from ...fixtures.course import CourseFixture, XBlockFixtureDesc
 from ...pages.common.logout import LogoutPage
@@ -36,7 +34,7 @@ class ProgressPageBaseTest(UniqueCourseTest):
     PROBLEM_NAME_2 = 'Test Problem 2'
 
     def setUp(self):
-        super(ProgressPageBaseTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.courseware_page = CoursewarePage(self.browser, self.course_id)
         self.problem_page = ProblemPage(self.browser)
         self.progress_page = ProgressPage(self.browser, self.course_id)
@@ -89,7 +87,7 @@ class ProgressPageBaseTest(UniqueCourseTest):
         Submit the given choice for the problem.
         """
         self.courseware_page.go_to_sequential_position(1)
-        self.problem_page.click_choice('choice_choice_{}'.format(choice))
+        self.problem_page.click_choice(f'choice_choice_{choice}')
         self.problem_page.click_submit()
 
     def _get_section_score(self):
@@ -128,7 +126,7 @@ class SubsectionGradingPolicyBase(ProgressPageBaseTest):
     the progress page
     """
     def setUp(self):
-        super(SubsectionGradingPolicyBase, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self._set_policy_for_subsection("Homework", 0)
         self._set_policy_for_subsection("Lab", 1)
 
@@ -194,46 +192,46 @@ class SubsectionGradingPolicyA11yTest(SubsectionGradingPolicyBase):
             assert ['0%', 'true'] == self.progress_page.y_tick_label(1)
             assert ['Pass 50%', 'true'] == self.progress_page.y_tick_label(2)
             # Verify x-Axis labels and sr-text
-            self._check_tick_text(0, [u'Homework 1 - Test Subsection 1 - 50% (1/2)'], u'HW 01')
+            self._check_tick_text(0, ['Homework 1 - Test Subsection 1 - 50% (1/2)'], 'HW 01')
 
             # Homeworks 2-10 are checked in the for loop below.
 
             self._check_tick_text(
                 10,
-                [u'Homework 11 Unreleased - 0% (?/?)', u'The lowest 2 Homework scores are dropped.'],
-                u'HW 11'
+                ['Homework 11 Unreleased - 0% (?/?)', 'The lowest 2 Homework scores are dropped.'],
+                'HW 11'
             )
 
             self._check_tick_text(
                 11,
-                [u'Homework 12 Unreleased - 0% (?/?)', u'The lowest 2 Homework scores are dropped.'],
-                u'HW 12'
+                ['Homework 12 Unreleased - 0% (?/?)', 'The lowest 2 Homework scores are dropped.'],
+                'HW 12'
             )
 
-            self._check_tick_text(12, [u'Homework Average = 5%'], u'HW Avg')
-            self._check_tick_text(13, [u'Lab 1 - Lab Subsection - 100% (1/1)'], u'Lab 01')
+            self._check_tick_text(12, ['Homework Average = 5%'], 'HW Avg')
+            self._check_tick_text(13, ['Lab 1 - Lab Subsection - 100% (1/1)'], 'Lab 01')
 
             # Labs 2-10 are checked in the for loop below.
 
             self._check_tick_text(
                 23,
-                [u'Lab 11 Unreleased - 0% (?/?)', u'The lowest 2 Lab scores are dropped.'],
-                u'Lab 11'
+                ['Lab 11 Unreleased - 0% (?/?)', 'The lowest 2 Lab scores are dropped.'],
+                'Lab 11'
             )
             self._check_tick_text(
                 24,
-                [u'Lab 12 Unreleased - 0% (?/?)', u'The lowest 2 Lab scores are dropped.'],
-                u'Lab 12'
+                ['Lab 12 Unreleased - 0% (?/?)', 'The lowest 2 Lab scores are dropped.'],
+                'Lab 12'
             )
 
-            self._check_tick_text(25, [u'Lab Average = 10%'], u'Lab Avg')
-            self._check_tick_text(26, [u'Midterm Exam = 0%'], u'Midterm')
-            self._check_tick_text(27, [u'Final Exam = 0%'], u'Final')
+            self._check_tick_text(25, ['Lab Average = 10%'], 'Lab Avg')
+            self._check_tick_text(26, ['Midterm Exam = 0%'], 'Midterm')
+            self._check_tick_text(27, ['Final Exam = 0%'], 'Final')
 
             self._check_tick_text(
                 28,
-                [u'Homework = 0.75% of a possible 15.00%', u'Lab = 1.50% of a possible 15.00%'],
-                u'Total',
+                ['Homework = 0.75% of a possible 15.00%', 'Lab = 1.50% of a possible 15.00%'],
+                'Total',
                 False  # The label "Total" should NOT be aria-hidden
             )
 
@@ -242,13 +240,13 @@ class SubsectionGradingPolicyA11yTest(SubsectionGradingPolicyBase):
             for i in range(1, 10):
                 self._check_tick_text(
                     i,
-                    [u'Homework {index} Unreleased - 0% (?/?)'.format(index=i + 1)],
-                    u'HW 0{index}'.format(index=i + 1) if i < 9 else u'HW {index}'.format(index=i + 1)
+                    ['Homework {index} Unreleased - 0% (?/?)'.format(index=i + 1)],
+                    'HW 0{index}'.format(index=i + 1) if i < 9 else 'HW {index}'.format(index=i + 1)
                 )
                 self._check_tick_text(
                     i + 13,
-                    [u'Lab {index} Unreleased - 0% (?/?)'.format(index=i + 1)],
-                    u'Lab 0{index}'.format(index=i + 1) if i < 9 else u'Lab {index}'.format(index=i + 1)
+                    ['Lab {index} Unreleased - 0% (?/?)'.format(index=i + 1)],
+                    'Lab 0{index}'.format(index=i + 1) if i < 9 else 'Lab {index}'.format(index=i + 1)
                 )
 
             # Verify the overall score. The first element in the array is the sr-only text, and the
