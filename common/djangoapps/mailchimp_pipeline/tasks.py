@@ -1,18 +1,36 @@
+"""
+Tasks related to the mailchimp_pipeline app
+"""
+from logging import getLogger
+
 from celery import task
 from django.contrib.auth.models import User
 from django.db import connection
-from lms.djangoapps.certificates import api as certificate_api
-from lms.djangoapps.onboarding.models import (FocusArea, OrgSector, UserExtendedProfile)
-from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
-from mailchimp_pipeline.client import ChimpClient, MailChimpException
-from mailchimp_pipeline.helpers import get_user_active_enrollements, get_enrollements_course_short_ids
 
-from logging import getLogger
+from lms.djangoapps.certificates import api as certificate_api
+from lms.djangoapps.onboarding.models import FocusArea, OrgSector, UserExtendedProfile
+from mailchimp_pipeline.client import ChimpClient, MailChimpException
+from mailchimp_pipeline.helpers import get_enrollements_course_short_ids, get_user_active_enrollements
+from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
+
 log = getLogger(__name__)
 
 
 @task()
 def update_org_details_at_mailchimp(org_label, org_type, work_area, org_id, list_id):
+    """
+    Update the details of the organization associated with the org_id
+
+    Arguments:
+        org_id (int): id of the target organization
+        org_label (str): Label of the organization to update to
+        org_type (str): Type of the organization to update to
+        work_area (str): Work area of the organization to update to
+        list_id (str): List id to add the update member to
+
+    Returns:
+        None
+    """
     log.info("Task to send organization details to MailChimp")
     log.info(org_label)
 
@@ -36,7 +54,6 @@ def update_org_details_at_mailchimp(org_label, org_type, work_area, org_id, list
 
 @task()
 def update_enrollments_completions_at_mailchimp(list_id):
-
     """Task to send user enrollments & course completions details to MailChimp"""
     log.info("starting enrollments & completions sync")
 
@@ -70,7 +87,7 @@ def update_enrollments_completions_at_mailchimp(list_id):
                 all_certs = []
                 try:
                     all_certs = certificate_api.get_certificates_for_user(user.username)
-                except Exception as ex:
+                except Exception as ex:  # pylint: disable=broad-except
                     log.exception(str(ex.args))
 
                 completed_course_keys = [cert.get('course_key', '') for cert in all_certs
@@ -109,7 +126,7 @@ def update_enrollments_completions_at_mailchimp(list_id):
                     )
                     log.exception(ex)
 
-        except Exception as ex:
+        except Exception as ex:  # pylint: disable=broad-except
             log.info("There was an error in batch from {} to {}".format(page_start, page_end))
             log.exception(str(ex.args))
 

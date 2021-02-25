@@ -1,39 +1,40 @@
+"""
+Tests related to tasks.py file of the mailchimp pipeline app
+"""
 import json
-import requests
-import factory
-from mock import ANY, patch
 from datetime import datetime
-from django.conf import settings
-from django.test import override_settings
-from django.contrib.auth.models import User
-from django.db.models.signals import post_save
-from common.djangoapps.mailchimp_pipeline.tests.helpers import create_organization, generate_mailchimp_url
-from lms.djangoapps.onboarding.tests.factories import UserFactory, UserExtendedProfileFactory
-from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
-from lms.djangoapps.onboarding.models import OrganizationMetricUpdatePrompt
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-from lms.djangoapps.onboarding.models import FocusArea, OrgSector
-from lms.djangoapps.certificates import api as certificate_api
-from xmodule.modulestore.tests.factories import CourseFactory
-from student.tests.factories import UserProfileFactory
-from student.models import CourseEnrollment
 
-from mailchimp_pipeline.tasks import update_org_details_at_mailchimp, update_enrollments_completions_at_mailchimp
+import factory
+import requests
+from django.conf import settings
+from django.db.models.signals import post_save
+from django.test import override_settings
+from mock import ANY, patch
+
+from common.djangoapps.mailchimp_pipeline.tests.helpers import create_organization, generate_mailchimp_url
+from lms.djangoapps.certificates import api as certificate_api
+from lms.djangoapps.onboarding.models import FocusArea, OrganizationMetricUpdatePrompt, OrgSector
+from lms.djangoapps.onboarding.tests.factories import UserFactory
+from mailchimp_pipeline.client import Connection, MailChimpException
 from mailchimp_pipeline.helpers import (
     get_enrollements_course_short_ids,
     get_org_data_for_mandrill,
     get_user_active_enrollements
 )
-from mailchimp_pipeline.client import MailChimpException, Connection
 from mailchimp_pipeline.signals.handlers import (
+    send_user_course_completions_to_mailchimp,
+    send_user_enrollments_to_mailchimp,
     send_user_info_to_mailchimp,
     sync_metric_update_prompt_with_mail_chimp,
-    update_mailchimp,
-    send_user_enrollments_to_mailchimp,
     task_send_account_activation_email,
     task_send_user_info_to_mailchimp,
-    send_user_course_completions_to_mailchimp
+    update_mailchimp
 )
+from mailchimp_pipeline.tasks import update_enrollments_completions_at_mailchimp, update_org_details_at_mailchimp
+from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
+from student.models import CourseEnrollment
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from xmodule.modulestore.tests.factories import CourseFactory
 
 
 @override_settings(CELERY_TASK_ALWAYS_EAGER=True, CELERY_TASK_EAGER_PROPOGATES=True)
@@ -46,7 +47,7 @@ class MailchimpPipelineTaskTestClass(ModuleStoreTestCase):
 
     @patch("nodebb.signals.handlers.get_current_request")
     @patch("common.lib.mandrill_client.client.MandrillClient.send_mail")
-    def setUp(self, mocked_nodebb_request, mocked_email_sender):
+    def setUp(self, mocked_nodebb_request, mocked_email_sender):  # pylint: disable=unused-argument, arguments-differ
         super(MailchimpPipelineTaskTestClass, self).setUp()
         self.mailchimp_list_id = settings.MAILCHIMP_LEARNERS_LIST_ID
         patcher = patch('mailchimp_pipeline.client.request', autospec=True)
@@ -269,7 +270,7 @@ class MailchimpPipelineTaskTestClass(ModuleStoreTestCase):
 
     @factory.django.mute_signals(post_save)
     @patch("mailchimp_pipeline.tasks.connection")
-    def test_update_enrollments_completions_at_mailchimp(self, mocked_connection):
+    def test_update_enrollments_completions_at_mailchimp(self, mocked_connection):  # pylint: disable=unused-argument
         """
             Test if the update_enrollments_completions_at_mailchimp task is sending complete
             information of a user to the expected MailChimp URL
@@ -314,7 +315,8 @@ class MailchimpPipelineTaskTestClass(ModuleStoreTestCase):
             "PUT", url=expected_url, headers=ANY, data=json.dumps(expected_data), auth=ANY, params=ANY)
 
     @patch("mailchimp_pipeline.tasks.connection")
-    def test_update_enrollments_completions_at_mailchimp_for_mailchimp_exception(self, mocked_connection):
+    def test_update_enrollments_completions_at_mailchimp_for_mailchimp_exception(
+            self, mocked_connection):  # pylint: disable=unused-argument
         """
             Test if the update_enrollments_completions_at_mailchimp task is raising an exception
             on response (from MailChimp server) status code  of 404
@@ -327,9 +329,8 @@ class MailchimpPipelineTaskTestClass(ModuleStoreTestCase):
 
     @patch("lms.djangoapps.certificates.api.get_certificates_for_user")
     @patch("mailchimp_pipeline.tasks.connection")
-    def test_update_enrollments_completions_at_mailchimp_for_certificate_exception(self,
-                                                                                   mocked_connection,
-                                                                                   mocked_certificate_api):
+    def test_update_enrollments_completions_at_mailchimp_for_certificate_exception(
+            self, mocked_connection, mocked_certificate_api):  # pylint: disable=unused-argument
         """
             Test if the update_enrollments_completions_at_mailchimp task is raising an exception
             on failure of certificate API
@@ -341,7 +342,8 @@ class MailchimpPipelineTaskTestClass(ModuleStoreTestCase):
         self.assertRaises(Exception)
 
     @patch("mailchimp_pipeline.tasks.connection")
-    def test_update_enrollments_completions_at_mailchimp_for_exception(self, mocked_connection):
+    def test_update_enrollments_completions_at_mailchimp_for_exception(
+            self, mocked_connection):  # pylint: disable=unused-argument
         """
            Test if the update_enrollments_completions_at_mailchimp task is raising an exception
            when there is no extended-profile of the use

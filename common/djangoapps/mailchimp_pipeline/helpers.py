@@ -1,9 +1,14 @@
+"""
+Helpers to provide utility to the mailchimp_pipeline app
+"""
 from datetime import datetime
+
 import pytz
+from opaque_keys.edx.keys import CourseKey
+
 from custom_settings.models import CustomSettings
 from enrollment.api import get_enrollments
-from opaque_keys.edx.keys import CourseKey
-from lms.djangoapps.onboarding.models import (FocusArea, OrgSector, )
+from lms.djangoapps.onboarding.models import FocusArea, OrgSector
 
 
 def is_active_enrollment(course_end_date):
@@ -21,6 +26,15 @@ def get_user_active_enrollements(username):
 
 
 def get_enrollements_course_short_ids(username):
+    """
+    Get the short course ids for all the enrollments of a given username
+
+    Arguments:
+        username (str): Username to get the enrollments' short course ids for
+
+    Returns:
+        str: All the short course ids (comma separated) associated with the enrollments of the given username
+    """
     course_keys = []
     for enrollment in get_enrollments(username):
         course_key = CourseKey.from_string(enrollment.get('course_details', {}).get('course_id', ''))
@@ -34,6 +48,15 @@ def get_enrollements_course_short_ids(username):
 
 
 def get_org_data_for_mandrill(organization):
+    """
+    Get all the details associated with an organization
+
+    Arguments:
+        organization: Target organization
+
+    Returns:
+        (str, str, str): The label, type, and the focus area of the target organization respectively in a tuple
+    """
     org_label = org_type = focus_area = ""
 
     if organization:
