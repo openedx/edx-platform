@@ -8,8 +8,8 @@ not migrating so as not to inconvenience users by logging them all out.
 
 
 from functools import wraps
+from urllib.parse import urlencode
 
-import six
 from django.conf import settings  # lint-amnesty, pylint: disable=unused-import
 from django.core import cache
 # If we can't find a 'general' CACHE defined in settings.py, we simply fall back
@@ -68,8 +68,8 @@ def cache_if_anonymous(*get_parameters):
                     if parameter_value is not None:
                         # urlencode expects data to be of type str, and doesn't deal well with Unicode data
                         # since it doesn't provide a way to specify an encoding.
-                        cache_key = cache_key + '.' + six.moves.urllib.parse.urlencode({
-                            get_parameter: six.text_type(parameter_value).encode('utf-8')
+                        cache_key = cache_key + '.' + urlencode({
+                            get_parameter: str(parameter_value).encode('utf-8')
                         })
 
                 response = cache.get(cache_key)

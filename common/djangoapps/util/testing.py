@@ -2,23 +2,19 @@
 Utility Mixins for unit tests
 """
 
-
 import json
 import sys
+from importlib import reload
+from unittest.mock import patch
 
-import six
 from django.conf import settings
 from django.test import TestCase
 from django.urls import clear_url_caches, resolve
-from mock import patch
 
 from common.djangoapps.util.db import OuterAtomic
 
-if six.PY3:
-    from importlib import reload
 
-
-class UrlResetMixin(object):
+class UrlResetMixin:
     """Mixin to reset urls.py before and after a test
 
     Django memoizes the function that reads the urls module (whatever module
@@ -69,18 +65,18 @@ class UrlResetMixin(object):
             URLCONF_MODULES = ['myapp.url', 'another_app.urls']
 
         """
-        super(UrlResetMixin, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
 
         self.reset_urls()
         self.addCleanup(self.reset_urls)
 
 
-class EventTestMixin(object):
+class EventTestMixin:
     """
     Generic mixin for verifying that events were emitted during a test.
     """
     def setUp(self, tracker):
-        super(EventTestMixin, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         patcher = patch(tracker)
         self.mock_tracker = patcher.start()
         self.addCleanup(patcher.stop)
@@ -124,7 +120,7 @@ class EventTestMixin(object):
         return self.mock_tracker.emit.call_args[0]
 
 
-class PatchMediaTypeMixin(object):
+class PatchMediaTypeMixin:
     """
     Generic mixin for verifying unsupported media type in PATCH
     """

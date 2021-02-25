@@ -1,15 +1,14 @@
-# -*- coding: utf-8 -*-
 """
 Tests for util.date_utils
 """
 
-
 import unittest
 from datetime import datetime, timedelta, tzinfo
-import pytest
+from unittest.mock import patch
+
 import ddt
+import pytest
 from markupsafe import Markup
-from mock import patch
 from pytz import utc
 
 from common.djangoapps.util.date_utils import (
@@ -127,7 +126,7 @@ class StrftimeLocalizedTest(unittest.TestCase):
         ("%Y", "2013"),
         ("%m/%d/%y", "02/14/13"),
         ("hello", "hello"),
-        (u'%Y년 %m월 %d일', u"2013년 02월 14일"),
+        ('%Y년 %m월 %d일', "2013년 02월 14일"),
         ("%a, %b %d, %Y", "Thu, Feb 14, 2013"),
         ("%I:%M:%S %p", "04:41:17 PM"),
         ("%A at %-I%P", "Thursday at 4pm"),

@@ -40,13 +40,13 @@ class XBlockStudioConfigurationFlag(ConfigurationModel):
     .. no_pii:
     """
 
-    class Meta(object):
+    class Meta:
         app_label = "xblock_django"
 
     # boolean field 'enabled' inherited from parent ConfigurationModel
 
     def __str__(self):
-        return "XBlockStudioConfigurationFlag(enabled={})".format(self.enabled)
+        return f"XBlockStudioConfigurationFlag(enabled={self.enabled})"
 
 
 class XBlockStudioConfiguration(ConfigurationModel):
@@ -57,9 +57,9 @@ class XBlockStudioConfiguration(ConfigurationModel):
     """
     KEY_FIELDS = ('name', 'template')  # xblock name/template combination is unique
 
-    FULL_SUPPORT = u'fs'
-    PROVISIONAL_SUPPORT = u'ps'
-    UNSUPPORTED = u'us'
+    FULL_SUPPORT = 'fs'
+    PROVISIONAL_SUPPORT = 'ps'
+    UNSUPPORTED = 'us'
 
     SUPPORT_CHOICES = (
         (FULL_SUPPORT, _('Fully Supported')),
@@ -69,10 +69,10 @@ class XBlockStudioConfiguration(ConfigurationModel):
 
     # boolean field 'enabled' inherited from parent ConfigurationModel
     name = models.CharField(max_length=255, null=False, db_index=True)
-    template = models.CharField(max_length=255, blank=True, default=u'')
+    template = models.CharField(max_length=255, blank=True, default='')
     support_level = models.CharField(max_length=2, choices=SUPPORT_CHOICES, default=UNSUPPORTED)
 
-    class Meta(object):
+    class Meta:
         app_label = "xblock_django"
 
     def __str__(self):

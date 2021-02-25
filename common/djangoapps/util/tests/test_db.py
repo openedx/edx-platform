@@ -4,6 +4,7 @@
 import threading
 import time
 import unittest
+from io import StringIO
 
 import ddt
 from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
@@ -12,8 +13,6 @@ from django.db import IntegrityError, connection
 from django.db.transaction import TransactionManagementError, atomic
 from django.test import TestCase, TransactionTestCase
 from django.test.utils import override_settings
-from django.utils.six import StringIO
-from six.moves import range
 
 from common.djangoapps.util.db import enable_named_outer_atomic, generate_int_id, outer_atomic
 
@@ -54,7 +53,7 @@ class TransactionManagersTestCase(TransactionTestCase):
         class RequestThread(threading.Thread):
             """ A thread which runs a dummy view."""
             def __init__(self, delay, **kwargs):
-                super(RequestThread, self).__init__(**kwargs)  # lint-amnesty, pylint: disable=super-with-arguments
+                super().__init__(**kwargs)
                 self.delay = delay
                 self.status = {}
 
@@ -189,7 +188,7 @@ class GenerateIntIdTestCase(TestCase):
         used_ids = {2, 4, 6, 8}
         for __ in range(times):
             int_id = generate_int_id(minimum, maximum, used_ids)
-            assert int_id in list((set(range(minimum, (maximum + 1))) - used_ids))
+            assert int_id in list(set(range(minimum, (maximum + 1))) - used_ids)
 
 
 class MigrationTests(TestCase):

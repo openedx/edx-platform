@@ -56,7 +56,7 @@ class OuterAtomic(transaction.Atomic):
     def __init__(self, using, savepoint, read_committed=False, name=None):
         self.read_committed = read_committed
         self.name = name
-        super(OuterAtomic, self).__init__(using, savepoint)  # lint-amnesty, pylint: disable=super-with-arguments
+        super().__init__(using, savepoint)
 
     def __enter__(self):
 
@@ -89,7 +89,7 @@ class OuterAtomic(transaction.Atomic):
                     cursor = connection.cursor()
                     cursor.execute("SET TRANSACTION ISOLATION LEVEL READ COMMITTED")
 
-        super(OuterAtomic, self).__enter__()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().__enter__()
 
 
 def outer_atomic(using=None, savepoint=True, read_committed=False, name=None):

@@ -26,14 +26,14 @@ def get_default_time_display(dtime):
 
     """
     if dtime is None:
-        return u""
+        return ""
     if dtime.tzinfo is not None:
         try:
-            timezone = u" " + dtime.tzinfo.tzname(dtime)  # lint-amnesty, pylint: disable=redefined-outer-name
+            timezone = " " + dtime.tzinfo.tzname(dtime)  # lint-amnesty, pylint: disable=redefined-outer-name
         except NotImplementedError:
             timezone = dtime.strftime('%z')
     else:
-        timezone = u" UTC"
+        timezone = " UTC"
 
     localized = strftime_localized(dtime, "DATE_TIME")
     return (localized + timezone).strip()

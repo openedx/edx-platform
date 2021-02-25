@@ -13,7 +13,7 @@ from django.core.cache import caches
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, SharedModuleStoreTestCase
 
 
-class CacheCheckMixin(object):
+class CacheCheckMixin:
     """Base mixin that does our cache check."""
 
     def check_caches(self, key):

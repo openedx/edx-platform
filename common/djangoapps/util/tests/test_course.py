@@ -1,10 +1,9 @@
 """
 Tests for course utils.
 """
-
+from unittest import mock
 
 import ddt
-import mock
 from django.conf import settings
 
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
@@ -20,7 +19,7 @@ class TestCourseSharingLinks(ModuleStoreTestCase):
     Tests for course sharing links.
     """
     def setUp(self):
-        super(TestCourseSharingLinks, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
 
         # create test mongo course
         self.course = CourseFactory.create(
@@ -70,7 +69,7 @@ class TestCourseSharingLinks(ModuleStoreTestCase):
         (True, True, 'test_social_sharing_url'),
         (False, True, 'test_marketing_url'),
         (True, False, 'test_social_sharing_url'),
-        (False, False, '{}/courses/course-v1:test_org+test_number+test_run/about'.format(settings.LMS_ROOT_URL)),
+        (False, False, f'{settings.LMS_ROOT_URL}/courses/course-v1:test_org+test_number+test_run/about'),
     )
     @ddt.unpack
     def test_sharing_link_with_settings(self, enable_social_sharing, enable_mktg_site, expected_course_sharing_link):
@@ -88,7 +87,7 @@ class TestCourseSharingLinks(ModuleStoreTestCase):
         (['marketing_url'], 'test_social_sharing_url'),
         (
             ['social_sharing_url', 'marketing_url'],
-            '{}/courses/course-v1:test_org+test_number+test_run/about'.format(settings.LMS_ROOT_URL)
+            f'{settings.LMS_ROOT_URL}/courses/course-v1:test_org+test_number+test_run/about'
         ),
     )
     @ddt.unpack
@@ -112,7 +111,7 @@ class TestCourseSharingLinks(ModuleStoreTestCase):
         (True, 'test_social_sharing_url'),
         (
             False,
-            '{}/courses/course-v1:test_org+test_number+test_run/about'.format(settings.LMS_ROOT_URL)
+            f'{settings.LMS_ROOT_URL}/courses/course-v1:test_org+test_number+test_run/about'
         ),
     )
     @ddt.unpack
