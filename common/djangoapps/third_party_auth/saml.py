@@ -12,11 +12,12 @@ from django.http import Http404
 from django.utils.functional import cached_property
 from django_countries import countries
 from onelogin.saml2.settings import OneLogin_Saml2_Settings
+from six import text_type
 from social_core.backends.saml import OID_EDU_PERSON_ENTITLEMENT, SAMLAuth, SAMLIdentityProvider
 from social_core.exceptions import AuthForbidden
 
-from common.djangoapps.third_party_auth.exceptions import IncorrectConfigurationException
 from openedx.core.djangoapps.theming.helpers import get_current_request
+from common.djangoapps.third_party_auth.exceptions import IncorrectConfigurationException
 
 STANDARD_SAML_PROVIDER_KEY = 'standard_saml_provider'
 SAP_SUCCESSFACTORS_SAML_KEY = 'sap_success_factors'
