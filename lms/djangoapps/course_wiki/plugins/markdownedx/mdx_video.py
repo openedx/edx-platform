@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # TODO: Is this file still used? If so it should be refactored and tests added.
 # pylint: disable=line-too-long, invalid-name
-u"""
+"""
 Embeds web videos using URLs.  For instance, if a URL to an youtube video is
 found in the text submitted to markdown and it isn't enclosed in parenthesis
 like a normal link in markdown, then the URL will be swapped with a embedded
@@ -164,7 +164,7 @@ class VideoExtension(markdown.Extension):  # lint-amnesty, pylint: disable=missi
         }
 
         # Override defaults with user settings
-        super(VideoExtension, self).__init__(**kwargs)  # lint-amnesty, pylint: disable=super-with-arguments
+        super().__init__(**kwargs)
 
     def add_inline(self, md, name, klass, re):  # pylint: disable=invalid-name
         """Adds the inline link"""
@@ -256,8 +256,7 @@ class Yahoo(markdown.inlinepatterns.Pattern):  # lint-amnesty, pylint: disable=m
         obj = flash_object(url, width, height)
         param = etree.Element('param')
         param.set('name', 'flashVars')
-        param.set('value', "id=%s&vid=%s" % (m.group('yahooid'),
-                                             m.group('yahoovid')))
+        param.set('value', "id={}&vid={}".format(m.group('yahooid'), m.group('yahoovid')))
         obj.append(param)
         return obj
 

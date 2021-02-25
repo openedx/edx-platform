@@ -1,7 +1,3 @@
-# -*- coding: utf-8 -*-
-
-
-
 from django.db import migrations, models
 
 
@@ -14,6 +10,6 @@ class Migration(migrations.Migration):
     operations = [
         migrations.AlterIndexTogether(
             name='studentmodulehistoryextended',
-            index_together=set([('student_module',)]),
+            index_together={('student_module',)},
         ),
     ]

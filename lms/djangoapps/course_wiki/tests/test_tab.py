@@ -16,7 +16,7 @@ class WikiTabTestCase(ModuleStoreTestCase):
     """Test cases for Wiki Tab."""
 
     def setUp(self):
-        super(WikiTabTestCase, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.course = CourseFactory.create()
         self.instructor = AdminFactory.create()
         self.user = UserFactory()

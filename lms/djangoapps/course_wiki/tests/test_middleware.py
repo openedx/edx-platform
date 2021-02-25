@@ -17,7 +17,7 @@ class TestWikiAccessMiddleware(ModuleStoreTestCase):
 
     def setUp(self):
         """Test setup."""
-        super(TestWikiAccessMiddleware, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
 
         self.wiki = get_or_create_root()
 

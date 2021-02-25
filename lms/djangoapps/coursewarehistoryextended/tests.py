@@ -8,11 +8,11 @@ backend tables.
 
 import json
 from unittest import skipUnless
+from unittest.mock import patch
 
 from django.conf import settings
 from django.db import connections
 from django.test import TestCase
-from mock import patch
 
 from lms.djangoapps.courseware.models import BaseStudentModuleHistory, StudentModule, StudentModuleHistory
 from lms.djangoapps.courseware.tests.factories import StudentModuleFactory, course_id, location
@@ -25,7 +25,7 @@ class TestStudentModuleHistoryBackends(TestCase):
     databases = {alias for alias in connections}  # lint-amnesty, pylint: disable=unnecessary-comprehension
 
     def setUp(self):
-        super(TestStudentModuleHistoryBackends, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         for record in (1, 2, 3):
             # This will store into CSMHE via the post_save signal
             csm = StudentModuleFactory.create(module_state_key=location('usage_id'),
