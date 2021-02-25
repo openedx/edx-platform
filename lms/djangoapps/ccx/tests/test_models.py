@@ -27,7 +27,7 @@ class TestCCX(ModuleStoreTestCase):
 
     def setUp(self):
         """common setup for all tests"""
-        super(TestCCX, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.course = CourseFactory.create()
         self.coach = AdminFactory.create()
         role = CourseCcxCoachRole(self.course.id)
