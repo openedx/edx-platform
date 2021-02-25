@@ -20,7 +20,6 @@ The resulting JSON object has one entry for each module in the course:
 import json
 from textwrap import dedent
 
-import six
 from django.core.management.base import BaseCommand, CommandError
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
@@ -76,7 +75,7 @@ class Command(BaseCommand):  # lint-amnesty, pylint: disable=missing-class-docst
 
         info = dump_module(course, inherited=options['inherited'], defaults=options['inherited_defaults'])
 
-        return json.dumps(info, indent=2, sort_keys=True, default=six.text_type)
+        return json.dumps(info, indent=2, sort_keys=True, default=str)
 
 
 def dump_module(module, destination=None, inherited=False, defaults=False):
@@ -93,11 +92,11 @@ def dump_module(module, destination=None, inherited=False, defaults=False):
     if isinstance(module, DiscussionXBlock) and 'discussion_id' not in items:
         items['discussion_id'] = module.discussion_id
 
-    filtered_metadata = {k: v for k, v in six.iteritems(items) if k not in FILTER_LIST}
+    filtered_metadata = {k: v for k, v in items.items() if k not in FILTER_LIST}
 
-    destination[six.text_type(module.location)] = {
+    destination[str(module.location)] = {
         'category': module.location.block_type,
-        'children': [six.text_type(child) for child in getattr(module, 'children', [])],
+        'children': [str(child) for child in getattr(module, 'children', [])],
         'metadata': filtered_metadata,
     }
 
@@ -118,7 +117,7 @@ def dump_module(module, destination=None, inherited=False, defaults=False):
                 return field.values != field.default
 
         inherited_metadata = {field.name: field.read_json(module) for field in module.fields.values() if is_inherited(field)}  # lint-amnesty, pylint: disable=line-too-long
-        destination[six.text_type(module.location)]['inherited_metadata'] = inherited_metadata
+        destination[str(module.location)]['inherited_metadata'] = inherited_metadata
 
     for child in module.get_children():
         dump_module(child, destination, inherited, defaults)
