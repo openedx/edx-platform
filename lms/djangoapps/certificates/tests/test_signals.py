@@ -4,14 +4,11 @@ and disabling for instructor-paced courses.
 """
 
 
+from unittest import mock
+
 import ddt
-import mock
-import six
 from edx_toggles.toggles import LegacyWaffleSwitch
-from edx_toggles.toggles.testutils import override_waffle_flag
-from edx_toggles.toggles.testutils import override_waffle_switch
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory
+from edx_toggles.toggles.testutils import override_waffle_flag, override_waffle_switch
 
 from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
 from lms.djangoapps.certificates.api import cert_generation_enabled
@@ -23,12 +20,13 @@ from lms.djangoapps.certificates.models import (
 )
 from lms.djangoapps.certificates.signals import _fire_ungenerated_certificate_task
 from lms.djangoapps.certificates.tasks import CERTIFICATE_DELAY_SECONDS
-from lms.djangoapps.certificates.tests.factories import CertificateWhitelistFactory
-from lms.djangoapps.certificates.tests.factories import GeneratedCertificateFactory
+from lms.djangoapps.certificates.tests.factories import CertificateWhitelistFactory, GeneratedCertificateFactory
 from lms.djangoapps.grades.course_grade_factory import CourseGradeFactory
 from lms.djangoapps.grades.tests.utils import mock_passing_grade
 from lms.djangoapps.verify_student.models import IDVerificationAttempt, SoftwareSecurePhotoVerification
 from openedx.core.djangoapps.certificates.config import waffle
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from xmodule.modulestore.tests.factories import CourseFactory
 
 AUTO_CERTIFICATE_GENERATION_SWITCH = LegacyWaffleSwitch(waffle.waffle(), waffle.AUTO_CERTIFICATE_GENERATION)
 
@@ -106,8 +104,8 @@ class WhitelistGeneratedCertificatesTest(ModuleStoreTestCase):
                 mock_generate_certificate_apply_async.assert_called_with(
                     countdown=CERTIFICATE_DELAY_SECONDS,
                     kwargs={
-                        'student': six.text_type(self.user.id),
-                        'course_key': six.text_type(self.course.id),
+                        'student': str(self.user.id),
+                        'course_key': str(self.course.id),
                     }
                 )
 
@@ -134,8 +132,8 @@ class WhitelistGeneratedCertificatesTest(ModuleStoreTestCase):
                 mock_generate_certificate_apply_async.assert_called_with(
                     countdown=CERTIFICATE_DELAY_SECONDS,
                     kwargs={
-                        'student': six.text_type(self.user.id),
-                        'course_key': six.text_type(self.ip_course.id),
+                        'student': str(self.user.id),
+                        'course_key': str(self.ip_course.id),
                     }
                 )
 
@@ -182,8 +180,8 @@ class WhitelistGeneratedCertificatesTest(ModuleStoreTestCase):
                     mock_generate_certificate_apply_async.assert_called_with(
                         countdown=CERTIFICATE_DELAY_SECONDS,
                         kwargs={
-                            'student': six.text_type(self.user.id),
-                            'course_key': six.text_type(self.ip_course.id),
+                            'student': str(self.user.id),
+                            'course_key': str(self.ip_course.id),
                         }
                     )
                     mock_generate_allowlist_task.assert_not_called()
@@ -235,8 +233,8 @@ class PassingGradeCertsTest(ModuleStoreTestCase):
                     mock_generate_certificate_apply_async.assert_called_with(
                         countdown=CERTIFICATE_DELAY_SECONDS,
                         kwargs={
-                            'student': six.text_type(self.user.id),
-                            'course_key': six.text_type(self.course.id),
+                            'student': str(self.user.id),
+                            'course_key': str(self.course.id),
                         }
                     )
 
@@ -256,8 +254,8 @@ class PassingGradeCertsTest(ModuleStoreTestCase):
                     mock_generate_certificate_apply_async.assert_called_with(
                         countdown=CERTIFICATE_DELAY_SECONDS,
                         kwargs={
-                            'student': six.text_type(self.user.id),
-                            'course_key': six.text_type(self.ip_course.id),
+                            'student': str(self.user.id),
+                            'course_key': str(self.ip_course.id),
                         }
                     )
 
@@ -446,8 +444,8 @@ class LearnerTrackChangeCertsTest(ModuleStoreTestCase):
                 mock_generate_certificate_apply_async.assert_called_with(
                     countdown=CERTIFICATE_DELAY_SECONDS,
                     kwargs={
-                        'student': six.text_type(self.user_one.id),
-                        'course_key': six.text_type(self.course_one.id),
+                        'student': str(self.user_one.id),
+                        'course_key': str(self.course_one.id),
                         'expected_verification_status': IDVerificationAttempt.STATUS.approved,
                     }
                 )
@@ -467,8 +465,8 @@ class LearnerTrackChangeCertsTest(ModuleStoreTestCase):
                 mock_generate_certificate_apply_async.assert_called_with(
                     countdown=CERTIFICATE_DELAY_SECONDS,
                     kwargs={
-                        'student': six.text_type(self.user_two.id),
-                        'course_key': six.text_type(self.course_two.id),
+                        'student': str(self.user_two.id),
+                        'course_key': str(self.course_two.id),
                         'expected_verification_status': IDVerificationAttempt.STATUS.approved,
                     }
                 )

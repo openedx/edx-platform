@@ -1,6 +1,3 @@
-# -*- coding: utf-8 -*-
-
-
 from django.db import migrations, models
 
 
@@ -14,7 +11,7 @@ class Migration(migrations.Migration):
     operations = [
         migrations.AlterUniqueTogether(
             name='badgeassertion',
-            unique_together=set([]),
+            unique_together=set(),
         ),
         migrations.RemoveField(
             model_name='badgeassertion',

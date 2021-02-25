@@ -4,17 +4,14 @@ Tests for certificate app views used by the support team.
 
 
 import json
+from unittest.mock import patch
 from uuid import uuid4
 
 import ddt
-import six
 from django.conf import settings
 from django.test.utils import override_settings
 from django.urls import reverse
-from mock import patch
 from opaque_keys.edx.keys import CourseKey
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory
 
 from common.djangoapps.student.models import CourseEnrollment
 from common.djangoapps.student.roles import GlobalStaff, SupportStaffRole
@@ -24,6 +21,8 @@ from lms.djangoapps.certificates.models import CertificateInvalidation, Certific
 from lms.djangoapps.certificates.tests.factories import CertificateInvalidationFactory, GeneratedCertificateFactory
 from lms.djangoapps.grades.tests.utils import mock_passing_grade
 from openedx.core.djangoapps.content.course_overviews.tests.factories import CourseOverviewFactory
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from xmodule.modulestore.tests.factories import CourseFactory
 
 FEATURES_WITH_CERTS_ENABLED = settings.FEATURES.copy()
 FEATURES_WITH_CERTS_ENABLED['CERTIFICATES_HTML_VIEW'] = True
@@ -166,9 +165,9 @@ class CertificateSearchTests(CertificateSupportTestCase):
         ("", False),
         (CertificateSupportTestCase.STUDENT_USERNAME, False, 'invalid_key'),
         (CertificateSupportTestCase.STUDENT_USERNAME, False,
-            six.text_type(CertificateSupportTestCase.COURSE_NOT_EXIST_KEY)),
+            str(CertificateSupportTestCase.COURSE_NOT_EXIST_KEY)),
         (CertificateSupportTestCase.STUDENT_USERNAME, True,
-            six.text_type(CertificateSupportTestCase.EXISTED_COURSE_KEY_1)),
+            str(CertificateSupportTestCase.EXISTED_COURSE_KEY_1)),
     )
     @ddt.unpack
     def test_search(self, user_filter, expect_result, course_filter=None):
@@ -204,10 +203,10 @@ class CertificateSearchTests(CertificateSupportTestCase):
         retrieved_cert = results[0]
 
         assert retrieved_cert['username'] == self.STUDENT_USERNAME
-        assert retrieved_cert['course_key'] == six.text_type(self.CERT_COURSE_KEY)
+        assert retrieved_cert['course_key'] == str(self.CERT_COURSE_KEY)
         assert retrieved_cert['created'] == self.cert.created_date.isoformat()
         assert retrieved_cert['modified'] == self.cert.modified_date.isoformat()
-        assert retrieved_cert['grade'] == six.text_type(self.CERT_GRADE)
+        assert retrieved_cert['grade'] == str(self.CERT_GRADE)
         assert retrieved_cert['status'] == self.CERT_STATUS
         assert retrieved_cert['type'] == self.CERT_MODE
         assert retrieved_cert['download_url'] == self.CERT_DOWNLOAD_URL
@@ -329,7 +328,7 @@ class CertificateRegenerateTests(CertificateSupportTestCase):
 
     def test_regenerate_no_such_user(self):
         response = self._regenerate(
-            course_key=six.text_type(self.CERT_COURSE_KEY),
+            course_key=str(self.CERT_COURSE_KEY),
             username="invalid_username",
         )
         assert response.status_code == 400
@@ -494,7 +493,7 @@ class CertificateGenerateTests(CertificateSupportTestCase):
 
     def test_generate_no_such_user(self):
         response = self._generate(
-            course_key=six.text_type(self.EXISTED_COURSE_KEY_2),
+            course_key=str(self.EXISTED_COURSE_KEY_2),
             username="invalid_username",
         )
         assert response.status_code == 400
