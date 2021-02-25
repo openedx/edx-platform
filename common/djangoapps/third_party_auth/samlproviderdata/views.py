@@ -2,22 +2,22 @@
     Viewset for auth/saml/v0/samlproviderdata
 """
 
-from django.shortcuts import get_object_or_404
 from django.http import Http404
+from django.shortcuts import get_object_or_404
 from edx_rbac.mixins import PermissionRequiredMixin
 from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthentication
+from enterprise.models import EnterpriseCustomerIdentityProvider
 from rest_framework import permissions, viewsets
 from rest_framework.authentication import SessionAuthentication
 from rest_framework.exceptions import ParseError
 
-from enterprise.models import EnterpriseCustomerIdentityProvider
-from common.djangoapps.third_party_auth.utils import validate_uuid4_string, convert_saml_slug_provider_id
+from common.djangoapps.third_party_auth.utils import convert_saml_slug_provider_id, validate_uuid4_string
 
 from ..models import SAMLProviderConfig, SAMLProviderData
 from .serializers import SAMLProviderDataSerializer
 
 
-class SAMLProviderDataMixin(object):
+class SAMLProviderDataMixin:
     authentication_classes = [JwtAuthentication, SessionAuthentication]
     permission_classes = [permissions.IsAuthenticated]
     serializer_class = SAMLProviderDataSerializer

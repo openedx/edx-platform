@@ -3,8 +3,10 @@ Utility functions for third_party_auth
 """
 
 from uuid import UUID
+
 from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
-from enterprise.models import EnterpriseCustomerUser, EnterpriseCustomerIdentityProvider
+from enterprise.models import EnterpriseCustomerIdentityProvider, EnterpriseCustomerUser
+
 from . import provider
 
 

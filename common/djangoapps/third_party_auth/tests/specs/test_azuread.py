@@ -8,7 +8,7 @@ class AzureADOauth2IntegrationTest(base.Oauth2IntegrationTest):  # lint-amnesty,
     """Integration tests for Azure Active Directory / Microsoft Account provider."""
 
     def setUp(self):
-        super(AzureADOauth2IntegrationTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.provider = self.configure_azure_ad_provider(
             enabled=True,
             visible=True,

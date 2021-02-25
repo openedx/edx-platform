@@ -1,14 +1,15 @@
 """
 Tests for SAMLConfiguration endpoints
 """
-from django.urls import reverse
-from django.contrib.sites.models import Site
 from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
-
+from django.contrib.sites.models import Site
+from django.urls import reverse
 from rest_framework import status
 from rest_framework.test import APITestCase
+
 from common.djangoapps.third_party_auth.models import SAMLConfiguration
 from common.djangoapps.third_party_auth.tests.utils import skip_unless_thirdpartyauth
+
 SAML_CONFIGURATIONS = [
     {
         'site': 1,
@@ -51,7 +52,7 @@ class SAMLConfigurationTests(APITestCase):
     """
     @classmethod
     def setUpTestData(cls):
-        super(SAMLConfigurationTests, cls).setUpTestData()
+        super().setUpTestData()
         cls.user = User.objects.create_user(username='testuser', password=TEST_PASSWORD)
         cls.site, _ = Site.objects.get_or_create(domain='example.com')
         for config in SAML_CONFIGURATIONS:
@@ -74,7 +75,7 @@ class SAMLConfigurationTests(APITestCase):
             )
 
     def setUp(self):
-        super(SAMLConfigurationTests, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.client.login(username=self.user.username, password=TEST_PASSWORD)
 
     def test_get_saml_configurations_successful(self):

@@ -2,7 +2,9 @@
 Unit tests for the IdentityServer3 OAuth2 Backend
 """
 import json
+
 import ddt
+
 from common.djangoapps.third_party_auth.identityserver3 import IdentityServer3
 from common.djangoapps.third_party_auth.tests import testutil
 from common.djangoapps.third_party_auth.tests.utils import skip_unless_thirdpartyauth
@@ -16,7 +18,7 @@ class IdentityServer3Test(testutil.TestCase):
     """
 
     def setUp(self):
-        super(IdentityServer3Test, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.id3_instance = IdentityServer3()
         self.response = {
             "sub": "020cadec-919a-4b06-845e-57915bf76826",

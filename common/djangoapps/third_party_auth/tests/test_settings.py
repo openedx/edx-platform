@@ -1,9 +1,11 @@
 """Unit tests for settings.py."""
 
-from mock import patch
+from unittest.mock import patch
+
 from common.djangoapps.third_party_auth import provider, settings
 from common.djangoapps.third_party_auth.tests import testutil
 from common.djangoapps.third_party_auth.tests.utils import skip_unless_thirdpartyauth
+
 _ORIGINAL_AUTHENTICATION_BACKENDS = ['first_authentication_backend']
 _ORIGINAL_INSTALLED_APPS = ['first_installed_app']
 _ORIGINAL_MIDDLEWARE_CLASSES = ['first_middleware_class']
@@ -29,7 +31,7 @@ class SettingsUnitTest(testutil.TestCase):
     # pylint: disable=no-member
 
     def setUp(self):
-        super(SettingsUnitTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.settings = testutil.FakeDjangoSettings(_SETTINGS_MAP)
 
     def test_apply_settings_adds_exception_middleware(self):

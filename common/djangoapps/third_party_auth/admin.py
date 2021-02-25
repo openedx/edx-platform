@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 Admin site configuration for third party authentication
 """
@@ -56,7 +55,7 @@ class SAMLProviderConfigAdmin(KeyedConfigurationModelAdmin):
         """
         Filter the queryset to exclude the archived records.
         """
-        queryset = super(SAMLProviderConfigAdmin, self).get_queryset(request).exclude(archived=True)  # lint-amnesty, pylint: disable=super-with-arguments
+        queryset = super().get_queryset(request).exclude(archived=True)
         return queryset
 
     def archive_provider_configuration(self, request, queryset):
@@ -81,7 +80,7 @@ class SAMLProviderConfigAdmin(KeyedConfigurationModelAdmin):
         """
         Get the actions.
         """
-        actions = super(SAMLProviderConfigAdmin, self).get_actions(request)  # lint-amnesty, pylint: disable=super-with-arguments
+        actions = super().get_actions(request)
         action_delete = {
             'archive_provider_configuration': (
                 SAMLProviderConfigAdmin.archive_provider_configuration,
@@ -99,11 +98,11 @@ class SAMLProviderConfigAdmin(KeyedConfigurationModelAdmin):
         if not instance.is_active:
             return instance.name
 
-        update_url = reverse('admin:{}_{}_add'.format(self.model._meta.app_label, self.model._meta.model_name))
-        update_url += '?source={}'.format(instance.pk)
-        return format_html(u'<a href="{}">{}</a>', update_url, instance.name)
+        update_url = reverse(f'admin:{self.model._meta.app_label}_{self.model._meta.model_name}_add')
+        update_url += f'?source={instance.pk}'
+        return format_html('<a href="{}">{}</a>', update_url, instance.name)
 
-    name_with_update_link.short_description = u'Name'
+    name_with_update_link.short_description = 'Name'
 
     def has_data(self, inst):
         """ Do we have cached metadata for this SAML provider? """
@@ -111,7 +110,7 @@ class SAMLProviderConfigAdmin(KeyedConfigurationModelAdmin):
             return None  # N/A
         data = SAMLProviderData.current(inst.entity_id)
         return bool(data and data.is_valid())
-    has_data.short_description = u'Metadata Ready'
+    has_data.short_description = 'Metadata Ready'
     has_data.boolean = True
 
     def mode(self, inst):
@@ -128,7 +127,7 @@ class SAMLProviderConfigAdmin(KeyedConfigurationModelAdmin):
         Note: This only works if the celery worker and the app worker are using the
         same 'configuration' cache.
         """
-        super(SAMLProviderConfigAdmin, self).save_model(request, obj, form, change)  # lint-amnesty, pylint: disable=super-with-arguments
+        super().save_model(request, obj, form, change)
         fetch_saml_metadata.apply_async((), countdown=2)
 
 admin.site.register(SAMLProviderConfig, SAMLProviderConfigAdmin)
@@ -148,10 +147,10 @@ class SAMLConfigurationAdmin(KeyedConfigurationModelAdmin):
         public_key = inst.get_setting('SP_PUBLIC_CERT')
         private_key = inst.get_setting('SP_PRIVATE_KEY')
         if not public_key or not private_key:
-            return format_html(u'<em>Key pair incomplete/missing</em>')
+            return format_html('<em>Key pair incomplete/missing</em>')
         pub1, pub2 = public_key[0:10], public_key[-10:]
         priv1, priv2 = private_key[0:10], private_key[-10:]
-        return format_html(u'Public: {}…{}<br>Private: {}…{}', pub1, pub2, priv1, priv2)
+        return format_html('Public: {}…{}<br>Private: {}…{}', pub1, pub2, priv1, priv2)
 
 admin.site.register(SAMLConfiguration, SAMLConfigurationAdmin)
 

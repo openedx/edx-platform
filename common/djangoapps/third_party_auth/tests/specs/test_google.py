@@ -5,10 +5,10 @@ import base64
 import hashlib
 import hmac
 import json
+from unittest.mock import patch
 
 from django.conf import settings
 from django.urls import reverse
-from mock import patch
 from social_core.exceptions import AuthException
 
 from common.djangoapps.student.tests.factories import UserFactory
@@ -20,7 +20,7 @@ class GoogleOauth2IntegrationTest(base.Oauth2IntegrationTest):  # lint-amnesty, 
     """Integration tests for provider.GoogleOauth2."""
 
     def setUp(self):
-        super(GoogleOauth2IntegrationTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.provider = self.configure_google_provider(
             enabled=True,
             visible=True,
@@ -50,7 +50,7 @@ class GoogleOauth2IntegrationTest(base.Oauth2IntegrationTest):  # lint-amnesty, 
         return self.get_response_data().get('email').split('@')[0]
 
     def assert_redirect_to_provider_looks_correct(self, response):
-        super(GoogleOauth2IntegrationTest, self).assert_redirect_to_provider_looks_correct(response)  # lint-amnesty, pylint: disable=super-with-arguments
+        super().assert_redirect_to_provider_looks_correct(response)
         assert 'google.com' in response['Location']
 
     def test_custom_form(self):

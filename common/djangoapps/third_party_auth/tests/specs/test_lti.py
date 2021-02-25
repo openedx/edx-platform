@@ -4,10 +4,12 @@ Integration tests for third_party_auth LTI auth providers
 
 
 import unittest
+
 from django.conf import settings
 from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.urls import reverse
-from oauthlib.oauth1.rfc5849 import Client, SIGNATURE_TYPE_BODY
+from oauthlib.oauth1.rfc5849 import SIGNATURE_TYPE_BODY, Client
+
 from common.djangoapps.third_party_auth.tests import testutil
 
 FORM_ENCODED = 'application/x-www-form-urlencoded'
@@ -30,10 +32,10 @@ class IntegrationTestLTI(testutil.TestCase):
     """
 
     def setUp(self):
-        super(IntegrationTestLTI, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.hostname = 'testserver'
         self.client.defaults['SERVER_NAME'] = self.hostname
-        self.url_prefix = 'http://{}'.format(self.hostname)
+        self.url_prefix = f'http://{self.hostname}'
         self.configure_lti_provider(
             name='Other Tool Consumer 1', enabled=True,
             lti_consumer_key='other1',

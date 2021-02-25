@@ -5,20 +5,20 @@ Viewset for auth/saml/v0/samlproviderconfig
 from django.shortcuts import get_object_or_404
 from edx_rbac.mixins import PermissionRequiredMixin
 from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthentication
-from rest_framework import permissions, viewsets, status
-from rest_framework.response import Response
+from enterprise.models import EnterpriseCustomer, EnterpriseCustomerIdentityProvider
+from rest_framework import permissions, status, viewsets
 from rest_framework.authentication import SessionAuthentication
 from rest_framework.exceptions import ParseError, ValidationError
+from rest_framework.response import Response
 
-from enterprise.models import EnterpriseCustomerIdentityProvider, EnterpriseCustomer
 from common.djangoapps.third_party_auth.utils import validate_uuid4_string
 
 from ..models import SAMLProviderConfig
-from .serializers import SAMLProviderConfigSerializer
 from ..utils import convert_saml_slug_provider_id
+from .serializers import SAMLProviderConfigSerializer
 
 
-class SAMLProviderMixin(object):
+class SAMLProviderMixin:
     authentication_classes = [JwtAuthentication, SessionAuthentication]
     permission_classes = [permissions.IsAuthenticated]
     serializer_class = SAMLProviderConfigSerializer
@@ -95,7 +95,7 @@ class SAMLProviderConfigViewSet(PermissionRequiredMixin, SAMLProviderMixin, view
         try:
             enterprise_customer = EnterpriseCustomer.objects.get(pk=customer_uuid)
         except EnterpriseCustomer.DoesNotExist:
-            raise ValidationError('Enterprise customer not found at uuid: {}'.format(customer_uuid))  # lint-amnesty, pylint: disable=raise-missing-from
+            raise ValidationError(f'Enterprise customer not found at uuid: {customer_uuid}')  # lint-amnesty, pylint: disable=raise-missing-from
 
         # Create the samlproviderconfig model first
         serializer = self.get_serializer(data=request.data)

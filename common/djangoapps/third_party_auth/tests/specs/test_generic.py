@@ -3,6 +3,7 @@ Use the 'Dummy' auth provider for generic integration tests of third_party_auth.
 """
 from common.djangoapps.third_party_auth.tests import testutil
 from common.djangoapps.third_party_auth.tests.utils import skip_unless_thirdpartyauth
+
 from .base import IntegrationTestMixin
 
 
@@ -20,7 +21,7 @@ class GenericIntegrationTest(IntegrationTestMixin, testutil.TestCase):
     USER_USERNAME = "Galactica1"
 
     def setUp(self):
-        super(GenericIntegrationTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.configure_dummy_provider(enabled=True, visible=True)
 
     def do_provider_login(self, provider_redirect_url):

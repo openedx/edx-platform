@@ -5,8 +5,6 @@ Third-party auth provider configuration API.
 
 from django.contrib.sites.models import Site
 
-from openedx.core.djangoapps.theming.helpers import get_current_request
-
 from common.djangoapps.third_party_auth.models import (
     _LTI_BACKENDS,
     _PSA_OAUTH2_BACKENDS,
@@ -16,9 +14,10 @@ from common.djangoapps.third_party_auth.models import (
     SAMLConfiguration,
     SAMLProviderConfig
 )
+from openedx.core.djangoapps.theming.helpers import get_current_request
 
 
-class Registry(object):
+class Registry:
     """
     API for querying third-party auth ProviderConfig objects.
 

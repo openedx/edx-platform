@@ -10,7 +10,7 @@ from ..models import SAMLConfiguration
 from .serializers import SAMLConfigurationSerializer
 
 
-class SAMLConfigurationMixin(object):
+class SAMLConfigurationMixin:
     authentication_classes = (JwtAuthentication, SessionAuthentication,)
     permission_classes = (permissions.IsAuthenticated,)
     serializer_class = SAMLConfigurationSerializer

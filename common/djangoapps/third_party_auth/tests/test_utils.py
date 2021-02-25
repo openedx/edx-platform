@@ -10,14 +10,14 @@ from django.conf import settings
 from common.djangoapps.student.tests.factories import UserFactory
 from common.djangoapps.third_party_auth.tests.testutil import TestCase
 from common.djangoapps.third_party_auth.utils import (
+    convert_saml_slug_provider_id,
     get_user_from_email,
     is_enterprise_customer_user,
-    user_exists,
-    convert_saml_slug_provider_id,
+    user_exists
 )
 from openedx.features.enterprise_support.tests.factories import (
     EnterpriseCustomerIdentityProviderFactory,
-    EnterpriseCustomerUserFactory,
+    EnterpriseCustomerUserFactory
 )
 
 

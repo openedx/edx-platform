@@ -17,7 +17,7 @@ class LinkedInOauth2IntegrationTest(base.Oauth2IntegrationTest):  # lint-amnesty
     """Integration tests for provider.LinkedInOauth2."""
 
     def setUp(self):
-        super(LinkedInOauth2IntegrationTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.provider = self.configure_linkedin_provider(
             enabled=True,
             visible=True,

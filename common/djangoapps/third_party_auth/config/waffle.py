@@ -17,6 +17,6 @@ WAFFLE_NAMESPACE = 'third_party_auth'
 # .. toggle_target_removal_date: 2021-04-31
 # .. toggle_tickets: ENT-4034
 ENABLE_MULTIPLE_SSO_ACCOUNTS_ASSOCIATION_TO_SAML_USER = WaffleSwitch(
-    '{NAMESPACE}.enable_multiple_sso_accounts_association_to_saml_user'.format(NAMESPACE=WAFFLE_NAMESPACE),
+    f'{WAFFLE_NAMESPACE}.enable_multiple_sso_accounts_association_to_saml_user',
     __name__
 )
