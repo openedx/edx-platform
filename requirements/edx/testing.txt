@@ -132,7 +132,7 @@ enmerkar==0.7.1           # via -r requirements/edx/base.txt, enmerkar-underscor
 event-tracking==1.0.4     # via -r requirements/edx/base.txt, edx-event-routing-backends, edx-proctoring, edx-search
 execnet==1.8.0            # via pytest-xdist
 factory-boy==2.8.1        # via -c requirements/edx/../constraints.txt, -r requirements/edx/testing.in
-faker==6.4.1              # via factory-boy
+faker==6.5.0              # via factory-boy
 filelock==3.0.12          # via tox, virtualenv
 freezegun==0.3.12         # via -c requirements/edx/../constraints.txt, -r requirements/edx/testing.in
 fs-s3fs==0.1.8            # via -r requirements/edx/base.txt, django-pyfs
@@ -172,7 +172,7 @@ lti-consumer-xblock==2.7.0  # via -r requirements/edx/base.txt
 lxml==4.5.0               # via -c requirements/edx/../constraints.txt, -r requirements/edx/base.txt, capa, edxval, lti-consumer-xblock, ora2, pyquery, safe-lxml, xblock, xmlsec
 mailsnake==1.6.4          # via -r requirements/edx/base.txt
 mako==1.1.4               # via -r requirements/edx/base.txt, acid-xblock, lti-consumer-xblock, xblock-google-drive, xblock-utils
-markdown==3.3.3           # via -r requirements/edx/base.txt, django-wiki, staff-graded-xblock, xblock-poll
+markdown==3.3.4           # via -r requirements/edx/base.txt, django-wiki, staff-graded-xblock, xblock-poll
 markey==0.8               # via -r requirements/edx/base.txt, enmerkar-underscore
 markupsafe==1.1.1         # via -r requirements/edx/base.txt, -r requirements/edx/coverage.txt, chem, jinja2, mako, xblock
 maxminddb==1.5.4          # via -c requirements/edx/../constraints.txt, -r requirements/edx/base.txt, geoip2
@@ -189,7 +189,7 @@ nodeenv==1.5.0            # via -r requirements/edx/base.txt
 numpy==1.20.1             # via -r requirements/edx/base.txt, chem, openedx-calc, scipy
 oauthlib==3.0.1           # via -c requirements/edx/../constraints.txt, -r requirements/edx/base.txt, django-oauth-toolkit, lti-consumer-xblock, requests-oauthlib, social-auth-core
 openedx-calc==2.0.1       # via -r requirements/edx/base.txt
-ora2==3.1.5               # via -r requirements/edx/base.txt
+ora2==3.1.6               # via -r requirements/edx/base.txt
 packaging==20.9           # via -r requirements/edx/base.txt, bleach, drf-yasg, pytest, tox
 path.py==12.5.0           # via -r requirements/edx/base.txt, edx-enterprise, edx-i18n-tools, ora2, staff-graded-xblock, xmodule
 path==13.1.0              # via -c requirements/edx/../constraints.txt, -r requirements/edx/base.txt, path.py
