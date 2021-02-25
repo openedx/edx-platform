@@ -4,15 +4,17 @@ Unit tests for bulk-email-related models.
 
 
 import datetime
+from unittest.mock import Mock, patch
 
 import pytest
 import ddt
 from django.core.management import call_command
 from django.test import TestCase
-from mock import Mock, patch
 from opaque_keys.edx.keys import CourseKey
 from pytz import UTC
 
+from common.djangoapps.course_modes.models import CourseMode
+from common.djangoapps.student.tests.factories import UserFactory
 from lms.djangoapps.bulk_email.api import is_bulk_email_feature_enabled
 from lms.djangoapps.bulk_email.models import (
     SEND_TO_COHORT,
@@ -22,11 +24,9 @@ from lms.djangoapps.bulk_email.models import (
     CourseAuthorization,
     CourseEmail,
     CourseEmailTemplate,
-    Optout,
+    Optout
 )
-from common.djangoapps.course_modes.models import CourseMode
 from openedx.core.djangoapps.course_groups.models import CourseCohort
-from common.djangoapps.student.tests.factories import UserFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
@@ -118,7 +118,7 @@ class CourseEmailTest(ModuleStoreTestCase):
         mode_display_name = free_mode.capitalize
         course_id = course.id
         sender = UserFactory.create()
-        to_option = 'track:{}'.format(free_mode)
+        to_option = f'track:{free_mode}'
         subject = "dummy subject"
         html_message = "<html>dummy message</html>"
         CourseMode.objects.create(
@@ -131,8 +131,8 @@ class CourseEmailTest(ModuleStoreTestCase):
         assert len(email.targets.all()) == 1
         target = email.targets.all()[0]
         assert target.target_type == SEND_TO_TRACK
-        assert target.short_display() == 'track-{}'.format(free_mode)
-        assert target.long_display() == u'Course mode: {}'.format(mode_display_name)
+        assert target.short_display() == f'track-{free_mode}'
+        assert target.long_display() == f'Course mode: {mode_display_name}'
 
     def test_cohort_target(self):
         course_id = CourseKey.from_string('abc/123/doremi')
@@ -176,7 +176,7 @@ class CourseEmailTemplateTest(TestCase):
     """Test the CourseEmailTemplate model."""
 
     def setUp(self):
-        super(CourseEmailTemplateTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
 
         # load initial content (since we don't run migrations as part of tests):
         call_command("loaddata", "course_email_template.json")
@@ -219,8 +219,8 @@ class CourseEmailTemplateTest(TestCase):
         template = CourseEmailTemplate.get_template(name="branded.template")
         assert template.html_template is not None
         assert template.plain_template is not None
-        assert u'THIS IS A BRANDED HTML TEMPLATE' in template.html_template
-        assert u'THIS IS A BRANDED TEXT TEMPLATE' in template.plain_template
+        assert 'THIS IS A BRANDED HTML TEMPLATE' in template.html_template
+        assert 'THIS IS A BRANDED TEXT TEMPLATE' in template.plain_template
 
     def test_render_html_without_context(self):
         template = CourseEmailTemplate.get_template()
@@ -249,7 +249,7 @@ class CourseEmailTemplateTest(TestCase):
         template = CourseEmailTemplate.get_template()
         context = self._add_xss_fields(self._get_sample_html_context())
         message = template.render_htmltext(
-            u"Dear %%USER_FULLNAME%%, thanks for enrolling in %%COURSE_DISPLAY_NAME%%.", context
+            "Dear %%USER_FULLNAME%%, thanks for enrolling in %%COURSE_DISPLAY_NAME%%.", context
         )
         assert '<script>' not in message
         assert '&lt;script&gt;alert(&#39;Course Title!&#39;);&lt;/alert&gt;' in message
@@ -264,7 +264,7 @@ class CourseEmailTemplateTest(TestCase):
         template = CourseEmailTemplate.get_template()
         context = self._add_xss_fields(self._get_sample_plain_context())
         message = template.render_plaintext(
-            u"Dear %%USER_FULLNAME%%, thanks for enrolling in %%COURSE_DISPLAY_NAME%%.", context
+            "Dear %%USER_FULLNAME%%, thanks for enrolling in %%COURSE_DISPLAY_NAME%%.", context
         )
         assert '&lt;script&gt;' not in message
         assert context['course_title'] in message
@@ -275,7 +275,7 @@ class CourseAuthorizationTest(TestCase):
     """Test the CourseAuthorization model."""
 
     def tearDown(self):
-        super(CourseAuthorizationTest, self).tearDown()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().tearDown()
         BulkEmailFlag.objects.all().delete()
 
     def test_creation_auth_on(self):

@@ -5,22 +5,15 @@ Views to support bulk email functionalities like opt-out.
 
 import logging
 
-from six import text_type
-
 from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.http import Http404
+from opaque_keys import InvalidKeyError
+from opaque_keys.edx.keys import CourseKey
 
+from common.djangoapps.edxmako.shortcuts import render_to_response
 from lms.djangoapps.bulk_email.models import Optout
 from lms.djangoapps.courseware.courses import get_course_by_id
-from common.djangoapps.edxmako.shortcuts import render_to_response
-from lms.djangoapps.discussion.notification_prefs.views import (
-    UsernameCipher,
-    UsernameDecryptionException,
-)
-
-from opaque_keys import InvalidKeyError  # lint-amnesty, pylint: disable=wrong-import-order
-from opaque_keys.edx.keys import CourseKey  # lint-amnesty, pylint: disable=wrong-import-order
-
+from lms.djangoapps.discussion.notification_prefs.views import UsernameCipher, UsernameDecryptionException
 
 log = logging.getLogger(__name__)
 
@@ -43,7 +36,7 @@ def opt_out_email_updates(request, token, course_id):
     except UnicodeDecodeError:
         raise Http404("base64url")  # lint-amnesty, pylint: disable=raise-missing-from
     except UsernameDecryptionException as exn:
-        raise Http404(text_type(exn))  # lint-amnesty, pylint: disable=raise-missing-from
+        raise Http404(str(exn))  # lint-amnesty, pylint: disable=raise-missing-from
     except User.DoesNotExist:
         raise Http404("username")  # lint-amnesty, pylint: disable=raise-missing-from
     except InvalidKeyError:
@@ -61,7 +54,7 @@ def opt_out_email_updates(request, token, course_id):
     if request.method == 'POST' and unsub_check:
         Optout.objects.get_or_create(user=user, course_id=course_key)
         log.info(
-            u"User %s (%s) opted out of receiving emails from course %s",
+            "User %s (%s) opted out of receiving emails from course %s",
             user.username,
             user.email,
             course_id,
