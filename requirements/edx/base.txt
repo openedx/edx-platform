@@ -106,7 +106,7 @@ edx-milestones==0.3.0     # via -r requirements/edx/base.in
 edx-opaque-keys[django]==2.2.0  # via -r requirements/edx/paver.txt, edx-bulk-grades, edx-ccx-keys, edx-completion, edx-drf-extensions, edx-enterprise, edx-milestones, edx-organizations, edx-proctoring, edx-user-state-client, edx-when, lti-consumer-xblock, xmodule
 edx-organizations==6.9.0  # via -r requirements/edx/base.in
 edx-proctoring-proctortrack==1.0.5  # via -r requirements/edx/base.in
-edx-proctoring==3.6.7     # via -r requirements/edx/base.in, edx-proctoring-proctortrack
+-e git+https://github.com/edx/edx-proctoring.git@6f5a24398babd9e51db5a0af466cf35c3936c700#egg=edx_proctoring
 edx-rbac==1.4.1           # via edx-enterprise
 edx-rest-api-client==5.3.0  # via -r requirements/edx/base.in, edx-enterprise, edx-proctoring
 edx-search==3.0.0         # via -r requirements/edx/base.in
