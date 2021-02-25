@@ -33,6 +33,6 @@ class TestDjangoUserStateClient(UserStateClientTestBase, ModuleStoreTestCase):
         return 'problem'
 
     def setUp(self):
-        super(TestDjangoUserStateClient, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.client = DjangoXBlockUserStateClient()
         self.users = defaultdict(UserFactory.create)

@@ -3,8 +3,8 @@ Unit tests for courseware context_processor
 """
 
 
+from unittest.mock import Mock
 from django.contrib.auth.models import AnonymousUser
-from mock import Mock
 
 from lms.djangoapps.courseware.context_processor import user_timezone_locale_prefs
 from openedx.core.djangoapps.user_api.preferences.api import set_user_preference
@@ -18,7 +18,7 @@ class UserPrefContextProcessorUnitTest(ModuleStoreTestCase):
     """
 
     def setUp(self):
-        super(UserPrefContextProcessorUnitTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
 
         self.user = UserFactory.create()
         self.request = Mock()

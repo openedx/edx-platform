@@ -54,7 +54,7 @@ class OverrideFieldBase(SharedModuleStoreTestCase):
         """
         Course is created here and shared by all the class's tests.
         """
-        super(OverrideFieldBase, cls).setUpClass()
+        super().setUpClass()
         cls.course = CourseFactory.create(enable_ccx=True)
 
 
@@ -66,11 +66,11 @@ class OverrideFieldDataTests(OverrideFieldBase):
     """
 
     def setUp(self):
-        super(OverrideFieldDataTests, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         OverrideFieldData.provider_classes = None
 
     def tearDown(self):
-        super(OverrideFieldDataTests, self).tearDown()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().tearDown()
         OverrideFieldData.provider_classes = None
 
     def make_one(self):

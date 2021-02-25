@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 Unit tests for masquerade.
 """
@@ -7,14 +6,13 @@ Unit tests for masquerade.
 import json
 import pickle
 from datetime import datetime
+from unittest.mock import patch
 import pytest
 import ddt
-import six
 from django.conf import settings
 from django.test import TestCase
 from django.urls import reverse
 from edx_toggles.toggles.testutils import override_waffle_flag
-from mock import patch
 from pytz import UTC
 from xblock.runtime import DictKeyValueStore
 
@@ -45,7 +43,7 @@ class MasqueradeTestCase(SharedModuleStoreTestCase, LoginEnrollmentTestCase, Mas
     """
     @classmethod
     def setUpClass(cls):
-        super(MasqueradeTestCase, cls).setUpClass()
+        super().setUpClass()
         cls.course = CourseFactory.create(number='masquerade-test', metadata={'start': datetime.now(UTC)})
         cls.info_page = ItemFactory.create(
             category="course_info", parent_location=cls.course.location,
@@ -83,7 +81,7 @@ class MasqueradeTestCase(SharedModuleStoreTestCase, LoginEnrollmentTestCase, Mas
         )
 
     def setUp(self):
-        super(MasqueradeTestCase, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
 
         self.test_user = self.create_user()
         self.login(self.test_user.email, 'test')
@@ -96,7 +94,7 @@ class MasqueradeTestCase(SharedModuleStoreTestCase, LoginEnrollmentTestCase, Mas
         url = reverse(
             'courseware_section',
             kwargs={
-                'course_id': six.text_type(self.course.id),
+                'course_id': str(self.course.id),
                 'chapter': self.chapter.location.block_id,
                 'section': self.sequential.location.block_id,
             }
@@ -110,7 +108,7 @@ class MasqueradeTestCase(SharedModuleStoreTestCase, LoginEnrollmentTestCase, Mas
         url = reverse(
             'info',
             kwargs={
-                'course_id': six.text_type(self.course.id),
+                'course_id': str(self.course.id),
             }
         )
         return self.client.get(url)
@@ -122,7 +120,7 @@ class MasqueradeTestCase(SharedModuleStoreTestCase, LoginEnrollmentTestCase, Mas
         url = reverse(
             'progress',
             kwargs={
-                'course_id': six.text_type(self.course.id),
+                'course_id': str(self.course.id),
             }
         )
         return self.client.get(url)
@@ -142,8 +140,8 @@ class MasqueradeTestCase(SharedModuleStoreTestCase, LoginEnrollmentTestCase, Mas
         problem_url = reverse(
             'xblock_handler',
             kwargs={
-                'course_id': six.text_type(self.course.id),
-                'usage_id': six.text_type(self.problem.location),
+                'course_id': str(self.course.id),
+                'usage_id': str(self.problem.location),
                 'handler': 'xmodule_handler',
                 'suffix': 'problem_get'
             }
@@ -251,7 +249,7 @@ class TestStaffMasqueradeAsSpecificStudent(StaffMasqueradeTestCase, ProblemSubmi
     Check for staff being able to masquerade as a specific student.
     """
     def setUp(self):
-        super(TestStaffMasqueradeAsSpecificStudent, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.student_user = self.create_user()
         self.login_student()
         self.enroll(self.course, True)
@@ -282,7 +280,7 @@ class TestStaffMasqueradeAsSpecificStudent(StaffMasqueradeTestCase, ProblemSubmi
         The return value is a string like u'1/2'.
         """
         json_data = json.loads(self.look_at_question(self.problem_display_name).content.decode('utf-8'))
-        progress = '%s/%s' % (str(json_data['current_score']), str(json_data['total_possible']))
+        progress = '{}/{}'.format(str(json_data['current_score']), str(json_data['total_possible']))
         return progress
 
     def assertExpectedLanguageInPreference(self, user, expected_language_code):
@@ -320,7 +318,7 @@ class TestStaffMasqueradeAsSpecificStudent(StaffMasqueradeTestCase, ProblemSubmi
 
     @ddt.data(
         'john',  # Non-unicode username
-        u'fôô@bar',  # Unicode username with @, which is what the ENABLE_UNICODE_USERNAME feature allows
+        'fôô@bar',  # Unicode username with @, which is what the ENABLE_UNICODE_USERNAME feature allows
     )
     @patch.dict('django.conf.settings.FEATURES', {'DISABLE_START_DATES': False})
     def test_masquerade_as_specific_student(self, username):
@@ -336,32 +334,32 @@ class TestStaffMasqueradeAsSpecificStudent(StaffMasqueradeTestCase, ProblemSubmi
         self.login(student.email, 'test')
         # Answer correctly as the student, and check progress.
         self.submit_answer('Correct', 'Correct')
-        assert self.get_progress_detail() == u'2/2'
+        assert self.get_progress_detail() == '2/2'
 
         # Log in as staff, and check the problem is unanswered.
         self.login_staff()
-        assert self.get_progress_detail() == u'0/2'
+        assert self.get_progress_detail() == '0/2'
 
         # Masquerade as the student, and check we can see the student state.
         self.update_masquerade(role='student', username=student.username)
-        assert self.get_progress_detail() == u'2/2'
+        assert self.get_progress_detail() == '2/2'
 
         # Temporarily override the student state.
         self.submit_answer('Correct', 'Incorrect')
-        assert self.get_progress_detail() == u'1/2'
+        assert self.get_progress_detail() == '1/2'
 
         # Reload the page and check we see the student state again.
         self.get_courseware_page()
-        assert self.get_progress_detail() == u'2/2'
+        assert self.get_progress_detail() == '2/2'
 
         # Become the staff user again, and check the problem is still unanswered.
         self.update_masquerade(role='staff')
-        assert self.get_progress_detail() == u'0/2'
+        assert self.get_progress_detail() == '0/2'
 
         # Verify the student state did not change.
         self.logout()
         self.login(student.email, 'test')
-        assert self.get_progress_detail() == u'2/2'
+        assert self.get_progress_detail() == '2/2'
 
     def test_masquerading_with_language_preference(self):
         """
@@ -437,7 +435,7 @@ class TestGetMasqueradingGroupId(StaffMasqueradeTestCase):
     Check for staff being able to masquerade as belonging to a group.
     """
     def setUp(self):
-        super(TestGetMasqueradingGroupId, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.user_partition = UserPartition(
             0, 'Test User Partition', '',
             [Group(0, 'Group 1'), Group(1, 'Group 2')],
@@ -489,7 +487,7 @@ class MasqueradingKeyValueStoreTest(TestCase):
     Unit tests for the MasqueradingKeyValueStore class.
     """
     def setUp(self):
-        super(MasqueradingKeyValueStoreTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.ro_kvs = ReadOnlyKeyValueStore({'a': 42, 'b': None, 'c': 'OpenCraft'})
         self.session = FakeSession()
         self.kvs = MasqueradingKeyValueStore(self.ro_kvs, self.session)

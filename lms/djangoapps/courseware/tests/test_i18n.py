@@ -5,7 +5,6 @@ Tests i18n in courseware
 
 import json
 import re
-import six
 
 from django.conf import settings
 from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
@@ -29,17 +28,17 @@ class BaseI18nTestCase(CacheIsolationTestCase):
     url = reverse_lazy('dashboard')
 
     def setUp(self):
-        super(BaseI18nTestCase, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.addCleanup(translation.deactivate)
         self.client = Client()
         self.create_user()
 
     def assert_tag_has_attr(self, content, tag, attname, value):
         """Assert that a tag in `content` has a certain value in a certain attribute."""
-        regex_string = six.text_type(r"""<{tag} [^>]*\b{attname}=['"]([\w\d\- ]+)['"][^>]*>""")  # noqa: W605,E501
+        regex_string = r"""<{tag} [^>]*\b{attname}=['"]([\w\d\- ]+)['"][^>]*>"""  # noqa: W605,E501
         regex = regex_string.format(tag=tag, attname=attname)
         match = re.search(regex, content)
-        assert match, (u"Couldn't find desired tag '%s' with attr '%s' in %r" % (tag, attname, content))
+        assert match, (f"Couldn't find desired tag '{tag}' with attr '{attname}' in {content!r}")
         attvalues = match.group(1).split()
         assert value in attvalues
 
@@ -166,7 +165,7 @@ class I18nLangPrefTests(BaseI18nTestCase):
     and use the dark lang preview functionality.
     """
     def setUp(self):
-        super(I18nLangPrefTests, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.user_login()
 
     def set_lang_preference(self, language):
