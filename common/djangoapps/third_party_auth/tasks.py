@@ -15,9 +15,10 @@ from edx_django_utils.monitoring import set_code_owner_attribute
 from lxml import etree
 from onelogin.saml2.utils import OneLogin_Saml2_Utils
 from requests import exceptions
+from six import text_type
 
-from common.djangoapps.third_party_auth.models import SAMLConfiguration, SAMLProviderConfig, SAMLProviderData
 from openedx.core.djangolib.markup import Text
+from common.djangoapps.third_party_auth.models import SAMLConfiguration, SAMLProviderConfig, SAMLProviderData
 
 log = logging.getLogger(__name__)
 

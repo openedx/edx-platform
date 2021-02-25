@@ -12,7 +12,6 @@ If true, it:
 
 
 from django.conf import settings
-
 from openedx.features.enterprise_support.api import insert_enterprise_pipeline_elements
 
 
