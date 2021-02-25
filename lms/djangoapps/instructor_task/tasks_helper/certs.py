@@ -155,18 +155,12 @@ def _invalidate_generated_certificates(course_id, enrolled_students, certificate
 
     allowlisted_users = get_allowlisted_users(course_id)
 
-    # Mark generated certificates as 'unavailable' and update download_url, download_uui, verify_uuid and
-    # grade with empty string for each cert that is not allowlisted. We loop over the certs and save each individually
-    # in order to save a history of the change.
+    # Invalidate each cert that is not allowlisted. We loop over the certs and invalidate each individually in order to
+    # save a history of the change.
     for c in certificates:
         if c.user in allowlisted_users:
             log.info(f'Certificate for user {c.user.id} will not be invalidated because they are on the allowlist for '
                      f'course {course_id}')
         else:
             log.info(f'About to invalidate certificate for user {c.user.id} in course {course_id}')
-            c.status = CertificateStatuses.unavailable
-            c.verify_uuid = ''
-            c.download_uuid = ''
-            c.download_url = ''
-            c.grade = ''
-            c.save()
+            c.invalidate()
