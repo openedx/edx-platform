@@ -110,7 +110,7 @@ edx-drf-extensions==6.5.0  # via -r requirements/edx/base.txt, edx-completion, e
 edx-enterprise==3.17.43   # via -c requirements/edx/../constraints.txt, -r requirements/edx/base.txt
 edx-event-routing-backends==4.0.1  # via -r requirements/edx/base.txt
 edx-i18n-tools==0.5.3     # via -r requirements/edx/base.txt, -r requirements/edx/testing.in, ora2
-edx-lint==4.0.1           # via -r requirements/edx/testing.in
+edx-lint==4.1.0           # via -r requirements/edx/testing.in
 edx-milestones==0.3.0     # via -r requirements/edx/base.txt
 edx-opaque-keys[django]==2.2.0  # via -r requirements/edx/base.txt, edx-bulk-grades, edx-ccx-keys, edx-completion, edx-drf-extensions, edx-enterprise, edx-milestones, edx-organizations, edx-proctoring, edx-user-state-client, edx-when, lti-consumer-xblock, xmodule
 edx-organizations==6.9.0  # via -r requirements/edx/base.txt
@@ -145,7 +145,7 @@ glob2==0.7                # via -r requirements/edx/base.txt
 gunicorn==20.0.4          # via -r requirements/edx/base.txt
 help-tokens==2.0.0        # via -r requirements/edx/base.txt
 html5lib==1.1             # via -r requirements/edx/base.txt, ora2
-httpretty==0.9.7          # via -c requirements/edx/../constraints.txt, -r requirements/edx/testing.in
+httpretty==1.0.5          # via -r requirements/edx/testing.in
 icalendar==4.0.7          # via -r requirements/edx/base.txt
 idna==2.10                # via -r requirements/edx/base.txt, requests
 importlib-metadata==1.7.0  # via -c requirements/edx/../constraints.txt, -r requirements/edx/coverage.txt, inflect
@@ -256,7 +256,7 @@ semantic-version==2.8.5   # via -r requirements/edx/base.txt, edx-drf-extensions
 shapely==1.7.1            # via -r requirements/edx/base.txt
 simplejson==3.17.2        # via -r requirements/edx/base.txt, sailthru-client, super-csv, xblock-utils
 singledispatch==3.6.0     # via -r requirements/edx/testing.in
-six==1.15.0               # via -r requirements/edx/base.txt, analytics-python, bleach, bok-choy, chem, codejail, crowdsourcehinter-xblock, cryptography, django-countries, django-simple-history, edx-ace, edx-bulk-grades, edx-ccx-keys, edx-django-release-util, edx-drf-extensions, edx-enterprise, edx-i18n-tools, edx-lint, edx-milestones, edx-rbac, event-tracking, freezegun, fs, fs-s3fs, html5lib, httpretty, isodate, libsass, mock, paver, pycontracts, pyjwkest, python-dateutil, python-memcached, python-swiftclient, singledispatch, social-auth-app-django, social-auth-core, stevedore, tox, transifex-client, virtualenv, xblock
+six==1.15.0               # via -r requirements/edx/base.txt, analytics-python, bleach, bok-choy, chem, codejail, crowdsourcehinter-xblock, cryptography, django-countries, django-simple-history, edx-ace, edx-bulk-grades, edx-ccx-keys, edx-django-release-util, edx-drf-extensions, edx-enterprise, edx-i18n-tools, edx-lint, edx-milestones, edx-rbac, event-tracking, freezegun, fs, fs-s3fs, html5lib, isodate, libsass, mock, paver, pycontracts, pyjwkest, python-dateutil, python-memcached, python-swiftclient, singledispatch, social-auth-app-django, social-auth-core, stevedore, tox, transifex-client, virtualenv, xblock
 slumber==0.7.1            # via -r requirements/edx/base.txt, edx-bulk-grades, edx-enterprise, edx-rest-api-client
 smmap==3.0.5              # via gitdb
 social-auth-app-django==4.0.0  # via -r requirements/edx/base.txt

@@ -39,9 +39,6 @@ factory-boy==2.8.1
 # Newer versions need a more recent version of python-dateutil
 freezegun==0.3.12
 
-# When we went from httpretty 0.9.7 to 1.0.2, tests broke
-httpretty<1.0
-
 # 4.0.0 dropped support for Python 3.5
 inflect<4.0.0
 
