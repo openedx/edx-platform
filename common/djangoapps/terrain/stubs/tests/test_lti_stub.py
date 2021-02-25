@@ -7,7 +7,7 @@ import unittest
 from unittest.mock import Mock, patch
 
 import requests
-from urllib.request import urlopen
+from urllib.request import urlopen  # pylint: disable=wrong-import-order
 
 from common.djangoapps.terrain.stubs.lti import StubLtiService
 
