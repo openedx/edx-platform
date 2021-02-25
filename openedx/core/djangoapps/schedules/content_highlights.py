@@ -14,6 +14,22 @@ from xmodule.modulestore.django import modulestore
 log = logging.getLogger(__name__)
 
 
+def get_all_course_highlights(course_key):
+    """
+    This ignores access checks, since highlights may be lurking in currently
+    inaccessible content.
+    Returns a list of all the section highlights in the course
+    """
+    try:
+        course = _get_course_with_highlights(course_key)
+
+    except CourseUpdateDoesNotExist:
+        return []
+    else:
+        highlights = [section.highlights for section in course.get_children() if not section.hide_from_toc]
+        return highlights
+
+
 def course_has_highlights(course):
     """
     Does the course have any highlights for any section/week in it?

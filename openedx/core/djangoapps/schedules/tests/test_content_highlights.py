@@ -5,6 +5,7 @@ from unittest.mock import patch
 import pytest
 from openedx.core.djangoapps.schedules.content_highlights import (
     course_has_highlights_from_store,
+    get_all_course_highlights,
     get_next_section_highlights,
     get_week_highlights
 )
@@ -57,6 +58,14 @@ class TestContentHighlights(ModuleStoreTestCase):  # lint-amnesty, pylint: disab
             self._create_chapter(highlights=highlights)
         assert course_has_highlights_from_store(self.course_key)
         assert get_week_highlights(self.user, self.course_key, week_num=1) == highlights
+
+    def test_get_all_course_highlights(self):
+        all_highlights = [["week1highlight1", "week1highlight2"], ["week1highlight1", "week1highlight2"], [], []]
+        with self.store.bulk_operations(self.course_key):
+            for week_highlights in all_highlights:
+                self._create_chapter(highlights=week_highlights)
+
+        assert get_all_course_highlights(self.course_key) == all_highlights
 
     def test_highlights_disabled_for_messaging(self):
         highlights = ['A test highlight.']
