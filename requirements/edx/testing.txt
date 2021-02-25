@@ -110,7 +110,7 @@ edx-drf-extensions==6.5.0  # via -r requirements/edx/base.txt, edx-completion, e
 edx-enterprise==3.17.42   # via -c requirements/edx/../constraints.txt, -r requirements/edx/base.txt
 edx-event-routing-backends==4.0.1  # via -r requirements/edx/base.txt
 edx-i18n-tools==0.5.3     # via -r requirements/edx/base.txt, -r requirements/edx/testing.in, ora2
-edx-lint==4.0.1           # via -r requirements/edx/testing.in
+edx-lint==4.1.0           # via -r requirements/edx/testing.in
 edx-milestones==0.3.0     # via -r requirements/edx/base.txt
 edx-opaque-keys[django]==2.2.0  # via -r requirements/edx/base.txt, edx-bulk-grades, edx-ccx-keys, edx-completion, edx-drf-extensions, edx-enterprise, edx-milestones, edx-organizations, edx-proctoring, edx-user-state-client, edx-when, lti-consumer-xblock, xmodule
 edx-organizations==6.9.0  # via -r requirements/edx/base.txt
