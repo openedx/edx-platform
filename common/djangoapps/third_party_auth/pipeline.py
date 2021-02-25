@@ -70,8 +70,8 @@ from uuid import uuid4
 import six
 import social_django
 from django.conf import settings
-from django.contrib.auth import logout
 from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
+from django.contrib.auth import logout
 from django.core.mail.message import EmailMessage
 from django.http import HttpResponseBadRequest
 from django.shortcuts import redirect
@@ -83,14 +83,6 @@ from social_core.utils import module_member, slugify
 
 from common.djangoapps import third_party_auth
 from common.djangoapps.edxmako.shortcuts import render_to_string
-from common.djangoapps.third_party_auth.utils import (
-    get_user_from_email,
-    is_enterprise_customer_user,
-    is_saml_provider,
-    user_exists
-)
-from common.djangoapps.track import segment
-from common.djangoapps.util.json_request import JsonResponse
 from lms.djangoapps.verify_student.models import SSOVerification
 from lms.djangoapps.verify_student.utils import earliest_allowed_verification_date
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
@@ -98,6 +90,14 @@ from openedx.core.djangoapps.user_api import accounts
 from openedx.core.djangoapps.user_api.accounts.utils import is_multiple_sso_accounts_association_to_saml_user_enabled
 from openedx.core.djangoapps.user_authn import cookies as user_authn_cookies
 from openedx.core.djangoapps.user_authn.toggles import should_redirect_to_authn_microfrontend
+from common.djangoapps.third_party_auth.utils import (
+    get_user_from_email,
+    is_enterprise_customer_user,
+    is_saml_provider,
+    user_exists,
+)
+from common.djangoapps.track import segment
+from common.djangoapps.util.json_request import JsonResponse
 
 from . import provider
 
