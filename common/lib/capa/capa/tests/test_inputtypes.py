@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 Tests of input types.
 
@@ -23,14 +22,12 @@ import textwrap
 import unittest
 import xml.sax.saxutils as saxutils
 from collections import OrderedDict
+from unittest.mock import ANY, patch
 
 import pytest
-import six
 from lxml import etree
 from lxml.html import fromstring
-from mock import ANY, patch
 from pyparsing import ParseException
-from six.moves import zip
 
 from capa import inputtypes
 from capa.checker import DemoSystem
@@ -105,14 +102,14 @@ class OptionInputTest(unittest.TestCase):
         check("('a', 'b')", ['a', 'b'])
         check("('a b','b')", ['a b', 'b'])
         check("('My \"quoted\"place','b')", ['My \"quoted\"place', 'b'])
-        check(u"('б','в')", [u'б', u'в'])
-        check(u"('б', 'в')", [u'б', u'в'])
-        check(u"('б в','в')", [u'б в', u'в'])
-        check(u"('Мой \"кавыки\"место','в')", [u'Мой \"кавыки\"место', u'в'])
+        check("('б','в')", ['б', 'в'])
+        check("('б', 'в')", ['б', 'в'])
+        check("('б в','в')", ['б в', 'в'])
+        check("('Мой \"кавыки\"место','в')", ['Мой \"кавыки\"место', 'в'])
 
         # check that escaping single quotes with leading backslash (\') properly works
         # note: actual input by user will be hasn\'t but json parses it as hasn\\'t
-        check(u"('hasnt','hasn't')", [u'hasnt', u'hasn\'t'])
+        check("('hasnt','hasn't')", ['hasnt', 'hasn\'t'])
 
 
 class ChoiceGroupTest(unittest.TestCase):
@@ -262,7 +259,7 @@ class TextLineTest(unittest.TestCase):
 
     def test_rendering(self):
         size = "42"
-        xml_str = """<textline id="prob_1_2" size="{size}"/>""".format(size=size)
+        xml_str = f"""<textline id="prob_1_2" size="{size}"/>"""
 
         element = etree.fromstring(xml_str)
 
@@ -337,13 +334,13 @@ class TextLineTest(unittest.TestCase):
         # standard trailing text
         trailing_text.append(('m/s', 'm/s'))
         # unicode trailing text
-        trailing_text.append((u'\xc3', u'\xc3'))
+        trailing_text.append(('\xc3', '\xc3'))
         # html escaped trailing text
         # this is the only one we expect to change
         trailing_text.append(('a &lt; b', 'a < b'))
 
         for xml_text, expected_text in trailing_text:
-            xml_str = u"""<textline id="prob_1_2"
+            xml_str = """<textline id="prob_1_2"
                             size="{size}"
                             trailing_text="{tt}"
                             />""".format(size=size, tt=xml_text)
@@ -467,7 +464,7 @@ class CodeInputTest(unittest.TestCase):
             'hidden': '',
             'tabsize': int(tabsize),
             'queue_len': '3',
-            'aria_label': '{mode} editor'.format(mode=mode),
+            'aria_label': f'{mode} editor',
             'code_mirror_exit_message': 'Press ESC then TAB or click outside of the code editor to exit',
             'response_data': RESPONSE_DATA,
             'describedby_html': DESCRIBEDBY.format(status_id=prob_id)
@@ -481,7 +478,7 @@ class MatlabTest(unittest.TestCase):
     Test Matlab input types
     """
     def setUp(self):
-        super(MatlabTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.rows = '10'
         self.cols = '80'
         self.tabsize = '4'
@@ -715,7 +712,7 @@ class MatlabTest(unittest.TestCase):
 
         the_input = self.input_class(test_capa_system(), elt, state)
         assert the_input.status == 'unsubmitted'
-        assert the_input.msg == 'No response from Xqueue within {} seconds. Aborted.'.format(XQUEUE_TIMEOUT)
+        assert the_input.msg == f'No response from Xqueue within {XQUEUE_TIMEOUT} seconds. Aborted.'
 
     @patch('capa.inputtypes.time.time', return_value=20)
     def test_matlab_response_migration_of_queuetime(self, time):  # lint-amnesty, pylint: disable=unused-argument
@@ -757,7 +754,7 @@ class MatlabTest(unittest.TestCase):
         for index, value in enumerate(output_list):
             output_list[index] = value.replace('u\'', '\'').strip()
 
-        expected_string = u"""
+        expected_string = """
         \'matlab_editor_js\': \'/dummy-static/js/vendor/CodeMirror/octave.js\',
         \'value\': \'print "good evening"\', \'hidden\': \'\',
         \'msg\': \'Submitted. As soon as a response is returned, this message will be replaced by that feedback.\',
@@ -768,7 +765,7 @@ class MatlabTest(unittest.TestCase):
         expected_list = (textwrap.dedent(expected_string).replace('\n', ' ').strip()).split(',')
         for index, value in enumerate(expected_list):
             expected_list[index] = value.replace('u\'', '\'').strip()
-        six.assertCountEqual(self, output_list, expected_list)
+        self.assertCountEqual(output_list, expected_list)
 
         # test html, that is correct HTML5 html, but is not parsable by XML parser.
         old_render_template = self.the_input.capa_system.render_template
@@ -791,7 +788,7 @@ class MatlabTest(unittest.TestCase):
         assert element_tags.count('audio') == 1
         audio_index = element_tags.index('audio')
 
-        six.assertCountEqual(self, element_keys[audio_index], ['autobuffer', 'controls', 'autoplay', 'src'])
+        self.assertCountEqual(element_keys[audio_index], ['autobuffer', 'controls', 'autoplay', 'src'])
         assert elements[audio_index].get('src') == 'data:audio/wav;base64='
         assert elements[audio_index].text == 'Audio is not supported on this browser.'
         href_index = element_keys.index(['href'])
@@ -857,13 +854,13 @@ class MatlabTest(unittest.TestCase):
         the_input = self.input_class(test_capa_system(), elt, state)
         context = the_input._get_render_context()  # pylint: disable=protected-access
         self.maxDiff = None
-        expected = fromstring(u'\n<div class="matlabResponse"><div class="commandWindowOutput" style="white-space: pre;"> <strong>if</strong> Conditionally execute statements.\nThe general form of the <strong>if</strong> statement is\n\n   <strong>if</strong> expression\n     statements\n   ELSEIF expression\n     statements\n   ELSE\n     statements\n   END\n\nThe statements are executed if the real part of the expression \nhas all non-zero elements. The ELSE and ELSEIF parts are optional.\nZero or more ELSEIF parts can be used as well as nested <strong>if</strong>\'s.\nThe expression is usually of the form expr rop expr where \nrop is ==, &lt;, &gt;, &lt;=, &gt;=, or ~=.\n<img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAjAAAAGkCAIAAACgj==">\n\nExample\n   if I == J\n     A(I,J) = 2;\n   elseif abs(I-J) == 1\n     A(I,J) = -1;\n   else\n     A(I,J) = 0;\n   end\n\nSee also <a>relop</a>, <a>else</a>, <a>elseif</a>, <a>end</a>, <a>for</a>, <a>while</a>, <a>switch</a>.\n\nReference page in Help browser\n   <a>doc if</a>\n\n</div><ul></ul></div>\n')  # lint-amnesty, pylint: disable=line-too-long
+        expected = fromstring('\n<div class="matlabResponse"><div class="commandWindowOutput" style="white-space: pre;"> <strong>if</strong> Conditionally execute statements.\nThe general form of the <strong>if</strong> statement is\n\n   <strong>if</strong> expression\n     statements\n   ELSEIF expression\n     statements\n   ELSE\n     statements\n   END\n\nThe statements are executed if the real part of the expression \nhas all non-zero elements. The ELSE and ELSEIF parts are optional.\nZero or more ELSEIF parts can be used as well as nested <strong>if</strong>\'s.\nThe expression is usually of the form expr rop expr where \nrop is ==, &lt;, &gt;, &lt;=, &gt;=, or ~=.\n<img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAjAAAAGkCAIAAACgj==">\n\nExample\n   if I == J\n     A(I,J) = 2;\n   elseif abs(I-J) == 1\n     A(I,J) = -1;\n   else\n     A(I,J) = 0;\n   end\n\nSee also <a>relop</a>, <a>else</a>, <a>elseif</a>, <a>end</a>, <a>for</a>, <a>while</a>, <a>switch</a>.\n\nReference page in Help browser\n   <a>doc if</a>\n\n</div><ul></ul></div>\n')  # lint-amnesty, pylint: disable=line-too-long
         received = fromstring(context['queue_msg'])
         html_tree_equal(received, expected)
 
     def test_rendering_with_invalid_queue_msg(self):
-        self.the_input.queue_msg = (u"<div class='matlabResponse'><div style='white-space:pre' class='commandWindowOutput'>"  # lint-amnesty, pylint: disable=line-too-long
-                                    u"\nans =\n\n\u0002\n\n</div><ul></ul></div>")
+        self.the_input.queue_msg = ("<div class='matlabResponse'><div style='white-space:pre' class='commandWindowOutput'>"  # lint-amnesty, pylint: disable=line-too-long
+                                    "\nans =\n\n\u0002\n\n</div><ul></ul></div>")
         context = self.the_input._get_render_context()  # pylint: disable=protected-access
 
         self.maxDiff = None
@@ -885,7 +882,7 @@ class MatlabTest(unittest.TestCase):
             'queue_len': '3',
             'matlab_editor_js': '/dummy-static/js/vendor/CodeMirror/octave.js',
             'response_data': {},
-            'describedby_html': 'aria-describedby="status_{id}"'.format(id=prob_id)
+            'describedby_html': f'aria-describedby="status_{prob_id}"'
         }
         assert context == expected
         self.the_input.capa_system.render_template = DemoSystem().render_template
@@ -1152,9 +1149,9 @@ class ChemicalEquationTest(unittest.TestCase):
     Check that chemical equation inputs work.
     """
     def setUp(self):
-        super(ChemicalEquationTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.size = "42"
-        xml_str = """<chemicalequationinput id="prob_1_2" size="{size}"/>""".format(size=self.size)
+        xml_str = f"""<chemicalequationinput id="prob_1_2" size="{self.size}"/>"""
 
         element = etree.fromstring(xml_str)
 
@@ -1215,7 +1212,7 @@ class ChemicalEquationTest(unittest.TestCase):
         """
         # Simulate answering a problem that raises the exception
         with patch('capa.inputtypes.chemcalc.render_to_html') as mock_render:
-            mock_render.side_effect = ParseException(u"ȧƈƈḗƞŧḗḓ ŧḗẋŧ ƒǿř ŧḗşŧīƞɠ")
+            mock_render.side_effect = ParseException("ȧƈƈḗƞŧḗḓ ŧḗẋŧ ƒǿř ŧḗşŧīƞɠ")
             response = self.the_input.handle_ajax(
                 "preview_chemcalc",
                 {'formula': 'H2O + invalid chemistry'}
@@ -1247,9 +1244,9 @@ class FormulaEquationTest(unittest.TestCase):
     Check that formula equation inputs work.
     """
     def setUp(self):
-        super(FormulaEquationTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.size = "42"
-        xml_str = """<formulaequationinput id="prob_1_2" size="{size}"/>""".format(size=self.size)
+        xml_str = f"""<formulaequationinput id="prob_1_2" size="{self.size}"/>"""
 
         element = etree.fromstring(xml_str)
 
@@ -1290,13 +1287,13 @@ class FormulaEquationTest(unittest.TestCase):
         # standard trailing text
         trailing_text.append(('m/s', 'm/s'))
         # unicode trailing text
-        trailing_text.append((u'\xc3', u'\xc3'))
+        trailing_text.append(('\xc3', '\xc3'))
         # html escaped trailing text
         # this is the only one we expect to change
         trailing_text.append(('a &lt; b', 'a < b'))
 
         for xml_text, expected_text in trailing_text:
-            xml_str = u"""<formulaequationinput id="prob_1_2"
+            xml_str = """<formulaequationinput id="prob_1_2"
                             size="{size}"
                             trailing_text="{tt}"
                             />""".format(size=size, tt=xml_text)
@@ -1634,7 +1631,7 @@ class TestStatus(unittest.TestCase):
         """
         statobj = inputtypes.Status('test')
         assert str(statobj) == 'test'
-        assert six.text_type(statobj) == u'test'
+        assert str(statobj) == 'test'
 
     def test_classes(self):
         """
@@ -1656,13 +1653,13 @@ class TestStatus(unittest.TestCase):
         Test that display names are correct
         """
         names = [
-            ('correct', u'correct'),
-            ('incorrect', u'incorrect'),
-            ('incomplete', u'incomplete'),
-            ('unanswered', u'unanswered'),
-            ('unsubmitted', u'unanswered'),
-            ('queued', u'processing'),
-            ('dave', u'dave'),
+            ('correct', 'correct'),
+            ('incorrect', 'incorrect'),
+            ('incomplete', 'incomplete'),
+            ('unanswered', 'unanswered'),
+            ('unsubmitted', 'unanswered'),
+            ('queued', 'processing'),
+            ('dave', 'dave'),
         ]
         for status, display_name in names:
             statobj = inputtypes.Status(status)
@@ -1675,10 +1672,10 @@ class TestStatus(unittest.TestCase):
         func = lambda t: t.upper()
         # status is in the mapping
         statobj = inputtypes.Status('queued', func)
-        assert statobj.display_name == u'PROCESSING'
+        assert statobj.display_name == 'PROCESSING'
 
         # status is not in the mapping
         statobj = inputtypes.Status('test', func)
-        assert statobj.display_name == u'test'
+        assert statobj.display_name == 'test'
         assert str(statobj) == 'test'
         assert statobj.classname == 'test'

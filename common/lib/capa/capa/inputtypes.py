@@ -50,12 +50,10 @@ from datetime import datetime
 import bleach
 import html5lib
 import pyparsing
-import six
 from calc.preview import latex_preview
 from chem import chemcalc
 from django.utils.encoding import python_2_unicode_compatible
 from lxml import etree
-from six import text_type
 
 from capa.xqueue_interface import XQUEUE_TIMEOUT
 from openedx.core.djangolib.markup import HTML, Text
@@ -74,7 +72,7 @@ registry = TagRegistry()  # pylint: disable=invalid-name
 
 
 @python_2_unicode_compatible
-class Status(object):
+class Status:
     """
     Problem status
     attributes: classname, display_name, display_tooltip
@@ -87,7 +85,7 @@ class Status(object):
     }
     __slots__ = ('classname', '_status', 'display_name', 'display_tooltip')
 
-    def __init__(self, status, gettext_func=six.text_type):
+    def __init__(self, status, gettext_func=str):
         self.classname = self.css_classes.get(status, status)
         _ = gettext_func
         names = {
@@ -112,8 +110,8 @@ class Status(object):
                 ['incomplete', 'unanswered', 'unsubmitted'], _('Not yet answered.')
             )
         )
-        self.display_name = names.get(status, six.text_type(status))
-        self.display_tooltip = tooltips.get(status, u'')
+        self.display_name = names.get(status, str(status))
+        self.display_tooltip = tooltips.get(status, '')
         self._status = status or ''
 
     def __str__(self):
@@ -129,7 +127,7 @@ class Status(object):
         return hash(str(self))
 
 
-class Attribute(object):
+class Attribute:
     """
     Allows specifying required and optional attributes for input types.
     """
@@ -170,7 +168,7 @@ class Attribute(object):
         val = element.get(self.name)
         if self.default == self._sentinel and val is None:
             raise ValueError(
-                'Missing required attribute {0}.'.format(self.name)
+                f'Missing required attribute {self.name}.'
             )
 
         if val is None:
@@ -186,7 +184,7 @@ class Attribute(object):
         return val
 
 
-class InputTypeBase(object):
+class InputTypeBase:
     """
     Abstract base class for input types.
     """
@@ -226,7 +224,7 @@ class InputTypeBase(object):
         self.input_id = state.get('id', xml.get('id'))
         if self.input_id is None:
             raise ValueError(
-                "input id state is None. xml is {0}".format(etree.tostring(xml))
+                "input id state is None. xml is {}".format(etree.tostring(xml))
             )
 
         self.value = state.get('value', '')
@@ -256,9 +254,9 @@ class InputTypeBase(object):
             self.setup()
         except Exception as err:  # lint-amnesty, pylint: disable=broad-except
             # Something went wrong: add xml to message, but keep the traceback
-            msg = u"Error in xml '{x}': {err} ".format(
-                x=etree.tostring(xml), err=text_type(err))
-            six.reraise(Exception, Exception(msg), sys.exc_info()[2])
+            msg = "Error in xml '{x}': {err} ".format(
+                x=etree.tostring(xml), err=str(err))
+            raise Exception(msg).with_traceback(sys.exc_info()[2])
 
     @classmethod
     def get_attributes(cls):
@@ -353,7 +351,7 @@ class InputTypeBase(object):
         )
 
         context.update(
-            (a, v) for (a, v) in six.iteritems(self.loaded_attributes) if a in self.to_render
+            (a, v) for (a, v) in self.loaded_attributes.items() if a in self.to_render
         )
         context.update(self._extra_context())
         if self.answervariable:
@@ -373,7 +371,7 @@ class InputTypeBase(object):
         Return the html for this input, as an etree element.
         """
         if self.template is None:
-            raise NotImplementedError("no rendering template specified for class {0}"
+            raise NotImplementedError("no rendering template specified for class {}"
                                       .format(self.__class__))
 
         context = self._get_render_context()
@@ -429,10 +427,7 @@ class OptionInput(InputTypeBase):
         options = re.sub(r"([a-zA-Z])('|\\')([a-zA-Z])", r"\1&#39;\3", options)
         options = re.sub(r"\\'", r"&#39;", options)  # replace already escaped single quotes
         # parse the set of possible options
-        if six.PY3:
-            lexer = shlex.shlex(options[1:-1])
-        else:
-            lexer = shlex.shlex(options[1:-1].encode('utf-8'))
+        lexer = shlex.shlex(options[1:-1])
 
         lexer.quotes = "'"
         # Allow options to be separated by whitespace as well as commas
@@ -440,10 +435,7 @@ class OptionInput(InputTypeBase):
 
         # remove quotes
         # convert escaped single quotes (html encoded string) back to single quotes
-        if six.PY3:
-            tokens = [x[1:-1].replace("&#39;", "'") for x in lexer]
-        else:
-            tokens = [x[1:-1].decode('utf-8').replace("&#39;", "'") for x in lexer]
+        tokens = [x[1:-1].replace("&#39;", "'") for x in lexer]
 
         # make list of (option_id, option_description), with description=id
         return [(t, t) for t in tokens]
@@ -566,7 +558,7 @@ class ChoiceGroup(InputTypeBase):
         return choices
 
     def get_user_visible_answer(self, internal_answer):
-        if isinstance(internal_answer, six.string_types):
+        if isinstance(internal_answer, str):
             return self._choices_map[internal_answer]
 
         return [self._choices_map[i] for i in internal_answer]
@@ -941,7 +933,7 @@ class MatlabInput(CodeInput):
         queue_msg = self.queue_msg
         if len(self.queue_msg) > 0:  # An empty string cannot be parsed as XML but is okay to include in the template.
             try:
-                etree.XML(HTML(u'<div>{0}</div>').format(HTML(self.queue_msg)))
+                etree.XML(HTML('<div>{0}</div>').format(HTML(self.queue_msg)))
             except etree.XMLSyntaxError:
                 try:
                     html5lib.parseFragment(self.queue_msg, treebuilder='lxml', namespaceHTMLElements=False)[0]
@@ -1596,7 +1588,7 @@ class AnnotationInput(InputTypeBase):
             if choice is None:  # lint-amnesty, pylint: disable=no-else-raise
                 raise ValueError('Missing required choice attribute.')
             elif choice not in valid_choices:
-                raise ValueError('Invalid choice attribute: {0}. Must be one of: {1}'.format(
+                raise ValueError('Invalid choice attribute: {}. Must be one of: {}'.format(
                     choice, ', '.join(valid_choices)))
 
     def _unpack(self, json_value):
@@ -1606,7 +1598,7 @@ class AnnotationInput(InputTypeBase):
             d = {}
 
         comment_value = d.get('comment', '')
-        if not isinstance(comment_value, six.string_types):
+        if not isinstance(comment_value, str):
             comment_value = ''
 
         options_value = d.get('options', [])

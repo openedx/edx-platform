@@ -30,7 +30,6 @@ import html5lib
 import numpy
 import random2 as random
 import requests
-import six
 # specific library imports
 from calc import UndefinedVariable, UnmatchedParenthesis, evaluator
 from django.utils import html
@@ -40,8 +39,6 @@ from lxml.html.soupparser import fromstring as fromstring_bs  # uses Beautiful S
 from pyparsing import ParseException
 from pytz import UTC
 from shapely.geometry import MultiPoint, Point
-from six import text_type
-from six.moves import map, range, zip
 
 import capa.safe_exec as safe_exec
 import capa.xqueue_interface as xqueue_interface
@@ -111,7 +108,7 @@ class StudentInputError(Exception):
 
 
 @python_2_unicode_compatible
-class LoncapaResponse(six.with_metaclass(abc.ABCMeta, object)):
+class LoncapaResponse(metaclass=abc.ABCMeta):
     """
     Base class for CAPA responsetypes.  Each response type (ie a capa question,
     which is part of a capa problem) is represented as a subclass,
@@ -185,23 +182,23 @@ class LoncapaResponse(six.with_metaclass(abc.ABCMeta, object)):
         # only displayed to the user when settings.DEBUG is True
         for abox in inputfields:
             if abox.tag not in self.allowed_inputfields:
-                msg = "%s: cannot have input field %s" % (
-                    six.text_type(self), abox.tag)
+                msg = "{}: cannot have input field {}".format(
+                    str(self), abox.tag)
                 msg += "\nSee XML source line %s" % getattr(
                     xml, 'sourceline', '[unavailable]')
                 raise LoncapaProblemError(msg)
 
         if self.max_inputfields and len(inputfields) > self.max_inputfields:
-            msg = "%s: cannot have more than %s input fields" % (
-                six.text_type(self), self.max_inputfields)
+            msg = "{}: cannot have more than {} input fields".format(
+                str(self), self.max_inputfields)
             msg += "\nSee XML source line %s" % getattr(
                 xml, 'sourceline', '[unavailable]')
             raise LoncapaProblemError(msg)
 
         for prop in self.required_attributes:
             if not xml.get(prop):
-                msg = "Error in problem specification: %s missing required attribute %s" % (
-                    six.text_type(self), prop)
+                msg = "Error in problem specification: {} missing required attribute {}".format(
+                    str(self), prop)
                 msg += "\nSee XML source line %s" % getattr(
                     xml, 'sourceline', '[unavailable]')
                 raise LoncapaProblemError(msg)
@@ -265,7 +262,7 @@ class LoncapaResponse(six.with_metaclass(abc.ABCMeta, object)):
 
         response_index = response_id.split('_')[-1]
         # Translators: index here could be 1,2,3 and so on
-        response_label = _(u'Question {index}').format(index=response_index)
+        response_label = _('Question {index}').format(index=response_index)
 
         # wrap the content inside a section
         tree = etree.Element('div')
@@ -368,14 +365,14 @@ class LoncapaResponse(six.with_metaclass(abc.ABCMeta, object)):
         # Tricky: label None means output defaults, while '' means output empty label
         if label is None:
             if correct:
-                label = _(u'Correct:')
+                label = _('Correct:')
             else:
-                label = _(u'Incorrect:')
+                label = _('Incorrect:')
 
         # self.runtime.track_function('get_demand_hint', event_info)
         # This this "feedback hint" event
         event_info = dict()
-        event_info['module_id'] = text_type(self.capa_module.location)
+        event_info['module_id'] = str(self.capa_module.location)
         event_info['problem_part_id'] = self.id
         event_info['trigger_type'] = 'single'  # maybe be overwritten by log_extra
         event_info['hint_label'] = label
@@ -581,7 +578,7 @@ class LoncapaResponse(six.with_metaclass(abc.ABCMeta, object)):
         pass
 
     def __str__(self):
-        return u'LoncapaProblem Response %s' % self.xml.tag
+        return 'LoncapaProblem Response %s' % self.xml.tag
 
     def _render_response_msg_html(self, response_msg):
         """ Render a <div> for a message that applies to the entire response.
@@ -1056,8 +1053,8 @@ class MultipleChoiceResponse(LoncapaResponse):
 
             # Find the named choice used by the student. Silently ignore a non-matching
             # choice name.
-            choice = self.xml.find('./choicegroup[@id="{0}"]/choice[@name="{1}"]'.format(self.answer_id,
-                                                                                         student_answer))
+            choice = self.xml.find('./choicegroup[@id="{}"]/choice[@name="{}"]'.format(self.answer_id,
+                                                                                       student_answer))
             if choice is not None:
                 hint_node = choice.find('./choicehint')
                 new_cmap[self.answer_id]['msg'] += self.make_hint_div(
@@ -1456,8 +1453,8 @@ class OptionResponse(LoncapaResponse):
         return cmap
 
     def get_answers(self):
-        amap = dict([(af.get('id'), contextualize_text(af.get(  # lint-amnesty, pylint: disable=consider-using-dict-comprehension
-            'correct'), self.context)) for af in self.answer_fields])
+        amap = {af.get('id'): contextualize_text(af.get(  # lint-amnesty, pylint: disable=consider-using-dict-comprehension
+            'correct'), self.context) for af in self.answer_fields}
         return amap
 
     def get_student_answer_variable_name(self, student_answers, aid):
@@ -1465,10 +1462,10 @@ class OptionResponse(LoncapaResponse):
         Return student answers variable name if exist in context else None.
         """
         if aid in student_answers:
-            for key, val in six.iteritems(self.context):
+            for key, val in self.context.items():
                 # convert val into unicode because student answer always be a unicode string
                 # even it is a list, dict etc.
-                if six.text_type(val) == student_answers[aid]:
+                if str(val) == student_answers[aid]:
                     return '$' + key
         return None
 
@@ -1521,7 +1518,7 @@ class NumericalResponse(LoncapaResponse):
         self.tolerance = default_tolerance
         self.range_tolerance = False
         self.answer_range = self.inclusion = None
-        super(NumericalResponse, self).__init__(*args, **kwargs)  # lint-amnesty, pylint: disable=super-with-arguments
+        super().__init__(*args, **kwargs)
 
     def setup_response(self):
         xml = self.xml
@@ -1600,7 +1597,7 @@ class NumericalResponse(LoncapaResponse):
 
         _ = edx_six.get_gettext(self.capa_system.i18n)
         general_exception = StudentInputError(
-            _(u"Could not interpret '{student_answer}' as a number.").format(student_answer=html.escape(student_answer))
+            _("Could not interpret '{student_answer}' as a number.").format(student_answer=html.escape(student_answer))
         )
 
         # Begin `evaluator` block
@@ -1616,7 +1613,7 @@ class NumericalResponse(LoncapaResponse):
                 err.args[0]
             )
         except ValueError as val_err:
-            if 'factorial' in text_type(val_err):  # lint-amnesty, pylint: disable=no-else-raise
+            if 'factorial' in str(val_err):  # lint-amnesty, pylint: disable=no-else-raise
                 # This is thrown when fact() or factorial() is used in an answer
                 #   that evaluates on negative and/or non-integer inputs
                 # text_type(ve) will be: `factorial() only accepts integral values` or
@@ -1629,7 +1626,7 @@ class NumericalResponse(LoncapaResponse):
                 raise general_exception  # lint-amnesty, pylint: disable=raise-missing-from
         except ParseException:
             raise StudentInputError(  # lint-amnesty, pylint: disable=raise-missing-from
-                _(u"Invalid math syntax: '{student_answer}'").format(student_answer=html.escape(student_answer))
+                _("Invalid math syntax: '{student_answer}'").format(student_answer=html.escape(student_answer))
             )
         except Exception:
             raise general_exception  # lint-amnesty, pylint: disable=raise-missing-from
@@ -1660,7 +1657,7 @@ class NumericalResponse(LoncapaResponse):
 
         if self.range_tolerance:
             if isinstance(student_float, complex):
-                raise StudentInputError(_(u"You may not use complex numbers in range tolerance problems"))
+                raise StudentInputError(_("You may not use complex numbers in range tolerance problems"))
             boundaries = []
             for inclusion, answer in zip(self.inclusion, self.answer_range):
                 boundary = self.get_staff_ans(answer)
@@ -2047,9 +2044,9 @@ class StringResponse(LoncapaResponse):
                 regexp = re.compile('^' + '|'.join(expected) + '$', flags=flags | re.UNICODE)
                 result = re.search(regexp, given)
             except Exception as err:
-                msg = u'[courseware.capa.responsetypes.stringresponse] {error}: {message}'.format(
+                msg = '[courseware.capa.responsetypes.stringresponse] {error}: {message}'.format(
                     error=_('error'),
-                    message=text_type(err)
+                    message=str(err)
                 )
                 log.error(msg, exc_info=True)
                 raise ResponseError(msg)  # lint-amnesty, pylint: disable=raise-missing-from
@@ -2139,7 +2136,7 @@ class CustomResponse(LoncapaResponse):
                         extra_args = "".join(", {0}={0}".format(k) for k in kwargs)
                         code = (
                             script_code + "\n" +
-                            "cfn_return = %s(expect, ans%s)\n" % (cfn, extra_args)
+                            f"cfn_return = {cfn}(expect, ans{extra_args})\n"
                         )
                         globals_dict = {
                             'expect': expect,
@@ -2180,7 +2177,7 @@ class CustomResponse(LoncapaResponse):
         """
         _ = edx_six.get_gettext(self.capa_system.i18n)
 
-        log.debug('%s: student_answers=%s', six.text_type(self), student_answers)
+        log.debug('%s: student_answers=%s', str(self), student_answers)
 
         # ordered list of answer id's
         # sort the responses on the bases of the problem's position number
@@ -2191,7 +2188,7 @@ class CustomResponse(LoncapaResponse):
             # ordered list of answers
             submission = [student_answers[k] for k in idset]
         except Exception as err:
-            msg = u"[courseware.capa.responsetypes.customresponse] {message}\n idset = {idset}, error = {err}".format(
+            msg = "[courseware.capa.responsetypes.customresponse] {message}\n idset = {idset}, error = {err}".format(
                 message=_("error getting student answer from {student_answers}").format(
                     student_answers=student_answers,
                 ),
@@ -2216,7 +2213,7 @@ class CustomResponse(LoncapaResponse):
             # default to no error message on empty answer (to be consistent with other
             # responsetypes) but allow author to still have the old behavior by setting
             # empty_answer_err attribute
-            msg = (HTML(u'<span class="inline-error">{0}</span>').format(_(u'No answer entered!'))
+            msg = (HTML('<span class="inline-error">{0}</span>').format(_('No answer entered!'))
                    if self.xml.get('empty_answer_err') else '')
             return CorrectMap(idset[0], 'incorrect', msg=msg)
 
@@ -2294,7 +2291,7 @@ class CustomResponse(LoncapaResponse):
 
     def execute_check_function(self, idset, submission):  # lint-amnesty, pylint: disable=missing-function-docstring, too-many-statements
         # exec the check function
-        if isinstance(self.code, six.string_types):  # lint-amnesty, pylint: disable=too-many-nested-blocks
+        if isinstance(self.code, str):  # lint-amnesty, pylint: disable=too-many-nested-blocks
             try:
                 safe_exec.safe_exec(
                     self.code,
@@ -2522,7 +2519,7 @@ class CustomResponse(LoncapaResponse):
 
         # Notify student with a student input error
         _, _, traceback_obj = sys.exc_info()
-        raise ResponseError(text_type(err), traceback_obj)
+        raise ResponseError(str(err), traceback_obj)
 
 #-----------------------------------------------------------------------------
 
@@ -2544,7 +2541,7 @@ class SymbolicResponse(CustomResponse):
         self.xml.set('cfn', 'symmath_check')
 
         # Let CustomResponse do its setup
-        super(SymbolicResponse, self).setup_response()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setup_response()
 
     def execute_check_function(self, idset, submission):
         from symmath import symmath_check
@@ -2564,7 +2561,7 @@ class SymbolicResponse(CustomResponse):
             log.error(traceback.format_exc())
             _ = edx_six.get_gettext(self.capa_system.i18n)
             # Translators: 'SymbolicResponse' is a problem type and should not be translated.
-            msg = _(u"An error occurred with SymbolicResponse. The error was: {error_msg}").format(
+            msg = _("An error occurred with SymbolicResponse. The error was: {error_msg}").format(
                 error_msg=err,
             )
             raise Exception(msg)  # lint-amnesty, pylint: disable=raise-missing-from
@@ -2660,7 +2657,7 @@ class CodeResponse(LoncapaResponse):
             codeparam, 'initial_display', '')
         _ = edx_six.get_gettext(self.capa_system.i18n)
         self.answer = find_with_default(codeparam, 'answer_display',
-                                        _(u'No answer provided.'))
+                                        _('No answer provided.'))
 
     def get_score(self, student_answers):
         _ = edx_six.get_gettext(self.capa_system.i18n)
@@ -2679,7 +2676,7 @@ class CodeResponse(LoncapaResponse):
         if self.capa_system.xqueue is None:
             cmap = CorrectMap()
             cmap.set(self.answer_id, queuestate=None,
-                     msg=_(u'Error: No grader has been set up for this problem.'))
+                     msg=_('Error: No grader has been set up for this problem.'))
             return cmap
 
         # Prepare xqueue request
@@ -2888,7 +2885,7 @@ class ExternalResponse(LoncapaResponse):
         self.url = ''
         self.tests = []
         self.code = ''
-        super(ExternalResponse, self).__init__(*args, **kwargs)  # lint-amnesty, pylint: disable=super-with-arguments
+        super().__init__(*args, **kwargs)
 
     def setup_response(self):
         xml = self.xml
@@ -2907,7 +2904,7 @@ class ExternalResponse(LoncapaResponse):
             # no <answer> stanza; get code from <script>
             self.code = self.context['script_code']
             if not self.code:
-                msg = '%s: Missing answer script code for externalresponse' % six.text_type(
+                msg = '%s: Missing answer script code for externalresponse' % str(
                     self)
                 msg += "\nSee XML source line %s" % getattr(
                     self.xml, 'sourceline', '[unavailable]')
@@ -2938,7 +2935,7 @@ class ExternalResponse(LoncapaResponse):
             # long time
             req = requests.post(self.url, data=payload)
         except Exception as err:
-            msg = 'Error {0} - cannot connect to external server url={1}'.format(err, self.url)
+            msg = f'Error {err} - cannot connect to external server url={self.url}'
             log.error(msg)
             raise Exception(msg)  # lint-amnesty, pylint: disable=raise-missing-from
 
@@ -2953,7 +2950,7 @@ class ExternalResponse(LoncapaResponse):
             # response is XML; parse it
             rxml = etree.fromstring(req.text)
         except Exception as err:
-            msg = 'Error {0} - cannot parse response from external server req.text={1}'.format(err, req.text)
+            msg = f'Error {err} - cannot parse response from external server req.text={req.text}'
             log.error(msg)
             raise Exception(msg)  # lint-amnesty, pylint: disable=raise-missing-from
 
@@ -3047,7 +3044,7 @@ class FormulaResponse(LoncapaResponse):
         self.samples = ''
         self.tolerance = default_tolerance
         self.case_sensitive = False
-        super(FormulaResponse, self).__init__(*args, **kwargs)  # lint-amnesty, pylint: disable=super-with-arguments
+        super().__init__(*args, **kwargs)
 
     def setup_response(self):
         xml = self.xml
@@ -3121,7 +3118,7 @@ class FormulaResponse(LoncapaResponse):
                     err.args[0]
                 )
             except ValueError as err:
-                if 'factorial' in text_type(err):
+                if 'factorial' in str(err):
                     # This is thrown when fact() or factorial() is used in a formularesponse answer
                     #   that tests on negative and/or non-integer inputs
                     # text_type(err) will be: `factorial() only accepts integral values` or
@@ -3216,10 +3213,10 @@ class FormulaResponse(LoncapaResponse):
         keys and all non-numeric values stripped out. All values also
         converted to float. Used so we can safely use Python contexts.
         """
-        inp_d = dict([(k, numpy.complex(inp_d[k]))  # lint-amnesty, pylint: disable=consider-using-dict-comprehension
-                      for k in inp_d if isinstance(k, str) and
-                      k.isalnum() and
-                      isinstance(inp_d[k], numbers.Number)])
+        inp_d = {k: numpy.complex(inp_d[k])  # lint-amnesty, pylint: disable=consider-using-dict-comprehension
+                 for k in inp_d if isinstance(k, str) and
+                 k.isalnum() and
+                 isinstance(inp_d[k], numbers.Number)}
         return inp_d
 
     def check_hint_condition(self, hxml_set, student_answers):
@@ -3261,7 +3258,7 @@ class SchematicResponse(LoncapaResponse):
 
     def __init__(self, *args, **kwargs):
         self.code = ''
-        super(SchematicResponse, self).__init__(*args, **kwargs)  # lint-amnesty, pylint: disable=super-with-arguments
+        super().__init__(*args, **kwargs)
 
     def setup_response(self):
         xml = self.xml
@@ -3339,7 +3336,7 @@ class ImageResponse(LoncapaResponse):
 
     def __init__(self, *args, **kwargs):
         self.ielements = []
-        super(ImageResponse, self).__init__(*args, **kwargs)  # lint-amnesty, pylint: disable=super-with-arguments
+        super().__init__(*args, **kwargs)
 
     def setup_response(self):
         self.ielements = self.inputfields
@@ -3419,9 +3416,9 @@ class ImageResponse(LoncapaResponse):
                 regions (dict) - a map of inputs to the defined region for that input
         """
         answers = (
-            dict([(ie.get('id'), ie.get(  # lint-amnesty, pylint: disable=consider-using-dict-comprehension
-                'rectangle')) for ie in self.ielements]),
-            dict([(ie.get('id'), ie.get('regions')) for ie in self.ielements]))  # lint-amnesty, pylint: disable=consider-using-dict-comprehension
+            {ie.get('id'): ie.get(  # lint-amnesty, pylint: disable=consider-using-dict-comprehension
+                'rectangle') for ie in self.ielements},
+            {ie.get('id'): ie.get('regions') for ie in self.ielements})  # lint-amnesty, pylint: disable=consider-using-dict-comprehension
         return answers
 
     def get_answers(self):
@@ -3461,7 +3458,7 @@ class AnnotationResponse(LoncapaResponse):
     def __init__(self, *args, **kwargs):
         self.scoring_map = {}
         self.answer_map = {}
-        super(AnnotationResponse, self).__init__(*args, **kwargs)  # lint-amnesty, pylint: disable=super-with-arguments
+        super().__init__(*args, **kwargs)
 
     def setup_response(self):
         self.scoring_map = self._get_scoring_map()
@@ -3493,17 +3490,17 @@ class AnnotationResponse(LoncapaResponse):
     def _get_scoring_map(self):
         """Returns a dict of option->scoring for each input."""
         scoring = self.default_scoring
-        choices = dict([(choice, choice) for choice in scoring])  # lint-amnesty, pylint: disable=consider-using-dict-comprehension
+        choices = {choice: choice for choice in scoring}  # lint-amnesty, pylint: disable=consider-using-dict-comprehension
         scoring_map = {}
 
         for inputfield in self.inputfields:
-            option_scoring = dict([(  # lint-amnesty, pylint: disable=consider-using-dict-comprehension
-                option['id'],
+            option_scoring = {  # lint-amnesty, pylint: disable=consider-using-dict-comprehension
+                option['id']:
                 {
                     'correctness': choices.get(option['choice']),
                     'points': scoring.get(option['choice'])
                 }
-            ) for option in self._find_options(inputfield)])
+                for option in self._find_options(inputfield)}
 
             scoring_map[inputfield.get('id')] = option_scoring
 
@@ -3524,7 +3521,7 @@ class AnnotationResponse(LoncapaResponse):
         """Returns a dict of the max points for each input: input id -> maxpoints."""
         scoring = self.default_scoring
         correct_points = scoring.get('correct')
-        return dict([(inputfield.get('id'), correct_points) for inputfield in self.inputfields])  # lint-amnesty, pylint: disable=consider-using-dict-comprehension
+        return {inputfield.get('id'): correct_points for inputfield in self.inputfields}  # lint-amnesty, pylint: disable=consider-using-dict-comprehension
 
     def _find_options(self, inputfield):
         """Returns an array of dicts where each dict represents an option. """
@@ -3550,7 +3547,7 @@ class AnnotationResponse(LoncapaResponse):
             json_d = {}
 
         comment_value = json_d.get('comment', '')
-        if not isinstance(json_d, six.string_types):
+        if not isinstance(json_d, str):
             comment_value = ''
 
         options_value = json_d.get('options', [])
@@ -3592,7 +3589,7 @@ class ChoiceTextResponse(LoncapaResponse):
         self.correct_inputs = {}
         self.answer_values = {}
         self.correct_choices = {}
-        super(ChoiceTextResponse, self).__init__(*args, **kwargs)  # lint-amnesty, pylint: disable=super-with-arguments
+        super().__init__(*args, **kwargs)
 
     def setup_response(self):
         """
@@ -3858,7 +3855,7 @@ class ChoiceTextResponse(LoncapaResponse):
         """
         _ = edx_six.get_gettext(self.capa_system.i18n)
         inputs_correct = True
-        for answer_name, answer_value in six.iteritems(numtolerance_inputs):
+        for answer_name, answer_value in numtolerance_inputs.items():
             # If `self.corrrect_inputs` does not contain an entry for
             # `answer_name`, this means that answer_name is a decoy
             # input's value, and validation of its numericality is the
@@ -3895,7 +3892,7 @@ class ChoiceTextResponse(LoncapaResponse):
                 msg = _("Could not interpret '{given_answer}' as a number.").format(
                     given_answer=html.escape(answer_value)
                 )
-                msg += " ({0})".format(trace)
+                msg += f" ({trace})"
                 raise StudentInputError(msg)  # lint-amnesty, pylint: disable=raise-missing-from
 
             # Ignore the results of the comparisons which were just for

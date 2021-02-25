@@ -19,7 +19,7 @@ logging.basicConfig(format="%(levelname)s %(message)s")
 log = logging.getLogger('capa.checker')
 
 
-class DemoSystem(object):  # lint-amnesty, pylint: disable=missing-class-docstring
+class DemoSystem:  # lint-amnesty, pylint: disable=missing-class-docstring
     def __init__(self):
         self.lookup = TemplateLookup(directories=[path(__file__).dirname() / 'templates'])
         self.DEBUG = True
@@ -46,12 +46,12 @@ def main():  # lint-amnesty, pylint: disable=missing-function-docstring
     system = DemoSystem()
 
     for problem_file in args.files:
-        log.info("Opening {0}".format(problem_file.name))
+        log.info(f"Opening {problem_file.name}")
 
         try:
             problem = LoncapaProblem(problem_file, "fakeid", seed=args.seed, system=system)  # lint-amnesty, pylint: disable=no-value-for-parameter, unexpected-keyword-arg
         except Exception as ex:  # lint-amnesty, pylint: disable=broad-except
-            log.error("Could not parse file {0}".format(problem_file.name))
+            log.error(f"Could not parse file {problem_file.name}")
             log.exception(ex)
             continue
 
@@ -81,9 +81,9 @@ def command_test(problem):  # lint-amnesty, pylint: disable=missing-function-doc
         check_that_blanks_fail(problem)
 
         log_captured_output(sys.stdout,
-                            "captured stdout from {0}".format(problem))
+                            f"captured stdout from {problem}")
         log_captured_output(sys.stderr,
-                            "captured stderr from {0}".format(problem))
+                            f"captured stderr from {problem}")
     except Exception as e:  # lint-amnesty, pylint: disable=broad-except
         log.exception(e)
     finally:
@@ -92,13 +92,12 @@ def command_test(problem):  # lint-amnesty, pylint: disable=missing-function-doc
 
 def check_that_blanks_fail(problem):
     """Leaving it blank should never work. Neither should a space."""
-    blank_answers = dict((answer_id, u"")
-                         for answer_id in problem.get_question_answers())
+    blank_answers = {answer_id: "" for answer_id in problem.get_question_answers()}
     grading_results = problem.grade_answers(blank_answers)
     try:
         assert all(result == 'incorrect' for result in grading_results.values())
     except AssertionError:
-        log.error("Blank accepted as correct answer in {0} for {1}"
+        log.error("Blank accepted as correct answer in {} for {}"
                   .format(problem,
                           [answer_id for answer_id, result
                            in sorted(grading_results.items())
@@ -122,29 +121,28 @@ def check_that_suggested_answers_work(problem):
     # all_answers is real_answers + blanks for other answer_ids for which the
     # responsetypes can't provide us pre-canned answers (customresponse)
     all_answer_ids = problem.get_answer_ids()
-    all_answers = dict((answer_id, real_answers.get(answer_id, ""))
-                       for answer_id in all_answer_ids)
+    all_answers = {answer_id: real_answers.get(answer_id, "") for answer_id in all_answer_ids}
 
-    log.debug("Real answers: {0}".format(real_answers))
+    log.debug(f"Real answers: {real_answers}")
     if real_answers:
         try:
-            real_results = dict((answer_id, result) for answer_id, result
-                                in problem.grade_answers(all_answers).items()
-                                if answer_id in real_answers)
+            real_results = {answer_id: result for answer_id, result
+                            in problem.grade_answers(all_answers).items()
+                            if answer_id in real_answers}
             log.debug(real_results)
             assert(all(result == 'correct'
                        for answer_id, result in real_results.items()))
         except UndefinedVariable as uv_exc:
-            log.error("The variable \"{0}\" specified in the ".format(uv_exc) +  # lint-amnesty, pylint: disable=logging-not-lazy
+            log.error(f"The variable \"{uv_exc}\" specified in the " +  # lint-amnesty, pylint: disable=logging-not-lazy
                       "solution isn't recognized (is it a units measure?).")
         except AssertionError:
-            log.error("The following generated answers were not accepted for {0}:"
+            log.error("The following generated answers were not accepted for {}:"
                       .format(problem))
             for question_id, result in sorted(real_results.items()):
                 if result != 'correct':
-                    log.error("  {0} = {1}".format(question_id, real_answers[question_id]))
+                    log.error("  {} = {}".format(question_id, real_answers[question_id]))
         except Exception as ex:  # lint-amnesty, pylint: disable=broad-except
-            log.error("Uncaught error in {0}".format(problem))
+            log.error(f"Uncaught error in {problem}")
             log.exception(ex)
 
 
@@ -152,8 +150,8 @@ def log_captured_output(output_stream, stream_name):  # lint-amnesty, pylint: di
     output_stream.seek(0)
     output_text = output_stream.read()
     if output_text:
-        log.info("##### Begin {0} #####\n".format(stream_name) + output_text)  # lint-amnesty, pylint: disable=logging-not-lazy
-        log.info("##### End {0} #####".format(stream_name))
+        log.info(f"##### Begin {stream_name} #####\n" + output_text)  # lint-amnesty, pylint: disable=logging-not-lazy
+        log.info(f"##### End {stream_name} #####")
 
 
 if __name__ == '__main__':

@@ -8,7 +8,6 @@ import json
 import logging
 
 import requests
-import six
 
 log = logging.getLogger(__name__)
 dateformat = '%Y%m%d%H%M%S'
@@ -26,7 +25,7 @@ def make_hashkey(seed):
     Generate a string key by hashing
     """
     h = hashlib.md5()
-    h.update(six.b(str(seed)))
+    h.update(str(seed).encode())
     return h.hexdigest()
 
 
@@ -66,13 +65,13 @@ def parse_xreply(xreply):
     return (return_code, content)
 
 
-class XQueueInterface(object):
+class XQueueInterface:
     """
     Interface to the external grading system
     """
 
     def __init__(self, url, django_auth, requests_auth=None):
-        self.url = six.text_type(url)
+        self.url = str(url)
         self.auth = django_auth
         self.session = requests.Session()
         self.session.auth = requests_auth
@@ -93,7 +92,7 @@ class XQueueInterface(object):
 
         # log the send to xqueue
         header_info = json.loads(header)
-        queue_name = header_info.get('queue_name', u'')  # lint-amnesty, pylint: disable=unused-variable
+        queue_name = header_info.get('queue_name', '')  # lint-amnesty, pylint: disable=unused-variable
 
         # Attempt to send to queue
         (error, msg) = self._send_to_queue(header, body, files_to_upload)

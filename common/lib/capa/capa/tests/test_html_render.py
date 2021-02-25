@@ -6,9 +6,9 @@ CAPA HTML rendering tests.
 import os
 import textwrap
 import unittest
+from unittest import mock
 
 import ddt
-import mock
 from lxml import etree
 
 # Changes formatting of empty elements; import here to avoid test order dependence
@@ -26,7 +26,7 @@ class CapaHtmlRenderTest(unittest.TestCase):
     """
 
     def setUp(self):
-        super(CapaHtmlRenderTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.capa_system = test_capa_system()
 
     def test_blank_problem(self):
@@ -46,8 +46,8 @@ class CapaHtmlRenderTest(unittest.TestCase):
     def test_include_html(self):
         # Create a test file to include
         self._create_test_file(
-            u'test_include.xml',
-            u'<test>Test include</test>'
+            'test_include.xml',
+            '<test>Test include</test>'
         )
 
         # Generate some XML with an <include>

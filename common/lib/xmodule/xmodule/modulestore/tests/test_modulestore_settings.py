@@ -5,6 +5,7 @@ Tests for testing the modulestore settings migration code.
 
 import copy
 from unittest import TestCase
+
 import pytest
 import ddt
 

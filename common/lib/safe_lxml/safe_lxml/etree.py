@@ -28,4 +28,4 @@ class XMLParser(_XMLParser):  # pylint: disable=function-redefined
     def __init__(self, *args, **kwargs):
         if "resolve_entities" not in kwargs:
             kwargs["resolve_entities"] = False
-        super(XMLParser, self).__init__(*args, **kwargs)  # lint-amnesty, pylint: disable=super-with-arguments
+        super().__init__(*args, **kwargs)

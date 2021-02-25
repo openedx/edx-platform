@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 Tests of responsetypes
 """
@@ -11,16 +10,14 @@ import textwrap
 import unittest
 import zipfile
 from datetime import datetime
+from unittest import mock
 
 import pytest
 import calc
-import mock
 import pyparsing
 import random2 as random
 import requests
-import six
 from pytz import UTC
-from six import text_type
 
 from capa.correctmap import CorrectMap
 from capa.responsetypes import LoncapaProblemError, ResponseError, StudentInputError
@@ -54,7 +51,7 @@ class ResponseTest(unittest.TestCase):
     maxDiff = None
 
     def setUp(self):
-        super(ResponseTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         if self.xml_factory_class:
             self.xml_factory = self.xml_factory_class()  # lint-amnesty, pylint: disable=not-callable
 
@@ -675,11 +672,11 @@ class StringResponseTest(ResponseTest):  # pylint: disable=missing-class-docstri
         self.assert_grade(problem, "|", "incorrect")
 
         # test unicode
-        problem = self.build_problem(answer=u"æ", case_sensitive=False, regexp=True, additional_answers=[u'ö'])
-        self.assert_grade(problem, u"æ", "correct")
-        self.assert_grade(problem, u"ö", "correct")
-        self.assert_grade(problem, u"î", "incorrect")
-        self.assert_grade(problem, u"o", "incorrect")
+        problem = self.build_problem(answer="æ", case_sensitive=False, regexp=True, additional_answers=['ö'])
+        self.assert_grade(problem, "æ", "correct")
+        self.assert_grade(problem, "ö", "correct")
+        self.assert_grade(problem, "î", "incorrect")
+        self.assert_grade(problem, "o", "incorrect")
 
     def test_backslash_and_unicode_regexps(self):
         r"""
@@ -697,19 +694,19 @@ class StringResponseTest(ResponseTest):  # pylint: disable=missing-class-docstri
             b) regexp is saved to xml and is read in python as repr of that string
             So  a\d in front-end editor will become a\\\\d in xml,  so it will match a1 as student answer.
         """
-        problem = self.build_problem(answer=u"5\\\\æ", case_sensitive=False, regexp=True)
-        self.assert_grade(problem, u"5\\æ", "correct")
+        problem = self.build_problem(answer="5\\\\æ", case_sensitive=False, regexp=True)
+        self.assert_grade(problem, "5\\æ", "correct")
 
-        problem = self.build_problem(answer=u"5\\\\æ", case_sensitive=False, regexp=True)
-        self.assert_grade(problem, u"5\\æ", "correct")
+        problem = self.build_problem(answer="5\\\\æ", case_sensitive=False, regexp=True)
+        self.assert_grade(problem, "5\\æ", "correct")
 
     def test_backslash(self):
-        problem = self.build_problem(answer=u"a\\\\c1", case_sensitive=False, regexp=True)
-        self.assert_grade(problem, u"a\\c1", "correct")
+        problem = self.build_problem(answer="a\\\\c1", case_sensitive=False, regexp=True)
+        self.assert_grade(problem, "a\\c1", "correct")
 
     def test_special_chars(self):
-        problem = self.build_problem(answer=u"a \\s1", case_sensitive=False, regexp=True)
-        self.assert_grade(problem, u"a  1", "correct")
+        problem = self.build_problem(answer="a \\s1", case_sensitive=False, regexp=True)
+        self.assert_grade(problem, "a  1", "correct")
 
     def test_case_sensitive(self):
         # Test single answer
@@ -751,13 +748,13 @@ class StringResponseTest(ResponseTest):  # pylint: disable=missing-class-docstri
         """
         We now adding ^ and $ around regexp, so no bogus escape error will be raised.
         """
-        problem = self.build_problem(answer=u"\\", case_sensitive=False, regexp=True)
+        problem = self.build_problem(answer="\\", case_sensitive=False, regexp=True)
 
-        self.assert_grade(problem, u"\\", "incorrect")
+        self.assert_grade(problem, "\\", "incorrect")
 
         # right way to search for \
-        problem = self.build_problem(answer=u"\\\\", case_sensitive=False, regexp=True)
-        self.assert_grade(problem, u"\\", "correct")
+        problem = self.build_problem(answer="\\\\", case_sensitive=False, regexp=True)
+        self.assert_grade(problem, "\\", "correct")
 
     def test_case_insensitive(self):
         # Test single answer
@@ -798,7 +795,7 @@ class StringResponseTest(ResponseTest):  # pylint: disable=missing-class-docstri
         problem = self.build_problem(answer="a2", case_sensitive=False, regexp=True, additional_answers=['?\\d?'])
         with pytest.raises(Exception) as cm:
             self.assert_grade(problem, "a3", "correct")
-        exception_message = text_type(cm.exception)
+        exception_message = str(cm.exception)
         assert 'nothing to repeat' in exception_message
 
     def test_hints(self):
@@ -930,14 +927,14 @@ class StringResponseTest(ResponseTest):  # pylint: disable=missing-class-docstri
         Tests that problem should be graded incorrect if blank space is chosen as answer
         """
         problem = self.build_problem(answer=" ", case_sensitive=False, regexp=True)
-        self.assert_grade(problem, u" ", "incorrect")
+        self.assert_grade(problem, " ", "incorrect")
 
 
 class CodeResponseTest(ResponseTest):  # pylint: disable=missing-class-docstring
     xml_factory_class = CodeResponseXMLFactory
 
     def setUp(self):
-        super(CodeResponseTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
 
         grader_payload = json.dumps({"grader": "ps04/grade_square.py"})
         self.problem = self.build_problem(initial_display="def square(x):",
@@ -1080,7 +1077,7 @@ class CodeResponseTest(ResponseTest):  # pylint: disable=missing-class-docstring
         Test whether LoncapaProblem._parse_score_msg correcly parses valid HTML5 html.
         """
         valid_grader_msgs = [
-            u'<span>MESSAGE</span>',  # Valid XML
+            '<span>MESSAGE</span>',  # Valid XML
             textwrap.dedent("""
                 <div class='matlabResponse'><div id='mwAudioPlaceHolder'>
                 <audio controls autobuffer autoplay src='data:audio/wav;base64='>Audio is not supported on this browser.</audio>
@@ -1125,7 +1122,7 @@ class CodeResponseTest(ResponseTest):  # pylint: disable=missing-class-docstring
                 self.problem.correct_map.update(old_cmap)
 
                 output = self.problem.update_score(xserver_msgs['correct'], queuekey=1000 + i)
-                assert output[answer_id]['msg'] == u'Invalid grader reply. Please contact the course staff.'
+                assert output[answer_id]['msg'] == 'Invalid grader reply. Please contact the course staff.'
 
 
 class ChoiceResponseTest(ResponseTest):  # pylint: disable=missing-class-docstring
@@ -1588,7 +1585,7 @@ class NumericalResponseTest(ResponseTest):  # pylint: disable=missing-class-docs
         staff_ans = "clearly bad syntax )[+1e"
         problem = self.build_problem(answer=staff_ans, tolerance=1e-3)
 
-        class FakeTranslations(object):
+        class FakeTranslations:
             """A fake gettext.Translations object."""
             def ugettext(self, text):
                 """Return the 'translation' of `text`."""
@@ -1709,7 +1706,7 @@ class CustomResponseTest(ResponseTest):  # pylint: disable=missing-class-docstri
 
     def test_inline_randomization(self):
         # Make sure the seed from the problem gets fed into the script execution.
-        inline_script = "messages[0] = {code}".format(code=self._get_random_number_code())
+        inline_script = f"messages[0] = {self._get_random_number_code()}"
         problem = self.build_problem(answer=inline_script)
 
         input_dict = {'1_2_1': '0'}
@@ -2268,7 +2265,7 @@ class CustomResponseTest(ResponseTest):  # pylint: disable=missing-class-docstri
                 problem.grade_answers({'1_2_1': '42'})
 
             except ResponseError:
-                self.fail("Could not use name '{0}s' in custom response".format(module_name))
+                self.fail(f"Could not use name '{module_name}s' in custom response")
 
     def test_module_imports_function(self):
         '''
@@ -2297,7 +2294,7 @@ class CustomResponseTest(ResponseTest):  # pylint: disable=missing-class-docstri
                 problem.grade_answers({'1_2_1': '42'})
 
             except ResponseError:
-                self.fail("Could not use name '{0}s' in custom response".format(module_name))
+                self.fail(f"Could not use name '{module_name}s' in custom response")
 
     def test_python_lib_zip_is_available(self):
         # Prove that we can import code from a zipfile passed down to us.
@@ -2421,7 +2418,7 @@ class SchematicResponseTest(ResponseTest):
 
     def test_check_function_randomization(self):
         # The check function should get a random seed from the problem.
-        script = "correct = ['correct' if (submission[0]['num'] == {code}) else 'incorrect']".format(code=self._get_random_number_code())  # lint-amnesty, pylint: disable=line-too-long
+        script = f"correct = ['correct' if (submission[0]['num'] == {self._get_random_number_code()}) else 'incorrect']"  # lint-amnesty, pylint: disable=line-too-long
         problem = self.build_problem(answer=script)
 
         submission_dict = {'num': self._get_random_number_result(problem.seed)}
@@ -2474,7 +2471,7 @@ class AnnotationResponseTest(ResponseTest):  # lint-amnesty, pylint: disable=mis
             actual_points = correct_map.get_npoints(answer_id)
 
             assert expected_correctness == actual_correctness,\
-                ('%s should be marked %s' % (answer_id, expected_correctness))
+                (f'{answer_id} should be marked {expected_correctness}')
             assert expected_points == actual_points, ('%s should have %d points' % (answer_id, expected_points))
 
 
@@ -2629,8 +2626,8 @@ class ChoiceTextResponseTest(ResponseTest):
             if choice:
                 # Radio/Checkbox inputs in choicetext problems follow
                 # a naming convention that gives them names ending with "bc"
-                choice_id = "1_2_1_choiceinput_{index}bc".format(index=index)
-                choice_value = "choiceinput_{index}".format(index=index)
+                choice_id = f"1_2_1_choiceinput_{index}bc"
+                choice_value = f"choiceinput_{index}"
                 answer_dict[choice_id] = choice_value
             # Build the names for the numtolerance_inputs and add their answers
             # to `answer_dict`.
@@ -2728,7 +2725,7 @@ class ChoiceTextResponseTest(ResponseTest):
         radiotextgroup.
         """
 
-        for name, inputs in six.iteritems(self.TEST_INPUTS):
+        for name, inputs in self.TEST_INPUTS.items():
             # Turn submission into the form expected when grading this problem.
             submission = self._make_answer_dict(inputs)
             # Lookup the problem_name, and the whether this test problem
@@ -2745,7 +2742,7 @@ class ChoiceTextResponseTest(ResponseTest):
                 test_problem,
                 submission,
                 correctness,
-                msg="{0} should be {1}".format(
+                msg="{} should be {}".format(
                     name,
                     correctness
                 )
@@ -2808,7 +2805,7 @@ class ChoiceTextResponseTest(ResponseTest):
             "checkbox_2_choices_2_inputs": checkbox_two_choices_two_inputs
         }
 
-        for name, inputs in six.iteritems(inputs):
+        for name, inputs in inputs.items():
             submission = self._make_answer_dict(inputs)
             # Load the test problem's name and desired correctness
             problem_name, correctness = scenarios[name]
@@ -2820,5 +2817,5 @@ class ChoiceTextResponseTest(ResponseTest):
                 problem,
                 submission,
                 correctness,
-                msg="{0} should be {1}".format(name, correctness)
+                msg=f"{name} should be {correctness}"
             )

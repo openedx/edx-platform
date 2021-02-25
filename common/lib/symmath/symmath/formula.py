@@ -1,5 +1,4 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 """
 Flexible python representation of a symbolic mathematical formula.
 Acceptes Presentation MathML, Content MathML (and could also do OpenMath).
@@ -21,9 +20,7 @@ import unicodedata
 #import subprocess
 from copy import deepcopy
 from functools import reduce
-from xml.sax.saxutils import unescape  # lint-amnesty, pylint: disable=unused-import
 
-import six
 import sympy
 from lxml import etree
 from sympy import latex, sympify
@@ -51,7 +48,7 @@ class dot(sympy.operations.LatticeOp):	 # pylint: disable=invalid-name, no-membe
 
 def _print_dot(_self, expr):
     """Print statement used for LatexPrinter"""
-    return r'{((%s) \cdot (%s))}' % (expr.args[0], expr.args[1])
+    return r'{{(({}) \cdot ({}))}}'.format(expr.args[0], expr.args[1])
 
 LatexPrinter._print_dot = _print_dot  # pylint: disable=protected-access
 
@@ -176,7 +173,7 @@ def my_sympify(expr, normphase=False, matrix=False, abcsym=False, do_qubit=False
 # class for symbolic mathematical formulas
 
 
-class formula(object):
+class formula:
     """
     Representation of a mathematical formula object.  Accepts mathml math expression
     for constructing, and can produce sympy translation.  The formula may or may not
@@ -211,7 +208,7 @@ class formula(object):
         for k in xml:
             tag = gettag(k)
             if tag == 'mi' or tag == 'ci':  # lint-amnesty, pylint: disable=consider-using-in
-                usym = six.text_type(k.text)
+                usym = str(k.text)
                 try:
                     udata = unicodedata.name(usym)
                 except Exception:  # pylint: disable=broad-except
@@ -237,7 +234,7 @@ class formula(object):
         it, if possible...
         """
 
-        if isinstance(xml, (str, six.text_type)):
+        if isinstance(xml, (str, str)):
             xml = etree.fromstring(xml)		# TODO: wrap in try
 
         xml = self.fix_greek_in_mathml(xml)	 # convert greek utf letters to greek spelled out in ascii
@@ -370,13 +367,13 @@ class formula(object):
                 if (
                         tag == 'msup' and
                         len(k) == 2 and gettag(k[1]) == 'mrow' and
-                        gettag(k[1][0]) == 'mo' and k[1][0].text == u'\u200b'  # whew
+                        gettag(k[1][0]) == 'mo' and k[1][0].text == '\u200b'  # whew
                 ):
 
                     # replace the msup with 'X__Y'
                     k[1].remove(k[1][0])
                     newk = etree.Element('mi')
-                    newk.text = '%s__%s' % (flatten_pmathml(k[0]), flatten_pmathml(k[1]))
+                    newk.text = '{}__{}'.format(flatten_pmathml(k[0]), flatten_pmathml(k[1]))
                     xml.replace(k, newk)
 
                 # match things like the middle example-
@@ -385,13 +382,13 @@ class formula(object):
                 if (
                         tag == 'msubsup' and
                         len(k) == 3 and gettag(k[2]) == 'mrow' and
-                        gettag(k[2][0]) == 'mo' and k[2][0].text == u'\u200b'    # whew
+                        gettag(k[2][0]) == 'mo' and k[2][0].text == '\u200b'    # whew
                 ):
 
                     # replace the msubsup with 'X_Y__Z'
                     k[2].remove(k[2][0])
                     newk = etree.Element('mi')
-                    newk.text = '%s_%s__%s' % (flatten_pmathml(k[0]), flatten_pmathml(k[1]), flatten_pmathml(k[2]))
+                    newk.text = '{}_{}__{}'.format(flatten_pmathml(k[0]), flatten_pmathml(k[1]), flatten_pmathml(k[2]))
                     xml.replace(k, newk)
 
                 fix_superscripts(k)
@@ -408,7 +405,7 @@ class formula(object):
                 if gettag(child) == 'msubsup' and len(child) == 3:
                     newchild = etree.Element('msup')
                     newbase = etree.Element('mi')
-                    newbase.text = '%s_%s' % (flatten_pmathml(child[0]), flatten_pmathml(child[1]))
+                    newbase.text = '{}_{}'.format(flatten_pmathml(child[0]), flatten_pmathml(child[1]))
                     newexp = child[2]
                     newchild.append(newbase)
                     newchild.append(newexp)
@@ -460,7 +457,7 @@ class formula(object):
                     if 'conversion from Presentation MathML to Content MathML was not successful' in cmml:  # lint-amnesty, pylint: disable=unsupported-membership-test
                         msg = "Illegal math expression"
                     else:
-                        msg = 'Err %s while converting cmathml to xml; cmml=%s' % (err, cmml)
+                        msg = f'Err {err} while converting cmathml to xml; cmml={cmml}'
                     raise Exception(msg)  # lint-amnesty, pylint: disable=raise-missing-from
                 xml = self.fix_greek_in_mathml(xml)
                 self.the_sympy = self.make_sympy(xml[0])
@@ -546,7 +543,7 @@ class formula(object):
                 except Exception as err:
                     self.args = args  # pylint: disable=attribute-defined-outside-init
                     self.op = op      # pylint: disable=attribute-defined-outside-init, invalid-name
-                    raise Exception('[formula] error=%s failed to apply %s to args=%s' % (err, opstr, args))  # lint-amnesty, pylint: disable=raise-missing-from
+                    raise Exception(f'[formula] error={err} failed to apply {opstr} to args={args}')  # lint-amnesty, pylint: disable=raise-missing-from
                 return res
             else:
                 raise Exception('[formula]: unknown operator tag %s' % (opstr))
@@ -573,7 +570,7 @@ class formula(object):
                 usym = parse_presentation_symbol(xml[0])
                 sym = sympy.Symbol(str(usym))
             else:
-                usym = six.text_type(xml.text)
+                usym = str(xml.text)
                 if 'hat' in usym:
                     sym = my_sympify(usym)
                 else:

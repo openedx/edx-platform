@@ -18,7 +18,7 @@ class CapaTargetedFeedbackTest(unittest.TestCase):
     '''
 
     def setUp(self):
-        super(CapaTargetedFeedbackTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.system = test_capa_system()
 
     def test_no_targeted_feedback(self):

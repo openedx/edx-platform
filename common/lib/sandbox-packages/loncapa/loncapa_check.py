@@ -8,7 +8,6 @@
 
 import math
 import random
-from six.moves import range
 
 
 def lc_random(lower, upper, stepsize):

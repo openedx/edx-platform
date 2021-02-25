@@ -2,12 +2,10 @@
 
 from abc import ABCMeta, abstractmethod
 
-import six
 from lxml import etree
-from six.moves import range, zip
 
 
-class ResponseXMLFactory(six.with_metaclass(ABCMeta, object)):
+class ResponseXMLFactory(metaclass=ABCMeta):
     """ Abstract base class for capa response XML factories.
     Subclasses override create_response_element and
     create_input_element to produce XML of particular response types"""
@@ -372,7 +370,7 @@ class CodeResponseXMLFactory(ResponseXMLFactory):
         # we should override the default behavior
         # of including a <solution> tag as well
         kwargs['explanation_text'] = None
-        return super(CodeResponseXMLFactory, self).build_xml(**kwargs)  # lint-amnesty, pylint: disable=super-with-arguments
+        return super().build_xml(**kwargs)
 
     def create_response_element(self, **kwargs):
         """
@@ -678,8 +676,8 @@ class OptionResponseXMLFactory(ResponseXMLFactory):
 
         # Set the "options" attribute
         # Format: "('first', 'second', 'third')"
-        options_attr_string = u",".join([u"'{}'".format(o) for o in options_list])
-        options_attr_string = u"({})".format(options_attr_string)
+        options_attr_string = ",".join([f"'{o}'" for o in options_list])
+        options_attr_string = f"({options_attr_string})"
         optioninput_element.set('options', options_attr_string)
 
         # Set the "correct" attribute
@@ -730,7 +728,7 @@ class StringResponseXMLFactory(ResponseXMLFactory):
         response_element = etree.Element("stringresponse")
 
         # Set the answer attribute
-        response_element.set("answer", six.text_type(answer))
+        response_element.set("answer", str(answer))
 
         # Set the case sensitivity and regexp:
         type_value = ''
@@ -901,7 +899,7 @@ class ChoiceTextResponseXMLFactory(ResponseXMLFactory):
 
         for ind, choice in enumerate(choice_inputs):
             # Give each choice text equal to it's position(0,1,2...)
-            choice.text = "choice_{0}".format(ind)
+            choice.text = f"choice_{ind}"
             input_element.append(choice)
 
         return input_element

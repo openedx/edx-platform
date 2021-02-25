@@ -9,15 +9,12 @@ import unittest
 
 import pytest
 import random2 as random
-import six
 from codejail import jail_code
 from codejail.django_integration import ConfigureCodeJailMiddleware
 from codejail.safe_exec import SafeExecException
 from django.conf import settings
 from django.core.exceptions import MiddlewareNotUsed
 from django.test import override_settings
-from six import text_type, unichr
-from six.moves import range
 
 from capa.safe_exec import safe_exec, update_hash
 
@@ -77,7 +74,7 @@ class TestSafeExec(unittest.TestCase):  # lint-amnesty, pylint: disable=missing-
         g = {}
         with pytest.raises(SafeExecException) as cm:
             safe_exec("1/0", g)
-        assert 'ZeroDivisionError' in text_type(cm.exception)
+        assert 'ZeroDivisionError' in str(cm.exception)
 
 
 class TestSafeOrNot(unittest.TestCase):  # lint-amnesty, pylint: disable=missing-class-docstring
@@ -89,8 +86,8 @@ class TestSafeOrNot(unittest.TestCase):  # lint-amnesty, pylint: disable=missing
         g = {}
         with pytest.raises(SafeExecException) as cm:
             safe_exec("import os; files = os.listdir('/')", g)
-        assert "OSError" in text_type(cm.exception)
-        assert "Permission denied" in text_type(cm.exception)
+        assert "OSError" in str(cm.exception)
+        assert "Permission denied" in str(cm.exception)
 
     def test_can_do_something_forbidden_if_run_unsafely(self):
         g = {}
@@ -173,7 +170,7 @@ class TestLimitConfiguration(unittest.TestCase):
         assert jail_code.get_effective_limits('course-v1:my+special+course')['NPROC'] == 30
 
 
-class DictCache(object):
+class DictCache:
     """A cache implementation over a simple dict, for testing."""
 
     def __init__(self, d):
@@ -253,11 +250,11 @@ class TestSafeExecCaching(unittest.TestCase):
         # Check that using non-ASCII unicode does not raise an encoding error.
         # Try several non-ASCII unicode characters.
         for code in [129, 500, 2 ** 8 - 1, 2 ** 16 - 1]:
-            code_with_unichr = six.text_type("# ") + unichr(code)
+            code_with_unichr = "# " + chr(code)
             try:
                 safe_exec(code_with_unichr, {}, cache=DictCache({}))
             except UnicodeEncodeError:
-                self.fail("Tried executing code with non-ASCII unicode: {0}".format(code))
+                self.fail(f"Tried executing code with non-ASCII unicode: {code}")
 
 
 class TestUpdateHash(unittest.TestCase):

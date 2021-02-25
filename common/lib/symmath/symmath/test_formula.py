@@ -22,7 +22,7 @@ class FormulaTest(unittest.TestCase):  # lint-amnesty, pylint: disable=missing-c
     mathml_end = '</mstyle></math>'
 
     def setUp(self):
-        super(FormulaTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.formulaInstance = formula('')
 
     def test_replace_mathvariants(self):
