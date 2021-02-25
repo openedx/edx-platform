@@ -27,7 +27,6 @@ import logging
 from abc import ABCMeta, abstractmethod
 from collections import defaultdict, namedtuple
 
-import six
 from contracts import contract, new_contract
 from django.db import DatabaseError, IntegrityError, transaction
 from opaque_keys.edx.asides import AsideUsageKeyV1, AsideUsageKeyV2
@@ -154,7 +153,7 @@ new_contract("DjangoKeyValueStore", DjangoKeyValueStore)
 new_contract("DjangoKeyValueStore_Key", DjangoKeyValueStore.Key)
 
 
-class DjangoOrmFieldCache(six.with_metaclass(ABCMeta, object)):
+class DjangoOrmFieldCache(metaclass=ABCMeta):
     """
     Baseclass for Scope-specific field cache objects that are based on
     single-row-per-field Django ORM objects.
@@ -236,7 +235,7 @@ class DjangoOrmFieldCache(six.with_metaclass(ABCMeta, object)):
                     field_object.save(force_update=True)
 
             except DatabaseError:
-                log.exception(u"Saving field %r failed", kvs_key.field_name)
+                log.exception("Saving field %r failed", kvs_key.field_name)
                 raise KeyValueMultiSaveError(saved_fields)  # lint-amnesty, pylint: disable=raise-missing-from
 
             finally:
@@ -342,7 +341,7 @@ class DjangoOrmFieldCache(six.with_metaclass(ABCMeta, object)):
         raise NotImplementedError()
 
 
-class UserStateCache(object):
+class UserStateCache:
     """
     Cache for Scope.user_state xblock field data.
     """
@@ -420,7 +419,7 @@ class UserStateCache(object):
                 pending_updates
             )
         except DatabaseError:
-            log.exception(u"Saving user state failed for %s", self.user.username)
+            log.exception("Saving user state failed for %s", self.user.username)
             raise KeyValueMultiSaveError([])  # lint-amnesty, pylint: disable=raise-missing-from
         finally:
             self._cache.update(pending_updates)
@@ -499,7 +498,7 @@ class UserStateSummaryCache(DjangoOrmFieldCache):
     Cache for Scope.user_state_summary xblock field data.
     """
     def __init__(self, course_id):
-        super(UserStateSummaryCache, self).__init__()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().__init__()
         self.course_id = course_id
 
     def _create_object(self, kvs_key, value):
@@ -533,7 +532,7 @@ class UserStateSummaryCache(DjangoOrmFieldCache):
         return XModuleUserStateSummaryField.objects.chunked_filter(
             'usage_id__in',
             _all_usage_keys(xblocks, aside_types),
-            field_name__in=set(field.name for field in fields),
+            field_name__in={field.name for field in fields},
         )
 
     def _cache_key_for_field_object(self, field_object):
@@ -560,7 +559,7 @@ class PreferencesCache(DjangoOrmFieldCache):
     Cache for Scope.preferences xblock field data.
     """
     def __init__(self, user):
-        super(PreferencesCache, self).__init__()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().__init__()
         self.user = user
 
     def _create_object(self, kvs_key, value):
@@ -596,7 +595,7 @@ class PreferencesCache(DjangoOrmFieldCache):
             'module_type__in',
             _all_block_types(xblocks, aside_types),
             student=self.user.pk,
-            field_name__in=set(field.name for field in fields),
+            field_name__in={field.name for field in fields},
         )
 
     def _cache_key_for_field_object(self, field_object):
@@ -623,7 +622,7 @@ class UserInfoCache(DjangoOrmFieldCache):
     Cache for Scope.user_info xblock field data
     """
     def __init__(self, user):
-        super(UserInfoCache, self).__init__()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().__init__()
         self.user = user
 
     def _create_object(self, kvs_key, value):
@@ -656,7 +655,7 @@ class UserInfoCache(DjangoOrmFieldCache):
         """
         return XModuleStudentInfoField.objects.filter(
             student=self.user.pk,
-            field_name__in=set(field.name for field in fields),
+            field_name__in={field.name for field in fields},
         )
 
     def _cache_key_for_field_object(self, field_object):
@@ -678,7 +677,7 @@ class UserInfoCache(DjangoOrmFieldCache):
         return key.field_name
 
 
-class FieldDataCache(object):
+class FieldDataCache:
     """
     A cache of django model objects needed to supply the data
     for a module and its descendants
@@ -841,7 +840,7 @@ class FieldDataCache(object):
 
         saved_fields = []
         by_scope = defaultdict(dict)
-        for key, value in six.iteritems(kv_dict):
+        for key, value in kv_dict.items():
 
             if key.scope.user == UserScope.ONE and not self.user.is_anonymous:
                 # If we're getting user data, we expect that the key matches the
@@ -853,14 +852,14 @@ class FieldDataCache(object):
 
             by_scope[key.scope][key] = value
 
-        for scope, set_many_data in six.iteritems(by_scope):
+        for scope, set_many_data in by_scope.items():
             try:
                 self.cache[scope].set_many(set_many_data)
                 # If save is successful on these fields, add it to
                 # the list of successful saves
                 saved_fields.extend(key.field_name for key in set_many_data)
             except KeyValueMultiSaveError as exc:
-                log.exception(u'Error saving fields %r', [key.field_name for key in set_many_data])
+                log.exception('Error saving fields %r', [key.field_name for key in set_many_data])
                 raise KeyValueMultiSaveError(saved_fields + exc.saved_field_names)  # lint-amnesty, pylint: disable=raise-missing-from
 
     @contract(key=DjangoKeyValueStore.Key)
@@ -931,7 +930,7 @@ class FieldDataCache(object):
         return sum(len(cache) for cache in self.cache.values())
 
 
-class ScoresClient(object):
+class ScoresClient:
     """
     Basic client interface for retrieving Score information.
 
@@ -977,7 +976,7 @@ class ScoresClient(object):
         """
         if not self._has_fetched:
             raise ValueError(
-                u"Tried to fetch location {} from ScoresClient before fetch_scores() has run."
+                "Tried to fetch location {} from ScoresClient before fetch_scores() has run."
                 .format(location)
             )
         return self._locations_to_scores.get(location.replace(version=None, branch=None))
@@ -1010,8 +1009,8 @@ def set_score(user_id, usage_key, score, max_score):
     except IntegrityError:
         # log information for duplicate entry and get the record as above command failed.
         log.exception(
-            u'set_score: IntegrityError for student %s - course_id %s - usage_key %s having '
-            u'score %d and max_score %d',
+            'set_score: IntegrityError for student %s - course_id %s - usage_key %s having '
+            'score %d and max_score %d',
             str(user_id), usage_key.context_key, usage_key, score, max_score
         )
         student_module = StudentModule.objects.get(**kwargs)

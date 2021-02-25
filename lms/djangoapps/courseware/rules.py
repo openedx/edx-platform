@@ -8,7 +8,6 @@ import traceback
 
 import laboratory
 import rules
-import six
 from bridgekeeper.rules import EMPTY, Rule
 from django.conf import settings
 from django.db.models import Q
@@ -71,7 +70,7 @@ class StaffAccessExperiment(laboratory.Experiment):  # lint-amnesty, pylint: dis
         if not result.match:
 
             LOG.warning(
-                u"StaffAccessExperiment: control=%r, candidate=%r\n%s",
+                "StaffAccessExperiment: control=%r, candidate=%r\n%s",
                 result.control,
                 result.candidates[0],
                 "".join(traceback.format_stack(limit=10))
@@ -113,7 +112,7 @@ class HasStaffAccessToContent(Rule):
             course_key = instance
         elif isinstance(instance, UsageKey):
             course_key = instance.course_key
-        elif isinstance(instance, six.string_types):
+        elif isinstance(instance, str):
             course_key = CourseKey.from_string(instance)
 
         return self.filter(user, CourseOverview.objects.filter(id=course_key)).exists()

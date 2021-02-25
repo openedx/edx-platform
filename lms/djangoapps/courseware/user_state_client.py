@@ -9,7 +9,6 @@ import logging
 from operator import attrgetter
 from time import time
 
-import six
 from django.conf import settings
 from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.core.paginator import Paginator
@@ -166,7 +165,7 @@ class DjangoXBlockUserStateClient(XBlockUserStateClient):
             field_state is a dict mapping field names to values.
         """
         if scope != Scope.user_state:
-            raise ValueError(u"Only Scope.user_state is supported, not {}".format(scope))
+            raise ValueError(f"Only Scope.user_state is supported, not {scope}")
 
         total_block_count = 0
         evt_time = time()
@@ -259,8 +258,8 @@ class DjangoXBlockUserStateClient(XBlockUserStateClient):
                 # on get_or_create to be able to see rows created in another
                 # process. This seems to happen frequently, and ignoring it is the
                 # best course of action for now
-                log.warning(u"set_many: IntegrityError for student {} - course_id {} - usage key {}".format(
-                    user, repr(six.text_type(usage_key.context_key)), usage_key
+                log.warning("set_many: IntegrityError for student {} - course_id {} - usage key {}".format(
+                    user, repr(str(usage_key.context_key)), usage_key
                 ))
                 return
 
@@ -282,10 +281,10 @@ class DjangoXBlockUserStateClient(XBlockUserStateClient):
                 except IntegrityError:
                     # The UPDATE above failed. Log information - but ignore the error.
                     # See https://openedx.atlassian.net/browse/TNL-5365
-                    log.warning(u"set_many: IntegrityError for student {} - course_id {} - usage key {}".format(
-                        user, repr(six.text_type(usage_key.context_key)), usage_key
+                    log.warning("set_many: IntegrityError for student {} - course_id {} - usage key {}".format(
+                        user, repr(str(usage_key.context_key)), usage_key
                     ))
-                    log.warning(u"set_many: All {} block keys: {}".format(
+                    log.warning("set_many: All {} block keys: {}".format(
                         len(block_keys_to_state), list(block_keys_to_state.keys())
                     ))
 

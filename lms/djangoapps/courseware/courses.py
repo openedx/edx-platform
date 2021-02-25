@@ -8,7 +8,6 @@ from collections import defaultdict, namedtuple
 from datetime import datetime
 
 import pytz
-import six
 from crum import get_current_request
 from dateutil.parser import parse as parse_date
 from django.conf import settings
@@ -19,7 +18,6 @@ from edx_django_utils.monitoring import function_trace
 from fs.errors import ResourceNotFound
 from opaque_keys.edx.keys import UsageKey
 from path import Path as path
-from six import text_type
 
 from openedx.core.lib.cache_utils import request_cached
 
@@ -106,7 +104,7 @@ def get_course_by_id(course_key, depth=0):
     if course:
         return course
     else:
-        raise Http404(u"Course not found: {}.".format(six.text_type(course_key)))
+        raise Http404("Course not found: {}.".format(str(course_key)))
 
 
 def get_course_with_access(user, action, course_key, depth=0, check_if_enrolled=False, check_survey_complete=True, check_if_authenticated=False):  # lint-amnesty, pylint: disable=line-too-long
@@ -275,7 +273,7 @@ def course_open_for_self_enrollment(course_key):
         return False
 
     # Check the enrollment start and end dates.
-    course_details = get_course_enrollment_details(six.text_type(course_key))
+    course_details = get_course_enrollment_details(str(course_key))
     now = datetime.now().replace(tzinfo=pytz.UTC)
     start = course_details['enrollment_start']
     end = course_details['enrollment_end']
@@ -304,7 +302,7 @@ def find_file(filesystem, dirs, filename):
         filepath = path(directory) / filename
         if filesystem.exists(filepath):
             return filepath
-    raise ResourceNotFound(u"Could not find {0}".format(filename))
+    raise ResourceNotFound(f"Could not find {filename}")
 
 
 def get_course_about_section(request, course, section_key):
@@ -379,15 +377,15 @@ def get_course_about_section(request, course, section_key):
                 except Exception:  # pylint: disable=broad-except
                     html = render_to_string('courseware/error-message.html', None)
                     log.exception(
-                        u"Error rendering course=%s, section_key=%s",
+                        "Error rendering course=%s, section_key=%s",
                         course, section_key
                     )
             return html
 
         except ItemNotFoundError:
             log.warning(
-                u"Missing about section %s in course %s",
-                section_key, text_type(course.location)
+                "Missing about section %s in course %s",
+                section_key, str(course.location)
             )
             return None
 
@@ -448,8 +446,8 @@ def get_course_info_section(request, user, course, section_key):
         except Exception:  # pylint: disable=broad-except
             html = render_to_string('courseware/error-message.html', None)
             log.exception(
-                u"Error rendering course_id=%s, section_key=%s",
-                six.text_type(course.id), section_key
+                "Error rendering course_id=%s, section_key=%s",
+                str(course.id), section_key
             )
 
     return html
@@ -607,7 +605,7 @@ def get_course_assignments(course_key, user, include_access=False):  # lint-amne
                             assessment_type = _("Submission")
                         else:
                             assessment_type = assessment_name
-                        title = "{} ({})".format(block_title, assessment_type)
+                        title = f"{block_title} ({assessment_type})"
                         url = ''
                         start = parse_date(assessment.get('start')).replace(tzinfo=pytz.UTC) if assessment.get('start') else None  # lint-amnesty, pylint: disable=line-too-long
                         assignment_released = not start or start < now
@@ -675,8 +673,8 @@ def get_course_syllabus_section(course, section_key):
                 )
         except ResourceNotFound:
             log.exception(
-                u"Missing syllabus section %s in course %s",
-                section_key, text_type(course.location)
+                "Missing syllabus section %s in course %s",
+                section_key, str(course.location)
             )
             return "! Syllabus missing !"
 
@@ -751,7 +749,7 @@ def get_cms_course_link(course, page='course'):
     """
     # This is fragile, but unfortunately the problem is that within the LMS we
     # can't use the reverse calls from the CMS
-    return u"//{}/{}/{}".format(settings.CMS_BASE, page, six.text_type(course.id))
+    return "//{}/{}/{}".format(settings.CMS_BASE, page, str(course.id))
 
 
 def get_cms_block_link(block, page):
@@ -761,7 +759,7 @@ def get_cms_block_link(block, page):
     """
     # This is fragile, but unfortunately the problem is that within the LMS we
     # can't use the reverse calls from the CMS
-    return u"//{}/{}/{}".format(settings.CMS_BASE, page, block.location)
+    return f"//{settings.CMS_BASE}/{page}/{block.location}"
 
 
 def get_studio_url(course, page):
@@ -798,7 +796,7 @@ def get_problems_in_section(section):
         for vertical in subsection.get_children():
             for component in vertical.get_children():
                 if component.location.block_type == 'problem' and getattr(component, 'has_score', False):
-                    problem_descriptors[six.text_type(component.location)] = component
+                    problem_descriptors[str(component.location)] = component
 
     return problem_descriptors
 
@@ -878,4 +876,4 @@ def get_course_chapter_ids(course_key):
     except Exception:  # pylint: disable=broad-except
         log.exception('Failed to retrieve course from modulestore.')
         return []
-    return [six.text_type(chapter_key) for chapter_key in chapter_keys if chapter_key.block_type == 'chapter']
+    return [str(chapter_key) for chapter_key in chapter_keys if chapter_key.block_type == 'chapter']

@@ -45,7 +45,7 @@ MASQUERADE_SETTINGS_KEY = 'masquerade_settings'
 MASQUERADE_DATA_KEY = 'masquerade_data'
 
 
-class CourseMasquerade(object):
+class CourseMasquerade:
     """
     Masquerade settings for a particular course.
     """
@@ -181,7 +181,7 @@ class MasqueradeView(View):
                 return JsonResponse({
                     'success': False,
                     'error': _(
-                        u'There is no user with the username or email address "{user_identifier}" '
+                        'There is no user with the username or email address "{user_identifier}" '
                         'enrolled in this course.'
                     ).format(
                         user_identifier=user_name,
@@ -471,5 +471,5 @@ def filter_displayed_blocks(block, unused_view, frag, unused_context):  # lint-a
     if getattr(block, 'show_in_read_only_mode', False):
         return frag
     return Fragment(
-        _(u'This type of component cannot be shown while viewing the course as a specific student.')
+        _('This type of component cannot be shown while viewing the course as a specific student.')
     )
