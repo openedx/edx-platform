@@ -8,10 +8,10 @@ from completion.test_utils import CompletionWaffleTestMixin
 from xblock.completable import CompletableXBlockMixin, XBlockCompletionMode
 from xblock.core import XBlock
 
+from common.djangoapps.student.tests.factories import UserFactory
 from lms.djangoapps.course_api.blocks.transformers.block_completion import BlockCompletionTransformer
 from lms.djangoapps.course_blocks.api import get_course_blocks
 from lms.djangoapps.course_blocks.transformers.tests.helpers import ModuleStoreTestCase, TransformerRegistryTestMixin
-from common.djangoapps.student.tests.factories import UserFactory
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 
 
@@ -47,7 +47,7 @@ class BlockCompletionTransformerTestCase(TransformerRegistryTestMixin, Completio
     COMPLETION_TEST_VALUE = 0.4
 
     def setUp(self):
-        super(BlockCompletionTransformerTestCase, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.user = UserFactory.create(password='test')
         # Set ENABLE_COMPLETION_TRACKING waffle switch to True
         self.override_waffle_switch(True)

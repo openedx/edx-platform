@@ -30,7 +30,7 @@ class TestExtraFieldsTransformer(ModuleStoreTestCase):
     }
 
     def setUp(self):
-        super(TestExtraFieldsTransformer, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
 
         self.course = SampleCourseFactory.create(
             other_course_settings=self.OTHER_COURSE_SETTINGS_DEFAULT

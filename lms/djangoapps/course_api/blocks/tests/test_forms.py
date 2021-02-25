@@ -3,17 +3,17 @@ Tests for Course Blocks forms
 """
 
 
+from urllib.parse import urlencode
+
 import ddt
 import pytest
-import six
-from six.moves.urllib.parse import urlencode
 from django.http import Http404, QueryDict
 from opaque_keys.edx.locator import CourseLocator
 from rest_framework.exceptions import PermissionDenied
 
-from openedx.core.djangoapps.util.test_forms import FormTestMixin
 from common.djangoapps.student.models import CourseEnrollment
 from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
+from openedx.core.djangoapps.util.test_forms import FormTestMixin
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
@@ -30,12 +30,12 @@ class TestBlockListGetForm(FormTestMixin, SharedModuleStoreTestCase):
 
     @classmethod
     def setUpClass(cls):
-        super(TestBlockListGetForm, cls).setUpClass()
+        super().setUpClass()
 
         cls.course = CourseFactory.create()
 
     def setUp(self):
-        super(TestBlockListGetForm, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
 
         self.student = UserFactory.create()
         self.student2 = UserFactory.create()
@@ -49,7 +49,7 @@ class TestBlockListGetForm(FormTestMixin, SharedModuleStoreTestCase):
         self.form_data = QueryDict(
             urlencode({
                 'username': self.student.username,
-                'usage_key': six.text_type(usage_key),
+                'usage_key': str(usage_key),
             }),
             mutable=True,
         )

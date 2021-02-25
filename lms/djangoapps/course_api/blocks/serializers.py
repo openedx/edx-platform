@@ -3,7 +3,6 @@ Serializers for Course Blocks related return objects.
 """
 
 
-import six
 from django.conf import settings
 from rest_framework import serializers
 from rest_framework.reverse import reverse
@@ -12,13 +11,13 @@ from lms.djangoapps.course_blocks.transformers.visibility import VisibilityTrans
 
 from .transformers.block_completion import BlockCompletionTransformer
 from .transformers.block_counts import BlockCountsTransformer
+from .transformers.extra_fields import ExtraFieldsTransformer
 from .transformers.milestones import MilestonesAndSpecialExamsTransformer
 from .transformers.navigation import BlockNavigationTransformer
 from .transformers.student_view import StudentViewTransformer
-from .transformers.extra_fields import ExtraFieldsTransformer
 
 
-class SupportedFieldType(object):
+class SupportedFieldType:
     """
     Metadata about fields supported by different transformers
     """
@@ -141,16 +140,16 @@ class BlockSerializer(serializers.Serializer):  # pylint: disable=abstract-metho
         authorization_denial_message = block_structure.get_xblock_field(block_key, 'authorization_denial_message')
 
         data = {
-            'id': six.text_type(block_key),
-            'block_id': six.text_type(block_key.block_id),
+            'id': str(block_key),
+            'block_id': str(block_key.block_id),
             'lms_web_url': reverse(
                 'jump_to',
-                kwargs={'course_id': six.text_type(block_key.course_key), 'location': six.text_type(block_key)},
+                kwargs={'course_id': str(block_key.course_key), 'location': str(block_key)},
                 request=self.context['request'],
             ),
             'student_view_url': reverse(
                 'render_xblock',
-                kwargs={'usage_key_string': six.text_type(block_key)},
+                kwargs={'usage_key_string': str(block_key)},
                 request=self.context['request'],
             ),
         }
@@ -158,7 +157,7 @@ class BlockSerializer(serializers.Serializer):  # pylint: disable=abstract-metho
         if settings.FEATURES.get("ENABLE_LTI_PROVIDER") and 'lti_url' in self.context['requested_fields']:
             data['lti_url'] = reverse(
                 'lti_provider_launch',
-                kwargs={'course_id': six.text_type(block_key.course_key), 'usage_id': six.text_type(block_key)},
+                kwargs={'course_id': str(block_key.course_key), 'usage_id': str(block_key)},
                 request=self.context['request'],
             )
 
@@ -178,7 +177,7 @@ class BlockSerializer(serializers.Serializer):  # pylint: disable=abstract-metho
         if 'children' in self.context['requested_fields']:
             children = block_structure.get_children(block_key)
             if children:
-                data['children'] = [six.text_type(child) for child in children]
+                data['children'] = [str(child) for child in children]
 
         if authorization_denial_reason and authorization_denial_message:
             data['authorization_denial_reason'] = authorization_denial_reason
@@ -205,6 +204,6 @@ class BlockDictSerializer(serializers.Serializer):  # pylint: disable=abstract-m
         Serialize to a dictionary of blocks keyed by the block's usage_key.
         """
         return {
-            six.text_type(block_key): BlockSerializer(block_key, context=self.context).data
+            str(block_key): BlockSerializer(block_key, context=self.context).data
             for block_key in structure
         }

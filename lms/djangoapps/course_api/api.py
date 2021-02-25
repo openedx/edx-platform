@@ -3,31 +3,29 @@ Course API
 """
 import logging
 
-from edx_django_utils.monitoring import function_trace
-from edx_when.api import get_dates_for_course
+import search
 from django.conf import settings
 from django.contrib.auth.models import AnonymousUser, User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.urls import reverse
+from edx_django_utils.monitoring import function_trace
+from edx_when.api import get_dates_for_course
+from opaque_keys.edx.django.models import CourseKeyField
 from rest_framework.exceptions import PermissionDenied
-import search
-import six
 
+from common.djangoapps.student.models import CourseAccessRole
+from common.djangoapps.student.roles import GlobalStaff
 from lms.djangoapps.courseware.access import has_access
 from lms.djangoapps.courseware.courses import (
     get_course_overview_with_access,
     get_courses,
     get_permission_for_course_about
 )
-from opaque_keys.edx.django.models import CourseKeyField  # lint-amnesty, pylint: disable=wrong-import-order
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.lib.api.view_utils import LazySequence
-from common.djangoapps.student.models import CourseAccessRole
-from common.djangoapps.student.roles import GlobalStaff
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError
 
 from .permissions import can_view_courses_for_username
-
 
 logger = logging.getLogger(__name__)  # pylint: disable=invalid-name
 
@@ -100,7 +98,7 @@ def _filter_by_search(course_queryset, search_term):
     return LazySequence(
         (
             course for course in course_queryset
-            if six.text_type(course.id) in search_courses_ids
+            if str(course.id) in search_courses_ids
         ),
         est_len=len(course_queryset)
     )
@@ -235,12 +233,12 @@ def get_due_dates(request, course_key, user):
     store = modulestore()
 
     due_dates = []
-    for (block_key, date_type), date in six.iteritems(dates):
+    for (block_key, date_type), date in dates.items():
         if date_type == 'due':
             try:
                 block_display_name = store.get_item(block_key).display_name
             except ItemNotFoundError:
-                logger.exception('Failed to get block for due date item with key: {}'.format(block_key))
+                logger.exception(f'Failed to get block for due date item with key: {block_key}')
                 block_display_name = UNKNOWN_BLOCK_DISPLAY_NAME
 
             # get url to the block in the course

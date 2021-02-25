@@ -4,11 +4,11 @@ Test for course API
 
 from datetime import datetime, timedelta
 from hashlib import md5
+from unittest import mock
 
 import pytest
 from django.contrib.auth.models import AnonymousUser
 from django.http import Http404
-import mock
 from opaque_keys.edx.keys import CourseKey
 from rest_framework.exceptions import PermissionDenied
 from rest_framework.request import Request
@@ -30,11 +30,11 @@ class CourseApiTestMixin(CourseApiFactoryMixin):
 
     @classmethod
     def setUpClass(cls):
-        super(CourseApiTestMixin, cls).setUpClass()
+        super().setUpClass()
         cls.request_factory = APIRequestFactory()
         CourseOverview.get_all_courses()  # seed the CourseOverview table
 
-    def verify_course(self, course, course_id=u'edX/toy/2012_Fall'):
+    def verify_course(self, course, course_id='edX/toy/2012_Fall'):
         """
         Ensure that the returned course is the course we just created
         """
@@ -65,9 +65,9 @@ class TestGetCourseDetail(CourseDetailTestMixin, SharedModuleStoreTestCase):
 
     @classmethod
     def setUpClass(cls):
-        super(TestGetCourseDetail, cls).setUpClass()
+        super().setUpClass()
         cls.course = cls.create_course()
-        cls.hidden_course = cls.create_course(course=u'hidden', visible_to_staff_only=True)
+        cls.hidden_course = cls.create_course(course='hidden', visible_to_staff_only=True)
         cls.honor_user = cls.create_user('honor', is_staff=False)
         cls.staff_user = cls.create_user('staff', is_staff=True)
 
@@ -76,7 +76,7 @@ class TestGetCourseDetail(CourseDetailTestMixin, SharedModuleStoreTestCase):
         self.verify_course(course)
 
     def test_get_nonexistent_course(self):
-        course_key = CourseKey.from_string(u'edX/toy/nope')
+        course_key = CourseKey.from_string('edX/toy/nope')
         with pytest.raises(Http404):
             self._make_api_call(self.honor_user, self.honor_user, course_key)
 
@@ -86,7 +86,7 @@ class TestGetCourseDetail(CourseDetailTestMixin, SharedModuleStoreTestCase):
 
     def test_hidden_course_for_staff(self):
         course = self._make_api_call(self.staff_user, self.staff_user, self.hidden_course.id)
-        self.verify_course(course, course_id=u'edX/hidden/2012_Fall')
+        self.verify_course(course, course_id='edX/hidden/2012_Fall')
 
     def test_hidden_course_for_staff_as_honor(self):
         with pytest.raises(Http404):
@@ -124,7 +124,7 @@ class TestGetCourseList(CourseListTestMixin, SharedModuleStoreTestCase):
 
     @classmethod
     def setUpClass(cls):
-        super(TestGetCourseList, cls).setUpClass()
+        super().setUpClass()
         cls.course = cls.create_course()
         cls.staff_user = cls.create_user("staff", is_staff=True)
         cls.honor_user = cls.create_user("honor", is_staff=False)
@@ -165,7 +165,7 @@ class TestGetCourseListMultipleCourses(CourseListTestMixin, ModuleStoreTestCase)
     ENABLED_SIGNALS = ['course_published']
 
     def setUp(self):
-        super(TestGetCourseListMultipleCourses, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.course = self.create_course(mobile_available=False)
         self.staff_user = self.create_user("staff", is_staff=True)
         self.honor_user = self.create_user("honor", is_staff=False)
@@ -217,7 +217,7 @@ class TestGetCourseListExtras(CourseListTestMixin, ModuleStoreTestCase):
 
     @classmethod
     def setUpClass(cls):
-        super(TestGetCourseListExtras, cls).setUpClass()
+        super().setUpClass()
         cls.staff_user = cls.create_user("staff", is_staff=True)
         cls.honor_user = cls.create_user("honor", is_staff=False)
 

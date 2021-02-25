@@ -3,15 +3,15 @@ Course API Serializers.  Representing course catalog data
 """
 
 
-from edx_django_utils import monitoring as monitoring_utils
-import six.moves.urllib.error  # lint-amnesty, pylint: disable=wrong-import-order
-import six.moves.urllib.parse  # lint-amnesty, pylint: disable=wrong-import-order
-import six.moves.urllib.request  # lint-amnesty, pylint: disable=wrong-import-order
+import urllib
+
 from django.urls import reverse
+from edx_django_utils import monitoring as monitoring_utils
 from rest_framework import serializers
 
+from openedx.core.djangoapps.content.course_overviews.models import \
+    CourseOverview  # lint-amnesty, pylint: disable=unused-import
 from openedx.core.djangoapps.models.course_details import CourseDetails
-from openedx.core.djangoapps.content.course_overviews.models import CourseOverview  # lint-amnesty, pylint: disable=unused-import
 from openedx.core.lib.api.fields import AbsoluteURLField
 
 
@@ -21,7 +21,7 @@ class _MediaSerializer(serializers.Serializer):  # pylint: disable=abstract-meth
     """
 
     def __init__(self, uri_attribute, *args, **kwargs):
-        super(_MediaSerializer, self).__init__(*args, **kwargs)  # lint-amnesty, pylint: disable=super-with-arguments
+        super().__init__(*args, **kwargs)
         self.uri_attribute = uri_attribute
 
     uri = serializers.SerializerMethodField(source='*')
@@ -131,7 +131,7 @@ class CourseSerializer(serializers.Serializer):  # pylint: disable=abstract-meth
         """
         base_url = '?'.join([
             reverse('blocks_in_course'),
-            six.moves.urllib.parse.urlencode({'course_id': course_overview.id}),
+            urllib.parse.urlencode({'course_id': course_overview.id}),
         ])
         return self.context['request'].build_absolute_uri(base_url)
 

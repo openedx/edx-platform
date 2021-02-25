@@ -11,7 +11,7 @@ from .views import BlocksInCourseView, BlocksView
 urlpatterns = [
     # This endpoint requires the usage_key for the starting block.
     url(
-        r'^v1/blocks/{}'.format(settings.USAGE_KEY_PATTERN),
+        fr'^v1/blocks/{settings.USAGE_KEY_PATTERN}',
         BlocksView.as_view(),
         kwargs={'hide_access_denials': True},
         name="blocks_in_block_tree"
@@ -26,7 +26,7 @@ urlpatterns = [
     ),
     # This endpoint requires the usage_key for the starting block.
     url(
-        r'^v2/blocks/{}'.format(settings.USAGE_KEY_PATTERN),
+        fr'^v2/blocks/{settings.USAGE_KEY_PATTERN}',
         BlocksView.as_view(),
         name="blocks_in_block_tree"
     ),

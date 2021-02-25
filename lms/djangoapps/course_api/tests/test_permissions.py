@@ -20,7 +20,7 @@ class ViewCoursesForUsernameTestCase(CourseApiFactoryMixin, TestCase):
 
     @classmethod
     def setUpClass(cls):
-        super(ViewCoursesForUsernameTestCase, cls).setUpClass()
+        super().setUpClass()
         cls.staff_user = cls.create_user('staff', is_staff=True)
         cls.honor_user = cls.create_user('honor', is_staff=False)
         cls.anonymous_user = AnonymousUser()

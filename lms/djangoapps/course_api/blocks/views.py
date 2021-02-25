@@ -3,7 +3,6 @@ CourseBlocks API views
 """
 
 
-import six
 from django.core.exceptions import ValidationError
 from django.db import transaction
 from django.http import Http404
@@ -13,7 +12,6 @@ from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
 from rest_framework.generics import ListAPIView
 from rest_framework.response import Response
-from six import text_type
 
 from openedx.core.lib.api.view_utils import DeveloperErrorViewMixin, view_auth_classes
 from xmodule.modulestore.django import modulestore
@@ -238,7 +236,7 @@ class BlocksView(DeveloperErrorViewMixin, ListAPIView):
                 patch_response_headers(response)
             return response
         except ItemNotFoundError as exception:
-            raise Http404(u"Block not found: {}".format(text_type(exception)))  # lint-amnesty, pylint: disable=raise-missing-from
+            raise Http404("Block not found: {}".format(str(exception)))  # lint-amnesty, pylint: disable=raise-missing-from
 
 
 @view_auth_classes(is_authenticated=False)
@@ -301,9 +299,9 @@ class BlocksInCourseView(BlocksView):
             course_key = CourseKey.from_string(course_key_string)
             course_usage_key = modulestore().make_course_usage_key(course_key)
         except InvalidKeyError:
-            raise ValidationError(u"'{}' is not a valid course key.".format(six.text_type(course_key_string)))  # lint-amnesty, pylint: disable=raise-missing-from
+            raise ValidationError("'{}' is not a valid course key.".format(str(course_key_string)))  # lint-amnesty, pylint: disable=raise-missing-from
         response = super().list(request, course_usage_key,
-                                hide_access_denials=hide_access_denials)  # lint-amnesty, pylint: disable=super-with-arguments
+                                hide_access_denials=hide_access_denials)
 
         if 'completion' not in request.query_params.getlist('requested_fields', ''):
             return response
@@ -321,7 +319,7 @@ class BlocksInCourseView(BlocksView):
             course_blocks = response.data['blocks']
 
         if not root:
-            raise ValueError("Unable to find course block in {}".format(course_key_string))
+            raise ValueError(f"Unable to find course block in {course_key_string}")
 
         recurse_mark_complete(root, course_blocks)
         return response
