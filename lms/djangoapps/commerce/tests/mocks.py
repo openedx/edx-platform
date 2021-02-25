@@ -10,7 +10,7 @@ from django.conf import settings
 from . import factories
 
 
-class mock_ecommerce_api_endpoint(object):
+class mock_ecommerce_api_endpoint:
     """
     Base class for contextmanagers used to mock calls to api endpoints.
 
@@ -95,11 +95,11 @@ class mock_basket_order(mock_ecommerce_api_endpoint):
     method = httpretty.GET
 
     def __init__(self, basket_id, **kwargs):
-        super(mock_basket_order, self).__init__(**kwargs)  # lint-amnesty, pylint: disable=super-with-arguments
+        super().__init__(**kwargs)
         self.basket_id = basket_id
 
     def get_path(self):
-        return '/baskets/{}/order/'.format(self.basket_id)
+        return f'/baskets/{self.basket_id}/order/'
 
 
 class mock_create_refund(mock_ecommerce_api_endpoint):
@@ -131,11 +131,11 @@ class mock_process_refund(mock_ecommerce_api_endpoint):
     method = httpretty.PUT
 
     def __init__(self, refund_id, **kwargs):
-        super(mock_process_refund, self).__init__(**kwargs)  # lint-amnesty, pylint: disable=super-with-arguments
+        super().__init__(**kwargs)
         self.refund_id = refund_id
 
     def get_path(self):
-        return '/refunds/{}/process/'.format(self.refund_id)
+        return f'/refunds/{self.refund_id}/process/'
 
 
 class mock_order_endpoint(mock_ecommerce_api_endpoint):
@@ -145,11 +145,11 @@ class mock_order_endpoint(mock_ecommerce_api_endpoint):
     method = httpretty.GET
 
     def __init__(self, order_number, **kwargs):
-        super(mock_order_endpoint, self).__init__(**kwargs)  # lint-amnesty, pylint: disable=super-with-arguments
+        super().__init__(**kwargs)
         self.order_number = order_number
 
     def get_path(self):
-        return '/orders/{}/'.format(self.order_number)
+        return f'/orders/{self.order_number}/'
 
 
 class mock_get_orders(mock_ecommerce_api_endpoint):

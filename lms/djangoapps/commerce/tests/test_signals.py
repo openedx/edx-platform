@@ -1,4 +1,3 @@
-# coding=UTF-8
 """
 Tests for signal handling in commerce djangoapp.
 """
@@ -6,17 +5,18 @@ Tests for signal handling in commerce djangoapp.
 
 import base64
 import json
+from unittest import mock
+from urllib.parse import urljoin
+
 import pytest
 import ddt
 import httpretty
-import mock
 from django.conf import settings
 from django.contrib.auth.models import AnonymousUser
 from django.test import TestCase
 from django.test.utils import override_settings
 from opaque_keys.edx.keys import CourseKey
 from requests import Timeout
-from six.moves.urllib.parse import urljoin
 
 from common.djangoapps.course_modes.models import CourseMode
 from common.djangoapps.student.signals import REFUND_ORDER
@@ -40,7 +40,7 @@ class TestRefundSignal(TestCase):
     """
 
     def setUp(self):
-        super(TestRefundSignal, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
 
         # Ensure the E-Commerce service user exists
         UserFactory(username=settings.ECOMMERCE_SERVICE_WORKER_USERNAME, is_staff=True)
@@ -306,7 +306,7 @@ class TestRefundSignal(TestCase):
         expected = {
             'content-type': JSON,
             'Authorization': 'Basic {}'.format(base64.b64encode(
-                '{user}/token:{pwd}'.format(user=ZENDESK_USER, pwd=ZENDESK_API_KEY).encode('utf8')).decode('utf8')
+                f'{ZENDESK_USER}/token:{ZENDESK_API_KEY}'.encode('utf8')).decode('utf8')
             )
         }
         self.assertDictContainsSubset(expected, last_request.headers)

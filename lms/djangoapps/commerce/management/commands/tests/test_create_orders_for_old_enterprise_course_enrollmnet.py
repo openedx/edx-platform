@@ -3,19 +3,19 @@ Test the create_orders_for_old_enterprise_course_enrollment management command
 """
 
 import re
+from io import StringIO
+from unittest.mock import patch
 
 from django.core.management import call_command
 from django.test import TestCase, override_settings
-from django.utils.six import StringIO
-from mock import patch
-from six.moves import range
 
 from common.djangoapps.course_modes.models import CourseMode
-from common.djangoapps.student.tests.factories import UserFactory, CourseEnrollmentFactory
+from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
 from openedx.core.djangoapps.credit.tests.test_api import TEST_ECOMMERCE_WORKER
 from openedx.core.djangolib.testing.utils import skip_unless_lms
 from openedx.features.enterprise_support.tests.factories import (
-    EnterpriseCourseEnrollmentFactory, EnterpriseCustomerUserFactory
+    EnterpriseCourseEnrollmentFactory,
+    EnterpriseCustomerUserFactory
 )
 
 
@@ -28,7 +28,7 @@ class TestEnterpriseCourseEnrollmentCreateOldOrder(TestCase):
 
     @classmethod
     def setUpTestData(cls):
-        super(TestEnterpriseCourseEnrollmentCreateOldOrder, cls).setUpTestData()
+        super().setUpTestData()
         UserFactory(username=TEST_ECOMMERCE_WORKER)
         cls._create_enterprise_course_enrollments(30)
 
