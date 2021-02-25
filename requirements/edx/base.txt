@@ -149,7 +149,7 @@ lti-consumer-xblock==2.7.0  # via -r requirements/edx/base.in
 lxml==4.5.0               # via -c requirements/edx/../constraints.txt, -r requirements/edx/../edx-sandbox/shared.txt, capa, edxval, lti-consumer-xblock, ora2, safe-lxml, xblock, xmlsec
 mailsnake==1.6.4          # via -r requirements/edx/base.in
 mako==1.1.4               # via -r requirements/edx/base.in, acid-xblock, lti-consumer-xblock, xblock-google-drive, xblock-utils
-markdown==3.3.3           # via -r requirements/edx/base.in, django-wiki, staff-graded-xblock, xblock-poll
+markdown==3.3.4           # via -r requirements/edx/base.in, django-wiki, staff-graded-xblock, xblock-poll
 markey==0.8               # via enmerkar-underscore
 markupsafe==1.1.1         # via -r requirements/edx/paver.txt, chem, jinja2, mako, xblock
 maxminddb==1.5.4          # via -c requirements/edx/../constraints.txt, geoip2
@@ -164,7 +164,7 @@ nodeenv==1.5.0            # via -r requirements/edx/base.in
 numpy==1.20.1             # via chem, openedx-calc, scipy
 oauthlib==3.0.1           # via -c requirements/edx/../constraints.txt, -r requirements/edx/base.in, django-oauth-toolkit, lti-consumer-xblock, requests-oauthlib, social-auth-core
 openedx-calc==2.0.1       # via -r requirements/edx/base.in
-ora2==3.1.5               # via -r requirements/edx/base.in
+ora2==3.1.6               # via -r requirements/edx/base.in
 packaging==20.9           # via bleach, drf-yasg
 path.py==12.5.0           # via edx-enterprise, edx-i18n-tools, ora2, staff-graded-xblock, xmodule
 path==13.1.0              # via -c requirements/edx/../constraints.txt, -r requirements/edx/paver.txt, path.py
