@@ -163,7 +163,7 @@ class PasswordResetConfirmation extends React.Component {
             <div className="text-center">
                 <Button
                     type="submit"
-                    className={['action', 'action-primary', 'action-update', 'js-reset', 'button']}
+                    className={['action', 'action-primary', 'action-update', 'js-reset', 'button', 'form-submit-btn', 'aqua-blue']}
                     label={this.props.primaryActionButtonLabel}
                 />
             </div>
