@@ -10,13 +10,13 @@ PROVIDER_PATTERN = r'(?P<provider_id>[\w.+-]+)(?:\:(?P<idp_slug>[\w.+-]+))?'
 
 urlpatterns = [
     url(
-        r'^v0/users/{username_pattern}$'.format(username_pattern=settings.USERNAME_PATTERN),
+        fr'^v0/users/{settings.USERNAME_PATTERN}$',
         UserView.as_view(),
         name='third_party_auth_users_api',
     ),
     url(r'^v0/users/', UserViewV2.as_view(), name='third_party_auth_users_api_v2'),
     url(
-        r'^v0/providers/{provider_pattern}/users$'.format(provider_pattern=PROVIDER_PATTERN),
+        fr'^v0/providers/{PROVIDER_PATTERN}/users$',
         UserMappingView.as_view(),
         name='third_party_auth_user_mapping_api',
     ),

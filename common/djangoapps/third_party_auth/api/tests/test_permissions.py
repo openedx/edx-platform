@@ -13,8 +13,8 @@ from edx_rest_framework_extensions.auth.jwt.tests.utils import generate_jwt
 from rest_framework.authentication import SessionAuthentication
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from common.djangoapps.student.tests.factories import UserFactory
 
+from common.djangoapps.student.tests.factories import UserFactory
 from common.djangoapps.third_party_auth.api.permissions import TPA_PERMISSIONS
 
 IDP_SLUG_TESTSHIB = 'testshib'
@@ -48,7 +48,7 @@ class ThirdPartyAuthPermissionTest(TestCase):
 
     def _create_jwt_header(self, user, is_restricted=False, scopes=None, filters=None):
         token = generate_jwt(user, is_restricted=is_restricted, scopes=scopes, filters=filters)
-        return "JWT {}".format(token)
+        return f"JWT {token}"
 
     def test_anonymous_fails(self):
         request = self._create_request()
