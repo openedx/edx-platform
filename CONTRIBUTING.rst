@@ -100,11 +100,11 @@ Step 1: Sign a Contribution Agreement
 =====================================
 
 Before edX can accept any code contributions from you, you'll need to sign the
-`individual contributor agreement`_. This confirms that you have the authority
+`Individual Contributor Agreement`_. This confirms that you have the authority
 to contribute the code in the pull request and ensures that edX can re-license
 it.
 
-.. _individual contributor agreement: https://openedx.org/cla
+.. _Individual Contributor Agreement: https://openedx.org/cla
 
 If you will be contributing code on behalf of your employer or another
 institution you are affiliated with, please reach out by email to legal@edx.org
