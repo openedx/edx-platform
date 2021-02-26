@@ -287,7 +287,7 @@ def bulk_enroll_students_and_upload(_xmodule_instance_args, _entry_id, course_id
     # Iterate through rows to get total assignments for task progress
     with DefaultStorage().open(task_input['file_name']) as f:
         total_assignments = 0
-        for _line in unicodecsv.DictReader(UniversalNewlineIterator(f)):
+        for _line in csv.DictReader(_get_csv_file_content(f).splitlines()):
             total_assignments += 1
 
     task_progress = TaskProgress(action_name, total_assignments, start_time)
@@ -306,7 +306,7 @@ def bulk_enroll_students_and_upload(_xmodule_instance_args, _entry_id, course_id
     }
 
     with DefaultStorage().open(task_input['file_name']) as f:
-        for row in unicodecsv.DictReader(UniversalNewlineIterator(f), encoding='utf-8'):
+        for row in csv.DictReader(_get_csv_file_content(f).splitlines()):
             # Try to use the 'email' field to identify the user.  If it's not present, use 'username'.
             username_or_email = row.get('email') or row.get('username')
             task_progress.attempted += 1

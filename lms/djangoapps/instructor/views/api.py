@@ -789,7 +789,7 @@ def _bulk_enrollment_csv_validator(file_storage, file_to_validate):
     Verifies that the expected columns are present in the CSV used to enroll users to course.
     """
     with file_storage.open(file_to_validate) as f:
-        reader = unicodecsv.reader(UniversalNewlineIterator(f), encoding='utf-8')
+        reader = csv.reader(f.read().decode('utf-8').splitlines())
         try:
             fieldnames = next(reader)
         except StopIteration:
@@ -825,9 +825,9 @@ def bulk_enroll_users_to_course(request, course_id):
             validator=_bulk_enrollment_csv_validator
         )
         # The task will assume the default file storage.
-        lms.djangoapps.instructor_task.api.submit_bulk_users_enrollments(request, course_key, filename)
+        task_api.submit_bulk_users_enrollments(request, course_key, filename)
     except (FileValidationException, PermissionDenied) as err:
-        return JsonResponse({'error': unicode(err)}, status=400)
+        return JsonResponse({'error': err}, status=400)
 
     return JsonResponse()
 
