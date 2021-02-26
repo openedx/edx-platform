@@ -184,7 +184,7 @@
                             view.setMessageTimeout();
                         },
                         error: function(xhr) {
-                            view.showErrorMessage(xhr);
+                            view.showErrorMessage(xhr, xhr.responseJSON.value);
                             view.setMessageTimeout();
                             view.toggleDisableButton(false);
                         }
