@@ -1,3 +1,4 @@
+/* eslint no-underscore-dangle: [2, { "allow": ["_super"] }] */
 (function(define) {
     'use strict';
     define([
@@ -188,7 +189,7 @@
                 _.bindAll(this, 'saveAttributes', 'saveSucceeded', 'showDisplayMode', 'showEditMode',
                     'startEditing', 'finishEditing'
                 );
-                this.super(options);
+                this._super(options);
 
                 this.editable = _.isUndefined(this.options.editable) ? 'always' : this.options.editable;
                 this.$el.addClass('editable-' + this.editable);
@@ -290,7 +291,7 @@
             fieldTemplate: fieldReadOnlyTemplate,
 
             initialize: function(options) {
-                this.super(options);
+                this._super(options);
                 _.bindAll(this, 'render', 'fieldValue', 'updateValueInField');
                 this.listenTo(this.model, 'change:' + this.options.valueAttribute, this.updateValueInField);
             },
@@ -359,7 +360,7 @@
             },
 
             initialize: function(options) {
-                this.super(options);
+                this._super(options);
                 _.bindAll(this, 'render', 'fieldValue', 'updateValueInField', 'saveValue');
                 this.listenTo(this.model, 'change:' + this.options.valueAttribute, this.updateValueInField);
             },
@@ -415,7 +416,7 @@
             initialize: function(options) {
                 _.bindAll(this, 'render', 'optionForValue', 'fieldValue', 'displayValue', 'updateValueInField',
                     'saveValue', 'createGroupOptions');
-                this.super(options);
+                this._super(options);
 
                 this.listenTo(this.model, 'change:' + this.options.valueAttribute, this.updateValueInField);
             },
@@ -520,14 +521,14 @@
             },
 
             showDisplayMode: function(render) {
-                this.super(render);
+                this._super(render);
                 if (this.editable === 'toggle') {
                     this.$('.u-field-value a').focus();
                 }
             },
 
             showEditMode: function(render) {
-                this.super(render);
+                this._super(render);
                 if (this.editable === 'toggle') {
                     this.$('.u-field-value select').focus();
                 }
@@ -542,7 +543,7 @@
                     this.$('option[value=""]').remove();
                 }
 
-                this.super();
+                this._super();
             },
 
             disableField: function(disable) {
@@ -581,7 +582,7 @@
             initialize: function(options) {
                 _.bindAll(this, 'render', 'onKeyDown', 'adjustTextareaHeight', 'manageTextareaContentChange',
                     'fieldValue', 'saveValue', 'updateView');
-                this.super(options);
+                this._super(options);
                 this.listenTo(this.model, 'change:' + this.options.valueAttribute, this.updateView);
             },
 
@@ -657,7 +658,7 @@
             },
 
             modelValue: function() {
-                var value = this.super();
+                var value = this._super();
                 return value ? $.trim(value) : '';
             },
 
@@ -686,13 +687,13 @@
             },
 
             showEditMode: function(render) {
-                this.super(render);
+                this._super(render);
                 this.adjustTextareaHeight();
                 this.$('.u-field-value textarea').focus();
             },
 
             saveSucceeded: function() {
-                this.super();
+                this._super();
                 if (this.editable === 'toggle') {
                     this.showDisplayMode(true);
                     this.$('a').focus();
@@ -711,7 +712,7 @@
             },
 
             initialize: function(options) {
-                this.super(options);
+                this._super(options);
                 _.bindAll(this, 'render', 'linkClicked');
             },
 
