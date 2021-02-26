@@ -13,8 +13,8 @@ from django.utils.translation import ugettext_lazy as _
 from openedx.adg.common.lib.mandrill_client.client import MandrillClient
 from openedx.adg.constants import MONTH_DAY_YEAR_FORMAT
 from openedx.adg.lms.constants import SAUDI_NATIONAL_PROMPT
-from xmodule.modulestore.django import modulestore
 from openedx.adg.lms.helpers import get_user_first_name
+from xmodule.modulestore.django import modulestore
 
 from .constants import (
     ACCEPTED_APPLICATIONS_TITLE,
