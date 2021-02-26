@@ -3,6 +3,12 @@ Constants for all the tests.
 """
 from django.urls import reverse
 
+ADMIN_TYPE_SUPER_ADMIN = 'super_admin'
+ADMIN_TYPE_ADG_ADMIN = 'adg_admin'
+
+TITLE_BUSINESS_LINE_1 = 'test_business_line1'
+TITLE_BUSINESS_LINE_2 = 'test_business_line2'
+
 USERNAME = 'test'
 EMAIL = 'test@example.com'
 PASSWORD = 'edx'
@@ -27,3 +33,5 @@ COVER_LETTER_REDIRECT_URL = '{register}?next={next}'.format(
     next=reverse('application_cover_letter')
 )
 MOCK_FILE_PATH = 'dummy_file.pdf'
+
+TEST_MESSAGE_FOR_APPLICANT = 'Test message for the applicant'

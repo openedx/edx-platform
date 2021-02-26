@@ -10,7 +10,6 @@ from django.utils.html import format_html
 from django.utils.translation import ugettext as _
 
 from openedx.adg.common.lib.mandrill_client.client import MandrillClient
-from openedx.adg.lms.student.helpers import send_mandrill_email
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.user_api.models import UserPreference
 from xmodule.modulestore.django import modulestore
@@ -114,7 +113,7 @@ def send_application_submission_confirmation_email(recipient_email):
     context = {
         'course_catalog_url': course_catalog_url
     }
-    send_mandrill_email(MandrillClient.APPLICATION_SUBMISSION_CONFIRMATION, recipient_email, context)
+    MandrillClient().send_mandrill_email(MandrillClient.APPLICATION_SUBMISSION_CONFIRMATION, recipient_email, context)
 
 
 def min_year_value_validator(value):
