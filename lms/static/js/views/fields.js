@@ -141,9 +141,9 @@
             },
 
             showSuccessMessage: function() {
-                var context = Date.now();
-                var successMessage = this.getMessage('success');
-                var view = this;
+                var context,
+                    successMessage = this.getMessage('success'),
+                    view;
 
                 this.showNotificationMessage(successMessage);
 
@@ -154,6 +154,9 @@
                     location.reload(true);
                 }
 
+                view = this;
+
+                context = Date.now();
                 this.lastSuccessMessageContext = context;
 
                 setTimeout(function() {
@@ -169,10 +172,13 @@
             },
 
             showErrorMessage: function(xhr) {
-                var errors = JSON.parse(xhr.responseText),
-                    validationErrorMessage = errors.field_errors[this.options.valueAttribute].user_message,
-                    message = HtmlUtils.joinHtml(this.indicators.validationError, validationErrorMessage);
+                var errors,
+                    validationErrorMessage,
+                    message;
                 if (xhr.status === 400) {
+                    errors = JSON.parse(xhr.responseText);
+                    validationErrorMessage = errors.field_errors[this.options.valueAttribute].user_message;
+                    message = HtmlUtils.joinHtml(this.indicators.validationError, validationErrorMessage);
                     try {
                         this.showNotificationMessage(message);
                     } catch (error) {
@@ -204,7 +210,10 @@
             },
 
             saveAttributes: function(attributes, options) {
-                var view = this,
+                var view,
+                    defaultOptions;
+                if (this.persistChanges === true) {
+                    view = this;
                     defaultOptions = {
                         contentType: 'application/merge-patch+json',
                         patch: true,
@@ -216,7 +225,6 @@
                             view.showErrorMessage(xhr);
                         }
                     };
-                if (this.persistChanges === true) {
                     this.showInProgressMessage();
                     this.model.save(attributes, _.extend(defaultOptions, options));
                 }
