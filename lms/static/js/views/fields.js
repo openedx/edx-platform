@@ -1,5 +1,5 @@
 /* eslint no-underscore-dangle: [2, { "allow": ["_super"] }] */
-(function(define) {
+(function(define, undef) {
     'use strict';
     define([
         'gettext', 'jquery', 'underscore', 'backbone',
@@ -111,10 +111,12 @@
             },
 
             showHelpMessage: function(message) {
+                var msg;
+                if (_.isUndefined(message) || _.isNull(message)) {
+                    msg = this.helpMessage;
+                }
                 this.$('.u-field-message-notification').html('');
-                HtmlUtils.setHtml(this.$('.u-field-message-help'),
-                  (_.isUndefined(message) || _.isNull(message)) ? this.helpMessage : message
-                );
+                HtmlUtils.setHtml(this.$('.u-field-message-help'), msg);
             },
 
             getNotificationMessage: function() {
@@ -428,7 +430,7 @@
                     editable: this.editable,
                     title: this.options.title,
                     screenReaderTitle: this.options.screenReaderTitle || this.options.title,
-                    titleVisible: this.options.titleVisible !== undefined ? this.options.titleVisible : true,
+                    titleVisible: this.options.titleVisible !== undef ? this.options.titleVisible : true,
                     iconName: this.options.iconName,
                     showBlankOption: (!this.options.required || !this.modelValueIsSet()),
                     groupOptions: this.createGroupOptions(),
