@@ -6,8 +6,10 @@ from django.contrib.admin import AdminSite
 from django.utils.html import format_html
 from django.utils.translation import ugettext_lazy as _
 
+from openedx.adg.common.lib.mandrill_client.client import MandrillClient
 from openedx.adg.constants import MONTH_DAY_YEAR_FORMAT
 from openedx.adg.lms.constants import SAUDI_NATIONAL_PROMPT
+from openedx.adg.lms.helpers import get_user_first_name
 
 from .constants import (
     ACCEPTED_APPLICATIONS_TITLE,
@@ -56,6 +58,7 @@ from .models import (
     UserApplication,
     WorkExperience
 )
+from .rules import is_adg_admin
 
 
 @admin.register(ApplicationHub)
@@ -237,10 +240,17 @@ class UserApplicationADGAdmin(admin.ModelAdmin):
 
     def get_queryset(self, request):
         """
-        Override `get_queryset` method of BaseModelAdmin to show ADG admin only those applications which have been
-        submitted successfully.
+        Override `get_queryset` method of BaseModelAdmin to show only the relevant applications to ADG admins
+        Super users and ADG admins can see all the applications
+        Business unit admins can only see the applications for their business unit
         """
-        return UserApplication.submitted_applications.all()
+        submitted_applications = UserApplication.submitted_applications.all()
+        user = request.user
+
+        if user.is_superuser or is_adg_admin(user):
+            return submitted_applications
+
+        return submitted_applications.filter(business_line__group__in=user.groups.all())
 
     def applicant_name(self, obj):
         return obj.user.profile.name
@@ -291,8 +301,10 @@ class UserApplicationADGAdmin(admin.ModelAdmin):
 
         if request.method == 'POST':
             note = request.POST.get('internal_note')
+            message_for_applicant = request.POST.get('message_for_applicant')
             if 'status' in request.POST:
                 self._save_application_review_info(application, request, note)
+                self._send_application_status_update_email(application, message_for_applicant)
 
                 return super(UserApplicationADGAdmin, self).changeform_view(
                     request, object_id, extra_context=extra_context
@@ -324,6 +336,22 @@ class UserApplicationADGAdmin(admin.ModelAdmin):
         application.reviewed_by = request.user
 
         application.save()
+
+    def _send_application_status_update_email(self, application, message_for_applicant):
+        """ Informs applicants about the decision taken against their application """
+        status_email_template_map = {
+            UserApplication.ACCEPTED: MandrillClient.APPLICATION_ACCEPTED,
+            UserApplication.WAITLIST: MandrillClient.APPLICATION_WAITLISTED
+        }
+        applicant = application.user
+        email_context = {
+            'first_name': get_user_first_name(applicant),
+            'message_for_applicant': message_for_applicant,
+        }
+
+        MandrillClient().send_mandrill_email(
+            status_email_template_map[application.status], applicant.email, email_context
+        )
 
     def email(self, obj):
         return format_html(EMAIL_ADDRESS_HTML_FORMAT, email_address=obj.user.email)

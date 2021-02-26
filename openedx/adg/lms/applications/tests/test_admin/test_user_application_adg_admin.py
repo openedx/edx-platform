@@ -5,9 +5,11 @@ Tests for all functionality related to UserApplicationADGAdmin
 
 import mock
 import pytest
+from django.contrib.auth.models import Group
 from django.utils.html import format_html
 
 from common.djangoapps.student.tests.factories import UserFactory
+from openedx.adg.common.lib.mandrill_client.client import MandrillClient
 from openedx.adg.constants import MONTH_DAY_YEAR_FORMAT
 from openedx.adg.lms.applications.admin import UserApplicationADGAdmin
 from openedx.adg.lms.applications.constants import (
@@ -44,6 +46,8 @@ from openedx.adg.lms.applications.constants import (
 )
 from openedx.adg.lms.applications.models import UserApplication
 from openedx.adg.lms.applications.tests.constants import (
+    ADMIN_TYPE_ADG_ADMIN,
+    ADMIN_TYPE_SUPER_ADMIN,
     ALL_FIELDSETS,
     FIELDSETS_WITHOUT_RESUME_OR_COVER_LETTER,
     FORMSET,
@@ -51,20 +55,57 @@ from openedx.adg.lms.applications.tests.constants import (
     NOTE,
     TEST_COVER_LETTER_FILE,
     TEST_COVER_LETTER_TEXT,
-    TEST_RESUME
+    TEST_MESSAGE_FOR_APPLICANT,
+    TEST_RESUME,
+    TITLE_BUSINESS_LINE_1,
+    TITLE_BUSINESS_LINE_2
 )
 from openedx.adg.lms.applications.tests.factories import ApplicationHubFactory, WorkExperienceFactory
 from openedx.adg.lms.registration_extension.tests.factories import ExtendedUserProfileFactory
 
 
+@pytest.mark.django_db
+@pytest.mark.parametrize(
+    'admin_type', [
+        ADMIN_TYPE_SUPER_ADMIN,
+        ADMIN_TYPE_ADG_ADMIN,
+    ], ids=[ADMIN_TYPE_SUPER_ADMIN, ADMIN_TYPE_ADG_ADMIN]
+)
 @mock.patch('openedx.adg.lms.applications.admin.UserApplication.submitted_applications')
-def test_get_queryset(mock_submitted_applications_manager):
+def test_get_queryset_with_super_admin_and_adg_admin(
+    mock_submitted_applications_manager, admin_user, user_applications_with_different_business_lines, request
+):
     """
-    Test that `get_queryset()` method calls the submitted_applications manager from UserApplication.
+    Test that `get_queryset()` returns all submitted applications for super admins and ADG Admins.
     """
-    UserApplicationADGAdmin.get_queryset('self', 'request')
+    mock_submitted_applications_manager.all.return_value = user_applications_with_different_business_lines
+    request.user = admin_user
 
-    assert mock_submitted_applications_manager.called_once()
+    assert UserApplicationADGAdmin.get_queryset('self', request) == user_applications_with_different_business_lines
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize(
+    'business_line_title', [
+        TITLE_BUSINESS_LINE_1,
+        TITLE_BUSINESS_LINE_2,
+    ], ids=[TITLE_BUSINESS_LINE_1, TITLE_BUSINESS_LINE_2]
+)
+@mock.patch('openedx.adg.lms.applications.admin.UserApplication.submitted_applications')
+def test_get_queryset_with_bu_admins(
+    mock_submitted_applications_manager,
+    business_line_title,
+    user_applications_with_different_business_lines,
+    request
+):
+    """
+    Test that `get_queryset()` returns only the applications of the particular business line, for business line admins
+    """
+    mock_submitted_applications_manager.all.return_value = user_applications_with_different_business_lines
+    request.user = UserFactory(is_staff=True, groups=[Group.objects.filter(name=business_line_title).first()])
+
+    assert len(UserApplicationADGAdmin.get_queryset('self', request)) == 1
+    assert UserApplicationADGAdmin.get_queryset('self', request).first().business_line.title == business_line_title
 
 
 @pytest.mark.django_db
@@ -130,7 +171,9 @@ def test_changelist_view(
 @mock.patch('openedx.adg.lms.applications.admin.admin.ModelAdmin.changeform_view')
 @mock.patch('openedx.adg.lms.applications.admin.get_extra_context_for_application_review_page')
 @mock.patch('openedx.adg.lms.applications.admin.UserApplicationADGAdmin._save_application_review_info')
+@mock.patch('openedx.adg.lms.applications.admin.UserApplicationADGAdmin._send_application_status_update_email')
 def test_changeform_view(
+    mock_send_application_status_update_email,
     mock_save_application_review_info,
     mock_get_extra_context_for_application_review_page,
     mock_changeform_view,
@@ -161,6 +204,7 @@ def test_changeform_view(
     UserApplicationADGAdmin.changeform_view(user_application_adg_admin_instance, request, application_id)
 
     mock_save_application_review_info.assert_not_called()
+    mock_send_application_status_update_email.assert_not_called()
     mock_get_extra_context_for_application_review_page.assert_called_once_with(user_application)
     mock_changeform_view.assert_called_once_with(request, application_id, extra_context=expected_context)
 
@@ -168,7 +212,9 @@ def test_changeform_view(
 @pytest.mark.django_db
 @mock.patch('openedx.adg.lms.applications.admin.admin.ModelAdmin.changeform_view')
 @mock.patch('openedx.adg.lms.applications.admin.UserApplicationADGAdmin._save_application_review_info')
+@mock.patch('openedx.adg.lms.applications.admin.UserApplicationADGAdmin._send_application_status_update_email')
 def test_changeform_view_post_with_status(
+    mock_send_application_status_update_email,
     mock_save_application_review_info,
     mock_changeform_view,
     request,
@@ -178,15 +224,21 @@ def test_changeform_view_post_with_status(
     """
     Test the overridden changeform_view.
 
-    Test that if a POST request is made with internal note and status, the application should be updated and saved.
+    Test that if a POST request is made with internal note and status, the application should be updated, saved and
+    an application status email should be sent to the applicant.
     """
     application_id = user_application.id
 
     request.method = 'POST'
-    request.POST = {'internal_note': NOTE, 'status': 'test_status'}
+    request.POST = {
+        'internal_note': NOTE,
+        'status': 'test_status',
+        'message_for_applicant': TEST_MESSAGE_FOR_APPLICANT
+    }
     UserApplicationADGAdmin.changeform_view(user_application_adg_admin_instance, request, application_id)
 
     mock_save_application_review_info.assert_called_once_with(user_application, request, NOTE)
+    mock_send_application_status_update_email.assert_called_once_with(user_application, TEST_MESSAGE_FOR_APPLICANT)
     mock_changeform_view.assert_called_once_with(request, application_id, extra_context=None)
 
 
@@ -205,6 +257,36 @@ def test_save_application_review_info(request, user_application):
     assert updated_application.status == UserApplication.ACCEPTED
     assert updated_application.internal_admin_note == NOTE
     assert updated_application.reviewed_by == request.user
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize(
+    'status, expected_email_template', [
+        (UserApplication.WAITLIST, MandrillClient.APPLICATION_WAITLISTED),
+        (UserApplication.ACCEPTED, MandrillClient.APPLICATION_ACCEPTED)
+    ], ids=['wait_list', 'accepted']
+)
+@mock.patch('openedx.adg.lms.applications.admin.get_user_first_name', return_value='test')
+@mock.patch('openedx.adg.lms.applications.admin.MandrillClient.__init__', return_value=None)
+@mock.patch('openedx.adg.lms.applications.admin.MandrillClient.send_mandrill_email')
+def test_send_application_status_update_email(
+    mock_send_mandrill_email, mock_init, mock_get_first_name, status, expected_email_template, request, user_application
+):
+    """
+     Test that upon application status update, applicant is intimated via an email with correct template and context.
+    """
+    request.method = 'POST'
+    user_application.status = status
+
+    expected_email_context = {
+        'first_name': mock_get_first_name(),
+        'message_for_applicant': TEST_MESSAGE_FOR_APPLICANT,
+    }
+
+    UserApplicationADGAdmin._send_application_status_update_email('self', user_application, TEST_MESSAGE_FOR_APPLICANT)
+    mock_send_mandrill_email.assert_called_once_with(
+        expected_email_template, user_application.user.email, expected_email_context
+    )
 
 
 @pytest.mark.django_db

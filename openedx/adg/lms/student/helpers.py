@@ -7,9 +7,8 @@ from django.contrib.auth.tokens import default_token_generator
 from django.urls import reverse
 from django.utils.http import int_to_base36
 
-from common.djangoapps.student.models import UserProfile
 from openedx.adg.common.lib.mandrill_client.client import MandrillClient
-from openedx.adg.common.lib.mandrill_client.email_data import EmailData
+from openedx.adg.lms.helpers import get_user_first_name
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangolib.markup import Text
@@ -26,7 +25,6 @@ def compose_and_send_adg_activation_email(user, activation_key):
     Returns:
         None
     """
-    user_profile = UserProfile.objects.get(user=user)
     root_url = configuration_helpers.get_value('LMS_ROOT_URL', settings.LMS_ROOT_URL)
     activation_url = '{root_url}/activate/{activation_key}'.format(
         root_url=root_url,
@@ -34,11 +32,11 @@ def compose_and_send_adg_activation_email(user, activation_key):
     )
 
     context = {
-        'first_name': user_profile.name.split()[0],
+        'first_name': get_user_first_name(user),
         'activation_link': activation_url
     }
 
-    send_mandrill_email(MandrillClient.USER_ACCOUNT_ACTIVATION, user.email, context)
+    MandrillClient().send_mandrill_email(MandrillClient.USER_ACCOUNT_ACTIVATION, user.email, context)
 
 
 def compose_and_send_adg_password_reset_email(user, request):
@@ -52,7 +50,6 @@ def compose_and_send_adg_password_reset_email(user, request):
     Returns:
         None
     """
-    user_profile = UserProfile.objects.get(user=user)
     reset_link = '{protocol}://{site}{link}?track=pwreset'.format(
         protocol='https' if request.is_secure() else 'http',
         site=configuration_helpers.get_value('SITE_NAME', settings.SITE_NAME),
@@ -63,11 +60,11 @@ def compose_and_send_adg_password_reset_email(user, request):
     )
 
     context = {
-        'first_name': user_profile.name.split()[0],
+        'first_name': get_user_first_name(user),
         'reset_link': reset_link
     }
 
-    send_mandrill_email(MandrillClient.PASSWORD_RESET, user.email, context)
+    MandrillClient().send_mandrill_email(MandrillClient.PASSWORD_RESET, user.email, context)
 
 
 def compose_and_send_adg_update_email_verification(user, use_https, confirm_link):
@@ -92,7 +89,7 @@ def compose_and_send_adg_update_email_verification(user, use_https, confirm_link
         'update_email_link': update_email_link
     }
 
-    send_mandrill_email(MandrillClient.CHANGE_USER_EMAIL_ALERT, user.email, context)
+    MandrillClient().send_mandrill_email(MandrillClient.CHANGE_USER_EMAIL_ALERT, user.email, context)
 
 
 def compose_and_send_adg_update_email_confirmation(user, context):
@@ -106,7 +103,7 @@ def compose_and_send_adg_update_email_confirmation(user, context):
     Returns:
         None
     """
-    send_mandrill_email(MandrillClient.VERIFY_CHANGE_USER_EMAIL, user.email, context)
+    MandrillClient().send_mandrill_email(MandrillClient.VERIFY_CHANGE_USER_EMAIL, user.email, context)
 
 
 def compose_and_send_adg_course_enrollment_confirmation_email(user, course_id):
@@ -131,7 +128,7 @@ def compose_and_send_adg_course_enrollment_confirmation_email(user, course_id):
         'course_name': course.display_name,
         'course_url': course_url
     }
-    send_mandrill_email(MandrillClient.ENROLLMENT_CONFIRMATION, user.email, context)
+    MandrillClient().send_mandrill_email(MandrillClient.ENROLLMENT_CONFIRMATION, user.email, context)
 
 
 def compose_and_send_adg_course_enrollment_invitation_email(user_email, message_context):
@@ -155,20 +152,4 @@ def compose_and_send_adg_course_enrollment_invitation_email(user_email, message_
         message_context['full_name'] = user.profile.name
 
     message_context.pop('course')
-    send_mandrill_email(MandrillClient.COURSE_ENROLLMENT_INVITATION, user_email, message_context)
-
-
-def send_mandrill_email(template, email, context):
-    """
-    Send mandrill email
-
-    Arguments:
-        template (str): String containing template id
-        email (str): Email address of user
-        context (dict): Dictionary containing email content
-
-    Returns:
-        None
-    """
-    email_data = EmailData(template, email, context)
-    MandrillClient().send_mail(email_data)
+    MandrillClient().send_mandrill_email(MandrillClient.COURSE_ENROLLMENT_INVITATION, user_email, message_context)

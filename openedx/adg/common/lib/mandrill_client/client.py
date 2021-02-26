@@ -6,6 +6,8 @@ import logging
 import mandrill
 from django.conf import settings
 
+from .email_data import EmailData
+
 log = logging.getLogger(__name__)
 
 
@@ -20,11 +22,13 @@ class MandrillClient(object):
     USER_ACCOUNT_ACTIVATION = 'adg-user-activation-email'
     VERIFY_CHANGE_USER_EMAIL = 'adg-verify-email-address-change-step-2'
     APPLICATION_SUBMISSION_CONFIRMATION = 'adg-application-submission-confirmation-1'
+    APPLICATION_WAITLISTED = 'adg-waitlisted-application'
+    APPLICATION_ACCEPTED = 'adg-application-accepted'
 
     def __init__(self):
         self.mandrill_client = mandrill.Mandrill(settings.MANDRILL_API_KEY)
 
-    def send_mail(self, email_data):
+    def _send_mail(self, email_data):
         """
         Calls the mandrill API for the specific template and email
 
@@ -47,3 +51,18 @@ class MandrillClient(object):
             )
             raise
         return result
+
+    def send_mandrill_email(self, template, email, context):
+        """
+        Creates EmailData object and calls _send_email
+
+        Arguments:
+            template (str): String containing template id
+            email (str): Email address of user
+            context (dict): Dictionary containing email content
+
+        Returns:
+            None
+        """
+        email_data = EmailData(template, email, context)
+        self._send_mail(email_data)

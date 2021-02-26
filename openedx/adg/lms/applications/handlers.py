@@ -16,11 +16,12 @@ def update_business_line_group(instance, **kwargs):  # pylint: disable=unused-ar
     Modify user group on updating a Business Line
     """
     if instance.pk is None:
-        Group.objects.create(name=instance.title)
+        instance.group = Group.objects.create(name=instance.title)
     else:
         old_instance = BusinessLine.objects.get(pk=instance.pk)
         if old_instance.title != instance.title:
-            Group.objects.filter(name=old_instance.title).update(name=instance.title)
+            instance.group.name = instance.title
+            instance.group.save()
 
 
 @receiver(post_delete, sender=BusinessLine)
@@ -28,4 +29,5 @@ def delete_business_line_group(instance, **kwargs):  # pylint: disable=unused-ar
     """
     Delete user group on deleting a Business Line
     """
+    # TODO: Use instance.group.delete(), once LP-2479 is deployed on prod.
     Group.objects.filter(name=instance.title).delete()
