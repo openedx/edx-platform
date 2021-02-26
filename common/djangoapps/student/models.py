@@ -2558,10 +2558,7 @@ def log_successful_logout(sender, request, user, **kwargs):  # lint-amnesty, pyl
             AUDIT_LOG.info('Logout - user.id: {0}'.format(request.user.id))  # pylint: disable=logging-format-interpolation
         else:
             AUDIT_LOG.info('Logout - {0}'.format(request.user))  # pylint: disable=logging-format-interpolation
-        tracker.emit('edx.bi.user.account.logout', {
-            'referrer': request.META.get('HTTP_REFERER'),
-            'user_id': request.user.id,
-        })
+        segment.track(request.user.id, 'edx.bi.user.account.logout')
 
 
 @receiver(user_logged_in)
