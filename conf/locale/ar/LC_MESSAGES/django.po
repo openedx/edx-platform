@@ -58,7 +58,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2021-02-25 08:17+0000\n"
+"POT-Creation-Date: 2021-02-26 05:36+0000\n"
 "PO-Revision-Date: 2020-10-27 19:12+0000\n"
 "Last-Translator: Rana Waqar <rana.waqar@arbisoft.com>, 2020\n"
 "Language-Team: Arabic (https://www.transifex.com/philanthropy-u/teams/113553/ar/)\n"
@@ -9441,6 +9441,16 @@ msgid "LMS Administration"
 msgstr "إدارة LMS"
 
 #: openedx/adg/lms/applications/admin.py
+msgid "Please add language of the course from studio."
+msgstr ""
+
+#: openedx/adg/lms/applications/admin.py
+msgid ""
+"You cannot add 2 or more courses with same language. Add courses of "
+"different language or change language of a course from studio!"
+msgstr ""
+
+#: openedx/adg/lms/applications/admin.py
 msgid "Al-Dabbagh"
 msgstr ""
 
@@ -9739,6 +9749,10 @@ msgstr ""
 #: openedx/adg/lms/applications/models.py
 msgid "Course group name"
 msgstr "متصفّح كروم للمساق"
+
+#: openedx/adg/lms/applications/models.py
+msgid "Is Prerequisite Course Group"
+msgstr "مساقات أساسية"
 
 #: openedx/adg/lms/applications/models.py
 msgid "Multilingual version of a course"
