@@ -1,10 +1,10 @@
 """
 Shallow tests for `./manage.py cms reset_course_content COURSE_KEY VERSION_GUID`
 """
-import mock
+from unittest import mock
 
-from django.test import TestCase
 from django.core.management import CommandError, call_command
+from django.test import TestCase
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
 

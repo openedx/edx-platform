@@ -7,7 +7,6 @@ from datetime import datetime, timedelta
 
 from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.core.management.base import BaseCommand, CommandError
-from six import text_type
 
 from cms.djangoapps.contentstore.management.commands.utils import user_from_str
 from cms.djangoapps.contentstore.views.course import create_new_course_in_store
@@ -23,12 +22,12 @@ class Command(BaseCommand):
     """
 
     # can this query modulestore for the list of write accessible stores or does that violate command pattern?
-    help = u"Create a course in one of {}".format([ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split])
+    help = "Create a course in one of {}".format([ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split])
 
     def add_arguments(self, parser):
         parser.add_argument('modulestore',
                             choices=MODULESTORE_CHOICES,
-                            help=u"Modulestore must be one of {}".format(MODULESTORE_CHOICES))
+                            help=f"Modulestore must be one of {MODULESTORE_CHOICES}")
         parser.add_argument('user',
                             help="The instructor's email address or integer ID.")
         parser.add_argument('org',
@@ -53,7 +52,7 @@ class Command(BaseCommand):
         try:
             user_object = user_from_str(user)
         except User.DoesNotExist:
-            raise CommandError(u"No user {user} found.".format(user=user))  # lint-amnesty, pylint: disable=raise-missing-from
+            raise CommandError(f"No user {user} found.")  # lint-amnesty, pylint: disable=raise-missing-from
         return user_object
 
     def handle(self, *args, **options):
@@ -87,6 +86,6 @@ class Command(BaseCommand):
                 run,
                 fields
             )
-            self.stdout.write(u"Created {}".format(text_type(new_course.id)))
+            self.stdout.write("Created {}".format(str(new_course.id)))
         except DuplicateCourseError:
-            self.stdout.write(u"Course already exists")
+            self.stdout.write("Course already exists")

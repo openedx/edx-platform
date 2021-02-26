@@ -98,7 +98,7 @@ def export_course_to_directory(course_key, root_dir):
     # The safest characters are A-Z, a-z, 0-9, <underscore>, <period> and <hyphen>.
     # We represent the first four with \w.
     # TODO: Once we support courses with unicode characters, we will need to revisit this.
-    replacement_char = u'-'
+    replacement_char = '-'
     course_dir = replacement_char.join([course.id.org, course.id.course, course.id.run])
     course_dir = re.sub(r'[^\w\.\-]', replacement_char, course_dir)
 
