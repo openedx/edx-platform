@@ -113,6 +113,7 @@
                 if (_.isUndefined(message) || _.isNull(message)) {
                     message = this.helpMessage;
                 }
+
                 this.$('.u-field-message-notification').html('');
                 HtmlUtils.setHtml(this.$('.u-field-message-help'), message);
             },
@@ -166,7 +167,7 @@
                 }, messageRevertDelay);
             },
 
-            showErrorMessage: function(xhr) {
+            showErrorMessage: function(xhr, message=null) {
                 if (xhr.status === 400) {
                     try {
                         var errors = JSON.parse(xhr.responseText),
@@ -177,7 +178,11 @@
                         this.showNotificationMessage(this.getMessage('error'));
                     }
                 } else {
-                    this.showNotificationMessage(this.getMessage('error'));
+                    var errorMessage = message;
+                    if (errorMessage === null) {
+                      errorMessage = this.getMessage('error');
+                    }
+                    this.showNotificationMessage(message);
                 }
             }
         });
