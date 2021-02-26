@@ -114,3 +114,7 @@ edx-bulk-grades<0.8.5
 
 # python3-saml==1.10.0 version started breaking a11y tests
 python3-saml<1.10.0
+
+# With greater version these tests `common.djangoapps.terrain.stubs.tests` becomes flaky on jenkins.
+httpretty<1.0
+
