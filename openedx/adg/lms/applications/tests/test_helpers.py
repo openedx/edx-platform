@@ -1,7 +1,7 @@
 """
 All tests for applications helpers functions
 """
-from datetime import date
+from datetime import date, datetime, timedelta
 from unittest.mock import Mock, patch
 
 import mock
@@ -10,7 +10,7 @@ from django.core.exceptions import ValidationError
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.utils.html import format_html
 
-from common.djangoapps.student.tests.factories import UserFactory
+from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
 from openedx.adg.lms.applications.constants import (
     COVER_LETTER_ONLY,
     FILE_MAX_SIZE,
@@ -28,6 +28,7 @@ from openedx.adg.lms.applications.helpers import (
     get_duration,
     get_embedded_view_html,
     get_extra_context_for_application_review_page,
+    get_prerequisite_courses_for_user,
     is_displayable_on_browser,
     max_year_value_validator,
     min_year_value_validator,
@@ -36,8 +37,10 @@ from openedx.adg.lms.applications.helpers import (
     validate_logo_size
 )
 from openedx.adg.lms.applications.models import UserApplication
+from openedx.core.djangoapps.content.course_overviews.tests.factories import CourseOverviewFactory
 
 from .constants import EMAIL
+from .factories import MultilingualCourseFactory, MultilingualCourseGroupFactory
 
 DATE_COMPLETED_MONTH = 5
 DATE_COMPLETED_YEAR = 2020
@@ -303,3 +306,43 @@ def test_get_extra_context_for_application_review_page(mock_get_application_revi
     actual_context = get_extra_context_for_application_review_page(user_application)
 
     assert expected_context == actual_context
+
+
+@pytest.mark.django_db
+@mock.patch('openedx.adg.lms.applications.helpers.modulestore')
+def test_get_prerequisites_for_user(mock_module_store):
+    """
+    Test to get prerequisites for user
+    """
+    mock_module_store.get_course.return_value = mock.Mock()
+    MultilingualCourseFactory()
+    user = UserFactory()
+    assert len(get_prerequisite_courses_for_user(user)) == 1
+
+
+@pytest.mark.django_db
+@mock.patch('openedx.adg.lms.applications.helpers.modulestore')
+def test_no_prerequisite_courses(mock_module_store):
+    """
+    Test no prerequisites courses for user
+    """
+    mock_module_store.get_course.return_value = mock.Mock()
+    MultilingualCourseGroupFactory()
+    user = UserFactory()
+    assert len(get_prerequisite_courses_for_user(user)) == 0
+
+
+@pytest.mark.django_db
+def test_get_enrolled_prerequisites_for_user():
+    """
+    Test to get enrolled prerequisites for user
+    """
+    user = UserFactory()
+    current_time = datetime.now()
+    course = CourseOverviewFactory(
+        start_date=current_time - timedelta(days=1),
+        end_date=current_time + timedelta(days=1)
+    )
+    MultilingualCourseFactory(course=course)
+    CourseEnrollmentFactory(course=course, user=user, is_active=True)
+    assert len(get_prerequisite_courses_for_user(user)) == 1

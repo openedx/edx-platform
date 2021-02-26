@@ -9,7 +9,7 @@ from django.core.management.base import BaseCommand
 from django.db.models import Q
 
 from lms.djangoapps.grades.api import CourseGradeFactory
-from openedx.adg.lms.applications.models import ApplicationHub, PrerequisiteCourseGroup
+from openedx.adg.lms.applications.models import ApplicationHub, MultilingualCourseGroup
 
 logger = logging.getLogger(__name__)
 
@@ -20,7 +20,7 @@ class Command(BaseCommand):
     """
 
     def handle(self, *args, **kwargs):  # pylint: disable=unused-argument
-        prereq_course_groups = PrerequisiteCourseGroup.non_empty_prereq_course_groups()
+        prereq_course_groups = MultilingualCourseGroup.prerequisite_course_groups.all()
 
         if not prereq_course_groups:
             sys.exit('Exiting!!! No open pre-req courses found but there must be some pre-reqs. Please add from admin')
@@ -71,7 +71,7 @@ class Command(BaseCommand):
         Returns:
             A querySet for users who should be checked for the update
         """
-        course_keys = prereq_course_group.course_keys()
+        course_keys = prereq_course_group.open_multilingual_course_keys()
         return User.objects.filter(
             id__in=users_to_be_checked_for_update,
             courseenrollment__course__in=course_keys,
@@ -117,7 +117,7 @@ class Command(BaseCommand):
         Returns:
             boolean, True if the course is failed otherwise False
         """
-        course_keys = prereq_course_group.course_keys()
+        course_keys = prereq_course_group.open_multilingual_course_keys()
 
         for course_key in course_keys:
             course_grade = CourseGradeFactory().read(user, course_key=course_key)

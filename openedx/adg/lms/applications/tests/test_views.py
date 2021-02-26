@@ -163,7 +163,6 @@ def test_get_complete_application_done_state_for_application_hub_view(mock_rende
     Test the case where the user has completed both objectives i.e the pre_req courses and the
     written application.
     """
-
     ApplicationHubView.as_view()(application_hub_view_get_request)
 
     expected_context = {

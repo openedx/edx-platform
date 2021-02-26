@@ -11,9 +11,12 @@ from django.utils.translation import ugettext as _
 
 from openedx.adg.common.lib.mandrill_client.client import MandrillClient
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
+from openedx.core.djangoapps.user_api.models import UserPreference
+from xmodule.modulestore.django import modulestore
 
 from .constants import (
     COVER_LETTER_ONLY,
+    DEFAULT_LANG_FOR_COURSES,
     HTML_FOR_EMBEDDED_FILE_VIEW,
     LOGO_IMAGE_MAX_SIZE,
     MAXIMUM_YEAR_OPTION,
@@ -243,3 +246,57 @@ def get_extra_context_for_application_review_page(application):
     }
 
     return extra_context
+
+
+def get_prerequisite_courses_for_user(user):
+    """
+    Get list of prerequisite courses for a user.
+    Following are the preferences for the prerequisites list.
+
+    1. Enrollment
+        If a user is enrolled in any of the courses of a prerequisite
+        group then that course is selected from the group.
+
+    2. Language preferred
+        If user has not enrolled in any of the courses of a prerequisite
+        group then find a course with preferred language.
+
+    Args:
+        user (User): user for which we need to find the prerequisite courses
+
+    Returns:
+        list: List of prerequisites for the user
+    """
+    from .models import MultilingualCourseGroup
+
+    prerequisite_course_groups = MultilingualCourseGroup.prerequisite_course_groups.all()
+
+    prerequisite_courses_for_user = []
+    for course_group in prerequisite_course_groups:
+        prerequisite_courses_for_user.append(
+            course_group.get_user_enrolled_course(user) or get_preferred_lang_course(user, course_group)
+        )
+    return prerequisite_courses_for_user
+
+
+def get_preferred_lang_course(user, course_group):
+    """
+    Return course with preferred language. If course with preferred lang
+    is not found then return the first course from the group.
+
+    Args:
+        user (User): user object
+        course_group (MultilingualCourseGroup): course group from which preferred course will be extracted
+
+    Returns:
+        MultilingualCourse: User preferred lang course.
+    """
+    store = modulestore()
+    user_preferred_lang = UserPreference.get_value(user, 'pref-lang', default=DEFAULT_LANG_FOR_COURSES)
+
+    for multilingual_course in course_group.multilingual_courses.all():
+        course_info = store.get_course(multilingual_course.course.id)
+        if course_info.language == user_preferred_lang:
+            return multilingual_course.course
+
+    return course_group.multilingual_courses.first().course

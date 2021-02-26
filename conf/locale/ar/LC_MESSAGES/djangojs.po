@@ -51,7 +51,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2021-02-25 10:48+0000\n"
+"POT-Creation-Date: 2021-02-26 05:46+0000\n"
 "PO-Revision-Date: 2020-10-27 19:11+0000\n"
 "Last-Translator: Imran Bashir <admin@omnipreneurshipacademy.com>, 2021\n"
 "Language-Team: Arabic (https://www.transifex.com/philanthropy-u/teams/113553/ar/)\n"
@@ -11444,18 +11444,3 @@ msgstr ""
 #: cms/templates/js/video/transcripts/messages/transcripts-use-existing.underscore
 msgid "Use Current Transcript"
 msgstr "استخدم النص الحالي"
-
-#~ msgid "This field is required"
-#~ msgstr "كلمة المرور مطلوبة"
-
-#~ msgid "Please enter valid url"
-#~ msgstr "يُرجى إدخال الدرجة."
-
-#~ msgid "Forgot password?"
-#~ msgstr "استعادة كلمة المرور الخاصة بي"
-
-#~ msgid "Create account"
-#~ msgstr "إنشاء حساب"
-
-#~ msgid "Already have an account?"
-#~ msgstr "هل لديك حساب {platformName} مسبقاً؟"

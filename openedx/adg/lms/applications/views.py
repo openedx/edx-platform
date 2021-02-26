@@ -18,10 +18,9 @@ from openedx.adg.lms.applications.forms import (
 )
 from openedx.adg.lms.registration_extension.models import ExtendedUserProfile
 from openedx.adg.lms.utils.date_utils import month_choices, year_choices
-from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 
-from .helpers import send_application_submission_confirmation_email
-from .models import ApplicationHub, BusinessLine, Education, PrerequisiteCourse, UserApplication
+from .helpers import get_prerequisite_courses_for_user, send_application_submission_confirmation_email
+from .models import ApplicationHub, BusinessLine, Education, UserApplication
 
 
 class RedirectToLoginOrRelevantPageMixin(AccessMixin):
@@ -106,8 +105,7 @@ class ApplicationHubView(RedirectToLoginOrRelevantPageMixin, View):
             HttpResponse object.
         """
         user_application_hub, _ = ApplicationHub.objects.get_or_create(user=self.request.user)
-        pre_req_course_ids = PrerequisiteCourse.open_prereq_course_manager.all()
-        pre_req_courses = [CourseOverview.get_from_id(course_id) for course_id in pre_req_course_ids]
+        pre_req_courses = get_prerequisite_courses_for_user(request.user)
 
         return render(
             request,
