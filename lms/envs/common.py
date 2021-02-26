@@ -415,8 +415,18 @@ FEATURES = {
     # Hide any Personally Identifiable Information from application logs
     'SQUELCH_PII_IN_LOGS': True,
 
-    # Toggles the embargo functionality, which blocks users from
-    # the site or courses based on their location.
+    # .. toggle_name: FEATURES['EMBARGO']
+    # .. toggle_implementation: DjangoSetting
+    # .. toggle_default: False
+    # .. toggle_description: Turns on embargo functionality, which blocks users from
+    #   the site or courses based on their location. Embargo can restrict users by states
+    #   and whitelist/blacklist (IP Addresses (ie. 10.0.0.0), Networks (ie. 10.0.0.0/24)), or the user profile country.
+    # .. toggle_use_cases: open_edx
+    # .. toggle_creation_date: 2014-02-27
+    # .. toggle_target_removal_date: None
+    # .. toggle_warnings: reverse proxy should be configured appropriately for example Client IP address headers
+    #   (e.g HTTP_X_FORWARDED_FOR) should be configured.
+    # .. toggle_tickets: https://github.com/edx/edx-platform/pull/2749
     'EMBARGO': False,
 
     # Whether the Wiki subsystem should be accessible via the direct /wiki/ paths. Setting this to True means
