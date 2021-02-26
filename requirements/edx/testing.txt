@@ -99,7 +99,7 @@ drf-yasg==1.20.0          # via -r requirements/edx/base.txt, edx-api-doc-tools
 edx-ace==0.1.17           # via -r requirements/edx/base.txt
 edx-analytics-data-api-client==0.17.0  # via -r requirements/edx/base.txt
 edx-api-doc-tools==1.4.0  # via -r requirements/edx/base.txt
-edx-bulk-grades==0.8.2    # via -c requirements/edx/../constraints.txt, -r requirements/edx/base.txt, staff-graded-xblock
+edx-bulk-grades==0.8.6    # via -r requirements/edx/base.txt, staff-graded-xblock
 edx-ccx-keys==1.2.0       # via -r requirements/edx/base.txt
 edx-celeryutils==1.0.0    # via -r requirements/edx/base.txt, super-csv
 edx-completion==4.0.3     # via -r requirements/edx/base.txt
@@ -183,13 +183,13 @@ mongoengine==0.22.1       # via -r requirements/edx/base.txt
 more-itertools==8.7.0     # via -r requirements/edx/coverage.txt, zipp
 mpmath==1.2.1             # via -r requirements/edx/base.txt, sympy
 mysqlclient==2.0.3        # via -r requirements/edx/base.txt
-newrelic==6.0.1.155       # via -r requirements/edx/base.txt, edx-django-utils
+newrelic==6.2.0.156       # via -r requirements/edx/base.txt, edx-django-utils
 nltk==3.5                 # via -r requirements/edx/base.txt, chem
 nodeenv==1.5.0            # via -r requirements/edx/base.txt
 numpy==1.20.1             # via -r requirements/edx/base.txt, chem, openedx-calc, scipy
 oauthlib==3.0.1           # via -c requirements/edx/../constraints.txt, -r requirements/edx/base.txt, django-oauth-toolkit, lti-consumer-xblock, requests-oauthlib, social-auth-core
 openedx-calc==2.0.1       # via -r requirements/edx/base.txt
-ora2==3.1.6               # via -r requirements/edx/base.txt
+ora2==3.2.0               # via -r requirements/edx/base.txt
 packaging==20.9           # via -r requirements/edx/base.txt, bleach, drf-yasg, pytest, tox
 path.py==12.5.0           # via -r requirements/edx/base.txt, edx-enterprise, edx-i18n-tools, ora2, staff-graded-xblock, xmodule
 path==13.1.0              # via -c requirements/edx/../constraints.txt, -r requirements/edx/base.txt, path.py
@@ -255,8 +255,8 @@ selenium==3.141.0         # via -r requirements/edx/testing.in, bok-choy
 semantic-version==2.8.5   # via -r requirements/edx/base.txt, edx-drf-extensions
 shapely==1.7.1            # via -r requirements/edx/base.txt
 simplejson==3.17.2        # via -r requirements/edx/base.txt, sailthru-client, super-csv, xblock-utils
-singledispatch==3.6.0     # via -r requirements/edx/testing.in
-six==1.15.0               # via -r requirements/edx/base.txt, analytics-python, bleach, bok-choy, chem, codejail, crowdsourcehinter-xblock, cryptography, django-countries, django-simple-history, edx-ace, edx-bulk-grades, edx-ccx-keys, edx-django-release-util, edx-drf-extensions, edx-enterprise, edx-i18n-tools, edx-lint, edx-milestones, edx-rbac, event-tracking, freezegun, fs, fs-s3fs, html5lib, isodate, libsass, mock, paver, pycontracts, pyjwkest, python-dateutil, python-memcached, python-swiftclient, singledispatch, social-auth-app-django, social-auth-core, stevedore, tox, transifex-client, virtualenv, xblock
+singledispatch==3.6.1     # via -r requirements/edx/testing.in
+six==1.15.0               # via -r requirements/edx/base.txt, analytics-python, bleach, bok-choy, chem, codejail, crowdsourcehinter-xblock, cryptography, django-countries, django-simple-history, edx-ace, edx-bulk-grades, edx-ccx-keys, edx-django-release-util, edx-drf-extensions, edx-enterprise, edx-i18n-tools, edx-lint, edx-milestones, edx-rbac, event-tracking, freezegun, fs, fs-s3fs, html5lib, isodate, libsass, paver, pycontracts, pyjwkest, python-dateutil, python-memcached, python-swiftclient, singledispatch, social-auth-app-django, social-auth-core, stevedore, tox, transifex-client, virtualenv, xblock
 slumber==0.7.1            # via -r requirements/edx/base.txt, edx-bulk-grades, edx-enterprise, edx-rest-api-client
 smmap==3.0.5              # via gitdb
 social-auth-app-django==4.0.0  # via -r requirements/edx/base.txt
@@ -276,7 +276,7 @@ tincan==1.0.0             # via -r requirements/edx/base.txt, edx-event-routing-
 toml==0.10.2              # via pylint, pytest, tox
 tox-battery==0.6.1        # via -r requirements/edx/testing.in
 tox==3.22.0               # via -r requirements/edx/testing.in, tox-battery
-tqdm==4.57.0              # via -r requirements/edx/base.txt, nltk
+tqdm==4.58.0              # via -r requirements/edx/base.txt, nltk
 transifex-client==0.14.2  # via -r requirements/edx/testing.in
 ua-parser==0.10.0         # via -r requirements/edx/base.txt, django-cookies-samesite
 unicodecsv==0.14.1        # via -r requirements/edx/base.txt, edx-enterprise
