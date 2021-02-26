@@ -185,7 +185,7 @@ markupsafe==1.1.1         # via -r requirements/edx/testing.txt, chem, jinja2, m
 maxminddb==1.5.4          # via -c requirements/edx/../constraints.txt, -r requirements/edx/testing.txt, geoip2
 mccabe==0.6.1             # via -r requirements/edx/testing.txt, pylint
 mistune==0.8.4            # via m2r
-mock==3.0.5               # via -c requirements/edx/../constraints.txt, -r requirements/edx/testing.txt, xblock-drag-and-drop-v2, xblock-poll
+mock==4.0.3               # via -r requirements/edx/testing.txt, xblock-drag-and-drop-v2, xblock-poll
 git+https://github.com/edx/MongoDBProxy.git@d92bafe9888d2940f647a7b2b2383b29c752f35a#egg=MongoDBProxy==0.1.0+edx.2  # via -r requirements/edx/testing.txt
 mongoengine==0.22.1       # via -r requirements/edx/testing.txt
 more-itertools==8.7.0     # via -r requirements/edx/testing.txt, zipp
