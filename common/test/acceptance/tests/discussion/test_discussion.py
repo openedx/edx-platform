@@ -7,17 +7,19 @@ from uuid import uuid4
 
 import pytest
 
-from common.test.acceptance.fixtures.course import CourseFixture, XBlockFixtureDesc  # lint-amnesty, pylint: disable=unused-import
+from common.test.acceptance.fixtures.course import CourseFixture  # lint-amnesty, pylint: disable=unused-import
 from common.test.acceptance.fixtures.discussion import (
     Comment,
     Response,
     SingleThreadViewFixture,
     Thread,
+
 )
 from common.test.acceptance.pages.common.auto_auth import AutoAuthPage
 from common.test.acceptance.pages.lms.discussion import (
     DiscussionTabHomePage,
     DiscussionTabSingleThreadPage,
+
 )
 from common.test.acceptance.tests.discussion.helpers import BaseDiscussionMixin, BaseDiscussionTestCase
 from common.test.acceptance.tests.helpers import UniqueCourseTest

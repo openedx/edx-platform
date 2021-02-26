@@ -3,7 +3,7 @@ Course Outline page in Studio.
 """
 
 
-from bok_choy.javascript import js_defined, wait_for_js  # lint-amnesty, pylint: disable=unused-import
+from bok_choy.javascript import js_defined  # lint-amnesty, pylint: disable=unused-import
 from bok_choy.page_object import PageObject
 from bok_choy.promise import EmptyPromise
 from selenium.webdriver.support.ui import Select
