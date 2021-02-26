@@ -7,9 +7,9 @@ import ddt
 import pytz
 from django.test import RequestFactory
 
-from openedx.core.lib.courses import course_image_url
 from common.djangoapps.student.roles import CourseInstructorRole, CourseStaffRole
 from common.djangoapps.student.tests.factories import UserFactory
+from openedx.core.lib.courses import course_image_url
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
@@ -21,7 +21,7 @@ from ..utils import serialize_datetime
 class CourseRunSerializerTests(ModuleStoreTestCase):  # lint-amnesty, pylint: disable=missing-class-docstring
 
     def setUp(self):
-        super(CourseRunSerializerTests, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
 
         self.course_start = datetime.datetime.now(pytz.UTC)
         self.course_end = self.course_start + datetime.timedelta(days=30)

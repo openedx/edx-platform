@@ -7,7 +7,6 @@ import logging
 from contextlib import contextmanager
 from datetime import datetime
 
-import six
 from django.conf import settings
 from django.urls import reverse
 from django.utils import translation
@@ -15,17 +14,16 @@ from django.utils.translation import ugettext as _
 from opaque_keys.edx.keys import CourseKey, UsageKey
 from opaque_keys.edx.locator import LibraryLocator
 from pytz import UTC
-from six import text_type
 
+from common.djangoapps.student import auth
+from common.djangoapps.student.models import CourseEnrollment
+from common.djangoapps.student.roles import CourseInstructorRole, CourseStaffRole
 from openedx.core.djangoapps.django_comment_common.models import assign_default_role
 from openedx.core.djangoapps.django_comment_common.utils import seed_permissions_roles
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.site_configuration.models import SiteConfiguration
 from openedx.features.content_type_gating.models import ContentTypeGatingConfig
 from openedx.features.content_type_gating.partitions import CONTENT_TYPE_GATING_SCHEME
-from common.djangoapps.student import auth
-from common.djangoapps.student.models import CourseEnrollment
-from common.djangoapps.student.roles import CourseInstructorRole, CourseStaffRole
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError
@@ -100,7 +98,7 @@ def _remove_instructors(course_key):
     try:
         remove_all_instructors(course_key)
     except Exception as err:  # lint-amnesty, pylint: disable=broad-except
-        log.error(u"Error in deleting course groups for {0}: {1}".format(course_key, err))
+        log.error(f"Error in deleting course groups for {course_key}: {err}")
 
 
 def get_lms_link_for_item(location, preview=False):
@@ -132,10 +130,10 @@ def get_lms_link_for_item(location, preview=False):
             settings.FEATURES.get('PREVIEW_LMS_BASE')
         )
 
-    return u"//{lms_base}/courses/{course_key}/jump_to/{location}".format(
+    return "//{lms_base}/courses/{course_key}/jump_to/{location}".format(
         lms_base=lms_base,
-        course_key=text_type(location.course_key),
-        location=text_type(location),
+        course_key=str(location.course_key),
+        location=str(location),
     )
 
 
@@ -151,9 +149,9 @@ def get_lms_link_for_certificate_web_view(course_key, mode):
     if lms_base is None:
         return None
 
-    return u"//{certificate_web_base}/certificates/course/{course_id}?preview={mode}".format(
+    return "//{certificate_web_base}/certificates/course/{course_id}?preview={mode}".format(
         certificate_web_base=lms_base,
-        course_id=six.text_type(course_key),
+        course_id=str(course_key),
         mode=mode
     )
 
@@ -292,7 +290,7 @@ def reverse_url(handler_name, key_name=None, key_value=None, kwargs=None):
     Creates the URL for the given handler.
     The optional key_name and key_value are passed in as kwargs to the handler.
     """
-    kwargs_for_reverse = {key_name: six.text_type(key_value)} if key_name else None
+    kwargs_for_reverse = {key_name: str(key_value)} if key_name else None
     if kwargs:
         kwargs_for_reverse.update(kwargs)
     return reverse(handler_name, kwargs=kwargs_for_reverse)
@@ -332,7 +330,7 @@ def get_split_group_display_name(xblock, course):
     """
     for user_partition in get_user_partition_info(xblock, schemes=['random'], course=course):
         for group in user_partition['groups']:
-            if u'Group ID {group_id}'.format(group_id=group['id']) == xblock.display_name_with_default:
+            if 'Group ID {group_id}'.format(group_id=group['id']) == xblock.display_name_with_default:
                 return group['name']
 
 
@@ -400,7 +398,7 @@ def get_user_partition_info(xblock, schemes=None, course=None):
 
     if course is None:
         log.warning(
-            u"Could not find course %s to retrieve user partition information",
+            "Could not find course %s to retrieve user partition information",
             xblock.location.course_key
         )
         return []
@@ -432,7 +430,7 @@ def get_user_partition_info(xblock, schemes=None, course=None):
                 })
 
             # Next, add any groups set on the XBlock that have been deleted
-            all_groups = set(g.id for g in p.groups)
+            all_groups = {g.id for g in p.groups}
             missing_group_ids = selected_groups - all_groups
             for gid in missing_group_ids:
                 groups.append({
@@ -445,7 +443,7 @@ def get_user_partition_info(xblock, schemes=None, course=None):
             # Put together the entire partition dictionary
             partitions.append({
                 "id": p.id,
-                "name": six.text_type(p.name),  # Convert into a string in case ugettext_lazy was used
+                "name": str(p.name),  # Convert into a string in case ugettext_lazy was used
                 "scheme": p.scheme.name,
                 "groups": groups,
             })
@@ -502,7 +500,7 @@ def get_visibility_partition_info(xblock, course=None):
                 else:
                     # Translators: This is building up a list of groups. It is marked for translation because of the
                     # comma, which is used as a separator between each group.
-                    selected_groups_label = _(u'{previous_groups}, {current_group}').format(
+                    selected_groups_label = _('{previous_groups}, {current_group}').format(
                         previous_groups=selected_groups_label,
                         current_group=group['name']
                     )
@@ -527,7 +525,7 @@ def get_xblock_aside_instance(usage_key):
             if aside.scope_ids.block_type == usage_key.aside_type:
                 return aside
     except ItemNotFoundError:
-        log.warning(u'Unable to load item %s', usage_key.usage_key)
+        log.warning('Unable to load item %s', usage_key.usage_key)
 
 
 def is_self_paced(course):
@@ -567,7 +565,7 @@ def get_sibling_urls(subsection):
             # section.get_parent SHOULD return the course, but for some reason, it might not
             sections = section.get_parent().get_children()
         except AttributeError:
-            log.error(u"URL Retrieval Error # 1: subsection {subsection} included in section {section}".format(
+            log.error("URL Retrieval Error # 1: subsection {subsection} included in section {section}".format(
                 section=section.location,
                 subsection=subsection.location
             ))
@@ -583,7 +581,7 @@ def get_sibling_urls(subsection):
         try:
             sections = section.get_parent().get_children()
         except AttributeError:
-            log.error(u"URL Retrieval Error # 2: subsection {subsection} included in section {section}".format(
+            log.error("URL Retrieval Error # 2: subsection {subsection} included in section {section}".format(
                 section=section.location,
                 subsection=subsection.location
             ))

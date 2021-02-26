@@ -8,7 +8,7 @@ from django.core.files.uploadhandler import FileUploadHandler
 
 class DebugFileUploader(FileUploadHandler):  # lint-amnesty, pylint: disable=missing-class-docstring
     def __init__(self, request=None):
-        super(DebugFileUploader, self).__init__(request)  # lint-amnesty, pylint: disable=super-with-arguments
+        super().__init__(request)
         self.count = 0
 
     def receive_data_chunk(self, raw_data, start):
