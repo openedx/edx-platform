@@ -1,4 +1,4 @@
-(function(define, undefined) {
+(function(define) {
     'use strict';
     define([
         'gettext', 'jquery', 'underscore', 'backbone',
@@ -25,7 +25,7 @@
             fieldType: 'generic',
 
             className: function() {
-                return 'u-field' + ' u-field-' + this.fieldType + ' u-field-' + this.options.valueAttribute;
+                return 'u-field u-field-' + this.fieldType + ' u-field-' + this.options.valueAttribute;
             },
 
             tagName: 'div',
@@ -100,21 +100,20 @@
                 return HtmlUtils.setHtml(this.$('.u-field-title'), title);
             },
 
-            getMessage: function(message_status) {
-                if ((message_status + 'Message') in this) {
-                    return this[message_status + 'Message'].call(this);
+            getMessage: function(messageStatus) {
+                if ((messageStatus + 'Message') in this) {
+                    return this[messageStatus + 'Message'].call(this);
                 } else if (this.showMessages) {
-                    return HtmlUtils.joinHtml(this.indicators[message_status], this.messages[message_status]);
+                    return HtmlUtils.joinHtml(this.indicators[messageStatus], this.messages[messageStatus]);
                 }
-                return this.indicators[message_status];
+                return this.indicators[messageStatus];
             },
 
             showHelpMessage: function(message) {
-                if (_.isUndefined(message) || _.isNull(message)) {
-                    message = this.helpMessage;
-                }
                 this.$('.u-field-message-notification').html('');
-                HtmlUtils.setHtml(this.$('.u-field-message-help'), message);
+                HtmlUtils.setHtml(this.$('.u-field-message-help'),
+                  (_.isUndefined(message) || _.isNull(message)) ? this.helpMessage : message
+                );
             },
 
             getNotificationMessage: function() {
@@ -139,19 +138,19 @@
             },
 
             showSuccessMessage: function() {
+                var context = Date.now();
                 var successMessage = this.getMessage('success');
+                var view = this;
+
                 this.showNotificationMessage(successMessage);
 
                 if (this.options.refreshPageOnSave) {
-                    if ("focusNextID" in this.options) {
-                        $.cookie('focus_id', this.options.focusNextID );
+                    if ('focusNextID' in this.options) {
+                        $.cookie('focus_id', this.options.focusNextID);
                     }
                     location.reload(true);
                 }
 
-                var view = this;
-
-                var context = Date.now();
                 this.lastSuccessMessageContext = context;
 
                 setTimeout(function() {
@@ -167,11 +166,11 @@
             },
 
             showErrorMessage: function(xhr) {
+                var errors = JSON.parse(xhr.responseText),
+                    validationErrorMessage = errors.field_errors[this.options.valueAttribute].user_message,
+                    message = HtmlUtils.joinHtml(this.indicators.validationError, validationErrorMessage);
                 if (xhr.status === 400) {
                     try {
-                        var errors = JSON.parse(xhr.responseText),
-                            validationErrorMessage = errors.field_errors[this.options.valueAttribute].user_message,
-                            message = HtmlUtils.joinHtml(this.indicators.validationError, validationErrorMessage);
                         this.showNotificationMessage(message);
                     } catch (error) {
                         this.showNotificationMessage(this.getMessage('error'));
@@ -189,7 +188,7 @@
                 _.bindAll(this, 'saveAttributes', 'saveSucceeded', 'showDisplayMode', 'showEditMode',
                     'startEditing', 'finishEditing'
                 );
-                this._super(options);
+                this.super(options);
 
                 this.editable = _.isUndefined(this.options.editable) ? 'always' : this.options.editable;
                 this.$el.addClass('editable-' + this.editable);
@@ -202,9 +201,8 @@
             },
 
             saveAttributes: function(attributes, options) {
-                if (this.persistChanges === true) {
-                    var view = this;
-                    var defaultOptions = {
+                var view = this,
+                    defaultOptions = {
                         contentType: 'application/merge-patch+json',
                         patch: true,
                         wait: true,
@@ -215,6 +213,7 @@
                             view.showErrorMessage(xhr);
                         }
                     };
+                if (this.persistChanges === true) {
                     this.showInProgressMessage();
                     this.model.save(attributes, _.extend(defaultOptions, options));
                 }
@@ -291,7 +290,7 @@
             fieldTemplate: fieldReadOnlyTemplate,
 
             initialize: function(options) {
-                this._super(options);
+                this.super(options);
                 _.bindAll(this, 'render', 'fieldValue', 'updateValueInField');
                 this.listenTo(this.model, 'change:' + this.options.valueAttribute, this.updateValueInField);
             },
@@ -360,7 +359,7 @@
             },
 
             initialize: function(options) {
-                this._super(options);
+                this.super(options);
                 _.bindAll(this, 'render', 'fieldValue', 'updateValueInField', 'saveValue');
                 this.listenTo(this.model, 'change:' + this.options.valueAttribute, this.updateValueInField);
             },
@@ -416,7 +415,7 @@
             initialize: function(options) {
                 _.bindAll(this, 'render', 'optionForValue', 'fieldValue', 'displayValue', 'updateValueInField',
                     'saveValue', 'createGroupOptions');
-                this._super(options);
+                this.super(options);
 
                 this.listenTo(this.model, 'change:' + this.options.valueAttribute, this.updateValueInField);
             },
@@ -477,8 +476,8 @@
             },
 
             displayValue: function(value) {
+                var option = this.optionForValue(value);
                 if (value) {
-                    var option = this.optionForValue(value);
                     return (option ? option[1] : '');
                 } else {
                     return '';
@@ -487,8 +486,8 @@
 
             updateValueInField: function() {
                 var value;  // str
-                var fieldHasFocus;  //bool
-                var fieldChanged;  //bool
+                var fieldHasFocus;  // bool
+                var fieldChanged;  // bool
                 if (this.editable !== 'never') {
                     value = this.modelValue() || '';
                     fieldHasFocus = (document.activeElement === this.$('.u-field-value select')[0]);
@@ -502,7 +501,7 @@
                     }
                 }
 
-                var value = this.displayValue(this.modelValue() || '');
+                value = this.displayValue(this.modelValue() || '');
                 if (this.modelValueIsSet() === false) {
                     value = this.options.placeholderValue || '';
                 }
@@ -521,14 +520,14 @@
             },
 
             showDisplayMode: function(render) {
-                this._super(render);
+                this.super(render);
                 if (this.editable === 'toggle') {
                     this.$('.u-field-value a').focus();
                 }
             },
 
             showEditMode: function(render) {
-                this._super(render);
+                this.super(render);
                 if (this.editable === 'toggle') {
                     this.$('.u-field-value select').focus();
                 }
@@ -543,7 +542,7 @@
                     this.$('option[value=""]').remove();
                 }
 
-                this._super();
+                this.super();
             },
 
             disableField: function(disable) {
@@ -582,7 +581,7 @@
             initialize: function(options) {
                 _.bindAll(this, 'render', 'onKeyDown', 'adjustTextareaHeight', 'manageTextareaContentChange',
                     'fieldValue', 'saveValue', 'updateView');
-                this._super(options);
+                this.super(options);
                 this.listenTo(this.model, 'change:' + this.options.valueAttribute, this.updateView);
             },
 
@@ -634,24 +633,21 @@
                             'aria-live': 'assertive',
                             'aria-atomic': true
                         });
-                    }
-                    else if (remainingCharCount < 60) {
+                    } else if (remainingCharCount < 60) {
                         $charCount.attr('aria-atomic', 'false');
-                    }
-                    else if (remainingCharCount < 70) {
+                    } else if (remainingCharCount < 70) {
                         $charCount.attr({
                             'aria-live': 'polite',
                             'aria-atomic': true
                         });
                     }
                     $charCount.text(curCharCount);
-
                 }
             },
 
             adjustTextareaHeight: function() {
-                if (this.persistChanges === false) { return; }
                 var textarea = this.$('textarea');
+                if (this.persistChanges === false) { return; }
                 textarea.css('height', 'auto').css('height', textarea.prop('scrollHeight') + 10);
             },
 
@@ -661,7 +657,7 @@
             },
 
             modelValue: function() {
-                var value = this._super();
+                var value = this.super();
                 return value ? $.trim(value) : '';
             },
 
@@ -690,13 +686,13 @@
             },
 
             showEditMode: function(render) {
-                this._super(render);
+                this.super(render);
                 this.adjustTextareaHeight();
                 this.$('.u-field-value textarea').focus();
             },
 
             saveSucceeded: function() {
-                this._super();
+                this.super();
                 if (this.editable === 'toggle') {
                     this.showDisplayMode(true);
                     this.$('a').focus();
@@ -715,7 +711,7 @@
             },
 
             initialize: function(options) {
-                this._super(options);
+                this.super(options);
                 _.bindAll(this, 'render', 'linkClicked');
             },
 
