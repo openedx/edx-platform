@@ -163,7 +163,13 @@
                     successTitle = gettext('Check Your Email'),
                     successMessageHtml = HtmlUtils.interpolateHtml(
                         gettext(
-                          'Thank you! Please check your email for a message with password reset instructions.'), {
+                          '{paragraphStart}You entered {boldStart}{email}{boldEnd}. If this email address is ' +
+                          'associated with your {platform_name} account, we will send a message with password ' +
+                          'recovery instructions.{paragraphEnd}' +
+                          '{paragraphStart}If you do not receive a password reset message within 5 minutes, ' +
+                          'please verify that you have provided the correct email address, or check your spam ' +
+                          'folder. If you need further assistance, please {anchorStart}contact technical ' +
+                          'support{anchorEnd}.{paragraphEnd}'), {
                             boldStart: HtmlUtils.HTML('<b>'),
                             boldEnd: HtmlUtils.HTML('</b>'),
                             paragraphStart: HtmlUtils.HTML('<p>'),
