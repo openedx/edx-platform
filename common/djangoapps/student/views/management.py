@@ -58,7 +58,7 @@ from common.djangoapps.student.message_types import AccountActivation, EmailChan
 from common.djangoapps.student.models import (  # lint-amnesty, pylint: disable=unused-import
     AccountRecovery,
     CourseEnrollment,
-    PendingEmailChange,
+    PendingEmailChange,  # unimport:skip
     PendingSecondaryEmailChange,
     Registration,
     RegistrationCookieConfiguration,

@@ -9,7 +9,6 @@ import datetime
 import ddt
 import pytest
 import six
-from django.conf import settings  # lint-amnesty, pylint: disable=unused-import
 from django.contrib.admin.sites import AdminSite
 from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.forms import ValidationError
