@@ -223,7 +223,7 @@ sqlparse==0.4.1           # via -r requirements/edx/base.in, django
 staff-graded-xblock==1.5  # via -r requirements/edx/base.in
 stevedore==1.32.0         # via -c requirements/edx/../constraints.txt, -r requirements/edx/base.in, -r requirements/edx/paver.txt, code-annotations, edx-ace, edx-django-utils, edx-enterprise, edx-opaque-keys
 super-csv==2.0.0          # via -r requirements/edx/base.in, edx-bulk-grades
-sympy==1.6.2              # via -c requirements/edx/../constraints.txt, symmath
+sympy==1.7.1              # via symmath
 tableauserverclient==0.15.0  # via edx-enterprise
 testfixtures==6.17.1      # via edx-enterprise
 text-unidecode==1.3       # via python-slugify

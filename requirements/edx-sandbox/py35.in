@@ -23,7 +23,6 @@ openedx-calc<2.0.0
 pyparsing==2.2.0                    # Python Parsing module
 random2                             # Implementation of random module that works identically under Python 2 and 3
 scipy==1.2.1                        # Math, science, and engineering library
-sympy==1.6.2                        # Symbolic math library
 
 # Install these packages from the edx-platform working tree
 # NOTE: if you change code in these packages, you MUST change the version
