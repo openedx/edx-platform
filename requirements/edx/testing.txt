@@ -120,7 +120,7 @@ edx-rbac==1.4.1           # via -r requirements/edx/base.txt, edx-enterprise
 edx-rest-api-client==5.3.0  # via -r requirements/edx/base.txt, edx-enterprise, edx-proctoring
 edx-search==3.0.0         # via -r requirements/edx/base.txt
 edx-sga==0.16.0           # via -r requirements/edx/base.txt
-edx-submissions==3.2.4    # via -r requirements/edx/base.txt, ora2
+-e git+https://github.com/edx/edx-submissions.git@680f5ebcac1a1d3a5bee667105df997b6f0ff026#egg=submissions
 edx-tincan-py35==1.0.0    # via -r requirements/edx/base.txt, edx-enterprise
 edx-toggles==4.0.0        # via -r requirements/edx/base.txt, edx-completion, edx-event-routing-backends, edxval, ora2
 edx-user-state-client==1.3.0  # via -r requirements/edx/base.txt
