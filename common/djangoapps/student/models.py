@@ -76,7 +76,7 @@ from lms.djangoapps.courseware.models import (
     OrgDynamicUpgradeDeadlineConfiguration,
 )
 from lms.djangoapps.courseware.toggles import (
-    courseware_mfe_streak_celebration_is_active,
+    streak_celebration_is_active,
     COURSEWARE_PROCTORING_IMPROVEMENTS,
 )
 from lms.djangoapps.verify_student.models import SoftwareSecurePhotoVerification
@@ -3210,9 +3210,8 @@ class UserCelebration(TimeStampedModel):
     def _get_celebration(cls, user, course_key):
         """ Retrieve (or create) the celebration for the provided user and course_key """
         try:
-            # The UI for celebrations is only supported on the MFE right now, so don't turn on
-            # celebrations unless this enrollment's course is MFE-enabled and has milestones enabled.
-            if not courseware_mfe_streak_celebration_is_active(course_key):
+            # Only enable the streak if milestones and the streak are enabled for this course
+            if not streak_celebration_is_active(course_key):
                 return None
             return user.celebration
         except (cls.DoesNotExist, User.celebration.RelatedObjectDoesNotExist):  # pylint: disable=no-member
