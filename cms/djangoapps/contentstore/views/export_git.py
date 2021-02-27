@@ -6,7 +6,6 @@ the giturl attribute is set.
 
 import logging
 
-import six
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
 from django.utils.translation import ugettext as _
@@ -34,7 +33,7 @@ def export_git(request, course_key_string):
     course_module = modulestore().get_course(course_key)
     failed = False
 
-    log.debug(u'export_git course_module=%s', course_module)
+    log.debug('export_git course_module=%s', course_module)
 
     msg = ""
     if 'action' in request.GET and course_module.giturl:
@@ -48,7 +47,7 @@ def export_git(request, course_key_string):
                 msg = _('Course successfully exported to git repository')
             except git_export_utils.GitExportError as ex:
                 failed = True
-                msg = six.text_type(ex)
+                msg = str(ex)
 
     return render_to_response('export_git.html', {
         'context_course': course_module,

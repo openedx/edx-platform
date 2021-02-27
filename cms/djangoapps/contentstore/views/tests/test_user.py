@@ -16,7 +16,7 @@ from common.djangoapps.student.roles import CourseInstructorRole, CourseStaffRol
 
 class UsersTestCase(CourseTestCase):  # lint-amnesty, pylint: disable=missing-class-docstring
     def setUp(self):
-        super(UsersTestCase, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.ext_user = User.objects.create_user(
             "joe", "joe@comedycentral.com", "haha")
         self.ext_user.is_active = True

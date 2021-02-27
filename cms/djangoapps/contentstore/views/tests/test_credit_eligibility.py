@@ -3,8 +3,7 @@ Unit tests for credit eligibility UI in Studio.
 """
 
 
-import mock
-import six
+from unittest import mock
 
 from cms.djangoapps.contentstore.tests.utils import CourseTestCase
 from cms.djangoapps.contentstore.utils import reverse_course_url
@@ -20,9 +19,9 @@ class CreditEligibilityTest(CourseTestCase):
     eligibility requirements.
     """
     def setUp(self):
-        super(CreditEligibilityTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.course = CourseFactory.create(org='edX', number='dummy', display_name='Credit Course')
-        self.course_details_url = reverse_course_url('settings_handler', six.text_type(self.course.id))
+        self.course_details_url = reverse_course_url('settings_handler', str(self.course.id))
 
     @mock.patch.dict("django.conf.settings.FEATURES", {'ENABLE_CREDIT_ELIGIBILITY': False})
     def test_course_details_with_disabled_setting(self):
@@ -50,7 +49,7 @@ class CreditEligibilityTest(CourseTestCase):
 
         # verify that credit eligibility requirements block shows if the
         # course is set as credit course and it has eligibility requirements
-        credit_course = CreditCourse(course_key=six.text_type(self.course.id), enabled=True)
+        credit_course = CreditCourse(course_key=str(self.course.id), enabled=True)
         credit_course.save()
         self.assertEqual(len(get_credit_requirements(self.course.id)), 0)
         # test that after publishing course, minimum grade requirement is added
