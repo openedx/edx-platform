@@ -4,9 +4,9 @@ Tests for Paver's Stylelint tasks.
 
 
 import unittest
-import pytest
+from unittest.mock import patch
 
-from mock import patch
+import pytest
 from paver.easy import BuildFailure, call_task
 
 import pavelib.quality
