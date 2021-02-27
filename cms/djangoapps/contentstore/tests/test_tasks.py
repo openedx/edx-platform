@@ -5,9 +5,9 @@ Unit tests for course import and export Celery tasks
 
 import copy
 import json
+from unittest import mock
 from uuid import uuid4
 
-import mock
 from django.conf import settings
 from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.test.utils import override_settings
@@ -45,7 +45,7 @@ class ExportCourseTestCase(CourseTestCase):
         Verify that a routine course export task succeeds
         """
         key = str(self.course.location.course_key)
-        result = export_olx.delay(self.user.id, key, u'en')
+        result = export_olx.delay(self.user.id, key, 'en')
         status = UserTaskStatus.objects.get(task_id=result.id)
         self.assertEqual(status.state, UserTaskStatus.SUCCEEDED)
         artifacts = UserTaskArtifact.objects.filter(status=status)
@@ -59,17 +59,17 @@ class ExportCourseTestCase(CourseTestCase):
         The export task should fail gracefully if an exception is thrown
         """
         key = str(self.course.location.course_key)
-        result = export_olx.delay(self.user.id, key, u'en')
-        self._assert_failed(result, json.dumps({u'raw_error_msg': u'Boom!'}))
+        result = export_olx.delay(self.user.id, key, 'en')
+        self._assert_failed(result, json.dumps({'raw_error_msg': 'Boom!'}))
 
     def test_invalid_user_id(self):
         """
         Verify that attempts to export a course as an invalid user fail
         """
-        user_id = User.objects.order_by(u'-id').first().pk + 100
+        user_id = User.objects.order_by('-id').first().pk + 100
         key = str(self.course.location.course_key)
-        result = export_olx.delay(user_id, key, u'en')
-        self._assert_failed(result, u'Unknown User ID: {}'.format(user_id))
+        result = export_olx.delay(user_id, key, 'en')
+        self._assert_failed(result, f'Unknown User ID: {user_id}')
 
     def test_non_course_author(self):
         """
@@ -77,8 +77,8 @@ class ExportCourseTestCase(CourseTestCase):
         """
         _, nonstaff_user = self.create_non_staff_authed_user_client()
         key = str(self.course.location.course_key)
-        result = export_olx.delay(nonstaff_user.id, key, u'en')
-        self._assert_failed(result, u'Permission denied')
+        result = export_olx.delay(nonstaff_user.id, key, 'en')
+        self._assert_failed(result, 'Permission denied')
 
     def _assert_failed(self, task_result, error_message):
         """
@@ -89,7 +89,7 @@ class ExportCourseTestCase(CourseTestCase):
         artifacts = UserTaskArtifact.objects.filter(status=status)
         self.assertEqual(len(artifacts), 1)
         error = artifacts[0]
-        self.assertEqual(error.name, u'Error')
+        self.assertEqual(error.name, 'Error')
         self.assertEqual(error.text, error_message)
 
 
@@ -104,7 +104,7 @@ class ExportLibraryTestCase(LibraryTestCase):
         Verify that a routine library export task succeeds
         """
         key = str(self.lib_key)
-        result = export_olx.delay(self.user.id, key, u'en')
+        result = export_olx.delay(self.user.id, key, 'en')
         status = UserTaskStatus.objects.get(task_id=result.id)
         self.assertEqual(status.state, UserTaskStatus.SUCCEEDED)
         artifacts = UserTaskArtifact.objects.filter(status=status)
