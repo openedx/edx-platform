@@ -15,8 +15,8 @@ from django.views.decorators.http import require_POST
 from opaque_keys.edx.keys import CourseKey
 
 from common.djangoapps.edxmako.shortcuts import render_to_response
-from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from lms.djangoapps.survey.models import SurveyForm
+from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 
 log = logging.getLogger("edx.survey")
 

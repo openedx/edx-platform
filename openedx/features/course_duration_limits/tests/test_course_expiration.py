@@ -30,7 +30,7 @@ from openedx.core.djangoapps.django_comment_common.models import (
     FORUM_ROLE_GROUP_MODERATOR,
     FORUM_ROLE_MODERATOR
 )
-from openedx.core.djangoapps.schedules.tests.factories import ScheduleFactory
+from openedx.core.djangoapps.schedules.models import Schedule
 from openedx.features.content_type_gating.helpers import CONTENT_GATING_PARTITION_ID, CONTENT_TYPE_GATE_GROUP_IDS
 from openedx.features.course_duration_limits.access import get_user_course_expiration_date
 from openedx.features.course_duration_limits.models import CourseDurationLimitConfig
@@ -337,12 +337,12 @@ class CourseExpirationTestCase(ModuleStoreTestCase, MasqueradeMixin):
         else:
             expired_staff = role_factory.create(password=TEST_PASSWORD, course_key=self.course.id)
 
-        ScheduleFactory(
-            start_date=self.THREE_YEARS_AGO,
-            enrollment__mode=CourseMode.AUDIT,
-            enrollment__course_id=self.course.id,
-            enrollment__user=expired_staff
+        CourseEnrollmentFactory.create(
+            mode=CourseMode.AUDIT,
+            course_id=self.course.id,
+            user=expired_staff,
         )
+        Schedule.objects.update(start_date=self.THREE_YEARS_AGO)
         CourseDurationLimitConfig.objects.create(
             enabled=True,
             course=CourseOverview.get_from_id(self.course.id),
@@ -385,12 +385,12 @@ class CourseExpirationTestCase(ModuleStoreTestCase, MasqueradeMixin):
         role = RoleFactory(name=role_name, course_id=self.course.id)
         role.users.add(expired_staff)
 
-        ScheduleFactory(
-            start_date=self.THREE_YEARS_AGO,
-            enrollment__mode=CourseMode.AUDIT,
-            enrollment__course_id=self.course.id,
-            enrollment__user=expired_staff
+        CourseEnrollmentFactory.create(
+            mode=CourseMode.AUDIT,
+            course_id=self.course.id,
+            user=expired_staff,
         )
+        Schedule.objects.update(start_date=self.THREE_YEARS_AGO)
 
         CourseDurationLimitConfig.objects.create(
             enabled=True,

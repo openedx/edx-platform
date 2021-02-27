@@ -17,7 +17,7 @@ import logging
 
 import six
 from django.conf import settings
-from django.http import Http404, HttpResponse  # lint-amnesty, pylint: disable=unused-import
+from django.http import HttpResponse  # lint-amnesty, pylint: disable=unused-import
 from django.template import engines
 from django.urls import reverse, NoReverseMatch
 from six.moves.urllib.parse import urljoin
@@ -26,7 +26,6 @@ from django.core.exceptions import ValidationError
 
 from edx_django_utils.monitoring import set_custom_attribute
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
-from openedx.core.djangoapps.theming.helpers import is_request_in_themed_site  # lint-amnesty, pylint: disable=unused-import
 from xmodule.util.xmodule_django import get_current_request_hostname
 
 from . import Engines

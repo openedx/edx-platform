@@ -13,7 +13,6 @@ from django.test import TestCase
 from django.test.client import RequestFactory
 from django.urls import reverse
 from edx_proctoring.exceptions import ProctoredExamNotFoundException
-from edx_toggles.toggles.testutils import override_waffle_switch
 from mock import Mock, PropertyMock, patch
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.asides import AsideUsageKeyV2
@@ -66,7 +65,6 @@ from ..item import (
     _xblock_type_and_display_name,
     add_container_page_publishing_info,
     create_xblock_info,
-    highlights_setting
 )
 
 
@@ -2696,12 +2694,8 @@ class TestXBlockInfo(ItemTest):
     def test_highlights_enabled(self):
         self.course.highlights_enabled_for_messaging = True
         self.store.update_item(self.course, None)
-        chapter = self.store.get_item(self.chapter.location)
-        with override_waffle_switch(highlights_setting, active=True):
-            chapter_xblock_info = create_xblock_info(chapter)
-            course_xblock_info = create_xblock_info(self.course)
-            self.assertTrue(chapter_xblock_info['highlights_enabled'])
-            self.assertTrue(course_xblock_info['highlights_enabled_for_messaging'])
+        course_xblock_info = create_xblock_info(self.course)
+        self.assertTrue(course_xblock_info['highlights_enabled_for_messaging'])
 
     def validate_course_xblock_info(self, xblock_info, has_child_info=True, course_outline=False):
         """
@@ -2731,7 +2725,7 @@ class TestXBlockInfo(ItemTest):
         self.assertEqual(xblock_info['due'], None)
         self.assertEqual(xblock_info['format'], None)
         self.assertEqual(xblock_info['highlights'], self.chapter.highlights)
-        self.assertFalse(xblock_info['highlights_enabled'])
+        self.assertTrue(xblock_info['highlights_enabled'])
 
         # Finally, validate the entire response for consistency
         self.validate_xblock_info_consistency(xblock_info, has_child_info=has_child_info)

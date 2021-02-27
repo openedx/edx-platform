@@ -407,6 +407,13 @@ class GeneratedCertificate(models.Model):
         self.grade = grade
         self.status = CertificateStatuses.notpassing
         self.save()
+        COURSE_CERT_REVOKED.send_robust(
+            sender=self.__class__,
+            user=self.user,
+            course_key=self.course_id,
+            mode=self.mode,
+            status=self.status,
+        )
 
     def is_valid(self):
         """

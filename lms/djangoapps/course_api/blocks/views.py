@@ -305,7 +305,9 @@ class BlocksInCourseView(BlocksView):
         response = super().list(request, course_usage_key,
                                 hide_access_denials=hide_access_denials)  # lint-amnesty, pylint: disable=super-with-arguments
 
-        if 'completion' not in request.query_params.getlist('requested_fields', ''):
+        calculate_completion = any('completion' in param
+                                   for param in request.query_params.getlist('requested_fields', []))
+        if not calculate_completion:
             return response
 
         course_blocks = {}

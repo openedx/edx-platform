@@ -27,7 +27,7 @@ class TeamsTab(EnrolledTab):
             course (CourseDescriptor): the course using the feature
             user (User): the user interacting with the course
         """
-        if not super(TeamsTab, cls).is_enabled(course, user=user):
+        if not super().is_enabled(course, user=user):
             return False
 
         return is_feature_enabled(course)

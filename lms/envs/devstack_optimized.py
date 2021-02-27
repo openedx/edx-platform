@@ -21,10 +21,9 @@ invoked each time that changes have been made.
 
 import os  # lint-amnesty, pylint: disable=unused-import
 
-from .devstack import *  # pylint: disable=wildcard-import
-
 ########################## Devstack settings ###################################
 
+from .devstack import *  # pylint: disable=wildcard-import
 
 TEST_ROOT = REPO_ROOT / "test_root"
 

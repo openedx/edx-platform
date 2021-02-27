@@ -18,7 +18,7 @@ class LmsUtilsTest(ModuleStoreTestCase):
         """
         Setup a dummy course content.
         """
-        super().setUp()
+        super(LmsUtilsTest, self).setUp()
 
         with self.store.default_store(ModuleStoreEnum.Type.mongo):
             self.course = CourseFactory.create()

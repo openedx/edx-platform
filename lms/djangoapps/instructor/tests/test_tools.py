@@ -17,9 +17,8 @@ from edx_when.field_data import DateLookupFieldData
 from opaque_keys.edx.keys import CourseKey
 from pytz import UTC
 
-from common.djangoapps.student.tests.factories import UserFactory
+from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
 from openedx.core.djangoapps.course_date_signals import handlers
-from openedx.core.djangoapps.schedules.tests.factories import ScheduleFactory
 from xmodule.fields import Date
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
@@ -219,7 +218,7 @@ class TestSetDueDateExtension(ModuleStoreTestCase):
         self.week3 = week3
         self.user = user
 
-        ScheduleFactory.create(enrollment__user=self.user, enrollment__course_id=self.course.id)
+        CourseEnrollmentFactory.create(user=self.user, course_id=self.course.id)
 
         inject_field_data((course, week1, week2, week3, homework, assignment), course, user)
 
@@ -307,8 +306,8 @@ class TestDataDumps(ModuleStoreTestCase):
         self.week2 = week2
         self.user1 = user1
         self.user2 = user2
-        ScheduleFactory.create(enrollment__user=self.user1, enrollment__course_id=self.course.id)
-        ScheduleFactory.create(enrollment__user=self.user2, enrollment__course_id=self.course.id)
+        CourseEnrollmentFactory.create(user=self.user1, course_id=self.course.id)
+        CourseEnrollmentFactory.create(user=self.user2, course_id=self.course.id)
         handlers.extract_dates(None, course.id)
 
     def test_dump_module_extensions(self):

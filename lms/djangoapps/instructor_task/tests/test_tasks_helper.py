@@ -21,6 +21,7 @@ import unicodecsv
 from django.conf import settings
 from django.test.utils import override_settings
 from edx_django_utils.cache import RequestCache
+from edx_toggles.toggles.testutils import override_waffle_flag
 from freezegun import freeze_time
 from pytz import UTC
 
@@ -29,6 +30,7 @@ from capa.tests.response_xml_factory import MultipleChoiceResponseXMLFactory
 from common.djangoapps.course_modes.models import CourseMode
 from common.djangoapps.student.models import CourseEnrollment, CourseEnrollmentAllowed
 from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
+from lms.djangoapps.certificates.generation_handler import CERTIFICATES_USE_ALLOWLIST
 from lms.djangoapps.certificates.models import CertificateStatuses, GeneratedCertificate
 from lms.djangoapps.certificates.tests.factories import CertificateWhitelistFactory, GeneratedCertificateFactory
 from lms.djangoapps.courseware.models import StudentModule
@@ -37,7 +39,10 @@ from lms.djangoapps.grades.models import PersistentCourseGrade, PersistentSubsec
 from lms.djangoapps.grades.subsection_grade import CreateSubsectionGrade
 from lms.djangoapps.grades.transformer import GradesTransformer
 from lms.djangoapps.instructor_analytics.basic import UNAVAILABLE, list_problem_responses
-from lms.djangoapps.instructor_task.tasks_helper.certs import generate_students_certificates
+from lms.djangoapps.instructor_task.tasks_helper.certs import (
+    generate_students_certificates,
+    _invalidate_generated_certificates
+)
 from lms.djangoapps.instructor_task.tasks_helper.enrollments import upload_may_enroll_csv, upload_students_csv
 from lms.djangoapps.instructor_task.tasks_helper.grades import (
     ENROLLED_IN_COURSE,
@@ -50,7 +55,8 @@ from lms.djangoapps.instructor_task.tasks_helper.misc import (
     cohort_students_and_upload,
     upload_course_survey_report,
     upload_ora2_data,
-    upload_ora2_submission_files
+    upload_ora2_submission_files,
+    upload_ora2_summary
 )
 from lms.djangoapps.instructor_task.tests.test_base import (
     InstructorTaskCourseTestCase,
@@ -2024,11 +2030,11 @@ class TestCertificateGeneration(InstructorTaskModuleTestCase):
             'action_name': 'certificates generated',
             'total': 10,
             'attempted': 8,
-            'succeeded': 5,
-            'failed': 3,
+            'succeeded': 0,
+            'failed': 0,
             'skipped': 2
         }
-        with self.assertNumQueries(141):
+        with self.assertNumQueries(157):
             self.assertCertificatesGenerated(task_input, expected_results)
 
         expected_results = {
@@ -2075,7 +2081,7 @@ class TestCertificateGeneration(InstructorTaskModuleTestCase):
             'action_name': 'certificates generated',
             'total': 3,
             'attempted': 3,
-            'succeeded': 3,
+            'succeeded': 0,
             'failed': 0,
             'skipped': 0
         }
@@ -2128,7 +2134,7 @@ class TestCertificateGeneration(InstructorTaskModuleTestCase):
             'action_name': 'certificates generated',
             'total': expected_certs,
             'attempted': expected_certs,
-            'succeeded': expected_certs,
+            'succeeded': 0,
             'failed': 0,
             'skipped': 0
         }
@@ -2160,7 +2166,7 @@ class TestCertificateGeneration(InstructorTaskModuleTestCase):
             'action_name': 'certificates generated',
             'total': 1,
             'attempted': 1,
-            'succeeded': 1,
+            'succeeded': 0,
             'failed': 0,
             'skipped': 0,
         }
@@ -2181,7 +2187,7 @@ class TestCertificateGeneration(InstructorTaskModuleTestCase):
             'total': 1,
             'attempted': 1,
             'succeeded': 0,
-            'failed': 1,
+            'failed': 0,
             'skipped': 0,
         }
         self.assertCertificatesGenerated(task_input, expected_results)
@@ -2233,7 +2239,7 @@ class TestCertificateGeneration(InstructorTaskModuleTestCase):
             'action_name': 'certificates generated',
             'total': 10,
             'attempted': 5,
-            'succeeded': 5,
+            'succeeded': 0,
             'failed': 0,
             'skipped': 5
         }
@@ -2309,8 +2315,8 @@ class TestCertificateGeneration(InstructorTaskModuleTestCase):
             'action_name': 'certificates generated',
             'total': 10,
             'attempted': 5,
-            'succeeded': 2,
-            'failed': 3,
+            'succeeded': 0,
+            'failed': 0,
             'skipped': 5
         }
 
@@ -2406,7 +2412,7 @@ class TestCertificateGeneration(InstructorTaskModuleTestCase):
             'action_name': 'certificates generated',
             'total': 10,
             'attempted': 8,
-            'succeeded': 8,
+            'succeeded': 0,
             'failed': 0,
             'skipped': 2
         }
@@ -2497,12 +2503,44 @@ class TestCertificateGeneration(InstructorTaskModuleTestCase):
             'action_name': 'certificates generated',
             'total': 7,
             'attempted': 7,
-            'succeeded': 7,
+            'succeeded': 0,
             'failed': 0,
             'skipped': 0,
         }
 
         self.assertCertificatesGenerated(task_input, expected_results)
+
+    @override_waffle_flag(CERTIFICATES_USE_ALLOWLIST, active=True)
+    def test_invalidation(self):
+        # Create students
+        students = self._create_students(2)
+        s1 = students[0]
+        s2 = students[1]
+
+        # Generate certificates
+        for s in students:
+            GeneratedCertificateFactory.create(
+                user=s,
+                course_id=self.course.id,
+                status=CertificateStatuses.downloadable,
+                mode='verified'
+            )
+
+        # Whitelist a student
+        CertificateWhitelistFactory.create(user=s1, course_id=self.course.id)
+
+        statuses = [CertificateStatuses.downloadable]
+        _invalidate_generated_certificates(self.course.id, students, statuses)
+
+        certs = GeneratedCertificate.objects.filter(user=s1, course_id=self.course.id)
+        assert certs.count() == 1
+        downloadable_cert = certs.first()
+        assert downloadable_cert.status == CertificateStatuses.downloadable
+
+        certs = GeneratedCertificate.objects.filter(user=s2, course_id=self.course.id)
+        assert certs.count() == 1
+        invalidated_cert = certs.first()
+        assert invalidated_cert.status == CertificateStatuses.unavailable
 
     def assertCertificatesGenerated(self, task_input, expected_results):
         """
@@ -2537,6 +2575,7 @@ class TestCertificateGeneration(InstructorTaskModuleTestCase):
         ]
 
 
+@ddt.ddt
 class TestInstructorOra2Report(SharedModuleStoreTestCase):
     """
     Tests that ORA2 response report generation works.
@@ -2557,17 +2596,20 @@ class TestInstructorOra2Report(SharedModuleStoreTestCase):
         if os.path.exists(settings.GRADES_DOWNLOAD['ROOT_PATH']):
             shutil.rmtree(settings.GRADES_DOWNLOAD['ROOT_PATH'])
 
-    def test_report_fails_if_error(self):
-        with patch(
-            'lms.djangoapps.instructor_task.tasks_helper.misc.OraAggregateData.collect_ora2_data'
-        ) as mock_collect_data:
+    @ddt.data(
+        ('lms.djangoapps.instructor_task.tasks_helper.misc.OraAggregateData.collect_ora2_data', upload_ora2_data),
+        ('lms.djangoapps.instructor_task.tasks_helper.misc.OraAggregateData.collect_ora2_summary', upload_ora2_summary),
+    )
+    @ddt.unpack
+    def test_report_fails_if_error(self, data_collector_module, upload_func):
+        with patch(data_collector_module) as mock_collect_data:
             mock_collect_data.side_effect = KeyError
 
             with patch('lms.djangoapps.instructor_task.tasks_helper.runner._get_current_task') as mock_current_task:
                 mock_current_task.return_value = self.current_task
 
-                response = upload_ora2_data(None, None, self.course.id, None, 'generated')
-                assert response == UPDATE_STATUS_FAILED
+                response = upload_func(None, None, self.course.id, None, 'generated')
+                self.assertEqual(response, UPDATE_STATUS_FAILED)
 
     def test_report_stores_results(self):
         with ExitStack() as stack:
@@ -2627,6 +2669,30 @@ class TestInstructorOra2AttachmentsExport(SharedModuleStoreTestCase):
 
                 response = upload_ora2_submission_files(None, None, self.course.id, None, 'compressed')
                 assert response == UPDATE_STATUS_FAILED
+
+    def test_summary_report_stores_results(self):
+        with freeze_time('2001-01-01 00:00:00'):
+            test_header = ['field1', 'field2']
+            test_rows = [['row1_field1', 'row1_field2'], ['row2_field1', 'row2_field2']]
+
+        with patch('lms.djangoapps.instructor_task.tasks_helper.runner._get_current_task') as mock_current_task:
+            mock_current_task.return_value = self.current_task
+
+            with patch(
+                'lms.djangoapps.instructor_task.tasks_helper.misc.OraAggregateData.collect_ora2_summary'
+            ) as mock_collect_summary:
+                mock_collect_summary.return_value = (test_header, test_rows)
+                with patch(
+                    'lms.djangoapps.instructor_task.models.DjangoStorageReportStore.store_rows'
+                ) as mock_store_rows:
+                    return_val = upload_ora2_summary(None, None, self.course.id, None, 'generated')
+
+                    timestamp_str = datetime.now(UTC).strftime('%Y-%m-%d-%H%M')
+                    course_id_string = quote(str(self.course.id).replace('/', '_'))
+                    filename = '{}_ORA_summary_{}.csv'.format(course_id_string, timestamp_str)
+
+                    self.assertEqual(return_val, UPDATE_STATUS_SUCCEEDED)
+                    mock_store_rows.assert_called_once_with(self.course.id, filename, [test_header] + test_rows)
 
     def test_export_fails_if_error_on_create_zip_step(self):
         with ExitStack() as stack:

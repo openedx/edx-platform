@@ -36,7 +36,7 @@ class ThirdPartyOAuthTestMixin(ThirdPartyAuthTestMixin):
     def setUp(self):  # lint-amnesty, pylint: disable=arguments-differ
         super(ThirdPartyOAuthTestMixin, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         if self.CREATE_USER:
-            self.user = UserFactory()
+            self.user = UserFactory.create(password='secret')
             UserSocialAuth.objects.create(user=self.user, provider=self.BACKEND, uid=self.social_uid)
         self.oauth_client = self._create_client()
         if self.BACKEND == 'google-oauth2':

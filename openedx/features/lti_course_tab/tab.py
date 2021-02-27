@@ -143,7 +143,7 @@ class LtiCourseLaunchMixin:
             """
             #lti-tab-embed {
                 width: 100%;
-                min-height: 400px;
+                min-height: 800px;
                 border: none;
             }
             """

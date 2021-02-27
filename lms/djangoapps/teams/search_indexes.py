@@ -33,7 +33,7 @@ def if_search_enabled(f):
     return wrapper
 
 
-class CourseTeamIndexer(object):
+class CourseTeamIndexer:
     """
     This is the index object for searching and storing CourseTeam model instances.
     """
@@ -79,7 +79,7 @@ class CourseTeamIndexer(object):
         """
         # Always use the English version of any localizable strings (see TNL-3239)
         with translation.override('en'):
-            return u"{name}\n{description}\n{country}\n{language}".format(
+            return "{name}\n{description}\n{country}\n{language}".format(
                 name=self.course_team.name,
                 description=self.course_team.description,
                 country=self.course_team.country.name.format(),
@@ -123,7 +123,7 @@ class CourseTeamIndexer(object):
         try:
             return SearchEngine.get_search_engine(index=cls.INDEX_NAME)
         except ConnectionError as err:
-            logging.error(u'Error connecting to elasticsearch: %s', err)
+            logging.error('Error connecting to elasticsearch: %s', err)
             raise ElasticSearchConnectionError  # lint-amnesty, pylint: disable=raise-missing-from
 
     @classmethod

@@ -3,13 +3,12 @@ Tests for the lms_filter_generator
 """
 
 
-from unittest.mock import Mock, patch
-
 import six
+from mock import Mock, patch
 
+from lms.lib.courseware_search.lms_filter_generator import LmsSearchFilterGenerator
 from common.djangoapps.student.models import CourseEnrollment
 from common.djangoapps.student.tests.factories import UserFactory
-from lms.lib.courseware_search.lms_filter_generator import LmsSearchFilterGenerator
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 
@@ -53,7 +52,7 @@ class LmsSearchFilterGeneratorTestCase(ModuleStoreTestCase):
         )
 
     def setUp(self):
-        super().setUp()
+        super(LmsSearchFilterGeneratorTestCase, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.build_courses()
         self.user = UserFactory.create(username="jack", email="jack@fake.edx.org", password='test')
 
@@ -67,8 +66,8 @@ class LmsSearchFilterGeneratorTestCase(ModuleStoreTestCase):
         field_dictionary, filter_dictionary, _ = LmsSearchFilterGenerator.generate_field_filters(user=self.user)
 
         assert 'start_date' in filter_dictionary
-        assert str(self.courses[0].id) in field_dictionary['course']
-        assert str(self.courses[1].id) in field_dictionary['course']
+        assert six.text_type(self.courses[0].id) in field_dictionary['course']
+        assert six.text_type(self.courses[1].id) in field_dictionary['course']
 
     def test_course_id_provided(self):
         """
@@ -76,11 +75,11 @@ class LmsSearchFilterGeneratorTestCase(ModuleStoreTestCase):
         """
         field_dictionary, filter_dictionary, _ = LmsSearchFilterGenerator.generate_field_filters(
             user=self.user,
-            course_id=str(self.courses[0].id)
+            course_id=six.text_type(self.courses[0].id)
         )
 
         assert 'start_date' in filter_dictionary
-        assert str(self.courses[0].id) == field_dictionary['course']
+        assert six.text_type(self.courses[0].id) == field_dictionary['course']
 
     def test_user_not_provided(self):
         """
