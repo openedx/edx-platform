@@ -120,7 +120,7 @@ def _lint(file_or_dir, template_linters, options, summary_results, out):
             if os.path.exists(file_or_dir):
                 directory = file_or_dir
             else:
-                raise ValueError("Path [{}] is not a valid file or directory.".format(file_or_dir))
+                raise ValueError(f"Path [{file_or_dir}] is not a valid file or directory.")
         _process_os_dirs(directory, template_linters, options, summary_results, out)
 
     summary_results.print_results(options, out)
@@ -177,7 +177,7 @@ def main():
     }
     template_linters = getattr(config, 'LINTERS', ())
     if not template_linters:
-        raise ValueError("LINTERS is empty or undefined in the config module ({}).".format(args.config))
+        raise ValueError(f"LINTERS is empty or undefined in the config module ({args.config}).")
 
     ruleset = _build_ruleset(template_linters)
     summary_results = SummaryResults(ruleset)

@@ -1,4 +1,4 @@
-class Rule(object):
+class Rule:
     def __init__(self, rule_id):
         self.rule_id = rule_id
 
@@ -6,7 +6,7 @@ class Rule(object):
         return self.rule_id == other.rule_id
 
 
-class RuleSet(object):
+class RuleSet:
     def __init__(self, **kwargs):
         self.rules = {}
         for k, v in kwargs.items():

@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 Tests for main.py
 """
@@ -6,10 +5,10 @@ Tests for main.py
 
 import json
 import re
-from six import StringIO
+from io import StringIO
 from unittest import TestCase
 
-import mock
+from unittest import mock
 
 from xsslint.linters import JavaScriptLinter, MakoTemplateLinter, PythonLinter, UnderscoreTemplateLinter
 from xsslint.main import _build_ruleset, _lint
@@ -79,9 +78,9 @@ class TestXSSLinter(TestCase):
 
         output = self.out.getvalue()
         # Assert violation details are displayed.
-        assert re.search('test\\.html.*{}'.format(self.ruleset.mako_missing_default.rule_id), output) is not None
-        assert re.search('test\\.js.*{}'.format(self.ruleset.javascript_concat_html.rule_id), output) is not None
-        assert re.search('test\\.js.*{}'.format(self.ruleset.underscore_not_escaped.rule_id), output) is not None
+        assert re.search(f'test\\.html.*{self.ruleset.mako_missing_default.rule_id}', output) is not None
+        assert re.search(f'test\\.js.*{self.ruleset.javascript_concat_html.rule_id}', output) is not None
+        assert re.search(f'test\\.js.*{self.ruleset.underscore_not_escaped.rule_id}', output) is not None
         lines_with_rule = 0
         lines_without_rule = 0  # Output with verbose setting only.
         for underscore_match in re.finditer(r'test\.underscore:.*\n', output):
@@ -91,8 +90,8 @@ class TestXSSLinter(TestCase):
                 lines_without_rule += 1
         assert lines_with_rule >= 1
         assert lines_without_rule == 0
-        assert re.search('test\\.py.*{}'.format(self.ruleset.python_parse_error.rule_id), output) is None
-        assert re.search('test\\.py.*{}'.format(self.ruleset.python_wrap_html.rule_id), output) is not None
+        assert re.search(f'test\\.py.*{self.ruleset.python_parse_error.rule_id}', output) is None
+        assert re.search(f'test\\.py.*{self.ruleset.python_wrap_html.rule_id}', output) is not None
         # Assert no rule totals.
         assert re.search('{}:\\s*{} violations'.format(self.ruleset.python_parse_error.rule_id, 0), output) is None
         # Assert final total
@@ -150,7 +149,7 @@ class TestXSSLinter(TestCase):
         )
 
         output = self.out.getvalue()
-        assert re.search('test\\.py.*{}'.format(self.ruleset.python_wrap_html.rule_id), output) is not None
+        assert re.search(f'test\\.py.*{self.ruleset.python_wrap_html.rule_id}', output) is not None
 
         # Assert totals output.
         assert re.search('{}:\\s*{} violations'.format(self.ruleset.python_parse_error.rule_id, 0), output) is not None
@@ -176,7 +175,7 @@ class TestXSSLinter(TestCase):
         )
 
         output = self.out.getvalue()
-        assert re.search('test\\.py.*{}'.format(self.ruleset.python_wrap_html.rule_id), output) is not None
+        assert re.search(f'test\\.py.*{self.ruleset.python_wrap_html.rule_id}', output) is not None
 
         # Find something that looks like pretty-printed JSON
         json_match = re.search(r'\n\{.*\n\}', output, re.DOTALL)
@@ -207,7 +206,7 @@ class TestXSSLinter(TestCase):
 
         output = self.out.getvalue()
         # Assert file with rule is not output.
-        assert re.search('test\\.py.*{}'.format(self.ruleset.python_wrap_html.rule_id), output) is None
+        assert re.search(f'test\\.py.*{self.ruleset.python_wrap_html.rule_id}', output) is None
         # Assert file is output.
         assert re.search('test\\.py', output) is not None
 

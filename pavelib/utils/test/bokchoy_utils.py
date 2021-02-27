@@ -7,8 +7,8 @@ import os
 import subprocess
 import sys
 import time
+from http.client import HTTPConnection
 
-import six
 from paver import tasks
 from paver.easy import cmdopts, needs, sh, task
 
@@ -89,7 +89,7 @@ def wait_for_server(server, port):
 
     while attempts < 120:
         try:
-            connection = six.moves.http_client.HTTPConnection(server, port, timeout=10)
+            connection = HTTPConnection(server, port, timeout=10)
             connection.request('GET', '/')
             response = connection.getresponse()
 
@@ -115,7 +115,7 @@ def wait_for_test_servers():
         if not ready:
             msg = colorize(
                 "red",
-                "Could not contact {} test server".format(service)
+                f"Could not contact {service} test server"
             )
             print(msg)
             sys.exit(1)
@@ -127,7 +127,7 @@ def is_mongo_running():
     """
     # The mongo command will connect to the service,
     # failing with a non-zero exit code if it cannot connect.
-    output = os.popen('mongo --host {} --eval "print(\'running\')"'.format(Env.MONGO_HOST)).read()
+    output = os.popen(f'mongo --host {Env.MONGO_HOST} --eval "print(\'running\')"').read()
     return output and "running" in output
 
 

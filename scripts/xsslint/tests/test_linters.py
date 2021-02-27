@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 Tests for linters.py
 """
@@ -8,7 +7,6 @@ import textwrap
 from unittest import TestCase
 
 from ddt import data, ddt
-from six.moves import range, zip
 
 from xsslint.linters import (
     JavaScriptLinter, MakoTemplateLinter,
@@ -69,7 +67,7 @@ class TestLinter(TestCase):
         # Print violations if the lengths are different.
         if len(results.violations) != len(rules):
             for violation in results.violations:
-                print("Found violation: {}".format(violation.rule))
+                print(f"Found violation: {violation.rule}")
 
         assert len(results.violations) == len(rules)
         for violation, rule in zip(results.violations, rules):
