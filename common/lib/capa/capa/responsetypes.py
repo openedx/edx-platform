@@ -107,7 +107,6 @@ class StudentInputError(Exception):
 # Main base class for CAPA responsetypes
 
 
-@python_2_unicode_compatible
 class LoncapaResponse(metaclass=abc.ABCMeta):
     """
     Base class for CAPA responsetypes.  Each response type (ie a capa question,
@@ -1453,7 +1452,7 @@ class OptionResponse(LoncapaResponse):
         return cmap
 
     def get_answers(self):
-        amap = {af.get('id'): contextualize_text(af.get(  # lint-amnesty, pylint: disable=consider-using-dict-comprehension
+        amap = {af.get('id'): contextualize_text(af.get(
             'correct'), self.context) for af in self.answer_fields}
         return amap
 
@@ -3213,7 +3212,7 @@ class FormulaResponse(LoncapaResponse):
         keys and all non-numeric values stripped out. All values also
         converted to float. Used so we can safely use Python contexts.
         """
-        inp_d = {k: numpy.complex(inp_d[k])  # lint-amnesty, pylint: disable=consider-using-dict-comprehension
+        inp_d = {k: numpy.complex(inp_d[k])
                  for k in inp_d if isinstance(k, str) and
                  k.isalnum() and
                  isinstance(inp_d[k], numbers.Number)}
@@ -3416,9 +3415,9 @@ class ImageResponse(LoncapaResponse):
                 regions (dict) - a map of inputs to the defined region for that input
         """
         answers = (
-            {ie.get('id'): ie.get(  # lint-amnesty, pylint: disable=consider-using-dict-comprehension
+            {ie.get('id'): ie.get(
                 'rectangle') for ie in self.ielements},
-            {ie.get('id'): ie.get('regions') for ie in self.ielements})  # lint-amnesty, pylint: disable=consider-using-dict-comprehension
+            {ie.get('id'): ie.get('regions') for ie in self.ielements})
         return answers
 
     def get_answers(self):
@@ -3490,11 +3489,11 @@ class AnnotationResponse(LoncapaResponse):
     def _get_scoring_map(self):
         """Returns a dict of option->scoring for each input."""
         scoring = self.default_scoring
-        choices = {choice: choice for choice in scoring}  # lint-amnesty, pylint: disable=consider-using-dict-comprehension
+        choices = {choice: choice for choice in scoring}
         scoring_map = {}
 
         for inputfield in self.inputfields:
-            option_scoring = {  # lint-amnesty, pylint: disable=consider-using-dict-comprehension
+            option_scoring = {
                 option['id']:
                 {
                     'correctness': choices.get(option['choice']),
@@ -3521,7 +3520,7 @@ class AnnotationResponse(LoncapaResponse):
         """Returns a dict of the max points for each input: input id -> maxpoints."""
         scoring = self.default_scoring
         correct_points = scoring.get('correct')
-        return {inputfield.get('id'): correct_points for inputfield in self.inputfields}  # lint-amnesty, pylint: disable=consider-using-dict-comprehension
+        return {inputfield.get('id'): correct_points for inputfield in self.inputfields}
 
     def _find_options(self, inputfield):
         """Returns an array of dicts where each dict represents an option. """

@@ -52,7 +52,6 @@ import html5lib
 import pyparsing
 from calc.preview import latex_preview
 from chem import chemcalc
-from django.utils.encoding import python_2_unicode_compatible
 from lxml import etree
 
 from capa.xqueue_interface import XQUEUE_TIMEOUT
@@ -71,7 +70,6 @@ log = logging.getLogger(__name__)
 registry = TagRegistry()  # pylint: disable=invalid-name
 
 
-@python_2_unicode_compatible
 class Status:
     """
     Problem status
