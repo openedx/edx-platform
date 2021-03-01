@@ -44,6 +44,7 @@ from openedx.core.djangoapps.util.maintenance_banner import add_maintenance_bann
 from openedx.core.djangoapps.waffle_utils import WaffleFlag, WaffleFlagNamespace
 from openedx.core.djangolib.markup import HTML, Text
 from openedx.features.enterprise_support.api import get_dashboard_consent_notification
+from shoppingcart.api import order_history
 from shoppingcart.models import CourseRegistrationCode, DonationConfiguration
 from student.api import COURSE_DASHBOARD_PLUGIN_VIEW_NAME
 from student.helpers import cert_info, check_verify_status_by_course, get_resume_urls_for_enrollments
@@ -797,6 +798,13 @@ def student_dashboard(request):
     # we'll display the banner
     denied_banner = any(item.display for item in reverifications["denied"])
 
+    # Populate the Order History for the side-bar.
+    order_history_list = order_history(
+        user,
+        course_org_filter=site_org_whitelist,
+        org_filter_out_set=site_org_blacklist
+    )
+
     # get list of courses having pre-requisites yet to be completed
     courses_having_prerequisites = frozenset(
         enrollment.course_id for enrollment in course_enrollments
@@ -819,8 +827,9 @@ def student_dashboard(request):
         redirect_message = ''
 
     valid_verification_statuses = ['approved', 'must_reverify', 'pending', 'expired']
-    display_sidebar_on_dashboard = verification_status['status'] in valid_verification_statuses and \
-        verification_status['should_display']
+    display_sidebar_on_dashboard = (len(order_history_list) or
+                                    (verification_status['status'] in valid_verification_statuses and
+                                    verification_status['should_display']))
 
     # Filter out any course enrollment course cards that are associated with fulfilled entitlements
     for entitlement in [e for e in course_entitlements if e.enrollment_course_run is not None]:
@@ -864,6 +873,7 @@ def student_dashboard(request):
         'platform_name': platform_name,
         'enrolled_courses_either_paid': enrolled_courses_either_paid,
         'provider_states': [],
+        'order_history_list': order_history_list,
         'courses_requirements_not_met': courses_requirements_not_met,
         'nav_hidden': True,
         'inverted_programs': inverted_programs,
