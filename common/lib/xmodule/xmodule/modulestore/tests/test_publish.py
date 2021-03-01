@@ -15,8 +15,6 @@ from tempfile import mkdtemp
 
 import pytest
 import ddt
-import six
-from six.moves import range
 
 from openedx.core.lib.tests import attr
 from xmodule.exceptions import InvalidVersionError
@@ -48,7 +46,7 @@ class TestPublish(SplitWMongoCourseBootstrapper):
         # create course: finds: 1 to verify uniqueness, 1 to find parents
         # sends: 1 to create course, 1 to create overview
         with check_mongo_calls(4, 2):
-            super(TestPublish, self)._create_course(split=False)  # 2 inserts (course and overview)  # lint-amnesty, pylint: disable=super-with-arguments
+            super()._create_course(split=False)  # 2 inserts (course and overview)
 
         # with bulk will delay all inheritance computations which won't be added into the mongo_calls
         with self.draft_mongo.bulk_operations(self.old_course_key):
@@ -183,7 +181,7 @@ class DraftPublishedOpTestCourseSetup(unittest.TestCase):
             """
             Given a block_type/num, return a block id.
             """
-            return '{}{:02d}'.format(block_type, num)
+            return f'{block_type}{num:02d}'
 
         def _make_course_db_entry(parent_type, parent_id, block_id, idx, child_block_type, child_block_id_base):
             """
@@ -276,7 +274,7 @@ class DraftPublishedOpTestCourseSetup(unittest.TestCase):
         # data needed to check the OLX.
         self.course_db = {}
 
-        super(DraftPublishedOpTestCourseSetup, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
 
 
 class OLXFormatChecker(unittest.TestCase):
@@ -306,7 +304,7 @@ class OLXFormatChecker(unittest.TestCase):
         self._ensure_exported()
 
         block_path = os.path.join(self.root_export_dir, self.export_dir)  # pylint: disable=no-member
-        assert os.path.isdir(block_path), '{} is not a dir.'.format(block_path)
+        assert os.path.isdir(block_path), f'{block_path} is not a dir.'
         return block_path
 
     def _get_block_type_path(self, course_export_dir, block_type, draft):
@@ -322,7 +320,7 @@ class OLXFormatChecker(unittest.TestCase):
         """
         Return the course export filename for a block.
         """
-        return '{}.xml'.format(block_id)
+        return f'{block_id}.xml'
 
     def _get_block_contents(self, block_subdir_path, block_id):
         """
@@ -333,8 +331,8 @@ class OLXFormatChecker(unittest.TestCase):
 
         block_file = self._get_block_filename(block_id)
         block_file_path = os.path.join(block_subdir_path, block_file)
-        assert os.path.isfile(block_file_path), '{} is not an existing file.'.format(block_file_path)
-        with open(block_file_path, "r") as file_handle:
+        assert os.path.isfile(block_file_path), f'{block_file_path} is not an existing file.'
+        with open(block_file_path) as file_handle:
             return file_handle.read()
 
     def assertElementTag(self, element, tag):
@@ -390,7 +388,7 @@ class OLXFormatChecker(unittest.TestCase):
         is_draft = kwargs.pop('draft', False)
         block_path = self._get_block_type_path(course_export_dir, block_type, is_draft)
         block_file_path = os.path.join(block_path, self._get_block_filename(block_id))
-        assert not os.path.exists(block_file_path), '{} exists but should not!'.format(block_file_path)
+        assert not os.path.exists(block_file_path), f'{block_file_path} exists but should not!'
 
     def assertParentReferences(self, element, course_key, parent_type, parent_id, index_in_children_list):
         """
@@ -406,7 +404,7 @@ class OLXFormatChecker(unittest.TestCase):
         parent_key = course_key.make_usage_key(parent_type, parent_id)
 
         self.assertElementAttrsSubset(element, {
-            'parent_url': re.escape(six.text_type(parent_key)),
+            'parent_url': re.escape(str(parent_key)),
             'index_in_children_list': re.escape(str(index_in_children_list)),
         })
 
@@ -496,11 +494,11 @@ class DraftPublishedOpBaseTestSetup(OLXFormatChecker, DraftPublishedOpTestCourse
     Setup base class for draft/published/OLX tests.
     """
 
-    EXPORTED_COURSE_BEFORE_DIR_NAME = u'exported_course_before'
-    EXPORTED_COURSE_AFTER_DIR_NAME = u'exported_course_after_{}'
+    EXPORTED_COURSE_BEFORE_DIR_NAME = 'exported_course_before'
+    EXPORTED_COURSE_AFTER_DIR_NAME = 'exported_course_after_{}'
 
     def setUp(self):
-        super(DraftPublishedOpBaseTestSetup, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.export_dir = self.EXPORTED_COURSE_BEFORE_DIR_NAME
         self.root_export_dir = None
         self.contentstore = None
@@ -564,7 +562,7 @@ class DraftPublishedOpBaseTestSetup(OLXFormatChecker, DraftPublishedOpTestCourse
         """
         Make a unique name for the new export dir.
         """
-        return self.EXPORTED_COURSE_AFTER_DIR_NAME.format(six.text_type(uuid.uuid4())[:8])
+        return self.EXPORTED_COURSE_AFTER_DIR_NAME.format(str(uuid.uuid4())[:8])
 
     def publish(self, block_list):
         """

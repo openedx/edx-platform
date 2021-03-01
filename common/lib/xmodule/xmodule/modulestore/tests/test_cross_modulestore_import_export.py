@@ -17,9 +17,9 @@ import itertools
 import os
 from shutil import rmtree
 from tempfile import mkdtemp
+from unittest.mock import patch
 
 import ddt
-from mock import patch
 from path import Path as path
 
 from openedx.core.lib.tests import attr
@@ -43,7 +43,7 @@ COURSE_DATA_NAMES = (
     'split_test_module_draft',
 )
 
-EXPORTED_COURSE_DIR_NAME = u'exported_source_course'
+EXPORTED_COURSE_DIR_NAME = 'exported_source_course'
 
 
 @ddt.ddt
@@ -55,7 +55,7 @@ class CrossStoreXMLRoundtrip(CourseComparisonTest, PartitionTestCase):
     """
 
     def setUp(self):
-        super(CrossStoreXMLRoundtrip, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.export_dir = mkdtemp()
         self.addCleanup(rmtree, self.export_dir, ignore_errors=True)
 

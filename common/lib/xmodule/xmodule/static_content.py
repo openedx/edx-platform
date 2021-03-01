@@ -16,7 +16,6 @@ from collections import defaultdict
 from pkg_resources import resource_string
 
 import django
-import six
 from docopt import docopt
 from path import Path as path
 
@@ -179,7 +178,7 @@ def _write_styles(selector, output_root, classes, css_attribute):
         module_styles_lines.append("""{selector}.xmodule_{class_} {{""".format(
             class_=class_, selector=selector
         ))
-        module_styles_lines.extend('  @import "{0}";'.format(name) for name in fragment_names)
+        module_styles_lines.extend(f'  @import "{name}";' for name in fragment_names)
         module_styles_lines.append('}')
 
     contents['_module-styles.scss'] = '\n'.join(module_styles_lines)
@@ -236,7 +235,7 @@ def _write_files(output_root, contents, generated_suffix_map=None):
         will be ignored
     """
     _ensure_dir(output_root)
-    to_delete = set(file.basename() for file in output_root.files()) - set(contents.keys())
+    to_delete = {file.basename() for file in output_root.files()} - set(contents.keys())
 
     if generated_suffix_map:
         for output_file in contents.keys():
@@ -247,7 +246,7 @@ def _write_files(output_root, contents, generated_suffix_map=None):
     for extra_file in to_delete:
         (output_root / extra_file).remove_p()
 
-    for filename, file_content in six.iteritems(contents):
+    for filename, file_content in contents.items():
         output_file = output_root / filename
 
         not_file = not output_file.isfile()
@@ -255,7 +254,7 @@ def _write_files(output_root, contents, generated_suffix_map=None):
         # Sometimes content is already unicode and sometimes it's not
         # so we add this conditional here to make sure that below we're
         # always working with streams of bytes.
-        if not isinstance(file_content, six.binary_type):
+        if not isinstance(file_content, bytes):
             file_content = file_content.encode('utf-8')
 
         # not_file is included to short-circuit this check, because
@@ -280,7 +279,7 @@ def write_webpack(output_file, module_files, descriptor_files):
         'entry': {}
     }
     for (owner, files) in list(module_files.items()) + list(descriptor_files.items()):
-        unique_files = sorted(set('./{}'.format(file) for file in files))
+        unique_files = sorted({f'./{file}' for file in files})
         if len(unique_files) == 1:
             unique_files = unique_files[0]
         config['entry'][owner] = unique_files
@@ -289,7 +288,7 @@ def write_webpack(output_file, module_files, descriptor_files):
 
     with output_file.open('w') as outfile:
         outfile.write(
-            textwrap.dedent(u"""\
+            textwrap.dedent("""\
                 module.exports = {config_json};
             """).format(
                 config_json=json.dumps(

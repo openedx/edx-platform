@@ -5,11 +5,10 @@ Test the partitions and partitions service
 
 
 from datetime import datetime
+from unittest.mock import Mock
 
 import pytest
-import six
 from django.test import TestCase
-from mock import Mock  # lint-amnesty, pylint: disable=unused-import
 from opaque_keys.edx.locator import CourseLocator
 from stevedore.extension import Extension, ExtensionManager
 
@@ -96,12 +95,12 @@ class TestGroup(TestCase):
         assert 'programmer' not in group.to_json()
 
 
-class MockUserPartitionScheme(object):
+class MockUserPartitionScheme:
     """
     Mock user partition scheme
     """
     def __init__(self, name="mock", current_group=None, **kwargs):
-        super(MockUserPartitionScheme, self).__init__(**kwargs)  # lint-amnesty, pylint: disable=super-with-arguments
+        super().__init__(**kwargs)
         self.name = name
         self.current_group = current_group
 
@@ -137,7 +136,7 @@ class PartitionTestCase(TestCase):
     ENROLLMENT_TRACK_SCHEME_NAME = "enrollment_track"
 
     def setUp(self):
-        super(PartitionTestCase, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         # Set up two user partition schemes: mock and random
         self.non_random_scheme = MockUserPartitionScheme(self.TEST_SCHEME_NAME)
         self.random_scheme = MockUserPartitionScheme("random")
@@ -419,7 +418,7 @@ class MockPartitionService(PartitionService):
     Mock PartitionService for testing.
     """
     def __init__(self, course, **kwargs):
-        super(MockPartitionService, self).__init__(**kwargs)  # lint-amnesty, pylint: disable=super-with-arguments
+        super().__init__(**kwargs)
         self._course = course
 
     def get_course(self):
@@ -432,7 +431,7 @@ class PartitionServiceBaseClass(PartitionTestCase):
     """
 
     def setUp(self):
-        super(PartitionServiceBaseClass, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
 
         ContentTypeGatingConfig.objects.create(
             enabled=True,
@@ -448,7 +447,7 @@ class PartitionServiceBaseClass(PartitionTestCase):
         # extra param to this method. Just has to be unique per user.
         user_id = abs(hash(username))
         self.user = Mock(
-            username=username, email='{}@edx.org'.format(username), is_staff=False, is_active=True, id=user_id
+            username=username, email=f'{username}@edx.org', is_staff=False, is_active=True, id=user_id
         )
         self.course.user_partitions = [self.user_partition]
 
@@ -543,7 +542,7 @@ class TestGetCourseUserPartitions(PartitionServiceBaseClass):
     """
 
     def setUp(self):
-        super(TestGetCourseUserPartitions, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         TestGetCourseUserPartitions._enable_enrollment_track_partition(True)
 
     @staticmethod
@@ -562,7 +561,7 @@ class TestGetCourseUserPartitions(PartitionServiceBaseClass):
         assert self.TEST_SCHEME_NAME == all_partitions[0].scheme.name
         enrollment_track_partition = all_partitions[1]
         assert self.ENROLLMENT_TRACK_SCHEME_NAME == enrollment_track_partition.scheme.name
-        assert six.text_type(self.course.id) == enrollment_track_partition.parameters['course_id']
+        assert str(self.course.id) == enrollment_track_partition.parameters['course_id']
         assert ENROLLMENT_TRACK_PARTITION_ID == enrollment_track_partition.id
 
     def test_enrollment_track_partition_not_added_if_conflict(self):

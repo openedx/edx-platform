@@ -9,12 +9,10 @@ from datetime import datetime, timedelta
 import pytest
 import ddt
 import pytz
-import six
 
 from django.test import TestCase
 from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locator import CourseLocator
-from six.moves import range, zip
 
 from openedx.core.lib.tests import attr
 from xmodule.assetstore import AssetMetadata
@@ -29,16 +27,13 @@ from xmodule.modulestore.tests.utils import (
 )
 
 
-class AssetStoreTestData(object):
+class AssetStoreTestData:
     """
     Shared data for constructing test assets.
     """
     now = datetime.now(pytz.utc)
     user_id = 144
-    if six.PY2:
-        user_id_long = long(user_id)  # lint-amnesty, pylint: disable=undefined-variable
-    else:
-        user_id_long = int(user_id)
+    user_id_long = int(user_id)
 
     user_email = "me@example.com"
 
@@ -75,7 +70,7 @@ class TestSortedAssetList(unittest.TestCase):
     """
 
     def setUp(self):
-        super(TestSortedAssetList, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         asset_list = [dict(list(zip(AssetStoreTestData.asset_fields, asset))) for asset in AssetStoreTestData.all_asset_data]  # lint-amnesty, pylint: disable=line-too-long
         self.sorted_asset_list_by_filename = SortedAssetList(iterable=asset_list)
         self.sorted_asset_list_by_last_edit = SortedAssetList(iterable=asset_list, key=lambda x: x['edited_on'])
@@ -105,7 +100,7 @@ class TestMongoAssetMetadataStorage(TestCase):
     }
 
     def setUp(self):
-        super(TestMongoAssetMetadataStorage, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
 
         self.differents = (('different', 'burn.jpg'),)
         self.vrmls = (
@@ -560,7 +555,7 @@ class TestMongoAssetMetadataStorage(TestCase):
                 course1.id, None, start=0, maxresults=-1,
                 sort=('displayname', ModuleStoreEnum.SortOrder.ascending)
             )
-            assert len(assets) == len((self.differents + self.vrmls))
+            assert len(assets) == len(self.differents + self.vrmls)
             self._check_asset_values(assets, self.differents + self.vrmls)
 
     @ddt.data(*MODULESTORE_SETUPS)

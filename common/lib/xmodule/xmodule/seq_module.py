@@ -11,12 +11,10 @@ import logging
 from datetime import datetime
 from functools import reduce
 
-import six
 from lxml import etree
 from opaque_keys.edx.keys import UsageKey
 from pkg_resources import resource_string
 from pytz import UTC
-from six import text_type
 from web_fragments.fragment import Fragment
 from xblock.completable import XBlockCompletionMode
 from xblock.core import XBlock
@@ -61,12 +59,12 @@ _ = lambda text: text
 
 TIMED_EXAM_GATING_WAFFLE_FLAG = LegacyWaffleFlag(
     waffle_namespace="xmodule",
-    flag_name=u'rev_1377_rollout',
+    flag_name='rev_1377_rollout',
     module_name=__name__,
 )
 
 
-class SequenceFields(object):  # lint-amnesty, pylint: disable=missing-class-docstring
+class SequenceFields:  # lint-amnesty, pylint: disable=missing-class-docstring
     has_children = True
     completion_mode = XBlockCompletionMode.AGGREGATOR
 
@@ -138,7 +136,7 @@ class SequenceMixin(SequenceFields):
         return xblock_body
 
 
-class ProctoringFields(object):
+class ProctoringFields:
     """
     Fields that are specific to Proctored or Timed Exams
     """
@@ -315,7 +313,7 @@ class SequenceBlock(
         if dispatch == 'goto_position':
             # set position to default value if either 'position' argument not
             # found in request or it is a non-positive integer
-            position = data.get('position', u'1')
+            position = data.get('position', '1')
             if position.isdigit() and int(position) > 0:
                 self.position = int(position)
             else:
@@ -516,7 +514,7 @@ class SequenceBlock(
         params = {
             'items': items,
             'element_id': self.location.html_id(),
-            'item_id': text_type(self.location),
+            'item_id': str(self.location),
             'is_time_limited': self.is_time_limited,
             'position': self.position,
             'tag': self.location.block_type,
@@ -742,7 +740,7 @@ class SequenceBlock(
                 'content': content,
                 'page_title': getattr(item, 'tooltip_title', ''),
                 'type': item_type,
-                'id': text_type(usage_id),
+                'id': str(usage_id),
                 'bookmarked': is_bookmarked,
                 'path': " > ".join(display_names + [item.display_name_with_default]),
                 'graded': item.graded,
@@ -783,7 +781,7 @@ class SequenceBlock(
         """
         if not newrelic:
             return
-        newrelic.agent.add_custom_parameter('seq.block_id', six.text_type(self.location))
+        newrelic.agent.add_custom_parameter('seq.block_id', str(self.location))
         newrelic.agent.add_custom_parameter('seq.display_name', self.display_name or '')
         newrelic.agent.add_custom_parameter('seq.position', self.position)
         newrelic.agent.add_custom_parameter('seq.is_time_limited', self.is_time_limited)
@@ -808,7 +806,7 @@ class SequenceBlock(
         # Count of all modules by block_type (e.g. "video": 2, "discussion": 4)
         block_counts = collections.Counter(usage_key.block_type for usage_key in all_item_keys)
         for block_type, count in block_counts.items():
-            newrelic.agent.add_custom_parameter('seq.block_counts.{}'.format(block_type), count)
+            newrelic.agent.add_custom_parameter(f'seq.block_counts.{block_type}', count)
 
     def _capture_current_unit_metrics(self, display_items):
         """
@@ -822,7 +820,7 @@ class SequenceBlock(
         if 1 <= self.position <= len(display_items):
             # Basic info about the Unit...
             current = display_items[self.position - 1]
-            newrelic.agent.add_custom_parameter('seq.current.block_id', six.text_type(current.location))
+            newrelic.agent.add_custom_parameter('seq.current.block_id', str(current.location))
             newrelic.agent.add_custom_parameter('seq.current.display_name', current.display_name or '')
 
             # Examining all items inside the Unit (or split_test, conditional, etc.)
@@ -830,7 +828,7 @@ class SequenceBlock(
             newrelic.agent.add_custom_parameter('seq.current.num_items', len(child_locs))
             curr_block_counts = collections.Counter(usage_key.block_type for usage_key in child_locs)
             for block_type, count in curr_block_counts.items():
-                newrelic.agent.add_custom_parameter('seq.current.block_counts.{}'.format(block_type), count)
+                newrelic.agent.add_custom_parameter(f'seq.current.block_counts.{block_type}', count)
 
     def _time_limited_student_view(self):
         """
@@ -906,8 +904,8 @@ class SequenceBlock(
         return view_html
 
     def get_icon_class(self):
-        child_classes = set(child.get_icon_class()
-                            for child in self.get_children())
+        child_classes = {child.get_icon_class()
+                         for child in self.get_children()}
         new_class = 'other'
         for c in class_priority:
             if c in child_classes:
@@ -930,7 +928,7 @@ class SequenceBlock(
         return non_editable_fields
 
 
-class HighlightsFields(object):
+class HighlightsFields:
     """Only Sections have summaries now, but we may expand that later."""
     highlights = List(
         help=_("A list summarizing what students should look forward to in this section."),

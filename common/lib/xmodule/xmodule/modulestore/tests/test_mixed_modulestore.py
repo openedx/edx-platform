@@ -12,20 +12,18 @@ from contextlib import contextmanager
 from shutil import rmtree
 from tempfile import mkdtemp
 from uuid import uuid4
+from unittest.mock import Mock, call, patch
 
 import ddt
 import pymongo
 import pytest
-import six
 # Mixed modulestore depends on django, so we'll manually configure some django settings
 # before importing the module
 # TODO remove this import and the configuration -- xmodule should not depend on django!
 from django.conf import settings
-from mock import Mock, call, patch
 from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locator import BlockUsageLocator, CourseLocator, LibraryLocator
 from pytz import UTC
-from six.moves import range
 from web_fragments.fragment import Fragment
 from xblock.core import XBlockAside
 from xblock.fields import Scope, ScopeIds, String
@@ -121,7 +119,7 @@ class CommonMixedModuleStoreSetup(CourseComparisonTest):
         """
         Set up the database for testing
         """
-        super(CommonMixedModuleStoreSetup, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
 
         self.exclude_field(None, 'wiki_slug')
         self.exclude_field(None, 'xml_attributes')
@@ -281,7 +279,7 @@ class AsideFoo(XBlockAside):
     """
     Test xblock aside class
     """
-    FRAG_CONTENT = u"<p>Aside Foo rendered</p>"
+    FRAG_CONTENT = "<p>Aside Foo rendered</p>"
 
     field11 = String(default="aside1_default_value1", scope=Scope.content)
     field12 = String(default="aside1_default_value2", scope=Scope.settings)
@@ -296,7 +294,7 @@ class AsideBar(XBlockAside):
     """
     Test xblock aside class
     """
-    FRAG_CONTENT = u"<p>Aside Bar rendered</p>"
+    FRAG_CONTENT = "<p>Aside Bar rendered</p>"
 
     field21 = String(default="aside2_default_value1", scope=Scope.content)
     field22 = String(default="aside2_default_value2", scope=Scope.settings)
@@ -483,7 +481,7 @@ class TestMixedModuleStore(CommonMixedModuleStoreSetup):
 
         items = self.store.get_items(course_key)
         # Check items found are either course or about type
-        assert set(['course', 'about']).issubset(set([item.location.block_type for item in items]))  # pylint: disable=consider-using-set-comprehension, line-too-long
+        assert {'course', 'about'}.issubset({item.location.block_type for item in items})  # pylint: disable=line-too-long
         # Assert that about is a detached category found in get_items
         assert [item.location.block_type for item in items if item.location.block_type == 'about'][0]\
                in DETACHED_XBLOCK_TYPES
@@ -511,7 +509,7 @@ class TestMixedModuleStore(CommonMixedModuleStoreSetup):
         items_in_tree = self.store.get_items(course_key, include_orphans=False)
 
         # Check that course and about blocks are found in get_items
-        assert set(['course', 'about']).issubset({item.location.block_type for item in items_in_tree})
+        assert {'course', 'about'}.issubset({item.location.block_type for item in items_in_tree})
         # Check orphan is found or not - this is based on mongo/split modulestore. It should be found in mongo.
         assert (orphan in [item.location for item in items_in_tree]) == orphan_in_items
         assert len(items_in_tree) == expected_items_in_tree
@@ -1046,7 +1044,7 @@ class TestMixedModuleStore(CommonMixedModuleStoreSetup):
         with check_mongo_calls(max_find, max_send):
             courses = self.store.get_courses()
             course_ids = [course.location for course in courses]
-            assert len(courses) == 1, 'Not one course: {}'.format(course_ids)
+            assert len(courses) == 1, f'Not one course: {course_ids}'
             assert self.course_locations[self.MONGO_COURSEID] in course_ids
 
         with self.store.branch_setting(ModuleStoreEnum.Branch.draft_preferred):
@@ -1608,7 +1606,7 @@ class TestMixedModuleStore(CommonMixedModuleStoreSetup):
         # add another parent (unit) "vertical_x1b" for problem "problem_x1a_1"
         mongo_store.collection.update_one(
             self.vertical_x1b.to_deprecated_son('_id.'),  # lint-amnesty, pylint: disable=no-member
-            {'$push': {'definition.children': six.text_type(self.problem_x1a_1)}}  # lint-amnesty, pylint: disable=no-member
+            {'$push': {'definition.children': str(self.problem_x1a_1)}}  # lint-amnesty, pylint: disable=no-member
         )
 
         # convert first parent (unit) "vertical_x1a" of problem "problem_x1a_1" to draft
@@ -1647,7 +1645,7 @@ class TestMixedModuleStore(CommonMixedModuleStoreSetup):
 
             should_work = (
                 (self.problem_x1a_2,  # lint-amnesty, pylint: disable=no-member
-                 (course_key, u"Chapter_x", u"Sequential_x1", u'Vertical_x1a', '1', self.problem_x1a_2)),  # lint-amnesty, pylint: disable=no-member
+                 (course_key, "Chapter_x", "Sequential_x1", 'Vertical_x1a', '1', self.problem_x1a_2)),  # lint-amnesty, pylint: disable=no-member
                 (self.chapter_x,  # lint-amnesty, pylint: disable=no-member
                  (course_key, "Chapter_x", None, None, None, self.chapter_x)),  # lint-amnesty, pylint: disable=no-member
             )
@@ -1908,7 +1906,7 @@ class TestMixedModuleStore(CommonMixedModuleStoreSetup):
 
         with check_mongo_calls(max_find, max_send):
             found_orphans = self.store.get_orphans(self.course_locations[self.MONGO_COURSEID].course_key)
-        six.assertCountEqual(self, found_orphans, orphan_locations)
+        self.assertCountEqual(found_orphans, orphan_locations)
 
     @ddt.data(ModuleStoreEnum.Type.mongo)
     def test_get_non_orphan_parents(self, default_ms):
@@ -1948,11 +1946,11 @@ class TestMixedModuleStore(CommonMixedModuleStoreSetup):
         # add orphan vertical and sequential as another parents of problem "problem_x1a_1"
         mongo_store.collection.update_one(
             orphan_sequential.to_deprecated_son('_id.'),
-            {'$push': {'definition.children': six.text_type(self.problem_x1a_1)}}  # lint-amnesty, pylint: disable=no-member
+            {'$push': {'definition.children': str(self.problem_x1a_1)}}  # lint-amnesty, pylint: disable=no-member
         )
         mongo_store.collection.update_one(
             orphan_vertical.to_deprecated_son('_id.'),
-            {'$push': {'definition.children': six.text_type(self.problem_x1a_1)}}  # lint-amnesty, pylint: disable=no-member
+            {'$push': {'definition.children': str(self.problem_x1a_1)}}  # lint-amnesty, pylint: disable=no-member
         )
         # test that "get_parent_location" method of published branch still returns the correct non-orphan parent for
         # problem "problem_x1a_1" since the two other parents are orphans
@@ -1961,7 +1959,7 @@ class TestMixedModuleStore(CommonMixedModuleStoreSetup):
             assert parent == self.vertical_x1a  # lint-amnesty, pylint: disable=no-member
 
         # now add valid published vertical as another parent of problem
-        mongo_store.collection.update_one(self.sequential_x1.to_deprecated_son('_id.'), {'$push': {'definition.children': six.text_type(self.problem_x1a_1)}})  # lint-amnesty, pylint: disable=no-member, line-too-long
+        mongo_store.collection.update_one(self.sequential_x1.to_deprecated_son('_id.'), {'$push': {'definition.children': str(self.problem_x1a_1)}})  # lint-amnesty, pylint: disable=no-member, line-too-long
         # now check that "get_parent_location" method of published branch raises "ReferentialIntegrityError" for
         # problem "problem_x1a_1" since it has now 2 valid published parents
         with self.store.branch_setting(ModuleStoreEnum.Branch.published_only, course_id):
@@ -1983,7 +1981,7 @@ class TestMixedModuleStore(CommonMixedModuleStoreSetup):
             block_id='orphan'
         )
         orphans = self.store.get_orphans(self.course_locations[self.MONGO_COURSEID].course_key)
-        assert len(orphans) == 0, 'unexpected orphans: {}'.format(orphans)
+        assert len(orphans) == 0, f'unexpected orphans: {orphans}'
 
     @ddt.data(ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split)
     def test_create_item_populates_edited_info(self, default_ms):
@@ -2487,7 +2485,7 @@ class TestMixedModuleStore(CommonMixedModuleStoreSetup):
         self._initialize_mixed(mappings={})
 
         fake_store = "fake"
-        with self.assertRaisesRegex(Exception, "Cannot find store of type {}".format(fake_store)):
+        with self.assertRaisesRegex(Exception, f"Cannot find store of type {fake_store}"):
             with self.store.default_store(fake_store):
                 pass  # pragma: no cover
 
@@ -2495,7 +2493,7 @@ class TestMixedModuleStore(CommonMixedModuleStoreSetup):
         """
         Load and save the given file. (taken from test_contentstore)
         """
-        with open("{}/static/{}".format(DATA_DIR, asset_key.block_id), "rb") as f:
+        with open(f"{DATA_DIR}/static/{asset_key.block_id}", "rb") as f:
             content = StaticContent(
                 asset_key, "Funky Pix", mimetypes.guess_type(asset_key.block_id)[0], f.read(),
             )
@@ -3002,7 +3000,7 @@ class TestPublishOverExportImport(CommonMixedModuleStoreSetup):
         """
         Set up the database for testing
         """
-        super(TestPublishOverExportImport, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
 
         self.user_id = ModuleStoreEnum.UserID.test
         self.export_dir = mkdtemp()
@@ -3353,11 +3351,11 @@ class TestPublishOverExportImport(CommonMixedModuleStoreSetup):
                     """
                     asides = block.runtime.get_asides(block)
 
-                    assert len(asides) == 1, 'Found {} asides but expected only test_aside'.format(asides)
+                    assert len(asides) == 1, f'Found {asides} asides but expected only test_aside'
                     assert isinstance(asides[0], AsideTestType)
                     category = block.scope_ids.block_type
-                    assert asides[0].data_field == '{} aside data'.format(category)
-                    assert asides[0].content == '{} Aside'.format(category.capitalize())
+                    assert asides[0].data_field == f'{category} aside data'
+                    assert asides[0].content == f'{category.capitalize()} Aside'
 
                     for child in block.get_children():
                         check_block(child)
@@ -3368,7 +3366,7 @@ class TestPublishOverExportImport(CommonMixedModuleStoreSetup):
                 new_chapter = self.store.create_child(self.user_id, courses[0].location, 'chapter', 'new_chapter')
                 asides = new_chapter.runtime.get_asides(new_chapter)
 
-                assert len(asides) == 1, 'Found {} asides but expected only test_aside'.format(asides)
+                assert len(asides) == 1, f'Found {asides} asides but expected only test_aside'
                 chapter_aside = asides[0]
                 assert isinstance(chapter_aside, AsideTestType)
                 assert not chapter_aside.fields['data_field'].is_set_on(chapter_aside), \
@@ -3468,11 +3466,11 @@ class TestPublishOverExportImport(CommonMixedModuleStoreSetup):
                     """
                     asides = block.runtime.get_asides(block)
 
-                    assert len(asides) == 1, 'Found {} asides but expected only test_aside'.format(asides)
+                    assert len(asides) == 1, f'Found {asides} asides but expected only test_aside'
                     assert isinstance(asides[0], AsideTestType)
                     category = block.scope_ids.block_type
-                    assert asides[0].data_field == 'Exported data_field {} aside data'.format(category)
-                    assert asides[0].content == 'Exported content {} Aside'.format(category.capitalize())
+                    assert asides[0].data_field == f'Exported data_field {category} aside data'
+                    assert asides[0].content == f'Exported content {category.capitalize()} Aside'
 
                     for child in block.get_children():
                         check_block(child)
@@ -3515,7 +3513,7 @@ class TestPublishOverExportImport(CommonMixedModuleStoreSetup):
                 new_chapter.display_name = new_chapter_display_name
                 asides = new_chapter.runtime.get_asides(new_chapter)
 
-                assert len(asides) == 1, 'Found {} asides but expected only test_aside'.format(asides)
+                assert len(asides) == 1, f'Found {asides} asides but expected only test_aside'
                 chapter_aside = asides[0]
                 assert isinstance(chapter_aside, AsideTestType)
                 chapter_aside.data_field = 'new value'
@@ -3528,7 +3526,7 @@ class TestPublishOverExportImport(CommonMixedModuleStoreSetup):
                 new_problem.display_name = new_problem_display_name
                 asides = new_problem.runtime.get_asides(new_problem)
 
-                assert len(asides) == 1, 'Found {} asides but expected only test_aside'.format(asides)
+                assert len(asides) == 1, f'Found {asides} asides but expected only test_aside'
                 problem_aside = asides[0]
                 assert isinstance(problem_aside, AsideTestType)
                 problem_aside.data_field = 'new problem value'
@@ -3607,7 +3605,7 @@ class TestAsidesWithMixedModuleStore(CommonMixedModuleStoreSetup):
         """
         Setup environment for testing
         """
-        super(TestAsidesWithMixedModuleStore, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         key_store = DictKeyValueStore()
         field_data = KvsFieldData(key_store)
         self.runtime = TestRuntime(services={'field-data': field_data})

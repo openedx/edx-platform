@@ -2,13 +2,12 @@
 
 import json
 import unittest
+from unittest.mock import Mock, patch
 
 from fs.memoryfs import MemoryFS
 from lxml import etree
-from mock import Mock, patch
 from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locator import BlockUsageLocator, CourseLocator
-from six import text_type
 from web_fragments.fragment import Fragment
 from xblock.field_data import DictFieldData
 from xblock.fields import ScopeIds
@@ -33,7 +32,7 @@ class DummySystem(ImportSystem):  # lint-amnesty, pylint: disable=abstract-metho
 
         xmlstore = XMLModuleStore("data_dir", source_dirs=[], load_error_modules=load_error_modules)
 
-        super(DummySystem, self).__init__(  # lint-amnesty, pylint: disable=super-with-arguments
+        super().__init__(
             xmlstore=xmlstore,
             course_id=CourseKey.from_string('/'.join([ORG, COURSE, 'test_run'])),
             course_dir='test_dir',
@@ -52,7 +51,7 @@ class ConditionalBlockFactory(xml.XmlImportFactory):
     tag = 'conditional'
 
 
-class ConditionalFactory(object):
+class ConditionalFactory:
     """
     A helper class to create a conditional module and associated source and child modules
     to allow for testing.
@@ -89,7 +88,7 @@ class ConditionalFactory(object):
         # construct other descriptors:
         child_descriptor = Mock(name='child_descriptor')
         child_descriptor.visible_to_staff_only = False
-        child_descriptor._xmodule.student_view.return_value = Fragment(content=u'<p>This is a secret</p>')  # lint-amnesty, pylint: disable=protected-access
+        child_descriptor._xmodule.student_view.return_value = Fragment(content='<p>This is a secret</p>')  # lint-amnesty, pylint: disable=protected-access
         child_descriptor.student_view = child_descriptor._xmodule.student_view  # lint-amnesty, pylint: disable=protected-access
         child_descriptor.displayable_items.return_value = [child_descriptor]
         child_descriptor.runtime = descriptor_system
@@ -149,7 +148,7 @@ class ConditionalBlockBasicTest(unittest.TestCase):
     """
 
     def setUp(self):
-        super(ConditionalBlockBasicTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.test_system = get_test_system()
 
     def test_icon_class(self):
@@ -168,8 +167,8 @@ class ConditionalBlockBasicTest(unittest.TestCase):
         html = modules['cond_module'].render(STUDENT_VIEW).content
         expected = modules['cond_module'].xmodule_runtime.render_template('conditional_ajax.html', {
             'ajax_url': modules['cond_module'].ajax_url,
-            'element_id': u'i4x-edX-conditional_test-conditional-SampleConditional',
-            'depends': u'i4x-edX-conditional_test-problem-SampleProblem',
+            'element_id': 'i4x-edX-conditional_test-conditional-SampleConditional',
+            'depends': 'i4x-edX-conditional_test-problem-SampleProblem',
         })
         assert expected == html
 
@@ -226,12 +225,12 @@ class ConditionalBlockXmlTest(unittest.TestCase):
         return DummySystem(load_error_modules)
 
     def setUp(self):
-        super(ConditionalBlockXmlTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.test_system = get_test_system()
 
     def get_course(self, name):
         """Get a test course by directory name.  If there's more than one, error."""
-        print("Importing {0}".format(name))
+        print(f"Importing {name}")
 
         modulestore = XMLModuleStore(DATA_DIR, source_dirs=[name])
         courses = modulestore.get_courses()
@@ -280,9 +279,9 @@ class ConditionalBlockXmlTest(unittest.TestCase):
             'conditional_ajax.html',
             {
                 # Test ajax url is just usage-id / handler_name
-                'ajax_url': '{}/xmodule_handler'.format(text_type(location)),
-                'element_id': u'i4x-HarvardX-ER22x-conditional-condone',
-                'depends': u'i4x-HarvardX-ER22x-problem-choiceprob'
+                'ajax_url': '{}/xmodule_handler'.format(str(location)),
+                'element_id': 'i4x-HarvardX-ER22x-conditional-condone',
+                'depends': 'i4x-HarvardX-ER22x-problem-choiceprob'
             }
         )
         assert html == html_expect
@@ -443,7 +442,7 @@ class ConditionalBlockStudioTest(XModuleXmlImportTest):
         """
         self.conditional.sources_list = None
         validation = self.conditional.validate()
-        assert validation.summary.text == u'This component has no source components configured yet.'
+        assert validation.summary.text == 'This component has no source components configured yet.'
         assert validation.summary.type == StudioValidationMessage.NOT_CONFIGURED
         assert validation.summary.action_class == 'edit-button'
-        assert validation.summary.action_label == u'Configure list of sources'
+        assert validation.summary.action_label == 'Configure list of sources'

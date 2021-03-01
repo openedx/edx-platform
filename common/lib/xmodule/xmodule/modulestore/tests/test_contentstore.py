@@ -52,7 +52,7 @@ class TestContentstore(unittest.TestCase):
             CourseLocator.deprecated = cls.ssck_deprecated
         else:
             del CourseLocator.deprecated
-        return super(TestContentstore, cls).tearDownClass()
+        return super().tearDownClass()
 
     def set_up_assets(self, deprecated):
         """
@@ -86,7 +86,7 @@ class TestContentstore(unittest.TestCase):
         """
         Load and save the given file.
         """
-        with open("{}/static/{}".format(DATA_DIR, filename), "rb") as f:
+        with open(f"{DATA_DIR}/static/{filename}", "rb") as f:
             content = StaticContent(
                 asset_key, displayname, mimetypes.guess_type(filename)[0], f.read(),
                 locked=locked
@@ -115,9 +115,9 @@ class TestContentstore(unittest.TestCase):
         """
         self.set_up_assets(deprecated)
         asset_key = self.course1_key.make_asset_key('asset', self.course1_files[0])
-        assert self.contentstore.find(asset_key) is not None, 'Could not find {}'.format(asset_key)
+        assert self.contentstore.find(asset_key) is not None, f'Could not find {asset_key}'
 
-        assert self.contentstore.find(asset_key, as_stream=True) is not None, 'Could not find {}'.format(asset_key)
+        assert self.contentstore.find(asset_key, as_stream=True) is not None, f'Could not find {asset_key}'
 
         unknown_asset = self.course1_key.make_asset_key('asset', 'no_such_file.gif')
         with pytest.raises(NotFoundError):
@@ -139,11 +139,11 @@ class TestContentstore(unittest.TestCase):
             )
             for filename in self.course1_files:
                 filepath = path.Path(root_dir / filename)
-                assert filepath.isfile(), '{} is not a file'.format(filepath)
+                assert filepath.isfile(), f'{filepath} is not a file'
             for filename in self.course2_files:
                 if filename not in self.course1_files:
                     filepath = path.Path(root_dir / filename)
-                    assert not filepath.isfile(), '{} is unexpected exported a file'.format(filepath)
+                    assert not filepath.isfile(), f'{filepath} is unexpected exported a file'
         finally:
             shutil.rmtree(root_dir)
 

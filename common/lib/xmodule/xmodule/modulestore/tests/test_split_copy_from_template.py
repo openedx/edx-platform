@@ -6,7 +6,6 @@ However for these tests, we make sure it also works when copying from course to 
 
 
 import ddt
-from six.moves import range
 import pytest
 
 from xmodule.modulestore import ModuleStoreEnum

@@ -14,7 +14,7 @@ log = logging.getLogger(__name__)
 PRE_TAG_REGEX = re.compile(r'<pre\b[^>]*>(?:(?=([^<]+))\1|<(?!pre\b[^>]*>))*?</pre>')
 
 
-class RawMixin(object):
+class RawMixin:
     """
     Common code between RawDescriptor and XBlocks converted from XModules.
     """
@@ -68,8 +68,8 @@ class RawMixin(object):
             lines = self.data.split('\n')
             line, offset = err.position
             msg = (
-                u"Unable to create xml for module {loc}. "
-                u"Context: '{context}'"
+                "Unable to create xml for module {loc}. "
+                "Context: '{context}'"
             ).format(
                 context=lines[line - 1][offset - 40:offset + 40],
                 loc=self.location,
@@ -92,9 +92,9 @@ class RawMixin(object):
             node.remove(child)
         # Get attributes, if any, via normal parse_xml.
         try:
-            block = super(RawMixin, cls).parse_xml_new_runtime(node, runtime, keys)
+            block = super().parse_xml_new_runtime(node, runtime, keys)
         except AttributeError:
-            block = super(RawMixin, cls).parse_xml(node, runtime, keys, id_generator=None)
+            block = super().parse_xml(node, runtime, keys, id_generator=None)
         block.data = data_field_value
         return block
 
@@ -107,7 +107,7 @@ class RawDescriptor(RawMixin, XmlDescriptor, XMLEditingDescriptor):
     pass  # lint-amnesty, pylint: disable=unnecessary-pass
 
 
-class EmptyDataRawMixin(object):
+class EmptyDataRawMixin:
     """
     Common code between EmptyDataRawDescriptor and XBlocks converted from XModules.
     """
