@@ -5,18 +5,16 @@ import logging
 
 from django.conf import settings
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.shortcuts import get_object_or_404, redirect, render
+from django.shortcuts import redirect, render
 from django.urls import reverse
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import ensure_csrf_cookie
 from django.views.generic import View
 from opaque_keys.edx.keys import CourseKey
-from rest_framework.exceptions import PermissionDenied
 
 from cms.djangoapps.contentstore.views.course import get_course_and_check_access
 from edxmako.shortcuts import render_to_string
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
-from student.auth import has_course_author_access
 from util.views import ensure_valid_course_key
 
 from .models import CourseOverviewContent
@@ -37,8 +35,7 @@ class CourseCustomSettingsView(LoginRequiredMixin, View):
         Show course custom settings page with course overview content editor
         """
         course_key = CourseKey.from_string(course_key_string)
-        if not has_course_author_access(request.user, course_key):
-            raise PermissionDenied()
+        context_course = get_course_and_check_access(course_key, request.user)
 
         course_overview_url = u'{overview_base_url}/courses/{course_key}/overview'.format(
             overview_base_url=configuration_helpers.get_value('LMS_ROOT_URL', settings.LMS_ROOT_URL),
@@ -50,7 +47,7 @@ class CourseCustomSettingsView(LoginRequiredMixin, View):
             defaults={'body_html': default_content}
         )
         context = {
-            'context_course': get_course_and_check_access(course_key, request.user),
+            'context_course': context_course,
             'default_content': course_overview_content.body_html,
             'course_overview_url': course_overview_url,
             'custom_settings_url': reverse('custom_settings', kwargs={'course_key_string': course_key})

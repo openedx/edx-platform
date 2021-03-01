@@ -590,3 +590,8 @@ PROCTORING_SETTINGS = {}
 ############### Settings for Django Rate limit #####################
 
 RATELIMIT_RATE = '2/m'
+
+############### Theme settings for unit test #####################
+DEFAULT_SITE_THEME = 'pakx'
+COMPREHENSIVE_THEME_DIRS = ['/edx/src/pakx-theme/']
+ENABLE_COMPREHENSIVE_THEMING = True
