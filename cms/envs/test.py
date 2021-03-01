@@ -298,3 +298,8 @@ SYSTEM_WIDE_ROLE_CLASSES = os.environ.get("SYSTEM_WIDE_ROLE_CLASSES", [])
 DEFAULT_MOBILE_AVAILABLE = True
 
 PROCTORING_SETTINGS = {}
+
+############### Theme settings for unit test #####################
+DEFAULT_SITE_THEME = 'pakx'
+COMPREHENSIVE_THEME_DIRS = ['/edx/src/pakx-theme/']
+ENABLE_COMPREHENSIVE_THEMING = True
