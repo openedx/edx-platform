@@ -61,7 +61,6 @@ class StudentViewTransformer(BlockStructureTransformer):
             )
             if getattr(block, 'student_view_data', None):
                 student_view_data = block.student_view_data()
-
                 block_structure.set_transformer_block_field(
                     block_key,
                     cls,
