@@ -3,7 +3,7 @@ Factories for schedules tests
 """
 
 
-import factory
+from factory.django import DjangoModelFactory
 import pytz
 
 from openedx.core.djangoapps.schedules import models
