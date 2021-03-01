@@ -4,16 +4,15 @@ Unit tests for student optouts from course email
 
 
 import json
+from unittest.mock import Mock, patch
 
 from django.core import mail
 from django.core.management import call_command
 from django.urls import reverse
-from mock import Mock, patch
-from six import text_type
 
+from common.djangoapps.student.tests.factories import AdminFactory, CourseEnrollmentFactory, UserFactory
 from lms.djangoapps.bulk_email.models import BulkEmailFlag, Optout
 from lms.djangoapps.bulk_email.signals import force_optout_all
-from common.djangoapps.student.tests.factories import AdminFactory, CourseEnrollmentFactory, UserFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
@@ -25,7 +24,7 @@ class TestOptoutCourseEmailsBySignal(ModuleStoreTestCase):
     """
 
     def setUp(self):
-        super(TestOptoutCourseEmailsBySignal, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.course = CourseFactory.create(run='testcourse1', display_name="Test Course Title")
         self.instructor = AdminFactory.create()
         self.student = UserFactory.create()
@@ -36,9 +35,9 @@ class TestOptoutCourseEmailsBySignal(ModuleStoreTestCase):
 
         self.client.login(username=self.student.username, password="test")
 
-        self.send_mail_url = reverse('send_email', kwargs={'course_id': text_type(self.course.id)})
+        self.send_mail_url = reverse('send_email', kwargs={'course_id': str(self.course.id)})
         self.success_content = {
-            'course_id': text_type(self.course.id),
+            'course_id': str(self.course.id),
             'success': True,
         }
         BulkEmailFlag.objects.create(enabled=True, require_course_email_auth=False)
@@ -55,7 +54,7 @@ class TestOptoutCourseEmailsBySignal(ModuleStoreTestCase):
         Navigate to the instructor dash's email view to send bulk email
         """
         # Pull up email view on instructor dashboard
-        url = reverse('instructor_dashboard', kwargs={'course_id': text_type(self.course.id)})
+        url = reverse('instructor_dashboard', kwargs={'course_id': str(self.course.id)})
         response = self.client.get(url)
         email_section = '<div class="vert-left send-email" id="section-send-email">'
 
