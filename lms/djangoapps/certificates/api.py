@@ -10,7 +10,6 @@ certificates models or any other certificates modules.
 
 import logging
 
-import six
 from django.contrib.auth import get_user_model
 from django.db.models import Q
 from eventtracking import tracker
@@ -18,13 +17,16 @@ from opaque_keys.edx.django.models import CourseKeyField
 from organizations.api import get_course_organization_id
 
 from lms.djangoapps.branding import api as branding_api
-from lms.djangoapps.certificates.generation_handler import (
-    is_using_certificate_allowlist as _is_using_certificate_allowlist,
-    is_using_certificate_allowlist_and_is_on_allowlist as _is_using_certificate_allowlist_and_is_on_allowlist,
-    generate_allowlist_certificate_task as _generate_allowlist_certificate_task,
-    generate_user_certificates as _generate_user_certificates,
+from lms.djangoapps.certificates.generation_handler import \
+    generate_user_certificates as _generate_user_certificates
+from lms.djangoapps.certificates.generation_handler import \
+    is_using_certificate_allowlist as _is_using_certificate_allowlist
+from lms.djangoapps.certificates.generation_handler import \
+    is_using_certificate_allowlist_and_is_on_allowlist as _is_using_certificate_allowlist_and_is_on_allowlist
+from lms.djangoapps.certificates.generation_handler import \
+    generate_allowlist_certificate_task as _generate_allowlist_certificate_task
+from lms.djangoapps.certificates.generation_handler import \
     regenerate_user_certificates as _regenerate_user_certificates
-)
 from lms.djangoapps.certificates.models import (
     CertificateGenerationConfiguration,
     CertificateGenerationCourseSetting,
@@ -273,12 +275,12 @@ def set_cert_generation_enabled(course_key, is_enabled):
     cert_event_type = 'enabled' if is_enabled else 'disabled'
     event_name = '.'.join(['edx', 'certificate', 'generation', cert_event_type])
     tracker.emit(event_name, {
-        'course_id': six.text_type(course_key),
+        'course_id': str(course_key),
     })
     if is_enabled:
-        log.info(u"Enabled self-generated certificates for course '%s'.", six.text_type(course_key))
+        log.info("Enabled self-generated certificates for course '%s'.", str(course_key))
     else:
-        log.info(u"Disabled self-generated certificates for course '%s'.", six.text_type(course_key))
+        log.info("Disabled self-generated certificates for course '%s'.", str(course_key))
 
 
 def is_certificate_invalid(student, course_key):
