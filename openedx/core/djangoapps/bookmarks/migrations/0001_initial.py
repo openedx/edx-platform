@@ -1,7 +1,3 @@
-# -*- coding: utf-8 -*-
-
-
-
 from django.db import migrations, models
 import model_utils.fields
 import jsonfield.fields
@@ -51,6 +47,6 @@ class Migration(migrations.Migration):
         ),
         migrations.AlterUniqueTogether(
             name='bookmark',
-            unique_together=set([('user', 'usage_key')]),
+            unique_together={('user', 'usage_key')},
         ),
     ]

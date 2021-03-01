@@ -1,11 +1,10 @@
 """Tests for cached authentication middleware."""
-
+from unittest.mock import patch
 
 from django.conf import settings
 from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.urls import reverse
 from django.test import TestCase
-from mock import patch
 
 from openedx.core.djangolib.testing.utils import skip_unless_cms, skip_unless_lms
 from common.djangoapps.student.tests.factories import UserFactory
@@ -15,7 +14,7 @@ class CachedAuthMiddlewareTestCase(TestCase):
     """Tests for CacheBackedAuthenticationMiddleware class."""
 
     def setUp(self):
-        super(CachedAuthMiddlewareTestCase, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         password = 'test-password'
         self.user = UserFactory(password=password)
         self.client.login(username=self.user.username, password=password)

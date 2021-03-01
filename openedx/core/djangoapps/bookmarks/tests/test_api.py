@@ -1,13 +1,12 @@
 """
 Tests for bookmarks api.
 """
+from unittest.mock import Mock, patch
 
 import pytest
 import ddt
-import six
 from django.conf import settings
 from django.core.exceptions import ObjectDoesNotExist
-from mock import Mock, patch
 from opaque_keys.edx.keys import UsageKey
 
 from openedx.core.djangoapps.bookmarks.api import BookmarksLimitReachedError
@@ -19,7 +18,7 @@ from ..models import Bookmark
 from .test_models import BookmarksTestsBase
 
 
-class BookmarkApiEventTestMixin(object):
+class BookmarkApiEventTestMixin:
     """ Mixin for verifying that bookmark api events were emitted during a test. """
 
     def assert_bookmark_event_emitted(self, mock_tracker, event_name, **kwargs):
@@ -125,10 +124,10 @@ class BookmarksAPITests(BookmarkApiEventTestMixin, BookmarksTestsBase):
         self.assert_bookmark_event_emitted(
             mock_tracker,
             event_name='edx.bookmark.added',
-            course_id=six.text_type(self.course_id),
+            course_id=str(self.course_id),
             bookmark_id=bookmark_data['id'],
             component_type=self.vertical_2.location.block_type,
-            component_usage_id=six.text_type(self.vertical_2.location),
+            component_usage_id=str(self.vertical_2.location),
         )
 
         assert len(api.get_bookmarks(user=self.user, course_key=self.course.id)) == 5
@@ -146,10 +145,10 @@ class BookmarksAPITests(BookmarkApiEventTestMixin, BookmarksTestsBase):
         self.assert_bookmark_event_emitted(
             mock_tracker,
             event_name='edx.bookmark.added',
-            course_id=six.text_type(self.course_id),
+            course_id=str(self.course_id),
             bookmark_id=bookmark_data['id'],
             component_type=self.vertical_2.location.block_type,
-            component_usage_id=six.text_type(self.vertical_2.location),
+            component_usage_id=str(self.vertical_2.location),
         )
 
         assert len(api.get_bookmarks(user=self.user, course_key=self.course.id)) == 5
@@ -214,16 +213,16 @@ class BookmarksAPITests(BookmarkApiEventTestMixin, BookmarksTestsBase):
         self.assert_bookmark_event_emitted(
             mock_tracker,
             event_name='edx.bookmark.removed',
-            course_id=six.text_type(self.course_id),
+            course_id=str(self.course_id),
             bookmark_id=self.bookmark_1.resource_id,
             component_type=self.sequential_1.location.block_type,
-            component_usage_id=six.text_type(self.sequential_1.location),
+            component_usage_id=str(self.sequential_1.location),
         )
 
         bookmarks_data = api.get_bookmarks(user=self.user)
         assert len(bookmarks_data) == 4
-        assert six.text_type(self.sequential_1.location) != bookmarks_data[0]['usage_id']
-        assert six.text_type(self.sequential_1.location) != bookmarks_data[1]['usage_id']
+        assert str(self.sequential_1.location) != bookmarks_data[0]['usage_id']
+        assert str(self.sequential_1.location) != bookmarks_data[1]['usage_id']
 
     @patch('openedx.core.djangoapps.bookmarks.api.tracker.emit')
     def test_delete_bookmarks_with_vertical_block_type(self, mock_tracker):
@@ -234,10 +233,10 @@ class BookmarksAPITests(BookmarkApiEventTestMixin, BookmarksTestsBase):
         self.assert_bookmark_event_emitted(
             mock_tracker,
             event_name='edx.bookmark.removed',
-            course_id=six.text_type(self.course_id),
+            course_id=str(self.course_id),
             bookmark_id=self.bookmark_3.resource_id,
             component_type=self.vertical_1.location.block_type,
-            component_usage_id=six.text_type(self.vertical_3.location),
+            component_usage_id=str(self.vertical_3.location),
         )
 
         assert len(api.get_bookmarks(self.user)) == 4
@@ -257,10 +256,10 @@ class BookmarksAPITests(BookmarkApiEventTestMixin, BookmarksTestsBase):
         self.assert_bookmark_event_emitted(
             mock_tracker,
             event_name='edx.bookmark.removed',
-            course_id=six.text_type(self.course_id),
+            course_id=str(self.course_id),
             bookmark_id=self.bookmark_4.resource_id,
             component_type=self.chapter_2.location.block_type,
-            component_usage_id=six.text_type(self.chapter_2.location),
+            component_usage_id=str(self.chapter_2.location),
         )
         assert len(api.get_bookmarks(self.user)) == 4
 

@@ -4,7 +4,7 @@
 from openedx.core.djangoapps.catalog.models import CatalogIntegration
 
 
-class CatalogIntegrationMixin(object):
+class CatalogIntegrationMixin:
     """Utility for working with the catalog service during testing."""
 
     catalog_integration_defaults = {

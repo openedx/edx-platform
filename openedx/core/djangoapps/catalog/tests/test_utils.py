@@ -4,9 +4,8 @@
 
 from collections import defaultdict
 from datetime import timedelta
+from unittest import mock
 
-import mock
-import six
 from django.contrib.auth import get_user_model
 from django.core.cache import cache
 from django.test import TestCase, override_settings
@@ -73,7 +72,7 @@ class TestGetPrograms(CacheIsolationTestCase):
     ENABLED_CACHES = ['default']
 
     def setUp(self):
-        super(TestGetPrograms, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.site = SiteFactory()
 
     def test_get_many(self, mock_warning, mock_info):
@@ -90,7 +89,7 @@ class TestGetPrograms(CacheIsolationTestCase):
         with with_site_configuration_context(domain=self.site.name, configuration={'COURSE_CATALOG_API_URL': 'foo'}):
             assert get_programs(site=self.site) == []
             mock_warning.assert_called_once_with(
-                u'Failed to get program UUIDs from the cache for site {}.'.format(self.site.domain)
+                f'Failed to get program UUIDs from the cache for site {self.site.domain}.'
             )
             mock_warning.reset_mock()
 
@@ -105,11 +104,11 @@ class TestGetPrograms(CacheIsolationTestCase):
 
         # The 2 cached programs should be returned while info and warning
         # messages should be logged for the missing one.
-        assert set((program['uuid'] for program in actual_programs)) == \
-               set((program['uuid'] for program in partial_programs.values()))
+        assert {program['uuid'] for program in actual_programs} == \
+               {program['uuid'] for program in partial_programs.values()}
         mock_info.assert_called_with('Failed to get details for 1 programs. Retrying.')
         mock_warning.assert_called_with(
-            u'Failed to get details for program {uuid} from the cache.'.format(uuid=programs[2]['uuid'])
+            'Failed to get details for program {uuid} from the cache.'.format(uuid=programs[2]['uuid'])
         )
         mock_warning.reset_mock()
 
@@ -130,8 +129,8 @@ class TestGetPrograms(CacheIsolationTestCase):
         actual_programs = get_programs(site=self.site)
 
         # All 3 programs should be returned.
-        assert set((program['uuid'] for program in actual_programs)) ==\
-               set((program['uuid'] for program in all_programs.values()))
+        assert {program['uuid'] for program in actual_programs} ==\
+               {program['uuid'] for program in all_programs.values()}
         assert not mock_warning.called
 
         for program in actual_programs:
@@ -165,8 +164,8 @@ class TestGetPrograms(CacheIsolationTestCase):
         # All 3 cached programs should be returned. An info message should be
         # logged about the one that was initially missing, but the code should
         # be able to stitch together all the details.
-            assert set((program['uuid'] for program in actual_programs)) ==\
-                   set((program['uuid'] for program in all_programs.values()))
+            assert {program['uuid'] for program in actual_programs} ==\
+                   {program['uuid'] for program in all_programs.values()}
             assert not mock_warning.called
             mock_info.assert_called_with('Failed to get details for 1 programs. Retrying.')
 
@@ -180,7 +179,7 @@ class TestGetPrograms(CacheIsolationTestCase):
 
         assert get_programs(uuid=expected_uuid) is None
         mock_warning.assert_called_once_with(
-            u'Failed to get details for program {uuid} from the cache.'.format(uuid=expected_uuid)
+            f'Failed to get details for program {expected_uuid} from the cache.'
         )
         mock_warning.reset_mock()
 
@@ -266,7 +265,7 @@ class TestGetPathways(CacheIsolationTestCase):
     ENABLED_CACHES = ['default']
 
     def setUp(self):
-        super(TestGetPathways, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.site = SiteFactory()
 
     def test_get_many(self, mock_warning, mock_info):
@@ -295,11 +294,11 @@ class TestGetPathways(CacheIsolationTestCase):
 
         # The 2 cached pathways should be returned while info and warning
         # messages should be logged for the missing one.
-        assert set((pathway['id'] for pathway in actual_pathways)) ==\
-               set((pathway['id'] for pathway in partial_pathways.values()))
+        assert {pathway['id'] for pathway in actual_pathways} ==\
+               {pathway['id'] for pathway in partial_pathways.values()}
         mock_info.assert_called_with('Failed to get details for 1 pathways. Retrying.')
         mock_warning.assert_called_with(
-            u'Failed to get details for credit pathway {id} from the cache.'.format(id=pathways[2]['id'])
+            'Failed to get details for credit pathway {id} from the cache.'.format(id=pathways[2]['id'])
         )
         mock_warning.reset_mock()
 
@@ -320,8 +319,8 @@ class TestGetPathways(CacheIsolationTestCase):
         actual_pathways = get_pathways(self.site)
 
         # All 3 pathways should be returned.
-        assert set((pathway['id'] for pathway in actual_pathways)) ==\
-               set((pathway['id'] for pathway in all_pathways.values()))
+        assert {pathway['id'] for pathway in actual_pathways} ==\
+               {pathway['id'] for pathway in all_pathways.values()}
         assert not mock_warning.called
 
         for pathway in actual_pathways:
@@ -354,8 +353,8 @@ class TestGetPathways(CacheIsolationTestCase):
         # All 3 cached pathways should be returned. An info message should be
         # logged about the one that was initially missing, but the code should
         # be able to stitch together all the details.
-        assert set((pathway['id'] for pathway in actual_pathways)) ==\
-               set((pathway['id'] for pathway in all_pathways.values()))
+        assert {pathway['id'] for pathway in actual_pathways} ==\
+               {pathway['id'] for pathway in all_pathways.values()}
         assert not mock_warning.called
         mock_info.assert_called_with('Failed to get details for 1 pathways. Retrying.')
 
@@ -369,7 +368,7 @@ class TestGetPathways(CacheIsolationTestCase):
 
         assert get_pathways(self.site, pathway_id=expected_id) is None
         mock_warning.assert_called_once_with(
-            u'Failed to get details for credit pathway {id} from the cache.'.format(id=expected_id)
+            f'Failed to get details for credit pathway {expected_id} from the cache.'
         )
         mock_warning.reset_mock()
 
@@ -437,8 +436,8 @@ class TestGetLocalizedPriceText(TestCase):
     """
     def test_localized_string(self, mock_get_currency_data):
         currency_data = {
-            "BEL": {"rate": 0.835621, "code": "EUR", "symbol": u"\u20ac"},
-            "GBR": {"rate": 0.737822, "code": "GBP", "symbol": u"\u00a3"},
+            "BEL": {"rate": 0.835621, "code": "EUR", "symbol": "\u20ac"},
+            "GBR": {"rate": 0.737822, "code": "GBP", "symbol": "\u00a3"},
             "CAN": {"rate": 2, "code": "CAD", "symbol": "$"},
         }
         mock_get_currency_data.return_value = currency_data
@@ -458,7 +457,7 @@ class TestGetCourseRuns(CatalogIntegrationMixin, CacheIsolationTestCase):
     Tests covering retrieval of course runs from the catalog service.
     """
     def setUp(self):
-        super(TestGetCourseRuns, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
 
         self.catalog_integration = self.create_catalog_integration(cache_ttl=1)
         self.user = UserFactory(username=self.catalog_integration.service_username)
@@ -503,7 +502,7 @@ class TestGetCourseRuns(CatalogIntegrationMixin, CacheIsolationTestCase):
 
         data = get_course_runs()
         mock_log_error.any_call(
-            u'Catalog service user with username [%s] does not exist. Course runs will not be retrieved.',
+            'Catalog service user with username [%s] does not exist. Course runs will not be retrieved.',
             catalog_integration.service_username,
         )
         assert not mock_get_edx_api_data.called
@@ -541,7 +540,7 @@ class TestGetCourseOwners(CatalogIntegrationMixin, TestCase):
     Tests covering retrieval of course runs from the catalog service.
     """
     def setUp(self):
-        super(TestGetCourseOwners, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
 
         self.catalog_integration = self.create_catalog_integration(cache_ttl=1)
         self.user = UserFactory(username=self.catalog_integration.service_username)
@@ -566,7 +565,7 @@ class TestSessionEntitlement(CatalogIntegrationMixin, TestCase):
     Test Covering data related Entitlements.
     """
     def setUp(self):
-        super(TestSessionEntitlement, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
 
         self.catalog_integration = self.create_catalog_integration(cache_ttl=1)
         self.user = UserFactory(username=self.catalog_integration.service_username)
@@ -674,7 +673,7 @@ class TestGetCourseRunDetails(CatalogIntegrationMixin, TestCase):
     Tests covering retrieval of information about a specific course run from the catalog service.
     """
     def setUp(self):
-        super(TestGetCourseRunDetails, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.catalog_integration = self.create_catalog_integration(cache_ttl=1)
         self.user = UserFactory(username=self.catalog_integration.service_username)
 
@@ -697,7 +696,7 @@ class TestGetCourseRunDetails(CatalogIntegrationMixin, TestCase):
 class TestProgramCourseRunCrawling(TestCase):
     @classmethod
     def setUpClass(cls):
-        super(TestProgramCourseRunCrawling, cls).setUpClass()
+        super().setUpClass()
         cls.grandchild_1 = {
             'title': 'grandchild 1',
             'curricula': [{'is_active': True, 'courses': [], 'programs': []}],
@@ -827,7 +826,7 @@ class TestGetProgramsByType(CacheIsolationTestCase):
     @classmethod
     def setUpClass(cls):
         """ Sets up program data. """
-        super(TestGetProgramsByType, cls).setUpClass()
+        super().setUpClass()
         cls.site = SiteFactory()
         cls.other_site = SiteFactory()
         cls.masters_program_1 = ProgramFactory.create(
@@ -853,7 +852,7 @@ class TestGetProgramsByType(CacheIsolationTestCase):
 
     def setUp(self):
         """ Loads program data into the cache before each test function. """
-        super(TestGetProgramsByType, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.init_cache()
 
     def init_cache(self):
@@ -896,8 +895,8 @@ class TestGetProgramsByType(CacheIsolationTestCase):
 
     def test_get_masters_programs(self):
         expected_programs = [self.masters_program_1, self.masters_program_2]
-        six.assertCountEqual(self, expected_programs, get_programs_by_type(self.site, 'masters'))
-        six.assertCountEqual(self, expected_programs, get_programs_by_type_slug(self.site, 'masters'))
+        self.assertCountEqual(expected_programs, get_programs_by_type(self.site, 'masters'))
+        self.assertCountEqual(expected_programs, get_programs_by_type_slug(self.site, 'masters'))
 
     def test_get_bachelors_programs(self):
         expected_programs = [self.bachelors_program]

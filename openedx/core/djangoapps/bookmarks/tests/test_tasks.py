@@ -4,7 +4,6 @@ Tests for tasks.
 
 
 import ddt
-import six
 
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.tests.factories import ItemFactory, check_mongo_calls
@@ -21,7 +20,7 @@ class XBlockCacheTaskTests(BookmarksTestsBase):
     """
 
     def setUp(self):
-        super(XBlockCacheTaskTests, self).setUp()
+        super().setUp()
 
         self.course_expected_cache_data = {
             self.course.location: [
@@ -140,7 +139,7 @@ class XBlockCacheTaskTests(BookmarksTestsBase):
 
         expected_cache_data = getattr(self, course_attr + '_expected_cache_data')
         for usage_key, __ in expected_cache_data.items():
-            for path_index, path in enumerate(blocks_data[six.text_type(usage_key)]['paths']):
+            for path_index, path in enumerate(blocks_data[str(usage_key)]['paths']):
                 for path_item_index, path_item in enumerate(path):
                     assert path_item['usage_key'] == expected_cache_data[usage_key][path_index][path_item_index]
 
