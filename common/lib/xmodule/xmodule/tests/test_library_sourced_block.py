@@ -30,7 +30,7 @@ class LibrarySourcedBlockTestCase(ContentLibrariesRestApiTest):
             user_id=self.user.id,
             modulestore=self.store
         )
-        self.submit_url = '/xblock/{0}/handler/submit_studio_edits'.format(self.source_block.scope_ids.usage_id)
+        self.submit_url = f'/xblock/{self.source_block.scope_ids.usage_id}/handler/submit_studio_edits'
 
     def test_block_views(self):
         # Create a blockstore content library
@@ -54,7 +54,7 @@ class LibrarySourcedBlockTestCase(ContentLibrariesRestApiTest):
         # Create a blockstore content library
         library = self._create_library(slug="testlib2_preview", title="Test Library 2", description="Testing XBlocks")
         # Add content to the library
-        blocks = [self._add_block_to_library(library["id"], "html", "block_{0}".format(i))["id"] for i in range(11)]
+        blocks = [self._add_block_to_library(library["id"], "html", f"block_{i}")["id"] for i in range(11)]
 
         # Import the html blocks from the library to the course
         post_data = {"values": {"source_block_ids": blocks}, "defaults": ["display_name"]}

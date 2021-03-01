@@ -8,8 +8,6 @@ from datetime import datetime, timedelta
 import pytest
 import ddt
 from pytz import UTC
-import six
-from six import text_type
 
 from lms.djangoapps.grades.scores import compute_percent
 from xmodule import graders
@@ -68,7 +66,7 @@ class GraderTest(unittest.TestCase):
         'Midterm': {},
     }
 
-    class MockGrade(object):
+    class MockGrade:
         """
         Mock class for SubsectionGrade object.
         """
@@ -319,25 +317,25 @@ class GraderTest(unittest.TestCase):
         (
             # empty
             {},
-            u"Configuration has no appropriate grader class."
+            "Configuration has no appropriate grader class."
         ),
         (
             # no min_count
             {'type': "Homework", 'drop_count': 0},
-            u"Configuration has no appropriate grader class."
+            "Configuration has no appropriate grader class."
         ),
         (
             # no drop_count
             {'type': "Homework", 'min_count': 0},
             # pylint: disable=line-too-long
-            u"__init__() takes at least 4 arguments (3 given)" if six.PY2 else u"__init__() missing 1 required positional argument: 'drop_count'"
+            "__init__() missing 1 required positional argument: 'drop_count'"
         ),
     )
     @ddt.unpack
     def test_grader_with_invalid_conf(self, invalid_conf, expected_error_message):
         with pytest.raises(ValueError) as error:
             graders.grader_from_conf([invalid_conf])
-        assert expected_error_message in text_type(error.value)
+        assert expected_error_message in str(error.value)
 
 
 @ddt.ddt
@@ -347,7 +345,7 @@ class ShowCorrectnessTest(unittest.TestCase):
     """
 
     def setUp(self):
-        super(ShowCorrectnessTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
 
         now = datetime.now(UTC)
         day_delta = timedelta(days=1)

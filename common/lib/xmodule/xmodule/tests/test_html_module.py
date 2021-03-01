@@ -1,10 +1,10 @@
 # lint-amnesty, pylint: disable=missing-module-docstring
 
 import unittest
+from unittest.mock import Mock
 
 import ddt
 from django.test.utils import override_settings
-from mock import Mock
 from opaque_keys.edx.locator import BlockUsageLocator, CourseLocator
 from xblock.field_data import DictFieldData
 from xblock.fields import ScopeIds
@@ -312,7 +312,7 @@ class CourseInfoBlockTestCase(unittest.TestCase):
             ],
             'hidden_updates': [],
         }
-        template_name = "{0}/course_updates.html".format(info_module.TEMPLATE_DIR)
+        template_name = f"{info_module.TEMPLATE_DIR}/course_updates.html"
         info_module.get_html()
         # Assertion to validate that render function is called with the expected context
         info_module.system.render_template.assert_called_once_with(

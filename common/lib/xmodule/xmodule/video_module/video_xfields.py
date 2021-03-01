@@ -14,7 +14,7 @@ from xmodule.fields import RelativeTime
 _ = lambda text: text
 
 
-class VideoFields(object):
+class VideoFields:
     """Fields for `VideoBlock`."""
     display_name = String(
         help=_("The display name for this component."),

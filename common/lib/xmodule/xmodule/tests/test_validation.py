@@ -21,16 +21,16 @@ class StudioValidationMessageTest(unittest.TestCase):
         Test that `TypeError`s are thrown for bad input parameters.
         """
         with pytest.raises(TypeError):
-            StudioValidationMessage("unknown type", u"Unknown type info")
+            StudioValidationMessage("unknown type", "Unknown type info")
 
         with pytest.raises(TypeError):
-            StudioValidationMessage(StudioValidationMessage.WARNING, u"bad warning", action_class=0)
+            StudioValidationMessage(StudioValidationMessage.WARNING, "bad warning", action_class=0)
 
         with pytest.raises(TypeError):
-            StudioValidationMessage(StudioValidationMessage.WARNING, u"bad warning", action_runtime_event=0)
+            StudioValidationMessage(StudioValidationMessage.WARNING, "bad warning", action_runtime_event=0)
 
         with pytest.raises(TypeError):
-            StudioValidationMessage(StudioValidationMessage.WARNING, u"bad warning", action_label=b"Non-unicode string")
+            StudioValidationMessage(StudioValidationMessage.WARNING, "bad warning", action_label=b"Non-unicode string")
 
     def test_to_json(self):
         """
@@ -38,22 +38,22 @@ class StudioValidationMessageTest(unittest.TestCase):
         """
         assert \
             {'type': StudioValidationMessage.NOT_CONFIGURED,
-             'text': u'Not Configured message', 'action_label': u'Action label'} == \
+             'text': 'Not Configured message', 'action_label': 'Action label'} == \
             StudioValidationMessage(StudioValidationMessage.NOT_CONFIGURED,
-                                    u'Not Configured message', action_label=u'Action label').to_json()
+                                    'Not Configured message', action_label='Action label').to_json()
 
         assert \
             {'type': StudioValidationMessage.WARNING,
-             'text': u'Warning message',
+             'text': 'Warning message',
              'action_class': 'class-for-action'} ==\
-            StudioValidationMessage(StudioValidationMessage.WARNING, u'Warning message',
+            StudioValidationMessage(StudioValidationMessage.WARNING, 'Warning message',
                                     action_class='class-for-action').to_json()
 
         assert \
             {'type': StudioValidationMessage.ERROR,
-             'text': u'Error message', 'action_runtime_event': 'do-fix-up'} ==\
+             'text': 'Error message', 'action_runtime_event': 'do-fix-up'} ==\
             StudioValidationMessage(StudioValidationMessage.ERROR,
-                                    u'Error message', action_runtime_event='do-fix-up').to_json()
+                                    'Error message', action_runtime_event='do-fix-up').to_json()
 
 
 class StudioValidationTest(unittest.TestCase):
@@ -63,7 +63,7 @@ class StudioValidationTest(unittest.TestCase):
 
     def test_copy(self):
         validation = Validation("id")
-        validation.add(ValidationMessage(ValidationMessage.ERROR, u"Error message"))
+        validation.add(ValidationMessage(ValidationMessage.ERROR, "Error message"))
 
         studio_validation = StudioValidation.copy(validation)
         assert isinstance(studio_validation, StudioValidation)
@@ -71,7 +71,7 @@ class StudioValidationTest(unittest.TestCase):
         assert 1 == len(studio_validation.messages)
         expected = {
             "type": StudioValidationMessage.ERROR,
-            "text": u"Error message"
+            "text": "Error message"
         }
         assert expected == studio_validation.messages[0].to_json()
         assert studio_validation.summary is None
@@ -79,7 +79,7 @@ class StudioValidationTest(unittest.TestCase):
     def test_copy_studio_validation(self):
         validation = StudioValidation("id")
         validation.add(
-            StudioValidationMessage(StudioValidationMessage.WARNING, u"Warning message", action_label=u"Action Label")
+            StudioValidationMessage(StudioValidationMessage.WARNING, "Warning message", action_label="Action Label")
         )
 
         validation_copy = StudioValidation.copy(validation)
@@ -87,8 +87,8 @@ class StudioValidationTest(unittest.TestCase):
         assert 1 == len(validation_copy.messages)
         expected = {
             "type": StudioValidationMessage.WARNING,
-            "text": u"Warning message",
-            "action_label": u"Action Label"
+            "text": "Warning message",
+            "action_label": "Action Label"
         }
         assert expected == validation_copy.messages[0].to_json()
 
@@ -105,13 +105,13 @@ class StudioValidationTest(unittest.TestCase):
         assert validation.empty
         assert validation
 
-        validation.add(StudioValidationMessage(StudioValidationMessage.ERROR, u"Error message"))
+        validation.add(StudioValidationMessage(StudioValidationMessage.ERROR, "Error message"))
         assert not validation.empty
         assert not validation
 
         validation_with_summary = StudioValidation("id")
         validation_with_summary.set_summary(
-            StudioValidationMessage(StudioValidationMessage.NOT_CONFIGURED, u"Summary message")
+            StudioValidationMessage(StudioValidationMessage.NOT_CONFIGURED, "Summary message")
         )
         assert not validation.empty
         assert not validation
@@ -121,33 +121,33 @@ class StudioValidationTest(unittest.TestCase):
         Test the behavior of calling `add_messages` with combination of `StudioValidation` instances.
         """
         validation_1 = StudioValidation("id")
-        validation_1.set_summary(StudioValidationMessage(StudioValidationMessage.WARNING, u"Summary message"))
-        validation_1.add(StudioValidationMessage(StudioValidationMessage.ERROR, u"Error message"))
+        validation_1.set_summary(StudioValidationMessage(StudioValidationMessage.WARNING, "Summary message"))
+        validation_1.add(StudioValidationMessage(StudioValidationMessage.ERROR, "Error message"))
 
         validation_2 = StudioValidation("id")
-        validation_2.set_summary(StudioValidationMessage(StudioValidationMessage.ERROR, u"Summary 2 message"))
-        validation_2.add(StudioValidationMessage(StudioValidationMessage.NOT_CONFIGURED, u"Not configured"))
+        validation_2.set_summary(StudioValidationMessage(StudioValidationMessage.ERROR, "Summary 2 message"))
+        validation_2.add(StudioValidationMessage(StudioValidationMessage.NOT_CONFIGURED, "Not configured"))
 
         validation_1.add_messages(validation_2)
         assert 2 == len(validation_1.messages)
 
         assert StudioValidationMessage.ERROR == validation_1.messages[0].type
-        assert u'Error message' == validation_1.messages[0].text
+        assert 'Error message' == validation_1.messages[0].text
 
         assert StudioValidationMessage.NOT_CONFIGURED == validation_1.messages[1].type
-        assert u'Not configured' == validation_1.messages[1].text
+        assert 'Not configured' == validation_1.messages[1].text
 
         assert StudioValidationMessage.WARNING == validation_1.summary.type
-        assert u'Summary message' == validation_1.summary.text
+        assert 'Summary message' == validation_1.summary.text
 
     def test_set_summary_accepts_validation_message(self):
         """
         Test that `set_summary` accepts a ValidationMessage.
         """
         validation = StudioValidation("id")
-        validation.set_summary(ValidationMessage(ValidationMessage.WARNING, u"Summary message"))
+        validation.set_summary(ValidationMessage(ValidationMessage.WARNING, "Summary message"))
         assert ValidationMessage.WARNING == validation.summary.type
-        assert u'Summary message' == validation.summary.text
+        assert 'Summary message' == validation.summary.text
 
     def test_set_summary_errors(self):
         """
@@ -171,24 +171,24 @@ class StudioValidationTest(unittest.TestCase):
         validation.add(
             StudioValidationMessage(
                 StudioValidationMessage.ERROR,
-                u"Error message",
-                action_label=u"Action label",
+                "Error message",
+                action_label="Action label",
                 action_class="edit-button"
             )
         )
         validation.add(
             StudioValidationMessage(
                 StudioValidationMessage.NOT_CONFIGURED,
-                u"Not configured message",
-                action_label=u"Action label",
+                "Not configured message",
+                action_label="Action label",
                 action_runtime_event="make groups"
             )
         )
         validation.set_summary(
             StudioValidationMessage(
                 StudioValidationMessage.WARNING,
-                u"Summary message",
-                action_label=u"Summary label",
+                "Summary message",
+                action_label="Summary label",
                 action_runtime_event="fix everything"
             )
         )
@@ -200,21 +200,21 @@ class StudioValidationTest(unittest.TestCase):
             "messages": [
                 {
                     "type": "error",
-                    "text": u"Error message",
-                    "action_label": u"Action label",
+                    "text": "Error message",
+                    "action_label": "Action label",
                     "action_class": "edit-button"
                 },
                 {
                     "type": "not-configured",
-                    "text": u"Not configured message",
-                    "action_label": u"Action label",
+                    "text": "Not configured message",
+                    "action_label": "Action label",
                     "action_runtime_event": "make groups"
                 }
             ],
             "summary": {
                 "type": "warning",
-                "text": u"Summary message",
-                "action_label": u"Summary label",
+                "text": "Summary message",
+                "action_label": "Summary label",
                 "action_runtime_event": "fix everything"
             },
             "empty": False

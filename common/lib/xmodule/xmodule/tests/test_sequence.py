@@ -7,14 +7,12 @@ Tests for sequence module.
 import ast
 import json
 from datetime import datetime, timedelta
+from unittest.mock import Mock, patch
 
 import ddt
-import six
 from django.test.utils import override_settings
 from django.utils.timezone import now
 from freezegun import freeze_time
-from mock import Mock, patch
-from six.moves import range
 from web_fragments.fragment import Fragment
 
 from edx_toggles.toggles.testutils import override_waffle_flag
@@ -137,7 +135,7 @@ class SequenceBlockTestCase(XModuleXmlImportTest):
         """
         Verifies that the rendered view contains the expected position.
         """
-        assert "'position': {}".format(expected_position) in rendered_html
+        assert f"'position': {expected_position}" in rendered_html
 
     def test_student_view_init(self):
         module_system = get_test_system()
@@ -159,7 +157,7 @@ class SequenceBlockTestCase(XModuleXmlImportTest):
             view=view
         )
         self._assert_view_at_position(html, expected_position=1)
-        assert six.text_type(self.sequence_3_1.location) in html
+        assert str(self.sequence_3_1.location) in html
         assert "'gated': False" in html
         assert "'next_url': 'NextSequential'" in html
         assert "'prev_url': 'PrevSequential'" in html
@@ -237,7 +235,7 @@ class SequenceBlockTestCase(XModuleXmlImportTest):
     def test_tooltip(self):
         html = self._get_rendered_view(self.sequence_3_1, requested_child=None)
         for child in self.sequence_3_1.children:
-            assert "'page_title': '{}'".format(child.block_id) in html
+            assert f"'page_title': '{child.block_id}'" in html
 
     def test_hidden_content_before_due(self):
         html = self._get_rendered_view(self.sequence_4_1)
@@ -292,7 +290,7 @@ class SequenceBlockTestCase(XModuleXmlImportTest):
         assert html['gated_content']['gated']
         assert 'PrereqUrl' == html['gated_content']['prereq_url']
         assert 'PrereqSectionName' == html['gated_content']['prereq_section_name']
-        assert six.text_type(sequence.display_name) in html['gated_content']['gated_section_name']
+        assert str(sequence.display_name) in html['gated_content']['gated_section_name']
         assert 'NextSequential' == html['next_url']
         assert 'PrevSequential' == html['prev_url']
 
@@ -304,7 +302,7 @@ class SequenceBlockTestCase(XModuleXmlImportTest):
         html = self.get_context_dict_from_string(html)
         assert 'This section is a prerequisite. You must complete this section in order to unlock additional content.' == html['banner_text']
         assert not html['gated_content']['gated']
-        assert six.text_type(sequence.location) == html['item_id']
+        assert str(sequence.location) == html['item_id']
         assert html['gated_content']['prereq_url'] is None
         assert html['gated_content']['prereq_section_name'] is None
         assert 'NextSequential' == html['next_url']
@@ -317,7 +315,7 @@ class SequenceBlockTestCase(XModuleXmlImportTest):
         assert 'seq_module.html' in html
         assert "'banner_text': None" in html
         assert "'gated': False" in html
-        assert six.text_type(sequence.location) in html
+        assert str(sequence.location) in html
         assert "'prereq_url': None" in html
         assert "'prereq_section_name': None" in html
         assert "'next_url': 'NextSequential'" in html
@@ -378,7 +376,7 @@ class SequenceBlockTestCase(XModuleXmlImportTest):
         targeted vertical through ajax call
         """
         for child in self.sequence_3_1.get_children():
-            usage_key = six.text_type(child.location)
+            usage_key = str(child.location)
             completion_return = json.loads(self.sequence_3_1.handle_ajax(
                 'get_completion',
                 {'usage_key': usage_key}

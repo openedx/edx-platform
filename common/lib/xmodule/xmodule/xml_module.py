@@ -45,9 +45,9 @@ def is_pointer_tag(xml_obj):
     Returns a bool.
     """
     if xml_obj.tag != "course":
-        expected_attr = set(['url_name'])
+        expected_attr = {'url_name'}
     else:
-        expected_attr = set(['url_name', 'course', 'org'])
+        expected_attr = {'url_name', 'course', 'org'}
 
     actual_attr = set(xml_obj.attrib.keys())
 
@@ -63,7 +63,7 @@ def serialize_field(value):
     If the value is a string, then we simply return what was passed in.
     Otherwise, we return json.dumps on the input value.
     """
-    if isinstance(value, six.string_types):
+    if isinstance(value, str):
         return value
 
     return json.dumps(value, cls=EdxJSONEncoder)
@@ -101,7 +101,7 @@ def deserialize_field(field, value):
         return value
 
 
-class XmlParserMixin(object):
+class XmlParserMixin:
     """
     Class containing XML parsing functionality shared between XBlock and XModuleDescriptor.
     """
@@ -208,7 +208,7 @@ class XmlParserMixin(object):
                 return cls.file_to_xml(xml_file)
         except Exception as err:  # lint-amnesty, pylint: disable=broad-except
             # Add info about where we are, but keep the traceback
-            msg = 'Unable to load file contents at path %s for item %s: %s ' % (
+            msg = 'Unable to load file contents at path {} for item {}: {} '.format(
                 filepath, def_id, err)
             six.reraise(Exception, msg, sys.exc_info()[2])
 
@@ -275,7 +275,7 @@ class XmlParserMixin(object):
         Returns a dictionary {key: value}.
         """
         metadata = {'xml_attributes': {}}
-        for attr, val in six.iteritems(xml_object.attrib):
+        for attr, val in xml_object.attrib.items():
             # VS[compat].  Remove after all key translations done
             attr = cls._translate(attr)
 
@@ -295,7 +295,7 @@ class XmlParserMixin(object):
         Add the keys in policy to metadata, after processing them
         through the attrmap.  Updates the metadata dict in place.
         """
-        for attr, value in six.iteritems(policy):
+        for attr, value in policy.items():
             attr = cls._translate(attr)
             if attr not in cls.fields:
                 # Store unknown attributes coming from policy.json
@@ -400,9 +400,9 @@ class XmlParserMixin(object):
         legacy XModule code. Use the "normal" XBlock parsing code.
         """
         try:
-            return super(XmlParserMixin, cls).parse_xml_new_runtime(node, runtime, keys)
+            return super().parse_xml_new_runtime(node, runtime, keys)
         except AttributeError:
-            return super(XmlParserMixin, cls).parse_xml(node, runtime, keys, id_generator=None)
+            return super().parse_xml(node, runtime, keys, id_generator=None)
 
     @classmethod
     def _get_url_name(cls, node):
@@ -423,9 +423,7 @@ class XmlParserMixin(object):
 
     @classmethod
     def _format_filepath(cls, category, name):
-        return u'{category}/{name}.{ext}'.format(category=category,
-                                                 name=name,
-                                                 ext=cls.filename_extension)
+        return f'{category}/{name}.{cls.filename_extension}'
 
     def export_to_file(self):
         """If this returns True, write the definition of this descriptor to a separate
@@ -472,7 +470,7 @@ class XmlParserMixin(object):
                     xml_object.set(attr, val)
                 except Exception:  # lint-amnesty, pylint: disable=broad-except
                     logging.exception(
-                        u'Failed to serialize metadata attribute %s with value %s in module %s. This could mean data loss!!!',  # lint-amnesty, pylint: disable=line-too-long
+                        'Failed to serialize metadata attribute %s with value %s in module %s. This could mean data loss!!!',  # lint-amnesty, pylint: disable=line-too-long
                         attr, val, self.url_name
                     )
 
@@ -520,7 +518,7 @@ class XmlParserMixin(object):
         """
         Return a list of all metadata fields that cannot be edited.
         """
-        non_editable_fields = super(XmlParserMixin, self).non_editable_metadata_fields  # lint-amnesty, pylint: disable=super-with-arguments
+        non_editable_fields = super().non_editable_metadata_fields
         non_editable_fields.append(XmlParserMixin.xml_attributes)
         return non_editable_fields
 
@@ -551,7 +549,7 @@ class XmlMixin(XmlParserMixin):  # lint-amnesty, pylint: disable=abstract-method
         # This only exists to satisfy subclasses that both:
         #    a) define from_xml themselves
         #    b) call super(..).from_xml(..)
-        return super(XmlMixin, cls).parse_xml(
+        return super().parse_xml(
             etree.fromstring(xml_data),
             system,
             None,  # This is ignored by XmlParserMixin
@@ -568,7 +566,7 @@ class XmlMixin(XmlParserMixin):  # lint-amnesty, pylint: disable=abstract-method
             # from XModuleDescriptor, which actually calls `from_xml`.
             return super(XmlParserMixin, cls).parse_xml(node, runtime, keys, id_generator)  # pylint: disable=bad-super-call
         else:
-            return super(XmlMixin, cls).parse_xml(node, runtime, keys, id_generator)
+            return super().parse_xml(node, runtime, keys, id_generator)
 
     @classmethod
     def parse_xml_new_runtime(cls, node, runtime, keys):
@@ -577,9 +575,9 @@ class XmlMixin(XmlParserMixin):  # lint-amnesty, pylint: disable=abstract-method
         legacy XModule code. Use the "normal" XBlock parsing code.
         """
         try:
-            return super(XmlMixin, cls).parse_xml_new_runtime(node, runtime, keys)
+            return super().parse_xml_new_runtime(node, runtime, keys)
         except AttributeError:
-            return super(XmlMixin, cls).parse_xml(node, runtime, keys, id_generator=None)
+            return super().parse_xml(node, runtime, keys, id_generator=None)
 
     def export_to_xml(self, resource_fs):  # lint-amnesty, pylint: disable=unused-argument
         """
@@ -599,7 +597,7 @@ class XmlMixin(XmlParserMixin):  # lint-amnesty, pylint: disable=abstract-method
         #    a) define export_to_xml themselves
         #    b) call super(..).export_to_xml(..)
         node = Element(self.category)
-        super(XmlMixin, self).add_xml_to_node(node)  # lint-amnesty, pylint: disable=super-with-arguments
+        super().add_xml_to_node(node)
         return etree.tostring(node)
 
     def add_xml_to_node(self, node):
@@ -612,7 +610,7 @@ class XmlMixin(XmlParserMixin):  # lint-amnesty, pylint: disable=abstract-method
             # from XModuleDescriptor, which actually calls `export_to_xml`.
             super(XmlParserMixin, self).add_xml_to_node(node)  # pylint: disable=bad-super-call
         else:
-            super(XmlMixin, self).add_xml_to_node(node)  # lint-amnesty, pylint: disable=super-with-arguments
+            super().add_xml_to_node(node)
 
 
 class XmlDescriptor(XmlMixin, XModuleDescriptor):  # lint-amnesty, pylint: disable=abstract-method

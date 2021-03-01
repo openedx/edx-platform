@@ -4,8 +4,8 @@ Tests that check that we ignore the appropriate files when importing courses.
 
 
 import unittest
+from unittest.mock import Mock
 
-from mock import Mock
 from opaque_keys.edx.locator import CourseLocator
 
 from xmodule.modulestore.tests.utils import (
@@ -26,7 +26,7 @@ class IgnoredFilesTestCase(unittest.TestCase):
     dict_list = [DOT_FILES_DICT, TILDA_FILES_DICT]
 
     def setUp(self):
-        super(IgnoredFilesTestCase, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         for dictionary in self.dict_list:
             self.addCleanup(remove_temp_files_from_list, list(dictionary.keys()), self.course_dir / "static")
             add_temp_files_from_dict(dictionary, self.course_dir / "static")

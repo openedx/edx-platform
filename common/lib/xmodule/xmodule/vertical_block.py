@@ -9,7 +9,6 @@ from datetime import datetime
 from functools import reduce
 
 import pytz
-import six
 from lxml import etree
 from web_fragments.fragment import Fragment
 
@@ -94,7 +93,7 @@ class VerticalBlock(SequenceFields, XModuleFields, StudioEditableBlock, XmlParse
             fragment.add_fragment_resources(rendered_child)
 
             contents.append({
-                'id': six.text_type(child.location),
+                'id': str(child.location),
                 'content': rendered_child.content
             })
 
@@ -120,8 +119,8 @@ class VerticalBlock(SequenceFields, XModuleFields, StudioEditableBlock, XmlParse
                 'show_bookmark_button': child_context.get('show_bookmark_button', not is_child_of_vertical),
                 'show_title': child_context.get('show_title', True),
                 'bookmarked': child_context['bookmarked'],
-                'bookmark_id': u"{},{}".format(
-                    child_context['username'], six.text_type(self.location)),  # pylint: disable=no-member
+                'bookmark_id': "{},{}".format(
+                    child_context['username'], str(self.location)),  # pylint: disable=no-member
             })
 
         fragment.add_content(self.system.render_template('vert_module.html', fragment_context))
@@ -172,7 +171,7 @@ class VerticalBlock(SequenceFields, XModuleFields, StudioEditableBlock, XmlParse
         """
         Returns the highest priority icon class.
         """
-        child_classes = set(child.get_icon_class() for child in self.get_children())
+        child_classes = {child.get_icon_class() for child in self.get_children()}
         new_class = 'other'
         for higher_class in CLASS_PRIORITY:
             if higher_class in child_classes:
@@ -189,7 +188,7 @@ class VerticalBlock(SequenceFields, XModuleFields, StudioEditableBlock, XmlParse
             except Exception as exc:  # pylint: disable=broad-except
                 log.exception("Unable to load child when parsing Vertical. Continuing...")
                 if system.error_tracker is not None:
-                    system.error_tracker(u"ERROR: {0}".format(exc))
+                    system.error_tracker(f"ERROR: {exc}")
                 continue
         return {}, children
 
@@ -204,14 +203,14 @@ class VerticalBlock(SequenceFields, XModuleFields, StudioEditableBlock, XmlParse
         """
         Gather all fields which can't be edited.
         """
-        non_editable_fields = super(VerticalBlock, self).non_editable_metadata_fields  # lint-amnesty, pylint: disable=super-with-arguments
+        non_editable_fields = super().non_editable_metadata_fields
         non_editable_fields.extend([
             self.fields['due'],  # lint-amnesty, pylint: disable=unsubscriptable-object
         ])
         return non_editable_fields
 
     def studio_view(self, context):
-        fragment = super(VerticalBlock, self).studio_view(context)  # lint-amnesty, pylint: disable=super-with-arguments
+        fragment = super().studio_view(context)
         # This continues to use the old XModuleDescriptor javascript code to enabled studio editing.
         # TODO: Remove this when studio better supports editing of pure XBlocks.
         fragment.add_javascript('VerticalBlock = XModule.Descriptor;')
@@ -224,7 +223,7 @@ class VerticalBlock(SequenceFields, XModuleFields, StudioEditableBlock, XmlParse
         # return key/value fields in a Python dict object
         # values may be numeric / string or dict
         # default implementation is an empty dict
-        xblock_body = super(VerticalBlock, self).index_dictionary()  # lint-amnesty, pylint: disable=super-with-arguments
+        xblock_body = super().index_dictionary()
         index_body = {
             "display_name": self.display_name,
         }

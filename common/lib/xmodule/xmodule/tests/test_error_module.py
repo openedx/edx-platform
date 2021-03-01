@@ -4,9 +4,9 @@ Tests for ErrorBlock and NonStaffErrorBlock
 
 
 import unittest
+from unittest.mock import MagicMock, Mock, patch
 
 import pytest
-from mock import MagicMock, Mock, patch
 from opaque_keys.edx.locator import BlockUsageLocator, CourseLocator
 from xblock.field_data import DictFieldData
 from xblock.fields import ScopeIds
@@ -27,7 +27,7 @@ class SetupTestErrorBlock(unittest.TestCase):
         self.system = get_test_system()
         self.course_id = CourseLocator('org', 'course', 'run')
         self.location = self.course_id.make_usage_key('foo', 'bar')
-        self.valid_xml = u"<problem>ABC \N{SNOWMAN}</problem>"
+        self.valid_xml = "<problem>ABC \N{SNOWMAN}</problem>"
         self.error_msg = "Error"
 
 
@@ -107,7 +107,7 @@ class TestNonStaffErrorBlock(SetupTestErrorBlock):
 
 class BrokenModule(XModule):  # lint-amnesty, pylint: disable=abstract-method
     def __init__(self, *args, **kwargs):
-        super(BrokenModule, self).__init__(*args, **kwargs)  # lint-amnesty, pylint: disable=super-with-arguments
+        super().__init__(*args, **kwargs)
         raise Exception("This is a broken xmodule")
 
 

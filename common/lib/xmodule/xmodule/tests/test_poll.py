@@ -1,8 +1,7 @@
-# -*- coding: utf-8 -*-
 """Test for Poll Xmodule functional logic."""
 
 
-from mock import Mock
+from unittest.mock import Mock
 
 from xmodule.poll_module import PollDescriptor
 

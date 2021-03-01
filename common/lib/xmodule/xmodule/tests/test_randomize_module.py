@@ -1,10 +1,10 @@
 """
 Test cases covering workflows and behaviors for the Randomize XModule
 """
+from unittest.mock import Mock
 
 from fs.memoryfs import MemoryFS
 from lxml import etree
-from mock import Mock
 
 from xmodule.modulestore.tests.factories import CourseFactory
 from xmodule.modulestore.tests.utils import MixedSplitTestCase
@@ -33,7 +33,7 @@ class RandomizeBlockTest(MixedSplitTestCase):
             display_name="Hello Randomize",
         )
         self.child_blocks = [
-            self.make_block("html", self.randomize_block, display_name="Hello HTML {}".format(i))
+            self.make_block("html", self.randomize_block, display_name=f"Hello HTML {i}")
             for i in range(1, 4)
         ]
 

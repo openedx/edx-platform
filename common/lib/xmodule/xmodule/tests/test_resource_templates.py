@@ -14,12 +14,12 @@ class ResourceTemplatesTests(unittest.TestCase):
     """
 
     def test_templates(self):
-        expected = set([
+        expected = {
             'latex_html.yaml',
             'zooming_image.yaml',
             'announcement.yaml',
-            'anon_user_id.yaml'])
-        got = set((t['template_id'] for t in TestClass.templates()))
+            'anon_user_id.yaml'}
+        got = {t['template_id'] for t in TestClass.templates()}
         assert expected == got
 
     def test_templates_no_suchdir(self):

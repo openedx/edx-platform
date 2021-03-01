@@ -1,14 +1,12 @@
 """
 Tests for SettingsService
 """
-
-
 import unittest
+from unittest import mock
+
 import pytest
 from django.test import TestCase
-
 import ddt
-import mock
 
 from config_models.models import ConfigurationModel
 from django.conf import settings
@@ -20,7 +18,7 @@ from xmodule.services import ConfigurationService, SettingsService, TeamsConfigu
 from openedx.core.lib.teams_config import TeamsConfig
 
 
-class _DummyBlock(object):
+class _DummyBlock:
     """ Dummy Xblock class """
     pass  # lint-amnesty, pylint: disable=unnecessary-pass
 
@@ -33,7 +31,7 @@ class DummyConfig(ConfigurationModel):
         app_label = 'xmoduletestservices'
 
 
-class DummyUnexpected(object):
+class DummyUnexpected:
     """
     Dummy Unexpected Class
     """
@@ -49,7 +47,7 @@ class TestSettingsService(unittest.TestCase):
 
     def setUp(self):
         """ Setting up tests """
-        super(TestSettingsService, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.settings_service = SettingsService()
         self.xblock_mock = mock.Mock()
         self.xblock_mock.block_settings_key = self.xblock_setting_key1
@@ -128,7 +126,7 @@ class MockConfigurationService(TeamsConfigurationService):
     Mock ConfigurationService for testing.
     """
     def __init__(self, course, **kwargs):  # lint-amnesty, pylint: disable=unused-argument
-        super(MockConfigurationService, self).__init__()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().__init__()
         self._course = course
 
     def get_course(self, course_id):
@@ -141,7 +139,7 @@ class ConfigurationServiceBaseClass(TestCase):
     """
 
     def setUp(self):
-        super(ConfigurationServiceBaseClass, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
 
         self.teams_config = TeamsConfig(
             {'max_size': 2, 'topics': [{'id': 'topic', 'name': 'Topic', 'description': 'A Topic'}]}

@@ -1,12 +1,11 @@
-# -*- coding: utf-8 -*-
 """Test for Word cloud Xmodule functional logic."""
 
 import json
+from unittest.mock import Mock
 
 from django.test import TestCase
 from fs.memoryfs import MemoryFS
 from lxml import etree
-from mock import Mock
 from opaque_keys.edx.locator import BlockUsageLocator, CourseLocator
 from webob.multidict import MultiDict
 from xblock.field_data import DictFieldData
@@ -57,7 +56,7 @@ class WordCloudBlockTest(TestCase):
         node = etree.Element("unknown_root")
         # This will export the olx to a separate file.
         block.add_xml_to_node(node)
-        with runtime.export_fs.open(u'word_cloud/block_id.xml') as f:
+        with runtime.export_fs.open('word_cloud/block_id.xml') as f:
             exported_xml = f.read()
 
         assert exported_xml == original_xml
@@ -103,7 +102,7 @@ class WordCloudBlockTest(TestCase):
              {'text': 'sun', 'size': 1, 'percent': 4.0}]
         )
 
-        assert 100.0 == sum((i['percent'] for i in response['top_words']))
+        assert 100.0 == sum(i['percent'] for i in response['top_words'])
 
     def test_indexibility(self):
         """
