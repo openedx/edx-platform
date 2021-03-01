@@ -176,8 +176,9 @@ urlpatterns = [
                                     namespace='api_discounts')),
 ]
 
-# include all pakx lms urls
-urlpatterns.extend(pakx_url_patterns)
+# include all pakx lms urls at the start of the url patterns list
+pakx_url_patterns.extend(urlpatterns)
+urlpatterns = pakx_url_patterns
 
 if settings.FEATURES.get('ENABLE_MOBILE_REST_API'):
     urlpatterns += [

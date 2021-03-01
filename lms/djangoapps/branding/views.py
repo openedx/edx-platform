@@ -93,7 +93,7 @@ def courses(request):
 
     #  we do not expect this case to be reached in cases where
     #  marketing is enabled or the courses are not browsable
-    return pakx_views.courses(request)
+    return courseware_views.courses(request)
 
 
 def _footer_static_url(request, name):
