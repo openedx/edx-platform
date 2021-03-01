@@ -62,7 +62,6 @@ import logging
 from collections import defaultdict
 from importlib import import_module
 
-import six
 from bson.objectid import ObjectId
 from ccx_keys.locator import CCXBlockUsageLocator, CCXLocator
 from contracts import contract, new_contract
@@ -142,7 +141,7 @@ new_contract('XBlock', XBlock)
 
 class SplitBulkWriteRecord(BulkOpsRecord):  # lint-amnesty, pylint: disable=missing-class-docstring
     def __init__(self):
-        super(SplitBulkWriteRecord, self).__init__()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().__init__()
         self.initial_index = None
         self.index = None
         self.structures = {}
@@ -187,7 +186,7 @@ class SplitBulkWriteRecord(BulkOpsRecord):  # lint-amnesty, pylint: disable=miss
         self.structures[structure['_id']] = structure
 
     def __repr__(self):
-        return u"SplitBulkWriteRecord<{!r}, {!r}, {!r}, {!r}, {!r}>".format(
+        return "SplitBulkWriteRecord<{!r}, {!r}, {!r}, {!r}, {!r}>".format(
             self._active_count,
             self.initial_index,
             self.index,
@@ -220,7 +219,7 @@ class SplitBulkWriteMixin(BulkOperationsMixin):
             return self._bulk_ops_record_type()
 
         if not isinstance(course_key, (CourseLocator, LibraryLocator)):
-            raise TypeError(u'{!r} is not a CourseLocator or LibraryLocator'.format(course_key))
+            raise TypeError(f'{course_key!r} is not a CourseLocator or LibraryLocator')
         # handle version_guid based retrieval locally
         if course_key.org is None or course_key.course is None or course_key.run is None:
             return self._active_bulk_ops.records[
@@ -228,7 +227,7 @@ class SplitBulkWriteMixin(BulkOperationsMixin):
             ]
 
         # handle ignore case and general use
-        return super(SplitBulkWriteMixin, self)._get_bulk_ops_record(  # lint-amnesty, pylint: disable=super-with-arguments
+        return super()._get_bulk_ops_record(
             course_key.replace(branch=None, version_guid=None), ignore_case
         )
 
@@ -237,7 +236,7 @@ class SplitBulkWriteMixin(BulkOperationsMixin):
         Clear the record for this course
         """
         if not isinstance(course_key, (CourseLocator, LibraryLocator)):
-            raise TypeError('{!r} is not a CourseLocator or LibraryLocator'.format(course_key))
+            raise TypeError(f'{course_key!r} is not a CourseLocator or LibraryLocator')
 
         if course_key.org and course_key.course and course_key.run:
             del self._active_bulk_ops.records[course_key.replace(branch=None, version_guid=None)]
@@ -263,7 +262,7 @@ class SplitBulkWriteMixin(BulkOperationsMixin):
         dirty = False
 
         # If the content is dirty, then update the database
-        for _id in six.viewkeys(bulk_write_record.structures) - bulk_write_record.structures_in_db:
+        for _id in bulk_write_record.structures.keys() - bulk_write_record.structures_in_db:
             dirty = True
 
             try:
@@ -274,7 +273,7 @@ class SplitBulkWriteMixin(BulkOperationsMixin):
                 # append only, so if it's already been written, we can just keep going.
                 log.debug("Attempted to insert duplicate structure %s", _id)
 
-        for _id in six.viewkeys(bulk_write_record.definitions) - bulk_write_record.definitions_in_db:
+        for _id in bulk_write_record.definitions.keys() - bulk_write_record.definitions_in_db:
             dirty = True
 
             try:
@@ -455,7 +454,7 @@ class SplitBulkWriteMixin(BulkOperationsMixin):
             defs_from_db = list(self.db_connection.get_definitions(list(ids), course_key))
             defs_dict = {d.get('_id'): d for d in defs_from_db}
             # Add the retrieved definitions to the cache.
-            bulk_write_record.definitions_in_db.update(six.iterkeys(defs_dict))
+            bulk_write_record.definitions_in_db.update(defs_dict.keys())
             bulk_write_record.definitions.update(defs_dict)
             definitions.extend(defs_from_db)
         return definitions
@@ -571,7 +570,7 @@ class SplitBulkWriteMixin(BulkOperationsMixin):
                     'search_targets' not in record.index or
                     field not in record.index['search_targets'] or
                     record.index['search_targets'][field] != value
-                    for field, value in six.iteritems(search_targets)
+                    for field, value in search_targets.items()
                 ):
                     continue
             # if we've specified a filter by org,
@@ -718,7 +717,7 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
         :param doc_store_config: must have a host, db, and collection entries. Other common entries: port, tz_aware.
         """
 
-        super(SplitMongoModuleStore, self).__init__(contentstore, **kwargs)  # lint-amnesty, pylint: disable=super-with-arguments
+        super().__init__(contentstore, **kwargs)
 
         self.db_connection = MongoConnection(**doc_store_config)
 
@@ -765,7 +764,7 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
         If connections is True, then close the connection to the database as well.
         """
         # drop the assets
-        super(SplitMongoModuleStore, self)._drop_database(database, collections, connections)  # lint-amnesty, pylint: disable=super-with-arguments
+        super()._drop_database(database, collections, connections)
 
         self.db_connection._drop_database(database, collections, connections)  # pylint: disable=protected-access
 
@@ -799,14 +798,14 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
                     course_key,
                     [
                         block.definition
-                        for block in six.itervalues(new_module_data)
+                        for block in new_module_data.values()
                     ]
                 )
                 # Turn definitions into a map.
                 definitions = {definition['_id']: definition
                                for definition in descendent_definitions}
 
-                for block in six.itervalues(new_module_data):
+                for block in new_module_data.values():
                     if block.definition in definitions:
                         definition = definitions[block.definition]
                         # convert_fields gets done later in the runtime's xblock_from_json
@@ -917,7 +916,7 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
 
         entry = self.get_structure(course_key, version_guid)
         if entry is None:
-            raise ItemNotFoundError('Structure: {}'.format(version_guid))
+            raise ItemNotFoundError(f'Structure: {version_guid}')
 
         # b/c more than one course can use same structure, the 'org', 'course',
         # 'run', and 'branch' are not intrinsic to structure
@@ -1065,7 +1064,7 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
 
             if len(course_block) > 1:
                 raise MultipleCourseBlocksFound(
-                    "Expected 1 course block to be found in the course, but found {0}".format(len(course_block))
+                    "Expected 1 course block to be found in the course, but found {}".format(len(course_block))
                 )
             course_summary = extract_course_summary(course_block[0])
             courses_summaries.append(
@@ -1107,7 +1106,7 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
 
             if len(library_block) > 1:
                 raise MultipleLibraryBlocksFound(
-                    "Expected 1 library block, but found {0}".format(len(library_block))
+                    "Expected 1 library block, but found {}".format(len(library_block))
                 )
 
             library_block_fields = library_block[0].fields
@@ -1245,7 +1244,7 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
             if len(items) == 0:  # lint-amnesty, pylint: disable=no-else-raise
                 raise ItemNotFoundError(usage_key)
             elif len(items) > 1:
-                log.debug("Found more than one item for '{}'".format(usage_key))
+                log.debug(f"Found more than one item for '{usage_key}'")
             return items[0]
 
     def get_items(self, course_locator, settings=None, content=None, qualifiers=None, include_orphans=True, **kwargs):  # lint-amnesty, pylint: disable=arguments-differ
@@ -1303,14 +1302,14 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
             # odd case where we don't search just confirm
             block_name = qualifiers.pop('name')
             block_ids = []
-            for block_id, block in six.iteritems(course.structure['blocks']):
+            for block_id, block in course.structure['blocks'].items():
                 # Don't do an in comparison blindly; first check to make sure
                 # that the name qualifier we're looking at isn't a plain string;
                 # if it is a string, then it should match exactly. If it's other
                 # than a string, we check whether it contains the block ID; this
                 # is so a list or other iterable can be passed with multiple
                 # valid qualifiers.
-                if isinstance(block_name, six.string_types):
+                if isinstance(block_name, str):
                     name_matches = block_id.id == block_name
                 else:
                     name_matches = block_id.id in block_name
@@ -1334,7 +1333,7 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
             path_cache = {}
             parents_cache = self.build_block_key_to_parents_mapping(course.structure)
 
-        for block_id, value in six.iteritems(course.structure['blocks']):
+        for block_id, value in course.structure['blocks'].items():
             if _block_matches_all(value):
                 if not include_orphans:
                     if (
@@ -1360,7 +1359,7 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
         :return dict: a dictionary containing mapping of block_keys against their parents.
         """
         children_to_parents = defaultdict(list)
-        for parent_key, value in six.iteritems(structure['blocks']):
+        for parent_key, value in structure['blocks'].items():
             for child_key in value.fields.get('children', []):
                 children_to_parents[child_key].append(parent_key)
 
@@ -1452,7 +1451,7 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
         items = set(course.structure['blocks'].keys())
         items.remove(course.structure['root'])
         blocks = course.structure['blocks']
-        for block_id, block_data in six.iteritems(blocks):
+        for block_id, block_data in blocks.items():
             items.difference_update(BlockKey(*child) for child in block_data.fields.get('children', []))
             if block_data.block_type in detached_categories:
                 items.discard(block_id)
@@ -1605,7 +1604,7 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
         elif len(possible_roots) == 0:
             return None
         # convert the results value sets to locators
-        for k, versions in six.iteritems(result):
+        for k, versions in result.items():
             result[k] = [
                 block_locator.for_version(version)
                 for version in versions
@@ -1670,10 +1669,10 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
         :param user_id: request.user
         """
         def needs_saved():
-            for key, value in six.iteritems(new_def_data):
+            for key, value in new_def_data.items():
                 if key not in old_definition['fields'] or value != old_definition['fields'][key]:
                     return True
-            for key, value in six.iteritems(old_definition.get('fields', {})):
+            for key, value in old_definition.get('fields', {}).items():
                 if key not in new_def_data:
                     return True
 
@@ -1720,7 +1719,7 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
         # moves, its id won't change and will be confusing
         serial = 1
         while True:
-            potential_key = BlockKey(category, "{}{}".format(category, serial))
+            potential_key = BlockKey(category, f"{category}{serial}")
             if potential_key not in course_blocks:
                 return potential_key
             serial += 1
@@ -1910,7 +1909,7 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
         """
         source_index = self.get_course_index_info(source_course_id)
         if source_index is None:
-            raise ItemNotFoundError("Cannot find a course at {0}. Aborting".format(source_course_id))
+            raise ItemNotFoundError(f"Cannot find a course at {source_course_id}. Aborting")
 
         with self.bulk_operations(dest_course_id):
             new_course = self.create_course(
@@ -1923,7 +1922,7 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
                 **kwargs
             )
             # don't copy assets until we create the course in case something's awry
-            super(SplitMongoModuleStore, self).clone_course(source_course_id, dest_course_id, user_id, fields, **kwargs)  # lint-amnesty, pylint: disable=super-with-arguments
+            super().clone_course(source_course_id, dest_course_id, user_id, fields, **kwargs)
             return new_course
 
     DEFAULT_ROOT_COURSE_BLOCK_ID = 'course'
@@ -2116,7 +2115,7 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
         with self.bulk_operations(course_key):
             if allow_not_found and isinstance(block_key.id, (LocalId, type(None))):
                 fields = {}
-                for subfields in six.itervalues(partitioned_fields):
+                for subfields in partitioned_fields.values():
                     fields.update(subfields)
                 return self.create_item(
                     user_id, course_key, block_key.type, fields=fields, asides=asides, force=force
@@ -2129,7 +2128,7 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
             if original_entry is None:
                 if allow_not_found:
                     fields = {}
-                    for subfields in six.itervalues(partitioned_fields):
+                    for subfields in partitioned_fields.values():
                         fields.update(subfields)
                     return self.create_item(user_id, course_key, block_key.type, block_id=block_key.id, fields=fields,
                                             asides=asides, force=force)
@@ -2260,7 +2259,7 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
             BlockData(**json_data),
             **kwargs
         )
-        for field_name, value in six.iteritems((fields or {})):
+        for field_name, value in (fields or {}).items():
             setattr(new_block, field_name, value)
 
         if parent_xblock is not None:
@@ -2437,7 +2436,7 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
                 # must be copying the dag root if there's no current dag
                 root_block_key = source_structure['root']
                 if not any(root_block_key == BlockKey.from_usage_key(subtree) for subtree in subtree_list):
-                    raise ItemNotFoundError(u'Must publish course root {}'.format(root_block_key))
+                    raise ItemNotFoundError(f'Must publish course root {root_block_key}')
                 root_source = source_structure['blocks'][root_block_key]
                 # create branch
                 destination_structure = self._new_structure(
@@ -2600,7 +2599,7 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
             # Compute a new block ID. This new block ID must be consistent when this
             # method is called with the same (source_key, dest_structure) pair
             unique_data = "{}:{}:{}".format(
-                six.text_type(hashable_source_id).encode("utf-8"),
+                str(hashable_source_id).encode("utf-8"),
                 block_key.id,
                 new_parent_block_key.id,
             )
@@ -2640,7 +2639,7 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
             # Setting it to the source_block_info structure version here breaks split_draft's has_changes() method.
             new_block_info.edit_info.edited_by = user_id
             new_block_info.edit_info.edited_on = datetime.datetime.now(UTC)
-            new_block_info.edit_info.original_usage = six.text_type(usage_key.replace(branch=None, version_guid=None))
+            new_block_info.edit_info.original_usage = str(usage_key.replace(branch=None, version_guid=None))
             new_block_info.edit_info.original_usage_version = source_block_info.edit_info.update_version
             dest_structure['blocks'][new_block_key] = new_block_info
 
@@ -2733,7 +2732,7 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
         """
         # create mapping from each child's key to its parents' keys
         child_parent_map = defaultdict(set)
-        for block_key, block_data in six.iteritems(blocks):
+        for block_key, block_data in blocks.items():
             for child in block_data.fields.get('children', []):
                 child_parent_map[BlockKey(*child)].add(block_key)
 
@@ -2764,7 +2763,7 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
         edited_by won't reflect the originals, of course.
         """
         # this is the only real delete in the system. should it do something else?
-        log.info(u"deleting course from split-mongo: %s", course_key)
+        log.info("deleting course from split-mongo: %s", course_key)
         self.delete_course_index(course_key)
 
         # We do NOT call the super class here since we need to keep the assets
@@ -2805,7 +2804,7 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
         for child in block_fields.get('children', []):
             try:
                 if child in inherited_from:
-                    raise Exception(u'Infinite loop detected when inheriting to {}, having already inherited from {}'.format(child, inherited_from))  # lint-amnesty, pylint: disable=line-too-long
+                    raise Exception(f'Infinite loop detected when inheriting to {child}, having already inherited from {inherited_from}')  # lint-amnesty, pylint: disable=line-too-long
                 self.inherit_settings(
                     block_map,
                     BlockKey(*child),
@@ -2855,8 +2854,8 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
         try:
             course_assets = self._lookup_course(course_key).structure.get('assets', {})
         except (InsufficientSpecificationError, VersionConflictError) as err:  # lint-amnesty, pylint: disable=unused-variable
-            log.warning(u'Error finding assets for org "%s" course "%s" on asset '
-                        u'request. Either version of course_key is None or invalid.',
+            log.warning('Error finding assets for org "%s" course "%s" on asset '
+                        'request. Either version of course_key is None or invalid.',
                         course_key.org, course_key.course)
             return {}
 
@@ -2912,7 +2911,7 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
                 course_key, asset_metadata_list, course_assets, user_id, import_only
             )
 
-            for asset_type, assets in six.iteritems(assets_by_type):
+            for asset_type, assets in assets_by_type.items():
                 new_structure['assets'][asset_type] = list(assets)
 
             # update index if appropriate and structures
@@ -3021,7 +3020,7 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
         original_structure = self._lookup_course(course_locator).structure
         index_entry = self._get_index_if_valid(course_locator)
         new_structure = self.version_structure(course_locator, original_structure, user_id)
-        for block in six.itervalues(new_structure['blocks']):
+        for block in new_structure['blocks'].values():
             if 'children' in block.fields:
                 block.fields['children'] = [
                     block_id for block_id in block.fields['children']
@@ -3064,7 +3063,7 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
         xblock_class = self.mixologist.mix(xblock_class)
         # Make a shallow copy, so that we aren't manipulating a cached field dictionary
         output_fields = dict(jsonfields)
-        for field_name, value in six.iteritems(output_fields):
+        for field_name, value in output_fields.items():
             if value:
                 try:
                     field = xblock_class.fields.get(field_name)
@@ -3075,7 +3074,7 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
                 elif isinstance(field, ReferenceList):
                     output_fields[field_name] = [robust_usage_key(ele) for ele in value]
                 elif isinstance(field, ReferenceValueDict):
-                    for key, subvalue in six.iteritems(value):
+                    for key, subvalue in value.items():
                         value[key] = robust_usage_key(subvalue)
         return output_fields
 
@@ -3124,7 +3123,7 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
         :param fields: a dictionary of fields and values usually only those explicitly set and already
             ready for persisting (e.g., references converted to block_ids)
         """
-        for field_name, field_value in six.iteritems(fields):
+        for field_name, field_value in fields.items():
             if field_name in self.SEARCH_TARGET_DICT:
                 index_entry.setdefault('search_targets', {})[field_name] = field_value
 
@@ -3137,7 +3136,7 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
         :param new_id:
         """
         if not isinstance(new_id, ObjectId):
-            raise TypeError('new_id must be an ObjectId, but is {!r}'.format(new_id))
+            raise TypeError(f'new_id must be an ObjectId, but is {new_id!r}')
         index_entry['versions'][branch] = new_id
         self.update_course_index(course_key, index_entry)
 
@@ -3148,7 +3147,7 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
         # explicitly_set_fields_by_scope converts to json; so, avoiding it
         # the existing partition_fields_by_scope works on a dict not an xblock
         result = defaultdict(dict)
-        for field in six.itervalues(xblock.fields):
+        for field in xblock.fields.values():
             if field.is_set_on(xblock):
                 result[field.scope][field.name] = field.read_from(xblock)
         return result
@@ -3171,13 +3170,13 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
             Handle client possibly setting field to strings rather than keys to get the block_id
             """
             # perhaps replace by fixing the views or Field Reference*.from_json to return a Key
-            if isinstance(reference, six.string_types):
+            if isinstance(reference, str):
                 reference = BlockUsageLocator.from_string(reference)
             elif isinstance(reference, BlockKey):
                 return reference
             return BlockKey.from_usage_key(reference)
 
-        for field_name, value in six.iteritems(fields):
+        for field_name, value in fields.items():
             if value is not None:
                 if isinstance(xblock_class.fields[field_name], Reference):
                     fields[field_name] = reference_block_id(value)
@@ -3186,7 +3185,7 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
                         reference_block_id(ele) for ele in value
                     ]
                 elif isinstance(xblock_class.fields[field_name], ReferenceValueDict):
-                    for key, subvalue in six.iteritems(value):
+                    for key, subvalue in value.items():
                         value[key] = reference_block_id(subvalue)
                 # should this recurse down dicts and lists just in case they contain datetime?
                 elif not isinstance(value, datetime.datetime):  # don't convert datetimes!
@@ -3229,7 +3228,7 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
         """
         return [
             parent_block_key
-            for parent_block_key, value in six.iteritems(structure['blocks'])
+            for parent_block_key, value in structure['blocks'].items()
             if block_key in value.fields.get('children', [])
         ]
 
@@ -3301,7 +3300,7 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
                 block_defaults=new_block.defaults
             )
             # Extend the block's new edit_info with any extra edit_info fields from the source (e.g. original_usage):
-            for key, val in six.iteritems(new_block.edit_info.to_storable()):
+            for key, val in new_block.edit_info.to_storable().items():
                 if getattr(destination_block.edit_info, key) is None:
                     setattr(destination_block.edit_info, key, val)
 
@@ -3408,7 +3407,7 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
                     result_list.append(aside)
 
             if tmp_new_asides_data:
-                for _, asd in six.iteritems(tmp_new_asides_data):
+                for _, asd in tmp_new_asides_data.items():
                     result_list.append(asd)
                     updated = True
 

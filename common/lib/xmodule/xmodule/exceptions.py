@@ -21,7 +21,7 @@ class InvalidVersionError(Exception):
     for a non-leaf node)
     """
     def __init__(self, location):
-        super(InvalidVersionError, self).__init__()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().__init__()
         self.location = location
 
 
@@ -30,7 +30,7 @@ class SerializationError(Exception):
     Thrown when a module cannot be exported to XML
     """
     def __init__(self, location, msg):
-        super(SerializationError, self).__init__(msg)  # lint-amnesty, pylint: disable=super-with-arguments
+        super().__init__(msg)
         self.location = location
 
 
@@ -51,4 +51,4 @@ class HeartbeatFailure(Exception):
         In addition to a msg, provide the name of the service.
         """
         self.service = service
-        super(HeartbeatFailure, self).__init__(msg)  # lint-amnesty, pylint: disable=super-with-arguments
+        super().__init__(msg)

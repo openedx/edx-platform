@@ -3,7 +3,6 @@
 import logging
 import sys
 
-import six
 from contracts import contract, new_contract
 from fs.osfs import OSFS
 from lazy import lazy
@@ -70,7 +69,7 @@ class CachingDescriptorSystem(MakoDescriptorSystem, EditInfoRuntimeMixin):  # li
         kwargs.setdefault('id_reader', id_manager)
         kwargs.setdefault('id_generator', id_manager)
 
-        super(CachingDescriptorSystem, self).__init__(  # lint-amnesty, pylint: disable=super-with-arguments
+        super().__init__(
             field_data=None,
             load_item=self._load_item,
             resources_fs=OSFS(root),
@@ -91,7 +90,7 @@ class CachingDescriptorSystem(MakoDescriptorSystem, EditInfoRuntimeMixin):  # li
     @contract(returns="dict(BlockKey: BlockKey)")
     def _parent_map(self):  # lint-amnesty, pylint: disable=missing-function-docstring
         parent_map = {}
-        for block_key, block in six.iteritems(self.course_entry.structure['blocks']):
+        for block_key, block in self.course_entry.structure['blocks'].items():
             for child in block.fields.get('children', []):
                 parent_map[child] = block_key
         return parent_map
@@ -382,10 +381,10 @@ class CachingDescriptorSystem(MakoDescriptorSystem, EditInfoRuntimeMixin):  # li
                 if aside.scope_ids.block_type == aside_type:
                     return aside
 
-        new_aside = super(CachingDescriptorSystem, self).get_aside_of_type(block, aside_type)  # lint-amnesty, pylint: disable=super-with-arguments
+        new_aside = super().get_aside_of_type(block, aside_type)
         new_aside._field_data = block._field_data  # pylint: disable=protected-access
 
-        for key, _ in six.iteritems(new_aside.fields):
+        for key, _ in new_aside.fields.items():
             if isinstance(key, KeyValueStore.Key) and block._field_data.has(new_aside, key):  # pylint: disable=protected-access
                 try:
                     value = block._field_data.get(new_aside, key)  # pylint: disable=protected-access

@@ -11,7 +11,7 @@ from xmodule.mako_module import MakoModuleDescriptor, MakoTemplateBlockBase
 log = logging.getLogger(__name__)
 
 
-class EditingFields(object):
+class EditingFields:
     """Contains specific template information (the raw data body)"""
     data = String(scope=Scope.content, default='')
 
@@ -32,7 +32,7 @@ class EditingMixin(EditingFields, MakoTemplateBlockBase):
         """
         `data` should not be editable in the Studio settings editor.
         """
-        non_editable_fields = super(EditingMixin, self).non_editable_metadata_fields  # lint-amnesty, pylint: disable=super-with-arguments
+        non_editable_fields = super().non_editable_metadata_fields
         non_editable_fields.append(self.fields['data'])
         return non_editable_fields
 

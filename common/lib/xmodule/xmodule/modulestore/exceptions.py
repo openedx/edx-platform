@@ -55,7 +55,7 @@ class DuplicateItemError(Exception):
     Attempted to create an item which already exists.
     """
     def __init__(self, element_id, store=None, collection=None):
-        super(DuplicateItemError, self).__init__()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().__init__()
         self.element_id = element_id
         self.store = store
         self.collection = collection
@@ -77,7 +77,7 @@ class VersionConflictError(Exception):
     The caller asked for either draft or published head and gave a version which conflicted with it.
     """
     def __init__(self, requestedLocation, currentHeadVersionGuid):
-        super(VersionConflictError, self).__init__(u'Requested {}, but current head is {}'.format(  # lint-amnesty, pylint: disable=super-with-arguments
+        super().__init__('Requested {}, but current head is {}'.format(
             requestedLocation,
             currentHeadVersionGuid
         ))
@@ -91,8 +91,8 @@ class DuplicateCourseError(Exception):
         """
         existing_entry will have the who, when, and other properties of the existing entry
         """
-        super(DuplicateCourseError, self).__init__(  # lint-amnesty, pylint: disable=super-with-arguments
-            u'Cannot create course {}, which duplicates {}'.format(course_id, existing_entry)
+        super().__init__(
+            f'Cannot create course {course_id}, which duplicates {existing_entry}'
         )
         self.course_id = course_id
         self.existing_entry = existing_entry
@@ -103,6 +103,6 @@ class InvalidBranchSetting(Exception):
     Raised when the process' branch setting did not match the required setting for the attempted operation on a store.
     """
     def __init__(self, expected_setting, actual_setting):
-        super(InvalidBranchSetting, self).__init__(u"Invalid branch: expected {} but got {}".format(expected_setting, actual_setting))  # lint-amnesty, pylint: disable=line-too-long, super-with-arguments
+        super().__init__(f"Invalid branch: expected {expected_setting} but got {actual_setting}")  # lint-amnesty, pylint: disable=line-too-long, super-with-arguments
         self.expected_setting = expected_setting
         self.actual_setting = actual_setting

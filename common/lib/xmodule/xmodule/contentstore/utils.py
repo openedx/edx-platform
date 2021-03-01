@@ -15,13 +15,13 @@ def empty_asset_trashcan(course_locs):
         # first delete all of the thumbnails
         thumbs = store.get_all_content_thumbnails_for_course(course_loc)
         for thumb in thumbs:
-            print("Deleting {0}...".format(thumb))
+            print(f"Deleting {thumb}...")
             store.delete(thumb['asset_key'])
 
         # then delete all of the assets
         assets, __ = store.get_all_content_for_course(course_loc)
         for asset in assets:
-            print("Deleting {0}...".format(asset))
+            print(f"Deleting {asset}...")
             store.delete(asset['asset_key'])
 
 

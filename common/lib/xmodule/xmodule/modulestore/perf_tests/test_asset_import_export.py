@@ -61,7 +61,7 @@ class CrossStoreXMLRoundtrip(unittest.TestCase):
     perf_test = True
 
     def setUp(self):
-        super(CrossStoreXMLRoundtrip, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.export_dir = mkdtemp()
         self.addCleanup(rmtree, self.export_dir, ignore_errors=True)
 

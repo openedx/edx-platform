@@ -3,7 +3,6 @@ XBlock runtime services for LibraryContentBlock
 """
 import hashlib
 
-import six
 from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.core.exceptions import PermissionDenied
 from opaque_keys.edx.keys import UsageKey
@@ -26,7 +25,7 @@ def normalize_key_for_search(library_key):
     return library_key.replace(version_guid=None, branch=None)
 
 
-class LibraryToolsService(object):
+class LibraryToolsService:
     """
     Service that allows LibraryContentBlock to interact with libraries in the
     modulestore.
@@ -81,9 +80,9 @@ class LibraryToolsService(object):
             """ Basic information about the given block """
             orig_key, orig_version = self.store.get_block_original_usage(usage_key)
             return {
-                "usage_key": six.text_type(usage_key),
-                "original_usage_key": six.text_type(orig_key) if orig_key else None,
-                "original_usage_version": six.text_type(orig_version) if orig_version else None,
+                "usage_key": str(usage_key),
+                "original_usage_key": str(orig_key) if orig_key else None,
+                "original_usage_version": str(orig_version) if orig_version else None,
             }
 
         result_json = []
@@ -109,7 +108,7 @@ class LibraryToolsService(object):
         search_engine = SearchEngine.get_search_engine(index="library_index")
         if search_engine:
             filter_clause = {
-                "library": six.text_type(normalize_key_for_search(library.location.library_key)),
+                "library": str(normalize_key_for_search(library.location.library_key)),
                 "content_type": ProblemBlock.INDEX_CONTENT_TYPE,
                 "problem_types": capa_type
             }
@@ -161,7 +160,7 @@ class LibraryToolsService(object):
             library_key = library_key.replace(branch=ModuleStoreEnum.BranchName.library, version_guid=version)
         library = self._get_library(library_key)
         if library is None:
-            raise ValueError("Requested library {0} not found.".format(library_key))
+            raise ValueError(f"Requested library {library_key} not found.")
         if user_perms and not user_perms.can_read(library_key):
             raise PermissionDenied()
         filter_children = (dest_block.capa_type != ANY_CAPA_TYPE_VALUE)
@@ -202,7 +201,7 @@ class LibraryToolsService(object):
         """
         dest_key = dest_block.scope_ids.usage_id
         if not isinstance(dest_key, BlockUsageLocator):
-            raise TypeError("Destination {} should be a modulestore course.".format(dest_key))
+            raise TypeError(f"Destination {dest_key} should be a modulestore course.")
         if self.user_id is None:
             raise ValueError("Cannot check user permissions - LibraryTools user_id is None")
 
@@ -286,7 +285,7 @@ class LibraryToolsService(object):
                 if isinstance(field_value, str):
                     # If string field (which may also be JSON/XML data), rewrite /static/... URLs to point to blockstore
                     for asset in all_assets:
-                        field_value = field_value.replace('/static/{}'.format(asset.path), asset.url)
+                        field_value = field_value.replace(f'/static/{asset.path}', asset.url)
                         # Make sure the URL is one that will work from the user's browser when using the docker devstack
                         field_value = blockstore_api.force_browser_url(field_value)
                 setattr(new_block, field_name, field_value)

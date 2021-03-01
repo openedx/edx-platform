@@ -43,7 +43,7 @@ class AssetMetadataFoundTemporary(AssetException):
     pass  # lint-amnesty, pylint: disable=unnecessary-pass
 
 
-class AssetManager(object):
+class AssetManager:
     """
     Manager for saving/loading course assets.
     """

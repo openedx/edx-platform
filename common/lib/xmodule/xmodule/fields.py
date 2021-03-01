@@ -6,9 +6,7 @@ import re
 import time
 
 import dateutil.parser
-import six
 from pytz import UTC
-from six import text_type
 from xblock.fields import JSONField
 from xblock.scorable import Score
 
@@ -37,7 +35,7 @@ class Date(JSONField):
         result = dateutil.parser.parse(field, default=self.PREVENT_DEFAULT_DAY_MON_SEED1)
         result_other = dateutil.parser.parse(field, default=self.PREVENT_DEFAULT_DAY_MON_SEED2)
         if result != result_other:
-            log.warning("Field {0} is missing month or day".format(self.name))
+            log.warning(f"Field {self.name} is missing month or day")
             return None
         if result.tzinfo is None:
             result = result.replace(tzinfo=UTC)
@@ -53,16 +51,16 @@ class Date(JSONField):
             return field
         elif field == "":
             return None
-        elif isinstance(field, six.string_types):
+        elif isinstance(field, str):
             return self._parse_date_wo_default_month_day(field)
-        elif isinstance(field, six.integer_types) or isinstance(field, float):  # lint-amnesty, pylint: disable=consider-merging-isinstance
+        elif isinstance(field, int) or isinstance(field, float):  # lint-amnesty, pylint: disable=consider-merging-isinstance
             return datetime.datetime.fromtimestamp(field / 1000, UTC)
         elif isinstance(field, time.struct_time):
             return datetime.datetime.fromtimestamp(time.mktime(field), UTC)
         elif isinstance(field, datetime.datetime):
             return field
         else:
-            msg = "Field {0} has bad value '{1}'".format(
+            msg = "Field {} has bad value '{}'".format(
                 self.name, field)
             raise TypeError(msg)
 
@@ -86,7 +84,7 @@ class Date(JSONField):
             else:
                 return value.isoformat()
         else:
-            raise TypeError("Cannot convert {!r} to json".format(value))
+            raise TypeError(f"Cannot convert {value!r} to json")
 
     enforce_type = from_json
 
@@ -118,7 +116,7 @@ class Timedelta(JSONField):  # lint-amnesty, pylint: disable=missing-class-docst
             return
         parts = parts.groupdict()
         time_params = {}
-        for (name, param) in six.iteritems(parts):
+        for (name, param) in parts.items():
             if param:
                 time_params[name] = int(param)
         return datetime.timedelta(**time_params)
@@ -179,7 +177,7 @@ class RelativeTime(JSONField):
         except ValueError as e:
             raise ValueError(  # lint-amnesty, pylint: disable=raise-missing-from
                 "Incorrect RelativeTime value {!r} was set in XML or serialized. "
-                "Original parse message is {}".format(value, text_type(e))
+                "Original parse message is {}".format(value, str(e))
             )
         return datetime.timedelta(
             hours=obj_time.tm_hour,
@@ -204,10 +202,10 @@ class RelativeTime(JSONField):
         if isinstance(value, float):
             return datetime.timedelta(seconds=value)
 
-        if isinstance(value, six.string_types):
+        if isinstance(value, str):
             return self.isotime_to_timedelta(value)
 
-        msg = "RelativeTime Field {0} has bad value '{1!r}'".format(self.name, value)
+        msg = f"RelativeTime Field {self.name} has bad value '{value!r}'"
         raise TypeError(msg)
 
     def to_json(self, value):
@@ -235,7 +233,7 @@ class RelativeTime(JSONField):
                 )
             return self.timedelta_to_string(value)
 
-        raise TypeError("RelativeTime: cannot convert {!r} to json".format(value))
+        raise TypeError(f"RelativeTime: cannot convert {value!r} to json")
 
     def timedelta_to_string(self, value):
         """
@@ -284,7 +282,7 @@ class ScoreField(JSONField):
 
         if raw_possible < 0:
             raise ValueError(
-                'Error deserializing field of type {0}: Expected a positive number for raw_possible, got {1}.'.format(
+                'Error deserializing field of type {}: Expected a positive number for raw_possible, got {}.'.format(
                     self.display_name,
                     raw_possible,
                 )
@@ -292,7 +290,7 @@ class ScoreField(JSONField):
 
         if not (0 <= raw_earned <= raw_possible):  # lint-amnesty, pylint: disable=superfluous-parens
             raise ValueError(
-                'Error deserializing field of type {0}: Expected raw_earned between 0 and {1}, got {2}.'.format(
+                'Error deserializing field of type {}: Expected raw_earned between 0 and {}, got {}.'.format(
                     self.display_name,
                     raw_possible,
                     raw_earned

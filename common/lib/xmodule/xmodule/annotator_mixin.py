@@ -3,12 +3,11 @@ Annotations Tool Mixin
 This file contains global variables and functions used in the various Annotation Tools.
 """
 
-
+from html.parser import HTMLParser
 from os.path import basename, splitext
+from urllib.parse import urlparse
 
 from lxml import etree
-from six.moves.html_parser import HTMLParser
-from six.moves.urllib.parse import urlparse
 
 
 def get_instructions(xmltree):

@@ -10,7 +10,6 @@ from datetime import datetime
 
 from pkg_resources import resource_string
 
-import six
 from django.conf import settings
 from fs.errors import ResourceNotFound
 from lxml import etree
@@ -59,7 +58,7 @@ class HtmlBlockMixin(  # lint-amnesty, pylint: disable=abstract-method
         # use display_name_with_default for those
         default=_("Text")
     )
-    data = String(help=_("Html contents to display for this module"), default=u"", scope=Scope.content)
+    data = String(help=_("Html contents to display for this module"), default="", scope=Scope.content)
     source_code = String(
         help=_("Source code for LaTeX documents. This feature is not well-supported."),
         scope=Scope.settings
@@ -111,7 +110,7 @@ class HtmlBlockMixin(  # lint-amnesty, pylint: disable=abstract-method
         else:
             return {
                 'enabled': False,
-                'message': 'To enable, set FEATURES["{}"]'.format(self.ENABLE_HTML_XBLOCK_STUDENT_VIEW_DATA)
+                'message': f'To enable, set FEATURES["{self.ENABLE_HTML_XBLOCK_STUDENT_VIEW_DATA}"]'
             }
 
     def get_html(self):
@@ -256,7 +255,7 @@ class HtmlBlockMixin(  # lint-amnesty, pylint: disable=abstract-method
             )
             base = path(pointer_path).dirname()
             # log.debug("base = {0}, base.dirname={1}, filename={2}".format(base, base.dirname(), filename))
-            filepath = u"{base}/{name}.html".format(base=base, name=filename)
+            filepath = f"{base}/{filename}.html"
             # log.debug("looking for html file for {0} at {1}".format(location, filepath))
 
             # VS[compat]
@@ -278,7 +277,7 @@ class HtmlBlockMixin(  # lint-amnesty, pylint: disable=abstract-method
                     html = infile.read()
                     # Log a warning if we can't parse the file, but don't error
                     if not check_html(html) and len(html) > 0:
-                        msg = "Couldn't parse html in {0}, content = {1}".format(filepath, html)
+                        msg = f"Couldn't parse html in {filepath}, content = {html}"
                         log.warning(msg)
                         system.error_tracker("Warning: " + msg)
 
@@ -291,10 +290,10 @@ class HtmlBlockMixin(  # lint-amnesty, pylint: disable=abstract-method
                     return definition, []
 
             except ResourceNotFound as err:
-                msg = 'Unable to load file contents at path {0}: {1} '.format(
+                msg = 'Unable to load file contents at path {}: {} '.format(
                     filepath, err)
                 # add more info and re-raise
-                six.reraise(Exception, Exception(msg), sys.exc_info()[2])
+                raise Exception(msg).with_traceback(sys.exc_info()[2])
 
     @classmethod
     def parse_xml_new_runtime(cls, node, runtime, keys):
@@ -319,7 +318,7 @@ class HtmlBlockMixin(  # lint-amnesty, pylint: disable=abstract-method
 
         # Write html to file, return an empty tag
         pathname = name_to_pathname(self.url_name)
-        filepath = u'{category}/{pathname}.html'.format(
+        filepath = '{category}/{pathname}.html'.format(
             category=self.category,
             pathname=pathname
         )
@@ -341,12 +340,12 @@ class HtmlBlockMixin(  # lint-amnesty, pylint: disable=abstract-method
         """
         `use_latex_compiler` should not be editable in the Studio settings editor.
         """
-        non_editable_fields = super(HtmlBlockMixin, self).non_editable_metadata_fields  # lint-amnesty, pylint: disable=super-with-arguments
+        non_editable_fields = super().non_editable_metadata_fields
         non_editable_fields.append(HtmlBlockMixin.use_latex_compiler)
         return non_editable_fields
 
     def index_dictionary(self):
-        xblock_body = super(HtmlBlockMixin, self).index_dictionary()  # lint-amnesty, pylint: disable=super-with-arguments
+        xblock_body = super().index_dictionary()
         # Removing script and style
         html_content = re.sub(
             re.compile(
@@ -380,7 +379,7 @@ class HtmlBlock(HtmlBlockMixin):  # lint-amnesty, pylint: disable=abstract-metho
     """
 
 
-class AboutFields(object):  # lint-amnesty, pylint: disable=missing-class-docstring
+class AboutFields:  # lint-amnesty, pylint: disable=missing-class-docstring
     display_name = String(
         help=_("The display name for this component."),
         scope=Scope.settings,
@@ -388,7 +387,7 @@ class AboutFields(object):  # lint-amnesty, pylint: disable=missing-class-docstr
     )
     data = String(
         help=_("Html contents to display for this module"),
-        default=u"",
+        default="",
         scope=Scope.content
     )
 
@@ -402,7 +401,7 @@ class AboutBlock(AboutFields, HtmlBlockMixin):  # lint-amnesty, pylint: disable=
     template_dir_name = "about"
 
 
-class StaticTabFields(object):
+class StaticTabFields:
     """
     The overrides for Static Tabs
     """
@@ -420,7 +419,7 @@ class StaticTabFields(object):
         scope=Scope.settings
     )
     data = String(
-        default=textwrap.dedent(u"""\
+        default=textwrap.dedent("""\
             <p>Add the content you want students to see on this page.</p>
         """),
         scope=Scope.content,
@@ -437,7 +436,7 @@ class StaticTabBlock(StaticTabFields, HtmlBlockMixin):  # lint-amnesty, pylint: 
     template_dir_name = None
 
 
-class CourseInfoFields(object):
+class CourseInfoFields:
     """
     Field overrides
     """
@@ -448,7 +447,7 @@ class CourseInfoFields(object):
     )
     data = String(
         help=_("Html contents to display for this module"),
-        default=u"<ol></ol>",
+        default="<ol></ol>",
         scope=Scope.content
     )
 
@@ -482,7 +481,7 @@ class CourseInfoBlock(CourseInfoFields, HtmlBlockMixin):  # lint-amnesty, pylint
                 'visible_updates': course_updates[:3],
                 'hidden_updates': course_updates[3:],
             }
-            return self.system.render_template("{0}/course_updates.html".format(self.TEMPLATE_DIR), context)
+            return self.system.render_template(f"{self.TEMPLATE_DIR}/course_updates.html", context)
 
     @classmethod
     def order_updates(self, updates):  # lint-amnesty, pylint: disable=bad-classmethod-argument

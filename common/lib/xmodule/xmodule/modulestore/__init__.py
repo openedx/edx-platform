@@ -13,12 +13,10 @@ from collections import defaultdict
 from contextlib import contextmanager
 from operator import itemgetter
 
-import six
 from contracts import contract, new_contract
 from opaque_keys.edx.keys import AssetKey, CourseKey
 from opaque_keys.edx.locations import Location  # For import backwards compatibility
 from pytz import UTC
-from six.moves import range
 from sortedcontainers import SortedKeyList
 from xblock.core import XBlock
 from xblock.plugin import default_select
@@ -39,8 +37,8 @@ new_contract('AssetKey', AssetKey)
 new_contract('AssetMetadata', AssetMetadata)
 new_contract('XBlock', XBlock)
 
-LIBRARY_ROOT = u'library.xml'
-COURSE_ROOT = u'course.xml'
+LIBRARY_ROOT = 'library.xml'
+COURSE_ROOT = 'course.xml'
 
 # List of names of computed fields on xmodules that are of type usage keys.
 # This list can be used to determine which fields need to be stripped of
@@ -48,19 +46,19 @@ COURSE_ROOT = u'course.xml'
 XMODULE_FIELDS_WITH_USAGE_KEYS = ['location', 'parent']
 
 
-class ModuleStoreEnum(object):
+class ModuleStoreEnum:
     """
     A class to encapsulate common constants that are used with the various modulestores.
     """
 
-    class Type(object):
+    class Type:
         """
         The various types of modulestores provided
         """
         split = 'split'
         mongo = 'mongo'
 
-    class RevisionOption(object):
+    class RevisionOption:
         """
         Revision constants to use for Module Store operations
         Note: These values are passed into store APIs and only used at run time
@@ -77,7 +75,7 @@ class ModuleStoreEnum(object):
         # all revisions are queried
         all = 'rev-opt-all'
 
-    class Branch(object):
+    class Branch:
         """
         Branch constants to use for stores, such as Mongo, that have only 2 branches: DRAFT and PUBLISHED
         Note: These values are taken from server configuration settings, so should not be changed without alerting DevOps  # lint-amnesty, pylint: disable=line-too-long
@@ -85,7 +83,7 @@ class ModuleStoreEnum(object):
         draft_preferred = 'draft-preferred'
         published_only = 'published-only'
 
-    class BranchName(object):
+    class BranchName:
         """
         Branch constants to use for stores, such as Split, that have named branches
         """
@@ -93,7 +91,7 @@ class ModuleStoreEnum(object):
         published = 'published-branch'
         library = 'library'
 
-    class UserID(object):
+    class UserID:
         """
         Values for user ID defaults
         """
@@ -112,7 +110,7 @@ class ModuleStoreEnum(object):
         # user ID for automatic update by the system
         system = -4
 
-    class SortOrder(object):
+    class SortOrder:
         """
         Values for sorting asset metadata.
         """
@@ -120,7 +118,7 @@ class ModuleStoreEnum(object):
         descending = 2
 
 
-class BulkOpsRecord(object):
+class BulkOpsRecord:
     """
     For handling nesting of bulk operations
     """
@@ -161,11 +159,11 @@ class ActiveBulkThread(threading.local):
     Add the expected vars to the thread.
     """
     def __init__(self, bulk_ops_record_type, **kwargs):
-        super(ActiveBulkThread, self).__init__(**kwargs)  # lint-amnesty, pylint: disable=super-with-arguments
+        super().__init__(**kwargs)
         self.records = defaultdict(bulk_ops_record_type)
 
 
-class BulkOperationsMixin(object):
+class BulkOperationsMixin:
     """
     This implements the :meth:`bulk_operations` modulestore semantics which handles nested invocations
 
@@ -178,7 +176,7 @@ class BulkOperationsMixin(object):
     mongo_connection.
     """
     def __init__(self, *args, **kwargs):
-        super(BulkOperationsMixin, self).__init__(*args, **kwargs)  # lint-amnesty, pylint: disable=super-with-arguments
+        super().__init__(*args, **kwargs)
         self._active_bulk_ops = ActiveBulkThread(self._bulk_ops_record_type)
         self.signal_handler = None
 
@@ -209,7 +207,7 @@ class BulkOperationsMixin(object):
 
         # Retrieve the bulk record based on matching org/course/run (possibly ignoring case)
         if ignore_case:
-            for key, record in six.iteritems(self._active_bulk_ops.records):
+            for key, record in self._active_bulk_ops.records.items():
                 # Shortcut: check basic equivalence for cases where org/course/run might be None.
                 if (key == course_key) or (  # lint-amnesty, pylint: disable=too-many-boolean-expressions
                         (key.org and key.org.lower() == course_key.org.lower()) and
@@ -225,7 +223,7 @@ class BulkOperationsMixin(object):
         """
         Yield all active (CourseLocator, BulkOpsRecord) tuples.
         """
-        for course_key, record in six.iteritems(self._active_bulk_ops.records):
+        for course_key, record in self._active_bulk_ops.records.items():
             if record.active:
                 yield (course_key, record)
 
@@ -336,7 +334,7 @@ class BulkOperationsMixin(object):
             bulk_ops_record.has_library_updated_item = False
 
 
-class EditInfo(object):
+class EditInfo:  # pylint: disable=eq-without-hash
     """
     Encapsulates the editing info of a block.
     """
@@ -415,7 +413,7 @@ class EditInfo(object):
         return not self == edit_info
 
 
-class BlockData(object):
+class BlockData:  # pylint: disable=eq-without-hash
     """
     Wrap the block data in an object instead of using a straight Python dictionary.
     Allows the storing of meta-information about a structure that doesn't persist along with
@@ -519,7 +517,7 @@ class SortedAssetList(SortedKeyList):  # lint-amnesty, pylint: disable=abstract-
         if key_func is None:
             kwargs['key'] = itemgetter('filename')
             self.filename_sort = True
-        super(SortedAssetList, self).__init__(**kwargs)  # lint-amnesty, pylint: disable=super-with-arguments
+        super().__init__(**kwargs)
 
     @contract(asset_id=AssetKey)
     def find(self, asset_id):
@@ -556,7 +554,7 @@ class SortedAssetList(SortedKeyList):  # lint-amnesty, pylint: disable=abstract-
         self.add(metadata_to_insert)
 
 
-class ModuleStoreAssetBase(object):
+class ModuleStoreAssetBase:
     """
     The methods for accessing assets and their metadata
     """
@@ -634,7 +632,7 @@ class ModuleStoreAssetBase(object):
         if asset_type is None:
             # Add assets of all types to the sorted list.
             all_assets = SortedAssetList(iterable=[], key=key_func)
-            for asset_type, val in six.iteritems(course_assets):  # lint-amnesty, pylint: disable=redefined-argument-from-local
+            for asset_type, val in course_assets.items():  # lint-amnesty, pylint: disable=redefined-argument-from-local
                 all_assets.update(val)
         else:
             # Add assets of a single type to the sorted list.
@@ -776,7 +774,7 @@ class ModuleStoreAssetWriteInterface(ModuleStoreAssetBase):
         pass  # lint-amnesty, pylint: disable=unnecessary-pass
 
 
-class ModuleStoreRead(six.with_metaclass(ABCMeta, ModuleStoreAssetBase)):
+class ModuleStoreRead(ModuleStoreAssetBase, metaclass=ABCMeta):
     """
     An abstract interface for a database backend that stores XModuleDescriptor
     instances and extends read-only functionality
@@ -875,7 +873,7 @@ class ModuleStoreRead(six.with_metaclass(ABCMeta, ModuleStoreAssetBase)):
             else:
                 return True, field
 
-        for key, criteria in six.iteritems(qualifiers):
+        for key, criteria in qualifiers.items():
             is_set, value = _is_set_on(key)
             if isinstance(criteria, dict) and '$exists' in criteria and criteria['$exists'] == is_set:
                 continue
@@ -1031,7 +1029,7 @@ class ModuleStoreRead(six.with_metaclass(ABCMeta, ModuleStoreAssetBase)):
         pass  # lint-amnesty, pylint: disable=unnecessary-pass
 
 
-class ModuleStoreWrite(six.with_metaclass(ABCMeta, ModuleStoreRead, ModuleStoreAssetWriteInterface)):
+class ModuleStoreWrite(ModuleStoreRead, ModuleStoreAssetWriteInterface, metaclass=ABCMeta):
     """
     An abstract interface for a database backend that stores XModuleDescriptor
     instances and extends both read and write functionality
@@ -1172,7 +1170,7 @@ class ModuleStoreReadBase(BulkOperationsMixin, ModuleStoreRead):
         '''
         Set up the error-tracking logic.
         '''
-        super(ModuleStoreReadBase, self).__init__(**kwargs)  # lint-amnesty, pylint: disable=super-with-arguments
+        super().__init__(**kwargs)
         self._course_errors = defaultdict(make_error_tracker)  # location -> ErrorLog
         # TODO move the inheritance_cache_subsystem to classes which use it
         self.metadata_inheritance_cache_subsystem = metadata_inheritance_cache_subsystem
@@ -1260,7 +1258,7 @@ class ModuleStoreReadBase(BulkOperationsMixin, ModuleStoreRead):
         """
         if self.contentstore:
             self.contentstore.close_connections()
-        super(ModuleStoreReadBase, self).close_connections()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().close_connections()
 
     @contextmanager
     def default_store(self, store_type):
@@ -1268,7 +1266,7 @@ class ModuleStoreReadBase(BulkOperationsMixin, ModuleStoreRead):
         A context manager for temporarily changing the default store
         """
         if self.get_modulestore_type(None) != store_type:
-            raise ValueError(u"Cannot set default store to type {}".format(store_type))
+            raise ValueError(f"Cannot set default store to type {store_type}")
         yield
 
 
@@ -1278,7 +1276,7 @@ class ModuleStoreWriteBase(ModuleStoreReadBase, ModuleStoreWrite):
     Implement interface functionality that can be shared.
     '''
     def __init__(self, contentstore, **kwargs):
-        super(ModuleStoreWriteBase, self).__init__(contentstore=contentstore, **kwargs)  # lint-amnesty, pylint: disable=super-with-arguments
+        super().__init__(contentstore=contentstore, **kwargs)
         self.mixologist = Mixologist(self.xblock_mixins)
 
     def partition_fields_by_scope(self, category, fields):
@@ -1293,7 +1291,7 @@ class ModuleStoreWriteBase(ModuleStoreReadBase, ModuleStoreWrite):
             return result
         classes = XBlock.load_class(category, select=prefer_xmodules)
         cls = self.mixologist.mix(classes)
-        for field_name, value in six.iteritems(fields):
+        for field_name, value in fields.items():
             field = getattr(cls, field_name)
             result[field.scope][field_name] = value
         return result
@@ -1338,7 +1336,7 @@ class ModuleStoreWriteBase(ModuleStoreReadBase, ModuleStoreWrite):
         # delete the assets
         if self.contentstore:
             self.contentstore.delete_all_course_assets(course_key)
-        super(ModuleStoreWriteBase, self).delete_course(course_key, user_id)  # lint-amnesty, pylint: disable=super-with-arguments
+        super().delete_course(course_key, user_id)
 
     def _drop_database(self, database=True, collections=True, connections=True):
         """
@@ -1354,7 +1352,7 @@ class ModuleStoreWriteBase(ModuleStoreReadBase, ModuleStoreWrite):
         """
         if self.contentstore:
             self.contentstore._drop_database(database, collections, connections)  # pylint: disable=protected-access
-        super(ModuleStoreWriteBase, self)._drop_database(database, collections, connections)  # lint-amnesty, pylint: disable=super-with-arguments
+        super()._drop_database(database, collections, connections)
 
     def create_child(self, user_id, parent_usage_key, block_type, block_id=None, fields=None, **kwargs):
         """

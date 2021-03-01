@@ -14,7 +14,7 @@ class BlockKey(namedtuple('BlockKey', 'type id')):  # lint-amnesty, pylint: disa
 
     @contract(type="string[>0]")
     def __new__(cls, type, id):  # lint-amnesty, pylint: disable=redefined-builtin
-        return super(BlockKey, cls).__new__(cls, type, id)
+        return super().__new__(cls, type, id)
 
     @classmethod
     @contract(usage_key=BlockUsageLocator)
