@@ -33,7 +33,7 @@ def print_course(course):
 
 
 # course.tabs looks like this
-# [{u'type': u'courseware'}, {u'type': u'course_info', u'name': u'Course Info'}, {u'type': u'textbooks'},
+# [{u'type': u'courseware'}, {u'type': u'textbooks'},
 # {u'type': u'discussion', u'name': u'Discussion'}, {u'type': u'wiki', u'name': u'Wiki'},
 # {u'type': u'progress', u'name': u'Progress'}]
 
@@ -53,7 +53,7 @@ command again, adding --insert or --delete to edit the list.
 
     course_help = '--course <id> required, e.g. Stanford/CS99/2013_spring'
     delete_help = '--delete <tab-number>'
-    insert_help = '--insert <tab-number> <type> <name>, e.g. 4 "course_info" "Course Info"'
+    insert_help = '--insert <tab-number> <type> <name>, e.g. 4 "discussion" "Discussion"'
 
     def add_arguments(self, parser):
         parser.add_argument('--course',

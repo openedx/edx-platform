@@ -124,7 +124,7 @@ class TabsPageTests(CourseTestCase):
     def test_reorder_tabs_invalid_tab(self):
         """Test re-ordering of tabs with invalid tab"""
 
-        invalid_tab_ids = ['courseware', 'info', 'invalid_tab_id']
+        invalid_tab_ids = ['courseware', 'invalid_tab_id']
 
         # post the request
         resp = self.client.ajax_post(
@@ -204,10 +204,11 @@ class PrimitiveTabEdit(ModuleStoreTestCase):
             tabs.primitive_delete(course, 1)
         with self.assertRaises(IndexError):
             tabs.primitive_delete(course, 7)
+        # Delete the Discussions tab & check it's not there
         tabs.primitive_delete(course, 2)
-        self.assertNotIn({'type': 'textbooks'}, course.tabs)
-        # Check that discussion has shifted up
-        self.assertEqual(course.tabs[2], {'type': 'discussion', 'name': 'Discussion'})
+        self.assertNotIn({'type': 'discussion'}, course.tabs)
+        # Check that the wiki has shifted up
+        self.assertEqual(course.tabs[2], {'type': 'wiki', 'name': 'Wiki'})
 
     def test_insert(self):
         """Test primitive tab insertion."""

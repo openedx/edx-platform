@@ -382,7 +382,6 @@ class CourseTabList(List):
         """
 
         course.tabs.extend([
-            CourseTab.load('course_info'),
             CourseTab.load('courseware')
         ])
 
@@ -468,13 +467,19 @@ class CourseTabList(List):
     @classmethod
     def upgrade_tabs(cls, tabs):
         """
-        Reverse and Rename Courseware to Course and Course Info to Home Tabs.
+        Remove course_info tab, and rename courseware tab to Course if needed
+
+        We are removing the `course_info` tab as part of TNL-7061
         """
         if tabs and len(tabs) > 1:
+            # Reverse them so that course_info is first, and rename courseware to Course
             if tabs[0].get('type') == 'courseware' and tabs[1].get('type') == 'course_info':
                 tabs[0], tabs[1] = tabs[1], tabs[0]
-                tabs[0]['name'] = _('Home')
                 tabs[1]['name'] = _('Course')
+
+            # If course_info tab is present, it should be at index 0. If so, remove it
+            if tabs[0].get('type') == 'course_info':
+                tabs.pop(0)
 
         return tabs
 
@@ -486,22 +491,18 @@ class CourseTabList(List):
 
         Specific rules checked:
         - if no tabs specified, that's fine
-        - if tabs specified, first two must have type 'courseware' and 'course_info', in that order.
+        - if tabs specified, first must have type 'courseware'
 
         """
         if tabs is None or len(tabs) == 0:
             return
 
-        if len(tabs) < 2:
-            raise InvalidTabsException(f"Expected at least two tabs.  tabs: '{tabs}'")
+        if len(tabs) < 1:
+            raise InvalidTabsException(f"Expected at least one tab.  tabs: '{tabs}'")
 
-        if tabs[0].get('type') != 'course_info':
+        if tabs[0].get('type') != 'courseware':
             raise InvalidTabsException(
-                f"Expected first tab to have type 'course_info'.  tabs: '{tabs}'")
-
-        if tabs[1].get('type') != 'courseware':
-            raise InvalidTabsException(
-                f"Expected second tab to have type 'courseware'.  tabs: '{tabs}'")
+                f"Expected first tab to have type 'courseware'.  tabs: '{tabs}'")
 
         # the following tabs should appear only once
         # TODO: don't import openedx capabilities from common

@@ -881,19 +881,6 @@ class ViewsTestCase(BaseViewsTestCase):
             response = self.client.get(url)
             self.assertRedirects(response, reverse('signin_user') + '?next=' + url)
 
-    @override_waffle_flag(DISABLE_UNIFIED_COURSE_TAB_FLAG, active=True)
-    def test_bypass_course_info(self):
-        course_id = str(self.course_key)
-
-        response = self.client.get(reverse('info', args=[course_id]))
-        assert response.status_code == 200
-
-        response = self.client.get(reverse('info', args=[course_id]), HTTP_REFERER=reverse('dashboard'))
-        assert response.status_code == 200
-
-        response = self.client.get(reverse('info', args=[course_id]), HTTP_REFERER='foo')
-        assert response.status_code == 200
-
     # TODO: TNL-6387: Remove test
     @override_waffle_flag(DISABLE_COURSE_OUTLINE_PAGE_FLAG, active=True)
     def test_accordion(self):
