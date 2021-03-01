@@ -42,7 +42,8 @@ from lms.djangoapps.instructor_task.tasks import (
     proctored_exam_results_csv,
     rescore_problem,
     reset_problem_attempts,
-    send_bulk_course_email
+    send_bulk_course_email,
+    generate_anonymous_ids_for_course
 )
 from xmodule.modulestore.django import modulestore
 
@@ -547,3 +548,15 @@ def regenerate_certificates(request, course_key, statuses_to_regenerate):
     )
 
     return instructor_task
+
+
+def generate_anonymous_ids(request, course_key):
+    """
+    Generate anonymize id CSV report.
+    """
+    task_type = 'generate_anonymous_ids_for_course'
+    task_class = generate_anonymous_ids_for_course
+    task_input = {}
+    task_key = ""
+
+    return submit_task(request, task_type, task_class, course_key, task_input, task_key)
