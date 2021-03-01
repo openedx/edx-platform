@@ -14,11 +14,6 @@ class StudentViewTransformer(BlockStructureTransformer):
     READ_VERSION = 1
     STUDENT_VIEW_DATA = 'student_view_data'
     STUDENT_VIEW_MULTI_DEVICE = 'student_view_multi_device'
-    STUDENT_VIEW_DATA_CONTEXT = {
-        'video': {
-            'profiles': ['mobile_low', 'desktop_mp4', 'desktop_webm', 'mobile_high']
-        }
-    }
 
     def __init__(self, requested_student_view_data=None):
         self.requested_student_view_data = requested_student_view_data or []
@@ -65,11 +60,7 @@ class StudentViewTransformer(BlockStructureTransformer):
                 supports_multi_device,
             )
             if getattr(block, 'student_view_data', None):
-                block_context = cls.STUDENT_VIEW_DATA_CONTEXT.get(block.category)
-                if block_context:
-                    student_view_data = block.student_view_data(context=block_context)
-                else:
-                    student_view_data = block.student_view_data()
+                student_view_data = block.student_view_data()
 
                 block_structure.set_transformer_block_field(
                     block_key,
