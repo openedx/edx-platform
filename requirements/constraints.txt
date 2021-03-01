@@ -33,8 +33,6 @@ django-storages<1.9
 # for them.
 edx-enterprise==3.18.0
 
-# Upgrading to 2.12.0 breaks several test classes due to API changes, need to update our code accordingly
-factory-boy==2.8.1
 
 # Newer versions need a more recent version of python-dateutil
 freezegun==0.3.12
@@ -120,4 +118,3 @@ httpretty<1.0
 
 # latest version of diff-cover conflicts with pygments version see https://github.com/Bachmann1234/diff_cover/commit/01f91760321cee1ad28cfa0d801c4acd8b9765a6
 diff-cover==4.0.0
-

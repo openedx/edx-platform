@@ -40,6 +40,7 @@ from lms.djangoapps.verify_student.models import VerificationDeadline
 from lms.djangoapps.verify_student.services import IDVerificationService
 from lms.djangoapps.verify_student.tests.factories import SoftwareSecurePhotoVerificationFactory
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
+from openedx.core.djangoapps.content.course_overviews.tests.factories import CourseOverviewFactory
 from openedx.core.djangoapps.self_paced.models import SelfPacedConfiguration
 from openedx.core.djangoapps.site_configuration.tests.factories import SiteFactory
 from openedx.core.djangoapps.user_api.preferences.api import set_user_preference
@@ -1004,15 +1005,19 @@ class TestScheduleOverrides(SharedModuleStoreTestCase):
         (True, True, True, True, True, False),
     )
     @ddt.unpack
-    def test_date_with_org_and_course_config_overrides(self, enroll_first, org_config_enabled, org_config_opt_out,
-                                                       course_config_enabled, course_config_opt_out,
-                                                       expected_dynamic_deadline):
+    def test_date_with_org_and_course_config_overrides(
+        self, enroll_first, org_config_enabled, org_config_opt_out,
+        course_config_enabled, course_config_opt_out,
+        expected_dynamic_deadline
+    ):
         """ Runs through every combination of org-level plus course-level DynamicUpgradeDeadlineConfiguration enabled
         and opt-out states to verify that course-level overrides the org-level config. """
         course = create_self_paced_course_run(days_till_start=-1, org_id='TestOrg')
+
         DynamicUpgradeDeadlineConfiguration.objects.create(enabled=True)
         if enroll_first:
-            enrollment = CourseEnrollmentFactory(course_id=course.id, mode=CourseMode.AUDIT, course__self_paced=True)
+            course_overview = CourseOverviewFactory.create(self_paced=True)
+            enrollment = CourseEnrollmentFactory(course_id=course.id, mode=CourseMode.AUDIT, course=course_overview)
         OrgDynamicUpgradeDeadlineConfiguration.objects.create(
             enabled=org_config_enabled, opt_out=org_config_opt_out, org_id=course.id.org
         )
@@ -1020,7 +1025,8 @@ class TestScheduleOverrides(SharedModuleStoreTestCase):
             enabled=course_config_enabled, opt_out=course_config_opt_out, course_id=course.id
         )
         if not enroll_first:
-            enrollment = CourseEnrollmentFactory(course_id=course.id, mode=CourseMode.AUDIT, course__self_paced=True)
+            course_overview = CourseOverviewFactory.create(self_paced=True)
+            enrollment = CourseEnrollmentFactory(course_id=course.id, mode=CourseMode.AUDIT, course=course_overview)
 
         # The enrollment has a schedule, and the upgrade_deadline is set when expected_dynamic_deadline is True
         if not enroll_first:
