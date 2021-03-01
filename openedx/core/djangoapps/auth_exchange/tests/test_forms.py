@@ -25,7 +25,7 @@ class AccessTokenExchangeFormTest(AccessTokenExchangeTestMixin):
     Mixin that defines test cases for AccessTokenExchangeForm
     """
     def setUp(self):
-        super(AccessTokenExchangeFormTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.request = RequestFactory().post("dummy_url")
         redirect_uri = 'dummy_redirect_url'
         SessionMiddleware().process_request(self.request)
@@ -34,7 +34,7 @@ class AccessTokenExchangeFormTest(AccessTokenExchangeTestMixin):
         self.request.backend = social_utils.load_backend(self.request.social_strategy, self.BACKEND, redirect_uri)
 
     def tearDown(self):
-        super(AccessTokenExchangeFormTest, self).tearDown()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().tearDown()
         Partial.objects.all().delete()
 
     def _assert_error(self, data, expected_error, expected_error_description):  # lint-amnesty, pylint: disable=arguments-differ

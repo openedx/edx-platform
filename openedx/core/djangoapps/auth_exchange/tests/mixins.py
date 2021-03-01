@@ -6,7 +6,7 @@ from openedx.core.djangoapps.oauth_dispatch import adapters
 from openedx.core.djangoapps.oauth_dispatch.tests.constants import DUMMY_REDIRECT_URL
 
 
-class DOTAdapterMixin(object):
+class DOTAdapterMixin:
     """
     Mixin to rewire existing tests to use django-oauth-toolkit (DOT) backend
 

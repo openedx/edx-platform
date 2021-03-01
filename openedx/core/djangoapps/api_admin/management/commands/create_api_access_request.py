@@ -8,7 +8,6 @@ from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imp
 from django.contrib.sites.models import Site
 from django.core.management.base import BaseCommand, CommandError
 from django.db.models.signals import post_save, pre_save
-from six import text_type
 
 from openedx.core.djangoapps.api_admin.models import (
     ApiAccessConfig,
@@ -106,7 +105,7 @@ class Command(BaseCommand):
         try:
             return User.objects.get(username=username)
         except User.DoesNotExist:
-            raise CommandError('User {} not found'.format(username))  # lint-amnesty, pylint: disable=raise-missing-from
+            raise CommandError(f'User {username} not found')  # lint-amnesty, pylint: disable=raise-missing-from
 
     def create_api_access_request(self, user, status, reason, website):
         """
@@ -123,9 +122,9 @@ class Command(BaseCommand):
         except OSError as e:
             # Ignore a specific error that occurs in the downstream `send_request_email` receiver.
             # see https://openedx.atlassian.net/browse/EDUCATOR-4478
-            error_msg = text_type(e)
+            error_msg = str(e)
             if 'Permission denied' in error_msg and 'mako_lms' in error_msg:
-                logger.warning('Error sending email about access request: {}'.format(error_msg))
+                logger.warning(f'Error sending email about access request: {error_msg}')
             else:
                 raise CommandError(error_msg)  # lint-amnesty, pylint: disable=raise-missing-from
         except Exception as e:
@@ -136,7 +135,7 @@ class Command(BaseCommand):
             )
             raise CommandError(msg)  # lint-amnesty, pylint: disable=raise-missing-from
 
-        logger.info('Created ApiAccessRequest for user {}'.format(user.username))
+        logger.info(f'Created ApiAccessRequest for user {user.username}')
 
     def create_api_access_config(self):
         """

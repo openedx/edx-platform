@@ -40,19 +40,19 @@ class AccessTokenExchangeViewTest(AccessTokenExchangeTestMixin):
         in the future.
     """
     def setUp(self):
-        super(AccessTokenExchangeViewTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.url = reverse("exchange_access_token", kwargs={"backend": self.BACKEND})
         self.csrf_client = APIClient(enforce_csrf_checks=True)
 
     def tearDown(self):
-        super(AccessTokenExchangeViewTest, self).tearDown()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().tearDown()
         Partial.objects.all().delete()
 
     def _assert_error(self, data, expected_error, expected_error_description, error_code=None):
         response = self.csrf_client.post(self.url, data)
         assert response.status_code == (error_code if error_code else 400)
         assert response['Content-Type'] == 'application/json'
-        expected_data = {u"error": expected_error, u"error_description": expected_error_description}
+        expected_data = {"error": expected_error, "error_description": expected_error_description}
         if error_code:
             expected_data['error_code'] = error_code
         assert json.loads(response.content.decode('utf-8')) == expected_data
@@ -146,7 +146,7 @@ class TestLoginWithAccessTokenView(TestCase):
     Tests for LoginWithAccessTokenView
     """
     def setUp(self):
-        super(TestLoginWithAccessTokenView, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.user = UserFactory()
         self.oauth2_client = Application.objects.create(client_type=Application.CLIENT_CONFIDENTIAL)
 
@@ -155,7 +155,7 @@ class TestLoginWithAccessTokenView(TestCase):
         Calls the login_with_access_token endpoint and verifies the response given the expected values.
         """
         url = reverse("login_with_access_token")
-        response = self.client.post(url, HTTP_AUTHORIZATION=u"Bearer {0}".format(access_token).encode('utf-8'))
+        response = self.client.post(url, HTTP_AUTHORIZATION=f"Bearer {access_token}".encode('utf-8'))
         assert response.status_code == expected_status_code
         if expected_cookie_name:
             assert expected_cookie_name in response.cookies

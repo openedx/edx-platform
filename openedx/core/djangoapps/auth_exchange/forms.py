@@ -55,7 +55,7 @@ class ScopeChoiceField(forms.ChoiceField):
             value = value.split(' ')
 
         # Split values into list
-        return u' '.join([smart_text(val) for val in value]).split(u' ')
+        return ' '.join([smart_text(val) for val in value]).split(' ')
 
     def validate(self, value):
         """
@@ -86,7 +86,7 @@ class AccessTokenExchangeForm(forms.Form):
     client_id = CharField(required=False)
 
     def __init__(self, request, oauth2_adapter, *args, **kwargs):
-        super(AccessTokenExchangeForm, self).__init__(*args, **kwargs)  # lint-amnesty, pylint: disable=super-with-arguments
+        super().__init__(*args, **kwargs)
         self.request = request
         self.oauth2_adapter = oauth2_adapter
 
@@ -96,7 +96,7 @@ class AccessTokenExchangeForm(forms.Form):
         instead of validating each field.
         """
         try:
-            super(AccessTokenExchangeForm, self)._clean_fields()  # lint-amnesty, pylint: disable=super-with-arguments
+            super()._clean_fields()
         except OAuthValidationError as e:
             self._errors.update(e.args[0])
 
@@ -105,7 +105,7 @@ class AccessTokenExchangeForm(forms.Form):
         Overriding the default cleaning behaviour for a shallow error dict.
         """
         try:
-            super(AccessTokenExchangeForm, self)._clean_form()  # lint-amnesty, pylint: disable=super-with-arguments
+            super()._clean_form()
         except OAuthValidationError as e:
             self._errors.update(e.args[0])
 
@@ -118,7 +118,7 @@ class AccessTokenExchangeForm(forms.Form):
             raise OAuthValidationError(
                 {
                     "error": "invalid_request",
-                    "error_description": u"{} is required".format(field_name),
+                    "error_description": f"{field_name} is required",
                 }
             )
         return field_val
@@ -154,7 +154,7 @@ class AccessTokenExchangeForm(forms.Form):
             raise OAuthValidationError(
                 {
                     "error": "invalid_request",
-                    "error_description": u"{} is not a supported provider".format(backend.name),
+                    "error_description": f"{backend.name} is not a supported provider",
                 }
             )
 
@@ -167,7 +167,7 @@ class AccessTokenExchangeForm(forms.Form):
             raise OAuthValidationError(  # lint-amnesty, pylint: disable=raise-missing-from
                 {
                     "error": "invalid_client",
-                    "error_description": u"{} is not a valid client_id".format(client_id),
+                    "error_description": f"{client_id} is not a valid client_id",
                 }
             )
         if client.client_type != Application.CLIENT_PUBLIC:
@@ -176,7 +176,7 @@ class AccessTokenExchangeForm(forms.Form):
                     # invalid_client isn't really the right code, but this mirrors
                     # https://github.com/edx/django-oauth2-provider/blob/edx/provider/oauth2/forms.py#L331
                     "error": "invalid_client",
-                    "error_description": u"{} is not a public client".format(client_id),
+                    "error_description": f"{client_id} is not a public client",
                 }
             )
         self.cleaned_data["client"] = client
