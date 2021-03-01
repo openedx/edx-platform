@@ -8,7 +8,6 @@ from unittest.mock import Mock, call, patch
 import json
 import ddt
 import httpretty
-from django.db.models.fields.files import ImageFieldFile
 from django.test.utils import override_settings
 from lazy.lazy import lazy  # lint-amnesty, pylint: disable=no-name-in-module
 
@@ -87,14 +86,14 @@ class BadgrBackendTestCase(ModuleStoreTestCase, EventTrackingTestCase):
         """
         Make sure the handler generates the correct URLs for different API tasks.
         """
-        assert self.handler._base_url == 'https://example.com/v1/issuer/issuers/test-issuer'
+        assert self.handler._base_url == 'https://example.com/v2/issuers/test-issuer'
         # lint-amnesty, pylint: disable=no-member
-        assert self.handler._badge_create_url == 'https://example.com/v1/issuer/issuers/test-issuer/badges'
+        assert self.handler._badge_create_url == 'https://example.com/v2/issuers/test-issuer/badgeclasses'
         # lint-amnesty, pylint: disable=no-member
         assert self.handler._badge_url('test_slug_here') ==\
-               'https://example.com/v1/issuer/issuers/test-issuer/badges/test_slug_here'
+               'https://example.com/v2/badgeclasses/test_slug_here'
         assert self.handler._assertion_url('another_test_slug') ==\
-               'https://example.com/v1/issuer/issuers/test-issuer/badges/another_test_slug/assertions'
+               'https://example.com/v2/badgeclasses/another_test_slug/assertions'
 
     def check_headers(self, headers):
         """
@@ -117,15 +116,13 @@ class BadgrBackendTestCase(ModuleStoreTestCase, EventTrackingTestCase):
         self.handler._get_access_token = Mock(return_value='12345')
         self.handler._create_badge(self.badge_class)
         args, kwargs = post.call_args
-        assert args[0] == 'https://example.com/v1/issuer/issuers/test-issuer/badges'
+        assert args[0] == 'https://example.com/v2/issuers/test-issuer/badgeclasses'
         assert kwargs['files']['image'][0] == self.badge_class.image.name
-        assert isinstance(kwargs['files']['image'][1], ImageFieldFile)
         assert kwargs['files']['image'][2] == 'image/png'
         self.check_headers(kwargs['headers'])
         assert kwargs['data'] ==\
                {'name': 'Test Badge',
-                'slug': EXAMPLE_SLUG,
-                'criteria': 'https://example.com/syllabus',
+                'criteriaUrl': 'https://example.com/syllabus',
                 'description': "Yay! It's a test badge."}
 
     def test_ensure_badge_created_cache(self):
@@ -159,7 +156,7 @@ class BadgrBackendTestCase(ModuleStoreTestCase, EventTrackingTestCase):
         assert get.called
         args, kwargs = get.call_args
         assert args[0] == (
-            'https://example.com/v1/issuer/issuers/test-issuer/badges/' +
+            'https://example.com/v2/badgeclasses/' +
             BADGR_SERVER_SLUG)
         self.check_headers(kwargs['headers'])
         assert BADGR_SERVER_SLUG in BadgrBackend.badges
@@ -184,7 +181,7 @@ class BadgrBackendTestCase(ModuleStoreTestCase, EventTrackingTestCase):
             'json': {'id': 'http://www.example.com/example'},
             'image': 'http://www.example.com/example.png',
             'badge': 'test_assertion_slug',
-            'issuer': 'https://example.com/v1/issuer/issuers/test-issuer',
+            'issuer': 'https://example.com/v2/issuers/test-issuer',
         }
         response = Mock()
         response.json.return_value = result
@@ -194,7 +191,7 @@ class BadgrBackendTestCase(ModuleStoreTestCase, EventTrackingTestCase):
         self.handler._create_assertion(self.badge_class, self.user, 'https://example.com/irrefutable_proof')  # lint-amnesty, pylint: disable=no-member
         args, kwargs = post.call_args
         assert args[0] == ((
-            'https://example.com/v1/issuer/issuers/test-issuer/badges/' +
+            'https://example.com/v2/badgeclasses/' +
             BADGR_SERVER_SLUG) +
             '/assertions')
         self.check_headers(kwargs['headers'])
@@ -217,7 +214,7 @@ class BadgrBackendTestCase(ModuleStoreTestCase, EventTrackingTestCase):
                 'issuing_component': 'test_component',
                 'assertion_image_url': 'http://www.example.com/example.png',
                 'assertion_json_url': 'http://www.example.com/example',
-                'issuer': 'https://example.com/v1/issuer/issuers/test-issuer',
+                'issuer': 'https://example.com/v2/issuers/test-issuer',
             }
         }, self.get_event())
 
