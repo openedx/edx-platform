@@ -24,7 +24,7 @@ analytics-python==1.2.9   # via -r requirements/edx/testing.txt
 aniso8601==9.0.0          # via -r requirements/edx/testing.txt, edx-tincan-py35, tincan
 apipkg==1.5               # via -r requirements/edx/testing.txt, execnet
 appdirs==1.4.4            # via -r requirements/edx/testing.txt, fs, virtualenv
-astroid==2.5              # via -r requirements/edx/testing.txt, pylint, pylint-celery
+astroid==2.5.1            # via -r requirements/edx/testing.txt, pylint, pylint-celery
 attrs==20.3.0             # via -r requirements/edx/testing.txt, edx-ace, jsonschema, pytest
 babel==2.9.0              # via -r requirements/edx/testing.txt, enmerkar, enmerkar-underscore, sphinx
 beautifulsoup4==4.9.3     # via -r requirements/edx/testing.txt, pynliner
@@ -46,7 +46,7 @@ code-annotations==1.1.0   # via -r requirements/edx/testing.txt, edx-enterprise,
 contextlib2==0.6.0.post1  # via -r requirements/edx/testing.txt
 coreapi==2.3.3            # via -r requirements/edx/testing.txt, drf-yasg
 coreschema==0.0.4         # via -r requirements/edx/testing.txt, coreapi, drf-yasg
-coverage==5.4             # via -r requirements/edx/testing.txt, pytest-cov
+coverage==5.5             # via -r requirements/edx/testing.txt, pytest-cov
 git+https://github.com/nedbat/coverage_pytest_plugin.git@29de030251471e200ff255eb9e549218cd60e872#egg=coverage_pytest_plugin==0.0  # via -r requirements/edx/testing.txt
 crowdsourcehinter-xblock==0.6  # via -r requirements/edx/testing.txt
 cryptography==3.2.1       # via -c requirements/edx/../constraints.txt, -r requirements/edx/testing.txt, django-fernet-fields, edx-enterprise, pyjwt, social-auth-core
@@ -144,7 +144,7 @@ fs==2.0.18                # via -r requirements/edx/testing.txt, django-pyfs, fs
 future==0.18.2            # via -r requirements/edx/testing.txt, django-ses, edx-celeryutils, edx-enterprise, pycontracts, pyjwkest
 geoip2==3.0.0             # via -c requirements/edx/../constraints.txt, -r requirements/edx/testing.txt
 gitdb==4.0.5              # via -r requirements/edx/testing.txt, gitpython
-gitpython==3.1.13         # via -r requirements/edx/testing.txt, transifex-client
+gitpython==3.1.14         # via -r requirements/edx/testing.txt, transifex-client
 glob2==0.7                # via -r requirements/edx/testing.txt
 gunicorn==20.0.4          # via -r requirements/edx/testing.txt
 help-tokens==2.0.0        # via -r requirements/edx/testing.txt
@@ -222,7 +222,7 @@ pyjwt[crypto]==1.7.1      # via -r requirements/edx/testing.txt, drf-jwt, edx-re
 pylint-celery==0.3        # via -r requirements/edx/testing.txt, edx-lint
 pylint-django==2.4.2      # via -r requirements/edx/testing.txt, edx-lint
 pylint-plugin-utils==0.6  # via -r requirements/edx/testing.txt, pylint-celery, pylint-django
-pylint==2.7.1             # via -r requirements/edx/testing.txt, edx-lint, pylint-celery, pylint-django, pylint-plugin-utils
+pylint==2.7.2             # via -r requirements/edx/testing.txt, edx-lint, pylint-celery, pylint-django, pylint-plugin-utils
 pymongo==3.10.1           # via -c requirements/edx/../constraints.txt, -r requirements/edx/testing.txt, edx-opaque-keys, event-tracking, mongodbproxy, mongoengine
 pynliner==0.8.0           # via -r requirements/edx/testing.txt
 pyparsing==2.4.7          # via -r requirements/edx/testing.txt, chem, openedx-calc, packaging, pycontracts
