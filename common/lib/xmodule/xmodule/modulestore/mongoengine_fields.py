@@ -43,7 +43,7 @@ class CourseKeyField(mongoengine.StringField):
             return course_key
 
     def validate(self, value):
-        assert isinstance(value, (type(None), (str,), CourseKey))
+        assert isinstance(value, (type(None), str, CourseKey))
         if isinstance(value, CourseKey):
             return super().validate(str(value))
         else:
@@ -70,7 +70,7 @@ class UsageKeyField(mongoengine.StringField):
         """
         Deserialize to a UsageKey instance: for now it's a location missing the run
         """
-        assert isinstance(location, (type(None), (str,), UsageKey))
+        assert isinstance(location, (type(None), str, UsageKey))
         if location == '':
             return None
         if isinstance(location, str):
@@ -80,7 +80,7 @@ class UsageKeyField(mongoengine.StringField):
             return location
 
     def validate(self, value):
-        assert isinstance(value, (type(None), (str,), UsageKey))
+        assert isinstance(value, (type(None), str, UsageKey))
         if isinstance(value, UsageKey):
             return super().validate(str(value))
         else:
