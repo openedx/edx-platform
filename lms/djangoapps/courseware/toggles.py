@@ -67,22 +67,6 @@ COURSEWARE_MICROFRONTEND_PROGRESS_MILESTONES = CourseWaffleFlag(
     WAFFLE_FLAG_NAMESPACE, 'mfe_progress_milestones', __name__
 )
 
-# .. toggle_name: courseware.mfe_progress_milestones_first_section_celebration
-# .. toggle_implementation: CourseWaffleFlag
-# .. toggle_default: False
-# .. toggle_description: Waffle flag to display a celebration modal on learner completion of their first section.
-#   Supports staged rollout to students for a new micro-frontend-based implementation of the
-#   courseware page.
-# .. toggle_use_cases: temporary, open_edx
-# .. toggle_creation_date: 2020-10-07
-# .. toggle_target_removal_date: None
-# .. toggle_warnings: Also set settings.LEARNING_MICROFRONTEND_URL and
-#   COURSEWARE_MICROFRONTEND_PROGRESS_MILESTONES.
-# .. toggle_tickets: AA-371
-COURSEWARE_MICROFRONTEND_PROGRESS_MILESTONES_FIRST_SECTION_CELEBRATION = CourseWaffleFlag(
-    WAFFLE_FLAG_NAMESPACE, 'mfe_progress_milestones_first_section_celebration', __name__
-)
-
 # .. toggle_name: courseware.mfe_progress_milestones_streak_celebration
 # .. toggle_implementation: CourseWaffleFlag
 # .. toggle_default: False
@@ -152,11 +136,10 @@ def course_exit_page_is_active(course_key):
     )
 
 
-def courseware_mfe_first_section_celebration_is_active(course_key):
+def courseware_mfe_progress_milestones_are_active(course_key):
     return (
         REDIRECT_TO_COURSEWARE_MICROFRONTEND.is_enabled(course_key) and
-        COURSEWARE_MICROFRONTEND_PROGRESS_MILESTONES.is_enabled(course_key) and
-        COURSEWARE_MICROFRONTEND_PROGRESS_MILESTONES_FIRST_SECTION_CELEBRATION.is_enabled(course_key)
+        COURSEWARE_MICROFRONTEND_PROGRESS_MILESTONES.is_enabled(course_key)
     )
 
 

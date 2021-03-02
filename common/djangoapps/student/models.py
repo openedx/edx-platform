@@ -1467,6 +1467,7 @@ class CourseEnrollment(models.Model):
         """
         Emits an event to explicitly track course enrollment and unenrollment.
         """
+        from openedx.core.djangoapps.schedules.config import set_up_external_updates_for_enrollment
 
         try:
             context = contexts.course_context_from_course_id(self.course_id)
@@ -1486,11 +1487,14 @@ class CourseEnrollment(models.Model):
             }
             if event_name == EVENT_NAME_ENROLLMENT_ACTIVATED:
                 segment_properties['email'] = self.user.email
+                # This next property is for an experiment, see method's comments for more information
+                segment_properties['external_course_updates'] = set_up_external_updates_for_enrollment(self.user,
+                                                                                                       self.course_id)
             with tracker.get_tracker().context(event_name, context):
                 tracker.emit(event_name, data)
                 segment.track(self.user_id, event_name, segment_properties)
 
-        except:  # pylint: disable=bare-except
+        except Exception:  # pylint: disable=broad-except
             if event_name and self.course_id:
                 log.exception(
                     u'Unable to emit event %s for user %s and course %s',

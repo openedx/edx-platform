@@ -154,6 +154,18 @@ class EnrollmentTest(UrlResetMixin, SharedModuleStoreTestCase):
         # Expect that we're no longer enrolled
         assert not CourseEnrollment.is_enrolled(self.user, self.course.id)
 
+    @ddt.data(-1, 0, 1)
+    def test_external_course_updates_signal(self, value):
+        """Confirm that we send the external updates experiment bucket with the activation signal"""
+        with patch('openedx.core.djangoapps.schedules.config.set_up_external_updates_for_enrollment',
+                   return_value=value):
+            with patch('common.djangoapps.student.models.segment') as mock_segment:
+                CourseEnrollment.enroll(self.user, self.course.id)
+
+        assert mock_segment.track.call_count == 1
+        assert mock_segment.track.call_args[0][1] == 'edx.course.enrollment.activated'
+        assert mock_segment.track.call_args[0][2]['external_course_updates'] == value
+
     @patch.dict(settings.FEATURES, {'ENABLE_MKTG_EMAIL_OPT_IN': True})
     @patch('openedx.core.djangoapps.user_api.preferences.api.update_email_opt_in')
     @ddt.data(
