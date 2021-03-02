@@ -13,7 +13,7 @@ For processing xml always prefer this over using lxml.etree directly.
 
 
 from lxml.etree import XMLParser as _XMLParser
-from lxml.etree import *  # lint-amnesty, pylint: disable=redefined-builtin
+from lxml.etree import *
 from lxml.etree import _Element, _ElementTree
 
 # This should be imported after lxml.etree so that it overrides the following attributes.
@@ -28,4 +28,4 @@ class XMLParser(_XMLParser):  # pylint: disable=function-redefined
     def __init__(self, *args, **kwargs):
         if "resolve_entities" not in kwargs:
             kwargs["resolve_entities"] = False
-        super(XMLParser, self).__init__(*args, **kwargs)  # lint-amnesty, pylint: disable=super-with-arguments
+        super(XMLParser, self).__init__(*args, **kwargs)
