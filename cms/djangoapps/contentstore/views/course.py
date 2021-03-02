@@ -536,8 +536,8 @@ def course_listing(request):
             'org': uca.course_key.org,
             'number': uca.course_key.course,
             'run': uca.course_key.run,
-            'is_failed': True if uca.state == CourseRerunUIStateManager.State.FAILED else False,  # lint-amnesty, pylint: disable=simplifiable-if-expression
-            'is_in_progress': True if uca.state == CourseRerunUIStateManager.State.IN_PROGRESS else False,  # lint-amnesty, pylint: disable=simplifiable-if-expression
+            'is_failed': uca.state == CourseRerunUIStateManager.State.FAILED,
+            'is_in_progress': uca.state == CourseRerunUIStateManager.State.IN_PROGRESS,
             'dismiss_link': reverse_course_url(
                 'course_notifications_handler',
                 uca.course_key,

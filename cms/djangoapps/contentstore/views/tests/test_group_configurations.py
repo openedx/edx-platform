@@ -229,7 +229,7 @@ class GroupConfigurationsBaseTestCase:
         Test invalid json handling.
         """
         # No property name.
-        invalid_json = "{u'name': 'Test Name', []}"
+        invalid_json = "{'name': 'Test Name', []}"
 
         response = self.client.post(
             self._url(),

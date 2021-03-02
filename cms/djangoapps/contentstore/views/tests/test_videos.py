@@ -65,7 +65,7 @@ class VideoUploadTestBase:
         return reverse_course_url(self.VIEW_NAME, course_key, kwargs)  # lint-amnesty, pylint: disable=no-member
 
     def setUp(self):
-        super().setUp()  # lint-amnesty, pylint: disable=no-member, super-with-arguments
+        super().setUp()  # lint-amnesty, pylint: disable=no-member
         self.url = self.get_url_for_course_key(self.course.id)
         self.test_token = "test_token"
         self.course.video_upload_pipeline = {
