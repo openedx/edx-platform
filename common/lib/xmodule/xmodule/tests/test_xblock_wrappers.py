@@ -34,7 +34,7 @@ from xmodule.annotatable_module import AnnotatableBlock
 from xmodule.conditional_module import ConditionalBlock
 from xmodule.course_module import CourseBlock
 from xmodule.html_module import HtmlBlock
-from xmodule.poll_module import PollDescriptor
+from xmodule.poll_module import PollBlock
 from xmodule.randomize_module import RandomizeBlock
 from xmodule.seq_module import SequenceBlock
 from xmodule.tests import get_test_descriptor_system, get_test_system
@@ -57,7 +57,7 @@ from xmodule.x_module import (
 LEAF_XMODULES = {
     AnnotatableBlock: [{}],
     HtmlBlock: [{}],
-    PollDescriptor: [{'display_name': 'Poll Display Name'}],
+    PollBlock: [{'display_name': 'Poll Display Name'}],
     WordCloudBlock: [{}],
 }
 
@@ -76,7 +76,7 @@ CONTAINER_XMODULES = {
 
 # These modules are not editable in studio yet
 NOT_STUDIO_EDITABLE = (
-    PollDescriptor,
+    PollBlock,
 )
 
 

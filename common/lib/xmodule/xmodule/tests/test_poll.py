@@ -1,23 +1,41 @@
 # -*- coding: utf-8 -*-
 """Test for Poll Xmodule functional logic."""
 
+import json
+import unittest
 
 from mock import Mock
 
-from xmodule.poll_module import PollDescriptor
+from xblock.field_data import DictFieldData
+from xblock.fields import ScopeIds
+from xmodule.poll_module import PollBlock
 
-from . import LogicTest
+from . import get_test_system
 from .test_import import DummySystem
 
 
-class PollModuleTest(LogicTest):
+class PollBlockTest(unittest.TestCase):
     """Logic tests for Poll Xmodule."""
-    descriptor_class = PollDescriptor
+
     raw_field_data = {
         'poll_answers': {'Yes': 1, 'Dont_know': 0, 'No': 0},
         'voted': False,
         'poll_answer': ''
     }
+
+    def setUp(self):
+        super().setUp()
+        self.system = get_test_system()
+        usage_key = self.system.course_id.make_usage_key(PollBlock.category, 'test_loc')
+        # ScopeIds has 4 fields: user_id, block_type, def_id, usage_id
+        scope_ids = ScopeIds(1, PollBlock.category, usage_key, usage_key)
+        self.xmodule = PollBlock(
+            self.system, DictFieldData(self.raw_field_data), scope_ids
+        )
+
+    def ajax_request(self, dispatch, data):
+        """Call Xmodule.handle_ajax."""
+        return json.loads(self.xmodule.handle_ajax(dispatch, data))
 
     def test_bad_ajax_request(self):
         # Make sure that answer for incorrect request is error json.
@@ -52,7 +70,7 @@ class PollModuleTest(LogicTest):
         </poll_question>
         '''
 
-        output = PollDescriptor.from_xml(sample_poll_xml, module_system, id_generator)
+        output = PollBlock.from_xml(sample_poll_xml, module_system, id_generator)
         # Update the answer with invalid character.
         invalid_characters_poll_answer = output.answers[0]
         # Invalid less-than character.
