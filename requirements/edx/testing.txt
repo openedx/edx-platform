@@ -20,7 +20,7 @@
 -e common/lib/xmodule  # via -r requirements/edx/base.txt
 amqp==2.6.1               # via -r requirements/edx/base.txt, kombu
 analytics-python==1.2.9   # via -r requirements/edx/base.txt
-aniso8601==9.0.0          # via -r requirements/edx/base.txt, edx-tincan-py35, tincan
+aniso8601==9.0.1          # via -r requirements/edx/base.txt, edx-tincan-py35, tincan
 apipkg==1.5               # via execnet
 appdirs==1.4.4            # via -r requirements/edx/base.txt, fs, virtualenv
 astroid==2.5.1            # via pylint, pylint-celery
