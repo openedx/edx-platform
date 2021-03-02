@@ -535,8 +535,7 @@ FEATURES = {
     # .. toggle_implementation: DjangoSetting
     # .. toggle_default: True
     # .. toggle_description: When enabled, along with the ENABLE_MKTG_SITE feature toggle, users who attempt to access a
-    #   course "about" page will be redirected to the course home url. This url might be the course "info" page or the
-    #   unified course tab (when the DISABLE_UNIFIED_COURSE_TAB_FLAG waffle is not enabled).
+    #   course "about" page will be redirected to the course home url. This url will be the unified course tab
     # .. toggle_use_cases: open_edx
     # .. toggle_creation_date: 2019-01-15
     # .. toggle_target_removal_date: None

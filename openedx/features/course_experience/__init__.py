@@ -21,11 +21,6 @@ DISABLE_COURSE_OUTLINE_PAGE_FLAG = CourseWaffleFlag(
     COURSE_EXPERIENCE_WAFFLE_FLAG_NAMESPACE, 'disable_course_outline_page', __name__
 )
 
-# Waffle flag to enable a single unified "Course" tab.
-DISABLE_UNIFIED_COURSE_TAB_FLAG = CourseWaffleFlag(
-    COURSE_EXPERIENCE_WAFFLE_FLAG_NAMESPACE, 'disable_unified_course_tab', __name__
-)
-
 # Waffle flag to enable the sock on the footer of the home and courseware pages.
 DISPLAY_COURSE_SOCK_FLAG = CourseWaffleFlag(WAFFLE_FLAG_NAMESPACE, 'display_course_sock', __name__)
 
@@ -118,7 +113,7 @@ def default_course_url_name(course_id):
     return 'openedx.course_experience.course_home'
 
 
-def course_home_url_name(course_key):
+def course_home_url_name(course_key):  # pylint: disable=unused-argument
     """
     Returns the course home page's URL name for the current user.
 
@@ -127,8 +122,6 @@ def course_home_url_name(course_key):
             requested.
 
     """
-    if DISABLE_UNIFIED_COURSE_TAB_FLAG.is_enabled(course_key):
-        return 'info'
     return 'openedx.course_experience.course_home'
 
 

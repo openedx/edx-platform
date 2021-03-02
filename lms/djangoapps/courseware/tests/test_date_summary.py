@@ -44,7 +44,6 @@ from openedx.core.djangoapps.site_configuration.tests.factories import SiteFacto
 from openedx.core.djangoapps.user_api.preferences.api import set_user_preference
 from openedx.features.course_duration_limits.models import CourseDurationLimitConfig
 from openedx.features.course_experience import (
-    DISABLE_UNIFIED_COURSE_TAB_FLAG,
     RELATIVE_DATES_FLAG,
     UPGRADE_DEADLINE_MESSAGE,
     CourseHomeMessages
@@ -412,7 +411,6 @@ class CourseDateSummaryTest(SharedModuleStoreTestCase):
     @ddt.data(
         'openedx.course_experience.course_home',
     )
-    @override_waffle_flag(DISABLE_UNIFIED_COURSE_TAB_FLAG, active=False)
     def test_todays_date_no_timezone(self, url_name):
         with freeze_time('2015-01-02'):
             course = create_course_run()
@@ -433,7 +431,6 @@ class CourseDateSummaryTest(SharedModuleStoreTestCase):
     @ddt.data(
         'openedx.course_experience.course_home',
     )
-    @override_waffle_flag(DISABLE_UNIFIED_COURSE_TAB_FLAG, active=False)
     def test_todays_date_timezone(self, url_name):
         with freeze_time('2015-01-02'):
             course = create_course_run()
@@ -462,7 +459,6 @@ class CourseDateSummaryTest(SharedModuleStoreTestCase):
     @ddt.data(
         'openedx.course_experience.course_home',
     )
-    @override_waffle_flag(DISABLE_UNIFIED_COURSE_TAB_FLAG, active=False)
     def test_start_date_render(self, url_name):
         with freeze_time('2015-01-02'):
             course = create_course_run()
@@ -479,7 +475,6 @@ class CourseDateSummaryTest(SharedModuleStoreTestCase):
     @ddt.data(
         'openedx.course_experience.course_home',
     )
-    @override_waffle_flag(DISABLE_UNIFIED_COURSE_TAB_FLAG, active=False)
     def test_start_date_render_time_zone(self, url_name):
         with freeze_time('2015-01-02'):
             course = create_course_run()
@@ -704,7 +699,6 @@ class CourseDateSummaryTest(SharedModuleStoreTestCase):
         ('openedx.course_experience.course_home', False),
     )
     @ddt.unpack
-    @override_waffle_flag(DISABLE_UNIFIED_COURSE_TAB_FLAG, active=False)
     @override_experiment_waffle_flag(RELATIVE_DATES_FLAG, active=True)
     def test_dates_tab_link_render(self, url_name, mfe_active):
         """ The dates tab link should only show for enrolled or staff users """

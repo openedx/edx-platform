@@ -200,8 +200,6 @@ class PrimitiveTabEdit(ModuleStoreTestCase):
         course = CourseFactory.create()
         with self.assertRaises(ValueError):
             tabs.primitive_delete(course, 0)
-        with self.assertRaises(ValueError):
-            tabs.primitive_delete(course, 1)
         with self.assertRaises(IndexError):
             tabs.primitive_delete(course, 7)
         # Delete the Discussions tab & check it's not there

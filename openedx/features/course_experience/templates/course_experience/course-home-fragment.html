@@ -14,7 +14,6 @@ from django.urls import reverse
 from lms.djangoapps.discussion.django_comment_client.permissions import has_permission
 from openedx.core.djangolib.js_utils import dump_js_escaped_json, js_escaped_string
 from openedx.core.djangolib.markup import Text, HTML
-from openedx.features.course_experience import DISABLE_UNIFIED_COURSE_TAB_FLAG
 from openedx.features.course_experience.course_tools import HttpMethod
 %>
 
@@ -73,7 +72,7 @@ from openedx.features.course_experience.course_tools import HttpMethod
                 ${HTML(course_home_message_fragment.body_html())}
             % endif
 
-            % if update_message_fragment and not DISABLE_UNIFIED_COURSE_TAB_FLAG.is_enabled(course.id):
+            % if update_message_fragment:
                 <div class="section section-update-message">
                     ${HTML(update_message_fragment.body_html())}
                 </div>
