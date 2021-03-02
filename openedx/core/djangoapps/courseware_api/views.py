@@ -6,7 +6,6 @@ import json
 
 from completion.exceptions import UnavailableCompletionData
 from completion.utilities import get_key_to_last_completed_block
-from django.conf import settings
 from django.urls import reverse
 from django.utils.translation import ugettext as _
 from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthentication
@@ -33,7 +32,7 @@ from lms.djangoapps.courseware.courses import check_course_access, get_course_by
 from lms.djangoapps.courseware.masquerade import setup_masquerade
 from lms.djangoapps.courseware.module_render import get_module_by_usage_id
 from lms.djangoapps.courseware.tabs import get_course_tab_list
-from lms.djangoapps.courseware.toggles import REDIRECT_TO_COURSEWARE_MICROFRONTEND, course_exit_page_is_active
+from lms.djangoapps.courseware.toggles import courseware_mfe_is_visible, course_exit_page_is_active
 from lms.djangoapps.courseware.views.views import get_cert_data
 from lms.djangoapps.grades.api import CourseGradeFactory
 from lms.djangoapps.verify_student.services import IDVerificationService
@@ -70,6 +69,7 @@ class CoursewareMeta:
             course_key,
         )
         self.original_user_is_staff = has_access(self.request.user, 'staff', self.overview).has_access
+        self.original_user_is_global_staff = self.request.user.is_staff
         self.course_key = course_key
         self.course_masquerade, self.effective_user = setup_masquerade(
             self.request,
@@ -86,25 +86,13 @@ class CoursewareMeta:
 
     def is_microfrontend_enabled_for_user(self):
         """
-        This method is the "opposite" of _redirect_to_learning_mfe in
-        lms/djangoapps/courseware/views/index.py. But not exactly...
-
-        1. It needs to redirect for old Mongo courses.
-        2. It does NOT need to worry about exams - the MFE will handle
-           those on its own. As of this writing, it will redirect back to
-           the LMS experience, but that may change soon.
-        3. Finally, it needs to redirect users who are bucketed out of
-           the MFE experience, but who aren't staff. Staff are allowed to
-           stay.
+        Can this user see the MFE for this course?
         """
-        # REDIRECT: Old Mongo courses, until removed from platform
-        if self.course_key.deprecated:
-            return False
-        # REDIRECT: If the user isn't staff, redirect if they're bucketed into the old LMS experience.
-        if not self.original_user_is_staff and not REDIRECT_TO_COURSEWARE_MICROFRONTEND.is_enabled(self.course_key):
-            return False
-        # STAY: If the user has made it past all the above, they're good to stay!
-        return True
+        return courseware_mfe_is_visible(
+            course_key=self.course_key,
+            is_global_staff=self.original_user_is_global_staff,
+            is_course_staff=self.original_user_is_staff
+        )
 
     @property
     def enrollment(self):

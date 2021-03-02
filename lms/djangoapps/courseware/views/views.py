@@ -396,7 +396,7 @@ def jump_to(_request, course_id, location):
     except InvalidKeyError:
         raise Http404(u"Invalid course_key or usage_key")  # lint-amnesty, pylint: disable=raise-missing-from
     try:
-        redirect_url = get_legacy_courseware_url(course_key, usage_key, _request)
+        redirect_url = get_legacy_courseware_url(usage_key, _request)
     except ItemNotFoundError:
         raise Http404(u"No data at this location: {0}".format(usage_key))  # lint-amnesty, pylint: disable=raise-missing-from
     except NoPathToItem:

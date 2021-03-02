@@ -9,30 +9,103 @@ from django.conf import settings
 from django.urls import reverse
 from six.moves.urllib.parse import urlencode
 
+from lms.djangoapps.courseware.toggles import courseware_mfe_is_active
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.search import navigation_index, path_to_location
 
 
-def get_legacy_courseware_url(course_key, usage_key, request=None):
+def get_courseware_url(usage_key, request=None):
     """
-    Return a str with the URL for the specified legacy (LMS-rendered) coursweare content.
+    Return the URL to the canonical learning experience for a given block.
 
-    Args:
-        course_id(str): Course Id string
-        usage_key(str): The location id of course component
+    We choose between either the Legacy frontend or Learning MFE depending on the
+    course that the block is in, the requesting user, and the state of
+    the 'courseware' waffle flags.
+
+    If you know that you want a Learning MFE URL, regardless of configuration,
+    then it is more performant to call `get_learning_mfe_courseware_url` directly.
 
     Raises:
-        ItemNotFoundError if no data at the location or NoPathToItem if location not in any class
+        * ItemNotFoundError if no data at the usage_key.
+        * NoPathToItem if location not in any class.
+
+    Args:
+        usage_key (UsageKey|str)
+        request (Request|None)
+    """
+    (
+        course_key,
+        chapter_id,
+        sequence_id,
+        unit_id,
+        position,
+        final_target_id,
+    ) = path_to_location(modulestore(), usage_key, request)
+    if courseware_mfe_is_active(course_key):
+        return get_learning_mfe_courseware_url(
+            course_key=course_key,
+            sequence_key=sequence_id,
+            unit_key=unit_id,
+        )
+    else:
+        return _get_legacy_courseware_url(
+            course_key=course_key,
+            chapter=chapter_id,
+            section=sequence_id,
+            position=position,
+            final_target_id=final_target_id,
+        )
+
+
+def get_legacy_courseware_url(usage_key, request=None):
+    """
+    Return the URL to Legacy (LMS-rendered) courseware content.
+
+    Raises:
+        * ItemNotFoundError if no data at the usage_key.
+        * NoPathToItem if location not in any class.
+
+    Args:
+        usage_key (UsageKey|str)
+        request (Request|None)
+    """
+    (
+        course_key,
+        chapter_id,
+        sequence_id,
+        _unit_id,
+        position,
+        final_target_id,
+    ) = path_to_location(modulestore(), usage_key, request)
+    return _get_legacy_courseware_url(
+        course_key=course_key,
+        chapter=chapter_id,
+        section=sequence_id,
+        position=position,
+        final_target_id=final_target_id,
+    )
+
+
+def _get_legacy_courseware_url(
+        course_key,
+        chapter,
+        section,
+        position,
+        final_target_id,
+):
+    """
+    Return a Legacy courseware URL given a broken-down spec of its location.
+
+    Args:
+        course_key (CourseKey|str)
+        chapter (str): aka 'section'.
+        section (str): canonically known as 'subsection' or 'sequence'.
+        position (str)
+        final_target_id (str)
 
     Returns:
         Redirect url string
     """
-
-    (
-        course_key, chapter, section, vertical_unused,
-        position, final_target_id
-    ) = path_to_location(modulestore(), usage_key, request)
-
     # choose the appropriate view (and provide the necessary args) based on the
     # args provided by the redirect.
     # Rely on index to do all error handling and access control.
@@ -59,7 +132,7 @@ def get_legacy_courseware_url(course_key, usage_key, request=None):
 
 def get_learning_mfe_courseware_url(course_key, sequence_key=None, unit_key=None):
     """
-    Return a str with the URL for the specified coursweare content in the Learning MFE.
+    Return a str with the URL for the specified courseware content in the Learning MFE.
 
     The micro-frontend determines the user's position in the vertical via
     a separate API call, so all we need here is the course_key, section, and

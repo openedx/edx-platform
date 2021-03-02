@@ -3,7 +3,10 @@ Toggles for courseware in-course experience.
 """
 
 from edx_toggles.toggles import LegacyWaffleFlagNamespace
+from opaque_keys.edx.keys import CourseKey
+
 from openedx.core.djangoapps.waffle_utils import CourseWaffleFlag
+
 
 # Namespace for courseware waffle flags.
 WAFFLE_FLAG_NAMESPACE = LegacyWaffleFlagNamespace(name='courseware')
@@ -129,22 +132,79 @@ COURSEWARE_OPTIMIZED_RENDER_XBLOCK = CourseWaffleFlag(
 )
 
 
+def courseware_mfe_is_active(course_key: CourseKey) -> bool:
+    """
+    Should we serve the Learning MFE as the canonical courseware experience?
+    """
+    # NO: Old Mongo courses are always served in the Legacy frontend,
+    #     regardless of configuration.
+    if course_key.deprecated:
+        return False
+    # OTHERWISE: Defer to value of waffle flag for this course run and user.
+    return REDIRECT_TO_COURSEWARE_MICROFRONTEND.is_enabled(course_key)
+
+
+def courseware_mfe_is_visible(
+        course_key: CourseKey,
+        is_global_staff=False,
+        is_course_staff=False,
+) -> bool:
+    """
+    Can we see a course run's content in the Learning MFE?
+    """
+    # DENY: Old Mongo courses don't work in the MFE.
+    if course_key.deprecated:
+        return False
+    # ALLOW: Where techincally possible, global staff may always see the MFE.
+    if is_global_staff:
+        return True
+    # ALLOW: If course team preview is enabled, then course staff may see their
+    #        course in the MFE.
+    if is_course_staff and COURSEWARE_MICROFRONTEND_COURSE_TEAM_PREVIEW.is_enabled(course_key):
+        return True
+    # OTHERWISE: The MFE is only visible if it's the active (ie canonical) experience.
+    return courseware_mfe_is_active(course_key)
+
+
+def courseware_legacy_is_visible(
+        course_key: CourseKey,
+        is_global_staff=False,
+        is_course_staff=False,
+) -> bool:
+    """
+    Can we see a course run's content in the Legacy frontend?
+
+    Note: This function will always return True for Old Mongo courses,
+    since `courseware_mfe_is_active` will always return False for them.
+    """
+    # ALLOW: Global staff may always see the Legacy experience.
+    if is_global_staff:
+        return True
+    # ALLOW: The course team may always see their course in the Legacy experience.
+    if is_course_staff:
+        return True
+    # OTHERWISE: Legacy is only visible if it's the active (ie canonical) experience.
+    #            Note that Old Mongo courses are never the active experience,
+    #            so we effectively always ALLOW them to be viewed in Legacy.
+    return not courseware_mfe_is_active(course_key)
+
+
 def course_exit_page_is_active(course_key):
     return (
-        REDIRECT_TO_COURSEWARE_MICROFRONTEND.is_enabled(course_key) and
+        courseware_mfe_is_active(course_key) and
         COURSEWARE_MICROFRONTEND_COURSE_EXIT_PAGE.is_enabled(course_key)
     )
 
 
 def courseware_mfe_progress_milestones_are_active(course_key):
     return (
-        REDIRECT_TO_COURSEWARE_MICROFRONTEND.is_enabled(course_key) and
+        courseware_mfe_is_active(course_key) and
         COURSEWARE_MICROFRONTEND_PROGRESS_MILESTONES.is_enabled(course_key)
     )
 
 
 def streak_celebration_is_active(course_key):
     return (
-        COURSEWARE_MICROFRONTEND_PROGRESS_MILESTONES.is_enabled(course_key) and
+        courseware_mfe_is_active(course_key) and
         COURSEWARE_MICROFRONTEND_PROGRESS_MILESTONES_STREAK_CELEBRATION.is_enabled(course_key)
     )

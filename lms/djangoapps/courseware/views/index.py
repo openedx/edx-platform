@@ -65,7 +65,7 @@ from ..masquerade import check_content_start_date_for_masquerade_user, setup_mas
 from ..model_data import FieldDataCache
 from ..module_render import get_module_for_descriptor, toc_for_course
 from ..permissions import MASQUERADE_AS_STUDENT
-from ..toggles import COURSEWARE_MICROFRONTEND_COURSE_TEAM_PREVIEW, REDIRECT_TO_COURSEWARE_MICROFRONTEND
+from ..toggles import courseware_legacy_is_visible, courseware_mfe_is_visible
 from .views import CourseTabView
 
 log = logging.getLogger("edx.courseware.views.index")
@@ -170,21 +170,24 @@ class CoursewareIndex(View):
 
     def _redirect_to_learning_mfe(self):
         """
-        Redirect to the new courseware micro frontend,
-        unless this is a time limited exam.
+        Can the user access this sequence in Legacy courseware? If not, redirect to MFE.
+
+        We specifically allow users to stay in the Legacy frontend for special
+        (ie timed/proctored) exams since they're not yet supported by the MFE.
         """
-        # DENY: staff access
-        if self.is_staff:
+        # STAY: if the course run as a whole is visible in the Legacy experience.
+        if courseware_legacy_is_visible(
+                course_key=self.course_key,
+                is_global_staff=self.request.user.is_staff,
+                is_course_staff=self.is_staff,
+        ):
             return
-        # DENY: Old Mongo courses, until removed from platform
-        if self.course_key.deprecated:
-            return
-        # DENY: Timed Exams, until supported
+        # STAY: if we are in a special (ie proctored/timed) exam, which isn't yet
+        #       supported on the MFE.
         if getattr(self.section, 'is_time_limited', False):
             return
-        # ALLOW: when flag set for course
-        if REDIRECT_TO_COURSEWARE_MICROFRONTEND.is_enabled(self.course_key):
-            raise Redirect(self.microfrontend_url)
+        # REDIRECT otherwise.
+        raise Redirect(self.microfrontend_url)
 
     @property
     def microfrontend_url(self):
@@ -622,24 +625,8 @@ def show_courseware_mfe_link(user, staff_access, course_key):
     """
     Return whether to display the button to switch to the Courseware MFE.
     """
-    # MFE does not work for Old Mongo courses.
-    if course_key.deprecated:
-        return False
-
-    # Global staff members always get to see the courseware MFE button if the
-    # platform and course are capable, regardless of rollout waffle flags.
-    if user.is_staff:
-        return True
-
-    # If you have course staff access, you can see this link if...
-    if staff_access:
-        # (a) we've turned on the redirect for your students, or...
-        mfe_enabled_for_course = REDIRECT_TO_COURSEWARE_MICROFRONTEND.is_enabled(course_key)
-        if mfe_enabled_for_course:
-            return True
-        # (b) we've enabled the course team preview.
-        mfe_enabled_for_course_team = COURSEWARE_MICROFRONTEND_COURSE_TEAM_PREVIEW.is_enabled(course_key)
-        if mfe_enabled_for_course_team:
-            return True
-
-    return False
+    return courseware_mfe_is_visible(
+        course_key=course_key,
+        is_global_staff=user.is_staff,
+        is_course_staff=staff_access,
+    )
