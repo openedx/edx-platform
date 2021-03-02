@@ -109,8 +109,6 @@ from lms.envs.common import (
     # Enterprise service settings
     ENTERPRISE_CATALOG_INTERNAL_ROOT_URL,
 
-    IDA_LOGOUT_URI_LIST,
-
     # Methods to derive settings
     _make_mako_template_dirs,
     _make_locale_paths,
@@ -622,10 +620,6 @@ ELASTIC_SEARCH_CONFIG = [
         'port': 9200
     }
 ]
-
-# List of logout URIs for each IDA that the learner should be logged out of when they logout of
-# Studio. Only applies to IDA for which the social auth flow uses DOT (Django OAuth Toolkit).
-IDA_LOGOUT_URI_LIST = []
 
 # These are standard regexes for pulling out info like course_ids, usage_ids, etc.
 # They are used so that URLs with deprecated-format strings still work.

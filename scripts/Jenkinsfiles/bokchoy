@@ -27,7 +27,7 @@ def bokchoyTestCleanup() {
 def shardCount = 25
 
 pipeline {
-    agent { label "ironwood-jenkins-worker" }
+    agent { label "jenkins-worker" }
     options {
         sendSplunkConsoleLog()
         timestamps()
@@ -67,7 +67,7 @@ pipeline {
                     for (int i = 1; i <= shardCount; i++) {
                         int index = i
                         parallel_stages["${index}"] = {
-                            node('ironwood-jenkins-worker') {
+                            node('jenkins-worker') {
                                 withEnv(["SHARD=${index}","TEST_SUITE=bok-choy"]) {
                                     try {
                                         stage("Bokchoy shard: ${index}") {

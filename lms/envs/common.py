@@ -2447,7 +2447,7 @@ YOUTUBE_API_KEY = 'PUT_YOUR_API_KEY_HERE'
 # RemovedInDjango19Warnings in the test logs.
 INSTALLED_APPS = [
     # Standard ones that are always installed...
-    'course_info',
+    'lms.djangoapps.course_info',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.humanize',
@@ -4162,3 +4162,9 @@ MAX_BLOCKS_PER_CONTENT_LIBRARY = 1000
 # COUNTRIES_FIRST = ['SA', 'BH', 'QA'] will display these countries on top of the list
 # https://github.com/SmileyChris/django-countries#show-certain-countries-first
 COUNTRIES_FIRST = []
+
+############## EOL #########################
+REGISTRATION_EMAIL_PATTERNS_DISALLOWED = None
+
+############## Grade Report - uchileedxlogin #########################
+UCHILEEDXLOGIN_TASK_RUN_ENABLE = False

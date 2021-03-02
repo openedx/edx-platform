@@ -137,7 +137,8 @@ msgstr ""
 #: cms/static/js/views/asset.js cms/static/js/views/container.js
 #: cms/static/js/views/course_info_handout.js
 #: cms/static/js/views/course_info_update.js
-#: cms/static/js/views/edit_textbook.js cms/static/js/views/list_item_editor.js
+#: cms/static/js/views/edit_textbook.js
+#: cms/static/js/views/list_item_editor.js
 #: cms/static/js/views/modals/edit_xblock.js cms/static/js/views/tabs.js
 #: cms/static/js/views/utils/xblock_utils.js
 #: common/lib/xmodule/xmodule/assets/library_source_block/public/js/library_source_block.js
@@ -210,7 +211,8 @@ msgstr "Đóng"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
-#: cms/static/js/views/assets.js common/lib/xmodule/xmodule/js/src/html/edit.js
+#: cms/static/js/views/assets.js
+#: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Name"
 msgstr "Tên"
 
@@ -236,7 +238,8 @@ msgstr "OK"
 msgid "None"
 msgstr "Không"
 
-#: cms/static/js/views/course_video_settings.js cms/static/js/views/metadata.js
+#: cms/static/js/views/course_video_settings.js
+#: cms/static/js/views/metadata.js
 #: cms/static/js/views/previous_video_upload.js
 #: cms/static/js/views/video_transcripts.js
 #: lms/djangoapps/teams/static/teams/js/views/edit_team_members.js
@@ -444,7 +447,8 @@ msgstr[0] ""
 
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
 msgid "The grading process is still running. Refresh the page to see updates."
-msgstr "Đang trong quá trình chấm điểm. Refresh lại trang để xem cập nhật mới."
+msgstr ""
+"Đang trong quá trình chấm điểm. Refresh lại trang để xem cập nhật mới."
 
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
 msgid "Could not grade your answer. The submission was aborted."
@@ -456,9 +460,9 @@ msgid ""
 "you can, please use Chrome or Safari which have been verified to support "
 "file uploads."
 msgstr ""
-"Gửi bị hủy bỏ! Xin lỗi, trình duyệt của bạn không hỗ trợ tải lên tệp. Nếu có "
-"thể, vui lòng sử dụng Chrome hoặc Safari đã được xác nhận hỗ trợ tải lên tệp "
-"tin."
+"Gửi bị hủy bỏ! Xin lỗi, trình duyệt của bạn không hỗ trợ tải lên tệp. Nếu có"
+" thể, vui lòng sử dụng Chrome hoặc Safari đã được xác nhận hỗ trợ tải lên "
+"tệp tin."
 
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
 msgid "You submitted {filename}; only {allowedFiles} are allowed."
@@ -492,8 +496,7 @@ msgstr "chưa gửi"
 
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid ""
-"{paragraph}=p;{preformatted}=pre;{heading3}=h3;{heading4}=h4;{heading5}=h5;"
-"{heading6}=h6"
+"{paragraph}=p;{preformatted}=pre;{heading3}=h3;{heading4}=h4;{heading5}=h5;{heading6}=h6"
 msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
@@ -1714,13 +1717,11 @@ msgstr "Chèn/Sửa hình ảnh"
 
 #: common/lib/xmodule/xmodule/js/src/lti/lti.js
 msgid ""
-"Click OK to have your username and e-mail address sent to a 3rd party "
-"application.\n"
+"Click OK to have your username and e-mail address sent to a 3rd party application.\n"
 "\n"
 "Click Cancel to return to this page without sending your information."
 msgstr ""
-"Nhấp chọn OK để gửi tên đăng nhập và địa chỉ e-mail của bạn tới ứng dụng của "
-"bên thứ 3.\n"
+"Nhấp chọn OK để gửi tên đăng nhập và địa chỉ e-mail của bạn tới ứng dụng của bên thứ 3.\n"
 "\n"
 "Nhấp chọn Hủy bỏ để quay lại trang và không gửi thông tin của bạn đi."
 
@@ -1762,16 +1763,13 @@ msgstr "Giải thích ngắn gọn"
 
 #: common/lib/xmodule/xmodule/js/src/problem/edit.js
 msgid ""
-"If you use the Advanced Editor, this problem will be converted to XML and "
-"you will not be able to return to the Simple Editor Interface.\n"
+"If you use the Advanced Editor, this problem will be converted to XML and you will not be able to return to the Simple Editor Interface.\n"
 "\n"
 "Proceed to the Advanced Editor and convert this problem to XML?"
 msgstr ""
-"Nếu bạn sử dụng bộ soạn thảo cao cấp, bài tập này sẽ được chuyển sang định "
-"dạng XML và bạn sẽ không thể quay trở lại bộ soạn thảo đơn giản được nữa.\n"
+"Nếu bạn sử dụng bộ soạn thảo cao cấp, bài tập này sẽ được chuyển sang định dạng XML và bạn sẽ không thể quay trở lại bộ soạn thảo đơn giản được nữa.\n"
 "\n"
-"Bạn có muốn sử dụng bộ soạn thảo cao cấp và chuyển định dạng bài tập thành "
-"XML?"
+"Bạn có muốn sử dụng bộ soạn thảo cao cấp và chuyển định dạng bài tập thành XML?"
 
 #: common/lib/xmodule/xmodule/js/src/problem/edit.js
 msgid "Explanation"
@@ -1782,8 +1780,8 @@ msgid ""
 "Sequence error! Cannot navigate to %(tab_name)s in the current "
 "SequenceModule. Please contact the course staff."
 msgstr ""
-"Lỗi Sequence! Không thể điều hướng tới tab %(tab_name)s trong SequenceModule "
-"hiện tại. Xin vui lòng liên hệ với nhân viên phụ trách khóa học."
+"Lỗi Sequence! Không thể điều hướng tới tab %(tab_name)s trong SequenceModule"
+" hiện tại. Xin vui lòng liên hệ với nhân viên phụ trách khóa học."
 
 #: common/lib/xmodule/xmodule/js/src/sequence/display.js
 #: openedx/features/course_bookmarks/static/course_bookmarks/js/views/bookmark_button.js
@@ -1934,9 +1932,9 @@ msgid ""
 "navigate the different speeds, then press ENTER to change to the selected "
 "speed."
 msgstr ""
-"Nhấn phím mũi tên lên để vào menu tốc độ rồi sử dụng các phím mũi tên lên và "
-"xuống để điều hướng các tốc độ khác nhau, sau đó nhấn ENTER để thay đổi tốc "
-"độ đã chọn."
+"Nhấn phím mũi tên lên để vào menu tốc độ rồi sử dụng các phím mũi tên lên và"
+" xuống để điều hướng các tốc độ khác nhau, sau đó nhấn ENTER để thay đổi tốc"
+" độ đã chọn."
 
 #: common/lib/xmodule/xmodule/js/src/video/08_video_speed_control.js
 msgid "Adjust video speed"
@@ -1987,8 +1985,8 @@ msgstr "Kết thúc bản dịch. Về đầu."
 
 #: common/lib/xmodule/xmodule/js/src/video/09_video_caption.js
 msgid ""
-"Press the UP arrow key to enter the language menu then use UP and DOWN arrow "
-"keys to navigate language options. Press ENTER to change to the selected "
+"Press the UP arrow key to enter the language menu then use UP and DOWN arrow"
+" keys to navigate language options. Press ENTER to change to the selected "
 "language."
 msgstr ""
 "Nhấn phím mũi tên lên để vào menu ngôn ngữ sau đó sử dụng các phím mũi tên "
@@ -2103,7 +2101,8 @@ msgstr "Bạn không thể gửi bài này. Làm mới lại trang và thử l�
 
 #: common/static/common/js/discussion/views/discussion_content_view.js
 msgid ""
-"You could not be unsubscribed from this post. Refresh the page and try again."
+"You could not be unsubscribed from this post. Refresh the page and try "
+"again."
 msgstr "Bạn không thể hủy bài này. Làm mới lại trang và thử lại."
 
 #: common/static/common/js/discussion/views/discussion_content_view.js
@@ -2111,8 +2110,8 @@ msgid ""
 "This response could not be marked as an answer. Refresh the page and try "
 "again."
 msgstr ""
-"Phản hồi này không thể đánh dấu là một câu trả lời. Làm mới lại trang và thử "
-"lại."
+"Phản hồi này không thể đánh dấu là một câu trả lời. Làm mới lại trang và thử"
+" lại."
 
 #: common/static/common/js/discussion/views/discussion_content_view.js
 msgid ""
@@ -2132,7 +2131,8 @@ msgstr ""
 #: common/static/common/js/discussion/views/discussion_content_view.js
 msgid "This response could not be unendorsed. Refresh the page and try again."
 msgstr ""
-"Phản hồi này không thể bỏ đánh dấu là xác nhận. Làm mới lại trang và thử lại."
+"Phản hồi này không thể bỏ đánh dấu là xác nhận. Làm mới lại trang và thử "
+"lại."
 
 #: common/static/common/js/discussion/views/discussion_content_view.js
 msgid "This vote could not be processed. Refresh the page and try again."
@@ -2198,7 +2198,8 @@ msgstr "Đang tải danh sách các bài viết"
 
 #: common/static/common/js/discussion/views/discussion_thread_list_view.js
 msgid ""
-"No results found for {original_query}. Showing results for {suggested_query}."
+"No results found for {original_query}. Showing results for "
+"{suggested_query}."
 msgstr ""
 "Không tìm thấy kết quả cho {original_query}. Đang hiện các kết quả cho "
 "{suggested_query}."
@@ -2447,8 +2448,8 @@ msgstr "Tệp bạn tải lên phải có dung lượng nhỏ hơn 5MB."
 
 #: lms/djangoapps/support/static/support/jsx/file_upload.jsx
 msgid ""
-"Files that you upload must be PDFs or image files in .gif, .jpg, .jpeg, or ."
-"png format."
+"Files that you upload must be PDFs or image files in .gif, .jpg, .jpeg, or "
+".png format."
 msgstr ""
 "Tệp bạn tải lên phải là PDF hoặc hình ảnh có định dạng .gif, .jpg, .jpeg, "
 "hoặc .png."
@@ -2601,7 +2602,8 @@ msgstr "Nhập một số chi tiết cho yêu cầu hỗ trợ của bạn."
 msgid ""
 "Due to the recent increase in interest in online education and edX, we are "
 "currently experiencing an unusually high volume of support requests. We "
-"appreciate your patience as we work to review each request. Please check the "
+"appreciate your patience as we work to review each request. Please check the"
+" "
 msgstr ""
 
 #: lms/djangoapps/support/static/support/jsx/single_support_form.jsx
@@ -2690,8 +2692,8 @@ msgid ""
 "A short description of the team to help other learners understand the goals "
 "or direction of the team (maximum 300 characters)."
 msgstr ""
-"Giới thiệu ngắn về nhóm để giúp người học khác hiểu mục đích và phương hướng "
-"của nhóm (tối đa 300 ký tự)."
+"Giới thiệu ngắn về nhóm để giúp người học khác hiểu mục đích và phương hướng"
+" của nhóm (tối đa 300 ký tự)."
 
 #: lms/djangoapps/teams/static/teams/js/views/edit_team.js
 #: lms/static/js/student_account/views/account_settings_factory.js
@@ -2878,8 +2880,8 @@ msgstr ""
 
 #: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
 msgid ""
-"Your request could not be completed due to a server problem. Reload the page "
-"and try again. If the issue persists, click the Help tab to report the "
+"Your request could not be completed due to a server problem. Reload the page"
+" and try again. If the issue persists, click the Help tab to report the "
 "problem."
 msgstr ""
 "Yêu cầu của bạn không thực hiện được do lỗi hệ thống. Bạn hãy thử mở lại "
@@ -2912,8 +2914,8 @@ msgid ""
 "If you make significant changes, make sure you notify members of the team "
 "before making these changes."
 msgstr ""
-"Trong trường hợp bạn muốn tạo ra những thay đổi lớn, bạn nên thông báo trước "
-"với các thành viên của nhóm về những thay đổi này."
+"Trong trường hợp bạn muốn tạo ra những thay đổi lớn, bạn nên thông báo trước"
+" với các thành viên của nhóm về những thay đổi này."
 
 #: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
 msgid "Membership"
@@ -3221,17 +3223,17 @@ msgid ""
 "Student username/email field is required and can not be empty. Kindly fill "
 "in username/email and then press \"Add to Exception List\" button."
 msgstr ""
-"Trường tên đăng nhập/email của sinh viên là bắt buộc và không được để trống. "
-"Vui lòng điền tên đăng nhập/email sau đó nhấn nút \"Thêm vào Danh sách Ngoại "
-"lệ\"."
+"Trường tên đăng nhập/email của sinh viên là bắt buộc và không được để trống."
+" Vui lòng điền tên đăng nhập/email sau đó nhấn nút \"Thêm vào Danh sách "
+"Ngoại lệ\"."
 
 #: lms/static/js/certificates/models/certificate_invalidation.js
 msgid ""
 "Student username/email field is required and can not be empty. Kindly fill "
 "in username/email and then press \"Invalidate Certificate\" button."
 msgstr ""
-"Trường tên đăng nhập/email của sinh viên là bắt buộc và không được để trống. "
-"Vui lòng điền tên đăng nhập/email sau đó nhấn nút \"Huỷ bỏ Chứng chỉ\"."
+"Trường tên đăng nhập/email của sinh viên là bắt buộc và không được để trống."
+" Vui lòng điền tên đăng nhập/email sau đó nhấn nút \"Huỷ bỏ Chứng chỉ\"."
 
 #: lms/static/js/certificates/views/certificate_bulk_whitelist.js
 msgid "Uploaded file issues. Click on \"+\" to view."
@@ -3248,8 +3250,8 @@ msgstr " đã thêm học viên vào danh sách không hợp lệ"
 #: lms/static/js/certificates/views/certificate_bulk_whitelist.js
 msgid " records are not in correct format and not added to the exception list"
 msgstr ""
-" các bản ghi không đúng định dạng và không được thêm vào danh sách không hợp "
-"lệ"
+" các bản ghi không đúng định dạng và không được thêm vào danh sách không hợp"
+" lệ"
 
 #: lms/static/js/certificates/views/certificate_bulk_whitelist.js
 msgid " record is not in correct format and not added to the exception list"
@@ -3265,8 +3267,8 @@ msgstr ""
 #: lms/static/js/certificates/views/certificate_bulk_whitelist.js
 msgid " learner does not exist in LMS and not added to the exception list"
 msgstr ""
-" học viên không tồn tại trong LMS và không được thêm vào danh sách không hợp "
-"lệ"
+" học viên không tồn tại trong LMS và không được thêm vào danh sách không hợp"
+" lệ"
 
 #: lms/static/js/certificates/views/certificate_bulk_whitelist.js
 msgid " learners are already white listed and not added to the exception list"
@@ -3284,14 +3286,14 @@ msgstr ""
 msgid ""
 " learners are not enrolled in course and not added to the exception list"
 msgstr ""
-" những học viên không ghi danh tham gia khóa học và không thêm vào danh sách "
-"không hợp lệ"
+" những học viên không ghi danh tham gia khóa học và không thêm vào danh sách"
+" không hợp lệ"
 
 #: lms/static/js/certificates/views/certificate_bulk_whitelist.js
 msgid " learner is not enrolled in course and not added to the exception list"
 msgstr ""
-" học viên không ghi danh tham gia khóa học và không thêm vào danh sách không "
-"hợp lệ"
+" học viên không ghi danh tham gia khóa học và không thêm vào danh sách không"
+" hợp lệ"
 
 #: lms/static/js/certificates/views/certificate_invalidation_view.js
 msgid ""
@@ -3316,16 +3318,16 @@ msgid ""
 "The certificate for this learner has been re-validated and the system is re-"
 "running the grade for this learner."
 msgstr ""
-"Giấy chứng nhận cho học viên này đã được xác nhận lại và hệ thống đang xử lý "
-"cấp phát lại cho học viên này này."
+"Giấy chứng nhận cho học viên này đã được xác nhận lại và hệ thống đang xử lý"
+" cấp phát lại cho học viên này này."
 
 #: lms/static/js/certificates/views/certificate_invalidation_view.js
 msgid ""
-"Could not find Certificate Invalidation in the list. Please refresh the page "
-"and try again"
+"Could not find Certificate Invalidation in the list. Please refresh the page"
+" and try again"
 msgstr ""
-"Không thể tìm thấy Chứng chỉ Không hợp lệ trong danh sách. Hãy làm mới trang "
-"và thử lại"
+"Không thể tìm thấy Chứng chỉ Không hợp lệ trong danh sách. Hãy làm mới trang"
+" và thử lại"
 
 #: lms/static/js/certificates/views/certificate_whitelist.js
 msgid "Student Removed from certificate white list successfully."
@@ -3404,8 +3406,8 @@ msgstr ""
 
 #: lms/static/js/dashboard/legacy.js
 msgid ""
-"Are you sure you want to unenroll from the verified {certNameLong}  track of "
-"{courseName}  ({courseNumber})?"
+"Are you sure you want to unenroll from the verified {certNameLong}  track of"
+" {courseName}  ({courseNumber})?"
 msgstr ""
 
 #: lms/static/js/dashboard/legacy.js
@@ -3605,8 +3607,8 @@ msgstr "Đã có lỗi xảy ra. Hãy refresh trình duyệt của bạn rồi t
 #: lms/static/js/edxnotes/views/notes_visibility_factory.js
 #: lms/static/js/edxnotes/views/search_box.js
 msgid ""
-"An error has occurred. Make sure that you are connected to the Internet, and "
-"then try refreshing the page."
+"An error has occurred. Make sure that you are connected to the Internet, and"
+" then try refreshing the page."
 msgstr "Đã có lỗi xảy ra. Hãy kiểm tra kết nối Internet và thử refresh lại."
 
 #: lms/static/js/edxnotes/views/notes_visibility_factory.js
@@ -3722,8 +3724,8 @@ msgstr "{email}"
 
 #: lms/static/js/groups/views/cohort_editor.js
 msgid ""
-"{numPreassigned} learner was pre-assigned for this cohort. This learner will "
-"automatically be added to the cohort when they enroll in the course."
+"{numPreassigned} learner was pre-assigned for this cohort. This learner will"
+" automatically be added to the cohort when they enroll in the course."
 msgid_plural ""
 "{numPreassigned} learners were pre-assigned for this cohort. These learners "
 "will automatically be added to the cohort when they enroll in the course."
@@ -3779,8 +3781,8 @@ msgstr "Thêm nhóm học viên"
 
 #: lms/static/js/groups/views/cohorts.js
 msgid ""
-"The {cohortGroupName} cohort has been created. You can manually add students "
-"to this cohort below."
+"The {cohortGroupName} cohort has been created. You can manually add students"
+" to this cohort below."
 msgstr ""
 "Nhóm học viên {cohortGroupName} vừa được tạo. Bạn có thể thêm học viên vào "
 "nhóm dưới đây."
@@ -3817,30 +3819,30 @@ msgstr "Không cho phép phân nhóm học viên"
 
 #: lms/static/js/groups/views/verified_track_settings_notification.js
 msgid ""
-"This course uses automatic cohorting for verified track learners. You cannot "
-"disable cohorts, and you cannot rename the manual cohort named "
+"This course uses automatic cohorting for verified track learners. You cannot"
+" disable cohorts, and you cannot rename the manual cohort named "
 "'{verifiedCohortName}'. To change the configuration for verified track "
 "cohorts, contact your edX partner manager."
 msgstr ""
-"Khóa học này tự động tạo nhóm cho những học viên thuộc loại có xác minh. Bạn "
-"không thể vô hiệu hoá các nhóm và bạn không thể đổi tên nhóm người dùng "
+"Khóa học này tự động tạo nhóm cho những học viên thuộc loại có xác minh. Bạn"
+" không thể vô hiệu hoá các nhóm và bạn không thể đổi tên nhóm người dùng "
 "'{verifiedCohortName}'. Để thay đổi cấu hình cho nhóm xác minh, hãy liên hệ "
 "với người quản lý đối tác edX của bạn."
 
 #: lms/static/js/groups/views/verified_track_settings_notification.js
 msgid ""
-"This course has automatic cohorting enabled for verified track learners, but "
-"the required cohort does not exist. You must create a manually-assigned "
+"This course has automatic cohorting enabled for verified track learners, but"
+" the required cohort does not exist. You must create a manually-assigned "
 "cohort named '{verifiedCohortName}' for the feature to work."
 msgstr ""
-"Khóa học này tự động tạo nhóm cho những học viên loại có xác minh, tuy nhiên "
-"nhóm được yêu cầu không tồn tại. Bạn phải tạo một nhóm được chỉ định theo "
+"Khóa học này tự động tạo nhóm cho những học viên loại có xác minh, tuy nhiên"
+" nhóm được yêu cầu không tồn tại. Bạn phải tạo một nhóm được chỉ định theo "
 "cách thủ công có tên '{verifiedCohortName}' để cho tính năng này hoạt động."
 
 #: lms/static/js/groups/views/verified_track_settings_notification.js
 msgid ""
-"This course has automatic cohorting enabled for verified track learners, but "
-"cohorts are disabled. You must enable cohorts for the feature to work."
+"This course has automatic cohorting enabled for verified track learners, but"
+" cohorts are disabled. You must enable cohorts for the feature to work."
 msgstr ""
 "Khóa học này tự động tạo nhóm cho những học viên loại có xác minh, nhưng "
 "nhóm đã bị vô hiệu hóa. Bạn phải kích hoạt nhóm để tính năng này hoạt động."
@@ -3909,7 +3911,8 @@ msgstr "Lỗi khi xem danh sách học viên."
 #: lms/static/js/instructor_dashboard/data_download_2.js
 msgid "Error generating list of students who may enroll. Please try again."
 msgstr ""
-"Xảy ra lỗi khi xuất danh sách học viên có thể ghi danh. Xin vui lòng thử lại."
+"Xảy ra lỗi khi xuất danh sách học viên có thể ghi danh. Xin vui lòng thử "
+"lại."
 
 #: lms/static/js/instructor_dashboard/data_download.js
 msgid "Error retrieving grading configuration."
@@ -3932,8 +3935,8 @@ msgstr "Lỗi khi tạo báo cáo dữ liệu ORA. Vui lòng thử lại."
 
 #: lms/static/js/instructor_dashboard/ecommerce.js
 msgid ""
-"There was a problem creating the report. Select \"Create Executive Summary\" "
-"to try again."
+"There was a problem creating the report. Select \"Create Executive Summary\""
+" to try again."
 msgstr "Lỗi khi truy xuất báo cáo. Chọn \"Tạo tóm tắt thực hiện\" để thử lại."
 
 #: lms/static/js/instructor_dashboard/ecommerce.js
@@ -3998,7 +4001,8 @@ msgid ""
 "must create and activate their accounts before they can be assigned a role."
 msgstr ""
 "Lỗi: Người dùng '<%- username %>' chưa kích hoạt tài khoản của họ. Người "
-"dùng phải tạo và kích hoạt tài khoản của họ trước khi họ có thể được xếp lớp."
+"dùng phải tạo và kích hoạt tài khoản của họ trước khi họ có thể được xếp "
+"lớp."
 
 #: lms/static/js/instructor_dashboard/membership.js
 msgid "Error: You cannot remove yourself from the Instructor group!"
@@ -4044,8 +4048,8 @@ msgid ""
 "These users could not be added as beta testers because their accounts are "
 "not yet activated:"
 msgstr ""
-"Không thể thêm những người dùng này làm người kiểm tra beta vì tài khoản của "
-"họ chưa được kích hoạt:"
+"Không thể thêm những người dùng này làm người kiểm tra beta vì tài khoản của"
+" họ chưa được kích hoạt:"
 
 #. Translators: A list of users appears after this sentence;
 #: lms/static/js/instructor_dashboard/membership.js
@@ -4057,7 +4061,8 @@ msgstr ""
 #: lms/static/js/instructor_dashboard/membership.js
 msgid "These users were not added as beta testers:"
 msgstr ""
-"Những thành viên này không được thêm vào danh sách thành viên bản thử nghiệm:"
+"Những thành viên này không được thêm vào danh sách thành viên bản thử "
+"nghiệm:"
 
 #. Translators: A list of users appears after this sentence;
 #: lms/static/js/instructor_dashboard/membership.js
@@ -4070,8 +4075,8 @@ msgid ""
 "Users must create and activate their account before they can be promoted to "
 "beta tester."
 msgstr ""
-"Người dùng phải tạo và kích hoạt tài khoản trước khi có thể dùng thử bản thử "
-"nghiệm."
+"Người dùng phải tạo và kích hoạt tài khoản trước khi có thể dùng thử bản thử"
+" nghiệm."
 
 #: lms/static/js/instructor_dashboard/membership.js
 msgid "Could not find users associated with the following identifiers:"
@@ -4197,13 +4202,13 @@ msgid ""
 "large number of learners, email messages to learners might take up to an "
 "hour to be sent."
 msgstr ""
-"Email của bạn đã được xếp hàng đợi để gửi. Với những khóa học có nhiều người "
-"học, thư điện tử gửi cho người học có thể mất đến một giờ để được gửi đi."
+"Email của bạn đã được xếp hàng đợi để gửi. Với những khóa học có nhiều người"
+" học, thư điện tử gửi cho người học có thể mất đến một giờ để được gửi đi."
 
 #: lms/static/js/instructor_dashboard/send_email.js
 msgid ""
-"You are sending an email message with the subject {subject} to the following "
-"recipients."
+"You are sending an email message with the subject {subject} to the following"
+" recipients."
 msgstr ""
 "Bạn đang gửi một email với chủ đề {subject} tới những người nhận sau đây."
 
@@ -4269,9 +4274,9 @@ msgstr ""
 
 #: lms/static/js/instructor_dashboard/student_admin.js
 msgid ""
-"Error resetting problem attempts for problem '<%= problem_id %>' and student "
-"'<%- student_id %>'. Make sure that the problem and student identifiers are "
-"complete and correct."
+"Error resetting problem attempts for problem '<%= problem_id %>' and student"
+" '<%- student_id %>'. Make sure that the problem and student identifiers are"
+" complete and correct."
 msgstr ""
 
 #: lms/static/js/instructor_dashboard/student_admin.js
@@ -4283,13 +4288,13 @@ msgstr ""
 
 #: lms/static/js/instructor_dashboard/student_admin.js
 msgid ""
-"Error deleting student '<%- student_id %>'s state on problem '<%- problem_id "
-"%>'. Make sure that the problem and student identifiers are complete and "
+"Error deleting student '<%- student_id %>'s state on problem '<%- problem_id"
+" %>'. Make sure that the problem and student identifiers are complete and "
 "correct."
 msgstr ""
 "Lỗi xoá tình trạng sinh viên '<%- student_id %>'s làm bài tập '<%- "
-"problem_id %>'. Hãy kiểm tra xem tên của câu hỏi và tên của học viên viết đã "
-"đầy đủ và đúng chưa."
+"problem_id %>'. Hãy kiểm tra xem tên của câu hỏi và tên của học viên viết đã"
+" đầy đủ và đúng chưa."
 
 #: lms/static/js/instructor_dashboard/student_admin.js
 msgid "Module state successfully deleted."
@@ -4302,8 +4307,8 @@ msgid ""
 "complete and correct."
 msgstr ""
 "Lỗi kiểm tra qua trình làm bài '<%- problem_id %>' của sinh viên '<%- "
-"student_id %>'. Hãy kiểm tra xem tên của câu hỏi và tên của học viên viết đã "
-"đầy đủ và đúng chưa."
+"student_id %>'. Hãy kiểm tra xem tên của câu hỏi và tên của học viên viết đã"
+" đầy đủ và đúng chưa."
 
 #: lms/static/js/instructor_dashboard/student_admin.js
 msgid "Entrance exam attempts is being reset for student '{student_id}'."
@@ -4312,8 +4317,8 @@ msgstr ""
 
 #: lms/static/js/instructor_dashboard/student_admin.js
 msgid ""
-"Error resetting entrance exam attempts for student '{student_id}'. Make sure "
-"student identifier is correct."
+"Error resetting entrance exam attempts for student '{student_id}'. Make sure"
+" student identifier is correct."
 msgstr ""
 "Lỗi khi tái thiết lập số lần thi thử đầu vào của học viên '{student_id}'. "
 "Xin hãy kiểm tra lại danh tính học viên cho chuẩn xác."
@@ -4324,15 +4329,16 @@ msgstr "Nhập tên đăng nhập hoặc email của học viên."
 
 #: lms/static/js/instructor_dashboard/student_admin.js
 msgid ""
-"Do you want to allow this student ('{student_id}') to skip the entrance exam?"
+"Do you want to allow this student ('{student_id}') to skip the entrance "
+"exam?"
 msgstr ""
 "Bạn có muốn cho phép sinh viên này ('{student_id}') được phép bỏ qua bài "
 "kiểm tra đầu vào?"
 
 #: lms/static/js/instructor_dashboard/student_admin.js
 msgid ""
-"An error occurred. Make sure that the student's username or email address is "
-"correct and try again."
+"An error occurred. Make sure that the student's username or email address is"
+" correct and try again."
 msgstr ""
 "Đã có lỗi xảy ra. Hãy kiểm tra username của học viên hoặc địa chỉ email của "
 "học viên cho chính xác và thử lại."
@@ -4347,8 +4353,8 @@ msgid ""
 "Error deleting entrance exam state for student '{student_id}'. Make sure "
 "student identifier is correct."
 msgstr ""
-"Lỗi khi xóa trạng thái bài kiểm tra đầu vào của học viên '{student_id}'. Xin "
-"kiểm tra xem tên của học viên viết đã đúng chưa."
+"Lỗi khi xóa trạng thái bài kiểm tra đầu vào của học viên '{student_id}'. Xin"
+" kiểm tra xem tên của học viên viết đã đúng chưa."
 
 #: lms/static/js/instructor_dashboard/student_admin.js
 msgid ""
@@ -4364,8 +4370,8 @@ msgstr ""
 
 #: lms/static/js/instructor_dashboard/student_admin.js
 msgid ""
-"Successfully started task to reset attempts for problem '<%- problem_id %>'. "
-"Click the 'Show Task Status' button to see the status of the task."
+"Successfully started task to reset attempts for problem '<%- problem_id %>'."
+" Click the 'Show Task Status' button to see the status of the task."
 msgstr ""
 "Đã bắt đầu tác vụ tái thiết lập số lần có quyền nộp bài cho câu hỏi '<%- "
 "problem_id %>'. Bấm nút 'Hiển thị lịch sử tác vụ' để xem trạng thái của tác "
@@ -4377,8 +4383,8 @@ msgid ""
 "problem_id %>'. Make sure that the problem identifier is complete and "
 "correct."
 msgstr ""
-"Lỗi khi bắt đầu tác vụ tái thiết lập số lần tất cả các học viên có quyền nộp "
-"bài đối với câu hỏi '<%- problem_id %>'. Xin kiểm tra xem tên của câu hỏi "
+"Lỗi khi bắt đầu tác vụ tái thiết lập số lần tất cả các học viên có quyền nộp"
+" bài đối với câu hỏi '<%- problem_id %>'. Xin kiểm tra xem tên của câu hỏi "
 "viết đã đầy đủ và đúng chưa."
 
 #: lms/static/js/instructor_dashboard/student_admin.js
@@ -4387,15 +4393,15 @@ msgstr "Lỗi khi xem lịch sử tác vụ của học viên và câu hỏi nà
 
 #: lms/static/js/instructor_dashboard/student_admin.js
 msgid ""
-"Started rescore problem task for problem '<%- problem_id %>' and student '<"
-"%- student_id %>'. Click the 'Show Task Status' button to see the status of "
-"the task."
+"Started rescore problem task for problem '<%- problem_id %>' and student "
+"'<%- student_id %>'. Click the 'Show Task Status' button to see the status "
+"of the task."
 msgstr ""
 
 #: lms/static/js/instructor_dashboard/student_admin.js
 msgid ""
-"Error starting a task to rescore problem '<%- problem_id %>' for student '<"
-"%- student_id %>'. Make sure that the the problem and student identifiers "
+"Error starting a task to rescore problem '<%- problem_id %>' for student "
+"'<%- student_id %>'. Make sure that the the problem and student identifiers "
 "are complete and correct."
 msgstr ""
 
@@ -4431,9 +4437,9 @@ msgid ""
 "Make sure that entrance exam has problems in it and student identifier is "
 "correct."
 msgstr ""
-"Lỗi khi bắt đầu tác vụ chấm lại bài thi đầu vào cho học viên '{student_id}'. "
-"Hãy kiểm tra lại xem bài thi có ít nhất một câu hỏi và danh tính học viên là "
-"chính xác."
+"Lỗi khi bắt đầu tác vụ chấm lại bài thi đầu vào cho học viên '{student_id}'."
+" Hãy kiểm tra lại xem bài thi có ít nhất một câu hỏi và danh tính học viên "
+"là chính xác."
 
 #: lms/static/js/instructor_dashboard/student_admin.js
 msgid "Rescore problem '<%- problem_id %>' for all students?"
@@ -4449,8 +4455,8 @@ msgstr ""
 
 #: lms/static/js/instructor_dashboard/student_admin.js
 msgid ""
-"Error starting a task to rescore problem '<%- problem_id %>'. Make sure that "
-"the problem identifier is complete and correct."
+"Error starting a task to rescore problem '<%- problem_id %>'. Make sure that"
+" the problem identifier is complete and correct."
 msgstr ""
 
 #. Translators: a "Task" is a background process such as grading students or
@@ -4509,8 +4515,8 @@ msgstr "Tiến Trình Tác Vụ"
 
 #: lms/static/js/instructor_dashboard/util.js
 msgid ""
-"An error occurred retrieving your email. Please try again later, and contact "
-"technical support if the problem persists."
+"An error occurred retrieving your email. Please try again later, and contact"
+" technical support if the problem persists."
 msgstr ""
 "Xảy ra lỗi khi mở email của bạn. Vui lòng thử lại sau và liên hệ với hỗ trợ "
 "kỹ thuật nếu tiếp tục xảy ra sự cố."
@@ -4568,8 +4574,8 @@ msgid ""
 "Links are generated on demand and expire within 5 minutes due to the "
 "sensitive nature of student information."
 msgstr ""
-"Các đường dẫn đang được xuất theo yêu cầu nhưng sẽ hết hạn trong vòng 5 phút "
-"vì độ nhạy cảm của thông tin về học viên."
+"Các đường dẫn đang được xuất theo yêu cầu nhưng sẽ hết hạn trong vòng 5 phút"
+" vì độ nhạy cảm của thông tin về học viên."
 
 #: lms/static/js/learner_dashboard/models/course_card_model.js
 msgid "(Self-paced) Starts {start}"
@@ -4742,8 +4748,8 @@ msgid ""
 msgstr ""
 "Bạn cũng có thể mất quyền truy cập vào các chứng chỉ đã được xác minh và "
 "thông tin đăng nhập chương trình khác như chứng chỉ MicroMasters. Nếu bạn "
-"muốn tạo một bản sao này cho hồ sơ của mình trước khi tiến hành xóa, hãy làm "
-"theo các hướng dẫn để {htmlStart}in hoặc tải xuống chứng chỉ{htmlEnd}."
+"muốn tạo một bản sao này cho hồ sơ của mình trước khi tiến hành xóa, hãy làm"
+" theo các hướng dẫn để {htmlStart}in hoặc tải xuống chứng chỉ{htmlEnd}."
 
 #: lms/static/js/student_account/components/StudentAccountDeletion.jsx
 msgid ""
@@ -4756,14 +4762,15 @@ msgstr ""
 #: lms/static/js/student_account/components/StudentAccountDeletion.jsx
 msgid "Before proceeding, please {htmlStart}activate your account{htmlEnd}."
 msgstr ""
-"Trước khi tiếp tục, vui lòng {htmlStart}kích hoạt tài khoản của bạn{htmlEnd}."
+"Trước khi tiếp tục, vui lòng {htmlStart}kích hoạt tài khoản của "
+"bạn{htmlEnd}."
 
 #: lms/static/js/student_account/components/StudentAccountDeletion.jsx
 msgid ""
 "{htmlStart}Want to change your email, name, or password instead?{htmlEnd}"
 msgstr ""
-"{htmlStart}Thay vào đó, bạn muốn thay đổi email, tên hoặc mật khẩu của bạn?"
-"{htmlEnd}"
+"{htmlStart}Thay vào đó, bạn muốn thay đổi email, tên hoặc mật khẩu của "
+"bạn?{htmlEnd}"
 
 #: lms/static/js/student_account/components/StudentAccountDeletion.jsx
 msgid ""
@@ -4776,8 +4783,8 @@ msgstr ""
 #: lms/static/js/student_account/components/StudentAccountDeletion.jsx
 msgid ""
 "Please note: Deletion of your account and personal data is permanent and "
-"cannot be undone. {platformName} will not be able to recover your account or "
-"the data that is deleted."
+"cannot be undone. {platformName} will not be able to recover your account or"
+" the data that is deleted."
 msgstr ""
 
 #: lms/static/js/student_account/components/StudentAccountDeletion.jsx
@@ -4827,8 +4834,8 @@ msgstr "Bắt buộc phải có Mật Khẩu"
 
 #: lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
 msgid ""
-"You have selected “Delete my account.” Deletion of your account and personal "
-"data is permanent and cannot be undone. {platformName} will not be able to "
+"You have selected “Delete my account.” Deletion of your account and personal"
+" data is permanent and cannot be undone. {platformName} will not be able to "
 "recover your account or the data that is deleted."
 msgstr ""
 
@@ -4859,8 +4866,8 @@ msgstr ""
 #: lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
 msgid ""
 "Account deletion, including removal from email lists, may take a few weeks "
-"to fully process through our system. If you want to opt-out of emails before "
-"then, please unsubscribe from the footer of any email."
+"to fully process through our system. If you want to opt-out of emails before"
+" then, please unsubscribe from the footer of any email."
 msgstr ""
 "Xóa tài khoản, bao gồm xóa khỏi danh sách email, có thể mất vài tuần để xử "
 "lý hoàn toàn trong hệ thống của chúng tôi. Nếu bạn không muốn nhận thêm "
@@ -4916,10 +4923,10 @@ msgstr "Kiểm tra email của bạn"
 msgid ""
 "{paragraphStart}You entered {boldStart}{email}{boldEnd}. If this email "
 "address is associated with your {platform_name} account, we will send a "
-"message with password recovery instructions to this email address."
-"{paragraphEnd}{paragraphStart}If you do not receive a password reset message "
-"after 1 minute, verify that you entered the correct email address, or check "
-"your spam folder.{paragraphEnd}{paragraphStart}If you need further "
+"message with password recovery instructions to this email "
+"address.{paragraphEnd}{paragraphStart}If you do not receive a password reset"
+" message after 1 minute, verify that you entered the correct email address, "
+"or check your spam folder.{paragraphEnd}{paragraphStart}If you need further "
 "assistance, {anchorStart}contact technical support{anchorEnd}.{paragraphEnd}"
 msgstr ""
 
@@ -4947,11 +4954,11 @@ msgstr ""
 #: lms/static/js/student_account/views/LoginView.js
 msgid ""
 "You have successfully signed into %(currentProvider)s, but your "
-"%(currentProvider)s account does not have a linked %(platformName)s account. "
-"To link your accounts, sign in now using your %(platformName)s password."
+"%(currentProvider)s account does not have a linked %(platformName)s account."
+" To link your accounts, sign in now using your %(platformName)s password."
 msgstr ""
-"Bạn đã đăng nhập thành công vào %(currentProvider)s, nhưng tài khoản của bạn "
-"%(currentProvider)s không được liên kết vào tài khoản %(platformName)s. Để "
+"Bạn đã đăng nhập thành công vào %(currentProvider)s, nhưng tài khoản của bạn"
+" %(currentProvider)s không được liên kết vào tài khoản %(platformName)s. Để "
 "liên kết các tài khoản của bạn, đăng nhập ngay bằng %(platformName)s mật "
 "khẩu."
 
@@ -5002,8 +5009,8 @@ msgstr "Khôi phục Địa chỉ Email"
 
 #: lms/static/js/student_account/views/account_settings_factory.js
 msgid ""
-"You may access your account with this address if single-sign on or access to "
-"your primary email is not available."
+"You may access your account with this address if single-sign on or access to"
+" your primary email is not available."
 msgstr ""
 "Bạn có thể truy cập tài khoản của mình bằng địa chỉ này nếu đăng nhập một "
 "lần hoặc truy cập vào email chính của bạn không khả dụng."
@@ -5040,7 +5047,8 @@ msgid ""
 "The name that identifies you on {platform_name}. You cannot change your "
 "username."
 msgstr ""
-"Tên định danh bạn trên {platform_name}. Bạn không thể thay đổi tên đăng nhập."
+"Tên định danh bạn trên {platform_name}. Bạn không thể thay đổi tên đăng "
+"nhập."
 
 #: lms/static/js/student_account/views/account_settings_factory.js
 #: lms/templates/student_account/account.underscore
@@ -5070,8 +5078,8 @@ msgid ""
 "time zone, course dates, including assignment deadlines, will be displayed "
 "in your browser's local time zone."
 msgstr ""
-"Chọn múi giờ để hiển thị ngày khóa học. Nếu bạn không chỉ định múi giờ, ngày "
-"bắt đầu khoá học, thời hạn khoá học, sẽ được hiển thị trong múi giờ địa "
+"Chọn múi giờ để hiển thị ngày khóa học. Nếu bạn không chỉ định múi giờ, ngày"
+" bắt đầu khoá học, thời hạn khoá học, sẽ được hiển thị trong múi giờ địa "
 "phương của trình duyệt."
 
 #: lms/static/js/student_account/views/account_settings_factory.js
@@ -5143,8 +5151,8 @@ msgid ""
 "You can link your social media accounts to simplify signing in to "
 "{platform_name}."
 msgstr ""
-"Bạn có thể liên kết tài khoản mạng xã hội của mình để đơn giản hóa việc đăng "
-"nhập vào {platform_name}."
+"Bạn có thể liên kết tài khoản mạng xã hội của mình để đơn giản hóa việc đăng"
+" nhập vào {platform_name}."
 
 #: lms/static/js/student_account/views/account_settings_factory.js
 msgid "ORDER NAME"
@@ -5171,7 +5179,8 @@ msgid ""
 "This page contains information about orders that you have placed with "
 "{platform_name}."
 msgstr ""
-"Trang này chứa thông tin về những đơn hàng mà bạn đã đặt với {platform_name}."
+"Trang này chứa thông tin về những đơn hàng mà bạn đã đặt với "
+"{platform_name}."
 
 #: lms/static/js/student_account/views/account_settings_fields.js
 msgid ""
@@ -5190,13 +5199,13 @@ msgstr ""
 
 #: lms/static/js/student_account/views/account_settings_fields.js
 msgid ""
-"We've sent a message to {email}. Click the link in the message to reset your "
-"password. Didn't receive the message? Contact {anchorStart}technical "
+"We've sent a message to {email}. Click the link in the message to reset your"
+" password. Didn't receive the message? Contact {anchorStart}technical "
 "support{anchorEnd}."
 msgstr ""
-"Chúng tôi đã gửi một thông báo đến {email}. Bấm vào liên kết trong thông báo "
-"để đặt lại mật khẩu. Không nhận được thông báo? Liên hệ {anchorStart} hỗ trợ "
-"kỹ thuật {anchorEnd}."
+"Chúng tôi đã gửi một thông báo đến {email}. Bấm vào liên kết trong thông báo"
+" để đặt lại mật khẩu. Không nhận được thông báo? Liên hệ {anchorStart} hỗ "
+"trợ kỹ thuật {anchorEnd}."
 
 #: lms/static/js/student_account/views/account_settings_fields.js
 msgid "Link your {accountName} account"
@@ -5248,7 +5257,8 @@ msgstr "Lỗi tải ảnh lên"
 
 #: lms/static/js/verify_student/views/image_input_view.js
 msgid "Please verify that you have uploaded a valid image (PNG and JPEG)."
-msgstr "Xin hãy chắc chắn rằng bạn đã chọn ảnh đúng định dạng (PNG hoặc JPEG)."
+msgstr ""
+"Xin hãy chắc chắn rằng bạn đã chọn ảnh đúng định dạng (PNG hoặc JPEG)."
 
 #: lms/static/js/verify_student/views/incourse_reverify_view.js
 #: lms/static/js/verify_student/views/review_photos_step_view.js
@@ -5329,8 +5339,8 @@ msgid ""
 "Please verify that your webcam is connected and that you have allowed your "
 "browser to access it."
 msgstr ""
-"Hãy kiểm tra xem webcam đã được kết nối và trình duyệt đã được cho phép dùng "
-"webcam chưa?"
+"Hãy kiểm tra xem webcam đã được kết nối và trình duyệt đã được cho phép dùng"
+" webcam chưa?"
 
 #: lms/static/js/verify_student/views/webcam_photo_view.js
 msgid "No Webcam Detected"
@@ -5420,8 +5430,8 @@ msgstr ""
 
 #: lms/static/js/views/image_field.js
 msgid ""
-"Removal is in progress. To avoid errors, stay on this page until the process "
-"is complete."
+"Removal is in progress. To avoid errors, stay on this page until the process"
+" is complete."
 msgstr ""
 "Đang xoá. Để tránh có lỗi xảy ra, xin đừng đóng trang này cho đến khi xoá "
 "xong."
@@ -5447,8 +5457,8 @@ msgid ""
 "You cannot view the course as a student or beta tester before the course "
 "release date."
 msgstr ""
-"Là học viên hoặc người dùng bản thử nghiệm, bạn không thể xem khóa học trước "
-"ngày khai giảng."
+"Là học viên hoặc người dùng bản thử nghiệm, bạn không thể xem khóa học trước"
+" ngày khai giảng."
 
 #: lms/templates/courseware/progress_graph.js
 msgid "Overall Score"
@@ -5536,8 +5546,8 @@ msgid ""
 "Tell other learners a little about yourself: where you live, what your "
 "interests are, why you're taking courses, or what you hope to learn."
 msgstr ""
-"Chia sẻ với các học viên khác về bản thân bạn: nơi bạn sống, sở thích, lý do "
-"chọn học một khoá học nào đó, hoặc những gì bạn muốn học được."
+"Chia sẻ với các học viên khác về bản thân bạn: nơi bạn sống, sở thích, lý do"
+" chọn học một khoá học nào đó, hoặc những gì bạn muốn học được."
 
 #: openedx/features/learner_profile/static/learner_profile/js/views/badge_list_container.js
 msgid "Accomplishments Pagination"
@@ -5712,7 +5722,8 @@ msgid "Already a library team member"
 msgstr "Đã là thành viên của nhóm thư viện"
 
 #: cms/static/js/factories/manage_users_lib.js
-msgid "Are you sure you want to delete {email} from the library “{container}”?"
+msgid ""
+"Are you sure you want to delete {email} from the library “{container}”?"
 msgstr "Bạn có chắc chắn muốn xóa {email} khỏi thư viện \"{container}\" không?"
 
 #: cms/static/js/factories/manage_users_lib.js
@@ -5750,7 +5761,8 @@ msgid "Choose new file"
 msgstr "Chọn tệp mới"
 
 #: cms/static/js/features/import/factories/import.js
-msgid "File format not supported. Please upload a file with a {ext} extension."
+msgid ""
+"File format not supported. Please upload a file with a {ext} extension."
 msgstr "Định dạng tệp không được hỗ trợ. Vui lòng tải lên tệp có đuôi {ext}."
 
 #: cms/static/js/features/import/factories/import.js
@@ -6008,8 +6020,8 @@ msgid ""
 "{filename} is not in a supported file format. Supported file formats are "
 "{supportedFileFormats}."
 msgstr ""
-"{filename} không phải định dạng tệp được hỗ trợ. Những định dạng tệp được hỗ "
-"trợ là {supportedFileFormats}."
+"{filename} không phải định dạng tệp được hỗ trợ. Những định dạng tệp được hỗ"
+" trợ là {supportedFileFormats}."
 
 #: cms/static/js/views/active_video_upload_list.js
 msgid "{filename} exceeds maximum size of {maxFileSizeInGB} GB."
@@ -6031,13 +6043,11 @@ msgstr "Xác Nhận Xóa File"
 msgid ""
 "Are you sure you wish to delete this item. It cannot be reversed!\n"
 "\n"
-"Also any content that links/refers to this item will no longer work (e.g. "
-"broken images and/or links)"
+"Also any content that links/refers to this item will no longer work (e.g. broken images and/or links)"
 msgstr ""
 "Bạn chắc chắn muốn xóa mục này? Nó không thể phục hồi!\n"
 "\n"
-"Ngoài ra bất kỳ nội dung liên kết hoặc dẫn đến mục này sẽ không còn hoạt "
-"động (ví dụ: hỏng hình ảnh, đường dẫn...)"
+"Ngoài ra bất kỳ nội dung liên kết hoặc dẫn đến mục này sẽ không còn hoạt động (ví dụ: hỏng hình ảnh, đường dẫn...)"
 
 #: cms/static/js/views/asset.js
 msgid "Your file has been deleted."
@@ -6069,7 +6079,8 @@ msgstr ""
 msgid "Max file size exceeded"
 msgstr "Đã vượt quá kích thước tệp tối đa"
 
-#: cms/static/js/views/assets.js cms/templates/js/asset-upload-modal.underscore
+#: cms/static/js/views/assets.js
+#: cms/templates/js/asset-upload-modal.underscore
 msgid "Upload New File"
 msgstr "Tải Lên Tập Tin Mới"
 
@@ -6159,8 +6170,8 @@ msgid ""
 "valid and do not display any error messages."
 msgstr ""
 "Có ít nhất một phần không thể xuất thành tệp XML. Bạn nên vào trang chỉnh "
-"sửa và sửa lỗi trước khi thử xuất lại bản khác. Vui lòng kiểm tra lại để đảm "
-"bảo tất cả các phần trong trang có hiệu lực và không có thông báo lỗi nào."
+"sửa và sửa lỗi trước khi thử xuất lại bản khác. Vui lòng kiểm tra lại để đảm"
+" bảo tất cả các phần trong trang có hiệu lực và không có thông báo lỗi nào."
 
 #: cms/static/js/views/export.js
 msgid "Correct failed component"
@@ -6177,8 +6188,8 @@ msgid ""
 "problematic components and try again."
 msgstr ""
 "Không thể xuất thư viện của bạn sang XML. Không có đủ thông tin để xác định "
-"thành phần gặp lỗi. Kiểm tra lại thư viện của bạn để xác định các thành phần "
-"có vấn đề và thử lại."
+"thành phần gặp lỗi. Kiểm tra lại thư viện của bạn để xác định các thành phần"
+" có vấn đề và thử lại."
 
 #: cms/static/js/views/export.js
 msgid "Take me to the main library page"
@@ -6186,8 +6197,8 @@ msgstr "Mở trang thư viện chính"
 
 #: cms/static/js/views/export.js
 msgid ""
-"Your course could not be exported to XML. There is not enough information to "
-"identify the failed component. Inspect your course to identify any "
+"Your course could not be exported to XML. There is not enough information to"
+" identify the failed component. Inspect your course to identify any "
 "problematic components and try again."
 msgstr ""
 "Không thể xuất khoá học của bạn sang tệp XML. Không có đủ thông tin để tìm "
@@ -6265,8 +6276,8 @@ msgstr "Creative Commons"
 #: cms/static/js/views/license.js
 msgid "You waive some rights for your work, such that others can use it too"
 msgstr ""
-"Bạn từ bỏ một số quyền đối với tác phẩm của bạn, như vậy những người khác có "
-"thể sử dụng lại"
+"Bạn từ bỏ một số quyền đối với tác phẩm của bạn, như vậy những người khác có"
+" thể sử dụng lại"
 
 #: cms/static/js/views/license.js
 msgid "Version"
@@ -6282,9 +6293,9 @@ msgid ""
 "but only if they give credit the way you request. Currently, this option is "
 "required."
 msgstr ""
-"Cho phép người khác sao chép, phân phối, trưng bày và trình diễn tác phẩm có "
-"bản quyền của bạn nhưng chỉ khi họ cung cấp tín dụng theo cách bạn yêu cầu. "
-"Hiện tại, tùy chọn này là bắt buộc."
+"Cho phép người khác sao chép, phân phối, trưng bày và trình diễn tác phẩm có"
+" bản quyền của bạn nhưng chỉ khi họ cung cấp tín dụng theo cách bạn yêu cầu."
+" Hiện tại, tùy chọn này là bắt buộc."
 
 #: cms/static/js/views/license.js
 msgid "Noncommercial"
@@ -6296,8 +6307,8 @@ msgid ""
 "derivative works based upon it - but for noncommercial purposes only."
 msgstr ""
 "Cho phép người khác sao chép, phân phối, trưng bày và trình diễn tác phẩm "
-"của bạn - và các tác phẩm phái sinh dựa trên nó - nhưng chỉ cho các mục đích "
-"phi thương mại."
+"của bạn - và các tác phẩm phái sinh dựa trên nó - nhưng chỉ cho các mục đích"
+" phi thương mại."
 
 #: cms/static/js/views/license.js
 msgid "No Derivatives"
@@ -6320,8 +6331,8 @@ msgstr "Share Alike."
 #: cms/static/js/views/license.js
 msgid ""
 "Allow others to distribute derivative works only under a license identical "
-"to the license that governs your work. This option is incompatible with \"No "
-"Derivatives\"."
+"to the license that governs your work. This option is incompatible with \"No"
+" Derivatives\"."
 msgstr ""
 "Cho phép người khác phân phối các tác phẩm phái sinh chỉ theo một giấy phép "
 "giống với giấy phép chi phối công việc của bạn. Tùy chọn này không tương "
@@ -6368,11 +6379,11 @@ msgstr "Đã là thành viên"
 
 #: cms/static/js/views/manage_users_and_roles.js
 msgid ""
-"{email} is already on the {container} team. Recheck the email address if you "
-"want to add a new member."
+"{email} is already on the {container} team. Recheck the email address if you"
+" want to add a new member."
 msgstr ""
-"{email} đã có trên nhóm {container}. Kiểm tra lại địa chỉ email nếu bạn muốn "
-"thêm một thành viên mới."
+"{email} đã có trên nhóm {container}. Kiểm tra lại địa chỉ email nếu bạn muốn"
+" thêm một thành viên mới."
 
 #: cms/static/js/views/manage_users_and_roles.js
 msgid "Return to team listing"
@@ -6717,8 +6728,8 @@ msgstr ""
 
 #: cms/static/js/views/show_textbook.js
 msgid ""
-"Deleting a textbook cannot be undone and once deleted any reference to it in "
-"your courseware's navigation will also be removed."
+"Deleting a textbook cannot be undone and once deleted any reference to it in"
+" your courseware's navigation will also be removed."
 msgstr ""
 "Xóa một giáo trình không thể được hoàn tác và một khi đã xóa bất kỳ tham "
 "chiếu đến nó trong bảng điều khiển chương trình học của bạn cũng sẽ bị xóa."
@@ -6897,8 +6908,8 @@ msgstr ""
 
 #: cms/static/js/views/video/translations_editor.js
 msgid ""
-"If you remove this transcript, the transcript will not be available for this "
-"component."
+"If you remove this transcript, the transcript will not be available for this"
+" component."
 msgstr ""
 
 #: cms/static/js/views/video/translations_editor.js
@@ -6933,11 +6944,12 @@ msgstr "Tải lên hình ảnh không thành công"
 #. Translators: This is a 3 part text which tells the image requirements.
 #: cms/static/js/views/video_thumbnail.js
 msgid ""
-"{ReqTextSpanStart}Requirements{spanEnd}{lineBreak}{InstructionsSpanStart}"
-"{videoImageResoultion}{lineBreak} {videoImageSupportedFileFormats}{spanEnd}"
+"{ReqTextSpanStart}Requirements{spanEnd}{lineBreak}{InstructionsSpanStart}{videoImageResoultion}{lineBreak}"
+" {videoImageSupportedFileFormats}{spanEnd}"
 msgstr ""
-"{ReqTextSpanStart}Những yêu cầu{spanEnd}{lineBreak}{InstructionsSpanStart}"
-"{videoImageResoultion}{lineBreak} {videoImageSupportedFileFormats}{spanEnd}"
+"{ReqTextSpanStart}Những yêu "
+"cầu{spanEnd}{lineBreak}{InstructionsSpanStart}{videoImageResoultion}{lineBreak}"
+" {videoImageSupportedFileFormats}{spanEnd}"
 
 #. Translators: message will be like 1280x720 pixels
 #: cms/static/js/views/video_thumbnail.js
@@ -7784,8 +7796,8 @@ msgstr "Quyên góp"
 
 #: lms/templates/api_admin/catalog-error.underscore
 msgid ""
-"There was an error retrieving preview results for this catalog. Please check "
-"that your query is correct and try again."
+"There was an error retrieving preview results for this catalog. Please check"
+" that your query is correct and try again."
 msgstr ""
 
 #: lms/templates/api_admin/catalog-results.underscore
@@ -8450,10 +8462,10 @@ msgstr ""
 
 #: lms/templates/learner_dashboard/program_details_sidebar.underscore
 msgid ""
-"Once you complete one of the program requirements you have a program record. "
-"This record is marked complete once you meet all program requirements. A "
-"program record can be used to continue your learning journey and demonstrate "
-"your learning to others."
+"Once you complete one of the program requirements you have a program record."
+" This record is marked complete once you meet all program requirements. A "
+"program record can be used to continue your learning journey and demonstrate"
+" your learning to others."
 msgstr ""
 
 #: lms/templates/learner_dashboard/program_details_sidebar.underscore
@@ -8762,8 +8774,8 @@ msgid ""
 msgstr ""
 "Cảm ơn bạn đã gửi hình ảnh của bạn. Chúng tôi sẽ xem lại chúng. Bây giờ bạn "
 "có thể đăng ký khóa học bất kỳ %(platformName)s mà cung cấp chứng chỉ xác "
-"nhận. Xác minh là tốt cho một năm. Sau một năm, bạn phải nộp ảnh để xác minh "
-"một lần nữa."
+"nhận. Xác minh là tốt cho một năm. Sau một năm, bạn phải nộp ảnh để xác minh"
+" một lần nữa."
 
 #: lms/templates/verify_student/error.underscore
 msgid "Error:"
@@ -8869,9 +8881,9 @@ msgid ""
 "You may be able to complete the image capture procedure without assistance, "
 "but it may take a couple of submission attempts to get the camera "
 "positioning right.  Optimal camera positioning varies with each computer, "
-"but generally the best position for a headshot is approximately 12-18 inches "
-"(30-45 centimeters) from the camera, with your head centered relative to the "
-"computer screen. "
+"but generally the best position for a headshot is approximately 12-18 inches"
+" (30-45 centimeters) from the camera, with your head centered relative to "
+"the computer screen. "
 msgstr ""
 
 #: lms/templates/verify_student/face_photo_step.underscore
@@ -8886,7 +8898,8 @@ msgstr ""
 #: lms/templates/verify_student/face_photo_step.underscore
 #: lms/templates/verify_student/incourse_reverify.underscore
 msgid ""
-"What if I have difficulty holding my head in position relative to the camera?"
+"What if I have difficulty holding my head in position relative to the "
+"camera?"
 msgstr ""
 
 #: lms/templates/verify_student/face_photo_step.underscore
@@ -8915,8 +8928,8 @@ msgstr ""
 
 #: lms/templates/verify_student/id_photo_step.underscore
 msgid ""
-"You need an ID with your name and photo. A driver's license, passport, or ID "
-"are all acceptable."
+"You need an ID with your name and photo. A driver's license, passport, or ID"
+" are all acceptable."
 msgstr ""
 
 #: lms/templates/verify_student/id_photo_step.underscore
@@ -8977,8 +8990,8 @@ msgid ""
 "Use your webcam to take a photo of your face. We will match this photo with "
 "the photo on your ID."
 msgstr ""
-"Sử dụng webcam của bạn để có một hình ảnh của khuôn mặt của bạn để chúng tôi "
-"có thể kết hợp nó với hình ảnh trên ID của bạn."
+"Sử dụng webcam của bạn để có một hình ảnh của khuôn mặt của bạn để chúng tôi"
+" có thể kết hợp nó với hình ảnh trên ID của bạn."
 
 #: lms/templates/verify_student/incourse_reverify.underscore
 msgid "Make sure your face is well-lit"
@@ -8996,7 +9009,8 @@ msgstr ""
 #: lms/templates/verify_student/incourse_reverify.underscore
 msgid "Can we match the photo you took with the one on your ID?"
 msgstr ""
-"Chúng ta có thể phù hợp với hình ảnh mà bạn đã có một trong những ID của bạn?"
+"Chúng ta có thể phù hợp với hình ảnh mà bạn đã có một trong những ID của "
+"bạn?"
 
 #: lms/templates/verify_student/incourse_reverify.underscore
 msgid ""
@@ -9010,11 +9024,11 @@ msgstr ""
 msgid ""
 "We use the highest levels of security available to encrypt your photo and "
 "send it to our authorization service for review. Your photo and information "
-"are not saved or visible anywhere on %(platformName)s after the verification "
-"process is complete."
+"are not saved or visible anywhere on %(platformName)s after the verification"
+" process is complete."
 msgstr ""
-"Chúng tôi sử dụng các mức bảo mật cao nhất có sẵn để mã hóa hình ảnh của bạn "
-"và gửi nó đến dịch vụ ủy quyền của chúng tôi để xem xét. Ảnh và thông tin "
+"Chúng tôi sử dụng các mức bảo mật cao nhất có sẵn để mã hóa hình ảnh của bạn"
+" và gửi nó đến dịch vụ ủy quyền của chúng tôi để xem xét. Ảnh và thông tin "
 "của bạn sẽ không được lưu hay bất cứ nơi nào có thể nhìn thấy trên "
 "%(platformName)s sau khi quá trình xác minh hoàn tất."
 
@@ -9105,7 +9119,8 @@ msgid "Government-Issued Photo ID"
 msgstr "Hình ảnh ID được cấp bới chính phủ"
 
 #: lms/templates/verify_student/make_payment_step.underscore
-msgid "ID-Verification is not required for this Professional Education course."
+msgid ""
+"ID-Verification is not required for this Professional Education course."
 msgstr "Khoá học cao cấp này không yêu cầu xác nhận ID."
 
 #: lms/templates/verify_student/make_payment_step.underscore
@@ -9403,7 +9418,8 @@ msgstr "Sử dụng như yêu cầu băt buộc"
 
 #: cms/templates/js/access-editor.underscore
 msgid "Make this subsection available as a prerequisite to other content"
-msgstr "Kích hoạt phần con này như là một điều kiện bắt buộc cho nội dung khác"
+msgstr ""
+"Kích hoạt phần con này như là một điều kiện bắt buộc cho nội dung khác"
 
 #: cms/templates/js/active-video-upload-list.underscore
 msgid "Active Uploads"
@@ -9550,12 +9566,12 @@ msgstr "Chữ ký trên chứng chỉ"
 #: cms/templates/js/certificate-editor.underscore
 msgid ""
 "It is strongly recommended that you include four or fewer signatories. If "
-"you include additional signatories, preview the certificate in Print View to "
-"ensure the certificate will print correctly on one page."
+"you include additional signatories, preview the certificate in Print View to"
+" ensure the certificate will print correctly on one page."
 msgstr ""
 "Chúng tôi đề nghị có bốn hoặc ít hơn người ký tên. Nếu bạn có chữ ký bổ "
-"sung, hãy xem trước chứng chỉ trong Chế độ xem In để đảm bảo chứng chỉ sẽ in "
-"chính xác trên một trang."
+"sung, hãy xem trước chứng chỉ trong Chế độ xem In để đảm bảo chứng chỉ sẽ in"
+" chính xác trên một trang."
 
 #: cms/templates/js/certificate-editor.underscore
 msgid "Certificate Information"
@@ -9681,8 +9697,8 @@ msgid ""
 "After the course\\'s end date has passed, learners can no longer access "
 "subsection content. The subsection remains included in grade calculations."
 msgstr ""
-"Sau ngày kết thúc khoá học, người học không còn có thể truy cập vào phần con "
-"nữa. Các phần con vẫn được bao gồm trong tính điểm."
+"Sau ngày kết thúc khoá học, người học không còn có thể truy cập vào phần con"
+" nữa. Các phần con vẫn được bao gồm trong tính điểm."
 
 #: cms/templates/js/content-visibility-editor.underscore
 msgid ""
@@ -9816,7 +9832,8 @@ msgstr "Những đơn vị chưa xuất bản sẽ không phát hành"
 
 #: cms/templates/js/course-outline.underscore
 msgid "Unpublished changes to content that will release in the future"
-msgstr "Những thay đổi chưa xuất bản tới nội dung sẽ phát hành trong tương lai"
+msgstr ""
+"Những thay đổi chưa xuất bản tới nội dung sẽ phát hành trong tương lai"
 
 #: cms/templates/js/course-outline.underscore
 msgid "Access to this unit is restricted to: {selectedGroupsLabel}"
@@ -9827,8 +9844,8 @@ msgid ""
 "Access to some content in this unit is restricted to specific groups of "
 "learners"
 msgstr ""
-"Truy cập vào một số nội dung trong đơn vị này bị hạn chế đối với một số nhóm "
-"người học cụ thể"
+"Truy cập vào một số nội dung trong đơn vị này bị hạn chế đối với một số nhóm"
+" người học cụ thể"
 
 #: cms/templates/js/course-outline.underscore
 msgid "Ungraded"
@@ -10012,8 +10029,8 @@ msgid ""
 "The general category for this type of assignment, for example, Homework or "
 "Midterm Exam. This name is visible to learners."
 msgstr ""
-"Danh mục chung cho loại bài tập này, ví dụ: Bài tập về nhà hoặc Bài kiểm tra "
-"giữa kỳ. Tên này hiển thị cho người học."
+"Danh mục chung cho loại bài tập này, ví dụ: Bài tập về nhà hoặc Bài kiểm tra"
+" giữa kỳ. Tên này hiển thị cho người học."
 
 #: cms/templates/js/course_grade_policy.underscore
 msgid "Abbreviation"
@@ -10021,11 +10038,11 @@ msgstr "Viết tắt"
 
 #: cms/templates/js/course_grade_policy.underscore
 msgid ""
-"This short name for the assignment type (for example, HW or Midterm) appears "
-"next to assignments on a learner's Progress page."
+"This short name for the assignment type (for example, HW or Midterm) appears"
+" next to assignments on a learner's Progress page."
 msgstr ""
-"Tên ngắn cho loại bài tập (ví dụ: BTVN hoặc KTra) xuất hiện bên cạnh các bài "
-"tập trên trang Tiến độ của người học."
+"Tên ngắn cho loại bài tập (ví dụ: BTVN hoặc KTra) xuất hiện bên cạnh các bài"
+" tập trên trang Tiến độ của người học."
 
 #: cms/templates/js/course_grade_policy.underscore
 msgid "Weight of Total Grade"
@@ -10058,8 +10075,8 @@ msgid ""
 "The number of assignments of this type that will be dropped. The lowest "
 "scoring assignments are dropped first."
 msgstr ""
-"Số lượng bài tập thuộc loại này sẽ bị loại bỏ. Những bài tập có điểm thấp sẽ "
-"bị loại bỏ trước."
+"Số lượng bài tập thuộc loại này sẽ bị loại bỏ. Những bài tập có điểm thấp sẽ"
+" bị loại bỏ trước."
 
 #: cms/templates/js/course_info_handouts.underscore
 msgid "Course Handouts"
@@ -10071,8 +10088,8 @@ msgstr "Bạn không có tài liệu phát tay"
 
 #: cms/templates/js/course_info_handouts.underscore
 msgid ""
-"There is invalid code in your content. Please check to make sure it is valid "
-"HTML."
+"There is invalid code in your content. Please check to make sure it is valid"
+" HTML."
 msgstr ""
 "Có mã không hợp lệ trong nội dung của bạn. Vui lòng kiểm tra để chắc chắn "
 "rằng đó là HTML hợp lệ."
@@ -10184,8 +10201,8 @@ msgstr "Cấu hình Nhóm này được sử dụng trong:"
 
 #: cms/templates/js/group-configuration-details.underscore
 msgid ""
-"This Group Configuration is not in use. Start by adding a content experiment "
-"to any Unit via the {linkStart}Course Outline{linkEnd}."
+"This Group Configuration is not in use. Start by adding a content experiment"
+" to any Unit via the {linkStart}Course Outline{linkEnd}."
 msgstr ""
 "Cấu hình Nhóm này không được sử dụng. Bắt đầu bằng cách thêm thử nghiệm nội "
 "dung cho bất kỳ Đơn vị nào thông qua {linkStart}Đề cương Khóa học{linkEnd}."
@@ -10248,8 +10265,8 @@ msgstr "Xoá nhóm"
 
 #: cms/templates/js/highlights-editor.underscore
 msgid ""
-"This feature is currently in testing. Course teams can enter highlights, but "
-"learners will not receive email messages."
+"This feature is currently in testing. Course teams can enter highlights, but"
+" learners will not receive email messages."
 msgstr ""
 
 #: cms/templates/js/highlights-editor.underscore
@@ -10291,8 +10308,8 @@ msgid ""
 "The following message will be displayed at the bottom of the courseware "
 "pages within your course:"
 msgstr ""
-"Thông báo sau sẽ được hiển thị ở dưới cùng của các trang giáo trình khóa học "
-"của bạn:"
+"Thông báo sau sẽ được hiển thị ở dưới cùng của các trang giáo trình khóa học"
+" của bạn:"
 
 #: cms/templates/js/license-selector.underscore
 msgid "Creative Commons licensed content, with terms as follow:"
@@ -10444,11 +10461,11 @@ msgstr "Trạng thái Xuất bản"
 
 #: cms/templates/js/publish-xblock.underscore
 msgid ""
-"Draft saved on {lastSavedStart}{editedOn}{lastSavedEnd} by {editedByStart}"
-"{editedBy}{editedByEnd}"
+"Draft saved on {lastSavedStart}{editedOn}{lastSavedEnd} by "
+"{editedByStart}{editedBy}{editedByEnd}"
 msgstr ""
-"Dự thảo lưu trên {lastSavedStart}{editedOn}{lastSavedEnd} bởi {editedByStart}"
-"{editedBy}{editedByEnd}"
+"Dự thảo lưu trên {lastSavedStart}{editedOn}{lastSavedEnd} bởi "
+"{editedByStart}{editedBy}{editedByEnd}"
 
 #: cms/templates/js/publish-xblock.underscore
 msgid ""
@@ -10571,8 +10588,8 @@ msgstr ""
 
 #: cms/templates/js/show-correctness-editor.underscore
 msgid ""
-"If the subsection does not have a due date, learners always see their scores "
-"when they submit answers to assessments."
+"If the subsection does not have a due date, learners always see their scores"
+" when they submit answers to assessments."
 msgstr ""
 "Nếu phần con không có ngày đến hạn, người học sẽ luôn thấy điểm của họ khi "
 "họ nộp câu trả lời cho các đánh giá."
@@ -10694,7 +10711,8 @@ msgstr "gửi một email đến {email}"
 
 #: cms/templates/js/team-member.underscore
 msgid "Promote another member to Admin to remove your admin rights"
-msgstr "Tiến cử các thành viên khác quản trị để loại bỏ quyền quản trị của bạn"
+msgstr ""
+"Tiến cử các thành viên khác quản trị để loại bỏ quyền quản trị của bạn"
 
 #: cms/templates/js/team-member.underscore
 msgid "Add {role} Access"
@@ -10744,8 +10762,8 @@ msgid ""
 msgstr ""
 "Sử dụng bài thi có thời gian để giới hạn thời gian người học làm bài trong "
 "phần con này. Người học phải nộp câu trả lời trước khi hết hạn. Bạn có thể "
-"cho phép thêm thời gian cho người học cá nhân thông qua Bảng thông tin Giảng "
-"viên."
+"cho phép thêm thời gian cho người học cá nhân thông qua Bảng thông tin Giảng"
+" viên."
 
 #: cms/templates/js/timed-examination-preference-editor.underscore
 msgid "Proctored"
@@ -10758,8 +10776,8 @@ msgid ""
 "examination rules."
 msgstr ""
 "Bài thi có giám sát được tính giờ và ghi lại video mỗi học viên tham dự bài "
-"thi. Các video này sau đó được xem xét để đảm bảo rằng các học viên tuân thủ "
-"tất cả các quy tắc kiểm tra."
+"thi. Các video này sau đó được xem xét để đảm bảo rằng các học viên tuân thủ"
+" tất cả các quy tắc kiểm tra."
 
 #: cms/templates/js/timed-examination-preference-editor.underscore
 msgid "Onboarding"
@@ -10793,8 +10811,8 @@ msgstr "Thời gian Quy định (HH:MM):"
 #: cms/templates/js/timed-examination-preference-editor.underscore
 msgid ""
 "Select a time allotment for the exam. If it is over 24 hours, type in the "
-"amount of time. You can grant individual learners extra time to complete the "
-"exam through the Instructor Dashboard."
+"amount of time. You can grant individual learners extra time to complete the"
+" exam through the Instructor Dashboard."
 msgstr ""
 "Chọn phân bổ thời gian cho bài thi. Nếu hơn 24 giờ, nhập vào khoảng thời "
 "gian. Bạn có thể cho học viên thêm thời gian để hoàn thành bài kiểm tra "
@@ -10813,9 +10831,9 @@ msgid ""
 "proctored exam rules{linkEnd}."
 msgstr ""
 "Chỉ định bất kỳ quy tắc hoặc các ngoại lệ quy tắc nào mà nhóm đánh giá giám "
-"sát cần thực hiện khi xem xét video. Ví dụ, bạn có thể chỉ định được phép sử "
-"dụng máy tính cầm tay. Các quy tắc được chỉ định này hiển thị cho người học "
-"trước khi người học bắt đầu bài kiểm tra, cùng với {linkStart}các quy tắc "
+"sát cần thực hiện khi xem xét video. Ví dụ, bạn có thể chỉ định được phép sử"
+" dụng máy tính cầm tay. Các quy tắc được chỉ định này hiển thị cho người học"
+" trước khi người học bắt đầu bài kiểm tra, cùng với {linkStart}các quy tắc "
 "thi có giám sát chung{linkEnd}."
 
 #: cms/templates/js/timed-examination-preference-editor.underscore
@@ -10830,8 +10848,8 @@ msgid ""
 "before the learners start the exam."
 msgstr ""
 "Chỉ định bất kỳ quy tắc hoặc các ngoại lệ quy tắc nào mà nhóm đánh giá giám "
-"sát cần thực hiện khi xem xét video. Ví dụ, bạn có thể chỉ định được phép sử "
-"dung máy tính cầm tay. Các quy tắc cụ thể này được hiển thị cho người học "
+"sát cần thực hiện khi xem xét video. Ví dụ, bạn có thể chỉ định được phép sử"
+" dung máy tính cầm tay. Các quy tắc cụ thể này được hiển thị cho người học "
 "trước khi người học bắt đầu bài làm bài kiểm thi."
 
 #: cms/templates/js/transcript-organization-credentials.underscore
@@ -10880,8 +10898,8 @@ msgid ""
 "This group no longer exists. Choose another group or do not restrict access "
 "to this unit."
 msgstr ""
-"Nhóm này không còn tồn tại. Chọn một nhóm khác hoặc không hạn chế quyền truy "
-"cập vào đơn vị này."
+"Nhóm này không còn tồn tại. Chọn một nhóm khác hoặc không hạn chế quyền truy"
+" cập vào đơn vị này."
 
 #: cms/templates/js/upload-dialog.underscore
 msgid "File upload succeeded"
@@ -10949,8 +10967,8 @@ msgstr "(Yêu cầu) chỉnh sửa %(display_name)s"
 
 #: cms/templates/js/maintenance/force-published-course-response.underscore
 msgid ""
-"You have done a dry run of force publishing the course. Nothing has changed. "
-"Had you run it, the following course versions would have been change."
+"You have done a dry run of force publishing the course. Nothing has changed."
+" Had you run it, the following course versions would have been change."
 msgstr ""
 "Bạn đã thực hiện chạy thử nghiệm xuất bản khóa học. Không có gì thay đổi. "
 "Nếu bạn chạy nó, những phiên bản khóa học sau đây có thể sẽ thay đổi."
@@ -10969,8 +10987,8 @@ msgstr "Thêm URL cho các phiên bản bổ sung"
 
 #: cms/templates/js/video/transcripts/metadata-videolist-entry.underscore
 msgid ""
-"To be sure all students can access the video, we recommend providing both "
-"an .mp4 and a .webm version of your video. Click below to add a URL for "
+"To be sure all students can access the video, we recommend providing both an"
+" .mp4 and a .webm version of your video. Click below to add a URL for "
 "another version. These URLs cannot be YouTube URLs. The first listed video "
 "that's compatible with the student's computer will play."
 msgstr ""
@@ -10991,11 +11009,11 @@ msgstr "Xung đột Bản dịch Đông bộ thời gian"
 
 #: cms/templates/js/video/transcripts/messages/transcripts-choose.underscore
 msgid ""
-"The timed transcript for the first video file does not appear to be the same "
-"as the timed transcript for the second video file."
+"The timed transcript for the first video file does not appear to be the same"
+" as the timed transcript for the second video file."
 msgstr ""
-"Bản dịch đồng bộ thời gian cho tệp video đầu không khớp với bản dịch đồng bộ "
-"thời gian cho tệp video thứ hai."
+"Bản dịch đồng bộ thời gian cho tệp video đầu không khớp với bản dịch đồng bộ"
+" thời gian cho tệp video thứ hai."
 
 #: cms/templates/js/video/transcripts/messages/transcripts-choose.underscore
 msgid "Which timed transcript would you like to use?"
@@ -11055,9 +11073,9 @@ msgstr "Không có Bản dịch Đồng bộ thời gian"
 
 #: cms/templates/js/video/transcripts/messages/transcripts-import.underscore
 msgid ""
-"EdX doesn't have a timed transcript for this video in Studio, but we found a "
-"transcript on YouTube. You can import the YouTube transcript or upload your "
-"own .srt transcript file."
+"EdX doesn't have a timed transcript for this video in Studio, but we found a"
+" transcript on YouTube. You can import the YouTube transcript or upload your"
+" own .srt transcript file."
 msgstr ""
 "EdX không có bản dịch đồng bộ thời gian cho video này trong Studio, nhưng "
 "chúng tôi đã tìm thấy một bản dịch trên YouTube. Bạn có thể nhập bản dịch "
@@ -11076,16 +11094,16 @@ msgid ""
 "EdX doesn\\'t have a timed transcript for this video. Please upload an .srt "
 "file."
 msgstr ""
-"EdX không có bản dịch đồng bộ thời gian cho video này. Hãy tải lên một tệp ."
-"srt."
+"EdX không có bản dịch đồng bộ thời gian cho video này. Hãy tải lên một tệp "
+".srt."
 
 #: cms/templates/js/video/transcripts/messages/transcripts-replace.underscore
 msgid ""
-"The timed transcript for this video on edX is out of date, but YouTube has a "
-"current timed transcript for this video."
+"The timed transcript for this video on edX is out of date, but YouTube has a"
+" current timed transcript for this video."
 msgstr ""
-"Bản dịch đồng bộ thời gian cho video này trên edX đã lỗi thời, nhưng YouTube "
-"có bản dịch đồng bộ thời gian cho video này."
+"Bản dịch đồng bộ thời gian cho video này trên edX đã lỗi thời, nhưng YouTube"
+" có bản dịch đồng bộ thời gian cho video này."
 
 #: cms/templates/js/video/transcripts/messages/transcripts-replace.underscore
 msgid "Do you want to replace the edX transcript with the YouTube transcript?"
@@ -11106,8 +11124,8 @@ msgid ""
 "transcript, you can download, edit, and re-upload the existing transcript."
 msgstr ""
 "EdX có Bản dịch đồng bộ thời gian cho video này. Nếu bạn muốn thay thế bản "
-"dịch này, hãy tải lên tệp bản dịch .srt mới. Nếu bạn muốn chỉnh sửa bản dịch "
-"này, bạn có thể tải xuống, chỉnh sửa và tải lại bản dịch hiện tại."
+"dịch này, hãy tải lên tệp bản dịch .srt mới. Nếu bạn muốn chỉnh sửa bản dịch"
+" này, bạn có thể tải xuống, chỉnh sửa và tải lại bản dịch hiện tại."
 
 #: cms/templates/js/video/transcripts/messages/transcripts-use-existing.underscore
 msgid "Confirm Timed Transcript"
@@ -11116,12 +11134,12 @@ msgstr "Xác nhận Bản dịch Đồng bộ thời gian"
 #: cms/templates/js/video/transcripts/messages/transcripts-use-existing.underscore
 msgid ""
 "You changed a video URL, but did not change the timed transcript file. Do "
-"you want to use the current timed transcript or upload a new .srt transcript "
-"file?"
+"you want to use the current timed transcript or upload a new .srt transcript"
+" file?"
 msgstr ""
-"Bạn đã thay đổi một URL của video, nhưng không thay đổi tệp bản dịch đồng bộ "
-"thời gian. Bạn muốn sử dụng bản dịch đồng bộ thời gian hiện tại hay tải lên "
-"tệp bản dịch .srt mới?"
+"Bạn đã thay đổi một URL của video, nhưng không thay đổi tệp bản dịch đồng bộ"
+" thời gian. Bạn muốn sử dụng bản dịch đồng bộ thời gian hiện tại hay tải lên"
+" tệp bản dịch .srt mới?"
 
 #: cms/templates/js/video/transcripts/messages/transcripts-use-existing.underscore
 msgid "Use Current Transcript"

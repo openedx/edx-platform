@@ -197,7 +197,8 @@ msgstr "Необхідний файл транскрипту. "
 #: cms/djangoapps/contentstore/views/transcripts_ajax.py
 #: common/lib/xmodule/xmodule/video_module/video_handlers.py
 msgid ""
-"There is a problem with this transcript file. Try to upload a different file."
+"There is a problem with this transcript file. Try to upload a different "
+"file."
 msgstr ""
 "Виникла проблема з файлом транскрипту. Будь ласка спробуйте завантажити "
 "інший файл."
@@ -260,7 +261,8 @@ msgid ""
 "verification."
 msgstr ""
 "ОПЦІОНАЛЬНО: Після цієї дати/часу, користувачам більше не зможуть надсилати "
-"фотографії для перевірки. Це діє тільки для режимів, які вимагають перевірки."
+"фотографії для перевірки. Це діє тільки для режимів, які вимагають "
+"перевірки."
 
 #: common/djangoapps/course_modes/helpers.py
 msgid "Your verification is pending"
@@ -344,8 +346,8 @@ msgstr ""
 #: common/djangoapps/course_modes/models.py
 msgid ""
 "OPTIONAL: This is the SKU (stock keeping unit) of this mode in the external "
-"ecommerce service.  Leave this blank if the course has not yet been migrated "
-"to the ecommerce service."
+"ecommerce service.  Leave this blank if the course has not yet been migrated"
+" to the ecommerce service."
 msgstr ""
 "ОПЦІОНАЛЬНО: Це SKU (ідентифікатор товарної одиниці) цього режиму в "
 "зовнішній службі електронної комерції. Залиште це поле порожнім, якщо курс "
@@ -361,7 +363,8 @@ msgstr ""
 
 #: common/djangoapps/course_modes/models.py
 msgid ""
-"Professional education modes are not allowed to have expiration_datetime set."
+"Professional education modes are not allowed to have expiration_datetime "
+"set."
 msgstr ""
 "Режиму професійної освіти не дозволено мати встановленої дати закінчення."
 
@@ -388,7 +391,8 @@ msgid "Free"
 msgstr "Безкоштовно"
 
 #: common/djangoapps/course_modes/models.py
-msgid "The time period before a course ends in which a course mode will expire"
+msgid ""
+"The time period before a course ends in which a course mode will expire"
 msgstr "Період часу до кінця курсу, після чого вказанний режим закінчується"
 
 #: common/djangoapps/course_modes/views.py
@@ -436,7 +440,8 @@ msgstr "Пароль"
 
 #: common/djangoapps/student/admin.py
 msgid ""
-"Raw passwords are not stored, so there is no way to see this user's password."
+"Raw passwords are not stored, so there is no way to see this user's "
+"password."
 msgstr ""
 "Паролі у відкритому вигляді не зберегаються, таким чином неможливо отримати "
 "пароль користувача."
@@ -453,8 +458,8 @@ msgstr[3] ""
 #: common/djangoapps/student/admin.py
 #, python-brace-format
 msgid ""
-"Please add a key/value 'THIRD_PARTY_AUTH_ONLY_DOMAIN/{site_email_domain}' in "
-"SiteConfiguration model's site_values field."
+"Please add a key/value 'THIRD_PARTY_AUTH_ONLY_DOMAIN/{site_email_domain}' in"
+" SiteConfiguration model's site_values field."
 msgstr ""
 
 #: common/djangoapps/student/admin.py
@@ -521,8 +526,8 @@ msgid ""
 "Invalid permission codename: \"{codename}\".  No such permission exists for "
 "the model {module}.{model_name}."
 msgstr ""
-"Неприпустимий дозвіл codename: \"{codename}\". Для моделі {module}."
-"{model_name} не існує такого дозволу."
+"Неприпустимий дозвіл codename: \"{codename}\". Для моделі "
+"{module}.{model_name} не існує такого дозволу."
 
 #: common/djangoapps/student/management/commands/manage_user.py
 #, python-brace-format
@@ -702,8 +707,8 @@ msgstr "Ім'я affiliate сookie"
 
 #: common/djangoapps/student/models.py
 msgid ""
-"It expect that the data will be provided in a csv file format "
-"with                     first row being the header and columns will be as "
+"It expect that the data will be provided in a csv file format with"
+"                     first row being the header and columns will be as "
 "follows:                     user_id, username, email, course_id, "
 "is_verified, verification_date"
 msgstr ""
@@ -791,12 +796,12 @@ msgstr "Фото на документі розмите"
 #, python-brace-format
 msgid ""
 "Check your {email_start}{email}{email_end} inbox for an account activation "
-"link from {platform_name}. If you need help, contact {link_start}"
-"{platform_name} Support{link_end}."
+"link from {platform_name}. If you need help, contact "
+"{link_start}{platform_name} Support{link_end}."
 msgstr ""
 "Перевірте ваш імейл {email_start}{email}{email_end} на наявність посилання "
-"активації облікового запису від {platform_name}. Якщо вам потрібна допомога, "
-"зверніться в  {link_start}службу підтримки {platform_name}{link_end}."
+"активації облікового запису від {platform_name}. Якщо вам потрібна допомога,"
+" зверніться в  {link_start}службу підтримки {platform_name}{link_end}."
 
 #: common/djangoapps/student/views/dashboard.py
 #, python-brace-format
@@ -970,21 +975,21 @@ msgid ""
 "prompted with a login dialog."
 msgstr ""
 "Якщо цей параметр активований, користувачі, які відвідують URL-адресу \"TPA "
-"hinted\" для цього провайдера (наприклад, URL-адреса, що закінчується на `?"
-"tpa_hint=[provider_name]`), будуть безпосередньо переадресовані на URL-"
+"hinted\" для цього провайдера (наприклад, URL-адреса, що закінчується на "
+"`?tpa_hint=[provider_name]`), будуть безпосередньо переадресовані на URL-"
 "адресу входу провайдера, замість того, щоб спочатку відвідати діалогове "
 "вікно входу."
 
 #: common/djangoapps/third_party_auth/models.py
 msgid ""
 "If this option is enabled, users will not be asked to confirm their details "
-"(name, email, etc.) during the registration process. Only select this option "
-"for trusted providers that are known to provide accurate user information."
+"(name, email, etc.) during the registration process. Only select this option"
+" for trusted providers that are known to provide accurate user information."
 msgstr ""
 "Якщо цей параметр активований, користувачів не будуть просити підтвердити "
 "їхні деталі (ім'я, електронна пошта, і т.п.) впродовж процесу реєстрації. "
-"Виберіть цей параметр тільки для довірених провайдерів, про яких, відомо, що "
-"вони надають точну інформацію про користувачів."
+"Виберіть цей параметр тільки для довірених провайдерів, про яких, відомо, що"
+" вони надають точну інформацію про користувачів."
 
 #: common/djangoapps/third_party_auth/models.py
 msgid ""
@@ -1017,8 +1022,8 @@ msgstr ""
 msgid ""
 "If this option is set, then users logging in using this SSO provider will "
 "have their session length limited to no longer than this value. If set to 0 "
-"(zero), the session will expire upon the user closing their browser. If left "
-"blank, the Django platform session default length will be used."
+"(zero), the session will expire upon the user closing their browser. If left"
+" blank, the Django platform session default length will be used."
 msgstr ""
 "Якщо цей параметр встановлено, тоді користувачі, які ввійшли за допомогою "
 "цього провайдера SSO, матимуть обмеження на тривалість сеансу, що не "
@@ -1419,13 +1424,17 @@ msgid "The file must end with the extension '{file_types}'."
 msgid_plural ""
 "The file must end with one of the following extensions: '{file_types}'."
 msgstr[0] ""
-"Ім`я файлу повинно закінчуватись одним з наступних розширень: '{file_types}'."
+"Ім`я файлу повинно закінчуватись одним з наступних розширень: "
+"'{file_types}'."
 msgstr[1] ""
-"Ім`я файлу повинно закінчуватись одним з наступних розширень: '{file_types}'."
+"Ім`я файлу повинно закінчуватись одним з наступних розширень: "
+"'{file_types}'."
 msgstr[2] ""
-"Ім`я файлу повинно закінчуватись одним з наступних розширень: '{file_types}'."
+"Ім`я файлу повинно закінчуватись одним з наступних розширень: "
+"'{file_types}'."
 msgstr[3] ""
-"Ім`я файлу повинно закінчуватись одним з наступних розширень: '{file_types}'."
+"Ім`я файлу повинно закінчуватись одним з наступних розширень: "
+"'{file_types}'."
 
 #: common/djangoapps/util/file.py
 #, python-brace-format
@@ -1689,8 +1698,8 @@ msgid ""
 "accordingly, as deprecated does not impact whether or not new XBlock "
 "instances can be created in Studio."
 msgstr ""
-"Тільки блоки XBlock, що зазначені в списку курса Advanced Module List можуть "
-"бути відключені. Не забудьте оновити стан підтримки "
+"Тільки блоки XBlock, що зазначені в списку курса Advanced Module List можуть"
+" бути відключені. Не забудьте оновити стан підтримки "
 "XBlockStudioConfiguration відповідно, оскільки відключені блоки XBlock "
 "можуть бути створені в Студії."
 
@@ -1738,11 +1747,13 @@ msgstr "Неможливо переоцінити задачі з можливи
 msgid "Question {}"
 msgstr ""
 
-#: common/lib/capa/capa/capa_problem.py common/lib/xmodule/xmodule/capa_base.py
+#: common/lib/capa/capa/capa_problem.py
+#: common/lib/xmodule/xmodule/capa_base.py
 msgid "Incorrect"
 msgstr "Неправильно"
 
-#: common/lib/capa/capa/capa_problem.py common/lib/xmodule/xmodule/capa_base.py
+#: common/lib/capa/capa/capa_problem.py
+#: common/lib/xmodule/xmodule/capa_base.py
 msgid "Correct"
 msgstr "Правильно"
 
@@ -1854,8 +1865,8 @@ msgstr ""
 #, python-brace-format
 msgid "No response from Xqueue within {xqueue_timeout} seconds. Aborted."
 msgstr ""
-"Немає відгуку від підсистеми Xqueue протягом {xqueue_timeout} секунд. Роботу "
-"припинено."
+"Немає відгуку від підсистеми Xqueue протягом {xqueue_timeout} секунд. Роботу"
+" припинено."
 
 #: common/lib/capa/capa/inputtypes.py
 msgid "Error running code."
@@ -1989,8 +2000,8 @@ msgstr "Некоректний математичний синтаксис: '{st
 #: common/lib/capa/capa/responsetypes.py
 msgid "You may not use complex numbers in range tolerance problems"
 msgstr ""
-"Ви не можете використовувати комплексні числа в діапазоні допустимих значень "
-"завдання"
+"Ви не можете використовувати комплексні числа в діапазоні допустимих значень"
+" завдання"
 
 #. Translators: This is an error message for a math problem. If the instructor
 #. provided a
@@ -2010,8 +2021,8 @@ msgstr ""
 msgid ""
 "There was a problem with the staff answer to this problem: empty boundary."
 msgstr ""
-"Виявлена ​​проблема з відповіддю співробітників курсу на це завдання: порожня "
-"межа."
+"Виявлена ​​проблема з відповіддю співробітників курсу на це завдання: "
+"порожня межа."
 
 #. Translators: Separator used in NumericalResponse to display multiple
 #. answers.
@@ -2099,8 +2110,8 @@ msgstr "Введення математичних виразів"
 #: common/lib/capa/capa/responsetypes.py
 #, python-brace-format
 msgid ""
-"Factorial function not permitted in answer for this problem. Provided answer "
-"was: {bad_input}"
+"Factorial function not permitted in answer for this problem. Provided answer"
+" was: {bad_input}"
 msgstr ""
 "Факторіальна функція не дозволена у відповідь на це завдання. Надана "
 "відповідь: {bad_input}"
@@ -2207,8 +2218,8 @@ msgstr "Максимальна кількість спроб"
 
 #: common/lib/xmodule/xmodule/capa_base.py
 msgid ""
-"Defines the number of times a student can try to answer this problem. If the "
-"value is not set, infinite attempts are allowed."
+"Defines the number of times a student can try to answer this problem. If the"
+" value is not set, infinite attempts are allowed."
 msgstr ""
 "Визначає, скільки разів студент може давати відповідь на завдання. Якщо "
 "значення не встановлено, надається необмежена кількість спроб."
@@ -2258,8 +2269,8 @@ msgid ""
 "Defines when to show the answer to the problem. A default value can be set "
 "in Advanced Settings."
 msgstr ""
-"Визначає, коли відображати відповідь на завдання. У розширених налаштуваннях "
-"можна встановити значення за замовчуванням."
+"Визначає, коли відображати відповідь на завдання. У розширених налаштуваннях"
+" можна встановити значення за замовчуванням."
 
 #: common/lib/xmodule/xmodule/capa_base.py
 msgid "Answered"
@@ -2403,8 +2414,8 @@ msgstr "Вага завдання"
 
 #: common/lib/xmodule/xmodule/capa_base.py
 msgid ""
-"Defines the number of points each problem is worth. If the value is not set, "
-"each response field in the problem is worth one point."
+"Defines the number of points each problem is worth. If the value is not set,"
+" each response field in the problem is worth one point."
 msgstr ""
 "Визначає кількість балів за кожне завдання. Якщо значення не вказано, кожне "
 "поле для відповіді в завданні буде оцінюватися в один бал."
@@ -2507,8 +2518,8 @@ msgstr "Підказка ({hint_num} з {hints_count}):"
 msgid ""
 "Your answers were previously saved. Click '{button_name}' to grade them."
 msgstr ""
-"Ваші відповіді були збережені раніше. Натисніть '{button_name}', щоб оцінити "
-"їх."
+"Ваші відповіді були збережені раніше. Натисніть '{button_name}', щоб оцінити"
+" їх."
 
 #: common/lib/xmodule/xmodule/capa_base.py
 #, python-brace-format
@@ -2553,7 +2564,8 @@ msgstr "Задача закрита."
 
 #: common/lib/xmodule/xmodule/capa_base.py
 msgid "Problem must be reset before it can be submitted again."
-msgstr "Задача повинна бути скинута, перш ніж можна буде знову дати відповідь."
+msgstr ""
+"Задача повинна бути скинута, перш ніж можна буде знову дати відповідь."
 
 #: common/lib/xmodule/xmodule/capa_base.py
 #, python-brace-format
@@ -2676,8 +2688,8 @@ msgstr "Джерельні компоненти"
 #: common/lib/xmodule/xmodule/conditional_module.py
 msgid ""
 "The component location IDs of all source components that are used to "
-"determine whether a learner is shown the content of this conditional module. "
-"Copy the component location ID of a component from its Settings dialog in "
+"determine whether a learner is shown the content of this conditional module."
+" Copy the component location ID of a component from its Settings dialog in "
 "Studio."
 msgstr ""
 "Ідентифікатори місцезнаходження компонентів усіх вхідних компонентів, які "
@@ -2703,8 +2715,8 @@ msgstr "Умовне значення"
 
 #: common/lib/xmodule/xmodule/conditional_module.py
 msgid ""
-"The value that the conditional attribute of the source components must match "
-"before a learner is shown the content of this conditional module."
+"The value that the conditional attribute of the source components must match"
+" before a learner is shown the content of this conditional module."
 msgstr ""
 "Значення,  з яким повинен співпадати умовний атрибут компонентів джерела, "
 "щоб учнень побачив зміст цього умовного модуля."
@@ -2729,7 +2741,8 @@ msgstr ""
 #: common/lib/xmodule/xmodule/conditional_module.py
 #, python-brace-format
 msgid "You must complete {link} before you can access this unit."
-msgstr "Ви повинні виконати {link}, перш ніж отримати доступ до цього розділу."
+msgstr ""
+"Ви повинні виконати {link}, перш ніж отримати доступ до цього розділу."
 
 #: common/lib/xmodule/xmodule/conditional_module.py
 msgid "This component has no source components configured yet."
@@ -2754,8 +2767,8 @@ msgstr "Реєстраційні дані LTI"
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid ""
-"Enter the passports for course LTI tools in the following format: \"id:"
-"client_key:client_secret\"."
+"Enter the passports for course LTI tools in the following format: "
+"\"id:client_key:client_secret\"."
 msgstr ""
 "Введіть паспорти для LTI інструментів курсу у такому форматі: \"id: "
 "client_key: client_secret\"."
@@ -2797,13 +2810,13 @@ msgstr "Відображення вартості курсу"
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid ""
-"The cost displayed to students for enrolling in the course. If a paid course "
-"registration price is set by an administrator in the database, that price "
+"The cost displayed to students for enrolling in the course. If a paid course"
+" registration price is set by an administrator in the database, that price "
 "will be displayed instead of this one."
 msgstr ""
 "Вартість зарахування на курс, що відображається студентам. Якщо ціна за "
-"запис на курс встановлена адміністратором у базі даних, то вказана ціна буде "
-"відображатися замість цієї."
+"запис на курс встановлена адміністратором у базі даних, то вказана ціна буде"
+" відображатися замість цієї."
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid "Course Advertised Start"
@@ -2815,8 +2828,8 @@ msgid ""
 "for the course, such as \"Winter 2018\". If you enter null for this value, "
 "the start date that you have set for this course is used."
 msgstr ""
-"Введіть текст, який ви хочете використовувати як оголошений стартовий період "
-"для курсу, наприклад \"Зима 2018\". Якщо нічого не вводити, буде "
+"Введіть текст, який ви хочете використовувати як оголошений стартовий період"
+" для курсу, наприклад \"Зима 2018\". Якщо нічого не вводити, буде "
 "використувана дата початку цього курсу."
 
 #: common/lib/xmodule/xmodule/course_module.py
@@ -2861,8 +2874,7 @@ msgstr "Редактор курсу"
 
 #: common/lib/xmodule/xmodule/course_module.py
 #: common/lib/xmodule/xmodule/modulestore/inheritance.py
-msgid ""
-"Enter the method by which this course is edited (\"XML\" or \"Studio\")."
+msgid "Enter the method by which this course is edited (\"XML\" or \"Studio\")."
 msgstr "Введіть спосіб редагування курсу (\"XML\" або \"Studio\")."
 
 #: common/lib/xmodule/xmodule/course_module.py
@@ -2887,20 +2899,20 @@ msgid ""
 "forums. Inside the provided brackets, enter an additional set of square "
 "brackets surrounding each pair of dates you add. Format each pair of dates "
 "as [\"YYYY-MM-DD\", \"YYYY-MM-DD\"]. To specify times as well as dates, "
-"format each pair as [\"YYYY-MM-DDTHH:MM\", \"YYYY-MM-DDTHH:MM\"]. Be sure to "
-"include the \"T\" between the date and time. For example, an entry defining "
-"two blackout periods looks like this, including the outer pair of square "
+"format each pair as [\"YYYY-MM-DDTHH:MM\", \"YYYY-MM-DDTHH:MM\"]. Be sure to"
+" include the \"T\" between the date and time. For example, an entry defining"
+" two blackout periods looks like this, including the outer pair of square "
 "brackets: [[\"2015-09-15\", \"2015-09-21\"], [\"2015-10-01\", "
 "\"2015-10-08\"]] "
 msgstr ""
 "Введіть пари дат, коли студенти не можуть розміщувати пости на дискусійних "
 "форумах. У межах наданих дужок введіть додаткові квадратні дужки, що "
 "оточують кожну пару дат, яку ви додаєте. Формат кожної пари дат: [\"РРРР-ММ-"
-"ДД\", \"РРРР-ММ-ДД\"]. Щоб вказати як час, так і дату, форматуйте кожну пару "
-"як [\"РРРРМ-ММ-ДДТЧ: ММ\", \"РРРР-ММ-ДДТЧ: ММ\"]. Не забудьте включити \"T\" "
-"між датою та часом. Наприклад, запис, який визначає два періоди відключення, "
-"виглядає таким чином, включаючи зовнішню пару квадратних дужок: "
-"[[\"2015-09-15\", \"2015-09-21\"], [\"2015-10-01\", \" 2015-10-08 \"]]"
+"ДД\", \"РРРР-ММ-ДД\"]. Щоб вказати як час, так і дату, форматуйте кожну пару"
+" як [\"РРРРМ-ММ-ДДТЧ: ММ\", \"РРРР-ММ-ДДТЧ: ММ\"]. Не забудьте включити "
+"\"T\" між датою та часом. Наприклад, запис, який визначає два періоди "
+"відключення, виглядає таким чином, включаючи зовнішню пару квадратних дужок:"
+" [[\"2015-09-15\", \"2015-09-21\"], [\"2015-10-01\", \" 2015-10-08 \"]]"
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid "Discussion Topic Mapping"
@@ -2908,25 +2920,26 @@ msgstr "Схема тем обговорення"
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid ""
-"Enter discussion categories in the following format: \"CategoryName\": {\"id"
-"\": \"i4x-InstitutionName-CourseNumber-course-CourseRun\"}. For example, one "
-"discussion category may be \"Lydian Mode\": {\"id\": \"i4x-UniversityX-"
-"MUS101-course-2015_T1\"}. The \"id\" value for each category must be unique. "
-"In \"id\" values, the only special characters that are supported are "
-"underscore, hyphen, and period. You can also specify a category as the "
-"default for new posts in the Discussion page by setting its \"default\" "
-"attribute to true. For example, \"Lydian Mode\": {\"id\": \"i4x-UniversityX-"
-"MUS101-course-2015_T1\", \"default\": true}."
+"Enter discussion categories in the following format: \"CategoryName\": "
+"{\"id\": \"i4x-InstitutionName-CourseNumber-course-CourseRun\"}. For "
+"example, one discussion category may be \"Lydian Mode\": {\"id\": "
+"\"i4x-UniversityX-MUS101-course-2015_T1\"}. The \"id\" value for each "
+"category must be unique. In \"id\" values, the only special characters that "
+"are supported are underscore, hyphen, and period. You can also specify a "
+"category as the default for new posts in the Discussion page by setting its "
+"\"default\" attribute to true. For example, \"Lydian Mode\": {\"id\": "
+"\"i4x-UniversityX-MUS101-course-2015_T1\", \"default\": true}."
 msgstr ""
-"Введіть категорії обговорення у такому форматі: \"Назва категорії\": {\"id"
-"\": \"i4x-InstitutionName-CourseNumber-course-CourseRun\"}. Наприклад, одна "
-"категорія обговорення може бути \"Lydian Mode\": {\"id\": \"i4x-UniversityX-"
-"MUS101-course-2015_T1\"}. Значення \"id\" для кожної категорії має бути "
-"унікальним. У значеннях \"id\" підтримуються лише такі спеціальні символи, "
-"як нижнє підкреслення, дефіс та точка. Ви також можете вказати категорію як "
-"стандартну для нових публікацій на сторінці \"Обговорення\", встановивши її "
-"атрибут \"default\" як \"true\". Наприклад, \"Lydian Mode\": {\"id\": \"i4x-"
-"UniversityX-MUS101-course-2015_T1\", \"default\": true}."
+"Введіть категорії обговорення у такому форматі: \"Назва категорії\": "
+"{\"id\": \"i4x-InstitutionName-CourseNumber-course-CourseRun\"}. Наприклад, "
+"одна категорія обговорення може бути \"Lydian Mode\": {\"id\": "
+"\"i4x-UniversityX-MUS101-course-2015_T1\"}. Значення \"id\" для кожної "
+"категорії має бути унікальним. У значеннях \"id\" підтримуються лише такі "
+"спеціальні символи, як нижнє підкреслення, дефіс та точка. Ви також можете "
+"вказати категорію як стандартну для нових публікацій на сторінці "
+"\"Обговорення\", встановивши її атрибут \"default\" як \"true\". Наприклад, "
+"\"Lydian Mode\": {\"id\": \"i4x-UniversityX-MUS101-course-2015_T1\", "
+"\"default\": true}."
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid "Discussion Sorting Alphabetical"
@@ -2935,8 +2948,8 @@ msgstr "Обговорення, відсортовані за алфавітом
 #: common/lib/xmodule/xmodule/course_module.py
 msgid ""
 "Enter true or false. If true, discussion categories and subcategories are "
-"sorted alphabetically. If false, they are sorted chronologically by creation "
-"date and time."
+"sorted alphabetically. If false, they are sorted chronologically by creation"
+" date and time."
 msgstr ""
 "Введіть true або false. Якщо це true, категорії та підкатегорії дискусій "
 "сортуються в алфавітному порядку. Якщо false, вони сортуються хронологічно "
@@ -2983,7 +2996,8 @@ msgstr "Доступність мобільних курсів"
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid ""
-"Enter true or false. If true, the course will be available to mobile devices."
+"Enter true or false. If true, the course will be available to mobile "
+"devices."
 msgstr ""
 "Введіть \"true\" або \"false\". Якщо введено значення \"true\", курс буде "
 "доступний на мобільних пристроях."
@@ -3004,8 +3018,7 @@ msgstr "Курс не оцінюється"
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid "Enter true or false. If true, the course will not be graded."
-msgstr ""
-"Введіть \"true\" або \"false\". Якщо \"true\", то курс не буде оцінюватися."
+msgstr "Введіть \"true\" або \"false\". Якщо \"true\", то курс не буде оцінюватися."
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid "Disable Progress Graph"
@@ -3084,8 +3097,8 @@ msgstr "URL для CCX Connector"
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid ""
-"URL for CCX Connector application for managing creation of CCXs. (optional). "
-"Ignored unless 'Enable CCX' is set to 'true'."
+"URL for CCX Connector application for managing creation of CCXs. (optional)."
+" Ignored unless 'Enable CCX' is set to 'true'."
 msgstr ""
 "URL-адреса програми CCX Connector (необов'язково). Щоб дозволити "
 "використання CCX встановіть значення «Дозволити CCX» в true."
@@ -3161,13 +3174,13 @@ msgstr "Формат відображення терміну кінцевої д
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid ""
-"Enter the format for due dates. The default is Mon DD, YYYY. Enter \"%m-%d-%Y"
-"\" for MM-DD-YYYY, \"%d-%m-%Y\" for DD-MM-YYYY, \"%Y-%m-%d\" for YYYY-MM-DD, "
-"or \"%Y-%d-%m\" for YYYY-DD-MM."
+"Enter the format for due dates. The default is Mon DD, YYYY. Enter "
+"\"%m-%d-%Y\" for MM-DD-YYYY, \"%d-%m-%Y\" for DD-MM-YYYY, \"%Y-%m-%d\" for "
+"YYYY-MM-DD, or \"%Y-%d-%m\" for YYYY-DD-MM."
 msgstr ""
 "Введіть формат для кінцевих дат. По замовчуванню - Пн ДД, РРРР. Введіть "
-"\"%m-1 %d-%Y\" для MM-DD-YYYY, \"1 %d-%m-%Y\" для DD-MM-YYYY, \"%Y-%m-1 %d"
-"\"\" для РРРР-ММ- DD, або \"%Y- 1 %d-%m\" \" для РРРР-ДД-ММ."
+"\"%m-1 %d-%Y\" для MM-DD-YYYY, \"1 %d-%m-%Y\" для DD-MM-YYYY, \"%Y-%m-1 "
+"%d\"\" для РРРР-ММ- DD, або \"%Y- 1 %d-%m\" \" для РРРР-ДД-ММ."
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid "External Login Domain"
@@ -3208,13 +3221,13 @@ msgid ""
 msgstr ""
 "Введіть end, early_with_info або early_no_info. Після створення сертифікату "
 "студенти, які пройшли курс, бачать посилання на свої сертифікати на "
-"інформаційній панелі, а студенти, які його не пройшли, бачать інформацію про "
-"конфігурацію оцінок. За умовчанням встановлено значення end - інформація про "
-"сертифікат будe доступнa усім студентам тільки після дати закінчення курсу. "
-"Щоб відобразити інформацію про сертифікат усім студентам відразу після його "
-"створення, введіть early_with_info. Щоб відобразити лише посилання  для тих "
-"студентів, які пройшли курс відразу після створення сертифікатів, введіть "
-"early_no_info."
+"інформаційній панелі, а студенти, які його не пройшли, бачать інформацію про"
+" конфігурацію оцінок. За умовчанням встановлено значення end - інформація "
+"про сертифікат будe доступнa усім студентам тільки після дати закінчення "
+"курсу. Щоб відобразити інформацію про сертифікат усім студентам відразу "
+"після його створення, введіть early_with_info. Щоб відобразити лише "
+"посилання  для тих студентів, які пройшли курс відразу після створення "
+"сертифікатів, введіть early_no_info."
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid "Course About Page Image"
@@ -3239,8 +3252,8 @@ msgid ""
 "Edit the name of the banner image file. You can set the banner image on the "
 "Settings & Details page."
 msgstr ""
-"Редагувати ім'я файла зображення заголовка. Ви можете завантажити зображення "
-"заголовка за допомогою сторінки Налаштування і Деталі."
+"Редагувати ім'я файла зображення заголовка. Ви можете завантажити зображення"
+" заголовка за допомогою сторінки Налаштування і Деталі."
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid "Course Video Thumbnail Image"
@@ -3269,12 +3282,12 @@ msgstr ""
 #: common/lib/xmodule/xmodule/course_module.py
 msgid ""
 "Use this setting only when generating PDF certificates. Between quotation "
-"marks, enter the short name of the type of certificate that students receive "
-"when they complete the course. For instance, \"Certificate\"."
+"marks, enter the short name of the type of certificate that students receive"
+" when they complete the course. For instance, \"Certificate\"."
 msgstr ""
 "Використовуйте цю опцію тільки для створення сертифікатів у форматі Pdf. В "
-"лапках введіть коротку назву типу сертифікату, який отримають студенти, коли "
-"закінчать курс. Наприклад: \"Сертифікат\"."
+"лапках введіть коротку назву типу сертифікату, який отримають студенти, коли"
+" закінчать курс. Наприклад: \"Сертифікат\"."
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid "Certificate Name (Short)"
@@ -3315,8 +3328,8 @@ msgid ""
 "Enter course-specific overrides for the Web/HTML template parameters here "
 "(JSON format)"
 msgstr ""
-"Введіть для кожного курсу конкретні параметри шаблону Web / HTML тут (формат "
-"JSON)."
+"Введіть для кожного курсу конкретні параметри шаблону Web / HTML тут (формат"
+" JSON)."
 
 #. Translators: This field is the container for course-specific certificate
 #. configuration values
@@ -3382,8 +3395,8 @@ msgstr "Відображення номеру курсу"
 #: common/lib/xmodule/xmodule/course_module.py
 msgid ""
 "Enter the course number that you want to appear in the course. This setting "
-"overrides the course number that you entered when you created the course. To "
-"use the course number that you entered when you created the course, enter "
+"overrides the course number that you entered when you created the course. To"
+" use the course number that you entered when you created the course, enter "
 "null."
 msgstr ""
 "Введіть номер курсу, який ви хочете відображати в програмі. Цей параметр "
@@ -3396,11 +3409,11 @@ msgstr "Максимальна кількість студентів курсу"
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid ""
-"Enter the maximum number of students that can enroll in the course. To allow "
-"an unlimited number of students, enter null."
+"Enter the maximum number of students that can enroll in the course. To allow"
+" an unlimited number of students, enter null."
 msgstr ""
-"Введіть максимальну кількість студентів, які можуть зареєструватися на курс. "
-"Щоб дозволити необмежену кількість студентів, введіть null."
+"Введіть максимальну кількість студентів, які можуть зареєструватися на курс."
+" Щоб дозволити необмежену кількість студентів, введіть null."
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid "Allow Public Wiki Access"
@@ -3442,8 +3455,8 @@ msgid ""
 "course content. If you set this value to true, you must add a name for the "
 "survey to the Course Survey Name setting above."
 msgstr ""
-"Вкажіть, чи слухачі повинні пройти вхідне опитування, щоб отримати доступ до "
-"змісту курсу. Якщо встановлено значення true, то необхідно додати назвe в "
+"Вкажіть, чи слухачі повинні пройти вхідне опитування, щоб отримати доступ до"
+" змісту курсу. Якщо встановлено значення true, то необхідно додати назвe в "
 "налаштуванні «Назва вступного опитування»."
 
 #: common/lib/xmodule/xmodule/course_module.py
@@ -3454,10 +3467,10 @@ msgstr "Видимість курсу у каталозі"
 #. left untranslated.  Leave them as English words.
 #: common/lib/xmodule/xmodule/course_module.py
 msgid ""
-"Defines the access permissions for showing the course in the course catalog. "
-"This can be set to one of three values: 'both' (show in catalog and allow "
-"access to about page), 'about' (only allow access to about page), 'none' (do "
-"not show in catalog and do not allow access to an about page)."
+"Defines the access permissions for showing the course in the course catalog."
+" This can be set to one of three values: 'both' (show in catalog and allow "
+"access to about page), 'about' (only allow access to about page), 'none' (do"
+" not show in catalog and do not allow access to an about page)."
 msgstr ""
 "Визначає права доступу для відображення курсу в каталозі курсу. Можна "
 "використовувати одне з трьох значень: \"both\" (показати в каталозі та "
@@ -3471,8 +3484,8 @@ msgstr "Вступний іспит активовано"
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid ""
-"Specify whether students must complete an entrance exam before they can view "
-"your course content. Note, you must enable Entrance Exams for this course "
+"Specify whether students must complete an entrance exam before they can view"
+" your course content. Note, you must enable Entrance Exams for this course "
 "setting to take effect."
 msgstr ""
 "Виберіть, чи повиннi слухачі пройти вступний іспит до того, як зможуть "
@@ -3490,8 +3503,8 @@ msgid ""
 "course setting to take effect."
 msgstr ""
 "Вкажіть мінімальний прохідний бал для вступного іспиту - у відсотках. "
-"Зверніть увагу, що ви повинні активувати вступні випробування на цьому курсі "
-"для того, щоб це налаштування працювало."
+"Зверніть увагу, що ви повинні активувати вступні випробування на цьому курсі"
+" для того, щоб це налаштування працювало."
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid "Entrance Exam ID"
@@ -3509,13 +3522,13 @@ msgstr "Посилання на соцмережі"
 msgid ""
 "If dashboard social sharing and custom course URLs are enabled, you can "
 "provide a URL (such as the URL to a course About page) that social media "
-"sites can link to. URLs must be fully qualified. For example: http://www.edx."
-"org/course/Introduction-to-MOOCs-ITM001"
+"sites can link to. URLs must be fully qualified. For example: "
+"http://www.edx.org/course/Introduction-to-MOOCs-ITM001"
 msgstr ""
 "Якщо включені індивідуальні URL-адреси курсів і можливість публікувати в "
 "соціальних мережах інформацію про запис на курс з панелі управління, то ви "
-"можете додати URL-адресу, на яку будуть посилатися повідомлення в соціальних "
-"мережах (наприклад, адреса сторінки \"Про курс\"). URL-адреса має бути "
+"можете додати URL-адресу, на яку будуть посилатися повідомлення в соціальних"
+" мережах (наприклад, адреса сторінки \"Про курс\"). URL-адреса має бути "
 "абсолютною, наприклад:\\nhttp://www.edx.org/course/Introduction-to-MOOCs-"
 "ITM001"
 
@@ -3547,7 +3560,8 @@ msgstr "Дозволити проведення контрольованих і�
 #: common/lib/xmodule/xmodule/course_module.py
 msgid ""
 "Enter true or false. If this value is true, proctored exams are enabled in "
-"your course. Note that enabling proctored exams will also enable timed exams."
+"your course. Note that enabling proctored exams will also enable timed "
+"exams."
 msgstr ""
 "Введіть true або false. Якщо true, в вашому курсі включені контрольовані "
 "іспити. Зверніть увагу, що включення контрольованих іспитів також дозволить "
@@ -3589,9 +3603,9 @@ msgid ""
 "exams are enabled for the course."
 msgstr ""
 "Введіть true чи false. Якщо це значення true, учні зможуть самостійно "
-"проходити екзамени без прокторінга. Якщо це значення false, усі учні повинні "
-"скласти іспит з використанням прокторінгу. Цей параметр застосовується лише "
-"у тому випадку, якщо для курсу включені контрольовані іспити."
+"проходити екзамени без прокторінга. Якщо це значення false, усі учні повинні"
+" скласти іспит з використанням прокторінгу. Цей параметр застосовується лише"
+" у тому випадку, якщо для курсу включені контрольовані іспити."
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid "Create Zendesk Tickets For Suspicious Proctored Exam Attempts"
@@ -3601,8 +3615,8 @@ msgstr ""
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid ""
-"Enter true or false. If this value is true, a Zendesk ticket will be created "
-"for suspicious attempts."
+"Enter true or false. If this value is true, a Zendesk ticket will be created"
+" for suspicious attempts."
 msgstr ""
 "Введіть значення true або false. Якщо це значення true, квиток Zendesk буде "
 "створено для підозрілої спроби."
@@ -3617,8 +3631,8 @@ msgid ""
 "course. Regardless of this setting, timed exams are enabled if Enable "
 "Proctored Exams is set to true."
 msgstr ""
-"Введіть true або false. Якщо true, тимчасові іспити включені в вашому курсі. "
-"Незалежно від цього налаштування, тимчасові іспити ввімкнено, якщо для "
+"Введіть true або false. Якщо true, тимчасові іспити включені в вашому курсі."
+" Незалежно від цього налаштування, тимчасові іспити ввімкнено, якщо для "
 "параметра \"Увімкнути контрольовані іспити\" встановлено значення true."
 
 #: common/lib/xmodule/xmodule/course_module.py
@@ -3642,8 +3656,8 @@ msgstr "Самостiйне складання"
 #: common/lib/xmodule/xmodule/modulestore/inheritance.py
 msgid ""
 "Set this to \"true\" to mark this course as self-paced. Self-paced courses "
-"do not have due dates for assignments, and students can progress through the "
-"course at any rate before the course ends."
+"do not have due dates for assignments, and students can progress through the"
+" course at any rate before the course ends."
 msgstr ""
 "Встановіть значення \"true\", щоб задати навчання на курсі в довільному "
 "темпі. Якщо навчання на курсі проходить в довільному темпі, терміни здачі "
@@ -3659,8 +3673,8 @@ msgid ""
 "Enter true or false. If this value is true, you can hide a subsection until "
 "learners earn a minimum score in another, prerequisite subsection."
 msgstr ""
-"Введіть true або false. Якщо це значення true, ви можете приховати підрозділ "
-"поки слухач не набрав необхідну кількість балів в попередньому підрозділі."
+"Введіть true або false. Якщо це значення true, ви можете приховати підрозділ"
+" поки слухач не набрав необхідну кількість балів в попередньому підрозділі."
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid "Course Learning Information"
@@ -3709,11 +3723,11 @@ msgid ""
 "requirements, such as testing, accessibility, internationalization, and "
 "documentation."
 msgstr ""
-"Введіть true чи false. Якщо truе, ви можете додавати непідтримувані завдання "
-"та інструменти до курсу у студії. Непідтримувані завдання та інструменти не "
-"рекомендуються для використання у курсах у зв'язку з невідповідностю з "
-"основними вимогами, таким як тестування, доступність, інтернаціоналізація та "
-"документація."
+"Введіть true чи false. Якщо truе, ви можете додавати непідтримувані завдання"
+" та інструменти до курсу у студії. Непідтримувані завдання та інструменти не"
+" рекомендуються для використання у курсах у зв'язку з невідповідностю з "
+"основними вимогами, таким як тестування, доступність, інтернаціоналізація та"
+" документація."
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid "Highlights Enabled for Messaging"
@@ -3737,13 +3751,13 @@ msgstr "Інші налаштування курсу"
 msgid ""
 "Any additional information about the course that the platform needs or that "
 "allows integration with external systems such as CRM software. Enter a "
-"dictionary of values in JSON format, such as { \"my_custom_setting\": \"value"
-"\", \"other_setting\": \"value\" }"
+"dictionary of values in JSON format, such as { \"my_custom_setting\": "
+"\"value\", \"other_setting\": \"value\" }"
 msgstr ""
 "Будь-яка додаткова інформація про курс, що потрібна платформі , або яка "
 "дозволяє інтегрувати з зовнішніми системами, такими як CRM програмне "
-"забезпечення. Введіть словник значень у форматі JSON, наприклад "
-"{ \"my_custom_setting\": \"value\", \"other_setting\": \"value\" }"
+"забезпечення. Введіть словник значень у форматі JSON, наприклад { "
+"\"my_custom_setting\": \"value\", \"other_setting\": \"value\" }"
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid "General"
@@ -3797,13 +3811,13 @@ msgstr "Код для документів LaTeX. Ця функція підтр
 #: common/lib/xmodule/xmodule/html_module.py
 msgid ""
 "Select Visual to enter content and have the editor automatically create the "
-"HTML. Select Raw to edit HTML directly. If you change this setting, you must "
-"save the component and then re-open it for editing."
+"HTML. Select Raw to edit HTML directly. If you change this setting, you must"
+" save the component and then re-open it for editing."
 msgstr ""
 "Виберіть \"Візуальний Редактор\", щоб ввести текст, який потім буде "
 "автоматично перетворено редактором в HTML. Виберіть \"Без Обробки\" для "
-"безпосереднього редагування тексту у форматі HTML. Змінивши це налаштування, "
-"ви повинні зберегти компонент, а потім знову відкрити його для редагування."
+"безпосереднього редагування тексту у форматі HTML. Змінивши це налаштування,"
+" ви повинні зберегти компонент, а потім знову відкрити його для редагування."
 
 #: common/lib/xmodule/xmodule/html_module.py
 msgid "Editor"
@@ -3875,8 +3889,8 @@ msgstr "Вид завдання"
 
 #: common/lib/xmodule/xmodule/library_content_module.py
 msgid ""
-"Choose a problem type to fetch from the library. If \"Any Type\" is selected "
-"no filtering is applied."
+"Choose a problem type to fetch from the library. If \"Any Type\" is selected"
+" no filtering is applied."
 msgstr ""
 "Виберіть вид завдання, який має повертати бібліотека. Якщо вибрано «Будь-"
 "який», фільтри не застосовуються."
@@ -4005,8 +4019,8 @@ msgstr "LTI ID "
 #: common/lib/xmodule/xmodule/lti_module.py
 #, python-brace-format
 msgid ""
-"Enter the LTI ID for the external LTI provider.  This value must be the same "
-"LTI ID that you entered in the LTI Passports setting on the Advanced "
+"Enter the LTI ID for the external LTI provider.  This value must be the same"
+" LTI ID that you entered in the LTI Passports setting on the Advanced "
 "Settings page.{break_tag}See {docs_anchor_open}the edX LTI "
 "documentation{anchor_close} for more details on this setting."
 msgstr ""
@@ -4031,10 +4045,10 @@ msgstr "Персональні параметри"
 #: common/lib/xmodule/xmodule/lti_module.py
 #, python-brace-format
 msgid ""
-"Add the key/value pair for any custom parameters, such as the page your e-"
-"book should open to or the background color for this component.{break_tag}"
-"See {docs_anchor_open}the edX LTI documentation{anchor_close} for more "
-"details on this setting."
+"Add the key/value pair for any custom parameters, such as the page your "
+"e-book should open to or the background color for this "
+"component.{break_tag}See {docs_anchor_open}the edX LTI "
+"documentation{anchor_close} for more details on this setting."
 msgstr ""
 
 #: common/lib/xmodule/xmodule/lti_module.py
@@ -4084,8 +4098,8 @@ msgid ""
 "The score kept in the xblock KVS -- duplicate of the published score in "
 "django DB"
 msgstr ""
-"Результат збережений в xblock KVS - опублікований результат продубльований в "
-"django DB."
+"Результат збережений в xblock KVS - опублікований результат продубльований в"
+" django DB."
 
 #: common/lib/xmodule/xmodule/lti_module.py
 msgid "Comment as returned from grader, LTI2.0 spec"
@@ -4194,8 +4208,8 @@ msgstr "Введіть кінцеву дату виконання завдань
 #: lms/djangoapps/lms_xblock/mixin.py
 msgid "If true, can be seen only by course staff, regardless of start date."
 msgstr ""
-"Якщо встановлено значення \\\"true\\\", буде доступний тільки співробітникам "
-"курсу незалежно від дати початку."
+"Якщо встановлено значення \\\"true\\\", буде доступний тільки співробітникам"
+" курсу незалежно від дати початку."
 
 #: common/lib/xmodule/xmodule/modulestore/inheritance.py
 msgid "GIT URL"
@@ -4247,12 +4261,12 @@ msgid ""
 "Specify the default for how often variable values in a problem are "
 "randomized. This setting should be set to \"never\" unless you plan to "
 "provide a Python script to identify and randomize values in most of the "
-"problems in your course. Valid values are \"always\", \"onreset\", \"never"
-"\", and \"per_student\"."
+"problems in your course. Valid values are \"always\", \"onreset\", "
+"\"never\", and \"per_student\"."
 msgstr ""
 "Вкажіть значення за замовчуванням для того, як часто значення змінних в "
-"завданні рандомізовані. Цей параметр повинен бути встановлений як \"never\", "
-"окрім випадку, коли ви плануєте додати Python script для визначення і "
+"завданні рандомізовані. Цей параметр повинен бути встановлений як \"never\","
+" окрім випадку, коли ви плануєте додати Python script для визначення і "
 "рандомізації значень в більшості завдань вашого курсу. Можна вибрати зі "
 "значень \"always\", \"onreset\", \"never\", та \"per_student\"."
 
@@ -4289,24 +4303,24 @@ msgid ""
 "Enter true or false. If true, you can use the LaTeX templates for HTML "
 "components and advanced Problem components."
 msgstr ""
-"Введіть true чи false. Якщо це true, ви можете використовувати шаблони LaTeX "
-"для компонентів HTML та додаткових компонентів завдань."
+"Введіть true чи false. Якщо це true, ви можете використовувати шаблони LaTeX"
+" для компонентів HTML та додаткових компонентів завдань."
 
 #: common/lib/xmodule/xmodule/modulestore/inheritance.py
 msgid ""
 "Enter the maximum number of times a student can try to answer problems. By "
 "default, Maximum Attempts is set to null, meaning that students have an "
-"unlimited number of attempts for problems. You can override this course-wide "
-"setting for individual problems. However, if the course-wide setting is a "
-"specific number, you cannot set the Maximum Attempts for individual problems "
-"to unlimited."
+"unlimited number of attempts for problems. You can override this course-wide"
+" setting for individual problems. However, if the course-wide setting is a "
+"specific number, you cannot set the Maximum Attempts for individual problems"
+" to unlimited."
 msgstr ""
 "Введіть максимальну кількість спроб виконання завдань. За замовчуванням "
 "кількість спроб встановлена як NULL, що означає, що учні мають необмежену "
 "кількість спроб виконати завдання. Ви можете налаштувати цей параметр для "
 "окремих завдань. Однак, якщо у налаштуваннях курсу вказано певне число, то "
-"ви не можете встановити кількість максимальних спроб для окремих завдань, як "
-"необмежену."
+"ви не можете встановити кількість максимальних спроб для окремих завдань, як"
+" необмежену."
 
 #: common/lib/xmodule/xmodule/modulestore/inheritance.py
 msgid ""
@@ -4317,12 +4331,12 @@ msgid ""
 "obtain a key for your course, or to report an issue, please contact "
 "moocsupport@mathworks.com"
 msgstr ""
-"Введіть API-ключ , наданий компанією MathWorks для доступу до сервісу MATLAB "
-"Hosted Service. Цей ключ надається для використання виключно в рамках даного "
-"курсу в зазначений період часу. Не використовуйте API-ключ в інших курсах. "
-"Негайно повідомте компанію MathWorks, якщо вважаєте, що ключ став відомий "
-"стороннім. Для отримання ключа для вашого курсу або надіслання повідомлення "
-"про помилку, будь ласка, зв'яжіться з moocsupport@mathworks.com"
+"Введіть API-ключ , наданий компанією MathWorks для доступу до сервісу MATLAB"
+" Hosted Service. Цей ключ надається для використання виключно в рамках "
+"даного курсу в зазначений період часу. Не використовуйте API-ключ в інших "
+"курсах. Негайно повідомте компанію MathWorks, якщо вважаєте, що ключ став "
+"відомий стороннім. Для отримання ключа для вашого курсу або надіслання "
+"повідомлення про помилку, будь ласка, зв'яжіться з moocsupport@mathworks.com"
 
 #: common/lib/xmodule/xmodule/modulestore/inheritance.py
 #: cms/templates/certificates.html cms/templates/group_configurations.html
@@ -4332,7 +4346,8 @@ msgid "Group Configurations"
 msgstr "Налаштування групи"
 
 #: common/lib/xmodule/xmodule/modulestore/inheritance.py
-msgid "Enter the configurations that govern how students are grouped together."
+msgid ""
+"Enter the configurations that govern how students are grouped together."
 msgstr "Введіть налаштування для розподілу слухачів за групами."
 
 #: common/lib/xmodule/xmodule/modulestore/inheritance.py
@@ -4353,8 +4368,8 @@ msgstr "Увімкнути автоматичне просування віде�
 #: common/lib/xmodule/xmodule/modulestore/inheritance.py
 msgid ""
 "Specify whether to show an auto-advance button in videos. If the student "
-"clicks it, when the last video in a unit finishes it will automatically move "
-"to the next unit and autoplay the first video."
+"clicks it, when the last video in a unit finishes it will automatically move"
+" to the next unit and autoplay the first video."
 msgstr ""
 "Укажіть, чи потрібно показувати кнопку \"Автоматичний перегляд\" у відео. "
 "Якщо студент натискає його, коли останнє відео в блоці закінчиться, воно "
@@ -4390,8 +4405,8 @@ msgid ""
 "is changed."
 msgstr ""
 "Введіть true або false. Якщо true, завдання в курсі за замовчуванням завжди "
-"відображають кнопку «Скинути». Ви можете замінити це в налаштуваннях кожного "
-"завдання. При зміні налаштуваннь усі поточні завдання цього курсу зазнають "
+"відображають кнопку «Скинути». Ви можете замінити це в налаштуваннях кожного"
+" завдання. При зміні налаштуваннь усі поточні завдання цього курсу зазнають "
 "впливу."
 
 #: common/lib/xmodule/xmodule/modulestore/inheritance.py
@@ -4407,8 +4422,8 @@ msgstr ""
 
 #: common/lib/xmodule/xmodule/modulestore/inheritance.py
 msgid ""
-"Indicates whether Student Notes are visible in the course. Students can also "
-"show or hide their notes in the courseware."
+"Indicates whether Student Notes are visible in the course. Students can also"
+" show or hide their notes in the courseware."
 msgstr ""
 "Показує, чи видимі замітки на даному курсі. Слухачі можуть відображати або "
 "приховувати свої нотатки у змісті курсу."
@@ -4419,8 +4434,8 @@ msgstr "Позначити цей модуль як частину розділ�
 
 #: common/lib/xmodule/xmodule/modulestore/inheritance.py
 msgid ""
-"Enter true or false. If true, answer submissions for problem modules will be "
-"considered in the Entrance Exam scoring/gating algorithm."
+"Enter true or false. If true, answer submissions for problem modules will be"
+" considered in the Entrance Exam scoring/gating algorithm."
 msgstr ""
 "Введіть true або false. При встановленні значення true, надіслані відповіді "
 "до модулів завдань будуть враховуватися в оціночному/відбірковому алгоритмі "
@@ -4491,8 +4506,8 @@ msgid ""
 "This setting indicates whether students have a limited time to view or "
 "interact with this courseware component."
 msgstr ""
-"Цей параметр визначає, чи обмежується час, відведений слухачам на перегляд і "
-"взаємодію з даним компонентом курсу."
+"Цей параметр визначає, чи обмежується час, відведений слухачам на перегляд і"
+" взаємодію з даним компонентом курсу."
 
 #: common/lib/xmodule/xmodule/seq_module.py
 msgid "Time Limit in Minutes"
@@ -4523,8 +4538,8 @@ msgid ""
 "This setting indicates what rules the proctoring team should follow when "
 "viewing the videos."
 msgstr ""
-"Цей параметр вказує те, які правила будуть використані командою перевіряючих "
-"при перегляді відеозаписів."
+"Цей параметр вказує те, які правила будуть використані командою перевіряючих"
+" при перегляді відеозаписів."
 
 #: common/lib/xmodule/xmodule/seq_module.py
 msgid "Is Practice Exam"
@@ -4535,8 +4550,8 @@ msgid ""
 "This setting indicates whether this exam is for testing purposes only. "
 "Practice exams are not verified."
 msgstr ""
-"Цей параметр визначає, чи виконується дане випробування тільки для того, щоб "
-"користувачі випробували можливості платформи. Пробні випробування не "
+"Цей параметр визначає, чи виконується дане випробування тільки для того, щоб"
+" користувачі випробували можливості платформи. Пробні випробування не "
 "вимагають підтвердження особи."
 
 #: common/lib/xmodule/xmodule/seq_module.py
@@ -4611,13 +4626,14 @@ msgstr ""
 
 #: common/lib/xmodule/xmodule/split_test_module.py
 msgid ""
-"The configuration defines how users are grouped for this content experiment. "
-"Caution: Changing the group configuration of a student-visible experiment "
+"The configuration defines how users are grouped for this content experiment."
+" Caution: Changing the group configuration of a student-visible experiment "
 "will impact the experiment data."
 msgstr ""
 "Конфігурація визначає, як формуються групи студентів для вивчення цих "
 "експериментальних матеріалів. Попередження: зміна конфігурації групи, коли "
-"експериментальні матеріали видимі для студентів, вплине на дані експерименту."
+"експериментальні матеріали видимі для студентів, вплине на дані "
+"експерименту."
 
 #: common/lib/xmodule/xmodule/split_test_module.py
 msgid "Group Configuration"
@@ -4658,7 +4674,8 @@ msgstr ""
 "видаліть цей експеримент."
 
 #: common/lib/xmodule/xmodule/split_test_module.py
-msgid "The experiment does not contain all of the groups in the configuration."
+msgid ""
+"The experiment does not contain all of the groups in the configuration."
 msgstr "В експерименті беруть участь не всі групи конфігурації."
 
 #: common/lib/xmodule/xmodule/split_test_module.py
@@ -4710,8 +4727,8 @@ msgid ""
 "Can't receive transcripts from Youtube for {youtube_id}. Status code: "
 "{status_code}."
 msgstr ""
-"Неможливо отримати субтитри з сервісу Youtube для {youtube_id}. Код статусу: "
-"{status_code}."
+"Неможливо отримати субтитри з сервісу Youtube для {youtube_id}. Код статусу:"
+" {status_code}."
 
 #: common/lib/xmodule/xmodule/video_module/transcripts_utils.py
 msgid "We support only SubRip (*.srt) transcripts format."
@@ -4757,8 +4774,8 @@ msgstr[3] "Немає файлів транскриптів, пов'язаних
 
 #: common/lib/xmodule/xmodule/video_module/video_module.py
 msgid ""
-"The URL for your video. This can be a YouTube URL or a link to an .mp4, ."
-"ogg, or .webm video file hosted elsewhere on the Internet."
+"The URL for your video. This can be a YouTube URL or a link to an .mp4, "
+".ogg, or .webm video file hosted elsewhere on the Internet."
 msgstr ""
 "URL вашого відео. Це може бути YouTube URL або посилання на відео-файли "
 "форматів. Mp4,. Ogg або. Webm, розташовані на будь-якому хостингу в "
@@ -4798,7 +4815,8 @@ msgid "YouTube ID for .75x speed"
 msgstr "YouTube ID для швидкості 0.75x"
 
 #: common/lib/xmodule/xmodule/video_module/video_xfields.py
-msgid "Optional, for older browsers: the YouTube ID for the 1.25x speed video."
+msgid ""
+"Optional, for older browsers: the YouTube ID for the 1.25x speed video."
 msgstr ""
 "Необов'язкове значення для застарілих браузерів: ідентифікатор відео на "
 "YouTube на швидкості 1.25x."
@@ -4819,8 +4837,8 @@ msgstr "YouTube ID для швидкості 1.5x"
 
 #: common/lib/xmodule/xmodule/video_module/video_xfields.py
 msgid ""
-"Time you want the video to start if you don't want the entire video to play. "
-"Not supported in the native mobile app: the full video file will play. "
+"Time you want the video to start if you don't want the entire video to play."
+" Not supported in the native mobile app: the full video file will play. "
 "Formatted as HH:MM:SS. The maximum value is 23:59:59."
 msgstr ""
 "Момент, коли почнеться відтворення відео, якщо не потрібен перегляд всього "
@@ -4837,9 +4855,9 @@ msgid ""
 "Not supported in the native mobile app: the full video file will play. "
 "Formatted as HH:MM:SS. The maximum value is 23:59:59."
 msgstr ""
-"Момент, коли закінчеться відтворення відео, якщо не потрібен перегляд всього "
-"відео. У мобільному додатку не підтримується: відео відтворюються повністю. "
-"Формат ЧЧ:ММ:СС, максимальне значення 23:59:59."
+"Момент, коли закінчеться відтворення відео, якщо не потрібен перегляд всього"
+" відео. У мобільному додатку не підтримується: відео відтворюються повністю."
+" Формат ЧЧ:ММ:СС, максимальне значення 23:59:59."
 
 #: common/lib/xmodule/xmodule/video_module/video_xfields.py
 msgid "Video Stop Time"
@@ -4869,9 +4887,9 @@ msgid ""
 "the student's computer. To allow students to download these videos, set "
 "Video Download Allowed to True."
 msgstr ""
-"URL посилання або посилання, за якими розташовані відео-файли крім файлів на "
-"YouTube. Кожне посилання повинне закінчуватися на.mpeg, .mp4, .ogg, або ."
-"webm і не повинне бути посиланням на ресурси YouTube. (Для сумісності з "
+"URL посилання або посилання, за якими розташовані відео-файли крім файлів на"
+" YouTube. Кожне посилання повинне закінчуватися на.mpeg, .mp4, .ogg, або "
+".webm і не повинне бути посиланням на ресурси YouTube. (Для сумісності з "
 "браузерами ми настійно рекомендуємо використовувати формати .mp4 і .webm.) "
 "Студентам буде доступне перше з посилань, сумісне з їх системою. Щоб "
 "дозволити студентам скачувати ці відео-файли, вкажіть \"True\" в "
@@ -4887,13 +4905,13 @@ msgid ""
 "Download Transcript Allowed to True. If you want to provide a downloadable "
 "transcript in a different format, we recommend that you upload a handout by "
 "using the Upload a Handout field. If this isn't possible, you can post a "
-"transcript file on the Files & Uploads page or on the Internet, and then add "
-"the URL for the transcript here. Students see a link to download that "
+"transcript file on the Files & Uploads page or on the Internet, and then add"
+" the URL for the transcript here. Students see a link to download that "
 "transcript below the video."
 msgstr ""
 "За замовчуванням студентам доступно скачування розшифровок в форматах .srt "
-"або .txt, якщо налаштування \"Доступно скачування розшифровки\" встановлено ​​"
-"в значення \"True\". Якщо вам необхідно додати розшифровку, в іншому "
+"або .txt, якщо налаштування \"Доступно скачування розшифровки\" встановлено "
+"​​в значення \"True\". Якщо вам необхідно додати розшифровку, в іншому "
 "форматі, ми рекомендуємо завантажити її через меню \"Замітка\" розділу "
 "\"Завантаження\". Якщо це неможливо, ви можете розмістити файл з "
 "розшифровкою на сторінках \"Файли та завантаження\" або \"Інтернет\", після "
@@ -4906,10 +4924,10 @@ msgstr "URL завантажуваного транскрипту"
 
 #: common/lib/xmodule/xmodule/video_module/video_xfields.py
 msgid ""
-"Allow students to download the timed transcript. A link to download the file "
-"appears below the video. By default, the transcript is an .srt or .txt file. "
-"If you want to provide the transcript for download in a different format, "
-"upload a file by using the Upload Handout field."
+"Allow students to download the timed transcript. A link to download the file"
+" appears below the video. By default, the transcript is an .srt or .txt "
+"file. If you want to provide the transcript for download in a different "
+"format, upload a file by using the Upload Handout field."
 msgstr ""
 "Зробити скачування субтитрів доступним для студентів. Посилання для "
 "скачування файлу з'явиться під відео. За замовчуванням формат файлу "
@@ -4924,8 +4942,8 @@ msgstr "Дозволити скачування транскриптiв"
 #: common/lib/xmodule/xmodule/video_module/video_xfields.py
 msgid ""
 "The default transcript for the video, from the Default Timed Transcript "
-"field on the Basic tab. This transcript should be in English. You don't have "
-"to change this setting."
+"field on the Basic tab. This transcript should be in English. You don't have"
+" to change this setting."
 msgstr ""
 "Розшифровка відео за замовчуванням береться з поля \"Розшифровка за "
 "замовчуванням\" у вкладці \"Основне\". Розшифровка повинна бути англійською "
@@ -4980,7 +4998,8 @@ msgstr "Текстовий файл (.txt)"
 
 #: common/lib/xmodule/xmodule/video_module/video_xfields.py
 msgid "The last speed that the user specified for the video."
-msgstr "Остання швидкість відтворення даного відео, встановлена ​​користувачем."
+msgstr ""
+"Остання швидкість відтворення даного відео, встановлена ​​користувачем."
 
 #: common/lib/xmodule/xmodule/video_module/video_xfields.py
 msgid "The default speed for the video."
@@ -5003,8 +5022,8 @@ msgid ""
 "Upload a handout to accompany this video. Students can download the handout "
 "by clicking Download Handout under the video."
 msgstr ""
-"Завантажте супровідні матеріали для цього відео. Студенти зможуть скачати їх "
-"за посиланням \"Завантажити додаткові матеріали\" під відео."
+"Завантажте супровідні матеріали для цього відео. Студенти зможуть скачати їх"
+" за посиланням \"Завантажити додаткові матеріали\" під відео."
 
 #: common/lib/xmodule/xmodule/video_module/video_xfields.py
 msgid "Upload Handout"
@@ -5033,8 +5052,8 @@ msgid ""
 msgstr ""
 "Якщо ви призначили код ID для відео, то для того, щоб воно могло бути "
 "програно в цьому компоненті, введіть ідентифікатор тут. Будь ласка, не "
-"вказуйте URL-адресу відео-файлу, або ідентифікатор відео на YouTube. Якщо ви "
-"не призначили ідентифікатор для відео, введіть ці значення в інших полях і "
+"вказуйте URL-адресу відео-файлу, або ідентифікатор відео на YouTube. Якщо ви"
+" не призначили ідентифікатор для відео, введіть ці значення в інших полях і "
 "проігноруйте це поле."
 
 #: common/lib/xmodule/xmodule/video_module/video_xfields.py
@@ -5104,8 +5123,8 @@ msgstr "Слова num_top_words, що найбільш часто зустрі�
 #: common/lib/xmodule/xmodule/x_module.py
 #, python-brace-format
 msgid ""
-"{display_name} is only accessible to enrolled learners. Sign in or register, "
-"and enroll in this course to view it."
+"{display_name} is only accessible to enrolled learners. Sign in or register,"
+" and enroll in this course to view it."
 msgstr ""
 "{display_name} доступний лише для зареєстрованих учнів. Увійдіть або "
 "зареєструйтеся та запишіться на  цей курс, щоб переглянути його."
@@ -5163,7 +5182,8 @@ msgstr ""
 #, python-format
 msgid ""
 "This email message was automatically sent by %(lms_url)s because someone "
-"attempted to create an account on %(platform_name)s using this email address."
+"attempted to create an account on %(platform_name)s using this email "
+"address."
 msgstr ""
 
 #: common/templates/student/edx_ace/accountactivation/email/body.txt
@@ -5210,8 +5230,8 @@ msgid ""
 "%(platform_name)s with this email (%(email)s) and your new password."
 msgstr ""
 "Після того, як ви створили пароль [нижче], ви зможете увійти в систему "
-"%(platform_name)s за допомогою цього електронного листа (%(email)s) і вашого "
-"нового пароля."
+"%(platform_name)s за допомогою цього електронного листа (%(email)s) і вашого"
+" нового пароля."
 
 #: common/templates/student/edx_ace/accountrecovery/email/body.html
 #: common/templates/student/edx_ace/accountrecovery/email/body.txt
@@ -5252,8 +5272,8 @@ msgid ""
 "%(platform_name)s account from %(old_email)s to %(new_email)s. If this is "
 "correct, please confirm your new e-mail address by visiting:"
 msgstr ""
-"Ми отримали запит на зміну електронної пошти, пов’язаної з вашим"
-"%(platform_name)s аккаунтом з %(old_email)sна%(new_email)s. Якщо це "
+"Ми отримали запит на зміну електронної пошти, пов’язаної з "
+"вашим%(platform_name)s аккаунтом з %(old_email)sна%(new_email)s. Якщо це "
 "правильно, підтвердіть нову адресу електронної пошти, відвідавши:"
 
 #: common/templates/student/edx_ace/emailchange/email/body.html
@@ -5264,14 +5284,14 @@ msgstr "Підтвердіть Зміну Електронної Пошти"
 #: common/templates/student/edx_ace/emailchange/email/body.txt
 #, python-format
 msgid ""
-"If you didn't request this, you don't need to do anything; you won't receive "
-"any more email from us. Please do not reply to this e-mail; if you require "
+"If you didn't request this, you don't need to do anything; you won't receive"
+" any more email from us. Please do not reply to this e-mail; if you require "
 "assistance, check the help section of the %(platform_name)s web site."
 msgstr ""
 "Якщо ви не робили цей запит, вам не потрібно нічого робити; ви більше не "
 "будете отримувати електронні листи від нас. Будь ласка, не відповідайте на "
-"цей лист; якщо вам потрібна допомога, перевірте розділ довідки веб-сайту"
-"%(platform_name)s."
+"цей лист; якщо вам потрібна допомога, перевірте розділ довідки веб-"
+"сайту%(platform_name)s."
 
 #: common/templates/student/edx_ace/emailchange/email/subject.txt
 #, python-format
@@ -5293,8 +5313,8 @@ msgid ""
 "this request, please contact us immediately. Contact information is listed "
 "at:"
 msgstr ""
-"Це підтверджує, що ви змінили електронну пошту, пов'язану%(platform_name)s з "
-"%(old_email)sдо%(new_email)s. Якщо ви не зробили цього запиту, негайно "
+"Це підтверджує, що ви змінили електронну пошту, пов'язану%(platform_name)s з"
+" %(old_email)sдо%(new_email)s. Якщо ви не зробили цього запиту, негайно "
 "зв'яжіться з нами. Контактна інформація вказана за адресою:"
 
 #: common/templates/student/edx_ace/emailchangeconfirmation/email/body.html
@@ -5314,7 +5334,8 @@ msgstr "Створіть електронну адресу для відновл
 #: common/templates/student/edx_ace/recoveryemailcreate/email/body.txt
 #, python-format
 msgid "You've registered this recovery email address for %(platform_name)s."
-msgstr "Ви зареєстрували цю електронну адресу для відновлення%(platform_name)s"
+msgstr ""
+"Ви зареєстрували цю електронну адресу для відновлення%(platform_name)s"
 
 #: common/templates/student/edx_ace/recoveryemailcreate/email/body.html
 #: common/templates/student/edx_ace/recoveryemailcreate/email/body.txt
@@ -5344,7 +5365,8 @@ msgid ""
 "Completed the course \"{course_name}\" ({course_mode}, {start_date} - "
 "{end_date})"
 msgstr ""
-"Закінчив/ла курс \"{course_name}\" ({course_mode}, {start_date} - {end_date})"
+"Закінчив/ла курс \"{course_name}\" ({course_mode}, {start_date} - "
+"{end_date})"
 
 #: lms/djangoapps/badges/events/course_complete.py
 #, python-brace-format
@@ -5364,8 +5386,7 @@ msgid "This value must be all lowercase."
 msgstr "Дане значення повинно бути в нижньому регістрі."
 
 #: lms/djangoapps/badges/models.py
-msgid ""
-"The course mode for this badge image. For example, \"verified\" or \"honor\"."
+msgid "The course mode for this badge image. For example, \"verified\" or \"honor\"."
 msgstr ""
 "Статус сертифіката для значка. Наприклад, «Підтверджений сертифікат» або "
 "«Сертифікат Кодексу честі»."
@@ -5380,8 +5401,8 @@ msgstr ""
 #: lms/djangoapps/badges/models.py
 msgid ""
 "Set this value to True if you want this image to be the default image for "
-"any course modes that do not have a specified badge image. You can have only "
-"one default image."
+"any course modes that do not have a specified badge image. You can have only"
+" one default image."
 msgstr ""
 "Якщо ви хочете, щоб це зображення використовувалося для курсів без "
 "спеціальних значків, встановіть значення true. За замовчуванням Значок може "
@@ -5413,18 +5434,17 @@ msgstr ""
 
 #: lms/djangoapps/badges/models.py
 msgid ""
-"Each line is a comma-separated list. The first item in each line is the slug "
-"of a badge class you have created that has an issuing component of "
+"Each line is a comma-separated list. The first item in each line is the slug"
+" of a badge class you have created that has an issuing component of "
 "'openedx__course'. The remaining items in each line are the course keys the "
 "learner needs to complete to be awarded the badge. For example: "
-"slug_for_compsci_courses_group_badge,course-v1:CompSci+Course+First,course-"
-"v1:CompsSci+Course+Second"
+"slug_for_compsci_courses_group_badge,course-v1:CompSci+Course+First,course-v1:CompsSci+Course+Second"
 msgstr ""
 "Кожен рядок є список через кому. Перший елемент в кожному рядку - це клас "
 "значка, який Ви створили з компонентом 'openedx__course'.. Інші елементи в "
 "кожному рядку - це ключі курсу, які учень повинен виконати, щоб бути "
-"нагородженим знаком. Наприклад: slug_for_compsci_courses_group_badge,course-"
-"v1:CompSci+Course+First,course-v1:CompsSci+Course+Second"
+"нагородженим знаком. Наприклад: "
+"slug_for_compsci_courses_group_badge,course-v1:CompSci+Course+First,course-v1:CompsSci+Course+Second"
 
 #: lms/djangoapps/badges/models.py
 msgid "Please check the syntax of your entry."
@@ -5585,8 +5605,8 @@ msgstr ""
 
 #: lms/djangoapps/ccx/views.py
 msgid ""
-"You cannot create a CCX from a course using a deprecated id. Please create a "
-"rerun of this course in the studio to allow this action."
+"You cannot create a CCX from a course using a deprecated id. Please create a"
+" rerun of this course in the studio to allow this action."
 msgstr ""
 "Неможливо створити CCX на основі курсу з застарілим ідентифікатором. "
 "Перезапустіть курс в edX Studioщоб дозволити цю дiю. "
@@ -5631,8 +5651,8 @@ msgstr ""
 #: lms/djangoapps/certificates/models.py
 msgid ""
 "A unique identifier for the example certificate.  This is used when we "
-"receive a response from the queue to determine which example certificate was "
-"processed."
+"receive a response from the queue to determine which example certificate was"
+" processed."
 msgstr ""
 "Унікальний ідентифікатор для прикладу сертифікату. Він використовується для "
 "того, щоб визначити який приклад сертифікату був оброблений."
@@ -5772,8 +5792,8 @@ msgid ""
 "A {cert_type} certificate signifies that a learner has agreed to abide by "
 "the honor code established by {platform_name} and has completed all of the "
 "required tasks for this course under its guidelines. A {cert_type} "
-"certificate also indicates that the identity of the learner has been checked "
-"and is valid."
+"certificate also indicates that the identity of the learner has been checked"
+" and is valid."
 msgstr ""
 "{cert_type} сертифікат означає, що слухач зобов'язався виконувати кодекс "
 "честі {platform_name} і завершив всі необхідні завдання даного курсу у "
@@ -5969,7 +5989,8 @@ msgstr "Я завершив курс {course_title} на {platform_name}."
 
 #: lms/djangoapps/certificates/views/webview.py
 #, python-brace-format
-msgid "I completed a course at {platform_name}. Take a look at my certificate."
+msgid ""
+"I completed a course at {platform_name}. Take a look at my certificate."
 msgstr "Я закінчив курс в {platform_name}. Погляньте на мій сертифікат!"
 
 #: lms/djangoapps/certificates/views/webview.py
@@ -6029,8 +6050,8 @@ msgstr "Період оновлення кешу"
 #: openedx/core/djangoapps/credentials/models.py
 #: openedx/core/djangoapps/credit/models.py
 msgid ""
-"Specified in seconds. Enable caching by setting this to a value greater than "
-"0."
+"Specified in seconds. Enable caching by setting this to a value greater than"
+" 0."
 msgstr ""
 "Визначається в секундах. Для включення кешування вкажіть значення більше 0."
 
@@ -6262,8 +6283,8 @@ msgstr "Після цієї дати курс буде архівовано."
 
 #: lms/djangoapps/courseware/date_summary.py
 msgid ""
-"This course is archived, which means you can review course content but it is "
-"no longer active."
+"This course is archived, which means you can review course content but it is"
+" no longer active."
 msgstr ""
 "Курс знаходиться в архіві, тобто у вас є доступ до матеріалів курсу, але "
 "фактично курс завершений."
@@ -6350,8 +6371,8 @@ msgstr "до {date}"
 #: lms/djangoapps/courseware/date_summary.py
 #, python-brace-format
 msgid ""
-"Don't forget, you have {time_remaining_string} left to upgrade to a Verified "
-"Certificate."
+"Don't forget, you have {time_remaining_string} left to upgrade to a Verified"
+" Certificate."
 msgstr ""
 "Не забувайте, що у вас залишилось {time_remaining_string}, до оновляння "
 "підтвердженого сертифікату."
@@ -6366,11 +6387,11 @@ msgstr "Не забудьте перейти на підтверджений с�
 msgid ""
 "In order to qualify for a certificate, you must meet all course grading "
 "requirements, upgrade before the course deadline, and successfully verify "
-"your identity on {platform_name} if you have not done so already."
-"{button_panel}"
+"your identity on {platform_name} if you have not done so "
+"already.{button_panel}"
 msgstr ""
-"Щоб мати право на отримання сертифіката, ви повинні відповідати всім вимогам "
-"до оцінювання курсу, оновити до кінцевого терміну, і успішно підтвердити "
+"Щоб мати право на отримання сертифіката, ви повинні відповідати всім вимогам"
+" до оцінювання курсу, оновити до кінцевого терміну, і успішно підтвердити "
 "свою особу на {platform_name}, якщо ви ще цього не зробили.{button_panel}"
 
 #: lms/djangoapps/courseware/date_summary.py
@@ -6419,8 +6440,8 @@ msgstr ""
 
 #: lms/djangoapps/courseware/masquerade.py
 msgid ""
-"This user does not have access to this content "
-"because                         the content start date is in the future"
+"This user does not have access to this content because"
+"                         the content start date is in the future"
 msgstr ""
 "Цей користувач не має доступу до цього контенту, оскільки в майбутньому "
 "стартує дата контенту"
@@ -6434,7 +6455,8 @@ msgstr ""
 "певного учня."
 
 #: lms/djangoapps/courseware/models.py
-msgid "Number of days a learner has to upgrade after content is made available"
+msgid ""
+"Number of days a learner has to upgrade after content is made available"
 msgstr ""
 "Кількість днів, які учень повинен оновити після того, як контент став "
 "доступним"
@@ -6553,8 +6575,8 @@ msgid ""
 "You have not received a certificate because you do not have a current "
 "{platform_name} verified identity."
 msgstr ""
-"Ви не отримали сертифікат, оскільки у вас немає перевіреної ідентифікації на "
-"{platform_name}."
+"Ви не отримали сертифікат, оскільки у вас немає перевіреної ідентифікації на"
+" {platform_name}."
 
 #: lms/djangoapps/courseware/views/views.py
 msgid "Your certificate will be available soon!"
@@ -6590,12 +6612,11 @@ msgstr "Увійти"
 #: lms/djangoapps/courseware/views/views.py
 #, python-brace-format
 msgid ""
-"You must be enrolled in the course to see course "
-"content.                             {enroll_link_start}Enroll "
-"now{enroll_link_end}."
+"You must be enrolled in the course to see course content."
+"                             {enroll_link_start}Enroll now{enroll_link_end}."
 msgstr ""
-" Ви повинні записатися на курс аби бачити контент курсу. {enroll_link_start}"
-"Записатися зараз{enroll_link_end}."
+" Ви повинні записатися на курс аби бачити контент курсу. "
+"{enroll_link_start}Записатися зараз{enroll_link_end}."
 
 #: lms/djangoapps/courseware/views/views.py
 #: openedx/features/course_experience/views/course_home_messages.py
@@ -6614,7 +6635,8 @@ msgstr "Користувач {username} не переглядав завданн
 #: lms/djangoapps/courseware/views/views.py
 #, python-brace-format
 msgid "You must be signed in to {platform_name} to create a certificate."
-msgstr "Для створення сертифікату ви повинні увійти в систему {platform_name}."
+msgstr ""
+"Для створення сертифікату ви повинні увійти в систему {platform_name}."
 
 #: lms/djangoapps/courseware/views/views.py
 msgid "Course is not valid"
@@ -6635,26 +6657,13 @@ msgstr "Створення сертифікату."
 #: lms/djangoapps/courseware/views/views.py
 #, python-brace-format
 msgid ""
-"{platform_name} now offers financial assistance for learners who want to "
-"earn Verified Certificates but who may not be able to pay the Verified "
-"Certificate fee. Eligible learners may receive up to 90{percent_sign} off "
-"the Verified Certificate fee for a course.\n"
-"To apply for financial assistance, enroll in the audit track for a course "
-"that offers Verified Certificates, and then complete this application. Note "
-"that you must complete a separate application for each course you take.\n"
-" We plan to use this information to evaluate your application for financial "
-"assistance and to further develop our financial assistance program."
+"{platform_name} now offers financial assistance for learners who want to earn Verified Certificates but who may not be able to pay the Verified Certificate fee. Eligible learners may receive up to 90{percent_sign} off the Verified Certificate fee for a course.\n"
+"To apply for financial assistance, enroll in the audit track for a course that offers Verified Certificates, and then complete this application. Note that you must complete a separate application for each course you take.\n"
+" We plan to use this information to evaluate your application for financial assistance and to further develop our financial assistance program."
 msgstr ""
-"{platform_name} пропонує фінансову допомогу тепер тим слухачам, які хочуть "
-"отримає Підтверджений сертифікат, але не мають можливості оплатити його "
-"вартість. Слухачі, що відповідають вимогам, можуть отримати знижку до "
-"90{percent_sign} від ціни Підтвердженого сертифікату. \n"
-"Для отримання фінансової допомоги, зареєструйтесь на курс як звичайний "
-"слухач, після чого заповніть заяву. Слід зауважити, що ви повинні "
-"заповнювати окремі заяви для кожного курсу, на який ви зареєстровані. \n"
-"Ми, в свою чергу, використовуємо надану вами інформацію для розгляду вашого "
-"прохання про фінансову допомогу, а також для подальшого розвитку нашої "
-"програми фінансової допомоги."
+"{platform_name} пропонує фінансову допомогу тепер тим слухачам, які хочуть отримає Підтверджений сертифікат, але не мають можливості оплатити його вартість. Слухачі, що відповідають вимогам, можуть отримати знижку до 90{percent_sign} від ціни Підтвердженого сертифікату. \n"
+"Для отримання фінансової допомоги, зареєструйтесь на курс як звичайний слухач, після чого заповніть заяву. Слід зауважити, що ви повинні заповнювати окремі заяви для кожного курсу, на який ви зареєстровані. \n"
+"Ми, в свою чергу, використовуємо надану вами інформацію для розгляду вашого прохання про фінансову допомогу, а також для подальшого розвитку нашої програми фінансової допомоги."
 
 #: lms/djangoapps/courseware/views/views.py
 msgid "Annual Household Income"
@@ -6699,22 +6708,22 @@ msgid ""
 "I allow edX to use the information provided in this application (except for "
 "financial information) for edX marketing purposes."
 msgstr ""
-"Я дозволяю edX використовувати інформацію, надану в даній заяві (за винятком "
-"фінансової інформації) у своїх маркетингових цілях."
+"Я дозволяю edX використовувати інформацію, надану в даній заяві (за винятком"
+" фінансової інформації) у своїх маркетингових цілях."
 
 #: lms/djangoapps/dashboard/git_import.py
 #, python-brace-format
 msgid ""
-"Path {0} doesn't exist, please create it, or configure a different path with "
-"GIT_REPO_DIR"
+"Path {0} doesn't exist, please create it, or configure a different path with"
+" GIT_REPO_DIR"
 msgstr ""
 "Шлях {0} не існує, будь ласка, виправте його або вкажіть інший шлях за "
 "допомогою GIT_REPO_DIR"
 
 #: lms/djangoapps/dashboard/git_import.py
 msgid ""
-"Non usable git url provided. Expecting something like: git@github.com:edx/"
-"edx4edx_lite.git"
+"Non usable git url provided. Expecting something like: "
+"git@github.com:edx/edx4edx_lite.git"
 msgstr ""
 
 #: lms/djangoapps/dashboard/git_import.py
@@ -6751,8 +6760,8 @@ msgstr ""
 
 #: lms/djangoapps/dashboard/management/commands/git_add_course.py
 msgid ""
-"Import the specified git repository and optional branch into the modulestore "
-"and optionally specified directory."
+"Import the specified git repository and optional branch into the modulestore"
+" and optionally specified directory."
 msgstr ""
 "Імпортувати вказаний git-репозиторій і вибіркову гілку у сховище модулів і "
 "опціонально зазначений розділ."
@@ -6791,7 +6800,8 @@ msgstr "Не вдалося знайти користувача з email {email_
 #: lms/djangoapps/dashboard/sysadmin.py
 #, python-brace-format
 msgid "Cannot find user with username {username} - {error}"
-msgstr "Не вдалося знайти користувача з ім'ям користувача {username} - {error}"
+msgstr ""
+"Не вдалося знайти користувача з ім'ям користувача {username} - {error}"
 
 #: lms/djangoapps/dashboard/sysadmin.py
 #, python-brace-format
@@ -6917,7 +6927,8 @@ msgid "Comment level too deep"
 msgstr "Рівень коментаря надто глибокий"
 
 #: lms/djangoapps/discussion/django_comment_client/base/views.py
-msgid "Error uploading file. Please contact the site administrator. Thank you."
+msgid ""
+"Error uploading file. Please contact the site administrator. Thank you."
 msgstr ""
 "Помилка при завантаженні файлу. Будь ласка, зв'яжіться із адміністратором "
 "сайту. Дякуємо."
@@ -7045,8 +7056,8 @@ msgstr "Витрати в центах, щоб повідомити Sailthru п�
 
 #: lms/djangoapps/email_marketing/models.py
 msgid ""
-"Optional lms url scheme + host used to construct urls for content library, e."
-"g. https://courses.edx.org."
+"Optional lms url scheme + host used to construct urls for content library, "
+"e.g. https://courses.edx.org."
 msgstr ""
 "Необов'язкова схема lms url scheme + хост, що використовується для побудови "
 "URL-адреси для контенту бібліотеки , наприклад https://courses.edx.org."
@@ -7081,14 +7092,10 @@ msgstr "Коментар до контрольованого іспиту: {revi
 #: lms/djangoapps/instructor/services.py
 #, python-brace-format
 msgid ""
-"A proctored exam attempt for {exam_name} in {course_name} by username: "
-"{student_username} was reviewed as {review_status} by the proctored exam "
-"review provider.\n"
+"A proctored exam attempt for {exam_name} in {course_name} by username: {student_username} was reviewed as {review_status} by the proctored exam review provider.\n"
 "Review link: {review_url}"
 msgstr ""
-"Очна спроба скласти екзамен для  {exam_name} у {course_name} користувачем:"
-"{student_username} була переглянута як  {review_status} провайдером "
-"перевірки іспиту\n"
+"Очна спроба скласти екзамен для  {exam_name} у {course_name} користувачем:{student_username} була переглянута як  {review_status} провайдером перевірки іспиту\n"
 "Посилання для перегляду:{review_url}"
 
 #: lms/djangoapps/instructor/settings/common.py
@@ -7098,8 +7105,8 @@ msgstr "Статистика платформи"
 #: lms/djangoapps/instructor/views/api.py
 #, python-brace-format
 msgid ""
-"The {report_type} report is being created. To view the status of the report, "
-"see Pending Tasks below."
+"The {report_type} report is being created. To view the status of the report,"
+" see Pending Tasks below."
 msgstr ""
 "Звіт {report_type} створюється. Щоб переглянути стан звіту, перегляньте "
 "розділ \"Черга завдань\" нижче."
@@ -7130,8 +7137,8 @@ msgstr "Не можливо прочитати завантажений файл
 #: lms/djangoapps/instructor/views/api.py
 #, python-brace-format
 msgid ""
-"Data in row #{row_num} must have exactly four columns: email, username, full "
-"name, and country"
+"Data in row #{row_num} must have exactly four columns: email, username, full"
+" name, and country"
 msgstr ""
 "Дані в рядку #{row_num} повинні містити рівно чотири колонки: адресу "
 "електронної пошти, ім'я користувача, повне ім'я і країну"
@@ -7144,8 +7151,8 @@ msgstr "Не корректна e-mail адреса {email_address}"
 #: lms/djangoapps/instructor/views/api.py
 #, python-brace-format
 msgid ""
-"An account with email {email} exists but the provided username {username} is "
-"different. Enrolling anyway with {email}."
+"An account with email {email} exists but the provided username {username} is"
+" different. Enrolling anyway with {email}."
 msgstr ""
 "Обліковий запис з адресою електронної пошти {email} існує, але вказане ім'я "
 "користувача {username} відрізняється. Продовжити реєстрацію з адресою "
@@ -7164,8 +7171,8 @@ msgstr "Ім'я користувача {user} в системі вже існу�
 #, python-brace-format
 msgid ""
 "Error '{error}' while sending email to new user (user email={email}). "
-"Without the email student would not be able to login. Please contact support "
-"for further information."
+"Without the email student would not be able to login. Please contact support"
+" for further information."
 msgstr ""
 "Помилка '{error}' при надсиланні листа новому користувачу (електронна пошта "
 "користувача={email}).  Без листа слухач не зможе увійти в систему. Будь "
@@ -7410,7 +7417,8 @@ msgid "Successfully changed due date for student {0} for {1} to {2}"
 msgstr "Вдало змінений термін оплати для студена {0} з {1} до {2}"
 
 #: lms/djangoapps/instructor/views/api.py
-msgid "Successfully removed invalid due date extension (unit has no due date)."
+msgid ""
+"Successfully removed invalid due date extension (unit has no due date)."
 msgstr ""
 "Некоректно продовжений термін здачі завдання успішно видалений (у блоку "
 "відсутній термін здачі)."
@@ -7494,7 +7502,8 @@ msgstr ""
 
 #: lms/djangoapps/instructor/views/api.py
 #, python-brace-format
-msgid "{user} does not exist in the LMS. Please check your spelling and retry."
+msgid ""
+"{user} does not exist in the LMS. Please check your spelling and retry."
 msgstr ""
 "{user} не зареєстрований в системі. Будь ласка, перевірте правильність "
 "введення і повторіть спробу."
@@ -7504,8 +7513,8 @@ msgstr ""
 msgid ""
 "{user} is not enrolled in this course. Please check your spelling and retry."
 msgstr ""
-"{user} не записаний на цей курс. Будь ласка, перевірте правильність введення "
-"і повторіть спробу."
+"{user} не записаний на цей курс. Будь ласка, перевірте правильність введення"
+" і повторіть спробу."
 
 #: lms/djangoapps/instructor/views/api.py
 msgid "Invalid data, generate_for must be \"new\" or \"all\"."
@@ -7549,8 +7558,8 @@ msgid ""
 "Certificate Invalidation does not exist, Please refresh the page and try "
 "again."
 msgstr ""
-"Анульованих сертифікатів не існує. Будь ласка, оновіть сторінку та повторіть "
-"спробу."
+"Анульованих сертифікатів не існує. Будь ласка, оновіть сторінку та повторіть"
+" спробу."
 
 #: lms/djangoapps/instructor/views/api.py
 msgid ""
@@ -7564,8 +7573,8 @@ msgstr ""
 #, python-brace-format
 msgid ""
 "The student {student} does not have certificate for the course {course}. "
-"Kindly verify student username/email and the selected course are correct and "
-"try again."
+"Kindly verify student username/email and the selected course are correct and"
+" try again."
 msgstr ""
 "{student} не має сертифікату за курс {course}. Будь ласка, переконайтесь у "
 "правильності ім'я користувача/адресі електронної пошти та обраного курсу, "
@@ -7578,11 +7587,11 @@ msgstr "Викладач"
 #: lms/djangoapps/instructor/views/instructor_dashboard.py
 #, python-brace-format
 msgid ""
-"To gain insights into student enrollment and participation {link_start}visit "
-"{analytics_dashboard_name}, our new course analytics product{link_end}."
+"To gain insights into student enrollment and participation {link_start}visit"
+" {analytics_dashboard_name}, our new course analytics product{link_end}."
 msgstr ""
-"Щоб дізнатися більше {link_start} відвідайте {analytics_dashboard_name}, наш "
-"курс з аналізу даних {link_end}."
+"Щоб дізнатися більше {link_start} відвідайте {analytics_dashboard_name}, наш"
+" курс з аналізу даних {link_end}."
 
 #: lms/djangoapps/instructor/views/instructor_dashboard.py
 msgid "Special Exams"
@@ -7614,7 +7623,8 @@ msgstr "Інформація про курс"
 #: lms/djangoapps/instructor/views/instructor_dashboard.py
 #, python-brace-format
 msgid "Enrollment data is now available in {dashboard_link}."
-msgstr "Дані про кількість зареєстрованих тепер доступні тут {dashboard_link}."
+msgstr ""
+"Дані про кількість зареєстрованих тепер доступні тут {dashboard_link}."
 
 #: lms/djangoapps/instructor/views/instructor_dashboard.py
 msgid "Membership"
@@ -7750,9 +7760,9 @@ msgstr "деталі запису"
 #: lms/djangoapps/instructor_task/api_helper.py
 #, python-brace-format
 msgid ""
-"The {report_type} report is being created. To view the status of the report, "
-"see Pending Tasks below. You will be able to download the report when it is "
-"complete."
+"The {report_type} report is being created. To view the status of the report,"
+" see Pending Tasks below. You will be able to download the report when it is"
+" complete."
 msgstr ""
 "Звіт {report_type} створюється. Щоб переглянути стан звіту, див. Список "
 "Відкладених Задач нижче. Ви зможете завантажити звіт, коли він буде "
@@ -7896,7 +7906,8 @@ msgstr "Прогрес: на даний момент {action} {succeeded} з {at
 #: lms/djangoapps/instructor_task/views.py
 #, python-brace-format
 msgid "Unable to find submission to be {action} for student '{student}'"
-msgstr "Не вдалося знайти завдання, яке має бути {action} студента '{student}'"
+msgstr ""
+"Не вдалося знайти завдання, яке має бути {action} студента '{student}'"
 
 #. Translators: {action} is a past-tense verb that is localized separately.
 #. {student} is a student identifier.
@@ -8021,12 +8032,13 @@ msgid ""
 "This component's access settings refer to deleted or invalid group "
 "configurations."
 msgstr ""
-"Налаштування доступу цього компоненту посилаються на видалені або некоректні "
-"налаштування груп."
+"Налаштування доступу цього компоненту посилаються на видалені або некоректні"
+" налаштування груп."
 
 #: lms/djangoapps/lms_xblock/mixin.py
 msgid ""
-"This unit's access settings refer to deleted or invalid group configurations."
+"This unit's access settings refer to deleted or invalid group "
+"configurations."
 msgstr ""
 "Налаштування доступу цього юніту відносяться до видалених або недійсних "
 "конфігурацій груп."
@@ -8034,13 +8046,14 @@ msgstr ""
 #: lms/djangoapps/lms_xblock/mixin.py
 msgid "This component's access settings refer to deleted or invalid groups."
 msgstr ""
-"Налаштування доступу цього компоненту посилаються на видалені або некоректні "
-"групи."
+"Налаштування доступу цього компоненту посилаються на видалені або некоректні"
+" групи."
 
 #: lms/djangoapps/lms_xblock/mixin.py
 msgid "This unit's access settings refer to deleted or invalid groups."
 msgstr ""
-"Налаштування доступа цього юніта посилаються на видалені чи некоректні групи."
+"Налаштування доступа цього юніта посилаються на видалені чи некоректні "
+"групи."
 
 #: lms/djangoapps/lms_xblock/mixin.py
 msgid ""
@@ -8059,8 +8072,8 @@ msgid ""
 "What format this module is in (used for deciding which grader to apply, and "
 "what to show in the TOC)"
 msgstr ""
-"В якому форматі цей модуль (використовується для рішення про те, яку систему "
-"оцінки застосовувати, і що показувати в змісті)"
+"В якому форматі цей модуль (використовується для рішення про те, яку систему"
+" оцінки застосовувати, і що показувати в змісті)"
 
 #: lms/djangoapps/lms_xblock/mixin.py
 msgid "Course Chrome"
@@ -8070,8 +8083,7 @@ msgstr "Налаштування Chrome"
 #. specific words for the acceptable values.
 #: lms/djangoapps/lms_xblock/mixin.py
 msgid ""
-"Enter the chrome, or navigation tools, to use for the XBlock in the LMS. "
-"Valid values are: \n"
+"Enter the chrome, or navigation tools, to use for the XBlock in the LMS. Valid values are: \n"
 "\"chromeless\" -- to not use tabs or the accordion; \n"
 "\"tabs\" -- to use tabs only; \n"
 "\"accordion\" -- to use the accordion only; or \n"
@@ -18703,8 +18715,8 @@ msgstr ""
 
 #: lms/templates/static_templates/404.html
 msgid ""
-"The page that you were looking for was not found. Go back to the {link_start}"
-"homepage{link_end} ."
+"The page that you were looking for was not found. Go back to the "
+"{link_start}homepage{link_end} ."
 msgstr ""
 
 #: lms/templates/static_templates/about.html
@@ -18775,8 +18787,8 @@ msgstr "Налаштування облікового запису"
 
 #: lms/templates/student_account/account_settings.html
 msgid ""
-" and access to private sites offered by MIT Open Learning, Wharton Executive "
-"Education, and Harvard Medical School"
+" and access to private sites offered by MIT Open Learning, Wharton Executive"
+" Education, and Harvard Medical School"
 msgstr ""
 
 #: lms/templates/student_account/finish_auth.html
@@ -18842,9 +18854,9 @@ msgstr ""
 #: lms/templates/survey/survey.html
 msgid ""
 "You can begin your course as soon as you complete the following form. "
-"Required fields are marked with an asterisk (*). This information is for the "
-"use of {platform_name} only. It will not be linked to your public profile in "
-"any way."
+"Required fields are marked with an asterisk (*). This information is for the"
+" use of {platform_name} only. It will not be linked to your public profile "
+"in any way."
 msgstr ""
 
 #: lms/templates/survey/survey.html
@@ -18915,13 +18927,14 @@ msgstr ""
 
 #: lms/templates/verify_student/missed_deadline.html
 msgid ""
-"The verification deadline for {course_name} was {{date}}. Verification is no "
-"longer available."
+"The verification deadline for {course_name} was {{date}}. Verification is no"
+" longer available."
 msgstr ""
 
 #: lms/templates/verify_student/missed_deadline.html
 msgid ""
-"The deadline to upgrade to a verified certificate for this course has passed."
+"The deadline to upgrade to a verified certificate for this course has "
+"passed."
 msgstr ""
 
 #: lms/templates/verify_student/pay_and_verify.html
@@ -19133,8 +19146,8 @@ msgstr ""
 
 #: openedx/features/course_experience/templates/course_experience/course-sock-fragment.html
 msgid ""
-"My certificate has helped me showcase my knowledge on "
-"my                             resume - I feel like this certificate could "
+"My certificate has helped me showcase my knowledge on my"
+"                             resume - I feel like this certificate could "
 "really help me land                             my dream job!"
 msgstr ""
 
@@ -19144,10 +19157,10 @@ msgstr ""
 
 #: openedx/features/course_experience/templates/course_experience/course-sock-fragment.html
 msgid ""
-"I wanted to include a verified certificate on my resume and my profile "
-"to                             illustrate that I am working towards this "
-"goal I have and that I have                             achieved something "
-"while I was unemployed."
+"I wanted to include a verified certificate on my resume and my profile to"
+"                             illustrate that I am working towards this goal "
+"I have and that I have                             achieved something while "
+"I was unemployed."
 msgstr ""
 
 #: openedx/features/course_experience/templates/course_experience/course-sock-fragment.html
@@ -19226,7 +19239,8 @@ msgid "My Profile"
 msgstr "Мій профіль"
 
 #: openedx/features/learner_profile/templates/learner_profile/learner_profile.html
-msgid "Build out your profile to personalize your identity on {platform_name}."
+msgid ""
+"Build out your profile to personalize your identity on {platform_name}."
 msgstr ""
 
 #: openedx/features/learner_profile/templates/learner_profile/learner_profile.html
@@ -19288,8 +19302,8 @@ msgstr ""
 #: themes/edx.org/lms/templates/certificates/_about-accomplishments.html
 msgid ""
 "An edX Verified Certificate signifies that the learner has agreed to abide "
-"by the edX honor code and completed all of the required tasks of this course "
-"under its guidelines, as well as having their photo ID checked to verify "
+"by the edX honor code and completed all of the required tasks of this course"
+" under its guidelines, as well as having their photo ID checked to verify "
 "their identity."
 msgstr ""
 
@@ -19503,8 +19517,8 @@ msgstr ""
 
 #: themes/stanford-style/lms/templates/register-shib.html
 msgid ""
-"Required fields are noted by {strong_indicator}bold text and an asterisk (*)."
-"{strong_close}"
+"Required fields are noted by {strong_indicator}bold text and an asterisk "
+"(*).{strong_close}"
 msgstr ""
 
 #: themes/stanford-style/lms/templates/register-shib.html
@@ -19531,8 +19545,8 @@ msgstr ""
 
 #: themes/stanford-style/lms/templates/register-sidebar.html
 msgid ""
-"You will receive an activation email.  You must click on the activation link "
-"to complete the process.  Don't see the email?  Check your spam folder and "
+"You will receive an activation email.  You must click on the activation link"
+" to complete the process.  Don't see the email?  Check your spam folder and "
 "mark emails from class.stanford.edu as 'not spam', since you'll want to be "
 "able to receive email from your courses."
 msgstr ""
@@ -19561,16 +19575,16 @@ msgstr ""
 
 #: themes/stanford-style/lms/templates/emails/activation_email.txt
 msgid ""
-"Change your life and start learning today by activating your {platform_name} "
-"account. Click on the link below or copy and paste it into your browser's "
+"Change your life and start learning today by activating your {platform_name}"
+" account. Click on the link below or copy and paste it into your browser's "
 "address bar."
 msgstr ""
 
 #: themes/stanford-style/lms/templates/emails/activation_email.txt
 #: themes/stanford-style/lms/templates/emails/email_change.txt
 msgid ""
-"If you didn't request this, you don't need to do anything; you won't receive "
-"any more email from us. Please do not reply to this e-mail; if you require "
+"If you didn't request this, you don't need to do anything; you won't receive"
+" any more email from us. Please do not reply to this e-mail; if you require "
 "assistance, check the about section of the {platform_name} Courses web site."
 msgstr ""
 
@@ -19584,19 +19598,19 @@ msgstr ""
 #: themes/stanford-style/lms/templates/emails/email_change.txt
 msgid ""
 "We received a request to change the e-mail associated with your "
-"{platform_name} account from {old_email} to {new_email}. If this is correct, "
-"please confirm your new e-mail address by visiting:"
+"{platform_name} account from {old_email} to {new_email}. If this is correct,"
+" please confirm your new e-mail address by visiting:"
 msgstr ""
 
 #: themes/stanford-style/lms/templates/emails/reject_name_change.txt
 msgid ""
 "We are sorry. Our course staff did not approve your request to change your "
-"name from {old_name} to {new_name}. If you need further assistance, please e-"
-"mail the tech support at {email}"
+"name from {old_name} to {new_name}. If you need further assistance, please "
+"e-mail the tech support at {email}"
 msgstr ""
 "Вибачте. Наш персонал відхилив ваш запит на зміну вашого імені з {old_name} "
-"на {new_name}. Якщо вам все ще потрібна наша допомога, будь ласка, надішліть "
-"листа на адресу технічної підтримки {email}"
+"на {new_name}. Якщо вам все ще потрібна наша допомога, будь ласка, надішліть"
+" листа на адресу технічної підтримки {email}"
 
 #: themes/stanford-style/lms/templates/static_templates/tos.html
 msgid "Put your Terms of Service here!"
@@ -19679,8 +19693,8 @@ msgid ""
 "For verified certificates, specify between one and four signatories and "
 "upload the associated images."
 msgstr ""
-"Для верифікованих сертифікатів вкажіть від одного до чотирьох підписантів та "
-"завантажте відповідні зображення."
+"Для верифікованих сертифікатів вкажіть від одного до чотирьох підписантів та"
+" завантажте відповідні зображення."
 
 #: cms/templates/certificates.html
 msgid ""
@@ -19691,8 +19705,8 @@ msgstr ""
 
 #: cms/templates/certificates.html
 msgid ""
-"To view a sample certificate, choose a course mode and select {em_start}"
-"Preview Certificate{em_end}."
+"To view a sample certificate, choose a course mode and select "
+"{em_start}Preview Certificate{em_end}."
 msgstr ""
 
 #: cms/templates/certificates.html
@@ -19843,8 +19857,8 @@ msgstr ""
 
 #: cms/templates/container.html
 msgid ""
-"Confirm that you have properly configured content in each of your experiment "
-"groups."
+"Confirm that you have properly configured content in each of your experiment"
+" groups."
 msgstr ""
 
 #: cms/templates/container.html
@@ -20005,9 +20019,9 @@ msgstr "Додати оновлення"
 
 #: cms/templates/course_info.html
 msgid ""
-"Use course updates to notify students of important dates or exams, highlight "
-"particular discussions in the forums, announce schedule changes, and respond "
-"to student questions. You add or edit updates in HTML."
+"Use course updates to notify students of important dates or exams, highlight"
+" particular discussions in the forums, announce schedule changes, and "
+"respond to student questions. You add or edit updates in HTML."
 msgstr ""
 "Використовуйте новини курсу, щоб повідомити студентів про важливі дати чи "
 "іспити, привернути увагу до певних дискусій на форумах, оголосити про зміни "
@@ -20166,8 +20180,8 @@ msgstr ""
 
 #: cms/templates/course_outline.html
 msgid ""
-"To publish draft content, select the Publish icon for a section, subsection, "
-"or unit."
+"To publish draft content, select the Publish icon for a section, subsection,"
+" or unit."
 msgstr ""
 "Щоб опублікувати новий контент чи зміни у ньому, натисніть \"Опублікувати\" "
 "для розділу, підрозділу чи блоку."
@@ -20175,9 +20189,9 @@ msgstr ""
 #: cms/templates/course_outline.html
 msgid ""
 "To make a section, subsection, or unit unavailable to learners, select the "
-"Configure icon for that level, then select the appropriate {em_start}"
-"Hide{em_end} option. Grades for hidden sections, subsections, and units are "
-"not included in grade calculations."
+"Configure icon for that level, then select the appropriate "
+"{em_start}Hide{em_end} option. Grades for hidden sections, subsections, and "
+"units are not included in grade calculations."
 msgstr ""
 
 #: cms/templates/course_outline.html
@@ -20240,12 +20254,12 @@ msgstr "Що таке сторінки?"
 #: cms/templates/edit-tabs.html
 msgid ""
 "Pages are listed horizontally at the top of your course. Default pages "
-"(Home, Course, Discussion, Wiki, and Progress) are followed by textbooks and "
-"custom pages that you create."
+"(Home, Course, Discussion, Wiki, and Progress) are followed by textbooks and"
+" custom pages that you create."
 msgstr ""
-"Сторінки відображаються горизонтально у верхній частині курсу. За сторінками "
-"за умовчанням (Навчальна програма, Інформація про курс, Обговорення, Вікі та "
-"Прогрес) слідують підручники та власні сторінки, які ви створюєте."
+"Сторінки відображаються горизонтально у верхній частині курсу. За сторінками"
+" за умовчанням (Навчальна програма, Інформація про курс, Обговорення, Вікі "
+"та Прогрес) слідують підручники та власні сторінки, які ви створюєте."
 
 #: cms/templates/edit-tabs.html
 msgid "Custom pages"
@@ -20288,12 +20302,12 @@ msgstr "Попередній перегляд сторінок вашого ку
 #: cms/templates/edit-tabs.html
 msgid ""
 "Pages appear in your course's top navigation bar. The default pages (Home, "
-"Course, Discussion, Wiki, and Progress) are followed by textbooks and custom "
-"pages."
+"Course, Discussion, Wiki, and Progress) are followed by textbooks and custom"
+" pages."
 msgstr ""
-"Сторінки з'являються на верхній панелі навігації вашого курсу. За сторінками "
-"за умовчанням (Навчальна програма, Інформація про курс, Обговорення, Вікі та "
-"Прогрес) слідують підручники та спеціальні сторінки, які ви створюєте."
+"Сторінки з'являються на верхній панелі навігації вашого курсу. За сторінками"
+" за умовчанням (Навчальна програма, Інформація про курс, Обговорення, Вікі "
+"та Прогрес) слідують підручники та спеціальні сторінки, які ви створюєте."
 
 #: cms/templates/edit-tabs.html cms/templates/howitworks.html
 msgid "close modal"
@@ -20345,8 +20359,8 @@ msgstr "Про експорт бібліотек"
 msgid ""
 "You can export libraries and edit them outside of {studio_name}. The "
 "exported file is a .tar.gz file (that is, a .tar file compressed with GNU "
-"Zip) that contains the library structure and content. You can also re-import "
-"libraries that you've exported."
+"Zip) that contains the library structure and content. You can also re-import"
+" libraries that you've exported."
 msgstr ""
 
 #: cms/templates/export.html
@@ -20370,15 +20384,15 @@ msgstr ""
 msgid ""
 "{em_start}Caution:{em_end} When you export a course, information such as "
 "MATLAB API keys, LTI passports, annotation secret token strings, and "
-"annotation storage URLs are included in the exported data. If you share your "
-"exported files, you may also be sharing sensitive or license-specific "
+"annotation storage URLs are included in the exported data. If you share your"
+" exported files, you may also be sharing sensitive or license-specific "
 "information."
 msgstr ""
 "{em_start}Застереження:{em_end} Під час експорту курсу буде додано таку "
 "інформацію, як ключі MATLAB API, паспорти LTI, секретні маркери анотації та "
 "URL-адреси зберігання анотацій. Будьте уважні, коли ви ділитесь своїми "
-"експортованими файлами, адже туди може потрапити конфіденційна інформація чи "
-"така, для якої потрібен дозвіл."
+"експортованими файлами, адже туди може потрапити конфіденційна інформація чи"
+" така, для якої потрібен дозвіл."
 
 #: cms/templates/export.html
 msgid "Export My Library Content"
@@ -20500,8 +20514,8 @@ msgstr ""
 #: cms/templates/export.html
 msgid ""
 "You may want to edit the XML in your library directly, outside of "
-"{studio_name}. You may want to create a backup copy of your library. Or, you "
-"may want to create a copy of your library that you can later import into "
+"{studio_name}. You may want to create a backup copy of your library. Or, you"
+" may want to create a copy of your library that you can later import into "
 "another library instance and customize."
 msgstr ""
 
@@ -20583,8 +20597,8 @@ msgstr ""
 #: cms/templates/export.html
 msgid ""
 "Use an archive program to extract the data from the .tar.gz file. Extracted "
-"data includes the course.xml file, as well as subfolders that contain course "
-"content."
+"data includes the course.xml file, as well as subfolders that contain course"
+" content."
 msgstr ""
 "Використовуйте архівну програму для вилучення даних із файлу .tar.gz. "
 "Вилучені дані містять файл course.xml, а також вкладені папки з контентом "
@@ -20678,16 +20692,16 @@ msgid ""
 "content that particular cohorts see in your course."
 msgstr ""
 "Якщо у вашому курсі увімкнено когорти, ви можете використовувати контентні "
-"групи для створення навчальної програми для певних когорт. Інакше кажучи, ви "
-"можете добирати контент, який певні когорти бачать у вашому курсі."
+"групи для створення навчальної програми для певних когорт. Інакше кажучи, ви"
+" можете добирати контент, який певні когорти бачать у вашому курсі."
 
 #: cms/templates/group_configurations.html
 msgid ""
 "Each content group that you create can be associated with one or more "
-"cohorts. In addition to making course content available to all learners, you "
-"can restrict access to some content to learners in specific content groups. "
-"Only learners in the cohorts that are associated with the specified content "
-"groups see the additional content."
+"cohorts. In addition to making course content available to all learners, you"
+" can restrict access to some content to learners in specific content groups."
+" Only learners in the cohorts that are associated with the specified content"
+" groups see the additional content."
 msgstr ""
 "Кожна контентна група, яку ви створюєте, може бути пов'язана з однією чи "
 "кількома когортами. Окрім контенту курсу, призначеного для всіх студентів, "
@@ -20698,10 +20712,10 @@ msgstr ""
 #: cms/templates/group_configurations.html
 msgid ""
 "Click {em_start}New content group{em_end} to add a new content group. To "
-"edit the name of a content group, hover over its box and click {em_start}"
-"Edit{em_end}. You can delete a content group only if it is not in use by a "
-"unit. To delete a content group, hover over its box and click the delete "
-"icon."
+"edit the name of a content group, hover over its box and click "
+"{em_start}Edit{em_end}. You can delete a content group only if it is not in "
+"use by a unit. To delete a content group, hover over its box and click the "
+"delete icon."
 msgstr ""
 "Натисніть {em_start} «Нова контентна група»{em_end} , щоб додати нову "
 "контентну групу. Щоб відредагувати назву контентної групи, наведіть курсор "
@@ -20722,10 +20736,10 @@ msgstr ""
 #: cms/templates/group_configurations.html
 msgid ""
 "Click {em_start}New Group Configuration{em_end} to add a new configuration. "
-"To edit a configuration, hover over its box and click {em_start}"
-"Edit{em_end}. You can delete a group configuration only if it is not in use "
-"in an experiment. To delete a configuration, hover over its box and click "
-"the delete icon."
+"To edit a configuration, hover over its box and click "
+"{em_start}Edit{em_end}. You can delete a group configuration only if it is "
+"not in use in an experiment. To delete a configuration, hover over its box "
+"and click the delete icon."
 msgstr ""
 "Натисніть {em_start} «Нове налаштування груп»{em_end} , щоб додати нове "
 "нашаштування. Щоб додати налаштування, наведіть курсор миші на поле та "
@@ -20744,8 +20758,8 @@ msgstr ""
 
 #: cms/templates/howitworks.html
 msgid ""
-"{studio_name} helps manage your online courses, so you can focus on teaching "
-"them"
+"{studio_name} helps manage your online courses, so you can focus on teaching"
+" them"
 msgstr ""
 
 #: cms/templates/howitworks.html
@@ -20856,8 +20870,8 @@ msgstr ""
 msgid ""
 "{studio_name} works like web applications you already know, yet understands "
 "how you build curriculum. Instant publishing to the web when you want it, "
-"incremental release when it makes sense. And with co-authors, you can have a "
-"whole team building a course, together."
+"incremental release when it makes sense. And with co-authors, you can have a"
+" whole team building a course, together."
 msgstr ""
 
 #: cms/templates/howitworks.html
@@ -20866,8 +20880,8 @@ msgstr ""
 
 #: cms/templates/howitworks.html
 msgid ""
-"Caught a bug? No problem. When you want, your changes go live when you click "
-"Save."
+"Caught a bug? No problem. When you want, your changes go live when you click"
+" Save."
 msgstr ""
 
 #: cms/templates/howitworks.html
@@ -20876,8 +20890,8 @@ msgstr ""
 
 #: cms/templates/howitworks.html
 msgid ""
-"When you've finished a {strong_start}section{strong_end}, pick when you want "
-"it to go live and {studio_name} takes care of the rest. Build your course "
+"When you've finished a {strong_start}section{strong_end}, pick when you want"
+" it to go live and {studio_name} takes care of the rest. Build your course "
 "incrementally."
 msgstr ""
 
@@ -20963,8 +20977,8 @@ msgstr ""
 #: cms/templates/import.html
 msgid ""
 "The library that you import must be in a .tar.gz file (that is, a .tar file "
-"compressed with GNU Zip). This .tar.gz file must contain a library.xml file. "
-"It may also contain other files."
+"compressed with GNU Zip). This .tar.gz file must contain a library.xml file."
+" It may also contain other files."
 msgstr ""
 
 #: cms/templates/import.html
@@ -20978,14 +20992,15 @@ msgstr ""
 #: cms/templates/import.html
 msgid ""
 "Be sure you want to import a course before continuing. The contents of the "
-"imported course will replace the contents of the existing course. {em_start}"
-"You cannot undo a course import{em_end}. Before you proceed, we recommend "
-"that you export the current course, so that you have a backup copy of it."
+"imported course will replace the contents of the existing course. "
+"{em_start}You cannot undo a course import{em_end}. Before you proceed, we "
+"recommend that you export the current course, so that you have a backup copy"
+" of it."
 msgstr ""
-"Переконатеся, що дійсно хочете імпортувати курс. Контент імпортованого курсу "
-"замінить контент існуючого. {em_start}Ви не можете скасувати імпорт курсу."
-"{em_end}. Тому ми рекомендуємо спершу експортувати поточний курс, щоб мати "
-"його резервну копію."
+"Переконатеся, що дійсно хочете імпортувати курс. Контент імпортованого курсу"
+" замінить контент існуючого. {em_start}Ви не можете скасувати імпорт "
+"курсу.{em_end}. Тому ми рекомендуємо спершу експортувати поточний курс, щоб "
+"мати його резервну копію."
 
 #: cms/templates/import.html
 msgid ""
@@ -20993,8 +21008,8 @@ msgid ""
 "compressed with GNU Zip). This .tar.gz file must contain a course.xml file. "
 "It may also contain other files."
 msgstr ""
-"Курс, який ви імпортуєте, повинен знаходитися у файлі .tar.gz (тобто файл ."
-"tar, стиснутий GNU Zip). Цей файл .tar.gz повинен містити файл course.xml. "
+"Курс, який ви імпортуєте, повинен знаходитися у файлі .tar.gz (тобто файл "
+".tar, стиснутий GNU Zip). Цей файл .tar.gz повинен містити файл course.xml. "
 "Він також може мати й інші файли."
 
 #: cms/templates/import.html
@@ -21006,8 +21021,8 @@ msgid ""
 msgstr ""
 "Процес імпорту складається з п'яти етапів. Протягом перших двох етапів ви "
 "повинні залишатися на цій сторінці. Ви можете залишити цю сторінку після "
-"завершення етапу розпакування. Проте ми рекомендуємо не робити важливих змін "
-"у вашому курсі, доки операція імпорту не завершиться."
+"завершення етапу розпакування. Проте ми рекомендуємо не робити важливих змін"
+" у вашому курсі, доки операція імпорту не завершиться."
 
 #: cms/templates/import.html
 msgid "Select a .tar.gz File to Replace Your Library Content"
@@ -21074,8 +21089,8 @@ msgstr ""
 
 #: cms/templates/import.html
 msgid ""
-"Integrating your imported content into this library. This process might take "
-"longer with larger libraries."
+"Integrating your imported content into this library. This process might take"
+" longer with larger libraries."
 msgstr ""
 
 #: cms/templates/import.html
@@ -21106,8 +21121,8 @@ msgstr ""
 
 #: cms/templates/import.html
 msgid ""
-"You might want to update an existing library to a new version, or replace an "
-"existing library entirely. You might also have developed a library outside "
+"You might want to update an existing library to a new version, or replace an"
+" existing library entirely. You might also have developed a library outside "
 "of {studio_name}."
 msgstr ""
 
@@ -21164,9 +21179,9 @@ msgid ""
 "students' problem scores."
 msgstr ""
 "Якщо ви здійснюєте імпорт, коли курс вже запущено, та змінюєте URL-адреси "
-"(або url_name вузли) будь-яких компонентів завдань, дані студента, пов'язані "
-"з компонентами завдань, можуть бути втрачені. Ці дані містять у собі оцінки "
-"студентів за проходження завдань."
+"(або url_name вузли) будь-яких компонентів завдань, дані студента, пов'язані"
+" з компонентами завдань, можуть бути втрачені. Ці дані містять у собі оцінки"
+" студентів за проходження завдань."
 
 #: cms/templates/import.html
 msgid "Learn more about importing a course"
@@ -21202,8 +21217,8 @@ msgstr ""
 
 #: cms/templates/index.html
 msgid ""
-"The public display name for your course. This cannot be changed, but you can "
-"set a different display name in Advanced Settings later."
+"The public display name for your course. This cannot be changed, but you can"
+" set a different display name in Advanced Settings later."
 msgstr ""
 "Публічна назва вашого курсу. Її неможливо змінити, але пізніше можна "
 "зазначити іншу назву в \"Розширенних налаштуваннях\""
@@ -21212,22 +21227,24 @@ msgstr ""
 msgid ""
 "The name of the organization sponsoring the course. {strong_start}Note: The "
 "organization name is part of the course URL.{strong_end} This cannot be "
-"changed, but you can set a different display name in Advanced Settings later."
+"changed, but you can set a different display name in Advanced Settings "
+"later."
 msgstr ""
 "Назва організації, яка фінансує курс. {strong_start}Примітка: Назва "
 "організації є частиною URL-адреси курсу.{strong_end} Назву неможливо "
-"змінити, але пізніше можна зазначити іншу назву в \"Розширенних налаштуваннях"
-"\"."
+"змінити, але пізніше можна зазначити іншу назву в \"Розширенних "
+"налаштуваннях\"."
 
 #: cms/templates/index.html
 msgid ""
 "The unique number that identifies your course within your organization. "
-"{strong_start}Note: This is part of your course URL, so no spaces or special "
-"characters are allowed and it cannot be changed.{strong_end}"
+"{strong_start}Note: This is part of your course URL, so no spaces or special"
+" characters are allowed and it cannot be changed.{strong_end}"
 msgstr ""
-"Унікальний номер, який визначає ваш курс у вашій організації.  {strong_start}"
-"Примітка: Це частина URL-адреси вашого курсу, тому пробіли або спеціальні "
-"символи не допускаються, і цей номер не можна змінити.{strong_end}"
+"Унікальний номер, який визначає ваш курс у вашій організації.  "
+"{strong_start}Примітка: Це частина URL-адреси вашого курсу, тому пробіли або"
+" спеціальні символи не допускаються, і цей номер не можна "
+"змінити.{strong_end}"
 
 #: cms/templates/index.html
 msgid ""
@@ -21290,8 +21307,8 @@ msgstr "наприклад: CSPROB"
 #: cms/templates/index.html
 msgid ""
 "The unique code that identifies this library. {strong_start}Note: This is "
-"part of your library URL, so no spaces or special characters are allowed."
-"{strong_end} This cannot be changed."
+"part of your library URL, so no spaces or special characters are "
+"allowed.{strong_end} This cannot be changed."
 msgstr ""
 "Унікальний код, який ідентифікує цю бібліотеку. {strong_start}Примітка: Це "
 "частина URL-адреси вашої бібліотеки, тому пробіли або спеціальні символи не "
@@ -21329,8 +21346,8 @@ msgstr ""
 #: cms/templates/index.html
 msgid ""
 "The new course will be added to your course list in 5-10 minutes. Return to "
-"this page or {link_start}refresh it{link_end} to update the course list. The "
-"new course will need some manual configuration."
+"this page or {link_start}refresh it{link_end} to update the course list. The"
+" new course will need some manual configuration."
 msgstr ""
 "Новий курс буде додано до вашого списку курсів через 5-10 хвилин. "
 "Поверніться на цю сторінку або {link_start} оновіть її {link_end}, щоб "
@@ -21387,8 +21404,8 @@ msgstr ""
 
 #: cms/templates/index.html
 msgid ""
-"{studio_name} is a hosted solution for our xConsortium partners and selected "
-"guests. Courses for which you are a team member appear above for you to "
+"{studio_name} is a hosted solution for our xConsortium partners and selected"
+" guests. Courses for which you are a team member appear above for you to "
 "edit, while course creator privileges are granted by {platform_name}. Our "
 "team will evaluate your request and provide you feedback within 24 hours "
 "during the work week."
@@ -21408,8 +21425,8 @@ msgstr ""
 
 #: cms/templates/index.html
 msgid ""
-"{studio_name} is a hosted solution for our xConsortium partners and selected "
-"guests. Courses for which you are a team member appear above for you to "
+"{studio_name} is a hosted solution for our xConsortium partners and selected"
+" guests. Courses for which you are a team member appear above for you to "
 "edit, while course creator privileges are granted by {platform_name}. Our "
 "team is has completed evaluating your request."
 msgstr ""
@@ -21426,16 +21443,16 @@ msgstr ""
 
 #: cms/templates/index.html
 msgid ""
-"{studio_name} is a hosted solution for our xConsortium partners and selected "
-"guests. Courses for which you are a team member appear above for you to "
+"{studio_name} is a hosted solution for our xConsortium partners and selected"
+" guests. Courses for which you are a team member appear above for you to "
 "edit, while course creator privileges are granted by {platform_name}. Our "
 "team is currently  evaluating your request."
 msgstr ""
 
 #: cms/templates/index.html
 msgid ""
-"Your request is currently being reviewed by {platform_name} staff and should "
-"be updated shortly."
+"Your request is currently being reviewed by {platform_name} staff and should"
+" be updated shortly."
 msgstr ""
 
 #: cms/templates/index.html
@@ -21444,8 +21461,8 @@ msgstr "Ви очікували знайти тут певну бібліоте�
 
 #: cms/templates/index.html
 msgid ""
-"The library creator must give you access to the library. Contact the library "
-"creator or administrator for the library you are helping to author."
+"The library creator must give you access to the library. Contact the library"
+" creator or administrator for the library you are helping to author."
 msgstr ""
 "Автор бібліотеки повинен надати вам доступ до бібліотеки. Зверніться до "
 "розробника бібліотеки або адміністратора бібліотеки, з наповненням якої ви "
@@ -21460,8 +21477,9 @@ msgid ""
 "Libraries hold a pool of components that can be re-used across multiple "
 "courses. Create your first library with the click of a button!"
 msgstr ""
-"Бібліотеки мають комплекс компонентів, які можна повторно використовувати на "
-"кількох курсах. Створіть свою першу бібліотеку, лише натиснувши одну кнопку!"
+"Бібліотеки мають комплекс компонентів, які можна повторно використовувати на"
+" кількох курсах. Створіть свою першу бібліотеку, лише натиснувши одну "
+"кнопку!"
 
 #: cms/templates/index.html
 msgid "New to {studio_name}?"
@@ -21470,8 +21488,8 @@ msgstr "Вперше на {studio_name}?"
 #: cms/templates/index.html
 msgid ""
 "Click Help in the upper-right corner to get more information about the "
-"{studio_name} page you are viewing. You can also use the links at the bottom "
-"of the page to access our continually updated documentation and other "
+"{studio_name} page you are viewing. You can also use the links at the bottom"
+" of the page to access our continually updated documentation and other "
 "{studio_name} resources."
 msgstr ""
 "Натисніть «Допомога» у верхньому правому куті, щоб отримати додаткову "
@@ -21567,18 +21585,18 @@ msgstr "Використання контенту бібліотек на кур
 
 #: cms/templates/library.html
 msgid ""
-"Use library content in courses by adding the {em_start}"
-"library_content{em_end} policy key to the Advanced Module List in the "
-"course's Advanced Settings, then adding a Randomized Content Block to your "
-"courseware. In the settings for each Randomized Content Block, select this "
-"library as the source library, and specify the number of problems to be "
-"randomly selected and displayed to each student."
+"Use library content in courses by adding the "
+"{em_start}library_content{em_end} policy key to the Advanced Module List in "
+"the course's Advanced Settings, then adding a Randomized Content Block to "
+"your courseware. In the settings for each Randomized Content Block, select "
+"this library as the source library, and specify the number of problems to be"
+" randomly selected and displayed to each student."
 msgstr ""
 "Ви можете використовувати контент бібліотеки на курсах тільки після додання "
 "{em_start}library_content{em_end} ключа до Розширеного списку модулів в "
 "Розширенних налаштуваннях курсу. Після цього додайте Випадковий блок "
-"контенту до програми навчання. У налаштуваннях для кожного Випадкового блоку "
-"контенту оберіть цю бібліотеку як джерело бібліотеки та визначте кількість "
+"контенту до програми навчання. У налаштуваннях для кожного Випадкового блоку"
+" контенту оберіть цю бібліотеку як джерело бібліотеки та визначте кількість "
 "завдань, які будуть випадковим чином обиратися та відображатися кожному "
 "студенту."
 
@@ -21651,8 +21669,8 @@ msgstr ""
 
 #: cms/templates/manage_users.html
 msgid ""
-"All course team members can access content in Studio, the LMS, and Insights, "
-"but are not automatically enrolled in the course."
+"All course team members can access content in Studio, the LMS, and Insights,"
+" but are not automatically enrolled in the course."
 msgstr ""
 "Всі учасники команди курсу можуть отримати доступ до Студії, Навчальної "
 "системи та бачити cтатистику, але вони не зараховуються на курс автоматично."
@@ -21664,8 +21682,8 @@ msgstr ""
 #: cms/templates/manage_users.html
 msgid ""
 "Every course must have an Admin. If you are the Admin and you want to "
-"transfer ownership of the course, click <strong>Add admin access</strong> to "
-"make another user the Admin, then ask that user to remove you from the "
+"transfer ownership of the course, click <strong>Add admin access</strong> to"
+" make another user the Admin, then ask that user to remove you from the "
 "Course Team list."
 msgstr ""
 
@@ -21706,7 +21724,8 @@ msgstr ""
 #: cms/templates/manage_users_lib.html
 msgid "There are three access roles for libraries: User, Staff, and Admin."
 msgstr ""
-"Існує три ролі доступу для бібліотек: Користувач, Персонал та Адміністратор. "
+"Існує три ролі доступу для бібліотек: Користувач, Персонал та Адміністратор."
+" "
 
 #: cms/templates/manage_users_lib.html
 msgid ""
@@ -21723,8 +21742,8 @@ msgstr ""
 #: cms/templates/manage_users_lib.html
 msgid ""
 "Library Admins have full editing privileges and can also add and remove "
-"other team members. There must be at least one user with the Admin role in a "
-"library."
+"other team members. There must be at least one user with the Admin role in a"
+" library."
 msgstr ""
 
 #: cms/templates/settings.html
@@ -21943,8 +21962,8 @@ msgstr "Надайте корисну інформацію про ваш кур�
 
 #: cms/templates/settings.html
 msgid ""
-"Identify the course language here. This is used to assist users find courses "
-"that are taught in a specific language. It is also used to localize the "
+"Identify the course language here. This is used to assist users find courses"
+" that are taught in a specific language. It is also used to localize the "
 "'From:' field in bulk emails."
 msgstr ""
 "Визначте мову курсу тут. Це допоможе користувачам знайти курси, які "
@@ -22039,13 +22058,13 @@ msgid ""
 "You can manage this image along with all of your other {a_link_start}files "
 "and uploads{a_link_end}"
 msgstr ""
-"Ви можете редагувати зображення разом із усіма іншими вашими {a_link_start}"
-"файлами та завантаженнями{a_link_end}"
+"Ви можете редагувати зображення разом із усіма іншими вашими "
+"{a_link_start}файлами та завантаженнями{a_link_end}"
 
 #: cms/templates/settings.html
 msgid ""
-"Your course currently does not have an image. Please upload one (JPEG or PNG "
-"format, and minimum suggested dimensions are 375px wide by 200px tall)"
+"Your course currently does not have an image. Please upload one (JPEG or PNG"
+" format, and minimum suggested dimensions are 375px wide by 200px tall)"
 msgstr ""
 
 #. Translators: This is the placeholder text for a field that requests the URL
@@ -22068,8 +22087,8 @@ msgstr ""
 
 #: cms/templates/settings.html
 msgid ""
-"Your course currently does not have an image. Please upload one (JPEG or PNG "
-"format, and minimum suggested dimensions are 1440px wide by 400px tall)"
+"Your course currently does not have an image. Please upload one (JPEG or PNG"
+" format, and minimum suggested dimensions are 1440px wide by 400px tall)"
 msgstr ""
 
 #. Translators: This is the placeholder text for a field that requests the URL
@@ -22187,8 +22206,8 @@ msgstr ""
 
 #: cms/templates/settings.html
 msgid ""
-"You can now view and author your course entrance exam from the {link_start}"
-"Course Outline{link_end}."
+"You can now view and author your course entrance exam from the "
+"{link_start}Course Outline{link_end}."
 msgstr ""
 
 #: cms/templates/settings.html
@@ -22240,8 +22259,8 @@ msgid ""
 msgstr ""
 "Інша інформація з цієї сторінки відображається на сторінці «Про курс». Ця "
 "інформація включає в себе огляд курсу, зображення курсу, вступне відео та "
-"прогнозовані вимоги до часу. Студенти враховують іформацію на сторінці \"Про "
-"курс\" під час вибору курсу."
+"прогнозовані вимоги до часу. Студенти враховують іформацію на сторінці \"Про"
+" курс\" під час вибору курсу."
 
 #: cms/templates/settings_advanced.html
 msgid ""
@@ -22299,8 +22318,8 @@ msgstr ""
 
 #: cms/templates/settings_advanced.html
 msgid ""
-"{em_start}Note:{em_end} When you enter strings as policy values, ensure that "
-"you use double quotation marks (\") around the string. Do not use single "
+"{em_start}Note:{em_end} When you enter strings as policy values, ensure that"
+" you use double quotation marks (\") around the string. Do not use single "
 "quotation marks (')."
 msgstr ""
 
@@ -22371,8 +22390,8 @@ msgstr "Що я можу зробити на цій сторінці?"
 #: cms/templates/settings_graders.html
 msgid ""
 "You can use the slider under Overall Grade Range to specify whether your "
-"course is pass/fail or graded by letter, and to establish the thresholds for "
-"each grade."
+"course is pass/fail or graded by letter, and to establish the thresholds for"
+" each grade."
 msgstr ""
 "Ви можете скористатися повзунком під \"Загальним діапазоном оцінок\", щоб "
 "визначити як оцінюється ваш курс - складено/не складено або оцінка "
@@ -22393,8 +22412,8 @@ msgid ""
 "exams, and specify how much of a student's grade each assignment type is "
 "worth."
 msgstr ""
-"Ви також можете створювати власні типи завдань, наприклад, домашні завдання, "
-"лабораторні роботи, вікторини та іспити, а також визначати, як оцінювати "
+"Ви також можете створювати власні типи завдань, наприклад, домашні завдання,"
+" лабораторні роботи, вікторини та іспити, а також визначати, як оцінювати "
 "кожний тип завдання, виконаний студентом."
 
 #: cms/templates/studio_xblock_wrapper.html
@@ -22439,9 +22458,9 @@ msgstr "Якщо моя книга не поділена на розділи?"
 
 #: cms/templates/textbooks.html
 msgid ""
-"If your textbook doesn't have individual chapters, you can upload the entire "
-"text as a single chapter and enter a name of your choice in the Chapter Name "
-"field."
+"If your textbook doesn't have individual chapters, you can upload the entire"
+" text as a single chapter and enter a name of your choice in the Chapter "
+"Name field."
 msgstr ""
 "Якщо у вашому підручнику немає окремих розділів, ви можете завантажити весь "
 "текст як окрему главу і ввести назву на ваш вибір у полі \"Назва розділу\" "
@@ -22478,8 +22497,8 @@ msgstr ""
 
 #: cms/templates/visibility_editor.html
 msgid ""
-"Access to this component is not restricted, but visibility might be affected "
-"by inherited settings."
+"Access to this component is not restricted, but visibility might be affected"
+" by inherited settings."
 msgstr ""
 
 #: cms/templates/visibility_editor.html
@@ -22490,8 +22509,8 @@ msgstr ""
 
 #: cms/templates/visibility_editor.html
 msgid ""
-"You can restrict access to this component to learners in specific enrollment "
-"tracks or content groups."
+"You can restrict access to this component to learners in specific enrollment"
+" tracks or content groups."
 msgstr ""
 
 #: cms/templates/visibility_editor.html
@@ -22513,9 +22532,9 @@ msgstr "Керування контентними групами"
 #. is only read by screen readers and never shown in the browser.
 #: cms/templates/visibility_editor.html
 msgid ""
-"{screen_reader_start}Warning:{screen_reader_end} The unit that contains this "
-"component is hidden from learners. The unit setting overrides the component "
-"access settings defined here."
+"{screen_reader_start}Warning:{screen_reader_end} The unit that contains this"
+" component is hidden from learners. The unit setting overrides the component"
+" access settings defined here."
 msgstr ""
 
 #: cms/templates/visibility_editor.html
@@ -22550,8 +22569,8 @@ msgstr ""
 
 #: cms/templates/emails/course_creator_admin_user_pending.txt
 msgid ""
-"User '{user}' with e-mail {email} has requested {studio_name} course creator "
-"privileges on edge."
+"User '{user}' with e-mail {email} has requested {studio_name} course creator"
+" privileges on edge."
 msgstr ""
 
 #: cms/templates/emails/course_creator_admin_user_pending.txt
@@ -22566,8 +22585,7 @@ msgstr ""
 
 #: cms/templates/emails/course_creator_granted.txt
 msgid ""
-"Your request for course creation rights to {studio_name} have been granted. "
-"To create your first course, visit\n"
+"Your request for course creation rights to {studio_name} have been granted. To create your first course, visit\n"
 "\n"
 "{url}"
 msgstr ""
@@ -22590,8 +22608,8 @@ msgstr ""
 
 #: cms/templates/emails/user_task_complete_email.txt
 msgid ""
-"Your {task_name} task has completed with the status '{task_status}'. Sign in "
-"to view the details of your task or download any files created."
+"Your {task_name} task has completed with the status '{task_status}'. Sign in"
+" to view the details of your task or download any files created."
 msgstr ""
 
 #: cms/templates/emails/user_task_complete_email_subject.txt
@@ -22656,8 +22674,8 @@ msgstr ""
 
 #: cms/templates/registration/activation_invalid.html
 msgid ""
-"Something went wrong. Email programs sometimes split URLs into two lines, so "
-"make sure the URL you're using is formatted correctly. If you still have "
+"Something went wrong. Email programs sometimes split URLs into two lines, so"
+" make sure the URL you're using is formatted correctly. If you still have "
 "issues, send us an email message at {email_start}{email}{email_end}."
 msgstr ""
 
@@ -22858,8 +22876,8 @@ msgstr ""
 #: wiki/forms.py
 msgid ""
 "While you were editing, someone else changed the revision. Your contents "
-"have been automatically merged with the new contents. Please review the text "
-"below."
+"have been automatically merged with the new contents. Please review the text"
+" below."
 msgstr ""
 "Поки ви редагували, хтось вже вніс зміни в поточну версію. Ваш зміст було "
 "автоматично злито з новим контентом. Будь ласка, перевірте текст внизу."
@@ -22910,8 +22928,8 @@ msgstr "Очищення"
 
 #: wiki/forms.py
 msgid ""
-"Purge the article: Completely remove it (and all its contents) with no undo. "
-"Purging is a good idea if you want to free the slug such that users can "
+"Purge the article: Completely remove it (and all its contents) with no undo."
+" Purging is a good idea if you want to free the slug such that users can "
 "create new articles in its place."
 msgstr ""
 "Очищення статті: Повне видалення (включаючи весь вміст) без можливості "
@@ -22919,7 +22937,8 @@ msgstr ""
 "коротку назву, щоб користувачі могли створювати нові статті на відповідному "
 "місці."
 
-#: wiki/forms.py wiki/plugins/attachments/forms.py wiki/plugins/images/forms.py
+#: wiki/forms.py wiki/plugins/attachments/forms.py
+#: wiki/plugins/images/forms.py
 msgid "You are not sure enough!"
 msgstr "Не схоже, що ви впевнені!"
 
@@ -22958,8 +22977,8 @@ msgstr "Успадковувати права доступу"
 
 #: wiki/forms.py
 msgid ""
-"Check here to apply the above permissions recursively to articles under this "
-"one."
+"Check here to apply the above permissions recursively to articles under this"
+" one."
 msgstr ""
 "Відзначте тут, щоб послідовно застосувати вищевказані права доступу до "
 "статей, які перебувають під цією."
@@ -23171,14 +23190,12 @@ msgid ""
 "Articles who lost their parents\n"
 "===============================\n"
 "\n"
-"The children of this article have had their parents deleted. You should "
-"probably find a new home for them."
+"The children of this article have had their parents deleted. You should probably find a new home for them."
 msgstr ""
 "Статті, які втратили своїх батьків\n"
 "=============================== \n"
 "\n"
-"У нащадків цієї статті були видалені батьки. Напевно, Вам слід знайти їм "
-"новий будинок."
+"У нащадків цієї статті були видалені батьки. Напевно, Вам слід знайти їм новий будинок."
 
 #: wiki/models/urlpath.py
 msgid "Lost and found"
@@ -23354,20 +23371,20 @@ msgstr "Використайте це!"
 #, python-format
 msgid ""
 "Replacing an attachment means adding a new file that will be used in its "
-"place. All references to the file will be replaced by the one you upload and "
-"the file will be downloaded as <strong>%(filename)s</strong>. Please note "
+"place. All references to the file will be replaced by the one you upload and"
+" the file will be downloaded as <strong>%(filename)s</strong>. Please note "
 "that this attachment is in use on other articles, you may distort contents. "
 "However, do not hestitate to take advantage of this and make replacements "
 "for the listed articles where necessary. This way of working is more "
 "efficient...."
 msgstr ""
-"Заміна вкладення означає додавання нового файлу, який буде використовуватися "
-"на його місці. Всі посилання на файл будуть замінені на той, який ви "
-"завантажили, і файл буде завантажений як <strong>%(filename)s</strong>. Будь "
-"ласка, зауважте, що цей додаток використовується на інших статтях, ви можете "
-"деформувати контенти. Проте, не замислюйтеся скористатися цим і внести "
-"заміни у перелічені статті, де це необхідно. Цей спосіб роботи є більш "
-"ефективним."
+"Заміна вкладення означає додавання нового файлу, який буде використовуватися"
+" на його місці. Всі посилання на файл будуть замінені на той, який ви "
+"завантажили, і файл буде завантажений як <strong>%(filename)s</strong>. Будь"
+" ласка, зауважте, що цей додаток використовується на інших статтях, ви "
+"можете деформувати контенти. Проте, не замислюйтеся скористатися цим і "
+"внести заміни у перелічені статті, де це необхідно. Цей спосіб роботи є "
+"більш ефективним."
 
 #: wiki/plugins/attachments/templates/wiki/plugins/attachments/replace.html
 msgid "Articles using"
@@ -23377,11 +23394,11 @@ msgstr "Використання статей"
 #, python-format
 msgid ""
 "Replacing an attachment means adding a new file that will be used in its "
-"place. All references to the file will be replaced by the one you upload and "
-"the file will be downloaded as <strong>%(filename)s</strong>."
+"place. All references to the file will be replaced by the one you upload and"
+" the file will be downloaded as <strong>%(filename)s</strong>."
 msgstr ""
-"Заміна вкладення означає додавання нового файлу, який буде використовуватися "
-"на його місці. Всі посилання на файл будуть замінені на той, який ви "
+"Заміна вкладення означає додавання нового файлу, який буде використовуватися"
+" на його місці. Всі посилання на файл будуть замінені на той, який ви "
 "завантажили, і файл буде завантажений як <strong>%(filename)s</strong>."
 
 #: wiki/plugins/attachments/templates/wiki/plugins/attachments/replace.html
@@ -23424,7 +23441,8 @@ msgstr "Заголовки"
 
 #: wiki/plugins/help/templates/wiki/plugins/help/sidebar.html
 msgid ""
-"Use these codes for headers and to automatically generate Tables of Contents."
+"Use these codes for headers and to automatically generate Tables of "
+"Contents."
 msgstr ""
 "Використовуйте ці коди для заголовків і для автоматичного генерування "
 "Таблиць Контенту."
@@ -23611,8 +23629,8 @@ msgstr "Як використати зображення"
 #: wiki/plugins/images/templates/wiki/plugins/images/sidebar.html
 msgid ""
 "After uploading an image, it is attached to this particular artice and can "
-"be used only here. Other users may replace the image, but older versions are "
-"kept. You probably want to show the image with a nice caption. To achieve "
+"be used only here. Other users may replace the image, but older versions are"
+" kept. You probably want to show the image with a nice caption. To achieve "
 "this, press the Insert button and fill in the caption fields and possibly "
 "choose to have you image floating right or left of the content. You can use "
 "Markdown in the caption. The markdown code syntax for images looks like "
@@ -23621,12 +23639,12 @@ msgstr ""
 "Після завантаження зображення, це буде прикріплено до конкретної статті і "
 "може бути використане тільки тут. Інші користувачі можуть замінити "
 "зображення, але старі версії зберігаються. Можливо, ви хочете показати "
-"зображення з гарним підписом. Щоб досягти цього, натисніть кнопку \"Вставити"
-"\", а потім заповніть в полі для підпису і, можливо, виберіть ваше "
-"зображення, яке має плаваючу сторону праворуч або ліворуч від контенту. У "
+"зображення з гарним підписом. Щоб досягти цього, натисніть кнопку "
+"\"Вставити\", а потім заповніть в полі для підпису і, можливо, виберіть ваше"
+" зображення, яке має плаваючу сторону праворуч або ліворуч від контенту. У "
 "заголовку можна використовувати Розмітку. Синтаксичний код розмітки для "
-"зображень виглядає так,як можливі значення для вирівнювання ліворуч / "
-"центр / справа:"
+"зображень виглядає так,як можливі значення для вирівнювання ліворуч / центр "
+"/ справа:"
 
 #: wiki/plugins/links/wiki_plugin.py
 msgid "Links"
@@ -23638,11 +23656,12 @@ msgstr "Посилання на іншу вікі-сторінку"
 
 #: wiki/plugins/links/templates/wiki/plugins/links/sidebar.html
 msgid ""
-"Type in something from another wiki page's title and auto-complete will help "
-"you create a tag for you wiki link. Tags for links look like this:"
+"Type in something from another wiki page's title and auto-complete will help"
+" you create a tag for you wiki link. Tags for links look like this:"
 msgstr ""
-"Введіть щось з назви іншої вікі-сторінки та  автоматичне заповнення допоможе "
-"вам створити тег для вашого вікі посилання. Теги для посилань виглядають так:"
+"Введіть щось з назви іншої вікі-сторінки та  автоматичне заповнення допоможе"
+" вам створити тег для вашого вікі посилання. Теги для посилань виглядають "
+"так:"
 
 #: wiki/plugins/links/templates/wiki/plugins/links/sidebar.html
 msgid ""
@@ -23735,8 +23754,8 @@ msgid ""
 "You may remove this article and any children permanently and free their "
 "slugs by clicking the below button. This action cannot be undone."
 msgstr ""
-"Ви можете видалити цю статтю та будь-які її підрозділи назавжди та звільнити "
-"їх слаги, натиснувши кнопку нижче. Цю дію не можна скасувати."
+"Ви можете видалити цю статтю та будь-які її підрозділи назавжди та звільнити"
+" їх слаги, натиснувши кнопку нижче. Цю дію не можна скасувати."
 
 #: wiki/templates/wiki/dir.html
 msgid "Listing articles in"
@@ -23830,12 +23849,12 @@ msgstr "Вітаємо!"
 
 #: wiki/templates/wiki/article/create_root.html
 msgid ""
-"You have django-wiki installed... but there are no articles. So it's time to "
-"create the first one, the root article. In the beginning, it will only be "
+"You have django-wiki installed... but there are no articles. So it's time to"
+" create the first one, the root article. In the beginning, it will only be "
 "editable by administrators, but you can define permissions after."
 msgstr ""
-"У вас встановлено django-wiki ... але статей немає. Тому настав час створити "
-"першу, кореневу статтю. Спочатку її можна редагувати лише за допомогою "
+"У вас встановлено django-wiki ... але статей немає. Тому настав час створити"
+" першу, кореневу статтю. Спочатку її можна редагувати лише за допомогою "
 "адміністраторів, але після цього можна визначити дозволи."
 
 #: wiki/templates/wiki/article/create_root.html
@@ -23849,11 +23868,12 @@ msgstr "Створити основу"
 #: wiki/templates/wiki/includes/anonymous_blocked.html
 #, python-format
 msgid ""
-"You need to <a href=\"%(login_url)s\">log in</a> or <a href=\"%(signup_url)s"
-"\">sign up</a> to use this function."
+"You need to <a href=\"%(login_url)s\">log in</a> or <a "
+"href=\"%(signup_url)s\">sign up</a> to use this function."
 msgstr ""
-"Щоб скористатися цією функцією, потрібно <a href=\"%(login_url)s\">ввійти</"
-"a> або <a href=\"%(signup_url)s\">зареєструватися</a>."
+"Щоб скористатися цією функцією, потрібно <a "
+"href=\"%(login_url)s\">ввійти</a> або <a "
+"href=\"%(signup_url)s\">зареєструватися</a>."
 
 #: wiki/templates/wiki/includes/anonymous_blocked.html
 msgid "You need to log in og sign up to use this function."
@@ -23967,7 +23987,8 @@ msgstr "Стаття \"%s\" та її дочірні статті були ві�
 msgid ""
 "The article %(title)s is now set to display revision #%(revision_number)d"
 msgstr ""
-"Стаття %(title)sтепер налаштована на відображення версії #%(revision_number)d"
+"Стаття %(title)sтепер налаштована на відображення версії "
+"#%(revision_number)d"
 
 #: wiki/views/article.py
 msgid "New title"
@@ -23981,8 +24002,8 @@ msgstr "Злиття версій #%(r1)d і #%(r2)d"
 #: wiki/views/article.py
 #, python-format
 msgid ""
-"A new revision was created: Merge between Revision #%(r1)d and Revision #"
-"%(r2)d"
+"A new revision was created: Merge between Revision #%(r1)d and Revision "
+"#%(r2)d"
 msgstr "Нова версія була створена: злиття версій #%(r1)d і #%(r2)d"
 
 #: edx_proctoring_proctortrack/backends/proctortrack_rest.py

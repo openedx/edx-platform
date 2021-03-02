@@ -181,17 +181,17 @@ def generate_course_expired_message(user, course):
                 sronly_span_open=HTML('<span class="sr-only">'),
                 span_close=HTML('</span>'),
                 a_close=HTML('</a>'),
-                expiration_date=formatted_expiration_date,
+                expiration_date=HTML(formatted_expiration_date),
                 strong_open=HTML('<strong>'),
                 strong_close=HTML('</strong>'),
                 line_break=HTML('<br>'),
-                upgrade_deadline=formatted_upgrade_deadline
+                upgrade_deadline=HTML(formatted_upgrade_deadline)
             )
 
         else:
             return HTML(full_message).format(
                 span_close=HTML('</span>'),
-                expiration_date=formatted_expiration_date,
+                expiration_date=HTML(formatted_expiration_date),
                 strong_open=HTML('<strong>'),
                 strong_close=HTML('</strong>'),
                 line_break=HTML('<br>'),

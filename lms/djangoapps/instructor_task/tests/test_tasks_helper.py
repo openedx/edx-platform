@@ -1253,31 +1253,33 @@ class TestStudentReport(TestReportMixin, InstructorTaskCourseTestCase):
 
         self.current_task = Mock()  # pylint: disable=attribute-defined-outside-init
         self.current_task.update_state = Mock()
-        task_input = [
+        task_input = {
+            'features': [
                 'id', 'username', 'name', 'email', 'language', 'location',
                 'year_of_birth', 'gender', 'level_of_education', 'mailing_address',
                 'goals'
             ]
-        
+        }
+
         with patch('lms.djangoapps.instructor_task.tasks_helper.runner._get_current_task') as mock_current_task:
             mock_current_task.return_value = self.current_task
             result = upload_students_csv(None, None, self.course.id, task_input, 'calculated')
         # This assertion simply confirms that the generation completed with no errors
         num_students = len(students)
         self.assertDictContainsSubset({'attempted': num_students, 'succeeded': num_students, 'failed': 0}, result)
-    
+
     ################ EOL ###############################################
     @override_settings(UCHILEEDXLOGIN_TASK_RUN_ENABLE=True)
     def test_users_with_run(self):
         """
-        Test uchileedxlogin users 
+        Test uchileedxlogin users
         """
         try:
             from unittest.case import SkipTest
             from uchileedxlogin.models import EdxLoginUser
         except ImportError:
             self.skipTest("import error uchileedxlogin")
-        
+
         aux_student = self.create_student(username="student1", email='student1@example.com')
         EdxLoginUser.objects.create(user=aux_student, run='000000001K')
 
@@ -1288,7 +1290,7 @@ class TestStudentReport(TestReportMixin, InstructorTaskCourseTestCase):
                 'year_of_birth', 'gender', 'level_of_education', 'mailing_address',
                 'goals'
             ]
-        
+
         with patch('lms.djangoapps.instructor_task.tasks_helper.runner._get_current_task') as mock_current_task:
             mock_current_task.return_value = self.current_task
             result = upload_students_csv(None, None, self.course.id, task_input, 'calculated')
@@ -1300,11 +1302,11 @@ class TestStudentReport(TestReportMixin, InstructorTaskCourseTestCase):
                         u'id': unicode(aux_student.id),
                         u'run': '000000001K',
                         u'email': aux_student.email,
-                        u'username': aux_student.username,                      
+                        u'username': aux_student.username,
                     },
                 ],
                 ignore_other_columns=True,
-            )  
+            )
 
 class TestTeamStudentReport(TestReportMixin, InstructorTaskCourseTestCase):
     "Test the student report when including teams information. "

@@ -125,7 +125,8 @@ msgstr ""
 #: cms/static/js/views/asset.js cms/static/js/views/container.js
 #: cms/static/js/views/course_info_handout.js
 #: cms/static/js/views/course_info_update.js
-#: cms/static/js/views/edit_textbook.js cms/static/js/views/list_item_editor.js
+#: cms/static/js/views/edit_textbook.js
+#: cms/static/js/views/list_item_editor.js
 #: cms/static/js/views/modals/edit_xblock.js cms/static/js/views/tabs.js
 #: cms/static/js/views/utils/xblock_utils.js
 #: common/lib/xmodule/xmodule/assets/library_source_block/public/js/library_source_block.js
@@ -194,7 +195,8 @@ msgstr "Закрити"
 #. #-#-#-#-#  djangojs-partial.po (edx-platform)  #-#-#-#-#
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
-#: cms/static/js/views/assets.js common/lib/xmodule/xmodule/js/src/html/edit.js
+#: cms/static/js/views/assets.js
+#: common/lib/xmodule/xmodule/js/src/html/edit.js
 #: cms/templates/js/asset-library.underscore
 #: cms/templates/js/course-instructor-details.underscore
 #: cms/templates/js/previous-video-upload-list.underscore
@@ -222,7 +224,8 @@ msgstr "Гаразд"
 msgid "None"
 msgstr "Немає"
 
-#: cms/static/js/views/course_video_settings.js cms/static/js/views/metadata.js
+#: cms/static/js/views/course_video_settings.js
+#: cms/static/js/views/metadata.js
 #: cms/static/js/views/previous_video_upload.js
 #: cms/static/js/views/video_transcripts.js
 #: lms/djangoapps/teams/static/teams/js/views/edit_team_members.js
@@ -460,8 +463,8 @@ msgid ""
 "file uploads."
 msgstr ""
 "Внесення скасовано! Вибачте, ваш браузер не підтримує завантаження файлів. "
-"За можливості використовуйте, будь ласка, Chrome або Safari, які підтримують "
-"завантаження файлів.  "
+"За можливості використовуйте, будь ласка, Chrome або Safari, які підтримують"
+" завантаження файлів.  "
 
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
 msgid "You submitted {filename}; only {allowedFiles} are allowed."
@@ -496,8 +499,7 @@ msgstr "не відправлений"
 
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid ""
-"{paragraph}=p;{preformatted}=pre;{heading3}=h3;{heading4}=h4;{heading5}=h5;"
-"{heading6}=h6"
+"{paragraph}=p;{preformatted}=pre;{heading3}=h3;{heading4}=h4;{heading5}=h5;{heading6}=h6"
 msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
@@ -1392,8 +1394,8 @@ msgid ""
 "Rich Text Area. Press ALT-F9 for menu. Press ALT-F10 for toolbar. Press "
 "ALT-0 for help"
 msgstr ""
-"Форматувння текстової області. Меню, натисніть клавішу ALT-F9. Натисніть ALT-"
-"F10 для панелі інструментів. Натисніть ALT-0 для допомоги"
+"Форматувння текстової області. Меню, натисніть клавішу ALT-F9. Натисніть "
+"ALT-F10 для панелі інструментів. Натисніть ALT-0 для допомоги"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
@@ -1692,8 +1694,8 @@ msgid ""
 "Your browser doesn't support direct access to the clipboard. Please use the "
 "Ctrl+X/C/V keyboard shortcuts instead."
 msgstr ""
-"Ваш браузер не підтримує прямий доступ до буферу обміну. Будь ласка, замість "
-"цього використайте комбінації клавіш Ctrl+X/C/V."
+"Ваш браузер не підтримує прямий доступ до буферу обміну. Будь ласка, замість"
+" цього використайте комбінації клавіш Ctrl+X/C/V."
 
 #. Translators: this is a toolbar button tooltip from the raw HTML editor
 #. displayed in the browser when a user needs to edit HTML
@@ -1703,15 +1705,13 @@ msgstr "Додати/редагувати зображення"
 
 #: common/lib/xmodule/xmodule/js/src/lti/lti.js
 msgid ""
-"Click OK to have your username and e-mail address sent to a 3rd party "
-"application.\n"
+"Click OK to have your username and e-mail address sent to a 3rd party application.\n"
 "\n"
 "Click Cancel to return to this page without sending your information."
 msgstr ""
 "Натисніть OK щоб відправити ваше ім’я та адресу email сторонньому доданку.\n"
 "\n"
-"Натисніть Відміна щоб повернутись до сторінки без відправлення вашої "
-"інформації."
+"Натисніть Відміна щоб повернутись до сторінки без відправлення вашої інформації."
 
 #: common/lib/xmodule/xmodule/js/src/lti/lti.js
 msgid ""
@@ -1721,8 +1721,7 @@ msgid ""
 msgstr ""
 "Натисніть OK щоб відправити ваше ім’я сторонньому доданку.\n"
 "\n"
-"Натисніть Відміна щоб повернутись до сторінки без відправлення вашої "
-"інформації."
+"Натисніть Відміна щоб повернутись до сторінки без відправлення вашої інформації."
 
 #: common/lib/xmodule/xmodule/js/src/lti/lti.js
 msgid ""
@@ -1732,8 +1731,7 @@ msgid ""
 msgstr ""
 "Натисніть OK щоб відправити вашу адресу email сторонньому доданку.\n"
 "\n"
-"Натисніть Відміна щоб повернутись до сторінки без відправлення вашої "
-"інформації."
+"Натисніть Відміна щоб повернутись до сторінки без відправлення вашої інформації."
 
 #: common/lib/xmodule/xmodule/js/src/problem/edit.js
 msgid "incorrect"
@@ -1753,13 +1751,11 @@ msgstr "Коротке пояснення"
 
 #: common/lib/xmodule/xmodule/js/src/problem/edit.js
 msgid ""
-"If you use the Advanced Editor, this problem will be converted to XML and "
-"you will not be able to return to the Simple Editor Interface.\n"
+"If you use the Advanced Editor, this problem will be converted to XML and you will not be able to return to the Simple Editor Interface.\n"
 "\n"
 "Proceed to the Advanced Editor and convert this problem to XML?"
 msgstr ""
-"Якщо ви використовуєте розширений редактор, ця проблема буде перетворена в "
-"XML і ви не зможете повернутися до інтерфейсу простого редактора.\n"
+"Якщо ви використовуєте розширений редактор, ця проблема буде перетворена в XML і ви не зможете повернутися до інтерфейсу простого редактора.\n"
 "\n"
 "Перейти до розширеного редактора і конвертувати цю проблему в XML?"
 
@@ -1987,8 +1983,8 @@ msgstr "Кінець тексту. Перейти на початок. "
 
 #: common/lib/xmodule/xmodule/js/src/video/09_video_caption.js
 msgid ""
-"Press the UP arrow key to enter the language menu then use UP and DOWN arrow "
-"keys to navigate language options. Press ENTER to change to the selected "
+"Press the UP arrow key to enter the language menu then use UP and DOWN arrow"
+" keys to navigate language options. Press ENTER to change to the selected "
 "language."
 msgstr ""
 "Натисніть кнопку із стрілкою вгору для вибору мови, потім використайте "
@@ -2053,8 +2049,9 @@ msgid ""
 "Your request could not be completed. Reload the page and try again. If the "
 "issue persists, click the Help tab to report the problem."
 msgstr ""
-"Не вдалося виконати ваш запит.  Перезавантажте сторінку і спробуйте ще раз.  "
-"Якщо помилка повториться, натисніть по вкладці Допомога і повідомте про це."
+"Не вдалося виконати ваш запит.  Перезавантажте сторінку і спробуйте ще раз."
+"  Якщо помилка повториться, натисніть по вкладці Допомога і повідомте про "
+"це."
 
 #: common/static/common/js/components/views/paging_header.js
 msgid "Showing {firstIndex} out of {numItems} total"
@@ -2109,7 +2106,8 @@ msgstr ""
 
 #: common/static/common/js/discussion/views/discussion_content_view.js
 msgid ""
-"You could not be unsubscribed from this post. Refresh the page and try again."
+"You could not be unsubscribed from this post. Refresh the page and try "
+"again."
 msgstr ""
 "Ви не можете відписатися від цього посту. Оновіть сторінку та повторіть "
 "спробу."
@@ -2173,7 +2171,8 @@ msgstr ""
 
 #: common/static/common/js/discussion/views/discussion_content_view.js
 msgid "This post could not be closed. Refresh the page and try again."
-msgstr "Цю публікацію неможливо закрити. Оновіть сторінку та повторіть спробу."
+msgstr ""
+"Цю публікацію неможливо закрити. Оновіть сторінку та повторіть спробу."
 
 #: common/static/common/js/discussion/views/discussion_content_view.js
 msgid "This post could not be reopened. Refresh the page and try again."
@@ -2218,7 +2217,8 @@ msgstr "Завантаження списку дописів"
 
 #: common/static/common/js/discussion/views/discussion_thread_list_view.js
 msgid ""
-"No results found for {original_query}. Showing results for {suggested_query}."
+"No results found for {original_query}. Showing results for "
+"{suggested_query}."
 msgstr ""
 "Жодних результатів для {original_query}. Показано результати для "
 "{suggested_query}."
@@ -2237,7 +2237,8 @@ msgstr "Обраний вами допис видалено. "
 
 #: common/static/common/js/discussion/views/discussion_thread_view.js
 msgid "Responses could not be loaded. Refresh the page and try again."
-msgstr "Відповіді неможливо завантажити. Оновіть сторінку та повторіть спробу."
+msgstr ""
+"Відповіді неможливо завантажити. Оновіть сторінку та повторіть спробу."
 
 #: common/static/common/js/discussion/views/discussion_thread_view.js
 msgid ""
@@ -2300,7 +2301,8 @@ msgstr "Ви впевнені, що хочете видалити цей ком�
 
 #: common/static/common/js/discussion/views/response_comment_view.js
 msgid "This comment could not be deleted. Refresh the page and try again."
-msgstr "Цей коментар неможливо видалити. Оновіть сторінку та повторіть спробу."
+msgstr ""
+"Цей коментар неможливо видалити. Оновіть сторінку та повторіть спробу."
 
 #: common/static/common/js/discussion/views/thread_response_view.js
 msgid "Are you sure you want to delete this response?"
@@ -2495,11 +2497,11 @@ msgstr "Файли, які ви завантажуєте, повинні мат�
 
 #: lms/djangoapps/support/static/support/jsx/file_upload.jsx
 msgid ""
-"Files that you upload must be PDFs or image files in .gif, .jpg, .jpeg, or ."
-"png format."
+"Files that you upload must be PDFs or image files in .gif, .jpg, .jpeg, or "
+".png format."
 msgstr ""
-"Файли, які ви завантажуєте, повинні бути PDF-файлами або файлами зображень у "
-"форматі .gif, .jpg, .jpeg або .png."
+"Файли, які ви завантажуєте, повинні бути PDF-файлами або файлами зображень у"
+" форматі .gif, .jpg, .jpeg або .png."
 
 #: lms/djangoapps/support/static/support/jsx/file_upload.jsx
 #: lms/djangoapps/support/static/support/jsx/single_support_form.jsx
@@ -2650,7 +2652,8 @@ msgstr "Введіть деякі деталі для підтримки ваш�
 msgid ""
 "Due to the recent increase in interest in online education and edX, we are "
 "currently experiencing an unusually high volume of support requests. We "
-"appreciate your patience as we work to review each request. Please check the "
+"appreciate your patience as we work to review each request. Please check the"
+" "
 msgstr ""
 
 #: lms/djangoapps/support/static/support/jsx/single_support_form.jsx
@@ -2925,12 +2928,13 @@ msgstr "Огляд"
 #: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
 msgid "Your request could not be completed. Reload the page and try again."
 msgstr ""
-"Ваш запит не може бути виконаний. Перезавантажте сторінку та спробуйте знову."
+"Ваш запит не може бути виконаний. Перезавантажте сторінку та спробуйте "
+"знову."
 
 #: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
 msgid ""
-"Your request could not be completed due to a server problem. Reload the page "
-"and try again. If the issue persists, click the Help tab to report the "
+"Your request could not be completed due to a server problem. Reload the page"
+" and try again. If the issue persists, click the Help tab to report the "
 "problem."
 msgstr ""
 "Не вдалося виконати Ваш запит у зв'язку з проблемой на сервері.  "
@@ -3043,8 +3047,8 @@ msgid ""
 msgstr ""
 "{browse_span_start}Перегляд команд з інших тем{span_end} або "
 "{search_span_start} пошук{span_end} по цій темі. Якщо Ви все ще не можете "
-"знайти команду, щоб приєднатися, {create_span_start}створіть нову команду по "
-"цій темі{span_end}."
+"знайти команду, щоб приєднатися, {create_span_start}створіть нову команду по"
+" цій темі{span_end}."
 
 #: lms/djangoapps/teams/static/teams/js/views/topic_teams.js
 msgid ""
@@ -3084,8 +3088,8 @@ msgid ""
 "Type in a URL or use the \"Choose File\" button to upload a file from your "
 "machine. (e.g. 'http://example.com/img/clouds.jpg')"
 msgstr ""
-"Введіть URL (напр. 'http://example.com/img/clouds.jpg') або натисніть кнопку "
-"\\\"Вибрати файл\\\" для завантаження файлу."
+"Введіть URL (напр. 'http://example.com/img/clouds.jpg') або натисніть кнопку"
+" \\\"Вибрати файл\\\" для завантаження файлу."
 
 #: lms/static/js/Markdown.Editor.js
 msgid "Image Description"
@@ -3361,8 +3365,8 @@ msgstr ""
 
 #: lms/static/js/certificates/views/certificate_invalidation_view.js
 msgid ""
-"Could not find Certificate Invalidation in the list. Please refresh the page "
-"and try again"
+"Could not find Certificate Invalidation in the list. Please refresh the page"
+" and try again"
 msgstr ""
 "Не вдалося знайти анульований сертифікат в списку. Будь ласка, оновіть "
 "сторінку та повторіть спробу."
@@ -3389,8 +3393,8 @@ msgid ""
 "<%= user %> has been successfully added to the exception list. Click "
 "Generate Exception Certificate below to send the certificate."
 msgstr ""
-"<%= user %> успішно доданий. Для видачі сертифікату натисніть кнопку \\"
-"\"Створити сертифікати для виняткових випадків\\\"."
+"<%= user %> успішно доданий. Для видачі сертифікату натисніть кнопку "
+"\\\"Створити сертифікати для виняткових випадків\\\"."
 
 #: lms/static/js/course_survey.js
 msgid "There has been an error processing your survey."
@@ -3443,8 +3447,8 @@ msgstr ""
 
 #: lms/static/js/dashboard/legacy.js
 msgid ""
-"Are you sure you want to unenroll from the verified {certNameLong}  track of "
-"{courseName}  ({courseNumber})?"
+"Are you sure you want to unenroll from the verified {certNameLong}  track of"
+" {courseName}  ({courseNumber})?"
 msgstr ""
 
 #: lms/static/js/dashboard/legacy.js
@@ -3648,8 +3652,8 @@ msgstr ""
 #: lms/static/js/edxnotes/views/notes_visibility_factory.js
 #: lms/static/js/edxnotes/views/search_box.js
 msgid ""
-"An error has occurred. Make sure that you are connected to the Internet, and "
-"then try refreshing the page."
+"An error has occurred. Make sure that you are connected to the Internet, and"
+" then try refreshing the page."
 msgstr ""
 "Виникла помилка. Будь ласка, переконайтесь, що ви під'єднанні до мережі та "
 "спробуйте оновити сторінку."
@@ -3721,7 +3725,8 @@ msgstr "Дозволити подати заяву"
 #: lms/static/js/financial-assistance/views/financial_assistance_form_view.js
 #: lms/static/js/student_account/views/LoginView.js
 msgid "An error has occurred. Check your Internet connection and try again."
-msgstr "Сталася помилка. Перевірте ваше інтернет з'єднання і спробуйте ще раз."
+msgstr ""
+"Сталася помилка. Перевірте ваше інтернет з'єднання і спробуйте ще раз."
 
 #: lms/static/js/financial-assistance/views/financial_assistance_form_view.js
 msgid "Choose one"
@@ -3773,8 +3778,8 @@ msgstr "{email}"
 
 #: lms/static/js/groups/views/cohort_editor.js
 msgid ""
-"{numPreassigned} learner was pre-assigned for this cohort. This learner will "
-"automatically be added to the cohort when they enroll in the course."
+"{numPreassigned} learner was pre-assigned for this cohort. This learner will"
+" automatically be added to the cohort when they enroll in the course."
 msgid_plural ""
 "{numPreassigned} learners were pre-assigned for this cohort. These learners "
 "will automatically be added to the cohort when they enroll in the course."
@@ -3789,7 +3794,8 @@ msgstr[2] ""
 "будуть автоматично додаватися до когорти після зарахування до когорти курсу."
 msgstr[3] ""
 "{numPreassigned} учні були попередньо призначені до цієї когорти. Ці учні "
-"будуть автоматично додаватися до когорти після зарахування до когорти  курсу."
+"будуть автоматично додаватися до когорти після зарахування до когорти  "
+"курсу."
 
 #: lms/static/js/groups/views/cohort_editor.js
 msgid "Unknown username: {user}"
@@ -3841,8 +3847,8 @@ msgstr "Додати когорту "
 
 #: lms/static/js/groups/views/cohorts.js
 msgid ""
-"The {cohortGroupName} cohort has been created. You can manually add students "
-"to this cohort below."
+"The {cohortGroupName} cohort has been created. You can manually add students"
+" to this cohort below."
 msgstr ""
 "Навчальна група {cohortGroupName} була створена. Нижче ви можете вручну "
 "додати студентів в цю групу."
@@ -3878,20 +3884,21 @@ msgstr "Когорти вимкнені"
 
 #: lms/static/js/groups/views/verified_track_settings_notification.js
 msgid ""
-"This course uses automatic cohorting for verified track learners. You cannot "
-"disable cohorts, and you cannot rename the manual cohort named "
+"This course uses automatic cohorting for verified track learners. You cannot"
+" disable cohorts, and you cannot rename the manual cohort named "
 "'{verifiedCohortName}'. To change the configuration for verified track "
 "cohorts, contact your edX partner manager."
 msgstr ""
-"Цей курс використовує автоматичний когортинг для перевірених для перевірених "
-"учасників треку. Ви не можете вимкнути когорти, і ви не можете перейменувати "
-"вручну  назву когорти '{verifiedCohortName}'. Щоб змінити конфігурацію "
-"перевірених доріжок когорт, зверніться до менеджера партнерів edX."
+"Цей курс використовує автоматичний когортинг для перевірених для перевірених"
+" учасників треку. Ви не можете вимкнути когорти, і ви не можете "
+"перейменувати вручну  назву когорти '{verifiedCohortName}'. Щоб змінити "
+"конфігурацію перевірених доріжок когорт, зверніться до менеджера партнерів "
+"edX."
 
 #: lms/static/js/groups/views/verified_track_settings_notification.js
 msgid ""
-"This course has automatic cohorting enabled for verified track learners, but "
-"the required cohort does not exist. You must create a manually-assigned "
+"This course has automatic cohorting enabled for verified track learners, but"
+" the required cohort does not exist. You must create a manually-assigned "
 "cohort named '{verifiedCohortName}' for the feature to work."
 msgstr ""
 "Цей курс має автоматичний когортинг для перевірених учнів, але необхідна "
@@ -3900,8 +3907,8 @@ msgstr ""
 
 #: lms/static/js/groups/views/verified_track_settings_notification.js
 msgid ""
-"This course has automatic cohorting enabled for verified track learners, but "
-"cohorts are disabled. You must enable cohorts for the feature to work."
+"This course has automatic cohorting enabled for verified track learners, but"
+" cohorts are disabled. You must enable cohorts for the feature to work."
 msgstr ""
 "Цей курс має автоматичний когортінг для перевірених учнів. але наразі "
 "когорти відключені. Ви повинні ввімкнути когорти для функціонування роботи. "
@@ -4001,11 +4008,11 @@ msgstr ""
 
 #: lms/static/js/instructor_dashboard/ecommerce.js
 msgid ""
-"There was a problem creating the report. Select \"Create Executive Summary\" "
-"to try again."
+"There was a problem creating the report. Select \"Create Executive Summary\""
+" to try again."
 msgstr ""
-"При складанні звіту сталася помилка. Повторіть спробу, натиснувши \\"
-"\"Створити зведений звіт\\\"."
+"При складанні звіту сталася помилка. Повторіть спробу, натиснувши "
+"\\\"Створити зведений звіт\\\"."
 
 #: lms/static/js/instructor_dashboard/ecommerce.js
 msgid "Enter the enrollment code."
@@ -4064,8 +4071,8 @@ msgstr "Помилка у зміні повноважень користувач
 msgid ""
 "Could not find a user with username or email address '<%- identifier %>'."
 msgstr ""
-"Неможливо знайти користувача з ім'ям або електронною адресою '<%- identifier "
-"%>'."
+"Неможливо знайти користувача з ім'ям або електронною адресою '<%- identifier"
+" %>'."
 
 #: lms/static/js/instructor_dashboard/membership.js
 msgid ""
@@ -4211,8 +4218,8 @@ msgid ""
 "Emails successfully sent. The following users are no longer enrolled in the "
 "course:"
 msgstr ""
-"Листи успішно надіслано. Наступні користувачі більше не зареєстровані на цей "
-"курс:"
+"Листи успішно надіслано. Наступні користувачі більше не зареєстровані на цей"
+" курс:"
 
 #. Translators: A list of users appears after this sentence;
 #: lms/static/js/instructor_dashboard/membership.js
@@ -4277,8 +4284,8 @@ msgstr ""
 
 #: lms/static/js/instructor_dashboard/send_email.js
 msgid ""
-"You are sending an email message with the subject {subject} to the following "
-"recipients."
+"You are sending an email message with the subject {subject} to the following"
+" recipients."
 msgstr "Ви надсилаєте листа із темою {subject} наступним одержувачам."
 
 #: lms/static/js/instructor_dashboard/send_email.js
@@ -4315,8 +4322,8 @@ msgid ""
 "Error getting enrollment status for '<%- student_id %>'. Make sure that the "
 "student identifier is spelled correctly."
 msgstr ""
-"Помилка отримання статусу реєстрації для '<%- student_id %>'. Переконайтеся, "
-"що ID студента написаний правильно."
+"Помилка отримання статусу реєстрації для '<%- student_id %>'. Переконайтеся,"
+" що ID студента написаний правильно."
 
 #: lms/static/js/instructor_dashboard/student_admin.js
 msgid "Retrieving enrollment status..."
@@ -4327,8 +4334,8 @@ msgid ""
 "Error getting student progress url for '<%- student_id %>'. Make sure that "
 "the student identifier is spelled correctly."
 msgstr ""
-"Сталась помилка під час отримання адреси сторінки із прогресом студента '<%- "
-"student_id %>'. Перевірте правильність написання ідентифікатору студента."
+"Сталась помилка під час отримання адреси сторінки із прогресом студента '<%-"
+" student_id %>'. Перевірте правильність написання ідентифікатору студента."
 
 #: lms/static/js/instructor_dashboard/student_admin.js
 msgid "Please enter a problem location."
@@ -4344,13 +4351,13 @@ msgstr ""
 
 #: lms/static/js/instructor_dashboard/student_admin.js
 msgid ""
-"Error resetting problem attempts for problem '<%= problem_id %>' and student "
-"'<%- student_id %>'. Make sure that the problem and student identifiers are "
-"complete and correct."
+"Error resetting problem attempts for problem '<%= problem_id %>' and student"
+" '<%- student_id %>'. Make sure that the problem and student identifiers are"
+" complete and correct."
 msgstr ""
-"Помилка при скиданнях спроб для завдання '<%= problem_id %>' та студента '<"
-"%- student_id %>'. Переконайтеся, що завдання та ідентифікатори студентів є "
-"повними та правильними."
+"Помилка при скиданнях спроб для завдання '<%= problem_id %>' та студента "
+"'<%- student_id %>'. Переконайтеся, що завдання та ідентифікатори студентів "
+"є повними та правильними."
 
 #: lms/static/js/instructor_dashboard/student_admin.js
 msgid ""
@@ -4360,13 +4367,13 @@ msgstr ""
 
 #: lms/static/js/instructor_dashboard/student_admin.js
 msgid ""
-"Error deleting student '<%- student_id %>'s state on problem '<%- problem_id "
-"%>'. Make sure that the problem and student identifiers are complete and "
+"Error deleting student '<%- student_id %>'s state on problem '<%- problem_id"
+" %>'. Make sure that the problem and student identifiers are complete and "
 "correct."
 msgstr ""
 "Помилка при видаленні стану завдання  '<%- problem_id %>' для студента'<%- "
-"student_id %>' Переконайтеся, що ідентифікатори завдання та студента вказані "
-"правильно і повністю. "
+"student_id %>' Переконайтеся, що ідентифікатори завдання та студента вказані"
+" правильно і повністю. "
 
 #: lms/static/js/instructor_dashboard/student_admin.js
 msgid "Module state successfully deleted."
@@ -4378,8 +4385,8 @@ msgid ""
 "student_id %>'. Make sure that the problem and student identifiers are "
 "complete and correct."
 msgstr ""
-"Помилка отримання історії задач, пов'язаних із завданням '<%- problem_id %>' "
-"для студента '<%- student_id %>. Переконайтеся, що ідентифікатори завдання "
+"Помилка отримання історії задач, пов'язаних із завданням '<%- problem_id %>'"
+" для студента '<%- student_id %>. Переконайтеся, що ідентифікатори завдання "
 "та студента вказані правильно і повністю. "
 
 #: lms/static/js/instructor_dashboard/student_admin.js
@@ -4388,8 +4395,8 @@ msgstr "Спроби здати вступний іспит скидаються
 
 #: lms/static/js/instructor_dashboard/student_admin.js
 msgid ""
-"Error resetting entrance exam attempts for student '{student_id}'. Make sure "
-"student identifier is correct."
+"Error resetting entrance exam attempts for student '{student_id}'. Make sure"
+" student identifier is correct."
 msgstr ""
 "Помилка скидання спроб виконання вступного тесту для студента "
 "'{student_id}'. Перевірте вірність ідентифікатора студента."
@@ -4400,15 +4407,16 @@ msgstr "Зазначте ім'я користувача або електрон�
 
 #: lms/static/js/instructor_dashboard/student_admin.js
 msgid ""
-"Do you want to allow this student ('{student_id}') to skip the entrance exam?"
+"Do you want to allow this student ('{student_id}') to skip the entrance "
+"exam?"
 msgstr ""
 "Ви хочете дозволити цьому студенту ('{student_id}') пропустити вступний "
 "іспит?"
 
 #: lms/static/js/instructor_dashboard/student_admin.js
 msgid ""
-"An error occurred. Make sure that the student's username or email address is "
-"correct and try again."
+"An error occurred. Make sure that the student's username or email address is"
+" correct and try again."
 msgstr ""
 "Виникла помилка. Переконайтеся, що ім'я користувача та адреса електронної "
 "пошти студента правильні і повторіть спробу."
@@ -4439,8 +4447,8 @@ msgstr "Скинути спроби для усіх студентів для з
 
 #: lms/static/js/instructor_dashboard/student_admin.js
 msgid ""
-"Successfully started task to reset attempts for problem '<%- problem_id %>'. "
-"Click the 'Show Task Status' button to see the status of the task."
+"Successfully started task to reset attempts for problem '<%- problem_id %>'."
+" Click the 'Show Task Status' button to see the status of the task."
 msgstr ""
 "Успішно розпочато задачу скинути спроби для завдання '<%- problem_id %>'. "
 "Натисніть кнопку «Показати стан задачі», щоб побачити статус задачі."
@@ -4451,8 +4459,8 @@ msgid ""
 "problem_id %>'. Make sure that the problem identifier is complete and "
 "correct."
 msgstr ""
-"Помилка при запуску задачі для скидання спроб усіх студентів на завданні '<"
-"%- problem_id %>'. Переконайтеся, що ідентифікатор завдання є повним і "
+"Помилка при запуску задачі для скидання спроб усіх студентів на завданні "
+"'<%- problem_id %>'. Переконайтеся, що ідентифікатор завдання є повним і "
 "правильним."
 
 #: lms/static/js/instructor_dashboard/student_admin.js
@@ -4463,9 +4471,9 @@ msgstr ""
 
 #: lms/static/js/instructor_dashboard/student_admin.js
 msgid ""
-"Started rescore problem task for problem '<%- problem_id %>' and student '<"
-"%- student_id %>'. Click the 'Show Task Status' button to see the status of "
-"the task."
+"Started rescore problem task for problem '<%- problem_id %>' and student "
+"'<%- student_id %>'. Click the 'Show Task Status' button to see the status "
+"of the task."
 msgstr ""
 "Почато переоцінювання завдання '<%- problem_id %>' для студента '<%- "
 "student_id %>'. Клацніть кнопку 'Показати історію задач для студента' щоб "
@@ -4473,8 +4481,8 @@ msgstr ""
 
 #: lms/static/js/instructor_dashboard/student_admin.js
 msgid ""
-"Error starting a task to rescore problem '<%- problem_id %>' for student '<"
-"%- student_id %>'. Make sure that the the problem and student identifiers "
+"Error starting a task to rescore problem '<%- problem_id %>' for student "
+"'<%- student_id %>'. Make sure that the the problem and student identifiers "
 "are complete and correct."
 msgstr ""
 "Помилка створення задачі по корегуванню оцінок студента '<%- student_id %>' "
@@ -4502,8 +4510,8 @@ msgid ""
 "and student identifiers are complete and correct."
 msgstr ""
 "Помилка запуску завдання для перевизначення оцінки для задачі '<%- "
-"problem_id %>' для студента '<%- student_id %>'. Переконайтеся, що оцінка та "
-"ідентифікатори задачі та студента є повними та правильними."
+"problem_id %>' для студента '<%- student_id %>'. Переконайтеся, що оцінка та"
+" ідентифікатори задачі та студента є повними та правильними."
 
 #: lms/static/js/instructor_dashboard/student_admin.js
 msgid ""
@@ -4539,12 +4547,12 @@ msgstr ""
 
 #: lms/static/js/instructor_dashboard/student_admin.js
 msgid ""
-"Error starting a task to rescore problem '<%- problem_id %>'. Make sure that "
-"the problem identifier is complete and correct."
+"Error starting a task to rescore problem '<%- problem_id %>'. Make sure that"
+" the problem identifier is complete and correct."
 msgstr ""
 "Помилка створення задачі по корегуванню оцінки за завдання '<%- problem_id "
-"%>'. Переконайтеся, що ідентифікатори завдання та студента вказані правильно "
-"і повністю. "
+"%>'. Переконайтеся, що ідентифікатори завдання та студента вказані правильно"
+" і повністю. "
 
 #. Translators: a "Task" is a background process such as grading students or
 #. sending email
@@ -4602,11 +4610,11 @@ msgstr "Прогрес завдання"
 
 #: lms/static/js/instructor_dashboard/util.js
 msgid ""
-"An error occurred retrieving your email. Please try again later, and contact "
-"technical support if the problem persists."
+"An error occurred retrieving your email. Please try again later, and contact"
+" technical support if the problem persists."
 msgstr ""
-"Виникла помилка при виділенні вашої адреси. Будь ласка, спробуйте пізніше та "
-"зверніться до служби підтримки в разі повторення проблеми."
+"Виникла помилка при виділенні вашої адреси. Будь ласка, спробуйте пізніше та"
+" зверніться до служби підтримки в разі повторення проблеми."
 
 #: lms/static/js/instructor_dashboard/util.js
 msgid "Sent By"
@@ -4837,8 +4845,8 @@ msgid ""
 msgstr ""
 "Ви також можете втратити доступ до перевірених сертифікатів та інших "
 "облікових даних програми, такі, як сертифікати MicroMasters. Якщо ви хочете "
-"зробити копію для ваших записів, перш ніж продовжити видалення, дотримуйтесь "
-"інструкцій для друку {htmlStart} або завантажте сертифікат{htmlEnd}."
+"зробити копію для ваших записів, перш ніж продовжити видалення, дотримуйтесь"
+" інструкцій для друку {htmlStart} або завантажте сертифікат{htmlEnd}."
 
 #: lms/static/js/student_account/components/StudentAccountDeletion.jsx
 msgid ""
@@ -4870,8 +4878,8 @@ msgstr ""
 #: lms/static/js/student_account/components/StudentAccountDeletion.jsx
 msgid ""
 "Please note: Deletion of your account and personal data is permanent and "
-"cannot be undone. {platformName} will not be able to recover your account or "
-"the data that is deleted."
+"cannot be undone. {platformName} will not be able to recover your account or"
+" the data that is deleted."
 msgstr ""
 
 #: lms/static/js/student_account/components/StudentAccountDeletion.jsx
@@ -4922,8 +4930,8 @@ msgstr "Необхідно вказати пароль"
 
 #: lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
 msgid ""
-"You have selected “Delete my account.” Deletion of your account and personal "
-"data is permanent and cannot be undone. {platformName} will not be able to "
+"You have selected “Delete my account.” Deletion of your account and personal"
+" data is permanent and cannot be undone. {platformName} will not be able to "
 "recover your account or the data that is deleted."
 msgstr ""
 
@@ -4953,8 +4961,8 @@ msgstr "Нам шкода, що ви йдете! Ваш акаунт буде в
 #: lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
 msgid ""
 "Account deletion, including removal from email lists, may take a few weeks "
-"to fully process through our system. If you want to opt-out of emails before "
-"then, please unsubscribe from the footer of any email."
+"to fully process through our system. If you want to opt-out of emails before"
+" then, please unsubscribe from the footer of any email."
 msgstr ""
 "Видалення акаунту, включаючи видалення зі списків електронної пошти, може "
 "зайняти кілька тижнів, щоб повністю обробити через нашу систему. Якщо ви "
@@ -5010,10 +5018,10 @@ msgstr "Перевірте вашу електрону поштову скрин
 msgid ""
 "{paragraphStart}You entered {boldStart}{email}{boldEnd}. If this email "
 "address is associated with your {platform_name} account, we will send a "
-"message with password recovery instructions to this email address."
-"{paragraphEnd}{paragraphStart}If you do not receive a password reset message "
-"after 1 minute, verify that you entered the correct email address, or check "
-"your spam folder.{paragraphEnd}{paragraphStart}If you need further "
+"message with password recovery instructions to this email "
+"address.{paragraphEnd}{paragraphStart}If you do not receive a password reset"
+" message after 1 minute, verify that you entered the correct email address, "
+"or check your spam folder.{paragraphEnd}{paragraphStart}If you need further "
 "assistance, {anchorStart}contact technical support{anchorEnd}.{paragraphEnd}"
 msgstr ""
 
@@ -5040,8 +5048,8 @@ msgstr ""
 #: lms/static/js/student_account/views/LoginView.js
 msgid ""
 "You have successfully signed into %(currentProvider)s, but your "
-"%(currentProvider)s account does not have a linked %(platformName)s account. "
-"To link your accounts, sign in now using your %(platformName)s password."
+"%(currentProvider)s account does not have a linked %(platformName)s account."
+" To link your accounts, sign in now using your %(platformName)s password."
 msgstr ""
 "Ви успішно увійшли в %(currentProvider)s, але ваш обліковий запис "
 "%(currentProvider)s не має під'єднаного облікового запису %(platformName)s. "
@@ -5078,8 +5086,8 @@ msgid ""
 "administrator or {link_start}edX Support{link_end} for help."
 msgstr ""
 "Керування налаштуваннями вашого профілю здійснюється {enterprise_name}. "
-"Зверніться до свого адміністратора або {link_start} edX Підтримки {link_end} "
-"за допомогою."
+"Зверніться до свого адміністратора або {link_start} edX Підтримки {link_end}"
+" за допомогою."
 
 #: lms/static/js/student_account/views/account_settings_factory.js
 msgid "Email Address (Sign In)"
@@ -5098,11 +5106,11 @@ msgstr "Відновити електронну адресу"
 
 #: lms/static/js/student_account/views/account_settings_factory.js
 msgid ""
-"You may access your account with this address if single-sign on or access to "
-"your primary email is not available."
+"You may access your account with this address if single-sign on or access to"
+" your primary email is not available."
 msgstr ""
-"Ви можете увійти до свого акаунту за допомогою цієї адреси, якщо єдиний вхід "
-"або основна електронна адреса недоступні."
+"Ви можете увійти до свого акаунту за допомогою цієї адреси, якщо єдиний вхід"
+" або основна електронна адреса недоступні."
 
 #: lms/static/js/student_account/views/account_settings_factory.js
 #: openedx/features/learner_profile/static/learner_profile/js/learner_profile_factory.js
@@ -5159,8 +5167,8 @@ msgid ""
 "a limited number of languages. Changing the value of this field will cause "
 "the page to refresh."
 msgstr ""
-"Мова, що використовується на цьому сайті. Цей сайт на даний час доступний на "
-"обмеженій кількості мов. Зміна значення цього поля призведе до оновлення "
+"Мова, що використовується на цьому сайті. Цей сайт на даний час доступний на"
+" обмеженій кількості мов. Зміна значення цього поля призведе до оновлення "
 "сторінки."
 
 #: lms/static/js/student_account/views/account_settings_factory.js
@@ -5173,8 +5181,8 @@ msgid ""
 "time zone, course dates, including assignment deadlines, will be displayed "
 "in your browser's local time zone."
 msgstr ""
-"Оберіть часовий пояс для відображення дат курсів. Якщо ви не вкажете часовий "
-"пояс, дати курсів, включно з дедлайнами здачі завдань, відображатимуться у "
+"Оберіть часовий пояс для відображення дат курсів. Якщо ви не вкажете часовий"
+" пояс, дати курсів, включно з дедлайнами здачі завдань, відображатимуться у "
 "місцевому часовому поясі вашого веб-браузера."
 
 #: lms/static/js/student_account/views/account_settings_factory.js
@@ -5212,8 +5220,8 @@ msgid ""
 "the link in the message to update your secondary email address."
 msgstr ""
 "Ми надіслали підтвердження на адресу {new_secondary_email_address}. "
-"Натисніть посилання в повідомленні, щоб оновити додаткову адресу електронної "
-"пошти."
+"Натисніть посилання в повідомленні, щоб оновити додаткову адресу електронної"
+" пошти."
 
 #: lms/static/js/student_account/views/account_settings_factory.js
 msgid "Social Media Links"
@@ -5274,7 +5282,8 @@ msgstr "Мої замовлення"
 msgid ""
 "This page contains information about orders that you have placed with "
 "{platform_name}."
-msgstr "Ця сторінка містить інформацію про ваші замовлення на {platform_name}."
+msgstr ""
+"Ця сторінка містить інформацію про ваші замовлення на {platform_name}."
 
 #: lms/static/js/student_account/views/account_settings_fields.js
 msgid ""
@@ -5293,12 +5302,12 @@ msgstr ""
 
 #: lms/static/js/student_account/views/account_settings_fields.js
 msgid ""
-"We've sent a message to {email}. Click the link in the message to reset your "
-"password. Didn't receive the message? Contact {anchorStart}technical "
+"We've sent a message to {email}. Click the link in the message to reset your"
+" password. Didn't receive the message? Contact {anchorStart}technical "
 "support{anchorEnd}."
 msgstr ""
-"Ми вислали повідомлення на {email}. Перейдіть по посиланню в листі для того, "
-"щоб скинути ваш пароль.  Не отримали повідомлення? Зверніться до "
+"Ми вислали повідомлення на {email}. Перейдіть по посиланню в листі для того,"
+" щоб скинути ваш пароль.  Не отримали повідомлення? Зверніться до "
 "{anchorStart}технічної підтримки{anchorEnd}."
 
 #: lms/static/js/student_account/views/account_settings_fields.js
@@ -5352,7 +5361,8 @@ msgstr "Помилка завантаження зображення"
 #: lms/static/js/verify_student/views/image_input_view.js
 msgid "Please verify that you have uploaded a valid image (PNG and JPEG)."
 msgstr ""
-"Будь ласка, перевірте, чи ви завантажили правильне зображення (PNG або JPEG)."
+"Будь ласка, перевірте, чи ви завантажили правильне зображення (PNG або "
+"JPEG)."
 
 #: lms/static/js/verify_student/views/incourse_reverify_view.js
 #: lms/static/js/verify_student/views/review_photos_step_view.js
@@ -5523,11 +5533,11 @@ msgstr ""
 
 #: lms/static/js/views/image_field.js
 msgid ""
-"Removal is in progress. To avoid errors, stay on this page until the process "
-"is complete."
+"Removal is in progress. To avoid errors, stay on this page until the process"
+" is complete."
 msgstr ""
-"Іде процес видалення. Щоб уникнути помилок, залишайтесь на цій сторінці доки "
-"процес не завершиться."
+"Іде процес видалення. Щоб уникнути помилок, залишайтесь на цій сторінці доки"
+" процес не завершиться."
 
 #: lms/static/js/views/image_field.js
 msgid "bytes"
@@ -5816,7 +5826,8 @@ msgid "Already a library team member"
 msgstr "Вже є членом бібліотечної команди"
 
 #: cms/static/js/factories/manage_users_lib.js
-msgid "Are you sure you want to delete {email} from the library “{container}”?"
+msgid ""
+"Are you sure you want to delete {email} from the library “{container}”?"
 msgstr "Ви впевнені, що хочете видалити {email} з бібліотеки “{container}”?"
 
 #: cms/static/js/factories/manage_users_lib.js
@@ -5853,7 +5864,8 @@ msgid "Choose new file"
 msgstr "Виберіть новий файл"
 
 #: cms/static/js/features/import/factories/import.js
-msgid "File format not supported. Please upload a file with a {ext} extension."
+msgid ""
+"File format not supported. Please upload a file with a {ext} extension."
 msgstr ""
 "Формат файлу не підтримується. Будь ласка, завантажте файл з розширенням "
 "{ext}. "
@@ -6132,13 +6144,11 @@ msgstr "Підтвердження видалення файлу. "
 msgid ""
 "Are you sure you wish to delete this item. It cannot be reversed!\n"
 "\n"
-"Also any content that links/refers to this item will no longer work (e.g. "
-"broken images and/or links)"
+"Also any content that links/refers to this item will no longer work (e.g. broken images and/or links)"
 msgstr ""
 "Ви впевнені, що хочете видалити цей елемент? Ця дія є незворотньою. \n"
 "\n"
-"Будь-який контент, що посилається на цю деталь більше не працюватиме. "
-"(наприклад пошкоджене зображення та/чи недіюче посилання)"
+"Будь-який контент, що посилається на цю деталь більше не працюватиме. (наприклад пошкоджене зображення та/чи недіюче посилання)"
 
 #: cms/static/js/views/asset.js
 msgid "Your file has been deleted."
@@ -6157,8 +6167,8 @@ msgstr "Тип"
 #: cms/static/js/views/assets.js
 msgid "File {filename} exceeds maximum size of {maxFileSizeInMBs} MB"
 msgstr ""
-"Файл {filename} перевищує максимально допустимий розмір в {maxFileSizeInMBs} "
-"MБ"
+"Файл {filename} перевищує максимально допустимий розмір в {maxFileSizeInMBs}"
+" MБ"
 
 #: cms/static/js/views/assets.js
 msgid ""
@@ -6172,7 +6182,8 @@ msgstr ""
 msgid "Max file size exceeded"
 msgstr "Перевищено максимально допустимий розмір файла"
 
-#: cms/static/js/views/assets.js cms/templates/js/asset-upload-modal.underscore
+#: cms/static/js/views/assets.js
+#: cms/templates/js/asset-upload-modal.underscore
 msgid "Upload New File"
 msgstr "Завантажити новий файл"
 
@@ -6289,8 +6300,8 @@ msgstr "Перейти на головну сторінку бібліотеки
 
 #: cms/static/js/views/export.js
 msgid ""
-"Your course could not be exported to XML. There is not enough information to "
-"identify the failed component. Inspect your course to identify any "
+"Your course could not be exported to XML. There is not enough information to"
+" identify the failed component. Inspect your course to identify any "
 "problematic components and try again."
 msgstr ""
 "Ваш курс не може бути експортовано в XML. Недостатньо інформації, що "
@@ -6374,8 +6385,8 @@ msgstr "Creative Commons"
 #: cms/static/js/views/license.js
 msgid "You waive some rights for your work, such that others can use it too"
 msgstr ""
-"Ви відмовляєтесь від деяких прав на свою роботу, наприклад, дозволяєте іншим "
-"також її використовувати."
+"Ви відмовляєтесь від деяких прав на свою роботу, наприклад, дозволяєте іншим"
+" також її використовувати."
 
 #: cms/static/js/views/license.js
 msgid "Version"
@@ -6429,11 +6440,11 @@ msgstr "Розповсюджувати за тих же умов"
 #: cms/static/js/views/license.js
 msgid ""
 "Allow others to distribute derivative works only under a license identical "
-"to the license that governs your work. This option is incompatible with \"No "
-"Derivatives\"."
+"to the license that governs your work. This option is incompatible with \"No"
+" Derivatives\"."
 msgstr ""
-"Дозволити іншим поширювати виключно роботи, засновані на ваших доробках, під "
-"ліцензіями такими, як для ваших робіт. Ця опція несумісна з «Без похідних»."
+"Дозволити іншим поширювати виключно роботи, засновані на ваших доробках, під"
+" ліцензіями такими, як для ваших робіт. Ця опція несумісна з «Без похідних»."
 
 #. Translators: "item_display_name" is the name of the item to be deleted.
 #: cms/static/js/views/list_item.js
@@ -6478,8 +6489,8 @@ msgstr "Вже є членом"
 
 #: cms/static/js/views/manage_users_and_roles.js
 msgid ""
-"{email} is already on the {container} team. Recheck the email address if you "
-"want to add a new member."
+"{email} is already on the {container} team. Recheck the email address if you"
+" want to add a new member."
 msgstr ""
 "{email} вже доданий до {container} команди. Перевірте електронну адресу ще "
 "раз, якщо хочете додати нового члена."
@@ -6822,8 +6833,8 @@ msgstr ""
 
 #: cms/static/js/views/show_textbook.js
 msgid ""
-"Deleting a textbook cannot be undone and once deleted any reference to it in "
-"your courseware's navigation will also be removed."
+"Deleting a textbook cannot be undone and once deleted any reference to it in"
+" your courseware's navigation will also be removed."
 msgstr ""
 "Видалення підручника є незворотнім і призведе до того, що всі посилання на "
 "нього в навігації по вашому курсу також будуть видалені. "
@@ -7000,8 +7011,8 @@ msgstr "Ви впевнені, що хочете видалити цю розш�
 
 #: cms/static/js/views/video/translations_editor.js
 msgid ""
-"If you remove this transcript, the transcript will not be available for this "
-"component."
+"If you remove this transcript, the transcript will not be available for this"
+" component."
 msgstr ""
 "Якщо ви видалите цю копію, то вона більше не буде доступна для цього "
 "компоненту."
@@ -7038,11 +7049,11 @@ msgstr "Помилка завантаження зображення"
 #. Translators: This is a 3 part text which tells the image requirements.
 #: cms/static/js/views/video_thumbnail.js
 msgid ""
-"{ReqTextSpanStart}Requirements{spanEnd}{lineBreak}{InstructionsSpanStart}"
-"{videoImageResoultion}{lineBreak} {videoImageSupportedFileFormats}{spanEnd}"
+"{ReqTextSpanStart}Requirements{spanEnd}{lineBreak}{InstructionsSpanStart}{videoImageResoultion}{lineBreak}"
+" {videoImageSupportedFileFormats}{spanEnd}"
 msgstr ""
-"{ReqTextSpanStart}Вимоги{spanEnd}{lineBreak}{InstructionsSpanStart}"
-"{videoImageResoultion}{lineBreak} {videoImageSupportedFileFormats}{spanEnd}"
+"{ReqTextSpanStart}Вимоги{spanEnd}{lineBreak}{InstructionsSpanStart}{videoImageResoultion}{lineBreak}"
+" {videoImageSupportedFileFormats}{spanEnd}"
 
 #. Translators: message will be like 1280x720 pixels
 #: cms/static/js/views/video_thumbnail.js
@@ -7196,8 +7207,8 @@ msgid ""
 "speak {beta_language}."
 msgstr ""
 "Ви змінили свою мову на {beta_language}, що наразі не є повністю "
-"перекладеною. Ви можете допомогти з перекладом для цієї мови приєднавшись до "
-"нашої спільноти у Transifex, та зробивши передклад для студентів з "
+"перекладеною. Ви можете допомогти з перекладом для цієї мови приєднавшись до"
+" нашої спільноти у Transifex, та зробивши передклад для студентів з "
 "англійської на {beta_language}."
 
 #: lms/static/js/student_account/views/account_settings_view.js
@@ -7894,8 +7905,8 @@ msgstr ""
 
 #: lms/templates/api_admin/catalog-error.underscore
 msgid ""
-"There was an error retrieving preview results for this catalog. Please check "
-"that your query is correct and try again."
+"There was an error retrieving preview results for this catalog. Please check"
+" that your query is correct and try again."
 msgstr ""
 
 #: lms/templates/api_admin/catalog-results.underscore
@@ -8123,8 +8134,8 @@ msgid ""
 "include an optional note describing the reason for the exception in the "
 "second comma separated field."
 msgstr ""
-"Завантажте файл зі значеннями, розділеними комами (.csv), який містить імена "
-"користувачів або адреси електронної пошти тих студентів, яким надано "
+"Завантажте файл зі значеннями, розділеними комами (.csv), який містить імена"
+" користувачів або адреси електронної пошти тих студентів, яким надано "
 "виняток. Першим введіть ім'я користувача або адресу електронної пошти та "
 "відокремте комою. За бажанням Ви можете додати примітку, яка б описувала "
 "причину винятку. Вона буде відображатися у другому полі."
@@ -8329,8 +8340,8 @@ msgstr ""
 msgid ""
 "{screen_reader_start}Warning:{screen_reader_end} No content groups exist."
 msgstr ""
-"{screen_reader_start}Попередження:{screen_reader_end} жодної контентої групи "
-"не створено. "
+"{screen_reader_start}Попередження:{screen_reader_end} жодної контентої групи"
+" не створено. "
 
 #: lms/templates/instructor/instructor_dashboard_2/cohort-form.underscore
 msgid "Only the parent course staff of a CCX can create content groups."
@@ -8575,10 +8586,10 @@ msgstr ""
 
 #: lms/templates/learner_dashboard/program_details_sidebar.underscore
 msgid ""
-"Once you complete one of the program requirements you have a program record. "
-"This record is marked complete once you meet all program requirements. A "
-"program record can be used to continue your learning journey and demonstrate "
-"your learning to others."
+"Once you complete one of the program requirements you have a program record."
+" This record is marked complete once you meet all program requirements. A "
+"program record can be used to continue your learning journey and demonstrate"
+" your learning to others."
 msgstr ""
 
 #: lms/templates/learner_dashboard/program_details_sidebar.underscore
@@ -8990,9 +9001,9 @@ msgid ""
 "You may be able to complete the image capture procedure without assistance, "
 "but it may take a couple of submission attempts to get the camera "
 "positioning right.  Optimal camera positioning varies with each computer, "
-"but generally the best position for a headshot is approximately 12-18 inches "
-"(30-45 centimeters) from the camera, with your head centered relative to the "
-"computer screen. "
+"but generally the best position for a headshot is approximately 12-18 inches"
+" (30-45 centimeters) from the camera, with your head centered relative to "
+"the computer screen. "
 msgstr ""
 
 #: lms/templates/verify_student/face_photo_step.underscore
@@ -9007,7 +9018,8 @@ msgstr ""
 #: lms/templates/verify_student/face_photo_step.underscore
 #: lms/templates/verify_student/incourse_reverify.underscore
 msgid ""
-"What if I have difficulty holding my head in position relative to the camera?"
+"What if I have difficulty holding my head in position relative to the "
+"camera?"
 msgstr ""
 
 #: lms/templates/verify_student/face_photo_step.underscore
@@ -9036,8 +9048,8 @@ msgstr ""
 
 #: lms/templates/verify_student/id_photo_step.underscore
 msgid ""
-"You need an ID with your name and photo. A driver's license, passport, or ID "
-"are all acceptable."
+"You need an ID with your name and photo. A driver's license, passport, or ID"
+" are all acceptable."
 msgstr ""
 
 #: lms/templates/verify_student/id_photo_step.underscore
@@ -9127,8 +9139,8 @@ msgstr ""
 msgid ""
 "We use the highest levels of security available to encrypt your photo and "
 "send it to our authorization service for review. Your photo and information "
-"are not saved or visible anywhere on %(platformName)s after the verification "
-"process is complete."
+"are not saved or visible anywhere on %(platformName)s after the verification"
+" process is complete."
 msgstr ""
 
 #: lms/templates/verify_student/intro_step.underscore
@@ -9211,7 +9223,8 @@ msgid "Government-Issued Photo ID"
 msgstr ""
 
 #: lms/templates/verify_student/make_payment_step.underscore
-msgid "ID-Verification is not required for this Professional Education course."
+msgid ""
+"ID-Verification is not required for this Professional Education course."
 msgstr ""
 
 #: lms/templates/verify_student/make_payment_step.underscore
@@ -9653,8 +9666,8 @@ msgstr "Підписанти сертифікатів"
 #: cms/templates/js/certificate-editor.underscore
 msgid ""
 "It is strongly recommended that you include four or fewer signatories. If "
-"you include additional signatories, preview the certificate in Print View to "
-"ensure the certificate will print correctly on one page."
+"you include additional signatories, preview the certificate in Print View to"
+" ensure the certificate will print correctly on one page."
 msgstr ""
 "Наполегливо рекомендується залучити не більше чотирьох підписантів. Якщо ви "
 "залучите додаткових підписантів, попередньо перегляньте сертифікат у вікні "
@@ -10103,8 +10116,8 @@ msgstr "Абревіатура"
 
 #: cms/templates/js/course_grade_policy.underscore
 msgid ""
-"This short name for the assignment type (for example, HW or Midterm) appears "
-"next to assignments on a learner's Progress page."
+"This short name for the assignment type (for example, HW or Midterm) appears"
+" next to assignments on a learner's Progress page."
 msgstr ""
 
 #: cms/templates/js/course_grade_policy.underscore
@@ -10147,8 +10160,8 @@ msgstr ""
 
 #: cms/templates/js/course_info_handouts.underscore
 msgid ""
-"There is invalid code in your content. Please check to make sure it is valid "
-"HTML."
+"There is invalid code in your content. Please check to make sure it is valid"
+" HTML."
 msgstr ""
 
 #: cms/templates/js/course_info_update.underscore
@@ -10182,7 +10195,8 @@ msgstr ""
 #: cms/templates/js/edit-chapter.underscore
 msgid "provide the title/name of the chapter that will be used in navigating"
 msgstr ""
-"Створіть заголовок / назву розділу, який буде використовуватися для навігації"
+"Створіть заголовок / назву розділу, який буде використовуватися для "
+"навігації"
 
 #: cms/templates/js/edit-chapter.underscore
 msgid "Chapter Asset"
@@ -10194,7 +10208,8 @@ msgstr ""
 
 #: cms/templates/js/edit-chapter.underscore
 msgid "upload a PDF file or provide the path to a Studio asset file"
-msgstr "Завантажте файл у форматі PDF або вкажіть шлях до файлу об'єкта Студії"
+msgstr ""
+"Завантажте файл у форматі PDF або вкажіть шлях до файлу об'єкта Студії"
 
 #: cms/templates/js/edit-chapter.underscore
 msgid "Upload PDF"
@@ -10257,8 +10272,8 @@ msgstr ""
 
 #: cms/templates/js/group-configuration-details.underscore
 msgid ""
-"This Group Configuration is not in use. Start by adding a content experiment "
-"to any Unit via the {linkStart}Course Outline{linkEnd}."
+"This Group Configuration is not in use. Start by adding a content experiment"
+" to any Unit via the {linkStart}Course Outline{linkEnd}."
 msgstr ""
 
 #: cms/templates/js/group-configuration-editor.underscore
@@ -10315,8 +10330,8 @@ msgstr ""
 
 #: cms/templates/js/highlights-editor.underscore
 msgid ""
-"This feature is currently in testing. Course teams can enter highlights, but "
-"learners will not receive email messages."
+"This feature is currently in testing. Course teams can enter highlights, but"
+" learners will not receive email messages."
 msgstr ""
 
 #: cms/templates/js/highlights-editor.underscore
@@ -10508,8 +10523,8 @@ msgstr ""
 
 #: cms/templates/js/publish-xblock.underscore
 msgid ""
-"Draft saved on {lastSavedStart}{editedOn}{lastSavedEnd} by {editedByStart}"
-"{editedBy}{editedByEnd}"
+"Draft saved on {lastSavedStart}{editedOn}{lastSavedEnd} by "
+"{editedByStart}{editedBy}{editedByEnd}"
 msgstr ""
 
 #: cms/templates/js/publish-xblock.underscore
@@ -10621,8 +10636,8 @@ msgstr ""
 
 #: cms/templates/js/show-correctness-editor.underscore
 msgid ""
-"If the subsection does not have a due date, learners always see their scores "
-"when they submit answers to assessments."
+"If the subsection does not have a due date, learners always see their scores"
+" when they submit answers to assessments."
 msgstr ""
 
 #: cms/templates/js/show-textbook.underscore
@@ -10823,8 +10838,8 @@ msgstr ""
 #: cms/templates/js/timed-examination-preference-editor.underscore
 msgid ""
 "Select a time allotment for the exam. If it is over 24 hours, type in the "
-"amount of time. You can grant individual learners extra time to complete the "
-"exam through the Instructor Dashboard."
+"amount of time. You can grant individual learners extra time to complete the"
+" exam through the Instructor Dashboard."
 msgstr ""
 
 #: cms/templates/js/timed-examination-preference-editor.underscore
@@ -10957,8 +10972,8 @@ msgstr ""
 
 #: cms/templates/js/maintenance/force-published-course-response.underscore
 msgid ""
-"You have done a dry run of force publishing the course. Nothing has changed. "
-"Had you run it, the following course versions would have been change."
+"You have done a dry run of force publishing the course. Nothing has changed."
+" Had you run it, the following course versions would have been change."
 msgstr ""
 
 #: cms/templates/js/maintenance/force-published-course-response.underscore
@@ -10973,8 +10988,8 @@ msgstr ""
 
 #: cms/templates/js/video/transcripts/metadata-videolist-entry.underscore
 msgid ""
-"To be sure all students can access the video, we recommend providing both "
-"an .mp4 and a .webm version of your video. Click below to add a URL for "
+"To be sure all students can access the video, we recommend providing both an"
+" .mp4 and a .webm version of your video. Click below to add a URL for "
 "another version. These URLs cannot be YouTube URLs. The first listed video "
 "that's compatible with the student's computer will play."
 msgstr ""
@@ -10990,8 +11005,8 @@ msgstr ""
 
 #: cms/templates/js/video/transcripts/messages/transcripts-choose.underscore
 msgid ""
-"The timed transcript for the first video file does not appear to be the same "
-"as the timed transcript for the second video file."
+"The timed transcript for the first video file does not appear to be the same"
+" as the timed transcript for the second video file."
 msgstr ""
 
 #: cms/templates/js/video/transcripts/messages/transcripts-choose.underscore
@@ -11049,9 +11064,9 @@ msgstr ""
 
 #: cms/templates/js/video/transcripts/messages/transcripts-import.underscore
 msgid ""
-"EdX doesn't have a timed transcript for this video in Studio, but we found a "
-"transcript on YouTube. You can import the YouTube transcript or upload your "
-"own .srt transcript file."
+"EdX doesn't have a timed transcript for this video in Studio, but we found a"
+" transcript on YouTube. You can import the YouTube transcript or upload your"
+" own .srt transcript file."
 msgstr ""
 
 #: cms/templates/js/video/transcripts/messages/transcripts-import.underscore
@@ -11070,8 +11085,8 @@ msgstr ""
 
 #: cms/templates/js/video/transcripts/messages/transcripts-replace.underscore
 msgid ""
-"The timed transcript for this video on edX is out of date, but YouTube has a "
-"current timed transcript for this video."
+"The timed transcript for this video on edX is out of date, but YouTube has a"
+" current timed transcript for this video."
 msgstr ""
 
 #: cms/templates/js/video/transcripts/messages/transcripts-replace.underscore
@@ -11100,8 +11115,8 @@ msgstr ""
 #: cms/templates/js/video/transcripts/messages/transcripts-use-existing.underscore
 msgid ""
 "You changed a video URL, but did not change the timed transcript file. Do "
-"you want to use the current timed transcript or upload a new .srt transcript "
-"file?"
+"you want to use the current timed transcript or upload a new .srt transcript"
+" file?"
 msgstr ""
 
 #: cms/templates/js/video/transcripts/messages/transcripts-use-existing.underscore
