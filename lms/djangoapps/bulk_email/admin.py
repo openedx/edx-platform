@@ -7,7 +7,13 @@ from config_models.admin import ConfigurationModelAdmin
 from django.contrib import admin
 
 from lms.djangoapps.bulk_email.forms import CourseAuthorizationAdminForm, CourseEmailTemplateForm
-from lms.djangoapps.bulk_email.models import BulkEmailFlag, CourseAuthorization, CourseEmail, CourseEmailTemplate, Optout  # lint-amnesty, pylint: disable=line-too-long
+from lms.djangoapps.bulk_email.models import (
+    BulkEmailFlag,
+    CourseAuthorization,
+    CourseEmail,
+    CourseEmailTemplate,
+    Optout
+)
 
 
 class CourseEmailAdmin(admin.ModelAdmin):
@@ -27,7 +33,7 @@ class CourseEmailTemplateAdmin(admin.ModelAdmin):
         (None, {
             # make the HTML template display above the plain template:
             'fields': ('html_template', 'plain_template', 'name'),
-            'description': u'''
+            'description': '''
 Enter template to be used by course staff when sending emails to enrolled students.
 
 The HTML template is for HTML email, and may contain HTML markup.  The plain template is

@@ -2023,6 +2023,11 @@ INTEGRATED_CHANNELS_API_CHUNK_TRANSMISSION_LIMIT = {}
 
 BASE_COOKIE_DOMAIN = 'localhost'
 
+# This limits the type of roles that are submittable via the `student` app's manual enrollment
+# audit API. While this isn't used in CMS, it is used via Enterprise which is installed in
+# the CMS. Without this, we get errors.
+MANUAL_ENROLLMENT_ROLE_CHOICES = ['Learner', 'Support', 'Partner']
+
 ############## Settings for the Discovery App ######################
 
 COURSE_CATALOG_URL_ROOT = 'http://localhost:8008'
@@ -2335,6 +2340,9 @@ DISABLE_DEPRECATED_SIGNUP_URL = False
 LOGISTRATION_RATELIMIT_RATE = '100/5m'
 LOGISTRATION_PER_EMAIL_RATELIMIT_RATE = '30/5m'
 LOGISTRATION_API_RATELIMIT = '20/m'
+RESET_PASSWORD_TOKEN_VALIDATE_API_RATELIMIT = '30/7d'
+RESET_PASSWORD_API_RATELIMIT = '30/7d'
+
 
 ##### REGISTRATION RATE LIMIT SETTINGS #####
 REGISTRATION_VALIDATION_RATELIMIT = '30/7d'

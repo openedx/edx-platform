@@ -255,9 +255,9 @@ def award_program_certificates(self, username):  # lint-amnesty, pylint: disable
                         f"Unable to award certificate to user {username} for program {program_uuid}. "
                         "The program might not be configured."
                     )
-            except Exception:  # pylint: disable=broad-except
+            except Exception as exc:  # pylint: disable=broad-except
                 # keep trying to award other certs, but retry the whole task to fix any missing entries
-                LOGGER.warning(f"Failed to award certificate for program {program_uuid} to user {username}.")
+                LOGGER.exception(f"Failed to award certificate for program {program_uuid} to user {username}.")
                 failed_program_certificate_award_attempts.append(program_uuid)
 
         if failed_program_certificate_award_attempts:

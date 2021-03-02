@@ -31,7 +31,6 @@ from lms.djangoapps.course_home_api.toggles import (
     course_home_mfe_dates_tab_is_active,
     course_home_mfe_outline_tab_is_active
 )
-from lms.djangoapps.course_home_api.utils import get_microfrontend_url
 from lms.djangoapps.courseware.access import has_access
 from lms.djangoapps.courseware.context_processor import user_timezone_locale_prefs
 from lms.djangoapps.courseware.courses import get_course_date_blocks, get_course_info_section, get_course_with_access
@@ -46,6 +45,7 @@ from openedx.features.course_experience.course_updates import (
     dismiss_current_update_for_user,
     get_current_update_for_user
 )
+from openedx.features.course_experience.url_helpers import get_learning_mfe_home_url
 from openedx.features.course_experience.utils import get_course_outline_block_tree, get_start_block
 from openedx.features.discounts.utils import generate_offer_data
 from xmodule.course_module import COURSE_VISIBILITY_PUBLIC, COURSE_VISIBILITY_PUBLIC_OUTLINE
@@ -189,7 +189,7 @@ class OutlineTabView(RetrieveAPIView):
 
         dates_tab_link = request.build_absolute_uri(reverse('dates', args=[course.id]))
         if course_home_mfe_dates_tab_is_active(course.id):
-            dates_tab_link = get_microfrontend_url(course_key=course.id, view_name='dates')
+            dates_tab_link = get_learning_mfe_home_url(course_key=course.id, view_name='dates')
 
         # Set all of the defaults
         access_expiration = None

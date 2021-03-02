@@ -44,6 +44,7 @@ from openedx.features.course_experience import (
     default_course_url_name
 )
 from openedx.features.course_experience.views.course_sock import CourseSockFragmentView
+from openedx.features.course_experience.url_helpers import get_learning_mfe_courseware_url
 from openedx.features.enterprise_support.api import data_sharing_consent_required
 from common.djangoapps.student.models import CourseEnrollment
 from common.djangoapps.util.views import ensure_valid_course_key
@@ -65,7 +66,6 @@ from ..model_data import FieldDataCache
 from ..module_render import get_module_for_descriptor, toc_for_course
 from ..permissions import MASQUERADE_AS_STUDENT
 from ..toggles import COURSEWARE_MICROFRONTEND_COURSE_TEAM_PREVIEW, REDIRECT_TO_COURSEWARE_MICROFRONTEND
-from ..url_helpers import get_microfrontend_url
 from .views import CourseTabView
 
 log = logging.getLogger("edx.courseware.views.index")
@@ -203,7 +203,7 @@ class CoursewareIndex(View):
                 unit_key = None
         except InvalidKeyError:
             unit_key = None
-        url = get_microfrontend_url(
+        url = get_learning_mfe_courseware_url(
             self.course_key,
             self.section.location if self.section else None,
             unit_key

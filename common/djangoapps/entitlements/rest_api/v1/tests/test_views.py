@@ -22,7 +22,6 @@ from common.djangoapps.student.tests.factories import TEST_PASSWORD, CourseEnrol
 from lms.djangoapps.courseware.models import DynamicUpgradeDeadlineConfiguration
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.content.course_overviews.tests.factories import CourseOverviewFactory
-from openedx.core.djangoapps.schedules.tests.factories import ScheduleFactory
 from openedx.core.djangoapps.site_configuration.tests.factories import SiteFactory
 from openedx.core.djangoapps.user_api.models import UserOrgTag
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
@@ -485,7 +484,7 @@ class EntitlementViewSetTest(ModuleStoreTestCase):
         DynamicUpgradeDeadlineConfiguration.objects.create(enabled=True)
         course = CourseFactory.create(self_paced=True)
         course_uuid = uuid.uuid4()
-        course_mode = CourseModeFactory(
+        CourseModeFactory(
             course_id=course.id,
             mode_slug=CourseMode.VERIFIED,
             # This must be in the future to ensure it is returned by downstream code.
@@ -499,11 +498,9 @@ class EntitlementViewSetTest(ModuleStoreTestCase):
         # Add an audit course enrollment for user.
         enrollment = CourseEnrollment.enroll(self.user, course.id, mode=CourseMode.AUDIT)
 
-        # Set an upgrade schedule so that dynamic upgrade deadlines are used
-        ScheduleFactory.create(
-            enrollment=enrollment,
-            upgrade_deadline=course_mode.expiration_datetime + timedelta(days=-3)
-        )
+        # Set an expired dynamic upgrade deadline
+        enrollment.schedule.upgrade_deadline = now() + timedelta(days=-2)
+        enrollment.schedule.save()
 
         # The upgrade should complete and ignore the deadline
         response = self.client.post(

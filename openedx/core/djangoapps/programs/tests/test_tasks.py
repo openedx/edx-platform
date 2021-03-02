@@ -343,7 +343,7 @@ class AwardProgramCertificatesTestCase(CatalogIntegrationMixin, CredentialsApiCo
         mock_award_program_certificate.side_effect = self._make_side_effect([Exception('boom'), None])
 
         with mock.patch(TASKS_MODULE + '.LOGGER.info') as mock_info, \
-                mock.patch(TASKS_MODULE + '.LOGGER.warning') as mock_warning:
+                mock.patch(TASKS_MODULE + '.LOGGER.exception') as mock_warning:
             tasks.award_program_certificates.delay(self.student.username).get()
 
         assert mock_award_program_certificate.call_count == 3

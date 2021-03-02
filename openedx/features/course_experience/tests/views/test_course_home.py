@@ -44,7 +44,7 @@ from openedx.core.djangoapps.django_comment_common.models import (
     FORUM_ROLE_GROUP_MODERATOR,
     FORUM_ROLE_MODERATOR
 )
-from openedx.core.djangoapps.schedules.tests.factories import ScheduleFactory
+from openedx.core.djangoapps.schedules.models import Schedule
 from openedx.core.djangoapps.waffle_utils.testutils import WAFFLE_TABLES
 from openedx.core.djangolib.markup import HTML
 from openedx.features.course_duration_limits.models import CourseDurationLimitConfig
@@ -448,12 +448,8 @@ class TestCourseHomePageAccess(CourseHomePageTestCase):
         url = course_home_url(course)
 
         user = UserFactory.create(password=self.TEST_PASSWORD)
-        ScheduleFactory(
-            start_date=THREE_YEARS_AGO,
-            enrollment__mode=CourseMode.VERIFIED,
-            enrollment__course_id=course.id,
-            enrollment__user=user
-        )
+        CourseEnrollment.enroll(user, self.course.id, mode=CourseMode.VERIFIED)
+        Schedule.objects.update(start_date=THREE_YEARS_AGO)
 
         # ensure that the user who has indefinite access
         self.client.login(username=user.username, password=self.TEST_PASSWORD)
@@ -478,12 +474,8 @@ class TestCourseHomePageAccess(CourseHomePageTestCase):
         url = course_home_url(course)
 
         user = role_factory.create(password=self.TEST_PASSWORD, course_key=course.id)
-        ScheduleFactory(
-            start_date=THREE_YEARS_AGO,
-            enrollment__mode=CourseMode.AUDIT,
-            enrollment__course_id=course.id,
-            enrollment__user=user
-        )
+        CourseEnrollment.enroll(user, self.course.id, mode=CourseMode.AUDIT)
+        Schedule.objects.update(start_date=THREE_YEARS_AGO)
 
         # ensure that the user has indefinite access
         self.client.login(username=user.username, password=self.TEST_PASSWORD)
@@ -526,12 +518,8 @@ class TestCourseHomePageAccess(CourseHomePageTestCase):
         url = course_home_url(course)
 
         user = role_factory.create(password=self.TEST_PASSWORD)
-        ScheduleFactory(
-            start_date=THREE_YEARS_AGO,
-            enrollment__mode=CourseMode.AUDIT,
-            enrollment__course_id=course.id,
-            enrollment__user=user
-        )
+        CourseEnrollment.enroll(user, self.course.id, mode=CourseMode.AUDIT)
+        Schedule.objects.update(start_date=THREE_YEARS_AGO)
 
         # ensure that the user who has indefinite access
         self.client.login(username=user.username, password=self.TEST_PASSWORD)
@@ -557,7 +545,6 @@ class TestCourseHomePageAccess(CourseHomePageTestCase):
         audit_enrollment = CourseEnrollment.enroll(audit_user, course.id, mode=CourseMode.AUDIT)
         audit_enrollment.created = THREE_YEARS_AGO + timedelta(days=1)
         audit_enrollment.save()
-        ScheduleFactory(enrollment=audit_enrollment)
 
         response = self.client.get(url)
 
@@ -627,7 +614,7 @@ class TestCourseHomePageAccess(CourseHomePageTestCase):
         audit_user = UserFactory(password=self.TEST_PASSWORD)
         self.client.login(username=audit_user.username, password=self.TEST_PASSWORD)
         audit_enrollment = CourseEnrollment.enroll(audit_user, course.id, mode=CourseMode.AUDIT)
-        ScheduleFactory(start_date=THREE_YEARS_AGO, enrollment=audit_enrollment)
+        Schedule.objects.update(start_date=THREE_YEARS_AGO)
         FBEEnrollmentExclusion.objects.create(
             enrollment=audit_enrollment
         )

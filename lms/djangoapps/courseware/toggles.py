@@ -162,9 +162,8 @@ def courseware_mfe_first_section_celebration_is_active(course_key):
     )
 
 
-def courseware_mfe_streak_celebration_is_active(course_key):
+def streak_celebration_is_active(course_key):
     return (
-        REDIRECT_TO_COURSEWARE_MICROFRONTEND.is_enabled(course_key) and
         COURSEWARE_MICROFRONTEND_PROGRESS_MILESTONES.is_enabled(course_key) and
         COURSEWARE_MICROFRONTEND_PROGRESS_MILESTONES_STREAK_CELEBRATION.is_enabled(course_key)
     )

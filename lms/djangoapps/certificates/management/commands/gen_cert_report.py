@@ -7,7 +7,6 @@ from django.contrib.auth import get_user_model
 from django.core.management.base import BaseCommand, CommandError
 from django.db.models import Count
 from opaque_keys.edx.keys import CourseKey
-from six import text_type
 
 from lms.djangoapps.certificates.models import GeneratedCertificate
 
@@ -59,7 +58,7 @@ class Command(BaseCommand):
 
         # find students who are active
         # number of enrolled students = downloadable + notpassing
-        print(u"Looking up certificate states for {0}".format(options['course']))
+        print("Looking up certificate states for {}".format(options['course']))
         enrolled_current = User.objects.filter(
             courseenrollment__course_id=course_id,
             courseenrollment__is_active=True
@@ -112,15 +111,15 @@ class Command(BaseCommand):
 
         # all states we have seen far all courses
         status_headings = sorted(
-            set([status for course in cert_data for status in cert_data[course]])  # pylint: disable=consider-using-set-comprehension
+            {status for course in cert_data for status in cert_data[course]}  # pylint: disable=consider-using-set-comprehension
         )
 
         # print the heading for the report
         print("{:>26}".format("course ID"), end=' ')
-        print(' '.join(["{:>16}".format(heading) for heading in status_headings]))
+        print(' '.join([f"{heading:>16}" for heading in status_headings]))
 
         # print the report
-        print("{0:>26}".format(text_type(course_id)), end=' ')
+        print("{:>26}".format(str(course_id)), end=' ')
         for heading in status_headings:
             if heading in cert_data[course_id]:
                 print("{:>16}".format(cert_data[course_id][heading]), end=' ')

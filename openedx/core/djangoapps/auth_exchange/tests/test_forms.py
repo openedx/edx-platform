@@ -41,7 +41,7 @@ class AccessTokenExchangeFormTest(AccessTokenExchangeTestMixin):
         form = AccessTokenExchangeForm(request=self.request, oauth2_adapter=self.oauth2_adapter, data=data)
         assert form.errors == {'error': expected_error, 'error_description': expected_error_description}
 
-    def _assert_success(self, data, expected_scopes):
+    def _assert_success(self, data, expected_scopes, expected_logged_in_user=None):
         form = AccessTokenExchangeForm(request=self.request, oauth2_adapter=self.oauth2_adapter, data=data)
         assert form.is_valid()
         assert form.cleaned_data['user'] == self.user

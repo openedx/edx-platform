@@ -3,19 +3,28 @@ Instructor tasks related to certificates.
 """
 
 
+import logging
+
 from time import time
 
 from django.contrib.auth import get_user_model
 from django.db.models import Q
 
 from common.djangoapps.student.models import CourseEnrollment
-from lms.djangoapps.certificates.api import generate_user_certificates
+from lms.djangoapps.certificates.api import (
+    generate_allowlist_certificate_task,
+    generate_user_certificates,
+    get_allowlisted_users,
+    is_using_certificate_allowlist_and_is_on_allowlist
+)
 from lms.djangoapps.certificates.models import CertificateStatuses, GeneratedCertificate
 from xmodule.modulestore.django import modulestore
 
 from .runner import TaskProgress
 
 User = get_user_model()
+
+log = logging.getLogger(__name__)
 
 
 def generate_students_certificates(
@@ -63,6 +72,8 @@ def generate_students_certificates(
             course_id, students_to_generate_certs_for, statuses_to_regenerate
         )
 
+    log.info(f'About to attempt certificate generation for {len(students_require_certs)} users in course {course_id}. '
+             f'The student_set is {student_set} and statuses_to_regenerate is {statuses_to_regenerate}')
     if statuses_to_regenerate:
         # Mark existing generated certificates as 'unavailable' before regenerating
         # We need to call this method after "students_require_certificate" otherwise "students_require_certificate"
@@ -78,17 +89,17 @@ def generate_students_certificates(
     # Generate certificate for each student
     for student in students_require_certs:
         task_progress.attempted += 1
-        status = generate_user_certificates(
-            student,
-            course_id,
-            course=course
-        )
-
-        if CertificateStatuses.is_passing_status(status):
-            task_progress.succeeded += 1
+        if is_using_certificate_allowlist_and_is_on_allowlist(student, course_id):
+            log.info(f'{course_id} is using allowlist certificates, and the user {student.id} is on its allowlist. '
+                     f'Attempt will be made to generate an allowlist certificate.')
+            generate_allowlist_certificate_task(student, course_id)
         else:
-            task_progress.failed += 1
-
+            log.info(f'Attempt will be made to generate a certificate for user {student.id} in {course_id}.')
+            generate_user_certificates(
+                student,
+                course_id,
+                course=course
+            )
     return task_progress.update_task_state(extra_meta=current_step)
 
 
@@ -127,7 +138,7 @@ def students_require_certificate(course_id, enrolled_students, statuses_to_regen
 def _invalidate_generated_certificates(course_id, enrolled_students, certificate_statuses):
     """
     Invalidate generated certificates for all enrolled students in the given course having status in
-    'certificate_statuses'.
+    'certificate_statuses', if the student is not on the course's allowlist.
 
     Generated Certificates are invalidated by marking its status 'unavailable' and updating verify_uuid, download_uuid,
     download_url and grade with empty string.
@@ -142,12 +153,14 @@ def _invalidate_generated_certificates(course_id, enrolled_students, certificate
         status__in=certificate_statuses,
     )
 
-    # Mark generated certificates as 'unavailable' and update download_url, download_uui, verify_uuid and
-    # grade with empty string for each row
-    certificates.update(
-        status=CertificateStatuses.unavailable,
-        verify_uuid='',
-        download_uuid='',
-        download_url='',
-        grade='',
-    )
+    allowlisted_users = get_allowlisted_users(course_id)
+
+    # Invalidate each cert that is not allowlisted. We loop over the certs and invalidate each individually in order to
+    # save a history of the change.
+    for c in certificates:
+        if c.user in allowlisted_users:
+            log.info(f'Certificate for user {c.user.id} will not be invalidated because they are on the allowlist for '
+                     f'course {course_id}')
+        else:
+            log.info(f'About to invalidate certificate for user {c.user.id} in course {course_id}')
+            c.invalidate()

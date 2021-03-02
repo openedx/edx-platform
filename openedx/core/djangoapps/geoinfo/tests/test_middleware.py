@@ -107,20 +107,6 @@ class CountryMiddlewareTests(TestCase):
         assert 'CN' == request.session.get('country_code')
         assert '117.79.83.100' == request.session.get('ip_address')
 
-    def test_ip_address_is_none(self):
-        # IP address is not defined in request.
-        request = self.request_factory.get('/somewhere')
-        request.user = self.anonymous_user
-        # Run process_request to set up the session in the request
-        # to be able to override it.
-        self.session_middleware.process_request(request)
-        request.session['country_code'] = 'CN'
-        request.session['ip_address'] = '117.79.83.1'
-        self.country_middleware.process_request(request)
-        # No country code exists after request processing.
-        assert 'country_code' not in request.session
-        assert 'ip_address' not in request.session
-
     def test_ip_address_is_ipv6(self):
         request = self.request_factory.get(
             '/somewhere',

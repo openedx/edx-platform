@@ -275,6 +275,32 @@ def upload_ora2_data(
     Collect ora2 responses and upload them to S3 as a CSV
     """
 
+    return _upload_ora2_data_common(
+        _xmodule_instance_args, _entry_id, course_id, _task_input, action_name,
+        'data', OraAggregateData.collect_ora2_data
+    )
+
+
+def upload_ora2_summary(
+        _xmodule_instance_args, _entry_id, course_id, _task_input, action_name
+):
+    """
+    Collect ora2/student summaries and upload them to file storage as a CSV
+    """
+
+    return _upload_ora2_data_common(
+        _xmodule_instance_args, _entry_id, course_id, _task_input, action_name,
+        'summary', OraAggregateData.collect_ora2_summary
+    )
+
+
+def _upload_ora2_data_common(
+        _xmodule_instance_args, _entry_id, course_id, _task_input, action_name,
+        report_name, csv_gen_func
+):
+    """
+    Common code for uploading data or summary csv report.
+    """
     start_date = datetime.now(UTC)
     start_time = time()
 
@@ -304,8 +330,10 @@ def upload_ora2_data(
     task_progress.update_task_state(extra_meta=curr_step)
 
     try:
-        header, datarows = OraAggregateData.collect_ora2_data(course_id)
-        rows = [header] + [row for row in datarows]  # lint-amnesty, pylint: disable=unnecessary-comprehension
+        header, datarows = csv_gen_func(course_id)
+        rows = [header]
+        for row in datarows:
+            rows.append(row)
     # Update progress to failed regardless of error type
     except Exception:  # pylint: disable=broad-except
         TASK_LOG.exception('Failed to get ORA data.')
@@ -326,9 +354,9 @@ def upload_ora2_data(
     )
     task_progress.update_task_state(extra_meta=curr_step)
 
-    upload_csv_to_report_store(rows, 'ORA_data', course_id, start_date)
+    upload_csv_to_report_store(rows, 'ORA_{}'.format(report_name), course_id, start_date)
 
-    curr_step = {'step': 'Finalizing ORA data report'}
+    curr_step = {'step': 'Finalizing ORA {} report'.format(report_name)}
     task_progress.update_task_state(extra_meta=curr_step)
     TASK_LOG.info('%s, Task type: %s, Upload complete.', task_info_string, action_name)
 

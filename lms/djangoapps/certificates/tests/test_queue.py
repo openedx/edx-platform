@@ -10,21 +10,19 @@ import ddt
 import freezegun
 import pytz
 import six
+from django.conf import settings
+from django.test import TestCase
+from django.test.utils import override_settings
+from mock import Mock, patch
+from opaque_keys.edx.locator import CourseLocator
+from testfixtures import LogCapture
+
 # It is really unfortunate that we are using the XQueue client
 # code from the capa library.  In the future, we should move this
 # into a shared library.  We import it here so we can mock it
 # and verify that items are being correctly added to the queue
 # in our `XQueueCertInterface` implementation.
 from capa.xqueue_interface import XQueueInterface
-from django.conf import settings  # lint-amnesty, pylint: disable=wrong-import-order
-from django.test import TestCase  # lint-amnesty, pylint: disable=wrong-import-order
-from django.test.utils import override_settings  # lint-amnesty, pylint: disable=wrong-import-order
-from mock import Mock, patch  # lint-amnesty, pylint: disable=wrong-import-order
-from opaque_keys.edx.locator import CourseLocator  # lint-amnesty, pylint: disable=wrong-import-order
-from testfixtures import LogCapture  # lint-amnesty, pylint: disable=wrong-import-order
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory
-
 from common.djangoapps.course_modes.models import CourseMode
 from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
 from lms.djangoapps.certificates.models import (
@@ -37,6 +35,8 @@ from lms.djangoapps.certificates.queue import LOGGER, XQueueCertInterface
 from lms.djangoapps.certificates.tests.factories import CertificateWhitelistFactory, GeneratedCertificateFactory
 from lms.djangoapps.grades.tests.utils import mock_passing_grade
 from lms.djangoapps.verify_student.tests.factories import SoftwareSecurePhotoVerificationFactory
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from xmodule.modulestore.tests.factories import CourseFactory
 
 
 @ddt.ddt

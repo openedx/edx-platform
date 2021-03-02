@@ -1,8 +1,6 @@
 """
 Tests for SAMLConfiguration endpoints
 """
-
-import unittest  # lint-amnesty, pylint: disable=unused-import
 from django.urls import reverse
 from django.contrib.sites.models import Site
 from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
@@ -10,7 +8,6 @@ from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imp
 from rest_framework import status
 from rest_framework.test import APITestCase
 from common.djangoapps.third_party_auth.models import SAMLConfiguration
-from common.djangoapps.third_party_auth.tests import testutil  # lint-amnesty, pylint: disable=unused-import
 from common.djangoapps.third_party_auth.tests.utils import skip_unless_thirdpartyauth
 SAML_CONFIGURATIONS = [
     {

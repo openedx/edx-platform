@@ -29,7 +29,7 @@ from edx_ace import ace
 from edx_ace.recipient import Recipient
 from edx_django_utils import monitoring as monitoring_utils
 from eventtracking import tracker
-from ipware.ip import get_ip
+from ipware.ip import get_client_ip
 # Note that this lives in LMS, so this dependency should be refactored.
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
@@ -58,7 +58,7 @@ from common.djangoapps.student.message_types import AccountActivation, EmailChan
 from common.djangoapps.student.models import (  # lint-amnesty, pylint: disable=unused-import
     AccountRecovery,
     CourseEnrollment,
-    PendingEmailChange,
+    PendingEmailChange,  # unimport:skip
     PendingSecondaryEmailChange,
     Registration,
     RegistrationCookieConfiguration,
@@ -94,6 +94,7 @@ REGISTRATION_UTM_PARAMETERS = {
     'utm_content': 'registration_utm_content',
 }
 REGISTRATION_UTM_CREATED_AT = 'registration_utm_created_at'
+USER_ACCOUNT_ACTIVATED = 'edx.user.account.activated'
 
 
 def csrf_token(context):
@@ -340,7 +341,7 @@ def change_enrollment(request, check_access=True):
         # or if the user is enrolling in a country in which the course
         # is not available.
         redirect_url = embargo_api.redirect_if_blocked(
-            course_id, user=user, ip_address=get_ip(request),
+            course_id, user=user, ip_address=get_client_ip(request)[0],
             url=request.path
         )
         if redirect_url:
@@ -528,6 +529,13 @@ def activate_account(request, key):
             registration.activate()
             # Success message for logged in users.
             message = _('{html_start}Success{html_end} You have activated your account.')
+
+            tracker.emit(
+                USER_ACCOUNT_ACTIVATED,
+                {
+                    "user_id": registration.user.id,
+                }
+            )
 
             if not request.user.is_authenticated:
                 # Success message for logged out users

@@ -51,6 +51,46 @@ class TestIDVerificationService(ModuleStoreTestCase):
         attempt.save()
         assert IDVerificationService.user_is_verified(user), attempt.status
 
+    def test_user_has_ever_been_verified(self):
+        """
+        Test to make sure we correctly answer whether a user has ever been verified.
+        """
+        # Missing user
+        assert not IDVerificationService.user_has_ever_been_verified(None)
+
+        # User without any attempts
+        photo_user = UserFactory.create()
+        assert not IDVerificationService.user_has_ever_been_verified(photo_user)
+
+        # User without an approved attempt
+        attempt = SoftwareSecurePhotoVerification(user=photo_user, status='submitted')
+        attempt.save()
+        assert not IDVerificationService.user_has_ever_been_verified(photo_user)
+
+        # User with a submitted, then an approved attempt
+        attempt = SoftwareSecurePhotoVerification(user=photo_user, status='approved')
+        attempt.save()
+        assert IDVerificationService.user_has_ever_been_verified(photo_user)
+
+        # User with a manual approved attempt
+        manual_user = UserFactory.create()
+        attempt = ManualVerification(user=manual_user, status='approved')
+        attempt.save()
+        assert IDVerificationService.user_has_ever_been_verified(manual_user)
+
+        # User with 2 manual approved attempts
+        attempt = ManualVerification(user=manual_user, status='approved')
+        attempt.save()
+        assert IDVerificationService.user_has_ever_been_verified(manual_user)
+
+        # User with an SSO approved attempt, then a must_retry attempt
+        sso_user = UserFactory.create()
+        attempt = SSOVerification(user=sso_user, status='approved')
+        attempt.save()
+        attempt = SSOVerification(user=sso_user, status='must_retry')
+        attempt.save()
+        assert IDVerificationService.user_has_ever_been_verified(sso_user)
+
     def test_user_has_valid_or_pending(self):
         """
         Determine whether we have to prompt this user to verify, or if they've

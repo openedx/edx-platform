@@ -33,11 +33,9 @@ class ScheduleConfigFactory(factory.DjangoModelFactory):  # lint-amnesty, pylint
         model = models.ScheduleConfig
 
     site = factory.SubFactory(SiteFactory)
-    create_schedules = True
     enqueue_recurring_nudge = True
     deliver_recurring_nudge = True
     enqueue_upgrade_reminder = True
     deliver_upgrade_reminder = True
     enqueue_course_update = True
     deliver_course_update = True
-    hold_back_ratio = 0

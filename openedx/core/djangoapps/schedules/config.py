@@ -2,30 +2,9 @@
 Contains configuration for schedules app
 """
 
+from edx_toggles.toggles import LegacyWaffleSwitch, LegacyWaffleSwitchNamespace, WaffleFlag
 
-from edx_toggles.toggles import (
-    WaffleFlag,
-    LegacyWaffleFlagNamespace,
-    LegacyWaffleSwitch,
-    LegacyWaffleSwitchNamespace
-)
-
-from openedx.core.djangoapps.waffle_utils import CourseWaffleFlag
-
-WAFFLE_FLAG_NAMESPACE = LegacyWaffleFlagNamespace(name='schedules')
 WAFFLE_SWITCH_NAMESPACE = LegacyWaffleSwitchNamespace(name='schedules')
-
-CREATE_SCHEDULE_WAFFLE_FLAG = CourseWaffleFlag(
-    waffle_namespace=WAFFLE_FLAG_NAMESPACE,
-    flag_name='create_schedules_for_course',
-    module_name=__name__,
-)
-
-COURSE_UPDATE_WAFFLE_FLAG = CourseWaffleFlag(
-    waffle_namespace=WAFFLE_FLAG_NAMESPACE,
-    flag_name='send_updates_for_course',
-    module_name=__name__,
-)
 
 # .. toggle_name: schedules.enable_debugging
 # .. toggle_implementation: WaffleFlag

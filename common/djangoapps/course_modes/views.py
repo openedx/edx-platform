@@ -21,7 +21,7 @@ from django.utils.translation import get_language, to_locale
 from django.utils.translation import ugettext as _
 from django.views.generic.base import View
 from edx_django_utils.monitoring.utils import increment
-from ipware.ip import get_ip
+from ipware.ip import get_client_ip
 from opaque_keys.edx.keys import CourseKey
 from six import text_type
 
@@ -90,7 +90,7 @@ class ChooseModeView(View):
         embargo_redirect = embargo_api.redirect_if_blocked(
             course_key,
             user=request.user,
-            ip_address=get_ip(request),
+            ip_address=get_client_ip(request)[0],
             url=request.path
         )
         if embargo_redirect:

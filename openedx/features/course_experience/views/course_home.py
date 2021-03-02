@@ -15,7 +15,6 @@ from opaque_keys.edx.keys import CourseKey
 from web_fragments.fragment import Fragment
 
 from lms.djangoapps.course_home_api.toggles import course_home_mfe_outline_tab_is_active
-from lms.djangoapps.course_home_api.utils import get_microfrontend_url
 from lms.djangoapps.courseware.access import has_access
 from lms.djangoapps.courseware.courses import can_self_enroll_in_course, get_course_info_section, get_course_with_access
 from lms.djangoapps.course_goals.api import (
@@ -33,6 +32,7 @@ from openedx.core.djangoapps.plugin_api.views import EdxFragmentView
 from openedx.core.djangoapps.util.maintenance_banner import add_maintenance_banner
 from openedx.features.course_duration_limits.access import generate_course_expired_fragment
 from openedx.features.course_experience.course_tools import CourseToolsPluginManager
+from openedx.features.course_experience.url_helpers import get_learning_mfe_home_url
 from openedx.features.discounts.utils import get_first_purchase_offer_banner_fragment
 from openedx.features.discounts.utils import format_strikeout_price
 from common.djangoapps.student.models import CourseEnrollment
@@ -72,7 +72,7 @@ class CourseHomeView(CourseTabView):
     def render_to_fragment(self, request, course=None, tab=None, **kwargs):  # lint-amnesty, pylint: disable=arguments-differ, unused-argument
         course_id = six.text_type(course.id)
         if course_home_mfe_outline_tab_is_active(course.id) and not request.user.is_staff:
-            microfrontend_url = get_microfrontend_url(course_key=course_id, view_name="home")
+            microfrontend_url = get_learning_mfe_home_url(course_key=course_id, view_name="home")
             raise Redirect(microfrontend_url)
         home_fragment_view = CourseHomeFragmentView()
         return home_fragment_view.render_to_fragment(request, course_id=course_id, **kwargs)
