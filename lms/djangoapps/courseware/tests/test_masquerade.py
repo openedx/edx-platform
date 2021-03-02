@@ -12,7 +12,6 @@ import ddt
 from django.conf import settings
 from django.test import TestCase
 from django.urls import reverse
-from edx_toggles.toggles.testutils import override_waffle_flag
 from pytz import UTC
 from xblock.runtime import DictKeyValueStore
 
@@ -26,9 +25,7 @@ from lms.djangoapps.courseware.tests.factories import StaffFactory
 from lms.djangoapps.courseware.tests.helpers import LoginEnrollmentTestCase, MasqueradeMixin, masquerade_as_group_member
 from lms.djangoapps.courseware.tests.test_submitting_problems import ProblemSubmissionTestMixin
 from openedx.core.djangoapps.lang_pref import LANGUAGE_KEY
-from openedx.core.djangoapps.self_paced.models import SelfPacedConfiguration
 from openedx.core.djangoapps.user_api.preferences.api import get_user_preference, set_user_preference
-from openedx.features.course_experience import DISABLE_UNIFIED_COURSE_TAB_FLAG
 from common.djangoapps.student.models import CourseEnrollment
 from common.djangoapps.student.tests.factories import UserFactory
 from xmodule.modulestore.django import modulestore

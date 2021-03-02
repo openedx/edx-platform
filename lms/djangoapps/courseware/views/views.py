@@ -105,7 +105,6 @@ from openedx.core.djangoapps.enrollments.permissions import ENROLL_IN_COURSE
 from openedx.core.djangoapps.models.course_details import CourseDetails
 from openedx.core.djangoapps.plugin_api.views import EdxFragmentView
 from openedx.core.djangoapps.programs.utils import ProgramMarketingDataExtender
-from openedx.core.djangoapps.self_paced.models import SelfPacedConfiguration
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.util.user_messages import PageLevelMessages
 from openedx.core.djangoapps.zendesk_proxy.utils import create_zendesk_ticket
@@ -117,7 +116,6 @@ from openedx.features.course_experience import DISABLE_UNIFIED_COURSE_TAB_FLAG, 
 from openedx.features.course_experience.course_tools import CourseToolsPluginManager
 from openedx.features.course_experience.url_helpers import get_legacy_courseware_url
 from openedx.features.course_experience.utils import dates_banner_should_display
-from openedx.features.course_experience.views.course_dates import CourseDatesFragmentView
 from openedx.features.course_experience.waffle import ENABLE_COURSE_ABOUT_SIDEBAR_HTML
 from openedx.features.course_experience.waffle import waffle as course_experience_waffle
 from openedx.features.enterprise_support.api import data_sharing_consent_required

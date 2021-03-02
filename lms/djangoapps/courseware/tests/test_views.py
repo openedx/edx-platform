@@ -79,7 +79,6 @@ from openedx.features.course_duration_limits.models import CourseDurationLimitCo
 from openedx.features.course_experience import (
     COURSE_ENABLE_UNENROLLED_ACCESS_FLAG,
     DISABLE_COURSE_OUTLINE_PAGE_FLAG,
-    DISABLE_UNIFIED_COURSE_TAB_FLAG,
     RELATIVE_DATES_FLAG
 )
 from openedx.features.course_experience.tests.views.helpers import add_course_mode

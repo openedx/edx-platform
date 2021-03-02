@@ -40,7 +40,6 @@ from lms.djangoapps.verify_student.models import VerificationDeadline
 from lms.djangoapps.verify_student.services import IDVerificationService
 from lms.djangoapps.verify_student.tests.factories import SoftwareSecurePhotoVerificationFactory
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
-from openedx.core.djangoapps.self_paced.models import SelfPacedConfiguration
 from openedx.core.djangoapps.site_configuration.tests.factories import SiteFactory  # pylint: disable=unused-import
 from openedx.core.djangoapps.user_api.preferences.api import set_user_preference
 from openedx.features.course_duration_limits.models import CourseDurationLimitConfig
@@ -60,10 +59,6 @@ from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 class CourseDateSummaryTest(SharedModuleStoreTestCase):
     """Tests for course date summary blocks."""
     MODULESTORE = TEST_DATA_SPLIT_MODULESTORE
-
-    def setUp(self):
-        super().setUp()
-        SelfPacedConfiguration.objects.create(enable_course_home_improvements=True)
 
     def make_request(self, user):
         """ Creates a request """
