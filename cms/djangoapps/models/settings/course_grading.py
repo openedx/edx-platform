@@ -7,7 +7,6 @@ from base64 import b64encode
 from datetime import timedelta
 from hashlib import sha1
 
-import six
 from eventtracking import tracker
 
 from cms.djangoapps.contentstore.signals.signals import GRADING_POLICY_CHANGED
@@ -20,7 +19,7 @@ log = logging.getLogger(__name__)
 GRADING_POLICY_CHANGED_EVENT_TYPE = 'edx.grades.grading_policy_changed'
 
 
-class CourseGradingModel(object):
+class CourseGradingModel:
     """
     Basically a DAO and Model combo for CRUD operations pertaining to grading policy.
     """
@@ -71,7 +70,7 @@ class CourseGradingModel(object):
         Probably not the usual path for updates as it's too coarse grained.
         """
         descriptor = modulestore().get_course(course_key)
-        previous_grading_policy_hash = six.text_type(hash_grading_policy(descriptor.grading_policy))
+        previous_grading_policy_hash = str(hash_grading_policy(descriptor.grading_policy))
 
         graders_parsed = [CourseGradingModel.parse_grader(jsonele) for jsonele in jsondict['graders']]
         fire_signal = CourseGradingModel.must_fire_grading_event_and_signal(
@@ -90,10 +89,10 @@ class CourseGradingModel(object):
         CourseGradingModel.update_minimum_grade_credit_from_json(course_key, jsondict['minimum_grade_credit'], user)
 
         descriptor = modulestore().get_course(course_key)
-        new_grading_policy_hash = six.text_type(hash_grading_policy(descriptor.grading_policy))
+        new_grading_policy_hash = str(hash_grading_policy(descriptor.grading_policy))
         log.info(
             "Updated course grading policy for course %s from %s to %s. fire_signal = %s",
-            six.text_type(course_key),
+            str(course_key),
             previous_grading_policy_hash,
             new_grading_policy_hash,
             fire_signal
@@ -155,7 +154,7 @@ class CourseGradingModel(object):
         grader which is a full model on the client but not on the server (just a dict)
         """
         descriptor = modulestore().get_course(course_key)
-        previous_grading_policy_hash = six.text_type(hash_grading_policy(descriptor.grading_policy))
+        previous_grading_policy_hash = str(hash_grading_policy(descriptor.grading_policy))
 
         # parse removes the id; so, grab it before parse
         index = int(grader.get('id', len(descriptor.raw_grader)))
@@ -175,10 +174,10 @@ class CourseGradingModel(object):
         modulestore().update_item(descriptor, user.id)
 
         descriptor = modulestore().get_course(course_key)
-        new_grading_policy_hash = six.text_type(hash_grading_policy(descriptor.grading_policy))
+        new_grading_policy_hash = str(hash_grading_policy(descriptor.grading_policy))
         log.info(
             "Updated grader for course %s. Grading policy has changed from %s to %s. fire_signal = %s",
-            six.text_type(course_key),
+            str(course_key),
             previous_grading_policy_hash,
             new_grading_policy_hash,
             fire_signal
@@ -272,12 +271,12 @@ class CourseGradingModel(object):
         descriptor = modulestore().get_item(location)
         return {
             "graderType": descriptor.format if descriptor.format is not None else 'notgraded',
-            "location": six.text_type(location),
+            "location": str(location),
         }
 
     @staticmethod
     def update_section_grader_type(descriptor, grader_type, user):  # lint-amnesty, pylint: disable=missing-function-docstring
-        if grader_type is not None and grader_type != u'notgraded':
+        if grader_type is not None and grader_type != 'notgraded':
             descriptor.format = grader_type
             descriptor.graded = True
         else:
@@ -345,12 +344,12 @@ class CourseGradingModel(object):
 def _grading_event_and_signal(course_key, user_id):  # lint-amnesty, pylint: disable=missing-function-docstring
     name = GRADING_POLICY_CHANGED_EVENT_TYPE
     course = modulestore().get_course(course_key)
-    grading_policy_hash = six.text_type(hash_grading_policy(course.grading_policy))
+    grading_policy_hash = str(hash_grading_policy(course.grading_policy))
     data = {
-        "course_id": six.text_type(course_key),
-        "user_id": six.text_type(user_id),
+        "course_id": str(course_key),
+        "user_id": str(user_id),
         "grading_policy_hash": grading_policy_hash,
-        "event_transaction_id": six.text_type(create_new_event_transaction_id()),
+        "event_transaction_id": str(create_new_event_transaction_id()),
         "event_transaction_type": GRADING_POLICY_CHANGED_EVENT_TYPE,
     }
     tracker.emit(name, data)
