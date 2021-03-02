@@ -2599,6 +2599,15 @@ input[name="subject"] {
       border-bottom: 1px solid #f3f3f3;
     }
 
+    tbody.even {
+      background-color: $gray-l6;
+      border-bottom: 1px solid #f3f3f3;
+    }
+
+    tbody.accordion-trigger {
+      cursor: pointer;
+    }
+
     .allowance-headings,
     .exam-attempt-headings,
     .onboarding-status-headings {
@@ -2626,10 +2635,12 @@ input[name="subject"] {
 
         &.attempt-type {
           width: 90px;
+          text-align: center;
         }
 
         &.attempt-started-at {
           width: 170px;
+          text-align: center;
         }
 
         &.attempt-completed-at {
@@ -2646,13 +2657,15 @@ input[name="subject"] {
           width: 150px;
         }
 
+        &.more {
+          width: 30px;
+        }
+
         &.username {
           width: 140px;
         }
 
         &.email {
-          @include text-align(center);
-
           width: ($baseline*8);
           word-wrap: break-word;
         }
@@ -2688,7 +2701,7 @@ input[name="subject"] {
         @include padding-left($baseline);
       }
 
-      td:nth-child(2) {
+      td:nth-child(3) {
         line-height: 22px;
 
         @include padding-right(0);
@@ -2696,20 +2709,20 @@ input[name="subject"] {
         word-wrap: break-word;
       }
 
+      td:nth-child(6),
       td:nth-child(5),
-      td:nth-child(4),
-      td:nth-child(6) {
+      td:nth-child(7) {
         @include padding-left(0);
 
         text-align: center;
       }
 
-      td:nth-child(3) {
+      td:nth-child(4) {
         word-wrap: break-word;
         text-align: center;
       }
 
-      td:nth-child(7) {
+      td:nth-child(8) {
         word-wrap: break-word;
         text-align: center;
       }
