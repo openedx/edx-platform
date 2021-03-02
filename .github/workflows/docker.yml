@@ -10,10 +10,10 @@ jobs:
       - uses: actions/checkout@master
 
       - name: Build Open edX Base
-        run: docker build . --file .github/build/Dockerfile --target base --build-arg EDX_PLATFORM_VERSION=${GITHUB_SHA} --tag eoluchile/edx-platform:${GITHUB_SHA} --tag eoluchile/edx-platform:juniper
+        run: docker build . --file .github/build/Dockerfile --target base --build-arg EDX_PLATFORM_VERSION=${GITHUB_SHA} --tag eoluchile/edx-platform:${GITHUB_SHA} --tag eoluchile/edx-platform:koa
 
       - name: Build Open edX Testing version
-        run: docker build . --file .github/build/Dockerfile --target testing --build-arg EDX_PLATFORM_VERSION=${GITHUB_SHA}  --tag eoluchile/edx-platform:testing-juniper
+        run: docker build . --file .github/build/Dockerfile --target testing --build-arg EDX_PLATFORM_VERSION=${GITHUB_SHA}  --tag eoluchile/edx-platform:testing-koa
 
       - name: Test eol changes
         run: |
@@ -24,13 +24,13 @@ jobs:
           docker-compose run lms /openedx/edx-platform/.github/test/tests.sh lms/djangoapps/bulk_email/tests/ && docker-compose down -v
           docker-compose run lms /openedx/edx-platform/.github/test/tests.sh lms/djangoapps/instructor/tests/ && docker-compose down -v
 
-      - name: Push to juniper
-        if: github.ref == 'refs/heads/eol/juniper.master'
+      - name: Push to koa
+        #if: github.ref == 'refs/heads/eol/koa.master'
         run: |
           echo "${DOCKERHUB_PASSWORD}" | docker login --username ${DOCKERHUB_USER} --password-stdin
           docker push eoluchile/edx-platform:${GITHUB_SHA}
-          docker push eoluchile/edx-platform:juniper
-          docker push eoluchile/edx-platform:testing-juniper
+          docker push eoluchile/edx-platform:koa
+          docker push eoluchile/edx-platform:testing-koa
         env:
           DOCKERHUB_USER: ${{ secrets.DOCKERHUB_USER }}
           DOCKERHUB_PASSWORD: ${{ secrets.DOCKERHUB_PASSWORD }}

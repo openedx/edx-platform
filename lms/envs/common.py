@@ -2480,7 +2480,7 @@ YOUTUBE_API_KEY = 'PUT_YOUR_API_KEY_HERE'
 # RemovedInDjango19Warnings in the test logs.
 INSTALLED_APPS = [
     # Standard ones that are always installed...
-    'course_info',
+    'lms.djangoapps.course_info',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.humanize',
@@ -4202,3 +4202,8 @@ LOGO_URL_PNG = None
 LOGO_TRADEMARK_URL = None
 FAVICON_URL = None
 DEFAULT_EMAIL_LOGO_URL = 'https://edx-cdn.org/v3/default/logo.png'
+############## EOL #########################
+REGISTRATION_EMAIL_PATTERNS_DISALLOWED = None
+
+############## Grade Report - uchileedxlogin #########################
+UCHILEEDXLOGIN_TASK_RUN_ENABLE = False

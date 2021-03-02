@@ -135,6 +135,7 @@ themes/**/css
 **/courseware/static/js/mathjax/*
 **/flushdb.sh
 **/build
+!.github/build
 /src/
 \#*\#
 **/.env/

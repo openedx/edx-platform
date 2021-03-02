@@ -107,7 +107,8 @@ msgstr ""
 #: cms/static/js/views/asset.js cms/static/js/views/container.js
 #: cms/static/js/views/course_info_handout.js
 #: cms/static/js/views/course_info_update.js
-#: cms/static/js/views/edit_textbook.js cms/static/js/views/list_item_editor.js
+#: cms/static/js/views/edit_textbook.js
+#: cms/static/js/views/list_item_editor.js
 #: cms/static/js/views/modals/edit_xblock.js cms/static/js/views/tabs.js
 #: cms/static/js/views/utils/xblock_utils.js
 #: common/lib/xmodule/xmodule/assets/library_source_block/public/js/library_source_block.js
@@ -181,7 +182,8 @@ msgstr "Tutup"
 #. #-#-#-#-#  djangojs-partial.po (edx-platform)  #-#-#-#-#
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
-#: cms/static/js/views/assets.js common/lib/xmodule/xmodule/js/src/html/edit.js
+#: cms/static/js/views/assets.js
+#: common/lib/xmodule/xmodule/js/src/html/edit.js
 #: cms/templates/js/asset-library.underscore
 #: cms/templates/js/course-instructor-details.underscore
 #: cms/templates/js/previous-video-upload-list.underscore
@@ -215,7 +217,8 @@ msgstr "OK"
 msgid "None"
 msgstr "kosong"
 
-#: cms/static/js/views/course_video_settings.js cms/static/js/views/metadata.js
+#: cms/static/js/views/course_video_settings.js
+#: cms/static/js/views/metadata.js
 #: cms/static/js/views/previous_video_upload.js
 #: cms/static/js/views/video_transcripts.js
 #: lms/djangoapps/teams/static/teams/js/views/edit_team_members.js
@@ -473,8 +476,7 @@ msgstr "submisi dibatalkan"
 
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid ""
-"{paragraph}=p;{preformatted}=pre;{heading3}=h3;{heading4}=h4;{heading5}=h5;"
-"{heading6}=h6"
+"{paragraph}=p;{preformatted}=pre;{heading3}=h3;{heading4}=h4;{heading5}=h5;{heading6}=h6"
 msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
@@ -1697,13 +1699,11 @@ msgstr "Insert/Edit Image"
 
 #: common/lib/xmodule/xmodule/js/src/lti/lti.js
 msgid ""
-"Click OK to have your username and e-mail address sent to a 3rd party "
-"application.\n"
+"Click OK to have your username and e-mail address sent to a 3rd party application.\n"
 "\n"
 "Click Cancel to return to this page without sending your information."
 msgstr ""
-"Klik OK untuk mengirim nama pengguna and alamat email ke aplikasi pihak "
-"ke-3.\n"
+"Klik OK untuk mengirim nama pengguna and alamat email ke aplikasi pihak ke-3.\n"
 "\n"
 "Klik Batalkan untuk kembali ke halaman ini tanpa mengirim informasi anda."
 
@@ -1745,13 +1745,11 @@ msgstr "Penjelasan singkat"
 
 #: common/lib/xmodule/xmodule/js/src/problem/edit.js
 msgid ""
-"If you use the Advanced Editor, this problem will be converted to XML and "
-"you will not be able to return to the Simple Editor Interface.\n"
+"If you use the Advanced Editor, this problem will be converted to XML and you will not be able to return to the Simple Editor Interface.\n"
 "\n"
 "Proceed to the Advanced Editor and convert this problem to XML?"
 msgstr ""
-"Jika anda menggunakan  Advanced Editor,  problem ini akan dikonversi ke  XML "
-"dan anda tidak akan bisa kembali ke  Simple Editor Interface.\n"
+"Jika anda menggunakan  Advanced Editor,  problem ini akan dikonversi ke  XML dan anda tidak akan bisa kembali ke  Simple Editor Interface.\n"
 "\n"
 "Melanjutkan ke  Advanced Editor dan andamengkonversi masalah ini ke XML?"
 
@@ -1970,13 +1968,13 @@ msgstr "Akhir transkrip. Kembali ke awal."
 
 #: common/lib/xmodule/xmodule/js/src/video/09_video_caption.js
 msgid ""
-"Press the UP arrow key to enter the language menu then use UP and DOWN arrow "
-"keys to navigate language options. Press ENTER to change to the selected "
+"Press the UP arrow key to enter the language menu then use UP and DOWN arrow"
+" keys to navigate language options. Press ENTER to change to the selected "
 "language."
 msgstr ""
 "Tekan tombol panah ke atas untuk masuk ke menu bahasa, lalu gunakan tombol "
-"panah ke atas dan bawah untuk memilih bahasa. Tekan ENTER untuk mengganti ke "
-"bahasa yang dipilih."
+"panah ke atas dan bawah untuk memilih bahasa. Tekan ENTER untuk mengganti ke"
+" bahasa yang dipilih."
 
 #: common/lib/xmodule/xmodule/js/src/video/09_video_caption.js
 msgid "Hide closed captions"
@@ -2038,8 +2036,8 @@ msgid ""
 "issue persists, click the Help tab to report the problem."
 msgstr ""
 "Permintaan Anda tidak dapat dilakukan. Reload halaman ini dan coba lagi. "
-"Jika permasalahan tetap terjadi, klik tab Help untuk melaporkan permasalahan "
-"ini."
+"Jika permasalahan tetap terjadi, klik tab Help untuk melaporkan permasalahan"
+" ini."
 
 #: common/static/common/js/components/views/paging_header.js
 msgid "Showing {firstIndex} out of {numItems} total"
@@ -2087,7 +2085,8 @@ msgstr ""
 
 #: common/static/common/js/discussion/views/discussion_content_view.js
 msgid ""
-"You could not be unsubscribed from this post. Refresh the page and try again."
+"You could not be unsubscribed from this post. Refresh the page and try "
+"again."
 msgstr ""
 "Anda tidak dapat membatalkan langganan pada post ini. Refresh halaman dan "
 "coba lagi."
@@ -2192,7 +2191,8 @@ msgstr "Memuat daftar post"
 
 #: common/static/common/js/discussion/views/discussion_thread_list_view.js
 msgid ""
-"No results found for {original_query}. Showing results for {suggested_query}."
+"No results found for {original_query}. Showing results for "
+"{suggested_query}."
 msgstr ""
 "Tidak ada hasil ditemukan untuk {original_query}. Menunjukkan hasil untuk "
 "{suggested_query}."
@@ -2216,7 +2216,8 @@ msgstr "Respon tidak dapat dimuat. Refresh halaman ini dan coba lagi."
 #: common/static/common/js/discussion/views/discussion_thread_view.js
 msgid ""
 "Additional responses could not be loaded. Refresh the page and try again."
-msgstr "Respon tambahan tidak dapat dimuat. Refresh halaman ini dan coba lagi."
+msgstr ""
+"Respon tambahan tidak dapat dimuat. Refresh halaman ini dan coba lagi."
 
 #: common/static/common/js/discussion/views/discussion_thread_view.js
 msgid "{numResponses} other response"
@@ -2442,11 +2443,11 @@ msgstr "File yang Anda unggah harus lebih kecil dari 5MB."
 
 #: lms/djangoapps/support/static/support/jsx/file_upload.jsx
 msgid ""
-"Files that you upload must be PDFs or image files in .gif, .jpg, .jpeg, or ."
-"png format."
+"Files that you upload must be PDFs or image files in .gif, .jpg, .jpeg, or "
+".png format."
 msgstr ""
-"File yang Anda unggah harus berupa PDFs atau gambar .gif, .jpg, .jpeg, atau ."
-"png."
+"File yang Anda unggah harus berupa PDFs atau gambar .gif, .jpg, .jpeg, atau "
+".png."
 
 #: lms/djangoapps/support/static/support/jsx/file_upload.jsx
 #: lms/djangoapps/support/static/support/jsx/single_support_form.jsx
@@ -2878,13 +2879,13 @@ msgstr ""
 
 #: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
 msgid ""
-"Your request could not be completed due to a server problem. Reload the page "
-"and try again. If the issue persists, click the Help tab to report the "
+"Your request could not be completed due to a server problem. Reload the page"
+" and try again. If the issue persists, click the Help tab to report the "
 "problem."
 msgstr ""
 "Permintaan Anda tidak dapat dilakukan karena permasalahan server. Reload "
-"halaman ini dan coba kembali. Jika permasalahan tetap terjadi, klik tab Help/"
-"Bantuan untuk melaporkan."
+"halaman ini dan coba kembali. Jika permasalahan tetap terjadi, klik tab "
+"Help/Bantuan untuk melaporkan."
 
 #: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
 msgid "Team Search"
@@ -2990,9 +2991,9 @@ msgid ""
 "find a team to join, {create_span_start}create a new team in this "
 "topic{span_end}."
 msgstr ""
-"{browse_span_start}Cari tim di topik lain{span_end} atau {search_span_start}"
-"cari tim{span_end} di topik ini. Jika belum menemukan tim yang tepat, "
-"{create_span_start}buat tim baru di topik ini{span_end}."
+"{browse_span_start}Cari tim di topik lain{span_end} atau "
+"{search_span_start}cari tim{span_end} di topik ini. Jika belum menemukan tim"
+" yang tepat, {create_span_start}buat tim baru di topik ini{span_end}."
 
 #: lms/djangoapps/teams/static/teams/js/views/topic_teams.js
 msgid ""
@@ -3052,8 +3053,8 @@ msgid ""
 "e.g. 'Sky with clouds'. The description is helpful for users who cannot see "
 "the image."
 msgstr ""
-"Contoh: 'Langit dengan awan'. Deskripsi ini berguna bagi pengguna yang tidak "
-"dapat melihat gambar."
+"Contoh: 'Langit dengan awan'. Deskripsi ini berguna bagi pengguna yang tidak"
+" dapat melihat gambar."
 
 #: lms/static/js/Markdown.Editor.js
 msgid "How to create useful text alternatives."
@@ -3250,12 +3251,14 @@ msgstr "pembelajar telah berhasil ditambahkan ke daftar exception"
 #: lms/static/js/certificates/views/certificate_bulk_whitelist.js
 msgid " records are not in correct format and not added to the exception list"
 msgstr ""
-"rekaman tidak dalam format yang tepat dan tidak ditambahkan ke daftar eksepsi"
+"rekaman tidak dalam format yang tepat dan tidak ditambahkan ke daftar "
+"eksepsi"
 
 #: lms/static/js/certificates/views/certificate_bulk_whitelist.js
 msgid " record is not in correct format and not added to the exception list"
 msgstr ""
-"rekaman tidak dalam format yang tepat dan tidak ditambahkan ke daftar eksepsi"
+"rekaman tidak dalam format yang tepat dan tidak ditambahkan ke daftar "
+"eksepsi"
 
 #: lms/static/js/certificates/views/certificate_bulk_whitelist.js
 msgid " learners do not exist in LMS and not added to the exception list"
@@ -3302,7 +3305,8 @@ msgstr ""
 
 #: lms/static/js/certificates/views/certificate_invalidation_view.js
 msgid "Certificate has been successfully invalidated for <%= user %>."
-msgstr "Sertifikat untuk <%= user %> telah berhasil dibatalkan keberlakuannya."
+msgstr ""
+"Sertifikat untuk <%= user %> telah berhasil dibatalkan keberlakuannya."
 
 #: lms/static/js/certificates/views/certificate_invalidation_view.js
 #: lms/static/js/certificates/views/certificate_whitelist.js
@@ -3315,13 +3319,13 @@ msgid ""
 "The certificate for this learner has been re-validated and the system is re-"
 "running the grade for this learner."
 msgstr ""
-"Sertifikat untuk pembelajar ini telah diberlakukan kembali dan sistem sedang "
-"melakukan penghitungan ulang nilai untuk pembelajar ini."
+"Sertifikat untuk pembelajar ini telah diberlakukan kembali dan sistem sedang"
+" melakukan penghitungan ulang nilai untuk pembelajar ini."
 
 #: lms/static/js/certificates/views/certificate_invalidation_view.js
 msgid ""
-"Could not find Certificate Invalidation in the list. Please refresh the page "
-"and try again"
+"Could not find Certificate Invalidation in the list. Please refresh the page"
+" and try again"
 msgstr ""
 "Tidak dapat menemukan Pembatalan Keberlakuan Sertifikat dalam daftar. "
 "Silakan refresh halaman ini dan coba kembali."
@@ -3335,8 +3339,8 @@ msgid ""
 "Could not find Certificate Exception in white list. Please refresh the page "
 "and try again"
 msgstr ""
-"Tidak dapat menemukan Eksepsi Sertifikat dalam daftar putih. Silakan refresh "
-"halaman ini dan coba kembali."
+"Tidak dapat menemukan Eksepsi Sertifikat dalam daftar putih. Silakan refresh"
+" halaman ini dan coba kembali."
 
 #: lms/static/js/certificates/views/certificate_whitelist_editor.js
 msgid "<%= user %> already in exception list."
@@ -3395,16 +3399,18 @@ msgstr "Anda tidak akan mendapatkan uang yang telah Anda bayarkan."
 msgid ""
 "Are you sure you want to unenroll from the purchased course {courseName} "
 "({courseNumber})?"
-msgstr "Anda Yakin membatalkan pendaftaran dari {courseName} ({courseNumber})?"
+msgstr ""
+"Anda Yakin membatalkan pendaftaran dari {courseName} ({courseNumber})?"
 
 #: lms/static/js/dashboard/legacy.js
 msgid "Are you sure you want to unenroll from {courseName} ({courseNumber})?"
-msgstr "Anda yakin membatalkan pendaftaran dari {courseName} ({courseNumber})?"
+msgstr ""
+"Anda yakin membatalkan pendaftaran dari {courseName} ({courseNumber})?"
 
 #: lms/static/js/dashboard/legacy.js
 msgid ""
-"Are you sure you want to unenroll from the verified {certNameLong}  track of "
-"{courseName}  ({courseNumber})?"
+"Are you sure you want to unenroll from the verified {certNameLong}  track of"
+" {courseName}  ({courseNumber})?"
 msgstr ""
 "Anda yakin akan keluar dari jalur terverifikasi {certNameLong} untuk "
 "{courseName}  ({courseNumber})?"
@@ -3559,8 +3565,8 @@ msgid ""
 msgstr ""
 "Gunakan jalur kepesertaan sebagai dasar untuk membagi diskusi. Semua "
 "pembelajar, apapun jalur kepesertaannya, melihat topik diskusi yang sama, "
-"namun dalam topik yang telah dibagi, hanya pembelajar yang berada pada jalur "
-"kepesertaan yang sama dapat melihat dan menanggapi post satu sama lain."
+"namun dalam topik yang telah dibagi, hanya pembelajar yang berada pada jalur"
+" kepesertaan yang sama dapat melihat dan menanggapi post satu sama lain."
 
 #: lms/static/js/discussions_management/views/discussions.js
 msgid "Cohorts"
@@ -3572,10 +3578,10 @@ msgid ""
 "of cohort, see the same discussion topics, but within divided topics, only "
 "members of the same cohort see and respond to each others’ posts. "
 msgstr ""
-"Gunakan kohort sebagai dasar untuk membagi diskusi. Semua pembelajar, apapun "
-"kohortnya, melihat topik diskusi yang sama, namun dalam topik yang telah "
-"dibagi, hanya pembelajar yang berada pada kohort yang sama dapat melihat dan "
-"menanggapi post satu sama lain."
+"Gunakan kohort sebagai dasar untuk membagi diskusi. Semua pembelajar, apapun"
+" kohortnya, melihat topik diskusi yang sama, namun dalam topik yang telah "
+"dibagi, hanya pembelajar yang berada pada kohort yang sama dapat melihat dan"
+" menanggapi post satu sama lain."
 
 #: lms/static/js/discussions_management/views/discussions.js
 msgid "Discussion topics in the course are not divided."
@@ -3584,7 +3590,8 @@ msgstr "Topik diskusi di kursus ini tidak dibagi."
 #: lms/static/js/discussions_management/views/discussions.js
 msgid "Any divided discussion topics are divided based on enrollment track."
 msgstr ""
-"Topik diskusi apapun yang telah dibagi, dibagi berdasarkan jalur kepesertaan."
+"Topik diskusi apapun yang telah dibagi, dibagi berdasarkan jalur "
+"kepesertaan."
 
 #: lms/static/js/discussions_management/views/discussions.js
 msgid "Any divided discussion topics are divided based on cohort."
@@ -3609,8 +3616,8 @@ msgstr "Kami mengalami error. Refresh peramban Anda dan coba ulangi kembali."
 #: lms/static/js/edxnotes/views/notes_visibility_factory.js
 #: lms/static/js/edxnotes/views/search_box.js
 msgid ""
-"An error has occurred. Make sure that you are connected to the Internet, and "
-"then try refreshing the page."
+"An error has occurred. Make sure that you are connected to the Internet, and"
+" then try refreshing the page."
 msgstr ""
 "Terjadi error. Pastikan Anda terhubung dengan Internet, kemudian refresh "
 "kembali halaman ini."
@@ -3728,8 +3735,8 @@ msgstr "{email}"
 
 #: lms/static/js/groups/views/cohort_editor.js
 msgid ""
-"{numPreassigned} learner was pre-assigned for this cohort. This learner will "
-"automatically be added to the cohort when they enroll in the course."
+"{numPreassigned} learner was pre-assigned for this cohort. This learner will"
+" automatically be added to the cohort when they enroll in the course."
 msgid_plural ""
 "{numPreassigned} learners were pre-assigned for this cohort. These learners "
 "will automatically be added to the cohort when they enroll in the course."
@@ -3785,8 +3792,8 @@ msgstr "Tambahkan Cohort"
 
 #: lms/static/js/groups/views/cohorts.js
 msgid ""
-"The {cohortGroupName} cohort has been created. You can manually add students "
-"to this cohort below."
+"The {cohortGroupName} cohort has been created. You can manually add students"
+" to this cohort below."
 msgstr ""
 "Kohort {cohortGroupName} telah dibuat. Anda dapat menambahkan siswa secara "
 "manual ke dalam kohort di bawah."
@@ -3824,20 +3831,20 @@ msgstr "Kohort Dinonaktifkan"
 
 #: lms/static/js/groups/views/verified_track_settings_notification.js
 msgid ""
-"This course uses automatic cohorting for verified track learners. You cannot "
-"disable cohorts, and you cannot rename the manual cohort named "
+"This course uses automatic cohorting for verified track learners. You cannot"
+" disable cohorts, and you cannot rename the manual cohort named "
 "'{verifiedCohortName}'. To change the configuration for verified track "
 "cohorts, contact your edX partner manager."
 msgstr ""
-"Kursus ini menggunakan kohort otomatis untuk pembelajar jalur terverifikasi. "
-"Anda tidak dapat menonaktifkan kohort, dan Anda tidak dapat mengubah nama "
+"Kursus ini menggunakan kohort otomatis untuk pembelajar jalur terverifikasi."
+" Anda tidak dapat menonaktifkan kohort, dan Anda tidak dapat mengubah nama "
 "kohort manual bernama '{verifiedCohortName}'. Untuk mengubah konfigurasi "
 "kohort jalur terverifikasi, hubungi manajer mitra edX Anda."
 
 #: lms/static/js/groups/views/verified_track_settings_notification.js
 msgid ""
-"This course has automatic cohorting enabled for verified track learners, but "
-"the required cohort does not exist. You must create a manually-assigned "
+"This course has automatic cohorting enabled for verified track learners, but"
+" the required cohort does not exist. You must create a manually-assigned "
 "cohort named '{verifiedCohortName}' for the feature to work."
 msgstr ""
 "Kursus ini memiliki kohort otomatis yang diaktifkan untuk pembelajar jalur "
@@ -3847,8 +3854,8 @@ msgstr ""
 
 #: lms/static/js/groups/views/verified_track_settings_notification.js
 msgid ""
-"This course has automatic cohorting enabled for verified track learners, but "
-"cohorts are disabled. You must enable cohorts for the feature to work."
+"This course has automatic cohorting enabled for verified track learners, but"
+" cohorts are disabled. You must enable cohorts for the feature to work."
 msgstr ""
 "Kursus ini memiliki kohort otomatis yang diaktifkan untuk pembelajar jalur "
 "terverifikasi, namun kohort dinonaktifkan. Anda harus mengaktifkan kohort "
@@ -3945,11 +3952,11 @@ msgstr "Error dalam mendapatkan laporan data ORA. Silakan coba kembali."
 
 #: lms/static/js/instructor_dashboard/ecommerce.js
 msgid ""
-"There was a problem creating the report. Select \"Create Executive Summary\" "
-"to try again."
+"There was a problem creating the report. Select \"Create Executive Summary\""
+" to try again."
 msgstr ""
-"Terdapat permasalahan dalam membuat laporan. Pilih \"Buat Ringkasan Eksekutif"
-"\" untuk mencoba kembali."
+"Terdapat permasalahan dalam membuat laporan. Pilih \"Buat Ringkasan "
+"Eksekutif\" untuk mencoba kembali."
 
 #: lms/static/js/instructor_dashboard/ecommerce.js
 msgid "Enter the enrollment code."
@@ -4017,8 +4024,8 @@ msgid ""
 "Error: User '<%- username %>' has not yet activated their account. Users "
 "must create and activate their accounts before they can be assigned a role."
 msgstr ""
-"Error: Pengguna '<%- username %>' belum mengaktivasi akunnya. Pengguna harus "
-"membuat dan mengaktivasi akunnya sebelum dapat diberikan peran."
+"Error: Pengguna '<%- username %>' belum mengaktivasi akunnya. Pengguna harus"
+" membuat dan mengaktivasi akunnya sebelum dapat diberikan peran."
 
 #: lms/static/js/instructor_dashboard/membership.js
 msgid "Error: You cannot remove yourself from the Instructor group!"
@@ -4219,8 +4226,8 @@ msgstr ""
 
 #: lms/static/js/instructor_dashboard/send_email.js
 msgid ""
-"You are sending an email message with the subject {subject} to the following "
-"recipients."
+"You are sending an email message with the subject {subject} to the following"
+" recipients."
 msgstr ""
 "Anda akan mengirimkan pesan email dengan judul {subject} kepada penerima "
 "berikut."
@@ -4287,13 +4294,13 @@ msgstr ""
 
 #: lms/static/js/instructor_dashboard/student_admin.js
 msgid ""
-"Error resetting problem attempts for problem '<%= problem_id %>' and student "
-"'<%- student_id %>'. Make sure that the problem and student identifiers are "
-"complete and correct."
+"Error resetting problem attempts for problem '<%= problem_id %>' and student"
+" '<%- student_id %>'. Make sure that the problem and student identifiers are"
+" complete and correct."
 msgstr ""
-"Error menyetel ulang percobaan untuk masalah '<%= problem_id %>' dan siswa '<"
-"%- student_id %>'. Pastikan kode identifikasi masalah dan siswa lengkap dan "
-"benar."
+"Error menyetel ulang percobaan untuk masalah '<%= problem_id %>' dan siswa "
+"'<%- student_id %>'. Pastikan kode identifikasi masalah dan siswa lengkap "
+"dan benar."
 
 #: lms/static/js/instructor_dashboard/student_admin.js
 msgid ""
@@ -4303,12 +4310,12 @@ msgstr ""
 
 #: lms/static/js/instructor_dashboard/student_admin.js
 msgid ""
-"Error deleting student '<%- student_id %>'s state on problem '<%- problem_id "
-"%>'. Make sure that the problem and student identifiers are complete and "
+"Error deleting student '<%- student_id %>'s state on problem '<%- problem_id"
+" %>'. Make sure that the problem and student identifiers are complete and "
 "correct."
 msgstr ""
-"Error menghapus status siswa '<%- student_id %> pada masalah '<%- problem_id "
-"%>'. Pastikan kode identifikasi masalah dan siswa lengkap dan benar."
+"Error menghapus status siswa '<%- student_id %> pada masalah '<%- problem_id"
+" %>'. Pastikan kode identifikasi masalah dan siswa lengkap dan benar."
 
 #: lms/static/js/instructor_dashboard/student_admin.js
 msgid "Module state successfully deleted."
@@ -4330,8 +4337,8 @@ msgstr "Percobaan ujian masuk telah disetel ulang untuk siswa '{student_id}'."
 
 #: lms/static/js/instructor_dashboard/student_admin.js
 msgid ""
-"Error resetting entrance exam attempts for student '{student_id}'. Make sure "
-"student identifier is correct."
+"Error resetting entrance exam attempts for student '{student_id}'. Make sure"
+" student identifier is correct."
 msgstr ""
 "Error menyetel ulang percobaan ujian masuk untuk siswa '{student_id}'. "
 "Pastikan kode identifikasi siswa benar."
@@ -4342,15 +4349,16 @@ msgstr "Masukkan nama pengguna siswa atau alamat email."
 
 #: lms/static/js/instructor_dashboard/student_admin.js
 msgid ""
-"Do you want to allow this student ('{student_id}') to skip the entrance exam?"
+"Do you want to allow this student ('{student_id}') to skip the entrance "
+"exam?"
 msgstr ""
-"Apakah Anda ingin memperbolehkan siswa ini ('{student_id}') untuk melewatkan "
-"ujian masuk?"
+"Apakah Anda ingin memperbolehkan siswa ini ('{student_id}') untuk melewatkan"
+" ujian masuk?"
 
 #: lms/static/js/instructor_dashboard/student_admin.js
 msgid ""
-"An error occurred. Make sure that the student's username or email address is "
-"correct and try again."
+"An error occurred. Make sure that the student's username or email address is"
+" correct and try again."
 msgstr ""
 "Terjadi kesalahan. Pastikan nama pengguna atau alamat email siswa benar dan "
 "coba kembali."
@@ -4364,8 +4372,8 @@ msgid ""
 "Error deleting entrance exam state for student '{student_id}'. Make sure "
 "student identifier is correct."
 msgstr ""
-"Error dalam menghapus status ujian masuk siswa '{student_id}'. Pastikan kode "
-"identifikasi siswa benar."
+"Error dalam menghapus status ujian masuk siswa '{student_id}'. Pastikan kode"
+" identifikasi siswa benar."
 
 #: lms/static/js/instructor_dashboard/student_admin.js
 msgid ""
@@ -4383,12 +4391,12 @@ msgstr ""
 
 #: lms/static/js/instructor_dashboard/student_admin.js
 msgid ""
-"Successfully started task to reset attempts for problem '<%- problem_id %>'. "
-"Click the 'Show Task Status' button to see the status of the task."
+"Successfully started task to reset attempts for problem '<%- problem_id %>'."
+" Click the 'Show Task Status' button to see the status of the task."
 msgstr ""
-"Berhasil memulai aktivitas penyetelan ulang percobaan untuk permasalahan '<"
-"%- problem_id %>'. Klik tombol 'Tampilkan Status Tugas' untuk melihat status "
-"tugas."
+"Berhasil memulai aktivitas penyetelan ulang percobaan untuk permasalahan "
+"'<%- problem_id %>'. Klik tombol 'Tampilkan Status Tugas' untuk melihat "
+"status tugas."
 
 #: lms/static/js/instructor_dashboard/student_admin.js
 msgid ""
@@ -4403,14 +4411,14 @@ msgstr ""
 #: lms/static/js/instructor_dashboard/student_admin.js
 msgid "Error listing task history for this student and problem."
 msgstr ""
-"Terjadi kesalahan dalam mendaftar riwayat tugas untuk siswa dan permasalahan "
-"ini."
+"Terjadi kesalahan dalam mendaftar riwayat tugas untuk siswa dan permasalahan"
+" ini."
 
 #: lms/static/js/instructor_dashboard/student_admin.js
 msgid ""
-"Started rescore problem task for problem '<%- problem_id %>' and student '<"
-"%- student_id %>'. Click the 'Show Task Status' button to see the status of "
-"the task."
+"Started rescore problem task for problem '<%- problem_id %>' and student "
+"'<%- student_id %>'. Click the 'Show Task Status' button to see the status "
+"of the task."
 msgstr ""
 "Telah memulai penilaian ulang tugas permasalahan untuk permasalahan '<%- "
 "problem_id %>' dan siswa '<%- student_id %>'. Klik tombol 'Tampilkan Status "
@@ -4418,13 +4426,13 @@ msgstr ""
 
 #: lms/static/js/instructor_dashboard/student_admin.js
 msgid ""
-"Error starting a task to rescore problem '<%- problem_id %>' for student '<"
-"%- student_id %>'. Make sure that the the problem and student identifiers "
+"Error starting a task to rescore problem '<%- problem_id %>' for student "
+"'<%- student_id %>'. Make sure that the the problem and student identifiers "
 "are complete and correct."
 msgstr ""
 "Terjadi kesalahan dalam memulai tugas untuk menilai ulang permasalahan '<%- "
-"problem_id %>' untuk siswa '<%- student_id %>'. Pastikan ID permasalahan dan "
-"siswa lengkap dan benar."
+"problem_id %>' untuk siswa '<%- student_id %>'. Pastikan ID permasalahan dan"
+" siswa lengkap dan benar."
 
 #: lms/static/js/instructor_dashboard/student_admin.js
 msgid "Please enter a score."
@@ -4446,8 +4454,8 @@ msgid ""
 "student '<%- student_id %>'. Make sure that the the score and the problem "
 "and student identifiers are complete and correct."
 msgstr ""
-"Terjadi kesalahan dalam memulai tugas untuk menimpa nilai untuk permasalahan "
-"'<%- problem_id %>' untuk siswa '<%- student_id %>'. Pastikan ID nilai dan "
+"Terjadi kesalahan dalam memulai tugas untuk menimpa nilai untuk permasalahan"
+" '<%- problem_id %>' untuk siswa '<%- student_id %>'. Pastikan ID nilai dan "
 "permasalahan dan siswa lengkap dan benar."
 
 #: lms/static/js/instructor_dashboard/student_admin.js
@@ -4465,8 +4473,8 @@ msgid ""
 "correct."
 msgstr ""
 "Terjadi kesalahan dalam memulai tugas untuk menilai ulang ujian ulang untuk "
-"siswa '{student_id}'. Pastikan ujian masuk memiliki permasalahan di dalamnya "
-"dan ID siswa lengkap dan benar."
+"siswa '{student_id}'. Pastikan ujian masuk memiliki permasalahan di dalamnya"
+" dan ID siswa lengkap dan benar."
 
 #: lms/static/js/instructor_dashboard/student_admin.js
 msgid "Rescore problem '<%- problem_id %>' for all students?"
@@ -4478,13 +4486,13 @@ msgid ""
 "students. Click the 'Show Task Status' button to see the status of the task."
 msgstr ""
 "Telah berhasil memulai tugas untuk menilai ulang permasalahan '<%- "
-"problem_id %>' untuk semua siswa. Klik tombol 'Tampilkan Status Tugas' untuk "
-"melihat status tugas."
+"problem_id %>' untuk semua siswa. Klik tombol 'Tampilkan Status Tugas' untuk"
+" melihat status tugas."
 
 #: lms/static/js/instructor_dashboard/student_admin.js
 msgid ""
-"Error starting a task to rescore problem '<%- problem_id %>'. Make sure that "
-"the problem identifier is complete and correct."
+"Error starting a task to rescore problem '<%- problem_id %>'. Make sure that"
+" the problem identifier is complete and correct."
 msgstr ""
 "Terjadi kesalahan dalam memulai tugas untuk menilai ulang permasalahan '<%- "
 "problem_id %>'. Pastikan ID permasalahan lengkap dan benar."
@@ -4545,8 +4553,8 @@ msgstr "Kemajuan Tugas"
 
 #: lms/static/js/instructor_dashboard/util.js
 msgid ""
-"An error occurred retrieving your email. Please try again later, and contact "
-"technical support if the problem persists."
+"An error occurred retrieving your email. Please try again later, and contact"
+" technical support if the problem persists."
 msgstr ""
 "Terjadi kesalahan dalam memuat email Anda. Silakan coba kembali beberapa "
 "saat lagi, dan hubungi dukungan teknis jika permasalahan berlanjut."
@@ -4685,8 +4693,8 @@ msgid ""
 "Are you sure you want to unenroll from {courseName} ({courseNumber})? You "
 "will be refunded the amount you paid."
 msgstr ""
-"Anda yakin ingin keluar dari {courseName} ({courseNumber})? Jumlah uang yang "
-"telah Anda bayarkan akan dikembalikan."
+"Anda yakin ingin keluar dari {courseName} ({courseNumber})? Jumlah uang yang"
+" telah Anda bayarkan akan dikembalikan."
 
 #: lms/static/js/learner_dashboard/views/program_details_sidebar_view.js
 msgid "{type} Progress"
@@ -4779,8 +4787,8 @@ msgid ""
 "instructions for {htmlStart}printing or downloading a certificate{htmlEnd}."
 msgstr ""
 "Anda mungkin akan kehilangan akses terhadap sertifikat yang terverifikasi "
-"dan kredensial program lain seperti sertifikat MicroMasters. Jika Anda ingin "
-"membuat salinan untuk dokumentasi Anda sebelum menghapus, ikuti petunjuk "
+"dan kredensial program lain seperti sertifikat MicroMasters. Jika Anda ingin"
+" membuat salinan untuk dokumentasi Anda sebelum menghapus, ikuti petunjuk "
 "untuk {htmlStart}mencetak atau mengunduh sertifikat{htmlEnd}."
 
 #: lms/static/js/student_account/components/StudentAccountDeletion.jsx
@@ -4799,8 +4807,8 @@ msgstr "Sebelum melanjutkan, mohon {htmlStart}aktivasi akun Anda{htmlEnd}."
 msgid ""
 "{htmlStart}Want to change your email, name, or password instead?{htmlEnd}"
 msgstr ""
-"{htmlStart}Mungkin Anda ingin mencoba mengganti email, nama, atau kata kunci?"
-"{htmlEnd}"
+"{htmlStart}Mungkin Anda ingin mencoba mengganti email, nama, atau kata "
+"kunci?{htmlEnd}"
 
 #: lms/static/js/student_account/components/StudentAccountDeletion.jsx
 msgid ""
@@ -4813,8 +4821,8 @@ msgstr ""
 #: lms/static/js/student_account/components/StudentAccountDeletion.jsx
 msgid ""
 "Please note: Deletion of your account and personal data is permanent and "
-"cannot be undone. {platformName} will not be able to recover your account or "
-"the data that is deleted."
+"cannot be undone. {platformName} will not be able to recover your account or"
+" the data that is deleted."
 msgstr ""
 
 #: lms/static/js/student_account/components/StudentAccountDeletion.jsx
@@ -4865,8 +4873,8 @@ msgstr "Masukkan kata kunci"
 
 #: lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
 msgid ""
-"You have selected “Delete my account.” Deletion of your account and personal "
-"data is permanent and cannot be undone. {platformName} will not be able to "
+"You have selected “Delete my account.” Deletion of your account and personal"
+" data is permanent and cannot be undone. {platformName} will not be able to "
 "recover your account or the data that is deleted."
 msgstr ""
 
@@ -4896,8 +4904,8 @@ msgstr "Kami sedih Anda pergi. Akun Anda akan dihapus segera."
 #: lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
 msgid ""
 "Account deletion, including removal from email lists, may take a few weeks "
-"to fully process through our system. If you want to opt-out of emails before "
-"then, please unsubscribe from the footer of any email."
+"to fully process through our system. If you want to opt-out of emails before"
+" then, please unsubscribe from the footer of any email."
 msgstr ""
 "Penghapusan akun, termasuk penghapusan dari daftar email, dapat memakan "
 "waktu beberapa minggu dalam sistem kami. Jika Anda tidak ingin menerima "
@@ -4953,10 +4961,10 @@ msgstr "Periksa email anda"
 msgid ""
 "{paragraphStart}You entered {boldStart}{email}{boldEnd}. If this email "
 "address is associated with your {platform_name} account, we will send a "
-"message with password recovery instructions to this email address."
-"{paragraphEnd}{paragraphStart}If you do not receive a password reset message "
-"after 1 minute, verify that you entered the correct email address, or check "
-"your spam folder.{paragraphEnd}{paragraphStart}If you need further "
+"message with password recovery instructions to this email "
+"address.{paragraphEnd}{paragraphStart}If you do not receive a password reset"
+" message after 1 minute, verify that you entered the correct email address, "
+"or check your spam folder.{paragraphEnd}{paragraphStart}If you need further "
 "assistance, {anchorStart}contact technical support{anchorEnd}.{paragraphEnd}"
 msgstr ""
 "{paragraphStart}Anda memasukkan {boldStart}{email}{boldEnd}. Jika alamat "
@@ -4991,8 +4999,8 @@ msgstr ""
 #: lms/static/js/student_account/views/LoginView.js
 msgid ""
 "You have successfully signed into %(currentProvider)s, but your "
-"%(currentProvider)s account does not have a linked %(platformName)s account. "
-"To link your accounts, sign in now using your %(platformName)s password."
+"%(currentProvider)s account does not have a linked %(platformName)s account."
+" To link your accounts, sign in now using your %(platformName)s password."
 msgstr ""
 "Anda telah berhasil masuk ke %(currentProvider)s, namun akun "
 "%(currentProvider)s Anda tidak memiliki akun %(platformName)s yang "
@@ -5039,7 +5047,8 @@ msgstr "Alamat Email (Masuk)"
 #: lms/static/js/student_account/views/account_settings_factory.js
 msgid ""
 "You receive messages from {platform_name} and course teams at this address."
-msgstr "Anda menerima pesan dari {platform_name} dan tim kursus di alamat ini."
+msgstr ""
+"Anda menerima pesan dari {platform_name} dan tim kursus di alamat ini."
 
 #: lms/static/js/student_account/views/account_settings_factory.js
 msgid "Recovery Email Address"
@@ -5047,11 +5056,11 @@ msgstr "Alamat Email Cadangan"
 
 #: lms/static/js/student_account/views/account_settings_factory.js
 msgid ""
-"You may access your account with this address if single-sign on or access to "
-"your primary email is not available."
+"You may access your account with this address if single-sign on or access to"
+" your primary email is not available."
 msgstr ""
-"Anda dapat mengakses akun Anda jika akses atau single-sign on ke email utama "
-"Anda tidak berhasil."
+"Anda dapat mengakses akun Anda jika akses atau single-sign on ke email utama"
+" Anda tidak berhasil."
 
 #: lms/static/js/student_account/views/account_settings_factory.js
 #: openedx/features/learner_profile/static/learner_profile/js/learner_profile_factory.js
@@ -5233,13 +5242,13 @@ msgstr ""
 msgid ""
 "You must sign out and sign back in before your language changes take effect."
 msgstr ""
-"Anda harus keluar dan masuk kembali sebelum perubahan bahasa yang Anda pilih "
-"dapat ditampilkan."
+"Anda harus keluar dan masuk kembali sebelum perubahan bahasa yang Anda pilih"
+" dapat ditampilkan."
 
 #: lms/static/js/student_account/views/account_settings_fields.js
 msgid ""
-"We've sent a message to {email}. Click the link in the message to reset your "
-"password. Didn't receive the message? Contact {anchorStart}technical "
+"We've sent a message to {email}. Click the link in the message to reset your"
+" password. Didn't receive the message? Contact {anchorStart}technical "
 "support{anchorEnd}."
 msgstr ""
 "Kami telah mengirimkan pesan ke {email}. Klik tautan dalam pesan tersebut "
@@ -5470,8 +5479,8 @@ msgstr ""
 
 #: lms/static/js/views/image_field.js
 msgid ""
-"Removal is in progress. To avoid errors, stay on this page until the process "
-"is complete."
+"Removal is in progress. To avoid errors, stay on this page until the process"
+" is complete."
 msgstr ""
 "Proses penghapusan sedang berlangsung. Untuk menghindari kesalahan, tetap "
 "berada di halaman ini sampai proses selesai."
@@ -5610,8 +5619,8 @@ msgid ""
 "that you have specified a birth year on the {account_settings_page_link}"
 msgstr ""
 "Anda harus berusia di atas 13 tahun untuk membagikan profil lengkap. Jika "
-"Anda berusia lebih dari 13 tahun, pastikan Anda telah memasukkan tahun lahir "
-"Anda di {account_settings_page_link}"
+"Anda berusia lebih dari 13 tahun, pastikan Anda telah memasukkan tahun lahir"
+" Anda di {account_settings_page_link}"
 
 #: openedx/features/learner_profile/static/learner_profile/js/views/learner_profile_fields.js
 msgid "Profile Image"
@@ -5757,7 +5766,8 @@ msgid "Already a library team member"
 msgstr ""
 
 #: cms/static/js/factories/manage_users_lib.js
-msgid "Are you sure you want to delete {email} from the library “{container}”?"
+msgid ""
+"Are you sure you want to delete {email} from the library “{container}”?"
 msgstr ""
 
 #: cms/static/js/factories/manage_users_lib.js
@@ -5794,7 +5804,8 @@ msgid "Choose new file"
 msgstr ""
 
 #: cms/static/js/features/import/factories/import.js
-msgid "File format not supported. Please upload a file with a {ext} extension."
+msgid ""
+"File format not supported. Please upload a file with a {ext} extension."
 msgstr ""
 
 #: cms/static/js/features/import/factories/import.js
@@ -6072,13 +6083,11 @@ msgstr "Konfirmasi Penghapusan Berkas"
 msgid ""
 "Are you sure you wish to delete this item. It cannot be reversed!\n"
 "\n"
-"Also any content that links/refers to this item will no longer work (e.g. "
-"broken images and/or links)"
+"Also any content that links/refers to this item will no longer work (e.g. broken images and/or links)"
 msgstr ""
 "Anda yakin hendak menghapus item ini. Tidak bisa dikembalikan\n"
 "\n"
-"Juga setiap isi yang menaut/mengacu pada item tidak akan berjalan lagi (mis. "
-"gambar dan/atau tautan rusak)"
+"Juga setiap isi yang menaut/mengacu pada item tidak akan berjalan lagi (mis. gambar dan/atau tautan rusak)"
 
 #: cms/static/js/views/asset.js
 msgid "Your file has been deleted."
@@ -6108,7 +6117,8 @@ msgstr ""
 msgid "Max file size exceeded"
 msgstr ""
 
-#: cms/static/js/views/assets.js cms/templates/js/asset-upload-modal.underscore
+#: cms/static/js/views/assets.js
+#: cms/templates/js/asset-upload-modal.underscore
 msgid "Upload New File"
 msgstr "Unggah Berkas Baru"
 
@@ -6219,8 +6229,8 @@ msgstr ""
 
 #: cms/static/js/views/export.js
 msgid ""
-"Your course could not be exported to XML. There is not enough information to "
-"identify the failed component. Inspect your course to identify any "
+"Your course could not be exported to XML. There is not enough information to"
+" identify the failed component. Inspect your course to identify any "
 "problematic components and try again."
 msgstr ""
 
@@ -6339,8 +6349,8 @@ msgstr "Bagikan Juga"
 #: cms/static/js/views/license.js
 msgid ""
 "Allow others to distribute derivative works only under a license identical "
-"to the license that governs your work. This option is incompatible with \"No "
-"Derivatives\"."
+"to the license that governs your work. This option is incompatible with \"No"
+" Derivatives\"."
 msgstr ""
 
 #. Translators: "item_display_name" is the name of the item to be deleted.
@@ -6383,8 +6393,8 @@ msgstr ""
 
 #: cms/static/js/views/manage_users_and_roles.js
 msgid ""
-"{email} is already on the {container} team. Recheck the email address if you "
-"want to add a new member."
+"{email} is already on the {container} team. Recheck the email address if you"
+" want to add a new member."
 msgstr ""
 
 #: cms/static/js/views/manage_users_and_roles.js
@@ -6711,8 +6721,8 @@ msgstr ""
 
 #: cms/static/js/views/show_textbook.js
 msgid ""
-"Deleting a textbook cannot be undone and once deleted any reference to it in "
-"your courseware's navigation will also be removed."
+"Deleting a textbook cannot be undone and once deleted any reference to it in"
+" your courseware's navigation will also be removed."
 msgstr ""
 "Penghapusan buku teks tidak bisa dibatalkan dan sekali terhapus referensi "
 "yang terkait dalam navigasi materi kursus juga akan dihapus."
@@ -6824,7 +6834,8 @@ msgstr ""
 
 #: cms/static/js/views/validation.js
 msgid "You've made some changes, but there are some errors"
-msgstr "Anda telah menyimpan beberapa perubahan, tetapi ada beberapa kesalahan"
+msgstr ""
+"Anda telah menyimpan beberapa perubahan, tetapi ada beberapa kesalahan"
 
 #: cms/static/js/views/validation.js
 msgid ""
@@ -6885,8 +6896,8 @@ msgstr ""
 
 #: cms/static/js/views/video/translations_editor.js
 msgid ""
-"If you remove this transcript, the transcript will not be available for this "
-"component."
+"If you remove this transcript, the transcript will not be available for this"
+" component."
 msgstr ""
 
 #: cms/static/js/views/video/translations_editor.js
@@ -6919,8 +6930,8 @@ msgstr ""
 #. Translators: This is a 3 part text which tells the image requirements.
 #: cms/static/js/views/video_thumbnail.js
 msgid ""
-"{ReqTextSpanStart}Requirements{spanEnd}{lineBreak}{InstructionsSpanStart}"
-"{videoImageResoultion}{lineBreak} {videoImageSupportedFileFormats}{spanEnd}"
+"{ReqTextSpanStart}Requirements{spanEnd}{lineBreak}{InstructionsSpanStart}{videoImageResoultion}{lineBreak}"
+" {videoImageSupportedFileFormats}{spanEnd}"
 msgstr ""
 
 #. Translators: message will be like 1280x720 pixels
@@ -7498,8 +7509,8 @@ msgid ""
 "Check this box to receive an email digest once a day notifying you about "
 "new, unread activity from posts you are following."
 msgstr ""
-"Centang kotak ini untuk menerima email sehari sekali mengenai aktivitas baru "
-"yang belum dibaca dari post yang Anda ikuti."
+"Centang kotak ini untuk menerima email sehari sekali mengenai aktivitas baru"
+" yang belum dibaca dari post yang Anda ikuti."
 
 #: lms/djangoapps/support/static/support/templates/certificates.underscore
 msgid "username or email"
@@ -7765,8 +7776,8 @@ msgstr "Donasi"
 
 #: lms/templates/api_admin/catalog-error.underscore
 msgid ""
-"There was an error retrieving preview results for this catalog. Please check "
-"that your query is correct and try again."
+"There was an error retrieving preview results for this catalog. Please check"
+" that your query is correct and try again."
 msgstr ""
 
 #: lms/templates/api_admin/catalog-results.underscore
@@ -7855,8 +7866,8 @@ msgid ""
 "To receive credit for problems, you must select \"Submit\" for each problem "
 "before you select \"End My Exam\"."
 msgstr ""
-"Untuk menerima kredit untuk permasalahan, Anda harus memilih \"Kirim\" untuk "
-"setiap permasalahan sebelum Anda memilih \"Akhiri Ujian Saya\"."
+"Untuk menerima kredit untuk permasalahan, Anda harus memilih \"Kirim\" untuk"
+" setiap permasalahan sebelum Anda memilih \"Akhiri Ujian Saya\"."
 
 #: lms/templates/discovery/course_card.underscore
 msgid "LEARN MORE"
@@ -8439,10 +8450,10 @@ msgstr "Record Program"
 
 #: lms/templates/learner_dashboard/program_details_sidebar.underscore
 msgid ""
-"Once you complete one of the program requirements you have a program record. "
-"This record is marked complete once you meet all program requirements. A "
-"program record can be used to continue your learning journey and demonstrate "
-"your learning to others."
+"Once you complete one of the program requirements you have a program record."
+" This record is marked complete once you meet all program requirements. A "
+"program record can be used to continue your learning journey and demonstrate"
+" your learning to others."
 msgstr ""
 "Setelah Anda melengkapi salah satu persyaratan program Anda akan memiliki "
 "record program. Record ini ditandai lengkap setelah Anda memenuhi semua "
@@ -8479,8 +8490,8 @@ msgid ""
 "To complete the program, you must earn a verified certificate for each "
 "course."
 msgstr ""
-"Untuk menyelesaikan program, Anda harus mendapatkan sertifikat terverifikasi "
-"untuk setiap kursus."
+"Untuk menyelesaikan program, Anda harus mendapatkan sertifikat terverifikasi"
+" untuk setiap kursus."
 
 #: lms/templates/learner_dashboard/program_details_view.underscore
 msgid "Upgrade All Remaining Courses ("
@@ -8514,8 +8525,8 @@ msgstr "Setelah Anda menyelesaikan kursus, Anda akan melihatnya di sini."
 msgid ""
 "Complete courses on your schedule to ensure you stand out in your field!"
 msgstr ""
-"Selesaikan kursus dalam jadwal Anda untuk memastikan Anda menonjol di bidang "
-"Anda!"
+"Selesaikan kursus dalam jadwal Anda untuk memastikan Anda menonjol di bidang"
+" Anda!"
 
 #: lms/templates/learner_dashboard/program_header_view.underscore
 msgid "{organization}\\'s logo"
@@ -8877,9 +8888,9 @@ msgid ""
 "You may be able to complete the image capture procedure without assistance, "
 "but it may take a couple of submission attempts to get the camera "
 "positioning right.  Optimal camera positioning varies with each computer, "
-"but generally the best position for a headshot is approximately 12-18 inches "
-"(30-45 centimeters) from the camera, with your head centered relative to the "
-"computer screen. "
+"but generally the best position for a headshot is approximately 12-18 inches"
+" (30-45 centimeters) from the camera, with your head centered relative to "
+"the computer screen. "
 msgstr ""
 
 #: lms/templates/verify_student/face_photo_step.underscore
@@ -8894,7 +8905,8 @@ msgstr ""
 #: lms/templates/verify_student/face_photo_step.underscore
 #: lms/templates/verify_student/incourse_reverify.underscore
 msgid ""
-"What if I have difficulty holding my head in position relative to the camera?"
+"What if I have difficulty holding my head in position relative to the "
+"camera?"
 msgstr ""
 
 #: lms/templates/verify_student/face_photo_step.underscore
@@ -8923,8 +8935,8 @@ msgstr ""
 
 #: lms/templates/verify_student/id_photo_step.underscore
 msgid ""
-"You need an ID with your name and photo. A driver's license, passport, or ID "
-"are all acceptable."
+"You need an ID with your name and photo. A driver's license, passport, or ID"
+" are all acceptable."
 msgstr ""
 
 #: lms/templates/verify_student/id_photo_step.underscore
@@ -9021,8 +9033,8 @@ msgstr ""
 msgid ""
 "We use the highest levels of security available to encrypt your photo and "
 "send it to our authorization service for review. Your photo and information "
-"are not saved or visible anywhere on %(platformName)s after the verification "
-"process is complete."
+"are not saved or visible anywhere on %(platformName)s after the verification"
+" process is complete."
 msgstr ""
 "Kami menggunakan keamanan tertinggi untuk mengenkripsi foto Anda dan "
 "mengirimkannya ke layanan otorisasi kami untuk ditinjau. Foto dan informasi "
@@ -9079,8 +9091,8 @@ msgstr ""
 msgid ""
 "You can now enter your payment information and complete your enrollment."
 msgstr ""
-"Anda sekarang dapat masuk ke informasi pembayaran dan melengkapi pendaftaran "
-"anda"
+"Anda sekarang dapat masuk ke informasi pembayaran dan melengkapi pendaftaran"
+" anda"
 
 #: lms/templates/verify_student/make_payment_step.underscore
 msgid ""
@@ -9094,8 +9106,8 @@ msgid ""
 "An email has been sent to {userEmail} with a link for you to activate your "
 "account."
 msgstr ""
-"Kami sudah mengirimkan email ke {userEmail} dengan tautan untuk mengaktivasi "
-"akun Anda."
+"Kami sudah mengirimkan email ke {userEmail} dengan tautan untuk mengaktivasi"
+" akun Anda."
 
 #: lms/templates/verify_student/make_payment_step.underscore
 msgid "Why activate?"
@@ -9106,8 +9118,8 @@ msgid ""
 "We ask you to activate your account to ensure it is really you creating the "
 "account and to prevent fraud."
 msgstr ""
-"Kami meminta Anda untuk mengaktivasi akun Anda untuk memastikan bahwa memang "
-"Anda yang membuat akun ini dan untuk mencegah penyalahgunaan."
+"Kami meminta Anda untuk mengaktivasi akun Anda untuk memastikan bahwa memang"
+" Anda yang membuat akun ini dan untuk mencegah penyalahgunaan."
 
 #: lms/templates/verify_student/make_payment_step.underscore
 msgid ""
@@ -9120,7 +9132,8 @@ msgid "Government-Issued Photo ID"
 msgstr "ID photo terbitan resmi pemerintah"
 
 #: lms/templates/verify_student/make_payment_step.underscore
-msgid "ID-Verification is not required for this Professional Education course."
+msgid ""
+"ID-Verification is not required for this Professional Education course."
 msgstr "Verifikasi ID tidak dibutuhkan untuk kursus pendidikan profesional"
 
 #: lms/templates/verify_student/make_payment_step.underscore
@@ -9177,7 +9190,8 @@ msgstr ""
 
 #: lms/templates/verify_student/make_payment_step_ab_testing.underscore
 msgid "To receive a certificate, you must also verify your identity."
-msgstr "Untuk mendapatkan sertifikat, Anda harus memverifikasi identitas Anda."
+msgstr ""
+"Untuk mendapatkan sertifikat, Anda harus memverifikasi identitas Anda."
 
 #: lms/templates/verify_student/make_payment_step_ab_testing.underscore
 msgid ""
@@ -9258,7 +9272,8 @@ msgstr "Edit nama anda"
 #: lms/templates/verify_student/review_photos_step.underscore
 msgid ""
 "Make sure that the full name on your account matches the name on your ID."
-msgstr "Pastikan bahwa nama lengkap anda pada account anda sesuai nama pada ID"
+msgstr ""
+"Pastikan bahwa nama lengkap anda pada account anda sesuai nama pada ID"
 
 #: lms/templates/verify_student/review_photos_step.underscore
 msgid "Photos don't meet the requirements?"
@@ -9306,8 +9321,8 @@ msgid ""
 "page, click \"Bookmark this page\" under the page title."
 msgstr ""
 "Gunakan bookmark untuk membantu Anda kembali ke halaman perangkat kursus "
-"tertentu. Untuk menandai halaman, klik \"Tandai halaman ini\" di bawah judul "
-"halaman."
+"tertentu. Untuk menandai halaman, klik \"Tandai halaman ini\" di bawah judul"
+" halaman."
 
 #: openedx/features/course_search/static/course_search/templates/course_search_results.underscore
 #: openedx/features/course_search/static/course_search/templates/dashboard_search_results.underscore
@@ -9567,8 +9582,8 @@ msgstr "Penandatangan Sertifikat"
 #: cms/templates/js/certificate-editor.underscore
 msgid ""
 "It is strongly recommended that you include four or fewer signatories. If "
-"you include additional signatories, preview the certificate in Print View to "
-"ensure the certificate will print correctly on one page."
+"you include additional signatories, preview the certificate in Print View to"
+" ensure the certificate will print correctly on one page."
 msgstr ""
 "Sangat dianjurkan untuk Anda menyertakan empat atau lebih sedikit "
 "penandatangan. Jika Anda memasukkan penandatangan tambahan, pratinjau "
@@ -9600,8 +9615,8 @@ msgid ""
 "Specify an alternative to the official course title to display on "
 "certificates. Leave blank to use the official course title."
 msgstr ""
-"Tentukan satu judul resmi alternatif saja untuk ditampilkan pada sertifikat. "
-"Biarkan kosong untuk menggunakan judul resmi kursus."
+"Tentukan satu judul resmi alternatif saja untuk ditampilkan pada sertifikat."
+" Biarkan kosong untuk menggunakan judul resmi kursus."
 
 #: cms/templates/js/certificate-editor.underscore
 msgid "Add Additional Signatory"
@@ -10023,8 +10038,8 @@ msgstr "Singkatan"
 
 #: cms/templates/js/course_grade_policy.underscore
 msgid ""
-"This short name for the assignment type (for example, HW or Midterm) appears "
-"next to assignments on a learner's Progress page."
+"This short name for the assignment type (for example, HW or Midterm) appears"
+" next to assignments on a learner's Progress page."
 msgstr ""
 "Nama singkat ini adalah untuk jenis tugas (misalnya, PS atau Pertengahan "
 "Semester) muncul di sebelah tugas pada halaman Kemajuan pelajar."
@@ -10074,8 +10089,8 @@ msgstr "Anda tidak memiliki handout yang terdefinisi"
 
 #: cms/templates/js/course_info_handouts.underscore
 msgid ""
-"There is invalid code in your content. Please check to make sure it is valid "
-"HTML."
+"There is invalid code in your content. Please check to make sure it is valid"
+" HTML."
 msgstr ""
 "Ada kode yang tidak sah/invalid  dalam konten anda. silakan cek untuk "
 "memastikan HTML yang sah/valid"
@@ -10187,8 +10202,8 @@ msgstr "Konfigurasi grup ini digunakan dalam"
 
 #: cms/templates/js/group-configuration-details.underscore
 msgid ""
-"This Group Configuration is not in use. Start by adding a content experiment "
-"to any Unit via the {linkStart}Course Outline{linkEnd}."
+"This Group Configuration is not in use. Start by adding a content experiment"
+" to any Unit via the {linkStart}Course Outline{linkEnd}."
 msgstr ""
 "Konfigurasi Grup ini tidak digunakan. Mulailah dengan menambahkan sebuah "
 "eksperimen konten untuk setiap Satuan melalui {linkStart} Course Outline "
@@ -10243,8 +10258,8 @@ msgid ""
 "This configuration is currently used in content experiments. If you make "
 "changes to the groups, you may need to edit those experiments."
 msgstr ""
-"Konfigurasi ini sekarang digunakan dalam percobaan konten. Jika anda membuat "
-"perubahan ke dalam grup, anda mungkin harus mengedit experiments/percobaan-"
+"Konfigurasi ini sekarang digunakan dalam percobaan konten. Jika anda membuat"
+" perubahan ke dalam grup, anda mungkin harus mengedit experiments/percobaan-"
 "percobaan itu"
 
 #: cms/templates/js/group-edit.underscore
@@ -10253,8 +10268,8 @@ msgstr "Hapus grup"
 
 #: cms/templates/js/highlights-editor.underscore
 msgid ""
-"This feature is currently in testing. Course teams can enter highlights, but "
-"learners will not receive email messages."
+"This feature is currently in testing. Course teams can enter highlights, but"
+" learners will not receive email messages."
 msgstr ""
 
 #: cms/templates/js/highlights-editor.underscore
@@ -10448,8 +10463,8 @@ msgstr "Status publikasi"
 
 #: cms/templates/js/publish-xblock.underscore
 msgid ""
-"Draft saved on {lastSavedStart}{editedOn}{lastSavedEnd} by {editedByStart}"
-"{editedBy}{editedByEnd}"
+"Draft saved on {lastSavedStart}{editedOn}{lastSavedEnd} by "
+"{editedByStart}{editedBy}{editedByEnd}"
 msgstr ""
 
 #: cms/templates/js/publish-xblock.underscore
@@ -10526,7 +10541,8 @@ msgid ""
 "whether the answer is correct or incorrect, and the score received."
 msgstr ""
 "Saat peserta mengirimkan jawaban untuk penilaian, mereka langsung dapat "
-"melihat apakah jawaban mereka benar atau salah, dan nilai yang mereka terima."
+"melihat apakah jawaban mereka benar atau salah, dan nilai yang mereka "
+"terima."
 
 #: cms/templates/js/show-correctness-editor.underscore
 msgid "Never show assessment results"
@@ -10566,8 +10582,8 @@ msgstr ""
 
 #: cms/templates/js/show-correctness-editor.underscore
 msgid ""
-"If the subsection does not have a due date, learners always see their scores "
-"when they submit answers to assessments."
+"If the subsection does not have a due date, learners always see their scores"
+" when they submit answers to assessments."
 msgstr ""
 
 #: cms/templates/js/show-textbook.underscore
@@ -10767,8 +10783,8 @@ msgid ""
 "Use a practice proctored exam to introduce learners to the proctoring tools "
 "and processes. Results of a practice exam do not affect a learner's grade."
 msgstr ""
-"Gunakan ujian praktek tersupervisi untuk memperkenalkan peserta didik dengan "
-"alat dan proses supervisi. Hasil dari ujian praktek tidak mempengaruhi "
+"Gunakan ujian praktek tersupervisi untuk memperkenalkan peserta didik dengan"
+" alat dan proses supervisi. Hasil dari ujian praktek tidak mempengaruhi "
 "peringkat peserta didik."
 
 #: cms/templates/js/timed-examination-preference-editor.underscore
@@ -10778,8 +10794,8 @@ msgstr "Waktu yang diberikan (HH: BB):"
 #: cms/templates/js/timed-examination-preference-editor.underscore
 msgid ""
 "Select a time allotment for the exam. If it is over 24 hours, type in the "
-"amount of time. You can grant individual learners extra time to complete the "
-"exam through the Instructor Dashboard."
+"amount of time. You can grant individual learners extra time to complete the"
+" exam through the Instructor Dashboard."
 msgstr ""
 "Pilih penjatahan waktu untuk ujian. Jika lebih dari 24 jam, ketik jumlah "
 "waktu. Anda dapat memberikan peserta didik waktu tambahan untuk "
@@ -10920,8 +10936,8 @@ msgstr "Ubah %(display_name)s (required)"
 
 #: cms/templates/js/maintenance/force-published-course-response.underscore
 msgid ""
-"You have done a dry run of force publishing the course. Nothing has changed. "
-"Had you run it, the following course versions would have been change."
+"You have done a dry run of force publishing the course. Nothing has changed."
+" Had you run it, the following course versions would have been change."
 msgstr ""
 
 #: cms/templates/js/maintenance/force-published-course-response.underscore
@@ -10936,8 +10952,8 @@ msgstr "Tambahkan URLs untuk versi tambahan "
 
 #: cms/templates/js/video/transcripts/metadata-videolist-entry.underscore
 msgid ""
-"To be sure all students can access the video, we recommend providing both "
-"an .mp4 and a .webm version of your video. Click below to add a URL for "
+"To be sure all students can access the video, we recommend providing both an"
+" .mp4 and a .webm version of your video. Click below to add a URL for "
 "another version. These URLs cannot be YouTube URLs. The first listed video "
 "that's compatible with the student's computer will play."
 msgstr ""
@@ -10958,8 +10974,8 @@ msgstr "Transkrip waktu konflik"
 
 #: cms/templates/js/video/transcripts/messages/transcripts-choose.underscore
 msgid ""
-"The timed transcript for the first video file does not appear to be the same "
-"as the timed transcript for the second video file."
+"The timed transcript for the first video file does not appear to be the same"
+" as the timed transcript for the second video file."
 msgstr ""
 "Transkrip waktu untuk video ini tidak tampak sama dengan transkrip untuk "
 "file video yang kedua"
@@ -10993,9 +11009,9 @@ msgid ""
 "transcript, you can download, edit, and re-upload the existing transcript. "
 "If you want to replace this transcript, upload a new .srt transcript file."
 msgstr ""
-"EdX tidak memiliki transkrip waktu untuk video ini. Jika anda ingin mengedit "
-"transkrip ini , anda dapat mengunduh , edit, dan upload ulang transkrip yang "
-"ada sekarang , jika anda ingin mengganti transkrip ini , unggah file "
+"EdX tidak memiliki transkrip waktu untuk video ini. Jika anda ingin mengedit"
+" transkrip ini , anda dapat mengunduh , edit, dan upload ulang transkrip "
+"yang ada sekarang , jika anda ingin mengganti transkrip ini , unggah file "
 "transkrip  .srt yang baru."
 
 #: cms/templates/js/video/transcripts/messages/transcripts-found.underscore
@@ -11023,13 +11039,13 @@ msgstr "Tidak ada transkrip waktu  EdX "
 
 #: cms/templates/js/video/transcripts/messages/transcripts-import.underscore
 msgid ""
-"EdX doesn't have a timed transcript for this video in Studio, but we found a "
-"transcript on YouTube. You can import the YouTube transcript or upload your "
-"own .srt transcript file."
+"EdX doesn't have a timed transcript for this video in Studio, but we found a"
+" transcript on YouTube. You can import the YouTube transcript or upload your"
+" own .srt transcript file."
 msgstr ""
 "EdX tidak memiliki transkrip waktu untuk video ini di studio , tapi kami "
-"menemukan transkrip di You Tube. Anda dapat mengimpor transkrip YouTube atau "
-"unggah file transkrip  .srt ."
+"menemukan transkrip di You Tube. Anda dapat mengimpor transkrip YouTube atau"
+" unggah file transkrip  .srt ."
 
 #: cms/templates/js/video/transcripts/messages/transcripts-import.underscore
 msgid "Import YouTube Transcript"
@@ -11044,12 +11060,13 @@ msgid ""
 "EdX doesn\\'t have a timed transcript for this video. Please upload an .srt "
 "file."
 msgstr ""
-"EdX tidak memiliki transkrip waktu untuk video ini. Silakan upload file .srt "
+"EdX tidak memiliki transkrip waktu untuk video ini. Silakan upload file .srt"
+" "
 
 #: cms/templates/js/video/transcripts/messages/transcripts-replace.underscore
 msgid ""
-"The timed transcript for this video on edX is out of date, but YouTube has a "
-"current timed transcript for this video."
+"The timed transcript for this video on edX is out of date, but YouTube has a"
+" current timed transcript for this video."
 msgstr ""
 "Transkrip waktu untuk video ini pada edX telah kadaluarsa, tetapi You Tube "
 "memiliki transkrip waktu sekarang untuk video ini"
@@ -11074,8 +11091,8 @@ msgid ""
 msgstr ""
 "EdX memiliki transkrip waktu untuk video ini. Jika anda ingin mengganti "
 "transkrip ini , unggah file transkrip baru  .srt . Jika anda ingin mengedit "
-"transkrip ini , anda dapat mengunduh , edit, dan unggah ulang transkrip yang "
-"ada sekarang ."
+"transkrip ini , anda dapat mengunduh , edit, dan unggah ulang transkrip yang"
+" ada sekarang ."
 
 #: cms/templates/js/video/transcripts/messages/transcripts-use-existing.underscore
 msgid "Confirm Timed Transcript"
@@ -11084,12 +11101,12 @@ msgstr "Konfirmasi transkrip waktu"
 #: cms/templates/js/video/transcripts/messages/transcripts-use-existing.underscore
 msgid ""
 "You changed a video URL, but did not change the timed transcript file. Do "
-"you want to use the current timed transcript or upload a new .srt transcript "
-"file?"
+"you want to use the current timed transcript or upload a new .srt transcript"
+" file?"
 msgstr ""
 "Anda telah mengubah  video URL, Tetapi tidak mengubah transkrip waktu. "
-"Apakah anda ingin menggunakan transkrip waktu yang sekarang atau unggah file "
-"transkrip waktu .srt yang baru?"
+"Apakah anda ingin menggunakan transkrip waktu yang sekarang atau unggah file"
+" transkrip waktu .srt yang baru?"
 
 #: cms/templates/js/video/transcripts/messages/transcripts-use-existing.underscore
 msgid "Use Current Transcript"

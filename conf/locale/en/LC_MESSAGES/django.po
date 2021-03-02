@@ -115,7 +115,8 @@ msgstr ""
 #: cms/djangoapps/contentstore/views/transcripts_ajax.py
 #: common/lib/xmodule/xmodule/video_module/video_handlers.py
 msgid ""
-"There is a problem with this transcript file. Try to upload a different file."
+"There is a problem with this transcript file. Try to upload a different "
+"file."
 msgstr ""
 
 #: cms/djangoapps/contentstore/views/videos.py
@@ -258,8 +259,8 @@ msgstr ""
 #: common/djangoapps/course_modes/models.py
 msgid ""
 "OPTIONAL: This is the SKU (stock keeping unit) of this mode in the external "
-"ecommerce service.  Leave this blank if the course has not yet been migrated "
-"to the ecommerce service."
+"ecommerce service.  Leave this blank if the course has not yet been migrated"
+" to the ecommerce service."
 msgstr ""
 
 #: common/djangoapps/course_modes/models.py
@@ -270,7 +271,8 @@ msgstr ""
 
 #: common/djangoapps/course_modes/models.py
 msgid ""
-"Professional education modes are not allowed to have expiration_datetime set."
+"Professional education modes are not allowed to have expiration_datetime "
+"set."
 msgstr ""
 
 #: common/djangoapps/course_modes/models.py
@@ -296,7 +298,8 @@ msgid "Free"
 msgstr ""
 
 #: common/djangoapps/course_modes/models.py
-msgid "The time period before a course ends in which a course mode will expire"
+msgid ""
+"The time period before a course ends in which a course mode will expire"
 msgstr ""
 
 #: common/djangoapps/course_modes/views.py
@@ -344,7 +347,8 @@ msgstr ""
 
 #: common/djangoapps/student/admin.py
 msgid ""
-"Raw passwords are not stored, so there is no way to see this user's password."
+"Raw passwords are not stored, so there is no way to see this user's "
+"password."
 msgstr ""
 
 #: common/djangoapps/student/admin.py
@@ -357,8 +361,8 @@ msgstr[1] ""
 #: common/djangoapps/student/admin.py
 #, python-brace-format
 msgid ""
-"Please add a key/value 'THIRD_PARTY_AUTH_ONLY_DOMAIN/{site_email_domain}' in "
-"SiteConfiguration model's site_values field."
+"Please add a key/value 'THIRD_PARTY_AUTH_ONLY_DOMAIN/{site_email_domain}' in"
+" SiteConfiguration model's site_values field."
 msgstr ""
 
 #: common/djangoapps/student/admin.py
@@ -594,8 +598,8 @@ msgstr ""
 
 #: common/djangoapps/student/models.py
 msgid ""
-"It expect that the data will be provided in a csv file format "
-"with                     first row being the header and columns will be as "
+"It expect that the data will be provided in a csv file format with"
+"                     first row being the header and columns will be as "
 "follows:                     user_id, username, email, course_id, "
 "is_verified, verification_date"
 msgstr ""
@@ -682,8 +686,8 @@ msgstr ""
 #, python-brace-format
 msgid ""
 "Check your {email_start}{email}{email_end} inbox for an account activation "
-"link from {platform_name}. If you need help, contact {link_start}"
-"{platform_name} Support{link_end}."
+"link from {platform_name}. If you need help, contact "
+"{link_start}{platform_name} Support{link_end}."
 msgstr ""
 
 #: common/djangoapps/student/views/dashboard.py
@@ -846,8 +850,8 @@ msgstr ""
 #: common/djangoapps/third_party_auth/models.py
 msgid ""
 "If this option is enabled, users will not be asked to confirm their details "
-"(name, email, etc.) during the registration process. Only select this option "
-"for trusted providers that are known to provide accurate user information."
+"(name, email, etc.) during the registration process. Only select this option"
+" for trusted providers that are known to provide accurate user information."
 msgstr ""
 
 #: common/djangoapps/third_party_auth/models.py
@@ -873,8 +877,8 @@ msgstr ""
 msgid ""
 "If this option is set, then users logging in using this SSO provider will "
 "have their session length limited to no longer than this value. If set to 0 "
-"(zero), the session will expire upon the user closing their browser. If left "
-"blank, the Django platform session default length will be used."
+"(zero), the session will expire upon the user closing their browser. If left"
+" blank, the Django platform session default length will be used."
 msgstr ""
 
 #: common/djangoapps/third_party_auth/models.py
@@ -1508,11 +1512,13 @@ msgstr ""
 msgid "Question {}"
 msgstr ""
 
-#: common/lib/capa/capa/capa_problem.py common/lib/xmodule/xmodule/capa_base.py
+#: common/lib/capa/capa/capa_problem.py
+#: common/lib/xmodule/xmodule/capa_base.py
 msgid "Incorrect"
 msgstr ""
 
-#: common/lib/capa/capa/capa_problem.py common/lib/xmodule/xmodule/capa_base.py
+#: common/lib/capa/capa/capa_problem.py
+#: common/lib/xmodule/xmodule/capa_base.py
 msgid "Correct"
 msgstr ""
 
@@ -1778,7 +1784,8 @@ msgstr ""
 #. Translators: this is the last choice of a number of choices of how to log
 #. in
 #. to the site.
-#: common/lib/capa/capa/responsetypes.py lms/templates/course_modes/choose.html
+#: common/lib/capa/capa/responsetypes.py
+#: lms/templates/course_modes/choose.html
 #: themes/edx.org/lms/templates/course_modes/choose.html
 #: themes/stanford-style/lms/templates/register-form.html
 msgid "or"
@@ -1856,8 +1863,8 @@ msgstr ""
 #: common/lib/capa/capa/responsetypes.py
 #, python-brace-format
 msgid ""
-"Factorial function not permitted in answer for this problem. Provided answer "
-"was: {bad_input}"
+"Factorial function not permitted in answer for this problem. Provided answer"
+" was: {bad_input}"
 msgstr ""
 
 #: common/lib/capa/capa/responsetypes.py
@@ -1957,8 +1964,8 @@ msgstr ""
 
 #: common/lib/xmodule/xmodule/capa_base.py
 msgid ""
-"Defines the number of times a student can try to answer this problem. If the "
-"value is not set, infinite attempts are allowed."
+"Defines the number of times a student can try to answer this problem. If the"
+" value is not set, infinite attempts are allowed."
 msgstr ""
 
 #: common/lib/xmodule/xmodule/capa_base.py
@@ -2135,8 +2142,8 @@ msgstr ""
 
 #: common/lib/xmodule/xmodule/capa_base.py
 msgid ""
-"Defines the number of points each problem is worth. If the value is not set, "
-"each response field in the problem is worth one point."
+"Defines the number of points each problem is worth. If the value is not set,"
+" each response field in the problem is worth one point."
 msgstr ""
 
 #: common/lib/xmodule/xmodule/capa_base.py
@@ -2373,8 +2380,8 @@ msgstr ""
 #: common/lib/xmodule/xmodule/conditional_module.py
 msgid ""
 "The component location IDs of all source components that are used to "
-"determine whether a learner is shown the content of this conditional module. "
-"Copy the component location ID of a component from its Settings dialog in "
+"determine whether a learner is shown the content of this conditional module."
+" Copy the component location ID of a component from its Settings dialog in "
 "Studio."
 msgstr ""
 
@@ -2394,8 +2401,8 @@ msgstr ""
 
 #: common/lib/xmodule/xmodule/conditional_module.py
 msgid ""
-"The value that the conditional attribute of the source components must match "
-"before a learner is shown the content of this conditional module."
+"The value that the conditional attribute of the source components must match"
+" before a learner is shown the content of this conditional module."
 msgstr ""
 
 #: common/lib/xmodule/xmodule/conditional_module.py
@@ -2437,8 +2444,8 @@ msgstr ""
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid ""
-"Enter the passports for course LTI tools in the following format: \"id:"
-"client_key:client_secret\"."
+"Enter the passports for course LTI tools in the following format: "
+"\"id:client_key:client_secret\"."
 msgstr ""
 
 #: common/lib/xmodule/xmodule/course_module.py
@@ -2476,8 +2483,8 @@ msgstr ""
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid ""
-"The cost displayed to students for enrolling in the course. If a paid course "
-"registration price is set by an administrator in the database, that price "
+"The cost displayed to students for enrolling in the course. If a paid course"
+" registration price is set by an administrator in the database, that price "
 "will be displayed instead of this one."
 msgstr ""
 
@@ -2530,8 +2537,7 @@ msgstr ""
 
 #: common/lib/xmodule/xmodule/course_module.py
 #: common/lib/xmodule/xmodule/modulestore/inheritance.py
-msgid ""
-"Enter the method by which this course is edited (\"XML\" or \"Studio\")."
+msgid "Enter the method by which this course is edited (\"XML\" or \"Studio\")."
 msgstr ""
 
 #: common/lib/xmodule/xmodule/course_module.py
@@ -2554,9 +2560,9 @@ msgid ""
 "forums. Inside the provided brackets, enter an additional set of square "
 "brackets surrounding each pair of dates you add. Format each pair of dates "
 "as [\"YYYY-MM-DD\", \"YYYY-MM-DD\"]. To specify times as well as dates, "
-"format each pair as [\"YYYY-MM-DDTHH:MM\", \"YYYY-MM-DDTHH:MM\"]. Be sure to "
-"include the \"T\" between the date and time. For example, an entry defining "
-"two blackout periods looks like this, including the outer pair of square "
+"format each pair as [\"YYYY-MM-DDTHH:MM\", \"YYYY-MM-DDTHH:MM\"]. Be sure to"
+" include the \"T\" between the date and time. For example, an entry defining"
+" two blackout periods looks like this, including the outer pair of square "
 "brackets: [[\"2015-09-15\", \"2015-09-21\"], [\"2015-10-01\", "
 "\"2015-10-08\"]] "
 msgstr ""
@@ -2567,15 +2573,15 @@ msgstr ""
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid ""
-"Enter discussion categories in the following format: \"CategoryName\": {\"id"
-"\": \"i4x-InstitutionName-CourseNumber-course-CourseRun\"}. For example, one "
-"discussion category may be \"Lydian Mode\": {\"id\": \"i4x-UniversityX-"
-"MUS101-course-2015_T1\"}. The \"id\" value for each category must be unique. "
-"In \"id\" values, the only special characters that are supported are "
-"underscore, hyphen, and period. You can also specify a category as the "
-"default for new posts in the Discussion page by setting its \"default\" "
-"attribute to true. For example, \"Lydian Mode\": {\"id\": \"i4x-UniversityX-"
-"MUS101-course-2015_T1\", \"default\": true}."
+"Enter discussion categories in the following format: \"CategoryName\": "
+"{\"id\": \"i4x-InstitutionName-CourseNumber-course-CourseRun\"}. For "
+"example, one discussion category may be \"Lydian Mode\": {\"id\": "
+"\"i4x-UniversityX-MUS101-course-2015_T1\"}. The \"id\" value for each "
+"category must be unique. In \"id\" values, the only special characters that "
+"are supported are underscore, hyphen, and period. You can also specify a "
+"category as the default for new posts in the Discussion page by setting its "
+"\"default\" attribute to true. For example, \"Lydian Mode\": {\"id\": "
+"\"i4x-UniversityX-MUS101-course-2015_T1\", \"default\": true}."
 msgstr ""
 
 #: common/lib/xmodule/xmodule/course_module.py
@@ -2585,8 +2591,8 @@ msgstr ""
 #: common/lib/xmodule/xmodule/course_module.py
 msgid ""
 "Enter true or false. If true, discussion categories and subcategories are "
-"sorted alphabetically. If false, they are sorted chronologically by creation "
-"date and time."
+"sorted alphabetically. If false, they are sorted chronologically by creation"
+" date and time."
 msgstr ""
 
 #: common/lib/xmodule/xmodule/course_module.py
@@ -2624,7 +2630,8 @@ msgstr ""
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid ""
-"Enter true or false. If true, the course will be available to mobile devices."
+"Enter true or false. If true, the course will be available to mobile "
+"devices."
 msgstr ""
 
 #: common/lib/xmodule/xmodule/course_module.py
@@ -2710,8 +2717,8 @@ msgstr ""
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid ""
-"URL for CCX Connector application for managing creation of CCXs. (optional). "
-"Ignored unless 'Enable CCX' is set to 'true'."
+"URL for CCX Connector application for managing creation of CCXs. (optional)."
+" Ignored unless 'Enable CCX' is set to 'true'."
 msgstr ""
 
 #: common/lib/xmodule/xmodule/course_module.py
@@ -2773,9 +2780,9 @@ msgstr ""
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid ""
-"Enter the format for due dates. The default is Mon DD, YYYY. Enter \"%m-%d-%Y"
-"\" for MM-DD-YYYY, \"%d-%m-%Y\" for DD-MM-YYYY, \"%Y-%m-%d\" for YYYY-MM-DD, "
-"or \"%Y-%d-%m\" for YYYY-DD-MM."
+"Enter the format for due dates. The default is Mon DD, YYYY. Enter "
+"\"%m-%d-%Y\" for MM-DD-YYYY, \"%d-%m-%Y\" for DD-MM-YYYY, \"%Y-%m-%d\" for "
+"YYYY-MM-DD, or \"%Y-%d-%m\" for YYYY-DD-MM."
 msgstr ""
 
 #: common/lib/xmodule/xmodule/course_module.py
@@ -2856,8 +2863,8 @@ msgstr ""
 #: common/lib/xmodule/xmodule/course_module.py
 msgid ""
 "Use this setting only when generating PDF certificates. Between quotation "
-"marks, enter the short name of the type of certificate that students receive "
-"when they complete the course. For instance, \"Certificate\"."
+"marks, enter the short name of the type of certificate that students receive"
+" when they complete the course. For instance, \"Certificate\"."
 msgstr ""
 
 #: common/lib/xmodule/xmodule/course_module.py
@@ -2954,8 +2961,8 @@ msgstr ""
 #: common/lib/xmodule/xmodule/course_module.py
 msgid ""
 "Enter the course number that you want to appear in the course. This setting "
-"overrides the course number that you entered when you created the course. To "
-"use the course number that you entered when you created the course, enter "
+"overrides the course number that you entered when you created the course. To"
+" use the course number that you entered when you created the course, enter "
 "null."
 msgstr ""
 
@@ -2965,8 +2972,8 @@ msgstr ""
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid ""
-"Enter the maximum number of students that can enroll in the course. To allow "
-"an unlimited number of students, enter null."
+"Enter the maximum number of students that can enroll in the course. To allow"
+" an unlimited number of students, enter null."
 msgstr ""
 
 #: common/lib/xmodule/xmodule/course_module.py
@@ -3014,10 +3021,10 @@ msgstr ""
 #. left untranslated.  Leave them as English words.
 #: common/lib/xmodule/xmodule/course_module.py
 msgid ""
-"Defines the access permissions for showing the course in the course catalog. "
-"This can be set to one of three values: 'both' (show in catalog and allow "
-"access to about page), 'about' (only allow access to about page), 'none' (do "
-"not show in catalog and do not allow access to an about page)."
+"Defines the access permissions for showing the course in the course catalog."
+" This can be set to one of three values: 'both' (show in catalog and allow "
+"access to about page), 'about' (only allow access to about page), 'none' (do"
+" not show in catalog and do not allow access to an about page)."
 msgstr ""
 
 #: common/lib/xmodule/xmodule/course_module.py
@@ -3026,8 +3033,8 @@ msgstr ""
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid ""
-"Specify whether students must complete an entrance exam before they can view "
-"your course content. Note, you must enable Entrance Exams for this course "
+"Specify whether students must complete an entrance exam before they can view"
+" your course content. Note, you must enable Entrance Exams for this course "
 "setting to take effect."
 msgstr ""
 
@@ -3058,8 +3065,8 @@ msgstr ""
 msgid ""
 "If dashboard social sharing and custom course URLs are enabled, you can "
 "provide a URL (such as the URL to a course About page) that social media "
-"sites can link to. URLs must be fully qualified. For example: http://www.edx."
-"org/course/Introduction-to-MOOCs-ITM001"
+"sites can link to. URLs must be fully qualified. For example: "
+"http://www.edx.org/course/Introduction-to-MOOCs-ITM001"
 msgstr ""
 
 #: common/lib/xmodule/xmodule/course_module.py cms/templates/settings.html
@@ -3090,7 +3097,8 @@ msgstr ""
 #: common/lib/xmodule/xmodule/course_module.py
 msgid ""
 "Enter true or false. If this value is true, proctored exams are enabled in "
-"your course. Note that enabling proctored exams will also enable timed exams."
+"your course. Note that enabling proctored exams will also enable timed "
+"exams."
 msgstr ""
 
 #: common/lib/xmodule/xmodule/course_module.py
@@ -3133,8 +3141,8 @@ msgstr ""
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid ""
-"Enter true or false. If this value is true, a Zendesk ticket will be created "
-"for suspicious attempts."
+"Enter true or false. If this value is true, a Zendesk ticket will be created"
+" for suspicious attempts."
 msgstr ""
 
 #: common/lib/xmodule/xmodule/course_module.py
@@ -3167,8 +3175,8 @@ msgstr ""
 #: common/lib/xmodule/xmodule/modulestore/inheritance.py
 msgid ""
 "Set this to \"true\" to mark this course as self-paced. Self-paced courses "
-"do not have due dates for assignments, and students can progress through the "
-"course at any rate before the course ends."
+"do not have due dates for assignments, and students can progress through the"
+" course at any rate before the course ends."
 msgstr ""
 
 #: common/lib/xmodule/xmodule/course_module.py
@@ -3244,8 +3252,8 @@ msgstr ""
 msgid ""
 "Any additional information about the course that the platform needs or that "
 "allows integration with external systems such as CRM software. Enter a "
-"dictionary of values in JSON format, such as { \"my_custom_setting\": \"value"
-"\", \"other_setting\": \"value\" }"
+"dictionary of values in JSON format, such as { \"my_custom_setting\": "
+"\"value\", \"other_setting\": \"value\" }"
 msgstr ""
 
 #: common/lib/xmodule/xmodule/course_module.py
@@ -3300,8 +3308,8 @@ msgstr ""
 #: common/lib/xmodule/xmodule/html_module.py
 msgid ""
 "Select Visual to enter content and have the editor automatically create the "
-"HTML. Select Raw to edit HTML directly. If you change this setting, you must "
-"save the component and then re-open it for editing."
+"HTML. Select Raw to edit HTML directly. If you change this setting, you must"
+" save the component and then re-open it for editing."
 msgstr ""
 
 #: common/lib/xmodule/xmodule/html_module.py
@@ -3373,8 +3381,8 @@ msgstr ""
 
 #: common/lib/xmodule/xmodule/library_content_module.py
 msgid ""
-"Choose a problem type to fetch from the library. If \"Any Type\" is selected "
-"no filtering is applied."
+"Choose a problem type to fetch from the library. If \"Any Type\" is selected"
+" no filtering is applied."
 msgstr ""
 
 #: common/lib/xmodule/xmodule/library_content_module.py
@@ -3492,8 +3500,8 @@ msgstr ""
 #: common/lib/xmodule/xmodule/lti_module.py
 #, python-brace-format
 msgid ""
-"Enter the LTI ID for the external LTI provider.  This value must be the same "
-"LTI ID that you entered in the LTI Passports setting on the Advanced "
+"Enter the LTI ID for the external LTI provider.  This value must be the same"
+" LTI ID that you entered in the LTI Passports setting on the Advanced "
 "Settings page.{break_tag}See {docs_anchor_open}the edX LTI "
 "documentation{anchor_close} for more details on this setting."
 msgstr ""
@@ -3518,10 +3526,10 @@ msgstr ""
 #: common/lib/xmodule/xmodule/lti_module.py
 #, python-brace-format
 msgid ""
-"Add the key/value pair for any custom parameters, such as the page your e-"
-"book should open to or the background color for this component.{break_tag}"
-"See {docs_anchor_open}the edX LTI documentation{anchor_close} for more "
-"details on this setting."
+"Add the key/value pair for any custom parameters, such as the page your "
+"e-book should open to or the background color for this "
+"component.{break_tag}See {docs_anchor_open}the edX LTI "
+"documentation{anchor_close} for more details on this setting."
 msgstr ""
 
 #: common/lib/xmodule/xmodule/lti_module.py
@@ -3699,8 +3707,8 @@ msgid ""
 "Specify the default for how often variable values in a problem are "
 "randomized. This setting should be set to \"never\" unless you plan to "
 "provide a Python script to identify and randomize values in most of the "
-"problems in your course. Valid values are \"always\", \"onreset\", \"never"
-"\", and \"per_student\"."
+"problems in your course. Valid values are \"always\", \"onreset\", "
+"\"never\", and \"per_student\"."
 msgstr ""
 
 #: common/lib/xmodule/xmodule/modulestore/inheritance.py
@@ -3737,10 +3745,10 @@ msgstr ""
 msgid ""
 "Enter the maximum number of times a student can try to answer problems. By "
 "default, Maximum Attempts is set to null, meaning that students have an "
-"unlimited number of attempts for problems. You can override this course-wide "
-"setting for individual problems. However, if the course-wide setting is a "
-"specific number, you cannot set the Maximum Attempts for individual problems "
-"to unlimited."
+"unlimited number of attempts for problems. You can override this course-wide"
+" setting for individual problems. However, if the course-wide setting is a "
+"specific number, you cannot set the Maximum Attempts for individual problems"
+" to unlimited."
 msgstr ""
 
 #: common/lib/xmodule/xmodule/modulestore/inheritance.py
@@ -3761,7 +3769,8 @@ msgid "Group Configurations"
 msgstr ""
 
 #: common/lib/xmodule/xmodule/modulestore/inheritance.py
-msgid "Enter the configurations that govern how students are grouped together."
+msgid ""
+"Enter the configurations that govern how students are grouped together."
 msgstr ""
 
 #: common/lib/xmodule/xmodule/modulestore/inheritance.py
@@ -3780,8 +3789,8 @@ msgstr ""
 #: common/lib/xmodule/xmodule/modulestore/inheritance.py
 msgid ""
 "Specify whether to show an auto-advance button in videos. If the student "
-"clicks it, when the last video in a unit finishes it will automatically move "
-"to the next unit and autoplay the first video."
+"clicks it, when the last video in a unit finishes it will automatically move"
+" to the next unit and autoplay the first video."
 msgstr ""
 
 #: common/lib/xmodule/xmodule/modulestore/inheritance.py
@@ -3820,8 +3829,8 @@ msgstr ""
 
 #: common/lib/xmodule/xmodule/modulestore/inheritance.py
 msgid ""
-"Indicates whether Student Notes are visible in the course. Students can also "
-"show or hide their notes in the courseware."
+"Indicates whether Student Notes are visible in the course. Students can also"
+" show or hide their notes in the courseware."
 msgstr ""
 
 #: common/lib/xmodule/xmodule/modulestore/inheritance.py
@@ -3830,8 +3839,8 @@ msgstr ""
 
 #: common/lib/xmodule/xmodule/modulestore/inheritance.py
 msgid ""
-"Enter true or false. If true, answer submissions for problem modules will be "
-"considered in the Entrance Exam scoring/gating algorithm."
+"Enter true or false. If true, answer submissions for problem modules will be"
+" considered in the Entrance Exam scoring/gating algorithm."
 msgstr ""
 
 #: common/lib/xmodule/xmodule/partitions/enrollment_track_partition_generator.py
@@ -4000,8 +4009,8 @@ msgstr ""
 
 #: common/lib/xmodule/xmodule/split_test_module.py
 msgid ""
-"The configuration defines how users are grouped for this content experiment. "
-"Caution: Changing the group configuration of a student-visible experiment "
+"The configuration defines how users are grouped for this content experiment."
+" Caution: Changing the group configuration of a student-visible experiment "
 "will impact the experiment data."
 msgstr ""
 
@@ -4039,7 +4048,8 @@ msgid ""
 msgstr ""
 
 #: common/lib/xmodule/xmodule/split_test_module.py
-msgid "The experiment does not contain all of the groups in the configuration."
+msgid ""
+"The experiment does not contain all of the groups in the configuration."
 msgstr ""
 
 #: common/lib/xmodule/xmodule/split_test_module.py
@@ -4133,8 +4143,8 @@ msgstr[1] ""
 
 #: common/lib/xmodule/xmodule/video_module/video_module.py
 msgid ""
-"The URL for your video. This can be a YouTube URL or a link to an .mp4, ."
-"ogg, or .webm video file hosted elsewhere on the Internet."
+"The URL for your video. This can be a YouTube URL or a link to an .mp4, "
+".ogg, or .webm video file hosted elsewhere on the Internet."
 msgstr ""
 
 #: common/lib/xmodule/xmodule/video_module/video_module.py
@@ -4167,7 +4177,8 @@ msgid "YouTube ID for .75x speed"
 msgstr ""
 
 #: common/lib/xmodule/xmodule/video_module/video_xfields.py
-msgid "Optional, for older browsers: the YouTube ID for the 1.25x speed video."
+msgid ""
+"Optional, for older browsers: the YouTube ID for the 1.25x speed video."
 msgstr ""
 
 #: common/lib/xmodule/xmodule/video_module/video_xfields.py
@@ -4184,8 +4195,8 @@ msgstr ""
 
 #: common/lib/xmodule/xmodule/video_module/video_xfields.py
 msgid ""
-"Time you want the video to start if you don't want the entire video to play. "
-"Not supported in the native mobile app: the full video file will play. "
+"Time you want the video to start if you don't want the entire video to play."
+" Not supported in the native mobile app: the full video file will play. "
 "Formatted as HH:MM:SS. The maximum value is 23:59:59."
 msgstr ""
 
@@ -4235,8 +4246,8 @@ msgid ""
 "Download Transcript Allowed to True. If you want to provide a downloadable "
 "transcript in a different format, we recommend that you upload a handout by "
 "using the Upload a Handout field. If this isn't possible, you can post a "
-"transcript file on the Files & Uploads page or on the Internet, and then add "
-"the URL for the transcript here. Students see a link to download that "
+"transcript file on the Files & Uploads page or on the Internet, and then add"
+" the URL for the transcript here. Students see a link to download that "
 "transcript below the video."
 msgstr ""
 
@@ -4246,10 +4257,10 @@ msgstr ""
 
 #: common/lib/xmodule/xmodule/video_module/video_xfields.py
 msgid ""
-"Allow students to download the timed transcript. A link to download the file "
-"appears below the video. By default, the transcript is an .srt or .txt file. "
-"If you want to provide the transcript for download in a different format, "
-"upload a file by using the Upload Handout field."
+"Allow students to download the timed transcript. A link to download the file"
+" appears below the video. By default, the transcript is an .srt or .txt "
+"file. If you want to provide the transcript for download in a different "
+"format, upload a file by using the Upload Handout field."
 msgstr ""
 
 #: common/lib/xmodule/xmodule/video_module/video_xfields.py
@@ -4259,8 +4270,8 @@ msgstr ""
 #: common/lib/xmodule/xmodule/video_module/video_xfields.py
 msgid ""
 "The default transcript for the video, from the Default Timed Transcript "
-"field on the Basic tab. This transcript should be in English. You don't have "
-"to change this setting."
+"field on the Basic tab. This transcript should be in English. You don't have"
+" to change this setting."
 msgstr ""
 
 #: common/lib/xmodule/xmodule/video_module/video_xfields.py
@@ -4418,8 +4429,8 @@ msgstr ""
 #: common/lib/xmodule/xmodule/x_module.py
 #, python-brace-format
 msgid ""
-"{display_name} is only accessible to enrolled learners. Sign in or register, "
-"and enroll in this course to view it."
+"{display_name} is only accessible to enrolled learners. Sign in or register,"
+" and enroll in this course to view it."
 msgstr ""
 
 #: common/templates/admin/student/loginfailures/change_form_template.html
@@ -4489,7 +4500,8 @@ msgstr ""
 #, python-format
 msgid ""
 "This email message was automatically sent by %(lms_url)s because someone "
-"attempted to create an account on %(platform_name)s using this email address."
+"attempted to create an account on %(platform_name)s using this email "
+"address."
 msgstr ""
 
 #: common/templates/student/edx_ace/accountactivation/email/body.txt
@@ -4578,8 +4590,8 @@ msgstr ""
 #: common/templates/student/edx_ace/emailchange/email/body.txt
 #, python-format
 msgid ""
-"If you didn't request this, you don't need to do anything; you won't receive "
-"any more email from us. Please do not reply to this e-mail; if you require "
+"If you didn't request this, you don't need to do anything; you won't receive"
+" any more email from us. Please do not reply to this e-mail; if you require "
 "assistance, check the help section of the %(platform_name)s web site."
 msgstr ""
 
@@ -4666,8 +4678,7 @@ msgid "This value must be all lowercase."
 msgstr ""
 
 #: lms/djangoapps/badges/models.py
-msgid ""
-"The course mode for this badge image. For example, \"verified\" or \"honor\"."
+msgid "The course mode for this badge image. For example, \"verified\" or \"honor\"."
 msgstr ""
 
 #: lms/djangoapps/badges/models.py
@@ -4678,8 +4689,8 @@ msgstr ""
 #: lms/djangoapps/badges/models.py
 msgid ""
 "Set this value to True if you want this image to be the default image for "
-"any course modes that do not have a specified badge image. You can have only "
-"one default image."
+"any course modes that do not have a specified badge image. You can have only"
+" one default image."
 msgstr ""
 
 #: lms/djangoapps/badges/models.py
@@ -4702,12 +4713,11 @@ msgstr ""
 
 #: lms/djangoapps/badges/models.py
 msgid ""
-"Each line is a comma-separated list. The first item in each line is the slug "
-"of a badge class you have created that has an issuing component of "
+"Each line is a comma-separated list. The first item in each line is the slug"
+" of a badge class you have created that has an issuing component of "
 "'openedx__course'. The remaining items in each line are the course keys the "
 "learner needs to complete to be awarded the badge. For example: "
-"slug_for_compsci_courses_group_badge,course-v1:CompSci+Course+First,course-"
-"v1:CompsSci+Course+Second"
+"slug_for_compsci_courses_group_badge,course-v1:CompSci+Course+First,course-v1:CompsSci+Course+Second"
 msgstr ""
 
 #: lms/djangoapps/badges/models.py
@@ -4753,7 +4763,8 @@ msgstr ""
 msgid "Help Center"
 msgstr ""
 
-#: lms/djangoapps/branding/api.py lms/templates/static_templates/media-kit.html
+#: lms/djangoapps/branding/api.py
+#: lms/templates/static_templates/media-kit.html
 msgid "Media Kit"
 msgstr ""
 
@@ -4882,8 +4893,8 @@ msgstr ""
 
 #: lms/djangoapps/ccx/views.py
 msgid ""
-"You cannot create a CCX from a course using a deprecated id. Please create a "
-"rerun of this course in the studio to allow this action."
+"You cannot create a CCX from a course using a deprecated id. Please create a"
+" rerun of this course in the studio to allow this action."
 msgstr ""
 
 #: lms/djangoapps/certificates/models.py wiki/admin.py wiki/models/article.py
@@ -4923,8 +4934,8 @@ msgstr ""
 #: lms/djangoapps/certificates/models.py
 msgid ""
 "A unique identifier for the example certificate.  This is used when we "
-"receive a response from the queue to determine which example certificate was "
-"processed."
+"receive a response from the queue to determine which example certificate was"
+" processed."
 msgstr ""
 
 #: lms/djangoapps/certificates/models.py
@@ -5054,8 +5065,8 @@ msgid ""
 "A {cert_type} certificate signifies that a learner has agreed to abide by "
 "the honor code established by {platform_name} and has completed all of the "
 "required tasks for this course under its guidelines. A {cert_type} "
-"certificate also indicates that the identity of the learner has been checked "
-"and is valid."
+"certificate also indicates that the identity of the learner has been checked"
+" and is valid."
 msgstr ""
 
 #. Translators:  This text describes the 'XSeries' course certificate type.
@@ -5237,7 +5248,8 @@ msgstr ""
 
 #: lms/djangoapps/certificates/views/webview.py
 #, python-brace-format
-msgid "I completed a course at {platform_name}. Take a look at my certificate."
+msgid ""
+"I completed a course at {platform_name}. Take a look at my certificate."
 msgstr ""
 
 #: lms/djangoapps/certificates/views/webview.py
@@ -5295,8 +5307,8 @@ msgstr ""
 #: openedx/core/djangoapps/credentials/models.py
 #: openedx/core/djangoapps/credit/models.py
 msgid ""
-"Specified in seconds. Enable caching by setting this to a value greater than "
-"0."
+"Specified in seconds. Enable caching by setting this to a value greater than"
+" 0."
 msgstr ""
 
 #: lms/djangoapps/commerce/models.py
@@ -5521,8 +5533,8 @@ msgstr ""
 
 #: lms/djangoapps/courseware/date_summary.py
 msgid ""
-"This course is archived, which means you can review course content but it is "
-"no longer active."
+"This course is archived, which means you can review course content but it is"
+" no longer active."
 msgstr ""
 
 #: lms/djangoapps/courseware/date_summary.py
@@ -5600,8 +5612,8 @@ msgstr ""
 #: lms/djangoapps/courseware/date_summary.py
 #, python-brace-format
 msgid ""
-"Don't forget, you have {time_remaining_string} left to upgrade to a Verified "
-"Certificate."
+"Don't forget, you have {time_remaining_string} left to upgrade to a Verified"
+" Certificate."
 msgstr ""
 
 #: lms/djangoapps/courseware/date_summary.py
@@ -5614,8 +5626,8 @@ msgstr ""
 msgid ""
 "In order to qualify for a certificate, you must meet all course grading "
 "requirements, upgrade before the course deadline, and successfully verify "
-"your identity on {platform_name} if you have not done so already."
-"{button_panel}"
+"your identity on {platform_name} if you have not done so "
+"already.{button_panel}"
 msgstr ""
 
 #: lms/djangoapps/courseware/date_summary.py
@@ -5663,8 +5675,8 @@ msgstr ""
 
 #: lms/djangoapps/courseware/masquerade.py
 msgid ""
-"This user does not have access to this content "
-"because                         the content start date is in the future"
+"This user does not have access to this content because"
+"                         the content start date is in the future"
 msgstr ""
 
 #: lms/djangoapps/courseware/masquerade.py
@@ -5674,7 +5686,8 @@ msgid ""
 msgstr ""
 
 #: lms/djangoapps/courseware/models.py
-msgid "Number of days a learner has to upgrade after content is made available"
+msgid ""
+"Number of days a learner has to upgrade after content is made available"
 msgstr ""
 
 #: lms/djangoapps/courseware/models.py
@@ -5821,9 +5834,8 @@ msgstr ""
 #: lms/djangoapps/courseware/views/views.py
 #, python-brace-format
 msgid ""
-"You must be enrolled in the course to see course "
-"content.                             {enroll_link_start}Enroll "
-"now{enroll_link_end}."
+"You must be enrolled in the course to see course content."
+"                             {enroll_link_start}Enroll now{enroll_link_end}."
 msgstr ""
 
 #: lms/djangoapps/courseware/views/views.py
@@ -5864,15 +5876,9 @@ msgstr ""
 #: lms/djangoapps/courseware/views/views.py
 #, python-brace-format
 msgid ""
-"{platform_name} now offers financial assistance for learners who want to "
-"earn Verified Certificates but who may not be able to pay the Verified "
-"Certificate fee. Eligible learners may receive up to 90{percent_sign} off "
-"the Verified Certificate fee for a course.\n"
-"To apply for financial assistance, enroll in the audit track for a course "
-"that offers Verified Certificates, and then complete this application. Note "
-"that you must complete a separate application for each course you take.\n"
-" We plan to use this information to evaluate your application for financial "
-"assistance and to further develop our financial assistance program."
+"{platform_name} now offers financial assistance for learners who want to earn Verified Certificates but who may not be able to pay the Verified Certificate fee. Eligible learners may receive up to 90{percent_sign} off the Verified Certificate fee for a course.\n"
+"To apply for financial assistance, enroll in the audit track for a course that offers Verified Certificates, and then complete this application. Note that you must complete a separate application for each course you take.\n"
+" We plan to use this information to evaluate your application for financial assistance and to further develop our financial assistance program."
 msgstr ""
 
 #: lms/djangoapps/courseware/views/views.py
@@ -5920,14 +5926,14 @@ msgstr ""
 #: lms/djangoapps/dashboard/git_import.py
 #, python-brace-format
 msgid ""
-"Path {0} doesn't exist, please create it, or configure a different path with "
-"GIT_REPO_DIR"
+"Path {0} doesn't exist, please create it, or configure a different path with"
+" GIT_REPO_DIR"
 msgstr ""
 
 #: lms/djangoapps/dashboard/git_import.py
 msgid ""
-"Non usable git url provided. Expecting something like: git@github.com:edx/"
-"edx4edx_lite.git"
+"Non usable git url provided. Expecting something like: "
+"git@github.com:edx/edx4edx_lite.git"
 msgstr ""
 
 #: lms/djangoapps/dashboard/git_import.py
@@ -5962,8 +5968,8 @@ msgstr ""
 
 #: lms/djangoapps/dashboard/management/commands/git_add_course.py
 msgid ""
-"Import the specified git repository and optional branch into the modulestore "
-"and optionally specified directory."
+"Import the specified git repository and optional branch into the modulestore"
+" and optionally specified directory."
 msgstr ""
 
 #: lms/djangoapps/dashboard/sysadmin.py
@@ -6108,7 +6114,8 @@ msgid "Comment level too deep"
 msgstr ""
 
 #: lms/djangoapps/discussion/django_comment_client/base/views.py
-msgid "Error uploading file. Please contact the site administrator. Thank you."
+msgid ""
+"Error uploading file. Please contact the site administrator. Thank you."
 msgstr ""
 
 #: lms/djangoapps/discussion/django_comment_client/base/views.py
@@ -6226,8 +6233,8 @@ msgstr ""
 
 #: lms/djangoapps/email_marketing/models.py
 msgid ""
-"Optional lms url scheme + host used to construct urls for content library, e."
-"g. https://courses.edx.org."
+"Optional lms url scheme + host used to construct urls for content library, "
+"e.g. https://courses.edx.org."
 msgstr ""
 
 #: lms/djangoapps/email_marketing/models.py
@@ -6256,9 +6263,7 @@ msgstr ""
 #: lms/djangoapps/instructor/services.py
 #, python-brace-format
 msgid ""
-"A proctored exam attempt for {exam_name} in {course_name} by username: "
-"{student_username} was reviewed as {review_status} by the proctored exam "
-"review provider.\n"
+"A proctored exam attempt for {exam_name} in {course_name} by username: {student_username} was reviewed as {review_status} by the proctored exam review provider.\n"
 "Review link: {review_url}"
 msgstr ""
 
@@ -6269,8 +6274,8 @@ msgstr ""
 #: lms/djangoapps/instructor/views/api.py
 #, python-brace-format
 msgid ""
-"The {report_type} report is being created. To view the status of the report, "
-"see Pending Tasks below."
+"The {report_type} report is being created. To view the status of the report,"
+" see Pending Tasks below."
 msgstr ""
 
 #: lms/djangoapps/instructor/views/api.py
@@ -6295,8 +6300,8 @@ msgstr ""
 #: lms/djangoapps/instructor/views/api.py
 #, python-brace-format
 msgid ""
-"Data in row #{row_num} must have exactly four columns: email, username, full "
-"name, and country"
+"Data in row #{row_num} must have exactly four columns: email, username, full"
+" name, and country"
 msgstr ""
 
 #: lms/djangoapps/instructor/views/api.py
@@ -6307,8 +6312,8 @@ msgstr ""
 #: lms/djangoapps/instructor/views/api.py
 #, python-brace-format
 msgid ""
-"An account with email {email} exists but the provided username {username} is "
-"different. Enrolling anyway with {email}."
+"An account with email {email} exists but the provided username {username} is"
+" different. Enrolling anyway with {email}."
 msgstr ""
 
 #: lms/djangoapps/instructor/views/api.py
@@ -6324,8 +6329,8 @@ msgstr ""
 #, python-brace-format
 msgid ""
 "Error '{error}' while sending email to new user (user email={email}). "
-"Without the email student would not be able to login. Please contact support "
-"for further information."
+"Without the email student would not be able to login. Please contact support"
+" for further information."
 msgstr ""
 
 #: lms/djangoapps/instructor/views/api.py
@@ -6573,7 +6578,8 @@ msgid "Successfully changed due date for student {0} for {1} to {2}"
 msgstr ""
 
 #: lms/djangoapps/instructor/views/api.py
-msgid "Successfully removed invalid due date extension (unit has no due date)."
+msgid ""
+"Successfully removed invalid due date extension (unit has no due date)."
 msgstr ""
 
 #: lms/djangoapps/instructor/views/api.py
@@ -6640,7 +6646,8 @@ msgstr ""
 
 #: lms/djangoapps/instructor/views/api.py
 #, python-brace-format
-msgid "{user} does not exist in the LMS. Please check your spelling and retry."
+msgid ""
+"{user} does not exist in the LMS. Please check your spelling and retry."
 msgstr ""
 
 #: lms/djangoapps/instructor/views/api.py
@@ -6697,8 +6704,8 @@ msgstr ""
 #, python-brace-format
 msgid ""
 "The student {student} does not have certificate for the course {course}. "
-"Kindly verify student username/email and the selected course are correct and "
-"try again."
+"Kindly verify student username/email and the selected course are correct and"
+" try again."
 msgstr ""
 
 #: lms/djangoapps/instructor/views/instructor_dashboard.py
@@ -6708,8 +6715,8 @@ msgstr ""
 #: lms/djangoapps/instructor/views/instructor_dashboard.py
 #, python-brace-format
 msgid ""
-"To gain insights into student enrollment and participation {link_start}visit "
-"{analytics_dashboard_name}, our new course analytics product{link_end}."
+"To gain insights into student enrollment and participation {link_start}visit"
+" {analytics_dashboard_name}, our new course analytics product{link_end}."
 msgstr ""
 
 #: lms/djangoapps/instructor/views/instructor_dashboard.py
@@ -6872,9 +6879,9 @@ msgstr ""
 #: lms/djangoapps/instructor_task/api_helper.py
 #, python-brace-format
 msgid ""
-"The {report_type} report is being created. To view the status of the report, "
-"see Pending Tasks below. You will be able to download the report when it is "
-"complete."
+"The {report_type} report is being created. To view the status of the report,"
+" see Pending Tasks below. You will be able to download the report when it is"
+" complete."
 msgstr ""
 
 #: lms/djangoapps/instructor_task/api_helper.py
@@ -7141,7 +7148,8 @@ msgstr ""
 
 #: lms/djangoapps/lms_xblock/mixin.py
 msgid ""
-"This unit's access settings refer to deleted or invalid group configurations."
+"This unit's access settings refer to deleted or invalid group "
+"configurations."
 msgstr ""
 
 #: lms/djangoapps/lms_xblock/mixin.py
@@ -7176,8 +7184,7 @@ msgstr ""
 #. specific words for the acceptable values.
 #: lms/djangoapps/lms_xblock/mixin.py
 msgid ""
-"Enter the chrome, or navigation tools, to use for the XBlock in the LMS. "
-"Valid values are: \n"
+"Enter the chrome, or navigation tools, to use for the XBlock in the LMS. Valid values are: \n"
 "\"chromeless\" -- to not use tabs or the accordion; \n"
 "\"tabs\" -- to use tabs only; \n"
 "\"accordion\" -- to use the accordion only; or \n"
@@ -17464,8 +17471,8 @@ msgstr ""
 
 #: lms/templates/static_templates/404.html
 msgid ""
-"The page that you were looking for was not found. Go back to the {link_start}"
-"homepage{link_end} ."
+"The page that you were looking for was not found. Go back to the "
+"{link_start}homepage{link_end} ."
 msgstr ""
 
 #: lms/templates/static_templates/about.html
@@ -17536,8 +17543,8 @@ msgstr ""
 
 #: lms/templates/student_account/account_settings.html
 msgid ""
-" and access to private sites offered by MIT Open Learning, Wharton Executive "
-"Education, and Harvard Medical School"
+" and access to private sites offered by MIT Open Learning, Wharton Executive"
+" Education, and Harvard Medical School"
 msgstr ""
 
 #: lms/templates/student_account/finish_auth.html
@@ -17603,9 +17610,9 @@ msgstr ""
 #: lms/templates/survey/survey.html
 msgid ""
 "You can begin your course as soon as you complete the following form. "
-"Required fields are marked with an asterisk (*). This information is for the "
-"use of {platform_name} only. It will not be linked to your public profile in "
-"any way."
+"Required fields are marked with an asterisk (*). This information is for the"
+" use of {platform_name} only. It will not be linked to your public profile "
+"in any way."
 msgstr ""
 
 #: lms/templates/survey/survey.html
@@ -17676,13 +17683,14 @@ msgstr ""
 
 #: lms/templates/verify_student/missed_deadline.html
 msgid ""
-"The verification deadline for {course_name} was {{date}}. Verification is no "
-"longer available."
+"The verification deadline for {course_name} was {{date}}. Verification is no"
+" longer available."
 msgstr ""
 
 #: lms/templates/verify_student/missed_deadline.html
 msgid ""
-"The deadline to upgrade to a verified certificate for this course has passed."
+"The deadline to upgrade to a verified certificate for this course has "
+"passed."
 msgstr ""
 
 #: lms/templates/verify_student/pay_and_verify.html
@@ -17720,8 +17728,8 @@ msgstr ""
 #: lms/templates/verify_student/reverify_not_allowed.html
 msgid ""
 "You have already submitted your verification information. You will see a "
-"message on your dashboard when the verification process is complete (usually "
-"within 5-7 days)."
+"message on your dashboard when the verification process is complete (usually"
+" within 5-7 days)."
 msgstr ""
 
 #: lms/templates/verify_student/reverify_not_allowed.html
@@ -17895,8 +17903,8 @@ msgstr ""
 
 #: openedx/features/course_experience/templates/course_experience/course-sock-fragment.html
 msgid ""
-"My certificate has helped me showcase my knowledge on "
-"my                             resume - I feel like this certificate could "
+"My certificate has helped me showcase my knowledge on my"
+"                             resume - I feel like this certificate could "
 "really help me land                             my dream job!"
 msgstr ""
 
@@ -17906,10 +17914,10 @@ msgstr ""
 
 #: openedx/features/course_experience/templates/course_experience/course-sock-fragment.html
 msgid ""
-"I wanted to include a verified certificate on my resume and my profile "
-"to                             illustrate that I am working towards this "
-"goal I have and that I have                             achieved something "
-"while I was unemployed."
+"I wanted to include a verified certificate on my resume and my profile to"
+"                             illustrate that I am working towards this goal "
+"I have and that I have                             achieved something while "
+"I was unemployed."
 msgstr ""
 
 #: openedx/features/course_experience/templates/course_experience/course-sock-fragment.html
@@ -17988,7 +17996,8 @@ msgid "My Profile"
 msgstr ""
 
 #: openedx/features/learner_profile/templates/learner_profile/learner_profile.html
-msgid "Build out your profile to personalize your identity on {platform_name}."
+msgid ""
+"Build out your profile to personalize your identity on {platform_name}."
 msgstr ""
 
 #: openedx/features/learner_profile/templates/learner_profile/learner_profile.html
@@ -18042,8 +18051,8 @@ msgstr ""
 #: themes/edx.org/lms/templates/certificates/_about-accomplishments.html
 msgid ""
 "An edX Verified Certificate signifies that the learner has agreed to abide "
-"by the edX honor code and completed all of the required tasks of this course "
-"under its guidelines, as well as having their photo ID checked to verify "
+"by the edX honor code and completed all of the required tasks of this course"
+" under its guidelines, as well as having their photo ID checked to verify "
 "their identity."
 msgstr ""
 
@@ -18257,8 +18266,8 @@ msgstr ""
 
 #: themes/stanford-style/lms/templates/register-shib.html
 msgid ""
-"Required fields are noted by {strong_indicator}bold text and an asterisk (*)."
-"{strong_close}"
+"Required fields are noted by {strong_indicator}bold text and an asterisk "
+"(*).{strong_close}"
 msgstr ""
 
 #: themes/stanford-style/lms/templates/register-shib.html
@@ -18285,8 +18294,8 @@ msgstr ""
 
 #: themes/stanford-style/lms/templates/register-sidebar.html
 msgid ""
-"You will receive an activation email.  You must click on the activation link "
-"to complete the process.  Don't see the email?  Check your spam folder and "
+"You will receive an activation email.  You must click on the activation link"
+" to complete the process.  Don't see the email?  Check your spam folder and "
 "mark emails from class.stanford.edu as 'not spam', since you'll want to be "
 "able to receive email from your courses."
 msgstr ""
@@ -18315,16 +18324,16 @@ msgstr ""
 
 #: themes/stanford-style/lms/templates/emails/activation_email.txt
 msgid ""
-"Change your life and start learning today by activating your {platform_name} "
-"account. Click on the link below or copy and paste it into your browser's "
+"Change your life and start learning today by activating your {platform_name}"
+" account. Click on the link below or copy and paste it into your browser's "
 "address bar."
 msgstr ""
 
 #: themes/stanford-style/lms/templates/emails/activation_email.txt
 #: themes/stanford-style/lms/templates/emails/email_change.txt
 msgid ""
-"If you didn't request this, you don't need to do anything; you won't receive "
-"any more email from us. Please do not reply to this e-mail; if you require "
+"If you didn't request this, you don't need to do anything; you won't receive"
+" any more email from us. Please do not reply to this e-mail; if you require "
 "assistance, check the about section of the {platform_name} Courses web site."
 msgstr ""
 
@@ -18338,15 +18347,15 @@ msgstr ""
 #: themes/stanford-style/lms/templates/emails/email_change.txt
 msgid ""
 "We received a request to change the e-mail associated with your "
-"{platform_name} account from {old_email} to {new_email}. If this is correct, "
-"please confirm your new e-mail address by visiting:"
+"{platform_name} account from {old_email} to {new_email}. If this is correct,"
+" please confirm your new e-mail address by visiting:"
 msgstr ""
 
 #: themes/stanford-style/lms/templates/emails/reject_name_change.txt
 msgid ""
 "We are sorry. Our course staff did not approve your request to change your "
-"name from {old_name} to {new_name}. If you need further assistance, please e-"
-"mail the tech support at {email}"
+"name from {old_name} to {new_name}. If you need further assistance, please "
+"e-mail the tech support at {email}"
 msgstr ""
 
 #: themes/stanford-style/lms/templates/static_templates/tos.html
@@ -18438,8 +18447,8 @@ msgstr ""
 
 #: cms/templates/certificates.html
 msgid ""
-"To view a sample certificate, choose a course mode and select {em_start}"
-"Preview Certificate{em_end}."
+"To view a sample certificate, choose a course mode and select "
+"{em_start}Preview Certificate{em_end}."
 msgstr ""
 
 #: cms/templates/certificates.html
@@ -18590,8 +18599,8 @@ msgstr ""
 
 #: cms/templates/container.html
 msgid ""
-"Confirm that you have properly configured content in each of your experiment "
-"groups."
+"Confirm that you have properly configured content in each of your experiment"
+" groups."
 msgstr ""
 
 #: cms/templates/container.html
@@ -18752,9 +18761,9 @@ msgstr ""
 
 #: cms/templates/course_info.html
 msgid ""
-"Use course updates to notify students of important dates or exams, highlight "
-"particular discussions in the forums, announce schedule changes, and respond "
-"to student questions. You add or edit updates in HTML."
+"Use course updates to notify students of important dates or exams, highlight"
+" particular discussions in the forums, announce schedule changes, and "
+"respond to student questions. You add or edit updates in HTML."
 msgstr ""
 
 #: cms/templates/course_outline.html
@@ -18898,16 +18907,16 @@ msgstr ""
 
 #: cms/templates/course_outline.html
 msgid ""
-"To publish draft content, select the Publish icon for a section, subsection, "
-"or unit."
+"To publish draft content, select the Publish icon for a section, subsection,"
+" or unit."
 msgstr ""
 
 #: cms/templates/course_outline.html
 msgid ""
 "To make a section, subsection, or unit unavailable to learners, select the "
-"Configure icon for that level, then select the appropriate {em_start}"
-"Hide{em_end} option. Grades for hidden sections, subsections, and units are "
-"not included in grade calculations."
+"Configure icon for that level, then select the appropriate "
+"{em_start}Hide{em_end} option. Grades for hidden sections, subsections, and "
+"units are not included in grade calculations."
 msgstr ""
 
 #: cms/templates/course_outline.html
@@ -18967,8 +18976,8 @@ msgstr ""
 #: cms/templates/edit-tabs.html
 msgid ""
 "Pages are listed horizontally at the top of your course. Default pages "
-"(Home, Course, Discussion, Wiki, and Progress) are followed by textbooks and "
-"custom pages that you create."
+"(Home, Course, Discussion, Wiki, and Progress) are followed by textbooks and"
+" custom pages that you create."
 msgstr ""
 
 #: cms/templates/edit-tabs.html
@@ -19007,8 +19016,8 @@ msgstr ""
 #: cms/templates/edit-tabs.html
 msgid ""
 "Pages appear in your course's top navigation bar. The default pages (Home, "
-"Course, Discussion, Wiki, and Progress) are followed by textbooks and custom "
-"pages."
+"Course, Discussion, Wiki, and Progress) are followed by textbooks and custom"
+" pages."
 msgstr ""
 
 #: cms/templates/edit-tabs.html cms/templates/howitworks.html
@@ -19061,8 +19070,8 @@ msgstr ""
 msgid ""
 "You can export libraries and edit them outside of {studio_name}. The "
 "exported file is a .tar.gz file (that is, a .tar file compressed with GNU "
-"Zip) that contains the library structure and content. You can also re-import "
-"libraries that you've exported."
+"Zip) that contains the library structure and content. You can also re-import"
+" libraries that you've exported."
 msgstr ""
 
 #: cms/templates/export.html
@@ -19082,8 +19091,8 @@ msgstr ""
 msgid ""
 "{em_start}Caution:{em_end} When you export a course, information such as "
 "MATLAB API keys, LTI passports, annotation secret token strings, and "
-"annotation storage URLs are included in the exported data. If you share your "
-"exported files, you may also be sharing sensitive or license-specific "
+"annotation storage URLs are included in the exported data. If you share your"
+" exported files, you may also be sharing sensitive or license-specific "
 "information."
 msgstr ""
 
@@ -19205,8 +19214,8 @@ msgstr ""
 #: cms/templates/export.html
 msgid ""
 "You may want to edit the XML in your library directly, outside of "
-"{studio_name}. You may want to create a backup copy of your library. Or, you "
-"may want to create a copy of your library that you can later import into "
+"{studio_name}. You may want to create a backup copy of your library. Or, you"
+" may want to create a copy of your library that you can later import into "
 "another library instance and customize."
 msgstr ""
 
@@ -19285,8 +19294,8 @@ msgstr ""
 #: cms/templates/export.html
 msgid ""
 "Use an archive program to extract the data from the .tar.gz file. Extracted "
-"data includes the course.xml file, as well as subfolders that contain course "
-"content."
+"data includes the course.xml file, as well as subfolders that contain course"
+" content."
 msgstr ""
 
 #: cms/templates/export.html
@@ -19380,19 +19389,19 @@ msgstr ""
 #: cms/templates/group_configurations.html
 msgid ""
 "Each content group that you create can be associated with one or more "
-"cohorts. In addition to making course content available to all learners, you "
-"can restrict access to some content to learners in specific content groups. "
-"Only learners in the cohorts that are associated with the specified content "
-"groups see the additional content."
+"cohorts. In addition to making course content available to all learners, you"
+" can restrict access to some content to learners in specific content groups."
+" Only learners in the cohorts that are associated with the specified content"
+" groups see the additional content."
 msgstr ""
 
 #: cms/templates/group_configurations.html
 msgid ""
 "Click {em_start}New content group{em_end} to add a new content group. To "
-"edit the name of a content group, hover over its box and click {em_start}"
-"Edit{em_end}. You can delete a content group only if it is not in use by a "
-"unit. To delete a content group, hover over its box and click the delete "
-"icon."
+"edit the name of a content group, hover over its box and click "
+"{em_start}Edit{em_end}. You can delete a content group only if it is not in "
+"use by a unit. To delete a content group, hover over its box and click the "
+"delete icon."
 msgstr ""
 
 #: cms/templates/group_configurations.html
@@ -19407,10 +19416,10 @@ msgstr ""
 #: cms/templates/group_configurations.html
 msgid ""
 "Click {em_start}New Group Configuration{em_end} to add a new configuration. "
-"To edit a configuration, hover over its box and click {em_start}"
-"Edit{em_end}. You can delete a group configuration only if it is not in use "
-"in an experiment. To delete a configuration, hover over its box and click "
-"the delete icon."
+"To edit a configuration, hover over its box and click "
+"{em_start}Edit{em_end}. You can delete a group configuration only if it is "
+"not in use in an experiment. To delete a configuration, hover over its box "
+"and click the delete icon."
 msgstr ""
 
 #: cms/templates/howitworks.html
@@ -19423,8 +19432,8 @@ msgstr ""
 
 #: cms/templates/howitworks.html
 msgid ""
-"{studio_name} helps manage your online courses, so you can focus on teaching "
-"them"
+"{studio_name} helps manage your online courses, so you can focus on teaching"
+" them"
 msgstr ""
 
 #: cms/templates/howitworks.html
@@ -19535,8 +19544,8 @@ msgstr ""
 msgid ""
 "{studio_name} works like web applications you already know, yet understands "
 "how you build curriculum. Instant publishing to the web when you want it, "
-"incremental release when it makes sense. And with co-authors, you can have a "
-"whole team building a course, together."
+"incremental release when it makes sense. And with co-authors, you can have a"
+" whole team building a course, together."
 msgstr ""
 
 #: cms/templates/howitworks.html
@@ -19545,8 +19554,8 @@ msgstr ""
 
 #: cms/templates/howitworks.html
 msgid ""
-"Caught a bug? No problem. When you want, your changes go live when you click "
-"Save."
+"Caught a bug? No problem. When you want, your changes go live when you click"
+" Save."
 msgstr ""
 
 #: cms/templates/howitworks.html
@@ -19555,8 +19564,8 @@ msgstr ""
 
 #: cms/templates/howitworks.html
 msgid ""
-"When you've finished a {strong_start}section{strong_end}, pick when you want "
-"it to go live and {studio_name} takes care of the rest. Build your course "
+"When you've finished a {strong_start}section{strong_end}, pick when you want"
+" it to go live and {studio_name} takes care of the rest. Build your course "
 "incrementally."
 msgstr ""
 
@@ -19642,8 +19651,8 @@ msgstr ""
 #: cms/templates/import.html
 msgid ""
 "The library that you import must be in a .tar.gz file (that is, a .tar file "
-"compressed with GNU Zip). This .tar.gz file must contain a library.xml file. "
-"It may also contain other files."
+"compressed with GNU Zip). This .tar.gz file must contain a library.xml file."
+" It may also contain other files."
 msgstr ""
 
 #: cms/templates/import.html
@@ -19657,9 +19666,10 @@ msgstr ""
 #: cms/templates/import.html
 msgid ""
 "Be sure you want to import a course before continuing. The contents of the "
-"imported course will replace the contents of the existing course. {em_start}"
-"You cannot undo a course import{em_end}. Before you proceed, we recommend "
-"that you export the current course, so that you have a backup copy of it."
+"imported course will replace the contents of the existing course. "
+"{em_start}You cannot undo a course import{em_end}. Before you proceed, we "
+"recommend that you export the current course, so that you have a backup copy"
+" of it."
 msgstr ""
 
 #: cms/templates/import.html
@@ -19742,8 +19752,8 @@ msgstr ""
 
 #: cms/templates/import.html
 msgid ""
-"Integrating your imported content into this library. This process might take "
-"longer with larger libraries."
+"Integrating your imported content into this library. This process might take"
+" longer with larger libraries."
 msgstr ""
 
 #: cms/templates/import.html
@@ -19774,8 +19784,8 @@ msgstr ""
 
 #: cms/templates/import.html
 msgid ""
-"You might want to update an existing library to a new version, or replace an "
-"existing library entirely. You might also have developed a library outside "
+"You might want to update an existing library to a new version, or replace an"
+" existing library entirely. You might also have developed a library outside "
 "of {studio_name}."
 msgstr ""
 
@@ -19864,22 +19874,23 @@ msgstr ""
 
 #: cms/templates/index.html
 msgid ""
-"The public display name for your course. This cannot be changed, but you can "
-"set a different display name in Advanced Settings later."
+"The public display name for your course. This cannot be changed, but you can"
+" set a different display name in Advanced Settings later."
 msgstr ""
 
 #: cms/templates/index.html
 msgid ""
 "The name of the organization sponsoring the course. {strong_start}Note: The "
 "organization name is part of the course URL.{strong_end} This cannot be "
-"changed, but you can set a different display name in Advanced Settings later."
+"changed, but you can set a different display name in Advanced Settings "
+"later."
 msgstr ""
 
 #: cms/templates/index.html
 msgid ""
 "The unique number that identifies your course within your organization. "
-"{strong_start}Note: This is part of your course URL, so no spaces or special "
-"characters are allowed and it cannot be changed.{strong_end}"
+"{strong_start}Note: This is part of your course URL, so no spaces or special"
+" characters are allowed and it cannot be changed.{strong_end}"
 msgstr ""
 
 #: cms/templates/index.html
@@ -19940,8 +19951,8 @@ msgstr ""
 #: cms/templates/index.html
 msgid ""
 "The unique code that identifies this library. {strong_start}Note: This is "
-"part of your library URL, so no spaces or special characters are allowed."
-"{strong_end} This cannot be changed."
+"part of your library URL, so no spaces or special characters are "
+"allowed.{strong_end} This cannot be changed."
 msgstr ""
 
 #: cms/templates/index.html
@@ -19976,8 +19987,8 @@ msgstr ""
 #: cms/templates/index.html
 msgid ""
 "The new course will be added to your course list in 5-10 minutes. Return to "
-"this page or {link_start}refresh it{link_end} to update the course list. The "
-"new course will need some manual configuration."
+"this page or {link_start}refresh it{link_end} to update the course list. The"
+" new course will need some manual configuration."
 msgstr ""
 
 #. Translators: This is a status message for the course re-runs feature.
@@ -20031,8 +20042,8 @@ msgstr ""
 
 #: cms/templates/index.html
 msgid ""
-"{studio_name} is a hosted solution for our xConsortium partners and selected "
-"guests. Courses for which you are a team member appear above for you to "
+"{studio_name} is a hosted solution for our xConsortium partners and selected"
+" guests. Courses for which you are a team member appear above for you to "
 "edit, while course creator privileges are granted by {platform_name}. Our "
 "team will evaluate your request and provide you feedback within 24 hours "
 "during the work week."
@@ -20052,8 +20063,8 @@ msgstr ""
 
 #: cms/templates/index.html
 msgid ""
-"{studio_name} is a hosted solution for our xConsortium partners and selected "
-"guests. Courses for which you are a team member appear above for you to "
+"{studio_name} is a hosted solution for our xConsortium partners and selected"
+" guests. Courses for which you are a team member appear above for you to "
 "edit, while course creator privileges are granted by {platform_name}. Our "
 "team is has completed evaluating your request."
 msgstr ""
@@ -20070,16 +20081,16 @@ msgstr ""
 
 #: cms/templates/index.html
 msgid ""
-"{studio_name} is a hosted solution for our xConsortium partners and selected "
-"guests. Courses for which you are a team member appear above for you to "
+"{studio_name} is a hosted solution for our xConsortium partners and selected"
+" guests. Courses for which you are a team member appear above for you to "
 "edit, while course creator privileges are granted by {platform_name}. Our "
 "team is currently  evaluating your request."
 msgstr ""
 
 #: cms/templates/index.html
 msgid ""
-"Your request is currently being reviewed by {platform_name} staff and should "
-"be updated shortly."
+"Your request is currently being reviewed by {platform_name} staff and should"
+" be updated shortly."
 msgstr ""
 
 #: cms/templates/index.html
@@ -20088,8 +20099,8 @@ msgstr ""
 
 #: cms/templates/index.html
 msgid ""
-"The library creator must give you access to the library. Contact the library "
-"creator or administrator for the library you are helping to author."
+"The library creator must give you access to the library. Contact the library"
+" creator or administrator for the library you are helping to author."
 msgstr ""
 
 #: cms/templates/index.html
@@ -20109,8 +20120,8 @@ msgstr ""
 #: cms/templates/index.html
 msgid ""
 "Click Help in the upper-right corner to get more information about the "
-"{studio_name} page you are viewing. You can also use the links at the bottom "
-"of the page to access our continually updated documentation and other "
+"{studio_name} page you are viewing. You can also use the links at the bottom"
+" of the page to access our continually updated documentation and other "
 "{studio_name} resources."
 msgstr ""
 
@@ -20197,12 +20208,12 @@ msgstr ""
 
 #: cms/templates/library.html
 msgid ""
-"Use library content in courses by adding the {em_start}"
-"library_content{em_end} policy key to the Advanced Module List in the "
-"course's Advanced Settings, then adding a Randomized Content Block to your "
-"courseware. In the settings for each Randomized Content Block, select this "
-"library as the source library, and specify the number of problems to be "
-"randomly selected and displayed to each student."
+"Use library content in courses by adding the "
+"{em_start}library_content{em_end} policy key to the Advanced Module List in "
+"the course's Advanced Settings, then adding a Randomized Content Block to "
+"your courseware. In the settings for each Randomized Content Block, select "
+"this library as the source library, and specify the number of problems to be"
+" randomly selected and displayed to each student."
 msgstr ""
 
 #: cms/templates/library.html
@@ -20269,8 +20280,8 @@ msgstr ""
 
 #: cms/templates/manage_users.html
 msgid ""
-"All course team members can access content in Studio, the LMS, and Insights, "
-"but are not automatically enrolled in the course."
+"All course team members can access content in Studio, the LMS, and Insights,"
+" but are not automatically enrolled in the course."
 msgstr ""
 
 #: cms/templates/manage_users.html
@@ -20280,8 +20291,8 @@ msgstr ""
 #: cms/templates/manage_users.html
 msgid ""
 "Every course must have an Admin. If you are the Admin and you want to "
-"transfer ownership of the course, click <strong>Add admin access</strong> to "
-"make another user the Admin, then ask that user to remove you from the "
+"transfer ownership of the course, click <strong>Add admin access</strong> to"
+" make another user the Admin, then ask that user to remove you from the "
 "Course Team list."
 msgstr ""
 
@@ -20338,8 +20349,8 @@ msgstr ""
 #: cms/templates/manage_users_lib.html
 msgid ""
 "Library Admins have full editing privileges and can also add and remove "
-"other team members. There must be at least one user with the Admin role in a "
-"library."
+"other team members. There must be at least one user with the Admin role in a"
+" library."
 msgstr ""
 
 #: cms/templates/settings.html
@@ -20558,8 +20569,8 @@ msgstr ""
 
 #: cms/templates/settings.html
 msgid ""
-"Identify the course language here. This is used to assist users find courses "
-"that are taught in a specific language. It is also used to localize the "
+"Identify the course language here. This is used to assist users find courses"
+" that are taught in a specific language. It is also used to localize the "
 "'From:' field in bulk emails."
 msgstr ""
 
@@ -20650,8 +20661,8 @@ msgstr ""
 
 #: cms/templates/settings.html
 msgid ""
-"Your course currently does not have an image. Please upload one (JPEG or PNG "
-"format, and minimum suggested dimensions are 375px wide by 200px tall)"
+"Your course currently does not have an image. Please upload one (JPEG or PNG"
+" format, and minimum suggested dimensions are 375px wide by 200px tall)"
 msgstr ""
 
 #. Translators: This is the placeholder text for a field that requests the URL
@@ -20672,8 +20683,8 @@ msgstr ""
 
 #: cms/templates/settings.html
 msgid ""
-"Your course currently does not have an image. Please upload one (JPEG or PNG "
-"format, and minimum suggested dimensions are 1440px wide by 400px tall)"
+"Your course currently does not have an image. Please upload one (JPEG or PNG"
+" format, and minimum suggested dimensions are 1440px wide by 400px tall)"
 msgstr ""
 
 #. Translators: This is the placeholder text for a field that requests the URL
@@ -20791,8 +20802,8 @@ msgstr ""
 
 #: cms/templates/settings.html
 msgid ""
-"You can now view and author your course entrance exam from the {link_start}"
-"Course Outline{link_end}."
+"You can now view and author your course entrance exam from the "
+"{link_start}Course Outline{link_end}."
 msgstr ""
 
 #: cms/templates/settings.html
@@ -20895,8 +20906,8 @@ msgstr ""
 
 #: cms/templates/settings_advanced.html
 msgid ""
-"{em_start}Note:{em_end} When you enter strings as policy values, ensure that "
-"you use double quotation marks (\") around the string. Do not use single "
+"{em_start}Note:{em_end} When you enter strings as policy values, ensure that"
+" you use double quotation marks (\") around the string. Do not use single "
 "quotation marks (')."
 msgstr ""
 
@@ -20967,8 +20978,8 @@ msgstr ""
 #: cms/templates/settings_graders.html
 msgid ""
 "You can use the slider under Overall Grade Range to specify whether your "
-"course is pass/fail or graded by letter, and to establish the thresholds for "
-"each grade."
+"course is pass/fail or graded by letter, and to establish the thresholds for"
+" each grade."
 msgstr ""
 
 #: cms/templates/settings_graders.html
@@ -21022,9 +21033,9 @@ msgstr ""
 
 #: cms/templates/textbooks.html
 msgid ""
-"If your textbook doesn't have individual chapters, you can upload the entire "
-"text as a single chapter and enter a name of your choice in the Chapter Name "
-"field."
+"If your textbook doesn't have individual chapters, you can upload the entire"
+" text as a single chapter and enter a name of your choice in the Chapter "
+"Name field."
 msgstr ""
 
 #: cms/templates/textbooks.html
@@ -21059,8 +21070,8 @@ msgstr ""
 
 #: cms/templates/visibility_editor.html
 msgid ""
-"Access to this component is not restricted, but visibility might be affected "
-"by inherited settings."
+"Access to this component is not restricted, but visibility might be affected"
+" by inherited settings."
 msgstr ""
 
 #: cms/templates/visibility_editor.html
@@ -21071,8 +21082,8 @@ msgstr ""
 
 #: cms/templates/visibility_editor.html
 msgid ""
-"You can restrict access to this component to learners in specific enrollment "
-"tracks or content groups."
+"You can restrict access to this component to learners in specific enrollment"
+" tracks or content groups."
 msgstr ""
 
 #: cms/templates/visibility_editor.html
@@ -21094,9 +21105,9 @@ msgstr ""
 #. is only read by screen readers and never shown in the browser.
 #: cms/templates/visibility_editor.html
 msgid ""
-"{screen_reader_start}Warning:{screen_reader_end} The unit that contains this "
-"component is hidden from learners. The unit setting overrides the component "
-"access settings defined here."
+"{screen_reader_start}Warning:{screen_reader_end} The unit that contains this"
+" component is hidden from learners. The unit setting overrides the component"
+" access settings defined here."
 msgstr ""
 
 #: cms/templates/visibility_editor.html
@@ -21131,8 +21142,8 @@ msgstr ""
 
 #: cms/templates/emails/course_creator_admin_user_pending.txt
 msgid ""
-"User '{user}' with e-mail {email} has requested {studio_name} course creator "
-"privileges on edge."
+"User '{user}' with e-mail {email} has requested {studio_name} course creator"
+" privileges on edge."
 msgstr ""
 
 #: cms/templates/emails/course_creator_admin_user_pending.txt
@@ -21147,8 +21158,7 @@ msgstr ""
 
 #: cms/templates/emails/course_creator_granted.txt
 msgid ""
-"Your request for course creation rights to {studio_name} have been granted. "
-"To create your first course, visit\n"
+"Your request for course creation rights to {studio_name} have been granted. To create your first course, visit\n"
 "\n"
 "{url}"
 msgstr ""
@@ -21171,8 +21181,8 @@ msgstr ""
 
 #: cms/templates/emails/user_task_complete_email.txt
 msgid ""
-"Your {task_name} task has completed with the status '{task_status}'. Sign in "
-"to view the details of your task or download any files created."
+"Your {task_name} task has completed with the status '{task_status}'. Sign in"
+" to view the details of your task or download any files created."
 msgstr ""
 
 #: cms/templates/emails/user_task_complete_email_subject.txt
@@ -21237,8 +21247,8 @@ msgstr ""
 
 #: cms/templates/registration/activation_invalid.html
 msgid ""
-"Something went wrong. Email programs sometimes split URLs into two lines, so "
-"make sure the URL you're using is formatted correctly. If you still have "
+"Something went wrong. Email programs sometimes split URLs into two lines, so"
+" make sure the URL you're using is formatted correctly. If you still have "
 "issues, send us an email message at {email_start}{email}{email_end}."
 msgstr ""
 
@@ -21435,8 +21445,8 @@ msgstr ""
 #: wiki/forms.py
 msgid ""
 "While you were editing, someone else changed the revision. Your contents "
-"have been automatically merged with the new contents. Please review the text "
-"below."
+"have been automatically merged with the new contents. Please review the text"
+" below."
 msgstr ""
 
 #: wiki/forms.py
@@ -21482,12 +21492,13 @@ msgstr ""
 
 #: wiki/forms.py
 msgid ""
-"Purge the article: Completely remove it (and all its contents) with no undo. "
-"Purging is a good idea if you want to free the slug such that users can "
+"Purge the article: Completely remove it (and all its contents) with no undo."
+" Purging is a good idea if you want to free the slug such that users can "
 "create new articles in its place."
 msgstr ""
 
-#: wiki/forms.py wiki/plugins/attachments/forms.py wiki/plugins/images/forms.py
+#: wiki/forms.py wiki/plugins/attachments/forms.py
+#: wiki/plugins/images/forms.py
 msgid "You are not sure enough!"
 msgstr ""
 
@@ -21525,8 +21536,8 @@ msgstr ""
 
 #: wiki/forms.py
 msgid ""
-"Check here to apply the above permissions recursively to articles under this "
-"one."
+"Check here to apply the above permissions recursively to articles under this"
+" one."
 msgstr ""
 
 #: wiki/forms.py
@@ -21724,8 +21735,7 @@ msgid ""
 "Articles who lost their parents\n"
 "===============================\n"
 "\n"
-"The children of this article have had their parents deleted. You should "
-"probably find a new home for them."
+"The children of this article have had their parents deleted. You should probably find a new home for them."
 msgstr ""
 
 #: wiki/models/urlpath.py
@@ -21892,8 +21902,8 @@ msgstr ""
 #, python-format
 msgid ""
 "Replacing an attachment means adding a new file that will be used in its "
-"place. All references to the file will be replaced by the one you upload and "
-"the file will be downloaded as <strong>%(filename)s</strong>. Please note "
+"place. All references to the file will be replaced by the one you upload and"
+" the file will be downloaded as <strong>%(filename)s</strong>. Please note "
 "that this attachment is in use on other articles, you may distort contents. "
 "However, do not hestitate to take advantage of this and make replacements "
 "for the listed articles where necessary. This way of working is more "
@@ -21908,8 +21918,8 @@ msgstr ""
 #, python-format
 msgid ""
 "Replacing an attachment means adding a new file that will be used in its "
-"place. All references to the file will be replaced by the one you upload and "
-"the file will be downloaded as <strong>%(filename)s</strong>."
+"place. All references to the file will be replaced by the one you upload and"
+" the file will be downloaded as <strong>%(filename)s</strong>."
 msgstr ""
 
 #: wiki/plugins/attachments/templates/wiki/plugins/attachments/replace.html
@@ -21952,7 +21962,8 @@ msgstr ""
 
 #: wiki/plugins/help/templates/wiki/plugins/help/sidebar.html
 msgid ""
-"Use these codes for headers and to automatically generate Tables of Contents."
+"Use these codes for headers and to automatically generate Tables of "
+"Contents."
 msgstr ""
 
 #: wiki/plugins/help/templates/wiki/plugins/help/sidebar.html
@@ -22133,8 +22144,8 @@ msgstr ""
 #: wiki/plugins/images/templates/wiki/plugins/images/sidebar.html
 msgid ""
 "After uploading an image, it is attached to this particular artice and can "
-"be used only here. Other users may replace the image, but older versions are "
-"kept. You probably want to show the image with a nice caption. To achieve "
+"be used only here. Other users may replace the image, but older versions are"
+" kept. You probably want to show the image with a nice caption. To achieve "
 "this, press the Insert button and fill in the caption fields and possibly "
 "choose to have you image floating right or left of the content. You can use "
 "Markdown in the caption. The markdown code syntax for images looks like "
@@ -22151,8 +22162,8 @@ msgstr ""
 
 #: wiki/plugins/links/templates/wiki/plugins/links/sidebar.html
 msgid ""
-"Type in something from another wiki page's title and auto-complete will help "
-"you create a tag for you wiki link. Tags for links look like this:"
+"Type in something from another wiki page's title and auto-complete will help"
+" you create a tag for you wiki link. Tags for links look like this:"
 msgstr ""
 
 #: wiki/plugins/links/templates/wiki/plugins/links/sidebar.html
@@ -22336,8 +22347,8 @@ msgstr ""
 
 #: wiki/templates/wiki/article/create_root.html
 msgid ""
-"You have django-wiki installed... but there are no articles. So it's time to "
-"create the first one, the root article. In the beginning, it will only be "
+"You have django-wiki installed... but there are no articles. So it's time to"
+" create the first one, the root article. In the beginning, it will only be "
 "editable by administrators, but you can define permissions after."
 msgstr ""
 
@@ -22352,8 +22363,8 @@ msgstr ""
 #: wiki/templates/wiki/includes/anonymous_blocked.html
 #, python-format
 msgid ""
-"You need to <a href=\"%(login_url)s\">log in</a> or <a href=\"%(signup_url)s"
-"\">sign up</a> to use this function."
+"You need to <a href=\"%(login_url)s\">log in</a> or <a "
+"href=\"%(signup_url)s\">sign up</a> to use this function."
 msgstr ""
 
 #: wiki/templates/wiki/includes/anonymous_blocked.html
@@ -22478,8 +22489,8 @@ msgstr ""
 #: wiki/views/article.py
 #, python-format
 msgid ""
-"A new revision was created: Merge between Revision #%(r1)d and Revision #"
-"%(r2)d"
+"A new revision was created: Merge between Revision #%(r1)d and Revision "
+"#%(r2)d"
 msgstr ""
 
 #: edx_proctoring_proctortrack/backends/proctortrack_rest.py
