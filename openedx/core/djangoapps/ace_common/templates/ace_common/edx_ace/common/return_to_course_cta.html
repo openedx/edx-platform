@@ -14,18 +14,25 @@
         {% endif %}
     {% endif %}
     style="
-        color: #ffffff;
         text-decoration: none;
-        border-radius: 4px;
-        -webkit-border-radius: 4px;
-        -moz-border-radius: 4px;
-        background-color: #005686;
-        border-top: 12px solid #005686;
-        border-bottom: 12px solid #005686;
-        border-right: 50px solid #005686;
-        border-left: 50px solid #005686;
+        color: #fff;
+        background-color: #007bff;
+        border-color: #007bff;
+        border-radius: .25rem;
+        padding: .375rem .75rem;
+        text-align: center;
+        vertical-align: middle;
+        user-select: none;
         display: inline-block;
-    ">
+
+        border-top: 12px solid #007bff;
+        border-bottom: 12px solid #007bff;
+        border-right: 50px solid #007bff;
+        border-left: 50px solid #007bff;
+    "
+        onMouseOver="this.style.color='#fff'; this.style.backgroundColor='#0069d9'; this.style.borderColor='#0069d9';"
+        onMouseOut="this.style.color='#fff'; this.style.backgroundColor='#007bff'; this.style.borderColor='#007bff';"
+        >
         {# old email clients require the use of the font tag :( #}
         <font color="#ffffff"><b>{{ course_cta_text }}</b></font>
     </a>
