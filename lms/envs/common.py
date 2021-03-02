@@ -744,8 +744,13 @@ FEATURES = {
     # .. toggle_tickets: https://openedx.atlassian.net/browse/YONK-513
     'ALLOW_PUBLIC_ACCOUNT_CREATION': True,
 
-    # Enable footer banner for cookie consent.
-    # See https://cookieconsent.insites.com/ for more.
+    # .. toggle_name: FEATURES['ENABLE_COOKIE_CONSENT']
+    # .. toggle_implementation: DjangoSetting
+    # .. toggle_default: False
+    # .. toggle_description: Enable header banner for cookie consent using this service: https://cookieconsent.insites.com/
+    # .. toggle_use_cases: open_edx
+    # .. toggle_creation_date: 2017-03-03
+    # .. toggle_tickets: https://openedx.atlassian.net/browse/OSPR-1560
     'ENABLE_COOKIE_CONSENT': False,
 
     # Whether or not the dynamic EnrollmentTrackUserPartition should be registered.
