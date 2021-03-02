@@ -3244,41 +3244,16 @@ class TestShowCoursewareMFE(TestCase):
     There are an unfortunate number of state permutations here since we have
     the product of the following binary states:
 
-    * the ENABLE_COURSEWARE_MICROFRONTEND Django setting
     * user is global staff member
     * user is member of the course team
     * whether the course_key is an old Mongo style of key
     * the COURSEWARE_MICROFRONTEND_COURSE_TEAM_PREVIEW CourseWaffleFlag
     * the REDIRECT_TO_COURSEWARE_MICROFRONTEND ExperimentWaffleFlag
 
-    Giving us theoretically 2^6 = 64 states. >_<
+    Giving us theoretically 2^5 = 32 states. >_<
     """
-    @patch.dict(settings.FEATURES, {'ENABLE_COURSEWARE_MICROFRONTEND': False})
-    def test_disabled_at_platform_level(self):
-        """Test every permutation where the platform feature is disabled."""
-        old_course_key = CourseKey.from_string("OpenEdX/Old/2020")
-        new_course_key = CourseKey.from_string("course-v1:OpenEdX+New+2020")
-        global_staff_user = UserFactory(username="global_staff", is_staff=True)
-        regular_user = UserFactory(username="normal", is_staff=False)
-
-        # We never show when the feature is entirely disabled, no matter what
-        # the waffle flags are set to, who the user is, or what the course_key
-        # type is.
-        combos = itertools.product(
-            [regular_user, global_staff_user],  # User (is global staff)
-            [old_course_key, new_course_key],   # Course Key (old vs. new)
-            [True, False],  # is_course_staff
-            [True, False],  # preview_active (COURSEWARE_MICROFRONTEND_COURSE_TEAM_PREVIEW)
-            [True, False],  # redirect_active (REDIRECT_TO_COURSEWARE_MICROFRONTEND)
-        )
-        for user, course_key, is_course_staff, preview_active, redirect_active in combos:
-            with override_waffle_flag(COURSEWARE_MICROFRONTEND_COURSE_TEAM_PREVIEW, preview_active):
-                with override_waffle_flag(REDIRECT_TO_COURSEWARE_MICROFRONTEND, active=redirect_active):
-                    assert show_courseware_mfe_link(user, is_course_staff, course_key) is False
-
-    @patch.dict(settings.FEATURES, {'ENABLE_COURSEWARE_MICROFRONTEND': True})
-    def test_enabled_at_platform_level(self):
-        """Test every permutation where the platform feature is enabled."""
+    def test_permuations(self):
+        """Test every permutation"""
         old_course_key = CourseKey.from_string("OpenEdX/Old/2020")
         new_course_key = CourseKey.from_string("course-v1:OpenEdX+New+2020")
         global_staff_user = UserFactory(username="global_staff", is_staff=True)
@@ -3366,7 +3341,6 @@ class TestShowCoursewareMFE(TestCase):
         )
 
 
-@patch.dict('django.conf.settings.FEATURES', {'ENABLE_COURSEWARE_MICROFRONTEND': True})
 @ddt.ddt
 class MFERedirectTests(BaseViewsTestCase):  # lint-amnesty, pylint: disable=missing-class-docstring
     MODULESTORE = TEST_DATA_SPLIT_MODULESTORE

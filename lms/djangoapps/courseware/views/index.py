@@ -173,9 +173,6 @@ class CoursewareIndex(View):
         Redirect to the new courseware micro frontend,
         unless this is a time limited exam.
         """
-        # DENY: feature disabled globally
-        if not settings.FEATURES.get('ENABLE_COURSEWARE_MICROFRONTEND'):
-            return
         # DENY: staff access
         if self.is_staff:
             return
@@ -625,10 +622,6 @@ def show_courseware_mfe_link(user, staff_access, course_key):
     """
     Return whether to display the button to switch to the Courseware MFE.
     """
-    # The MFE isn't enabled at all, so don't show the button.
-    if not settings.FEATURES.get('ENABLE_COURSEWARE_MICROFRONTEND'):
-        return False
-
     # MFE does not work for Old Mongo courses.
     if course_key.deprecated:
         return False

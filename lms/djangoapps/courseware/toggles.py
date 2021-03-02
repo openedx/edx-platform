@@ -16,8 +16,7 @@ WAFFLE_FLAG_NAMESPACE = LegacyWaffleFlagNamespace(name='courseware')
 # .. toggle_use_cases: temporary, open_edx
 # .. toggle_creation_date: 2020-01-29
 # .. toggle_target_removal_date: 2020-12-31
-# .. toggle_warnings: Also set settings.LEARNING_MICROFRONTEND_URL and
-#   ENABLE_COURSEWARE_MICROFRONTEND.
+# .. toggle_warnings: Also set settings.LEARNING_MICROFRONTEND_URL.
 # .. toggle_tickets: DEPR-109
 REDIRECT_TO_COURSEWARE_MICROFRONTEND = CourseWaffleFlag(
     WAFFLE_FLAG_NAMESPACE, 'courseware_mfe', __name__
@@ -32,8 +31,7 @@ REDIRECT_TO_COURSEWARE_MICROFRONTEND = CourseWaffleFlag(
 # .. toggle_use_cases: temporary, open_edx
 # .. toggle_creation_date: 2020-03-09
 # .. toggle_target_removal_date: 2020-12-31
-# .. toggle_warnings: Also set settings.LEARNING_MICROFRONTEND_URL and
-#   ENABLE_COURSEWARE_MICROFRONTEND.
+# .. toggle_warnings: Also set settings.LEARNING_MICROFRONTEND_URL.
 # .. toggle_tickets: DEPR-109
 COURSEWARE_MICROFRONTEND_COURSE_TEAM_PREVIEW = CourseWaffleFlag(
     WAFFLE_FLAG_NAMESPACE, 'microfrontend_course_team_preview', __name__
@@ -49,7 +47,7 @@ COURSEWARE_MICROFRONTEND_COURSE_TEAM_PREVIEW = CourseWaffleFlag(
 # .. toggle_use_cases: open_edx, temporary
 # .. toggle_creation_date: 2020-10-02
 # .. toggle_target_removal_date: None
-# .. toggle_warnings: Also set settings.LEARNING_MICROFRONTEND_URL and ENABLE_COURSEWARE_MICROFRONTEND.
+# .. toggle_warnings: Also set settings.LEARNING_MICROFRONTEND_URL.
 # .. toggle_tickets: AA-188
 COURSEWARE_MICROFRONTEND_COURSE_EXIT_PAGE = CourseWaffleFlag(
     WAFFLE_FLAG_NAMESPACE, 'microfrontend_course_exit_page', __name__
@@ -63,7 +61,7 @@ COURSEWARE_MICROFRONTEND_COURSE_EXIT_PAGE = CourseWaffleFlag(
 # .. toggle_use_cases: temporary, open_edx
 # .. toggle_creation_date: 2020-10-07
 # .. toggle_target_removal_date: none
-# .. toggle_warnings: Also set settings.LEARNING_MICROFRONTEND_URL and ENABLE_COURSEWARE_MICROFRONTEND.
+# .. toggle_warnings: Also set settings.LEARNING_MICROFRONTEND_URL.
 # .. toggle_tickets: AA-371
 COURSEWARE_MICROFRONTEND_PROGRESS_MILESTONES = CourseWaffleFlag(
     WAFFLE_FLAG_NAMESPACE, 'mfe_progress_milestones', __name__
@@ -78,7 +76,7 @@ COURSEWARE_MICROFRONTEND_PROGRESS_MILESTONES = CourseWaffleFlag(
 # .. toggle_use_cases: temporary, open_edx
 # .. toggle_creation_date: 2020-10-07
 # .. toggle_target_removal_date: None
-# .. toggle_warnings: Also set settings.LEARNING_MICROFRONTEND_URL and ENABLE_COURSEWARE_MICROFRONTEND and
+# .. toggle_warnings: Also set settings.LEARNING_MICROFRONTEND_URL and
 #   COURSEWARE_MICROFRONTEND_PROGRESS_MILESTONES.
 # .. toggle_tickets: AA-371
 COURSEWARE_MICROFRONTEND_PROGRESS_MILESTONES_FIRST_SECTION_CELEBRATION = CourseWaffleFlag(
@@ -94,7 +92,7 @@ COURSEWARE_MICROFRONTEND_PROGRESS_MILESTONES_FIRST_SECTION_CELEBRATION = CourseW
 # .. toggle_use_cases: temporary, open_edx
 # .. toggle_creation_date: 2021-02-16
 # .. toggle_target_removal_date: None
-# .. toggle_warnings: Also set settings.LEARNING_MICROFRONTEND_URL and ENABLE_COURSEWARE_MICROFRONTEND and
+# .. toggle_warnings: Also set settings.LEARNING_MICROFRONTEND_URL and
 #   COURSEWARE_MICROFRONTEND_PROGRESS_MILESTONES.
 # .. toggle_tickets: AA-304
 COURSEWARE_MICROFRONTEND_PROGRESS_MILESTONES_STREAK_CELEBRATION = CourseWaffleFlag(
