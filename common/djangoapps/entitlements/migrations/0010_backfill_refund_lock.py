@@ -1,6 +1,4 @@
-# -*- coding: utf-8 -*-  # lint-amnesty, pylint: disable=missing-module-docstring
-
-
+from datetime import datetime  # lint-amnesty, pylint: disable=unused-import
 
 from django.db import migrations, models  # lint-amnesty, pylint: disable=unused-import
 
