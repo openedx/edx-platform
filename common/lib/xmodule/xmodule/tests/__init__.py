@@ -191,29 +191,6 @@ class ModelsTest(unittest.TestCase):  # lint-amnesty, pylint: disable=missing-cl
         assert str(vc) == vc_str
 
 
-class LogicTest(unittest.TestCase):
-    """Base class for testing xmodule logic."""
-    descriptor_class = None
-    raw_field_data = {}
-
-    def setUp(self):
-        super(LogicTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
-        self.system = get_test_system()
-        self.descriptor = Mock(name="descriptor", url_name='', category='test')
-
-        self.xmodule_class = self.descriptor_class.module_class
-        usage_key = self.system.course_id.make_usage_key(self.descriptor.category, 'test_loc')
-        # ScopeIds has 4 fields: user_id, block_type, def_id, usage_id
-        scope_ids = ScopeIds(1, self.descriptor.category, usage_key, usage_key)
-        self.xmodule = self.xmodule_class(
-            self.descriptor, self.system, DictFieldData(self.raw_field_data), scope_ids
-        )
-
-    def ajax_request(self, dispatch, data):
-        """Call Xmodule.handle_ajax."""
-        return json.loads(self.xmodule.handle_ajax(dispatch, data))
-
-
 def map_references(value, field, actual_course_key):
     """
     Map the references in value to actual_course_key and return value
