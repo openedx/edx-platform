@@ -4,35 +4,139 @@ Helper functions for logic related to learning (courseare & course home) URLs.
 Centralizdd in openedx/features/course_experience instead of lms/djangoapps/courseware
 because the Studio course outline may need these utilities.
 """
+from datetime import datetime
+from typing import Optional, Tuple
+
 import six
 from django.conf import settings
+from django.contrib.auth import get_user_model
+from django.http import HttpRequest
 from django.urls import reverse
+from opaque_keys.edx.keys import CourseKey, UsageKey
 from six.moves.urllib.parse import urlencode
 
+from lms.djangoapps.courseware.toggles import courseware_mfe_is_active
+from openedx.core.djangoapps.content.learning_sequences.api import get_course_outline, get_user_course_outline
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.search import navigation_index, path_to_location
 
+User = get_user_model()
 
-def get_legacy_courseware_url(course_key, usage_key, request=None):
+
+def get_courseware_url(
+        usage_key: UsageKey,
+        request: Optional[HttpRequest] = None,
+) -> str:
     """
-    Return a str with the URL for the specified legacy (LMS-rendered) coursweare content.
+    Return the URL to the canonical learning experience for a given block.
 
-    Args:
-        course_id(str): Course Id string
-        usage_key(str): The location id of course component
+    We choose between either the Legacy frontend or Learning MFE depending on the
+    course that the block is in, the requesting user, and the state of
+    the 'courseware' waffle flags.
+
+    If you know that you want a Learning MFE URL, regardless of configuration,
+    then it is more performant to call `get_learning_mfe_courseware_url` directly.
 
     Raises:
-        ItemNotFoundError if no data at the location or NoPathToItem if location not in any class
-
-    Returns:
-        Redirect url string
+        * ItemNotFoundError if no data at the usage_key.
+        * NoPathToItem if location not in any class.
     """
+    course_key = usage_key.course_key.replace(version_guid=None, branch=None)
+    if courseware_mfe_is_active(course_key):
+        sequence_key, unit_key = _get_sequence_and_unit_keys(
+            usage_key=usage_key,
+            user=(request.user if request else None),
+            request=request,
+        )
+        return get_learning_mfe_courseware_url(
+            course_key=course_key,
+            sequence_key=sequence_key,
+            unit_key=unit_key,
+        )
+    else:
+        return get_legacy_courseware_url(
+            usage_key=usage_key,
+            request=request
+        )
 
+
+def _get_sequence_and_unit_keys(
+        usage_key: UsageKey,
+        user: Optional[User] = None,
+        request: Optional[HttpRequest] = None,
+) -> Tuple[Optional[UsageKey], Optional[UsageKey]]:
+    """
+    Find the sequence and unit of a block within a course run.
+
+    Currently requires a modulestore query.
+    Could probably be further optimized.
+
+    Raises:
+        * ItemNotFoundError if no data at the usage_key.
+        * NoPathToItem if location not in any class.
+
+    Returns: (sequence_key|None, unit_key|None)
+    """
+    path = path_to_location(modulestore(), usage_key, request, full_path=True)
+    if len(path) <= 1:
+        # Course-run-level block: no sequence or unit key.
+        return None, None
+    elif len(path) == 2:
+        # Section-level (ie chapter) block:
+        # no unit key, but try to find the first sequence within the section
+        # so that we can send the user there instead of the course run root.
+        section_key = path[1]
+        if user:
+            course_sections = get_user_course_outline(
+                course_key=usage_key.course_key,
+                user=user,
+                at_time=datetime.now(),
+            ).sections
+        else:
+            course_sections = get_course_outline(
+                course_key=usage_key.course_key
+            ).sections
+        try:
+            # Try to find a matching section,
+            # and grab the first subsection within it.
+            section_data = next(
+                section for section in course_sections
+                if section.usage_key == section_key
+            )
+            return next(section_data.sequences), None
+        except StopIteration:
+            # Either there were no matching sections,
+            # or the matching section is empty.
+            return None, None
+    elif len(path) == 3:
+        # Subsection-level block:
+        # We have a sequence key, but no unit key.
+        return path[2], None
+    else:
+        # Unit-level (or lower) block:
+        # We have both a sequence key and a unit key.
+        return path[2], path[3]
+
+
+def get_legacy_courseware_url(
+        usage_key: UsageKey,
+        request: Optional[HttpRequest] = None,
+) -> str:
+    """
+    Return the URL to Legacy (LMS-rendered) courseware content.
+
+    Raises:
+        * ItemNotFoundError if no data at the usage_key.
+        * NoPathToItem if location not in any class.
+    """
     (
-        course_key, chapter, section, vertical_unused,
-        position, final_target_id
+        course_key,
+        chapter,
+        section,
+        _unit_id,
+        position,
+        final_target_id,
     ) = path_to_location(modulestore(), usage_key, request)
-
     # choose the appropriate view (and provide the necessary args) based on the
     # args provided by the redirect.
     # Rely on index to do all error handling and access control.
@@ -57,9 +161,13 @@ def get_legacy_courseware_url(course_key, usage_key, request=None):
     return redirect_url
 
 
-def get_learning_mfe_courseware_url(course_key, sequence_key=None, unit_key=None):
+def get_learning_mfe_courseware_url(
+        course_key: CourseKey,
+        sequence_key: Optional[UsageKey] = None,
+        unit_key: Optional[UsageKey] = None,
+) -> str:
     """
-    Return a str with the URL for the specified coursweare content in the Learning MFE.
+    Return a str with the URL for the specified courseware content in the Learning MFE.
 
     The micro-frontend determines the user's position in the vertical via
     a separate API call, so all we need here is the course_key, section, and
@@ -92,7 +200,9 @@ def get_learning_mfe_courseware_url(course_key, sequence_key=None, unit_key=None
     return mfe_link
 
 
-def get_learning_mfe_home_url(course_key, view_name=None):
+def get_learning_mfe_home_url(
+        course_key: CourseKey, view_name: Optional[str] = None
+) -> str:
     """
     Given a course run key and view name, return the appropriate course home (MFE) URL.
 
@@ -111,7 +221,7 @@ def get_learning_mfe_home_url(course_key, view_name=None):
     return mfe_link
 
 
-def is_request_from_learning_mfe(request):
+def is_request_from_learning_mfe(request: HttpRequest):
     """
     Returns whether the given request was made by the frontend-app-learning MFE.
     """
