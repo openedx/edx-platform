@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 This config file runs the simplest dev environment using sqlite, and db-based
 sessions. Assumes structure:
@@ -47,8 +46,8 @@ from lms.envs.test import (  # pylint: disable=wrong-import-order
 
 # Include a non-ascii character in STUDIO_NAME and STUDIO_SHORT_NAME to uncover possible
 # UnicodeEncodeErrors in tests. Also use lazy text to reveal possible json dumps errors
-STUDIO_NAME = ugettext_lazy(u"Your Platform 𝓢𝓽𝓾𝓭𝓲𝓸")
-STUDIO_SHORT_NAME = ugettext_lazy(u"𝓢𝓽𝓾𝓭𝓲𝓸")
+STUDIO_NAME = ugettext_lazy("Your Platform 𝓢𝓽𝓾𝓭𝓲𝓸")
+STUDIO_SHORT_NAME = ugettext_lazy("𝓢𝓽𝓾𝓭𝓲𝓸")
 
 # Allow all hosts during tests, we use a lot of different ones all over the codebase.
 ALLOWED_HOSTS = [
@@ -103,7 +102,7 @@ update_module_store_settings(
         'fs_root': TEST_ROOT / "data",
     },
     doc_store_settings={
-        'db': 'test_xmodule_{}'.format(THIS_UUID),
+        'db': f'test_xmodule_{THIS_UUID}',
         'host': MONGO_HOST,
         'port': MONGO_PORT_NUM,
         'collection': 'test_modulestore',
@@ -114,7 +113,7 @@ CONTENTSTORE = {
     'ENGINE': 'xmodule.contentstore.mongo.MongoContentStore',
     'DOC_STORE_CONFIG': {
         'host': MONGO_HOST,
-        'db': 'test_xcontent_{}'.format(THIS_UUID),
+        'db': f'test_xcontent_{THIS_UUID}',
         'port': MONGO_PORT_NUM,
         'collection': 'dont_trip',
     },
@@ -135,7 +134,7 @@ DATABASES = {
 }
 
 LMS_BASE = "localhost:8000"
-LMS_ROOT_URL = "http://{}".format(LMS_BASE)
+LMS_ROOT_URL = f"http://{LMS_BASE}"
 FEATURES['PREVIEW_LMS_BASE'] = "preview.localhost"
 
 COURSE_AUTHORING_MICROFRONTEND_URL = "http://course-authoring-mfe"
