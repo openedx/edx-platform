@@ -451,7 +451,7 @@ class ProctoringProviderTestCase(unittest.TestCase):
 
         with pytest.raises(ValueError) as context_manager:
             self.proctoring_provider.from_json(provider)
-        assert context_manager.exception.args[0] ==\
+        assert context_manager.value.args[0] ==\
                [f'The selected proctoring provider, {provider},'
                 f' is not a valid provider. Please select from one of {allowed_proctoring_providers}.']
 

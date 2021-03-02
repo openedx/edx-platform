@@ -337,7 +337,7 @@ class GraderTest(unittest.TestCase):
     def test_grader_with_invalid_conf(self, invalid_conf, expected_error_message):
         with pytest.raises(ValueError) as error:
             graders.grader_from_conf([invalid_conf])
-        assert expected_error_message in text_type(error.exception)
+        assert expected_error_message in text_type(error.value)
 
 
 @ddt.ddt
