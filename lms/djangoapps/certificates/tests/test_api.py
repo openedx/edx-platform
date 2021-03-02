@@ -33,17 +33,22 @@ from common.djangoapps.util.testing import EventTestMixin
 from lms.djangoapps.certificates.api import (
     cert_generation_enabled,
     certificate_downloadable_status,
+    create_certificate_allowlist_entry,
+    create_certificate_invalidation_entry,
     example_certificates_status,
     generate_example_certificates,
     generate_user_certificates,
+    get_allowlist_entry,
     get_allowlisted_users,
     get_certificate_for_user,
     get_certificates_for_user,
     get_certificates_for_user_by_course_keys,
     get_certificate_footer_context,
     get_certificate_header_context,
+    get_certificate_invalidation_entry,
     get_certificate_url,
-    is_certificate_invalid,
+    is_certificate_invalidated,
+    is_on_allowlist,
     set_cert_generation_enabled
 )
 from lms.djangoapps.certificates.generation_handler import CERTIFICATES_USE_ALLOWLIST
@@ -260,7 +265,7 @@ class CertificateIsInvalid(WebCertificateTestMixin, ModuleStoreTestCase):
         )
         # Also check query count for 'is_certificate_invalid' method.
         with self.assertNumQueries(1):
-            assert not is_certificate_invalid(self.student, course.id)
+            assert not is_certificate_invalidated(self.student, course.id)
 
     @ddt.data(
         CertificateStatuses.generating,
@@ -276,7 +281,7 @@ class CertificateIsInvalid(WebCertificateTestMixin, ModuleStoreTestCase):
         True. """
         generated_cert = self._generate_cert(status)
         self._invalidate_certificate(generated_cert, True)
-        assert is_certificate_invalid(self.student, self.course.id)
+        assert is_certificate_invalidated(self.student, self.course.id)
 
     @ddt.data(
         CertificateStatuses.generating,
@@ -292,7 +297,7 @@ class CertificateIsInvalid(WebCertificateTestMixin, ModuleStoreTestCase):
         false than method will return false. """
         generated_cert = self._generate_cert(status)
         self._invalidate_certificate(generated_cert, False)
-        assert not is_certificate_invalid(self.student, self.course.id)
+        assert not is_certificate_invalidated(self.student, self.course.id)
 
     @ddt.data(
         CertificateStatuses.generating,
@@ -315,7 +320,7 @@ class CertificateIsInvalid(WebCertificateTestMixin, ModuleStoreTestCase):
         )
         # Also check query count for 'is_certificate_invalid' method.
         with self.assertNumQueries(2):
-            assert is_certificate_invalid(self.student, self.course.id)
+            assert is_certificate_invalidated(self.student, self.course.id)
 
     def _invalidate_certificate(self, certificate, active):
         """ Dry method to mark certificate as invalid. """
@@ -876,3 +881,113 @@ class AllowlistTests(ModuleStoreTestCase):
 
         users = get_allowlisted_users(self.third_course_run_key)
         assert 0 == users.count()
+
+
+class InstructorDashboardFunctionalityTests(ModuleStoreTestCase):
+    """
+    Tests for some functionality that the Instructor Dashboard django app relies on.
+    """
+
+    def setUp(self):
+        super().setUp()
+
+        self.global_staff = GlobalStaffFactory()
+        self.user = UserFactory()
+        self.course_run = CourseFactory()
+        self.course_run_key = self.course_run.id  # pylint: disable=no-member
+
+        CourseEnrollmentFactory(
+            user=self.user,
+            course_id=self.course_run_key,
+            is_active=True,
+            mode="verified",
+        )
+
+    def test_create_certificate_invalidation_entry(self):
+        """
+        Test to verify that we can use the functionality defined in the Certificates api.py to create certificate
+        invalidation entries. This is functionality the Instructor Dashboard django app relies on.
+        """
+        certificate = GeneratedCertificateFactory.create(
+            user=self.user,
+            course_id=self.course_run_key,
+            status=CertificateStatuses.unavailable,
+            mode='verified'
+        )
+
+        result = create_certificate_invalidation_entry(certificate, self.global_staff, "Test!")
+
+        assert result.generated_certificate == certificate
+        assert result.active is True
+        assert result.notes == "Test!"
+
+    def test_create_certificate_allowlist_entry(self):
+        """
+        Test to verify that we can use the functionality defined in the Certificates api.py to create allowlist
+        entries. This is functionality the Instructor Dashboard django app relies on.
+        """
+        result = create_certificate_allowlist_entry(self.user, self.course_run_key, "Testing!")
+
+        assert result.course_id == self.course_run_key
+        assert result.user == self.user
+        assert result.notes == "Testing!"
+
+    def test_get_allowlist_entry(self):
+        """
+        Test to verify that we can retrieve an allowlist entry for a learner.
+        """
+        allowlist_entry = CertificateWhitelistFactory.create(course_id=self.course_run_key, user=self.user)
+
+        retrieved_entry = get_allowlist_entry(self.user, self.course_run_key)
+
+        assert retrieved_entry.id == allowlist_entry.id
+        assert retrieved_entry.course_id == allowlist_entry.course_id
+        assert retrieved_entry.user == allowlist_entry.user
+
+    def test_get_certificate_invalidation_entry(self):
+        """
+        Test to verify that we can retrieve a certificate invalidation entry for a learner.
+        """
+        certificate = GeneratedCertificateFactory.create(
+            user=self.user,
+            course_id=self.course_run_key,
+            status=CertificateStatuses.unavailable,
+            mode='verified'
+        )
+
+        invalidation = CertificateInvalidationFactory.create(
+            generated_certificate=certificate,
+            invalidated_by=self.global_staff,
+            active=True
+        )
+
+        retrieved_invalidation = get_certificate_invalidation_entry(certificate)
+
+        assert retrieved_invalidation.id == invalidation.id
+        assert retrieved_invalidation.generated_certificate == certificate
+        assert retrieved_invalidation.active == invalidation.active
+
+    def test_is_on_allowlist(self):
+        """
+        Test to verify that we return True when an allowlist entry exists.
+        """
+        CertificateWhitelistFactory.create(course_id=self.course_run_key, user=self.user)
+
+        result = is_on_allowlist(self.user, self.course_run_key)
+        assert result
+
+    def test_is_on_allowlist_expect_false(self):
+        """
+        Test to verify that we will not return False when no allowlist entry exists.
+        """
+        result = is_on_allowlist(self.user, self.course_run_key)
+        assert not result
+
+    def test_is_on_allowlist_entry_disabled(self):
+        """
+        Test to verify that we will return False when the allowlist entry if it is disabled.
+        """
+        CertificateWhitelistFactory.create(course_id=self.course_run_key, user=self.user, whitelist=False)
+
+        result = is_on_allowlist(self.user, self.course_run_key)
+        assert not result
