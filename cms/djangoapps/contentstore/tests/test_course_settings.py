@@ -1174,7 +1174,7 @@ class CourseMetadataEditingTest(CourseTestCase):
         self.assertEqual(len(errors), 3)
         self.assertFalse(test_model)
 
-        error_keys = {error_obj['model']['display_name'] for error_obj in errors}  # lint-amnesty, pylint: disable=consider-using-set-comprehension
+        error_keys = {error_obj['model']['display_name'] for error_obj in errors}
         test_keys = {'Advanced Module List', 'Course Advertised Start Date', 'Days Early for Beta Users'}
         self.assertEqual(error_keys, test_keys)
 

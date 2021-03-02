@@ -284,8 +284,8 @@ class CourseTestCase(ProceduralCourseTestMixin, ModuleStoreTestCase):
         course2_items = self.store.get_items(course2_id)
         self.assertGreater(len(course1_items), 0)  # ensure it found content instead of [] == []
         if len(course1_items) != len(course2_items):
-            course1_block_ids = {item.location.block_id for item in course1_items}  # lint-amnesty, pylint: disable=consider-using-set-comprehension
-            course2_block_ids = {item.location.block_id for item in course2_items}  # lint-amnesty, pylint: disable=consider-using-set-comprehension
+            course1_block_ids = {item.location.block_id for item in course1_items}
+            course2_block_ids = {item.location.block_id for item in course2_items}
             raise AssertionError(
                 "Course1 extra blocks: {}; course2 extra blocks: {}".format(
                     course1_block_ids - course2_block_ids, course2_block_ids - course1_block_ids

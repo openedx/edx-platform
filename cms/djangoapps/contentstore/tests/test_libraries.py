@@ -530,7 +530,7 @@ class TestLibraryAccess(LibraryTestCase):
 
         `library` can be a LibraryLocator or the library's root XBlock
         """
-        if isinstance(library, ((str,), LibraryLocator)):
+        if isinstance(library, (str, LibraryLocator)):
             lib_key = library
         else:
             lib_key = library.location.library_key
