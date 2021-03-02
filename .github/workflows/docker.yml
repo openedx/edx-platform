@@ -25,7 +25,7 @@ jobs:
           docker-compose run lms /openedx/edx-platform/.github/test/tests.sh lms/djangoapps/instructor/tests/ && docker-compose down -v
 
       - name: Push to koa
-        #if: github.ref == 'refs/heads/eol/koa.master'
+        if: github.ref == 'refs/heads/eol/koa.master'
         run: |
           echo "${DOCKERHUB_PASSWORD}" | docker login --username ${DOCKERHUB_USER} --password-stdin
           docker push eoluchile/edx-platform:${GITHUB_SHA}
