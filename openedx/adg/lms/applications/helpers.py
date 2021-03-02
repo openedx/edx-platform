@@ -11,12 +11,9 @@ from django.utils.translation import ugettext as _
 
 from openedx.adg.common.lib.mandrill_client.client import MandrillClient
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
-from openedx.core.djangoapps.user_api.models import UserPreference
-from xmodule.modulestore.django import modulestore
 
 from .constants import (
     COVER_LETTER_ONLY,
-    DEFAULT_LANG_FOR_COURSES,
     HTML_FOR_EMBEDDED_FILE_VIEW,
     LOGO_IMAGE_MAX_SIZE,
     MAXIMUM_YEAR_OPTION,
@@ -273,30 +270,13 @@ def get_prerequisite_courses_for_user(user):
 
     prerequisite_courses_for_user = []
     for course_group in prerequisite_course_groups:
-        prerequisite_courses_for_user.append(
-            course_group.get_user_enrolled_course(user) or get_preferred_lang_course(user, course_group)
-        )
+        enrolled_course = course_group.get_user_enrolled_course(user)
+
+        if enrolled_course:
+            prerequisite_courses_for_user.append(enrolled_course)
+        else:
+            preferred_lang_course = course_group.get_preferred_lang_course()
+
+            if preferred_lang_course:
+                prerequisite_courses_for_user.append(preferred_lang_course)
     return prerequisite_courses_for_user
-
-
-def get_preferred_lang_course(user, course_group):
-    """
-    Return course with preferred language. If course with preferred lang
-    is not found then return the first course from the group.
-
-    Args:
-        user (User): user object
-        course_group (MultilingualCourseGroup): course group from which preferred course will be extracted
-
-    Returns:
-        MultilingualCourse: User preferred lang course.
-    """
-    store = modulestore()
-    user_preferred_lang = UserPreference.get_value(user, 'pref-lang', default=DEFAULT_LANG_FOR_COURSES)
-
-    for multilingual_course in course_group.multilingual_courses.all():
-        course_info = store.get_course(multilingual_course.course.id)
-        if course_info.language == user_preferred_lang:
-            return multilingual_course.course
-
-    return course_group.multilingual_courses.first().course

@@ -6,6 +6,7 @@ from datetime import date
 from django.contrib.auth.models import Group, User
 from django.core.validators import FileExtensionValidator
 from django.db import models
+from django.utils.translation import get_language
 from django.utils.translation import ugettext_lazy as _
 from model_utils.models import TimeStampedModel
 
@@ -324,12 +325,15 @@ class MultilingualCourseGroup(models.Model):
     def multilingual_course_count(self):
         return self.multilingual_courses.count()
 
-    # pylint: disable=no-member
     def open_multilingual_courses_count(self):
-        return self.multilingual_courses(manager='open_multilingual_courses').count()
+        return self.open_multilingual_courses.count()
 
     def open_multilingual_course_keys(self):
-        return self.multilingual_courses(manager='open_multilingual_courses').values_list('course', flat=True)
+        return self.open_multilingual_courses.values_list('course', flat=True)
+
+    @property
+    def open_multilingual_courses(self):
+        return self.multilingual_courses(manager='open_multilingual_courses').all()  # pylint: disable=no-member
 
     def get_user_enrolled_course(self, user):
         """
@@ -341,14 +345,30 @@ class MultilingualCourseGroup(models.Model):
         Returns:
             CourseOverview: Enrolled multilingual course or None
         """
-        enrolled_multilingual_course = self.multilingual_courses(
-            manager='open_multilingual_courses'
-        ).filter(
+        enrolled_multilingual_course = self.open_multilingual_courses.filter(
             course__courseenrollment__user=user,
             course__courseenrollment__is_active=True
         ).first()
         return enrolled_multilingual_course.course if enrolled_multilingual_course else None
-    # pylint: enable=no-member
+
+    def get_preferred_lang_course(self):
+        """
+        Return course with preferred language.
+
+        If course with preferred lang is not found then return the first course from the group.
+        If there are no open courses then return None.
+
+        Returns:
+            MultilingualCourse: User preferred lang course.
+        """
+        user_preferred_lang = get_language()
+        open_multilingual_courses = self.open_multilingual_courses
+
+        for multilingual_course in open_multilingual_courses:
+            if multilingual_course.course.language == user_preferred_lang:
+                return multilingual_course.course
+
+        return open_multilingual_courses[0].course if open_multilingual_courses else None
 
     def does_course_exist(self, multilingual_course):
         return self.multilingual_courses.filter(course=multilingual_course.course).exists()

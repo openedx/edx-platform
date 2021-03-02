@@ -309,24 +309,26 @@ def test_get_extra_context_for_application_review_page(mock_get_application_revi
 
 
 @pytest.mark.django_db
-@mock.patch('openedx.adg.lms.applications.helpers.modulestore')
-def test_get_prerequisites_for_user(mock_module_store):
+def test_get_prerequisites_for_user():
     """
     Test to get prerequisites for user
     """
-    mock_module_store.get_course.return_value = mock.Mock()
-    MultilingualCourseFactory()
+    current_time = datetime.now()
+    course = CourseOverviewFactory(
+        language='en',
+        start_date=current_time - timedelta(days=1),
+        end_date=current_time + timedelta(days=1)
+    )
+    MultilingualCourseFactory(course=course)
     user = UserFactory()
     assert len(get_prerequisite_courses_for_user(user)) == 1
 
 
 @pytest.mark.django_db
-@mock.patch('openedx.adg.lms.applications.helpers.modulestore')
-def test_no_prerequisite_courses(mock_module_store):
+def test_no_prerequisite_courses():
     """
     Test no prerequisites courses for user
     """
-    mock_module_store.get_course.return_value = mock.Mock()
     MultilingualCourseGroupFactory()
     user = UserFactory()
     assert len(get_prerequisite_courses_for_user(user)) == 0

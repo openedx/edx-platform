@@ -255,3 +255,33 @@ def test_course_does_not_exist_in_course_group():
     multilingual_course = MultilingualCourseFactory()
     course_group = MultilingualCourseGroupFactory()
     assert not course_group.does_course_exist(multilingual_course)
+
+
+@pytest.mark.django_db
+def test_get_preferred_lang_course():
+    """
+    Tests get_preferred_language_course course is active.
+    """
+    current_time = datetime.now()
+    course = CourseOverviewFactory(
+        language='en',
+        start_date=current_time - timedelta(days=1),
+        end_date=current_time + timedelta(days=1)
+    )
+    multilingual_course_group = MultilingualCourseFactory(course=course).multilingual_course_group
+    assert multilingual_course_group.get_preferred_lang_course().id == course.id
+
+
+@pytest.mark.django_db
+def test_get_preferred_lang_course_expired_courses():
+    """
+    Tests get_preferred_language_course course is expired.
+    """
+    current_time = datetime.now()
+    course = CourseOverviewFactory(
+        language='en',
+        start_date=current_time - timedelta(days=2),
+        end_date=current_time - timedelta(days=1)
+    )
+    multilingual_course_group = MultilingualCourseFactory(course=course).multilingual_course_group
+    assert multilingual_course_group.get_preferred_lang_course() is None
