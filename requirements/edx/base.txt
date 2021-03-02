@@ -20,7 +20,7 @@
 -e common/lib/xmodule  # via -r requirements/edx/local.in
 amqp==2.6.1               # via kombu
 analytics-python==1.2.9   # via -r requirements/edx/base.in
-aniso8601==9.0.0          # via edx-tincan-py35, tincan
+aniso8601==9.0.1          # via edx-tincan-py35, tincan
 appdirs==1.4.4            # via fs
 attrs==20.3.0             # via -r requirements/edx/base.in, edx-ace
 babel==2.9.0              # via -r requirements/edx/base.in, enmerkar, enmerkar-underscore
