@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 Common Utilities for the verify_student application.
 """
@@ -8,8 +7,6 @@ import logging
 
 from django.conf import settings
 from django.utils.timezone import now
-
-from six import text_type
 
 from lms.djangoapps.verify_student.tasks import send_request_to_ss_for_user
 
@@ -29,7 +26,7 @@ def submit_request_to_ss(user_verification, copy_id_photo_from):
         )
     except Exception as error:  # pylint: disable=broad-except
         log.error(
-            "Software Secure submit request %r failed, result: %s", user_verification.user.username, text_type(error)
+            "Software Secure submit request %r failed, result: %s", user_verification.user.username, str(error)
         )
         user_verification.mark_must_retry()
 
