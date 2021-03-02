@@ -137,7 +137,8 @@ def login_and_registration_form(request, initial_mode="login"):
             'third_party_auth_hint': third_party_auth_hint or '',
             'platform_name': configuration_helpers.get_value('PLATFORM_NAME', settings.PLATFORM_NAME),
             'support_link': configuration_helpers.get_value('SUPPORT_SITE_LINK', settings.SUPPORT_SITE_LINK),
-
+            'password_reset_support_link':
+                configuration_helpers.get_value('PASSWORD_RESET_SUPPORT_LINK', settings.SUPPORT_SITE_LINK),
             # Include form descriptions retrieved from the user API.
             # We could have the JS client make these requests directly,
             # but we include them in the initial page load to avoid
