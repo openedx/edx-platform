@@ -56,7 +56,7 @@ class ExportAllCourses(ModuleStoreTestCase):
         # check that there are two assets ['example.txt', '.example.txt'] in contentstore for imported course
         all_assets, count = self.content_store.get_all_content_for_course(course.id)
         self.assertEqual(count, 2)
-        self.assertEqual({asset['_id']['name'] for asset in all_assets}, {'.example.txt', 'example.txt'})  # lint-amnesty, pylint: disable=consider-using-set-comprehension
+        self.assertEqual({asset['_id']['name'] for asset in all_assets}, {'.example.txt', 'example.txt'})
 
         # manually add redundant assets (file ".DS_Store" and filename starts with "._")
         course_filter = course.id.make_asset_key("asset", None)
@@ -72,11 +72,11 @@ class ExportAllCourses(ModuleStoreTestCase):
         all_assets, count = self.content_store.get_all_content_for_course(course.id)
         self.assertEqual(count, 4)
         self.assertEqual(
-            {asset['_id']['name'] for asset in all_assets},  # lint-amnesty, pylint: disable=consider-using-set-comprehension
+            {asset['_id']['name'] for asset in all_assets},
             {'.example.txt', 'example.txt', '._example_test.txt', '.DS_Store'}
         )
         # now call asset_cleanup command and check that there is only two proper assets in contentstore for the course
         call_command('cleanup_assets')
         all_assets, count = self.content_store.get_all_content_for_course(course.id)
         self.assertEqual(count, 2)
-        self.assertEqual({asset['_id']['name'] for asset in all_assets}, {'.example.txt', 'example.txt'})  # lint-amnesty, pylint: disable=consider-using-set-comprehension
+        self.assertEqual({asset['_id']['name'] for asset in all_assets}, {'.example.txt', 'example.txt'})
