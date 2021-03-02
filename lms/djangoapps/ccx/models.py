@@ -39,7 +39,7 @@ class CustomCourseForEdX(models.Model):
 
     @lazy
     def course(self):
-        """Return the CourseDescriptor of the course related to this CCX"""
+        """Return the CourseBlock of the course related to this CCX"""
         store = modulestore()
         with store.bulk_operations(self.course_id):
             course = store.get_course(self.course_id)

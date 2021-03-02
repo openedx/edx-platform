@@ -13,6 +13,7 @@ from uuid import uuid4
 import six
 from django.utils.functional import cached_property
 from lxml import etree
+from pkg_resources import resource_string
 from six import text_type
 from web_fragments.fragment import Fragment
 from webob import Response
@@ -21,12 +22,13 @@ from xblock.fields import Integer, ReferenceValueDict, Scope, String
 from xmodule.mako_module import MakoTemplateBlockBase
 from xmodule.modulestore.inheritance import UserPartitionList
 from xmodule.progress import Progress
-from xmodule.seq_module import ProctoringFields, SequenceDescriptor, SequenceMixin
+from xmodule.seq_module import ProctoringFields, SequenceMixin
 from xmodule.studio_editable import StudioEditableBlock
 from xmodule.util.xmodule_django import add_webpack_to_fragment
 from xmodule.validation import StudioValidation, StudioValidationMessage
 from xmodule.xml_module import XmlMixin
 from xmodule.x_module import (
+    HTMLSnippet,
     ResourceTemplates,
     shim_xmodule_js,
     STUDENT_VIEW,
@@ -133,6 +135,7 @@ class SplitTestBlock(
     XmlMixin,
     XModuleDescriptorToXBlockMixin,
     XModuleToXBlockMixin,
+    HTMLSnippet,
     ResourceTemplates,
     XModuleMixin,
     StudioEditableBlock,
@@ -158,7 +161,23 @@ class SplitTestBlock(
 
     show_in_read_only_mode = True
 
+    preview_view_js = {
+        'js': [],
+        'xmodule_js': resource_string(__name__, 'js/src/xmodule.js'),
+    }
+    preview_view_css = {
+        'scss': [],
+    }
+
     mako_template = "widgets/metadata-only-edit.html"
+    studio_js_module_name = 'SequenceDescriptor'
+    studio_view_js = {
+        'js': [resource_string(__name__, 'js/src/sequence/edit.js')],
+        'xmodule_js': resource_string(__name__, 'js/src/xmodule.js'),
+    }
+    studio_view_css = {
+        'scss': [],
+    }
 
     @cached_property
     def child_descriptor(self):
@@ -352,10 +371,8 @@ class SplitTestBlock(
         fragment = Fragment(
             self.system.render_template(self.mako_template, self.get_context())
         )
-        # Use the SequenceDescriptor js for the metadata edit view.
-        # Both the webpack bundle to include and the js class are named "SequenceDescriptor".
-        add_webpack_to_fragment(fragment, SequenceDescriptor.js_module_name)
-        shim_xmodule_js(fragment, SequenceDescriptor.js_module_name)
+        add_webpack_to_fragment(fragment, 'SplitTestBlockStudio')
+        shim_xmodule_js(fragment, self.studio_js_module_name)
         return fragment
 
     def student_view(self, context):

@@ -26,7 +26,7 @@ def is_survey_required_for_course(course_descriptor):
     Returns whether a Survey is required for this course
     """
 
-    # Check to see that the survey is required in the CourseDescriptor.
+    # Check to see that the survey is required in the CourseBlock.
     if not getattr(course_descriptor, 'course_survey_required', False):
         return SurveyRequiredAccessError()
 

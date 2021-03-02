@@ -127,7 +127,7 @@ class FieldOverrideProvider(six.with_metaclass(ABCMeta, object)):
         Concrete implementations are responsible for implementing this method.
 
         Arguments:
-          course (CourseModule or None)
+          course (CourseBlock or None)
 
         Returns:
           bool

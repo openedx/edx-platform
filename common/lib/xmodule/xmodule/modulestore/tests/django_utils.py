@@ -551,7 +551,7 @@ class ModuleStoreTestCase(
         """
         Updates the version of course in the modulestore
 
-        'course' is an instance of CourseDescriptor for which we want
+        'course' is an instance of CourseBlock for which we want
         to update metadata.
         """
         with self.store.branch_setting(ModuleStoreEnum.Branch.draft_preferred, course.id):

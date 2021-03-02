@@ -92,7 +92,7 @@ def config_course_discussions(
     Set discussions and configure divided discussions for a course.
 
     Arguments:
-        course: CourseDescriptor
+        course: CourseBlock
         discussion_topics (Dict): Discussion topic names. Picks ids and
             sort_keys automatically.
         divided_discussions: Discussion topics to divide. Converts the

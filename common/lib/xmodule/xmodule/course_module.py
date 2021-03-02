@@ -27,7 +27,7 @@ from openedx.core.lib.teams_config import TeamsConfig, DEFAULT_COURSE_RUN_MAX_TE
 from xmodule import course_metadata_utils
 from xmodule.course_metadata_utils import DEFAULT_GRADING_POLICY, DEFAULT_START_DATE
 from xmodule.graders import grader_from_conf
-from xmodule.seq_module import SequenceDescriptor, SequenceModule
+from xmodule.seq_module import SequenceBlock
 from xmodule.tabs import CourseTabList, InvalidTabsException
 
 from .fields import Date
@@ -1031,27 +1031,18 @@ class CourseFields(object):  # lint-amnesty, pylint: disable=missing-class-docst
     )
 
 
-class CourseModule(CourseFields, SequenceModule):  # pylint: disable=abstract-method
+class CourseBlock(
+    CourseFields,
+    SequenceBlock,
+    LicenseMixin,
+):  # pylint: disable=abstract-method
     """
-    The CourseDescriptor needs its module_class to be a SequenceModule, but some code that
-    expects a CourseDescriptor to have all its fields can fail if it gets a SequenceModule instead.
-    This class is to make sure that all the fields are present in all cases.
+    The Course XBlock.
     """
-
-
-class CourseDescriptor(CourseFields, SequenceDescriptor, LicenseMixin):
-    """
-    The descriptor for the course XModule
-    """
-    module_class = CourseModule
-
     resources_dir = None
 
     def __init__(self, *args, **kwargs):
-        """
-        Expects the same arguments as XModuleDescriptor.__init__
-        """
-        super(CourseDescriptor, self).__init__(*args, **kwargs)  # lint-amnesty, pylint: disable=super-with-arguments
+        super().__init__(*args, **kwargs)
         _ = self.runtime.service(self, "i18n").ugettext
 
         self._gating_prerequisites = None
@@ -1143,7 +1134,7 @@ class CourseDescriptor(CourseFields, SequenceDescriptor, LicenseMixin):
 
     @classmethod
     def from_xml(cls, xml_data, system, id_generator):
-        instance = super(CourseDescriptor, cls).from_xml(xml_data, system, id_generator)
+        instance = super().from_xml(xml_data, system, id_generator)
 
         # bleh, have to parse the XML here to just pull out the url_name attribute
         # I don't think it's stored anywhere in the instance.
@@ -1187,7 +1178,7 @@ class CourseDescriptor(CourseFields, SequenceDescriptor, LicenseMixin):
             wiki_slug = wiki_tag.attrib.get("slug", default=None)
             xml_object.remove(wiki_tag)
 
-        definition, children = super(CourseDescriptor, cls).definition_from_xml(xml_object, system)
+        definition, children = super().definition_from_xml(xml_object, system)
         definition['textbooks'] = textbooks
         definition['wiki_slug'] = wiki_slug
 
@@ -1197,7 +1188,7 @@ class CourseDescriptor(CourseFields, SequenceDescriptor, LicenseMixin):
         return definition, children
 
     def definition_to_xml(self, resource_fs):
-        xml_object = super(CourseDescriptor, self).definition_to_xml(resource_fs)  # lint-amnesty, pylint: disable=super-with-arguments
+        xml_object = super().definition_to_xml(resource_fs)
 
         if self.textbooks:
             textbook_xml_object = etree.Element('textbook')

@@ -21,7 +21,7 @@ class Command(BaseCommand):
     A management command that provides an interactive way to remove erroneous cert_name_long and
     cert_name_short course attributes across both the Split and Mongo modulestores.
     """
-    help = 'Allows manual clean-up of invalid cert_name_short and cert_name_long entries on CourseModules'
+    help = 'Allows manual clean-up of invalid cert_name_short and cert_name_long entries on CourseBlocks'
 
     def _mongo_results(self):
         """

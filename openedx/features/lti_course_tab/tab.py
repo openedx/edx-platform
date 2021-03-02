@@ -18,7 +18,7 @@ from lms.djangoapps.courseware.tabs import EnrolledTab
 from openedx.core.djangoapps.discussions.models import DiscussionsConfiguration
 from openedx.core.djangolib.markup import HTML
 from common.djangoapps.student.models import anonymous_id_for_user
-from xmodule.course_module import CourseDescriptor
+from xmodule.course_module import CourseBlock
 from xmodule.tabs import TabFragmentViewMixin, key_checker
 
 
@@ -34,7 +34,7 @@ class LtiCourseLaunchMixin:
     }
     DEFAULT_ROLE = 'Student'
 
-    def _get_additional_lti_parameters(self, course: CourseDescriptor, request: HttpRequest) -> Dict[str, str]:
+    def _get_additional_lti_parameters(self, course: CourseBlock, request: HttpRequest) -> Dict[str, str]:
         lti_config = self._get_lti_config(course)
         additional_config = lti_config.lti_config.get('additional_parameters', {})
         return additional_config
@@ -70,20 +70,20 @@ class LtiCourseLaunchMixin:
         )
 
     @staticmethod
-    def _get_context_title(course: CourseDescriptor) -> str:
+    def _get_context_title(course: CourseBlock) -> str:
         return "{} - {}".format(
             course.display_name_with_default,
             course.display_org_with_default,
         )
 
-    def _get_lti_config(self, course: CourseDescriptor) -> LtiConfiguration:
+    def _get_lti_config(self, course: CourseBlock) -> LtiConfiguration:
         raise NotImplementedError
 
-    def _get_lti_embed_code(self, course: CourseDescriptor, request: HttpRequest) -> str:
+    def _get_lti_embed_code(self, course: CourseBlock, request: HttpRequest) -> str:
         """
         Returns the LTI embed code for embedding in the current course context.
         Args:
-            course (CourseDescriptor): CourseDescriptor object.
+            course (CourseBlock): CourseBlock object.
             request (HttpRequest): Request object for view in which LTI will be embedded.
         Returns:
             HTML code to embed LTI in course page.
@@ -115,12 +115,12 @@ class LtiCourseLaunchMixin:
         )
 
     # pylint: disable=unused-argument
-    def render_to_fragment(self, request: HttpRequest, course: CourseDescriptor, **kwargs) -> Fragment:
+    def render_to_fragment(self, request: HttpRequest, course: CourseBlock, **kwargs) -> Fragment:
         """
         Returns a fragment view for the LTI launch.
         Args:
             request (HttpRequest): request object
-            course (CourseDescriptor): A course object
+            course (CourseBlock): A course object
         Returns:
             A Fragment that embeds LTI in a course page.
         """
@@ -159,7 +159,7 @@ class LtiCourseTab(LtiCourseLaunchMixin, EnrolledTab):
     is_default = False
     allow_multiple = True
 
-    def _get_lti_config(self, course: CourseDescriptor) -> LtiConfiguration:
+    def _get_lti_config(self, course: CourseBlock) -> LtiConfiguration:
         return LtiConfiguration.objects.get(config_id=self.lti_config_id)
 
     def __init__(self, tab_dict=None, name=None, lti_config_id=None):
@@ -231,7 +231,7 @@ class DiscussionLtiCourseTab(LtiCourseLaunchMixin, TabFragmentViewMixin, Enrolle
     is_dynamic = True
     title = ugettext_lazy("Discussion")
 
-    def _get_lti_config(self, course: CourseDescriptor) -> LtiConfiguration:
+    def _get_lti_config(self, course: CourseBlock) -> LtiConfiguration:
         config = DiscussionsConfiguration.get(course.id)
         return config.lti_configuration
 

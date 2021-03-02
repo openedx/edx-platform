@@ -24,7 +24,7 @@ from xblock.fields import Reference, ReferenceList, ReferenceValueDict
 
 from openedx.core.lib import tempdir
 from openedx.core.lib.tests import attr
-from xmodule.course_module import CourseDescriptor
+from xmodule.course_module import CourseBlock
 from xmodule.fields import Date, Timedelta
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.edit_info import EditInfoMixin
@@ -1083,8 +1083,8 @@ class SplitModuleItemTests(SplitModuleTest):
         # positive tests of various forms
         locator = course.location.map_into_course(CourseLocator(version_guid=previous_version))
         block = modulestore().get_item(locator)
-        assert isinstance(block, CourseDescriptor)
-        assert isinstance(modulestore().get_item(locator), CourseDescriptor)
+        assert isinstance(block, CourseBlock)
+        assert isinstance(modulestore().get_item(locator), CourseBlock)
 
         def verify_greek_hero(block):
             """
@@ -1125,7 +1125,7 @@ class SplitModuleItemTests(SplitModuleTest):
         locator = BlockUsageLocator(
             CourseLocator(org='testx', course='wonderful', run="run", branch=BRANCH_NAME_PUBLISHED), 'course', 'head23456'  # lint-amnesty, pylint: disable=line-too-long
         )
-        assert isinstance(modulestore().get_item(locator), CourseDescriptor)
+        assert isinstance(modulestore().get_item(locator), CourseBlock)
 
         # negative tests--not found
         # no such course or block
@@ -1772,7 +1772,7 @@ class TestCourseCreation(SplitModuleTest):
 
         assert structure_info['edited_by'] == 'create_user'
         # check the returned course object
-        assert isinstance(new_course, CourseDescriptor)
+        assert isinstance(new_course, CourseBlock)
         assert new_course.category == 'course'
         assert not new_course.show_calculator
         assert new_course.allow_anonymous
@@ -1956,7 +1956,7 @@ class TestInheritance(SplitModuleTest):
         The actual test
         """
         # Note, not testing value where defined (course) b/c there's no
-        # defined accessor for it on CourseDescriptor.
+        # defined accessor for it on CourseBlock.
         locator = BlockUsageLocator(
             CourseLocator(org='testx', course='GreekHero', run="run", branch=BRANCH_NAME_DRAFT), 'problem', 'problem3_2'
         )

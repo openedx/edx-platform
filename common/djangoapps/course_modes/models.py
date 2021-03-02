@@ -364,7 +364,7 @@ class CourseMode(models.Model):
             raise ValueError("One of course_id or course must not be None.")
 
         if course is not None and not isinstance(course, CourseOverview):
-            # CourseModules don't have the data needed to pull related modes,
+            # CourseBlocks don't have the data needed to pull related modes,
             # so we'll fall back on course_id-based lookup instead
             course_id = course.id
             course = None

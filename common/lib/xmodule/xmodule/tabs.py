@@ -106,7 +106,7 @@ class CourseTab(six.with_metaclass(ABCMeta, object)):
         """Returns true if this course tab is enabled in the course.
 
         Args:
-            course (CourseDescriptor): the course using the feature
+            course (CourseBlock): the course using the feature
             user (User): an optional user interacting with the course (defaults to None)
         """
         raise NotImplementedError()
@@ -369,7 +369,7 @@ class StaticTab(CourseTab):
 class CourseTabList(List):
     """
     An XBlock field class that encapsulates a collection of Tabs in a course.
-    It is automatically created and can be retrieved through a CourseDescriptor object: course.tabs
+    It is automatically created and can be retrieved through a CourseBlock object: course.tabs
     """
 
     # TODO: Ideally, we'd like for this list of tabs to be dynamically

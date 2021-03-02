@@ -23,7 +23,7 @@ class EdxNotesTab(EnrolledTab):
         """Returns true if the edX Notes feature is enabled in the course.
 
         Args:
-            course (CourseDescriptor): the course using the feature
+            course (CourseBlock): the course using the feature
             user (User): the user interacting with the course
         """
         if not super().is_enabled(course, user=user):
