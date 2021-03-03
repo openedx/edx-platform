@@ -2,12 +2,20 @@
 Unit test for student helpers
 """
 
+from datetime import datetime, timedelta
+
 import pytest
 from django.conf import settings
 from django.test.client import RequestFactory
 from mock import patch
 
-from common.djangoapps.student.tests.factories import UserFactory, UserProfileFactory
+from common.djangoapps.student.tests.factories import (
+    AnonymousUserFactory,
+    CourseEnrollmentFactory,
+    UserFactory,
+    UserProfileFactory
+)
+from openedx.adg.lms.applications.tests.factories import MultilingualCourseFactory, MultilingualCourseGroupFactory
 from openedx.adg.lms.student import helpers as student_helpers
 from openedx.core.djangoapps.content.course_overviews.tests.factories import CourseOverviewFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
@@ -209,3 +217,108 @@ class MandrillCourseEnrollmentEmails(ModuleStoreTestCase):
         mock_mandrill_client().send_mandrill_email.assert_called_once_with(
             mock_mandrill_client.COURSE_ENROLLMENT_INVITATION, self.user.email, expected_context
         )
+
+
+@pytest.fixture(name='current_time')
+def current_datetime():
+    return datetime.now()
+
+
+@pytest.fixture(name='courses')
+def course_overviews(current_time):
+    """
+    Fixture which return multiple courses
+    """
+    course1 = CourseOverviewFactory(
+        language='en',
+        start_date=current_time - timedelta(days=1),
+        end_date=current_time + timedelta(days=1),
+    )
+    course2 = CourseOverviewFactory(
+        language='ar',
+        start_date=current_time - timedelta(days=1),
+        end_date=current_time + timedelta(days=1),
+    )
+    return {
+        'course1': course1,
+        'course2': course2,
+    }
+
+
+@pytest.fixture(name='expired_course')
+def expired_course_overview(current_time):
+    return CourseOverviewFactory(
+        language='en',
+        start_date=current_time - timedelta(days=2),
+        end_date=current_time - timedelta(days=1),
+    )
+
+
+@pytest.fixture(name='course_group')
+def multilingual_course_group():
+    return MultilingualCourseGroupFactory()
+
+
+@pytest.mark.django_db
+def test_get_catalog_courses_valid_user(courses, course_group, user_with_profile):
+    """
+    Tests multiple courses in a single group for a valid user
+    """
+    MultilingualCourseFactory(
+        course=courses['course1'],
+        multilingual_course_group=course_group
+    )
+    MultilingualCourseFactory(
+        course=courses['course2'],
+        multilingual_course_group=course_group
+    )
+    assert len(student_helpers.get_catalog_courses(user_with_profile)) == 1
+
+
+@pytest.mark.django_db
+def test_get_catalog_courses_enrolled_user(courses, course_group, user_with_profile):
+    """
+    Tests multiple courses in a single group and user enrolled in one of the courses
+    """
+    MultilingualCourseFactory(
+        course=courses['course1'],
+        multilingual_course_group=course_group
+    )
+    MultilingualCourseFactory(
+        course=courses['course2'],
+        multilingual_course_group=course_group
+    )
+    enrolled_course = courses['course2']
+    CourseEnrollmentFactory(user=user_with_profile, course=enrolled_course)
+    courses_list = student_helpers.get_catalog_courses(user_with_profile)
+    assert len(courses_list) == 1
+    assert courses_list[0].id == enrolled_course.id
+
+
+@pytest.mark.django_db
+def test_get_catalog_courses_anonymous_user(courses, course_group):
+    """
+    Tests multiple courses in a single group for anonymous user
+    """
+    user = AnonymousUserFactory()
+    MultilingualCourseFactory(
+        course=courses['course1'],
+        multilingual_course_group=course_group
+    )
+    MultilingualCourseFactory(
+        course=courses['course2'],
+        multilingual_course_group=course_group
+    )
+    assert len(student_helpers.get_catalog_courses(user)) == 1
+
+
+@pytest.mark.django_db
+def test_get_catalog_courses_expired_course(expired_course, course_group, user_with_profile):
+    """
+    Tests expired course in a group for a valid user
+    """
+    MultilingualCourseFactory(
+        course=expired_course,
+        multilingual_course_group=course_group
+    )
+    assert len(student_helpers.get_catalog_courses(user_with_profile)) == 0
