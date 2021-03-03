@@ -20,7 +20,7 @@
     "backbone": "1.4.0",
     "backbone-associations": "0.6.2",
     "backbone.paginator": "2.0.8",
-    "bootstrap": "4.0.0",
+    "bootstrap": "4.3.1",
     "camelize": "1.0.0",
     "classnames": "2.2.5",
     "css-loader": "0.28.8",
