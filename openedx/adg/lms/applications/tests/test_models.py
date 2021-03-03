@@ -117,23 +117,56 @@ def test_user_application_string_representation(user_application):
     assert expected_str == actual_str
 
 
+@pytest.fixture(name='current_time')
+def current_datetime():
+    return datetime.now()
+
+
+@pytest.fixture(name='courses')
+def course_overviews(current_time):
+    """
+    Fixture which return multiple courses
+    """
+    course1 = CourseOverviewFactory(
+        language='en',
+        start_date=current_time - timedelta(days=1),
+        end_date=current_time + timedelta(days=1),
+    )
+    course2 = CourseOverviewFactory(
+        language='ar',
+        start_date=current_time - timedelta(days=1),
+        end_date=current_time + timedelta(days=1),
+    )
+    return {
+        'test_course1': course1,
+        'test_course2': course2,
+    }
+
+
+@pytest.fixture(name='expired_course')
+def expired_course_overview(current_time):
+    return CourseOverviewFactory(
+        language='en',
+        start_date=current_time - timedelta(days=2),
+        end_date=current_time - timedelta(days=1),
+    )
+
+
+@pytest.fixture(name='course_group')
+def multilingual_course_group():
+    return MultilingualCourseGroupFactory()
+
+
 @pytest.mark.parametrize('percent', [0.9250, 0.7649])
 @pytest.mark.django_db
 @mock.patch('openedx.adg.lms.applications.models.CourseGradeFactory.read')
-def test_prereq_course_scores(mock_read, user_application, percent):
+def test_prereq_course_scores(mock_read, user_application, percent, courses):
     """
     Test that the `prereq_course_scores` property returns the correct prerequisite course names and respective scores of
     the applicant in those courses, in the correct format.
     """
-    current_time = datetime.now()
-    test_course_1 = CourseOverviewFactory(
-        start_date=current_time - timedelta(days=1),
-        end_date=current_time + timedelta(days=1),
-    )
-    test_course_2 = CourseOverviewFactory(
-        start_date=current_time - timedelta(days=1),
-        end_date=current_time + timedelta(days=1),
-    )
+    test_course_1 = courses['test_course1']
+    test_course_2 = courses['test_course2']
     MultilingualCourseFactory(course=test_course_1)
     MultilingualCourseFactory(course=test_course_2)
 
@@ -215,30 +248,20 @@ def test_multilingual_course_count():
 
 
 @pytest.mark.django_db
-def test_open_multilingual_courses_count():
+def test_open_multilingual_courses_count(courses):
     """
     Test open multilingual course count for a course group
     """
-    current_time = datetime.now()
-    course = CourseOverviewFactory(
-        start_date=current_time - timedelta(days=1),
-        end_date=current_time + timedelta(days=1)
-    )
-    course_group = MultilingualCourseFactory(course=course).multilingual_course_group
+    course_group = MultilingualCourseFactory(course=courses['test_course1']).multilingual_course_group
     assert course_group.open_multilingual_courses_count() == 1
 
 
 @pytest.mark.django_db
-def test_open_multilingual_course_keys():
+def test_open_multilingual_course_keys(courses):
     """
     Test course keys of a course group
     """
-    current_time = datetime.now()
-    course = CourseOverviewFactory(
-        start_date=current_time - timedelta(days=1),
-        end_date=current_time + timedelta(days=1)
-    )
-    course_group = MultilingualCourseFactory(course=course).multilingual_course_group
+    course_group = MultilingualCourseFactory(course=courses['test_course1']).multilingual_course_group
     assert len(course_group.open_multilingual_course_keys()) == 1
 
 
@@ -253,40 +276,28 @@ def test_does_course_exist_in_course_group():
 
 
 @pytest.mark.django_db
-def test_course_does_not_exist_in_course_group():
+def test_course_does_not_exist_in_course_group(course_group):
     """
     Tests course does not exist in multilingual group.
     """
     multilingual_course = MultilingualCourseFactory()
-    course_group = MultilingualCourseGroupFactory()
     assert not course_group.does_course_exist(multilingual_course)
 
 
 @pytest.mark.django_db
-def test_get_preferred_lang_course():
+def test_get_preferred_lang_course(courses):
     """
     Tests get_preferred_language_course course is active.
     """
-    current_time = datetime.now()
-    course = CourseOverviewFactory(
-        language='en',
-        start_date=current_time - timedelta(days=1),
-        end_date=current_time + timedelta(days=1)
-    )
-    multilingual_course_group = MultilingualCourseFactory(course=course).multilingual_course_group
-    assert multilingual_course_group.get_preferred_lang_course().id == course.id
+    course = courses['test_course1']
+    course_group = MultilingualCourseFactory(course=course).multilingual_course_group
+    assert course_group.get_preferred_lang_course().id == course.id
 
 
 @pytest.mark.django_db
-def test_get_preferred_lang_course_expired_courses():
+def test_get_preferred_lang_course_expired_courses(expired_course):
     """
     Tests get_preferred_language_course course is expired.
     """
-    current_time = datetime.now()
-    course = CourseOverviewFactory(
-        language='en',
-        start_date=current_time - timedelta(days=2),
-        end_date=current_time - timedelta(days=1)
-    )
-    multilingual_course_group = MultilingualCourseFactory(course=course).multilingual_course_group
-    assert multilingual_course_group.get_preferred_lang_course() is None
+    course_group = MultilingualCourseFactory(course=expired_course).multilingual_course_group
+    assert course_group.get_preferred_lang_course() is None

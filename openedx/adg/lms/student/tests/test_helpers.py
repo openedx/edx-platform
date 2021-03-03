@@ -240,8 +240,8 @@ def course_overviews(current_time):
         end_date=current_time + timedelta(days=1),
     )
     return {
-        'course1': course1,
-        'course2': course2,
+        'test_course1': course1,
+        'test_course2': course2,
     }
 
 
@@ -265,11 +265,11 @@ def test_get_catalog_courses_valid_user(courses, course_group, user_with_profile
     Tests multiple courses in a single group for a valid user
     """
     MultilingualCourseFactory(
-        course=courses['course1'],
+        course=courses['test_course1'],
         multilingual_course_group=course_group
     )
     MultilingualCourseFactory(
-        course=courses['course2'],
+        course=courses['test_course2'],
         multilingual_course_group=course_group
     )
     assert len(student_helpers.get_catalog_courses(user_with_profile)) == 1
@@ -280,15 +280,15 @@ def test_get_catalog_courses_enrolled_user(courses, course_group, user_with_prof
     """
     Tests multiple courses in a single group and user enrolled in one of the courses
     """
+    enrolled_course = courses['test_course2']
     MultilingualCourseFactory(
-        course=courses['course1'],
+        course=courses['test_course1'],
         multilingual_course_group=course_group
     )
     MultilingualCourseFactory(
-        course=courses['course2'],
+        course=enrolled_course,
         multilingual_course_group=course_group
     )
-    enrolled_course = courses['course2']
     CourseEnrollmentFactory(user=user_with_profile, course=enrolled_course)
     courses_list = student_helpers.get_catalog_courses(user_with_profile)
     assert len(courses_list) == 1
@@ -302,11 +302,11 @@ def test_get_catalog_courses_anonymous_user(courses, course_group):
     """
     user = AnonymousUserFactory()
     MultilingualCourseFactory(
-        course=courses['course1'],
+        course=courses['test_course1'],
         multilingual_course_group=course_group
     )
     MultilingualCourseFactory(
-        course=courses['course2'],
+        course=courses['test_course2'],
         multilingual_course_group=course_group
     )
     assert len(student_helpers.get_catalog_courses(user)) == 1
@@ -329,7 +329,7 @@ def test_get_prerequisites_for_user(courses, user_with_profile):
     """
     Tests prerequisites for user
     """
-    MultilingualCourseFactory(course=courses['course1'])
+    MultilingualCourseFactory(course=courses['test_course1'])
     assert len(student_helpers.get_prerequisite_courses_for_user(user_with_profile)) == 1
 
 
@@ -346,6 +346,6 @@ def test_get_enrolled_prerequisites_for_user(user_with_profile, courses):
     """
     Tests enrolled prerequisites for user
     """
-    MultilingualCourseFactory(course=courses['course1'])
-    CourseEnrollmentFactory(course=courses['course1'], user=user_with_profile, is_active=True)
+    MultilingualCourseFactory(course=courses['test_course1'])
+    CourseEnrollmentFactory(course=courses['test_course1'], user=user_with_profile, is_active=True)
     assert len(student_helpers.get_prerequisite_courses_for_user(user_with_profile)) == 1
