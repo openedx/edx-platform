@@ -325,42 +325,27 @@ def test_get_catalog_courses_expired_course(expired_course, course_group, user_w
 
 
 @pytest.mark.django_db
-def test_get_prerequisites_for_user():
+def test_get_prerequisites_for_user(courses, user_with_profile):
     """
-    Test to get prerequisites for user
+    Tests prerequisites for user
     """
-    current_time = datetime.now()
-    course = CourseOverviewFactory(
-        language='en',
-        start_date=current_time - timedelta(days=1),
-        end_date=current_time + timedelta(days=1)
-    )
-    MultilingualCourseFactory(course=course)
-    user = UserFactory()
-    assert len(student_helpers.get_prerequisite_courses_for_user(user)) == 1
+    MultilingualCourseFactory(course=courses['course1'])
+    assert len(student_helpers.get_prerequisite_courses_for_user(user_with_profile)) == 1
 
 
 @pytest.mark.django_db
-def test_no_prerequisite_courses():
+def test_no_prerequisite_courses(user_with_profile):
     """
-    Test no prerequisites courses for user
+    Tests no prerequisites courses for user
     """
-    MultilingualCourseGroupFactory()
-    user = UserFactory()
-    assert len(student_helpers.get_prerequisite_courses_for_user(user)) == 0
+    assert len(student_helpers.get_prerequisite_courses_for_user(user_with_profile)) == 0
 
 
 @pytest.mark.django_db
-def test_get_enrolled_prerequisites_for_user():
+def test_get_enrolled_prerequisites_for_user(user_with_profile, courses):
     """
-    Test to get enrolled prerequisites for user
+    Tests enrolled prerequisites for user
     """
-    user = UserFactory()
-    current_time = datetime.now()
-    course = CourseOverviewFactory(
-        start_date=current_time - timedelta(days=1),
-        end_date=current_time + timedelta(days=1)
-    )
-    MultilingualCourseFactory(course=course)
-    CourseEnrollmentFactory(course=course, user=user, is_active=True)
-    assert len(student_helpers.get_prerequisite_courses_for_user(user)) == 1
+    MultilingualCourseFactory(course=courses['course1'])
+    CourseEnrollmentFactory(course=courses['course1'], user=user_with_profile, is_active=True)
+    assert len(student_helpers.get_prerequisite_courses_for_user(user_with_profile)) == 1
