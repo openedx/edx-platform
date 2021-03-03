@@ -3,7 +3,7 @@ version: 2.1
 executors:
   adg-edx-executor:
     docker:
-      - image: cimg/python:3.5-node
+      - image: cimg/python:3.8-node
         auth:
           username: jw3759142
           password: $DOCKERHUB_PASSWORD
@@ -32,6 +32,7 @@ commands:
 
             pip install --exists-action w -r requirements/edx/testing.txt
             pip install --exists-action w -r requirements/adg/base.txt
+            pip install --upgrade django==2.2.17
       - run:
           name: Run all tests
           command: |
