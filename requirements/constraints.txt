@@ -122,4 +122,5 @@ httpretty<1.0
 # mock version 4.0.0 drops support for python 3.5
 mock<4.0.0
 
+# greater versions causing conflicts with other few packages upgrade
 pygments==2.6.1
