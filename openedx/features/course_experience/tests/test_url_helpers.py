@@ -150,13 +150,20 @@ class GetCoursewareUrlTests(SharedModuleStoreTestCase):
             ModuleStoreEnum.Type.split,
             'mfe',
             'subsection',
-            'http://learning-mfe/course/course-v1:TestX+UrlHelpers+split/TODO'
+            (
+                'http://learning-mfe/course/course-v1:TestX+UrlHelpers+split' +
+                '/block-v1:TestX+UrlHelpers+split+type@sequential+block@Generated_Subsection'
+            ),
         ),
         (
             ModuleStoreEnum.Type.split,
             'mfe',
             'component',
-            'http://learning-mfe/course/course-v1:TestX+UrlHelpers+split/TODO/TODO'
+            (
+                'http://learning-mfe/course/course-v1:TestX+UrlHelpers+split' +
+                '/block-v1:TestX+UrlHelpers+split+type@sequential+block@Generated_Subsection' +
+                '/block-v1:TestX+UrlHelpers+split+type@problem+block@1'
+            ),
         ),
         (
             ModuleStoreEnum.Type.split,
