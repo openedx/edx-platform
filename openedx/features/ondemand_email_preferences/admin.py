@@ -1,5 +1,9 @@
+"""
+Admin configurations for ondemand_email_preferences app
+"""
 from django.contrib import admin
 from django.forms import ModelForm, Select
+
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.features.ondemand_email_preferences.models import OnDemandEmailPreferences
 
@@ -10,6 +14,9 @@ def get_all_on_demand_courses():
 
 
 class OnDemandEmailPreferencesAdminForm(ModelForm):
+    """
+    Form for the OnDemandEmailPreferences admin to show courses that are self paced.
+    """
     def __init__(self, *args, **kwargs):
         """
         Only show courses that are self paced.
@@ -26,6 +33,9 @@ class OnDemandEmailPreferencesAdminForm(ModelForm):
 
 
 class OnDemandEmailPreferencesAdminModel(admin.ModelAdmin):
+    """
+    Django admin customizations for OnDemandEmailPreferences model.
+    """
     form = OnDemandEmailPreferencesAdminForm
     list_display = ['user', 'course_id', 'is_enabled']
     search_fields = ('user__username', 'course_id',)

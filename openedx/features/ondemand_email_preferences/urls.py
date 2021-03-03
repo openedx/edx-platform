@@ -1,9 +1,9 @@
 """
 The urls for On Demand Email Preferences app.
 """
-
-from django.conf.urls import url
 from django.conf import settings
+from django.conf.urls import url
+
 from openedx.features.ondemand_email_preferences import views
 
 urlpatterns = [
