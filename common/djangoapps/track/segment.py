@@ -16,7 +16,7 @@ from eventtracking import tracker
 from six.moves.urllib.parse import urlunsplit
 
 
-def track(user_id, event_name, properties=None, context=None):
+def track(user_id, event_name, properties=None, context=None, traits=None):
     """
     Wrapper for emitting Segment track event, including augmenting context information from middleware.
     """
@@ -58,6 +58,9 @@ def track(user_id, event_name, properties=None, context=None):
                 segment_context['page']['referrer'] = referer
             if page is not None and 'url' not in segment_context['page']:
                 segment_context['page']['url'] = page
+
+        if traits:
+            segment_context['traits'] = traits
 
         analytics.track(user_id, event_name, properties, segment_context)
 

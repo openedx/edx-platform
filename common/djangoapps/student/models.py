@@ -1492,7 +1492,7 @@ class CourseEnrollment(models.Model):
                                                                                                        self.course_id)
             with tracker.get_tracker().context(event_name, context):
                 tracker.emit(event_name, data)
-                segment.track(self.user_id, event_name, segment_properties)
+                segment.track(self.user_id, event_name, segment_properties, traits=segment_properties)
 
         except Exception:  # pylint: disable=broad-except
             if event_name and self.course_id:
