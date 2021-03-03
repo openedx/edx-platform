@@ -115,7 +115,7 @@ from openedx.features.content_type_gating.models import ContentTypeGatingConfig
 from openedx.features.course_duration_limits.access import generate_course_expired_fragment
 from openedx.features.course_experience import DISABLE_UNIFIED_COURSE_TAB_FLAG, course_home_url_name
 from openedx.features.course_experience.course_tools import CourseToolsPluginManager
-from openedx.features.course_experience.url_helpers import get_legacy_courseware_url
+from openedx.features.course_experience.url_helpers import get_courseware_url, ExperienceOption
 from openedx.features.course_experience.utils import dates_banner_should_display
 from openedx.features.course_experience.views.course_dates import CourseDatesFragmentView
 from openedx.features.course_experience.waffle import ENABLE_COURSE_ABOUT_SIDEBAR_HTML
@@ -385,20 +385,39 @@ def jump_to_id(request, course_id, module_id):
 
 
 @ensure_csrf_cookie
-def jump_to(_request, course_id, location):
+def jump_to(request, course_id, location):
     """
     Show the page that contains a specific location.
+
     If the location is invalid or not in any class, return a 404.
-    Otherwise, delegates to the index view to figure out whether this user
+    Otherwise, delegates to the courseware views to figure out whether this user
     has access, and what they should see.
+
+    By default, this view redirects to the active courseware experience.
+    Alternatively, the `experience` query parameter may be provided as either
+    "new" or "legacy" to force either a Micro-Frontend or Legacy-LMS redirect
+    link to be generated, respectively.
     """
     try:
         course_key = CourseKey.from_string(course_id)
         usage_key = UsageKey.from_string(location).replace(course_key=course_key)
     except InvalidKeyError:
         raise Http404("Invalid course_key or usage_key")  # lint-amnesty, pylint: disable=raise-missing-from
+
+    experience_param = request.GET.get("experience", "").lower()
+    if experience_param == "new":
+        experience = ExperienceOption.NEW
+    elif experience_param == "legacy":
+        experience = ExperienceOption.LEGACY
+    else:
+        experience = ExperienceOption.ACTIVE
+
     try:
-        redirect_url = get_legacy_courseware_url(usage_key, _request)
+        redirect_url = get_courseware_url(
+            usage_key=usage_key,
+            request=request,
+            experience=experience,
+        )
     except ItemNotFoundError:
         raise Http404(f"No data at this location: {usage_key}")  # lint-amnesty, pylint: disable=raise-missing-from
     except NoPathToItem:
