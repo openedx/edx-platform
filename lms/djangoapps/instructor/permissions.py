@@ -36,9 +36,9 @@ perms[ASSIGN_TO_COHORTS] = HasAccessRule('staff')
 perms[EDIT_COURSE_ACCESS] = HasAccessRule('instructor')
 perms[EDIT_FORUM_ROLES] = HasAccessRule('staff')
 perms[EDIT_INVOICE_VALIDATION] = HasAccessRule('staff')
-perms[ENABLE_CERTIFICATE_GENERATION] = is_staff
-perms[GENERATE_CERTIFICATE_EXCEPTIONS] = is_staff
-perms[GENERATE_BULK_CERTIFICATE_EXCEPTIONS] = is_staff
+perms[ENABLE_CERTIFICATE_GENERATION] = is_staff | HasRolesRule('staff', 'instructor')
+perms[GENERATE_CERTIFICATE_EXCEPTIONS] = is_staff | HasRolesRule('staff', 'instructor')
+perms[GENERATE_BULK_CERTIFICATE_EXCEPTIONS] = is_staff | HasRolesRule('staff', 'instructor')
 perms[GIVE_STUDENT_EXTENSION] = HasAccessRule('staff')
 perms[VIEW_ISSUED_CERTIFICATES] = HasAccessRule('staff') | HasRolesRule('data_researcher')
 # only global staff or those with the data_researcher role can access the data download tab
