@@ -211,7 +211,7 @@ class Env:
     JS_REPORT_DIR = REPORT_DIR / 'javascript'
 
     # Directories used for common/lib/tests
-    IGNORED_TEST_DIRS = ('__pycache__', '.cache')
+    IGNORED_TEST_DIRS = ('__pycache__', '.cache', '.pytest_cache')
     LIB_TEST_DIRS = []
     for item in (REPO_ROOT / "common/lib").listdir():
         dir_name = (REPO_ROOT / 'common/lib' / item)

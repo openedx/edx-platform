@@ -106,8 +106,6 @@ class TestMongoAssetMetadataStorage(TestCase):
 
     def setUp(self):
         super(TestMongoAssetMetadataStorage, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
-        self.addTypeEqualityFunc(datetime, self._compare_datetimes)
-        self.addTypeEqualityFunc(AssetMetadata, self._compare_metadata)
 
         self.differents = (('different', 'burn.jpg'),)
         self.vrmls = (
@@ -117,21 +115,21 @@ class TestMongoAssetMetadataStorage(TestCase):
         self.regular_assets = (('asset', 'zippy.png'),)
         self.alls = self.differents + self.vrmls + self.regular_assets
 
-    def _compare_metadata(self, mdata1, mdata2, msg=None):
+    def _assert_metadata_equal(self, mdata1, mdata2):
         """
         So we can use the below date comparison
         """
-        if type(mdata1) != type(mdata2):  # lint-amnesty, pylint: disable=unidiomatic-typecheck
-            self.fail(self._formatMessage(msg, u"{} is not same type as {}".format(mdata1, mdata2)))
         for attr in mdata1.ATTRS_ALLOWED_TO_UPDATE:  # lint-amnesty, pylint: disable=redefined-outer-name
-            assert getattr(mdata1, attr) == getattr(mdata2, attr), msg
+            if isinstance(getattr(mdata1, attr), datetime):
+                self._assert_datetimes_equal(getattr(mdata1, attr), getattr(mdata2, attr))
+            else:
+                assert getattr(mdata1, attr) == getattr(mdata2, attr)
 
-    def _compare_datetimes(self, datetime1, datetime2, msg=None):
+    def _assert_datetimes_equal(self, datetime1, datetime2):
         """
         Don't compare microseconds as mongo doesn't encode below milliseconds
         """
-        if not timedelta(seconds=-1) < datetime1 - datetime2 < timedelta(seconds=1):
-            self.fail(self._formatMessage(msg, u"{} != {}".format(datetime1, datetime2)))
+        assert datetime1.replace(microsecond=0) == datetime2.replace(microsecond=0)
 
     def _make_asset_metadata(self, asset_loc):
         """
@@ -187,7 +185,7 @@ class TestMongoAssetMetadataStorage(TestCase):
             # Find the asset's metadata and confirm it's the same.
             found_asset_md = store.find_asset_metadata(new_asset_loc)
             assert found_asset_md is not None
-            assert new_asset_md == found_asset_md
+            self._assert_metadata_equal(new_asset_md, found_asset_md)
             assert len(store.get_all_asset_metadata(course.id, 'asset')) == 1
 
     @ddt.data(*MODULESTORE_SETUPS)
@@ -378,9 +376,14 @@ class TestMongoAssetMetadataStorage(TestCase):
                 # Find the same course and check its changed attribute.
                 updated_asset_md = store.find_asset_metadata(new_asset_loc)
                 assert updated_asset_md is not None
-                assert getattr(updated_asset_md, attribute, None) is not None
+
+                updated_attr_val = getattr(updated_asset_md, attribute, None)
+                assert updated_attr_val is not None
                 # Make sure that the attribute is unchanged from its original value.
-                assert getattr(updated_asset_md, attribute, None) == original_attr_val
+                if isinstance(original_attr_val, datetime):
+                    self._assert_datetimes_equal(updated_attr_val, original_attr_val)
+                else:
+                    assert updated_attr_val == original_attr_val
 
     @ddt.data(*MODULESTORE_SETUPS)
     def test_set_unknown_attrs(self, storebuilder):
