@@ -67,6 +67,9 @@ matplotlib<3.1
 # maxminddb 2.0.0 has dropped support for Python 3.5
 maxminddb<2.0.0
 
+# mock version 4.0.0 drops support for python 3.5
+mock<4.0.0
+
 # oauthlib>3.0.1 causes test failures ( also remove the django-oauth-toolkit constraint when this is fixed )
 oauthlib==3.0.1
 
