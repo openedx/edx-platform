@@ -3872,6 +3872,7 @@ ACCOUNT_VISIBILITY_CONFIGURATION["custom_shareable_fields"] = (
 ACCOUNT_VISIBILITY_CONFIGURATION["admin_fields"] = (
     ACCOUNT_VISIBILITY_CONFIGURATION["custom_shareable_fields"] + [
         "email",
+        "id",
         "extended_profile",
         "gender",
         "state",

@@ -262,7 +262,7 @@ class TestAccountsAPI(CacheIsolationTestCase, UserAPITestCase):
         Verify that all account fields are returned (even those that are not shareable).
         """
         data = response.data
-        assert 26 == len(data)
+        assert 27 == len(data)
 
         # public fields (3)
         expected_account_privacy = (
@@ -285,8 +285,9 @@ class TestAccountsAPI(CacheIsolationTestCase, UserAPITestCase):
         assert data['accomplishments_shared'] is not None
         assert ((self.user.first_name + ' ') + self.user.last_name) == data['name']
 
-        # additional admin fields (10)
+        # additional admin fields (11)
         assert self.user.email == data['email']
+        assert self.user.id == data['id']
         assert data['extended_profile'] is not None
         assert 'MA' == data['state']
         assert 'f' == data['gender']
@@ -493,7 +494,7 @@ class TestAccountsAPI(CacheIsolationTestCase, UserAPITestCase):
             with self.assertNumQueries(queries):
                 response = self.send_get(self.client)
             data = response.data
-            assert 26 == len(data)
+            assert 27 == len(data)
             assert self.user.username == data['username']
             assert ((self.user.first_name + ' ') + self.user.last_name) == data['name']
             for empty_field in ("year_of_birth", "level_of_education", "mailing_address", "bio"):
@@ -503,6 +504,7 @@ class TestAccountsAPI(CacheIsolationTestCase, UserAPITestCase):
             assert 'm' == data['gender']
             assert 'Learn a lot' == data['goals']
             assert self.user.email == data['email']
+            assert self.user.id == data['id']
             assert data['date_joined'] is not None
             assert data['last_login'] is not None
             assert self.user.is_active == data['is_active']
@@ -846,7 +848,7 @@ class TestAccountsAPI(CacheIsolationTestCase, UserAPITestCase):
         client = self.login_client("client", "user")
         response = self.send_patch(client, {"language_proficiencies": patch_value}, expected_status=400)
         assert response.data['field_errors']['language_proficiencies']['developer_message'] == \
-               f"Value '{patch_value}' is not valid for field 'language_proficiencies': {expected_error_message}"
+            f"Value '{patch_value}' is not valid for field 'language_proficiencies': {expected_error_message}"
 
     @mock.patch('openedx.core.djangoapps.user_api.accounts.serializers.AccountUserSerializer.save')
     def test_patch_serializer_save_fails(self, serializer_save):
@@ -869,8 +871,8 @@ class TestAccountsAPI(CacheIsolationTestCase, UserAPITestCase):
         self.client.login(username=self.user.username, password=TEST_PASSWORD)
         response = self.send_get(self.client)
         assert response.data['profile_image'] ==\
-               {'has_image': False,
-                'image_url_full': 'http://testserver/static/default_50.png',
+            {'has_image': False,
+             'image_url_full': 'http://testserver/static/default_50.png',
                 'image_url_small': 'http://testserver/static/default_10.png'}
 
     @ddt.data(
@@ -892,10 +894,11 @@ class TestAccountsAPI(CacheIsolationTestCase, UserAPITestCase):
         response = self.send_get(client)
         if has_full_access:
             data = response.data
-            assert 26 == len(data)
+            assert 27 == len(data)
             assert self.user.username == data['username']
             assert ((self.user.first_name + ' ') + self.user.last_name) == data['name']
             assert self.user.email == data['email']
+            assert self.user.id == data['id']
             assert year_of_birth == data['year_of_birth']
             for empty_field in ("country", "level_of_education", "mailing_address", "bio", "state",):
                 assert data[empty_field] is None
