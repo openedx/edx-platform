@@ -179,7 +179,7 @@ pycontracts==1.8.12       # via -r requirements/edx/base.in, edx-user-state-clie
 pycountry==20.7.3         # via -r requirements/edx/base.in
 pycparser==2.20           # via -r requirements/edx/../edx-sandbox/shared.txt, cffi
 pycryptodomex==3.10.1     # via -r requirements/edx/base.in, edx-proctoring, lti-consumer-xblock, pyjwkest
-pygments==2.6.1           # via -c requirements/edx/../constraints.txt, -r requirements/edx/base.in
+pygments==2.8.0           # via -r requirements/edx/base.in
 pyjwkest==1.4.2           # via -r requirements/edx/base.in, edx-drf-extensions, lti-consumer-xblock
 pyjwt[crypto]==1.7.1      # via -r requirements/edx/base.in, drf-jwt, edx-rest-api-client, social-auth-core
 pymongo==3.10.1           # via -c requirements/edx/../constraints.txt, -r requirements/edx/base.in, -r requirements/edx/paver.txt, edx-opaque-keys, event-tracking, mongodbproxy, mongoengine
