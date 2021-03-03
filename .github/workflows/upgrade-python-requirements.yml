@@ -56,3 +56,4 @@ jobs:
           --commit-message="chore: Updating Python Requirements" --pr-title="Python Requirements Update" \
           --pr-body="Python requirements update.Please review the [changelogs](https://openedx.atlassian.net/wiki/spaces/TE/pages/1001521320/Python+Package+Changelogs) for the upgraded packages." \
           --user-reviewers="" --team-reviewers="arbi-bom" --delete-old-pull-requests
+        if: env.GITHUB_TOKEN != null && env.GITHUB_USER_EMAIL != null

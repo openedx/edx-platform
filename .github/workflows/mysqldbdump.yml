@@ -21,3 +21,4 @@ jobs:
         run: ./.github/workflows/mysqldbdump_pr.sh
         env:
           GH_ACCESS_TOKEN: ${{ secrets.EDX_DEPLOYMENT_GH_TOKEN }}
+        if: env.GH_ACCESS_TOKEN != null
