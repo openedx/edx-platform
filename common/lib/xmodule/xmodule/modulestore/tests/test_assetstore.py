@@ -124,7 +124,7 @@ class TestMongoAssetMetadataStorage(TestCase):
         if type(mdata1) != type(mdata2):  # lint-amnesty, pylint: disable=unidiomatic-typecheck
             self.fail(self._formatMessage(msg, u"{} is not same type as {}".format(mdata1, mdata2)))
         for attr in mdata1.ATTRS_ALLOWED_TO_UPDATE:  # lint-amnesty, pylint: disable=redefined-outer-name
-            assert getattr(mdata1, attr) == getattr(mdata2, attr), msg
+            self.assertEqual(getattr(mdata1, attr), getattr(mdata2, attr), msg)
 
     def _compare_datetimes(self, datetime1, datetime2, msg=None):
         """
@@ -187,7 +187,7 @@ class TestMongoAssetMetadataStorage(TestCase):
             # Find the asset's metadata and confirm it's the same.
             found_asset_md = store.find_asset_metadata(new_asset_loc)
             assert found_asset_md is not None
-            assert new_asset_md == found_asset_md
+            self.assertEqual(new_asset_md, found_asset_md)
             assert len(store.get_all_asset_metadata(course.id, 'asset')) == 1
 
     @ddt.data(*MODULESTORE_SETUPS)
@@ -380,7 +380,7 @@ class TestMongoAssetMetadataStorage(TestCase):
                 assert updated_asset_md is not None
                 assert getattr(updated_asset_md, attribute, None) is not None
                 # Make sure that the attribute is unchanged from its original value.
-                assert getattr(updated_asset_md, attribute, None) == original_attr_val
+                self.assertEqual(getattr(updated_asset_md, attribute, None), original_attr_val)
 
     @ddt.data(*MODULESTORE_SETUPS)
     def test_set_unknown_attrs(self, storebuilder):

@@ -1142,7 +1142,7 @@ class TestMixedModuleStore(CommonMixedModuleStoreSetup):
         Verifies the results of calling get_parent_locations matches expected_results.
         """
         for child_location, parent_location, revision in expected_results:
-            assert parent_location == self.store.get_parent_location(child_location, revision=revision)
+            self.assertEqual(parent_location, self.store.get_parent_location(child_location, revision=revision))
 
     def verify_item_parent(self, item_location, expected_parent_location, old_parent_location, is_reverted=False):
         """
@@ -1631,7 +1631,7 @@ class TestMixedModuleStore(CommonMixedModuleStoreSetup):
         # problem location revision
         with self.store.branch_setting(ModuleStoreEnum.Branch.draft_preferred, course_id):
             parent = mongo_store.get_parent_location(self.problem_x1a_1)  # lint-amnesty, pylint: disable=no-member
-            assert parent == self.vertical_x1a  # lint-amnesty, pylint: disable=no-member
+            self.assertEqual(parent, self.vertical_x1a)  # lint-amnesty, pylint: disable=no-member
 
     # Draft:
     #   Problem path:

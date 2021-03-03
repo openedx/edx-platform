@@ -1651,10 +1651,7 @@ class ProblemBlockTest(unittest.TestCase):  # lint-amnesty, pylint: disable=miss
         module = CapaFactory.create(xml=self.demand_xml)
         # Re-mock the module_id to a fixed string, so we can check the logging
         module.location = Mock(module.location)
-        if six.PY2:
-            module.location.__unicode__ = mock_location_text
-        else:
-            module.location.__str__ = mock_location_text
+        module.location.__str__ = mock_location_text
 
         with patch.object(module.runtime, 'publish') as mock_track_function:
             module.get_problem_html()
