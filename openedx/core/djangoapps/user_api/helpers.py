@@ -113,6 +113,7 @@ class FormDescription(object):
         forms.Textarea: "textarea",
         forms.BooleanField: "checkbox",
         forms.EmailField: "email",
+        forms.models.ModelMultipleChoiceField: "select",
     }
 
     OVERRIDE_FIELD_PROPERTIES = [
