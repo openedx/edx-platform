@@ -3,7 +3,7 @@
         var STATUS = window.STATUS;
         var state,
             oldOTBD,
-            playbackRates = [0.75, 1.0, 1.25, 1.5],
+            playbackRates = [0.75, 1.0, 1.25, 1.5, 2.0],
             describeInfo,
             POSTER_URL = '/media/video-images/poster.png';
 
