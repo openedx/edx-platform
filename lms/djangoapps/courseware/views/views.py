@@ -1204,7 +1204,7 @@ def _missing_required_verification(student, enrollment_mode):
 
 
 def _certificate_message(student, course, enrollment_mode):  # lint-amnesty, pylint: disable=missing-function-docstring
-    if certs_api.is_certificate_invalid(student, course.id):
+    if certs_api.is_certificate_invalidated(student, course.id):
         return INVALID_CERT_DATA
 
     cert_downloadable_status = certs_api.certificate_downloadable_status(student, course.id)
