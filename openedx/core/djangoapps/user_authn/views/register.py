@@ -178,10 +178,13 @@ def create_account_with_params(request, params):
     # error message
     if is_third_party_auth_enabled and ('social_auth_provider' in params and not pipeline.running(request)):
         raise ValidationError(
-            {'session_expired': [
-                _(u"Registration using {provider} has timed out.").format(
-                    provider=params.get('social_auth_provider'))
-            ]}
+            {
+                'session_expired': [
+                    _(u"Registration using {provider} has timed out.").format(
+                        provider=params.get('social_auth_provider'))
+                ],
+                'error_code': 'tpa-session-expired',
+            }
         )
 
     if is_third_party_auth_enabled:
@@ -288,21 +291,25 @@ def _link_user_to_third_party_provider(
                     _(u"An access_token is required when passing value ({}) for provider.").format(
                         params['provider']
                     )
-                ]
+                ],
+                'error_code': 'tpa-missing-access-token'
             })
         request.session[pipeline.AUTH_ENTRY_KEY] = pipeline.AUTH_ENTRY_REGISTER_API
         pipeline_user = None
         error_message = ""
+        error_code = None
         try:
             pipeline_user = request.backend.do_auth(social_access_token, user=user)
         except AuthAlreadyAssociated:
             error_message = _("The provided access_token is already associated with another user.")
+            error_code = 'tpa-token-already-associated'
         except (HTTPError, AuthException):
             error_message = _("The provided access_token is not valid.")
+            error_code = 'tpa-invalid-access-token'
         if not pipeline_user or not isinstance(pipeline_user, User):
             # Ensure user does not re-enter the pipeline
             request.social_strategy.clean_partial_pipeline(social_access_token)
-            raise ValidationError({'access_token': [error_message]})
+            raise ValidationError({'access_token': [error_message], 'error_code': error_code})
 
     # If the user is registering via 3rd party auth, track which provider they use
     if is_third_party_auth_enabled and pipeline.running(request):
@@ -523,14 +530,17 @@ class RegistrationView(APIView):
         username = data.get('username')
         errors = {}
 
+        error_code = 'duplicate'
         if email is not None and email_exists_or_retired(email):
+            error_code += '-email'
             errors["email"] = [{"user_message": accounts_settings.EMAIL_CONFLICT_MSG.format(email_address=email)}]
 
         if username is not None and username_exists_or_retired(username):
+            error_code += '-username'
             errors["username"] = [{"user_message": accounts_settings.USERNAME_CONFLICT_MSG.format(username=username)}]
 
         if errors:
-            return self._create_response(request, errors, status_code=409)
+            return self._create_response(request, errors, status_code=409, error_code=error_code)
 
     def _handle_terms_of_service(self, data):
         # Backwards compatibility: the student view expects both
@@ -551,22 +561,26 @@ class RegistrationView(APIView):
             errors = {
                 err.field: [{"user_message": text_type(err)}]
             }
-            response = self._create_response(request, errors, status_code=409)
+            response = self._create_response(request, errors, status_code=409, error_code=err.error_code)
         except ValidationError as err:
             # Should only get field errors from this exception
             assert NON_FIELD_ERRORS not in err.message_dict
+
+            # Error messages are returned as arrays from ValidationError
+            error_code = err.message_dict.get('error_code', ['validation-error'])[0]
+
             # Only return first error for each field
             errors = {
                 field: [{"user_message": error} for error in error_list]
-                for field, error_list in err.message_dict.items()
+                for field, error_list in err.message_dict.items() if field != 'error_code'
             }
-            response = self._create_response(request, errors, status_code=400)
+            response = self._create_response(request, errors, status_code=400, error_code=error_code)
         except PermissionDenied:
             response = HttpResponseForbidden(_("Account creation not allowed."))
 
         return response, user
 
-    def _create_response(self, request, response_dict, status_code, redirect_url=None):
+    def _create_response(self, request, response_dict, status_code, redirect_url=None, error_code=None):
         if status_code == 200:
             # keeping this `success` field in for now, as we have outstanding clients expecting this
             response_dict['success'] = True
@@ -574,6 +588,9 @@ class RegistrationView(APIView):
             self._log_validation_errors(request, response_dict, status_code)
         if redirect_url:
             response_dict['redirect_url'] = redirect_url
+        if error_code:
+            response_dict['error_code'] = error_code
+            set_custom_attribute('register_error_code', error_code)
         return JsonResponse(response_dict, status=status_code)
 
     def _log_validation_errors(self, request, errors, status_code):
