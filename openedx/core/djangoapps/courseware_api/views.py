@@ -6,7 +6,6 @@ import json
 
 from completion.exceptions import UnavailableCompletionData
 from completion.utilities import get_key_to_last_completed_block
-from django.conf import settings
 from django.urls import reverse
 from django.utils.translation import ugettext as _
 from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthentication

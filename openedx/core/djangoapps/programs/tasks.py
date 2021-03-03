@@ -606,7 +606,6 @@ def update_certificate_visible_date_on_course_update(self, course_key):
     # feature, it may indicate a condition where processing of such tasks
     # has been temporarily disabled.  Since this is a recoverable situation,
     # mark this task for retry instead of failing it altogether.
-
     if not CredentialsApiConfig.current().is_learner_issuance_enabled:
         error_msg = (
             "Task update_certificate_visible_date_on_course_update cannot be executed when credentials issuance is "
@@ -622,5 +621,9 @@ def update_certificate_visible_date_on_course_update(self, course_key):
         course_id=course_key
     ).values_list('user__username', flat=True)
 
+    LOGGER.info(
+        "Task update_certificate_visible_date_on_course_update resending course certificates"
+        f"for {len(users_with_certificates_in_course)} users in course {course_key}."
+    )
     for user in users_with_certificates_in_course:
         award_course_certificate.delay(user, str(course_key))
