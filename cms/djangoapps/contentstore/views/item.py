@@ -29,12 +29,14 @@ from xblock.core import XBlock
 from xblock.fields import Scope
 
 from cms.djangoapps.contentstore.config.waffle import SHOW_REVIEW_RULES_FLAG
+from cms.djangoapps.contentstore.signals.signals import COURSE_BLOCK_VISIBILTY_CHANGED
 from cms.djangoapps.models.settings.course_grading import CourseGradingModel
 from cms.djangoapps.xblock_config.models import CourseEditLTIFieldsEnabledFlag
 from cms.lib.xblock.authoring_mixin import VISIBILITY_VIEW
 from common.djangoapps.edxmako.shortcuts import render_to_string
 from common.djangoapps.static_replace import replace_static_urls
 from common.djangoapps.student.auth import has_studio_read_access, has_studio_write_access
+from common.djangoapps.track.event_transaction_utils import create_new_event_transaction_id
 from common.djangoapps.util.date_utils import get_default_time_display
 from common.djangoapps.util.json_request import JsonResponse, expect_json
 from common.djangoapps.xblock_django.user_service import DjangoXBlockUserService
@@ -654,6 +656,15 @@ def _save_xblock(user, xblock, data=None, children_strings=None, metadata=None, 
         if grader_type is not None:
             result.update(CourseGradingModel.update_section_grader_type(xblock, grader_type, user))
 
+        # If visible_to_staff_only has changed, send a signal to regrade the course
+        if _block_visibility_changed(xblock, metadata, old_metadata):
+            COURSE_BLOCK_VISIBILTY_CHANGED.send(
+                user_id=user.id,
+                sender="_save_xblock",
+                course_key=xblock.location.course_key,
+                event_transaction_id=str(create_new_event_transaction_id()),
+            )
+
         # Save gating info
         if xblock.category == 'sequential' and course.enable_subsection_gating:
             if is_prereq is not None:
@@ -686,6 +697,24 @@ def _save_xblock(user, xblock, data=None, children_strings=None, metadata=None, 
 
         # Note that children aren't being returned until we have a use case.
         return JsonResponse(result, encoder=EdxJSONEncoder)
+
+
+def _block_visibility_changed(xblock, metadata, old_metadata):
+    """
+    Has the 'visible_to_staff_only' metadata field changed?
+    """
+    if metadata is None:
+        return False
+    new_value = metadata.get('visible_to_staff_only')
+    if new_value is not None:
+        field = xblock.fields['visible_to_staff_only']
+        try:
+            new_value = field.from_json(new_value)
+        except ValueError:
+            # This shouldn't ever happen, since it should have been caught in _save_xblock
+            # but better safe than sorry
+            return False
+    return new_value != old_metadata.get('visible_to_staff_only')
 
 
 @login_required

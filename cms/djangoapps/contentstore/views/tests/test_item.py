@@ -1893,6 +1893,27 @@ class TestEditItem(TestEditItemSetup):
         self.assertIn("error", parsed)
         self.assertIn("Incorrect RelativeTime value", parsed["error"])  # See xmodule/fields.py
 
+    def test_change_visibility_signal(self):
+        resp = self.create_xblock(parent_usage_key=self.seq_usage_key, display_name='Test Unit', category='vertical')
+        unit_usage_key = self.response_usage_key(resp)
+        unit_update_url = reverse_usage_url('xblock_handler', unit_usage_key)
+
+        with patch('cms.djangoapps.contentstore.views.item.COURSE_BLOCK_VISIBILTY_CHANGED') as mock_signal:
+            def _update_visibility_and_assert_signal_sent(visible_to_staff_only, expected_call_count):
+                metadata = {
+                    'visible_to_staff_only': 'True' if visible_to_staff_only else None
+                }
+                resp = self.client.ajax_post(unit_update_url, data={'metadata': metadata})
+                self.assertEqual(resp.status_code, 200)
+                self.assertEqual(mock_signal.send.call_count, expected_call_count)
+
+            _update_visibility_and_assert_signal_sent(True, 1)
+            _update_visibility_and_assert_signal_sent(True, 1)  # No change, so the signal should not be sent
+            _update_visibility_and_assert_signal_sent(False, 2)
+            _update_visibility_and_assert_signal_sent(False, 2)  # No change, so the signal should not be sent
+            _update_visibility_and_assert_signal_sent(True, 3)
+            _update_visibility_and_assert_signal_sent(False, 4)
+
 
 class TestEditItemSplitMongo(TestEditItemSetup):
     """

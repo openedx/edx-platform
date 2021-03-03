@@ -23,7 +23,7 @@ from openedx.core.djangoapps.content.learning_sequences.api import key_supports_
 from openedx.core.lib.gating import api as gating_api
 from xmodule.modulestore.django import SignalHandler, modulestore
 
-from .signals import GRADING_POLICY_CHANGED
+from .signals import GRADING_POLICY_CHANGED, COURSE_BLOCK_VISIBILTY_CHANGED
 
 log = logging.getLogger(__name__)
 
@@ -115,6 +115,26 @@ def handle_item_deleted(**kwargs):
             gating_api.set_required_content(course_key, module.location, None, None, None)
 
 
+def _enqueue_recompute_grades_task(course_key, grading_policy_hash=None):
+    """
+    Helper function to enqueue a recompute course grades task.
+    """
+    kwargs = {
+        'course_key': str(course_key),
+        'event_transaction_id': str(get_event_transaction_id()),
+        'event_transaction_type': str(get_event_transaction_type()),
+    }
+    if grading_policy_hash is not None:
+        kwargs['grading_policy_hash'] = str(grading_policy_hash)
+
+    result = task_compute_all_grades_for_course.apply_async(kwargs=kwargs, countdown=GRADING_POLICY_COUNTDOWN_SECONDS)
+    log.info("Grades: Created {task_name}[{task_id}] with arguments {kwargs}".format(
+        task_name=task_compute_all_grades_for_course.name,
+        task_id=result.task_id,
+        kwargs=kwargs,
+    ))
+
+
 @receiver(GRADING_POLICY_CHANGED)
 @locked(expiry_seconds=GRADING_POLICY_COUNTDOWN_SECONDS, key='course_key')
 def handle_grading_policy_changed(sender, **kwargs):
@@ -122,15 +142,18 @@ def handle_grading_policy_changed(sender, **kwargs):
     """
     Receives signal and kicks off celery task to recalculate grades
     """
-    kwargs = {
-        'course_key': str(kwargs.get('course_key')),
-        'grading_policy_hash': str(kwargs.get('grading_policy_hash')),
-        'event_transaction_id': str(get_event_transaction_id()),
-        'event_transaction_type': str(get_event_transaction_type()),
-    }
-    result = task_compute_all_grades_for_course.apply_async(kwargs=kwargs, countdown=GRADING_POLICY_COUNTDOWN_SECONDS)
-    log.info("Grades: Created {task_name}[{task_id}] with arguments {kwargs}".format(
-        task_name=task_compute_all_grades_for_course.name,
-        task_id=result.task_id,
-        kwargs=kwargs,
-    ))
+    _enqueue_recompute_grades_task(
+        kwargs.get('course_key'),
+        kwargs.get('grading_policy_hash')
+    )
+
+
+@receiver(COURSE_BLOCK_VISIBILTY_CHANGED)
+def handle_course_block_visibility_changed(sender, **kwargs):
+    # pylint: disable=unused-argument
+    """
+    Receives signal and kicks off celery task to recalculate grades
+    """
+    _enqueue_recompute_grades_task(
+        kwargs.get('course_key'),
+    )

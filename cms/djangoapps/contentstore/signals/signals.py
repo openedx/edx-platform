@@ -14,3 +14,10 @@ GRADING_POLICY_CHANGED = Signal(
         'course_key',  # Unicode string representing the course
     ]
 )
+
+COURSE_BLOCK_VISIBILTY_CHANGED = Signal(
+    providing_args=[
+        'user_id',  # Integer User ID
+        'course_key',  # Unicode string representing the course
+    ]
+)
