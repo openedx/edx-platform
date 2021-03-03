@@ -414,6 +414,7 @@ class CoursewareInformation(RetrieveAPIView):
 
     authentication_classes = (
         JwtAuthentication,
+        BearerAuthenticationAllowInactiveUser,
         SessionAuthenticationAllowInactiveUser,
     )
 
