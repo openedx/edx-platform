@@ -2642,6 +2642,7 @@ def add_certificate_exception(course_key, student, certificate_exception):
     :param certificate_exception: A dict object containing certificate exception info.
     :return: CertificateWhitelist item in dict format containing certificate exception info.
     """
+    log.info(f"Request received to add an allowlist entry for student {student.id} in course {course_key}")
     # Check if the learner is blocked from receiving certificates in this course run.
     if certs_api.is_certificate_invalidated(student, course_key):
         raise ValueError(
@@ -2686,27 +2687,23 @@ def remove_certificate_exception(course_key, student):
     :param student: User object whose certificate exception needs to be removed.
     :return:
     """
-    try:
-        certificate_exception = certs_api.get_allowlist_entry(student, course_key)
-    except ObjectDoesNotExist:
+    log.info(f"Request received to remove an allowlist entry for student {student.id} in course {course_key}.")
+
+    allowlist_entry = certs_api.get_allowlist_entry(student, course_key)
+    if not allowlist_entry:
         raise ValueError(  # lint-amnesty, pylint: disable=raise-missing-from
             _('Certificate exception (user={user}) does not exist in certificate white list. '
               'Please refresh the page and try again.').format(user=student.username)
         )
 
-    try:
-        certificate = certs_api.get_certificate_for_user(student.username, course_key, False)
-        log.info(
-            f"Invalidating certificate for student {student.id} in course {course_key} before removing them from the "
-            "allowlist."
-        )
+    # If a certificate was generated then we should invalidate it before removing the learner from the allowlist
+    certificate = certs_api.get_certificate_for_user(student.username, course_key, False)
+    if certificate:
+        log.info(f"Invalidating certificate for student {student.id} in course {course_key} before allowlist removal.")
         certificate.invalidate()
-    except ObjectDoesNotExist:
-        # Certificate has not been generated yet, so just remove the certificate exception from white list
-        pass
 
     log.info(f"Removing student {student.id} from the allowlist in course {course_key}.")
-    certificate_exception.delete()
+    allowlist_entry.delete()
 
 
 def parse_request_data_and_get_user(request, course_key):
@@ -3018,11 +3015,13 @@ def re_validate_certificate(request, course_key, generated_certificate, student)
     :param course_key: CourseKey object identifying the current course.
     :param generated_certificate: GeneratedCertificate object of the student for the given course
     """
-    try:
-        certificate_invalidation = certs_api.get_certificate_invalidation_entry(generated_certificate)
-        certificate_invalidation.deactivate()
-    except ObjectDoesNotExist:
+    log.info(f"Attempting to revalidate certificate for student {student.id} in course {course_key}")
+
+    certificate_invalidation = certs_api.get_certificate_invalidation_entry(generated_certificate)
+    if not certificate_invalidation:
         raise ValueError(_("Certificate Invalidation does not exist, Please refresh the page and try again."))  # lint-amnesty, pylint: disable=raise-missing-from
+
+    certificate_invalidation.deactivate()
 
     task_api.generate_certificates_for_students(
         request, course_key, student_set="specific_student", specific_student_id=student.id

@@ -11,6 +11,7 @@ certificates models or any other certificates modules.
 import logging
 
 from django.contrib.auth import get_user_model
+from django.core.exceptions import ObjectDoesNotExist
 from django.db.models import Q
 from eventtracking import tracker
 from opaque_keys.edx.django.models import CourseKeyField
@@ -578,6 +579,7 @@ def create_certificate_allowlist_entry(user, course_key, notes):
     """
     Creates a certificate exception for a given learner in a given course-run.
     """
+    log.info(f"Creating an allowlist entry for student {user.id} in course {course_key}")
     certificate_allowlist, __ = CertificateWhitelist.objects.get_or_create(
         user=user,
         course_id=course_key,
@@ -594,6 +596,7 @@ def create_certificate_invalidation_entry(certificate, user_requesting_invalidat
     """
     Invalidates a certificate with the given certificate id.
     """
+    log.info(f"Creating a certificate invalidation entry linked to certificate with id {certificate.id}.")
     certificate_invalidation, __ = CertificateInvalidation.objects.update_or_create(
         generated_certificate=certificate,
         defaults={
@@ -610,14 +613,28 @@ def get_allowlist_entry(user, course_key):
     """
     Retrieves and returns an allowlist entry for a given learner and course-run.
     """
-    return CertificateWhitelist.objects.get(user=user, course_id=course_key)
+    log.info(f"Attempting to retrieve an allowlist entry for student {user.id} in course {course_key}.")
+    try:
+        allowlist_entry = CertificateWhitelist.objects.get(user=user, course_id=course_key)
+    except ObjectDoesNotExist:
+        log.warning(f"No allowlist entry found for student {user.id} in course {course_key}.")
+        return None
+
+    return allowlist_entry
 
 
 def get_certificate_invalidation_entry(certificate):
     """
     Retrieves and returns an certificate invalidation entry for a given certificate id.
     """
-    return CertificateInvalidation.objects.get(generated_certificate=certificate)
+    log.info(f"Attempting to retrieve certificate invalidation entry for certificate with id {certificate.id}.")
+    try:
+        certificate_invalidation_entry = CertificateInvalidation.objects.get(generated_certificate=certificate)
+    except ObjectDoesNotExist:
+        log.warning(f"No certificate invalidation found linked to certificate with id {certificate.id}.")
+        return None
+
+    return certificate_invalidation_entry
 
 
 def is_on_allowlist(user, course_key):

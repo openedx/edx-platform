@@ -19,6 +19,7 @@ from freezegun import freeze_time
 from mock import patch
 from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locator import CourseLocator
+from testfixtures import LogCapture
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
@@ -944,6 +945,23 @@ class InstructorDashboardFunctionalityTests(ModuleStoreTestCase):
         assert retrieved_entry.course_id == allowlist_entry.course_id
         assert retrieved_entry.user == allowlist_entry.user
 
+    def test_get_allowlist_entry_dne(self):
+        """
+        Test to verify behavior when an allowlist entry for a user does not exist
+        """
+        expected_messages = [
+            f"Attempting to retrieve an allowlist entry for student {self.user.id} in course {self.course_run_key}.",
+            f"No allowlist entry found for student {self.user.id} in course {self.course_run_key}."
+        ]
+
+        with LogCapture() as log:
+            retrieved_entry = get_allowlist_entry(self.user, self.course_run_key)
+
+        assert retrieved_entry is None
+
+        for index, message in enumerate(expected_messages):
+            assert message in log.records[index].getMessage()
+
     def test_get_certificate_invalidation_entry(self):
         """
         Test to verify that we can retrieve a certificate invalidation entry for a learner.
@@ -966,6 +984,30 @@ class InstructorDashboardFunctionalityTests(ModuleStoreTestCase):
         assert retrieved_invalidation.id == invalidation.id
         assert retrieved_invalidation.generated_certificate == certificate
         assert retrieved_invalidation.active == invalidation.active
+
+    def test_get_certificate_invalidation_entry_dne(self):
+        """
+        Test to verify behavior when a certificate invalidation entry does not exist.
+        """
+        certificate = GeneratedCertificateFactory.create(
+            user=self.user,
+            course_id=self.course_run_key,
+            status=CertificateStatuses.unavailable,
+            mode='verified'
+        )
+
+        expected_messages = [
+            f"Attempting to retrieve certificate invalidation entry for certificate with id {certificate.id}.",
+            f"No certificate invalidation found linked to certificate with id {certificate.id}.",
+        ]
+
+        with LogCapture() as log:
+            retrieved_invalidation = get_certificate_invalidation_entry(certificate)
+
+        assert retrieved_invalidation is None
+
+        for index, message in enumerate(expected_messages):
+            assert message in log.records[index].getMessage()
 
     def test_is_on_allowlist(self):
         """
