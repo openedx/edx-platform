@@ -118,3 +118,8 @@ python3-saml<1.10.0
 # With greater version these tests `common.djangoapps.terrain.stubs.tests` becomes flaky on jenkins.
 httpretty<1.0
 
+
+# mock version 4.0.0 drops support for python 3.5
+mock<4.0.0
+
+pygments==2.6.1
