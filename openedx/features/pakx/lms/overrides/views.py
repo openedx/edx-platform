@@ -9,7 +9,6 @@ from opaque_keys.edx.keys import CourseKey
 from six import text_type
 
 from course_modes.models import CourseMode, get_course_prices
-from courseware.courses import get_course_with_access
 from edxmako.shortcuts import marketing_link, render_to_response, render_to_string
 from lms.djangoapps.commerce.utils import EcommerceService
 from lms.djangoapps.courseware.access import has_access
@@ -23,6 +22,7 @@ from lms.djangoapps.courseware.courses import (
     sort_by_announcement,
     sort_by_start_date
 )
+
 from lms.djangoapps.courseware.permissions import VIEW_COURSE_HOME, VIEW_COURSEWARE
 from lms.djangoapps.courseware.views.index import render_accordion
 from lms.djangoapps.courseware.views.views import _course_home_redirect_enabled, registered_for_course
