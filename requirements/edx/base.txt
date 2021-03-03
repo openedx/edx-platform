@@ -48,7 +48,7 @@ ddt==1.4.1                # via xblock-drag-and-drop-v2, xblock-poll
 decorator==4.4.2          # via pycontracts
 defusedxml==0.6.0         # via -r requirements/edx/base.in, djangorestframework-xml, ora2, python3-openid, python3-saml, safe-lxml, social-auth-core
 django-appconf==1.0.4     # via -r requirements/edx/base.in, django-statici18n
-django-cache-memoize==0.1.7  # via edx-enterprise
+django-cache-memoize==0.1.8  # via edx-enterprise
 django-celery-results==2.0.1  # via -r requirements/edx/base.in
 django-classy-tags==2.0.0  # via django-sekizai
 django-config-models==2.1.1  # via -r requirements/edx/base.in, edx-enterprise, edx-event-routing-backends
@@ -164,7 +164,7 @@ nodeenv==1.5.0            # via -r requirements/edx/base.in
 numpy==1.20.1             # via chem, openedx-calc, scipy
 oauthlib==3.0.1           # via -c requirements/edx/../constraints.txt, -r requirements/edx/base.in, django-oauth-toolkit, lti-consumer-xblock, requests-oauthlib, social-auth-core
 openedx-calc==2.0.1       # via -r requirements/edx/base.in
-ora2==3.2.0               # via -r requirements/edx/base.in
+ora2==3.3.1               # via -r requirements/edx/base.in
 packaging==20.9           # via bleach, drf-yasg
 path.py==12.5.0           # via edx-enterprise, edx-i18n-tools, ora2, staff-graded-xblock, xmodule
 path==13.1.0              # via -c requirements/edx/../constraints.txt, -r requirements/edx/paver.txt, path.py
