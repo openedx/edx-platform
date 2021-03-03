@@ -322,3 +322,45 @@ def test_get_catalog_courses_expired_course(expired_course, course_group, user_w
         multilingual_course_group=course_group
     )
     assert len(student_helpers.get_catalog_courses(user_with_profile)) == 0
+
+
+@pytest.mark.django_db
+def test_get_prerequisites_for_user():
+    """
+    Test to get prerequisites for user
+    """
+    current_time = datetime.now()
+    course = CourseOverviewFactory(
+        language='en',
+        start_date=current_time - timedelta(days=1),
+        end_date=current_time + timedelta(days=1)
+    )
+    MultilingualCourseFactory(course=course)
+    user = UserFactory()
+    assert len(student_helpers.get_prerequisite_courses_for_user(user)) == 1
+
+
+@pytest.mark.django_db
+def test_no_prerequisite_courses():
+    """
+    Test no prerequisites courses for user
+    """
+    MultilingualCourseGroupFactory()
+    user = UserFactory()
+    assert len(student_helpers.get_prerequisite_courses_for_user(user)) == 0
+
+
+@pytest.mark.django_db
+def test_get_enrolled_prerequisites_for_user():
+    """
+    Test to get enrolled prerequisites for user
+    """
+    user = UserFactory()
+    current_time = datetime.now()
+    course = CourseOverviewFactory(
+        start_date=current_time - timedelta(days=1),
+        end_date=current_time + timedelta(days=1)
+    )
+    MultilingualCourseFactory(course=course)
+    CourseEnrollmentFactory(course=course, user=user, is_active=True)
+    assert len(student_helpers.get_prerequisite_courses_for_user(user)) == 1

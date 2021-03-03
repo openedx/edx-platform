@@ -125,8 +125,17 @@ def test_prereq_course_scores(mock_read, user_application, percent):
     Test that the `prereq_course_scores` property returns the correct prerequisite course names and respective scores of
     the applicant in those courses, in the correct format.
     """
-    test_course_1 = MultilingualCourseFactory().course
-    test_course_2 = MultilingualCourseFactory().course
+    current_time = datetime.now()
+    test_course_1 = CourseOverviewFactory(
+        start_date=current_time - timedelta(days=1),
+        end_date=current_time + timedelta(days=1),
+    )
+    test_course_2 = CourseOverviewFactory(
+        start_date=current_time - timedelta(days=1),
+        end_date=current_time + timedelta(days=1),
+    )
+    MultilingualCourseFactory(course=test_course_1)
+    MultilingualCourseFactory(course=test_course_2)
 
     course_grade = CourseGradeFactory()
     course_grade.percent = percent
@@ -138,11 +147,7 @@ def test_prereq_course_scores(mock_read, user_application, percent):
     course_score_2 = CourseScore(test_course_2.display_name, score)
 
     expected_prereq_course_scores = [course_score_1, course_score_2]
-    with mock.patch(
-        'openedx.adg.lms.applications.models.get_prerequisite_courses_for_user'
-    ) as mock_get_prerequisite_courses_for_user:
-        mock_get_prerequisite_courses_for_user.return_value = [test_course_1, test_course_2]
-        actual_prereq_course_scores = user_application.prereq_course_scores
+    actual_prereq_course_scores = user_application.prereq_course_scores
 
     assert expected_prereq_course_scores == actual_prereq_course_scores
 

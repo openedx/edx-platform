@@ -156,20 +156,6 @@ def compose_and_send_adg_course_enrollment_invitation_email(user_email, message_
     MandrillClient().send_mandrill_email(MandrillClient.COURSE_ENROLLMENT_INVITATION, user_email, message_context)
 
 
-def get_catalog_courses(user):
-    """
-    Get catalog courses for user using multilingual course groups.
-
-    Args:
-        user (User): User for which courses will be returned
-
-    Returns:
-        list: List of catalog courses
-    """
-    course_groups = MultilingualCourseGroup.objects.all()
-    return get_courses_from_course_groups(course_groups, user)
-
-
 def get_courses_from_course_groups(course_groups, user):
     """
     Get courses from course groups.
@@ -202,3 +188,31 @@ def get_courses_from_course_groups(course_groups, user):
             if preferred_course:
                 courses_list.append(preferred_course)
     return courses_list
+
+
+def get_catalog_courses(user):
+    """
+    Get catalog courses for user by using multilingual course groups.
+
+    Args:
+        user (User): User for which courses will be returned
+
+    Returns:
+        list: List of catalog courses
+    """
+    course_groups = MultilingualCourseGroup.objects.all()
+    return get_courses_from_course_groups(course_groups, user)
+
+
+def get_prerequisite_courses_for_user(user):
+    """
+    Get list of prerequisite courses for a user.
+
+    Args:
+        user (User): user for which we need to find the prerequisite courses
+
+    Returns:
+        list: List of prerequisites for the user
+    """
+    prerequisite_course_groups = MultilingualCourseGroup.prerequisite_course_groups.all()
+    return get_courses_from_course_groups(prerequisite_course_groups, user)

@@ -17,9 +17,10 @@ from openedx.adg.lms.applications.forms import (
     UserProfileForm
 )
 from openedx.adg.lms.registration_extension.models import ExtendedUserProfile
+from openedx.adg.lms.student.helpers import get_prerequisite_courses_for_user
 from openedx.adg.lms.utils.date_utils import month_choices, year_choices
 
-from .helpers import get_prerequisite_courses_for_user, send_application_submission_confirmation_email
+from .helpers import send_application_submission_confirmation_email
 from .models import ApplicationHub, BusinessLine, Education, UserApplication
 
 

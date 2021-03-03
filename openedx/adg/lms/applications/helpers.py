@@ -243,30 +243,3 @@ def get_extra_context_for_application_review_page(application):
     }
 
     return extra_context
-
-
-def get_prerequisite_courses_for_user(user):
-    """
-    Get list of prerequisite courses for a user.
-    Following are the preferences for the prerequisites list.
-
-    1. Enrollment
-        If a user is enrolled in any of the courses of a prerequisite
-        group then that course is selected from the group.
-
-    2. Language preferred
-        If user has not enrolled in any of the courses of a prerequisite
-        group then find a course with preferred language.
-
-    Args:
-        user (User): user for which we need to find the prerequisite courses
-
-    Returns:
-        list: List of prerequisites for the user
-    """
-    from openedx.adg.lms.student.helpers import get_courses_from_course_groups
-
-    from .models import MultilingualCourseGroup
-
-    prerequisite_course_groups = MultilingualCourseGroup.prerequisite_course_groups.all()
-    return get_courses_from_course_groups(prerequisite_course_groups, user)

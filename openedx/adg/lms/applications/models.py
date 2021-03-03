@@ -16,12 +16,7 @@ from openedx.core.djangoapps.content.course_overviews.models import CourseOvervi
 from openedx.core.lib.grade_utils import round_away_from_zero
 
 from .constants import ALLOWED_LOGO_EXTENSIONS, CourseScore
-from .helpers import (
-    get_prerequisite_courses_for_user,
-    max_year_value_validator,
-    min_year_value_validator,
-    validate_logo_size
-)
+from .helpers import max_year_value_validator, min_year_value_validator, validate_logo_size
 from .managers import OpenMultilingualCourseManager, PrerequisiteCourseGroupManager, SubmittedApplicationsManager
 
 
@@ -200,6 +195,8 @@ class UserApplication(TimeStampedModel):
         Returns:
             list: Prereq course name and score pairs
         """
+        from openedx.adg.lms.student.helpers import get_prerequisite_courses_for_user
+
         prereq_course_overviews = get_prerequisite_courses_for_user(self.user)
         scores_in_prereq_courses = []
 
