@@ -118,3 +118,6 @@ python3-saml<1.10.0
 # With greater version these tests `common.djangoapps.terrain.stubs.tests` becomes flaky on jenkins.
 httpretty<1.0
 
+# pygments was constrained by diff-cover see https://github.com/Bachmann1234/diff_cover/commit/01f91760321cee1ad28cfa0d801c4acd8b9765a6
+pygments==2.6.1
+
