@@ -178,9 +178,15 @@ class BlocksView(DeveloperErrorViewMixin, ListAPIView):
             parameter.
 
           * lms_web_url: (string) The URL to the navigational container of the
-            xBlock on the web LMS.  This URL can be used as a further fallback
+            xBlock on the web. This URL can be used as a further fallback
             if the student_view_url and the student_view_data fields are not
-            supported.
+            supported. Will direct to either the "New" (micro-frontend) or
+            "Legacy" (Django-template-rendered) frontend experience depending
+            on which experience is active.
+
+          * legacy_web_url: (string) Like `lms_web_url`, but always directs to
+            the "Legacy" frontend experience. Should only be used for
+            transitional purposes; will be removed as part of DEPR-109.
 
           * lti_url: The block URL for an LTI consumer. Returned only if the
             "ENABLE_LTI_PROVIDER" Django settign is set to "True".

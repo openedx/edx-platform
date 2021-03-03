@@ -64,7 +64,9 @@ class TestBlockSerializerBase(SharedModuleStoreTestCase):
         """
         block_key = deserialize_usage_key(block_key_string, self.course.id)
         assert self.block_structure.get_xblock_field(block_key, 'category') == serialized_block['type']
-        assert set(serialized_block.keys()) == {'id', 'block_id', 'type', 'lms_web_url', 'student_view_url'}
+        assert set(serialized_block.keys()) == {
+            'id', 'block_id', 'type', 'lms_web_url', 'legacy_web_url', 'student_view_url'
+        }
 
     def add_additional_requested_fields(self, context=None):
         """
@@ -88,8 +90,18 @@ class TestBlockSerializerBase(SharedModuleStoreTestCase):
         """
         Verifies the given serialized_block when additional fields are requested.
         """
-        assert {'id', 'type', 'lms_web_url', 'student_view_url', 'display_name', 'graded', 'student_view_multi_device',
-                'lti_url', 'visible_to_staff_only'} <= set(serialized_block.keys())
+        assert {
+            'id',
+            'type',
+            'lms_web_url',
+            'legacy_web_url',
+            'student_view_url',
+            'display_name',
+            'graded',
+            'student_view_multi_device',
+            'lti_url',
+            'visible_to_staff_only'
+        } <= set(serialized_block.keys())
 
         # video blocks should have student_view_data
         if serialized_block['type'] == 'video':

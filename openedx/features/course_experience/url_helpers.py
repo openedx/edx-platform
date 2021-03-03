@@ -4,7 +4,8 @@ Helper functions for logic related to learning (courseare & course home) URLs.
 Centralizdd in openedx/features/course_experience instead of lms/djangoapps/courseware
 because the Studio course outline may need these utilities.
 """
-from typing import Optional, Tuple
+from enum import Enum
+from typing import Optional
 
 import six
 from django.conf import settings
@@ -21,9 +22,24 @@ from xmodule.modulestore.search import navigation_index, path_to_location
 User = get_user_model()
 
 
+class ExperienceOption(Enum):
+    """
+    Versions of the courseware experience that can be requested.
+
+    `ACTIVE` indicates that the default experience (in the context of the
+    course run) should be used.
+
+    To be removed as part of DEPR-109.
+    """
+    ACTIVE = 'courseware-experience-active'
+    NEW = 'courseware-experience-new'
+    LEGACY = 'courseware-experience-legacy'
+
+
 def get_courseware_url(
         usage_key: UsageKey,
         request: Optional[HttpRequest] = None,
+        experience: ExperienceOption = ExperienceOption.ACTIVE,
 ) -> str:
     """
     Return the URL to the canonical learning experience for a given block.
@@ -32,70 +48,27 @@ def get_courseware_url(
     course that the block is in, the requesting user, and the state of
     the 'courseware' waffle flags.
 
-    If you know that you want a Learning MFE URL, regardless of configuration,
-    then it is more performant to call `get_learning_mfe_courseware_url` directly.
+    If you know the specific Sequence or Sequence/Unit you need to redirect to,
+    and you know that you want a Learning MFE URL regardless of configuration,
+    then it is more performant to call `make_learning_mfe_courseware_url` directly.
 
     Raises:
         * ItemNotFoundError if no data at the `usage_key`.
         * NoPathToItem if we cannot build a path to the `usage_key`.
     """
     course_key = usage_key.course_key.replace(version_guid=None, branch=None)
-    if courseware_mfe_is_active(course_key):
-        sequence_key, unit_key = _get_sequence_and_unit_keys(
-            usage_key=usage_key,
-            request=request,
-        )
-        return get_learning_mfe_courseware_url(
-            course_key=course_key,
-            sequence_key=sequence_key,
-            unit_key=unit_key,
-        )
+    if experience == ExperienceOption.NEW:
+        get_url_fn = _get_new_courseware_url
+    elif experience == ExperienceOption.LEGACY:
+        get_url_fn = _get_legacy_courseware_url
+    elif courseware_mfe_is_active(course_key):
+        get_url_fn = _get_new_courseware_url
     else:
-        return get_legacy_courseware_url(
-            usage_key=usage_key,
-            request=request
-        )
+        get_url_fn = _get_legacy_courseware_url
+    return get_url_fn(usage_key=usage_key, request=request)
 
 
-def _get_sequence_and_unit_keys(
-        usage_key: UsageKey,
-        request: Optional[HttpRequest] = None,
-) -> Tuple[Optional[UsageKey], Optional[UsageKey]]:
-    """
-    Find the sequence and unit containg a block within a course run.
-
-    Performance consideration: Currently, this function incurs a modulestore query.
-
-    Raises:
-        * ItemNotFoundError if no data at the `usage_key`.
-        * NoPathToItem if we cannot build a path to the `usage_key`.
-
-    Returns: (sequence_key|None, unit_key|None)
-    * sequence_key points to a Section (ie chapter) or Subsection (ie sequential).
-    * unit_key points to  Unit (ie vertical).
-    Either of these may be None if we are above that level in the course hierarchy.
-    For example, if `usage_key` points to a Subsection, then unit_key will be None.
-    """
-    path = path_to_location(modulestore(), usage_key, request, full_path=True)
-    if len(path) <= 1:
-        # Course-run-level block:
-        # We have no Sequence or Unit to return.
-        return None, None
-    elif len(path) == 2:
-        # Section-level (ie chapter) block:
-        # The Section is the Sequence. We have no Unit to return.
-        return path[1], None
-    elif len(path) == 3:
-        # Subsection-level block:
-        # The Subsection is the Sequence. We still have no Unit to return.
-        return path[2], None
-    else:
-        # Unit-level (or lower) block:
-        # The Subsection is the Sequence, and the next level down is the Unit.
-        return path[2], path[3]
-
-
-def get_legacy_courseware_url(
+def _get_legacy_courseware_url(
         usage_key: UsageKey,
         request: Optional[HttpRequest] = None,
 ) -> str:
@@ -135,7 +108,46 @@ def get_legacy_courseware_url(
     return redirect_url
 
 
-def get_learning_mfe_courseware_url(
+def _get_new_courseware_url(
+        usage_key: UsageKey,
+        request: Optional[HttpRequest] = None,
+) -> str:
+    """
+    Return the URL to the "new" (Learning Micro-Frontend) experience for a given block.
+
+    If you know the specific Sequence or Sequence/Unit you need to redirect to,
+    then it is more performant to call `make_learning_mfe_courseware_url` directly.
+
+    Raises:
+        * ItemNotFoundError if no data at the `usage_key`.
+        * NoPathToItem if we cannot build a path to the `usage_key`.
+    """
+    course_key = usage_key.course_key.replace(version_guid=None, branch=None)
+    path = path_to_location(modulestore(), usage_key, request, full_path=True)
+    if len(path) <= 1:
+        # Course-run-level block:
+        # We have no Sequence or Unit to return.
+        sequence_key, unit_key = None, None
+    elif len(path) == 2:
+        # Section-level (ie chapter) block:
+        # The Section is the Sequence. We have no Unit to return.
+        sequence_key, unit_key = path[1], None
+    elif len(path) == 3:
+        # Subsection-level block:
+        # The Subsection is the Sequence. We still have no Unit to return.
+        sequence_key, unit_key = path[2], None
+    else:
+        # Unit-level (or lower) block:
+        # The Subsection is the Sequence, and the next level down is the Unit.
+        sequence_key, unit_key = path[2], path[3]
+    return make_learning_mfe_courseware_url(
+        course_key=course_key,
+        sequence_key=sequence_key,
+        unit_key=unit_key,
+    )
+
+
+def make_learning_mfe_courseware_url(
         course_key: CourseKey,
         sequence_key: Optional[UsageKey] = None,
         unit_key: Optional[UsageKey] = None,
