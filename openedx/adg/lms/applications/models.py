@@ -345,6 +345,9 @@ class MultilingualCourseGroup(models.Model):
         Returns:
             CourseOverview: Enrolled multilingual course or None
         """
+        if user.is_anonymous:
+            return None
+
         enrolled_multilingual_course = self.open_multilingual_courses.filter(
             course__courseenrollment__user=user,
             course__courseenrollment__is_active=True

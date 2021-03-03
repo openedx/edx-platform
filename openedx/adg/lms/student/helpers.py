@@ -8,6 +8,7 @@ from django.urls import reverse
 from django.utils.http import int_to_base36
 
 from openedx.adg.common.lib.mandrill_client.client import MandrillClient
+from openedx.adg.lms.applications.models import MultilingualCourseGroup
 from openedx.adg.lms.helpers import get_user_first_name
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
@@ -153,3 +154,51 @@ def compose_and_send_adg_course_enrollment_invitation_email(user_email, message_
 
     message_context.pop('course')
     MandrillClient().send_mandrill_email(MandrillClient.COURSE_ENROLLMENT_INVITATION, user_email, message_context)
+
+
+def get_catalog_courses(user):
+    """
+    Get catalog courses for user using multilingual course groups.
+
+    Args:
+        user (User): User for which courses will be returned
+
+    Returns:
+        list: List of catalog courses
+    """
+    course_groups = MultilingualCourseGroup.objects.all()
+    return get_courses_from_course_groups(course_groups, user)
+
+
+def get_courses_from_course_groups(course_groups, user):
+    """
+    Get courses from course groups.
+    Following are the preferences for the course list.
+
+    1. Enrollment
+        If a user is enrolled in any of the courses of a prerequisite
+        group then that course is selected from the group.
+
+    2. Language preferred
+        If user has not enrolled in any of the courses of a prerequisite
+        group then find a course with preferred language.
+
+    Args:
+        course_groups (list):  List of MultilingualCourseGroups
+        user (User): user for which we need to find courses
+
+    Returns:
+        list: List of courses which contains a course from each group
+    """
+    courses_list = []
+
+    for course_group in course_groups:
+        enrolled_course = course_group.get_user_enrolled_course(user)
+
+        if enrolled_course:
+            courses_list.append(enrolled_course)
+        else:
+            preferred_course = course_group.get_preferred_lang_course()
+            if preferred_course:
+                courses_list.append(preferred_course)
+    return courses_list

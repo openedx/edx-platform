@@ -264,19 +264,9 @@ def get_prerequisite_courses_for_user(user):
     Returns:
         list: List of prerequisites for the user
     """
+    from openedx.adg.lms.student.helpers import get_courses_from_course_groups
+
     from .models import MultilingualCourseGroup
 
     prerequisite_course_groups = MultilingualCourseGroup.prerequisite_course_groups.all()
-
-    prerequisite_courses_for_user = []
-    for course_group in prerequisite_course_groups:
-        enrolled_course = course_group.get_user_enrolled_course(user)
-
-        if enrolled_course:
-            prerequisite_courses_for_user.append(enrolled_course)
-        else:
-            preferred_lang_course = course_group.get_preferred_lang_course()
-
-            if preferred_lang_course:
-                prerequisite_courses_for_user.append(preferred_lang_course)
-    return prerequisite_courses_for_user
+    return get_courses_from_course_groups(prerequisite_course_groups, user)
