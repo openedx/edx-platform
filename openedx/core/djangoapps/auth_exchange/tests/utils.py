@@ -35,7 +35,7 @@ class AccessTokenExchangeTestMixin(ThirdPartyOAuthTestMixin):
         """
         raise NotImplementedError()
 
-    def _assert_success(self, data, expected_scopes):
+    def _assert_success(self, data, expected_scopes, expected_logged_in_user=None):
         """
         Given request data, execute a test and check that the expected scopes
         were returned (along with any other appropriate assertions).

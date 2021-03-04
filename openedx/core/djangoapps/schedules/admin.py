@@ -166,22 +166,16 @@ class ScheduleAdmin(admin.ModelAdmin):  # lint-amnesty, pylint: disable=missing-
 
 
 class ScheduleConfigAdminForm(forms.ModelForm):  # lint-amnesty, pylint: disable=missing-class-docstring
-
-    def clean_hold_back_ratio(self):
-        hold_back_ratio = self.cleaned_data["hold_back_ratio"]
-        if hold_back_ratio < 0 or hold_back_ratio > 1:
-            raise forms.ValidationError("Invalid hold back ratio, the value must be between 0 and 1.")
-        return hold_back_ratio
+    pass
 
 
 @admin.register(models.ScheduleConfig)
 class ScheduleConfigAdmin(admin.ModelAdmin):  # lint-amnesty, pylint: disable=missing-class-docstring
     search_fields = ('site',)
     list_display = (
-        'site', 'create_schedules',
+        'site',
         'enqueue_recurring_nudge', 'deliver_recurring_nudge',
         'enqueue_upgrade_reminder', 'deliver_upgrade_reminder',
         'enqueue_course_update', 'deliver_course_update',
-        'hold_back_ratio',
     )
     form = ScheduleConfigAdminForm

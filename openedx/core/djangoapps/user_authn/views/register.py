@@ -342,7 +342,11 @@ def _track_user_registration(user, profile, params, third_party_provider):
                 # ..pii: Learner email is sent to Segment in following line and will be associated with analytics data.
                 'email': user.email,
                 'label': params.get('course_id'),
-                'provider': third_party_provider.name if third_party_provider else None
+                'provider': third_party_provider.name if third_party_provider else None,
+                'is_gender_selected': bool(profile.gender_display),
+                'is_year_of_birth_selected': bool(profile.year_of_birth),
+                'is_education_selected': bool(profile.level_of_education_display),
+                'is_goal_set': bool(profile.goals),
             },
         )
 

@@ -16,7 +16,7 @@ from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, U
 from lms.djangoapps.certificates.generation_handler import CERTIFICATES_USE_ALLOWLIST
 from lms.djangoapps.certificates.generation_handler import (
     _can_generate_allowlist_certificate_for_status,
-    _is_using_certificate_allowlist,
+    is_using_certificate_allowlist,
     can_generate_allowlist_certificate,
     generate_allowlist_certificate_task,
     is_using_certificate_allowlist_and_is_on_allowlist
@@ -31,7 +31,7 @@ from openedx.core.djangoapps.certificates.config import waffle
 
 log = logging.getLogger(__name__)
 
-ID_VERIFIED_METHOD = 'lms.djangoapps.verify_student.services.IDVerificationService.user_is_verified'
+ID_VERIFIED_METHOD = 'lms.djangoapps.verify_student.services.IDVerificationService.user_has_ever_been_verified'
 AUTO_GENERATION_NAMESPACE = waffle.WAFFLE_NAMESPACE
 AUTO_GENERATION_NAME = waffle.AUTO_CERTIFICATE_GENERATION
 AUTO_GENERATION_SWITCH_NAME = '{}.{}'.format(AUTO_GENERATION_NAMESPACE, AUTO_GENERATION_NAME)
@@ -68,14 +68,14 @@ class AllowlistTests(ModuleStoreTestCase):
         """
         Test the allowlist flag
         """
-        assert _is_using_certificate_allowlist(self.course_run_key)
+        assert is_using_certificate_allowlist(self.course_run_key)
 
     @override_waffle_flag(CERTIFICATES_USE_ALLOWLIST, active=False)
     def test_is_using_allowlist_false(self):
         """
         Test the allowlist flag without the override
         """
-        assert not _is_using_certificate_allowlist(self.course_run_key)
+        assert not is_using_certificate_allowlist(self.course_run_key)
 
     def test_is_using_allowlist_and_is_on_list(self):
         """

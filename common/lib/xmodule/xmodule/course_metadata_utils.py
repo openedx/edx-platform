@@ -2,7 +2,7 @@
 Simple utility functions that operate on course metadata.
 
 This is a place to put simple functions that operate on course metadata. It
-allows us to share code between the CourseDescriptor and CourseOverview
+allows us to share code between the CourseBlock and CourseOverview
 classes, which both need these type of functions.
 """
 

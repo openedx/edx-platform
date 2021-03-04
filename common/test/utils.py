@@ -6,8 +6,6 @@ General testing utilities.
 import functools
 import sys
 from contextlib import contextmanager
-
-import pytest  # lint-amnesty, pylint: disable=unused-import
 from django.dispatch import Signal
 from markupsafe import escape
 from mock import Mock, patch

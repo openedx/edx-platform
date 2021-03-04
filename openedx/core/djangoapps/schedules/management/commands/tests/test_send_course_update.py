@@ -12,9 +12,7 @@ from edx_ace.utils.date import serialize
 from mock import patch
 from six.moves import range
 
-from edx_toggles.toggles.testutils import override_waffle_flag
 from openedx.core.djangoapps.schedules import resolvers, tasks
-from openedx.core.djangoapps.schedules.config import COURSE_UPDATE_WAFFLE_FLAG
 from openedx.core.djangoapps.schedules.management.commands import send_course_update as nudge
 from openedx.core.djangoapps.schedules.management.commands.tests.send_email_base import (
     ExperienceTest,
@@ -59,13 +57,12 @@ class TestSendCourseUpdate(ScheduleUpsellTestMixin, ScheduleSendEmailTestMixin, 
         mock_highlights.return_value = [u'Highlight {}'.format(num + 1) for num in range(3)]
         self.addCleanup(self.stop_highlights_patcher)
 
-    def prepare_course_data(self, mock_get_current_site, is_self_paced=True):
+    def prepare_course_data(self, is_self_paced=True):
         """
         Prepare course data with highlights
         """
         self.highlights_patcher.stop()
         self.highlights_patcher = None
-        mock_get_current_site.return_value = self.site_config.site
 
         course = CourseFactory(highlights_enabled_for_messaging=True, self_paced=is_self_paced)
         with self.store.bulk_operations(course.id):
@@ -96,10 +93,8 @@ class TestSendCourseUpdate(ScheduleUpsellTestMixin, ScheduleSendEmailTestMixin, 
     def test_schedule_in_different_experience(self, test_config):
         self._check_if_email_sent_for_experience(test_config)
 
-    @override_waffle_flag(COURSE_UPDATE_WAFFLE_FLAG, True)
-    @patch('openedx.core.djangoapps.schedules.signals.get_current_site')
-    def test_with_course_data(self, mock_get_current_site):
-        offset, target_day, enrollment = self.prepare_course_data(mock_get_current_site)
+    def test_with_course_data(self):
+        offset, target_day, enrollment = self.prepare_course_data()
 
         with patch.object(tasks, 'ace') as mock_ace:
             self.task().apply(kwargs=dict(
@@ -111,14 +106,12 @@ class TestSendCourseUpdate(ScheduleUpsellTestMixin, ScheduleSendEmailTestMixin, 
 
             assert mock_ace.send.called
 
-    @override_waffle_flag(COURSE_UPDATE_WAFFLE_FLAG, True)
-    @patch('openedx.core.djangoapps.schedules.signals.get_current_site')
-    def test_template_for_instructor_led_courses(self, mock_get_current_site):
+    def test_template_for_instructor_led_courses(self):
         """
         Test that InstructorLedCourseUpdate template is picked for instructor led
         courses
         """
-        offset, target_day, enrollment = self.prepare_course_data(mock_get_current_site, is_self_paced=False)
+        offset, target_day, enrollment = self.prepare_course_data(is_self_paced=False)
 
         self.task().apply(kwargs=dict(
             site_id=self.site_config.site.id,

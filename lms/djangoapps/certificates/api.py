@@ -10,19 +10,24 @@ certificates models or any other certificates modules.
 
 import logging
 
-import six
+from django.contrib.auth import get_user_model
+from django.core.exceptions import ObjectDoesNotExist
 from django.db.models import Q
 from eventtracking import tracker
 from opaque_keys.edx.django.models import CourseKeyField
 from organizations.api import get_course_organization_id
 
 from lms.djangoapps.branding import api as branding_api
-from lms.djangoapps.certificates.generation_handler import (
-    is_using_certificate_allowlist_and_is_on_allowlist as _is_using_certificate_allowlist_and_is_on_allowlist,
-    generate_allowlist_certificate_task as _generate_allowlist_certificate_task,
-    generate_user_certificates as _generate_user_certificates,
+from lms.djangoapps.certificates.generation_handler import \
+    generate_user_certificates as _generate_user_certificates
+from lms.djangoapps.certificates.generation_handler import \
+    is_using_certificate_allowlist as _is_using_certificate_allowlist
+from lms.djangoapps.certificates.generation_handler import \
+    is_using_certificate_allowlist_and_is_on_allowlist as _is_using_certificate_allowlist_and_is_on_allowlist
+from lms.djangoapps.certificates.generation_handler import \
+    generate_allowlist_certificate_task as _generate_allowlist_certificate_task
+from lms.djangoapps.certificates.generation_handler import \
     regenerate_user_certificates as _regenerate_user_certificates
-)
 from lms.djangoapps.certificates.models import (
     CertificateGenerationConfiguration,
     CertificateGenerationCourseSetting,
@@ -30,6 +35,7 @@ from lms.djangoapps.certificates.models import (
     CertificateStatuses,
     CertificateTemplate,
     CertificateTemplateAsset,
+    CertificateWhitelist,
     ExampleCertificateSet,
     GeneratedCertificate,
     certificate_status_for_student
@@ -41,6 +47,7 @@ from openedx.core.djangoapps.certificates.api import certificates_viewable_for_c
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 
 log = logging.getLogger("edx.certificate")
+User = get_user_model()
 MODES = GeneratedCertificate.MODES
 
 
@@ -119,14 +126,16 @@ def get_certificates_for_user(username):
     return certs
 
 
-def get_certificate_for_user(username, course_key):
+def get_certificate_for_user(username, course_key, format_results=True):
     """
     Retrieve certificate information for a particular user for a specific course.
 
     Arguments:
         username (unicode): The identifier of the user.
         course_key (CourseKey): A Course Key.
-    Returns: dict
+    Returns:
+        A dict containing information about the certificate or, optionally,
+        the GeneratedCertificate object itself.
     """
     try:
         cert = GeneratedCertificate.eligible_certificates.get(
@@ -135,7 +144,11 @@ def get_certificate_for_user(username, course_key):
         )
     except GeneratedCertificate.DoesNotExist:
         return None
-    return format_certificate_for_user(username, cert)
+
+    if format_results:
+        return format_certificate_for_user(username, cert)
+    else:
+        return cert
 
 
 def get_certificates_for_user_by_course_keys(user, course_keys):
@@ -269,32 +282,29 @@ def set_cert_generation_enabled(course_key, is_enabled):
     cert_event_type = 'enabled' if is_enabled else 'disabled'
     event_name = '.'.join(['edx', 'certificate', 'generation', cert_event_type])
     tracker.emit(event_name, {
-        'course_id': six.text_type(course_key),
+        'course_id': str(course_key),
     })
     if is_enabled:
-        log.info(u"Enabled self-generated certificates for course '%s'.", six.text_type(course_key))
+        log.info("Enabled self-generated certificates for course '%s'.", str(course_key))
     else:
-        log.info(u"Disabled self-generated certificates for course '%s'.", six.text_type(course_key))
+        log.info("Disabled self-generated certificates for course '%s'.", str(course_key))
 
 
-def is_certificate_invalid(student, course_key):
-    """Check that whether the student in the course has been invalidated
-    for receiving certificates.
+def is_certificate_invalidated(student, course_key):
+    """Check whether the certificate belonging to the given student (in given course) has been invalidated.
 
     Arguments:
         student (user object): logged-in user
         course_key (CourseKey): The course identifier.
 
     Returns:
-        Boolean denoting whether the student in the course is invalidated
-        to receive certificates
+        Boolean denoting whether the certificate has been invalidated for this learner.
     """
-    is_invalid = False
     certificate = GeneratedCertificate.certificate_for_student(student, course_key)
-    if certificate is not None:
-        is_invalid = CertificateInvalidation.has_certificate_invalidation(student, course_key)
+    if certificate:
+        return CertificateInvalidation.has_certificate_invalidation(student, course_key)
 
-    return is_invalid
+    return False
 
 
 def cert_generation_enabled(course_key):
@@ -553,3 +563,82 @@ def is_using_certificate_allowlist_and_is_on_allowlist(user, course_key):
     2) if the user is on the allowlist for this course run
     """
     return _is_using_certificate_allowlist_and_is_on_allowlist(user, course_key)
+
+
+def get_allowlisted_users(course_key):
+    """
+    Return the users who are on the allowlist for this course run
+    """
+    if not _is_using_certificate_allowlist(course_key):
+        return User.objects.none()
+
+    return User.objects.filter(certificatewhitelist__course_id=course_key, certificatewhitelist__whitelist=True)
+
+
+def create_certificate_allowlist_entry(user, course_key, notes):
+    """
+    Creates a certificate exception for a given learner in a given course-run.
+    """
+    log.info(f"Creating an allowlist entry for student {user.id} in course {course_key}")
+    certificate_allowlist, __ = CertificateWhitelist.objects.get_or_create(
+        user=user,
+        course_id=course_key,
+        defaults={
+            'whitelist': True,
+            'notes': notes,
+        }
+    )
+
+    return certificate_allowlist
+
+
+def create_certificate_invalidation_entry(certificate, user_requesting_invalidation, notes):
+    """
+    Invalidates a certificate with the given certificate id.
+    """
+    log.info(f"Creating a certificate invalidation entry linked to certificate with id {certificate.id}.")
+    certificate_invalidation, __ = CertificateInvalidation.objects.update_or_create(
+        generated_certificate=certificate,
+        defaults={
+            'active': True,
+            'invalidated_by': user_requesting_invalidation,
+            'notes': notes,
+        }
+    )
+
+    return certificate_invalidation
+
+
+def get_allowlist_entry(user, course_key):
+    """
+    Retrieves and returns an allowlist entry for a given learner and course-run.
+    """
+    log.info(f"Attempting to retrieve an allowlist entry for student {user.id} in course {course_key}.")
+    try:
+        allowlist_entry = CertificateWhitelist.objects.get(user=user, course_id=course_key)
+    except ObjectDoesNotExist:
+        log.warning(f"No allowlist entry found for student {user.id} in course {course_key}.")
+        return None
+
+    return allowlist_entry
+
+
+def get_certificate_invalidation_entry(certificate):
+    """
+    Retrieves and returns an certificate invalidation entry for a given certificate id.
+    """
+    log.info(f"Attempting to retrieve certificate invalidation entry for certificate with id {certificate.id}.")
+    try:
+        certificate_invalidation_entry = CertificateInvalidation.objects.get(generated_certificate=certificate)
+    except ObjectDoesNotExist:
+        log.warning(f"No certificate invalidation found linked to certificate with id {certificate.id}.")
+        return None
+
+    return certificate_invalidation_entry
+
+
+def is_on_allowlist(user, course_key):
+    """
+    Determines if a learner appears on the allowlist for a given course-run.
+    """
+    return CertificateWhitelist.objects.filter(user=user, course_id=course_key, whitelist=True).exists()

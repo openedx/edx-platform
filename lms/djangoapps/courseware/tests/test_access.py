@@ -675,7 +675,7 @@ class UserRoleTestCase(TestCase):
 @ddt.ddt
 class CourseOverviewAccessTestCase(ModuleStoreTestCase):
     """
-    Tests confirming that has_access works equally on CourseDescriptors and
+    Tests confirming that has_access works equally on CourseBlocks and
     CourseOverviews.
     """
 
@@ -739,7 +739,7 @@ class CourseOverviewAccessTestCase(ModuleStoreTestCase):
                 User to test with.
             action (str): action to test with.
             course_attr_name (str): the name of the attribute on self that is
-                the CourseDescriptor to test with.
+                the CourseBlock to test with.
         """
         user = getattr(self, user_attr_name)
         course = getattr(self, course_attr_name)

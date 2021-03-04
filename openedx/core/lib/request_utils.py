@@ -142,13 +142,13 @@ class CookieMonitoringMiddleware(MiddlewareMixin):
         if not CAPTURE_COOKIE_SIZES.is_enabled():
             return
 
-        # ..setting_name: TOP_N_COOKIES_CAPTURED
+        # .. setting_name: TOP_N_COOKIES_CAPTURED
         # .. setting_default: 5
         # .. setting_description: The number of the largest cookies to capture when monitoring. Capture fewer cookies
         #       if you need to save on monitoring resources.
         # .. setting_warning: Depends on the `request_utils.capture_cookie_sizes` toggle being enabled.
         top_n_cookies_captured = getattr(settings, "TOP_N_COOKIES_CAPTURED", 5)
-        # ..setting_name: TOP_N_COOKIE_GROUPS_CAPTURED
+        # .. setting_name: TOP_N_COOKIE_GROUPS_CAPTURED
         # .. setting_default: 5
         # .. setting_description: The number of the largest cookie groups to capture when monitoring. Capture
         #       fewer cookies if you need to save on monitoring resources.

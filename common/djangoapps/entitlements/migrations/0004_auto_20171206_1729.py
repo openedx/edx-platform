@@ -1,6 +1,3 @@
-# -*- coding: utf-8 -*-  # lint-amnesty, pylint: disable=missing-module-docstring
-
-
 import uuid
 
 from django.db import migrations, models

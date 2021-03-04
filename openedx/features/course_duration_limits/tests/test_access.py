@@ -14,7 +14,7 @@ from common.djangoapps.course_modes.models import CourseMode
 from common.djangoapps.course_modes.tests.factories import CourseModeFactory
 from common.djangoapps.student.tests.factories import UserFactory
 from lms.djangoapps.courseware.models import DynamicUpgradeDeadlineConfiguration
-from openedx.core.djangoapps.schedules.tests.factories import ScheduleFactory
+from openedx.core.djangoapps.schedules.models import Schedule
 from openedx.core.djangoapps.user_api.preferences.api import set_user_preference
 from openedx.core.djangolib.testing.utils import CacheIsolationTestCase
 from openedx.features.course_duration_limits.access import (
@@ -113,10 +113,7 @@ class TestAccess(CacheIsolationTestCase):
             course_id=enrollment.course.id,
             mode_slug=CourseMode.AUDIT,
         )
-        ScheduleFactory.create(
-            enrollment=enrollment,
-            upgrade_deadline=schedule_upgrade_deadline,
-        )
+        Schedule.objects.update(upgrade_deadline=schedule_upgrade_deadline)
 
         duration_limit_upgrade_deadline = get_user_course_expiration_date(enrollment.user, enrollment.course)
         assert duration_limit_upgrade_deadline is not None
@@ -155,10 +152,7 @@ class TestAccess(CacheIsolationTestCase):
             course_id=enrollment.course.id,
             mode_slug=CourseMode.AUDIT,
         )
-        ScheduleFactory.create(
-            enrollment=enrollment,
-            start_date=datetime(2017, 1, 1, tzinfo=UTC),
-        )
+        Schedule.objects.update(start_date=datetime(2017, 1, 1, tzinfo=UTC))
 
         content_availability_date = max(enrollment.created, enrollment.course.start)
         access_duration = get_user_course_duration(enrollment.user, enrollment.course)

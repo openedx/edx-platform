@@ -3,18 +3,16 @@ Tests for the badges API views.
 """
 
 
-import six
-from ddt import data, ddt, unpack  # lint-amnesty, pylint: disable=import-error
+from ddt import data, ddt, unpack
 from django.conf import settings
 from django.test.utils import override_settings
-from six.moves import range
 
-from lms.djangoapps.badges.tests.factories import BadgeAssertionFactory, BadgeClassFactory, RandomBadgeClassFactory
-from openedx.core.lib.api.test_utils import ApiTestCase
 from common.djangoapps.student.tests.factories import UserFactory
 from common.djangoapps.util.testing import UrlResetMixin
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase  # lint-amnesty, pylint: disable=import-error, wrong-import-order
-from xmodule.modulestore.tests.factories import CourseFactory  # lint-amnesty, pylint: disable=import-error, wrong-import-order
+from lms.djangoapps.badges.tests.factories import BadgeAssertionFactory, BadgeClassFactory, RandomBadgeClassFactory
+from openedx.core.lib.api.test_utils import ApiTestCase
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from xmodule.modulestore.tests.factories import CourseFactory
 
 FEATURES_WITH_BADGES_ENABLED = settings.FEATURES.copy()
 FEATURES_WITH_BADGES_ENABLED['ENABLE_OPENBADGES'] = True
@@ -27,7 +25,7 @@ class UserAssertionTestCase(UrlResetMixin, ModuleStoreTestCase, ApiTestCase):
     """
 
     def setUp(self):
-        super(UserAssertionTestCase, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.course = CourseFactory.create()
         self.user = UserFactory.create()
         # Password defined by factory.
@@ -37,7 +35,7 @@ class UserAssertionTestCase(UrlResetMixin, ModuleStoreTestCase, ApiTestCase):
         """
         Return the URL to look up the current user's assertions.
         """
-        return '/api/badges/v1/assertions/user/{}/'.format(self.user.username)
+        return f'/api/badges/v1/assertions/user/{self.user.username}/'
 
     def check_class_structure(self, badge_class, json_class):
         """
@@ -48,7 +46,7 @@ class UserAssertionTestCase(UrlResetMixin, ModuleStoreTestCase, ApiTestCase):
         assert badge_class.image.url in json_class['image_url']
         assert badge_class.description == json_class['description']
         assert badge_class.criteria == json_class['criteria']
-        assert (badge_class.course_id and six.text_type(badge_class.course_id)) == json_class['course_id']
+        assert (badge_class.course_id and str(badge_class.course_id)) == json_class['course_id']
 
     def check_assertion_structure(self, assertion, json_assertion):
         """
@@ -65,7 +63,7 @@ class UserAssertionTestCase(UrlResetMixin, ModuleStoreTestCase, ApiTestCase):
         if wildcard:
             return '*'
         else:
-            return six.text_type(badge_class.course_id)
+            return str(badge_class.course_id)
 
     def create_badge_class(self, check_course, **kwargs):
         """

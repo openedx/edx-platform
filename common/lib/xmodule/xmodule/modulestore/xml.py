@@ -437,7 +437,7 @@ class XMLModuleStore(ModuleStoreReadBase):
         Load a course into this module store
         course_path: Course directory name
 
-        returns a CourseDescriptor for the course
+        returns a CourseBlock for the course
         """
         log.debug('========> Starting courselike import from %s', course_dir)
         with open(self.data_dir / course_dir / self.parent_xml) as course_file:

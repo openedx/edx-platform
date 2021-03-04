@@ -34,7 +34,6 @@ from lms.djangoapps.mobile_api.testutils import (
     MobileCourseAccessTestMixin
 )
 from lms.djangoapps.mobile_api.utils import API_V1, API_V05
-from openedx.core.djangoapps.schedules.tests.factories import ScheduleFactory
 from openedx.core.lib.courses import course_image_url
 from openedx.features.course_duration_limits.models import CourseDurationLimitConfig
 from openedx.features.course_experience.tests.views.helpers import add_course_mode
@@ -279,10 +278,6 @@ class TestUserEnrollmentApi(UrlResetMixin, MobileAPITestCase, MobileAuthUserTest
             )
             enrollment.created = self.THREE_YEARS_AGO + datetime.timedelta(days=1)
             enrollment.save()
-
-            ScheduleFactory(
-                enrollment=enrollment
-            )
         else:
             course = CourseFactory.create(start=self.LAST_WEEK, mobile_available=True)
             self.enroll(course.id)

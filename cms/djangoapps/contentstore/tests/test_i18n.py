@@ -1,13 +1,11 @@
-# -*- coding: utf-8 -*-
 """
 Tests for validate Internationalization and Module i18n service.
 """
 
 
 import gettext
-from unittest import skip
+from unittest import mock, skip
 
-import mock
 from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.utils import translation
 from django.utils.translation import get_language
@@ -62,7 +60,7 @@ class TestModuleI18nService(ModuleStoreTestCase):
 
     def setUp(self):
         """ Setting up tests """
-        super(TestModuleI18nService, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.test_language = 'dummy language'
         self.request = mock.Mock()
         self.course = CourseFactory.create()
@@ -89,7 +87,7 @@ class TestModuleI18nService(ModuleStoreTestCase):
         Test django translation service works fine.
         """
 
-        class wrap_ugettext_with_xyz(object):  # pylint: disable=invalid-name
+        class wrap_ugettext_with_xyz:  # pylint: disable=invalid-name
             """
             A context manager function that just adds 'XYZ ' to the front
             of all strings of the module ugettext function.
@@ -187,7 +185,7 @@ class InternationalizationTest(ModuleStoreTestCase):
         will be cleared out before each test case execution and deleted
         afterwards.
         """
-        super(InternationalizationTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
 
         self.uname = 'testuser'
         self.email = 'test+courses@edx.org'
@@ -216,7 +214,7 @@ class InternationalizationTest(ModuleStoreTestCase):
 
         resp = self.client.get_html('/home/')
         self.assertContains(resp,
-                            u'<h1 class="page-header">𝓢𝓽𝓾𝓭𝓲𝓸 Home</h1>',
+                            '<h1 class="page-header">𝓢𝓽𝓾𝓭𝓲𝓸 Home</h1>',
                             status_code=200,
                             html=True)
 
@@ -232,7 +230,7 @@ class InternationalizationTest(ModuleStoreTestCase):
         )
 
         self.assertContains(resp,
-                            u'<h1 class="page-header">𝓢𝓽𝓾𝓭𝓲𝓸 Home</h1>',
+                            '<h1 class="page-header">𝓢𝓽𝓾𝓭𝓲𝓸 Home</h1>',
                             status_code=200,
                             html=True)
 
@@ -257,9 +255,9 @@ class InternationalizationTest(ModuleStoreTestCase):
         )
 
         TEST_STRING = (
-            u'<h1 class="title-1">'
-            u'My \xc7\xf6\xfcrs\xe9s L#'
-            u'</h1>'
+            '<h1 class="title-1">'
+            'My \xc7\xf6\xfcrs\xe9s L#'
+            '</h1>'
         )
 
         self.assertContains(resp,

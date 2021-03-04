@@ -7,15 +7,15 @@ Tests for django admin commands in the verify_student module
 import logging
 import os
 import tempfile
+
 import pytest
-import six
 from django.core.management import CommandError, call_command
 from django.test import TestCase
 from testfixtures import LogCapture
 
+from common.djangoapps.student.tests.factories import UserFactory
 from lms.djangoapps.verify_student.models import ManualVerification
 from lms.djangoapps.verify_student.utils import earliest_allowed_verification_date
-from common.djangoapps.student.tests.factories import UserFactory
 
 LOGGER_NAME = 'lms.djangoapps.verify_student.management.commands.manual_verifications'
 
@@ -27,11 +27,11 @@ class TestVerifyStudentCommand(TestCase):
     tmp_file_path = os.path.join(tempfile.gettempdir(), 'tmp-emails.txt')
 
     def setUp(self):
-        super(TestVerifyStudentCommand, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.user1 = UserFactory.create()
         self.user2 = UserFactory.create()
         self.user3 = UserFactory.create()
-        self.invalid_email = six.text_type('unknown@unknown.com')
+        self.invalid_email = 'unknown@unknown.com'
 
         self.create_email_ids_file(
             self.tmp_file_path,
@@ -87,15 +87,15 @@ class TestVerifyStudentCommand(TestCase):
         expected_log = (
             (LOGGER_NAME,
              'INFO',
-             u'Creating manual verification for 4 emails.'
+             'Creating manual verification for 4 emails.'
              ),
             (LOGGER_NAME,
              'ERROR',
-             u'Tried to verify email unknown@unknown.com, but user not found'
+             'Tried to verify email unknown@unknown.com, but user not found'
              ),
             (LOGGER_NAME,
              'ERROR',
-             u'Completed manual verification. 1 of 4 failed.'
+             'Completed manual verification. 1 of 4 failed.'
              ),
             (LOGGER_NAME,
              'ERROR',

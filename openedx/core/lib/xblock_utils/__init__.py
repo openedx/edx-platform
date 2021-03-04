@@ -30,7 +30,7 @@ from xblock.scorable import ScorableXBlockMixin
 
 from common.djangoapps import static_replace
 from common.djangoapps.edxmako.shortcuts import render_to_string
-from xmodule.seq_module import SequenceModule
+from xmodule.seq_module import SequenceBlock
 from xmodule.util.xmodule_django import add_webpack_to_fragment
 from xmodule.vertical_block import VerticalBlock
 from xmodule.x_module import (
@@ -319,7 +319,7 @@ def add_staff_markup(user, disable_staff_debug_info, block, view, frag, context)
     definition of the xmodule, and a link to view the module in Studio
     if it is a Studio edited, mongo stored course.
 
-    Does nothing if module is a SequenceModule.
+    Does nothing if module is a SequenceBlock.
     """
     if context and context.get('hide_staff_markup', False):
         # If hide_staff_markup is passed, don't add the markup
@@ -328,7 +328,7 @@ def add_staff_markup(user, disable_staff_debug_info, block, view, frag, context)
     if isinstance(block, VerticalBlock) and (not context or not context.get('child_of_vertical', False)):
         return frag
 
-    if isinstance(block, SequenceModule) or getattr(block, 'HIDDEN', False):
+    if isinstance(block, SequenceBlock) or getattr(block, 'HIDDEN', False):
         return frag
 
     block_id = block.location

@@ -42,7 +42,7 @@ class TestCCX(ModuleStoreTestCase):
         """verify that the course property of a ccx returns the right course"""
         expected = self.course
         actual = self.ccx.course
-        assert expected == actual
+        assert expected.location == actual.location
 
     def test_ccx_course_caching(self):
         """verify that caching the propery works to limit queries"""

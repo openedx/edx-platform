@@ -1,15 +1,13 @@
 """
 Code to get ip from request.
 """
-
-
 from uuid import uuid4
 
-from ipware.ip import get_ip
+from ipware.ip import get_client_ip
 
 
 def real_ip(group, request):  # pylint: disable=unused-argument
-    return get_ip(request)
+    return get_client_ip(request)[0]
 
 
 def request_post_email(group, request) -> str:  # pylint: disable=unused-argument

@@ -24,9 +24,6 @@ django-cors-headers<3.0.0
 # It seems like django-countries > 5.5 may cause performance issues for us.
 django-countries==5.5
 
-# Removes deprecated get_ip function, which we still use (ARCHBOM-1329 for unpinning)
-django-ipware<3.0.0
-
 # django-storages version 1.9 drops support for boto storage backend.
 django-storages<1.9
 
@@ -34,16 +31,13 @@ django-storages<1.9
 # The team that owns this package will manually bump this package rather than having it pulled in automatically.
 # This is to allow them to better control its deployment and to do it in a process that works better
 # for them.
-edx-enterprise==3.17.40
+edx-enterprise==3.17.44
 
 # Upgrading to 2.12.0 breaks several test classes due to API changes, need to update our code accordingly
 factory-boy==2.8.1
 
 # Newer versions need a more recent version of python-dateutil
 freezegun==0.3.12
-
-# When we went from httpretty 0.9.7 to 1.0.2, tests broke
-httpretty<1.0
 
 # 4.0.0 dropped support for Python 3.5
 inflect<4.0.0
@@ -72,9 +66,6 @@ matplotlib<3.1
 
 # maxminddb 2.0.0 has dropped support for Python 3.5
 maxminddb<2.0.0
-
-# mock version 4.0.0 drops support for python 3.5
-mock<4.0.0
 
 # oauthlib>3.0.1 causes test failures ( also remove the django-oauth-toolkit constraint when this is fixed )
 oauthlib==3.0.1
@@ -124,5 +115,9 @@ edx-bulk-grades<0.8.5
 # python3-saml==1.10.0 version started breaking a11y tests
 python3-saml<1.10.0
 
-# edx-proctoring>3.5.0 causes test failures
-edx-proctoring==3.5.0
+# With greater version these tests `common.djangoapps.terrain.stubs.tests` becomes flaky on jenkins.
+httpretty<1.0
+
+# latest version of diff-cover conflicts with pygments version see https://github.com/Bachmann1234/diff_cover/commit/01f91760321cee1ad28cfa0d801c4acd8b9765a6
+diff-cover<4.2.2
+

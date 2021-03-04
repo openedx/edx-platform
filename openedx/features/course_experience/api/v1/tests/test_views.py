@@ -44,15 +44,12 @@ class ResetCourseDeadlinesViewTests(EventTestMixin, BaseCourseHomeTests, Masquer
         student_username = self.user.username
         student_user_id = self.user.id
         student_enrollment = CourseEnrollment.enroll(self.user, course.id)
-        student_schedule = ScheduleFactory.create(
-            start_date=timezone.now() - datetime.timedelta(days=100),
-            enrollment=student_enrollment
-        )
-        staff_schedule = ScheduleFactory(
-            start_date=timezone.now() - datetime.timedelta(days=30),
-            enrollment__course__id=course.id,
-            enrollment__user=self.staff_user,
-        )
+        student_enrollment.schedule.start_date = timezone.now() - datetime.timedelta(days=100)
+        student_enrollment.schedule.save()
+
+        staff_enrollment = CourseEnrollment.enroll(self.staff_user, course.id)
+        staff_enrollment.schedule.start_date = timezone.now() - datetime.timedelta(days=30)
+        staff_enrollment.schedule.save()
 
         self.switch_to_staff()
         self.update_masquerade(course=course, username=student_username)
@@ -60,10 +57,10 @@ class ResetCourseDeadlinesViewTests(EventTestMixin, BaseCourseHomeTests, Masquer
         with patch('openedx.features.course_experience.api.v1.views.dates_banner_should_display',
                    return_value=(True, False)):
             self.client.post(reverse('course-experience-reset-course-deadlines'), {'course_key': course.id})
-        updated_schedule = Schedule.objects.get(id=student_schedule.id)
+        updated_schedule = Schedule.objects.get(id=student_enrollment.schedule.id)
         assert updated_schedule.start_date.date() == datetime.datetime.today().date()
-        updated_staff_schedule = Schedule.objects.get(id=staff_schedule.id)
-        assert updated_staff_schedule.start_date == staff_schedule.start_date
+        updated_staff_schedule = Schedule.objects.get(id=staff_enrollment.schedule.id)
+        assert updated_staff_schedule.start_date == staff_enrollment.schedule.start_date
         self.assert_event_emitted(
             'edx.ui.lms.reset_deadlines.clicked',
             courserun_key=str(course.id),

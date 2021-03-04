@@ -1,7 +1,6 @@
 """Views for items (modules)."""
 
 
-import hashlib  # lint-amnesty, pylint: disable=unused-import
 import logging
 from collections import OrderedDict
 from datetime import datetime
@@ -21,7 +20,6 @@ from edx_proctoring.api import (
     get_exam_configuration_dashboard_url
 )
 from edx_proctoring.exceptions import ProctoredExamNotFoundException
-from edx_toggles.toggles import LegacyWaffleSwitch
 from help_tokens.core import HelpUrlExpert
 from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locator import LibraryUsageLocator
@@ -36,7 +34,6 @@ from cms.djangoapps.models.settings.course_grading import CourseGradingModel
 from cms.djangoapps.xblock_config.models import CourseEditLTIFieldsEnabledFlag
 from cms.lib.xblock.authoring_mixin import VISIBILITY_VIEW
 from common.djangoapps.edxmako.shortcuts import render_to_string
-from openedx.core.djangoapps.schedules.config import COURSE_UPDATE_WAFFLE_FLAG
 from openedx.core.lib.gating import api as gating_api
 from openedx.core.lib.xblock_utils import hash_resource, request_token, wrap_xblock, wrap_xblock_aside
 from openedx.core.djangoapps.bookmarks import api as bookmarks_api
@@ -90,9 +87,6 @@ CREATE_IF_NOT_FOUND = ['course_info']
 # Useful constants for defining predicates
 NEVER = lambda x: False
 ALWAYS = lambda x: True
-
-
-highlights_setting = LegacyWaffleSwitch('dynamic_pacing', 'studio_course_update', __name__)
 
 
 def _filter_entrance_exam_grader(graders):
@@ -1096,7 +1090,7 @@ def _get_gating_info(course, xblock):
     can be added to xblock info responses.
 
     Arguments:
-        course (CourseDescriptor): The course
+        course (CourseBlock): The course
         xblock (XBlock): The xblock
 
     Returns:
@@ -1262,8 +1256,8 @@ def create_xblock_info(xblock, data=None, metadata=None, include_ancestor_info=F
                     'highlights_enabled_for_messaging': course.highlights_enabled_for_messaging,
                 })
             xblock_info.update({
-                'highlights_enabled': highlights_setting.is_enabled(),
-                'highlights_preview_only': not COURSE_UPDATE_WAFFLE_FLAG.is_enabled(course.id),
+                'highlights_enabled': True,  # used to be controlled by a waffle switch, now just always enabled
+                'highlights_preview_only': False,  # used to be controlled by a waffle flag, now just always disabled
                 'highlights_doc_url': HelpUrlExpert.the_one().url_for_token('content_highlights'),
             })
 
@@ -1356,7 +1350,7 @@ def _was_xblock_ever_special_exam(course, xblock):
     indicating that this *was* once a special exam.
 
     Arguments:
-        course (CourseDescriptor)
+        course (CourseBlock)
         xblock (XBlock)
 
     Returns: bool

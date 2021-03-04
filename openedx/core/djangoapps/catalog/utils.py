@@ -526,7 +526,8 @@ def get_pseudo_session_for_entitlement(entitlement):
     This function is used to pass pseudo-data to the front end, returning a single session, regardless of whether that
     session is currently available.
 
-    First tries to return the first available session, followed by the first session regardless of availability.
+    First tries to return the first available session. If there are no available sessions, will try
+    to return the most recent session regardless of availability.
     Returns None if there are no sessions for that course.
     """
     sessions_for_course = get_course_runs_for_course(entitlement.course_uuid)
@@ -534,7 +535,7 @@ def get_pseudo_session_for_entitlement(entitlement):
     if available_sessions:
         return available_sessions[0]
     if sessions_for_course:
-        return sessions_for_course[0]
+        return sessions_for_course[-1]
     return None
 
 

@@ -4,22 +4,21 @@ Tests for BadgrBackend
 
 
 from datetime import datetime
+from unittest.mock import Mock, call, patch
 
-import ddt  # lint-amnesty, pylint: disable=import-error
-import six
+import ddt
 from django.db.models.fields.files import ImageFieldFile
 from django.test.utils import override_settings
-from lazy.lazy import lazy  # lint-amnesty, pylint: disable=import-error, no-name-in-module
-from mock import Mock, call, patch  # lint-amnesty, pylint: disable=import-error
+from lazy.lazy import lazy  # lint-amnesty, pylint: disable=no-name-in-module
 
+from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
+from common.djangoapps.track.tests import EventTrackingTestCase
 from lms.djangoapps.badges.backends.badgr import BadgrBackend
 from lms.djangoapps.badges.models import BadgeAssertion
 from lms.djangoapps.badges.tests.factories import BadgeClassFactory
 from openedx.core.lib.tests.assertions.events import assert_event_matches
-from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
-from common.djangoapps.track.tests import EventTrackingTestCase
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase  # lint-amnesty, pylint: disable=import-error, wrong-import-order
-from xmodule.modulestore.tests.factories import CourseFactory  # lint-amnesty, pylint: disable=import-error, wrong-import-order
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from xmodule.modulestore.tests.factories import CourseFactory
 
 BADGR_SETTINGS = {
     'BADGR_API_TOKEN': '12345',
@@ -43,7 +42,7 @@ class BadgrBackendTestCase(ModuleStoreTestCase, EventTrackingTestCase):
         """
         Create a course and user to test with.
         """
-        super(BadgrBackendTestCase, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         # Need key to be deterministic to test slugs.
         self.course = CourseFactory.create(
             org='edX', course='course_test', run='test_run', display_name='Badged',
@@ -182,7 +181,7 @@ class BadgrBackendTestCase(ModuleStoreTestCase, EventTrackingTestCase):
             'name': 'edx.badge.assertion.created',
             'data': {
                 'user_id': self.user.id,
-                'course_id': six.text_type(self.course.location.course_key),
+                'course_id': str(self.course.location.course_key),
                 'enrollment_mode': 'honor',
                 'assertion_id': assertion.id,
                 'badge_name': 'Test Badge',

@@ -38,6 +38,7 @@ from lms.djangoapps.instructor_task.tasks_helper.misc import (
     upload_course_survey_report,
     upload_ora2_data,
     upload_ora2_submission_files,
+    upload_ora2_summary,
     upload_proctored_exam_results_report
 )
 from lms.djangoapps.instructor_task.tasks_helper.module_state import (
@@ -315,4 +316,15 @@ def export_ora2_submission_files(entry_id, xmodule_instance_args):
     """
     action_name = ugettext_noop('compressed')
     task_fn = partial(upload_ora2_submission_files, xmodule_instance_args)
+    return run_main_task(entry_id, task_fn, action_name)
+
+
+@shared_task(base=BaseInstructorTask)
+@set_code_owner_attribute
+def export_ora2_summary(entry_id, xmodule_instance_args):
+    """
+    Generate a CSV of ora2/student summaries and push it to S3.
+    """
+    action_name = ugettext_noop('generated')
+    task_fn = partial(upload_ora2_summary, xmodule_instance_args)
     return run_main_task(entry_id, task_fn, action_name)

@@ -61,7 +61,6 @@ from lms.djangoapps.courseware.toggles import (
     REDIRECT_TO_COURSEWARE_MICROFRONTEND,
 
 )
-from lms.djangoapps.courseware.url_helpers import get_microfrontend_url, get_redirect_url
 from lms.djangoapps.courseware.user_state_client import DjangoXBlockUserStateClient
 from lms.djangoapps.courseware.views.index import show_courseware_mfe_link
 from lms.djangoapps.experiments.testutils import override_experiment_waffle_flag
@@ -88,6 +87,7 @@ from openedx.features.course_experience import (
     RELATIVE_DATES_FLAG
 )
 from openedx.features.course_experience.tests.views.helpers import add_course_mode
+from openedx.features.course_experience.url_helpers import get_learning_mfe_courseware_url, get_legacy_courseware_url
 from openedx.features.enterprise_support.tests.mixins.enterprise import EnterpriseTestConsentRequired
 from common.djangoapps.student.models import CourseEnrollment
 from common.djangoapps.student.roles import CourseStaffRole
@@ -258,7 +258,7 @@ class TestJumpTo(ModuleStoreTestCase):
         )
         expected_url += "?{}".format(urlencode({'activate_block_id': six.text_type(staff_only_vertical.location)}))
 
-        assert expected_url == get_redirect_url(course_key, usage_key, request)
+        assert expected_url == get_legacy_courseware_url(course_key, usage_key, request)
 
 
 @ddt.ddt
@@ -270,8 +270,8 @@ class IndexQueryTestCase(ModuleStoreTestCase):
     NUM_PROBLEMS = 20
 
     @ddt.data(
-        (ModuleStoreEnum.Type.mongo, 10, 172),
-        (ModuleStoreEnum.Type.split, 4, 168),
+        (ModuleStoreEnum.Type.mongo, 10, 171),
+        (ModuleStoreEnum.Type.split, 4, 167),
     )
     @ddt.unpack
     def test_index_query_counts(self, store_type, expected_mongo_query_count, expected_mysql_query_count):
@@ -548,9 +548,9 @@ class ViewsTestCase(BaseViewsTestCase):
 
     def test_get_redirect_url(self):
         # test the course location
-        assert u'/courses/{course_key}/courseware?{activate_block_id}'.format(course_key=text_type(self.course_key), activate_block_id=urlencode({'activate_block_id': text_type(self.course.location)})) == get_redirect_url(self.course_key, self.course.location)  # pylint: disable=line-too-long
+        assert u'/courses/{course_key}/courseware?{activate_block_id}'.format(course_key=text_type(self.course_key), activate_block_id=urlencode({'activate_block_id': text_type(self.course.location)})) == get_legacy_courseware_url(self.course_key, self.course.location)  # pylint: disable=line-too-long
         # test a section location
-        assert u'/courses/{course_key}/courseware/Chapter_1/Sequential_1/?{activate_block_id}'.format(course_key=text_type(self.course_key), activate_block_id=urlencode({'activate_block_id': text_type(self.section.location)})) == get_redirect_url(self.course_key, self.section.location)  # pylint: disable=line-too-long
+        assert u'/courses/{course_key}/courseware/Chapter_1/Sequential_1/?{activate_block_id}'.format(course_key=text_type(self.course_key), activate_block_id=urlencode({'activate_block_id': text_type(self.section.location)})) == get_legacy_courseware_url(self.course_key, self.section.location)  # pylint: disable=line-too-long
 
     def test_invalid_course_id(self):
         response = self.client.get('/courses/MITx/3.091X/')
@@ -1408,7 +1408,7 @@ class ProgressPageTests(ProgressPageBaseTests):
             self.assertContains(resp, u"Download Your Certificate")
 
     @ddt.data(
-        (True, 55),
+        (True, 54),
         (False, 54),
     )
     @ddt.unpack
@@ -3244,41 +3244,16 @@ class TestShowCoursewareMFE(TestCase):
     There are an unfortunate number of state permutations here since we have
     the product of the following binary states:
 
-    * the ENABLE_COURSEWARE_MICROFRONTEND Django setting
     * user is global staff member
     * user is member of the course team
     * whether the course_key is an old Mongo style of key
     * the COURSEWARE_MICROFRONTEND_COURSE_TEAM_PREVIEW CourseWaffleFlag
     * the REDIRECT_TO_COURSEWARE_MICROFRONTEND ExperimentWaffleFlag
 
-    Giving us theoretically 2^6 = 64 states. >_<
+    Giving us theoretically 2^5 = 32 states. >_<
     """
-    @patch.dict(settings.FEATURES, {'ENABLE_COURSEWARE_MICROFRONTEND': False})
-    def test_disabled_at_platform_level(self):
-        """Test every permutation where the platform feature is disabled."""
-        old_course_key = CourseKey.from_string("OpenEdX/Old/2020")
-        new_course_key = CourseKey.from_string("course-v1:OpenEdX+New+2020")
-        global_staff_user = UserFactory(username="global_staff", is_staff=True)
-        regular_user = UserFactory(username="normal", is_staff=False)
-
-        # We never show when the feature is entirely disabled, no matter what
-        # the waffle flags are set to, who the user is, or what the course_key
-        # type is.
-        combos = itertools.product(
-            [regular_user, global_staff_user],  # User (is global staff)
-            [old_course_key, new_course_key],   # Course Key (old vs. new)
-            [True, False],  # is_course_staff
-            [True, False],  # preview_active (COURSEWARE_MICROFRONTEND_COURSE_TEAM_PREVIEW)
-            [True, False],  # redirect_active (REDIRECT_TO_COURSEWARE_MICROFRONTEND)
-        )
-        for user, course_key, is_course_staff, preview_active, redirect_active in combos:
-            with override_waffle_flag(COURSEWARE_MICROFRONTEND_COURSE_TEAM_PREVIEW, preview_active):
-                with override_waffle_flag(REDIRECT_TO_COURSEWARE_MICROFRONTEND, active=redirect_active):
-                    assert show_courseware_mfe_link(user, is_course_staff, course_key) is False
-
-    @patch.dict(settings.FEATURES, {'ENABLE_COURSEWARE_MICROFRONTEND': True})
-    def test_enabled_at_platform_level(self):
-        """Test every permutation where the platform feature is enabled."""
+    def test_permuations(self):
+        """Test every permutation"""
         old_course_key = CourseKey.from_string("OpenEdX/Old/2020")
         new_course_key = CourseKey.from_string("course-v1:OpenEdX+New+2020")
         global_staff_user = UserFactory(username="global_staff", is_staff=True)
@@ -3349,16 +3324,16 @@ class TestShowCoursewareMFE(TestCase):
         course_key = CourseKey.from_string("course-v1:OpenEdX+MFE+2020")
         section_key = UsageKey.from_string("block-v1:OpenEdX+MFE+2020+type@sequential+block@Introduction")
         unit_id = "block-v1:OpenEdX+MFE+2020+type@vertical+block@Getting_To_Know_You"
-        assert get_microfrontend_url(course_key) == (
+        assert get_learning_mfe_courseware_url(course_key) == (
             'https://learningmfe.openedx.org'
             '/course/course-v1:OpenEdX+MFE+2020'
         )
-        assert get_microfrontend_url(course_key, section_key, '') == (
+        assert get_learning_mfe_courseware_url(course_key, section_key, '') == (
             'https://learningmfe.openedx.org'
             '/course/course-v1:OpenEdX+MFE+2020'
             '/block-v1:OpenEdX+MFE+2020+type@sequential+block@Introduction'
         )
-        assert get_microfrontend_url(course_key, section_key, unit_id) == (
+        assert get_learning_mfe_courseware_url(course_key, section_key, unit_id) == (
             'https://learningmfe.openedx.org'
             '/course/course-v1:OpenEdX+MFE+2020'
             '/block-v1:OpenEdX+MFE+2020+type@sequential+block@Introduction'
@@ -3366,7 +3341,6 @@ class TestShowCoursewareMFE(TestCase):
         )
 
 
-@patch.dict('django.conf.settings.FEATURES', {'ENABLE_COURSEWARE_MICROFRONTEND': True})
 @ddt.ddt
 class MFERedirectTests(BaseViewsTestCase):  # lint-amnesty, pylint: disable=missing-class-docstring
     MODULESTORE = TEST_DATA_SPLIT_MODULESTORE

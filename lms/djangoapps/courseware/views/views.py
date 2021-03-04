@@ -34,7 +34,7 @@ from django.views.decorators.http import require_GET, require_http_methods, requ
 from django.views.generic import View
 from edx_django_utils import monitoring as monitoring_utils
 from edx_django_utils.monitoring import set_custom_attribute, set_custom_attributes_for_course_key
-from ipware.ip import get_ip
+from ipware.ip import get_client_ip
 from markupsafe import escape
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey, UsageKey
@@ -56,7 +56,7 @@ from lms.djangoapps.certificates import api as certs_api
 from lms.djangoapps.certificates.models import CertificateStatuses
 from lms.djangoapps.commerce.utils import EcommerceService
 from lms.djangoapps.course_home_api.toggles import course_home_mfe_dates_tab_is_active
-from lms.djangoapps.course_home_api.utils import get_microfrontend_url, is_request_from_learning_mfe
+from openedx.features.course_experience.url_helpers import get_learning_mfe_home_url, is_request_from_learning_mfe
 from lms.djangoapps.courseware.access import has_access, has_ccx_coach_role
 from lms.djangoapps.courseware.access_utils import check_course_open_for_learner, check_public_access
 from lms.djangoapps.courseware.courses import (
@@ -84,7 +84,6 @@ from lms.djangoapps.courseware.permissions import (  # lint-amnesty, pylint: dis
     VIEW_COURSEWARE,
     VIEW_XQA_INTERFACE
 )
-from lms.djangoapps.courseware.url_helpers import get_redirect_url
 from lms.djangoapps.courseware.user_state_client import DjangoXBlockUserStateClient
 from lms.djangoapps.experiments.utils import get_experiment_user_metadata_context
 from lms.djangoapps.grades.api import CourseGradeFactory
@@ -114,6 +113,7 @@ from openedx.features.content_type_gating.models import ContentTypeGatingConfig
 from openedx.features.course_duration_limits.access import generate_course_expired_fragment
 from openedx.features.course_experience import DISABLE_UNIFIED_COURSE_TAB_FLAG, course_home_url_name
 from openedx.features.course_experience.course_tools import CourseToolsPluginManager
+from openedx.features.course_experience.url_helpers import get_legacy_courseware_url
 from openedx.features.course_experience.utils import dates_banner_should_display
 from openedx.features.course_experience.views.course_dates import CourseDatesFragmentView
 from openedx.features.course_experience.waffle import ENABLE_COURSE_ABOUT_SIDEBAR_HTML
@@ -396,7 +396,7 @@ def jump_to(_request, course_id, location):
     except InvalidKeyError:
         raise Http404(u"Invalid course_key or usage_key")  # lint-amnesty, pylint: disable=raise-missing-from
     try:
-        redirect_url = get_redirect_url(course_key, usage_key, _request)
+        redirect_url = get_legacy_courseware_url(course_key, usage_key, _request)
     except ItemNotFoundError:
         raise Http404(u"No data at this location: {0}".format(usage_key))  # lint-amnesty, pylint: disable=raise-missing-from
     except NoPathToItem:
@@ -967,7 +967,7 @@ def course_about(request, course_id):
             'active_reg_button': active_reg_button,
             'is_shib_course': is_shib_course,
             # We do not want to display the internal courseware header, which is used when the course is found in the
-            # context. This value is therefor explicitly set to render the appropriate header.
+            # context. This value is therefore explicitly set to render the appropriate header.
             'disable_courseware_header': True,
             'pre_requisite_courses': pre_requisite_courses,
             'course_image_urls': overview.image_urls,
@@ -1016,7 +1016,7 @@ def dates(request, course_id):
 
     course_key = CourseKey.from_string(course_id)
     if course_home_mfe_dates_tab_is_active(course_key) and not request.user.is_staff:
-        microfrontend_url = get_microfrontend_url(course_key=course_key, view_name=COURSE_DATES_NAME)
+        microfrontend_url = get_learning_mfe_home_url(course_key=course_key, view_name=COURSE_DATES_NAME)
         raise Redirect(microfrontend_url)
 
     # Enable NR tracing for this view based on course
@@ -1204,7 +1204,7 @@ def _missing_required_verification(student, enrollment_mode):
 
 
 def _certificate_message(student, course, enrollment_mode):  # lint-amnesty, pylint: disable=missing-function-docstring
-    if certs_api.is_certificate_invalid(student, course.id):
+    if certs_api.is_certificate_invalidated(student, course.id):
         return INVALID_CERT_DATA
 
     cert_downloadable_status = certs_api.certificate_downloadable_status(student, course.id)
@@ -1569,6 +1569,12 @@ def generate_user_cert(request, course_id):
     if not course:
         return HttpResponseBadRequest(_("Course is not valid"))
 
+    if certs_api.is_using_certificate_allowlist_and_is_on_allowlist(student, course_key):
+        log.info(f'{course_key} is using allowlist certificates, and the user {student.id} is on its allowlist. '
+                 f'Attempt will be made to generate an allowlist certificate.')
+        certs_api.generate_allowlist_certificate_task(student, course_key)
+        return HttpResponse()
+
     if not is_course_passed(student, course):
         log.info(u"User %s has not passed the course: %s", student.username, course_id)
         return HttpResponseBadRequest(_("Your certificate will be available when you pass the course."))
@@ -1647,9 +1653,13 @@ def enclosing_sequence_for_gating_checks(block):
 
     ancestor = block
     while ancestor and ancestor.location.block_type not in seq_tags:
-        ancestor = ancestor.get_parent()  # Note: CourseDescriptor's parent is None
+        ancestor = ancestor.get_parent()  # Note: CourseBlock's parent is None
 
-    return ancestor
+    if ancestor:
+        # get_parent() returns a parent block instance cached on the block which does not
+        # have the ModuleSystem bound to it so we need to get it again with get_block() which will set up everything.
+        return block.runtime.get_block(ancestor.location)
+    return None
 
 
 @require_http_methods(["GET", "POST"])
@@ -1722,34 +1732,15 @@ def render_xblock(request, usage_key_string, check_if_enrolled=True):
 
         # Some content gating happens only at the Sequence level (e.g. "has this
         # timed exam started?").
-        ancestor_seq = enclosing_sequence_for_gating_checks(block)
-        if ancestor_seq:
-            seq_usage_key = ancestor_seq.location
-            # We have a Descriptor, but I had trouble getting a SequenceModule
-            # from it (even using ._xmodule to force the conversion) because the
-            # runtime wasn't properly initialized. This view uses multiple
-            # runtimes (including Blockstore), so I'm pulling it from scratch
-            # based on the usage_key. We'll have to watch the performance impact
-            # of this. :(
-            seq_module_descriptor, _ = get_module_by_usage_id(
-                request, str(course_key), str(seq_usage_key), disable_staff_debug_info=True, course=course
-            )
-
-            # I'm not at all clear why get_module_by_usage_id returns the
-            # descriptor or why I need to manually force it to load the module
-            # like this manually instead of the proxying working, but trial and
-            # error has led me here. Hopefully all this weirdness goes away when
-            # SequenceModule gets converted to an XBlock in:
-            #     https://github.com/edx/edx-platform/pull/25965
-            seq_module = seq_module_descriptor._xmodule  # pylint: disable=protected-access
-
+        ancestor_sequence_block = enclosing_sequence_for_gating_checks(block)
+        if ancestor_sequence_block:
             # If the SequenceModule feels that gating is necessary, redirect
             # there so we can have some kind of error message at any rate.
-            if seq_module.descendants_are_gated():
+            if ancestor_sequence_block.descendants_are_gated():
                 return redirect(
                     reverse(
                         'render_xblock',
-                        kwargs={'usage_key_string': str(seq_module.location)}
+                        kwargs={'usage_key_string': str(ancestor_sequence_block.location)}
                     )
                 )
 
@@ -1911,7 +1902,7 @@ def financial_assistance_request(request):
         goals = data['goals']
         effort = data['effort']
         marketing_permission = data['mktg-permission']
-        ip_address = get_ip(request)
+        ip_address = get_client_ip(request)[0]
     except ValueError:
         # Thrown if JSON parsing fails
         return HttpResponseBadRequest(u'Could not parse request JSON.')

@@ -20,7 +20,6 @@ from django.core.management.base import BaseCommand, CommandError
 from django.utils.translation import ugettext as _
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
-from six import text_type
 
 import cms.djangoapps.contentstore.git_export_utils as git_export_utils
 
@@ -51,7 +50,7 @@ class Command(BaseCommand):
         try:
             course_key = CourseKey.from_string(options['course_loc'])
         except InvalidKeyError:
-            raise CommandError(text_type(git_export_utils.GitExportError.BAD_COURSE))  # lint-amnesty, pylint: disable=raise-missing-from
+            raise CommandError(str(git_export_utils.GitExportError.BAD_COURSE))  # lint-amnesty, pylint: disable=raise-missing-from
 
         try:
             git_export_utils.export_to_git(
@@ -61,4 +60,4 @@ class Command(BaseCommand):
                 options.get('rdir', None)
             )
         except git_export_utils.GitExportError as ex:
-            raise CommandError(text_type(ex))  # lint-amnesty, pylint: disable=raise-missing-from
+            raise CommandError(str(ex))  # lint-amnesty, pylint: disable=raise-missing-from

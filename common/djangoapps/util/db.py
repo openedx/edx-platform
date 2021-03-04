@@ -8,9 +8,8 @@ import random
 # TransactionManagementError used below actually *does* derive from the standard "Exception" class.
 # lint-amnesty, pylint: disable=bad-option-value, nonstandard-exception
 from contextlib import contextmanager
-from functools import wraps  # lint-amnesty, pylint: disable=unused-import
 
-from django.db import DEFAULT_DB_ALIAS, DatabaseError, Error, transaction  # lint-amnesty, pylint: disable=unused-import
+from django.db import DEFAULT_DB_ALIAS, transaction  # lint-amnesty, pylint: disable=unused-import
 
 from openedx.core.lib.cache_utils import get_cache
 

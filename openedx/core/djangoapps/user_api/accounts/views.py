@@ -164,6 +164,7 @@ class AccountViewSet(ViewSet):
             "OK" response is returned. The response contains the following
             values.
 
+            * id: numerical lms user id in db
             * bio: null or textual representation of user biographical
               information ("about me").
             * country: An ISO 3166 country code or null.

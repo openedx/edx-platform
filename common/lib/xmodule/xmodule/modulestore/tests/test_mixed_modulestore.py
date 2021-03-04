@@ -117,13 +117,6 @@ class CommonMixedModuleStoreSetup(CourseComparisonTest):
         'xblock_mixins': modulestore_options['xblock_mixins'],
     }
 
-    def _compare_ignore_version(self, loc1, loc2, msg=None):
-        """
-        AssertEqual replacement for CourseLocator
-        """
-        if loc1.for_branch(None) != loc2.for_branch(None):
-            self.fail(self._formatMessage(msg, u"{} != {}".format(six.text_type(loc1), six.text_type(loc2))))
-
     def setUp(self):
         """
         Set up the database for testing
@@ -148,8 +141,6 @@ class CommonMixedModuleStoreSetup(CourseComparisonTest):
         self.addCleanup(self.connection.drop_database, self.DB)
         self.addCleanup(self.connection.close)
 
-        self.addTypeEqualityFunc(BlockUsageLocator, '_compare_ignore_version')
-        self.addTypeEqualityFunc(CourseLocator, '_compare_ignore_version')
         # define attrs which get set in initdb to quell pylint
         self.writable_chapter_location = self.store = self.fake_location = None
         self.course_locations = {}
@@ -1142,7 +1133,8 @@ class TestMixedModuleStore(CommonMixedModuleStoreSetup):
         Verifies the results of calling get_parent_locations matches expected_results.
         """
         for child_location, parent_location, revision in expected_results:
-            assert parent_location == self.store.get_parent_location(child_location, revision=revision)
+            assert parent_location.for_branch(None) if parent_location else parent_location == \
+                   self.store.get_parent_location(child_location, revision=revision)
 
     def verify_item_parent(self, item_location, expected_parent_location, old_parent_location, is_reverted=False):
         """
@@ -1631,7 +1623,7 @@ class TestMixedModuleStore(CommonMixedModuleStoreSetup):
         # problem location revision
         with self.store.branch_setting(ModuleStoreEnum.Branch.draft_preferred, course_id):
             parent = mongo_store.get_parent_location(self.problem_x1a_1)  # lint-amnesty, pylint: disable=no-member
-            assert parent == self.vertical_x1a  # lint-amnesty, pylint: disable=no-member
+            assert parent.for_branch(None) == self.vertical_x1a  # lint-amnesty, pylint: disable=no-member
 
     # Draft:
     #   Problem path:

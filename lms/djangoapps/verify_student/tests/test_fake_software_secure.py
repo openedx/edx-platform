@@ -3,12 +3,13 @@ Tests for the fake software secure response.
 """
 
 
-from django.test import TestCase
-from mock import patch
+from unittest.mock import patch
 
-from lms.djangoapps.verify_student.models import SoftwareSecurePhotoVerification
+from django.test import TestCase
+
 from common.djangoapps.student.tests.factories import UserFactory
 from common.djangoapps.util.testing import UrlResetMixin
+from lms.djangoapps.verify_student.models import SoftwareSecurePhotoVerification
 
 
 class SoftwareSecureFakeViewTest(UrlResetMixin, TestCase):
@@ -21,7 +22,7 @@ class SoftwareSecureFakeViewTest(UrlResetMixin, TestCase):
     def setUp(self, **kwargs):
         enable_software_secure_fake = kwargs.get('enable_software_secure_fake', False)
         with patch.dict('django.conf.settings.FEATURES', {'ENABLE_SOFTWARE_SECURE_FAKE': enable_software_secure_fake}):
-            super(SoftwareSecureFakeViewTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+            super().setUp()
 
         self.user = UserFactory.create(username="test", password="test")
         self.attempt = SoftwareSecurePhotoVerification.objects.create(user=self.user)
@@ -35,7 +36,7 @@ class SoftwareSecureFakeViewDisabledTest(SoftwareSecureFakeViewTest):
     """
 
     def setUp(self):  # lint-amnesty, pylint: disable=arguments-differ
-        super(SoftwareSecureFakeViewDisabledTest, self).setUp(enable_software_secure_fake=False)  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp(enable_software_secure_fake=False)
 
     def test_get_method_without_enable_feature_flag(self):
         """
@@ -56,7 +57,7 @@ class SoftwareSecureFakeViewEnabledTest(SoftwareSecureFakeViewTest):
     """
 
     def setUp(self):  # lint-amnesty, pylint: disable=arguments-differ
-        super(SoftwareSecureFakeViewEnabledTest, self).setUp(enable_software_secure_fake=True)  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp(enable_software_secure_fake=True)
 
     def test_get_method_without_logged_in_user(self):
         """

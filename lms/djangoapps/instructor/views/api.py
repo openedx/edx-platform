@@ -73,10 +73,8 @@ from lms.djangoapps.bulk_email.api import is_bulk_email_feature_enabled
 from lms.djangoapps.bulk_email.models import CourseEmail
 from lms.djangoapps.certificates import api as certs_api
 from lms.djangoapps.certificates.models import (
-    CertificateInvalidation,
     CertificateStatuses,
-    CertificateWhitelist,
-    GeneratedCertificate
+    CertificateWhitelist
 )
 from lms.djangoapps.courseware.access import has_access
 from lms.djangoapps.courseware.courses import get_course_by_id, get_course_with_access
@@ -2034,6 +2032,24 @@ def export_ora2_data(request, course_id):
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @require_course_permission(permissions.CAN_RESEARCH)
 @common_exceptions_400
+def export_ora2_summary(request, course_id):
+    """
+    Pushes a Celery task which will aggregate a summary students' progress in ora2 tasks for a course into a .csv
+    """
+    course_key = CourseKey.from_string(course_id)
+    report_type = _('ORA summary')
+    task_api.submit_export_ora2_summary(request, course_key)
+    success_status = SUCCESS_MESSAGE_TEMPLATE.format(report_type=report_type)
+
+    return JsonResponse({"status": success_status})
+
+
+@transaction.non_atomic_requests
+@require_POST
+@ensure_csrf_cookie
+@cache_control(no_cache=True, no_store=True, must_revalidate=True)
+@require_course_permission(permissions.CAN_RESEARCH)
+@common_exceptions_400
 def export_ora2_submission_files(request, course_id):
     """
     Pushes a Celery task which will download and compress all submission
@@ -2618,41 +2634,44 @@ def certificate_exception_view(request, course_id):
 def add_certificate_exception(course_key, student, certificate_exception):
     """
     Add a certificate exception to CertificateWhitelist table.
-    Raises ValueError in case Student is already white listed.
+
+    Raises ValueError in case Student is already white listed or if they appear on the block list.
 
     :param course_key: identifier of the course whose certificate exception will be added.
     :param student: User object whose certificate exception will be added.
     :param certificate_exception: A dict object containing certificate exception info.
     :return: CertificateWhitelist item in dict format containing certificate exception info.
     """
-    if CertificateWhitelist.get_certificate_white_list(course_key, student):
+    log.info(f"Request received to add an allowlist entry for student {student.id} in course {course_key}")
+    # Check if the learner is blocked from receiving certificates in this course run.
+    if certs_api.is_certificate_invalidated(student, course_key):
+        raise ValueError(
+            _("Student {user} is already on the certificate invalidation list and cannot be added to the certificate "
+              "exception list.").format(user=student.username)
+        )
+
+    if certs_api.is_on_allowlist(student, course_key):
         raise ValueError(
             _("Student (username/email={user}) already in certificate exception list.").format(user=student.username)
         )
 
-    certificate_white_list, __ = CertificateWhitelist.objects.get_or_create(
-        user=student,
-        course_id=course_key,
-        defaults={
-            'whitelist': True,
-            'notes': certificate_exception.get('notes', '')
-        }
+    certificate_allowlist_entry = certs_api.create_certificate_allowlist_entry(
+        student,
+        course_key,
+        certificate_exception.get("notes", "")
     )
-    log.info('%s has been added to the whitelist in course %s', student.username, course_key)
 
-    generated_certificate = GeneratedCertificate.eligible_certificates.filter(
-        user=student,
-        course_id=course_key,
-        status=CertificateStatuses.downloadable,
-    ).first()
+    log.info(f"Student {student.id} has been added to the whitelist in course {course_key}")
+
+    generated_certificate = certs_api.get_certificate_for_user(student.username, course_key, False)
 
     exception = dict({
-        'id': certificate_white_list.id,
+        'id': certificate_allowlist_entry.id,
         'user_email': student.email,
         'user_name': student.username,
         'user_id': student.id,
         'certificate_generated': generated_certificate and generated_certificate.created_date.strftime("%B %d, %Y"),
-        'created': certificate_white_list.created.strftime("%A, %B %d, %Y"),
+        'created': certificate_allowlist_entry.created.strftime("%A, %B %d, %Y"),
     })
 
     return exception
@@ -2668,30 +2687,23 @@ def remove_certificate_exception(course_key, student):
     :param student: User object whose certificate exception needs to be removed.
     :return:
     """
-    try:
-        certificate_exception = CertificateWhitelist.objects.get(user=student, course_id=course_key)
-    except ObjectDoesNotExist:
+    log.info(f"Request received to remove an allowlist entry for student {student.id} in course {course_key}.")
+
+    allowlist_entry = certs_api.get_allowlist_entry(student, course_key)
+    if not allowlist_entry:
         raise ValueError(  # lint-amnesty, pylint: disable=raise-missing-from
             _('Certificate exception (user={user}) does not exist in certificate white list. '
               'Please refresh the page and try again.').format(user=student.username)
         )
 
-    try:
-        generated_certificate = GeneratedCertificate.objects.get(
-            user=student,
-            course_id=course_key
-        )
-        generated_certificate.invalidate()
-        log.info(
-            'Certificate invalidated for %s in course %s when removed from certificate exception list',
-            student.username,
-            course_key
-        )
-    except ObjectDoesNotExist:
-        # Certificate has not been generated yet, so just remove the certificate exception from white list
-        pass
-    log.info('%s has been removed from the whitelist in course %s', student.username, course_key)
-    certificate_exception.delete()
+    # If a certificate was generated then we should invalidate it before removing the learner from the allowlist
+    certificate = certs_api.get_certificate_for_user(student.username, course_key, False)
+    if certificate:
+        log.info(f"Invalidating certificate for student {student.id} in course {course_key} before allowlist removal.")
+        certificate.invalidate()
+
+    log.info(f"Removing student {student.id} from the allowlist in course {course_key}.")
+    allowlist_entry.delete()
 
 
 def parse_request_data_and_get_user(request, course_key):
@@ -2806,17 +2818,24 @@ def generate_bulk_certificate_exceptions(request, course_id):
     {
         general_errors: [errors related to csv file e.g. csv uploading, csv attachment, content reading etc. ],
         row_errors: {
-            data_format_error:              [users/data in csv file that are not well formatted],
-            user_not_exist:                 [csv with none exiting users in LMS system],
-            user_already_white_listed:      [users that are already white listed],
-            user_not_enrolled:              [rows with not enrolled users in the given course]
+            data_format_error: [users/data in csv file that are not well formatted],
+            user_not_exist: [csv with none exiting users in LMS system],
+            user_already_white_listed: [users that are already white listed],
+            user_not_enrolled: [rows with not enrolled users in the given course],
+            user_on_certificate_invalidation_list: [users that are currently have an active blocklist entry]
         },
         success: [list of successfully added users to the certificate white list model]
     }
     """
     user_index = 0
     notes_index = 1
-    row_errors_key = ['data_format_error', 'user_not_exist', 'user_already_white_listed', 'user_not_enrolled']
+    row_errors_key = [
+        'data_format_error',
+        'user_not_exist',
+        'user_already_white_listed',
+        'user_not_enrolled',
+        'user_on_certificate_invalidation_list'
+    ]
     course_key = CourseKey.from_string(course_id)
     students, general_errors, success = [], [], []
     row_errors = {key: [] for key in row_errors_key}
@@ -2835,7 +2854,6 @@ def generate_bulk_certificate_exceptions(request, course_id):
             else:
                 general_errors.append(_('Make sure that the file you upload is in CSV format with no '
                                         'extraneous characters or rows.'))
-
         except Exception:  # pylint: disable=broad-except
             general_errors.append(_('Could not read uploaded file.'))
         finally:
@@ -2849,7 +2867,7 @@ def generate_bulk_certificate_exceptions(request, course_id):
             if len(student) != 2:
                 if student:
                     build_row_errors('data_format_error', student[user_index], row_num)
-                    log.info('invalid data/format in csv row# %s', row_num)
+                    log.info(f'Invalid data/format in csv row# {row_num}')
                 continue
 
             user = student[user_index]
@@ -2857,17 +2875,20 @@ def generate_bulk_certificate_exceptions(request, course_id):
                 user = get_user_by_username_or_email(user)
             except ObjectDoesNotExist:
                 build_row_errors('user_not_exist', user, row_num)
-                log.info('student %s does not exist', user)
+                log.info(f'Student {user} does not exist')
             else:
-                if CertificateWhitelist.get_certificate_white_list(course_key, user):
+                # make sure learner isn't on the blocklist
+                if certs_api.is_certificate_invalidated(user, course_key):
+                    build_row_errors('user_on_certificate_invalidation_list', user, row_num)
+                    log.warning(f'Student {user.id} is blocked from receiving a Certificate in Course {course_key}')
+                # make sure user isn't already on the exception list
+                elif CertificateWhitelist.get_certificate_white_list(course_key, user):
                     build_row_errors('user_already_white_listed', user, row_num)
-                    log.warning('student %s already exist.', user.username)
-
+                    log.warning(f'Student {user.id} already on exception list in Course {course_key}.')
                 # make sure user is enrolled in course
                 elif not CourseEnrollment.is_enrolled(user, course_key):
                     build_row_errors('user_not_enrolled', user, row_num)
-                    log.warning('student %s is not enrolled in course.', user.username)
-
+                    log.warning(f'Student {user.id} is not enrolled in Course {course_key}')
                 else:
                     CertificateWhitelist.objects.create(
                         user=user,
@@ -2876,7 +2897,6 @@ def generate_bulk_certificate_exceptions(request, course_id):
                         notes=student[notes_index]
                     )
                     success.append(_('user "{username}" in row# {row}').format(username=user.username, row=row_num))
-
     else:
         general_errors.append(_('File is not attached.'))
 
@@ -2885,7 +2905,6 @@ def generate_bulk_certificate_exceptions(request, course_id):
         'row_errors': row_errors,
         'success': success
     }
-
     return JsonResponse(results)
 
 
@@ -2906,14 +2925,28 @@ def certificate_invalidation_view(request, course_id):
     # Validate request data and return error response in case of invalid data
     try:
         certificate_invalidation_data = parse_request_data(request)
-        certificate = validate_request_data_and_get_certificate(certificate_invalidation_data, course_key)
+        student = _get_student_from_request_data(certificate_invalidation_data, course_key)
+        certificate = _get_certificate_for_user(course_key, student)
     except ValueError as error:
         return JsonResponse({'message': str(error)}, status=400)
 
     # Invalidate certificate of the given student for the course course
     if request.method == 'POST':
         try:
-            certificate_invalidation = invalidate_certificate(request, certificate, certificate_invalidation_data)
+            if certs_api.is_on_allowlist(student, course_key):
+                log.warning(f"Invalidating certificate for student {student.id} in course {course_key} failed. "
+                            "Student is currently on the allow list.")
+                raise ValueError(
+                    _("The student {student} appears on the Certificate Exception list in course {course}. Please "
+                      "remove them from the Certificate Exception list before attempting to invalidate their "
+                      "certificate.").format(student=student, course=course_key)
+                )
+            certificate_invalidation = invalidate_certificate(
+                request,
+                certificate,
+                certificate_invalidation_data,
+                student
+            )
         except ValueError as error:
             return JsonResponse({'message': str(error)}, status=400)
         return JsonResponse(certificate_invalidation)
@@ -2921,54 +2954,51 @@ def certificate_invalidation_view(request, course_id):
     # Re-Validate student certificate for the course course
     elif request.method == 'DELETE':
         try:
-            re_validate_certificate(request, course_key, certificate)
+            re_validate_certificate(request, course_key, certificate, student)
         except ValueError as error:
             return JsonResponse({'message': str(error)}, status=400)
 
         return JsonResponse({}, status=204)
 
 
-def invalidate_certificate(request, generated_certificate, certificate_invalidation_data):
+def invalidate_certificate(request, generated_certificate, certificate_invalidation_data, student):
     """
     Invalidate given GeneratedCertificate and add CertificateInvalidation record for future reference or re-validation.
 
     :param request: HttpRequest object
     :param generated_certificate: GeneratedCertificate object, the certificate we want to invalidate
     :param certificate_invalidation_data: dict object containing data for CertificateInvalidation.
+    :param student: User object, this user is tied to the generated_certificate we are going to invalidate
     :return: dict object containing updated certificate invalidation data.
     """
-    if CertificateInvalidation.get_certificate_invalidations(
-        generated_certificate.course_id,
-        generated_certificate.user,
-    ):
+    # Check if the learner already appears on the certificate invalidation list
+    if certs_api.is_certificate_invalidated(student, generated_certificate.course_id):
         raise ValueError(
             _("Certificate of {user} has already been invalidated. Please check your spelling and retry.").format(
-                user=generated_certificate.user.username,
+                user=student.username,
             )
         )
 
-    # Verify that certificate user wants to invalidate is a valid one.
+    # Verify that the learner's certificate is valid before invalidating
     if not generated_certificate.is_valid():
         raise ValueError(
             _("Certificate for student {user} is already invalid, kindly verify that certificate was generated "
-              "for this student and then proceed.").format(user=generated_certificate.user.username)
+              "for this student and then proceed.").format(user=student.username)
         )
 
     # Add CertificateInvalidation record for future reference or re-validation
-    certificate_invalidation, __ = CertificateInvalidation.objects.update_or_create(
-        generated_certificate=generated_certificate,
-        defaults={
-            'invalidated_by': request.user,
-            'notes': certificate_invalidation_data.get("notes", ""),
-            'active': True,
-        }
+    certificate_invalidation = certs_api.create_certificate_invalidation_entry(
+        generated_certificate,
+        request.user,
+        certificate_invalidation_data.get("notes", ""),
     )
 
-    # Invalidate GeneratedCertificate
+    # Invalidate the certificate
     generated_certificate.invalidate()
+
     return {
         'id': certificate_invalidation.id,
-        'user': certificate_invalidation.generated_certificate.user.username,
+        'user': student.username,
         'invalidated_by': certificate_invalidation.invalidated_by.username,
         'created': certificate_invalidation.created.strftime("%B %d, %Y"),
         'notes': certificate_invalidation.notes,
@@ -2976,7 +3006,7 @@ def invalidate_certificate(request, generated_certificate, certificate_invalidat
 
 
 @common_exceptions_400
-def re_validate_certificate(request, course_key, generated_certificate):
+def re_validate_certificate(request, course_key, generated_certificate, student):
     """
     Remove certificate invalidation from db and start certificate generation task for this student.
     Raises ValueError if certificate invalidation is present.
@@ -2985,51 +3015,17 @@ def re_validate_certificate(request, course_key, generated_certificate):
     :param course_key: CourseKey object identifying the current course.
     :param generated_certificate: GeneratedCertificate object of the student for the given course
     """
-    try:
-        # Fetch CertificateInvalidation object
-        certificate_invalidation = CertificateInvalidation.objects.get(generated_certificate=generated_certificate)
-    except ObjectDoesNotExist:
-        raise ValueError(_("Certificate Invalidation does not exist, Please refresh the page and try again."))  # lint-amnesty, pylint: disable=raise-missing-from
-    else:
-        # Deactivate certificate invalidation if it was fetched successfully.
-        certificate_invalidation.deactivate()
+    log.info(f"Attempting to revalidate certificate for student {student.id} in course {course_key}")
 
-    # We need to generate certificate only for a single student here
-    student = certificate_invalidation.generated_certificate.user
+    certificate_invalidation = certs_api.get_certificate_invalidation_entry(generated_certificate)
+    if not certificate_invalidation:
+        raise ValueError(_("Certificate Invalidation does not exist, Please refresh the page and try again."))  # lint-amnesty, pylint: disable=raise-missing-from
+
+    certificate_invalidation.deactivate()
 
     task_api.generate_certificates_for_students(
         request, course_key, student_set="specific_student", specific_student_id=student.id
     )
-
-
-def validate_request_data_and_get_certificate(certificate_invalidation, course_key):
-    """
-    Fetch and return GeneratedCertificate of the student passed in request data for the given course.
-
-    Raises ValueError in case of missing student username/email or
-    if student does not have certificate for the given course.
-
-    :param certificate_invalidation: dict containing certificate invalidation data
-    :param course_key: CourseKey object identifying the current course.
-    :return: GeneratedCertificate object of the student for the given course
-    """
-    user = certificate_invalidation.get("user")
-
-    if not user:
-        raise ValueError(
-            _('Student username/email field is required and can not be empty. '
-              'Kindly fill in username/email and then press "Invalidate Certificate" button.')
-        )
-
-    student = get_student(user, course_key)
-
-    certificate = GeneratedCertificate.certificate_for_student(student, course_key)
-    if not certificate:
-        raise ValueError(_(
-            "The student {student} does not have certificate for the course {course}. Kindly verify student "
-            "username/email and the selected course are correct and try again."
-        ).format(student=student.username, course=course_key.course))
-    return certificate
 
 
 def _get_boolean_param(request, param_name):
@@ -3047,3 +3043,39 @@ def _create_error_response(request, msg):
     in JSON form.
     """
     return JsonResponse({"error": msg}, 400)
+
+
+def _get_student_from_request_data(request_data, course_key):
+    """
+    Attempts to retrieve the student information from the incoming request data.
+
+    :param request: HttpRequest object
+    :param course_key: CourseKey object identifying the current course.
+    """
+    user = request_data.get("user")
+    if not user:
+        raise ValueError(
+            _('Student username/email field is required and can not be empty. '
+              'Kindly fill in username/email and then press "Invalidate Certificate" button.')
+        )
+
+    return get_student(user, course_key)
+
+
+def _get_certificate_for_user(course_key, student):
+    """
+    Attempt to retrieve certificate information for a learner in a given course-run.
+
+    Raises a ValueError if a certificate cannot be retrieved for the learner. This will prompt an informative message
+    to be displayed on the instructor dashboard.
+    """
+    log.info(f"Retrieving certificate for student {student.id} in course {course_key}")
+    certificate = certs_api.get_certificate_for_user(student.username, course_key, False)
+    if not certificate:
+        raise ValueError(_(
+            "The student {student} does not have certificate for the course {course}. Kindly verify student "
+            "username/email and the selected course are correct and try again.").format(
+                student=student.username, course=course_key.course)
+        )
+
+    return certificate

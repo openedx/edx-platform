@@ -128,11 +128,8 @@ class TestCourseOutlinePage(SharedModuleStoreTestCase, MasqueradeMixin):
         """Set up and enroll our fake user in the course."""
         cls.user = UserFactory(password=TEST_PASSWORD)
         for course in cls.courses:
-            enrollment = CourseEnrollment.enroll(cls.user, course.id)
-            ScheduleFactory.create(
-                start_date=timezone.now() - datetime.timedelta(days=1),
-                enrollment=enrollment
-            )
+            CourseEnrollment.enroll(cls.user, course.id)
+        Schedule.objects.update(start_date=timezone.now() - datetime.timedelta(days=1))
 
     def setUp(self):
         """
@@ -238,53 +235,41 @@ class TestCourseOutlinePage(SharedModuleStoreTestCase, MasqueradeMixin):
     @override_experiment_waffle_flag(RELATIVE_DATES_FLAG, active=True)
     def test_reset_course_deadlines(self):
         course = self.courses[0]
-        enrollment = CourseEnrollment.objects.get(course_id=course.id)
-        enrollment.schedule.start_date = timezone.now() - datetime.timedelta(days=30)
-        enrollment.schedule.save()
 
-        student_schedule = CourseEnrollment.objects.get(course_id=course.id, user=self.user).schedule
-        student_schedule.start_date = timezone.now() - datetime.timedelta(days=30)
-        student_schedule.save()
         staff = StaffFactory(course_key=course.id)
-        staff_schedule = ScheduleFactory(
-            start_date=timezone.now() - datetime.timedelta(days=30),
-            enrollment__course__id=course.id,
-            enrollment__user=staff,
-        )
+        CourseEnrollment.enroll(staff, course.id)
+
+        start_date = timezone.now() - datetime.timedelta(days=30)
+        Schedule.objects.update(start_date=start_date)
 
         self.client.login(username=staff.username, password=TEST_PASSWORD)
         self.update_masquerade(course=course, username=self.user.username)
 
         post_dict = {'course_id': str(course.id)}
         self.client.post(reverse(RESET_COURSE_DEADLINES_NAME), post_dict)
-        updated_schedule = Schedule.objects.get(id=student_schedule.id)
+        updated_schedule = Schedule.objects.get(enrollment__user=self.user, enrollment__course_id=course.id)
         assert updated_schedule.start_date.date() == datetime.datetime.today().date()
-        updated_staff_schedule = Schedule.objects.get(id=staff_schedule.id)
-        assert updated_staff_schedule.start_date == staff_schedule.start_date
+        updated_staff_schedule = Schedule.objects.get(enrollment__user=staff, enrollment__course_id=course.id)
+        assert updated_staff_schedule.start_date == start_date
 
     @override_experiment_waffle_flag(RELATIVE_DATES_FLAG, active=True)
     def test_reset_course_deadlines_masquerade_generic_student(self):
         course = self.courses[0]
 
-        student_schedule = CourseEnrollment.objects.get(course_id=course.id, user=self.user).schedule
-        student_schedule.start_date = timezone.now() - datetime.timedelta(days=30)
-        student_schedule.save()
-
         staff = StaffFactory(course_key=course.id)
-        staff_schedule = ScheduleFactory(
-            start_date=timezone.now() - datetime.timedelta(days=30),
-            enrollment__course__id=course.id,
-            enrollment__user=staff,
-        )
+        CourseEnrollment.enroll(staff, course.id)
+
+        start_date = timezone.now() - datetime.timedelta(days=30)
+        Schedule.objects.update(start_date=start_date)
 
         self.client.login(username=staff.username, password=TEST_PASSWORD)
         self.update_masquerade(course=course)
 
         post_dict = {'course_id': str(course.id)}
         self.client.post(reverse(RESET_COURSE_DEADLINES_NAME), post_dict)
-        updated_student_schedule = Schedule.objects.get(id=student_schedule.id)
-        assert updated_student_schedule.start_date == student_schedule.start_date
-        updated_staff_schedule = Schedule.objects.get(id=staff_schedule.id)
+        updated_student_schedule = Schedule.objects.get(enrollment__user=self.user, enrollment__course_id=course.id)
+        assert updated_student_schedule.start_date == start_date
+        updated_staff_schedule = Schedule.objects.get(enrollment__user=staff, enrollment__course_id=course.id)
         assert updated_staff_schedule.start_date.date() == datetime.date.today()
 
 

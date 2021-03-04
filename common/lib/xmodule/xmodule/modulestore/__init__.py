@@ -1085,7 +1085,7 @@ class ModuleStoreWrite(six.with_metaclass(ABCMeta, ModuleStoreRead, ModuleStoreA
             fields (dict): Fields to set on the course at initialization
             kwargs: Any optional arguments understood by a subset of modulestores to customize instantiation
 
-        Returns: a CourseDescriptor
+        Returns: a CourseBlock
         """
         pass  # lint-amnesty, pylint: disable=unnecessary-pass
 

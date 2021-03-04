@@ -1,13 +1,11 @@
 """ Tests for course reindex command """
 
 
-import ddt
-import mock
-import six
-from django.core.management import CommandError, call_command
-from six import text_type
+from unittest import mock
 
-from cms.djangoapps.contentstore.courseware_index import SearchIndexingError  # lint-amnesty, pylint: disable=unused-import
+import ddt
+from django.core.management import CommandError, call_command
+
 from cms.djangoapps.contentstore.management.commands.reindex_course import Command as ReindexCommand
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
@@ -20,7 +18,7 @@ class TestReindexCourse(ModuleStoreTestCase):
     """ Tests for course reindex command """
     def setUp(self):
         """ Setup method - create courses """
-        super(TestReindexCourse, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.store = modulestore()
         self.first_lib = LibraryFactory.create(
             org="test", library="lib1", display_name="run1", default_store=ModuleStoreEnum.Type.split
@@ -58,41 +56,41 @@ class TestReindexCourse(ModuleStoreTestCase):
     @ddt.data('qwerty', 'invalid_key', 'xblockv1:qwerty')
     def test_given_invalid_course_key_raises_not_found(self, invalid_key):
         """ Test that raises InvalidKeyError for invalid keys """
-        err_string = u"Invalid course_key: '{0}'".format(invalid_key)
+        err_string = f"Invalid course_key: '{invalid_key}'"
         with self.assertRaisesRegex(CommandError, err_string):
             call_command('reindex_course', invalid_key)
 
     def test_given_library_key_raises_command_error(self):
         """ Test that raises CommandError if library key is passed """
         with self.assertRaisesRegex(CommandError, ".* is not a course key"):
-            call_command('reindex_course', text_type(self._get_lib_key(self.first_lib)))
+            call_command('reindex_course', str(self._get_lib_key(self.first_lib)))
 
         with self.assertRaisesRegex(CommandError, ".* is not a course key"):
-            call_command('reindex_course', text_type(self._get_lib_key(self.second_lib)))
+            call_command('reindex_course', str(self._get_lib_key(self.second_lib)))
 
         with self.assertRaisesRegex(CommandError, ".* is not a course key"):
             call_command(
                 'reindex_course',
-                text_type(self.second_course.id),
-                text_type(self._get_lib_key(self.first_lib))
+                str(self.second_course.id),
+                str(self._get_lib_key(self.first_lib))
             )
 
     def test_given_id_list_indexes_courses(self):
         """ Test that reindexes courses when given single course key or a list of course keys """
         with mock.patch(self.REINDEX_PATH_LOCATION) as patched_index, \
                 mock.patch(self.MODULESTORE_PATCH_LOCATION, mock.Mock(return_value=self.store)):
-            call_command('reindex_course', text_type(self.first_course.id))
+            call_command('reindex_course', str(self.first_course.id))
             self.assertEqual(patched_index.mock_calls, self._build_calls(self.first_course))
             patched_index.reset_mock()
 
-            call_command('reindex_course', text_type(self.second_course.id))
+            call_command('reindex_course', str(self.second_course.id))
             self.assertEqual(patched_index.mock_calls, self._build_calls(self.second_course))
             patched_index.reset_mock()
 
             call_command(
                 'reindex_course',
-                text_type(self.first_course.id),
-                text_type(self.second_course.id)
+                str(self.first_course.id),
+                str(self.second_course.id)
             )
             expected_calls = self._build_calls(self.first_course, self.second_course)
             self.assertEqual(patched_index.mock_calls, expected_calls)
@@ -107,7 +105,7 @@ class TestReindexCourse(ModuleStoreTestCase):
 
                 patched_yes_no.assert_called_once_with(ReindexCommand.CONFIRMATION_PROMPT, default='no')
                 expected_calls = self._build_calls(self.first_course, self.second_course)
-                six.assertCountEqual(self, patched_index.mock_calls, expected_calls)
+                self.assertCountEqual(patched_index.mock_calls, expected_calls)
 
     def test_given_all_key_prompts_and_reindexes_all_courses_cancelled(self):
         """ Test that does not reindex anything when --all key is given and cancelled """

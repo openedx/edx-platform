@@ -12,7 +12,9 @@ from config_models.models import ConfigurationModel
 from django.conf import settings
 from django.db import models, transaction
 from django.db.models import Q
-from django.db.models.fields import BooleanField, DateTimeField, DecimalField, FloatField, IntegerField, TextField
+from django.db.models.fields import (
+    BooleanField, DateTimeField, DecimalField, FloatField, IntegerField, NullBooleanField, TextField
+)
 from django.db.models.signals import post_save, post_delete
 from django.db.utils import IntegrityError
 from django.template import defaultfilters
@@ -31,7 +33,7 @@ from openedx.core.djangoapps.models.course_details import CourseDetails
 from openedx.core.lib.cache_utils import request_cached, RequestCache
 from common.djangoapps.static_replace.models import AssetBaseUrlConfig
 from xmodule import block_metadata_utils, course_metadata_utils
-from xmodule.course_module import DEFAULT_START_DATE, CourseDescriptor
+from xmodule.course_module import DEFAULT_START_DATE, CourseBlock
 from xmodule.error_module import ErrorBlock
 from xmodule.modulestore.django import modulestore
 from xmodule.tabs import CourseTab
@@ -126,6 +128,9 @@ class CourseOverview(TimeStampedModel):
     marketing_url = TextField(null=True)
     eligible_for_financial_aid = BooleanField(default=True)
 
+    # Course highlight info, used to guide course update emails
+    has_highlights = NullBooleanField(default=None)  # if None, you have to look up the answer yourself
+
     language = TextField(null=True)
 
     history = HistoricalRecords()
@@ -133,13 +138,13 @@ class CourseOverview(TimeStampedModel):
     @classmethod
     def _create_or_update(cls, course):  # lint-amnesty, pylint: disable=too-many-statements
         """
-        Creates or updates a CourseOverview object from a CourseDescriptor.
+        Creates or updates a CourseOverview object from a CourseBlock.
 
         Does not touch the database, simply constructs and returns an overview
         from the given course.
 
         Arguments:
-            course (CourseDescriptor): any course descriptor object
+            course (CourseBlock): any course descriptor object
 
         Returns:
             CourseOverview: created or updated overview extracted from the given course
@@ -229,6 +234,8 @@ class CourseOverview(TimeStampedModel):
         course_overview.course_video_url = CourseDetails.fetch_video_url(course.id)
         course_overview.self_paced = course.self_paced
 
+        course_overview.has_highlights = cls._get_course_has_highlights(course)
+
         if not CatalogIntegration.is_enabled():
             course_overview.language = course.language
 
@@ -237,7 +244,7 @@ class CourseOverview(TimeStampedModel):
     @classmethod
     def load_from_module_store(cls, course_id):
         """
-        Load a CourseDescriptor, create or update a CourseOverview from it, cache the
+        Load a CourseBlock, create or update a CourseOverview from it, cache the
         overview, and return it.
 
         Arguments:
@@ -259,7 +266,7 @@ class CourseOverview(TimeStampedModel):
         store = modulestore()
         with store.bulk_operations(course_id):
             course = store.get_course(course_id)
-            if isinstance(course, CourseDescriptor):
+            if isinstance(course, CourseBlock):
                 try:
                     course_overview = cls._create_or_update(course)
                     with transaction.atomic():
@@ -412,6 +419,12 @@ class CourseOverview(TimeStampedModel):
                 except CourseOverview.DoesNotExist:
                     overviews[course_id] = None
         return overviews
+
+    @classmethod
+    def _get_course_has_highlights(cls, course):
+        # Avoid circular import here
+        from openedx.core.djangoapps.schedules.content_highlights import course_has_highlights
+        return course_has_highlights(course)
 
     def clean_id(self, padding_char='='):
         """

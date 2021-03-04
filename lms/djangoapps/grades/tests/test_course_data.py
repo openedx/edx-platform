@@ -55,7 +55,10 @@ class CourseDataTest(ModuleStoreTestCase):
                 if arg != kwarg and arg != "collected_block_structure":  # lint-amnesty, pylint: disable=consider-using-in
                     expected = self.expected_results[arg]
                     actual = getattr(course_data, arg)
-                    assert expected == actual
+                    if arg == 'course':
+                        assert expected.location == actual.location
+                    else:
+                        assert expected == actual
 
     def test_properties(self):
         expected_edited_on = getattr(  # lint-amnesty, pylint: disable=literal-used-as-attribute

@@ -2,15 +2,16 @@
 Tests for management command backfill_sso_verifications_for_old_account_links
 """
 
-from mock import patch
+from unittest.mock import patch
+
 import pytest
 from django.core.management import call_command
 from django.core.management.base import CommandError
 
+from common.djangoapps.third_party_auth.tests.testutil import TestCase
 from lms.djangoapps.program_enrollments.management.commands.tests.utils import UserSocialAuthFactory
 from lms.djangoapps.verify_student.models import SSOVerification
 from lms.djangoapps.verify_student.tests.factories import SSOVerificationFactory
-from common.djangoapps.third_party_auth.tests.testutil import TestCase
 
 
 class TestBackfillSSOVerificationsCommand(TestCase):
@@ -20,7 +21,7 @@ class TestBackfillSSOVerificationsCommand(TestCase):
     slug = 'test'
 
     def setUp(self):
-        super(TestBackfillSSOVerificationsCommand, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.enable_saml()
         self.provider = self.configure_saml_provider(
             name="Test",

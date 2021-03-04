@@ -7,7 +7,8 @@ import inspect  # lint-amnesty, pylint: disable=unused-import
 import logging
 from collections import defaultdict, namedtuple
 from datetime import timedelta
-
+import logging
+import six
 from config_models.models import ConfigurationModel
 from django.conf import settings
 from django.core.exceptions import ValidationError
@@ -20,7 +21,6 @@ from django.utils.timezone import now
 from django.utils.translation import ugettext_lazy as _
 from edx_django_utils.cache import RequestCache
 from opaque_keys.edx.django.models import CourseKeyField
-from opaque_keys.edx.keys import CourseKey  # lint-amnesty, pylint: disable=unused-import
 from simple_history.models import HistoricalRecords
 
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
@@ -366,7 +366,7 @@ class CourseMode(models.Model):
             raise ValueError("One of course_id or course must not be None.")
 
         if course is not None and not isinstance(course, CourseOverview):
-            # CourseModules don't have the data needed to pull related modes,
+            # CourseBlocks don't have the data needed to pull related modes,
             # so we'll fall back on course_id-based lookup instead
             course_id = course.id
             course = None

@@ -74,11 +74,11 @@ def config_course_cohorts_legacy(
     the cohort config on the course descriptor.
 
     Since cohort settings are now stored in models.CourseCohortSettings,
-    this is only used for testing data migration from the CourseDescriptor
+    this is only used for testing data migration from the CourseBlock
     to the table.
 
     Arguments:
-        course: CourseDescriptor
+        course: CourseBlock
         cohorted: bool.
         auto_cohort_groups: optional list of strings
                   (names of groups to put students into).
@@ -113,7 +113,7 @@ def config_course_cohorts(
     Set and configure cohorts for a course.
 
     Arguments:
-        course: CourseDescriptor
+        course: CourseBlock
         is_cohorted (bool): Is the course cohorted?
         discussion_division_scheme (String): the division scheme for discussions. Default is
             CourseDiscussionSettings.COHORT.

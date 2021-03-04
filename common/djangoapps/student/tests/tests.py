@@ -418,10 +418,10 @@ class DashboardTest(ModuleStoreTestCase, TestVerificationBase):
 
         Note to future developers:
             If you break this test so that the "check_mongo_calls(0)" fails,
-            please do NOT change it to "check_mongo_calls(n>1)". Instead, change
+            please do NOT change it to "check_mongo_calls(n>=1)". Instead, change
             your code to not load courses from the module store. This may
             involve adding fields to CourseOverview so that loading a full
-            CourseDescriptor isn't necessary.
+            CourseBlock isn't necessary.
         """
         # Create a course and log in the user.
         # Creating a new course will trigger a publish event and the course will be cached

@@ -14,9 +14,8 @@ from edx_api_doc_tools import make_docs_urls
 from edx_django_utils.plugins import get_plugin_url_patterns
 from ratelimitbackend import admin
 
-from common.djangoapps.student import views as student_views
-from common.djangoapps.util import views as util_views
 from lms.djangoapps.branding import views as branding_views
+from lms.djangoapps.debug import views as debug_views
 from lms.djangoapps.certificates import views as certificates_views
 from lms.djangoapps.courseware.masquerade import MasqueradeView
 from lms.djangoapps.courseware.module_render import (
@@ -28,14 +27,13 @@ from lms.djangoapps.courseware.module_render import (
 from lms.djangoapps.courseware.views import views as courseware_views
 from lms.djangoapps.courseware.views.index import CoursewareIndex
 from lms.djangoapps.courseware.views.views import CourseTabView, EnrollStaffView, StaticCourseTabView
-from lms.djangoapps.debug import views as debug_views
 from lms.djangoapps.discussion import views as discussion_views
 from lms.djangoapps.discussion.config.settings import is_forum_daily_digest_enabled
 from lms.djangoapps.discussion.notification_prefs import views as notification_prefs_views
 from lms.djangoapps.instructor.views import instructor_dashboard as instructor_dashboard_views
 from lms.djangoapps.instructor_task import views as instructor_task_views
-from lms.djangoapps.static_template_view import views as static_template_view_views
 from lms.djangoapps.staticbook import views as staticbook_views
+from lms.djangoapps.static_template_view import views as static_template_view_views
 from openedx.core.apidocs import api_info
 from openedx.core.djangoapps.auth_exchange.views import LoginWithAccessTokenView
 from openedx.core.djangoapps.catalog.models import CatalogIntegration
@@ -54,6 +52,8 @@ from openedx.core.djangoapps.site_configuration import helpers as configuration_
 from openedx.core.djangoapps.user_authn.views.login import redirect_to_lms_login
 from openedx.core.djangoapps.verified_track_content import views as verified_track_content_views
 from openedx.features.enterprise_support.api import enterprise_enabled
+from common.djangoapps.student import views as student_views
+from common.djangoapps.util import views as util_views
 
 RESET_COURSE_DEADLINES_NAME = 'reset_course_deadlines'
 RENDER_XBLOCK_NAME = 'render_xblock'
@@ -256,9 +256,9 @@ if settings.WIKI_ENABLED:
 
         # These urls are for viewing the wiki in the context of a course. They should
         # never be returned by a reverse() so they come after the other url patterns
-        url(fr'^courses/{settings.COURSE_ID_PATTERN}/course_wiki/?$',
+        url(r'^courses/{}/course_wiki/?$'.format(settings.COURSE_ID_PATTERN),
             course_wiki_views.course_wiki_redirect, name='course_wiki'),
-        url(fr'^courses/{settings.COURSE_KEY_REGEX}/wiki/',
+        url(r'^courses/{}/wiki/'.format(settings.COURSE_KEY_REGEX),
             include((wiki_url_patterns, 'course_wiki_do_not_reverse'), namespace='course_wiki_do_not_reverse')),
     ]
 
@@ -314,7 +314,7 @@ urlpatterns += [
     # passed as a 'view' parameter to the URL.
     # Note: This is not an API. Compare this with the xblock_view API above.
     url(
-        fr'^xblock/{settings.USAGE_KEY_PATTERN}$',
+        r'^xblock/{usage_key_string}$'.format(usage_key_string=settings.USAGE_KEY_PATTERN),
         courseware_views.render_xblock,
         name=RENDER_XBLOCK_NAME,
     ),
@@ -664,7 +664,7 @@ urlpatterns += [
 
     # Calendar Sync UI in LMS
     url(
-        fr'^courses/{settings.COURSE_ID_PATTERN}/',
+        r'^courses/{}/'.format(settings.COURSE_ID_PATTERN,),
         include('openedx.features.calendar_sync.urls'),
     ),
 
@@ -912,7 +912,7 @@ urlpatterns += [
 # Custom courses on edX (CCX) URLs
 if settings.FEATURES.get('CUSTOM_COURSES_EDX'):
     urlpatterns += [
-        url(fr'^courses/{settings.COURSE_ID_PATTERN}/',
+        url(r'^courses/{}/'.format(settings.COURSE_ID_PATTERN),
             include('lms.djangoapps.ccx.urls')),
         url(r'^api/ccx/', include(('lms.djangoapps.ccx.api.urls', 'lms.djangoapps.ccx'), namespace='ccx_api')),
     ]

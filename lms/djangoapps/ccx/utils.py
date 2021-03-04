@@ -38,7 +38,7 @@ def get_ccx_creation_dict(course):
     Return dict of rendering create ccx form.
 
     Arguments:
-        course (CourseDescriptorWithMixins): An edx course
+        course (CourseBlockWithMixins): An edx course
 
     Returns:
         dict: A attribute dict for view rendering
@@ -175,7 +175,7 @@ def get_ccx_by_ccx_id(course, coach, ccx_id):
     Finds a CCX of given coach on given master course.
 
     Arguments:
-        course (CourseDescriptor): Master course
+        course (CourseBlock): Master course
         coach (User): Coach to ccx
         ccx_id (long): Id of ccx
 
@@ -327,7 +327,7 @@ def add_master_course_staff_to_ccx(master_course, ccx_key, display_name, send_em
     Add staff and instructor roles on ccx to all the staff and instructors members of master course.
 
     Arguments:
-        master_course (CourseDescriptorWithMixins): Master course instance.
+        master_course (CourseBlockWithMixins): Master course instance.
         ccx_key (CCXLocator): CCX course key.
         display_name (str): ccx display name for email.
         send_email (bool): flag to switch on or off email to the users on access grant.
@@ -396,7 +396,7 @@ def remove_master_course_staff_from_ccx(master_course, ccx_key, display_name, se
     Remove staff and instructor roles on ccx to all the staff and instructors members of master course.
 
     Arguments:
-        master_course (CourseDescriptorWithMixins): Master course instance.
+        master_course (CourseBlockWithMixins): Master course instance.
         ccx_key (CCXLocator): CCX course key.
         display_name (str): ccx display name for email.
         send_email (bool): flag to switch on or off email to the users on revoke access.

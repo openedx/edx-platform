@@ -51,6 +51,14 @@ ${static.get_page_title_breadcrumbs(course_name())}
   ## in this iframe to navigate the parent window.
   <base target="_parent">
 %endif
+
+## Expose the $$course_id variable for course-team-authored JS.
+## We assign it in the <head> so that it will definitely be
+## assigned before any in-XBlock JS is run.
+<script type="text/javascript">
+  var $$course_id = "${course.id | n, js_escaped_string}";
+</script>
+
 </%block>
 
 <%block name="js_extra">
@@ -65,10 +73,6 @@ ${static.get_page_title_breadcrumbs(course_name())}
   % if staff_access:
   	<%include file="xqa_interface.html"/>
   % endif
-
-  <script type="text/javascript">
-    var $$course_id = "${course.id | n, js_escaped_string}";
-  </script>
 
 ${HTML(fragment.foot_html())}
 

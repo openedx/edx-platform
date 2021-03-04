@@ -6,7 +6,6 @@ Test CRUD for authorization.
 import copy
 
 from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
-from six.moves import range
 
 from cms.djangoapps.contentstore.tests.utils import AjaxEnabledTestClient
 from cms.djangoapps.contentstore.utils import reverse_course_url, reverse_url
@@ -25,7 +24,7 @@ class TestCourseAccess(ModuleStoreTestCase):
 
         Create a pool of users w/o granting them any permissions
         """
-        super(TestCourseAccess, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
 
         self.client = AjaxEnabledTestClient()
         self.client.login(username=self.user.username, password=self.user_password)
@@ -51,8 +50,8 @@ class TestCourseAccess(ModuleStoreTestCase):
         """
         users = []
         for i in range(8):
-            username = "user{}".format(i)
-            email = "test+user{}@edx.org".format(i)
+            username = f"user{i}"
+            email = f"test+user{i}@edx.org"
             user = User.objects.create_user(username, email, 'foo')
             user.is_active = True
             user.save()
@@ -94,7 +93,7 @@ class TestCourseAccess(ModuleStoreTestCase):
             user = users.pop()
             group.add_users(user)
             user_by_role[role].append(user)
-            self.assertTrue(auth.has_course_author_access(user, self.course_key), "{} does not have access".format(user))  # lint-amnesty, pylint: disable=line-too-long
+            self.assertTrue(auth.has_course_author_access(user, self.course_key), f"{user} does not have access")  # lint-amnesty, pylint: disable=line-too-long
 
         course_team_url = reverse_course_url('course_team_handler', self.course_key)
         response = self.client.get_html(course_team_url)
@@ -127,9 +126,9 @@ class TestCourseAccess(ModuleStoreTestCase):
                 if hasattr(user, '_roles'):
                     del user._roles
 
-                self.assertTrue(auth.has_course_author_access(user, copy_course_key), u"{} no copy access".format(user))
+                self.assertTrue(auth.has_course_author_access(user, copy_course_key), f"{user} no copy access")
                 if (role is OrgStaffRole) or (role is OrgInstructorRole):
                     auth.remove_users(self.user, role(self.course_key.org), user)
                 else:
                     auth.remove_users(self.user, role(self.course_key), user)
-                self.assertFalse(auth.has_course_author_access(user, self.course_key), u"{} remove didn't work".format(user))  # lint-amnesty, pylint: disable=line-too-long
+                self.assertFalse(auth.has_course_author_access(user, self.course_key), f"{user} remove didn't work")  # lint-amnesty, pylint: disable=line-too-long

@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 Tests for verify_student utility functions.
 """
@@ -6,21 +5,21 @@ Tests for verify_student utility functions.
 
 import unittest
 from datetime import timedelta
+from unittest import mock
+from unittest.mock import patch
 
 import ddt
-import mock
 from django.conf import settings
 from django.utils import timezone
-from mock import patch
 from pytest import mark
 
+from common.djangoapps.student.tests.factories import UserFactory
 from lms.djangoapps.verify_student.models import ManualVerification, SoftwareSecurePhotoVerification, SSOVerification
 from lms.djangoapps.verify_student.utils import (
     most_recent_verification,
     submit_request_to_ss,
     verification_for_datetime
 )
-from common.djangoapps.student.tests.factories import UserFactory
 
 FAKE_SETTINGS = {
     "DAYS_GOOD_FOR": 10,

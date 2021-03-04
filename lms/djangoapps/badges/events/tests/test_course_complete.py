@@ -4,11 +4,11 @@ Tests for the course completion helper functions.
 from datetime import datetime
 from uuid import uuid4
 
+from common.djangoapps.student.tests.factories import UserFactory
 from lms.djangoapps.badges.events import course_complete
 from lms.djangoapps.certificates.models import GeneratedCertificate
-from common.djangoapps.student.tests.factories import UserFactory
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase  # lint-amnesty, pylint: disable=import-error, wrong-import-order
-from xmodule.modulestore.tests.factories import CourseFactory  # lint-amnesty, pylint: disable=import-error, wrong-import-order
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from xmodule.modulestore.tests.factories import CourseFactory
 
 
 class CourseCompleteTestCase(ModuleStoreTestCase):
@@ -17,7 +17,7 @@ class CourseCompleteTestCase(ModuleStoreTestCase):
     """
 
     def setUp(self):
-        super(CourseCompleteTestCase, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         # Need key to be deterministic to test slugs.
         self.course = CourseFactory.create(
             org='edX', course='course_test', run='test_run', display_name='Badged',

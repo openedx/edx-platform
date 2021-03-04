@@ -622,7 +622,7 @@ def _deprecated_blocks_info(course_module, deprecated_block_types):
     Returns deprecation information about `deprecated_block_types`
 
     Arguments:
-        course_module (CourseDescriptor): course object
+        course_module (CourseBlock): course object
         deprecated_block_types (list): list of deprecated blocks types
 
     Returns:
@@ -872,9 +872,9 @@ def _create_or_rerun_course(request):
             fields['display_name'] = display_name
 
         # Set a unique wiki_slug for newly created courses. To maintain active wiki_slugs for
-        # existing xml courses this cannot be changed in CourseDescriptor.
+        # existing xml courses this cannot be changed in CourseBlock.
         # # TODO get rid of defining wiki slug in this org/course/run specific way and reconcile
-        # w/ xmodule.course_module.CourseDescriptor.__init__
+        # w/ xmodule.course_module.CourseBlock.__init__
         wiki_slug = u"{0}.{1}.{2}".format(org, course, run)
         definition_data = {'wiki_slug': wiki_slug}
         fields.update(definition_data)
