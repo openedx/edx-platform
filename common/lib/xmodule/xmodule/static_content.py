@@ -29,6 +29,7 @@ from xmodule.lti_module import LTIBlock
 from xmodule.poll_module import PollBlock
 from xmodule.seq_module import SequenceBlock
 from xmodule.split_test_module import SplitTestBlock
+from xmodule.template_module import CustomTagBlock
 from xmodule.word_cloud_module import WordCloudBlock
 from xmodule.x_module import XModuleDescriptor, HTMLSnippet
 
@@ -75,6 +76,7 @@ XBLOCK_CLASSES = [
     AnnotatableBlock,
     ConditionalBlock,
     CourseInfoBlock,
+    CustomTagBlock,
     HtmlBlock,
     LibraryContentBlock,
     LTIBlock,

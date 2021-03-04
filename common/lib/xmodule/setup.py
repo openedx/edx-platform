@@ -4,7 +4,6 @@ from setuptools import find_packages, setup
 
 XMODULES = [
     "book = xmodule.backcompat_module:TranslateCustomTagDescriptor",
-    "customtag = xmodule.template_module:CustomTagDescriptor",
     "discuss = xmodule.backcompat_module:TranslateCustomTagDescriptor",
     "image = xmodule.backcompat_module:TranslateCustomTagDescriptor",
     "section = xmodule.backcompat_module:SemanticSectionDescriptor",
@@ -20,6 +19,7 @@ XBLOCKS = [
     "conditional = xmodule.conditional_module:ConditionalBlock",
     "course = xmodule.course_module:CourseBlock",
     "course_info = xmodule.html_module:CourseInfoBlock",
+    "customtag = xmodule.template_module:CustomTagBlock",
     "error = xmodule.error_module:ErrorBlock",
     "hidden = xmodule.hidden_module:HiddenDescriptor",
     "html = xmodule.html_module:HtmlBlock",
