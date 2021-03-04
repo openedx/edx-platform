@@ -10,10 +10,13 @@ from typing import Optional  # lint-amnesty, pylint: disable=unused-import
 
 import attr  # lint-amnesty, pylint: disable=unused-import
 from django.contrib.auth import get_user_model
+from django.db.models.query import QuerySet
 from django.db import transaction
 from edx_django_utils.cache import TieredCache, get_cache_key  # lint-amnesty, pylint: disable=unused-import
 from edx_django_utils.monitoring import function_trace
-from opaque_keys.edx.keys import CourseKey, UsageKey  # lint-amnesty, pylint: disable=unused-import
+from opaque_keys import OpaqueKey
+from opaque_keys.edx.locator import LibraryLocator
+from opaque_keys.edx.keys import CourseKey  # lint-amnesty, pylint: disable=unused-import
 
 from ..data import (
     CourseLearningSequenceData,
@@ -46,11 +49,40 @@ log = logging.getLogger(__name__)
 
 # Public API...
 __all__ = [
+    'get_course_keys_with_outlines',
     'get_course_outline',
     'get_user_course_outline',
     'get_user_course_outline_details',
+    'key_supports_outlines',
     'replace_course_outline',
 ]
+
+
+def key_supports_outlines(opaque_key: OpaqueKey) -> bool:
+    """
+    Does this key-type support outlines?
+
+    Allow all non-deprecated CourseKeys except for v1 Libraries (which subclass
+    CourseKey but shouldn't). So our normal SplitMongo courses (CourseLocator)
+    will work, as will CCX courses. But libraries, pathways, and Old Mongo
+    courses will not.
+    """
+    # Get LibraryLocators out of the way first because they subclass CourseKey.
+    if isinstance(opaque_key, LibraryLocator):
+        return False
+
+    # All other CourseKey types are acceptable if they're not deprecated. There
+    # are only two at the moment though, course-v1: and ccx-v1:. The old slash-
+    # separated course IDs (Org/Course/Run) are not supported.
+    if isinstance(opaque_key, CourseKey):
+        return not opaque_key.deprecated
+
+    return False
+
+
+def get_course_keys_with_outlines() -> QuerySet:
+    """Queryset of ContextKeys, iterable as a flat list."""
+    return LearningContext.objects.values_list('context_key', flat=True)
 
 
 def get_course_outline(course_key: CourseKey) -> CourseOutlineData:

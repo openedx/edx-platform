@@ -42,6 +42,7 @@ from cms.djangoapps.contentstore.utils import initialize_permissions, reverse_us
 from cms.djangoapps.models.settings.course_metadata import CourseMetadata
 from common.djangoapps.course_action_state.models import CourseRerunState
 from common.djangoapps.student.auth import has_course_author_access
+from openedx.core.djangoapps.content.learning_sequences.api import key_supports_outlines
 from openedx.core.djangoapps.embargo.models import CountryAccessRule, RestrictedCourse
 from openedx.core.lib.extract_tar import safetar_extractall
 from xmodule.contentstore.django import contentstore
@@ -571,6 +572,16 @@ def update_outline_from_modulestore_task(course_key_str):
     """
     try:
         course_key = CourseKey.from_string(course_key_str)
+        if not key_supports_outlines(course_key):
+            LOGGER.warning(
+                (
+                    "update_outline_from_modulestore_task called for course key"
+                    " %s, which does not support learning_sequence outlines."
+                ),
+                course_key_str
+            )
+            return
+
         update_outline_from_modulestore(course_key)
     except Exception:  # pylint disable=broad-except
         LOGGER.exception("Could not create course outline for course %s", course_key_str)

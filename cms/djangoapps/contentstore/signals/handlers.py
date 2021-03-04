@@ -19,6 +19,7 @@ from common.djangoapps.track.event_transaction_utils import get_event_transactio
 from common.djangoapps.util.module_utils import yield_dynamic_descriptor_descendants
 from lms.djangoapps.grades.api import task_compute_all_grades_for_course
 from openedx.core.djangoapps.credit.signals import on_course_publish
+from openedx.core.djangoapps.content.learning_sequences.api import key_supports_outlines
 from openedx.core.lib.gating import api as gating_api
 from xmodule.modulestore.django import SignalHandler, modulestore
 
@@ -65,7 +66,8 @@ def listen_for_course_publish(sender, course_key, **kwargs):  # pylint: disable=
 
     # import here, because signal is registered at startup, but items in tasks are not yet able to be loaded
     from cms.djangoapps.contentstore.tasks import update_outline_from_modulestore_task, update_search_index
-    update_outline_from_modulestore_task.delay(str(course_key))
+    if key_supports_outlines(course_key):
+        update_outline_from_modulestore_task.delay(str(course_key))
 
     # Finally call into the course search subsystem
     # to kick off an indexing action
