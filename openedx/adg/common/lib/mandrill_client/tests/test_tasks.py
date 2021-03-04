@@ -9,4 +9,4 @@ def test_task_send_mandrill_email(mocker):
 
     mandrill_tasks.task_send_mandrill_email('email_template', 'user@email.com', {'content': 'content'})
 
-    mock_mandrill.assert_called_once_with()
+    mock_mandrill.assert_called_once()
