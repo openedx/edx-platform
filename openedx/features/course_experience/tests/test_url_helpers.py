@@ -6,6 +6,7 @@ from unittest import mock
 import ddt
 
 from xmodule.modulestore import ModuleStoreEnum
+from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 
@@ -32,14 +33,20 @@ class GetCoursewareUrlTests(SharedModuleStoreTestCase):
     def setUpClass(cls):
         """
         Set up data used across test functions.
+        """
+        # pylint: disable=super-method-not-called
+        with super().setUpClassAndTestData():
+            cls.items = cls.create_test_courses()
 
+    @classmethod
+    def create_test_courses(cls):
+        """
         We build two simple course structures (one using Split, the other Old Mongo).
         Each course structure is a non-branching tree from the root Course block down
         to the Component-level problem block; that is, we make one item for each course
         hierarchy level.
 
-        For easy access in the test functions, we expose them in `self.items`
-        in a dict like this:
+        For easy access in the test functions, we return them in a dict like this:
         {
             "split": {
                 "course_run": <course block for Split Mongo course>,
@@ -54,57 +61,50 @@ class GetCoursewareUrlTests(SharedModuleStoreTestCase):
             }
         }
         """
-        super().setUpClass()
 
-        with super().setUpClassAndTestData():
-
-            # Make Split Mongo course.
+        # Make Split Mongo course.
+        with modulestore().default_store(ModuleStoreEnum.Type.split):
             course_run = CourseFactory.create(
                 org='TestX',
                 number='UrlHelpers',
                 run='split',
                 display_name='URL Helpers Test Course',
-                default_store=ModuleStoreEnum.Type.split,
             )
             with cls.store.bulk_operations(course_run.id):
                 section = ItemFactory.create(
                     parent_location=course_run.location,
                     category='chapter',
                     display_name="Generated Section",
-                    publish_item=False,
                 )
                 subsection = ItemFactory.create(
                     parent_location=section.location,
                     category='sequential',
                     display_name="Generated Subsection",
-                    publish_item=False,
                 )
                 unit = ItemFactory.create(
                     parent_location=subsection.location,
                     category='vertical',
                     display_name="Generated Unit",
-                    publish_item=False,
                 )
                 component = ItemFactory.create(
                     parent_location=unit.location,
                     category='problem',
                     display_name="Generated Problem Component",
-                    publish_item=False,
                 )
-                cls.store.publish(course_run.location, None)
 
-            # Make (deprecated) Old Mongo course.
+        # Make (deprecated) Old Mongo course.
+        with modulestore().default_store(ModuleStoreEnum.Type.mongo):
             deprecated_course_run = CourseFactory.create(
                 org='TestX',
                 number='UrlHelpers',
                 run='mongo',
                 display_name='URL Helpers Test Course (Deprecated)',
-                default_store=ModuleStoreEnum.Type.mongo,
             )
             with cls.store.bulk_operations(deprecated_course_run.id):
                 deprecated_section = ItemFactory.create(
                     parent_location=deprecated_course_run.location,
                     category='chapter',
+                    display_name="Generated Section",
                 )
                 deprecated_subsection = ItemFactory.create(
                     parent_location=deprecated_section.location,
@@ -122,7 +122,7 @@ class GetCoursewareUrlTests(SharedModuleStoreTestCase):
                     display_name="Generated Problem Component",
                 )
 
-        cls.items = {
+        return {
             ModuleStoreEnum.Type.split: {
                 'course_run': course_run,
                 'section': section,
@@ -175,13 +175,13 @@ class GetCoursewareUrlTests(SharedModuleStoreTestCase):
             ModuleStoreEnum.Type.split,
             'legacy',
             'subsection',
-            '/courses/course-v1:TestX+UrlHelpers+split/courseware/chapter_6/Generated_Subsection/',
+            '/courses/course-v1:TestX+UrlHelpers+split/courseware/Generated_Section/Generated_Subsection/',
         ),
         (
             ModuleStoreEnum.Type.split,
             'legacy',
             'component',
-            '/courses/course-v1:TestX+UrlHelpers+split/courseware/chapter_6/Generated_Subsection/1',
+            '/courses/course-v1:TestX+UrlHelpers+split/courseware/Generated_Section/Generated_Subsection/1',
         ),
         (
             ModuleStoreEnum.Type.mongo,
@@ -193,13 +193,13 @@ class GetCoursewareUrlTests(SharedModuleStoreTestCase):
             ModuleStoreEnum.Type.mongo,
             'legacy',
             'subsection',
-            '/courses/TestX/UrlHelpers/mongo/courseware/chapter_6/Generated_Subsection/',
+            '/courses/TestX/UrlHelpers/mongo/courseware/Generated_Section/Generated_Subsection/',
         ),
         (
             ModuleStoreEnum.Type.mongo,
             'legacy',
             'component',
-            '/courses/TestX/UrlHelpers/mongo/courseware/chapter_6/Generated_Subsection/1',
+            '/courses/TestX/UrlHelpers/mongo/courseware/Generated_Section/Generated_Subsection/1',
         ),
     )
     @ddt.unpack
