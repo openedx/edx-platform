@@ -68,13 +68,13 @@ def test_validate_logo_size_with_invalid_size():
         validate_logo_size(mocked_file)
 
 
-@patch('openedx.adg.lms.applications.helpers.MandrillClient')
-def test_send_application_submission_confirmation_email(mocked_mandrill_client):
+@patch('openedx.adg.lms.applications.helpers.task_send_mandrill_email')
+def test_send_application_submission_confirmation_email(mocked_task_send_mandrill_email):
     """
     Check if the email is being sent correctly
     """
     send_application_submission_confirmation_email(EMAIL)
-    assert mocked_mandrill_client().send_mandrill_email.called
+    assert mocked_task_send_mandrill_email.delay.called
 
 
 def test_min_year_value_validator_invalid():
