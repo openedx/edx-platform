@@ -4,7 +4,6 @@ Helper functions for logic related to learning (courseare & course home) URLs.
 Centralizdd in openedx/features/course_experience instead of lms/djangoapps/courseware
 because the Studio course outline may need these utilities.
 """
-from datetime import datetime
 from typing import Optional, Tuple
 
 import six
@@ -16,7 +15,6 @@ from opaque_keys.edx.keys import CourseKey, UsageKey
 from six.moves.urllib.parse import urlencode
 
 from lms.djangoapps.courseware.toggles import courseware_mfe_is_active
-from openedx.core.djangoapps.content.learning_sequences.api import get_course_outline, get_user_course_outline
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.search import navigation_index, path_to_location
 
@@ -38,14 +36,13 @@ def get_courseware_url(
     then it is more performant to call `get_learning_mfe_courseware_url` directly.
 
     Raises:
-        * ItemNotFoundError if no data at the usage_key.
-        * NoPathToItem if location not in any class.
+        * ItemNotFoundError if no data at the `usage_key`.
+        * NoPathToItem if we cannot build a path to the `usage_key`.
     """
     course_key = usage_key.course_key.replace(version_guid=None, branch=None)
     if courseware_mfe_is_active(course_key):
         sequence_key, unit_key = _get_sequence_and_unit_keys(
             usage_key=usage_key,
-            user=(request.user if request else None),
             request=request,
         )
         return get_learning_mfe_courseware_url(
@@ -62,59 +59,39 @@ def get_courseware_url(
 
 def _get_sequence_and_unit_keys(
         usage_key: UsageKey,
-        user: Optional[User] = None,
         request: Optional[HttpRequest] = None,
 ) -> Tuple[Optional[UsageKey], Optional[UsageKey]]:
     """
-    Find the sequence and unit of a block within a course run.
+    Find the sequence and unit containg a block within a course run.
 
-    Currently requires a modulestore query.
-    Could probably be further optimized.
+    Performance consideration: Currently, this function incurs a modulestore query.
 
     Raises:
-        * ItemNotFoundError if no data at the usage_key.
-        * NoPathToItem if location not in any class.
+        * ItemNotFoundError if no data at the `usage_key`.
+        * NoPathToItem if we cannot build a path to the `usage_key`.
 
     Returns: (sequence_key|None, unit_key|None)
+    * sequence_key points to a Section (ie chapter) or Subsection (ie sequential).
+    * unit_key points to  Unit (ie vertical).
+    Either of these may be None if we are above that level in the course hierarchy.
+    For example, if `usage_key` points to a Subsection, then unit_key will be None.
     """
     path = path_to_location(modulestore(), usage_key, request, full_path=True)
     if len(path) <= 1:
-        # Course-run-level block: no sequence or unit key.
+        # Course-run-level block:
+        # We have no Sequence or Unit to return.
         return None, None
     elif len(path) == 2:
         # Section-level (ie chapter) block:
-        # no unit key, but try to find the first sequence within the section
-        # so that we can send the user there instead of the course run root.
-        section_key = path[1]
-        if user:
-            course_sections = get_user_course_outline(
-                course_key=usage_key.course_key,
-                user=user,
-                at_time=datetime.now(),
-            ).sections
-        else:
-            course_sections = get_course_outline(
-                course_key=usage_key.course_key
-            ).sections
-        try:
-            # Try to find a matching section,
-            # and grab the first subsection within it.
-            section_data = next(
-                section for section in course_sections
-                if section.usage_key == section_key
-            )
-            return next(section_data.sequences), None
-        except StopIteration:
-            # Either there were no matching sections,
-            # or the matching section is empty.
-            return None, None
+        # The Section is the Sequence. We have no Unit to return.
+        return path[1], None
     elif len(path) == 3:
         # Subsection-level block:
-        # We have a sequence key, but no unit key.
+        # The Subsection is the Sequence. We still have no Unit to return.
         return path[2], None
     else:
         # Unit-level (or lower) block:
-        # We have both a sequence key and a unit key.
+        # The Subsection is the Sequence, and the next level down is the Unit.
         return path[2], path[3]
 
 
@@ -130,13 +107,10 @@ def get_legacy_courseware_url(
         * NoPathToItem if location not in any class.
     """
     (
-        course_key,
-        chapter,
-        section,
-        _unit_id,
-        position,
-        final_target_id,
+        course_key, chapter, section, vertical_unused,
+        position, final_target_id
     ) = path_to_location(modulestore(), usage_key, request)
+
     # choose the appropriate view (and provide the necessary args) based on the
     # args provided by the redirect.
     # Rely on index to do all error handling and access control.
@@ -170,12 +144,17 @@ def get_learning_mfe_courseware_url(
     Return a str with the URL for the specified courseware content in the Learning MFE.
 
     The micro-frontend determines the user's position in the vertical via
-    a separate API call, so all we need here is the course_key, section, and
+    a separate API call, so all we need here is the course_key, sequence, and
     vertical IDs to format it's URL. For simplicity and performance reasons,
     this method does not inspect the modulestore to try to figure out what
     Unit/Vertical a sequence is in. If you try to pass in a unit_key without
     a sequence_key, the value will just be ignored and you'll get a URL pointing
     to just the course_key.
+
+    Note that `sequence_key` may either point to a Section (ie chapter) or
+    Subsection (ie sequential), as those are both abstractly understood as
+    "sequences". If you pass in a Section-level `sequence_key`, then the MFE
+    will replace it with key of the first Subsection in that Section.
 
     It is also capable of determining our section and vertical if they're not
     present.  Fully specifying it all is preferable, though, as the

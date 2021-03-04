@@ -148,6 +148,15 @@ class GetCoursewareUrlTests(SharedModuleStoreTestCase):
         (
             ModuleStoreEnum.Type.split,
             'mfe',
+            'section',
+            (
+                'http://learning-mfe/course/course-v1:TestX+UrlHelpers+split' +
+                '/block-v1:TestX+UrlHelpers+split+type@chapter+block@Generated_Section'
+            ),
+        ),
+        (
+            ModuleStoreEnum.Type.split,
+            'mfe',
             'subsection',
             (
                 'http://learning-mfe/course/course-v1:TestX+UrlHelpers+split' +
