@@ -32,11 +32,11 @@ from xblock.fields import ScopeIds
 
 from xmodule.annotatable_module import AnnotatableBlock
 from xmodule.conditional_module import ConditionalBlock
-from xmodule.course_module import CourseDescriptor
+from xmodule.course_module import CourseBlock
 from xmodule.html_module import HtmlBlock
 from xmodule.poll_module import PollDescriptor
 from xmodule.randomize_module import RandomizeBlock
-from xmodule.seq_module import SequenceDescriptor
+from xmodule.seq_module import SequenceBlock
 from xmodule.tests import get_test_descriptor_system, get_test_system
 from xmodule.vertical_block import VerticalBlock
 from xmodule.word_cloud_module import WordCloudBlock
@@ -67,9 +67,9 @@ LEAF_XMODULES = {
 # TODO: Add more types of sample data
 CONTAINER_XMODULES = {
     ConditionalBlock: [{}],
-    CourseDescriptor: [{}],
+    CourseBlock: [{}],
     RandomizeBlock: [{'display_name': 'Test String Display'}],
-    SequenceDescriptor: [{'display_name': u'Test Unicode हिंदी Display'}],
+    SequenceBlock: [{'display_name': u'Test Unicode हिंदी Display'}],
     VerticalBlock: [{}],
     WrapperBlock: [{}],
 }

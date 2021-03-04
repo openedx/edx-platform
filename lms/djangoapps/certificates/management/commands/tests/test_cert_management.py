@@ -186,14 +186,18 @@ class RegenerateCertificatesTest(CertificateManagementTest):
         args = u'-u {} -c {}'.format(self.user.email, text_type(key))
         call_command(self.command, *args.split(' '))
 
-        xqueue.return_value.regen_cert.assert_called_with(
+        assert xqueue.return_value.regen_cert.call_args.args == (
             self.user,
             key,
-            course=self.course,
-            forced_grade=None,
-            template_file=None,
-            generate_pdf=True
         )
+        regen_cert_call_kwargs = xqueue.return_value.regen_cert.call_args.kwargs
+        assert regen_cert_call_kwargs.pop('course').location == self.course.location
+        assert regen_cert_call_kwargs == {
+            'forced_grade': None,
+            'template_file': None,
+            'generate_pdf': True,
+        }
+
         assert bool(BadgeAssertion.objects.filter(user=self.user, badge_class=badge_class)) == (not issue_badges)
 
     @override_settings(CERT_QUEUE='test-queue')

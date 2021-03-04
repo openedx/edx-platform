@@ -3,21 +3,21 @@
 
 import unittest
 from datetime import timedelta
+from unittest.mock import patch
 from uuid import uuid4
 
 from django.conf import settings
 from django.test import TestCase
 from django.utils.timezone import now
-from mock import patch
 
 from common.djangoapps.course_modes.models import CourseMode
 from common.djangoapps.course_modes.tests.factories import CourseModeFactory
+from common.djangoapps.student.models import CourseEnrollment
+from common.djangoapps.student.tests.factories import TEST_PASSWORD, CourseEnrollmentFactory, UserFactory
 from lms.djangoapps.certificates.api import MODES
 from lms.djangoapps.certificates.models import CertificateStatuses
 from lms.djangoapps.certificates.tests.factories import GeneratedCertificateFactory
 from openedx.core.djangoapps.content.course_overviews.tests.factories import CourseOverviewFactory
-from common.djangoapps.student.models import CourseEnrollment
-from common.djangoapps.student.tests.factories import TEST_PASSWORD, CourseEnrollmentFactory, UserFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
@@ -33,7 +33,7 @@ class TestCourseEntitlementModelHelpers(ModuleStoreTestCase):
     Series of tests for the helper methods in the CourseEntitlement Model Class.
     """
     def setUp(self):
-        super(TestCourseEntitlementModelHelpers, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.user = UserFactory()
         self.client.login(username=self.user.username, password=TEST_PASSWORD)
 
@@ -117,7 +117,7 @@ class TestModels(TestCase):
     """Test entitlement with policy model functions."""
 
     def setUp(self):
-        super(TestModels, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.course = CourseOverviewFactory.create(
             start=now()
         )

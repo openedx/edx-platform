@@ -11,7 +11,7 @@ from openedx.core.djangoapps.content.block_structure.transformer import (
     BlockStructureTransformer,
     FilteringTransformerMixin
 )
-from xmodule.seq_module import SequenceModule
+from xmodule.seq_module import SequenceBlock
 
 from .utils import collect_merged_boolean_field, collect_merged_date_field
 
@@ -112,4 +112,4 @@ class HiddenContentTransformer(FilteringTransformerMixin, BlockStructureTransfor
             hidden_date = block_structure[block_structure.root_block_usage_key].end
         else:
             hidden_date = self._get_merged_due_date(block_structure, block_key)
-        return not SequenceModule.verify_current_content_visibility(hidden_date, hide_after_due)
+        return not SequenceBlock.verify_current_content_visibility(hidden_date, hide_after_due)

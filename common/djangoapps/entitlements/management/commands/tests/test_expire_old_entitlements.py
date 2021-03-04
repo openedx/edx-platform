@@ -1,10 +1,10 @@
 """Test Entitlements models"""  # lint-amnesty, pylint: disable=django-not-configured
 
 
-import mock
+from unittest import mock
+
 from django.core.management import call_command
 from django.test import TestCase
-from six.moves import range
 
 from common.djangoapps.entitlements.tests.factories import CourseEntitlementFactory
 from openedx.core.djangolib.testing.utils import skip_unless_lms

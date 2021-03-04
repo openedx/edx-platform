@@ -3,8 +3,9 @@ Unit tests for the gating feature in Studio
 """
 
 
+from unittest.mock import patch
+
 from milestones.tests.utils import MilestonesTestCaseMixin
-from mock import patch
 
 from cms.djangoapps.contentstore.signals.handlers import handle_item_deleted
 from openedx.core.lib.gating import api as gating_api
@@ -22,7 +23,7 @@ class TestHandleItemDeleted(ModuleStoreTestCase, MilestonesTestCaseMixin):
         """
         Initial data setup
         """
-        super(TestHandleItemDeleted, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
 
         self.course = CourseFactory.create()
         self.course.enable_subsection_gating = True

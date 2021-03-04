@@ -5,22 +5,21 @@ import logging
 from datetime import datetime
 from functools import wraps
 
-import six
 from django.core.cache import cache
 from django.dispatch import receiver
 from pytz import UTC
 
 from cms.djangoapps.contentstore.courseware_index import (
-    CoursewareSearchIndexer,
     CourseAboutSearchIndexer,
+    CoursewareSearchIndexer,
     LibrarySearchIndexer
 )
 from cms.djangoapps.contentstore.proctoring import register_special_exams
+from common.djangoapps.track.event_transaction_utils import get_event_transaction_id, get_event_transaction_type
+from common.djangoapps.util.module_utils import yield_dynamic_descriptor_descendants
 from lms.djangoapps.grades.api import task_compute_all_grades_for_course
 from openedx.core.djangoapps.credit.signals import on_course_publish
 from openedx.core.lib.gating import api as gating_api
-from common.djangoapps.track.event_transaction_utils import get_event_transaction_id, get_event_transaction_type
-from common.djangoapps.util.module_utils import yield_dynamic_descriptor_descendants
 from xmodule.modulestore.django import SignalHandler, modulestore
 
 from .signals import GRADING_POLICY_CHANGED
@@ -36,7 +35,7 @@ def locked(expiry_seconds, key):  # lint-amnesty, pylint: disable=missing-functi
         def wrapper(*args, **kwargs):
             cache_key = '{}-{}'.format(func.__name__, kwargs[key])
             if cache.add(cache_key, "true", expiry_seconds):
-                log.info(u'Locking task in cache with key: %s for %s seconds', cache_key, expiry_seconds)
+                log.info('Locking task in cache with key: %s for %s seconds', cache_key, expiry_seconds)
                 return func(*args, **kwargs)
             else:
                 log.info('Task with key %s already exists in cache', cache_key)
@@ -84,7 +83,7 @@ def listen_for_library_update(sender, library_key, **kwargs):  # pylint: disable
         # import here, because signal is registered at startup, but items in tasks are not yet able to be loaded
         from cms.djangoapps.contentstore.tasks import update_library_index
 
-        update_library_index.delay(six.text_type(library_key), datetime.now(UTC).isoformat())
+        update_library_index.delay(str(library_key), datetime.now(UTC).isoformat())
 
 
 @receiver(SignalHandler.item_deleted)
@@ -122,13 +121,13 @@ def handle_grading_policy_changed(sender, **kwargs):
     Receives signal and kicks off celery task to recalculate grades
     """
     kwargs = {
-        'course_key': six.text_type(kwargs.get('course_key')),
-        'grading_policy_hash': six.text_type(kwargs.get('grading_policy_hash')),
-        'event_transaction_id': six.text_type(get_event_transaction_id()),
-        'event_transaction_type': six.text_type(get_event_transaction_type()),
+        'course_key': str(kwargs.get('course_key')),
+        'grading_policy_hash': str(kwargs.get('grading_policy_hash')),
+        'event_transaction_id': str(get_event_transaction_id()),
+        'event_transaction_type': str(get_event_transaction_type()),
     }
     result = task_compute_all_grades_for_course.apply_async(kwargs=kwargs, countdown=GRADING_POLICY_COUNTDOWN_SECONDS)
-    log.info(u"Grades: Created {task_name}[{task_id}] with arguments {kwargs}".format(
+    log.info("Grades: Created {task_name}[{task_id}] with arguments {kwargs}".format(
         task_name=task_compute_all_grades_for_course.name,
         task_id=result.task_id,
         kwargs=kwargs,

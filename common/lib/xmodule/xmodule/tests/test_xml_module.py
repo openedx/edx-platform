@@ -11,11 +11,11 @@ from xblock.field_data import DictFieldData
 from xblock.fields import Any, Boolean, Dict, Float, Integer, List, Scope, String
 from xblock.runtime import DictKeyValueStore, KvsFieldData
 
-from xmodule.course_module import CourseDescriptor
+from xmodule.course_module import CourseBlock
 from xmodule.fields import Date, RelativeTime, Timedelta
 from xmodule.modulestore.inheritance import InheritanceKeyValueStore, InheritanceMixin, InheritingFieldData
 from xmodule.modulestore.split_mongo.split_mongo_kvs import SplitMongoKVS
-from xmodule.seq_module import SequenceDescriptor
+from xmodule.seq_module import SequenceBlock
 from xmodule.tests import get_test_descriptor_system
 from xmodule.tests.xml import XModuleXmlImportTest
 from xmodule.tests.xml.factories import CourseFactory, ProblemFactory, SequenceFactory
@@ -588,20 +588,20 @@ class TestDeserializeRelativeTime(TestDeserialize):
 class TestXmlAttributes(XModuleXmlImportTest):
 
     def test_unknown_attribute(self):
-        assert not hasattr(CourseDescriptor, 'unknown_attr')
+        assert not hasattr(CourseBlock, 'unknown_attr')
         course = self.process_xml(CourseFactory.build(unknown_attr='value'))
         assert not hasattr(course, 'unknown_attr')
         assert course.xml_attributes['unknown_attr'] == 'value'
 
     def test_known_attribute(self):
-        assert hasattr(CourseDescriptor, 'show_calculator')
+        assert hasattr(CourseBlock, 'show_calculator')
         course = self.process_xml(CourseFactory.build(show_calculator='true'))
         assert course.show_calculator
         assert 'show_calculator' not in course.xml_attributes
 
     def test_rerandomize_in_policy(self):
         # Rerandomize isn't a basic attribute of Sequence
-        assert not hasattr(SequenceDescriptor, 'rerandomize')
+        assert not hasattr(SequenceBlock, 'rerandomize')
 
         root = SequenceFactory.build(policy={'rerandomize': 'never'})
         ProblemFactory.build(parent=root)
@@ -617,7 +617,7 @@ class TestXmlAttributes(XModuleXmlImportTest):
 
     def test_attempts_in_policy(self):
         # attempts isn't a basic attribute of Sequence
-        assert not hasattr(SequenceDescriptor, 'attempts')
+        assert not hasattr(SequenceBlock, 'attempts')
 
         root = SequenceFactory.build(policy={'attempts': '1'})
         ProblemFactory.build(parent=root)
@@ -635,7 +635,7 @@ class TestXmlAttributes(XModuleXmlImportTest):
 
     def check_inheritable_attribute(self, attribute, value):
         # `attribute` isn't a basic attribute of Sequence
-        assert not hasattr(SequenceDescriptor, attribute)
+        assert not hasattr(SequenceBlock, attribute)
 
         # `attribute` is added by InheritanceMixin
         assert hasattr(InheritanceMixin, attribute)
@@ -648,8 +648,8 @@ class TestXmlAttributes(XModuleXmlImportTest):
 
         seq = self.process_xml(root)
 
-        assert seq.unmixed_class == SequenceDescriptor
-        assert type(seq) != SequenceDescriptor  # lint-amnesty, pylint: disable=unidiomatic-typecheck
+        assert seq.unmixed_class == SequenceBlock
+        assert not seq.__class__ == SequenceBlock
 
         # `attribute` is added to the constructed sequence, because
         # it's in the InheritanceMixin

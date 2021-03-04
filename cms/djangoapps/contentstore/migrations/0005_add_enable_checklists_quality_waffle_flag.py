@@ -1,6 +1,3 @@
-# -*- coding: utf-8 -*-
-from __future__ import absolute_import, unicode_literals
-
 from django.db import migrations
 
 from cms.djangoapps.contentstore.config.waffle import ENABLE_CHECKLISTS_QUALITY

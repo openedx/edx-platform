@@ -43,7 +43,7 @@ class TestViewAuth(EnterpriseTestConsentRequired, ModuleStoreTestCase, LoginEnro
 
         `names` is a list of URL names that correspond to sections in a course.
 
-        `course` is the instance of CourseDescriptor whose section URLs are to be returned.
+        `course` is the instance of CourseBlock whose section URLs are to be returned.
 
         Returns a list URLs corresponding to section in the passed in course.
 
@@ -55,7 +55,7 @@ class TestViewAuth(EnterpriseTestConsentRequired, ModuleStoreTestCase, LoginEnro
         """
         Check that non-staff have access to light urls.
 
-        `course` is an instance of CourseDescriptor.
+        `course` is an instance of CourseBlock.
         """
         urls = [reverse('about_course', kwargs={'course_id': text_type(course.id)}),
                 reverse('courses')]

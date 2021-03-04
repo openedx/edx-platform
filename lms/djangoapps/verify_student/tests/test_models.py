@@ -2,17 +2,18 @@
 
 import base64
 from datetime import datetime, timedelta
+from unittest import mock
+from unittest.mock import patch
+
 import pytest
 import ddt
-import mock
 import requests.exceptions
 import simplejson as json
 from django.conf import settings
 from django.utils.timezone import now
 from freezegun import freeze_time
-from mock import patch
-from six.moves import range
 
+from common.djangoapps.student.tests.factories import UserFactory
 from common.test.utils import MockS3BotoMixin
 from lms.djangoapps.verify_student.models import (
     ManualVerification,
@@ -21,7 +22,6 @@ from lms.djangoapps.verify_student.models import (
     SSOVerification,
     VerificationException
 )
-from common.djangoapps.student.tests.factories import UserFactory
 from lms.djangoapps.verify_student.tests import TestVerificationBase
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 
@@ -175,15 +175,15 @@ class TestPhotoVerification(TestVerificationBase, MockS3BotoMixin, ModuleStoreTe
         was when you submitted it.
         """
         user = UserFactory.create()
-        user.profile.name = u"Jack \u01B4"  # gratuious non-ASCII char to test encodings
+        user.profile.name = "Jack \u01B4"  # gratuious non-ASCII char to test encodings
 
         attempt = SoftwareSecurePhotoVerification(user=user)
-        user.profile.name = u"Clyde \u01B4"
+        user.profile.name = "Clyde \u01B4"
         attempt.mark_ready()
 
-        user.profile.name = u"Rusty \u01B4"
+        user.profile.name = "Rusty \u01B4"
 
-        assert u'Clyde ƴ' == attempt.name
+        assert 'Clyde ƴ' == attempt.name
 
     def test_submissions(self):
         """Test that we set our status correctly after a submission."""
@@ -222,7 +222,7 @@ class TestPhotoVerification(TestVerificationBase, MockS3BotoMixin, ModuleStoreTe
     @ddt.data(
         'Not Provided',
         '{"IdReasons": ["Not provided"]}',
-        u'[{"ïḋṚëäṡöṅṡ": ["Ⓝⓞⓣ ⓟⓡⓞⓥⓘⓓⓔⓓ "]}]',
+        '[{"ïḋṚëäṡöṅṡ": ["Ⓝⓞⓣ ⓟⓡⓞⓥⓘⓓⓔⓓ "]}]',
     )
     def test_parse_error_msg_failure(self, msg):
         user = UserFactory.create()
@@ -286,7 +286,7 @@ class TestPhotoVerification(TestVerificationBase, MockS3BotoMixin, ModuleStoreTe
         Retire user with record(s) in table
         """
         user = UserFactory.create()
-        user.profile.name = u"Enrique"
+        user.profile.name = "Enrique"
         attempt = SoftwareSecurePhotoVerification(user=user)
 
         # Populate Record

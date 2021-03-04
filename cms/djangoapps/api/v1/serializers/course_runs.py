@@ -1,10 +1,6 @@
 """ Course run serializers. """
-
-
 import logging
-import time  # pylint: disable=unused-import
 
-import six
 from django.contrib.auth import get_user_model
 from django.db import transaction
 from django.utils.translation import ugettext_lazy as _
@@ -14,8 +10,8 @@ from rest_framework.fields import empty
 
 from cms.djangoapps.contentstore.views.assets import update_course_run_asset
 from cms.djangoapps.contentstore.views.course import create_new_course, get_course_and_check_access, rerun_course
-from openedx.core.lib.courses import course_image_url
 from common.djangoapps.student.models import CourseAccessRole
+from openedx.core.lib.courses import course_image_url
 from xmodule.modulestore.django import modulestore
 
 IMAGE_TYPES = {
@@ -88,7 +84,7 @@ def image_is_jpeg_or_png(value):
     content_type = value.content_type
     if content_type not in list(IMAGE_TYPES.keys()):
         raise serializers.ValidationError(
-            u'Only JPEG and PNG image types are supported. {} is not valid'.format(content_type))
+            f'Only JPEG and PNG image types are supported. {content_type} is not valid')
 
 
 class CourseRunImageField(serializers.ImageField):  # lint-amnesty, pylint: disable=missing-class-docstring
@@ -143,7 +139,7 @@ class CourseRunSerializer(CourseRunSerializerCommonFieldsMixin, CourseRunTeamSer
         with transaction.atomic():
             self.update_team(instance, team)
 
-            for attr, value in six.iteritems(validated_data):
+            for attr, value in validated_data.items():
                 setattr(instance, attr, value)
 
             modulestore().update_item(instance, self.context['request'].user.id)
@@ -183,11 +179,11 @@ class CourseRunRerunSerializer(CourseRunSerializerCommonFieldsMixin, CourseRunTe
                 new_course_run_key = store.make_course_key(course_run_key.org, number, run)
         except InvalidKeyError:
             raise serializers.ValidationError(  # lint-amnesty, pylint: disable=raise-missing-from
-                u'Invalid key supplied. Ensure there are no special characters in the Course Number.'
+                'Invalid key supplied. Ensure there are no special characters in the Course Number.'
             )
         if store.has_course(new_course_run_key, ignore_case=True):
             raise serializers.ValidationError(
-                {'run': u'Course run {key} already exists'.format(key=new_course_run_key)}
+                {'run': f'Course run {new_course_run_key} already exists'}
             )
         return attrs
 

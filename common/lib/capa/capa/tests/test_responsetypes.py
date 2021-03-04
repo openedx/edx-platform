@@ -798,7 +798,7 @@ class StringResponseTest(ResponseTest):  # pylint: disable=missing-class-docstri
         problem = self.build_problem(answer="a2", case_sensitive=False, regexp=True, additional_answers=['?\\d?'])
         with pytest.raises(Exception) as cm:
             self.assert_grade(problem, "a3", "correct")
-        exception_message = text_type(cm.exception)
+        exception_message = text_type(cm.value)
         assert 'nothing to repeat' in exception_message
 
     def test_hints(self):

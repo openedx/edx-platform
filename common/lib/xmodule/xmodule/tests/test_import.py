@@ -638,7 +638,7 @@ class ImportTestCase(BaseCourseTestCase):  # lint-amnesty, pylint: disable=missi
         """
         Check that cohort config parsing works right.
 
-        Note: The cohort config on the CourseModule is no longer used.
+        Note: The cohort config on the CourseBlock is no longer used.
         See openedx.core.djangoapps.course_groups.models.CourseCohortSettings.
         """
         modulestore = XMLModuleStore(DATA_DIR, source_dirs=['toy'])

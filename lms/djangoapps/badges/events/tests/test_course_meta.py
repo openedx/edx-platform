@@ -3,19 +3,18 @@ Tests the course meta badging events
 """
 
 
-import six
-from six.moves import range, zip
-from ddt import data, ddt, unpack  # lint-amnesty, pylint: disable=import-error
+from unittest.mock import patch
+
+from ddt import data, ddt, unpack
 from django.conf import settings
 from django.test.utils import override_settings
-from mock import patch  # lint-amnesty, pylint: disable=import-error
 
-from lms.djangoapps.badges.tests.factories import CourseEventBadgesConfigurationFactory, RandomBadgeClassFactory
-from lms.djangoapps.certificates.models import CertificateStatuses, GeneratedCertificate
 from common.djangoapps.student.models import CourseEnrollment
 from common.djangoapps.student.tests.factories import UserFactory
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase  # lint-amnesty, pylint: disable=import-error, wrong-import-order
-from xmodule.modulestore.tests.factories import CourseFactory  # lint-amnesty, pylint: disable=import-error, wrong-import-order
+from lms.djangoapps.badges.tests.factories import CourseEventBadgesConfigurationFactory, RandomBadgeClassFactory
+from lms.djangoapps.certificates.models import CertificateStatuses, GeneratedCertificate
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from xmodule.modulestore.tests.factories import CourseFactory
 
 
 @ddt
@@ -27,7 +26,7 @@ class CourseEnrollmentBadgeTest(ModuleStoreTestCase):
     """
 
     def setUp(self):
-        super(CourseEnrollmentBadgeTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.badge_classes = [
             RandomBadgeClassFactory(
                 issuing_component='openedx__course'
@@ -77,7 +76,7 @@ class CourseCompletionBadgeTest(ModuleStoreTestCase):
     """
 
     def setUp(self):
-        super(CourseCompletionBadgeTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.badge_classes = [
             RandomBadgeClassFactory(
                 issuing_component='openedx__course'
@@ -131,7 +130,7 @@ class CourseGroupBadgeTest(ModuleStoreTestCase):
     """
 
     def setUp(self):
-        super(CourseGroupBadgeTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.badge_classes = [
             RandomBadgeClassFactory(
                 issuing_component='openedx__course'
@@ -145,8 +144,8 @@ class CourseGroupBadgeTest(ModuleStoreTestCase):
         ]
         self.courses = []
         for _badge_class in self.badge_classes:
-            self.courses.append([CourseFactory().location.course_key for _i in range(3)])
-        lines = [badge_class.slug + ',' + ','.join([six.text_type(course_key) for course_key in keys])
+            self.courses.append([CourseFactory().location.course_key for _i in range(3)])  # lint-amnesty, pylint: disable=no-member
+        lines = [badge_class.slug + ',' + ','.join([str(course_key) for course_key in keys])
                  for badge_class, keys in zip(self.badge_classes, self.courses)]
         config = '\r'.join(lines)
         self.config = CourseEventBadgesConfigurationFactory(course_groups=config)

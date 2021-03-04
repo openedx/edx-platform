@@ -13,17 +13,17 @@ from django.utils.timezone import now
 from django.utils.translation import ugettext as _
 
 from common.djangoapps.course_modes.models import CourseMode
+from common.djangoapps.student.models import User
 from lms.djangoapps.verify_student.utils import is_verification_expiring_soon
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
-from common.djangoapps.student.models import User
 
 from .models import ManualVerification, SoftwareSecurePhotoVerification, SSOVerification
-from .utils import earliest_allowed_verification_date, most_recent_verification, active_verifications  # lint-amnesty, pylint: disable=unused-import
+from .utils import most_recent_verification
 
 log = logging.getLogger(__name__)
 
 
-class XBlockVerificationService(object):
+class XBlockVerificationService:
     """
     Learner verification XBlock service.
     """
@@ -52,7 +52,7 @@ class XBlockVerificationService(object):
         return IDVerificationService.get_verify_location()
 
 
-class IDVerificationService(object):
+class IDVerificationService:
     """
     Learner verification service interface for callers within edx-platform.
     """
@@ -67,6 +67,31 @@ class IDVerificationService(object):
         expiration_datetime = cls.get_expiration_datetime(user, ['approved'])
         if expiration_datetime:
             return expiration_datetime >= now()
+        return False
+
+    @classmethod
+    def user_has_ever_been_verified(cls, user):
+        """
+        Return whether or not a user has ever satisfactorily proved their identity (has had an approved verification)
+        of any kind.
+        """
+        if not user:
+            log.warning('No user provided. Verification attempts cannot be checked.')
+            return False
+
+        if SoftwareSecurePhotoVerification.objects.filter(user=user, status='approved').exists():
+            log.info(f'User {user.id} has an approved SoftwareSecurePhotoVerification')
+            return True
+
+        if SSOVerification.objects.filter(user=user, status='approved').exists():
+            log.info(f'User {user.id} has an approved SSOVerification')
+            return True
+
+        if ManualVerification.objects.filter(user=user, status='approved').exists():
+            log.info(f'User {user.id} has an approved ManualVerification')
+            return True
+
+        log.info(f'User {user.id} has no approved verifications')
         return False
 
     @classmethod
@@ -187,7 +212,7 @@ class IDVerificationService(object):
         if attempt.expiration_datetime < now() and attempt.status == 'approved':
             if user_status['should_display']:
                 user_status['status'] = 'expired'
-                user_status['error'] = _(u"Your {platform_name} verification has expired.").format(
+                user_status['error'] = _("Your {platform_name} verification has expired.").format(
                     platform_name=configuration_helpers.get_value('platform_name', settings.PLATFORM_NAME),
                 )
             else:
@@ -237,7 +262,7 @@ class IDVerificationService(object):
         Returns a string:
             Returns URL for IDV on Account Microfrontend
         """
-        location = '{}/id-verification'.format(settings.ACCOUNT_MICROFRONTEND_URL)
+        location = f'{settings.ACCOUNT_MICROFRONTEND_URL}/id-verification'
         if course_id:
             location += '?course_id={}'.format(quote(str(course_id)))
         return location

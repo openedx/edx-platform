@@ -42,7 +42,7 @@ class CertificateTemplateForm(forms.ModelForm):
             choices=lang_choices, required=False
         )
 
-    class Meta(object):
+    class Meta:
         model = CertificateTemplate
         fields = '__all__'
 

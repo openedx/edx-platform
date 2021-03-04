@@ -53,7 +53,7 @@ class Command(BaseCommand):
         if unparseable_guid or len(version_guid) != 24:
             raise CommandError("version_guid should be a 24-digit hexadecimal number")
 
-        print("Resetting '{}' to version '{}'...".format(course_key, version_guid))
+        print(f"Resetting '{course_key}' to version '{version_guid}'...")
         modulestore().reset_course_to_version(
             course_key,
             version_guid,

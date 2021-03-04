@@ -99,7 +99,7 @@ def get_threads(request, course, user_info, discussion_id=None, per_page=THREADS
 
     Arguments:
         request (WSGIRequest): The user request.
-        course (CourseDescriptorWithMixins): The course object.
+        course (CourseBlockWithMixins): The course object.
         user_info (dict): The comment client User object as a dict.
         discussion_id (unicode): Optional discussion id/commentable id for context.
         per_page (int): Optional number of threads per page.

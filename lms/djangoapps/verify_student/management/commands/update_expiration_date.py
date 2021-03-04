@@ -11,8 +11,8 @@ from django.conf import settings  # lint-amnesty, pylint: disable=unused-import
 from django.core.management.base import BaseCommand
 from django.db.models import F
 
-from lms.djangoapps.verify_student.models import SoftwareSecurePhotoVerification
 from common.djangoapps.util.query import use_read_replica_if_available
+from lms.djangoapps.verify_student.models import SoftwareSecurePhotoVerification
 
 logger = logging.getLogger(__name__)
 

@@ -1,24 +1,23 @@
-# encoding: utf-8
 """Tests of Branding API views. """
 
 
 import json
+from unittest import mock
 
 import ddt
-import mock
 import six
 from django.conf import settings
 from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.test import TestCase
 from django.urls import reverse
 
+from common.djangoapps.student.tests.factories import UserFactory
 from lms.djangoapps.branding.models import BrandingApiConfig
 from openedx.core.djangoapps.dark_lang.models import DarkLangConfig
 from openedx.core.djangoapps.lang_pref.api import released_languages
 from openedx.core.djangoapps.site_configuration.tests.mixins import SiteMixin
 from openedx.core.djangoapps.theming.tests.test_util import with_comprehensive_theme_context
 from openedx.core.djangolib.testing.utils import CacheIsolationTestCase
-from common.djangoapps.student.tests.factories import UserFactory
 
 
 @ddt.ddt
@@ -127,7 +126,7 @@ class TestFooter(CacheIsolationTestCase):
 
     @ddt.data(
         ("en", "registered trademarks"),
-        ("eo", u"régïstéréd trädémärks"),  # Dummy language string
+        ("eo", "régïstéréd trädémärks"),  # Dummy language string
         ("unknown", "registered trademarks"),  # default to English
     )
     @ddt.unpack
@@ -250,7 +249,7 @@ class TestFooter(CacheIsolationTestCase):
         url = reverse("branding_footer")
 
         if params is not None:
-            url = u"{url}?{params}".format(
+            url = "{url}?{params}".format(
                 url=url,
                 params=six.moves.urllib.parse.urlencode(params)
             )
@@ -264,13 +263,13 @@ class TestFooter(CacheIsolationTestCase):
         assert 'footer-language-selector' in content
 
         # Verify the correct language is selected
-        assert u'<option value="{}" selected="selected">'.format(selected_language) in content
+        assert f'<option value="{selected_language}" selected="selected">' in content
 
         # Verify the language choices
         for language in released_languages():
             if language.code == selected_language:
                 continue
-            assert u'<option value="{}">'.format(language.code) in content
+            assert f'<option value="{language.code}">' in content
 
 
 class TestIndex(SiteMixin, TestCase):
@@ -278,7 +277,7 @@ class TestIndex(SiteMixin, TestCase):
 
     def setUp(self):
         """ Set up a user """
-        super(TestIndex, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
 
         patcher = mock.patch("common.djangoapps.student.models.tracker")
         self.mock_tracker = patcher.start()
