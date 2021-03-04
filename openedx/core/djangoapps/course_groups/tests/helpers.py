@@ -22,7 +22,7 @@ class CohortFactory(DjangoModelFactory):
     """
     Factory for constructing mock cohorts.
     """
-    class Meta(object):
+    class Meta:
         model = CourseUserGroup
 
     name = Sequence("cohort{}".format)
@@ -47,7 +47,7 @@ class CourseCohortFactory(DjangoModelFactory):
     """
     Factory for constructing mock course cohort.
     """
-    class Meta(object):
+    class Meta:
         model = CourseCohort
 
 
@@ -55,7 +55,7 @@ class CourseCohortSettingsFactory(DjangoModelFactory):
     """
     Factory for constructing mock course cohort settings.
     """
-    class Meta(object):
+    class Meta:
         model = CourseCohortsSettings
 
     is_cohorted = False

@@ -6,7 +6,6 @@ Views related to course groups functionality.
 import logging
 import re
 
-import six
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.core.exceptions import ValidationError
@@ -132,14 +131,14 @@ def course_cohort_settings_handler(request, course_key_string):
 
     if request.method == 'PATCH':
         if 'is_cohorted' not in request.json:
-            return JsonResponse({"error": u"Bad Request"}, 400)
+            return JsonResponse({"error": "Bad Request"}, 400)
 
         is_cohorted = request.json.get('is_cohorted')
         try:
             cohorts.set_course_cohorted(course_key, is_cohorted)
         except ValueError as err:
             # Note: error message not translated because it is not exposed to the user (UI prevents this state).
-            return JsonResponse({"error": six.text_type(err)}, 400)
+            return JsonResponse({"error": str(err)}, 400)
 
     return JsonResponse(_get_course_cohort_settings_representation(
         cohorts.get_course_cohort_id(course_key),
@@ -198,18 +197,18 @@ def cohort_handler(request, course_key_string, cohort_id=None):
             if name != cohort.name:
                 if cohorts.is_cohort_exists(course_key, name):
                     err_msg = ugettext("A cohort with the same name already exists.")
-                    return JsonResponse({"error": six.text_type(err_msg)}, 400)
+                    return JsonResponse({"error": str(err_msg)}, 400)
                 cohort.name = name
                 cohort.save()
             try:
                 cohorts.set_assignment_type(cohort, assignment_type)
             except ValueError as err:
-                return JsonResponse({"error": six.text_type(err)}, 400)
+                return JsonResponse({"error": str(err)}, 400)
         else:
             try:
                 cohort = cohorts.add_cohort(course_key, name, assignment_type)
             except ValueError as err:
-                return JsonResponse({"error": six.text_type(err)}, 400)
+                return JsonResponse({"error": str(err)}, 400)
 
         group_id = request.json.get('group_id')
         if group_id is not None:
@@ -272,7 +271,7 @@ def users_in_cohort(request, course_key_string, cohort_id):
 
     user_info = [{'username': u.username,
                   'email': u.email,
-                  'name': u'{0} {1}'.format(u.first_name, u.last_name)}
+                  'name': f'{u.first_name} {u.last_name}'}
                  for u in users]
 
     return json_http_response({'success': True,
@@ -309,7 +308,7 @@ def add_users_to_cohort(request, course_key_string, cohort_id):
     try:
         cohort = cohorts.get_cohort_by_id(course_key, cohort_id)
     except CourseUserGroup.DoesNotExist:
-        raise Http404(u"Cohort (ID {cohort_id}) not found for {course_key_string}".format(  # lint-amnesty, pylint: disable=raise-missing-from
+        raise Http404("Cohort (ID {cohort_id}) not found for {course_key_string}".format(  # lint-amnesty, pylint: disable=raise-missing-from
             cohort_id=cohort_id,
             course_key_string=course_key_string
         ))
@@ -380,7 +379,7 @@ def remove_user_from_cohort(request, course_key_string, cohort_id):  # lint-amne
         api.remove_user_from_cohort(course_key, username)
     except User.DoesNotExist:
         log.debug('no user')
-        return json_http_response({'success': False, 'msg': u"No user '{0}'".format(username)})
+        return json_http_response({'success': False, 'msg': f"No user '{username}'"})
 
     return json_http_response({'success': True})
 
@@ -396,7 +395,7 @@ def debug_cohort_mgmt(request, course_key_string):
 
     context = {'cohorts_url': reverse(
         'cohorts',
-        kwargs={'course_key': six.text_type(course_key)}
+        kwargs={'course_key': str(course_key)}
     )}
     return render_to_response('/course_groups/debug.html', context)
 
@@ -669,7 +668,7 @@ class CohortUsers(DeveloperErrorViewMixin, APIPermissions):
         try:
             cohort = cohorts.get_cohort_by_id(course_key, cohort_id)
         except CourseUserGroup.DoesNotExist:
-            msg = u'Cohort (ID {cohort_id}) not found for {course_key_string}'.format(
+            msg = 'Cohort (ID {cohort_id}) not found for {course_key_string}'.format(
                 cohort_id=cohort_id,
                 course_key_string=course_key_string
             )

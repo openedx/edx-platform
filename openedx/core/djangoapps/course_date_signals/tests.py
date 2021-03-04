@@ -16,7 +16,7 @@ class SelfPacedDueDatesTests(ModuleStoreTestCase):  # lint-amnesty, pylint: disa
         super().setUp()
         self.course = CourseFactory.create()
         for i in range(4):
-            ItemFactory(parent=self.course, category="sequential", display_name="Section {}".format(i))
+            ItemFactory(parent=self.course, category="sequential", display_name=f"Section {i}")
 
     def test_basic_spacing(self):
         expected_sections = [

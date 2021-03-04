@@ -15,7 +15,7 @@ class CohortUsersAPISerializer(serializers.ModelSerializer):
 
     def get_full_name(self, model):
         """Return the full name of the user."""
-        return u'{} {}'.format(model.first_name, model.last_name)
+        return f'{model.first_name} {model.last_name}'
 
     class Meta:
         model = User
