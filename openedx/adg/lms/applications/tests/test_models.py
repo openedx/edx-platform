@@ -1,25 +1,19 @@
 """
 Tests for all the models in applications app.
 """
-from datetime import date, datetime, timedelta
+from datetime import date
 
 import mock
 import pytest
 
-from common.djangoapps.student.tests.factories import UserFactory
+from common.djangoapps.student.tests.factories import AnonymousUserFactory, CourseEnrollmentFactory, UserFactory
 from lms.djangoapps.grades.api import CourseGradeFactory
 from openedx.adg.lms.applications.constants import CourseScore
-from openedx.adg.lms.applications.models import UserApplication
-from openedx.core.djangoapps.content.course_overviews.tests.factories import CourseOverviewFactory
+from openedx.adg.lms.applications.models import MultilingualCourseGroup, UserApplication
 from openedx.core.lib.grade_utils import round_away_from_zero
 
 from .constants import USERNAME
-from .factories import (
-    ApplicationHubFactory,
-    MultilingualCourseFactory,
-    MultilingualCourseGroupFactory,
-    UserApplicationFactory
-)
+from .factories import ApplicationHubFactory, MultilingualCourseFactory, UserApplicationFactory
 
 
 @pytest.mark.django_db
@@ -115,46 +109,6 @@ def test_user_application_string_representation(user_application):
     actual_str = user_application.__str__()
 
     assert expected_str == actual_str
-
-
-@pytest.fixture(name='current_time')
-def current_datetime():
-    return datetime.now()
-
-
-@pytest.fixture(name='courses')
-def course_overviews(current_time):
-    """
-    Fixture which return multiple courses
-    """
-    course1 = CourseOverviewFactory(
-        language='en',
-        start_date=current_time - timedelta(days=1),
-        end_date=current_time + timedelta(days=1),
-    )
-    course2 = CourseOverviewFactory(
-        language='ar',
-        start_date=current_time - timedelta(days=1),
-        end_date=current_time + timedelta(days=1),
-    )
-    return {
-        'test_course1': course1,
-        'test_course2': course2,
-    }
-
-
-@pytest.fixture(name='expired_course')
-def expired_course_overview(current_time):
-    return CourseOverviewFactory(
-        language='en',
-        start_date=current_time - timedelta(days=2),
-        end_date=current_time - timedelta(days=1),
-    )
-
-
-@pytest.fixture(name='course_group')
-def multilingual_course_group():
-    return MultilingualCourseGroupFactory()
 
 
 @pytest.mark.parametrize('percent', [0.9250, 0.7649])
@@ -301,3 +255,95 @@ def test_get_preferred_lang_course_expired_courses(expired_course):
     """
     course_group = MultilingualCourseFactory(course=expired_course).multilingual_course_group
     assert course_group.get_preferred_lang_course() is None
+
+
+@pytest.mark.django_db
+def test_get_catalog_courses_valid_user(courses, course_group, user_with_profile):
+    """
+    Tests multiple courses in a single group for a valid user
+    """
+    MultilingualCourseFactory(
+        course=courses['test_course1'],
+        multilingual_course_group=course_group
+    )
+    MultilingualCourseFactory(
+        course=courses['test_course2'],
+        multilingual_course_group=course_group
+    )
+    assert len(MultilingualCourseGroup.get_catalog_courses(user_with_profile)) == 1
+
+
+@pytest.mark.django_db
+def test_get_catalog_courses_enrolled_user(courses, course_group, user_with_profile):
+    """
+    Tests multiple courses in a single group and user enrolled in one of the courses
+    """
+    enrolled_course = courses['test_course2']
+    MultilingualCourseFactory(
+        course=courses['test_course1'],
+        multilingual_course_group=course_group
+    )
+    MultilingualCourseFactory(
+        course=enrolled_course,
+        multilingual_course_group=course_group
+    )
+    CourseEnrollmentFactory(user=user_with_profile, course=enrolled_course)
+    courses_list = MultilingualCourseGroup.get_catalog_courses(user_with_profile)
+    assert len(courses_list) == 1
+    assert courses_list[0].id == enrolled_course.id
+
+
+@pytest.mark.django_db
+def test_get_catalog_courses_anonymous_user(courses, course_group):
+    """
+    Tests multiple courses in a single group for anonymous user
+    """
+    user = AnonymousUserFactory()
+    MultilingualCourseFactory(
+        course=courses['test_course1'],
+        multilingual_course_group=course_group
+    )
+    MultilingualCourseFactory(
+        course=courses['test_course2'],
+        multilingual_course_group=course_group
+    )
+    assert len(MultilingualCourseGroup.get_catalog_courses(user)) == 1
+
+
+@pytest.mark.django_db
+def test_get_catalog_courses_expired_course(expired_course, course_group, user_with_profile):
+    """
+    Tests expired course in a group for a valid user
+    """
+    MultilingualCourseFactory(
+        course=expired_course,
+        multilingual_course_group=course_group
+    )
+    assert len(MultilingualCourseGroup.get_catalog_courses(user_with_profile)) == 0
+
+
+@pytest.mark.django_db
+def test_get_prerequisites_for_user(courses, user_with_profile):
+    """
+    Tests prerequisites for user
+    """
+    MultilingualCourseFactory(course=courses['test_course1'])
+    assert len(MultilingualCourseGroup.get_prerequisite_courses_for_user(user_with_profile)) == 1
+
+
+@pytest.mark.django_db
+def test_no_prerequisite_courses(user_with_profile):
+    """
+    Tests no prerequisites courses for user
+    """
+    assert len(MultilingualCourseGroup.get_prerequisite_courses_for_user(user_with_profile)) == 0
+
+
+@pytest.mark.django_db
+def test_get_enrolled_prerequisites_for_user(user_with_profile, courses):
+    """
+    Tests enrolled prerequisites for user
+    """
+    MultilingualCourseFactory(course=courses['test_course1'])
+    CourseEnrollmentFactory(course=courses['test_course1'], user=user_with_profile, is_active=True)
+    assert len(MultilingualCourseGroup.get_prerequisite_courses_for_user(user_with_profile)) == 1

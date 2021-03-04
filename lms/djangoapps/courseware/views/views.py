@@ -90,6 +90,7 @@ from lms.djangoapps.grades.api import CourseGradeFactory
 from lms.djangoapps.instructor.enrollment import uses_shib
 from lms.djangoapps.instructor.views.api import require_global_staff
 from lms.djangoapps.verify_student.services import IDVerificationService
+from openedx.adg.lms.applications.models import MultilingualCourseGroup
 from openedx.adg.lms.utils.env_utils import is_testing_environment
 from openedx.core.djangoapps.catalog.utils import get_programs, get_programs_with_type
 from openedx.core.djangoapps.certificates import api as auto_certs_api
@@ -136,9 +137,6 @@ from ..entrance_exams import user_can_skip_entrance_exam
 from ..module_render import get_module, get_module_by_usage_id, get_module_for_descriptor
 
 log = logging.getLogger("edx.courseware")
-
-if not is_testing_environment():
-    from openedx.adg.lms.student.helpers import get_catalog_courses
 
 
 # Only display the requirements on learner dashboard for
@@ -260,10 +258,10 @@ def courses(request):
     courses_list = []
     course_discovery_meanings = getattr(settings, 'COURSE_DISCOVERY_MEANINGS', {})
     if not settings.FEATURES.get('ENABLE_COURSE_DISCOVERY'):
-        if is_testing_environment():
-            courses_list = get_courses(request.user)
-        else:
-            courses_list = get_catalog_courses(request.user)
+        courses_list = (
+            get_courses(request.user)
+            if is_testing_environment() else MultilingualCourseGroup.get_catalog_courses(request.user)
+        )
 
         if configuration_helpers.get_value("ENABLE_COURSE_SORTING_BY_START_DATE",
                                            settings.FEATURES["ENABLE_COURSE_SORTING_BY_START_DATE"]):

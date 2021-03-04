@@ -17,11 +17,10 @@ from openedx.adg.lms.applications.forms import (
     UserProfileForm
 )
 from openedx.adg.lms.registration_extension.models import ExtendedUserProfile
-from openedx.adg.lms.student.helpers import get_prerequisite_courses_for_user
 from openedx.adg.lms.utils.date_utils import month_choices, year_choices
 
 from .helpers import send_application_submission_confirmation_email
-from .models import ApplicationHub, BusinessLine, Education, UserApplication
+from .models import ApplicationHub, BusinessLine, Education, MultilingualCourseGroup, UserApplication
 
 
 class RedirectToLoginOrRelevantPageMixin(AccessMixin):
@@ -106,7 +105,7 @@ class ApplicationHubView(RedirectToLoginOrRelevantPageMixin, View):
             HttpResponse object.
         """
         user_application_hub, _ = ApplicationHub.objects.get_or_create(user=self.request.user)
-        pre_req_courses = get_prerequisite_courses_for_user(request.user)
+        pre_req_courses = MultilingualCourseGroup.get_prerequisite_courses_for_user(request.user)
 
         return render(
             request,
