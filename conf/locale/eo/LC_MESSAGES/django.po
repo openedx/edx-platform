@@ -10220,10 +10220,10 @@ msgstr ""
 #: lms/templates/verify_student/edx_ace/verificationapproved/email/body.txt
 #, python-format
 msgid ""
-"Your approval status remains valid for one year, and it will expire "
+"Your approval status remains valid for two years, and it will expire "
 "%(expiration_datetime)s."
 msgstr ""
-"Ýöür äppröväl stätüs rémäïns välïd för öné ýéär, änd ït wïll éxpïré "
+"Ýöür äppröväl stätüs rémäïns välïd för twö ýéärs, änd ït wïll éxpïré "
 "%(expiration_datetime)s. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя#"
 
 #: lms/templates/verify_student/edx_ace/verificationapproved/email/body.html
@@ -10340,9 +10340,9 @@ msgstr ""
 #: lms/templates/verify_student/edx_ace/verificationsubmitted/email/body.html
 #: lms/templates/verify_student/edx_ace/verificationsubmitted/email/body.txt
 msgid ""
-"We have received your photos and they will be reviewed within 5-7 days."
+"We have received your photos and they will be reviewed within 3-5 days."
 msgstr ""
-"Wé hävé réçéïvéd ýöür phötös änd théý wïll ßé révïéwéd wïthïn 5-7 däýs. "
+"Wé hävé réçéïvéd ýöür phötös änd théý wïll ßé révïéwéd wïthïn 3-5 däýs. "
 "Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя#"
 
 #: lms/templates/verify_student/edx_ace/verificationsubmitted/email/body.html
