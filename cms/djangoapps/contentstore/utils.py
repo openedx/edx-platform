@@ -575,7 +575,7 @@ def get_sibling_urls(subsection):
             # won't display a link to a previous unit.
         else:
             try:
-                prev_section = sections[sections.index(section) - 1]
+                prev_section = sections[sections.index(next(s for s in sections if s.location == section.location)) - 1]
                 prev_loc = prev_section.get_children()[-1].get_children()[-1].location
             except IndexError:
                 pass
@@ -589,7 +589,7 @@ def get_sibling_urls(subsection):
             ))
         else:
             try:
-                next_section = sections[sections.index(section) + 1]
+                next_section = sections[sections.index(next(s for s in sections if s.location == section.location)) - 1]
                 next_loc = next_section.get_children()[0].get_children()[0].location
             except IndexError:
                 pass

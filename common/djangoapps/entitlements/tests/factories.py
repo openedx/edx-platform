@@ -8,22 +8,22 @@ from factory.fuzzy import FuzzyChoice, FuzzyText
 
 from common.djangoapps.course_modes.helpers import CourseMode
 from common.djangoapps.entitlements.models import CourseEntitlement, CourseEntitlementPolicy
-from openedx.core.djangoapps.site_configuration.tests.factories import SiteFactory
 from common.djangoapps.student.tests.factories import UserFactory
+from openedx.core.djangoapps.site_configuration.tests.factories import SiteFactory
 
 
 class CourseEntitlementPolicyFactory(factory.django.DjangoModelFactory):
     """
     Factory for a a CourseEntitlementPolicy
     """
-    class Meta(object):
+    class Meta:
         model = CourseEntitlementPolicy
 
     site = factory.SubFactory(SiteFactory)
 
 
 class CourseEntitlementFactory(factory.django.DjangoModelFactory):  # lint-amnesty, pylint: disable=missing-class-docstring
-    class Meta(object):
+    class Meta:
         model = CourseEntitlement
 
     uuid = factory.LazyFunction(uuid4)

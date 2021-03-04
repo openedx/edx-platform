@@ -346,7 +346,7 @@ def recurse_mark_complete(block_id, blocks):
     if block.get('completion') == 1:
         return
 
-    child_blocks = block.get('children', block.get('descendents'))
+    child_blocks = block.get('children', block.get('descendants'))
     # Unit blocks(blocks with no children) completion is being marked by patch call to completion service.
     if child_blocks:
         for child_block in child_blocks:

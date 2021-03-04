@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 Test the bulk email opt out view.
 """
@@ -10,15 +9,13 @@ from django.test.client import RequestFactory
 from django.test.utils import override_settings
 from django.urls import reverse
 
+from common.djangoapps.student.tests.factories import UserFactory
 from lms.djangoapps.bulk_email.models import Optout
 from lms.djangoapps.bulk_email.views import opt_out_email_updates
-from six import text_type  # lint-amnesty, pylint: disable=wrong-import-order
-
 from lms.djangoapps.discussion.notification_prefs.views import UsernameCipher
 from openedx.core.lib.tests import attr
-from common.djangoapps.student.tests.factories import UserFactory
-from xmodule.modulestore.tests.factories import CourseFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from xmodule.modulestore.tests.factories import CourseFactory
 
 
 @attr(shard=1)
@@ -29,12 +26,12 @@ class OptOutEmailUpdatesViewTest(ModuleStoreTestCase):
     Check the opt out email functionality.
     """
     def setUp(self):
-        super(OptOutEmailUpdatesViewTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.user = UserFactory.create(username="testuser1", email='test@example.com')
         self.course = CourseFactory.create(run='testcourse1', display_name='Test Course Title')
         self.token = UsernameCipher.encrypt('testuser1')
         self.request_factory = RequestFactory()
-        self.url = reverse('bulk_email_opt_out', args=[self.token, text_type(self.course.id)])
+        self.url = reverse('bulk_email_opt_out', args=[self.token, str(self.course.id)])
 
         # Ensure we start with no opt-out records
         assert Optout.objects.count() == 0

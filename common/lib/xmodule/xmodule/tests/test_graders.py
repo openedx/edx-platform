@@ -43,14 +43,14 @@ class GradesheetTest(unittest.TestCase):
         agg_fields['first_attempted'] = now
         scores.append(ProblemScore(weighted_earned=3, weighted_possible=5, graded=True, **prob_fields))
         all_total, graded_total = aggregate_scores(scores)
-        assert round(all_total - AggregatedScore(tw_earned=3, tw_possible=10, graded=False, **agg_fields), 7) >= 0
-        assert round(graded_total - AggregatedScore(tw_earned=3, tw_possible=5, graded=True, **agg_fields), 7) >= 0
+        assert all_total == AggregatedScore(tw_earned=3, tw_possible=10, graded=False, **agg_fields)
+        assert graded_total == AggregatedScore(tw_earned=3, tw_possible=5, graded=True, **agg_fields)
 
         # (0/5 non-graded) + (3/5 graded) + (2/5 graded) = 5/15 total, 5/10 graded
         scores.append(ProblemScore(weighted_earned=2, weighted_possible=5, graded=True, **prob_fields))
         all_total, graded_total = aggregate_scores(scores)
-        assert round(all_total - AggregatedScore(tw_earned=5, tw_possible=15, graded=False, **agg_fields), 7) >= 0
-        assert round(graded_total - AggregatedScore(tw_earned=5, tw_possible=10, graded=True, **agg_fields), 7) >= 0
+        assert all_total == AggregatedScore(tw_earned=5, tw_possible=15, graded=False, **agg_fields)
+        assert graded_total == AggregatedScore(tw_earned=5, tw_possible=10, graded=True, **agg_fields)
 
 
 @ddt.ddt
@@ -337,7 +337,7 @@ class GraderTest(unittest.TestCase):
     def test_grader_with_invalid_conf(self, invalid_conf, expected_error_message):
         with pytest.raises(ValueError) as error:
             graders.grader_from_conf([invalid_conf])
-        assert expected_error_message in text_type(error.exception)
+        assert expected_error_message in text_type(error.value)
 
 
 @ddt.ddt

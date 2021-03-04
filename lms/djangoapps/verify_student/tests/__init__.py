@@ -8,8 +8,8 @@ from django.db import DEFAULT_DB_ALIAS
 from django.test import TestCase
 from django.utils.timezone import now
 
-from lms.djangoapps.verify_student.models import SoftwareSecurePhotoVerification
 from common.djangoapps.student.tests.factories import UserFactory
+from lms.djangoapps.verify_student.models import SoftwareSecurePhotoVerification
 
 
 class TestVerificationBase(TestCase):
@@ -85,7 +85,7 @@ class TestVerificationBase(TestCase):
         if not user:
             user = UserFactory.create()
         attempt = SoftwareSecurePhotoVerification(user=user)
-        user.profile.name = u"Rust\u01B4"
+        user.profile.name = "Rust\u01B4"
 
         attempt.upload_face_image("Just pretend this is image data")
         attempt.upload_photo_id_image("Hey, we're a photo ID")

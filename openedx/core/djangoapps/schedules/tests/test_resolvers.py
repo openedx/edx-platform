@@ -6,12 +6,20 @@ Tests for schedules resolvers
 import datetime
 from unittest.mock import Mock
 
+import crum
 import ddt
+import pytz
 from django.test import TestCase
+from django.test.client import RequestFactory
 from django.test.utils import override_settings
 from testfixtures import LogCapture
 from waffle.testutils import override_switch
 
+from common.djangoapps.student.models import CourseEnrollment
+from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
+from lms.djangoapps.experiments.testutils import override_experiment_waffle_flag
+from openedx.core.djangoapps.content.course_overviews.tests.factories import CourseOverviewFactory
+from openedx.core.djangoapps.schedules.config import _EXTERNAL_COURSE_UPDATES_FLAG
 from openedx.core.djangoapps.schedules.models import Schedule
 from openedx.core.djangoapps.schedules.resolvers import (
     LOG,
@@ -22,7 +30,6 @@ from openedx.core.djangoapps.schedules.resolvers import (
 from openedx.core.djangoapps.schedules.tests.factories import ScheduleConfigFactory
 from openedx.core.djangoapps.site_configuration.tests.factories import SiteConfigurationFactory, SiteFactory
 from openedx.core.djangolib.testing.utils import CacheIsolationMixin, skip_unless_lms
-from common.djangoapps.student.tests.factories import CourseEnrollmentFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 
@@ -92,6 +99,38 @@ class TestBinnedSchedulesBaseResolver(SchedulesResolverTestMixin, TestCase):
         result = self.resolver.filter_by_org(mock_query)
         mock_query.exclude.assert_called_once_with(enrollment__course__org__in=expected_org_list)
         assert result == mock_query.exclude.return_value
+
+    @ddt.data(0, 1)
+    def test_external_course_updates(self, bucket):
+        """Confirm that we exclude enrollments in the external course updates experiment"""
+        user = UserFactory()
+        overview1 = CourseOverviewFactory(has_highlights=False)  # set has_highlights just to avoid a modulestore lookup
+        overview2 = CourseOverviewFactory(has_highlights=False)
+
+        # We need to enroll with a request, because our specific experiment code expects it
+        self.addCleanup(crum.set_current_request, None)
+        request = RequestFactory()
+        request.user = user
+        crum.set_current_request(request)
+
+        enrollment1 = CourseEnrollment.enroll(user, overview1.id)
+        with override_experiment_waffle_flag(_EXTERNAL_COURSE_UPDATES_FLAG, bucket=bucket):
+            enrollment2 = CourseEnrollment.enroll(user, overview2.id)
+
+        # OK, at this point, we'd expect course1 to be returned, but course2's enrollment to be excluded by the
+        # experiment. Note that the experiment waffle is currently inactive, but they should still be excluded because
+        # they were bucketed at enrollment time.
+        bin_num = BinnedSchedulesBaseResolver.bin_num_for_user_id(user.id)
+        resolver = BinnedSchedulesBaseResolver(None, self.site, datetime.datetime.now(pytz.UTC), 0, bin_num)
+        resolver.schedule_date_field = 'created'
+        schedules = resolver.get_schedules_with_target_date_by_bin_and_orgs()
+
+        if bucket == 1:
+            assert len(schedules) == 1
+            assert schedules[0].enrollment == enrollment1
+        else:
+            assert len(schedules) == 2
+            assert {s.enrollment for s in schedules} == {enrollment1, enrollment2}
 
 
 @skip_unless_lms

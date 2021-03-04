@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 Unit tests for handling email sending errors
 """
@@ -7,6 +6,8 @@ Unit tests for handling email sending errors
 import json
 from itertools import cycle
 from smtplib import SMTPConnectError, SMTPDataError, SMTPServerDisconnected
+from unittest.mock import Mock, patch
+
 import pytest
 import ddt
 from celery.states import RETRY, SUCCESS
@@ -14,11 +15,9 @@ from django.conf import settings
 from django.core.management import call_command
 from django.db import DatabaseError
 from django.urls import reverse
-from mock import Mock, patch
 from opaque_keys.edx.locator import CourseLocator
-from six import text_type
-from six.moves import range
 
+from common.djangoapps.student.tests.factories import AdminFactory, CourseEnrollmentFactory, UserFactory
 from lms.djangoapps.bulk_email.models import SEND_TO_MYSELF, BulkEmailFlag, CourseEmail
 from lms.djangoapps.bulk_email.tasks import perform_delegate_email_batches, send_course_email
 from lms.djangoapps.courseware.exceptions import CourseRunNotFound
@@ -31,7 +30,6 @@ from lms.djangoapps.instructor_task.subtasks import (
     initialize_subtask_info,
     update_subtask_status
 )
-from common.djangoapps.student.tests.factories import AdminFactory, CourseEnrollmentFactory, UserFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
@@ -51,29 +49,29 @@ class TestEmailErrors(ModuleStoreTestCase):
     ENABLED_CACHES = ['default', 'mongo_metadata_inheritance', 'loc_cache']
 
     def setUp(self):
-        super(TestEmailErrors, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
-        course_title = u"ẗëṡẗ title ｲ乇丂ｲ ﾶ乇丂丂ﾑg乇 ｷo尺 ﾑﾚﾚ тэѕт мэѕѕаБэ"
+        super().setUp()
+        course_title = "ẗëṡẗ title ｲ乇丂ｲ ﾶ乇丂丂ﾑg乇 ｷo尺 ﾑﾚﾚ тэѕт мэѕѕаБэ"
         self.course = CourseFactory.create(display_name=course_title)
         self.instructor = AdminFactory.create()
         self.client.login(username=self.instructor.username, password="test")
 
         # load initial content (since we don't run migrations as part of tests):
         call_command("loaddata", "course_email_template.json")
-        self.url = reverse('instructor_dashboard', kwargs={'course_id': text_type(self.course.id)})
-        self.send_mail_url = reverse('send_email', kwargs={'course_id': text_type(self.course.id)})
+        self.url = reverse('instructor_dashboard', kwargs={'course_id': str(self.course.id)})
+        self.send_mail_url = reverse('send_email', kwargs={'course_id': str(self.course.id)})
         self.success_content = {
-            'course_id': text_type(self.course.id),
+            'course_id': str(self.course.id),
             'success': True,
         }
 
     @classmethod
     def setUpClass(cls):
-        super(TestEmailErrors, cls).setUpClass()
+        super().setUpClass()
         BulkEmailFlag.objects.create(enabled=True, require_course_email_auth=False)
 
     @classmethod
     def tearDownClass(cls):
-        super(TestEmailErrors, cls).tearDownClass()
+        super().tearDownClass()
         BulkEmailFlag.objects.all().delete()
 
     @patch('lms.djangoapps.bulk_email.tasks.get_connection', autospec=True)
@@ -226,7 +224,7 @@ class TestEmailErrors(ModuleStoreTestCase):
             email = CourseEmail.create(  # pylint: disable=unused-variable
                 self.course.id,
                 self.instructor,
-                [u"{}:IDONTEXIST".format(target_type)],
+                [f"{target_type}:IDONTEXIST"],
                 "re: subject",
                 "dummy body goes here"
             )

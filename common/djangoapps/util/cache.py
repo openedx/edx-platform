@@ -10,7 +10,6 @@ not migrating so as not to inconvenience users by logging them all out.
 from functools import wraps
 
 import six
-from django.conf import settings  # lint-amnesty, pylint: disable=unused-import
 from django.core import cache
 # If we can't find a 'general' CACHE defined in settings.py, we simply fall back
 # to returning the default cache. This will happen with dev machines.

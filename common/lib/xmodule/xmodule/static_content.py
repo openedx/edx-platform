@@ -26,6 +26,8 @@ from xmodule.conditional_module import ConditionalBlock
 from xmodule.html_module import AboutBlock, CourseInfoBlock, HtmlBlock, StaticTabBlock
 from xmodule.library_content_module import LibraryContentBlock
 from xmodule.lti_module import LTIBlock
+from xmodule.seq_module import SequenceBlock
+from xmodule.split_test_module import SplitTestBlock
 from xmodule.word_cloud_module import WordCloudBlock
 from xmodule.x_module import XModuleDescriptor, HTMLSnippet
 
@@ -76,6 +78,8 @@ XBLOCK_CLASSES = [
     LibraryContentBlock,
     LTIBlock,
     ProblemBlock,
+    SequenceBlock,
+    SplitTestBlock,
     StaticTabBlock,
     VideoBlock,
     WordCloudBlock,
