@@ -667,8 +667,9 @@ class CertificateExceptionViewInstructorApiTest(SharedModuleStoreTestCase):
         assert not res_json['success']
 
         # Assert Error Message
-        assert res_json['message'] == '{user} is not enrolled in this course. Please check your spelling and retry.'\
-            .format(user=self.certificate_exception['user_name'])
+        assert res_json['message'] == (
+            f"Student {self.user.username} is not enrolled in this course. Please check your spelling and retry."
+        )
 
     def test_certificate_exception_removed_successfully(self):
         """
@@ -1196,26 +1197,6 @@ class CertificateInvalidationViewTests(SharedModuleStoreTestCase):
 
         # Assert Error Message
         assert res_json['message'] == f'{invalid_user} does not exist in the LMS. Please check your spelling and retry.'
-
-    def test_user_not_enrolled_error(self):
-        """
-        Test error message if user is not enrolled in the course.
-        """
-        self.certificate_invalidation_data.update({"user": self.not_enrolled_student.username})
-
-        response = self.client.post(
-            self.url,
-            data=json.dumps(self.certificate_invalidation_data),
-            content_type='application/json',
-        )
-
-        # Assert 400 status code in response
-        assert response.status_code == 400
-        res_json = json.loads(response.content.decode('utf-8'))
-
-        # Assert Error Message
-        assert res_json['message'] == '{user} is not enrolled in this course. Please check your spelling and retry.'\
-            .format(user=self.not_enrolled_student.username)
 
     def test_no_generated_certificate_error(self):
         """
