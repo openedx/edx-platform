@@ -6,16 +6,11 @@ Test view handler for rerun (and eventually create)
 import datetime
 
 import ddt
-import six
 from django.test import override_settings
 from django.test.client import RequestFactory
 from django.urls import reverse
 from opaque_keys.edx.keys import CourseKey
-from organizations.api import (
-    add_organization,
-    get_organization_by_short_name,
-    get_course_organizations
-)
+from organizations.api import add_organization, get_course_organizations, get_organization_by_short_name
 from organizations.exceptions import InvalidOrganizationException
 
 from cms.djangoapps.contentstore.tests.utils import AjaxEnabledTestClient, parse_json
@@ -37,7 +32,7 @@ class TestCourseListing(ModuleStoreTestCase):
         """
         Add a user and a course
         """
-        super(TestCourseListing, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         # create and log in a staff user.
         # create and log in a non-staff user
         self.user = UserFactory()
@@ -81,7 +76,7 @@ class TestCourseListing(ModuleStoreTestCase):
             'description': 'Testing Organization Description',
         })
         response = self.client.ajax_post(self.course_create_rerun_url, {
-            'source_course_key': six.text_type(self.source_course_key),
+            'source_course_key': str(self.source_course_key),
             'org': self.source_course_key.org, 'course': self.source_course_key.course, 'run': 'copy',
             'display_name': 'not the same old name',
         })
@@ -160,7 +155,7 @@ class TestCourseListing(ModuleStoreTestCase):
             with self.assertRaises(InvalidOrganizationException):
                 get_organization_by_short_name("orgX")
             data = parse_json(response)
-            self.assertIn(u'Organization you selected does not exist in the system', data['error'])
+            self.assertIn('Organization you selected does not exist in the system', data['error'])
 
     @ddt.data(True, False)
     def test_course_creation_for_known_organization(self, organizations_autocreate):

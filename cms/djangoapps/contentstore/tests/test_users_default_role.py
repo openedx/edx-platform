@@ -6,8 +6,8 @@ after deleting it creates same course again
 
 from cms.djangoapps.contentstore.tests.utils import AjaxEnabledTestClient
 from cms.djangoapps.contentstore.utils import delete_course, reverse_url
-from lms.djangoapps.courseware.tests.factories import UserFactory
 from common.djangoapps.student.models import CourseEnrollment
+from lms.djangoapps.courseware.tests.factories import UserFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 
 
@@ -19,7 +19,7 @@ class TestUsersDefaultRole(ModuleStoreTestCase):
         """
         Add a user and a course
         """
-        super(TestUsersDefaultRole, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         # create and log in a staff user.
         self.user = UserFactory(is_staff=True)
         self.client = AjaxEnabledTestClient()
@@ -49,7 +49,7 @@ class TestUsersDefaultRole(ModuleStoreTestCase):
         Reverse the setup
         """
         self.client.logout()
-        super(TestUsersDefaultRole, self).tearDown()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().tearDown()
 
     def test_user_forum_default_role_on_course_deletion(self):
         """
