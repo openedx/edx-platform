@@ -8,6 +8,7 @@ import logging
 from django.dispatch import receiver
 
 from openedx.core.djangoapps.credentials.helpers import is_learner_records_enabled_for_org
+from openedx.core.djangoapps.models.config.waffle import enable_course_detail_update_certificate_date
 from openedx.core.djangoapps.signals.signals import (
     COURSE_CERT_AWARDED,
     COURSE_CERT_CHANGED,
@@ -82,8 +83,7 @@ def handle_course_cert_changed(sender, user, course_key, mode, status, **kwargs)
 
         Returns:
             None
-
-        """
+    """
     # Import here instead of top of file since this module gets imported before
     # the credentials app is loaded, resulting in a Django deprecation warning.
     from openedx.core.djangoapps.credentials.models import CredentialsApiConfig
@@ -196,6 +196,10 @@ def handle_course_cert_date_change(sender, course_key, **kwargs):  # lint-amnest
         None
 
     """
+    # Stop if cert date updating isn't in effect for the course
+    if not enable_course_detail_update_certificate_date(course_key):
+        return
+
     # Import here instead of top of file since this module gets imported before
     # the credentials app is loaded, resulting in a Django deprecation warning.
     from openedx.core.djangoapps.credentials.models import CredentialsApiConfig
@@ -209,6 +213,7 @@ def handle_course_cert_date_change(sender, course_key, **kwargs):  # lint-amnest
         'handling COURSE_CERT_DATE_CHANGE for course %s',
         course_key,
     )
+
     # import here, because signal is registered at startup, but items in tasks are not yet loaded
     from openedx.core.djangoapps.programs.tasks import update_certificate_visible_date_on_course_update
-    update_certificate_visible_date_on_course_update.delay(course_key)
+    update_certificate_visible_date_on_course_update.delay(str(course_key))
