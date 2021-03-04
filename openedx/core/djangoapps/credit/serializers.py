@@ -5,7 +5,6 @@ import datetime
 import logging
 
 import pytz
-import six
 from django.conf import settings
 from rest_framework import serializers
 from rest_framework.exceptions import PermissionDenied
@@ -23,7 +22,7 @@ class CreditCourseSerializer(serializers.ModelSerializer):
 
     course_key = CourseKeyField()
 
-    class Meta(object):
+    class Meta:
         model = CreditCourse
         exclude = ('id',)
 
@@ -35,7 +34,7 @@ class CreditProviderSerializer(serializers.ModelSerializer):
     status_url = serializers.URLField(source='provider_status_url')
     url = serializers.URLField(source='provider_url')
 
-    class Meta(object):
+    class Meta:
         model = CreditProvider
         fields = ('id', 'display_name', 'url', 'status_url', 'description', 'enable_integration',
                   'fulfillment_instructions', 'thumbnail_url',)
@@ -47,9 +46,9 @@ class CreditEligibilitySerializer(serializers.ModelSerializer):
 
     def get_course_key(self, obj):
         """ Returns the course key associated with the course. """
-        return six.text_type(obj.course.course_key)
+        return str(obj.course.course_key)
 
-    class Meta(object):
+    class Meta:
         model = CreditEligibility
         fields = ('username', 'course_key', 'deadline',)
 
@@ -67,7 +66,7 @@ class CreditProviderCallbackSerializer(serializers.Serializer):  # pylint:disabl
 
     def __init__(self, **kwargs):
         self.provider = kwargs.pop('provider', None)
-        super(CreditProviderCallbackSerializer, self).__init__(**kwargs)  # lint-amnesty, pylint: disable=super-with-arguments
+        super().__init__(**kwargs)
 
     def validate_timestamp(self, value):
         """ Ensure the request has been received in a timely manner. """
@@ -75,13 +74,13 @@ class CreditProviderCallbackSerializer(serializers.Serializer):  # pylint:disabl
 
         # Ensure we converted the timestamp to a datetime
         if not date_time:
-            msg = '[{}] is not a valid timestamp'.format(value)
+            msg = f'[{value}] is not a valid timestamp'
             log.warning(msg)
             raise serializers.ValidationError(msg)
 
         elapsed = (datetime.datetime.now(pytz.UTC) - date_time).total_seconds()
         if elapsed > settings.CREDIT_PROVIDER_TIMESTAMP_EXPIRATION:
-            msg = '[{value}] is too far in the past (over [{elapsed}] seconds).'.format(value=value, elapsed=elapsed)
+            msg = f'[{value}] is too far in the past (over [{elapsed}] seconds).'
             log.warning(msg)
             raise serializers.ValidationError(msg)
 
@@ -121,8 +120,8 @@ class CreditProviderCallbackSerializer(serializers.Serializer):  # pylint:disabl
         actual_signature = data["signature"]
 
         # Accounts for old way of storing provider key
-        if isinstance(secret_key, six.text_type) and signature(data, secret_key) != actual_signature:
-            msg = 'Request from credit provider [{}] had an invalid signature.'.format(provider_id)
+        if isinstance(secret_key, str) and signature(data, secret_key) != actual_signature:
+            msg = f'Request from credit provider [{provider_id}] had an invalid signature.'
             raise PermissionDenied(msg)
 
         # Accounts for new way of storing provider key
@@ -134,7 +133,7 @@ class CreditProviderCallbackSerializer(serializers.Serializer):  # pylint:disabl
                     key_match = True
 
             if not key_match:
-                msg = 'Request from credit provider [{}] had an invalid signature.'.format(provider_id)
+                msg = f'Request from credit provider [{provider_id}] had an invalid signature.'
                 raise PermissionDenied(msg)
 
     def validate_signature(self, value):

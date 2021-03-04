@@ -4,7 +4,6 @@ Tests for the Credit xBlock service
 
 
 import ddt
-import six
 
 from common.djangoapps.course_modes.models import CourseMode
 from openedx.core.djangoapps.credit.api.eligibility import set_credit_requirements
@@ -22,7 +21,7 @@ class CreditServiceTests(ModuleStoreTestCase):
     """
 
     def setUp(self):
-        super(CreditServiceTests, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
 
         self.service = CreditService()
         self.course = CourseFactory.create(org='edX', number='DemoX', display_name='Demo_Course')
@@ -383,12 +382,12 @@ class CreditServiceTests(ModuleStoreTestCase):
         # mark the grade as satisfied
         self.service.set_credit_requirement_status(
             self.user.id,
-            six.text_type(self.course.id),
+            str(self.course.id),
             'grade',
             'grade'
         )
 
-        credit_state = self.service.get_credit_state(self.user.id, six.text_type(self.course.id))
+        credit_state = self.service.get_credit_state(self.user.id, str(self.course.id))
 
         assert credit_state is not None
         assert credit_state['enrollment_mode'] == 'verified'

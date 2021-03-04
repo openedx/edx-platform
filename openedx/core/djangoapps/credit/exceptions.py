@@ -76,7 +76,7 @@ class UserNotEligibleException(InvalidCreditRequest):
     def __init__(self, course_key, username):
         detail = _('[{username}] is not eligible for credit for [{course_key}].').format(username=username,
                                                                                          course_key=course_key)
-        super(UserNotEligibleException, self).__init__(detail)  # lint-amnesty, pylint: disable=super-with-arguments
+        super().__init__(detail)
 
 
 class InvalidCourseKey(InvalidCreditRequest):
@@ -84,4 +84,4 @@ class InvalidCourseKey(InvalidCreditRequest):
 
     def __init__(self, course_key):
         detail = _('[{course_key}] is not a valid course key.').format(course_key=course_key)
-        super(InvalidCourseKey, self).__init__(detail)  # lint-amnesty, pylint: disable=super-with-arguments
+        super().__init__(detail)

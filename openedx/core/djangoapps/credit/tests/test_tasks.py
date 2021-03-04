@@ -5,8 +5,7 @@ Tests for credit course tasks.
 
 from datetime import datetime
 
-import mock
-import six
+from unittest import mock
 from edx_proctoring.api import create_exam
 
 from openedx.core.djangoapps.credit.api import get_credit_requirements
@@ -33,7 +32,7 @@ class TestTaskExecution(ModuleStoreTestCase):
         raise InvalidCreditRequirements
 
     def setUp(self):
-        super(TestTaskExecution, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
 
         self.course = CourseFactory.create(start=datetime(2015, 3, 1))
         self.section = ItemFactory.create(parent=self.course, category='chapter', display_name='Test Section')
@@ -73,8 +72,8 @@ class TestTaskExecution(ModuleStoreTestCase):
         self.add_credit_course(self.course.id)
 
         create_exam(
-            course_id=six.text_type(self.course.id),
-            content_id=six.text_type(self.subsection.location),
+            course_id=str(self.course.id),
+            content_id=str(self.subsection.location),
             exam_name='A Proctored Exam',
             time_limit_mins=10,
             is_proctored=True,
@@ -89,7 +88,7 @@ class TestTaskExecution(ModuleStoreTestCase):
         requirements = get_credit_requirements(self.course.id)
         assert len(requirements) == 2
         assert requirements[1]['namespace'] == 'proctored_exam'
-        assert requirements[1]['name'] == six.text_type(self.subsection.location)
+        assert requirements[1]['name'] == str(self.subsection.location)
         assert requirements[1]['display_name'] == 'A Proctored Exam'
         assert requirements[1]['criteria'] == {}
 
@@ -101,7 +100,7 @@ class TestTaskExecution(ModuleStoreTestCase):
 
         self.add_credit_course(self.course.id)
         create_exam(
-            course_id=six.text_type(self.course.id),
+            course_id=str(self.course.id),
             content_id='foo',
             exam_name='A Proctored Exam',
             time_limit_mins=10,
@@ -121,7 +120,7 @@ class TestTaskExecution(ModuleStoreTestCase):
         assert not [requirement for requirement in requirements if requirement['namespace'] == 'proctored_exam']
 
         create_exam(
-            course_id=six.text_type(self.course.id),
+            course_id=str(self.course.id),
             content_id='foo2',
             exam_name='A Proctored Exam',
             time_limit_mins=10,
@@ -139,7 +138,7 @@ class TestTaskExecution(ModuleStoreTestCase):
 
         # practice proctored exams aren't requirements
         create_exam(
-            course_id=six.text_type(self.course.id),
+            course_id=str(self.course.id),
             content_id='foo3',
             exam_name='A Proctored Exam',
             time_limit_mins=10,
@@ -185,8 +184,8 @@ class TestTaskExecution(ModuleStoreTestCase):
         self.add_credit_course(self.course.id)
         subsection = ItemFactory.create(parent=self.section, category='sequential', display_name='Dummy Subsection')
         create_exam(
-            course_id=six.text_type(self.course.id),
-            content_id=six.text_type(subsection.location),
+            course_id=str(self.course.id),
+            content_id=str(subsection.location),
             exam_name='A Proctored Exam',
             time_limit_mins=10,
             is_proctored=True,
@@ -200,7 +199,7 @@ class TestTaskExecution(ModuleStoreTestCase):
         requirements = get_credit_requirements(self.course.id)
         assert len(requirements) == 2
         assert requirements[1]['namespace'] == 'proctored_exam'
-        assert requirements[1]['name'] == six.text_type(subsection.location)
+        assert requirements[1]['name'] == str(subsection.location)
         assert requirements[1]['display_name'] == 'A Proctored Exam'
         assert requirements[1]['criteria'] == {}
 

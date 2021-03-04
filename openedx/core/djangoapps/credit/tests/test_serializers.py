@@ -1,7 +1,6 @@
 """ Tests for Credit API serializers. """
 
 import pytest
-import six
 from django.test import TestCase
 from django.test.utils import override_settings  # lint-amnesty, pylint: disable=unused-import
 from rest_framework.exceptions import PermissionDenied
@@ -40,7 +39,7 @@ class CreditEligibilitySerializerTests(TestCase):
         eligibility = CreditEligibilityFactory(username=user.username)
         serializer = serializers.CreditEligibilitySerializer(eligibility)
         expected = {
-            'course_key': six.text_type(eligibility.course.course_key),
+            'course_key': str(eligibility.course.course_key),
             'deadline': eligibility.deadline.strftime('%Y-%m-%dT%H:%M:%S.%fZ'),
             'username': user.username,
         }

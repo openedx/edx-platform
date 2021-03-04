@@ -8,7 +8,6 @@ import json
 
 import ddt
 import pytz
-import six
 from django.conf import settings
 from django.test import Client, TestCase
 from django.test.utils import override_settings
@@ -39,7 +38,7 @@ from common.djangoapps.util.date_utils import to_timestamp
 JSON = 'application/json'
 
 
-class ApiTestCaseMixin(object):
+class ApiTestCaseMixin:
     """ Mixin to aid with API testing. """
 
     def assert_error_response(self, response, msg, status_code=400):
@@ -48,13 +47,13 @@ class ApiTestCaseMixin(object):
         self.assertDictEqual(response.data, {'detail': msg})
 
 
-class UserMixin(object):
+class UserMixin:
     """ Test mixin that creates, and authenticates, a new user for every test. """
     password = 'password'
     list_path = None
 
     def setUp(self):
-        super(UserMixin, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
 
         # This value must be set here, as setting it outside of a method results in issues with CMS/Studio tests.
         if self.list_path:
@@ -66,7 +65,7 @@ class UserMixin(object):
         self.client.login(username=self.user.username, password=self.password)
 
 
-class AuthMixin(object):
+class AuthMixin:
     """ Test mixin with methods to test OAuth 2.0 and session authentication. """
 
     def test_authentication_required(self):
@@ -104,7 +103,7 @@ class AuthMixin(object):
 
 
 @ddt.ddt
-class ReadOnlyMixin(object):
+class ReadOnlyMixin:
     """ Test mixin for read-only API endpoints. """
 
     @ddt.data('delete', 'post', 'put')
@@ -127,7 +126,7 @@ class CreditCourseViewSetTests(AuthMixin, UserMixin, TestCase):
         """ Serializes a CreditCourse to a Python dict. """
 
         return {
-            'course_key': six.text_type(credit_course.course_key),
+            'course_key': str(credit_course.course_key),
             'enabled': credit_course.enabled
         }
 
@@ -193,7 +192,7 @@ class CreditCourseViewSetTests(AuthMixin, UserMixin, TestCase):
         """ Verify an API request created a new CreditCourse object. """
         enabled = True
         data = {
-            'course_key': six.text_type(course_id),
+            'course_key': str(course_id),
             'enabled': enabled
         }
 
@@ -211,7 +210,7 @@ class CreditCourseViewSetTests(AuthMixin, UserMixin, TestCase):
         course_id = 'a/b/c'
         enabled = True
         data = {
-            'course_key': six.text_type(course_id),
+            'course_key': str(course_id),
             'enabled': enabled
         }
 
@@ -223,7 +222,7 @@ class CreditCourseViewSetTests(AuthMixin, UserMixin, TestCase):
         course_id = 'd/e/f'
         enabled = True
         data = {
-            'course_key': six.text_type(course_id),
+            'course_key': str(course_id),
             'enabled': enabled
         }
 
@@ -282,7 +281,7 @@ class CreditProviderViewSetTests(ApiTestCaseMixin, ReadOnlyMixin, AuthMixin, Use
 
     @classmethod
     def setUpClass(cls):
-        super(CreditProviderViewSetTests, cls).setUpClass()
+        super().setUpClass()
         cls.bayside = CreditProviderFactory(provider_id='bayside')
         cls.hogwarts = CreditProviderFactory(provider_id='hogwarts')
         cls.starfleet = CreditProviderFactory(provider_id='starfleet')
@@ -324,11 +323,11 @@ class CreditProviderRequestCreateViewTests(ApiTestCaseMixin, UserMixin, TestCase
 
     @classmethod
     def setUpClass(cls):
-        super(CreditProviderRequestCreateViewTests, cls).setUpClass()
+        super().setUpClass()
         cls.provider = CreditProviderFactory()
 
     def setUp(self):
-        super(CreditProviderRequestCreateViewTests, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.path = reverse('credit:create_request', kwargs={'provider_id': self.provider.provider_id})
         self.eligibility = CreditEligibilityFactory(username=self.user.username)
 
@@ -336,7 +335,7 @@ class CreditProviderRequestCreateViewTests(ApiTestCaseMixin, UserMixin, TestCase
         """ Create a credit request for the given user and course. """
         data = {
             'username': username,
-            'course_key': six.text_type(course_id)
+            'course_key': str(course_id)
         }
         return self.client.post(self.path, json.dumps(data), content_type=JSON)
 
@@ -393,7 +392,7 @@ class CreditProviderRequestCreateViewTests(ApiTestCaseMixin, UserMixin, TestCase
             assert parameters['course_org'] == course_key.org
             assert parameters['course_num'] == course_key.course
             assert parameters['course_run'] == course_key.run
-            assert parameters['final_grade'] == six.text_type(final_grade)
+            assert parameters['final_grade'] == str(final_grade)
             assert parameters['user_username'] == username
             assert parameters['user_full_name'] == self.user.get_full_name()
             assert parameters['user_mailing_address'] == ''
@@ -421,7 +420,7 @@ class CreditProviderRequestCreateViewTests(ApiTestCaseMixin, UserMixin, TestCase
         """ Verify the endpoint returns HTTP 400 if the course is not a valid course key. """
         course_key = 'not-a-course-id'
         response = self.post_credit_request(self.user.username, course_key)
-        self.assert_error_response(response, '[{}] is not a valid course key.'.format(course_key))
+        self.assert_error_response(response, f'[{course_key}] is not a valid course key.')
 
     def test_post_user_not_eligible(self):
         """ Verify the endpoint returns HTTP 400 if the user is not eligible for credit for the course. """
@@ -495,7 +494,7 @@ class CreditProviderCallbackViewTests(UserMixin, TestCase):
     """ Tests for CreditProviderCallbackView. """
 
     def setUp(self):
-        super(CreditProviderCallbackViewTests, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
 
         # Authentication should NOT be required for this endpoint.
         self.client.logout()
@@ -653,7 +652,7 @@ class CreditEligibilityViewTests(AuthMixin, UserMixin, ReadOnlyMixin, TestCase):
     view_name = 'credit:eligibility_details'
 
     def setUp(self):
-        super(CreditEligibilityViewTests, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.eligibility = CreditEligibilityFactory(username=self.user.username)
         self.path = self.create_url(self.eligibility)
 

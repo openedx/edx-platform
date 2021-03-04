@@ -5,12 +5,11 @@ Tests for the API functions in the credit app.
 
 import datetime
 import json
+from unittest import mock
 import pytest
 import ddt
 import httpretty
-import mock
 import pytz
-import six
 from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.core import mail
 from django.db import connection
@@ -79,7 +78,7 @@ class CreditApiTestBase(ModuleStoreTestCase):
     }
     THUMBNAIL_URL = "https://credit.example.com/logo.png"
 
-    PROVIDERS_LIST = [u'Hogwarts School of Witchcraft and Wizardry', u'Arizona State University']
+    PROVIDERS_LIST = ['Hogwarts School of Witchcraft and Wizardry', 'Arizona State University']
 
     COURSE_API_RESPONSE = {
         "id": "course-v1:Demo+Demox+Course",
@@ -160,7 +159,7 @@ class CreditApiTestBase(ModuleStoreTestCase):
     }
 
     def setUp(self):
-        super(CreditApiTestBase, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.course = CourseFactory.create(org="edx", course="DemoX", run="Demo_Course")
         self.course_key = self.course.id
 
@@ -199,7 +198,7 @@ class CreditApiTestBase(ModuleStoreTestCase):
         """ Mock GET requests to the ecommerce course API endpoint. """
         httpretty.reset()
         httpretty.register_uri(
-            httpretty.GET, '{}/courses/{}/?include_products=1'.format(TEST_API_URL, six.text_type(course_key)),
+            httpretty.GET, '{}/courses/{}/?include_products=1'.format(TEST_API_URL, str(course_key)),
             status=status,
             body=json.dumps(body), content_type='application/json',
         )
@@ -788,16 +787,16 @@ class CreditRequirementApiTests(CreditApiTestBase):
 
     @ddt.data(
         (
-            [u'Arizona State University'],
+            ['Arizona State University'],
             'credit from Arizona State University for',
             'You are eligible for credit from Arizona State University'),
         (
-            [u'Arizona State University', u'Hogwarts School of Witchcraft and Wizardry'],
+            ['Arizona State University', 'Hogwarts School of Witchcraft and Wizardry'],
             'credit from Arizona State University and Hogwarts School of Witchcraft and Wizardry for',
             'You are eligible for credit from Arizona State University and Hogwarts School of Witchcraft and Wizardry'
         ),
         (
-            [u'Arizona State University', u'Hogwarts School of Witchcraft and Wizardry', u'Charter Oak'],
+            ['Arizona State University', 'Hogwarts School of Witchcraft and Wizardry', 'Charter Oak'],
             'credit from Arizona State University, Hogwarts School of Witchcraft and Wizardry, and Charter Oak for',
             'You are eligible for credit from Arizona State University, Hogwarts School'
             ' of Witchcraft and Wizardry, and Charter Oak'
@@ -885,7 +884,7 @@ class CreditProviderIntegrationApiTests(CreditApiTestBase):
     FINAL_GRADE = 0.95
 
     def setUp(self):
-        super(CreditProviderIntegrationApiTests, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.user = UserFactory(
             username=self.USER_INFO['username'],
             email=self.USER_INFO['email'],
@@ -967,11 +966,11 @@ class CreditProviderIntegrationApiTests(CreditApiTestBase):
         assert parameters['course_org'] == self.course_key.org
         assert parameters['course_num'] == self.course_key.course
         assert parameters['course_run'] == self.course_key.run
-        assert parameters['final_grade'] == six.text_type(self.FINAL_GRADE)
+        assert parameters['final_grade'] == str(self.FINAL_GRADE)
 
         # Validate user information
         for key in self.USER_INFO.keys():  # lint-amnesty, pylint: disable=consider-iterating-dictionary
-            param_key = 'user_{key}'.format(key=key)
+            param_key = f'user_{key}'
             assert param_key in parameters
             expected = '' if key == 'mailing_address' else self.USER_INFO[key]
             assert parameters[param_key] == expected
@@ -989,7 +988,7 @@ class CreditProviderIntegrationApiTests(CreditApiTestBase):
 
         # Initiate a credit request
         request = api.create_credit_request(self.course_key, self.PROVIDER_ID, self.USER_INFO['username'])
-        assert request['parameters']['final_grade'] == u'0.33333'
+        assert request['parameters']['final_grade'] == '0.33333'
 
     def test_create_credit_request_address_empty(self):
         """ Verify the mailing address is always empty. """
@@ -1114,7 +1113,7 @@ class CreditProviderIntegrationApiTests(CreditApiTestBase):
         # Simulate users who registered accounts before the country field was introduced.
         # We need to manipulate the database directly because the country Django field
         # coerces None values to empty strings.
-        query = u"UPDATE auth_userprofile SET country = NULL WHERE id = %s"
+        query = "UPDATE auth_userprofile SET country = NULL WHERE id = %s"
         connection.cursor().execute(query, [str(self.user.profile.id)])
 
         # Request should include an empty country field
@@ -1197,7 +1196,7 @@ class CourseApiTests(CreditApiTestBase):
     """Test Python API for course product information."""
 
     def setUp(self):
-        super(CourseApiTests, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.worker_user = User.objects.create_user(username=TEST_ECOMMERCE_WORKER)
         self.add_credit_course(self.course_key)
         self.credit_config = CreditConfig(cache_ttl=100, enabled=True)

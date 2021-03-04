@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 Tests for credit course models.
 """
@@ -41,7 +40,7 @@ class CreditEligibilityModelTests(TestCase):
     """
 
     def setUp(self):
-        super(CreditEligibilityModelTests, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.course_key = CourseKey.from_string("edX/DemoX/Demo_Course")
 
     @ddt.data(False, True)
@@ -105,7 +104,7 @@ class CreditRequirementStatusTests(RetirementTestCase):
     """
 
     def setUp(self):
-        super(CreditRequirementStatusTests, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.course_key = CourseKey.from_string("edX/DemoX/Demo_Course")
         self.old_username = "username"
         self.user = UserFactory(username=self.old_username)
@@ -177,7 +176,7 @@ class CreditRequestTest(RetirementTestCase):
     """
 
     def setUp(self):
-        super(CreditRequestTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.user = UserFactory.create()
         self.retirement = UserRetirementStatus.create_retirement(self.user)
         self.credit_course = CreditCourse.objects.create()
