@@ -15,6 +15,7 @@ disable+ =
     useless-suppression,
     cyclic-import,
     logging-format-interpolation,
+    django-not-configured
 
 [BASIC]
 attr-rgx = [a-z_][a-z0-9_]{2,40}$
