@@ -15,7 +15,7 @@ from lms.djangoapps.utils import _get_key
 log = logging.getLogger(__name__)
 
 
-class CertificateService(object):
+class CertificateService:
     """
     User Certificate service
     """
@@ -38,13 +38,13 @@ class CertificateService(object):
             )
             generated_certificate.invalidate()
             log.info(
-                u'Certificate invalidated for user %d in course %s',
+                'Certificate invalidated for user %d in course %s',
                 user_id,
                 course_key
             )
         except ObjectDoesNotExist:
             log.warning(
-                u'Invalidation failed because a certificate for user %d in course %s does not exist.',
+                'Invalidation failed because a certificate for user %d in course %s does not exist.',
                 user_id,
                 course_key
             )

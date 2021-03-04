@@ -55,9 +55,9 @@ However, this has two main disadvantages:
 Usage
 ~~~~~
 
-To use, find ``MIDDLEWARE_CLASSES`` in your ``settings.py`` and replace::
+To use, find ``MIDDLEWARE`` in your ``settings.py`` and replace::
 
-    MIDDLEWARE_CLASSES = [
+    MIDDLEWARE = [
         ...
         'django.contrib.auth.middleware.AuthenticationMiddleware',
         ...
@@ -65,7 +65,7 @@ To use, find ``MIDDLEWARE_CLASSES`` in your ``settings.py`` and replace::
 
 with::
 
-    MIDDLEWARE_CLASSES = [
+    MIDDLEWARE = [
         ...
         'openedx.core.djangoapps.cache_toolbox.middleware.CacheBackedAuthenticationMiddleware',
         ...

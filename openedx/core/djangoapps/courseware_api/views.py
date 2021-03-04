@@ -89,20 +89,14 @@ class CoursewareMeta:
         This method is the "opposite" of _redirect_to_learning_mfe in
         lms/djangoapps/courseware/views/index.py. But not exactly...
 
-        1. It needs to respect the global
-           ENABLE_COURSEWARE_MICROFRONTEND feature flag and redirect users
-           out of the MFE experience if it's turned off.
-        2. It needs to redirect for old Mongo courses.
-        3. It does NOT need to worry about exams - the MFE will handle
+        1. It needs to redirect for old Mongo courses.
+        2. It does NOT need to worry about exams - the MFE will handle
            those on its own. As of this writing, it will redirect back to
            the LMS experience, but that may change soon.
-        4. Finally, it needs to redirect users who are bucketed out of
+        3. Finally, it needs to redirect users who are bucketed out of
            the MFE experience, but who aren't staff. Staff are allowed to
            stay.
         """
-        # REDIRECT: feature disabled globally
-        if not settings.FEATURES.get('ENABLE_COURSEWARE_MICROFRONTEND'):
-            return False
         # REDIRECT: Old Mongo courses, until removed from platform
         if self.course_key.deprecated:
             return False
@@ -420,6 +414,7 @@ class CoursewareInformation(RetrieveAPIView):
 
     authentication_classes = (
         JwtAuthentication,
+        BearerAuthenticationAllowInactiveUser,
         SessionAuthenticationAllowInactiveUser,
     )
 

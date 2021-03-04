@@ -11,6 +11,7 @@ from opaque_keys.edx.keys import CourseKey
 from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthentication
 from edx_rest_framework_extensions.auth.session.authentication import SessionAuthenticationAllowInactiveUser
 from openedx.core.lib.api.authentication import BearerAuthenticationAllowInactiveUser
+from openedx.core.djangoapps.courseware_api.views import CoursewareMeta
 
 from common.djangoapps.student.models import CourseEnrollment, UserCelebration
 from lms.djangoapps.course_api.api import course_detail
@@ -84,6 +85,10 @@ class CourseHomeMetadataView(RetrieveAPIView):
                 request.user, course_key, browser_timezone
             )
         }
+
+        courseware_meta = CoursewareMeta(course_key, request, request.user.username)
+        can_load_courseware = courseware_meta.is_microfrontend_enabled_for_user()
+
         data = {
             'course_id': course.id,
             'is_staff': has_access(request.user, 'staff', course_key).has_access,
@@ -94,6 +99,7 @@ class CourseHomeMetadataView(RetrieveAPIView):
             'title': course.display_name_with_default,
             'is_self_paced': getattr(course, 'self_paced', False),
             'is_enrolled': user_is_enrolled,
+            'can_load_courseware': can_load_courseware,
             'celebrations': celebrations,
         }
         context = self.get_serializer_context()

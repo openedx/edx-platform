@@ -27,13 +27,24 @@ from xblock.fields import Boolean, Integer, List, Scope, String
 from edx_toggles.toggles import LegacyWaffleFlag
 from edx_toggles.toggles import WaffleFlag  # lint-amnesty, pylint: disable=unused-import
 from lms.djangoapps.courseware.toggles import COURSEWARE_PROCTORING_IMPROVEMENTS
+from xmodule.util.xmodule_django import add_webpack_to_fragment
+from xmodule.x_module import (
+    HTMLSnippet,
+    ResourceTemplates,
+    shim_xmodule_js,
+    STUDENT_VIEW,
+    XModuleDescriptorToXBlockMixin,
+    XModuleMixin,
+    XModuleToXBlockMixin,
+)
 
 from .exceptions import NotFoundError
 from .fields import Date
-from .mako_module import MakoModuleDescriptor
+from .mako_module import MakoTemplateBlockBase
 from .progress import Progress
 from .x_module import AUTHOR_VIEW, PUBLIC_VIEW, STUDENT_VIEW, XModule
-from .xml_module import XmlDescriptor
+from .xml_module import XmlMixin
+
 
 log = logging.getLogger(__name__)
 
@@ -89,6 +100,44 @@ class SequenceFields(object):  # lint-amnesty, pylint: disable=missing-class-doc
         default=False,
         scope=Scope.settings,
     )
+
+
+class SequenceMixin(SequenceFields):
+    """
+    A mixin of shared code between the SequenceBlock and other XBlocks.
+    """
+    @classmethod
+    def definition_from_xml(cls, xml_object, system):  # pylint: disable=missing-function-docstring
+        children = []
+        for child in xml_object:
+            try:
+                child_block = system.process_xml(etree.tostring(child, encoding='unicode'))
+                children.append(child_block.scope_ids.usage_id)
+            except Exception as e:  # pylint: disable=broad-except
+                log.exception("Unable to load child when parsing Sequence. Continuing...")
+                if system.error_tracker is not None:
+                    system.error_tracker(u"ERROR: {0}".format(e))
+                continue
+        return {}, children
+
+    def index_dictionary(self):
+        """
+        Return dictionary prepared with module content and type for indexing.
+        """
+        # return key/value fields in a Python dict object
+        # values may be numeric / string or dict
+        # default implementation is an empty dict
+        xblock_body = super().index_dictionary()
+        html_body = {
+            "display_name": self.display_name,
+        }
+        if "content" in xblock_body:
+            xblock_body["content"].update(html_body)
+        else:
+            xblock_body["content"] = html_body
+        xblock_body["content_type"] = "Sequence"
+
+        return xblock_body
 
 
 class ProctoringFields(object):
@@ -154,7 +203,7 @@ class ProctoringFields(object):
         """
         Return course by course id.
         """
-        return self.descriptor.runtime.modulestore.get_course(self.course_id)  # pylint: disable=no-member
+        return self.runtime.modulestore.get_course(self.course_id)  # pylint: disable=no-member
 
     @property
     def is_timed_exam(self):
@@ -192,22 +241,61 @@ class ProctoringFields(object):
 @XBlock.needs('bookmarks')
 @XBlock.needs('i18n')
 @XBlock.wants('content_type_gating')
-class SequenceModule(SequenceFields, ProctoringFields, XModule):
+class SequenceBlock(
+    SequenceMixin,
+    SequenceFields,
+    ProctoringFields,
+    MakoTemplateBlockBase,
+    XmlMixin,
+    XModuleDescriptorToXBlockMixin,
+    XModuleToXBlockMixin,
+    HTMLSnippet,
+    ResourceTemplates,
+    XModuleMixin,
+):
     """
     Layout module which lays out content in a temporal sequence
     """
-    js = {
-        'js': [resource_string(__name__, 'js/src/sequence/display.js')],
+    resources_dir = None
+    has_author_view = True
+
+    show_in_read_only_mode = True
+    uses_xmodule_styles_setup = True
+
+    preview_view_js = {
+        'js': [
+            resource_string(__name__, 'js/src/sequence/display.js'),
+        ],
+        'xmodule_js': resource_string(__name__, 'js/src/xmodule.js')
     }
-    css = {
-        'scss': [resource_string(__name__, 'css/sequence/display.scss')],
+
+    preview_view_css = {
+        'scss': [
+            resource_string(__name__, 'css/sequence/display.scss'),
+        ],
     }
-    js_module_name = "Sequence"
+
+    # There is no studio_view() for this XBlock but this is needed to make the
+    # the static_content command happy.
+    studio_view_js = {
+        'js': [],
+        'xmodule_js': resource_string(__name__, 'js/src/xmodule.js')
+    }
+
+    studio_view_css = {
+        'scss': []
+    }
 
     def __init__(self, *args, **kwargs):
-        super(SequenceModule, self).__init__(*args, **kwargs)  # lint-amnesty, pylint: disable=super-with-arguments
+        super().__init__(*args, **kwargs)
 
         self.gated_sequence_paywall = None
+
+    def bind_for_student(self, xmodule_runtime, user_id, wrappers=None):
+        # The position of the child XBlock to select can also be passed in via the URL.
+        # In such cases the value is set on the ModuleSystem in get_module_system_for_user()
+        # and needs to be read here after the ModuleSystem has been set on the XBlock.
+        super().bind_for_student(xmodule_runtime, user_id, wrappers)
         # If position is specified in system, then use that instead.
         position = getattr(self.system, 'position', None)
         if position is not None:
@@ -337,7 +425,10 @@ class SequenceModule(SequenceFields, ProctoringFields, XModule):
                 masquerading_as_specific_student = context.get('specific_masquerade', False)
                 banner_text, special_html = special_html_view
                 if special_html and not masquerading_as_specific_student:
-                    return Fragment(special_html)
+                    fragment = Fragment(special_html)
+                    add_webpack_to_fragment(fragment, 'SequenceBlockPreview')
+                    shim_xmodule_js(fragment, 'Sequence')
+                    return fragment
 
         return self._student_or_public_view(context, prereq_met, prereq_meta_info, banner_text)
 
@@ -431,7 +522,7 @@ class SequenceModule(SequenceFields, ProctoringFields, XModule):
             'is_time_limited': self.is_time_limited,
             'position': self.position,
             'tag': self.location.block_type,
-            'ajax_url': self.system.ajax_url,
+            'ajax_url': self.ajax_url,
             'next_url': context.get('next_url'),
             'prev_url': context.get('prev_url'),
             'banner_text': banner_text,
@@ -462,6 +553,8 @@ class SequenceModule(SequenceFields, ProctoringFields, XModule):
         self._capture_full_seq_item_metrics(display_items)
         self._capture_current_unit_metrics(display_items)
 
+        add_webpack_to_fragment(fragment, 'SequenceBlockPreview')
+        shim_xmodule_js(fragment, 'Sequence')
         return fragment
 
     def _get_gated_content_info(self, prereq_met, prereq_meta_info):
@@ -823,62 +916,6 @@ class SequenceModule(SequenceFields, ProctoringFields, XModule):
                 new_class = c
         return new_class
 
-
-class SequenceMixin(SequenceFields):
-    """
-    A mixin of shared code between the SequenceDescriptor and XBlocks
-    converted from XModules which inherited from SequenceDescriptor.
-    """
-    @classmethod
-    def definition_from_xml(cls, xml_object, system):  # lint-amnesty, pylint: disable=missing-function-docstring
-        children = []
-        for child in xml_object:
-            try:
-                child_block = system.process_xml(etree.tostring(child, encoding='unicode'))
-                children.append(child_block.scope_ids.usage_id)
-            except Exception as e:  # lint-amnesty, pylint: disable=broad-except
-                log.exception("Unable to load child when parsing Sequence. Continuing...")
-                if system.error_tracker is not None:
-                    system.error_tracker(u"ERROR: {0}".format(e))
-                continue
-        return {}, children
-
-    def index_dictionary(self):
-        """
-        Return dictionary prepared with module content and type for indexing.
-        """
-        # return key/value fields in a Python dict object
-        # values may be numeric / string or dict
-        # default implementation is an empty dict
-        xblock_body = super(SequenceMixin, self).index_dictionary()  # lint-amnesty, pylint: disable=super-with-arguments
-        html_body = {
-            "display_name": self.display_name,
-        }
-        if "content" in xblock_body:
-            xblock_body["content"].update(html_body)
-        else:
-            xblock_body["content"] = html_body
-        xblock_body["content_type"] = "Sequence"
-
-        return xblock_body
-
-
-class SequenceDescriptor(SequenceMixin, ProctoringFields, MakoModuleDescriptor, XmlDescriptor):
-    """
-    A Sequence's Descriptor object
-    """
-    mako_template = 'widgets/sequence-edit.html'
-    module_class = SequenceModule
-    resources_dir = None
-    has_author_view = True
-
-    show_in_read_only_mode = True
-
-    js = {
-        'js': [resource_string(__name__, 'js/src/sequence/edit.js')],
-    }
-    js_module_name = "SequenceDescriptor"
-
     def definition_to_xml(self, resource_fs):
         xml_object = etree.Element('sequential')
         for child in self.get_children():
@@ -890,7 +927,7 @@ class SequenceDescriptor(SequenceMixin, ProctoringFields, MakoModuleDescriptor, 
         """
         `is_entrance_exam` should not be editable in the Studio settings editor.
         """
-        non_editable_fields = super(SequenceDescriptor, self).non_editable_metadata_fields  # lint-amnesty, pylint: disable=super-with-arguments
+        non_editable_fields = super().non_editable_metadata_fields
         non_editable_fields.append(self.fields['is_entrance_exam'])  # pylint:disable=unsubscriptable-object
         return non_editable_fields
 
@@ -903,10 +940,7 @@ class HighlightsFields(object):
     )
 
 
-class SectionModule(HighlightsFields, SequenceModule):
-    """Module for a Section/Chapter."""
-
-
-class SectionDescriptor(HighlightsFields, SequenceDescriptor):
-    """Descriptor for a Section/Chapter."""
-    module_class = SectionModule
+class SectionBlock(HighlightsFields, SequenceBlock):
+    """
+    XBlock for a Section/Chapter.
+    """

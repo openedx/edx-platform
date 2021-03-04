@@ -1,7 +1,7 @@
 """
 CMS feature toggles.
 """
-from edx_toggles.toggles import SettingDictToggle, LegacyWaffleFlag, LegacyWaffleFlagNamespace
+from edx_toggles.toggles import LegacyWaffleFlag, LegacyWaffleFlagNamespace, SettingDictToggle
 
 # .. toggle_name: FEATURES['ENABLE_EXPORT_GIT']
 # .. toggle_implementation: SettingDictToggle
@@ -20,7 +20,7 @@ EXPORT_GIT = SettingDictToggle(
 
 # Namespace for studio dashboard waffle flags.
 WAFFLE_NAMESPACE = 'contentstore'
-WAFFLE_FLAG_NAMESPACE = LegacyWaffleFlagNamespace(name=WAFFLE_NAMESPACE, log_prefix=u'Contentstore: ')
+WAFFLE_FLAG_NAMESPACE = LegacyWaffleFlagNamespace(name=WAFFLE_NAMESPACE, log_prefix='Contentstore: ')
 
 # Waffle flag to split library to new view.
 # .. toggle_name: split_library_on_studio_dashboard

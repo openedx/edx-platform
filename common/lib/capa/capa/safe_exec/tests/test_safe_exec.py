@@ -74,7 +74,7 @@ class TestSafeExec(unittest.TestCase):  # lint-amnesty, pylint: disable=missing-
         g = {}
         with pytest.raises(SafeExecException) as cm:
             safe_exec("1/0", g)
-        assert 'ZeroDivisionError' in str(cm.exception)
+        assert 'ZeroDivisionError' in str(cm.value)
 
 
 class TestSafeOrNot(unittest.TestCase):  # lint-amnesty, pylint: disable=missing-class-docstring

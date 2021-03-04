@@ -1,6 +1,3 @@
-# -*- coding: utf-8 -*-  # lint-amnesty, pylint: disable=missing-module-docstring
-
-
 from django.db import migrations, models
 
 
@@ -14,7 +11,7 @@ class Migration(migrations.Migration):  # lint-amnesty, pylint: disable=missing-
         migrations.AddField(
             model_name='courseentitlementpolicy',
             name='mode',
-            field=models.CharField(max_length=32, null=True, choices=[(None, u'---------'), (u'verified', u'verified'), (u'professional', u'professional')]),  # lint-amnesty, pylint: disable=line-too-long
+            field=models.CharField(max_length=32, null=True, choices=[(None, '---------'), ('verified', 'verified'), ('professional', 'professional')]),  # lint-amnesty, pylint: disable=line-too-long
         ),
         migrations.AlterField(
             model_name='courseentitlementpolicy',

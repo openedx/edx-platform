@@ -15,7 +15,7 @@ class BrandingInfoConfigTest(TestCase):
     """
 
     def setUp(self):
-        super(BrandingInfoConfigTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.configuration_string = """{
             "CN": {
                     "url": "http://www.xuetangx.com",

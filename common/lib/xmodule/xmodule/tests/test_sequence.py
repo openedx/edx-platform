@@ -20,7 +20,7 @@ from web_fragments.fragment import Fragment
 from edx_toggles.toggles.testutils import override_waffle_flag
 from common.djangoapps.student.tests.factories import UserFactory
 from openedx.features.content_type_gating.models import ContentTypeGatingConfig
-from xmodule.seq_module import TIMED_EXAM_GATING_WAFFLE_FLAG, SequenceModule
+from xmodule.seq_module import TIMED_EXAM_GATING_WAFFLE_FLAG, SequenceBlock
 from xmodule.tests import get_test_system
 from xmodule.tests.helpers import StubUserService
 from xmodule.tests.xml import XModuleXmlImportTest
@@ -40,7 +40,7 @@ class SequenceBlockTestCase(XModuleXmlImportTest):
     """
 
     def setUp(self):
-        super(SequenceBlockTestCase, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
 
         course_xml = self._set_up_course_xml()
         self.course = self.process_xml(course_xml)
@@ -101,7 +101,6 @@ class SequenceBlockTestCase(XModuleXmlImportTest):
             return_value=Mock(vertical_is_complete=Mock(return_value=True))
         )
         block.xmodule_runtime._services['user'] = StubUserService()  # pylint: disable=protected-access
-        block.xmodule_runtime.xmodule_instance = getattr(block, '_xmodule', None)
         block.parent = parent.location
         return block
 
@@ -129,7 +128,7 @@ class SequenceBlockTestCase(XModuleXmlImportTest):
 
         # The render operation will ask modulestore for the current course to get some data. As these tests were
         # originally not written to be compatible with a real modulestore, we've mocked out the relevant return values.
-        with patch.object(SequenceModule, '_get_course') as mock_course:
+        with patch.object(SequenceBlock, '_get_course') as mock_course:
             self.course.self_paced = self_paced
             mock_course.return_value = self.course
             return sequence.xmodule_runtime.render(sequence, view, context).content
@@ -141,7 +140,10 @@ class SequenceBlockTestCase(XModuleXmlImportTest):
         assert "'position': {}".format(expected_position) in rendered_html
 
     def test_student_view_init(self):
-        seq_module = SequenceModule(runtime=Mock(position=2), descriptor=Mock(), scope_ids=Mock())
+        module_system = get_test_system()
+        module_system.position = 2
+        seq_module = SequenceBlock(runtime=module_system, scope_ids=Mock())
+        seq_module.bind_for_student(module_system, 34)
         assert seq_module.position == 2
         # matches position set in the runtime
 
@@ -164,7 +166,7 @@ class SequenceBlockTestCase(XModuleXmlImportTest):
         assert 'fa fa-check-circle check-circle is-hidden' not in html
 
     # pylint: disable=line-too-long
-    @patch('xmodule.seq_module.SequenceModule.gate_entire_sequence_if_it_is_a_timed_exam_and_contains_content_type_gated_problems')
+    @patch('xmodule.seq_module.SequenceBlock.gate_entire_sequence_if_it_is_a_timed_exam_and_contains_content_type_gated_problems')
     def test_timed_exam_gating_waffle_flag(self, mocked_function):  # pylint: disable=unused-argument
         """
         Verify the code inside the waffle flag is not executed with the flag off

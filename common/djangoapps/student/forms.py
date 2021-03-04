@@ -2,17 +2,10 @@
 Utility functions for validating forms
 """
 
-
-import re  # lint-amnesty, pylint: disable=unused-import
-from importlib import import_module  # lint-amnesty, pylint: disable=unused-import
-
 from django.conf import settings
-from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user, unused-import
 from django.contrib.auth.tokens import default_token_generator
-from django.core.exceptions import ValidationError  # lint-amnesty, pylint: disable=unused-import
 from django.urls import reverse
 from django.utils.http import int_to_base36
-from django.utils.translation import ugettext_lazy as _  # lint-amnesty, pylint: disable=unused-import
 from edx_ace import ace
 from edx_ace.recipient import Recipient
 
@@ -20,12 +13,9 @@ from openedx.core.djangoapps.ace_common.template_context import get_base_templat
 from openedx.core.djangoapps.lang_pref import LANGUAGE_KEY
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.theming.helpers import get_current_site
-from openedx.core.djangoapps.user_api import accounts as accounts_settings  # lint-amnesty, pylint: disable=unused-import
-from openedx.core.djangoapps.user_api.accounts.utils import is_secondary_email_feature_enabled  # lint-amnesty, pylint: disable=unused-import
 from openedx.core.djangoapps.user_authn.toggles import should_redirect_to_authn_microfrontend
 from openedx.core.djangoapps.user_api.preferences.api import get_user_preference
 from common.djangoapps.student.message_types import AccountRecovery as AccountRecoveryMessage
-from common.djangoapps.student.models import CourseEnrollmentAllowed, email_exists_or_retired  # lint-amnesty, pylint: disable=unused-import
 
 
 def send_account_recovery_email_for_user(user, request, email=None):

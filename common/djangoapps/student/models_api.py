@@ -35,8 +35,7 @@ def create_manual_enrollment_audit(  # lint-amnesty, pylint: disable=missing-fun
     user_email,
     state_transition,
     reason,
-    course_enrollment,
-    role
+    course_enrollment
 ):
     _ManualEnrollmentAudit.create_manual_enrollment_audit(
         user=enrolled_by,
@@ -44,7 +43,6 @@ def create_manual_enrollment_audit(  # lint-amnesty, pylint: disable=missing-fun
         state_transition=state_transition,
         reason=reason,
         enrollment=course_enrollment,
-        role=role,
     )
 
 

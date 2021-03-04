@@ -7,11 +7,11 @@ from datetime import timedelta
 
 from django.utils.timezone import now
 
+from common.djangoapps.student.tests.factories import UserFactory
 from lms.djangoapps.verify_student.models import SoftwareSecurePhotoVerification, VerificationDeadline
 from lms.djangoapps.verify_student.signals import _listen_for_course_publish, _listen_for_lms_retire
 from lms.djangoapps.verify_student.tests.factories import SoftwareSecurePhotoVerificationFactory
 from openedx.core.djangoapps.user_api.accounts.tests.retirement_helpers import fake_completed_retirement
-from common.djangoapps.student.tests.factories import UserFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
@@ -22,7 +22,7 @@ class VerificationDeadlineSignalTest(ModuleStoreTestCase):
     """
 
     def setUp(self):
-        super(VerificationDeadlineSignalTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.end = now().replace(microsecond=0) + timedelta(days=7)
         self.course = CourseFactory.create(end=self.end)
         VerificationDeadline.objects.all().delete()

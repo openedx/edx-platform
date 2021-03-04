@@ -4,8 +4,8 @@ Tests for branding page
 
 
 import datetime
+from unittest.mock import Mock, patch
 
-import six
 from django.conf import settings
 from django.contrib.auth.models import AnonymousUser
 from django.http import HttpResponseRedirect
@@ -13,14 +13,13 @@ from django.test.client import RequestFactory
 from django.test.utils import override_settings
 from django.urls import reverse
 from milestones.tests.utils import MilestonesTestCaseMixin
-from mock import Mock, patch
 from pytz import UTC
 
+from common.djangoapps.edxmako.shortcuts import render_to_response
+from common.djangoapps.util.milestones_helpers import set_prerequisite_courses
 from lms.djangoapps.branding.views import index
 from lms.djangoapps.courseware.tests.helpers import LoginEnrollmentTestCase
-from common.djangoapps.edxmako.shortcuts import render_to_response
 from openedx.core.djangoapps.site_configuration.tests.mixins import SiteMixin
-from common.djangoapps.util.milestones_helpers import set_prerequisite_courses
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
@@ -44,7 +43,7 @@ class AnonymousIndexPageTest(ModuleStoreTestCase):
     Tests that anonymous users can access the '/' page,  Need courses with start date
     """
     def setUp(self):
-        super(AnonymousIndexPageTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.factory = RequestFactory()
         self.course = CourseFactory.create(
             days_early_for_beta=5,
@@ -130,7 +129,7 @@ class PreRequisiteCourseCatalog(ModuleStoreTestCase, LoginEnrollmentTestCase, Mi
             emit_signals=True,
         )
 
-        pre_requisite_courses = [six.text_type(pre_requisite_course.id)]
+        pre_requisite_courses = [str(pre_requisite_course.id)]
 
         # for this failure to occur, the enrollment window needs to be in the past
         course = CourseFactory.create(
@@ -161,7 +160,7 @@ class IndexPageCourseCardsSortingTests(ModuleStoreTestCase):
     ENABLED_SIGNALS = ['course_published']
 
     def setUp(self):
-        super(IndexPageCourseCardsSortingTests, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.starting_later = CourseFactory.create(
             org='MITx',
             number='1000',

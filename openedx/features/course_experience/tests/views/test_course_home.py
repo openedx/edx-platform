@@ -92,7 +92,7 @@ def course_home_url(course):
     Returns the URL for the course's home page.
 
     Arguments:
-        course (CourseDescriptor): The course being tested.
+        course (CourseBlock): The course being tested.
     """
     return course_home_url_from_string(six.text_type(course.id))
 
@@ -286,7 +286,7 @@ class TestCourseHomePageAccess(CourseHomePageTestCase):
         self.create_user_for_course(self.course, user_type)
 
         # Render the course home page
-        with mock.patch('xmodule.course_module.CourseDescriptor.course_visibility', course_visibility):
+        with mock.patch('xmodule.course_module.CourseBlock.course_visibility', course_visibility):
             # Test access with anonymous flag and course visibility
             with override_waffle_flag(COURSE_ENABLE_UNENROLLED_ACCESS_FLAG, enable_unenrolled_access):
                 url = course_home_url(self.course)

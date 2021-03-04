@@ -10,9 +10,6 @@ from unittest import mock
 
 import ddt
 from lxml import etree
-
-# Changes formatting of empty elements; import here to avoid test order dependence
-import xmodule.modulestore.xml  # pylint: disable=unused-import
 from capa.tests.helpers import new_loncapa_problem, test_capa_system
 from openedx.core.djangolib.markup import HTML
 

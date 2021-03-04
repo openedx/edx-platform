@@ -100,6 +100,7 @@ class TestXblockUtils(SharedModuleStoreTestCase):
         Verify that new content is added and the resources are the same.
         """
         fragment = self.create_fragment(u"<h1>Test!</h1>")
+        fragment.initialize_js('BlockMain')  # wrap_block() sets some attributes only if there is JS.
         course = getattr(self, course_id)
         test_wrap_output = wrap_xblock(
             runtime_class='TestRuntime',

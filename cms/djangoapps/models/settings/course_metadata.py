@@ -6,23 +6,21 @@ Django module for Course Metadata class -- manages advanced settings and related
 from datetime import datetime
 
 import pytz
-import six
 from crum import get_current_user
 from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.utils.translation import ugettext as _
-from six import text_type
 from xblock.fields import Scope
 
 from cms.djangoapps.contentstore import toggles
-from openedx.core.lib.teams_config import TeamsetType
-from openedx.features.course_experience import COURSE_ENABLE_UNENROLLED_ACCESS_FLAG
 from common.djangoapps.student.roles import GlobalStaff
 from common.djangoapps.xblock_django.models import XBlockStudioConfigurationFlag
+from openedx.core.lib.teams_config import TeamsetType
+from openedx.features.course_experience import COURSE_ENABLE_UNENROLLED_ACCESS_FLAG
 from xmodule.modulestore.django import modulestore
 
 
-class CourseMetadata(object):
+class CourseMetadata:
     '''
     For CRUD operations on metadata fields which do not have specific editors
     on the other pages including any user generated ones.
@@ -158,7 +156,7 @@ class CourseMetadata(object):
         metadata = cls.fetch_all(descriptor)
         exclude_list_of_fields = cls.get_exclude_list_of_fields(descriptor.id)
 
-        for key, value in six.iteritems(metadata):
+        for key, value in metadata.items():
             if key in exclude_list_of_fields:
                 continue
             result[key] = value
@@ -203,7 +201,7 @@ class CourseMetadata(object):
         # Validate the values before actually setting them.
         key_values = {}
 
-        for key, model in six.iteritems(jsondict):
+        for key, model in jsondict.items():
             # should it be an error if one of the filtered list items is in the payload?
             if key in exclude_list_of_fields:
                 continue
@@ -212,8 +210,8 @@ class CourseMetadata(object):
                 if hasattr(descriptor, key) and getattr(descriptor, key) != val:
                     key_values[key] = descriptor.fields[key].from_json(val)
             except (TypeError, ValueError) as err:
-                raise ValueError(_(u"Incorrect format for field '{name}'. {detailed_message}").format(  # lint-amnesty, pylint: disable=raise-missing-from
-                    name=model['display_name'], detailed_message=text_type(err)))
+                raise ValueError(_("Incorrect format for field '{name}'. {detailed_message}").format(  # lint-amnesty, pylint: disable=raise-missing-from
+                    name=model['display_name'], detailed_message=str(err)))
 
         return cls.update_from_dict(key_values, descriptor, user)
 
@@ -236,20 +234,20 @@ class CourseMetadata(object):
         if not filter_tabs:
             exclude_list_of_fields.remove("tabs")
 
-        filtered_dict = dict((k, v) for k, v in six.iteritems(jsondict) if k not in exclude_list_of_fields)
+        filtered_dict = {k: v for k, v in jsondict.items() if k not in exclude_list_of_fields}
         did_validate = True
         errors = []
         key_values = {}
         updated_data = None
 
-        for key, model in six.iteritems(filtered_dict):
+        for key, model in filtered_dict.items():
             try:
                 val = model['value']
                 if hasattr(descriptor, key) and getattr(descriptor, key) != val:
                     key_values[key] = descriptor.fields[key].from_json(val)
             except (TypeError, ValueError, ValidationError) as err:
                 did_validate = False
-                errors.append({'key': key, 'message': text_type(err), 'model': model})
+                errors.append({'key': key, 'message': str(err), 'model': model})
 
         team_setting_errors = cls.validate_team_settings(filtered_dict)
         if team_setting_errors:
@@ -272,7 +270,7 @@ class CourseMetadata(object):
         """
         Update metadata descriptor from key_values. Saves to modulestore if save is true.
         """
-        for key, value in six.iteritems(key_values):
+        for key, value in key_values.items():
             setattr(descriptor, key, value)
 
         if save and key_values:

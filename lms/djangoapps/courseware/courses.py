@@ -154,7 +154,7 @@ def get_course_overview_with_access(user, action, course_key, check_if_enrolled=
 def check_course_access(course, user, action, check_if_enrolled=False, check_survey_complete=True, check_if_authenticated=False):  # lint-amnesty, pylint: disable=line-too-long
     """
     Check that the user has the access to perform the specified action
-    on the course (CourseDescriptor|CourseOverview).
+    on the course (CourseBlock|CourseOverview).
 
     check_if_enrolled: If true, additionally verifies that the user is enrolled.
     check_survey_complete: If true, additionally verifies that the user has completed the survey.
@@ -200,7 +200,7 @@ def check_course_access(course, user, action, check_if_enrolled=False, check_sur
 def check_course_access_with_redirect(course, user, action, check_if_enrolled=False, check_survey_complete=True, check_if_authenticated=False):  # lint-amnesty, pylint: disable=line-too-long
     """
     Check that the user has the access to perform the specified action
-    on the course (CourseDescriptor|CourseOverview).
+    on the course (CourseBlock|CourseOverview).
 
     check_if_enrolled: If true, additionally verifies that the user is enrolled.
     check_survey_complete: If true, additionally verifies that the user has completed the survey.
@@ -769,7 +769,7 @@ def get_studio_url(course, page):
     Get the Studio URL of the page that is passed in.
 
     Args:
-        course (CourseDescriptor)
+        course (CourseBlock)
     """
     studio_link = None
     if course.course_edit_method == "Studio":

@@ -7,7 +7,6 @@ import os
 import shutil
 import tempfile
 
-import six
 from django.core.management import call_command
 from path import Path as path
 
@@ -26,9 +25,9 @@ class TestImport(ModuleStoreTestCase):
         directory = tempfile.mkdtemp(dir=content_dir)
         os.makedirs(os.path.join(directory, "course"))
         with open(os.path.join(directory, "course.xml"), "w+") as f:
-            f.write(u'<course url_name="{0.run}" org="{0.org}" course="{0.course}"/>'.format(course_id))
+            f.write('<course url_name="{0.run}" org="{0.org}" course="{0.course}"/>'.format(course_id))
 
-        with open(os.path.join(directory, "course", "{0.run}.xml".format(course_id)), "w+") as f:
+        with open(os.path.join(directory, "course", f"{course_id.run}.xml"), "w+") as f:
             f.write('<course><chapter name="Test Chapter"></chapter></course>')
 
         return directory
@@ -37,12 +36,12 @@ class TestImport(ModuleStoreTestCase):
         """
         Build course XML for importing
         """
-        super(TestImport, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.content_dir = path(tempfile.mkdtemp())
         self.addCleanup(shutil.rmtree, self.content_dir)
 
-        self.base_course_key = self.store.make_course_key(u'edX', u'test_import_course', u'2013_Spring')
-        self.truncated_key = self.store.make_course_key(u'edX', u'test_import', u'2014_Spring')
+        self.base_course_key = self.store.make_course_key('edX', 'test_import_course', '2013_Spring')
+        self.truncated_key = self.store.make_course_key('edX', 'test_import', '2014_Spring')
 
         # Create good course xml
         self.good_dir = self.create_course_xml(self.content_dir, self.base_course_key)
@@ -93,4 +92,4 @@ class TestImport(ModuleStoreTestCase):
             course = modulestore().get_course(self.base_course_key)
             # With the bug, this fails because the chapter's course_key is the split mongo form,
             # while the course's course_key is the old mongo form.
-            self.assertEqual(six.text_type(course.location.course_key), six.text_type(course.children[0].course_key))
+            self.assertEqual(str(course.location.course_key), str(course.children[0].course_key))
