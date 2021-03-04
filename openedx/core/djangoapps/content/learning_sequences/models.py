@@ -58,14 +58,17 @@ class LearningContext(TimeStampedModel):
     context_key = LearningContextKeyField(
         max_length=255, db_index=True, unique=True, null=False
     )
-    title = models.CharField(max_length=255)
+    title = models.CharField(max_length=255, db_index=True)
     published_at = models.DateTimeField(null=False)
     published_version = models.CharField(max_length=255)
 
     class Meta:
         indexes = [
-            models.Index(fields=['-published_at'])
+            models.Index(fields=['-published_at']),
         ]
+
+    def __str__(self):
+        return f"LearningContext for {self.context_key}"
 
 
 class CourseContext(TimeStampedModel):

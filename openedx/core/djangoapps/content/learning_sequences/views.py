@@ -169,8 +169,8 @@ class CourseOutlineView(APIView):
         # Grab the user's outline and send our response...
         try:
             user_course_outline_details = get_user_course_outline_details(course_key, user, at_time)
-        except CourseOutlineData.DoesNotExist:
-            raise NotFound()
+        except CourseOutlineData.DoesNotExist as does_not_exist_err:
+            raise NotFound() from does_not_exist_err
 
         serializer = self.UserCourseOutlineDataSerializer(user_course_outline_details)
         return Response(serializer.data)

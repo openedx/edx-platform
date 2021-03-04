@@ -3,22 +3,23 @@ Top level API tests. Tests API public contracts only. Do not import/create/mock
 models for this app.
 """
 from datetime import datetime, timezone
-from mock import patch
+from unittest import TestCase
+
 import pytest
 import attr
 from django.conf import settings
 from django.contrib.auth.models import AnonymousUser, User  # lint-amnesty, pylint: disable=imported-auth-user
 from edx_proctoring.exceptions import ProctoredExamNotFoundException
 from edx_when.api import set_dates_for_course
-from opaque_keys.edx.keys import CourseKey, UsageKey  # lint-amnesty, pylint: disable=unused-import
-from opaque_keys.edx.locator import BlockUsageLocator  # lint-amnesty, pylint: disable=unused-import
+from mock import patch
+from opaque_keys.edx.keys import CourseKey
+from opaque_keys.edx.locator import LibraryLocator
 
 from edx_toggles.toggles.testutils import override_waffle_flag
 from lms.djangoapps.courseware.tests.factories import BetaTesterFactory
 from openedx.core.djangolib.testing.utils import CacheIsolationTestCase
 from openedx.features.course_experience import COURSE_ENABLE_UNENROLLED_ACCESS_FLAG
 from common.djangoapps.student.auth import user_has_role
-from common.djangoapps.student.models import CourseEnrollment  # lint-amnesty, pylint: disable=unused-import
 from common.djangoapps.student.roles import CourseBetaTesterRole
 
 from ...data import (
@@ -33,9 +34,23 @@ from ..outlines import (
     get_course_outline,
     get_user_course_outline,
     get_user_course_outline_details,
-    replace_course_outline
+    key_supports_outlines,
+    replace_course_outline,
 )
 from .test_data import generate_sections
+
+
+class OutlineSupportTestCase(TestCase):
+    """
+    Make sure we know what kinds of course-like keys we support for outlines.
+    """
+    def test_supported_types(self):
+        assert key_supports_outlines(CourseKey.from_string("course-v1:edX+100+2021"))
+        assert key_supports_outlines(CourseKey.from_string("ccx-v1:edX+100+2021+ccx@1"))
+
+    def test_unsupported_types(self):
+        assert not key_supports_outlines(CourseKey.from_string("edX/100/2021"))
+        assert not key_supports_outlines(LibraryLocator(org="edX", library="100"))
 
 
 class CourseOutlineTestCase(CacheIsolationTestCase):
