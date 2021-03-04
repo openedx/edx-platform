@@ -9,7 +9,6 @@ from django.core.cache import cache
 from django.db import transaction
 from django.http import Http404, HttpResponse
 from django.shortcuts import redirect
-from django.urls import reverse  # lint-amnesty, pylint: disable=unused-import
 from django.urls.exceptions import NoReverseMatch
 from django.utils import translation
 from django.utils.translation.trans_real import get_supported_language_variant

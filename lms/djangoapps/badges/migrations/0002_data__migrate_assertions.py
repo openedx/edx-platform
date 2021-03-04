@@ -11,7 +11,6 @@ def forwards(apps, schema_editor):
     """
     Migrate the initial badge classes, assertions, and course image configurations from lms.djangoapps.certificates.
     """
-    from django.core.files.base import ContentFile
     from xmodule.modulestore.django import modulestore
     from lms.djangoapps.badges.events import course_complete
     db_alias = schema_editor.connection.alias
