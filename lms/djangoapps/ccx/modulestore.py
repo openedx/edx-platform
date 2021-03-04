@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """A modulestore wrapper
 
 It will 'unwrap' ccx keys on the way in and re-wrap them on the way out
@@ -14,7 +13,6 @@ version that was passed in.
 from contextlib import contextmanager
 from functools import partial
 
-import six
 from ccx_keys.locator import CCXBlockUsageLocator, CCXLocator
 from opaque_keys.edx.locator import BlockUsageLocator, CourseLocator
 
@@ -71,7 +69,7 @@ def restore_ccx_collection(field_value, ccx_id=None):
     if isinstance(field_value, list):
         field_value = [restore_ccx(fv, ccx_id) for fv in field_value]
     elif isinstance(field_value, dict):
-        for key, val in six.iteritems(field_value):
+        for key, val in field_value.items():
             field_value[key] = restore_ccx(val, ccx_id)
     else:
         field_value = restore_ccx(field_value, ccx_id)
@@ -88,7 +86,7 @@ def remove_ccx(to_strip):
     yield stripped, partial(restore_ccx_collection, ccx_id=ccx)
 
 
-class CCXModulestoreWrapper(object):
+class CCXModulestoreWrapper:
     """This class wraps a modulestore
 
     The purpose is to remove ccx-specific identifiers during lookup and restore

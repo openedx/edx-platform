@@ -6,7 +6,6 @@ Tests for the Bulk Enrollment views.
 import json
 
 import ddt
-import six
 from django.conf import settings
 from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.core import mail
@@ -15,14 +14,19 @@ from django.urls import reverse
 from opaque_keys.edx.keys import CourseKey
 from rest_framework.test import APIRequestFactory, APITestCase, force_authenticate
 
+from common.djangoapps.student.models import (  # lint-amnesty, pylint: disable=line-too-long
+    ENROLLED_TO_UNENROLLED,
+    UNENROLLED_TO_ENROLLED,
+    CourseEnrollment,
+    ManualEnrollmentAudit
+)
+from common.djangoapps.student.tests.factories import UserFactory
 from lms.djangoapps.bulk_enroll.serializers import BulkEnrollmentSerializer
 from lms.djangoapps.bulk_enroll.views import BulkEnrollView
 from lms.djangoapps.courseware.tests.helpers import LoginEnrollmentTestCase
 from openedx.core.djangoapps.course_groups.cohorts import get_cohort_id
 from openedx.core.djangoapps.course_groups.tests.helpers import config_course_cohorts
 from openedx.core.djangoapps.site_configuration.helpers import get_value as get_site_value
-from common.djangoapps.student.models import ENROLLED_TO_UNENROLLED, UNENROLLED_TO_ENROLLED, CourseEnrollment, ManualEnrollmentAudit  # lint-amnesty, pylint: disable=line-too-long
-from common.djangoapps.student.tests.factories import UserFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
@@ -40,7 +44,7 @@ class BulkEnrollmentTest(ModuleStoreTestCase, LoginEnrollmentTestCase, APITestCa
 
     def setUp(self):
         """ Create a course and user, then log in. """
-        super(BulkEnrollmentTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
 
         self.view = BulkEnrollView.as_view()
         self.request_factory = APIRequestFactory()
@@ -54,7 +58,7 @@ class BulkEnrollmentTest(ModuleStoreTestCase, LoginEnrollmentTestCase, APITestCa
         )
 
         self.course = CourseFactory.create()
-        self.course_key = six.text_type(self.course.id)
+        self.course_key = str(self.course.id)
         self.enrolled_student = UserFactory(username='EnrolledStudent', first_name='Enrolled', last_name='Student')
         CourseEnrollment.enroll(
             self.enrolled_student,
@@ -68,8 +72,8 @@ class BulkEnrollmentTest(ModuleStoreTestCase, LoginEnrollmentTestCase, APITestCa
             'SITE_NAME',
             settings.SITE_NAME
         )
-        self.about_path = '/courses/{}/about'.format(self.course.id)
-        self.course_path = '/courses/{}/'.format(self.course.id)
+        self.about_path = f'/courses/{self.course.id}/about'
+        self.course_path = f'/courses/{self.course.id}/'
 
     def request_bulk_enroll(self, data=None, use_json=False, **extra):
         """ Make an authenticated request to the bulk enrollment API. """
@@ -368,7 +372,7 @@ class BulkEnrollmentTest(ModuleStoreTestCase, LoginEnrollmentTestCase, APITestCa
         })
         self.assertContains(
             response,
-            u'cohort {cohort_name} not found in course {course_id}.'.format(
+            'cohort {cohort_name} not found in course {course_id}.'.format(
                 cohort_name='cohort1', course_id=self.course_key
             ),
             status_code=400,
