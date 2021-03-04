@@ -4,7 +4,6 @@
 import unittest
 
 from lxml import etree
-from mock import Mock  # lint-amnesty, pylint: disable=unused-import
 from opaque_keys.edx.locator import BlockUsageLocator, CourseLocator
 from xblock.field_data import DictFieldData
 from xblock.fields import ScopeIds

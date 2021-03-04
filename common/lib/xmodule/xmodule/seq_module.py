@@ -12,7 +12,6 @@ from datetime import datetime
 from functools import reduce
 
 import six
-from django.contrib.auth import get_user_model
 from lxml import etree
 from opaque_keys.edx.keys import UsageKey
 from pkg_resources import resource_string
@@ -25,7 +24,6 @@ from xblock.exceptions import NoSuchServiceError
 from xblock.fields import Boolean, Integer, List, Scope, String
 
 from edx_toggles.toggles import LegacyWaffleFlag
-from edx_toggles.toggles import WaffleFlag  # lint-amnesty, pylint: disable=unused-import
 from lms.djangoapps.courseware.toggles import COURSEWARE_PROCTORING_IMPROVEMENTS
 from xmodule.util.xmodule_django import add_webpack_to_fragment
 from xmodule.x_module import (
