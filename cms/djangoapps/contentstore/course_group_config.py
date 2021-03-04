@@ -102,7 +102,7 @@ class GroupConfiguration:
         """
         Return a list of IDs that already in use.
         """
-        return {p.id for p in get_all_partitions_for_course(course)}  # lint-amnesty, pylint: disable=consider-using-set-comprehension
+        return {p.id for p in get_all_partitions_for_course(course)}
 
     def get_user_partition(self):
         """
