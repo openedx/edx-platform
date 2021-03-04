@@ -22,8 +22,8 @@ from django.urls import reverse
 from django.utils.translation import ugettext as _
 from six.moves.urllib.parse import urljoin
 
-from lms.djangoapps.branding.models import BrandingApiConfig
 from common.djangoapps.edxmako.shortcuts import marketing_link
+from lms.djangoapps.branding.models import BrandingApiConfig
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 
 log = logging.getLogger("edx.footer")
@@ -126,9 +126,9 @@ def _footer_copyright():
     return _(
         # Translators: 'edX' and 'Open edX' are trademarks of 'edX Inc.'.
         # Please do not translate any of these trademarks and company names.
-        u"\u00A9 {org_name}.  All rights reserved except where noted.  "
-        u"edX, Open edX and their respective logos are "
-        u"registered trademarks of edX Inc."
+        "\u00A9 {org_name}.  All rights reserved except where noted.  "
+        "edX, Open edX and their respective logos are "
+        "registered trademarks of edX Inc."
     ).format(org_name=configuration_helpers.get_value('PLATFORM_NAME', settings.PLATFORM_NAME))
 
 
@@ -165,10 +165,10 @@ def _footer_social_links():
         links.append(
             {
                 "name": social_name,
-                "title": six.text_type(display.get("title", "")),
+                "title": str(display.get("title", "")),
                 "url": settings.SOCIAL_MEDIA_FOOTER_URLS.get(social_name, "#"),
                 "icon-class": display.get("icon", ""),
-                "action": six.text_type(display.get("action", "")).format(platform_name=platform_name),
+                "action": str(display.get("action", "")).format(platform_name=platform_name),
             }
         )
     return links
@@ -215,7 +215,7 @@ def _build_support_form_url(full_path=False):
 
             # Prepend with lms base_url if specified by `full_path`
             if full_path:
-                contact_us_page = '{}{}'.format(settings.LMS_ROOT_URL, contact_us_page)
+                contact_us_page = f'{settings.LMS_ROOT_URL}{contact_us_page}'
 
     return contact_us_page
 
@@ -277,7 +277,7 @@ def _footer_navigation_links(language=settings.LANGUAGE_CODE):
         ("about", (marketing_link("ABOUT"), _("About"))),
         ("enterprise", (
             marketing_link("ENTERPRISE"),
-            _(u"{platform_name} for Business").format(platform_name=platform_name)
+            _("{platform_name} for Business").format(platform_name=platform_name)
         )),
         ("blog", (marketing_link("BLOG"), _("Blog"))),
         ("help-center", (_build_help_center_url(language), _("Help Center"))),
@@ -353,7 +353,7 @@ def _footer_business_links(language=settings.LANGUAGE_CODE):
         ("about", (marketing_link("ABOUT"), _("About"))),
         ("enterprise", (
             _add_enterprise_marketing_footer_query_params(marketing_link("ENTERPRISE")),
-            _(u"{platform_name} for Business").format(platform_name=platform_name)
+            _("{platform_name} for Business").format(platform_name=platform_name)
         )),
     ]
 
@@ -424,7 +424,7 @@ def _footer_mobile_links(is_secure):
             {
                 "name": "apple",
                 "title": _(
-                    u"Download the {platform_name} mobile app from the Apple App Store"
+                    "Download the {platform_name} mobile app from the Apple App Store"
                 ).format(platform_name=platform_name),
                 "url": settings.MOBILE_STORE_URLS.get('apple', '#'),
                 "image": _absolute_url_staticfile(is_secure, 'images/app/app_store_badge_135x40.svg'),
@@ -432,7 +432,7 @@ def _footer_mobile_links(is_secure):
             {
                 "name": "google",
                 "title": _(
-                    u"Download the {platform_name} mobile app from Google Play"
+                    "Download the {platform_name} mobile app from Google Play"
                 ).format(platform_name=platform_name),
                 "url": settings.MOBILE_STORE_URLS.get('google', '#'),
                 "image": _absolute_url_staticfile(is_secure, 'images/app/google_play_badge_45.png'),
@@ -586,7 +586,7 @@ def get_logo_url(is_secure=True):
         return _absolute_url_staticfile(is_secure=is_secure, name=logo_url_from_site_config)
 
     if university:
-        return staticfiles_storage.url('images/{uni}-on-edx-logo.png'.format(uni=university))
+        return staticfiles_storage.url(f'images/{university}-on-edx-logo.png')
 
     if brand_logo_url:
         return brand_logo_url
