@@ -3,9 +3,8 @@ Tests for the CORS CSRF middleware
 """
 
 
-from mock import patch, Mock
+from unittest.mock import patch, Mock
 import ddt
-import six
 import pytest
 from django.test import TestCase
 from django.test.utils import override_settings
@@ -34,7 +33,7 @@ class TestCorsMiddlewareProcessRequest(TestCase):
 
     @override_settings(FEATURES={'ENABLE_CORS_HEADERS': True})
     def setUp(self):
-        super(TestCorsMiddlewareProcessRequest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.middleware = CorsCSRFMiddleware()
 
     def check_not_enabled(self, request):
@@ -114,7 +113,7 @@ class TestCsrfCrossDomainCookieMiddleware(TestCase):
         CROSS_DOMAIN_CSRF_COOKIE_DOMAIN=COOKIE_DOMAIN
     )
     def setUp(self):
-        super(TestCsrfCrossDomainCookieMiddleware, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.middleware = CsrfCrossDomainCookieMiddleware()
 
     @override_settings(FEATURES={'ENABLE_CROSS_DOMAIN_CSRF_COOKIE': False})
@@ -263,9 +262,9 @@ class TestCsrfCrossDomainCookieMiddleware(TestCase):
         """Check that the cross-domain CSRF cookie was sent. """
         if is_set:
             assert self.COOKIE_NAME in response.cookies
-            cookie_header = six.text_type(response.cookies[self.COOKIE_NAME])
+            cookie_header = str(response.cookies[self.COOKIE_NAME])
             # lint-amnesty, pylint: disable=bad-option-value, unicode-format-string
-            expected = six.u('Set-Cookie: {name}={value}; Domain={domain};').format(
+            expected = 'Set-Cookie: {name}={value}; Domain={domain};'.format(
                 name=self.COOKIE_NAME,
                 value=self.COOKIE_VALUE,
                 domain=self.COOKIE_DOMAIN
