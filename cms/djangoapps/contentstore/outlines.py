@@ -14,7 +14,7 @@ from openedx.core.djangoapps.content.learning_sequences.data import (
     CourseSectionData,
     CourseVisibility,
     ExamData,
-    VisibilityData,
+    VisibilityData
 )
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
