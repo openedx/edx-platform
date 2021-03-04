@@ -28,9 +28,9 @@ def update_ccxcon(course_id, cur_retry=0):
     course_key = CourseKey.from_string(course_id)
     try:
         api.course_info_to_ccxcon(course_key)
-        log.info(u'Course update to CCXCon returned no errors. Course key: %s', course_id)
+        log.info('Course update to CCXCon returned no errors. Course key: %s', course_id)
     except (ConnectionError, HTTPError, RequestException, TooManyRedirects, api.CCXConnServerError) as exp:
-        log.error(u'Course update to CCXCon failed for course_id %s with error: %s', course_id, exp)
+        log.error('Course update to CCXCon failed for course_id %s with error: %s', course_id, exp)
         # in case the maximum amount of retries has not been reached,
         # insert another task delayed exponentially up to 5 retries
         if cur_retry < 5:
@@ -38,4 +38,4 @@ def update_ccxcon(course_id, cur_retry=0):
                 kwargs={'course_id': course_id, 'cur_retry': cur_retry + 1},
                 countdown=10 ** cur_retry  # number of seconds the task should be delayed
             )
-            log.info(u'Requeued celery task for course key %s ; retry # %s', course_id, cur_retry + 1)
+            log.info('Requeued celery task for course key %s ; retry # %s', course_id, cur_retry + 1)

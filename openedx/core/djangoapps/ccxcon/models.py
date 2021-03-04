@@ -20,13 +20,13 @@ class CCXCon(models.Model):
     oauth_client_secret = models.CharField(max_length=255)
     title = models.CharField(max_length=255)
 
-    class Meta(object):
+    class Meta:
         app_label = 'ccxcon'
         verbose_name = 'CCX Connector'
         verbose_name_plural = 'CCX Connectors'
 
     def __repr__(self):
-        return '<CCXCon {}>'.format(self.title)
+        return f'<CCXCon {self.title}>'
 
     def __str__(self):
         return self.title
