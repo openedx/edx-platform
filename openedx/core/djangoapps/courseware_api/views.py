@@ -489,7 +489,7 @@ class SequenceMetadata(DeveloperErrorViewMixin, APIView):
         try:
             usage_key = UsageKey.from_string(usage_key_string)
         except InvalidKeyError:
-            raise NotFound("Invalid usage key: '{}'.".format(usage_key_string))  # lint-amnesty, pylint: disable=raise-missing-from
+            raise NotFound(f"Invalid usage key: '{usage_key_string}'.")  # lint-amnesty, pylint: disable=raise-missing-from
 
         _, request.user = setup_masquerade(
             request,

@@ -8,7 +8,7 @@ import logging
 
 from celery import shared_task
 from django.conf import settings  # lint-amnesty, pylint: disable=unused-import
-from django.utils import six, timezone
+from django.utils import timezone
 from edx_django_utils.cache import RequestCache
 from edx_django_utils.monitoring import set_code_owner_attribute
 from opaque_keys.edx.keys import CourseKey
@@ -24,7 +24,7 @@ celery_log = logging.getLogger('edx.celery.task')
 bolt_log = logging.getLogger('neo4j.bolt')  # pylint: disable=invalid-name
 bolt_log.setLevel(logging.ERROR)
 
-PRIMITIVE_NEO4J_TYPES = (integer, string, six.text_type, float, bool)
+PRIMITIVE_NEO4J_TYPES = (integer, string, str, float, bool)
 
 
 def serialize_item(item):
@@ -40,23 +40,23 @@ def serialize_item(item):
     from xmodule.modulestore.store_utilities import DETACHED_XBLOCK_TYPES
 
     # convert all fields to a dict and filter out parent and children field
-    fields = dict(
-        (field, field_value.read_from(item))
-        for (field, field_value) in six.iteritems(item.fields)
+    fields = {
+        field: field_value.read_from(item)
+        for (field, field_value) in item.fields.items()
         if field not in ['parent', 'children']
-    )
+    }
 
     course_key = item.scope_ids.usage_id.course_key
     block_type = item.scope_ids.block_type
 
     # set or reset some defaults
-    fields['edited_on'] = six.text_type(getattr(item, 'edited_on', ''))
+    fields['edited_on'] = str(getattr(item, 'edited_on', ''))
     fields['display_name'] = item.display_name_with_default
     fields['org'] = course_key.org
     fields['course'] = course_key.course
     fields['run'] = course_key.run
-    fields['course_key'] = six.text_type(course_key)
-    fields['location'] = six.text_type(item.location)
+    fields['course_key'] = str(course_key)
+    fields['location'] = str(item.location)
     fields['block_type'] = block_type
     fields['detached'] = block_type in DETACHED_XBLOCK_TYPES
 
@@ -66,7 +66,7 @@ def serialize_item(item):
             del fields['checklists']
 
         # record the time this command was run
-        fields['time_last_dumped_to_neo4j'] = six.text_type(timezone.now())
+        fields['time_last_dumped_to_neo4j'] = str(timezone.now())
 
     return fields, block_type
 
@@ -81,12 +81,12 @@ def coerce_types(value):
     """
     coerced_value = value
     if isinstance(value, list):
-        coerced_value = [six.text_type(element) for element in coerced_value]
+        coerced_value = [str(element) for element in coerced_value]
 
     # if it's not one of the types that neo4j accepts,
     # just convert it to text
     elif not isinstance(value, PRIMITIVE_NEO4J_TYPES):
-        coerced_value = six.text_type(value)
+        coerced_value = str(value)
 
     return coerced_value
 
@@ -114,7 +114,7 @@ def get_command_last_run(course_key, graph):
     selector = NodeSelector(graph)
     course_node = selector.select(
         "course",
-        course_key=six.text_type(course_key)
+        course_key=str(course_key)
     ).first()
 
     last_this_command_was_run = None
@@ -144,7 +144,7 @@ def get_course_last_published(course_key):
     course_usage_key = store.make_course_usage_key(course_key)
     try:
         structure = BlockStructureModel.get(course_usage_key)
-        course_last_published_date = six.text_type(structure.modified)
+        course_last_published_date = str(structure.modified)
     except BlockStructureNotFound:
         course_last_published_date = None
 
@@ -183,7 +183,7 @@ def serialize_course(course_id):
     for item in items:
         fields, block_type = serialize_item(item)
 
-        for field_name, value in six.iteritems(fields):
+        for field_name, value in fields.items():
             fields[field_name] = coerce_types(value)
 
         node = Node(block_type, 'item', **fields)
@@ -270,7 +270,7 @@ def dump_course_to_neo4j(course_key_string, credentials):
     graph = authenticate_and_create_graph(credentials)
 
     transaction = graph.begin()
-    course_string = six.text_type(course_key)
+    course_string = str(course_key)
     try:
         # first, delete existing course
         transaction.run(
@@ -293,7 +293,7 @@ def dump_course_to_neo4j(course_key_string, credentials):
         transaction.rollback()
 
 
-class ModuleStoreSerializer(object):
+class ModuleStoreSerializer:
     """
     Class with functionality to serialize a modulestore into subgraphs,
     one graph per course.
@@ -361,13 +361,13 @@ class ModuleStoreSerializer(object):
 
             if not (override_cache or should_dump_course(course_key, graph)):
                 log.info("skipping submitting %s, since it hasn't changed", course_key)
-                skipped_courses.append(six.text_type(course_key))
+                skipped_courses.append(str(course_key))
                 continue
 
             dump_course_to_neo4j.apply_async(
-                args=[six.text_type(course_key), credentials],
+                args=[str(course_key), credentials],
             )
-            submitted_courses.append(six.text_type(course_key))
+            submitted_courses.append(str(course_key))
 
         return submitted_courses, skipped_courses
 
