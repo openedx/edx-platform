@@ -197,7 +197,7 @@ def test_check_validations_for_current_record(date_attrs_with_expected_results):
             'date_started_month': DATE_STARTED_MONTH,
             'date_started_year': DATE_COMPLETED_YEAR + 1
         },
-        'expected_result': {'date_completed_year': 'Completion date must comes after started date'}
+        'expected_result': {'date_completed_year': 'Completed date must be greater than started date.'}
     }
 ])
 def test_check_validations_for_past_record(date_attrs_with_expected_results):

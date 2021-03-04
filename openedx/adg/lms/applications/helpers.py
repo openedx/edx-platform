@@ -68,7 +68,7 @@ def check_validations_for_past_record(attrs, error_message):
         completed_date = datetime(year=attrs['date_completed_year'], month=attrs['date_completed_month'], day=1)
 
         if completed_date <= started_date:
-            errors['date_completed_year'] = _('Completion date must comes after started date')
+            errors['date_completed_year'] = _('Completed date must be greater than started date.')
 
         errors = update_errors_if_future_date(completed_date, errors, 'date_completed_year')
 
