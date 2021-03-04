@@ -104,6 +104,11 @@ def update_errors_if_future_date(date, errors, key):
     """
     Update errors dict if date is in future
 
+    Arguments:
+        date (datetime): date that needs to be checked
+        errors (dict): error messages dict that needs to be updated
+        key (str): field key for adding error
+
     Returns:
         dict: contains updated error messages
     """
