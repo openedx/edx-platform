@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 Settings for Bok Choy tests that are used when running LMS.
 
@@ -35,7 +34,7 @@ TEST_ROOT = CONFIG_ROOT.dirname().dirname() / "test_root"
 os.environ['SERVICE_VARIANT'] = 'bok_choy_docker' if 'BOK_CHOY_HOSTNAME' in os.environ else 'bok_choy'
 os.environ['LMS_CFG'] = str.format("{config_root}/{service_variant}.yml",
                                    config_root=CONFIG_ROOT, service_variant=os.environ['SERVICE_VARIANT'])
-os.environ['REVISION_CFG'] = "{config_root}/revisions.yml".format(config_root=CONFIG_ROOT)
+os.environ['REVISION_CFG'] = f"{CONFIG_ROOT}/revisions.yml"
 
 from .production import *  # pylint: disable=wildcard-import, unused-wildcard-import, wrong-import-position
 
@@ -58,8 +57,8 @@ update_module_store_settings(
     default_store=os.environ.get('DEFAULT_STORE', 'draft'),
 )
 
-PLATFORM_NAME = ugettext_lazy(u"édX")
-PLATFORM_DESCRIPTION = ugettext_lazy(u"Open édX Platform")
+PLATFORM_NAME = ugettext_lazy("édX")
+PLATFORM_DESCRIPTION = ugettext_lazy("Open édX Platform")
 
 ############################ STATIC FILES #############################
 
@@ -101,9 +100,9 @@ YOUTUBE_HOSTNAME = os.environ.get('BOK_CHOY_HOSTNAME', '127.0.0.1')
 # Point the URL used to test YouTube availability to our stub YouTube server
 YOUTUBE_PORT = 9080
 YOUTUBE['TEST_TIMEOUT'] = 5000
-YOUTUBE['API'] = "http://{0}:{1}/get_youtube_api/".format(YOUTUBE_HOSTNAME, YOUTUBE_PORT)
-YOUTUBE['METADATA_URL'] = "http://{0}:{1}/test_youtube/".format(YOUTUBE_HOSTNAME, YOUTUBE_PORT)
-YOUTUBE['TEXT_API']['url'] = "{0}:{1}/test_transcripts_youtube/".format(YOUTUBE_HOSTNAME, YOUTUBE_PORT)
+YOUTUBE['API'] = f"http://{YOUTUBE_HOSTNAME}:{YOUTUBE_PORT}/get_youtube_api/"
+YOUTUBE['METADATA_URL'] = f"http://{YOUTUBE_HOSTNAME}:{YOUTUBE_PORT}/test_youtube/"
+YOUTUBE['TEXT_API']['url'] = f"{YOUTUBE_HOSTNAME}:{YOUTUBE_PORT}/test_transcripts_youtube/"
 
 ############################# SECURITY SETTINGS ################################
 # Default to advanced security in common.py, so tests can reset here to use
