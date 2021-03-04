@@ -3,7 +3,6 @@ Unittests for migrating a course to split mongo
 """
 
 
-import six
 from django.core.management import CommandError, call_command
 from django.test import TestCase
 
@@ -19,16 +18,13 @@ class TestArgParsing(TestCase):
     Tests for parsing arguments for the `migrate_to_split` management command
     """
     def setUp(self):  # lint-amnesty, pylint: disable=useless-super-delegation
-        super(TestArgParsing, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
 
     def test_no_args(self):
         """
         Test the arg length error
         """
-        if six.PY2:
-            errstring = "Error: too few arguments"
-        else:
-            errstring = "Error: the following arguments are required: course_key, email"
+        errstring = "Error: the following arguments are required: course_key, email"
         with self.assertRaisesRegex(CommandError, errstring):
             call_command("migrate_to_split")
 
@@ -64,7 +60,7 @@ class TestMigrateToSplit(ModuleStoreTestCase):
     """
 
     def setUp(self):
-        super(TestMigrateToSplit, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.course = CourseFactory(default_store=ModuleStoreEnum.Type.mongo)
 
     def test_user_email(self):

@@ -42,7 +42,7 @@ class Command(BaseCommand):
         try:
             user = user_from_str(options['email'])
         except User.DoesNotExist:
-            raise CommandError(u"No user found identified by {}".format(options['email']))  # lint-amnesty, pylint: disable=raise-missing-from
+            raise CommandError("No user found identified by {}".format(options['email']))  # lint-amnesty, pylint: disable=raise-missing-from
 
         return course_key, user.id, options['org'], options['course'], options['run']
 

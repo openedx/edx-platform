@@ -6,8 +6,6 @@ Test for export all courses.
 import shutil
 from tempfile import mkdtemp
 
-import six
-
 from cms.djangoapps.contentstore.management.commands.export_all_courses import export_courses_to_output_path
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
@@ -21,7 +19,7 @@ class ExportAllCourses(ModuleStoreTestCase):
     """
     def setUp(self):
         """ Common setup. """
-        super(ExportAllCourses, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.store = modulestore()._get_modulestore_by_type(ModuleStoreEnum.Type.mongo)  # lint-amnesty, pylint: disable=protected-access
         self.temp_dir = mkdtemp()
         self.addCleanup(shutil.rmtree, self.temp_dir)
@@ -50,4 +48,4 @@ class ExportAllCourses(ModuleStoreTestCase):
         courses, failed_export_courses = export_courses_to_output_path(self.temp_dir)
         self.assertEqual(len(courses), 2)
         self.assertEqual(len(failed_export_courses), 1)
-        self.assertEqual(failed_export_courses[0], six.text_type(second_course_id))
+        self.assertEqual(failed_export_courses[0], str(second_course_id))
