@@ -4,12 +4,12 @@ Tests of DarkLangMiddleware
 
 
 import unittest
+from unittest.mock import Mock
 
 import ddt
 from django.http import HttpRequest
 from django.test.client import Client
 from django.utils.translation import LANGUAGE_SESSION_KEY
-from mock import Mock
 
 from openedx.core.djangoapps.dark_lang.middleware import DarkLangMiddleware
 from openedx.core.djangoapps.dark_lang.models import DarkLangConfig
@@ -34,7 +34,7 @@ class DarkLangMiddlewareTests(CacheIsolationTestCase):
     Tests of DarkLangMiddleware
     """
     def setUp(self):
-        super(DarkLangMiddlewareTests, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.user = UserFactory.build(username='test', email='test@edx.org', password='test_password')
         self.user.save()
         self.client = Client()

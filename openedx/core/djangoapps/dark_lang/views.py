@@ -58,7 +58,7 @@ class PreviewLanguageFragmentView(EdxFragmentView):
         """
         if not self._user_can_preview_languages(request.user):
             raise Http404
-        return super(PreviewLanguageFragmentView, self).get(request, *args, **kwargs)  # lint-amnesty, pylint: disable=super-with-arguments
+        return super().get(request, *args, **kwargs)
 
     @method_decorator(login_required)
     def post(self, request, **kwargs):  # lint-amnesty, pylint: disable=unused-argument
@@ -94,7 +94,7 @@ class PreviewLanguageFragmentView(EdxFragmentView):
         set_user_preference(request.user, DARK_LANGUAGE_KEY, preview_language)
         PageLevelMessages.register_success_message(
             request,
-            _(u'Language set to {preview_language}').format(
+            _('Language set to {preview_language}').format(
                 preview_language=preview_language
             )
         )
