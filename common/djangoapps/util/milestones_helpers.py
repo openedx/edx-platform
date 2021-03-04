@@ -179,7 +179,7 @@ def get_course_display_string(descriptor):
     Returns a string to display for a course or course overview.
 
     Arguments:
-        descriptor (CourseDescriptor|CourseOverview): a course or course overview.
+        descriptor (CourseBlock|CourseOverview): a course or course overview.
     """
     return ' '.join([
         descriptor.display_org_with_default,

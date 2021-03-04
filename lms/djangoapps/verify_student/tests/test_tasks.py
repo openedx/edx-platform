@@ -1,9 +1,10 @@
 # lint-amnesty, pylint: disable=missing-module-docstring
 # Lots of patching to stub in our own settings, and HTTP posting
+from unittest import mock
+from unittest.mock import patch
+
 import ddt
-import mock
 from django.conf import settings
-from mock import patch
 
 from common.test.utils import MockS3BotoMixin
 from lms.djangoapps.verify_student.tests import TestVerificationBase

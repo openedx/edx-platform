@@ -44,7 +44,7 @@ EMAIL_FILE_PATH = '/edx/src/ace_messages/'
 ################################# LMS INTEGRATION #############################
 
 LMS_BASE = 'localhost:18000'
-LMS_ROOT_URL = 'http://{}'.format(LMS_BASE)
+LMS_ROOT_URL = f'http://{LMS_BASE}'
 FEATURES['PREVIEW_LMS_BASE'] = "preview." + LMS_BASE
 
 FRONTEND_LOGIN_URL = LMS_ROOT_URL + '/login'
@@ -167,10 +167,10 @@ REQUIRE_DEBUG = DEBUG
 
 ########################### OAUTH2 #################################
 JWT_AUTH.update({
-    'JWT_ISSUER': '{}/oauth2'.format(LMS_ROOT_URL),
+    'JWT_ISSUER': f'{LMS_ROOT_URL}/oauth2',
     'JWT_ISSUERS': [{
         'AUDIENCE': 'lms-key',
-        'ISSUER': '{}/oauth2'.format(LMS_ROOT_URL),
+        'ISSUER': f'{LMS_ROOT_URL}/oauth2',
         'SECRET_KEY': 'lms-secret',
     }],
     'JWT_SECRET_KEY': 'lms-secret',

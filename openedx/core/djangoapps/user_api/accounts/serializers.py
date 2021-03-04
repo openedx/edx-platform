@@ -43,6 +43,7 @@ class PhoneNumberSerializer(serializers.BaseSerializer):  # lint-amnesty, pylint
     """
     Class to serialize phone number into a digit only representation
     """
+
     def to_internal_value(self, data):
         """Remove all non numeric characters in phone number"""
         return re.sub("[^0-9]", "", data) or None
@@ -94,6 +95,7 @@ class UserReadOnlySerializer(serializers.Serializer):  # lint-amnesty, pylint: d
     """
     Class that serializes the User model and UserProfile model together.
     """
+
     def __init__(self, *args, **kwargs):
         # Don't pass the 'configuration' arg up to the superclass
         self.configuration = kwargs.pop('configuration', None)
@@ -129,6 +131,7 @@ class UserReadOnlySerializer(serializers.Serializer):  # lint-amnesty, pylint: d
                 reverse('accounts_api', kwargs={'username': user.username})
             ),
             "email": user.email,
+            "id": user.id,
             # For backwards compatibility: Tables created after the upgrade to Django 1.8 will save microseconds.
             # However, mobile apps are not expecting microsecond in the serialized value. If we set it to zero the
             # DRF JSONEncoder will not include it in the serialized value.

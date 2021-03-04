@@ -1672,7 +1672,7 @@ class MembershipBulkManagementView(GenericAPIView):
     @cached_property
     def course(self):
         """
-        Return a CourseDescriptor based on the `course_id` kwarg.
+        Return a CourseBlock based on the `course_id` kwarg.
         If invalid or not found, raise 404.
         """
         course_id_string = self.kwargs.get('course_id')

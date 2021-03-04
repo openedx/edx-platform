@@ -4,10 +4,10 @@ Test entitlements tasks
 
 
 from datetime import datetime, timedelta
+from unittest import mock
 
-import mock
-import pytz
 import pytest
+import pytz
 from django.test import TestCase
 
 from common.djangoapps.entitlements import tasks

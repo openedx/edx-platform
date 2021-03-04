@@ -668,7 +668,7 @@ class MixedModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase):
             fields (dict): Fields to set on the course at initialization
             kwargs: Any optional arguments understood by a subset of modulestores to customize instantiation
 
-        Returns: a CourseDescriptor
+        Returns: a CourseBlock
         """
         # first make sure an existing course doesn't already exist in the mapping
         course_key = self.make_course_key(org, course, run)

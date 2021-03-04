@@ -78,9 +78,9 @@ class BackfillOrgsAndOrgCoursesTest(SharedModuleStoreTestCase):
 
         # Confirm starting condition:
         # Only orgs are org_A and org_B, and only linkage is org_a->course_a1.
-        assert set(
+        assert {
             org["short_name"] for org in get_organizations()
-        ) == {
+        } == {
             "org_A", "org_B"
         }
         assert len(get_organization_courses(get_organization_by_short_name('org_A'))) == 1
@@ -91,9 +91,9 @@ class BackfillOrgsAndOrgCoursesTest(SharedModuleStoreTestCase):
 
         if run_type == "--dry":
             # Confirm ending conditions are the same as the starting conditions.
-            assert set(
+            assert {
                 org["short_name"] for org in get_organizations()
-            ) == {
+            } == {
                 "org_A", "org_B"
             }
             assert len(get_organization_courses(get_organization_by_short_name('org_A'))) == 1
@@ -101,9 +101,9 @@ class BackfillOrgsAndOrgCoursesTest(SharedModuleStoreTestCase):
         else:
             # Confirm ending condition:
             # All five orgs present. Each org a has expected number of org-course linkages.
-            assert set(
+            assert {
                 org["short_name"] for org in get_organizations()
-            ) == {
+            } == {
                 "org_A", "org_B", "org_C", "org_D", "org_E"
             }
             assert len(get_organization_courses(get_organization_by_short_name('org_A'))) == 2

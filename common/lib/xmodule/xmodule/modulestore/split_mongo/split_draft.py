@@ -34,7 +34,7 @@ class DraftVersioningModuleStore(SplitMongoModuleStore, ModuleStoreDraftAndPubli
             user_id: id of the user creating the course
             kwargs: Any optional arguments understood by a subset of modulestores to customize instantiation
 
-        Returns: a CourseDescriptor
+        Returns: a CourseBlock
         """
         master_branch = kwargs.pop('master_branch', ModuleStoreEnum.BranchName.draft)
         with self.bulk_operations(CourseLocator(org, course, run), ignore_case=True):

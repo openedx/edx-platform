@@ -1,18 +1,18 @@
-# encoding: utf-8
 """
 Tests of verify_student views.
 """
 
-from datetime import timedelta
-from uuid import uuid4
-
 import base64
 import codecs
+import urllib
+from datetime import timedelta
+from unittest import mock
+from unittest.mock import Mock, patch
+from uuid import uuid4
+
 import ddt
 import httpretty
-import mock
 import simplejson as json
-import six
 from bs4 import BeautifulSoup
 from django.conf import settings
 from django.core import mail
@@ -21,29 +21,27 @@ from django.test.client import Client, RequestFactory
 from django.test.utils import override_settings
 from django.urls import reverse
 from django.utils.timezone import now
-from mock import Mock, patch
 from opaque_keys.edx.locator import CourseLocator
-from six.moves import zip
 from waffle.testutils import override_switch
 
-from common.test.utils import MockS3BotoMixin, XssTestMixin
 from common.djangoapps.course_modes.models import CourseMode
 from common.djangoapps.course_modes.tests.factories import CourseModeFactory
+from common.djangoapps.student.models import CourseEnrollment
+from common.djangoapps.student.tests.factories import AdminFactory, CourseEnrollmentFactory, UserFactory
+from common.djangoapps.util.testing import UrlResetMixin
+from common.test.utils import MockS3BotoMixin, XssTestMixin
 from lms.djangoapps.commerce.models import CommerceConfiguration
 from lms.djangoapps.commerce.tests import TEST_API_URL, TEST_PAYMENT_DATA, TEST_PUBLIC_URL_ROOT
 from lms.djangoapps.commerce.tests.mocks import mock_payment_processors
 from lms.djangoapps.commerce.utils import EcommerceService
 from lms.djangoapps.verify_student.models import SoftwareSecurePhotoVerification, VerificationDeadline
 from lms.djangoapps.verify_student.services import IDVerificationService
-from lms.djangoapps.verify_student.views import PayAndVerifyView, checkout_with_ecommerce_service, render_to_response
 from lms.djangoapps.verify_student.ssencrypt import encrypt_and_encode, rsa_encrypt
+from lms.djangoapps.verify_student.tests import TestVerificationBase
+from lms.djangoapps.verify_student.views import PayAndVerifyView, checkout_with_ecommerce_service, render_to_response
 from openedx.core.djangoapps.embargo.test_utils import restrict_course
 from openedx.core.djangoapps.theming.tests.test_util import with_comprehensive_theme
 from openedx.core.djangoapps.user_api.accounts.api import get_account_settings
-from common.djangoapps.student.models import CourseEnrollment
-from common.djangoapps.student.tests.factories import AdminFactory, CourseEnrollmentFactory, UserFactory
-from common.djangoapps.util.testing import UrlResetMixin
-from lms.djangoapps.verify_student.tests import TestVerificationBase
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
@@ -104,7 +102,7 @@ def _mock_payment_processors():
     """
     httpretty.register_uri(
         httpretty.GET,
-        "{}/payment/processors/".format(TEST_API_URL),
+        f"{TEST_API_URL}/payment/processors/",
         body=json.dumps(['foo', 'bar']),
         content_type="application/json",
     )
@@ -117,7 +115,7 @@ class StartView(TestCase):
     """
 
     def start_url(self, course_id=""):
-        return "/verify_student/{0}".format(six.moves.urllib.parse.quote(course_id))
+        return "/verify_student/{}".format(urllib.parse.quote(course_id))
 
     def test_start_new_verification(self):
         """
@@ -151,7 +149,7 @@ class TestPayAndVerifyView(UrlResetMixin, ModuleStoreTestCase, XssTestMixin, Tes
 
     @mock.patch.dict(settings.FEATURES, {'EMBARGO': True})
     def setUp(self):
-        super(TestPayAndVerifyView, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.user = UserFactory.create(username=self.USERNAME, password=self.PASSWORD)
         result = self.client.login(username=self.USERNAME, password=self.PASSWORD)
         assert result, 'Could not log in'
@@ -193,7 +191,7 @@ class TestPayAndVerifyView(UrlResetMixin, ModuleStoreTestCase, XssTestMixin, Tes
         configuration = CommerceConfiguration.objects.create(checkout_on_ecommerce_service=True)
         checkout_page = configuration.basket_checkout_page
         checkout_page += "?utm_source=test"
-        httpretty.register_uri(httpretty.GET, "{}{}".format(TEST_PUBLIC_URL_ROOT, checkout_page))
+        httpretty.register_uri(httpretty.GET, f"{TEST_PUBLIC_URL_ROOT}{checkout_page}")
 
         course = self._create_course('verified', sku=sku)
         self._enroll(course.id)
@@ -202,7 +200,7 @@ class TestPayAndVerifyView(UrlResetMixin, ModuleStoreTestCase, XssTestMixin, Tes
         url_with_utm = 'http://www.example.com/basket/add/?utm_source=test&sku=TESTSKU'
         with mock.patch.object(EcommerceService, 'get_checkout_page_url', return_value=url_with_utm):
             response = self._get_page('verify_student_start_flow', course.id, expected_status_code=302)
-        expected_page = '{}{}&sku={}'.format(TEST_PUBLIC_URL_ROOT, checkout_page, sku)
+        expected_page = f'{TEST_PUBLIC_URL_ROOT}{checkout_page}&sku={sku}'
         self.assertRedirects(response, expected_page, fetch_redirect_response=False)
 
     @ddt.data(
@@ -588,8 +586,8 @@ class TestPayAndVerifyView(UrlResetMixin, ModuleStoreTestCase, XssTestMixin, Tes
         course = self._create_course("verified")
         response = self._get_page(url_name, course.id, expected_status_code=302)
 
-        original_url = reverse(url_name, kwargs={'course_id': six.text_type(course.id)})
-        login_url = u"{login_url}?next={original_url}".format(
+        original_url = reverse(url_name, kwargs={'course_id': str(course.id)})
+        login_url = "{login_url}?next={original_url}".format(
             login_url=reverse('signin_user'),
             original_url=original_url
         )
@@ -688,7 +686,7 @@ class TestPayAndVerifyView(UrlResetMixin, ModuleStoreTestCase, XssTestMixin, Tes
         # Expect that the expiration date is set
         response = self._get_page(payment_flow, course.id)
         data = self._get_page_data(response)
-        assert data['verification_deadline'] == six.text_type(deadline)
+        assert data['verification_deadline'] == str(deadline)
 
     def test_course_mode_expired(self):
         deadline = now() + timedelta(days=-360)
@@ -756,7 +754,7 @@ class TestPayAndVerifyView(UrlResetMixin, ModuleStoreTestCase, XssTestMixin, Tes
 
         # Check that the verification deadline (rather than the upgrade deadline) is displayed
         if verification_deadline is not None:
-            assert data['verification_deadline'] == six.text_type(verification_deadline)
+            assert data['verification_deadline'] == str(verification_deadline)
         else:
             assert data['verification_deadline'] == ''
 
@@ -887,7 +885,7 @@ class TestPayAndVerifyView(UrlResetMixin, ModuleStoreTestCase, XssTestMixin, Tes
         """Set the contribution amount pre-filled in a session var. """
         session = self.client.session
         session["donation_for_course"] = {
-            six.text_type(course_id): amount
+            str(course_id): amount
         }
         session.save()
 
@@ -895,7 +893,7 @@ class TestPayAndVerifyView(UrlResetMixin, ModuleStoreTestCase, XssTestMixin, Tes
     @override_settings(ECOMMERCE_API_URL=TEST_API_URL)
     def _get_page(self, url_name, course_key, expected_status_code=200, skip_first_step=False, assert_headers=False):
         """Retrieve one of the verification pages. """
-        url = reverse(url_name, kwargs={"course_id": six.text_type(course_key)})
+        url = reverse(url_name, kwargs={"course_id": str(course_key)})
 
         if skip_first_step:
             url += "?skip-first-step=1"
@@ -930,11 +928,11 @@ class TestPayAndVerifyView(UrlResetMixin, ModuleStoreTestCase, XssTestMixin, Tes
     def _assert_requirements_displayed(self, response, requirements):
         """Check that requirements are displayed on the page. """
         response_dict = self._get_page_data(response)
-        for req, displayed in six.iteritems(response_dict['requirements']):
+        for req, displayed in response_dict['requirements'].items():
             if req in requirements:
-                assert displayed, "Expected '{req}' requirement to be displayed".format(req=req)
+                assert displayed, f"Expected '{req}' requirement to be displayed"
             else:
-                assert not displayed, "Expected '{req}' requirement to be displayed".format(req=req)
+                assert not displayed, f"Expected '{req}' requirement to be hidden"
 
     def _assert_course_details(self, response, course_key, display_name, url):
         """Check the course information on the page. """
@@ -986,7 +984,7 @@ class TestPayAndVerifyView(UrlResetMixin, ModuleStoreTestCase, XssTestMixin, Tes
 
     def _assert_redirects_to_start_flow(self, response, course_id):
         """Check that the page redirects to the start of the payment/verification flow. """
-        url = reverse('verify_student_start_flow', kwargs={'course_id': six.text_type(course_id)})
+        url = reverse('verify_student_start_flow', kwargs={'course_id': str(course_id)})
         with mock_payment_processors():
             self.assertRedirects(response, url)
 
@@ -997,14 +995,14 @@ class TestPayAndVerifyView(UrlResetMixin, ModuleStoreTestCase, XssTestMixin, Tes
 
     def _assert_redirects_to_upgrade(self, response, course_id):
         """Check that the page redirects to the "upgrade" part of the flow. """
-        url = reverse('verify_student_upgrade_and_verify', kwargs={'course_id': six.text_type(course_id)})
+        url = reverse('verify_student_upgrade_and_verify', kwargs={'course_id': str(course_id)})
         with mock_payment_processors():
             self.assertRedirects(response, url)
 
     @ddt.data("verify_student_start_flow", "verify_student_begin_flow")
     def test_course_upgrade_page_with_unicode_and_special_values_in_display_name(self, payment_flow):
         """Check the course information on the page. """
-        mode_display_name = u"Introduction à l'astrophysique"
+        mode_display_name = "Introduction à l'astrophysique"
         course = CourseFactory.create(display_name=mode_display_name)
         for course_mode in [CourseMode.DEFAULT_MODE_SLUG, "verified"]:
             min_price = (self.MIN_PRICE if course_mode != CourseMode.DEFAULT_MODE_SLUG else 0)
@@ -1037,7 +1035,7 @@ class TestPayAndVerifyView(UrlResetMixin, ModuleStoreTestCase, XssTestMixin, Tes
         assert response.status_code == 200
 
 
-class CheckoutTestMixin(object):
+class CheckoutTestMixin:
     """
     Mixin implementing test methods that should behave identically regardless
     of which backend is used (currently only the ecommerce service).  Subclasses
@@ -1052,7 +1050,7 @@ class CheckoutTestMixin(object):
 
     def setUp(self):
         """ Create a user and course. """
-        super(CheckoutTestMixin, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
 
         self.user = UserFactory.create(username="test", password="test")
         self.course = CourseFactory.create()
@@ -1094,7 +1092,7 @@ class CheckoutTestMixin(object):
     def test_create_order(self, patched_create_order):
         # Create an order
         params = {
-            'course_id': six.text_type(self.course.id),
+            'course_id': str(self.course.id),
             'contribution': 100,
         }
         self._assert_checked_out(params, patched_create_order, self.course.id, 'verified')
@@ -1104,7 +1102,7 @@ class CheckoutTestMixin(object):
         course = CourseFactory.create()
         CourseModeFactory.create(mode_slug="professional", course_id=course.id, min_price=10, sku=self.make_sku())
         # Create an order for a prof ed course
-        params = {'course_id': six.text_type(course.id)}
+        params = {'course_id': str(course.id)}
         self._assert_checked_out(params, patched_create_order, course.id, 'professional')
 
     def test_create_order_no_id_professional(self, patched_create_order):
@@ -1112,7 +1110,7 @@ class CheckoutTestMixin(object):
         course = CourseFactory.create()
         CourseModeFactory.create(mode_slug="no-id-professional", course_id=course.id, min_price=10, sku=self.make_sku())
         # Create an order for a prof ed course
-        params = {'course_id': six.text_type(course.id)}
+        params = {'course_id': str(course.id)}
         self._assert_checked_out(params, patched_create_order, course.id, 'no-id-professional')
 
     def test_create_order_for_multiple_paid_modes(self, patched_create_order):
@@ -1121,14 +1119,14 @@ class CheckoutTestMixin(object):
         CourseModeFactory.create(mode_slug="no-id-professional", course_id=course.id, min_price=10, sku=self.make_sku())
         CourseModeFactory.create(mode_slug="professional", course_id=course.id, min_price=10, sku=self.make_sku())
         # Create an order for a prof ed course
-        params = {'course_id': six.text_type(course.id)}
+        params = {'course_id': str(course.id)}
         # TODO jsa - is this the intended behavior?
         self._assert_checked_out(params, patched_create_order, course.id, 'no-id-professional')
 
     def test_create_order_bad_donation_amount(self, patched_create_order):
         # Create an order
         params = {
-            'course_id': six.text_type(self.course.id),
+            'course_id': str(self.course.id),
             'contribution': '99.9'
         }
         self._assert_checked_out(params, patched_create_order, None, None, expected_status_code=400)
@@ -1136,7 +1134,7 @@ class CheckoutTestMixin(object):
     def test_create_order_good_donation_amount(self, patched_create_order):
         # Create an order
         params = {
-            'course_id': six.text_type(self.course.id),
+            'course_id': str(self.course.id),
             'contribution': '100.0'
         }
         self._assert_checked_out(params, patched_create_order, self.course.id, 'verified')
@@ -1149,7 +1147,7 @@ class CheckoutTestMixin(object):
         expected_payment_data['payment_form_data'].update({'foo': 'bar'})
         patched_create_order.return_value = expected_payment_data
         # there is no 'processor' parameter in the post payload, so the response should only contain payment form data.
-        params = {'course_id': six.text_type(self.course.id), 'contribution': 100}
+        params = {'course_id': str(self.course.id), 'contribution': 100}
         response = self.client.post(reverse('verify_student_create_order'), params)
         assert response.status_code == 200
         assert patched_create_order.called
@@ -1174,7 +1172,7 @@ class TestCreateOrderEcommerceService(CheckoutTestMixin, ModuleStoreTestCase):
 
     def make_sku(self):
         """ Checkout is handled by the ecommerce service when the course mode's sku is nonempty. """
-        return six.text_type(uuid4().hex)
+        return str(uuid4().hex)
 
     def _get_checkout_args(self, patched_create_order):
         """ Assuming patched_create_order was called, return a mapping containing the call arguments."""
@@ -1200,7 +1198,7 @@ class TestCheckoutWithEcommerceService(ModuleStoreTestCase):
         # mock out the payment processors endpoint
         httpretty.register_uri(
             httpretty.POST,
-            "{}/baskets/".format(TEST_API_URL),
+            f"{TEST_API_URL}/baskets/",
             body=json.dumps({'payment_data': expected_payment_data}),
             content_type="application/json",
         )
@@ -1233,10 +1231,10 @@ class TestSubmitPhotosForVerification(MockS3BotoMixin, TestVerificationBase):
     USERNAME = "test_user"
     PASSWORD = "test_password"
     IMAGE_DATA = "abcd,1234"
-    FULL_NAME = u"Ḟüḷḷ Ṅäṁë"
+    FULL_NAME = "Ḟüḷḷ Ṅäṁë"
 
     def setUp(self):
-        super(TestSubmitPhotosForVerification, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.user = UserFactory.create(username=self.USERNAME, password=self.PASSWORD)
         result = self.client.login(username=self.USERNAME, password=self.PASSWORD)
         assert result, 'Could not log in'
@@ -1447,7 +1445,7 @@ class TestPhotoVerificationResultsCallback(ModuleStoreTestCase, TestVerification
     """
 
     def setUp(self):
-        super(TestPhotoVerificationResultsCallback, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
 
         self.course = CourseFactory.create(org='Robot', number='999', display_name='Test Course')
         self.course_id = self.course.id
@@ -1591,7 +1589,7 @@ class TestPhotoVerificationResultsCallback(ModuleStoreTestCase, TestVerification
         )
         attempt = SoftwareSecurePhotoVerification.objects.get(receipt_id=self.receipt_id)
         old_verification = SoftwareSecurePhotoVerification.objects.get(pk=verification.pk)
-        assert attempt.status == u'approved'
+        assert attempt.status == 'approved'
         assert attempt.expiration_datetime.date() == expiration_datetime.date()
         assert old_verification.expiry_email_date is None
         assert response.content.decode('utf-8') == 'OK!'
@@ -1626,7 +1624,7 @@ class TestPhotoVerificationResultsCallback(ModuleStoreTestCase, TestVerification
         )
 
         attempt = SoftwareSecurePhotoVerification.objects.get(receipt_id=self.receipt_id)
-        assert attempt.status == u'approved'
+        assert attempt.status == 'approved'
         assert attempt.expiration_datetime.date() == expiration_datetime.date()
         assert response.content.decode('utf-8') == 'OK!'
         self._assert_verification_approved_email(expiration_datetime.date())
@@ -1656,9 +1654,9 @@ class TestPhotoVerificationResultsCallback(ModuleStoreTestCase, TestVerification
             HTTP_DATE='testdate'
         )
         attempt = SoftwareSecurePhotoVerification.objects.get(receipt_id=self.receipt_id)
-        assert attempt.status == u'denied'
-        assert attempt.error_code == u"Your photo doesn't meet standards."
-        assert attempt.error_msg == u'[{"photoIdReasons": ["Not provided"]}]'
+        assert attempt.status == 'denied'
+        assert attempt.error_code == "Your photo doesn't meet standards."
+        assert attempt.error_msg == '[{"photoIdReasons": ["Not provided"]}]'
         assert response.content.decode('utf-8') == 'OK!'
         self._assert_verification_denied_email()
 
@@ -1683,9 +1681,9 @@ class TestPhotoVerificationResultsCallback(ModuleStoreTestCase, TestVerification
             HTTP_DATE='testdate'
         )
         attempt = SoftwareSecurePhotoVerification.objects.get(receipt_id=self.receipt_id)
-        assert attempt.status == u'must_retry'
-        assert attempt.error_code == u'You must retry the verification.'
-        assert attempt.error_msg == u'"Memory overflow"'
+        assert attempt.status == 'must_retry'
+        assert attempt.error_code == 'You must retry the verification.'
+        assert attempt.error_msg == '"Memory overflow"'
         assert response.content.decode('utf-8') == 'OK!'
 
     @patch(
@@ -1725,7 +1723,7 @@ class TestReverifyView(TestVerificationBase):
     PASSWORD = "detachment-2702"
 
     def setUp(self):
-        super(TestReverifyView, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.user = UserFactory.create(username=self.USERNAME, password=self.PASSWORD)
         success = self.client.login(username=self.USERNAME, password=self.PASSWORD)
         assert success, 'Could not log in'
@@ -1823,7 +1821,7 @@ class TestPhotoURLView(TestVerificationBase):
     """
 
     def setUp(self):
-        super(TestPhotoURLView, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
 
         self.user = AdminFactory()
         login_success = self.client.login(username=self.user.username, password='test')
@@ -1836,7 +1834,7 @@ class TestPhotoURLView(TestVerificationBase):
         self.receipt_id = self.attempt.receipt_id
 
     def test_photo_url_view_returns_data(self):
-        url = reverse('verification_photo_urls', kwargs={'receipt_id': six.text_type(self.receipt_id)})
+        url = reverse('verification_photo_urls', kwargs={'receipt_id': str(self.receipt_id)})
         response = self.client.get(url)
         assert response.status_code == 200
         assert response.data['EdX-ID'] == self.receipt_id
@@ -1847,7 +1845,7 @@ class TestPhotoURLView(TestVerificationBase):
 
     def test_photo_url_view_returns_404_if_invalid_receipt_id(self):
         url = reverse('verification_photo_urls',
-                      kwargs={'receipt_id': six.text_type('00000000-0000-0000-0000-000000000000')})
+                      kwargs={'receipt_id': '00000000-0000-0000-0000-000000000000'})
         response = self.client.get(url)
         assert response.status_code == 404
 
@@ -1855,7 +1853,7 @@ class TestPhotoURLView(TestVerificationBase):
         self.user = UserFactory()
         login_success = self.client.login(username=self.user.username, password='test')
         assert login_success
-        url = reverse('verification_photo_urls', kwargs={'receipt_id': six.text_type(self.receipt_id)})
+        url = reverse('verification_photo_urls', kwargs={'receipt_id': str(self.receipt_id)})
         response = self.client.get(url)
         assert response.status_code == 403
 
@@ -1927,7 +1925,7 @@ class TestDecodeImageViews(MockS3BotoMixin, TestVerificationBase):
         url_name = 'verification_decrypt_face_image'
         if img_type == 'photo_id':
             url_name = 'verification_decrypt_photo_id_image'
-        url = reverse(url_name, kwargs={'receipt_id': six.text_type(receipt_id)})
+        url = reverse(url_name, kwargs={'receipt_id': str(receipt_id)})
 
         response = self.client.get(url)
 

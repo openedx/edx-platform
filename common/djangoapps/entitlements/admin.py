@@ -30,7 +30,7 @@ class CourseEntitlementAdmin(admin.ModelAdmin):  # lint-amnesty, pylint: disable
 class CourseEntitlementSupportDetailForm(forms.ModelForm):
     """Form for adding entitlement support details, exists mostly for testing purposes"""
     def __init__(self, *args, **kwargs):
-        super(CourseEntitlementSupportDetailForm, self).__init__(*args, **kwargs)  # lint-amnesty, pylint: disable=super-with-arguments
+        super().__init__(*args, **kwargs)
 
         if self.data.get('unenrolled_run'):
             try:
@@ -44,10 +44,10 @@ class CourseEntitlementSupportDetailForm(forms.ModelForm):
         try:
             course_key = CourseKey.from_string(course_id)
         except InvalidKeyError:
-            raise forms.ValidationError("Cannot make a valid CourseKey from id {}!".format(course_id))  # lint-amnesty, pylint: disable=raise-missing-from
+            raise forms.ValidationError(f"Cannot make a valid CourseKey from id {course_id}!")  # lint-amnesty, pylint: disable=raise-missing-from
 
         if not modulestore().has_course(course_key):
-            raise forms.ValidationError("Cannot find course with id {} in the modulestore".format(course_id))
+            raise forms.ValidationError(f"Cannot find course with id {course_id} in the modulestore")
 
         return course_key
 
@@ -72,7 +72,7 @@ class CourseEntitlementSupportDetailAdmin(admin.ModelAdmin):
 class CourseEntitlementPolicyForm(forms.ModelForm):
     """ Form for creating custom course entitlement policies. """
     def __init__(self, *args, **kwargs):
-        super(CourseEntitlementPolicyForm, self).__init__(*args, **kwargs)  # lint-amnesty, pylint: disable=super-with-arguments
+        super().__init__(*args, **kwargs)
         self.fields['site'].required = False
         self.fields['mode'].required = False
 

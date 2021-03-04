@@ -3,8 +3,8 @@
 #
 # This migration does not produce any changes at the database level.
 
-from django.db import migrations
 import opaque_keys.edx.django.models
+from django.db import migrations
 
 
 class Migration(migrations.Migration):

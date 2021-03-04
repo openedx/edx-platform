@@ -114,7 +114,7 @@ def send_user_notification_callback(sender, **kwargs):  # lint-amnesty, pylint: 
     try:
         user.email_user(subject, message, studio_request_email)
     except:  # lint-amnesty, pylint: disable=bare-except
-        log.warning(u"Unable to send course creator status e-mail to %s", user.email)
+        log.warning("Unable to send course creator status e-mail to %s", user.email)
 
 
 @receiver(send_admin_notification, sender=CourseCreator)
@@ -140,4 +140,4 @@ def send_admin_notification_callback(sender, **kwargs):  # lint-amnesty, pylint:
             fail_silently=False
         )
     except SMTPException:
-        log.warning(u"Failure sending 'pending state' e-mail for %s to %s", user.email, studio_request_email)
+        log.warning("Failure sending 'pending state' e-mail for %s to %s", user.email, studio_request_email)

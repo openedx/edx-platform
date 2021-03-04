@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 Unit tests for LMS instructor-initiated background tasks.
 
@@ -11,6 +10,7 @@ paths actually work.
 import json
 from itertools import chain, cycle, repeat
 from smtplib import SMTPAuthenticationError, SMTPConnectError, SMTPDataError, SMTPServerDisconnected
+from unittest.mock import Mock, patch
 from uuid import uuid4
 import pytest
 from boto.exception import AWSConnectionError
@@ -28,18 +28,17 @@ from boto.ses.exceptions import (
 from celery.states import FAILURE, SUCCESS
 from django.conf import settings
 from django.core.management import call_command
-from mock import Mock, patch
 from opaque_keys.edx.locator import CourseLocator
-from six.moves import range
+
+from lms.djangoapps.bulk_email.tasks import _get_course_email_context
+from lms.djangoapps.instructor_task.models import InstructorTask
+from lms.djangoapps.instructor_task.subtasks import SubtaskStatus, update_subtask_status
+from lms.djangoapps.instructor_task.tasks import send_bulk_course_email
+from lms.djangoapps.instructor_task.tests.factories import InstructorTaskFactory
+from lms.djangoapps.instructor_task.tests.test_base import InstructorTaskCourseTestCase
+from xmodule.modulestore.tests.factories import CourseFactory
 
 from ..models import SEND_TO_LEARNERS, SEND_TO_MYSELF, SEND_TO_STAFF, CourseEmail, Optout
-from lms.djangoapps.bulk_email.tasks import _get_course_email_context  # lint-amnesty, pylint: disable=wrong-import-order
-from lms.djangoapps.instructor_task.models import InstructorTask  # lint-amnesty, pylint: disable=wrong-import-order
-from lms.djangoapps.instructor_task.subtasks import SubtaskStatus, update_subtask_status  # lint-amnesty, pylint: disable=wrong-import-order
-from lms.djangoapps.instructor_task.tasks import send_bulk_course_email  # lint-amnesty, pylint: disable=wrong-import-order
-from lms.djangoapps.instructor_task.tests.factories import InstructorTaskFactory  # lint-amnesty, pylint: disable=wrong-import-order
-from lms.djangoapps.instructor_task.tests.test_base import InstructorTaskCourseTestCase  # lint-amnesty, pylint: disable=wrong-import-order
-from xmodule.modulestore.tests.factories import CourseFactory  # lint-amnesty, pylint: disable=wrong-import-order
 
 
 class TestTaskFailure(Exception):
@@ -80,7 +79,7 @@ class TestBulkEmailInstructorTask(InstructorTaskCourseTestCase):
     """Tests instructor task that send bulk email."""
 
     def setUp(self):
-        super(TestBulkEmailInstructorTask, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.initialize_course()
         self.instructor = self.create_instructor('instructor')
 
@@ -154,7 +153,7 @@ class TestBulkEmailInstructorTask(InstructorTaskCourseTestCase):
         assert len(task_id_list) == 1
         task_id = task_id_list[0]
         subtask_status = subtask_status_info.get(task_id)
-        print(u"Testing subtask status: {}".format(subtask_status))
+        print(f"Testing subtask status: {subtask_status}")
         assert subtask_status.get('task_id') == task_id
         assert subtask_status.get('attempted') == (succeeded + failed)
         assert subtask_status.get('succeeded') == succeeded
@@ -291,7 +290,7 @@ class TestBulkEmailInstructorTask(InstructorTaskCourseTestCase):
 
         students = [self.create_student('robot%d' % i) for i in range(num_emails)]
         for student in students[:emails_with_non_ascii_chars]:
-            student.email = '{username}@tesá.com'.format(username=student.username)
+            student.email = f'{student.username}@tesá.com'
             student.save()
 
         total = num_emails + num_of_course_instructors
@@ -451,7 +450,7 @@ class TestBulkEmailInstructorTask(InstructorTaskCourseTestCase):
 
     def test_bulk_emails_with_unicode_course_image_name(self):
         # Test bulk email with unicode characters in course image name
-        course_image = u'在淡水測試.jpg'
+        course_image = '在淡水測試.jpg'
         self.course = CourseFactory.create(course_image=course_image)
 
         num_emails = 2

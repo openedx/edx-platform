@@ -6,6 +6,7 @@ user/course
 
 from django.contrib.auth import get_user_model
 from django.core.management.base import BaseCommand, CommandError
+from django.db.models import Q
 from opaque_keys.edx.keys import CourseKey
 
 from lms.djangoapps.certificates.models import CertificateWhitelist
@@ -17,11 +18,9 @@ def get_user_from_identifier(identifier):
     """
      This function takes the string identifier and fetch relevant user object from database
     """
-    identifier = identifier.strip()
-    if '@' in identifier:
-        user = User.objects.get(email=identifier)
-    else:
-        user = User.objects.get(username=identifier)
+    user = User.objects.filter(Q(username=identifier) | Q(email=identifier)).first()
+    if not user:
+        raise CommandError("User {} does not exist.".format(identifier))
     return user
 
 
@@ -103,7 +102,8 @@ class Command(BaseCommand):
             add_to_whitelist = True if options['add'] else False  # pylint: disable=simplifiable-if-expression
             users_list = user_str.split(",")
             for username in users_list:
-                if username.strip():
+                username = username.strip()
+                if username:
                     update_user_whitelist(username, add=add_to_whitelist)
 
         whitelist = CertificateWhitelist.objects.filter(course_id=course)

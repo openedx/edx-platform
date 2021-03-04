@@ -268,7 +268,7 @@ class InheritanceMixin(XBlockMixin):
 
 def compute_inherited_metadata(descriptor):
     """Given a descriptor, traverse all of its descendants and do metadata
-    inheritance.  Should be called on a CourseDescriptor after importing a
+    inheritance.  Should be called on a CourseBlock after importing a
     course.
 
     NOTE: This means that there is no such thing as lazy loading at the

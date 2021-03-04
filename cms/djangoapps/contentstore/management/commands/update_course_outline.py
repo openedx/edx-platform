@@ -6,7 +6,6 @@ do it manually for debugging, error recovery, or backfilling purposes.
 Should be invoked from the Studio process.
 """
 from django.core.management.base import BaseCommand
-
 from opaque_keys.edx.keys import CourseKey
 
 from ...tasks import update_outline_from_modulestore

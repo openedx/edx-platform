@@ -14,7 +14,6 @@ from django.core.management.base import BaseCommand, CommandError
 from lxml import etree
 from opaque_keys.edx.locator import LibraryLocator
 from path import Path
-from six.moves import input
 
 from cms.djangoapps.contentstore.utils import add_instructor
 from openedx.core.lib.extract_tar import safetar_extractall
@@ -52,7 +51,7 @@ class Command(BaseCommand):
         try:
             safetar_extractall(tar_file, course_dir.encode('utf-8'))
         except SuspiciousOperation as exc:
-            raise CommandError(u'\n=== Course import {0}: Unsafe tar file - {1}\n'.format(archive_path, exc.args[0]))  # lint-amnesty, pylint: disable=raise-missing-from
+            raise CommandError('\n=== Course import {}: Unsafe tar file - {}\n'.format(archive_path, exc.args[0]))  # lint-amnesty, pylint: disable=raise-missing-from
         finally:
             tar_file.close()
 
@@ -63,7 +62,7 @@ class Command(BaseCommand):
         # Gather library metadata from XML file
         xml_root = etree.parse(abs_xml_path / 'library.xml').getroot()
         if xml_root.tag != 'library':
-            raise CommandError(u'Failed to import {0}: Not a library archive'.format(archive_path))
+            raise CommandError(f'Failed to import {archive_path}: Not a library archive')
 
         metadata = xml_root.attrib
         org = metadata['org']
@@ -77,10 +76,10 @@ class Command(BaseCommand):
         # Check if data would be overwritten
         ans = ''
         while not created and ans not in ['y', 'yes', 'n', 'no']:
-            inp = input(u'Library "{0}" already exists, overwrite it? [y/n] '.format(courselike_key))
+            inp = input(f'Library "{courselike_key}" already exists, overwrite it? [y/n] ')
             ans = inp.lower()
         if ans.startswith('n'):
-            print(u'Aborting import of "{0}"'.format(courselike_key))
+            print(f'Aborting import of "{courselike_key}"')
             return
 
         # At last, import the library
@@ -93,10 +92,10 @@ class Command(BaseCommand):
                 target_id=courselike_key
             )
         except Exception:
-            print(u'\n=== Failed to import library-v1:{0}+{1}'.format(org, library))
+            print(f'\n=== Failed to import library-v1:{org}+{library}')
             raise
 
-        print(u'Library "{0}" imported to "{1}"'.format(archive_path, courselike_key))
+        print(f'Library "{archive_path}" imported to "{courselike_key}"')
 
 
 def _get_or_create_library(org, number, display_name, user):

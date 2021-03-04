@@ -1090,7 +1090,7 @@ def _get_gating_info(course, xblock):
     can be added to xblock info responses.
 
     Arguments:
-        course (CourseDescriptor): The course
+        course (CourseBlock): The course
         xblock (XBlock): The xblock
 
     Returns:
@@ -1350,7 +1350,7 @@ def _was_xblock_ever_special_exam(course, xblock):
     indicating that this *was* once a special exam.
 
     Arguments:
-        course (CourseDescriptor)
+        course (CourseBlock)
         xblock (XBlock)
 
     Returns: bool

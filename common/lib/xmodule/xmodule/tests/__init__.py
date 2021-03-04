@@ -25,6 +25,7 @@ from mock import Mock
 from opaque_keys.edx.keys import CourseKey
 from path import Path as path
 from six import text_type
+from xblock.core import XBlock
 from xblock.field_data import DictFieldData
 from xblock.fields import Reference, ReferenceList, ReferenceValueDict, ScopeIds
 
@@ -185,8 +186,8 @@ def mock_render_template(*args, **kwargs):
 class ModelsTest(unittest.TestCase):  # lint-amnesty, pylint: disable=missing-class-docstring
 
     def test_load_class(self):
-        vc = XModuleDescriptor.load_class('sequential')
-        vc_str = "<class 'xmodule.seq_module.SequenceDescriptor'>"
+        vc = XBlock.load_class('sequential')
+        vc_str = "<class 'xmodule.seq_module.SequenceBlock'>"
         assert str(vc) == vc_str
 
 

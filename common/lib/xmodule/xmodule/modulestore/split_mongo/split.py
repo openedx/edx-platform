@@ -877,7 +877,7 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
     def _lookup_course(self, course_key, head_validation=True):
         """
         Decode the locator into the right series of db access. Does not
-        return the CourseDescriptor! It returns the actual db json from
+        return the CourseBlock! It returns the actual db json from
         structures.
 
         Semantics: if course id and branch given, then it will get that branch. If
