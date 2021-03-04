@@ -5,11 +5,32 @@ Template module
 from string import Template
 
 from lxml import etree
-from xmodule.raw_module import RawDescriptor
-from xmodule.x_module import XModule  # lint-amnesty, pylint: disable=unused-import
+from pkg_resources import resource_string
+from web_fragments.fragment import Fragment
+from xmodule.editing_module import EditingMixin
+from xmodule.raw_module import RawMixin
+from xmodule.util.xmodule_django import add_webpack_to_fragment
+from xmodule.x_module import (
+    HTMLSnippet,
+    ResourceTemplates,
+    shim_xmodule_js,
+    XModuleMixin,
+    XModuleDescriptorToXBlockMixin,
+    XModuleToXBlockMixin,
+)
+from xmodule.xml_module import XmlMixin
 
 
-class CustomTagModule(XModule):
+class CustomTagBlock(
+    RawMixin,
+    XmlMixin,
+    EditingMixin,
+    XModuleDescriptorToXBlockMixin,
+    XModuleToXBlockMixin,
+    HTMLSnippet,
+    ResourceTemplates,
+    XModuleMixin,
+):  # pylint: disable=abstract-method
     """
     This module supports tags of the form
     <customtag option="val" option2="val2" impl="tagname"/>
@@ -31,16 +52,34 @@ class CustomTagModule(XModule):
     Renders to::
         More information given in <a href="/book/234">the text</a>
     """
-
-    def get_html(self):
-        return self.descriptor.rendered_html
-
-
-class CustomTagDescriptor(RawDescriptor):
-    """ Descriptor for custom tags.  Loads the template when created."""
-    module_class = CustomTagModule
     resources_dir = None
     template_dir_name = 'customtag'
+
+    preview_view_js = {
+        'js': [],
+        'xmodule_js': resource_string(__name__, 'js/src/xmodule.js'),
+    }
+    preview_view_css = {
+        'scss': [],
+    }
+    studio_view_js = {
+        'js': [resource_string(__name__, 'js/src/raw/edit/xml.js')],
+        'xmodule_js': resource_string(__name__, 'js/src/xmodule.js'),
+    }
+    studio_view_css = {
+        'scss': [resource_string(__name__, 'css/codemirror/codemirror.scss')],
+    }
+
+    def studio_view(self, _context):
+        """
+        Return the studio view.
+        """
+        fragment = Fragment(
+            self.system.render_template(self.mako_template, self.get_context())
+        )
+        add_webpack_to_fragment(fragment, 'CustomTagBlockStudio')
+        shim_xmodule_js(fragment, 'XMLEditingDescriptor')
+        return fragment
 
     def render_template(self, system, xml_data):
         '''Render the template, given the definition xml_data'''
@@ -70,6 +109,14 @@ class CustomTagDescriptor(RawDescriptor):
     @property
     def rendered_html(self):
         return self.render_template(self.system, self.data)
+
+    def student_view(self, _context):
+        """
+        Renders the student view.
+        """
+        fragment = Fragment()
+        fragment.add_content(self.rendered_html)
+        return fragment
 
     def export_to_file(self):
         """
