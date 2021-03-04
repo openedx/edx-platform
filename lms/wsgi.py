@@ -1,4 +1,4 @@
-"""  # lint-amnesty, pylint: disable=django-not-configured
+"""
 WSGI config for LMS.
 
 This module contains the WSGI application used by Django's development server

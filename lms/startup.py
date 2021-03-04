@@ -1,4 +1,4 @@
-"""  # lint-amnesty, pylint: disable=django-not-configured
+"""
 Module for code that should run during LMS startup (deprecated)
 """
 

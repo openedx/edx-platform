@@ -1,4 +1,4 @@
-"""  # lint-amnesty, pylint: disable=django-not-configured
+"""
 edX Platform support for external user IDs.
 
 This package will be used to support generating external User IDs to be shared

@@ -1,4 +1,4 @@
-# lint-amnesty, pylint: disable=django-not-configured, missing-module-docstring
+# lint-amnesty, pylint: disable=missing-module-docstring
 
 from setuptools import find_packages, setup
 

@@ -1,4 +1,4 @@
-"""  # lint-amnesty, pylint: disable=django-not-configured
+"""
 EdX Branding package.
 
 Provides a way to retrieve "branded" parts of the site.

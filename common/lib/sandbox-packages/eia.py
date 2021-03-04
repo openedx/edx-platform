@@ -1,4 +1,4 @@
-"""  # lint-amnesty, pylint: disable=django-not-configured
+"""
 Standard resistor values.
 
 Commonly used for verifying electronic components in circuit classes are

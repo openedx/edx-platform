@@ -1,4 +1,4 @@
-"""Code run by pylint before running any tests."""  # lint-amnesty, pylint: disable=django-not-configured
+"""Code run by pylint before running any tests."""
 
 # Patch the xml libs before anything else.
 

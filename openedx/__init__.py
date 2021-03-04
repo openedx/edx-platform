@@ -1,4 +1,4 @@
-"""  # lint-amnesty, pylint: disable=django-not-configured
+"""
 This is the root package for Open edX. The intent is that all importable code
 from Open edX will eventually live here, including the code in the lms, cms,
 and common directories.

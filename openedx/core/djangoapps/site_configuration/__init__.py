@@ -1,4 +1,4 @@
-"""  # lint-amnesty, pylint: disable=django-not-configured
+"""
 This app is used for creating/updating site's configuration. This app encapsulate configuration related logic for sites
 and provides a way for sites to override default/system behavioural or presentation logic.
 

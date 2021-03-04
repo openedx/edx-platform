@@ -1,4 +1,4 @@
-"""  # lint-amnesty, pylint: disable=django-not-configured
+"""
 Tests that verify that the admin view loads.
 
 This is not inside a django app because it is a global property of the system.
