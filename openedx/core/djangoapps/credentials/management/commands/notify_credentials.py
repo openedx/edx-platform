@@ -24,7 +24,6 @@ from django.core.management.base import BaseCommand, CommandError
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
 from pytz import UTC
-from six.moves import range
 
 from lms.djangoapps.certificates.api import get_recently_modified_certificates
 from lms.djangoapps.grades.api import get_recently_modified_grades
@@ -39,11 +38,11 @@ log = logging.getLogger(__name__)
 
 
 def certstr(cert):
-    return '{} for user {}'.format(cert.course_id, cert.user.username)
+    return f'{cert.course_id} for user {cert.user.username}'
 
 
 def gradestr(grade):
-    return '{} for user {}'.format(grade.course_id, grade.user_id)
+    return f'{grade.course_id} for user {grade.user_id}'
 
 
 def parsetime(timestr):
@@ -99,8 +98,8 @@ class Command(BaseCommand):
             course-v1:edX+RecordsSelfPaced+1 for user 18
     """
     help = (
-        u"Simulate certificate/grade changes without actually modifying database "
-        u"content. Specifically, trigger the handlers that send data to Credentials."
+        "Simulate certificate/grade changes without actually modifying database "
+        "content. Specifically, trigger the handlers that send data to Credentials."
     )
 
     def add_arguments(self, parser):
@@ -189,8 +188,8 @@ class Command(BaseCommand):
             options['start_date'] = options['end_date'] - timedelta(hours=4)
 
         log.info(
-            u"notify_credentials starting, dry-run=%s, site=%s, delay=%d seconds, page_size=%d, "
-            u"from=%s, to=%s, notify_programs=%s, user_ids=%s, execution=%s",
+            "notify_credentials starting, dry-run=%s, site=%s, delay=%d seconds, page_size=%d, "
+            "from=%s, to=%s, notify_programs=%s, user_ids=%s, execution=%s",
             options['dry_run'],
             options['site'],
             options['delay'],
@@ -205,7 +204,7 @@ class Command(BaseCommand):
         try:
             site_config = SiteConfiguration.objects.get(site__domain=options['site']) if options['site'] else None
         except SiteConfiguration.DoesNotExist:
-            log.error(u'No site configuration found for site %s', options['site'])
+            log.error('No site configuration found for site %s', options['site'])
 
         course_keys = self.get_course_keys(options['courses'])
         if not (course_keys or options['start_date'] or options['end_date'] or options['user_ids']):
@@ -250,11 +249,11 @@ class Command(BaseCommand):
         # First, do certs
         for i, cert in paged_query(certs, delay, page_size):
             if site_config and not site_config.has_org(cert.course_id.org):
-                log.info(u"Skipping credential changes %d for certificate %s", i, certstr(cert))
+                log.info("Skipping credential changes %d for certificate %s", i, certstr(cert))
                 continue
 
             log.info(
-                u"Handling credential changes %d for certificate %s",
+                "Handling credential changes %d for certificate %s",
                 i, certstr(cert),
             )
 
@@ -280,11 +279,11 @@ class Command(BaseCommand):
         # Then do grades
         for i, grade in paged_query(grades, delay, page_size):
             if site_config and not site_config.has_org(grade.course_id.org):
-                log.info(u"Skipping grade changes %d for grade %s", i, gradestr(grade))
+                log.info("Skipping grade changes %d for grade %s", i, gradestr(grade))
                 continue
 
             log.info(
-                u"Handling grade changes %d for grade %s",
+                "Handling grade changes %d for grade %s",
                 i, gradestr(grade),
             )
 
@@ -321,12 +320,12 @@ class Command(BaseCommand):
             courses = []
         course_keys = []
 
-        log.info(u"%d courses specified: %s", len(courses), ", ".join(courses))
+        log.info("%d courses specified: %s", len(courses), ", ".join(courses))
         for course_id in courses:
             try:
                 course_keys.append(CourseKey.from_string(course_id))
             except InvalidKeyError:
-                log.fatal(u"%s is not a parseable CourseKey", course_id)
+                log.fatal("%s is not a parseable CourseKey", course_id)
                 sys.exit(1)
 
         return course_keys
@@ -340,10 +339,10 @@ class Command(BaseCommand):
         for cert in certs[:ITEMS_TO_SHOW]:
             print("   ", certstr(cert))
         if certs.count() > ITEMS_TO_SHOW:
-            print(u"    (+ {} more)".format(certs.count() - ITEMS_TO_SHOW))
+            print("    (+ {} more)".format(certs.count() - ITEMS_TO_SHOW))
 
         print(grades.count(), "Grades:")
         for grade in grades[:ITEMS_TO_SHOW]:
             print("   ", gradestr(grade))
         if grades.count() > ITEMS_TO_SHOW:
-            print(u"    (+ {} more)".format(grades.count() - ITEMS_TO_SHOW))
+            print("    (+ {} more)".format(grades.count() - ITEMS_TO_SHOW))

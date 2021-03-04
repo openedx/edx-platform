@@ -3,7 +3,7 @@
 
 import uuid
 
-import mock
+from unittest import mock
 
 from openedx.core.djangoapps.credentials.models import CredentialsApiConfig
 from openedx.core.djangoapps.credentials.tests import factories
@@ -24,7 +24,7 @@ class TestGetCredentials(CredentialsApiConfigMixin, CacheIsolationTestCase):
     ENABLED_CACHES = ['default']
 
     def setUp(self):
-        super(TestGetCredentials, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
 
         ApplicationFactory(name=CredentialsApiConfig.OAUTH2_CLIENT_NAME)
 
@@ -46,7 +46,7 @@ class TestGetCredentials(CredentialsApiConfigMixin, CacheIsolationTestCase):
             'status': 'awarded',
             'only_visible': 'True',
         }
-        cache_key = '{}.{}'.format(self.credentials_config.CACHE_KEY, self.user.username)
+        cache_key = f'{self.credentials_config.CACHE_KEY}.{self.user.username}'
         assert kwargs['querystring'] == querystring
         assert kwargs['cache_key'] == cache_key
 
@@ -69,7 +69,7 @@ class TestGetCredentials(CredentialsApiConfigMixin, CacheIsolationTestCase):
             'only_visible': 'True',
             'program_uuid': program_uuid,
         }
-        cache_key = '{}.{}.{}'.format(self.credentials_config.CACHE_KEY, self.user.username, program_uuid)
+        cache_key = f'{self.credentials_config.CACHE_KEY}.{self.user.username}.{program_uuid}'
         assert kwargs['querystring'] == querystring
         assert kwargs['cache_key'] == cache_key
 

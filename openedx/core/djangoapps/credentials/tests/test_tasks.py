@@ -2,8 +2,9 @@
 Test credentials tasks
 """
 
+from unittest import mock
+
 import pytest
-import mock
 from django.conf import settings
 from django.test import TestCase, override_settings
 
@@ -27,7 +28,7 @@ class TestSendGradeToCredentialTask(TestCase):
     Tests for the 'send_grade_to_credentials' method.
     """
     def setUp(self):
-        super(TestSendGradeToCredentialTask, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.user = UserFactory.create(username=settings.CREDENTIALS_SERVICE_USERNAME)
 
     def test_happy_path(self, mock_get_api_client):
