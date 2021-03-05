@@ -309,13 +309,21 @@ class MultilingualCourseGroup(models.Model):
     Model for multilingual course groups
     """
 
-    objects = models.Manager()
-    prerequisite_course_groups = PrerequisiteCourseGroupManager()
     name = models.CharField(verbose_name=_('Course group name'), max_length=255, )
     is_prerequisite = models.BooleanField(default=False, verbose_name=_('Is Prerequisite Course Group'), )
 
+    objects = models.Manager()
+    prerequisite_course_groups = PrerequisiteCourseGroupManager()
+
     class Meta:
         app_label = 'applications'
+
+    def __str__(self):
+        return self.name
+
+    @property
+    def open_multilingual_courses(self):
+        return self.multilingual_courses(manager='open_multilingual_courses').all()  # pylint: disable=no-member
 
     def multilingual_course_count(self):
         return self.multilingual_courses.count()
@@ -325,10 +333,6 @@ class MultilingualCourseGroup(models.Model):
 
     def open_multilingual_course_keys(self):
         return self.open_multilingual_courses.values_list('course', flat=True)
-
-    @property
-    def open_multilingual_courses(self):
-        return self.multilingual_courses(manager='open_multilingual_courses').all()  # pylint: disable=no-member
 
     def get_user_enrolled_course(self, user):
         """
@@ -368,13 +372,10 @@ class MultilingualCourseGroup(models.Model):
         return None
 
     def get_first_course(self):
-        return self.open_multilingual_courses.first().course if self.open_multilingual_courses else None
+        return self.open_multilingual_courses.first().course if self.open_multilingual_courses.exists() else None
 
     def does_course_exist(self, multilingual_course):
         return self.multilingual_courses.filter(course=multilingual_course.course).exists()
-
-    def __str__(self):
-        return self.name
 
     @classmethod
     def get_courses_from_course_groups(cls, course_groups, user):
@@ -443,9 +444,6 @@ class MultilingualCourse(models.Model):
     Model for multilingual courses
     """
 
-    objects = models.Manager()
-    open_multilingual_courses = OpenMultilingualCourseManager()
-
     course = models.OneToOneField(
         CourseOverview,
         on_delete=models.CASCADE,
@@ -458,6 +456,9 @@ class MultilingualCourse(models.Model):
         on_delete=models.CASCADE,
         related_name='multilingual_courses',
     )
+
+    objects = models.Manager()
+    open_multilingual_courses = OpenMultilingualCourseManager()
 
     class Meta:
         app_label = 'applications'
