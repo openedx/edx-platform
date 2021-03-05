@@ -164,7 +164,7 @@ class Command(BaseCommand):
         parser.add_argument(
             '--user_ids',
             default=None,
-            nargs='+',
+            nargs='*',
             help='Run the command for the given user or list of users',
         )
 
