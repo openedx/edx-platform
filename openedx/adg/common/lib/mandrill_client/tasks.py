@@ -23,10 +23,6 @@ def task_send_mandrill_email(template, email, context):
     Returns:
         None
     """
-    log.info(
-        'Preparing to send an email using template: %s to account: %s, from inside task_send_mandrill_email',
-        template,
-        email
-    )
+    log.info(f'Sending an email using template: {template} to account: {email}, from inside task_send_mandrill_email')
 
     MandrillClient().send_mandrill_email(template, email, context)

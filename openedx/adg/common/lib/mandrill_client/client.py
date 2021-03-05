@@ -64,12 +64,7 @@ class MandrillClient(object):
         Returns:
             None
         """
-        log.info(
-            'Preparing data using template: %s, account: %s and context: %s for email and sending it using mandrill',
-            template,
-            email,
-            context
-        )
+        log.info(f'Sending email using template: {template}, account: {email} and context: {context} using mandrill')
 
         email_data = EmailData(template, email, context)
         self._send_mail(email_data)
