@@ -7,4 +7,5 @@ will atomically be registered in lms and cms.
 ADG_COMMON_INSTALLED_APPS = [
     'openedx.adg.common.course_meta',
     'openedx.adg.common.mailchimp_pipeline',
+    'msp_assessment.msp_dashboard',
 ]
