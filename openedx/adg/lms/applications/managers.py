@@ -17,16 +17,13 @@ class SubmittedApplicationsManager(Manager):
         )
 
 
-class PrerequisiteCourseGroupManager(Manager):
+class MultilingualCourseGroupManager(Manager):
     """
-    Manager which returns all non-empty pre requisite groups
+    Manager for MultilingualCourseGroup, It contains a method to return prerequisite course groups
     """
 
-    def get_queryset(self):
-        return super().get_queryset().filter(
-            is_prerequisite=True,
-            multilingual_courses__isnull=False
-        ).distinct()
+    def prereq_course_groups(self):
+        return self.get_queryset().filter(is_prerequisite=True, multilingual_courses__isnull=False).distinct()
 
 
 class OpenMultilingualCourseManager(Manager):

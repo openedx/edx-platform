@@ -17,7 +17,7 @@ from openedx.core.lib.grade_utils import round_away_from_zero
 
 from .constants import ALLOWED_LOGO_EXTENSIONS, CourseScore
 from .helpers import max_year_value_validator, min_year_value_validator, validate_logo_size
-from .managers import OpenMultilingualCourseManager, PrerequisiteCourseGroupManager, SubmittedApplicationsManager
+from .managers import MultilingualCourseGroupManager, OpenMultilingualCourseManager, SubmittedApplicationsManager
 
 
 class ApplicationHub(TimeStampedModel):
@@ -195,7 +195,7 @@ class UserApplication(TimeStampedModel):
         Returns:
             list: Prereq course name and score pairs
         """
-        prereq_course_overviews = MultilingualCourseGroup.get_prerequisite_courses_for_user(self.user)
+        prereq_course_overviews = MultilingualCourseGroup.get_courses(self.user, is_prereq=True)
         scores_in_prereq_courses = []
 
         for course_overview in prereq_course_overviews:
@@ -309,11 +309,10 @@ class MultilingualCourseGroup(models.Model):
     Model for multilingual course groups
     """
 
-    name = models.CharField(verbose_name=_('Course group name'), max_length=255, )
-    is_prerequisite = models.BooleanField(default=False, verbose_name=_('Is Prerequisite Course Group'), )
+    name = models.CharField(verbose_name=_('Course group name'), max_length=255,)
+    is_prerequisite = models.BooleanField(default=False, verbose_name=_('Is Prerequisite Course Group'),)
 
-    objects = models.Manager()
-    prerequisite_course_groups = PrerequisiteCourseGroupManager()
+    objects = MultilingualCourseGroupManager()
 
     class Meta:
         app_label = 'applications'
@@ -333,6 +332,9 @@ class MultilingualCourseGroup(models.Model):
 
     def open_multilingual_course_keys(self):
         return self.open_multilingual_courses.values_list('course', flat=True)
+
+    def does_course_exist(self, multilingual_course):
+        return self.multilingual_courses.filter(course=multilingual_course.course).exists()
 
     def get_user_enrolled_course(self, user):
         """
@@ -374,11 +376,8 @@ class MultilingualCourseGroup(models.Model):
     def get_first_course(self):
         return self.open_multilingual_courses.first().course if self.open_multilingual_courses.exists() else None
 
-    def does_course_exist(self, multilingual_course):
-        return self.multilingual_courses.filter(course=multilingual_course.course).exists()
-
     @classmethod
-    def get_courses_from_course_groups(cls, course_groups, user):
+    def get_courses(cls, user, is_prereq=False):
         """
         Get courses from course groups.
         Following are the preferences for the course list.
@@ -392,13 +391,14 @@ class MultilingualCourseGroup(models.Model):
             group then find a course with preferred language.
 
         Args:
-            course_groups (list):  List of MultilingualCourseGroups
+            is_prereq (bool):  List of MultilingualCourseGroups
             user (User): user for which we need to find courses
 
         Returns:
             list: List of courses which contains a course from each group
         """
         courses_list = []
+        course_groups = cls.objects.prereq_course_groups() if is_prereq else cls.objects.all()
         for course_group in course_groups:
             course = (
                 course_group.get_user_enrolled_course(user) or
@@ -409,34 +409,6 @@ class MultilingualCourseGroup(models.Model):
                 courses_list.append(course)
 
         return courses_list
-
-    @classmethod
-    def get_catalog_courses(cls, user):
-        """
-        Get catalog courses for user by using multilingual course groups.
-
-        Args:
-            user (User): User for which courses will be returned
-
-        Returns:
-            list: List of catalog courses
-        """
-        course_groups = cls.objects.all()
-        return cls.get_courses_from_course_groups(course_groups, user)
-
-    @classmethod
-    def get_prerequisite_courses_for_user(cls, user):
-        """
-        Get list of prerequisite courses for a user.
-
-        Args:
-            user (User): user for which we need to find the prerequisite courses
-
-        Returns:
-            list: List of prerequisites for the user
-        """
-        prerequisite_course_groups = cls.prerequisite_course_groups.all()
-        return cls.get_courses_from_course_groups(prerequisite_course_groups, user)
 
 
 class MultilingualCourse(models.Model):

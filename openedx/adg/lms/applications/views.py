@@ -105,7 +105,7 @@ class ApplicationHubView(RedirectToLoginOrRelevantPageMixin, View):
             HttpResponse object.
         """
         user_application_hub, _ = ApplicationHub.objects.get_or_create(user=self.request.user)
-        pre_req_courses = MultilingualCourseGroup.get_prerequisite_courses_for_user(request.user)
+        pre_req_courses = MultilingualCourseGroup.get_courses(request.user, is_prereq=True)
 
         return render(
             request,
