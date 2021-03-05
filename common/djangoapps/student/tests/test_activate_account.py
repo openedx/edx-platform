@@ -3,6 +3,7 @@
 
 import unittest
 from uuid import uuid4
+from datetime import datetime
 
 from django.conf import settings
 from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
@@ -86,6 +87,16 @@ class TestActivateAccount(TestCase):
         self.registration.activate()  # Until you explicitly activate it
         assert self.user.is_active, 'Sanity check for .activate()'
         mock_signal.send_robust.assert_called_once_with(Registration, user=self.user)  # Ensure the signal is emitted
+
+    def test_activation_timestamp(self):
+        """ Assert that activate sets the flag but does not call segment. """
+        # Ensure that the user starts inactive
+        assert not self.user.is_active
+        # Until you explicitly activate it
+        timestamp_before_activation = datetime.utcnow()
+        self.registration.activate()
+        assert self.user.is_active
+        assert self.registration.activation_timestamp > timestamp_before_activation
 
     def test_account_activation_message(self):
         """
