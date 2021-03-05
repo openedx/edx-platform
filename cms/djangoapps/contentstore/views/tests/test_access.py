@@ -20,7 +20,7 @@ class RolesTest(TestCase):
     """
     def setUp(self):
         """ Test case setup """
-        super(RolesTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
 
         self.global_admin = AdminFactory()
         self.instructor = User.objects.create_user('testinstructor', 'testinstructor+courses@edx.org', 'foo')

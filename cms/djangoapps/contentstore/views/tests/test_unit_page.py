@@ -16,7 +16,7 @@ class UnitPageTestCase(StudioPageTestCase):
     """
 
     def setUp(self):
-        super(UnitPageTestCase, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.vertical = ItemFactory.create(parent_location=self.sequential.location,
                                            category='vertical', display_name='Unit')
         self.video = ItemFactory.create(parent_location=self.vertical.location,

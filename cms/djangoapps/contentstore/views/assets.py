@@ -7,7 +7,6 @@ import math
 import re
 from functools import partial
 
-import six
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
@@ -17,13 +16,12 @@ from django.views.decorators.csrf import ensure_csrf_cookie
 from django.views.decorators.http import require_http_methods, require_POST
 from opaque_keys.edx.keys import AssetKey, CourseKey
 from pymongo import ASCENDING, DESCENDING
-from six import text_type
 
 from common.djangoapps.edxmako.shortcuts import render_to_response
-from openedx.core.djangoapps.contentserver.caching import del_cached_content
 from common.djangoapps.student.auth import has_course_author_access
 from common.djangoapps.util.date_utils import get_default_time_display
 from common.djangoapps.util.json_request import JsonResponse
+from openedx.core.djangoapps.contentserver.caching import del_cached_content
 from xmodule.contentstore.content import StaticContent
 from xmodule.contentstore.django import contentstore
 from xmodule.exceptions import NotFoundError
@@ -206,9 +204,9 @@ def _get_error_if_invalid_parameters(requested_filter):
     if invalid_filters:
         error_message = {
             'error_code': 'invalid_asset_type_filter',
-            'developer_message': u'The asset_type parameter to the request is invalid. '
-                                 u'The {} filters are not described in the settings.FILES_AND_UPLOAD_TYPE_FILTERS '
-                                 u'dictionary.'.format(invalid_filters)
+            'developer_message': 'The asset_type parameter to the request is invalid. '
+                                 'The {} filters are not described in the settings.FILES_AND_UPLOAD_TYPE_FILTERS '
+                                 'dictionary.'.format(invalid_filters)
         }
         return JsonResponse({'error': error_message}, status=400)
 
@@ -414,7 +412,7 @@ def _upload_asset(request, course_key):
     try:
         content = update_course_run_asset(course_key, upload_file)
     except AssetSizeTooLargeException as exception:
-        return JsonResponse({'error': text_type(exception)}, status=413)
+        return JsonResponse({'error': str(exception)}, status=413)
 
     # readback the saved content - we need the database timestamp
     readback = contentstore().find(content.location)
@@ -436,7 +434,7 @@ def _get_error_if_course_does_not_exist(course_key):  # lint-amnesty, pylint: di
     try:
         modulestore().get_course(course_key)
     except ItemNotFoundError:
-        logging.error(u'Could not find course: %s', course_key)
+        logging.error('Could not find course: %s', course_key)
         return HttpResponseBadRequest()
 
 
@@ -472,8 +470,8 @@ def _get_file_too_large_error_message(filename):
     """returns formatted error message for large files"""
 
     return _(
-        u'File {filename} exceeds maximum size of '
-        u'{maximum_size_in_megabytes} MB.'
+        'File {filename} exceeds maximum size of '
+        '{maximum_size_in_megabytes} MB.'
     ).format(
         filename=filename,
         maximum_size_in_megabytes=settings.MAX_ASSET_UPLOAD_FILE_SIZE_IN_MB,
@@ -585,7 +583,7 @@ def _delete_thumbnail(thumbnail_location, course_key, asset_key):  # lint-amnest
             contentstore().delete(thumbnail_content.get_id())
             del_cached_content(thumbnail_location)
         except Exception:  # pylint: disable=broad-except
-            logging.warning(u'Could not delete thumbnail: %s', thumbnail_location)
+            logging.warning('Could not delete thumbnail: %s', thumbnail_location)
 
 
 def _get_asset_json(display_name, content_type, date, location, thumbnail_location, locked):
@@ -604,5 +602,5 @@ def _get_asset_json(display_name, content_type, date, location, thumbnail_locati
         'thumbnail': StaticContent.serialize_asset_key_with_slash(thumbnail_location) if thumbnail_location else None,
         'locked': locked,
         # needed for Backbone delete/update.
-        'id': six.text_type(location)
+        'id': str(location)
     }
