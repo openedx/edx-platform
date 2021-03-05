@@ -2996,7 +2996,7 @@ CREATE TABLE `django_migrations` (
   `name` varchar(255) NOT NULL,
   `applied` datetime(6) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=842 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=839 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `django_openid_auth_association`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -6053,6 +6053,7 @@ CREATE TABLE `schedules_scheduleconfig` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `change_date` datetime(6) NOT NULL,
   `enabled` tinyint(1) NOT NULL,
+  `create_schedules` tinyint(1) NOT NULL,
   `enqueue_recurring_nudge` tinyint(1) NOT NULL,
   `deliver_recurring_nudge` tinyint(1) NOT NULL,
   `changed_by_id` int(11) DEFAULT NULL,
@@ -6061,6 +6062,7 @@ CREATE TABLE `schedules_scheduleconfig` (
   `enqueue_upgrade_reminder` tinyint(1) NOT NULL,
   `deliver_course_update` tinyint(1) NOT NULL,
   `enqueue_course_update` tinyint(1) NOT NULL,
+  `hold_back_ratio` double NOT NULL,
   PRIMARY KEY (`id`),
   KEY `schedules_scheduleconfig_changed_by_id_38ef599b_fk_auth_user_id` (`changed_by_id`),
   KEY `schedules_scheduleconfig_site_id_44296ee1_fk_django_site_id` (`site_id`),
