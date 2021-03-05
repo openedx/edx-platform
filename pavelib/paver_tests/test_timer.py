@@ -6,7 +6,7 @@ Tests of the pavelib.utils.timer module.
 from datetime import datetime, timedelta
 from unittest import TestCase
 
-from unittest.mock import MagicMock, patch
+from mock import MagicMock, patch
 
 from pavelib.utils import timer
 

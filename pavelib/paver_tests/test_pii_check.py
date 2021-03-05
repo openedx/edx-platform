@@ -5,9 +5,9 @@ Tests for Paver's PII checker task.
 import shutil
 import tempfile
 import unittest
-from unittest.mock import patch
-
 import pytest
+
+from mock import patch
 from path import Path as path
 from paver.easy import call_task, BuildFailure
 
@@ -44,7 +44,7 @@ class TestPaverPIICheck(unittest.TestCase):
         assert any('cms.envs.test' in call for call in mock_calls)
         assert all(str(self.report_dir) in call for call in mock_calls)
         metrics_file = Env.METRICS_DIR / 'pii'
-        assert open(metrics_file).read() == 'Number of PII Annotation violations: 66\n'
+        assert open(metrics_file, 'r').read() == 'Number of PII Annotation violations: 66\n'
 
     @patch.object(pavelib.quality.run_pii_check, 'needs')
     @patch('pavelib.quality.sh')
@@ -71,4 +71,4 @@ class TestPaverPIICheck(unittest.TestCase):
         assert any('cms.envs.test' in call for call in mock_calls)
         assert all(str(self.report_dir) in call for call in mock_calls)
         metrics_file = Env.METRICS_DIR / 'pii'
-        assert open(metrics_file).read() == 'Number of PII Annotation violations: 66\n'
+        assert open(metrics_file, 'r').read() == 'Number of PII Annotation violations: 66\n'

@@ -490,7 +490,7 @@ def compile_sass(options):
     print("\t\tFinished compiling Sass:")
     if not dry_run:
         for sass_dir, css_dir, duration in timing_info:
-            print(f">> {sass_dir} -> {css_dir} in {duration}s")
+            print(">> {} -> {} in {}s".format(sass_dir, css_dir, duration))
 
     if compilation_results['success']:
         print("\033[92m\nSuccessful compilations:\n--- " + "\n--- ".join(compilation_results['success']) + "\n\033[00m")
@@ -548,7 +548,7 @@ def _compile_sass(system, theme, debug, force, timing_info):
                     css_dir=css_dir,
                 ))
             else:
-                sh(f"rm -rf {css_dir}/*.css")
+                sh("rm -rf {css_dir}/*.css".format(css_dir=css_dir))
 
         if dry_run:
             tasks.environment.info("libsass {sass_dir}".format(
@@ -611,7 +611,7 @@ def process_npm_assets():
         if library.startswith('node_modules/'):
             library_path = library
         else:
-            library_path = f'node_modules/{library}'
+            library_path = 'node_modules/{library}'.format(library=library)
 
         if library.endswith('.css') or library.endswith('.css.map'):
             vendor_dir = NPM_CSS_VENDOR_DIRECTORY
@@ -623,14 +623,14 @@ def process_npm_assets():
                 vendor_dir=vendor_dir,
             ))
         elif not skip_if_missing:
-            raise Exception(f'Missing vendor file {library_path}')
+            raise Exception('Missing vendor file {library_path}'.format(library_path=library_path))
 
     def copy_vendor_library_dir(library_dir, skip_if_missing=False):
         """
         Copies all vendor libraries in directory to the shared vendor directory.
         """
-        library_dir_path = f'node_modules/{library_dir}'
-        print(f'Copying vendor library dir: {library_dir_path}')
+        library_dir_path = 'node_modules/{library_dir}'.format(library_dir=library_dir)
+        print('Copying vendor library dir: {}'.format(library_dir_path))
         if os.path.exists(library_dir_path):
             for dirpath, _, filenames in os.walk(library_dir_path):
                 for filename in filenames:
@@ -709,7 +709,7 @@ def collect_assets(systems, settings, **kwargs):
     ]
 
     ignore_args = " ".join(
-        f'--ignore "{pattern}"' for pattern in ignore_patterns
+        '--ignore "{}"'.format(pattern) for pattern in ignore_patterns
     )
 
     for sys in systems:
@@ -718,7 +718,7 @@ def collect_assets(systems, settings, **kwargs):
             ignore_args=ignore_args,
             logfile_str=collectstatic_stdout_str
         )))
-        print(f"\t\tFinished collecting {sys} assets.")
+        print("\t\tFinished collecting {} assets.".format(sys))
 
 
 def _collect_assets_cmd(system, **kwargs):

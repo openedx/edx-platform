@@ -214,9 +214,9 @@ class TestPaverServerTasks(PaverTestCase):
         if task_name == "devstack":
             args = ["studio" if system == "cms" else system]
             if settings:
-                args.append(f"--settings={settings}")
+                args.append("--settings={settings}".format(settings=settings))
             if asset_settings:
-                args.append(f"--asset-settings={asset_settings}")
+                args.append("--asset-settings={asset_settings}".format(asset_settings=asset_settings))
             if is_optimized:
                 args.append("--optimized")
             if is_fast:
@@ -225,7 +225,7 @@ class TestPaverServerTasks(PaverTestCase):
                 args.append("--no-contracts")
             call_task("pavelib.servers.devstack", args=args)
         else:
-            call_task(f"pavelib.servers.{task_name}", options=options)
+            call_task("pavelib.servers.{task_name}".format(task_name=task_name), options=options)
         expected_messages = options.get("expected_messages", [])
         expected_settings = settings if settings else Env.DEVSTACK_SETTINGS
         expected_asset_settings = asset_settings if asset_settings else expected_settings
