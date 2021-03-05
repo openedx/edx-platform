@@ -967,6 +967,8 @@ HTTPS = 'on'
 ROOT_URLCONF = 'cms.urls'
 
 COURSE_IMPORT_EXPORT_BUCKET = ''
+COURSE_METADATA_EXPORT_BUCKET = ''
+
 ALTERNATE_WORKER_QUEUES = 'lms'
 
 STATIC_URL_BASE = '/static/'
@@ -1051,6 +1053,8 @@ derived('LOCALE_PATHS')
 MESSAGE_STORAGE = 'django.contrib.messages.storage.session.SessionStorage'
 
 COURSE_IMPORT_EXPORT_STORAGE = 'django.core.files.storage.FileSystemStorage'
+COURSE_METADATA_EXPORT_STORAGE = 'django.core.files.storage.FileSystemStorage'
+
 
 ##### EMBARGO #####
 EMBARGO_SITE_REDIRECT_URL = None
@@ -1388,6 +1392,7 @@ INSTALLED_APPS = [
     'common.djangoapps.student.apps.StudentConfig',  # misleading name due to sharing with lms
     'openedx.core.djangoapps.course_groups',  # not used in cms (yet), but tests run
     'cms.djangoapps.xblock_config.apps.XBlockConfig',
+    'cms.djangoapps.export_course_metadata.apps.ExportCourseMetadataConfig',
 
     # New (Blockstore-based) XBlock runtime
     'openedx.core.djangoapps.xblock.apps.StudioXBlockAppConfig',
