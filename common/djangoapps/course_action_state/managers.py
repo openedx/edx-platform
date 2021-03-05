@@ -4,6 +4,7 @@ Model Managers for Course Actions
 
 import traceback
 
+import six
 from django.db import models, transaction
 
 
@@ -12,7 +13,7 @@ class CourseActionStateManager(models.Manager):
     An abstract Model Manager class for Course Action State models.
     This abstract class expects child classes to define the ACTION (string) field.
     """
-    class Meta:
+    class Meta(object):
         """Abstract manager class, with subclasses defining the ACTION (string) field."""
         abstract = True
 
@@ -89,7 +90,7 @@ class CourseActionUIStateManager(CourseActionStateManager):
 
         # update any additional fields in kwargs
         if kwargs:
-            for key, value in kwargs.items():
+            for key, value in six.iteritems(kwargs):
                 setattr(state_object, key, value)
 
         state_object.save()
@@ -108,7 +109,7 @@ class CourseRerunUIStateManager(CourseActionUIStateManager):
     """
     ACTION = "rerun"
 
-    class State:
+    class State(object):
         """
         An Enum class for maintaining the list of possible states for Reruns.
         """

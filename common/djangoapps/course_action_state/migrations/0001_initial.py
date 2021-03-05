@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 import django.db.models.deletion
 from django.conf import settings
 from django.db import migrations, models
@@ -23,13 +25,13 @@ class Migration(migrations.Migration):
                 ('should_display', models.BooleanField(default=False)),
                 ('message', models.CharField(max_length=1000)),
                 ('source_course_key', CourseKeyField(max_length=255, db_index=True)),
-                ('display_name', models.CharField(default='', max_length=255, blank=True)),
+                ('display_name', models.CharField(default=u'', max_length=255, blank=True)),
                 ('created_user', models.ForeignKey(related_name='created_by_user+', on_delete=django.db.models.deletion.SET_NULL, to=settings.AUTH_USER_MODEL, null=True)),
                 ('updated_user', models.ForeignKey(related_name='updated_by_user+', on_delete=django.db.models.deletion.SET_NULL, to=settings.AUTH_USER_MODEL, null=True)),
             ],
         ),
         migrations.AlterUniqueTogether(
             name='coursererunstate',
-            unique_together={('course_key', 'action')},
+            unique_together=set([('course_key', 'action')]),
         ),
     ]
