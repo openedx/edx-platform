@@ -64,7 +64,7 @@ def test_compose_and_send_adg_activation_email(
     }
 
     student_helpers.compose_and_send_adg_activation_email(user_with_profile, activation_key)
-    mock_task_send_mandrill_email.delay.assert_called_once_with(
+    mock_task_send_mandrill_email.assert_called_once_with(
         mock_mandrill_client.USER_ACCOUNT_ACTIVATION, user_with_profile.email, expected_context
     )
 
@@ -97,7 +97,7 @@ def test_compose_and_send_adg_password_reset_email(
     }
 
     student_helpers.compose_and_send_adg_password_reset_email(user_with_profile, fake_request)
-    mock_task_send_mandrill_email.delay.assert_called_once_with(
+    mock_task_send_mandrill_email.assert_called_once_with(
         mock_mandrill_client.PASSWORD_RESET, user_with_profile.email, expected_context
     )
 
@@ -122,7 +122,7 @@ def test_compose_and_send_adg_update_email_verification(
     }
 
     student_helpers.compose_and_send_adg_update_email_verification(user_with_profile, True, confirmation_link)
-    mock_task_send_mandrill_email.delay.assert_called_once_with(
+    mock_task_send_mandrill_email.assert_called_once_with(
         mock_mandrill_client.CHANGE_USER_EMAIL_ALERT, user_with_profile.email, expected_context
     )
 
