@@ -52,5 +52,5 @@ class TestExportCourseMetadata(SharedModuleStoreTestCase):
             '{"highlights": [["week1highlight1", "week1highlight2"], ["week1highlight1", "week1highlight2"], [], []]}'
         )
         patched_storage.save.assert_called_once_with(
-            'course_metadata_export/course-v1:org.0+course_0+Run_0.json', patched_content.return_value
+            'course_metadata_export/{}.json'.format(self.course_key), patched_content.return_value
         )
