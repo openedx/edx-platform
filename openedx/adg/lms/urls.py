@@ -17,5 +17,9 @@ adg_url_patterns = [
         r'^api/applications/',
         include('openedx.adg.lms.applications.api_urls', namespace='applications_api')
     ),
+    url(
+        r'msp/',
+        include('msp_assessment.msp_dashboard.urls')
+    ),
     path('adg-admin/', adg_admin_site.urls)
 ]
