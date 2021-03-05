@@ -1,48 +1,5 @@
 """
-Certificates are created for a student and an offering of a course.
-
-When a certificate is generated, a unique ID is generated so that
-the certificate can be verified later. The ID is a UUID4, so that
-it can't be easily guessed and so that it is unique.
-
-Certificates are generated in batches by a cron job, when a
-certificate is available for download the GeneratedCertificate
-table is updated with information that will be displayed
-on the course overview page.
-
-
-State diagram:
-
-[deleted,error,unavailable] [error,downloadable]
-            +                +             +
-            |                |             |
-            |                |             |
-         add_cert       regen_cert     del_cert
-            |                |             |
-            v                v             v
-       [generating]    [regenerating]  [deleting]
-            +                +             +
-            |                |             |
-       certificate      certificate    certificate
-         created       removed,created   deleted
-            +----------------+-------------+------->[error]
-            |                |             |
-            |                |             |
-            v                v             v
-      [downloadable]   [downloadable]  [deleted]
-
-
-Eligibility:
-
-    Students are eligible for a certificate if they pass the course
-    with the following exceptions:
-
-       If the student has allow_certificate set to False in the student profile
-       he will never be issued a certificate.
-
-       If the user and course is present in the certificate whitelist table
-       then the student will be issued a certificate regardless of his grade,
-       unless he has allow_certificate set to False.
+Course certificates are created for a student and an offering of a course (a course run).
 """
 
 
