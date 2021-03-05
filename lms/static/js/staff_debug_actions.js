@@ -28,9 +28,10 @@ var StaffDebug = (function() {
     };
 
     var doInstructorDashAction = function(action) {
+        var user = getUser(action.locationName);
         var pdata = {
             problem_to_reset: action.location,
-            unique_student_identifier: getUser(action.locationName),
+            unique_student_identifier: user,
             delete_module: action.delete_module,
             only_if_higher: action.only_if_higher,
             score: action.score
@@ -41,7 +42,7 @@ var StaffDebug = (function() {
             data: pdata,
             success: function(data) {
                 var text = _.template(action.success_msg, {interpolate: /\{(.+?)\}/g})(
-                {user: data.student}
+                {user: user}
             );
                 var html = _.template('<p id="idash_msg" class="success">{text}</p>', {interpolate: /\{(.+?)\}/g})(
                 {text: text}
@@ -53,14 +54,17 @@ var StaffDebug = (function() {
             },
             error: function(request, status, error) {
                 var responseJSON;
+                var errorMsg = _.template(action.error_msg, {interpolate: /\{(.+?)\}/g})(
+                {user: user}
+            );
                 try {
-                    responseJSON = $.parseJSON(request.responseText);
+                    responseJSON = $.parseJSON(request.responseText).error;
                 } catch (e) {
                     responseJSON = 'Unknown Error Occurred.';
                 }
                 var text = _.template('{error_msg} {error}', {interpolate: /\{(.+?)\}/g})(
                     {
-                        error_msg: action.error_msg,
+                        error_msg: errorMsg,
                         error: gettext(responseJSON)
                     }
             );
