@@ -2664,13 +2664,11 @@ def add_certificate_exception(course_key, student, certificate_exception):
             _("Student (username/email={user}) already in certificate exception list.").format(user=student.username)
         )
 
-    certificate_allowlist_entry = certs_api.create_certificate_allowlist_entry(
+    certificate_allowlist_entry, __ = certs_api.create_or_update_certificate_allowlist_entry(
         student,
         course_key,
         certificate_exception.get("notes", "")
     )
-
-    log.info(f"Student {student.id} has been added to the whitelist in course {course_key}")
 
     generated_certificate = certs_api.get_certificate_for_user(student.username, course_key, False)
 
@@ -2688,31 +2686,20 @@ def add_certificate_exception(course_key, student, certificate_exception):
 
 def remove_certificate_exception(course_key, student):
     """
-    Remove certificate exception for given course and student from CertificateWhitelist table and
-    invalidate its GeneratedCertificate if present.
-    Raises ValueError in case no exception exists for the student in the given course.
+    Remove certificate exception for given course and student from the certificate allowlist.
+
+    Raises ValueError if an error occurs during removal of the allowlist entry.
 
     :param course_key: identifier of the course whose certificate exception needs to be removed.
     :param student: User object whose certificate exception needs to be removed.
     :return:
     """
-    log.info(f"Request received to remove an allowlist entry for student {student.id} in course {course_key}.")
-
-    allowlist_entry = certs_api.get_allowlist_entry(student, course_key)
-    if not allowlist_entry:
-        raise ValueError(  # lint-amnesty, pylint: disable=raise-missing-from
-            _('Certificate exception (user={user}) does not exist in certificate white list. '
-              'Please refresh the page and try again.').format(user=student.username)
+    result = certs_api.remove_allowlist_entry(student, course_key)
+    if not result:
+        raise ValueError(
+            _("Error occurred removing the allowlist entry for student {student}. Please refresh the page "
+              "and try again").format(student=student.username)
         )
-
-    # If a certificate was generated then we should invalidate it before removing the learner from the allowlist
-    certificate = certs_api.get_certificate_for_user(student.username, course_key, False)
-    if certificate:
-        log.info(f"Invalidating certificate for student {student.id} in course {course_key} before allowlist removal.")
-        certificate.invalidate()
-
-    log.info(f"Removing student {student.id} from the allowlist in course {course_key}.")
-    allowlist_entry.delete()
 
 
 def parse_request_data_and_get_user(request):

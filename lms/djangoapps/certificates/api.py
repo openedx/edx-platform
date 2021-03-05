@@ -17,17 +17,16 @@ from eventtracking import tracker
 from opaque_keys.edx.django.models import CourseKeyField
 from organizations.api import get_course_organization_id
 
+from common.djangoapps.student.api import is_user_enrolled_in_course
 from lms.djangoapps.branding import api as branding_api
 from lms.djangoapps.certificates.generation_handler import \
-    generate_user_certificates as _generate_user_certificates
+    generate_allowlist_certificate_task as _generate_allowlist_certificate_task
+from lms.djangoapps.certificates.generation_handler import generate_user_certificates as _generate_user_certificates
 from lms.djangoapps.certificates.generation_handler import \
     is_using_certificate_allowlist as _is_using_certificate_allowlist
 from lms.djangoapps.certificates.generation_handler import \
     is_using_certificate_allowlist_and_is_on_allowlist as _is_using_certificate_allowlist_and_is_on_allowlist
-from lms.djangoapps.certificates.generation_handler import \
-    generate_allowlist_certificate_task as _generate_allowlist_certificate_task
-from lms.djangoapps.certificates.generation_handler import \
-    regenerate_user_certificates as _regenerate_user_certificates
+from lms.djangoapps.certificates.generation_handler import regenerate_user_certificates as _regenerate_user_certificates
 from lms.djangoapps.certificates.models import (
     CertificateGenerationConfiguration,
     CertificateGenerationCourseSetting,
@@ -300,6 +299,8 @@ def is_certificate_invalidated(student, course_key):
     Returns:
         Boolean denoting whether the certificate has been invalidated for this learner.
     """
+    log.info(f"Checking if student {student.id} has an invalidated certificate in course {course_key}.")
+
     certificate = GeneratedCertificate.certificate_for_student(student, course_key)
     if certificate:
         return CertificateInvalidation.has_certificate_invalidation(student, course_key)
@@ -575,21 +576,88 @@ def get_allowlisted_users(course_key):
     return User.objects.filter(certificatewhitelist__course_id=course_key, certificatewhitelist__whitelist=True)
 
 
-def create_certificate_allowlist_entry(user, course_key, notes):
+def create_or_update_certificate_allowlist_entry(user, course_key, notes, enabled=True):
     """
-    Creates a certificate exception for a given learner in a given course-run.
+    Update-or-create an allowlist entry for a student in a given course-run.
     """
-    log.info(f"Creating an allowlist entry for student {user.id} in course {course_key}")
-    certificate_allowlist, __ = CertificateWhitelist.objects.get_or_create(
+    certificate_allowlist, created = CertificateWhitelist.objects.update_or_create(
         user=user,
         course_id=course_key,
         defaults={
-            'whitelist': True,
+            'whitelist': enabled,
             'notes': notes,
         }
     )
 
-    return certificate_allowlist
+    log.info(f"Updated the allowlist of course {course_key} with student {user.id} and enabled={enabled}")
+
+    return certificate_allowlist, created
+
+
+def remove_allowlist_entry(user, course_key):
+    """
+    Removes an allowlist entry for a user in a given course-run. If a certificate exists for the student in the
+    course-run we will also attempt to invalidate the it before removing them from the allowlist.
+
+    Returns the result of the removal operation as a bool.
+    """
+    log.info(f"Removing student {user.id} from the allowlist in course {course_key}")
+
+    allowlist_entry = get_allowlist_entry(user, course_key)
+    if allowlist_entry:
+        certificate = get_certificate_for_user(user.username, course_key, False)
+        if certificate:
+            log.info(f"Invalidating certificate for student {user.id} in course {course_key} before allowlist removal.")
+            certificate.invalidate()
+
+        log.info(f"Removing student {user.id} from the allowlist in course {course_key}.")
+        allowlist_entry.delete()
+        return True
+
+    return False
+
+
+def get_allowlist_entry(user, course_key):
+    """
+    Retrieves and returns an allowlist entry for a given learner and course-run.
+    """
+    log.info(f"Attempting to retrieve an allowlist entry for student {user.id} in course {course_key}.")
+    try:
+        allowlist_entry = CertificateWhitelist.objects.get(user=user, course_id=course_key)
+    except ObjectDoesNotExist:
+        log.warning(f"No allowlist entry found for student {user.id} in course {course_key}.")
+        return None
+
+    return allowlist_entry
+
+
+def is_on_allowlist(user, course_key):
+    """
+    Determines if a learner has an active allowlist entry for a given course-run.
+    """
+    log.info(f"Checking if student {user.id} is on the allowlist in course {course_key}")
+    return CertificateWhitelist.objects.filter(user=user, course_id=course_key, whitelist=True).exists()
+
+
+def can_be_added_to_allowlist(user, course_key):
+    """
+    Determines if a student is able to be added to the allowlist in a given course-run.
+    """
+    log.info(f"Checking if student {user.id} in course {course_key} can be added to the allowlist.")
+
+    if not is_user_enrolled_in_course(user, course_key):
+        log.info(f"Student {user.id} is not enrolled in course {course_key}")
+        return False
+
+    if is_certificate_invalidated(user, course_key):
+        log.info(f"Student {user.id} is on the certificate invalidation list for course {course_key}")
+        return False
+
+    if is_on_allowlist(user, course_key):
+        log.info(f"Student {user.id} already appears on allowlist in course {course_key}")
+        return False
+
+    return True
 
 
 def create_certificate_invalidation_entry(certificate, user_requesting_invalidation, notes):
@@ -609,20 +677,6 @@ def create_certificate_invalidation_entry(certificate, user_requesting_invalidat
     return certificate_invalidation
 
 
-def get_allowlist_entry(user, course_key):
-    """
-    Retrieves and returns an allowlist entry for a given learner and course-run.
-    """
-    log.info(f"Attempting to retrieve an allowlist entry for student {user.id} in course {course_key}.")
-    try:
-        allowlist_entry = CertificateWhitelist.objects.get(user=user, course_id=course_key)
-    except ObjectDoesNotExist:
-        log.warning(f"No allowlist entry found for student {user.id} in course {course_key}.")
-        return None
-
-    return allowlist_entry
-
-
 def get_certificate_invalidation_entry(certificate):
     """
     Retrieves and returns an certificate invalidation entry for a given certificate id.
@@ -635,10 +689,3 @@ def get_certificate_invalidation_entry(certificate):
         return None
 
     return certificate_invalidation_entry
-
-
-def is_on_allowlist(user, course_key):
-    """
-    Determines if a learner appears on the allowlist for a given course-run.
-    """
-    return CertificateWhitelist.objects.filter(user=user, course_id=course_key, whitelist=True).exists()
