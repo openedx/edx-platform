@@ -1,12 +1,13 @@
 """
 All tests for mandrill client tasks
 """
-from openedx.adg.common.lib.mandrill_client import tasks as mandrill_tasks
+from unittest.mock import patch
+
+from openedx.adg.common.lib.mandrill_client.tasks import task_send_mandrill_email
 
 
-def test_task_send_mandrill_email(mocker):
-    mock_mandrill = mocker.patch.object(mandrill_tasks, 'MandrillClient')
+@patch('openedx.adg.common.lib.mandrill_client.tasks.MandrillClient')
+def test_task_send_mandrill_email(mock_mandrill_client):
+    task_send_mandrill_email('email_template', 'user@email.com', {'content': 'content'})
 
-    mandrill_tasks.task_send_mandrill_email('email_template', 'user@email.com', {'content': 'content'})
-
-    mock_mandrill.assert_called_once()
+    mock_mandrill_client.assert_called_once()
