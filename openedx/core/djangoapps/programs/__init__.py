@@ -1,4 +1,4 @@
-"""
+"""  # lint-amnesty, pylint: disable=django-not-configured
 Platform support for Programs.
 
 This package is a thin wrapper around interactions with the Programs service,

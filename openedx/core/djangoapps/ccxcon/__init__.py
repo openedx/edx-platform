@@ -1,4 +1,4 @@
-"""
+"""  # lint-amnesty, pylint: disable=django-not-configured
 The ccxcon app contains the models and the APIs to  interact
 with the `CCX Connector`, an application external to openedx
 that is used to interact with the CCX and their master courses.

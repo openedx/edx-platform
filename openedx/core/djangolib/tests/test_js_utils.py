@@ -1,4 +1,4 @@
-# lint-amnesty, pylint: disable=bad-option-value, unicode-format-string
+# lint-amnesty, pylint: disable=bad-option-value, unicode-format-string  # lint-amnesty, pylint: disable=django-not-configured
 # -*- coding: utf-8 -*-
 """
 Tests for js_utils.py

@@ -1,4 +1,4 @@
-"""
+"""  # lint-amnesty, pylint: disable=django-not-configured
 Feature toggles used across the platform. Toggles should only be added to this module if we don't have a better place
 for them. Generally speaking, they should be added to the most appropriate app or repo.
 """

@@ -1,4 +1,4 @@
-"""
+"""  # lint-amnesty, pylint: disable=django-not-configured
 Constants that are relevant to all of Open edX
 """
 # These are standard regexes for pulling out info like course_ids, usage_ids, etc.

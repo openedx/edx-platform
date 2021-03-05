@@ -1,3 +1,3 @@
-# lint-amnesty, pylint: disable=missing-module-docstring
+# lint-amnesty, pylint: disable=django-not-configured, missing-module-docstring
 from .formula import *
 from .symmath_check import *

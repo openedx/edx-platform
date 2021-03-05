@@ -1,4 +1,4 @@
-"""Admin forms for Course Entitlements"""
+"""Admin forms for Course Entitlements"""  # lint-amnesty, pylint: disable=django-not-configured
 
 
 from django import forms

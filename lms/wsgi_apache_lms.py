@@ -1,4 +1,4 @@
-"""
+"""  # lint-amnesty, pylint: disable=django-not-configured
 Apache WSGI file for LMS
 
 This module contains the WSGI application used for Apache deployment.
