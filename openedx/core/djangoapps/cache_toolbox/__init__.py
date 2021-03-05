@@ -1,4 +1,4 @@
-"""  # lint-amnesty, pylint: disable=django-not-configured
+"""
 :mod:`cache_toolbox` --- Non-magical object caching tools for Django
 ====================================================================
 

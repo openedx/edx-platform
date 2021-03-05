@@ -1,4 +1,4 @@
-"""  # lint-amnesty, pylint: disable=django-not-configured
+"""
 These views handle all actions in Studio related to import and exporting of
 courses
 """

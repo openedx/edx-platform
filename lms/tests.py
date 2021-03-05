@@ -1,4 +1,4 @@
-"""Tests for the lms module itself."""  # lint-amnesty, pylint: disable=django-not-configured
+"""Tests for the lms module itself."""
 
 
 import logging

@@ -1,4 +1,4 @@
-"""  # lint-amnesty, pylint: disable=django-not-configured
+"""
 Contains methods for accessing course highlights. Course highlights is a
 schedule experience built on the Schedules app.
 """

@@ -1,4 +1,4 @@
-"""Entitlement Models"""  # lint-amnesty, pylint: disable=django-not-configured
+"""Entitlement Models"""
 
 
 import logging

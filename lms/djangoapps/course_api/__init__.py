@@ -1,4 +1,4 @@
-""" Course API """  # lint-amnesty, pylint: disable=django-not-configured
+""" Course API """
 
 
 from edx_toggles.toggles import LegacyWaffleSwitch, LegacyWaffleSwitchNamespace
