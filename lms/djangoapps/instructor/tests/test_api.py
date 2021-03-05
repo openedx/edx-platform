@@ -4383,7 +4383,7 @@ class TestInstructorCertificateExceptions(SharedModuleStoreTestCase):
         """
         Test ability to retrieve a learner record using their username and course id
         """
-        student = _get_student_from_request_data({"user": self.user.username}, self.course.id)
+        student = _get_student_from_request_data({"user": self.user.username})
 
         assert student.username == self.user.username
 
@@ -4392,7 +4392,7 @@ class TestInstructorCertificateExceptions(SharedModuleStoreTestCase):
         Test that we receive an expected error when no learner's username or email is entered
         """
         with pytest.raises(ValueError) as error:
-            _get_student_from_request_data({"user": ""}, self.course.id)
+            _get_student_from_request_data({"user": ""})
 
         assert str(error.value) == (
             'Student username/email field is required and can not be empty. Kindly fill in username/email and then '
@@ -4405,23 +4405,9 @@ class TestInstructorCertificateExceptions(SharedModuleStoreTestCase):
         in the LMS.
         """
         with pytest.raises(ValueError) as error:
-            _get_student_from_request_data({"user": "Neo"}, self.course.id)
+            _get_student_from_request_data({"user": "Neo"})
 
         assert str(error.value) == "Neo does not exist in the LMS. Please check your spelling and retry."
-
-    def test_get_student_from_request_data_user_not_enrolled(self):
-        """
-        Test to verify an expected error message is returned when attempting to retrieve a learner that is not enrolled
-        in a course-run.
-        """
-        new_course = CourseFactory.create()
-
-        with pytest.raises(ValueError) as error:
-            _get_student_from_request_data({"user": self.user.username}, new_course.id)
-
-        assert str(error.value) == (
-            f"{self.user.username} is not enrolled in this course. Please check your spelling and retry."
-        )
 
     def test_get_certificate_for_user(self):
         """

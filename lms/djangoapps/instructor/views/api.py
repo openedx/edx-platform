@@ -41,6 +41,7 @@ from submissions import api as sub_api  # installed from the edx-submissions rep
 
 from common.djangoapps.course_modes.models import CourseMode
 from common.djangoapps.student import auth
+from common.djangoapps.student.api import is_user_enrolled_in_course
 from common.djangoapps.student.models import (
     ALLOWEDTOENROLL_TO_ENROLLED,
     ALLOWEDTOENROLL_TO_UNENROLLED,
@@ -404,7 +405,7 @@ def register_and_enroll_students(request, course_id):  # pylint: disable=too-man
                         )
 
                     # enroll a user if it is not already enrolled.
-                    if not CourseEnrollment.is_enrolled(user, course_id):
+                    if not is_user_enrolled_in_course(user, course_id):
                         # Enroll user to the course and add manual enrollment audit trail
                         create_manual_course_enrollment(
                             user=user,
@@ -820,7 +821,7 @@ def bulk_beta_modify_access(request, course_id):
             # See if we should autoenroll the student
             if auto_enroll:
                 # Check if student is already enrolled
-                if not CourseEnrollment.is_enrolled(user, course_id):
+                if not is_user_enrolled_in_course(user, course_id):
                     CourseEnrollment.enroll(user, course_id)
 
         finally:
@@ -2609,7 +2610,7 @@ def certificate_exception_view(request, course_id):
     course_key = CourseKey.from_string(course_id)
     # Validate request data and return error response in case of invalid data
     try:
-        certificate_exception, student = parse_request_data_and_get_user(request, course_key)
+        certificate_exception, student = parse_request_data_and_get_user(request)
     except ValueError as error:
         return JsonResponse({'success': False, 'message': str(error)}, status=400)
 
@@ -2643,6 +2644,14 @@ def add_certificate_exception(course_key, student, certificate_exception):
     :return: CertificateWhitelist item in dict format containing certificate exception info.
     """
     log.info(f"Request received to add an allowlist entry for student {student.id} in course {course_key}")
+
+    # Check if the learner is actively enrolled in the course-run
+    if not is_user_enrolled_in_course(student, course_key):
+        raise ValueError(
+            _("Student {user} is not enrolled in this course. Please check your spelling and retry.")
+            .format(user=student.username)
+        )
+
     # Check if the learner is blocked from receiving certificates in this course run.
     if certs_api.is_certificate_invalidated(student, course_key):
         raise ValueError(
@@ -2706,7 +2715,7 @@ def remove_certificate_exception(course_key, student):
     allowlist_entry.delete()
 
 
-def parse_request_data_and_get_user(request, course_key):
+def parse_request_data_and_get_user(request):
     """
         Parse request data into Certificate Exception and User object.
         Certificate Exception is the dict object containing information about certificate exception.
@@ -2721,7 +2730,7 @@ def parse_request_data_and_get_user(request, course_key):
     if not user:
         raise ValueError(_('Student username/email field is required and can not be empty. '
                            'Kindly fill in username/email and then press "Add to Exception List" button.'))
-    db_user = get_student(user, course_key)
+    db_user = get_student(user)
 
     return certificate_exception, db_user
 
@@ -2741,7 +2750,7 @@ def parse_request_data(request):
     return data
 
 
-def get_student(username_or_email, course_key):
+def get_student(username_or_email):
     """
     Retrieve and return User object from db, raise ValueError
     if user is does not exists or is not enrolled in the given course.
@@ -2757,10 +2766,6 @@ def get_student(username_or_email, course_key):
             user=username_or_email
         ))
 
-    # Make Sure the given student is enrolled in the course
-    if not CourseEnrollment.is_enrolled(student, course_key):
-        raise ValueError(_("{user} is not enrolled in this course. Please check your spelling and retry.")
-                         .format(user=username_or_email))
     return student
 
 
@@ -2886,7 +2891,7 @@ def generate_bulk_certificate_exceptions(request, course_id):
                     build_row_errors('user_already_white_listed', user, row_num)
                     log.warning(f'Student {user.id} already on exception list in Course {course_key}.')
                 # make sure user is enrolled in course
-                elif not CourseEnrollment.is_enrolled(user, course_key):
+                elif not is_user_enrolled_in_course(user, course_key):
                     build_row_errors('user_not_enrolled', user, row_num)
                     log.warning(f'Student {user.id} is not enrolled in Course {course_key}')
                 else:
@@ -2925,7 +2930,7 @@ def certificate_invalidation_view(request, course_id):
     # Validate request data and return error response in case of invalid data
     try:
         certificate_invalidation_data = parse_request_data(request)
-        student = _get_student_from_request_data(certificate_invalidation_data, course_key)
+        student = _get_student_from_request_data(certificate_invalidation_data)
         certificate = _get_certificate_for_user(course_key, student)
     except ValueError as error:
         return JsonResponse({'message': str(error)}, status=400)
@@ -3045,7 +3050,7 @@ def _create_error_response(request, msg):
     return JsonResponse({"error": msg}, 400)
 
 
-def _get_student_from_request_data(request_data, course_key):
+def _get_student_from_request_data(request_data):
     """
     Attempts to retrieve the student information from the incoming request data.
 
@@ -3059,7 +3064,7 @@ def _get_student_from_request_data(request_data, course_key):
               'Kindly fill in username/email and then press "Invalidate Certificate" button.')
         )
 
-    return get_student(user, course_key)
+    return get_student(user)
 
 
 def _get_certificate_for_user(course_key, student):

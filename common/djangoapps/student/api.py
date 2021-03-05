@@ -7,6 +7,7 @@ Python APIs exposed by the student app to other in-process apps.
 from django.contrib.auth import get_user_model
 from django.conf import settings
 
+from common.djangoapps.student.models import CourseEnrollment
 from common.djangoapps.student.models_api import create_manual_enrollment_audit as _create_manual_enrollment_audit
 from common.djangoapps.student.models_api import get_course_access_role
 from common.djangoapps.student.models_api import get_course_enrollment as _get_course_enrollment
@@ -101,3 +102,10 @@ def get_access_role_by_role_name(role_name):
         role_name: the name of the role
     """
     return _REGISTERED_ACCESS_ROLES.get(role_name, None)
+
+
+def is_user_enrolled_in_course(student, course_key):
+    """
+    Determines if a learner is enrolled in a given course-run.
+    """
+    return CourseEnrollment.is_enrolled(student, course_key)
