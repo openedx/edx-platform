@@ -1,8 +1,8 @@
 """Unit tests for the Paver JavaScript testing tasks."""
 
+from unittest.mock import patch
 
 import ddt
-from mock import patch
 from paver.easy import call_task
 
 import pavelib.js_test
@@ -141,7 +141,7 @@ class TestPaverJavaScriptTestTasks(PaverTestCase):
                         suite=suite
                     )
                 if port:
-                    expected_test_tool_command += " --port={port}".format(port=port)
+                    expected_test_tool_command += f" --port={port}"
             else:
                 expected_test_tool_command = 'jest'
 

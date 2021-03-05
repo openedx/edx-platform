@@ -97,10 +97,10 @@ def prereq_cache(cache_name, paths, install_func):
     """
     # Retrieve the old hash
     cache_filename = cache_name.replace(" ", "_")
-    cache_file_path = os.path.join(PREREQS_STATE_DIR, "{}.sha1".format(cache_filename))
+    cache_file_path = os.path.join(PREREQS_STATE_DIR, f"{cache_filename}.sha1")
     old_hash = None
     if os.path.isfile(cache_file_path):
-        with open(cache_file_path, "r") as cache_file:
+        with open(cache_file_path) as cache_file:
             old_hash = cache_file.read()
 
     # Compare the old hash to the new hash
@@ -120,7 +120,7 @@ def prereq_cache(cache_name, paths, install_func):
             post_install_hash = compute_fingerprint(paths)
             cache_file.write(post_install_hash.encode('utf-8'))
     else:
-        print('{cache} unchanged, skipping...'.format(cache=cache_name))
+        print(f'{cache_name} unchanged, skipping...')
 
 
 def node_prereqs_installation():
@@ -132,9 +132,9 @@ def node_prereqs_installation():
     # determine if any packages are chronic offenders.
     shard_str = os.getenv('SHARD', None)
     if shard_str:
-        npm_log_file_path = '{}/npm-install.{}.log'.format(Env.GEN_LOG_DIR, shard_str)
+        npm_log_file_path = f'{Env.GEN_LOG_DIR}/npm-install.{shard_str}.log'
     else:
-        npm_log_file_path = '{}/npm-install.log'.format(Env.GEN_LOG_DIR)
+        npm_log_file_path = f'{Env.GEN_LOG_DIR}/npm-install.log'
     npm_log_file = open(npm_log_file_path, 'wb')
     npm_command = 'npm install --verbose'.split()
 
@@ -151,7 +151,7 @@ def node_prereqs_installation():
         proc = subprocess.Popen(npm_command, stderr=npm_log_file)
         retcode = proc.wait()
         if retcode == 1:
-            raise Exception("npm install failed: See {}".format(npm_log_file_path))
+            raise Exception(f"npm install failed: See {npm_log_file_path}")
     print("Successfully installed NPM packages. Log found at {}".format(
         npm_log_file_path
     ))
@@ -168,7 +168,7 @@ def python_prereqs_installation():
 def pip_install_req_file(req_file):
     """Pip install the requirements file."""
     pip_cmd = 'pip install -q --disable-pip-version-check --exists-action w'
-    sh("{pip_cmd} -r {req_file}".format(pip_cmd=pip_cmd, req_file=req_file))
+    sh(f"{pip_cmd} -r {req_file}")
 
 
 @task
@@ -243,7 +243,7 @@ def uninstall_python_packages():
         for package_name in PACKAGES_TO_UNINSTALL:
             if package_in_frozen(package_name, frozen):
                 # Uninstall the pacakge
-                sh("pip uninstall --disable-pip-version-check -y {}".format(package_name))
+                sh(f"pip uninstall --disable-pip-version-check -y {package_name}")
                 uninstalled = True
         if not uninstalled:
             break

@@ -86,7 +86,7 @@ class TestGenerate(TestCase):
                 mofile = filename + '.mo'
                 path = os.path.join(self.configuration.get_messages_dir(locale), mofile)
                 exists = os.path.exists(path)
-                assert exists, ('Missing file in locale %s: %s' % (locale, mofile))
+                assert exists, (f'Missing file in locale {locale}: {mofile}')
                 assert datetime.fromtimestamp(os.path.getmtime(path), UTC) >= \
                        self.start_time, ('File not recently modified: %s' % path)
             # Segmenting means that the merge headers don't work they way they
@@ -109,7 +109,7 @@ class TestGenerate(TestCase):
         pof = pofile(path)
         pattern = re.compile('^#-#-#-#-#', re.M)
         match = pattern.findall(pof.header)
-        assert len(match) == 3, ('Found %s (should be 3) merge comments in the header for %s' % (len(match), path))
+        assert len(match) == 3, ('Found {} (should be 3) merge comments in the header for {}'.format(len(match), path))
 
 
 def random_name(size=6):

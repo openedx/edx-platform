@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-  # lint-amnesty, pylint: disable=missing-module-docstring
 #
 # Configuration file for the Sphinx documentation builder.
 #
@@ -14,7 +13,6 @@ from subprocess import check_call
 
 import django
 import edx_theme
-import six
 from path import Path
 
 root = Path('../..').abspath()
@@ -44,14 +42,14 @@ django.setup()
 
 # -- Project information -----------------------------------------------------
 
-project = u'edx-platform'
+project = 'edx-platform'
 copyright = edx_theme.COPYRIGHT  # lint-amnesty, pylint: disable=redefined-builtin
 author = edx_theme.AUTHOR
 
 # The short X.Y version
-version = u''
+version = ''
 # The full version, including alpha/beta/rc tags
-release = u''
+release = ''
 
 
 # -- General configuration ---------------------------------------------------
@@ -95,7 +93,7 @@ language = None
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.
 # This pattern also affects html_static_path and html_extra_path.
-exclude_patterns = [u'_build', 'Thumbs.db', '.DS_Store']
+exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
 
 # The name of the Pygments (syntax highlighting) style to use.
 pygments_style = None
@@ -165,7 +163,7 @@ latex_elements = {
 # (source start file, target name, title,
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [
-    (master_doc, 'edx-platform.tex', u'edx-platform Documentation',
+    (master_doc, 'edx-platform.tex', 'edx-platform Documentation',
      author, 'manual'),
 ]
 
@@ -175,7 +173,7 @@ latex_documents = [
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
 man_pages = [
-    (master_doc, 'edx-platform', u'edx-platform Documentation',
+    (master_doc, 'edx-platform', 'edx-platform Documentation',
      [author], 1)
 ]
 
@@ -186,7 +184,7 @@ man_pages = [
 # (source start file, target name, title, author,
 #  dir menu entry, description, category)
 texinfo_documents = [
-    (master_doc, 'edx-platform', u'edx-platform Documentation',
+    (master_doc, 'edx-platform', 'edx-platform Documentation',
      author, 'edx-platform', 'The Open edX platform, the software that powers edX!',
      'Miscellaneous'),
 ]
@@ -249,9 +247,9 @@ for app in cms_djangoapps:
     modules[path] = path
 
 # The Django apps under common must be imported directly, not under their path
-for app in os.listdir(six.text_type(root / 'common' / 'djangoapps')):
+for app in os.listdir(str(root / 'common' / 'djangoapps')):
     path = os.path.join('common', 'djangoapps', app)
-    if os.path.isdir(six.text_type(root / path)) and app != 'terrain':
+    if os.path.isdir(str(root / path)) and app != 'terrain':
         modules[path] = path
 
 
@@ -272,9 +270,9 @@ def update_settings_module(service='lms'):
     for the module sphinx-apidoc is about to be run on.
     """
     if os.environ['EDX_PLATFORM_SETTINGS'] == 'devstack_docker':
-        settings_module = '{}.envs.devstack_docker'.format(service)
+        settings_module = f'{service}.envs.devstack_docker'
     else:
-        settings_module = '{}.envs.devstack'.format(service)
+        settings_module = f'{service}.envs.devstack'
     os.environ['DJANGO_SETTINGS_MODULE'] = settings_module
 
 
@@ -297,8 +295,8 @@ def on_init(app):  # lint-amnesty, pylint: disable=redefined-outer-name, unused-
 
     exclude_files = ['admin.py', 'test.py', 'testing.py', 'tests.py', 'testutils.py', 'wsgi.py']
     for module in modules:
-        module_path = six.text_type(root / module)
-        output_path = six.text_type(docs_path / modules[module])
+        module_path = str(root / module)
+        output_path = str(docs_path / modules[module])
         args = [apidoc_path, '--ext-intersphinx', '-o',
                 output_path, module_path]
         exclude = []
