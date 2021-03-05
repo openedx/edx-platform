@@ -12,13 +12,15 @@ from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthenticat
 from edx_rest_framework_extensions.auth.session.authentication import SessionAuthenticationAllowInactiveUser
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
-from rest_framework.views import APIView
-from rest_framework.response import Response
 from rest_framework import serializers
+from rest_framework.exceptions import NotFound
+from rest_framework.response import Response
+from rest_framework.views import APIView
 import attr  # lint-amnesty, pylint: disable=unused-import
 
 from openedx.core.lib.api.permissions import IsStaff
 from .api import get_user_course_outline_details
+from .data import CourseOutlineData
 
 User = get_user_model()
 log = logging.getLogger(__name__)
@@ -165,7 +167,11 @@ class CourseOutlineView(APIView):
         user = self._determine_user(request)
 
         # Grab the user's outline and send our response...
-        user_course_outline_details = get_user_course_outline_details(course_key, user, at_time)
+        try:
+            user_course_outline_details = get_user_course_outline_details(course_key, user, at_time)
+        except CourseOutlineData.DoesNotExist:
+            raise NotFound()
+
         serializer = self.UserCourseOutlineDataSerializer(user_course_outline_details)
         return Response(serializer.data)
 
