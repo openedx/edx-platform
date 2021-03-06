@@ -75,7 +75,7 @@ class SiteSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         site = super(SiteSerializer, self).create(validated_data)
-        organization, site, user = bootstrap_site(site)
+        _organization, site, _user = bootstrap_site(site)
         return site
 
     def custom_domain_status(self, obj):

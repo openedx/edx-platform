@@ -89,7 +89,7 @@ class Command(BaseCommand):
                 'domain': site_name,
                 'name': site_name,
             },
-            'user_email': user.email,
+            'username': user.username,
             'organization': {
                 'name': name,
                 'short_name': name,
