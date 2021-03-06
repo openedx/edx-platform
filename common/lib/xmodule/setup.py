@@ -8,7 +8,6 @@ XMODULES = [
     "discuss = xmodule.backcompat_module:TranslateCustomTagDescriptor",
     "image = xmodule.backcompat_module:TranslateCustomTagDescriptor",
     "poll_question = xmodule.poll_module:PollDescriptor",
-    "section = xmodule.backcompat_module:SemanticSectionDescriptor",
     "slides = xmodule.backcompat_module:TranslateCustomTagDescriptor",
     "videodev = xmodule.backcompat_module:TranslateCustomTagDescriptor",
     "custom_tag_template = xmodule.raw_module:RawDescriptor",
