@@ -47,7 +47,7 @@ class TestFindUsernameByEmailView(APITestCase):
             create_org_user(red_org, email=email, username=username)
 
         response = self.get_username(email, red_org.name)
-        assert response.status_code == status.HTTP_200_OK, response.content
+        assert response.status_code == status.HTTP_200_OK, response.content.decode('utf-8')
         assert response.json()['username'] == username
 
     def test_organization_separation(self):
@@ -64,11 +64,11 @@ class TestFindUsernameByEmailView(APITestCase):
             pass
 
         response = self.get_username(email, blue_org.name)
-        assert response.status_code == status.HTTP_404_NOT_FOUND, response.content  # Should keep sites separated
+        assert response.status_code == status.HTTP_404_NOT_FOUND, response.content.decode('utf-8')  # Should keep sites separated
 
         blue_user = create_org_user(blue_org, email=email)
         response = self.get_username(email, blue_org.name)
-        assert response.status_code == status.HTTP_200_OK, response.content
+        assert response.status_code == status.HTTP_200_OK, response.content.decode('utf-8')
         assert response.json()['username'] == blue_user.username
 
     def test_not_found(self):
@@ -79,4 +79,4 @@ class TestFindUsernameByEmailView(APITestCase):
             pass
 
         response = self.get_username('nobody@example.com', red_org.name)
-        assert response.status_code == status.HTTP_404_NOT_FOUND, response.content
+        assert response.status_code == status.HTTP_404_NOT_FOUND, response.content.decode('utf-8')
