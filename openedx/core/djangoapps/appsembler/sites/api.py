@@ -47,7 +47,7 @@ class SiteViewSet(viewsets.ReadOnlyModelViewSet):
         queryset = Site.objects.exclude(id=settings.SITE_ID)
         user = self.request.user
         if not user.is_superuser:
-            queryset = queryset.filter(organizations=user.organizations.all())
+            queryset = queryset.filter(organizations__in=user.organizations.all())
         return queryset
 
 
