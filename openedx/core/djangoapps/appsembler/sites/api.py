@@ -17,7 +17,7 @@ from openedx.core.djangoapps.site_configuration.models import SiteConfiguration
 from rest_framework.views import APIView
 from openedx.core.lib.api.permissions import ApiKeyHeaderPermission
 from openedx.core.lib.api.authentication import (
-    OAuth2AuthenticationAllowInactiveUser,
+    BearerAuthenticationAllowInactiveUser,
 )
 from openedx.core.djangoapps.appsembler.sites.models import AlternativeDomain
 from openedx.core.djangoapps.appsembler.sites.permissions import AMCAdminPermission
@@ -40,7 +40,7 @@ log = logging.Logger(__name__)
 class SiteViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Site.objects.all()
     serializer_class = SiteSerializer
-    authentication_classes = (OAuth2AuthenticationAllowInactiveUser,)
+    authentication_classes = (BearerAuthenticationAllowInactiveUser,)
     permission_classes = (IsAuthenticated, AMCAdminPermission)
 
     def get_queryset(self):
@@ -56,7 +56,7 @@ class SiteConfigurationViewSet(viewsets.ModelViewSet):
     serializer_class = SiteConfigurationSerializer
     list_serializer_class = SiteConfigurationListSerializer
     create_serializer_class = SiteSerializer
-    authentication_classes = (OAuth2AuthenticationAllowInactiveUser,)
+    authentication_classes = (BearerAuthenticationAllowInactiveUser,)
     permission_classes = (IsAuthenticated, AMCAdminPermission)
 
     def get_serializer_class(self):
