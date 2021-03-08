@@ -133,6 +133,3 @@ RUN_BLOCKSTORE_TESTS = False
 SOFTWARE_SECURE_REQUEST_RETRY_DELAY = 60 * 60
 # Maximum of 6 retries before giving up.
 SOFTWARE_SECURE_RETRY_MAX_ATTEMPTS = 6
-
-# Don't tolerate deprecated edx-platform import usage in tests.
-ERROR_ON_DEPRECATED_EDX_PLATFORM_IMPORTS = True
