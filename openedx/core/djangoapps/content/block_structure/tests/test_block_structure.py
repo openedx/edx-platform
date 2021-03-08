@@ -11,8 +11,6 @@ from datetime import datetime
 from unittest import TestCase
 
 import ddt
-import six
-from six.moves import range
 
 from openedx.core.lib.graph_traversals import traverse_post_order
 
@@ -101,7 +99,7 @@ class TestBlockStructureData(TestCase, ChildrenMapTestMixin):
             block_structure._add_transformer(t_info.transformer)
             for key, val in t_info.structure_wide_data:
                 block_structure.set_transformer_data(t_info.transformer, key, val)
-            for block, block_data in six.iteritems(t_info.block_specific_data):
+            for block, block_data in t_info.block_specific_data.items():
                 for key, val in block_data:
                     block_structure.set_transformer_block_field(block, t_info.transformer, key, val)
 
@@ -110,7 +108,7 @@ class TestBlockStructureData(TestCase, ChildrenMapTestMixin):
             assert block_structure._get_transformer_data_version(t_info.transformer) == MockTransformer.WRITE_VERSION
             for key, val in t_info.structure_wide_data:
                 assert block_structure.get_transformer_data(t_info.transformer, key) == val
-            for block, block_data in six.iteritems(t_info.block_specific_data):
+            for block, block_data in t_info.block_specific_data.items():
                 for key, val in block_data:
                     assert block_structure.get_transformer_block_field(block, t_info.transformer, key) == val
 

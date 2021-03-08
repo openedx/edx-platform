@@ -4,7 +4,6 @@ Tests for manager.py
 
 import pytest
 import ddt
-import six
 from django.test import TestCase
 from edx_toggles.toggles.testutils import override_waffle_switch
 
@@ -92,7 +91,7 @@ class TestTransformer1(MockTransformer):
         Returns a unique deterministic value for the given block key
         and data key.
         """
-        return data_key + 't1.val1.' + six.text_type(block_key)
+        return data_key + 't1.val1.' + str(block_key)
 
 
 @ddt.ddt
@@ -102,7 +101,7 @@ class TestBlockStructureManager(UsageKeyFactoryMixin, ChildrenMapTestMixin, Test
     """
 
     def setUp(self):
-        super(TestBlockStructureManager, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
 
         TestTransformer1.collect_call_count = 0
         self.registered_transformers = [TestTransformer1()]

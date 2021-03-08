@@ -1,11 +1,11 @@
 """
 Unit tests for the Course Blocks signals
 """
+from unittest.mock import patch
 
 import pytest
 import ddt
 from edx_toggles.toggles.testutils import override_waffle_switch
-from mock import patch
 from opaque_keys.edx.locator import CourseLocator, LibraryLocator
 from xmodule.modulestore.exceptions import ItemNotFoundError
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
@@ -25,7 +25,7 @@ class CourseBlocksSignalTest(ModuleStoreTestCase):
     ENABLED_SIGNALS = ['course_deleted', 'course_published']
 
     def setUp(self):
-        super(CourseBlocksSignalTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.course = CourseFactory.create()
         self.course_usage_key = self.store.make_course_usage_key(self.course.id)
 
