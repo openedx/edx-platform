@@ -194,7 +194,7 @@ class UserApplication(TimeStampedModel):
         Returns:
             list: Prereq course name and score pairs
         """
-        prereq_course_overviews = MultilingualCourseGroup.get_courses(self.user, is_prereq=True)
+        prereq_course_overviews = MultilingualCourseGroup.objects.get_courses(self.user, is_prereq=True)
         scores_in_prereq_courses = []
 
         for course_overview in prereq_course_overviews:
@@ -329,43 +329,6 @@ class MultilingualCourseGroup(models.Model):
     def open_multilingual_course_keys(self):
         return self.multilingual_courses.open_multilingual_courses().values_list('course', flat=True)
     # pylint: enable=no-member
-
-    @classmethod
-    def get_courses(cls, user, is_prereq=False):
-        """
-        Get courses from course groups.
-        Following are the preferences for the course list.
-
-        1. Enrollment
-            If a user is enrolled in any of the courses of a course
-            group then that course is selected from the group.
-
-        2. Language preferred
-            If user has not enrolled in any of the courses of a course
-            group then find a course with preferred language.
-
-        Args:
-            is_prereq (bool):  List of MultilingualCourseGroups
-            user (User): user for which we need to find courses
-
-        Returns:
-            list: List of courses which contains a course from each group
-        """
-        courses_list = []
-        course_groups = cls.objects.prereq_course_groups() if is_prereq else cls.objects.all()
-
-        for course_group in course_groups:
-            open_multilingual_courses = course_group.multilingual_courses.open_multilingual_courses()
-            enrolled_course = open_multilingual_courses.get_enrolled_course(user) if not user.is_anonymous else None
-            multilingual_course = (
-                enrolled_course or
-                open_multilingual_courses.get_preferred_lang_course() or
-                open_multilingual_courses.first()
-            )
-            if multilingual_course:
-                courses_list.append(multilingual_course.course)
-
-        return courses_list
 
 
 class MultilingualCourse(models.Model):

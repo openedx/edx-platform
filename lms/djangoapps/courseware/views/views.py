@@ -260,7 +260,7 @@ def courses(request):
     if not settings.FEATURES.get('ENABLE_COURSE_DISCOVERY'):
         courses_list = (
             get_courses(request.user)
-            if is_testing_environment() else MultilingualCourseGroup.get_courses(request.user)
+            if is_testing_environment() else MultilingualCourseGroup.objects.get_courses(request.user)
         )
 
         if configuration_helpers.get_value("ENABLE_COURSE_SORTING_BY_START_DATE",
