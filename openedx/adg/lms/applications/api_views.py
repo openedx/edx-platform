@@ -23,7 +23,7 @@ class ApplicationRequirementsViewSet(viewsets.ModelViewSet):
     """
     filter_backends = (DjangoFilterBackend,)
     pagination_class = None
-    http_method_names = ['get', 'post', 'head', 'patch', 'delete']
+    http_method_names = ['get', 'post', 'head', 'put', 'patch', 'delete']
 
     def filter_queryset(self, queryset):
         """
@@ -68,11 +68,11 @@ class EducationViewSet(ApplicationRequirementsViewSet):
     **Example Requests**
     DELETE /api/applications/education/
 
-    partial_update:
+    update:
         Update an existing education record.
 
     **Example Requests**
-    PATCH /api/applications/education/
+    PUT /api/applications/education/
 
     """
     queryset = Education.objects.all()
@@ -113,12 +113,16 @@ class WorkExperienceViewSet(ApplicationRequirementsViewSet):
     **Example Requests**
     DELETE /api/applications/work_experience/
 
-    partial_update:
+    update:
         Update an existing work experience record.
+
+    **Example Requests**
+    PUT /api/applications/work_experience/
+
+    partial_update:
         Update user work_experience is not applicable
 
     **Example Requests**
-    PATCH /api/applications/work_experience/
     PATCH /api/applications/work_experience/update_is_not_applicable/
 
     """

@@ -56,19 +56,22 @@ def check_validations_for_past_record(attrs, error_message):
     """
     errors = {}
 
+    started_date = datetime(year=attrs['date_started_year'], month=attrs['date_started_month'], day=1)
+    errors = update_errors_if_future_date(started_date, errors, 'date_started_year')
+
     if not attrs.get('date_completed_month', False):
         errors['date_completed_month'] = _(error_message).format(key='Date completed month')
 
     if not attrs.get('date_completed_year', False):
         errors['date_completed_year'] = _(error_message).format(key='Date completed year')
 
-    started_date = datetime(year=attrs['date_started_year'], month=attrs['date_started_month'], day=1)
-
     if attrs.get('date_completed_month') and attrs.get('date_completed_year'):
         completed_date = datetime(year=attrs['date_completed_year'], month=attrs['date_completed_month'], day=1)
 
         if completed_date <= started_date:
-            errors['date_completed_year'] = _('Completion date must comes after started date')
+            errors['date_completed_year'] = _('Completed date must be greater than started date.')
+
+        errors = update_errors_if_future_date(completed_date, errors, 'date_completed_year')
 
     return errors
 
@@ -86,11 +89,32 @@ def check_validations_for_current_record(attrs, error_message):
     """
     errors = {}
 
+    started_date = datetime(year=attrs['date_started_year'], month=attrs['date_started_month'], day=1)
+    errors = update_errors_if_future_date(started_date, errors, 'date_started_year')
+
     if attrs.get('date_completed_month'):
         errors['date_completed_month'] = _(error_message).format(key='Date completed month')
 
     if attrs.get('date_completed_year'):
         errors['date_completed_year'] = _(error_message).format(key='Date completed year')
+
+    return errors
+
+
+def update_errors_if_future_date(date, errors, key):
+    """
+    Update errors dict if date is in future
+
+    Arguments:
+        date (datetime): date that needs to be checked
+        errors (dict): error messages dict that needs to be updated
+        key (str): field key for adding error
+
+    Returns:
+        dict: contains updated error messages
+    """
+    if datetime.now() <= date:
+        errors[key] = _('Date should not be in future')
 
     return errors
 
