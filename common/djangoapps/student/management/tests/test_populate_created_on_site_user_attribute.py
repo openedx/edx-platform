@@ -3,17 +3,17 @@ Unittests for populate_created_on_site_user_attribute management command.
 """
 
 
-import ddt
 from unittest import mock
-import pytest
 
+import ddt
+import pytest
 from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.core.management import CommandError, call_command
 from django.test import TestCase
 
-from openedx.core.djangoapps.site_configuration.tests.mixins import SiteMixin
 from common.djangoapps.student.models import Registration, UserAttribute
 from common.djangoapps.student.tests.factories import UserFactory
+from openedx.core.djangoapps.site_configuration.tests.mixins import SiteMixin
 
 CREATED_ON_SITE = 'created_on_site'
 
