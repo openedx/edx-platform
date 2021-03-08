@@ -175,7 +175,7 @@ class RenderXBlockTestMixin(six.with_metaclass(ABCMeta, object)):
             self.setup_user(admin=True, enroll=True, login=True)
 
             with check_mongo_calls(mongo_calls):
-                url = get_legacy_courseware_url(self.course.id, self.block_to_be_tested.location)
+                url = get_legacy_courseware_url(self.block_to_be_tested.location)
                 response = self.client.get(url)
                 expected_elements = self.block_specific_chrome_html_elements + self.COURSEWARE_CHROME_HTML_ELEMENTS
                 for chrome_element in expected_elements:

@@ -40,6 +40,7 @@ from common.djangoapps.student.models import (
     PendingNameChange,
 )
 from common.djangoapps.student.tests.factories import AccountRecoveryFactory, CourseEnrollmentFactory, UserFactory
+from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
@@ -258,7 +259,7 @@ class UserCelebrationTests(SharedModuleStoreTestCase):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
-        cls.course = CourseFactory()
+        cls.course = CourseFactory(default_store=ModuleStoreEnum.Type.split)
         cls.course_key = cls.course.id  # pylint: disable=no-member
 
     def setUp(self):

@@ -258,7 +258,7 @@ class TestJumpTo(ModuleStoreTestCase):
         )
         expected_url += "?{}".format(urlencode({'activate_block_id': six.text_type(staff_only_vertical.location)}))
 
-        assert expected_url == get_legacy_courseware_url(course_key, usage_key, request)
+        assert expected_url == get_legacy_courseware_url(usage_key, request)
 
 
 @ddt.ddt
@@ -548,9 +548,9 @@ class ViewsTestCase(BaseViewsTestCase):
 
     def test_get_redirect_url(self):
         # test the course location
-        assert u'/courses/{course_key}/courseware?{activate_block_id}'.format(course_key=text_type(self.course_key), activate_block_id=urlencode({'activate_block_id': text_type(self.course.location)})) == get_legacy_courseware_url(self.course_key, self.course.location)  # pylint: disable=line-too-long
+        assert u'/courses/{course_key}/courseware?{activate_block_id}'.format(course_key=text_type(self.course_key), activate_block_id=urlencode({'activate_block_id': text_type(self.course.location)})) == get_legacy_courseware_url(self.course.location)  # pylint: disable=line-too-long
         # test a section location
-        assert u'/courses/{course_key}/courseware/Chapter_1/Sequential_1/?{activate_block_id}'.format(course_key=text_type(self.course_key), activate_block_id=urlencode({'activate_block_id': text_type(self.section.location)})) == get_legacy_courseware_url(self.course_key, self.section.location)  # pylint: disable=line-too-long
+        assert u'/courses/{course_key}/courseware/Chapter_1/Sequential_1/?{activate_block_id}'.format(course_key=text_type(self.course_key), activate_block_id=urlencode({'activate_block_id': text_type(self.section.location)})) == get_legacy_courseware_url(self.section.location)  # pylint: disable=line-too-long
 
     def test_invalid_course_id(self):
         response = self.client.get('/courses/MITx/3.091X/')
@@ -3282,8 +3282,9 @@ class TestShowCoursewareMFE(TestCase):
                 assert show_courseware_mfe_link(global_staff_user, False, new_course_key)
                 assert show_courseware_mfe_link(regular_user, True, new_course_key)
 
-                # Regular users don't see the link.
-                assert not show_courseware_mfe_link(regular_user, False, new_course_key)
+                # (Regular users would see the link, but they can't see the Legacy
+                #  experience, so it doesn't matter.)
+
             with override_waffle_flag(REDIRECT_TO_COURSEWARE_MICROFRONTEND, active=False):
                 # (preview=on, redirect=off)
                 # Global and Course Staff can see the link.
@@ -3305,8 +3306,9 @@ class TestShowCoursewareMFE(TestCase):
                 # if preview=off.
                 assert show_courseware_mfe_link(regular_user, True, new_course_key)
 
-                # Regular users don't see the link.
-                assert not show_courseware_mfe_link(regular_user, False, new_course_key)
+                # (Regular users would see the link, but they can't see the Legacy
+                #  experience, so it doesn't matter.)
+
             with override_waffle_flag(REDIRECT_TO_COURSEWARE_MICROFRONTEND, active=False):
                 # (preview=off, redirect=off)
                 # Global staff see the link anyway
