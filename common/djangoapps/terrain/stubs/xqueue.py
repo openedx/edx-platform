@@ -14,7 +14,6 @@ import copy
 import json
 from threading import Timer
 
-import six
 from requests import post
 
 from openedx.core.djangolib.markup import HTML
@@ -38,7 +37,7 @@ class StubXQueueHandler(StubHttpRequestHandler):
         Sends back an immediate success/failure response.
         It then POSTS back to the client with grading results.
         """
-        msg = "XQueue received POST request {0} to path {1}".format(self.post_dict, self.path)
+        msg = f"XQueue received POST request {self.post_dict} to path {self.path}"
         self.log_message(msg)
 
         # Respond only to grading requests
@@ -100,7 +99,7 @@ class StubXQueueHandler(StubHttpRequestHandler):
             self.send_response(
                 200, content=response_str, headers={'Content-type': 'text/plain'}
             )
-            self.log_message("XQueue: sent response {0}".format(response_str))
+            self.log_message(f"XQueue: sent response {response_str}")
 
         else:
             self.send_response(500)
@@ -138,7 +137,7 @@ class StubXQueueHandler(StubHttpRequestHandler):
                 # Multiple matches, so abort and log an error
                 else:
                     self.log_error(
-                        "Multiple response patterns matched '{0}'".format(xqueue_body_json),
+                        f"Multiple response patterns matched '{xqueue_body_json}'",
                     )
                     return
 
@@ -159,7 +158,7 @@ class StubXQueueHandler(StubHttpRequestHandler):
         }
 
         post(postback_url, data=data)
-        self.log_message("XQueue: sent grading response {0} to {1}".format(data, postback_url))
+        self.log_message(f"XQueue: sent grading response {data} to {postback_url}")
 
     def _register_submission(self, xqueue_body_json):
         """
@@ -174,7 +173,7 @@ class StubXQueueHandler(StubHttpRequestHandler):
                 xqueue_body = json.loads(xqueue_body_json)
             except ValueError:
                 self.log_error(
-                    "Could not decode XQueue body as JSON: '{0}'".format(xqueue_body_json))
+                    f"Could not decode XQueue body as JSON: '{xqueue_body_json}'")
 
             else:
 
@@ -187,12 +186,12 @@ class StubXQueueHandler(StubHttpRequestHandler):
                     response = post(url, data={'grader_payload': grader_payload})
                     if not response.ok:
                         self.log_error(
-                            "Could register submission at URL '{0}'.  Status was {1}".format(
+                            "Could register submission at URL '{}'.  Status was {}".format(
                                 url, response.status_code))
 
                 else:
                     self.log_message(
-                        "XQueue body is missing 'grader_payload' key: '{0}'".format(xqueue_body)
+                        f"XQueue body is missing 'grader_payload' key: '{xqueue_body}'"
                     )
 
     def _is_grade_request(self):
@@ -222,6 +221,6 @@ class StubXQueueService(StubHttpService):
         """
         return list({
             key: value
-            for key, value in six.iteritems(self.config)
+            for key, value in self.config.items()
             if key not in self.NON_QUEUE_CONFIG_KEYS
         }.items())

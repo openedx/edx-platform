@@ -10,8 +10,7 @@ from datetime import datetime
 from math import ceil
 from uuid import uuid4
 
-import six
-from six.moves.urllib.parse import urlencode
+from urllib.parse import urlencode
 
 from .http import StubHttpRequestHandler, StubHttpService
 
@@ -62,7 +61,7 @@ class StubEdxNotesServiceHandler(StubHttpRequestHandler):
         if method in self.URL_HANDLERS:
             handlers_list = self.URL_HANDLERS[method]
         else:
-            self.log_error("Unrecognized method '{method}'".format(method=method))
+            self.log_error(f"Unrecognized method '{method}'")
             return
 
         # Check the path (without querystring params) against our list of handlers
@@ -300,7 +299,7 @@ class StubEdxNotesService(StubHttpService):
     HANDLER_CLASS = StubEdxNotesServiceHandler
 
     def __init__(self, *args, **kwargs):
-        super(StubEdxNotesService, self).__init__(*args, **kwargs)  # lint-amnesty, pylint: disable=super-with-arguments
+        super().__init__(*args, **kwargs)
         self.notes = list()
 
     def get_all_notes(self):
@@ -393,4 +392,4 @@ class StubEdxNotesService(StubHttpService):
         """
         Search the `query(str)` text in the provided `data(list)`.
         """
-        return [note for note in data if six.text_type(query).strip() in note.get("text", "").split()]
+        return [note for note in data if str(query).strip() in note.get("text", "").split()]
