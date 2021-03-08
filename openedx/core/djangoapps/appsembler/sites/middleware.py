@@ -2,6 +2,7 @@ from django.conf import settings
 from django.core.cache import cache, caches
 from django.contrib.redirects.models import Redirect
 from django.shortcuts import redirect
+from django.utils.deprecation import MiddlewareMixin
 
 from openedx.core.djangoapps.appsembler.sites.models import AlternativeDomain
 
@@ -10,7 +11,7 @@ import logging
 log = logging.getLogger(__name__)
 
 
-class CustomDomainsRedirectMiddleware(object):
+class CustomDomainsRedirectMiddleware(MiddlewareMixin):
 
     def process_request(self, request):
         cache_general = caches['default']
@@ -35,7 +36,7 @@ class CustomDomainsRedirectMiddleware(object):
             return
 
 
-class RedirectMiddleware(object):
+class RedirectMiddleware(MiddlewareMixin):
     """
     Redirects requests for URLs persisted using the django.contrib.redirects.models.Redirect model.
     With the exception of the main site.
