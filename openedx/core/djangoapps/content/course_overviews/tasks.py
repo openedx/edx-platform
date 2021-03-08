@@ -2,13 +2,11 @@
 
 import logging
 
-import six
 from celery import shared_task
 from celery_utils.persist_on_failure import LoggedPersistOnFailureTask
 from django.conf import settings
 from edx_django_utils.monitoring import set_code_owner_attribute
 from opaque_keys.edx.keys import CourseKey
-from six.moves import range  # pylint: disable=ungrouped-imports
 
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from xmodule.modulestore.django import modulestore
@@ -49,7 +47,7 @@ def enqueue_async_course_overview_update_tasks(  # lint-amnesty, pylint: disable
         course_keys = [CourseKey.from_string(id) for id in course_ids]
 
     for course_key_group in chunks(course_keys, chunk_size):
-        course_key_strings = [six.text_type(key) for key in course_key_group]
+        course_key_strings = [str(key) for key in course_key_group]
 
         options = _task_options(routing_key)
         async_course_overview_update.apply_async(

@@ -1,24 +1,21 @@
 """
 Tests for course_overviews app.
 """
+from io import BytesIO
+from unittest import mock
 
 import pytest
 import datetime
 import itertools
 import math
-from six import BytesIO
-
 import ddt
-import mock
 import pytz
-import six
 from django.conf import settings
 from django.db.utils import IntegrityError
 from django.test.utils import override_settings
 from django.utils import timezone
 from opaque_keys.edx.keys import CourseKey
 from PIL import Image
-from six.moves import range  # pylint: disable=ungrouped-imports
 
 from lms.djangoapps.certificates.api import get_active_web_certificate
 from openedx.core.djangoapps.catalog.tests.mixins import CatalogIntegrationMixin
@@ -505,7 +502,7 @@ class CourseOverviewTestCase(CatalogIntegrationMixin, ModuleStoreTestCase, Cache
         org_courses = []  # list of lists of courses
         for index in range(3):
             org_courses.append([
-                CourseFactory.create(org='test_org_' + six.text_type(index), emit_signals=True)
+                CourseFactory.create(org='test_org_' + str(index), emit_signals=True)
                 for __ in range(3)
             ])
 
@@ -532,7 +529,7 @@ class CourseOverviewTestCase(CatalogIntegrationMixin, ModuleStoreTestCase, Cache
 
         for filter_, expected_courses in test_cases:
             assert {course_overview.id for course_overview in CourseOverview.get_all_courses(filter_=filter_)} ==\
-                   expected_courses, u'testing CourseOverview.get_all_courses with filter_={}'.format(filter_)
+                   expected_courses, f'testing CourseOverview.get_all_courses with filter_={filter_}'
 
     def test_get_from_ids(self):
         """
@@ -588,7 +585,7 @@ class CourseOverviewImageSetTestCase(ModuleStoreTestCase):
     def setUp(self):
         """Create an active CourseOverviewImageConfig with non-default values."""
         self.set_config(True)
-        super(CourseOverviewImageSetTestCase, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
 
     def _create_course_image(self, course, image_name):
         """
@@ -1090,7 +1087,7 @@ class CourseOverviewTabTestCase(ModuleStoreTestCase):
             # Update display name on the course descriptor
             # This fires a course_published signal, which should be caught in signals.py,
             # which should in turn load CourseOverview from modulestore.
-            course.display_name = u'Updated display name'
+            course.display_name = 'Updated display name'
             with self.store.branch_setting(ModuleStoreEnum.Branch.draft_preferred):
                 self.store.update_item(course, ModuleStoreEnum.UserID.test)
 

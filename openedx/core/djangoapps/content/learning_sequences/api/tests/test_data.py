@@ -51,7 +51,7 @@ class TestCourseOutlineData(TestCase):
         for section in self.course_outline.sections:
             for seq in section.sequences:
                 assert seq == self.course_outline.sequences[seq.usage_key]
-        assert sum((len(section.sequences) for section in self.course_outline.sections)) ==\
+        assert sum(len(section.sequences) for section in self.course_outline.sections) ==\
                len(self.course_outline.sequences)
 
     def test_duplicate_sequence(self):
@@ -145,15 +145,15 @@ def generate_sections(course_key, num_sequences):
     for sec_num, seq_count in enumerate(num_sequences, 1):
         sections.append(
             CourseSectionData(
-                usage_key=course_key.make_usage_key('chapter', 'ch_{}'.format(sec_num)),
-                title="Chapter {}: 🔥".format(sec_num),
+                usage_key=course_key.make_usage_key('chapter', f'ch_{sec_num}'),
+                title=f"Chapter {sec_num}: 🔥",
                 visibility=normal_visibility,
                 sequences=[
                     CourseLearningSequenceData(
                         usage_key=course_key.make_usage_key(
-                            'sequential', 'seq_{}_{}'.format(sec_num, seq_num)
+                            'sequential', f'seq_{sec_num}_{seq_num}'
                         ),
-                        title="Seq {}.{}: 🔥".format(sec_num, seq_num),
+                        title=f"Seq {sec_num}.{seq_num}: 🔥",
                         visibility=normal_visibility,
                     )
                     for seq_num in range(seq_count)

@@ -5,8 +5,8 @@ Declaration of CourseOverview model
 
 import json
 import logging
+from urllib.parse import urlparse, urlunparse
 
-import six
 from ccx_keys.locator import CCXLocator
 from config_models.models import ConfigurationModel
 from django.conf import settings
@@ -22,8 +22,6 @@ from django.utils.encoding import python_2_unicode_compatible
 from django.utils.functional import cached_property
 from model_utils.models import TimeStampedModel
 from opaque_keys.edx.django.models import CourseKeyField, UsageKeyField
-from six import text_type  # pylint: disable=ungrouped-imports
-from six.moves.urllib.parse import urlparse, urlunparse  # pylint: disable=import-error
 from simple_history.models import HistoricalRecords
 
 from lms.djangoapps.discussion import django_comment_client
@@ -61,7 +59,7 @@ class CourseOverview(TimeStampedModel):
     .. no_pii:
     """
 
-    class Meta(object):
+    class Meta:
         app_label = 'course_overviews'
 
     # IMPORTANT: Bump this whenever you modify this model and/or add a migration.
@@ -73,7 +71,7 @@ class CourseOverview(TimeStampedModel):
     # Course identification
     id = CourseKeyField(db_index=True, primary_key=True, max_length=255)
     _location = UsageKeyField(max_length=255)
-    org = TextField(max_length=255, default=u'outdated_entry')
+    org = TextField(max_length=255, default='outdated_entry')
     display_name = TextField(null=True)
     display_number_with_default = TextField()
     display_org_with_default = TextField()
@@ -176,7 +174,7 @@ class CourseOverview(TimeStampedModel):
 
         course_overview = cls.objects.filter(id=course.id)
         if course_overview.exists():
-            log.info(u'Updating course overview for %s.', six.text_type(course.id))
+            log.info('Updating course overview for %s.', str(course.id))
             course_overview = course_overview.first()
             # MySQL ignores casing, but CourseKey doesn't. To prevent multiple
             # courses with different cased keys from overriding each other, we'll
@@ -184,7 +182,7 @@ class CourseOverview(TimeStampedModel):
             if course_overview.id != course.id:
                 raise CourseOverviewCaseMismatchException(course_overview.id, course.id)
         else:
-            log.info(u'Creating course overview for %s.', six.text_type(course.id))
+            log.info('Creating course overview for %s.', str(course.id))
             course_overview = cls()
 
         course_overview.version = cls.VERSION
@@ -313,11 +311,11 @@ class CourseOverview(TimeStampedModel):
 
                 return course_overview
             elif course is not None:
-                raise IOError(  # lint-amnesty, pylint: disable=raising-format-tuple
+                raise OSError(  # lint-amnesty, pylint: disable=raising-format-tuple
                     "Error while loading CourseOverview for course {} "
                     "from the module store: {}",
-                    six.text_type(course_id),
-                    course.error_msg if isinstance(course, ErrorBlock) else six.text_type(course)
+                    str(course_id),
+                    course.error_msg if isinstance(course, ErrorBlock) else str(course)
                 )
             else:
                 log.info(
@@ -558,11 +556,11 @@ class CourseOverview(TimeStampedModel):
         Returns the type of the course's 'start' field.
         """
         if self.advertised_start:
-            return u'string'
+            return 'string'
         elif self.start != DEFAULT_START_DATE:
-            return u'timestamp'
+            return 'timestamp'
         else:
-            return u'empty'
+            return 'empty'
 
     @property
     def start_display(self):
@@ -620,8 +618,8 @@ class CourseOverview(TimeStampedModel):
                 whether the requested CourseOverview objects should be
                 forcefully updated (i.e., re-synched with the modulestore).
         """
-        log.info(u'Generating course overview for %d courses.', len(course_keys))
-        log.debug(u'Generating course overview(s) for the following courses: %s', course_keys)
+        log.info('Generating course overview for %d courses.', len(course_keys))
+        log.debug('Generating course overview(s) for the following courses: %s', course_keys)
 
         action = CourseOverview.load_from_module_store if force_update else CourseOverview.get_from_id
 
@@ -630,9 +628,9 @@ class CourseOverview(TimeStampedModel):
                 action(course_key)
             except Exception as ex:  # pylint: disable=broad-except
                 log.exception(
-                    u'An error occurred while generating course overview for %s: %s',
-                    six.text_type(course_key),
-                    text_type(ex),
+                    'An error occurred while generating course overview for %s: %s',
+                    str(course_key),
+                    str(ex),
                 )
 
         log.info('Finished generating course overviews.')
@@ -889,7 +887,7 @@ class CourseOverview(TimeStampedModel):
 
     def __str__(self):
         """Represent ourselves with the course key."""
-        return six.text_type(self.id)
+        return str(self.id)
 
 
 class CourseOverviewTab(models.Model):
@@ -984,8 +982,8 @@ class CourseOverviewImageSet(TimeStampedModel):
     """
     course_overview = models.OneToOneField(CourseOverview, db_index=True, related_name="image_set",
                                            on_delete=models.CASCADE)
-    small_url = models.TextField(blank=True, default=u"")
-    large_url = models.TextField(blank=True, default=u"")
+    small_url = models.TextField(blank=True, default="")
+    large_url = models.TextField(blank=True, default="")
 
     @classmethod
     def create(cls, course_overview, course=None):
@@ -1020,7 +1018,7 @@ class CourseOverviewImageSet(TimeStampedModel):
                 image_set.large_url = create_course_image_thumbnail(course, config.large)
             except Exception:  # pylint: disable=broad-except
                 log.exception(
-                    u"Could not create thumbnail for course %s with image %s (small=%s), (large=%s)",
+                    "Could not create thumbnail for course %s with image %s (small=%s), (large=%s)",
                     course.id,
                     course.course_image,
                     config.small,
@@ -1049,7 +1047,7 @@ class CourseOverviewImageSet(TimeStampedModel):
             pass
 
     def __str__(self):
-        return u"CourseOverviewImageSet({}, small_url={}, large_url={})".format(
+        return "CourseOverviewImageSet({}, small_url={}, large_url={})".format(
             self.course_overview_id, self.small_url, self.large_url
         )
 
@@ -1085,7 +1083,7 @@ class CourseOverviewImageConfig(ConfigurationModel):
         return (self.large_width, self.large_height)
 
     def __str__(self):
-        return u"CourseOverviewImageConfig(enabled={}, small={}, large={})".format(
+        return "CourseOverviewImageConfig(enabled={}, small={}, large={})".format(
             self.enabled, self.small, self.large
         )
 
@@ -1098,19 +1096,19 @@ class SimulateCoursePublishConfig(ConfigurationModel):
     .. no_pii:
     """
 
-    class Meta(object):
+    class Meta:
         app_label = 'course_overviews'
         verbose_name = 'simulate_publish argument'
 
     arguments = models.TextField(
         blank=True,
-        help_text=u'Useful for manually running a Jenkins job. Specify like "--delay 10 --receivers A B C \
+        help_text='Useful for manually running a Jenkins job. Specify like "--delay 10 --receivers A B C \
         --courses X Y Z".',
-        default=u'',
+        default='',
     )
 
     def __str__(self):
-        return six.text_type(self.arguments)
+        return str(self.arguments)
 
 
 def _invalidate_overview_cache(**kwargs):  # pylint: disable=unused-argument

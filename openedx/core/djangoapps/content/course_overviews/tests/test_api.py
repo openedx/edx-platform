@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 course_overview api tests
 """
@@ -16,7 +15,7 @@ class TestCourseOverviewsApi(TestCase):
     """
 
     def setUp(self):
-        super(TestCourseOverviewsApi, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         for _ in range(3):
             CourseOverviewFactory.create()
 

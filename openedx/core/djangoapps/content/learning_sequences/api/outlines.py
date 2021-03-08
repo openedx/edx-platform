@@ -154,7 +154,7 @@ def _get_course_context_for_outline(course_key: CourseKey) -> CourseContext:
     except LearningContext.DoesNotExist:
         # Could happen if it hasn't been published.
         raise CourseOutlineData.DoesNotExist(  # lint-amnesty, pylint: disable=raise-missing-from
-            "No CourseOutlineData for {}".format(course_key)
+            f"No CourseOutlineData for {course_key}"
         )
     return course_context
 
@@ -231,7 +231,7 @@ def _get_user_course_outline_and_processors(course_key: CourseKey,  # lint-amnes
         processor.load_data()
         if not user_can_see_all_content:
             # function_trace lets us see how expensive each processor is being.
-            with function_trace('processor:{}'.format(name)):
+            with function_trace(f'processor:{name}'):
                 processor_usage_keys_removed = processor.usage_keys_to_remove(full_course_outline)
                 processor_inaccessible_sequences = processor.inaccessible_sequences(full_course_outline)
                 usage_keys_to_remove |= processor_usage_keys_removed

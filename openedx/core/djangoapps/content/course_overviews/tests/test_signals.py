@@ -1,9 +1,10 @@
 # lint-amnesty, pylint: disable=missing-module-docstring
 
 import datetime
+from unittest.mock import patch
+
 import pytest
 import ddt
-from mock import patch
 
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
@@ -74,7 +75,7 @@ class CourseOverviewSignalsTestCase(ModuleStoreTestCase):
         course = CourseFactory.create(emit_signals=True, **{field_name: initial_value})
 
         # changing display name doesn't fire the signal
-        course.display_name = course.display_name + u'changed'
+        course.display_name = course.display_name + 'changed'
         self.store.update_item(course, ModuleStoreEnum.UserID.test)
         assert not mock_signal.called
 

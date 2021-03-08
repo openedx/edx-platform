@@ -174,7 +174,7 @@ class CourseOutlineView(APIView):
             course_key = CourseKey.from_string(course_key_str)
         except InvalidKeyError:
             raise serializers.ValidationError(  # lint-amnesty, pylint: disable=raise-missing-from
-                "{} is not a valid CourseKey".format(course_key_str)
+                f"{course_key_str} is not a valid CourseKey"
             )
         if course_key.deprecated:
             raise serializers.ValidationError(

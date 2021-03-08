@@ -12,7 +12,7 @@ from ..models import CourseOverview
 
 
 class CourseOverviewFactory(DjangoModelFactory):  # lint-amnesty, pylint: disable=missing-class-docstring
-    class Meta(object):
+    class Meta:
         model = CourseOverview
         django_get_or_create = ('id', )
         exclude = ('run', )
@@ -36,7 +36,7 @@ class CourseOverviewFactory(DjangoModelFactory):  # lint-amnesty, pylint: disabl
 
     @factory.lazy_attribute
     def display_name(self):
-        return "{} Course".format(self.id)
+        return f"{self.id} Course"
 
     @factory.lazy_attribute
     def start(self):

@@ -58,7 +58,7 @@ class CourseOutlineViewTest(CacheIsolationTestCase, APITestCase):  # lint-amnest
 
     @classmethod
     def url_for(cls, course_key):
-        return '/api/learning_sequences/v1/course_outline/{}'.format(course_key)
+        return f'/api/learning_sequences/v1/course_outline/{course_key}'
 
     def test_student_access_denied(self):
         """
