@@ -13,10 +13,10 @@ def random_user_data_generator(num_users):
     for _ in range(num_users):
         identification = uuid.uuid4().hex[:8]
         yield {
-            'username': 'user_{id}'.format(id=identification),
-            'email': 'email_{id}@example.com'.format(id=identification),
+            'username': f'user_{identification}',
+            'email': f'email_{identification}@example.com',
             'password': '12345',
-            'name': 'User {id}'.format(id=identification),
+            'name': f'User {identification}',
         }
 
 

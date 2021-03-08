@@ -39,10 +39,10 @@ class Command(BaseCommand):
                     userobj.is_superuser = True
 
                 userobj.save()
-                print('Modified {} sucessfully.'.format(user))
+                print(f'Modified {user} sucessfully.')
 
             except Exception as err:  # pylint: disable=broad-except
                 print("Error modifying user with identifier {}: {}: {}".format(user, type(err).__name__,
-                                                                               text_type(err)))
+                                                                               str(err)))
 
         print('Complete!')

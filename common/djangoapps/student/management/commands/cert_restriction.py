@@ -56,7 +56,7 @@ class Command(BaseCommand):  # lint-amnesty, pylint: disable=missing-class-docst
     def handle(self, *args, **options):
         if options['output']:
             if os.path.exists(options['output']):
-                raise CommandError("File {0} already exists".format(options['output']))
+                raise CommandError("File {} already exists".format(options['output']))
             disabled_users = UserProfile.objects.filter(allow_certificate=False)
 
             with open(options['output'], 'w') as csvfile:
@@ -67,28 +67,28 @@ class Command(BaseCommand):  # lint-amnesty, pylint: disable=missing-class-docst
 
         elif options['import']:
             if not os.path.exists(options['import']):
-                raise CommandError("File {0} does not exist".format(options['import']))
+                raise CommandError("File {} does not exist".format(options['import']))
 
-            print("Importing students from {0}".format(options['import']))
+            print("Importing students from {}".format(options['import']))
 
             with open(options['import']) as csvfile:
                 student_list = csv.reader(csvfile, delimiter=',', quotechar='"')
                 students = [student[0] for student in student_list]
 
             if not students:
-                raise CommandError("Unable to read student data from {0}".format(options['import']))
+                raise CommandError("Unable to read student data from {}".format(options['import']))
 
             update_cnt = UserProfile.objects.filter(user__username__in=students).update(allow_certificate=False)
             print('{} user(s) disabled out of {} in CSV file'.format(update_cnt, len(students)))
 
         elif options['enable']:
-            print("Enabling {0} for certificate download".format(options['enable']))
+            print("Enabling {} for certificate download".format(options['enable']))
             cert_allow = UserProfile.objects.get(user__username=options['enable'])
             cert_allow.allow_certificate = True
             cert_allow.save()
 
         elif options['disable']:
-            print("Disabling {0} for certificate download".format(options['disable']))
+            print("Disabling {} for certificate download".format(options['disable']))
             cert_allow = UserProfile.objects.get(user__username=options['disable'])
             cert_allow.allow_certificate = False
             cert_allow.save()

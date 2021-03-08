@@ -19,7 +19,7 @@ LOGGER_NAME = 'common.djangoapps.student.management.commands.bulk_unenroll'
 class BulkUnenrollTests(SharedModuleStoreTestCase):
     """Test Bulk un-enroll command works fine for all test cases."""
     def setUp(self):
-        super(BulkUnenrollTests, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.course = CourseFactory.create()
         self.audit_mode = CourseModeFactory.create(
             course_id=self.course.id,
@@ -58,7 +58,7 @@ class BulkUnenrollTests(SharedModuleStoreTestCase):
             csv = self._write_test_csv(csv, lines=["amy,test_course\n"])
 
             with LogCapture(LOGGER_NAME) as log:
-                call_command("bulk_unenroll", "--csv_path={}".format(csv.name), "--commit")
+                call_command("bulk_unenroll", f"--csv_path={csv.name}", "--commit")
                 expected_message = 'Invalid course id {}, skipping un-enrollement.'.\
                     format('test_course')
 
@@ -76,7 +76,7 @@ class BulkUnenrollTests(SharedModuleStoreTestCase):
         with NamedTemporaryFile() as csv:
             csv = self._write_test_csv(csv, lines=lines)
 
-            call_command("bulk_unenroll", "--csv_path={}".format(csv.name), "--commit")
+            call_command("bulk_unenroll", f"--csv_path={csv.name}", "--commit")
             for enrollment in CourseEnrollment.objects.all():
                 assert enrollment.is_active is False
 
@@ -92,7 +92,7 @@ class BulkUnenrollTests(SharedModuleStoreTestCase):
         with NamedTemporaryFile() as csv:
             csv = self._write_test_csv(csv, lines=lines)
 
-            call_command("bulk_unenroll", "--csv_path={}".format(csv.name))
+            call_command("bulk_unenroll", f"--csv_path={csv.name}")
             for enrollment in CourseEnrollment.objects.all():
                 assert enrollment.is_active is True
 
@@ -124,7 +124,7 @@ class BulkUnenrollTests(SharedModuleStoreTestCase):
                 (
                     LOGGER_NAME,
                     'INFO',
-                    'Processing [{}] with [1] enrollments.'.format(course_id),
+                    f'Processing [{course_id}] with [1] enrollments.',
                 ),
                 (
                     LOGGER_NAME,

@@ -8,7 +8,7 @@ import unittest
 import ddt
 from django.conf import settings
 from django.core.management import call_command
-from mock import call, patch
+from unittest.mock import call, patch
 from opaque_keys.edx import locator
 from six import text_type
 
@@ -39,7 +39,7 @@ class TestTransferStudents(ModuleStoreTestCase):
         """
         Connect a stub receiver, and analytics event tracking.
         """
-        super(TestTransferStudents, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
 
         UNENROLL_DONE.connect(self.assert_unenroll_signal)
         patcher = patch('common.djangoapps.student.models.tracker')
@@ -79,9 +79,9 @@ class TestTransferStudents(ModuleStoreTestCase):
         # New Course 2
         course_location_two = locator.CourseLocator('Org2', 'Course2', 'Run2')
         new_course_two = self._create_course(course_location_two)
-        original_key = text_type(course.id)
-        new_key_one = text_type(new_course_one.id)
-        new_key_two = text_type(new_course_two.id)
+        original_key = str(course.id)
+        new_key_one = str(new_course_one.id)
+        new_key_two = str(new_course_two.id)
 
         # Run the actual management command
         call_command(

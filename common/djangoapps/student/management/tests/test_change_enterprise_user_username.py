@@ -1,10 +1,9 @@
-# -*- coding: utf-8 -*-
 """
 Tests for the django management command `change_enterprise_user_username`.
 """
 
 
-import mock
+from unittest import mock
 from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.contrib.sites.models import Site
 from django.core.management import call_command
@@ -34,7 +33,7 @@ class ChangeEnterpriseUserUsernameCommandTests(TestCase):
 
         call_command(self.command, user_id=user.id, new_username=new_username)
 
-        logger_mock.info.assert_called_with('User {} must be an Enterprise User.'.format(user.id))
+        logger_mock.info.assert_called_with(f'User {user.id} must be an Enterprise User.')
         post_save_handler.assert_not_called()
 
     @mock.patch('common.djangoapps.student.management.commands.change_enterprise_user_username.LOGGER')
@@ -59,7 +58,7 @@ class ChangeEnterpriseUserUsernameCommandTests(TestCase):
 
         call_command(self.command, user_id=user.id, new_username=new_username)
 
-        logger_mock.info.assert_called_with('User {} has been updated with username {}.'.format(user.id, new_username))
+        logger_mock.info.assert_called_with(f'User {user.id} has been updated with username {new_username}.')
         post_save_handler.assert_called()
 
         updated_user = User.objects.get(id=user.id)
