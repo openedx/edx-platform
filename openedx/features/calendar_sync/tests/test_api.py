@@ -1,9 +1,9 @@
 """ Tests for the Calendar Sync API """
 
 
+from common.djangoapps.student.tests.factories import UserFactory
 from openedx.features.calendar_sync.api import subscribe_user_to_calendar, unsubscribe_user_to_calendar
 from openedx.features.calendar_sync.models import UserCalendarSyncConfig
-from common.djangoapps.student.tests.factories import UserFactory
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
@@ -15,12 +15,12 @@ class TestCalendarSyncAPI(SharedModuleStoreTestCase):
     @classmethod
     def setUpClass(cls):
         """ Set up any course data """
-        super(TestCalendarSyncAPI, cls).setUpClass()
+        super().setUpClass()
         cls.course = CourseFactory.create()
         cls.course_key = cls.course.id
 
     def setUp(self):
-        super(TestCalendarSyncAPI, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.user = UserFactory(password=TEST_PASSWORD)
 
     def test_subscribe_to_calendar(self):

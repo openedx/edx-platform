@@ -1,19 +1,19 @@
 """ Tests for the Calendar Sync .ics methods """
 
 from datetime import datetime, timedelta
+from unittest.mock import patch
 
 import pytz
 from django.test import RequestFactory, TestCase
 from freezegun import freeze_time
-from mock import patch
 
+from common.djangoapps.student.tests.factories import UserFactory
 from lms.djangoapps.courseware.courses import _Assignment
 from openedx.core.djangoapps.content.course_overviews.tests.factories import CourseOverviewFactory
 from openedx.core.djangoapps.site_configuration.tests.factories import SiteConfigurationFactory, SiteFactory
 from openedx.features.calendar_sync import get_calendar_event_id
 from openedx.features.calendar_sync.ics import generate_ics_files_for_user_course
 from openedx.features.calendar_sync.tests.factories import UserCalendarSyncConfigFactory
-from common.djangoapps.student.tests.factories import UserFactory
 
 
 class TestIcsGeneration(TestCase):

@@ -6,8 +6,8 @@ Unit tests for the calendar sync plugins.
 import crum
 import ddt
 from django.test import RequestFactory
-
 from edx_toggles.toggles.testutils import override_waffle_flag
+
 from lms.djangoapps.experiments.testutils import override_experiment_waffle_flag
 from openedx.features.calendar_sync.plugins import CalendarSyncToggleTool
 from openedx.features.course_experience import CALENDAR_SYNC_FLAG, RELATIVE_DATES_FLAG
@@ -23,7 +23,7 @@ class TestCalendarSyncToggleTool(SharedModuleStoreTestCase):
     @classmethod
     def setUpClass(cls):
         """ Set up any course data """
-        super(TestCalendarSyncToggleTool, cls).setUpClass()
+        super().setUpClass()
         cls.course = CourseFactory.create()
         cls.course_key = cls.course.id
 
