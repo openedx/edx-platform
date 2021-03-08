@@ -263,6 +263,17 @@ FEATURES = {
     # .. toggle_tickets: https://github.com/edx/edx-platform/pull/1073
     'COURSES_ARE_BROWSABLE': True,
 
+    # Can be turned off to disable the help link in the navbar
+    # .. toggle_name: FEATURES['ENABLE_HELP_LINK']
+    # .. toggle_implementation: DjangoSetting
+    # .. toggle_default: True
+    # .. toggle_description: When True, a help link is displayed on the main navbar. Set False to hide it.
+    # .. toggle_use_cases: open_edx
+    # .. toggle_creation_date: 2021-03-05
+    # .. toggle_tickets: https://github.com/edx/edx-platform/pull/26106
+    'ENABLE_HELP_LINK': True,
+
+
     # .. toggle_name: FEATURES['HIDE_DASHBOARD_COURSES_UNTIL_ACTIVATED']
     # .. toggle_implementation: DjangoSetting
     # .. toggle_default: False
