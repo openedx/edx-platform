@@ -440,6 +440,7 @@ CREATE TABLE `auth_registration` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `activation_key` varchar(32) NOT NULL,
   `user_id` int(11) NOT NULL,
+  `activation_timestamp` datetime(6) DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `activation_key` (`activation_key`),
   UNIQUE KEY `user_id` (`user_id`),
@@ -2996,7 +2997,7 @@ CREATE TABLE `django_migrations` (
   `name` varchar(255) NOT NULL,
   `applied` datetime(6) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=842 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=843 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `django_openid_auth_association`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
