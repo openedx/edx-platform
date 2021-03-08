@@ -90,6 +90,13 @@ class UserApplicationAdmin(admin.ModelAdmin):
     Django admin class for UserApplication
     """
 
+    def has_change_permission(self, request, obj=None):
+        """
+        Revoke permission to edit user applications if user is not super user. As BU Admin and ADG Admin will also
+        have admin access to view user applications so we are revoking the edit permission for them.
+        """
+        return request.user.is_superuser
+
     list_display = ('id', 'user_email', 'business_line',)
     list_filter = ('business_line',)
     raw_id_fields = ('user',)
