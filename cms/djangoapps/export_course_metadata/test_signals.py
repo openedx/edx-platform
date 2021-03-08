@@ -38,8 +38,8 @@ class TestExportCourseMetadata(SharedModuleStoreTestCase):
             **kwargs
         )
 
-    @patch('cms.djangoapps.export_course_metadata.signals.course_metadata_export_storage')
-    @patch('cms.djangoapps.export_course_metadata.signals.ContentFile')
+    @patch('cms.djangoapps.export_course_metadata.tasks.course_metadata_export_storage')
+    @patch('cms.djangoapps.export_course_metadata.tasks.ContentFile')
     def test_happy_path(self, patched_content, patched_storage):
         """ Ensure we call the storage class with the correct parameters and course metadata """
         all_highlights = [["week1highlight1", "week1highlight2"], ["week1highlight1", "week1highlight2"], [], []]
