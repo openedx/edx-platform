@@ -268,7 +268,7 @@ def test_save_application_review_info(request, user_application):
 )
 @mock.patch('openedx.adg.lms.applications.admin.get_user_first_name', return_value='test')
 @mock.patch('openedx.adg.lms.applications.admin.MandrillClient.__init__', return_value=None)
-@mock.patch('openedx.adg.lms.applications.admin.MandrillClient.send_mandrill_email')
+@mock.patch('openedx.adg.lms.applications.admin.task_send_mandrill_email')
 def test_send_application_status_update_email(
     mock_send_mandrill_email, mock_init, mock_get_first_name, status, expected_email_template, request, user_application
 ):
@@ -284,7 +284,7 @@ def test_send_application_status_update_email(
     }
 
     UserApplicationADGAdmin._send_application_status_update_email('self', user_application, TEST_MESSAGE_FOR_APPLICANT)
-    mock_send_mandrill_email.assert_called_once_with(
+    mock_send_mandrill_email.delay.assert_called_once_with(
         expected_email_template, user_application.user.email, expected_email_context
     )
 

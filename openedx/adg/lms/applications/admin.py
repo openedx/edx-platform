@@ -11,6 +11,7 @@ from django.utils.html import format_html
 from django.utils.translation import ugettext_lazy as _
 
 from openedx.adg.common.lib.mandrill_client.client import MandrillClient
+from openedx.adg.common.lib.mandrill_client.tasks import task_send_mandrill_email
 from openedx.adg.constants import MONTH_DAY_YEAR_FORMAT
 from openedx.adg.lms.constants import SAUDI_NATIONAL_PROMPT
 from openedx.adg.lms.helpers import get_user_first_name
@@ -396,7 +397,7 @@ class UserApplicationADGAdmin(admin.ModelAdmin):
             'message_for_applicant': message_for_applicant,
         }
 
-        MandrillClient().send_mandrill_email(
+        task_send_mandrill_email.delay(
             status_email_template_map[application.status], applicant.email, email_context
         )
 
