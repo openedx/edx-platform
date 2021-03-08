@@ -359,16 +359,12 @@ class MultilingualCourseGroup(models.Model):
         """
         Return course with preferred language.
 
-        If course with preferred lang is not found then return the first course from the group.
-        If there are no open courses then return None.
-
         Returns:
-            MultilingualCourse: User preferred lang course.
+            MultilingualCourse: User preferred lang course or None
         """
         user_preferred_lang = get_language()
-        open_multilingual_courses = self.open_multilingual_courses
 
-        for multilingual_course in open_multilingual_courses:
+        for multilingual_course in self.open_multilingual_courses:
             if multilingual_course.course.language == user_preferred_lang:
                 return multilingual_course.course
         return None
