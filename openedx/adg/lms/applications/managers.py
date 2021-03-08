@@ -32,19 +32,6 @@ class MultilingualCourseGroupManager(Manager):
     def get_courses(self, user, is_prereq=False):
         """
         Get courses from course groups.
-        Following are the preferences for the course list.
-
-        1. Enrollment
-            If a user is enrolled in any of the courses of a course
-            group then that course is selected from the group.
-
-        2. Language preferred
-            If user has not enrolled in any of the courses of a course
-            group then find a course with preferred language.
-
-        3. First Course
-            If user enrolled and preferred language courses are not found then
-            return the first course of a group.
 
         Args:
             is_prereq (bool):  List of MultilingualCourseGroups
@@ -58,12 +45,7 @@ class MultilingualCourseGroupManager(Manager):
 
         for course_group in course_groups:
             open_multilingual_courses = course_group.multilingual_courses.open_multilingual_courses()
-            enrolled_course = open_multilingual_courses.get_enrolled_course(user) if not user.is_anonymous else None
-            multilingual_course = (
-                enrolled_course or
-                open_multilingual_courses.get_preferred_lang_course() or
-                open_multilingual_courses.first()
-            )
+            multilingual_course = open_multilingual_courses.multilingual_course(user)
             if multilingual_course:
                 courses_list.append(multilingual_course.course)
 
@@ -75,21 +57,47 @@ class MultilingualCourseQuerySet(QuerySet):
     QuerySet for MultilingualCourse
     """
 
-    def get_enrolled_course(self, user):
+    def enrolled_course(self, user):
         """
-        Returns enrolled course for a user
+        Returns enrolled course for a authenticated user else None
         """
+        if user.is_anonymous:
+            return None
+
         return self.filter(
             course__courseenrollment__user=user,
             course__courseenrollment__is_active=True
         ).first()
 
-    def get_preferred_lang_course(self):
+    def preferred_lang_course(self):
         """
         Returns preferred language based course
         """
         user_preferred_lang = get_language()
         return self.filter(course__language=user_preferred_lang).first()
+
+    def multilingual_course(self, user):
+        """
+        Returns a multilingual course
+
+        Following are the preferences for the course.
+
+        1. Enrollment
+            Get User enrolled course.
+
+        2. Language preferred
+            If user has not enrolled then find a course with preferred language.
+
+        3. First Course
+            If user enrolled and preferred language courses are not found then
+            return the first course of a group.
+        Args:
+            user (User): User for which we need to find the course
+
+        Returns:
+            MultilingualCourse: MultilingualCourse for a user
+        """
+        return self.enrolled_course(user) or self.preferred_lang_course() or self.first()
 
 
 class MultilingualCourseManager(Manager):

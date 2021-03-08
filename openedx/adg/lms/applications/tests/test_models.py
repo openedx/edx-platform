@@ -226,7 +226,7 @@ def test_get_preferred_lang_course(courses):
     """
     course = courses['test_course1']
     course_group = MultilingualCourseFactory(course=course).multilingual_course_group
-    preferred_course = course_group.multilingual_courses.open_multilingual_courses().get_preferred_lang_course().course
+    preferred_course = course_group.multilingual_courses.open_multilingual_courses().preferred_lang_course().course
     assert preferred_course.id == course.id
 
 
@@ -236,7 +236,7 @@ def test_get_preferred_lang_course_expired_courses(expired_course):
     Tests get_preferred_language_course course is expired.
     """
     course_group = MultilingualCourseFactory(course=expired_course).multilingual_course_group
-    assert course_group.multilingual_courses.open_multilingual_courses().get_preferred_lang_course() is None
+    assert course_group.multilingual_courses.open_multilingual_courses().preferred_lang_course() is None
 
 
 @pytest.mark.django_db

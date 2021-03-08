@@ -1,0 +1,3 @@
+"""
+Override for courseware application
+"""
