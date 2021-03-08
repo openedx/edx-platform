@@ -44,7 +44,7 @@ from student.tests.factories import (
     UserStandingFactory,
 )
 
-from organizations.models import Organization, OrganizationCourse
+from organizations.models import Organization, OrganizationCourse, UserOrganizationMapping
 
 from oauth2_provider.models import AccessToken, RefreshToken, Application
 
@@ -97,6 +97,7 @@ class CreateDevstackSiteCommandTestCase(TestCase):
         user = get_user_model().objects.get()
         assert user.check_password(self.name)
         assert user.profile.name == self.name
+        assert UserOrganizationMapping.objects.get(organization__name=self.name, user=user)
 
         assert CourseCreatorRole().has_user(user), 'User should be a course creator'
 

@@ -56,9 +56,8 @@ class Command(BaseCommand):
         ))
 
     def handle(self, *args, **options):
-        # TODO: Uncomment after fixing the AMC trial site
-        # if not settings.DEBUG:
-        #     raise CommandError('This only works on devstack.')
+        if not settings.DEBUG:
+            raise CommandError('This only works on devstack.')
 
         name = options['name'][0].lower()
         try:
@@ -90,7 +89,7 @@ class Command(BaseCommand):
                 'domain': site_name,
                 'name': site_name,
             },
-            'user_email': user.email,
+            'username': user.username,
             'organization': {
                 'name': name,
                 'short_name': name,
