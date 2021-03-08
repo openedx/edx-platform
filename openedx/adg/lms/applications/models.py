@@ -6,7 +6,6 @@ from datetime import date
 from django.contrib.auth.models import Group, User
 from django.core.validators import FileExtensionValidator
 from django.db import models
-from django.utils.translation import get_language
 from django.utils.translation import ugettext_lazy as _
 from model_utils.models import TimeStampedModel
 
@@ -17,7 +16,7 @@ from openedx.core.lib.grade_utils import round_away_from_zero
 
 from .constants import ALLOWED_LOGO_EXTENSIONS, CourseScore
 from .helpers import max_year_value_validator, min_year_value_validator, validate_logo_size
-from .managers import MultilingualCourseGroupManager, OpenMultilingualCourseManager, SubmittedApplicationsManager
+from .managers import MultilingualCourseGroupManager, MultilingualCourseManager, SubmittedApplicationsManager
 
 
 class ApplicationHub(TimeStampedModel):
@@ -320,57 +319,16 @@ class MultilingualCourseGroup(models.Model):
     def __str__(self):
         return self.name
 
-    @property
-    def open_multilingual_courses(self):
-        return self.multilingual_courses(manager='open_multilingual_courses').all()  # pylint: disable=no-member
-
     def multilingual_course_count(self):
         return self.multilingual_courses.count()
 
+    # pylint: disable=no-member
     def open_multilingual_courses_count(self):
-        return self.open_multilingual_courses.count()
+        return self.multilingual_courses.open_multilingual_courses().count()
 
     def open_multilingual_course_keys(self):
-        return self.open_multilingual_courses.values_list('course', flat=True)
-
-    def does_course_exist(self, multilingual_course):
-        return self.multilingual_courses.filter(course=multilingual_course.course).exists()
-
-    def get_user_enrolled_course(self, user):
-        """
-        Finds user enrolled course of current course group.
-
-        Args:
-            user (User): user for which enrolled course needs to be returned
-
-        Returns:
-            CourseOverview: Enrolled multilingual course or None
-        """
-        if user.is_anonymous:
-            return None
-
-        enrolled_multilingual_course = self.open_multilingual_courses.filter(
-            course__courseenrollment__user=user,
-            course__courseenrollment__is_active=True
-        ).first()
-        return enrolled_multilingual_course.course if enrolled_multilingual_course else None
-
-    def get_preferred_lang_course(self):
-        """
-        Return course with preferred language.
-
-        Returns:
-            MultilingualCourse: User preferred lang course or None
-        """
-        user_preferred_lang = get_language()
-
-        for multilingual_course in self.open_multilingual_courses:
-            if multilingual_course.course.language == user_preferred_lang:
-                return multilingual_course.course
-        return None
-
-    def get_first_course(self):
-        return self.open_multilingual_courses.first().course if self.open_multilingual_courses.exists() else None
+        return self.multilingual_courses.open_multilingual_courses().values_list('course', flat=True)
+    # pylint: enable=no-member
 
     @classmethod
     def get_courses(cls, user, is_prereq=False):
@@ -395,14 +353,17 @@ class MultilingualCourseGroup(models.Model):
         """
         courses_list = []
         course_groups = cls.objects.prereq_course_groups() if is_prereq else cls.objects.all()
+
         for course_group in course_groups:
-            course = (
-                course_group.get_user_enrolled_course(user) or
-                course_group.get_preferred_lang_course() or
-                course_group.get_first_course()
+            open_multilingual_courses = course_group.multilingual_courses.open_multilingual_courses()
+            enrolled_course = open_multilingual_courses.get_enrolled_course(user) if not user.is_anonymous else None
+            multilingual_course = (
+                enrolled_course or
+                open_multilingual_courses.get_preferred_lang_course() or
+                open_multilingual_courses.first()
             )
-            if course:
-                courses_list.append(course)
+            if multilingual_course:
+                courses_list.append(multilingual_course.course)
 
         return courses_list
 
@@ -425,8 +386,7 @@ class MultilingualCourse(models.Model):
         related_name='multilingual_courses',
     )
 
-    objects = models.Manager()
-    open_multilingual_courses = OpenMultilingualCourseManager()
+    objects = MultilingualCourseManager()
 
     class Meta:
         app_label = 'applications'

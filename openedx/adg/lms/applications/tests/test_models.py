@@ -220,32 +220,14 @@ def test_open_multilingual_course_keys(courses):
 
 
 @pytest.mark.django_db
-def test_does_course_exist_in_course_group():
-    """
-    Tests course exists in multilingual group.
-    """
-    multilingual_course = MultilingualCourseFactory()
-    course_group = multilingual_course.multilingual_course_group
-    assert course_group.does_course_exist(multilingual_course)
-
-
-@pytest.mark.django_db
-def test_course_does_not_exist_in_course_group(course_group):
-    """
-    Tests course does not exist in multilingual group.
-    """
-    multilingual_course = MultilingualCourseFactory()
-    assert not course_group.does_course_exist(multilingual_course)
-
-
-@pytest.mark.django_db
 def test_get_preferred_lang_course(courses):
     """
     Tests get_preferred_language_course course is active.
     """
     course = courses['test_course1']
     course_group = MultilingualCourseFactory(course=course).multilingual_course_group
-    assert course_group.get_preferred_lang_course().id == course.id
+    preferred_course = course_group.multilingual_courses.open_multilingual_courses().get_preferred_lang_course().course
+    assert preferred_course.id == course.id
 
 
 @pytest.mark.django_db
@@ -254,7 +236,7 @@ def test_get_preferred_lang_course_expired_courses(expired_course):
     Tests get_preferred_language_course course is expired.
     """
     course_group = MultilingualCourseFactory(course=expired_course).multilingual_course_group
-    assert course_group.get_preferred_lang_course() is None
+    assert course_group.multilingual_courses.open_multilingual_courses().get_preferred_lang_course() is None
 
 
 @pytest.mark.django_db
