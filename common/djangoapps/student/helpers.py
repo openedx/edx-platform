@@ -430,9 +430,10 @@ class AccountValidationError(Exception):
     """
     Used in account creation views to raise exceptions with details about specific invalid fields
     """
-    def __init__(self, message, field):
+    def __init__(self, message, field, error_code=None):
         super(AccountValidationError, self).__init__(message)  # lint-amnesty, pylint: disable=super-with-arguments
         self.field = field
+        self.error_code = error_code
 
 
 def cert_info(user, course_overview):
@@ -652,12 +653,14 @@ def do_create_account(form, custom_form=None):
         if username_exists_or_retired(user.username):  # lint-amnesty, pylint: disable=no-else-raise
             raise AccountValidationError(  # lint-amnesty, pylint: disable=raise-missing-from
                 USERNAME_EXISTS_MSG_FMT.format(username=proposed_username),
-                field="username"
+                field="username",
+                error_code='duplicate-username',
             )
         elif email_exists_or_retired(user.email):
             raise AccountValidationError(  # lint-amnesty, pylint: disable=raise-missing-from
                 _("An account with the Email '{email}' already exists.").format(email=user.email),
-                field="email"
+                field="email",
+                error_code='duplicate-email'
             )
         else:
             raise
