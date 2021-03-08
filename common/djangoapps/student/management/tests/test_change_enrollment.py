@@ -1,10 +1,10 @@
 """ Test the change_enrollment command line script."""
 
 
+from unittest.mock import patch
+
 import ddt
 from django.core.management import call_command
-from unittest.mock import patch
-from six import text_type
 
 from common.djangoapps.course_modes.tests.factories import CourseModeFactory
 from common.djangoapps.student.models import CourseEnrollment

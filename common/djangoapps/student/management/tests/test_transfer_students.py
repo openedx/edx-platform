@@ -4,13 +4,12 @@ Tests the transfer student management command
 
 
 import unittest
+from unittest.mock import call, patch
 
 import ddt
 from django.conf import settings
 from django.core.management import call_command
-from unittest.mock import call, patch
 from opaque_keys.edx import locator
-from six import text_type
 
 from common.djangoapps.course_modes.models import CourseMode
 from common.djangoapps.student.models import (
