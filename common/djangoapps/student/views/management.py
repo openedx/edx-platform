@@ -534,6 +534,7 @@ def activate_account(request, key):
                 USER_ACCOUNT_ACTIVATED,
                 {
                     "user_id": registration.user.id,
+                    "activation_timestamp": registration.activation_timestamp
                 }
             )
 

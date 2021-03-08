@@ -905,6 +905,7 @@ class Registration(models.Model):
 
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     activation_key = models.CharField((u'activation key'), max_length=32, unique=True, db_index=True)
+    activation_timestamp = models.DateTimeField(default=None, null=True, blank=True)
 
     def register(self, user):
         # MINOR TODO: Switch to crypto-secure key
@@ -915,6 +916,8 @@ class Registration(models.Model):
     def activate(self):
         self.user.is_active = True
         self.user.save(update_fields=['is_active'])
+        self.activation_timestamp = datetime.utcnow()
+        self.save()
         USER_ACCOUNT_ACTIVATED.send_robust(self.__class__, user=self.user)
         log.info(u'User %s (%s) account is successfully activated.', self.user.username, self.user.email)
 
