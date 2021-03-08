@@ -63,9 +63,7 @@ def get_all_course_instructors(course_key, request=None):
         list: A list of tuples containing respectively, a list containing UserProfile objects for all
             the instructors, and a dict containing the profile image url in the {'size':'url'} format
     """
-    course_locator = course_key
-    if getattr(course_key, 'ccx', None):
-        course_locator = course_key.to_course_locator()
+    course_locator = course_key.to_course_locator() if getattr(course_key, 'ccx', None) else course_key
 
     instructors = CourseInstructorRole(course_locator).users_with_role()
     instructor_data = []

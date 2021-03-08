@@ -1,8 +1,6 @@
 """
 Tests for views.py file of courseware_override
 """
-from datetime import datetime, timedelta
-
 import mock
 import pytest
 
@@ -16,9 +14,7 @@ from openedx.adg.lms.courseware_override.views import (
 )
 from openedx.core.djangoapps.content.course_overviews.tests.factories import CourseOverviewFactory
 
-START_DATE = datetime.today() - timedelta(days=365)
-END_DATE = datetime.today() + timedelta(days=365)
-DUMMY_IMAGE_URLS = {'small': 'small_dummy_url', 'medium': 'large_dummy_url', 'large': 'large_dummy_url'}
+from .constants import DUMMY_IMAGE_URLS, END_DATE, START_DATE
 
 
 @pytest.mark.django_db
@@ -42,9 +38,7 @@ def course_fixture():
     Returns:
         func: A function that allows user to create a course with the specified language
     """
-    course_list = []
-
-    def create_user(language='en'):
+    def create_course(language='en'):
         """
         Create a course with the given language
 
@@ -59,10 +53,9 @@ def course_fixture():
         course.start_date = START_DATE
         course.end_date = END_DATE
         course.save()
-        course_list.append(course)
         return course
 
-    return create_user
+    return create_course
 
 
 @pytest.fixture(name='multilingual_course_group')
