@@ -31,7 +31,7 @@ jobs:
       - name: Set up python
         uses: actions/setup-python@v2
         with:
-          python-version: 3.5
+          python-version: 3.8
         if: env.GIT_DIFF
 
       - name: Cache python requirements
