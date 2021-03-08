@@ -23,16 +23,6 @@ def mandrill_client(request, mocker):
     return mock_mandrill
 
 
-@pytest.fixture(name='user_with_profile')
-def user_with_user_profile(request):
-    """
-    Create user with profile, this fixture will be passed as a parameter to all pytests
-    """
-    user = UserFactory()
-    UserProfileFactory(user=user)
-    return user
-
-
 @pytest.mark.django_db
 def test_compose_and_send_adg_activation_email(mocker, user_with_profile, mock_mandrill_client):
     """
