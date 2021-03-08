@@ -130,7 +130,7 @@ class SearchIndexerBase(ABC):
         text_search_normalised = text_search.translate(text_search.maketrans('', '', RESERVED_CHARACTERS + '"'))
         text_search_normalised = text_search_normalised.replace('-', ' ')
         # Wrap with asterix to enable partial matches
-        text_search_normalised = "*{}*".format(text_search_normalised)
+        text_search_normalised = f"*{text_search_normalised}*"
         terms = [
             {
                 'terms': {

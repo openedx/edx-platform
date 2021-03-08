@@ -1,11 +1,11 @@
 """
 Testing indexing of blockstore based content libraries
 """
+from unittest.mock import patch
 
 from django.conf import settings
 from django.core.management import call_command
 from django.test.utils import override_settings
-from mock import patch
 from opaque_keys.edx.locator import LibraryLocatorV2, LibraryUsageLocatorV2
 from search.search_engine_base import SearchEngine
 

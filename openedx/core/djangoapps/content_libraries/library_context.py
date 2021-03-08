@@ -27,7 +27,7 @@ class LibraryContextImpl(LearningContext):
     """
 
     def __init__(self, **kwargs):
-        super(LibraryContextImpl, self).__init__(**kwargs)  # lint-amnesty, pylint: disable=super-with-arguments
+        super().__init__(**kwargs)
         self.use_draft = kwargs.get('use_draft', None)
 
     def can_edit_block(self, user, usage_key):

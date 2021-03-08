@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 Tests for static asset files in Blockstore-based Content Libraries
 """
@@ -11,17 +10,17 @@ from openedx.core.djangoapps.content_libraries.tests.base import ContentLibrarie
 # Binary data representing an SVG image file
 SVG_DATA = """<svg xmlns="http://www.w3.org/2000/svg" height="30" width="100">
   <text x="0" y="15" fill="red">SVG is 🔥</text>
-</svg>""".encode('utf-8')
+</svg>""".encode()
 
 # part of an .srt transcript file
-TRANSCRIPT_DATA = """1
+TRANSCRIPT_DATA = b"""1
 00:00:00,260 --> 00:00:01,510
 Welcome to edX.
 
 2
 00:00:01,510 --> 00:00:04,480
 I'm Anant Agarwal, I'm the president of edX,
-""".encode('utf-8')
+"""
 
 
 class ContentLibrariesStaticAssetsTest(ContentLibrariesRestApiTest):
