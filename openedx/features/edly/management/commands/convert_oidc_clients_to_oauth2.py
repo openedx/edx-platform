@@ -27,16 +27,16 @@ class Command(BaseCommand):
         """
         return Client.objects.all()
 
-    def _create_or_update_application(self, user, app_name, application_kwargs):
+    def _create_or_update_application(self, user, application_kwargs, client_id=''):
         """
         Creates a new application if it does not exists otherwise update existing application.
         """
         application, is_created = Application.objects.update_or_create(
-            user=user, name=app_name, defaults=application_kwargs
+            user=user, client_id=client_id, defaults=application_kwargs
         )
         logger.info('{} {} application with id: {}, client_id: {}'.format(
             'Created' if is_created else 'Updated',
-            app_name,
+            application.name,
             application.id,
             application.client_id,
         ))
@@ -68,13 +68,12 @@ class Command(BaseCommand):
             )
             redirect_url = client.redirect_uri.replace('oidc', 'oauth2')
             application_kwargs['redirect_uris'] = redirect_url
-            application_kwargs['client_id'] = client.client_id
+            application_kwargs['name'] = client.name
             application_kwargs['client_secret'] = client.client_secret
-            application = self._create_or_update_application(client.user, client.name, application_kwargs)
-            app_name = '{}-backend-service'.format(client.name)
+            application = self._create_or_update_application(client.user, application_kwargs, client.client_id)
+            application_kwargs['name'] = '{}-backend-service'.format(client.name)
             del application_kwargs['redirect_uris']
-            del application_kwargs['client_id']
             application_kwargs['authorization_grant_type'] = Application.GRANT_CLIENT_CREDENTIALS
             application_kwargs['skip_authorization'] = False
-            self._create_or_update_application(client.user, app_name, application_kwargs)
+            self._create_or_update_application(client.user, application_kwargs)
             self._create_or_update_access(application, application_access_kwargs)
