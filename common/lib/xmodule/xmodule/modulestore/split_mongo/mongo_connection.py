@@ -19,7 +19,6 @@ from contracts import check, new_contract
 from mongodb_proxy import autoretry_read
 # Import this just to export it
 from pymongo.errors import DuplicateKeyError  # pylint: disable=unused-import
-
 from xmodule.exceptions import HeartbeatFailure
 from xmodule.modulestore import BlockData
 from xmodule.modulestore.split_mongo import BlockKey

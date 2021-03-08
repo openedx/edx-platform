@@ -1642,26 +1642,16 @@ class ProblemBlockTest(unittest.TestCase):  # lint-amnesty, pylint: disable=miss
         assert not result['should_enable_next_hint']
 
     def test_demand_hint_logging(self):
-        def mock_location_text(self):  # lint-amnesty, pylint: disable=unused-argument
-            """
-            Mock implementation of __unicode__ or __str__ for the module's location.
-            """
-            return u'i4x://edX/capa_test/problem/meh'
-
+        """
+        Test calling get_demand_hunt() results in an event being published.
+        """
         module = CapaFactory.create(xml=self.demand_xml)
-        # Re-mock the module_id to a fixed string, so we can check the logging
-        module.location = Mock(module.location)
-        if six.PY2:
-            module.location.__unicode__ = mock_location_text
-        else:
-            module.location.__str__ = mock_location_text
-
         with patch.object(module.runtime, 'publish') as mock_track_function:
             module.get_problem_html()
             module.get_demand_hint(0)
             mock_track_function.assert_called_with(
                 module, 'edx.problem.hint.demandhint_displayed',
-                {'hint_index': 0, 'module_id': u'i4x://edX/capa_test/problem/meh',
+                {'hint_index': 0, 'module_id': str(module.location),
                  'hint_text': 'Demand 1', 'hint_len': 2}
             )
 

@@ -1,4 +1,3 @@
-# coding=UTF-8
 """
 Performance tests for field overrides.
 """
@@ -6,12 +5,10 @@ Performance tests for field overrides.
 
 import itertools
 from datetime import datetime
+from unittest import mock
 
 import ddt
-import mock
 import pytest
-import six
-from six.moves import range
 from ccx_keys.locator import CCXLocator
 from django.conf import settings
 from django.contrib.messages.storage.fallback import FallbackStorage
@@ -24,15 +21,15 @@ from opaque_keys.edx.keys import CourseKey
 from pytz import UTC
 from xblock.core import XBlock
 
-from lms.djangoapps.courseware.testutils import FieldOverrideTestMixin
-from lms.djangoapps.courseware.views.views import progress
+from common.djangoapps.student.models import CourseEnrollment
+from common.djangoapps.student.tests.factories import UserFactory
 from lms.djangoapps.ccx.tests.factories import CcxFactory
 from lms.djangoapps.courseware.field_overrides import OverrideFieldData
+from lms.djangoapps.courseware.testutils import FieldOverrideTestMixin
+from lms.djangoapps.courseware.views.views import progress
 from openedx.core.djangoapps.content.block_structure.api import get_course_in_cache
 from openedx.core.djangoapps.waffle_utils.testutils import WAFFLE_TABLES
 from openedx.features.content_type_gating.models import ContentTypeGatingConfig
-from common.djangoapps.student.models import CourseEnrollment
-from common.djangoapps.student.tests.factories import UserFactory
 from xmodule.modulestore.tests.django_utils import (
     TEST_DATA_MONGO_MODULESTORE,
     TEST_DATA_SPLIT_MODULESTORE,
@@ -67,7 +64,7 @@ class FieldOverridePerformanceTestCase(FieldOverrideTestMixin, ProceduralCourseT
         """
         Create a test client, course, and user.
         """
-        super(FieldOverridePerformanceTestCase, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
 
         self.request_factory = RequestFactory()
         self.student = UserFactory.create()
@@ -140,7 +137,7 @@ class FieldOverridePerformanceTestCase(FieldOverrideTestMixin, ProceduralCourseT
             self.student,
             course_key
         )
-        return CourseKey.from_string(six.text_type(course_key))
+        return CourseKey.from_string(str(course_key))
 
     def grade_course(self, course_key):
         """
@@ -148,7 +145,7 @@ class FieldOverridePerformanceTestCase(FieldOverrideTestMixin, ProceduralCourseT
         """
         return progress(
             self.request,
-            course_id=six.text_type(course_key),
+            course_id=str(course_key),
             student_id=self.student.id
         )
 
@@ -283,9 +280,9 @@ class TestFieldOverrideSplitPerformance(FieldOverridePerformanceTestCase):
         ('ccx', 1, True, False): (QUERY_COUNT, 3),
         ('ccx', 2, True, False): (QUERY_COUNT, 3),
         ('ccx', 3, True, False): (QUERY_COUNT, 3),
-        ('ccx', 1, True, True): (QUERY_COUNT + 1, 3),
-        ('ccx', 2, True, True): (QUERY_COUNT + 1, 3),
-        ('ccx', 3, True, True): (QUERY_COUNT + 1, 3),
+        ('ccx', 1, True, True): (QUERY_COUNT + 2, 3),
+        ('ccx', 2, True, True): (QUERY_COUNT + 2, 3),
+        ('ccx', 3, True, True): (QUERY_COUNT + 2, 3),
         ('no_overrides', 1, False, False): (QUERY_COUNT, 3),
         ('no_overrides', 2, False, False): (QUERY_COUNT, 3),
         ('no_overrides', 3, False, False): (QUERY_COUNT, 3),

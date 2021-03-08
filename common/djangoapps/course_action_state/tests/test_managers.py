@@ -9,7 +9,6 @@ import pytest
 from ddt import data, ddt
 from django.test import TestCase
 from opaque_keys.edx.locations import CourseLocator
-from six.moves import range
 
 from common.djangoapps.course_action_state.managers import CourseActionStateItemNotFoundError
 from common.djangoapps.course_action_state.models import CourseRerunState
@@ -23,7 +22,7 @@ class TestCourseActionStateManagerBase(TestCase):
     Base class for testing Course Action State Managers.
     """
     def setUp(self):
-        super(TestCourseActionStateManagerBase, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.course_key = CourseLocator("test_org", "test_course_num", "test_run")
 
 
@@ -118,8 +117,8 @@ class TestCourseActionUIStateManager(TestCourseActionStateManagerBase):
     def assertCourseActionStatesEqual(self, expected, found):
         """Asserts that the set of course keys in the expected state equal those that are found"""
         self.assertSetEqual(
-            set(course_action_state.course_key for course_action_state in expected),
-            set(course_action_state.course_key for course_action_state in found))
+            {course_action_state.course_key for course_action_state in expected},
+            {course_action_state.course_key for course_action_state in found})
 
     @data(*COURSE_ACTION_STATES)
     def test_find_all_for_display(self, action_class):

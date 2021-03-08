@@ -27,7 +27,7 @@ class TestCCX(ModuleStoreTestCase):
 
     def setUp(self):
         """common setup for all tests"""
-        super(TestCCX, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.course = CourseFactory.create()
         self.coach = AdminFactory.create()
         role = CourseCcxCoachRole(self.course.id)
@@ -42,7 +42,7 @@ class TestCCX(ModuleStoreTestCase):
         """verify that the course property of a ccx returns the right course"""
         expected = self.course
         actual = self.ccx.course
-        assert expected == actual
+        assert expected.location == actual.location
 
     def test_ccx_course_caching(self):
         """verify that caching the propery works to limit queries"""

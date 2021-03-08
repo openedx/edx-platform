@@ -4,17 +4,17 @@ Tests for django admin command `populate_expiry_date` in the verify_student modu
 
 
 from datetime import timedelta
+from unittest.mock import patch
 
 from django.conf import settings
 from django.core.management import call_command
 from django.test import TestCase
-from mock import patch
 from testfixtures import LogCapture
 
+from common.djangoapps.student.tests.factories import UserFactory
 from common.test.utils import MockS3BotoMixin
 from lms.djangoapps.verify_student.models import SoftwareSecurePhotoVerification
 from lms.djangoapps.verify_student.tests.test_models import FAKE_SETTINGS, mock_software_secure_post
-from common.djangoapps.student.tests.factories import UserFactory
 
 LOGGER_NAME = 'lms.djangoapps.verify_student.management.commands.populate_expiry_date'
 

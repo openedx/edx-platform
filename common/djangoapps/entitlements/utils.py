@@ -1,4 +1,4 @@
-"""  # lint-amnesty, pylint: disable=django-not-configured
+"""
 Utility methods for the entitlement application.
 """
 
@@ -8,8 +8,8 @@ import logging
 from django.utils import timezone
 
 from common.djangoapps.course_modes.models import CourseMode
-from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from common.djangoapps.student.models import CourseEnrollment
+from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 
 log = logging.getLogger("common.entitlements.utils")
 
@@ -36,8 +36,8 @@ def is_course_run_entitlement_fulfillable(
     try:
         course_overview = CourseOverview.get_from_id(course_run_key)
     except CourseOverview.DoesNotExist:
-        log.error((u'There is no CourseOverview entry available for {course_run_id}, '
-                   u'course run cannot be applied to entitlement').format(
+        log.error(('There is no CourseOverview entry available for {course_run_id}, '
+                   'course run cannot be applied to entitlement').format(
             course_run_id=str(course_run_key)
         ))
         return False

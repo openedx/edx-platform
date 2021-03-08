@@ -385,7 +385,7 @@ class TestProblemTypeAccess(SharedModuleStoreTestCase, MasqueradeMixin):
             component_types (list of str): list of problem types this course should have
         Returns:
              (dict): {
-                'course': (CourseDescriptorWithMixins): course definition
+                'course': (CourseBlockWithMixins): course definition
                 'blocks': (dict) {
                     'block_category_1': XBlock representing that block,
                     'block_category_2': XBlock representing that block,

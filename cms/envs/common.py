@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 This is the common settings file, intended to set sane defaults. If you have a
 piece of configuration that's dependent on a set of feature flags being set,
@@ -968,6 +967,8 @@ HTTPS = 'on'
 ROOT_URLCONF = 'cms.urls'
 
 COURSE_IMPORT_EXPORT_BUCKET = ''
+COURSE_METADATA_EXPORT_BUCKET = ''
+
 ALTERNATE_WORKER_QUEUES = 'lms'
 
 STATIC_URL_BASE = '/static/'
@@ -1052,6 +1053,8 @@ derived('LOCALE_PATHS')
 MESSAGE_STORAGE = 'django.contrib.messages.storage.session.SessionStorage'
 
 COURSE_IMPORT_EXPORT_STORAGE = 'django.core.files.storage.FileSystemStorage'
+COURSE_METADATA_EXPORT_STORAGE = 'django.core.files.storage.FileSystemStorage'
+
 
 ##### EMBARGO #####
 EMBARGO_SITE_REDIRECT_URL = None
@@ -1389,6 +1392,7 @@ INSTALLED_APPS = [
     'common.djangoapps.student.apps.StudentConfig',  # misleading name due to sharing with lms
     'openedx.core.djangoapps.course_groups',  # not used in cms (yet), but tests run
     'cms.djangoapps.xblock_config.apps.XBlockConfig',
+    'cms.djangoapps.export_course_metadata.apps.ExportCourseMetadataConfig',
 
     # New (Blockstore-based) XBlock runtime
     'openedx.core.djangoapps.xblock.apps.StudioXBlockAppConfig',
@@ -2023,15 +2027,10 @@ INTEGRATED_CHANNELS_API_CHUNK_TRANSMISSION_LIMIT = {}
 
 BASE_COOKIE_DOMAIN = 'localhost'
 
-# This limits the type of roles that are submittable via the `student` app's manual enrollment
-# audit API. While this isn't used in CMS, it is used via Enterprise which is installed in
-# the CMS. Without this, we get errors.
-MANUAL_ENROLLMENT_ROLE_CHOICES = ['Learner', 'Support', 'Partner']
-
 ############## Settings for the Discovery App ######################
 
 COURSE_CATALOG_URL_ROOT = 'http://localhost:8008'
-COURSE_CATALOG_API_URL = '{}/api/v1'.format(COURSE_CATALOG_URL_ROOT)
+COURSE_CATALOG_API_URL = f'{COURSE_CATALOG_URL_ROOT}/api/v1'
 
 # which access.py permission name to check in order to determine if a course is visible in
 # the course catalog. We default this to the legacy permission 'see_exists'.
@@ -2139,6 +2138,7 @@ ECOMMERCE_API_SIGNING_KEY = 'SET-ME-PLEASE'
 
 CREDENTIALS_INTERNAL_SERVICE_URL = 'http://localhost:8005'
 CREDENTIALS_PUBLIC_SERVICE_URL = 'http://localhost:8005'
+CREDENTIALS_SERVICE_USERNAME = 'credentials_service_user'
 
 ANALYTICS_DASHBOARD_URL = 'http://localhost:18110/courses'
 ANALYTICS_DASHBOARD_NAME = 'Your Platform Name Here Insights'

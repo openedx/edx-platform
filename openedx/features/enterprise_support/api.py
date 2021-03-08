@@ -815,7 +815,8 @@ def get_enterprise_learner_portal_enabled_message(request):
         learner_portal_url = settings.ENTERPRISE_LEARNER_PORTAL_BASE_URL + '/' + enterprise_customer['slug']
         return Text(_(
             "Your organization {bold_start}{enterprise_customer_name}{bold_end} uses a custom dashboard for learning. "
-            "{link_start}Click here{link_end} to continue in that experience."
+            "{link_start}Click here {screen_reader_start}for your {enterprise_customer_name} dashboard,"
+            "{screen_reader_end}{link_end} to continue in that experience."
         )).format(
             enterprise_customer_name=enterprise_customer['name'],
             link_start=HTML("<a href='{learner_portal_url}'>").format(
@@ -824,6 +825,8 @@ def get_enterprise_learner_portal_enabled_message(request):
             link_end=HTML("</a>"),
             bold_start=HTML("<b>"),
             bold_end=HTML("</b>"),
+            screen_reader_start=HTML("<span class='sr-only'>"),
+            screen_reader_end=HTML("</span>"),
         )
     else:
         return None

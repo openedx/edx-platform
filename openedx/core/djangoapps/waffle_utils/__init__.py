@@ -1,4 +1,4 @@
-"""  # lint-amnesty, pylint: disable=django-not-configured
+"""
 Extra utilities for waffle: most classes are defined in edx_toggles.toggles (https://edx-toggles.readthedocs.io/), but
 we keep here some extra classes for usage within edx-platform. These classes cover course override use cases.
 """

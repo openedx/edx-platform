@@ -4,17 +4,14 @@ Certificates utilities
 
 import logging
 
-import six
 from django.conf import settings
 from django.urls import reverse
 from eventtracking import tracker
 from opaque_keys.edx.keys import CourseKey
-from xmodule.modulestore.django import modulestore
 
-from lms.djangoapps.certificates.models import (
-    GeneratedCertificate
-)
+from lms.djangoapps.certificates.models import GeneratedCertificate
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
+from xmodule.modulestore.django import modulestore
 
 log = logging.getLogger(__name__)
 
@@ -31,12 +28,12 @@ def emit_certificate_event(event_name, user, course_id, course=None, event_data=
         course = modulestore().get_course(course_id, depth=0)
     context = {
         'org_id': course.org,
-        'course_id': six.text_type(course_id)
+        'course_id': str(course_id)
     }
 
     data = {
         'user_id': user.id,
-        'course_id': six.text_type(course_id),
+        'course_id': str(course_id),
         'certificate_url': get_certificate_url(user.id, course_id, uuid=event_data['certificate_id'])
     }
     event_data = event_data or {}
@@ -93,9 +90,9 @@ def _certificate_download_url(user_id, course_id, user_certificate=None):
             )
         except GeneratedCertificate.DoesNotExist:
             log.critical(
-                u'Unable to lookup certificate\n'
-                u'user id: %s\n'
-                u'course: %s', six.text_type(user_id), six.text_type(course_id)
+                'Unable to lookup certificate\n'
+                'user id: %s\n'
+                'course: %s', str(user_id), str(course_id)
             )
 
     if user_certificate:

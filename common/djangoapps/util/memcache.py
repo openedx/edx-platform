@@ -5,10 +5,7 @@ so that we can cache any keys, not just ones that memcache would ordinarily acce
 
 
 import hashlib
-
-import six.moves.urllib.error
 import six.moves.urllib.parse
-import six.moves.urllib.request
 from django.utils.encoding import smart_str
 
 

@@ -8,9 +8,9 @@ import shutil
 import tarfile
 from tempfile import mkdtemp
 from unittest import TestCase
+from unittest.mock import call, patch, Mock
 
 import boto
-from mock import call, patch, Mock
 
 from pavelib import database
 from pavelib.utils import db_utils
@@ -69,7 +69,7 @@ class TestPaverDatabaseTasks(PaverTestCase):
         # This value is the actual sha1 fingerprint calculated for the dummy
         # files used in these tests
         self.expected_fingerprint = 'ccaa8d8dcc7d030cd6a6768db81f90d0ef976c3d'
-        self.fingerprint_filename = '{}.tar.gz'.format(self.expected_fingerprint)
+        self.fingerprint_filename = f'{self.expected_fingerprint}.tar.gz'
         self.bucket = Mock(name='test_bucket')
 
     @patch.object(db_utils, 'CACHE_FOLDER', mkdtemp())
@@ -94,8 +94,8 @@ class TestPaverDatabaseTasks(PaverTestCase):
             # Make sure that the local cache files are used - NOT downloaded from s3
             assert not _mock_get_file.called
         calls = [
-            call('{}/scripts/reset-test-db.sh --calculate_migrations'.format(Env.REPO_ROOT)),
-            call('{}/scripts/reset-test-db.sh --use-existing-db'.format(Env.REPO_ROOT))
+            call(f'{Env.REPO_ROOT}/scripts/reset-test-db.sh --calculate_migrations'),
+            call(f'{Env.REPO_ROOT}/scripts/reset-test-db.sh --use-existing-db')
         ]
         _mock_sh.assert_has_calls(calls)
 
@@ -137,8 +137,8 @@ class TestPaverDatabaseTasks(PaverTestCase):
                 )
 
         calls = [
-            call('{}/scripts/reset-test-db.sh --calculate_migrations'.format(Env.REPO_ROOT)),
-            call('{}/scripts/reset-test-db.sh --use-existing-db'.format(Env.REPO_ROOT))
+            call(f'{Env.REPO_ROOT}/scripts/reset-test-db.sh --calculate_migrations'),
+            call(f'{Env.REPO_ROOT}/scripts/reset-test-db.sh --use-existing-db')
         ]
         _mock_sh.assert_has_calls(calls)
 
@@ -165,8 +165,8 @@ class TestPaverDatabaseTasks(PaverTestCase):
 
         database.update_local_bokchoy_db_from_s3()  # pylint: disable=no-value-for-parameter
         calls = [
-            call('{}/scripts/reset-test-db.sh --calculate_migrations'.format(Env.REPO_ROOT)),
-            call('{}/scripts/reset-test-db.sh --rebuild_cache --use-existing-db'.format(Env.REPO_ROOT))
+            call(f'{Env.REPO_ROOT}/scripts/reset-test-db.sh --calculate_migrations'),
+            call(f'{Env.REPO_ROOT}/scripts/reset-test-db.sh --rebuild_cache --use-existing-db')
         ]
         _mock_sh.assert_has_calls(calls)
 

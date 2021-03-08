@@ -7,6 +7,7 @@ Python APIs exposed by the student app to other in-process apps.
 from django.contrib.auth import get_user_model
 from django.conf import settings
 
+from common.djangoapps.student.models import CourseEnrollment
 from common.djangoapps.student.models_api import create_manual_enrollment_audit as _create_manual_enrollment_audit
 from common.djangoapps.student.models_api import get_course_access_role
 from common.djangoapps.student.models_api import get_course_enrollment as _get_course_enrollment
@@ -45,11 +46,6 @@ TRANSITION_STATES = (
     DEFAULT_TRANSITION_STATE,
 )
 
-MANUAL_ENROLLMENT_ROLE_CHOICES = configuration_helpers.get_value(
-    'MANUAL_ENROLLMENT_ROLE_CHOICES',
-    settings.MANUAL_ENROLLMENT_ROLE_CHOICES
-)
-
 COURSE_DASHBOARD_PLUGIN_VIEW_NAME = "course_dashboard"
 
 
@@ -59,7 +55,6 @@ def create_manual_enrollment_audit(
     transition_state,
     reason,
     course_run_key=None,
-    role=None
 ):
     """
     Creates an audit item for a manual enrollment.
@@ -69,13 +64,10 @@ def create_manual_enrollment_audit(
         transition_state: <str> state of enrollment transition state from _TRANSITIONS_STATES
         reason: <str> Reason why user was manually enrolled
         course_run_key: <str> Used to link the audit enrollment to the actual enrollment
-        role: <str> role of the enrolled user from MANUAL_ENROLLMENT_ROLE_CHOICES
 
     Note: We purposefully *exclude* passing items like CourseEnrollment objects to prevent callers from needed to
     know about model level code.
     """
-    if role and role not in MANUAL_ENROLLMENT_ROLE_CHOICES:
-        raise ValueError("Role `{}` not in allowed roles: `{}".format(role, MANUAL_ENROLLMENT_ROLE_CHOICES))
     if transition_state not in TRANSITION_STATES:
         raise ValueError("State `{}` not in allow states: `{}`".format(transition_state, TRANSITION_STATES))
 
@@ -95,8 +87,7 @@ def create_manual_enrollment_audit(
         user_email,
         transition_state,
         reason,
-        enrollment,
-        role
+        enrollment
     )
 
 
@@ -111,3 +102,10 @@ def get_access_role_by_role_name(role_name):
         role_name: the name of the role
     """
     return _REGISTERED_ACCESS_ROLES.get(role_name, None)
+
+
+def is_user_enrolled_in_course(student, course_key):
+    """
+    Determines if a learner is enrolled in a given course-run.
+    """
+    return CourseEnrollment.is_enrolled(student, course_key)

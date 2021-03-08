@@ -1,5 +1,3 @@
-#-*- coding: utf-8 -*-
-
 """
 Course Header Menu Tests.
 """
@@ -31,7 +29,7 @@ class TestHeaderMenu(CourseTestCase, UrlResetMixin):
         """
         Set up the for the course header menu tests.
         """
-        super(TestHeaderMenu, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.reset_urls()
 
     def test_header_menu_without_web_certs_enabled(self):

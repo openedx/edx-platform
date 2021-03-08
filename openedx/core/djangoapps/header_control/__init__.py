@@ -1,4 +1,4 @@
-"""  # lint-amnesty, pylint: disable=django-not-configured
+"""
 This middleware is used for adjusting the headers in a response before it is sent to the end user.
 
 This middleware is intended to sit as close as possible to the top of the middleare list as possible,

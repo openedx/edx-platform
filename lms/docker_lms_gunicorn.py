@@ -1,4 +1,4 @@
-"""  # lint-amnesty, pylint: disable=django-not-configured
+"""
 gunicorn configuration file: http://docs.gunicorn.org/en/stable/configure.html
 """
 

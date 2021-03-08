@@ -36,7 +36,7 @@ class AuthoringMixinTestCase(ModuleStoreTestCase):
         """
         Create a simple course with a video component.
         """
-        super(AuthoringMixinTestCase, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.course = CourseFactory.create()
         chapter = ItemFactory.create(
             category='chapter',

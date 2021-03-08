@@ -4,9 +4,9 @@ Tests for pavelib/utils/test/utils
 
 
 import unittest
-import pytest
+from unittest.mock import patch
 
-from mock import patch
+import pytest
 
 from pavelib.utils.envs import Env
 from pavelib.utils.test.utils import MINIMUM_FIREFOX_VERSION, check_firefox_version

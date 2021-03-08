@@ -1,4 +1,4 @@
-"""  # lint-amnesty, pylint: disable=django-not-configured
+"""
 Import celery, load its settings from the django settings
 and auto discover tasks in all installed django apps.
 

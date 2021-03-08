@@ -73,10 +73,6 @@ LMS_ROOT_URL = 'https://localhost:18000'
 LMS_INTERNAL_ROOT_URL = LMS_ROOT_URL
 LMS_ENROLLMENT_API_PATH = "/api/enrollment/v1/"
 
-# Default choices for role dropdown in the membership tab of the instructor dashboard
-# This setting is used when a site does not define its own choices via site configuration
-MANUAL_ENROLLMENT_ROLE_CHOICES = ['Learner', 'Support', 'Partner']
-
 # List of logout URIs for each IDA that the learner should be logged out of when they logout of the LMS. Only applies to
 # IDA for which the social auth flow uses DOT (Django OAuth Toolkit).
 IDA_LOGOUT_URI_LIST = []
@@ -94,6 +90,16 @@ FEATURES = {
     # .. toggle_warnings: None
     # .. toggle_tickets: https://github.com/edx/edx-platform/pull/2425
     'DISPLAY_DEBUG_INFO_TO_STAFF': True,
+
+    # .. toggle_name: FEATURES['DISPLAY_HISTOGRAMS_TO_STAFF']
+    # .. toggle_implementation: DjangoSetting
+    # .. toggle_default: False
+    # .. toggle_description: This displays histograms in the Staff Debug Info panel to course staff.
+    # .. toggle_use_cases: open_edx
+    # .. toggle_creation_date: 2014-02-13
+    # .. toggle_warnings: Generating histograms requires scanning the courseware_studentmodule table on each view. This
+    #   can make staff access to courseware very slow on large courses.
+    # .. toggle_tickets: https://github.com/edx/edx-platform/pull/2425
     'DISPLAY_HISTOGRAMS_TO_STAFF': False,  # For large courses this slows down courseware access for staff.
 
     'REROUTE_ACTIVATION_EMAIL': False,  # nonempty string = address for all activation emails
@@ -374,6 +380,17 @@ FEATURES = {
     'ENABLE_COSMETIC_DISPLAY_PRICE': False,
 
     # Automatically approve student identity verification attempts
+    # .. toggle_name: FEATURES['AUTOMATIC_VERIFY_STUDENT_IDENTITY_FOR_TESTING']
+    # .. toggle_implementation: DjangoSetting
+    # .. toggle_default: False
+    # .. toggle_description: If set to True, then we want to skip posting anything to Software Secure. Bypass posting
+    #   anything to Software Secure if the auto verify feature for testing is enabled. We actually don't even create
+    #   the message because that would require encryption and message signing that rely on settings.VERIFY_STUDENT
+    #   values that aren't set in dev. So we just pretend like we successfully posted and automatically approve student
+    #   identity verification attempts.
+    # .. toggle_use_cases: open_edx
+    # .. toggle_creation_date: 2013-10-03
+    # .. toggle_tickets: https://github.com/edx/edx-platform/pull/1184
     'AUTOMATIC_VERIFY_STUDENT_IDENTITY_FOR_TESTING': False,
 
     # Maximum number of rows to include in the csv file for downloading problem responses.
@@ -404,8 +421,18 @@ FEATURES = {
     # Hide any Personally Identifiable Information from application logs
     'SQUELCH_PII_IN_LOGS': True,
 
-    # Toggles the embargo functionality, which blocks users from
-    # the site or courses based on their location.
+    # .. toggle_name: FEATURES['EMBARGO']
+    # .. toggle_implementation: DjangoSetting
+    # .. toggle_default: False
+    # .. toggle_description: Turns on embargo functionality, which blocks users from
+    #   the site or courses based on their location. Embargo can restrict users by states
+    #   and whitelist/blacklist (IP Addresses (ie. 10.0.0.0), Networks (ie. 10.0.0.0/24)), or the user profile country.
+    # .. toggle_use_cases: open_edx
+    # .. toggle_creation_date: 2014-02-27
+    # .. toggle_target_removal_date: None
+    # .. toggle_warnings: reverse proxy should be configured appropriately for example Client IP address headers
+    #   (e.g HTTP_X_FORWARDED_FOR) should be configured.
+    # .. toggle_tickets: https://github.com/edx/edx-platform/pull/2749
     'EMBARGO': False,
 
     # Whether the Wiki subsystem should be accessible via the direct /wiki/ paths. Setting this to True means
@@ -713,8 +740,14 @@ FEATURES = {
     # .. toggle_tickets: https://openedx.atlassian.net/browse/YONK-513
     'ALLOW_PUBLIC_ACCOUNT_CREATION': True,
 
-    # Enable footer banner for cookie consent.
-    # See https://cookieconsent.insites.com/ for more.
+    # .. toggle_name: FEATURES['ENABLE_COOKIE_CONSENT']
+    # .. toggle_implementation: DjangoSetting
+    # .. toggle_default: False
+    # .. toggle_description: Enable header banner for cookie consent using this service:
+    #   https://cookieconsent.insites.com/
+    # .. toggle_use_cases: open_edx
+    # .. toggle_creation_date: 2017-03-03
+    # .. toggle_tickets: https://openedx.atlassian.net/browse/OSPR-1560
     'ENABLE_COOKIE_CONSENT': False,
 
     # Whether or not the dynamic EnrollmentTrackUserPartition should be registered.
@@ -805,19 +838,6 @@ FEATURES = {
     # .. toggle_warnings: None
     # .. toggle_tickets: 'https://github.com/edx/edx-platform/pull/21616'
     'ENABLE_CHANGE_USER_PASSWORD_ADMIN': False,
-
-    # .. toggle_name: FEATURES['ENABLE_COURSEWARE_MICROFRONTEND']
-    # .. toggle_implementation: DjangoSetting
-    # .. toggle_default: False
-    # .. toggle_description: Set to True to enable the Courseware MFE at the platform level for global staff (see
-    #   REDIRECT_TO_COURSEWARE_MICROFRONTEND for course rollout)
-    # .. toggle_use_cases: open_edx
-    # .. toggle_creation_date: 2020-03-05
-    # .. toggle_target_removal_date: None
-    # .. toggle_tickets: DEPR-109
-    # .. toggle_warnings: Also set settings.LEARNING_MICROFRONTEND_URL and see REDIRECT_TO_COURSEWARE_MICROFRONTEND for
-    #   rollout.
-    'ENABLE_COURSEWARE_MICROFRONTEND': False,
 
     # .. toggle_name: FEATURES['ENABLE_AUTHN_MICROFRONTEND']
     # .. toggle_implementation: DjangoSetting
@@ -2856,7 +2876,6 @@ INSTALLED_APPS = [
 
     # Discussion forums
     'openedx.core.djangoapps.django_comment_common',
-    'openedx.core.djangoapps.discussions',
 
     # Notes
     'lms.djangoapps.edxnotes',
@@ -3855,6 +3874,7 @@ ACCOUNT_VISIBILITY_CONFIGURATION["custom_shareable_fields"] = (
 ACCOUNT_VISIBILITY_CONFIGURATION["admin_fields"] = (
     ACCOUNT_VISIBILITY_CONFIGURATION["custom_shareable_fields"] + [
         "email",
+        "id",
         "extended_profile",
         "gender",
         "state",
@@ -4500,8 +4520,7 @@ PROGRAM_CONSOLE_MICROFRONTEND_URL = None
 # .. setting_name: LEARNING_MICROFRONTEND_URL
 # .. setting_default: None
 # .. setting_description: Base URL of the micro-frontend-based courseware page.
-# .. setting_warning: Also set site's ENABLE_COURSEWARE_MICROFRONTEND or
-#     FEATURES['ENABLE_COURSEWARE_MICROFRONTEND'] and courseware.courseware_mfe waffle flag
+# .. setting_warning: Also set site's courseware.courseware_mfe waffle flag.
 LEARNING_MICROFRONTEND_URL = None
 
 ############### Settings for the ace_common plugin #################

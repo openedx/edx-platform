@@ -5,17 +5,16 @@ More important high-level tests are in contentstore/tests/test_libraries.py
 """
 
 
+from unittest import mock
+from unittest.mock import patch
+
 import ddt
-import mock
 from django.conf import settings
 from django.test.utils import override_settings
 from django.urls import reverse
-from mock import patch
+from opaque_keys.edx.locator import CourseKey, LibraryLocator
 from organizations.api import get_organization_by_short_name
 from organizations.exceptions import InvalidOrganizationException
-from opaque_keys.edx.locator import CourseKey, LibraryLocator
-from six import text_type
-from six.moves import range
 
 from cms.djangoapps.contentstore.tests.utils import AjaxEnabledTestClient, CourseTestCase, parse_json
 from cms.djangoapps.contentstore.utils import reverse_course_url, reverse_library_url
@@ -32,7 +31,7 @@ LIBRARY_REST_URL = '/library/'  # URL for GET/POST requests involving libraries
 def make_url_for_lib(key):
     """ Get the RESTful/studio URL for testing the given library """
     if isinstance(key, LibraryLocator):
-        key = text_type(key)
+        key = str(key)
     return LIBRARY_REST_URL + key
 
 
@@ -44,7 +43,7 @@ class UnitTestLibraries(CourseTestCase):
     """
 
     def setUp(self):
-        super(UnitTestLibraries, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
 
         self.client = AjaxEnabledTestClient()
         self.client.login(username=self.user.username, password=self.user_password)
@@ -283,11 +282,11 @@ class UnitTestLibraries(CourseTestCase):
         self.assertEqual(response.status_code, 200)
         info = parse_json(response)
         self.assertEqual(info['display_name'], lib.display_name)
-        self.assertEqual(info['library_id'], text_type(lib_key))
+        self.assertEqual(info['library_id'], str(lib_key))
         self.assertEqual(info['previous_version'], None)
         self.assertNotEqual(info['version'], None)
         self.assertNotEqual(info['version'], '')
-        self.assertEqual(info['version'], text_type(version))
+        self.assertEqual(info['version'], str(version))
 
     def test_get_lib_edit_html(self):
         """
@@ -368,7 +367,7 @@ class UnitTestLibraries(CourseTestCase):
         """
         library = LibraryFactory.create()
         extra_user, _ = self.create_non_staff_user()
-        manage_users_url = reverse_library_url('manage_library_users', text_type(library.location.library_key))
+        manage_users_url = reverse_library_url('manage_library_users', str(library.location.library_key))
 
         response = self.client.get(manage_users_url)
         self.assertEqual(response.status_code, 200)

@@ -6,7 +6,7 @@ Badging service for XBlocks
 from lms.djangoapps.badges.models import BadgeClass
 
 
-class BadgingService(object):
+class BadgingService:
     """
     A class that provides functions for managing badges which XBlocks can use.
 

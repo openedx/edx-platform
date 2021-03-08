@@ -1,4 +1,4 @@
-"""  # lint-amnesty, pylint: disable=django-not-configured
+"""
 Contains methods for accessing course highlights. Course highlights is a
 schedule experience built on the Schedules app.
 """
@@ -12,6 +12,22 @@ from openedx.core.lib.request_utils import get_request_or_stub
 from xmodule.modulestore.django import modulestore
 
 log = logging.getLogger(__name__)
+
+
+def get_all_course_highlights(course_key):
+    """
+    This ignores access checks, since highlights may be lurking in currently
+    inaccessible content.
+    Returns a list of all the section highlights in the course
+    """
+    try:
+        course = _get_course_with_highlights(course_key)
+
+    except CourseUpdateDoesNotExist:
+        return []
+    else:
+        highlights = [section.highlights for section in course.get_children() if not section.hide_from_toc]
+        return highlights
 
 
 def course_has_highlights(course):

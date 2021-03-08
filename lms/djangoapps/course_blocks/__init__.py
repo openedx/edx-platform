@@ -1,4 +1,4 @@
-"""  # lint-amnesty, pylint: disable=django-not-configured
+"""
 The Course Blocks app, built upon the Block Cache framework in
 openedx.core.djangoapps.content.block_structure, is a higher layer django app in LMS that
 provides additional context of Courses and Users (via usage_info.py) with

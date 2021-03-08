@@ -1,10 +1,6 @@
-# -*- coding: utf-8 -*-
 """
 Structured Tagging based on XBlockAsides
 """
-
-
-import six
 from django.conf import settings
 from web_fragments.fragment import Fragment
 from webob import Response
@@ -52,7 +48,7 @@ class StructuredTagsAside(XBlockAside):
                 tag_available_values = tag.get_values()
                 tag_current_values = self.saved_tags.get(tag.name, [])
 
-                if isinstance(tag_current_values, six.string_types):
+                if isinstance(tag_current_values, str):
                     tag_current_values = [tag_current_values]
 
                 tag_values_not_exists = [cur_val for cur_val in tag_current_values
@@ -74,7 +70,7 @@ class StructuredTagsAside(XBlockAside):
             fragment.initialize_js('StructuredTagsInit')
             return fragment
         else:
-            return Fragment(u'')
+            return Fragment('')
 
     @XBlock.handler
     def save_tags(self, request=None, suffix=None):  # lint-amnesty, pylint: disable=unused-argument
@@ -94,12 +90,12 @@ class StructuredTagsAside(XBlockAside):
                 tag_available_values = av_tag.get_values()
                 tag_current_values = self.saved_tags.get(av_tag.name, [])
 
-                if isinstance(tag_current_values, six.string_types):
+                if isinstance(tag_current_values, str):
                     tag_current_values = [tag_current_values]
 
                 for posted_tag_value in posted_data[av_tag.name]:
                     if posted_tag_value not in tag_available_values and posted_tag_value not in tag_current_values:
-                        return Response(u"Invalid tag value was passed: %s" % posted_tag_value, status=400)
+                        return Response("Invalid tag value was passed: %s" % posted_tag_value, status=400)
 
                 saved_tags[av_tag.name] = posted_data[av_tag.name]
                 need_update = True

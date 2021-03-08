@@ -9,7 +9,7 @@ class VerificationExpiry(BaseMessageType):  # lint-amnesty, pylint: disable=miss
     Name = 'verificationexpiry'
 
     def __init__(self, *args, **kwargs):
-        super(VerificationExpiry, self).__init__(*args, **kwargs)  # lint-amnesty, pylint: disable=super-with-arguments
+        super().__init__(*args, **kwargs)
 
         self.options['transactional'] = True
 
@@ -22,7 +22,7 @@ class VerificationApproved(BaseMessageType):
     Name = 'verificationapproved'
 
     def __init__(self, *args, **kwargs):
-        super(VerificationApproved, self).__init__(*args, **kwargs)  # lint-amnesty, pylint: disable=super-with-arguments
+        super().__init__(*args, **kwargs)
         self.options['transactional'] = True
 
 
@@ -34,5 +34,5 @@ class VerificationSubmitted(BaseMessageType):
     Name = 'verificationsubmitted'
 
     def __init__(self, *args, **kwargs):
-        super(VerificationSubmitted, self).__init__(*args, **kwargs)  # lint-amnesty, pylint: disable=super-with-arguments
+        super().__init__(*args, **kwargs)
         self.options['transactional'] = True

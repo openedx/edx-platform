@@ -11,11 +11,10 @@ from django.contrib.auth import get_user_model
 from django.core.management.base import BaseCommand
 from opaque_keys.edx.keys import CourseKey
 from pytz import UTC
-from six import text_type
-from xmodule.modulestore.django import modulestore
 
 from lms.djangoapps.certificates.api import generate_user_certificates
 from lms.djangoapps.certificates.models import CertificateStatuses, certificate_status_for_student
+from xmodule.modulestore.django import modulestore
 
 LOGGER = logging.getLogger(__name__)
 User = get_user_model()
@@ -69,11 +68,11 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         LOGGER.info(
             (
-                u"Starting to create tasks for ungenerated certificates "
-                u"with arguments %s and options %s"
+                "Starting to create tasks for ungenerated certificates "
+                "with arguments %s and options %s"
             ),
-            text_type(args),
-            text_type(options)
+            str(args),
+            str(options)
         )
 
         # Will only generate a certificate if the current
@@ -113,18 +112,18 @@ class Command(BaseCommand):
                     timeleft = diff * (total - count) / status_interval
                     hours, remainder = divmod(timeleft.seconds, 3600)
                     minutes, _seconds = divmod(remainder, 60)
-                    print(u"{0}/{1} completed ~{2:02}:{3:02}m remaining".format(count, total, hours, minutes))
+                    print(f"{count}/{total} completed ~{hours:02}:{minutes:02}m remaining")
                     start = datetime.datetime.now(UTC)
 
                 cert_status = certificate_status_for_student(student, course_key)['status']
                 LOGGER.info(
                     (
-                        u"Student %s has certificate status '%s' "
-                        u"in course '%s'"
+                        "Student %s has certificate status '%s' "
+                        "in course '%s'"
                     ),
                     student.id,
                     cert_status,
-                    text_type(course_key)
+                    str(course_key)
                 )
 
                 if cert_status in valid_statuses:
@@ -144,29 +143,29 @@ class Command(BaseCommand):
                     else:
                         LOGGER.info(
                             (
-                                u"Skipping certificate generation for "
-                                u"student %s in course '%s' "
-                                u"because the noop flag is set."
+                                "Skipping certificate generation for "
+                                "student %s in course '%s' "
+                                "because the noop flag is set."
                             ),
                             student.id,
-                            text_type(course_key)
+                            str(course_key)
                         )
 
                 else:
                     LOGGER.info(
                         (
-                            u"Skipped student %s because "
-                            u"certificate status '%s' is not in %s"
+                            "Skipped student %s because "
+                            "certificate status '%s' is not in %s"
                         ),
                         student.id,
                         cert_status,
-                        text_type(valid_statuses)
+                        str(valid_statuses)
                     )
 
             LOGGER.info(
                 (
-                    u"Completed ungenerated certificates command "
-                    u"for course '%s'"
+                    "Completed ungenerated certificates command "
+                    "for course '%s'"
                 ),
-                text_type(course_key)
+                str(course_key)
             )

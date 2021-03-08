@@ -5,14 +5,13 @@ Tests for the Studio Tagging XBlockAside
 
 import json
 from datetime import datetime
+from io import StringIO
 
 import ddt
-import six
 from django.test.client import RequestFactory
 from lxml import etree
 from opaque_keys.edx.asides import AsideUsageKeyV1, AsideUsageKeyV2
 from pytz import UTC
-from six import StringIO
 from xblock.fields import ScopeIds
 from xblock.runtime import DictKeyValueStore, KvsFieldData
 from xblock.test.tools import TestRuntime
@@ -39,7 +38,7 @@ class StructuredTagsAsideTestCase(ModuleStoreTestCase):
         """
         Preparation for the test execution
         """
-        super(StructuredTagsAsideTestCase, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.aside_name = 'tagging_aside'
         self.aside_tag_dif = 'difficulty'
         self.aside_tag_dif_value = 'Hard'
@@ -113,7 +112,7 @@ class StructuredTagsAsideTestCase(ModuleStoreTestCase):
     def tearDown(self):
         TagAvailableValues.objects.all().delete()
         TagCategories.objects.all().delete()
-        super(StructuredTagsAsideTestCase, self).tearDown()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().tearDown()
 
     def test_aside_contains_tags(self):
         """
@@ -194,7 +193,7 @@ class StructuredTagsAsideTestCase(ModuleStoreTestCase):
         """
         handler_url = reverse_usage_url(
             'component_handler',
-            six.text_type(aside_key_class(self.problem.location, self.aside_name)),
+            str(aside_key_class(self.problem.location, self.aside_name)),
             kwargs={'handler': 'save_tags'}
         )
 

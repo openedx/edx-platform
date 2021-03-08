@@ -4,8 +4,8 @@ import functools
 from django.http import HttpResponse, HttpResponseNotFound, HttpResponseServerError
 
 from common.djangoapps.edxmako.shortcuts import render_to_response, render_to_string
-from openedx.core.djangolib.js_utils import dump_js_escaped_json
 from common.djangoapps.util.views import fix_crum_request
+from openedx.core.djangolib.js_utils import dump_js_escaped_json
 
 __all__ = ['not_found', 'server_error', 'render_404', 'render_500']
 

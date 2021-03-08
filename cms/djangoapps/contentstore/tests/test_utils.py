@@ -4,7 +4,6 @@
 import collections
 from datetime import datetime, timedelta
 
-import six
 from django.test import TestCase
 from opaque_keys.edx.locator import CourseLocator
 from pytz import UTC
@@ -83,7 +82,7 @@ class ExtraPanelTabTestCase(TestCase):
         if tabs is None:
             tabs = []
         course = collections.namedtuple('MockCourse', ['tabs'])
-        if isinstance(tabs, six.string_types):
+        if isinstance(tabs, str):
             course.tabs = self.get_tab_type_dicts(tabs)
         else:
             course.tabs = tabs
@@ -95,7 +94,7 @@ class XBlockVisibilityTestCase(SharedModuleStoreTestCase):
 
     @classmethod
     def setUpClass(cls):
-        super(XBlockVisibilityTestCase, cls).setUpClass()
+        super().setUpClass()
 
         cls.dummy_user = ModuleStoreEnum.UserID.test
         cls.past = datetime(1970, 1, 1, tzinfo=UTC)
@@ -168,7 +167,7 @@ class ReleaseDateSourceTest(CourseTestCase):
     """Tests for finding the source of an xblock's release date."""
 
     def setUp(self):
-        super(ReleaseDateSourceTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
 
         self.chapter = ItemFactory.create(category='chapter', parent_location=self.course.location)
         self.sequential = ItemFactory.create(category='sequential', parent_location=self.chapter.location)
@@ -222,7 +221,7 @@ class StaffLockTest(CourseTestCase):
     """Base class for testing staff lock functions."""
 
     def setUp(self):
-        super(StaffLockTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
 
         self.chapter = ItemFactory.create(category='chapter', parent_location=self.course.location)
         self.sequential = ItemFactory.create(category='sequential', parent_location=self.chapter.location)
@@ -332,7 +331,7 @@ class GroupVisibilityTest(CourseTestCase):
     """
 
     def setUp(self):
-        super(GroupVisibilityTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
 
         chapter = ItemFactory.create(category='chapter', parent_location=self.course.location)
         sequential = ItemFactory.create(category='sequential', parent_location=chapter.location)
@@ -432,7 +431,7 @@ class GetUserPartitionInfoTest(ModuleStoreTestCase):
 
     def setUp(self):
         """Create a dummy course. """
-        super(GetUserPartitionInfoTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.course = CourseFactory()
         self.block = ItemFactory.create(category="problem", parent_location=self.course.location)
 
@@ -465,18 +464,18 @@ class GetUserPartitionInfoTest(ModuleStoreTestCase):
         expected = [
             {
                 "id": 0,
-                "name": u"Cohort user partition",
-                "scheme": u"cohort",
+                "name": "Cohort user partition",
+                "scheme": "cohort",
                 "groups": [
                     {
                         "id": 0,
-                        "name": u"Group A",
+                        "name": "Group A",
                         "selected": False,
                         "deleted": False,
                     },
                     {
                         "id": 1,
-                        "name": u"Group B",
+                        "name": "Group B",
                         "selected": False,
                         "deleted": False,
                     },
@@ -484,12 +483,12 @@ class GetUserPartitionInfoTest(ModuleStoreTestCase):
             },
             {
                 "id": 1,
-                "name": u"Random user partition",
-                "scheme": u"random",
+                "name": "Random user partition",
+                "scheme": "random",
                 "groups": [
                     {
                         "id": 0,
-                        "name": u"Group C",
+                        "name": "Group C",
                         "selected": False,
                         "deleted": False,
                     },

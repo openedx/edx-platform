@@ -14,15 +14,13 @@ import random
 from uuid import uuid4
 
 from capa.xqueue_interface import make_hashkey
-from xmodule.modulestore.django import modulestore
-
 from common.djangoapps.student.models import CourseEnrollment, UserProfile
 from lms.djangoapps.certificates.models import CertificateStatuses, GeneratedCertificate
 from lms.djangoapps.certificates.queue import XQueueCertInterface
-from lms.djangoapps.certificates.utils import emit_certificate_event
-from lms.djangoapps.certificates.utils import has_html_certificates_enabled
+from lms.djangoapps.certificates.utils import emit_certificate_event, has_html_certificates_enabled
 from lms.djangoapps.grades.api import CourseGradeFactory
 from lms.djangoapps.instructor.access import list_with_level
+from xmodule.modulestore.django import modulestore
 
 log = logging.getLogger(__name__)
 

@@ -9,10 +9,10 @@ from itertools import chain
 
 import pytz
 from ccx_keys.locator import CCXLocator
-from six.moves import range, zip_longest
+from six.moves import zip_longest
 
-from lms.djangoapps.ccx.models import CustomCourseForEdX
 from common.djangoapps.student.tests.factories import AdminFactory, UserFactory
+from lms.djangoapps.ccx.models import CustomCourseForEdX
 from xmodule.modulestore.tests.django_utils import TEST_DATA_SPLIT_MODULESTORE, SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 
@@ -24,7 +24,7 @@ class TestCCXModulestoreWrapper(SharedModuleStoreTestCase):
 
     @classmethod
     def setUpClass(cls):
-        super(TestCCXModulestoreWrapper, cls).setUpClass()
+        super().setUpClass()
         cls.course = CourseFactory.create()
         start = datetime.datetime(2010, 5, 12, 2, 42, tzinfo=pytz.UTC)
         due = datetime.datetime(2010, 7, 7, 0, 0, tzinfo=pytz.UTC)
@@ -57,7 +57,7 @@ class TestCCXModulestoreWrapper(SharedModuleStoreTestCase):
         """
         Set up tests
         """
-        super(TestCCXModulestoreWrapper, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.ccx = ccx = CustomCourseForEdX(
             course_id=self.course.id,
             display_name='Test CCX',

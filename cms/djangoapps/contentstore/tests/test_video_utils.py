@@ -1,4 +1,3 @@
-#-*- coding: utf-8 -*-
 """
 Unit tests for video utils.
 """
@@ -6,16 +5,15 @@ Unit tests for video utils.
 
 from datetime import datetime
 from unittest import TestCase
+from unittest.mock import patch
 
 import ddt
 import pytz
 import requests
-import six
 from django.conf import settings
 from django.core.files.uploadedfile import UploadedFile
 from django.test.utils import override_settings
 from edxval.api import create_profile, create_video, get_course_video_image_url, update_video_image
-from mock import patch
 
 from cms.djangoapps.contentstore.tests.utils import CourseTestCase
 from cms.djangoapps.contentstore.video_utils import (
@@ -59,8 +57,8 @@ class ScrapeVideoThumbnailsTestCase(CourseTestCase):
     """
 
     def setUp(self):
-        super(ScrapeVideoThumbnailsTestCase, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
-        course_ids = [six.text_type(self.course.id)]
+        super().setUp()
+        course_ids = [str(self.course.id)]
         profiles = ['youtube']
         created = datetime.now(pytz.utc)
         previous_uploads = [
@@ -116,7 +114,7 @@ class ScrapeVideoThumbnailsTestCase(CourseTestCase):
         # Create video images.
         with make_image_file() as image_file:
             update_video_image(
-                'test-youtube-video-2', six.text_type(self.course.id), image_file, 'image.jpg'
+                'test-youtube-video-2', str(self.course.id), image_file, 'image.jpg'
             )
 
     def mocked_youtube_thumbnail_response(
@@ -232,7 +230,7 @@ class ScrapeVideoThumbnailsTestCase(CourseTestCase):
         """
         Test that youtube thumbnails are correctly scrapped.
         """
-        course_id = six.text_type(self.course.id)
+        course_id = str(self.course.id)
         video1_edx_video_id = 'test-youtube-video-1'
         video2_edx_video_id = 'test-youtube-video-2'
 
@@ -286,7 +284,7 @@ class ScrapeVideoThumbnailsTestCase(CourseTestCase):
         """
         Test that we get correct logs in case of failure as well as success.
         """
-        course_id = six.text_type(self.course.id)
+        course_id = str(self.course.id)
         video1_edx_video_id = 'test-youtube-video-1'
         mocked_request.side_effect = [
             self.mocked_youtube_thumbnail_response(
@@ -297,13 +295,13 @@ class ScrapeVideoThumbnailsTestCase(CourseTestCase):
         scrape_youtube_thumbnail(course_id, video1_edx_video_id, 'test-yt-id')
         if is_success:
             mock_logger.info.assert_called_with(
-                u'VIDEOS: Scraping youtube video thumbnail for edx_video_id [%s] in course [%s]',
+                'VIDEOS: Scraping youtube video thumbnail for edx_video_id [%s] in course [%s]',
                 video1_edx_video_id,
                 course_id
             )
         else:
             mock_logger.info.assert_called_with(
-                u'VIDEOS: Scraping youtube video thumbnail failed for edx_video_id [%s] in course [%s] with error: %s',
+                'VIDEOS: Scraping youtube video thumbnail failed for edx_video_id [%s] in course [%s] with error: %s',
                 video1_edx_video_id,
                 course_id,
                 'This image file must be larger than 2 KB.'
@@ -313,21 +311,21 @@ class ScrapeVideoThumbnailsTestCase(CourseTestCase):
         (
             None,
             'image/jpeg',
-            u'This image file must be larger than {image_min_size}.'.format(
+            'This image file must be larger than {image_min_size}.'.format(
                 image_min_size=settings.VIDEO_IMAGE_MIN_FILE_SIZE_KB
             )
         ),
         (
             b'dummy-content',
             None,
-            u'This image file type is not supported. Supported file types are {supported_file_formats}.'.format(
+            'This image file type is not supported. Supported file types are {supported_file_formats}.'.format(
                 supported_file_formats=list(settings.VIDEO_IMAGE_SUPPORTED_FILE_FORMATS.keys())
             )
         ),
         (
             None,
             None,
-            u'This image file type is not supported. Supported file types are {supported_file_formats}.'.format(
+            'This image file type is not supported. Supported file types are {supported_file_formats}.'.format(
                 supported_file_formats=list(settings.VIDEO_IMAGE_SUPPORTED_FILE_FORMATS.keys())
             )
         ),
@@ -347,7 +345,7 @@ class ScrapeVideoThumbnailsTestCase(CourseTestCase):
         Test that when no thumbnail is downloaded, video image is not updated.
         """
         mock_download_youtube_thumbnail.return_value = image_content, image_content_type
-        course_id = six.text_type(self.course.id)
+        course_id = str(self.course.id)
         video1_edx_video_id = 'test-youtube-video-1'
 
         # Verify that video1 has no image attached.
@@ -358,7 +356,7 @@ class ScrapeVideoThumbnailsTestCase(CourseTestCase):
         scrape_youtube_thumbnail(course_id, video1_edx_video_id, 'test-yt-id')
 
         mock_logger.info.assert_called_with(
-            u'VIDEOS: Scraping youtube video thumbnail failed for edx_video_id [%s] in course [%s] with error: %s',
+            'VIDEOS: Scraping youtube video thumbnail failed for edx_video_id [%s] in course [%s] with error: %s',
             video1_edx_video_id,
             course_id,
             error_message

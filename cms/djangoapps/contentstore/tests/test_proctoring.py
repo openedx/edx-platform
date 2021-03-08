@@ -4,12 +4,11 @@ Tests for the edx_proctoring integration into Studio
 
 
 from datetime import datetime, timedelta
+from unittest.mock import patch
 
 import ddt
-import six
 from django.conf import settings
 from edx_proctoring.api import get_all_exams_for_course, get_review_policy_by_exam_id
-from mock import patch
 from pytz import UTC
 
 from cms.djangoapps.contentstore.signals.handlers import listen_for_course_publish
@@ -28,7 +27,7 @@ class TestProctoredExams(ModuleStoreTestCase):
         """
         Initial data setup
         """
-        super(TestProctoredExams, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
 
         self.course = CourseFactory.create(
             org='edX',
@@ -43,7 +42,7 @@ class TestProctoredExams(ModuleStoreTestCase):
         Helper method to compare the sequence with the stored exam,
         which should just be a single one
         """
-        exams = get_all_exams_for_course(six.text_type(self.course.id))
+        exams = get_all_exams_for_course(str(self.course.id))
 
         self.assertEqual(len(exams), 1)
 
@@ -58,8 +57,8 @@ class TestProctoredExams(ModuleStoreTestCase):
             # the hide after due value only applies to timed exams
             self.assertEqual(exam['hide_after_due'], sequence.hide_after_due)
 
-        self.assertEqual(exam['course_id'], six.text_type(self.course.id))
-        self.assertEqual(exam['content_id'], six.text_type(sequence.location))
+        self.assertEqual(exam['course_id'], str(self.course.id))
+        self.assertEqual(exam['content_id'], str(sequence.location))
         self.assertEqual(exam['exam_name'], sequence.display_name)
         self.assertEqual(exam['time_limit_mins'], sequence.default_time_limit_minutes)
         self.assertEqual(exam['is_proctored'], sequence.is_proctored_exam)
@@ -166,7 +165,7 @@ class TestProctoredExams(ModuleStoreTestCase):
 
         listen_for_course_publish(self, self.course.id)
 
-        exams = get_all_exams_for_course(six.text_type(self.course.id))
+        exams = get_all_exams_for_course(str(self.course.id))
         self.assertEqual(len(exams), 1)
 
         sequence.is_time_limited = False
@@ -197,7 +196,7 @@ class TestProctoredExams(ModuleStoreTestCase):
 
         listen_for_course_publish(self, self.course.id)
 
-        exams = get_all_exams_for_course(six.text_type(self.course.id))
+        exams = get_all_exams_for_course(str(self.course.id))
         self.assertEqual(len(exams), 1)
 
         self.store.delete_item(chapter.location, self.user.id)
@@ -207,7 +206,7 @@ class TestProctoredExams(ModuleStoreTestCase):
 
         # look through exam table, the dangling exam
         # should be disabled
-        exams = get_all_exams_for_course(six.text_type(self.course.id))
+        exams = get_all_exams_for_course(str(self.course.id))
         self.assertEqual(len(exams), 1)
 
         exam = exams[0]
@@ -232,7 +231,7 @@ class TestProctoredExams(ModuleStoreTestCase):
 
         listen_for_course_publish(self, self.course.id)
 
-        exams = get_all_exams_for_course(six.text_type(self.course.id))
+        exams = get_all_exams_for_course(str(self.course.id))
         self.assertEqual(len(exams), 0)
 
     @ddt.data(
@@ -271,7 +270,7 @@ class TestProctoredExams(ModuleStoreTestCase):
 
         # there shouldn't be any exams because we haven't enabled that
         # advanced setting flag
-        exams = get_all_exams_for_course(six.text_type(self.course.id))
+        exams = get_all_exams_for_course(str(self.course.id))
         self.assertEqual(len(exams), expected_count)
 
     def test_self_paced_no_due_dates(self):
@@ -299,7 +298,7 @@ class TestProctoredExams(ModuleStoreTestCase):
             is_onboarding_exam=False,
         )
         listen_for_course_publish(self, self.course.id)
-        exams = get_all_exams_for_course(six.text_type(self.course.id))
+        exams = get_all_exams_for_course(str(self.course.id))
         # self-paced courses should ignore due dates
         assert exams[0]['due_date'] is None
 
@@ -308,5 +307,5 @@ class TestProctoredExams(ModuleStoreTestCase):
         self.course.self_paced = False
         self.course = self.update_course(self.course, 1)
         listen_for_course_publish(self, self.course.id)
-        exams = get_all_exams_for_course(six.text_type(self.course.id))
+        exams = get_all_exams_for_course(str(self.course.id))
         assert exams[0]['due_date'] is not None

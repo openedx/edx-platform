@@ -57,8 +57,6 @@ from lms.djangoapps.bulk_email.models import BulkEmailFlag, CourseEmail, CourseE
 from lms.djangoapps.certificates.api import generate_user_certificates
 from lms.djangoapps.certificates.models import CertificateStatuses
 from lms.djangoapps.certificates.tests.factories import (
-    CertificateInvalidationFactory,
-    CertificateWhitelistFactory,
     GeneratedCertificateFactory
 )
 from lms.djangoapps.courseware.models import StudentModule
@@ -72,8 +70,6 @@ from lms.djangoapps.courseware.tests.helpers import LoginEnrollmentTestCase
 from lms.djangoapps.experiments.testutils import override_experiment_waffle_flag
 from lms.djangoapps.instructor.tests.utils import FakeContentTask, FakeEmail, FakeEmailInfo
 from lms.djangoapps.instructor.views.api import (
-    _check_if_learner_on_allowlist,
-    _check_if_learner_on_blocklist,
     _get_certificate_for_user,
     _get_student_from_request_data,
     _split_input_list,
@@ -1778,19 +1774,18 @@ class TestInstructorAPIEnrollment(SharedModuleStoreTestCase, LoginEnrollmentTest
         )
         assert course_enrollment.mode == CourseMode.DEFAULT_MODE_SLUG
 
-    def test_role_and_reason_are_persisted(self):
+    def test_reason_is_persisted(self):
         """
-        test that role and reason fields are persisted in the database
+        test that reason field is persisted in the database
         """
         paid_course = self.create_paid_course()
         url = reverse('students_update_enrollment', kwargs={'course_id': str(paid_course.id)})
         params = {'identifiers': self.notregistered_email, 'action': 'enroll', 'email_students': False,
-                  'auto_enroll': False, 'reason': 'testing', 'role': 'Learner'}
+                  'auto_enroll': False, 'reason': 'testing'}
         response = self.client.post(url, params)
 
         manual_enrollment = ManualEnrollmentAudit.objects.first()
         assert manual_enrollment.reason == 'testing'
-        assert manual_enrollment.role == 'Learner'
         assert response.status_code == 200
 
     def _change_student_enrollment(self, user, course, action):
@@ -4388,7 +4383,7 @@ class TestInstructorCertificateExceptions(SharedModuleStoreTestCase):
         """
         Test ability to retrieve a learner record using their username and course id
         """
-        student = _get_student_from_request_data({"user": self.user.username}, self.course.id)
+        student = _get_student_from_request_data({"user": self.user.username})
 
         assert student.username == self.user.username
 
@@ -4397,7 +4392,7 @@ class TestInstructorCertificateExceptions(SharedModuleStoreTestCase):
         Test that we receive an expected error when no learner's username or email is entered
         """
         with pytest.raises(ValueError) as error:
-            _get_student_from_request_data({"user": ""}, self.course.id)
+            _get_student_from_request_data({"user": ""})
 
         assert str(error.value) == (
             'Student username/email field is required and can not be empty. Kindly fill in username/email and then '
@@ -4410,23 +4405,9 @@ class TestInstructorCertificateExceptions(SharedModuleStoreTestCase):
         in the LMS.
         """
         with pytest.raises(ValueError) as error:
-            _get_student_from_request_data({"user": "Neo"}, self.course.id)
+            _get_student_from_request_data({"user": "Neo"})
 
         assert str(error.value) == "Neo does not exist in the LMS. Please check your spelling and retry."
-
-    def test_get_student_from_request_data_user_not_enrolled(self):
-        """
-        Test to verify an expected error message is returned when attempting to retrieve a learner that is not enrolled
-        in a course-run.
-        """
-        new_course = CourseFactory.create()
-
-        with pytest.raises(ValueError) as error:
-            _get_student_from_request_data({"user": self.user.username}, new_course.id)
-
-        assert str(error.value) == (
-            f"{self.user.username} is not enrolled in this course. Please check your spelling and retry."
-        )
 
     def test_get_certificate_for_user(self):
         """
@@ -4440,10 +4421,7 @@ class TestInstructorCertificateExceptions(SharedModuleStoreTestCase):
         )
 
         retrieved_certificate = _get_certificate_for_user(self.course.id, self.user)
-
         assert retrieved_certificate.id == generated_certificate.id
-        assert retrieved_certificate.user == self.user
-        assert retrieved_certificate.course_id == self.course.id
 
     def test_get_certificate_for_user_no_certificate(self):
         """
@@ -4457,89 +4435,3 @@ class TestInstructorCertificateExceptions(SharedModuleStoreTestCase):
             f"The student {self.user} does not have certificate for the course {self.course.id.course}. Kindly "
             "verify student username/email and the selected course are correct and try again."
         )
-
-    def test_check_if_learner_on_allowlist(self):
-        """
-        Test to verify that no learner is returned if the learner does not have an active entry on the allowlist.
-        """
-        result = _check_if_learner_on_allowlist(self.course.id, self.user)
-
-        assert not result
-
-    def test_check_if_learner_on_allowlist_allowlist_entry_exists(self):
-        """
-        Test that verifies the correct result is returned if a learner has an active entry on the allowlist.
-        """
-        CertificateWhitelistFactory.create(
-            course_id=self.course.id,
-            user=self.user
-        )
-
-        result = _check_if_learner_on_allowlist(self.course.id, self.user)
-
-        assert result
-
-    def test_check_if_learner_on_blocklist_no_cert(self):
-        """
-        Test to verify that the correct result is returned if a learner does not currently have a certificate in a
-        course-run.
-        """
-        result = _check_if_learner_on_blocklist(self.course.id, self.user)
-
-        assert not result
-
-    def test_check_if_learner_on_blocklist_with_cert(self):
-        """
-        Test to verify that the correct result is returned if a learner has a certificate but does not have an active
-        entry on the blocklist.
-        """
-        GeneratedCertificateFactory.create(
-            user=self.user,
-            course_id=self.course.id,
-            mode='verified',
-            status=CertificateStatuses.downloadable,
-        )
-
-        result = _check_if_learner_on_blocklist(self.course.id, self.user)
-        assert not result
-
-    def test_check_if_learner_on_blocklist_blocklist_entry_exists(self):
-        """
-        Test to verify that the correct result is returned if a learner has a Certificate and an active entry on
-        the blocklist.
-        """
-        generated_certificate = GeneratedCertificateFactory.create(
-            user=self.user,
-            course_id=self.course.id,
-            mode='verified',
-            status=CertificateStatuses.downloadable,
-        )
-
-        CertificateInvalidationFactory.create(
-            generated_certificate=generated_certificate,
-            invalidated_by=self.global_staff,
-            active=True
-        )
-
-        result = _check_if_learner_on_blocklist(self.course.id, self.user)
-        assert result
-
-    def test_check_if_learner_on_blocklist_inactive_blocklist_entry_exists(self):
-        """
-        Test to verify that the correct result is returned if a learner has an inactive entry on the blocklist.
-        """
-        generated_certificate = GeneratedCertificateFactory.create(
-            user=self.user,
-            course_id=self.course.id,
-            mode='verified',
-            status=CertificateStatuses.downloadable,
-        )
-
-        CertificateInvalidationFactory.create(
-            generated_certificate=generated_certificate,
-            invalidated_by=self.global_staff,
-            active=False
-        )
-
-        result = _check_if_learner_on_blocklist(self.course.id, self.user)
-        assert not result

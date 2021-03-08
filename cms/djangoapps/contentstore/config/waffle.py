@@ -5,39 +5,40 @@ waffle switches for the contentstore app.
 
 
 from edx_toggles.toggles import LegacyWaffleFlag, LegacyWaffleFlagNamespace, LegacyWaffleSwitchNamespace
+
 from openedx.core.djangoapps.waffle_utils import CourseWaffleFlag
 
 # Namespace
-WAFFLE_NAMESPACE = u'studio'
+WAFFLE_NAMESPACE = 'studio'
 
 # Switches
-ENABLE_ACCESSIBILITY_POLICY_PAGE = u'enable_policy_page'
+ENABLE_ACCESSIBILITY_POLICY_PAGE = 'enable_policy_page'
 
 
 def waffle():
     """
     Returns the namespaced, cached, audited Waffle Switch class for Studio pages.
     """
-    return LegacyWaffleSwitchNamespace(name=WAFFLE_NAMESPACE, log_prefix=u'Studio: ')
+    return LegacyWaffleSwitchNamespace(name=WAFFLE_NAMESPACE, log_prefix='Studio: ')
 
 
 def waffle_flags():
     """
     Returns the namespaced, cached, audited Waffle Flag class for Studio pages.
     """
-    return LegacyWaffleFlagNamespace(name=WAFFLE_NAMESPACE, log_prefix=u'Studio: ')
+    return LegacyWaffleFlagNamespace(name=WAFFLE_NAMESPACE, log_prefix='Studio: ')
 
 
 # TODO: After removing this flag, add a migration to remove waffle flag in a follow-up deployment.
 ENABLE_CHECKLISTS_QUALITY = CourseWaffleFlag(
     waffle_namespace=waffle_flags(),
-    flag_name=u'enable_checklists_quality',
+    flag_name='enable_checklists_quality',
     module_name=__name__,
 )
 
 SHOW_REVIEW_RULES_FLAG = CourseWaffleFlag(
     waffle_namespace=waffle_flags(),
-    flag_name=u'show_review_rules',
+    flag_name='show_review_rules',
     module_name=__name__,
 )
 

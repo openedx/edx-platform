@@ -1,6 +1,3 @@
-# -*- coding: utf-8 -*-
-
-
 import django.db.models.deletion
 from django.db import migrations, models
 from opaque_keys.edx.django.models import CourseKeyField
@@ -71,6 +68,6 @@ class Migration(migrations.Migration):
         ),
         migrations.AlterUniqueTogether(
             name='courseenrollment',
-            unique_together=set([('user', 'course')]),
+            unique_together={('user', 'course')},
         ),
     ]

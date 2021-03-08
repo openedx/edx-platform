@@ -4,8 +4,8 @@ Studio component views
 
 
 import logging
+from urllib.parse import quote_plus
 
-import six
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
@@ -14,7 +14,6 @@ from django.utils.translation import ugettext as _
 from django.views.decorators.http import require_GET
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import UsageKey
-from six.moves.urllib.parse import quote_plus
 from xblock.core import XBlock
 from xblock.django.request import django_to_webob_request, webob_to_django_response
 from xblock.exceptions import NoSuchHandlerError
@@ -22,10 +21,10 @@ from xblock.plugin import PluginMissingError
 from xblock.runtime import Mixologist
 
 from common.djangoapps.edxmako.shortcuts import render_to_response
-from openedx.core.lib.xblock_utils import get_aside_from_xblock, is_xblock_aside
 from common.djangoapps.student.auth import has_course_author_access
 from common.djangoapps.xblock_django.api import authorable_xblocks, disabled_xblocks
 from common.djangoapps.xblock_django.models import XBlockStudioConfigurationFlag
+from openedx.core.lib.xblock_utils import get_aside_from_xblock, is_xblock_aside
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError
 
@@ -43,7 +42,7 @@ log = logging.getLogger(__name__)
 # NOTE: This list is disjoint from ADVANCED_COMPONENT_TYPES
 COMPONENT_TYPES = ['discussion', 'html', 'openassessment', 'problem', 'video']
 
-ADVANCED_COMPONENT_TYPES = sorted(set(name for name, class_ in XBlock.load_classes()) - set(COMPONENT_TYPES))
+ADVANCED_COMPONENT_TYPES = sorted({name for name, class_ in XBlock.load_classes()} - set(COMPONENT_TYPES))
 
 ADVANCED_PROBLEM_TYPES = settings.ADVANCED_PROBLEM_TYPES
 
@@ -155,10 +154,10 @@ def container_handler(request, usage_key_string):
 
             assert unit is not None, "Could not determine unit page"
             subsection = get_parent_xblock(unit)
-            assert subsection is not None, "Could not determine parent subsection from unit " + six.text_type(
+            assert subsection is not None, "Could not determine parent subsection from unit " + str(
                 unit.location)
             section = get_parent_xblock(subsection)
-            assert section is not None, "Could not determine ancestor section from unit " + six.text_type(unit.location)
+            assert section is not None, "Could not determine ancestor section from unit " + str(unit.location)
 
             # for the sequence navigator
             prev_url, next_url = get_sibling_urls(subsection)
@@ -270,7 +269,7 @@ def get_component_templates(courselike, library=False):  # lint-amnesty, pylint:
         return {
             "show_legend": XBlockStudioConfigurationFlag.is_enabled(),
             "allow_unsupported_xblocks": allow_unsupported,
-            "documentation_label": _(u"{platform_name} Support Levels:").format(platform_name=settings.PLATFORM_NAME)
+            "documentation_label": _("{platform_name} Support Levels:").format(platform_name=settings.PLATFORM_NAME)
         }
 
     component_display_names = {
@@ -367,7 +366,7 @@ def get_component_templates(courselike, library=False):  # lint-amnesty, pylint:
                     try:
                         component_display_name = xblock_type_display_name(component)
                     except PluginMissingError:
-                        log.warning(u'Unable to load xblock type %s to read display_name', component, exc_info=True)
+                        log.warning('Unable to load xblock type %s to read display_name', component, exc_info=True)
                     else:
                         templates_for_category.append(
                             create_template_dict(
@@ -425,12 +424,12 @@ def get_component_templates(courselike, library=False):  # lint-amnesty, pylint:
                     # prevents any authors from trying to instantiate the
                     # non-existent component type by not showing it in the menu
                     log.warning(
-                        u"Advanced component %s does not exist. It will not be added to the Studio new component menu.",
+                        "Advanced component %s does not exist. It will not be added to the Studio new component menu.",
                         category
                     )
     else:
         log.error(
-            u"Improper format for course advanced keys! %s",
+            "Improper format for course advanced keys! %s",
             course_advanced_keys
         )
     if advanced_component_templates['templates']:
@@ -503,7 +502,7 @@ def component_handler(request, usage_key_string, handler, suffix=''):
         handler_descriptor.xmodule_runtime = StudioEditModuleRuntime(request.user)
         resp = handler_descriptor.handle(handler, req, suffix)
     except NoSuchHandlerError:
-        log.info(u"XBlock %s attempted to access missing handler %r", handler_descriptor, handler, exc_info=True)
+        log.info("XBlock %s attempted to access missing handler %r", handler_descriptor, handler, exc_info=True)
         raise Http404  # lint-amnesty, pylint: disable=raise-missing-from
 
     # unintentional update to handle any side effects of handle call

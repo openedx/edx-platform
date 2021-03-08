@@ -83,6 +83,7 @@ setup(
             "credentials = openedx.core.djangoapps.credentials.apps:CredentialsConfig",
             "content_libraries = openedx.core.djangoapps.content_libraries.apps:ContentLibrariesConfig",
             "discussion = lms.djangoapps.discussion.apps:DiscussionConfig",
+            "discussions = openedx.core.djangoapps.discussions.apps:DiscussionsConfig",
             "grades = lms.djangoapps.grades.apps:GradesConfig",
             "plugins = openedx.core.djangoapps.plugins.apps:PluginsConfig",
             "theming = openedx.core.djangoapps.theming.apps:ThemingConfig",

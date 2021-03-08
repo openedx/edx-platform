@@ -1,4 +1,4 @@
-# lint-amnesty, pylint: disable=django-not-configured, missing-module-docstring
+# lint-amnesty, pylint: disable=missing-module-docstring
 import warnings
 
 if __name__ == 'courseware':

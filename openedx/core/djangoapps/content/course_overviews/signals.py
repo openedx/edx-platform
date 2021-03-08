@@ -8,6 +8,7 @@ import logging
 from django.dispatch import Signal
 from django.dispatch.dispatcher import receiver
 
+from openedx.core.djangoapps.signals.signals import COURSE_CERT_DATE_CHANGE
 from xmodule.modulestore.django import SignalHandler
 
 from .models import CourseOverview
@@ -50,6 +51,7 @@ def _check_for_course_changes(previous_course_overview, updated_course_overview)
     if previous_course_overview:
         _check_for_course_date_changes(previous_course_overview, updated_course_overview)
         _check_for_pacing_changes(previous_course_overview, updated_course_overview)
+        _check_for_cert_availability_date_changes(previous_course_overview, updated_course_overview)
 
 
 def _check_for_course_date_changes(previous_course_overview, updated_course_overview):
@@ -83,3 +85,8 @@ def _check_for_pacing_changes(previous_course_overview, updated_course_overview)
             updated_course_overview=updated_course_overview,
             previous_self_paced=previous_course_overview.self_paced,
         )
+
+
+def _check_for_cert_availability_date_changes(previous_course_overview, updated_course_overview):
+    if previous_course_overview.certificate_available_date != updated_course_overview.certificate_available_date:
+        COURSE_CERT_DATE_CHANGE.send_robust(sender=None, course_key=updated_course_overview.id)

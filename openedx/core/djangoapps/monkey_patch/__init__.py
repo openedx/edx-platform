@@ -1,4 +1,4 @@
-"""  # lint-amnesty, pylint: disable=django-not-configured
+"""
 Monkey-patch the edX platform
 
 Here be dragons (and simians!)

@@ -126,14 +126,14 @@ def parse_coverage(report_dir, coveragerc):
     msg = colorize('green', "Combining coverage reports")
     print(msg)
 
-    sh("coverage combine --rcfile={}".format(coveragerc))
+    sh(f"coverage combine --rcfile={coveragerc}")
 
     msg = colorize('green', "Generating coverage reports")
     print(msg)
 
-    sh("coverage html --rcfile={}".format(coveragerc))
-    sh("coverage xml --rcfile={}".format(coveragerc))
-    sh("coverage report --rcfile={}".format(coveragerc))
+    sh(f"coverage html --rcfile={coveragerc}")
+    sh(f"coverage xml --rcfile={coveragerc}")
+    sh(f"coverage report --rcfile={coveragerc}")
 
 
 @task

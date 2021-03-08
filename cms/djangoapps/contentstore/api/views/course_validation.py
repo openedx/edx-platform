@@ -2,7 +2,6 @@
 import logging
 
 import dateutil
-import six
 from pytz import UTC
 from rest_framework.generics import GenericAPIView
 from rest_framework.response import Response
@@ -118,7 +117,7 @@ class CourseValidationView(DeveloperErrorViewMixin, GenericAPIView):
         ]
         assignments_with_dates_before_start = (
             [
-                {'id': six.text_type(a.location), 'display_name': a.display_name}
+                {'id': str(a.location), 'display_name': a.display_name}
                 for a in assignments_with_dates
                 if a.due < course.start
             ]
@@ -128,7 +127,7 @@ class CourseValidationView(DeveloperErrorViewMixin, GenericAPIView):
 
         assignments_with_dates_after_end = (
             [
-                {'id': six.text_type(a.location), 'display_name': a.display_name}
+                {'id': str(a.location), 'display_name': a.display_name}
                 for a in assignments_with_dates
                 if a.due > course.end
             ]
@@ -144,7 +143,7 @@ class CourseValidationView(DeveloperErrorViewMixin, GenericAPIView):
             ]
             assignments_with_dates_before_start = (
                 [
-                    {'id': six.text_type(a.location), 'display_name': a.display_name}
+                    {'id': str(a.location), 'display_name': a.display_name}
                     for a in assignments_with_dates
                     if a.due < course.start
                 ]
@@ -154,7 +153,7 @@ class CourseValidationView(DeveloperErrorViewMixin, GenericAPIView):
 
             assignments_with_dates_after_end = (
                 [
-                    {'id': six.text_type(a.location), 'display_name': a.display_name}
+                    {'id': str(a.location), 'display_name': a.display_name}
                     for a in assignments_with_dates
                     if a.due > course.end
                 ]
@@ -175,14 +174,14 @@ class CourseValidationView(DeveloperErrorViewMixin, GenericAPIView):
                     parent_unit = modulestore().get_item(ora.parent)
                     parent_assignment = modulestore().get_item(parent_unit.parent)
                     assignments_with_ora_dates_before_start.append({
-                        'id': six.text_type(parent_assignment.location),
+                        'id': str(parent_assignment.location),
                         'display_name': parent_assignment.display_name
                     })
                 if course.end and self._has_date_after_end(ora, course.end):
                     parent_unit = modulestore().get_item(ora.parent)
                     parent_assignment = modulestore().get_item(parent_unit.parent)
                     assignments_with_ora_dates_after_end.append({
-                        'id': six.text_type(parent_assignment.location),
+                        'id': str(parent_assignment.location),
                         'display_name': parent_assignment.display_name
                     })
 

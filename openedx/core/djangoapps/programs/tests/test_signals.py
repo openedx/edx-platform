@@ -238,6 +238,7 @@ class CertRevokedReceiverTest(TestCase):
     new_callable=mock.PropertyMock,
     return_value=False,
 )
+@mock.patch("openedx.core.djangoapps.programs.signals.enable_course_detail_update_certificate_date")
 class CourseCertAvailableDateChangedReceiverTest(TestCase):
     """
     Tests for the `handle_course_cert_date_change` signal handler function.
@@ -253,7 +254,7 @@ class CourseCertAvailableDateChangedReceiverTest(TestCase):
             'course_key': TEST_COURSE_KEY,
         }
 
-    def test_signal_received(self, mock_is_learner_issuance_enabled, mock_task):  # pylint: disable=unused-argument
+    def test_signal_received(self, mock_enable_update, mock_is_learner_issuance_enabled, mock_task):  # pylint: disable=unused-argument
         """
         Ensures the receiver function is invoked when COURSE_CERT_DATE_CHANGE is
         sent.
@@ -262,23 +263,26 @@ class CourseCertAvailableDateChangedReceiverTest(TestCase):
         to the way django signals work), we mock a configuration call that is
         known to take place inside the function.
         """
+        mock_enable_update.return_value = True
         COURSE_CERT_DATE_CHANGE.send(**self.signal_kwargs)
         assert mock_is_learner_issuance_enabled.call_count == 1
 
-    def test_programs_disabled(self, mock_is_learner_issuance_enabled, mock_task):
+    def test_programs_disabled(self, mock_enable_update, mock_is_learner_issuance_enabled, mock_task):
         """
         Ensures that the receiver function does nothing when the credentials API
         configuration is not enabled.
         """
+        mock_enable_update.return_value = True
         handle_course_cert_date_change(**self.signal_kwargs)
         assert mock_is_learner_issuance_enabled.call_count == 1
         assert mock_task.call_count == 0
 
-    def test_programs_enabled(self, mock_is_learner_issuance_enabled, mock_task):
+    def test_programs_enabled(self, mock_enable_update, mock_is_learner_issuance_enabled, mock_task):
         """
         Ensures that the receiver function invokes the expected celery task
         when the credentials API configuration is enabled.
         """
+        mock_enable_update.return_value = True
         mock_is_learner_issuance_enabled.return_value = True
 
         handle_course_cert_date_change(**self.signal_kwargs)

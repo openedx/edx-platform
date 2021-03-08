@@ -5,10 +5,10 @@ Tests covering the Open edX Paver prequisites installation workflow
 
 import os
 import unittest
-import pytest
+from unittest import mock
+from unittest.mock import patch
 
-import mock
-from mock import patch
+import pytest
 from paver.easy import BuildFailure
 
 import pavelib.prereqs
@@ -31,7 +31,7 @@ class TestPaverPrereqInstall(unittest.TestCase):
         _orig_environ = dict(os.environ)
         os.environ['NO_PREREQ_INSTALL'] = set_val
         assert pavelib.prereqs.no_prereq_install() == expected_val,\
-            'NO_PREREQ_INSTALL is set to {}, but we read it as {}'.format(set_val, expected_val)
+            f'NO_PREREQ_INSTALL is set to {set_val}, but we read it as {expected_val}'
 
         # Reset Environment back to original state
         os.environ.clear()

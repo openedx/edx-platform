@@ -1,4 +1,4 @@
-"""  # lint-amnesty, pylint: disable=django-not-configured
+"""
 Instructor Dashboard Views
 """
 
@@ -456,8 +456,6 @@ def _section_membership(course, access):
     """ Provide data for the corresponding dashboard section """
     course_key = course.id
     ccx_enabled = settings.FEATURES.get('CUSTOM_COURSES_EDX', False) and course.enable_ccx
-    enrollment_role_choices = configuration_helpers.get_value('MANUAL_ENROLLMENT_ROLE_CHOICES',
-                                                              settings.MANUAL_ENROLLMENT_ROLE_CHOICES)
 
     section_data = {
         'section_key': 'membership',
@@ -484,7 +482,6 @@ def _section_membership(course, access):
             'update_forum_role_membership',
             kwargs={'course_id': str(course_key)}
         ),
-        'enrollment_role_choices': enrollment_role_choices,
         'is_reason_field_enabled': configuration_helpers.get_value('ENABLE_MANUAL_ENROLLMENT_REASON_FIELD', False)
     }
     return section_data

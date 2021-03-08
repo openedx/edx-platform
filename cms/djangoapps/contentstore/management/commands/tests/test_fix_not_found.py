@@ -3,7 +3,6 @@ Tests for the fix_not_found management command
 """
 
 
-import six
 from django.core.management import CommandError, call_command
 
 from xmodule.modulestore import ModuleStoreEnum
@@ -19,10 +18,7 @@ class TestFixNotFound(ModuleStoreTestCase):
         """
         Test fix_not_found command with no arguments
         """
-        if six.PY2:
-            msg = "Error: too few arguments"
-        else:
-            msg = "Error: the following arguments are required: course_id"
+        msg = "Error: the following arguments are required: course_id"
 
         with self.assertRaisesRegex(CommandError, msg):
             call_command('fix_not_found')
@@ -33,7 +29,7 @@ class TestFixNotFound(ModuleStoreTestCase):
         """
         course = CourseFactory.create(default_store=ModuleStoreEnum.Type.mongo)
         with self.assertRaisesRegex(CommandError, "The owning modulestore does not support this command."):
-            call_command("fix_not_found", six.text_type(course.id))
+            call_command("fix_not_found", str(course.id))
 
     def test_fix_not_found(self):
         course = CourseFactory.create(default_store=ModuleStoreEnum.Type.split)
@@ -53,7 +49,7 @@ class TestFixNotFound(ModuleStoreTestCase):
         self.assertEqual(len(course.children), 2)
         self.assertIn(dangling_pointer, course.children)
 
-        call_command("fix_not_found", six.text_type(course.id))
+        call_command("fix_not_found", str(course.id))
 
         # make sure the dangling pointer was removed from
         # the course block's children

@@ -454,3 +454,26 @@ class TestBlocksInCourseView(TestBlocksView, CompletionWaffleTestMixin):  # pyli
         for block in response.data:
             if block['block_id'] in self.non_orphaned_block_usage_keys:
                 assert block.get('completion')
+
+    def test_completion_all_course_with_requested_fields_as_string(self):
+        for block in self.non_orphaned_raw_block_usage_keys:
+            submit_completions_for_testing(self.user, [block])
+
+        response = self.verify_response(params={
+            'depth': 'all',
+            'requested_fields': 'completion,children',
+        })
+        for block_id in self.non_orphaned_block_usage_keys:
+            assert response.data['blocks'][block_id].get('completion')
+
+    def test_completion_all_course_with_nav_depth(self):
+        # when we include nav_depth we get descendants in parent nodes
+        for block in self.non_orphaned_raw_block_usage_keys:
+            submit_completions_for_testing(self.user, [block])
+        response = self.verify_response(params={
+            'depth': 'all',
+            'nav_depth': 3,
+            'requested_fields': ['completion'],
+        })
+        for block_id in self.non_orphaned_block_usage_keys:
+            assert response.data['blocks'][block_id].get('completion')

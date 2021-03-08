@@ -40,7 +40,7 @@ class CustomCoursesForEdxOverrideProvider(FieldOverrideProvider):
         elif hasattr(block, 'location'):
             course_key = block.location.course_key
         else:
-            msg = u"Unable to get course id when calculating ccx overide for block type %r"
+            msg = "Unable to get course id when calculating ccx overide for block type %r"
             log.error(msg, type(block))
         if course_key is not None:
             ccx = get_current_ccx(course_key)

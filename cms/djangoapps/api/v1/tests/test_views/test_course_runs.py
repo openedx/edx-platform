@@ -2,20 +2,20 @@
 
 
 import datetime
+from unittest.mock import patch  # lint-amnesty, pylint: disable=unused-import
 
 import ddt
 import pytz
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import RequestFactory, override_settings
 from django.urls import reverse
-from mock import patch  # lint-amnesty, pylint: disable=unused-import
 from opaque_keys.edx.keys import CourseKey
 from organizations.api import add_organization, get_course_organizations
 from rest_framework.test import APIClient
 
-from openedx.core.lib.courses import course_image_url
 from common.djangoapps.student.models import CourseAccessRole
 from common.djangoapps.student.tests.factories import TEST_PASSWORD, AdminFactory, UserFactory
+from openedx.core.lib.courses import course_image_url
 from xmodule.contentstore.content import StaticContent
 from xmodule.contentstore.django import contentstore
 from xmodule.exceptions import NotFoundError
@@ -35,7 +35,7 @@ class CourseRunViewSetTests(ModuleStoreTestCase):
     list_url = reverse('api:v1:course_run-list')
 
     def setUp(self):
-        super(CourseRunViewSetTests, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.client = APIClient()
         user = AdminFactory()
         self.client.login(username=user.username, password=TEST_PASSWORD)
@@ -388,7 +388,7 @@ class CourseRunViewSetTests(ModuleStoreTestCase):
         }
         response = self.client.post(url, data, format='json')
         assert response.status_code == 400
-        assert response.data == {'run': [u'Course run {key} already exists'.format(key=course_run.id)]}
+        assert response.data == {'run': [f'Course run {course_run.id} already exists']}
 
     def test_rerun_invalid_number(self):
         course_run = ToyCourseFactory()
@@ -400,5 +400,5 @@ class CourseRunViewSetTests(ModuleStoreTestCase):
         response = self.client.post(url, data, format='json')
         assert response.status_code == 400
         assert response.data == {'non_field_errors': [
-            u'Invalid key supplied. Ensure there are no special characters in the Course Number.'
+            'Invalid key supplied. Ensure there are no special characters in the Course Number.'
         ]}

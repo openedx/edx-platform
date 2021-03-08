@@ -21,7 +21,6 @@ import unicodedata
 #import subprocess
 from copy import deepcopy
 from functools import reduce
-from xml.sax.saxutils import unescape  # lint-amnesty, pylint: disable=unused-import
 
 import six
 import sympy

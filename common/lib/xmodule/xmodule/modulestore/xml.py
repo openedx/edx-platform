@@ -1,6 +1,5 @@
 # lint-amnesty, pylint: disable=missing-module-docstring
 
-import codecs  # lint-amnesty, pylint: disable=unused-import
 import glob
 import hashlib
 import io
@@ -34,7 +33,6 @@ from xmodule.modulestore import COURSE_ROOT, LIBRARY_ROOT, ModuleStoreEnum, Modu
 from xmodule.modulestore.xml_exporter import DEFAULT_CONTENT_FIELDS
 from xmodule.tabs import CourseTabList
 from xmodule.x_module import (  # lint-amnesty, pylint: disable=unused-import
-    DEPRECATION_VSCOMPAT_EVENT,
     AsideKeyGenerator,
     OpaqueKeyReader,
     XMLParsingSystem,
@@ -437,7 +435,7 @@ class XMLModuleStore(ModuleStoreReadBase):
         Load a course into this module store
         course_path: Course directory name
 
-        returns a CourseDescriptor for the course
+        returns a CourseBlock for the course
         """
         log.debug('========> Starting courselike import from %s', course_dir)
         with open(self.data_dir / course_dir / self.parent_xml) as course_file:

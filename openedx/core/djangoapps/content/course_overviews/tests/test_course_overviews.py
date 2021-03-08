@@ -72,16 +72,16 @@ class CourseOverviewTestCase(CatalogIntegrationMixin, ModuleStoreTestCase, Cache
     def check_course_overview_against_course(self, course):
         """
         Compares a CourseOverview object against its corresponding
-        CourseDescriptor object.
+        CourseBlock object.
 
         Specifically, given a course, test that data within the following three
         objects match each other:
-         - the CourseDescriptor itself
+         - the CourseBlock itself
          - a CourseOverview that was newly constructed from _create_or_update
          - a CourseOverview that was loaded from the MySQL database
 
         Arguments:
-            course (CourseDescriptor): the course to be checked.
+            course (CourseBlock): the course to be checked.
         """
 
         def get_seconds_since_epoch(date_time):
@@ -257,7 +257,7 @@ class CourseOverviewTestCase(CatalogIntegrationMixin, ModuleStoreTestCase, Cache
     @ddt.unpack
     def test_course_overview_behavior(self, course_kwargs, modulestore_type):
         """
-        Tests if CourseOverviews and CourseDescriptors behave the same
+        Tests if CourseOverviews and CourseBlocks behave the same
         by comparing pairs of them given a variety of scenarios.
 
         Arguments:

@@ -233,7 +233,7 @@ class AboutTestCase(LoginEnrollmentTestCase, SharedModuleStoreTestCase, EventTra
         Assert that anonymous or unenrolled users see View Course option
         when unenrolled access flag is set
         """
-        with mock.patch('xmodule.course_module.CourseDescriptor.course_visibility', course_visibility):
+        with mock.patch('xmodule.course_module.CourseBlock.course_visibility', course_visibility):
             with override_waffle_flag(COURSE_ENABLE_UNENROLLED_ACCESS_FLAG, active=True):
                 url = reverse('about_course', args=[text_type(self.course.id)])
                 resp = self.client.get(url)

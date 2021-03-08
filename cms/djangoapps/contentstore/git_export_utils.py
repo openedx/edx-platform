@@ -7,13 +7,12 @@ committing and pushing the changes.
 import logging
 import os
 import subprocess
+from urllib.parse import urlparse
 
-import six
 from django.conf import settings
 from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
-from six.moves.urllib.parse import urlparse
 
 from xmodule.contentstore.django import contentstore
 from xmodule.modulestore.django import modulestore
@@ -32,9 +31,9 @@ class GitExportError(Exception):
 
     def __init__(self, message):
         # Force the lazy i18n values to turn into actual unicode objects
-        super().__init__(six.text_type(message))
+        super().__init__(str(message))
 
-    NO_EXPORT_DIR = _(u"GIT_REPO_EXPORT_DIR not set or path {0} doesn't exist, "
+    NO_EXPORT_DIR = _("GIT_REPO_EXPORT_DIR not set or path {0} doesn't exist, "
                       "please create it, or configure a different path with "
                       "GIT_REPO_EXPORT_DIR").format(GIT_REPO_EXPORT_DIR)
     URL_BAD = _('Non writable git url provided. Expecting something like:'
@@ -61,9 +60,9 @@ def cmd_log(cmd, cwd):
     command doesn't return 0, and returns the command's output.
     """
     output = subprocess.check_output(cmd, cwd=cwd, stderr=subprocess.STDOUT)
-    log.debug(u'Command was: {0!r}. '
-              u'Working directory was: {1!r}'.format(' '.join(cmd), cwd))
-    log.debug(u'Command output was: {0!r}'.format(output))
+    log.debug('Command was: {!r}. '
+              'Working directory was: {!r}'.format(' '.join(cmd), cwd))
+    log.debug(f'Command output was: {output!r}')
     return output
 
 
@@ -92,11 +91,11 @@ def export_to_git(course_id, repo, user='', rdir=None):
     else:
         rdir = repo.rsplit('/', 1)[-1].rsplit('.git', 1)[0]
 
-    log.debug(u"rdir = %s", rdir)
+    log.debug("rdir = %s", rdir)
 
     # Pull or clone repo before exporting to xml
     # and update url in case origin changed.
-    rdirp = '{0}/{1}'.format(GIT_REPO_EXPORT_DIR, rdir)
+    rdirp = f'{GIT_REPO_EXPORT_DIR}/{rdir}'
     branch = None
     if os.path.exists(rdirp):
         log.info('Directory already exists, doing a git reset and pull '
@@ -107,13 +106,13 @@ def export_to_git(course_id, repo, user='', rdir=None):
         try:
             branch = cmd_log(cmd, cwd).decode('utf-8').strip('\n')
         except subprocess.CalledProcessError as ex:
-            log.exception(u'Failed to get branch: %r', ex.output)
+            log.exception('Failed to get branch: %r', ex.output)
             raise GitExportError(GitExportError.DETACHED_HEAD) from ex
 
         cmds = [
             ['git', 'remote', 'set-url', 'origin', repo],
             ['git', 'fetch', 'origin'],
-            ['git', 'reset', '--hard', 'origin/{0}'.format(branch)],
+            ['git', 'reset', '--hard', f'origin/{branch}'],
             ['git', 'pull'],
             ['git', 'clean', '-d', '-f'],
         ]
@@ -126,7 +125,7 @@ def export_to_git(course_id, repo, user='', rdir=None):
         try:
             cmd_log(cmd, cwd)
         except subprocess.CalledProcessError as ex:
-            log.exception(u'Failed to pull git repository: %r', ex.output)
+            log.exception('Failed to pull git repository: %r', ex.output)
             raise GitExportError(GitExportError.CANNOT_PULL) from ex
 
     # export course as xml before commiting and pushing
@@ -135,7 +134,7 @@ def export_to_git(course_id, repo, user='', rdir=None):
     try:
         export_course_to_xml(modulestore(), contentstore(), course_id,
                              root_dir, course_dir)
-    except (EnvironmentError, AttributeError):
+    except (OSError, AttributeError):
         log.exception('Failed export to xml')
         raise GitExportError(GitExportError.XML_EXPORT_FAIL)  # lint-amnesty, pylint: disable=raise-missing-from
 
@@ -145,7 +144,7 @@ def export_to_git(course_id, repo, user='', rdir=None):
         try:
             branch = cmd_log(cmd, os.path.abspath(rdirp)).decode('utf-8').strip('\n')
         except subprocess.CalledProcessError as ex:
-            log.exception(u'Failed to get branch from freshly cloned repo: %r',
+            log.exception('Failed to get branch from freshly cloned repo: %r',
                           ex.output)
             raise GitExportError(GitExportError.MISSING_BRANCH) from ex
 
@@ -161,23 +160,23 @@ def export_to_git(course_id, repo, user='', rdir=None):
         ident = GIT_EXPORT_DEFAULT_IDENT
     time_stamp = timezone.now()
     cwd = os.path.abspath(rdirp)
-    commit_msg = u"Export from Studio at {time_stamp}".format(
+    commit_msg = "Export from Studio at {time_stamp}".format(
         time_stamp=time_stamp,
     )
     try:
         cmd_log(['git', 'config', 'user.email', ident['email']], cwd)
         cmd_log(['git', 'config', 'user.name', ident['name']], cwd)
     except subprocess.CalledProcessError as ex:
-        log.exception(u'Error running git configure commands: %r', ex.output)
+        log.exception('Error running git configure commands: %r', ex.output)
         raise GitExportError(GitExportError.CONFIG_ERROR) from ex
     try:
         cmd_log(['git', 'add', '.'], cwd)
         cmd_log(['git', 'commit', '-a', '-m', commit_msg], cwd)
     except subprocess.CalledProcessError as ex:
-        log.exception(u'Unable to commit changes: %r', ex.output)
+        log.exception('Unable to commit changes: %r', ex.output)
         raise GitExportError(GitExportError.CANNOT_COMMIT) from ex
     try:
         cmd_log(['git', 'push', '-q', 'origin', branch], cwd)
     except subprocess.CalledProcessError as ex:
-        log.exception(u'Error running git push command: %r', ex.output)
+        log.exception('Error running git push command: %r', ex.output)
         raise GitExportError(GitExportError.CANNOT_PUSH) from ex

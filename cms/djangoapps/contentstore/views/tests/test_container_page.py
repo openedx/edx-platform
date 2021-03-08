@@ -5,12 +5,11 @@ Unit tests for the container page.
 
 import datetime
 import re
+from unittest.mock import Mock, patch
 
-import six
 from django.http import Http404
 from django.test.client import RequestFactory
 from django.utils import http
-from mock import Mock, patch
 from pytz import UTC
 
 import cms.djangoapps.contentstore.views.component as views
@@ -31,7 +30,7 @@ class ContainerPageTestCase(StudioPageTestCase, LibraryTestCase):
     reorderable_child_view = 'reorderable_container_child_preview'
 
     def setUp(self):
-        super(ContainerPageTestCase, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.vertical = self._create_item(self.sequential.location, 'vertical', 'Unit')
         self.html = self._create_item(self.vertical.location, "html", "HTML")
         self.child_container = self._create_item(self.vertical.location, 'split_test', 'Split Test')
@@ -60,18 +59,18 @@ class ContainerPageTestCase(StudioPageTestCase, LibraryTestCase):
         self._test_html_content(
             self.child_container,
             expected_section_tag=(
-                u'<section class="wrapper-xblock level-page is-hidden studio-xblock-wrapper" '
-                u'data-locator="{0}" data-course-key="{0.course_key}">'.format(self.child_container.location)
+                '<section class="wrapper-xblock level-page is-hidden studio-xblock-wrapper" '
+                'data-locator="{0}" data-course-key="{0.course_key}">'.format(self.child_container.location)
             ),
             expected_breadcrumbs=(
-                u'<li class="nav-item">\\s*<a href="/course/{course}{section_parameters}">Week 1<\\/a>.*'
-                u'<a href="/course/{course}{subsection_parameters}">Lesson 1</a>'
+                '<li class="nav-item">\\s*<a href="/course/{course}{section_parameters}">Week 1<\\/a>.*'
+                '<a href="/course/{course}{subsection_parameters}">Lesson 1</a>'
             ).format(
-                course=re.escape(six.text_type(self.course.id)),
-                section_parameters=re.escape(u'?show={}'.format(http.urlquote(
+                course=re.escape(str(self.course.id)),
+                section_parameters=re.escape('?show={}'.format(http.urlquote(
                     str(self.chapter.location).encode()
                 ))),
-                subsection_parameters=re.escape(u'?show={}'.format(http.urlquote(
+                subsection_parameters=re.escape('?show={}'.format(http.urlquote(
                     str(self.sequential.location).encode()
                 ))),
             ),
@@ -89,16 +88,16 @@ class ContainerPageTestCase(StudioPageTestCase, LibraryTestCase):
             self._test_html_content(
                 xblock,
                 expected_section_tag=(
-                    u'<section class="wrapper-xblock level-page is-hidden studio-xblock-wrapper" '
-                    u'data-locator="{0}" data-course-key="{0.course_key}">'.format(draft_container.location)
+                    '<section class="wrapper-xblock level-page is-hidden studio-xblock-wrapper" '
+                    'data-locator="{0}" data-course-key="{0.course_key}">'.format(draft_container.location)
                 ),
                 expected_breadcrumbs=(
-                    u'<a href="/course/{course}{subsection_parameters}">Lesson 1</a>.*'
-                    u'<a href="/container/{unit_parameters}">Unit</a>.*'
+                    '<a href="/course/{course}{subsection_parameters}">Lesson 1</a>.*'
+                    '<a href="/container/{unit_parameters}">Unit</a>.*'
                 ).format(
-                    course=re.escape(six.text_type(self.course.id)),
+                    course=re.escape(str(self.course.id)),
                     unit_parameters=re.escape(str(self.vertical.location)),
-                    subsection_parameters=re.escape(u'?show={}'.format(http.urlquote(
+                    subsection_parameters=re.escape('?show={}'.format(http.urlquote(
                         str(self.sequential.location).encode()
                     ))),
                 ),
@@ -228,6 +227,6 @@ class ContainerPageTestCase(StudioPageTestCase, LibraryTestCase):
         # Check 200 response if 'usage_key_string' is correct
         response = views.container_handler(
             request=request,
-            usage_key_string=six.text_type(self.vertical.location)
+            usage_key_string=str(self.vertical.location)
         )
         self.assertEqual(response.status_code, 200)

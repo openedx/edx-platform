@@ -1,4 +1,4 @@
-"""  # lint-amnesty, pylint: disable=django-not-configured
+"""
 Utility classes for testing django applications.
 
 :py:class:`CacheIsolationMixin`
