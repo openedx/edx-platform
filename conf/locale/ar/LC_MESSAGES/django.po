@@ -58,7 +58,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2021-03-05 11:22+0000\n"
+"POT-Creation-Date: 2021-03-05 11:39+0000\n"
 "PO-Revision-Date: 2020-10-27 19:12+0000\n"
 "Last-Translator: Rana Waqar <rana.waqar@arbisoft.com>, 2020\n"
 "Language-Team: Arabic (https://www.transifex.com/philanthropy-u/teams/113553/ar/)\n"
@@ -9574,7 +9574,12 @@ msgid "File size must not exceed {size} KB"
 msgstr ""
 
 #: openedx/adg/lms/applications/helpers.py
-msgid "Completion date must comes after started date"
+msgid "Completed date must be greater than started date."
+msgstr ""
+"لا بدّ أن يتأخّر تاريخ الاستحقاق الخاضع للتمديد عن تاريخ الاستحقاق الأساسي."
+
+#: openedx/adg/lms/applications/helpers.py
+msgid "Date should not be in future"
 msgstr ""
 
 #: openedx/adg/lms/applications/helpers.py

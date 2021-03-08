@@ -51,7 +51,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2021-03-05 11:39+0000\n"
+"POT-Creation-Date: 2021-03-08 11:40+0000\n"
 "PO-Revision-Date: 2020-10-27 19:11+0000\n"
 "Last-Translator: Imran Bashir <admin@omnipreneurshipacademy.com>, 2021\n"
 "Language-Team: Arabic (https://www.transifex.com/philanthropy-u/teams/113553/ar/)\n"
@@ -5829,6 +5829,18 @@ msgstr ""
 msgid "Continue"
 msgstr ""
 
+#: themes/edx-platform/adg/lms/static/js/applications/education_experience_validations.js
+msgid "This field is required."
+msgstr "كلمة المرور مطلوبة"
+
+#: themes/edx-platform/adg/lms/static/js/applications/education_experience_validations.js
+msgid "Date must not be in future."
+msgstr ""
+
+#: themes/edx-platform/adg/lms/static/js/applications/education_experience_validations.js
+msgid "Completed date must be greater than started date."
+msgstr "لايمكن أن يسبق تاريخ الاستحقاق تاريخ الابتداء."
+
 #: cms/static/cms/js/main.js
 msgid "Studio's having trouble saving your work"
 msgstr ""
@@ -11542,9 +11554,3 @@ msgstr ""
 #: cms/templates/js/video/transcripts/messages/transcripts-use-existing.underscore
 msgid "Use Current Transcript"
 msgstr "استخدم النص الحالي"
-
-#~ msgid "This field is required."
-#~ msgstr "كلمة المرور مطلوبة"
-
-#~ msgid "Completed date must be greater than started date."
-#~ msgstr "لايمكن أن يسبق تاريخ الاستحقاق تاريخ الابتداء."
