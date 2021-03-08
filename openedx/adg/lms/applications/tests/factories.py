@@ -111,3 +111,4 @@ class MultilingualCourseFactory(factory.DjangoModelFactory):
 
     class Meta:
         model = MultilingualCourse
+        django_get_or_create = ('course', 'multilingual_course_group')
