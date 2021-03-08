@@ -167,10 +167,12 @@ def _build_message_context(context):  # lint-amnesty, pylint: disable=missing-fu
 
 
 def _get_thread_url(context):  # lint-amnesty, pylint: disable=missing-function-docstring
+    scheme = 'https' if settings.HTTPS == 'on' else 'http'
+    base_url = '{}://{}'.format(scheme, context['site'].domain)
     thread_content = {
         'type': 'thread',
         'course_id': context['course_id'],
         'commentable_id': context['thread_commentable_id'],
         'id': context['thread_id'],
     }
-    return urljoin(context['site'].domain, permalink(thread_content))
+    return urljoin(base_url, permalink(thread_content))
