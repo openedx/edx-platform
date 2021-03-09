@@ -14,7 +14,7 @@ from common.djangoapps.student.tests.factories import UserFactory
 @unittest.skipUnless(settings.FEATURES.get("ENABLE_OAUTH2_PROVIDER"), "OAuth2 not enabled")
 class TestClientFactory(TestCase):
     def setUp(self):
-        super(TestClientFactory, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.user = UserFactory.create()
 
     def test_client_factory(self):
@@ -26,7 +26,7 @@ class TestClientFactory(TestCase):
 @unittest.skipUnless(settings.FEATURES.get("ENABLE_OAUTH2_PROVIDER"), "OAuth2 not enabled")
 class TestAccessTokenFactory(TestCase):
     def setUp(self):
-        super(TestAccessTokenFactory, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.user = UserFactory.create()
 
     def test_access_token_client_factory(self):
@@ -39,7 +39,7 @@ class TestAccessTokenFactory(TestCase):
 @unittest.skipUnless(settings.FEATURES.get("ENABLE_OAUTH2_PROVIDER"), "OAuth2 not enabled")
 class TestRefreshTokenFactory(TestCase):
     def setUp(self):
-        super(TestRefreshTokenFactory, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.user = UserFactory.create()
 
     def test_refresh_token_factory(self):

@@ -38,7 +38,7 @@ class RestrictedApplication(models.Model):
         """
         Return a unicode representation of this object
         """
-        return HTML(u"<RestrictedApplication '{name}'>").format(
+        return HTML("<RestrictedApplication '{name}'>").format(
             name=HTML(self.application.name)
         )
 
@@ -116,7 +116,7 @@ class ApplicationAccess(models.Model):
         """
         Return a unicode representation of this object.
         """
-        return u"{application_name}:{scopes}:{filters}".format(
+        return "{application_name}:{scopes}:{filters}".format(
             application_name=self.application.name,
             scopes=self.scopes,
             filters=self.filters,
@@ -139,7 +139,7 @@ class ApplicationOrganization(models.Model):
 
     .. no_pii:
     """
-    RELATION_TYPE_CONTENT_ORG = u'content_org'
+    RELATION_TYPE_CONTENT_ORG = 'content_org'
     RELATION_TYPES = (
         (RELATION_TYPE_CONTENT_ORG, _('Content Provider')),
     )

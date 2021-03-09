@@ -36,7 +36,7 @@ class EdxOAuth2AuthorizationView(AuthorizationView):
                 oauth2_settings.REQUEST_APPROVAL_PROMPT,
             )
             if require_approval != 'auto_even_if_expired':
-                return super(EdxOAuth2AuthorizationView, self).get(request, *args, **kwargs)  # lint-amnesty, pylint: disable=super-with-arguments
+                return super().get(request, *args, **kwargs)
 
             scopes, credentials = self.validate_authorization_request(request)
             all_scopes = get_scopes_backend().get_all_scopes()

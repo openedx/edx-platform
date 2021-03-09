@@ -53,7 +53,7 @@ class OlxRestApiTestCase(SharedModuleStoreTestCase):
         assert clean(xml_str_a) == clean(xml_str_b)
 
     def get_olx_response_for_block(self, block_id):
-        return self.client.get('/api/olx-export/v1/xblock/{}/'.format(block_id))
+        return self.client.get(f'/api/olx-export/v1/xblock/{block_id}/')
 
     # Actual tests:
 

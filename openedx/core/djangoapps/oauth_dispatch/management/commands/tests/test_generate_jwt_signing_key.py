@@ -8,13 +8,13 @@ import os
 import sys
 import tempfile
 from contextlib import contextmanager
-from six import StringIO
+from io import StringIO
+from unittest.mock import patch
 
 import ddt
 import yaml
 from django.core.management import call_command
 from django.test import TestCase
-from mock import patch
 
 from openedx.core.djangolib.testing.utils import skip_unless_lms
 

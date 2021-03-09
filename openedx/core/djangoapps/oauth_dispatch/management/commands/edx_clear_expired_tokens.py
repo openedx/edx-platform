@@ -42,7 +42,7 @@ class Command(BaseCommand):  # lint-amnesty, pylint: disable=missing-class-docst
                             help='Comma-separated list of application IDs for which tokens will NOT be removed')
 
     def clear_table_data(self, query_set, batch_size, model, sleep_time):  # lint-amnesty, pylint: disable=missing-function-docstring
-        message = 'Cleaning {} rows from {} table'.format(query_set.count(), model.__name__)
+        message = f'Cleaning {query_set.count()} rows from {model.__name__} table'
         logger.info(message)
         while query_set.exists():
             qs = query_set[:batch_size]

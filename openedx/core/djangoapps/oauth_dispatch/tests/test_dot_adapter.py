@@ -7,7 +7,6 @@ from datetime import timedelta
 import pytest
 
 import ddt
-import six
 from django.conf import settings
 from django.test import TestCase
 from django.utils.timezone import now
@@ -29,7 +28,7 @@ class DOTAdapterTestCase(TestCase):
     Test class for DOTAdapter.
     """
     def setUp(self):
-        super(DOTAdapterTestCase, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.adapter = DOTAdapter()
         self.user = UserFactory()
         self.public_client = self.adapter.create_public_client(
@@ -56,7 +55,7 @@ class DOTAdapterTestCase(TestCase):
         """
         Make sure unicode representation of RestrictedApplication is correct
         """
-        assert six.text_type(self.restricted_app) == "<RestrictedApplication '{name}'>"\
+        assert str(self.restricted_app) == "<RestrictedApplication '{name}'>"\
             .format(name=self.restricted_client.name)
 
     @ddt.data(
@@ -65,9 +64,9 @@ class DOTAdapterTestCase(TestCase):
     )
     @ddt.unpack
     def test_create_client(self, client_name, client_type):
-        client = getattr(self, '{}_client'.format(client_name))
+        client = getattr(self, f'{client_name}_client')
         assert isinstance(client, models.Application)
-        assert client.client_id == '{}-client-id'.format(client_name)
+        assert client.client_id == f'{client_name}-client-id'
         assert client.client_type == client_type
 
     def test_get_client(self):
