@@ -54,11 +54,12 @@ def get_extra_context(request, course):
     course_group = course.multilingual_course.multilingual_course_group
     course_languages = course_group.multilingual_courses.open_multilingual_courses().language(course.language)
     course_intructors = get_course_instructors(course.id, request=request)
+    print(course_intructors)
     course_enrollment_count = CourseEnrollment.objects.enrollment_counts(course.id).get('total', 0)
 
     context = {
         "languages": course_languages,
-        "instructor": course_intructors,
+        "instructors": course_intructors,
         "total_enrollments": course_enrollment_count,
         "self_paced": course.self_paced,
         "effort": course.effort
