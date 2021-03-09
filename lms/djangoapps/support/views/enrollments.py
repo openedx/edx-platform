@@ -22,6 +22,7 @@ from common.djangoapps.student.models import (
     ManualEnrollmentAudit
 )
 from common.djangoapps.util.json_request import JsonResponse
+from common.djangoapps.entitlements.models import CourseEntitlement
 from lms.djangoapps.support.decorators import require_support_permission
 from lms.djangoapps.support.serializers import ManualEnrollmentSerializer
 from lms.djangoapps.verify_student.models import VerificationDeadline
@@ -130,6 +131,11 @@ class EnrollmentSupportListView(GenericAPIView):
                     CourseEnrollmentAttribute.add_enrollment_attr(
                         enrollment=enrollment, data_list=[credit_provider_attr]
                     )
+                entitlement = CourseEntitlement.get_fulfillable_entitlement_for_user_course_run(
+                    user=user, course_run_key=course_id
+                )
+                if entitlement is not None and entitlement.mode == new_mode:
+                    entitlement.set_enrollment(CourseEnrollment.get_enrollment(user, course_id))
                 return JsonResponse(ManualEnrollmentSerializer(instance=manual_enrollment).data)
         except CourseModeNotFoundError as err:
             return HttpResponseBadRequest(str(err))
