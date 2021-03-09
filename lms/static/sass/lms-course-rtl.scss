@@ -1,3 +1,6 @@
 @import 'bourbon/bourbon';
 @import 'vendor/bi-app/bi-app-rtl'; // set the layout for right to left languages
 @import 'build-course'; // shared app style assets/rendering
+
+// Extra theme-specific rules for mfe iframe
+@import 'lms/theme/extras-mfe';
