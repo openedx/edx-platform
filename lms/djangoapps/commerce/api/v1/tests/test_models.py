@@ -14,7 +14,7 @@ class CourseTests(TestCase):
     """ Tests for Course model. """
 
     def setUp(self):
-        super(CourseTests, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.course = Course('a/b/c', [])
 
     @ddt.unpack

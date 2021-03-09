@@ -3,11 +3,11 @@
 from common.djangoapps.student.tests.factories import UserFactory
 
 
-class UserMixin(object):
+class UserMixin:
     """ Mixin for tests involving users. """
 
     def setUp(self):
-        super(UserMixin, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.user = UserFactory()
 
     def _login(self):
