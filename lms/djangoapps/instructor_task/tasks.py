@@ -24,7 +24,6 @@ import logging
 from functools import partial
 
 from celery import shared_task
-from django.conf import settings  # lint-amnesty, pylint: disable=unused-import
 from django.utils.translation import ugettext_noop
 from edx_django_utils.monitoring import set_code_owner_attribute
 

@@ -7,7 +7,6 @@ paths actually work.
 
 
 import json
-from functools import partial  # lint-amnesty, pylint: disable=unused-import
 from unittest.mock import MagicMock, Mock, patch
 from uuid import uuid4
 import pytest
