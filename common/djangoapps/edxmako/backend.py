@@ -36,7 +36,7 @@ class Mako(BaseEngine):
         """
         params = params.copy()
         options = params.pop('OPTIONS').copy()
-        super(Mako, self).__init__(params)  # lint-amnesty, pylint: disable=super-with-arguments
+        super().__init__(params)
         self.context_processors = options.pop('context_processors', [])
         self.namespace = options.pop('namespace', 'main')
 

@@ -1,6 +1,7 @@
 # lint-amnesty, pylint: disable=cyclic-import, missing-module-docstring
 
 import unittest
+from unittest.mock import Mock, patch
 
 import ddt
 from django.conf import settings
@@ -10,7 +11,6 @@ from django.test.client import RequestFactory
 from django.test.utils import override_settings
 from django.urls import reverse
 from edx_django_utils.cache import RequestCache
-from mock import Mock, patch
 
 from common.djangoapps.edxmako import LOOKUP, add_lookup
 from common.djangoapps.edxmako.request_context import get_template_request_context
@@ -139,7 +139,7 @@ class MakoRequestContextTest(TestCase):
     """
 
     def setUp(self):
-        super(MakoRequestContextTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.user = UserFactory.create()
         self.url = "/"
         self.request = RequestFactory().get(self.url)
