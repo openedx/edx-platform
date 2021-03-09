@@ -38,7 +38,7 @@ bridgekeeper==0.9         # via -r requirements/edx/testing.txt
 celery==4.4.7             # via -c requirements/edx/../constraints.txt, -r requirements/edx/testing.txt, django-celery-results, django-user-tasks, edx-celeryutils, edx-enterprise, event-tracking
 certifi==2020.12.5        # via -r requirements/edx/testing.txt, elasticsearch, requests
 cffi==1.14.5              # via -r requirements/edx/testing.txt, cryptography
-chardet==4.0.0            # via -r requirements/edx/testing.txt, diff-cover, pysrt, requests
+chardet==4.0.0            # via -r requirements/edx/testing.txt, pysrt, requests
 chem==1.2.0               # via -r requirements/edx/testing.txt
 click-log==0.3.2          # via -r requirements/edx/testing.txt, edx-lint
 click==7.1.2              # via -r requirements/edx/development.in, -r requirements/edx/pip-tools.txt, -r requirements/edx/testing.txt, click-log, code-annotations, edx-lint, nltk, pip-tools, user-util
@@ -55,7 +55,7 @@ cssutils==1.0.2           # via -r requirements/edx/testing.txt, pynliner
 ddt==1.4.1                # via -r requirements/edx/testing.txt, xblock-drag-and-drop-v2, xblock-poll
 decorator==4.4.2          # via -r requirements/edx/testing.txt, pycontracts
 defusedxml==0.7.1         # via -r requirements/edx/testing.txt, djangorestframework-xml, ora2, python3-openid, python3-saml, safe-lxml, social-auth-core
-diff-cover==4.2.1         # via -c requirements/edx/../constraints.txt, -r requirements/edx/testing.txt
+diff-cover==4.0.0         # via -c requirements/edx/../constraints.txt, -r requirements/edx/testing.txt
 distlib==0.3.1            # via -r requirements/edx/testing.txt, virtualenv
 django-appconf==1.0.4     # via -r requirements/edx/testing.txt, django-statici18n
 django-cache-memoize==0.1.8  # via -r requirements/edx/testing.txt, edx-enterprise
