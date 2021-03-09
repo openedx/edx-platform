@@ -5,8 +5,6 @@ Language Preference Views
 
 import json
 
-import six
-
 from django.conf import settings
 from django.http import HttpResponse
 from django.utils.translation import LANGUAGE_SESSION_KEY
@@ -26,7 +24,7 @@ def update_session_language(request):
         data = json.loads(request.body.decode('utf8'))
         language = data.get(LANGUAGE_KEY, settings.LANGUAGE_CODE)
         if request.session.get(LANGUAGE_SESSION_KEY, None) != language:
-            request.session[LANGUAGE_SESSION_KEY] = six.text_type(language)
+            request.session[LANGUAGE_SESSION_KEY] = str(language)
         response.set_cookie(
             settings.LANGUAGE_COOKIE,
             language,

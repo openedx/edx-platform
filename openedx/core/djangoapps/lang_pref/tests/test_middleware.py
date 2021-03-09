@@ -4,10 +4,9 @@ Tests for lang_pref middleware.
 
 
 import itertools
+from unittest import mock
 
 import ddt
-import mock
-import six
 from django.conf import settings
 from django.contrib.sessions.middleware import SessionMiddleware
 from django.http import HttpResponse
@@ -33,7 +32,7 @@ class TestUserPreferenceMiddleware(CacheIsolationTestCase):
     """
 
     def setUp(self):
-        super(TestUserPreferenceMiddleware, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.middleware = LanguagePreferenceMiddleware()
         self.session_middleware = SessionMiddleware()
         self.user = UserFactory.create()
@@ -151,7 +150,7 @@ class TestUserPreferenceMiddleware(CacheIsolationTestCase):
             accept_lang_out = parse_accept_lang_header(accept_lang_out)
 
         if accept_lang_out and accept_lang_result:
-            six.assertCountEqual(self, accept_lang_result, accept_lang_out)
+            self.assertCountEqual(accept_lang_result, accept_lang_out)
         else:
             assert accept_lang_result == accept_lang_out
 

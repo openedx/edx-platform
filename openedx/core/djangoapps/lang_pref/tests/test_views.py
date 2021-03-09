@@ -19,7 +19,7 @@ class TestLangPrefView(TestCase):
     """
 
     def setUp(self):
-        super(TestLangPrefView, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.session_middleware = SessionMiddleware()
         self.user = UserFactory.create()
         self.request = RequestFactory().get('/somewhere')
