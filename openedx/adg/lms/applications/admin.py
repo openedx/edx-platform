@@ -196,7 +196,7 @@ class BusinessLineAdmin(admin.ModelAdmin):
     Django admin class for BusinessLine
     """
 
-    fields = ('title', 'logo', 'description',)
+    fields = ('title', 'logo', 'description', 'site_url',)
     list_display = ('id', 'title', 'logo', 'description',)
     list_filter = ('title',)
     search_fields = ('title',)
