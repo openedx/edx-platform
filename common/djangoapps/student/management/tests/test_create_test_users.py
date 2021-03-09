@@ -26,7 +26,7 @@ class CreateTestUsersTestCase(SharedModuleStoreTestCase):
     def setUp(self):
         super().setUp()
         self.course = CourseFactory.create()
-        self.course_id = text_type(self.course.id)
+        self.course_id = str(self.course.id)
         self.user_model = get_user_model()
         self.num_users_start = len(self.user_model.objects.all())
 
@@ -62,7 +62,7 @@ class CreateTestUsersTestCase(SharedModuleStoreTestCase):
         assert len(users) == len(usernames)
         for user in users:
             assert user.is_active
-            assert user.email == '{}@example.com'.format(user.username)
+            assert user.email == f'{user.username}@example.com'
             assert self.client.login(username=user.username, password='12345')
 
         assert not CourseEnrollment.objects.filter(user__in=users).exists()
@@ -134,7 +134,7 @@ class CreateTestUsersTestCase(SharedModuleStoreTestCase):
         self.call_command([username], domain=domain)
 
         user = self.user_model.objects.get(username=username)
-        assert user.email == '{}@{}'.format(username, domain)
+        assert user.email == f'{username}@{domain}'
 
     def test_create_user__email_taken(self):
         """
