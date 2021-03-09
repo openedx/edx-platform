@@ -8,10 +8,10 @@ Accepted
 Background
 ----------
 Users can earn a course certificate in a particular course run (the certificate
-is stored in the GeneratedCertificate model). If a user has not earned a certificate
+is stored in the *GeneratedCertificate* model). If a user has not earned a certificate
 but the course staff would like them to have a certificate anyway, the user can
 be added to the certificate allowlist for the course run. The allowlist is currently
-stored in the CertificateWhitelist model, and was previously referred to as the
+stored in the *CertificateWhitelist* model, and was previously referred to as the
 certificate whitelist.
 
 Requirements
