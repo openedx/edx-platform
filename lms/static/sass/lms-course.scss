@@ -25,5 +25,14 @@
     }
 }
 
-// Extra theme-specific rules for mfe iframe
-@import 'lms/theme/extras-mfe';
+.xmodule_display.xmodule_ProblemBlock div.problem {
+  .choicegroup {
+    label {
+      padding-left: $baseline*2.3;
+    }
+
+    input[type="radio"], input[type="checkbox"] {
+      top: 0.35em;
+    }
+  }
+}
