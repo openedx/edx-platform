@@ -213,7 +213,7 @@ class Command(BaseCommand):
                 user = users.get(pk=verification.user_id)
                 with emulate_http_request(site=site, user=user):
                     msg = expiry_email.personalize(
-                        recipient=Recipient(user.username, user.email),
+                        recipient=Recipient(user.id, user.email),
                         language=get_user_preference(user, LANGUAGE_KEY),
                         user_context={
                             'full_name': user.profile.name,

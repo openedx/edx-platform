@@ -71,7 +71,7 @@ def send_ace_message(context):  # lint-amnesty, pylint: disable=missing-function
         with emulate_http_request(site=context['site'], user=thread_author):
             message_context = _build_message_context(context)
             message = ResponseNotification().personalize(
-                Recipient(thread_author.username, thread_author.email),
+                Recipient(thread_author.id, thread_author.email),
                 _get_course_language(context['course_id']),
                 message_context
             )

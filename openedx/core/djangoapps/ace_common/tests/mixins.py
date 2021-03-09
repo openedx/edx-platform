@@ -82,7 +82,7 @@ class EmailTemplateTagMixin(object):
         self.message = Message(
             app_label='test_app_label',
             name='test_name',
-            recipient=Recipient(username='test_user'),
+            recipient=Recipient(lms_user_id=123),
             context={},
             send_uuid=uuid.uuid4(),
         )

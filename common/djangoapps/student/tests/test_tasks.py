@@ -37,7 +37,7 @@ class SendActivationEmailTestCase(TestCase):
         assert 'platform_name' in self.msg.context
         assert 'contact_mailing_address' in self.msg.context
         # Verify the presence of the activation-email specific attributes
-        assert self.msg.recipient.username == self.student.username
+        assert self.msg.recipient.lms_user_id == self.student.id
         assert self.msg.recipient.email_address == self.student.email
         assert self.msg.context['routed_user'] == self.student.username
         assert self.msg.context['routed_user_email'] == self.student.email

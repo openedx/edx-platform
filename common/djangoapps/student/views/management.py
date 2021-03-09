@@ -191,7 +191,7 @@ def compose_activation_email(root_url, user, user_registration=None, route_enabl
         dest_addr = user.email
 
     msg = AccountActivation().personalize(
-        recipient=Recipient(user.username, dest_addr),
+        recipient=Recipient(user.id, dest_addr),
         language=preferences_api.get_user_preference(user, LANGUAGE_KEY),
         user_context=message_context,
     )
@@ -676,13 +676,13 @@ def do_email_change_request(user, new_email, activation_key=None, secondary_emai
 
     if secondary_email_change_request:
         msg = RecoveryEmailCreate().personalize(
-            recipient=Recipient(user.username, new_email),
+            recipient=Recipient(user.id, new_email),
             language=preferences_api.get_user_preference(user, LANGUAGE_KEY),
             user_context=message_context,
         )
     else:
         msg = EmailChange().personalize(
-            recipient=Recipient(user.username, new_email),
+            recipient=Recipient(user.id, new_email),
             language=preferences_api.get_user_preference(user, LANGUAGE_KEY),
             user_context=message_context,
         )
@@ -782,7 +782,7 @@ def confirm_email_change(request, key):
         })
 
         msg = EmailChangeConfirmation().personalize(
-            recipient=Recipient(user.username, user.email),
+            recipient=Recipient(user.id, user.email),
             language=preferences_api.get_user_preference(user, LANGUAGE_KEY),
             user_context=message_context,
         )
@@ -807,7 +807,7 @@ def confirm_email_change(request, key):
         user.save()
         pec.delete()
         # And send it to the new email...
-        msg.recipient = Recipient(user.username, pec.new_email)
+        msg.recipient = Recipient(user.id, pec.new_email)
         try:
             ace.send(msg)
         except Exception:  # pylint: disable=broad-except
