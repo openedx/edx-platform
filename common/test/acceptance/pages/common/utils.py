@@ -1,10 +1,6 @@
 """
 Utility methods common to Studio and the LMS.
 """
-
-
-import six
-
 from common.test.acceptance.tests.helpers import disable_animations
 
 
@@ -21,7 +17,7 @@ def click_css(page, css, source_index=0):
         """Is the given element visible?"""
         # Only make the call to size once (instead of once for the height and once for the width)
         # because otherwise you will trigger a extra query on a remote element.
-        return element.is_displayed() and all(size > 0 for size in six.itervalues(element.size))
+        return element.is_displayed() and all(size > 0 for size in element.size.values())
 
     # Disable all animations for faster testing with more reliable synchronization
     disable_animations(page)

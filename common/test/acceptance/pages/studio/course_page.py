@@ -6,7 +6,6 @@ Base class for pages specific to a course in Studio.
 import os
 from abc import abstractmethod
 
-import six
 from bok_choy.page_object import PageObject
 from opaque_keys.edx.locator import CourseLocator
 
@@ -39,7 +38,7 @@ class CoursePage(PageObject, HelpMixin):
 
         These identifiers will likely change in the future.
         """
-        super(CoursePage, self).__init__(browser)  # lint-amnesty, pylint: disable=super-with-arguments
+        super().__init__(browser)
         self.course_info = {
             'course_org': course_org,
             'course_num': course_num,
@@ -59,4 +58,4 @@ class CoursePage(PageObject, HelpMixin):
             self.course_info['course_run'],
             deprecated=(default_store == 'draft')
         )
-        return "/".join([BASE_URL, self.url_path, six.text_type(course_key)])
+        return "/".join([BASE_URL, self.url_path, str(course_key)])
