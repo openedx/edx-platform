@@ -329,3 +329,24 @@ def test_get_enrolled_prerequisites_for_user(user_with_profile, courses):
     MultilingualCourseFactory(course=courses['test_course1'])
     CourseEnrollmentFactory(course=courses['test_course1'], user=user_with_profile, is_active=True)
     assert len(MultilingualCourseGroup.objects.get_courses(user_with_profile, is_prereq=True)) == 1
+
+
+@pytest.mark.django_db
+def test_get_course_group_languages(courses, course_group):
+    """
+    Tests if the queryset MultilingualCourseQuerySet method `language()` gets all languages of all the courses
+    in a multilingual course group correctly or not
+    """
+    course1 = courses['test_course1']
+    course2 = courses['test_course2']
+
+    MultilingualCourseFactory(course=course1, multilingual_course_group=course_group)
+    assert course_group.multilingual_courses.open_multilingual_courses().language(
+        course1.language) == ['English']
+
+    MultilingualCourseFactory(course=course2, multilingual_course_group=course_group)
+    assert course_group.multilingual_courses.open_multilingual_courses().language(
+        course1.language) == ['English', 'Arabic']
+
+    assert course_group.multilingual_courses.open_multilingual_courses().language(
+        course2.language) == ['Arabic', 'English']
