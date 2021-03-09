@@ -5,8 +5,8 @@ from datetime import datetime
 
 import pytest
 
-from openedx.core.djangoapps.content.course_overviews.tests.factories import CourseOverviewFactory
 from common.djangoapps.student.tests.factories import UserFactory, UserProfileFactory
+from openedx.core.djangoapps.content.course_overviews.tests.factories import CourseOverviewFactory
 
 
 @pytest.fixture(name='current_time')
