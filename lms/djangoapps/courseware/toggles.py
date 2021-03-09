@@ -205,6 +205,6 @@ def courseware_mfe_progress_milestones_are_active(course_key):
 
 def streak_celebration_is_active(course_key):
     return (
-        courseware_mfe_is_active(course_key) and
+        courseware_mfe_progress_milestones_are_active(course_key) and
         COURSEWARE_MICROFRONTEND_PROGRESS_MILESTONES_STREAK_CELEBRATION.is_enabled(course_key)
     )
