@@ -7,13 +7,12 @@ from hashlib import md5
 from unittest import TestCase
 import pytest
 import ddt
-import six
-from six.moves import range
 from django.core.exceptions import ImproperlyConfigured
 from django.test import RequestFactory
 from django.test.utils import override_settings
 from django.urls import reverse
 from edx_django_utils.cache import RequestCache
+from opaque_keys.edx.locator import LibraryLocator
 from search.tests.test_course_discovery import DemoCourse
 from search.tests.tests import TEST_INDEX_NAME
 from search.tests.utils import SearcherMixin
@@ -21,13 +20,12 @@ from waffle.testutils import override_switch
 
 from common.djangoapps.course_modes.models import CourseMode
 from common.djangoapps.course_modes.tests.factories import CourseModeFactory
-from opaque_keys.edx.locator import LibraryLocator  # lint-amnesty, pylint: disable=wrong-import-order
-from openedx.core.lib.api.view_utils import LazySequence
-from openedx.features.content_type_gating.models import ContentTypeGatingConfig
-from openedx.features.course_duration_limits.models import CourseDurationLimitConfig
 from common.djangoapps.student.auth import add_users
 from common.djangoapps.student.roles import CourseInstructorRole, CourseStaffRole
 from common.djangoapps.student.tests.factories import AdminFactory
+from openedx.core.lib.api.view_utils import LazySequence
+from openedx.features.content_type_gating.models import ContentTypeGatingConfig
+from openedx.features.course_duration_limits.models import CourseDurationLimitConfig
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
@@ -78,7 +76,7 @@ class CourseListViewTestCase(CourseApiTestViewMixin, SharedModuleStoreTestCase):
 
     @classmethod
     def setUpClass(cls):
-        super(CourseListViewTestCase, cls).setUpClass()
+        super().setUpClass()
         cls.course = cls.create_course()
         cls.url = reverse('course-list')
         cls.staff_user = cls.create_user(username='staff', is_staff=True)
@@ -159,7 +157,7 @@ class CourseListViewTestCaseMultipleCourses(CourseApiTestViewMixin, ModuleStoreT
     ENABLED_SIGNALS = ['course_published']
 
     def setUp(self):
-        super(CourseListViewTestCaseMultipleCourses, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.course = self.create_course(mobile_available=False)
         self.url = reverse('course-list')
         self.staff_user = self.create_user(username='staff', is_staff=True)
@@ -201,7 +199,7 @@ class CourseListViewTestCaseMultipleCourses(CourseApiTestViewMixin, ModuleStoreT
             if filter_:
                 params.update(filter_)
             response = self.verify_response(params=params)
-            assert {course['course_id'] for course in response.data['results']} == {six.text_type(course.id) for course in expected_courses}, f'testing course_api.views.CourseListView with filter_={filter_}'  # pylint: disable=line-too-long
+            assert {course['course_id'] for course in response.data['results']} == {str(course.id) for course in expected_courses}, f'testing course_api.views.CourseListView with filter_={filter_}'  # pylint: disable=line-too-long
 
 
 class CourseDetailViewTestCase(CourseApiTestViewMixin, SharedModuleStoreTestCase):
@@ -211,9 +209,9 @@ class CourseDetailViewTestCase(CourseApiTestViewMixin, SharedModuleStoreTestCase
 
     @classmethod
     def setUpClass(cls):
-        super(CourseDetailViewTestCase, cls).setUpClass()
+        super().setUpClass()
         cls.course = cls.create_course()
-        cls.hidden_course = cls.create_course(course=u'hidden', visible_to_staff_only=True)
+        cls.hidden_course = cls.create_course(course='hidden', visible_to_staff_only=True)
         cls.url = reverse('course-detail', kwargs={'course_key_string': cls.course.id})
         cls.hidden_url = reverse('course-detail', kwargs={'course_key_string': cls.hidden_course.id})
         cls.nonexistent_url = reverse('course-detail', kwargs={'course_key_string': 'edX/nope/Fall_2014'})
@@ -289,7 +287,7 @@ class CourseListSearchViewTest(CourseApiTestViewMixin, ModuleStoreTestCase, Sear
     ENABLED_CACHES = ModuleStoreTestCase.ENABLED_CACHES + ['configuration']
 
     def setUp(self):
-        super(CourseListSearchViewTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         DemoCourse.reset_count()
         self.searcher.destroy()
 
@@ -316,7 +314,7 @@ class CourseListSearchViewTest(CourseApiTestViewMixin, ModuleStoreTestCase, Sear
             'run': '2010',
             'number': 'DemoZ',
             # Using the slash separated course ID bcuz `DemoCourse` isn't updated yet to new locator.
-            'id': '{org_code}/DemoZ/2010'.format(org_code=org_code),
+            'id': f'{org_code}/DemoZ/2010',
             'content': {
                 'short_description': short_description,
             },
@@ -377,10 +375,10 @@ class CourseListSearchViewTest(CourseApiTestViewMixin, ModuleStoreTestCase, Sear
 
         # Create 300 courses across 30 organizations
         for org_num in range(10):
-            org_id = 'org{}'.format(org_num)
+            org_id = f'org{org_num}'
             for course_num in range(30):
-                course_name = 'course{}.{}'.format(org_num, course_num)
-                course_run_name = 'run{}.{}'.format(org_num, course_num)
+                course_name = f'course{org_num}.{course_num}'
+                course_run_name = f'run{org_num}.{course_num}'
                 course = CourseFactory.create(org=org_id, number=course_name, run=course_run_name, emit_signals=True)
                 CourseModeFactory.create(course_id=course.id, mode_slug=CourseMode.AUDIT)
                 CourseModeFactory.create(course_id=course.id, mode_slug=CourseMode.VERIFIED)
@@ -412,7 +410,7 @@ class CourseIdListViewTestCase(CourseApiTestViewMixin, ModuleStoreTestCase):
     ENABLED_SIGNALS = ['course_published']
 
     def setUp(self):
-        super(CourseIdListViewTestCase, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.course = self.create_course()
         self.url = reverse('course-id-list')
         self.staff_user = self.create_user(username='staff', is_staff=True)
@@ -528,7 +526,7 @@ class CourseIdListViewTestCase(CourseApiTestViewMixin, ModuleStoreTestCase):
 class LazyPageNumberPaginationTestCase(TestCase):  # lint-amnesty, pylint: disable=missing-class-docstring
 
     def test_lazy_page_number_pagination(self):
-        number_sequence = range(20)
+        number_sequence = range(20)  # lint-amnesty, pylint: disable=range-builtin-not-iterating
         even_numbers_lazy_sequence = LazySequence(
             (
                 number for number in number_sequence
@@ -557,7 +555,7 @@ class LazyPageNumberPaginationTestCase(TestCase):  # lint-amnesty, pylint: disab
         self.assertDictEqual(expected_response, paginated_response.data)
 
     def test_not_found_error_for_invalid_page(self):
-        number_sequence = range(20)
+        number_sequence = range(20)  # lint-amnesty, pylint: disable=range-builtin-not-iterating
         even_numbers_lazy_sequence = LazySequence(
             (
                 number for number in number_sequence

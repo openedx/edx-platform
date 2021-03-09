@@ -7,10 +7,10 @@ from datetime import datetime
 from unittest import TestCase
 
 import ddt
+from opaque_keys.edx.locator import CourseLocator
 from rest_framework.request import Request
 from rest_framework.test import APIRequestFactory
 from xblock.core import XBlock
-from opaque_keys.edx.locator import CourseLocator
 
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.models.course_details import CourseDetails
@@ -34,22 +34,22 @@ class TestCourseSerializer(CourseApiFactoryMixin, ModuleStoreTestCase):
     ENABLED_SIGNALS = ['course_published']
 
     def setUp(self):
-        super(TestCourseSerializer, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.staff_user = self.create_user('staff', is_staff=True)
         self.honor_user = self.create_user('honor', is_staff=False)
         self.request_factory = APIRequestFactory()
 
-        course_id = u'edX/toy/2012_Fall'
-        banner_image_uri = u'/c4x/edX/toy/asset/images_course_image.jpg'
-        banner_image_absolute_uri = u'http://testserver' + banner_image_uri
-        image_path = u'/c4x/edX/toy/asset/just_a_test.jpg'
-        image_url = u'http://testserver' + image_path
+        course_id = 'edX/toy/2012_Fall'
+        banner_image_uri = '/c4x/edX/toy/asset/images_course_image.jpg'
+        banner_image_absolute_uri = 'http://testserver' + banner_image_uri
+        image_path = '/c4x/edX/toy/asset/just_a_test.jpg'
+        image_url = 'http://testserver' + image_path
         self.expected_data = {
             'id': course_id,
-            'name': u'Toy Course',
-            'number': u'toy',
-            'org': u'edX',
-            'short_description': u'A course about toys.',
+            'name': 'Toy Course',
+            'number': 'toy',
+            'org': 'edX',
+            'short_description': 'A course about toys.',
             'media': {
                 'banner_image': {
                     'uri': banner_image_uri,
@@ -59,7 +59,7 @@ class TestCourseSerializer(CourseApiFactoryMixin, ModuleStoreTestCase):
                     'uri': image_path,
                 },
                 'course_video': {
-                    'uri': u'http://www.youtube.com/watch?v=test_youtube_id',
+                    'uri': 'http://www.youtube.com/watch?v=test_youtube_id',
                 },
                 'image': {
                     'raw': image_url,
@@ -67,14 +67,14 @@ class TestCourseSerializer(CourseApiFactoryMixin, ModuleStoreTestCase):
                     'large': image_url,
                 }
             },
-            'start': u'2015-07-17T12:00:00Z',
-            'start_type': u'timestamp',
-            'start_display': u'July 17, 2015',
-            'end': u'2015-09-19T18:00:00Z',
-            'enrollment_start': u'2015-06-15T00:00:00Z',
-            'enrollment_end': u'2015-07-15T00:00:00Z',
-            'blocks_url': u'http://testserver/api/courses/v2/blocks/?course_id=edX%2Ftoy%2F2012_Fall',
-            'effort': u'6 hours',
+            'start': '2015-07-17T12:00:00Z',
+            'start_type': 'timestamp',
+            'start_display': 'July 17, 2015',
+            'end': '2015-09-19T18:00:00Z',
+            'enrollment_start': '2015-06-15T00:00:00Z',
+            'enrollment_end': '2015-07-15T00:00:00Z',
+            'blocks_url': 'http://testserver/api/courses/v2/blocks/?course_id=edX%2Ftoy%2F2012_Fall',
+            'effort': '6 hours',
             'pacing': 'instructor',
             'mobile_available': True,
             'hidden': False,
@@ -110,29 +110,29 @@ class TestCourseSerializer(CourseApiFactoryMixin, ModuleStoreTestCase):
 
     def test_hidden(self):
         course = self.create_course(
-            course=u'custom',
+            course='custom',
             start=datetime(2015, 3, 15),
-            catalog_visibility=u'none'
+            catalog_visibility='none'
         )
         result = self._get_result(course)
         assert result['hidden'] is True
 
     def test_advertised_start(self):
         course = self.create_course(
-            course=u'custom',
+            course='custom',
             start=datetime(2015, 3, 15),
-            advertised_start=u'The Ides of March'
+            advertised_start='The Ides of March'
         )
         result = self._get_result(course)
-        assert result['course_id'] == u'edX/custom/2012_Fall'
-        assert result['start_type'] == u'string'
-        assert result['start_display'] == u'The Ides of March'
+        assert result['course_id'] == 'edX/custom/2012_Fall'
+        assert result['start_type'] == 'string'
+        assert result['start_display'] == 'The Ides of March'
 
     def test_empty_start(self):
-        course = self.create_course(start=DEFAULT_START_DATE, course=u'custom')
+        course = self.create_course(start=DEFAULT_START_DATE, course='custom')
         result = self._get_result(course)
-        assert result['course_id'] == u'edX/custom/2012_Fall'
-        assert result['start_type'] == u'empty'
+        assert result['course_id'] == 'edX/custom/2012_Fall'
+        assert result['start_type'] == 'empty'
         assert result['start_display'] is None
 
     @ddt.unpack
@@ -158,7 +158,7 @@ class TestCourseDetailSerializer(TestCourseSerializer):  # lint-amnesty, pylint:
     serializer_class = CourseDetailSerializer
 
     def setUp(self):
-        super(TestCourseDetailSerializer, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
 
         # update the expected_data to include the 'overview' data.
         about_descriptor = XBlock.load_class('about')
