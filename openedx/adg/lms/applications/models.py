@@ -15,13 +15,8 @@ from openedx.core.djangoapps.content.course_overviews.models import CourseOvervi
 from openedx.core.lib.grade_utils import round_away_from_zero
 
 from .constants import ALLOWED_LOGO_EXTENSIONS, CourseScore
-from .helpers import (
-    get_prerequisite_courses_for_user,
-    max_year_value_validator,
-    min_year_value_validator,
-    validate_logo_size
-)
-from .managers import OpenMultilingualCourseManager, PrerequisiteCourseGroupManager, SubmittedApplicationsManager
+from .helpers import max_year_value_validator, min_year_value_validator, validate_logo_size
+from .managers import MultilingualCourseGroupManager, MultilingualCourseManager, SubmittedApplicationsManager
 
 
 class ApplicationHub(TimeStampedModel):
@@ -199,7 +194,7 @@ class UserApplication(TimeStampedModel):
         Returns:
             list: Prereq course name and score pairs
         """
-        prereq_course_overviews = get_prerequisite_courses_for_user(self.user)
+        prereq_course_overviews = MultilingualCourseGroup.objects.get_courses(self.user, is_prereq=True)
         scores_in_prereq_courses = []
 
         for course_overview in prereq_course_overviews:
@@ -313,57 +308,33 @@ class MultilingualCourseGroup(models.Model):
     Model for multilingual course groups
     """
 
-    objects = models.Manager()
-    prerequisite_course_groups = PrerequisiteCourseGroupManager()
-    name = models.CharField(verbose_name=_('Course group name'), max_length=255, )
-    is_prerequisite = models.BooleanField(default=False, verbose_name=_('Is Prerequisite Course Group'), )
+    name = models.CharField(verbose_name=_('Course group name'), max_length=255,)
+    is_prerequisite = models.BooleanField(default=False, verbose_name=_('Is Prerequisite Course Group'),)
+
+    objects = MultilingualCourseGroupManager()
 
     class Meta:
         app_label = 'applications'
+
+    def __str__(self):
+        return self.name
 
     def multilingual_course_count(self):
         return self.multilingual_courses.count()
 
     # pylint: disable=no-member
     def open_multilingual_courses_count(self):
-        return self.multilingual_courses(manager='open_multilingual_courses').count()
+        return self.multilingual_courses.open_multilingual_courses().count()
 
     def open_multilingual_course_keys(self):
-        return self.multilingual_courses(manager='open_multilingual_courses').values_list('course', flat=True)
-
-    def get_user_enrolled_course(self, user):
-        """
-        Finds user enrolled course of current course group.
-
-        Args:
-            user (User): user for which enrolled course needs to be returned
-
-        Returns:
-            CourseOverview: Enrolled multilingual course or None
-        """
-        enrolled_multilingual_course = self.multilingual_courses(
-            manager='open_multilingual_courses'
-        ).filter(
-            course__courseenrollment__user=user,
-            course__courseenrollment__is_active=True
-        ).first()
-        return enrolled_multilingual_course.course if enrolled_multilingual_course else None
+        return self.multilingual_courses.open_multilingual_courses().values_list('course', flat=True)
     # pylint: enable=no-member
-
-    def does_course_exist(self, multilingual_course):
-        return self.multilingual_courses.filter(course=multilingual_course.course).exists()
-
-    def __str__(self):
-        return self.name
 
 
 class MultilingualCourse(models.Model):
     """
     Model for multilingual courses
     """
-
-    objects = models.Manager()
-    open_multilingual_courses = OpenMultilingualCourseManager()
 
     course = models.OneToOneField(
         CourseOverview,
@@ -377,6 +348,8 @@ class MultilingualCourse(models.Model):
         on_delete=models.CASCADE,
         related_name='multilingual_courses',
     )
+
+    objects = MultilingualCourseManager()
 
     class Meta:
         app_label = 'applications'

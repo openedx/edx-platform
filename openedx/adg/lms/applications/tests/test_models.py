@@ -1,25 +1,19 @@
 """
 Tests for all the models in applications app.
 """
-from datetime import date, datetime, timedelta
+from datetime import date
 
 import mock
 import pytest
 
-from common.djangoapps.student.tests.factories import UserFactory
+from common.djangoapps.student.tests.factories import AnonymousUserFactory, CourseEnrollmentFactory, UserFactory
 from lms.djangoapps.grades.api import CourseGradeFactory
 from openedx.adg.lms.applications.constants import CourseScore
-from openedx.adg.lms.applications.models import UserApplication
-from openedx.core.djangoapps.content.course_overviews.tests.factories import CourseOverviewFactory
+from openedx.adg.lms.applications.models import MultilingualCourseGroup, UserApplication
 from openedx.core.lib.grade_utils import round_away_from_zero
 
 from .constants import USERNAME
-from .factories import (
-    ApplicationHubFactory,
-    MultilingualCourseFactory,
-    MultilingualCourseGroupFactory,
-    UserApplicationFactory
-)
+from .factories import ApplicationHubFactory, MultilingualCourseFactory, UserApplicationFactory
 
 
 @pytest.mark.django_db
@@ -120,13 +114,15 @@ def test_user_application_string_representation(user_application):
 @pytest.mark.parametrize('percent', [0.9250, 0.7649])
 @pytest.mark.django_db
 @mock.patch('openedx.adg.lms.applications.models.CourseGradeFactory.read')
-def test_prereq_course_scores(mock_read, user_application, percent):
+def test_prereq_course_scores(mock_read, user_application, percent, courses):
     """
     Test that the `prereq_course_scores` property returns the correct prerequisite course names and respective scores of
     the applicant in those courses, in the correct format.
     """
-    test_course_1 = MultilingualCourseFactory().course
-    test_course_2 = MultilingualCourseFactory().course
+    test_course_1 = courses['test_course1']
+    test_course_2 = courses['test_course2']
+    MultilingualCourseFactory(course=test_course_1)
+    MultilingualCourseFactory(course=test_course_2)
 
     course_grade = CourseGradeFactory()
     course_grade.percent = percent
@@ -138,11 +134,7 @@ def test_prereq_course_scores(mock_read, user_application, percent):
     course_score_2 = CourseScore(test_course_2.display_name, score)
 
     expected_prereq_course_scores = [course_score_1, course_score_2]
-    with mock.patch(
-        'openedx.adg.lms.applications.models.get_prerequisite_courses_for_user'
-    ) as mock_get_prerequisite_courses_for_user:
-        mock_get_prerequisite_courses_for_user.return_value = [test_course_1, test_course_2]
-        actual_prereq_course_scores = user_application.prereq_course_scores
+    actual_prereq_course_scores = user_application.prereq_course_scores
 
     assert expected_prereq_course_scores == actual_prereq_course_scores
 
@@ -210,48 +202,130 @@ def test_multilingual_course_count():
 
 
 @pytest.mark.django_db
-def test_open_multilingual_courses_count():
+def test_open_multilingual_courses_count(courses):
     """
     Test open multilingual course count for a course group
     """
-    current_time = datetime.now()
-    course = CourseOverviewFactory(
-        start_date=current_time - timedelta(days=1),
-        end_date=current_time + timedelta(days=1)
-    )
-    course_group = MultilingualCourseFactory(course=course).multilingual_course_group
+    course_group = MultilingualCourseFactory(course=courses['test_course1']).multilingual_course_group
     assert course_group.open_multilingual_courses_count() == 1
 
 
 @pytest.mark.django_db
-def test_open_multilingual_course_keys():
+def test_open_multilingual_course_keys(courses):
     """
     Test course keys of a course group
     """
-    current_time = datetime.now()
-    course = CourseOverviewFactory(
-        start_date=current_time - timedelta(days=1),
-        end_date=current_time + timedelta(days=1)
-    )
-    course_group = MultilingualCourseFactory(course=course).multilingual_course_group
+    course_group = MultilingualCourseFactory(course=courses['test_course1']).multilingual_course_group
     assert len(course_group.open_multilingual_course_keys()) == 1
 
 
 @pytest.mark.django_db
-def test_does_course_exist_in_course_group():
+def test_get_preferred_lang_course(courses):
     """
-    Tests course exists in multilingual group.
+    Tests get_preferred_language_course course is active.
     """
-    multilingual_course = MultilingualCourseFactory()
-    course_group = multilingual_course.multilingual_course_group
-    assert course_group.does_course_exist(multilingual_course)
+    course = courses['test_course1']
+    course_group = MultilingualCourseFactory(course=course).multilingual_course_group
+    preferred_course = course_group.multilingual_courses.open_multilingual_courses().preferred_lang_course().course
+    assert preferred_course.id == course.id
 
 
 @pytest.mark.django_db
-def test_course_does_not_exist_in_course_group():
+def test_get_preferred_lang_course_expired_courses(expired_course):
     """
-    Tests course does not exist in multilingual group.
+    Tests get_preferred_language_course course is expired.
     """
-    multilingual_course = MultilingualCourseFactory()
-    course_group = MultilingualCourseGroupFactory()
-    assert not course_group.does_course_exist(multilingual_course)
+    course_group = MultilingualCourseFactory(course=expired_course).multilingual_course_group
+    assert course_group.multilingual_courses.open_multilingual_courses().preferred_lang_course() is None
+
+
+@pytest.mark.django_db
+def test_get_catalog_courses_valid_user(courses, course_group, user_with_profile):
+    """
+    Tests multiple courses in a single group for a valid user
+    """
+    MultilingualCourseFactory(
+        course=courses['test_course1'],
+        multilingual_course_group=course_group
+    )
+    MultilingualCourseFactory(
+        course=courses['test_course2'],
+        multilingual_course_group=course_group
+    )
+    assert len(MultilingualCourseGroup.objects.get_courses(user_with_profile)) == 1
+
+
+@pytest.mark.django_db
+def test_get_catalog_courses_enrolled_user(courses, course_group, user_with_profile):
+    """
+    Tests multiple courses in a single group and user enrolled in one of the courses
+    """
+    enrolled_course = courses['test_course2']
+    MultilingualCourseFactory(
+        course=courses['test_course1'],
+        multilingual_course_group=course_group
+    )
+    MultilingualCourseFactory(
+        course=enrolled_course,
+        multilingual_course_group=course_group
+    )
+    CourseEnrollmentFactory(user=user_with_profile, course=enrolled_course)
+    courses_list = MultilingualCourseGroup.objects.get_courses(user_with_profile)
+    assert len(courses_list) == 1
+    assert courses_list[0].id == enrolled_course.id
+
+
+@pytest.mark.django_db
+def test_get_catalog_courses_anonymous_user(courses, course_group):
+    """
+    Tests multiple courses in a single group for anonymous user
+    """
+    user = AnonymousUserFactory()
+    MultilingualCourseFactory(
+        course=courses['test_course1'],
+        multilingual_course_group=course_group
+    )
+    MultilingualCourseFactory(
+        course=courses['test_course2'],
+        multilingual_course_group=course_group
+    )
+    assert len(MultilingualCourseGroup.objects.get_courses(user)) == 1
+
+
+@pytest.mark.django_db
+def test_get_catalog_courses_expired_course(expired_course, course_group, user_with_profile):
+    """
+    Tests expired course in a group for a valid user
+    """
+    MultilingualCourseFactory(
+        course=expired_course,
+        multilingual_course_group=course_group
+    )
+    assert len(MultilingualCourseGroup.objects.get_courses(user_with_profile)) == 0
+
+
+@pytest.mark.django_db
+def test_get_prerequisites_for_user(courses, user_with_profile):
+    """
+    Tests prerequisites for user
+    """
+    MultilingualCourseFactory(course=courses['test_course1'])
+    assert len(MultilingualCourseGroup.objects.get_courses(user_with_profile, is_prereq=True)) == 1
+
+
+@pytest.mark.django_db
+def test_no_prerequisite_courses(user_with_profile):
+    """
+    Tests no prerequisites courses for user
+    """
+    assert len(MultilingualCourseGroup.objects.get_courses(user_with_profile, is_prereq=True)) == 0
+
+
+@pytest.mark.django_db
+def test_get_enrolled_prerequisites_for_user(user_with_profile, courses):
+    """
+    Tests enrolled prerequisites for user
+    """
+    MultilingualCourseFactory(course=courses['test_course1'])
+    CourseEnrollmentFactory(course=courses['test_course1'], user=user_with_profile, is_active=True)
+    assert len(MultilingualCourseGroup.objects.get_courses(user_with_profile, is_prereq=True)) == 1

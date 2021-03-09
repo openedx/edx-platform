@@ -1,7 +1,6 @@
 """
 Unit test for student helpers
 """
-
 import pytest
 from django.conf import settings
 from django.test.client import RequestFactory
@@ -32,16 +31,6 @@ def task_send_mandrill_email(request, mocker):
     mock_task = mocker.patch.object(student_helpers, 'task_send_mandrill_email')
 
     return mock_task
-
-
-@pytest.fixture(name='user_with_profile')
-def user_with_user_profile(request):
-    """
-    Create user with profile, this fixture will be passed as a parameter to all pytests
-    """
-    user = UserFactory()
-    UserProfileFactory(user=user)
-    return user
 
 
 @pytest.mark.django_db

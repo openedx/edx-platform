@@ -65,7 +65,6 @@ from lms.djangoapps.courseware.courses import (
     get_course_date_blocks,
     get_course_overview_with_access,
     get_course_with_access,
-    get_courses,
     get_current_child,
     get_permission_for_course_about,
     get_studio_url,
@@ -90,6 +89,7 @@ from lms.djangoapps.grades.api import CourseGradeFactory
 from lms.djangoapps.instructor.enrollment import uses_shib
 from lms.djangoapps.instructor.views.api import require_global_staff
 from lms.djangoapps.verify_student.services import IDVerificationService
+from openedx.adg.lms.courseware_override.helpers import get_courses
 from openedx.core.djangoapps.catalog.utils import get_programs, get_programs_with_type
 from openedx.core.djangoapps.certificates import api as auto_certs_api
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
