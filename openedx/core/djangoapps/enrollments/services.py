@@ -13,7 +13,7 @@ from common.djangoapps.student.models import CourseEnrollment
 from xmodule.modulestore.django import modulestore
 
 
-class EnrollmentsService(object):
+class EnrollmentsService:
     """
     Enrollments service
 

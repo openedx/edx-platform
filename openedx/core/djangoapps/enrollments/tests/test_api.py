@@ -4,12 +4,12 @@ Tests for student enrollment.
 
 
 import unittest
+from unittest.mock import Mock, patch
 
 import ddt
 import pytest
 from django.conf import settings
 from django.test.utils import override_settings
-from mock import Mock, patch
 
 from common.djangoapps.course_modes.models import CourseMode
 from openedx.core.djangoapps.enrollments import api
@@ -33,7 +33,7 @@ class EnrollmentTest(CacheIsolationTestCase):
     ENABLED_CACHES = ['default']
 
     def setUp(self):
-        super(EnrollmentTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         fake_data_api.reset()
 
     @ddt.data(

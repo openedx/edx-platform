@@ -1,4 +1,3 @@
-
 """
 Enrollments Application Configuration
 
@@ -15,7 +14,7 @@ class EnrollmentsConfig(AppConfig):
     """
     Application Configuration for Enrollments.
     """
-    name = u'openedx.core.djangoapps.enrollments'
+    name = 'openedx.core.djangoapps.enrollments'
 
     def ready(self):
         """

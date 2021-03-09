@@ -45,13 +45,13 @@ class CourseSerializer(serializers.Serializer):  # pylint: disable=abstract-meth
     invite_only = serializers.BooleanField(source="invitation_only")
     course_modes = serializers.SerializerMethodField()
 
-    class Meta(object):
+    class Meta:
         # For disambiguating within the drf-yasg swagger schema
         ref_name = 'enrollment.Course'
 
     def __init__(self, *args, **kwargs):
         self.include_expired = kwargs.pop("include_expired", False)
-        super(CourseSerializer, self).__init__(*args, **kwargs)  # lint-amnesty, pylint: disable=super-with-arguments
+        super().__init__(*args, **kwargs)
 
     def get_course_modes(self, obj):
         """
@@ -82,7 +82,7 @@ class CourseEnrollmentSerializer(serializers.ModelSerializer):
         """Retrieves the username from the associated model."""
         return model.username
 
-    class Meta(object):
+    class Meta:
         model = CourseEnrollment
         fields = ('created', 'mode', 'is_active', 'course_details', 'user')
         lookup_field = 'username'
@@ -96,7 +96,7 @@ class CourseEnrollmentsApiListSerializer(CourseEnrollmentSerializer):
     course_id = serializers.CharField(source='course_overview.id')
 
     def __init__(self, *args, **kwargs):
-        super(CourseEnrollmentsApiListSerializer, self).__init__(*args, **kwargs)  # lint-amnesty, pylint: disable=super-with-arguments
+        super().__init__(*args, **kwargs)
         self.fields.pop('course_details')
 
     class Meta(CourseEnrollmentSerializer.Meta):

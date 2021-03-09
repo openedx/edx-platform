@@ -9,7 +9,6 @@ import logging
 from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.db import transaction
 from opaque_keys.edx.keys import CourseKey
-from six import text_type
 
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.enrollments.errors import (
@@ -69,8 +68,8 @@ def get_course_enrollments(username, include_inactive=False):
     if deleted:
         log.warning(
             (
-                u"Course enrollments for user %s reference "
-                u"courses that do not exist (this can occur if a course is deleted)."
+                "Course enrollments for user %s reference "
+                "courses that do not exist (this can occur if a course is deleted)."
             ), username,
         )
 
@@ -142,7 +141,7 @@ def create_course_enrollment(username, course_id, mode, is_active):
     try:
         user = User.objects.get(username=username)
     except User.DoesNotExist:
-        msg = u"Not user with username '{username}' found.".format(username=username)
+        msg = f"Not user with username '{username}' found."
         log.warning(msg)
         raise UserNotFoundError(msg)  # lint-amnesty, pylint: disable=raise-missing-from
 
@@ -150,14 +149,14 @@ def create_course_enrollment(username, course_id, mode, is_active):
         enrollment = CourseEnrollment.enroll(user, course_key, check_access=True)
         return _update_enrollment(enrollment, is_active=is_active, mode=mode)
     except NonExistentCourseError as err:
-        raise CourseNotFoundError(text_type(err))  # lint-amnesty, pylint: disable=raise-missing-from
+        raise CourseNotFoundError(str(err))  # lint-amnesty, pylint: disable=raise-missing-from
     except EnrollmentClosedError as err:
-        raise CourseEnrollmentClosedError(text_type(err))  # lint-amnesty, pylint: disable=raise-missing-from
+        raise CourseEnrollmentClosedError(str(err))  # lint-amnesty, pylint: disable=raise-missing-from
     except CourseFullError as err:
-        raise CourseEnrollmentFullError(text_type(err))  # lint-amnesty, pylint: disable=raise-missing-from
+        raise CourseEnrollmentFullError(str(err))  # lint-amnesty, pylint: disable=raise-missing-from
     except AlreadyEnrolledError as err:
         enrollment = get_course_enrollment(username, course_id)
-        raise CourseEnrollmentExistsError(text_type(err), enrollment)  # lint-amnesty, pylint: disable=raise-missing-from
+        raise CourseEnrollmentExistsError(str(err), enrollment)  # lint-amnesty, pylint: disable=raise-missing-from
 
 
 def update_course_enrollment(username, course_id, mode=None, is_active=None):
@@ -180,7 +179,7 @@ def update_course_enrollment(username, course_id, mode=None, is_active=None):
     try:
         user = User.objects.get(username=username)
     except User.DoesNotExist:
-        msg = u"Not user with username '{username}' found.".format(username=username)
+        msg = f"Not user with username '{username}' found."
         log.warning(msg)
         raise UserNotFoundError(msg)  # lint-amnesty, pylint: disable=raise-missing-from
 
@@ -257,7 +256,7 @@ def unenroll_user_from_all_courses(username):
         for enrollment in enrollments:
             _update_enrollment(enrollment, is_active=False)
 
-    return set([str(enrollment.course_id.org) for enrollment in enrollments])  # lint-amnesty, pylint: disable=consider-using-set-comprehension
+    return {str(enrollment.course_id.org) for enrollment in enrollments}  # lint-amnesty, pylint: disable=consider-using-set-comprehension
 
 
 def _get_user(username):
@@ -271,7 +270,7 @@ def _get_user(username):
     try:
         return User.objects.get(username=username)
     except User.DoesNotExist:
-        msg = u"Not user with username '{username}' found.".format(username=username)
+        msg = f"Not user with username '{username}' found."
         log.warning(msg)
         raise UserNotFoundError(msg)  # lint-amnesty, pylint: disable=raise-missing-from
 
@@ -294,17 +293,17 @@ def _invalid_attribute(attributes):
     invalid_attributes = []
     for attribute in attributes:
         if "namespace" not in attribute:
-            msg = u"'namespace' not in enrollment attribute"
+            msg = "'namespace' not in enrollment attribute"
             log.warning(msg)
             invalid_attributes.append("namespace")
             raise InvalidEnrollmentAttribute(msg)
         if "name" not in attribute:
-            msg = u"'name' not in enrollment attribute"
+            msg = "'name' not in enrollment attribute"
             log.warning(msg)
             invalid_attributes.append("name")
             raise InvalidEnrollmentAttribute(msg)
         if "value" not in attribute:
-            msg = u"'value' not in enrollment attribute"
+            msg = "'value' not in enrollment attribute"
             log.warning(msg)
             invalid_attributes.append("value")
             raise InvalidEnrollmentAttribute(msg)
@@ -335,7 +334,7 @@ def get_course_enrollment_info(course_id, include_expired=False):
     try:
         course = CourseOverview.get_from_id(course_key)
     except CourseOverview.DoesNotExist:
-        msg = u"Requested enrollment information for unknown course {course}".format(course=course_id)
+        msg = f"Requested enrollment information for unknown course {course_id}"
         log.warning(msg)
         raise CourseNotFoundError(msg)  # lint-amnesty, pylint: disable=raise-missing-from
     else:

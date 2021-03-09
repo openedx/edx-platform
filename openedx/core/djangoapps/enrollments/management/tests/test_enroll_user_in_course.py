@@ -14,8 +14,6 @@ from common.djangoapps.student.tests.factories import UserFactory
 
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
-import six  # lint-amnesty, pylint: disable=wrong-import-order
-from six.moves import range  # lint-amnesty, pylint: disable=wrong-import-order
 
 
 @ddt.ddt
@@ -27,12 +25,12 @@ class EnrollManagementCommandTest(SharedModuleStoreTestCase):
 
     @classmethod
     def setUpClass(cls):
-        super(EnrollManagementCommandTest, cls).setUpClass()
+        super().setUpClass()
         cls.course = CourseFactory.create(org='fooX', number='007')
 
     def setUp(self):
-        super(EnrollManagementCommandTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
-        self.course_id = six.text_type(self.course.id)
+        super().setUp()
+        self.course_id = str(self.course.id)
         self.username = 'ralph' + uuid4().hex
         self.user_email = self.username + '@example.com'
 

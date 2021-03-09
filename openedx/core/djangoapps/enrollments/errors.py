@@ -8,7 +8,7 @@ class CourseEnrollmentError(Exception):
 
     """
     def __init__(self, msg, data=None):
-        super(CourseEnrollmentError, self).__init__(msg)  # lint-amnesty, pylint: disable=super-with-arguments
+        super().__init__(msg)
         # Corresponding information to help resolve the error.
         self.data = data
 
@@ -29,7 +29,7 @@ class CourseEnrollmentExistsError(CourseEnrollmentError):  # lint-amnesty, pylin
     enrollment = None
 
     def __init__(self, message, enrollment):
-        super(CourseEnrollmentExistsError, self).__init__(message)  # lint-amnesty, pylint: disable=super-with-arguments
+        super().__init__(message)
         self.enrollment = enrollment
 
 
