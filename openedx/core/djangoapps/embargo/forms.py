@@ -25,7 +25,7 @@ class RestrictedCourseForm(forms.ModelForm):
     error message instead.
 
     """
-    class Meta(object):
+    class Meta:
         model = RestrictedCourse
         fields = '__all__'
 
@@ -59,7 +59,7 @@ class RestrictedCourseForm(forms.ModelForm):
 class IPFilterForm(forms.ModelForm):
     """Form validating entry of IP addresses"""
 
-    class Meta(object):
+    class Meta:
         model = IPFilter
         fields = '__all__'
 
@@ -86,7 +86,7 @@ class IPFilterForm(forms.ModelForm):
             if not self._is_valid_ip(address):
                 error_addresses.append(address)
         if error_addresses:
-            msg = u'Invalid IP Address(es): {0}'.format(error_addresses)
+            msg = f'Invalid IP Address(es): {error_addresses}'
             msg += ' Please fix the error(s) and try again.'
             raise forms.ValidationError(msg)
 

@@ -62,7 +62,7 @@ class EmbargoMiddleware(MiddlewareMixin):
         # If embargoing is turned off, make this middleware do nothing
         if not settings.FEATURES.get('EMBARGO'):
             raise MiddlewareNotUsed()
-        super(EmbargoMiddleware, self).__init__(*args, **kwargs)  # lint-amnesty, pylint: disable=super-with-arguments
+        super().__init__(*args, **kwargs)
 
     def process_request(self, request):
         """Block requests based on embargo rules.
@@ -89,8 +89,8 @@ class EmbargoMiddleware(MiddlewareMixin):
         if ip_filter.enabled and ip_address in ip_filter.blacklist_ips:
             log.info(
                 (
-                    u"User %s was blocked from accessing %s "
-                    u"because IP address %s is blacklisted."
+                    "User %s was blocked from accessing %s "
+                    "because IP address %s is blacklisted."
                 ), request.user.id, request.path, ip_address
             )
 
@@ -108,8 +108,8 @@ class EmbargoMiddleware(MiddlewareMixin):
         elif ip_filter.enabled and ip_address in ip_filter.whitelist_ips:
             log.info(
                 (
-                    u"User %s was allowed access to %s because "
-                    u"IP address %s is whitelisted."
+                    "User %s was allowed access to %s because "
+                    "IP address %s is whitelisted."
                 ),
                 request.user.id, request.path, ip_address
             )

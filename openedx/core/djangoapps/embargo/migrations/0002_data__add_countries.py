@@ -1,6 +1,3 @@
-# -*- coding: utf-8 -*-
-
-
 # Converted from the original South migration 0003_add_countries.py
 
 from django.db import migrations, models

@@ -1,13 +1,14 @@
 """Tests for embargo app views. """
 
 
+from unittest.mock import patch, MagicMock
+
 import ddt
 import maxminddb
 import geoip2.database
 
 from django.urls import reverse
 from django.conf import settings
-from mock import patch, MagicMock
 
 from .factories import CountryAccessRuleFactory, RestrictedCourseFactory
 from .. import messages
@@ -46,7 +47,7 @@ class CourseAccessMessageViewTest(CacheIsolationTestCase, UrlResetMixin):
 
     @patch.dict(settings.FEATURES, {'EMBARGO': True})
     def setUp(self):
-        super(CourseAccessMessageViewTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
 
     @ddt.data(*list(messages.ENROLL_MESSAGES.keys()))
     def test_enrollment_messages(self, msg_key):
@@ -94,7 +95,7 @@ class CheckCourseAccessViewTest(CourseApiFactoryMixin, ModuleStoreTestCase):
 
     @patch.dict(settings.FEATURES, {'EMBARGO': True})
     def setUp(self):
-        super(CheckCourseAccessViewTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.url = reverse('api_embargo:v1_course_access')
         user = UserFactory(is_staff=True)
         self.client.login(username=user.username, password=UserFactory._DEFAULT_PASSWORD)  # lint-amnesty, pylint: disable=protected-access

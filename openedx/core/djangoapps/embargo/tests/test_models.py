@@ -3,7 +3,6 @@
 
 import json
 import pytest
-import six
 from django.db.utils import IntegrityError
 from django.test import TestCase
 from opaque_keys.edx.locator import CourseLocator
@@ -37,14 +36,14 @@ class EmbargoModelsTest(CacheIsolationTestCase):
 
         # Now, course should be embargoed
         assert EmbargoedCourse.is_embargoed(course_id)
-        assert six.text_type(cauth) == u"Course '{course_id}' is Embargoed".format(course_id=course_id)
+        assert str(cauth) == f"Course '{course_id}' is Embargoed"
 
         # Unauthorize by explicitly setting email_enabled to False
         cauth.embargoed = False
         cauth.save()
         # Test that course is now unauthorized
         assert not EmbargoedCourse.is_embargoed(course_id)
-        assert six.text_type(cauth) == u"Course '{course_id}' is Not Embargoed".format(course_id=course_id)
+        assert str(cauth) == f"Course '{course_id}' is Not Embargoed"
 
     def test_state_embargo(self):
         # Azerbaijan and France should not be blocked
@@ -78,8 +77,8 @@ class EmbargoModelsTest(CacheIsolationTestCase):
             assert state in currently_blocked
 
     def test_ip_blocking(self):
-        whitelist = u'127.0.0.1'
-        blacklist = u'18.244.51.3'
+        whitelist = '127.0.0.1'
+        blacklist = '18.244.51.3'
 
         cwhitelist = IPFilter.current().whitelist_ips
         assert whitelist not in cwhitelist
@@ -94,20 +93,20 @@ class EmbargoModelsTest(CacheIsolationTestCase):
         assert blacklist in cblacklist
 
     def test_ip_network_blocking(self):
-        whitelist = u'1.0.0.0/24'
-        blacklist = u'1.1.0.0/16'
+        whitelist = '1.0.0.0/24'
+        blacklist = '1.1.0.0/16'
 
         IPFilter(whitelist=whitelist, blacklist=blacklist).save()
 
         cwhitelist = IPFilter.current().whitelist_ips
-        assert u'1.0.0.100' in cwhitelist
-        assert u'1.0.0.10' in cwhitelist
-        assert u'1.0.1.0' not in cwhitelist
+        assert '1.0.0.100' in cwhitelist
+        assert '1.0.0.10' in cwhitelist
+        assert '1.0.1.0' not in cwhitelist
         cblacklist = IPFilter.current().blacklist_ips
-        assert u'1.1.0.0' in cblacklist
-        assert u'1.1.0.1' in cblacklist
-        assert u'1.1.1.0' in cblacklist
-        assert u'1.2.0.0' not in cblacklist
+        assert '1.1.0.0' in cblacklist
+        assert '1.1.0.1' in cblacklist
+        assert '1.1.1.0' in cblacklist
+        assert '1.2.0.0' not in cblacklist
 
 
 class RestrictedCourseTest(CacheIsolationTestCase):
@@ -118,7 +117,7 @@ class RestrictedCourseTest(CacheIsolationTestCase):
     def test_unicode_values(self):
         course_id = CourseLocator('abc', '123', 'doremi')
         restricted_course = RestrictedCourse.objects.create(course_key=course_id)
-        assert six.text_type(restricted_course) == six.text_type(course_id)
+        assert str(restricted_course) == str(course_id)
 
     def test_restricted_course_cache_with_save_delete(self):
         course_id = CourseLocator('abc', '123', 'doremi')
@@ -167,7 +166,7 @@ class CountryTest(TestCase):
 
     def test_unicode_values(self):
         country = Country.objects.create(country='NZ')
-        assert six.text_type(country) == 'New Zealand (NZ)'
+        assert str(country) == 'New Zealand (NZ)'
 
 
 class CountryAccessRuleTest(CacheIsolationTestCase):
@@ -184,7 +183,7 @@ class CountryAccessRuleTest(CacheIsolationTestCase):
             country=country
         )
 
-        assert six.text_type(access_rule) == u'Whitelist New Zealand (NZ) for {course_key}'.format(course_key=course_id)
+        assert str(access_rule) == f'Whitelist New Zealand (NZ) for {course_id}'
 
         course_id = CourseLocator('def', '123', 'doremi')
         restricted_course1 = RestrictedCourse.objects.create(course_key=course_id)
@@ -194,7 +193,7 @@ class CountryAccessRuleTest(CacheIsolationTestCase):
             country=country
         )
 
-        assert six.text_type(access_rule) == u'Blacklist New Zealand (NZ) for {course_key}'.format(course_key=course_id)
+        assert str(access_rule) == f'Blacklist New Zealand (NZ) for {course_id}'
 
     def test_unique_together_constraint(self):
         """
@@ -246,7 +245,7 @@ class CourseAccessRuleHistoryTest(TestCase):
     """Test course access rule history. """
 
     def setUp(self):
-        super(CourseAccessRuleHistoryTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.course_key = CourseLocator('edx', 'DemoX', 'Demo_Course')
         self.restricted_course = RestrictedCourse.objects.create(course_key=self.course_key)
         self.countries = {
