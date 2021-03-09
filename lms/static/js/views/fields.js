@@ -141,9 +141,9 @@
             },
 
             showSuccessMessage: function() {
-                var context,
+                var context = Date.now(),
                     successMessage = this.getMessage('success'),
-                    view;
+                    view = this;
 
                 this.showNotificationMessage(successMessage);
 
@@ -154,9 +154,6 @@
                     location.reload(true);
                 }
 
-                view = this;
-
-                context = Date.now();
                 this.lastSuccessMessageContext = context;
 
                 setTimeout(function() {
@@ -176,10 +173,10 @@
                     validationErrorMessage,
                     message;
                 if (xhr.status === 400) {
-                    errors = JSON.parse(xhr.responseText);
-                    validationErrorMessage = errors.field_errors[this.options.valueAttribute].user_message;
-                    message = HtmlUtils.joinHtml(this.indicators.validationError, validationErrorMessage);
                     try {
+                        errors = JSON.parse(xhr.responseText);
+                        validationErrorMessage = errors.field_errors[this.options.valueAttribute].user_message;
+                        message = HtmlUtils.joinHtml(this.indicators.validationError, validationErrorMessage);
                         this.showNotificationMessage(message);
                     } catch (error) {
                         this.showNotificationMessage(this.getMessage('error'));
@@ -210,21 +207,19 @@
             },
 
             saveAttributes: function(attributes, options) {
-                var view,
-                    defaultOptions;
+                var view = this;
+                var defaultOptions = {
+                    contentType: 'application/merge-patch+json',
+                    patch: true,
+                    wait: true,
+                    success: function() {
+                        view.saveSucceeded();
+                    },
+                    error: function(model, xhr) {
+                        view.showErrorMessage(xhr);
+                    }
+                };
                 if (this.persistChanges === true) {
-                    view = this;
-                    defaultOptions = {
-                        contentType: 'application/merge-patch+json',
-                        patch: true,
-                        wait: true,
-                        success: function() {
-                            view.saveSucceeded();
-                        },
-                        error: function(model, xhr) {
-                            view.showErrorMessage(xhr);
-                        }
-                    };
                     this.showInProgressMessage();
                     this.model.save(attributes, _.extend(defaultOptions, options));
                 }
@@ -487,8 +482,9 @@
             },
 
             displayValue: function(value) {
-                var option = this.optionForValue(value);
+                var option;
                 if (value) {
+                    option = this.optionForValue(value);
                     return (option ? option[1] : '');
                 } else {
                     return '';
