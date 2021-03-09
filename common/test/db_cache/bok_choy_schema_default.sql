@@ -2997,7 +2997,7 @@ CREATE TABLE `django_migrations` (
   `name` varchar(255) NOT NULL,
   `applied` datetime(6) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=844 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=845 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `django_openid_auth_association`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -4708,7 +4708,8 @@ CREATE TABLE `learning_sequences_learningcontext` (
   `modified` datetime(6) NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `context_key` (`context_key`),
-  KEY `learning_se_publish_62319b_idx` (`published_at`)
+  KEY `learning_se_publish_62319b_idx` (`published_at`),
+  KEY `learning_sequences_learningcontext_title_5a70c4cd` (`title`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `learning_sequences_learningsequence`;
