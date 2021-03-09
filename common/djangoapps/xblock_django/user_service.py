@@ -24,7 +24,7 @@ class DjangoXBlockUserService(UserService):
     A user service that converts Django users to XBlockUser
     """
     def __init__(self, django_user, **kwargs):
-        super(DjangoXBlockUserService, self).__init__(**kwargs)  # lint-amnesty, pylint: disable=super-with-arguments
+        super().__init__(**kwargs)
         self._django_user = django_user
         if self._django_user:
             self._django_user.user_is_staff = kwargs.get('user_is_staff', False)

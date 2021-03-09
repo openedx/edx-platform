@@ -2,9 +2,9 @@
 
 
 import unittest
+from unittest import mock
 
 import pytest
-import mock
 from django.conf import settings
 from django.core.cache import cache
 from django.test import TestCase
@@ -33,7 +33,7 @@ class DisableRateLimitTest(TestCase):
     """Check that we can disable rate limiting for perf testing. """
 
     def setUp(self):
-        super(DisableRateLimitTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         cache.clear()
         self.view = FakeApiView()
 

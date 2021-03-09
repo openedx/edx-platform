@@ -1,11 +1,9 @@
 """
 Tests for keyword_substitution.py
 """
+from unittest.mock import patch
 
-
-import six
 from ddt import ddt, file_data
-from mock import patch
 
 from common.djangoapps.student.tests.factories import UserFactory
 from common.djangoapps.util import keyword_substitution as Ks
@@ -21,7 +19,7 @@ class KeywordSubTest(ModuleStoreTestCase):
     CREATE_USER = False
 
     def setUp(self):
-        super(KeywordSubTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.user = UserFactory.create(
             email="testuser@edx.org",
             username="testuser",
@@ -115,14 +113,14 @@ class KeywordSubTest(ModuleStoreTestCase):
         """
         test_string = 'This string should not be subbed here %%USER_ID%%'
 
-        no_course_context = dict(
-            (key, value) for key, value in six.iteritems(self.context) if key != 'course_title'
-        )
+        no_course_context = {
+            key: value for key, value in self.context.items() if key != 'course_title'
+        }
         result = Ks.substitute_keywords_with_data(test_string, no_course_context)
         assert test_string == result
 
-        no_user_id_context = dict(
-            (key, value) for key, value in six.iteritems(self.context) if key != 'user_id'
-        )
+        no_user_id_context = {
+            key: value for key, value in self.context.items() if key != 'user_id'
+        }
         result = Ks.substitute_keywords_with_data(test_string, no_user_id_context)
         assert test_string == result
