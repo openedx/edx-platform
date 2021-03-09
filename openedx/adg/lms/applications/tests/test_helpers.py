@@ -65,13 +65,13 @@ def test_validate_logo_size_with_invalid_size():
         validate_logo_size(mocked_file)
 
 
-@patch('openedx.adg.lms.applications.helpers.MandrillClient')
-def test_send_application_submission_confirmation_email(mocked_mandrill_client):
+@patch('openedx.adg.lms.applications.helpers.task_send_mandrill_email')
+def test_send_application_submission_confirmation_email(mocked_task_send_mandrill_email):
     """
     Check if the email is being sent correctly
     """
     send_application_submission_confirmation_email(EMAIL)
-    assert mocked_mandrill_client().send_mandrill_email.called
+    assert mocked_task_send_mandrill_email.delay.called
 
 
 def test_min_year_value_validator_invalid():
@@ -106,22 +106,43 @@ def test_max_year_value_validator_valid():
 
 @pytest.mark.parametrize('date_attrs_with_expected_results', [
     {
-        'attrs': {},
+        'attrs': {
+            'date_started_month': 1,
+            'date_started_year': date.today().year - 1,
+        },
         'expected_result': {}
     },
     {
-        'attrs': {'date_completed_month': DATE_COMPLETED_MONTH},
-        'expected_result': {'date_completed_month': ERROR_MESSAGE.format(key='Date completed month')}
+        'attrs': {
+            'date_started_month': 1,
+            'date_started_year': date.today().year - 1,
+            'date_completed_month': DATE_COMPLETED_MONTH
+        },
+        'expected_result': {
+            'date_completed_month': ERROR_MESSAGE.format(key='Date completed month')
+        }
     },
     {
-        'attrs': {'date_completed_year': DATE_COMPLETED_YEAR},
-        'expected_result': {'date_completed_year': ERROR_MESSAGE.format(key='Date completed year')}
+        'attrs': {
+            'date_started_month': 1,
+            'date_started_year': date.today().year - 1,
+            'date_completed_year': DATE_COMPLETED_YEAR
+        },
+        'expected_result': {
+            'date_completed_year': ERROR_MESSAGE.format(key='Date completed year')
+        }
     },
     {
-        'attrs': {'date_completed_month': DATE_COMPLETED_MONTH, 'date_completed_year': DATE_COMPLETED_YEAR},
+        'attrs': {
+            'date_started_month': 1,
+            'date_started_year': date.today().year + 1,
+            'date_completed_month': DATE_COMPLETED_MONTH,
+            'date_completed_year': DATE_COMPLETED_YEAR,
+        },
         'expected_result': {
             'date_completed_month': ERROR_MESSAGE.format(key='Date completed month'),
-            'date_completed_year': ERROR_MESSAGE.format(key='Date completed year')
+            'date_completed_year': ERROR_MESSAGE.format(key='Date completed year'),
+            'date_started_year': 'Date should not be in future',
         }
     },
 ])
@@ -173,7 +194,7 @@ def test_check_validations_for_current_record(date_attrs_with_expected_results):
             'date_started_month': DATE_STARTED_MONTH,
             'date_started_year': DATE_COMPLETED_YEAR + 1
         },
-        'expected_result': {'date_completed_year': 'Completion date must comes after started date'}
+        'expected_result': {'date_completed_year': 'Completed date must be greater than started date.'}
     }
 ])
 def test_check_validations_for_past_record(date_attrs_with_expected_results):
