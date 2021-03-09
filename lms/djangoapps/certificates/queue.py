@@ -59,8 +59,7 @@ class XQueueCertInterface:
     Instantiating an object will create a new
     connection to the queue server.
 
-    See models.py for valid state transitions,
-    summary of methods:
+    Summary of methods:
 
        add_cert:   Add a new certificate.  Puts a single
                    request on the queue for the student/course.

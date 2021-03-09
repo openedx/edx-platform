@@ -69,8 +69,6 @@ def update_certificate(request):
     Will update GeneratedCertificate for a new certificate or
     modify an existing certificate entry.
 
-    See models.py for a state diagram of certificate states
-
     This view should only ever be accessed by the xqueue server
     """
 
