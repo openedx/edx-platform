@@ -50,7 +50,7 @@ class StackedConfigurationModel(ConfigurationModel):
     A ConfigurationModel that stacks Global, Site, Org, Course, and Course Run level
     configuration values.
     """
-    class Meta(object):
+    class Meta:
         abstract = True
         indexes = [
             # This index optimizes the .object.current_set() query
@@ -314,7 +314,7 @@ class StackedConfigurationModel(ConfigurationModel):
         else:
             site_id = site.id
 
-        return super(StackedConfigurationModel, cls).cache_key_name(site_id, org, org_course, course_key)
+        return super().cache_key_name(site_id, org, org_course, course_key)
 
     @classmethod
     def _org_from_org_course(cls, org_course):
@@ -322,7 +322,7 @@ class StackedConfigurationModel(ConfigurationModel):
 
     @classmethod
     def _org_course_from_course_key(cls, course_key):
-        return u"{}+{}".format(course_key.org, course_key.course)
+        return f"{course_key.org}+{course_key.course}"
 
     @classmethod
     @request_cached()
