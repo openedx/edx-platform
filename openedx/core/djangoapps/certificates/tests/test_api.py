@@ -8,12 +8,11 @@ import ddt
 import pytz
 import waffle
 from django.test import TestCase
-from edx_toggles.toggles import LegacyWaffleSwitch
 from edx_toggles.toggles.testutils import override_waffle_switch
 
 from common.djangoapps.course_modes.models import CourseMode
 from openedx.core.djangoapps.certificates import api
-from openedx.core.djangoapps.certificates.config import waffle as certs_waffle
+from openedx.core.djangoapps.certificates.config.waffle import AUTO_CERTIFICATE_GENERATION
 from openedx.core.djangoapps.content.course_overviews.tests.factories import CourseOverviewFactory
 from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
 
@@ -67,9 +66,7 @@ class MockGeneratedCertificate(object):
 
 @contextmanager
 def configure_waffle_namespace(feature_enabled):
-    namespace = certs_waffle.waffle()
-    auto_certificate_generation_switch = LegacyWaffleSwitch(namespace, certs_waffle.AUTO_CERTIFICATE_GENERATION)
-    with override_waffle_switch(auto_certificate_generation_switch, active=feature_enabled):
+    with override_waffle_switch(AUTO_CERTIFICATE_GENERATION, active=feature_enabled):
         yield
 
 

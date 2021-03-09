@@ -4,17 +4,19 @@ waffle switches for the Certificates app.
 """
 
 
-from edx_toggles.toggles import LegacyWaffleSwitchNamespace
+from edx_toggles.toggles import WaffleSwitch
 
-# Namespace
-WAFFLE_NAMESPACE = u'certificates'
 
 # Switches
-AUTO_CERTIFICATE_GENERATION = u'auto_certificate_generation'
-
-
-def waffle():
-    """
-    Returns the namespaced, cached, audited Waffle class for Certificates.
-    """
-    return LegacyWaffleSwitchNamespace(name=WAFFLE_NAMESPACE, log_prefix=u'Certificates: ')
+# .. toggle_name: certificates.auto_certificate_generation
+# .. toggle_implementation: WaffleSwitch
+# .. toggle_default: False
+# .. toggle_description: When enabled, certificates are generated automatically
+#   when learners reach the pass grade (self-paced courses) or available date
+#   (instructor-led courses).
+# .. toggle_use_cases: open_edx
+# .. toggle_creation_date: 2017-05-09
+# .. toggle_tickets: https://github.com/edx/edx-platform/pull/15937
+AUTO_CERTIFICATE_GENERATION = WaffleSwitch(
+    "certificates.auto_certificate_generation", __name__
+)

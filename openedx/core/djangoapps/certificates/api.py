@@ -10,16 +10,14 @@ import six  # lint-amnesty, pylint: disable=unused-import
 from pytz import UTC
 
 from lms.djangoapps.certificates.models import CertificateStatuses, CertificateWhitelist
-from openedx.core.djangoapps.certificates.config import waffle
+from openedx.core.djangoapps.certificates.config.waffle import AUTO_CERTIFICATE_GENERATION
 from common.djangoapps.student.models import CourseEnrollment
 
 log = logging.getLogger(__name__)
 
-SWITCHES = waffle.waffle()
-
 
 def auto_certificate_generation_enabled():
-    return SWITCHES.is_enabled(waffle.AUTO_CERTIFICATE_GENERATION)
+    return AUTO_CERTIFICATE_GENERATION.is_enabled()
 
 
 def _enabled_and_instructor_paced(course):

@@ -16,11 +16,11 @@ from django.conf import settings
 from django.test import TestCase, override_settings
 from edx_rest_api_client import exceptions
 from edx_rest_api_client.client import EdxRestApiClient
-from waffle.testutils import override_switch
+from edx_toggles.toggles.testutils import override_waffle_switch
 
 from lms.djangoapps.certificates.tests.factories import GeneratedCertificateFactory
 from openedx.core.djangoapps.catalog.tests.mixins import CatalogIntegrationMixin
-from openedx.core.djangoapps.certificates.config import waffle
+from openedx.core.djangoapps.certificates.config.waffle import AUTO_CERTIFICATE_GENERATION
 from openedx.core.djangoapps.content.course_overviews.tests.factories import CourseOverviewFactory
 from openedx.core.djangoapps.credentials.tests.mixins import CredentialsApiConfigMixin
 from openedx.core.djangoapps.oauth_dispatch.tests.factories import ApplicationFactory
@@ -505,7 +505,7 @@ class PostCourseCertificateTestCase(TestCase):
 @ddt.ddt
 @mock.patch(TASKS_MODULE + '.post_course_certificate')
 @override_settings(CREDENTIALS_SERVICE_USERNAME='test-service-username')
-@override_switch(waffle.WAFFLE_NAMESPACE + '.' + waffle.AUTO_CERTIFICATE_GENERATION, True)
+@override_waffle_switch(AUTO_CERTIFICATE_GENERATION, True)
 class AwardCourseCertificatesTestCase(CredentialsApiConfigMixin, TestCase):
     """
     Test the award_course_certificate celery task

@@ -3,11 +3,11 @@ Tests for certificate generation handler
 """
 import logging
 from unittest import mock
-
 import ddt
-from edx_toggles.toggles import LegacyWaffleSwitch
+
 from edx_toggles.toggles.testutils import override_waffle_flag, override_waffle_switch
-from waffle.testutils import override_switch
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from xmodule.modulestore.tests.factories import CourseFactory
 
 from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
 from lms.djangoapps.certificates.generation_handler import (
@@ -30,20 +30,16 @@ from lms.djangoapps.certificates.tests.factories import (
     CertificateWhitelistFactory,
     GeneratedCertificateFactory
 )
-from openedx.core.djangoapps.certificates.config import waffle
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
+from openedx.core.djangoapps.certificates.config.waffle import AUTO_CERTIFICATE_GENERATION
 
 log = logging.getLogger(__name__)
 
 ID_VERIFIED_METHOD = 'lms.djangoapps.verify_student.services.IDVerificationService.user_is_verified'
-AUTO_GENERATION_NAMESPACE = waffle.WAFFLE_NAMESPACE
-AUTO_GENERATION_NAME = waffle.AUTO_CERTIFICATE_GENERATION
-AUTO_GENERATION_SWITCH_NAME = f'{AUTO_GENERATION_NAMESPACE}.{AUTO_GENERATION_NAME}'
-AUTO_GENERATION_SWITCH = LegacyWaffleSwitch(AUTO_GENERATION_NAMESPACE, AUTO_GENERATION_NAME)
 
 
-@override_switch(AUTO_GENERATION_SWITCH_NAME, active=True)
+@override_waffle_switch(AUTO_CERTIFICATE_GENERATION, active=True)
 @override_waffle_flag(CERTIFICATES_USE_ALLOWLIST, active=True)
 @mock.patch(ID_VERIFIED_METHOD, mock.Mock(return_value=True))
 @ddt.ddt
@@ -175,7 +171,7 @@ class AllowlistTests(ModuleStoreTestCase):
         """
         Test handling when automatic generation is disabled
         """
-        with override_waffle_switch(AUTO_GENERATION_SWITCH, active=False):
+        with override_waffle_switch(AUTO_CERTIFICATE_GENERATION, active=False):
             assert not _can_generate_allowlist_certificate(self.user, self.course_run_key)
 
     def test_can_generate_not_verified(self):
@@ -239,7 +235,7 @@ class AllowlistTests(ModuleStoreTestCase):
         assert not _can_generate_allowlist_certificate(u, key)
 
 
-@override_switch(AUTO_GENERATION_SWITCH_NAME, active=True)
+@override_waffle_switch(AUTO_CERTIFICATE_GENERATION, active=True)
 @override_waffle_flag(CERTIFICATES_USE_UPDATED, active=True)
 @mock.patch(ID_VERIFIED_METHOD, mock.Mock(return_value=True))
 class CertificateTests(ModuleStoreTestCase):

@@ -12,7 +12,6 @@ from django.conf import settings
 from django.test.client import Client, RequestFactory
 from django.test.utils import override_settings
 from django.urls import reverse
-from edx_toggles.toggles import LegacyWaffleSwitch
 from edx_toggles.toggles.testutils import override_waffle_switch
 from organizations import api as organizations_api
 
@@ -42,7 +41,7 @@ from lms.djangoapps.certificates.tests.factories import (
 )
 from lms.djangoapps.certificates.utils import get_certificate_url
 from lms.djangoapps.grades.tests.utils import mock_passing_grade
-from openedx.core.djangoapps.certificates.config import waffle
+from openedx.core.djangoapps.certificates.config.waffle import AUTO_CERTIFICATE_GENERATION
 from openedx.core.djangoapps.dark_lang.models import DarkLangConfig
 from openedx.core.djangoapps.site_configuration.tests.test_util import (
     with_site_configuration,
@@ -54,7 +53,7 @@ from openedx.core.lib.tests.assertions.events import assert_event_matches
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
-AUTO_CERTIFICATE_GENERATION_SWITCH = LegacyWaffleSwitch(waffle.waffle(), waffle.AUTO_CERTIFICATE_GENERATION)
+
 FEATURES_WITH_CERTS_ENABLED = settings.FEATURES.copy()
 FEATURES_WITH_CERTS_ENABLED['CERTIFICATES_HTML_VIEW'] = True
 FEATURES_WITH_BADGES_ENABLED = FEATURES_WITH_CERTS_ENABLED.copy()
@@ -937,7 +936,7 @@ class CertificatesViewsTests(CommonCertificatesTestCase, CacheIsolationTestCase)
             expected_date = today
         else:
             expected_date = self.course.certificate_available_date
-        with override_waffle_switch(AUTO_CERTIFICATE_GENERATION_SWITCH, active=True):
+        with override_waffle_switch(AUTO_CERTIFICATE_GENERATION, active=True):
             response = self.client.get(test_url)
         date = '{month} {day}, {year}'.format(
             month=strftime_localized(expected_date, "%B"),

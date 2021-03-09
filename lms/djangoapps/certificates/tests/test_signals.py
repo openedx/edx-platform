@@ -5,9 +5,9 @@ and disabling for instructor-paced courses.
 
 
 from unittest import mock
-
 import ddt
-from edx_toggles.toggles import LegacyWaffleSwitch
+import six
+
 from edx_toggles.toggles.testutils import override_waffle_flag, override_waffle_switch
 
 from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
@@ -24,11 +24,9 @@ from lms.djangoapps.certificates.tests.factories import CertificateWhitelistFact
 from lms.djangoapps.grades.course_grade_factory import CourseGradeFactory
 from lms.djangoapps.grades.tests.utils import mock_passing_grade
 from lms.djangoapps.verify_student.models import IDVerificationAttempt, SoftwareSecurePhotoVerification
-from openedx.core.djangoapps.certificates.config import waffle
+from openedx.core.djangoapps.certificates.config.waffle import AUTO_CERTIFICATE_GENERATION
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
-
-AUTO_CERTIFICATE_GENERATION_SWITCH = LegacyWaffleSwitch(waffle.waffle(), waffle.AUTO_CERTIFICATE_GENERATION)
 
 
 class SelfGeneratedCertsSignalTest(ModuleStoreTestCase):
@@ -90,13 +88,13 @@ class WhitelistGeneratedCertificatesTest(ModuleStoreTestCase):
             'lms.djangoapps.certificates.signals.generate_certificate.apply_async',
             return_value=None
         ) as mock_generate_certificate_apply_async:
-            with override_waffle_switch(AUTO_CERTIFICATE_GENERATION_SWITCH, active=False):
+            with override_waffle_switch(AUTO_CERTIFICATE_GENERATION, active=False):
                 CertificateWhitelistFactory(
                     user=self.user,
                     course_id=self.course.id
                 )
                 mock_generate_certificate_apply_async.assert_not_called()
-            with override_waffle_switch(AUTO_CERTIFICATE_GENERATION_SWITCH, active=True):
+            with override_waffle_switch(AUTO_CERTIFICATE_GENERATION, active=True):
                 CertificateWhitelistFactory(
                     user=self.user,
                     course_id=self.course.id
@@ -118,13 +116,13 @@ class WhitelistGeneratedCertificatesTest(ModuleStoreTestCase):
                 'lms.djangoapps.certificates.signals.generate_certificate.apply_async',
                 return_value=None
         ) as mock_generate_certificate_apply_async:
-            with override_waffle_switch(AUTO_CERTIFICATE_GENERATION_SWITCH, active=False):
+            with override_waffle_switch(AUTO_CERTIFICATE_GENERATION, active=False):
                 CertificateWhitelistFactory(
                     user=self.user,
                     course_id=self.ip_course.id
                 )
                 mock_generate_certificate_apply_async.assert_not_called()
-            with override_waffle_switch(AUTO_CERTIFICATE_GENERATION_SWITCH, active=True):
+            with override_waffle_switch(AUTO_CERTIFICATE_GENERATION, active=True):
                 CertificateWhitelistFactory(
                     user=self.user,
                     course_id=self.ip_course.id
@@ -150,7 +148,7 @@ class WhitelistGeneratedCertificatesTest(ModuleStoreTestCase):
                 'lms.djangoapps.certificates.signals.generate_allowlist_certificate_task',
                 return_value=None
             ) as mock_generate_allowlist_task:
-                with override_waffle_switch(AUTO_CERTIFICATE_GENERATION_SWITCH, active=True):
+                with override_waffle_switch(AUTO_CERTIFICATE_GENERATION, active=True):
                     CertificateWhitelistFactory(
                         user=self.user,
                         course_id=self.ip_course.id,
@@ -171,7 +169,7 @@ class WhitelistGeneratedCertificatesTest(ModuleStoreTestCase):
                 'lms.djangoapps.certificates.signals.generate_allowlist_certificate_task',
                 return_value=None
             ) as mock_generate_allowlist_task:
-                with override_waffle_switch(AUTO_CERTIFICATE_GENERATION_SWITCH, active=True):
+                with override_waffle_switch(AUTO_CERTIFICATE_GENERATION, active=True):
                     CertificateWhitelistFactory(
                         user=self.user,
                         course_id=self.ip_course.id,
@@ -222,7 +220,7 @@ class PassingGradeCertsTest(ModuleStoreTestCase):
             'lms.djangoapps.certificates.signals.generate_certificate.apply_async',
             return_value=None
         ) as mock_generate_certificate_apply_async:
-            with override_waffle_switch(AUTO_CERTIFICATE_GENERATION_SWITCH, active=True):
+            with override_waffle_switch(AUTO_CERTIFICATE_GENERATION, active=True):
                 grade_factory = CourseGradeFactory()
                 # Not passing
                 grade_factory.update(self.user, self.course)
@@ -243,7 +241,7 @@ class PassingGradeCertsTest(ModuleStoreTestCase):
             'lms.djangoapps.certificates.signals.generate_certificate.apply_async',
             return_value=None
         ) as mock_generate_certificate_apply_async:
-            with override_waffle_switch(AUTO_CERTIFICATE_GENERATION_SWITCH, active=True):
+            with override_waffle_switch(AUTO_CERTIFICATE_GENERATION, active=True):
                 grade_factory = CourseGradeFactory()
                 # Not passing
                 grade_factory.update(self.user, self.ip_course)
@@ -278,7 +276,7 @@ class PassingGradeCertsTest(ModuleStoreTestCase):
 
     @override_waffle_flag(CERTIFICATES_USE_ALLOWLIST, active=True)
     def test_passing_grade_allowlist(self):
-        with override_waffle_switch(AUTO_CERTIFICATE_GENERATION_SWITCH, active=True):
+        with override_waffle_switch(AUTO_CERTIFICATE_GENERATION, active=True):
             # User who is not on the allowlist
             GeneratedCertificateFactory(
                 user=self.user,
@@ -434,7 +432,7 @@ class LearnerTrackChangeCertsTest(ModuleStoreTestCase):
             'lms.djangoapps.certificates.signals.generate_certificate.apply_async',
             return_value=None
         ) as mock_generate_certificate_apply_async:
-            with override_waffle_switch(AUTO_CERTIFICATE_GENERATION_SWITCH, active=True):
+            with override_waffle_switch(AUTO_CERTIFICATE_GENERATION, active=True):
                 mock_generate_certificate_apply_async.assert_not_called()
                 attempt = SoftwareSecurePhotoVerification.objects.create(
                     user=self.user_one,
@@ -455,7 +453,7 @@ class LearnerTrackChangeCertsTest(ModuleStoreTestCase):
             'lms.djangoapps.certificates.signals.generate_certificate.apply_async',
             return_value=None
         ) as mock_generate_certificate_apply_async:
-            with override_waffle_switch(AUTO_CERTIFICATE_GENERATION_SWITCH, active=True):
+            with override_waffle_switch(AUTO_CERTIFICATE_GENERATION, active=True):
                 mock_generate_certificate_apply_async.assert_not_called()
                 attempt = SoftwareSecurePhotoVerification.objects.create(
                     user=self.user_two,
@@ -478,7 +476,7 @@ class LearnerTrackChangeCertsTest(ModuleStoreTestCase):
             'lms.djangoapps.certificates.signals.generate_allowlist_certificate_task',
             return_value=None
         ) as mock_allowlist_task:
-            with override_waffle_switch(AUTO_CERTIFICATE_GENERATION_SWITCH, active=True):
+            with override_waffle_switch(AUTO_CERTIFICATE_GENERATION, active=True):
                 attempt = SoftwareSecurePhotoVerification.objects.create(
                     user=self.user_two,
                     status='submitted'
@@ -491,7 +489,7 @@ class LearnerTrackChangeCertsTest(ModuleStoreTestCase):
             'lms.djangoapps.certificates.signals.generate_allowlist_certificate_task',
             return_value=None
         ) as mock_allowlist_task:
-            with override_waffle_switch(AUTO_CERTIFICATE_GENERATION_SWITCH, active=True):
+            with override_waffle_switch(AUTO_CERTIFICATE_GENERATION, active=True):
                 u = UserFactory.create()
                 c = CourseFactory()
                 course_key = c.id  # pylint: disable=no-member
@@ -549,7 +547,7 @@ class CertificateGenerationTaskTest(ModuleStoreTestCase):
             'lms.djangoapps.certificates.signals.generate_certificate.apply_async',
             return_value=None
         ) as mock_generate_certificate_apply_async:
-            with override_waffle_switch(AUTO_CERTIFICATE_GENERATION_SWITCH, active=True):
+            with override_waffle_switch(AUTO_CERTIFICATE_GENERATION, active=True):
                 _fire_ungenerated_certificate_task(self.user, self.course.id)
                 task_created = mock_generate_certificate_apply_async.called
                 assert task_created == should_create
