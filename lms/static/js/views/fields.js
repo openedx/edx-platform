@@ -111,7 +111,7 @@
             },
 
             showHelpMessage: function(message) {
-                var msg;
+                var msg = message;
                 if (_.isUndefined(message) || _.isNull(message)) {
                     msg = this.helpMessage;
                 }
