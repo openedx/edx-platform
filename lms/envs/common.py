@@ -332,7 +332,7 @@ FEATURES = {
     #   CCX. Documentation for configuring and using this feature is available at
     #   https://edx.readthedocs.io/projects/open-edx-ca/en/latest/set_up_course/custom_courses.html
     # .. toggle_warnings: When set to true, 'lms.djangoapps.ccx.overrides.CustomCoursesForEdxOverrideProvider' will
-    # .. be added to MODULESTORE_FIELD_OVERRIDE_PROVIDERS
+    #    be added to MODULESTORE_FIELD_OVERRIDE_PROVIDERS
     # .. toggle_use_cases: opt_in, circuit_breaker
     # .. toggle_creation_date: 2015-04-10
     # .. toggle_tickets: https://github.com/edx/edx-platform/pull/6636
