@@ -143,8 +143,15 @@ FEATURES = {
     # .. toggle_tickets: https://github.com/edx/edx-platform/pull/3064
     'ENABLE_TEXTBOOK': True,
 
-    # discussion home panel, which includes a subscription on/off setting for discussion digest emails.
-    # this should remain off in production until digest notifications are online.
+    # .. toggle_name: FEATURES['ENABLE_DISCUSSION_HOME_PANEL']
+    # .. toggle_implementation: DjangoSetting
+    # .. toggle_default: True
+    # .. toggle_description: Hides or displays a welcome panel under the Discussion tab, which includes a subscription
+    #   on/off setting for discussion digest emails.
+    # .. toggle_use_cases: open_edx
+    # .. toggle_creation_date: 2013-07-30
+    # .. toggle_warnings: This should remain off in production until digest notifications are online.
+    # .. toggle_tickets: https://github.com/edx/edx-platform/pull/520
     'ENABLE_DISCUSSION_HOME_PANEL': False,
 
     # .. toggle_name: FEATURES['ENABLE_DISCUSSION_EMAIL_DIGEST']
