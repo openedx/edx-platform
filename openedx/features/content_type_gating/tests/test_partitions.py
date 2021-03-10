@@ -1,20 +1,18 @@
-
-
 from datetime import datetime
+from unittest.mock import Mock, patch
 
 from django.conf import settings
 from django.test import RequestFactory
-from mock import Mock, patch
 from opaque_keys.edx.keys import CourseKey
 
 from common.djangoapps.course_modes.tests.factories import CourseModeFactory
+from common.djangoapps.student.tests.factories import GroupFactory
 from lms.djangoapps.courseware.tests.factories import GlobalStaffFactory
+from openedx.core.djangoapps.content.course_overviews.tests.factories import CourseOverviewFactory
 from openedx.core.djangolib.testing.utils import CacheIsolationTestCase
 from openedx.features.content_type_gating.helpers import CONTENT_GATING_PARTITION_ID, FULL_ACCESS, LIMITED_ACCESS
 from openedx.features.content_type_gating.models import ContentTypeGatingConfig
 from openedx.features.content_type_gating.partitions import ContentTypeGatingPartition, create_content_gating_partition
-from openedx.core.djangoapps.content.course_overviews.tests.factories import CourseOverviewFactory
-from common.djangoapps.student.tests.factories import GroupFactory
 from xmodule.partitions.partitions import ENROLLMENT_TRACK_PARTITION_ID, UserPartitionError
 
 

@@ -1,24 +1,22 @@
-import pytest
-
-
 import itertools
 from datetime import datetime, timedelta
+from unittest.mock import Mock
 
 import ddt
+import pytest
 import pytz
 from django.utils import timezone
 from edx_django_utils.cache import RequestCache
-from mock import Mock
+from edx_toggles.toggles.testutils import override_waffle_flag
 from opaque_keys.edx.locator import CourseLocator
 
 from common.djangoapps.course_modes.tests.factories import CourseModeFactory
-from edx_toggles.toggles.testutils import override_waffle_flag
+from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
 from openedx.core.djangoapps.config_model_utils.models import Provenance
 from openedx.core.djangoapps.content.course_overviews.tests.factories import CourseOverviewFactory
 from openedx.core.djangoapps.site_configuration.tests.factories import SiteConfigurationFactory
 from openedx.core.djangolib.testing.utils import CacheIsolationTestCase
 from openedx.features.content_type_gating.models import ContentTypeGatingConfig
-from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
 
 
 @ddt.ddt
@@ -31,7 +29,7 @@ class TestContentTypeGatingConfig(CacheIsolationTestCase):
         CourseModeFactory.create(course_id=self.course_overview.id, mode_slug='audit')
         CourseModeFactory.create(course_id=self.course_overview.id, mode_slug='verified')
         self.user = UserFactory.create()
-        super(TestContentTypeGatingConfig, self).setUp()
+        super().setUp()
 
     @ddt.data(
         (True, True),
@@ -173,7 +171,7 @@ class TestContentTypeGatingConfig(CacheIsolationTestCase):
                 ContentTypeGatingConfig.objects.create(site=test_site_cfg.site, enabled=site_setting, enabled_as_of=datetime(2018, 1, 1))
 
                 for org_setting in (True, False, None):
-                    test_org = "{}-{}".format(test_site_cfg.id, org_setting)
+                    test_org = f"{test_site_cfg.id}-{org_setting}"
                     test_site_cfg.site_values['course_org_filter'].append(test_org)
                     test_site_cfg.save()
 
@@ -182,7 +180,7 @@ class TestContentTypeGatingConfig(CacheIsolationTestCase):
                     for course_setting in (True, False, None):
                         test_course = CourseOverviewFactory.create(
                             org=test_org,
-                            id=CourseLocator(test_org, 'test_course', 'run-{}'.format(course_setting))
+                            id=CourseLocator(test_org, 'test_course', f'run-{course_setting}')
                         )
                         ContentTypeGatingConfig.objects.create(course=test_course, enabled=course_setting, enabled_as_of=datetime(2018, 1, 1))
 
