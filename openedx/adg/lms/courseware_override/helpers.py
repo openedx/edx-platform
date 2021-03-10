@@ -1,6 +1,8 @@
 """
 Helpers for courseware app
 """
+from django.utils.translation import get_language_info
+
 from common.djangoapps.student.models import CourseEnrollment
 from common.djangoapps.student.roles import CourseInstructorRole
 from lms.djangoapps.courseware.courses import get_courses as get_courses_core
@@ -22,11 +24,11 @@ def get_course_instructors(course_key, request=None):
 
     Arguments:
         request: request object
-        course_key: Course for which to fetch all the instructor data
+        course_key: The key of the Course for which to fetch all the instructor data
 
     Returns:
-        list: A list of tuples containing respectively, a list containing UserProfile objects for all
-            the instructors, and a dict containing the profile image url in the {'size':'url'} format
+        list: A list of dicts where each dict has a UserProfile object and a dict containing the
+        profile image urls in the {'size':'url'} format for that particular instructor profile.
     """
     course_locator = course_key.to_course_locator() if getattr(course_key, 'ccx', None) else course_key
 
@@ -35,14 +37,33 @@ def get_course_instructors(course_key, request=None):
 
     for instructor in instructors:
         profile_image_urls_for_instructor = get_profile_image_urls_for_user(instructor, request=request)
-        instructor_data.append((instructor.profile, profile_image_urls_for_instructor,))
+        instructor_data.append({'profile': instructor.profile, 'profile_image_urls': profile_image_urls_for_instructor})
 
     return instructor_data
 
 
-def get_extra_context(request, course):
+def get_language_names_from_codes(language_codes_with_course_id):
     """
-    Return all the extra context for the course_about page
+    Converts the codes to language names and returns a list
+
+    Arguments:
+        language_codes_with_course_id (QuerySet): a QuerySet of tuples containing (course_id, language_code)
+
+    Returns:
+        list: A list of tuples containing (course_id, language_name)
+    """
+    language_names_with_course_id = []
+
+    for course_id, language_code in language_codes_with_course_id:
+        language_name = get_language_info(language_code).get('name')
+        language_names_with_course_id.append((course_id, language_name))
+
+    return language_names_with_course_id
+
+
+def get_extra_course_about_context(request, course):
+    """
+    Get all the extra context for the course_about page
 
     Arguments:
         request (Request): Request object
@@ -51,18 +72,22 @@ def get_extra_context(request, course):
     Returns:
         dict: Returns an empty dict if it is the testing environment otherwise returns a dict with added context
     """
+    if is_testing_environment():
+        return {}
+
     course_group = course.multilingual_course.multilingual_course_group
-    course_languages = course_group.multilingual_courses.open_multilingual_courses().language(course.language)
-    course_intructors = get_course_instructors(course.id, request=request)
-    print(course_intructors)
-    course_enrollment_count = CourseEnrollment.objects.enrollment_counts(course.id).get('total', 0)
+    languages_codes = course_group.multilingual_courses.open_multilingual_courses().language_codes_with_course_ids()
+
+    course_language_names = get_language_names_from_codes(languages_codes)
+    course_instructors = get_course_instructors(course.id, request=request)
+    course_enrollment_count = CourseEnrollment.objects.enrollment_counts(course.id).get('total')
 
     context = {
-        "languages": course_languages,
-        "instructors": course_intructors,
+        "course_languages": course_language_names,
+        "instructors": course_instructors,
         "total_enrollments": course_enrollment_count,
         "self_paced": course.self_paced,
         "effort": course.effort
     }
 
-    return {} if is_testing_environment() else context
+    return context

@@ -3,8 +3,8 @@ Managers for the models of applications app
 """
 from datetime import datetime
 
-from django.db.models import Case, Manager, QuerySet, When
-from django.utils.translation import get_language, get_language_info
+from django.db.models import Manager, QuerySet
+from django.utils.translation import get_language
 
 
 class SubmittedApplicationsManager(Manager):
@@ -99,22 +99,14 @@ class MultilingualCourseQuerySet(QuerySet):
         """
         return self.enrolled_course(user) or self.preferred_lang_course() or self.first()
 
-    def language(self, language):
+    def language_codes_with_course_ids(self):
         """
-        Returns a list of all the languages with the given language at top
-
-        Arguments:
-            language (str): language code to have its corresponding language name at top
+        Get a QuerySet containing tuples, each with a course_id and its corresponding language code
 
         Returns:
-            list: A list of language names
+            QuerySet: A QuerySet containing one or more tuples in the form: (course_id, language_code)
         """
-        language_codes = self.order_by(
-            Case(When(course__language=language, then=0), default=1),
-        ).values_list('course__language', flat=True)
-
-        languages = [get_language_info(language_code).get('name', '') for language_code in language_codes]
-        return languages
+        return self.values_list('course__id', 'course__language')
 
 
 class MultilingualCourseManager(Manager):

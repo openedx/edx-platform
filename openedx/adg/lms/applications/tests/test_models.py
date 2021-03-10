@@ -340,13 +340,12 @@ def test_get_course_group_languages(courses, course_group):
     course1 = courses['test_course1']
     course2 = courses['test_course2']
 
+    open_multilingual_courses = course_group.multilingual_courses.open_multilingual_courses()
+
     MultilingualCourseFactory(course=course1, multilingual_course_group=course_group)
-    assert course_group.multilingual_courses.open_multilingual_courses().language(
-        course1.language) == ['English']
-
     MultilingualCourseFactory(course=course2, multilingual_course_group=course_group)
-    assert course_group.multilingual_courses.open_multilingual_courses().language(
-        course1.language) == ['English', 'Arabic']
 
-    assert course_group.multilingual_courses.open_multilingual_courses().language(
-        course2.language) == ['Arabic', 'English']
+    actual_output = open_multilingual_courses.language_codes_with_course_ids()
+    expected_output = [(course1.id, 'en'), (course2.id, 'ar')]
+
+    assert all([actual_item == expected_item for actual_item, expected_item in zip(actual_output, expected_output)])

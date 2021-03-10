@@ -89,7 +89,7 @@ from lms.djangoapps.grades.api import CourseGradeFactory
 from lms.djangoapps.instructor.enrollment import uses_shib
 from lms.djangoapps.instructor.views.api import require_global_staff
 from lms.djangoapps.verify_student.services import IDVerificationService
-from openedx.adg.lms.courseware_override.helpers import get_courses, get_extra_context
+from openedx.adg.lms.courseware_override.helpers import get_courses, get_extra_course_about_context
 from openedx.core.djangoapps.catalog.utils import get_programs, get_programs_with_type
 from openedx.core.djangoapps.certificates import api as auto_certs_api
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
@@ -984,7 +984,7 @@ def course_about(request, course_id):
             'allow_anonymous': allow_anonymous,
         }
 
-        context.update(get_extra_context(request, overview))
+        context.update(get_extra_course_about_context(request, overview))
 
         return render_to_response('courseware/course_about.html', context)
 
