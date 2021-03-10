@@ -1,10 +1,9 @@
 # lint-amnesty, pylint: disable=missing-module-docstring
 import datetime
 import hashlib
-from unittest import mock
 
 import ddt
-import factory
+import mock
 import pytz
 from crum import set_current_request
 from django.contrib.auth.models import AnonymousUser, User  # lint-amnesty, pylint: disable=imported-auth-user
