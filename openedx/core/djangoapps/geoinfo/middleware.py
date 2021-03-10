@@ -46,5 +46,5 @@ class CountryMiddleware(MiddlewareMixin):
 
             request.session['country_code'] = country_code
             request.session['ip_address'] = new_ip_address
-            log.debug(u'Country code for IP: %s is set to %s', new_ip_address, country_code)
+            log.debug('Country code for IP: %s is set to %s', new_ip_address, country_code)
             reader.close()
