@@ -47,7 +47,16 @@ class ZendeskProxyTestCase(ApiTestCase):
         }
         return super(ZendeskProxyTestCase, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
 
-    def test_post(self):
+    @ddt.data(
+        True, False
+    )
+    def test_post(self, user_activation_status):
+        """
+        Test both active and inactive users can request Zendesk Proxy for the
+        submission of support tickets.
+        """
+        self.user.is_active = user_activation_status
+        self.user.save()
         with patch('requests.post', return_value=MagicMock(status_code=201)) as mock_post:
             response = self.request_without_auth(
                 'post',
