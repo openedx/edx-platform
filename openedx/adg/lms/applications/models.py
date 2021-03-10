@@ -111,6 +111,7 @@ class BusinessLine(TimeStampedModel):
     group = models.OneToOneField(
         Group, related_name='business_line', on_delete=models.CASCADE, null=True
     )
+    site_url = models.URLField(default='', verbose_name=_('Site URL'))
 
     class Meta:
         app_label = 'applications'
