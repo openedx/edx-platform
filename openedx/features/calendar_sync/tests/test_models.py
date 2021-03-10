@@ -1,8 +1,8 @@
 """ Tests for the Calendar Sync models """
 
 
-from openedx.features.calendar_sync.models import UserCalendarSyncConfig
 from common.djangoapps.student.tests.factories import UserFactory
+from openedx.features.calendar_sync.models import UserCalendarSyncConfig
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
@@ -14,12 +14,12 @@ class TestUserCalendarSyncConfig(SharedModuleStoreTestCase):
     @classmethod
     def setUpClass(cls):
         """ Set up any course data """
-        super(TestUserCalendarSyncConfig, cls).setUpClass()
+        super().setUpClass()
         cls.course = CourseFactory.create()
         cls.course_key = cls.course.id
 
     def setUp(self):
-        super(TestUserCalendarSyncConfig, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.user = UserFactory(password=TEST_PASSWORD)
 
     def test_is_enabled_for_course(self):
