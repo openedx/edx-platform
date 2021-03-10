@@ -26,6 +26,8 @@ values are (x, y) coordinates of centers of dragged images.
 
 
 import json
+import six
+from six.moves import zip
 
 
 def flat_user_answer(user_answer):
@@ -54,9 +56,9 @@ def flat_user_answer(user_answer):
                 v_value = list(v_value.values())[0]
                 complex_value_list.append(v_key)
 
-            complex_value = f'{v_value}'
+            complex_value = '{0}'.format(v_value)
             for i in reversed(complex_value_list):
-                complex_value = f'{complex_value}[{i}]'
+                complex_value = '{0}[{1}]'.format(complex_value, i)
 
             res = {key: complex_value}
             return res
@@ -102,8 +104,8 @@ class PositionsCompare(list):
                 isinstance(other[0], (list, int, float))):
             return self.coordinate_positions_compare(other)
 
-        elif (isinstance(self[0], (str, str)) and
-              isinstance(other[0], (str, str))):
+        elif (isinstance(self[0], (six.text_type, str)) and
+              isinstance(other[0], (six.text_type, str))):
             return ''.join(self) == ''.join(other)
         else:  # improper argument types: no (float / int or lists of list
             #and float / int pair) or two string / unicode lists pair
@@ -142,7 +144,7 @@ class PositionsCompare(list):
         return True
 
 
-class DragAndDrop:
+class DragAndDrop(object):
     """ Grader class for drag and drop inputtype.
     """
 
@@ -354,10 +356,10 @@ class DragAndDrop:
         # correct_answer entries.  If the draggable is mentioned in at least one
         # correct_answer entry, the value is False.
         # default to consider every user answer excess until proven otherwise.
-        self.excess_draggables = {
-            list(users_draggable.keys())[0]: True
+        self.excess_draggables = dict(
+            (list(users_draggable.keys())[0], True)
             for users_draggable in user_answer
-        }
+        )
 
         # Convert nested `user_answer` to flat format.
         user_answer = flat_user_answer(user_answer)

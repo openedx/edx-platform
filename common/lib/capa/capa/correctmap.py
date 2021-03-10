@@ -5,7 +5,7 @@
 # Used by responsetypes and capa_problem
 
 
-class CorrectMap:
+class CorrectMap(object):
     """
     Stores map between answer_id and response evaluation result for each question
     in a capa problem.  The response evaluation result for each answer_id includes

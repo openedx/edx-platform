@@ -12,7 +12,7 @@ class CapaShuffleTest(unittest.TestCase):
     """Capa problem tests for shuffling and choice-name masking."""
 
     def setUp(self):
-        super().setUp()
+        super(CapaShuffleTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.system = test_capa_system()
 
     def test_shuffle_4_choices(self):

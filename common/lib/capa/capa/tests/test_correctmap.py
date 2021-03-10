@@ -15,7 +15,7 @@ class CorrectMapTest(unittest.TestCase):
     """
 
     def setUp(self):
-        super().setUp()
+        super(CorrectMapTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.cmap = CorrectMap()
 
     def test_set_input_properties(self):
