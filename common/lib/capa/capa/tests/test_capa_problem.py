@@ -5,12 +5,12 @@ Test capa problem.
 
 import textwrap
 import unittest
+from unittest.mock import patch
+
 import pytest
 import ddt
-import six
 from lxml import etree
 from markupsafe import Markup
-from mock import patch
 
 from capa.responsetypes import LoncapaProblemError
 from capa.tests.helpers import new_loncapa_problem
@@ -78,7 +78,7 @@ class CAPAProblemTest(unittest.TestCase):
         """.format(question, label_attr)
         problem = new_loncapa_problem(xml)
         assert problem.problem_data == {'1_2_1': {'label': question, 'descriptions': {}}}
-        assert len(problem.tree.xpath("//*[normalize-space(text())='{}']".format(question))) == 0
+        assert len(problem.tree.xpath(f"//*[normalize-space(text())='{question}']")) == 0
 
     @ddt.unpack
     @ddt.data(
@@ -120,7 +120,7 @@ class CAPAProblemTest(unittest.TestCase):
         assert problem.problem_data ==\
                {'1_2_1': {'label': question1, 'descriptions': {}}, '1_3_1': {'label': question2, 'descriptions': {}}}
         for question in (question1, question2):
-            assert len(problem.tree.xpath('//label[text()="{}"]'.format(question))) == 0
+            assert len(problem.tree.xpath(f'//label[text()="{question}"]')) == 0
 
     def test_multiple_descriptions(self):
         """
@@ -179,7 +179,7 @@ class CAPAProblemTest(unittest.TestCase):
         problem = new_loncapa_problem(xml)
         assert problem.problem_data == {'1_2_1': {'label': question, 'descriptions': {}}}
         # <p> tag with question text should not be deleted
-        assert problem.tree.xpath("string(p[text()='{}'])".format(question)) == question
+        assert problem.tree.xpath(f"string(p[text()='{question}'])") == question
 
     def test_label_is_empty_if_no_label_attribute(self):
         """
@@ -314,7 +314,7 @@ class CAPAProblemTest(unittest.TestCase):
         assert len(multi_inputs_group) == 0
 
         # verify that question is rendered only once
-        question = problem_html.xpath("//*[normalize-space(text())='{}']".format(question))
+        question = problem_html.xpath(f"//*[normalize-space(text())='{question}']")
         assert len(question) == 1
 
     def assert_question_tag(self, question1, question2, tag, label_attr=False):
@@ -323,8 +323,8 @@ class CAPAProblemTest(unittest.TestCase):
         """
         question1_tag = '<{tag}>{}</{tag}>'.format(question1, tag=tag) if question1 else ''
         question2_tag = '<{tag}>{}</{tag}>'.format(question2, tag=tag) if question2 else ''
-        question1_label_attr = 'label="{}"'.format(question1) if label_attr else ''
-        question2_label_attr = 'label="{}"'.format(question2) if label_attr else ''
+        question1_label_attr = f'label="{question1}"' if label_attr else ''
+        question2_label_attr = f'label="{question2}"' if label_attr else ''
         xml = """
         <problem>
             {question1_tag}
@@ -351,7 +351,7 @@ class CAPAProblemTest(unittest.TestCase):
         problem = new_loncapa_problem(xml)
         assert problem.problem_data ==\
                {'1_2_1': {'label': question1, 'descriptions': {}}, '1_3_1': {'label': question2, 'descriptions': {}}}
-        assert len(problem.tree.xpath('//{}'.format(tag))) == 0
+        assert len(problem.tree.xpath(f'//{tag}')) == 0
 
     @ddt.unpack
     @ddt.data(
@@ -410,7 +410,7 @@ class CAPAMultiInputProblemTest(unittest.TestCase):
 
     def assert_problem_data(self, problem_data):
         """Verify problem data is in expected state"""
-        for problem_value in six.viewvalues(problem_data):
+        for problem_value in problem_data.values():
             assert isinstance(problem_value['label'], Markup)
 
     def assert_problem_html(self, problem_html, group_label, *input_labels):
@@ -437,14 +437,14 @@ class CAPAMultiInputProblemTest(unittest.TestCase):
             # verify that multi input group label <p> tag exists and its
             # id matches with correct multi input group aria-labelledby
             multi_inputs_group_label_id = multi_inputs_group[0].attrib.get('aria-labelledby')
-            multi_inputs_group_label = html.xpath('//p[@id="{}"]'.format(multi_inputs_group_label_id))
+            multi_inputs_group_label = html.xpath(f'//p[@id="{multi_inputs_group_label_id}"]')
             assert len(multi_inputs_group_label) == 1
             assert multi_inputs_group_label[0].text == group_label
 
         # verify that label for each input comes only once
         for input_label in input_labels:
             # normalize-space is used to remove whitespace around the text
-            input_label_element = multi_inputs_group[0].xpath('//*[normalize-space(text())="{}"]'.format(input_label))
+            input_label_element = multi_inputs_group[0].xpath(f'//*[normalize-space(text())="{input_label}"]')
             assert len(input_label_element) == 1
 
     @ddt.unpack
@@ -537,7 +537,7 @@ class CAPAMultiInputProblemTest(unittest.TestCase):
 
         # For each description, check its order and text is correct
         for index, description_id in enumerate(description_ids):
-            description_element = multi_inputs_group.xpath('//p[@id="{}"]'.format(description_id))
+            description_element = multi_inputs_group.xpath(f'//p[@id="{description_id}"]')
             assert len(description_element) == 1
             assert description_element[0].text == descriptions[index]
 
@@ -557,7 +557,7 @@ class CAPAProblemReportHelpersTest(unittest.TestCase):
     @ddt.unpack
     def test_find_question_label(self, answer_id, label, stripped_label):
         problem = new_loncapa_problem(
-            '<problem><some-problem id="{}"/></problem>'.format(answer_id)
+            f'<problem><some-problem id="{answer_id}"/></problem>'
         )
         mock_problem_data = {
             answer_id: {
@@ -676,4 +676,4 @@ class CAPAProblemReportHelpersTest(unittest.TestCase):
 
         # Ensure that the answer is a string so that the dict returned from this
         # function can eventualy be serialized to json without issues.
-        assert isinstance(problem.get_question_answers()['1_solution_1'], six.text_type)
+        assert isinstance(problem.get_question_answers()['1_solution_1'], str)

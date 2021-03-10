@@ -2,15 +2,13 @@
 
 
 import gettext
-import io
 import os
 import os.path
 import xml.sax.saxutils as saxutils
+from unittest.mock import MagicMock, Mock
 
 import fs.osfs
-import six
 from mako.lookup import TemplateLookup
-from mock import MagicMock, Mock
 from path import Path
 
 from capa.capa_problem import LoncapaProblem, LoncapaSystem
@@ -41,7 +39,7 @@ def tst_render_template(template, context):  # pylint: disable=unused-argument
     A test version of render to template.  Renders to the repr of the context, completely ignoring
     the template name.  To make the output valid xml, quotes the content, and wraps it in a <div>
     """
-    return '<div>{0}</div>'.format(saxutils.escape(repr(context)))
+    return '<div>{}</div>'.format(saxutils.escape(repr(context)))
 
 
 def calledback_url(dispatch='score_update'):
@@ -90,13 +88,10 @@ def mock_capa_module():
         """
         Mock implementation of __unicode__ or __str__ for the module's location.
         """
-        return u'i4x://Foo/bar/mock/abc'
+        return 'i4x://Foo/bar/mock/abc'
 
     capa_module = Mock()
-    if six.PY2:
-        capa_module.location.__unicode__ = mock_location_text
-    else:
-        capa_module.location.__str__ = mock_location_text
+    capa_module.location.__str__ = mock_location_text
     # The following comes into existence by virtue of being called
     # capa_module.runtime.track_function
     return capa_module
@@ -116,6 +111,6 @@ def load_fixture(relpath):
     in the same directory as the test file.
     """
     abspath = os.path.join(os.path.dirname(__file__), 'test_files', relpath)
-    with io.open(abspath, encoding="utf-8") as fixture_file:
+    with open(abspath, encoding="utf-8") as fixture_file:
         contents = fixture_file.read()
         return contents

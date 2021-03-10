@@ -9,7 +9,6 @@ from cmath import isinf, isnan
 from decimal import Decimal
 
 import bleach
-import six
 from calc import evaluator
 from lxml import etree
 
@@ -120,7 +119,7 @@ def contextualize_text(text, context):  # private
         # Should be a separate dict of variables that should be
         # replaced.
         context_key = '$' + key
-        if context_key in (text.decode('utf-8') if six.PY3 and isinstance(text, bytes) else text):
+        if context_key in (text.decode('utf-8') if isinstance(text, bytes) else text):  # pylint: disable=superfluous-parens
             text = convert_to_str(text)
             context_value = convert_to_str(context[key])
             text = text.replace(context_key, context_value)
@@ -207,7 +206,7 @@ def get_inner_html_from_xpath(xpath_node):
     html = etree.tostring(xpath_node).strip().decode('utf-8')
     # strips outer tag from html string
     # xss-lint: disable=python-interpolate-html
-    inner_html = re.sub('(?ms)<%s[^>]*>(.*)</%s>' % (xpath_node.tag, xpath_node.tag), '\\1', html)
+    inner_html = re.sub(f'(?ms)<{xpath_node.tag}[^>]*>(.*)</{xpath_node.tag}>', '\\1', html)
     return inner_html.strip()
 
 
