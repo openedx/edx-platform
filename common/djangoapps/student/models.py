@@ -1490,6 +1490,7 @@ class CourseEnrollment(models.Model):
                 # This next property is for an experiment, see method's comments for more information
                 segment_properties['external_course_updates'] = set_up_external_updates_for_enrollment(self.user,
                                                                                                        self.course_id)
+            segment_traits = dict(segment_properties)
             with tracker.get_tracker().context(event_name, context):
                 tracker.emit(event_name, data)
                 segment.track(self.user_id, event_name, segment_properties, traits=segment_properties)

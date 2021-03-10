@@ -334,20 +334,22 @@ def _track_user_registration(user, profile, params, third_party_provider):
         # .. pii_types: email_address, username, name, birth_date, location, gender
         # .. pii_retirement: third_party
         segment.identify(*identity_args)
+        properties = {
+            'category': 'conversion',
+            # ..pii: Learner email is sent to Segment in following line and will be associated with analytics data.
+            'email': user.email,
+            'label': params.get('course_id'),
+            'provider': third_party_provider.name if third_party_provider else None,
+            'is_gender_selected': bool(profile.gender_display),
+            'is_year_of_birth_selected': bool(profile.year_of_birth),
+            'is_education_selected': bool(profile.level_of_education_display),
+            'is_goal_set': bool(profile.goals),
+        }
         segment.track(
             user.id,
             "edx.bi.user.account.registered",
-            {
-                'category': 'conversion',
-                # ..pii: Learner email is sent to Segment in following line and will be associated with analytics data.
-                'email': user.email,
-                'label': params.get('course_id'),
-                'provider': third_party_provider.name if third_party_provider else None,
-                'is_gender_selected': bool(profile.gender_display),
-                'is_year_of_birth_selected': bool(profile.year_of_birth),
-                'is_education_selected': bool(profile.level_of_education_display),
-                'is_goal_set': bool(profile.goals),
-            },
+            properties=properties,
+            traits=properties,
         )
 
 
