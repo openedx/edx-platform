@@ -372,6 +372,10 @@ def award_course_certificate(self, username, course_run_key):
             # This is a known limitation of this implementation and was chosen to reduce the amount of replication,
             # endpoints, celery tasks, and jenkins jobs that needed to be written for this functionality
             visible_date = available_date_for_certificate(course_overview, certificate)
+            LOGGER.info(
+                "Task award_course_certificate will award certificate for course "
+                f"{course_key} with a visible date of {visible_date}"
+            )
             post_course_certificate(credentials_client, username, certificate, visible_date)
 
             LOGGER.info(f"Awarded certificate for course {course_key} to user {username}")
