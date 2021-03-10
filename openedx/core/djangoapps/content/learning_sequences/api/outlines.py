@@ -13,7 +13,7 @@ from django.contrib.auth import get_user_model
 from django.db.models.query import QuerySet
 from django.db import transaction
 from edx_django_utils.cache import TieredCache, get_cache_key  # lint-amnesty, pylint: disable=unused-import
-from edx_django_utils.monitoring import function_trace
+from edx_django_utils.monitoring import function_trace, set_custom_attribute
 from opaque_keys import OpaqueKey
 from opaque_keys.edx.locator import LibraryLocator
 from opaque_keys.edx.keys import CourseKey  # lint-amnesty, pylint: disable=unused-import
@@ -80,11 +80,19 @@ def key_supports_outlines(opaque_key: OpaqueKey) -> bool:
     return False
 
 
+@function_trace('learning_sequences.api.get_course_keys_with_outlines')
 def get_course_keys_with_outlines() -> QuerySet:
-    """Queryset of ContextKeys, iterable as a flat list."""
+    """
+    Queryset of ContextKeys, iterable as a flat list.
+
+    The function_trace time here is a little misleading because querysets are
+    lazily evaluated. It's mostly there to get information about how often it's
+    being called and by what transactions.
+    """
     return LearningContext.objects.values_list('context_key', flat=True)
 
 
+@function_trace('learning_sequences.api.get_course_outline')
 def get_course_outline(course_key: CourseKey) -> CourseOutlineData:
     """
     Get the outline of a course run.
@@ -93,6 +101,10 @@ def get_course_outline(course_key: CourseKey) -> CourseOutlineData:
 
     See the definition of CourseOutlineData for details about the data returned.
     """
+    # Record the course separately from the course_id usually done in views,
+    # to make sure we get useful Span information if we're invoked by things
+    # like management commands, where it may iterate through many courses.
+    set_custom_attribute('learning_sequences.api.course_id', str(course_key))
     course_context = _get_course_context_for_outline(course_key)
 
     # Check to see if it's in the cache.
@@ -191,6 +203,7 @@ def _get_course_context_for_outline(course_key: CourseKey) -> CourseContext:
     return course_context
 
 
+@function_trace('learning_sequences.api.get_user_course_outline')
 def get_user_course_outline(course_key: CourseKey,
                             user: User,
                             at_time: datetime) -> UserCourseOutlineData:
@@ -207,6 +220,7 @@ def get_user_course_outline(course_key: CourseKey,
     return user_course_outline
 
 
+@function_trace('learning_sequences.api.get_user_course_outline_details')
 def get_user_course_outline_details(course_key: CourseKey,
                                     user: User,
                                     at_time: datetime) -> UserCourseOutlineDetailsData:
@@ -232,6 +246,12 @@ def get_user_course_outline_details(course_key: CourseKey,
 def _get_user_course_outline_and_processors(course_key: CourseKey,  # lint-amnesty, pylint: disable=missing-function-docstring
                                             user: User,
                                             at_time: datetime):
+    # Record the user separately from the standard user_id that views record,
+    # because it's possible to ask for views as other users if you're global
+    # staff. Performance is going to vary based on the user we're asking the
+    # outline for, not the user who is initiating the request.
+    set_custom_attribute('learning_sequences.api.user_id', user.id)
+
     full_course_outline = get_course_outline(course_key)
     user_can_see_all_content = can_see_all_content(user, course_key)
 
@@ -246,8 +266,6 @@ def _get_user_course_outline_and_processors(course_key: CourseKey,  # lint-amnes
         ('special_exams', SpecialExamsOutlineProcessor),
         ('visibility', VisibilityOutlineProcessor),
         ('enrollment', EnrollmentOutlineProcessor),
-        # Future:
-        # ('user_partitions', UserPartitionsOutlineProcessor),
     ]
 
     # Run each OutlineProcessor in order to figure out what items we have to
@@ -263,7 +281,7 @@ def _get_user_course_outline_and_processors(course_key: CourseKey,  # lint-amnes
         processor.load_data()
         if not user_can_see_all_content:
             # function_trace lets us see how expensive each processor is being.
-            with function_trace('processor:{}'.format(name)):
+            with function_trace('learning_sequences.api.outline_processors.{}'.format(name)):
                 processor_usage_keys_removed = processor.usage_keys_to_remove(full_course_outline)
                 processor_inaccessible_sequences = processor.inaccessible_sequences(full_course_outline)
                 usage_keys_to_remove |= processor_usage_keys_removed
@@ -297,7 +315,7 @@ def _get_user_course_outline_and_processors(course_key: CourseKey,  # lint-amnes
     return user_course_outline, processors
 
 
-@function_trace('replace_course_outline')
+@function_trace('learning_sequences.api.replace_course_outline')
 def replace_course_outline(course_outline: CourseOutlineData):
     """
     Replace the model data stored for the Course Outline with the contents of
@@ -309,6 +327,7 @@ def replace_course_outline(course_outline: CourseOutlineData):
         "Replacing CourseOutline for %s (version %s, %d sequences)",
         course_outline.course_key, course_outline.published_version, len(course_outline.sequences)
     )
+    set_custom_attribute('learning_sequences.api.course_id', str(course_outline.course_key))
 
     with transaction.atomic():
         # Update or create the basic CourseContext...
