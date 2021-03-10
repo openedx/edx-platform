@@ -1,11 +1,9 @@
-# -*- coding: utf-8 -*-
 """
 Basic unit tests for LibraryRoot
 """
 
 
-from mock import patch
-from six.moves import range
+from unittest.mock import patch
 from web_fragments.fragment import Fragment
 from xblock.runtime import Runtime as VanillaRuntime
 
@@ -34,7 +32,7 @@ class TestLibraryRoot(MixedSplitTestCase):
         We have to patch the runtime (module system) in order to be able to
         render blocks in our test environment.
         """
-        message = u"Hello world"
+        message = "Hello world"
         library = LibraryFactory.create(modulestore=self.store)
         # Add one HTML block to the library:
         ItemFactory.create(

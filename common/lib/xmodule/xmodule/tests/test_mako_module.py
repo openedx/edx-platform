@@ -2,8 +2,9 @@
 
 
 from unittest import TestCase
+from unittest.mock import Mock
+
 import pytest
-from mock import Mock
 
 from xmodule.mako_module import MakoModuleDescriptor
 

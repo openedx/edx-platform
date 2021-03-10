@@ -5,8 +5,8 @@ Tests for the Unit XBlock
 import re
 import unittest
 from xml.dom import minidom
+from unittest.mock import patch
 
-from mock import patch
 from web_fragments.fragment import Fragment
 from xblock.core import XBlock
 from xblock.completable import XBlockCompletionMode

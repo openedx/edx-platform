@@ -1,19 +1,17 @@
 # lint-amnesty, pylint: disable=missing-module-docstring
-# -*- coding: utf-8 -*-
 
 
 import datetime
 from tempfile import mkdtemp
+from unittest.mock import Mock, patch
 
 import ddt
 from django.test import TestCase
 from fs.osfs import OSFS
 from lxml import etree
-from mock import Mock, patch
 from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locator import BlockUsageLocator, CourseLocator
 from pytz import UTC
-from six import text_type
 from xblock.core import XBlock
 from xblock.fields import Integer, Scope, String
 from xblock.runtime import DictKeyValueStore, KvsFieldData
@@ -44,7 +42,7 @@ class DummySystem(ImportSystem):  # lint-amnesty, pylint: disable=abstract-metho
         course_dir = "test_dir"
         error_tracker = Mock()
 
-        super(DummySystem, self).__init__(  # lint-amnesty, pylint: disable=super-with-arguments
+        super().__init__(
             xmlstore=xmlstore,
             course_id=course_id,
             course_dir=course_dir,
@@ -68,7 +66,7 @@ class BaseCourseTestCase(TestCase):
 
     def get_course(self, name):
         """Get a test course by directory name.  If there's more than one, error."""
-        print("Importing {0}".format(name))
+        print(f"Importing {name}")
 
         modulestore = XMLModuleStore(
             DATA_DIR,
@@ -126,7 +124,7 @@ class ImportTestCase(BaseCourseTestCase):  # lint-amnesty, pylint: disable=missi
         '''Check that malformed xml loads as an ErrorBlock.'''
 
         # Use an exotic character to also flush out Unicode issues.
-        bad_xml = u'''<sequential display_name="oops\N{SNOWMAN}"><video url="hi"></sequential>'''
+        bad_xml = '''<sequential display_name="oops\N{SNOWMAN}"><video url="hi"></sequential>'''
         system = self.get_system()
 
         descriptor = system.process_xml(bad_xml)
@@ -208,7 +206,7 @@ class ImportTestCase(BaseCourseTestCase):  # lint-amnesty, pylint: disable=missi
 
         # Now export and check things
         file_system = OSFS(mkdtemp())
-        descriptor.runtime.export_fs = file_system.makedir(u'course', recreate=True)
+        descriptor.runtime.export_fs = file_system.makedir('course', recreate=True)
         node = etree.Element('unknown')
         descriptor.add_xml_to_node(node)
 
@@ -220,7 +218,7 @@ class ImportTestCase(BaseCourseTestCase):  # lint-amnesty, pylint: disable=missi
         assert node.attrib['org'] == ORG
 
         # Does the course still have unicorns?
-        with descriptor.runtime.export_fs.open(u'course/{course_run}.xml'.format(course_run=course_run)) as f:
+        with descriptor.runtime.export_fs.open(f'course/{course_run}.xml') as f:
             course_xml = etree.fromstring(f.read())
 
         assert course_xml.attrib['unicorn'] == unicorn_color
@@ -234,7 +232,7 @@ class ImportTestCase(BaseCourseTestCase):  # lint-amnesty, pylint: disable=missi
 
         # Does the chapter tag now have a due attribute?
         # hardcoded path to child
-        with descriptor.runtime.export_fs.open(u'chapter/ch.xml') as f:
+        with descriptor.runtime.export_fs.open('chapter/ch.xml') as f:
             chapter_xml = etree.fromstring(f.read())
         assert chapter_xml.tag == 'chapter'
         assert 'due' not in chapter_xml.attrib
@@ -426,11 +424,11 @@ class ImportTestCase(BaseCourseTestCase):  # lint-amnesty, pylint: disable=missi
               """]
 
         for xml_str in yes:
-            print("should be True for {0}".format(xml_str))
+            print(f"should be True for {xml_str}")
             assert is_pointer_tag(etree.fromstring(xml_str))
 
         for xml_str in no:
-            print("should be False for {0}".format(xml_str))
+            print(f"should be False for {xml_str}")
             assert not is_pointer_tag(etree.fromstring(xml_str))
 
     def test_metadata_inherit(self):
@@ -441,7 +439,7 @@ class ImportTestCase(BaseCourseTestCase):  # lint-amnesty, pylint: disable=missi
 
         def check_for_key(key, node, value):
             "recursive check for presence of key"
-            print("Checking {0}".format(text_type(node.location)))
+            print("Checking {}".format(str(node.location)))
             assert getattr(node, key) == value
             for c in node.get_children():
                 check_for_key(key, c, value)
@@ -561,7 +559,7 @@ class ImportTestCase(BaseCourseTestCase):  # lint-amnesty, pylint: disable=missi
             in modulestore.get_course_errors(course.id)
         ]
 
-        assert any((((expect in msg) or (expect in err)) for (msg, err) in errors))
+        assert any(((expect in msg) or (expect in err)) for (msg, err) in errors)
         chapters = course.get_children()
         assert len(chapters) == 4
 
@@ -584,7 +582,7 @@ class ImportTestCase(BaseCourseTestCase):  # lint-amnesty, pylint: disable=missi
         for i in (2, 3):
             video = sections[i]
             # Name should be 'video_{hash}'
-            print("video {0} url_name: {1}".format(i, video.url_name))
+            print(f"video {i} url_name: {video.url_name}")
             assert len(video.url_name) == (len('video_') + 12)
 
     def test_poll_and_conditional_import(self):
@@ -608,7 +606,7 @@ class ImportTestCase(BaseCourseTestCase):  # lint-amnesty, pylint: disable=missi
         assert module.poll_answer == ''
         assert module.poll_answers == {}
         assert module.answers ==\
-               [{'text': u'Yes', 'id': 'Yes'}, {'text': u'No', 'id': 'No'}, {'text': u"Don't know", 'id': 'Dont_know'}]
+               [{'text': 'Yes', 'id': 'Yes'}, {'text': 'No', 'id': 'No'}, {'text': "Don't know", 'id': 'Dont_know'}]
 
     def test_error_on_import(self):
         '''Check that when load_error_module is false, an exception is raised, rather than returning an ErrorBlock'''

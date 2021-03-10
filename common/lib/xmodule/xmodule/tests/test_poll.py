@@ -1,10 +1,9 @@
-# -*- coding: utf-8 -*-
 """Test for Poll Xmodule functional logic."""
 
 import json
 import unittest
 
-from mock import Mock
+from unittest.mock import Mock
 
 from xblock.field_data import DictFieldData
 from xblock.fields import ScopeIds

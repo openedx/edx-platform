@@ -68,7 +68,7 @@ def get_short_labeler(prefix):
     `prefix` to an assignment index.
     """
     def labeler(index):
-        return u"{prefix} {index:02d}".format(prefix=prefix, index=index)
+        return f"{prefix} {index:02d}"
     return labeler
 
 

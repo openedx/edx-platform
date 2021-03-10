@@ -3,9 +3,9 @@
 
 import os
 import unittest
+from unittest.mock import Mock, patch
 
 import ddt
-from mock import Mock, patch
 from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locator import AssetLocator, CourseLocator
 from path import Path as path
@@ -54,7 +54,7 @@ injected humour and the like).
 """
 
 
-class Content(object):
+class Content:
     """
     A class with location and content_type members
     """
@@ -64,7 +64,7 @@ class Content(object):
         self.data = None
 
 
-class FakeGridFsItem(object):
+class FakeGridFsItem:
     """
     This class provides the basic methods to get data from a GridFS item
     """
@@ -112,19 +112,19 @@ class ContentTest(unittest.TestCase):  # lint-amnesty, pylint: disable=missing-c
         assert content.thumbnail_location is None
 
     @ddt.data(
-        (u"monsters__.jpg", u"monsters__.jpg"),
-        (u"monsters__.png", u"monsters__-png.jpg"),
-        (u"dots.in.name.jpg", u"dots.in.name.jpg"),
-        (u"dots.in.name.png", u"dots.in.name-png.jpg"),
+        ("monsters__.jpg", "monsters__.jpg"),
+        ("monsters__.png", "monsters__-png.jpg"),
+        ("dots.in.name.jpg", "dots.in.name.jpg"),
+        ("dots.in.name.png", "dots.in.name-png.jpg"),
     )
     @ddt.unpack
     def test_generate_thumbnail_image(self, original_filename, thumbnail_filename):
         content_store = ContentStore()
-        content = Content(AssetLocator(CourseLocator(u'mitX', u'800', u'ignore_run'), u'asset', original_filename),
+        content = Content(AssetLocator(CourseLocator('mitX', '800', 'ignore_run'), 'asset', original_filename),
                           None)
         (thumbnail_content, thumbnail_file_location) = content_store.generate_thumbnail(content)
         assert thumbnail_content is None
-        assert AssetLocator(CourseLocator(u'mitX', u'800', u'ignore_run'), u'thumbnail', thumbnail_filename) ==\
+        assert AssetLocator(CourseLocator('mitX', '800', 'ignore_run'), 'thumbnail', thumbnail_filename) ==\
                thumbnail_file_location
 
     @patch('xmodule.contentstore.content.Image')
@@ -135,7 +135,7 @@ class ContentTest(unittest.TestCase):  # lint-amnesty, pylint: disable=missing-c
         image_class_mock.open.return_value = mock_image
 
         content_store = ContentStore()
-        content = Content(AssetLocator(CourseLocator(u'mitX', u'800', u'ignore_run'), u'asset', "monsters.jpg"),
+        content = Content(AssetLocator(CourseLocator('mitX', '800', 'ignore_run'), 'asset', "monsters.jpg"),
                           "image/jpeg")
         content.data = b'mock data'
         content_store.generate_thumbnail(content)
@@ -147,13 +147,13 @@ class ContentTest(unittest.TestCase):  # lint-amnesty, pylint: disable=missing-c
         # SVG files should be stored in original form for thumbnail purposes.
         content_store = ContentStore()
         content_store.save = Mock()
-        thumbnail_filename = u'test.svg'
-        content = Content(AssetLocator(CourseLocator(u'mitX', u'800', u'ignore_run'), u'asset', u'test.svg'),
+        thumbnail_filename = 'test.svg'
+        content = Content(AssetLocator(CourseLocator('mitX', '800', 'ignore_run'), 'asset', 'test.svg'),
                           'image/svg+xml')
         content.data = b'mock svg file'
         (thumbnail_content, thumbnail_file_location) = content_store.generate_thumbnail(content)
         assert thumbnail_content.data.read() == b'mock svg file'
-        assert AssetLocator(CourseLocator(u'mitX', u'800', u'ignore_run'), u'thumbnail', thumbnail_filename) ==\
+        assert AssetLocator(CourseLocator('mitX', '800', 'ignore_run'), 'thumbnail', thumbnail_filename) ==\
                thumbnail_file_location
 
     def test_compute_location(self):
@@ -162,13 +162,13 @@ class ContentTest(unittest.TestCase):  # lint-amnesty, pylint: disable=missing-c
         asset_location = StaticContent.compute_location(
             CourseKey.from_string('mitX/400/ignore'), 'subs__1eo_jXvZnE .srt.sjson'
         )
-        assert AssetLocator(CourseLocator(u'mitX', u'400', u'ignore', deprecated=True),
-                            u'asset', u'subs__1eo_jXvZnE_.srt.sjson') == asset_location
+        assert AssetLocator(CourseLocator('mitX', '400', 'ignore', deprecated=True),
+                            'asset', 'subs__1eo_jXvZnE_.srt.sjson') == asset_location
 
     def test_get_location_from_path(self):
-        asset_location = StaticContent.get_location_from_path(u'/c4x/a/b/asset/images_course_image.jpg')
-        assert AssetLocator(CourseLocator(u'a', u'b', None, deprecated=True),
-                            u'asset', u'images_course_image.jpg', deprecated=True) == asset_location
+        asset_location = StaticContent.get_location_from_path('/c4x/a/b/asset/images_course_image.jpg')
+        assert AssetLocator(CourseLocator('a', 'b', None, deprecated=True),
+                            'asset', 'images_course_image.jpg', deprecated=True) == asset_location
 
     def test_static_content_stream_stream_data(self):
         """
@@ -210,8 +210,8 @@ class ContentTest(unittest.TestCase):  # lint-amnesty, pylint: disable=missing-c
         """
         Test that only one filename starts with 000.
         """
-        output_root = path(u'common/static/xmodule/descriptors/js')
+        output_root = path('common/static/xmodule/descriptors/js')
         file_owners = _write_js(output_root, _list_descriptors(), 'get_studio_view_js')
-        js_file_paths = set(file_path for file_path in sum(list(file_owners.values()), []) if os.path.basename(file_path).startswith('000-'))  # lint-amnesty, pylint: disable=line-too-long
+        js_file_paths = {file_path for file_path in sum(list(file_owners.values()), []) if os.path.basename(file_path).startswith('000-')}  # lint-amnesty, pylint: disable=line-too-long
         assert len(js_file_paths) == 1
         assert 'XModule.Descriptor = (function() {' in open(js_file_paths.pop()).read()

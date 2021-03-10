@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # pylint: disable=protected-access
 """Test for Video Xmodule functional logic.
 These test data read from xml, not from mongo.
@@ -21,19 +20,18 @@ import shutil
 import unittest
 from tempfile import mkdtemp
 from uuid import uuid4
+from unittest.mock import ANY, MagicMock, Mock, patch
+
 import pytest
 import ddt
 import httpretty
-import six
 from django.conf import settings
 from django.test import TestCase
 from django.test.utils import override_settings
 from fs.osfs import OSFS
 from lxml import etree
-from mock import ANY, MagicMock, Mock, patch
 from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locator import CourseLocator
-from six.moves import zip
 from xblock.field_data import DictFieldData
 from xblock.fields import ScopeIds
 
@@ -79,9 +77,9 @@ MOCKED_YOUTUBE_TRANSCRIPT_API_RESPONSE = '''
 '''
 
 ALL_LANGUAGES = (
-    [u"en", u"English"],
-    [u"eo", u"Esperanto"],
-    [u"ur", u"Urdu"]
+    ["en", "English"],
+    ["eo", "Esperanto"],
+    ["ur", "Urdu"]
 )
 
 
@@ -174,7 +172,7 @@ class VideoBlockTestBase(unittest.TestCase):
     """
 
     def setUp(self):
-        super(VideoBlockTestBase, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.descriptor = instantiate_descriptor()
 
     def assertXmlEqual(self, expected, xml):
@@ -233,7 +231,7 @@ class TestCreateYouTubeUrl(VideoBlockTestBase):
         Test that passing unicode to `create_youtube_url` doesn't throw
         an error.
         """
-        self.descriptor.create_youtube_url(u"üñîçø∂é")
+        self.descriptor.create_youtube_url("üñîçø∂é")
 
 
 @ddt.ddt
@@ -617,7 +615,7 @@ class VideoBlockImportTestCase(TestCase):
             assert edx_video_id == 'test_edx_video_id'
             assert static_dir == EXPORT_IMPORT_STATIC_DIR
             assert resource_fs is not None
-            assert external_transcripts == {u'en': [u'subs_3_yD_cEKoCk.srt.sjson']}
+            assert external_transcripts == {'en': ['subs_3_yD_cEKoCk.srt.sjson']}
             assert course_id == 'test_course_id'
             return edx_video_id
 
@@ -646,7 +644,7 @@ class VideoBlockImportTestCase(TestCase):
             edx_video_id,
             module_system.resources_fs,
             EXPORT_IMPORT_STATIC_DIR,
-            {u'en': [u'subs_3_yD_cEKoCk.srt.sjson']},
+            {'en': ['subs_3_yD_cEKoCk.srt.sjson']},
             course_id='test_course_id'
         )
 
@@ -672,7 +670,7 @@ class VideoExportTestCase(VideoBlockTestBase):
     """
 
     def setUp(self):
-        super(VideoExportTestCase, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.temp_dir = mkdtemp()
         self.file_system = OSFS(self.temp_dir)
         self.addCleanup(shutil.rmtree, self.temp_dir)
@@ -682,7 +680,7 @@ class VideoExportTestCase(VideoBlockTestBase):
         """
         Test that we write the correct XML on export.
         """
-        edx_video_id = u'test_edx_video_id'
+        edx_video_id = 'test_edx_video_id'
         mock_val_api.export_to_xml = Mock(
             return_value=dict(
                 xml=etree.Element('video_asset'),
@@ -733,7 +731,7 @@ class VideoExportTestCase(VideoBlockTestBase):
             video_id=edx_video_id,
             static_dir=EXPORT_IMPORT_STATIC_DIR,
             resource_fs=self.file_system,
-            course_id=six.text_type(self.descriptor.runtime.course_id.for_branch(None)),
+            course_id=str(self.descriptor.runtime.course_id.for_branch(None)),
         )
 
     @patch('xmodule.video_module.video_module.edxval_api')
@@ -814,9 +812,9 @@ class VideoExportTestCase(VideoBlockTestBase):
         """
         Test XML export handles the unicode characters.
         """
-        self.descriptor.display_name = u'这是文'
+        self.descriptor.display_name = '这是文'
         xml = self.descriptor.definition_to_xml(self.file_system)
-        assert xml.get('display_name') == u'这是文'
+        assert xml.get('display_name') == '这是文'
 
 
 @ddt.ddt
@@ -875,15 +873,15 @@ class VideoBlockStudentViewDataTestCase(unittest.TestCase):
     def test_student_view_data_with_hls_flag(self, mock_get_video_info, mock_get_video_transcript_content):
         mock_get_video_info.return_value = {
             'url': '/edxval/video/example',
-            'edx_video_id': u'example_id',
+            'edx_video_id': 'example_id',
             'duration': 111.0,
-            'client_video_id': u'The example video',
+            'client_video_id': 'The example video',
             'encoded_videos': [
                 {
-                    'url': u'http://www.meowmix.com',
+                    'url': 'http://www.meowmix.com',
                     'file_size': 25556,
                     'bitrate': 9600,
-                    'profile': u'hls'
+                    'profile': 'hls'
                 }
             ]
         }
@@ -901,7 +899,7 @@ class VideoBlockStudentViewDataTestCase(unittest.TestCase):
         descriptor.runtime.course_id = MagicMock()
         descriptor.runtime.handler_url = MagicMock()
         student_view_data = descriptor.student_view_data()
-        expected_video_data = {u'hls': {'url': u'http://www.meowmix.com', 'file_size': 25556}}
+        expected_video_data = {'hls': {'url': 'http://www.meowmix.com', 'file_size': 25556}}
         self.assertDictEqual(student_view_data.get('encoded_videos'), expected_video_data)
 
 
@@ -985,7 +983,7 @@ class VideoBlockIndexingTestCase(unittest.TestCase):
             </video>
         '''
         yt_subs_id = 'OEoXaMPEzfM'
-        url = 'http://video.google.com/timedtext?lang=en&v={}'.format(yt_subs_id)
+        url = f'http://video.google.com/timedtext?lang=en&v={yt_subs_id}'
         httpretty.register_uri(
             method=httpretty.GET,
             uri=url,
@@ -1020,7 +1018,7 @@ class VideoBlockIndexingTestCase(unittest.TestCase):
             </video>
         '''
         yt_subs_id = 'OEoXaMPEzfM'
-        url = 'http://video.google.com/timedtext?lang=en&v={}'.format(yt_subs_id)
+        url = f'http://video.google.com/timedtext?lang=en&v={yt_subs_id}'
         httpretty.register_uri(
             method=httpretty.GET,
             uri=url,

@@ -78,7 +78,7 @@ class DateTest(unittest.TestCase):  # lint-amnesty, pylint: disable=missing-clas
         """
         now = datetime.datetime.now(UTC)
         delta = now - datetime.datetime.fromtimestamp(0, UTC)
-        assert DateTest.date.from_json((delta.total_seconds() * 1000)) == now
+        assert DateTest.date.from_json(delta.total_seconds() * 1000) == now
         yesterday = datetime.datetime.now(UTC) - datetime.timedelta(days=-1)
         assert DateTest.date.from_json(yesterday) == yesterday
 

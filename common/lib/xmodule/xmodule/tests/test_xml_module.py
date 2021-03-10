@@ -3,10 +3,9 @@
 
 
 import unittest
+from unittest.mock import Mock
 
-from mock import Mock
 from opaque_keys.edx.locator import BlockUsageLocator, CourseLocator
-from six.moves import range
 from xblock.field_data import DictFieldData
 from xblock.fields import Any, Boolean, Dict, Float, Integer, List, Scope, String
 from xblock.runtime import DictKeyValueStore, KvsFieldData
@@ -28,7 +27,7 @@ class CrazyJsonString(String):
         return value + " JSON"
 
 
-class TestFields(object):
+class TestFields:
     # Will be returned by editable_metadata_fields.
     max_attempts = Integer(scope=Scope.settings, default=1000, values={'min': 1, 'max': 10})
     # Will not be returned by editable_metadata_fields because filtered out by non_editable_metadata_fields.
@@ -73,7 +72,7 @@ class InheritingFieldDataTest(unittest.TestCase):
         not_inherited = String(scope=Scope.settings, default="nothing")
 
     def setUp(self):
-        super(InheritingFieldDataTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.dummy_course_key = CourseLocator('test_org', 'test_123', 'test_run')
         self.system = get_test_descriptor_system()
         self.all_blocks = {}
@@ -164,7 +163,7 @@ class InheritingFieldDataTest(unittest.TestCase):
         parent.inherited = "Changed!"
         assert parent.inherited == 'Changed!'
         for child_num in range(10):
-            usage_id = self.get_usage_id("vertical", "child_{}".format(child_num))
+            usage_id = self.get_usage_id("vertical", f"child_{child_num}")
             child = self.get_a_block(usage_id=usage_id)
             child.parent = parent.location
             assert child.inherited == 'Changed!'
@@ -343,7 +342,7 @@ class EditableMetadataFieldsTest(unittest.TestCase):
         class TestModuleDescriptor(TestFields, XmlDescriptor):  # lint-amnesty, pylint: disable=abstract-method
             @property
             def non_editable_metadata_fields(self):
-                non_editable_fields = super(TestModuleDescriptor, self).non_editable_metadata_fields  # lint-amnesty, pylint: disable=super-with-arguments
+                non_editable_fields = super().non_editable_metadata_fields
                 non_editable_fields.append(TestModuleDescriptor.due)
                 return non_editable_fields
 

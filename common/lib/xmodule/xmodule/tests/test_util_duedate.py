@@ -4,8 +4,7 @@ Tests for extended due date utilities.
 
 
 import unittest
-
-import mock
+from unittest import mock
 
 from ..util import duedate
 
