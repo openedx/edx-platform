@@ -4,6 +4,8 @@ Python APIs exposed by the student app to other in-process apps.
 """
 
 
+import logging
+
 from django.contrib.auth import get_user_model
 from django.conf import settings
 
@@ -47,6 +49,8 @@ TRANSITION_STATES = (
 )
 
 COURSE_DASHBOARD_PLUGIN_VIEW_NAME = "course_dashboard"
+
+log = logging.getLogger()
 
 
 def create_manual_enrollment_audit(
@@ -108,4 +112,5 @@ def is_user_enrolled_in_course(student, course_key):
     """
     Determines if a learner is enrolled in a given course-run.
     """
+    log.info(f"Checking if {student.id} is enrolled in course {course_key}")
     return CourseEnrollment.is_enrolled(student, course_key)

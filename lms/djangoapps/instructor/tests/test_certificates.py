@@ -740,9 +740,10 @@ class CertificateExceptionViewInstructorApiTest(SharedModuleStoreTestCase):
         # Assert Request not successful
         assert not res_json['success']
         # Assert Error Message
-        assert res_json['message'] ==\
-               'Certificate exception (user={user}) does not exist in certificate white list.' \
-               ' Please refresh the page and try again.'.format(user=self.certificate_exception['user_name'])
+        assert res_json['message'] == (
+            f"Error occurred removing the allowlist entry for student {self.user.username}. Please refresh the page "
+            "and try again"
+        )
 
     def test_certificate_invalidation_already_exists(self):
         """
