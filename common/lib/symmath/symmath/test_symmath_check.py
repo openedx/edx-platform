@@ -1,6 +1,7 @@
 # lint-amnesty, pylint: disable=missing-module-docstring
 from unittest import TestCase
 
+from six.moves import range
 
 from .symmath_check import symmath_check
 
@@ -80,9 +81,9 @@ class SymmathCheckTest(TestCase):  # lint-amnesty, pylint: disable=missing-class
             expect = n
             ans = n
             result = symmath_check(str(expect), str(ans))
-            assert (('ok' in result) and result['ok']), (f'{expect:f} should == {ans:f}')
+            assert (('ok' in result) and result['ok']), ('%f should == %f' % (expect, ans))
 
             # Change expect so that it != ans
             expect += 0.1
             result = symmath_check(str(expect), str(ans))
-            assert (('ok' in result) and (not result['ok'])), (f'{expect:f} should != {ans:f}')
+            assert (('ok' in result) and (not result['ok'])), ('%f should != %f' % (expect, ans))

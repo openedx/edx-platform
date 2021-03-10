@@ -1,3 +1,4 @@
+# coding=utf-8
 """
 Tests capa util
 """
@@ -23,7 +24,7 @@ class UtilTest(unittest.TestCase):
     """Tests for util"""
 
     def setUp(self):
-        super().setUp()
+        super(UtilTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.system = test_capa_system()
 
     def test_compare_with_tolerance(self):  # lint-amnesty, pylint: disable=too-many-statements
@@ -160,9 +161,9 @@ class UtilTest(unittest.TestCase):
 
     def test_contextualize_text_with_non_ascii_context(self):
         """Verify that variable substitution works as intended with non-ascii characters."""
-        key = 'あなた$a $b'
+        key = u'あなた$a $b'
         text = '$' + key
-        context = {'a': 'あなたあなたあなた', 'b': 'あなたhi'}
+        context = {'a': u'あなたあなたあなた', 'b': u'あなたhi'}
         expected_text = '$あなたあなたあなたあなた あなたhi'
         contextual_text = contextualize_text(text, context)
         assert expected_text == contextual_text

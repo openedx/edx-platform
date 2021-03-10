@@ -6,9 +6,9 @@ CAPA HTML rendering tests.
 import os
 import textwrap
 import unittest
-from unittest import mock
 
 import ddt
+import mock
 from lxml import etree
 from capa.tests.helpers import new_loncapa_problem, test_capa_system
 from openedx.core.djangolib.markup import HTML
@@ -23,7 +23,7 @@ class CapaHtmlRenderTest(unittest.TestCase):
     """
 
     def setUp(self):
-        super().setUp()
+        super(CapaHtmlRenderTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.capa_system = test_capa_system()
 
     def test_blank_problem(self):
@@ -43,8 +43,8 @@ class CapaHtmlRenderTest(unittest.TestCase):
     def test_include_html(self):
         # Create a test file to include
         self._create_test_file(
-            'test_include.xml',
-            '<test>Test include</test>'
+            u'test_include.xml',
+            u'<test>Test include</test>'
         )
 
         # Generate some XML with an <include>

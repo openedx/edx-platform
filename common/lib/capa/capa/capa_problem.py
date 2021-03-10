@@ -22,6 +22,7 @@ from copy import deepcopy
 from datetime import datetime
 from xml.sax.saxutils import unescape
 
+import six
 from django.utils.encoding import python_2_unicode_compatible
 from lxml import etree
 from pytz import UTC
@@ -79,7 +80,7 @@ log = logging.getLogger(__name__)
 # main class for this module
 
 
-class LoncapaSystem:
+class LoncapaSystem(object):
     """
     An encapsulation of resources needed from the outside.
 
@@ -128,7 +129,7 @@ class LoncapaSystem:
 
 
 @python_2_unicode_compatible
-class LoncapaProblem:
+class LoncapaProblem(object):
     """
     Main class for capa Problems.
     """
@@ -184,7 +185,7 @@ class LoncapaProblem:
         self.problem_text = problem_text
 
         # parse problem XML file into an element tree
-        if isinstance(problem_text, str):
+        if isinstance(problem_text, six.text_type):
             # etree chokes on Unicode XML with an encoding declaration
             problem_text = problem_text.encode('utf-8')
         self.tree = etree.XML(problem_text)
@@ -316,7 +317,7 @@ class LoncapaProblem:
         self.student_answers = initial_answers
 
     def __str__(self):
-        return f"LoncapaProblem ({self.problem_id})"
+        return u"LoncapaProblem ({0})".format(self.problem_id)
 
     def get_state(self):
         """
@@ -484,7 +485,7 @@ class LoncapaProblem:
             # TODO: figure out where to get file submissions when rescoring.
             if 'filesubmission' in responder.allowed_inputfields and student_answers is None:
                 _ = get_gettext(self.capa_system.i18n)
-                raise Exception(_("Cannot rescore problems with possible file submissions"))
+                raise Exception(_(u"Cannot rescore problems with possible file submissions"))
 
             # use 'student_answers' only if it is provided, and if it might contain a file
             # submission that would not exist in the persisted "student_answers".
@@ -659,7 +660,7 @@ class LoncapaProblem:
                 self.find_answer_text(answer_id, answer) for answer in current_answer
             )
 
-        elif isinstance(current_answer, str) and current_answer.startswith('choice_'):
+        elif isinstance(current_answer, six.string_types) and current_answer.startswith('choice_'):
             # Many problem (e.g. checkbox) report "choice_0" "choice_1" etc.
             # Here we transform it
             elems = self.tree.xpath('//*[@id="{answer_id}"]//*[@name="{choice_number}"]'.format(
@@ -672,7 +673,7 @@ class LoncapaProblem:
             choices_map = dict(input_cls.extract_choices(choicegroup, self.capa_system.i18n, text_only=True))
             answer_text = choices_map[current_answer]
 
-        elif isinstance(current_answer, str):
+        elif isinstance(current_answer, six.string_types):
             # Already a string with the answer
             answer_text = current_answer
 
@@ -803,7 +804,7 @@ class LoncapaProblem:
         """
         includes = self.tree.findall('.//include')
         for inc in includes:
-            filename = inc.get('file')
+            filename = inc.get('file') if six.PY3 else inc.get('file').decode('utf-8')
             if filename is not None:
                 try:
                     # open using LoncapaSystem OSFS filestore
@@ -956,7 +957,7 @@ class LoncapaProblem:
 
         Used by get_html.
         """
-        if not isinstance(problemtree.tag, str):
+        if not isinstance(problemtree.tag, six.string_types):
             # Comment and ProcessingInstruction nodes are not Elements,
             # and we're ok leaving those behind.
             # BTW: etree gives us no good way to distinguish these things
@@ -1149,7 +1150,7 @@ class LoncapaProblem:
             response.set('multiple_inputtypes', 'true')
             group_label_tag = response.find('label')
             group_description_tags = response.findall('description')
-            group_label_tag_id = f'multiinput-group-label-{responsetype_id}'
+            group_label_tag_id = u'multiinput-group-label-{}'.format(responsetype_id)
             group_label_tag_text = ''
             if group_label_tag is not None:
                 group_label_tag.tag = 'p'
@@ -1160,7 +1161,7 @@ class LoncapaProblem:
 
             group_description_ids = []
             for index, group_description_tag in enumerate(group_description_tags):
-                group_description_tag_id = f'multiinput-group-description-{responsetype_id}-{index}'
+                group_description_tag_id = u'multiinput-group-description-{}-{}'.format(responsetype_id, index)
                 group_description_tag.tag = 'p'
                 group_description_tag.set('id', group_description_tag_id)
                 group_description_tag.set('class', 'multi-inputs-group-description question-description')

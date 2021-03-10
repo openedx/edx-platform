@@ -1,11 +1,12 @@
 <%page expression_filter="h"/>
 <%!
 from openedx.core.djangolib.markup import HTML
+import six
 %>
 <%
   def is_radio_input(choice_id):
-    return input_type == 'radio' and ((isinstance(value, str) and (choice_id == value)) or (
-      not isinstance(value, str) and choice_id in value
+    return input_type == 'radio' and ((isinstance(value, six.string_types) and (choice_id == value)) or (
+      not isinstance(value, six.string_types) and choice_id in value
     ))
 %>
 <div class="choicegroup capa_inputtype" id="inputtype_${id}">

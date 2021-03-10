@@ -9,6 +9,7 @@ from collections import OrderedDict
 
 from lxml import etree
 from mako import exceptions
+from six.moves import range
 
 from capa.inputtypes import Status
 from capa.tests.helpers import capa_render_template
@@ -50,7 +51,7 @@ class TemplateTestCase(unittest.TestCase):
         """
         Initialize the context.
         """
-        super().setUp()
+        super(TemplateTestCase, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.context = {}
 
     def render_to_xml(self, context_dict):
@@ -73,7 +74,7 @@ class TemplateTestCase(unittest.TestCase):
         try:
             xml = etree.fromstring("<test>" + xml_str + "</test>")
         except Exception as exc:
-            raise TemplateError("Could not parse XML from '{}': {}".format(  # lint-amnesty, pylint: disable=raise-missing-from
+            raise TemplateError("Could not parse XML from '{0}': {1}".format(  # lint-amnesty, pylint: disable=raise-missing-from
                                 xml_str, str(exc)))
         else:
             return xml
@@ -116,7 +117,7 @@ class TemplateTestCase(unittest.TestCase):
         If no elements are found, the assertion fails.
         """
         element_list = xml_root.xpath(xpath)
-        assert len(element_list) > 0, f"Could not find element at '{str(xpath)}'\n{etree.tostring(xml_root)}"
+        assert len(element_list) > 0, ("Could not find element at '%s'\n%s" % (str(xpath), etree.tostring(xml_root)))
         if exact:
             assert text == element_list[0].text.strip()
         else:
@@ -244,7 +245,7 @@ class ChoiceGroupTemplateTest(TemplateTestCase):
     TEMPLATE_NAME = 'choicegroup.html'
 
     def setUp(self):
-        super().setUp()
+        super(ChoiceGroupTemplateTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         choices = [('1', 'choice 1'), ('2', 'choice 2'), ('3', 'choice 3')]
         self.context = {
             'id': '1',
@@ -491,7 +492,7 @@ class TextlineTemplateTest(TemplateTestCase):
     TEMPLATE_NAME = 'textline.html'
 
     def setUp(self):
-        super().setUp()
+        super(TextlineTemplateTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.context = {
             'id': '1',
             'status': Status('correct'),
@@ -616,7 +617,7 @@ class FormulaEquationInputTemplateTest(TemplateTestCase):
     TEMPLATE_NAME = 'formulaequationinput.html'
 
     def setUp(self):
-        super().setUp()
+        super(FormulaEquationInputTemplateTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.context = {
             'id': 2,
             'value': 'PREFILLED_VALUE',
@@ -667,7 +668,7 @@ class AnnotationInputTemplateTest(TemplateTestCase):
     TEMPLATE_NAME = 'annotationinput.html'
 
     def setUp(self):
-        super().setUp()
+        super(AnnotationInputTemplateTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.context = {
             'id': 2,
             'value': '<p>Test value</p>',
@@ -713,7 +714,7 @@ class AnnotationInputTemplateTest(TemplateTestCase):
         self.context['options'] = [
             {'id': id_num,
              'choice': 'correct',
-             'description': f'<p>Unescaped <b>HTML {id_num}</b></p>'}
+             'description': '<p>Unescaped <b>HTML {0}</b></p>'.format(id_num)}
             for id_num in range(5)]
 
         xml = self.render_to_xml(self.context)
@@ -722,8 +723,8 @@ class AnnotationInputTemplateTest(TemplateTestCase):
         # with unescaped HTML.
         # Since the HTML is unescaped, we can traverse the XML tree
         for id_num in range(5):
-            xpath = f"//span[@data-id='{id_num}']/p/b"
-            self.assert_has_text(xml, xpath, f'HTML {id_num}', exact=False)
+            xpath = "//span[@data-id='{0}']/p/b".format(id_num)
+            self.assert_has_text(xml, xpath, 'HTML {0}'.format(id_num), exact=False)
 
         # Expect that the correct option is selected
         xpath = "//span[contains(@class,'selected')]/p/b"
@@ -743,7 +744,7 @@ class AnnotationInputTemplateTest(TemplateTestCase):
             self.context['status'] = Status(input_status)
             xml = self.render_to_xml(self.context)
 
-            xpath = f"//span[@class='status {expected_css_class}']"
+            xpath = "//span[@class='status {0}']".format(expected_css_class)
             self.assert_has_xpath(xml, xpath, self.context)
 
         # If individual options are being marked, then expect
@@ -795,7 +796,7 @@ class MathStringTemplateTest(TemplateTestCase):
     TEMPLATE_NAME = 'mathstring.html'
 
     def setUp(self):
-        super().setUp()
+        super(MathStringTemplateTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.context = {'isinline': False, 'mathstr': '', 'tail': ''}
 
     def test_math_string_inline(self):
@@ -837,7 +838,7 @@ class OptionInputTemplateTest(TemplateTestCase):
     TEMPLATE_NAME = 'optioninput.html'
 
     def setUp(self):
-        super().setUp()
+        super(OptionInputTemplateTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.context = {
             'id': 2,
             'options': [],
@@ -851,7 +852,7 @@ class OptionInputTemplateTest(TemplateTestCase):
     def test_select_options(self):
 
         # Create options 0-4, and select option 2
-        self.context['options'] = [(id_num, f'Option {id_num}')
+        self.context['options'] = [(id_num, 'Option {0}'.format(id_num))
                                    for id_num in range(5)]
         self.context['value'] = 2
 
@@ -862,8 +863,8 @@ class OptionInputTemplateTest(TemplateTestCase):
         self.assert_has_xpath(xml, xpath, self.context)
 
         for id_num in range(5):
-            xpath = f"//option[@value='{id_num}']"
-            self.assert_has_text(xml, xpath, f'Option {id_num}')
+            xpath = "//option[@value='{0}']".format(id_num)
+            self.assert_has_text(xml, xpath, 'Option {0}'.format(id_num))
 
         # Should have the correct option selected
         xpath = "//option[@selected='true']"
@@ -898,7 +899,7 @@ class DragAndDropTemplateTest(TemplateTestCase):
     TEMPLATE_NAME = 'drag_and_drop_input.html'
 
     def setUp(self):
-        super().setUp()
+        super(DragAndDropTemplateTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.context = {'id': 2,
                         'drag_and_drop_json': '',
                         'value': 0,
@@ -919,11 +920,11 @@ class DragAndDropTemplateTest(TemplateTestCase):
             xml = self.render_to_xml(self.context)
 
             # Expect a <div> with the status
-            xpath = f"//div[@class='{expected_css_class}']"
+            xpath = "//div[@class='{0}']".format(expected_css_class)
             self.assert_has_xpath(xml, xpath, self.context)
 
             # Expect a <span> with the status
-            xpath = f"//span[@class='status {expected_css_class}']/span[@class='sr']"
+            xpath = "//span[@class='status {0}']/span[@class='sr']".format(expected_css_class)
             self.assert_has_text(xml, xpath, expected_text, exact=False)
 
     def test_drag_and_drop_json_html(self):
@@ -955,7 +956,7 @@ class ChoiceTextGroupTemplateTest(TemplateTestCase):
                              '1_choiceinput_1_textinput_0': '0'}
 
     def setUp(self):
-        super().setUp()
+        super(ChoiceTextGroupTemplateTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         choices = [
             (
                 '1_choiceinput_0bc',
@@ -1039,11 +1040,11 @@ class ChoiceTextGroupTemplateTest(TemplateTestCase):
             # Should NOT mark individual options
             grouping_tag = grouping_tags[test_conditions['input_type']]
             self.assert_no_xpath(xml,
-                                 f"//{grouping_tag}[@class='choicetextgroup_incorrect']",
+                                 "//{0}[@class='choicetextgroup_incorrect']".format(grouping_tag),
                                  self.context)
 
             self.assert_no_xpath(xml,
-                                 f"//{grouping_tag}[@class='choicetextgroup_correct']",
+                                 "//{0}[@class='choicetextgroup_correct']".format(grouping_tag),
                                  self.context)
 
     def test_problem_marked_unsubmitted(self):
@@ -1071,11 +1072,11 @@ class ChoiceTextGroupTemplateTest(TemplateTestCase):
             # Should NOT mark individual options
             grouping_tag = grouping_tags[test_conditions['input_type']]
             self.assert_no_xpath(xml,
-                                 f"//{grouping_tag}[@class='choicetextgroup_incorrect']",
+                                 "//{0}[@class='choicetextgroup_incorrect']".format(grouping_tag),
                                  self.context)
 
             self.assert_no_xpath(xml,
-                                 f"//{grouping_tag}[@class='choicetextgroup_correct']",
+                                 "//{0}[@class='choicetextgroup_correct']".format(grouping_tag),
                                  self.context)
 
     def test_option_marked_correct(self):
@@ -1131,7 +1132,7 @@ class ChemicalEquationTemplateTest(TemplateTestCase):
     TEMPLATE_NAME = 'chemicalequationinput.html'
 
     def setUp(self):
-        super().setUp()
+        super(ChemicalEquationTemplateTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.context = {
             'id': '1',
             'status': Status('correct'),
@@ -1152,7 +1153,7 @@ class SchematicInputTemplateTest(TemplateTestCase):
     TEMPLATE_NAME = 'schematicinput.html'
 
     def setUp(self):
-        super().setUp()
+        super(SchematicInputTemplateTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.context = {
             'id': '1',
             'status': Status('correct'),
@@ -1184,7 +1185,7 @@ class CodeinputTemplateTest(TemplateTestCase):
     TEMPLATE_NAME = 'codeinput.html'
 
     def setUp(self):
-        super().setUp()
+        super(CodeinputTemplateTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.context = {
             'id': '1',
             'status': Status('correct'),

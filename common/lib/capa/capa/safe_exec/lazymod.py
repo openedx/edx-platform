@@ -8,7 +8,7 @@ in the public domain.
 import sys
 
 
-class LazyModule:
+class LazyModule(object):
     """A lazy module proxy."""
 
     def __init__(self, modname):
@@ -34,7 +34,7 @@ class LazyModule:
             return getattr(mod, name)
         else:
             try:
-                subname = f'{self.__name__}.{name}'
+                subname = '%s.%s' % (self.__name__, name)
                 __import__(subname)
                 submod = getattr(mod, name)  # lint-amnesty, pylint: disable=unused-variable
             except ImportError:

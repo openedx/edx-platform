@@ -6,6 +6,8 @@ import hashlib
 from codejail.safe_exec import SafeExecException, json_safe
 from codejail.safe_exec import not_safe_exec as codejail_not_safe_exec
 from codejail.safe_exec import safe_exec as codejail_safe_exec
+import six
+from six import text_type
 
 from . import lazymod
 
@@ -49,7 +51,7 @@ with open(lazymod_py_file) as f:
 
 LAZY_IMPORTS = [lazymod_py]
 for name, modname in ASSUMED_IMPORTS:
-    LAZY_IMPORTS.append(f"{name} = LazyModule('{modname}')\n")
+    LAZY_IMPORTS.append("{} = LazyModule('{}')\n".format(name, modname))
 
 LAZY_IMPORTS = "".join(LAZY_IMPORTS)
 
@@ -65,7 +67,7 @@ def update_hash(hasher, obj):
     `obj` in the process.  Only primitive JSON-safe types are supported.
 
     """
-    hasher.update((str(type(obj)).encode()))
+    hasher.update(six.b(str(type(obj))))
     if isinstance(obj, (tuple, list)):
         for e in obj:
             update_hash(hasher, e)
@@ -74,7 +76,7 @@ def update_hash(hasher, obj):
             update_hash(hasher, k)
             update_hash(hasher, obj[k])
     else:
-        hasher.update(repr(obj).encode())
+        hasher.update(six.b(repr(obj)))
 
 
 def safe_exec(
@@ -125,7 +127,7 @@ def safe_exec(
         md5er = hashlib.md5()
         md5er.update(repr(code).encode('utf-8'))
         update_hash(md5er, safe_globals)
-        key = f"safe_exec.{random_seed!r}.{md5er.hexdigest()}"
+        key = "safe_exec.%r.%s" % (random_seed, md5er.hexdigest())
         cached = cache.get(key)
         if cached is not None:
             # We have a cached result.  The result is a pair: the exception
@@ -158,7 +160,7 @@ def safe_exec(
     except SafeExecException as e:
         # Saving SafeExecException e in exception to be used later.
         exception = e
-        emsg = str(e)
+        emsg = text_type(e)
     else:
         emsg = None
 
