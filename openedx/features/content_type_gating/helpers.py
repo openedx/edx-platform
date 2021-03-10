@@ -7,9 +7,9 @@ import logging
 from django.utils import timezone
 
 from common.djangoapps.course_modes.models import CourseMode
-from openedx.core.djangoapps.config_model_utils.utils import is_in_holdback
 from common.djangoapps.student.models import CourseEnrollment
 from common.djangoapps.student.role_helpers import has_staff_roles
+from openedx.core.djangoapps.config_model_utils.utils import is_in_holdback
 from xmodule.partitions.partitions import Group
 
 # Studio generates partition IDs starting at 100. There is already a manually generated
@@ -56,8 +56,8 @@ def correct_modes_for_fbe(course_key=None, enrollment=None, user=None, course=No
             )
             if course_mode is None:
                 LOG.error(
-                    u"User %s is in an unknown CourseMode '%s'"
-                    u" for course %s. Granting full access to content for this user",
+                    "User %s is in an unknown CourseMode '%s'"
+                    " for course %s. Granting full access to content for this user",
                     user.username,
                     mode_slug,
                     course_key,
