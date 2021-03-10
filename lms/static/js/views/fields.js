@@ -1,4 +1,4 @@
-/* eslint no-underscore-dangle: [2, { "allow": ["_super"] }] */
+/* eslint no-underscore-dangle: ["error", { "allow": ["_super"] }] */
 (function(define, undef) {
     'use strict';
     define([
