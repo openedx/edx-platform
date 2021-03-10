@@ -166,6 +166,8 @@ class UserApplicationCoverLetterForm(forms.ModelForm):
 
         if 'cover_letter_file' in self.changed_data and self.cleaned_data.get('cover_letter'):
             self.add_error('cover_letter_file', _('Either upload a cover letter file or type text'))
+        elif self.data.get('button_click') == 'submit' and self.cleaned_data.get('business_line') is None:
+            self.add_error('business_line', _('This field is required'))
 
     def save_form(self, post_data):
         """
