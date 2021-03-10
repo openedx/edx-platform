@@ -1,4 +1,3 @@
-# encoding: utf-8
 """
 Modulestore configuration for test cases.
 """
@@ -9,14 +8,13 @@ import functools
 import os
 from contextlib import contextmanager
 from enum import Enum
+from unittest.mock import patch
 
 from django.conf import settings
 from django.contrib.auth.models import AnonymousUser, User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.db import connections
 from django.test import TestCase
 from django.test.utils import override_settings
-from mock import patch
-from six.moves import range
 
 from lms.djangoapps.courseware.tests.factories import StaffFactory
 from lms.djangoapps.courseware.field_overrides import OverrideFieldData
@@ -43,7 +41,7 @@ class CourseUserType(Enum):
     UNENROLLED_STAFF = 'unenrolled_staff'
 
 
-class StoreConstructors(object):
+class StoreConstructors:
     """Enumeration of store constructor types."""
     draft, split = list(range(2))
 
@@ -108,7 +106,7 @@ def draft_mongo_store_config(data_dir):
             'DOC_STORE_CONFIG': {
                 'host': MONGO_HOST,
                 'port': MONGO_PORT_NUM,
-                'db': 'test_xmodule_{}'.format(os.getpid()),
+                'db': f'test_xmodule_{os.getpid()}',
                 'collection': 'modulestore',
             },
             'OPTIONS': modulestore_options
@@ -135,7 +133,7 @@ def split_mongo_store_config(data_dir):
             'DOC_STORE_CONFIG': {
                 'host': MONGO_HOST,
                 'port': MONGO_PORT_NUM,
-                'db': 'test_xmodule_{}'.format(os.getpid()),
+                'db': f'test_xmodule_{os.getpid()}',
                 'collection': 'modulestore',
             },
             'OPTIONS': modulestore_options
@@ -154,7 +152,7 @@ def contentstore_config():
         'ENGINE': 'xmodule.contentstore.mongo.MongoContentStore',
         'DOC_STORE_CONFIG': {
             'host': MONGO_HOST,
-            'db': 'test_xcontent_{}'.format(os.getpid()),
+            'db': f'test_xcontent_{os.getpid()}',
             'port': MONGO_PORT_NUM,
         },
         # allow for additional options that can be keyed on a name, e.g. 'trashcan'
@@ -210,7 +208,7 @@ TEST_DATA_SPLIT_MODULESTORE = functools.partial(
 )
 
 
-class SignalIsolationMixin(object):
+class SignalIsolationMixin:
     """
     Simple utility mixin class to toggle ModuleStore signals on and off. This
     class operates on `SwitchedSignal` objects on the modulestore's
@@ -421,7 +419,7 @@ class SharedModuleStoreTestCase(
         # Now yield to allow the test class to run its setUpClass() setup code.
         yield
         # Now call the base class, which calls back into the test class's setUpTestData().
-        super(SharedModuleStoreTestCase, cls).setUpClass()
+        super().setUpClass()
 
     @classmethod
     def setUpClass(cls):
@@ -429,19 +427,19 @@ class SharedModuleStoreTestCase(
         Start modulestore isolation, and then load modulestore specific
         test data.
         """
-        super(SharedModuleStoreTestCase, cls).setUpClass()
+        super().setUpClass()
         cls.start_modulestore_isolation()
 
     @classmethod
     def tearDownClass(cls):
         cls.end_modulestore_isolation()
-        super(SharedModuleStoreTestCase, cls).tearDownClass()
+        super().tearDownClass()
 
     def setUp(self):
         # OverrideFieldData.provider_classes is always reset to `None` so
         # that they're recalculated for every test
         OverrideFieldData.provider_classes = None
-        super(SharedModuleStoreTestCase, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
 
 
 class ModuleStoreTestCase(
@@ -491,11 +489,11 @@ class ModuleStoreTestCase(
 
     @classmethod
     def setUpClass(cls):
-        super(ModuleStoreTestCase, cls).setUpClass()
+        super().setUpClass()
 
     @classmethod
     def tearDownClass(cls):
-        super(ModuleStoreTestCase, cls).tearDownClass()
+        super().tearDownClass()
 
     def setUp(self):
         """
@@ -511,7 +509,7 @@ class ModuleStoreTestCase(
         # that they're recalculated for every test
         OverrideFieldData.provider_classes = None
 
-        super(ModuleStoreTestCase, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
 
         self.store = modulestore()
 

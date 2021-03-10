@@ -17,14 +17,12 @@ import traceback
 import unittest
 from contextlib import contextmanager
 from functools import wraps
+from unittest.mock import Mock
 
-import six
 from django.test import TestCase
 from django.utils.encoding import python_2_unicode_compatible
-from mock import Mock
 from opaque_keys.edx.keys import CourseKey
 from path import Path as path
-from six import text_type
 from xblock.core import XBlock
 from xblock.field_data import DictFieldData
 from xblock.fields import Reference, ReferenceList, ReferenceValueDict, ScopeIds
@@ -53,11 +51,11 @@ class TestModuleSystem(ModuleSystem):  # pylint: disable=abstract-method
         kwargs.setdefault('id_reader', id_manager)
         kwargs.setdefault('id_generator', id_manager)
         kwargs.setdefault('services', {}).setdefault('field-data', DictFieldData({}))
-        super(TestModuleSystem, self).__init__(**kwargs)  # lint-amnesty, pylint: disable=super-with-arguments
+        super().__init__(**kwargs)
 
     def handler_url(self, block, handler, suffix='', query='', thirdparty=False):  # lint-amnesty, pylint: disable=arguments-differ
         return '{usage_id}/{handler}{suffix}?{query}'.format(
-            usage_id=six.text_type(block.scope_ids.usage_id),
+            usage_id=str(block.scope_ids.usage_id),
             handler=handler,
             suffix=suffix,
             query=query,
@@ -65,7 +63,7 @@ class TestModuleSystem(ModuleSystem):  # pylint: disable=abstract-method
 
     def local_resource_url(self, block, uri):
         return 'resource/{usage_id}/{uri}'.format(
-            usage_id=six.text_type(block.scope_ids.usage_id),
+            usage_id=str(block.scope_ids.usage_id),
             uri=uri,
         )
 
@@ -84,7 +82,7 @@ class TestModuleSystem(ModuleSystem):  # pylint: disable=abstract-method
         if hasattr(self, '_view_name'):
             orig_view_name = self._view_name
         self._view_name = None
-        rt_repr = super(TestModuleSystem, self).__repr__()  # lint-amnesty, pylint: disable=super-with-arguments
+        rt_repr = super().__repr__()
         self._view_name = orig_view_name
         return rt_repr
 
@@ -202,12 +200,12 @@ def map_references(value, field, actual_course_key):
     if isinstance(field, ReferenceList):
         return [sub.map_into_course(actual_course_key) for sub in value]
     if isinstance(field, ReferenceValueDict):
-        return {key: ele.map_into_course(actual_course_key) for key, ele in six.iteritems(value)}
+        return {key: ele.map_into_course(actual_course_key) for key, ele in value.items()}
     return value
 
 
 @python_2_unicode_compatible
-class LazyFormat(object):
+class LazyFormat:
     """
     An stringy object that delays formatting until it's put into a string context.
     """
@@ -225,13 +223,13 @@ class LazyFormat(object):
         return self._message
 
     def __repr__(self):
-        return six.text_type(self)
+        return str(self)
 
     def __len__(self):
-        return len(six.text_type(self))
+        return len(str(self))
 
     def __getitem__(self, index):
-        return six.text_type(self)[index]
+        return str(self)[index]
 
 
 class CourseComparisonTest(TestCase):
@@ -240,7 +238,7 @@ class CourseComparisonTest(TestCase):
     """
 
     def setUp(self):
-        super(CourseComparisonTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.field_exclusions = set()
         self.ignored_asset_keys = set()
 
@@ -283,8 +281,8 @@ class CourseComparisonTest(TestCase):
             expected = [extract_key(key) for key in expected]
             actual = [extract_key(key) for key in actual]
         elif isinstance(reference_field, ReferenceValueDict):
-            expected = {key: extract_key(val) for (key, val) in six.iteritems(expected)}
-            actual = {key: extract_key(val) for (key, val) in six.iteritems(actual)}
+            expected = {key: extract_key(val) for (key, val) in expected.items()}
+            actual = {key: extract_key(val) for (key, val) in actual.items()}
         assert expected == actual,\
             LazyFormat("Field {} doesn't match between usages {} and {}: {!r} != {!r}",
                        reference_field.name,
@@ -365,8 +363,7 @@ class CourseComparisonTest(TestCase):
         }
         # Split Mongo and Old-Mongo disagree about what the block_id of courses is, so skip those in
         # this comparison
-        six.assertCountEqual(
-            self,
+        self.assertCountEqual(
             [map_key(item.location) for item in expected_items if item.scope_ids.block_type != 'course'],
             [key for key in actual_item_map.keys() if key[0] != 'course'],
         )
@@ -387,7 +384,7 @@ class CourseComparisonTest(TestCase):
                 continue
             # compare fields
             assert expected_item.fields == actual_item.fields
-            for field_name, field in six.iteritems(expected_item.fields):
+            for field_name, field in expected_item.fields.items():
                 if (expected_item.scope_ids.usage_id, field_name) in self.field_exclusions:
                     continue
                 if (None, field_name) in self.field_exclusions:
@@ -428,8 +425,8 @@ class CourseComparisonTest(TestCase):
 
         expected_filename = expected_asset.pop('filename')
         actual_filename = actual_asset.pop('filename')
-        assert text_type(expected_key) == expected_filename
-        assert text_type(actual_key) == actual_filename
+        assert str(expected_key) == expected_filename
+        assert str(actual_key) == actual_filename
         assert expected_asset == actual_asset
 
     def _assertAssetsEqual(self, expected_course_key, expected_assets, actual_course_key, actual_assets):  # pylint: disable=invalid-name

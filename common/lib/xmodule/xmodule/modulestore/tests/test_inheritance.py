@@ -4,10 +4,10 @@ Unit tests for testing inheritance mixins
 
 
 import unittest
+from unittest.mock import Mock
 
 import ddt
 from django.utils.timezone import now, timedelta
-from mock import Mock
 from xblock.core import XBlock
 from xblock.fields import ScopeIds
 from xblock.test.tools import TestRuntime
@@ -38,7 +38,7 @@ class TestInheritanceMixin(unittest.TestCase):
         self.xblock = runtime.construct_xblock_from_class(
             TestXBlock, ScopeIds('user', 'TestXBlock', 'def_id', 'usage_id')
         )
-        super(TestInheritanceMixin, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
 
     def add_submission_deadline_information(self, due_date, graceperiod, self_paced):
         """

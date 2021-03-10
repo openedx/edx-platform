@@ -6,9 +6,7 @@ Implement CourseTab
 import logging
 from abc import ABCMeta
 
-import six
 from django.core.files.storage import get_storage_class
-from six import text_type
 from xblock.fields import List
 
 from edx_django_utils.plugins import PluginError
@@ -23,7 +21,7 @@ _ = lambda text: text
 READ_ONLY_COURSE_TAB_ATTRIBUTES = ['type']
 
 
-class CourseTab(six.with_metaclass(ABCMeta, object)):
+class CourseTab(metaclass=ABCMeta):
     """
     The Course Tab class is a data abstraction for all tabs (i.e., course navigation links) within a course.
     It is an abstract class - to be inherited by various tab types.
@@ -85,7 +83,7 @@ class CourseTab(six.with_metaclass(ABCMeta, object)):
         Args:
             tab_dict (dict) - a dictionary of parameters used to build the tab.
         """
-        super(CourseTab, self).__init__()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().__init__()
         self.name = tab_dict.get('name', self.title)
         self.tab_id = tab_dict.get('tab_id', getattr(self, 'tab_id', self.type))
         self.course_staff_only = tab_dict.get('course_staff_only', False)
@@ -129,7 +127,7 @@ class CourseTab(six.with_metaclass(ABCMeta, object)):
         if hasattr(self, key):
             return getattr(self, key, None)
         else:
-            raise KeyError('Key {0} not present in tab {1}'.format(key, self.to_json()))
+            raise KeyError(f'Key {key} not present in tab {self.to_json()}')
 
     def __setitem__(self, key, value):
         """
@@ -141,7 +139,7 @@ class CourseTab(six.with_metaclass(ABCMeta, object)):
         if hasattr(self, key) and key not in READ_ONLY_COURSE_TAB_ATTRIBUTES:
             setattr(self, key, value)
         else:
-            raise KeyError('Key {0} cannot be set in tab {1}'.format(key, self.to_json()))
+            raise KeyError(f'Key {key} cannot be set in tab {self.to_json()}')
 
     def __eq__(self, other):
         """
@@ -245,14 +243,14 @@ class CourseTab(six.with_metaclass(ABCMeta, object)):
         return tab_type(tab_dict=tab_dict)
 
 
-class TabFragmentViewMixin(object):
+class TabFragmentViewMixin:
     """
     A mixin for tabs that render themselves as web fragments.
     """
     fragment_view_name = None
 
     def __init__(self, tab_dict):
-        super(TabFragmentViewMixin, self).__init__(tab_dict)  # lint-amnesty, pylint: disable=super-with-arguments
+        super().__init__(tab_dict)
         self._fragment_view = None
 
     @property
@@ -261,12 +259,12 @@ class TabFragmentViewMixin(object):
 
         # If a view_name is specified, then use the default link function
         if self.view_name:
-            return super(TabFragmentViewMixin, self).link_func  # lint-amnesty, pylint: disable=super-with-arguments
+            return super().link_func
 
         # If not, then use the generic course tab URL
         def link_func(course, reverse_func):
             """ Returns a function that returns the course tab's URL. """
-            return reverse_func("course_tab_view", args=[text_type(course.id), self.type])
+            return reverse_func("course_tab_view", args=[str(course.id), self.type])
 
         return link_func
 
@@ -290,7 +288,7 @@ class TabFragmentViewMixin(object):
         """
         Renders this tab to a web fragment.
         """
-        return self.fragment_view.render_to_fragment(request, course_id=six.text_type(course.id), **kwargs)
+        return self.fragment_view.render_to_fragment(request, course_id=str(course.id), **kwargs)
 
     def __hash__(self):
         """ Return a hash representation of Tab Object. """
@@ -308,7 +306,7 @@ class StaticTab(CourseTab):
     def __init__(self, tab_dict=None, name=None, url_slug=None):
         def link_func(course, reverse_func):
             """ Returns a function that returns the static tab's URL. """
-            return reverse_func(self.type, args=[text_type(course.id), self.url_slug])
+            return reverse_func(self.type, args=[str(course.id), self.url_slug])
 
         self.url_slug = tab_dict.get('url_slug') if tab_dict else url_slug
 
@@ -319,9 +317,9 @@ class StaticTab(CourseTab):
             tab_dict['name'] = name
 
         tab_dict['link_func'] = link_func
-        tab_dict['tab_id'] = 'static_tab_{0}'.format(self.url_slug)
+        tab_dict['tab_id'] = f'static_tab_{self.url_slug}'
 
-        super(StaticTab, self).__init__(tab_dict)  # lint-amnesty, pylint: disable=super-with-arguments
+        super().__init__(tab_dict)
 
     @classmethod
     def is_enabled(cls, course, user=None):
@@ -335,29 +333,29 @@ class StaticTab(CourseTab):
         """
         Ensures that the specified tab_dict is valid.
         """
-        return (super(StaticTab, cls).validate(tab_dict, raise_error)
+        return (super().validate(tab_dict, raise_error)
                 and key_checker(['name', 'url_slug'])(tab_dict, raise_error))
 
     def __getitem__(self, key):
         if key == 'url_slug':
             return self.url_slug
         else:
-            return super(StaticTab, self).__getitem__(key)  # lint-amnesty, pylint: disable=super-with-arguments
+            return super().__getitem__(key)
 
     def __setitem__(self, key, value):
         if key == 'url_slug':
             self.url_slug = value
         else:
-            super(StaticTab, self).__setitem__(key, value)  # lint-amnesty, pylint: disable=super-with-arguments
+            super().__setitem__(key, value)
 
     def to_json(self):
         """ Return a dictionary representation of this tab. """
-        to_json_val = super(StaticTab, self).to_json()  # lint-amnesty, pylint: disable=super-with-arguments
+        to_json_val = super().to_json()
         to_json_val.update({'url_slug': self.url_slug})
         return to_json_val
 
     def __eq__(self, other):
-        if not super(StaticTab, self).__eq__(other):  # lint-amnesty, pylint: disable=super-with-arguments
+        if not super().__eq__(other):
             return False
         return self.url_slug == other.get('url_slug')
 
@@ -461,8 +459,7 @@ class CourseTabList(List):
                     # If rendering inline that add each item in the collection,
                     # else just show the tab itself as long as it is not empty.
                     if inline_collections:
-                        for item in tab.items(course):
-                            yield item
+                        yield from tab.items(course)
                     elif len(list(tab.items(course))) > 0:
                         yield tab
                 else:
@@ -496,15 +493,15 @@ class CourseTabList(List):
             return
 
         if len(tabs) < 2:
-            raise InvalidTabsException("Expected at least two tabs.  tabs: '{0}'".format(tabs))
+            raise InvalidTabsException(f"Expected at least two tabs.  tabs: '{tabs}'")
 
         if tabs[0].get('type') != 'course_info':
             raise InvalidTabsException(
-                "Expected first tab to have type 'course_info'.  tabs: '{0}'".format(tabs))
+                f"Expected first tab to have type 'course_info'.  tabs: '{tabs}'")
 
         if tabs[1].get('type') != 'courseware':
             raise InvalidTabsException(
-                "Expected second tab to have type 'courseware'.  tabs: '{0}'".format(tabs))
+                f"Expected second tab to have type 'courseware'.  tabs: '{tabs}'")
 
         # the following tabs should appear only once
         # TODO: don't import openedx capabilities from common
@@ -574,7 +571,7 @@ def key_checker(expected_keys):
             return True
         if raise_error:  # lint-amnesty, pylint: disable=no-else-raise
             raise InvalidTabsException(
-                "Expected keys '{0}' are not present in the given dict: {1}".format(expected_keys, actual_dict)
+                f"Expected keys '{expected_keys}' are not present in the given dict: {actual_dict}"
             )
         else:
             return False
@@ -620,7 +617,7 @@ def course_reverse_func_from_name_func(reverse_name_func):
     """
     return lambda course, reverse_url_func: reverse_url_func(
         reverse_name_func(course),
-        args=[text_type(course.id)]
+        args=[str(course.id)]
     )
 
 

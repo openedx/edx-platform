@@ -7,16 +7,15 @@ import logging
 import shutil
 from datetime import datetime
 from tempfile import mkdtemp
+from unittest.mock import patch
 from uuid import uuid4
 
 import pymongo
 import pytest
-import six
 
 # pylint: disable=protected-access
 from django.test import TestCase
 # pylint: enable=E0611
-from mock import patch
 from opaque_keys.edx.keys import CourseKey, UsageKey
 from opaque_keys.edx.locator import AssetLocator, BlockUsageLocator, CourseLocator, LibraryLocator
 from path import Path as path
@@ -172,7 +171,7 @@ class TestMongoModuleStoreBase(TestCase):
         connection.drop_database(DB)
 
     def setUp(self):
-        super(TestMongoModuleStoreBase, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.dummy_user = ModuleStoreEnum.UserID.test
 
 
@@ -188,11 +187,11 @@ class TestMongoModuleStore(TestMongoModuleStoreBase):
 
     @classmethod
     def setUpClass(cls):
-        super(TestMongoModuleStore, cls).setUpClass()
+        super().setUpClass()
 
     @classmethod
     def tearDownClass(cls):
-        super(TestMongoModuleStore, cls).tearDownClass()
+        super().tearDownClass()
 
     def test_init(self):
         '''Make sure the db loads'''
@@ -370,7 +369,7 @@ class TestMongoModuleStore(TestMongoModuleStoreBase):
         courses = self.draft_store.get_courses()
         for course in courses:
             assert not ((course.location.org == 'edx') and (course.location.course == 'templates')),\
-                '{0} is a template course'.format(course)
+                f'{course} is a template course'
 
     def test_contentstore_attrs(self):
         """
@@ -523,7 +522,7 @@ class TestMongoModuleStore(TestMongoModuleStoreBase):
             for ref in refele.reference_list:
                 assert isinstance(ref, UsageKey)
             assert len(refele.reference_dict) > 0
-            for ref in six.itervalues(refele.reference_dict):
+            for ref in refele.reference_dict.values():
                 assert isinstance(ref, UsageKey)
 
         def check_mongo_fields():
@@ -532,17 +531,17 @@ class TestMongoModuleStore(TestMongoModuleStoreBase):
 
             def check_children(payload):
                 for child in payload['definition']['children']:
-                    assert isinstance(child, six.string_types)
+                    assert isinstance(child, str)
 
             refele = get_item(self.refloc)
             check_children(refele)
-            assert isinstance(refele['definition']['data']['reference_link'], six.string_types)
+            assert isinstance(refele['definition']['data']['reference_link'], str)
             assert len(refele['definition']['data']['reference_list']) > 0
             for ref in refele['definition']['data']['reference_list']:
-                assert isinstance(ref, six.string_types)
+                assert isinstance(ref, str)
             assert len(refele['metadata']['reference_dict']) > 0
-            for ref in six.itervalues(refele['metadata']['reference_dict']):
-                assert isinstance(ref, six.string_types)
+            for ref in refele['metadata']['reference_dict'].values():
+                assert isinstance(ref, str)
 
         setup_test()
         check_xblock_fields()
@@ -563,9 +562,9 @@ class TestMongoModuleStore(TestMongoModuleStoreBase):
 
         root_dir = path(mkdtemp())
         self.addCleanup(shutil.rmtree, root_dir)
-        export_course_to_xml(self.draft_store, self.content_store, course_key, root_dir, u'test_export')
-        assert path((root_dir / 'test_export/static/images/course_image.jpg')).isfile()
-        assert path((root_dir / 'test_export/static/images_course_image.jpg')).isfile()
+        export_course_to_xml(self.draft_store, self.content_store, course_key, root_dir, 'test_export')
+        assert path(root_dir / 'test_export/static/images/course_image.jpg').isfile()
+        assert path(root_dir / 'test_export/static/images_course_image.jpg').isfile()
 
     @patch('xmodule.video_module.video_module.edxval_api', None)
     @patch('xmodule.tabs.CourseTab.from_json', side_effect=mock_tab_from_json)
@@ -579,9 +578,9 @@ class TestMongoModuleStore(TestMongoModuleStoreBase):
 
         root_dir = path(mkdtemp())
         self.addCleanup(shutil.rmtree, root_dir)
-        export_course_to_xml(self.draft_store, self.content_store, course.id, root_dir, u'test_export')
-        assert path((root_dir / 'test_export/static/just_a_test.jpg')).isfile()
-        assert not path((root_dir / 'test_export/static/images/course_image.jpg')).isfile()
+        export_course_to_xml(self.draft_store, self.content_store, course.id, root_dir, 'test_export')
+        assert path(root_dir / 'test_export/static/just_a_test.jpg').isfile()
+        assert not path(root_dir / 'test_export/static/images/course_image.jpg').isfile()
 
     @patch('xmodule.video_module.video_module.edxval_api', None)
     def test_course_without_image(self):
@@ -592,9 +591,9 @@ class TestMongoModuleStore(TestMongoModuleStoreBase):
         course = self.draft_store.get_course(CourseKey.from_string('edX/simple_with_draft/2012_Fall'))
         root_dir = path(mkdtemp())
         self.addCleanup(shutil.rmtree, root_dir)
-        export_course_to_xml(self.draft_store, self.content_store, course.id, root_dir, u'test_export')
-        assert not path((root_dir / 'test_export/static/images/course_image.jpg')).isfile()
-        assert not path((root_dir / 'test_export/static/images_course_image.jpg')).isfile()
+        export_course_to_xml(self.draft_store, self.content_store, course.id, root_dir, 'test_export')
+        assert not path(root_dir / 'test_export/static/images/course_image.jpg').isfile()
+        assert not path(root_dir / 'test_export/static/images_course_image.jpg').isfile()
 
     def _create_test_tree(self, name, user_id=None):
         """
@@ -610,7 +609,7 @@ class TestMongoModuleStore(TestMongoModuleStoreBase):
             user_id = self.dummy_user
 
         org = 'edX'
-        course = 'tree{}'.format(name)
+        course = f'tree{name}'
         run = name
 
         if not self.draft_store.has_course(CourseKey.from_string('/'.join[org, course, run])):  # lint-amnesty, pylint: disable=unsubscriptable-object
@@ -701,8 +700,8 @@ class TestMongoModuleStore(TestMongoModuleStoreBase):
 
         # First child should have been moved to second position, and better child takes the lead
         course = self.draft_store.get_course(course.id)
-        assert six.text_type(course.children[1]) == six.text_type(first_child.location)
-        assert six.text_type(course.children[0]) == six.text_type(second_child.location)
+        assert str(course.children[1]) == str(first_child.location)
+        assert str(course.children[0]) == str(second_child.location)
 
         # Clean up the data so we don't break other tests which apparently expect a particular state
         self.draft_store.delete_course(course.id, self.dummy_user)
@@ -729,11 +728,11 @@ class TestMongoModuleStoreWithNoAssetCollection(TestMongoModuleStore):  # lint-a
 
     @classmethod
     def setUpClass(cls):
-        super(TestMongoModuleStoreWithNoAssetCollection, cls).setUpClass()
+        super().setUpClass()
 
     @classmethod
     def tearDownClass(cls):
-        super(TestMongoModuleStoreWithNoAssetCollection, cls).tearDownClass()
+        super().tearDownClass()
 
     def test_no_asset_collection(self):
         courses = self.draft_store.get_courses()
@@ -753,7 +752,7 @@ class TestMongoKeyValueStore(TestCase):
     """
 
     def setUp(self):
-        super(TestMongoKeyValueStore, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.data = {'foo': 'foo_value'}
         self.course_id = CourseKey.from_string('org/course/run')
         self.parent = self.course_id.make_usage_key('parent', 'p')

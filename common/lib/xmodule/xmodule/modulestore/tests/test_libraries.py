@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 Basic unit tests related to content libraries.
 
@@ -7,10 +6,8 @@ Higher-level tests are in `cms/djangoapps/contentstore`.
 
 import pytest
 import ddt
-import six
 from bson.objectid import ObjectId
 from opaque_keys.edx.locator import LibraryLocator
-from six.moves import range
 
 from xmodule.modulestore.exceptions import DuplicateCourseError
 from xmodule.modulestore.tests.factories import ItemFactory, LibraryFactory, check_mongo_calls
@@ -50,15 +47,15 @@ class TestLibraries(MixedSplitTestCase):
 
     @ddt.data(
         "This is a test library!",
-        u"Ωμέγα Βιβλιοθήκη",
+        "Ωμέγα Βιβλιοθήκη",
     )
     def test_str_repr(self, name):
         """
         Test __unicode__() and __str__() methods of libraries
         """
         library = LibraryFactory.create(metadata={"display_name": name}, modulestore=self.store)
-        assert name in six.text_type(library)
-        if not isinstance(name, six.text_type):
+        assert name in str(library)
+        if not isinstance(name, str):
             assert name in str(library)
 
     def test_display_with_default_methods(self):
@@ -155,7 +152,7 @@ class TestLibraries(MixedSplitTestCase):
     def test_get_libraries(self):
         """ Test get_libraries() """
         libraries = [LibraryFactory.create(modulestore=self.store) for _ in range(3)]
-        lib_dict = dict([(lib.location.library_key, lib) for lib in libraries])  # lint-amnesty, pylint: disable=consider-using-dict-comprehension
+        lib_dict = {lib.location.library_key: lib for lib in libraries}
 
         lib_list = self.store.get_libraries()
 

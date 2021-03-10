@@ -6,9 +6,10 @@ well-formed and not-well-formed XML.
 
 import os.path
 from glob import glob
+from unittest.mock import Mock, patch
+
 import pytest
 from django.test import TestCase
-from mock import Mock, patch
 from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locator import CourseLocator
 
@@ -145,7 +146,7 @@ class TestModuleStoreIgnore(TestXMLModuleStore):  # lint-amnesty, pylint: disabl
     course_dir = DATA_DIR / "course_ignore"
 
     def setUp(self):
-        super(TestModuleStoreIgnore, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.addCleanup(remove_temp_files_from_list, list(TILDA_FILES_DICT.keys()), self.course_dir / "static")
         add_temp_files_from_dict(TILDA_FILES_DICT, self.course_dir / "static")
 

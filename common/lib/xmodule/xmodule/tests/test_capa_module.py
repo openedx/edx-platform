@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 Tests of the Capa XModule
 """
@@ -11,19 +10,17 @@ import os
 import random
 import textwrap
 import unittest
+from unittest.mock import DEFAULT, Mock, patch
 
 import pytest
 import ddt
 import requests
-import six
 import webob
 from django.utils.encoding import smart_text
 from edx_user_state_client.interface import XBlockUserState
 from lxml import etree
-from mock import DEFAULT, Mock, patch
 from opaque_keys.edx.locator import BlockUsageLocator, CourseLocator
 from pytz import UTC
-from six.moves import range, zip
 from webob.multidict import MultiDict
 from xblock.field_data import DictFieldData
 from xblock.fields import ScopeIds
@@ -41,7 +38,7 @@ from ..capa_base import RANDOMIZATION, SHOWANSWER
 from . import get_test_system
 
 
-class CapaFactory(object):
+class CapaFactory:
     """
     A helper class to create problem modules with various parameters for testing.
     """
@@ -101,7 +98,7 @@ class CapaFactory(object):
         location = BlockUsageLocator(
             CourseLocator("edX", "capa_test", "2012_Fall", deprecated=True),
             "problem",
-            "SampleProblem{0}".format(cls.next_num()),
+            f"SampleProblem{cls.next_num()}",
             deprecated=True,
         )
         if xml is None:
@@ -182,7 +179,7 @@ if submission[0] == '':
 class ProblemBlockTest(unittest.TestCase):  # lint-amnesty, pylint: disable=missing-class-docstring
 
     def setUp(self):
-        super(ProblemBlockTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
 
         now = datetime.datetime.now(UTC)
         day_delta = datetime.timedelta(days=1)
@@ -861,8 +858,8 @@ class ProblemBlockTest(unittest.TestCase):  # lint-amnesty, pylint: disable=miss
 
         assert xqueue_interface._http_post.call_count == 1
         _, kwargs = xqueue_interface._http_post.call_args
-        six.assertCountEqual(self, fpaths, list(kwargs['files'].keys()))
-        for fpath, fileobj in six.iteritems(kwargs['files']):
+        self.assertCountEqual(fpaths, list(kwargs['files'].keys()))
+        for fpath, fileobj in kwargs['files'].items():
             assert fpath == fileobj.name
 
     def test_submit_problem_with_files_as_xblock(self):
@@ -894,8 +891,8 @@ class ProblemBlockTest(unittest.TestCase):  # lint-amnesty, pylint: disable=miss
 
         assert xqueue_interface._http_post.call_count == 1
         _, kwargs = xqueue_interface._http_post.call_args
-        six.assertCountEqual(self, fnames, list(kwargs['files'].keys()))
-        for fpath, fileobj in six.iteritems(kwargs['files']):
+        self.assertCountEqual(fnames, list(kwargs['files'].keys()))
+        for fpath, fileobj in kwargs['files'].items():
             assert fpath == fileobj.name
 
     def test_submit_problem_error(self):
@@ -947,7 +944,7 @@ class ProblemBlockTest(unittest.TestCase):  # lint-amnesty, pylint: disable=miss
                         '  File "<string>", line 65, in check_func\\n'
                         'Exception: Couldn\'t execute jailed code\\n\' with status code: 1', )
                 except ResponseError as err:
-                    mock_grade.side_effect = exception_class(six.text_type(err))
+                    mock_grade.side_effect = exception_class(str(err))
                 get_request_dict = {CapaFactory.input_key(): '3.14'}
                 result = module.submit_problem(get_request_dict)
 
@@ -974,7 +971,7 @@ class ProblemBlockTest(unittest.TestCase):  # lint-amnesty, pylint: disable=miss
 
         # Simulate answering a problem that raises the exception
         with patch('capa.capa_problem.LoncapaProblem.grade_answers') as mock_grade:
-            error_msg = u"Superterrible error happened: ☠"
+            error_msg = "Superterrible error happened: ☠"
             mock_grade.side_effect = Exception(error_msg)
 
             get_request_dict = {CapaFactory.input_key(): '3.14'}
@@ -1009,13 +1006,13 @@ class ProblemBlockTest(unittest.TestCase):  # lint-amnesty, pylint: disable=miss
 
             # Simulate answering a problem that raises the exception
             with patch('capa.capa_problem.LoncapaProblem.grade_answers') as mock_grade:
-                mock_grade.side_effect = exception_class(u"ȧƈƈḗƞŧḗḓ ŧḗẋŧ ƒǿř ŧḗşŧīƞɠ")
+                mock_grade.side_effect = exception_class("ȧƈƈḗƞŧḗḓ ŧḗẋŧ ƒǿř ŧḗşŧīƞɠ")
 
                 get_request_dict = {CapaFactory.input_key(): '3.14'}
                 result = module.submit_problem(get_request_dict)
 
             # Expect an AJAX alert message in 'success'
-            expected_msg = u'ȧƈƈḗƞŧḗḓ ŧḗẋŧ ƒǿř ŧḗşŧīƞɠ'
+            expected_msg = 'ȧƈƈḗƞŧḗḓ ŧḗẋŧ ƒǿř ŧḗşŧīƞɠ'
 
             assert expected_msg == result['success']
 
@@ -1241,7 +1238,7 @@ class ProblemBlockTest(unittest.TestCase):  # lint-amnesty, pylint: disable=miss
 
         # Simulate answering a problem that raises the exception
         with patch('capa.capa_problem.LoncapaProblem.get_grade_from_current_answers') as mock_rescore:
-            mock_rescore.side_effect = exception_class(u'test error \u03a9')
+            mock_rescore.side_effect = exception_class('test error \u03a9')
             with pytest.raises(exception_class):
                 module.rescore(only_if_higher=False)
 
@@ -1710,7 +1707,7 @@ class ProblemBlockTest(unittest.TestCase):  # lint-amnesty, pylint: disable=miss
 
         # Simulate throwing an exception when the capa problem
         # is asked to render itself as HTML
-        error_msg = u"Superterrible error happened: ☠"
+        error_msg = "Superterrible error happened: ☠"
         module.lcp.get_html = Mock(side_effect=Exception(error_msg))
 
         # Stub out the get_test_system rendering function
@@ -2527,7 +2524,7 @@ class ProblemBlockXMLTest(unittest.TestCase):  # lint-amnesty, pylint: disable=m
         self.assertDictEqual(
             indexing_result, {
                 'content_type': ProblemBlock.INDEX_CONTENT_TYPE,
-                'problem_types': set(["optionresponse", "multiplechoiceresponse"]),
+                'problem_types': {"optionresponse", "multiplechoiceresponse"},
                 'content': {
                     'display_name': name,
                     'capa_content': " Label Some comment Donut Buggy '1','2' "
@@ -2569,7 +2566,7 @@ class ProblemBlockXMLTest(unittest.TestCase):  # lint-amnesty, pylint: disable=m
     def test_indexing_checkboxes(self):
         name = "Checkboxes"
         descriptor = self._create_descriptor(self.sample_checkbox_problem_xml, name=name)
-        capa_content = textwrap.dedent(u"""
+        capa_content = textwrap.dedent("""
             Title
             Description
             Example
@@ -2856,7 +2853,7 @@ class ProblemCheckTrackingTest(unittest.TestCase):
     """
 
     def setUp(self):
-        super(ProblemCheckTrackingTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.maxDiff = None
 
     def test_choice_answer_text(self):
@@ -2909,14 +2906,14 @@ class ProblemCheckTrackingTest(unittest.TestCase):
                                         'group_label': '',
                                         'variant': ''},
                 factory.answer_key(3): {'question': 'Which piece of furniture is built for sitting?',
-                                        'answer': u'<text>a table</text>',
+                                        'answer': '<text>a table</text>',
                                         'response_type': 'multiplechoiceresponse',
                                         'input_type': 'choicegroup',
                                         'correct': False,
                                         'group_label': '',
                                         'variant': ''},
                 factory.answer_key(4): {'question': 'Which of the following are musical instruments?',
-                                        'answer': [u'a piano', u'a tree'],
+                                        'answer': ['a piano', 'a tree'],
                                         'response_type': 'choiceresponse',
                                         'input_type': 'checkboxgroup',
                                         'correct': False,
@@ -3160,14 +3157,14 @@ class ProblemBlockReportGenerationTest(unittest.TestCase):
 
     def _mock_user_state_generator(self, user_count=1, response_count=10):
         for uid in range(user_count):
-            yield self._user_state(username='user{}'.format(uid), response_count=response_count)
+            yield self._user_state(username=f'user{uid}', response_count=response_count)
 
     def _user_state(self, username='testuser', response_count=10, suffix=''):
         return XBlockUserState(
             username=username,
             state={
                 'student_answers': {
-                    '{}_answerid_{}{}'.format(username, aid, suffix): '{}_answer_{}'.format(username, aid)
+                    f'{username}_answerid_{aid}{suffix}': f'{username}_answer_{aid}'
                     for aid in range(response_count)
                 },
                 'seed': 1,

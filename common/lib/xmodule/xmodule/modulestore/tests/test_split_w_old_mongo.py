@@ -4,10 +4,9 @@ import datetime
 import os
 import random
 import unittest
+from unittest import mock
 
-import mock
 import pytest
-import six
 from opaque_keys.edx.locator import BlockUsageLocator, CourseLocator
 
 from xmodule.modulestore import ModuleStoreEnum
@@ -38,7 +37,7 @@ class SplitWMongoCourseBootstrapper(unittest.TestCase):
     db_config = {
         'host': MONGO_HOST,
         'port': MONGO_PORT_NUM,
-        'db': 'test_xmodule_{}'.format(os.getpid()),
+        'db': f'test_xmodule_{os.getpid()}',
         'collection': 'modulestore'
     }
 
@@ -53,7 +52,7 @@ class SplitWMongoCourseBootstrapper(unittest.TestCase):
 
     def setUp(self):
         self.user_id = random.getrandbits(32)
-        super(SplitWMongoCourseBootstrapper, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.split_mongo = SplitMongoModuleStore(
             None,
             self.db_config,
@@ -90,7 +89,7 @@ class SplitWMongoCourseBootstrapper(unittest.TestCase):
         )
         if not draft:
             self.draft_mongo.publish(location, self.user_id)
-        if isinstance(data, six.string_types):
+        if isinstance(data, str):
             fields = {'data': data}
         else:
             fields = data.copy()

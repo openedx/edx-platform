@@ -5,10 +5,10 @@ Tests of modulestore semantics: How do the interfaces methods of ModuleStore rel
 
 import itertools
 from collections import namedtuple
+from unittest.mock import patch
 
 import pytest
 import ddt
-from mock import patch
 from xblock.core import XBlock, XBlockAside
 from xblock.fields import Scope, String
 from xblock.runtime import DictKeyValueStore, KvsFieldData
@@ -59,7 +59,7 @@ class DirectOnlyCategorySemantics(PureModulestoreTestCase):
     ASIDE_DATA_FIELD = TestField('content', '<div>aside test data</div>', '<div>aside different test data</div>')
 
     def setUp(self):
-        super(DirectOnlyCategorySemantics, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.course = CourseFactory.create(
             org='test_org',
             number='999',
@@ -345,7 +345,7 @@ class DirectOnlyCategorySemantics(PureModulestoreTestCase):
             self.assertCourseSummaryFields(course_summaries)
 
             # Verify fetched accessible courses list is a list of CourseSummery instances
-            assert all((isinstance(course, CourseSummary) for course in course_summaries))
+            assert all(isinstance(course, CourseSummary) for course in course_summaries)
 
     @ddt.data(*itertools.product(['chapter', 'sequential'], [True, False]))
     @ddt.unpack

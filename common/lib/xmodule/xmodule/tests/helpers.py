@@ -36,7 +36,7 @@ class StubUserService(UserService):
 
     def __init__(self, is_anonymous=False, **kwargs):
         self.is_anonymous = is_anonymous
-        super(StubUserService, self).__init__(**kwargs)  # lint-amnesty, pylint: disable=super-with-arguments
+        super().__init__(**kwargs)
 
     def get_current_user(self):
         """

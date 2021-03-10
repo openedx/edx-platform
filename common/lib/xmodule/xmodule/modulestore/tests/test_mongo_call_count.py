@@ -9,7 +9,6 @@ from tempfile import mkdtemp
 from unittest import skip
 
 import ddt
-import six
 from django.test import TestCase  # lint-amnesty, pylint: disable=reimported
 
 from xmodule.modulestore.tests.factories import check_mongo_calls
@@ -35,7 +34,7 @@ class CountMongoCallsXMLRoundtrip(TestCase):
     """
 
     def setUp(self):
-        super(CountMongoCallsXMLRoundtrip, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.export_dir = mkdtemp()
         self.addCleanup(rmtree, self.export_dir, ignore_errors=True)
 
@@ -112,7 +111,7 @@ class CountMongoCallsCourseTraversal(TestCase):
         if access_all_block_fields:
             # Read the fields on each block in order to ensure each block and its definition is loaded.
             for xblock in all_blocks:
-                for __, field in six.iteritems(xblock.fields):
+                for __, field in xblock.fields.items():
                     if field.is_set_on(xblock):
                         __ = field.read_from(xblock)
 

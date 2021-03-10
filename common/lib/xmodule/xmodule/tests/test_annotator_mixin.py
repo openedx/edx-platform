@@ -30,7 +30,7 @@ class HelperFunctionTest(unittest.TestCase):
         """
         xmltree = etree.fromstring(self.sample_xml)
 
-        expected_xml = u"<div><p>Helper Test Instructions.</p></div>"
+        expected_xml = "<div><p>Helper Test Instructions.</p></div>"
         actual_xml = get_instructions(xmltree)
         assert actual_xml is not None
         assert expected_xml.strip() == actual_xml.strip()
