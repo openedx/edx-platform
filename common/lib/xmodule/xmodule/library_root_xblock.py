@@ -4,7 +4,6 @@
 
 
 import logging
-import six
 
 from django.utils.encoding import python_2_unicode_compatible
 from web_fragments.fragment import Fragment
@@ -50,7 +49,7 @@ class LibraryRoot(XBlock):
     has_author_view = True
 
     def __str__(self):
-        return u"Library: {}".format(self.display_name)
+        return f"Library: {self.display_name}"
 
     def author_view(self, context):
         """
@@ -91,7 +90,7 @@ class LibraryRoot(XBlock):
             child = self.runtime.get_block(child_key)
             child_view_name = StudioEditableModule.get_preview_view_name(child)
 
-            if six.text_type(child.location) == force_render:
+            if str(child.location) == force_render:
                 child_context['show_preview'] = True
 
             if child_context['show_preview']:
@@ -101,7 +100,7 @@ class LibraryRoot(XBlock):
             fragment.add_fragment_resources(rendered_child)
 
             contents.append({
-                'id': six.text_type(child.location),
+                'id': str(child.location),
                 'content': rendered_child.content,
             })
 

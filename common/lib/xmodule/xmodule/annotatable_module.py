@@ -46,7 +46,7 @@ class AnnotatableBlock(
     data = String(
         help=_("XML data for the annotation"),
         scope=Scope.content,
-        default=textwrap.dedent(HTML(u"""
+        default=textwrap.dedent(HTML("""
         <annotatable>
             <instructions>
                 <p>Enter your (optional) instructions for the exercise in HTML format.</p>

@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 LibraryContent: The XBlock used to include blocks from a library in a course.
 """
@@ -10,14 +9,11 @@ import random
 from copy import copy
 from gettext import ngettext
 
-import six
 import bleach
 from lazy import lazy
 from lxml import etree
 from opaque_keys.edx.locator import LibraryLocator
 from pkg_resources import resource_string
-from six import text_type
-from six.moves import zip
 from web_fragments.fragment import Fragment
 from webob import Response
 from xblock.completable import XBlockCompletionMode
@@ -196,10 +192,10 @@ class LibraryContentBlock(
         """
         rand = random.Random()
 
-        selected_keys = set(tuple(k) for k in selected)  # set of (block_type, block_id) tuples assigned to this student
+        selected_keys = {tuple(k) for k in selected}  # set of (block_type, block_id) tuples assigned to this student
 
         # Determine which of our children we will show:
-        valid_block_keys = set((c.block_type, c.block_id) for c in children)
+        valid_block_keys = {(c.block_type, c.block_id) for c in children}
 
         # Remove any selected blocks that are no longer valid:
         invalid_block_keys = (selected_keys - valid_block_keys)
@@ -244,13 +240,13 @@ class LibraryContentBlock(
         Helper method to publish an event for analytics purposes
         """
         event_data = {
-            "location": six.text_type(self.location),
+            "location": str(self.location),
             "result": result,
             "previous_count": getattr(self, "_last_event_result_count", len(self.selected)),
             "max_count": self.max_count,
         }
         event_data.update(kwargs)
-        self.runtime.publish(self, "edx.librarycontentblock.content.{}".format(event_name), event_data)
+        self.runtime.publish(self, f"edx.librarycontentblock.content.{event_name}", event_data)
         self._last_event_result_count = len(result)  # pylint: disable=attribute-defined-outside-init
 
     @classmethod
@@ -364,7 +360,7 @@ class LibraryContentBlock(
                 rendered_child = displayable.render(STUDENT_VIEW, child_context)
                 fragment.add_fragment_resources(rendered_child)
                 contents.append({
-                    'id': text_type(displayable.location),
+                    'id': str(displayable.location),
                     'content': rendered_child.content,
                 })
 
@@ -478,7 +474,7 @@ class LibraryContentBlock(
         """
         Copy any overrides the user has made on blocks in this library.
         """
-        for field in six.itervalues(source.fields):
+        for field in source.fields.values():
             if field.scope == Scope.settings and field.is_set_on(source):
                 setattr(dest, field.name, field.read_from(source))
         if source.has_children:
@@ -515,16 +511,16 @@ class LibraryContentBlock(
         """
         latest_version = lib_tools.get_library_version(library_key)
         if latest_version is not None:
-            if version is None or version != six.text_type(latest_version):
+            if version is None or version != str(latest_version):
                 validation.set_summary(
                     StudioValidationMessage(
                         StudioValidationMessage.WARNING,
-                        _(u'This component is out of date. The library has new content.'),
+                        _('This component is out of date. The library has new content.'),
                         # TODO: change this to action_runtime_event='...' once the unit page supports that feature.
                         # See https://openedx.atlassian.net/browse/TNL-993
                         action_class='library-update-btn',
                         # Translators: {refresh_icon} placeholder is substituted to "↻" (without double quotes)
-                        action_label=_(u"{refresh_icon} Update now.").format(refresh_icon=u"↻")
+                        action_label=_("{refresh_icon} Update now.").format(refresh_icon="↻")
                     )
                 )
                 return False
@@ -532,9 +528,9 @@ class LibraryContentBlock(
             validation.set_summary(
                 StudioValidationMessage(
                     StudioValidationMessage.ERROR,
-                    _(u'Library is invalid, corrupt, or has been deleted.'),
+                    _('Library is invalid, corrupt, or has been deleted.'),
                     action_class='edit-button',
-                    action_label=_(u"Edit Library List.")
+                    action_label=_("Edit Library List.")
                 )
             )
             return False
@@ -560,8 +556,8 @@ class LibraryContentBlock(
                 StudioValidationMessage(
                     StudioValidationMessage.ERROR,
                     _(
-                        u"This course does not support content libraries. "
-                        u"Contact your system administrator for more information."
+                        "This course does not support content libraries. "
+                        "Contact your system administrator for more information."
                     )
                 )
             )
@@ -570,9 +566,9 @@ class LibraryContentBlock(
             validation.set_summary(
                 StudioValidationMessage(
                     StudioValidationMessage.NOT_CONFIGURED,
-                    _(u"A library has not yet been selected."),
+                    _("A library has not yet been selected."),
                     action_class='edit-button',
-                    action_label=_(u"Select a Library.")
+                    action_label=_("Select a Library.")
                 )
             )
             return validation
@@ -587,9 +583,9 @@ class LibraryContentBlock(
                 validation,
                 StudioValidationMessage(
                     StudioValidationMessage.WARNING,
-                    _(u'There are no matching problem types in the specified libraries.'),
+                    _('There are no matching problem types in the specified libraries.'),
                     action_class='edit-button',
-                    action_label=_(u"Select another problem type.")
+                    action_label=_("Select another problem type.")
                 )
             )
 
@@ -600,18 +596,18 @@ class LibraryContentBlock(
                     StudioValidationMessage.WARNING,
                     (
                         ngettext(
-                            u'The specified library is configured to fetch {count} problem, ',
-                            u'The specified library is configured to fetch {count} problems, ',
+                            'The specified library is configured to fetch {count} problem, ',
+                            'The specified library is configured to fetch {count} problems, ',
                             self.max_count
                         ) +
                         ngettext(
-                            u'but there is only {actual} matching problem.',
-                            u'but there are only {actual} matching problems.',
+                            'but there is only {actual} matching problem.',
+                            'but there are only {actual} matching problems.',
                             matching_children_count
                         )
                     ).format(count=self.max_count, actual=matching_children_count),
                     action_class='edit-button',
-                    action_label=_(u"Edit the library configuration.")
+                    action_label=_("Edit the library configuration.")
                 )
             )
 
@@ -625,13 +621,13 @@ class LibraryContentBlock(
         user_perms = self.runtime.service(self, 'studio_user_permissions')
         all_libraries = [
             (key, bleach.clean(name)) for key, name in lib_tools.list_available_libraries()
-            if user_perms.can_read(key) or self.source_library_id == six.text_type(key)
+            if user_perms.can_read(key) or self.source_library_id == str(key)
         ]
         all_libraries.sort(key=lambda entry: entry[1])  # Sort by name
         if self.source_library_id and self.source_library_key not in [entry[0] for entry in all_libraries]:
-            all_libraries.append((self.source_library_id, _(u"Invalid Library")))
-        all_libraries = [(u"", _("No Library Selected"))] + all_libraries
-        values = [{"display_name": name, "value": six.text_type(key)} for key, name in all_libraries]
+            all_libraries.append((self.source_library_id, _("Invalid Library")))
+        all_libraries = [("", _("No Library Selected"))] + all_libraries
+        values = [{"display_name": name, "value": str(key)} for key, name in all_libraries]
         return values
 
     def editor_saved(self, user, old_metadata, old_content):  # lint-amnesty, pylint: disable=unused-argument
@@ -684,15 +680,15 @@ class LibraryContentBlock(
         for child in self.get_children():
             self.runtime.add_block_as_child_node(child, xml_object)
         # Set node attributes based on our fields.
-        for field_name, field in six.iteritems(self.fields):
+        for field_name, field in self.fields.items():  # pylint: disable=no-member
             if field_name in ('children', 'parent', 'content'):
                 continue
             if field.is_set_on(self):
-                xml_object.set(field_name, six.text_type(field.read_from(self)))
+                xml_object.set(field_name, str(field.read_from(self)))
         return xml_object
 
 
-class LibrarySummary(object):
+class LibrarySummary:
     """
     A library summary object which contains the fields required for library listing on studio.
     """
@@ -706,7 +702,7 @@ class LibrarySummary(object):
 
         display_name (unicode): display name of the library.
         """
-        self.display_name = display_name if display_name else _(u"Empty")
+        self.display_name = display_name if display_name else _("Empty")
 
         self.id = library_locator  # pylint: disable=invalid-name
         self.location = library_locator.make_usage_key('library', 'library')

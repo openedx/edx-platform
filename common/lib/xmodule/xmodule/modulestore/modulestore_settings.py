@@ -6,8 +6,6 @@ This file contains helper functions for configuring module_store_setting setting
 import copy
 import warnings
 
-import six
-
 
 def convert_module_store_setting_if_needed(module_store_setting):
     """
@@ -19,7 +17,7 @@ def convert_module_store_setting_if_needed(module_store_setting):
         Converts and returns the given stores in old (unordered) dict-style format to the new (ordered) list format
         """
         new_store_list = []
-        for store_name, store_settings in six.iteritems(old_stores):
+        for store_name, store_settings in old_stores.items():
 
             store_settings['NAME'] = store_name
             if store_name == 'default':
@@ -125,7 +123,7 @@ def update_module_store_settings(
                 mixed_stores.remove(store)
                 mixed_stores.insert(0, store)
                 return
-        raise Exception("Could not find setting for requested default store: {}".format(default_store))
+        raise Exception(f"Could not find setting for requested default store: {default_store}")
 
     if mappings and 'mappings' in module_store_setting['default']['OPTIONS']:
         module_store_setting['default']['OPTIONS']['mappings'] = mappings

@@ -5,13 +5,12 @@ import os
 import re
 import uuid
 from io import BytesIO
+from urllib.parse import parse_qsl, quote_plus, urlencode, urlparse, urlunparse
 
-import six
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import AssetKey, CourseKey
 from opaque_keys.edx.locator import AssetLocator
 from PIL import Image
-from six.moves.urllib.parse import parse_qsl, quote_plus, urlencode, urlparse, urlunparse
 
 from xmodule.assetstore.assetmgr import AssetManager
 from xmodule.exceptions import NotFoundError
@@ -26,7 +25,7 @@ VERSIONED_ASSETS_PREFIX = '/assets/courseware'
 VERSIONED_ASSETS_PATTERN = r'/assets/courseware/(v[\d]/)?([a-f0-9]{32})'
 
 
-class StaticContent(object):  # lint-amnesty, pylint: disable=missing-class-docstring
+class StaticContent:  # lint-amnesty, pylint: disable=missing-class-docstring
     def __init__(self, loc, name, content_type, data, last_modified_at=None, thumbnail_location=None, import_path=None,
                  length=None, locked=False, content_digest=None):
         self.location = loc
@@ -58,13 +57,13 @@ class StaticContent(object):  # lint-amnesty, pylint: disable=missing-class-docs
 
         name_root, ext = os.path.splitext(original_name)
         if not ext == extension:
-            name_root = name_root + ext.replace(u'.', u'-')
+            name_root = name_root + ext.replace('.', '-')
 
         if dimensions:
             width, height = dimensions
-            name_root += "-{}x{}".format(width, height)
+            name_root += f"-{width}x{height}"
 
-        return u"{name_root}{extension}".format(
+        return "{name_root}{extension}".format(
             name_root=name_root,
             extension=extension,
         )
@@ -118,7 +117,7 @@ class StaticContent(object):  # lint-amnesty, pylint: disable=missing-class-docs
         the actual /c4x/... path which the client needs to reference static content
         """
         if location is not None:
-            return u"/static/{name}".format(name=location.block_id)
+            return f"/static/{location.block_id}"
         else:
             return None
 
@@ -180,9 +179,9 @@ class StaticContent(object):  # lint-amnesty, pylint: disable=missing-class-docs
         if StaticContent.is_versioned_asset_path(path):
             return path
 
-        structure_version = 'v{}'.format(STATIC_CONTENT_VERSION)
+        structure_version = f'v{STATIC_CONTENT_VERSION}'
 
-        return u'{}/{}/{}{}'.format(VERSIONED_ASSETS_PREFIX, structure_version, version, path)
+        return f'{VERSIONED_ASSETS_PREFIX}/{structure_version}/{version}{path}'
 
     @staticmethod
     def get_asset_key_from_path(course_key, path):
@@ -301,7 +300,7 @@ class StaticContent(object):  # lint-amnesty, pylint: disable=missing-class-docs
         Legacy code expects the serialized asset key to start w/ a slash; so, do that in one place
         :param asset_key:
         """
-        url = six.text_type(asset_key)
+        url = str(asset_key)
         if not url.startswith('/'):
             url = '/' + url  # TODO - re-address this once LMS-11198 is tackled.
         return url
@@ -310,9 +309,9 @@ class StaticContent(object):  # lint-amnesty, pylint: disable=missing-class-docs
 class StaticContentStream(StaticContent):  # lint-amnesty, pylint: disable=missing-class-docstring
     def __init__(self, loc, name, content_type, stream, last_modified_at=None, thumbnail_location=None, import_path=None,  # lint-amnesty, pylint: disable=line-too-long
                  length=None, locked=False, content_digest=None):
-        super(StaticContentStream, self).__init__(loc, name, content_type, None, last_modified_at=last_modified_at,  # lint-amnesty, pylint: disable=super-with-arguments
-                                                  thumbnail_location=thumbnail_location, import_path=import_path,
-                                                  length=length, locked=locked, content_digest=content_digest)
+        super().__init__(loc, name, content_type, None, last_modified_at=last_modified_at,
+                         thumbnail_location=thumbnail_location, import_path=import_path,
+                         length=length, locked=locked, content_digest=content_digest)
         self._stream = stream
 
     def stream_data(self):
@@ -349,7 +348,7 @@ class StaticContentStream(StaticContent):  # lint-amnesty, pylint: disable=missi
         return content
 
 
-class ContentStore(object):
+class ContentStore:
     '''
     Abstraction for all ContentStore providers (e.g. MongoDB)
     '''
@@ -459,7 +458,7 @@ class ContentStore(object):
         except Exception as exc:  # pylint: disable=broad-except
             # log and continue as thumbnails are generally considered as optional
             logging.exception(
-                u"Failed to generate thumbnail for {0}. Exception: {1}".format(content.location, str(exc))
+                "Failed to generate thumbnail for {}. Exception: {}".format(content.location, str(exc))
             )
 
         return thumbnail_content, thumbnail_file_location

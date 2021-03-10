@@ -318,7 +318,7 @@ class InheritingFieldData(KvsFieldData):
         parents.
 
         """
-        super(InheritingFieldData, self).__init__(**kwargs)  # lint-amnesty, pylint: disable=super-with-arguments
+        super().__init__(**kwargs)
         self.inheritable_names = set(inheritable_names)
 
     def has_default_value(self, name):
@@ -349,14 +349,14 @@ class InheritingFieldData(KvsFieldData):
             if ancestor and \
                ancestor.location.block_type == 'library_content' and \
                self.has_default_value(name):
-                return super(InheritingFieldData, self).default(block, name)  # lint-amnesty, pylint: disable=super-with-arguments
+                return super().default(block, name)
 
             while ancestor is not None:
                 if field.is_set_on(ancestor):
                     return field.read_json(ancestor)
                 else:
                     ancestor = ancestor.get_parent()
-        return super(InheritingFieldData, self).default(block, name)  # lint-amnesty, pylint: disable=super-with-arguments
+        return super().default(block, name)
 
 
 def inheriting_field_data(kvs):
@@ -375,7 +375,7 @@ class InheritanceKeyValueStore(KeyValueStore):
     Note: inherited_settings is a dict of key to json values (internal xblock field repr)
     """
     def __init__(self, initial_values=None, inherited_settings=None):
-        super(InheritanceKeyValueStore, self).__init__()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().__init__()
         self.inherited_settings = inherited_settings or {}
         self._fields = initial_values or {}
 

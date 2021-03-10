@@ -12,7 +12,6 @@ from datetime import datetime, timedelta
 from math import exp
 
 import dateutil.parser
-import six
 from pytz import utc
 
 DEFAULT_START_DATE = datetime(2030, 1, 1, tzinfo=utc)
@@ -66,7 +65,7 @@ def clean_course_key(course_key, padding_char):
         padding_char (str): Character used for padding at end of the encoded
             string. The standard value for this is '='.
     """
-    encoded = b32encode(six.text_type(course_key).encode('utf8')).decode('utf8')
+    encoded = b32encode(str(course_key).encode('utf8')).decode('utf8')
     return "course_{}".format(
         encoded.replace('=', padding_char)
     )
