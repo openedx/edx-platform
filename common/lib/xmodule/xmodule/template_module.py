@@ -20,6 +20,8 @@ from xmodule.x_module import (
 )
 from xmodule.xml_module import XmlMixin
 
+from openedx.core.djangolib.markup import Text
+
 
 class CustomTagTemplateBlock(  # pylint: disable=abstract-method
     RawMixin,
@@ -132,3 +134,33 @@ class CustomTagBlock(CustomTagTemplateBlock):  # pylint: disable=abstract-method
         to export them in a file with yet another layer of indirection.
         """
         return False
+
+
+class TranslateCustomTagBlock(  # pylint: disable=abstract-method
+    XModuleDescriptorToXBlockMixin,
+    XModuleToXBlockMixin,
+    XModuleMixin,
+):
+    """
+    Converts olx of the form `<$custom_tag attr="" attr=""/>` to CustomTagBlock
+    of the form `<customtag attr="" attr="" impl="$custom_tag"/>`.
+    """
+    resources_dir = None
+
+    @classmethod
+    def from_xml(cls, xml_data, system, id_generator):
+        """
+        Transforms the xml_data from <$custom_tag attr="" attr=""/> to
+        <customtag attr="" attr="" impl="$custom_tag"/>
+        """
+
+        xml_object = etree.fromstring(xml_data)
+        system.error_tracker(Text('WARNING: the <{tag}> tag is deprecated.  '
+                             'Instead, use <customtag impl="{tag}" attr1="..." attr2="..."/>. ')
+                             .format(tag=xml_object.tag))
+
+        tag = xml_object.tag
+        xml_object.tag = 'customtag'
+        xml_object.attrib['impl'] = tag
+
+        return system.process_xml(etree.tostring(xml_object))
