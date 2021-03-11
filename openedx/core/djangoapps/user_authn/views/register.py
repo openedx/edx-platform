@@ -345,11 +345,18 @@ def _track_user_registration(user, profile, params, third_party_provider):
             'is_education_selected': bool(profile.level_of_education_display),
             'is_goal_set': bool(profile.goals),
         }
+        # DENG-803: For segment events forwarded along to Hubspot, duplicate the `properties` section of
+        # the event payload into the `traits` section so that they can be received. This is a temporary
+        # fix until we implement this behavior outside of the LMS.
+        # TODO: DENG-805: remove the properties duplication in the event traits.
+        segment_traits = dict(properties)
+        segment_traits['user_id'] = user.id
+        segment_traits['joined_date'] = user.date_joined.strftime("%Y-%m-%d")
         segment.track(
             user.id,
             "edx.bi.user.account.registered",
             properties=properties,
-            traits=properties,
+            traits=segment_traits,
         )
 
 

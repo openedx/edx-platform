@@ -1485,7 +1485,12 @@ class CourseEnrollment(models.Model):
                 'run': self.course_id.run,
                 'mode': self.mode,
             }
+            # DENG-803: For segment events forwarded along to Hubspot, duplicate the `properties`
+            # section of the event payload into the `traits` section so that they can be received.
+            # This is a temporary fix until we implement this behavior outside of the LMS.
+            # TODO: DENG-804: remove the properties duplication in the event traits.
             segment_traits = dict(segment_properties)
+            # Add course_title to the traits, as it is used by Hubspot filters
             segment_traits['course_title'] = self.course_overview.display_name if self.course_overview else None
             if event_name == EVENT_NAME_ENROLLMENT_ACTIVATED:
                 segment_properties['email'] = self.user.email
