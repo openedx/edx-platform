@@ -43,7 +43,7 @@ coreapi==2.3.3            # via drf-yasg
 coreschema==0.0.4         # via coreapi, drf-yasg
 crowdsourcehinter-xblock==0.6  # via -r requirements/edx/base.in
 cryptography==3.2.1       # via -c requirements/edx/../constraints.txt, -r requirements/edx/../edx-sandbox/shared.txt, django-fernet-fields, edx-enterprise, pyjwt, social-auth-core
-cssutils==1.0.2           # via pynliner
+cssutils==2.2.0           # via pynliner
 ddt==1.4.1                # via xblock-drag-and-drop-v2, xblock-poll
 decorator==4.4.2          # via pycontracts
 defusedxml==0.7.1         # via -r requirements/edx/base.in, djangorestframework-xml, ora2, python3-openid, python3-saml, safe-lxml, social-auth-core
@@ -164,7 +164,7 @@ nodeenv==1.5.0            # via -r requirements/edx/base.in
 numpy==1.20.1             # via chem, openedx-calc, scipy
 oauthlib==3.0.1           # via -c requirements/edx/../constraints.txt, -r requirements/edx/base.in, django-oauth-toolkit, lti-consumer-xblock, requests-oauthlib, social-auth-core
 openedx-calc==2.0.1       # via -r requirements/edx/base.in
-ora2==3.3.2               # via -r requirements/edx/base.in
+ora2==3.4.0               # via -r requirements/edx/base.in
 packaging==20.9           # via bleach, drf-yasg
 path.py==12.5.0           # via edx-enterprise, edx-i18n-tools, ora2, staff-graded-xblock, xmodule
 path==13.1.0              # via -c requirements/edx/../constraints.txt, -r requirements/edx/paver.txt, path.py
@@ -190,7 +190,7 @@ python-dateutil==2.4.0    # via -c requirements/edx/../constraints.txt, -r requi
 python-levenshtein==0.12.2  # via -r requirements/edx/base.in
 python-memcached==1.59    # via -r requirements/edx/paver.txt
 python-slugify==4.0.1     # via code-annotations
-python-swiftclient==3.11.0  # via ora2
+python-swiftclient==3.11.1  # via ora2
 python3-openid==3.2.0 ; python_version >= "3"  # via -r requirements/edx/base.in, social-auth-core
 python3-saml==1.9.0       # via -c requirements/edx/../constraints.txt, -r requirements/edx/base.in
 pytz==2021.1              # via -r requirements/edx/base.in, babel, capa, celery, django, django-ses, edx-completion, edx-enterprise, edx-event-routing-backends, edx-proctoring, edx-submissions, edx-tincan-py35, event-tracking, fs, icalendar, ora2, tincan, xblock
