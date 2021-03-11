@@ -137,10 +137,6 @@ class CourseApiTestViews(BaseCoursewareTests):
 
                 assert not response.data['user_has_passing_grade']
                 if enrollment_mode == 'audit':
-                    # This message comes from AUDIT_PASSING_CERT_DATA in lms/djangoapps/courseware/views/views.py
-                    expected_audit_message = ('You are enrolled in the audit track for this course. '
-                                              'The audit track does not include a certificate.')
-                    assert response.data['certificate_data']['msg'] == expected_audit_message
                     assert response.data['verify_identity_url'] is None
                     assert response.data['verification_status'] == 'none'  # lint-amnesty, pylint: disable=literal-comparison
                     assert response.data['linkedin_add_to_profile_url'] is None
