@@ -43,7 +43,7 @@ def waffle_flags():
     IMPORTANT: Do NOT copy this dict pattern and do NOT add new flags to this dict.
       Instead, replace the string constants above with the actual flag instances.
     """
-    namespace = LegacyWaffleFlagNamespace(name=WAFFLE_NAMESPACE, log_prefix=u'Videos: ')
+    namespace = LegacyWaffleFlagNamespace(name=WAFFLE_NAMESPACE, log_prefix='Videos: ')
     return {
         DEPRECATE_YOUTUBE: CourseWaffleFlag(
             waffle_namespace=namespace,
