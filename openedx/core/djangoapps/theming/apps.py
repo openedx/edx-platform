@@ -5,7 +5,7 @@ from edx_django_utils.plugins import PluginURLs
 
 from openedx.core.djangoapps.plugins.constants import ProjectType
 
-plugin_urls_config = {PluginURLs.NAMESPACE: u'theming', PluginURLs.REGEX: r'^theming/'}
+plugin_urls_config = {PluginURLs.NAMESPACE: 'theming', PluginURLs.REGEX: r'^theming/'}
 
 
 class ThemingConfig(AppConfig):  # lint-amnesty, pylint: disable=missing-class-docstring

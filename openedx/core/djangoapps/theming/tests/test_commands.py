@@ -3,7 +3,6 @@ Tests for Management commands of comprehensive theming.
 """
 
 import pytest
-import six
 from django.core.management import CommandError, call_command
 from django.test import TestCase
 
@@ -16,7 +15,7 @@ class TestUpdateAssets(TestCase):
     Test comprehensive theming helper functions.
     """
     def setUp(self):
-        super(TestUpdateAssets, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.themes = get_themes()
 
     def test_errors_for_invalid_arguments(self):
@@ -45,16 +44,15 @@ class TestUpdateAssets(TestCase):
         """
         # make sure compile_sass picks all themes when called with 'themes=all' option
         parsed_args = Command.parse_arguments(themes=["all"])
-        six.assertCountEqual(self, parsed_args[2], get_themes())
+        self.assertCountEqual(parsed_args[2], get_themes())
 
         # make sure compile_sass picks no themes when called with 'themes=no' option
         parsed_args = Command.parse_arguments(themes=["no"])
-        six.assertCountEqual(self, parsed_args[2], [])
+        self.assertCountEqual(parsed_args[2], [])
 
         # make sure compile_sass picks only specified themes
         parsed_args = Command.parse_arguments(themes=["test-theme"])
-        six.assertCountEqual(
-            self,
+        self.assertCountEqual(
             parsed_args[2],
             [theme for theme in get_themes() if theme.theme_dir_name == "test-theme"]
         )

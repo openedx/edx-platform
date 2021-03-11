@@ -57,7 +57,7 @@ def stylesheet(parser, token):  # pylint: disable=unused-argument
         _, name = token.split_contents()
     except ValueError:
         raise template.TemplateSyntaxError(  # lint-amnesty, pylint: disable=raise-missing-from
-            u'%r requires exactly one argument: the name of a group in the PIPELINE["STYLESHEETS"] setting' %
+            '%r requires exactly one argument: the name of a group in the PIPELINE["STYLESHEETS"] setting' %
             token.split_contents()[0]
         )
     return ThemeStylesheetNode(name)
@@ -72,7 +72,7 @@ def javascript(parser, token):  # pylint: disable=unused-argument
         _, name = token.split_contents()
     except ValueError:
         raise template.TemplateSyntaxError(  # lint-amnesty, pylint: disable=raise-missing-from
-            u'%r requires exactly one argument: the name of a group in the PIPELINE["JAVASCRIPT"] setting' %
+            '%r requires exactly one argument: the name of a group in the PIPELINE["JAVASCRIPT"] setting' %
             token.split_contents()[0]
         )
     return ThemeJavascriptNode(name)

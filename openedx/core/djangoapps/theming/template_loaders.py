@@ -33,7 +33,7 @@ class ThemeFilesystemLoader(FilesystemLoader):
         theme_dirs = self.get_theme_template_sources()
         if isinstance(theme_dirs, list):
             self.dirs = theme_dirs + self.dirs
-        super(ThemeFilesystemLoader, self).__init__(engine, self.dirs)  # lint-amnesty, pylint: disable=super-with-arguments
+        super().__init__(engine, self.dirs)
 
     @staticmethod
     def get_theme_template_sources():

@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 Django admin integration for system wide roles application.
 """
@@ -18,5 +17,5 @@ class SystemWideRoleAssignmentAdmin(UserRoleAssignmentAdmin):
 
     form = SystemWideRoleAssignmentForm
 
-    class Meta(object):
+    class Meta:
         model = SystemWideRoleAssignment

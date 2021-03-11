@@ -206,7 +206,7 @@ def get_current_theme():
         )
     except ValueError as error:
         # Log exception message and return None, so that open source theme is used instead
-        logger.exception(u'Theme not found in any of the themes dirs. [%s]', error)
+        logger.exception('Theme not found in any of the themes dirs. [%s]', error)
         return None
 
 
@@ -240,7 +240,7 @@ def get_theme_base_dir(theme_dir_name, suppress_error=False):
         return None
 
     raise ValueError(
-        u"Theme '{theme}' not found in any of the following themes dirs, \nTheme dirs: \n{dir}".format(
+        "Theme '{theme}' not found in any of the following themes dirs, \nTheme dirs: \n{dir}".format(
             theme=theme_dir_name,
             dir=get_theme_base_dirs(),
         ))

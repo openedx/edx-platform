@@ -22,7 +22,7 @@ register = Library()
 class OptionalIncludeNode(IncludeNode):
     def render(self, context):
         try:
-            return super(OptionalIncludeNode, self).render(context)
+            return super().render(context)
         except TemplateDoesNotExist:
             return ''
 
