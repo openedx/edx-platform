@@ -105,7 +105,7 @@ class MixedSplitTestCase(TestCase):
     """
     RENDER_TEMPLATE = lambda t_n, d, ctx=None, nsp='main': '{}: {}, {}'.format(t_n, repr(d), repr(ctx))
     modulestore_options = {
-        'default_class': 'xmodule.raw_module.RawDescriptor',
+        'default_class': 'xmodule.hidden_module.HiddenDescriptor',
         'fs_root': DATA_DIR,
         'render_template': RENDER_TEMPLATE,
         'xblock_mixins': (EditInfoMixin, InheritanceMixin, LocationMixin, XModuleMixin),
