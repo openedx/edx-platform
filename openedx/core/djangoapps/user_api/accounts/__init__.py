@@ -40,58 +40,58 @@ VISIBILITY_PREFIX = 'visibility.'
 # It is shown to users who attempt to create a new account using invalid characters
 # in the username.
 USERNAME_INVALID_CHARS_ASCII = _(
-    u"Usernames can only contain letters (A-Z, a-z), numerals (0-9), underscores (_), and hyphens (-)."
+    "Usernames can only contain letters (A-Z, a-z), numerals (0-9), underscores (_), and hyphens (-)."
 )
 
 # Translators: This message is shown only when the Unicode usernames are allowed.
 # It is shown to users who attempt to create a new account using invalid characters
 # in the username.
 USERNAME_INVALID_CHARS_UNICODE = _(
-    u"Usernames can only contain letters, numerals, and @/./+/-/_ characters."
+    "Usernames can only contain letters, numerals, and @/./+/-/_ characters."
 )
 
 # Translators: This message is shown to users who attempt to create a new account using
 # an invalid email format.
-EMAIL_INVALID_MSG = _(u'"{email}" is not a valid email address.')
+EMAIL_INVALID_MSG = _('"{email}" is not a valid email address.')
 
 # Translators: This message is shown to users who attempt to create a new
 # account using an username/email associated with an existing account.
 EMAIL_CONFLICT_MSG = _(
-    u"It looks like {email_address} belongs to an existing account. "
-    u"Try again with a different email address."
+    "It looks like {email_address} belongs to an existing account. "
+    "Try again with a different email address."
 )
 USERNAME_CONFLICT_MSG = _(
-    u"It looks like {username} belongs to an existing account. "
-    u"Try again with a different username."
+    "It looks like {username} belongs to an existing account. "
+    "Try again with a different username."
 )
 
 # Translators: This message is shown to users who enter a username/email/password
 # with an inappropriate length (too short or too long).
 USERNAME_BAD_LENGTH_MSG = format_lazy(
-    _(u"Username must be between {min} and {max} characters long."),
+    _("Username must be between {min} and {max} characters long."),
     min=USERNAME_MIN_LENGTH,
     max=USERNAME_MAX_LENGTH,
 )
 EMAIL_BAD_LENGTH_MSG = format_lazy(
-    _(u"Enter a valid email address that contains at least {min} characters."),
+    _("Enter a valid email address that contains at least {min} characters."),
     min=EMAIL_MIN_LENGTH,
 )
 
 # These strings are normally not user-facing.
-USERNAME_BAD_TYPE_MSG = u"Username must be a string."
-EMAIL_BAD_TYPE_MSG = u"Email must be a string."
-PASSWORD_BAD_TYPE_MSG = u"Password must be a string."
+USERNAME_BAD_TYPE_MSG = "Username must be a string."
+EMAIL_BAD_TYPE_MSG = "Email must be a string."
+PASSWORD_BAD_TYPE_MSG = "Password must be a string."
 
 # Translators: These messages are shown to users who do not enter information
 # into the required field or enter it incorrectly.
-REQUIRED_FIELD_NAME_MSG = _(u"Enter your full name.")
-REQUIRED_FIELD_CONFIRM_EMAIL_MSG = _(u"The email addresses do not match.")
-REQUIRED_FIELD_COUNTRY_MSG = _(u"Select your country or region of residence.")
-REQUIRED_FIELD_PROFESSION_SELECT_MSG = _(u"Select your profession.")
-REQUIRED_FIELD_SPECIALTY_SELECT_MSG = _(u"Select your specialty.")
-REQUIRED_FIELD_PROFESSION_TEXT_MSG = _(u"Enter your profession.")
-REQUIRED_FIELD_SPECIALTY_TEXT_MSG = _(u"Enter your specialty.")
-REQUIRED_FIELD_CITY_MSG = _(u"Enter your city.")
-REQUIRED_FIELD_GOALS_MSG = _(u"Tell us your goals.")
-REQUIRED_FIELD_LEVEL_OF_EDUCATION_MSG = _(u"Select the highest level of education you have completed.")
-REQUIRED_FIELD_MAILING_ADDRESS_MSG = _(u"Enter your mailing address.")
+REQUIRED_FIELD_NAME_MSG = _("Enter your full name.")
+REQUIRED_FIELD_CONFIRM_EMAIL_MSG = _("The email addresses do not match.")
+REQUIRED_FIELD_COUNTRY_MSG = _("Select your country or region of residence.")
+REQUIRED_FIELD_PROFESSION_SELECT_MSG = _("Select your profession.")
+REQUIRED_FIELD_SPECIALTY_SELECT_MSG = _("Select your specialty.")
+REQUIRED_FIELD_PROFESSION_TEXT_MSG = _("Enter your profession.")
+REQUIRED_FIELD_SPECIALTY_TEXT_MSG = _("Enter your specialty.")
+REQUIRED_FIELD_CITY_MSG = _("Enter your city.")
+REQUIRED_FIELD_GOALS_MSG = _("Tell us your goals.")
+REQUIRED_FIELD_LEVEL_OF_EDUCATION_MSG = _("Select the highest level of education you have completed.")
+REQUIRED_FIELD_MAILING_ADDRESS_MSG = _("Enter your mailing address.")

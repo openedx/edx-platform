@@ -5,13 +5,12 @@ Tests for helper functions.
 
 import json
 import re
+from unittest import mock
 
 import ddt  # lint-amnesty, pylint: disable=unused-import
-import mock
 import pytest
 from django import forms
 from django.test import TestCase
-from six import text_type
 
 from ..helpers import FormDescription, InvalidFieldError, intercept_errors
 
@@ -57,17 +56,17 @@ class InterceptErrorsTest(TestCase):
         self.maxDiff = None
         exception = 'openedx.core.djangoapps.user_api.tests.test_helpers.FakeInputException'
         expected_log_msg = (
-            u"An unexpected error occurred when calling 'intercepted_function' with arguments '()' and "
-            u"keyword arguments '{{'raise_error': <class '{}'>}}' "
-            u"from File \"{}\", line XXX, in test_logs_errors\n"
-            u"    intercepted_function(raise_error=FakeInputException): FakeInputException()"
+            "An unexpected error occurred when calling 'intercepted_function' with arguments '()' and "
+            "keyword arguments '{{'raise_error': <class '{}'>}}' "
+            "from File \"{}\", line XXX, in test_logs_errors\n"
+            "    intercepted_function(raise_error=FakeInputException): FakeInputException()"
         ).format(exception, __file__.rstrip('c'))
 
         # Verify that the raised exception has the error message
         try:
             intercepted_function(raise_error=FakeInputException)
         except FakeOutputException as ex:
-            actual_message = re.sub(r'line \d+', 'line XXX', text_type(ex), flags=re.MULTILINE)
+            actual_message = re.sub(r'line \d+', 'line XXX', str(ex), flags=re.MULTILINE)
             assert actual_message == expected_log_msg
 
         # Verify that the error logger is called
@@ -159,7 +158,7 @@ class FormDescriptionTest(TestCase):
                 {'default': True, 'name': 'Pakistan', 'value': 'PK'}]
 
 
-class DummyRegistrationExtensionModel(object):
+class DummyRegistrationExtensionModel:
     """
     Dummy registration object
     """
@@ -190,8 +189,8 @@ class TestCaseForm(forms.Form):
 
     favorite_movie = forms.CharField(
         label="Fav Flick", min_length=MOVIE_MIN_LEN, max_length=MOVIE_MAX_LEN, error_messages={
-            "required": u"Please tell us your favorite movie.",
-            "invalid": u"We're pretty sure you made that movie up."
+            "required": "Please tell us your favorite movie.",
+            "invalid": "We're pretty sure you made that movie up."
         }
     )
     favorite_editor = forms.ChoiceField(label="Favorite Editor", choices=FAVORITE_EDITOR, required=False, initial='cat')
@@ -207,7 +206,7 @@ class TestCaseForm(forms.Form):
         dummy_model = DummyRegistrationExtensionModel()
         return dummy_model
 
-    class Meta(object):
+    class Meta:
         """
         Set options for fields which can't be conveyed in their definition.
         """

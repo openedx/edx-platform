@@ -19,7 +19,7 @@ urlpatterns = [
     url(r'^account/settings$', account_settings, name='account_settings'),
     url(r'^user_api/v1/', include(USER_API_ROUTER.urls)),
     url(
-        r'^user_api/v1/preferences/(?P<pref_key>{})/users/$'.format(UserPreference.KEY_REGEX),
+        fr'^user_api/v1/preferences/(?P<pref_key>{UserPreference.KEY_REGEX})/users/$',
         user_api_views.PreferenceUsersListView.as_view()
     ),
     url(

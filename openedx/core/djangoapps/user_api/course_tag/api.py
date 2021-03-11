@@ -20,8 +20,8 @@ from ..models import UserCourseTag
 COURSE_SCOPE = 'course'
 
 
-class BulkCourseTags(object):  # lint-amnesty, pylint: disable=missing-class-docstring
-    CACHE_NAMESPACE = u'user_api.course_tag.api'
+class BulkCourseTags:  # lint-amnesty, pylint: disable=missing-class-docstring
+    CACHE_NAMESPACE = 'user_api.course_tag.api'
 
     @classmethod
     def prefetch(cls, course_id, users):
@@ -53,7 +53,7 @@ class BulkCourseTags(object):  # lint-amnesty, pylint: disable=missing-class-doc
 
     @classmethod
     def _cache_key(cls, course_id):
-        return u'course_tag.{}'.format(course_id)
+        return f'course_tag.{course_id}'
 
 
 def get_course_tag(user, course_id, key):

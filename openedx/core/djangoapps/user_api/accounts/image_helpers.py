@@ -43,7 +43,7 @@ def _get_profile_image_filename(name, size, file_extension=PROFILE_IMAGE_FILE_EX
     """
     Returns the full filename for a profile image, given the name and size.
     """
-    return '{name}_{size}.{file_extension}'.format(name=name, size=size, file_extension=file_extension)
+    return f'{name}_{size}.{file_extension}'
 
 
 def _get_profile_image_urls(name, storage, file_extension=PROFILE_IMAGE_FILE_EXTENSION, version=None):
@@ -60,7 +60,7 @@ def _get_profile_image_urls(name, storage, file_extension=PROFILE_IMAGE_FILE_EXT
         # query string (such as signed S3 URLs), append to the query
         # string with "&v=" instead.
         separator = '&' if '?' in url else '?'
-        return '{}{}v={}'.format(url, separator, version) if version is not None else url
+        return f'{url}{separator}v={version}' if version is not None else url
 
     return {size_display_name: _make_url(size) for size_display_name, size in settings.PROFILE_IMAGE_SIZES_MAP.items()}
 
