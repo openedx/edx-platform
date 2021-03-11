@@ -87,9 +87,9 @@ class TestBinnedSchedulesBaseResolver(SchedulesResolverTestMixin, TestCase):
 
     @ddt.unpack
     @ddt.data(
-        (None, set([])),
-        ('course1', set(['course1'])),
-        (['course1', 'course2'], set(['course1', 'course2']))
+        (None, set()),
+        ('course1', {'course1'}),
+        (['course1', 'course2'], {'course1', 'course2'})
     )
     def test_get_course_org_filter_exclude__in(self, course_org_filter, expected_org_list):
         SiteConfigurationFactory.create(
@@ -168,7 +168,7 @@ class TestCourseUpdateResolver(SchedulesResolverTestMixin, ModuleStoreTestCase):
             'contact_mailing_address': '123 Sesame Street',
             'course_ids': [str(self.course.id)],
             'course_name': self.course.display_name,
-            'course_url': '/courses/{}/course/'.format(self.course.id),
+            'course_url': f'/courses/{self.course.id}/course/',
             'dashboard_url': '/dashboard',
             'homepage_url': '/',
             'mobile_store_urls': {},
@@ -257,7 +257,7 @@ class TestCourseNextSectionUpdateResolver(SchedulesResolverTestMixin, ModuleStor
             'contact_mailing_address': '123 Sesame Street',
             'course_ids': [str(self.course.id)],
             'course_name': self.course.display_name,
-            'course_url': '/courses/{}/course/'.format(self.course.id),
+            'course_url': f'/courses/{self.course.id}/course/',
             'dashboard_url': '/dashboard',
             'homepage_url': '/',
             'mobile_store_urls': {},
