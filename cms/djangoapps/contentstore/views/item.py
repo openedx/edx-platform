@@ -20,7 +20,7 @@ from edx_proctoring.api import (
 )
 from edx_proctoring.exceptions import ProctoredExamNotFoundException
 from help_tokens.core import HelpUrlExpert
-from lti_consumer.models import CourseEditLTIFieldsEnabledFlag
+from lti_consumer.models import CourseAllowPIISharingInLTIFlag
 from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locator import LibraryUsageLocator
 from pytz import UTC
@@ -311,7 +311,7 @@ class StudioEditModuleRuntime:
             if service_name == "settings":
                 return SettingsService()
             if service_name == "lti-configuration":
-                return ConfigurationService(CourseEditLTIFieldsEnabledFlag)
+                return ConfigurationService(CourseAllowPIISharingInLTIFlag)
             if service_name == "teams_configuration":
                 return TeamsConfigurationService()
             if service_name == "library_tools":

@@ -3,11 +3,13 @@ Test app view logic
 """
 # pylint: disable=test-inherits-tests
 import unittest
+from contextlib import contextmanager
 
 import ddt
 from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.urls import reverse
+from lti_consumer.models import CourseAllowPIISharingInLTIFlag
 from rest_framework import status
 from rest_framework.test import APITestCase
 
@@ -180,6 +182,59 @@ class DataTest(AuthorizedApiTest):
         """
         response = self._get()
         self._assert_defaults(response)
+
+    @contextmanager
+    def _pii_sharing_for_course(self, enabled):
+        instance = CourseAllowPIISharingInLTIFlag.objects.create(course_id=self.course.id, enabled=enabled)
+        yield
+        instance.delete()
+
+    @ddt.data(
+        {"pii_share_username": True},
+        {"pii_share_email": True},
+        {"pii_share_email": True, "pii_share_username": True},
+    )
+    def test_post_pii_fields_fail(self, pii_fields):
+        """
+        If no record exists, defaults should be returned.
+        """
+        data = self._setup_lti()
+        data['lti_configuration'].update(pii_fields)
+        response = self._post(data)
+        assert response.status_code == 400
+
+    @ddt.data(
+        {"pii_share_username": True},
+        {"pii_share_email": True},
+        {"pii_share_email": True, "pii_share_username": True},
+    )
+    def test_post_pii_fields(self, pii_fields):
+        """
+        Only if PII sharing is enabled should a user be able to set pii fields.
+        """
+        data = self._setup_lti()
+        data['lti_configuration'].update(pii_fields)
+        with self._pii_sharing_for_course(enabled=False):
+            response = self._post(data)
+            assert response.status_code == 400
+        with self._pii_sharing_for_course(enabled=True):
+            response = self._post(data)
+            assert response.status_code == 200
+
+    @ddt.data(
+        True, False
+    )
+    def test_get_pii_fields(self, pii_sharing):
+        """
+        Only if PII is enabled should pii fields be returned.
+        """
+        self._setup_lti()
+        with self._pii_sharing_for_course(enabled=pii_sharing):
+            response = self._get()
+            data = response.json()
+            # If pii_sharing is true, then the fields should be present, and absent otherwise
+            assert ("pii_share_email" in data["lti_configuration"]) == pii_sharing
+            assert ("pii_share_username" in data["lti_configuration"]) == pii_sharing
 
     def test_post_everything(self):
         """
