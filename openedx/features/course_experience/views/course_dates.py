@@ -67,7 +67,7 @@ class CourseDatesFragmentMobileView(CourseDatesFragmentView):
     def get(self, request, *args, **kwargs):
         if not request.user.is_authenticated:
             raise Http404
-        return super(CourseDatesFragmentMobileView, self).get(request, *args, **kwargs)  # lint-amnesty, pylint: disable=super-with-arguments
+        return super().get(request, *args, **kwargs)
 
     def css_dependencies(self):
         """

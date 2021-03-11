@@ -22,7 +22,7 @@ urlpatterns += [
 # URL for retrieving course deadlines info
 urlpatterns += [
     re_path(
-        r'v1/course_deadlines_info/{}'.format(settings.COURSE_KEY_PATTERN),
+        fr'v1/course_deadlines_info/{settings.COURSE_KEY_PATTERN}',
         CourseDeadlinesMobileView.as_view(),
         name='course-experience-course-deadlines-mobile'
     ),
