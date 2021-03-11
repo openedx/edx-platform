@@ -1,24 +1,23 @@
-# -*- coding: utf-8 -*-
 """
 Tests for BundleCache
 """
 
 import unittest
+from unittest.mock import patch
 
 from django.conf import settings
-from mock import patch
 from openedx.core.djangolib.blockstore_cache import BundleCache
 from openedx.core.lib import blockstore_api as api
 
 
-class TestWithBundleMixin(object):
+class TestWithBundleMixin:
     """
     Mixin that gives every test method access to a bundle + draft
     """
 
     @classmethod
     def setUpClass(cls):
-        super(TestWithBundleMixin, cls).setUpClass()
+        super().setUpClass()
         cls.collection = api.create_collection(title="Collection")
         cls.bundle = api.create_bundle(cls.collection.uuid, title="Test Bundle", slug="test")
         cls.draft = api.get_or_create_bundle_draft(cls.bundle.uuid, draft_name="test-draft")

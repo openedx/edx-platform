@@ -3,7 +3,7 @@ Custom Django Model mixins.
 """
 
 
-class DeprecatedModelMixin(object):
+class DeprecatedModelMixin:
     """
     Used to make a class unusable in practice, but leave database tables intact.
     """
@@ -14,7 +14,7 @@ class DeprecatedModelMixin(object):
         raise TypeError("This model has been deprecated and should not be used.")
 
 
-class DeletableByUserValue(object):
+class DeletableByUserValue:
     """
     This mixin allows inheriting models to delete instances of the model
     associated with some specified user.

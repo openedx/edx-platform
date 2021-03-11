@@ -7,7 +7,6 @@ from django.conf import settings
 
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.locator import CourseKey
-from six import text_type
 from xmodule.assetstore.assetmgr import AssetManager
 from xmodule.contentstore.content import StaticContent
 from xmodule.contentstore.django import contentstore
@@ -75,11 +74,11 @@ def clean_course_id(model_form, is_required=True):
     try:
         course_key = CourseKey.from_string(cleaned_id)
     except InvalidKeyError:
-        msg = u'Course id invalid. Entered course id was: "{0}".'.format(cleaned_id)
+        msg = f'Course id invalid. Entered course id was: "{cleaned_id}".'
         raise forms.ValidationError(msg)  # lint-amnesty, pylint: disable=raise-missing-from
 
     if not modulestore().has_course(course_key):
-        msg = u'Course not found. Entered course id was: "{0}".'.format(text_type(course_key))
+        msg = 'Course not found. Entered course id was: "{}".'.format(str(course_key))
         raise forms.ValidationError(msg)
 
     return course_key
