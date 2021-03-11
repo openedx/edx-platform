@@ -7,12 +7,14 @@ import crum
 from django.conf import settings
 from django.test.client import RequestFactory
 from django.utils.deprecation import MiddlewareMixin
+from edx_django_utils.cache import RequestCache
 from edx_django_utils.monitoring import set_custom_attribute
+from edx_toggles.toggles import WaffleFlag
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
+from rest_framework.views import exception_handler
 from six.moves.urllib.parse import urlparse
 
-from edx_toggles.toggles import WaffleFlag
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 
 # accommodates course api urls, excluding any course api routes that do not fall under v*/courses, such as v1/blocks.
@@ -227,3 +229,235 @@ class CookieMonitoringMiddleware(MiddlewareMixin):
             set_custom_attribute(name_attribute, name)
             set_custom_attribute(size_attribute, size)
             log.debug('%s = %d', name, size)
+
+
+def expected_error_exception_handler(exc, context):
+    """
+    Replacement for DRF's default exception handler to enable observing expected errors.
+
+    In addition to the default behaviour, add logging and monitoring for expected errors.
+    """
+    # Call REST framework's default exception handler first to get the standard error response.
+    response = exception_handler(exc, context)
+
+    try:
+        request = context['request']
+    except TypeError:
+        request = None
+
+    _log_and_monitor_expected_errors(request, exc, 'drf')
+    return response
+
+
+class ExpectedErrorMiddleware:
+    """
+    Middleware to add logging and monitoring for expected errors.
+    """
+    def __init__(self, get_response):
+        self.get_response = get_response
+
+    def __call__(self, request):
+        response = self.get_response(request)
+        return response
+
+    def process_exception(self, request, exception):
+        """
+        Add logging and monitoring of expected errors.
+        """
+        _log_and_monitor_expected_errors(request, exception, 'middleware')
+
+
+# .. setting_name: EXPECTED_ERRORS
+# .. setting_default: []
+# .. setting_description: Used to configured logging and monitoring for expected errors.
+#     This setting is configured of a list of dicts. See setting and toggle annotations for
+#     ``EXPECTED_ERRORS[N]['XXX']`` for details of each item in the dict.
+#     If this setting is configured, all uncaught errors processed will get a ``checked_error_expected_from`` attribute,
+#     whether they are expected or not. This can be used to ensure that all uncaught errors are actually processed.
+#     Those errors that are processed and match a 'MODULE_AND_CLASS' (documented elsewhere), will get an
+#     ``error_expected`` custom attribute. The value of the custom attribute will include the error class module, name
+#     and message. Unexpected errors would be errors with ``error_expected IS NULL``.
+# .. setting_warning: We use Django Middleware and a DRF custom error handler to find uncaught errors. It is still
+#     possible that some errors could slip by these mechanisms.
+
+# .. setting_name: EXPECTED_ERRORS[N]['MODULE_AND_CLASS']
+# .. setting_default: None
+# .. setting_description: Required error module and class name that is expected. The two names should be separated by a
+#    `:`. For example, ``rest_framework.exceptions:PermissionDenied``. This format is to simplify copying/pasting from
+#    New Relic.
+
+# .. toggle_name: EXPECTED_ERRORS[N]['IS_IGNORED']
+# .. toggle_implementation: DjangoSetting
+# .. toggle_default: True
+# .. toggle_description: If True, adds a custom attribute ``error_ignored`` if the error is configured to be ignored
+#      from monitoring. For example, for ignoring errors in New Relic, see:
+#      https://docs.newrelic.com/docs/agents/manage-apm-agents/agent-data/manage-errors-apm-collect-ignore-or-mark-expected/#ignore  pylint: disable=line-too-long,useless-suppression
+# .. toggle_warning: At this time, this toggle does not actually configure the error to be ignored. It is meant to match
+#     the ignored error configuration found elsewhere. When monitoring, no errors should ever have the attribute
+#     ``error_ignored``. If it is found, it means we are stating an error should be ignored when it is not actually
+#     configured as such, or the configuration is not working.
+# .. toggle_use_cases: opt_out
+# .. toggle_creation_date: 2021-03-11
+
+# .. toggle_name: EXPECTED_ERRORS[N]['LOG_ERROR']
+# .. toggle_implementation: DjangoSetting
+# .. toggle_default: False
+# .. toggle_description: If True, the error will be logged with a message like: "Expected error ...".
+# .. toggle_use_cases: opt_in
+# .. toggle_creation_date: 2021-03-11
+
+# .. toggle_name: EXPECTED_ERRORS[N]['LOG_STACK_TRACE']
+# .. toggle_implementation: DjangoSetting
+# .. toggle_default: False
+# .. toggle_description: If True, the stacktrace will be included with the logging message. Also, if True, the
+#     ``LOG_ERROR`` toggle value will be ignored, even if disabled.
+# .. toggle_use_cases: opt_in
+# .. toggle_creation_date: 2021-03-11
+
+# .. setting_name: EXPECTED_ERRORS[N]['REASON_EXPECTED']
+# .. setting_default: None
+# .. setting_description: Required string explaining why the error is expected and/or ignored for documentation
+#     purposes.error module and class name that is expected.
+
+
+# Warning: do not access this directly, but instead use get_expected_errors.
+# EXPECTED ERRORS Django setting is processed and stored as a dict keyed by ERROR_MODULE_AND_CLASS.
+_EXPECTED_ERROR_SETTINGS_DICT = None
+
+
+def _get_expected_error_settings_dict():
+    """
+    Returns a dict of dicts of expected error settings used for logging and monitoring.
+
+    The contents of the EXPECTED_ERRORS Django Setting list is processed for efficient lookup by module:class.
+
+    Returns:
+         (dict): dict of dicts, mapping module-and-class name to settings for proper handling of expected errors.
+           Keys of the inner dicts use the lowercase version of the related Django Setting (e.g. ''REASON_EXPECTED' =>
+           'reason_expected').
+
+    Example return value::
+
+        {
+            'rest_framework.exceptions:PermissionDenied': {
+                'is_ignored': True,
+                'log_error': True,
+                'log_stack_trace': True,
+                'reason_expected': 'In most cases, signifies a user was trying to do something they couldn't.' /
+                   'It is possible that there could be a bug, so this case should still be monitored at some level.'
+            }
+            ...
+        }
+
+    """
+    global _EXPECTED_ERROR_SETTINGS_DICT
+
+    # Return cached processed mappings if already processed
+    if _EXPECTED_ERROR_SETTINGS_DICT is not None:
+        return _EXPECTED_ERROR_SETTINGS_DICT
+
+    expected_errors = getattr(settings, 'EXPECTED_ERRORS', None)
+    if expected_errors is None:
+        return None
+
+    # Use temporary variable to build mappings to avoid multi-threading issue with a partially
+    # processed map.  Worst case, it is processed more than once at start-up.
+    expected_error_settings_dict = {}
+
+    try:
+        for index, expected_error in enumerate(expected_errors):
+            module_and_class = expected_error.get('MODULE_AND_CLASS')
+            processed_expected_error = {
+                'is_ignored': expected_error.get('IS_IGNORED', True),
+                'log_error': expected_error.get('LOG_ERROR', False),
+                'log_stack_trace': expected_error.get('LOG_STACK_TRACE', False),
+                'reason_expected': expected_error.get('REASON_EXPECTED'),
+            }
+
+            # validate configuration
+            if not isinstance(module_and_class, str) or ':' not in module_and_class:
+                log.error(
+                    "Skipping EXPECTED_ERRORS[%d] setting. 'MODULE_AND_CLASS' set to [%s] and should be module:class, "
+                    "like 'rest_framework.exceptions:PermissionDenied'.",
+                    index, module_and_class
+                )
+                continue
+            if not processed_expected_error['reason_expected']:
+                log.error(
+                    "Skipping EXPECTED_ERRORS[%d] setting. 'REASON_EXPECTED' is required to document why %s is an "
+                    "expected error.",
+                    index, module_and_class
+                )
+                continue
+
+            expected_error_settings_dict[module_and_class] = processed_expected_error
+    except Exception as e:  # pylint: disable=broad-except
+        set_custom_attribute('expected_errors_setting_misconfigured', repr(e))
+        log.exception(f'Error processing setting EXPECTED_ERRORS. {repr(e)}')
+
+    _EXPECTED_ERROR_SETTINGS_DICT = expected_error_settings_dict
+    return _EXPECTED_ERROR_SETTINGS_DICT
+
+
+def clear_cached_expected_error_settings():
+    """
+    Clears the cached expected error settings. Useful for testing.
+    """
+    global _EXPECTED_ERROR_SETTINGS_DICT
+    _EXPECTED_ERROR_SETTINGS_DICT = None
+
+
+def _log_and_monitor_expected_errors(request, exception, caller):
+    """
+    Adds logging and monitoring for expected errors as needed.
+
+    Arguments:
+        request: The request
+        exception: The exception
+        caller: Either 'middleware' or 'drf`
+    """
+    expected_error_settings_dict = _get_expected_error_settings_dict()
+    if not expected_error_settings_dict:
+        return
+
+    # 'module:class', for example, 'django.core.exceptions:PermissionDenied'
+    # Note: `Exception` itself doesn't have a module.
+    exception_module = exception.__module__ if hasattr(exception, '__module__') else ''
+    module_and_class = f'{exception_module}:{exception.__class__.__name__}'
+
+    # Set checked_error_expected_from custom attribute to potentially help find issues where errors are never processed.
+    set_custom_attribute('checked_error_expected_from', caller)
+
+    # check if we already added logging/monitoring from a different caller
+    request_cache = RequestCache('openedx.core.lib.request_utils')
+    cached_handled_exception = request_cache.get_cached_response('handled_exception')
+    if cached_handled_exception.is_found:
+        cached_module_and_class = cached_handled_exception.value
+        # exception was already processed by a different caller
+        if cached_handled_exception.value == module_and_class:
+            set_custom_attribute('checked_error_expected_from', 'multiple')
+            return
+
+        # Currently, it seems unexpected that middleware and drf will both handle different uncaught exceptions.
+        # However, since it is possible, we will add an additional attribute and log message and then continue.
+        set_custom_attribute('unexpected_multiple_exceptions', cached_module_and_class)
+        log.warning(
+            "Unexpected scenario where different exceptions are handled by _log_and_monitor_expected_errors. "
+            "See 'unexpected_multiple_exceptions' custom attribute."
+        )
+    request_cache.set('handled_exception', module_and_class)
+
+    if module_and_class not in expected_error_settings_dict:
+        return
+
+    module_and_class_with_message = f'{exception_module}:{repr(exception)}'
+    set_custom_attribute('error_expected', module_and_class_with_message)
+
+    expected_error_settings = expected_error_settings_dict[module_and_class]
+    if expected_error_settings['is_ignored']:
+        set_custom_attribute('error_ignored', True)
+
+    if expected_error_settings['log_error'] or expected_error_settings['log_stack_trace']:
+        print_stack = expected_error_settings['log_stack_trace']
+        request_path = request.path if hasattr(request, 'path') else 'request-path-unknown'
+        log.info('Expected error seen for %s', request_path, exc_info=exception, stack_info=print_stack)
