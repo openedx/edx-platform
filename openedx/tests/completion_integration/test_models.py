@@ -3,7 +3,6 @@ Test models, managers, and validators.
 """
 
 import pytest
-import six
 from completion import models
 from completion.test_utils import CompletionWaffleTestMixin, submit_completions_for_testing
 from completion.waffle import ENABLE_COMPLETION_TRACKING_SWITCH
@@ -11,7 +10,6 @@ from django.core.exceptions import ValidationError
 from django.test import TestCase
 from edx_toggles.toggles.testutils import override_waffle_switch
 from opaque_keys.edx.keys import CourseKey, UsageKey
-from six.moves import range, zip
 
 from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
 from openedx.core.djangolib.testing.utils import skip_unless_lms
@@ -42,7 +40,7 @@ class CompletionSetUpMixin(CompletionWaffleTestMixin):
     """
     def set_up_completion(self):
         self.user = UserFactory()
-        self.block_key = UsageKey.from_string(u'block-v1:edx+test+run+type@video+block@doggos')
+        self.block_key = UsageKey.from_string('block-v1:edx+test+run+type@video+block@doggos')
         self.completion = models.BlockCompletion.objects.create(
             user=self.user,
             context_key=self.block_key.context_key,
@@ -59,7 +57,7 @@ class SubmitCompletionTestCase(CompletionSetUpMixin, TestCase):
     semantics.
     """
     def setUp(self):
-        super(SubmitCompletionTestCase, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.override_waffle_switch(True)
         self.set_up_completion()
 
@@ -100,7 +98,7 @@ class SubmitCompletionTestCase(CompletionSetUpMixin, TestCase):
         assert models.BlockCompletion.objects.count() == 2
 
     def test_new_block(self):
-        newblock = UsageKey.from_string(u'block-v1:edx+test+run+type@video+block@puppers')
+        newblock = UsageKey.from_string('block-v1:edx+test+run+type@video+block@puppers')
         with self.assertNumQueries(SELECT + UPDATE + 4 * SAVEPOINT):
             _, isnew = models.BlockCompletion.objects.submit_completion(
                 user=self.user,
@@ -128,7 +126,7 @@ class CompletionDisabledTestCase(CompletionSetUpMixin, TestCase):
     Tests that completion API is not called when the feature is disabled.
     """
     def setUp(self):
-        super(CompletionDisabledTestCase, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         # insert one completion record...
         self.set_up_completion()
         # ...then disable the feature.
@@ -152,13 +150,13 @@ class SubmitBatchCompletionTestCase(CompletionWaffleTestMixin, TestCase):
     semantics.
     """
     def setUp(self):
-        super(SubmitBatchCompletionTestCase, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.override_waffle_switch(True)
 
         self.block_key = UsageKey.from_string('block-v1:edx+test+run+type@video+block@doggos')
         self.course_key_obj = CourseKey.from_string('course-v1:edx+test+run')
         self.user = UserFactory()
-        CourseEnrollmentFactory.create(user=self.user, course_id=six.text_type(self.course_key_obj))
+        CourseEnrollmentFactory.create(user=self.user, course_id=str(self.course_key_obj))
 
     def test_submit_batch_completion(self):
         blocks = [(self.block_key, 1.0)]
@@ -194,14 +192,14 @@ class BatchCompletionMethodTests(CompletionWaffleTestMixin, TestCase):
     Tests for the classmethods that retrieve course/block completion data.
     """
     def setUp(self):
-        super(BatchCompletionMethodTests, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.override_waffle_switch(True)
 
         self.user = UserFactory.create()
         self.other_user = UserFactory.create()
         self.course_key = CourseKey.from_string("edX/MOOC101/2049_T2")
         self.other_course_key = CourseKey.from_string("course-v1:ReedX+Hum110+1904")
-        self.block_keys = [UsageKey.from_string("i4x://edX/MOOC101/video/{}".format(number)) for number in range(5)]
+        self.block_keys = [UsageKey.from_string(f"i4x://edX/MOOC101/video/{number}") for number in range(5)]
         self.block_keys_with_runs = [key.replace(course_key=self.course_key) for key in self.block_keys]
         self.other_course_block_keys = [self.other_course_key.make_usage_key('html', '1')]
 
