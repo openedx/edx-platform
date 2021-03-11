@@ -33,11 +33,13 @@ from lms.djangoapps.instructor_task.api import (
     submit_rescore_problem_for_all_students,
     submit_rescore_problem_for_student,
     submit_reset_problem_attempts_for_all_students,
-    submit_reset_problem_attempts_in_entrance_exam
+    submit_reset_problem_attempts_in_entrance_exam,
+    generate_anonymous_ids
 )
 from lms.djangoapps.instructor_task.api_helper import AlreadyRunningError, QueueConnectionError
 from lms.djangoapps.instructor_task.models import PROGRESS, InstructorTask
-from lms.djangoapps.instructor_task.tasks import export_ora2_data, export_ora2_submission_files
+from lms.djangoapps.instructor_task.tasks import export_ora2_data, export_ora2_submission_files, \
+    generate_anonymous_ids_for_course
 from lms.djangoapps.instructor_task.tests.test_base import (
     TEST_COURSE_KEY,
     InstructorTaskCourseTestCase,
@@ -368,3 +370,19 @@ class InstructorTaskCourseSubmitTest(TestReportMixin, InstructorTaskCourseTestCa
 
         # Validate that record was added to CertificateGenerationHistory
         assert certificate_generation_history.exists()
+
+    def test_submit_anonymized_id_report_generation(self):
+        request = self.create_task_request(self.instructor)
+
+        with patch('lms.djangoapps.instructor_task.api.submit_task') as mock_submit_task:
+            mock_submit_task.return_value = MagicMock()
+            generate_anonymous_ids(request, self.course.id)
+
+            mock_submit_task.assert_called_once_with(
+                request,
+                'generate_anonymous_ids_for_course',
+                generate_anonymous_ids_for_course,
+                self.course.id,
+                {},
+                ''
+            )

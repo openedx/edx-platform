@@ -2705,39 +2705,6 @@ class TestInstructorAPILevelsDataDump(SharedModuleStoreTestCase, LoginEnrollment
         decorated_func(request, str(self.course.id))
         assert func.called
 
-    @patch('lms.djangoapps.instructor.views.api.anonymous_id_for_user', Mock(return_value='42'))
-    @patch('lms.djangoapps.instructor.views.api.unique_id_for_user', Mock(return_value='41'))
-    def test_get_anon_ids(self):
-        """
-        Test the CSV output for the anonymized user ids.
-        """
-        base_time = datetime.datetime.now(UTC)
-        url = reverse('get_anon_ids', kwargs={'course_id': str(self.course.id)})
-        with freeze_time(base_time):
-            response = self.client.post(url, {})
-
-        assert response['Content-Type'] == 'text/csv'
-        body = response.content.decode("utf-8").replace('\r', '')
-        assert body.startswith(
-            f'"User ID","Anonymized User ID","Course Specific Anonymized User ID"\n"{self.students[0].id}","41","42"\n')
-        assert body.endswith('"{user_id}","41","42"\n'.format(user_id=self.students[(- 1)].id))
-        assert 'attachment; filename=org' in response['Content-Disposition']
-
-        # Test rate-limiting
-        # The get_anon_ids view is computationally intensive and its execution time can vary
-        # depending on the number of enrollments in a course.  We are rate limiting it to
-        # prevent too many concurrent calls which could result in a denial of service for
-        # other users of the lms.
-        # Note: We use the base_time exactly so that we don't accidentally end up on the wrong
-        # side of the rate limit time chunking boundary.
-        with freeze_time(base_time):
-            response = self.client.post(url, {})
-            assert response.status_code == 429
-
-        with freeze_time(base_time + datetime.timedelta(minutes=5)):
-            response = self.client.post(url, {})
-            assert response.status_code == 200
-
     @patch('lms.djangoapps.instructor_task.models.logger.error')
     @patch.dict(settings.GRADES_DOWNLOAD, {'STORAGE_TYPE': 's3', 'ROOT_PATH': 'tmp/edx-s3/grades'})
     def test_list_report_downloads_error(self, mock_error):
