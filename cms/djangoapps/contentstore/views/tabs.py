@@ -15,8 +15,7 @@ from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
 from xmodule.tabs import CourseTab, CourseTabList, InvalidTabsException, StaticTab
 
-from ..utils import get_lms_link_for_item
-
+from ..utils import get_lms_link_for_item, get_pages_and_resources_url
 __all__ = ['tabs_handler']
 
 
@@ -72,6 +71,7 @@ def tabs_handler(request, course_key_string):
             'context_course': course_item,
             'tabs_to_render': tabs_to_render,
             'lms_link': get_lms_link_for_item(course_item.location),
+            'pages_and_resources_mfe_link': get_pages_and_resources_url(course_item),
         })
     else:
         return HttpResponseNotFound()

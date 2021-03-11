@@ -2,7 +2,10 @@
 
 
 import json
+import ddt
+from edx_toggles.toggles.testutils import override_waffle_flag
 
+from cms.djangoapps.contentstore.config.waffle import ENABLE_PAGES_AND_RESOURCES_MICROFRONTEND
 from cms.djangoapps.contentstore.tests.utils import CourseTestCase
 from cms.djangoapps.contentstore.utils import reverse_course_url
 from cms.djangoapps.contentstore.views import tabs
@@ -13,6 +16,7 @@ from xmodule.tabs import CourseTabList
 from xmodule.x_module import STUDENT_VIEW
 
 
+@ddt.ddt
 class TabsPageTests(CourseTestCase):
     """Test cases for Tabs (a.k.a Pages) page"""
 
@@ -70,6 +74,18 @@ class TabsPageTests(CourseTestCase):
 
         resp = self.client.get_html(self.url)
         self.assertContains(resp, 'course-nav-list')
+
+    @ddt.data(
+        # toggle active, assert count
+        (True, 1),
+        (False, 0),
+    )
+    @ddt.unpack
+    def test_pages_and_resources_toggle(self, toggle_active, assert_count):
+        """Basic check that the Pages page responds correctly"""
+        with override_waffle_flag(ENABLE_PAGES_AND_RESOURCES_MICROFRONTEND, active=toggle_active):
+            resp = self.client.get_html(self.url)
+            self.assertContains(resp, 'View new Pages and Resources Experience', count=assert_count)
 
     def test_reorder_tabs(self):
         """Test re-ordering of tabs"""

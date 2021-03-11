@@ -43,6 +43,11 @@
         <li class="nav-item">
           <a href="${lms_link}" rel="external" class="button view-button view-live-button">${_("View Live")}</a>
         </li>
+        % if pages_and_resources_mfe_link:
+        <li class="nav-item">
+          <a href="${pages_and_resources_mfe_link}" rel="external" class="button"><span class="icon fa fa-link" aria-hidden="true"></span>${_("View new Pages and Resources Experience")}</a>
+        </li>
+        % endif
       </ul>
     </nav>
   </header>
