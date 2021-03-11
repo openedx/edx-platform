@@ -123,7 +123,7 @@ def _make_section_data(section):
         sequences_data.append(
             CourseLearningSequenceData(
                 usage_key=_remove_version_info(sequence.location),
-                title=sequence.display_name,
+                title=sequence.display_name_with_default,
                 inaccessible_after_due=sequence.hide_after_due,
                 exam=ExamData(
                     is_practice_exam=sequence.is_practice_exam,
@@ -139,7 +139,7 @@ def _make_section_data(section):
 
     section_data = CourseSectionData(
         usage_key=_remove_version_info(section.location),
-        title=section.display_name,
+        title=section.display_name_with_default,
         sequences=sequences_data,
         visibility=VisibilityData(
             hide_from_toc=section.hide_from_toc,
@@ -165,7 +165,7 @@ def get_outline_from_modulestore(course_key):
 
         course_outline_data = CourseOutlineData(
             course_key=course_key,
-            title=course.display_name,
+            title=course.display_name_with_default,
 
             # subtree_edited_on has a tzinfo of bson.tz_util.FixedOffset (which
             # maps to UTC), but for consistency, we're going to use the standard
