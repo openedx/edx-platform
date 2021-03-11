@@ -40,8 +40,9 @@ class SetDjangoSettingsChecker(BaseChecker):
         if cms_module and (lms_module or common_module):
             # when cms module is present in pylint command, it can't be parired with (lms, common)
             # as common and lms gives error with cms test settings
-            raise ArgumentCompatibilityError("Modules from both common and lms can't be paired "
-                                        "with cms while running pylint")
+            raise ArgumentCompatibilityError(
+                "Modules from both common and lms can't be paired with cms while running pylint"
+            )
         elif cms_module:
             # If a module from cms is present in pylint command arguments
             # and ony other module from (openedx, pavelib) is present
