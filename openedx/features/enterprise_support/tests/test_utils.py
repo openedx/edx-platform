@@ -6,7 +6,7 @@ import json
 import uuid
 
 import ddt
-import mock
+from unittest import mock
 from django.conf import settings
 from django.test import TestCase
 from django.test.utils import override_settings
@@ -52,7 +52,7 @@ class TestEnterpriseUtils(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.user = UserFactory.create(password='password')
-        super(TestEnterpriseUtils, cls).setUpTestData()
+        super().setUpTestData()
 
     @mock.patch('openedx.features.enterprise_support.utils.get_cache_key')
     def test_get_data_consent_share_cache_key(self, mock_get_cache_key):

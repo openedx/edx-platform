@@ -8,7 +8,7 @@ import ddt
 from django.test.utils import override_settings
 from django.utils.timezone import now
 from edx_django_utils.cache import TieredCache
-from mock import patch
+from unittest.mock import patch
 from opaque_keys.edx.keys import CourseKey
 from slumber.exceptions import HttpClientError, HttpServerError
 from testfixtures import LogCapture
@@ -50,7 +50,7 @@ class EnterpriseSupportSignals(SharedModuleStoreTestCase):
         self.user = UserFactory.create(username='test', email=TEST_EMAIL)
         self.course_id = 'course-v1:edX+DemoX+Demo_Course'
         self.enterprise_customer = EnterpriseCustomerFactory()
-        super(EnterpriseSupportSignals, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
 
     @staticmethod
     def _create_dsc_cache(user_id, course_id):

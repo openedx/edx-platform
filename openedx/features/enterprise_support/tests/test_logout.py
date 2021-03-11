@@ -4,7 +4,7 @@ Tests for logout for enterprise flow
 
 
 import ddt
-import mock
+from unittest import mock
 
 from django.test.utils import override_settings
 from django.urls import reverse
@@ -28,7 +28,7 @@ class EnterpriseLogoutTests(EnterpriseServiceMockMixin, CacheIsolationTestCase, 
     """ Tests for the enterprise logout functionality. """
 
     def setUp(self):
-        super(EnterpriseLogoutTests, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.user = UserFactory()
 
         self.enterprise_customer = FAKE_ENTERPRISE_CUSTOMER

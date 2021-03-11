@@ -24,7 +24,7 @@ class EnrollmentAttributeOverrideViewTest(ModuleStoreTestCase):
 
     def setUp(self):
         """ Test case setup """
-        super(EnrollmentAttributeOverrideViewTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
 
         self.client = Client()
         user = AdminFactory()
