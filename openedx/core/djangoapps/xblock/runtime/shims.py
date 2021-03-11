@@ -17,14 +17,14 @@ from common.djangoapps.edxmako.shortcuts import render_to_string
 from common.djangoapps.student.models import anonymous_id_for_user
 
 
-class RuntimeShim(object):
+class RuntimeShim:
     """
     All the old/deprecated APIs that our XBlock runtime(s) need to
     support are captured in this mixin.
     """
 
     def __init__(self, *args, **kwargs):
-        super(RuntimeShim, self).__init__(*args, **kwargs)  # lint-amnesty, pylint: disable=super-with-arguments
+        super().__init__(*args, **kwargs)
         self._active_block = None
 
     def render(self, block, view_name, context=None):
@@ -40,7 +40,7 @@ class RuntimeShim(object):
         old_active_block = self._active_block
         self._active_block = block
         try:
-            return super(RuntimeShim, self).render(block, view_name, context)  # lint-amnesty, pylint: disable=super-with-arguments
+            return super().render(block, view_name, context)
         finally:
             # Reset the active view to what it was before entering this method
             self._active_block = old_active_block
@@ -53,7 +53,7 @@ class RuntimeShim(object):
         old_active_block = self._active_block
         self._active_block = block
         try:
-            return super(RuntimeShim, self).handle(block, handler_name, request, suffix)  # lint-amnesty, pylint: disable=super-with-arguments
+            return super().handle(block, handler_name, request, suffix)
         finally:
             # Reset the active view to what it was before entering this method
             self._active_block = old_active_block
@@ -358,7 +358,7 @@ class RuntimeShim(object):
         Get the list of CSS classes that the wrapping <div> should have for the
         specified xblock or aside's view.
         """
-        css_classes = super(RuntimeShim, self)._css_classes_for(block, view)  # lint-amnesty, pylint: disable=super-with-arguments
+        css_classes = super()._css_classes_for(block, view)
         # Many CSS styles for former XModules use
         # .xmodule_display.xmodule_VideoBlock
         # as their selector, so add those classes:
@@ -366,11 +366,11 @@ class RuntimeShim(object):
             css_classes.append('xmodule_display')
         elif view == 'studio_view':
             css_classes.append('xmodule_edit')
-        css_classes.append('xmodule_{}'.format(block.unmixed_class.__name__))
+        css_classes.append(f'xmodule_{block.unmixed_class.__name__}')
         return css_classes
 
 
-class XBlockShim(object):
+class XBlockShim:
     """
     Mixin added to XBlock classes in this runtime, to support
     older/XModule APIs

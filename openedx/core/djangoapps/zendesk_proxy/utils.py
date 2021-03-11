@@ -5,24 +5,24 @@ Utility functions for zendesk interaction.
 
 import json
 import logging
+from urllib.parse import urljoin  # pylint: disable=import-error
 
 import requests
 from django.conf import settings
 from rest_framework import status
-from six.moves.urllib.parse import urljoin  # pylint: disable=import-error
 
 log = logging.getLogger(__name__)
 
 
 def _std_error_message(details, payload):
     """Internal helper to standardize error message. This allows for simpler splunk alerts."""
-    return u'zendesk_proxy action required\n{}\nNo ticket created for payload {}'.format(details, payload)
+    return f'zendesk_proxy action required\n{details}\nNo ticket created for payload {payload}'
 
 
 def _get_request_headers():
     return {
         'content-type': 'application/json',
-        'Authorization': u"Bearer {}".format(settings.ZENDESK_OAUTH_ACCESS_TOKEN),
+        'Authorization': f"Bearer {settings.ZENDESK_OAUTH_ACCESS_TOKEN}",
     }
 
 
@@ -72,7 +72,7 @@ def create_zendesk_ticket(
             group_id = settings.ZENDESK_GROUP_ID_MAPPING[group]
             data['ticket']['group_id'] = group_id
         else:
-            msg = u"Group ID not found for group {}. Please update ZENDESK_GROUP_ID_MAPPING".format(group)
+            msg = f"Group ID not found for group {group}. Please update ZENDESK_GROUP_ID_MAPPING"
             log.error(_std_error_message(msg, payload))
             return status.HTTP_400_BAD_REQUEST
 
@@ -84,11 +84,11 @@ def create_zendesk_ticket(
 
         # Check for HTTP codes other than 201 (Created)
         if response.status_code == status.HTTP_201_CREATED:
-            log.debug(u'Successfully created ticket for {}'.format(requester_email))
+            log.debug(f'Successfully created ticket for {requester_email}')
         else:
             log.error(
                 _std_error_message(
-                    u'Unexpected response: {} - {}'.format(response.status_code, response.content),
+                    f'Unexpected response: {response.status_code} - {response.content}',
                     payload
                 )
             )
@@ -98,8 +98,8 @@ def create_zendesk_ticket(
             except (ValueError, KeyError):
                 log.error(
                     _std_error_message(
-                        u"Got an unexpected response from zendesk api. Can't"
-                        u" get the ticket number to add extra info. {}".format(additional_info),
+                        "Got an unexpected response from zendesk api. Can't"
+                        " get the ticket number to add extra info. {}".format(additional_info),
                         response.content
                     )
                 )
@@ -118,8 +118,8 @@ def post_additional_info_as_comment(ticket_id, additional_info):
     to management and not students.
     """
     additional_info_string = (
-        u"Additional information:\n\n" +
-        u"\n".join(u"%s: %s" % (key, value) for (key, value) in additional_info.items() if value is not None)
+        "Additional information:\n\n" +
+        "\n".join(f"{key}: {value}" for (key, value) in additional_info.items() if value is not None)
     )
 
     data = {
@@ -131,16 +131,16 @@ def post_additional_info_as_comment(ticket_id, additional_info):
         }
     }
 
-    url = urljoin(settings.ZENDESK_URL, 'api/v2/tickets/{}.json'.format(ticket_id))
+    url = urljoin(settings.ZENDESK_URL, f'api/v2/tickets/{ticket_id}.json')
 
     try:
         response = requests.put(url, data=json.dumps(data), headers=_get_request_headers())
         if response.status_code == 200:
-            log.debug(u'Successfully created comment for ticket {}'.format(ticket_id))
+            log.debug(f'Successfully created comment for ticket {ticket_id}')
         else:
             log.error(
                 _std_error_message(
-                    u'Unexpected response: {} - {}'.format(response.status_code, response.content),
+                    f'Unexpected response: {response.status_code} - {response.content}',
                     data
                 )
             )

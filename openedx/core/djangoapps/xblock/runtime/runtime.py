@@ -3,6 +3,7 @@ Common base classes for all new XBlock runtimes.
 """
 
 import logging
+from urllib.parse import urljoin  # pylint: disable=import-error
 
 import crum
 from completion.waffle import ENABLE_COMPLETION_TRACKING_SWITCH
@@ -12,7 +13,6 @@ from django.contrib.auth import get_user_model
 from django.core.exceptions import PermissionDenied
 from django.utils.lru_cache import lru_cache
 from eventtracking import tracker
-from six.moves.urllib.parse import urljoin  # pylint: disable=import-error
 from web_fragments.fragment import Fragment
 from xblock.exceptions import NoSuchServiceError
 from xblock.field_data import SplitFieldData
@@ -72,7 +72,7 @@ class XBlockRuntime(RuntimeShim, Runtime):
     suppports_state_for_anonymous_users = True
 
     def __init__(self, system, user):
-        super(XBlockRuntime, self).__init__(  # lint-amnesty, pylint: disable=super-with-arguments
+        super().__init__(
             id_reader=system.id_reader,
             mixins=(
                 LmsBlockMixin,  # Adds Non-deprecated LMS/Studio functionality
@@ -215,7 +215,7 @@ class XBlockRuntime(RuntimeShim, Runtime):
         # be removed from here and from XBlock.runtime
         declaration = block.service_declaration(service_name)
         if declaration is None:
-            raise NoSuchServiceError("Service {!r} was not requested.".format(service_name))
+            raise NoSuchServiceError(f"Service {service_name!r} was not requested.")
         # Most common service is field-data so check that first:
         if service_name == "field-data":
             if block.scope_ids not in self.block_field_datas:
@@ -234,7 +234,7 @@ class XBlockRuntime(RuntimeShim, Runtime):
         # Otherwise, fall back to the base implementation which loads services
         # defined in the constructor:
         if service is None:
-            service = super(XBlockRuntime, self).service(block, service_name)  # lint-amnesty, pylint: disable=super-with-arguments
+            service = super().service(block, service_name)
         return service
 
     def _init_field_data_for_block(self, block):
@@ -291,7 +291,7 @@ class XBlockRuntime(RuntimeShim, Runtime):
         # which create relative URLs (/static/studio/bundles/webpack-foo.js).
         # We want all resource URLs to be absolute, such as is done when
         # local_resource_url() is used.
-        fragment = super(XBlockRuntime, self).render(block, view_name, context)  # lint-amnesty, pylint: disable=super-with-arguments
+        fragment = super().render(block, view_name, context)
         needs_fix = False
         for resource in fragment.resources:
             if resource.kind == 'url' and resource.data.startswith('/'):
@@ -361,7 +361,7 @@ class XBlockRuntime(RuntimeShim, Runtime):
         return None
 
 
-class XBlockRuntimeSystem(object):
+class XBlockRuntimeSystem:
     """
     This class is essentially a factory for XBlockRuntimes. This is a
     long-lived object which provides the behavior specific to the application

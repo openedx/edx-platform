@@ -41,7 +41,7 @@ class BlockstoreXBlockRuntime(XBlockRuntime):
         """
         def_id = self.id_reader.get_definition_id(usage_id)
         if def_id is None:
-            raise ValueError("Definition not found for usage {}".format(usage_id))
+            raise ValueError(f"Definition not found for usage {usage_id}")
         if not isinstance(def_id, BundleDefinitionLocator):
             raise TypeError("This runtime can only load blocks stored in Blockstore bundles.")
         try:
