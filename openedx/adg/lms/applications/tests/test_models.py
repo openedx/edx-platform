@@ -334,8 +334,8 @@ def test_get_enrolled_prerequisites_for_user(user_with_profile, courses):
 @pytest.mark.django_db
 def test_get_course_group_languages(courses, course_group):
     """
-    Tests if the queryset MultilingualCourseQuerySet method `language()` gets all languages of all the courses
-    in a multilingual course group correctly or not
+    Tests if the queryset MultilingualCourseQuerySet method `language_codes_with_course_ids()` gets all the
+    languages of all the courses in a multilingual course group correctly or not
     """
     course1 = courses['test_course1']
     course2 = courses['test_course2']

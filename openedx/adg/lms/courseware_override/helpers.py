@@ -75,19 +75,19 @@ def get_extra_course_about_context(request, course):
     if is_testing_environment():
         return {}
 
-    course_group = course.multilingual_course.multilingual_course_group
-    languages_codes = course_group.multilingual_courses.open_multilingual_courses().language_codes_with_course_ids()
+    course_group_courses = course.multilingual_course.multilingual_course_group.multilingual_courses
+    course_language_codes = course_group_courses.open_multilingual_courses().language_codes_with_course_ids()
 
-    course_language_names = get_language_names_from_codes(languages_codes)
+    course_language_names = get_language_names_from_codes(course_language_codes)
     course_instructors = get_course_instructors(course.id, request=request)
     course_enrollment_count = CourseEnrollment.objects.enrollment_counts(course.id).get('total')
 
     context = {
-        "course_languages": course_language_names,
-        "instructors": course_instructors,
-        "total_enrollments": course_enrollment_count,
-        "self_paced": course.self_paced,
-        "effort": course.effort
+        'course_languages': course_language_names,
+        'instructors': course_instructors,
+        'total_enrollments': course_enrollment_count,
+        'self_paced': course.self_paced,
+        'effort': course.effort,
     }
 
     return context

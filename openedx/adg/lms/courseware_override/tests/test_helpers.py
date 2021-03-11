@@ -1,5 +1,5 @@
 """
-Tests for views.py file of courseware_override
+Tests for helpers.py file of courseware_override
 """
 import mock
 import pytest
@@ -50,6 +50,9 @@ def test_get_course_instructors(profile_image_urls_mock, users):
     'language_codes, language_names', [(['en'], ['English']), (['ar', 'en'], ['Arabic', 'English'])]
 )
 def test_get_language_name_from_codes(language_codes, language_names):
+    """
+    Tests if the correct language names are being returned, with their respective course_ids
+    """
     language_codes_with_course_ids = []
     expected_output = []
 
