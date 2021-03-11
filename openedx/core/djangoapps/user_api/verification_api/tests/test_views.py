@@ -132,7 +132,7 @@ class VerificationsDetailsViewTests(VerificationStatusViewTestsMixin, TestCase):
             'status': self.photo_verification.status,
             'expiration_datetime': '{}Z'.format(kwargs.get('expected_expires').isoformat()),
             'message': '',
-            'updated_at': '{}Z'.format(self.CREATED_AT.isoformat()),
+            'updated_at': f'{self.CREATED_AT.isoformat()}Z',
             'receipt_id': self.photo_verification.receipt_id,
         }]
 
@@ -155,25 +155,25 @@ class VerificationsDetailsViewTests(VerificationStatusViewTestsMixin, TestCase):
             {
                 'type': 'Software Secure',
                 'status': self.photo_verification.status,
-                'expiration_datetime': '{}Z'.format(expected_expires.isoformat()),
+                'expiration_datetime': f'{expected_expires.isoformat()}Z',
                 'message': self.photo_verification.error_msg,
-                'updated_at': '{}Z'.format(self.CREATED_AT.isoformat()),
+                'updated_at': f'{self.CREATED_AT.isoformat()}Z',
                 'receipt_id': self.photo_verification.receipt_id
             },
             {
                 'type': 'SSO',
                 'status': self.sso_verification.status,
-                'expiration_datetime': '{}Z'.format(expected_expires.isoformat()),
+                'expiration_datetime': f'{expected_expires.isoformat()}Z',
                 'message': '',
-                'updated_at': '{}Z'.format(self.CREATED_AT.isoformat()),
+                'updated_at': f'{self.CREATED_AT.isoformat()}Z',
                 'receipt_id': None,
             },
             {
                 'type': 'Manual',
                 'status': self.manual_verification.status,
-                'expiration_datetime': '{}Z'.format(expected_expires.isoformat()),
+                'expiration_datetime': f'{expected_expires.isoformat()}Z',
                 'message': self.manual_verification.reason,
-                'updated_at': '{}Z'.format(self.CREATED_AT.isoformat()),
+                'updated_at': f'{self.CREATED_AT.isoformat()}Z',
                 'receipt_id': None,
             },
         ]
@@ -195,25 +195,25 @@ class VerificationsDetailsViewTests(VerificationStatusViewTestsMixin, TestCase):
             {
                 'type': 'Software Secure',
                 'status': self.photo_verification.status,
-                'expiration_datetime': '{}Z'.format(expected_expires.isoformat()),
+                'expiration_datetime': f'{expected_expires.isoformat()}Z',
                 'message': self.photo_verification.error_msg,
-                'updated_at': '{}Z'.format(self.CREATED_AT.isoformat()),
+                'updated_at': f'{self.CREATED_AT.isoformat()}Z',
                 'receipt_id': self.photo_verification.receipt_id,
             },
             {
                 'type': 'Software Secure',
                 'status': second_ss_photo_verification.status,
-                'expiration_datetime': '{}Z'.format(expected_expires.isoformat()),
+                'expiration_datetime': f'{expected_expires.isoformat()}Z',
                 'message': second_ss_photo_verification.error_msg,
-                'updated_at': '{}Z'.format(self.CREATED_AT.isoformat()),
+                'updated_at': f'{self.CREATED_AT.isoformat()}Z',
                 'receipt_id': second_ss_photo_verification.receipt_id,
             },
             {
                 'type': 'SSO',
                 'status': self.sso_verification.status,
-                'expiration_datetime': '{}Z'.format(expected_expires.isoformat()),
+                'expiration_datetime': f'{expected_expires.isoformat()}Z',
                 'message': '',
-                'updated_at': '{}Z'.format(self.CREATED_AT.isoformat()),
+                'updated_at': f'{self.CREATED_AT.isoformat()}Z',
                 'receipt_id': None,
             },
         ]

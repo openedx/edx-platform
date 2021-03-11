@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 Test cases to cover account retirement views
 """
@@ -7,11 +6,10 @@ Test cases to cover account retirement views
 import datetime
 import json
 import unittest
+from unittest import mock
 
 import ddt
-import mock
 import pytz
-import six
 from consent.models import DataSharingConsent
 from django.conf import settings
 from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
@@ -29,8 +27,6 @@ from enterprise.models import (
 from integrated_channels.sap_success_factors.models import SapSuccessFactorsLearnerDataTransmissionAudit
 from opaque_keys.edx.keys import CourseKey
 from rest_framework import status
-from six import iteritems, text_type
-from six.moves import range
 from social_django.models import UserSocialAuth
 from wiki.models import Article, ArticleRevision
 from wiki.models.pluginbase import RevisionPlugin, RevisionPluginRevision
@@ -109,7 +105,7 @@ class TestAccountDeactivation(TestCase):
     """
 
     def setUp(self):
-        super(TestAccountDeactivation, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.test_user = UserFactory()
         self.url = reverse('accounts_deactivation', kwargs={'username': self.test_user.username})
 
@@ -180,7 +176,7 @@ class TestDeactivateLogout(RetirementTestCase):
     Tests the account deactivation/logout endpoint.
     """
     def setUp(self):
-        super(TestDeactivateLogout, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.test_password = 'password'
         self.test_user = UserFactory(password=self.test_password)
         UserSocialAuth.objects.create(
@@ -277,7 +273,7 @@ class TestPartnerReportingCleanup(ModuleStoreTestCase):
     """
 
     def setUp(self):
-        super(TestPartnerReportingCleanup, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.test_superuser = SuperuserFactory()
         self.course = CourseFactory()
         self.course_awesome_org = CourseFactory(org='awesome_org')
@@ -389,7 +385,7 @@ class TestPartnerReportingPut(RetirementTestCase, ModuleStoreTestCase):
     """
 
     def setUp(self):
-        super(TestPartnerReportingPut, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.test_superuser = SuperuserFactory()
         self.course = CourseFactory()
         self.course_awesome_org = CourseFactory(org='awesome_org')
@@ -496,7 +492,7 @@ class TestPartnerReportingList(ModuleStoreTestCase):
     ]
 
     def setUp(self):
-        super(TestPartnerReportingList, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.test_superuser = SuperuserFactory()
         self.course = CourseFactory()
         self.course_awesome_org = CourseFactory(org='awesome_org')
@@ -698,7 +694,7 @@ class TestAccountRetirementList(RetirementTestCase):
     """
 
     def setUp(self):
-        super(TestAccountRetirementList, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.test_superuser = SuperuserFactory()
         self.headers = build_jwt_headers(self.test_superuser)
         self.url = reverse('accounts_retirement_queue')
@@ -737,7 +733,7 @@ class TestAccountRetirementList(RetirementTestCase):
                     del retirement['created']
                     del retirement['modified']
 
-            six.assertCountEqual(self, response_data, expected_data)
+            self.assertCountEqual(response_data, expected_data)
 
     def test_empty(self):
         """
@@ -858,7 +854,7 @@ class TestAccountRetirementsByStatusAndDate(RetirementTestCase):
     """
 
     def setUp(self):
-        super(TestAccountRetirementsByStatusAndDate, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.test_superuser = SuperuserFactory()
         self.headers = build_jwt_headers(self.test_superuser)
         self.url = reverse('accounts_retirements_by_status_and_date')
@@ -910,7 +906,7 @@ class TestAccountRetirementsByStatusAndDate(RetirementTestCase):
                     except KeyError:
                         pass
 
-            six.assertCountEqual(self, response_data, expected_data)
+            self.assertCountEqual(response_data, expected_data)
 
     def test_empty(self):
         """
@@ -1005,7 +1001,7 @@ class TestAccountRetirementRetrieve(RetirementTestCase):
     Tests the account retirement retrieval endpoint.
     """
     def setUp(self):
-        super(TestAccountRetirementRetrieve, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.test_user = UserFactory()
         self.test_superuser = SuperuserFactory()
         self.url = reverse('accounts_retirement_retrieve', kwargs={'username': self.test_user.username})
@@ -1076,7 +1072,7 @@ class TestAccountRetirementCleanup(RetirementTestCase):
     Tests the account retirement cleanup endpoint.
     """
     def setUp(self):
-        super(TestAccountRetirementCleanup, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.pending_state = RetirementState.objects.get(state_name='PENDING')
         self.complete_state = RetirementState.objects.get(state_name='COMPLETE')
         self.retirements = []
@@ -1151,7 +1147,7 @@ class TestAccountRetirementUpdate(RetirementTestCase):
     Tests the account retirement endpoint.
     """
     def setUp(self):
-        super(TestAccountRetirementUpdate, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.pending_state = RetirementState.objects.get(state_name='PENDING')
         self.locking_state = RetirementState.objects.get(state_name='LOCKING_ACCOUNT')
 
@@ -1291,7 +1287,7 @@ class TestAccountRetirementPost(RetirementTestCase):
     Tests the account retirement endpoint.
     """
     def setUp(self):
-        super(TestAccountRetirementPost, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
 
         self.test_user = UserFactory()
         self.test_superuser = SuperuserFactory()
@@ -1403,7 +1399,7 @@ class TestAccountRetirementPost(RetirementTestCase):
         with mock.patch(path, side_effect=Exception('Unexpected Exception')) as mock_get_retirement:
             data = {'username': self.test_user.username}
             response = self.post_and_assert_status(data, status.HTTP_500_INTERNAL_SERVER_ERROR)
-            assert 'Unexpected Exception' == text_type(response.json())
+            assert 'Unexpected Exception' == str(response.json())
             mock_get_retirement.assert_called_once_with(self.original_username)
 
     def test_retire_user_where_user_already_retired(self):
@@ -1416,7 +1412,7 @@ class TestAccountRetirementPost(RetirementTestCase):
 
     def test_retire_user_where_username_not_provided(self):
         response = self.post_and_assert_status({}, status.HTTP_404_NOT_FOUND)
-        expected_response_message = {'message': text_type('The user was not specified.')}
+        expected_response_message = {'message': 'The user was not specified.'}
         assert expected_response_message == response.json()
 
     @mock.patch('openedx.core.djangoapps.user_api.accounts.views.get_profile_image_names')
@@ -1434,10 +1430,10 @@ class TestAccountRetirementPost(RetirementTestCase):
             'is_active': False,
             'username': self.retired_username,
         }
-        for field, expected_value in iteritems(expected_user_values):
+        for field, expected_value in expected_user_values.items():
             assert expected_value == getattr(self.test_user, field)
 
-        for field, expected_value in iteritems(USER_PROFILE_PII):
+        for field, expected_value in USER_PROFILE_PII.items():
             assert expected_value == getattr(self.test_user.profile, field)
 
         assert self.test_user.profile.profile_image_uploaded_at is None
@@ -1468,7 +1464,7 @@ class TestAccountRetirementPost(RetirementTestCase):
         self.post_and_assert_status(data)
 
     def test_deletes_pii_from_user_profile(self):
-        for model_field, value_to_assign in iteritems(USER_PROFILE_PII):
+        for model_field, value_to_assign in USER_PROFILE_PII.items():
             if value_to_assign == '':
                 value = 'foo'
             else:
@@ -1477,7 +1473,7 @@ class TestAccountRetirementPost(RetirementTestCase):
 
         AccountRetirementView.clear_pii_from_userprofile(self.test_user)
 
-        for model_field, value_to_assign in iteritems(USER_PROFILE_PII):
+        for model_field, value_to_assign in USER_PROFILE_PII.items():
             assert value_to_assign == getattr(self.test_user.profile, model_field)
 
         social_links = SocialLink.objects.filter(
@@ -1570,7 +1566,7 @@ class TestLMSAccountRetirementPost(RetirementTestCase, ModuleStoreTestCase):
     Tests the LMS account retirement (GDPR P2) endpoint.
     """
     def setUp(self):
-        super(TestLMSAccountRetirementPost, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.pii_standin = 'PII here'
         self.course = CourseFactory()
         self.test_user = UserFactory()

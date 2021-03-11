@@ -1,17 +1,16 @@
-# -*- coding: utf-8 -*-
 """
 Unit tests for preference APIs.
 """
 
 
 import datetime
+from unittest.mock import patch
 import pytest
 import ddt
 from dateutil.parser import parse as parse_datetime
 from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.test.utils import override_settings
 from django.urls import reverse
-from mock import patch
 from pytz import common_timezones, utc
 
 from openedx.core.djangolib.testing.utils import CacheIsolationTestCase, skip_unless_lms
@@ -50,7 +49,7 @@ class TestPreferenceAPI(CacheIsolationTestCase):
     password = "test"
 
     def setUp(self):
-        super(TestPreferenceAPI, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.user = UserFactory.create(password=self.password)
         self.different_user = UserFactory.create(password=self.password)
         self.staff_user = UserFactory.create(is_staff=True, password=self.password)
@@ -107,8 +106,8 @@ class TestPreferenceAPI(CacheIsolationTestCase):
         """
         Verifies the basic behavior of set_user_preference.
         """
-        test_key = u'ⓟⓡⓔⓕⓔⓡⓔⓝⓒⓔ_ⓚⓔⓨ'
-        test_value = u'ǝnןɐʌ_ǝɔuǝɹǝɟǝɹd'
+        test_key = 'ⓟⓡⓔⓕⓔⓡⓔⓝⓒⓔ_ⓚⓔⓨ'
+        test_value = 'ǝnןɐʌ_ǝɔuǝɹǝɟǝɹd'
         set_user_preference(self.user, test_key, test_value)
         assert get_user_preference(self.user, test_key) == test_value
         set_user_preference(self.user, test_key, "new_value", username=self.user.username)
@@ -151,11 +150,11 @@ class TestPreferenceAPI(CacheIsolationTestCase):
 
         user_preference_save.side_effect = [Exception, None]
         with pytest.raises(PreferenceUpdateError) as context_manager:
-            set_user_preference(self.user, u"new_key_ȻħȺɍłɇs", u"new_value_ȻħȺɍłɇs")
+            set_user_preference(self.user, "new_key_ȻħȺɍłɇs", "new_value_ȻħȺɍłɇs")
         assert context_manager.value.developer_message ==\
-               u"Save failed for user preference 'new_key_ȻħȺɍłɇs' with value 'new_value_ȻħȺɍłɇs': "
+               "Save failed for user preference 'new_key_ȻħȺɍłɇs' with value 'new_value_ȻħȺɍłɇs': "
         assert context_manager.value.user_message ==\
-               u"Save failed for user preference 'new_key_ȻħȺɍłɇs' with value 'new_value_ȻħȺɍłɇs'."
+               "Save failed for user preference 'new_key_ȻħȺɍłɇs' with value 'new_value_ȻħȺɍłɇs'."
 
     def test_update_user_preferences(self):
         """
@@ -231,15 +230,15 @@ class TestPreferenceAPI(CacheIsolationTestCase):
         with pytest.raises(PreferenceUpdateError) as context_manager:
             update_user_preferences(self.user, {self.test_preference_key: "new_value"})
         assert context_manager.value.developer_message ==\
-               u"Save failed for user preference 'test_key' with value 'new_value': "
+               "Save failed for user preference 'test_key' with value 'new_value': "
         assert context_manager.value.user_message ==\
-               u"Save failed for user preference 'test_key' with value 'new_value'."
+               "Save failed for user preference 'test_key' with value 'new_value'."
 
         user_preference_delete.side_effect = [Exception, None]
         with pytest.raises(PreferenceUpdateError) as context_manager:
             update_user_preferences(self.user, {self.test_preference_key: None})
-        assert context_manager.value.developer_message == u"Delete failed for user preference 'test_key': "
-        assert context_manager.value.user_message == u"Delete failed for user preference 'test_key'."
+        assert context_manager.value.developer_message == "Delete failed for user preference 'test_key': "
+        assert context_manager.value.user_message == "Delete failed for user preference 'test_key'."
 
     def test_delete_user_preference(self):
         """
@@ -270,8 +269,8 @@ class TestPreferenceAPI(CacheIsolationTestCase):
         user_preference_delete.side_effect = [Exception, None]
         with pytest.raises(PreferenceUpdateError) as context_manager:
             delete_user_preference(self.user, self.test_preference_key)
-        assert context_manager.value.developer_message == u"Delete failed for user preference 'test_key': "
-        assert context_manager.value.user_message == u"Delete failed for user preference 'test_key'."
+        assert context_manager.value.developer_message == "Delete failed for user preference 'test_key': "
+        assert context_manager.value.user_message == "Delete failed for user preference 'test_key'."
 
 
 @ddt.ddt
@@ -279,9 +278,9 @@ class UpdateEmailOptInTests(ModuleStoreTestCase):
     """
     Test cases to cover API-driven email list opt-in update workflows
     """
-    USERNAME = u'claire-underwood'
-    PASSWORD = u'ṕáśśẃőŕd'
-    EMAIL = u'claire+underwood@example.com'
+    USERNAME = 'claire-underwood'
+    PASSWORD = 'ṕáśśẃőŕd'
+    EMAIL = 'claire+underwood@example.com'
 
     def _create_account(self, username, password, email):
         # pylint: disable=missing-docstring
@@ -297,19 +296,19 @@ class UpdateEmailOptInTests(ModuleStoreTestCase):
 
     @ddt.data(
         # Check that a 27 year old can opt-in
-        (27, True, u"True"),
+        (27, True, "True"),
 
         # Check that a 32-year old can opt-out
-        (32, False, u"False"),
+        (32, False, "False"),
 
         # Check that someone 14 years old can opt-in
-        (14, True, u"True"),
+        (14, True, "True"),
 
         # Check that someone 13 years old cannot opt-in (must have turned 13 before this year)
-        (13, True, u"False"),
+        (13, True, "False"),
 
         # Check that someone 12 years old cannot opt-in
-        (12, True, u"False")
+        (12, True, "False")
     )
     @ddt.unpack
     @override_settings(EMAIL_OPTIN_MINIMUM_AGE=13)
@@ -339,7 +338,7 @@ class UpdateEmailOptInTests(ModuleStoreTestCase):
 
         update_email_opt_in(user, course.id.org, True)
         result_obj = UserOrgTag.objects.get(user=user, org=course.id.org, key='email-optin')
-        assert result_obj.value == u'True'
+        assert result_obj.value == 'True'
 
     def test_update_email_optin_anonymous_user(self):
         """Verify that the API raises an exception for a user with no profile."""
@@ -350,16 +349,16 @@ class UpdateEmailOptInTests(ModuleStoreTestCase):
 
     @ddt.data(
         # Check that a 27 year old can opt-in, then out.
-        (27, True, False, u"False"),
+        (27, True, False, "False"),
 
         # Check that a 32-year old can opt-out, then in.
-        (32, False, True, u"True"),
+        (32, False, True, "True"),
 
         # Check that someone 13 years old can opt-in, then out.
-        (13, True, False, u"False"),
+        (13, True, False, "False"),
 
         # Check that someone 12 years old cannot opt-in, then explicitly out.
-        (12, True, False, u"False")
+        (12, True, False, "False")
     )
     @ddt.unpack
     @override_settings(EMAIL_OPTIN_MINIMUM_AGE=13)
@@ -425,11 +424,11 @@ def get_expected_validation_developer_message(preference_key, preference_value):
     """
     Returns the expected dict of validation messages for the specified key.
     """
-    return u"Value '{preference_value}' not valid for preference '{preference_key}': {error}".format(
+    return "Value '{preference_value}' not valid for preference '{preference_key}': {error}".format(
         preference_key=preference_key,
         preference_value=preference_value,
         error={
-            "key": [u"Ensure this field has no more than 255 characters."]
+            "key": ["Ensure this field has no more than 255 characters."]
         }
     )
 
@@ -438,11 +437,11 @@ def get_expected_key_error_user_message(preference_key, preference_value):  # li
     """
     Returns the expected user message for an invalid key.
     """
-    return u"Invalid user preference key '{preference_key}'.".format(preference_key=preference_key)
+    return f"Invalid user preference key '{preference_key}'."
 
 
 def get_empty_preference_message(preference_key):
     """
     Returns the validation message shown for an empty preference.
     """
-    return u"Preference '{preference_key}' cannot be set to an empty value.".format(preference_key=preference_key)
+    return f"Preference '{preference_key}' cannot be set to an empty value."

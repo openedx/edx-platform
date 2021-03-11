@@ -13,7 +13,7 @@ class CanDeactivateUserTest(TestCase):
     """ Tests for user deactivation API permissions """
 
     def setUp(self):
-        super(CanDeactivateUserTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.request = RequestFactory().get('/test/url')
 
     def test_api_permission_superuser(self):
@@ -46,7 +46,7 @@ class CanRetireUserTest(TestCase):
     """ Tests for user retirement API permissions """
 
     def setUp(self):
-        super(CanRetireUserTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.request = RequestFactory().get('/test/url')
 
     def test_api_permission_superuser(self):
