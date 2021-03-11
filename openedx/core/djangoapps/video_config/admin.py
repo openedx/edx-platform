@@ -26,7 +26,7 @@ class CourseSpecificEnabledFlagBaseAdmin(KeyedConfigurationModelAdmin):
     Allows searching by course id.
     """
     # Make abstract base class
-    class Meta(object):
+    class Meta:
         abstract = True
 
     search_fields = ['course_id']

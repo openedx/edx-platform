@@ -15,7 +15,7 @@ class CourseVideoUploadsEnabledByDefaultAdminForm(CourseSpecificFlagAdminBaseFor
     Form for course-specific Video Uploads enabled by default configuration.
     """
 
-    class Meta(object):
+    class Meta:
         model = CourseVideoUploadsEnabledByDefault
         fields = '__all__'
 
@@ -24,6 +24,6 @@ class VEMPipelineIntegrationAdminForm(forms.ModelForm):
     """
     Form for VEM Pipeline Integration Admin class.
     """
-    class Meta(object):
+    class Meta:
         model = VEMPipelineIntegration
         fields = '__all__'

@@ -8,7 +8,6 @@ from django.db import models
 from django.utils.encoding import python_2_unicode_compatible
 from django.utils.translation import ugettext_lazy as _
 from opaque_keys.edx.django.models import CourseKeyField
-import six
 
 
 class VEMPipelineIntegration(ConfigurationModel):
@@ -98,7 +97,7 @@ class VideoUploadsEnabledByDefault(ConfigurationModel):
 
     def __str__(self):
         current_model = VideoUploadsEnabledByDefault.current()
-        return u"VideoUploadsEnabledByDefault: enabled {is_enabled}".format(
+        return "VideoUploadsEnabledByDefault: enabled {is_enabled}".format(
             is_enabled=current_model.is_enabled()
         )
 
@@ -128,7 +127,7 @@ class CourseVideoUploadsEnabledByDefault(ConfigurationModel):
         if self.enabled:
             not_en = ""
 
-        return u"Course '{course_key}': Video Uploads {not_enabled}Enabled by default.".format(
-            course_key=six.text_type(self.course_id),
+        return "Course '{course_key}': Video Uploads {not_enabled}Enabled by default.".format(
+            course_key=str(self.course_id),
             not_enabled=not_en
         )
