@@ -1,9 +1,9 @@
 """
 Test password policy forms
 """
-import pytest
-import mock
+from unittest import mock
 
+import pytest
 from django.forms import ValidationError
 from django.test import TestCase
 from django.test.utils import override_settings
@@ -20,7 +20,7 @@ class PasswordPolicyAwareAdminAuthFormTests(TestCase):
     Tests the custom form for enforcing password policy rules
     """
     def setUp(self):
-        super(PasswordPolicyAwareAdminAuthFormTests, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.auth_form = PasswordPolicyAwareAdminAuthForm()
         self.user = UserFactory.create(username='test_user', password='test_password', is_staff=True)
         self.auth_form.cleaned_data = {
