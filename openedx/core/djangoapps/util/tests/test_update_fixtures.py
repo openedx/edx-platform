@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 Tests of the update_fixtures management command for bok-choy test database
 initialization.
