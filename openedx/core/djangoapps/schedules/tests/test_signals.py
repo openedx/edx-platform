@@ -4,10 +4,10 @@ Tests for schedules signals
 
 
 import datetime
+from unittest.mock import patch
 
 import ddt
 import pytest
-from mock import patch
 from pytz import utc
 
 from common.djangoapps.course_modes.models import CourseMode
@@ -99,7 +99,7 @@ class UpdateScheduleTests(SharedModuleStoreTestCase):  # lint-amnesty, pylint: d
     VERIFICATION_DEADLINE_DAYS = 14
 
     def setUp(self):
-        super(UpdateScheduleTests, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.site = SiteFactory.create()
         ScheduleConfigFactory.create(site=self.site)
         DynamicUpgradeDeadlineConfiguration.objects.create(enabled=True, deadline_days=self.VERIFICATION_DEADLINE_DAYS)

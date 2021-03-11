@@ -12,14 +12,14 @@ from common.djangoapps.student.tests.factories import CourseEnrollmentFactory
 
 
 class ScheduleExperienceFactory(factory.DjangoModelFactory):
-    class Meta(object):
+    class Meta:
         model = models.ScheduleExperience
 
     experience_type = models.ScheduleExperience.EXPERIENCES.default
 
 
 class ScheduleFactory(factory.DjangoModelFactory):  # lint-amnesty, pylint: disable=missing-class-docstring
-    class Meta(object):
+    class Meta:
         model = models.Schedule
 
     start_date = factory.Faker('future_datetime', tzinfo=pytz.UTC)
@@ -29,7 +29,7 @@ class ScheduleFactory(factory.DjangoModelFactory):  # lint-amnesty, pylint: disa
 
 
 class ScheduleConfigFactory(factory.DjangoModelFactory):  # lint-amnesty, pylint: disable=missing-class-docstring
-    class Meta(object):
+    class Meta:
         model = models.ScheduleConfig
 
     site = factory.SubFactory(SiteFactory)
