@@ -99,14 +99,6 @@ class RawMixin:
         return block
 
 
-class RawDescriptor(RawMixin, XmlDescriptor, XMLEditingDescriptor):
-    """
-    Module that provides a raw editing view of its data and children.  It
-    requires that the definition xml is valid.
-    """
-    pass  # lint-amnesty, pylint: disable=unnecessary-pass
-
-
 class EmptyDataRawMixin:
     """
     Common code between EmptyDataRawDescriptor and XBlocks converted from XModules.
@@ -125,11 +117,3 @@ class EmptyDataRawMixin:
         if self.data:
             return etree.fromstring(self.data)
         return etree.Element(self.category)
-
-
-class EmptyDataRawDescriptor(EmptyDataRawMixin, XmlDescriptor, XMLEditingDescriptor):
-    """
-    Version of RawDescriptor for modules which may have no XML data,
-    but use XMLEditingDescriptor for import/export handling.
-    """
-    pass  # lint-amnesty, pylint: disable=unnecessary-pass

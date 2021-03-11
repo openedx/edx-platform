@@ -19,7 +19,6 @@ from xblockutils.studio_editable import StudioEditableXBlockMixin
 
 from openedx.core.djangolib.markup import HTML, Text
 from openedx.core.lib.xblock_builtin import get_css_dependencies, get_js_dependencies
-from xmodule.raw_module import RawDescriptor
 from xmodule.xml_module import XmlParserMixin
 
 
@@ -74,7 +73,7 @@ class DiscussionXBlock(XBlock, StudioEditableXBlockMixin, XmlParserMixin):  # li
     has_author_view = True  # Tells Studio to use author_view
 
     # support for legacy OLX format - consumed by XmlParserMixin.load_metadata
-    metadata_translations = dict(RawDescriptor.metadata_translations)
+    metadata_translations = dict(XmlParserMixin.metadata_translations)
     metadata_translations['id'] = 'discussion_id'
     metadata_translations['for'] = 'discussion_target'
 

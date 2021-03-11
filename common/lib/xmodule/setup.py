@@ -4,7 +4,6 @@ from setuptools import find_packages, setup
 
 XMODULES = [
     "section = xmodule.backcompat_module:SemanticSectionDescriptor",
-    "raw = xmodule.raw_module:RawDescriptor",
 ]
 XBLOCKS = [
     "about = xmodule.html_module:AboutBlock",
