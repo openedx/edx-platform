@@ -52,7 +52,7 @@ from .course_sock import CourseSockFragmentView
 from .latest_update import LatestUpdateFragmentView
 from .welcome_message import WelcomeMessageFragmentView
 
-EMPTY_HANDOUTS_HTML = u'<ol></ol>'
+EMPTY_HANDOUTS_HTML = '<ol></ol>'
 
 
 class CourseHomeView(CourseTabView):
@@ -67,10 +67,10 @@ class CourseHomeView(CourseTabView):
         """
         Displays the home page for the specified course.
         """
-        return super(CourseHomeView, self).get(request, course_id, 'courseware', **kwargs)  # lint-amnesty, pylint: disable=super-with-arguments
+        return super().get(request, course_id, 'courseware', **kwargs)
 
     def render_to_fragment(self, request, course=None, tab=None, **kwargs):  # lint-amnesty, pylint: disable=arguments-differ, unused-argument
-        course_id = six.text_type(course.id)
+        course_id = str(course.id)
         if course_home_mfe_outline_tab_is_active(course.id) and not request.user.is_staff:
             microfrontend_url = get_learning_mfe_home_url(course_key=course_id, view_name="home")
             raise Redirect(microfrontend_url)

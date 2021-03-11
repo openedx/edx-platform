@@ -32,7 +32,7 @@ from common.djangoapps.util.date_utils import strftime_localized
 class TestAccess(CacheIsolationTestCase):
     """Tests of openedx.features.course_duration_limits.access"""
     def setUp(self):
-        super(TestAccess, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
 
         CourseDurationLimitConfig.objects.create(enabled=True, enabled_as_of=datetime(2018, 1, 1, tzinfo=UTC))
         DynamicUpgradeDeadlineConfiguration.objects.create(enabled=True)

@@ -9,7 +9,6 @@ from completion.models import BlockCompletion
 from django.db.models import Q  # lint-amnesty, pylint: disable=unused-import
 from django.utils import timezone
 from opaque_keys.edx.keys import CourseKey
-from six.moves import range
 
 from lms.djangoapps.course_api.blocks.api import get_blocks
 from lms.djangoapps.course_blocks.api import get_course_blocks

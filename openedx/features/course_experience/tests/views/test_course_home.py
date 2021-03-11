@@ -1,4 +1,3 @@
-# coding=utf-8
 """
 Tests for the course home page.
 """
@@ -7,7 +6,7 @@ Tests for the course home page.
 from datetime import datetime, timedelta
 
 import ddt
-import mock
+from unittest import mock
 import six
 from django.conf import settings
 from django.http import QueryDict
@@ -94,7 +93,7 @@ def course_home_url(course):
     Arguments:
         course (CourseBlock): The course being tested.
     """
-    return course_home_url_from_string(six.text_type(course.id))
+    return course_home_url_from_string(str(course.id))
 
 
 def course_home_url_from_string(course_key_string):
@@ -412,7 +411,7 @@ class TestCourseHomePageAccess(CourseHomePageTestCase):
         can_receive_discount_mock.return_value = applicability
         discount_percentage_mock.return_value = percentage
         user = self.create_user_for_course(self.course, CourseUserType.ENROLLED)
-        now_time = datetime.now(tz=UTC).strftime(u"%Y-%m-%d %H:%M:%S%z")
+        now_time = datetime.now(tz=UTC).strftime("%Y-%m-%d %H:%M:%S%z")
         ExperimentData.objects.create(
             user=user, experiment_id=REV1008_EXPERIMENT_ID, key=str(self.course.id), value=now_time
         )
@@ -421,7 +420,7 @@ class TestCourseHomePageAccess(CourseHomePageTestCase):
         response = self.client.get(url)
         expiration_date = strftime_localized_html(get_discount_expiration_date(user, self.course), 'SHORT_DATE')
         upgrade_link = verified_upgrade_deadline_link(user=user, course=self.course)
-        bannerText = u'''<div class="first-purchase-offer-banner" role="note">
+        bannerText = '''<div class="first-purchase-offer-banner" role="note">
              <span class="first-purchase-offer-banner-bold"><b>
              Upgrade by {discount_expiration_date} and save {percentage}% [{strikeout_price}]</b></span>
              <br>Use code <b>EDXWELCOME</b> at checkout! <a id="welcome" href="{upgrade_link}">Upgrade Now</a>
@@ -551,7 +550,7 @@ class TestCourseHomePageAccess(CourseHomePageTestCase):
         expiration_date = strftime_localized(course.start + timedelta(weeks=4) + timedelta(days=1), 'SHORT_DATE')
         expected_params = QueryDict(mutable=True)
         course_name = CourseOverview.get_from_id(course.id).display_name_with_default
-        expected_params['access_response_error'] = u'Access to {run} expired on {expiration_date}'.format(
+        expected_params['access_response_error'] = 'Access to {run} expired on {expiration_date}'.format(
             run=course_name,
             expiration_date=expiration_date
         )
@@ -633,14 +632,14 @@ class TestCourseHomePageAccess(CourseHomePageTestCase):
         future_course = self.create_future_course()
         self.create_user_for_course(future_course, CourseUserType.ENROLLED)
 
-        fake_unicode_start_time = u"üñîçø∂é_ßtå®t_tîµé"
+        fake_unicode_start_time = "üñîçø∂é_ßtå®t_tîµé"
         mock_strftime_localized.return_value = fake_unicode_start_time
 
         url = course_home_url(future_course)
         response = self.client.get(url)
         expected_params = QueryDict(mutable=True)
         expected_params['notlive'] = fake_unicode_start_time
-        expected_url = u'{url}?{params}'.format(
+        expected_url = '{url}?{params}'.format(
             url=reverse('dashboard'),
             params=expected_params.urlencode()
         )
@@ -859,7 +858,7 @@ class CourseHomeFragmentViewTests(ModuleStoreTestCase):
     CREATE_USER = False
 
     def setUp(self):
-        super(CourseHomeFragmentViewTests, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         CommerceConfiguration.objects.create(checkout_on_ecommerce_service=True)
 
         end = now() + timedelta(days=30)
@@ -898,7 +897,7 @@ class CourseHomeFragmentViewTests(ModuleStoreTestCase):
         self.assertContains(response, url)
         self.assertContains(
             response,
-            u"Upgrade (<span class='price'>${price}</span>)".format(price=self.verified_mode.min_price),
+            f"Upgrade (<span class='price'>${self.verified_mode.min_price}</span>)",
         )
 
     def test_no_upgrade_message_if_logged_out(self):

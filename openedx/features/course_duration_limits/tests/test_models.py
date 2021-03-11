@@ -10,7 +10,7 @@ import pytest
 import pytz
 from django.utils import timezone
 from edx_django_utils.cache import RequestCache
-from mock import Mock
+from unittest.mock import Mock
 from opaque_keys.edx.locator import CourseLocator
 
 from common.djangoapps.course_modes.tests.factories import CourseModeFactory
@@ -35,7 +35,7 @@ class TestCourseDurationLimitConfig(CacheIsolationTestCase):
         CourseModeFactory.create(course_id=self.course_overview.id, mode_slug='audit')
         CourseModeFactory.create(course_id=self.course_overview.id, mode_slug='verified')
         self.user = UserFactory.create()
-        super(TestCourseDurationLimitConfig, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
 
     @ddt.data(
         (True, True),
@@ -188,7 +188,7 @@ class TestCourseDurationLimitConfig(CacheIsolationTestCase):
                 )
 
                 for org_setting in (True, False, None):
-                    test_org = "{}-{}".format(test_site_cfg.id, org_setting)
+                    test_org = f"{test_site_cfg.id}-{org_setting}"
                     test_site_cfg.site_values['course_org_filter'].append(test_org)
                     test_site_cfg.save()
 
@@ -199,7 +199,7 @@ class TestCourseDurationLimitConfig(CacheIsolationTestCase):
                     for course_setting in (True, False, None):
                         test_course = CourseOverviewFactory.create(
                             org=test_org,
-                            id=CourseLocator(test_org, 'test_course', 'run-{}'.format(course_setting))
+                            id=CourseLocator(test_org, 'test_course', f'run-{course_setting}')
                         )
                         CourseDurationLimitConfig.objects.create(
                             course=test_course, enabled=course_setting, enabled_as_of=datetime(2018, 1, 1, tzinfo=pytz.UTC)  # lint-amnesty, pylint: disable=line-too-long

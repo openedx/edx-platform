@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 Contains code related to computing content gating course duration limits
 and course access based on these limits.
@@ -28,7 +27,7 @@ class AuditExpiredError(AccessError):
     """
     def __init__(self, user, course, expiration_date):
         error_code = 'audit_expired'
-        developer_message = 'User {} had access to {} until {}'.format(user, course, expiration_date)
+        developer_message = f'User {user} had access to {course} until {expiration_date}'
         expiration_date = strftime_localized(expiration_date, 'SHORT_DATE')
         user_message = _('Access expired on {expiration_date}').format(expiration_date=expiration_date)
         try:
@@ -42,7 +41,7 @@ class AuditExpiredError(AccessError):
                                                 ' for expired on {expiration_date}').format(
                 expiration_date=expiration_date
             )
-        super(AuditExpiredError, self).__init__(error_code, developer_message, user_message,  # lint-amnesty, pylint: disable=super-with-arguments
+        super().__init__(error_code, developer_message, user_message,
                                                 additional_context_user_message)
 
 
@@ -219,7 +218,7 @@ def generate_course_expired_fragment_from_key(user, course_key):
     shouldn't show a course expired message for this user.
     """
     request_cache = RequestCache('generate_course_expired_fragment_from_key')
-    cache_key = 'message:{},{}'.format(user.id, course_key)
+    cache_key = f'message:{user.id},{course_key}'
     cache_response = request_cache.get_cached_response(cache_key)
     if cache_response.is_found:
         cached_message = cache_response.value

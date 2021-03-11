@@ -29,10 +29,10 @@ class CourseUpdatesView(CourseTabView):
         """
         Displays the home page for the specified course.
         """
-        return super(CourseUpdatesView, self).get(request, course_id, 'courseware', **kwargs)  # lint-amnesty, pylint: disable=super-with-arguments
+        return super().get(request, course_id, 'courseware', **kwargs)
 
     def render_to_fragment(self, request, course=None, tab=None, **kwargs):  # lint-amnesty, pylint: disable=arguments-differ, unused-argument
-        course_id = six.text_type(course.id)
+        course_id = str(course.id)
         updates_fragment_view = CourseUpdatesFragmentView()
         return updates_fragment_view.render_to_fragment(request, course_id=course_id, **kwargs)
 
@@ -49,7 +49,7 @@ class CourseUpdatesFragmentView(EdxFragmentView):
         course_key = CourseKey.from_string(course_id)
         course = get_course_with_access(request.user, 'load', course_key, check_if_enrolled=True)
         course_url_name = default_course_url_name(course.id)
-        course_url = reverse(course_url_name, kwargs={'course_id': six.text_type(course.id)})
+        course_url = reverse(course_url_name, kwargs={'course_id': str(course.id)})
 
         ordered_updates = get_ordered_updates(request, course)
         plain_html_updates = ''
