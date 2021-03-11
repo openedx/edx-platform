@@ -1,5 +1,4 @@
 """Tests of openedx.features.discounts.views"""
-# -*- coding: utf-8 -*-
 
 
 import jwt
@@ -19,20 +18,20 @@ class TestCourseUserDiscount(ModuleStoreTestCase):
     """
 
     def setUp(self):
-        super(TestCourseUserDiscount, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.user = UserFactory.create()
         self.course = CourseFactory.create(run='test', display_name='test')
         self.client = Client()
         self.url = reverse(
             'api_discounts:course_user_discount',
-            kwargs={'course_key_string': six.text_type(self.course.id)}
+            kwargs={'course_key_string': str(self.course.id)}
         )
 
     def test_url(self):
         """
         Test that the url hasn't changed
         """
-        assert self.url == ('/api/discounts/course/' + six.text_type(self.course.id))
+        assert self.url == ('/api/discounts/course/' + str(self.course.id))
 
     def test_course_user_discount(self):
         """

@@ -1,7 +1,7 @@
 """
 Tests of the openedx.features.discounts.utils module.
 """
-from mock import patch, Mock
+from unittest.mock import patch, Mock
 
 import ddt
 import six
@@ -33,7 +33,7 @@ class TestStrikeoutPrice(TestCase):
         ):
             content, has_discount = utils.format_strikeout_price(Mock(name='user'), Mock(name='course'))
 
-        assert six.text_type(content) == u"<span class='price'>$100</span>"
+        assert str(content) == "<span class='price'>$100</span>"
         assert not has_discount
 
     @ddt.data((15, 100, "$100", "$85",), (50, 50, "$50", "$25"), (10, 99, "$99", "$89.10"))
@@ -47,12 +47,12 @@ class TestStrikeoutPrice(TestCase):
         ):
             content, has_discount = utils.format_strikeout_price(Mock(name='user'), Mock(name='course'))
 
-        assert six.text_type(content) == (
-            u"<span class='sr-only'>"
-            u"Original price: <span class='price original'>{original_price}</span>, discount price: "
-            u"</span>"
-            u"<span class='price discount'>{discount_price}</span> "
-            u"<del aria-hidden='true'><span class='price original'>{original_price}</span></del>"
+        assert str(content) == (
+            "<span class='sr-only'>"
+            "Original price: <span class='price original'>{original_price}</span>, discount price: "
+            "</span>"
+            "<span class='price discount'>{discount_price}</span> "
+            "<del aria-hidden='true'><span class='price original'>{original_price}</span></del>"
         ).format(original_price=formatted_base_price, discount_price=final_price)
         assert has_discount
 

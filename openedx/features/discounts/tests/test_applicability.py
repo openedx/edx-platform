@@ -1,5 +1,4 @@
 """Tests of openedx.features.discounts.applicability"""
-# -*- coding: utf-8 -*-
 
 
 from datetime import datetime, timedelta
@@ -11,7 +10,7 @@ from django.contrib.sites.models import Site
 from django.utils.timezone import now
 from edx_toggles.toggles.testutils import override_waffle_flag
 from enterprise.models import EnterpriseCustomer, EnterpriseCustomerUser
-from mock import Mock, patch
+from unittest.mock import Mock, patch
 
 from common.djangoapps.course_modes.models import CourseMode
 from common.djangoapps.course_modes.tests.factories import CourseModeFactory
@@ -35,12 +34,12 @@ class TestApplicability(ModuleStoreTestCase):
     """
 
     def setUp(self):
-        super(TestApplicability, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.site, _ = Site.objects.get_or_create(domain='example.com')
         self.user = UserFactory.create()
         self.course = CourseFactory.create(run='test', display_name='test')
         CourseModeFactory.create(course_id=self.course.id, mode_slug='verified')
-        now_time = datetime.now(tz=pytz.UTC).strftime(u"%Y-%m-%d %H:%M:%S%z")
+        now_time = datetime.now(tz=pytz.UTC).strftime("%Y-%m-%d %H:%M:%S%z")
         ExperimentData.objects.create(
             user=self.user, experiment_id=REV1008_EXPERIMENT_ID, key=str(self.course.id), value=now_time
         )
