@@ -8,7 +8,7 @@ import requests
 from pavelib.utils.envs import Env
 
 
-class RemoteContextPlugin(object):
+class RemoteContextPlugin:
     """
     Pytest plugin for reporting pytests contexts to coverage running in another process
     """
@@ -31,7 +31,7 @@ class RemoteContextPlugin(object):
                 result = requests.post(
                     'http://{host}:{port}/coverage_context/update_context'.format(**cfg),
                     {
-                        'context': "{}|{}".format(item.nodeid, when),
+                        'context': f"{item.nodeid}|{when}",
                     }
                 )
                 assert result.status_code == 204

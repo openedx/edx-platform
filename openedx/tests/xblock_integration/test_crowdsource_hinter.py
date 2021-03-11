@@ -8,8 +8,6 @@ import unittest
 import simplejson as json
 from django.conf import settings
 from django.urls import reverse
-from six import text_type
-from six.moves import range
 
 from lms.djangoapps.courseware.tests.factories import GlobalStaffFactory
 from lms.djangoapps.courseware.tests.helpers import LoginEnrollmentTestCase
@@ -36,7 +34,7 @@ class TestCrowdsourceHinter(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
         if settings.ROOT_URLCONF != 'lms.urls':
             raise unittest.SkipTest('Test only valid in lms')
 
-        super(TestCrowdsourceHinter, cls).setUpClass()
+        super().setUpClass()
         cls.course = CourseFactory.create(
             display_name='CrowdsourceHinter_Test_Course'
         )
@@ -59,16 +57,16 @@ class TestCrowdsourceHinter(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
         cls.course_url = reverse(
             'courseware_section',
             kwargs={
-                'course_id': text_type(cls.course.id),
+                'course_id': str(cls.course.id),
                 'chapter': 'Overview',
                 'section': 'Welcome',
             }
         )
 
     def setUp(self):
-        super(TestCrowdsourceHinter, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         for idx, student in enumerate(self.STUDENTS):
-            username = "u{}".format(idx)
+            username = f"u{idx}"
             self.create_account(username, student['email'], student['password'])
             self.activate_user(student['email'])
 
@@ -81,8 +79,8 @@ class TestCrowdsourceHinter(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
         if xblock_name is None:
             xblock_name = TestCrowdsourceHinter.XBLOCK_NAMES[0]
         return reverse('xblock_handler', kwargs={
-            'course_id': text_type(self.course.id),
-            'usage_id': quote_slashes(text_type(self.course.id.make_usage_key('crowdsourcehinter', xblock_name))),
+            'course_id': str(self.course.id),
+            'usage_id': quote_slashes(str(self.course.id.make_usage_key('crowdsourcehinter', xblock_name))),
             'handler': handler,
             'suffix': ''
         })

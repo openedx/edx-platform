@@ -8,7 +8,6 @@ from completion.models import BlockCompletion
 from completion.services import CompletionService
 from completion.test_utils import CompletionWaffleTestMixin
 from opaque_keys.edx.keys import CourseKey
-from six.moves import range
 
 from openedx.core.djangolib.testing.utils import skip_unless_lms
 from common.djangoapps.student.tests.factories import UserFactory
@@ -28,7 +27,7 @@ class CompletionServiceTestCase(CompletionWaffleTestMixin, SharedModuleStoreTest
 
     @classmethod
     def setUpClass(cls):
-        super(CompletionServiceTestCase, cls).setUpClass()
+        super().setUpClass()
         cls.course = CourseFactory.create()
         with cls.store.bulk_operations(cls.course.id):
             cls.chapter = ItemFactory.create(
@@ -80,7 +79,7 @@ class CompletionServiceTestCase(CompletionWaffleTestMixin, SharedModuleStoreTest
         cls.problems = [cls.problem, cls.problem2, cls.problem3, cls.problem4, cls.problem5]
 
     def setUp(self):
-        super(CompletionServiceTestCase, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.override_waffle_switch(True)
         self.user = UserFactory.create()
         self.other_user = UserFactory.create()

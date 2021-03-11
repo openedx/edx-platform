@@ -11,12 +11,9 @@ from copy import deepcopy
 from io import BytesIO
 
 import simplejson as json
-import six
 from ddt import data, ddt
 from django.conf import settings
 from django.urls import reverse
-from six import text_type
-from six.moves import range
 
 from lms.djangoapps.courseware.tests.factories import GlobalStaffFactory
 from lms.djangoapps.courseware.tests.helpers import LoginEnrollmentTestCase
@@ -43,7 +40,7 @@ class TestRecommender(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
         if settings.ROOT_URLCONF != 'lms.urls':
             raise unittest.SkipTest('Test only valid in lms')
 
-        super(TestRecommender, cls).setUpClass()
+        super().setUpClass()
         cls.course = CourseFactory.create(
             display_name='Recommender_Test_Course'
         )
@@ -71,7 +68,7 @@ class TestRecommender(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
         cls.course_url = reverse(
             'courseware_section',
             kwargs={
-                'course_id': text_type(cls.course.id),
+                'course_id': str(cls.course.id),
                 'chapter': 'Overview',
                 'section': 'Welcome',
             }
@@ -117,9 +114,9 @@ class TestRecommender(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
         }
 
     def setUp(self):
-        super(TestRecommender, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         for idx, student in enumerate(self.STUDENTS):
-            username = "u{}".format(idx)
+            username = f"u{idx}"
             self.create_account(username, student['email'], student['password'])
             self.activate_user(student['email'])
             self.logout()
@@ -133,8 +130,8 @@ class TestRecommender(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
         if xblock_name is None:
             xblock_name = TestRecommender.XBLOCK_NAMES[0]
         return reverse('xblock_handler', kwargs={
-            'course_id': text_type(self.course.id),
-            'usage_id': quote_slashes(text_type(self.course.id.make_usage_key('recommender', xblock_name))),
+            'course_id': str(self.course.id),
+            'usage_id': quote_slashes(str(self.course.id.make_usage_key('recommender', xblock_name))),
             'handler': handler,
             'suffix': ''
         })
@@ -209,7 +206,7 @@ class TestRecommenderCreateFromEmpty(TestRecommender):
         """
         self.enroll_student(self.STUDENTS[0]['email'], self.STUDENTS[0]['password'])
         # Check whether adding new resource is successful
-        for resource_id, resource in six.iteritems(self.test_recommendations):
+        for resource_id, resource in self.test_recommendations.items():
             for xblock_name in self.XBLOCK_NAMES:
                 result = self.call_event('add_resource', resource, xblock_name)
 
@@ -228,7 +225,7 @@ class TestRecommenderCreateFromEmpty(TestRecommender):
 class TestRecommenderResourceBase(TestRecommender):
     """Base helper class for tests with resources."""
     def setUp(self):
-        super(TestRecommenderResourceBase, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.resource_id = self.resource_urls[0]
         self.resource_id_second = self.resource_urls[1]
         self.non_existing_resource_id = 'An non-existing id'
@@ -251,7 +248,7 @@ class TestRecommenderResourceBase(TestRecommender):
         """
         resource = {"id": resource_id}
         edited_recommendations = {
-            key: value + "edited" for key, value in six.iteritems(self.test_recommendations[self.resource_id])
+            key: value + "edited" for key, value in self.test_recommendations[self.resource_id].items()
         }
         resource.update(edited_recommendations)
         return resource
@@ -634,7 +631,7 @@ class TestRecommenderFileUploading(TestRecommender):
     Check whether we can handle file uploading correctly
     """
     def setUp(self):
-        super(TestRecommenderFileUploading, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.initial_configuration = {
             'flagged_accum_resources': {},
             'endorsed_recommendation_reasons': [],
@@ -653,7 +650,7 @@ class TestRecommenderFileUploading(TestRecommender):
             f_handler = BytesIO(codecs.decode(test_case['magic_number'], 'hex_codec'))
         elif content is not None:
             f_handler = BytesIO(
-                json.dumps(content, sort_keys=True) if six.PY2 else json.dumps(content, sort_keys=True).encode('utf-8'))
+                json.dumps(content, sort_keys=True).encode('utf-8'))
         else:
             f_handler = BytesIO(b'')
 
