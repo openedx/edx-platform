@@ -3,7 +3,7 @@ Database Routers for use with the coursewarehistoryextended django app.
 """
 
 
-class StudentModuleHistoryExtendedRouter(object):
+class StudentModuleHistoryExtendedRouter:
     """
     A Database Router that separates StudentModuleHistoryExtended into its own database.
     """

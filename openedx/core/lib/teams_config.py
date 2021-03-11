@@ -6,7 +6,6 @@ Safe configuration wrapper for Course Teams feature.
 import re
 from enum import Enum
 
-import six
 from django.utils.functional import cached_property
 
 # "Arbitrarily large" but still limited
@@ -15,7 +14,7 @@ MANAGED_TEAM_MAX_TEAM_SIZE = 200
 DEFAULT_COURSE_RUN_MAX_TEAM_SIZE = 50
 
 
-class TeamsConfig(object):
+class TeamsConfig:  # pylint: disable=eq-without-hash
     """
     Configuration for the Course Teams feature on a course run.
 
@@ -148,7 +147,7 @@ class TeamsConfig(object):
         try:
             teamset = self.teamsets_by_id[teamset_id]
         except KeyError:
-            raise ValueError("Team-set {!r} does not exist.".format(teamset_id))  # lint-amnesty, pylint: disable=raise-missing-from
+            raise ValueError(f"Team-set {teamset_id!r} does not exist.")  # lint-amnesty, pylint: disable=raise-missing-from
         if teamset.teamset_type != TeamsetType.open:
             return MANAGED_TEAM_MAX_TEAM_SIZE
         if teamset.max_team_size:
@@ -156,7 +155,7 @@ class TeamsConfig(object):
         return self.default_max_team_size
 
 
-class TeamsetConfig(object):
+class TeamsetConfig:  # pylint: disable=eq-without-hash
     """
     Configuration for a team-set within a course run.
 
@@ -316,8 +315,8 @@ def _clean_string(value):
     """
     Return `str(value)` if it's a string or int, otherwise "".
     """
-    if isinstance(value, six.integer_types + six.string_types):
-        return six.text_type(value)
+    if isinstance(value, (int,) + (str,)):
+        return str(value)
     return ""
 
 
@@ -325,7 +324,7 @@ def _clean_max_team_size(value):
     """
     Return `value` if it's a positive int, otherwise None.
     """
-    if not isinstance(value, six.integer_types):
+    if not isinstance(value, int):
         return None
     if value < 0:
         return None
