@@ -115,8 +115,8 @@ class BinnedSchedulesBaseResolver(PrefixedDebugLoggerMixin, RecipientResolver):
         """
         target_day = _get_datetime_beginning_of_day(self.target_datetime)
         schedule_day_equals_target_day_filter = {
-            'courseenrollment__schedule__{}__gte'.format(self.schedule_date_field): target_day,
-            'courseenrollment__schedule__{}__lt'.format(self.schedule_date_field): target_day + datetime.timedelta(days=1),  # lint-amnesty, pylint: disable=line-too-long
+            f'courseenrollment__schedule__{self.schedule_date_field}__gte': target_day,
+            f'courseenrollment__schedule__{self.schedule_date_field}__lt': target_day + datetime.timedelta(days=1),  # lint-amnesty, pylint: disable=line-too-long
         }
         users = User.objects.filter(
             courseenrollment__is_active=True,
@@ -129,8 +129,8 @@ class BinnedSchedulesBaseResolver(PrefixedDebugLoggerMixin, RecipientResolver):
         )
 
         schedule_day_equals_target_day_filter = {
-            '{}__gte'.format(self.schedule_date_field): target_day,
-            '{}__lt'.format(self.schedule_date_field): target_day + datetime.timedelta(days=1),
+            f'{self.schedule_date_field}__gte': target_day,
+            f'{self.schedule_date_field}__lt': target_day + datetime.timedelta(days=1),
         }
         schedules = Schedule.objects.select_related(
             'enrollment__user__profile',

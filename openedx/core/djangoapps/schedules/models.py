@@ -42,7 +42,7 @@ class Schedule(TimeStampedModel):
         except ScheduleExperience.DoesNotExist:
             return ScheduleExperience.EXPERIENCES.default
 
-    class Meta(object):
+    class Meta:
         verbose_name = _('Schedule')
         verbose_name_plural = _('Schedules')
 
@@ -67,8 +67,8 @@ class ScheduleExperience(models.Model):
     .. no_pii:
     """
     EXPERIENCES = Choices(
-        (0, 'default', u'Recurring Nudge and Upgrade Reminder'),
-        (1, 'course_updates', u'Course Updates')
+        (0, 'default', 'Recurring Nudge and Upgrade Reminder'),
+        (1, 'course_updates', 'Course Updates')
     )
 
     schedule = models.OneToOneField(Schedule, related_name='experience', on_delete=models.CASCADE)

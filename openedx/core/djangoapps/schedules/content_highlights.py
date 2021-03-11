@@ -51,7 +51,7 @@ def course_has_highlights(course):
 
         if not highlights_are_available:
             log.warning(
-                'Course team enabled highlights and provided no highlights in {}'.format(course.id)
+                f'Course team enabled highlights and provided no highlights in {course.id}'
             )
 
         return highlights_are_available
@@ -110,7 +110,7 @@ def _get_course_with_highlights(course_key):
     course_descriptor = _get_course_descriptor(course_key)
     if not course_descriptor.highlights_enabled_for_messaging:
         raise CourseUpdateDoesNotExist(
-            '{} Course Update Messages are disabled.'.format(course_key)
+            f'{course_key} Course Update Messages are disabled.'
         )
 
     return course_descriptor
@@ -121,7 +121,7 @@ def _get_course_descriptor(course_key):
     course_descriptor = modulestore().get_course(course_key, depth=1)
     if course_descriptor is None:
         raise CourseUpdateDoesNotExist(
-            'Course {} not found.'.format(course_key)
+            f'Course {course_key} not found.'
         )
     return course_descriptor
 
@@ -146,7 +146,7 @@ def _get_course_module(course_descriptor, user):
         user, request, course_descriptor, field_data_cache, course_descriptor.id, course=course_descriptor,
     )
     if not course_module:
-        raise CourseUpdateDoesNotExist('Course module {} not found'.format(course_descriptor.id))
+        raise CourseUpdateDoesNotExist(f'Course module {course_descriptor.id} not found')
     return course_module
 
 
@@ -188,14 +188,14 @@ def _get_highlights_for_next_section(course, start_date, target_date):
             use_next_sections_highlights = True
         elif use_next_sections_highlights and not _section_has_highlights(section):
             raise CourseUpdateDoesNotExist(
-                'Next section [{}] has no highlights for {}'.format(section.display_name, course.id)
+                f'Next section [{section.display_name}] has no highlights for {course.id}'
             )
         elif use_next_sections_highlights:
             return section.highlights, index + 1
 
     if use_next_sections_highlights:
         raise CourseUpdateDoesNotExist(
-            'Last section was reached. There are no more highlights for {}'.format(course.id)
+            f'Last section was reached. There are no more highlights for {course.id}'
         )
 
     return None, None

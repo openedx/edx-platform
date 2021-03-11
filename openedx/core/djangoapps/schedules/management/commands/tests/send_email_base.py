@@ -7,6 +7,7 @@ import datetime
 import logging
 from collections import namedtuple
 from copy import deepcopy
+from unittest.mock import Mock, patch
 
 import attr
 import ddt
@@ -18,9 +19,7 @@ from edx_ace.channel import ChannelMap, ChannelType
 from edx_ace.test_utils import StubPolicy, patch_policies
 from edx_ace.utils.date import serialize
 from freezegun import freeze_time
-from mock import Mock, patch
 from opaque_keys.edx.keys import CourseKey
-from six.moves import range
 
 from common.djangoapps.course_modes.models import CourseMode
 from common.djangoapps.course_modes.tests.factories import CourseModeFactory
@@ -93,7 +92,7 @@ class ScheduleSendEmailTestMixin(FilteredQueryCountMixin):  # lint-amnesty, pyli
     consolidates_emails_for_learner = False
 
     def setUp(self):
-        super(ScheduleSendEmailTestMixin, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
 
         site = SiteFactory.create()
         self.site_config = SiteConfigurationFactory.create(site=site)
@@ -131,7 +130,7 @@ class ScheduleSendEmailTestMixin(FilteredQueryCountMixin):  # lint-amnesty, pyli
 
     def _get_template_overrides(self):
         templates_override = deepcopy(settings.TEMPLATES)
-        templates_override[0]['OPTIONS']['string_if_invalid'] = u"TEMPLATE WARNING - MISSING VARIABLE [%s]"
+        templates_override[0]['OPTIONS']['string_if_invalid'] = "TEMPLATE WARNING - MISSING VARIABLE [%s]"
         return templates_override
 
     def _schedule_factory(self, offset=None, **factory_kwargs):  # lint-amnesty, pylint: disable=missing-function-docstring
@@ -209,7 +208,7 @@ class ScheduleSendEmailTestMixin(FilteredQueryCountMixin):  # lint-amnesty, pyli
             target_day_str = serialize(target_day)
 
             for b in range(self.task.num_bins):
-                LOG.debug(u'Checking bin %d', b)
+                LOG.debug('Checking bin %d', b)
                 expected_queries = NUM_QUERIES_SITE_SCHEDULES
                 if b in bins_in_use:
                     if is_first_match:
@@ -371,7 +370,7 @@ class ScheduleSendEmailTestMixin(FilteredQueryCountMixin):  # lint-amnesty, pyli
         for course_index in range(num_courses):
             self._schedule_factory(
                 enrollment__user=user,
-                enrollment__course__id=CourseKey.from_string('edX/toy/course{}'.format(course_index))
+                enrollment__course__id=CourseKey.from_string(f'edX/toy/course{course_index}')
             )
 
         # 2 queries per course, one for the course opt out and one for the course modes
@@ -405,7 +404,7 @@ class ScheduleSendEmailTestMixin(FilteredQueryCountMixin):  # lint-amnesty, pyli
             self._schedule_factory(
                 offset=offset,
                 enrollment__user=user,
-                enrollment__course__id=CourseKey.from_string('edX/toy/course{}'.format(course_index))
+                enrollment__course__id=CourseKey.from_string(f'edX/toy/course{course_index}')
             )
 
         patch_policies(self, [StubPolicy([ChannelType.PUSH])])

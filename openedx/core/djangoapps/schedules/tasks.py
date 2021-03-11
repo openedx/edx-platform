@@ -2,8 +2,6 @@
 
 import datetime
 import logging
-import six
-from six.moves import range
 
 from celery import shared_task, current_app
 from celery_utils.logged_task import LoggedTask
@@ -60,7 +58,7 @@ def update_course_schedules(self, **kwargs):  # lint-amnesty, pylint: disable=mi
         )
     except Exception as exc:
         if not isinstance(exc, KNOWN_RETRY_ERRORS):
-            LOG.exception(u"Unexpected failure: task id: {}, kwargs={}".format(self.request.id, kwargs))
+            LOG.exception(f"Unexpected failure: task id: {self.request.id}, kwargs={kwargs}")
         raise self.retry(kwargs=kwargs, exc=exc)
 
 
@@ -110,11 +108,11 @@ class BinnedScheduleMessageBaseTask(ScheduleMessageBaseTask):
         current_date = resolvers._get_datetime_beginning_of_day(current_date)  # lint-amnesty, pylint: disable=protected-access
 
         if not cls.is_enqueue_enabled(site):
-            cls.log_info(u'Message queuing disabled for site %s', site.domain)
+            cls.log_info('Message queuing disabled for site %s', site.domain)
             return
 
         target_date = current_date + datetime.timedelta(days=day_offset)
-        cls.log_info(u'Target date = %s', target_date.isoformat())
+        cls.log_info('Target date = %s', target_date.isoformat())
         for bin in range(cls.num_bins):  # lint-amnesty, pylint: disable=redefined-builtin
             task_args = (
                 site.id,
@@ -123,7 +121,7 @@ class BinnedScheduleMessageBaseTask(ScheduleMessageBaseTask):
                 bin,
                 override_recipient_email,
             )
-            cls.log_info(u'Launching task with args = %r', task_args)
+            cls.log_info('Launching task with args = %r', task_args)
             cls.task_instance.apply_async(
                 task_args,
                 retry=False,
@@ -238,10 +236,10 @@ class ScheduleCourseNextSectionUpdate(ScheduleMessageBaseTask):  # lint-amnesty,
         target_datetime = (current_date - datetime.timedelta(days=day_offset))
 
         if not cls.is_enqueue_enabled(site):
-            cls.log_info(u'Message queuing disabled for site %s', site.domain)
+            cls.log_info('Message queuing disabled for site %s', site.domain)
             return
 
-        cls.log_info(u'Target date = %s', target_datetime.date().isoformat())
+        cls.log_info('Target date = %s', target_datetime.date().isoformat())
         for course_key in CourseOverview.get_all_course_keys():
             task_args = (
                 site.id,
@@ -249,7 +247,7 @@ class ScheduleCourseNextSectionUpdate(ScheduleMessageBaseTask):  # lint-amnesty,
                 str(course_key),  # Needs to be a string for celery to properly process
                 override_recipient_email,
             )
-            cls.log_info(u'Launching task with args = %r', task_args)
+            cls.log_info('Launching task with args = %r', task_args)
             cls.task_instance.apply_async(
                 task_args,
                 retry=False,
@@ -280,7 +278,7 @@ def _schedule_send(msg_str, site_id, delivery_config_var, log_prefix):  # lint-a
         user = User.objects.get(username=msg.recipient.username)
         with emulate_http_request(site=site, user=user):
             _annonate_send_task_for_monitoring(msg)
-            LOG.debug(u'%s: Sending message = %s', log_prefix, msg_str)
+            LOG.debug('%s: Sending message = %s', log_prefix, msg_str)
             ace.send(msg)
             _track_message_sent(site, user, msg)
 
@@ -291,8 +289,8 @@ def _track_message_sent(site, user, msg):  # lint-amnesty, pylint: disable=missi
         'app_label': msg.app_label,
         'name': msg.name,
         'language': msg.language,
-        'uuid': six.text_type(msg.uuid),
-        'send_uuid': six.text_type(msg.send_uuid),
+        'uuid': str(msg.uuid),
+        'send_uuid': str(msg.send_uuid),
         'nonInteraction': 1,
     }
     course_ids = msg.context.get('course_ids', [])
@@ -325,12 +323,12 @@ def _is_delivery_enabled(site, delivery_config_var, log_prefix):
     if getattr(ScheduleConfig.current(site), delivery_config_var, False):
         return True
     else:
-        LOG.info(u'%s: Message delivery disabled for site %s', log_prefix, site.domain)
+        LOG.info('%s: Message delivery disabled for site %s', log_prefix, site.domain)
 
 
 def _annotate_for_monitoring(message_type, site, bin_num=None, target_day_str=None, day_offset=None, course_key=None):  # lint-amnesty, pylint: disable=missing-function-docstring
     # This identifies the type of message being sent, for example: schedules.recurring_nudge3.
-    set_custom_attribute('message_name', '{0}.{1}'.format(message_type.app_label, message_type.name))
+    set_custom_attribute('message_name', f'{message_type.app_label}.{message_type.name}')
     # The domain name of the site we are sending the message for.
     set_custom_attribute('site', site.domain)
     # This is the "bin" of data being processed. We divide up the work into chunks so that we don't tie up celery
