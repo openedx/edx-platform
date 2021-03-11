@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 Tests for user authorization password-related functionality.
 """
@@ -6,6 +5,7 @@ import json
 import logging
 import re
 from datetime import datetime, timedelta
+from unittest.mock import Mock, patch
 
 import pytest
 import ddt
@@ -17,7 +17,6 @@ from django.test import TestCase
 from django.test.client import RequestFactory
 from django.urls import reverse
 from freezegun import freeze_time
-from mock import Mock, patch
 from oauth2_provider.models import AccessToken as dot_access_token
 from oauth2_provider.models import RefreshToken as dot_refresh_token
 from pytz import UTC
@@ -38,9 +37,9 @@ class TestRequestPasswordChange(CreateAccountMixin, TestCase):
     """
     Tests for users who request a password change.
     """
-    USERNAME = u'claire-underwood'
-    PASSWORD = u'ṕáśśẃőŕd'
-    EMAIL = u'claire+underwood@example.com'
+    USERNAME = 'claire-underwood'
+    PASSWORD = 'ṕáśśẃőŕd'
+    EMAIL = 'claire+underwood@example.com'
 
     IS_SECURE = False
 
@@ -97,19 +96,19 @@ class TestRequestPasswordChange(CreateAccountMixin, TestCase):
 class TestPasswordChange(CreateAccountMixin, CacheIsolationTestCase):
     """ Tests for views that change the user's password. """
 
-    USERNAME = u"heisenberg"
-    ALTERNATE_USERNAME = u"walt"
-    OLD_PASSWORD = u"ḅḷüëṡḳÿ"
-    NEW_PASSWORD = u"B🄸🄶B🄻🅄🄴"
-    OLD_EMAIL = u"walter@graymattertech.com"
-    NEW_EMAIL = u"walt@savewalterwhite.com"
+    USERNAME = "heisenberg"
+    ALTERNATE_USERNAME = "walt"
+    OLD_PASSWORD = "ḅḷüëṡḳÿ"
+    NEW_PASSWORD = "B🄸🄶B🄻🅄🄴"
+    OLD_EMAIL = "walter@graymattertech.com"
+    NEW_EMAIL = "walt@savewalterwhite.com"
 
-    INVALID_KEY = u"123abc"
+    INVALID_KEY = "123abc"
 
     ENABLED_CACHES = ['default']
 
     def setUp(self):
-        super(TestPasswordChange, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
 
         self.create_account(self.USERNAME, self.OLD_PASSWORD, self.OLD_EMAIL)
         result = self.client.login(username=self.USERNAME, password=self.OLD_PASSWORD)
@@ -204,11 +203,11 @@ class TestPasswordChange(CreateAccountMixin, CacheIsolationTestCase):
         html_body = sent_message.alternatives[0][0]
 
         for email_body in [text_body, html_body]:
-            msg = u'However, there is currently no user account associated with your email address: {email}'.format(
+            msg = 'However, there is currently no user account associated with your email address: {email}'.format(
                 email=bad_email
             )
 
-            assert u'reset for your user account at {}'.format(settings.PLATFORM_NAME) in email_body
+            assert f'reset for your user account at {settings.PLATFORM_NAME}' in email_body
             assert 'password_reset_confirm' not in email_body, 'The link should not be added if user was not found'
             assert msg in email_body
 
@@ -270,7 +269,7 @@ class TestPasswordChange(CreateAccountMixin, CacheIsolationTestCase):
             assert response.status_code == 200
 
             expected_logs = (
-                (LOGGER_NAME, 'INFO', 'Password reset initiated for email {}.'.format(self.NEW_EMAIL)),
+                (LOGGER_NAME, 'INFO', f'Password reset initiated for email {self.NEW_EMAIL}.'),
                 (LOGGER_NAME, 'INFO', 'Invalid password reset attempt')
             )
             logger.check(*expected_logs)

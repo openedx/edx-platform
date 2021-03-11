@@ -2,14 +2,14 @@
 
 
 import re
+import urllib.parse as parse  # pylint: disable=import-error
+from urllib.parse import parse_qs, urlsplit, urlunsplit  # pylint: disable=import-error
 
-import six.moves.urllib.parse as parse  # pylint: disable=import-error
 from django.conf import settings
 from django.contrib.auth import logout
 from django.utils.http import urlencode
 from django.views.generic import TemplateView
 from oauth2_provider.models import Application
-from six.moves.urllib.parse import parse_qs, urlsplit, urlunsplit  # pylint: disable=import-error
 
 from openedx.core.djangoapps.user_authn.cookies import delete_logged_in_cookies
 from openedx.core.djangoapps.user_authn.utils import is_safe_login_or_logout_redirect
@@ -76,7 +76,7 @@ class LogoutView(TemplateView):
 
         logout(request)
 
-        response = super(LogoutView, self).dispatch(request, *args, **kwargs)  # lint-amnesty, pylint: disable=super-with-arguments
+        response = super().dispatch(request, *args, **kwargs)
 
         # Clear the cookie used by the edx.org marketing site
         delete_logged_in_cookies(response)
@@ -123,7 +123,7 @@ class LogoutView(TemplateView):
         return False
 
     def get_context_data(self, **kwargs):
-        context = super(LogoutView, self).get_context_data(**kwargs)  # lint-amnesty, pylint: disable=super-with-arguments
+        context = super().get_context_data(**kwargs)
 
         # Create a list of URIs that must be called to log the user out of all of the IDAs.
         uris = []

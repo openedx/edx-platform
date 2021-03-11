@@ -8,8 +8,8 @@ import json
 import logging
 import hashlib
 import re
+import urllib
 
-import six
 from django.conf import settings
 from django.contrib.auth import authenticate
 from django.contrib.auth import login as django_login
@@ -71,17 +71,17 @@ def _do_third_party_auth(request):
         return pipeline.get_authenticated_user(requested_provider, username, third_party_uid)
     except User.DoesNotExist:
         AUDIT_LOG.info(
-            u"Login failed - user with username {username} has no social auth "
-            u"with backend_name {backend_name}".format(
+            "Login failed - user with username {username} has no social auth "
+            "with backend_name {backend_name}".format(
                 username=username, backend_name=backend_name)
         )
         message = Text(_(
-            u"You've successfully signed in to your {provider_name} account, "
-            u"but this account isn't linked with your {platform_name} account yet. {blank_lines}"
-            u"Use your {platform_name} username and password to sign in to {platform_name} below, "
-            u"and then link your {platform_name} account with {provider_name} from your dashboard. {blank_lines}"
-            u"If you don't have an account on {platform_name} yet, "
-            u"click {register_label_strong} at the top of the page."
+            "You've successfully signed in to your {provider_name} account, "
+            "but this account isn't linked with your {platform_name} account yet. {blank_lines}"
+            "Use your {platform_name} username and password to sign in to {platform_name} below, "
+            "and then link your {platform_name} account with {provider_name} from your dashboard. {blank_lines}"
+            "If you don't have an account on {platform_name} yet, "
+            "click {register_label_strong} at the top of the page."
         )).format(
             blank_lines=HTML('<br/><br/>'),
             platform_name=platform_name,
@@ -149,12 +149,12 @@ def _enforce_password_policy_compliance(request, user):  # lint-amnesty, pylint:
         password_policy_compliance.enforce_compliance_on_login(user, request.POST.get('password'))
     except password_policy_compliance.NonCompliantPasswordWarning as e:
         # Allow login, but warn the user that they will be required to reset their password soon.
-        PageLevelMessages.register_warning_message(request, six.text_type(e))
+        PageLevelMessages.register_warning_message(request, str(e))
     except password_policy_compliance.NonCompliantPasswordException as e:
         AUDIT_LOG.info("Password reset initiated for email %s.", user.email)
         send_password_reset_email_for_user(user, request)
         # Prevent the login attempt.
-        raise AuthFailedError(HTML(six.text_type(e)), error_code=e.__class__.__name__)  # lint-amnesty, pylint: disable=raise-missing-from
+        raise AuthFailedError(HTML(str(e)), error_code=e.__class__.__name__)  # lint-amnesty, pylint: disable=raise-missing-from
 
 
 def _log_and_raise_inactive_user_auth_error(unauthenticated_user):
@@ -309,8 +309,8 @@ def _create_message(site, root_url, allowed_domain):
     through allowed domain SSO provider.
     """
     msg = Text(_(
-        u'As {allowed_domain} user, You must login with your {allowed_domain} '
-        u'{link_start}{provider} account{link_end}.'
+        'As {allowed_domain} user, You must login with your {allowed_domain} '
+        '{link_start}{provider} account{link_end}.'
     )).format(
         allowed_domain=allowed_domain,
         link_start=HTML("<a href='{root_url}{tpa_provider_link}'>").format(
@@ -404,7 +404,7 @@ def enterprise_selection_page(request, user, next_url):
 
         # Check to see if next url has an enterprise in it. In this case if user is associated with
         # that enterprise, activate that enterprise and bypass the selection page.
-        if re.match(ENTERPRISE_ENROLLMENT_URL_REGEX, six.moves.urllib.parse.unquote(next_url)):
+        if re.match(ENTERPRISE_ENROLLMENT_URL_REGEX, urllib.parse.unquote(next_url)):
             enterprise_in_url = re.search(UUID4_REGEX, next_url).group(0)
             for enterprise in response:
                 if enterprise_in_url == str(enterprise['enterprise_customer']['uuid']):
@@ -614,7 +614,7 @@ class LoginSessionView(APIView):
 
     @method_decorator(sensitive_post_parameters("password"))
     def dispatch(self, request, *args, **kwargs):
-        return super(LoginSessionView, self).dispatch(request, *args, **kwargs)  # lint-amnesty, pylint: disable=super-with-arguments
+        return super().dispatch(request, *args, **kwargs)
 
 
 def _parse_analytics_param_for_course_id(request):
@@ -642,7 +642,7 @@ def _parse_analytics_param_for_course_id(request):
         except (ValueError, TypeError):
             set_custom_attribute('shim_analytics_course_id', 'parse-error')
             log.error(
-                u"Could not parse analytics object sent to user API: {analytics}".format(
+                "Could not parse analytics object sent to user API: {analytics}".format(
                     analytics=analytics
                 )
             )

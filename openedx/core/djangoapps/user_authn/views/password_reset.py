@@ -85,16 +85,16 @@ def get_password_reset_form():
 
     # Translators: This label appears above a field on the password reset
     # form meant to hold the user's email address.
-    email_label = _(u"Email")
+    email_label = _("Email")
 
     # Translators: This example email address is used as a placeholder in
     # a field on the password reset form meant to hold the user's email address.
-    email_placeholder = _(u"username@domain.com")
+    email_placeholder = _("username@domain.com")
 
     # Translators: These instructions appear on the password reset form,
     # immediately below a field meant to hold the user's email address.
     # pylint: disable=no-member
-    email_instructions = _(u"The email address you used to register with {platform_name}").format(
+    email_instructions = _("The email address you used to register with {platform_name}").format(
         platform_name=configuration_helpers.get_value('PLATFORM_NAME', settings.PLATFORM_NAME)
     )
 
@@ -124,7 +124,7 @@ def send_password_reset_success_email(user, request):
     message_context, user_language_preference = get_user_default_email_params(user)
     lms_root_url = configuration_helpers.get_value('LMS_ROOT_URL', settings.LMS_ROOT_URL)
     message_context.update(
-        {'login_link': '{}/login'.format(lms_root_url), 'request': request, }
+        {'login_link': f'{lms_root_url}/login', 'request': request, }
     )
 
     msg = PasswordResetSuccess(context=message_context).personalize(
@@ -392,8 +392,7 @@ class PasswordResetConfirmWrapper(PasswordResetConfirmView):
         except (ValueError, User.DoesNotExist):
             # if there's any error getting a user, just let django's
             # password_reset_confirm function handle it.
-            return super(PasswordResetConfirmWrapper, self).dispatch(request, uidb64=self.uidb64, token=self.token,  # lint-amnesty, pylint: disable=super-with-arguments
-                                                                     extra_context=self.platform_name)
+            return super().dispatch(request, uidb64=self.uidb64, token=self.token, extra_context=self.platform_name)
 
     def _handle_retired_user(self, request):
         """
@@ -430,8 +429,8 @@ class PasswordResetConfirmWrapper(PasswordResetConfirmView):
         form_valid = response.context_data['form'].is_valid() if response.context_data['form'] else False
         if not form_valid:
             log.warning(
-                u'Unable to reset password for user [%s] because form is not valid. '
-                u'A possible cause is that the user had an invalid reset token',
+                'Unable to reset password for user [%s] because form is not valid. '
+                'A possible cause is that the user had an invalid reset token',
                 self.user.username,
             )
             response.context_data['err_msg'] = _('Error in resetting your password. Please try again.')
@@ -459,8 +458,8 @@ class PasswordResetConfirmWrapper(PasswordResetConfirmView):
         messages.success(
             request,
             HTML(_(
-                u'{html_start}Password Creation Complete{html_end}'
-                u'Your password has been created. {bold_start}{email}{bold_end} is now your primary login email.'
+                '{html_start}Password Creation Complete{html_end}'
+                'Your password has been created. {bold_start}{email}{bold_end} is now your primary login email.'
             )).format(
                 support_url=configuration_helpers.get_value('SUPPORT_SITE_LINK', settings.SUPPORT_SITE_LINK),
                 html_start=HTML('<p class="message-title">'),
@@ -532,7 +531,7 @@ class PasswordResetConfirmWrapper(PasswordResetConfirmView):
             self.token = self._get_token_from_session(self.request)
             return self.post(self.request, *args, **kwargs)
         else:
-            response = super(PasswordResetConfirmWrapper, self).dispatch(  # lint-amnesty, pylint: disable=super-with-arguments
+            response = super().dispatch(
                 self.request,
                 uidb64=self.uidb64,
                 token=self.token,
@@ -634,7 +633,7 @@ def password_change_request_handler(request):
                 )
                 ace.send(msg)
         except errors.UserAPIInternalError as err:
-            log.exception(u'Error occured during password change for user {email}: {error}'
+            log.exception('Error occured during password change for user {email}: {error}'
                           .format(email=email, error=err))
             return HttpResponse(_("Some error occured during password change. Please try again"), status=500)
 

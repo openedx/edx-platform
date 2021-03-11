@@ -3,8 +3,8 @@
 
 import json
 import logging
+import urllib
 
-import six
 from django.conf import settings
 from django.contrib import messages
 from django.shortcuts import redirect
@@ -115,7 +115,7 @@ def get_login_session_form(request):
 
     # Translators: This label appears above a field on the login form
     # meant to hold the user's password.
-    password_label = _(u"Password")
+    password_label = _("Password")
 
     form_desc.add_field(
         "password",
@@ -166,7 +166,7 @@ def login_and_registration_form(request, initial_mode="login"):
     third_party_auth_hint = None
     if '?' in redirect_to:  # lint-amnesty, pylint: disable=too-many-nested-blocks
         try:
-            next_args = six.moves.urllib.parse.parse_qs(six.moves.urllib.parse.urlparse(redirect_to).query)
+            next_args = urllib.parse.parse_qs(urllib.parse.urlparse(redirect_to).query)
             if 'tpa_hint' in next_args:
                 provider_id = next_args['tpa_hint'][0]
                 tpa_hint_provider = third_party_auth.provider.Registry.get(provider_id=provider_id)
@@ -184,7 +184,7 @@ def login_and_registration_form(request, initial_mode="login"):
                     third_party_auth_hint = provider_id
                     initial_mode = "hinted_login"
         except (KeyError, ValueError, IndexError) as ex:
-            log.exception(u"Unknown tpa_hint provider: %s", ex)
+            log.exception("Unknown tpa_hint provider: %s", ex)
 
     # Redirect to authn MFE if it is enabled or user is not an enterprise user or not coming from a SAML IDP.
     saml_provider = False
