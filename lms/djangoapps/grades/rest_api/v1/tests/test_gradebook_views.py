@@ -5,6 +5,7 @@ Tests for the course grading API view
 
 import json
 from collections import OrderedDict, namedtuple
+from contextlib import contextmanager
 from datetime import datetime
 from unittest.mock import MagicMock, patch
 
@@ -19,6 +20,13 @@ from rest_framework import status
 from rest_framework.test import APITestCase
 
 from common.djangoapps.course_modes.models import CourseMode
+from common.djangoapps.student.roles import (
+    CourseBetaTesterRole,
+    CourseCcxCoachRole,
+    CourseDataResearcherRole,
+    CourseInstructorRole,
+    CourseStaffRole
+)
 from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
 from lms.djangoapps.certificates.models import CertificateStatuses, GeneratedCertificate
 from lms.djangoapps.courseware.tests.factories import InstructorFactory, StaffFactory
@@ -1279,6 +1287,102 @@ class GradebookViewTest(GradebookViewTestBase):
                 assert expected_results == actual_data['results']
                 assert actual_data['total_users_count'] == num_enrollments
                 assert actual_data['filtered_users_count'] == num_enrollments
+
+    @contextmanager
+    def _mock_all_course_grade_reads(self, percent=0.9):
+        """
+        A context manager for mocking CourseGradeFactory.read and returning the same grade for all learners.
+        """
+        # pylint: disable=unused-argument
+        def fake_course_grade_read(*args, **kwargs):
+            return self.mock_course_grade(kwargs['user'], passed=True, percent=percent)
+
+        with patch('lms.djangoapps.grades.course_grade_factory.CourseGradeFactory.read') as mock_read:
+            mock_read.side_effect = fake_course_grade_read
+            yield
+
+    def _assert_usernames(self, response, expected_usernames):
+        """ Helper method to assert that the expected users were returned from the endpoint """
+        assert status.HTTP_200_OK == response.status_code
+        response_data = dict(response.data)
+        actual_usernames = [row['username'] for row in response_data['results']]
+        assert set(actual_usernames) == set(expected_usernames)
+
+    def test_users_with_course_roles(self):
+        """ Test that a staff member erolled in the course will be included in grade results. """
+        # This function creates and enrolls a course staff (not global staff) user
+        staff_user = self.login_course_staff()
+        with override_waffle_flag(self.waffle_flag, active=True):
+            with self._mock_all_course_grade_reads():
+                response = self.client.get(self.get_url(course_key=self.course.id))
+        self._assert_usernames(response, [
+            self.student.username,
+            self.other_student.username,
+            self.program_student.username,
+            self.program_masters_student.username,
+            staff_user.username,
+        ])
+
+    @ddt.data(
+        None,
+        [],
+        ['all'],
+        [CourseInstructorRole.ROLE, CourseBetaTesterRole.ROLE, CourseCcxCoachRole.ROLE],
+        [CourseInstructorRole.ROLE, 'all'],
+        [CourseBetaTesterRole.ROLE, 'nonexistant-role'],
+        [
+            CourseInstructorRole.ROLE,
+            CourseStaffRole.ROLE,
+            CourseBetaTesterRole.ROLE,
+            CourseCcxCoachRole.ROLE,
+            CourseDataResearcherRole.ROLE
+        ],
+    )
+    def test_filter_course_roles(self, excluded_course_roles):
+        """ Test that excluded_course_roles=all filters out any user with a course role """
+        # Create test users, enroll them in the course, and give them roles.
+        role_user_usernames = dict()
+        course_roles_to_create = [
+            CourseInstructorRole,
+            CourseStaffRole,
+            CourseBetaTesterRole,
+            CourseCcxCoachRole,
+            CourseDataResearcherRole,
+        ]
+        for role in course_roles_to_create:
+            user = UserFactory.create(username="test_filter_course_roles__" + role.ROLE)
+            role(self.course.id).add_users(user)
+            self._create_user_enrollments(user)
+            role_user_usernames[role.ROLE] = user.username
+
+        # This will create global staff and not enroll them in the course
+        self.login_staff()
+        with self._mock_all_course_grade_reads():
+            with override_waffle_flag(self.waffle_flag, active=True):
+                response = self.client.get(
+                    self.get_url(course_key=self.course.id),
+                    {'excluded_course_roles': excluded_course_roles} if excluded_course_roles is not None else {}
+                )
+
+        expected_usernames = [
+            self.student.username,
+            self.other_student.username,
+            self.program_student.username,
+            self.program_masters_student.username,
+        ]
+        if not excluded_course_roles:
+            # Don't filter out any course roles
+            expected_usernames += list(role_user_usernames.values())
+        elif 'all' in excluded_course_roles:
+            # Filter out every course role
+            pass
+        else:
+            # Filter out some number of course roles
+            for role, username in role_user_usernames.items():
+                if role not in excluded_course_roles:
+                    expected_usernames.append(username)
+
+        self._assert_usernames(response, expected_usernames)
 
 
 @ddt.ddt

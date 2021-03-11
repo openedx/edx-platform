@@ -618,6 +618,17 @@ class GradebookView(GradeViewMixin, PaginatedAPIView):
                 q_object |= Q(course_grade_in_range=True)
 
                 q_objects.append(q_object)
+            if request.GET.get('excluded_course_roles'):
+                excluded_course_roles = request.GET.getlist('excluded_course_roles')
+                if 'all' in excluded_course_roles:
+                    q_objects.append(~Q(user__courseaccessrole__course_id=course_key))
+                else:
+                    q_objects.append(
+                        ~Q(
+                            user__courseaccessrole__course_id=course_key,
+                            user__courseaccessrole__role__in=excluded_course_roles
+                        )
+                    )
 
             entries = []
             related_models = ['user']
