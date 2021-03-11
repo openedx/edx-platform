@@ -15,7 +15,7 @@ class SiteConfigurationAdmin(admin.ModelAdmin):
     list_display = ('site', 'enabled', 'site_values')
     search_fields = ('site__domain', 'site_values')
 
-    class Meta(object):
+    class Meta:
         """
         Meta class for SiteConfiguration admin model
         """
@@ -33,7 +33,7 @@ class SiteConfigurationHistoryAdmin(admin.ModelAdmin):
 
     ordering = ['-created']
 
-    class Meta(object):
+    class Meta:
         """
         Meta class for SiteConfigurationHistory admin model
         """

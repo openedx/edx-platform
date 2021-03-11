@@ -22,7 +22,7 @@ class CreateOrUpdateSiteConfigurationTest(TestCase):
     command = 'create_or_update_site_configuration'
 
     def setUp(self):
-        super(CreateOrUpdateSiteConfigurationTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.site_id = 1
         self.site_id_arg = ['--site-id', str(self.site_id)]
         self.json_file_path = Path(__file__).parent / "fixtures/config1.json"
@@ -123,7 +123,7 @@ class CreateOrUpdateSiteConfigurationTest(TestCase):
         Verify that the SiteConfiguration instance is enabled/disabled as per the flag used.
         """
         self.assert_site_configuration_does_not_exist()
-        call_command(self.command, '--{}'.format(flag), *self.site_id_arg)
+        call_command(self.command, f'--{flag}', *self.site_id_arg)
         site_configuration = SiteConfiguration.objects.get(site=self.site)
         assert not site_configuration.site_values
         assert enabled == site_configuration.enabled
