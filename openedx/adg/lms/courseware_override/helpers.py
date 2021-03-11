@@ -6,7 +6,7 @@ from django.utils.translation import get_language_info
 from common.djangoapps.student.models import CourseEnrollment
 from common.djangoapps.student.roles import CourseInstructorRole
 from lms.djangoapps.courseware.courses import get_courses as get_courses_core
-from openedx.adg.lms.applications.models import MultilingualCourseGroup
+from openedx.adg.lms.applications.models import MultilingualCourse, MultilingualCourseGroup
 from openedx.adg.lms.utils.env_utils import is_testing_environment
 from openedx.core.djangoapps.user_api.accounts.image_helpers import get_profile_image_urls_for_user
 
@@ -75,10 +75,14 @@ def get_extra_course_about_context(request, course):
     if is_testing_environment():
         return {}
 
-    course_group_courses = course.multilingual_course.multilingual_course_group.multilingual_courses
-    course_language_codes = course_group_courses.open_multilingual_courses().language_codes_with_course_ids()
+    course_language_names = []
 
-    course_language_names = get_language_names_from_codes(course_language_codes)
+    multilingual_course = MultilingualCourse.objects.all().multilingual_course_with_course_id(course.id)
+    if multilingual_course:
+        course_group_courses = multilingual_course.multilingual_course_group.multilingual_courses
+        course_language_codes = course_group_courses.open_multilingual_courses().language_codes_with_course_ids()
+        course_language_names = get_language_names_from_codes(course_language_codes)
+
     course_instructors = get_course_instructors(course.id, request=request)
     course_enrollment_count = CourseEnrollment.objects.enrollment_counts(course.id).get('total')
 
