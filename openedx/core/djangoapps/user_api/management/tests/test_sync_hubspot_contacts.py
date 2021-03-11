@@ -5,13 +5,12 @@ Test the sync_hubspot_contacts management command
 
 import json
 from datetime import timedelta
+from io import StringIO
+from unittest.mock import patch
 
 from django.core.management import call_command
 from django.test import TestCase
 from django.utils import timezone
-from django.utils.six import StringIO
-from mock import patch
-from six.moves import range
 
 from openedx.core.djangoapps.site_configuration.tests.factories import SiteConfigurationFactory
 from openedx.core.djangoapps.user_api.management.commands.sync_hubspot_contacts import Command as sync_command
@@ -28,7 +27,7 @@ class TestHubspotSyncCommand(TestCase):
 
     @classmethod
     def setUpClass(cls):
-        super(TestHubspotSyncCommand, cls).setUpClass()
+        super().setUpClass()
         cls.site_config = SiteConfigurationFactory()
         cls.hubspot_site_config = SiteConfigurationFactory.create(
             site_values={'HUBSPOT_API_KEY': 'test_key'}
@@ -42,11 +41,11 @@ class TestHubspotSyncCommand(TestCase):
         # Create some test users
         for i in range(1, 20):
             profile_meta = {
-                "first_name": "First Name{0}".format(i),
-                "last_name": "Last Name{0}".format(i),
-                "company": "Company{0}".format(i),
-                "title": "Title{0}".format(i),
-                "state": "State{0}".format(i),
+                "first_name": f"First Name{i}",
+                "last_name": f"Last Name{i}",
+                "company": f"Company{i}",
+                "title": f"Title{i}",
+                "state": f"State{i}",
                 "country": "US",
             }
             loe = UserProfile.LEVEL_OF_EDUCATION_CHOICES[0][0]

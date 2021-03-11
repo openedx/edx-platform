@@ -33,9 +33,6 @@ from django.core.management.base import BaseCommand, CommandError
 from django.db import connections
 from django.utils import timezone
 from opaque_keys.edx.keys import CourseKey  # lint-amnesty, pylint: disable=unused-import
-import six
-from six import text_type
-from six.moves import range
 
 from xmodule.modulestore.django import modulestore
 
@@ -88,7 +85,7 @@ class Command(BaseCommand):
     QUERY_INTERVAL = 1000
 
     # Default datetime if the user has not set a preference
-    DEFAULT_DATETIME_STR = datetime.datetime(year=2014, month=12, day=1).isoformat(str(' '))
+    DEFAULT_DATETIME_STR = datetime.datetime(year=2014, month=12, day=1).isoformat(' ')
 
     def handle(self, *args, **options):
         """
@@ -109,7 +106,7 @@ class Command(BaseCommand):
         org_list = options['org_list']
 
         if os.path.exists(file_path):
-            raise CommandError("File already exists at '{path}'".format(path=file_path))
+            raise CommandError(f"File already exists at '{file_path}'")
 
         only_courses = options.get("courses")
 
@@ -120,7 +117,7 @@ class Command(BaseCommand):
             courses = self._get_courses_for_org(org_list)
 
             # Add in organizations from the course keys, to ensure we're including orgs with different capitalizations
-            org_list = list(set(org_list) | set(course.org for course in courses))
+            org_list = list(set(org_list) | {course.org for course in courses})
         else:
             courses = list(set(only_courses.split(",")))
 
@@ -135,7 +132,7 @@ class Command(BaseCommand):
         # Let the user know what's about to happen
         LOGGER.info(
             "Retrieving data for courses: {courses}".format(
-                courses=", ".join([text_type(course) for course in courses])
+                courses=", ".join([str(course) for course in courses])
             )
         )
 
@@ -148,7 +145,7 @@ class Command(BaseCommand):
                     self._write_email_opt_in_prefs(file_handle, org_list, course_group)
 
         # Remind the user where the output file is
-        LOGGER.info("Output file: {file_path}".format(file_path=file_path))
+        LOGGER.info(f"Output file: {file_path}")
 
     def _get_courses_for_org(self, org_aliases):
         """
@@ -176,7 +173,7 @@ class Command(BaseCommand):
         start_time = time.time()
         yield
         execution_time = time.time() - start_time
-        LOGGER.info("Execution time: {time} seconds".format(time=execution_time))
+        LOGGER.info(f"Execution time: {execution_time} seconds")
 
     def _write_email_opt_in_prefs(self, file_handle, org_aliases, courses):
         """
@@ -254,19 +251,19 @@ class Command(BaseCommand):
             # Only encode to utf-8 in python2 because python3's csv writer can handle unicode.
             writer.writerow({
                 "user_id": user_id,
-                "username": username.encode('utf-8') if six.PY2 else username,
-                "email": email.encode('utf-8') if six.PY2 else email,
+                "username": username,
+                "email": email,
                 # There should not be a case where users are without full_names. We only need this safe check because
                 # of ECOM-1995.
-                "full_name": full_name.encode('utf-8') if six.PY2 else full_name,
-                "course_id": course_id.encode('utf-8') if six.PY2 else course_id,
+                "full_name": full_name,
+                "course_id": course_id,
                 "is_opted_in_for_email": is_opted_in if is_opted_in else "True",
                 "preference_set_datetime": pref_set_datetime,
             })
             row_count += 1
 
         # Log the number of rows we processed
-        LOGGER.info("Retrieved {num_rows} records for orgs {org}.".format(num_rows=row_count, org=org_aliases))
+        LOGGER.info(f"Retrieved {row_count} records for orgs {org_aliases}.")
 
     def _iterate_results(self, cursor):
         """
@@ -282,14 +279,13 @@ class Command(BaseCommand):
             rows = cursor.fetchmany(self.QUERY_INTERVAL)
             if not rows:
                 break
-            for row in rows:
-                yield row
+            yield from rows
 
     def _sql_list(self, values):
         """
         Serialize a list of values for including in a SQL "IN" statement.
         """
-        return ",".join(['"{}"'.format(val) for val in values])
+        return ",".join([f'"{val}"' for val in values])
 
     def _db_cursor(self):
         """

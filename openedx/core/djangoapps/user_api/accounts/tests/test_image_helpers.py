@@ -5,14 +5,13 @@ Tests for helpers.py
 
 import datetime
 import hashlib
+from unittest.mock import patch
 
 from django.test import TestCase
-from mock import patch
 from pytz import UTC
 
 from openedx.core.djangolib.testing.utils import skip_unless_lms
 from common.djangoapps.student.tests.factories import UserFactory
-from six import text_type  # lint-amnesty, pylint: disable=wrong-import-order
 
 from ..image_helpers import get_profile_image_urls_for_user
 
@@ -28,7 +27,7 @@ class ProfileImageUrlTestCase(TestCase):
     """
 
     def setUp(self):
-        super(ProfileImageUrlTestCase, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.user = UserFactory()
         # Ensure that parental controls don't apply to this user
         self.user.profile.year_of_birth = 1980
@@ -46,7 +45,7 @@ class ProfileImageUrlTestCase(TestCase):
         """
         Verify correct url structure for a default profile image.
         """
-        assert actual_url == '/static/default_{size}.png'.format(size=expected_pixels)
+        assert actual_url == f'/static/default_{expected_pixels}.png'
 
     def verify_urls(self, actual_urls, expected_name, is_default=False):
         """
@@ -68,7 +67,7 @@ class ProfileImageUrlTestCase(TestCase):
         self.user.profile.profile_image_uploaded_at = TEST_PROFILE_IMAGE_UPLOAD_DT
         self.user.profile.save()  # lint-amnesty, pylint: disable=no-member
         expected_name = hashlib.md5((
-            'secret' + text_type(self.user.username)).encode('utf-8')).hexdigest()
+            'secret' + str(self.user.username)).encode('utf-8')).hexdigest()
         actual_urls = get_profile_image_urls_for_user(self.user)
         self.verify_urls(actual_urls, expected_name, is_default=False)
 

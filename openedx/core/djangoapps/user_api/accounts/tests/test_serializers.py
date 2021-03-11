@@ -18,7 +18,7 @@ LOGGER_NAME = "openedx.core.djangoapps.user_api.accounts.serializers"
 
 class UserReadOnlySerializerTest(TestCase):  # lint-amnesty, pylint: disable=missing-class-docstring
     def setUp(self):
-        super(UserReadOnlySerializerTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         request_factory = RequestFactory()
         self.request = request_factory.get('/api/user/v1/accounts/')
         self.user = UserFactory.build(username='test_user', email='test_user@test.com')
