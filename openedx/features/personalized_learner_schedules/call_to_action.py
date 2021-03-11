@@ -153,7 +153,7 @@ class PersonalizedLearnerScheduleCallToAction:
                 },
                 'research_event_data': {
                     'block_id': str(xblock.location),
-                    'location': '{category}-view'.format(category=xblock.category),
+                    'location': f'{xblock.category}-view',
                 },
             }
 
