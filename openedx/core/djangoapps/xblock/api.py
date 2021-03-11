@@ -16,7 +16,6 @@ from django.utils.translation import ugettext as _
 from opaque_keys.edx.keys import UsageKeyV2
 from opaque_keys.edx.locator import BundleDefinitionLocator
 from rest_framework.exceptions import NotFound
-import six
 from xblock.core import XBlock
 from xblock.exceptions import NoSuchViewError
 
@@ -48,7 +47,7 @@ def get_runtime_system():
     # and XBlock field data in general [does not distinguish between setting initial values during parsing and changing
     # values at runtime due to user interaction], and how it interacts with BlockstoreFieldData. Keeping the caches
     # local to each thread completely avoids this problem.)
-    cache_name = '_system_{}'.format(threading.get_ident())
+    cache_name = f'_system_{threading.get_ident()}'
     if not hasattr(get_runtime_system, cache_name):
         params = dict(
             handler_url=get_handler_url,
@@ -77,7 +76,7 @@ def load_block(usage_key, user):
     if user is not None and not context_impl.can_view_block(user, usage_key):
         # We do not know if the block was not found or if the user doesn't have
         # permission, but we want to return the same result in either case:
-        raise NotFound("XBlock {} does not exist, or you don't have permission to view it.".format(usage_key))
+        raise NotFound(f"XBlock {usage_key} does not exist, or you don't have permission to view it.")
 
     # TODO: load field overrides from the context
     # e.g. a course might specify that all 'problem' XBlocks have 'max_attempts'
@@ -106,7 +105,7 @@ def get_block_metadata(block, includes=()):
             children in other bundles.
     """
     data = {
-        "block_id": six.text_type(block.scope_ids.usage_id),
+        "block_id": str(block.scope_ids.usage_id),
         "block_type": block.scope_ids.block_type,
         "display_name": get_block_display_name(block),
     }
@@ -174,7 +173,7 @@ def get_block_display_name(block_or_key):
     def_key = resolve_definition(block_or_key)
     use_draft = get_xblock_app_config().get_learning_context_params().get('use_draft')
     cache = BundleCache(def_key.bundle_uuid, draft_name=use_draft)
-    cache_key = ('block_display_name', six.text_type(def_key))
+    cache_key = ('block_display_name', str(def_key))
     display_name = cache.get(cache_key)
     if display_name is None:
         # Instead of loading the block, just load its XML and parse it
@@ -236,7 +235,7 @@ def get_handler_url(usage_key, handler_name, user):
 
     This view does not check/care if the XBlock actually exists.
     """
-    usage_key_str = six.text_type(usage_key)
+    usage_key_str = str(usage_key)
     site_root_url = get_xblock_app_config().get_site_root_url()
     if not user:  # lint-amnesty, pylint: disable=no-else-raise
         raise TypeError("Cannot get handler URLs without specifying a specific user ID.")
