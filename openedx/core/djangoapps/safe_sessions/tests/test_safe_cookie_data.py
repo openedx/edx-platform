@@ -6,12 +6,11 @@ Unit tests for SafeCookieData
 
 import itertools
 from time import time
+from unittest.mock import patch
+
 import pytest
 import ddt
-import six
 from django.test import TestCase
-from mock import patch
-from six.moves import range  # pylint: disable=ungrouped-imports
 
 from ..middleware import SafeCookieData, SafeCookieError
 from .test_utils import TestSafeSessionsLogMixin
@@ -24,7 +23,7 @@ class TestSafeCookieData(TestSafeSessionsLogMixin, TestCase):
     """
 
     def setUp(self):
-        super(TestSafeCookieData, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.session_id = 'test_session_id'
         self.user_id = 'test_user_id'
         self.safe_cookie_data = SafeCookieData.create(self.session_id, self.user_id)
@@ -51,7 +50,7 @@ class TestSafeCookieData(TestSafeSessionsLogMixin, TestCase):
         assert safe_cookie_data_1.verify(user_id)
 
         # serialize
-        serialized_value = six.text_type(safe_cookie_data_1)
+        serialized_value = str(safe_cookie_data_1)
 
         # parse and verify
         safe_cookie_data_2 = SafeCookieData.parse(serialized_value)
@@ -64,9 +63,9 @@ class TestSafeCookieData(TestSafeSessionsLogMixin, TestCase):
         assert self.safe_cookie_data.version == SafeCookieData.CURRENT_VERSION
 
     def test_serialize(self):
-        serialized_value = six.text_type(self.safe_cookie_data)
-        for field_value in six.itervalues(self.safe_cookie_data.__dict__):
-            assert six.text_type(field_value) in serialized_value
+        serialized_value = str(self.safe_cookie_data)
+        for field_value in self.safe_cookie_data.__dict__.values():
+            assert str(field_value) in serialized_value
 
     #---- Test Parse ----#
 
@@ -78,7 +77,7 @@ class TestSafeCookieData(TestSafeSessionsLogMixin, TestCase):
         )
 
     def test_parse_success_serialized(self):
-        serialized_value = six.text_type(self.safe_cookie_data)
+        serialized_value = str(self.safe_cookie_data)
         self.assert_cookie_data_equal(
             SafeCookieData.parse(serialized_value),
             self.safe_cookie_data,
@@ -92,7 +91,7 @@ class TestSafeCookieData(TestSafeSessionsLogMixin, TestCase):
 
     @ddt.data(0, 2, -1, 'invalid_version')
     def test_parse_invalid_version(self, version):
-        serialized_value = '{}|session_id|key_salt|signature'.format(version)
+        serialized_value = f'{version}|session_id|key_salt|signature'
         with self.assert_logged(r"SafeCookieData version .* is not supported."):
             with pytest.raises(SafeCookieError):
                 SafeCookieData.parse(serialized_value)

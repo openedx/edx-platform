@@ -366,7 +366,7 @@ def award_course_certificate(self, username, course_run_key, certificate_availab
         if certificate.mode in CourseMode.CERTIFICATE_RELEVANT_MODES:
             try:
                 course_overview = CourseOverview.get_from_id(course_key)
-            except (CourseOverview.DoesNotExist, IOError):
+            except (CourseOverview.DoesNotExist, OSError):
                 LOGGER.exception(
                     f"Task award_course_certificate was called without course overview data for course {course_key}"
                 )

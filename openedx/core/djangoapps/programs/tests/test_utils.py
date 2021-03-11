@@ -6,12 +6,10 @@ import json
 import uuid
 from collections import namedtuple
 from copy import deepcopy
+from unittest import mock
 
 import ddt
 import httpretty
-import mock
-import six
-from six.moves import range
 from django.conf import settings
 from django.test import TestCase
 from django.test.utils import override_settings
@@ -69,7 +67,7 @@ class TestProgramProgressMeter(TestCase):
     """Tests of the program progress utility class."""
 
     def setUp(self):
-        super(TestProgramProgressMeter, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
 
         self.user = UserFactory()
         self.site = SiteFactory()
@@ -651,8 +649,7 @@ class TestProgramProgressMeter(TestCase):
         self._create_certificates(unknown['key'], status='unknown')
 
         meter = ProgramProgressMeter(self.site, self.user)
-        six.assertCountEqual(
-            self,
+        self.assertCountEqual(
             meter.completed_course_runs,
             [
                 {'course_run_id': downloadable['key'], 'type': CourseMode.VERIFIED},
@@ -725,7 +722,7 @@ class TestProgramProgressMeter(TestCase):
         program_data = meter.engaged_programs[0]
         detail_fragment_url = reverse('program_details_fragment_view', kwargs={'program_uuid': program_data['uuid']})
         path_id = detail_fragment_url.replace('/dashboard/', '')
-        expected_url = 'edxapp://enrolled_program_info?path_id={}'.format(path_id)
+        expected_url = f'edxapp://enrolled_program_info?path_id={path_id}'
 
         assert program_data['detail_url'] == expected_url
 
@@ -746,7 +743,7 @@ def _create_course(self, course_price, course_run_count=1, make_entitlement=Fals
         course.instructor_info = self.instructors
         course = self.update_course(course, self.user.id)
 
-        run = CourseRunFactory(key=six.text_type(course.id), seats=[SeatFactory(price=course_price)])
+        run = CourseRunFactory(key=str(course.id), seats=[SeatFactory(price=course_price)])
         course_runs.append(run)
     entitlements = [EntitlementFactory()] if make_entitlement else []
 
@@ -775,14 +772,14 @@ class TestProgramDataExtender(ModuleStoreTestCase):
     }
 
     def setUp(self):
-        super(TestProgramDataExtender, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
 
         self.course = ModuleStoreCourseFactory()
         self.course.start = datetime.datetime.now(utc) - datetime.timedelta(days=1)
         self.course.end = datetime.datetime.now(utc) + datetime.timedelta(days=1)
         self.course = self.update_course(self.course, self.user.id)
 
-        self.course_run = CourseRunFactory(key=six.text_type(self.course.id))
+        self.course_run = CourseRunFactory(key=str(self.course.id))
         self.catalog_course = CourseFactory(course_runs=[self.course_run])
         self.program = ProgramFactory(courses=[self.catalog_course])
         self.course_price = 100
@@ -1081,7 +1078,7 @@ class TestProgramDataExtender(ModuleStoreTestCase):
         """
         course1 = _create_course(self, self.course_price, course_run_count=2, make_entitlement=True)
         course2 = _create_course(self, self.course_price, course_run_count=2, make_entitlement=True)
-        expected_skus = set([course1['entitlements'][0]['sku'], course2['entitlements'][0]['sku']])
+        expected_skus = {course1['entitlements'][0]['sku'], course2['entitlements'][0]['sku']}
         program = ProgramFactory(
             courses=[course1, course2],
             is_program_eligible_for_one_click_purchase=True,
@@ -1114,7 +1111,7 @@ class TestProgramDataExtender(ModuleStoreTestCase):
         course1 = _create_course(self, self.course_price, course_run_count=2, make_entitlement=True)
         course2 = _create_course(self, self.course_price, course_run_count=2, make_entitlement=True)
         CourseEntitlementFactory(user=self.user, course_uuid=course1['uuid'], mode=CourseMode.VERIFIED)
-        expected_skus = set([course2['entitlements'][0]['sku']])
+        expected_skus = {course2['entitlements'][0]['sku']}
         program = ProgramFactory(
             courses=[course1, course2],
             is_program_eligible_for_one_click_purchase=True,
@@ -1155,7 +1152,7 @@ class TestProgramDataExtender(ModuleStoreTestCase):
             ProgramDataExtender(program_data, self.user).extend()
             logger.check(
                 (LOGGER_NAME,
-                 'WARNING', u'Failed to get course overview for course run key: {}'.format(course_run.get('key')))
+                 'WARNING', 'Failed to get course overview for course run key: {}'.format(course_run.get('key')))
             )
 
     def test_entitlement_product_wrong_mode(self):
@@ -1185,7 +1182,7 @@ class TestProgramDataExtender(ModuleStoreTestCase):
         # The above statement makes a verified entitlement for the course, which is an applicable seat type
         # and the statement below makes a professional entitlement for the same course, which is not applicable
         course2['entitlements'].append(EntitlementFactory(mode=CourseMode.PROFESSIONAL))
-        expected_skus = set([course1['course_runs'][0]['seats'][0]['sku'], course2['entitlements'][0]['sku']])
+        expected_skus = {course1['course_runs'][0]['seats'][0]['sku'], course2['entitlements'][0]['sku']}
         program = ProgramFactory(
             courses=[course1, course2],
             is_program_eligible_for_one_click_purchase=True,
@@ -1202,7 +1199,7 @@ class TestProgramDataExtender(ModuleStoreTestCase):
         """
         course1 = _create_course(self, self.course_price, make_entitlement=True)
         course2 = _create_course(self, self.course_price)
-        expected_skus = set([course2['course_runs'][0]['seats'][0]['sku']])
+        expected_skus = {course2['course_runs'][0]['seats'][0]['sku']}
         CourseEnrollmentFactory(user=self.user, course_id=course1['course_runs'][0]['key'], mode=CourseMode.VERIFIED)
         program = ProgramFactory(
             courses=[course1, course2],
@@ -1221,7 +1218,7 @@ class TestProgramDataExtender(ModuleStoreTestCase):
         course1 = _create_course(self, self.course_price, course_run_count=2)
         course2 = _create_course(self, self.course_price, course_run_count=2, make_entitlement=True)
         CourseEnrollmentFactory(user=self.user, course_id=course1['course_runs'][0]['key'], mode=CourseMode.VERIFIED)
-        expected_skus = set([course2['entitlements'][0]['sku']])
+        expected_skus = {course2['entitlements'][0]['sku']}
         program = ProgramFactory(
             courses=[course1, course2],
             is_program_eligible_for_one_click_purchase=True,
@@ -1236,7 +1233,7 @@ class TestProgramDataExtender(ModuleStoreTestCase):
         Verify that correct course url is returned for mobile.
         """
         data = ProgramDataExtender(self.program, self.user, mobile_only=True).extend()
-        expected_course_url = 'edxapp://enrolled_course_info?course_id={}'.format(self.course.id)
+        expected_course_url = f'edxapp://enrolled_course_info?course_id={self.course.id}'
         self._assert_supplemented(data, course_url=expected_course_url)
 
 
@@ -1247,7 +1244,7 @@ class TestGetCertificates(TestCase):
     Tests of the function used to get certificates associated with a program.
     """
     def setUp(self):
-        super(TestGetCertificates, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
 
         self.user = UserFactory()
         self.program = ProgramFactory()
@@ -1351,7 +1348,7 @@ class TestGetCertificates(TestCase):
 @skip_unless_lms
 class TestProgramMarketingDataExtender(ModuleStoreTestCase):
     """Tests of the program data extender utility class."""
-    ECOMMERCE_CALCULATE_DISCOUNT_ENDPOINT = '{root}/api/v2/baskets/calculate/'.format(root=ECOMMERCE_URL_ROOT)
+    ECOMMERCE_CALCULATE_DISCOUNT_ENDPOINT = f'{ECOMMERCE_URL_ROOT}/api/v2/baskets/calculate/'
     instructors = {
         'instructors': [
             {
@@ -1366,7 +1363,7 @@ class TestProgramMarketingDataExtender(ModuleStoreTestCase):
     }
 
     def setUp(self):
-        super(TestProgramMarketingDataExtender, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
 
         # Ensure the E-Commerce service user exists
         UserFactory(username=settings.ECOMMERCE_SERVICE_WORKER_USERNAME, is_staff=True)
@@ -1424,7 +1421,7 @@ class TestProgramMarketingDataExtender(ModuleStoreTestCase):
         for __ in range(3):
             course = ModuleStoreCourseFactory()
             course = self.update_course(course, self.user.id)
-            course_runs.append(CourseRunFactory(key=six.text_type(course.id), seats=[]))
+            course_runs.append(CourseRunFactory(key=str(course.id), seats=[]))
         program = ProgramFactory(courses=[CourseFactory(course_runs=course_runs)])
 
         data = ProgramMarketingDataExtender(program, self.user).extend()
@@ -1492,7 +1489,7 @@ class TestProgramMarketingDataExtender(ModuleStoreTestCase):
             content_type='application/json'
         )
         ProgramMarketingDataExtender(self.program, self.user).extend()
-        assert httpretty.last_request().querystring.get('is_anonymous')[0] == u'True'  # lint-amnesty, pylint: disable=no-member, line-too-long
+        assert httpretty.last_request().querystring.get('is_anonymous')[0] == 'True'  # lint-amnesty, pylint: disable=no-member, line-too-long
 
     @httpretty.activate
     def test_fetching_program_discounted_price_as_anonymous_user(self):

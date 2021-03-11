@@ -9,7 +9,6 @@ from contextlib import closing
 from io import BytesIO
 
 import piexif
-import six
 from django.conf import settings
 from django.core.files.base import ContentFile
 from django.utils.translation import ugettext as _
@@ -96,25 +95,25 @@ def validate_uploaded_image(uploaded_file):
 
     if uploaded_file.size > settings.PROFILE_IMAGE_MAX_BYTES:  # lint-amnesty, pylint: disable=no-else-raise
         file_upload_too_large = _(
-            u'The file must be smaller than {image_max_size} in size.'
+            'The file must be smaller than {image_max_size} in size.'
         ).format(
             image_max_size=_user_friendly_size(settings.PROFILE_IMAGE_MAX_BYTES)
         )
         raise ImageValidationError(file_upload_too_large)
     elif uploaded_file.size < settings.PROFILE_IMAGE_MIN_BYTES:
         file_upload_too_small = _(
-            u'The file must be at least {image_min_size} in size.'
+            'The file must be at least {image_min_size} in size.'
         ).format(
             image_min_size=_user_friendly_size(settings.PROFILE_IMAGE_MIN_BYTES)
         )
         raise ImageValidationError(file_upload_too_small)
 
     # check the file extension looks acceptable
-    filename = six.text_type(uploaded_file.name).lower()
+    filename = str(uploaded_file.name).lower()
     filetype = [ft for ft in IMAGE_TYPES if any(filename.endswith(ext) for ext in IMAGE_TYPES[ft].extensions)]
     if not filetype:
         file_upload_bad_type = _(
-            u'The file must be one of the following types: {valid_file_types}.'
+            'The file must be one of the following types: {valid_file_types}.'
         ).format(valid_file_types=_get_valid_file_types())
         raise ImageValidationError(file_upload_bad_type)
     filetype = filetype[0]
@@ -122,8 +121,8 @@ def validate_uploaded_image(uploaded_file):
     # check mimetype matches expected file type
     if uploaded_file.content_type not in IMAGE_TYPES[filetype].mimetypes:
         file_upload_bad_mimetype = _(
-            u'The Content-Type header for this file does not match '
-            u'the file data. The file may be corrupted.'
+            'The Content-Type header for this file does not match '
+            'the file data. The file may be corrupted.'
         )
         raise ImageValidationError(file_upload_bad_mimetype)
 
@@ -131,8 +130,8 @@ def validate_uploaded_image(uploaded_file):
     headers = IMAGE_TYPES[filetype].magic
     if binascii.hexlify(uploaded_file.read(len(headers[0]) // 2)).decode('utf-8') not in headers:
         file_upload_bad_ext = _(
-            u'The file name extension for this file does not match '
-            u'the file data. The file may be corrupted.'
+            'The file name extension for this file does not match '
+            'the file data. The file may be corrupted.'
         )
         raise ImageValidationError(file_upload_bad_ext)
     # avoid unexpected errors from subsequent modules expecting the fp to be at 0
@@ -245,4 +244,4 @@ def _user_friendly_size(size):
     while size >= 1024 and i < len(units):
         size //= 1024
         i += 1
-    return u'{} {}'.format(size, units[i])
+    return '{} {}'.format(size, units[i])

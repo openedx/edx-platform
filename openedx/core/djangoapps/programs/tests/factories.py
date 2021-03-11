@@ -6,7 +6,7 @@ import factory
 
 
 class ProgressFactory(factory.Factory):
-    class Meta(object):
+    class Meta:
         model = dict
 
     uuid = factory.Faker('uuid4')

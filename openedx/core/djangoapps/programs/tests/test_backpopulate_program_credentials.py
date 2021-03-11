@@ -1,12 +1,11 @@
 """Tests for the backpopulate_program_credentials management command."""
 
+from unittest import mock
 
 import ddt
-import mock
 from django.core.management import call_command
 from django.test import TestCase
 from opaque_keys.edx.keys import CourseKey
-from six.moves import range
 
 from common.djangoapps.course_modes.models import CourseMode
 from lms.djangoapps.certificates.api import MODES
@@ -42,7 +41,7 @@ class BackpopulateProgramCredentialsTests(CatalogIntegrationMixin, CredentialsAp
     SAME_COURSE = 'same_course'
 
     def setUp(self):
-        super(BackpopulateProgramCredentialsTests, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
 
         self.alice = UserFactory()
         self.bob = UserFactory()

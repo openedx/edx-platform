@@ -2,9 +2,9 @@
 Unit tests for SafeSessionMiddleware
 """
 
+from unittest.mock import patch
 
 import ddt
-import six
 from crum import set_current_request
 from django.conf import settings
 from django.contrib.auth import SESSION_KEY
@@ -12,7 +12,6 @@ from django.contrib.auth.models import AnonymousUser
 from django.http import HttpResponse, HttpResponseRedirect, SimpleCookie
 from django.test import TestCase
 from django.test.utils import override_settings
-from mock import patch
 
 from openedx.core.djangolib.testing.utils import get_mock_request
 from common.djangoapps.student.tests.factories import UserFactory
@@ -27,7 +26,7 @@ class TestSafeSessionProcessRequest(TestSafeSessionsLogMixin, TestCase):
     """
 
     def setUp(self):
-        super(TestSafeSessionProcessRequest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.user = UserFactory.create()
         self.addCleanup(set_current_request, None)
         self.request = get_mock_request()
@@ -44,7 +43,7 @@ class TestSafeSessionProcessRequest(TestSafeSessionsLogMixin, TestCase):
               Else, verifies a failed response with an HTTP redirect.
         """
         if safe_cookie_data:
-            self.request.COOKIES[settings.SESSION_COOKIE_NAME] = six.text_type(safe_cookie_data)
+            self.request.COOKIES[settings.SESSION_COOKIE_NAME] = str(safe_cookie_data)
         response = SafeSessionMiddleware().process_request(self.request)
         if success:
             assert response is None
@@ -127,7 +126,7 @@ class TestSafeSessionProcessResponse(TestSafeSessionsLogMixin, TestCase):
     """
 
     def setUp(self):
-        super(TestSafeSessionProcessResponse, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.user = UserFactory.create()
         self.addCleanup(set_current_request, None)
         self.request = get_mock_request()
@@ -232,7 +231,7 @@ class TestSafeSessionMiddleware(TestSafeSessionsLogMixin, TestCase):
     """
 
     def setUp(self):
-        super(TestSafeSessionMiddleware, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.user = UserFactory.create()
         self.addCleanup(set_current_request, None)
         self.request = get_mock_request()
@@ -258,7 +257,7 @@ class TestSafeSessionMiddleware(TestSafeSessionsLogMixin, TestCase):
 
         session_id = self.client.session.session_key
         safe_cookie_data = SafeCookieData.create(session_id, self.user.id)
-        self.request.COOKIES[settings.SESSION_COOKIE_NAME] = six.text_type(safe_cookie_data)
+        self.request.COOKIES[settings.SESSION_COOKIE_NAME] = str(safe_cookie_data)
 
         with self.assert_not_logged():
             response = SafeSessionMiddleware().process_request(self.request)
