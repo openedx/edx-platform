@@ -6,8 +6,6 @@ Tests for graph traversal generator functions.
 from collections import defaultdict
 from unittest import TestCase
 
-import six
-from six.moves import range
 from ..graph_traversals import traverse_post_order, traverse_pre_order, traverse_topologically
 
 
@@ -31,7 +29,7 @@ class TestGraphTraversals(TestCase):
         #   e1  e2
         #       |
         #       f1
-        super(TestGraphTraversals, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.parent_to_children_map = {
             'a1': ['b1'],
             'a2': ['b2'],
@@ -65,7 +63,7 @@ class TestGraphTraversals(TestCase):
                 will be [].
         """
         result = defaultdict(list)
-        for parent, children in six.iteritems(parent_to_children_map):
+        for parent, children in parent_to_children_map.items():
             for child in children:
                 result[child].append(parent)
         return result

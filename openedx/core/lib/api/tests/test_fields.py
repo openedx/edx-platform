@@ -6,7 +6,7 @@ from django.test import TestCase
 from openedx.core.lib.api.fields import AbsoluteURLField
 
 
-class MockRequest(object):
+class MockRequest:
     """ Mock request object. """
     ROOT = 'http://example.com'
 
@@ -20,7 +20,7 @@ class AbsoluteURLFieldTests(TestCase):
     """ Tests for the AbsoluteURLField. """
 
     def setUp(self):
-        super(AbsoluteURLFieldTests, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.field = AbsoluteURLField()
         self.field._context = {'request': MockRequest()}  # pylint:disable=protected-access
 

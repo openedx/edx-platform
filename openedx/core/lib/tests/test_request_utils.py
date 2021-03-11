@@ -20,12 +20,12 @@ class RequestUtilTestCase(unittest.TestCase):
     Tests for request_utils module.
     """
     def setUp(self):
-        super(RequestUtilTestCase, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.old_site_name = settings.SITE_NAME
         self.old_allowed_hosts = settings.ALLOWED_HOSTS
 
     def tearDown(self):
-        super(RequestUtilTestCase, self).tearDown()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().tearDown()
         settings.SITE_NAME = self.old_site_name
         settings.ALLOWED_HOSTS = self.old_allowed_hosts
 
@@ -35,7 +35,7 @@ class RequestUtilTestCase(unittest.TestCase):
         that allows us to build an absolute URI.
         """
         stub = get_request_or_stub()
-        expected_url = "http://{site_name}/foobar".format(site_name=settings.SITE_NAME)
+        expected_url = f"http://{settings.SITE_NAME}/foobar"
         assert stub.build_absolute_uri('foobar') == expected_url
 
     def test_safe_get_host(self):
