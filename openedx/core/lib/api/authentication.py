@@ -76,8 +76,8 @@ class BearerAuthentication(BaseAuthentication):
             token = self.get_access_token(access_token)
         except AuthenticationFailed as exc:
             raise AuthenticationFailed({  # lint-amnesty, pylint: disable=raise-missing-from
-                u'error_code': OAUTH2_TOKEN_ERROR,
-                u'developer_message': exc.detail
+                'error_code': OAUTH2_TOKEN_ERROR,
+                'developer_message': exc.detail
             })
 
         if not token:  # lint-amnesty, pylint: disable=no-else-raise

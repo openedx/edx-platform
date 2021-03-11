@@ -4,7 +4,6 @@ Tests for Course Teams configuration.
 
 
 import ddt
-import six
 from django.test import TestCase
 
 from ..teams_config import TeamsConfig, TeamsetConfig, MANAGED_TEAM_MAX_TEAM_SIZE, DEFAULT_COURSE_RUN_MAX_TEAM_SIZE
@@ -174,14 +173,14 @@ class TeamsConfigTests(TestCase):
         Assert that teams configs can be reasonably stringified.
         """
         config = TeamsConfig({})
-        assert six.text_type(config) == "Teams configuration for 0 team-sets"
+        assert str(config) == "Teams configuration for 0 team-sets"
 
     def test_teamset_config_string(self):
         """
         Assert that team-set configs can be reasonably stringified.
         """
         config = TeamsetConfig({"id": "omlette-du-fromage"})
-        assert six.text_type(config) == "omlette-du-fromage"
+        assert str(config) == "omlette-du-fromage"
 
     def test_teams_config_repr(self):
         """
@@ -189,7 +188,7 @@ class TeamsConfigTests(TestCase):
         """
         config = TeamsConfig({"team_sets": [{"id": "hedgehogs"}], "max_team_size": 987})
         config_repr = repr(config)
-        assert isinstance(config_repr, six.string_types)
+        assert isinstance(config_repr, str)
 
         # When repr() fails, it doesn't always throw an exception.
         # Instead, it puts error messages in the repr.

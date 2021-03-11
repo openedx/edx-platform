@@ -12,7 +12,7 @@ from common.djangoapps.student.tests.factories import UserFactory
 from openedx.core.lib.api.permissions import IsCourseStaffInstructor, IsMasterCourseStaffInstructor, IsStaffOrOwner
 
 
-class TestObject(object):
+class TestObject:
     """ Fake class for object permission tests. """
     def __init__(self, user=None, course_id=None):
         self.user = user
@@ -22,7 +22,7 @@ class TestObject(object):
 class TestCcxObject(TestObject):
     """ Fake class for object permission for CCX Courses """
     def __init__(self, user=None, course_id=None):
-        super(TestCcxObject, self).__init__(user, course_id)  # lint-amnesty, pylint: disable=super-with-arguments
+        super().__init__(user, course_id)
         self.coach = user
 
 
@@ -30,7 +30,7 @@ class IsCourseStaffInstructorTests(TestCase):
     """ Test for IsCourseStaffInstructor permission class. """
 
     def setUp(self):
-        super(IsCourseStaffInstructorTests, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.permission = IsCourseStaffInstructor()
         self.coach = UserFactory()
         self.user = UserFactory()
@@ -63,11 +63,11 @@ class IsMasterCourseStaffInstructorTests(TestCase):
     """ Test for IsMasterCourseStaffInstructorTests permission class. """
 
     def setUp(self):
-        super(IsMasterCourseStaffInstructorTests, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.permission = IsMasterCourseStaffInstructor()
         master_course_id = 'edx/test123/run'
         self.user = UserFactory()
-        self.get_request = RequestFactory().get('/?master_course_id={}'.format(master_course_id))
+        self.get_request = RequestFactory().get(f'/?master_course_id={master_course_id}')
         self.get_request.user = self.user
         self.post_request = RequestFactory().post('/', data={'master_course_id': master_course_id})
         self.post_request.user = self.user
@@ -108,7 +108,7 @@ class IsStaffOrOwnerTests(TestCase):
     """ Tests for IsStaffOrOwner permission class. """
 
     def setUp(self):
-        super(IsStaffOrOwnerTests, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.permission = IsStaffOrOwner()
         self.request = RequestFactory().get('/')
         self.obj = TestObject()
@@ -148,7 +148,7 @@ class IsStaffOrOwnerTests(TestCase):
     def test_has_permission_as_owner_with_get(self):
         """ Owners always have permission to make GET actions. """
         user = UserFactory()
-        request = RequestFactory().get('/?username={}'.format(user.username))
+        request = RequestFactory().get(f'/?username={user.username}')
         request.user = user
         assert self.permission.has_permission(request, None)
 
@@ -174,7 +174,7 @@ class IsStaffOrOwnerTests(TestCase):
     def test_has_permission_as_non_owner(self):
         """ Non-owners should not have permission. """
         user = UserFactory()
-        request = RequestFactory().get('/?username={}'.format(user.username))
+        request = RequestFactory().get(f'/?username={user.username}')
         request.user = UserFactory()
         assert not self.permission.has_permission(request, None)
 

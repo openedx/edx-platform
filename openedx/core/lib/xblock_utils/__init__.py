@@ -11,7 +11,6 @@ import re
 import uuid
 
 import markupsafe
-import six
 import webpack_loader.utils
 from contracts import contract
 from django.conf import settings
@@ -23,7 +22,6 @@ from edx_django_utils.plugins import pluggable_override
 from lxml import etree, html
 from opaque_keys.edx.asides import AsideUsageKeyV1, AsideUsageKeyV2
 from pytz import UTC
-from six import text_type
 from web_fragments.fragment import Fragment
 from xblock.core import XBlock
 from xblock.exceptions import InvalidScopeError
@@ -149,8 +147,8 @@ def wrap_xblock(
         'content': block.display_name if display_name_only else frag.content,
         'classes': css_classes,
         'display_name': block.display_name_with_default_escaped,  # xss-lint: disable=python-deprecated-display-name
-        'data_attributes': u' '.join(u'data-{}="{}"'.format(markupsafe.escape(key), markupsafe.escape(value))
-                                     for key, value in six.iteritems(data)),
+        'data_attributes': ' '.join('data-{}="{}"'.format(markupsafe.escape(key), markupsafe.escape(value))
+                                    for key, value in data.items()),
     }
 
     if hasattr(frag, 'json_init_args') and frag.json_init_args is not None:
@@ -222,8 +220,8 @@ def wrap_xblock_aside(
     template_context = {
         'content': frag.content,
         'classes': css_classes,
-        'data_attributes': u' '.join(u'data-{}="{}"'.format(markupsafe.escape(key), markupsafe.escape(value))
-                                     for key, value in six.iteritems(data)),
+        'data_attributes': ' '.join('data-{}="{}"'.format(markupsafe.escape(key), markupsafe.escape(value))
+                                    for key, value in data.items()),
     }
 
     if hasattr(frag, 'json_init_args') and frag.json_init_args is not None:
@@ -287,14 +285,14 @@ def grade_histogram(module_id):
     from django.db import connection
     cursor = connection.cursor()
 
-    query = u"""\
+    query = """\
         SELECT courseware_studentmodule.grade,
         COUNT(courseware_studentmodule.student_id)
         FROM courseware_studentmodule
         WHERE courseware_studentmodule.module_id=%s
         GROUP BY courseware_studentmodule.grade"""
     # Passing module_id this way prevents sql-injection.
-    cursor.execute(query, [text_type(module_id)])
+    cursor.execute(query, [str(module_id)])
 
     grades = list(cursor.fetchall())
     grades.sort(key=lambda x: x[0])  # Add ORDER BY to sql query?
@@ -311,7 +309,7 @@ def sanitize_html_id(html_id):
     return sanitized_html_id
 
 
-@contract(user=User, block=XBlock, view=six.string_types[0], frag=Fragment, context="dict|None")
+@contract(user=User, block=XBlock, view=(str,)[0], frag=Fragment, context="dict|None")
 def add_staff_markup(user, disable_staff_debug_info, block, view, frag, context):  # pylint: disable=unused-argument
     """
     Updates the supplied module with a new get_html function that wraps
@@ -349,7 +347,7 @@ def add_staff_markup(user, disable_staff_debug_info, block, view, frag, context)
             filepath = filename
         data_dir = block.static_asset_path or osfs.root_path.rsplit('/')[-1]
         giturl = block.giturl or 'https://github.com/MITx'
-        edit_link = "%s/%s/tree/master/%s" % (giturl, data_dir, filepath)
+        edit_link = f"{giturl}/{data_dir}/tree/master/{filepath}"
     else:
         edit_link = False
         # Need to define all the variables that are about to be used
@@ -383,7 +381,7 @@ def add_staff_markup(user, disable_staff_debug_info, block, view, frag, context)
         'location': block.location,
         'xqa_key': block.xqa_key,
         'source_file': source_file,
-        'source_url': '%s/%s/tree/master/%s' % (giturl, data_dir, source_file),
+        'source_url': f'{giturl}/{data_dir}/tree/master/{source_file}',
         'category': str(block.__class__.__name__),
         'element_id': sanitize_html_id(block.location.html_id()),
         'edit_link': edit_link,
@@ -550,7 +548,7 @@ def hash_resource(resource):
     for data in resource:
         if isinstance(data, bytes):
             md5.update(data)
-        elif isinstance(data, six.string_types):
+        elif isinstance(data, str):
             md5.update(data.encode('utf-8'))
         else:
             md5.update(repr(data).encode('utf-8'))

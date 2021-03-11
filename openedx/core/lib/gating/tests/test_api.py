@@ -3,15 +3,14 @@ Tests for the gating API
 """
 
 import unittest
+from unittest.mock import Mock, patch
 
 import pytest
-import six
 from completion.models import BlockCompletion
 from ddt import data, ddt, unpack
 from django.conf import settings
 from milestones import api as milestones_api
 from milestones.tests.utils import MilestonesTestCaseMixin
-from mock import Mock, patch
 
 from common.djangoapps.student.tests.factories import UserFactory
 from lms.djangoapps.gating import api as lms_gating_api
@@ -37,7 +36,7 @@ class TestGatingApi(ModuleStoreTestCase, MilestonesTestCaseMixin):
         """
         Initial data setup
         """
-        super(TestGatingApi, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
 
         # create course
         self.course = CourseFactory.create(
@@ -77,7 +76,7 @@ class TestGatingApi(ModuleStoreTestCase, MilestonesTestCaseMixin):
 
         self.generic_milestone = {
             'name': 'Test generic milestone',
-            'namespace': six.text_type(self.seq1.location),
+            'namespace': str(self.seq1.location),
         }
 
     @patch('openedx.core.lib.gating.api.log.warning')
@@ -147,7 +146,7 @@ class TestGatingApi(ModuleStoreTestCase, MilestonesTestCaseMixin):
         prereqs = gating_api.get_prerequisites(self.course.id)
         assert len(prereqs) == 1
         assert prereqs[0]['block_display_name'] == self.seq1.display_name
-        assert prereqs[0]['block_usage_key'] == six.text_type(self.seq1.location)
+        assert prereqs[0]['block_usage_key'] == str(self.seq1.location)
         assert gating_api.is_prerequisite(self.course.id, self.seq1.location)
 
         gating_api.remove_prerequisite(self.seq1.location)
@@ -164,7 +163,7 @@ class TestGatingApi(ModuleStoreTestCase, MilestonesTestCaseMixin):
         prereq_content_key, min_score, min_completion = gating_api.get_required_content(
             self.course.id, self.seq2.location
         )
-        assert prereq_content_key == six.text_type(self.seq1.location)
+        assert prereq_content_key == str(self.seq1.location)
         assert min_score == 100
         assert min_completion == 100
 
@@ -193,7 +192,7 @@ class TestGatingApi(ModuleStoreTestCase, MilestonesTestCaseMixin):
         milestone = milestones_api.get_course_content_milestones(self.course.id, self.seq2.location, 'requires')[0]
 
         assert gating_api.get_gated_content(self.course, staff) == []
-        assert gating_api.get_gated_content(self.course, student) == [six.text_type(self.seq2.location)]
+        assert gating_api.get_gated_content(self.course, student) == [str(self.seq2.location)]
 
         milestones_api.add_user_milestone({'id': student.id}, milestone)
 
@@ -300,7 +299,7 @@ class TestGatingApi(ModuleStoreTestCase, MilestonesTestCaseMixin):
         component = ItemFactory.create(
             parent_location=self.vertical.location,
             category=component_type,
-            display_name=u'{} block'.format(component_type)
+            display_name=f'{component_type} block'
         )
 
         with patch.object(BlockCompletion, 'get_learning_context_completions') as course_block_completions_mock:
