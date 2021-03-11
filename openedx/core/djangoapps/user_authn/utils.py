@@ -4,11 +4,11 @@ Utility functions used during user authentication.
 
 import random
 import string
+from urllib.parse import urlparse  # pylint: disable=import-error
 
 from django.conf import settings
 from django.utils import http
 from oauth2_provider.models import Application
-from six.moves.urllib.parse import urlparse  # pylint: disable=import-error
 
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers  # lint-amnesty, pylint: disable=unused-import
 

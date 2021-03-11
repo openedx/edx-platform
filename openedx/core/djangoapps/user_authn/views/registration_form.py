@@ -6,8 +6,6 @@ import copy
 from importlib import import_module
 import re
 
-import six
-
 from django import forms
 from django.conf import settings
 from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
@@ -69,7 +67,7 @@ def validate_username(username):
     message = accounts.USERNAME_INVALID_CHARS_ASCII
 
     if settings.FEATURES.get("ENABLE_UNICODE_USERNAME"):
-        username_re = r"^{regex}$".format(regex=settings.USERNAME_REGEX_PARTIAL)
+        username_re = fr"^{settings.USERNAME_REGEX_PARTIAL}$"
         flags = re.UNICODE
         message = accounts.USERNAME_INVALID_CHARS_UNICODE
 
@@ -109,7 +107,7 @@ class UsernameField(forms.CharField):
     default_validators = [validate_username]
 
     def __init__(self, *args, **kwargs):  # lint-amnesty, pylint: disable=unused-argument
-        super(UsernameField, self).__init__(  # lint-amnesty, pylint: disable=super-with-arguments
+        super().__init__(
             min_length=accounts.USERNAME_MIN_LENGTH,
             max_length=accounts.USERNAME_MAX_LENGTH,
             error_messages={
@@ -127,7 +125,7 @@ class UsernameField(forms.CharField):
         """
 
         value = self.to_python(value).strip()
-        return super(UsernameField, self).clean(value)  # lint-amnesty, pylint: disable=super-with-arguments
+        return super().clean(value)
 
 
 class AccountCreationForm(forms.Form):
@@ -136,8 +134,8 @@ class AccountCreationForm(forms.Form):
     validation, not rendering.
     """
 
-    _EMAIL_INVALID_MSG = _(u"A properly formatted e-mail is required")
-    _NAME_TOO_SHORT_MSG = _(u"Your legal name must be a minimum of one character long")
+    _EMAIL_INVALID_MSG = _("A properly formatted e-mail is required")
+    _NAME_TOO_SHORT_MSG = _("Your legal name must be a minimum of one character long")
 
     # TODO: Resolve repetition
 
@@ -149,7 +147,7 @@ class AccountCreationForm(forms.Form):
         error_messages={
             "required": _EMAIL_INVALID_MSG,
             "invalid": _EMAIL_INVALID_MSG,
-            "max_length": _(u"Email cannot be more than %(limit_value)s characters long"),
+            "max_length": _("Email cannot be more than %(limit_value)s characters long"),
         }
     )
 
@@ -172,7 +170,7 @@ class AccountCreationForm(forms.Form):
         do_third_party_auth=True,
         tos_required=True
     ):
-        super(AccountCreationForm, self).__init__(data)  # lint-amnesty, pylint: disable=super-with-arguments
+        super().__init__(data)
 
         extra_fields = extra_fields or {}
         self.extended_profile_fields = extended_profile_fields or {}
@@ -245,11 +243,11 @@ class AccountCreationForm(forms.Form):
                 # they may have been manually invited by an instructor and if not,
                 # reject the registration.
                 if not CourseEnrollmentAllowed.objects.filter(email=email).exists():
-                    raise ValidationError(_(u"Unauthorized email address."))
+                    raise ValidationError(_("Unauthorized email address."))
         if email_exists_or_retired(email):
             raise ValidationError(
                 _(
-                    u"It looks like {email} belongs to an existing account. Try again with a different email address."
+                    "It looks like {email} belongs to an existing account. Try again with a different email address."
                 ).format(email=email)
             )
         return email
@@ -290,7 +288,7 @@ def get_registration_extension_form(*args, **kwargs):
     return getattr(module, klass)(*args, **kwargs)
 
 
-class RegistrationFormFactory(object):
+class RegistrationFormFactory:
     """
     Construct Registration forms and associated fields.
     """
@@ -338,14 +336,14 @@ class RegistrationFormFactory(object):
         # Check that the setting is configured correctly
         for field_name in self.EXTRA_FIELDS:
             if self._extra_fields_setting.get(field_name, "hidden") not in ["required", "optional", "hidden"]:
-                msg = u"Setting REGISTRATION_EXTRA_FIELDS values must be either required, optional, or hidden."
+                msg = "Setting REGISTRATION_EXTRA_FIELDS values must be either required, optional, or hidden."
                 raise ImproperlyConfigured(msg)
 
         # Map field names to the instance method used to add the field to the form
         self.field_handlers = {}
         valid_fields = self.DEFAULT_FIELDS + self.EXTRA_FIELDS
         for field_name in valid_fields:
-            handler = getattr(self, "_add_{field_name}_field".format(field_name=field_name))
+            handler = getattr(self, f"_add_{field_name}_field")
             self.field_handlers[field_name] = handler
 
         field_order = configuration_helpers.get_value('REGISTRATION_FIELD_ORDER')
@@ -397,7 +395,7 @@ class RegistrationFormFactory(object):
                 field_type = field_options.get('field_type', FormDescription.FIELD_TYPE_MAP.get(field.__class__))
                 if not field_type:
                     raise ImproperlyConfigured(
-                        u"Field type '{}' not recognized for registration extension field '{}'.".format(
+                        "Field type '{}' not recognized for registration extension field '{}'.".format(
                             field_type,
                             field_name
                         )
@@ -450,11 +448,11 @@ class RegistrationFormFactory(object):
         """
         # Translators: This label appears above a field on the registration form
         # meant to hold the user's email address.
-        email_label = _(u"Email")
+        email_label = _("Email")
 
         # Translators: These instructions appear on the registration form, immediately
         # below a field meant to hold the user's email address.
-        email_instructions = _(u"This is what you will use to login.")
+        email_instructions = _("This is what you will use to login.")
 
         form_desc.add_field(
             "email",
@@ -477,7 +475,7 @@ class RegistrationFormFactory(object):
         """
         # Translators: This label appears above a field on the registration form
         # meant to confirm the user's email address.
-        email_label = _(u"Confirm Email")
+        email_label = _("Confirm Email")
 
         error_msg = accounts.REQUIRED_FIELD_CONFIRM_EMAIL_MSG
 
@@ -500,11 +498,11 @@ class RegistrationFormFactory(object):
         """
         # Translators: This label appears above a field on the registration form
         # meant to hold the user's full name.
-        name_label = _(u"Full Name")
+        name_label = _("Full Name")
 
         # Translators: These instructions appear on the registration form, immediately
         # below a field meant to hold the user's full name.
-        name_instructions = _(u"This name will be used on any certificates that you earn.")
+        name_instructions = _("This name will be used on any certificates that you earn.")
 
         form_desc.add_field(
             "name",
@@ -525,13 +523,13 @@ class RegistrationFormFactory(object):
         """
         # Translators: This label appears above a field on the registration form
         # meant to hold the user's public username.
-        username_label = _(u"Public Username")
+        username_label = _("Public Username")
 
         username_instructions = _(
             # Translators: These instructions appear on the registration form, immediately
             # below a field meant to hold the user's public username.
-            u"The name that will identify you in your courses. "
-            u"It cannot be changed later."
+            "The name that will identify you in your courses. "
+            "It cannot be changed later."
         )
         form_desc.add_field(
             "username",
@@ -553,7 +551,7 @@ class RegistrationFormFactory(object):
         """
         # Translators: This label appears above a field on the registration form
         # meant to hold the user's password.
-        password_label = _(u"Password")
+        password_label = _("Password")
 
         form_desc.add_field(
             "password",
@@ -573,7 +571,7 @@ class RegistrationFormFactory(object):
         """
         # Translators: This label appears above a dropdown menu on the registration
         # form used to select the user's highest completed level of education.
-        education_level_label = _(u"Highest level of education completed")
+        education_level_label = _("Highest level of education completed")
         error_msg = accounts.REQUIRED_FIELD_LEVEL_OF_EDUCATION_MSG
 
         # The labels are marked for translation in UserProfile model definition.
@@ -600,7 +598,7 @@ class RegistrationFormFactory(object):
         """
         # Translators: This label appears above a dropdown menu on the registration
         # form used to select the user's gender.
-        gender_label = _(u"Gender")
+        gender_label = _("Gender")
 
         # The labels are marked for translation in UserProfile model definition.
         # pylint: disable=translation-of-non-string
@@ -623,9 +621,9 @@ class RegistrationFormFactory(object):
         """
         # Translators: This label appears above a dropdown menu on the registration
         # form used to select the user's year of birth.
-        yob_label = _(u"Year of birth")
+        yob_label = _("Year of birth")
 
-        options = [(six.text_type(year), six.text_type(year)) for year in UserProfile.VALID_YEARS]
+        options = [(str(year), str(year)) for year in UserProfile.VALID_YEARS]
         form_desc.add_field(
             "year_of_birth",
             label=yob_label,
@@ -656,14 +654,14 @@ class RegistrationFormFactory(object):
             include_default_option = False
             options = None
             error_msg = ''
-            error_msg = getattr(accounts, u'REQUIRED_FIELD_{}_TEXT_MSG'.format(field_name.upper()))
+            error_msg = getattr(accounts, f'REQUIRED_FIELD_{field_name.upper()}_TEXT_MSG')
         else:
             field_type = "select"
             include_default_option = True
             field_options = extra_field_options.get(field_name)
-            options = [(six.text_type(option.lower()), option) for option in field_options]
+            options = [(str(option.lower()), option) for option in field_options]
             error_msg = ''
-            error_msg = getattr(accounts, u'REQUIRED_FIELD_{}_SELECT_MSG'.format(field_name.upper()))
+            error_msg = getattr(accounts, f'REQUIRED_FIELD_{field_name.upper()}_SELECT_MSG')
 
         form_desc.add_field(
             field_name,
@@ -718,7 +716,7 @@ class RegistrationFormFactory(object):
         """
         # Translators: This label appears above a field on the registration form
         # meant to hold the user's mailing address.
-        mailing_address_label = _(u"Mailing address")
+        mailing_address_label = _("Mailing address")
         error_msg = accounts.REQUIRED_FIELD_MAILING_ADDRESS_MSG
 
         form_desc.add_field(
@@ -740,7 +738,7 @@ class RegistrationFormFactory(object):
         """
         # Translators: This phrase appears above a field on the registration form
         # meant to hold the user's reasons for registering with edX.
-        goals_label = _(u"Tell us why you're interested in {platform_name}").format(
+        goals_label = _("Tell us why you're interested in {platform_name}").format(
             platform_name=configuration_helpers.get_value("PLATFORM_NAME", settings.PLATFORM_NAME)
         )
         error_msg = accounts.REQUIRED_FIELD_GOALS_MSG
@@ -764,7 +762,7 @@ class RegistrationFormFactory(object):
         """
         # Translators: This label appears above a field on the registration form
         # which allows the user to input the city in which they live.
-        city_label = _(u"City")
+        city_label = _("City")
         error_msg = accounts.REQUIRED_FIELD_CITY_MSG
 
         form_desc.add_field(
@@ -785,7 +783,7 @@ class RegistrationFormFactory(object):
         """
         # Translators: This label appears above a field on the registration form
         # which allows the user to input the State/Province/Region in which they live.
-        state_label = _(u"State/Province/Region")
+        state_label = _("State/Province/Region")
 
         form_desc.add_field(
             "state",
@@ -802,7 +800,7 @@ class RegistrationFormFactory(object):
         """
         # Translators: This label appears above a field on the registration form
         # which allows the user to input the Company
-        company_label = _(u"Company")
+        company_label = _("Company")
 
         form_desc.add_field(
             "company",
@@ -819,7 +817,7 @@ class RegistrationFormFactory(object):
         """
         # Translators: This label appears above a field on the registration form
         # which allows the user to input the Title
-        title_label = _(u"Title")
+        title_label = _("Title")
 
         form_desc.add_field(
             "title",
@@ -836,7 +834,7 @@ class RegistrationFormFactory(object):
         """
         # Translators: This label appears above a field on the registration form
         # which allows the user to input the Job Title
-        job_title_label = _(u"Job Title")
+        job_title_label = _("Job Title")
 
         form_desc.add_field(
             "job_title",
@@ -853,7 +851,7 @@ class RegistrationFormFactory(object):
         """
         # Translators: This label appears above a field on the registration form
         # which allows the user to input the First Name
-        first_name_label = _(u"First Name")
+        first_name_label = _("First Name")
 
         form_desc.add_field(
             "first_name",
@@ -870,7 +868,7 @@ class RegistrationFormFactory(object):
         """
         # Translators: This label appears above a field on the registration form
         # which allows the user to input the First Name
-        last_name_label = _(u"Last Name")
+        last_name_label = _("Last Name")
 
         form_desc.add_field(
             "last_name",
@@ -887,7 +885,7 @@ class RegistrationFormFactory(object):
         """
         # Translators: This label appears above a dropdown menu on the registration
         # form used to select the country in which the user lives.
-        country_label = _(u"Country or Region of Residence")
+        country_label = _("Country or Region of Residence")
 
         error_msg = accounts.REQUIRED_FIELD_COUNTRY_MSG
 
@@ -898,7 +896,7 @@ class RegistrationFormFactory(object):
         country_instructions = _(
             # Translators: These instructions appear on the registration form, immediately
             # below a field meant to hold the user's country.
-            u"The country or region where you live."
+            "The country or region where you live."
         )
         if default_country:
             form_desc.override_field_properties(
@@ -930,24 +928,24 @@ class RegistrationFormFactory(object):
         separate_honor_and_tos = self._is_field_visible("terms_of_service")
         # Separate terms of service and honor code checkboxes
         if separate_honor_and_tos:
-            terms_label = _(u"Honor Code")
+            terms_label = _("Honor Code")
             terms_link = marketing_link("HONOR")
 
         # Combine terms of service and honor code checkboxes
         else:
             # Translators: This is a legal document users must agree to
             # in order to register a new account.
-            terms_label = _(u"Terms of Service and Honor Code")
+            terms_label = _("Terms of Service and Honor Code")
             terms_link = marketing_link("HONOR")
 
         # Translators: "Terms of Service" is a legal document users must agree to
         # in order to register a new account.
         label = Text(_(
-            u"I agree to the {platform_name} {terms_of_service_link_start}{terms_of_service}{terms_of_service_link_end}"
+            "I agree to the {platform_name} {terms_of_service_link_start}{terms_of_service}{terms_of_service_link_end}"
         )).format(
             platform_name=configuration_helpers.get_value("PLATFORM_NAME", settings.PLATFORM_NAME),
             terms_of_service=terms_label,
-            terms_of_service_link_start=HTML(u"<a href='{terms_link}' rel='noopener' target='_blank'>").format(
+            terms_of_service_link_start=HTML("<a href='{terms_link}' rel='noopener' target='_blank'>").format(
                 terms_link=terms_link
             ),
             terms_of_service_link_end=HTML("</a>"),
@@ -955,7 +953,7 @@ class RegistrationFormFactory(object):
 
         # Translators: "Terms of Service" is a legal document users must agree to
         # in order to register a new account.
-        error_msg = _(u"You must agree to the {platform_name} {terms_of_service}").format(
+        error_msg = _("You must agree to the {platform_name} {terms_of_service}").format(
             platform_name=configuration_helpers.get_value("PLATFORM_NAME", settings.PLATFORM_NAME),
             terms_of_service=terms_label
         )
@@ -966,18 +964,18 @@ class RegistrationFormFactory(object):
 
             pp_link = marketing_link("PRIVACY")
             label = Text(_(
-                u"By creating an account, you agree to the \
+                "By creating an account, you agree to the \
                   {terms_of_service_link_start}{terms_of_service}{terms_of_service_link_end} \
                   and you acknowledge that {platform_name} and each Member process your personal data in accordance \
                   with the {privacy_policy_link_start}Privacy Policy{privacy_policy_link_end}."
             )).format(
                 platform_name=configuration_helpers.get_value("PLATFORM_NAME", settings.PLATFORM_NAME),
                 terms_of_service=terms_label,
-                terms_of_service_link_start=HTML(u"<a href='{terms_url}' rel='noopener' target='_blank'>").format(
+                terms_of_service_link_start=HTML("<a href='{terms_url}' rel='noopener' target='_blank'>").format(
                     terms_url=terms_link
                 ),
                 terms_of_service_link_end=HTML("</a>"),
-                privacy_policy_link_start=HTML(u"<a href='{pp_url}' rel='noopener' target='_blank'>").format(
+                privacy_policy_link_start=HTML("<a href='{pp_url}' rel='noopener' target='_blank'>").format(
                     pp_url=pp_link
                 ),
                 privacy_policy_link_end=HTML("</a>"),
@@ -1003,15 +1001,15 @@ class RegistrationFormFactory(object):
         """
         # Translators: This is a legal document users must agree to
         # in order to register a new account.
-        terms_label = _(u"Terms of Service")
+        terms_label = _("Terms of Service")
         terms_link = marketing_link("TOS")
 
         # Translators: "Terms of service" is a legal document users must agree to
         # in order to register a new account.
-        label = Text(_(u"I agree to the {platform_name} {tos_link_start}{terms_of_service}{tos_link_end}")).format(
+        label = Text(_("I agree to the {platform_name} {tos_link_start}{terms_of_service}{tos_link_end}")).format(
             platform_name=configuration_helpers.get_value("PLATFORM_NAME", settings.PLATFORM_NAME),
             terms_of_service=terms_label,
-            tos_link_start=HTML(u"<a href='{terms_link}' rel='noopener' target='_blank'>").format(
+            tos_link_start=HTML("<a href='{terms_link}' rel='noopener' target='_blank'>").format(
                 terms_link=terms_link
             ),
             tos_link_end=HTML("</a>"),
@@ -1019,7 +1017,7 @@ class RegistrationFormFactory(object):
 
         # Translators: "Terms of service" is a legal document users must agree to
         # in order to register a new account.
-        error_msg = _(u"You must agree to the {platform_name} {terms_of_service}").format(
+        error_msg = _("You must agree to the {platform_name} {terms_of_service}").format(
             platform_name=configuration_helpers.get_value("PLATFORM_NAME", settings.PLATFORM_NAME),
             terms_of_service=terms_label
         )

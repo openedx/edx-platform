@@ -1,4 +1,3 @@
-# coding:utf-8
 """
 Tests for student activation and login
 """
@@ -8,9 +7,9 @@ import datetime
 import hashlib
 import json
 import unicodedata
+from unittest.mock import Mock, patch
 
 import ddt
-import six
 from django.conf import settings
 from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.core import mail
@@ -21,7 +20,6 @@ from django.test.utils import override_settings
 from django.urls import NoReverseMatch, reverse
 from edx_toggles.toggles.testutils import override_waffle_flag, override_waffle_switch
 from freezegun import freeze_time
-from mock import Mock, patch
 from common.djangoapps.student.tests.factories import RegistrationFactory, UserFactory, UserProfileFactory
 
 from openedx.core.djangoapps.password_policy.compliance import (
@@ -59,7 +57,7 @@ class LoginTest(SiteMixin, CacheIsolationTestCase):
 
     def setUp(self):
         """Setup a test user along with its registration and profile"""
-        super(LoginTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.user = self._create_user(self.username, self.user_email)
 
         RegistrationFactory(user=self.user)
@@ -81,7 +79,7 @@ class LoginTest(SiteMixin, CacheIsolationTestCase):
             self.user_email, self.password, patched_audit_log='common.djangoapps.student.models.AUDIT_LOG'
         )
         self._assert_response(response, success=True)
-        self._assert_audit_log(mock_audit_log, 'info', [u'Login success', self.user_email])
+        self._assert_audit_log(mock_audit_log, 'info', ['Login success', self.user_email])
 
     FEATURES_WITH_AUTHN_MFE_ENABLED = settings.FEATURES.copy()
     FEATURES_WITH_AUTHN_MFE_ENABLED['ENABLE_AUTHN_MICROFRONTEND'] = True
@@ -291,11 +289,11 @@ class LoginTest(SiteMixin, CacheIsolationTestCase):
             self.user_email, self.password, patched_audit_log='common.djangoapps.student.models.AUDIT_LOG'
         )
         self._assert_response(response, success=True)
-        self._assert_audit_log(mock_audit_log, 'info', [u'Login success'])
+        self._assert_audit_log(mock_audit_log, 'info', ['Login success'])
         self._assert_not_in_audit_log(mock_audit_log, 'info', [self.user_email])
 
     def test_login_success_unicode_email(self):
-        unicode_email = u'test' + six.unichr(40960) + u'@edx.org'
+        unicode_email = 'test' + chr(40960) + '@edx.org'
         self.user.email = unicode_email
         self.user.save()
 
@@ -303,10 +301,10 @@ class LoginTest(SiteMixin, CacheIsolationTestCase):
             unicode_email, self.password, patched_audit_log='common.djangoapps.student.models.AUDIT_LOG'
         )
         self._assert_response(response, success=True)
-        self._assert_audit_log(mock_audit_log, 'info', [u'Login success', unicode_email])
+        self._assert_audit_log(mock_audit_log, 'info', ['Login success', unicode_email])
 
     def test_login_fail_no_user_exists(self):
-        nonexistent_email = u'not_a_user@edx.org'
+        nonexistent_email = 'not_a_user@edx.org'
         # pylint: disable=too-many-function-args
         email_hash = hashlib.shake_128(nonexistent_email.encode('utf-8')).hexdigest(16)
         response, mock_audit_log = self._login_response(
@@ -316,17 +314,17 @@ class LoginTest(SiteMixin, CacheIsolationTestCase):
         self._assert_response(
             response, success=False, value=self.LOGIN_FAILED_WARNING, status_code=400
         )
-        self._assert_audit_log(mock_audit_log, 'warning', [u'Login failed', u'Unknown user email', email_hash])
+        self._assert_audit_log(mock_audit_log, 'warning', ['Login failed', 'Unknown user email', email_hash])
 
     @patch.dict("django.conf.settings.FEATURES", {'SQUELCH_PII_IN_LOGS': True})
     def test_login_fail_no_user_exists_no_pii(self):
-        nonexistent_email = u'not_a_user@edx.org'
+        nonexistent_email = 'not_a_user@edx.org'
         response, mock_audit_log = self._login_response(
             nonexistent_email,
             self.password,
         )
         self._assert_response(response, success=False, value=self.LOGIN_FAILED_WARNING)
-        self._assert_audit_log(mock_audit_log, 'warning', [u'Login failed', u'Unknown user email'])
+        self._assert_audit_log(mock_audit_log, 'warning', ['Login failed', 'Unknown user email'])
         self._assert_not_in_audit_log(mock_audit_log, 'warning', [nonexistent_email])
 
     def test_login_fail_wrong_password(self):
@@ -336,14 +334,14 @@ class LoginTest(SiteMixin, CacheIsolationTestCase):
         )
         self._assert_response(response, success=False, value=self.LOGIN_FAILED_WARNING)
         self._assert_audit_log(mock_audit_log, 'warning',
-                               [u'Login failed', u'password for', str(self.user.id), u'invalid'])
+                               ['Login failed', 'password for', str(self.user.id), 'invalid'])
 
     @patch.dict("django.conf.settings.FEATURES", {'SQUELCH_PII_IN_LOGS': True})
     def test_login_fail_wrong_password_no_pii(self):
         response, mock_audit_log = self._login_response(self.user_email, 'wrong_password')
         self._assert_response(response, success=False, value=self.LOGIN_FAILED_WARNING)
         self._assert_audit_log(
-            mock_audit_log, 'warning', [u'Login failed', u'password for', str(self.user.id), u'invalid']
+            mock_audit_log, 'warning', ['Login failed', 'password for', str(self.user.id), 'invalid']
         )
         self._assert_not_in_audit_log(mock_audit_log, 'warning', [self.user_email])
 
@@ -358,8 +356,8 @@ class LoginTest(SiteMixin, CacheIsolationTestCase):
             self.password
         )
         self._assert_response(response, success=False, error_code="inactive-user")
-        self._assert_audit_log(mock_audit_log, 'warning', [u'Login failed', u'Account not active for user'])
-        self._assert_not_in_audit_log(mock_audit_log, 'warning', [u'test'])
+        self._assert_audit_log(mock_audit_log, 'warning', ['Login failed', 'Account not active for user'])
+        self._assert_not_in_audit_log(mock_audit_log, 'warning', ['test'])
 
     def test_login_not_activated_with_correct_credentials(self):
         """
@@ -374,7 +372,7 @@ class LoginTest(SiteMixin, CacheIsolationTestCase):
             self.password,
         )
         self._assert_response(response, success=False, error_code="inactive-user")
-        self._assert_audit_log(mock_audit_log, 'warning', [u'Login failed', u'Account not active for user'])
+        self._assert_audit_log(mock_audit_log, 'warning', ['Login failed', 'Account not active for user'])
 
     @patch('openedx.core.djangoapps.user_authn.views.login._log_and_raise_inactive_user_auth_error')
     def test_login_inactivated_user_with_incorrect_credentials(self, mock_inactive_user_email_and_error):
@@ -391,10 +389,10 @@ class LoginTest(SiteMixin, CacheIsolationTestCase):
 
         assert not mock_inactive_user_email_and_error.called
         self._assert_response(response, success=False, value=self.LOGIN_FAILED_WARNING)
-        self._assert_audit_log(mock_audit_log, 'warning', [u'Login failed', u'Unknown user email', email_hash])
+        self._assert_audit_log(mock_audit_log, 'warning', ['Login failed', 'Unknown user email', email_hash])
 
     def test_login_unicode_email(self):
-        unicode_email = self.user_email + six.unichr(40960)
+        unicode_email = self.user_email + chr(40960)
         # pylint: disable=too-many-function-args
         email_hash = hashlib.shake_128(unicode_email.encode('utf-8')).hexdigest(16)
         response, mock_audit_log = self._login_response(
@@ -402,17 +400,17 @@ class LoginTest(SiteMixin, CacheIsolationTestCase):
             self.password,
         )
         self._assert_response(response, success=False)
-        self._assert_audit_log(mock_audit_log, 'warning', [u'Login failed', email_hash])
+        self._assert_audit_log(mock_audit_log, 'warning', ['Login failed', email_hash])
 
     def test_login_unicode_password(self):
-        unicode_password = self.password + six.unichr(1972)
+        unicode_password = self.password + chr(1972)
         response, mock_audit_log = self._login_response(
             self.user_email,
             unicode_password,
         )
         self._assert_response(response, success=False)
         self._assert_audit_log(mock_audit_log, 'warning',
-                               [u'Login failed', u'password for', str(self.user.id), u'invalid'])
+                               ['Login failed', 'password for', str(self.user.id), 'invalid'])
 
     def test_logout_logging(self):
         response, _ = self._login_response(self.user_email, self.password)
@@ -421,7 +419,7 @@ class LoginTest(SiteMixin, CacheIsolationTestCase):
         with patch('common.djangoapps.student.models.AUDIT_LOG') as mock_audit_log:
             response = self.client.post(logout_url)
         assert response.status_code == 200
-        self._assert_audit_log(mock_audit_log, 'info', [u'Logout', u'test'])
+        self._assert_audit_log(mock_audit_log, 'info', ['Logout', 'test'])
 
     def test_login_user_info_cookie(self):
         response, _ = self._login_response(self.user_email, self.password)
@@ -457,8 +455,8 @@ class LoginTest(SiteMixin, CacheIsolationTestCase):
             assert '01 Jan 1970' in cookie.get('expires').replace('-', ' ')
 
     @override_settings(
-        EDXMKTG_LOGGED_IN_COOKIE_NAME=u"unicode-logged-in",
-        EDXMKTG_USER_INFO_COOKIE_NAME=u"unicode-user-info",
+        EDXMKTG_LOGGED_IN_COOKIE_NAME="unicode-logged-in",
+        EDXMKTG_USER_INFO_COOKIE_NAME="unicode-user-info",
     )
     def test_unicode_mktg_cookie_names(self):
         # When logged in cookie names are loaded from JSON files, they may
@@ -481,15 +479,15 @@ class LoginTest(SiteMixin, CacheIsolationTestCase):
         with patch('common.djangoapps.student.models.AUDIT_LOG') as mock_audit_log:
             response = self.client.post(logout_url)
         assert response.status_code == 200
-        self._assert_audit_log(mock_audit_log, 'info', [u'Logout'])
-        self._assert_not_in_audit_log(mock_audit_log, 'info', [u'test'])
+        self._assert_audit_log(mock_audit_log, 'info', ['Logout'])
+        self._assert_not_in_audit_log(mock_audit_log, 'info', ['test'])
 
     @override_settings(RATELIMIT_ENABLE=False)
     def test_excessive_login_attempts_success(self):
         # Try (and fail) logging in with fewer attempts than the limit of 30
         # and verify that you can still successfully log in afterwards.
         for i in range(20):
-            password = u'test_password{0}'.format(i)
+            password = f'test_password{i}'
             response, _audit_log = self._login_response(self.user_email, password)
             self._assert_response(response, success=False)
         # now try logging in with a valid password
@@ -506,7 +504,7 @@ class LoginTest(SiteMixin, CacheIsolationTestCase):
         # are not predictable and we don't want the test to be flaky.
         with freeze_time():
             for i in range(6):
-                password = u'test_password{0}'.format(i)
+                password = f'test_password{i}'
                 # Provide unique IPs so we don't get ip rate limited.
                 real_ip_mock.return_value = f'192.168.1.{i}'
                 self._login_response(self.user_email, password)
@@ -692,12 +690,12 @@ class LoginTest(SiteMixin, CacheIsolationTestCase):
 
     @ddt.data(
         ('test_password', 'test_password', True),
-        (unicodedata.normalize('NFKD', u'Ṗŕệṿïệẅ Ṯệẍt'),
-         unicodedata.normalize('NFKC', u'Ṗŕệṿïệẅ Ṯệẍt'), False),
-        (unicodedata.normalize('NFKC', u'Ṗŕệṿïệẅ Ṯệẍt'),
-         unicodedata.normalize('NFKD', u'Ṗŕệṿïệẅ Ṯệẍt'), True),
-        (unicodedata.normalize('NFKD', u'Ṗŕệṿïệẅ Ṯệẍt'),
-         unicodedata.normalize('NFKD', u'Ṗŕệṿïệẅ Ṯệẍt'), False),
+        (unicodedata.normalize('NFKD', 'Ṗŕệṿïệẅ Ṯệẍt'),
+         unicodedata.normalize('NFKC', 'Ṗŕệṿïệẅ Ṯệẍt'), False),
+        (unicodedata.normalize('NFKC', 'Ṗŕệṿïệẅ Ṯệẍt'),
+         unicodedata.normalize('NFKD', 'Ṗŕệṿïệẅ Ṯệẍt'), True),
+        (unicodedata.normalize('NFKD', 'Ṗŕệṿïệẅ Ṯệẍt'),
+         unicodedata.normalize('NFKD', 'Ṗŕệṿïệẅ Ṯệẍt'), False),
     )
     @ddt.unpack
     def test_password_unicode_normalization_login(self, password, password_entered, login_success):
@@ -741,7 +739,7 @@ class LoginTest(SiteMixin, CacheIsolationTestCase):
         try:
             response_dict = json.loads(response.content.decode('utf-8'))
         except ValueError:
-            self.fail(u"Could not parse response content as JSON: %s"
+            self.fail("Could not parse response content as JSON: %s"
                       % str(response.content))
 
         if success is not None:
@@ -751,8 +749,8 @@ class LoginTest(SiteMixin, CacheIsolationTestCase):
             assert response_dict['error_code'] == error_code
 
         if value is not None:
-            msg = (u"'%s' did not contain '%s'" %
-                   (six.text_type(response_dict['value']), six.text_type(value)))
+            msg = ("'%s' did not contain '%s'" %
+                   (str(response_dict['value']), str(value)))
             assert value in response_dict['value'], msg
 
     def _assert_redirect_url(self, response, expected_redirect_url):
@@ -877,7 +875,7 @@ class LoginTest(SiteMixin, CacheIsolationTestCase):
         provider = 'Google'
         provider_tpa_hint = 'saml-test'
         username = 'batman'
-        user_email = '{username}@{domain}'.format(username=username, domain=user_domain)
+        user_email = f'{username}@{user_domain}'
         user = self._create_user(username, user_email)
         default_site_configuration_values = {
             'SITE_NAME': allowed_domain,
@@ -898,7 +896,7 @@ class LoginTest(SiteMixin, CacheIsolationTestCase):
                 if success:
                     value = None
                 else:
-                    value = u'As {0} user, You must login with your {0} <a href=\'{1}\'>{2} account</a>.'.format(
+                    value = 'As {0} user, You must login with your {0} <a href=\'{1}\'>{2} account</a>.'.format(
                         allowed_domain,
                         '{}?tpa_hint={}'.format(reverse("dashboard"), provider_tpa_hint),
                         provider,
@@ -958,7 +956,7 @@ class LoginSessionViewTest(ApiTestCase):
     PASSWORD = "password"
 
     def setUp(self):
-        super(LoginSessionViewTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.url = reverse("user_api_login_session")
 
     @ddt.data("get", "post")

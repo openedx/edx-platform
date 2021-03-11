@@ -3,14 +3,13 @@
 
 from datetime import date
 import json
-import six
+from unittest.mock import MagicMock, patch
 from django.conf import settings
 from django.http import HttpResponse
 from django.test import RequestFactory, TestCase
 from django.urls import reverse
 from edx_rest_framework_extensions.auth.jwt.decoder import jwt_decode_handler
 from edx_rest_framework_extensions.auth.jwt.middleware import JwtAuthCookieMiddleware
-from mock import MagicMock, patch
 
 from openedx.core.djangoapps.user_api.accounts.utils import retrieve_last_sitewide_block_completed
 from openedx.core.djangoapps.user_authn import cookies as cookies_api
@@ -24,7 +23,7 @@ from openedx.core.djangoapps.user_api.accounts.image_helpers import get_profile_
 
 class CookieTests(TestCase):
     def setUp(self):
-        super(CookieTests, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.user = UserFactory.create()
         self.user.profile = UserProfileFactory.create(user=self.user)
         self.request = RequestFactory().get('/')
@@ -38,7 +37,7 @@ class CookieTests(TestCase):
 
     def _convert_to_absolute_uris(self, request, urls_obj):
         """ Convert relative URL paths to absolute URIs """
-        for url_name, url_path in six.iteritems(urls_obj):
+        for url_name, url_path in urls_obj.items():
             urls_obj[url_name] = request.build_absolute_uri(url_path)
 
         return urls_obj
@@ -70,7 +69,7 @@ class CookieTests(TestCase):
     def _copy_cookies_to_request(self, response, request):
         request.COOKIES = {
             key: val.value
-            for key, val in six.iteritems(response.cookies)
+            for key, val in response.cookies.items()
         }
 
     def _set_use_jwt_cookie_header(self, request):

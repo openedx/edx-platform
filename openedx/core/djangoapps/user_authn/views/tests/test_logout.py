@@ -4,10 +4,9 @@ Tests for logout
 
 
 import unittest
-
+import urllib
+from unittest import mock
 import ddt
-import mock
-import six
 from django.conf import settings
 from django.test import TestCase
 from django.test.utils import override_settings
@@ -24,7 +23,7 @@ class LogoutTests(TestCase):
 
     def setUp(self):
         """ Create a course and user, then log in. """
-        super(LogoutTests, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.user = UserFactory()
         self.client.login(username=self.user.username, password='test')
 
@@ -75,7 +74,7 @@ class LogoutTests(TestCase):
         )
         response = self.client.get(url, HTTP_HOST=host)
         expected = {
-            'target': six.moves.urllib.parse.unquote(redirect_url),
+            'target': urllib.parse.unquote(redirect_url),
         }
         self.assertDictContainsSubset(expected, response.context_data)
 
@@ -180,7 +179,7 @@ class LogoutTests(TestCase):
         Test when learner logout from learner portal having active SSO session
         logout page should have link to logout url IdP.
         """
-        learner_portal_logout_url = '{}/logout'.format(settings.LEARNER_PORTAL_URL_ROOT)
+        learner_portal_logout_url = f'{settings.LEARNER_PORTAL_URL_ROOT}/logout'
         idp_logout_url = 'http://mock-idp.com/logout'
         client = self._create_oauth_client()
 

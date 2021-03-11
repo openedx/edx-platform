@@ -28,7 +28,6 @@ from ratelimit.decorators import ratelimit
 from requests import HTTPError
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from six import text_type
 from social_core.exceptions import AuthAlreadyAssociated, AuthException
 from social_django import utils as social_utils
 
@@ -107,8 +106,8 @@ REGISTER_USER = Signal(providing_args=["user", "registration"])
 # .. toggle_warnings: This temporary feature toggle does not have a target removal date.
 # .. toggle_tickets: None
 REGISTRATION_FAILURE_LOGGING_FLAG = LegacyWaffleFlag(
-    waffle_namespace=LegacyWaffleFlagNamespace(name=u'registration'),
-    flag_name=u'enable_failure_logging',
+    waffle_namespace=LegacyWaffleFlagNamespace(name='registration'),
+    flag_name='enable_failure_logging',
     module_name=__name__,
 )
 REAL_IP_KEY = 'openedx.core.djangoapps.util.ratelimit.real_ip'
@@ -180,7 +179,7 @@ def create_account_with_params(request, params):
         raise ValidationError(
             {
                 'session_expired': [
-                    _(u"Registration using {provider} has timed out.").format(
+                    _("Registration using {provider} has timed out.").format(
                         provider=params.get('social_auth_provider'))
                 ],
                 'error_code': 'tpa-session-expired',
@@ -241,7 +240,7 @@ def create_account_with_params(request, params):
         try:
             enable_notifications(user)
         except Exception:  # pylint: disable=broad-except
-            log.exception(u"Enable discussion notifications failed for user {id}.".format(id=user.id))
+            log.exception(f"Enable discussion notifications failed for user {user.id}.")
 
     _track_user_registration(user, profile, params, third_party_provider)
 
@@ -259,7 +258,7 @@ def create_account_with_params(request, params):
     # TODO: there is no error checking here to see that the user actually logged in successfully,
     # and is not yet an active user.
     if new_user is not None:
-        AUDIT_LOG.info(u"Login success on new account creation - {0}".format(new_user.username))
+        AUDIT_LOG.info(f"Login success on new account creation - {new_user.username}")
 
     return new_user
 
@@ -288,7 +287,7 @@ def _link_user_to_third_party_provider(
         if not social_access_token:
             raise ValidationError({
                 'access_token': [
-                    _(u"An access_token is required when passing value ({}) for provider.").format(
+                    _("An access_token is required when passing value ({}) for provider.").format(
                         params['provider']
                     )
                 ],
@@ -334,7 +333,7 @@ def _track_user_registration(user, profile, params, third_party_provider):
                 'education': profile.level_of_education_display,
                 'address': profile.mailing_address,
                 'gender': profile.gender_display,
-                'country': text_type(profile.country),
+                'country': str(profile.country),
             }
         ]
         # .. pii: Many pieces of PII are sent to Segment here. Retired directly through Segment API call in Tubular.
@@ -410,7 +409,7 @@ def _skip_activation_email(user, running_pipeline, third_party_provider):
     # log the cases where skip activation email flag is set, but email validity check fails
     if third_party_provider and third_party_provider.skip_email_verification and not valid_email:
         log.info(
-            u'[skip_email_verification=True][user=%s][pipeline-email=%s][identity_provider=%s][provider_type=%s] '
+            '[skip_email_verification=True][user=%s][pipeline-email=%s][identity_provider=%s][provider_type=%s] '
             'Account activation email sent as user\'s system email differs from SSO email.',
             user.email,
             sso_pipeline_email,
@@ -484,7 +483,7 @@ class RegistrationView(APIView):
     @method_decorator(transaction.non_atomic_requests)
     @method_decorator(sensitive_post_parameters("password"))
     def dispatch(self, request, *args, **kwargs):
-        return super(RegistrationView, self).dispatch(request, *args, **kwargs)  # lint-amnesty, pylint: disable=super-with-arguments
+        return super().dispatch(request, *args, **kwargs)
 
     @method_decorator(ensure_csrf_cookie)
     def get(self, request):
@@ -574,7 +573,7 @@ class RegistrationView(APIView):
             user = create_account_with_params(request, data)
         except AccountValidationError as err:
             errors = {
-                err.field: [{"user_message": text_type(err)}]
+                err.field: [{"user_message": str(err)}]
             }
             response = self._create_response(request, errors, status_code=409, error_code=err.error_code)
         except ValidationError as err:
