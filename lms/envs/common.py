@@ -325,7 +325,17 @@ FEATURES = {
     # True.
     'INDIVIDUAL_DUE_DATES': False,
 
-    # Enable Custom Courses for EdX
+    # .. toggle_name: CUSTOM_COURSES_EDX
+    # .. toggle_implementation: DjangoSetting
+    # .. toggle_default: False
+    # .. toggle_description: Set to True to enable Custom Courses for edX, a feature that is more commonly known as
+    #   CCX. Documentation for configuring and using this feature is available at
+    #   https://edx.readthedocs.io/projects/open-edx-ca/en/latest/set_up_course/custom_courses.html
+    # .. toggle_warnings: When set to true, 'lms.djangoapps.ccx.overrides.CustomCoursesForEdxOverrideProvider' will
+    #    be added to MODULESTORE_FIELD_OVERRIDE_PROVIDERS
+    # .. toggle_use_cases: opt_in, circuit_breaker
+    # .. toggle_creation_date: 2015-04-10
+    # .. toggle_tickets: https://github.com/edx/edx-platform/pull/6636
     'CUSTOM_COURSES_EDX': False,
 
     # Toggle to enable certificates of courses on dashboard
@@ -4110,9 +4120,10 @@ RSS_PROXY_CACHE_TIMEOUT = 3600  # The length of time we cache RSS retrieved from
 
 #### Custom Courses for EDX (CCX) configuration
 
-# This is an arbitrary hard limit.
-# The reason we introcuced this number is because we do not want the CCX
-# to compete with the MOOC.
+# .. setting_name: CCX_MAX_STUDENTS_ALLOWED
+# .. setting_default: 200
+# .. setting_description: Maximum number of students allowed in a CCX (Custom Courses for edX), This is an arbitrary
+#   hard limit, chosen so that a CCX does not compete with public MOOCs.
 CCX_MAX_STUDENTS_ALLOWED = 200
 
 # Financial assistance settings
