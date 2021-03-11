@@ -209,6 +209,26 @@ class OutlineFromModuleStoreTestCase(ModuleStoreTestCase):
         with self.assertRaises(CourseStructureError):
             get_outline_from_modulestore(self.course_key)
 
+    def test_missing_display_names(self):
+        """
+        When display_names are empty, it should fallback on url_names.
+        """
+        with self.store.bulk_operations(self.course_key):
+            section = ItemFactory.create(
+                parent_location=self.draft_course.location,
+                category='chapter',
+                display_name=None,
+            )
+            sequence = ItemFactory.create(
+                parent_location=section.location,
+                category='sequential',
+                display_name=None,
+            )
+
+        outline = get_outline_from_modulestore(self.course_key)
+        assert outline.sections[0].title == section.url_name
+        assert outline.sections[0].sequences[0].title == sequence.url_name
+
     def _outline_seq_data(self, modulestore_seq):
         """
         (CourseLearningSequenceData, UsageKey) for a Modulestore sequence.
