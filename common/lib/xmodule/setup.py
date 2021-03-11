@@ -9,7 +9,6 @@ XMODULES = [
     "section = xmodule.backcompat_module:SemanticSectionDescriptor",
     "slides = xmodule.backcompat_module:TranslateCustomTagDescriptor",
     "videodev = xmodule.backcompat_module:TranslateCustomTagDescriptor",
-    "custom_tag_template = xmodule.raw_module:RawDescriptor",
     "raw = xmodule.raw_module:RawDescriptor",
 ]
 XBLOCKS = [
@@ -20,6 +19,7 @@ XBLOCKS = [
     "course = xmodule.course_module:CourseBlock",
     "course_info = xmodule.html_module:CourseInfoBlock",
     "customtag = xmodule.template_module:CustomTagBlock",
+    "custom_tag_template = xmodule.template_module:CustomTagTemplateBlock",
     "error = xmodule.error_module:ErrorBlock",
     "hidden = xmodule.hidden_module:HiddenDescriptor",
     "html = xmodule.html_module:HtmlBlock",

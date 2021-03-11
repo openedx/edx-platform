@@ -21,7 +21,7 @@ from xmodule.x_module import (
 from xmodule.xml_module import XmlMixin
 
 
-class CustomTagBlock(
+class CustomTagTemplateBlock(  # pylint: disable=abstract-method
     RawMixin,
     XmlMixin,
     EditingMixin,
@@ -30,7 +30,15 @@ class CustomTagBlock(
     HTMLSnippet,
     ResourceTemplates,
     XModuleMixin,
-):  # pylint: disable=abstract-method
+):
+    """
+    A block which provides templates for CustomTagBlock. The template name
+    is set on the `impl` attribute of CustomTagBlock. See below for more details
+    on how to use it.
+    """
+
+
+class CustomTagBlock(CustomTagTemplateBlock):  # pylint: disable=abstract-method
     """
     This module supports tags of the form
     <customtag option="val" option2="val2" impl="tagname"/>
