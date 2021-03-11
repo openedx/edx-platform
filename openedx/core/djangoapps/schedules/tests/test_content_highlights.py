@@ -147,7 +147,9 @@ class TestContentHighlights(ModuleStoreTestCase):  # lint-amnesty, pylint: disab
 
         assert get_next_section_highlights(self.user, self.course_key, two_days_ago, today.date()) ==\
                (['skipped a week'], 2)
-        exception_message = 'Next section [{}] has no highlights for {}'.format('chapter 3', self.course_key)
+        exception_message = 'Next section [{}] has no highlights for {}'.format(  # pylint: disable=unused-variable
+            'chapter 3', self.course_key
+        )
         with pytest.raises(CourseUpdateDoesNotExist):
             get_next_section_highlights(self.user, self.course_key, two_days_ago, two_days.date())
         # Returns None, None if the target date does not match any due dates. This is caused by

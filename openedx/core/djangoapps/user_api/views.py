@@ -17,7 +17,6 @@ from rest_framework import authentication, generics, status, viewsets
 from rest_framework.exceptions import ParseError
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.views import APIView
-from six import text_type  # lint-amnesty, pylint: disable=unused-import
 
 from openedx.core.djangoapps.django_comment_common.models import Role
 from openedx.core.djangoapps.user_api import accounts  # lint-amnesty, pylint: disable=unused-import
@@ -128,7 +127,7 @@ class UpdateEmailOptInPreference(APIView):
         except InvalidKeyError:
             return HttpResponse(
                 status=400,
-                content=u"No course '{course_id}' found".format(course_id=course_id),
+                content=f"No course '{course_id}' found",
                 content_type="text/plain"
             )
         # Only check for true. All other values are False.

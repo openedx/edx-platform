@@ -7,7 +7,7 @@ from django.utils.translation import ugettext_lazy as _
 
 from edx_toggles.toggles import WaffleSwitch
 
-SYSTEM_MAINTENANCE_MSG = _(u'System maintenance in progress. Please try again later.')
+SYSTEM_MAINTENANCE_MSG = _('System maintenance in progress. Please try again later.')
 
 # .. toggle_name: user_api.enable_multiple_user_enterprises_feature
 # .. toggle_implementation: WaffleSwitch

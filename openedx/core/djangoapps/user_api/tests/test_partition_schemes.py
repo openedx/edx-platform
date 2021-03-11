@@ -4,11 +4,10 @@ Test the user api's partition extensions.
 
 
 from collections import defaultdict
+from unittest.mock import patch
 
 import pytest
 from django.test import TestCase
-from mock import patch
-from six.moves import range
 
 from openedx.core.djangoapps.user_api.partition_schemes import RandomUserPartitionScheme, UserPartitionError
 from common.djangoapps.student.tests.factories import UserFactory
@@ -16,7 +15,7 @@ from xmodule.partitions.partitions import Group, UserPartition
 from xmodule.partitions.tests.test_partitions import PartitionTestCase
 
 
-class MemoryCourseTagAPI(object):
+class MemoryCourseTagAPI:
     """
     An implementation of a user service that uses an in-memory dictionary for storage
     """
@@ -31,7 +30,7 @@ class MemoryCourseTagAPI(object):
         """Gets the value of ``key``"""
         self._tags[course_id][key] = value
 
-    class BulkCourseTags(object):
+    class BulkCourseTags:
         @classmethod
         def is_prefetched(self, course_id):  # lint-amnesty, pylint: disable=bad-classmethod-argument, unused-argument
             return False
@@ -46,7 +45,7 @@ class TestRandomUserPartitionScheme(PartitionTestCase):
     MOCK_COURSE_ID = "mock-course-id"
 
     def setUp(self):
-        super(TestRandomUserPartitionScheme, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         # Patch in a memory-based user service instead of using the persistent version
         course_tag_api = MemoryCourseTagAPI()
         self.user_service_patcher = patch(

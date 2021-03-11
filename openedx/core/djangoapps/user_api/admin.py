@@ -26,7 +26,7 @@ class RetirementStateAdmin(admin.ModelAdmin):
     list_filter = ('is_dead_end_state', 'required',)
     search_fields = ('state_name',)
 
-    class Meta(object):
+    class Meta:
         model = RetirementState
 
 
@@ -87,7 +87,7 @@ class UserRetirementStatusAdmin(admin.ModelAdmin):
         """
         Adds our custom URL to the admin
         """
-        urls = super(UserRetirementStatusAdmin, self).get_urls()  # lint-amnesty, pylint: disable=super-with-arguments
+        urls = super().get_urls()
         custom_urls = [
             url(
                 r'^(?P<retirement_id>.+)/cancel_retirement/$',
@@ -105,7 +105,7 @@ class UserRetirementStatusAdmin(admin.ModelAdmin):
         try:
             if obj.current_state.state_name == 'PENDING':
                 return format_html(
-                    u'<a class="button" href="{}">{}</a>&nbsp;',
+                    '<a class="button" href="{}">{}</a>&nbsp;',
                     reverse('admin:cancel-retirement', args=[obj.pk]),
                     _('Cancel')
                 )
@@ -121,7 +121,7 @@ class UserRetirementStatusAdmin(admin.ModelAdmin):
         Removes the default bulk delete option provided by Django,
         it doesn't do what we need for this model.
         """
-        actions = super(UserRetirementStatusAdmin, self).get_actions(request)  # lint-amnesty, pylint: disable=super-with-arguments
+        actions = super().get_actions(request)
         if 'delete_selected' in actions:
             del actions['delete_selected']
         return actions
@@ -138,7 +138,7 @@ class UserRetirementStatusAdmin(admin.ModelAdmin):
         """
         return False
 
-    class Meta(object):
+    class Meta:
         model = UserRetirementStatus
 
 
@@ -150,7 +150,7 @@ class UserRetirementRequestAdmin(admin.ModelAdmin):
     list_display = ('user', 'created')
     raw_id_fields = ('user',)
 
-    class Meta(object):
+    class Meta:
         model = UserRetirementRequest
 
 
@@ -172,7 +172,7 @@ class UserRetirementPartnerReportingStatusAdmin(admin.ModelAdmin):
         'reset_state',  # See reset_state() below.
     ]
 
-    class Meta(object):
+    class Meta:
         model = UserRetirementPartnerReportingStatus
 
     def user_id(self, obj):
@@ -192,7 +192,7 @@ class UserRetirementPartnerReportingStatusAdmin(admin.ModelAdmin):
         if rows_updated == 1:
             message_bit = "one user was"
         else:
-            message_bit = u"%s users were" % rows_updated
-        self.message_user(request, u"%s successfully reset." % message_bit)
+            message_bit = "%s users were" % rows_updated
+        self.message_user(request, "%s successfully reset." % message_bit)
 
     reset_state.short_description = 'Reset is_being_processed to False'
