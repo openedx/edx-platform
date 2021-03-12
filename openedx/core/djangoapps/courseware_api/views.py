@@ -68,6 +68,17 @@ class CoursewareMeta:
             username or self.request.user.username,
             course_key,
         )
+        # We must compute course load access *before* setting up masquerading,
+        # else course staff (who are not enrolled) will not be able view
+        # their course from the perspective of a learner.
+        self.load_access = check_course_access(
+            self.overview,
+            self.request.user,
+            'load',
+            check_if_enrolled=True,
+            check_survey_complete=False,
+            check_if_authenticated=True,
+        )
         self.original_user_is_staff = has_access(self.request.user, 'staff', self.overview).has_access
         self.original_user_is_global_staff = self.request.user.is_staff
         self.course_key = course_key
@@ -132,21 +143,18 @@ class CoursewareMeta:
         return course.license
 
     @property
-    def can_load_courseware(self):  # lint-amnesty, pylint: disable=missing-function-docstring
-        access_response = check_course_access(
-            self.overview,
-            self.effective_user,
-            'load',
-            check_if_enrolled=True,
-            check_survey_complete=False,
-            check_if_authenticated=True,
-        ).to_json()
+    def can_load_courseware(self) -> dict:
+        """
+        Can the user load this course in the learning micro-frontend?
+
+        Return a JSON-friendly access response.
+        """
         # Only check whether the MFE is enabled if the user would otherwise be allowed to see it
         # This means that if the user was denied access, they'll see a meaningful message first if
         # there is one.
-        if access_response and not self.is_microfrontend_enabled_for_user():
+        if self.load_access and not self.is_microfrontend_enabled_for_user():
             return CoursewareMicrofrontendDisabledAccessError().to_json()
-        return access_response
+        return self.load_access.to_json()
 
     @property
     def tabs(self):
