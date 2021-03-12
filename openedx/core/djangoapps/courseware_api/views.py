@@ -439,8 +439,11 @@ class CoursewareInformation(RetrieveAPIView):
         """
         response = super().finalize_response(request, response, *args, **kwargs)
         # Adding this header should be moved somewhere global, not just this endpoint
-        response['Access-Control-Expose-Headers'] = 'Date'
+        exposedHeaders = response.get('Access-Control-Expose-Headers', '')
+        exposedHeaders += ', Date' if exposedHeaders else 'Date'
+        response['Access-Control-Expose-Headers'] = exposedHeaders
         return response
+
 
 class SequenceMetadata(DeveloperErrorViewMixin, APIView):
     """
