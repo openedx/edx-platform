@@ -2,17 +2,17 @@
 
 
 import uuid
+from unittest.mock import patch
+from urllib.parse import parse_qs, urlparse
 
 from django.http import HttpRequest
 from edx_ace import Message, Recipient
-from mock import patch
-from six.moves.urllib.parse import parse_qs, urlparse  # pylint: disable=import-error
 
 from openedx.core.djangoapps.site_configuration.tests.factories import SiteFactory
 from common.djangoapps.student.tests.factories import UserFactory
 
 
-class QueryStringAssertionMixin(object):
+class QueryStringAssertionMixin:
 
     def assert_query_string_equal(self, expected_qs, actual_qs):
         """
@@ -64,10 +64,10 @@ class QueryStringAssertionMixin(object):
             assert parsed_qs[expected_key] == [str(expected_value)]
 
 
-class EmailTemplateTagMixin(object):
+class EmailTemplateTagMixin:
 
     def setUp(self):
-        super(EmailTemplateTagMixin, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
 
         patcher = patch('openedx.core.djangoapps.ace_common.templatetags.ace.get_current_request')
         self.mock_get_current_request = patcher.start()

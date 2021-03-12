@@ -13,7 +13,7 @@ class ApiAccessRequestForm(forms.ModelForm):
     """Form to request API access."""
     terms_of_service = forms.BooleanField(widget=TermsOfServiceCheckboxInput(), label='')
 
-    class Meta(object):
+    class Meta:
         model = ApiAccessRequest
         fields = ('company_name', 'website', 'company_address', 'reason', 'terms_of_service')
         labels = {
@@ -34,7 +34,7 @@ class ApiAccessRequestForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         # Get rid of the colons at the end of the field labels.
         kwargs.setdefault('label_suffix', '')
-        super(ApiAccessRequestForm, self).__init__(*args, **kwargs)  # lint-amnesty, pylint: disable=super-with-arguments
+        super().__init__(*args, **kwargs)
 
 
 class ViewersWidget(forms.widgets.TextInput):
@@ -61,7 +61,7 @@ class ViewersField(forms.Field):
         return [username.strip() for username in value.split(',')]
 
     def validate(self, value):
-        super(ViewersField, self).validate(value)  # lint-amnesty, pylint: disable=super-with-arguments
+        super().validate(value)
         nonexistent_users = []
         for username in value:
             try:
@@ -70,7 +70,7 @@ class ViewersField(forms.Field):
                 nonexistent_users.append(username)
         if nonexistent_users:
             raise forms.ValidationError(
-                _(u'The following users do not exist: {usernames}.').format(usernames=nonexistent_users)
+                _('The following users do not exist: {usernames}.').format(usernames=nonexistent_users)
             )
 
 
@@ -79,7 +79,7 @@ class CatalogForm(forms.ModelForm):
 
     viewers = ViewersField()
 
-    class Meta(object):
+    class Meta:
         model = Catalog
         fields = ('name', 'query', 'viewers')
         help_texts = {

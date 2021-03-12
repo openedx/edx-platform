@@ -83,7 +83,7 @@ class ApiAccessRequestViewTests(TestCase):
         """
         self.update_user_and_re_login(is_staff=True)
 
-        response = self.client.get(self.url + '?user__username={}'.format(self.user.username))
+        response = self.client.get(self.url + f'?user__username={self.user.username}')
         self._assert_api_access_request_response(api_response=response, expected_results_count=1)
 
     def test_filtering_for_non_existing_user(self):
