@@ -7,8 +7,7 @@ import os
 import tarfile
 import datetime
 
-from backports.tempfile import TemporaryDirectory
-from tempfile import NamedTemporaryFile
+from tempfile import NamedTemporaryFile, TemporaryDirectory
 
 from celery.task import task
 from celery.utils.log import get_task_logger
