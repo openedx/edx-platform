@@ -53,12 +53,6 @@
 
         function MarkdownEditingDescriptor(element) {
             var that = this;
-            this.toggleCheatsheetVisibility = function() {
-                return MarkdownEditingDescriptor.prototype.toggleCheatsheetVisibility.apply(that, arguments);
-            };
-            this.toggleCheatsheet = function() {
-                return MarkdownEditingDescriptor.prototype.toggleCheatsheet.apply(that, arguments);
-            };
             this.onToolbarButton = function() {
                 return MarkdownEditingDescriptor.prototype.onToolbarButton.apply(that, arguments);
             };
@@ -75,7 +69,6 @@
                 // Add listeners for toolbar buttons (only present for markdown editor)
                 this.element.on('click', '.xml-tab', this.onShowXMLButton);
                 this.element.on('click', '.format-buttons button', this.onToolbarButton);
-                this.element.on('click', '.cheatsheet-toggle', this.toggleCheatsheet);
                 // Hide the XML text area
                 $(this.element.find('.xml-box')).hide();
             } else {
@@ -110,10 +103,6 @@
          */
         MarkdownEditingDescriptor.prototype.onShowXMLButton = function(e) {
             e.preventDefault();
-            if (this.cheatsheet && this.cheatsheet.hasClass('shown')) {
-                this.cheatsheet.toggleClass('shown');
-                this.toggleCheatsheetVisibility();
-            }
             if (this.confirmConversionToXml()) {
                 this.createXMLEditor(MarkdownEditingDescriptor.markdownToXml(this.markdown_editor.getValue()));
                 this.xml_editor.setCursor(0);
@@ -170,29 +159,6 @@
         };
 
         /*
-         Event listener for toggling cheatsheet (only possible when markdown editor is visible).
-         */
-        MarkdownEditingDescriptor.prototype.toggleCheatsheet = function(e) {
-            var that = this;
-            e.preventDefault();
-            if (!$(this.markdown_editor.getWrapperElement()).find('.simple-editor-cheatsheet')[0]) {
-                this.cheatsheet = $($('#simple-editor-cheatsheet').html());
-                $(this.markdown_editor.getWrapperElement()).append(this.cheatsheet);
-            }
-            this.toggleCheatsheetVisibility();
-            return setTimeout((function() {
-                return that.cheatsheet.toggleClass('shown');
-            }), 10);
-        };
-
-        /*
-         Function to toggle cheatsheet visibility.
-         */
-        MarkdownEditingDescriptor.prototype.toggleCheatsheetVisibility = function() {
-            return $('.modal-content').toggleClass('cheatsheet-is-shown');
-        };
-
-        /*
          Stores the current editor and hides the one that is not displayed.
          */
         MarkdownEditingDescriptor.prototype.setCurrentEditor = function(editor) {
@@ -212,7 +178,6 @@
         MarkdownEditingDescriptor.prototype.save = function() {
             this.element.off('click', '.xml-tab', this.changeEditor);
             this.element.off('click', '.format-buttons button', this.onToolbarButton);
-            this.element.off('click', '.cheatsheet-toggle', this.toggleCheatsheet);
             if (this.current_editor === this.markdown_editor) {
                 return {
                     data: MarkdownEditingDescriptor.markdownToXml(this.markdown_editor.getValue()),
@@ -327,12 +292,13 @@
                 // <label>question</label> <description>description</description>
                 xml = xml.replace(/>>([^]+?)<</gm, function(match, questionText) {
                     var result = questionText.split('||'),
-                        label = '<label>' + result[0] + '</label>\n';
+                        label = '<label>' + result[0] + '</label>\n'; // xss-lint: disable=javascript-concat-html
 
                     // don't add empty <description> tag
                     if (result.length === 1 || !result[1]) {
                         return label;
                     }
+                    // xss-lint: disable=javascript-concat-html
                     return label + '<description>' + result[1] + '</description>\n';
                 });
 
@@ -425,6 +391,7 @@
                             optiontag += correct[1];
                         }
                         optiontag += '">';
+                        // xss-lint: disable=javascript-concat-html
                         return '\n<optionresponse>\n' + optiontag + '</optioninput>\n</optionresponse>\n\n';
                     }
 
@@ -442,12 +409,15 @@
                                 if (label) {
                                     label = ' label="' + label + '"';
                                 }
+                                // xss-lint: disable=javascript-concat-html
                                 hintstr = ' <optionhint' + label + '>' + textHint.hint + '</optionhint>';
                             }
+                            // xss-lint: disable=javascript-concat-html
                             optionlines += '    <option' + correctstr + '>' + textHint.nothint + hintstr +
                                 '</option>\n';
                         }
                     }
+                    // xss-lint: disable=javascript-concat-html
                     return '\n<optionresponse>\n  <optioninput>\n' + optionlines +
                         '  </optioninput>\n</optionresponse>\n\n';
                 });
@@ -477,8 +447,10 @@
                             hint = extractHint(value);
                             if (hint.hint) {
                                 value = hint.nothint;
+                                // xss-lint: disable=javascript-concat-html
                                 value = value + ' <choicehint' + hint.labelassign + '>' + hint.hint + '</choicehint>';
                             }
+                            // xss-lint: disable=javascript-concat-html
                             choices += '    <choice correct="' + correct + '"' + fixed + '>' + value + '</choice>\n';
                         }
                     }
@@ -515,6 +487,7 @@
                                 // lone case of hint text processing outside of extractHint, since syntax here is unique
                                 hintbody = abhint[2];
                                 hintbody = hintbody.replace('&lf;', '\n').trim();
+                                // xss-lint: disable=javascript-concat-html
                                 endHints += '    <compoundhint value="' + abhint[1].trim() + '">' + hintbody +
                                     '</compoundhint>\n';
                                 continue;  // bail
@@ -534,11 +507,13 @@
                                 // checkbox choicehints get their own line, since there can be two of them
                                 // <choicehint selected="true">You’re right that apple is a fruit.</choicehint>
                                 if (select) {
+                                    // xss-lint: disable=javascript-concat-html
                                     hints += '\n      <choicehint selected="true">' + select[2].trim() +
                                         '</choicehint>';
                                 }
                                 select = /{\s*(u|unselected):((.|\n)*?)}/i.exec(inner);
                                 if (select) {
+                                    // xss-lint: disable=javascript-concat-html
                                     hints += '\n      <choicehint selected="false">' + select[2].trim() +
                                         '</choicehint>';
                                 }
@@ -549,6 +524,7 @@
                                     value = hint.nothint;
                                 }
                             }
+                            // xss-lint: disable=javascript-concat-html
                             groupString += '    <choice correct="' + correct + '">' + value + hints + '</choice>\n';
                         }
                     }
@@ -573,6 +549,17 @@
                             );
                         },
 
+                        checkIsNumeric = function(stringValue) {
+                            // remove OLX feedback
+                            if ((stringValue.indexOf('{{') !== -1) && (stringValue.indexOf('}}') !== -1)) {
+                                stringValue = stringValue.replace(/{{[\s\S]*?}}/g, '').trim();
+                            }
+                            if (stringValue.match(/[a-z]/i)) {
+                                return false;
+                            }
+                            return !isNaN(parseFloat(stringValue));
+                        },
+
                         getAnswerData = function(answerValue) {
                             var answerData = {},
                                 answerParams = /(.*?)\+\-\s*(.*?$)/.exec(answerValue);
@@ -593,7 +580,7 @@
                             firstAnswer = answerValues[0].replace(/^\=\s*/, '');
 
                             // If answer is not numerical
-                            if (isNaN(parseFloat(firstAnswer)) && !isRangeToleranceCase(firstAnswer)) {
+                            if (!checkIsNumeric(firstAnswer) && !isRangeToleranceCase(firstAnswer)) {
                                 return false;
                             }
 
@@ -683,10 +670,12 @@
                                 typ = ' type="ci regexp"';
                                 firstAnswer = firstAnswer.slice(1).trim();
                             }
+                            // xss-lint: disable=javascript-concat-html
                             string = '<stringresponse answer="' + firstAnswer + '"' + typ + ' >\n';
                             if (textHint.hint) {
+                                // xss-lint: disable=javascript-concat-html
                                 string += '  <correcthint' + textHint.labelassign + '>' +
-                                    textHint.hint + '</correcthint>\n';
+                                    textHint.hint + '</correcthint>\n'; // xss-lint: disable=javascript-concat-html
                             }
 
                             // Subsequent cases are not= or or=
@@ -694,16 +683,22 @@
                                 textHint = extractHint(values[i]);
                                 notMatch = /^not\=\s*(.*)/.exec(textHint.nothint);
                                 if (notMatch) {
+                                    // xss-lint: disable=javascript-concat-html
                                     string += '  <stringequalhint answer="' + notMatch[1] + '"' +
+                                        // xss-lint: disable=javascript-concat-html
                                         textHint.labelassign + '>' + textHint.hint + '</stringequalhint>\n';
+
                                     continue;
                                 }
                                 orMatch = /^or\=\s*(.*)/.exec(textHint.nothint);
                                 if (orMatch) {
                                     // additional_answer with answer= attribute
+                                    // xss-lint: disable=javascript-concat-html
                                     string += '  <additional_answer answer="' + orMatch[1] + '">';
                                     if (textHint.hint) {
+                                        // xss-lint: disable=javascript-concat-html
                                         string += '<correcthint' + textHint.labelassign + '>' +
+                                            // xss-lint: disable=javascript-concat-html
                                             textHint.hint + '</correcthint>';
                                     }
                                     string += '</additional_answer>\n';
@@ -721,12 +716,15 @@
 
                 // replace explanations
                 xml = xml.replace(/\[explanation\]\n?([^\]]*)\[\/?explanation\]/gmi, function(match, p1) {
+                    // xss-lint: disable=javascript-concat-html
                     return '<solution>\n<div class="detailed-solution">\n' +
+                        // xss-lint: disable=javascript-concat-html
                         gettext('Explanation') + '\n\n' + p1 + '\n</div>\n</solution>';
                 });
 
                 // replace code blocks
                 xml = xml.replace(/\[code\]\n?([^\]]*)\[\/?code\]/gmi, function(match, p1) {
+                    // xss-lint: disable=javascript-concat-html
                     return '<pre><code>' + p1 + '</code></pre>';
                 });
 

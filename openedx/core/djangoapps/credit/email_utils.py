@@ -2,14 +2,14 @@
 This file contains utility functions which will responsible for sending emails.
 """
 
-import HTMLParser
+
 import logging
 import os
-import urlparse
 import uuid
 from email.mime.image import MIMEImage
 from email.mime.multipart import MIMEMultipart
 
+import six
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.contrib.staticfiles import finders
@@ -17,13 +17,14 @@ from django.core.cache import cache
 from django.core.mail import EmailMessage, SafeMIMEText
 from django.urls import reverse
 from django.utils.translation import ugettext as _
+from eventtracking import tracker
 
 from edxmako.shortcuts import render_to_string
 from edxmako.template import Template
-from eventtracking import tracker
 from openedx.core.djangoapps.commerce.utils import ecommerce_api_client
 from openedx.core.djangoapps.credit.models import CreditConfig, CreditProvider
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
+from openedx.core.djangolib.markup import HTML
 from xmodule.modulestore.django import modulestore
 
 log = logging.getLogger(__name__)
@@ -36,7 +37,7 @@ def send_credit_notifications(username, course_key):
     try:
         user = User.objects.get(username=username)
     except User.DoesNotExist:
-        log.error('No user with %s exist', username)
+        log.error(u'No user with %s exist', username)
         return
 
     course = modulestore().get_course(course_key, depth=0)
@@ -65,7 +66,7 @@ def send_credit_notifications(username, course_key):
         # strip enclosing angle brackets from 'logo_image' cache 'Content-ID'
         logo_image_id = logo_image.get('Content-ID', '')[1:-1]
 
-    providers_names = get_credit_provider_display_names(course_key)
+    providers_names = get_credit_provider_attribute_values(course_key, 'display_name')
     providers_string = make_providers_strings(providers_names)
     context = {
         'full_name': user.get_full_name(),
@@ -105,7 +106,7 @@ def send_credit_notifications(username, course_key):
                 cur_text = cur_file.read()
                 # use html parser to unescape html characters which are changed
                 # by the 'pynliner' while adding inline css to html content
-                html_parser = HTMLParser.HTMLParser()
+                html_parser = six.moves.html_parser.HTMLParser()
                 email_body_content = html_parser.unescape(with_inline_css(cur_text))
                 # cache the email body content before rendering it since the
                 # email context will change for each user e.g., 'full_name'
@@ -150,7 +151,7 @@ def with_inline_css(html_without_css):
         import pynliner
 
         # insert style tag in the html and run pyliner.
-        html_with_inline_css = pynliner.fromString('<style>' + css_content + '</style>' + html_without_css)
+        html_with_inline_css = pynliner.fromString(HTML('<style>{}</style>{}').format(css_content, html_without_css))
         return html_with_inline_css
 
     return html_without_css
@@ -167,7 +168,7 @@ def attach_image(img_dict, filename):
     if img_path:
         with open(img_path, 'rb') as img:
             msg_image = MIMEImage(img.read(), name=os.path.basename(img_path))
-            msg_image.add_header('Content-ID', '<{}>'.format(img_dict['cid']))
+            msg_image.add_header('Content-ID', '<{}>'.format(img_dict['cid']))  # xss-lint: disable=python-wrap-html
             msg_image.add_header("Content-Disposition", "inline", filename=filename)
         return msg_image
 
@@ -192,43 +193,46 @@ def _email_url_parser(url_name, extra_param=None):
     site_name = configuration_helpers.get_value('SITE_NAME', settings.SITE_NAME)
     dashboard_url_path = reverse(url_name) + extra_param if extra_param else reverse(url_name)
     dashboard_link_parts = ("https", site_name, dashboard_url_path, '', '', '')
-    return urlparse.urlunparse(dashboard_link_parts)
+    return six.moves.urllib.parse.urlunparse(dashboard_link_parts)  # pylint: disable=too-many-function-args
 
 
-def get_credit_provider_display_names(course_key):
+def get_credit_provider_attribute_values(course_key, attribute_name):
     """Get the course information from ecommerce and parse the data to get providers.
 
     Arguments:
         course_key (CourseKey): The identifier for the course.
+        attribute_name (String): Name of the attribute of credit provider.
 
     Returns:
-        List of credit provider display names.
+        List of provided credit provider attribute values.
     """
-    course_id = unicode(course_key)
+    course_id = six.text_type(course_key)
     credit_config = CreditConfig.current()
 
     cache_key = None
-    provider_names = None
+    attribute_values = None
 
     if credit_config.is_cache_enabled:
-        cache_key = '{key_prefix}.{course_key}'.format(
-            key_prefix=credit_config.CACHE_KEY, course_key=course_id
+        cache_key = '{key_prefix}.{course_key}.{attribute_name}'.format(
+            key_prefix=credit_config.CACHE_KEY,
+            course_key=course_id,
+            attribute_name=attribute_name
         )
-        provider_names = cache.get(cache_key)
+        attribute_values = cache.get(cache_key)
 
-    if provider_names is not None:
-        return provider_names
+    if attribute_values is not None:
+        return attribute_values
 
     try:
         user = User.objects.get(username=settings.ECOMMERCE_SERVICE_WORKER_USERNAME)
         response = ecommerce_api_client(user).courses(course_id).get(include_products=1)
     except Exception:  # pylint: disable=broad-except
-        log.exception("Failed to receive data from the ecommerce course API for Course ID '%s'.", course_id)
-        return provider_names
+        log.exception(u"Failed to receive data from the ecommerce course API for Course ID '%s'.", course_id)
+        return attribute_values
 
     if not response:
-        log.info("No Course information found from ecommerce API for Course ID '%s'.", course_id)
-        return provider_names
+        log.info(u"No Course information found from ecommerce API for Course ID '%s'.", course_id)
+        return attribute_values
 
     provider_ids = []
     for product in response.get('products'):
@@ -236,16 +240,16 @@ def get_credit_provider_display_names(course_key):
             attr.get('value') for attr in product.get('attribute_values') if attr.get('name') == 'credit_provider'
         ]
 
-    provider_names = []
+    attribute_values = []
     credit_providers = CreditProvider.get_credit_providers()
     for provider in credit_providers:
         if provider['id'] in provider_ids:
-            provider_names.append(provider['display_name'])
+            attribute_values.append(provider[attribute_name])
 
     if credit_config.is_cache_enabled:
-        cache.set(cache_key, provider_names, credit_config.cache_ttl)
+        cache.set(cache_key, attribute_values, credit_config.cache_ttl)
 
-    return provider_names
+    return attribute_values
 
 
 def make_providers_strings(providers):
@@ -265,14 +269,14 @@ def make_providers_strings(providers):
 
     elif len(providers) == 2:
         # Translators: The join of two university names (e.g., Harvard and MIT).
-        providers_string = _("{first_provider} and {second_provider}").format(
+        providers_string = _(u"{first_provider} and {second_provider}").format(
             first_provider=providers[0],
             second_provider=providers[1]
         )
     else:
         # Translators: The join of three or more university names. The first of these formatting strings
         # represents a comma-separated list of names (e.g., MIT, Harvard, Dartmouth).
-        providers_string = _("{first_providers}, and {last_provider}").format(
+        providers_string = _(u"{first_providers}, and {last_provider}").format(
             first_providers=u", ".join(providers[:-1]),
             last_provider=providers[-1]
         )

@@ -1,6 +1,8 @@
 """
 CCX API URLs.
 """
+
+
 from django.conf.urls import include, url
 
 app_name = 'ccx_api'

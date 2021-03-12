@@ -6,13 +6,13 @@
 # Run it this way:
 #   ./manage.py cms --settings dev edit_course_tabs --course Stanford/CS99/2013_spring
 #
-from __future__ import print_function
+
 
 from django.core.management.base import BaseCommand, CommandError
 from opaque_keys.edx.keys import CourseKey
 
 from contentstore.views import tabs
-from courseware.courses import get_course_by_id
+from lms.djangoapps.courseware.courses import get_course_by_id
 
 from .prompt import query_yes_no
 
@@ -85,7 +85,7 @@ command again, adding --insert or --delete to edit the list.
                 if num < 3:
                     raise CommandError("Tabs 1 and 2 cannot be changed.")
 
-                if query_yes_no('Deleting tab {0} Confirm?'.format(num), default='no'):
+                if query_yes_no(u'Deleting tab {0} Confirm?'.format(num), default='no'):
                     tabs.primitive_delete(course, num - 1)  # -1 for 0-based indexing
             elif options['insert']:
                 num, tab_type, name = options['insert']
@@ -93,7 +93,7 @@ command again, adding --insert or --delete to edit the list.
                 if num < 3:
                     raise CommandError("Tabs 1 and 2 cannot be changed.")
 
-                if query_yes_no('Inserting tab {0} "{1}" "{2}" Confirm?'.format(num, tab_type, name), default='no'):
+                if query_yes_no(u'Inserting tab {0} "{1}" "{2}" Confirm?'.format(num, tab_type, name), default='no'):
                     tabs.primitive_insert(course, num - 1, tab_type, name)  # -1 as above
         except ValueError as e:
             # Cute: translate to CommandError so the CLI error prints nicely.

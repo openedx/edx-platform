@@ -2,6 +2,7 @@
 Views file for theming administration.
 """
 
+
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.http import Http404
@@ -9,15 +10,16 @@ from django.shortcuts import redirect
 from django.template.loader import render_to_string
 from django.utils.decorators import method_decorator
 from django.utils.translation import ugettext as _
+from web_fragments.fragment import Fragment
+
 from openedx.core.djangoapps.plugin_api.views import EdxFragmentView
 from openedx.core.djangoapps.user_api.preferences.api import (
     delete_user_preference,
     get_user_preference,
-    set_user_preference,
+    set_user_preference
 )
 from openedx.core.djangoapps.util.user_messages import PageLevelMessages
 from student.roles import GlobalStaff
-from web_fragments.fragment import Fragment
 
 from .helpers import theme_exists
 from .models import SiteTheme
@@ -72,12 +74,12 @@ def set_user_preview_site_theme(request, preview_site_theme):
             set_user_preference(request.user, PREVIEW_SITE_THEME_PREFERENCE_KEY, preview_site_theme_name)
             PageLevelMessages.register_success_message(
                 request,
-                _('Site theme changed to {site_theme}'.format(site_theme=preview_site_theme_name))
+                _(u'Site theme changed to {site_theme}').format(site_theme=preview_site_theme_name)
             )
         else:
             PageLevelMessages.register_error_message(
                 request,
-                _('Theme {site_theme} does not exist'.format(site_theme=preview_site_theme_name))
+                _(u'Theme {site_theme} does not exist').format(site_theme=preview_site_theme_name)
             )
     else:
         delete_user_preference(request.user, PREVIEW_SITE_THEME_PREFERENCE_KEY)

@@ -101,7 +101,8 @@ define([
                                 name: 'Group 2',
                                 usage: []
                             }
-                        ]
+                        ],
+                        read_only: true
                     },
                     clientModelSpec = {
                         id: 10,
@@ -124,7 +125,8 @@ define([
                                 usage: []
                             }
                         ],
-                        usage: []
+                        usage: [],
+                        read_only: true
                     },
                     model = new GroupConfigurationModel(
                         serverModelSpec, {parse: true}

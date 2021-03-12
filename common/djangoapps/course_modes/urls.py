@@ -1,3 +1,6 @@
+"""URLs for course_mode API"""
+
+
 from django.conf import settings
 from django.conf.urls import url
 

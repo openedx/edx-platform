@@ -1,20 +1,16 @@
 """ Tests for API permissions classes. """
 
+
 import ddt
 from django.contrib.auth.models import AnonymousUser
 from django.http import Http404
-from django.test import TestCase, RequestFactory
-from nose.plugins.attrib import attr
+from django.test import RequestFactory, TestCase
+from opaque_keys.edx.keys import CourseKey
 from rest_framework.generics import GenericAPIView
 
-from student.roles import CourseStaffRole, CourseInstructorRole
-from openedx.core.lib.api.permissions import (
-    IsStaffOrOwner,
-    IsCourseStaffInstructor,
-    IsMasterCourseStaffInstructor,
-)
+from openedx.core.lib.api.permissions import IsCourseStaffInstructor, IsMasterCourseStaffInstructor, IsStaffOrOwner
+from student.roles import CourseInstructorRole, CourseStaffRole
 from student.tests.factories import UserFactory
-from opaque_keys.edx.keys import CourseKey
 
 
 class TestObject(object):
@@ -31,7 +27,6 @@ class TestCcxObject(TestObject):
         self.coach = user
 
 
-@attr(shard=2)
 class IsCourseStaffInstructorTests(TestCase):
     """ Test for IsCourseStaffInstructor permission class. """
 
@@ -65,7 +60,6 @@ class IsCourseStaffInstructorTests(TestCase):
         self.assertFalse(self.permission.has_object_permission(self.request, None, self.obj))
 
 
-@attr(shard=2)
 class IsMasterCourseStaffInstructorTests(TestCase):
     """ Test for IsMasterCourseStaffInstructorTests permission class. """
 
@@ -110,7 +104,6 @@ class IsMasterCourseStaffInstructorTests(TestCase):
             self.permission.has_permission(post_request, None)
 
 
-@attr(shard=2)
 @ddt.ddt
 class IsStaffOrOwnerTests(TestCase):
     """ Tests for IsStaffOrOwner permission class. """

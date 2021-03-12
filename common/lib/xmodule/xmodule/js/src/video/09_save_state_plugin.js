@@ -99,28 +99,30 @@
             },
 
             saveState: function(async, data) {
-                if (!($.isPlainObject(data))) {
-                    data = {
-                        saved_video_position: this.state.videoPlayer.currentTime
-                    };
-                }
+                if (this.state.config.saveStateEnabled) {
+                    if (!($.isPlainObject(data))) {
+                        data = {
+                            saved_video_position: this.state.videoPlayer.currentTime
+                        };
+                    }
 
-                if (data.speed) {
-                    this.state.storage.setItem('speed', data.speed, true);
-                }
+                    if (data.speed) {
+                        this.state.storage.setItem('speed', data.speed, true);
+                    }
 
-                if (_.has(data, 'saved_video_position')) {
-                    this.state.storage.setItem('savedVideoPosition', data.saved_video_position, true);
-                    data.saved_video_position = Time.formatFull(data.saved_video_position);
-                }
+                    if (_.has(data, 'saved_video_position')) {
+                        this.state.storage.setItem('savedVideoPosition', data.saved_video_position, true);
+                        data.saved_video_position = Time.formatFull(data.saved_video_position);
+                    }
 
-                $.ajax({
-                    url: this.state.config.saveStateUrl,
-                    type: 'POST',
-                    async: !!async,
-                    dataType: 'json',
-                    data: data
-                });
+                    $.ajax({
+                        url: this.state.config.saveStateUrl,
+                        type: 'POST',
+                        async: !!async,
+                        dataType: 'json',
+                        data: data
+                    });
+                }
             }
         };
 

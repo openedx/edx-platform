@@ -53,17 +53,17 @@
 // ====================
 
 // theme mixin styles
-@mixin login_register_h1_style {}
+@mixin login_register_h1_style {} /* stylelint-disable-line */
 
-@mixin footer_references_style {}
+@mixin footer_references_style {} /* stylelint-disable-line */
 
 // ====================
 
 // extends - UI - used for page/view-level wrappers (for centering/grids)
 %ui-wrapper {
   @include clearfix();
-  @include box-sizing(border-box);
 
+  box-sizing: border-box;
   width: 100%;
 }
 
@@ -151,7 +151,9 @@
   padding: 0;
   text-indent: 0;
 
-  li, dt, dd {
+  li,
+  dt,
+  dd {
     margin: 0;
     padding: 0;
   }
@@ -166,7 +168,7 @@
 
 // extends - text - wrapping
 %text-wrap {
-  text-wrap: wrap;
+  text-wrap: wrap; /* stylelint-disable-line */
   white-space: pre-wrap;
   white-space: -moz-pre-wrap;
   word-wrap: break-word;
@@ -174,8 +176,7 @@
 
 // extends - text - text overflow by ellipsis
 %text-truncated {
-  @include box-sizing(border-box);
-
+  box-sizing: border-box;
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
@@ -207,7 +208,8 @@
 %shame-link-base {
   color: $link-color;
 
-  &:hover, &:focus {
+  &:hover,
+  &:focus {
     color: saturate($link-color, 50%);
   }
 }
@@ -215,7 +217,8 @@
 %shame-link-text {
   @extend %shame-link-base;
 
-  &:hover, &:focus {
+  &:hover,
+  &:focus {
     text-decoration: underline !important;
   }
 }

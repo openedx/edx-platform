@@ -45,7 +45,7 @@
             </div>
         <% } %>
 
-        <% if (isMember) { %>
+        <% if (showLeaveLink) { %>
             <div class="leave-team">
                 <button class="btn btn-link leave-team-link"><%- gettext("Leave Team") %></button>
             </div>

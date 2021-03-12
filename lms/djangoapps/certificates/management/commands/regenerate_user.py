@@ -1,4 +1,6 @@
 """Django management command to force certificate regeneration for one user"""
+
+
 import copy
 import logging
 

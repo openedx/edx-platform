@@ -3,10 +3,12 @@ Django admin page for CourseOverviews, the basic metadata about a course that
 is used in user dashboard queries and other places where you need info like
 name, and start dates, but don't actually need to crawl into course content.
 """
-from django.contrib import admin
+
 
 from config_models.admin import ConfigurationModelAdmin
-from .models import CourseOverview, CourseOverviewImageConfig, CourseOverviewImageSet
+from django.contrib import admin
+
+from .models import CourseOverview, CourseOverviewImageConfig, CourseOverviewImageSet, SimulateCoursePublishConfig
 
 
 class CourseOverviewAdmin(admin.ModelAdmin):
@@ -71,6 +73,11 @@ class CourseOverviewImageSetAdmin(admin.ModelAdmin):
     fields = ('course_overview_id', 'small_url', 'large_url')
 
 
+class SimulateCoursePublishConfigAdmin(ConfigurationModelAdmin):
+    pass
+
+
 admin.site.register(CourseOverview, CourseOverviewAdmin)
 admin.site.register(CourseOverviewImageConfig, CourseOverviewImageConfigAdmin)
 admin.site.register(CourseOverviewImageSet, CourseOverviewImageSetAdmin)
+admin.site.register(SimulateCoursePublishConfig, SimulateCoursePublishConfigAdmin)

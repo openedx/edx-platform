@@ -1,15 +1,15 @@
 """
 Transfer Student Management Command
 """
-from __future__ import print_function, unicode_literals
+
 
 from textwrap import dedent
-
-from six import text_type
 
 from django.contrib.auth.models import User
 from django.db import transaction
 from opaque_keys.edx.keys import CourseKey
+from six import text_type
+
 from shoppingcart.models import CertificateItem
 from student.models import CourseEnrollment
 from track.management.tracked_command import TrackedCommand

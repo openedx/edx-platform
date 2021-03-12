@@ -2,16 +2,20 @@
 Tests for django admin commands in the verify_student module
 
 """
+
+
 import logging
 import os
 import tempfile
 
-from django.core.management import call_command, CommandError
+import six
+from django.core.management import CommandError, call_command
 from django.test import TestCase
+from testfixtures import LogCapture
+
 from lms.djangoapps.verify_student.models import ManualVerification
 from lms.djangoapps.verify_student.utils import earliest_allowed_verification_date
 from student.tests.factories import UserFactory
-from testfixtures import LogCapture
 
 LOGGER_NAME = 'lms.djangoapps.verify_student.management.commands.manual_verifications'
 
@@ -27,7 +31,7 @@ class TestVerifyStudentCommand(TestCase):
         self.user1 = UserFactory.create()
         self.user2 = UserFactory.create()
         self.user3 = UserFactory.create()
-        self.invalid_email = unicode('unknown@unknown.com')
+        self.invalid_email = six.text_type('unknown@unknown.com')
 
         self.create_email_ids_file(
             self.tmp_file_path,
@@ -46,11 +50,11 @@ class TestVerifyStudentCommand(TestCase):
         """
         Tests that the manual_verifications management command executes successfully
         """
-        self.assertEquals(ManualVerification.objects.filter(status='approved').count(), 0)
+        self.assertEqual(ManualVerification.objects.filter(status='approved').count(), 0)
 
         call_command('manual_verifications', '--email-ids-file', self.tmp_file_path)
 
-        self.assertEquals(ManualVerification.objects.filter(status='approved').count(), 3)
+        self.assertEqual(ManualVerification.objects.filter(status='approved').count(), 3)
 
     def test_manual_verifications_created_date(self):
         """

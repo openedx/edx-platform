@@ -1,3 +1,8 @@
+"""
+Experimentation factories
+"""
+
+
 import factory
 import factory.fuzzy
 

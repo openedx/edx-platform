@@ -5,7 +5,7 @@
         "fields": {
             "enabled": true,
             "enabled_for_all_courses": true,
-            "change_date": "2016-09-01"
+            "change_date": "2016-09-01T00:00:00Z"
         }
     }
 ]

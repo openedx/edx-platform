@@ -1,17 +1,14 @@
 """ Tests for Credit API serializers. """
 
-# pylint: disable=no-member
-from __future__ import unicode_literals
 
+import six
 from django.test import TestCase
 
-from nose.plugins.attrib import attr
 from openedx.core.djangoapps.credit import serializers
-from openedx.core.djangoapps.credit.tests.factories import CreditProviderFactory, CreditEligibilityFactory
+from openedx.core.djangoapps.credit.tests.factories import CreditEligibilityFactory, CreditProviderFactory
 from student.tests.factories import UserFactory
 
 
-@attr(shard=2)
 class CreditProviderSerializerTests(TestCase):
     """ CreditProviderSerializer tests. """
 
@@ -32,7 +29,6 @@ class CreditProviderSerializerTests(TestCase):
         self.assertDictEqual(serializer.data, expected)
 
 
-@attr(shard=2)
 class CreditEligibilitySerializerTests(TestCase):
     """ CreditEligibilitySerializer tests. """
 
@@ -42,7 +38,7 @@ class CreditEligibilitySerializerTests(TestCase):
         eligibility = CreditEligibilityFactory(username=user.username)
         serializer = serializers.CreditEligibilitySerializer(eligibility)
         expected = {
-            'course_key': unicode(eligibility.course.course_key),
+            'course_key': six.text_type(eligibility.course.course_key),
             'deadline': eligibility.deadline.strftime('%Y-%m-%dT%H:%M:%S.%fZ'),
             'username': user.username,
         }

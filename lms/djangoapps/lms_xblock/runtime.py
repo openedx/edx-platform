@@ -1,22 +1,26 @@
 """
 Module implementing `xblock.runtime.Runtime` functionality for the LMS
 """
+
+
+import six
+import xblock.reference.plugins
 from completion.services import CompletionService
 from django.conf import settings
 from django.urls import reverse
-import xblock.reference.plugins
+from edx_django_utils.cache import DEFAULT_REQUEST_CACHE
 
 from badges.service import BadgingService
 from badges.utils import badges_enabled
 from lms.djangoapps.lms_xblock.models import XBlockAsidesConfig
+from lms.djangoapps.teams.services import TeamsService
 from openedx.core.djangoapps.user_api.course_tag import api as user_course_tag_api
 from openedx.core.lib.url_utils import quote_slashes
-from openedx.core.lib.xblock_utils import xblock_local_resource_url
-from openedx.core.djangoapps.request_cache.middleware import RequestCache
+from openedx.core.lib.xblock_utils import wrap_xblock_aside, xblock_local_resource_url
 from xmodule.library_tools import LibraryToolsService
 from xmodule.modulestore.django import ModuleI18nService, modulestore
 from xmodule.partitions.partitions_service import PartitionService
-from xmodule.services import SettingsService
+from xmodule.services import SettingsService, TeamsConfigurationService
 from xmodule.x_module import ModuleSystem
 
 
@@ -24,7 +28,13 @@ def handler_url(block, handler_name, suffix='', query='', thirdparty=False):
     """
     This method matches the signature for `xblock.runtime:Runtime.handler_url()`
 
-    See :method:`xblock.runtime:Runtime.handler_url`
+    :param block: The block to generate the url for
+    :param handler_name: The handler on that block that the url should resolve to
+    :param suffix: Any path suffix that should be added to the handler url
+    :param query: Any query string that should be added to the handler url
+        (which should not include an initial ? or &)
+    :param thirdparty: If true, return a fully-qualified URL instead of relative
+        URL. This is useful for URLs to be used by third-party services.
     """
     view_name = 'xblock_handler'
     if handler_name:
@@ -35,7 +45,7 @@ def handler_url(block, handler_name, suffix='', query='', thirdparty=False):
         # to ask for handler URLs without a student context.
         func = getattr(block.__class__, handler_name, None)
         if not func:
-            raise ValueError("{!r} is not a function name".format(handler_name))
+            raise ValueError(u"{!r} is not a function name".format(handler_name))
 
         # Is the following necessary? ProxyAttribute causes an UndefinedContext error
         # if trying this without the module system.
@@ -47,8 +57,8 @@ def handler_url(block, handler_name, suffix='', query='', thirdparty=False):
         view_name = 'xblock_handler_noauth'
 
     url = reverse(view_name, kwargs={
-        'course_id': unicode(block.location.course_key),
-        'usage_id': quote_slashes(unicode(block.scope_ids.usage_id).encode('utf-8')),
+        'course_id': six.text_type(block.location.course_key),
+        'usage_id': quote_slashes(six.text_type(block.scope_ids.usage_id)),
         'handler': handler_name,
         'suffix': suffix,
     })
@@ -104,7 +114,7 @@ class UserTagsService(object):
             key: the key for the value we want
         """
         if scope != user_course_tag_api.COURSE_SCOPE:
-            raise ValueError("unexpected scope {0}".format(scope))
+            raise ValueError(u"unexpected scope {0}".format(scope))
 
         return user_course_tag_api.get_course_tag(
             self._get_current_user(),
@@ -120,7 +130,7 @@ class UserTagsService(object):
             value: the value to set
         """
         if scope != user_course_tag_api.COURSE_SCOPE:
-            raise ValueError("unexpected scope {0}".format(scope))
+            raise ValueError(u"unexpected scope {0}".format(scope))
 
         return user_course_tag_api.set_course_tag(
             self._get_current_user(),
@@ -133,11 +143,13 @@ class LmsModuleSystem(ModuleSystem):  # pylint: disable=abstract-method
     ModuleSystem specialized to the LMS
     """
     def __init__(self, **kwargs):
-        request_cache_dict = RequestCache.get_request_cache().data
+        request_cache_dict = DEFAULT_REQUEST_CACHE.data
         store = modulestore()
 
         services = kwargs.setdefault('services', {})
-        services['completion'] = CompletionService(user=kwargs.get('user'), course_key=kwargs.get('course_id'))
+        user = kwargs.get('user')
+        if user and user.is_authenticated:
+            services['completion'] = CompletionService(user=user, context_key=kwargs.get('course_id'))
         services['fs'] = xblock.reference.plugins.FSService()
         services['i18n'] = ModuleI18nService
         services['library_tools'] = LibraryToolsService(store)
@@ -150,6 +162,8 @@ class LmsModuleSystem(ModuleSystem):  # pylint: disable=abstract-method
         if badges_enabled():
             services['badging'] = BadgingService(course_id=kwargs.get('course_id'), modulestore=store)
         self.request_token = kwargs.pop('request_token', None)
+        services['teams'] = TeamsService()
+        services['teams_configuration'] = TeamsConfigurationService()
         super(LmsModuleSystem, self).__init__(**kwargs)
 
     def handler_url(self, *args, **kwargs):
@@ -184,19 +198,28 @@ class LmsModuleSystem(ModuleSystem):  # pylint: disable=abstract-method
         The default implementation creates a frag to wraps frag w/ a div identifying the xblock. If you have
         javascript, you'll need to override this impl
         """
+        if not frag.content:
+            return frag
+
+        runtime_class = 'LmsRuntime'
         extra_data = {
-            'block-id': quote_slashes(unicode(block.scope_ids.usage_id)),
+            'block-id': quote_slashes(six.text_type(block.scope_ids.usage_id)),
+            'course-id': quote_slashes(six.text_type(block.course_id)),
             'url-selector': 'asideBaseUrl',
-            'runtime-class': 'LmsRuntime',
+            'runtime-class': runtime_class,
         }
         if self.request_token:
             extra_data['request-token'] = self.request_token
 
-        return self._wrap_ele(
+        return wrap_xblock_aside(
+            runtime_class,
             aside,
             view,
             frag,
-            extra_data,
+            context,
+            usage_id_serializer=six.text_type,
+            request_token=self.request_token,
+            extra_data=extra_data,
         )
 
     def applicable_aside_types(self, block):

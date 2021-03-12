@@ -2,6 +2,7 @@
 Mixin class that provides authoring capabilities for XBlocks.
 """
 
+
 import logging
 
 from django.conf import settings

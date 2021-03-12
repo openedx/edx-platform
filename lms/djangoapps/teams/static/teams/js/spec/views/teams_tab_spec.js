@@ -1,5 +1,6 @@
 define([
     'jquery',
+    'underscore',
     'backbone',
     'logger',
     'edx-ui-toolkit/js/utils/spec-helpers/spec-helpers',
@@ -7,7 +8,7 @@ define([
     'common/js/spec_helpers/page_helpers',
     'teams/js/views/teams_tab',
     'teams/js/spec_helpers/team_spec_helpers'
-], function($, Backbone, Logger, SpecHelpers, AjaxHelpers, PageHelpers, TeamsTabView, TeamSpecHelpers) {
+], function($, _, Backbone, Logger, SpecHelpers, AjaxHelpers, PageHelpers, TeamsTabView, TeamSpecHelpers) {
     'use strict';
 
     describe('TeamsTab', function() {
@@ -170,7 +171,7 @@ define([
                     }
                 ],
                 'fires a page view event for the edit team page': [
-                    'teams/' + TeamSpecHelpers.testTopicID + '/' + 'test_team_id/edit-team',
+                    'teams/' + TeamSpecHelpers.testTopicID + '/test_team_id/edit-team',
                     {
                         page_name: 'edit-team',
                         topic_id: TeamSpecHelpers.testTopicID,
@@ -229,18 +230,80 @@ define([
             });
         });
 
+        describe('Manage Tab', function() {
+            var manageTabSelector = '.page-content-nav>.nav-item[data-url=manage]';
+            it('is not visible to unprivileged users', function() {
+                var teamsTabView = createTeamsTabView(this, {
+                    userInfo: TeamSpecHelpers.createMockUserInfo({privileged: false}),
+                    hasManagedTopic: true
+                });
+                expect(teamsTabView.$(manageTabSelector).length).toBe(0);
+            });
+
+            it('is not visible when there are no managed topics', function() {
+                var teamsTabView = createTeamsTabView(this, {
+                    userInfo: TeamSpecHelpers.createMockUserInfo({privileged: true}),
+                    hasManagedTopic: false
+                });
+                expect(teamsTabView.$(manageTabSelector).length).toBe(0);
+            });
+
+            it('is visible to privileged users when there is a managed topic', function() {
+                var teamsTabView = createTeamsTabView(this, {
+                    userInfo: TeamSpecHelpers.createMockUserInfo({privileged: true}),
+                    hasManagedTopic: true
+                });
+                expect(teamsTabView.$(manageTabSelector).length).toBe(1);
+            });
+        });
+
+        describe('Browse Tab', function() {
+            var browseTabSelector = '.page-content-nav>.nav-item[data-url=browse]';
+            it('is not visible if there are no open and no public teamsets', function() {
+                var teamsTabView = createTeamsTabView(this, {
+                    hasOpenTopic: false,
+                    hasPublicManagedTopic: false
+                });
+                expect(teamsTabView.$(browseTabSelector).length).toBe(0);
+            });
+
+            it('is visible if there are open teamsets', function() {
+                var teamsTabView = createTeamsTabView(this, {
+                    hasOpenTopic: true,
+                    hasPublicManagedTopic: false
+                });
+                expect(teamsTabView.$(browseTabSelector).length).toBe(1);
+            });
+
+            it('is visible if there are public teamsets', function() {
+                var teamsTabView = createTeamsTabView(this, {
+                    hasOpenTopic: false,
+                    hasPublicManagedTopic: true
+                });
+                expect(teamsTabView.$(browseTabSelector).length).toBe(1);
+            });
+
+            it('is visible if there are both public and open teamsets', function() {
+                var teamsTabView = createTeamsTabView(this, {
+                    hasOpenTopic: true,
+                    hasPublicManagedTopic: true
+                });
+                expect(teamsTabView.$(browseTabSelector).length).toBe(1);
+            });
+        });
+
         describe('Search', function() {
-            var performSearch = function(requests, teamsTabView) {
+            var performSearch = function(reqs, teamsTabView) {
                 teamsTabView.$('.search-field').val('foo');
                 teamsTabView.$('.action-search').click();
                 verifyTeamsRequest({
                     order_by: '',
                     text_search: 'foo'
                 });
-                AjaxHelpers.respondWithJson(requests, TeamSpecHelpers.createMockTeamsResponse({results: []}));
+                AjaxHelpers.respondWithJson(reqs, TeamSpecHelpers.createMockTeamsResponse({results: []}));
 
                 // Expect exactly one search request to be fired
-                AjaxHelpers.expectNoRequests(requests);
+                AjaxHelpers.expectNoRequests(reqs);
             };
 
             it('can search teams', function() {

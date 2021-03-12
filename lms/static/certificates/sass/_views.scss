@@ -26,13 +26,13 @@
   .content-main {
     margin-bottom: spacing-vertical(base);
 
-    @media(min-width: $bp-screen-md) {
+    @media (min-width: $bp-screen-md) {
       @include span(9, after);
     }
   }
 
   .content-secondary {
-    @media(min-width: $bp-screen-md) {
+    @media (min-width: $bp-screen-md) {
       @include span(3, before);
     }
   }

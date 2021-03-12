@@ -1,9 +1,11 @@
 """
 Tests for Course Blocks forms
 """
-from urllib import urlencode
+
 
 import ddt
+import six
+from six.moves.urllib.parse import urlencode
 from django.http import Http404, QueryDict
 from opaque_keys.edx.locator import CourseLocator
 from rest_framework.exceptions import PermissionDenied
@@ -22,7 +24,6 @@ class TestBlockListGetForm(FormTestMixin, SharedModuleStoreTestCase):
     """
     Tests for BlockListGetForm
     """
-    shard = 4
 
     FORM_CLASS = BlockListGetForm
 
@@ -47,7 +48,7 @@ class TestBlockListGetForm(FormTestMixin, SharedModuleStoreTestCase):
         self.form_data = QueryDict(
             urlencode({
                 'username': self.student.username,
-                'usage_key': unicode(usage_key),
+                'usage_key': six.text_type(usage_key),
             }),
             mutable=True,
         )

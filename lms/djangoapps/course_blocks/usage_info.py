@@ -2,6 +2,8 @@
 Declares CourseUsageInfo class to be used by the transform method in
 Transformers.
 """
+
+
 from lms.djangoapps.courseware.access import _has_access_to_course
 
 
@@ -12,12 +14,18 @@ class CourseUsageInfo(object):
     an instance of it in calls to BlockStructureTransformer.transform
     methods.
     '''
-    def __init__(self, course_key, user):
+    def __init__(self, course_key, user, allow_start_dates_in_future=False):
         # Course identifier (opaque_keys.edx.keys.CourseKey)
         self.course_key = course_key
 
         # User object (django.contrib.auth.models.User)
         self.user = user
+
+        # Sometimes we want to allow blocks to be returned that can bypass the
+        # StartDateTransformer's filter to show blocks with start dates in the future.
+        # One use case of this is for the Dates page where we want to display
+        # assignments that have not yet been released.
+        self.allow_start_dates_in_future = allow_start_dates_in_future
 
         # Cached value of whether the user has staff access (bool/None)
         self._has_staff_access = None

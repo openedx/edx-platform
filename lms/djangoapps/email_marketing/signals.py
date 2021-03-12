@@ -1,6 +1,8 @@
 """
 This module contains signals needed for email integration
 """
+
+
 import datetime
 import logging
 from random import randint
@@ -9,21 +11,20 @@ import crum
 from celery.exceptions import TimeoutError
 from django.conf import settings
 from django.dispatch import receiver
-from sailthru.sailthru_client import SailthruClient
 from sailthru.sailthru_error import SailthruClientError
 from six import text_type
 
 import third_party_auth
 from course_modes.models import CourseMode
 from email_marketing.models import EmailMarketingConfiguration
-from openedx.core.djangoapps.user_api.accounts.signals import USER_RETIRE_THIRD_PARTY_MAILINGS
-from openedx.core.djangoapps.waffle_utils import WaffleSwitchNamespace
-from lms.djangoapps.email_marketing.tasks import update_user, update_user_email, get_email_cookies_via_sailthru
+from lms.djangoapps.email_marketing.tasks import get_email_cookies_via_sailthru, update_user, update_user_email
 from openedx.core.djangoapps.lang_pref import LANGUAGE_KEY
-from student.cookies import CREATE_LOGON_COOKIE
-from student.signals import ENROLL_STATUS_CHANGE
-from student.views import REGISTER_USER
+from openedx.core.djangoapps.user_authn.cookies import CREATE_LOGON_COOKIE
+from openedx.core.djangoapps.user_authn.views.register import REGISTER_USER
+from openedx.core.djangoapps.waffle_utils import WaffleSwitchNamespace
+from student.signals import SAILTHRU_AUDIT_PURCHASE
 from util.model_utils import USER_FIELD_CHANGED
+
 from .tasks import update_course_enrollment
 
 log = logging.getLogger(__name__)
@@ -39,8 +40,8 @@ WAFFLE_SWITCHES = WaffleSwitchNamespace(name=WAFFLE_NAMESPACE)
 SAILTHRU_AUDIT_PURCHASE_ENABLED = 'audit_purchase_enabled'
 
 
-@receiver(ENROLL_STATUS_CHANGE)
-def update_sailthru(sender, event, user, mode, course_id, **kwargs):
+@receiver(SAILTHRU_AUDIT_PURCHASE)
+def update_sailthru(sender, user, mode, course_id, **kwargs):  # pylint: disable=unused-argument
     """
     Receives signal and calls a celery task to update the
     enrollment track
@@ -51,9 +52,8 @@ def update_sailthru(sender, event, user, mode, course_id, **kwargs):
         None
     """
     if WAFFLE_SWITCHES.is_enabled(SAILTHRU_AUDIT_PURCHASE_ENABLED) and mode in CourseMode.AUDIT_MODES:
-        course_key = str(course_id)
-        email = str(user.email)
-        update_course_enrollment.delay(email, course_key, mode)
+        email = user.email.encode('utf-8')
+        update_course_enrollment.delay(email, course_id, mode, site=_get_current_site())
 
 
 @receiver(CREATE_LOGON_COOKIE)
@@ -97,17 +97,17 @@ def add_email_marketing_cookies(sender, response=None, user=None,
         _log_sailthru_api_call_time(time_before_call)
 
     except TimeoutError as exc:
-        log.error("Timeout error while attempting to obtain cookie from Sailthru: %s", text_type(exc))
+        log.error(u"Timeout error while attempting to obtain cookie from Sailthru: %s", text_type(exc))
         return response
     except SailthruClientError as exc:
-        log.error("Exception attempting to obtain cookie from Sailthru: %s", text_type(exc))
+        log.error(u"Exception attempting to obtain cookie from Sailthru: %s", text_type(exc))
         return response
     except Exception:
-        log.error("Exception Connecting to celery task for %s", user.email)
+        log.error(u"Exception Connecting to celery task for %s", user.email)
         return response
 
     if not cookie:
-        log.error("No cookie returned attempting to obtain cookie from Sailthru for %s", user.email)
+        log.error(u"No cookie returned attempting to obtain cookie from Sailthru for %s", user.email)
         return response
     else:
         response.set_cookie(
@@ -116,8 +116,9 @@ def add_email_marketing_cookies(sender, response=None, user=None,
             max_age=365 * 24 * 60 * 60,  # set for 1 year
             domain=settings.SESSION_COOKIE_DOMAIN,
             path='/',
+            secure=request.is_secure()
         )
-        log.info("sailthru_hid cookie:%s successfully retrieved for user %s", cookie, user.email)
+        log.info(u"sailthru_hid cookie:%s successfully retrieved for user %s", cookie, user.email)
 
     return response
 
@@ -257,62 +258,7 @@ def _log_sailthru_api_call_time(time_before_call):
     time_after_call = datetime.datetime.now()
     delta_sailthru_api_call_time = time_after_call - time_before_call
 
-    log.info("Started at %s and ended at %s, time spent:%s milliseconds",
+    log.info(u"Started at %s and ended at %s, time spent:%s milliseconds",
              time_before_call.isoformat(' '),
              time_after_call.isoformat(' '),
              delta_sailthru_api_call_time.microseconds / 1000)
-
-
-@receiver(USER_RETIRE_THIRD_PARTY_MAILINGS)
-def force_unsubscribe_all(sender, **kwargs):  # pylint: disable=unused-argument
-    """
-    Synchronously(!) unsubscribes the given user from all Sailthru email lists.
-
-    In the future this could be moved to a Celery task, however this is currently
-    only used as part of user retirement, where we need a very reliable indication
-    of success or failure.
-
-    Args:
-        email: Email address to unsubscribe
-        new_email (optional): Email address to change 3rd party services to for this user (used in retirement to clear
-                              personal information from the service)
-    Returns:
-        None
-    """
-    email = kwargs.get('email', None)
-    new_email = kwargs.get('new_email', None)
-
-    if not email:
-        raise TypeError('Expected an email address to unsubscribe, but received None.')
-
-    email_config = EmailMarketingConfiguration.current()
-    if not email_config.enabled:
-        return
-
-    sailthru_parms = {
-        "id": email,
-        "optout_email": "all",
-        "fields": {"optout_email": 1}
-    }
-
-    # If we have a new email address to change to, do that as well
-    if new_email:
-        sailthru_parms["keys"] = {
-            "email": new_email
-        }
-        sailthru_parms["fields"]["keys"] = 1
-        sailthru_parms["keysconflict"] = "merge"
-
-    try:
-        sailthru_client = SailthruClient(email_config.sailthru_key, email_config.sailthru_secret)
-        sailthru_response = sailthru_client.api_post("user", sailthru_parms)
-    except SailthruClientError as exc:
-        error_msg = "Exception attempting to opt-out user {} from Sailthru - {}".format(email, text_type(exc))
-        log.error(error_msg)
-        raise Exception(error_msg)
-
-    if not sailthru_response.is_ok():
-        error = sailthru_response.get_error()
-        error_msg = "Error attempting to opt-out user {} from Sailthru - {}".format(email, error.get_message())
-        log.error(error_msg)
-        raise Exception(error_msg)

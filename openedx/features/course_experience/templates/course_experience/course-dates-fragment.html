@@ -7,12 +7,13 @@
 <%!
 from django.utils.translation import ugettext as _
 %>
-<h3 class="hd hd-6 handouts-header">${_("Important Course Dates")}</h3>
-## Should be organized by date, last date appearing at the bottom
-
-% for course_date in course_date_blocks:
-    <%include file="dates-summary.html" args="course_date=course_date" />
-% endfor
+% if len(course_date_blocks) > 0:
+    <h3 class="hd hd-6 handouts-header">${_("Upcoming Dates")}</h3>
+    ## Should be organized by date, last date appearing at the bottom
+    % for course_date_block in course_date_blocks:
+        <%include file="dates-summary.html" args="course_date=course_date_block" />
+    % endfor
+% endif
 
 <%static:require_module_async module_name="js/dateutil_factory" class_name="DateUtilFactory">
     DateUtilFactory.transform('.localized-datetime');

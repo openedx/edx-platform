@@ -9,6 +9,8 @@ from lms.djangoapps.instructor.enrollment import (
     get_user_email_language,
 )
 
+from student.models import (email_exists_or_retired,
+                            username_exists_or_retired)
 from lms.djangoapps.instructor.views.tools import get_student_from_identifier
 
 from openedx.core.djangoapps.appsembler.api.sites import (
@@ -31,6 +33,29 @@ from student.models import (
 
 
 log = logging.getLogger(__name__)
+
+
+def account_exists(email, username):
+    """Check if an account exists for either the email or the username
+
+    Both email and username are required as parameters, but either or both can
+    be None
+
+    Do we need to check secondary email? If so then check if the email exists:
+    ```
+    from student.models import AccountRecovery
+    AccountRecovery.objects.filter(secondary_email=email).exists()
+    ```
+    """
+    if email and email_exists_or_retired(email, check_for_new_site=False):
+        email_exists = True
+    else:
+        email_exists = False
+    if username and username_exists_or_retired(username):
+        username_exists = True
+    else:
+        username_exists = False
+    return email_exists or username_exists
 
 
 def enrollment_learners_context(identifiers):
@@ -79,7 +104,7 @@ def enroll_learners_in_course(course_id, identifiers, enroll_func, **kwargs):
         - email notification is a seperate method or class
     """
 
-    reason = kwargs.get('reason', u'')
+    reason = kwargs.get('reason', '')
     request_user = kwargs.get('request_user')
     role = kwargs.get('role')
 
@@ -129,7 +154,7 @@ def enroll_learners_in_course(course_id, identifiers, enroll_func, **kwargs):
         except Exception as exc:  # pylint: disable=broad-except
             # catch and log any exceptions
             # so that one error doesn't cause a 500.
-            log.exception(u"Error while enrolling student")
+            log.exception("Error while enrolling student")
             results.append({
                 'identifier': identifier,
                 'error': True,
@@ -165,7 +190,7 @@ def unenroll_learners_in_course(course_id, identifiers, unenroll_func, **kwargs)
           We need to refactor both of our and edX's functions to avoid having
           the `appsembler/api/v1/api.py` module altogether.
     """
-    reason = kwargs.get('reason', u'')
+    reason = kwargs.get('reason', '')
     request_user = kwargs.get('request_user')
     role = kwargs.get('role')
     results = []
@@ -202,7 +227,7 @@ def unenroll_learners_in_course(course_id, identifiers, unenroll_func, **kwargs)
         except Exception as exc:  # pylint: disable=broad-except
             # catch and log any exceptions
             # so that one error doesn't cause a 500.
-            log.exception(u"Error while unenrolling student")
+            log.exception("Error while unenrolling student")
             results.append({
                 'identifier': identifier,
                 'error': True,

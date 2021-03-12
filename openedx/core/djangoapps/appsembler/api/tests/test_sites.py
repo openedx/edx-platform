@@ -39,7 +39,7 @@ from openedx.core.djangoapps.appsembler.api.tests.factories import (
 
 def create_org_users(org, new_user_count):
     return [UserOrganizationMappingFactory(
-        organization=org).user for i in xrange(new_user_count)]
+        organization=org).user for i in range(new_user_count)]
 
 
 class SitesModuleTests(TestCase):
@@ -47,7 +47,7 @@ class SitesModuleTests(TestCase):
         """
         The default site already created is u'example.com'
         """
-        self.other_site = Site.objects.get(domain=u'example.com')
+        self.other_site = Site.objects.get(domain='example.com')
         self.my_site = SiteFactory(domain='foo.test')
         self.other_site_org = OrganizationFactory(sites=[self.other_site])
         self.my_site_org = OrganizationFactory(sites=[self.my_site])

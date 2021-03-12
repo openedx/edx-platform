@@ -2,23 +2,27 @@
 """
 Modulestore configuration for test cases.
 """
+
+
 import copy
 import functools
 import os
 from contextlib import contextmanager
 from enum import Enum
 
-from courseware.field_overrides import OverrideFieldData  # pylint: disable=import-error
-from courseware.tests.factories import StaffFactory
 from django.conf import settings
 from django.contrib.auth.models import AnonymousUser, User
 from django.test import TestCase
 from django.test.utils import override_settings
 from mock import patch
+from six.moves import range
+
+from lms.djangoapps.courseware.tests.factories import StaffFactory
+from lms.djangoapps.courseware.field_overrides import OverrideFieldData
 from openedx.core.djangolib.testing.utils import CacheIsolationMixin, CacheIsolationTestCase, FilteredQueryCountMixin
 from openedx.core.lib.tempdir import mkdtemp_clean
 from student.models import CourseEnrollment
-from student.tests.factories import UserFactory
+from student.tests.factories import AdminFactory, UserFactory
 from xmodule.contentstore.django import _CONTENTSTORE
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import SignalHandler, clear_existing_modulestores, modulestore
@@ -40,7 +44,7 @@ class CourseUserType(Enum):
 
 class StoreConstructors(object):
     """Enumeration of store constructor types."""
-    draft, split = range(2)
+    draft, split = list(range(2))
 
 
 def mixed_store_config(data_dir, mappings, store_order=None):
@@ -271,7 +275,7 @@ class ModuleStoreIsolationMixin(CacheIsolationMixin, SignalIsolationMixin):
 
     # List of modulestore signals enabled for this test. Defaults to an empty
     # list. The list of signals available is found on the SignalHandler class,
-    # in /common/lib/xmodule/xmodule/modulestore/django.py
+    # in /common/lib/xmodule/xmodule/modulestore/xmodule_django.py
     #
     # You must use the signal itself, and not its name. So for example:
     #
@@ -343,6 +347,8 @@ class ModuleStoreTestUsersMixin():
         # Set up the test user
         if is_unenrolled_staff:
             user = StaffFactory(course_key=course.id, password=self.TEST_PASSWORD)
+        elif user_type is CourseUserType.GLOBAL_STAFF:
+            user = AdminFactory(password=self.TEST_PASSWORD)
         else:
             user = UserFactory(password=self.TEST_PASSWORD)
         self.client.login(username=user.username, password=self.TEST_PASSWORD)
@@ -402,6 +408,7 @@ class SharedModuleStoreTestCase(
         Use it like so:
         @classmethod
         def setUpClass(cls):
+            # pylint: disable=super-method-not-called
             with super(MyTestClass, cls).setUpClassAndTestData():
                 <all the cls.setUpClass() setup code that performs modulestore setup...>
         @classmethod

@@ -37,7 +37,7 @@
 // --------------------
 $notes-annotator-background-light: rgb(251, 251, 251); // taken from annotatorJS base colors
 $notes-annotator-background-med: rgb(214, 214, 214); // taken from annotatorJS base colors
-$notes-annotator-background-dark: rgba(122,122,122,0.6); // taken from annotatorJS base colors
+$notes-annotator-background-dark: rgba(122, 122, 122, 0.6); // taken from annotatorJS base colors
 
 %notes-reset-background {
   background-image: none !important;
@@ -219,7 +219,8 @@ $notes-annotator-background-dark: rgba(122,122,122,0.6); // taken from annotator
       font-family: $font-family-sans-serif !important;
 
       // actions
-      .annotator-save, .annotator-cancel {
+      .annotator-save,
+      .annotator-cancel {
         @extend %notes-reset-background;
 
         padding: ($baseline/4) ($baseline/2) !important;
@@ -256,7 +257,8 @@ $notes-annotator-background-dark: rgba(122,122,122,0.6); // taken from annotator
         background: $notes-annotator-background-light !important; //matches annotator JS editing bubble triangle color
 
         // STATE: hover/focus
-        &:hover, &:focus {
+        &:hover,
+        &:focus {
           background: $notes-annotator-background-light;
         }
       }
@@ -275,12 +277,14 @@ $notes-annotator-background-dark: rgba(122,122,122,0.6); // taken from annotator
       color: $link-color;
 
       // STATE: hover/focus
-      &:hover, &:focus {
+      &:hover,
+      &:focus {
         text-decoration: underline;
       }
 
       // STATE: disabled
-      &:disabled, &.is-disabled {
+      &:disabled,
+      &.is-disabled {
         @extend %ui-disabled;
 
         opacity: 0.5;
@@ -294,7 +298,8 @@ $notes-annotator-background-dark: rgba(122,122,122,0.6); // taken from annotator
     color: $link-color;
 
     // STATE: hover/focus
-    &:hover, &:focus {
+    &:hover,
+    &:focus {
       text-decoration: underline;
     }
   }
@@ -326,7 +331,9 @@ $notes-annotator-background-dark: rgba(122,122,122,0.6); // taken from annotator
       @include float(right);
       @include padding-left($baseline/4);
 
-      .annotator-edit, .annotator-delete, .annotator-close {
+      .annotator-edit,
+      .annotator-delete,
+      .annotator-close {
         position: relative;
         display: inline-block;
         vertical-align: middle;

@@ -1,6 +1,8 @@
 """
 Tests for contentstore/views/user.py.
 """
+
+
 import json
 
 from django.contrib.auth.models import User
@@ -52,20 +54,20 @@ class UsersTestCase(CourseTestCase):
     def test_detail(self):
         resp = self.client.get(self.detail_url)
         self.assertEqual(resp.status_code, 200)
-        result = json.loads(resp.content)
+        result = json.loads(resp.content.decode('utf-8'))
         self.assertEqual(result["role"], None)
         self.assertTrue(result["active"])
 
     def test_detail_inactive(self):
         resp = self.client.get(self.inactive_detail_url)
         self.assertEqual(resp.status_code, 200)
-        result = json.loads(resp.content)
+        result = json.loads(resp.content.decode('utf-8'))
         self.assertFalse(result["active"])
 
     def test_detail_invalid(self):
         resp = self.client.get(self.invalid_detail_url)
         self.assertEqual(resp.status_code, 404)
-        result = json.loads(resp.content)
+        result = json.loads(resp.content.decode('utf-8'))
         self.assertIn("error", result)
 
     def test_detail_post(self):
@@ -137,7 +139,7 @@ class UsersTestCase(CourseTestCase):
             HTTP_ACCEPT="application/json",
         )
         self.assertEqual(resp.status_code, 400)
-        result = json.loads(resp.content)
+        result = json.loads(resp.content.decode('utf-8'))
         self.assertIn("error", result)
         self.assert_not_enrolled()
 
@@ -186,7 +188,7 @@ class UsersTestCase(CourseTestCase):
             HTTP_ACCEPT="application/json",
         )
         self.assertEqual(resp.status_code, 400)
-        result = json.loads(resp.content)
+        result = json.loads(resp.content.decode('utf-8'))
         self.assertIn("error", result)
         # reload user from DB
         ext_user = User.objects.get(email=self.ext_user.email)
@@ -201,7 +203,7 @@ class UsersTestCase(CourseTestCase):
             HTTP_ACCEPT="application/json",
         )
         self.assertEqual(resp.status_code, 400)
-        result = json.loads(resp.content)
+        result = json.loads(resp.content.decode('utf-8'))
         self.assertIn("error", result)
         # reload user from DB
         ext_user = User.objects.get(email=self.ext_user.email)
@@ -220,7 +222,7 @@ class UsersTestCase(CourseTestCase):
             HTTP_ACCEPT="application/json",
         )
         self.assertEqual(resp.status_code, 403)
-        result = json.loads(resp.content)
+        result = json.loads(resp.content.decode('utf-8'))
         self.assertIn("error", result)
 
     def test_permission_denied_other(self):
@@ -234,7 +236,7 @@ class UsersTestCase(CourseTestCase):
             HTTP_ACCEPT="application/json",
         )
         self.assertEqual(resp.status_code, 403)
-        result = json.loads(resp.content)
+        result = json.loads(resp.content.decode('utf-8'))
         self.assertIn("error", result)
 
     def test_staff_can_delete_self(self):
@@ -257,7 +259,7 @@ class UsersTestCase(CourseTestCase):
 
         resp = self.client.delete(self.detail_url)
         self.assertEqual(resp.status_code, 403)
-        result = json.loads(resp.content)
+        result = json.loads(resp.content.decode('utf-8'))
         self.assertIn("error", result)
         # reload user from DB
         ext_user = User.objects.get(email=self.ext_user.email)

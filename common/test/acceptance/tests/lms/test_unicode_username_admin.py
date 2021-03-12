@@ -3,6 +3,7 @@
 End-to-end tests for admin change view.
 """
 
+
 from common.test.acceptance.pages.common.auto_auth import AutoAuthPage
 from common.test.acceptance.pages.lms.admin import ChangeUserAdminPage
 from common.test.acceptance.tests.helpers import AcceptanceTest
@@ -42,7 +43,7 @@ class UnicodeUsernameAdminTest(AcceptanceTest):
         As a superuser I should be able to update the first name of a user with unicode username.
         """
         self.assertNotEqual(self.page.first_name, 'John')
-        self.assertEquals(self.page.username, self.FIXTURE_USERNAME)
+        self.assertEqual(self.page.username, self.FIXTURE_USERNAME)
 
         self.page.change_first_name('John')
 
@@ -51,4 +52,4 @@ class UnicodeUsernameAdminTest(AcceptanceTest):
         # Visit the page again to verify changes
         self.page.visit()
 
-        self.assertEquals(self.page.first_name, 'John', 'The first name should be updated')
+        self.assertEqual(self.page.first_name, 'John', 'The first name should be updated')

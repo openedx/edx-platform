@@ -1,7 +1,21 @@
+
+
+import logging
+import os
 import re
 import uuid
+from io import BytesIO
+
+import six
+from opaque_keys import InvalidKeyError
+from opaque_keys.edx.keys import AssetKey, CourseKey
+from opaque_keys.edx.locator import AssetLocator
+from PIL import Image
+from six.moves.urllib.parse import parse_qsl, quote_plus, urlencode, urlparse, urlunparse
 
 from xmodule.assetstore.assetmgr import AssetManager
+from xmodule.exceptions import NotFoundError
+from xmodule.modulestore.exceptions import ItemNotFoundError
 
 STATIC_CONTENT_VERSION = 1
 XASSET_LOCATION_TAG = 'c4x'
@@ -10,19 +24,6 @@ XASSET_THUMBNAIL_TAIL_NAME = '.jpg'
 STREAM_DATA_CHUNK_SIZE = 1024
 VERSIONED_ASSETS_PREFIX = '/assets/courseware'
 VERSIONED_ASSETS_PATTERN = r'/assets/courseware/(v[\d]/)?([a-f0-9]{32})'
-
-import os
-import logging
-import StringIO
-from urlparse import urlparse, urlunparse, parse_qsl
-from urllib import urlencode, quote_plus
-
-from opaque_keys.edx.locator import AssetLocator
-from opaque_keys.edx.keys import CourseKey, AssetKey
-from opaque_keys import InvalidKeyError
-from xmodule.modulestore.exceptions import ItemNotFoundError
-from xmodule.exceptions import NotFoundError
-from PIL import Image
 
 
 class StaticContent(object):
@@ -60,7 +61,7 @@ class StaticContent(object):
             name_root = name_root + ext.replace(u'.', u'-')
 
         if dimensions:
-            width, height = dimensions  # pylint: disable=unpacking-non-sequence
+            width, height = dimensions
             name_root += "-{}x{}".format(width, height)
 
         return u"{name_root}{extension}".format(
@@ -269,7 +270,7 @@ class StaticContent(object):
             if query_val.startswith("/static/"):
                 new_val = StaticContent.get_canonicalized_asset_path(
                     course_key, query_val, base_url, excluded_exts, encode=False)
-                updated_query_params.append((query_name, new_val))
+                updated_query_params.append((query_name, new_val.encode('utf-8')))
             else:
                 # Make sure we're encoding Unicode strings down to their byte string
                 # representation so that `urlencode` can handle it.
@@ -285,11 +286,11 @@ class StaticContent(object):
 
         # Only encode this if told to.  Important so that we don't double encode
         # when working with paths that are in query parameters.
-        asset_path = asset_path.encode('utf-8')
         if encode:
+            asset_path = asset_path.encode('utf-8')
             asset_path = quote_plus(asset_path, '/:+@')
 
-        return urlunparse((None, base_url.encode('utf-8'), asset_path, params, urlencode(updated_query_params), None))
+        return urlunparse(('', base_url, asset_path, params, urlencode(updated_query_params), ''))
 
     def stream_data(self):
         yield self._data
@@ -300,7 +301,7 @@ class StaticContent(object):
         Legacy code expects the serialized asset key to start w/ a slash; so, do that in one place
         :param asset_key:
         """
-        url = unicode(asset_key)
+        url = six.text_type(asset_key)
         if not url.startswith('/'):
             url = '/' + url  # TODO - re-address this once LMS-11198 is tackled.
         return url
@@ -417,10 +418,10 @@ class ContentStore(object):
                 # for svg simply store the provided svg file, since vector graphics should be good enough
                 # for downscaling client-side
                 if tempfile_path is None:
-                    thumbnail_file = StringIO.StringIO(content.data)
+                    thumbnail_file = BytesIO(content.data)
                 else:
                     with open(tempfile_path) as f:
-                        thumbnail_file = StringIO.StringIO(f.read())
+                        thumbnail_file = BytesIO(f.read())
                 thumbnail_content = StaticContent(thumbnail_file_location, thumbnail_name,
                                                   'image/svg+xml', thumbnail_file)
                 self.save(thumbnail_content)
@@ -430,13 +431,13 @@ class ContentStore(object):
                 # the max-height/width to be whatever you pass in as 'size'
                 # @todo: move the thumbnail size to a configuration setting?!?
                 if tempfile_path is None:
-                    source = StringIO.StringIO(content.data)
+                    source = BytesIO(content.data)
                 else:
                     source = tempfile_path
 
                 # We use the context manager here to avoid leaking the inner file descriptor
                 # of the Image object -- this way it gets closed after we're done with using it.
-                thumbnail_file = StringIO.StringIO()
+                thumbnail_file = BytesIO()
                 with Image.open(source) as image:
                     # I've seen some exceptions from the PIL library when trying to save palletted
                     # PNG files to JPEG. Per the google-universe, they suggest converting to RGB first.
@@ -455,7 +456,7 @@ class ContentStore(object):
 
                 self.save(thumbnail_content)
 
-        except Exception, exc:  # pylint: disable=broad-except
+        except Exception as exc:  # pylint: disable=broad-except
             # log and continue as thumbnails are generally considered as optional
             logging.exception(
                 u"Failed to generate thumbnail for {0}. Exception: {1}".format(content.location, str(exc))

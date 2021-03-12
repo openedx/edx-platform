@@ -2,12 +2,14 @@
 This file contains Django middleware related to the site_configuration app.
 """
 
+import django
 from django.conf import settings
+from django.utils.deprecation import MiddlewareMixin
 
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 
 
-class SessionCookieDomainOverrideMiddleware(object):
+class SessionCookieDomainOverrideMiddleware(MiddlewareMixin):
     """
     Special case middleware which should be at the very end of the MIDDLEWARE list (so that it runs first
     on the process_response chain). This middleware will define a wrapper function for the set_cookie() function
@@ -26,7 +28,7 @@ class SessionCookieDomainOverrideMiddleware(object):
         session_cookie_domain = configuration_helpers.get_value('SESSION_COOKIE_DOMAIN')
         if session_cookie_domain:
             def _set_cookie_wrapper(key, value='', max_age=None, expires=None, path='/', domain=None, secure=None,
-                                    httponly=False):
+                                    httponly=False, samesite=None):
                 """
                 Wrapper function for set_cookie() which applies SESSION_COOKIE_DOMAIN override
                 """
@@ -36,17 +38,20 @@ class SessionCookieDomainOverrideMiddleware(object):
                 if key == configuration_helpers.get_value('SESSION_COOKIE_NAME', settings.SESSION_COOKIE_NAME):
                     domain = session_cookie_domain
 
+                kwargs = {
+                    'max_age': max_age,
+                    'expires': expires,
+                    'path': path,
+                    'domain': domain,
+                    'secure': secure,
+                    'httponly': httponly,
+                }
+                # samesite flag was added in django 2.1, so only pass it in for django 2.1 or higher
+                if django.VERSION >= (2, 1):
+                    kwargs['samesite'] = samesite
+
                 # then call down into the normal Django set_cookie method
-                return response.set_cookie_wrapped_func(
-                    key,
-                    value,
-                    max_age=max_age,
-                    expires=expires,
-                    path=path,
-                    domain=domain,
-                    secure=secure,
-                    httponly=httponly
-                )
+                return response.set_cookie_wrapped_func(key, value, **kwargs)
 
             # then point the HttpResponse.set_cookie to point to the wrapper and keep
             # the original around

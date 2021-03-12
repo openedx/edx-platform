@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
-from __future__ import unicode_literals
 
-from django.db import migrations, models
+
 import django.db.models.deletion
+from django.db import migrations, models
 from opaque_keys.edx.django.models import CourseKeyField
 
 

@@ -17,7 +17,7 @@ define(
                     DiscussionProfilePageFactory(_.extend(
                         {
                             courseId: testCourseId,
-                            roles: DiscussionSpecHelper.getTestRoleInfo(),
+                            roles: (options) ? options.roles : DiscussionSpecHelper.getTestRoleInfo(),
                             courseSettings: DiscussionSpecHelper.createTestCourseSettings().attributes,
                             el: $('.discussion-user-threads'),
                             discussion: new Discussion(),
@@ -38,6 +38,11 @@ define(
 
             it('can render itself', function() {
                 initializeDiscussionProfilePageFactory();
+                expect($('.discussion-user-threads').text()).toContain('Show');
+            });
+            it('can render itself when roles are undefined', function() {
+                var options = {roles: undefined};
+                initializeDiscussionProfilePageFactory(options);
                 expect($('.discussion-user-threads').text()).toContain('Show');
             });
         });

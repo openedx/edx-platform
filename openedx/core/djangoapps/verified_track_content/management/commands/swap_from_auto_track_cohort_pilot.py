@@ -1,15 +1,19 @@
-from contentstore.course_group_config import GroupConfiguration
+"""Management command to migrate a course's xblock's group_access from Verified Track Cohorts to Enrollment Tracks"""
+
+
+from textwrap import dedent
+
 from django.conf import settings
-from course_modes.models import CourseMode
 from django.core.management.base import BaseCommand, CommandError
 
+from contentstore.course_group_config import GroupConfiguration
+from course_modes.models import CourseMode
 from openedx.core.djangoapps.course_groups.cohorts import CourseCohort
-from openedx.core.djangoapps.course_groups.models import (CourseUserGroup, CourseUserGroupPartitionGroup)
+from openedx.core.djangoapps.course_groups.models import CourseUserGroup, CourseUserGroupPartitionGroup
 from openedx.core.djangoapps.verified_track_content.models import (
     MigrateVerifiedTrackCohortsSetting,
     VerifiedTrackCohortedCourse
 )
-
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
 from xmodule.partitions.partitions import ENROLLMENT_TRACK_PARTITION_ID
@@ -20,6 +24,7 @@ class Command(BaseCommand):
     """
     Migrates a course's xblock's group_access from Verified Track Cohorts to Enrollment Tracks
     """
+    help = dedent(__doc__).strip()
 
     def handle(self, *args, **options):
 
@@ -27,7 +32,7 @@ class Command(BaseCommand):
 
         module_store = modulestore()
 
-        print "Starting Swap from Auto Track Cohort Pilot command"
+        print("Starting Swap from Auto Track Cohort Pilot command")
 
         verified_track_cohorts_setting = self._latest_settings()
 
@@ -43,19 +48,19 @@ class Command(BaseCommand):
 
         # Verify that the MigrateVerifiedTrackCohortsSetting has all required fields
         if not old_course_key:
-            raise CommandError("No old_course_key set for MigrateVerifiedTrackCohortsSetting with ID: '%s'"
+            raise CommandError(u"No old_course_key set for MigrateVerifiedTrackCohortsSetting with ID: '%s'"
                                % verified_track_cohorts_setting.id)
 
         if not rerun_course_key:
-            raise CommandError("No rerun_course_key set for MigrateVerifiedTrackCohortsSetting with ID: '%s'"
+            raise CommandError(u"No rerun_course_key set for MigrateVerifiedTrackCohortsSetting with ID: '%s'"
                                % verified_track_cohorts_setting.id)
 
         if not audit_cohort_names:
-            raise CommandError("No audit_cohort_names set for MigrateVerifiedTrackCohortsSetting with ID: '%s'"
+            raise CommandError(u"No audit_cohort_names set for MigrateVerifiedTrackCohortsSetting with ID: '%s'"
                                % verified_track_cohorts_setting.id)
 
-        print "Running for MigrateVerifiedTrackCohortsSetting with old_course_key='%s' and rerun_course_key='%s'" % \
-              (verified_track_cohorts_setting.old_course_key, verified_track_cohorts_setting.rerun_course_key)
+        print(u"Running for MigrateVerifiedTrackCohortsSetting with old_course_key='%s' and rerun_course_key='%s'" %
+              (verified_track_cohorts_setting.old_course_key, verified_track_cohorts_setting.rerun_course_key))
 
         # Get the CourseUserGroup IDs for the audit course names from the old course
         audit_course_user_group_ids = CourseUserGroup.objects.filter(
@@ -66,7 +71,7 @@ class Command(BaseCommand):
 
         if not audit_course_user_group_ids:
             raise CommandError(
-                "No Audit CourseUserGroup found for course_id='%s' with group_type='%s' for names='%s'"
+                u"No Audit CourseUserGroup found for course_id='%s' with group_type='%s' for names='%s'"
                 % (old_course_key, CourseUserGroup.COHORT, audit_cohort_names)
             )
 
@@ -78,7 +83,7 @@ class Command(BaseCommand):
 
         if not random_audit_course_user_group_ids:
             raise CommandError(
-                "No Audit CourseCohorts found for course_user_group_ids='%s' with assignment_type='%s"
+                u"No Audit CourseCohorts found for course_user_group_ids='%s' with assignment_type='%s"
                 % (audit_course_user_group_ids, CourseCohort.RANDOM)
             )
 
@@ -90,7 +95,7 @@ class Command(BaseCommand):
 
         if not random_audit_course_user_group_partition_groups:
             raise CommandError(
-                "No Audit CourseUserGroupPartitionGroup found for course_user_group_ids='%s'"
+                u"No Audit CourseUserGroupPartitionGroup found for course_user_group_ids='%s'"
                 % random_audit_course_user_group_ids
             )
 
@@ -98,10 +103,10 @@ class Command(BaseCommand):
         try:
             verified_track_cohorted_course = VerifiedTrackCohortedCourse.objects.get(course_key=old_course_key)
         except VerifiedTrackCohortedCourse.DoesNotExist:
-            raise CommandError("No VerifiedTrackCohortedCourse found for course: '%s'" % old_course_key)
+            raise CommandError(u"No VerifiedTrackCohortedCourse found for course: '%s'" % old_course_key)
 
         if not verified_track_cohorted_course.enabled:
-            raise CommandError("VerifiedTrackCohortedCourse not enabled for course: '%s'" % old_course_key)
+            raise CommandError(u"VerifiedTrackCohortedCourse not enabled for course: '%s'" % old_course_key)
 
         # Get the single CourseUserGroupPartitionGroup for the verified_track
         # based on the verified_track name for the old course
@@ -113,7 +118,7 @@ class Command(BaseCommand):
             )
         except CourseUserGroup.DoesNotExist:
             raise CommandError(
-                "No Verified CourseUserGroup found for course_id='%s' with group_type='%s' for names='%s'"
+                u"No Verified CourseUserGroup found for course_id='%s' with group_type='%s' for names='%s'"
                 % (old_course_key, CourseUserGroup.COHORT, verified_track_cohorted_course.verified_cohort_name)
             )
 
@@ -123,7 +128,7 @@ class Command(BaseCommand):
             )
         except CourseUserGroupPartitionGroup.DoesNotExist:
             raise CommandError(
-                "No Verified CourseUserGroupPartitionGroup found for course_user_group_ids='%s'"
+                u"No Verified CourseUserGroupPartitionGroup found for course_user_group_ids='%s'"
                 % random_audit_course_user_group_ids
             )
 
@@ -134,7 +139,7 @@ class Command(BaseCommand):
                 mode_slug=CourseMode.AUDIT
             )
         except CourseMode.DoesNotExist:
-            raise CommandError("Audit CourseMode is not defined for course: '%s'" % rerun_course_key)
+            raise CommandError(u"Audit CourseMode is not defined for course: '%s'" % rerun_course_key)
 
         try:
             CourseMode.objects.get(
@@ -142,11 +147,11 @@ class Command(BaseCommand):
                 mode_slug=CourseMode.VERIFIED
             )
         except CourseMode.DoesNotExist:
-            raise CommandError("Verified CourseMode is not defined for course: '%s'" % rerun_course_key)
+            raise CommandError(u"Verified CourseMode is not defined for course: '%s'" % rerun_course_key)
 
         items = module_store.get_items(rerun_course_key)
         if not items:
-            raise CommandError("Items for Course with key '%s' not found." % rerun_course_key)
+            raise CommandError(u"Items for Course with key '%s' not found." % rerun_course_key)
 
         items_to_update = []
 
@@ -170,7 +175,7 @@ class Command(BaseCommand):
                     )
                     if (audit_partition_group_access
                             and audit_course_user_group_partition_group.group_id in audit_partition_group_access):
-                        print "Queueing XBlock at location: '%s' for Audit Content Group update " % item.location
+                        print(u"Queueing XBlock at location: '%s' for Audit Content Group update " % item.location)
                         set_audit_enrollment_track = True
 
                 # Check the partition and group IDs for the verified course group, if it exists in
@@ -187,19 +192,19 @@ class Command(BaseCommand):
                     # This only needs to be checked for this partition_group once
                     if non_verified_track_access_groups:
                         errors.append(
-                            "Non audit/verified cohorted content group set for xblock, location '%s' with IDs '%s'"
+                            u"Non audit/verified cohorted content group set for xblock, location '%s' with IDs '%s'"
                             % (item.location, non_verified_track_access_groups)
                         )
                     if verified_course_user_group_partition_group.group_id in verified_partition_group_access:
-                        print "Queueing XBlock at location: '%s' for Verified Content Group update " % item.location
+                        print(u"Queueing XBlock at location: '%s' for Verified Content Group update " % item.location)
                         set_verified_enrollment_track = True
 
                 # Add the enrollment track ids to a group access array
                 enrollment_track_group_access = []
                 if set_audit_enrollment_track:
-                    enrollment_track_group_access.append(settings.COURSE_ENROLLMENT_MODES['audit'])
+                    enrollment_track_group_access.append(settings.COURSE_ENROLLMENT_MODES['audit']['id'])
                 if set_verified_enrollment_track:
-                    enrollment_track_group_access.append(settings.COURSE_ENROLLMENT_MODES['verified'])
+                    enrollment_track_group_access.append(settings.COURSE_ENROLLMENT_MODES['verified']['id'])
 
                 # If there are no errors, and either the audit track, or verified
                 #  track needed an update, set the access, update and publish
@@ -212,7 +217,7 @@ class Command(BaseCommand):
                         item.group_access = {ENROLLMENT_TRACK_PARTITION_ID: enrollment_track_group_access}
                         items_to_update.append(item)
                     else:
-                        errors.append("XBlock '%s' with location '%s' needs access changes, but is a draft"
+                        errors.append(u"XBlock '%s' with location '%s' needs access changes, but is a draft"
                                       % (item.display_name, item.location))
 
         partitions_to_delete = random_audit_course_user_group_partition_groups
@@ -223,7 +228,7 @@ class Command(BaseCommand):
             for item in items_to_update:
                 module_store.update_item(item, ModuleStoreEnum.UserID.mgmt_command)
                 module_store.publish(item.location, ModuleStoreEnum.UserID.mgmt_command)
-                print "Updated and published XBlock at location: '%s'" % item.location
+                print(u"Updated and published XBlock at location: '%s'" % item.location)
 
         # Check if we should delete any partition groups if there are no errors.
         # If there are errors, none of the xblock items will have been updated,
@@ -242,9 +247,9 @@ class Command(BaseCommand):
                     # since they should have been converted to use enrollment tracks instead.
                     # Taken from contentstore/views/course.py.remove_content_or_experiment_group
                     usages = GroupConfiguration.get_partitions_usage_info(module_store, course)
-                    used = group_id in usages
+                    used = group_id in usages[partition.id]
                     if used:
-                        errors.append("Content group '%s' is in use and cannot be deleted."
+                        errors.append(u"Content group '%s' is in use and cannot be deleted."
                                       % partition_to_delete.group_id)
 
                     # If there are not errors, proceed to update the course and user_partitions
@@ -265,11 +270,11 @@ class Command(BaseCommand):
         # If there are any errors, join them together and raise the CommandError
         if errors:
             raise CommandError(
-                ("Error for MigrateVerifiedTrackCohortsSetting with ID='%s'\n" % verified_track_cohorts_setting.id) +
+                (u"Error for MigrateVerifiedTrackCohortsSetting with ID='%s'\n" % verified_track_cohorts_setting.id) +
                 "\t\n".join(errors)
             )
 
-        print "Finished for MigrateVerifiedTrackCohortsSetting with ID='%s" % verified_track_cohorts_setting.id
+        print(u"Finished for MigrateVerifiedTrackCohortsSetting with ID='%s" % verified_track_cohorts_setting.id)
 
     def _latest_settings(self):
         """

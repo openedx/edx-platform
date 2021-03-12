@@ -2,6 +2,7 @@
 OAuth2 wrapper urls
 """
 
+
 from django.conf import settings
 from django.conf.urls import url
 from django.views.decorators.csrf import csrf_exempt
@@ -12,8 +13,6 @@ urlpatterns = [
     url(r'^authorize/?$', csrf_exempt(views.AuthorizationView.as_view()), name='authorize'),
     url(r'^access_token/?$', csrf_exempt(views.AccessTokenView.as_view()), name='access_token'),
     url(r'^revoke_token/?$', csrf_exempt(views.RevokeTokenView.as_view()), name='revoke_token'),
-    url(r'^\.well-known/openid-configuration/?$', views.ProviderInfoView.as_view(), name='openid-config'),
-    url(r'^jwks\.json$', views.JwksView.as_view(), name='jwks')
 ]
 
 if settings.FEATURES.get('ENABLE_THIRD_PARTY_AUTH'):

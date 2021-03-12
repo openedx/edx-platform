@@ -2,6 +2,8 @@
 Unit tests for helpers.py.
 """
 
+
+import six
 from django.utils import http
 
 from contentstore.tests.utils import CourseTestCase
@@ -17,7 +19,7 @@ class HelpersTestCase(CourseTestCase):
     def test_xblock_studio_url(self):
 
         # Verify course URL
-        course_url = u'/course/{}'.format(unicode(self.course.id))
+        course_url = u'/course/{}'.format(six.text_type(self.course.id))
         self.assertEqual(xblock_studio_url(self.course), course_url)
 
         # Verify chapter URL
@@ -25,7 +27,7 @@ class HelpersTestCase(CourseTestCase):
                                      display_name="Week 1")
         self.assertEqual(
             xblock_studio_url(chapter),
-            u'{}?show={}'.format(course_url, http.urlquote(chapter.location))
+            u'{}?show={}'.format(course_url, http.urlquote(str(chapter.location).encode()))
         )
 
         # Verify sequential URL
@@ -33,7 +35,7 @@ class HelpersTestCase(CourseTestCase):
                                         display_name="Lesson 1")
         self.assertEqual(
             xblock_studio_url(sequential),
-            u'{}?show={}'.format(course_url, http.urlquote(sequential.location))
+            u'{}?show={}'.format(course_url, http.urlquote(str(sequential.location).encode()))
         )
 
         # Verify unit URL
@@ -53,7 +55,7 @@ class HelpersTestCase(CourseTestCase):
 
         # Verify library URL
         library = LibraryFactory.create()
-        expected_url = u'/library/{}'.format(unicode(library.location.library_key))
+        expected_url = u'/library/{}'.format(six.text_type(library.location.library_key))
         self.assertEqual(xblock_studio_url(library), expected_url)
 
     def test_xblock_type_display_name(self):

@@ -41,14 +41,15 @@
   float: right;
   width: auto;
   max-width: 420px;
-  margin: 0 0 10px 0;
+  margin: 0 0 10px;
 }
 
 /* Part of LEARNER-3583 experiment (https://openedx.atlassian.net/browse/LEARNER-3583) */
 
 /* modal-specific */
 
-#upsell-modal, #portfolio-experiment-upsell-modal {
+#upsell-modal,
+#portfolio-experiment-upsell-modal {
   display: none;
 
   /* slick modal from https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.6.0/slick.min.css */
@@ -505,7 +506,7 @@
     padding-bottom: 15px;
   }
 
-  @media only screen and (max-width: 600px){
+  @media only screen and (max-width: 600px) {
     .slick-slide.carousel-item {
       min-width: 0;
     }

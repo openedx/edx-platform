@@ -1,11 +1,12 @@
 # -*- coding: utf-8 -*-
-from __future__ import unicode_literals
 
-from django.db import migrations, models
-import coursewarehistoryextended.fields
+
 import django.utils.timezone
 import model_utils.fields
+from django.db import migrations, models
 from opaque_keys.edx.django.models import CourseKeyField, UsageKeyField
+
+from lms.djangoapps.courseware.fields import UnsignedBigIntAutoField
 
 
 class Migration(migrations.Migration):
@@ -19,12 +20,12 @@ class Migration(migrations.Migration):
             fields=[
                 ('created', model_utils.fields.AutoCreatedField(default=django.utils.timezone.now, verbose_name='created', editable=False)),
                 ('modified', model_utils.fields.AutoLastModifiedField(default=django.utils.timezone.now, verbose_name='modified', editable=False)),
-                ('id', coursewarehistoryextended.fields.UnsignedBigIntAutoField(serialize=False, primary_key=True)),
+                ('id', UnsignedBigIntAutoField(serialize=False, primary_key=True)),
                 ('user_id', models.IntegerField()),
                 ('course_id', CourseKeyField(max_length=255)),
                 ('usage_key', UsageKeyField(max_length=255)),
-                ('subtree_edited_date', models.DateTimeField(verbose_name=b'last content edit timestamp')),
-                ('course_version', models.CharField(max_length=255, verbose_name=b'guid of latest course version', blank=True)),
+                ('subtree_edited_date', models.DateTimeField(verbose_name='last content edit timestamp')),
+                ('course_version', models.CharField(max_length=255, verbose_name='guid of latest course version', blank=True)),
                 ('earned_all', models.FloatField()),
                 ('possible_all', models.FloatField()),
                 ('earned_graded', models.FloatField()),
@@ -42,7 +43,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='persistentsubsectiongrade',
             name='visible_blocks',
-            field=models.ForeignKey(to='grades.VisibleBlocks', db_column=b'visible_blocks_hash', to_field=b'hashed', on_delete=models.CASCADE),
+            field=models.ForeignKey(to='grades.VisibleBlocks', db_column='visible_blocks_hash', to_field='hashed', on_delete=models.CASCADE),
         ),
         migrations.AlterUniqueTogether(
             name='persistentsubsectiongrade',

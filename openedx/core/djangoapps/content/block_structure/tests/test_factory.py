@@ -1,23 +1,23 @@
 """
 Tests for block_structure_factory.py
 """
+
+
 from django.test import TestCase
-from nose.plugins.attrib import attr
+
 from xmodule.modulestore.exceptions import ItemNotFoundError
 
-from ..store import BlockStructureStore
 from ..exceptions import BlockStructureNotFound
 from ..factory import BlockStructureFactory
-from .helpers import (
-    MockCache, MockModulestoreFactory, ChildrenMapTestMixin
-)
+from ..store import BlockStructureStore
+from .helpers import ChildrenMapTestMixin, MockCache, MockModulestoreFactory
 
 
-@attr(shard=2)
 class TestBlockStructureFactory(TestCase, ChildrenMapTestMixin):
     """
     Tests for BlockStructureFactory
     """
+
     def setUp(self):
         super(TestBlockStructureFactory, self).setUp()
         self.children_map = self.SIMPLE_CHILDREN_MAP

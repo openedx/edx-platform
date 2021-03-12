@@ -1,9 +1,13 @@
+"""
+    Middleware utilities
+"""
+
 from contextlib import contextmanager
 
 from crum import CurrentRequestUserMiddleware
-from openedx.core.djangoapps.theming.middleware import CurrentSiteThemeMiddleware
 from django.http import HttpResponse
-from openedx.core.djangoapps.request_cache import get_request_or_stub
+from openedx.core.djangoapps.theming.middleware import CurrentSiteThemeMiddleware
+from openedx.core.lib.request_utils import get_request_or_stub
 
 
 @contextmanager
@@ -45,6 +49,7 @@ def emulate_http_request(site=None, user=None, middleware_classes=None):
     except Exception as exc:
         for middleware in reversed(middleware_instances):
             _run_method_if_implemented(middleware, 'process_exception', request, exc)
+        raise
     else:
         for middleware in reversed(middleware_instances):
             _run_method_if_implemented(middleware, 'process_response', request, response)

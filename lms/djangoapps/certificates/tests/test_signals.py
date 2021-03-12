@@ -2,19 +2,22 @@
 Unit tests for enabling self-generated certificates for self-paced courses
 and disabling for instructor-paced courses.
 """
+
+
 import ddt
 import mock
+import six
 
 from django.conf import settings
 
 from lms.djangoapps.certificates import api as certs_api
 from lms.djangoapps.certificates.models import (
     CertificateGenerationConfiguration,
-    CertificateWhitelist,
-    GeneratedCertificate,
     CertificateStatuses,
+    CertificateWhitelist,
+    GeneratedCertificate
 )
-from lms.djangoapps.certificates.signals import fire_ungenerated_certificate_task, CERTIFICATE_DELAY_SECONDS
+from lms.djangoapps.certificates.signals import CERTIFICATE_DELAY_SECONDS, fire_ungenerated_certificate_task
 from lms.djangoapps.grades.course_grade_factory import CourseGradeFactory
 from lms.djangoapps.grades.tests.utils import mock_passing_grade
 from lms.djangoapps.verify_student.models import IDVerificationAttempt, SoftwareSecurePhotoVerification
@@ -28,7 +31,6 @@ class SelfGeneratedCertsSignalTest(ModuleStoreTestCase):
     """
     Tests for enabling/disabling self-generated certificates according to course-pacing.
     """
-    shard = 4
     ENABLED_SIGNALS = ['course_published']
 
     def setUp(self):
@@ -56,7 +58,6 @@ class WhitelistGeneratedCertificatesTest(ModuleStoreTestCase):
     """
     Tests for whitelisted student auto-certificate generation
     """
-    shard = 4
 
     def setUp(self):
         super(WhitelistGeneratedCertificatesTest, self).setUp()
@@ -99,8 +100,8 @@ class WhitelistGeneratedCertificatesTest(ModuleStoreTestCase):
                 mock_generate_certificate_apply_async.assert_called_with(
                     countdown=CERTIFICATE_DELAY_SECONDS,
                     kwargs={
-                        'student': unicode(self.user.id),
-                        'course_key': unicode(self.course.id),
+                        'student': six.text_type(self.user.id),
+                        'course_key': six.text_type(self.course.id),
                     }
                 )
 
@@ -127,8 +128,8 @@ class WhitelistGeneratedCertificatesTest(ModuleStoreTestCase):
                 mock_generate_certificate_apply_async.assert_called_with(
                     countdown=CERTIFICATE_DELAY_SECONDS,
                     kwargs={
-                        'student': unicode(self.user.id),
-                        'course_key': unicode(self.ip_course.id),
+                        'student': six.text_type(self.user.id),
+                        'course_key': six.text_type(self.ip_course.id),
                     }
                 )
 
@@ -137,7 +138,6 @@ class PassingGradeCertsTest(ModuleStoreTestCase):
     """
     Tests for certificate generation task firing on passing grade receipt
     """
-    shard = 4
 
     def setUp(self):
         super(PassingGradeCertsTest, self).setUp()
@@ -180,8 +180,8 @@ class PassingGradeCertsTest(ModuleStoreTestCase):
                     mock_generate_certificate_apply_async.assert_called_with(
                         countdown=CERTIFICATE_DELAY_SECONDS,
                         kwargs={
-                            'student': unicode(self.user.id),
-                            'course_key': unicode(self.course.id),
+                            'student': six.text_type(self.user.id),
+                            'course_key': six.text_type(self.course.id),
                         }
                     )
 
@@ -201,8 +201,8 @@ class PassingGradeCertsTest(ModuleStoreTestCase):
                     mock_generate_certificate_apply_async.assert_called_with(
                         countdown=CERTIFICATE_DELAY_SECONDS,
                         kwargs={
-                            'student': unicode(self.user.id),
-                            'course_key': unicode(self.ip_course.id),
+                            'student': six.text_type(self.user.id),
+                            'course_key': six.text_type(self.ip_course.id),
                         }
                     )
 
@@ -224,11 +224,67 @@ class PassingGradeCertsTest(ModuleStoreTestCase):
                 mock_generate_certificate_apply_async.assert_not_called()
 
 
+@ddt.ddt
+class FailingGradeCertsTest(ModuleStoreTestCase):
+    """
+    Tests for marking certificate notpassing when grade goes from passing to failing,
+    and that the signal has no effect on the cert status if the cert has a non-passing
+    status
+    """
+
+    def setUp(self):
+        super(FailingGradeCertsTest, self).setUp()
+        self.course = CourseFactory.create(
+            self_paced=True,
+        )
+        self.user = UserFactory.create()
+        self.enrollment = CourseEnrollmentFactory(
+            user=self.user,
+            course_id=self.course.id,
+            is_active=True,
+            mode="verified",
+        )
+        attempt = SoftwareSecurePhotoVerification.objects.create(
+            user=self.user,
+            status='submitted'
+        )
+        attempt.approve()
+
+    @ddt.data(
+        CertificateStatuses.deleted,
+        CertificateStatuses.deleting,
+        CertificateStatuses.downloadable,
+        CertificateStatuses.error,
+        CertificateStatuses.generating,
+        CertificateStatuses.notpassing,
+        CertificateStatuses.restricted,
+        CertificateStatuses.unavailable,
+        CertificateStatuses.auditing,
+        CertificateStatuses.audit_passing,
+        CertificateStatuses.audit_notpassing,
+        CertificateStatuses.unverified,
+        CertificateStatuses.invalidated,
+        CertificateStatuses.requesting,
+    )
+    def test_cert_failure(self, status):
+        if CertificateStatuses.is_passing_status(status):
+            expected_status = CertificateStatuses.notpassing
+        else:
+            expected_status = status
+        GeneratedCertificate.eligible_certificates.create(
+            user=self.user,
+            course_id=self.course.id,
+            status=status
+        )
+        CourseGradeFactory().update(self.user, self.course)
+        cert = GeneratedCertificate.certificate_for_student(self.user, self.course.id)
+        self.assertEqual(cert.status, expected_status)
+
+
 class LearnerTrackChangeCertsTest(ModuleStoreTestCase):
     """
     Tests for certificate generation task firing on learner verification
     """
-    shard = 4
 
     def setUp(self):
         super(LearnerTrackChangeCertsTest, self).setUp()
@@ -268,8 +324,8 @@ class LearnerTrackChangeCertsTest(ModuleStoreTestCase):
                 mock_generate_certificate_apply_async.assert_called_with(
                     countdown=CERTIFICATE_DELAY_SECONDS,
                     kwargs={
-                        'student': unicode(self.user_one.id),
-                        'course_key': unicode(self.course_one.id),
+                        'student': six.text_type(self.user_one.id),
+                        'course_key': six.text_type(self.course_one.id),
                         'expected_verification_status': IDVerificationAttempt.STATUS.approved,
                     }
                 )
@@ -289,8 +345,8 @@ class LearnerTrackChangeCertsTest(ModuleStoreTestCase):
                 mock_generate_certificate_apply_async.assert_called_with(
                     countdown=CERTIFICATE_DELAY_SECONDS,
                     kwargs={
-                        'student': unicode(self.user_two.id),
-                        'course_key': unicode(self.course_two.id),
+                        'student': six.text_type(self.user_two.id),
+                        'course_key': six.text_type(self.course_two.id),
                         'expected_verification_status': IDVerificationAttempt.STATUS.approved,
                     }
                 )
@@ -301,7 +357,6 @@ class CertificateGenerationTaskTest(ModuleStoreTestCase):
     """
     Tests for certificate generation task.
     """
-    shard = 4
 
     def setUp(self):
         super(CertificateGenerationTaskTest, self).setUp()
@@ -312,6 +367,7 @@ class CertificateGenerationTaskTest(ModuleStoreTestCase):
         ('verified', True),
         ('no-id-professional', True),
         ('credit', True),
+        ('masters', True),
         ('audit', False),
         ('honor', True),  # TAHOE_AUTO_GENERATE_HONOR_CERTS feature: allows for honor
     )

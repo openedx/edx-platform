@@ -1,0 +1,35 @@
+<%page expression_filter="h"/>
+
+<%!
+from django.utils.translation import ugettext as _
+from openedx.core.djangolib.js_utils import js_escaped_string
+%>
+
+## Override the default styles_version to use Bootstrap
+<%! main_css = "css/bootstrap/lms-main.css" %>
+
+<%namespace name='static' file='../static_content.html'/>
+
+<%inherit file="../main.html" />
+
+<%block name="js_extra">
+</%block>
+
+<%block name="pagetitle">
+	${_("Program Enrollments Inspector")}
+</%block>
+
+<%block name="content">
+	<section class="container outside-app">
+        <h1> Program Enrollments Inspector </h1>
+            ${static.renderReact(
+                component="ProgramEnrollmentsInspectorPage",
+                id="program-enrollments-inspector-page",
+                props={
+                    'error': error,
+                    'learnerInfo': learner_program_enrollments,
+                    'orgKeys': org_keys
+                }
+            )}
+	</section>
+</%block>

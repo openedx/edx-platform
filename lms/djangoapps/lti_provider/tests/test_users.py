@@ -2,13 +2,15 @@
 Tests for the LTI user management functionality
 """
 
+
 import string
 
 from django.contrib.auth.models import User
 from django.core.exceptions import PermissionDenied
 from django.test import TestCase
 from django.test.client import RequestFactory
-from mock import MagicMock, patch, PropertyMock
+from mock import MagicMock, PropertyMock, patch
+from six.moves import range
 
 import lti_provider.users as users
 from lti_provider.models import LtiConsumer, LtiUser
@@ -19,7 +21,6 @@ class UserManagementHelperTest(TestCase):
     """
     Tests for the helper functions in users.py
     """
-    shard = 4
 
     def setUp(self):
         super(UserManagementHelperTest, self).setUp()
@@ -68,7 +69,7 @@ class UserManagementHelperTest(TestCase):
             for char in range(len(username)):
                 self.assertIn(
                     username[char], string.ascii_letters + string.digits,
-                    "Username has forbidden character '{}'".format(username[char])
+                    u"Username has forbidden character '{}'".format(username[char])
                 )
 
 
@@ -78,7 +79,6 @@ class AuthenticateLtiUserTest(TestCase):
     """
     Tests for the authenticate_lti_user function in users.py
     """
-    shard = 4
 
     def setUp(self):
         super(AuthenticateLtiUserTest, self).setUp()
@@ -146,7 +146,6 @@ class CreateLtiUserTest(TestCase):
     """
     Tests for the create_lti_user function in users.py
     """
-    shard = 4
 
     def setUp(self):
         super(CreateLtiUserTest, self).setUp()
@@ -184,7 +183,6 @@ class LtiBackendTest(TestCase):
     """
     Tests for the authentication backend that authenticates LTI users.
     """
-    shard = 4
 
     def setUp(self):
         super(LtiBackendTest, self).setUp()
@@ -201,9 +199,13 @@ class LtiBackendTest(TestCase):
             lti_user_id=self.lti_user_id,
             edx_user=self.edx_user
         ).save()
+        self.old_user = UserFactory.create()
+        self.request = RequestFactory().post('/')
+        self.request.user = self.old_user
 
     def test_valid_user_authenticates(self):
         user = users.LtiBackend().authenticate(
+            self.request,
             username=self.edx_user.username,
             lti_user_id=self.lti_user_id,
             lti_consumer=self.lti_consumer
@@ -212,6 +214,7 @@ class LtiBackendTest(TestCase):
 
     def test_missing_user_returns_none(self):
         user = users.LtiBackend().authenticate(
+            self.request,
             username=self.edx_user.username,
             lti_user_id='Invalid Username',
             lti_consumer=self.lti_consumer
@@ -222,12 +225,14 @@ class LtiBackendTest(TestCase):
         non_edx_user = UserFactory.create()
         non_edx_user.save()
         user = users.LtiBackend().authenticate(
+            self.request,
             username=non_edx_user.username,
         )
         self.assertIsNone(user)
 
     def test_missing_lti_id_returns_null(self):
         user = users.LtiBackend().authenticate(
+            self.request,
             username=self.edx_user.username,
             lti_consumer=self.lti_consumer
         )
@@ -235,6 +240,7 @@ class LtiBackendTest(TestCase):
 
     def test_missing_lti_consumer_returns_null(self):
         user = users.LtiBackend().authenticate(
+            self.request,
             username=self.edx_user.username,
             lti_user_id=self.lti_user_id,
         )

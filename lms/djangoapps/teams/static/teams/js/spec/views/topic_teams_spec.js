@@ -7,12 +7,14 @@ define([
 ], function(Backbone, _, TopicTeamsView, TeamSpecHelpers, PageHelpers) {
     'use strict';
     describe('Topic Teams View', function() {
-        var createTopicTeamsView = function(options) {
-            options = options || {};
-            var myTeamsCollection = options.myTeamsCollection || TeamSpecHelpers.createMockTeams({results: []});
+        var createTopicTeamsView = function(options, isInstructorManagedTopic) {
+            var myTeamsCollection;
+            options = options || {}; // eslint-disable-line no-param-reassign
+            myTeamsCollection = options.myTeamsCollection || TeamSpecHelpers.createMockTeams({results: []});
             return new TopicTeamsView({
                 el: '.teams-container',
-                model: TeamSpecHelpers.createMockTopic(),
+                model: isInstructorManagedTopic ?
+                    TeamSpecHelpers.createMockInstructorManagedTopic() : TeamSpecHelpers.createMockTopic(),
                 collection: options.teams || TeamSpecHelpers.createMockTeams(),
                 myTeamsCollection: myTeamsCollection,
                 showActions: true,
@@ -21,14 +23,15 @@ define([
         };
 
         var verifyActions = function(teamsView, options) {
-            if (!options) {
-                options = {showActions: true};
-            }
             var expectedTitle = 'Are you having trouble finding a team to join?',
                 expectedMessage = 'Browse teams in other topics or search teams in this topic. ' +
                     'If you still can\'t find a team to join, create a new team in this topic.',
                 title = teamsView.$('.title').text().trim(),
                 message = teamsView.$('.copy').text().trim();
+            if (!options) {
+                options = {showActions: true}; // eslint-disable-line no-param-reassign
+            }
+
             if (options.showActions) {
                 expect(title).toBe(expectedTitle);
                 expect(message).toBe(expectedMessage);
@@ -50,11 +53,9 @@ define([
                         results: testTeamData
                     })
                 });
-
-            expect(teamsView.$('.teams-paging-header').text()).toMatch('Showing 1-5 out of 6 total');
-
             var footerEl = teamsView.$('.teams-paging-footer');
-            expect(footerEl.text()).toMatch('1\\s+out of\\s+\/\\s+2');
+            expect(teamsView.$('.teams-paging-header').text()).toMatch('Showing 1-5 out of 6 total');
+            expect(footerEl.text()).toMatch('1\\s+out of\\s+\/\\s+2'); // eslint-disable-line no-useless-escape
             expect(footerEl).not.toHaveClass('hidden');
 
             TeamSpecHelpers.verifyCards(teamsView, testTeamData);
@@ -85,18 +86,38 @@ define([
         });
 
         it('does not show actions for a user already in a team', function() {
-            var teamsView = createTopicTeamsView({myTeamsCollection: TeamSpecHelpers.createMockTeams()});
+            var options = {myTeamsCollection: TeamSpecHelpers.createMockTeams()};
+            var teamsView = createTopicTeamsView(options);
+            verifyActions(teamsView, {showActions: false});
+        });
+
+        it('does not show actions for a student in an instructor managed topic', function() {
+            var teamsView = createTopicTeamsView({}, true);
             verifyActions(teamsView, {showActions: false});
         });
 
         it('shows actions for a privileged user already in a team', function() {
-            var teamsView = createTopicTeamsView({privileged: true});
-            verifyActions(teamsView);
+            var options = {
+                userInfo: {
+                    privileged: true,
+                    staff: false
+                },
+                myTeamsCollection: TeamSpecHelpers.createMockTeams()
+            };
+            var teamsView = createTopicTeamsView(options);
+            verifyActions(teamsView, {showActions: true});
         });
 
         it('shows actions for a staff user already in a team', function() {
-            var teamsView = createTopicTeamsView({privileged: false, staff: true});
-            verifyActions(teamsView);
+            var options = {
+                userInfo: {
+                    privileged: false,
+                    staff: true
+                },
+                myTeamsCollection: TeamSpecHelpers.createMockTeams()
+            };
+            var teamsView = createTopicTeamsView(options);
+            verifyActions(teamsView, {showActions: true});
         });
 
         /*

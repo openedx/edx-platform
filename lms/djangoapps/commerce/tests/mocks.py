@@ -1,4 +1,7 @@
 """ Commerce app tests package. """
+# pylint: disable=invalid-name
+
+
 import json
 
 import httpretty
@@ -6,8 +9,6 @@ from django.conf import settings
 
 from . import factories
 
-
-# pylint: disable=invalid-name
 
 class mock_ecommerce_api_endpoint(object):
     """
@@ -59,9 +60,9 @@ class mock_ecommerce_api_endpoint(object):
         """
         raise NotImplementedError
 
-    def _exception_body(self, request, uri, headers):  # pylint: disable=unused-argument
+    def _exception_body(self, request, uri, headers):
         """Helper used to create callbacks in order to have httpretty raise Exceptions."""
-        raise self.exception  # pylint: disable=raising-bad-type
+        raise self.exception
 
     def __enter__(self):
         httpretty.enable()

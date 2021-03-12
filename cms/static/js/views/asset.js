@@ -1,6 +1,7 @@
 define(['js/views/baseview', 'underscore', 'gettext', 'common/js/components/views/feedback_prompt',
-    'common/js/components/views/feedback_notification'],
-    function(BaseView, _, gettext, PromptView, NotificationView) {
+    'common/js/components/views/feedback_notification', 'edx-ui-toolkit/js/utils/html-utils'],
+    function(BaseView, _, gettext, PromptView, NotificationView, HtmlUtils) {
+        'use strict';
         var AssetView = BaseView.extend({
             initialize: function() {
                 this.template = this.loadTemplate('asset');
@@ -14,7 +15,7 @@ define(['js/views/baseview', 'underscore', 'gettext', 'common/js/components/view
 
             render: function() {
                 var uniqueId = _.uniqueId('lock_asset_');
-                this.$el.html(this.template({
+                var attributes = {
                     display_name: this.model.get('display_name'),
                     thumbnail: this.model.get('thumbnail'),
                     date_added: this.model.get('date_added'),
@@ -23,32 +24,32 @@ define(['js/views/baseview', 'underscore', 'gettext', 'common/js/components/view
                     portable_url: this.model.get('portable_url'),
                     asset_type: this.model.get_extension(),
                     uniqueId: uniqueId
-                }));
+                };
+                this.$el.html(HtmlUtils.HTML(this.template(attributes)).toString());
                 this.updateLockState();
                 return this;
             },
 
             updateLockState: function() {
-                var locked_class = 'is-locked';
+                var lockedClass = 'is-locked';
 
     // Add a class of "locked" to the tr element if appropriate,
     // and toggle locked state of hidden checkbox.
                 if (this.model.get('locked')) {
-                    this.$el.addClass(locked_class);
+                    this.$el.addClass(lockedClass);
                     this.$el.find('.lock-checkbox').attr('checked', 'checked');
                 } else {
-                    this.$el.removeClass(locked_class);
+                    this.$el.removeClass(lockedClass);
                     this.$el.find('.lock-checkbox').removeAttr('checked');
                 }
             },
 
             confirmDelete: function(e) {
+                var asset = this.model;
                 if (e && e.preventDefault) { e.preventDefault(); }
-                var asset = this.model,
-                    collection = this.model.collection;
                 new PromptView.Warning({
                     title: gettext('Delete File Confirmation'),
-                    message: gettext('Are you sure you wish to delete this item. It cannot be reversed!\n\nAlso any content that links/refers to this item will no longer work (e.g. broken images and/or links)'),
+                    message: gettext('Are you sure you wish to delete this item. It cannot be reversed!\n\nAlso any content that links/refers to this item will no longer work (e.g. broken images and/or links)'), // eslint-disable-line max-len
                     actions: {
                         primary: {
                             text: gettext('Delete'),
@@ -76,7 +77,7 @@ define(['js/views/baseview', 'underscore', 'gettext', 'common/js/components/view
                 }).show();
             },
 
-            lockAsset: function(e) {
+            lockAsset: function() {
                 var asset = this.model;
                 var saving = new NotificationView.Mini({
                     title: gettext('Saving')

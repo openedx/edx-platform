@@ -2,12 +2,13 @@
 Tests for sandboxing.py in util app
 """
 
+
 from django.test import TestCase
 from django.test.utils import override_settings
 from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locator import CourseLocator, LibraryLocator
 
-from util.sandboxing import can_execute_unsafe_code
+from xmodule.util.sandboxing import can_execute_unsafe_code
 
 
 class SandboxingTest(TestCase):

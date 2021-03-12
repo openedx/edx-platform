@@ -1,6 +1,7 @@
 """
 Tests for the models that configures 'VideoUploadsEnabledByDefault' feature.
 """
+
 import ddt
 import itertools
 

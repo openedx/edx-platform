@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 """ Tests for setting and displaying the site status message. """
+
+
 import unittest
 
 import ddt

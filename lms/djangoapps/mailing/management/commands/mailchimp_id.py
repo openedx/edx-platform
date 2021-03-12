@@ -2,7 +2,7 @@
 mailchimp_id: Returns whether or not a given mailchimp key represents
 a valid list.
 """
-from __future__ import print_function
+
 
 import sys
 
@@ -42,8 +42,8 @@ class Command(BaseCommand):
         list_with_id = by_web_id.get(web_id, None)
 
         if list_with_id:
-            print("id: {} for web_id: {}".format(list_with_id['id'], web_id))
-            print("list name: {}".format(list_with_id['name']))
+            print(u"id: {} for web_id: {}".format(list_with_id['id'], web_id))
+            print(u"list name: {}".format(list_with_id['name']))
         else:
-            print("list with web_id: {} not found.".format(web_id))
+            print(u"list with web_id: {} not found.".format(web_id))
             sys.exit(1)

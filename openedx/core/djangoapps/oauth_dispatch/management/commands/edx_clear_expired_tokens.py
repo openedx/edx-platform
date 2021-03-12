@@ -1,4 +1,7 @@
-from __future__ import unicode_literals
+"""
+Management command for clear expired access tokens!
+"""
+
 
 import logging
 from datetime import timedelta

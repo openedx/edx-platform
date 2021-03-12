@@ -1,15 +1,17 @@
 '''
 Utilities for contentstore tests
 '''
+
+
 import json
 import textwrap
 
+import six
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.test.client import Client
 from mock import Mock
-from opaque_keys.edx.keys import CourseKey
-from opaque_keys.edx.locations import AssetLocation
+from opaque_keys.edx.keys import AssetKey, CourseKey
 
 from contentstore.utils import reverse_url
 from student.models import Registration
@@ -27,7 +29,7 @@ TEST_DATA_DIR = settings.COMMON_TEST_DATA_ROOT
 
 def parse_json(response):
     """Parse response, which is assumed to be json"""
-    return json.loads(response.content)
+    return json.loads(response.content.decode('utf-8'))
 
 
 def user(email):
@@ -49,7 +51,7 @@ class AjaxEnabledTestClient(Client):
         Convenience method for client post which serializes the data into json and sets the accept type
         to json
         """
-        if not isinstance(data, basestring):
+        if not isinstance(data, six.string_types):
             data = json.dumps(data or {})
         kwargs.setdefault("HTTP_X_REQUESTED_WITH", "XMLHttpRequest")
         kwargs.setdefault("HTTP_ACCEPT", "application/json")
@@ -121,7 +123,7 @@ class CourseTestCase(ProceduralCourseTestMixin, ModuleStoreTestCase):
     SEQUENTIAL = 'vertical_sequential'
     DRAFT_HTML = 'draft_html'
     DRAFT_VIDEO = 'draft_video'
-    LOCKED_ASSET_KEY = AssetLocation.from_deprecated_string('/c4x/edX/toy/asset/sample_static.html')
+    LOCKED_ASSET_KEY = AssetKey.from_string('/c4x/edX/toy/asset/sample_static.html')
 
     def import_and_populate_course(self):
         """
@@ -355,7 +357,7 @@ class CourseTestCase(ProceduralCourseTestMixin, ModuleStoreTestCase):
         course1_asset_attrs = content_store.get_attrs(course1_id.make_asset_key(category, filename))
         course2_asset_attrs = content_store.get_attrs(course2_id.make_asset_key(category, filename))
         self.assertEqual(len(course1_asset_attrs), len(course2_asset_attrs))
-        for key, value in course1_asset_attrs.iteritems():
+        for key, value in six.iteritems(course1_asset_attrs):
             if key in ['_id', 'filename', 'uploadDate', 'content_son', 'thumbnail_location']:
                 pass
             else:

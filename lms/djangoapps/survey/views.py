@@ -2,13 +2,14 @@
 View endpoints for Survey
 """
 
+
 import json
 import logging
 
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
-from django.urls import reverse
 from django.http import HttpResponse, HttpResponseNotFound, HttpResponseRedirect
+from django.urls import reverse
 from django.utils.html import escape
 from django.views.decorators.http import require_POST
 from opaque_keys.edx.keys import CourseKey

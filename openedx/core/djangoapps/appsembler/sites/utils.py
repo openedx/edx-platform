@@ -1,21 +1,25 @@
-from django.db.models import Q, F
-from django.utils import timezone
+from datetime import timedelta
 
 import beeline
 import json
-from itertools import izip
-from urlparse import urlparse
+
+from urllib.parse import urlparse
 
 import cssutils
 import os
 import sass
+
+from django.db.models import Q, F
+from django.utils import timezone
 from django.core.files.storage import get_storage_class
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.contrib.sites.models import Site
 from django.core.exceptions import ImproperlyConfigured
 from django.db.models.query import Q
-from provider.oauth2.models import AccessToken, RefreshToken, Client
+
+from oauth2_provider.models import AccessToken, RefreshToken, Application
+
 from django.utils.text import slugify
 
 from organizations import api as org_api
@@ -105,12 +109,12 @@ def get_active_sites(order_by='domain'):
     ).order_by(order_by)
 
 
-@beeline.traced(name="get_amc_oauth_client")
-def get_amc_oauth_client():
+@beeline.traced(name="get_amc_oauth_app")
+def get_amc_oauth_app():
     """
     Return the AMC OAuth2 Client model instance.
     """
-    return Client.objects.get(url=settings.AMC_APP_URL)
+    return Application.objects.get(client_id=settings.AMC_APP_OAUTH2_CLIENT_ID)
 
 
 @beeline.traced(name="get_amc_tokens")
@@ -118,8 +122,7 @@ def get_amc_tokens(user):
     """
     Return the the access and refresh token with expiry date in a dict.
     """
-
-    client = get_amc_oauth_client()
+    app = get_amc_oauth_app()
     tokens = {
         'access_token': '',
         'access_expires': '',
@@ -127,7 +130,7 @@ def get_amc_tokens(user):
     }
 
     try:
-        access = AccessToken.objects.get(user=user, client=client)
+        access = AccessToken.objects.get(user=user, application=app)
         tokens.update({
             'access_token': access.token,
             'access_expires': access.expires,
@@ -136,7 +139,7 @@ def get_amc_tokens(user):
         return tokens
 
     try:
-        refresh = RefreshToken.objects.get(user=user, access_token=access, client=client)
+        refresh = RefreshToken.objects.get(user=user, access_token=access, application=app)
         tokens['refresh_token'] = refresh.token
     except RefreshToken.DoesNotExist:
         pass
@@ -149,28 +152,25 @@ def reset_amc_tokens(user, access_token=None, refresh_token=None):
     """
     Create and return new tokens, or extend existing ones to one year in the future.
     """
-    client = get_amc_oauth_client()
-    try:
-        access = AccessToken.objects.get(user=user, client=client)
-    except AccessToken.DoesNotExist:
-        access = AccessToken.objects.create(
-            user=user,
-            client=client,
-        )
+    app = get_amc_oauth_app()
+    one_year_ahead = timezone.now() + timedelta(days=settings.OAUTH_EXPIRE_CONFIDENTIAL_CLIENT_DAYS)
 
-    access.expires = access.client.get_default_token_expiry()
+    access, _created = AccessToken.objects.get_or_create(
+        user=user,
+        application=app,
+        defaults={'expires': one_year_ahead}
+    )
+
+    access.expires = one_year_ahead
     if access_token:
         access.token = access_token
     access.save()
 
-    try:
-        refresh = RefreshToken.objects.get(user=user, access_token=access, client=client)
-    except RefreshToken.DoesNotExist:
-        refresh = RefreshToken.objects.create(
-            user=user,
-            client=client,
-            access_token=access,
-        )
+    refresh, _created = RefreshToken.objects.get_or_create(
+        user=user,
+        access_token=access,
+        application=app,
+    )
 
     if refresh_token:
         refresh.token = refresh_token
@@ -259,6 +259,15 @@ def is_request_for_amc_admin(request):
 def get_current_organization(failure_return_none=False):
     """
     Get current organization from request using multiple strategies.
+
+    The split is made to enable global patching of the function.
+    """
+    return _get_current_organization(failure_return_none)
+
+
+def _get_current_organization(failure_return_none=False):
+    """
+    Implements get_current_organization.
     """
     request = get_current_request()
     organization_name = None
@@ -351,7 +360,7 @@ def get_initial_sass_variables():
     """
     values = get_branding_values_from_file()
     labels = get_branding_labels_from_file()
-    return [(val[0], (val[1], lab[1])) for val, lab in izip(values, labels)]
+    return [(val[0], (val[1], lab[1])) for val, lab in zip(values, labels)]
 
 
 @beeline.traced(name="get_branding_values_from_file")
@@ -361,7 +370,14 @@ def get_branding_values_from_file():
     if not settings.ENABLE_COMPREHENSIVE_THEMING:
         return {}
 
-    site_theme = SiteTheme(site=Site.objects.get(id=settings.SITE_ID), theme_dir_name=settings.DEFAULT_SITE_THEME)
+    try:
+        default_site = Site.objects.get(id=settings.SITE_ID)
+    except Site.DoesNotExist:
+        # Empty values dictionary if the database isn't initialized yet.
+        # This unblocks migrations and other cases before having a default site.
+        return {}
+
+    site_theme = SiteTheme(site=default_site, theme_dir_name=settings.DEFAULT_SITE_THEME)
     theme = Theme(
         name=site_theme.theme_dir_name,
         theme_dir_name=site_theme.theme_dir_name,
@@ -400,7 +416,14 @@ def get_branding_labels_from_file(custom_branding=None):
 @beeline.traced(name="compile_sass")
 def compile_sass(sass_file, custom_branding=None):
     from openedx.core.djangoapps.theming.helpers import get_theme_base_dir, Theme
-    site_theme = SiteTheme(site=Site.objects.get(id=settings.SITE_ID), theme_dir_name=settings.DEFAULT_SITE_THEME)
+    try:
+        default_site = Site.objects.get(id=settings.SITE_ID)
+    except Site.DoesNotExist:
+        # Empty CSS output if the database isn't initialized yet.
+        # This unblocks migrations and other cases before having a default site.
+        return ''
+
+    site_theme = SiteTheme(site=default_site, theme_dir_name=settings.DEFAULT_SITE_THEME)
     theme = Theme(
         name=site_theme.theme_dir_name,
         theme_dir_name=site_theme.theme_dir_name,
@@ -466,7 +489,7 @@ def bootstrap_site(site, org_data=None, username=None):
         })
         organization = org_models.Organization.objects.get(id=organization_data.get('id'))
         organization.sites.add(site)
-        site_config.values['course_org_filter'] = organization_slug
+        site_config.site_values['course_org_filter'] = organization_slug
         site_config.save()
     else:
         organization = {}
@@ -506,18 +529,18 @@ def migrate_page_element(element):
     Translate the `content` in the page element, apply the same for all children elements.
     """
     if not isinstance(element, dict):
-        print 'DEBUG:', element
+        print('DEBUG:', element)
         raise Exception('An element should be a dict')
 
     if 'options' not in element:
-        print 'DEBUG:', element
+        print('DEBUG:', element)
         raise Exception('Unknown element type')
 
     options = element['options']
 
     if 'content' in options or 'text-content' in options:
         if 'content' in options and 'text-content' in options:
-            print 'DEBUG:', options
+            print('DEBUG:', options)
             raise Exception(
                 'Both `content` and `text-content` are there, but which one to translate?'
             )
@@ -532,7 +555,7 @@ def migrate_page_element(element):
                 'en': options['text-content']
             }
 
-    for _column_name, children in element.get('children', {}).iteritems():
+    for _column_name, children in element.get('children', {}).items():
         for child_element in children:
             migrate_page_element(child_element)
 
@@ -541,8 +564,8 @@ def to_new_page_elements(page_elements):
     """
     Migrate the page elements of a site.
     """
-    for page_id, page_obj in page_elements.iteritems():
-        if isinstance(page_obj, (unicode, str)):
+    for page_id, page_obj in page_elements.items():
+        if isinstance(page_obj, str):
             continue  # Skip pages like `"course-card": "course-tile-01"`
 
         for element in page_obj.get('content', []):

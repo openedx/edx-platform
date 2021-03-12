@@ -1,17 +1,15 @@
 """
 Defines a form for providing validation of CourseEmail templates.
 """
+
+
 import logging
 
 from django import forms
 from django.core.exceptions import ValidationError
-from opaque_keys import InvalidKeyError
-from opaque_keys.edx.keys import CourseKey
-from six import text_type
 
 from bulk_email.models import COURSE_EMAIL_MESSAGE_BODY_TAG, CourseAuthorization, CourseEmailTemplate
 from openedx.core.lib.courses import clean_course_id
-from xmodule.modulestore.django import modulestore
 
 log = logging.getLogger(__name__)
 
@@ -29,11 +27,11 @@ class CourseEmailTemplateForm(forms.ModelForm):
         """Check the template for required tags."""
         index = template.find(COURSE_EMAIL_MESSAGE_BODY_TAG)
         if index < 0:
-            msg = 'Missing tag: "{}"'.format(COURSE_EMAIL_MESSAGE_BODY_TAG)
+            msg = u'Missing tag: "{}"'.format(COURSE_EMAIL_MESSAGE_BODY_TAG)
             log.warning(msg)
             raise ValidationError(msg)
         if template.find(COURSE_EMAIL_MESSAGE_BODY_TAG, index + 1) >= 0:
-            msg = 'Multiple instances of tag: "{}"'.format(COURSE_EMAIL_MESSAGE_BODY_TAG)
+            msg = u'Multiple instances of tag: "{}"'.format(COURSE_EMAIL_MESSAGE_BODY_TAG)
             log.warning(msg)
             raise ValidationError(msg)
         # TODO: add more validation here, including the set of known tags
@@ -65,7 +63,7 @@ class CourseEmailTemplateForm(forms.ModelForm):
             try:
                 CourseEmailTemplate.get_template(name)
                 # already exists, this is no good
-                raise ValidationError('Name of "{}" already exists, this must be unique.'.format(name))
+                raise ValidationError(u'Name of "{}" already exists, this must be unique.'.format(name))
             except CourseEmailTemplate.DoesNotExist:
                 # this is actually the successful validation
                 pass

@@ -2,6 +2,8 @@
 Tests for helper function provided by site_configuration app.
 """
 
+
+import six
 from django.test import TestCase
 
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
@@ -80,7 +82,8 @@ class TestHelpers(TestCase):
         Test that get_dict returns correct value for any given key.
         """
         # Make sure entry is saved and retrieved correctly
-        self.assertItemsEqual(
+        six.assertCountEqual(
+            self,
             configuration_helpers.get_dict("REGISTRATION_EXTRA_FIELDS"),
             test_config['REGISTRATION_EXTRA_FIELDS'],
         )
@@ -90,7 +93,8 @@ class TestHelpers(TestCase):
         expected.update(test_config['REGISTRATION_EXTRA_FIELDS'])
 
         # Test that the default value is returned if the value for the given key is not found in the configuration
-        self.assertItemsEqual(
+        six.assertCountEqual(
+            self,
             configuration_helpers.get_dict("REGISTRATION_EXTRA_FIELDS", default),
             expected,
         )
@@ -133,7 +137,8 @@ class TestHelpers(TestCase):
                 test_config['css_overrides_file']
             )
 
-            self.assertItemsEqual(
+            six.assertCountEqual(
+                self,
                 configuration_helpers.get_value_for_org(test_org, "REGISTRATION_EXTRA_FIELDS"),
                 test_config['REGISTRATION_EXTRA_FIELDS']
             )
@@ -159,37 +164,25 @@ class TestHelpers(TestCase):
         test_org = test_config['course_org_filter']
         with with_site_configuration_context(configuration=test_config):
 
-            # Make sure if ORG is not present in site configuration then microsite configuration is used instead
+            # Make sure if ORG is not present in site configuration then default is used instead
             self.assertEqual(
                 configuration_helpers.get_value_for_org("TestSiteX", "email_from_address"),
-                "test_site@edx.org"
+                None
             )
             # Make sure 'default' is returned if org is present but key is not
             self.assertEqual(
                 configuration_helpers.get_value_for_org(test_org, "email_from_address"),
                 None
             )
-            # Make sure if ORG is not present in site configuration then microsite configuration is used instead
-            self.assertEqual(
-                configuration_helpers.get_value_for_org("LogistrationX", "email_from_address"),
-                "test_site@edx.org"
-            )
-
-        # This test must come after the above test
-        with with_site_configuration_context(configuration={"course_org_filter": "TestSiteX", "university": "Test"}):
-            # Make sure site configuration gets preference over microsite configuration
-            self.assertEqual(
-                configuration_helpers.get_value_for_org("TestSiteX", "university"),
-                "Test"
-            )
 
     def test_get_all_orgs(self):
         """
-        Test that get_all_orgs returns organizations defined in both site configuration and microsite configuration.
+        Test that get_all_orgs returns organizations defined in site configuration
         """
-        test_orgs = [test_config['course_org_filter'], "LogistrationX", "TestSiteX"]
+        test_orgs = [test_config['course_org_filter']]
         with with_site_configuration_context(configuration=test_config):
-            self.assertItemsEqual(
+            six.assertCountEqual(
+                self,
                 list(configuration_helpers.get_all_orgs()),
                 test_orgs,
             )
@@ -197,7 +190,8 @@ class TestHelpers(TestCase):
     @with_site_configuration(configuration=test_config_multi_org)
     def test_get_current_site_orgs(self):
         test_orgs = test_config_multi_org['course_org_filter']
-        self.assertItemsEqual(
+        six.assertCountEqual(
+            self,
             list(configuration_helpers.get_current_site_orgs()),
             test_orgs
         )

@@ -1,0 +1,104 @@
+# Version constraints for pip-installation.
+#
+# This file doesn't install any packages. It specifies version constraints
+# that will be applied if a package is needed.
+#
+# When pinning something here, please provide an explanation of why.  Ideally,
+# link to other information that will help people in the future to remove the
+# pin when possible.  Writing an issue against the offending project and
+# linking to it here is good.
+
+# We're not ready for Celery 4 yet, but 3.1.25+ are forward-compatible with it.
+# As of this writing, there's a 3.1.26.post2 with a very important bugfix
+# (although it is advertised in the changelog as 3.1.26.)
+celery>=3.1.25,<4.0.0
+
+# Constrain until https://github.com/datadriventests/ddt/issues/83 is fixed.
+ddt<1.4.0
+
+# Stay on the latest LTS release of Django
+Django<2.3
+
+# 0.6.0 has a missing dependency declaration on ua-parser: https://github.com/jotes/django-cookies-samesite/issues/25
+# 0.6.1 throws on some requests from iOS app: https://github.com/jotes/django-cookies-samesite/issues/28
+django-cookies-samesite<0.6.0
+
+# The CORS_ORIGIN_WHITELIST changes in a backwards incompatible way in 3.0.0, needs matching configuration repo changes
+django-cors-headers<3.0.0
+
+# It seems like django-countries > 5.5 may cause performance issues for us.
+django-countries==5.5
+
+# django-storages version 1.9 drops support for boto storage backend.
+django-storages<1.9
+
+# Support was dropped for Python 3.5
+drf-yasg<1.17.1
+
+# Not properly supporting latest changing of drf-jwt
+drf-jwt==1.14.0
+
+# Upgrading to 2.12.0 breaks several test classes due to API changes, need to update our code accordingly
+factory-boy==2.8.1
+
+# Newer versions need a more recent version of python-dateutil
+freezegun==0.3.12
+
+# When we went from httpretty 0.9.7 to 1.0.2, tests broke
+httpretty<1.0
+
+# 4.0.0 dropped support for Python 3.5
+inflect<4.0.0
+
+# 0.15.0 dropped support for Python 3.5
+joblib<0.15.0
+
+# jsonfield2 3.1.0 drops support for python 3.5
+jsonfield2<3.1.0
+
+# kiwisolver 1.2.0 requires Python 3.6+
+kiwisolver<1.2.0
+
+# Convert text markup to HTML; used in capa problems, forums, and course wikis; pin Markdown version as tests failed for its upgrade to the latest release
+Markdown==2.6.11
+
+# Matplotlib 3.1 requires Python 3.6
+matplotlib<3.1
+
+# mock version 4.0.0 drops support for python 3.5
+mock<4.0.0
+
+# oauthlib>3.0.1 causes test failures
+oauthlib==3.0.1
+
+# Version 0.23.0 requires python-dateutil>=2.5.0
+pandas==0.22.0
+
+# path 13.2.0 drops support for Python 3.5
+path<13.2.0
+
+# ARCHBOM-1141: pip-tools upgrade requires pip upgrade
+pip-tools<5.0.0
+
+# BOM-1430: pytest 5.4.0 breaks reporting sometimes: https://github.com/pytest-dev/pytest/issues/6925
+pytest<5.4.0
+
+# pytest-django 3.9.0 has a fix for pytest 5.4.0+ that breaks cleanup after failed tests in earlier pytest versions
+# https://github.com/pytest-dev/pytest-django/issues/824
+pytest-django<3.9.0
+
+# Upgrading to 2.5.3 on 2020-01-03 triggered "'tzlocal' object has no attribute '_std_offset'" errors in production
+python-dateutil==2.4.0
+
+# transifex-client 0.13.5 and 0.13.6 needlessly pin six and urllib3, 0.13.7 does so for python-slugify
+#   https://github.com/transifex/transifex-client/issues/252
+transifex-client==0.13.4
+
+# Constraint from astroid 2.3.3
+wrapt==1.11.*
+
+# zipp 2.0.0 requires Python >= 3.6
+zipp==1.0.0
+
+# Matplotlib 3.1 requires Python 3.6
+matplotlib<3.1

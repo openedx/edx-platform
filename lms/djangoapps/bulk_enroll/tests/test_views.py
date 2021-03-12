@@ -1,25 +1,27 @@
 """
 Tests for the Bulk Enrollment views.
 """
-import ddt
+
+
 import json
+
+import ddt
+import six
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.core import mail
-from django.urls import reverse
 from django.test.utils import override_settings
+from django.urls import reverse
+from opaque_keys.edx.keys import CourseKey
 from rest_framework.test import APIRequestFactory, APITestCase, force_authenticate
 
 from bulk_enroll.serializers import BulkEnrollmentSerializer
 from bulk_enroll.views import BulkEnrollView
-from courseware.tests.helpers import LoginEnrollmentTestCase
-from microsite_configuration import microsite
-from student.models import (
-    CourseEnrollment,
-    ManualEnrollmentAudit,
-    ENROLLED_TO_UNENROLLED,
-    UNENROLLED_TO_ENROLLED,
-)
+from lms.djangoapps.courseware.tests.helpers import LoginEnrollmentTestCase
+from openedx.core.djangoapps.course_groups.cohorts import get_cohort_id
+from openedx.core.djangoapps.course_groups.tests.helpers import config_course_cohorts
+from openedx.core.djangoapps.site_configuration.helpers import get_value as get_site_value
+from student.models import ENROLLED_TO_UNENROLLED, UNENROLLED_TO_ENROLLED, CourseEnrollment, ManualEnrollmentAudit
 from student.tests.factories import UserFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
@@ -31,7 +33,6 @@ class BulkEnrollmentTest(ModuleStoreTestCase, LoginEnrollmentTestCase, APITestCa
     """
     Test the bulk enrollment endpoint
     """
-    shard = 4
 
     USERNAME = "Bob"
     EMAIL = "bob@example.com"
@@ -53,7 +54,7 @@ class BulkEnrollmentTest(ModuleStoreTestCase, LoginEnrollmentTestCase, APITestCa
         )
 
         self.course = CourseFactory.create()
-        self.course_key = unicode(self.course.id)
+        self.course_key = six.text_type(self.course.id)
         self.enrolled_student = UserFactory(username='EnrolledStudent', first_name='Enrolled', last_name='Student')
         CourseEnrollment.enroll(
             self.enrolled_student,
@@ -63,7 +64,7 @@ class BulkEnrollmentTest(ModuleStoreTestCase, LoginEnrollmentTestCase, APITestCa
                                                last_name='Student')
 
         # Email URL values
-        self.site_name = microsite.get_value(
+        self.site_name = get_site_value(
             'SITE_NAME',
             settings.SITE_NAME
         )
@@ -148,7 +149,7 @@ class BulkEnrollmentTest(ModuleStoreTestCase, LoginEnrollmentTestCase, APITestCa
             }
         }
 
-        res_json = json.loads(response.content)
+        res_json = json.loads(response.content.decode('utf-8'))
         self.assertEqual(res_json, expected)
 
     def test_invalid_username(self):
@@ -180,7 +181,7 @@ class BulkEnrollmentTest(ModuleStoreTestCase, LoginEnrollmentTestCase, APITestCa
             }
         }
 
-        res_json = json.loads(response.content)
+        res_json = json.loads(response.content.decode('utf-8'))
         self.assertEqual(res_json, expected)
 
     def test_enroll_with_username(self):
@@ -225,7 +226,7 @@ class BulkEnrollmentTest(ModuleStoreTestCase, LoginEnrollmentTestCase, APITestCa
         manual_enrollments = ManualEnrollmentAudit.objects.all()
         self.assertEqual(manual_enrollments.count(), 1)
         self.assertEqual(manual_enrollments[0].state_transition, UNENROLLED_TO_ENROLLED)
-        res_json = json.loads(response.content)
+        res_json = json.loads(response.content.decode('utf-8'))
         self.assertEqual(res_json, expected)
 
     @ddt.data(False, True)
@@ -276,7 +277,7 @@ class BulkEnrollmentTest(ModuleStoreTestCase, LoginEnrollmentTestCase, APITestCa
         manual_enrollments = ManualEnrollmentAudit.objects.all()
         self.assertEqual(manual_enrollments.count(), 1)
         self.assertEqual(manual_enrollments[0].state_transition, UNENROLLED_TO_ENROLLED)
-        res_json = json.loads(response.content)
+        res_json = json.loads(response.content.decode('utf-8'))
         self.assertEqual(res_json, expected)
 
         # Check the outbox
@@ -331,8 +332,300 @@ class BulkEnrollmentTest(ModuleStoreTestCase, LoginEnrollmentTestCase, APITestCa
         manual_enrollments = ManualEnrollmentAudit.objects.all()
         self.assertEqual(manual_enrollments.count(), 1)
         self.assertEqual(manual_enrollments[0].state_transition, ENROLLED_TO_UNENROLLED)
-        res_json = json.loads(response.content)
+        res_json = json.loads(response.content.decode('utf-8'))
         self.assertEqual(res_json, expected)
 
         # Check the outbox
         self.assertEqual(len(mail.outbox), 0)
+
+    def test_fail_on_unequal_cohorts(self):
+        """
+        Test unequal items in cohorts and courses.
+        """
+        response = self.request_bulk_enroll({
+            'identifiers': self.notenrolled_student.username,
+            'action': 'enroll',
+            'email_students': False,
+            'courses': self.course_key,
+            'cohorts': "cohort1,cohort2"
+        })
+        self.assertContains(
+            response,
+            'If provided, the cohorts and courses should have equal number of items.',
+            status_code=400,
+        )
+
+    def test_fail_on_missing_cohorts(self):
+        """
+        Test cohorts don't exist in the course.
+        """
+        response = self.request_bulk_enroll({
+            'identifiers': self.notenrolled_student.username,
+            'action': 'enroll',
+            'email_students': False,
+            'cohorts': 'cohort1',
+            'courses': self.course_key
+        })
+        self.assertContains(
+            response,
+            u'cohort {cohort_name} not found in course {course_id}.'.format(
+                cohort_name='cohort1', course_id=self.course_key
+            ),
+            status_code=400,
+        )
+
+    def test_allow_cohorts_when_enrolling(self):
+        """
+        Test if the cohorts are given but the action is unenroll.
+        """
+        config_course_cohorts(self.course, is_cohorted=True, manual_cohorts=["cohort1", "cohort2"])
+        response = self.request_bulk_enroll({
+            'identifiers': self.notenrolled_student.username,
+            'action': 'unenroll',
+            'email_students': False,
+            'cohorts': 'cohort1',
+            'courses': self.course_key
+        })
+        self.assertContains(response, 'Cohorts can only be used for enrollments.', status_code=400)
+
+    def test_add_to_valid_cohort(self):
+        config_course_cohorts(self.course, is_cohorted=True, manual_cohorts=["cohort1", "cohort2"])
+        response = self.request_bulk_enroll({
+            'identifiers': self.notenrolled_student.username,
+            'action': 'enroll',
+            'email_students': False,
+            'courses': self.course_key,
+            'cohorts': "cohort1"
+        })
+
+        self.assertEqual(response.status_code, 200)
+
+        # test the response data
+        expected = {
+            "action": "enroll",
+            'auto_enroll': False,
+            "email_students": False,
+            "courses": {
+                self.course_key: {
+                    "action": "enroll",
+                    'auto_enroll': False,
+                    "results": [
+                        {
+                            "identifier": self.notenrolled_student.username,
+                            "before": {
+                                "enrollment": False,
+                                "auto_enroll": False,
+                                "user": True,
+                                "allowed": False,
+                                "cohort": None,
+                            },
+                            "after": {
+                                "enrollment": True,
+                                "auto_enroll": False,
+                                "user": True,
+                                "allowed": False,
+                                "cohort": 'cohort1',
+                            }
+                        }
+                    ]
+                }
+            }
+        }
+        manual_enrollments = ManualEnrollmentAudit.objects.all()
+        self.assertEqual(manual_enrollments.count(), 1)
+        self.assertEqual(manual_enrollments[0].state_transition, UNENROLLED_TO_ENROLLED)
+        res_json = json.loads(response.content.decode('utf-8'))
+        self.assertIsNotNone(get_cohort_id(self.notenrolled_student, CourseKey.from_string(self.course_key)))
+
+        self.assertEqual(res_json, expected)
+
+    def test_readd_to_different_cohort(self):
+        config_course_cohorts(self.course, is_cohorted=True, manual_cohorts=["cohort1", "cohort2"])
+        response = self.request_bulk_enroll({
+            'identifiers': self.notenrolled_student.username,
+            'action': 'enroll',
+            'email_students': False,
+            'courses': self.course_key,
+            'cohorts': "cohort1"
+        })
+
+        self.assertEqual(response.status_code, 200)
+
+        # test the response data
+        expected = {
+            "action": "enroll",
+            'auto_enroll': False,
+            "email_students": False,
+            "courses": {
+                self.course_key: {
+                    "action": "enroll",
+                    'auto_enroll': False,
+                    "results": [
+                        {
+                            "identifier": self.notenrolled_student.username,
+                            "before": {
+                                "enrollment": False,
+                                "auto_enroll": False,
+                                "user": True,
+                                "allowed": False,
+                                "cohort": None,
+                            },
+                            "after": {
+                                "enrollment": True,
+                                "auto_enroll": False,
+                                "user": True,
+                                "allowed": False,
+                                "cohort": 'cohort1',
+                            }
+                        }
+                    ]
+                }
+            }
+        }
+        manual_enrollments = ManualEnrollmentAudit.objects.all()
+        self.assertEqual(manual_enrollments.count(), 1)
+        self.assertEqual(manual_enrollments[0].state_transition, UNENROLLED_TO_ENROLLED)
+        res_json = json.loads(response.content.decode('utf-8'))
+        self.assertIsNotNone(get_cohort_id(self.notenrolled_student, CourseKey.from_string(self.course_key)))
+        self.assertEqual(res_json, expected)
+
+        response2 = self.request_bulk_enroll({
+            'identifiers': self.notenrolled_student.username,
+            'action': 'enroll',
+            'email_students': False,
+            'courses': self.course_key,
+            'cohorts': "cohort2"
+        })
+
+        self.assertEqual(response2.status_code, 200)
+
+        # test the response data
+        expected2 = {
+            "action": "enroll",
+            'auto_enroll': False,
+            "email_students": False,
+            "courses": {
+                self.course_key: {
+                    "action": "enroll",
+                    'auto_enroll': False,
+                    "results": [
+                        {
+                            "identifier": self.notenrolled_student.username,
+                            "before": {
+                                "enrollment": True,
+                                "auto_enroll": False,
+                                "user": True,
+                                "allowed": False,
+                                "cohort": 'cohort1',
+                            },
+                            "after": {
+                                "enrollment": True,
+                                "auto_enroll": False,
+                                "user": True,
+                                "allowed": False,
+                                "cohort": 'cohort2',
+                            }
+                        }
+                    ]
+                }
+            }
+        }
+        res2_json = json.loads(response2.content.decode('utf-8'))
+        self.assertIsNotNone(get_cohort_id(self.notenrolled_student, CourseKey.from_string(self.course_key)))
+        self.assertEqual(res2_json, expected2)
+
+    def test_readd_to_same_cohort(self):
+        config_course_cohorts(self.course, is_cohorted=True, manual_cohorts=["cohort1", "cohort2"])
+        response = self.request_bulk_enroll({
+            'identifiers': self.notenrolled_student.username,
+            'action': 'enroll',
+            'email_students': False,
+            'courses': self.course_key,
+            'cohorts': "cohort1"
+        })
+
+        self.assertEqual(response.status_code, 200)
+
+        # test the response data
+        expected = {
+            "action": "enroll",
+            'auto_enroll': False,
+            "email_students": False,
+            "courses": {
+                self.course_key: {
+                    "action": "enroll",
+                    'auto_enroll': False,
+                    "results": [
+                        {
+                            "identifier": self.notenrolled_student.username,
+                            "before": {
+                                "enrollment": False,
+                                "auto_enroll": False,
+                                "user": True,
+                                "allowed": False,
+                                "cohort": None,
+                            },
+                            "after": {
+                                "enrollment": True,
+                                "auto_enroll": False,
+                                "user": True,
+                                "allowed": False,
+                                "cohort": 'cohort1',
+                            }
+                        }
+                    ]
+                }
+            }
+        }
+        manual_enrollments = ManualEnrollmentAudit.objects.all()
+        self.assertEqual(manual_enrollments.count(), 1)
+        self.assertEqual(manual_enrollments[0].state_transition, UNENROLLED_TO_ENROLLED)
+        res_json = json.loads(response.content.decode('utf-8'))
+        self.assertIsNotNone(get_cohort_id(self.notenrolled_student, CourseKey.from_string(self.course_key)))
+
+        self.assertEqual(res_json, expected)
+
+        response2 = self.request_bulk_enroll({
+            'identifiers': self.notenrolled_student.username,
+            'action': 'enroll',
+            'email_students': False,
+            'courses': self.course_key,
+            'cohorts': "cohort1"
+        })
+
+        self.assertEqual(response2.status_code, 200)
+
+        # test the response data
+        expected2 = {
+            "action": "enroll",
+            'auto_enroll': False,
+            "email_students": False,
+            "courses": {
+                self.course_key: {
+                    "action": "enroll",
+                    'auto_enroll': False,
+                    "results": [
+                        {
+                            "identifier": self.notenrolled_student.username,
+                            "before": {
+                                "enrollment": True,
+                                "auto_enroll": False,
+                                "user": True,
+                                "allowed": False,
+                                "cohort": 'cohort1',
+                            },
+                            "after": {
+                                "enrollment": True,
+                                "auto_enroll": False,
+                                "user": True,
+                                "allowed": False,
+                                "cohort": 'cohort1',
+                            }
+                        }
+                    ]
+                }
+            }
+        }
+        res2_json = json.loads(response2.content.decode('utf-8'))
+        self.assertIsNotNone(get_cohort_id(self.notenrolled_student, CourseKey.from_string(self.course_key)))
+        self.assertEqual(res2_json, expected2)

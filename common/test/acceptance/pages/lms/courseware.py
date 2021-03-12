@@ -2,11 +2,13 @@
 Courseware page.
 """
 
+
 import re
 
 from bok_choy.page_object import PageObject, unguarded
 from bok_choy.promise import EmptyPromise
 from selenium.webdriver.common.action_chains import ActionChains
+from six.moves import range
 
 from common.test.acceptance.pages.lms import BASE_URL
 from common.test.acceptance.pages.lms.bookmarks import BookmarksPage
@@ -95,7 +97,7 @@ class CoursewarePage(CoursePage, CompletionOnViewMixin):
         # When Student Notes feature is enabled, it looks for the content inside
         # `.edx-notes-wrapper-content` element (Otherwise, you will get an
         # additional html related to Student Notes).
-        element = self.q(css='{} .edx-notes-wrapper-content'.format(self.xblock_component_selector))
+        element = self.q(css=u'{} .edx-notes-wrapper-content'.format(self.xblock_component_selector))
         if element.first:
             return element.attrs('innerHTML')[index].strip()
         else:
@@ -110,8 +112,8 @@ class CoursewarePage(CoursePage, CompletionOnViewMixin):
         for index, tab in enumerate(self.q(css='#sequence-list > li')):
             ActionChains(self.browser).move_to_element(tab).perform()
             self.wait_for_element_visibility(
-                '#tab_{index} > .sequence-tooltip'.format(index=index),
-                'Tab {index} should appear'.format(index=index)
+                u'#tab_{index} > .sequence-tooltip'.format(index=index),
+                u'Tab {index} should appear'.format(index=index)
             )
 
     @property
@@ -142,7 +144,7 @@ class CoursewarePage(CoursePage, CompletionOnViewMixin):
             except IndexError:
                 return False
 
-        sequential_position_css = '#sequence-list #tab_{0}'.format(sequential_position - 1)
+        sequential_position_css = u'#sequence-list #tab_{0}'.format(sequential_position - 1)
         self.q(css=sequential_position_css).first.click()
         EmptyPromise(is_at_new_position, "Position navigation fulfilled").fulfill()
 
@@ -155,27 +157,27 @@ class CoursewarePage(CoursePage, CompletionOnViewMixin):
         return int(tab_id.split('_')[1])
 
     @property
-    def _active_sequence_tab(self):  # pylint: disable=missing-docstring
+    def _active_sequence_tab(self):
         return self.q(css='#sequence-list .nav-item.active')
 
     @property
-    def is_next_button_enabled(self):  # pylint: disable=missing-docstring
+    def is_next_button_enabled(self):
         return not self.q(css='.sequence-nav > .sequence-nav-button.button-next.disabled').is_present()
 
     @property
-    def is_previous_button_enabled(self):  # pylint: disable=missing-docstring
+    def is_previous_button_enabled(self):
         return not self.q(css='.sequence-nav > .sequence-nav-button.button-previous.disabled').is_present()
 
-    def click_next_button_on_top(self):  # pylint: disable=missing-docstring
+    def click_next_button_on_top(self):
         self._click_navigation_button('sequence-nav', 'button-next')
 
-    def click_next_button_on_bottom(self):  # pylint: disable=missing-docstring
+    def click_next_button_on_bottom(self):
         self._click_navigation_button('sequence-bottom', 'button-next')
 
-    def click_previous_button_on_top(self):  # pylint: disable=missing-docstring
+    def click_previous_button_on_top(self):
         self._click_navigation_button('sequence-nav', 'button-previous')
 
-    def click_previous_button_on_bottom(self):  # pylint: disable=missing-docstring
+    def click_previous_button_on_bottom(self):
         self._click_navigation_button('sequence-bottom', 'button-previous')
 
     def _click_navigation_button(self, top_or_bottom_class, next_or_previous_class):
@@ -196,7 +198,7 @@ class CoursewarePage(CoursePage, CompletionOnViewMixin):
                 return False
 
         self.q(
-            css='.{} > .sequence-nav-button.{}'.format(top_or_bottom_class, next_or_previous_class)
+            css=u'.{} > .sequence-nav-button.{}'.format(top_or_bottom_class, next_or_previous_class)
         ).first.click()
         EmptyPromise(is_at_new_tab_id, "Button navigation fulfilled").fulfill()
 
@@ -325,6 +327,133 @@ class CoursewarePage(CoursePage, CompletionOnViewMixin):
         bookmarks_page = BookmarksPage(self.browser, self.course_id)
         bookmarks_page.visit()
 
+    def is_gating_banner_visible(self):
+        """
+        Check if the gated banner for locked content is visible.
+        """
+        return self.q(css='.problem-header').is_present() \
+            and self.q(css='.btn-brand').text[0] == u'Go To Prerequisite Section' \
+            and self.q(css='.problem-header').text[0] == u'Content Locked'
+
+    @property
+    def is_word_cloud_rendered(self):
+        """
+        Check for word cloud fields presence
+        """
+        return self.q(css='.input-cloud').visible
+
+    def input_word_cloud(self, answer_word):
+        """
+        Fill the word cloud fields
+
+        Args:
+            answer_word(str): An answer words to be filled in the field
+        """
+        self.wait_for_element_visibility('.input-cloud', "Word cloud fields are visible")
+        css = u'.input_cloud_section label:nth-child({}) .input-cloud'
+        for index in range(1, len(self.q(css='.input-cloud')) + 1):
+            self.q(css=css.format(index)).fill(answer_word + str(index))
+
+    def save_word_cloud(self):
+        """
+        Click save button
+        """
+        self.q(css='.input_cloud_section .action button.save').click()
+        self.wait_for_ajax()
+
+    @property
+    def word_cloud_answer_list(self):
+        """
+        Get saved words
+
+        Returns:
+            list: Return empty when no answer words are present
+            list: Return populated when answer words are present
+        """
+
+        self.wait_for_element_presence('.your_words', "Answer list is present")
+        if self.q(css='.your_words strong').present:
+            return self.q(css='.your_words strong').text
+        else:
+            return self.q(css='.your_words').text[0]
+
+    def is_error_message_present(self):
+        """ Check if LTI error is shown """
+        return self.q(css=".error_message").is_present()
+
+    def is_iframe_present(self):
+        """ Check if LTI iframe is present"""
+        return self.q(css=".ltiLaunchFrame").is_present()
+
+    def is_launch_url_present(self):
+        """ Check if LTI launch link is present"""
+        return self.q(css=".link_lti_new_window").is_present()
+
+    def go_to_lti_container(self):
+        """ Switch to LTI container"""
+        self.scroll_to_element('.problem-header')
+        iframe_name = self.q(css='.ltiLaunchFrame').attrs("name")[0]
+        self.browser.switch_to.frame(iframe_name)
+
+    @property
+    def get_role_selector(self):
+        """
+        Find and return role selector
+        """
+        self.wait_for_element_visibility(
+            '.action-preview-select',
+            'Role selector element is available'
+        )
+        return self.q(css='.action-preview-select')
+
+    def get_elem_text(self, elem_css):
+        """
+        Find the element with CSS selector given in the argument and return its text
+        """
+        self.wait_for_element_visibility(
+            elem_css,
+            'problem score element is visible'
+        )
+        return self.q(css=elem_css).text[0]
+
+    def is_lti_component_present(self, elem_css):
+        """ Check if LTI component element with given CSS selector is present"""
+        return self.q(css=elem_css).is_present()
+
+
+class LTIContentIframe(CoursePage):
+    """
+    LTIContentIframe info
+    """
+
+    def is_browser_on_page(self):
+        return self.q(css=".result").present
+
+    def submit_lti_answer(self, button_css):
+        """ Click on Submit button"""
+        self.wait_for_element_presence(button_css, "Button element not present.")
+        self.q(css=button_css).first.click()
+
+    @property
+    def lti_content(self):
+        """ return LTI content"""
+        self.wait_for_element_presence(".result", "Result element not present.")
+        content = self.q(css=".result").text[0]
+        return content
+
+    @property
+    def get_user_role(self):
+        """
+        return logged in user role text from lti iframe contents(i.e staff or learner)
+        """
+        return self.q(css="h5").text[0]
+
+    def switch_to_default(self):
+        """
+        Switches to default page
+        """
+        self.browser.switch_to_default_content()
+
 
 class CoursewareSequentialTabPage(CoursePage):
     """
@@ -411,7 +540,7 @@ class CourseNavPage(PageObject):
         for sec_index, sec_title in enumerate(section_titles):
 
             if len(section_titles) < 1:
-                self.warning("Could not find subsections for '{0}'".format(sec_title))
+                self.warning(u"Could not find subsections for '{0}'".format(sec_title))
             else:
                 # Add one to convert list index (starts at 0) to CSS index (starts at 1)
                 nav_dict[sec_title] = self._subsection_titles(sec_index + 1)
@@ -448,25 +577,25 @@ class CourseNavPage(PageObject):
         try:
             sec_index = self._section_titles().index(section_title)
         except ValueError:
-            self.warning("Could not find section '{0}'".format(section_title))
+            self.warning(u"Could not find section '{0}'".format(section_title))
             return
 
         # Click the section to ensure it's open (no harm in clicking twice if it's already open)
         # Add one to convert from list index to CSS index
-        section_css = '.course-navigation .chapter:nth-of-type({0})'.format(sec_index + 1)
+        section_css = u'.course-navigation .chapter:nth-of-type({0})'.format(sec_index + 1)
         self.q(css=section_css).first.click()
 
         # Get the subsection by index
         try:
             subsec_index = self._subsection_titles(sec_index + 1).index(subsection_title)
         except ValueError:
-            msg = "Could not find subsection '{0}' in section '{1}'".format(subsection_title, section_title)
+            msg = u"Could not find subsection '{0}' in section '{1}'".format(subsection_title, section_title)
             self.warning(msg)
             return
 
         # Convert list indices (start at zero) to CSS indices (start at 1)
         subsection_css = (
-            ".course-navigation .chapter-content-container:nth-of-type({0}) "
+            u".course-navigation .chapter-content-container:nth-of-type({0}) "
             ".menu-item:nth-of-type({1})"
         ).format(sec_index + 1, subsec_index + 1)
 
@@ -486,7 +615,7 @@ class CourseNavPage(PageObject):
             seq_index = all_items.index(vertical_title)
 
         except ValueError:
-            msg = "Could not find sequential '{0}'.  Available sequentials: [{1}]".format(
+            msg = u"Could not find sequential '{0}'.  Available sequentials: [{1}]".format(
                 vertical_title, ", ".join(all_items)
             )
             self.warning(msg)
@@ -517,7 +646,7 @@ class CourseNavPage(PageObject):
         # Retrieve the subsection title for the section
         # Add one to the list index to get the CSS index, which starts at one
         subsection_css = (
-            ".course-navigation .chapter-content-container:nth-of-type({0}) "
+            u".course-navigation .chapter-content-container:nth-of-type({0}) "
             ".menu-item a p:nth-of-type(1)"
         ).format(section_index)
 
@@ -537,7 +666,7 @@ class CourseNavPage(PageObject):
         Return a `Promise` that is fulfilled when the user is on
         the correct section and subsection.
         """
-        desc = "currently at section '{0}' and subsection '{1}'".format(section_title, subsection_title)
+        desc = u"currently at section '{0}' and subsection '{1}'".format(section_title, subsection_title)
         return EmptyPromise(
             lambda: self.is_on_section(section_title, subsection_title), desc
         )

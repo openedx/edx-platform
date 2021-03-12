@@ -1,12 +1,14 @@
 """
 Unit test tasks
 """
+
+
 import os
 import re
 import sys
 from optparse import make_option
 
-from paver.easy import cmdopts, needs, sh, task
+from paver.easy import cmdopts, needs, sh, task, call_task
 
 from pavelib.utils.envs import Env
 from pavelib.utils.passthrough_opts import PassthroughTask
@@ -69,7 +71,33 @@ __test__ = False  # do not collect
         dest='disable_migrations',
         help="Create tables by applying migrations."
     ),
-], share_with=['pavelib.utils.test.utils.clean_reports_dir'])
+    make_option(
+        '--disable_courseenrollment_history',
+        action='store_true',
+        dest='disable_courseenrollment_history',
+        help="Disable history on student.CourseEnrollent. Can also be used by exporting"
+             "DISABLE_COURSEENROLLMENT_HISTORY=1."
+    ),
+    make_option(
+        '--enable_courseenrollment_history',
+        action='store_false',
+        dest='disable_courseenrollment_history',
+        help="Enable django-simple-history on student.CourseEnrollment."
+    ),
+    make_option(
+        '--xdist_ip_addresses',
+        dest='xdist_ip_addresses',
+        help="Comma separated string of ip addresses to shard tests to via xdist."
+    ),
+    make_option(
+        '--with-wtw',
+        dest='with_wtw',
+        action='store',
+        help="Only run tests based on the lines changed relative to the specified branch"
+    ),
+], share_with=[
+    'pavelib.utils.test.utils.clean_reports_dir',
+])
 @PassthroughTask
 @timed
 def test_system(options, passthrough_options):
@@ -82,6 +110,11 @@ def test_system(options, passthrough_options):
 
     assert system in (None, 'lms', 'cms')
     assert django_version in (None, '1.8', '1.9', '1.10', '1.11')
+
+    if hasattr(options.test_system, 'with_wtw'):
+        call_task('fetch_coverage_test_selection_data', options={
+            'compare_branch': options.test_system.with_wtw
+        })
 
     if test_id:
         # Testing a single test ID.
@@ -152,6 +185,13 @@ def test_system(options, passthrough_options):
         "--disable-coverage", action="store_false", dest="with_coverage",
         help="Run the unit tests directly through pytest, NOT coverage"
     ),
+    make_option(
+        '--xdist_ip_addresses',
+        dest='xdist_ip_addresses',
+        help="Comma separated string of ip addresses to shard tests to via xdist."
+    ),
+    make_option('-p', '--processes', dest='processes', default=0, help='number of processes to use running tests'),
+    make_option('-r', '--randomize', action='store_true', help='run the tests in a random order'),
 ], share_with=['pavelib.utils.test.utils.clean_reports_dir'])
 @PassthroughTask
 @timed
@@ -217,6 +257,19 @@ def test_lib(options, passthrough_options):
         dest='disable_migrations',
         help="Create tables directly from apps' models. Can also be used by exporting DISABLE_MIGRATIONS=1."
     ),
+    make_option(
+        '--disable_courseenrollment_history',
+        action='store_true',
+        dest='disable_courseenrollment_history',
+        help="Disable history on student.CourseEnrollent. Can also be used by exporting"
+             "DISABLE_COURSEENROLLMENT_HISTORY=1."
+    ),
+    make_option(
+        '--enable_courseenrollment_history',
+        action='store_false',
+        dest='disable_courseenrollment_history',
+        help="Enable django-simple-history on student.CourseEnrollment."
+    ),
 ])
 @PassthroughTask
 @timed
@@ -269,21 +322,24 @@ def test(options, passthrough_options):
 @needs('pavelib.prereqs.install_coverage_prereqs')
 @cmdopts([
     ("compare-branch=", "b", "Branch to compare against, defaults to origin/master"),
+    ("rcfile=", "c", "Coveragerc file to use, defaults to .coveragerc"),
 ])
 @timed
-def coverage():
+def coverage(options):
     """
     Build the html, xml, and diff coverage reports
     """
     report_dir = Env.REPORT_DIR
-    rcfile = Env.PYTHON_COVERAGERC
+    rcfile = getattr(options.coverage, 'rcfile', Env.PYTHON_COVERAGERC)
 
-    if not (report_dir / '.coverage').isfile():
+    combined_report_file = report_dir / '{}.coverage'.format(os.environ.get('TEST_SUITE', ''))
+
+    if not combined_report_file.isfile():
         # This may be that the coverage files were generated using -p,
         # try to combine them to the one file that we need.
-        sh("coverage combine --rcfile={}".format(rcfile))
+        sh(u"coverage combine --rcfile={}".format(rcfile))
 
-    if not os.path.getsize(report_dir / '.coverage') > 50:
+    if not os.path.getsize(combined_report_file) > 50:
         # Check if the .coverage data file is larger than the base file,
         # because coverage combine will always at least make the "empty" data
         # file even when there isn't any data to be combined.
@@ -296,9 +352,9 @@ def coverage():
         return
 
     # Generate the coverage.py XML report
-    sh("coverage xml --rcfile={}".format(rcfile))
+    sh(u"coverage xml --rcfile={}".format(rcfile))
     # Generate the coverage.py HTML report
-    sh("coverage html --rcfile={}".format(rcfile))
+    sh(u"coverage html --rcfile={}".format(rcfile))
     diff_coverage()  # pylint: disable=no-value-for-parameter
 
 
@@ -334,12 +390,12 @@ def diff_coverage(options):
 
         # Generate the diff coverage reports (HTML and console)
         sh(
-            "diff-cover {xml_report_str} --compare-branch={compare_branch} "
-            "--html-report {diff_html_path}".format(
+            u"diff-cover {xml_report_str} --compare-branch={compare_branch} "
+            u"--html-report {diff_html_path}".format(
                 xml_report_str=xml_report_str,
                 compare_branch=compare_branch,
                 diff_html_path=diff_html_path,
             )
         )
 
-        print "\n"
+        print("\n")

@@ -12,8 +12,10 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 
+
 from django.conf import settings
-from django.template import Context, engines
+from django.template import Context, engines, Origin
+from edx_django_utils.cache import RequestCache
 from mako.template import Template as MakoTemplate
 from six import text_type
 
@@ -22,6 +24,8 @@ from .request_context import get_template_request_context
 from .shortcuts import is_any_marketing_link_set, is_marketing_link_set, marketing_link
 
 KEY_CSRF_TOKENS = ('csrf_token', 'csrf')
+
+UNKNOWN_SOURCE = '<unknown source>'
 
 
 class Template(object):
@@ -34,6 +38,8 @@ class Template(object):
     def __init__(self, *args, **kwargs):
         """Overrides base __init__ to provide django variable overrides"""
         self.engine = kwargs.pop('engine', engines[Engines.MAKO])
+        if kwargs.get('origin') is None:
+            self.origin = Origin(UNKNOWN_SOURCE)
         if len(args) and isinstance(args[0], MakoTemplate):
             self.mako_template = args[0]
         else:
@@ -44,9 +50,27 @@ class Template(object):
         """
         This takes a render call with a context (from Django) and translates
         it to a render call on the mako template.
+
+        When rendering a large sequence of XBlocks, we may end up rendering
+        hundreds of small templates. Even if context processors aren't very
+        expensive individually, they will quickly add up in that situation. To
+        help guard against this, we do context processing once for a given
+        request and then cache it.
         """
         context_object = self._get_context_object(request)
-        context_dictionary = self._get_context_processors_output_dict(context_object)
+
+        request_cache = RequestCache('context_processors')
+        cache_response = request_cache.get_cached_response('cp_output')
+        if cache_response.is_found:
+            context_dictionary = dict(cache_response.value)
+        else:
+            context_dictionary = self._get_context_processors_output_dict(context_object)
+            # The context_dictionary is later updated with template specific
+            # variables. There are potentially hundreds of calls to templates
+            # rendering and we don't want them to interfere with each other, so
+            # we make a copy from the output of the context processors and then
+            # recreate a new dict every time we pull from the cache.
+            request_cache.set('cp_output', dict(context_dictionary))
 
         if isinstance(context, Context):
             context_dictionary.update(context.flatten())

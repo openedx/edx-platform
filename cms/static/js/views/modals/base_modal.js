@@ -63,6 +63,7 @@ define(['jquery', 'underscore', 'gettext', 'js/views/baseview'],
             },
 
             render: function() {
+                // xss-lint: disable=javascript-jquery-html
                 this.$el.html(this.modalTemplate({
                     name: this.options.modalName,
                     type: this.options.modalType,
@@ -83,6 +84,7 @@ define(['jquery', 'underscore', 'gettext', 'js/views/baseview'],
 
             renderContents: function() {
                 var contentHtml = this.getContentHtml();
+                // xss-lint: disable=javascript-jquery-html
                 this.$('.modal-content').html(contentHtml);
             },
 
@@ -146,6 +148,7 @@ define(['jquery', 'underscore', 'gettext', 'js/views/baseview'],
                     name: name,
                     isPrimary: isPrimary
                 });
+                // xss-lint: disable=javascript-jquery-append
                 this.getActionBar().find('ul').append(html);
             },
 
@@ -178,8 +181,8 @@ define(['jquery', 'underscore', 'gettext', 'js/views/baseview'],
                 modalWindow = this.$el.find(this.options.modalWindowClass);
                 availableWidth = $(window).width();
                 availableHeight = $(window).height();
-                maxWidth = availableWidth * 0.80;
-                maxHeight = availableHeight * 0.80;
+                maxWidth = availableWidth * 0.98;
+                maxHeight = availableHeight * 0.98;
                 modalWidth = Math.min(modalWindow.outerWidth(), maxWidth);
                 modalHeight = Math.min(modalWindow.outerHeight(), maxHeight);
 

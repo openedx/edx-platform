@@ -2,12 +2,15 @@
 Account constants
 """
 
+
 from django.utils.text import format_lazy
 from django.utils.translation import ugettext_lazy as _
 
+# The maximum length for the bio ("about me") account field
+BIO_MAX_LENGTH = 300
 
 # The minimum and maximum length for the name ("full name") account field
-NAME_MIN_LENGTH = 2
+NAME_MIN_LENGTH = 1
 NAME_MAX_LENGTH = 255
 
 # The minimum and maximum length for the username account field
@@ -25,6 +28,12 @@ ALL_USERS_VISIBILITY = 'all_users'
 
 # Indicates the user's preference that all their account information be private.
 PRIVATE_VISIBILITY = 'private'
+
+# Indicates that the user has custom preferences for the visibility of their account information.
+CUSTOM_VISIBILITY = 'custom'
+
+# Prefix prepended to user preferences related to custom account visibility preferences.
+VISIBILITY_PREFIX = 'visibility.'
 
 # Translators: This message is shown when the Unicode usernames are NOT allowed.
 # It is shown to users who attempt to create a new account using invalid characters

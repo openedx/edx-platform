@@ -2,11 +2,10 @@ import hmac
 import hashlib
 
 from django.conf import settings
-from student.auth import user_has_role
-from student.models import CourseAccessRole
-from student.roles import CourseCreatorRole
 
-from openedx.core.djangoapps.appsembler.intercom_integration.helpers import should_show_intercom_widget
+from openedx.core.djangoapps.appsembler.intercom_integration.helpers import (
+    should_show_intercom_widget
+)
 
 
 def intercom(request):
@@ -20,8 +19,8 @@ def intercom(request):
     if should_show_intercom_widget(user):
         data['show_intercom_widget'] = True
         user_hash = hmac.new(
-            str(settings.INTERCOM_APP_SECRET),
-            str(user.email),
+            str(settings.INTERCOM_APP_SECRET).encode('utf-8'),
+            str(user.email).encode('utf-8'),
             digestmod=hashlib.sha256).hexdigest()
         data['intercom_user_hash'] = user_hash
         data['intercom_app_id'] = intercom_app_id

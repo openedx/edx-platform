@@ -1,6 +1,7 @@
 """
 Tests for the models that configures HLS Playback feature.
 """
+
 import ddt
 import itertools
 

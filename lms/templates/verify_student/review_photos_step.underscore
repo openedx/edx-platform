@@ -25,7 +25,6 @@
             <h5 class="title"><%- gettext( "Photo requirements:" ) %></h5>
             <ul class="list-help list-tips copy">
               <li class="tip"><%- gettext( "Does the photo of you show your whole face?" ) %></li>
-              <li class="tip"><%- gettext( "Does the photo of you match your ID photo?" ) %></li>
               <li class="tip"><%- gettext( "Is your name on your ID readable?" ) %></li>
               <li class="tip"><%- _.sprintf(  gettext( "Does the name on your ID match your account name: %(fullName)s?" ), { fullName: fullName } ) %>
                 <div class="help-tip is-expandable">

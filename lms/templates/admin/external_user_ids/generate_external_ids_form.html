@@ -1,0 +1,21 @@
+{% extends 'admin/base.html' %}
+
+{% block content %}
+    <div>
+        <h2>Generate External IDs in bulk</h2>
+        <P>
+            This form will generate external IDs for a set of Users based on the
+            provided CSV file. The file should contain a header labeled "ID" and then
+            a list of numeric IDs, one row per ID.
+        </P>
+        <form action="." method="POST" enctype="multipart/form-data">
+            {{ form.as_p }}
+            {% csrf_token %}
+
+            <a href="/admin/external_user_ids/externalid/">Cancel</a>
+            <button type="submit">Upload CSV</button>
+        </form>
+    </div>
+    <br />
+
+{% endblock %}

@@ -139,7 +139,7 @@ class Command(BaseCommand):
         for course in query_set:
             self.stdout.write('Processing {} course data...'.format(course.course_id))
             course_id = CourseKey.from_string(course.course_id)
-            course_overview = CourseOverview.get_from_id_if_exists(course_id)
+            course_overview = CourseOverview.get_from_id(course_id)
 
             courses.append({
                 'course_id': course.course_id,
@@ -440,7 +440,7 @@ class Command(BaseCommand):
 
         return {
             'enabled': site_configs.enabled,
-            'values': site_configs.values,
+            'values': site_configs.site_values,
             'sass_variables': site_configs.sass_variables,
             'page_elements': site_configs.page_elements,
         }
@@ -454,7 +454,7 @@ class Command(BaseCommand):
         return [
             {
                 'enabled': record.enabled,
-                'values': record.values,
+                'values': record.site_values,
             } for record in SiteConfigurationHistory.objects.filter(site=site)
         ]
 

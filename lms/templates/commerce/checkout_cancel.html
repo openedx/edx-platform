@@ -1,4 +1,7 @@
-<%! from django.utils.translation import ugettext as _ %>
+<%page expression_filter="h"/>
+<%! from django.utils.translation import ugettext as _
+from openedx.core.djangolib.markup import HTML, Text
+%>
 
 <%inherit file="../main.html" />
 
@@ -7,6 +10,6 @@
 
 <section class="container">
     <h1>${_("Checkout Cancelled")}</h1>
-    ${ _(u"Your transaction has been cancelled. If you feel an error has occurred, contact {email}.").format(
-    email="<a href=\"mailto:{email}\">{email}</a>".format(email=payment_support_email)) }
+    ${ Text(_(u"Your transaction has been cancelled. If you feel an error has occurred, contact {email}.")).format(
+    email=HTML("<a href=\"mailto:{email}\">{email}</a>").format(email=payment_support_email)) }
 </section>

@@ -18,11 +18,12 @@ below::
 
 """
 
+
 import inspect
 from importlib import import_module
 
+import six
 from django.conf import settings
-from dogapi import dog_stats_api
 
 from track.backends import BaseBackend
 
@@ -42,7 +43,7 @@ def _initialize_backends_from_django_settings():
 
     config = getattr(settings, 'TRACKING_BACKENDS', {})
 
-    for name, values in config.iteritems():
+    for name, values in six.iteritems(config):
         # Ignore empty values to turn-off default tracker backends
         if values:
             engine = values['ENGINE']
@@ -81,17 +82,14 @@ def _instantiate_backend_from_name(name, options):
     return backend
 
 
-@dog_stats_api.timed('track.send')
 def send(event):
     """
     Send an event object to all the initialized backends.
 
     """
-    dog_stats_api.increment('track.send.count')
 
-    for name, backend in backends.iteritems():
-        with dog_stats_api.timer('track.send.backend.{0}'.format(name)):
-            backend.send(event)
+    for name, backend in six.iteritems(backends):
+        backend.send(event)
 
 
 _initialize_backends_from_django_settings()

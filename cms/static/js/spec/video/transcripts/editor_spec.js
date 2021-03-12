@@ -145,10 +145,10 @@ function($, Backbone, _, Utils, Editor, MetadataView, MetadataModel, MetadataCol
                             'check',
                             component_locator,
                             [
-                                { mode: 'youtube', video: '12345678901', type: 'youtube' },
-                                { mode: 'html5', video: 'video', type: 'mp4' },
-                                { mode: 'html5', video: 'video', type: 'webm' },
-                                { mode: 'edx_video_id', type: 'edx_video_id', video: 'basic tab video id' }
+                                {mode: 'youtube', video: '12345678901', type: 'youtube'},
+                                {mode: 'html5', video: 'video', type: 'mp4'},
+                                {mode: 'html5', video: 'video', type: 'webm'},
+                                {mode: 'edx_video_id', type: 'edx_video_id', video: 'basic tab video id'}
                             ]
                         );
                     }).always(done);

@@ -5,7 +5,6 @@ Tests for APPSEMBLER_MULTI_TENANT_EMAILS in Studio for course team invite.
 from mock import patch
 import json
 
-from django.contrib.auth.models import User
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import LibraryFactory
 
@@ -22,14 +21,11 @@ from openedx.core.djangoapps.appsembler.multi_tenant_emails.tests.test_utils imp
     create_org_user,
 )
 
-
 from student.roles import CourseCreatorRole, CourseAccessRole
-
-from student.tests.factories import UserFactory
 
 
 @patch.dict('django.conf.settings.FEATURES', {'APPSEMBLER_MULTI_TENANT_EMAILS': True})
-@override_settings(DEFAULT_SITE_THEME='edx-theme-codebase')
+@override_settings(DEFAULT_SITE_THEME='edx-theme-codebase')  # Needed override for Studio tests
 class MultiTenantStudioCourseTeamTestCase(ModuleStoreTestCase):
     """
     Testing the Course Team management when the APPSEMBLER_MULTI_TENANT_EMAILS feature is enabled in Studio.

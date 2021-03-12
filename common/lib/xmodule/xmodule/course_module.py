@@ -1,29 +1,34 @@
 """
 Django module container for classes and operations related to the "Course Module" content type
 """
+
+
 import json
 import logging
-from cStringIO import StringIO
 from datetime import datetime, timedelta
+from io import BytesIO
+
 import dateutil.parser
-
-from django.conf import settings
-
 import requests
+import six
+from django.conf import settings
 from lazy import lazy
 from lxml import etree
-from openedx.core.djangoapps.video_pipeline.models import VideoUploadsEnabledByDefault
-from openedx.core.lib.license import LicenseMixin
 from path import Path as path
 from pytz import utc
 from six import text_type
-from xblock.fields import Scope, List, String, Dict, Boolean, Integer, Float
+from xblock.fields import Boolean, Dict, Float, Integer, List, Scope, String
 
+from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
+from openedx.core.djangoapps.video_pipeline.models import VideoUploadsEnabledByDefault
+from openedx.core.lib.license import LicenseMixin
+from openedx.core.lib.teams_config import TeamsConfig, DEFAULT_COURSE_RUN_MAX_TEAM_SIZE
 from xmodule import course_metadata_utils
-from xmodule.course_metadata_utils import DEFAULT_START_DATE
+from xmodule.course_metadata_utils import DEFAULT_GRADING_POLICY, DEFAULT_START_DATE
 from xmodule.graders import grader_from_conf
 from xmodule.seq_module import SequenceDescriptor, SequenceModule
 from xmodule.tabs import CourseTabList, InvalidTabsException
+
 from .fields import Date
 
 log = logging.getLogger(__name__)
@@ -43,6 +48,10 @@ DEFAULT_COURSE_VISIBILITY_IN_CATALOG = getattr(
 )
 
 DEFAULT_MOBILE_AVAILABLE = getattr(settings, 'DEFAULT_MOBILE_AVAILABLE', False)
+
+COURSE_VISIBILITY_PRIVATE = 'private'
+COURSE_VISIBILITY_PUBLIC_OUTLINE = 'public_outline'
+COURSE_VISIBILITY_PUBLIC = 'public'
 
 
 class StringOrDate(Date):
@@ -179,6 +188,116 @@ class TextbookList(List):
         return json_data
 
 
+class ProctoringProvider(String):
+    """
+    ProctoringProvider field, which includes validation of the provider
+    and default that pulls from edx platform settings.
+    """
+    def from_json(self, value):
+        """
+        Return ProctoringProvider as full featured Python type. Perform validation on the provider
+        and include any inherited values from the platform default.
+        """
+        errors = []
+        value = super(ProctoringProvider, self).from_json(value)
+
+        provider_errors = self._validate_proctoring_provider(value)
+        errors.extend(provider_errors)
+
+        if errors:
+            raise ValueError(errors)
+
+        value = self._get_proctoring_value(value)
+
+        return value
+
+    def _get_proctoring_value(self, value):
+        """
+        Return a proctoring value that includes any inherited attributes from the platform defaults
+        for the provider.
+        """
+        # if provider is missing from the value, return the default
+        if value is None:
+            return self.default
+
+        return value
+
+    def _validate_proctoring_provider(self, value):
+        """
+        Validate the value for the proctoring provider. If the proctoring provider value is
+        specified, and it is not one of the providers configured at the platform level, return
+        a list of error messages to the caller.
+        """
+        errors = []
+
+        available_providers = get_available_providers()
+
+        if value is not None and value not in available_providers:
+            errors.append(
+                _('The selected proctoring provider, {proctoring_provider}, is not a valid provider. '
+                    'Please select from one of {available_providers}.')
+                .format(
+                    proctoring_provider=value,
+                    available_providers=available_providers
+                )
+            )
+
+        return errors
+
+    @property
+    def default(self):
+        """
+        Return default value for ProctoringProvider.
+        """
+        default = super(ProctoringProvider, self).default
+
+        proctoring_backend_settings = getattr(settings, 'PROCTORING_BACKENDS', None)
+
+        if proctoring_backend_settings:
+            return proctoring_backend_settings.get('DEFAULT', None)
+
+        return default
+
+
+def get_available_providers():
+    proctoring_backend_settings = getattr(
+        settings,
+        'PROCTORING_BACKENDS',
+        {}
+    )
+
+    available_providers = [provider for provider in proctoring_backend_settings if provider != 'DEFAULT']
+    available_providers.sort()
+    return available_providers
+
+
+class TeamsConfigField(Dict):
+    """
+    XBlock field for teams configuration, including definitions for teamsets.
+
+    Serializes to JSON dictionary.
+    """
+    _default = TeamsConfig({})
+
+    def from_json(self, value):
+        """
+        Return a TeamsConfig instance from a dict.
+        """
+        return TeamsConfig(value)
+
+    def to_json(self, value):
+        """
+        Convert a TeamsConfig instance back to a dict.
+
+        If we have the data that was used to build the TeamsConfig instance,
+        return that instead of `value.cleaned_data`, thus preserving the
+        data in the form that the user entered it.
+        """
+        if value.source_data is not None:
+            return value.source_data
+        return value.cleaned_data
+
+
 class CourseFields(object):
     lti_passports = List(
         display_name=_("LTI Passports"),
@@ -229,40 +348,7 @@ class CourseFields(object):
     )
     grading_policy = Dict(
         help=_("Grading policy definition for this class"),
-        default={
-            "GRADER": [
-                {
-                    "type": "Homework",
-                    "min_count": 12,
-                    "drop_count": 2,
-                    "short_label": "HW",
-                    "weight": 0.15,
-                },
-                {
-                    "type": "Lab",
-                    "min_count": 12,
-                    "drop_count": 2,
-                    "weight": 0.15,
-                },
-                {
-                    "type": "Midterm Exam",
-                    "short_label": "Midterm",
-                    "min_count": 1,
-                    "drop_count": 0,
-                    "weight": 0.3,
-                },
-                {
-                    "type": "Final Exam",
-                    "short_label": "Final",
-                    "min_count": 1,
-                    "drop_count": 0,
-                    "weight": 0.4,
-                }
-            ],
-            "GRADE_CUTOFFS": {
-                "Pass": 0.5,
-            },
-        },
+        default=DEFAULT_GRADING_POLICY,
         scope=Scope.content
     )
     show_calculator = Boolean(
@@ -275,7 +361,7 @@ class CourseFields(object):
         help=_("Enter the name of the course as it should appear in the edX.org course list."),
         default="Empty",
         display_name=_("Course Display Name"),
-        scope=Scope.settings
+        scope=Scope.settings,
     )
     course_edit_method = String(
         display_name=_("Course Editor"),
@@ -495,7 +581,8 @@ class CourseFields(object):
         ),
         scope=Scope.settings,
         # Ensure that courses imported from XML keep their image
-        default="images_course_image.jpg"
+        default="images_course_image.jpg",
+        hide_on_enabled_publisher=True
     )
     banner_image = String(
         display_name=_("Course Banner Image"),
@@ -677,6 +764,8 @@ class CourseFields(object):
     catalog_visibility = String(
         display_name=_("Course Visibility In Catalog"),
         help=_(
+            # Translators: the quoted words 'both', 'about', and 'none' must be
+            # left untranslated.  Leave them as English words.
             "Defines the access permissions for showing the course in the course catalog. This can be set to one "
             "of three values: 'both' (show in catalog and allow access to about page), 'about' (only allow access "
             "to about page), 'none' (do not show in catalog and do not allow access to an about page)."
@@ -684,9 +773,10 @@ class CourseFields(object):
         default=DEFAULT_COURSE_VISIBILITY_IN_CATALOG,
         scope=Scope.settings,
         values=[
-            {"display_name": _("Both"), "value": CATALOG_VISIBILITY_CATALOG_AND_ABOUT},
-            {"display_name": _("About"), "value": CATALOG_VISIBILITY_ABOUT},
-            {"display_name": _("None"), "value": CATALOG_VISIBILITY_NONE}]
+            {"display_name": "Both", "value": CATALOG_VISIBILITY_CATALOG_AND_ABOUT},
+            {"display_name": "About", "value": CATALOG_VISIBILITY_ABOUT},
+            {"display_name": "None", "value": CATALOG_VISIBILITY_NONE},
+        ],
     )
 
     entrance_exam_enabled = Boolean(
@@ -736,7 +826,7 @@ class CourseFields(object):
         scope=Scope.settings
     )
 
-    teams_configuration = Dict(
+    teams_configuration = TeamsConfigField(
         display_name=_("Teams Configuration"),
         # Translators: please don't translate "id".
         help=_(
@@ -746,7 +836,10 @@ class CourseFields(object):
             'closing square brackets. '
             'For example, to specify that teams should have a maximum of 5 participants and provide a list of '
             '2 topics, enter the configuration in this format: {example_format}. '
+            'If no max_size is provided, it will default to {default_max}'
             'In "id" values, the only supported special characters are underscore, hyphen, and period.'
+            # Note that we also support space (" "), which may have been an accident, but it's in
+            # our DB now. Let's not advertise the fact, though.
         ),
         help_format_args=dict(
             # Put the sample JSON into a format variable so that translators
@@ -755,6 +848,7 @@ class CourseFields(object):
                 '{"topics": [{"name": "Topic1Name", "description": "Topic1Description", "id": "Topic1ID"}, '
                 '{"name": "Topic2Name", "description": "Topic2Description", "id": "Topic2ID"}], "max_team_size": 5}'
             ),
+            default_max=str(DEFAULT_COURSE_RUN_MAX_TEAM_SIZE),
         ),
         scope=Scope.settings,
     )
@@ -767,6 +861,21 @@ class CourseFields(object):
         ),
         default=False,
         scope=Scope.settings
+    )
+
+    proctoring_provider = ProctoringProvider(
+        display_name=_("Proctoring Provider"),
+        help=_(
+            "Enter the proctoring provider you want to use for this course run. "
+            "Choose from the following options: {available_providers}."),
+        help_format_args=dict(
+            # Put the available providers into a format variable so that translators
+            # don't translate them.
+            available_providers=(
+                ', '.join(get_available_providers())
+            ),
+        ),
+        scope=Scope.settings,
     )
 
     allow_proctoring_opt_out = Boolean(
@@ -849,6 +958,24 @@ class CourseFields(object):
         scope=Scope.settings
     )
 
+    course_visibility = String(
+        display_name=_("Course Visibility For Unenrolled Learners"),
+        help=_(
+            # Translators: the quoted words 'private', 'public_outline', and 'public'
+            # must be left untranslated.  Leave them as English words.
+            "Defines the access permissions for unenrolled learners. This can be set to one of three values: "
+            "'private' (default visibility, only allowed for enrolled students), 'public_outline' "
+            "(allow access to course outline) and 'public' (allow access to both outline and course content)."
+        ),
+        default=COURSE_VISIBILITY_PRIVATE,
+        scope=Scope.settings,
+        values=[
+            {"display_name": "private", "value": COURSE_VISIBILITY_PRIVATE},
+            {"display_name": "public_outline", "value": COURSE_VISIBILITY_PUBLIC_OUTLINE},
+            {"display_name": "public", "value": COURSE_VISIBILITY_PUBLIC},
+        ],
+    )
+
     """
     instructor_info dict structure:
     {
@@ -887,6 +1014,15 @@ class CourseFields(object):
             "to learners at their scheduled time."
         ),
         scope=Scope.settings, default=False
+    )
+    other_course_settings = Dict(
+        display_name=_("Other Course Settings"),
+        help=_(
+            "Any additional information about the course that the platform needs or that allows integration with "
+            "external systems such as CRM software. Enter a dictionary of values in JSON format, such as "
+            "{ \"my_custom_setting\": \"value\", \"other_setting\": \"value\" }"
+        ),
+        scope=Scope.settings
     )
 
 
@@ -946,7 +1082,7 @@ class CourseDescriptor(CourseFields, SequenceDescriptor, LicenseMixin):
             if not getattr(self, "tabs", []):
                 CourseTabList.initialize_default(self)
         except InvalidTabsException as err:
-            raise type(err)('{msg} For course: {course_id}'.format(msg=text_type(err), course_id=unicode(self.id)))
+            raise type(err)('{msg} For course: {course_id}'.format(msg=text_type(err), course_id=six.text_type(self.id)))
 
         self.set_default_certificate_available_date()
 
@@ -1006,7 +1142,9 @@ class CourseDescriptor(CourseFields, SequenceDescriptor, LicenseMixin):
 
         # bleh, have to parse the XML here to just pull out the url_name attribute
         # I don't think it's stored anywhere in the instance.
-        course_file = StringIO(xml_data.encode('ascii', 'ignore'))
+        if isinstance(xml_data, six.text_type):
+            xml_data = xml_data.encode('ascii', 'ignore')
+        course_file = BytesIO(xml_data)
         xml_obj = etree.parse(course_file, parser=edx_xml_parser).getroot()
 
         policy_dir = None
@@ -1056,7 +1194,7 @@ class CourseDescriptor(CourseFields, SequenceDescriptor, LicenseMixin):
     def definition_to_xml(self, resource_fs):
         xml_object = super(CourseDescriptor, self).definition_to_xml(resource_fs)
 
-        if len(self.textbooks) > 0:
+        if self.textbooks:
             textbook_xml_object = etree.Element('textbook')
             for textbook in self.textbooks:
                 textbook_xml_object.set('title', textbook.title)
@@ -1110,7 +1248,8 @@ class CourseDescriptor(CourseFields, SequenceDescriptor, LicenseMixin):
 
     @raw_grader.setter
     def raw_grader(self, value):
-        # NOTE WELL: this change will not update the processed graders. If we need that, this needs to call grader_from_conf
+        # NOTE WELL: this change will not update the processed graders.
+        # If we need that, this needs to call grader_from_conf.
         self._grading_policy['RAW_GRADER'] = value
         self.grading_policy['GRADER'] = value
 
@@ -1233,7 +1372,7 @@ class CourseDescriptor(CourseFields, SequenceDescriptor, LicenseMixin):
                 return True
             else:
                 return False
-        elif isinstance(flag, basestring):
+        elif isinstance(flag, six.string_types):
             return flag.lower() in ['true', 'yes', 'y']
         else:
             return bool(flag)
@@ -1275,12 +1414,17 @@ class CourseDescriptor(CourseFields, SequenceDescriptor, LicenseMixin):
         Get a list of dicts with start and end fields with datetime values from
         the discussion_blackouts setting
         """
+
+        blackout_dates = self.discussion_blackouts
         date_proxy = Date()
+        if blackout_dates and type(blackout_dates[0]) not in (list, tuple):
+            blackout_dates = [blackout_dates]
+
         try:
             ret = [
                 {"start": date_proxy.from_json(start), "end": date_proxy.from_json(end)}
                 for start, end
-                in filter(None, self.discussion_blackouts)
+                in [blackout_date for blackout_date in blackout_dates if blackout_date]
             ]
             for blackout in ret:
                 if not blackout["start"] or not blackout["end"]:
@@ -1289,7 +1433,7 @@ class CourseDescriptor(CourseFields, SequenceDescriptor, LicenseMixin):
         except (TypeError, ValueError):
             log.info(
                 "Error parsing discussion_blackouts %s for course %s",
-                self.discussion_blackouts,
+                blackout_dates,
                 self.id
             )
             return []
@@ -1363,27 +1507,29 @@ class CourseDescriptor(CourseFields, SequenceDescriptor, LicenseMixin):
     @property
     def teams_enabled(self):
         """
-        Returns whether or not teams has been enabled for this course.
+        Alias to `self.teams_configuration.is_enabled`, for convenience.
 
-        Currently, teams are considered enabled when at least one topic has been configured for the course.
+        Returns bool.
         """
-        if self.teams_configuration:
-            return len(self.teams_configuration.get('topics', [])) > 0
-        return False
+        return self.teams_configuration.is_enabled  # pylint: disable=no-member
 
     @property
-    def teams_max_size(self):
+    def teamsets(self):
         """
-        Returns the max size for teams if teams has been configured, else None.
+        Alias to `self.teams_configuration.teamsets`, for convenience.
+
+        Returns list[TeamsetConfig].
         """
-        return self.teams_configuration.get('max_team_size', None)
+        return self.teams_configuration.teamsets  # pylint: disable=no-member
 
     @property
-    def teams_topics(self):
+    def teamsets_by_id(self):
         """
-        Returns the topics that have been configured for teams for this course, else None.
+        Alias to `self.teams_configuration.teamsets_by_id`, for convenience.
+
+        Returns dict[str: TeamsetConfig].
         """
-        return self.teams_configuration.get('topics', None)
+        return self.teams_configuration.teamsets_by_id
 
     def set_user_partitions_for_scheme(self, partitions, scheme):
         """
@@ -1484,7 +1630,7 @@ class CourseSummary(object):
         except TypeError as e:
             log.warning(
                 "Course '{course_id}' has an improperly formatted end date '{end_date}'. Error: '{err}'.".format(
-                    course_id=unicode(self.id), end_date=self.end, err=e
+                    course_id=six.text_type(self.id), end_date=self.end, err=e
                 )
             )
             modified_end = self.end.replace(tzinfo=utc)

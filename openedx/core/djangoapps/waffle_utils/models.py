@@ -1,21 +1,26 @@
 """
 Models for configuring waffle utils.
 """
+
 from django.db.models import CharField
+from django.utils.encoding import python_2_unicode_compatible
 from django.utils.translation import ugettext_lazy as _
 from model_utils import Choices
 from opaque_keys.edx.django.models import CourseKeyField
 from six import text_type
 
 from config_models.models import ConfigurationModel
-from openedx.core.djangoapps.request_cache.middleware import request_cached
+from openedx.core.lib.cache_utils import request_cached
 
 
+@python_2_unicode_compatible
 class WaffleFlagCourseOverrideModel(ConfigurationModel):
     """
     Used to force a waffle flag on or off for a course.
+
+    .. no_pii:
     """
-    OVERRIDE_CHOICES = Choices(('on', _('Force On')), ('off', _('Force Off')))
+    OVERRIDE_CHOICES = Choices((u'on', _(u'Force On')), (u'off', _(u'Force Off')))
     ALL_CHOICES = OVERRIDE_CHOICES + Choices('unset')
 
     KEY_FIELDS = ('waffle_flag', 'course_id')
@@ -26,7 +31,7 @@ class WaffleFlagCourseOverrideModel(ConfigurationModel):
     override_choice = CharField(choices=OVERRIDE_CHOICES, default=OVERRIDE_CHOICES.on, max_length=3)
 
     @classmethod
-    @request_cached
+    @request_cached()
     def override_value(cls, waffle_flag, course_id):
         """
         Returns whether the waffle flag was overridden (on or off) for the
@@ -56,7 +61,6 @@ class WaffleFlagCourseOverrideModel(ConfigurationModel):
         verbose_name = 'Waffle flag course override'
         verbose_name_plural = 'Waffle flag course overrides'
 
-    def __unicode__(self):
+    def __str__(self):
         enabled_label = "Enabled" if self.enabled else "Not Enabled"
-        # pylint: disable=no-member
         return u"Course '{}': Persistent Grades {}".format(text_type(self.course_id), enabled_label)

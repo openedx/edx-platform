@@ -1,21 +1,22 @@
 """
 Tests for SplitTestTransformer.
 """
+
+
 import ddt
-from nose.plugins.attrib import attr
 
 import openedx.core.djangoapps.user_api.course_tag.api as course_tag_api
 from openedx.core.djangoapps.user_api.partition_schemes import RandomUserPartitionScheme
 from student.tests.factories import CourseEnrollmentFactory
 from xmodule.modulestore.tests.factories import check_mongo_calls
 from xmodule.partitions.partitions import Group, UserPartition
+from xmodule.partitions.partitions_service import get_user_partition_groups
 
 from ...api import get_course_blocks
-from ..user_partitions import UserPartitionTransformer, _get_user_partition_groups
+from ..user_partitions import UserPartitionTransformer
 from .helpers import CourseStructureTestCase, create_location
 
 
-@attr(shard=3)
 @ddt.ddt
 class SplitTestTransformerTestCase(CourseStructureTestCase):
     """
@@ -178,7 +179,7 @@ class SplitTestTransformerTestCase(CourseStructureTestCase):
         #  parents. However, we don't think this is a use case we need to
         #  support for split_test components (since they are now deprecated
         #  in favor of content groups and user partitions).
-        (0, ('course', 'A', 'D', 'E', 'H', 'L', 'O', 'P',)),
+        (0, ('course', 'A', 'D', 'E', 'H', 'L', 'O', 'P', )),
         (1, ('course', 'A', 'D', 'F', 'J', 'M', 'I',)),
         (2, ('course', 'A', 'D', 'G', 'O',)),
     )
@@ -203,10 +204,10 @@ class SplitTestTransformerTestCase(CourseStructureTestCase):
 
     def test_user_randomly_assigned(self):
         # user was randomly assigned to one of the groups
-        user_groups = _get_user_partition_groups(
-            self.course.id, [self.split_test_user_partition], self.user
+        user_groups = get_user_partition_groups(
+            self.course.id, [self.split_test_user_partition], self.user, 'id'
         )
-        self.assertEquals(len(user_groups), 1)
+        self.assertEqual(len(user_groups), 1)
 
         # calling twice should result in the same block set
         block_structure1 = get_course_blocks(

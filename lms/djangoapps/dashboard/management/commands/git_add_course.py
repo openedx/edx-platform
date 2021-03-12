@@ -2,6 +2,7 @@
 Script for importing courseware from git/xml into a mongo modulestore
 """
 
+
 import logging
 
 from django.core.management.base import BaseCommand, CommandError

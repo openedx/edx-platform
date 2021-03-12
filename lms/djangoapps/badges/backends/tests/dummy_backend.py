@@ -1,6 +1,8 @@
 """
 Dummy backend, for use in testing.
 """
+
+
 from lms.djangoapps.badges.backends.base import BadgeBackend
 from lms.djangoapps.badges.tests.factories import BadgeAssertionFactory
 

@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from __future__ import unicode_literals
+
 
 from django.db import migrations, models
 
@@ -14,6 +14,6 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='generatedcertificate',
             name='verify_uuid',
-            field=models.CharField(default=b'', max_length=32, db_index=True, blank=True),
+            field=models.CharField(default=u'', max_length=32, db_index=True, blank=True),
         ),
     ]

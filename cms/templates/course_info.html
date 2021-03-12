@@ -27,8 +27,7 @@ from openedx.core.djangolib.js_utils import (
       CourseInfoFactory(
         "${updates_url | n, js_escaped_string}",
         "${handouts_locator | n, js_escaped_string}",
-        "${base_asset_url | n, js_escaped_string}",
-        ${push_notification_enabled | n, dump_js_escaped_json}
+        "${base_asset_url | n, js_escaped_string}"
        );
   });
 </%block>

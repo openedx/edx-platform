@@ -1,14 +1,14 @@
 """
 Forms to support third-party to first-party OAuth 2.0 access token exchange
 """
-import provider.constants
+
+from django import forms
 from django.contrib.auth.models import User
 from django.forms import CharField
-from edx_oauth2_provider.constants import SCOPE_NAMES
+from django.conf import settings
+from django.utils.encoding import smart_text
+from django.utils.translation import ugettext as _
 from oauth2_provider.models import Application
-from provider.forms import OAuthForm, OAuthValidationError
-from provider.oauth2.forms import ScopeChoiceField, ScopeMixin
-from provider.oauth2.models import Client
 from requests import HTTPError
 from social_core.backends import oauth as social_oauth
 from social_core.exceptions import AuthException
@@ -16,16 +16,98 @@ from social_core.exceptions import AuthException
 from third_party_auth import pipeline
 
 
-class AccessTokenExchangeForm(ScopeMixin, OAuthForm):
+class OAuthValidationError(Exception):
+    """
+    Exception to throw inside :class:`AccessTokenExchangeForm` if any OAuth2 related errors
+    are encountered such as invalid grant type, invalid client, etc.
+    :attr:`OAuthValidationError` expects a dictionary outlining the OAuth error
+    as its first argument when instantiating.
+    :example:
+    ::
+        class GrantValidationForm(AccessTokenExchangeForm):
+            grant_type = forms.CharField()
+            def clean_grant(self):
+                if not self.cleaned_data.get('grant_type') == 'code':
+                    raise OAuthValidationError({
+                        'error': 'invalid_grant',
+                        'error_description': "%s is not a valid grant type" % (
+                            self.cleaned_data.get('grant_type'))
+                    })
+    """
+
+
+class ScopeChoiceField(forms.ChoiceField):
+    """
+    Custom form field that seperates values on space
+    """
+    widget = forms.SelectMultiple
+
+    def to_python(self, value):
+        if not value:
+            return []
+
+        # value may come in as a string.
+        # try to parse and
+        # ultimately return an empty list if nothing remains -- this will
+        # eventually raise an `OAuthValidationError` in `validate` where
+        # it should be anyways.
+        if not isinstance(value, (list, tuple)):
+            value = value.split(' ')
+
+        # Split values into list
+        return u' '.join([smart_text(val) for val in value]).split(u' ')
+
+    def validate(self, value):
+        """
+        Validates that the input is a list or tuple.
+        """
+        if self.required and not value:
+            raise OAuthValidationError({'error': 'invalid_request'})
+
+        # Validate that each value in the value list is in self.choices.
+        for val in value:
+            if not self.valid_value(val):
+                raise OAuthValidationError({
+                    'error': 'invalid_request',
+                    'error_description': _("'%s' is not a valid scope.") %
+                    val})
+
+
+class AccessTokenExchangeForm(forms.Form):
     """Form for access token exchange endpoint"""
+
     access_token = CharField(required=False)
-    scope = ScopeChoiceField(choices=SCOPE_NAMES, required=False)
+    OAUTH2_PROVIDER = getattr(settings, "OAUTH2_PROVIDER", {})
+    scope_choices = ()
+    if 'SCOPES' in OAUTH2_PROVIDER:
+        scope_choices = OAUTH2_PROVIDER['SCOPES'].items()
+    scope = ScopeChoiceField(choices=scope_choices, required=False)
+
     client_id = CharField(required=False)
 
     def __init__(self, request, oauth2_adapter, *args, **kwargs):
         super(AccessTokenExchangeForm, self).__init__(*args, **kwargs)
         self.request = request
         self.oauth2_adapter = oauth2_adapter
+
+    def _clean_fields(self):
+        """
+        Overriding the default cleaning behaviour to exit early on errors
+        instead of validating each field.
+        """
+        try:
+            super(AccessTokenExchangeForm, self)._clean_fields()
+        except OAuthValidationError as e:
+            self._errors.update(e.args[0])
+
+    def _clean_form(self):
+        """
+        Overriding the default cleaning behaviour for a shallow error dict.
+        """
+        try:
+            super(AccessTokenExchangeForm, self)._clean_form()
+        except OAuthValidationError as e:
+            self._errors.update(e.args[0])
 
     def _require_oauth_field(self, field_name):
         """
@@ -36,7 +118,7 @@ class AccessTokenExchangeForm(ScopeMixin, OAuthForm):
             raise OAuthValidationError(
                 {
                     "error": "invalid_request",
-                    "error_description": "{} is required".format(field_name),
+                    "error_description": u"{} is required".format(field_name),
                 }
             )
         return field_val
@@ -53,6 +135,16 @@ class AccessTokenExchangeForm(ScopeMixin, OAuthForm):
         """
         return self._require_oauth_field("client_id")
 
+    def clean_scope(self):
+        """
+        The scope is assembled by combining all the set flags into a single
+        integer value which we can later check again for set bits.
+        If *no* scope is set, we return the default scope which is the first
+        defined scope in :attr:`provider.constants.SCOPES`.
+        """
+        flags = self.cleaned_data.get('scope', [])
+        return flags
+
     def clean(self):
         if self._errors:
             return {}
@@ -62,7 +154,7 @@ class AccessTokenExchangeForm(ScopeMixin, OAuthForm):
             raise OAuthValidationError(
                 {
                     "error": "invalid_request",
-                    "error_description": "{} is not a supported provider".format(backend.name),
+                    "error_description": u"{} is not a supported provider".format(backend.name),
                 }
             )
 
@@ -71,20 +163,20 @@ class AccessTokenExchangeForm(ScopeMixin, OAuthForm):
         client_id = self.cleaned_data["client_id"]
         try:
             client = self.oauth2_adapter.get_client(client_id=client_id)
-        except (Client.DoesNotExist, Application.DoesNotExist):
+        except Application.DoesNotExist:
             raise OAuthValidationError(
                 {
                     "error": "invalid_client",
-                    "error_description": "{} is not a valid client_id".format(client_id),
+                    "error_description": u"{} is not a valid client_id".format(client_id),
                 }
             )
-        if client.client_type not in [provider.constants.PUBLIC, Application.CLIENT_PUBLIC]:
+        if client.client_type != Application.CLIENT_PUBLIC:
             raise OAuthValidationError(
                 {
                     # invalid_client isn't really the right code, but this mirrors
                     # https://github.com/edx/django-oauth2-provider/blob/edx/provider/oauth2/forms.py#L331
                     "error": "invalid_client",
-                    "error_description": "{} is not a public client".format(client_id),
+                    "error_description": u"{} is not a public client".format(client_id),
                 }
             )
         self.cleaned_data["client"] = client

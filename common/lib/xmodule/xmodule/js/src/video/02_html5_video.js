@@ -95,6 +95,38 @@ function(_) {
             this.videoEl.on('error', this.onError.bind(this));
         }
 
+        Player.prototype.showPlayButton = function() {
+            this.videoOverlayEl.removeClass('is-hidden');
+        };
+
+        Player.prototype.hidePlayButton = function() {
+            this.videoOverlayEl.addClass('is-hidden');
+        };
+
+        Player.prototype.showLoading = function() {
+            this.el
+                .removeClass('is-initialized')
+                .find('.spinner')
+                .removeAttr('tabindex')
+                .attr({'aria-hidden': 'false'});
+        };
+
+        Player.prototype.hideLoading = function() {
+            this.el
+                .addClass('is-initialized')
+                .find('.spinner')
+                .attr({'aria-hidden': 'false', tabindex: -1});
+        };
+
+        Player.prototype.updatePlayerLoadingState = function(state) {
+            if (state === 'show') {
+                this.hidePlayButton();
+                this.showLoading();
+            } else if (state === 'hide') {
+                this.hideLoading();
+            }
+        };
+
         Player.prototype.callStateChangeCallback = function() {
             if ($.isFunction(this.config.events.onStateChange)) {
                 this.config.events.onStateChange({
@@ -211,11 +243,15 @@ function(_) {
             this.videoEl.remove();
         };
 
+        Player.prototype.onReady = function() {
+            this.config.events.onReady(null);
+            this.showPlayButton();
+        };
+
         Player.prototype.onLoadedMetadata = function() {
             this.playerState = HTML5Video.PlayerState.PAUSED;
             if ($.isFunction(this.config.events.onReady)) {
-                this.config.events.onReady(null);
-                this.videoOverlayEl.removeClass('is-hidden');
+                this.onReady();
             }
         };
 
@@ -234,7 +270,7 @@ function(_) {
         Player.prototype.onPause = function() {
             this.playerState = HTML5Video.PlayerState.PAUSED;
             this.callStateChangeCallback();
-            this.videoOverlayEl.removeClass('is-hidden');
+            this.showPlayButton();
         };
 
         Player.prototype.onEnded = function() {

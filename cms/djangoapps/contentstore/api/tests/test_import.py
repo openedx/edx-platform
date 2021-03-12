@@ -1,6 +1,8 @@
 """
 Tests for the course import API views
 """
+
+
 import os
 import tarfile
 import tempfile
@@ -9,10 +11,10 @@ from django.urls import reverse
 from path import Path as path
 from rest_framework import status
 from rest_framework.test import APITestCase
+from user_tasks.models import UserTaskStatus
 
 from lms.djangoapps.courseware.tests.factories import StaffFactory
 from student.tests.factories import UserFactory
-from user_tasks.models import UserTaskStatus
 from xmodule.modulestore.tests.django_utils import TEST_DATA_SPLIT_MODULESTORE, SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 

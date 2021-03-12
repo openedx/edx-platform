@@ -2,7 +2,6 @@
 Command to compute all grades for specified courses.
 """
 
-from __future__ import absolute_import, division, print_function, unicode_literals
 
 import hashlib
 import logging
@@ -107,7 +106,9 @@ class Command(BaseCommand):
             # and consumed one at a time.
             for task_arg_tuple in tasks._course_task_args(course_key, **options):
                 all_args.append(task_arg_tuple)
-        all_args.sort(key=lambda x: hashlib.md5(b'{!r}'.format(x)))
+
+        all_args.sort(key=lambda x: hashlib.md5('{!r}'.format(x).encode('utf-8')).digest())
+
         for args in all_args:
             yield {
                 'course_key': args[0],

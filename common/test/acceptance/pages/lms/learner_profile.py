@@ -1,6 +1,8 @@
 """
 Bok-Choy PageObject class for learner profile page.
 """
+
+
 from bok_choy.page_object import PageObject
 from bok_choy.promise import EmptyPromise
 from bok_choy.query import BrowserQuery
@@ -11,7 +13,7 @@ from common.test.acceptance.pages.lms.fields import FieldsMixin
 from common.test.acceptance.pages.lms.instructor_dashboard import InstructorDashboardPage
 from common.test.acceptance.tests.helpers import select_option_by_value
 
-PROFILE_VISIBILITY_SELECTOR = '#u-field-select-account_privacy option[value="{}"]'
+PROFILE_VISIBILITY_SELECTOR = u'#u-field-select-account_privacy option[value="{}"]'
 PROFILE_VISIBILITY_INPUT = '#u-field-select-account_privacy'
 
 
@@ -53,8 +55,8 @@ class Badge(PageObject):
         """
         Execute javascript to bring the popup(.badges-model) inside the window.
         """
-        script_to_execute = ("var popup = document.querySelectorAll('.badges-modal')[0];;"
-                             "popup.style.left = '20%';")
+        script_to_execute = (u"var popup = document.querySelectorAll('.badges-modal')[0];;"
+                             u"popup.style.left = '20%';")
         self.browser.execute_script(script_to_execute)
 
     def close_modal(self):
@@ -145,7 +147,7 @@ class LearnerProfilePage(FieldsMixin, PageObject):
         if privacy != self.privacy:
             query = self.q(css=PROFILE_VISIBILITY_INPUT)
             select_option_by_value(query, privacy)
-            EmptyPromise(lambda: privacy == self.privacy, 'Privacy is set to {}'.format(privacy)).fulfill()
+            EmptyPromise(lambda: privacy == self.privacy, u'Privacy is set to {}'.format(privacy)).fulfill()
             self.q(css='.btn-change-privacy').first.click()
             self.wait_for_ajax()
 

@@ -2,6 +2,7 @@
 Tests core caching facilities.
 """
 
+
 from django.test import TestCase
 from opaque_keys.edx.locator import AssetLocator, CourseLocator
 

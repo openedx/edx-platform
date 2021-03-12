@@ -1,14 +1,16 @@
 """
 Utils for video bumper
 """
-from collections import OrderedDict
+
+
 import copy
 import json
 import logging
-
+from collections import OrderedDict
 from datetime import datetime, timedelta
-from django.conf import settings
+
 import pytz
+from django.conf import settings
 
 from .video_utils import set_query_parameter
 
@@ -106,7 +108,7 @@ def get_bumper_sources(video):
     try:
         val_profiles = ["desktop_webm", "desktop_mp4"]
         val_video_urls = edxval_api.get_urls_for_profiles(video.bumper['edx_video_id'], val_profiles)
-        bumper_sources = filter(None, [val_video_urls[p] for p in val_profiles])
+        bumper_sources = [url for url in [val_video_urls[p] for p in val_profiles] if url]
     except edxval_api.ValInternalError:
         # if no bumper sources, nothing will be showed
         log.warning(
@@ -125,7 +127,7 @@ def bumper_metadata(video, sources):
     unused_track_url, bumper_transcript_language, bumper_languages = video.get_transcripts_for_student(transcripts)
 
     metadata = OrderedDict({
-        'saveStateUrl': video.system.ajax_url + '/save_user_state',
+        'saveStateUrl': video.ajax_url + '/save_user_state',
         'showCaptions': json.dumps(video.show_captions),
         'sources': sources,
         'streams': '',

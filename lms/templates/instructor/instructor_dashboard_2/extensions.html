@@ -7,7 +7,7 @@ from django.utils.translation import ugettext as _
   <h3 class="hd hd-3">${_("Individual due date extensions")}</h3>
   <p>
     ${_("In this section, you have the ability to grant extensions on specific "
-        "units to individual students. Please note that the latest date is always "
+        "subsections to individual students. Please note that the latest date is always "
         "taken; you cannot use this tool to make an assignment due earlier for a "
         "particular student.")}
   </p>
@@ -17,7 +17,7 @@ from django.utils.translation import ugettext as _
     <input type="text" name="student" placeholder="${_("Student Email or Username")}">
   </p>
   <p>
-    ${_("Choose the graded unit:")}
+    ${_("Choose the graded subsection:")}
     <select name="url">
       <option value="">Choose one</option>
       %for title, url in section_data['units_with_due_dates']:
@@ -30,7 +30,7 @@ from django.utils.translation import ugettext as _
     ## Translators: "format_string" is the string MM/DD/YYYY HH:MM, as that is the format the system requires.
     ${_("Specify the extension due date and time (in UTC; please specify {format_string}).").format(format_string=format_string)}</p>
   <p><input type="text" name="due_datetime" 
-           placeholder="${format_string}"/>
+           placeholder="${format_string}"/> <input type="text" name="reason" placeholder="${_('Reason for extension')}" size=40 />
   </p>
   <p class="request-response"></p>
   <p class="request-response-error"></p>
@@ -45,14 +45,14 @@ from django.utils.translation import ugettext as _
   <h3 class="hd hd-3">${_("Viewing granted extensions")}</h3>
   <p>
     ${_("Here you can see what extensions have been granted on particular "
-        "units or for a particular student.")}
+        "subsection or for a particular student.")}
   </p>
   <p>
-    ${_("Choose a graded unit and click the button to obtain a list of all "
-        "students who have extensions for the given unit.")}
+    ${_("Choose a graded subsection and click the button to obtain a list of all "
+        "students who have extensions for the given subsection.")}
   </p>
   <p>
-    ${_("Choose the graded unit:")}
+    ${_("Choose the graded subsection:")}
     <select name="url">
       <option value="">Choose one</option>
       %for title, url in section_data['units_with_due_dates']:
@@ -86,7 +86,7 @@ from django.utils.translation import ugettext as _
   <h3 class="hd hd-3">${_("Resetting extensions")}</h3>
   <p>
     ${_("Resetting a problem's due date rescinds a due date extension for a "
-        "student on a particular unit. This will revert the due date for the "
+        "student on a particular subsection. This will revert the due date for the "
         "student back to the problem's original due date.")}
   </p>
   <p>
@@ -95,13 +95,14 @@ from django.utils.translation import ugettext as _
     <input type="text" name="student" placeholder="${_("Student Email or Username")}">
   </p>
   <p>
-    ${_("Choose the graded unit:")}
+    ${_("Choose the graded subsection:")}
     <select name="url">
       <option value="">Choose one</option>
       %for title, url in section_data['units_with_due_dates']:
       <option value="${url}">${title}</option>
       %endfor
     </select>
+    <input type="text" name="reason" placeholder="${_('Reason for reset')}" size=40 />
   </p>
   <p class="request-response"></p>
   <p class="request-response-error"></p>

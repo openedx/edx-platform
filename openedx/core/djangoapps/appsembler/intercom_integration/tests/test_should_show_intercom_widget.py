@@ -7,10 +7,15 @@ import ddt
 from django.test import TestCase
 from django.conf import settings
 from opaque_keys.edx.keys import CourseKey
-from student.roles import CourseCreatorRole, CourseInstructorRole, CourseStaffRole, CourseBetaTesterRole
+from student.roles import (CourseCreatorRole,
+                           CourseInstructorRole,
+                           CourseStaffRole,
+                           CourseBetaTesterRole)
 from student.tests.factories import UserFactory
 
-from openedx.core.djangoapps.appsembler.intercom_integration.helpers import should_show_intercom_widget
+from openedx.core.djangoapps.appsembler.intercom_integration.helpers import (
+    should_show_intercom_widget
+)
 
 
 @ddt.ddt

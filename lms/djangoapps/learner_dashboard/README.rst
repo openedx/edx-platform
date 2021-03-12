@@ -1,5 +1,7 @@
-Learner Dashboard
-=================
+Status: Maintenance
+
+Responsibilities
+================
 
 This Django app hosts dashboard pages used by edX learners. The intent is for
 this Django app to include the following dashboard tabs:
@@ -7,13 +9,19 @@ this Django app to include the following dashboard tabs:
  - Courses
  - Programs
 
+Direction: Deprecate
+====================
+This is being replaced by new UI that is in active development.  New functionality should not be added here.
+
+Glossary
+========
+
 Courses
 -------
 
 The learner-facing dashboard listing active and archived enrollments. The
 current implementation of the dashboard resides in
-``common/djangoapps/student/``. The goal is to replace the existing dashboard
-with a Backbone app served by this Django app.
+``common/djangoapps/student/``.
 
 Programs
 --------
@@ -21,6 +29,10 @@ Programs
 A page listing programs in which the learner is engaged. The page also shows
 learners' progress towards completing the programs. Programs are structured
 collections of course runs which culminate into a certificate.
+
+
+More Documentation
+==================
 
 Implementation
 ^^^^^^^^^^^^^^

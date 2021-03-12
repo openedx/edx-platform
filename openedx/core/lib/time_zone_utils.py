@@ -1,6 +1,7 @@
 """
 Utilities related to timezones
 """
+
 from datetime import datetime
 
 from pytz import common_timezones, timezone, utc
@@ -44,7 +45,7 @@ def get_display_time_zone(time_zone_name):
     tz_abbr = get_time_zone_abbr(time_zone)
     tz_offset = get_time_zone_offset(time_zone)
 
-    return "{name} ({abbr}, UTC{offset})".format(name=time_zone, abbr=tz_abbr, offset=tz_offset).replace("_", " ")
+    return u"{name} ({abbr}, UTC{offset})".format(name=time_zone, abbr=tz_abbr, offset=tz_offset).replace("_", " ")
 
 
 TIME_ZONE_CHOICES = sorted(

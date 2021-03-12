@@ -1,5 +1,6 @@
 """Tests for cross-domain request views. """
 
+
 import json
 import unittest
 

@@ -2,6 +2,7 @@
 URLs for course_info API
 """
 
+
 from django.conf import settings
 from django.conf.urls import url
 

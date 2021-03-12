@@ -21,7 +21,6 @@
                     USER_DATA = {
                         email: 'xsy@edx.org',
                         password: 'xsyisawesome',
-                        remember: true
                     },
                     THIRD_PARTY_AUTH = {
                         currentProvider: null,
@@ -64,16 +63,6 @@
                                 type: 'password',
                                 required: true,
                                 instructions: 'Enter your password.',
-                                restrictions: {}
-                            },
-                            {
-                                placeholder: '',
-                                name: 'remember',
-                                label: 'Remember me',
-                                defaultValue: '',
-                                type: 'checkbox',
-                                required: true,
-                                instructions: 'Agree to the terms of service.',
                                 restrictions: {}
                             }
                         ]
@@ -119,9 +108,6 @@
                 // Simulate manual entry of login form data
                     $('#login-email').val(USER_DATA.email);
                     $('#login-password').val(USER_DATA.password);
-
-                // Check the 'Remember me' checkbox
-                    $('#login-remember').prop('checked', USER_DATA.remember);
 
                 // If validationSuccess isn't passed, we avoid
                 // spying on `view.validate` twice

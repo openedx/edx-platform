@@ -1,17 +1,20 @@
 """
 Signal handlers for the gating djangoapp
 """
+
+
+import six
+from completion.models import BlockCompletion
 from django.db import models
 from django.dispatch import receiver
 
-from completion.models import BlockCompletion
 from gating import api as gating_api
 from gating.tasks import task_evaluate_subsection_completion_milestones
-from lms.djangoapps.grades.signals.signals import SUBSECTION_SCORE_CHANGED
+from lms.djangoapps.grades.api import signals as grades_signals
 from openedx.core.djangoapps.signals.signals import COURSE_GRADE_CHANGED
 
 
-@receiver(SUBSECTION_SCORE_CHANGED)
+@receiver(grades_signals.SUBSECTION_SCORE_CHANGED)
 def evaluate_subsection_gated_milestones(**kwargs):
     """
     Receives the SUBSECTION_SCORE_CHANGED signal and triggers the
@@ -34,8 +37,10 @@ def evaluate_subsection_completion_milestones(**kwargs):
     evaluation of any milestone which can be completed.
     """
     instance = kwargs['instance']
-    course_id = unicode(instance.course_key)
-    block_id = unicode(instance.block_key)
+    course_id = six.text_type(instance.context_key)
+    if not instance.context_key.is_course:
+        return  # Content in a library or some other thing that doesn't support milestones
+    block_id = six.text_type(instance.block_key)
     user_id = instance.user_id
     task_evaluate_subsection_completion_milestones(course_id, block_id, user_id)
 

@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
-from __future__ import unicode_literals
 
-from django.db import migrations, models
-import provider.utils
+from openedx.core.lib.hash_utils import create_hash256, short_token
+
 from django.conf import settings
+from django.db import migrations, models
 from opaque_keys.edx.django.models import CourseKeyField, UsageKeyField
 
 
@@ -29,8 +29,8 @@ class Migration(migrations.Migration):
             fields=[
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
                 ('consumer_name', models.CharField(unique=True, max_length=255)),
-                ('consumer_key', models.CharField(default=provider.utils.short_token, unique=True, max_length=32, db_index=True)),
-                ('consumer_secret', models.CharField(default=provider.utils.long_token, unique=True, max_length=32)),
+                ('consumer_key', models.CharField(default=short_token, unique=True, max_length=32, db_index=True)),
+                ('consumer_secret', models.CharField(default=create_hash256, unique=True, max_length=32)),
                 ('instance_guid', models.CharField(max_length=255, unique=True, null=True, blank=True)),
             ],
         ),

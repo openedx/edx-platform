@@ -1,13 +1,21 @@
 """
 Commerce-related models.
 """
+
+
 from config_models.models import ConfigurationModel
 from django.db import models
+from django.utils.encoding import python_2_unicode_compatible
 from django.utils.translation import ugettext_lazy as _
 
 
+@python_2_unicode_compatible
 class CommerceConfiguration(ConfigurationModel):
-    """ Commerce configuration """
+    """
+    Commerce configuration
+
+    .. no_pii:
+    """
 
     class Meta(object):
         app_label = "commerce"
@@ -24,7 +32,7 @@ class CommerceConfiguration(ConfigurationModel):
 
     basket_checkout_page = models.CharField(
         max_length=255,
-        default='/basket/add/',
+        default=u'/basket/add/',
         help_text=_('Path to course(s) checkout page hosted by the E-Commerce service.')
     )
     cache_ttl = models.PositiveIntegerField(
@@ -46,7 +54,7 @@ class CommerceConfiguration(ConfigurationModel):
         help_text=_('Automatically approve valid refund requests, without manual processing')
     )
 
-    def __unicode__(self):
+    def __str__(self):
         return "Commerce configuration"
 
     @property

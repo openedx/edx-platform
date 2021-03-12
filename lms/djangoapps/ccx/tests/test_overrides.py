@@ -2,28 +2,29 @@
 """
 tests for overrides
 """
+
+
 import datetime
 
 import mock
 import pytz
 from ccx_keys.locator import CCXLocator
 from django.test.utils import override_settings
-from nose.plugins.attrib import attr
+from edx_django_utils.cache import RequestCache
+from six.moves import range
 
-from courseware.courses import get_course_by_id
-from courseware.field_overrides import OverrideFieldData
-from courseware.testutils import FieldOverrideTestMixin
+from lms.djangoapps.courseware.courses import get_course_by_id
+from lms.djangoapps.courseware.testutils import FieldOverrideTestMixin
 from lms.djangoapps.ccx.models import CustomCourseForEdX
 from lms.djangoapps.ccx.overrides import override_field_for_ccx
 from lms.djangoapps.ccx.tests.utils import flatten, iter_blocks
+from lms.djangoapps.courseware.field_overrides import OverrideFieldData
 from lms.djangoapps.courseware.tests.test_field_overrides import inject_field_overrides
-from openedx.core.djangoapps.request_cache.middleware import RequestCache
 from student.tests.factories import AdminFactory
 from xmodule.modulestore.tests.django_utils import TEST_DATA_SPLIT_MODULESTORE, SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 
 
-@attr(shard=7)
 @override_settings(
     XBLOCK_FIELD_DATA_WRAPPERS=['lms.djangoapps.courseware.field_overrides:OverrideModulestoreFieldData.wrap'],
     MODULESTORE_FIELD_OVERRIDE_PROVIDERS=['ccx.overrides.CustomCoursesForEdxOverrideProvider'],
@@ -47,15 +48,15 @@ class TestFieldOverrides(FieldOverrideTestMixin, SharedModuleStoreTestCase):
         start = datetime.datetime(2010, 5, 12, 2, 42, tzinfo=pytz.UTC)
         due = datetime.datetime(2010, 7, 7, 0, 0, tzinfo=pytz.UTC)
         chapters = [ItemFactory.create(start=start, parent=cls.course)
-                    for _ in xrange(2)]
+                    for _ in range(2)]
         sequentials = flatten([
-            [ItemFactory.create(parent=chapter) for _ in xrange(2)]
+            [ItemFactory.create(parent=chapter) for _ in range(2)]
             for chapter in chapters])
         verticals = flatten([
-            [ItemFactory.create(due=due, parent=sequential) for _ in xrange(2)]
+            [ItemFactory.create(due=due, parent=sequential) for _ in range(2)]
             for sequential in sequentials])
         blocks = flatten([  # pylint: disable=unused-variable
-            [ItemFactory.create(parent=vertical) for _ in xrange(2)]
+            [ItemFactory.create(parent=vertical) for _ in range(2)]
             for vertical in verticals])
 
     def setUp(self):
@@ -75,7 +76,7 @@ class TestFieldOverrides(FieldOverrideTestMixin, SharedModuleStoreTestCase):
         get_ccx.return_value = ccx
         self.addCleanup(patch.stop)
 
-        self.addCleanup(RequestCache.clear_request_cache)
+        self.addCleanup(RequestCache.clear_all_namespaces)
 
         inject_field_overrides(iter_blocks(ccx.course), self.course, AdminFactory.create())
 
@@ -97,7 +98,7 @@ class TestFieldOverrides(FieldOverrideTestMixin, SharedModuleStoreTestCase):
         ccx_start = datetime.datetime(2014, 12, 25, 00, 00, tzinfo=pytz.UTC)
         chapter = self.ccx_course.get_children()[0]
         override_field_for_ccx(self.ccx, chapter, 'start', ccx_start)
-        self.assertEquals(chapter.start, ccx_start)
+        self.assertEqual(chapter.start, ccx_start)
 
     def test_override_num_queries_new_field(self):
         """
@@ -155,8 +156,8 @@ class TestFieldOverrides(FieldOverrideTestMixin, SharedModuleStoreTestCase):
         ccx_start = datetime.datetime(2014, 12, 25, 00, 00, tzinfo=pytz.UTC)
         chapter = self.ccx_course.get_children()[0]
         override_field_for_ccx(self.ccx, chapter, 'start', ccx_start)
-        self.assertEquals(chapter.get_children()[0].start, ccx_start)
-        self.assertEquals(chapter.get_children()[1].start, ccx_start)
+        self.assertEqual(chapter.get_children()[0].start, ccx_start)
+        self.assertEqual(chapter.get_children()[1].start, ccx_start)
 
     def test_override_is_inherited_even_if_set_in_mooc(self):
         """

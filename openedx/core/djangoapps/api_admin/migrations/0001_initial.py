@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
-from __future__ import unicode_literals
 
-from django.db import migrations, models
+
 import django.db.models.deletion
-from django.conf import settings
 import django.utils.timezone
 import model_utils.fields
+from django.conf import settings
+from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
@@ -21,7 +21,7 @@ class Migration(migrations.Migration):
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
                 ('created', model_utils.fields.AutoCreatedField(default=django.utils.timezone.now, verbose_name='created', editable=False)),
                 ('modified', model_utils.fields.AutoLastModifiedField(default=django.utils.timezone.now, verbose_name='modified', editable=False)),
-                ('status', models.CharField(default=b'pending', help_text='Status of this API access request', max_length=255, db_index=True, choices=[(b'pending', 'Pending'), (b'denied', 'Denied'), (b'approved', 'Approved')])),
+                ('status', models.CharField(default=u'pending', help_text='Status of this API access request', max_length=255, db_index=True, choices=[(u'pending', 'Pending'), (u'denied', 'Denied'), (u'approved', 'Approved')])),
                 ('website', models.URLField(help_text='The URL of the website associated with this API user.')),
                 ('reason', models.TextField(help_text='The reason this user wants to access the API.')),
                 ('user', models.ForeignKey(to=settings.AUTH_USER_MODEL, on_delete=models.CASCADE)),
@@ -38,7 +38,7 @@ class Migration(migrations.Migration):
                 ('id', models.IntegerField(verbose_name='ID', db_index=True, auto_created=True, blank=True)),
                 ('created', model_utils.fields.AutoCreatedField(default=django.utils.timezone.now, verbose_name='created', editable=False)),
                 ('modified', model_utils.fields.AutoLastModifiedField(default=django.utils.timezone.now, verbose_name='modified', editable=False)),
-                ('status', models.CharField(default=b'pending', help_text='Status of this API access request', max_length=255, db_index=True, choices=[(b'pending', 'Pending'), (b'denied', 'Denied'), (b'approved', 'Approved')])),
+                ('status', models.CharField(default=u'pending', help_text='Status of this API access request', max_length=255, db_index=True, choices=[(u'pending', 'Pending'), (u'denied', 'Denied'), (u'approved', 'Approved')])),
                 ('website', models.URLField(help_text='The URL of the website associated with this API user.')),
                 ('reason', models.TextField(help_text='The reason this user wants to access the API.')),
                 ('history_id', models.AutoField(serialize=False, primary_key=True)),

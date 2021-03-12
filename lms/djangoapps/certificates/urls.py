@@ -1,6 +1,8 @@
 """
 URLs for the certificates app.
 """
+
+
 from django.conf import settings
 from django.conf.urls import url
 
@@ -11,8 +13,14 @@ urlpatterns = [
     # Certificates HTML view end point to render web certs by user and course
     url(
         r'^user/(?P<user_id>[^/]*)/course/{course_id}'.format(course_id=settings.COURSE_ID_PATTERN),
-        views.render_html_view,
-        name='html_view'
+        views.unsupported_url,
+        name='unsupported_url'
+    ),
+
+    url(
+        r'^course/{course_id}'.format(course_id=settings.COURSE_ID_PATTERN),
+        views.render_preview_certificate,
+        name='preview_cert'
     ),
 
     # Certificates HTML view end point to render web certs by certificate_uuid
@@ -25,7 +33,7 @@ urlpatterns = [
     # End-points used by student support
     # The views in the lms/djangoapps/support use these end-points
     # to retrieve certificate information and regenerate certificates.
-    url(r'search', views.search_certificates, name="search"),
-    url(r'regenerate', views.regenerate_certificate_for_user, name="regenerate_certificate_for_user"),
-    url(r'generate', views.generate_certificate_for_user, name="generate_certificate_for_user"),
+    url(r'^search', views.search_certificates, name="search"),
+    url(r'^regenerate', views.regenerate_certificate_for_user, name="regenerate_certificate_for_user"),
+    url(r'^generate', views.generate_certificate_for_user, name="generate_certificate_for_user"),
 ]

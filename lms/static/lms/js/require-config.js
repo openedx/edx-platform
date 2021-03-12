@@ -101,31 +101,10 @@
             'utility': 'js/src/utility',
             'draggabilly': 'js/vendor/draggabilly',
             'bootstrap': 'common/js/vendor/bootstrap.bundle',
-
-            // Files needed by OVA
-            'annotator': 'js/vendor/ova/annotator-full',
-            'annotator-harvardx': 'js/vendor/ova/annotator-full-firebase-auth',
-            'video.dev': 'js/vendor/ova/video.dev',
-            'vjs.youtube': 'js/vendor/ova/vjs.youtube',
-            'rangeslider': 'js/vendor/ova/rangeslider',
-            'share-annotator': 'js/vendor/ova/share-annotator',
-            'richText-annotator': 'js/vendor/ova/richText-annotator',
-            'reply-annotator': 'js/vendor/ova/reply-annotator',
-            'grouping-annotator': 'js/vendor/ova/grouping-annotator',
-            'tags-annotator': 'js/vendor/ova/tags-annotator',
-            'diacritic-annotator': 'js/vendor/ova/diacritic-annotator',
-            'flagging-annotator': 'js/vendor/ova/flagging-annotator',
-            'jquery-Watch': 'js/vendor/ova/jquery-Watch',
-            'openseadragon': 'js/vendor/ova/openseadragon',
-            'osda': 'js/vendor/ova/OpenSeaDragonAnnotation',
-            'ova': 'js/vendor/ova/ova',
-            'catch': 'js/vendor/ova/catch/js/catch',
-            'handlebars': 'js/vendor/ova/catch/js/handlebars-1.1.2',
+            'picturefill': 'common/js/vendor/picturefill',
+            'hls': 'common/js/vendor/hls',
             'tinymce': 'js/vendor/tinymce/js/tinymce/tinymce.full.min',
             'jquery.tinymce': 'js/vendor/tinymce/js/tinymce/jquery.tinymce.min',
-            'picturefill': 'common/js/vendor/picturefill',
-            'hls': 'common/js/vendor/hls'
-            // end of files needed by OVA
         },
         shim: {
             'annotator_1.2.9': {

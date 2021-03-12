@@ -209,7 +209,9 @@
           position: absolute;
           background-color: theme-color("inverse");
           color: theme-color("secondary");
-          right: 30px;
+
+          @include right(30px);
+
           top: 55px;
           z-index: 10;
 
@@ -259,6 +261,7 @@
     // Display the menu icon and allow for transition to an X on click
     .hamburger-menu {
       @include left($baseline);
+
       position: absolute;
       top: $baseline*0.9;
       width: 30px;

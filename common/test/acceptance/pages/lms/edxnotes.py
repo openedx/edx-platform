@@ -1,3 +1,8 @@
+"""
+LMS edxnotes page
+"""
+
+
 from bok_choy.page_object import PageLoadError, PageObject, unguarded
 from bok_choy.promise import BrokenPromise, EmptyPromise
 from selenium.webdriver.common.action_chains import ActionChains
@@ -22,7 +27,7 @@ class NoteChild(PageObject):
         """
         Return `selector`, but limited to this particular `NoteChild` context
         """
-        return "{}#{} {}".format(
+        return u"{}#{} {}".format(
             self.BODY_SELECTOR,
             self.item_id,
             selector,
@@ -101,7 +106,7 @@ class EdxNotesTagsGroup(NoteChild, EdxNotesGroupMixin):
         top_script = "return " + title_selector + ".getBoundingClientRect().top;"
         EmptyPromise(
             lambda: 8 < self.browser.execute_script(top_script) < 12,
-            "Expected tag title '{}' to scroll to top, but was at location {}".format(
+            u"Expected tag title '{}' to scroll to top, but was at location {}".format(
                 self.title, self.browser.execute_script(top_script)
             )
         ).fulfill()
@@ -177,7 +182,7 @@ class EdxNotesPageView(PageObject):
         try:
             return self.wait_for_page()
         except BrokenPromise:
-            raise PageLoadError("Timed out waiting to load page '{!r}'".format(self))
+            raise PageLoadError(u"Timed out waiting to load page '{!r}'".format(self))
 
     def is_browser_on_page(self):
         return all([
@@ -191,13 +196,13 @@ class EdxNotesPageView(PageObject):
         """
         Indicates if tab is closable or not.
         """
-        return self.q(css="{} .action-close".format(self.TAB_SELECTOR)).present
+        return self.q(css=u"{} .action-close".format(self.TAB_SELECTOR)).present
 
     def close(self):
         """
         Closes the tab.
         """
-        self.q(css="{} .action-close".format(self.TAB_SELECTOR)).first.click()
+        self.q(css=u"{} .action-close".format(self.TAB_SELECTOR)).first.click()
 
     @property
     def children(self):
@@ -296,7 +301,7 @@ class EdxNotesPage(CoursePage, PaginatedUIMixin):
         """
         tabs = self.q(css=".tabs .tab-label")
         if tabs:
-            return map(lambda x: x.replace("Current tab\n", ""), tabs.text)
+            return [x.replace("Current tab\n", "") for x in tabs.text]
         else:
             return None
 
@@ -353,129 +358,6 @@ class EdxNotesPage(CoursePage, PaginatedUIMixin):
     def count(self):
         """ Returns the total number of notes in the list """
         return len(self.q(css='div.wrapper-note-excerpts').results)
-
-
-class EdxNotesPageNoContent(CoursePage):
-    """
-    EdxNotes page -- when no notes have been added.
-    """
-    url_path = "edxnotes/"
-
-    def is_browser_on_page(self):
-        return self.q(css=".wrapper-student-notes .is-empty").visible
-
-    @property
-    def no_content_text(self):
-        """
-        Returns no content message.
-        """
-        element = self.q(css=".is-empty").first
-        if element:
-            return element.text[0]
-        else:
-            return None
-
-
-class EdxNotesUnitPage(CoursePage):
-    """
-    Page for the Unit with EdxNotes.
-    """
-    url_path = "courseware/"
-
-    def is_browser_on_page(self):
-        return self.q(css="body.courseware .edx-notes-wrapper").present
-
-    def move_mouse_to(self, selector):
-        """
-        Moves mouse to the element that matches `selector(str)`.
-        """
-        body = self.q(css=selector)[0]
-        ActionChains(self.browser).move_to_element(body).perform()
-        return self
-
-    def click(self, selector):
-        """
-        Clicks on the element that matches `selector(str)`.
-        """
-        self.q(css=selector).first.click()
-        return self
-
-    def toggle_visibility(self):
-        """
-        Clicks on the "Show notes" checkbox.
-        """
-        self.q(css=".action-toggle-notes").first.click()
-        return self
-
-    @property
-    def components(self):
-        """
-        Returns a list of annotatable components.
-        """
-        components = self.q(css=".edx-notes-wrapper")
-        return [AnnotatableComponent(self.browser, component.get_attribute("id")) for component in components]
-
-    @property
-    def notes(self):
-        """
-        Returns a list of notes for the page.
-        """
-        notes = []
-        for component in self.components:
-            notes.extend(component.notes)
-        return notes
-
-    def refresh(self):
-        """
-        Refreshes the page and returns a list of annotatable components.
-        """
-        self.browser.refresh()
-        return self.components
-
-
-class AnnotatableComponent(NoteChild):
-    """
-    Helper class that works with annotatable components.
-    """
-    BODY_SELECTOR = ".edx-notes-wrapper"
-
-    @property
-    def notes(self):
-        """
-        Returns a list of notes for the component.
-        """
-        notes = self.q(css=self._bounded_selector(".annotator-hl"))
-        return [EdxNoteHighlight(self.browser, note, self.item_id) for note in notes]
-
-    def create_note(self, selector=".annotate-id"):
-        """
-        Create the note by the selector, return a context manager that will
-        show and save the note popup.
-        """
-        for element in self.q(css=self._bounded_selector(selector)):
-            note = EdxNoteHighlight(self.browser, element, self.item_id)
-            note.select_and_click_adder()
-            yield note
-            note.save()
-
-    def edit_note(self, selector=".annotator-hl"):
-        """
-        Edit the note by the selector, return a context manager that will
-        show and save the note popup.
-        """
-        for element in self.q(css=self._bounded_selector(selector)):
-            note = EdxNoteHighlight(self.browser, element, self.item_id)
-            note.show().edit()
-            yield note
-            note.save()
-
-    def remove_note(self, selector=".annotator-hl"):
-        """
-        Removes the note by the selector.
-        """
-        for element in self.q(css=self._bounded_selector(selector)):
-            note = EdxNoteHighlight(self.browser, element, self.item_id)
-            note.show().remove()
 
 
 class EdxNoteHighlight(NoteChild):
@@ -652,7 +534,7 @@ class EdxNoteHighlight(NoteChild):
         label_exists = False
         EmptyPromise(
             lambda: len(self.q(css=self._bounded_selector("li.annotator-item > label.sr"))) > sr_index,
-            "Expected more than '{}' sr labels".format(sr_index)
+            u"Expected more than '{}' sr labels".format(sr_index)
         ).fulfill()
         annotator_field_label = self.q(css=self._bounded_selector("li.annotator-item > label.sr"))[sr_index]
         for_attrib_correct = annotator_field_label.get_attribute("for") == "annotator-field-" + str(field_index)

@@ -1,6 +1,8 @@
 """
 Django AppConfig module for the Gating app
 """
+
+
 from django.apps import AppConfig
 
 
@@ -12,4 +14,4 @@ class GatingConfig(AppConfig):
 
     def ready(self):
         # Import signals to wire up the signal handlers contained within
-        from gating import signals  # pylint: disable=unused-variable
+        from gating import signals  # pylint: disable=unused-import

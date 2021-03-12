@@ -6,11 +6,16 @@ Exists at the top level of modulestore b/c it needs to know about and access eac
 In general, it's strategy is to treat the other modulestores as read-only and to never directly
 manipulate storage but use existing api's.
 '''
+
+
 import logging
 
-from xblock.fields import Reference, ReferenceList, ReferenceValueDict
-from xmodule.modulestore import ModuleStoreEnum
+import six
 from opaque_keys.edx.locator import CourseLocator
+from six.moves import range
+from xblock.fields import Reference, ReferenceList, ReferenceValueDict
+
+from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.exceptions import ItemNotFoundError
 
 log = logging.getLogger(__name__)
@@ -48,7 +53,7 @@ class SplitMigrator(object):
         # create the course: set fields to explicitly_set for each scope, id_root = new_course_locator, master_branch = 'production'
         original_course = self.source_modulestore.get_course(source_course_key, **kwargs)
         if original_course is None:
-            raise ItemNotFoundError(unicode(source_course_key))
+            raise ItemNotFoundError(six.text_type(source_course_key))
 
         if new_org is None:
             new_org = source_course_key.org
@@ -139,12 +144,12 @@ class SplitMigrator(object):
                 # was in 'direct' so draft is a new version
                 split_module = self.split_modulestore.get_item(new_locator, **kwargs)
                 # need to remove any no-longer-explicitly-set values and add/update any now set values.
-                for name, field in split_module.fields.iteritems():
+                for name, field in six.iteritems(split_module.fields):
                     if field.is_set_on(split_module) and not module.fields[name].is_set_on(module):
                         field.delete_from(split_module)
-                for field, value in self._get_fields_translate_references(
+                for field, value in six.iteritems(self._get_fields_translate_references(
                         module, new_draft_course_loc, published_course_usage_key.block_id, field_names=False
-                ).iteritems():
+                )):
                     field.write_to(split_module, value)
 
                 _new_module = self.split_modulestore.update_item(split_module, user_id, **kwargs)
@@ -160,12 +165,12 @@ class SplitMigrator(object):
                     **kwargs
                 )
                 awaiting_adoption[module.location] = new_locator
-        for draft_location, new_locator in awaiting_adoption.iteritems():
+        for draft_location, new_locator in six.iteritems(awaiting_adoption):
             parent_loc = self.source_modulestore.get_parent_location(
                 draft_location, revision=ModuleStoreEnum.RevisionOption.draft_preferred, **kwargs
             )
             if parent_loc is None:
-                log.warn(u'No parent found in source course for %s', draft_location)
+                log.warning(u'No parent found in source course for %s', draft_location)
                 continue
             old_parent = self.source_modulestore.get_item(parent_loc, **kwargs)
             split_parent_loc = new_draft_course_loc.make_usage_key(
@@ -207,7 +212,7 @@ class SplitMigrator(object):
             )
 
         result = {}
-        for field_name, field in xblock.fields.iteritems():
+        for field_name, field in six.iteritems(xblock.fields):
             if field.is_set_on(xblock):
                 field_value = field.read_from(xblock)
                 field_key = field_name if field_names else field
@@ -220,7 +225,7 @@ class SplitMigrator(object):
                 elif isinstance(field, ReferenceValueDict):
                     result[field_key] = {
                         key: get_translation(subvalue)
-                        for key, subvalue in field_value.iteritems()
+                        for key, subvalue in six.iteritems(field_value)
                     }
                 else:
                     result[field_key] = field_value

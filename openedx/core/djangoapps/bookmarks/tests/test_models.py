@@ -1,6 +1,8 @@
 """
 Tests for Bookmarks models.
 """
+
+
 import datetime
 from contextlib import contextmanager
 
@@ -8,9 +10,10 @@ import ddt
 import mock
 import pytz
 from freezegun import freeze_time
-from nose.plugins.attrib import attr
 from opaque_keys.edx.keys import UsageKey
 from opaque_keys.edx.locator import BlockUsageLocator, CourseLocator
+from six import text_type
+from six.moves import range
 
 from openedx.core.djangolib.testing.utils import skip_unless_lms
 from student.tests.factories import AdminFactory, UserFactory
@@ -54,7 +57,7 @@ class BookmarksTestsBase(ModuleStoreTestCase):
         with self.store.default_store(store_type):
 
             self.course = CourseFactory.create(display_name='An Introduction to API Testing')
-            self.course_id = unicode(self.course.id)
+            self.course_id = text_type(self.course.id)
 
             with self.store.bulk_operations(self.course.id):
 
@@ -132,11 +135,11 @@ class BookmarksTestsBase(ModuleStoreTestCase):
 
             # self.other_vertical_1 has two parents
             self.other_sequential_2.children.append(self.other_vertical_1.location)
-            modulestore().update_item(self.other_sequential_2, self.admin.id)  # pylint: disable=no-member
+            modulestore().update_item(self.other_sequential_2, self.admin.id)
 
         self.other_bookmark_1 = BookmarkFactory.create(
             user=self.user,
-            course_key=unicode(self.other_course.id),
+            course_key=text_type(self.other_course.id),
             usage_key=self.other_vertical_1.location,
             xblock_cache=XBlockCache.create({
                 'display_name': self.other_vertical_1.display_name,
@@ -163,7 +166,7 @@ class BookmarksTestsBase(ModuleStoreTestCase):
                     for block in blocks_at_current_level:
                         for __ in range(children_per_block):
                             blocks_at_next_level += [ItemFactory.create(
-                                parent_location=block.scope_ids.usage_id, display_name=unicode(display_name)
+                                parent_location=block.scope_ids.usage_id, display_name=text_type(display_name)
                             )]
                             display_name += 1
 
@@ -179,7 +182,7 @@ class BookmarksTestsBase(ModuleStoreTestCase):
 
             with self.store.bulk_operations(course.id):
                 blocks = [ItemFactory.create(
-                    parent_location=course.location, category='chapter', display_name=unicode(index)
+                    parent_location=course.location, category='chapter', display_name=text_type(index)
                 ) for index in range(count)]
 
             bookmarks = [BookmarkFactory.create(
@@ -200,7 +203,7 @@ class BookmarksTestsBase(ModuleStoreTestCase):
         """
         self.assertEqual(bookmark.user, bookmark_data['user'])
         self.assertEqual(bookmark.course_key, bookmark_data['course_key'])
-        self.assertEqual(unicode(bookmark.usage_key), unicode(bookmark_data['usage_key']))
+        self.assertEqual(text_type(bookmark.usage_key), text_type(bookmark_data['usage_key']))
         self.assertEqual(bookmark.resource_id, u"{},{}".format(bookmark_data['user'], bookmark_data['usage_key']))
         self.assertEqual(bookmark.display_name, bookmark_data['display_name'])
         self.assertEqual(bookmark.path, self.path)
@@ -214,9 +217,9 @@ class BookmarksTestsBase(ModuleStoreTestCase):
         Assert that the bookmark data matches the data in the model.
         """
         self.assertEqual(bookmark_data['id'], bookmark.resource_id)
-        self.assertEqual(bookmark_data['course_id'], unicode(bookmark.course_key))
-        self.assertEqual(bookmark_data['usage_id'], unicode(bookmark.usage_key))
-        self.assertEqual(bookmark_data['block_type'], unicode(bookmark.usage_key.block_type))
+        self.assertEqual(bookmark_data['course_id'], text_type(bookmark.course_key))
+        self.assertEqual(bookmark_data['usage_id'], text_type(bookmark.usage_key))
+        self.assertEqual(bookmark_data['block_type'], text_type(bookmark.usage_key.block_type))
         self.assertIsNotNone(bookmark_data['created'])
 
         if check_optional_fields:
@@ -224,13 +227,13 @@ class BookmarksTestsBase(ModuleStoreTestCase):
             self.assertEqual(bookmark_data['path'], bookmark.path)
 
 
-@attr(shard=9)
 @ddt.ddt
 @skip_unless_lms
 class BookmarkModelTests(BookmarksTestsBase):
     """
     Test the Bookmark model.
     """
+
     def setUp(self):
         super(BookmarkModelTests, self).setUp()
 
@@ -393,7 +396,7 @@ class BookmarkModelTests(BookmarksTestsBase):
 
         # Block is an orphan
         self.other_sequential_1.children = []
-        modulestore().update_item(self.other_sequential_1, self.admin.id)  # pylint: disable=no-member
+        modulestore().update_item(self.other_sequential_1, self.admin.id)
 
         bookmark_data = self.get_bookmark_data(self.other_vertical_2, user=user)
         bookmark, __ = Bookmark.create(bookmark_data)
@@ -410,25 +413,23 @@ class BookmarkModelTests(BookmarksTestsBase):
             self.assertEqual(bookmark.path, [])
 
 
-@attr(shard=9)
 @ddt.ddt
 class XBlockCacheModelTest(ModuleStoreTestCase):
     """
     Test the XBlockCache model.
     """
-
     COURSE_KEY = CourseLocator(org='test', course='test', run='test')
     CHAPTER1_USAGE_KEY = BlockUsageLocator(COURSE_KEY, block_type='chapter', block_id='chapter1')
     SECTION1_USAGE_KEY = BlockUsageLocator(COURSE_KEY, block_type='section', block_id='section1')
     SECTION2_USAGE_KEY = BlockUsageLocator(COURSE_KEY, block_type='section', block_id='section1')
     VERTICAL1_USAGE_KEY = BlockUsageLocator(COURSE_KEY, block_type='vertical', block_id='sequential1')
     PATH1 = [
-        [unicode(CHAPTER1_USAGE_KEY), 'Chapter 1'],
-        [unicode(SECTION1_USAGE_KEY), 'Section 1'],
+        [text_type(CHAPTER1_USAGE_KEY), 'Chapter 1'],
+        [text_type(SECTION1_USAGE_KEY), 'Section 1'],
     ]
     PATH2 = [
-        [unicode(CHAPTER1_USAGE_KEY), 'Chapter 1'],
-        [unicode(SECTION2_USAGE_KEY), 'Section 2'],
+        [text_type(CHAPTER1_USAGE_KEY), 'Chapter 1'],
+        [text_type(SECTION2_USAGE_KEY), 'Section 2'],
     ]
 
     def assert_xblock_cache_data(self, xblock_cache, data):

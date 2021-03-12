@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
-from __future__ import unicode_literals
 
-from django.db import migrations, models
+
 from django.conf import settings
+from django.db import migrations, models
 from opaque_keys.edx.django.models import CourseKeyField
 
 
@@ -32,7 +32,7 @@ class Migration(migrations.Migration):
                 ('created', models.DateTimeField(auto_now_add=True)),
                 ('modified', models.DateTimeField(auto_now=True)),
                 ('course_id', CourseKeyField(max_length=255, db_index=True)),
-                ('to_option', models.CharField(default=b'myself', max_length=64, choices=[(b'myself', b'Myself'), (b'staff', b'Staff and instructors'), (b'all', b'All')])),
+                ('to_option', models.CharField(default=u'myself', max_length=64, choices=[(u'myself', u'Myself'), (u'staff', u'Staff and instructors'), (u'all', u'All')])),
                 ('template_name', models.CharField(max_length=255, null=True)),
                 ('from_addr', models.CharField(max_length=255, null=True)),
                 ('sender', models.ForeignKey(default=1, blank=True, to=settings.AUTH_USER_MODEL, null=True, on_delete=models.CASCADE)),

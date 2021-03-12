@@ -51,7 +51,7 @@ payload.
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 We will no longer return expired *JWTs as access tokens* to Restricted
-Applications. We will sign them with a *new key* that is not shared with 
+Applications. We will sign them with a *new key* that is not shared with
 unprotected microservices.
 
 * API endpoints that are exposed by other microservices and that
@@ -59,7 +59,7 @@ unprotected microservices.
   they are also updated to enforce scopes.
 
   * We do not want a lock-step deployment across all of our microservices.
-    We want to enable these changes without blocking on updating all 
+    We want to enable these changes without blocking on updating all
     microservices.
 
   * We do not want to issue unexpired *Bearer tokens* to Restricted
@@ -72,13 +72,11 @@ unprotected microservices.
   make the new keys available to a microservice only after they
   have been updated to enforce OAuth Scopes.
 
-  * edx_rest_framework_extensions.settings_ supports having a list of
-    JWT_ISSUERS instead of just a single one.
-
-  * The `edx-platform settings`_ will be updated to have a list of
-    JWT_ISSUERS instead of a single JWT_ISSUER in its settings (example_).
-    A separate settings field will keep track of which is the new issuer
-    key that is to be used for signing tokens for Restricted Application.
+  * The `edx-platform settings`_ will be updated to support a new signing
+    key. Since this transition to using a new key will happen as a staged
+    rollout, we will take this opportunity to have the new signing key be
+    an asymmetric key, rather than the current (not as secure) shared
+    symmetric key.
 
   * oauth_dispatch.views.AccessTokenView.dispatch_ will be updated to
     pass the new JWT key to JwtBuilder_, but only if
@@ -90,12 +88,10 @@ unprotected microservices.
     JWT tokens for Restricted Applications, but ONLY if:
 
     * the token_type in the request equals *"jwt"* and
-    * a `feature toggle (switch)`_ named "oauth2.unexpired_restricted_applications"
-      is enabled.
+    * a `feature toggle (switch)`_ named "oauth2.enforce_jwt_scopes" is enabled.
+      * **Note:** the toggle has since been retired with the equivalent of ``enforce_jwt_scopes`` value of True.
 
-.. _edx_rest_framework_extensions.settings: https://github.com/edx/edx-drf-extensions/blob/1db9f5e3e5130a1e0f43af2035489b3ed916d245/edx_rest_framework_extensions/settings.py#L73
 .. _edx-platform settings: https://github.com/edx/edx-platform/blob/master/lms/envs/docs/README.rst
-.. _example: https://github.com/edx/edx-drf-extensions/blob/1db9f5e3e5130a1e0f43af2035489b3ed916d245/test_settings.py#L51
 .. _JwtBuilder: https://github.com/edx/edx-platform/blob/d3d64970c36f36a96d684571ec5b48ed645618d8/openedx/core/lib/token_utils.py#L15
 .. _oauth_dispatch.views.AccessTokenView.dispatch: https://github.com/edx/edx-platform/blob/d21a09828072504bc97a2e05883c1241e3a35da9/openedx/core/djangoapps/oauth_dispatch/views.py#L100
 .. _oauth_dispatch.validators: https://github.com/edx/edx-platform/blob/master/openedx/core/djangoapps/oauth_dispatch/dot_overrides/validators.py
@@ -186,27 +182,28 @@ See 0007-include-organizations-in-tokens_ for decisions on this.
     `feature toggle (switch)`_ named "oauth2.enforce_token_scopes". When the
     switch is disabled, the new Permission class fails verification of all
     Restricted Application requests.
-     
+
 .. _custom Permission: http://www.django-rest-framework.org/api-guide/permissions/#custom-permissions
 .. _TokenHasScope: https://github.com/evonove/django-oauth-toolkit/blob/50e4df7d97af90439d27a73c5923f2c06a4961f2/oauth2_provider/contrib/rest_framework/permissions.py#L13
 .. _`REST_FRAMEWORK's DEFAULT_PERMISSION_CLASSES`: http://www.django-rest-framework.org/api-guide/permissions/#setting-the-permission-policy
 .. _function-based Django views: https://docs.djangoproject.com/en/2.0/topics/http/views/
 .. _Django Rest Framework (DRF): http://www.django-rest-framework.org/
 .. _Python decorator: http://www.django-rest-framework.org/tutorial/2-requests-and-responses/#wrapping-api-views
-.. _JwtAuthentication: https://github.com/edx/edx-drf-extensions/blob/1db9f5e3e5130a1e0f43af2035489b3ed916d245/edx_rest_framework_extensions/authentication.py#L153
+.. _JwtAuthentication: https://github.com/edx/edx-drf-extensions/blob/4569b9bf7e54a917d4acdd545b10c058c960dd1a/edx_rest_framework_extensions/auth/jwt/authentication.py#L17
+
 
 Consequences
 ------------
 
-* Putting these changes behind a feature toggle allows us to decouple 
+* Putting these changes behind a feature toggle allows us to decouple
   release from deployment and disable these changes in the event of
-  unexpected issues. 
-  
+  unexpected issues.
+
   * Minimizing the places that the feature toggle is checked (at the
     time of returning unexpired tokens and at the time of validating
     requests), minimizes the complexity of the code.
 
-* By associating Scopes with DOT Applications and not Restricted 
+* By associating Scopes with DOT Applications and not Restricted
   Applications, we can eventually eliminate Restricted Applications
   altogether. Besides, they were introduced as a temporary concept
   until Scopes were fully rolled out.

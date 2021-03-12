@@ -1,9 +1,10 @@
 
+
 from django.apps import AppConfig
-from openedx.core.djangoapps.plugins.constants import ProjectType, PluginURLs
 
+from openedx.core.djangoapps.plugins.constants import PluginURLs, ProjectType
 
-plugin_urls_config = {PluginURLs.NAMESPACE: u'theming', PluginURLs.REGEX: u'theming/'}
+plugin_urls_config = {PluginURLs.NAMESPACE: u'theming', PluginURLs.REGEX: r'^theming/'}
 
 
 class ThemingConfig(AppConfig):

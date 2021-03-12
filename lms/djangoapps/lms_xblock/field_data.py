@@ -2,6 +2,7 @@
 :class:`~xblock.field_data.FieldData` subclasses used by the LMS
 """
 
+
 from xblock.field_data import ReadOnlyFieldData, SplitFieldData
 from xblock.fields import Scope
 
@@ -16,7 +17,7 @@ class LmsFieldData(SplitFieldData):
     def __init__(self, authored_data, student_data):
         # Make sure that we don't repeatedly nest LmsFieldData instances
         if isinstance(authored_data, LmsFieldData):
-            authored_data = authored_data._authored_data  # pylint: disable=protected-access
+            authored_data = authored_data._authored_data
         else:
             authored_data = ReadOnlyFieldData(authored_data)
 

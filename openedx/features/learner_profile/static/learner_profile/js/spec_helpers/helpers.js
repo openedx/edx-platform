@@ -107,7 +107,7 @@ define(['underscore', 'URI', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers'
         }
     };
 
-    var expectProfileSectionsNotToBeRendered = function(learnerProfileView) {
+    var expectProfileSectionsNotToBeRendered = function() {
         expect($('.wrapper-profile-field-account-privacy').length).toBe(0);
         expect($('.wrapper-profile-section-one').length).toBe(0);
         expect($('.wrapper-profile-section-two').length).toBe(0);
@@ -138,7 +138,7 @@ define(['underscore', 'URI', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers'
         expect($badgeListingView.find('.badge-display').length).toBe(updatedLength);
     };
 
-    var expectBadgesHidden = function(learnerProfileView) {
+    var expectBadgesHidden = function() {
         var $accomplishmentsTab = $('#tabpanel-accomplishments');
         if ($accomplishmentsTab.length) {
             // Nonexistence counts as hidden.
@@ -158,7 +158,7 @@ define(['underscore', 'URI', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers'
         });
     };
 
-    var expectBadgeLoadingErrorIsRendered = function(learnerProfileView) {
+    var expectBadgeLoadingErrorIsRendered = function() {
         var errorMessage = $('.badge-set-display').text();
         expect(errorMessage).toBe(
             'Your request could not be completed. Reload the page and try again. If the issue persists, click the ' +

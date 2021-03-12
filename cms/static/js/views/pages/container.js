@@ -30,6 +30,7 @@ define(['jquery', 'underscore', 'backbone', 'gettext', 'js/views/pages/base_page
 
             view: 'container_preview',
 
+
             defaultViewClass: ContainerView,
 
             // Overridable by subclasses-- determines whether the XBlock component
@@ -197,7 +198,7 @@ define(['jquery', 'underscore', 'backbone', 'gettext', 'js/views/pages/base_page
                 this.editXBlock(event, {
                     view: 'visibility_view',
                     // Translators: "title" is the name of the current component or unit being edited.
-                    titleFormat: gettext('Editing access for: %(title)s'),
+                    titleFormat: gettext('Editing access for: {title}'),
                     viewSpecificClasses: '',
                     modalSize: 'med'
                 });

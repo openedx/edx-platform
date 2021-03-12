@@ -2,6 +2,7 @@
 Tests for the functionality and infrastructure of grades tasks.
 """
 
+
 import itertools
 from collections import OrderedDict
 from contextlib import contextmanager
@@ -12,10 +13,13 @@ import pytz
 import six
 from django.conf import settings
 from django.db.utils import IntegrityError
+from django.utils import timezone
 from mock import MagicMock, patch
+from six.moves import range
 
 from lms.djangoapps.grades import tasks
 from lms.djangoapps.grades.config.models import PersistentGradesEnabledFlag
+from lms.djangoapps.grades.config.waffle import ENFORCE_FREEZE_GRADE_AFTER_COURSE_END, waffle_flags
 from lms.djangoapps.grades.constants import ScoreDatabaseTableEnum
 from lms.djangoapps.grades.models import PersistentCourseGrade, PersistentSubsectionGrade
 from lms.djangoapps.grades.services import GradesService
@@ -23,10 +27,13 @@ from lms.djangoapps.grades.signals.signals import PROBLEM_WEIGHTED_SCORE_CHANGED
 from lms.djangoapps.grades.tasks import (
     RECALCULATE_GRADE_DELAY_SECONDS,
     _course_task_args,
+    compute_all_grades_for_course,
+    compute_grades_for_course,
     compute_grades_for_course_v2,
     recalculate_subsection_grade_v3
 )
 from openedx.core.djangoapps.content.block_structure.exceptions import BlockStructureNotFound
+from openedx.core.djangoapps.waffle_utils.testutils import override_waffle_flag
 from student.models import CourseEnrollment, anonymous_id_for_user
 from student.tests.factories import UserFactory
 from track.event_transaction_utils import create_new_event_transaction_id, get_event_transaction_id
@@ -39,23 +46,11 @@ from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory, chec
 from .utils import mock_get_score
 
 
-class MockGradesService(GradesService):
-    """
-    A mock grades service.
-    """
-    def __init__(self, mocked_return_value=None):
-        super(MockGradesService, self).__init__()
-        self.mocked_return_value = mocked_return_value
-
-    def get_subsection_grade_override(self, user_id, course_key_or_id, usage_key_or_id):
-        return self.mocked_return_value
-
-
 class HasCourseWithProblemsMixin(object):
     """
     Mixin to provide tests with a sample course with graded subsections
     """
-    def set_up_course(self, enable_persistent_grades=True, create_multiple_subsections=False):
+    def set_up_course(self, enable_persistent_grades=True, create_multiple_subsections=False, course_end=None):
         """
         Configures the course for this test.
         """
@@ -63,6 +58,7 @@ class HasCourseWithProblemsMixin(object):
             org='edx',
             name='course',
             run='run',
+            end=course_end
         )
         if not enable_persistent_grades:
             PersistentGradesEnabledFlag.objects.create(enabled=False)
@@ -83,8 +79,8 @@ class HasCourseWithProblemsMixin(object):
             ('weighted_possible', 2.0),
             ('user_id', self.user.id),
             ('anonymous_user_id', 5),
-            ('course_id', unicode(self.course.id)),
-            ('usage_id', unicode(self.problem.location)),
+            ('course_id', six.text_type(self.course.id)),
+            ('usage_id', six.text_type(self.problem.location)),
             ('only_if_higher', None),
             ('modified', self.frozen_now_datetime),
             ('score_db_table', ScoreDatabaseTableEnum.courseware_student_module),
@@ -94,13 +90,13 @@ class HasCourseWithProblemsMixin(object):
 
         self.recalculate_subsection_grade_kwargs = OrderedDict([
             ('user_id', self.user.id),
-            ('course_id', unicode(self.course.id)),
-            ('usage_id', unicode(self.problem.location)),
+            ('course_id', six.text_type(self.course.id)),
+            ('usage_id', six.text_type(self.problem.location)),
             ('anonymous_user_id', 5),
             ('only_if_higher', None),
             ('expected_modified_time', self.frozen_now_timestamp),
             ('score_deleted', False),
-            ('event_transaction_id', unicode(get_event_transaction_id())),
+            ('event_transaction_id', six.text_type(get_event_transaction_id())),
             ('event_transaction_type', u'edx.grades.problem.submitted'),
             ('score_db_table', ScoreDatabaseTableEnum.courseware_student_module),
         ])
@@ -116,7 +112,6 @@ class RecalculateSubsectionGradeTest(HasCourseWithProblemsMixin, ModuleStoreTest
     """
     Ensures that the recalculate subsection grade task functions as expected when run.
     """
-    shard = 4
     ENABLED_SIGNALS = ['course_published', 'pre_publish']
 
     def setUp(self):
@@ -141,6 +136,7 @@ class RecalculateSubsectionGradeTest(HasCourseWithProblemsMixin, ModuleStoreTest
         send_args = self.problem_weighted_score_changed_kwargs
         local_task_args = self.recalculate_subsection_grade_kwargs.copy()
         local_task_args['event_transaction_type'] = u'edx.grades.problem.submitted'
+        local_task_args['force_update_subsections'] = False
         with self.mock_csm_get_score() and patch(
             'lms.djangoapps.grades.tasks.recalculate_subsection_grade_v3.apply_async',
             return_value=None
@@ -165,13 +161,13 @@ class RecalculateSubsectionGradeTest(HasCourseWithProblemsMixin, ModuleStoreTest
             side_effect=BlockStructureNotFound(self.course.location),
         ) as mock_block_structure_create:
             self._apply_recalculate_subsection_grade()
-            self.assertEquals(mock_block_structure_create.call_count, 1)
+            self.assertEqual(mock_block_structure_create.call_count, 1)
 
     @ddt.data(
-        (ModuleStoreEnum.Type.mongo, 1, 28, True),
-        (ModuleStoreEnum.Type.mongo, 1, 28, False),
-        (ModuleStoreEnum.Type.split, 3, 28, True),
-        (ModuleStoreEnum.Type.split, 3, 28, False),
+        (ModuleStoreEnum.Type.mongo, 1, 37, True),
+        (ModuleStoreEnum.Type.mongo, 1, 37, False),
+        (ModuleStoreEnum.Type.split, 3, 37, True),
+        (ModuleStoreEnum.Type.split, 3, 37, False),
     )
     @ddt.unpack
     def test_query_counts(self, default_store, num_mongo_calls, num_sql_calls, create_multiple_subsections):
@@ -183,8 +179,8 @@ class RecalculateSubsectionGradeTest(HasCourseWithProblemsMixin, ModuleStoreTest
                     self._apply_recalculate_subsection_grade()
 
     @ddt.data(
-        (ModuleStoreEnum.Type.mongo, 1, 28),
-        (ModuleStoreEnum.Type.split, 3, 28),
+        (ModuleStoreEnum.Type.mongo, 1, 37),
+        (ModuleStoreEnum.Type.split, 3, 37),
     )
     @ddt.unpack
     def test_query_counts_dont_change_with_more_content(self, default_store, num_mongo_calls, num_sql_calls):
@@ -218,7 +214,7 @@ class RecalculateSubsectionGradeTest(HasCourseWithProblemsMixin, ModuleStoreTest
 
         # Make sure the signal is sent for only the 2 accessible sequentials.
         self._apply_recalculate_subsection_grade()
-        self.assertEquals(mock_subsection_signal.call_count, 2)
+        self.assertEqual(mock_subsection_signal.call_count, 2)
         sequentials_signalled = {
             args[1]['subsection_grade'].location
             for args in mock_subsection_signal.call_args_list
@@ -229,8 +225,8 @@ class RecalculateSubsectionGradeTest(HasCourseWithProblemsMixin, ModuleStoreTest
         )
 
     @ddt.data(
-        (ModuleStoreEnum.Type.mongo, 1, 12),
-        (ModuleStoreEnum.Type.split, 3, 12),
+        (ModuleStoreEnum.Type.mongo, 1, 20),
+        (ModuleStoreEnum.Type.split, 3, 20),
     )
     @ddt.unpack
     def test_persistent_grades_not_enabled_on_course(self, default_store, num_mongo_queries, num_sql_queries):
@@ -244,8 +240,8 @@ class RecalculateSubsectionGradeTest(HasCourseWithProblemsMixin, ModuleStoreTest
             self.assertEqual(len(PersistentSubsectionGrade.bulk_read_grades(self.user.id, self.course.id)), 0)
 
     @ddt.data(
-        (ModuleStoreEnum.Type.mongo, 1, 29),
-        (ModuleStoreEnum.Type.split, 3, 29),
+        (ModuleStoreEnum.Type.mongo, 1, 38),
+        (ModuleStoreEnum.Type.split, 3, 38),
     )
     @ddt.unpack
     def test_persistent_grades_enabled_on_course(self, default_store, num_mongo_queries, num_sql_queries):
@@ -266,7 +262,7 @@ class RecalculateSubsectionGradeTest(HasCourseWithProblemsMixin, ModuleStoreTest
         self.set_up_course()
         mock_update.side_effect = [IntegrityError("WHAMMY"), None]
         self._apply_recalculate_subsection_grade()
-        self.assertEquals(mock_course_signal.call_count, 1)
+        self.assertEqual(mock_course_signal.call_count, 1)
 
     @patch('lms.djangoapps.grades.tasks.recalculate_subsection_grade_v3.retry')
     @patch('lms.djangoapps.grades.subsection_grade_factory.SubsectionGradeFactory.update')
@@ -300,10 +296,10 @@ class RecalculateSubsectionGradeTest(HasCourseWithProblemsMixin, ModuleStoreTest
                 mock_score=MagicMock(modified=modified_datetime)
             )
         else:
-            with patch(
-                'lms.djangoapps.grades.tasks.GradesService',
-                return_value=MockGradesService(mocked_return_value=MagicMock(modified=modified_datetime))
-            ):
+            with patch('lms.djangoapps.grades.api') as mock_grade_service:
+                mock_grade_service.get_subsection_grade_override = MagicMock(
+                    return_value=MagicMock(modified=modified_datetime)
+                )
                 recalculate_subsection_grade_v3.apply(kwargs=self.recalculate_subsection_grade_kwargs)
 
         self._assert_retry_called(mock_retry)
@@ -334,9 +330,8 @@ class RecalculateSubsectionGradeTest(HasCourseWithProblemsMixin, ModuleStoreTest
                     mock_score=MagicMock(module_type='any_block_type')
                 )
         elif score_db_table == ScoreDatabaseTableEnum.overrides:
-            with patch('lms.djangoapps.grades.tasks.GradesService',
-                       return_value=MockGradesService(mocked_return_value=None)) as mock_service:
-                mock_service.get_subsection_grade_override.return_value = None
+            with patch('lms.djangoapps.grades.api') as mock_grade_service:
+                mock_grade_service.get_subsection_grade_override.return_value = None
                 recalculate_subsection_grade_v3.apply(kwargs=self.recalculate_subsection_grade_kwargs)
         else:
             self._apply_recalculate_subsection_grade(mock_score=None)
@@ -398,7 +393,7 @@ class RecalculateSubsectionGradeTest(HasCourseWithProblemsMixin, ModuleStoreTest
         number of arguments.
         """
         self.assertTrue(mock_retry.called)
-        self.assertEquals(len(mock_retry.call_args[1]['kwargs']), len(self.recalculate_subsection_grade_kwargs))
+        self.assertEqual(len(mock_retry.call_args[1]['kwargs']), len(self.recalculate_subsection_grade_kwargs))
 
     def _assert_retry_not_called(self, mock_retry):
         """
@@ -412,18 +407,17 @@ class ComputeGradesForCourseTest(HasCourseWithProblemsMixin, ModuleStoreTestCase
     """
     Test compute_grades_for_course_v2 task.
     """
-    shard = 4
 
     ENABLED_SIGNALS = ['course_published', 'pre_publish']
 
     def setUp(self):
         super(ComputeGradesForCourseTest, self).setUp()
-        self.users = [UserFactory.create() for _ in xrange(12)]
+        self.users = [UserFactory.create() for _ in range(12)]
         self.set_up_course()
         for user in self.users:
             CourseEnrollment.enroll(user, self.course.id)
 
-    @ddt.data(*xrange(0, 12, 3))
+    @ddt.data(*range(0, 12, 3))
     def test_behavior(self, batch_size):
         with mock_get_score(1, 2):
             result = compute_grades_for_course_v2.delay(
@@ -441,7 +435,7 @@ class ComputeGradesForCourseTest(HasCourseWithProblemsMixin, ModuleStoreTestCase
             min(batch_size, 8)  # No more than 8 due to offset
         )
 
-    @ddt.data(*xrange(1, 12, 3))
+    @ddt.data(*range(1, 12, 3))
     def test_course_task_args(self, test_batch_size):
         offset_expected = 0
         for course_key, offset, batch_size in _course_task_args(
@@ -498,3 +492,159 @@ class RecalculateGradesForUserTest(HasCourseWithProblemsMixin, ModuleStoreTestCa
 
             factory.read.assert_called_once_with(self.user, course_key=self.course.id)
             self.assertFalse(factory.update.called)
+
+
+@ddt.ddt
+class FreezeGradingAfterCourseEndTest(HasCourseWithProblemsMixin, ModuleStoreTestCase):
+    """
+    Test enforce_freeze_grade_after_course_end waffle flag controlling grading tasks.
+    """
+    def setUp(self):
+        super(FreezeGradingAfterCourseEndTest, self).setUp()
+        self.users = [UserFactory.create() for _ in range(12)]
+        self.user = self.users[0]
+        self.freeze_grade_flag = waffle_flags()[ENFORCE_FREEZE_GRADE_AFTER_COURSE_END]
+
+    def _assert_log(self, mock_log, method_name):
+        self.assertTrue(mock_log.info.called)
+        log_message = u"Attempted {} for course '%s', but grades are frozen.".format(method_name)
+        self.assertIn(
+            log_message,
+            mock_log.info.call_args_list[0][0][0]
+        )
+
+    def _assert_for_freeze_grade_flag(
+        self,
+        result,
+        freeze_flag_value,
+        end_date_adjustment,
+        mock_log,
+        mock_call,
+        task_name
+    ):
+        self.assertTrue(result.successful)
+        if freeze_flag_value and end_date_adjustment > 30:
+            mock_call.assert_not_called()
+            self._assert_log(mock_log, task_name)
+        else:
+            mock_call.assert_called_once()
+
+    @ddt.data(
+        *itertools.product(
+            (True, False),
+            (29, 31)
+        )
+    )
+    @ddt.unpack
+    @patch('lms.djangoapps.grades.tasks.log')
+    def test_compute_all_grades_for_course(self, freeze_flag_value, end_date_adjustment, mock_log):
+        self.set_up_course(course_end=timezone.now() - timedelta(end_date_adjustment))
+        for user in self.users:
+            CourseEnrollment.enroll(user, self.course.id)
+
+        with override_waffle_flag(self.freeze_grade_flag, active=freeze_flag_value):
+            with patch(
+                'lms.djangoapps.grades.tasks.compute_grades_for_course_v2.apply_async',
+                return_value=None
+            ) as mock_compute_grades:
+                result = compute_all_grades_for_course.apply_async(
+                    kwargs={
+                        'course_key': six.text_type(self.course.id)
+                    }
+                )
+                self._assert_for_freeze_grade_flag(
+                    result,
+                    freeze_flag_value,
+                    end_date_adjustment,
+                    mock_log,
+                    mock_compute_grades,
+                    'compute_all_grades_for_course'
+                )
+
+    @ddt.data(
+        *itertools.product(
+            (True, False),
+            (29, 31)
+        )
+    )
+    @ddt.unpack
+    @patch('lms.djangoapps.grades.tasks.log')
+    def test_compute_grades_for_course(self, freeze_flag_value, end_date_adjustment, mock_log):
+        self.set_up_course(course_end=timezone.now() - timedelta(end_date_adjustment))
+        for user in self.users:
+            CourseEnrollment.enroll(user, self.course.id)
+
+        with override_waffle_flag(self.freeze_grade_flag, active=freeze_flag_value):
+            with patch('lms.djangoapps.grades.tasks.CourseGradeFactory') as mock_factory:
+                factory = mock_factory.return_value
+                with mock_get_score(1, 2):
+                    result = compute_grades_for_course.apply_async(
+                        kwargs={
+                            'course_key': six.text_type(self.course.id),
+                            'batch_size': 2,
+                            'offset': 4,
+                        }
+                    )
+                    self._assert_for_freeze_grade_flag(
+                        result,
+                        freeze_flag_value,
+                        end_date_adjustment,
+                        mock_log,
+                        factory.iter,
+                        'compute_grades_for_course'
+                    )
+
+    @ddt.data(
+        *itertools.product(
+            (True, False),
+            (29, 31)
+        )
+    )
+    @ddt.unpack
+    @patch('lms.djangoapps.grades.tasks.log')
+    def test_recalculate_course_and_subsection_grades(self, freeze_flag_value, end_date_adjustment, mock_log):
+        self.set_up_course(course_end=timezone.now() - timedelta(end_date_adjustment))
+        CourseEnrollment.enroll(self.user, self.course.id)
+        with override_waffle_flag(self.freeze_grade_flag, active=freeze_flag_value):
+            with patch('lms.djangoapps.grades.tasks.CourseGradeFactory') as mock_factory:
+                factory = mock_factory.return_value
+                kwargs = {
+                    'user_id': self.user.id,
+                    'course_key': six.text_type(self.course.id),
+                }
+
+                result = tasks.recalculate_course_and_subsection_grades_for_user.apply_async(kwargs=kwargs)
+                self._assert_for_freeze_grade_flag(
+                    result,
+                    freeze_flag_value,
+                    end_date_adjustment,
+                    mock_log,
+                    factory.read,
+                    'recalculate_course_and_subsection_grades_for_user'
+                )
+
+    @ddt.data(
+        *itertools.product(
+            (True, False),
+            (29, 31)
+        )
+    )
+    @ddt.unpack
+    @patch('lms.djangoapps.grades.tasks.log')
+    def test_recalculate_subsection_grade_v3(self, freeze_flag_value, end_date_adjustment, mock_log):
+        self.set_up_course(course_end=timezone.now() - timedelta(end_date_adjustment))
+        for user in self.users:
+            CourseEnrollment.enroll(user, self.course.id)
+
+        with override_waffle_flag(self.freeze_grade_flag, active=freeze_flag_value):
+            modified_datetime = datetime.utcnow().replace(tzinfo=pytz.UTC) - timedelta(days=1)
+            with patch('lms.djangoapps.grades.tasks._has_db_updated_with_new_score') as mock_has_db_updated:
+                result = recalculate_subsection_grade_v3.apply_async(kwargs=self.recalculate_subsection_grade_kwargs)
+                self._assert_for_freeze_grade_flag(
+                    result,
+                    freeze_flag_value,
+                    end_date_adjustment,
+                    mock_log,
+                    mock_has_db_updated,
+                    '_recalculate_subsection_grade'
+                )

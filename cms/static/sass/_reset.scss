@@ -3,7 +3,7 @@
 
 // not ready for this yet, but this should be done as things get cleaner
 // * {
-// 	@include box-sizing(border-box);
+// 	box-sizing: border-box;
 // }
 
 // better text rendering/kerning through SVG
@@ -92,8 +92,8 @@ video {
   padding: 0;
   border: 0;
   outline: 0;
-  font-size: 100%;
   font: inherit;
+  font-size: 100%;
   vertical-align: baseline;
 }
 

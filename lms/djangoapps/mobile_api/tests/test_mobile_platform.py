@@ -1,6 +1,8 @@
 """
 Tests for Platform against Mobile App Request
 """
+
+
 import ddt
 from django.test import TestCase
 
@@ -12,7 +14,6 @@ class TestMobilePlatform(TestCase):
     """
     Tests for platform against mobile app request
     """
-    shard = 4
 
     @ddt.data(
         ("edX/org.edx.mobile (0.1.5; OS Version 9.2 (Build 13C75))", "iOS", "0.1.5"),

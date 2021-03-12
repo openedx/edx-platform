@@ -82,7 +82,7 @@ class SiteAdminPermissionsTest(TestCase):
             sass_variables={},
             page_elements={},
         )
-        self.site_configuration.values['course_org_filter'] = self.organization.short_name
+        self.site_configuration.site_values['course_org_filter'] = self.organization.short_name
         self.callers = [
             UserFactory(username='alpha_nonadmin'),
             UserFactory(username='alpha_site_admin'),

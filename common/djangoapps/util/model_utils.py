@@ -1,10 +1,12 @@
 """
 Utilities for django models.
 """
+
+
+import six
 from django.conf import settings
 from django.dispatch import Signal
 from django_countries.fields import Country
-
 from eventtracking import tracker
 
 # The setting name used for events when "settings" (account settings, preferences, profile information) change.
@@ -40,7 +42,7 @@ def get_changed_fields_dict(instance, model_class):
     else:
         # We want to compare all of the scalar fields on the model, but none of
         # the relations.
-        field_names = [f.name for f in model_class._meta.get_fields() if not f.is_relation]     # pylint: disable=protected-access
+        field_names = [f.name for f in model_class._meta.get_fields() if not f.is_relation]
         changed_fields = {
             field_name: getattr(old_model, field_name) for field_name in field_names
             if getattr(old_model, field_name) != getattr(instance, field_name)
@@ -112,7 +114,7 @@ def truncate_fields(old_value, new_value):
     """
     # Compute the maximum value length so that two copies can fit into the maximum event size
     # in addition to all the other fields recorded.
-    max_value_length = settings.TRACK_MAX_EVENT / 4
+    max_value_length = settings.TRACK_MAX_EVENT // 4
 
     serialized_old_value, old_was_truncated = _get_truncated_setting_value(old_value, max_length=max_value_length)
     serialized_new_value, new_was_truncated = _get_truncated_setting_value(new_value, max_length=max_value_length)
@@ -162,7 +164,7 @@ def _get_truncated_setting_value(value, max_length=None):
         truncated_value (object): the possibly truncated version of the value.
         was_truncated (bool): returns true if the serialized value was truncated.
     """
-    if isinstance(value, basestring) and max_length is not None and len(value) > max_length:
+    if isinstance(value, six.string_types) and max_length is not None and len(value) > max_length:
         return value[0:max_length], True
     else:
         return value, False

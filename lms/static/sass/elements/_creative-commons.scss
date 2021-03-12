@@ -1,7 +1,8 @@
 @font-face {
   font-family: 'CreativeCommons';
   src: url('#{$static-path}/fonts/CreativeCommons/cc.eot');
-  src: url('#{$static-path}/fonts/CreativeCommons/cc.eot#iefix') format('embedded-opentype'),
+  src:
+    url('#{$static-path}/fonts/CreativeCommons/cc.eot#iefix') format('embedded-opentype'),
     url('#{$static-path}/fonts/CreativeCommons/cc.woff') format('woff'),
     url('#{$static-path}/fonts/CreativeCommons/cc.ttf') format('truetype'),
     url('#{$static-path}/fonts/CreativeCommons/cc.svg#CreativeCommons') format('svg');
@@ -9,7 +10,8 @@
   font-style: normal;
 }
 
-[class^="icon-cc"]::before, [class*=" icon-cc"]::before {
+[class^="icon-cc"]::before,
+[class*=" icon-cc"]::before {
   font-family: "CreativeCommons";
 }
 

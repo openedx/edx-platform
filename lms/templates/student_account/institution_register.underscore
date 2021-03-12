@@ -26,6 +26,6 @@
     </div>
 
     <div class="toggle-form">
-        <button class="nav-btn form-toggle" data-type="register"><%- gettext("Register through edX") %></button>
+        <button class="nav-btn form-toggle" data-type="register"><%- gettext("Create an Account") %></button>
     </div>
 </div>

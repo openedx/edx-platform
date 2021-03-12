@@ -1,4 +1,5 @@
 ## mako
+<%page expression_filter="h"/>
 <%namespace name='static' file='static_content.html'/>
 <%!
 from django.urls import reverse
@@ -9,6 +10,7 @@ from datetime import datetime
 import pytz
 
 from openedx.core.djangoapps.lang_pref.api import footer_language_selector_is_enabled
+from openedx.core.djangolib.markup import HTML, Text
 %>
 
 <div class="wrapper wrapper-footer">
@@ -67,10 +69,10 @@ from openedx.core.djangoapps.lang_pref.api import footer_language_selector_is_en
 
       ## Site operators: Please do not remove this paragraph! This attributes back to edX and makes your acknowledgement of edX's trademarks clear.
       <p class="copyright">
-        ## Translators: 'EdX', 'edX', and 'Open edX' are trademarks of 'edX Inc.'. Please do not translate any of these trademarks and company names.
-        ${_("EdX, Open edX, and the edX and Open edX logos are registered trademarks or trademarks of {link_start}edX Inc.{link_end}").format(
-            link_start=u"<a href='https://www.edx.org/'>",
-            link_end=u"</a>"
+        ## Translators: 'edX' and 'Open edX' are trademarks of 'edX Inc.'. Please do not translate any of these trademarks and company names.
+        ${Text(_("edX, Open edX, and the edX and Open edX logos are registered trademarks of {link_start}edX Inc.{link_end}")).format(
+            link_start=HTML(u"<a href='https://www.edx.org/'>"),
+            link_end=HTML(u"</a>")
         )}
       </p>
       <nav class="nav-legal" aria-label="${_('Legal')}">
@@ -78,16 +80,15 @@ from openedx.core.djangoapps.lang_pref.api import footer_language_selector_is_en
         % if marketing_link('HONOR') and marketing_link('HONOR') != '#':
           <li class="nav-legal-01">
             <%
-              tos_link = u"<a href='{}'>".format(marketing_link('TOS'))
-              honor_link = u"<a href='{}'>".format(marketing_link('HONOR'))
+              tos_link = HTML(u"<a href='{}'>").format(marketing_link('TOS'))
+              honor_link = HTML(u"<a href='{}'>").format(marketing_link('HONOR'))
             %>
             ${
-              _(
-                "{tos_link_start}Terms of Service{tos_link_end} and {honor_link_start}Honor Code{honor_link_end}").format(
+              Text(_("{tos_link_start}Terms of Service{tos_link_end} and {honor_link_start}Honor Code{honor_link_end}")).format(
                 tos_link_start=tos_link,
-                tos_link_end="</a>",
+                tos_link_end=HTML("</a>"),
                 honor_link_start=honor_link,
-                honor_link_end="</a>",
+                honor_link_end=HTML("</a>"),
               )
             }
           </li>

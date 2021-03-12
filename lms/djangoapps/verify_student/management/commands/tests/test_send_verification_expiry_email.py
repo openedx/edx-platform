@@ -2,24 +2,21 @@
 Tests for django admin command `send_verification_expiry_email` in the verify_student module
 """
 
-from __future__ import absolute_import
 
 from datetime import timedelta
 
-import boto
 from django.conf import settings
 from django.contrib.sites.models import Site
 from django.core import mail
 from django.core.management import call_command, CommandError
+from django.test import TestCase
 from django.test.utils import override_settings
 from django.utils.timezone import now
 from mock import patch
-from student.tests.factories import CourseEnrollmentFactory, UserFactory
+from student.tests.factories import UserFactory
 from testfixtures import LogCapture
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory
 
-from common.test.utils import MockS3Mixin, py2_only
+from common.test.utils import MockS3BotoMixin
 from lms.djangoapps.verify_student.models import SoftwareSecurePhotoVerification
 from lms.djangoapps.verify_student.tests.test_models import FAKE_SETTINGS, mock_software_secure_post
 
@@ -28,14 +25,12 @@ LOGGER_NAME = 'lms.djangoapps.verify_student.management.commands.send_verificati
 
 @patch.dict(settings.VERIFY_STUDENT, FAKE_SETTINGS)
 @patch('lms.djangoapps.verify_student.models.requests.post', new=mock_software_secure_post)
-class TestSendVerificationExpiryEmail(MockS3Mixin, ModuleStoreTestCase):
+class TestSendVerificationExpiryEmail(MockS3BotoMixin, TestCase):
     """ Tests for django admin command `send_verification_expiry_email` in the verify_student module """
 
     def setUp(self):
         """ Initial set up for tests """
         super(TestSendVerificationExpiryEmail, self).setUp()
-        connection = boto.connect_s3()
-        connection.create_bucket(FAKE_SETTINGS['SOFTWARE_SECURE']['S3_BUCKET'])
         Site.objects.create(domain='edx.org', name='edx.org')
         self.resend_days = settings.VERIFICATION_EXPIRY_EMAIL['RESEND_DAYS']
         self.days = settings.VERIFICATION_EXPIRY_EMAIL['DAYS_RANGE']
@@ -106,6 +101,8 @@ class TestSendVerificationExpiryEmail(MockS3Mixin, ModuleStoreTestCase):
         outdated_verification.status = 'approved'
         outdated_verification.save()
 
+        call_command('send_verification_expiry_email')
+
         # Check that the expiry_email_date is not set for the outdated verification
         expiry_email_date = SoftwareSecurePhotoVerification.objects.get(pk=outdated_verification.pk).expiry_email_date
         self.assertIsNone(expiry_email_date)
@@ -124,7 +121,7 @@ class TestSendVerificationExpiryEmail(MockS3Mixin, ModuleStoreTestCase):
 
         expected_date = now()
         attempt = SoftwareSecurePhotoVerification.objects.get(user_id=verification.user_id)
-        self.assertEquals(attempt.expiry_email_date.date(), expected_date.date())
+        self.assertEqual(attempt.expiry_email_date.date(), expected_date.date())
         self.assertEqual(len(mail.outbox), 1)
 
     def test_email_already_sent(self):
@@ -206,30 +203,6 @@ class TestSendVerificationExpiryEmail(MockS3Mixin, ModuleStoreTestCase):
         self.assertEqual(len(mail.outbox), 1)
         self.assertIsNone(attempt.expiry_email_date)
 
-    @py2_only
-    def test_user_enrolled_in_verified_course(self):
-        """
-        Test that if the user is enrolled in verified track, then after sending the default no of
-        emails, `expiry_email_date` is updated to now() so that it's filtered in the future to send
-        email again.
-
-        Does not work on python 3 with the latest mongo driver version due to class inheritance issues.
-        """
-        user = UserFactory.create()
-        course = CourseFactory()
-        CourseEnrollmentFactory.create(user=user, course_id=course.id, mode='verified')
-        today = now().replace(hour=0, minute=0, second=0, microsecond=0)
-        verification = self.create_and_submit(user)
-        verification.status = 'approved'
-        verification.expiry_date = now() - timedelta(days=self.resend_days * (self.default_no_of_emails - 1))
-        verification.expiry_email_date = today - timedelta(days=self.resend_days)
-        verification.save()
-
-        call_command('send_verification_expiry_email')
-
-        attempt = SoftwareSecurePhotoVerification.objects.get(pk=verification.id)
-        self.assertEqual(attempt.expiry_email_date, today)
-
     def test_number_of_emails_sent(self):
         """
         Tests that the number of emails sent in case the user is only enrolled in audit track are same
@@ -263,5 +236,34 @@ class TestSendVerificationExpiryEmail(MockS3Mixin, ModuleStoreTestCase):
     def test_command_error(self):
         err_string = u"DEFAULT_EMAILS must be a positive integer. If you do not wish to send " \
                      u"emails use --dry-run flag instead."
-        with self.assertRaisesRegexp(CommandError, err_string):
+        with self.assertRaisesRegex(CommandError, err_string):
             call_command('send_verification_expiry_email')
+
+    def test_one_failed_but_others_succeeded(self):
+        """
+        Test that if the first verification fails to send, the rest still do.
+        """
+        verifications = []
+        for _i in range(2):
+            user = UserFactory.create()
+            verification = self.create_and_submit(user)
+            verification.status = 'approved'
+            verification.expiry_date = now() - timedelta(days=self.days)
+            verification.save()
+            verifications.append(verification)
+
+        with patch('lms.djangoapps.verify_student.management.commands.send_verification_expiry_email.ace') as mock_ace:
+            mock_ace.send.side_effect = (Exception('Aw shucks'), None)
+            with self.assertRaisesRegex(CommandError, 'One or more email attempts failed.*'):
+                with LogCapture(LOGGER_NAME) as logger:
+                    call_command('send_verification_expiry_email')
+
+        logger.check_present(
+            (LOGGER_NAME, 'ERROR', 'Could not send email for verification id {}'.format(verifications[0].id)),
+        )
+
+        for verification in verifications:
+            verification.refresh_from_db()
+        self.assertIsNone(verifications[0].expiry_email_date)
+        self.assertIsNotNone(verifications[1].expiry_email_date)
+        self.assertEqual(mock_ace.send.call_count, 2)

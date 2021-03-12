@@ -5,10 +5,10 @@
 # Python functions which duplicate the standard comparison functions available to LON-CAPA problems.
 # Used in translating LON-CAPA problems to i4x problem specification language.
 
-from __future__ import division
 
 import math
 import random
+from six.moves import range
 
 
 def lc_random(lower, upper, stepsize):
@@ -26,7 +26,7 @@ def lc_choose(index, *args):
     '''
     try:
         return args[int(index) - 1]
-    except Exception, err:
+    except Exception as err:
         pass
     if len(args):
         return args[0]

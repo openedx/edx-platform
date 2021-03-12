@@ -2,12 +2,16 @@
 This module provides an abstraction for Module Stores that support Draft and Published branches.
 """
 
-import threading
+
 import logging
+import threading
 from abc import ABCMeta, abstractmethod
 from contextlib import contextmanager
+
+import six
 from six import text_type
-from . import ModuleStoreEnum, BulkOperationsMixin
+
+from . import BulkOperationsMixin, ModuleStoreEnum
 from .exceptions import ItemNotFoundError
 
 # Things w/ these categories should never be marked as version=DRAFT
@@ -67,12 +71,11 @@ class BranchSettingMixin(object):
             return self.default_branch_setting_func()
 
 
-class ModuleStoreDraftAndPublished(BranchSettingMixin, BulkOperationsMixin):
+class ModuleStoreDraftAndPublished(six.with_metaclass(ABCMeta, BranchSettingMixin, BulkOperationsMixin)):
     """
     A mixin for a read-write database backend that supports two branches, Draft and Published, with
     options to prefer Draft and fallback to Published.
     """
-    __metaclass__ = ABCMeta
 
     @abstractmethod
     def delete_item(self, location, user_id, revision=None, **kwargs):
@@ -167,8 +170,8 @@ class ModuleStoreDraftAndPublished(BranchSettingMixin, BulkOperationsMixin):
             self.update_item(old_parent_item, user_id)  # pylint: disable=no-member
             log.info(
                 '%s removed from %s children',
-                unicode(source_item.location),
-                unicode(old_parent_item.location)
+                text_type(source_item.location),
+                text_type(old_parent_item.location)
             )
 
         # Add item to new parent at particular location.
@@ -180,8 +183,8 @@ class ModuleStoreDraftAndPublished(BranchSettingMixin, BulkOperationsMixin):
             self.update_item(new_parent_item, user_id)  # pylint: disable=no-member
             log.info(
                 '%s added to %s children',
-                unicode(source_item.location),
-                unicode(new_parent_item.location)
+                text_type(source_item.location),
+                text_type(new_parent_item.location)
             )
 
         # Update parent attribute of the item block
@@ -189,8 +192,8 @@ class ModuleStoreDraftAndPublished(BranchSettingMixin, BulkOperationsMixin):
         self.update_item(source_item, user_id)  # pylint: disable=no-member
         log.info(
             '%s parent updated to %s',
-            unicode(source_item.location),
-            unicode(new_parent_item.location)
+            text_type(source_item.location),
+            text_type(new_parent_item.location)
         )
         return source_item.location
 

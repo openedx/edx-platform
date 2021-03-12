@@ -1,10 +1,17 @@
-import urllib
+"""
+Tests for experimentation views
+"""
+
+
 import unittest
 
+import six.moves.urllib.error
+import six.moves.urllib.parse
+import six.moves.urllib.request
 from django.conf import settings
 from django.core.handlers.wsgi import WSGIRequest
-from django.urls import reverse
 from django.test.utils import override_settings
+from django.urls import reverse
 from mock import patch
 from rest_framework.test import APITestCase
 
@@ -13,12 +20,10 @@ from experiments.models import ExperimentData, ExperimentKeyValue
 from experiments.serializers import ExperimentDataSerializer
 from student.tests.factories import UserFactory
 
-
 CROSS_DOMAIN_REFERER = 'https://ecommerce.edx.org'
 
 
 class ExperimentDataViewSetTests(APITestCase):
-    shard = 4
 
     def assert_data_created_for_user(self, user, method='post', status=201):
         url = reverse('api_experiments:v0:data-list')
@@ -64,18 +69,18 @@ class ExperimentDataViewSetTests(APITestCase):
         ExperimentDataFactory(user=user)
         data = ExperimentDataFactory.create_batch(3, user=user, experiment_id=experiment_id)
 
-        qs = urllib.urlencode({'experiment_id': experiment_id})
+        qs = six.moves.urllib.parse.urlencode({'experiment_id': experiment_id})
         response = self.client.get('{url}?{qs}'.format(url=url, qs=qs))
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data['results'], ExperimentDataSerializer(data, many=True).data)
 
         datum = data[0]
-        qs = urllib.urlencode({'key': datum.key})
+        qs = six.moves.urllib.parse.urlencode({'key': datum.key})
         response = self.client.get('{url}?{qs}'.format(url=url, qs=qs))
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data['results'], ExperimentDataSerializer([datum], many=True).data)
 
-        qs = urllib.urlencode({'experiment_id': experiment_id, 'key': datum.key})
+        qs = six.moves.urllib.parse.urlencode({'experiment_id': experiment_id, 'key': datum.key})
         response = self.client.get('{url}?{qs}'.format(url=url, qs=qs))
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data['results'], ExperimentDataSerializer([datum], many=True).data)
@@ -159,65 +164,6 @@ class ExperimentDataViewSetTests(APITestCase):
         self.client.login(username=other_user.username, password=UserFactory._DEFAULT_PASSWORD)
         response = self.client.patch(url, data)
         self.assertEqual(response.status_code, 404)
-
-    def test_bulk_upsert_permissions(self):
-        """ Only staff users can access the bulk upsert endpoint. """
-        url = reverse('api_experiments:v0:data-bulk-upsert')
-        data = []
-
-        # Authentication is required
-        response = self.client.put(url, data, format='json')
-        self.assertEqual(response.status_code, 401)
-
-        user = UserFactory()
-        self.client.login(username=user.username, password=UserFactory._DEFAULT_PASSWORD)
-
-        # No access to non-staff users
-        response = self.client.put(url, data, format='json')
-        self.assertEqual(response.status_code, 403)
-
-        user.is_staff = True
-        user.save()
-        response = self.client.put(url, data, format='json')
-        self.assertEqual(response.status_code, 200)
-
-    def test_bulk_upsert(self):
-        """ The endpoint should support creating/updating multiple ExperimentData objects with a single call. """
-        url = reverse('api_experiments:v0:data-bulk-upsert')
-        experiment_id = 1
-        user = UserFactory(is_staff=True)
-        other_user = UserFactory()
-        self.client.login(username=user.username, password=UserFactory._DEFAULT_PASSWORD)
-
-        data = [
-            {
-                'experiment_id': experiment_id,
-                'key': 'foo',
-                'value': 'bar',
-                'user': user.username,
-            },
-            {
-                'experiment_id': experiment_id,
-                'key': 'foo',
-                'value': 'bar',
-                'user': other_user.username,
-            },
-        ]
-        response = self.client.put(url, data, format='json')
-        self.assertEqual(response.status_code, 200)
-        kwargs = {
-            'experiment_id': experiment_id,
-            'key': 'foo',
-            'value': 'bar',
-        }
-        ExperimentData.objects.get(user=user, **kwargs)
-        ExperimentData.objects.get(user=other_user, **kwargs)
-
-        # Subsequent calls should update the existing data rather than create more
-        response = self.client.put(url, data, format='json')
-        self.assertEqual(response.status_code, 200)
-        ExperimentData.objects.get(user=user, **kwargs)
-        ExperimentData.objects.get(user=other_user, **kwargs)
 
 
 def cross_domain_config(func):
@@ -314,7 +260,6 @@ class ExperimentCrossDomainTests(APITestCase):
 
 
 class ExperimentKeyValueViewSetTests(APITestCase):
-    shard = 4
 
     def test_permissions(self):
         """ Staff access is required for write operations. """
@@ -343,54 +288,3 @@ class ExperimentKeyValueViewSetTests(APITestCase):
 
         response = self.client.delete(url)
         self.assertEqual(response.status_code, 403)
-
-    def test_bulk_upsert_permissions(self):
-        """ Non-staff users should not be allowed to access the endpoint.  """
-        data = []
-        url = reverse('api_experiments:v0:key_value-bulk-upsert')
-        user = UserFactory(is_staff=False)
-
-        # Authentication required
-        response = self.client.put(url, data, format='json')
-        self.assertEqual(response.status_code, 401)
-
-        # Staff permission required
-        self.client.login(username=user.username, password=UserFactory._DEFAULT_PASSWORD)
-        response = self.client.put(url, data, format='json')
-        self.assertEqual(response.status_code, 403)
-
-    def test_bulk_upsert(self):
-        """ The endpoint should support creating/updating multiple ExperimentData objects with a single call. """
-        url = reverse('api_experiments:v0:key_value-bulk-upsert')
-        experiment_id = 1
-        user = UserFactory(is_staff=True)
-        data = [
-            {
-                'experiment_id': experiment_id,
-                'key': 'foo',
-                'value': 'bar',
-            },
-            {
-                'experiment_id': experiment_id,
-                'key': 'foo1',
-                'value': 'bar',
-            },
-        ]
-
-        self.client.login(username=user.username, password=UserFactory._DEFAULT_PASSWORD)
-
-        # New data should be created
-        response = self.client.put(url, data, format='json')
-        self.assertEqual(response.status_code, 200)
-        kwargs = {
-            'experiment_id': experiment_id,
-            'value': 'bar',
-        }
-        ExperimentKeyValue.objects.get(key='foo', **kwargs)
-        ExperimentKeyValue.objects.get(key='foo1', **kwargs)
-
-        # Subsequent calls should update the existing data rather than create more
-        response = self.client.put(url, data, format='json')
-        self.assertEqual(response.status_code, 200)
-        ExperimentKeyValue.objects.get(key='foo', **kwargs)
-        ExperimentKeyValue.objects.get(key='foo1', **kwargs)

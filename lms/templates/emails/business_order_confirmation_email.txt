@@ -1,3 +1,4 @@
+## mako
 <%! from django.utils.translation import ugettext as _ %>
 <p>
 ${_("Hi {name},").format(name=recipient_name)}

@@ -9,23 +9,23 @@ from django.conf import settings
 
 def get_css_dependencies(group):
     """
-    Returns list of CSS dependencies belonging to `group` in settings.PIPELINE_JS.
+    Returns list of CSS dependencies belonging to `group` in settings.PIPELINE['STYLESHEETS'].
 
-    Respects `PIPELINE_ENABLED` setting.
+    Respects `PIPELINE['PIPELINE_ENABLED']` setting.
     """
-    if settings.PIPELINE_ENABLED:
-        return [settings.PIPELINE_CSS[group]['output_filename']]
+    if settings.PIPELINE['PIPELINE_ENABLED']:
+        return [settings.PIPELINE['STYLESHEETS'][group]['output_filename']]
     else:
-        return settings.PIPELINE_CSS[group]['source_filenames']
+        return settings.PIPELINE['STYLESHEETS'][group]['source_filenames']
 
 
 def get_js_dependencies(group):
     """
-    Returns list of JS dependencies belonging to `group` in settings.PIPELINE_JS.
+    Returns list of JS dependencies belonging to `group` in settings.PIPELINE['JAVASCRIPT'].
 
-    Respects `PIPELINE_ENABLED` setting.
+    Respects `PIPELINE['PIPELINE_ENABLED']` setting.
     """
-    if settings.PIPELINE_ENABLED:
-        return [settings.PIPELINE_JS[group]['output_filename']]
+    if settings.PIPELINE['PIPELINE_ENABLED']:
+        return [settings.PIPELINE['JAVASCRIPT'][group]['output_filename']]
     else:
-        return settings.PIPELINE_JS[group]['source_filenames']
+        return settings.PIPELINE['JAVASCRIPT'][group]['source_filenames']

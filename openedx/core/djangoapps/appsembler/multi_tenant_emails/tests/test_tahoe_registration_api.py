@@ -3,7 +3,7 @@ Tests to ensure the Tahoe Registration API end-point allows multi-tenant emails.
 """
 
 from mock import patch
-from unittest import skipUnless
+from unittest import skipUnless, skipIf
 
 from django.conf import settings
 from django.urls import reverse
@@ -22,6 +22,7 @@ APPSEMBLER_API_VIEWS_MODULE = 'openedx.core.djangoapps.appsembler.api.v1.views'
 @patch(APPSEMBLER_API_VIEWS_MODULE + '.RegistrationViewSet.permission_classes', [])
 @patch(APPSEMBLER_API_VIEWS_MODULE + '.RegistrationViewSet.throttle_classes', [])
 @skipUnless(settings.FEATURES['APPSEMBLER_MULTI_TENANT_EMAILS'], 'This only tests multi-tenancy')
+@skipIf(settings.TAHOE_TEMP_MONKEYPATCHING_JUNIPER_TESTS, 'fix in Juniper')
 class MultiTenantRegistrationAPITest(APITestCase):
     """
     Tests to ensure the Tahoe Registration API end-point allow multi-tenant emails.

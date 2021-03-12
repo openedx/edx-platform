@@ -1,11 +1,14 @@
 """
 Certificate service
 """
+
+
 import logging
 
 from django.core.exceptions import ObjectDoesNotExist
-from lms.djangoapps.utils import _get_key
 from opaque_keys.edx.keys import CourseKey
+
+from lms.djangoapps.utils import _get_key
 
 from .models import GeneratedCertificate
 

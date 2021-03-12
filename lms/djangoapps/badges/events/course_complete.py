@@ -1,8 +1,12 @@
 """
 Helper functions for the course complete event that was originally included with the Badging MVP.
 """
+
+
 import hashlib
 import logging
+
+import six
 
 from django.urls import reverse
 from django.utils.text import slugify
@@ -11,6 +15,7 @@ from django.utils.translation import ugettext_lazy as _
 from badges.models import BadgeAssertion, BadgeClass, CourseCompleteImageConfiguration
 from badges.utils import requires_badges_enabled, site_prefix
 from xmodule.modulestore.django import modulestore
+
 
 LOGGER = logging.getLogger(__name__)
 
@@ -29,8 +34,10 @@ def course_slug(course_key, mode):
     Badgr's max slug length is 255.
     """
     # Seven digits should be enough to realistically avoid collisions. That's what git services use.
-    digest = hashlib.sha256(u"{}{}".format(unicode(course_key), unicode(mode))).hexdigest()[:7]
-    base_slug = slugify(unicode(course_key) + u'_{}_'.format(mode))[:248]
+    digest = hashlib.sha256(
+        u"{}{}".format(six.text_type(course_key), six.text_type(mode)).encode('utf-8')
+    ).hexdigest()[:7]
+    base_slug = slugify(six.text_type(course_key) + u'_{}_'.format(mode))[:248]
     return base_slug + digest
 
 
@@ -57,15 +64,19 @@ def evidence_url(user_id, course_key):
     Generates a URL to the user's Certificate HTML view, along with a GET variable that will signal the evidence visit
     event.
     """
+    course_id = six.text_type(course_key)
+    # avoid circular import problems
+    from lms.djangoapps.certificates.models import GeneratedCertificate
+    cert = GeneratedCertificate.eligible_certificates.get(user__id=int(user_id), course_id=course_id)
     return site_prefix() + reverse(
-        'certificates:html_view', kwargs={'user_id': user_id, 'course_id': unicode(course_key)}) + '?evidence_visit=1'
+        'certificates:render_cert_by_uuid', kwargs={'certificate_uuid': cert.verify_uuid}) + '?evidence_visit=1'
 
 
 def criteria(course_key):
     """
     Constructs the 'criteria' URL from the course about page.
     """
-    about_path = reverse('about_course', kwargs={'course_id': unicode(course_key)})
+    about_path = reverse('about_course', kwargs={'course_id': six.text_type(course_key)})
     return u'{}{}'.format(site_prefix(), about_path)
 
 

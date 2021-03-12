@@ -1,12 +1,13 @@
 """Tests for embargo app views. """
 
+
 import ddt
-import mock
-import pygeoip
+import maxminddb
+import geoip2.database
 
 from django.urls import reverse
 from django.conf import settings
-from mock import patch
+from mock import patch, MagicMock
 
 from .factories import CountryAccessRuleFactory, RestrictedCourseFactory
 from .. import messages
@@ -47,11 +48,11 @@ class CourseAccessMessageViewTest(CacheIsolationTestCase, UrlResetMixin):
     def setUp(self):
         super(CourseAccessMessageViewTest, self).setUp()
 
-    @ddt.data(*messages.ENROLL_MESSAGES.keys())
+    @ddt.data(*list(messages.ENROLL_MESSAGES.keys()))
     def test_enrollment_messages(self, msg_key):
         self._load_page('enrollment', msg_key)
 
-    @ddt.data(*messages.COURSEWARE_MESSAGES.keys())
+    @ddt.data(*list(messages.COURSEWARE_MESSAGES.keys()))
     def test_courseware_messages(self, msg_key):
         self._load_page('courseware', msg_key)
 
@@ -124,9 +125,29 @@ class CheckCourseAccessViewTest(CourseApiFactoryMixin, ModuleStoreTestCase):
         self.user.is_staff = False
         self.user.save()
         # Appear to make a request from an IP in the blocked country
-        with mock.patch.object(pygeoip.GeoIP, 'country_code_by_addr') as mock_ip:
-            mock_ip.return_value = 'US'
-            response = self.client.get(self.url, data=self.request_data)
+
+        # pylint: disable=unused-argument
+        def mock_country(reader, country):
+            """
+            :param reader:
+            :param country:
+            :return:
+            """
+            magic_mock = MagicMock()
+            magic_mock.country = MagicMock()
+            type(magic_mock.country).iso_code = 'US'
+
+            return magic_mock
+
+        patcher = patch.object(maxminddb, 'open_database')
+        patcher.start()
+        country_patcher = patch.object(geoip2.database.Reader, 'country', mock_country)
+        country_patcher.start()
+        self.addCleanup(patcher.stop)
+        self.addCleanup(country_patcher.stop)
+
+        response = self.client.get(self.url, data=self.request_data)
+
         expected_response = {'access': False}
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data, expected_response)

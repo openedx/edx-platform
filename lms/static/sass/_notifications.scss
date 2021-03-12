@@ -23,11 +23,11 @@
 }
 
 .site-status {
-  @include linear-gradient(top, $shadow-l1, rgba(0, 0, 0, .0));
+  @include linear-gradient(top, $shadow-l1, rgba(0, 0, 0, 0));
 
   padding: ($baseline / 2);
   background-color: $site-status-color;
-  box-shadow: 0 -1px 0 rgba(0, 0, 0, .3) inset;
+  box-shadow: 0 -1px 0 rgba(0, 0, 0, 0.3) inset;
   font-size: 14px;
 
   .icon {

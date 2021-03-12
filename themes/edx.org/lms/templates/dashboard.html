@@ -5,7 +5,8 @@
 <%!
 import json
 import pytz
-from courseware.context_processor import user_timezone_locale_prefs
+import six
+from lms.djangoapps.courseware.context_processor import user_timezone_locale_prefs
 from datetime import datetime, timedelta
 from django.utils import timezone
 from django.utils.translation import ugettext as _
@@ -18,9 +19,6 @@ from openedx.core.djangoapps.content.course_overviews.models import CourseOvervi
 from openedx.core.djangoapps.theming import helpers as theming_helpers
 from openedx.core.djangolib.js_utils import dump_js_escaped_json, js_escaped_string
 from openedx.core.djangolib.markup import HTML, Text
-
-from openedx.features.learner_analytics import INCLUDE_UPSELL_MODAL
-from openedx.features.portfolio_project import INCLUDE_PORTFOLIO_UPSELL_MODAL
 
 from entitlements.models import CourseEntitlement
 from student.models import CourseEnrollment
@@ -91,6 +89,20 @@ from student.models import CourseEnrollment
         banner.showMessage(${redirect_message | n, dump_js_escaped_json})
     </%static:require_module>
   % endif
+  % if recovery_email_message:
+      <%static:require_module module_name="js/views/message_banner" class_name="MessageBannerView">
+        var banner = new MessageBannerView({urgency: 'low', type: 'warning', hideCloseBtn: false, isRecoveryEmailMsg: true});
+        $('#content').prepend(banner.$el);
+        banner.showMessage(${recovery_email_message | n, dump_js_escaped_json})
+      </%static:require_module>
+  % endif
+  % if recovery_email_activation_message:
+      <%static:require_module module_name="js/views/message_banner" class_name="MessageBannerView">
+        var banner = new MessageBannerView({urgency: 'low', type: 'warning', isRecoveryEmailMsg: true});
+        $('#content').prepend(banner.$el);
+        banner.showMessage(${recovery_email_activation_message | n, dump_js_escaped_json})
+      </%static:require_module>
+  % endif
 </%block>
 
 <div class="dashboard-notifications" tabindex="-1">
@@ -124,26 +136,10 @@ from student.models import CourseEnrollment
         % endfor
       </div>
     %endif
-
 </div>
 
 <section class="dashboard" id="dashboard-main">
 <main class="main-container" id="main" aria-label="Content" tabindex="-1">
-  % if INCLUDE_UPSELL_MODAL.is_enabled():
-      ${static.renderReact(
-        component="UpsellExperimentModal",
-        id="upsell-modal",
-        props={},
-      )}
-  % endif
-
-  % if INCLUDE_PORTFOLIO_UPSELL_MODAL.is_enabled():
-    ${static.renderReact(
-      component="PortfolioExperimentUpsellModal",
-      id="portfolio-experiment-upsell-modal",
-      props={},
-    )}
-  % endif
   <section class="my-courses" id="my-courses">
     <header class="wrapper-header-courses">
       <h2 class="header-courses">${_("My Courses")}</h2>
@@ -183,14 +179,17 @@ from student.models import CourseEnrollment
                 pseudo_session = unfulfilled_entitlement_pseudo_sessions[str(entitlement.uuid)]
                 if not pseudo_session:
                     continue
-                enrollment = CourseEnrollment(user=user, course_id=pseudo_session['key'], mode=pseudo_session['type'])
+                pseudo_key = pseudo_session['key']
+                if not isinstance(pseudo_key, CourseKey):
+                  pseudo_key = CourseKey.from_string(pseudo_session['key'])
+                enrollment = CourseEnrollment(user=user, course=CourseOverview.get_from_id(pseudo_key), mode=pseudo_session['type'])
               # We only show email settings for entitlement cards if the entitlement has an associated enrollment
               show_email_settings = is_fulfilled_entitlement and (entitlement_session.course_id in show_email_settings_for)
             else:
               show_email_settings = (enrollment.course_id in show_email_settings_for)
 
             session_id = enrollment.course_id
-            show_courseware_link = (session_id in show_courseware_links_for)
+            show_courseware_link = show_courseware_links_for.get(session_id, False)
             cert_status = cert_statuses.get(session_id)
             can_refund_entitlement = entitlement and entitlement.is_entitlement_refundable()
             can_unenroll = (not cert_status) or cert_status.get('can_unenroll') if not unfulfilled_entitlement else False
@@ -200,13 +199,20 @@ from student.models import CourseEnrollment
             is_course_blocked = (session_id in block_courses)
             course_verification_status = verification_status_by_course.get(session_id, {})
             course_requirements = courses_requirements_not_met.get(session_id)
-            related_programs = inverted_programs.get(unicode(entitlement.course_uuid if is_unfulfilled_entitlement else session_id))
+            related_programs = inverted_programs.get(six.text_type(entitlement.course_uuid if is_unfulfilled_entitlement else session_id))
             show_consent_link = (session_id in consent_required_courses)
             course_overview = enrollment.course_overview
             resume_button_url = resume_button_urls[dashboard_index]
           %>
           <%include file='dashboard/_dashboard_course_listing.html' args='course_overview=course_overview, course_card_index=dashboard_index, enrollment=enrollment, is_unfulfilled_entitlement=is_unfulfilled_entitlement, is_fulfilled_entitlement=is_fulfilled_entitlement, entitlement=entitlement, entitlement_session=entitlement_session, entitlement_available_sessions=entitlement_available_sessions, entitlement_expiration_date=entitlement_expiration_date, entitlement_expired_at=entitlement_expired_at, show_courseware_link=show_courseware_link, cert_status=cert_status, can_refund_entitlement=can_refund_entitlement, can_unenroll=can_unenroll, credit_status=credit_status, show_email_settings=show_email_settings, course_mode_info=course_mode_info, is_paid_course=is_paid_course, is_course_blocked=is_course_blocked, verification_status=course_verification_status, course_requirements=course_requirements, dashboard_index=dashboard_index, share_settings=share_settings, user=user, related_programs=related_programs, display_course_modes_on_dashboard=display_course_modes_on_dashboard, show_consent_link=show_consent_link, enterprise_customer_name=enterprise_customer_name, resume_button_url=resume_button_url' />
         % endfor
+        % if show_load_all_courses_link:
+                <br/>
+                 ${len(course_enrollments)} ${_("results successfully populated,")}
+                 <a href="${reverse('dashboard')}?course_limit=None">
+                     ${_("Click to load all enrolled courses")}
+                </a>
+            % endif
         </ul>
     % else:
       <section class="empty-dashboard-message">
@@ -269,7 +275,7 @@ from student.models import CourseEnrollment
               <div class="advertise-message">
                   ${_("Browse recently launched courses and see what's new in your favorite subjects.")}
               </div>
-              <div class="ad-link">
+              <div class="marketing-link">
                   <a class="btn-neutral" href="${marketing_link('COURSES')}">
                       <span class="icon fa fa-search" aria-hidden="true"></span>
                       ${_("Explore New Courses")}
@@ -279,6 +285,22 @@ from student.models import CourseEnrollment
       </div>
   % endif
 
+  <% account_mfe_url = getattr(settings, 'ACCOUNT_MICROFRONTEND_URL', '') or '' %>
+  % if plugins.get("coaching", {}).get("show_coaching_aside"):
+    <div class="wrapper-coaching">
+        <div class="coaching-signup">
+            <div class="coaching-prompt">
+                ${_("Take advantage of free coaching!")}
+            </div>
+            <div class="coaching-link">
+                <a class="btn-neutral" href="${account_mfe_url}">
+                  ${_("Get Started")}
+                </a>
+            </div>
+        </div>
+    </div>
+  % endif
+
   % if display_sidebar_on_dashboard:
     <section class="profile-sidebar" id="profile-sidebar" role="region" aria-label="Account Status Info">
       <header class="profile">
@@ -286,15 +308,6 @@ from student.models import CourseEnrollment
       </header>
       <section class="user-info">
         <ul>
-
-          % if len(order_history_list):
-          <li class="order-history">
-            <span class="title">${_("Order History")}</span>
-            % for order_history_item in order_history_list:
-              <span><a href="${order_history_item['receipt_url']}" target="_blank" class="edit-name">${order_history_item['order_date']}</a></span>
-            % endfor
-          </li>
-          % endif
 
           <%include file="${theming_helpers.get_template_path('dashboard/_dashboard_status_verification.html')}" />
 
@@ -370,3 +383,4 @@ from student.models import CourseEnrollment
 </section>
 
 <%include file="dashboard/_dashboard_entitlement_unenrollment_modal.html"/>
+<%include file="/experiments/dashboard_metadata.html" args='course_info=course_info'/>

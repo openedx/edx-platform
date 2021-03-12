@@ -19,12 +19,6 @@
 // --------------------
 
 .forum-nav {
-
-  // wrapper for multiple alerts
-  .search-alerts {
-
-  }
-
   // a single alert, which can be independently displayed / dismissed
   .search-alert {
     @include transition(none);
@@ -33,7 +27,8 @@
     background-color: $black;
   }
 
-  .search-alert-content, .search-alert-controls {
+  .search-alert-content,
+  .search-alert-controls {
     display: inline-block;
     vertical-align: middle;
   }
@@ -78,7 +73,8 @@
       font-size: $forum-base-font-size;
 
       // reseting poorly globally scoped hover/focus state for this control
-      &:hover, &:focus {
+      &:hover,
+      &:focus {
         color: $white;
         text-decoration: none;
       }

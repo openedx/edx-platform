@@ -2,8 +2,10 @@
 Course API forms
 """
 
+
 from collections import namedtuple
 
+import six
 from django.core.exceptions import ValidationError
 from django.forms import CharField, Form
 from opaque_keys import InvalidKeyError
@@ -41,7 +43,7 @@ class CourseDetailGetForm(UsernameValidatorMixin, Form):
         try:
             return CourseKey.from_string(course_key_string)
         except InvalidKeyError:
-            raise ValidationError("'{}' is not a valid course key.".format(unicode(course_key_string)))
+            raise ValidationError(u"'{}' is not a valid course key.".format(six.text_type(course_key_string)))
 
 
 class CourseListGetForm(UsernameValidatorMixin, Form):
@@ -73,3 +75,11 @@ class CourseListGetForm(UsernameValidatorMixin, Form):
         cleaned_data['filter_'] = filter_ or None
 
         return cleaned_data
+
+
+class CourseIdListGetForm(UsernameValidatorMixin, Form):
+    """
+    A form to validate query parameters in the course list retrieval endpoint
+    """
+    username = CharField(required=False)
+    role = CharField(required=True)

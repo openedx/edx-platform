@@ -1,7 +1,7 @@
 """Provides management command calling info to tracking context."""
 
-from django.core.management.base import BaseCommand
 
+from django.core.management.base import BaseCommand
 from eventtracking import tracker
 
 
