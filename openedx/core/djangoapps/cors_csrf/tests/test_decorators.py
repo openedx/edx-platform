@@ -2,7 +2,7 @@
 
 
 import json
-import mock
+from unittest import mock
 from django.http import HttpResponse
 from django.test import TestCase
 
