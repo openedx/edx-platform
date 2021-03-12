@@ -60,13 +60,6 @@ class CoursewareTab(EnrolledTab):
         tab_dict['link_func'] = link_func
         super().__init__(tab_dict)
 
-    @classmethod
-    def is_enabled(cls, course, user=None):  # pylint: disable=unused-argument
-        """
-        Returns true if this tab is enabled.
-        """
-        return True
-
 
 class SyllabusTab(EnrolledTab):
     """

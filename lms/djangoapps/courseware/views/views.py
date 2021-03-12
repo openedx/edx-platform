@@ -112,7 +112,6 @@ from openedx.core.djangolib.markup import HTML, Text
 from openedx.core.lib.mobile_utils import is_request_from_mobile_app
 from openedx.features.content_type_gating.models import ContentTypeGatingConfig
 from openedx.features.course_duration_limits.access import generate_course_expired_fragment
-from openedx.features.course_experience import course_home_url_name
 from openedx.features.course_experience.course_tools import CourseToolsPluginManager
 from openedx.features.course_experience.url_helpers import get_legacy_courseware_url
 from openedx.features.course_experience.utils import dates_banner_should_display
@@ -736,7 +735,7 @@ def course_about(request, course_id):
 
     # If user needs to be redirected to course home then redirect
     if _course_home_redirect_enabled():
-        return redirect(reverse(course_home_url_name(course_key), args=[str(course_key)]))
+        return redirect(reverse('openedx.course_experience.course_home', args=[str(course_key)]))
 
     with modulestore().bulk_operations(course_key):
         permission = get_permission_for_course_about()
@@ -749,7 +748,8 @@ def course_about(request, course_id):
         studio_url = get_studio_url(course, 'settings/details')
 
         if request.user.has_perm(VIEW_COURSE_HOME, course):
-            course_target = reverse(course_home_url_name(course.id), args=[str(course.id)])
+            course_target = reverse('openedx.course_experience.course_home', args=[str(course.id)])
+
         else:
             course_target = reverse('about_course', args=[str(course.id)])
 
@@ -1366,7 +1366,7 @@ def course_survey(request, course_id):
     course_key = CourseKey.from_string(course_id)
     course = get_course_with_access(request.user, 'load', course_key, check_survey_complete=False)
 
-    redirect_url = reverse(course_home_url_name(course.id), args=[course_id])
+    redirect_url = reverse('openedx.course_experience.course_home', args=[course_id])
 
     # if there is no Survey associated with this course,
     # then redirect to the course instead

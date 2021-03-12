@@ -113,18 +113,6 @@ def default_course_url_name(course_id):
     return 'openedx.course_experience.course_home'
 
 
-def course_home_url_name(course_key):  # pylint: disable=unused-argument
-    """
-    Returns the course home page's URL name for the current user.
-
-    Arguments:
-        course_key (CourseKey): The course key for which the home url is being
-            requested.
-
-    """
-    return 'openedx.course_experience.course_home'
-
-
 class CourseHomeMessages(UserMessageCollection):
     """
     This set of messages appear above the outline on the course home page.
