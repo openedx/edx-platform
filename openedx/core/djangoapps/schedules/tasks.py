@@ -277,7 +277,7 @@ def _schedule_send(msg_str, site_id, delivery_config_var, log_prefix):  # lint-a
     if _is_delivery_enabled(site, delivery_config_var, log_prefix):
         msg = Message.from_string(msg_str)
 
-        user = User.objects.get(username=msg.recipient.username)
+        user = User.objects.get(id=msg.recipient.lms_user_id)
         with emulate_http_request(site=site, user=user):
             _annonate_send_task_for_monitoring(msg)
             LOG.debug(u'%s: Sending message = %s', log_prefix, msg_str)

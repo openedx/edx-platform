@@ -456,7 +456,7 @@ class DeactivateLogoutView(APIView):
                         default=settings.LANGUAGE_CODE
                     )
                     notification = DeletionNotificationMessage().personalize(
-                        recipient=Recipient(username='', email_address=user_email),
+                        recipient=Recipient(lms_user_id=0, email_address=user_email),
                         language=language_code,
                         user_context=notification_context,
                     )

@@ -494,7 +494,7 @@ def send_mail_to_student(student, param_dict, language=None):
 
     message_class = ace_emails_dict[message_type]
     message = message_class().personalize(
-        recipient=Recipient(username='', email_address=student),
+        recipient=Recipient(lms_user_id=0, email_address=student),
         language=language,
         user_context=param_dict,
     )

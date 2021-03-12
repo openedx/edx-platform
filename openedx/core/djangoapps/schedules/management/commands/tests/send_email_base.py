@@ -272,7 +272,7 @@ class ScheduleSendEmailTestMixin(FilteredQueryCountMixin):  # lint-amnesty, pyli
         }
         self._update_schedule_config(schedule_config_kwargs)
 
-        mock_message.from_string.return_value.recipient.username = user.username
+        mock_message.from_string.return_value.recipient.lms_user_id = user.id
         mock_msg = Mock()
         self.deliver_task(self.site_config.site.id, mock_msg)
         if is_enabled:

@@ -22,7 +22,7 @@ def send_proctoring_requirements_email(context):
     user = context['user']
     try:
         msg = ProctoringRequirements(context=message_context).personalize(
-            recipient=Recipient(user.username, user.email),
+            recipient=Recipient(user.id, user.email),
             language=settings.LANGUAGE_CODE,
             user_context={'full_name': user.profile.name}
         )

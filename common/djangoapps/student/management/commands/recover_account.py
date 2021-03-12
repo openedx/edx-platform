@@ -124,7 +124,7 @@ class Command(BaseCommand):
 
         with emulate_http_request(site, user):
             msg = PasswordReset().personalize(
-                recipient=Recipient(user.username, email),
+                recipient=Recipient(user.id, email),
                 language=get_user_preference(user, LANGUAGE_KEY),
                 user_context=message_context,
             )
