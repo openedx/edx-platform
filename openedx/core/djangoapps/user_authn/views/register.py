@@ -256,6 +256,7 @@ def create_account_with_params(request, params):
     # Announce registration
     REGISTER_USER.send(sender=None, user=user, registration=registration)
 
+    # .. event_implemented_name: STUDENT_REGISTRATION_COMPLETED
     STUDENT_REGISTRATION_COMPLETED.send_event(
         user=UserData(
             pii=UserPersonalData(

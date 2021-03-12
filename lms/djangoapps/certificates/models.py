@@ -394,6 +394,7 @@ class GeneratedCertificate(models.Model):
             status=self.status,
         )
 
+        # .. event_implemented_name: CERTIFICATE_REVOKED
         CERTIFICATE_REVOKED.send_event(
             certificate=CertificateData(
                 user=UserData(
@@ -472,6 +473,7 @@ class GeneratedCertificate(models.Model):
             status=self.status,
         )
 
+        # .. event_implemented_name: CERTIFICATE_CHANGED
         CERTIFICATE_CHANGED.send_event(
             certificate=CertificateData(
                 user=UserData(
@@ -503,6 +505,7 @@ class GeneratedCertificate(models.Model):
                 status=self.status,
             )
 
+            # .. event_implemented_name: CERTIFICATE_CREATED
             CERTIFICATE_CREATED.send_event(
                 certificate=CertificateData(
                     user=UserData(
