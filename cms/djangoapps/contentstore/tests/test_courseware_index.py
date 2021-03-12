@@ -101,7 +101,7 @@ class MixedWithOptionsTestCase(MixedSplitTestCase):
     DATABASE = 'test_mongo_%s' % uuid4().hex[:5]
     COLLECTION = 'modulestore'
     ASSET_COLLECTION = 'assetstore'
-    DEFAULT_CLASS = 'xmodule.raw_module.RawDescriptor'
+    DEFAULT_CLASS = 'xmodule.hidden_module.HiddenDescriptor'
     RENDER_TEMPLATE = lambda t_n, d, ctx=None, nsp='main': ''
     modulestore_options = {
         'default_class': DEFAULT_CLASS,

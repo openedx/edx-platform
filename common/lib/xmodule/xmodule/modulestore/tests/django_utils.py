@@ -94,7 +94,7 @@ def draft_mongo_store_config(data_dir):
     """
 
     modulestore_options = {
-        'default_class': 'xmodule.raw_module.RawDescriptor',
+        'default_class': 'xmodule.hidden_module.HiddenDescriptor',
         'fs_root': data_dir,
         'render_template': 'common.djangoapps.edxmako.shortcuts.render_to_string'
     }
@@ -121,7 +121,7 @@ def split_mongo_store_config(data_dir):
     Defines split module store.
     """
     modulestore_options = {
-        'default_class': 'xmodule.raw_module.RawDescriptor',
+        'default_class': 'xmodule.hidden_module.HiddenDescriptor',
         'fs_root': data_dir,
         'render_template': 'common.djangoapps.edxmako.shortcuts.render_to_string',
     }

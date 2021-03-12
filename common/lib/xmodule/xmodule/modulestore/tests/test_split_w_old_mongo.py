@@ -42,7 +42,7 @@ class SplitWMongoCourseBootstrapper(unittest.TestCase):
     }
 
     modulestore_options = {
-        'default_class': 'xmodule.raw_module.RawDescriptor',
+        'default_class': 'xmodule.hidden_module.HiddenDescriptor',
         'fs_root': '',
         'render_template': mock.Mock(return_value=""),
         'xblock_mixins': (InheritanceMixin, XModuleMixin)

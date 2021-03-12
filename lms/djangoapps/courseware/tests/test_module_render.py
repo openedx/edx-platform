@@ -2500,7 +2500,7 @@ class TestDisabledXBlockTypes(ModuleStoreTestCase):
     def test_get_item(self, default_ms):
         with self.store.default_store(default_ms):
             course = CourseFactory()
-            self._verify_descriptor('video', course, 'RawDescriptorWithMixins')
+            self._verify_descriptor('video', course, 'HiddenDescriptorWithMixins')
 
     @ddt.data(ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split)
     def test_dynamic_updates(self, default_ms):
@@ -2515,7 +2515,7 @@ class TestDisabledXBlockTypes(ModuleStoreTestCase):
 
             # Now simulate a new request cache.
             self.store.request_cache.data.clear()
-            self._verify_descriptor('problem', course, 'RawDescriptorWithMixins', item_usage_id)
+            self._verify_descriptor('problem', course, 'HiddenDescriptorWithMixins', item_usage_id)
 
     def _verify_descriptor(self, category, course, descriptor, item_id=None):
         """
