@@ -1,11 +1,13 @@
 """
 This module contains tests for programs-related signals and signal handlers.
 """
-
+import datetime
 
 import mock
 from django.test import TestCase
 from opaque_keys.edx.keys import CourseKey
+
+from common.djangoapps.student.tests.factories import UserFactory
 from openedx.core.djangoapps.programs.signals import (
     handle_course_cert_awarded,
     handle_course_cert_changed,
@@ -20,7 +22,6 @@ from openedx.core.djangoapps.signals.signals import (
 )
 from openedx.core.djangoapps.site_configuration.tests.factories import SiteConfigurationFactory
 from openedx.core.djangolib.testing.utils import skip_unless_lms
-from common.djangoapps.student.tests.factories import UserFactory
 
 TEST_USERNAME = 'test-user'
 TEST_COURSE_KEY = CourseKey.from_string('course-v1:edX+test_course+1')
@@ -252,6 +253,7 @@ class CourseCertAvailableDateChangedReceiverTest(TestCase):
         return {
             'sender': self.__class__,
             'course_key': TEST_COURSE_KEY,
+            'available_date': datetime.datetime.now()
         }
 
     def test_signal_received(self, mock_enable_update, mock_is_learner_issuance_enabled, mock_task):  # pylint: disable=unused-argument

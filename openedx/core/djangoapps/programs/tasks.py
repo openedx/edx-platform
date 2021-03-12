@@ -378,7 +378,8 @@ def award_course_certificate(self, username, course_run_key, certificate_availab
 
             # Date is being passed via JSON and is encoded in the EMCA date time string format. The rest of the code
             # expects a datetime.
-            certificate_available_date = datetime.strptime(certificate_available_date, VISIBLE_DATE_FORMAT)
+            if certificate_available_date:
+                certificate_available_date = datetime.strptime(certificate_available_date, VISIBLE_DATE_FORMAT)
 
             # Even in the cases where this task is called with a certificate_available_date, we still need to retrieve
             # the course overview because it's required to determine if we should use the certificate_available_date or
