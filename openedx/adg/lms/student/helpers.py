@@ -104,7 +104,7 @@ def compose_and_send_adg_update_email_confirmation(user, context):
     Returns:
         None
     """
-    task_send_mandrill_email.delay(MandrillClient.VERIFY_CHANGE_USER_EMAIL, user.email, context)
+    task_send_mandrill_email(MandrillClient.VERIFY_CHANGE_USER_EMAIL, user.email, context)
 
 
 def compose_and_send_adg_course_enrollment_confirmation_email(user, course_id):

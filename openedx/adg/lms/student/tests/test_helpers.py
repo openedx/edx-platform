@@ -128,7 +128,7 @@ def test_compose_and_send_adg_update_email_confirmation(
     }
 
     student_helpers.compose_and_send_adg_update_email_confirmation(user_with_profile, context)
-    mock_task_send_mandrill_email.delay.assert_called_once_with(
+    mock_task_send_mandrill_email.assert_called_once_with(
         mock_mandrill_client.VERIFY_CHANGE_USER_EMAIL, user_with_profile.email, context
     )
 
