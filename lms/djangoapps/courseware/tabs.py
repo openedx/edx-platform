@@ -3,7 +3,7 @@ This module is essentially a broker to xmodule/tabs.py -- it was originally intr
 perform some LMS-specific tab display gymnastics for the Entrance Exams feature
 """
 
-import six
+
 from django.conf import settings
 from django.utils.translation import ugettext as _
 from django.utils.translation import ugettext_noop
@@ -114,7 +114,7 @@ class ProgressTab(EnrolledTab):
             if course_home_mfe_progress_tab_is_active(course.id):
                 return get_learning_mfe_home_url(course_key=course.id, view_name=self.view_name)
             else:
-                return reverse_func(self.view_name, args=[six.text_type(course.id)])
+                return reverse_func(self.view_name, args=[str(course.id)])
 
         tab_dict['link_func'] = link_func
         super(ProgressTab, self).__init__(tab_dict)  # pylint: disable=super-with-arguments
