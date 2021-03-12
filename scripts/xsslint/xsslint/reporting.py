@@ -7,12 +7,11 @@ import json
 import os
 import re
 
-from six.moves import range
 
 from xsslint.utils import StringLines
 
 
-class RuleViolation(object):
+class RuleViolation:
     """
     Base class representing a rule violation which can be used for reporting.
     """
@@ -97,7 +96,7 @@ class RuleViolation(object):
             _options: ignored
             out: output file
         """
-        print("{}: {}".format(self.full_path, self.rule.rule_id), file=out)
+        print(f"{self.full_path}: {self.rule.rule_id}", file=out)
 
 
 class ExpressionRuleViolation(RuleViolation):
@@ -117,7 +116,7 @@ class ExpressionRuleViolation(RuleViolation):
             expression: The Expression that was in violation.
 
         """
-        super(ExpressionRuleViolation, self).__init__(rule)
+        super().__init__(rule)
         self.expression = expression
         self.start_line = 0
         self.start_column = 0
@@ -235,7 +234,7 @@ class ExpressionRuleViolation(RuleViolation):
             ), file=out)
 
 
-class SummaryResults(object):
+class SummaryResults:
     """
     Contains the summary results for all violations.
     """
@@ -295,7 +294,7 @@ class SummaryResults(object):
 
         # matches output of eslint for simplicity
         print("", file=out)
-        print("{} violations total".format(self.total_violations), file=out)
+        print(f"{self.total_violations} violations total", file=out)
 
     def _print_json_format(self, options, out):
         """
@@ -315,7 +314,7 @@ class SummaryResults(object):
         )
 
 
-class FileResults(object):
+class FileResults:
     """
     Contains the results, or violations, for a file.
     """
