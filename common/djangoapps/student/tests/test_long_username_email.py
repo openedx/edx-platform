@@ -1,3 +1,6 @@
+# -*- coding: utf-8 -*-  # lint-amnesty, pylint: disable=missing-module-docstring
+
+
 import json
 
 from django.test import TestCase
@@ -9,7 +12,7 @@ from openedx.core.djangoapps.user_api.accounts import USERNAME_BAD_LENGTH_MSG
 class TestLongUsernameEmail(TestCase):  # lint-amnesty, pylint: disable=missing-class-docstring
 
     def setUp(self):
-        super().setUp()
+        super(TestLongUsernameEmail, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.url = reverse('create_account')
         self.url_params = {
             'username': 'username',

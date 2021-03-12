@@ -5,7 +5,7 @@ Test for user creation from sites with configuration overrides.
 
 import json
 
-from unittest import mock
+import mock
 from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.test import TestCase
 from django.urls import reverse
@@ -53,7 +53,7 @@ def fake_get_value(name, default=None):
 class TestSite(TestCase):
     """Test for Account Creation from white labeled Sites"""
     def setUp(self):
-        super().setUp()
+        super(TestSite, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.username = "test_user"
         self.url = reverse("create_account")
         self.params = {

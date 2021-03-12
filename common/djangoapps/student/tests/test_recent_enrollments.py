@@ -12,6 +12,7 @@ from django.urls import reverse
 from django.utils.timezone import now
 from opaque_keys.edx import locator
 from pytz import UTC
+from six.moves import range, zip
 
 from common.test.utils import XssTestMixin
 from common.djangoapps.student.models import CourseEnrollment, DashboardConfiguration
@@ -34,7 +35,7 @@ class TestRecentEnrollments(ModuleStoreTestCase, XssTestMixin):
         """
         Add a student
         """
-        super().setUp()
+        super(TestRecentEnrollments, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.student = UserFactory()
         self.student.set_password(self.PASSWORD)
         self.student.save()
@@ -101,9 +102,9 @@ class TestRecentEnrollments(ModuleStoreTestCase, XssTestMixin):
         courses = []
         for idx, seconds_past in zip(list(range(2, 6)), [5, 10, 15, 20]):
             course_location = locator.CourseLocator(
-                f'Org{idx}',
-                f'Course{idx}',
-                f'Run{idx}'
+                'Org{num}'.format(num=idx),
+                'Course{num}'.format(num=idx),
+                'Run{num}'.format(num=idx)
             )
             course, enrollment = self._create_course_and_enrollment(course_location)
             enrollment.created = now() - datetime.timedelta(seconds=seconds_past)
@@ -125,7 +126,10 @@ class TestRecentEnrollments(ModuleStoreTestCase, XssTestMixin):
         response = self.client.get(reverse("dashboard"))
 
         # verify recent enrollment message
-        self.assertContains(response, 'Thank you for enrolling in:')
+        self.assertContains(
+            response,
+            'Thank you for enrolling in:'.format(course_name=self.course.display_name)
+        )
         self.assertContains(
             response,
             ', '.join(enrollment.course.display_name for enrollment in recent_course_list)
@@ -140,7 +144,7 @@ class TestRecentEnrollments(ModuleStoreTestCase, XssTestMixin):
         response = self.client.get(reverse("dashboard"))
         self.assertContains(
             response,
-            f"Thank you for enrolling in {self.course.display_name}"
+            "Thank you for enrolling in {course_name}".format(course_name=self.course.display_name)
         )
 
     def test_dashboard_rendering_with_two_courses(self):
@@ -167,7 +171,7 @@ class TestRecentEnrollments(ModuleStoreTestCase, XssTestMixin):
 
         self.assertContains(
             response,
-            "Thank you for enrolling in:"
+            "Thank you for enrolling in:".format(course_name=self.course.display_name)
         )
         self.assertContains(
             response,

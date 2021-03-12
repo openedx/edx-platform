@@ -6,7 +6,6 @@
 import logging
 import unittest
 from datetime import datetime, timedelta
-from unittest.mock import patch
 
 import ddt
 import httpretty
@@ -17,15 +16,17 @@ from django.conf import settings
 from django.test.client import Client
 from django.test.utils import override_settings
 from django.urls import reverse
+from mock import patch
+from six.moves import range
 
 # These imports refer to lms djangoapps.
 # Their testcases are only run under lms.
 from common.djangoapps.course_modes.tests.factories import CourseModeFactory
-from common.djangoapps.student.models import CourseEnrollment, CourseEnrollmentAttribute, EnrollmentRefundConfiguration
-from common.djangoapps.student.tests.factories import UserFactory
 from lms.djangoapps.certificates.models import CertificateStatuses, GeneratedCertificate
 from lms.djangoapps.certificates.tests.factories import GeneratedCertificateFactory
 from openedx.core.djangoapps.commerce.utils import ECOMMERCE_DATE_FORMAT
+from common.djangoapps.student.models import CourseEnrollment, CourseEnrollmentAttribute, EnrollmentRefundConfiguration
+from common.djangoapps.student.tests.factories import UserFactory
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
@@ -45,12 +46,12 @@ class RefundableTest(SharedModuleStoreTestCase):
 
     @classmethod
     def setUpClass(cls):
-        super().setUpClass()
+        super(RefundableTest, cls).setUpClass()
         cls.course = CourseFactory.create()
 
     def setUp(self):
         """ Setup components used by each refund test."""
-        super().setUp()
+        super(RefundableTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.user = UserFactory.create(password=self.USER_PASSWORD)
         self.verified_mode = CourseModeFactory.create(
             course_id=self.course.id,
@@ -135,11 +136,11 @@ class RefundableTest(SharedModuleStoreTestCase):
         expected_date = now + expected_date_delta
         refund_period = timedelta(days=days)
         date_placed = order_date.strftime(ECOMMERCE_DATE_FORMAT)
-        expected_content = f'{{"date_placed": "{date_placed}"}}'
+        expected_content = '{{"date_placed": "{date}"}}'.format(date=date_placed)
 
         httpretty.register_uri(
             httpretty.GET,
-            f'{TEST_API_URL}/orders/{self.ORDER_NUMBER}/',
+            '{url}/orders/{order}/'.format(url=TEST_API_URL, order=self.ORDER_NUMBER),
             status=200, body=expected_content,
             adding_headers={'Content-Type': JSON}
         )
@@ -201,7 +202,7 @@ class RefundableTest(SharedModuleStoreTestCase):
 
         httpretty.register_uri(
             httpretty.GET,
-            f'{TEST_API_URL}/orders/{self.ORDER_NUMBER}/',
+            '{url}/orders/{order}/'.format(url=TEST_API_URL, order=self.ORDER_NUMBER),
             status=200, body=expected_content,
             adding_headers={'Content-Type': JSON}
         )

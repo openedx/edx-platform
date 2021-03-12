@@ -28,7 +28,7 @@ class RolesTestCase(TestCase):
     """
 
     def setUp(self):
-        super().setUp()
+        super(RolesTestCase, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.course_key = CourseKey.from_string('edX/toy/2012_Fall')
         self.course_loc = self.course_key.make_usage_key('course', '2012_Fall')
         self.anonymous_user = AnonymousUserFactory()
@@ -156,7 +156,7 @@ class RoleCacheTestCase(TestCase):  # lint-amnesty, pylint: disable=missing-clas
     )
 
     def setUp(self):
-        super().setUp()
+        super(RoleCacheTestCase, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.user = UserFactory()
 
     @ddt.data(*ROLES)

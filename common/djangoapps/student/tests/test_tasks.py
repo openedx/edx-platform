@@ -3,9 +3,10 @@ Tests for the Sending activation email celery tasks
 """
 
 
-from unittest import mock
+import mock
 from django.conf import settings
 from django.test import TestCase
+from six.moves import range
 
 from edx_ace.errors import ChannelError, RecoverableChannelDeliveryError
 from lms.djangoapps.courseware.tests.factories import UserFactory
@@ -20,7 +21,7 @@ class SendActivationEmailTestCase(TestCase):
     """
     def setUp(self):
         """ Setup components used by each test."""
-        super().setUp()
+        super(SendActivationEmailTestCase, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.student = UserFactory()
 
         registration = Registration()

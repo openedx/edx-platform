@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """
 This test file will verify proper password policy enforcement, which is an option feature
 """
@@ -16,7 +17,7 @@ class TestPasswordPolicy(TestCase):
     Go through some password policy tests to make sure things are properly working
     """
     def setUp(self):
-        super().setUp()
+        super(TestPasswordPolicy, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.url = reverse('create_account')
         self.request_factory = RequestFactory()
         self.url_params = {
@@ -124,7 +125,7 @@ class TestPasswordPolicy(TestCase):
     ])
     def test_not_enough_numeric_characters(self):
         # The unicode ២ is the number 2 in Khmer and the ٧ is the Arabic-Indic number 7
-        self.url_params['password'] = 'thisShouldFail២٧'
+        self.url_params['password'] = u'thisShouldFail២٧'
         response = self.client.post(self.url, self.url_params)
         assert response.status_code == 400
         obj = json.loads(response.content.decode('utf-8'))
@@ -135,7 +136,7 @@ class TestPasswordPolicy(TestCase):
     ])
     def test_enough_numeric_characters(self):
         # The unicode ២ is the number 2 in Khmer
-        self.url_params['password'] = 'thisShouldPass២33'
+        self.url_params['password'] = u'thisShouldPass២33'
         response = self.client.post(self.url, self.url_params)
         assert response.status_code == 200
         obj = json.loads(response.content.decode('utf-8'))
@@ -155,7 +156,7 @@ class TestPasswordPolicy(TestCase):
         create_validator_config('common.djangoapps.util.password_policy_validators.AlphabeticValidator', {'min_alphabetic': 3})  # lint-amnesty, pylint: disable=line-too-long
     ])
     def test_enough_alphabetic_characters(self):
-        self.url_params['password'] = '𝒯𝓗Ï𝓼𝒫å𝓼𝓼𝔼𝓼'
+        self.url_params['password'] = u'𝒯𝓗Ï𝓼𝒫å𝓼𝓼𝔼𝓼'
         response = self.client.post(self.url, self.url_params)
         assert response.status_code == 200
         obj = json.loads(response.content.decode('utf-8'))
@@ -188,7 +189,7 @@ class TestPasswordPolicy(TestCase):
         create_validator_config('common.djangoapps.util.password_policy_validators.PunctuationValidator', {'min_punctuation': 3}),  # lint-amnesty, pylint: disable=line-too-long
     ])
     def test_multiple_errors_pass(self):
-        self.url_params['password'] = 'tH1s Sh0u!d P3#$!'
+        self.url_params['password'] = u'tH1s Sh0u!d P3#$!'
         response = self.client.post(self.url, self.url_params)
         assert response.status_code == 200
         obj = json.loads(response.content.decode('utf-8'))
@@ -219,7 +220,7 @@ class TestPasswordPolicy(TestCase):
         create_validator_config('common.djangoapps.util.password_policy_validators.MaximumLengthValidator', {'max_length': 75}),  # lint-amnesty, pylint: disable=line-too-long
     ])
     def test_with_unicode(self):
-        self.url_params['password'] = '四節比分和七年前'
+        self.url_params['password'] = u'四節比分和七年前'
         response = self.client.post(self.url, self.url_params)
         assert response.status_code == 200
         obj = json.loads(response.content.decode('utf-8'))
@@ -231,7 +232,7 @@ class TestUsernamePasswordNonmatch(TestCase):
     Test that registration username and password fields differ
     """
     def setUp(self):
-        super().setUp()
+        super(TestUsernamePasswordNonmatch, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.url = reverse('create_account')
 
         self.url_params = {

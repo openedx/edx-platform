@@ -270,7 +270,7 @@ class TestRegisterRetiredUsername(TestCase):
     INVALID_ERR_MSG = ('It looks like', 'belongs to an existing account. Try again with a different username.')
 
     def setUp(self):
-        super().setUp()
+        super(TestRegisterRetiredUsername, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.url = reverse('user_api_registration')
         self.url_params = {
             'username': 'username',

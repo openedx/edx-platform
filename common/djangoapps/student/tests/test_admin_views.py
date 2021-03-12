@@ -1,10 +1,10 @@
+# coding=UTF-8
 """
 Tests student admin.py
 """
 
 
 import datetime
-from unittest.mock import Mock
 
 import ddt
 import pytest
@@ -16,20 +16,17 @@ from django.test import TestCase, override_settings
 from django.urls import reverse
 from django.utils.timezone import now
 from edx_toggles.toggles.testutils import override_waffle_switch
+from mock import Mock
 from pytz import UTC
 
-from common.djangoapps.student.admin import (  # lint-amnesty, pylint: disable=line-too-long
-    COURSE_ENROLLMENT_ADMIN_SWITCH,
-    AllowedAuthUserForm,
-    CourseEnrollmentForm,
-    UserAdmin
-)
+from common.djangoapps.student.admin import AllowedAuthUserForm, COURSE_ENROLLMENT_ADMIN_SWITCH, UserAdmin, CourseEnrollmentForm  # lint-amnesty, pylint: disable=line-too-long
 from common.djangoapps.student.models import AllowedAuthUser, CourseEnrollment, LoginFailures
 from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
-from openedx.core.djangoapps.content.course_overviews.tests.factories import CourseOverviewFactory
-from openedx.core.djangoapps.site_configuration.tests.mixins import SiteMixin
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
+
+from openedx.core.djangoapps.content.course_overviews.tests.factories import CourseOverviewFactory
+from openedx.core.djangoapps.site_configuration.tests.mixins import SiteMixin
 
 
 class AdminCourseRolesPageTest(SharedModuleStoreTestCase):
@@ -37,18 +34,18 @@ class AdminCourseRolesPageTest(SharedModuleStoreTestCase):
     """
     @classmethod
     def setUpClass(cls):
-        super().setUpClass()
+        super(AdminCourseRolesPageTest, cls).setUpClass()
         cls.course = CourseFactory.create(org='edx')
 
     def setUp(self):
-        super().setUp()
+        super(AdminCourseRolesPageTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.user = UserFactory.create(is_staff=True, is_superuser=True)
         self.user.save()
 
     def test_save_valid_data(self):
 
         data = {
-            'course_id': str(self.course.id),
+            'course_id': six.text_type(self.course.id),
             'role': 'finance_admin',
             'org': 'edx',
             'email': self.user.email
@@ -64,7 +61,7 @@ class AdminCourseRolesPageTest(SharedModuleStoreTestCase):
         self.assertContains(response, 'Select course access role to change')
         self.assertContains(response, 'Add course access role')
         self.assertContains(response, 'finance_admin')
-        self.assertContains(response, str(self.course.id))
+        self.assertContains(response, six.text_type(self.course.id))
         self.assertContains(response, '1 course access role')
 
         #try adding with same information raise error.
@@ -76,7 +73,7 @@ class AdminCourseRolesPageTest(SharedModuleStoreTestCase):
         data = {
             'role': 'staff',
             'email': self.user.email,
-            'course_id': str(self.course.id)
+            'course_id': six.text_type(self.course.id)
         }
 
         self.client.login(username=self.user.username, password='test')
@@ -128,7 +125,7 @@ class AdminCourseRolesPageTest(SharedModuleStoreTestCase):
 
     def test_save_with_invalid_course(self):
 
-        course = 'no/edx/course'
+        course = six.text_type('no/edx/course')
         email = "invalid@email.com"
         data = {
             'course_id': course,
@@ -158,7 +155,7 @@ class AdminCourseRolesPageTest(SharedModuleStoreTestCase):
     def test_save_valid_course_invalid_org(self):
 
         data = {
-            'course_id': str(self.course.id),
+            'course_id': six.text_type(self.course.id),
             'role': 'finance_admin',
             'org': 'edxxx',
             'email': self.user.email
@@ -181,7 +178,7 @@ class AdminUserPageTest(TestCase):
     Unit tests for the UserAdmin view.
     """
     def setUp(self):
-        super().setUp()
+        super(AdminUserPageTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.admin = UserAdmin(User, AdminSite())
 
     def test_username_is_writable_for_user_creation(self):
@@ -224,7 +221,7 @@ class CourseEnrollmentAdminTest(SharedModuleStoreTestCase):
     )
 
     def setUp(self):
-        super().setUp()
+        super(CourseEnrollmentAdminTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.user = UserFactory.create(is_staff=True, is_superuser=True)
         self.course = CourseFactory()
         self.course_enrollment = CourseEnrollmentFactory(
@@ -256,7 +253,7 @@ class CourseEnrollmentAdminTest(SharedModuleStoreTestCase):
         """
         Ensure that course enrollment searches return exact matches on username first.
         """
-        user2 = UserFactory.create(username=f'aaa_{self.user.username}')
+        user2 = UserFactory.create(username='aaa_{}'.format(self.user.username))
         CourseEnrollmentFactory(
             user=user2,
             course_id=self.course.id,  # pylint: disable=no-member
@@ -282,8 +279,8 @@ class CourseEnrollmentAdminTest(SharedModuleStoreTestCase):
         # is_active will change from True to False
         assert self.course_enrollment.is_active
         data = {
-            'user': str(self.course_enrollment.user.id),
-            'course': str(self.course_enrollment.course.id),
+            'user': six.text_type(self.course_enrollment.user.id),
+            'course': six.text_type(self.course_enrollment.course.id),
             'is_active': 'false',
             'mode': self.course_enrollment.mode,
         }
@@ -303,7 +300,7 @@ class CourseEnrollmentAdminTest(SharedModuleStoreTestCase):
         Send an invalid course ID instead of "org.0/course_0/Run_0" when saving, and verify that it fails.
         """
         data = {
-            'user': str(self.course_enrollment.user.id),
+            'user': six.text_type(self.course_enrollment.user.id),
             'course': 'invalid-course-id',
             'is_active': 'true',
             'mode': self.course_enrollment.mode,
@@ -324,22 +321,22 @@ class LoginFailuresAdminTest(TestCase):
     @classmethod
     def setUpClass(cls):
         """Setup class"""
-        super().setUpClass()
-        cls.user = UserFactory.create(username='§', is_staff=True, is_superuser=True)
+        super(LoginFailuresAdminTest, cls).setUpClass()
+        cls.user = UserFactory.create(username=u'§', is_staff=True, is_superuser=True)
         cls.user.save()
 
     def setUp(self):
         """Setup."""
-        super().setUp()
+        super(LoginFailuresAdminTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.client.login(username=self.user.username, password='test')
-        self.user2 = UserFactory.create(username='Zażółć gęślą jaźń')
+        self.user2 = UserFactory.create(username=u'Zażółć gęślą jaźń')
         self.user_lockout_until = datetime.datetime.now(UTC)
         LoginFailures.objects.create(user=self.user, failure_count=10, lockout_until=self.user_lockout_until)
         LoginFailures.objects.create(user=self.user2, failure_count=2)
 
     def tearDown(self):
         """Tear Down."""
-        super().tearDown()
+        super(LoginFailuresAdminTest, self).tearDown()  # lint-amnesty, pylint: disable=super-with-arguments
         LoginFailures.objects.all().delete()
 
     def test_unicode_username(self):
@@ -377,7 +374,7 @@ class LoginFailuresAdminTest(TestCase):
             url,
             data={
                 'action': 'unlock_student_accounts',
-                '_selected_action': [str(o.pk) for o in LoginFailures.objects.all()]
+                '_selected_action': [six.text_type(o.pk) for o in LoginFailures.objects.all()]
             },
             follow=True
         )
@@ -403,11 +400,11 @@ class CourseEnrollmentAdminFormTest(SharedModuleStoreTestCase):
     """
     @classmethod
     def setUpClass(cls):
-        super().setUpClass()
+        super(CourseEnrollmentAdminFormTest, cls).setUpClass()
         cls.course = CourseOverviewFactory(start=now())
 
     def setUp(self):
-        super().setUp()
+        super(CourseEnrollmentAdminFormTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.user = UserFactory.create()
 
     def test_admin_model_form_create(self):
@@ -418,7 +415,7 @@ class CourseEnrollmentAdminFormTest(SharedModuleStoreTestCase):
 
         form = CourseEnrollmentForm({
             'user': self.user.id,
-            'course': str(self.course.id),
+            'course': six.text_type(self.course.id),
             'is_active': True,
             'mode': 'audit',
         })
@@ -435,7 +432,7 @@ class CourseEnrollmentAdminFormTest(SharedModuleStoreTestCase):
         count = CourseEnrollment.objects.count()
         form = CourseEnrollmentForm({
             'user': self.user.id,
-            'course': str(self.course.id),
+            'course': six.text_type(self.course.id),
             'is_active': False,
             'mode': 'audit'},
             instance=enrollment
@@ -453,11 +450,11 @@ class AllowedAuthUserFormTest(SiteMixin, TestCase):
     """
     @classmethod
     def setUpClass(cls):
-        super().setUpClass()
+        super(AllowedAuthUserFormTest, cls).setUpClass()
         cls.email_domain_name = "dummy.com"
         cls.email_with_wrong_domain = "dummy@example.com"
-        cls.valid_email = f"dummy@{cls.email_domain_name}"
-        cls.other_valid_email = f"dummy1@{cls.email_domain_name}"
+        cls.valid_email = "dummy@{email_domain_name}".format(email_domain_name=cls.email_domain_name)
+        cls.other_valid_email = "dummy1@{email_domain_name}".format(email_domain_name=cls.email_domain_name)
         UserFactory(email=cls.valid_email)
         UserFactory(email=cls.email_with_wrong_domain)
 

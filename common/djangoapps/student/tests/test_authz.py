@@ -2,7 +2,7 @@
 Tests authz.py
 """
 
-from unittest import mock
+import mock
 import pytest
 
 from ccx_keys.locator import CCXLocator
@@ -23,7 +23,7 @@ class CreatorGroupTest(TestCase):
 
     def setUp(self):
         """ Test case setup """
-        super().setUp()
+        super(CreatorGroupTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.user = User.objects.create_user('testuser', 'test+courses@edx.org', 'foo')
         self.admin = User.objects.create_user('Mark', 'admin+courses@edx.org', 'foo')
         self.admin.is_staff = True
@@ -151,7 +151,7 @@ class CCXCourseGroupTest(TestCase):
         """
         Set up test variables
         """
-        super().setUp()
+        super(CCXCourseGroupTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.global_admin = AdminFactory()
         self.staff = User.objects.create_user('teststaff', 'teststaff+courses@edx.org', 'foo')
         self.ccx_course_key = CCXLocator.from_string('ccx-v1:edX+DemoX+Demo_Course+ccx@1')
@@ -189,7 +189,7 @@ class CourseGroupTest(TestCase):
 
     def setUp(self):
         """ Test case setup """
-        super().setUp()
+        super(CourseGroupTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.global_admin = AdminFactory()
         self.creator = User.objects.create_user('testcreator', 'testcreator+courses@edx.org', 'foo')
         self.staff = User.objects.create_user('teststaff', 'teststaff+courses@edx.org', 'foo')

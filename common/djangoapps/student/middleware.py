@@ -33,7 +33,7 @@ class UserStandingMiddleware(MiddlewareMixin):
                     'this was done in error, please contact us at '
                     '{support_email}'
                 )).format(
-                    support_email=HTML('<a href="mailto:{address}?subject={subject_line}">{address}</a>').format(
+                    support_email=HTML(u'<a href="mailto:{address}?subject={subject_line}">{address}</a>').format(
                         address=settings.DEFAULT_FEEDBACK_EMAIL,
                         subject_line=_('Disabled Account'),
                     ),

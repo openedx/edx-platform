@@ -6,7 +6,7 @@ by reversing group name formats.
 
 import unittest
 
-from unittest import mock
+import mock
 import six
 from django.conf import settings
 from django.test.client import Client
@@ -35,7 +35,7 @@ class TestCourseListing(ModuleStoreTestCase, MilestonesTestCaseMixin):
         """
         Add a student & teacher
         """
-        super().setUp()
+        super(TestCourseListing, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
 
         self.student = UserFactory()
         self.teacher = UserFactory()
@@ -65,7 +65,7 @@ class TestCourseListing(ModuleStoreTestCase, MilestonesTestCaseMixin):
         Reverse the setup
         """
         self.client.logout()
-        super().tearDown()
+        super(TestCourseListing, self).tearDown()  # lint-amnesty, pylint: disable=super-with-arguments
 
     @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
     def test_get_course_list(self):
@@ -153,8 +153,8 @@ class TestCourseListing(ModuleStoreTestCase, MilestonesTestCaseMixin):
         self._create_course_with_access_groups(pre_requisite_course_location2)
         # create a course with pre_requisite_courses
         pre_requisite_courses = [
-            str(pre_requisite_course_location),
-            str(pre_requisite_course_location2),
+            six.text_type(pre_requisite_course_location),
+            six.text_type(pre_requisite_course_location2),
         ]
         course_location = self.store.make_course_key('Org1', 'Course1', 'Run1')
         self._create_course_with_access_groups(course_location, {

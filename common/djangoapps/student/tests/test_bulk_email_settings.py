@@ -27,11 +27,11 @@ class TestStudentDashboardEmailView(SharedModuleStoreTestCase):
     """
     @classmethod
     def setUpClass(cls):
-        super().setUpClass()
+        super(TestStudentDashboardEmailView, cls).setUpClass()
         cls.course = CourseFactory.create()
 
     def setUp(self):
-        super().setUp()
+        super(TestStudentDashboardEmailView, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
 
         # Create student account
         student = UserFactory.create()
@@ -51,7 +51,7 @@ class TestStudentDashboardEmailView(SharedModuleStoreTestCase):
         )
 
     def tearDown(self):
-        super().tearDown()
+        super(TestStudentDashboardEmailView, self).tearDown()  # lint-amnesty, pylint: disable=super-with-arguments
         BulkEmailFlag.objects.all().delete()
 
     def test_email_flag_true(self):

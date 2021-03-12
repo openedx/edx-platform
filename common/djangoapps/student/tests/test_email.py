@@ -1,9 +1,12 @@
+# coding=utf-8  # lint-amnesty, pylint: disable=missing-module-docstring
+
+
 import json
 import unittest
 from string import capwords
-from unittest.mock import Mock, patch
 
 import ddt
+import six
 import pytest
 from django.conf import settings
 from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
@@ -15,6 +18,7 @@ from django.test.client import RequestFactory
 from django.urls import reverse
 from django.utils.html import escape
 from edx_toggles.toggles.testutils import override_waffle_flag
+from mock import Mock, patch
 from six import text_type
 
 from common.djangoapps.edxmako.shortcuts import marketing_link
@@ -52,7 +56,7 @@ def mock_render_to_string(template_name, context):
     """
     Return a string that encodes template_name and context
     """
-    return str((template_name, sorted(context.items())))
+    return str((template_name, sorted(six.iteritems(context))))
 
 
 def mock_render_to_response(template_name, context):
@@ -64,7 +68,7 @@ def mock_render_to_response(template_name, context):
     return HttpResponse(mock_render_to_string(template_name, context))
 
 
-class EmailTestMixin:
+class EmailTestMixin(object):
     """
     Adds useful assertions for testing `email_user`
     """
@@ -101,29 +105,29 @@ class ActivationEmailTests(EmailTemplateTagMixin, CacheIsolationTestCase):
     Test sending of the activation email.
     """
 
-    ACTIVATION_SUBJECT = f"Action Required: Activate your {settings.PLATFORM_NAME} account"
+    ACTIVATION_SUBJECT = u"Action Required: Activate your {} account".format(settings.PLATFORM_NAME)
 
     # Text fragments we expect in the body of an email
     # sent from an OpenEdX installation.
     OPENEDX_FRAGMENTS = [
         (
-            "Use the link below to activate your account to access engaging, "
-            "high-quality {platform_name} courses. Note that you will not be able to log back into your "
-            "account until you have activated it.".format(
+            u"Use the link below to activate your account to access engaging, "
+            u"high-quality {platform_name} courses. Note that you will not be able to log back into your "
+            u"account until you have activated it.".format(
                 platform_name=settings.PLATFORM_NAME
             )
         ),
-        f"{settings.LMS_ROOT_URL}/activate/",
-        "If you need help, please use our web form at ", (
+        u"{}/activate/".format(settings.LMS_ROOT_URL),
+        u"If you need help, please use our web form at ", (
             settings.ACTIVATION_EMAIL_SUPPORT_LINK or settings.SUPPORT_SITE_LINK
         ),
         settings.CONTACT_EMAIL,
-        "This email message was automatically sent by ",
+        u"This email message was automatically sent by ",
         settings.LMS_ROOT_URL,
-        " because someone attempted to create an account on {platform_name}".format(
+        u" because someone attempted to create an account on {platform_name}".format(
             platform_name=settings.PLATFORM_NAME
         ),
-        " using this email address."
+        u" using this email address."
     ]
 
     @ddt.data('plain_text', 'html')
@@ -245,7 +249,7 @@ class ProctoringRequirementsEmailTests(EmailTemplateTagMixin, ModuleStoreTestCas
         text = message.body
         html = message.alternatives[0][0]
 
-        assert message.subject == f"Proctoring requirements for {self.course.display_name}"
+        assert message.subject == "Proctoring requirements for {}".format(self.course.display_name)
 
         for fragment in self._get_fragments():
             assert fragment in text
@@ -284,7 +288,7 @@ class EmailChangeRequestTests(EventTestMixin, EmailTemplateTagMixin, CacheIsolat
     """
 
     def setUp(self, tracker='common.djangoapps.student.views.management.tracker'):
-        super().setUp(tracker)
+        super(EmailChangeRequestTests, self).setUp(tracker)  # lint-amnesty, pylint: disable=super-with-arguments
         self.user = UserFactory.create()
         self.new_email = 'new.email@edx.org'
         self.req_factory = RequestFactory()
@@ -302,7 +306,7 @@ class EmailChangeRequestTests(EventTestMixin, EmailTemplateTagMixin, CacheIsolat
         try:
             validate_new_email(self.request.user, email)
         except ValueError as err:
-            return str(err)
+            return text_type(err)
 
     def do_email_change(self, user, email, activation_key=None):
         """
@@ -373,22 +377,22 @@ class EmailChangeRequestTests(EventTestMixin, EmailTemplateTagMixin, CacheIsolat
         self.do_email_change(self.user, new_email, registration_key)
 
         self._assert_email(
-            subject='Request to change édX account e-mail',
+            subject=u'Request to change édX account e-mail',
             body_fragments=[
-                'We received a request to change the e-mail associated with',
-                'your édX account from {old_email} to {new_email}.'.format(
+                u'We received a request to change the e-mail associated with',
+                u'your édX account from {old_email} to {new_email}.'.format(
                     old_email=old_email,
                     new_email=new_email,
                 ),
-                'If this is correct, please confirm your new e-mail address by visiting:',
-                f'http://edx.org/email_confirm/{registration_key}',
-                'Please do not reply to this e-mail; if you require assistance,',
-                'check the help section of the édX web site.',
+                u'If this is correct, please confirm your new e-mail address by visiting:',
+                u'http://edx.org/email_confirm/{key}'.format(key=registration_key),
+                u'Please do not reply to this e-mail; if you require assistance,',
+                u'check the help section of the édX web site.',
             ],
         )
 
         self.assert_event_emitted(
-            SETTING_CHANGE_INITIATED, user_id=self.user.id, setting='email', old=old_email, new=new_email
+            SETTING_CHANGE_INITIATED, user_id=self.user.id, setting=u'email', old=old_email, new=new_email
         )
 
     def _assert_email(self, subject, body_fragments):
@@ -419,7 +423,7 @@ class EmailChangeConfirmationTests(EmailTestMixin, EmailTemplateTagMixin, CacheI
     """
 
     def setUp(self):
-        super().setUp()
+        super(EmailChangeConfirmationTests, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.clear_caches()
         self.addCleanup(self.clear_caches)
         self.user = UserFactory.create()
@@ -431,31 +435,31 @@ class EmailChangeConfirmationTests(EmailTestMixin, EmailTemplateTagMixin, CacheI
         self.key = self.pending_change_request.activation_key
 
         # Expected subject of the email
-        self.email_subject = "Email Change Confirmation for {platform_name}".format(
+        self.email_subject = u"Email Change Confirmation for {platform_name}".format(
             platform_name=settings.PLATFORM_NAME
         )
 
         # Text fragments we expect in the body of the confirmation email
         self.email_fragments = [
-            "This is to confirm that you changed the e-mail associated with {platform_name}"
-            " from {old_email} to {new_email}. If you did not make this request, please contact us immediately."
-            " Contact information is listed at:".format(
+            u"This is to confirm that you changed the e-mail associated with {platform_name}"
+            u" from {old_email} to {new_email}. If you did not make this request, please contact us immediately."
+            u" Contact information is listed at:".format(
                 platform_name=settings.PLATFORM_NAME,
                 old_email=self.user.email,
                 new_email=PendingEmailChange.objects.get(activation_key=self.key).new_email
             ),
-            "We keep a log of old e-mails, so if this request was unintentional, we can investigate."
+            u"We keep a log of old e-mails, so if this request was unintentional, we can investigate."
         ]
 
     @classmethod
     def setUpClass(cls):
-        super().setUpClass()
+        super(EmailChangeConfirmationTests, cls).setUpClass()
         cls.start_cache_isolation()
 
     @classmethod
     def tearDownClass(cls):
         cls.end_cache_isolation()
-        super().tearDownClass()
+        super(EmailChangeConfirmationTests, cls).tearDownClass()
 
     def assertRolledBack(self):
         """
@@ -609,7 +613,7 @@ class SecondaryEmailChangeRequestTests(EventTestMixin, EmailTemplateTagMixin, Ca
         try:
             validate_new_email(self.request.user, email)
         except ValueError as err:
-            return str(err)
+            return text_type(err)
 
     def do_secondary_email_change(self, user, email, activation_key=None):
         """
@@ -660,12 +664,12 @@ class SecondaryEmailChangeRequestTests(EventTestMixin, EmailTemplateTagMixin, Ca
         self.do_secondary_email_change(self.user, new_email, registration_key)
 
         self._assert_email(
-            subject='Confirm your recovery email for édX',
+            subject=u'Confirm your recovery email for édX',
             body_fragments=[
-                'You\'ve registered this recovery email address for édX.',
-                'If you set this email address, click "confirm email."',
-                'If you didn\'t request this change, you can disregard this email.',
-                f'http://edx.org/activate_secondary_email/{registration_key}',
+                u'You\'ve registered this recovery email address for édX.',
+                u'If you set this email address, click "confirm email."',
+                u'If you didn\'t request this change, you can disregard this email.',
+                u'http://edx.org/activate_secondary_email/{key}'.format(key=registration_key),
 
             ],
         )

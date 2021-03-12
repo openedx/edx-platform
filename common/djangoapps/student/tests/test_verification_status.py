@@ -3,7 +3,6 @@
 
 import unittest
 from datetime import datetime, timedelta
-from unittest.mock import patch
 
 import ddt
 import six
@@ -11,9 +10,12 @@ from django.conf import settings
 from django.test import override_settings
 from django.urls import reverse
 from django.utils.timezone import now
+
+from mock import patch
 from pytz import UTC
 
 from common.djangoapps.course_modes.tests.factories import CourseModeFactory
+from lms.djangoapps.verify_student.models import SoftwareSecurePhotoVerification, VerificationDeadline
 from common.djangoapps.student.helpers import (
     VERIFY_STATUS_APPROVED,
     VERIFY_STATUS_MISSED_DEADLINE,
@@ -24,7 +26,6 @@ from common.djangoapps.student.helpers import (
 )
 from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
 from common.djangoapps.util.testing import UrlResetMixin
-from lms.djangoapps.verify_student.models import SoftwareSecurePhotoVerification, VerificationDeadline
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
@@ -47,7 +48,7 @@ class TestCourseVerificationStatus(UrlResetMixin, ModuleStoreTestCase):
 
     def setUp(self):
         # Invoke UrlResetMixin
-        super().setUp()
+        super(TestCourseVerificationStatus, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
 
         self.user = UserFactory(password="edx")
         self.course = CourseFactory.create()
@@ -378,7 +379,7 @@ class TestCourseVerificationStatus(UrlResetMixin, ModuleStoreTestCase):
         response = self.client.get(self.dashboard_url)
 
         # Sanity check: verify that the course is on the page
-        self.assertContains(response, str(self.course.id))
+        self.assertContains(response, six.text_type(self.course.id))
 
         # Verify that the correct banner is rendered on the dashboard
         alt_text = self.BANNER_ALT_MESSAGES.get(status)
