@@ -4,15 +4,16 @@ Test the enterprise support utils.
 
 import json
 import uuid
+from unittest import mock
 
 import ddt
-from unittest import mock
 from django.conf import settings
 from django.test import TestCase
 from django.test.utils import override_settings
 from django.urls import NoReverseMatch
-
 from edx_toggles.toggles.testutils import override_waffle_flag
+
+from common.djangoapps.student.tests.factories import UserFactory
 from openedx.core.djangolib.testing.utils import skip_unless_lms
 from openedx.features.enterprise_support.tests import FEATURES_WITH_ENTERPRISE_ENABLED
 from openedx.features.enterprise_support.tests.factories import (
@@ -36,9 +37,8 @@ from openedx.features.enterprise_support.utils import (
     is_enterprise_learner,
     update_account_settings_context_for_enterprise,
     update_logistration_context_for_enterprise,
-    update_third_party_auth_context_for_enterprise,
+    update_third_party_auth_context_for_enterprise
 )
-from common.djangoapps.student.tests.factories import UserFactory
 
 
 @ddt.ddt

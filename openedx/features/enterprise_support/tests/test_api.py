@@ -1,9 +1,10 @@
 """
 Test the enterprise support APIs.
 """
+from unittest import mock
+
 import ddt
 import httpretty
-from unittest import mock
 import pytest
 from consent.models import DataSharingConsent
 from django.conf import settings
@@ -21,7 +22,6 @@ from common.djangoapps.student.tests.factories import UserFactory
 from openedx.core.djangoapps.site_configuration.tests.factories import SiteFactory
 from openedx.core.djangolib.testing.utils import CacheIsolationTestCase, skip_unless_lms
 from openedx.features.enterprise_support.api import (
-    activate_learner_enterprise,
     _CACHE_MISS,
     ENTERPRISE_CUSTOMER_KEY_NAME,
     ConsentApiClient,
@@ -29,6 +29,7 @@ from openedx.features.enterprise_support.api import (
     EnterpriseApiClient,
     EnterpriseApiException,
     EnterpriseApiServiceClient,
+    activate_learner_enterprise,
     add_enterprise_customer_to_session,
     consent_needed_for_course,
     data_sharing_consent_required,
