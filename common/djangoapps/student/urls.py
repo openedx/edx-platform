@@ -19,7 +19,7 @@ urlpatterns = [
 
     url(r'^change_email_settings$', views.change_email_settings, name='change_email_settings'),
 
-    url(r'^course_run/{}/refund_status$'.format(settings.COURSE_ID_PATTERN),
+    url(fr'^course_run/{settings.COURSE_ID_PATTERN}/refund_status$',
         views.course_run_refund_status,
         name="course_run_refund_status"),
 

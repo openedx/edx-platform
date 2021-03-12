@@ -21,7 +21,7 @@ class UserProfilePropertiesTest(CacheIsolationTestCase):
     ENABLED_CACHES = ['default']
 
     def setUp(self):
-        super(UserProfilePropertiesTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.user = UserFactory.create(password=self.password)
         self.profile = self.user.profile
 

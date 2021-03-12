@@ -73,7 +73,7 @@ def create_manual_enrollment_audit(
     know about model level code.
     """
     if transition_state not in TRANSITION_STATES:
-        raise ValueError("State `{}` not in allow states: `{}`".format(transition_state, TRANSITION_STATES))
+        raise ValueError(f"State `{transition_state}` not in allow states: `{TRANSITION_STATES}`")
 
     User = get_user_model()
     try:
