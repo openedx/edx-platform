@@ -5,7 +5,7 @@ Mixins for the EnterpriseApiClient.
 
 import json
 
-import mock
+from unittest import mock
 
 import httpretty
 from django.conf import settings
@@ -15,7 +15,7 @@ from django.urls import reverse
 from openedx.features.enterprise_support.tests import FAKE_ENTERPRISE_CUSTOMER
 
 
-class EnterpriseServiceMockMixin(object):
+class EnterpriseServiceMockMixin:
     """
     Mocks for the Enterprise service responses.
     """
@@ -23,13 +23,13 @@ class EnterpriseServiceMockMixin(object):
     consent_url = '{}{}'.format(settings.ENTERPRISE_CONSENT_API_URL, 'data_sharing_consent')
 
     def setUp(self):
-        super(EnterpriseServiceMockMixin, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         cache.clear()
 
     @staticmethod
     def get_enterprise_url(path):
         """Return a URL to the configured Enterprise API. """
-        return '{}{}/'.format(settings.ENTERPRISE_API_URL, path)
+        return f'{settings.ENTERPRISE_API_URL}{path}/'
 
     def mock_get_enterprise_customer(self, uuid, response, status):
         """
