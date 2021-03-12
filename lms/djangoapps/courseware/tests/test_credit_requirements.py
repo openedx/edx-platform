@@ -3,11 +3,10 @@ Tests for credit requirement display on the progress page.
 """
 
 
+from unittest.mock import patch
 import ddt
-import six
 from django.conf import settings
 from django.urls import reverse
-from mock import patch
 
 from common.djangoapps.course_modes.models import CourseMode
 from openedx.core.djangoapps.credit import api as credit_api
@@ -33,11 +32,11 @@ class ProgressPageCreditRequirementsTest(SharedModuleStoreTestCase):
 
     @classmethod
     def setUpClass(cls):
-        super(ProgressPageCreditRequirementsTest, cls).setUpClass()
+        super().setUpClass()
         cls.course = CourseFactory.create()
 
     def setUp(self):
-        super(ProgressPageCreditRequirementsTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
 
         # Configure course as a credit course
         CreditCourse.objects.create(course_key=self.course.id, enabled=True)
@@ -89,7 +88,7 @@ class ProgressPageCreditRequirementsTest(SharedModuleStoreTestCase):
         self.assertContains(response, "Upcoming")
         self.assertContains(
             response,
-            u"{}, you have not yet met the requirements for credit".format(self.USER_FULL_NAME)
+            f"{self.USER_FULL_NAME}, you have not yet met the requirements for credit"
         )
 
     def test_credit_requirements_eligible(self):
@@ -116,13 +115,13 @@ class ProgressPageCreditRequirementsTest(SharedModuleStoreTestCase):
         self.assertContains(response, self.VERIFICATION_REQ_DISPLAY)
         self.assertContains(
             response,
-            u"{}, you have met the requirements for credit in this course.".format(self.USER_FULL_NAME)
+            f"{self.USER_FULL_NAME}, you have met the requirements for credit in this course."
         )
-        self.assertContains(response, u"Completed by {date}")
+        self.assertContains(response, "Completed by {date}")
 
         credit_requirements = credit_api.get_credit_requirement_status(self.course.id, self.user.username)
         for requirement in credit_requirements:
-            self.assertContains(response, requirement['status_date'].strftime(u'%Y-%m-%d %H:%M'))
+            self.assertContains(response, requirement['status_date'].strftime('%Y-%m-%d %H:%M'))
         self.assertNotContains(response, "95%")
 
     def test_credit_requirements_not_eligible(self):
@@ -142,7 +141,7 @@ class ProgressPageCreditRequirementsTest(SharedModuleStoreTestCase):
         self.assertContains(response, self.VERIFICATION_REQ_DISPLAY)
         self.assertContains(
             response,
-            u"{}, you are no longer eligible for credit in this course.".format(self.USER_FULL_NAME)
+            f"{self.USER_FULL_NAME}, you are no longer eligible for credit in this course."
         )
         self.assertContains(response, "Verification Failed")
 
@@ -170,5 +169,5 @@ class ProgressPageCreditRequirementsTest(SharedModuleStoreTestCase):
 
     def _get_progress_page(self):
         """Load the progress page for the course the user is enrolled in. """
-        url = reverse("progress", kwargs={"course_id": six.text_type(self.course.id)})
+        url = reverse("progress", kwargs={"course_id": str(self.course.id)})
         return self.client.get(url)

@@ -31,7 +31,7 @@ from common.djangoapps.student.tests.factories import UserProfileFactory as Stud
 # TODO fix this (course_id and location are invalid names as constants, and course_id should really be COURSE_KEY)
 # pylint: disable=invalid-name
 course_id = CourseKey.from_string('edX/test_course/test')
-location = partial(course_id.make_usage_key, u'problem')
+location = partial(course_id.make_usage_key, 'problem')
 
 
 class UserProfileFactory(StudentUserProfileFactory):
@@ -126,7 +126,7 @@ class GlobalStaffFactory(UserFactory):
 
 
 class StudentModuleFactory(DjangoModelFactory):  # lint-amnesty, pylint: disable=missing-class-docstring
-    class Meta(object):
+    class Meta:
         model = StudentModule
 
     module_type = "problem"
@@ -139,7 +139,7 @@ class StudentModuleFactory(DjangoModelFactory):  # lint-amnesty, pylint: disable
 
 
 class UserStateSummaryFactory(DjangoModelFactory):  # lint-amnesty, pylint: disable=missing-class-docstring
-    class Meta(object):
+    class Meta:
         model = XModuleUserStateSummaryField
 
     field_name = 'existing_field'
@@ -148,7 +148,7 @@ class UserStateSummaryFactory(DjangoModelFactory):  # lint-amnesty, pylint: disa
 
 
 class StudentPrefsFactory(DjangoModelFactory):  # lint-amnesty, pylint: disable=missing-class-docstring
-    class Meta(object):
+    class Meta:
         model = XModuleStudentPrefsField
 
     field_name = 'existing_field'
@@ -158,7 +158,7 @@ class StudentPrefsFactory(DjangoModelFactory):  # lint-amnesty, pylint: disable=
 
 
 class StudentInfoFactory(DjangoModelFactory):  # lint-amnesty, pylint: disable=missing-class-docstring
-    class Meta(object):
+    class Meta:
         model = XModuleStudentInfoField
 
     field_name = 'existing_field'
@@ -171,6 +171,6 @@ class RequestFactoryNoCsrf(RequestFactory):
     RequestFactory, which disables csrf checks.
     """
     def request(self, **kwargs):
-        request = super(RequestFactoryNoCsrf, self).request(**kwargs)  # lint-amnesty, pylint: disable=super-with-arguments
+        request = super().request(**kwargs)
         setattr(request, '_dont_enforce_csrf_checks', True)  # pylint: disable=literal-used-as-attribute
         return request

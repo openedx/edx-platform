@@ -2,9 +2,9 @@
 
 import datetime
 
+from unittest.mock import patch
 import pytz
 from django.test.utils import override_settings
-from mock import patch
 
 from lms.djangoapps.courseware.access import has_access
 from lms.djangoapps.courseware.tests.factories import BetaTesterFactory
@@ -28,7 +28,7 @@ class SelfPacedDateOverrideTest(ModuleStoreTestCase):
 
     def setUp(self):
         self.reset_setting_cache_variables()
-        super(SelfPacedDateOverrideTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
 
         self.non_staff_user, __ = self.create_non_staff_user()
         self.now = datetime.datetime.now(pytz.UTC).replace(microsecond=0)
@@ -36,7 +36,7 @@ class SelfPacedDateOverrideTest(ModuleStoreTestCase):
 
     def tearDown(self):
         self.reset_setting_cache_variables()
-        super(SelfPacedDateOverrideTest, self).tearDown()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().tearDown()
 
     def reset_setting_cache_variables(self):
         """
@@ -122,7 +122,7 @@ class SelfPacedDateOverrideTest(ModuleStoreTestCase):
 
         # Only the released xblocks should be visible when the course is instructor-paced.
         xblocks = get_accessible_discussion_xblocks(course, self.non_staff_user)
-        assert all(((xblock.display_name == 'released') for xblock in xblocks))
+        assert all((xblock.display_name == 'released') for xblock in xblocks)
 
     @patch.dict('lms.djangoapps.courseware.access.settings.FEATURES', {'DISABLE_START_DATES': False})
     def test_self_paced_discussion_xblock_visibility(self):
@@ -136,4 +136,4 @@ class SelfPacedDateOverrideTest(ModuleStoreTestCase):
         # The scheduled xblocks should be visible when the course is self-paced.
         xblocks = get_accessible_discussion_xblocks(course, self.non_staff_user)
         assert len(xblocks) == 2
-        assert any(((xblock.display_name == 'scheduled') for xblock in xblocks))
+        assert any((xblock.display_name == 'scheduled') for xblock in xblocks)

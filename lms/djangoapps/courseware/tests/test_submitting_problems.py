@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 Integration tests for submitting problem responses and getting grades.
 """
@@ -10,8 +9,8 @@ import json
 import os
 from textwrap import dedent
 
+from unittest.mock import patch
 import ddt
-import six
 from django.conf import settings
 from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.db import connections
@@ -19,8 +18,6 @@ from django.test import TestCase
 from django.test.client import RequestFactory
 from django.urls import reverse
 from django.utils.timezone import now
-from mock import patch
-from six import text_type
 from submissions import api as submissions_api
 
 from capa.tests.response_xml_factory import (
@@ -71,8 +68,8 @@ class ProblemSubmissionTestMixin(TestCase):
         return reverse(
             'xblock_handler',
             kwargs={
-                'course_id': text_type(self.course.id),
-                'usage_id': quote_slashes(text_type(problem_location)),
+                'course_id': str(self.course.id),
+                'usage_id': quote_slashes(str(problem_location)),
                 'handler': 'xmodule_handler',
                 'suffix': dispatch,
             }
@@ -89,7 +86,7 @@ class ProblemSubmissionTestMixin(TestCase):
         problem_location = self.problem_location(problem_url_name)
         modx_url = self.modx_url(problem_location, 'problem_check')
 
-        answer_key_prefix = 'input_{}_'.format(problem_location.html_id())
+        answer_key_prefix = f'input_{problem_location.html_id()}_'
 
         # format the response dictionary to be sent in the post request by adding the above prefix to each key
         response_dict = {(answer_key_prefix + k): v for k, v in responses.items()}
@@ -149,7 +146,7 @@ class TestSubmittingProblems(ModuleStoreTestCase, LoginEnrollmentTestCase, Probl
     ENABLED_SIGNALS = ['course_published']
 
     def setUp(self):
-        super(TestSubmittingProblems, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
 
         # create a test student
         self.course = CourseFactory.create(display_name=self.COURSE_NAME, number=self.COURSE_SLUG)
@@ -177,7 +174,7 @@ class TestSubmittingProblems(ModuleStoreTestCase, LoginEnrollmentTestCase, Probl
             question_text='The correct answer is Correct',
             num_inputs=num_inputs,
             weight=num_inputs,
-            options=['Correct', 'Incorrect', u'ⓤⓝⓘⓒⓞⓓⓔ'],
+            options=['Correct', 'Incorrect', 'ⓤⓝⓘⓒⓞⓓⓔ'],
             correct_option='Correct'
         )
 
@@ -278,15 +275,14 @@ class TestSubmittingProblems(ModuleStoreTestCase, LoginEnrollmentTestCase, Probl
         Returns list of scores: [<points on hw_1>, <points on hw_2>, ..., <points on hw_n>]
         """
         return [
-            s.graded_total.earned for s in six.itervalues(
-                self.get_course_grade().graded_subsections_by_format['Homework'])
+            s.graded_total.earned for s in self.get_course_grade().graded_subsections_by_format['Homework'].values()
         ]
 
     def hw_grade(self, hw_url_name):
         """
         Returns SubsectionGrade for given url.
         """
-        for chapter in six.itervalues(self.get_course_grade().chapter_grades):
+        for chapter in self.get_course_grade().chapter_grades.values():
             for section in chapter['sections']:
                 if section.url_name == hw_url_name:
                     return section
@@ -307,7 +303,7 @@ class TestCourseGrades(TestSubmittingProblems):
     Tests grades are updated correctly when manipulating problems.
     """
     def setUp(self):
-        super(TestCourseGrades, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.homework = self.add_graded_section_to_course('homework')
         self.problem = self.add_dropdown_to_section(self.homework.location, 'p1', 1)
 
@@ -409,7 +405,7 @@ class TestCourseGrader(TestSubmittingProblems):
             ]
         }
         self.add_grading_policy(grading_policy)
-        task_compute_all_grades_for_course.apply_async(kwargs={'course_key': six.text_type(self.course.id)})
+        task_compute_all_grades_for_course.apply_async(kwargs={'course_key': str(self.course.id)})
 
     def dropping_setup(self):
         """
@@ -485,7 +481,7 @@ class TestCourseGrader(TestSubmittingProblems):
 
     def test_show_answer_doesnt_write_to_csm(self):
         self.basic_setup()
-        self.submit_question_answer('p1', {'2_1': u'Correct'})
+        self.submit_question_answer('p1', {'2_1': 'Correct'})
 
         # Now fetch the state entry for that problem.
         student_module = StudentModule.objects.filter(
@@ -581,8 +577,8 @@ class TestCourseGrader(TestSubmittingProblems):
 
         student_item = {
             'student_id': anonymous_id_for_user(self.student_user, self.course.id),
-            'course_id': six.text_type(self.course.id),
-            'item_id': six.text_type(self.problem_location('p3')),
+            'course_id': str(self.course.id),
+            'item_id': str(self.problem_location('p3')),
             'item_type': 'problem'
         }
         submission = submissions_api.create_submission(student_item, 'any answer')
@@ -600,7 +596,7 @@ class TestCourseGrader(TestSubmittingProblems):
 
         with patch('submissions.api.get_scores') as mock_get_scores:
             mock_get_scores.return_value = {
-                text_type(self.problem_location('p3')): {
+                str(self.problem_location('p3')): {
                     'points_earned': 1,
                     'points_possible': 1,
                     'created_at': now(),
@@ -610,7 +606,7 @@ class TestCourseGrader(TestSubmittingProblems):
 
             # Verify that the submissions API was sent an anonymized student ID
             mock_get_scores.assert_called_with(
-                text_type(self.course.id),
+                str(self.course.id),
                 anonymous_id_for_user(self.student_user, self.course.id)
             )
 
@@ -759,7 +755,7 @@ class ProblemWithUploadedFilesTest(TestSubmittingProblems):
     databases = {alias for alias in connections}  # lint-amnesty, pylint: disable=unnecessary-comprehension
 
     def setUp(self):
-        super(ProblemWithUploadedFilesTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.section = self.add_graded_section_to_course('section')
 
     def problem_setup(self, name, files):
@@ -803,8 +799,8 @@ class ProblemWithUploadedFilesTest(TestSubmittingProblems):
         assert name == 'post'
         assert len(args) == 1
         assert args[0].endswith('/submit/')
-        six.assertCountEqual(self, list(kwargs.keys()), ["files", "data", "timeout"])
-        six.assertCountEqual(self, list(kwargs['files'].keys()), filenames.split())
+        self.assertCountEqual(list(kwargs.keys()), ["files", "data", "timeout"])
+        self.assertCountEqual(list(kwargs['files'].keys()), filenames.split())
 
 
 class TestPythonGradedResponse(TestSubmittingProblems):
@@ -903,7 +899,7 @@ class TestPythonGradedResponse(TestSubmittingProblems):
     COMPUTED_ANSWER_INCORRECT = "because we never let them in"
 
     def setUp(self):
-        super(TestPythonGradedResponse, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.section = self.add_graded_section_to_course('section')
         self.correct_responses = {}
         self.incorrect_responses = {}
@@ -1067,7 +1063,7 @@ class TestConditionalContent(TestSubmittingProblems):
         One section is pre-populated with a problem (with 2 inputs), visible to all students.
         The second section is empty. Test cases should add conditional content to it.
         """
-        super(TestConditionalContent, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
 
         self.user_partition_group_0 = 0
         self.user_partition_group_1 = 1
@@ -1143,7 +1139,7 @@ class TestConditionalContent(TestSubmittingProblems):
         UserCourseTagFactory(
             user=self.student_user,
             course_id=self.course.id,
-            key='xblock.partition_service.partition_{0}'.format(self.partition.id),
+            key=f'xblock.partition_service.partition_{self.partition.id}',
             value=str(user_partition_group)
         )
 

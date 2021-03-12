@@ -5,10 +5,10 @@ Unit tests for course tools.
 
 import datetime
 
+from unittest.mock import patch
 import crum
 import pytz
 from django.test import RequestFactory
-from mock import patch
 
 from common.djangoapps.course_modes.models import CourseMode
 from common.djangoapps.course_modes.tests.factories import CourseModeFactory
@@ -24,7 +24,7 @@ class VerifiedUpgradeToolTest(SharedModuleStoreTestCase):  # lint-amnesty, pylin
 
     @classmethod
     def setUpClass(cls):
-        super(VerifiedUpgradeToolTest, cls).setUpClass()
+        super().setUpClass()
         cls.now = datetime.datetime.now(pytz.UTC)
 
         cls.course = CourseFactory.create(
@@ -37,7 +37,7 @@ class VerifiedUpgradeToolTest(SharedModuleStoreTestCase):  # lint-amnesty, pylin
         cls.course_overview = CourseOverview.get_from_id(cls.course.id)
 
     def setUp(self):
-        super(VerifiedUpgradeToolTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
 
         self.course_verified_mode = CourseModeFactory(
             course_id=self.course.id,
@@ -102,7 +102,7 @@ class FinancialAssistanceToolTest(SharedModuleStoreTestCase):
     """
     @classmethod
     def setUpClass(cls):
-        super(FinancialAssistanceToolTest, cls).setUpClass()
+        super().setUpClass()
         cls.now = datetime.datetime.now(pytz.UTC)
 
         cls.course = CourseFactory.create(
@@ -114,7 +114,7 @@ class FinancialAssistanceToolTest(SharedModuleStoreTestCase):
         cls.course_overview = CourseOverview.get_from_id(cls.course.id)
 
     def setUp(self):
-        super(FinancialAssistanceToolTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
 
         self.course_financial_mode = CourseModeFactory(
             course_id=self.course.id,
