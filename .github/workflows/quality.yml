@@ -44,6 +44,8 @@ jobs:
         if: env.GIT_DIFF
 
       - name: Install requirements
+        env:
+          PHILU_PAT: ${{ secrets.PHILU_PAT }}
         run: |
           sudo apt-get install libxmlsec1-dev pkg-config
           sudo apt-get update
