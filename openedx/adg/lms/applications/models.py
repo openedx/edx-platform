@@ -127,7 +127,7 @@ class UserApplication(TimeStampedModel):
 
     user = models.OneToOneField(User, related_name='application', on_delete=models.CASCADE, verbose_name=_('User'), )
     business_line = models.ForeignKey(BusinessLine, verbose_name=_('Business Line'),
-                                      on_delete=models.CASCADE, null=True)
+                                      on_delete=models.CASCADE, null=True, blank=True, )
 
     organization = models.CharField(verbose_name=_('Organization'), max_length=255, blank=True, )
     linkedin_url = models.URLField(verbose_name=_('LinkedIn URL'), max_length=255, blank=True, )

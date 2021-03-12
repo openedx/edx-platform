@@ -150,17 +150,29 @@ def mock_cover_letter_file_fixture():
 
 
 @pytest.mark.django_db
-@pytest.mark.parametrize('expected', [True, False], ids=['business_line_selected', 'no_business_line'])
-def test_user_application_cover_letter_form_business_line(expected):
+@pytest.mark.parametrize(
+    'business_line, button_click, expected',
+    [
+        (None, 'back', True), ('business', 'back', True), (None, 'submit', False), ('business', 'submit', True)
+    ],
+    ids=[
+        'back_button_clicked with_no_business_line',
+        'back_button_clicked_with_business_line_selected',
+        'submit_button_clicked_with_no_business_line',
+        'submit_button_clicked_with_business_line_selected'
+    ]
+)
+def test_user_application_cover_letter_form_business_line(business_line, button_click, expected):
     """
     Validate that business line is a compulsory field
     """
-    if expected:
+    if business_line == 'business':
         business_line = BusinessLineFactory().id
-    else:
-        business_line = None
 
-    data_dict = {'business_line': business_line}
+    data_dict = {
+        'business_line': business_line,
+        'button_click': button_click
+    }
     form = UserApplicationCoverLetterForm(data=data_dict)
 
     assert form.is_valid() == expected
