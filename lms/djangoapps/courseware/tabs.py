@@ -114,7 +114,7 @@ class ProgressTab(EnrolledTab):
             if course_home_mfe_progress_tab_is_active(course.id):
                 return get_learning_mfe_home_url(course_key=course.id, view_name=self.view_name)
             else:
-                return reverse_func(self.view_name, args=[six.text_type(course.id)])
+                return reverse_func(self.view_name, args=[str(course.id)])
 
         tab_dict['link_func'] = link_func
         super(ProgressTab, self).__init__(tab_dict)  # pylint: disable=super-with-arguments
