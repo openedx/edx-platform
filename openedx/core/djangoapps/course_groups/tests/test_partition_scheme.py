@@ -4,9 +4,8 @@ Test the partitions and partitions service
 """
 
 
+from unittest.mock import patch
 import django.test
-from mock import patch
-from six.moves import range
 
 from lms.djangoapps.courseware.tests.test_masquerade import StaffMasqueradeTestCase
 from openedx.core.djangoapps.user_api.partition_schemes import RandomUserPartitionScheme
@@ -35,7 +34,7 @@ class TestCohortPartitionScheme(ModuleStoreTestCase):
         Regenerate a course with cohort configuration, partition and groups,
         and a student for each test.
         """
-        super(TestCohortPartitionScheme, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
 
         self.course_key = ToyCourseFactory.create().id
         self.course = modulestore().get_course(self.course_key)
@@ -275,7 +274,7 @@ class TestGetCohortedUserPartition(ModuleStoreTestCase):
         Regenerate a course with cohort configuration, partition and groups,
         and a student for each test.
         """
-        super(TestGetCohortedUserPartition, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.course_key = ToyCourseFactory.create().id
         self.course = modulestore().get_course(self.course_key)
         self.student = UserFactory.create()
@@ -326,7 +325,7 @@ class TestMasqueradedGroup(StaffMasqueradeTestCase):
     Check for staff being able to masquerade as belonging to a group.
     """
     def setUp(self):
-        super(TestMasqueradedGroup, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.user_partition = UserPartition(
             0, 'Test User Partition', '',
             [Group(0, 'Group 1'), Group(1, 'Group 2')],

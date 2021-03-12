@@ -3,17 +3,15 @@ Tests for cohorts
 """
 # pylint: disable=no-member
 
+from unittest.mock import call, patch
 import pytest
 import ddt
 from django.contrib.auth.models import AnonymousUser, User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.db import IntegrityError
 from django.http import Http404
 from django.test import TestCase
-from mock import call, patch
 from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locator import CourseLocator
-from six import text_type
-from six.moves import range
 
 from common.djangoapps.student.models import CourseEnrollment
 from common.djangoapps.student.tests.factories import UserFactory
@@ -33,7 +31,7 @@ class TestCohortSignals(TestCase):
     """
 
     def setUp(self):
-        super(TestCohortSignals, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.course_key = CourseLocator("dummy", "dummy", "dummy")
 
     def test_cohort_added(self, mock_tracker):
@@ -143,7 +141,7 @@ class TestCohorts(ModuleStoreTestCase):
         """
         Make sure that course is reloaded every time--clear out the modulestore.
         """
-        super(TestCohorts, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.toy_course_key = ToyCourseFactory.create().id
 
     def _create_cohort(self, course_id, cohort_name, assignment_type):
@@ -447,7 +445,7 @@ class TestCohorts(ModuleStoreTestCase):
         course = modulestore().get_course(self.toy_course_key)
         assert not cohorts.is_course_cohorted(course.id)
 
-        groups = ["group_{0}".format(n) for n in range(5)]
+        groups = [f"group_{n}" for n in range(5)]
         config_course_cohorts(
             course, is_cohorted=True, auto_cohorts=groups
         )
@@ -455,8 +453,8 @@ class TestCohorts(ModuleStoreTestCase):
         # Assign 100 users to cohorts
         for i in range(100):
             user = UserFactory(
-                username="test_{0}".format(i),
-                email="a@b{0}.com".format(i)
+                username=f"test_{i}",
+                email=f"a@b{i}.com"
             )
             cohorts.get_cohort(user, course.id)
 
@@ -628,7 +626,7 @@ class TestCohorts(ModuleStoreTestCase):
         with pytest.raises(ValueError) as value_error:
             cohorts.set_course_cohorted(course.id, 'not a boolean')
 
-        assert 'Cohorted must be a boolean' == text_type(value_error.value)
+        assert 'Cohorted must be a boolean' == str(value_error.value)
 
 
 @ddt.ddt
@@ -642,7 +640,7 @@ class TestCohortsAndPartitionGroups(ModuleStoreTestCase):
         """
         Regenerate a test course and cohorts for each test
         """
-        super(TestCohortsAndPartitionGroups, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
 
         self.test_course_key = ToyCourseFactory.create().id
         self.course = modulestore().get_course(self.test_course_key)
@@ -766,7 +764,7 @@ class TestUnregisteredLearnerCohortAssignments(TestCase):
     """
 
     def setUp(self):
-        super(TestUnregisteredLearnerCohortAssignments, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.course_key = CourseKey.from_string('course-v1:edX+DemoX+Demo_Course')
         self.cohort = CourseUserGroup.objects.create(
             name="TestCohort",

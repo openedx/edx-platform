@@ -7,8 +7,6 @@ import json
 import tempfile
 
 import ddt
-import six
-from six.moves import range
 from django.urls import reverse
 
 from openedx.core.djangoapps.oauth_dispatch.tests.factories import ApplicationFactory, AccessTokenFactory
@@ -27,7 +25,7 @@ HANDLER_POST_PAYLOAD = '{"name":"Default","user_count":0,"assignment_type":"rand
 ,"group_id":null}'
 HANDLER_PATCH_PAYLOAD = '{"name":"Default Group","group_id":null,"user_partition_id":null,"assignment_type":"random"}'
 ADD_USER_PAYLOAD = json.dumps({'users': [USER_MAIL, ]})
-CSV_DATA = '''email,cohort\n{},DEFAULT'''.format(USER_MAIL)
+CSV_DATA = f'''email,cohort\n{USER_MAIL},DEFAULT'''
 
 
 @skip_unless_lms
@@ -41,11 +39,11 @@ class TestCohortOauth(SharedModuleStoreTestCase):
 
     @classmethod
     def setUpClass(cls):
-        super(TestCohortOauth, cls).setUpClass()
+        super().setUpClass()
         cls.user = UserFactory(username=USERNAME, email=USER_MAIL, password=cls.password)
         cls.staff_user = UserFactory(is_staff=True, password=cls.password)
         cls.course_key = ToyCourseFactory.create().id
-        cls.course_str = six.text_type(cls.course_key)
+        cls.course_str = str(cls.course_key)
 
     @ddt.data({'path_name': 'api_cohorts:cohort_settings'},
               {'path_name': 'api_cohorts:cohort_handler'}, )
@@ -127,11 +125,11 @@ class TestCohortApi(SharedModuleStoreTestCase):
 
     @classmethod
     def setUpClass(cls):
-        super(TestCohortApi, cls).setUpClass()
+        super().setUpClass()
         cls.user = UserFactory(username=USERNAME, email=USER_MAIL, password=cls.password)
         cls.staff_user = UserFactory(is_staff=True, password=cls.password)
         cls.course_key = ToyCourseFactory.create().id
-        cls.course_str = six.text_type(cls.course_key)
+        cls.course_str = str(cls.course_key)
 
     @ddt.data(
         {'is_staff': True, 'status': 200},
@@ -313,7 +311,7 @@ class TestCohortApi(SharedModuleStoreTestCase):
             expected_results = [{
                 'username': user.username,
                 'email': user.email,
-                'name': u'{} {}'.format(user.first_name, user.last_name)
+                'name': f'{user.first_name} {user.last_name}'
             } for user in users]
             assert results == expected_results
 
@@ -456,7 +454,7 @@ class TestCohortApi(SharedModuleStoreTestCase):
         path = reverse('api_cohorts:cohort_users_csv', kwargs={'course_key_string': self.course_str})
         user = self.staff_user if is_staff else self.user
         assert self.client.login(username=user.username, password=self.password)
-        with open(file_name, 'r') as file_pointer:
+        with open(file_name) as file_pointer:
             response = self.client.post(path=path,
                                         data={'uploaded-file': file_pointer})
             assert response.status_code == status
