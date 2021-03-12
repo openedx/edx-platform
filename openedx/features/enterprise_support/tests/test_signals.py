@@ -3,23 +3,21 @@
 
 import logging
 from datetime import timedelta
-from unittest.mock import patch
 
 import ddt
 from django.test.utils import override_settings
 from django.utils.timezone import now
 from edx_django_utils.cache import TieredCache
+from mock import patch
 from opaque_keys.edx.keys import CourseKey
 from slumber.exceptions import HttpClientError, HttpServerError
 from testfixtures import LogCapture
 
 from common.djangoapps.course_modes.tests.factories import CourseModeFactory
-from common.djangoapps.student.models import CourseEnrollmentAttribute
-from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
 from lms.djangoapps.certificates.signals import listen_for_passing_grade
 from openedx.core.djangoapps.commerce.utils import ECOMMERCE_DATE_FORMAT
 from openedx.core.djangoapps.credit.tests.test_api import TEST_ECOMMERCE_WORKER
-from openedx.core.djangoapps.signals.signals import COURSE_ASSESSMENT_GRADE_CHANGED, COURSE_GRADE_NOW_PASSED
+from openedx.core.djangoapps.signals.signals import COURSE_GRADE_NOW_PASSED, COURSE_ASSESSMENT_GRADE_CHANGED
 from openedx.features.enterprise_support.tests import FEATURES_WITH_ENTERPRISE_ENABLED
 from openedx.features.enterprise_support.tests.factories import (
     EnterpriseCourseEnrollmentFactory,
@@ -27,6 +25,8 @@ from openedx.features.enterprise_support.tests.factories import (
     EnterpriseCustomerUserFactory
 )
 from openedx.features.enterprise_support.utils import get_data_consent_share_cache_key
+from common.djangoapps.student.models import CourseEnrollmentAttribute
+from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
@@ -50,7 +50,7 @@ class EnterpriseSupportSignals(SharedModuleStoreTestCase):
         self.user = UserFactory.create(username='test', email=TEST_EMAIL)
         self.course_id = 'course-v1:edX+DemoX+Demo_Course'
         self.enterprise_customer = EnterpriseCustomerFactory()
-        super().setUp()
+        super(EnterpriseSupportSignals, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
 
     @staticmethod
     def _create_dsc_cache(user_id, course_id):

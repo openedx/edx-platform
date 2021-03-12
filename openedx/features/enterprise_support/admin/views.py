@@ -28,7 +28,7 @@ class EnrollmentAttributeOverrideView(FormView):
         return reverse('admin:enterprise_override_attributes')
 
     def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
+        context = super(EnrollmentAttributeOverrideView, self).get_context_data(**kwargs)  # lint-amnesty, pylint: disable=super-with-arguments
         context.update(self._get_admin_context(self.request))
         return context
 
@@ -68,4 +68,4 @@ class EnrollmentAttributeOverrideView(FormView):
                 ).format(error_line_numbers=', '.join(error_line_numbers))
             )
 
-        return super().form_valid(form)
+        return super(EnrollmentAttributeOverrideView, self).form_valid(form)  # lint-amnesty, pylint: disable=super-with-arguments

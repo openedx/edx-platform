@@ -1,10 +1,9 @@
 """
 Test the enterprise support APIs.
 """
-from unittest import mock
-
 import ddt
 import httpretty
+import mock
 import pytest
 from consent.models import DataSharingConsent
 from django.conf import settings
@@ -22,6 +21,7 @@ from common.djangoapps.student.tests.factories import UserFactory
 from openedx.core.djangoapps.site_configuration.tests.factories import SiteFactory
 from openedx.core.djangolib.testing.utils import CacheIsolationTestCase, skip_unless_lms
 from openedx.features.enterprise_support.api import (
+    activate_learner_enterprise,
     _CACHE_MISS,
     ENTERPRISE_CUSTOMER_KEY_NAME,
     ConsentApiClient,
@@ -29,7 +29,6 @@ from openedx.features.enterprise_support.api import (
     EnterpriseApiClient,
     EnterpriseApiException,
     EnterpriseApiServiceClient,
-    activate_learner_enterprise,
     add_enterprise_customer_to_session,
     consent_needed_for_course,
     data_sharing_consent_required,
@@ -81,7 +80,7 @@ class TestEnterpriseApi(EnterpriseServiceMockMixin, CacheIsolationTestCase):
             email='ent_worker@example.com',
             password='password123',
         )
-        super().setUpTestData()
+        super(TestEnterpriseApi, cls).setUpTestData()
 
     def _assert_api_service_client(self, api_client, mocked_jwt_builder):
         """
@@ -660,7 +659,7 @@ class TestEnterpriseApi(EnterpriseServiceMockMixin, CacheIsolationTestCase):
             'course_id': ['course-v1:edX+DemoX+Demo_Course'],
             'failure_url': ['http://localhost:8000/dashboard?consent_failed=course-v1%3AedX%2BDemoX%2BDemo_Course'],
             'enterprise_customer_uuid': ['cf246b88-d5f6-4908-a522-fc307e0b0c59'],
-            'next': [f'http://localhost:8000{expected_path}']
+            'next': ['http://localhost:8000{}'.format(expected_path)]
         }
 
         actual_url = get_enterprise_consent_url(request_mock, course_id, return_to=return_to)

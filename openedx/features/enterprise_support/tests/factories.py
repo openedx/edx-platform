@@ -28,7 +28,7 @@ class EnterpriseCustomerFactory(factory.django.DjangoModelFactory):
     parameters for EnterpriseCustomer constructor.
     """
 
-    class Meta:
+    class Meta(object):
         """
         Meta for EnterpriseCustomerFactory.
         """
@@ -52,7 +52,7 @@ class EnterpriseCustomerUserFactory(factory.django.DjangoModelFactory):
     parameters for EnterpriseCustomerUser constructor.
     """
 
-    class Meta:
+    class Meta(object):
         """
         Meta for EnterpriseCustomerFactory.
         """
@@ -70,7 +70,7 @@ class EnterpriseCourseEnrollmentFactory(factory.django.DjangoModelFactory):
     Creates an instance of EnterpriseCourseEnrollment with minimal boilerplate.
     """
 
-    class Meta:
+    class Meta(object):
         """
         Meta for EnterpriseCourseEnrollmentFactory.
         """
@@ -88,7 +88,7 @@ class EnterpriseCustomerBrandingConfigurationFactory(factory.django.DjangoModelF
     Creates an instance of EnterpriseCustomerBrandingConfiguration with minimal boilerplate.
     """
 
-    class Meta:
+    class Meta(object):
         """
         Meta for EnterpriseCustomerBrandingConfigurationFactory.
         """
@@ -106,7 +106,7 @@ class EnterpriseCustomerIdentityProviderFactory(factory.django.DjangoModelFactor
     EnterpriseCustomerIdentityProvider factory.
     """
 
-    class Meta:
+    class Meta(object):
         """
         Meta for EnterpriseCustomerIdentityProviderFactory.
         """

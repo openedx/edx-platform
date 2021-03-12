@@ -58,7 +58,7 @@ class EnterpriseApiException(Exception):
     """
 
 
-class ConsentApiClient:
+class ConsentApiClient(object):
     """
     Class for producing an Enterprise Consent service API client
     """
@@ -121,7 +121,7 @@ class ConsentApiClient:
         return response['consent_required']
 
 
-class EnterpriseServiceClientMixin:
+class EnterpriseServiceClientMixin(object):
     """
     Class for initializing an Enterprise API clients with service user.
     """
@@ -132,7 +132,7 @@ class EnterpriseServiceClientMixin:
         Enterprise worker user by default.
         """
         user = User.objects.get(username=settings.ENTERPRISE_SERVICE_WORKER_USERNAME)
-        super().__init__(user)
+        super(EnterpriseServiceClientMixin, self).__init__(user)  # lint-amnesty, pylint: disable=super-with-arguments
 
 
 class ConsentApiServiceClient(EnterpriseServiceClientMixin, ConsentApiClient):
@@ -141,7 +141,7 @@ class ConsentApiServiceClient(EnterpriseServiceClientMixin, ConsentApiClient):
     """
 
 
-class EnterpriseApiClient:
+class EnterpriseApiClient(object):
     """
     Class for producing an Enterprise service API client.
     """
@@ -176,8 +176,8 @@ class EnterpriseApiClient:
             endpoint.post(data=data)
         except (HttpClientError, HttpServerError):
             message = (
-                "An error occured while posting EnterpriseCourseEnrollment for user {username} and "
-                "course run {course_id} (consent_granted value: {consent_granted})"
+                u"An error occured while posting EnterpriseCourseEnrollment for user {username} and "
+                u"course run {course_id} (consent_granted value: {consent_granted})"
             ).format(
                 username=username,
                 course_id=course_id,
@@ -273,7 +273,7 @@ class EnterpriseApiClient:
             response = endpoint().get(**querystring)
         except (HttpClientError, HttpServerError):
             LOGGER.exception(
-                'Failed to get enterprise-learner for user [%s] with client user [%s]. Caller: %s, Request PATH: %s',
+                u'Failed to get enterprise-learner for user [%s] with client user [%s]. Caller: %s, Request PATH: %s',
                 user.username,
                 self.user.username,
                 "".join(traceback.format_stack()),
@@ -355,7 +355,7 @@ def data_sharing_consent_required(view_func):
         if consent_url:
             real_user = getattr(request.user, 'real_user', request.user)
             LOGGER.info(
-                'User %s cannot access the course %s because they have not granted consent',
+                u'User %s cannot access the course %s because they have not granted consent',
                 real_user,
                 course_id,
             )
@@ -594,7 +594,7 @@ def consent_needed_for_course(request, user, course_id, enrollment_exists=False)
     data sharing permissions before accessing a course.
     """
     LOGGER.info(
-        "Determining if user [{username}] must consent to data sharing for course [{course_id}]".format(
+        u"Determining if user [{username}] must consent to data sharing for course [{course_id}]".format(
             username=user.username,
             course_id=course_id
         )
@@ -604,8 +604,8 @@ def consent_needed_for_course(request, user, course_id, enrollment_exists=False)
     data_sharing_consent_needed_cache = TieredCache.get_cached_response(consent_cache_key)
     if data_sharing_consent_needed_cache.is_found and data_sharing_consent_needed_cache.value == 0:
         LOGGER.info(
-            "Consent from user [{username}] is not needed for course [{course_id}]. The DSC cache was checked,"
-            " and the value was 0.".format(
+            u"Consent from user [{username}] is not needed for course [{course_id}]. The DSC cache was checked,"
+            u" and the value was 0.".format(
                 username=user.username,
                 course_id=course_id
             )
@@ -616,8 +616,8 @@ def consent_needed_for_course(request, user, course_id, enrollment_exists=False)
     enterprise_learner_details = get_enterprise_learner_data_from_db(user)
     if not enterprise_learner_details:
         LOGGER.info(
-            "Consent from user [{username}] is not needed for course [{course_id}]. The user is not linked to an"
-            " enterprise.".format(
+            u"Consent from user [{username}] is not needed for course [{course_id}]. The user is not linked to an"
+            u" enterprise.".format(
                 username=user.username,
                 course_id=course_id
             )
@@ -665,16 +665,16 @@ def consent_needed_for_course(request, user, course_id, enrollment_exists=False)
 
         if consent_needed:
             LOGGER.info(
-                "Consent from user [{username}] is needed for course [{course_id}]. The user's current enterprise"
-                " required data sharing consent, and it has not been given.".format(
+                u"Consent from user [{username}] is needed for course [{course_id}]. The user's current enterprise"
+                u" required data sharing consent, and it has not been given.".format(
                     username=user.username,
                     course_id=course_id
                 )
             )
         else:
             LOGGER.info(
-                "Consent from user [{username}] is not needed for course [{course_id}]. The user's current enterprise "
-                "does not require data sharing consent.".format(
+                u"Consent from user [{username}] is not needed for course [{course_id}]. The user's current enterprise "
+                u"does not require data sharing consent.".format(
                     username=user.username,
                     course_id=course_id
                 )
@@ -727,7 +727,7 @@ def get_enterprise_consent_url(request, course_id, user=None, return_to=None, en
     user = user or request.user
 
     LOGGER.info(
-        'Getting enterprise consent url for user [{username}] and course [{course_id}].'.format(
+        u'Getting enterprise consent url for user [{username}] and course [{course_id}].'.format(
             username=user.username,
             course_id=course_id
         )
@@ -755,7 +755,7 @@ def get_enterprise_consent_url(request, course_id, user=None, return_to=None, en
     }
     querystring = urlencode(url_params)
     full_url = reverse('grant_data_sharing_permissions') + '?' + querystring
-    LOGGER.info('Redirecting to %s to complete data sharing consent', full_url)
+    LOGGER.info(u'Redirecting to %s to complete data sharing consent', full_url)
     return full_url
 
 
@@ -844,7 +844,7 @@ def get_consent_notification_data(enterprise_customer):
         message_template = consent_page.declined_notification_message
     except DataSharingConsentTextOverrides.DoesNotExist:
         LOGGER.info(
-            "DataSharingConsentPage object doesn't exit for {enterprise_customer_name}".format(
+            u"DataSharingConsentPage object doesn't exit for {enterprise_customer_name}".format(
                 enterprise_customer_name=enterprise_customer['name']
             )
         )
@@ -891,12 +891,12 @@ def get_dashboard_consent_notification(request, user, course_enrollments):
         title_template, message_template = get_consent_notification_data(enterprise_customer)
         if not title_template:
             title_template = _(
-                'Enrollment in {course_title} was not complete.'
+                u'Enrollment in {course_title} was not complete.'
             )
         if not message_template:
             message_template = _(
                 'If you have concerns about sharing your data, please contact your administrator '
-                'at {enterprise_customer_name}.'
+                u'at {enterprise_customer_name}.'
             )
 
         title = title_template.format(
