@@ -95,4 +95,8 @@ def _check_for_cert_availability_date_changes(previous_course_overview, updated_
             f"{previous_course_overview.certificate_available_date} to " +
             f"{updated_course_overview.certificate_available_date}. Sending COURSE_CERT_DATE_CHANGE signal."
         )
-        COURSE_CERT_DATE_CHANGE.send_robust(sender=None, course_key=updated_course_overview.id)
+        COURSE_CERT_DATE_CHANGE.send_robust(
+            sender=None,
+            course_key=updated_course_overview.id,
+            available_date=updated_course_overview.certificate_available_date
+        )
