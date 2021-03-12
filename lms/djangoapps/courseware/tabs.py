@@ -10,7 +10,7 @@ from django.utils.translation import ugettext_noop
 
 from lms.djangoapps.courseware.access import has_access
 from lms.djangoapps.courseware.entrance_exams import user_can_skip_entrance_exam
-from lms.djangoapps.course_home_api.toggles import course_home_mfe_dates_tab_is_active, course_home_mfe_outline_tab_is_active  # lint-amnesty, pylint: disable=line-too-long
+from lms.djangoapps.course_home_api.toggles import course_home_mfe_dates_tab_is_active, course_home_mfe_outline_tab_is_active, course_home_mfe_progress_tab_is_active  # lint-amnesty, pylint: disable=line-too-long
 from openedx.core.lib.course_tabs import CourseTabPluginManager
 from openedx.features.course_experience import RELATIVE_DATES_FLAG, DISABLE_UNIFIED_COURSE_TAB_FLAG, default_course_url_name  # lint-amnesty, pylint: disable=line-too-long
 from openedx.features.course_experience.url_helpers import get_learning_mfe_home_url
@@ -108,6 +108,16 @@ class ProgressTab(EnrolledTab):
     view_name = 'progress'
     is_hideable = True
     is_default = False
+
+    def __init__(self, tab_dict):
+        def link_func(course, reverse_func):
+            if course_home_mfe_progress_tab_is_active(course.id):
+                return get_learning_mfe_home_url(course_key=course.id, view_name=self.view_name)
+            else:
+                return reverse_func(self.view_name, args=[six.text_type(course.id)])
+
+        tab_dict['link_func'] = link_func
+        super(ProgressTab, self).__init__(tab_dict)  # pylint: disable=super-with-arguments
 
     @classmethod
     def is_enabled(cls, course, user=None):

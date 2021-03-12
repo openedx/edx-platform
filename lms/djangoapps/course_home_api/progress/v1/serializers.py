@@ -6,11 +6,17 @@ from rest_framework.reverse import reverse
 
 
 class CourseGradeSerializer(serializers.Serializer):
+    """
+    Serializer for course grade
+    """
     percent = serializers.FloatField()
     is_passing = serializers.BooleanField(source='passed')
 
 
 class SubsectionScoresSerializer(serializers.Serializer):
+    """
+    Serializer for subsections in section_scores
+    """
     assignment_type = serializers.CharField(source='format')
     display_name = serializers.CharField()
     has_graded_assignment = serializers.BooleanField(source='graded')
@@ -32,13 +38,16 @@ class SubsectionScoresSerializer(serializers.Serializer):
 
 class SectionScoresSerializer(serializers.Serializer):
     """
-    Serializer for chapters in courseware_summary
+    Serializer for sections in section_scores
     """
     display_name = serializers.CharField()
     subsections = SubsectionScoresSerializer(source='sections', many=True)
 
 
 class GradingPolicySerializer(serializers.Serializer):
+    """
+    Serializer for grading policy
+    """
     assignment_policies = serializers.SerializerMethodField()
     grade_range = serializers.DictField(source='GRADE_CUTOFFS')
 
@@ -50,6 +59,9 @@ class GradingPolicySerializer(serializers.Serializer):
 
 
 class CertificateDataSerializer(serializers.Serializer):
+    """
+    Serializer for certificate data
+    """
     cert_status = serializers.CharField()
     cert_web_view_url = serializers.CharField()
     download_url = serializers.CharField()

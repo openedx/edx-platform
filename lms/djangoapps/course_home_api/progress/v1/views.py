@@ -2,6 +2,7 @@
 Progress Tab Views
 """
 
+from django.http.response import Http404
 from edx_django_utils import monitoring as monitoring_utils
 from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthentication
 from edx_rest_framework_extensions.auth.session.authentication import SessionAuthenticationAllowInactiveUser
@@ -13,6 +14,7 @@ from rest_framework.response import Response
 from xmodule.modulestore.django import modulestore
 from common.djangoapps.student.models import CourseEnrollment
 from lms.djangoapps.course_home_api.progress.v1.serializers import ProgressTabSerializer
+from lms.djangoapps.course_home_api.toggles import course_home_mfe_progress_tab_is_active
 from lms.djangoapps.courseware.access import has_access
 from lms.djangoapps.courseware.courses import get_course_blocks_completion_summary, get_course_with_access, get_studio_url
 from lms.djangoapps.courseware.masquerade import setup_masquerade
@@ -49,7 +51,7 @@ class ProgressTabView(RetrieveAPIView):
         course_grade: Object containing the following fields:
             percent: (float) the user's total graded percent in the course
             is_passing: (bool) whether the user's grade is above the passing grade cutoff
-        graded_course_blocks: List of serialized Chapters. Each Chapter has the following fields:
+        section_scores: List of serialized Chapters. Each Chapter has the following fields:
             display_name: (str) a str of what the name of the Chapter is for displaying on the site
             subsections: List of serialized Subsections, each has the following fields:
                 assignment_type: (str) the format, if any, of the Subsection (Homework, Exam, etc)
@@ -96,6 +98,9 @@ class ProgressTabView(RetrieveAPIView):
     def get(self, request, *args, **kwargs):
         course_key_string = kwargs.get('course_key_string')
         course_key = CourseKey.from_string(course_key_string)
+
+        if not course_home_mfe_progress_tab_is_active(course_key):
+            raise Http404
 
         # Enable NR tracing for this view based on course
         monitoring_utils.set_custom_attribute('course_id', course_key_string)

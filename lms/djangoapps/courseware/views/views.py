@@ -54,7 +54,10 @@ from lms.djangoapps.ccx.custom_exception import CCXLocatorValidationException
 from lms.djangoapps.certificates import api as certs_api
 from lms.djangoapps.certificates.models import CertificateStatuses
 from lms.djangoapps.commerce.utils import EcommerceService
-from lms.djangoapps.course_home_api.toggles import course_home_mfe_dates_tab_is_active
+from lms.djangoapps.course_home_api.toggles import (
+    course_home_mfe_dates_tab_is_active,
+    course_home_mfe_progress_tab_is_active
+)
 from openedx.features.course_experience.url_helpers import get_learning_mfe_home_url, is_request_from_learning_mfe
 from lms.djangoapps.courseware.access import has_access, has_ccx_coach_role
 from lms.djangoapps.courseware.access_utils import check_course_open_for_learner, check_public_access
@@ -1087,7 +1090,13 @@ def dates(request, course_id):
 @data_sharing_consent_required
 def progress(request, course_id, student_id=None):
     """ Display the progress page. """
+    from lms.urls import COURSE_PROGRESS_NAME
+
     course_key = CourseKey.from_string(course_id)
+
+    if course_home_mfe_progress_tab_is_active(course_key) and not request.user.is_staff:
+        microfrontend_url = get_learning_mfe_home_url(course_key=course_key, view_name=COURSE_PROGRESS_NAME)
+        raise Redirect(microfrontend_url)
 
     with modulestore().bulk_operations(course_key):
         return _progress(request, course_key, student_id)
