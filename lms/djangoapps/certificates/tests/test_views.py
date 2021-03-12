@@ -6,16 +6,12 @@ import json
 from uuid import uuid4
 
 import ddt
-import six
 from django.conf import settings
 from django.core.cache import cache
 from django.test.client import Client
 from django.test.utils import override_settings
 from django.urls import reverse
 from opaque_keys.edx.locator import CourseLocator
-from six.moves import range
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory
 
 from common.djangoapps.student.tests.factories import UserFactory
 from lms.djangoapps.certificates.models import (
@@ -27,6 +23,8 @@ from lms.djangoapps.certificates.tests.factories import GeneratedCertificateFact
 from lms.djangoapps.certificates.utils import get_certificate_url
 from openedx.core.djangoapps.site_configuration.tests.test_util import with_site_configuration
 from openedx.core.djangolib.testing.utils import CacheIsolationTestCase
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from xmodule.modulestore.tests.factories import CourseFactory
 
 FEATURES_WITH_CERTS_ENABLED = settings.FEATURES.copy()
 FEATURES_WITH_CERTS_ENABLED['CERTIFICATES_HTML_VIEW'] = True
@@ -257,7 +255,7 @@ class CertificatesViewsSiteTests(ModuleStoreTestCase):
                 'name': 'Signatory_Name ' + str(i),
                 'title': 'Signatory_Title ' + str(i),
                 'organization': 'Signatory_Organization ' + str(i),
-                'signature_image_path': '/static/certificates/images/demo-sig{}.png'.format(i),
+                'signature_image_path': f'/static/certificates/images/demo-sig{i}.png',
                 'id': i,
             } for i in range(signatory_count)
 
@@ -285,7 +283,7 @@ class CertificatesViewsSiteTests(ModuleStoreTestCase):
     def test_html_view_for_site(self):
         test_url = get_certificate_url(
             user_id=self.user.id,
-            course_id=six.text_type(self.course.id),
+            course_id=str(self.course.id),
             uuid=self.cert.verify_uuid
         )
         self._add_course_certificates(count=1, signatory_count=2)
@@ -304,7 +302,7 @@ class CertificatesViewsSiteTests(ModuleStoreTestCase):
     def test_html_view_site_configuration_missing(self):
         test_url = get_certificate_url(
             user_id=self.user.id,
-            course_id=six.text_type(self.course.id),
+            course_id=str(self.course.id),
             uuid=self.cert.verify_uuid
         )
         self._add_course_certificates(count=1, signatory_count=2)

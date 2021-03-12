@@ -1,6 +1,3 @@
-# -*- coding: utf-8 -*-
-
-
 import django.utils.timezone
 import model_utils.fields
 from django.conf import settings

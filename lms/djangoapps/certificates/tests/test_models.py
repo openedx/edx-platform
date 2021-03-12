@@ -2,6 +2,8 @@
 
 
 import json
+from unittest.mock import patch
+
 import pytest
 import ddt
 from django.conf import settings
@@ -9,11 +11,8 @@ from django.core.exceptions import ValidationError
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import TestCase
 from django.test.utils import override_settings
-from mock import patch
 from opaque_keys.edx.locator import CourseKey, CourseLocator
 from path import Path as path
-from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory
 
 from common.djangoapps.student.tests.factories import AdminFactory, UserFactory
 from lms.djangoapps.certificates.models import (
@@ -29,6 +28,8 @@ from lms.djangoapps.certificates.models import (
 from lms.djangoapps.certificates.tests.factories import CertificateInvalidationFactory, GeneratedCertificateFactory
 from lms.djangoapps.instructor_task.tests.factories import InstructorTaskFactory
 from openedx.core.djangoapps.content.course_overviews.tests.factories import CourseOverviewFactory
+from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
+from xmodule.modulestore.tests.factories import CourseFactory
 
 FEATURES_INVALID_FILE_PATH = settings.FEATURES.copy()
 FEATURES_INVALID_FILE_PATH['CERTS_HTML_VIEW_CONFIG_PATH'] = 'invalid/path/to/config.json'
@@ -201,7 +202,7 @@ class EligibleCertificateManagerTest(SharedModuleStoreTestCase):
 
         self.course1 = CourseOverviewFactory()
         self.course2 = CourseOverviewFactory(
-            id=CourseKey.from_string('{}a'.format(self.course1.id))
+            id=CourseKey.from_string(f'{self.course1.id}a')
         )
 
         self.eligible_cert = GeneratedCertificateFactory.create(
