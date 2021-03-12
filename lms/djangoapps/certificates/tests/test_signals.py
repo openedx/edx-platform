@@ -83,7 +83,7 @@ class WhitelistGeneratedCertificatesTest(ModuleStoreTestCase):
             mode="verified",
         )
 
-    def test_cert_generation_on_whitelist_append_self_paced(self):
+    def test_cert_generation_on_allowlist_append_self_paced_auto_cert_generation_disabled(self):
         """
         Verify that signal is sent, received, and fires task
         based on 'AUTO_CERTIFICATE_GENERATION' flag
@@ -98,6 +98,16 @@ class WhitelistGeneratedCertificatesTest(ModuleStoreTestCase):
                     course_id=self.course.id
                 )
                 mock_generate_certificate_apply_async.assert_not_called()
+
+    def test_cert_generation_on_allowlist_append_self_paced_auto_cert_generation_enabled(self):
+        """
+        Verify that signal is sent, received, and fires task
+        based on 'AUTO_CERTIFICATE_GENERATION' flag
+        """
+        with mock.patch(
+            'lms.djangoapps.certificates.signals.generate_certificate.apply_async',
+            return_value=None
+        ) as mock_generate_certificate_apply_async:
             with override_waffle_switch(AUTO_CERTIFICATE_GENERATION_SWITCH, active=True):
                 CertificateWhitelistFactory(
                     user=self.user,
@@ -111,7 +121,7 @@ class WhitelistGeneratedCertificatesTest(ModuleStoreTestCase):
                     }
                 )
 
-    def test_cert_generation_on_whitelist_append_instructor_paced(self):
+    def test_cert_generation_on_allowlist_append_instructor_paced_cert_generation_disabled(self):
         """
         Verify that signal is sent, received, and fires task
         based on 'AUTO_CERTIFICATE_GENERATION' flag
@@ -126,6 +136,16 @@ class WhitelistGeneratedCertificatesTest(ModuleStoreTestCase):
                     course_id=self.ip_course.id
                 )
                 mock_generate_certificate_apply_async.assert_not_called()
+
+    def test_cert_generation_on_allowlist_append_instructor_paced_cert_generation_enabled(self):
+        """
+        Verify that signal is sent, received, and fires task
+        based on 'AUTO_CERTIFICATE_GENERATION' flag
+        """
+        with mock.patch(
+                'lms.djangoapps.certificates.signals.generate_certificate.apply_async',
+                return_value=None
+        ) as mock_generate_certificate_apply_async:
             with override_waffle_switch(AUTO_CERTIFICATE_GENERATION_SWITCH, active=True):
                 CertificateWhitelistFactory(
                     user=self.user,
