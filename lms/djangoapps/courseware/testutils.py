@@ -5,11 +5,10 @@ Common test utilities for courseware functionality
 
 from abc import ABCMeta, abstractmethod
 from datetime import datetime, timedelta
+from unittest.mock import patch
+from urllib.parse import urlencode
 
 import ddt
-import six
-from mock import patch
-from six.moves.urllib.parse import urlencode
 
 from lms.djangoapps.courseware.field_overrides import OverrideModulestoreFieldData
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
@@ -21,7 +20,7 @@ from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory, chec
 
 
 @ddt.ddt
-class RenderXBlockTestMixin(six.with_metaclass(ABCMeta, object)):
+class RenderXBlockTestMixin(metaclass=ABCMeta):
     """
     Mixin for testing the courseware.render_xblock function.
     It can be used for testing any higher-level endpoint that calls this method.
@@ -56,7 +55,7 @@ class RenderXBlockTestMixin(six.with_metaclass(ABCMeta, object)):
         """
         Clear out the block to be requested/tested before each test.
         """
-        super(RenderXBlockTestMixin, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         # to adjust the block to be tested, update block_name_to_be_tested before calling setup_course.
         self.block_name_to_be_tested = 'html_block'
 
@@ -267,15 +266,15 @@ class RenderXBlockTestMixin(six.with_metaclass(ABCMeta, object)):
         self.verify_response(url_params={'view': 'author_view'}, expected_response_code=400)
 
 
-class FieldOverrideTestMixin(object):
+class FieldOverrideTestMixin:
     """
     A Mixin helper class for classes that test Field Overrides.
     """
 
     def setUp(self):
-        super(FieldOverrideTestMixin, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         OverrideModulestoreFieldData.provider_classes = None
 
     def tearDown(self):
-        super(FieldOverrideTestMixin, self).tearDown()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().tearDown()
         OverrideModulestoreFieldData.provider_classes = None

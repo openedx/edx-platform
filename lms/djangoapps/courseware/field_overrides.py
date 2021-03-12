@@ -20,7 +20,6 @@ import threading
 from abc import ABCMeta, abstractmethod
 from contextlib import contextmanager
 
-import six
 from django.conf import settings
 from edx_django_utils.cache import DEFAULT_REQUEST_CACHE
 from xblock.field_data import FieldData
@@ -28,8 +27,8 @@ from xblock.field_data import FieldData
 from xmodule.modulestore.inheritance import InheritanceMixin
 
 NOTSET = object()
-ENABLED_OVERRIDE_PROVIDERS_KEY = u'courseware.field_overrides.enabled_providers.{course_id}'
-ENABLED_MODULESTORE_OVERRIDE_PROVIDERS_KEY = u'courseware.modulestore_field_overrides.enabled_providers.{course_id}'
+ENABLED_OVERRIDE_PROVIDERS_KEY = 'courseware.field_overrides.enabled_providers.{course_id}'
+ENABLED_MODULESTORE_OVERRIDE_PROVIDERS_KEY = 'courseware.modulestore_field_overrides.enabled_providers.{course_id}'
 
 
 def resolve_dotted(name):
@@ -94,7 +93,7 @@ def overrides_disabled():
     return bool(_OVERRIDES_DISABLED.disabled)
 
 
-class FieldOverrideProvider(six.with_metaclass(ABCMeta, object)):
+class FieldOverrideProvider(metaclass=ABCMeta):
     """
     Abstract class which defines the interface that a `FieldOverrideProvider`
     must provide.  In general, providers should derive from this class, but
@@ -161,9 +160,7 @@ class OverrideFieldData(FieldData):
         configured.
         """
         if cls.provider_classes is None:
-            cls.provider_classes = tuple(
-                (resolve_dotted(name) for name in
-                 settings.FIELD_OVERRIDE_PROVIDERS))
+            cls.provider_classes = tuple(resolve_dotted(name) for name in settings.FIELD_OVERRIDE_PROVIDERS)
 
         enabled_providers = cls._providers_for_course(course)
         if enabled_providers:
@@ -189,11 +186,11 @@ class OverrideFieldData(FieldData):
         if course is None:
             cache_key = ENABLED_OVERRIDE_PROVIDERS_KEY.format(course_id='None')
         else:
-            cache_key = ENABLED_OVERRIDE_PROVIDERS_KEY.format(course_id=six.text_type(course.id))
+            cache_key = ENABLED_OVERRIDE_PROVIDERS_KEY.format(course_id=str(course.id))
         enabled_providers = request_cache.data.get(cache_key, NOTSET)
         if enabled_providers == NOTSET:
             enabled_providers = tuple(
-                (provider_class for provider_class in cls.provider_classes if provider_class.enabled_for(course))  # lint-amnesty, pylint: disable=not-an-iterable
+                provider_class for provider_class in cls.provider_classes if provider_class.enabled_for(course)  # lint-amnesty, pylint: disable=not-an-iterable
             )
             request_cache.data[cache_key] = enabled_providers
 
@@ -296,7 +293,7 @@ class OverrideModulestoreFieldData(OverrideFieldData):
         Arguments:
             block: An XBlock
         """
-        course_id = six.text_type(block.location.course_key)
+        course_id = str(block.location.course_key)
         cache_key = ENABLED_MODULESTORE_OVERRIDE_PROVIDERS_KEY.format(course_id=course_id)
 
         request_cache = DEFAULT_REQUEST_CACHE
@@ -311,4 +308,4 @@ class OverrideModulestoreFieldData(OverrideFieldData):
         return enabled_providers
 
     def __init__(self, fallback, providers):
-        super(OverrideModulestoreFieldData, self).__init__(None, fallback, providers)  # lint-amnesty, pylint: disable=super-with-arguments
+        super().__init__(None, fallback, providers)

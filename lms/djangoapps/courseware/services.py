@@ -11,7 +11,7 @@ from lms.djangoapps.courseware.models import StudentModule
 from common.djangoapps.student.models import get_user_by_username_or_email
 
 
-class UserStateService(object):
+class UserStateService:
     """
     User state service to make state accessible in runtime.
     """
