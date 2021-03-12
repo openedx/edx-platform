@@ -23,6 +23,7 @@ from common.djangoapps.student.auth import user_has_role
 from common.djangoapps.student.roles import CourseBetaTesterRole
 
 from ...data import (
+    ContentErrorData,
     CourseLearningSequenceData,
     CourseOutlineData,
     CourseSectionData,
@@ -31,6 +32,7 @@ from ...data import (
     VisibilityData,
 )
 from ..outlines import (
+    get_content_errors,
     get_course_outline,
     get_user_course_outline,
     get_user_course_outline_details,
@@ -1274,3 +1276,64 @@ class SequentialVisibilityTestCase(CacheIsolationTestCase):
                     assert len(user_course_outline.sequences) == 6
                     assert all(is_sequence_accessible),\
                         'Sequences should be accessible to enrolled, staff users for a public_outline course'
+
+
+class ContentErrorTestCase(CacheIsolationTestCase):
+    """Test error collection and reporting."""
+
+    def test_errors(self):
+        """
+        Basic tests for writing and retriving errors.
+        """
+        course_key = CourseKey.from_string("course-v1:OpenEdX+Outlines+Errors")
+        outline = CourseOutlineData(
+            course_key=course_key,
+            title="Outline Errors Test Course!",
+            published_at=datetime(2021, 3, 21, tzinfo=timezone.utc),
+            published_version="8ebece4b69dd593d82fe2020",
+            sections=[],
+            self_paced=False,
+            days_early_for_beta=None,
+            entrance_exam_id=None,
+            course_visibility=CourseVisibility.PRIVATE,
+        )
+        usage_key_1 = course_key.make_usage_key('sequential', 'seq1')
+        usage_key_2 = course_key.make_usage_key('sequential', 'seq2')
+        replace_course_outline(
+            outline,
+            content_errors=[
+                # Explicitly set to no usage key.
+                ContentErrorData(message="Content is Hard", usage_key=None),
+
+                # Implicitly set usage key
+                ContentErrorData("Simple Content Error Description"),
+
+                # Multiple copies of the same usage key
+                ContentErrorData(message="Seq1 is wrong", usage_key=usage_key_1),
+                ContentErrorData(message="Seq1 is still wrong", usage_key=usage_key_1),
+
+                # Another key
+                ContentErrorData(message="Seq2 is also wrong", usage_key=usage_key_2)
+            ]
+        )
+        assert outline == get_course_outline(course_key)
+
+        # Ordering is preserved.
+        assert get_content_errors(course_key) == [
+            ContentErrorData(message="Content is Hard", usage_key=None),
+            ContentErrorData(message="Simple Content Error Description", usage_key=None),
+            ContentErrorData(message="Seq1 is wrong", usage_key=usage_key_1),
+            ContentErrorData(message="Seq1 is still wrong", usage_key=usage_key_1),
+            ContentErrorData(message="Seq2 is also wrong", usage_key=usage_key_2),
+        ]
+
+        # Now do it again and make sure updates work as well as inserts
+        replace_course_outline(
+            outline,
+            content_errors=[
+                ContentErrorData(message="Content is Hard", usage_key=None),
+            ]
+        )
+        assert get_content_errors(course_key) == [
+            ContentErrorData(message="Content is Hard", usage_key=None),
+        ]

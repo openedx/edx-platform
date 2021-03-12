@@ -6,15 +6,112 @@ from enum import Enum
 import json
 
 from django.contrib import admin
-from django.utils.html import format_html
+from django.utils.html import format_html, format_html_join
+from django.utils.translation import gettext_lazy as _
 from opaque_keys import OpaqueKey
 import attr
 
-from .api import get_course_outline
-from .models import LearningContext
+from .api import get_content_errors, get_course_outline
+from .models import CourseContext, CourseSectionSequence
 
 
-class LearningContextAdmin(admin.ModelAdmin):
+class HasErrorsListFilter(admin.SimpleListFilter):
+    """
+    Filter to find Courses with content errors.
+
+    The default Django filter on an integer field will give a choice of values,
+    which isn't something we really want. We just want a filter for > 0 errors.
+    """
+    title = _("Error Status")
+    parameter_name = 'status'
+
+    def lookups(self, request, model_admin):
+        return (
+            ('has_errors', _('Courses with Errors')),
+        )
+
+    def queryset(self, request, queryset):
+        if self.value() == 'has_errors':
+            return queryset.filter(
+                learning_context__publish_report__num_errors__gt=0,
+            )
+
+
+class CourseSectionSequenceInline(admin.TabularInline):
+    """
+    Inline for showing the sequences of a course.
+
+    The queries look a bit weird because a CourseSectionSequence holds both
+    course-specific Sequence metadata, while much of the data we care about is
+    in LearningSequence (like the title) and CourseSequenceExam.
+    """
+    model = CourseSectionSequence
+    verbose_name = "Sequence"
+    verbose_name_plural = "Sequences"
+
+    fields = (
+        'title',
+        'is_time_limited',
+        'is_proctored_exam',
+        'is_practice_exam',
+        'accessible_after_due',
+        'visible_to_staff_only',
+        'hide_from_toc',
+    )
+    readonly_fields = (
+        'title',
+        'is_time_limited',
+        'is_proctored_exam',
+        'is_practice_exam',
+        'accessible_after_due',
+        'visible_to_staff_only',
+        'hide_from_toc',
+    )
+    ordering = ['ordering']
+
+    def get_queryset(self, request):
+        """
+        Optimization to cut an extra two requests per sequence.
+
+        We still have an N+1 issue, but given the number of sequences in a
+        course, this is tolerable even for large courses. It is possible to get
+        this down to one query if we do a lower level rendering for the
+        sequences later.
+        """
+        qs = super().get_queryset(request)
+        qs = qs.select_related('section', 'sequence')
+        return qs
+
+    def title(self, cs_seq):
+        return cs_seq.sequence.title
+    title.short_description = "Title"
+
+    def accessible_after_due(self, cs_seq):
+        return not cs_seq.inaccessible_after_due
+    accessible_after_due.boolean = True
+
+    def visible_to_staff_only(self, cs_seq):
+        return not cs_seq.visible_to_staff_only
+    visible_to_staff_only.boolean = True
+    visible_to_staff_only.short_description = "Staff Only"
+
+    def is_time_limited(self, cs_seq):
+        return cs_seq.exam.is_time_limited
+    is_time_limited.boolean = True
+    is_time_limited.short_description = "Timed Exam"
+
+    def is_proctored_exam(self, cs_seq):
+        return cs_seq.exam.is_proctored_exam
+    is_proctored_exam.boolean = True
+    is_proctored_exam.short_description = "Proctored Exam"
+
+    def is_practice_exam(self, cs_seq):
+        return cs_seq.exam.is_practice_exam
+    is_practice_exam.boolean = True
+    is_practice_exam.short_description = "Practice Exam"
+
+
+class CourseContextAdmin(admin.ModelAdmin):
     """
     This is a read-only model admin that is meant to be useful for querying.
 
@@ -25,25 +122,124 @@ class LearningContextAdmin(admin.ModelAdmin):
        to be written to from the Studio process.
     """
     list_display = (
-        'context_key',
+        'course_key',
         'title',
         'published_at',
-        'published_version',
-        'modified'
+        'num_errors',
+        'num_sections',
+        'num_sequences',
+    )
+    list_select_related = (
+        'learning_context',
+        'learning_context__publish_report',
+    )
+    list_filter = (
+        HasErrorsListFilter,
+        'learning_context__published_at',
     )
     readonly_fields = (
-        'context_key',
+        'course_key',
         'title',
         'published_at',
         'published_version',
         'created',
         'modified',
-        'outline',
-    )
-    search_fields = ['context_key', 'title']
-    actions = None
+        'course_visibility',
+        'self_paced',
+        'days_early_for_beta',
+        'entrance_exam_id',
 
-    def outline(self, obj):
+        'error_details',
+        'raw_outline',
+    )
+    raw_id_fields = (
+        'learning_context',
+    )
+    fieldsets = (
+        (
+            None,
+            {
+                'fields': (
+                    'course_key',
+                    'title',
+                    'published_at',
+                    'course_visibility',
+                    'self_paced',
+                    'days_early_for_beta',
+                    'entrance_exam_id',
+                ),
+            }
+        ),
+        (
+            'Outline Data',
+            {
+                'fields': (
+                    'num_sections', 'num_sequences', 'num_errors', 'error_details',
+                ),
+            }
+        ),
+        (
+            'Debug Details',
+            {
+                'fields': (
+                    'published_version', 'created', 'modified', 'raw_outline'
+                ),
+                'classes': ('collapse',),
+            }
+        ),
+    )
+    inlines = [
+        CourseSectionSequenceInline,
+    ]
+    search_fields = ['learning_context__context_key', 'learning_context__title']
+    ordering = ['-learning_context__published_at']
+
+    def get_queryset(self, request):
+        qs = super().get_queryset(request)
+        qs = qs.prefetch_related('section_sequences')
+        return qs
+
+    def created(self, course_context):
+        return course_context.learning_context.created
+    created.short_description = "Record Created"
+
+    def modified(self, course_context):
+        return course_context.learning_context.modified
+    modified.short_description = "Record Modified"
+
+    def course_key(self, course_context):
+        return course_context.learning_context.context_key
+
+    def title(self, course_context):
+        return course_context.learning_context.title
+
+    def published_at(self, course_context):
+        published_at_dt = course_context.learning_context.published_at
+        return published_at_dt.strftime("%B %-d, %Y, %-I:%M %p")
+    published_at.short_description = "Published at (UTC)"
+
+    def published_version(self, course_context):
+        return course_context.learning_context.published_version
+
+    def _publish_report_attr(self, course_context, attr_name):
+        learning_context = course_context.learning_context
+        if not hasattr(learning_context, 'publish_report'):
+            return None
+        return getattr(learning_context.publish_report, attr_name)
+
+    def num_errors(self, course_context):
+        return self._publish_report_attr(course_context, 'num_errors')
+    num_errors.short_description = "Errors"
+
+    def num_sections(self, course_context):
+        return self._publish_report_attr(course_context, 'num_sections')
+    num_sections.short_description = "Sections"
+
+    def num_sequences(self, course_context):
+        return self._publish_report_attr(course_context, 'num_sequences')
+    num_sequences.short_description = "Sequences"
+
+    def raw_outline(self, obj):
         """
         Computed attribute that shows the outline JSON in the detail view.
         """
@@ -56,7 +252,7 @@ class LearningContextAdmin(admin.ModelAdmin):
                 return value.isoformat()
             return value
 
-        outline_data = get_course_outline(obj.context_key)
+        outline_data = get_course_outline(obj.learning_context.context_key)
         outline_data_dict = attr.asdict(
             outline_data,
             recurse=True,
@@ -64,6 +260,46 @@ class LearningContextAdmin(admin.ModelAdmin):
         )
         outline_data_json = json.dumps(outline_data_dict, indent=2, sort_keys=True)
         return format_html("<pre>\n{}\n</pre>", outline_data_json)
+
+    def error_details(self, course_context):
+        """
+        Generates the HTML for Error Details.
+        """
+        learning_context = course_context.learning_context
+        if not hasattr(learning_context, 'publish_report'):
+            return ""
+
+        content_errors = get_content_errors(learning_context.context_key)
+        if not content_errors:
+            return format_html("<p>No errors were found.</p>")
+
+        list_items = format_html_join(
+            "\n",
+            "<li>{} <br><small>Usage Key: {}</small></li>",
+            (
+                (err_data.message, err_data.usage_key)
+                for err_data in content_errors
+            )
+        )
+        return format_html(
+            """
+            <p>
+            Parts of the course content were skipped when generating the Outline
+            because they did not follow the standard Course → Section →
+            Subsection hierarchy. Course structures like this cannot be created
+            in Studio, but can be created by OLX import. In OLX, this hierarchy
+            is represented by the tags <code>{}</code> → <code>{}</code> →
+            <code>{}</code>.
+            </p>
+            <ol>
+                {}
+            </ol>
+            """,
+            "<course>",
+            "<chapter>",
+            "<sequential>",
+            list_items,
+        )
 
     def has_add_permission(self, request):
         """
@@ -93,4 +329,4 @@ class LearningContextAdmin(admin.ModelAdmin):
         return False
 
 
-admin.site.register(LearningContext, LearningContextAdmin)
+admin.site.register(CourseContext, CourseContextAdmin)

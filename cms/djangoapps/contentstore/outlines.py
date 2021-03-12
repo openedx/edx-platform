@@ -4,11 +4,13 @@ is responsible for holding course outline data. Studio _pushes_ that data into
 learning_sequences at publish time.
 """
 from datetime import timezone
+from typing import List, Tuple
 
 from edx_django_utils.monitoring import function_trace, set_custom_attribute
 
 from openedx.core.djangoapps.content.learning_sequences.api import replace_course_outline
 from openedx.core.djangoapps.content.learning_sequences.data import (
+    ContentErrorData,
     CourseLearningSequenceData,
     CourseOutlineData,
     CourseSectionData,
@@ -18,70 +20,6 @@ from openedx.core.djangoapps.content.learning_sequences.data import (
 )
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
-
-
-class CourseStructureError(Exception):
-    """
-    Raise this if we can't create an outline because of the course structure.
-
-    Courses built in Studio conform to a hierarchy that looks like:
-        Course -> Section (a.k.a. Chapter) -> Subsection (a.k.a. Sequence)
-
-    OLX imports are much more freeform and can generate unusual structures that
-    we won't know how to handle.
-    """
-
-
-def _check_sequence_fields(sequence):
-    """
-    Raise CourseStructureError if `sequence` is missing a required field.
-
-    Do this instead of checking against specific block types to better future
-    proof ourselves against new sequence-types, aliases, changes in the way
-    dynamic mixing of XBlock types happens, as well as deprecation/removal of
-    the specific fields we care about. If it quacks like a duck...
-    """
-    expected_fields = [
-        'display_name',
-        'hide_after_due',
-        'hide_from_toc',
-        'is_practice_exam',
-        'is_proctored_enabled',
-        'is_time_limited',
-        'visible_to_staff_only',
-    ]
-    for field in expected_fields:
-        if not hasattr(sequence, field):
-            msg = (
-                f"Cannot create CourseOutline: Expected a Sequence at "
-                f"{sequence.location} (child of {sequence.parent}), "
-                f"but this object does not have sequence field {field}."
-            )
-            raise CourseStructureError(msg)
-
-
-def _check_section_fields(section):
-    """
-    Raise CourseStructureError if `section` is missing a required field.
-
-    Do this instead of checking against specific block types to better future
-    proof ourselves against new sequence-types, aliases, changes in the way
-    dynamic mixing of XBlock types happens, as well as deprecation/removal of
-    the specific fields we care about. If it quacks like a duck...
-    """
-    expected_fields = [
-        'children',
-        'hide_from_toc',
-        'visible_to_staff_only',
-    ]
-    for field in expected_fields:
-        if not hasattr(section, field):
-            msg = (
-                f"Cannot create CourseOutline: Expected a Section at "
-                f"{section.location} (child of {section.parent}), "
-                f"but this object does not have Section field {field}."
-            )
-            raise CourseStructureError(msg)
 
 
 def _remove_version_info(usage_key):
@@ -105,21 +43,78 @@ def _remove_version_info(usage_key):
     return usage_key.map_into_course(unversioned_course_key)
 
 
+def _error_for_not_section(not_section):
+    """
+    ContentErrorData when we run into a child of <course> that's not a Section.
+
+    Has to be phrased in a way that makes sense to course teams.
+    """
+    return ContentErrorData(
+        message=(
+            f'<course> contains a <{not_section.location.block_type}> tag with '
+            f'url_name="{not_section.location.block_id}" and '
+            f'display_name="{getattr(not_section, "display_name", "")}". '
+            f'Expected <chapter> tag instead.'
+        ),
+        usage_key=_remove_version_info(not_section.location),
+    )
+
+
+def _error_for_not_sequence(section, not_sequence):
+    """
+    ContentErrorData when we run into a child of Section that's not a Sequence.
+
+    Has to be phrased in a way that makes sense to course teams.
+    """
+    return ContentErrorData(
+        message=(
+            f'<chapter> with url_name="{section.location.block_id}" and '
+            f'display_name="{section.display_name}" contains a '
+            f'<{not_sequence.location.block_type}> tag with '
+            f'url_name="{not_sequence.location.block_id}" and '
+            f'display_name="{getattr(not_sequence, "display_name", "")}". '
+            f'Expected a <sequential> tag instead.'
+        ),
+        usage_key=_remove_version_info(not_sequence.location),
+    )
+
+
 def _make_section_data(section):
     """
-    Generate a CourseSectionData from a SectionDescriptor.
+    Return a (CourseSectionData, List[ContentDataError]) from a SectionBlock.
+
+    Can return None for CourseSectionData if it's not really a SectionBlock that
+    was passed in.
 
     This method does a lot of the work to convert modulestore fields to an input
-    that the learning_sequences app expects. It doesn't check for specific
-    classes (i.e. you could create your own Sequence-like XBlock), but it will
-    raise a CourseStructureError if anything you pass in is missing fields that
-    we expect in a SectionDescriptor or its SequenceDescriptor children.
-    """
-    _check_section_fields(section)
+    that the learning_sequences app expects. OLX import permits structures that
+    are much less constrained than Studio's UI allows for, so whenever we run
+    into something that does not meet our Course -> Section -> Subsection
+    hierarchy expectations, we add a support-team-readable error message to our
+    list of ContentDataErrors to pass back.
 
+    At this point in the code, everything has already been deserialized into
+    SectionBlocks and SequenceBlocks, but we're going to phrase our messages in
+    ways that would make sense to someone looking at the import OLX, since that
+    is the layer that the course teams and support teams are working with.
+    """
+    section_errors = []
+
+    # First check if it's not a section at all, and short circuit if it isn't.
+    if section.location.block_type != 'chapter':
+        section_errors.append(_error_for_not_section(section))
+        return (None, section_errors)
+
+    # We haven't officially killed off problemset and videosequence yet, so
+    # treat them as equivalent to sequential for now.
+    valid_sequence_tags = ['sequential', 'problemset', 'videosequence']
     sequences_data = []
+
     for sequence in section.get_children():
-        _check_sequence_fields(sequence)
+        if sequence.location.block_type not in valid_sequence_tags:
+            section_errors.append(_error_for_not_sequence(section, sequence))
+            continue
+
         sequences_data.append(
             CourseLearningSequenceData(
                 usage_key=_remove_version_info(sequence.location),
@@ -146,22 +141,30 @@ def _make_section_data(section):
             visible_to_staff_only=section.visible_to_staff_only,
         ),
     )
-    return section_data
+    return section_data, section_errors
 
 
 @function_trace('get_outline_from_modulestore')
-def get_outline_from_modulestore(course_key):
+def get_outline_from_modulestore(course_key) -> Tuple[CourseOutlineData, List[ContentErrorData]]:
     """
-    Get a learning_sequence.data.CourseOutlineData for a param:course_key
+    Return a CourseOutlineData and list of ContentErrorData for param:course_key
+
+    This function does not write any data as a side-effect. It generates a
+    CourseOutlineData by inspecting the contents in the modulestore, but does
+    not push that data anywhere. This function only operates on the published
+    branch, and will not work on Old Mongo courses.
     """
     store = modulestore()
+    content_errors = []
 
     with store.branch_setting(ModuleStoreEnum.Branch.published_only, course_key):
         course = store.get_course(course_key, depth=2)
         sections_data = []
         for section in course.get_children():
-            section_data = _make_section_data(section)
-            sections_data.append(section_data)
+            section_data, section_errors = _make_section_data(section)
+            if section_data:
+                sections_data.append(section_data)
+            content_errors.extend(section_errors)
 
         course_outline_data = CourseOutlineData(
             course_key=course_key,
@@ -183,7 +186,8 @@ def get_outline_from_modulestore(course_key):
             self_paced=course.self_paced,
             course_visibility=CourseVisibility(course.course_visibility),
         )
-    return course_outline_data
+
+    return (course_outline_data, content_errors)
 
 
 def update_outline_from_modulestore(course_key):
@@ -196,6 +200,8 @@ def update_outline_from_modulestore(course_key):
     # New Relic for easier trace debugging.
     set_custom_attribute('course_id', str(course_key))
 
-    course_outline_data = get_outline_from_modulestore(course_key)
+    course_outline_data, content_errors = get_outline_from_modulestore(course_key)
     set_custom_attribute('num_sequences', len(course_outline_data.sequences))
-    replace_course_outline(course_outline_data)
+    set_custom_attribute('num_content_errors', len(content_errors))
+
+    replace_course_outline(course_outline_data, content_errors=content_errors)
