@@ -1571,7 +1571,7 @@ class TestLMSAccountRetirementPost(RetirementTestCase, ModuleStoreTestCase):
         return response
 
     @unittest.skipIf(
-        settings.TAHOE_TEMP_MONKEYPATCHING_JUNIPER_TESTS,
+        settings.TAHOE_TEMP_MONKEYPATCHING_JUNIPER_TESTS,  # TODO: Triage IntegrityError in RED-1877
         'IntegrityError in wiki_articleplugin needs devstack/staging to test before marking as perm. failure.'
     )
     def test_retire_user(self):
@@ -1611,7 +1611,7 @@ class TestLMSAccountRetirementPost(RetirementTestCase, ModuleStoreTestCase):
         self.assertEqual(retired_api_access_request.reason, '')
 
     @unittest.skipIf(
-        settings.TAHOE_TEMP_MONKEYPATCHING_JUNIPER_TESTS,
+        settings.TAHOE_TEMP_MONKEYPATCHING_JUNIPER_TESTS,  # TODO: Triage IntegrityError in RED-1877
         'IntegrityError in wiki_articleplugin needs devstack/staging to test before marking as perm. failure.'
     )
     def test_retire_user_twice_idempotent(self):

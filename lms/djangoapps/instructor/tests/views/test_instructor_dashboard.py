@@ -225,7 +225,10 @@ class TestInstructorDashboard(ModuleStoreTestCase, LoginEnrollmentTestCase, XssT
         )
 
     @ddt.data(True, False)
-    @unittest.skipIf(settings.TAHOE_TEMP_MONKEYPATCHING_JUNIPER_TESTS, 'Fails due to missing html element')
+    @unittest.skipIf(
+        settings.TAHOE_TEMP_MONKEYPATCHING_JUNIPER_TESTS,  # TODO: Triage and fix in RED-1878
+        'Fails due to missing html element'
+    )
     def test_membership_reason_field_visibility(self, enbale_reason_field):
         """
         Verify that reason field is enabled by site configuration flag 'ENABLE_MANUAL_ENROLLMENT_REASON_FIELD'
@@ -255,7 +258,10 @@ class TestInstructorDashboard(ModuleStoreTestCase, LoginEnrollmentTestCase, XssT
         else:
             self.assertNotContains(response, reason_field)
 
-    @unittest.skipIf(settings.TAHOE_TEMP_MONKEYPATCHING_JUNIPER_TESTS, 'Fails due to missing html element')
+    @unittest.skipIf(
+        settings.TAHOE_TEMP_MONKEYPATCHING_JUNIPER_TESTS,  # TODO: Triage and fix in RED-1878
+        'Fails due to missing html element'
+    )
     def test_membership_site_configuration_role(self):
         """
         Verify that the role choices set via site configuration are loaded in the membership tab
@@ -607,7 +613,7 @@ class TestInstructorDashboard(ModuleStoreTestCase, LoginEnrollmentTestCase, XssT
 
 
 @unittest.skipIf(
-    settings.TAHOE_TEMP_MONKEYPATCHING_JUNIPER_TESTS,
+    settings.TAHOE_TEMP_MONKEYPATCHING_JUNIPER_TESTS,  # TODO: Triage and fix in RED-1879
     'This should be re-examined later see https://github.com/appsembler/edx-platform/pull/706. '
     'It may not be needed because we may not have performance problems anymore. '
 )
