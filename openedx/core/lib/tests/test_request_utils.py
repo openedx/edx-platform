@@ -226,7 +226,7 @@ class TestGetExpectedErrorSettingsDict(unittest.TestCase):
 
     def test_get_with_no_setting(self):
         expected_error_settings_dict = _get_expected_error_settings_dict()
-        assert expected_error_settings_dict is None
+        assert expected_error_settings_dict == {}
 
     @override_settings(EXPECTED_ERRORS=[])
     def test_get_with_empty_list_setting(self):
@@ -249,6 +249,28 @@ class TestGetExpectedErrorSettingsDict(unittest.TestCase):
         expected_error_settings_dict = _get_expected_error_settings_dict()
         mock_logger.error.assert_called_once_with(self.MODULE_AND_CLASS_MESSAGE, 0, 'invalid.module.and.class')
         assert expected_error_settings_dict == {}
+
+    @patch('openedx.core.lib.request_utils.log')
+    @override_settings(EXPECTED_ERRORS=[
+        {
+            'MODULE_AND_CLASS': 'valid.module:DuplicateClass',
+            'REASON_EXPECTED': 'Because'
+        },
+        {
+            'MODULE_AND_CLASS': 'valid.module:DuplicateClass',
+            'REASON_EXPECTED': 'Because overridden'
+        },
+    ])
+    def test_get_with_duplicate_class_and_module(self, mock_logger):
+        expected_error_settings_dict = _get_expected_error_settings_dict()
+        mock_logger.warning.assert_called_once_with(
+            "EXPECTED_ERRORS[%d] setting is overriding an earlier setting. 'MODULE_AND_CLASS' [%s] is defined "
+            "multiple times.",
+            1,
+            'valid.module:DuplicateClass',
+        )
+        assert 'valid.module:DuplicateClass' in expected_error_settings_dict
+        assert expected_error_settings_dict['valid.module:DuplicateClass']['reason_expected'] == 'Because overridden'
 
     @patch('openedx.core.lib.request_utils.log')
     @override_settings(EXPECTED_ERRORS=[{'MODULE_AND_CLASS': 'valid.module.and.class:ButMissingReason'}])
@@ -421,9 +443,9 @@ class TestExpectedErrorMiddleware(unittest.TestCase):
     @patch('openedx.core.lib.request_utils.set_custom_attribute')
     @patch('openedx.core.lib.request_utils.log')
     @ddt.data(
+        (False, True),  # skip logging
         (True, False),  # log without stacktrace
         (True, True),   # log with stacktrace
-        (False, True),  # log with stacktrace overrides disabled logging
     )
     @ddt.unpack
     def test_process_exception_expected_error_with_overrides(
@@ -438,13 +460,18 @@ class TestExpectedErrorMiddleware(unittest.TestCase):
         }]):
             ExpectedErrorMiddleware('mock-response').process_exception(self.mock_request, self.mock_exception)
 
-        mock_logger.info.assert_called_once_with(
-            'Expected error seen for %s', '/test', exc_info=self.mock_exception, stack_info=log_stack_trace
-        )
+        expected_class_with_message = "openedx.core.lib.tests.test_request_utils:CustomError1('Test failure')"
+        if log_error:
+            exc_info = self.mock_exception if log_stack_trace else None
+            mock_logger.info.assert_called_once_with(
+                'Expected error %s seen for path %s', expected_class_with_message, '/test', exc_info=exc_info
+            )
+        else:
+            mock_logger.info.assert_not_called()
         mock_set_custom_attribute.assert_has_calls(
             [
                 call('checked_error_expected_from', 'middleware'),
-                call('error_expected', "openedx.core.lib.tests.test_request_utils:CustomError1('Test failure')"),
+                call('error_expected', expected_class_with_message),
             ],
             any_order=True
         )
@@ -483,13 +510,17 @@ class TestExpectedErrorExceptionHandler(unittest.TestCase):
             expected_request_path = 'request-path-unknown'
         expected_error_exception_handler(self.mock_exception, mock_context)
 
+        expected_class_with_message = "openedx.core.lib.tests.test_request_utils:CustomError1('Test failure')"
         mock_logger.info.assert_called_once_with(
-            'Expected error seen for %s', expected_request_path, exc_info=self.mock_exception, stack_info=False
+            'Expected error %s seen for path %s',
+            expected_class_with_message,
+            expected_request_path,
+            exc_info=None,
         )
         mock_set_custom_attribute.assert_has_calls(
             [
                 call('checked_error_expected_from', 'drf'),
-                call('error_expected', "openedx.core.lib.tests.test_request_utils:CustomError1('Test failure')"),
+                call('error_expected', expected_class_with_message),
                 call('error_ignored', True)
             ],
             any_order=True

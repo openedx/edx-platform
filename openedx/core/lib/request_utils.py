@@ -241,8 +241,8 @@ def expected_error_exception_handler(exc, context):
     response = exception_handler(exc, context)
 
     try:
-        request = context['request']
-    except TypeError:
+        request = context['request'] if 'request' in context else None
+    except TypeError:  # when context is not iterable
         request = None
 
     _log_and_monitor_expected_errors(request, exc, 'drf')
@@ -268,13 +268,13 @@ class ExpectedErrorMiddleware:
 
 
 # .. setting_name: EXPECTED_ERRORS
-# .. setting_default: []
+# .. setting_default: None
 # .. setting_description: Used to configure logging and monitoring for expected errors.
 #     This setting is configured of a list of dicts. See setting and toggle annotations for
 #     ``EXPECTED_ERRORS[N]['XXX']`` for details of each item in the dict.
-#     If this setting is a non-empty list, all uncaught errors processed will get a ``checked_error_expected_from`` attribute,
-#     whether they are expected or not. This can be used to ensure that all uncaught errors are actually processed.
-#     Those errors that are processed and match a 'MODULE_AND_CLASS' (documented elsewhere), will get an
+#     If this setting is a non-empty list, all uncaught errors processed will get a ``checked_error_expected_from``
+#     attribute, whether they are expected or not. This can be used to ensure that all uncaught errors are actually
+#     processed. Those errors that are processed and match a 'MODULE_AND_CLASS' (documented elsewhere), will get an
 #     ``error_expected`` custom attribute. The value of the custom attribute will include the error class module, name
 #     and message. Unexpected errors would be errors with ``error_expected IS NULL``.
 # .. setting_warning: We use Django Middleware and a DRF custom error handler to find uncaught errors. It is still
@@ -309,15 +309,15 @@ class ExpectedErrorMiddleware:
 # .. toggle_name: EXPECTED_ERRORS[N]['LOG_STACK_TRACE']
 # .. toggle_implementation: DjangoSetting
 # .. toggle_default: False
-# .. toggle_description: If True, the stacktrace will be included with the logging message. Also, if True, the
-#     ``LOG_ERROR`` toggle value will be ignored, even if disabled.
+# .. toggle_description: If True, the stacktrace will be included with the logging message.
+# .. toggle_warnings: Requires ``LOG_ERROR`` to be set to True, otherwise this value will be ignored.
 # .. toggle_use_cases: opt_in
 # .. toggle_creation_date: 2021-03-11
 
 # .. setting_name: EXPECTED_ERRORS[N]['REASON_EXPECTED']
 # .. setting_default: None
 # .. setting_description: Required string explaining why the error is expected and/or ignored for documentation
-#     purposes.error module and class name that is expected.
+#     purposes.
 
 
 # Warning: do not access this directly, but instead use _get_expected_error_settings_dict.
@@ -343,8 +343,8 @@ def _get_expected_error_settings_dict():
                 'is_ignored': True,
                 'log_error': True,
                 'log_stack_trace': True,
-                'reason_expected': 'In most cases, signifies a user was trying to do something they couldn't.' /
-                   'It is possible that there could be a bug, so this case should still be monitored at some level.'
+                'reason_expected': 'In most cases, signifies a user was trying to do something they cannot do. '
+                   'However, an overabundance could indicate a bug, which could be monitored for.'
             }
             ...
         }
@@ -358,7 +358,8 @@ def _get_expected_error_settings_dict():
 
     expected_errors = getattr(settings, 'EXPECTED_ERRORS', None)
     if expected_errors is None:
-        return None
+        _EXPECTED_ERROR_SETTINGS_DICT = {}
+        return _EXPECTED_ERROR_SETTINGS_DICT
 
     # Use temporary variable to build mappings to avoid multi-threading issue with a partially
     # processed map.  Worst case, it is processed more than once at start-up.
@@ -382,6 +383,12 @@ def _get_expected_error_settings_dict():
                     index, module_and_class
                 )
                 continue
+            if module_and_class in expected_error_settings_dict:
+                log.warning(
+                    "EXPECTED_ERRORS[%d] setting is overriding an earlier setting. 'MODULE_AND_CLASS' [%s] is defined "
+                    "multiple times.",
+                    index, module_and_class
+                )
             if not processed_expected_error['reason_expected']:
                 log.error(
                     "Skipping EXPECTED_ERRORS[%d] setting. 'REASON_EXPECTED' is required to document why %s is an "
@@ -389,7 +396,6 @@ def _get_expected_error_settings_dict():
                     index, module_and_class
                 )
                 continue
-
             expected_error_settings_dict[module_and_class] = processed_expected_error
     except Exception as e:  # pylint: disable=broad-except
         set_custom_attribute('expected_errors_setting_misconfigured', repr(e))
@@ -450,14 +456,15 @@ def _log_and_monitor_expected_errors(request, exception, caller):
     if module_and_class not in expected_error_settings_dict:
         return
 
-    module_and_class_with_message = f'{exception_module}:{repr(exception)}'
+    exception_message = repr(str(exception))
+    module_and_class_with_message = f'{module_and_class}({exception_message})'
     set_custom_attribute('error_expected', module_and_class_with_message)
 
     expected_error_settings = expected_error_settings_dict[module_and_class]
     if expected_error_settings['is_ignored']:
         set_custom_attribute('error_ignored', True)
 
-    if expected_error_settings['log_error'] or expected_error_settings['log_stack_trace']:
-        print_stack = expected_error_settings['log_stack_trace']
-        request_path = getattr(request, 'path', default='request-path-unknown')
-        log.info('Expected error seen for %s', request_path, exc_info=exception, stack_info=print_stack)
+    if expected_error_settings['log_error']:
+        exc_info = exception if expected_error_settings['log_stack_trace'] else None
+        request_path = getattr(request, 'path', 'request-path-unknown')
+        log.info('Expected error %s seen for path %s', module_and_class_with_message, request_path, exc_info=exc_info)

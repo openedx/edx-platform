@@ -28,4 +28,3 @@ The new feature adds the ability to mark errors as expected, temporarily or perm
 For help configuring and using the new logging and monitoring features, see the `EXPECTED_ERRORS settings and toggles on Readthedocs`_.
 
 .. _EXPECTED_ERRORS settings and toggles on Readthedocs: https://edx.readthedocs.io/projects/edx-platform-technical/en/latest/search.html?q=EXPECTED_ERRORS&check_keywords=yes&area=default
-https://edx.readthedocs.io/projects/edx-platform-technical/en/latest/featuretoggles.html
