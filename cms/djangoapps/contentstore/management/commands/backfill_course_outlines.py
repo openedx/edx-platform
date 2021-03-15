@@ -40,24 +40,30 @@ class Command(BaseCommand):
             action='store_true',
             help="Show course outlines that will be backfilled, but do not make any changes."
         )
+        parser.add_argument(
+            '--force',
+            action='store_true',
+            help="Force Outline re-generation for all Courses, not just missing ones."
+        )
 
     def handle(self, *args, **options):
         dry_run = options.get('dry', False)
-        log.info("Starting backfill_course_outlines{}".format(" (dry run)" if dry_run else ""))
+        force_all = options.get('force', False)
+        log.info("Starting backfill_course_outlines: dry=%s, force=%s", dry_run, force_all)
 
         all_course_keys_qs = CourseOverview.objects.values_list('id', flat=True)
-        # .difference() is not supported in MySQL, but this at least does the
-        # SELECT NOT IN... subquery in the database rather than Python.
-        missing_outlines_qs = all_course_keys_qs.exclude(
-            id__in=get_course_keys_with_outlines()
-        )
-        num_courses_needing_outlines = len(missing_outlines_qs)
-        log.info(
-            "Found %d courses without outlines. Queuing tasks...",
-            num_courses_needing_outlines
-        )
+        if force_all:
+            target_courses_qs = all_course_keys_qs
+            log.info("Forcing re-generation for all %d course runs.", len(target_courses_qs))
+        else:
+            # .difference() is not supported in MySQL, but this at least does the
+            # SELECT NOT IN... subquery in the database rather than Python.
+            target_courses_qs = all_course_keys_qs.exclude(
+                id__in=get_course_keys_with_outlines()
+            )
+            log.info("Found %d courses without outlines.", len(target_courses_qs))
 
-        for course_key in missing_outlines_qs:
+        for course_key in target_courses_qs:
             if key_supports_outlines(course_key):
                 log.info("Queuing outline creation for %s", course_key)
                 if not dry_run:

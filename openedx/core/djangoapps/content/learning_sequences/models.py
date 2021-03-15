@@ -87,6 +87,13 @@ class CourseContext(TimeStampedModel):
     self_paced = models.BooleanField(default=False)
     entrance_exam_id = models.CharField(max_length=255, null=True)
 
+    class Meta:
+        verbose_name = 'Course'
+        verbose_name_plural = 'Courses'
+
+    def __str__(self):
+        return f"{self.learning_context.context_key} ({self.learning_context.title})"
+
 
 class LearningSequence(TimeStampedModel):
     """
@@ -200,6 +207,11 @@ class CourseSectionSequence(CourseContentVisibilityMixin, TimeStampedModel):
         unique_together = [
             ['course_context', 'ordering'],
         ]
+        verbose_name = 'Course Sequence'
+        verbose_name_plural = 'Course Sequences'
+
+    def __str__(self):
+        return f"{self.section.title} > {self.sequence.title}"
 
 
 class CourseSequenceExam(TimeStampedModel):
@@ -212,3 +224,51 @@ class CourseSequenceExam(TimeStampedModel):
     is_practice_exam = models.BooleanField(default=False)
     is_proctored_enabled = models.BooleanField(default=False)
     is_time_limited = models.BooleanField(default=False)
+
+
+class PublishReport(models.Model):
+    """
+    A report about the content that generated this LearningContext publish.
+
+    All these fields could be derived with aggregate SQL functions, but it would
+    be slower and make the admin code more complex. Since we only write at
+    publish time, keeping things in sync is less of a concern.
+    """
+    learning_context = models.OneToOneField(
+        LearningContext, on_delete=models.CASCADE, related_name='publish_report'
+    )
+    num_errors = models.PositiveIntegerField(null=False, db_index=True)
+    num_sections = models.PositiveIntegerField(null=False, db_index=True)
+    num_sequences = models.PositiveIntegerField(null=False, db_index=True)
+
+
+class ContentError(models.Model):
+    """
+    Human readable content errors.
+
+    If something got here, it means that we were able to make _something_ (or
+    there would be no LearningContext at all), but something about the published
+    state of the content is wrong and should be flagged to course and support
+    teams. In many cases, this will be some malformed course structure that gets
+    uploaded via OLX import–a process that is more forgiving than Studio's UI.
+
+    It's a little weird to store errors in such a freeform manner like this. It
+    would be more efficient and flexible in terms of i18n if we were to store
+    error codes, and leave the message generation to the time of display. The
+    problem with that is that we don't know up front what the parameterization
+    for such errors would be. The current error messages being created are
+    fairly complicated and include references to multiple attributes of multiple
+    pieces of content with supporting breadcrumbs. Other future errors might
+    just be about display_name string length.
+
+    So instead of trying to model all that internally, I'm just allowing for
+    freeform messages. It is quite possible that at some point we will come up
+    with a more comprehensive taxonomy of error messages, at which point we
+    could do a backfill to regenerate this data in a more normalized way.
+    """
+    id = models.BigAutoField(primary_key=True)
+    publish_report = models.ForeignKey(
+        PublishReport, on_delete=models.CASCADE, related_name='content_errors'
+    )
+    usage_key = UsageKeyField(max_length=255, null=True)
+    message = models.TextField(max_length=10000, blank=False, null=False)

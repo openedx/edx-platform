@@ -12,7 +12,7 @@ from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 
-from ..outlines import CourseStructureError, get_outline_from_modulestore
+from ..outlines import get_outline_from_modulestore
 
 
 class OutlineFromModuleStoreTestCase(ModuleStoreTestCase):
@@ -58,7 +58,7 @@ class OutlineFromModuleStoreTestCase(ModuleStoreTestCase):
         # published branch to make sure we have the right data.
         with self.store.branch_setting(ModuleStoreEnum.Branch.published_only, self.course_key):
             published_course = self.store.get_course(self.course_key, depth=2)
-        outline = get_outline_from_modulestore(self.course_key)
+        outline, _errs = get_outline_from_modulestore(self.course_key)
 
         # Check basic metdata...
         assert outline.title == "OutlineFromModuleStoreTestCase Course"
@@ -152,7 +152,7 @@ class OutlineFromModuleStoreTestCase(ModuleStoreTestCase):
                     display_name=f"Seq_1_{i}",
                 )
 
-        outline = get_outline_from_modulestore(self.course_key)
+        outline, _errs = get_outline_from_modulestore(self.course_key)
 
         assert len(outline.sections) == 2
         assert len(outline.sections[0].sequences) == 3
@@ -171,19 +171,58 @@ class OutlineFromModuleStoreTestCase(ModuleStoreTestCase):
         """
         # Course -> Section -> Unit (No Sequence)
         with self.store.bulk_operations(self.course_key):
-            section = ItemFactory.create(
+            section_1 = ItemFactory.create(
                 parent_location=self.draft_course.location,
                 category='chapter',
                 display_name="Section",
             )
+            # This Unit should be skipped
             ItemFactory.create(
-                parent_location=section.location,
+                parent_location=section_1.location,
                 category='vertical',
-                display_name="Unit"
+                display_name="u1"
+            )
+            ItemFactory.create(
+                parent_location=section_1.location,
+                category='sequential',
+                display_name="standard_seq"
+            )
+            ItemFactory.create(
+                parent_location=section_1.location,
+                category='problemset',
+                display_name="pset_seq"
+            )
+            ItemFactory.create(
+                parent_location=section_1.location,
+                category='videosequence',
+                display_name="video_seq"
             )
 
-        with self.assertRaises(CourseStructureError):
-            get_outline_from_modulestore(self.course_key)
+            # This should work fine
+            section_2 = ItemFactory.create(
+                parent_location=self.draft_course.location,
+                category='chapter',
+                display_name="Section 2",
+            )
+
+            # Second error message here
+            ItemFactory.create(
+                parent_location=section_2.location,
+                category='vertical',
+                display_name="u2"
+            )
+
+        outline, errs = get_outline_from_modulestore(self.course_key)
+        assert len(outline.sections) == 2
+        assert len(outline.sections[0].sequences) == 3
+        assert len(outline.sections[1].sequences) == 0
+        assert len(outline.sequences) == 3
+
+        # Version-less usage keys
+        unit_1_loc = self.course_key.make_usage_key('vertical', 'u1')
+        unit_2_loc = self.course_key.make_usage_key('vertical', 'u2')
+        assert errs[0].usage_key == unit_1_loc
+        assert errs[1].usage_key == unit_2_loc
 
     def test_sequence_without_section(self):
         """
@@ -206,8 +245,13 @@ class OutlineFromModuleStoreTestCase(ModuleStoreTestCase):
                 display_name="Unit",
             )
 
-        with self.assertRaises(CourseStructureError):
-            get_outline_from_modulestore(self.course_key)
+        outline, errs = get_outline_from_modulestore(self.course_key)
+        assert len(errs) == 1
+
+        # Strip version information from seq.location before comparison.
+        assert errs[0].usage_key == seq.location.map_into_course(self.course_key)
+        assert outline.sections == []
+        assert outline.sequences == {}
 
     def test_missing_display_names(self):
         """
@@ -225,7 +269,7 @@ class OutlineFromModuleStoreTestCase(ModuleStoreTestCase):
                 display_name=None,
             )
 
-        outline = get_outline_from_modulestore(self.course_key)
+        outline, _errs = get_outline_from_modulestore(self.course_key)
         assert outline.sections[0].title == section.url_name
         assert outline.sections[0].sequences[0].title == sequence.url_name
 
@@ -238,7 +282,7 @@ class OutlineFromModuleStoreTestCase(ModuleStoreTestCase):
         published set of blocks will have version information when they're
         published, but learning_sequences ignores all of that).
         """
-        outline = get_outline_from_modulestore(self.course_key)
+        outline, _errs = get_outline_from_modulestore(self.course_key)
 
         # Recently modified content can have full version information on their
         # CourseKeys. We need to strip that out and have versionless-CourseKeys
