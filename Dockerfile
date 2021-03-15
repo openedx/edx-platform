@@ -1,4 +1,4 @@
-FROM ubuntu:xenial as base
+FROM ubuntu:bionic as base
 
 # Install system requirements
 RUN apt update && \
@@ -37,9 +37,8 @@ RUN apt update && \
     libxslt1-dev \
     ntp \
     pkg-config \
-    python3-dev \
     python3-pip \
-    python3.5 \
+    python3 \
     -qy && rm -rf /var/lib/apt/lists/*
 
 RUN locale-gen en_US.UTF-8
@@ -61,7 +60,7 @@ ENV PATH /edx/app/edx-platform/edx-platform/bin:${PATH}
 ENV SETTINGS production
 
 # TODO: Install requirements before copying in code.
-RUN pip install setuptools==39.0.1 pip==9.0.3
+RUN pip install setuptools==39.0.1 pip==21.0.1
 RUN pip install -r requirements/edx/base.txt
 
 RUN nodeenv /edx/app/edx-platform/nodeenv --node=8.9.3 --prebuilt

@@ -28,7 +28,8 @@ export class WelcomeMessage {  // eslint-disable-line import/prefer-default-expo
       if ($.cookie('welcome-message-viewed') === 'True') {
         // If the timer cookie no longer exists, dismiss the welcome message permanently.
         if ($.cookie('welcome-message-timer') !== 'True') {
-          WelcomeMessage.dismissWelcomeMessage(options.dismissUrl);
+          // STEAM customization: always show welcome message
+          // WelcomeMessage.dismissWelcomeMessage(options.dismissUrl);
         }
       } else {
         // Set both the viewed cookie and the timer cookie.

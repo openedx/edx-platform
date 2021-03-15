@@ -52,7 +52,7 @@ django-appconf==1.0.4     # via -r requirements/edx/base.in, django-statici18n
 django-celery==3.3.1      # via -r requirements/edx/base.in, edx-bulk-grades
 django-classy-tags==1.0.0  # via django-sekizai
 django-config-models==2.0.2  # via -r requirements/edx/base.in, edx-enterprise
-django-cookies-samesite==0.6.6  # via -r requirements/edx/base.in
+django-cookies-samesite==0.8.0  # via -r requirements/edx/base.in
 django-cors-headers==2.5.3  # via -c requirements/edx/../constraints.txt, -r requirements/edx/base.in
 django-countries==5.5     # via -c requirements/edx/../constraints.txt, -r requirements/edx/base.in, edx-enterprise
 django-crum==0.7.6        # via -r requirements/edx/base.in, edx-enterprise, edx-proctoring, edx-rbac, super-csv

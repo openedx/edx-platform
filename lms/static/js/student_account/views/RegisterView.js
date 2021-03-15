@@ -31,6 +31,7 @@
                     'name',
                     'username',
                     'password',
+                    'confirm_password',
                     'email',
                     'confirm_email',
                     'country',
@@ -275,6 +276,9 @@
                         }
                     });
                     $('#register-confirm_email').bind('cut copy paste', function(e) {
+                        e.preventDefault();
+                    });
+                    $('#register-confirm_password').bind('cut copy paste', function(e) {
                         e.preventDefault();
                     });
                     setTimeout(handleAutocomplete, 1000);

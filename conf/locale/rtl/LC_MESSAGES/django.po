@@ -2136,7 +2136,6 @@ msgid "Never"
 msgstr "رثدثق"
 
 #: common/lib/xmodule/xmodule/capa_base.py lms/templates/courseware/dates.html
-#: lms/templates/vert_module.html
 msgid "Past Due"
 msgstr "حشسف يعث"
 
@@ -6859,6 +6858,51 @@ msgstr ""
 "فاث رعوزثق خب سثذخريس فخ يثمشغ/فهوثخعف صشهف فخ لثف ذخخنهث دشمعثس بقخو "
 "سشهمفاقع."
 
+#: lms/djangoapps/instructor/paidcourse_enrollment_report.py
+#, python-brace-format
+msgid "{platform_name} Staff"
+msgstr "{platform_name} سفشبب"
+
+#: lms/djangoapps/instructor/paidcourse_enrollment_report.py
+msgid "Course Staff"
+msgstr "ذخعقسث سفشبب"
+
+#: lms/djangoapps/instructor/paidcourse_enrollment_report.py
+#: openedx/core/djangoapps/django_comment_common/models.py
+msgid "Student"
+msgstr "سفعيثرف"
+
+#: lms/djangoapps/instructor/paidcourse_enrollment_report.py
+#: lms/templates/instructor/instructor_dashboard_2/membership.html
+#: lms/templates/preview_menu.html
+msgid "Staff"
+msgstr "سفشبب"
+
+#: lms/djangoapps/instructor/paidcourse_enrollment_report.py
+msgid "Used Registration Code"
+msgstr "عسثي قثلهسفقشفهخر ذخيث"
+
+#: lms/djangoapps/instructor/paidcourse_enrollment_report.py
+msgid "Credit Card - Individual"
+msgstr "ذقثيهف ذشقي - هريهدهيعشم"
+
+#: lms/djangoapps/instructor/paidcourse_enrollment_report.py
+#, python-brace-format
+msgid "manually enrolled by username: {username}"
+msgstr "وشرعشممغ ثرقخممثي زغ عسثقرشوث: {username}"
+
+#: lms/djangoapps/instructor/paidcourse_enrollment_report.py
+msgid "Manually Enrolled"
+msgstr "وشرعشممغ ثرقخممثي"
+
+#: lms/djangoapps/instructor/paidcourse_enrollment_report.py
+msgid "Data Integrity Error"
+msgstr "يشفش هرفثلقهفغ ثققخق"
+
+#: lms/djangoapps/instructor/paidcourse_enrollment_report.py
+msgid "TBD"
+msgstr "فزي"
+
 #: lms/djangoapps/instructor/services.py
 #, python-brace-format
 msgid "Proctored Exam Review: {review_status}"
@@ -8770,6 +8814,45 @@ msgstr "عسثق ثرشزمثي سعذذثسسبعممغ"
 #: lms/djangoapps/support/views/manage_user.py
 msgid "User Disabled Successfully"
 msgstr "عسثق يهسشزمثي سعذذثسسبعممغ"
+
+#: lms/djangoapps/support/views/refund.py
+#: lms/templates/shoppingcart/billing_details.html
+msgid "Email Address"
+msgstr "ثوشهم شييقثسس"
+
+#: lms/djangoapps/support/views/refund.py
+#: openedx/core/djangoapps/schedules/admin.py
+#: cms/templates/maintenance/_force_publish_course.html
+#: lms/templates/instructor/instructor_dashboard_2/add_coupon_modal.html
+#: lms/templates/instructor/instructor_dashboard_2/edit_coupon_modal.html
+#: lms/templates/support/feature_based_enrollments.html
+#: lms/templates/sysadmin_dashboard_gitlogs.html
+msgid "Course ID"
+msgstr "ذخعقسث هي"
+
+#: lms/djangoapps/support/views/refund.py
+msgid "User not found"
+msgstr "عسثق رخف بخعري"
+
+#: lms/djangoapps/support/views/refund.py
+#, python-brace-format
+msgid "Course {course_id} not past the refund window."
+msgstr "ذخعقسث {course_id} رخف حشسف فاث قثبعري صهريخص."
+
+#: lms/djangoapps/support/views/refund.py
+#, python-brace-format
+msgid "No order found for {user} in course {course_id}"
+msgstr "رخ خقيثق بخعري بخق {user} هر ذخعقسث {course_id}"
+
+#: lms/djangoapps/support/views/refund.py
+#, python-brace-format
+msgid "Unenrolled {user} from {course_id}"
+msgstr "عرثرقخممثي {user} بقخو {course_id}"
+
+#: lms/djangoapps/support/views/refund.py
+#, python-brace-format
+msgid "Refunded {cost} for order id {order_id}"
+msgstr "قثبعريثي {cost} بخق خقيثق هي {order_id}"
 
 #: lms/djangoapps/survey/utils.py
 msgid "You must complete a survey"
@@ -11409,6 +11492,7 @@ msgid "Success"
 msgstr "سعذذثسس"
 
 #: openedx/core/djangoapps/user_api/admin.py
+#: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
 #: lms/templates/staff_problem_info.html
 msgid "Actions"
 msgstr "شذفهخرس"
@@ -13706,6 +13790,20 @@ msgid "Unenroll"
 msgstr "عرثرقخمم"
 
 #: lms/templates/dates_banner.html
+msgid "We've built a suggested schedule to help you stay on track."
+msgstr "صث'دث زعهمف ش سعللثسفثي سذاثيعمث فخ اثمح غخع سفشغ خر فقشذن."
+
+#: lms/templates/dates_banner.html
+msgid ""
+"But don't worry—it's flexible so you can learn at your own pace. If you "
+"happen to fall behind on our suggested dates, you'll be able to adjust them "
+"to keep yourself on track."
+msgstr ""
+"زعف يخر'ف صخققغ—هف'س بمثطهزمث سخ غخع ذشر مثشقر شف غخعق خصر حشذث. هب غخع "
+"اشححثر فخ بشمم زثاهري خر خعق سعللثسفثي يشفثس, غخع'مم زث شزمث فخ شيتعسف فاثو "
+"فخ نثثح غخعقسثمب خر فقشذن."
+
+#: lms/templates/dates_banner.html
 msgid ""
 "It looks like you missed some important deadlines based on our suggested "
 "schedule. "
@@ -13723,33 +13821,11 @@ msgstr ""
 
 #: lms/templates/dates_banner.html
 msgid ""
-" Don't worry—you won't lose any of the progress you've made when you shift "
+" Don’t worry—you won’t lose any of the progress you’ve made when you shift "
 "your due dates."
 msgstr ""
-" يخر'ف صخققغ—غخع صخر'ف مخسث شرغ خب فاث حقخلقثسس غخع'دث وشيث صاثر غخع ساهبف "
+" يخر’ف صخققغ—غخع صخر’ف مخسث شرغ خب فاث حقخلقثسس غخع’دث وشيث صاثر غخع ساهبف "
 "غخعق يعث يشفثس."
-
-#: lms/templates/dates_banner.html
-msgid ""
-"It looks like you missed some important deadlines based on our suggested "
-"schedule."
-msgstr ""
-"هف مخخنس مهنث غخع وهسسثي سخوث هوحخقفشرف يثشيمهرثس زشسثي خر خعق سعللثسفثي "
-"سذاثيعمث."
-
-#: lms/templates/dates_banner.html
-msgid ""
-"To keep yourself on track, you can update this schedule and shift the past "
-"due assignments into the future. Don't worry—you won't lose any of the "
-"progress you've made when you shift your due dates."
-msgstr ""
-"فخ نثثح غخعقسثمب خر فقشذن, غخع ذشر عحيشفث فاهس سذاثيعمث شري ساهبف فاث حشسف "
-"يعث شسسهلروثرفس هرفخ فاث بعفعقث. يخر'ف صخققغ—غخع صخر'ف مخسث شرغ خب فاث "
-"حقخلقثسس غخع'دث وشيث صاثر غخع ساهبف غخعق يعث يشفثس."
-
-#: lms/templates/dates_banner.html
-msgid "Shift due dates"
-msgstr "ساهبف يعث يشفثس"
 
 #: lms/templates/dates_banner.html
 msgid "You are auditing this course,"
@@ -13763,12 +13839,30 @@ msgstr ""
 #: lms/templates/dates_banner.html
 msgid ""
 " It looks like you missed some important deadlines based on our suggested "
-"schedule. Graded assignments and schedule adjustment are available to "
-"Verified Track learners."
+"schedule. To complete graded assignments as part of this course and shift "
+"the past due assignments into the future, you can upgrade today by visiting "
 msgstr ""
 " هف مخخنس مهنث غخع وهسسثي سخوث هوحخقفشرف يثشيمهرثس زشسثي خر خعق سعللثسفثي "
-"سذاثيعمث. لقشيثي شسسهلروثرفس شري سذاثيعمث شيتعسفوثرف شقث شدشهمشزمث فخ "
-"دثقهبهثي فقشذن مثشقرثقس."
+"سذاثيعمث. فخ ذخوحمثفث لقشيثي شسسهلروثرفس شس حشقف خب فاهس ذخعقسث شري ساهبف "
+"فاث حشسف يعث شسسهلروثرفس هرفخ فاث بعفعقث, غخع ذشر عحلقشيث فخيشغ زغ دهسهفهرل "
+
+#: lms/templates/dates_banner.html
+msgid ""
+"It looks like you missed some important deadlines based on our suggested "
+"schedule."
+msgstr ""
+"هف مخخنس مهنث غخع وهسسثي سخوث هوحخقفشرف يثشيمهرثس زشسثي خر خعق سعللثسفثي "
+"سذاثيعمث."
+
+#: lms/templates/dates_banner.html
+msgid ""
+"To keep yourself on track, you can update this schedule and shift the past "
+"due assignments into the future. Don’t worry—you won’t lose any of the "
+"progress you’ve made when you shift your due dates."
+msgstr ""
+"فخ نثثح غخعقسثمب خر فقشذن, غخع ذشر عحيشفث فاهس سذاثيعمث شري ساهبف فاث حشسف "
+"يعث شسسهلروثرفس هرفخ فاث بعفعقث. يخر’ف صخققغ—غخع صخر’ف مخسث شرغ خب فاث "
+"حقخلقثسس غخع’دث وشيث صاثر غخع ساهبف غخعق يعث يشفثس."
 
 #: lms/templates/dates_banner.html
 msgid ""
@@ -13781,14 +13875,6 @@ msgstr ""
 "فاث حشسف يعث شسسهلروثرفس هرفخ فاث بعفعقث, غخع ذشر عحلقشيث فخيشغ."
 
 #: lms/templates/dates_banner.html
-msgid "Upgrade to shift due dates"
-msgstr "عحلقشيث فخ ساهبف يعث يشفثس"
-
-#: lms/templates/dates_banner.html
-msgid "Graded assignments are available to Verified Track learners."
-msgstr "لقشيثي شسسهلروثرفس شقث شدشهمشزمث فخ دثقهبهثي فقشذن مثشقرثقس."
-
-#: lms/templates/dates_banner.html
 msgid ""
 " To complete graded assignments as part of this course, you can upgrade "
 "today."
@@ -13797,18 +13883,16 @@ msgstr ""
 "فخيشغ."
 
 #: lms/templates/dates_banner.html
-msgid "We've built a suggested schedule to help you stay on track."
-msgstr "صث'دث زعهمف ش سعللثسفثي سذاثيعمث فخ اثمح غخع سفشغ خر فقشذن."
+msgid "Reset my deadlines"
+msgstr "قثسثف وغ يثشيمهرثس"
 
 #: lms/templates/dates_banner.html
-msgid ""
-"But don't worry—it's flexible so you can learn at your own pace. If you "
-"happen to fall behind on our suggested dates, you'll be able to adjust them "
-"to keep yourself on track."
-msgstr ""
-"زعف يخر'ف صخققغ—هف'س بمثطهزمث سخ غخع ذشر مثشقر شف غخعق خصر حشذث. هب غخع "
-"اشححثر فخ بشمم زثاهري خر خعق سعللثسفثي يشفثس, غخع'مم زث شزمث فخ شيتعسف فاثو "
-"فخ نثثح غخعقسثمب خر فقشذن."
+msgid "Upgrade to shift due dates"
+msgstr "عحلقشيث فخ ساهبف يعث يشفثس"
+
+#: lms/templates/edit_unit_link.html
+msgid "View Unit in Studio"
+msgstr "دهثص عرهف هر سفعيهخ"
 
 #: lms/templates/email_change_failed.html lms/templates/email_exists.html
 msgid "E-mail change failed"
@@ -14099,6 +14183,7 @@ msgstr "صخقنهرل"
 msgid "There has been an error on the {platform_name} servers"
 msgstr "فاثقث اشس زثثر شر ثققخق خر فاث {platform_name} سثقدثقس"
 
+#: lms/templates/courseware/courseware-error.html
 #: lms/templates/module-error.html
 msgid ""
 "We're sorry, this module is temporarily unavailable. Our staff is working to"
@@ -14277,7 +14362,6 @@ msgid "Sequence"
 msgstr "سثضعثرذث"
 
 #: lms/templates/courseware/dates.html lms/templates/seq_module.html
-#: lms/templates/vert_module.html
 #: openedx/features/course_experience/templates/course_experience/course-outline-fragment.html
 msgid "Completed"
 msgstr "ذخوحمثفثي"
@@ -16586,6 +16670,14 @@ msgstr "يعث رثطف"
 msgid "Not yet released"
 msgstr "رخف غثف قثمثشسثي"
 
+#: lms/templates/courseware/dates.html
+msgid "Due Next"
+msgstr "يعث رثطف"
+
+#: lms/templates/courseware/dates.html
+msgid "Not yet released"
+msgstr "رخف غثف قثمثشسثي"
+
 #: lms/templates/courseware/gradebook.html
 msgid "Gradebook"
 msgstr "لقشيثزخخن"
@@ -18257,10 +18349,13 @@ msgstr "يهسذخدثق رثص"
 msgid "Sysadmin"
 msgstr "سغسشيوهر"
 
-#: lms/templates/header/navbar-logo-header.html
-#: lms/templates/header/user_dropdown.html
-msgid "{name} Dashboard"
-msgstr "{name} يشسازخشقي"
+#: lms/templates/header/navbar-authenticated.html
+#: lms/templates/navigation/bootstrap/navbar-authenticated.html
+#: lms/templates/navigation/navbar-authenticated.html
+#: lms/templates/shoppingcart/shopping_cart.html
+#: themes/edx.org/lms/templates/header/navbar-authenticated.html
+msgid "Shopping Cart"
+msgstr "ساخححهرل ذشقف"
 
 #: lms/templates/header/navbar-not-authenticated.html
 msgid "Supplemental Links"

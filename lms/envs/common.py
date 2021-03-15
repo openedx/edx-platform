@@ -277,13 +277,16 @@ FEATURES = {
     'ENABLE_PUBLISHER': False,
 
     # Milestones application flag
-    'MILESTONES_APP': False,
+    'MILESTONES_APP': True,
 
     # Organizations application flag
     'ORGANIZATIONS_APP': False,
 
     # Prerequisite courses feature flag
-    'ENABLE_PREREQUISITE_COURSES': False,
+    'ENABLE_PREREQUISITE_COURSES': True,
+
+    # Entrance exams feature flag
+    'ENTRANCE_EXAMS': True,
 
     # For easily adding modes to courses during acceptance testing
     'MODE_CREATION_FOR_TESTING': False,
@@ -379,7 +382,7 @@ FEATURES = {
     'ALLOW_EMAIL_ADDRESS_CHANGE': True,
 
     # Whether the bulk enrollment view is enabled.
-    'ENABLE_BULK_ENROLLMENT_VIEW': False,
+    'ENABLE_BULK_ENROLLMENT_VIEW': True,
 
     # Whether course goals is enabled.
     'ENABLE_COURSE_GOALS': True,
@@ -861,9 +864,9 @@ COURSE_MODE_DEFAULTS = {
     'description': None,
     'expiration_datetime': None,
     'min_price': 0,
-    'name': _(u'Audit'),
+    'name': _(u'Honor'),
     'sku': None,
-    'slug': u'audit',
+    'slug': u'honor',
     'suggested_prices': '',
 }
 
@@ -2794,7 +2797,8 @@ LOGIN_REDIRECT_WHITELIST = []
 # - 'hidden': to not display the field
 
 REGISTRATION_EXTRA_FIELDS = {
-    'confirm_email': 'hidden',
+    'confirm_email': 'required',
+    'confirm_password': 'required',
     'level_of_education': 'optional',
     'gender': 'optional',
     'year_of_birth': 'optional',
@@ -2814,6 +2818,7 @@ REGISTRATION_FIELD_ORDER = [
     "email",
     "confirm_email",
     "password",
+    "confirm_password",
     "city",
     "state",
     "country",
