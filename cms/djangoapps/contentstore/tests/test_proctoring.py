@@ -100,7 +100,10 @@ class TestProctoredExams(ModuleStoreTestCase):
 
         self._verify_exam_data(sequence, True)
 
-    @unittest.skipIf(settings.TAHOE_TEMP_MONKEYPATCHING_JUNIPER_TESTS, 'IntegrityError due to UserID.test')
+    @unittest.skipIf(
+        settings.TAHOE_TEMP_MONKEYPATCHING_JUNIPER_TESTS,  # TODO: Triage IntegrityError in RED-1877
+        'IntegrityError due to UserID.test'
+    )
     @ddt.data(
         (True, False, True, False, False),
         (False, False, True, False, False),
@@ -253,7 +256,8 @@ class TestProctoredExams(ModuleStoreTestCase):
         #
         # The fix is probably to see if there's some missing user creation for
         # Special user IDs such as xmodule.modulestore.ModuleStoreEnum.UserID.test
-        settings.TAHOE_TEMP_MONKEYPATCHING_JUNIPER_TESTS, 'fails due to IntegrityError'
+        settings.TAHOE_TEMP_MONKEYPATCHING_JUNIPER_TESTS,  # TODO: Triage IntegrityError in RED-1877
+        'fails due to IntegrityError'
     )
     def test_advanced_settings(self, enable_timed_exams, enable_proctored_exams, expected_count):
         """
