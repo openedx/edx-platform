@@ -97,6 +97,7 @@ class CertificateWhitelist(models.Model):
     """
     class Meta:
         app_label = "certificates"
+        unique_together = [['course_id', 'user']]
 
     objects = NoneToEmptyManager()
 
