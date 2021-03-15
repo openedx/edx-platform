@@ -79,4 +79,4 @@ def display_name_with_default_escaped(block):
     # This escaping is incomplete.  However, rather than switching this to use
     # markupsafe.escape() and fixing issues, better to put that energy toward
     # migrating away from this method altogether.
-    return escape(display_name_with_default(block))
+    return escape(display_name_with_default(block)).replace('&amp;', '&')
