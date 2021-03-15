@@ -5,7 +5,6 @@ Bookmarks service.
 
 import logging
 
-import six
 from django.core.exceptions import ObjectDoesNotExist
 from edx_django_utils.cache import DEFAULT_REQUEST_CACHE
 
@@ -16,10 +15,10 @@ from . import DEFAULT_FIELDS, api
 
 log = logging.getLogger(__name__)
 
-CACHE_KEY_TEMPLATE = u"bookmarks.list.{}.{}"
+CACHE_KEY_TEMPLATE = "bookmarks.list.{}.{}"
 
 
-class BookmarksService(object):
+class BookmarksService:
     """
     A service that provides access to the bookmarks API.
 
@@ -32,7 +31,7 @@ class BookmarksService(object):
     """
 
     def __init__(self, user, **kwargs):
-        super(BookmarksService, self).__init__(**kwargs)
+        super().__init__(**kwargs)
         self._user = user
 
     def _bookmarks_cache(self, course_key, fetch=False):
@@ -80,7 +79,7 @@ class BookmarksService(object):
         Returns:
             Bool
         """
-        usage_id = six.text_type(usage_key)
+        usage_id = str(usage_key)
         bookmarks_cache = self._bookmarks_cache(usage_key.course_key, fetch=True)
         for bookmark in bookmarks_cache:
             if bookmark['usage_id'] == usage_id:
@@ -101,7 +100,7 @@ class BookmarksService(object):
         try:
             bookmark = api.create_bookmark(user=self._user, usage_key=usage_key)
         except ItemNotFoundError:
-            log.error(u'Block with usage_id: %s not found.', usage_key)
+            log.error('Block with usage_id: %s not found.', usage_key)
             return False
 
         bookmarks_cache = self._bookmarks_cache(usage_key.course_key)
@@ -123,13 +122,13 @@ class BookmarksService(object):
         try:
             api.delete_bookmark(self._user, usage_key=usage_key)
         except ObjectDoesNotExist:
-            log.error(u'Bookmark with usage_id: %s does not exist.', usage_key)
+            log.error('Bookmark with usage_id: %s does not exist.', usage_key)
             return False
 
         bookmarks_cache = self._bookmarks_cache(usage_key.course_key)
         if bookmarks_cache is not None:
             deleted_bookmark_index = None
-            usage_id = six.text_type(usage_key)
+            usage_id = str(usage_key)
             for index, bookmark in enumerate(bookmarks_cache):
                 if bookmark['usage_id'] == usage_id:
                     deleted_bookmark_index = index

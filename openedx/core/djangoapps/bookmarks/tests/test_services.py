@@ -18,7 +18,7 @@ class BookmarksServiceTests(BookmarksTestsBase):
     """
 
     def setUp(self):
-        super(BookmarksServiceTests, self).setUp()
+        super().setUp()
 
         self.bookmark_service = BookmarksService(user=self.user)
 

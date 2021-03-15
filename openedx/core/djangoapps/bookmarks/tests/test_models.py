@@ -5,15 +5,13 @@ Tests for Bookmarks models.
 
 import datetime
 from contextlib import contextmanager
+from unittest import mock
 
 import ddt
-import mock
 import pytz
 from freezegun import freeze_time
 from opaque_keys.edx.keys import UsageKey
 from opaque_keys.edx.locator import BlockUsageLocator, CourseLocator
-from six import text_type
-from six.moves import range
 
 from openedx.core.djangolib.testing.utils import skip_unless_lms
 from common.djangoapps.student.tests.factories import AdminFactory, UserFactory
@@ -26,8 +24,8 @@ from .. import DEFAULT_FIELDS, OPTIONAL_FIELDS, PathItem
 from ..models import Bookmark, XBlockCache, parse_path_data
 from .factories import BookmarkFactory
 
-EXAMPLE_USAGE_KEY_1 = u'i4x://org.15/course_15/chapter/Week_1'
-EXAMPLE_USAGE_KEY_2 = u'i4x://org.15/course_15/chapter/Week_2'
+EXAMPLE_USAGE_KEY_1 = 'i4x://org.15/course_15/chapter/Week_1'
+EXAMPLE_USAGE_KEY_2 = 'i4x://org.15/course_15/chapter/Week_2'
 
 
 noop_contextmanager = contextmanager(lambda x: (yield))  # pylint: disable=invalid-name
@@ -44,7 +42,7 @@ class BookmarksTestsBase(ModuleStoreTestCase):
     ENABLED_CACHES = ['default', 'mongo_metadata_inheritance', 'loc_cache']
 
     def setUp(self):
-        super(BookmarksTestsBase, self).setUp()
+        super().setUp()
 
         self.admin = AdminFactory()
         self.user = UserFactory.create(password=self.TEST_PASSWORD)
@@ -57,7 +55,7 @@ class BookmarksTestsBase(ModuleStoreTestCase):
         with self.store.default_store(store_type):
 
             self.course = CourseFactory.create(display_name='An Introduction to API Testing')
-            self.course_id = text_type(self.course.id)
+            self.course_id = str(self.course.id)
 
             with self.store.bulk_operations(self.course.id):
 
@@ -157,7 +155,7 @@ class BookmarksTestsBase(ModuleStoreTestCase):
 
         self.other_bookmark_1 = BookmarkFactory.create(
             user=self.user,
-            course_key=text_type(self.other_course.id),
+            course_key=str(self.other_course.id),
             usage_key=self.other_vertical_1.location,
             xblock_cache=XBlockCache.create({
                 'display_name': self.other_vertical_1.display_name,
@@ -184,7 +182,7 @@ class BookmarksTestsBase(ModuleStoreTestCase):
                     for block in blocks_at_current_level:
                         for __ in range(children_per_block):
                             blocks_at_next_level += [ItemFactory.create(
-                                parent_location=block.scope_ids.usage_id, display_name=text_type(display_name)
+                                parent_location=block.scope_ids.usage_id, display_name=str(display_name)
                             )]
                             display_name += 1
 
@@ -200,7 +198,7 @@ class BookmarksTestsBase(ModuleStoreTestCase):
 
             with self.store.bulk_operations(course.id):
                 blocks = [ItemFactory.create(
-                    parent_location=course.location, category='chapter', display_name=text_type(index)
+                    parent_location=course.location, category='chapter', display_name=str(index)
                 ) for index in range(count)]
 
             bookmarks = [BookmarkFactory.create(
@@ -221,8 +219,8 @@ class BookmarksTestsBase(ModuleStoreTestCase):
         """
         assert bookmark.user == bookmark_data['user']
         assert bookmark.course_key == bookmark_data['course_key']
-        assert text_type(bookmark.usage_key) == text_type(bookmark_data['usage_key'])
-        assert bookmark.resource_id == u'{},{}'.format(bookmark_data['user'], bookmark_data['usage_key'])
+        assert str(bookmark.usage_key) == str(bookmark_data['usage_key'])
+        assert bookmark.resource_id == '{},{}'.format(bookmark_data['user'], bookmark_data['usage_key'])
         assert bookmark.display_name == bookmark_data['display_name']
         assert bookmark.path == self.path
         assert bookmark.created is not None
@@ -235,9 +233,9 @@ class BookmarksTestsBase(ModuleStoreTestCase):
         Assert that the bookmark data matches the data in the model.
         """
         assert bookmark_data['id'] == bookmark.resource_id
-        assert bookmark_data['course_id'] == text_type(bookmark.course_key)
-        assert bookmark_data['usage_id'] == text_type(bookmark.usage_key)
-        assert bookmark_data['block_type'] == text_type(bookmark.usage_key.block_type)
+        assert bookmark_data['course_id'] == str(bookmark.course_key)
+        assert bookmark_data['usage_id'] == str(bookmark.usage_key)
+        assert bookmark_data['block_type'] == str(bookmark.usage_key.block_type)
         assert bookmark_data['created'] is not None
 
         if check_optional_fields:
@@ -253,7 +251,7 @@ class BookmarkModelTests(BookmarksTestsBase):
     """
 
     def setUp(self):
-        super(BookmarkModelTests, self).setUp()
+        super().setUp()
 
         self.vertical_4 = ItemFactory.create(
             parent_location=self.sequential_2.location,
@@ -442,12 +440,12 @@ class XBlockCacheModelTest(ModuleStoreTestCase):
     SECTION2_USAGE_KEY = BlockUsageLocator(COURSE_KEY, block_type='section', block_id='section1')
     VERTICAL1_USAGE_KEY = BlockUsageLocator(COURSE_KEY, block_type='vertical', block_id='sequential1')
     PATH1 = [
-        [text_type(CHAPTER1_USAGE_KEY), 'Chapter 1'],
-        [text_type(SECTION1_USAGE_KEY), 'Section 1'],
+        [str(CHAPTER1_USAGE_KEY), 'Chapter 1'],
+        [str(SECTION1_USAGE_KEY), 'Section 1'],
     ]
     PATH2 = [
-        [text_type(CHAPTER1_USAGE_KEY), 'Chapter 1'],
-        [text_type(SECTION2_USAGE_KEY), 'Section 2'],
+        [str(CHAPTER1_USAGE_KEY), 'Chapter 1'],
+        [str(SECTION2_USAGE_KEY), 'Section 2'],
     ]
 
     def assert_xblock_cache_data(self, xblock_cache, data):
