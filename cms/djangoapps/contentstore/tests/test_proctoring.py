@@ -309,3 +309,8 @@ class TestProctoredExams(ModuleStoreTestCase):
         listen_for_course_publish(self, self.course.id)
         exams = get_all_exams_for_course(str(self.course.id))
         assert exams[0]['due_date'] is not None
+
+    def test_check_sqlite_version(self):
+        import sqlite3
+        assert sqlite3.sqlite_version=='3.31.1'
+
