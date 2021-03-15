@@ -314,3 +314,12 @@ class TestProctoredExams(ModuleStoreTestCase):
         import sqlite3
         assert sqlite3.sqlite_version=='3.31.1'
 
+    def test_check_sqlite_foregin_keys(self):
+        import sqlite3
+        from django.db import connection
+        connect = sqlite3.connect(connection.settings_dict['NAME'])
+        cur = connect.cursor()
+        aaa = cur.execute("PRAGMA foreign_keys;")
+        assert aaa.fetchall() == [(0,)]
+
+
