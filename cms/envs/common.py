@@ -430,6 +430,20 @@ FEATURES = {
     # .. toggle_warnings: Also set settings.LIBRARY_AUTHORING_MICROFRONTEND_URL and see
     #   REDIRECT_TO_LIBRARY_AUTHORING_MICROFRONTEND for rollout.
     'ENABLE_LIBRARY_AUTHORING_MICROFRONTEND': False,
+
+    # .. toggle_name: FEATURES['DISABLE_COURSE_CREATION']
+    # .. toggle_implementation: DjangoSetting
+    # .. toggle_default: False
+    # .. toggle_description: If set to True, it disables the course creation functionality and hides the "New Course"
+    #   button in studio.
+    #   It is important to note that the value of this flag only affects if the user doesn't have a staff role,
+    #   otherwise the course creation functionality will work as it should.
+    # .. toggle_use_cases: open_edx
+    # .. toggle_creation_date: 2013-12-02
+    # .. toggle_target_removal_date: None
+    # .. toggle_tickets: None
+    # .. toggle_warnings: Another toggle DISABLE_LIBRARY_CREATION overrides DISABLE_COURSE_CREATION, if present.
+    'DISABLE_COURSE_CREATION': False,
 }
 
 ENABLE_JASMINE = False
