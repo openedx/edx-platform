@@ -73,6 +73,15 @@ class ExportCourseTestCase(CourseTestCase):
         result = export_olx.delay(user.id, key, 'en')
         self._assert_failed(result, f'Unknown User ID: {user.id}')
 
+    def test_non_course_author(self):
+        """
+        Verify that users who aren't authors of the course are unable to export it
+        """
+        _, nonstaff_user = self.create_non_staff_authed_user_client()
+        key = str(self.course.location.course_key)
+        result = export_olx.delay(nonstaff_user.id, key, 'en')
+        self._assert_failed(result, 'Permission denied')
+
     def _assert_failed(self, task_result, error_message):
         """
         Verify that a task failed with the specified error message
