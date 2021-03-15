@@ -79,17 +79,21 @@ class ProgressTabTestViews(BaseCourseHomeTests):
         response = self.client.get(self.url)
         assert response.status_code == 404
 
-    # TODO: (AA-212) implement masquerade
-    # def test_masquerade(self):
-    #     user = UserFactory()
-    #     set_user_preference(user, 'time_zone', 'Asia/Tokyo')
-    #     CourseEnrollment.enroll(user, self.course.id)
-    #
-    #     self.switch_to_staff()  # needed for masquerade
-    #
-    #     # Sanity check on our normal user
-    #     assert self.client.get(self.url).data['user_timezone'] is None
-    #
-    #     # Now switch users and confirm we get a different result
-    #     self.update_masquerade(username=user.username)
-    #     assert self.client.get(self.url).data['user_timezone'] == 'Asia/Tokyo'
+    @override_experiment_waffle_flag(COURSE_HOME_MICROFRONTEND, active=True)
+    @override_waffle_flag(COURSE_HOME_MICROFRONTEND_PROGRESS_TAB, active=True)
+    def test_masquerade(self):
+        # Enroll a verified user
+        verified_user = UserFactory(is_staff=False)
+        CourseEnrollment.enroll(verified_user, self.course.id, CourseMode.VERIFIED)
+
+        # Enroll self in course
+        CourseEnrollment.enroll(self.user, self.course.id)
+        response = self.client.get(self.url)
+        assert response.status_code == 200
+
+        self.switch_to_staff()  # needed for masquerade
+        assert self.client.get(self.url).data.get('enrollment_mode') is None
+
+        # Masquerade as verified user
+        self.update_masquerade(username=verified_user.username)
+        assert self.client.get(self.url).data.get('enrollment_mode') == 'verified'
