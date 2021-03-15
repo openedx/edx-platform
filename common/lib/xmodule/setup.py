@@ -2,9 +2,6 @@
 
 from setuptools import find_packages, setup
 
-XMODULES = [
-    "section = xmodule.backcompat_module:SemanticSectionDescriptor",
-]
 XBLOCKS = [
     "about = xmodule.html_module:AboutBlock",
     "book = xmodule.template_module:TranslateCustomTagBlock",
@@ -65,8 +62,7 @@ setup(
     # See https://setuptools.readthedocs.io/en/latest/setuptools.html#dynamic-discovery-of-services-and-plugins
     # for a description of entry_points
     entry_points={
-        'xblock.v1': XMODULES + XBLOCKS,
-        'xmodule.v1': XMODULES,
+        'xblock.v1': XBLOCKS,
         'xblock_asides.v1': XBLOCKS_ASIDES,
         'console_scripts': [
             'xmodule_assets = xmodule.static_content:main',
