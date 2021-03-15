@@ -99,6 +99,27 @@ class MultilingualCourseQuerySet(QuerySet):
         """
         return self.enrolled_course(user) or self.preferred_lang_course() or self.first()
 
+    def language_codes_with_course_ids(self):
+        """
+        Get a QuerySet containing tuples, each with a course_id and its corresponding language code
+
+        Returns:
+            QuerySet: A QuerySet containing one or more tuples in the form: (course_id, language_code)
+        """
+        return self.values_list('course__id', 'course__language')
+
+    def multilingual_course_with_course_id(self, course_id):
+        """
+        Given a course_id, returns a MultilingualCourse associated with that course_id.
+
+        Arguments:
+            course_id (CourseKey): id of the specified course
+
+        Returns:
+            MultilingualCourse: MultilingualCourse object associated with the given course_id
+        """
+        return self.filter(course__id=course_id).first()
+
 
 class MultilingualCourseManager(Manager):
     """

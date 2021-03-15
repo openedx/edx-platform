@@ -9,7 +9,7 @@ import pytest
 from common.djangoapps.student.tests.factories import AnonymousUserFactory, CourseEnrollmentFactory, UserFactory
 from lms.djangoapps.grades.api import CourseGradeFactory
 from openedx.adg.lms.applications.constants import CourseScore
-from openedx.adg.lms.applications.models import MultilingualCourseGroup, UserApplication
+from openedx.adg.lms.applications.models import MultilingualCourse, MultilingualCourseGroup, UserApplication
 from openedx.core.lib.grade_utils import round_away_from_zero
 
 from .constants import USERNAME
@@ -329,3 +329,35 @@ def test_get_enrolled_prerequisites_for_user(user_with_profile, courses):
     MultilingualCourseFactory(course=courses['test_course1'])
     CourseEnrollmentFactory(course=courses['test_course1'], user=user_with_profile, is_active=True)
     assert len(MultilingualCourseGroup.objects.get_courses(user_with_profile, is_prereq=True)) == 1
+
+
+@pytest.mark.django_db
+def test_get_course_group_languages(courses, course_group):
+    """
+    Tests if the queryset MultilingualCourseQuerySet method `language_codes_with_course_ids()` gets all the
+    languages of all the courses in a multilingual course group correctly or not
+    """
+    course1 = courses['test_course1']
+    course2 = courses['test_course2']
+
+    open_multilingual_courses = course_group.multilingual_courses.open_multilingual_courses()
+
+    MultilingualCourseFactory(course=course1, multilingual_course_group=course_group)
+    MultilingualCourseFactory(course=course2, multilingual_course_group=course_group)
+
+    actual_output = open_multilingual_courses.language_codes_with_course_ids()
+    expected_output = [(course1.id, 'en'), (course2.id, 'ar')]
+
+    assert all([actual_item == expected_item for actual_item, expected_item in zip(actual_output, expected_output)])
+
+
+@pytest.mark.django_db
+def test_multilingual_course_with_course_id(courses):
+    """
+    Test if the queryset MultilingualCourseQuerySet method `multilingual_course_with_course_id()` gets the
+    multilingual course associated with the id
+    """
+    course = courses['test_course1']
+    multilingual_course = MultilingualCourseFactory(course=course)
+
+    assert MultilingualCourse.objects.all().multilingual_course_with_course_id(course.id) == multilingual_course
