@@ -10,7 +10,6 @@ from urllib.parse import urlencode
 
 import ddt
 
-from lms.djangoapps.courseware.field_overrides import OverrideModulestoreFieldData
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.features.course_experience.url_helpers import get_legacy_courseware_url
 from common.djangoapps.student.tests.factories import AdminFactory, CourseEnrollmentFactory, UserFactory
@@ -18,9 +17,12 @@ from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory, check_mongo_calls
 
+from .field_overrides import OverrideModulestoreFieldData
+from .tests.helpers import MasqueradeMixin
+
 
 @ddt.ddt
-class RenderXBlockTestMixin(metaclass=ABCMeta):
+class RenderXBlockTestMixin(MasqueradeMixin, metaclass=ABCMeta):
     """
     Mixin for testing the courseware.render_xblock function.
     It can be used for testing any higher-level endpoint that calls this method.
@@ -218,6 +220,12 @@ class RenderXBlockTestMixin(metaclass=ABCMeta):
     def test_success_unenrolled_staff(self):
         self.setup_course()
         self.setup_user(admin=True, enroll=False, login=True)
+        self.verify_response()
+
+    def test_success_unenrolled_staff_masquerading_as_student(self):
+        self.setup_course()
+        self.setup_user(admin=True, enroll=False, login=True)
+        self.update_masquerade(role='student')
         self.verify_response()
 
     def test_success_enrolled_student(self):

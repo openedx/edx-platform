@@ -1700,7 +1700,6 @@ def render_xblock(request, usage_key_string, check_if_enrolled=True):
         )
 
     staff_access = has_access(request.user, 'staff', course_key)
-    _course_masquerade, request.user = setup_masquerade(request, course_key, staff_access)
 
     with modulestore().bulk_operations(course_key):
         # verify the user has access to the course, including enrollment check
@@ -1708,6 +1707,18 @@ def render_xblock(request, usage_key_string, check_if_enrolled=True):
             course = get_course_with_access(request.user, 'load', course_key, check_if_enrolled=check_if_enrolled)
         except CourseAccessRedirect:
             raise Http404("Course not found.")  # lint-amnesty, pylint: disable=raise-missing-from
+
+        # with course access now verified:
+        # assume masquerading role, if applicable.
+        # (if we did this *before* the course access check, then course staff
+        #  masquerading as learners would often be denied access, since course
+        #  staff are generally not enrolled, and viewing a course generally
+        #  requires enrollment.)
+        _course_masquerade, request.user = setup_masquerade(
+            request,
+            course_key,
+            staff_access,
+        )
 
         # get the block, which verifies whether the user has access to the block.
         recheck_access = request.GET.get('recheck_access') == '1'
