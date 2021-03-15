@@ -6,6 +6,7 @@ Test finding orphans via the view and django config
 import json
 
 import ddt
+import six
 from opaque_keys.edx.locator import BlockUsageLocator
 
 from cms.djangoapps.contentstore.tests.utils import CourseTestCase
@@ -94,13 +95,13 @@ class TestOrphan(TestOrphanBase):
                 HTTP_ACCEPT='application/json'
             ).content.decode('utf-8')
         )
-        self.assertEqual(len(orphans), 3, f"Wrong # {orphans}")
+        self.assertEqual(len(orphans), 3, u"Wrong # {}".format(orphans))
         location = course.location.replace(category='chapter', name='OrphanChapter')
-        self.assertIn(str(location), orphans)
+        self.assertIn(six.text_type(location), orphans)
         location = course.location.replace(category='vertical', name='OrphanVert')
-        self.assertIn(str(location), orphans)
+        self.assertIn(six.text_type(location), orphans)
         location = course.location.replace(category='html', name='OrphanHtml')
-        self.assertIn(str(location), orphans)
+        self.assertIn(six.text_type(location), orphans)
 
     @ddt.data(
         (ModuleStoreEnum.Type.split, 9, 5),
@@ -120,7 +121,7 @@ class TestOrphan(TestOrphanBase):
         orphans = json.loads(
             self.client.get(orphan_url, HTTP_ACCEPT='application/json').content.decode('utf-8')
         )
-        self.assertEqual(len(orphans), 0, f"Orphans not deleted {orphans}")
+        self.assertEqual(len(orphans), 0, u"Orphans not deleted {}".format(orphans))
 
         # make sure that any children with one orphan parent and one non-orphan
         # parent are not deleted
@@ -173,8 +174,8 @@ class TestOrphan(TestOrphanBase):
 
         # HTML component has `vertical1` as its parent.
         html_parent = self.store.get_parent_location(multi_parent_html.location)
-        self.assertNotEqual(str(html_parent), str(orphan_vertical.location))
-        self.assertEqual(str(html_parent), str(vertical1.location))
+        self.assertNotEqual(six.text_type(html_parent), six.text_type(orphan_vertical.location))
+        self.assertEqual(six.text_type(html_parent), six.text_type(vertical1.location))
 
         # Get path of the `multi_parent_html` & verify path_to_location returns a expected path
         path = path_to_location(self.store, multi_parent_html.location)
@@ -226,7 +227,7 @@ class TestOrphan(TestOrphanBase):
 
         # Verify chapter1 is parent of vertical1.
         vertical1_parent = self.store.get_parent_location(vertical1.location)
-        self.assertEqual(str(vertical1_parent), str(chapter1.location))
+        self.assertEqual(six.text_type(vertical1_parent), six.text_type(chapter1.location))
 
         # Make `Vertical1` the parent of `HTML0`. So `HTML0` will have to parents (`Vertical0` & `Vertical1`)
         vertical1.children.append(html.location)
@@ -235,7 +236,7 @@ class TestOrphan(TestOrphanBase):
         # Get parent location & verify its either of the two verticals. As both parents are non-orphan,
         # alphabetically least is returned
         html_parent = self.store.get_parent_location(html.location)
-        self.assertEqual(str(html_parent), str(vertical1.location))
+        self.assertEqual(six.text_type(html_parent), six.text_type(vertical1.location))
 
         # verify path_to_location returns a expected path
         path = path_to_location(self.store, html.location)
