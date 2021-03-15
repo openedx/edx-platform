@@ -12,7 +12,7 @@ import pytz
 from lxml import etree
 from web_fragments.fragment import Fragment
 
-from common.lib.xmodule.xmodule.util.misc import is_xblock_an_assignment
+from xmodule.util.misc import is_xblock_an_assignment
 from xblock.core import XBlock  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.mako_module import MakoTemplateBlockBase
 from xmodule.progress import Progress

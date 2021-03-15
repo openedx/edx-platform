@@ -11,8 +11,8 @@ from django.urls import reverse
 from rest_framework import status
 from rest_framework.test import APITestCase
 
-from common.lib.xmodule.xmodule.modulestore.tests.django_utils import CourseUserType
-from common.lib.xmodule.xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from xmodule.modulestore.tests.django_utils import CourseUserType
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.tests.factories import CourseFactory
 

@@ -9,7 +9,7 @@ from rest_framework.views import APIView
 
 from cms.djangoapps.contentstore.views.course import get_course_and_check_access
 from cms.djangoapps.models.settings.course_metadata import CourseMetadata
-from common.lib.xmodule.xmodule.course_module import get_available_providers
+from xmodule.course_module import get_available_providers
 from openedx.core.lib.api.view_utils import view_auth_classes
 from xmodule.modulestore.django import modulestore
 

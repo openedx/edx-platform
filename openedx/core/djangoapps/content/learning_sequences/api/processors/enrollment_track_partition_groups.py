@@ -1,13 +1,13 @@
 # lint-amnesty, pylint: disable=missing-module-docstring
 import logging
 
-from common.lib.xmodule.xmodule.partitions.enrollment_track_partition_generator import (
+from xmodule.partitions.enrollment_track_partition_generator import (
     create_enrollment_track_partition_with_course_id
 )
-from common.lib.xmodule.xmodule.partitions.partitions import (
+from xmodule.partitions.partitions import (
     ENROLLMENT_TRACK_PARTITION_ID,
 )
-from common.lib.xmodule.xmodule.partitions.partitions_service import get_user_partition_groups
+from xmodule.partitions.partitions_service import get_user_partition_groups
 
 from .base import OutlineProcessor
 
