@@ -195,6 +195,23 @@ class AllowlistTests(ModuleStoreTestCase):
         CertificateWhitelistFactory.create(course_id=key, user=u)
         assert not _can_generate_allowlist_certificate(u, key)
 
+    def test_can_generate_audit(self):
+        """
+        Test handling when user is enrolled in audit mode
+        """
+        u = UserFactory()
+        cr = CourseFactory()
+        key = cr.id  # pylint: disable=no-member
+        CourseEnrollmentFactory(
+            user=u,
+            course_id=key,
+            is_active=True,
+            mode="audit",
+        )
+        CertificateWhitelistFactory.create(course_id=key, user=u)
+
+        assert not _can_generate_allowlist_certificate(u, key)
+
     def test_can_generate_not_whitelisted(self):
         """
         Test handling when user is not whitelisted

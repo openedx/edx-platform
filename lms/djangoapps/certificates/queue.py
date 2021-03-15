@@ -15,6 +15,7 @@ from lxml.etree import ParserError, XMLSyntaxError
 from requests.auth import HTTPBasicAuth
 
 from capa.xqueue_interface import XQueueInterface, make_hashkey, make_xheader
+from common.djangoapps.course_modes import api as modes_api
 from common.djangoapps.course_modes.models import CourseMode
 from common.djangoapps.student.models import CourseEnrollment, UserProfile
 from lms.djangoapps.certificates.models import CertificateStatuses as status
@@ -289,7 +290,7 @@ class XQueueCertInterface:
         user_is_verified = IDVerificationService.user_is_verified(student)
         cert_mode = enrollment_mode
 
-        is_eligible_for_certificate = CourseMode.is_eligible_for_certificate(enrollment_mode, cert_status)
+        is_eligible_for_certificate = modes_api.is_eligible_for_certificate(enrollment_mode, cert_status)
         if is_whitelisted and not is_eligible_for_certificate:
             # check if audit certificates are enabled for audit mode
             is_eligible_for_certificate = enrollment_mode != CourseMode.AUDIT or \
