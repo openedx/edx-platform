@@ -549,7 +549,7 @@ $sidebar-active-image: linear-gradient(top, rgb(230, 230, 230), rgb(214, 214, 21
 // student notes
 $student-notes-highlight-color-base: saturate($yellow, 65%) !default;
 $student-notes-highlight-color: tint($student-notes-highlight-color-base, 50%) !default;
-$student-notes-highlight-color-focus: $student-notes-highlight-color-base !default;
+$student-notes-highlight-color-focus: #ffea75 !default;
 
 // ----------------------------
 // #DEPRECATED
