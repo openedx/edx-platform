@@ -166,6 +166,23 @@ class EnrollmentTest(UrlResetMixin, SharedModuleStoreTestCase):
         assert mock_segment.track.call_args[0][1] == 'edx.course.enrollment.activated'
         assert mock_segment.track.call_args[0][2]['external_course_updates'] == value
 
+    def test_enrollment_properties_in_segment_traits(self):
+        with patch('common.djangoapps.student.models.segment') as mock_segment:
+            enrollment = CourseEnrollment.enroll(self.user, self.course.id)
+        assert mock_segment.track.call_count == 1
+        assert mock_segment.track.call_args[0][1] == 'edx.course.enrollment.activated'
+        traits = mock_segment.track.call_args[1]['traits']
+        assert traits['course_title'] == 'Run 0'
+        assert traits['mode'] == 'audit'
+
+        with patch('common.djangoapps.student.models.segment') as mock_segment:
+            enrollment.update_enrollment(mode='verified')
+        assert mock_segment.track.call_count == 1
+        assert mock_segment.track.call_args[0][1] == 'edx.course.enrollment.mode_changed'
+        traits = mock_segment.track.call_args[1]['traits']
+        assert traits['course_title'] == 'Run 0'
+        assert traits['mode'] == 'verified'
+
     @patch.dict(settings.FEATURES, {'ENABLE_MKTG_EMAIL_OPT_IN': True})
     @patch('openedx.core.djangoapps.user_api.preferences.api.update_email_opt_in')
     @ddt.data(
