@@ -153,3 +153,14 @@ docker_push: docker_tag docker_auth ## push to docker hub
 	docker push "openedx/cms:${GITHUB_SHA}"
 	docker push "openedx/cms-dev:latest"
 	docker push "openedx/cms-dev:${GITHUB_SHA}"
+
+lint-imports: lint-imports-root lint-imports-xmodule lint-imports-capa
+
+lint-imports-root:
+	lint-imports
+
+lint-imports-xmodule:
+	cd common/lib/xmodule && lint-imports
+
+lint-imports-capa:
+	cd common/lib/capa && lint-imports
