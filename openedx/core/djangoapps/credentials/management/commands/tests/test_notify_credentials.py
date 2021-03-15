@@ -4,7 +4,7 @@ Tests the ``notify_credentials`` management command.
 
 
 from datetime import datetime
-import mock
+from unittest import mock
 
 from django.core.management import call_command
 from django.core.management.base import CommandError
@@ -31,7 +31,7 @@ class TestNotifyCredentials(TestCase):
     Tests the ``notify_credentials`` management command.
     """
     def setUp(self):
-        super(TestNotifyCredentials, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.user = UserFactory.create()
         self.user2 = UserFactory.create()
 
