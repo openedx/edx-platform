@@ -6,6 +6,7 @@ Signal handler for enabling/disabling self-generated certificates based on the c
 import logging
 
 import six
+from django.conf import settings
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 
@@ -156,6 +157,12 @@ def fire_ungenerated_certificate_task(user, course_key, expected_verification_st
         CourseMode.NO_ID_PROFESSIONAL_MODE,
         CourseMode.MASTERS,
     ]
+    if settings.FEATURES.get('TAHOE_AUTO_GENERATE_HONOR_CERTS', False):
+        # Appsembler change: allow for Honor mode
+        allowed_enrollment_modes_list += [
+            CourseMode.HONOR
+        ]
+
     enrollment_mode, __ = CourseEnrollment.enrollment_mode_for_user(user, course_key)
     cert = GeneratedCertificate.certificate_for_student(user, course_key)
 

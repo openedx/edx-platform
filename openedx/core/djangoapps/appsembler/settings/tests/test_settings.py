@@ -29,6 +29,7 @@ def get_faked_settings():
     settings.APPSEMBLER_FEATURES = {}
     settings.MIDDLEWARE = [
         'django.contrib.sites.middleware.CurrentSiteMiddleware',
+        'django_sites_extensions.middleware.RedirectMiddleware',
     ]
     settings.STATICFILES_DIRS = []
     settings.CACHES = {}
