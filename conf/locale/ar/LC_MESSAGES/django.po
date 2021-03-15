@@ -58,7 +58,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2021-03-10 08:25+0000\n"
+"POT-Creation-Date: 2021-03-11 12:28+0000\n"
 "PO-Revision-Date: 2020-10-27 19:12+0000\n"
 "Last-Translator: Rana Waqar <rana.waqar@arbisoft.com>, 2020\n"
 "Language-Team: Arabic (https://www.transifex.com/philanthropy-u/teams/113553/ar/)\n"
@@ -267,7 +267,6 @@ msgstr "اسم العرض"
 
 #: common/djangoapps/course_modes/models.py
 #: lms/templates/courseware/course_about.html
-#: themes/edx-platform/adg/lms/templates/courseware/course_about.html
 msgid "Price"
 msgstr "السعر"
 
@@ -9497,7 +9496,6 @@ msgid "Cover Letter"
 msgstr ""
 
 #: lms/templates/courseware/course_about.html
-#: themes/edx-platform/adg/lms/templates/courseware/course_about.html
 msgid "Prerequisites"
 msgstr "المتطلّبات الأساسية"
 
@@ -13365,7 +13363,6 @@ msgstr "جاري التحميل"
 
 #: cms/templates/course-create-rerun.html cms/templates/index.html
 #: cms/templates/settings.html lms/templates/courseware/course_about.html
-#: themes/edx-platform/adg/lms/templates/courseware/course_about.html
 msgid "Course Number"
 msgstr "رقم المساق "
 
@@ -13412,12 +13409,11 @@ msgid "Courses"
 msgstr "المساقات"
 
 #: cms/templates/settings.html lms/templates/courseware/program_marketing.html
-#: themes/edx-platform/adg/lms/templates/courseware/course_about.html
+#: themes/edx-platform/adg/lms/templates/courseware/course_instructors.html
 msgid "Instructors"
 msgstr "المُدرسين في المدورة"
 
 #: cms/templates/settings.html lms/templates/courseware/course_about.html
-#: themes/edx-platform/adg/lms/templates/courseware/course_about.html
 msgid "Requirements"
 msgstr "المتطلّبات"
 
@@ -16367,7 +16363,6 @@ msgid "An error occurred. Please try again later."
 msgstr "نأسف لحدوث خطأ. يُرجى إعادة المحاولة لاحقًا. "
 
 #: lms/templates/courseware/course_about.html
-#: themes/edx-platform/adg/lms/templates/courseware/course_about.html
 msgid "You are enrolled in this course"
 msgstr "أنت مسجّل في هذا المساق"
 
@@ -16393,7 +16388,6 @@ msgid "Enrollment is Closed"
 msgstr "أُغلِق باب التسجيل"
 
 #: lms/templates/courseware/course_about.html
-#: themes/edx-platform/adg/lms/templates/courseware/course_about.html
 msgid "Enroll Now"
 msgstr "سجل الآن"
 
@@ -16403,12 +16397,10 @@ msgid "View About Page in studio"
 msgstr "استعراض صفحة اللمحة في استوديو"
 
 #: lms/templates/courseware/course_about.html
-#: themes/edx-platform/adg/lms/templates/courseware/course_about.html
 msgid "Classes Start"
 msgstr "تبدأ الحصص"
 
 #: lms/templates/courseware/course_about.html
-#: themes/edx-platform/adg/lms/templates/courseware/course_about.html
 msgid "Classes End"
 msgstr "تنتهي الحصص"
 
@@ -16419,7 +16411,6 @@ msgstr "الجهد المقدَّر"
 
 #: lms/templates/courseware/course_about.html
 #: lms/templates/dashboard/_dashboard_course_listing.html
-#: themes/edx-platform/adg/lms/templates/courseware/course_about.html
 msgid ""
 "You must successfully complete {link_start}{prc_display}{link_end} before "
 "you begin this course."
@@ -20747,19 +20738,11 @@ msgid "Select course language"
 msgstr ""
 
 #: themes/edx-platform/adg/lms/templates/courseware/course_about.html
-msgid "English"
-msgstr ""
-
-#: themes/edx-platform/adg/lms/templates/courseware/course_about.html
-msgid "Arabic"
-msgstr ""
-
-#: themes/edx-platform/adg/lms/templates/courseware/course_about.html
 msgid "enroll now"
 msgstr ""
 
 #: themes/edx-platform/adg/lms/templates/courseware/course_about.html
-msgid "1554 already enrolled!"
+msgid "{total_enrollments} already enrolled!"
 msgstr ""
 
 #: themes/edx-platform/adg/lms/templates/courseware/course_about.html
@@ -20771,15 +20754,11 @@ msgid "Self - Paced"
 msgstr ""
 
 #: themes/edx-platform/adg/lms/templates/courseware/course_about.html
+msgid "Instructor - Paced"
+msgstr "المُدرسين في المدورة"
+
+#: themes/edx-platform/adg/lms/templates/courseware/course_about.html
 msgid "Start learning today"
-msgstr ""
-
-#: themes/edx-platform/adg/lms/templates/courseware/course_about.html
-msgid "10 Hours."
-msgstr ""
-
-#: themes/edx-platform/adg/lms/templates/courseware/course_about.html
-msgid "1-2 hours per module"
 msgstr ""
 
 #: themes/edx-platform/adg/lms/templates/courseware/course_about.html
@@ -20788,10 +20767,6 @@ msgstr ""
 
 #: themes/edx-platform/adg/lms/templates/courseware/course_about.html
 msgid "Digital"
-msgstr ""
-
-#: themes/edx-platform/adg/lms/templates/courseware/course_about.html
-msgid "AMR AL-DABBAGH"
 msgstr ""
 
 #: themes/edx-platform/adg/lms/templates/header/navbar-authenticated.html
