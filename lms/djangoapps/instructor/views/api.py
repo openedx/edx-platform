@@ -71,8 +71,7 @@ from lms.djangoapps.bulk_email.api import is_bulk_email_feature_enabled
 from lms.djangoapps.bulk_email.models import CourseEmail
 from lms.djangoapps.certificates import api as certs_api
 from lms.djangoapps.certificates.models import (
-    CertificateStatuses,
-    CertificateWhitelist
+    CertificateStatuses
 )
 from lms.djangoapps.courseware.access import has_access
 from lms.djangoapps.courseware.courses import get_course_by_id, get_course_with_access
@@ -2849,7 +2848,7 @@ def generate_bulk_certificate_exceptions(request, course_id):
                     build_row_errors('user_on_certificate_invalidation_list', user, row_num)
                     log.warning(f'Student {user.id} is blocked from receiving a Certificate in Course {course_key}')
                 # make sure user isn't already on the exception list
-                elif CertificateWhitelist.get_certificate_white_list(course_key, user):
+                elif certs_api.is_on_allowlist(user, course_key):
                     build_row_errors('user_already_white_listed', user, row_num)
                     log.warning(f'Student {user.id} already on exception list in Course {course_key}.')
                 # make sure user is enrolled in course
@@ -2857,10 +2856,9 @@ def generate_bulk_certificate_exceptions(request, course_id):
                     build_row_errors('user_not_enrolled', user, row_num)
                     log.warning(f'Student {user.id} is not enrolled in Course {course_key}')
                 else:
-                    CertificateWhitelist.objects.create(
-                        user=user,
-                        course_id=course_key,
-                        whitelist=True,
+                    certs_api.create_or_update_certificate_allowlist_entry(
+                        user,
+                        course_key,
                         notes=student[notes_index]
                     )
                     success.append(_('user "{username}" in row# {row}').format(username=user.username, row=row_num))
