@@ -60,7 +60,7 @@ class RedirectMiddleware(MiddlewareMixin):
             pass
 
 
-class LmsCurrentOrganizationMiddleware(object):
+class LmsCurrentOrganizationMiddleware(RedirectMiddleware):
     """
     Get the current middleware for the LMS.
 
