@@ -269,10 +269,10 @@ class ExpectedErrorMiddleware:
 
 # .. setting_name: EXPECTED_ERRORS
 # .. setting_default: []
-# .. setting_description: Used to configured logging and monitoring for expected errors.
+# .. setting_description: Used to configure logging and monitoring for expected errors.
 #     This setting is configured of a list of dicts. See setting and toggle annotations for
 #     ``EXPECTED_ERRORS[N]['XXX']`` for details of each item in the dict.
-#     If this setting is configured, all uncaught errors processed will get a ``checked_error_expected_from`` attribute,
+#     If this setting is a non-empty list, all uncaught errors processed will get a ``checked_error_expected_from`` attribute,
 #     whether they are expected or not. This can be used to ensure that all uncaught errors are actually processed.
 #     Those errors that are processed and match a 'MODULE_AND_CLASS' (documented elsewhere), will get an
 #     ``error_expected`` custom attribute. The value of the custom attribute will include the error class module, name
@@ -320,7 +320,7 @@ class ExpectedErrorMiddleware:
 #     purposes.error module and class name that is expected.
 
 
-# Warning: do not access this directly, but instead use get_expected_errors.
+# Warning: do not access this directly, but instead use _get_expected_error_settings_dict.
 # EXPECTED ERRORS Django setting is processed and stored as a dict keyed by ERROR_MODULE_AND_CLASS.
 _EXPECTED_ERROR_SETTINGS_DICT = None
 
@@ -333,7 +333,7 @@ def _get_expected_error_settings_dict():
 
     Returns:
          (dict): dict of dicts, mapping module-and-class name to settings for proper handling of expected errors.
-           Keys of the inner dicts use the lowercase version of the related Django Setting (e.g. ''REASON_EXPECTED' =>
+           Keys of the inner dicts use the lowercase version of the related Django Setting (e.g. 'REASON_EXPECTED' =>
            'reason_expected').
 
     Example return value::
@@ -422,7 +422,7 @@ def _log_and_monitor_expected_errors(request, exception, caller):
 
     # 'module:class', for example, 'django.core.exceptions:PermissionDenied'
     # Note: `Exception` itself doesn't have a module.
-    exception_module = exception.__module__ if hasattr(exception, '__module__') else ''
+    exception_module = getattr(exception, '__module__', '')
     module_and_class = f'{exception_module}:{exception.__class__.__name__}'
 
     # Set checked_error_expected_from custom attribute to potentially help find issues where errors are never processed.
@@ -459,5 +459,5 @@ def _log_and_monitor_expected_errors(request, exception, caller):
 
     if expected_error_settings['log_error'] or expected_error_settings['log_stack_trace']:
         print_stack = expected_error_settings['log_stack_trace']
-        request_path = request.path if hasattr(request, 'path') else 'request-path-unknown'
+        request_path = getattr(request, 'path', default='request-path-unknown')
         log.info('Expected error seen for %s', request_path, exc_info=exception, stack_info=print_stack)
