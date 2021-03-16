@@ -40,7 +40,7 @@ class LanguagePreferenceMiddleware(MiddlewareMixin):
                 # Promote the cookie_lang over any language currently in the accept header
                 current_langs = [(lang, qvalue) for (lang, qvalue) in current_langs if lang != cookie_lang]
                 current_langs.insert(0, (cookie_lang, 1))
-                accept_header = ",".join("{};q={}".format(lang, qvalue) for (lang, qvalue) in current_langs)
+                accept_header = ",".join(f"{lang};q={qvalue}" for (lang, qvalue) in current_langs)
             else:
                 accept_header = cookie_lang
             request.META[LANGUAGE_HEADER] = accept_header

@@ -4,11 +4,11 @@ Test the heartbeat
 
 
 import json
+from unittest.mock import patch
 
 from django.db.utils import DatabaseError
 from django.test.client import Client
 from django.urls import reverse
-from mock import patch
 
 from xmodule.exceptions import HeartbeatFailure
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
@@ -22,7 +22,7 @@ class HeartbeatTestCase(ModuleStoreTestCase):
     def setUp(self):
         self.client = Client()
         self.heartbeat_url = reverse('heartbeat')
-        return super(HeartbeatTestCase, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        return super().setUp()
 
     def test_success(self):
         response = self.client.get(self.heartbeat_url + '?extended')

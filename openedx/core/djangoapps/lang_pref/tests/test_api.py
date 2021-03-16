@@ -1,20 +1,18 @@
-# -*- coding: utf-8 -*-
 """ Tests for the language API. """
-
+from unittest.mock import patch
 
 import ddt
 from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.test.utils import override_settings
 from django.utils import translation
-from mock import patch
 from openedx.core.djangoapps.dark_lang.models import DarkLangConfig
 from openedx.core.djangoapps.lang_pref import api as language_api
 from openedx.core.djangoapps.site_configuration.tests.test_util import with_site_configuration_context
 from openedx.core.djangolib.testing.utils import CacheIsolationTestCase
 
 EN = language_api.Language('en', 'English')
-ES_419 = language_api.Language('es-419', u'Español (Latinoamérica)')
-LT_LT = language_api.Language('lt-lt', u'Lietuvių (Lietuva)')
+ES_419 = language_api.Language('es-419', 'Español (Latinoamérica)')
+LT_LT = language_api.Language('lt-lt', 'Lietuvių (Lietuva)')
 
 
 @ddt.ddt
@@ -85,7 +83,7 @@ class LanguageApiTest(CacheIsolationTestCase):
             released_languages = language_api.released_languages()
             assert released_languages == expected_languages
 
-    @override_settings(ALL_LANGUAGES=[[u"cs", u"Czech"], [u"nl", u"Dutch"]])
+    @override_settings(ALL_LANGUAGES=[["cs", "Czech"], ["nl", "Dutch"]])
     def test_all_languages(self):
         """
         Tests for the list of all languages.
@@ -97,8 +95,8 @@ class LanguageApiTest(CacheIsolationTestCase):
         assert all_languages[0][1] < all_languages[1][1]
         assert 'nl' == all_languages[0][0]
         assert 'cs' == all_languages[1][0]
-        assert u'Hollandais' == all_languages[0][1]
-        assert u'Tchèque' == all_languages[1][1]
+        assert 'Hollandais' == all_languages[0][1]
+        assert 'Tchèque' == all_languages[1][1]
 
     def test_beta_languages(self):
         """

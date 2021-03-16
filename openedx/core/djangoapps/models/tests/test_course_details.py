@@ -21,7 +21,7 @@ class CourseDetailsTestCase(ModuleStoreTestCase):
     """
 
     def setUp(self):
-        super(CourseDetailsTestCase, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.course = CourseFactory.create()
 
     def test_virgin_fetch(self):
@@ -141,4 +141,4 @@ class CourseDetailsTestCase(ModuleStoreTestCase):
             CourseDetails.update_about_video(self.course, video_value, self.user.id)
         assert CourseDetails.fetch_youtube_video_id(self.course.id) == video_value
         video_url = CourseDetails.fetch_video_url(self.course.id)
-        self.assertRegex(video_url, r'http://.*{}'.format(video_value))
+        self.assertRegex(video_url, fr'http://.*{video_value}')

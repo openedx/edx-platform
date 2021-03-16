@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """ Python API for language and translation management. """
 
 

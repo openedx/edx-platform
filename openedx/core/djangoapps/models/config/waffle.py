@@ -12,7 +12,7 @@ COURSE_DETAIL_WAFFLE_FLAG_NAMESPACE = LegacyWaffleFlagNamespace(name=COURSE_DETA
 WAFFLE_SWITCHES = LegacyWaffleSwitchNamespace(name=COURSE_DETAIL_WAFFLE_NAMESPACE)
 
 # Course Override Flag
-COURSE_DETAIL_UPDATE_CERTIFICATE_DATE = u'course_detail_update_certificate_date'
+COURSE_DETAIL_UPDATE_CERTIFICATE_DATE = 'course_detail_update_certificate_date'
 
 
 def waffle_flags():
