@@ -84,6 +84,7 @@ module.exports = Merge.smart({
             // LMS
             SingleSupportForm: './lms/static/support/jsx/single_support_form.jsx',
             AlertStatusBar: './lms/static/js/accessible_components/StatusBarAlert.jsx',
+            EnterpriseLearnerPortalAlert: './lms/static/js/dashboard/EnterpriseLearnerPortalAlert.jsx',
             EntitlementSupportPage: './lms/djangoapps/support/static/support/jsx/entitlements/index.jsx',
             LinkProgramEnrollmentsSupportPage: './lms/djangoapps/support/static/support/jsx/' +
                                                'program_enrollments/index.jsx',

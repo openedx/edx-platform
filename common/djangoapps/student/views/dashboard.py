@@ -45,7 +45,8 @@ from openedx.core.djangoapps.util.maintenance_banner import add_maintenance_bann
 from openedx.core.djangolib.markup import HTML, Text
 from openedx.features.enterprise_support.api import (
     get_dashboard_consent_notification,
-    get_enterprise_learner_portal_enabled_message
+    get_enterprise_learner_portal_enabled_message,
+    enterprise_customer_from_session_or_learner_data,
 )
 from common.djangoapps.student.api import COURSE_DASHBOARD_PLUGIN_VIEW_NAME
 from common.djangoapps.student.helpers import cert_info, check_verify_status_by_course, get_resume_urls_for_enrollments
@@ -577,8 +578,16 @@ def student_dashboard(request):  # lint-amnesty, pylint: disable=too-many-statem
 
     enterprise_message = get_dashboard_consent_notification(request, user, course_enrollments)
 
+    enterprise_customer = enterprise_customer_from_session_or_learner_data(request)
+    enterprise_customer_name = enterprise_customer.get('name', '')
+    log.info('Enterprise Customer Name: {}'.format(enterprise_customer_name))
+
     # Display a message guiding the user to their Enterprise's Learner Portal if enabled
-    enterprise_learner_portal_enabled_message = get_enterprise_learner_portal_enabled_message(request)
+    enterprise_learner_portal_enabled_message = get_enterprise_learner_portal_enabled_message(enterprise_customer)
+
+    # Display a blocking modal guiding the user to their Enterprise's Learner Portal if enabled
+    enterprise_customer_learner_portal_slug = enterprise_customer['slug']
+    log.info('Enterprise Customer Slug: {}'.format(enterprise_customer_learner_portal_slug))
 
     recovery_email_message = recovery_email_activation_message = None
     if is_secondary_email_feature_enabled():
@@ -610,7 +619,6 @@ def student_dashboard(request):  # lint-amnesty, pylint: disable=too-many-statem
 # Disable lookup of Enterprise consent_required_course due to ENT-727
     # Will re-enable after fixing WL-1315
     consent_required_courses = set()
-    enterprise_customer_name = None
 
     # Account activation message
     account_activation_messages = [
@@ -791,6 +799,7 @@ def student_dashboard(request):  # lint-amnesty, pylint: disable=too-many-statem
         'recovery_email_message': recovery_email_message,
         'recovery_email_activation_message': recovery_email_activation_message,
         'enterprise_learner_portal_enabled_message': enterprise_learner_portal_enabled_message,
+        'enterprise_customer_learner_portal_slug': enterprise_customer_learner_portal_slug,
         'show_load_all_courses_link': show_load_all_courses_link(user, course_limit, course_enrollments),
         # TODO START: clean up as part of REVEM-199 (START)
         'course_info': get_dashboard_course_info(user, course_enrollments),

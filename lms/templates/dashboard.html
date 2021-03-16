@@ -378,4 +378,15 @@ from common.djangoapps.student.models import CourseEnrollment
   </div>
 </div>
 
+% if enterprise_customer_name and enterprise_customer_learner_portal_slug:
+  ${static.renderReact(
+    component="EnterpriseLearnerPortalAlert",
+    id="enterprise-learner-portal-modal-react",
+    props={
+      'enterpriseCustomerName': enterprise_customer_name,
+      'enterpriseCustomerSlug': enterprise_customer_learner_portal_slug,
+    },
+  )}
+%endif
+
 <%include file="dashboard/_dashboard_entitlement_unenrollment_modal.html"/>
