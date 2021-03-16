@@ -282,9 +282,8 @@ class ExpectedErrorMiddleware:
 
 # .. setting_name: EXPECTED_ERRORS[N]['MODULE_AND_CLASS']
 # .. setting_default: None
-# .. setting_description: Required error module and class name that is expected. The two names should be separated by a
-#    `:`. For example, ``rest_framework.exceptions:PermissionDenied``. This format is to simplify copying/pasting from
-#    New Relic.
+# .. setting_description: Required error module and class name that is expected. For example,
+#     ``rest_framework.exceptions.PermissionDenied``.
 
 # .. toggle_name: EXPECTED_ERRORS[N]['IS_IGNORED']
 # .. toggle_implementation: DjangoSetting
@@ -329,7 +328,7 @@ def _get_expected_error_settings_dict():
     """
     Returns a dict of dicts of expected error settings used for logging and monitoring.
 
-    The contents of the EXPECTED_ERRORS Django Setting list is processed for efficient lookup by module:class.
+    The contents of the EXPECTED_ERRORS Django Setting list is processed for efficient lookup by module.Class.
 
     Returns:
          (dict): dict of dicts, mapping module-and-class name to settings for proper handling of expected errors.
@@ -376,13 +375,20 @@ def _get_expected_error_settings_dict():
             }
 
             # validate configuration
-            if not isinstance(module_and_class, str) or ':' not in module_and_class:
+            if not isinstance(module_and_class, str):
                 log.error(
-                    "Skipping EXPECTED_ERRORS[%d] setting. 'MODULE_AND_CLASS' set to [%s] and should be module:class, "
-                    "like 'rest_framework.exceptions:PermissionDenied'.",
+                    "Skipping EXPECTED_ERRORS[%d] setting. 'MODULE_AND_CLASS' set to [%s] and should be module.Class, "
+                    "like 'rest_framework.exceptions.PermissionDenied'.",
                     index, module_and_class
                 )
                 continue
+            if ':' in module_and_class:
+                log.warning(
+                    "Replacing ':' with '.' in EXPECTED_ERRORS[%d]['MODULE_AND_CLASS'], which was set to %s. Note that "
+                    "monitoring and logging will not include the ':'.",
+                    index, module_and_class
+                )
+                module_and_class = module_and_class.replace(":", ".")
             if module_and_class in expected_error_settings_dict:
                 log.warning(
                     "EXPECTED_ERRORS[%d] setting is overriding an earlier setting. 'MODULE_AND_CLASS' [%s] is defined "
@@ -426,10 +432,11 @@ def _log_and_monitor_expected_errors(request, exception, caller):
     if not expected_error_settings_dict:
         return
 
-    # 'module:class', for example, 'django.core.exceptions:PermissionDenied'
+    # 'module.Class', for example, 'django.core.exceptions.PermissionDenied'
     # Note: `Exception` itself doesn't have a module.
     exception_module = getattr(exception, '__module__', '')
-    module_and_class = f'{exception_module}:{exception.__class__.__name__}'
+    separator = '.' if exception_module else ''
+    module_and_class = f'{exception_module}{separator}{exception.__class__.__name__}'
 
     # Set checked_error_expected_from custom attribute to potentially help find issues where errors are never processed.
     set_custom_attribute('checked_error_expected_from', caller)
