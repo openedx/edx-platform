@@ -1,6 +1,6 @@
 # Changelog EOL
 
-## 21/01/2020 Changes on Certificates
+## 21/01/2021 Changes on Certificates
 - Get user profile name from user_certificate and not from user. (lms/djangoapps/certificates/views/webview.py)
 - Update tests (lms/djangoapps/certificates/tests/test_webview_views.py)
 
