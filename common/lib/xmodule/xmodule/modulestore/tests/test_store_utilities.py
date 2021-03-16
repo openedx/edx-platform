@@ -4,9 +4,9 @@ Tests for store_utilities.py
 
 
 import unittest
+from unittest.mock import Mock
 
 import ddt
-from mock import Mock
 
 from xmodule.modulestore.store_utilities import draft_node_constructor, get_draft_subtree_roots
 

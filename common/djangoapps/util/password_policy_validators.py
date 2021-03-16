@@ -13,7 +13,6 @@ from django.contrib.auth.password_validation import validate_password as django_
 from django.core.exceptions import ValidationError
 from django.utils.translation import ugettext as _
 from django.utils.translation import ungettext
-from six import text_type
 
 log = logging.getLogger(__name__)
 
@@ -71,7 +70,7 @@ def password_validators_instruction_texts():
             complexity_instructions=' & '.join(complexity_instructions)
         )
     else:
-        return _('Your password must contain {length_instruction}.'.format(length_instruction=length_instruction))  # lint-amnesty, pylint: disable=translation-of-non-string
+        return _(f'Your password must contain {length_instruction}.')  # lint-amnesty, pylint: disable=translation-of-non-string
 
 
 def password_validators_restrictions():
@@ -93,10 +92,10 @@ def normalize_password(password):
     Normalize all passwords to 'NFKC' across the platform to prevent mismatched hash strings when comparing entered
     passwords on login. See LEARNER-4283 for more context.
     """
-    if not isinstance(password, text_type):
+    if not isinstance(password, str):
         try:
             # some checks rely on unicode semantics (e.g. length)
-            password = text_type(password, encoding='utf8')
+            password = str(password, encoding='utf8')
         except UnicodeDecodeError:
             # no reason to get into weeds
             raise ValidationError([_('Invalid password.')])  # lint-amnesty, pylint: disable=raise-missing-from
@@ -159,7 +158,7 @@ class MinimumLengthValidator(DjangoMinimumLengthValidator):  # lint-amnesty, pyl
         return 'min_length', self.min_length
 
 
-class MaximumLengthValidator(object):
+class MaximumLengthValidator:
     """
     Validate whether the password is shorter than a maximum length.
 
@@ -195,7 +194,7 @@ class MaximumLengthValidator(object):
         return 'max_length', self.max_length
 
 
-class AlphabeticValidator(object):
+class AlphabeticValidator:
     """
     Validate whether the password contains at least min_alphabetic letters.
 
@@ -243,7 +242,7 @@ class AlphabeticValidator(object):
         return 'min_alphabetic', self.min_alphabetic
 
 
-class NumericValidator(object):
+class NumericValidator:
     """
     Validate whether the password contains at least min_numeric numbers.
 
@@ -291,7 +290,7 @@ class NumericValidator(object):
         return 'min_numeric', self.min_numeric
 
 
-class UppercaseValidator(object):
+class UppercaseValidator:
     """
     Validate whether the password contains at least min_upper uppercase letters.
 
@@ -339,7 +338,7 @@ class UppercaseValidator(object):
         return 'min_upper', self.min_upper
 
 
-class LowercaseValidator(object):
+class LowercaseValidator:
     """
     Validate whether the password contains at least min_lower lowercase letters.
 
@@ -387,7 +386,7 @@ class LowercaseValidator(object):
         return 'min_lower', self.min_lower
 
 
-class PunctuationValidator(object):
+class PunctuationValidator:
     """
     Validate whether the password contains at least min_punctuation punctuation marks
     as defined by unicode categories.
@@ -436,7 +435,7 @@ class PunctuationValidator(object):
         return 'min_punctuation', self.min_punctuation
 
 
-class SymbolValidator(object):
+class SymbolValidator:
     """
     Validate whether the password contains at least min_symbol symbols as defined by unicode categories.
 

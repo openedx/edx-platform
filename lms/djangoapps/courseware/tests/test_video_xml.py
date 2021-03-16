@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # pylint: disable=protected-access
 
 """Test for Video Xmodule functional logic.

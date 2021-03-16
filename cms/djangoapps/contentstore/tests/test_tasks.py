@@ -20,6 +20,7 @@ from cms.djangoapps.contentstore.tasks import export_olx, rerun_course
 from cms.djangoapps.contentstore.tests.test_libraries import LibraryTestCase
 from cms.djangoapps.contentstore.tests.utils import CourseTestCase
 from common.djangoapps.course_action_state.models import CourseRerunState
+from common.djangoapps.student.tests.factories import UserFactory
 from openedx.core.djangoapps.embargo.models import Country, CountryAccessRule, RestrictedCourse
 from xmodule.modulestore.django import modulestore
 
@@ -62,14 +63,15 @@ class ExportCourseTestCase(CourseTestCase):
         result = export_olx.delay(self.user.id, key, 'en')
         self._assert_failed(result, json.dumps({'raw_error_msg': 'Boom!'}))
 
-    def test_invalid_user_id(self):
+    @mock.patch('cms.djangoapps.contentstore.tasks.User.objects.get', side_effect=User.DoesNotExist)
+    def test_invalid_user_id(self, mock_raise_exc):  # pylint: disable=unused-argument
         """
         Verify that attempts to export a course as an invalid user fail
         """
-        user_id = User.objects.order_by('-id').first().pk + 100
+        user = UserFactory(id=User.objects.order_by('-id').first().pk + 100)
         key = str(self.course.location.course_key)
-        result = export_olx.delay(user_id, key, 'en')
-        self._assert_failed(result, f'Unknown User ID: {user_id}')
+        result = export_olx.delay(user.id, key, 'en')
+        self._assert_failed(result, f'Unknown User ID: {user.id}')
 
     def test_non_course_author(self):
         """

@@ -4,8 +4,8 @@
 import logging
 import os
 import unittest
+from unittest.mock import Mock
 
-from mock import Mock
 from opaque_keys.edx.locator import BlockUsageLocator, CourseLocator
 from pkg_resources import resource_string
 from xblock.field_data import DictFieldData
@@ -21,7 +21,7 @@ class TabsEditingDescriptorTestCase(unittest.TestCase):
     """ Testing TabsEditingDescriptor"""
 
     def setUp(self):
-        super(TabsEditingDescriptorTestCase, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         system = get_test_descriptor_system()
         system.render_template = Mock(return_value="<div>Test Template HTML</div>")
         self.tabs = [

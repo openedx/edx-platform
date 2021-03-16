@@ -12,6 +12,8 @@ from edx_proctoring.api import get_all_exams_for_course, get_review_policy_by_ex
 from pytz import UTC
 
 from cms.djangoapps.contentstore.signals.handlers import listen_for_course_publish
+from common.djangoapps.student.tests.factories import UserFactory
+from common.lib.xmodule.xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 
@@ -36,6 +38,9 @@ class TestProctoredExams(ModuleStoreTestCase):
             enable_proctored_exams=True,
             proctoring_provider=settings.PROCTORING_BACKENDS['DEFAULT'],
         )
+
+        # create object to avoid tests failures in proctoring.
+        UserFactory(id=ModuleStoreEnum.UserID.test)
 
     def _verify_exam_data(self, sequence, expected_active):
         """

@@ -21,7 +21,7 @@ class GeneratedCertificateFactory(DjangoModelFactory):
     """
     GeneratedCertificate factory
     """
-    class Meta(object):
+    class Meta:
         model = GeneratedCertificate
 
     course_id = None
@@ -37,7 +37,7 @@ class CertificateWhitelistFactory(DjangoModelFactory):
     CertificateWhitelist factory
     """
 
-    class Meta(object):
+    class Meta:
         model = CertificateWhitelist
 
     course_id = None
@@ -50,7 +50,7 @@ class CertificateInvalidationFactory(DjangoModelFactory):
     CertificateInvalidation factory
     """
 
-    class Meta(object):
+    class Meta:
         model = CertificateInvalidation
 
     notes = 'Test Notes'
@@ -62,7 +62,7 @@ class CertificateHtmlViewConfigurationFactory(DjangoModelFactory):
     CertificateHtmlViewConfiguration factory
     """
 
-    class Meta(object):
+    class Meta:
         model = CertificateHtmlViewConfiguration
 
     enabled = True
@@ -99,7 +99,7 @@ class LinkedInAddToProfileConfigurationFactory(DjangoModelFactory):
     LinkedInAddToProfileConfiguration factory
     """
 
-    class Meta(object):
+    class Meta:
         model = LinkedInAddToProfileConfiguration
 
     enabled = True

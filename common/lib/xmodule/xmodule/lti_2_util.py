@@ -9,11 +9,10 @@ import hashlib
 import json
 import logging
 import re
+from unittest import mock
+from urllib import parse
 
-import mock
-import six
 from oauthlib.oauth1 import Client
-from six import text_type
 from webob import Response
 from xblock.core import XBlock
 
@@ -29,7 +28,7 @@ class LTIError(Exception):
     """Error class for LTIBlock and LTI20BlockMixin"""
 
 
-class LTI20BlockMixin(object):
+class LTI20BlockMixin:
     """
     This class MUST be mixed into LTIBlock.  It does not do anything on its own.  It's just factored
     out for modularity.
@@ -81,7 +80,7 @@ class LTI20BlockMixin(object):
 
         real_user = self.system.get_real_user(anon_id)
         if not real_user:  # that means we can't save to database, as we do not have real user id.
-            msg = "[LTI]: Real user not found against anon_id: {}".format(anon_id)
+            msg = f"[LTI]: Real user not found against anon_id: {anon_id}"
             log.info(msg)
             return Response(status=404)  # have to do 404 due to spec, but 400 is better, with error msg in body
         if request.method == "PUT":
@@ -108,22 +107,22 @@ class LTI20BlockMixin(object):
         """
         sha1 = hashlib.sha1()
         sha1.update(request.body)
-        oauth_body_hash = six.text_type(base64.b64encode(sha1.digest()))
-        log.debug("[LTI] oauth_body_hash = {}".format(oauth_body_hash))
+        oauth_body_hash = str(base64.b64encode(sha1.digest()))
+        log.debug(f"[LTI] oauth_body_hash = {oauth_body_hash}")
         client_key, client_secret = self.get_client_key_secret()
         client = Client(client_key, client_secret)
         mock_request = mock.Mock(
-            uri=six.text_type(six.moves.urllib.parse.unquote(request.url)),
+            uri=str(parse.unquote(request.url)),
             headers=request.headers,
-            body=u"",
-            decoded_body=u"",
-            http_method=six.text_type(request.method),
+            body="",
+            decoded_body="",
+            http_method=str(request.method),
         )
         params = client.get_oauth_params(mock_request)
         mock_request.oauth_params = params
-        mock_request.oauth_params.append((u'oauth_body_hash', oauth_body_hash))
+        mock_request.oauth_params.append(('oauth_body_hash', oauth_body_hash))
         sig = client.get_oauth_signature(mock_request)
-        mock_request.oauth_params.append((u'oauth_signature', sig))
+        mock_request.oauth_params.append(('oauth_signature', sig))
 
         _, headers, _ = client._render(mock_request)  # pylint: disable=protected-access
         log.debug("\n\n#### COPY AND PASTE AUTHORIZATION HEADER ####\n{}\n####################################\n\n"
@@ -151,7 +150,7 @@ class LTI20BlockMixin(object):
                 return match_obj.group('anon_id')
         # fall-through handles all error cases
         msg = "No valid user id found in endpoint URL"
-        log.info("[LTI]: {}".format(msg))
+        log.info(f"[LTI]: {msg}")
         raise LTIError(msg)
 
     def _lti_2_0_result_get_handler(self, request, real_user):
@@ -236,7 +235,7 @@ class LTI20BlockMixin(object):
         """
         self.set_user_module_score(user, None, None, score_deleted=True)
 
-    def set_user_module_score(self, user, score, max_score, comment=u"", score_deleted=False):
+    def set_user_module_score(self, user, score, max_score, comment="", score_deleted=False):
         """
         Sets the module user state, including grades and comments, and also scoring in db's courseware_studentmodule
 
@@ -286,15 +285,15 @@ class LTI20BlockMixin(object):
         """
         content_type = request.headers.get('Content-Type')
         if verify_content_type and content_type != LTI_2_0_JSON_CONTENT_TYPE:
-            log.info("[LTI]: v2.0 result service -- bad Content-Type: {}".format(content_type))
+            log.info(f"[LTI]: v2.0 result service -- bad Content-Type: {content_type}")
             raise LTIError(
                 "For LTI 2.0 result service, Content-Type must be {}.  Got {}".format(LTI_2_0_JSON_CONTENT_TYPE,
                                                                                       content_type))
         try:
             self.verify_oauth_body_sign(request, content_type=LTI_2_0_JSON_CONTENT_TYPE)
         except (ValueError, LTIError) as err:
-            log.info("[LTI]: v2.0 result service -- OAuth body verification failed:  {}".format(text_type(err)))
-            raise LTIError(text_type(err))  # lint-amnesty, pylint: disable=raise-missing-from
+            log.info("[LTI]: v2.0 result service -- OAuth body verification failed:  {}".format(str(err)))
+            raise LTIError(str(err))  # lint-amnesty, pylint: disable=raise-missing-from
 
     def parse_lti_2_0_result_json(self, json_str):
         """
@@ -319,8 +318,8 @@ class LTI20BlockMixin(object):
         try:
             json_obj = json.loads(json_str)
         except (ValueError, TypeError):
-            msg = "Supplied JSON string in request body could not be decoded: {}".format(json_str)
-            log.info("[LTI] {}".format(msg))
+            msg = f"Supplied JSON string in request body could not be decoded: {json_str}"
+            log.info(f"[LTI] {msg}")
             raise LTIError(msg)  # lint-amnesty, pylint: disable=raise-missing-from
 
         # the standard supports a list of objects, who knows why. It must contain at least 1 element, and the
@@ -331,22 +330,22 @@ class LTI20BlockMixin(object):
             else:
                 msg = ("Supplied JSON string is a list that does not contain an object as the first element. {}"
                        .format(json_str))
-                log.info("[LTI] {}".format(msg))
+                log.info(f"[LTI] {msg}")
                 raise LTIError(msg)
 
         # '@type' must be "Result"
         result_type = json_obj.get("@type")
         if result_type != "Result":
-            msg = "JSON object does not contain correct @type attribute (should be 'Result', is {})".format(result_type)
-            log.info("[LTI] {}".format(msg))
+            msg = f"JSON object does not contain correct @type attribute (should be 'Result', is {result_type})"
+            log.info(f"[LTI] {msg}")
             raise LTIError(msg)
 
         # '@context' must be present as a key
         REQUIRED_KEYS = ["@context"]  # pylint: disable=invalid-name
         for key in REQUIRED_KEYS:
             if key not in json_obj:
-                msg = "JSON object does not contain required key {}".format(key)
-                log.info("[LTI] {}".format(msg))
+                msg = f"JSON object does not contain required key {key}"
+                log.info(f"[LTI] {msg}")
                 raise LTIError(msg)
 
         # 'resultScore' is not present.  If this was a PUT this means it's actually a DELETE according
@@ -360,11 +359,11 @@ class LTI20BlockMixin(object):
             score = float(json_obj.get('resultScore', "unconvertable"))  # Check if float is present and the right type
             if not 0 <= score <= 1:
                 msg = 'score value outside the permitted range of 0-1.'
-                log.info("[LTI] {}".format(msg))
+                log.info(f"[LTI] {msg}")
                 raise LTIError(msg)
         except (TypeError, ValueError) as err:
-            msg = "Could not convert resultScore to float: {}".format(text_type(err))
-            log.info("[LTI] {}".format(msg))
+            msg = "Could not convert resultScore to float: {}".format(str(err))
+            log.info(f"[LTI] {msg}")
             raise LTIError(msg)  # lint-amnesty, pylint: disable=raise-missing-from
 
         return score, json_obj.get('comment', "")

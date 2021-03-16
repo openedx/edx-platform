@@ -68,16 +68,16 @@ class Command(BaseCommand):
             try:
                 course_key = CourseKey.from_string(course_id)
             except InvalidKeyError:
-                raise CommandError('Course ID {} is invalid.'.format(course_id))  # lint-amnesty, pylint: disable=raise-missing-from
+                raise CommandError(f'Course ID {course_id} is invalid.')  # lint-amnesty, pylint: disable=raise-missing-from
 
             if modulestore().get_course(course_key) is None:
-                raise CommandError('The given course {} does not exist.'.format(course_id))
+                raise CommandError(f'The given course {course_id} does not exist.')
 
             course_keys.append(course_key)
         else:
             course_keys = [course.id for course in CourseOverview.get_all_courses(orgs=[org])]
             if not course_keys:
-                raise CommandError('No courses exist for the org "{}".'.format(org))
+                raise CommandError(f'No courses exist for the org "{org}".')
 
         for course_key in course_keys:
             self.move_users_for_course(course_key, from_mode, to_mode, commit)
@@ -96,9 +96,9 @@ class Command(BaseCommand):
             commit (bool): required to make the change to the database. Otherwise
                                      just a count will be displayed.
         """
-        unicode_course_key = text_type(course_key)
+        unicode_course_key = str(course_key)
         if CourseMode.mode_for_course(course_key, to_mode) is None:
-            logger.info('Mode ({}) does not exist for course ({}).'.format(to_mode, unicode_course_key))
+            logger.info(f'Mode ({to_mode}) does not exist for course ({unicode_course_key}).')
             return
 
         course_enrollments = CourseEnrollment.objects.filter(course_id=course_key, mode=from_mode)

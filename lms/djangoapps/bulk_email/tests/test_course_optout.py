@@ -186,7 +186,7 @@ class TestACEOptoutCourseEmails(ModuleStoreTestCase):
             app_label='foo',
             name='bar',
             recipient=Recipient(
-                username=self.student.username,
+                lms_user_id=self.student.id,
                 email_address=self.student.email,
             ),
             context={

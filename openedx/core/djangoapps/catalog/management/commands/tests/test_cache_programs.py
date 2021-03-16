@@ -35,7 +35,7 @@ class TestCachePrograms(CatalogIntegrationMixin, CacheIsolationTestCase, SiteMix
     ENABLED_CACHES = ['default']
 
     def setUp(self):
-        super(TestCachePrograms, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
 
         httpretty.httpretty.reset()
 

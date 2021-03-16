@@ -7,14 +7,14 @@ waffle switches for the Certificates app.
 from edx_toggles.toggles import LegacyWaffleSwitchNamespace
 
 # Namespace
-WAFFLE_NAMESPACE = u'certificates'
+WAFFLE_NAMESPACE = 'certificates'
 
 # Switches
-AUTO_CERTIFICATE_GENERATION = u'auto_certificate_generation'
+AUTO_CERTIFICATE_GENERATION = 'auto_certificate_generation'
 
 
 def waffle():
     """
     Returns the namespaced, cached, audited Waffle class for Certificates.
     """
-    return LegacyWaffleSwitchNamespace(name=WAFFLE_NAMESPACE, log_prefix=u'Certificates: ')
+    return LegacyWaffleSwitchNamespace(name=WAFFLE_NAMESPACE, log_prefix='Certificates: ')

@@ -1,5 +1,5 @@
 """
-Management command which sets or gets the certificate whitelist for a given
+Management command which sets or gets the certificate allowlist for a given
 user/course
 """
 
@@ -9,14 +9,19 @@ from django.core.management.base import BaseCommand, CommandError
 from django.db.models import Q
 from opaque_keys.edx.keys import CourseKey
 
+from lms.djangoapps.certificates.api import (
+    can_be_added_to_allowlist,
+    create_or_update_certificate_allowlist_entry, remove_allowlist_entry,
+)
 from lms.djangoapps.certificates.models import CertificateWhitelist
+
 
 User = get_user_model()
 
 
 def get_user_from_identifier(identifier):
     """
-     This function takes the string identifier and fetch relevant user object from database
+    This function takes the string identifier and fetch relevant user object from database
     """
     user = User.objects.filter(Q(username=identifier) | Q(email=identifier)).first()
     if not user:
@@ -24,9 +29,26 @@ def get_user_from_identifier(identifier):
     return user
 
 
+def update_allowlist(user, course, enable):
+    """
+    Update the status of a user on the allowlist.
+    """
+    if enable and can_be_added_to_allowlist(user, course):
+        create_or_update_certificate_allowlist_entry(
+            user,
+            course,
+            "Updated by mngmt cmd",
+            enable
+        )
+    elif not enable:
+        remove_allowlist_entry(user, course)
+    else:
+        print(f"Failed to process allowlist request for student {user.id} in course {course} and enable={enable}.")
+
+
 class Command(BaseCommand):
     """
-    Management command to set or get the certificate whitelist
+    Management command to set or get the certificate allowlist
     for a given user(s)/course
     """
 
@@ -58,14 +80,14 @@ class Command(BaseCommand):
             metavar='USER',
             dest='add',
             default=False,
-            help='user or list of users to add to the certificate whitelist'
+            help='user or list of users to add to the certificate allowlist'
         )
         parser.add_argument(
             '-d', '--del',
             metavar='USER',
             dest='del',
             default=False,
-            help='user or list of users to remove from the certificate whitelist'
+            help='user or list of users to remove from the certificate allowlist'
         )
         parser.add_argument(
             '-c', '--course-id',
@@ -80,17 +102,6 @@ class Command(BaseCommand):
         if not course_id:
             raise CommandError("You must specify a course-id")
 
-        def update_user_whitelist(username, add=True):
-            """
-            Update the status of whitelist user(s)
-            """
-            user = get_user_from_identifier(username)
-            cert_whitelist, _created = CertificateWhitelist.objects.get_or_create(
-                user=user, course_id=course
-            )
-            cert_whitelist.whitelist = add
-            cert_whitelist.save()
-
         # try to parse the serialized course key into a CourseKey
         course = CourseKey.from_string(course_id)
 
@@ -99,16 +110,22 @@ class Command(BaseCommand):
 
         if options['add'] or options['del']:
             user_str = options['add'] or options['del']
-            add_to_whitelist = True if options['add'] else False  # pylint: disable=simplifiable-if-expression
+            enable = True if options['add'] else False  # pylint: disable=simplifiable-if-expression
+
             users_list = user_str.split(",")
             for username in users_list:
                 username = username.strip()
                 if username:
-                    update_user_whitelist(username, add=add_to_whitelist)
+                    try:
+                        user = get_user_from_identifier(username)
+                    except CommandError as error:
+                        print(f"Error occurred retrieving user {username}: {error}")
+                    else:
+                        update_allowlist(user, course, enable)
 
         whitelist = CertificateWhitelist.objects.filter(course_id=course)
         wl_users = '\n'.join(
             "{u.user.username} {u.user.email} {u.whitelist}".format(u=u)
             for u in whitelist
         )
-        print(f"User whitelist for course {course_id}:\n{wl_users}")
+        print(f"Allowlist for course {course_id}:\n{wl_users}")

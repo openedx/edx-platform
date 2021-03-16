@@ -1,13 +1,12 @@
 """Middleware for course_wiki"""
 
 
+from urllib.parse import urlparse
 from django.conf import settings
 from django.core.exceptions import PermissionDenied
 from django.http import Http404
 from django.shortcuts import redirect
 from django.utils.deprecation import MiddlewareMixin
-from six import text_type
-from six.moves.urllib.parse import urlparse
 from wiki.models import reverse
 
 from lms.djangoapps.courseware.access import has_access
@@ -35,7 +34,7 @@ class WikiAccessMiddleware(MiddlewareMixin):
             # See if we are able to view the course. If we are, redirect to it
             try:
                 get_course_overview_with_access(request.user, 'load', course_id)
-                return redirect("/courses/{course_id}/wiki/{path}".format(course_id=text_type(course_id), path=wiki_path))  # lint-amnesty, pylint: disable=line-too-long
+                return redirect("/courses/{course_id}/wiki/{path}".format(course_id=str(course_id), path=wiki_path))  # lint-amnesty, pylint: disable=line-too-long
             except Http404:
                 # Even though we came from the course, we can't see it. So don't worry about it.
                 pass
@@ -58,7 +57,7 @@ class WikiAccessMiddleware(MiddlewareMixin):
 
         if course_id:
             # This is a /courses/org/name/run/wiki request
-            course_path = "/courses/{}".format(text_type(course_id))
+            course_path = "/courses/{}".format(str(course_id))
             # HACK: django-wiki monkeypatches the reverse function to enable
             # urls to be rewritten
             reverse._transform_url = lambda url: course_path + url  # pylint: disable=protected-access
@@ -71,7 +70,7 @@ class WikiAccessMiddleware(MiddlewareMixin):
                 # clearing the referrer will cause process_response not to redirect
                 # back to a non-existent course
                 request.META['HTTP_REFERER'] = ''
-                return redirect('/wiki/{}'.format(wiki_path))
+                return redirect(f'/wiki/{wiki_path}')
 
             if not course.allow_public_wiki_access:
                 is_enrolled = CourseEnrollment.is_enrolled(request.user, course.id)
@@ -79,10 +78,10 @@ class WikiAccessMiddleware(MiddlewareMixin):
                 if not (is_enrolled or is_staff):
                     # if a user is logged in, but not authorized to see a page,
                     # we'll redirect them to the course about page
-                    return redirect('about_course', text_type(course_id))
+                    return redirect('about_course', str(course_id))
 
                 # If we need enterprise data sharing consent for this course, then redirect to the form.
-                consent_url = get_enterprise_consent_url(request, text_type(course_id))
+                consent_url = get_enterprise_consent_url(request, str(course_id))
                 if consent_url:
                     return redirect(consent_url)
 

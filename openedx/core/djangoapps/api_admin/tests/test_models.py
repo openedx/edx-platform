@@ -2,11 +2,10 @@
 
 
 from smtplib import SMTPException
+from unittest import mock
 
 import pytest
 import ddt
-import mock
-import six
 from django.db import IntegrityError
 from django.test import TestCase
 
@@ -23,7 +22,7 @@ from common.djangoapps.student.tests.factories import UserFactory
 class ApiAccessRequestTests(TestCase):
 
     def setUp(self):
-        super(ApiAccessRequestTests, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.user = UserFactory()
         self.request = ApiAccessRequestFactory(user=self.user)
 
@@ -64,7 +63,7 @@ class ApiAccessRequestTests(TestCase):
         assert ApiAccessRequest.api_access_status(self.user) is None
 
     def test_unicode(self):
-        request_unicode = six.text_type(self.request)
+        request_unicode = str(self.request)
         assert self.request.website in request_unicode
         assert self.request.status in request_unicode
 
@@ -85,14 +84,14 @@ class ApiAccessRequestTests(TestCase):
 class ApiAccessConfigTests(TestCase):
 
     def test_unicode(self):
-        assert six.text_type(ApiAccessConfig(enabled=True)) == u'ApiAccessConfig [enabled=True]'
-        assert six.text_type(ApiAccessConfig(enabled=False)) == u'ApiAccessConfig [enabled=False]'
+        assert str(ApiAccessConfig(enabled=True)) == 'ApiAccessConfig [enabled=True]'
+        assert str(ApiAccessConfig(enabled=False)) == 'ApiAccessConfig [enabled=False]'
 
 
 @skip_unless_lms
 class ApiAccessRequestSignalTests(TestCase):
     def setUp(self):
-        super(ApiAccessRequestSignalTests, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.user = UserFactory()
         self.api_access_request = ApiAccessRequest(user=self.user, site=SiteFactory())
         self.send_new_pending_email_function = 'openedx.core.djangoapps.api_admin.models._send_new_pending_email'
@@ -141,7 +140,7 @@ class ApiAccessRequestSignalTests(TestCase):
 
         # Verify that initial save logs email errors properly
         mock_model_log_exception.assert_called_once_with(
-            u'Error sending API user notification email for request [%s].', self.api_access_request.id
+            'Error sending API user notification email for request [%s].', self.api_access_request.id
         )
         # Verify object saved
         assert self.api_access_request.id is not None
@@ -151,7 +150,7 @@ class ApiAccessRequestSignalTests(TestCase):
                 self.api_access_request.approve()
         # Verify that updating request status logs email errors properly
         mock_model_log_exception.assert_called_once_with(
-            u'Error sending API user notification email for request [%s].', self.api_access_request.id
+            'Error sending API user notification email for request [%s].', self.api_access_request.id
         )
         # Verify object saved
         assert self.api_access_request.status == ApiAccessRequest.APPROVED

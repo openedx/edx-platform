@@ -148,7 +148,8 @@ class RegistrationViewValidationErrorTest(ThirdPartyAuthTestMixin, UserAPITestCa
                     ).format(
                         self.EMAIL
                     )
-                }]
+                }],
+                "error_code": "duplicate-email"
             }
         )
 
@@ -192,7 +193,8 @@ class RegistrationViewValidationErrorTest(ThirdPartyAuthTestMixin, UserAPITestCa
                     ).format(
                         self.USERNAME
                     )
-                }]
+                }],
+                "error_code": "duplicate-username"
             }
         )
 
@@ -229,7 +231,8 @@ class RegistrationViewValidationErrorTest(ThirdPartyAuthTestMixin, UserAPITestCa
                     ).format(
                         self.EMAIL
                     )
-                }]
+                }],
+                "error_code": "duplicate-email"
             }
         )
 
@@ -266,7 +269,8 @@ class RegistrationViewValidationErrorTest(ThirdPartyAuthTestMixin, UserAPITestCa
                     ).format(
                         self.EMAIL
                     )
-                }]
+                }],
+                "error_code": "duplicate-email"
             }
         )
 
@@ -302,7 +306,8 @@ class RegistrationViewValidationErrorTest(ThirdPartyAuthTestMixin, UserAPITestCa
                     ).format(
                         self.USERNAME
                     )
-                }]
+                }],
+                "error_code": "duplicate-username"
             }
         )
 
@@ -346,7 +351,8 @@ class RegistrationViewValidationErrorTest(ThirdPartyAuthTestMixin, UserAPITestCa
                     ).format(
                         self.EMAIL
                     )
-                }]
+                }],
+                "error_code": "duplicate-email-username"
             }
         )
 
@@ -1460,7 +1466,8 @@ class RegistrationViewTestV1(ThirdPartyAuthTestMixin, UserAPITestCase):
                     ).format(
                         self.EMAIL
                     )
-                }]
+                }],
+                "error_code": "duplicate-email"
             }
         )
 
@@ -1496,7 +1503,8 @@ class RegistrationViewTestV1(ThirdPartyAuthTestMixin, UserAPITestCase):
                     ).format(
                         self.USERNAME
                     )
-                }]
+                }],
+                "error_code": "duplicate-username"
             }
         )
 
@@ -1540,7 +1548,8 @@ class RegistrationViewTestV1(ThirdPartyAuthTestMixin, UserAPITestCase):
                     ).format(
                         self.EMAIL
                     )
-                }]
+                }],
+                "error_code": "duplicate-email-username"
             }
         )
 
@@ -1568,8 +1577,9 @@ class RegistrationViewTestV1(ThirdPartyAuthTestMixin, UserAPITestCase):
         self.assertDictEqual(
             response_json,
             {
-                u"username": [{u"user_message": USERNAME_BAD_LENGTH_MSG}],
-                u"password": [{u"user_message": u"This field is required."}],
+                "username": [{u"user_message": USERNAME_BAD_LENGTH_MSG}],
+                "password": [{u"user_message": u"This field is required."}],
+                "error_code": "validation-error"
             }
         )
 
@@ -1974,7 +1984,7 @@ class ThirdPartyRegistrationTestMixin(ThirdPartyOAuthTestMixin, CacheIsolationTe
             assert conflict_attribute in errors
             assert "belongs to an existing account" in errors[conflict_attribute][0]["user_message"]
 
-    def _assert_access_token_error(self, response, expected_error_message):
+    def _assert_access_token_error(self, response, expected_error_message, error_code):
         """Assert that the given response was an error for the access_token field with the given error message."""
         assert response.status_code == 400
         response_json = json.loads(response.content.decode('utf-8'))
@@ -1982,6 +1992,7 @@ class ThirdPartyRegistrationTestMixin(ThirdPartyOAuthTestMixin, CacheIsolationTe
             response_json,
             {
                 "access_token": [{"user_message": expected_error_message}],
+                "error_code": error_code
             }
         )
 
@@ -1993,6 +2004,7 @@ class ThirdPartyRegistrationTestMixin(ThirdPartyOAuthTestMixin, CacheIsolationTe
             response_json,
             {
                 "session_expired": [{"user_message": expected_error_message}],
+                "error_code": "tpa-session-expired",
             }
         )
 
@@ -2049,7 +2061,11 @@ class ThirdPartyRegistrationTestMixin(ThirdPartyOAuthTestMixin, CacheIsolationTe
         user = UserFactory()
         UserSocialAuth.objects.create(user=user, provider=self.BACKEND, uid=self.social_uid)
         response = self.client.post(self.url, self.data())
-        self._assert_access_token_error(response, "The provided access_token is already associated with another user.")
+        self._assert_access_token_error(
+            response,
+            "The provided access_token is already associated with another user.",
+            "tpa-token-already-associated"
+        )
         self._verify_user_existence(
             user_exists=True, social_link_exists=True, user_is_active=True, username=user.username
         )
@@ -2057,7 +2073,7 @@ class ThirdPartyRegistrationTestMixin(ThirdPartyOAuthTestMixin, CacheIsolationTe
     def test_invalid_token(self):
         self._setup_provider_response(success=False)
         response = self.client.post(self.url, self.data())
-        self._assert_access_token_error(response, "The provided access_token is not valid.")
+        self._assert_access_token_error(response, "The provided access_token is not valid.", "tpa-invalid-access-token")
         self._verify_user_existence(user_exists=False, social_link_exists=False)
 
     def test_missing_token(self):
@@ -2066,7 +2082,8 @@ class ThirdPartyRegistrationTestMixin(ThirdPartyOAuthTestMixin, CacheIsolationTe
         response = self.client.post(self.url, data)
         self._assert_access_token_error(
             response,
-            u"An access_token is required when passing value ({}) for provider.".format(self.BACKEND)
+            u"An access_token is required when passing value ({}) for provider.".format(self.BACKEND),
+            "tpa-missing-access-token"
         )
         self._verify_user_existence(user_exists=False, social_link_exists=False)
 
@@ -2106,7 +2123,7 @@ class TestFacebookRegistrationView(
         """
         self._setup_provider_response_with_body(200, json.dumps("false"))
         response = self.client.post(self.url, self.data())
-        self._assert_access_token_error(response, "The provided access_token is not valid.")
+        self._assert_access_token_error(response, "The provided access_token is not valid.", "tpa-invalid-access-token")
         self._verify_user_existence(user_exists=False, social_link_exists=False)
 
 

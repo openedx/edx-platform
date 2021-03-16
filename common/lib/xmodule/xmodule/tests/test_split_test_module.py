@@ -2,12 +2,11 @@
 Tests for the Split Testing Module
 """
 import json
+from unittest.mock import Mock, patch
 
 import ddt
 import lxml
-import six
 from fs.memoryfs import MemoryFS
-from mock import Mock, patch
 
 from xmodule.modulestore.tests.factories import CourseFactory
 from xmodule.modulestore.tests.utils import MixedSplitTestCase
@@ -97,8 +96,8 @@ class SplitTestBlockTest(XModuleXmlImportTest, PartitionTestCase):
             UserPartition(
                 MINIMUM_STATIC_PARTITION_ID, 'second_partition', 'Second Partition',
                 [
-                    Group(six.text_type(MINIMUM_STATIC_PARTITION_ID + 1), 'abel'),
-                    Group(six.text_type(MINIMUM_STATIC_PARTITION_ID + 2), 'baker'), Group("103", 'charlie')
+                    Group(str(MINIMUM_STATIC_PARTITION_ID + 1), 'abel'),
+                    Group(str(MINIMUM_STATIC_PARTITION_ID + 2), 'baker'), Group("103", 'charlie')
                 ],
                 MockUserPartitionScheme()
             )
@@ -403,10 +402,10 @@ class SplitTestBlockStudioTest(SplitTestBlockTest):
         assert len(validation.messages) == 0
         verify_validation_message(
             validation.summary,
-            u"The experiment is not associated with a group configuration.",
+            "The experiment is not associated with a group configuration.",
             StudioValidationMessage.NOT_CONFIGURED,
             'edit-button',
-            u"Select a Group Configuration",
+            "Select a Group Configuration",
         )
 
         # Verify the messages for a correctly configured split_test
@@ -427,14 +426,14 @@ class SplitTestBlockStudioTest(SplitTestBlockTest):
         assert len(validation.messages) == 1
         verify_validation_message(
             validation.messages[0],
-            u"The experiment does not contain all of the groups in the configuration.",
+            "The experiment does not contain all of the groups in the configuration.",
             StudioValidationMessage.ERROR,
             expected_action_runtime_event='add-missing-groups',
-            expected_action_label=u"Add Missing Groups"
+            expected_action_label="Add Missing Groups"
         )
         verify_summary_message(
             validation.summary,
-            u"This content experiment has issues that affect content visibility.",
+            "This content experiment has issues that affect content visibility.",
             StudioValidationMessage.ERROR
         )
         # Verify the messages for a split test with children that are not associated with any group
@@ -446,12 +445,12 @@ class SplitTestBlockStudioTest(SplitTestBlockTest):
         assert len(validation.messages) == 1
         verify_validation_message(
             validation.messages[0],
-            u"The experiment has an inactive group. Move content into active groups, then delete the inactive group.",
+            "The experiment has an inactive group. Move content into active groups, then delete the inactive group.",
             StudioValidationMessage.WARNING
         )
         verify_summary_message(
             validation.summary,
-            u"This content experiment has issues that affect content visibility.",
+            "This content experiment has issues that affect content visibility.",
             StudioValidationMessage.WARNING
         )
         # Verify the messages for a split test with both missing and inactive children
@@ -463,20 +462,20 @@ class SplitTestBlockStudioTest(SplitTestBlockTest):
         assert len(validation.messages) == 2
         verify_validation_message(
             validation.messages[0],
-            u"The experiment does not contain all of the groups in the configuration.",
+            "The experiment does not contain all of the groups in the configuration.",
             StudioValidationMessage.ERROR,
             expected_action_runtime_event='add-missing-groups',
-            expected_action_label=u"Add Missing Groups"
+            expected_action_label="Add Missing Groups"
         )
         verify_validation_message(
             validation.messages[1],
-            u"The experiment has an inactive group. Move content into active groups, then delete the inactive group.",
+            "The experiment has an inactive group. Move content into active groups, then delete the inactive group.",
             StudioValidationMessage.WARNING
         )
         # With two messages of type error and warning priority given to error.
         verify_summary_message(
             validation.summary,
-            u"This content experiment has issues that affect content visibility.",
+            "This content experiment has issues that affect content visibility.",
             StudioValidationMessage.ERROR
         )
 
@@ -486,13 +485,13 @@ class SplitTestBlockStudioTest(SplitTestBlockTest):
         assert len(validation.messages) == 1
         verify_validation_message(
             validation.messages[0],
-            u"The experiment uses a deleted group configuration. "
-            u"Select a valid group configuration or delete this experiment.",
+            "The experiment uses a deleted group configuration. "
+            "Select a valid group configuration or delete this experiment.",
             StudioValidationMessage.ERROR
         )
         verify_summary_message(
             validation.summary,
-            u"This content experiment has issues that affect content visibility.",
+            "This content experiment has issues that affect content visibility.",
             StudioValidationMessage.ERROR
         )
 
@@ -508,13 +507,13 @@ class SplitTestBlockStudioTest(SplitTestBlockTest):
         assert len(validation.messages) == 1
         verify_validation_message(
             validation.messages[0],
-            u"The experiment uses a group configuration that is not supported for experiments. "
-            u"Select a valid group configuration or delete this experiment.",
+            "The experiment uses a group configuration that is not supported for experiments. "
+            "Select a valid group configuration or delete this experiment.",
             StudioValidationMessage.ERROR
         )
         verify_summary_message(
             validation.summary,
-            u"This content experiment has issues that affect content visibility.",
+            "This content experiment has issues that affect content visibility.",
             StudioValidationMessage.ERROR
         )
 
@@ -539,7 +538,7 @@ class SplitTestBlockExportImportTest(MixedSplitTestCase):
             user_partition_id=2,
         )
         self.child_blocks = [
-            self.make_block("html", self.split_test_block, display_name="Hello HTML {}".format(i))
+            self.make_block("html", self.split_test_block, display_name=f"Hello HTML {i}")
             for i in range(1, 3)
         ]
         self.split_test_block.group_id_to_child = {

@@ -5,13 +5,11 @@ Common test utilities for courseware functionality
 
 from abc import ABCMeta, abstractmethod
 from datetime import datetime, timedelta
+from unittest.mock import patch
+from urllib.parse import urlencode
 
 import ddt
-import six
-from mock import patch
-from six.moves.urllib.parse import urlencode
 
-from lms.djangoapps.courseware.field_overrides import OverrideModulestoreFieldData
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.features.course_experience.url_helpers import get_legacy_courseware_url
 from common.djangoapps.student.tests.factories import AdminFactory, CourseEnrollmentFactory, UserFactory
@@ -19,9 +17,12 @@ from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory, check_mongo_calls
 
+from .field_overrides import OverrideModulestoreFieldData
+from .tests.helpers import MasqueradeMixin
+
 
 @ddt.ddt
-class RenderXBlockTestMixin(six.with_metaclass(ABCMeta, object)):
+class RenderXBlockTestMixin(MasqueradeMixin, metaclass=ABCMeta):
     """
     Mixin for testing the courseware.render_xblock function.
     It can be used for testing any higher-level endpoint that calls this method.
@@ -56,7 +57,7 @@ class RenderXBlockTestMixin(six.with_metaclass(ABCMeta, object)):
         """
         Clear out the block to be requested/tested before each test.
         """
-        super(RenderXBlockTestMixin, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         # to adjust the block to be tested, update block_name_to_be_tested before calling setup_course.
         self.block_name_to_be_tested = 'html_block'
 
@@ -175,7 +176,7 @@ class RenderXBlockTestMixin(six.with_metaclass(ABCMeta, object)):
             self.setup_user(admin=True, enroll=True, login=True)
 
             with check_mongo_calls(mongo_calls):
-                url = get_legacy_courseware_url(self.course.id, self.block_to_be_tested.location)
+                url = get_legacy_courseware_url(self.block_to_be_tested.location)
                 response = self.client.get(url)
                 expected_elements = self.block_specific_chrome_html_elements + self.COURSEWARE_CHROME_HTML_ELEMENTS
                 for chrome_element in expected_elements:
@@ -219,6 +220,12 @@ class RenderXBlockTestMixin(six.with_metaclass(ABCMeta, object)):
     def test_success_unenrolled_staff(self):
         self.setup_course()
         self.setup_user(admin=True, enroll=False, login=True)
+        self.verify_response()
+
+    def test_success_unenrolled_staff_masquerading_as_student(self):
+        self.setup_course()
+        self.setup_user(admin=True, enroll=False, login=True)
+        self.update_masquerade(role='student')
         self.verify_response()
 
     def test_success_enrolled_student(self):
@@ -267,15 +274,15 @@ class RenderXBlockTestMixin(six.with_metaclass(ABCMeta, object)):
         self.verify_response(url_params={'view': 'author_view'}, expected_response_code=400)
 
 
-class FieldOverrideTestMixin(object):
+class FieldOverrideTestMixin:
     """
     A Mixin helper class for classes that test Field Overrides.
     """
 
     def setUp(self):
-        super(FieldOverrideTestMixin, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         OverrideModulestoreFieldData.provider_classes = None
 
     def tearDown(self):
-        super(FieldOverrideTestMixin, self).tearDown()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().tearDown()
         OverrideModulestoreFieldData.provider_classes = None

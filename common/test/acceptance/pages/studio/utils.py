@@ -16,7 +16,7 @@ SIDE_BAR_HELP_CSS = '.external-help a, .external-help-button'
 
 @js_defined('window.jQuery')
 def type_in_codemirror(page, index, text, find_prefix="$"):  # lint-amnesty, pylint: disable=missing-function-docstring
-    script = u"""
+    script = """
     var cm = {find_prefix}('div.CodeMirror:eq({index})').get(0).CodeMirror;
     CodeMirror.signal(cm, "focus", cm);
     cm.setValue(arguments[0]);
@@ -28,7 +28,7 @@ def type_in_codemirror(page, index, text, find_prefix="$"):  # lint-amnesty, pyl
 @js_defined('window.jQuery')
 def get_codemirror_value(page, index=0, find_prefix="$"):
     return page.browser.execute_script(
-        u"return {find_prefix}('div.CodeMirror:eq({index})').get(0).CodeMirror.getValue();".format(
+        "return {find_prefix}('div.CodeMirror:eq({index})').get(0).CodeMirror.getValue();".format(
             index=index, find_prefix=find_prefix
         )
     )
@@ -80,7 +80,7 @@ def verify_ordering(test_class, page, expected_orderings):  # pylint: disable=un
     assert len(blocks_checked) == len(xblocks)
 
 
-class HelpMixin(object):
+class HelpMixin:
     """
     Mixin for testing Help links.
     """

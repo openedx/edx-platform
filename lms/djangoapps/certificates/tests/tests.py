@@ -4,15 +4,12 @@ Tests for the certificates models.
 
 
 from datetime import datetime, timedelta
+from unittest.mock import patch
 
-import six
 from ddt import data, ddt, unpack
 from django.conf import settings
 from milestones.tests.utils import MilestonesTestCaseMixin
-from mock import patch
 from pytz import UTC
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory
 
 from common.djangoapps.student.models import CourseEnrollment
 from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
@@ -25,6 +22,8 @@ from lms.djangoapps.certificates.models import (
     certificate_status_for_student
 )
 from lms.djangoapps.certificates.tests.factories import GeneratedCertificateFactory
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from xmodule.modulestore.tests.factories import CourseFactory
 
 
 @ddt
@@ -198,9 +197,9 @@ class CertificatesModelTest(ModuleStoreTestCase, MilestonesTestCaseMixin):
         course = CourseFactory.create(org='edx', number='998', display_name='Test Course')
         pre_requisite_course = CourseFactory.create(org='edx', number='999', display_name='Pre requisite Course')
         # set pre-requisite course
-        set_prerequisite_courses(course.id, [six.text_type(pre_requisite_course.id)])
+        set_prerequisite_courses(course.id, [str(pre_requisite_course.id)])
         # get milestones collected by user before completing the pre-requisite course
-        completed_milestones = milestones_achieved_by_user(student, six.text_type(pre_requisite_course.id))
+        completed_milestones = milestones_achieved_by_user(student, str(pre_requisite_course.id))
         assert len(completed_milestones) == 0
 
         GeneratedCertificateFactory.create(
@@ -210,9 +209,9 @@ class CertificatesModelTest(ModuleStoreTestCase, MilestonesTestCaseMixin):
             mode='verified'
         )
         # get milestones collected by user after user has completed the pre-requisite course
-        completed_milestones = milestones_achieved_by_user(student, six.text_type(pre_requisite_course.id))
+        completed_milestones = milestones_achieved_by_user(student, str(pre_requisite_course.id))
         assert len(completed_milestones) == 1
-        assert completed_milestones[0]['namespace'] == six.text_type(pre_requisite_course.id)
+        assert completed_milestones[0]['namespace'] == str(pre_requisite_course.id)
 
     @patch.dict(settings.FEATURES, {'ENABLE_OPENBADGES': True})
     @patch('lms.djangoapps.badges.backends.badgr.BadgrBackend', spec=True)

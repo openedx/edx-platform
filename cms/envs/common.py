@@ -430,6 +430,20 @@ FEATURES = {
     # .. toggle_warnings: Also set settings.LIBRARY_AUTHORING_MICROFRONTEND_URL and see
     #   REDIRECT_TO_LIBRARY_AUTHORING_MICROFRONTEND for rollout.
     'ENABLE_LIBRARY_AUTHORING_MICROFRONTEND': False,
+
+    # .. toggle_name: FEATURES['DISABLE_COURSE_CREATION']
+    # .. toggle_implementation: DjangoSetting
+    # .. toggle_default: False
+    # .. toggle_description: If set to True, it disables the course creation functionality and hides the "New Course"
+    #   button in studio.
+    #   It is important to note that the value of this flag only affects if the user doesn't have a staff role,
+    #   otherwise the course creation functionality will work as it should.
+    # .. toggle_use_cases: open_edx
+    # .. toggle_creation_date: 2013-12-02
+    # .. toggle_target_removal_date: None
+    # .. toggle_tickets: None
+    # .. toggle_warnings: Another toggle DISABLE_LIBRARY_CREATION overrides DISABLE_COURSE_CREATION, if present.
+    'DISABLE_COURSE_CREATION': False,
 }
 
 ENABLE_JASMINE = False
@@ -2275,8 +2289,15 @@ BLOCKSTORE_API_URL = 'http://localhost:18250/api/v1/'
 # in the blockstore-based XBlock runtime
 XBLOCK_RUNTIME_V2_EPHEMERAL_DATA_CACHE = 'default'
 
-# Blockstore data could contain S3 links, so this should be lower than Blockstore's AWS_QUERYSTRING_EXPIRE
-BLOCKSTORE_BUNDLE_CACHE_TIMEOUT = 169200
+# .. setting_name: BLOCKSTORE_BUNDLE_CACHE_TIMEOUT
+# .. setting_default: 3000
+# .. setting_description: Maximum time-to-live of cached Bundles fetched from
+#     Blockstore, in seconds. When the values returned from Blockstore have
+#     TTLs of their own (such as signed S3 URLs), the maximum TTL of this cache
+#     must be lower than the minimum TTL of those values.
+#     We use a default of 3000s (50mins) because temporary URLs are often
+#     configured to expire after one hour.
+BLOCKSTORE_BUNDLE_CACHE_TIMEOUT = 3000
 
 ###################### LEARNER PORTAL ################################
 LEARNER_PORTAL_URL_ROOT = 'https://learner-portal-localhost:18000'
@@ -2386,17 +2407,3 @@ LOGO_URL_PNG = None
 LOGO_TRADEMARK_URL = None
 FAVICON_URL = None
 DEFAULT_EMAIL_LOGO_URL = 'https://edx-cdn.org/v3/default/logo.png'
-
-# .. toggle_name: ERROR_ON_DEPRECATED_EDX_PLATFORM_IMPORTS
-# .. toggle_implementation: DjangoSetting
-# .. toggle_default: False
-# .. toggle_use_cases: temporary
-# .. toggle_creation_date: 2021-01-20
-# .. toggle_target_removal_date: 2021-01-27
-# .. toggle_tickets: https://github.com/edx/edx-platform/pull/25932
-# .. toggle_description: Whether to raise an exception where,
-#   normally, a DeprecatedEdxPlatformImportWarning would be raised.
-#   This will allow us to test dropping support for the deprecated
-#   import paths without yet removing all of the import_shims
-#   machinery.
-ERROR_ON_DEPRECATED_EDX_PLATFORM_IMPORTS = False

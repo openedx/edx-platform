@@ -102,7 +102,7 @@ class RandomizeBlock(
         """
         if self.child is None:
             # raise error instead?  In fact, could complain on descriptor load...
-            return Fragment(content=u"<div>Nothing to randomize between</div>")
+            return Fragment(content="<div>Nothing to randomize between</div>")
 
         return self.child.render(STUDENT_VIEW, context)
 

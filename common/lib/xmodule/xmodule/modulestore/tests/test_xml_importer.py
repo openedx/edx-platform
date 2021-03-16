@@ -7,9 +7,9 @@ import importlib
 import os
 import unittest
 from uuid import uuid4
+from unittest import mock
+
 import pytest
-import mock
-import six
 from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locator import BlockUsageLocator, CourseLocator
 from path import Path as path
@@ -23,10 +23,7 @@ from xmodule.modulestore.xml_importer import StaticContentImporter, _update_and_
 from xmodule.tests import DATA_DIR
 from xmodule.x_module import XModuleMixin
 
-if six.PY2:
-    OPEN_BUILTIN = '__builtin__.open'
-else:
-    OPEN_BUILTIN = 'builtins.open'
+OPEN_BUILTIN = 'builtins.open'
 
 
 class ModuleStoreNoSettings(unittest.TestCase):
@@ -72,7 +69,7 @@ class ModuleStoreNoSettings(unittest.TestCase):
         Add cleanups
         """
         self.addCleanup(self.cleanup_modulestore)
-        super(ModuleStoreNoSettings, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
 
 
 #===========================================
@@ -141,7 +138,7 @@ class RemapNamespaceTest(ModuleStoreNoSettings):
         self.field_data = KvsFieldData(kvs=DictKeyValueStore())
         self.scope_ids = ScopeIds('Bob', 'stubxblock', '123', 'import')
         self.xblock = StubXBlock(self.runtime, self.field_data, self.scope_ids)
-        super(RemapNamespaceTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
 
     def test_remap_namespace_native_xblock(self):
 
@@ -282,7 +279,7 @@ class UpdateLocationTest(ModuleStoreNoSettings):
             BlockUsageLocator(CourseLocator('org', 'course', 'run'), 'mutablestubxblock', 'child2'),
         ]
 
-        super(UpdateLocationTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
 
     def _check_explicitly_set(self, block, scope, expected_explicitly_set_fields, should_be_set=False):
         """ Gets fields that are explicitly set on block and checks if they are marked as explicitly set or not """

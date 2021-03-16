@@ -6,20 +6,18 @@ Tests for bulk operations in Split Modulestore.
 
 import copy
 import unittest
+from unittest.mock import MagicMock, Mock, call
 
-import six
 import ddt
 from bson.objectid import ObjectId
-from mock import MagicMock, Mock, call
 from opaque_keys.edx.locator import CourseLocator
-from six.moves import range
 
 from xmodule.modulestore.split_mongo.mongo_connection import MongoConnection
 from xmodule.modulestore.split_mongo.split import SplitBulkWriteMixin
 
 VERSION_GUID_DICT = {
     'SAMPLE_VERSION_GUID': 'deadbeef1234' * 2,
-    'SAMPLE_UNICODE_VERSION_GUID': u'deadbeef1234' * 2,
+    'SAMPLE_UNICODE_VERSION_GUID': 'deadbeef1234' * 2,
     'BSON_OBJECTID': ObjectId()
 }
 SAMPLE_GUIDS_LIST = ['SAMPLE_VERSION_GUID', 'SAMPLE_UNICODE_VERSION_GUID', 'BSON_OBJECTID']
@@ -28,7 +26,7 @@ SAMPLE_GUIDS_LIST = ['SAMPLE_VERSION_GUID', 'SAMPLE_UNICODE_VERSION_GUID', 'BSON
 class TestBulkWriteMixin(unittest.TestCase):  # lint-amnesty, pylint: disable=missing-class-docstring
 
     def setUp(self):
-        super(TestBulkWriteMixin, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.bulk = SplitBulkWriteMixin()
         self.bulk.SCHEMA_VERSION = 1
         self.clear_cache = self.bulk._clear_cache = Mock(name='_clear_cache')
@@ -53,7 +51,7 @@ class TestBulkWriteMixinPreviousTransaction(TestBulkWriteMixin):
     Verify that opening and closing a transaction doesn't affect later behaviour.
     """
     def setUp(self):
-        super(TestBulkWriteMixinPreviousTransaction, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.bulk._begin_bulk_operation(self.course_key)
         self.bulk.insert_course_index(self.course_key, MagicMock('prev-index-entry'))
         self.bulk.update_structure(self.course_key, {'this': 'is', 'the': 'previous structure', '_id': ObjectId()})
@@ -170,8 +168,7 @@ class TestBulkWriteMixinClosed(TestBulkWriteMixin):
         self.bulk.update_structure(self.course_key.replace(branch='b'), other_structure)
         self.assertConnCalls()
         self.bulk._end_bulk_operation(self.course_key)
-        six.assertCountEqual(
-            self,
+        self.assertCountEqual(
             [
                 call.insert_structure(self.structure, self.course_key),
                 call.insert_structure(other_structure, self.course_key)
@@ -207,8 +204,7 @@ class TestBulkWriteMixinClosed(TestBulkWriteMixin):
         self.bulk.update_definition(self.course_key.replace(branch='b'), other_definition)
         self.bulk.insert_course_index(self.course_key, {'versions': {'a': self.definition['_id'], 'b': other_definition['_id']}})  # lint-amnesty, pylint: disable=line-too-long
         self.bulk._end_bulk_operation(self.course_key)
-        six.assertCountEqual(
-            self,
+        self.assertCountEqual(
             [
                 call.insert_definition(self.definition, self.course_key),
                 call.insert_definition(other_definition, self.course_key),
@@ -239,8 +235,7 @@ class TestBulkWriteMixinClosed(TestBulkWriteMixin):
         self.bulk.update_definition(self.course_key.replace(branch='b'), other_definition)
         self.assertConnCalls()
         self.bulk._end_bulk_operation(self.course_key)
-        six.assertCountEqual(
-            self,
+        self.assertCountEqual(
             [
                 call.insert_definition(self.definition, self.course_key),
                 call.insert_definition(other_definition, self.course_key)
@@ -276,8 +271,7 @@ class TestBulkWriteMixinClosed(TestBulkWriteMixin):
         self.bulk.update_structure(self.course_key.replace(branch='b'), other_structure)
         self.bulk.insert_course_index(self.course_key, {'versions': {'a': self.structure['_id'], 'b': other_structure['_id']}})  # lint-amnesty, pylint: disable=line-too-long
         self.bulk._end_bulk_operation(self.course_key)
-        six.assertCountEqual(
-            self,
+        self.assertCountEqual(
             [
                 call.insert_structure(self.structure, self.course_key),
                 call.insert_structure(other_structure, self.course_key),
@@ -385,7 +379,7 @@ class TestBulkWriteMixinFindMethods(TestBulkWriteMixin):
     def test_find_matching_course_indexes(self, branch, search_targets, matching, unmatching):
         db_indexes = [{'org': 'what', 'course': 'this', 'run': 'needs'}]
         for n, index in enumerate(matching + unmatching):
-            course_key = CourseLocator('org', 'course', 'run{}'.format(n))
+            course_key = CourseLocator('org', 'course', f'run{n}')
             self.bulk._begin_bulk_operation(course_key)
             for attr in ['org', 'course', 'run']:
                 index[attr] = getattr(course_key, attr)
@@ -394,7 +388,7 @@ class TestBulkWriteMixinFindMethods(TestBulkWriteMixin):
         expected = matching + db_indexes
         self.conn.find_matching_course_indexes.return_value = db_indexes
         result = self.bulk.find_matching_course_indexes(branch, search_targets)
-        six.assertCountEqual(self, result, expected)
+        self.assertCountEqual(result, expected)
         for item in unmatching:
             assert item not in result
 
@@ -419,7 +413,7 @@ class TestBulkWriteMixinFindMethods(TestBulkWriteMixin):
 
         db_structures = [db_structure(_id) for _id in db_ids if _id not in active_ids]
         for n, _id in enumerate(active_ids):
-            course_key = CourseLocator('org', 'course', 'run{}'.format(n))
+            course_key = CourseLocator('org', 'course', f'run{n}')
             self.bulk._begin_bulk_operation(course_key)
             self.bulk.update_structure(course_key, active_structure(_id))
 
@@ -515,7 +509,7 @@ class TestBulkWriteMixinFindMethods(TestBulkWriteMixin):
         db_structures = [db_structure(_id) for _id in db_ids]
         active_structures = []
         for n, _id in enumerate(active_ids):
-            course_key = CourseLocator('org', 'course', 'run{}'.format(n))
+            course_key = CourseLocator('org', 'course', f'run{n}')
             self.bulk._begin_bulk_operation(course_key)
             structure = active_structure(_id)
             self.bulk.update_structure(course_key, structure)
@@ -575,14 +569,14 @@ class TestBulkWriteMixinFindMethods(TestBulkWriteMixin):
             structure.setdefault('_id', ObjectId())
 
         for n, structure in enumerate(active_match + active_unmatch):
-            course_key = CourseLocator('org', 'course', 'run{}'.format(n))
+            course_key = CourseLocator('org', 'course', f'run{n}')
             self.bulk._begin_bulk_operation(course_key)
             self.bulk.update_structure(course_key, structure)
 
         self.conn.find_ancestor_structures.return_value = db_match + db_unmatch
         results = self.bulk.find_ancestor_structures(original_version, block_id)
         self.conn.find_ancestor_structures.assert_called_once_with(original_version, block_id)
-        six.assertCountEqual(self, active_match + db_match, results)
+        self.assertCountEqual(active_match + db_match, results)
 
 
 @ddt.ddt
@@ -592,7 +586,7 @@ class TestBulkWriteMixinOpen(TestBulkWriteMixin):
     """
 
     def setUp(self):
-        super(TestBulkWriteMixinOpen, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.bulk._begin_bulk_operation(self.course_key)
 
     @ddt.data(*SAMPLE_GUIDS_LIST)

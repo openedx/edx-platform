@@ -10,11 +10,9 @@ functionalities.
 import json
 import uuid
 
+from unittest import mock
 import ddt
-import mock
-import six
 from django.urls import reverse
-from six.moves import range
 from web_fragments.fragment import Fragment
 from xblock.field_data import DictFieldData
 
@@ -40,7 +38,7 @@ class TestDiscussionXBlock(XModuleRenderingTestBase):
         """
         Set up the xblock runtime, test course, discussion, and user.
         """
-        super(TestDiscussionXBlock, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.patchers = []
         self.course_id = "test_course"
         self.runtime = self.new_module_runtime()
@@ -77,7 +75,7 @@ class TestDiscussionXBlock(XModuleRenderingTestBase):
         """
         Tears down any patchers added during tests.
         """
-        super(TestDiscussionXBlock, self).tearDown()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().tearDown()
         for patcher in self.patchers:
             patcher.stop()
 
@@ -93,7 +91,7 @@ class TestGetDjangoUser(TestDiscussionXBlock):
         """
         Mock the user service and runtime.
         """
-        super(TestGetDjangoUser, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.django_user = object()
         self.user_service = mock.Mock()
         self.add_patcher(
@@ -129,8 +127,8 @@ class TestViews(TestDiscussionXBlock):
         """
         Mock the methods needed for these tests.
         """
-        super(TestViews, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
-        self.template_canary = u'canary'
+        super().setUp()
+        self.template_canary = 'canary'
         self.render_template = mock.Mock()
         self.render_template.return_value = self.template_canary
         self.block.runtime.render_template = self.render_template
@@ -227,7 +225,7 @@ class TestTemplates(TestDiscussionXBlock):
     def test_studio_view(self):
         """Test for studio view."""
         fragment = self.block.author_view({})
-        assert 'data-discussion-id="{}"'.format(self.discussion_id) in fragment.content
+        assert f'data-discussion-id="{self.discussion_id}"' in fragment.content
 
     @ddt.data(
         (True, False, False),
@@ -247,10 +245,10 @@ class TestTemplates(TestDiscussionXBlock):
         self.block.has_permission = lambda perm: permission_dict[perm]
         fragment = self.block.student_view()
         read_only = 'false' if permissions[0] else 'true'
-        assert 'data-discussion-id="{}"'.format(self.discussion_id) in fragment.content
+        assert f'data-discussion-id="{self.discussion_id}"' in fragment.content
         assert 'data-user-create-comment="{}"'.format(json.dumps(permissions[1])) in fragment.content
         assert 'data-user-create-subcomment="{}"'.format(json.dumps(permissions[2])) in fragment.content
-        assert 'data-read-only="{read_only}"'.format(read_only=read_only) in fragment.content
+        assert f'data-read-only="{read_only}"' in fragment.content
 
 
 @ddt.ddt
@@ -264,7 +262,7 @@ class TestXBlockInCourse(SharedModuleStoreTestCase):
         """
         Set up a user, course, and discussion XBlock for use by tests.
         """
-        super(TestXBlockInCourse, cls).setUpClass()
+        super().setUpClass()
         cls.user = UserFactory()
         cls.course = ToyCourseFactory.create()
         cls.course_key = cls.course.id
@@ -359,7 +357,7 @@ class TestXBlockInCourse(SharedModuleStoreTestCase):
         Tests that course block api returns student_view_data for discussion xblock
         """
         self.client.login(username=self.user.username, password='test')
-        url = reverse('blocks_in_block_tree', kwargs={'usage_key_string': six.text_type(self.course_usage_key)})
+        url = reverse('blocks_in_block_tree', kwargs={'usage_key_string': str(self.course_usage_key)})
         query_params = {
             'depth': 'all',
             'username': self.user.username,
@@ -368,8 +366,8 @@ class TestXBlockInCourse(SharedModuleStoreTestCase):
         }
         response = self.client.get(url, query_params)
         assert response.status_code == 200
-        assert response.data['root'] == six.text_type(self.course_usage_key)
-        for block_key_string, block_data in six.iteritems(response.data['blocks']):
+        assert response.data['root'] == str(self.course_usage_key)
+        for block_key_string, block_data in response.data['blocks'].items():
             block_key = deserialize_usage_key(block_key_string, self.course_key)
             assert block_data['id'] == block_key_string
             assert block_data['type'] == block_key.block_type
@@ -393,7 +391,7 @@ class TestXBlockQueryLoad(SharedModuleStoreTestCase):
         discussions = []
 
         for counter in range(5):
-            discussion_id = 'test_discussion_{}'.format(counter)
+            discussion_id = f'test_discussion_{counter}'
             discussions.append(ItemFactory.create(
                 parent_location=course_usage_key,
                 category='discussion',

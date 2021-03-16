@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 Tests the "preview" selector in the LMS that allows changing between Staff, Learner, and Content Groups.
 """
@@ -24,7 +23,7 @@ class StaffViewTest(UniqueCourseTest):
     EMAIL = "johndoe@example.com"
 
     def setUp(self):
-        super(StaffViewTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
 
         self.courseware_page = CoursewarePage(self.browser, self.course_id)
 
@@ -60,11 +59,11 @@ class CourseWithContentGroupsTest(StaffViewTest):
     """
 
     def setUp(self):
-        super(CourseWithContentGroupsTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         # pylint: disable=protected-access
         self.course_fixture._update_xblock(self.course_fixture._course_location, {
             "metadata": {
-                u"user_partitions": [
+                "user_partitions": [
                     create_user_partition_json(
                         MINIMUM_STATIC_PARTITION_ID,
                         'Configuration alpha,beta',

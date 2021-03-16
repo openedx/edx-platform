@@ -51,6 +51,22 @@ class ObjectDoesNotExist(Exception):
 
 
 @attr.s(frozen=True)
+class ContentErrorData:
+    """
+    A human-readable description of something wrong with the content, to ease
+    the debugging of content issues–especially ones where content had to be
+    skipped because it was somehow malformed. The messages should be
+    comprehensible to course teams and support staff.
+
+    Errors can refer to things that are not anywhere in the outline, such as
+    when things don't show up where we expect then to be and we omit them from
+    the outline (unknown tag types, sequences where we expect sections, etc.)
+    """
+    message = attr.ib(type=str)
+    usage_key = attr.ib(type=Optional[UsageKey], default=None)
+
+
+@attr.s(frozen=True)
 class VisibilityData:
     """
     XBlock attributes that help determine item visibility.

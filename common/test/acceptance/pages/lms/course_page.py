@@ -23,7 +23,7 @@ class CoursePage(PageObject):  # lint-amnesty, pylint: disable=abstract-method
         Course ID is currently of the form "edx/999/2013_Spring"
         but this format could change.
         """
-        super(CoursePage, self).__init__(browser)  # lint-amnesty, pylint: disable=super-with-arguments
+        super().__init__(browser)
         self.course_id = course_id
 
     @property

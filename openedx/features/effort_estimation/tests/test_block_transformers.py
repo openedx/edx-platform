@@ -1,7 +1,7 @@
 """Tests for effort_estimation transformers."""
 
 from datetime import timedelta
-from mock import patch
+from unittest.mock import patch
 
 from crum import set_current_request
 from django.test.client import RequestFactory

@@ -1594,7 +1594,7 @@ class TestLMSAccountRetirementPost(RetirementTestCase, ModuleStoreTestCase):
             plugin=rp,
             user=self.test_user,
         )
-        article = Article.objects.create()
+        article = Article.objects.create(id=rp.article_id)
         ArticleRevision.objects.create(ip_address="ipaddresss", user=self.test_user, article=article)
 
         # ManualEnrollmentAudit setup

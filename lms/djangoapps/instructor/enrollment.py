@@ -12,7 +12,6 @@ from datetime import datetime
 import pytz
 from django.conf import settings
 from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
-from django.core.mail import send_mail  # lint-amnesty, pylint: disable=unused-import
 from django.template.loader import render_to_string
 from django.urls import reverse
 from django.utils.translation import override as override_language
@@ -495,7 +494,7 @@ def send_mail_to_student(student, param_dict, language=None):
 
     message_class = ace_emails_dict[message_type]
     message = message_class().personalize(
-        recipient=Recipient(username='', email_address=student),
+        recipient=Recipient(lms_user_id=0, email_address=student),
         language=language,
         user_context=param_dict,
     )

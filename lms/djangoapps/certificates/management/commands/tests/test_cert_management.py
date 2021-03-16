@@ -1,16 +1,13 @@
 """Tests for the resubmit_error_certificates management command. """
 
 
+from unittest.mock import patch
+
 import ddt
 from django.core.management import call_command
 from django.core.management.base import CommandError
 from django.test.utils import override_settings
-from mock import patch
 from opaque_keys.edx.locator import CourseLocator
-from six import text_type
-from six.moves import range
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory, check_mongo_calls
 
 from common.djangoapps.course_modes.models import CourseMode
 from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
@@ -20,6 +17,8 @@ from lms.djangoapps.badges.tests.factories import BadgeAssertionFactory, CourseC
 from lms.djangoapps.certificates.models import CertificateStatuses, GeneratedCertificate
 from lms.djangoapps.certificates.tests.factories import GeneratedCertificateFactory
 from lms.djangoapps.grades.tests.utils import mock_passing_grade
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory, check_mongo_calls
 
 
 class CertificateManagementTest(ModuleStoreTestCase):
@@ -88,8 +87,8 @@ class ResubmitErrorCertificatesTest(CertificateManagementTest):
 
         # Re-submit certificates for two of the courses
         call_command(self.command, course_key_list=[
-            text_type(self.courses[0].id),
-            text_type(self.courses[1].id)
+            str(self.courses[0].id),
+            str(self.courses[1].id)
         ])
 
         # Expect that the first two courses have been re-submitted,
@@ -136,7 +135,7 @@ class ResubmitErrorCertificatesTest(CertificateManagementTest):
             call_command(self.command)
 
     def test_invalid_course_key(self):
-        invalid_key = u"invalid/"
+        invalid_key = "invalid/"
         with self.assertRaisesRegex(CommandError, invalid_key):
             call_command(self.command, course_key_list=[invalid_key])
 
@@ -183,7 +182,7 @@ class RegenerateCertificatesTest(CertificateManagementTest):
         self.course.issue_badges = issue_badges
         self.store.update_item(self.course, None)
 
-        args = u'-u {} -c {}'.format(self.user.email, text_type(key))
+        args = '-u {} -c {}'.format(self.user.email, str(key))
         call_command(self.command, *args.split(' '))
 
         assert xqueue.return_value.regen_cert.call_args.args == (
@@ -211,7 +210,7 @@ class RegenerateCertificatesTest(CertificateManagementTest):
         key = self.course.location.course_key
         self._create_cert(key, self.user, CertificateStatuses.downloadable)
 
-        args = u'-u {} -c {} --insecure'.format(self.user.email, text_type(key))
+        args = '-u {} -c {} --insecure'.format(self.user.email, str(key))
         call_command(self.command, *args.split(' '))
 
         certificate = GeneratedCertificate.eligible_certificates.get(
@@ -248,7 +247,7 @@ class UngenerateCertificatesTest(CertificateManagementTest):
         self._create_cert(key, self.user, CertificateStatuses.unavailable)
 
         with mock_passing_grade():
-            args = u'-c {} --insecure'.format(text_type(key))
+            args = '-c {} --insecure'.format(str(key))
             call_command(self.command, *args.split(' '))
 
         assert mock_send_to_queue.called

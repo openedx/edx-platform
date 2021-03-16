@@ -5,12 +5,10 @@ This test file will run through some LMS test scenarios regarding access and nav
 
 import time
 
+from unittest.mock import patch
 from django.conf import settings
 from django.test.utils import override_settings
 from django.urls import reverse
-from mock import patch
-from six import text_type
-from six.moves import range
 
 from edx_toggles.toggles.testutils import override_waffle_flag
 from lms.djangoapps.courseware.tests.factories import GlobalStaffFactory
@@ -31,7 +29,7 @@ class TestNavigation(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
     @classmethod
     def setUpClass(cls):
         # pylint: disable=super-method-not-called
-        with super(TestNavigation, cls).setUpClassAndTestData():
+        with super().setUpClassAndTestData():
             cls.test_course = CourseFactory.create()
             cls.test_course_proctored = CourseFactory.create()
             cls.course = CourseFactory.create()
@@ -75,12 +73,12 @@ class TestNavigation(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
         cls.user = UserFactory()
 
     def setUp(self):
-        super(TestNavigation, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
 
         # Create student accounts and activate them.
         for i in range(len(self.STUDENT_INFO)):
             email, password = self.STUDENT_INFO[i]
-            username = 'u{0}'.format(i)
+            username = f'u{i}'
             self.create_account(username, email, password)
             self.activate_user(email)
 
@@ -89,7 +87,7 @@ class TestNavigation(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
         for line in response.content.decode('utf-8').split('\n'):
             if tabname in line and 'active' in line:
                 return
-        raise AssertionError(u"assertTabActive failed: {} not active".format(tabname))
+        raise AssertionError(f"assertTabActive failed: {tabname} not active")
 
     def assertTabInactive(self, tabname, response):  # lint-amnesty, pylint: disable=useless-return
         ''' Check if the progress tab is active in the tab set '''
@@ -118,7 +116,7 @@ class TestNavigation(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
         )
         for (displayname, accordion, tabs) in test_data:
             response = self.client.get(reverse('courseware_section', kwargs={
-                'course_id': text_type(self.course.id),
+                'course_id': str(self.course.id),
                 'chapter': 'Chrome',
                 'section': displayname,
             }))
@@ -129,7 +127,7 @@ class TestNavigation(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
         self.assertTabActive('courseware', response)
 
         response = self.client.get(reverse('courseware_section', kwargs={
-            'course_id': text_type(self.course.id),
+            'course_id': str(self.course.id),
             'chapter': 'Chrome',
             'section': 'pdf_textbooks_tab',
         }))
@@ -169,9 +167,9 @@ class TestNavigation(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
         self.enroll(self.test_course, True)
 
         resp = self.client.get(reverse('courseware',
-                               kwargs={'course_id': text_type(self.course.id)}))
+                               kwargs={'course_id': str(self.course.id)}))
         self.assertRedirects(resp, reverse(
-            'courseware_section', kwargs={'course_id': text_type(self.course.id),
+            'courseware_section', kwargs={'course_id': str(self.course.id),
                                           'chapter': 'Overview',
                                           'section': 'Welcome'}))
 
@@ -188,14 +186,14 @@ class TestNavigation(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
         section_url = reverse(
             'courseware_section',
             kwargs={
-                'course_id': text_type(self.course.id),
+                'course_id': str(self.course.id),
                 'chapter': 'Overview',
                 'section': 'Welcome',
             },
         )
         self.client.get(section_url)
         resp = self.client.get(
-            reverse('courseware', kwargs={'course_id': text_type(self.course.id)}),
+            reverse('courseware', kwargs={'course_id': str(self.course.id)}),
         )
         self.assertRedirects(resp, section_url)
 
@@ -212,7 +210,7 @@ class TestNavigation(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
         section_url = reverse(
             'courseware_section',
             kwargs={
-                'course_id': text_type(self.course.id),
+                'course_id': str(self.course.id),
                 'chapter': 'factory_chapter',
                 'section': 'factory_section',
             }
@@ -222,7 +220,7 @@ class TestNavigation(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
         # And now hitting the courseware tab should redirect to 'factory_chapter'
         url = reverse(
             'courseware',
-            kwargs={'course_id': text_type(self.course.id)}
+            kwargs={'course_id': str(self.course.id)}
         )
         resp = self.client.get(url)
         self.assertRedirects(resp, section_url)
@@ -235,7 +233,7 @@ class TestNavigation(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
         self.login(email, password)
         self.enroll(self.test_course, True)
 
-        test_course_id = text_type(self.test_course.id)
+        test_course_id = str(self.test_course.id)
 
         url = reverse(
             'courseware',
@@ -289,7 +287,7 @@ class TestNavigation(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
         self.login(email, password)
         self.enroll(self.test_course_proctored, True)
 
-        test_course_id = text_type(self.test_course_proctored.id)
+        test_course_id = str(self.test_course_proctored.id)
 
         with patch.dict(settings.FEATURES, {'ENABLE_SPECIAL_EXAMS': False}):
             url = reverse(

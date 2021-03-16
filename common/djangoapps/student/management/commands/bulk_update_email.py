@@ -44,7 +44,7 @@ class Command(BaseCommand):
         if not path.isfile(file_path):
             raise CommandError('File not found.')
 
-        with open(file_path, 'r') as csv_file:
+        with open(file_path) as csv_file:
             csv_reader = csv.reader(csv_file)
 
             email_mappings = [

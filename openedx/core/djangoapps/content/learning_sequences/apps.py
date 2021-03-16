@@ -7,7 +7,7 @@ from edx_proctoring.runtime import set_runtime_service
 
 class LearningSequencesConfig(AppConfig):  # lint-amnesty, pylint: disable=missing-class-docstring
     name = 'openedx.core.djangoapps.content.learning_sequences'
-    verbose_name = _('Learning Sequences')
+    verbose_name = _('Learning Sequences and Outlines')
 
     def ready(self):
         # Register celery workers

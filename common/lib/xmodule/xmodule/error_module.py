@@ -9,7 +9,6 @@ import json
 import logging
 import sys
 
-import six
 from lxml import etree
 from web_fragments.fragment import Fragment
 from xblock.field_data import DictFieldData
@@ -35,7 +34,7 @@ log = logging.getLogger(__name__)
 # decides whether to create a staff or not-staff module.
 
 
-class ErrorFields(object):
+class ErrorFields:
     """
     XBlock fields used by the ErrorBlocks
     """
@@ -107,7 +106,7 @@ class ErrorBlock(
 
         # real metadata stays in the content, but add a display name
         field_data = DictFieldData({
-            'error_msg': six.text_type(error_msg),
+            'error_msg': str(error_msg),
             'contents': contents,
             'location': location,
             'category': 'error'

@@ -100,7 +100,7 @@ class Command(BaseCommand):  # lint-amnesty, pylint: disable=missing-class-docst
         if created:
             if initial_password_hash:
                 if not (is_password_usable(initial_password_hash) and is_valid_django_hash(initial_password_hash)):
-                    raise CommandError('The password hash provided for user {} is invalid.'.format(username))
+                    raise CommandError(f'The password hash provided for user {username} is invalid.')
                 user.password = initial_password_hash
             else:
                 # Set the password to a random, unknown, but usable password

@@ -88,7 +88,7 @@ class BinnedSchedulesBaseResolver(PrefixedDebugLoggerMixin, RecipientResolver):
         for (user, language, context) in self.schedules_for_bin():
             msg = msg_type.personalize(
                 Recipient(
-                    user.username,
+                    user.id,
                     self.override_recipient_email or user.email,
                 ),
                 language,
@@ -370,7 +370,7 @@ class CourseUpdateResolver(BinnedSchedulesBaseResolver):
         for (user, language, context) in self.schedules_for_bin():
             msg = InstructorLedCourseUpdate().personalize(
                 Recipient(
-                    user.username,
+                    user.id,
                     self.override_recipient_email or user.email,
                 ),
                 language,
@@ -451,7 +451,7 @@ class CourseNextSectionUpdate(PrefixedDebugLoggerMixin, RecipientResolver):
         for (user, language, context) in schedules:
             msg = CourseUpdate().personalize(
                 Recipient(
-                    user.username,
+                    user.id,
                     self.override_recipient_email or user.email,
                 ),
                 language,

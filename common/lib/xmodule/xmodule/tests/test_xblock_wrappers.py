@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 Tests for the wrapping layer that provides the XBlock API using XModule/Descriptor
 functionality
@@ -8,6 +7,7 @@ functionality
 
 
 from unittest.case import SkipTest, TestCase
+from unittest.mock import Mock
 
 import ddt
 import webob
@@ -23,9 +23,7 @@ from factory import (
 )
 from fs.memoryfs import MemoryFS
 from lxml import etree
-from mock import Mock
 from opaque_keys.edx.locator import BlockUsageLocator, CourseLocator
-from six.moves import range
 from xblock.core import XBlock
 from xblock.field_data import DictFieldData
 from xblock.fields import ScopeIds
@@ -34,7 +32,7 @@ from xmodule.annotatable_module import AnnotatableBlock
 from xmodule.conditional_module import ConditionalBlock
 from xmodule.course_module import CourseBlock
 from xmodule.html_module import HtmlBlock
-from xmodule.poll_module import PollDescriptor
+from xmodule.poll_module import PollBlock
 from xmodule.randomize_module import RandomizeBlock
 from xmodule.seq_module import SequenceBlock
 from xmodule.tests import get_test_descriptor_system, get_test_system
@@ -57,7 +55,7 @@ from xmodule.x_module import (
 LEAF_XMODULES = {
     AnnotatableBlock: [{}],
     HtmlBlock: [{}],
-    PollDescriptor: [{'display_name': 'Poll Display Name'}],
+    PollBlock: [{'display_name': 'Poll Display Name'}],
     WordCloudBlock: [{}],
 }
 
@@ -69,14 +67,14 @@ CONTAINER_XMODULES = {
     ConditionalBlock: [{}],
     CourseBlock: [{}],
     RandomizeBlock: [{'display_name': 'Test String Display'}],
-    SequenceBlock: [{'display_name': u'Test Unicode हिंदी Display'}],
+    SequenceBlock: [{'display_name': 'Test Unicode हिंदी Display'}],
     VerticalBlock: [{}],
     WrapperBlock: [{}],
 }
 
 # These modules are not editable in studio yet
 NOT_STUDIO_EDITABLE = (
-    PollDescriptor,
+    PollBlock,
 )
 
 
@@ -98,7 +96,7 @@ class ModuleSystemFactory(Factory):
     performed by :func:`xmodule.tests.get_test_system`, so
     arguments for that function are valid factory attributes.
     """
-    class Meta(object):
+    class Meta:
         model = ModuleSystem
 
     @classmethod
@@ -114,7 +112,7 @@ class DescriptorSystemFactory(Factory):
     performed by :func:`xmodule.tests.get_test_descriptor_system`, so
     arguments for that function are valid factory attributes.
     """
-    class Meta(object):
+    class Meta:
         model = DescriptorSystem
 
     @classmethod
@@ -185,7 +183,7 @@ class LeafDescriptorFactory(Factory):
     Factory to generate leaf XModuleDescriptors.
     """
 
-    class Meta(object):
+    class Meta:
         model = XModuleDescriptor
 
     runtime = SubFactory(DescriptorSystemFactory)
@@ -260,7 +258,7 @@ class ContainerModuleFactory(LeafModuleFactory):
 
 
 @ddt.ddt
-class XBlockWrapperTestMixin(object):
+class XBlockWrapperTestMixin:
     """
     This is a mixin for building tests of the implementation of the XBlock
     api by wrapping XModule native functions.
@@ -374,7 +372,7 @@ class TestXModuleHandler(TestCase):
     """
 
     def setUp(self):
-        super(TestXModuleHandler, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.module = XModule(descriptor=Mock(), field_data=Mock(), runtime=Mock(), scope_ids=Mock())
         self.module.handle_ajax = Mock(return_value='{}')
         self.request = webob.Request({})
@@ -393,7 +391,7 @@ class TestXModuleHandler(TestCase):
         assert response.body.decode('utf-8') == '{}'
 
     @ddt.data(
-        u'{"test_key": "test_value"}',
+        '{"test_key": "test_value"}',
         '{"test_key": "test_value"}',
     )
     def test_xmodule_handler_with_data(self, response_data):

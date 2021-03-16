@@ -2,6 +2,8 @@
 
 
 import json
+from unittest.mock import patch
+from urllib.parse import urlencode
 
 import ddt
 import httpretty
@@ -9,19 +11,17 @@ from django.conf import settings
 from django.test import TestCase
 from django.test.client import RequestFactory
 from django.test.utils import override_settings
-from mock import patch
 from opaque_keys.edx.locator import CourseLocator
-from six.moves.urllib.parse import urlencode
 from waffle.testutils import override_switch
 
 from common.djangoapps.course_modes.models import CourseMode
 from common.djangoapps.course_modes.tests.factories import CourseModeFactory
+from common.djangoapps.student.models import CourseEnrollment
+from common.djangoapps.student.tests.factories import TEST_PASSWORD, UserFactory
 from lms.djangoapps.commerce.models import CommerceConfiguration
 from lms.djangoapps.commerce.utils import EcommerceService, refund_entitlement, refund_seat
 from openedx.core.djangolib.testing.utils import skip_unless_lms
 from openedx.core.lib.log_utils import audit_log
-from common.djangoapps.student.models import CourseEnrollment
-from common.djangoapps.student.tests.factories import TEST_PASSWORD, UserFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
@@ -61,7 +61,7 @@ class EcommerceServiceTests(TestCase):
         self.user = UserFactory.create()
         self.request = self.request_factory.get("foo")
         update_commerce_config(enabled=True)
-        super(EcommerceServiceTests, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
 
     def test_is_enabled(self):
         """Verify that is_enabled() returns True when ecomm checkout is enabled. """
@@ -105,7 +105,7 @@ class EcommerceServiceTests(TestCase):
         """Verify that the proper Receipt page URL is returned."""
         order_number = 'ORDER1'
         url = EcommerceService().get_receipt_page_url(order_number)
-        expected_url = 'http://ecommerce_url/checkout/receipt/?order_number={}'.format(order_number)
+        expected_url = f'http://ecommerce_url/checkout/receipt/?order_number={order_number}'
         assert url == expected_url
 
     @override_settings(ECOMMERCE_PUBLIC_URL_ROOT='http://ecommerce_url')
@@ -187,7 +187,7 @@ class RefundUtilMethodTests(ModuleStoreTestCase):
     """Tests for Refund Utilities"""
 
     def setUp(self):
-        super(RefundUtilMethodTests, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.user = UserFactory()
         UserFactory(username=settings.ECOMMERCE_SERVICE_WORKER_USERNAME, is_staff=True)
 

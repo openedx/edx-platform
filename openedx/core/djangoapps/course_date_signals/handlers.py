@@ -5,7 +5,6 @@ import logging
 
 from django.dispatch import receiver
 from edx_when.api import FIELDS_TO_EXTRACT, set_dates_for_course
-from six import text_type
 
 from common.lib.xmodule.xmodule.util.misc import is_xblock_an_assignment
 from openedx.core.lib.graph_traversals import get_children, leaf_filter, traverse_pre_order
@@ -33,8 +32,8 @@ def _field_values(fields, xblock):
                 result[field.name] = field.read_from(xblock)
             except TypeError as exception:
                 exception_message = "{message}, Block-location:{location}, Field-name:{field_name}".format(
-                    message=text_type(exception),
-                    location=text_type(xblock.location),
+                    message=str(exception),
+                    location=str(xblock.location),
                     field_name=field.name
                 )
                 raise TypeError(exception_message)  # lint-amnesty, pylint: disable=raise-missing-from

@@ -1,15 +1,13 @@
 """
 Unit tests for the API module
 """
-
-
 import datetime
+from unittest import mock
+from urllib import parse
+
 import pytest
-import mock
 import pytz
-import six.moves.urllib.parse  # lint-amnesty, pylint: disable=import-error, wrong-import-order
 from opaque_keys.edx.keys import CourseKey
-from six.moves import range
 
 from openedx.core.djangoapps.ccxcon import api as ccxconapi
 from common.djangoapps.student.tests.factories import AdminFactory
@@ -42,7 +40,7 @@ class APIsTestCase(SharedModuleStoreTestCase):
 
     @classmethod
     def setUpClass(cls):
-        super(APIsTestCase, cls).setUpClass()
+        super().setUpClass()
         cls.course = course = CourseFactory.create()
         cls.course_key = cls.course.location.course_key
 
@@ -65,7 +63,7 @@ class APIsTestCase(SharedModuleStoreTestCase):
         cls.verticals = flatten([
             [
                 ItemFactory.create(
-                    start=start, due=due, parent=sequential, graded=True, format='Homework', category=u'vertical'
+                    start=start, due=due, parent=sequential, graded=True, format='Homework', category='vertical'
                 ) for _ in range(2)
             ] for sequential in cls.sequentials
         ])
@@ -83,7 +81,7 @@ class APIsTestCase(SharedModuleStoreTestCase):
         """
         Set up tests
         """
-        super(APIsTestCase, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         # Create instructor account
         self.instructor = AdminFactory.create()
         # create an instance of modulestore
@@ -163,7 +161,7 @@ class APIsTestCase(SharedModuleStoreTestCase):
         # no args used for the call
         assert k_args == tuple()
         assert k_kwargs.get('url') ==\
-               six.moves.urllib.parse.urljoin(self.course.ccx_connector, ccxconapi.CCXCON_COURSEXS_URL)
+               parse.urljoin(self.course.ccx_connector, ccxconapi.CCXCON_COURSEXS_URL)
 
         # second call with different status code
         mock_response.status_code = 200
@@ -176,7 +174,7 @@ class APIsTestCase(SharedModuleStoreTestCase):
         # no args used for the call
         assert k_args == tuple()
         assert k_kwargs.get('url') ==\
-               six.moves.urllib.parse.urljoin(self.course.ccx_connector, ccxconapi.CCXCON_COURSEXS_URL)
+               parse.urljoin(self.course.ccx_connector, ccxconapi.CCXCON_COURSEXS_URL)
 
     @mock.patch('requests_oauthlib.oauth2_session.OAuth2Session.fetch_token', fetch_token_mock)
     @mock.patch('requests_oauthlib.oauth2_session.OAuth2Session.post')

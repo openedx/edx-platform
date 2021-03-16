@@ -21,7 +21,7 @@ class TestAbsoluteUrl(CacheIsolationTestCase):
     def setUp(self):
         self.site = SiteFactory.create()
         self.site.domain = 'example.com'
-        super(TestAbsoluteUrl, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
 
     def test_absolute_url(self):
         absolute = ensure_url_is_absolute(self.site, '/foo/bar')

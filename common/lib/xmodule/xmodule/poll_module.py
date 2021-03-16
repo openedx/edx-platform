@@ -14,19 +14,38 @@ from collections import OrderedDict
 from copy import deepcopy
 
 from pkg_resources import resource_string
+from web_fragments.fragment import Fragment
+
 from lxml import etree
 from openedx.core.djangolib.markup import Text, HTML
 from xblock.fields import Boolean, Dict, List, Scope, String  # lint-amnesty, pylint: disable=wrong-import-order
-from xmodule.mako_module import MakoModuleDescriptor
+from xmodule.mako_module import MakoTemplateBlockBase
 from xmodule.stringify import stringify_children
-from xmodule.x_module import XModule
-from xmodule.xml_module import XmlDescriptor
+from xmodule.util.xmodule_django import add_webpack_to_fragment
+from xmodule.x_module import (
+    HTMLSnippet,
+    ResourceTemplates,
+    shim_xmodule_js,
+    XModuleMixin,
+    XModuleDescriptorToXBlockMixin,
+    XModuleToXBlockMixin,
+)
+from xmodule.xml_module import XmlMixin
 
 log = logging.getLogger(__name__)
 _ = lambda text: text
 
 
-class PollFields(object):  # lint-amnesty, pylint: disable=missing-class-docstring
+class PollBlock(
+    MakoTemplateBlockBase,
+    XmlMixin,
+    XModuleDescriptorToXBlockMixin,
+    XModuleToXBlockMixin,
+    HTMLSnippet,
+    ResourceTemplates,
+    XModuleMixin,
+):  # pylint: disable=abstract-method
+    """Poll Module"""
     # Name of poll to use in links to this poll
     display_name = String(
         help=_("The display name for this component."),
@@ -61,18 +80,33 @@ class PollFields(object):  # lint-amnesty, pylint: disable=missing-class-docstri
         default=''
     )
 
+    resources_dir = None
+    uses_xmodule_styles_setup = True
 
-class PollModule(PollFields, XModule):
-    """Poll Module"""
-    js = {
+    preview_view_js = {
         'js': [
             resource_string(__name__, 'js/src/javascript_loader.js'),
             resource_string(__name__, 'js/src/poll/poll.js'),
             resource_string(__name__, 'js/src/poll/poll_main.js')
-        ]
+        ],
+        'xmodule_js': resource_string(__name__, 'js/src/xmodule.js'),
     }
-    css = {'scss': [resource_string(__name__, 'css/poll/display.scss')]}
-    js_module_name = "Poll"
+    preview_view_css = {
+        'scss': [
+            resource_string(__name__, 'css/poll/display.scss')
+        ],
+    }
+
+    # There is no studio_view() for this XBlock but this is needed to make the
+    # the static_content command happy.
+    studio_view_js = {
+        'js': [],
+        'xmodule_js': resource_string(__name__, 'js/src/xmodule.js')
+    }
+
+    studio_view_css = {
+        'scss': []
+    }
 
     def handle_ajax(self, dispatch, data):  # lint-amnesty, pylint: disable=unused-argument
         """Ajax handler.
@@ -103,7 +137,7 @@ class PollModule(PollFields, XModule):
                                'total': sum(self.poll_answers.values())
                                })
         elif dispatch == 'reset_poll' and self.voted and \
-                self.descriptor.xml_attributes.get('reset', 'True').lower() != 'false':
+                self.xml_attributes.get('reset', 'True').lower() != 'false':
             self.voted = False
 
             # FIXME: fix this, when xblock will support mutable types.
@@ -117,16 +151,21 @@ class PollModule(PollFields, XModule):
         else:  # return error message
             return json.dumps({'error': 'Unknown Command!'})
 
-    def get_html(self):
-        """Renders parameters to template."""
+    def student_view(self, _context):
+        """
+        Renders the student view.
+        """
+        fragment = Fragment()
         params = {
             'element_id': self.location.html_id(),
             'element_class': self.location.block_type,
-            'ajax_url': self.system.ajax_url,
+            'ajax_url': self.ajax_url,
             'configuration_json': self.dump_poll(),
         }
-        self.content = self.system.render_template('poll.html', params)  # lint-amnesty, pylint: disable=attribute-defined-outside-init
-        return self.content
+        fragment.add_content(self.system.render_template('poll.html', params))
+        add_webpack_to_fragment(fragment, 'PollBlockPreview')
+        shim_xmodule_js(fragment, 'Poll')
+        return fragment
 
     def dump_poll(self):
         """Dump poll information.
@@ -160,16 +199,11 @@ class PollModule(PollFields, XModule):
             'poll_answer': self.poll_answer,
             'poll_answers': self.poll_answers if self.voted else {},
             'total': sum(self.poll_answers.values()) if self.voted else 0,
-            'reset': str(self.descriptor.xml_attributes.get('reset', 'true')).lower()
+            'reset': str(self.xml_attributes.get('reset', 'true')).lower()
         })
 
-
-class PollDescriptor(PollFields, MakoModuleDescriptor, XmlDescriptor):  # lint-amnesty, pylint: disable=missing-class-docstring
     _tag_name = 'poll_question'
     _child_tag_name = 'answer'
-
-    module_class = PollModule
-    resources_dir = None
 
     @classmethod
     def definition_from_xml(cls, xml_object, system):

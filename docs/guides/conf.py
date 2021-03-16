@@ -21,16 +21,10 @@ root = Path('../..').abspath()
 # can be successfully imported
 sys.path.insert(0, root)
 sys.path.append(root / "docs/guides")
-sys.path.append(root / "cms/djangoapps")
-sys.path.append(root / "common/djangoapps")
 sys.path.append(root / "common/lib/capa")
 sys.path.append(root / "common/lib/safe_lxml")
 sys.path.append(root / "common/lib/symmath")
 sys.path.append(root / "common/lib/xmodule")
-sys.path.append(root / "lms/djangoapps")
-sys.path.append(root / "lms/envs")
-sys.path.append(root / "openedx/core/djangoapps")
-sys.path.append(root / "openedx/features")
 
 # Use a settings module that allows all LMS and Studio code to be imported
 # without errors.  If running sphinx-apidoc, we already set a different
@@ -239,30 +233,6 @@ modules = {
     'openedx': 'openedx',
 }
 
-# These Django apps under cms don't import correctly with the "cms.djangapps" prefix
-# Others don't import correctly without it...INSTALLED_APPS entries are inconsistent
-cms_djangoapps = ['contentstore', 'course_creators', 'xblock_config']
-for app in cms_djangoapps:
-    path = os.path.join('cms', 'djangoapps', app)
-    modules[path] = path
-
-# The Django apps under common must be imported directly, not under their path
-for app in os.listdir(str(root / 'common' / 'djangoapps')):
-    path = os.path.join('common', 'djangoapps', app)
-    if os.path.isdir(str(root / path)) and app != 'terrain':
-        modules[path] = path
-
-
-# These Django apps under lms don't import correctly with the "lms.djangapps" prefix
-# Others don't import correctly without it...INSTALLED_APPS entries are inconsistent
-lms_djangoapps = ['badges', 'branding', 'bulk_email', 'courseware',
-                  'coursewarehistoryextended', 'email_marketing', 'experiments', 'lti_provider',
-                  'mobile_api', 'notes', 'rss_proxy', 'shoppingcart', 'survey']
-for app in lms_djangoapps:
-    path = os.path.join('lms', 'djangoapps', app)
-    if app not in ['notes']:
-        modules[path] = path
-
 
 def update_settings_module(service='lms'):
     """
@@ -290,8 +260,6 @@ def on_init(app):  # lint-amnesty, pylint: disable=redefined-outer-name, unused-
         bin_path = os.path.abspath(os.path.join(sys.prefix, 'bin'))
         apidoc_path = os.path.join(bin_path, apidoc_path)
     exclude_dirs = ['envs', 'migrations', 'test', 'tests']
-    exclude_dirs.extend(cms_djangoapps)
-    exclude_dirs.extend(lms_djangoapps)
 
     exclude_files = ['admin.py', 'test.py', 'testing.py', 'tests.py', 'testutils.py', 'wsgi.py']
     for module in modules:

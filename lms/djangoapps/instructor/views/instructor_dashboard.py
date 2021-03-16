@@ -24,7 +24,6 @@ from edx_proctoring.api import does_backend_support_onboarding
 from edx_when.api import is_enabled_for_course
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
-from six.moves.urllib.parse import urljoin  # lint-amnesty, pylint: disable=unused-import
 from xblock.field_data import DictFieldData
 from xblock.fields import ScopeIds
 

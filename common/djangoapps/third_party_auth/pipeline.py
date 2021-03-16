@@ -76,6 +76,7 @@ from django.core.mail.message import EmailMessage
 from django.http import HttpResponseBadRequest
 from django.shortcuts import redirect
 from django.urls import reverse
+from edx_django_utils.monitoring import set_custom_attribute
 from social_core.exceptions import AuthException
 from social_core.pipeline import partial
 from social_core.pipeline.social_auth import associate_by_email
@@ -484,6 +485,9 @@ def parse_query_params(strategy, response, *args, **kwargs):
     auth_entry = strategy.request.session.get(AUTH_ENTRY_KEY, AUTH_ENTRY_LOGIN)
     if auth_entry not in _AUTH_ENTRY_CHOICES:
         raise AuthEntryError(strategy.request.backend, 'auth_entry invalid')
+
+    # Enable monitoring of the third-party-auth auth_entry value.
+    set_custom_attribute('tpa_pipeline.auth_entry', auth_entry)
     return {'auth_entry': auth_entry}
 
 
@@ -733,6 +737,8 @@ def associate_by_email_if_login_api(auth_entry, backend, details, user, current_
     This association is done ONLY if the user entered the pipeline through a LOGIN API.
     """
     if auth_entry == AUTH_ENTRY_LOGIN_API:
+        # Temporary custom attribute to help ensure there is no usage.
+        set_custom_attribute('deprecated_auth_entry_login_api', True)
         association_response = associate_by_email(backend, details, user, *args, **kwargs)
         if (
             association_response and

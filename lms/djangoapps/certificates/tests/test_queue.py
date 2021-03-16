@@ -1,19 +1,17 @@
-# -*- coding: utf-8 -*-
 """Tests for the XQueue certificates interface. """
 
 
 import json
 from contextlib import contextmanager
 from datetime import datetime, timedelta
+from unittest.mock import Mock, patch
 
 import ddt
 import freezegun
 import pytz
-import six
 from django.conf import settings
 from django.test import TestCase
 from django.test.utils import override_settings
-from mock import Mock, patch
 from opaque_keys.edx.locator import CourseLocator
 from testfixtures import LogCapture
 
@@ -349,14 +347,14 @@ class XQueueCertInterfaceAddCertificateTest(ModuleStoreTestCase):
                     LOGGER.name,
                     'WARNING',
                     (
-                        u"PDF certificate generation discontinued, canceling "
-                        u"PDF certificate generation for student {student_id} "
-                        u"in course '{course_id}' "
-                        u"with status '{status}' "
-                        u"and download_url '{download_url}'."
+                        "PDF certificate generation discontinued, canceling "
+                        "PDF certificate generation for student {student_id} "
+                        "in course '{course_id}' "
+                        "with status '{status}' "
+                        "and download_url '{download_url}'."
                     ).format(
                         student_id=self.user_2.id,
-                        course_id=six.text_type(self.course.id),
+                        course_id=str(self.course.id),
                         status=CertificateStatuses.downloadable,
                         download_url=download_url
                     )
@@ -418,15 +416,15 @@ class XQueueCertInterfaceExampleCertificateTest(TestCase):
         """Check that the task was added to the queue. """
         expected_header = {
             'lms_key': cert.access_key,
-            'lms_callback_url': 'https://edx.org/update_example_certificate?key={key}'.format(key=cert.uuid),
+            'lms_callback_url': f'https://edx.org/update_example_certificate?key={cert.uuid}',
             'queue_name': 'certificates'
         }
 
         expected_body = {
             'action': 'create',
             'username': cert.uuid,
-            'name': u'John Doë',
-            'course_id': six.text_type(self.COURSE_KEY),
+            'name': 'John Doë',
+            'course_id': str(self.COURSE_KEY),
             'template_pdf': 'test.pdf',
             'example_certificate': True
         }

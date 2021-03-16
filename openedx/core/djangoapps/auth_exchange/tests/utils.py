@@ -20,7 +20,7 @@ class AccessTokenExchangeTestMixin(ThirdPartyOAuthTestMixin):
     * _assert_success(data, expected_scopes)
     """
     def setUp(self):
-        super(AccessTokenExchangeTestMixin, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
 
         # Initialize to minimal data
         self.data = {
@@ -61,7 +61,7 @@ class AccessTokenExchangeTestMixin(ThirdPartyOAuthTestMixin):
         for field in ["access_token", "client_id"]:
             data = dict(self.data)
             del data[field]
-            self._assert_error(data, "invalid_request", u"{} is required".format(field))  # lint-amnesty, pylint: disable=no-value-for-parameter
+            self._assert_error(data, "invalid_request", f"{field} is required")  # lint-amnesty, pylint: disable=no-value-for-parameter
 
     def test_invalid_client(self):
         self.data["client_id"] = "nonexistent_client"
@@ -77,7 +77,7 @@ class AccessTokenExchangeTestMixin(ThirdPartyOAuthTestMixin):
         self._assert_error(  # lint-amnesty, pylint: disable=no-value-for-parameter
             self.data,
             "invalid_client",
-            "{}_confidential is not a public client".format(self.client_id),
+            f"{self.client_id}_confidential is not a public client",
         )
 
     def test_inactive_user(self):

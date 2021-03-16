@@ -3,8 +3,8 @@ Tests for permissions defined in courseware.rules
 """
 
 
+from unittest.mock import patch
 import ddt
-from mock import patch
 
 from common.djangoapps.course_modes.tests.factories import CourseModeFactory
 from common.djangoapps.student.models import CourseEnrollment

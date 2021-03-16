@@ -1,18 +1,14 @@
-# -*- coding: utf-8 -*-
 """
 Basic unit tests for LibraryContentBlock
 
 Higher-level tests are in `cms/djangoapps/contentstore/tests/test_libraries.py`.
 """
+from unittest.mock import Mock, patch
 
-
-import six
 from bson.objectid import ObjectId
 from fs.memoryfs import MemoryFS
 from lxml import etree
-from mock import Mock, patch
 from search.search_engine_base import SearchEngine
-from six.moves import range
 from web_fragments.fragment import Fragment
 from xblock.runtime import Runtime as VanillaRuntime
 
@@ -35,12 +31,12 @@ class LibraryContentTest(MixedSplitTestCase):
     Base class for tests of LibraryContentBlock (library_content_block.py)
     """
     def setUp(self):
-        super(LibraryContentTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
 
         self.tools = LibraryToolsService(self.store, self.user_id)
         self.library = LibraryFactory.create(modulestore=self.store)
         self.lib_blocks = [
-            self.make_block("html", self.library, data="Hello world from block {}".format(i))
+            self.make_block("html", self.library, data=f"Hello world from block {i}")
             for i in range(1, 5)
         ]
         self.course = CourseFactory.create(modulestore=self.store)
@@ -51,7 +47,7 @@ class LibraryContentTest(MixedSplitTestCase):
             "library_content",
             self.vertical,
             max_count=1,
-            source_library_id=six.text_type(self.library.location.library_key)
+            source_library_id=str(self.library.location.library_key)
         )
 
     def _bind_course_module(self, module):
@@ -138,7 +134,7 @@ class TestLibraryContentExportImport(LibraryContentTest):
         assert imported_lc_block.children == lc_block.children
 
 
-class LibraryContentBlockTestMixin(object):
+class LibraryContentBlockTestMixin:
     """
     Basic unit tests for LibraryContentBlock
     """
@@ -222,7 +218,7 @@ class LibraryContentBlockTestMixin(object):
         assert 'invalid' in result.summary.text
 
         # When source_library_id is set but the block needs to be updated, the summary should say so:
-        self.lc_block.source_library_id = six.text_type(self.library.location.library_key)
+        self.lc_block.source_library_id = str(self.library.location.library_key)
         result = self.lc_block.validate()
         assert not result
         # Validation fails due to at least one warning/message
@@ -385,7 +381,7 @@ class TestLibraryContentBlockWithSearchIndex(LibraryContentBlockTestMixin, Libra
 
     def setUp(self):
         """ Sets up search engine mock """
-        super(TestLibraryContentBlockWithSearchIndex, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         search_index_mock.search = Mock(side_effect=self._get_search_response)
 
 
@@ -427,7 +423,7 @@ class TestLibraryContentAnalytics(LibraryContentTest):
     """
 
     def setUp(self):
-        super(TestLibraryContentAnalytics, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.publisher = Mock()
         self.lc_block.refresh_children()
         self.lc_block = self.store.get_item(self.lc_block.location)
@@ -441,8 +437,8 @@ class TestLibraryContentAnalytics(LibraryContentTest):
         assert self.publisher.called
         assert len(self.publisher.call_args[0]) == 3  # pylint:disable=unsubscriptable-object
         _, event_name, event_data = self.publisher.call_args[0]  # pylint:disable=unsubscriptable-object
-        assert event_name == 'edx.librarycontentblock.content.{}'.format(event_type)
-        assert event_data['location'] == six.text_type(self.lc_block.location)
+        assert event_name == f'edx.librarycontentblock.content.{event_type}'
+        assert event_data['location'] == str(self.lc_block.location)
         return event_data
 
     def test_assigned_event(self):
@@ -455,13 +451,13 @@ class TestLibraryContentAnalytics(LibraryContentTest):
         assert isinstance(child_lib_version, ObjectId)
         event_data = self._assert_event_was_published("assigned")
         block_info = {
-            "usage_key": six.text_type(child.location),
-            "original_usage_key": six.text_type(child_lib_location),
-            "original_usage_version": six.text_type(child_lib_version),
+            "usage_key": str(child.location),
+            "original_usage_key": str(child_lib_location),
+            "original_usage_version": str(child_lib_version),
             "descendants": [],
         }
         assert event_data ==\
-               {'location': six.text_type(self.lc_block.location),
+               {'location': str(self.lc_block.location),
                 'added': [block_info],
                 'result': [block_info],
                 'previous_count': 0, 'max_count': 1}
@@ -473,7 +469,7 @@ class TestLibraryContentAnalytics(LibraryContentTest):
         assert len(children) == 2
         child, new_child = children if children[0].location == child.location else reversed(children)
         event_data = self._assert_event_was_published("assigned")
-        assert event_data['added'][0]['usage_key'] == six.text_type(new_child.location)
+        assert event_data['added'][0]['usage_key'] == str(new_child.location)
         assert len(event_data['result']) == 2
         assert event_data['previous_count'] == 1
         assert event_data['max_count'] == 2
@@ -521,7 +517,7 @@ class TestLibraryContentAnalytics(LibraryContentTest):
         for block_list in (event_data["added"], event_data["result"]):
             assert len(block_list) == 1
             # main_vertical is the only root block added, and is the only result.
-            assert block_list[0]['usage_key'] == six.text_type(course_usage_main_vertical)
+            assert block_list[0]['usage_key'] == str(course_usage_main_vertical)
 
             # Check that "descendants" is a flat, unordered list of all of main_vertical's descendants:
             descendants_expected = (
@@ -531,10 +527,10 @@ class TestLibraryContentAnalytics(LibraryContentTest):
             )
             descendant_data_expected = {}
             for lib_key, course_usage_key in descendants_expected:
-                descendant_data_expected[six.text_type(course_usage_key)] = {
-                    "usage_key": six.text_type(course_usage_key),
-                    "original_usage_key": six.text_type(lib_key),
-                    "original_usage_version": six.text_type(self.store.get_block_original_usage(course_usage_key)[1]),
+                descendant_data_expected[str(course_usage_key)] = {
+                    "usage_key": str(course_usage_key),
+                    "original_usage_key": str(lib_key),
+                    "original_usage_version": str(self.store.get_block_original_usage(course_usage_key)[1]),
                 }
             assert len(block_list[0]['descendants']) == len(descendant_data_expected)
             for descendant in block_list[0]["descendants"]:
@@ -585,12 +581,12 @@ class TestLibraryContentAnalytics(LibraryContentTest):
         assert len(children) == 1
         event_data = self._assert_event_was_published("removed")
         assert event_data['removed'] ==\
-               [{'usage_key': six.text_type(deleted_block_key),
+               [{'usage_key': str(deleted_block_key),
                  'original_usage_key': None,
                  'original_usage_version': None,
                  'descendants': []}]
         assert event_data['result'] ==\
-               [{'usage_key': six.text_type(keep_block_key),
-                 'original_usage_key': six.text_type(keep_block_lib_usage_key),
-                 'original_usage_version': six.text_type(keep_block_lib_version), 'descendants': []}]
+               [{'usage_key': str(keep_block_key),
+                 'original_usage_key': str(keep_block_lib_usage_key),
+                 'original_usage_version': str(keep_block_lib_version), 'descendants': []}]
         assert event_data['reason'] == 'invalid'

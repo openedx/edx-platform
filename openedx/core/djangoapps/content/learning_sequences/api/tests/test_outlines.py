@@ -3,25 +3,28 @@ Top level API tests. Tests API public contracts only. Do not import/create/mock
 models for this app.
 """
 from datetime import datetime, timezone
+from unittest import TestCase
 from unittest.mock import patch
+
 import pytest
 import attr
 from django.conf import settings
 from django.contrib.auth.models import AnonymousUser, User  # lint-amnesty, pylint: disable=imported-auth-user
 from edx_proctoring.exceptions import ProctoredExamNotFoundException
 from edx_when.api import set_dates_for_course
-from opaque_keys.edx.keys import CourseKey, UsageKey  # lint-amnesty, pylint: disable=unused-import
-from opaque_keys.edx.locator import BlockUsageLocator  # lint-amnesty, pylint: disable=unused-import
+from mock import patch
+from opaque_keys.edx.keys import CourseKey
+from opaque_keys.edx.locator import LibraryLocator
 
 from edx_toggles.toggles.testutils import override_waffle_flag
 from lms.djangoapps.courseware.tests.factories import BetaTesterFactory
 from openedx.core.djangolib.testing.utils import CacheIsolationTestCase
 from openedx.features.course_experience import COURSE_ENABLE_UNENROLLED_ACCESS_FLAG
 from common.djangoapps.student.auth import user_has_role
-from common.djangoapps.student.models import CourseEnrollment  # lint-amnesty, pylint: disable=unused-import
 from common.djangoapps.student.roles import CourseBetaTesterRole
 
 from ...data import (
+    ContentErrorData,
     CourseLearningSequenceData,
     CourseOutlineData,
     CourseSectionData,
@@ -30,12 +33,27 @@ from ...data import (
     VisibilityData,
 )
 from ..outlines import (
+    get_content_errors,
     get_course_outline,
     get_user_course_outline,
     get_user_course_outline_details,
-    replace_course_outline
+    key_supports_outlines,
+    replace_course_outline,
 )
 from .test_data import generate_sections
+
+
+class OutlineSupportTestCase(TestCase):
+    """
+    Make sure we know what kinds of course-like keys we support for outlines.
+    """
+    def test_supported_types(self):
+        assert key_supports_outlines(CourseKey.from_string("course-v1:edX+100+2021"))
+        assert key_supports_outlines(CourseKey.from_string("ccx-v1:edX+100+2021+ccx@1"))
+
+    def test_unsupported_types(self):
+        assert not key_supports_outlines(CourseKey.from_string("edX/100/2021"))
+        assert not key_supports_outlines(LibraryLocator(org="edX", library="100"))
 
 
 class CourseOutlineTestCase(CacheIsolationTestCase):
@@ -1259,3 +1277,64 @@ class SequentialVisibilityTestCase(CacheIsolationTestCase):
                     assert len(user_course_outline.sequences) == 6
                     assert all(is_sequence_accessible),\
                         'Sequences should be accessible to enrolled, staff users for a public_outline course'
+
+
+class ContentErrorTestCase(CacheIsolationTestCase):
+    """Test error collection and reporting."""
+
+    def test_errors(self):
+        """
+        Basic tests for writing and retriving errors.
+        """
+        course_key = CourseKey.from_string("course-v1:OpenEdX+Outlines+Errors")
+        outline = CourseOutlineData(
+            course_key=course_key,
+            title="Outline Errors Test Course!",
+            published_at=datetime(2021, 3, 21, tzinfo=timezone.utc),
+            published_version="8ebece4b69dd593d82fe2020",
+            sections=[],
+            self_paced=False,
+            days_early_for_beta=None,
+            entrance_exam_id=None,
+            course_visibility=CourseVisibility.PRIVATE,
+        )
+        usage_key_1 = course_key.make_usage_key('sequential', 'seq1')
+        usage_key_2 = course_key.make_usage_key('sequential', 'seq2')
+        replace_course_outline(
+            outline,
+            content_errors=[
+                # Explicitly set to no usage key.
+                ContentErrorData(message="Content is Hard", usage_key=None),
+
+                # Implicitly set usage key
+                ContentErrorData("Simple Content Error Description"),
+
+                # Multiple copies of the same usage key
+                ContentErrorData(message="Seq1 is wrong", usage_key=usage_key_1),
+                ContentErrorData(message="Seq1 is still wrong", usage_key=usage_key_1),
+
+                # Another key
+                ContentErrorData(message="Seq2 is also wrong", usage_key=usage_key_2)
+            ]
+        )
+        assert outline == get_course_outline(course_key)
+
+        # Ordering is preserved.
+        assert get_content_errors(course_key) == [
+            ContentErrorData(message="Content is Hard", usage_key=None),
+            ContentErrorData(message="Simple Content Error Description", usage_key=None),
+            ContentErrorData(message="Seq1 is wrong", usage_key=usage_key_1),
+            ContentErrorData(message="Seq1 is still wrong", usage_key=usage_key_1),
+            ContentErrorData(message="Seq2 is also wrong", usage_key=usage_key_2),
+        ]
+
+        # Now do it again and make sure updates work as well as inserts
+        replace_course_outline(
+            outline,
+            content_errors=[
+                ContentErrorData(message="Content is Hard", usage_key=None),
+            ]
+        )
+        assert get_content_errors(course_key) == [
+            ContentErrorData(message="Content is Hard", usage_key=None),
+        ]

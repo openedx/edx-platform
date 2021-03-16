@@ -2,12 +2,11 @@
 
 
 from unittest import skipUnless
+from unittest.mock import patch
 
 import ddt
 from django.conf import settings
 from django.test import TestCase
-from mock import patch
-from six.moves import map
 
 from common.djangoapps.pipeline_mako import compressed_css, compressed_js, render_require_js_path_overrides
 
@@ -65,11 +64,11 @@ class PipelineRenderTest(TestCase):
         with self.settings(PIPELINE=pipeline):
             # Verify the default behavior
             css_include = compressed_css('style-main-v1')
-            assert u'lms-main-v1.css' in css_include
+            assert 'lms-main-v1.css' in css_include
 
             # Verify that raw keyword causes raw URLs to be emitted
             css_include = compressed_css('style-main-v1', raw=True)
-            assert u'lms-main-v1.css?raw' in css_include
+            assert 'lms-main-v1.css?raw' in css_include
 
     @patch('django.contrib.staticfiles.storage.staticfiles_storage.exists', return_value=True)
     @patch('common.djangoapps.static_replace.try_staticfiles_lookup', side_effect=mock_staticfiles_lookup)
@@ -83,10 +82,10 @@ class PipelineRenderTest(TestCase):
         pipeline['PIPELINE_ENABLED'] = True
         with self.settings(PIPELINE=pipeline):
             js_include = compressed_js('base_application')
-            assert u'lms-base-application.js' in js_include
+            assert 'lms-base-application.js' in js_include
 
         # Verify that multiple JS files are rendered with the pipeline disabled
         pipeline['PIPELINE_ENABLED'] = False
         with self.settings(PIPELINE=pipeline):
             js_include = compressed_js('base_application')
-            assert u'/static/js/src/logger.js' in js_include
+            assert '/static/js/src/logger.js' in js_include

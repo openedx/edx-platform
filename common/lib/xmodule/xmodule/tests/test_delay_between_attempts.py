@@ -11,9 +11,9 @@ submissions" setting is set to different values
 import datetime
 import textwrap
 import unittest
+from unittest.mock import Mock
 
 import pytest
-from mock import Mock
 from opaque_keys.edx.locator import BlockUsageLocator, CourseLocator
 from pytz import UTC
 from xblock.field_data import DictFieldData
@@ -26,7 +26,7 @@ from xmodule.capa_module import ProblemBlock
 from . import get_test_system
 
 
-class CapaFactoryWithDelay(object):
+class CapaFactoryWithDelay:
     """
     Create problem modules class, specialized for delay_between_attempts
     test cases. This factory seems different enough from the one in
@@ -88,7 +88,7 @@ class CapaFactoryWithDelay(object):
         Optional parameters here are cut down to what we actually use vs. the regular CapaFactory.
         """
         location = BlockUsageLocator(CourseLocator('edX', 'capa_test', 'run', deprecated=True),
-                                     'problem', 'SampleProblem{0}'.format(cls.next_num()), deprecated=True)
+                                     'problem', f'SampleProblem{cls.next_num()}', deprecated=True)
         field_data = {'data': cls.sample_problem_xml}
 
         if max_attempts is not None:

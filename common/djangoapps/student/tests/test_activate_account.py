@@ -2,6 +2,8 @@
 
 
 import unittest
+from datetime import datetime
+from unittest.mock import patch
 from uuid import uuid4
 
 from django.conf import settings
@@ -9,13 +11,11 @@ from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imp
 from django.test import TestCase, override_settings
 from django.urls import reverse
 from edx_toggles.toggles.testutils import override_waffle_flag
-from mock import patch
 
-from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
-from openedx.core.djangoapps.user_authn.toggles import REDIRECT_TO_AUTHN_MICROFRONTEND
 from common.djangoapps.student.models import Registration
 from common.djangoapps.student.tests.factories import UserFactory
-
+from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
+from openedx.core.djangoapps.user_authn.toggles import REDIRECT_TO_AUTHN_MICROFRONTEND
 
 FEATURES_WITH_AUTHN_MFE_ENABLED = settings.FEATURES.copy()
 FEATURES_WITH_AUTHN_MFE_ENABLED['ENABLE_AUTHN_MICROFRONTEND'] = True
@@ -26,7 +26,7 @@ class TestActivateAccount(TestCase):
     """Tests for account creation"""
 
     def setUp(self):
-        super(TestActivateAccount, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.username = "jack"
         self.email = "jack@fake.edx.org"
         self.password = "test-password"
@@ -87,6 +87,16 @@ class TestActivateAccount(TestCase):
         assert self.user.is_active, 'Sanity check for .activate()'
         mock_signal.send_robust.assert_called_once_with(Registration, user=self.user)  # Ensure the signal is emitted
 
+    def test_activation_timestamp(self):
+        """ Assert that activate sets the flag but does not call segment. """
+        # Ensure that the user starts inactive
+        assert not self.user.is_active
+        # Until you explicitly activate it
+        timestamp_before_activation = datetime.utcnow()
+        self.registration.activate()
+        assert self.user.is_active
+        assert self.registration.activation_timestamp > timestamp_before_activation
+
     def test_account_activation_message(self):
         """
         Verify that account correct activation message is displayed.
@@ -97,8 +107,8 @@ class TestActivateAccount(TestCase):
         # Log in with test user.
         self.login()
         expected_message = (
-            u"Check your {email_start}{email}{email_end} inbox for an account activation link from "
-            u"{platform_name}. If you need help, contact {link_start}{platform_name} Support{link_end}."
+            "Check your {email_start}{email}{email_end} inbox for an account activation link from "
+            "{platform_name}. If you need help, contact {link_start}{platform_name} Support{link_end}."
         ).format(
             platform_name=self.platform_name,
             email_start="<strong>",

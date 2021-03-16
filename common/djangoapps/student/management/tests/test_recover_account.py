@@ -35,7 +35,7 @@ class RecoverAccountTests(TestCase):
     request_factory = RequestFactory()
 
     def setUp(self):
-        super(RecoverAccountTests, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.user = UserFactory.create(username='amy', email='amy@edx.com', password='password')
 
     def _write_test_csv(self, csv, lines):
@@ -55,7 +55,7 @@ class RecoverAccountTests(TestCase):
 
         with NamedTemporaryFile() as csv:
             csv = self._write_test_csv(csv, lines=['amy,amy@edx.com,amy@newemail.com\n'])
-            call_command("recover_account", "--csv_file_path={}".format(csv.name))
+            call_command("recover_account", f"--csv_file_path={csv.name}")
 
             assert len(mail.outbox) == 1
 
@@ -83,7 +83,7 @@ class RecoverAccountTests(TestCase):
 
         with NamedTemporaryFile() as csv:
             csv = self._write_test_csv(csv, lines=['amy,amy@edx.com,amy@newemail.com\n'])
-            call_command("recover_account", "--csv_file_path={}".format(csv.name))
+            call_command("recover_account", f"--csv_file_path={csv.name}")
 
             assert len(mail.outbox) == 1
 
@@ -110,7 +110,7 @@ class RecoverAccountTests(TestCase):
                                'exception was User matching query does not exist.'
 
             with LogCapture(LOGGER_NAME) as log:
-                call_command("recover_account", "--csv_file_path={}".format(csv.name))
+                call_command("recover_account", f"--csv_file_path={csv.name}")
 
                 log.check_present(
                     (LOGGER_NAME, 'ERROR', expected_message)
@@ -126,7 +126,7 @@ class RecoverAccountTests(TestCase):
             expected_message = "Successfully updated ['amy@newemail.com'] accounts. Failed to update [] accounts"
 
             with LogCapture(LOGGER_NAME) as log:
-                call_command("recover_account", "--csv_file_path={}".format(csv.name))
+                call_command("recover_account", f"--csv_file_path={csv.name}")
 
                 log.check_present(
                     (LOGGER_NAME, 'INFO', expected_message)

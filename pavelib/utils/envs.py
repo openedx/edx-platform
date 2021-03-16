@@ -1,7 +1,7 @@
 """
 Helper functions for loading environment settings.
 """
-
+import configparser
 import json
 import os
 import sys
@@ -11,7 +11,6 @@ import memcache
 from lazy import lazy
 from path import Path as path
 from paver.easy import BuildFailure, sh
-from six.moves import configparser
 
 from pavelib.utils.cmd import django_cmd
 
@@ -33,7 +32,7 @@ def repo_root():
             absolute_path = file_path.abspath()
             break
         except OSError:
-            print('Attempt {}/180 to get an absolute path failed'.format(attempt))
+            print(f'Attempt {attempt}/180 to get an absolute path failed')
             if attempt < 180:
                 attempt += 1
                 sleep(1)
@@ -137,7 +136,7 @@ class Env:
         'video': {
             'port': 8777,
             'log': BOK_CHOY_LOG_DIR / "bok_choy_video_sources.log",
-            'config': "root_dir={}".format(VIDEO_SOURCE_DIR),
+            'config': f"root_dir={VIDEO_SOURCE_DIR}",
         },
 
         'youtube': {
@@ -170,7 +169,7 @@ class Env:
     MONGO_HOST = 'edx.devstack.mongo' if USING_DOCKER else 'localhost'
     BOK_CHOY_MONGO_DATABASE = "test"
     BOK_CHOY_CACHE_HOST = 'edx.devstack.memcached' if USING_DOCKER else '0.0.0.0'
-    BOK_CHOY_CACHE = memcache.Client(['{}:11211'.format(BOK_CHOY_CACHE_HOST)], debug=0)
+    BOK_CHOY_CACHE = memcache.Client([f'{BOK_CHOY_CACHE_HOST}:11211'], debug=0)
 
     # Test Ids Directory
     TEST_DIR = REPO_ROOT / ".testids"
@@ -269,8 +268,8 @@ class Env:
             # else for cases where values are not found & sh returns one None value
             return tuple(str(value).splitlines()) if value else tuple(None for _ in range(settings_length))
         except BuildFailure:
-            print("Unable to print the value of the {} setting:".format(django_settings))
-            with open(cls.PRINT_SETTINGS_LOG_FILE, 'r') as f:
+            print(f"Unable to print the value of the {django_settings} setting:")
+            with open(cls.PRINT_SETTINGS_LOG_FILE) as f:
                 print(f.read())
             sys.exit(1)
 
@@ -315,7 +314,7 @@ class Env:
 
         # Find the env JSON file
         if self.SERVICE_VARIANT:
-            env_path = self.REPO_ROOT.parent / "{service}.env.json".format(service=self.SERVICE_VARIANT)
+            env_path = self.REPO_ROOT.parent / f"{self.SERVICE_VARIANT}.env.json"
         else:
             env_path = path("env.json").abspath()
 

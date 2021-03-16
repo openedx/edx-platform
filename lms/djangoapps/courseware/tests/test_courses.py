@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 Tests for course access
 """
@@ -7,11 +6,10 @@ Tests for course access
 import datetime
 import itertools
 
+from unittest import mock
 import pytest
 import ddt
-import mock
 import pytz
-import six
 from completion.models import BlockCompletion
 from completion.test_utils import CompletionWaffleTestMixin
 from crum import set_current_request
@@ -20,8 +18,6 @@ from django.test.client import RequestFactory
 from django.test.utils import override_settings
 from django.urls import reverse
 from opaque_keys.edx.keys import CourseKey
-from six import text_type
-from six.moves import range
 
 from lms.djangoapps.courseware.courses import (
     course_open_for_self_enrollment,
@@ -75,9 +71,9 @@ class CoursesTest(ModuleStoreTestCase):
             org='org', number='num', display_name='name'
         )
 
-        cms_url = u"//{}/course/{}".format(CMS_BASE_TEST, six.text_type(self.course.id))
+        cms_url = "//{}/course/{}".format(CMS_BASE_TEST, str(self.course.id))
         assert cms_url == get_cms_course_link(self.course)
-        cms_url = u"//{}/course/{}".format(CMS_BASE_TEST, six.text_type(self.course.location))
+        cms_url = "//{}/course/{}".format(CMS_BASE_TEST, str(self.course.location))
         assert cms_url == get_cms_block_link(self.course, 'course')
 
     @ddt.data(GET_COURSE_WITH_ACCESS, GET_COURSE_OVERVIEW_WITH_ACCESS)
@@ -88,7 +84,7 @@ class CoursesTest(ModuleStoreTestCase):
 
         with pytest.raises(CoursewareAccessException) as error:
             course_access_func(user, 'load', course.id)
-        assert text_type(error.value) == 'Course not found.'
+        assert str(error.value) == 'Course not found.'
         assert error.value.access_response.error_code == 'not_visible_to_user'
         assert not error.value.access_response.has_access
 
@@ -130,10 +126,10 @@ class CoursesTest(ModuleStoreTestCase):
 
         unfiltered_courses = get_courses(user)
         for org in [primary_course.org, alternate_course.org]:
-            assert any(((course.org == org) for course in unfiltered_courses))
+            assert any((course.org == org) for course in unfiltered_courses)
 
         filtered_courses = get_courses(user, org=primary)
-        assert all(((course.org == primary_course.org) for course in filtered_courses))
+        assert all((course.org == primary_course.org) for course in filtered_courses)
 
         with mock.patch(
             'openedx.core.djangoapps.site_configuration.helpers.get_value',
@@ -147,7 +143,7 @@ class CoursesTest(ModuleStoreTestCase):
 
             # Request filtering for an org matching the designated org.
             site_courses = get_courses(user, org=alternate)
-            assert all(((course.org == alternate_course.org) for course in site_courses))
+            assert all((course.org == alternate_course.org) for course in site_courses)
 
     def test_get_courses_with_filter(self):
         """
@@ -165,7 +161,7 @@ class CoursesTest(ModuleStoreTestCase):
         )
         for filter_, expected_courses in test_cases:
             assert {course.id for course in get_courses(user, filter_=filter_)} ==\
-                   expected_courses, u'testing get_courses with filter_={}'.format(filter_)
+                   expected_courses, f'testing get_courses with filter_={filter_}'
 
     def test_get_current_child(self):
         mock_xmodule = mock.MagicMock()
@@ -217,17 +213,17 @@ class MongoCourseImageTestCase(ModuleStoreTestCase):
     def test_get_image_url(self):
         """Test image URL formatting."""
         course = CourseFactory.create(org='edX', course='999')
-        assert course_image_url(course) == '/c4x/edX/999/asset/{0}'.format(course.course_image)
+        assert course_image_url(course) == f'/c4x/edX/999/asset/{course.course_image}'
 
     def test_non_ascii_image_name(self):
         # Verify that non-ascii image names are cleaned
-        course = CourseFactory.create(course_image=u'before_\N{SNOWMAN}_after.jpg')
-        assert course_image_url(course) == '/c4x/{org}/{course}/asset/before___after.jpg'.format(org=course.location.org, course=course.location.course)  # pylint: disable=line-too-long
+        course = CourseFactory.create(course_image='before_\N{SNOWMAN}_after.jpg')
+        assert course_image_url(course) == f'/c4x/{course.location.org}/{course.location.course}/asset/before___after.jpg'  # pylint: disable=line-too-long
 
     def test_spaces_in_image_name(self):
         # Verify that image names with spaces in them are cleaned
-        course = CourseFactory.create(course_image=u'before after.jpg')
-        assert course_image_url(course) == '/c4x/{org}/{course}/asset/before_after.jpg'.format(org=course.location.org, course=course.location.course)  # pylint: disable=line-too-long
+        course = CourseFactory.create(course_image='before after.jpg')
+        assert course_image_url(course) == f'/c4x/{course.location.org}/{course.location.course}/asset/before_after.jpg'  # pylint: disable=line-too-long
 
     def test_static_asset_path_course_image_default(self):
         """
@@ -242,7 +238,7 @@ class MongoCourseImageTestCase(ModuleStoreTestCase):
         Test that with course_image and static_asset_path both
         being set, that we get the right course_image url.
         """
-        course = CourseFactory.create(course_image=u'things_stuff.jpg',
+        course = CourseFactory.create(course_image='things_stuff.jpg',
                                       static_asset_path="foo")
         assert course_image_url(course) == '/static/foo/things_stuff.jpg'
 
@@ -256,12 +252,12 @@ class XmlCourseImageTestCase(XModuleXmlImportTest):
         assert course_image_url(course) == '/static/xml_test_course/images/course_image.jpg'
 
     def test_non_ascii_image_name(self):
-        course = self.process_xml(xml.CourseFactory.build(course_image=u'before_\N{SNOWMAN}_after.jpg'))
-        assert course_image_url(course) == u'/static/xml_test_course/before_☃_after.jpg'
+        course = self.process_xml(xml.CourseFactory.build(course_image='before_\N{SNOWMAN}_after.jpg'))
+        assert course_image_url(course) == '/static/xml_test_course/before_☃_after.jpg'
 
     def test_spaces_in_image_name(self):
-        course = self.process_xml(xml.CourseFactory.build(course_image=u'before after.jpg'))
-        assert course_image_url(course) == u'/static/xml_test_course/before after.jpg'
+        course = self.process_xml(xml.CourseFactory.build(course_image='before after.jpg'))
+        assert course_image_url(course) == '/static/xml_test_course/before after.jpg'
 
 
 class CoursesRenderTest(ModuleStoreTestCase):
@@ -273,7 +269,7 @@ class CoursesRenderTest(ModuleStoreTestCase):
         """
         Set up the course and user context
         """
-        super(CoursesRenderTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
 
         store = modulestore()
         course_items = import_course_from_xml(store, self.user.id, TEST_DATA_DIR, ['toy'])
@@ -285,7 +281,7 @@ class CoursesRenderTest(ModuleStoreTestCase):
     def test_get_course_info_section_render(self):
         # Test render works okay
         course_info = get_course_info_section(self.request, self.request.user, self.course, 'handouts')
-        assert course_info == u"<a href='/c4x/edX/toy/asset/handouts_sample_handout.txt'>Sample</a>"
+        assert course_info == "<a href='/c4x/edX/toy/asset/handouts_sample_handout.txt'>Sample</a>"
 
         # Test when render raises an exception
         with mock.patch('lms.djangoapps.courseware.courses.get_module') as mock_module_render:
@@ -312,7 +308,7 @@ class CoursesRenderTest(ModuleStoreTestCase):
 
 class CourseEnrollmentOpenTests(ModuleStoreTestCase):  # lint-amnesty, pylint: disable=missing-class-docstring
     def setUp(self):
-        super(CourseEnrollmentOpenTests, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.now = datetime.datetime.now().replace(tzinfo=pytz.UTC)
 
     def test_course_enrollment_open(self):
@@ -362,7 +358,7 @@ class CourseInstantiationTests(ModuleStoreTestCase):
     Tests around instantiating a course multiple times in the same request.
     """
     def setUp(self):
-        super(CourseInstantiationTests, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
 
         self.factory = RequestFactory()
 
@@ -377,7 +373,7 @@ class CourseInstantiationTests(ModuleStoreTestCase):
             __ = ItemFactory(parent=section, category='problem')
 
         fake_request = self.factory.get(
-            reverse('progress', kwargs={'course_id': six.text_type(course.id)})
+            reverse('progress', kwargs={'course_id': str(course.id)})
         )
 
         course = modulestore().get_course(course.id, depth=course_depth)
@@ -423,7 +419,7 @@ class TestGetCourseChapters(ModuleStoreTestCase):
         ItemFactory(parent=course, category='chapter')
         course_chapter_ids = get_course_chapter_ids(course.location.course_key)
         assert len(course_chapter_ids) == 2
-        assert course_chapter_ids == [six.text_type(child) for child in course.children]
+        assert course_chapter_ids == [str(child) for child in course.children]
 
 
 class TestGetCourseAssignments(CompletionWaffleTestMixin, ModuleStoreTestCase):

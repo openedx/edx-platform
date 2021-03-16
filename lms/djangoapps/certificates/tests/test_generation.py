@@ -4,21 +4,21 @@ Tests for certificate generation
 import logging
 
 from edx_toggles.toggles import LegacyWaffleSwitch
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory
 
 from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
 from common.djangoapps.util.testing import EventTestMixin
 from lms.djangoapps.certificates.generation import generate_allowlist_certificate
-from lms.djangoapps.certificates.models import GeneratedCertificate, CertificateStatuses
+from lms.djangoapps.certificates.models import CertificateStatuses, GeneratedCertificate
 from openedx.core.djangoapps.certificates.config import waffle
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from xmodule.modulestore.tests.factories import CourseFactory
 
 log = logging.getLogger(__name__)
 
 ID_VERIFIED_METHOD = 'lms.djangoapps.verify_student.services.IDVerificationService.user_is_verified'
 AUTO_GENERATION_NAMESPACE = waffle.WAFFLE_NAMESPACE
 AUTO_GENERATION_NAME = waffle.AUTO_CERTIFICATE_GENERATION
-AUTO_GENERATION_SWITCH_NAME = '{}.{}'.format(AUTO_GENERATION_NAMESPACE, AUTO_GENERATION_NAME)
+AUTO_GENERATION_SWITCH_NAME = f'{AUTO_GENERATION_NAMESPACE}.{AUTO_GENERATION_NAME}'
 AUTO_GENERATION_SWITCH = LegacyWaffleSwitch(AUTO_GENERATION_NAMESPACE, AUTO_GENERATION_NAME)
 
 

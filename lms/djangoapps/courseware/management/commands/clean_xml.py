@@ -11,7 +11,6 @@ import lxml.etree
 from django.core.management.base import BaseCommand
 from fs.osfs import OSFS
 from path import Path as path
-from six.moves import map
 
 from xmodule.modulestore.xml import XMLModuleStore
 
@@ -35,7 +34,7 @@ def export(course, export_dir):
     """
     fs = OSFS(export_dir, create=True)
     if not fs.isdirempty('.'):  # lint-amnesty, pylint: disable=no-member
-        print(u'WARNING: Directory {dir} not-empty.  May clobber/confuse things'.format(dir=export_dir))
+        print(f'WARNING: Directory {export_dir} not-empty.  May clobber/confuse things')
 
     try:
         course.runtime.export_fs = fs
@@ -55,7 +54,7 @@ def export(course, export_dir):
 def import_with_checks(course_dir):  # lint-amnesty, pylint: disable=missing-function-docstring
     all_ok = True
 
-    print(u'Attempting to load "{}"'.format(course_dir))
+    print(f'Attempting to load "{course_dir}"')
 
     course_dir = path(course_dir)
     data_dir = course_dir.dirname()
@@ -71,13 +70,13 @@ def import_with_checks(course_dir):  # lint-amnesty, pylint: disable=missing-fun
 
     def str_of_err(tpl):
         (msg, exc_str) = tpl
-        return '{msg}\n{exc}'.format(msg=msg, exc=exc_str)
+        return f'{msg}\n{exc_str}'
 
     courses = modulestore.get_courses()
 
     n = len(courses)
     if n != 1:
-        print(u'ERROR: Expect exactly 1 course.  Loaded {n}: {lst}'.format(n=n, lst=courses))
+        print(f'ERROR: Expect exactly 1 course.  Loaded {n}: {courses}')
         return (False, None)
 
     course = courses[0]
@@ -102,7 +101,7 @@ def import_with_checks(course_dir):  # lint-amnesty, pylint: disable=missing-fun
     print('Running validators...')
 
     for validate in validators:
-        print(u'Running {}'.format(validate.__name__))
+        print(f'Running {validate.__name__}')
         all_ok = validate(course) and all_ok
 
     if all_ok:
@@ -130,7 +129,7 @@ def check_roundtrip(course_dir):
     # diff = dircmp(course_dir, export_dir, ignore=[], hide=[])
     print('======== Roundtrip diff: =========')
     sys.stdout.flush()  # needed to make diff appear in the right place
-    os.system(u'diff -r {} {}'.format(course_dir, export_dir))
+    os.system(f'diff -r {course_dir} {export_dir}')
     print('======== ideally there is no diff above this =======')
 
 

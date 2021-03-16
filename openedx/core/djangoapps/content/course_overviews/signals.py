@@ -88,5 +88,11 @@ def _check_for_pacing_changes(previous_course_overview, updated_course_overview)
 
 
 def _check_for_cert_availability_date_changes(previous_course_overview, updated_course_overview):
+    """ Checks if the cert available date has changed and if so, sends a COURSE_CERT_DATE_CHANGE signal"""
     if previous_course_overview.certificate_available_date != updated_course_overview.certificate_available_date:
+        LOG.info(
+            f"Certificate availability date for {str(updated_course_overview.id)} has changed from " +
+            f"{previous_course_overview.certificate_available_date} to " +
+            f"{updated_course_overview.certificate_available_date}. Sending COURSE_CERT_DATE_CHANGE signal."
+        )
         COURSE_CERT_DATE_CHANGE.send_robust(sender=None, course_key=updated_course_overview.id)

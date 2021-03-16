@@ -70,6 +70,15 @@ class CourseOutlineViewTest(CacheIsolationTestCase, APITestCase):  # lint-amnest
         result = self.client.get(self.course_url)
         assert result.status_code == 403
 
+    def test_non_existent_course_404(self):
+        """
+        We should 404, not 500, when asking for a course that isn't there.
+        """
+        self.client.login(username='staff', password='staff_pass')
+        fake_course_key = self.course_key.replace(run="not_real")
+        result = self.client.get(self.url_for(fake_course_key))
+        assert result.status_code == 404
+
     def test_deprecated_course_key(self):
         """
         For now, make sure you need staff access bits to use the API.

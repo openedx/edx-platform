@@ -58,6 +58,7 @@ from common.djangoapps.util import views as util_views
 RESET_COURSE_DEADLINES_NAME = 'reset_course_deadlines'
 RENDER_XBLOCK_NAME = 'render_xblock'
 COURSE_DATES_NAME = 'dates'
+COURSE_PROGRESS_NAME = 'progress'
 
 if settings.DEBUG or settings.FEATURES.get('ENABLE_DJANGO_ADMIN_SITE'):
     django_autodiscover()
@@ -498,7 +499,7 @@ urlpatterns += [
             settings.COURSE_ID_PATTERN,
         ),
         courseware_views.progress,
-        name='progress',
+        name=COURSE_PROGRESS_NAME,
     ),
 
     # dates page

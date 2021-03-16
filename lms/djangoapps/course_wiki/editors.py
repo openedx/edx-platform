@@ -27,7 +27,7 @@ class CodeMirrorWidget(forms.Widget):
         }
         if attrs:
             default_attrs.update(attrs)
-        super(CodeMirrorWidget, self).__init__(default_attrs)  # lint-amnesty, pylint: disable=super-with-arguments
+        super().__init__(default_attrs)
 
     def render(self, name, value, attrs=None, renderer=None):
         if value is None:
@@ -57,7 +57,7 @@ class CodeMirror(BaseEditor):
     def get_widget(self, instance=None):  # lint-amnesty, pylint: disable=unused-argument
         return CodeMirrorWidget()
 
-    class AdminMedia(object):  # pylint: disable=missing-class-docstring
+    class AdminMedia:  # pylint: disable=missing-class-docstring
         css = {
             'all': ("wiki/markitup/skins/simple/style.css",
                     "wiki/markitup/sets/admin/style.css",)
@@ -67,7 +67,7 @@ class CodeMirror(BaseEditor):
               "wiki/markitup/sets/admin/set.js",
               )
 
-    class Media(object):
+    class Media:
         css = {
             'all': ("js/vendor/CodeMirror/codemirror.css",)
         }

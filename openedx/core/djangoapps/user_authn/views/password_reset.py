@@ -128,7 +128,7 @@ def send_password_reset_success_email(user, request):
     )
 
     msg = PasswordResetSuccess(context=message_context).personalize(
-        recipient=Recipient(user.username, user.email),
+        recipient=Recipient(user.id, user.email),
         language=user_language_preference,
         user_context={"name": user.profile.name},
     )
@@ -165,7 +165,7 @@ def send_password_reset_email_for_user(user, request, preferred_email=None):
     })
 
     msg = PasswordReset().personalize(
-        recipient=Recipient(user.username, preferred_email or user.email),
+        recipient=Recipient(user.id, preferred_email or user.email),
         language=user_language_preference,
         user_context=message_context,
     )
@@ -628,7 +628,7 @@ def password_change_request_handler(request):
                 })
 
                 msg = PasswordReset().personalize(
-                    recipient=Recipient(username='', email_address=email),
+                    recipient=Recipient(lms_user_id=0, email_address=email),
                     language=settings.LANGUAGE_CODE,
                     user_context=message_context,
                 )

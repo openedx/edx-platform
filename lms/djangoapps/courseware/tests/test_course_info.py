@@ -1,4 +1,3 @@
-# coding=utf-8
 """
 Test the course_info xblock
 """
@@ -6,16 +5,14 @@ Test the course_info xblock
 
 from datetime import datetime
 
+from unittest import mock
 import ddt
-import mock
-import six
 from ccx_keys.locator import CCXLocator
 from django.conf import settings
 from django.http import QueryDict
 from django.test.utils import override_settings
 from django.urls import reverse
 from edx_toggles.toggles.testutils import override_waffle_flag
-from six import text_type
 
 from lms.djangoapps.ccx.tests.factories import CcxFactory
 from openedx.core.djangoapps.self_paced.models import SelfPacedConfiguration
@@ -51,7 +48,7 @@ class CourseInfoTestCase(EnterpriseTestConsentRequired, LoginEnrollmentTestCase,
 
     @classmethod
     def setUpClass(cls):
-        super(CourseInfoTestCase, cls).setUpClass()
+        super().setUpClass()
         cls.course = CourseFactory.create()
         cls.page = ItemFactory.create(
             category="course_info", parent_location=cls.course.location,
@@ -60,14 +57,14 @@ class CourseInfoTestCase(EnterpriseTestConsentRequired, LoginEnrollmentTestCase,
 
     def test_logged_in_unenrolled(self):
         self.setup_user()
-        url = reverse('info', args=[text_type(self.course.id)])
+        url = reverse('info', args=[str(self.course.id)])
         resp = self.client.get(url)
         self.assertContains(resp, "OOGIE BLOOGIE")
         self.assertContains(resp, "You are not currently enrolled in this course")
 
     def test_logged_in_enrolled(self):
         self.enroll(self.course)
-        url = reverse('info', args=[text_type(self.course.id)])
+        url = reverse('info', args=[str(self.course.id)])
         resp = self.client.get(url)
         assert b'You are not currently enrolled in this course' not in resp.content
 
@@ -85,19 +82,19 @@ class CourseInfoTestCase(EnterpriseTestConsentRequired, LoginEnrollmentTestCase,
         self.setup_user()
         self.enroll(self.course)
 
-        url = reverse('info', args=[text_type(self.course.id)])
+        url = reverse('info', args=[str(self.course.id)])
 
         self.verify_consent_required(self.client, url)  # lint-amnesty, pylint: disable=no-value-for-parameter
 
     def test_anonymous_user(self):
-        url = reverse('info', args=[text_type(self.course.id)])
+        url = reverse('info', args=[str(self.course.id)])
         resp = self.client.get(url)
         assert resp.status_code == 200
         assert b'OOGIE BLOOGIE' not in resp.content
 
     def test_logged_in_not_enrolled(self):
         self.setup_user()
-        url = reverse('info', args=[text_type(self.course.id)])
+        url = reverse('info', args=[str(self.course.id)])
         self.client.get(url)
 
         # Check whether the user has been enrolled in the course.
@@ -116,7 +113,7 @@ class CourseInfoTestCase(EnterpriseTestConsentRequired, LoginEnrollmentTestCase,
         """
         self.setup_user()
         self.enroll(self.course)
-        url = reverse('info', args=[text_type(self.course.id)])
+        url = reverse('info', args=[str(self.course.id)])
         response = self.client.get(url)
         start_date = strftime_localized(self.course.start, 'SHORT_DATE')
         expected_params = QueryDict(mutable=True)
@@ -135,14 +132,14 @@ class CourseInfoTestCase(EnterpriseTestConsentRequired, LoginEnrollmentTestCase,
         """
         self.setup_user()
         self.enroll(self.course)
-        fake_unicode_start_time = u"üñîçø∂é_ßtå®t_tîµé"
+        fake_unicode_start_time = "üñîçø∂é_ßtå®t_tîµé"
         mock_strftime_localized.return_value = fake_unicode_start_time
 
-        url = reverse('info', args=[text_type(self.course.id)])
+        url = reverse('info', args=[str(self.course.id)])
         response = self.client.get(url)
         expected_params = QueryDict(mutable=True)
         expected_params['notlive'] = fake_unicode_start_time
-        expected_url = u'{url}?{params}'.format(
+        expected_url = '{url}?{params}'.format(
             url=reverse('dashboard'),
             params=expected_params.urlencode()
         )
@@ -162,7 +159,7 @@ class CourseInfoLastAccessedTestCase(LoginEnrollmentTestCase, ModuleStoreTestCas
     """
 
     def setUp(self):
-        super(CourseInfoLastAccessedTestCase, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.course = CourseFactory.create()
         self.page = ItemFactory.create(
             category="course_info", parent_location=self.course.location,
@@ -175,7 +172,7 @@ class CourseInfoLastAccessedTestCase(LoginEnrollmentTestCase, ModuleStoreTestCas
         is no course content.
         """
         SelfPacedConfiguration(enable_course_home_improvements=True).save()
-        url = reverse('info', args=(six.text_type(self.course.id),))
+        url = reverse('info', args=(str(self.course.id),))
         response = self.client.get(url)
         content = pq(response.content)
         assert content('.page-header-secondary a').length == 0
@@ -206,7 +203,7 @@ class CourseInfoLastAccessedTestCase(LoginEnrollmentTestCase, ModuleStoreTestCas
             }
         )
         self.client.get(section_url)
-        info_url = reverse('info', args=(six.text_type(self.course.id),))
+        info_url = reverse('info', args=(str(self.course.id),))
 
         # Assuring a non-authenticated user cannot see the resume course button.
         resume_course_url = self.get_resume_course_url(info_url)
@@ -230,7 +227,7 @@ class CourseInfoTitleTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase):
     Tests of the CourseInfo page title site configuration options.
     """
     def setUp(self):
-        super(CourseInfoTitleTestCase, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.course = CourseFactory.create(
             org="HogwartZ",
             number="Potions_3",
@@ -292,7 +289,7 @@ class CourseInfoTitleTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase):
         Test the info page on a course with all the multiple display options
         depeding on the current site configuration
         """
-        url = reverse('info', args=(six.text_type(self.course.id),))
+        url = reverse('info', args=(str(self.course.id),))
         with with_site_configuration_context(configuration=site_config):
             response = self.client.get(url)
 
@@ -317,11 +314,11 @@ class CourseInfoTestCaseCCX(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
 
     @classmethod
     def setUpClass(cls):
-        super(CourseInfoTestCaseCCX, cls).setUpClass()
+        super().setUpClass()
         cls.course = CourseFactory.create()
 
     def setUp(self):
-        super(CourseInfoTestCaseCCX, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
 
         # Create ccx coach account
         self.coach = coach = AdminFactory.create(password="test")
@@ -334,7 +331,7 @@ class CourseInfoTestCaseCCX(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
         """
         # create ccx
         ccx = CcxFactory(course_id=self.course.id, coach=self.coach)
-        ccx_locator = CCXLocator.from_course_locator(self.course.id, six.text_type(ccx.id))
+        ccx_locator = CCXLocator.from_course_locator(self.course.id, str(ccx.id))
 
         self.setup_user()
         url = reverse('info', args=[ccx_locator])
@@ -354,7 +351,7 @@ class CourseInfoTestCaseXML(LoginEnrollmentTestCase, ModuleStoreTestCase):
         """
         Set up the tests
         """
-        super(CourseInfoTestCaseXML, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
 
         # The following test course (which lives at common/test/data/2014)
         # is closed; we're testing that a course info page still appears when
@@ -378,13 +375,13 @@ class CourseInfoTestCaseXML(LoginEnrollmentTestCase, ModuleStoreTestCase):
     @mock.patch.dict('django.conf.settings.FEATURES', {'DISABLE_START_DATES': False})
     def test_logged_in_xml(self):
         self.setup_user()
-        url = reverse('info', args=[text_type(self.xml_course_key)])
+        url = reverse('info', args=[str(self.xml_course_key)])
         resp = self.client.get(url)
         self.assertContains(resp, self.xml_data)
 
     @mock.patch.dict('django.conf.settings.FEATURES', {'DISABLE_START_DATES': False})
     def test_anonymous_user_xml(self):
-        url = reverse('info', args=[text_type(self.xml_course_key)])
+        url = reverse('info', args=[str(self.xml_course_key)])
         resp = self.client.get(url)
         self.assertNotContains(resp, self.xml_data)
 
@@ -399,12 +396,12 @@ class SelfPacedCourseInfoTestCase(LoginEnrollmentTestCase, SharedModuleStoreTest
 
     @classmethod
     def setUpClass(cls):
-        super(SelfPacedCourseInfoTestCase, cls).setUpClass()
+        super().setUpClass()
         cls.instructor_paced_course = CourseFactory.create(self_paced=False)
         cls.self_paced_course = CourseFactory.create(self_paced=True)
 
     def setUp(self):
-        super(SelfPacedCourseInfoTestCase, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         ContentTypeGatingConfig.objects.create(enabled=True, enabled_as_of=datetime(2018, 1, 1))
 
         self.setup_user()
@@ -414,7 +411,7 @@ class SelfPacedCourseInfoTestCase(LoginEnrollmentTestCase, SharedModuleStoreTest
         Fetch the given course's info page, asserting the number of SQL
         and Mongo queries.
         """
-        url = reverse('info', args=[text_type(course.id)])
+        url = reverse('info', args=[str(course.id)])
         with self.assertNumQueries(sql_queries, table_blacklist=QUERY_COUNT_TABLE_BLACKLIST):
             with check_mongo_calls(mongo_queries):
                 with mock.patch("openedx.core.djangoapps.theming.helpers.get_current_site", return_value=None):

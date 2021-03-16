@@ -1,6 +1,3 @@
-# -*- coding: utf-8 -*-
-
-
 import logging
 
 from django.db import migrations, models
@@ -47,7 +44,7 @@ class Migration(migrations.Migration):
     operations = [
         migrations.AlterUniqueTogether(
             name='certificatetemplate',
-            unique_together=set([('organization_id', 'course_key', 'mode', 'language')]),
+            unique_together={('organization_id', 'course_key', 'mode', 'language')},
         ),
         migrations.RunPython(migrations.RunPython.noop, reverse_code=revert_alter_unique)
     ]

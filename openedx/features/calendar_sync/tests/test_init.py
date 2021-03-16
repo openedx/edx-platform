@@ -3,8 +3,8 @@
 
 from django.test import TestCase
 
-from openedx.features.calendar_sync import get_calendar_event_id
 from common.djangoapps.student.tests.factories import UserFactory
+from openedx.features.calendar_sync import get_calendar_event_id
 
 TEST_PASSWORD = 'test'
 
@@ -12,7 +12,7 @@ TEST_PASSWORD = 'test'
 class TestCalendarSyncInit(TestCase):
     """ Tests for the contents of __init__.py """
     def setUp(self):
-        super(TestCalendarSyncInit, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.user = UserFactory(password=TEST_PASSWORD)
 
     def test_get_calendar_event_id(self):

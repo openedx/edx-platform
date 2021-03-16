@@ -15,13 +15,11 @@ Note: The access control logic in this file does NOT check for enrollment in
 import logging
 from datetime import datetime
 
-import six
 from django.conf import settings  # pylint: disable=unused-import
 from django.contrib.auth.models import AnonymousUser
 from edx_django_utils.monitoring import function_trace
 from opaque_keys.edx.keys import CourseKey, UsageKey
 from pytz import UTC
-from six import text_type
 from xblock.core import XBlock
 
 from lms.djangoapps.courseware.access_response import (
@@ -165,12 +163,12 @@ def has_access(user, action, obj, course_key=None):
     if isinstance(obj, UsageKey):
         return _has_access_location(user, action, obj, course_key)
 
-    if isinstance(obj, six.string_types):
+    if isinstance(obj, str):
         return _has_access_string(user, action, obj)
 
     # Passing an unknown object here is a coding error, so rather than
     # returning a default, complain.
-    raise TypeError(u"Unknown object type in has_access(): '{0}'"
+    raise TypeError("Unknown object type in has_access(): '{}'"
                     .format(type(obj)))
 
 
@@ -264,7 +262,7 @@ def _can_enroll_courselike(user, courselike):
         if cea and cea.valid_for_user(user):
             return ACCESS_GRANTED
         elif cea:
-            debug(u"Deny: CEA was already consumed by a different user {} and can't be used again by {}".format(
+            debug("Deny: CEA was already consumed by a different user {} and can't be used again by {}".format(
                 cea.user.id,
                 user.id,
             ))
@@ -471,7 +469,7 @@ def _has_group_access(descriptor, user, course_key):
                     partitions.append(partition)
             else:
                 log.debug(
-                    u"Skipping partition with ID %s in course %s because it is no longer active",
+                    "Skipping partition with ID %s in course %s because it is no longer active",
                     partition.id, course_key
                 )
         except NoSuchUserPartitionError:
@@ -653,7 +651,7 @@ def _has_access_string(user, action, perm):
         Checks for staff access
         """
         if perm != 'global':
-            debug(u"Deny: invalid permission '%s'", perm)
+            debug("Deny: invalid permission '%s'", perm)
             return ACCESS_DENIED
         return ACCESS_GRANTED if GlobalStaff().has_user(user) else ACCESS_DENIED
 
@@ -685,14 +683,14 @@ def _dispatch(table, action, user, obj):
     """
     if action in table:
         result = table[action]()
-        debug(u"%s user %s, object %s, action %s",
+        debug("%s user %s, object %s, action %s",
               'ALLOWED' if result else 'DENIED',
               user,
-              text_type(obj.location) if isinstance(obj, XBlock) else str(obj),
+              str(obj.location) if isinstance(obj, XBlock) else str(obj),
               action)
         return result
 
-    raise ValueError(u"Unknown action for object type '{0}': '{1}'".format(
+    raise ValueError("Unknown action for object type '{}': '{}'".format(
         type(obj), action))
 
 
@@ -754,7 +752,7 @@ def _has_access_to_course(user, access_level, course_key):
         return ACCESS_GRANTED
 
     if access_level not in ('staff', 'instructor'):
-        log.debug(u"Error in access._has_access_to_course access_level=%s unknown", access_level)
+        log.debug("Error in access._has_access_to_course access_level=%s unknown", access_level)
         debug("Deny: unknown access level")
         return ACCESS_DENIED
 
@@ -835,7 +833,7 @@ def _can_access_descriptor_with_milestones(user, descriptor, course_key):
     """
     if milestones_helpers.get_course_content_milestones(
         course_key,
-        six.text_type(descriptor.location),
+        str(descriptor.location),
         'requires',
         user.id
     ):

@@ -6,16 +6,20 @@ __init__.py imports from here, and is a more stable place to import from.
 import logging
 from collections import defaultdict
 from datetime import datetime
-from typing import Optional  # lint-amnesty, pylint: disable=unused-import
+from typing import Optional, List  # lint-amnesty, pylint: disable=unused-import
 
 import attr  # lint-amnesty, pylint: disable=unused-import
 from django.contrib.auth import get_user_model
+from django.db.models.query import QuerySet
 from django.db import transaction
 from edx_django_utils.cache import TieredCache, get_cache_key  # lint-amnesty, pylint: disable=unused-import
-from edx_django_utils.monitoring import function_trace
-from opaque_keys.edx.keys import CourseKey, UsageKey  # lint-amnesty, pylint: disable=unused-import
+from edx_django_utils.monitoring import function_trace, set_custom_attribute
+from opaque_keys import OpaqueKey
+from opaque_keys.edx.locator import LibraryLocator
+from opaque_keys.edx.keys import CourseKey  # lint-amnesty, pylint: disable=unused-import
 
 from ..data import (
+    ContentErrorData,
     CourseLearningSequenceData,
     CourseOutlineData,
     CourseSectionData,
@@ -26,12 +30,14 @@ from ..data import (
     VisibilityData,
 )
 from ..models import (
+    ContentError,
     CourseSection,
     CourseSectionSequence,
     CourseContext,
     CourseSequenceExam,
     LearningContext,
-    LearningSequence
+    LearningSequence,
+    PublishReport,
 )
 from .permissions import can_see_all_content
 from .processors.content_gating import ContentGatingOutlineProcessor
@@ -46,13 +52,51 @@ log = logging.getLogger(__name__)
 
 # Public API...
 __all__ = [
+    'get_content_errors',
+    'get_course_keys_with_outlines',
     'get_course_outline',
     'get_user_course_outline',
     'get_user_course_outline_details',
+    'key_supports_outlines',
     'replace_course_outline',
 ]
 
 
+def key_supports_outlines(opaque_key: OpaqueKey) -> bool:
+    """
+    Does this key-type support outlines?
+
+    Allow all non-deprecated CourseKeys except for v1 Libraries (which subclass
+    CourseKey but shouldn't). So our normal SplitMongo courses (CourseLocator)
+    will work, as will CCX courses. But libraries, pathways, and Old Mongo
+    courses will not.
+    """
+    # Get LibraryLocators out of the way first because they subclass CourseKey.
+    if isinstance(opaque_key, LibraryLocator):
+        return False
+
+    # All other CourseKey types are acceptable if they're not deprecated. There
+    # are only two at the moment though, course-v1: and ccx-v1:. The old slash-
+    # separated course IDs (Org/Course/Run) are not supported.
+    if isinstance(opaque_key, CourseKey):
+        return not opaque_key.deprecated
+
+    return False
+
+
+@function_trace('learning_sequences.api.get_course_keys_with_outlines')
+def get_course_keys_with_outlines() -> QuerySet:
+    """
+    Queryset of ContextKeys, iterable as a flat list.
+
+    The function_trace time here is a little misleading because querysets are
+    lazily evaluated. It's mostly there to get information about how often it's
+    being called and by what transactions.
+    """
+    return LearningContext.objects.values_list('context_key', flat=True)
+
+
+@function_trace('learning_sequences.api.get_course_outline')
 def get_course_outline(course_key: CourseKey) -> CourseOutlineData:
     """
     Get the outline of a course run.
@@ -61,6 +105,10 @@ def get_course_outline(course_key: CourseKey) -> CourseOutlineData:
 
     See the definition of CourseOutlineData for details about the data returned.
     """
+    # Record the course separately from the course_id usually done in views,
+    # to make sure we get useful Span information if we're invoked by things
+    # like management commands, where it may iterate through many courses.
+    set_custom_attribute('learning_sequences.api.course_id', str(course_key))
     course_context = _get_course_context_for_outline(course_key)
 
     # Check to see if it's in the cache.
@@ -149,7 +197,10 @@ def _get_course_context_for_outline(course_key: CourseKey) -> CourseContext:
         )
     try:
         course_context = (
-            LearningContext.objects.select_related('course_context').get(context_key=course_key).course_context
+            LearningContext.objects
+                           .select_related('course_context')
+                           .get(context_key=course_key)
+                           .course_context
         )
     except LearningContext.DoesNotExist:
         # Could happen if it hasn't been published.
@@ -159,6 +210,26 @@ def _get_course_context_for_outline(course_key: CourseKey) -> CourseContext:
     return course_context
 
 
+def get_content_errors(course_key: CourseKey) -> List[ContentErrorData]:
+    """
+    Get ContentErrors created in the most recent publish of this Course run.
+    """
+    try:
+        learning_context = (
+            LearningContext.objects.select_related('publish_report')
+                                   .get(context_key=course_key)
+        )
+        publish_report = learning_context.publish_report
+    except (LearningContext.DoesNotExist, PublishReport.DoesNotExist):
+        return []
+
+    return [
+        ContentErrorData(usage_key=error.usage_key, message=error.message)
+        for error in publish_report.content_errors.all().order_by('id')
+    ]
+
+
+@function_trace('learning_sequences.api.get_user_course_outline')
 def get_user_course_outline(course_key: CourseKey,
                             user: User,
                             at_time: datetime) -> UserCourseOutlineData:
@@ -175,6 +246,7 @@ def get_user_course_outline(course_key: CourseKey,
     return user_course_outline
 
 
+@function_trace('learning_sequences.api.get_user_course_outline_details')
 def get_user_course_outline_details(course_key: CourseKey,
                                     user: User,
                                     at_time: datetime) -> UserCourseOutlineDetailsData:
@@ -200,6 +272,19 @@ def get_user_course_outline_details(course_key: CourseKey,
 def _get_user_course_outline_and_processors(course_key: CourseKey,  # lint-amnesty, pylint: disable=missing-function-docstring
                                             user: User,
                                             at_time: datetime):
+    """
+    Helper function that runs the outline processors.
+
+    This function returns a UserCourseOutlineData and a dict of outline
+    processors that have executed their data loading and returned which
+    sequences to remove and which to mark as inaccessible.
+    """
+    # Record the user separately from the standard user_id that views record,
+    # because it's possible to ask for views as other users if you're global
+    # staff. Performance is going to vary based on the user we're asking the
+    # outline for, not the user who is initiating the request.
+    set_custom_attribute('learning_sequences.api.user_id', user.id)
+
     full_course_outline = get_course_outline(course_key)
     user_can_see_all_content = can_see_all_content(user, course_key)
 
@@ -214,8 +299,6 @@ def _get_user_course_outline_and_processors(course_key: CourseKey,  # lint-amnes
         ('special_exams', SpecialExamsOutlineProcessor),
         ('visibility', VisibilityOutlineProcessor),
         ('enrollment', EnrollmentOutlineProcessor),
-        # Future:
-        # ('user_partitions', UserPartitionsOutlineProcessor),
     ]
 
     # Run each OutlineProcessor in order to figure out what items we have to
@@ -231,7 +314,7 @@ def _get_user_course_outline_and_processors(course_key: CourseKey,  # lint-amnes
         processor.load_data()
         if not user_can_see_all_content:
             # function_trace lets us see how expensive each processor is being.
-            with function_trace(f'processor:{name}'):
+            with function_trace(f'learning_sequences.api.outline_processors.{name}'):
                 processor_usage_keys_removed = processor.usage_keys_to_remove(full_course_outline)
                 processor_inaccessible_sequences = processor.inaccessible_sequences(full_course_outline)
                 usage_keys_to_remove |= processor_usage_keys_removed
@@ -265,11 +348,12 @@ def _get_user_course_outline_and_processors(course_key: CourseKey,  # lint-amnes
     return user_course_outline, processors
 
 
-@function_trace('replace_course_outline')
-def replace_course_outline(course_outline: CourseOutlineData):
+@function_trace('learning_sequences.api.replace_course_outline')
+def replace_course_outline(course_outline: CourseOutlineData,
+                           content_errors: Optional[List[ContentErrorData]] = None):
     """
     Replace the model data stored for the Course Outline with the contents of
-    course_outline (a CourseOutlineData).
+    course_outline (a CourseOutlineData). Record any content errors.
 
     This isn't particularly optimized at the moment.
     """
@@ -277,18 +361,22 @@ def replace_course_outline(course_outline: CourseOutlineData):
         "Replacing CourseOutline for %s (version %s, %d sequences)",
         course_outline.course_key, course_outline.published_version, len(course_outline.sequences)
     )
+    set_custom_attribute('learning_sequences.api.course_id', str(course_outline.course_key))
+
+    if content_errors is None:
+        content_errors = []
 
     with transaction.atomic():
         # Update or create the basic CourseContext...
         course_context = _update_course_context(course_outline)
 
-        # Wipe out the CourseSectionSequences join+ordering table so we can
-        # delete CourseSection and LearningSequence objects more easily.
+        # Wipe out the CourseSectionSequences join+ordering table
         course_context.section_sequences.all().delete()
 
         _update_sections(course_outline, course_context)
         _update_sequences(course_outline, course_context)
         _update_course_section_sequences(course_outline, course_context)
+        _update_publish_report(course_outline, content_errors, course_context)
 
 
 def _update_course_context(course_outline: CourseOutlineData):
@@ -406,3 +494,38 @@ def _update_course_section_sequences(course_outline: CourseOutlineData, course_c
             else:
                 # Otherwise, delete any exams associated with it
                 CourseSequenceExam.objects.filter(course_section_sequence=course_section_sequence).delete()
+
+
+def _update_publish_report(course_outline: CourseOutlineData,
+                           content_errors: List[ContentErrorData],
+                           course_context: CourseContext):
+    """
+    Record ContentErrors for this course publish. Deletes previous errors.
+    """
+    set_custom_attribute('learning_sequences.api.num_content_errors', len(content_errors))
+    learning_context = course_context.learning_context
+    try:
+        # Normal path if we're updating a PublishReport
+        publish_report = learning_context.publish_report
+        publish_report.num_errors = len(content_errors)
+        publish_report.num_sections = len(course_outline.sections)
+        publish_report.num_sequences = len(course_outline.sequences)
+        publish_report.content_errors.all().delete()
+    except PublishReport.DoesNotExist:
+        # Case where we're creating it for the first time.
+        publish_report = PublishReport(
+            learning_context=learning_context,
+            num_errors=len(content_errors),
+            num_sections=len(course_outline.sections),
+            num_sequences=len(course_outline.sequences),
+        )
+
+    publish_report.save()
+    publish_report.content_errors.bulk_create([
+        ContentError(
+            publish_report=publish_report,
+            usage_key=error_data.usage_key,
+            message=error_data.message,
+        )
+        for error_data in content_errors
+    ])

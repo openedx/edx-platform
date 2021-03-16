@@ -13,12 +13,12 @@ from rest_framework.authentication import SessionAuthentication
 from rest_framework.generics import ListAPIView, RetrieveUpdateAPIView
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.views import APIView
-from openedx.core.lib.api.authentication import BearerAuthentication
 
 from common.djangoapps.course_modes.models import CourseMode
-from openedx.core.djangoapps.commerce.utils import ecommerce_api_client
-from openedx.core.lib.api.mixins import PutAsCreateMixin
 from common.djangoapps.util.json_request import JsonResponse
+from openedx.core.djangoapps.commerce.utils import ecommerce_api_client
+from openedx.core.lib.api.authentication import BearerAuthentication
+from openedx.core.lib.api.mixins import PutAsCreateMixin
 
 from ...utils import is_account_activation_requirement_disabled
 from .models import Course

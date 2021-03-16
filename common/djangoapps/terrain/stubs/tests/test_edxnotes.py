@@ -10,7 +10,6 @@ from uuid import uuid4
 import ddt
 import requests
 import six
-from six.moves import range
 
 from ..edxnotes import StubEdxNotesService
 
@@ -24,7 +23,7 @@ class StubEdxNotesServiceTest(unittest.TestCase):
         """
         Start the stub server.
         """
-        super(StubEdxNotesServiceTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.server = StubEdxNotesService()
         dummy_notes = self._get_dummy_notes(count=5)
         self.server.add_notes(dummy_notes)
@@ -192,7 +191,7 @@ class StubEdxNotesServiceTest(unittest.TestCase):
         updated_note = self._get_notes()[0]
         assert 'new test text' == updated_note['text']
         assert note['id'] == updated_note['id']
-        six.assertCountEqual(self, note, updated_note)
+        self.assertCountEqual(note, updated_note)
 
         response = requests.get(self._get_url("api/v1/annotations/does_not_exist"))
         assert response.status_code == 404

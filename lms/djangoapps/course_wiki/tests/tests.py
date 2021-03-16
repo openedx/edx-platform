@@ -3,10 +3,8 @@ Tests for course wiki
 """
 
 
-import six
+from unittest.mock import patch
 from django.urls import reverse
-from mock import patch
-from six import text_type
 
 from lms.djangoapps.courseware.tests.tests import LoginEnrollmentTestCase
 from openedx.features.enterprise_support.tests.mixins.enterprise import EnterpriseTestConsentRequired
@@ -20,7 +18,7 @@ class WikiRedirectTestCase(EnterpriseTestConsentRequired, LoginEnrollmentTestCas
     """
 
     def setUp(self):
-        super(WikiRedirectTestCase, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.toy = CourseFactory.create(org='edX', course='toy', display_name='2012_Fall')
 
         # Create two accounts
@@ -49,7 +47,7 @@ class WikiRedirectTestCase(EnterpriseTestConsentRequired, LoginEnrollmentTestCas
 
         self.enroll(self.toy)
 
-        referer = reverse("progress", kwargs={'course_id': text_type(self.toy.id)})
+        referer = reverse("progress", kwargs={'course_id': str(self.toy.id)})
         destination = reverse("wiki:get", kwargs={'path': 'some/fake/wiki/page/'})
 
         redirected_to = referer.replace("progress", "wiki/some/fake/wiki/page/")
@@ -78,7 +76,7 @@ class WikiRedirectTestCase(EnterpriseTestConsentRequired, LoginEnrollmentTestCas
 
         self.enroll(self.toy)
 
-        referer = reverse("progress", kwargs={'course_id': text_type(self.toy.id)})
+        referer = reverse("progress", kwargs={'course_id': str(self.toy.id)})
         destination = reverse("wiki:get", kwargs={'path': 'some/fake/wiki/page/'})
 
         resp = self.client.get(destination, HTTP_REFERER=referer)
@@ -90,8 +88,8 @@ class WikiRedirectTestCase(EnterpriseTestConsentRequired, LoginEnrollmentTestCas
         The user must be enrolled in the course to see the page.
         """
 
-        course_wiki_home = reverse('course_wiki', kwargs={'course_id': text_type(course.id)})
-        referer = reverse("progress", kwargs={'course_id': text_type(course.id)})
+        course_wiki_home = reverse('course_wiki', kwargs={'course_id': str(course.id)})
+        referer = reverse("progress", kwargs={'course_id': str(course.id)})
 
         resp = self.client.get(course_wiki_home, follow=True, HTTP_REFERER=referer)
 
@@ -103,7 +101,7 @@ class WikiRedirectTestCase(EnterpriseTestConsentRequired, LoginEnrollmentTestCas
         assert resp.status_code == 200
 
         self.has_course_navigator(resp)
-        self.assertContains(resp, u'<h3 class="entry-title">{}</h3>'.format(course.display_name_with_default))
+        self.assertContains(resp, f'<h3 class="entry-title">{course.display_name_with_default}</h3>')
 
     def has_course_navigator(self, resp):
         """
@@ -123,7 +121,7 @@ class WikiRedirectTestCase(EnterpriseTestConsentRequired, LoginEnrollmentTestCas
         self.create_course_page(self.toy)
 
         course_wiki_page = reverse('wiki:get', kwargs={'path': self.toy.wiki_slug + '/'})
-        referer = reverse("courseware", kwargs={'course_id': text_type(self.toy.id)})
+        referer = reverse("courseware", kwargs={'course_id': str(self.toy.id)})
 
         resp = self.client.get(course_wiki_page, follow=True, HTTP_REFERER=referer)
 
@@ -143,7 +141,7 @@ class WikiRedirectTestCase(EnterpriseTestConsentRequired, LoginEnrollmentTestCas
 
         self.login(self.student, self.password)
         course_wiki_page = reverse('wiki:get', kwargs={'path': self.toy.wiki_slug + '/'})
-        referer = reverse("courseware", kwargs={'course_id': text_type(self.toy.id)})
+        referer = reverse("courseware", kwargs={'course_id': str(self.toy.id)})
 
         # When not enrolled, we should get a 302
         resp = self.client.get(course_wiki_page, follow=False, HTTP_REFERER=referer)
@@ -152,7 +150,7 @@ class WikiRedirectTestCase(EnterpriseTestConsentRequired, LoginEnrollmentTestCas
         # and end up at the course about page
         resp = self.client.get(course_wiki_page, follow=True, HTTP_REFERER=referer)
         target_url, __ = resp.redirect_chain[-1]
-        assert target_url.endswith(reverse('about_course', args=[text_type(self.toy.id)]))
+        assert target_url.endswith(reverse('about_course', args=[str(self.toy.id)]))
 
     @patch.dict("django.conf.settings.FEATURES", {'ALLOW_WIKI_ROOT_ACCESS': True})
     def test_redirect_when_not_logged_in(self):
@@ -185,9 +183,9 @@ class WikiRedirectTestCase(EnterpriseTestConsentRequired, LoginEnrollmentTestCas
         course = 'a-very-long-course-name'
         display_name = 'very-long-display-name'
         # This is how wiki_slug is generated in cms/djangoapps/contentstore/views/course.py.
-        wiki_slug = "{0}.{1}.{2}".format(org, course, display_name)
+        wiki_slug = f"{org}.{course}.{display_name}"
 
-        assert len(((org + course) + display_name)) == 65
+        assert len((org + course) + display_name) == 65
         # sanity check
 
         course = CourseFactory.create(org=org, course=course, display_name=display_name, wiki_slug=wiki_slug)
@@ -197,7 +195,7 @@ class WikiRedirectTestCase(EnterpriseTestConsentRequired, LoginEnrollmentTestCas
         self.create_course_page(course)
 
         course_wiki_page = reverse('wiki:get', kwargs={'path': course.wiki_slug + '/'})
-        referer = reverse("courseware", kwargs={'course_id': text_type(course.id)})
+        referer = reverse("courseware", kwargs={'course_id': str(course.id)})
 
         resp = self.client.get(course_wiki_page, follow=True, HTTP_REFERER=referer)
         assert resp.status_code == 200
@@ -218,12 +216,12 @@ class WikiRedirectTestCase(EnterpriseTestConsentRequired, LoginEnrollmentTestCas
 
         # However, for private wikis, enrolled users must pass through the consent gate
         # (Unenrolled users are redirected to course/about)
-        course_id = six.text_type(course.id)
+        course_id = str(course.id)
         self.login(self.student, self.password)
         self.enroll(course)
 
         for (url, status_code) in (
                 (reverse('course_wiki', kwargs={'course_id': course_id}), 302),
-                ('/courses/{}/wiki/'.format(course_id), 200),
+                (f'/courses/{course_id}/wiki/', 200),
         ):
             self.verify_consent_required(self.client, url, status_code=status_code)  # lint-amnesty, pylint: disable=no-value-for-parameter

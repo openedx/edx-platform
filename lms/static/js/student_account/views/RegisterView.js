@@ -454,15 +454,22 @@
                         _.map(
                             // Something is passing this 'undefined'. Protect against this.
                             JSON.parse(error.responseText || '[]'),
-                            function(errorList) {
-                                return _.map(
-                                    errorList,
-                                    function(errorItem) {
-                                        return StringUtils.interpolate('<li>{error}</li>', {
-                                            error: errorItem.user_message
-                                        });
-                                    }
-                                );
+                            function(errorList, key) {
+                                if (key === 'error_code') {
+                                    return null;
+                                } else {
+                                    return _.map(
+                                        errorList,
+                                        function(errorItem) {
+                                            return StringUtils.interpolate('<li {suppressAttr} >{error}</li>', {
+                                                error: errorItem.user_message,
+                                                suppressAttr: (
+                                                  key === 'email' || key === 'username'
+                                                ) ? 'data-hj-suppress' : ''
+                                            });
+                                        }
+                                  );
+                                }
                             }
                         )
                     );

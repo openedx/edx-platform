@@ -98,7 +98,7 @@ BLOCK_STRUCTURES_SETTINGS['PRUNING_ACTIVE'] = True
 update_module_store_settings(
     MODULESTORE,
     module_store_options={
-        'default_class': 'xmodule.raw_module.RawDescriptor',
+        'default_class': 'xmodule.hidden_module.HiddenDescriptor',
         'fs_root': TEST_ROOT / "data",
     },
     doc_store_settings={
@@ -332,8 +332,6 @@ LOGISTRATION_API_RATELIMIT = '5/m'
 REGISTRATION_VALIDATION_RATELIMIT = '5/minute'
 RESET_PASSWORD_TOKEN_VALIDATE_API_RATELIMIT = '2/m'
 RESET_PASSWORD_API_RATELIMIT = '2/m'
-# Don't tolerate deprecated edx-platform import usage in tests.
-ERROR_ON_DEPRECATED_EDX_PLATFORM_IMPORTS = True
 
 ############### Settings for proctoring  ###############
 PROCTORING_USER_OBFUSCATION_KEY = 'test_key'

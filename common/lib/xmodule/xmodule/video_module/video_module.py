@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Video is ungraded Xmodule for support video content.
 It's new improved video module, which support additional feature:
 - Can play non-YouTube video sources via in-browser HTML5 video player.
@@ -20,7 +19,6 @@ import logging
 from collections import OrderedDict, defaultdict
 from operator import itemgetter
 
-import six
 from django.conf import settings
 from edx_django_utils.cache import RequestCache
 from lxml import etree
@@ -105,8 +103,8 @@ log = logging.getLogger(__name__)
 #  `django.utils.translation.ugettext_noop` because Django cannot be imported in this file
 _ = lambda text: text
 
-EXPORT_IMPORT_COURSE_DIR = u'course'
-EXPORT_IMPORT_STATIC_DIR = u'static'
+EXPORT_IMPORT_COURSE_DIR = 'course'
+EXPORT_IMPORT_STATIC_DIR = 'static'
 
 
 @XBlock.wants('settings', 'completion', 'i18n', 'request_cache')
@@ -338,7 +336,7 @@ class VideoBlock(
         if getattr(self, 'video_speed_optimizations', True) and cdn_url:
             branding_info = BrandingInfoConfig.get_config().get(self.system.user_location)
 
-            if self.edx_video_id and edxval_api and video_status != u'external':
+            if self.edx_video_id and edxval_api and video_status != 'external':
                 for index, source_url in enumerate(sources):
                     new_url = rewrite_video_url(cdn_url, source_url)
                     if new_url:
@@ -478,7 +476,7 @@ class VideoBlock(
         is the override of the general XBlock method, and it will also ask
         its superclass to validate.
         """
-        validation = super(VideoBlock, self).validate()  # lint-amnesty, pylint: disable=super-with-arguments
+        validation = super().validate()
         if not isinstance(validation, StudioValidation):
             validation = StudioValidation.copy(validation)
 
@@ -564,7 +562,7 @@ class VideoBlock(
 
     @property
     def editable_metadata_fields(self):
-        editable_fields = super(VideoBlock, self).editable_metadata_fields  # lint-amnesty, pylint: disable=super-with-arguments
+        editable_fields = super().editable_metadata_fields
 
         settings_service = self.runtime.service(self, 'settings')
         if settings_service:
@@ -593,7 +591,7 @@ class VideoBlock(
         possible_sub_ids = [self.sub, self.youtube_id_1_0] + get_html5_ids(self.html5_sources)
         for sub_id in possible_sub_ids:
             try:
-                _, sub_id, _ = get_transcript(self, lang=u'en', output_format=Transcript.TXT)
+                _, sub_id, _ = get_transcript(self, lang='en', output_format=Transcript.TXT)
                 transcripts_info['transcripts'] = dict(transcripts_info['transcripts'], en=sub_id)
                 break
             except NotFoundError:
@@ -675,7 +673,7 @@ class VideoBlock(
         # Mild workaround to ensure that tests pass -- if a field
         # is set to its default value, we don't need to write it out.
         if youtube_string and youtube_string != '1.00:3_yD_cEKoCk':
-            xml.set('youtube', six.text_type(youtube_string))
+            xml.set('youtube', str(youtube_string))
         xml.set('url_name', self.url_name)
         attrs = [
             ('display_name', self.display_name),
@@ -692,13 +690,13 @@ class VideoBlock(
             if value:
                 if key in self.fields and self.fields[key].is_set_on(self):  # lint-amnesty, pylint: disable=unsubscriptable-object, unsupported-membership-test
                     try:
-                        xml.set(key, six.text_type(value))
+                        xml.set(key, str(value))
                     except UnicodeDecodeError:
                         exception_message = format_xml_exception_message(self.location, key, value)
                         log.exception(exception_message)
                         # If exception is UnicodeDecodeError set value using unicode 'utf-8' scheme.
                         log.info("Setting xml value using 'utf-8' scheme.")
-                        xml.set(key, six.text_type(value, 'utf-8'))
+                        xml.set(key, str(value, 'utf-8'))
                     except ValueError:
                         exception_message = format_xml_exception_message(self.location, key, value)
                         log.exception(exception_message)
@@ -740,7 +738,7 @@ class VideoBlock(
                     video_id=edx_video_id,
                     resource_fs=resource_fs,
                     static_dir=EXPORT_IMPORT_STATIC_DIR,
-                    course_id=six.text_type(self.runtime.course_id.for_branch(None))
+                    course_id=str(self.runtime.course_id.for_branch(None))
                 )
                 # Update xml with edxval metadata
                 xml.append(exported_metadata['xml'])
@@ -780,15 +778,15 @@ class VideoBlock(
             A full youtube url to the video whose ID is passed in
         """
         if youtube_id:
-            return u'https://www.youtube.com/watch?v={0}'.format(youtube_id)
+            return f'https://www.youtube.com/watch?v={youtube_id}'
         else:
-            return u''
+            return ''
 
     def get_context(self):
         """
         Extend context by data for transcript basic tab.
         """
-        _context = super(VideoBlock, self).get_context()  # lint-amnesty, pylint: disable=super-with-arguments
+        _context = super().get_context()
 
         metadata_fields = copy.deepcopy(self.editable_metadata_fields)
 
@@ -891,7 +889,7 @@ class VideoBlock(
         Arguments:
             id_generator is used to generate course-specific urls and identifiers
         """
-        if isinstance(xml, six.string_types):
+        if isinstance(xml, str):
             xml = etree.fromstring(xml)
 
         field_data = {}
@@ -937,7 +935,7 @@ class VideoBlock(
                     normalized_speed = speed[:-1] if speed.endswith('0') else speed
                     # If the user has specified html5 sources, make sure we don't use the default video
                     if youtube_id != '' or 'html5_sources' in field_data:
-                        field_data['youtube_id_{0}'.format(normalized_speed.replace('.', '_'))] = youtube_id
+                        field_data['youtube_id_{}'.format(normalized_speed.replace('.', '_'))] = youtube_id
             elif attr in conversions:
                 field_data[attr] = conversions[attr](value)
             elif attr not in cls.fields:  # lint-amnesty, pylint: disable=unsupported-membership-test
@@ -1016,7 +1014,7 @@ class VideoBlock(
         return edx_video_id
 
     def index_dictionary(self):
-        xblock_body = super(VideoBlock, self).index_dictionary()  # lint-amnesty, pylint: disable=super-with-arguments
+        xblock_body = super().index_dictionary()
         video_body = {
             "display_name": self.display_name,
         }
@@ -1061,7 +1059,7 @@ class VideoBlock(
         """
         Returns the VAL data for the requested video profiles for the given course.
         """
-        return edxval_api.get_video_info_for_course_and_profiles(six.text_type(course_id), video_profile_names)
+        return edxval_api.get_video_info_for_course_and_profiles(str(course_id), video_profile_names)
 
     def student_view_data(self, context=None):
         """

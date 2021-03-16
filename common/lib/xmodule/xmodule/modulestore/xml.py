@@ -13,7 +13,6 @@ from collections import defaultdict
 from contextlib import contextmanager
 from importlib import import_module
 
-import six
 from django.utils.encoding import python_2_unicode_compatible
 from edx_django_utils.monitoring import set_custom_attribute
 from fs.osfs import OSFS
@@ -128,9 +127,9 @@ class ImportSystem(XMLParsingSystem, MakoDescriptorSystem):  # lint-amnesty, pyl
                     # put it in the error tracker--content folks need to see it.
 
                     if tag in need_uniq_names:
-                        error_tracker(u"PROBLEM: no name of any kind specified for {tag}.  Student "
-                                      u"state will not be properly tracked for this module.  Problem xml:"
-                                      u" '{xml}...'".format(tag=tag, xml=xml[:100]))
+                        error_tracker("PROBLEM: no name of any kind specified for {tag}.  Student "
+                                      "state will not be properly tracked for this module.  Problem xml:"
+                                      " '{xml}...'".format(tag=tag, xml=xml[:100]))
                     else:
                         # TODO (vshnayder): We may want to enable this once course repos are cleaned up.
                         # (or we may want to give up on the requirement for non-state-relevant issues...)
@@ -143,8 +142,8 @@ class ImportSystem(XMLParsingSystem, MakoDescriptorSystem):  # lint-amnesty, pyl
                     # doesn't store state, don't complain about things that are
                     # hashed.
                     if tag in need_uniq_names:
-                        msg = (u"Non-unique url_name in xml.  This may break state tracking for content."
-                               u"  url_name={0}.  Content={1}".format(url_name, xml[:100]))
+                        msg = ("Non-unique url_name in xml.  This may break state tracking for content."
+                               "  url_name={}.  Content={}".format(url_name, xml[:100]))
                         error_tracker("PROBLEM: " + msg)
                         log.warning(msg)
                         # Just set name to fallback_name--if there are multiple things with the same fallback name,
@@ -181,14 +180,14 @@ class ImportSystem(XMLParsingSystem, MakoDescriptorSystem):  # lint-amnesty, pyl
                 msg = "Error loading from xml. %s"
                 log.warning(
                     msg,
-                    six.text_type(err)[:200],
+                    str(err)[:200],
                     # Normally, we don't want lots of exception traces in our logs from common
                     # content problems.  But if you're debugging the xml loading code itself,
                     # uncomment the next line.
                     # exc_info=True
                 )
 
-                msg = msg % (six.text_type(err)[:200])
+                msg = msg % (str(err)[:200])
 
                 self.error_tracker(msg)
                 err_msg = msg + "\n" + exc_info_to_str(sys.exc_info())
@@ -221,7 +220,7 @@ class ImportSystem(XMLParsingSystem, MakoDescriptorSystem):  # lint-amnesty, pyl
             descriptor.save()
             return descriptor
 
-        render_template = lambda template, context: u''
+        render_template = lambda template, context: ''
 
         # TODO (vshnayder): we are somewhat architecturally confused in the loading code:
         # load_item should actually be get_instance, because it expects the course-specific
@@ -234,7 +233,7 @@ class ImportSystem(XMLParsingSystem, MakoDescriptorSystem):  # lint-amnesty, pyl
 
         id_manager = CourseImportLocationManager(course_id, target_course_id)
 
-        super(ImportSystem, self).__init__(  # lint-amnesty, pylint: disable=super-with-arguments
+        super().__init__(
             load_item=load_item,
             resources_fs=resources_fs,
             render_template=render_template,
@@ -258,7 +257,7 @@ class CourseLocationManager(OpaqueKeyReader, AsideKeyGenerator):
     based within a course
     """
     def __init__(self, course_id):
-        super(CourseLocationManager, self).__init__()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().__init__()
         self.course_id = course_id
         self.autogen_ids = itertools.count(0)
 
@@ -298,7 +297,7 @@ class CourseImportLocationManager(CourseLocationManager):
     see https://openedx.atlassian.net/browse/MA-417 as a pending TODO.
     """
     def __init__(self, course_id, target_course_id):
-        super(CourseImportLocationManager, self).__init__(course_id=course_id)  # lint-amnesty, pylint: disable=super-with-arguments
+        super().__init__(course_id=course_id)
         self.target_course_id = target_course_id
 
 
@@ -326,7 +325,7 @@ class XMLModuleStore(ModuleStoreReadBase):
             source_dirs or course_ids (list of str): If specified, the list of source_dirs or course_ids to load.
                 Otherwise, load all courses. Note, providing both
         """
-        super(XMLModuleStore, self).__init__(**kwargs)  # lint-amnesty, pylint: disable=super-with-arguments
+        super().__init__(**kwargs)
 
         self.data_dir = path(data_dir)
         self.modules = defaultdict(dict)  # course_id -> dict(location -> XBlock)
@@ -378,10 +377,10 @@ class XMLModuleStore(ModuleStoreReadBase):
         try:
             course_descriptor = self.load_course(course_dir, course_ids, errorlog.tracker, target_course_id)
         except Exception as exc:  # pylint: disable=broad-except
-            msg = "ERROR: Failed to load courselike '{0}': {1}".format(
-                course_dir.encode("utf-8"), six.text_type(exc)
+            msg = "ERROR: Failed to load courselike '{}': {}".format(
+                course_dir.encode("utf-8"), str(exc)
             )
-            set_custom_attribute('course_import_failure', "Courselike load failure: {}".format(msg))
+            set_custom_attribute('course_import_failure', f"Courselike load failure: {msg}")
             log.exception(msg)
             errorlog.tracker(msg)
             self.errored_courses[course_dir] = errorlog
@@ -424,8 +423,8 @@ class XMLModuleStore(ModuleStoreReadBase):
         try:
             with open(policy_path) as f:
                 return json.load(f)
-        except (IOError, ValueError) as err:
-            msg = "ERROR: loading courselike policy from {0}".format(policy_path)
+        except (OSError, ValueError) as err:
+            msg = f"ERROR: loading courselike policy from {policy_path}"
             tracker(msg)
             log.warning(msg + " " + str(err))  # lint-amnesty, pylint: disable=logging-not-lazy
         return {}
@@ -478,7 +477,7 @@ class XMLModuleStore(ModuleStoreReadBase):
 
                 # VS[compat]: remove once courses use the policy dirs.
                 if policy == {}:
-                    old_policy_path = self.data_dir / course_dir / 'policies' / '{0}.json'.format(url_name)
+                    old_policy_path = self.data_dir / course_dir / 'policies' / f'{url_name}.json'
                     policy = self.load_policy(old_policy_path, tracker)
             else:
                 policy = {}
@@ -608,7 +607,7 @@ class XMLModuleStore(ModuleStoreReadBase):
                 with open(file_path) as field_content_file:
                     field_data = json.load(field_content_file)
                     data_content = {field: field_data}
-        except (IOError, ValueError):
+        except (OSError, ValueError):
             # ignore this exception
             # only new exported courses which use content fields other than 'metadata' and 'data'
             # will have this file '{dirname}.{field_name}.json'
@@ -627,7 +626,7 @@ class XMLModuleStore(ModuleStoreReadBase):
             if filepath.endswith('~'):  # skip *~ files
                 continue
 
-            with io.open(filepath) as f:
+            with open(filepath) as f:
                 try:
                     if filepath.find('.json') != -1:
                         # json file with json data content
@@ -638,7 +637,7 @@ class XMLModuleStore(ModuleStoreReadBase):
                             try:
                                 # get and update data field in xblock runtime
                                 module = system.load_item(loc)
-                                for key, value in six.iteritems(data_content):
+                                for key, value in data_content.items():
                                     setattr(module, key, value)
                                 module.save()
                             except ItemNotFoundError:
@@ -681,8 +680,8 @@ class XMLModuleStore(ModuleStoreReadBase):
                         self.modules[course_descriptor.id][module.scope_ids.usage_id] = module
                 except Exception as exc:  # pylint: disable=broad-except
                     logging.exception("Failed to load %s. Skipping... \
-                            Exception: %s", filepath, six.text_type(exc))
-                    system.error_tracker("ERROR: " + six.text_type(exc))
+                            Exception: %s", filepath, str(exc))
+                    system.error_tracker("ERROR: " + str(exc))
 
     def has_item(self, usage_key):
         """
@@ -756,7 +755,7 @@ class XMLModuleStore(ModuleStoreReadBase):
                 for fields in [settings, content, qualifiers]
             )
 
-        for mod_loc, module in six.iteritems(self.modules[course_id]):
+        for mod_loc, module in self.modules[course_id].items():
             if _block_matches_all(mod_loc, module):
                 items.append(module)
 
@@ -796,7 +795,7 @@ class XMLModuleStore(ModuleStoreReadBase):
         Return a dictionary of course_dir -> [(msg, exception_str)], for each
         course_dir where course loading failed.
         """
-        return dict((k, self.errored_courses[k].errors) for k in self.errored_courses)
+        return {k: self.errored_courses[k].errors for k in self.errored_courses}
 
     def get_orphans(self, course_key, **kwargs):
         """
@@ -847,7 +846,7 @@ class XMLModuleStore(ModuleStoreReadBase):
         A context manager for temporarily setting the branch value for the store to the given branch_setting.
         """
         if branch_setting != ModuleStoreEnum.Branch.published_only:
-            raise ValueError(u"Cannot set branch setting to {} on a ReadOnly store".format(branch_setting))
+            raise ValueError(f"Cannot set branch setting to {branch_setting} on a ReadOnly store")
         yield
 
     def _find_course_asset(self, asset_key):

@@ -89,7 +89,7 @@ class Command(BaseCommand):  # lint-amnesty, pylint: disable=missing-class-docst
             v = random.uniform(0, 1)
             group = group_from_value(groups, v)
             group_objects[group].users.add(user)
-            f.write(u"Assigned user {name} ({id}) to {group}\n".format(
+            f.write("Assigned user {name} ({id}) to {group}\n".format(
                 name=user.username,
                 id=user.id,
                 group=group

@@ -2,7 +2,7 @@
 Account constants
 """
 
-
+from django.conf import settings
 from django.utils.text import format_lazy
 from django.utils.translation import ugettext_lazy as _
 
@@ -15,7 +15,8 @@ NAME_MAX_LENGTH = 255
 
 # The minimum and maximum length for the username account field
 USERNAME_MIN_LENGTH = 2
-USERNAME_MAX_LENGTH = 30
+# Note: 30 chars is the default for historical reasons. Django uses 150 as the username length since 1.10
+USERNAME_MAX_LENGTH = getattr(settings, 'USERNAME_MAX_LENGTH', 30)
 
 # The minimum and maximum length for the email account field
 EMAIL_MIN_LENGTH = 3

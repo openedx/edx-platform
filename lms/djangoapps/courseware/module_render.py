@@ -9,7 +9,6 @@ import textwrap
 from collections import OrderedDict
 from functools import partial
 
-import six
 from completion.waffle import ENABLE_COMPLETION_TRACKING_SWITCH
 from completion.models import BlockCompletion
 from django.conf import settings
@@ -35,7 +34,6 @@ from opaque_keys.edx.keys import CourseKey, UsageKey
 from requests.auth import HTTPBasicAuth
 from rest_framework.decorators import api_view
 from rest_framework.exceptions import APIException
-from six import text_type
 from web_fragments.fragment import Fragment
 from xblock.core import XBlock
 from xblock.django.request import django_to_webob_request, webob_to_django_response
@@ -196,7 +194,7 @@ def toc_for_course(user, request, course, active_chapter, active_section, field_
             display_id = slugify(chapter.display_name_with_default_escaped)
             local_hide_from_toc = False
             if required_content:
-                if six.text_type(chapter.location) not in required_content:
+                if str(chapter.location) not in required_content:
                     local_hide_from_toc = True
 
             # Skip the current chapter if a hide flag is tripped
@@ -271,8 +269,8 @@ def _add_timed_exam_info(user, course, section, section_context):
         try:
             timed_exam_attempt_context = get_attempt_status_summary(
                 user.id,
-                six.text_type(course.id),
-                six.text_type(section.location)
+                str(course.id),
+                str(section.location)
             )
         except Exception as ex:  # pylint: disable=broad-except
             # safety net in case something blows up in edx_proctoring
@@ -358,21 +356,21 @@ def display_access_messages(user, block, view, frag, context):  # pylint: disabl
     prior_sibling = blocked_prior_sibling.get_cached_response(block.parent)
 
     if prior_sibling.is_found and prior_sibling.value.error_code == load_access.error_code:
-        return Fragment(u"")
+        return Fragment("")
     else:
         blocked_prior_sibling.set(block.parent, load_access)
 
     if load_access.user_fragment:
         msg_fragment = load_access.user_fragment
     elif load_access.user_message:
-        msg_fragment = Fragment(textwrap.dedent(HTML(u"""\
+        msg_fragment = Fragment(textwrap.dedent(HTML("""\
             <div>{}</div>
         """).format(load_access.user_message)))
     else:
-        msg_fragment = Fragment(u"")
+        msg_fragment = Fragment("")
 
     if load_access.developer_message and has_access(user, 'staff', block, block.scope_ids.usage_id.course_key):
-        msg_fragment.content += textwrap.dedent(HTML(u"""\
+        msg_fragment.content += textwrap.dedent(HTML("""\
             <div>{}</div>
         """).format(load_access.developer_message))
 
@@ -480,9 +478,9 @@ def get_module_system_for_user(
         relative_xqueue_callback_url = reverse(
             'xqueue_callback',
             kwargs=dict(
-                course_id=text_type(course_id),
+                course_id=str(course_id),
                 userid=str(user.id),
-                mod_id=text_type(descriptor.location),
+                mod_id=str(descriptor.location),
                 dispatch=dispatch
             ),
         )
@@ -604,7 +602,7 @@ def get_module_system_for_user(
         else:
             requested_user_id = event.get('user_id', user.id)
             if requested_user_id != user.id:
-                log.warning(u"{} tried to submit a completion on behalf of {}".format(user, requested_user_id))
+                log.warning(f"{user} tried to submit a completion on behalf of {requested_user_id}")
                 return
 
             # If blocks explicitly declare support for the new completion API,
@@ -695,8 +693,8 @@ def get_module_system_for_user(
         block_wrappers.append(partial(
             wrap_xblock,
             'LmsRuntime',
-            extra_data={'course-id': text_type(course_id)},
-            usage_id_serializer=lambda usage_id: quote_slashes(text_type(usage_id)),
+            extra_data={'course-id': str(course_id)},
+            usage_id_serializer=lambda usage_id: quote_slashes(str(usage_id)),
             request_token=request_token,
         ))
 
@@ -724,7 +722,7 @@ def get_module_system_for_user(
     block_wrappers.append(partial(
         replace_jump_to_id_urls,
         course_id,
-        reverse('jump_to_id', kwargs={'course_id': text_type(course_id), 'module_id': ''}),
+        reverse('jump_to_id', kwargs={'course_id': str(course_id), 'module_id': ''}),
     ))
 
     block_wrappers.append(partial(display_access_messages, user))
@@ -763,7 +761,7 @@ def get_module_system_for_user(
     field_data = DateLookupFieldData(descriptor._field_data, course_id, user)  # pylint: disable=protected-access
     field_data = LmsFieldData(field_data, student_data)
 
-    user_is_staff = bool(has_access(user, u'staff', descriptor.location, course_id))
+    user_is_staff = bool(has_access(user, 'staff', descriptor.location, course_id))
 
     system = LmsModuleSystem(
         track_function=track_function,
@@ -792,7 +790,7 @@ def get_module_system_for_user(
         replace_jump_to_id_urls=partial(
             static_replace.replace_jump_to_id_urls,
             course_id=course_id,
-            jump_to_id_base_url=reverse('jump_to_id', kwargs={'course_id': text_type(course_id), 'module_id': ''})
+            jump_to_id_base_url=reverse('jump_to_id', kwargs={'course_id': str(course_id), 'module_id': ''})
         ),
         node_path=settings.NODE_PATH,
         publish=publish,
@@ -831,18 +829,18 @@ def get_module_system_for_user(
         try:
             position = int(position)
         except (ValueError, TypeError):
-            log.exception(u'Non-integer %r passed as position.', position)
+            log.exception('Non-integer %r passed as position.', position)
             position = None
 
     system.set('position', position)
 
-    system.set(u'user_is_staff', user_is_staff)
-    system.set(u'user_is_admin', bool(has_access(user, u'staff', 'global')))
-    system.set(u'user_is_beta_tester', CourseBetaTesterRole(course_id).has_user(user))
-    system.set(u'days_early_for_beta', descriptor.days_early_for_beta)
+    system.set('user_is_staff', user_is_staff)
+    system.set('user_is_admin', bool(has_access(user, 'staff', 'global')))
+    system.set('user_is_beta_tester', CourseBetaTesterRole(course_id).has_user(user))
+    system.set('days_early_for_beta', descriptor.days_early_for_beta)
 
     # make an ErrorBlock -- assuming that the descriptor's system is ok
-    if has_access(user, u'staff', descriptor.location, course_id):
+    if has_access(user, 'staff', descriptor.location, course_id):
         system.error_descriptor_class = ErrorBlock
     else:
         system.error_descriptor_class = NonStaffErrorBlock
@@ -942,7 +940,7 @@ def load_single_xblock(request, user_id, course_id, usage_key_string, course=Non
         will_recheck_access=will_recheck_access
     )
     if instance is None:
-        msg = u"No module {0} for user {1}--access denied?".format(usage_key_string, user)
+        msg = f"No module {usage_key_string} for user {user}--access denied?"
         log.debug(msg)
         raise Http404
     return instance
@@ -1042,7 +1040,7 @@ def handle_xblock_callback(request, course_id, usage_id, handler, suffix=None):
                 user_auth_tuple = authenticator.authenticate(request)
             except APIException:
                 log.exception(
-                    u"XBlock handler %r failed to authenticate with %s", handler, authenticator.__class__.__name__
+                    "XBlock handler %r failed to authenticate with %s", handler, authenticator.__class__.__name__
                 )
             else:
                 if user_auth_tuple is not None:
@@ -1059,13 +1057,13 @@ def handle_xblock_callback(request, course_id, usage_id, handler, suffix=None):
     try:
         course_key = CourseKey.from_string(course_id)
     except InvalidKeyError:
-        raise Http404(u'{} is not a valid course key'.format(course_id))  # lint-amnesty, pylint: disable=raise-missing-from
+        raise Http404(f'{course_id} is not a valid course key')  # lint-amnesty, pylint: disable=raise-missing-from
 
     with modulestore().bulk_operations(course_key):
         try:
             course = modulestore().get_course(course_key)
         except ItemNotFoundError:
-            raise Http404(u'{} does not exist in the modulestore'.format(course_id))  # lint-amnesty, pylint: disable=raise-missing-from
+            raise Http404(f'{course_id} does not exist in the modulestore')  # lint-amnesty, pylint: disable=raise-missing-from
 
         return _invoke_xblock_handler(request, course_id, usage_id, handler, suffix, course=course)
 
@@ -1090,7 +1088,7 @@ def get_module_by_usage_id(request, course_id, usage_id, disable_staff_debug_inf
         descriptor_orig_usage_key, descriptor_orig_version = modulestore().get_block_original_usage(usage_key)
     except ItemNotFoundError:
         log.warning(
-            u"Invalid location for course id %s: %s",
+            "Invalid location for course id %s: %s",
             usage_key.course_key,
             usage_key
         )
@@ -1100,14 +1098,14 @@ def get_module_by_usage_id(request, course_id, usage_id, disable_staff_debug_inf
         'module': {
             # xss-lint: disable=python-deprecated-display-name
             'display_name': descriptor.display_name_with_default_escaped,
-            'usage_key': six.text_type(descriptor.location),
+            'usage_key': str(descriptor.location),
         }
     }
 
     # For blocks that are inherited from a content library, we add some additional metadata:
     if descriptor_orig_usage_key is not None:
-        tracking_context['module']['original_usage_key'] = six.text_type(descriptor_orig_usage_key)
-        tracking_context['module']['original_usage_version'] = six.text_type(descriptor_orig_version)
+        tracking_context['module']['original_usage_key'] = str(descriptor_orig_usage_key)
+        tracking_context['module']['original_usage_version'] = str(descriptor_orig_version)
 
     unused_masquerade, user = setup_masquerade(request, course_id, has_access(user, 'staff', descriptor, course_id))
     field_data_cache = FieldDataCache.cache_for_descriptor_descendents(
@@ -1129,7 +1127,7 @@ def get_module_by_usage_id(request, course_id, usage_id, disable_staff_debug_inf
     if instance is None:
         # Either permissions just changed, or someone is trying to be clever
         # and load something they shouldn't have access to.
-        log.debug(u"No module %s for user %s -- access denied?", usage_key, user)
+        log.debug("No module %s for user %s -- access denied?", usage_key, user)
         raise Http404
 
     return (instance, tracking_context)
@@ -1172,14 +1170,14 @@ def _invoke_xblock_handler(request, course_id, usage_id, handler, suffix, course
         else:
             block_usage_key = usage_key
         instance, tracking_context = get_module_by_usage_id(
-            request, course_id, six.text_type(block_usage_key), course=course
+            request, course_id, str(block_usage_key), course=course
         )
 
         # Name the transaction so that we can view XBlock handlers separately in
         # New Relic. The suffix is necessary for XModule handlers because the
         # "handler" in those cases is always just "xmodule_handler".
-        nr_tx_name = "{}.{}".format(instance.__class__.__name__, handler)
-        nr_tx_name += "/{}".format(suffix) if (suffix and handler == "xmodule_handler") else ""
+        nr_tx_name = f"{instance.__class__.__name__}.{handler}"
+        nr_tx_name += f"/{suffix}" if (suffix and handler == "xmodule_handler") else ""
         set_monitoring_transaction_name(nr_tx_name, group="Python/XBlock/Handler")
 
         tracking_context_name = 'module_callback_handler'
@@ -1202,7 +1200,7 @@ def _invoke_xblock_handler(request, course_id, usage_id, handler, suffix, course
                     resp = append_data_to_webob_response(resp, ee_data)
 
         except NoSuchHandlerError:
-            log.exception(u"XBlock %s attempted to access missing handler %r", instance, handler)
+            log.exception("XBlock %s attempted to access missing handler %r", instance, handler)
             raise Http404  # lint-amnesty, pylint: disable=raise-missing-from
 
         # If we can't find the module, respond with a 404
@@ -1252,7 +1250,7 @@ def xblock_view(request, course_id, usage_id, view_name):
         try:
             fragment = instance.render(view_name, context=request.GET)
         except NoSuchViewError:
-            log.exception(u"Attempt to render missing view on %s: %s", instance, view_name)
+            log.exception("Attempt to render missing view on %s: %s", instance, view_name)
             raise Http404  # lint-amnesty, pylint: disable=raise-missing-from
 
         hashed_resources = OrderedDict()
@@ -1262,7 +1260,7 @@ def xblock_view(request, course_id, usage_id, view_name):
         return JsonResponse({
             'html': fragment.content,
             'resources': list(hashed_resources.items()),
-            'csrf_token': six.text_type(csrf(request)['csrf_token']),
+            'csrf_token': str(csrf(request)['csrf_token']),
         })
 
 
@@ -1279,14 +1277,14 @@ def _check_files_limits(files):
 
         # Check number of files submitted
         if len(inputfiles) > settings.MAX_FILEUPLOADS_PER_INPUT:
-            msg = u'Submission aborted! Maximum %d files may be submitted at once' % \
+            msg = 'Submission aborted! Maximum %d files may be submitted at once' % \
                   settings.MAX_FILEUPLOADS_PER_INPUT
             return msg
 
         # Check file sizes
         for inputfile in inputfiles:
             if inputfile.size > settings.STUDENT_FILEUPLOAD_MAX_SIZE:  # Bytes
-                msg = u'Submission aborted! Your file "%s" is too large (max size: %d MB)' % \
+                msg = 'Submission aborted! Your file "%s" is too large (max size: %d MB)' % \
                       (inputfile.name, settings.STUDENT_FILEUPLOAD_MAX_SIZE / (1000 ** 2))
                 return msg
 

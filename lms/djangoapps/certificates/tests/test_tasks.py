@@ -3,9 +3,10 @@ Test module for user certificate generation.
 """
 
 
+from unittest.mock import call, patch
+
 import ddt
 from django.test import TestCase
-from mock import call, patch
 from opaque_keys.edx.keys import CourseKey
 
 from common.djangoapps.student.tests.factories import UserFactory

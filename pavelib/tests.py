@@ -389,8 +389,9 @@ def diff_coverage(options):
         diff_html_path = os.path.join(Env.REPORT_DIR, 'diff_coverage_combined.html')
 
         # Generate the diff coverage reports (HTML and console)
+        # The --diff-range-notation parameter is a workaround for https://github.com/Bachmann1234/diff_cover/issues/153
         sh(
-            "diff-cover {xml_report_str} --compare-branch={compare_branch} "
+            "diff-cover {xml_report_str} --diff-range-notation '..' --compare-branch={compare_branch} "
             "--html-report {diff_html_path}".format(
                 xml_report_str=xml_report_str,
                 compare_branch=compare_branch,

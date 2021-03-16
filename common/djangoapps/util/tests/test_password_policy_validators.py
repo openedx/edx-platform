@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Tests for util.password_policy_validators module."""
 
 
@@ -48,7 +47,7 @@ class PasswordPolicyValidatorsTestCase(unittest.TestCase):
 
     def test_unicode_password(self):
         """ Tests that validate_password enforces unicode """
-        unicode_str = u'𤭮'
+        unicode_str = '𤭮'
         byte_str = unicode_str.encode('utf-8')
 
         # Sanity checks and demonstration of why this test is useful
@@ -65,7 +64,7 @@ class PasswordPolicyValidatorsTestCase(unittest.TestCase):
     def test_password_unicode_normalization(self):
         """ Tests that validate_password normalizes passwords """
         # s ̣ ̇ (s with combining dot below and combining dot above)
-        not_normalized_password = u'\u0073\u0323\u0307'
+        not_normalized_password = '\u0073\u0323\u0307'
         assert len(not_normalized_password) == 3
 
         # When we normalize we expect the not_normalized password to fail
@@ -102,10 +101,10 @@ class PasswordPolicyValidatorsTestCase(unittest.TestCase):
             assert msg in password_validators_instruction_texts()
 
     @data(
-        (u'userna', u'username', 'test@example.com', 'The password is too similar to the username.'),
-        (u'password', u'username', 'password@example.com', 'The password is too similar to the email address.'),
-        (u'password', u'username', 'test@password.com', 'The password is too similar to the email address.'),
-        (u'password', u'username', 'test@example.com', None),
+        ('userna', 'username', 'test@example.com', 'The password is too similar to the username.'),
+        ('password', 'username', 'password@example.com', 'The password is too similar to the email address.'),
+        ('password', 'username', 'test@password.com', 'The password is too similar to the email address.'),
+        ('password', 'username', 'test@example.com', None),
     )
     @unpack
     @override_settings(AUTH_PASSWORD_VALIDATORS=[
@@ -118,13 +117,13 @@ class PasswordPolicyValidatorsTestCase(unittest.TestCase):
 
     @data(
         ([create_validator_config('common.djangoapps.util.password_policy_validators.MinimumLengthValidator', {'min_length': 1})],  # lint-amnesty, pylint: disable=line-too-long
-            u'', 'This password is too short. It must contain at least 1 character.'),
+            '', 'This password is too short. It must contain at least 1 character.'),
 
         ([create_validator_config('common.djangoapps.util.password_policy_validators.MinimumLengthValidator', {'min_length': 8})],  # lint-amnesty, pylint: disable=line-too-long
-            u'd', 'This password is too short. It must contain at least 8 characters.'),
+            'd', 'This password is too short. It must contain at least 8 characters.'),
 
         ([create_validator_config('common.djangoapps.util.password_policy_validators.MinimumLengthValidator', {'min_length': 8})],  # lint-amnesty, pylint: disable=line-too-long
-            u'longpassword', None),
+            'longpassword', None),
     )
     @unpack
     def test_minimum_length_validation_errors(self, config, password, msg):
@@ -134,13 +133,13 @@ class PasswordPolicyValidatorsTestCase(unittest.TestCase):
 
     @data(
         ([create_validator_config('common.djangoapps.util.password_policy_validators.MaximumLengthValidator', {'max_length': 1})],  # lint-amnesty, pylint: disable=line-too-long
-            u'longpassword', 'This password is too long. It must contain no more than 1 character.'),
+            'longpassword', 'This password is too long. It must contain no more than 1 character.'),
 
         ([create_validator_config('common.djangoapps.util.password_policy_validators.MaximumLengthValidator', {'max_length': 10})],  # lint-amnesty, pylint: disable=line-too-long
-            u'longpassword', 'This password is too long. It must contain no more than 10 characters.'),
+            'longpassword', 'This password is too long. It must contain no more than 10 characters.'),
 
         ([create_validator_config('common.djangoapps.util.password_policy_validators.MaximumLengthValidator', {'max_length': 20})],  # lint-amnesty, pylint: disable=line-too-long
-            u'shortpassword', None),
+            'shortpassword', None),
     )
     @unpack
     def test_maximum_length_validation_errors(self, config, password, msg):
@@ -149,8 +148,8 @@ class PasswordPolicyValidatorsTestCase(unittest.TestCase):
             self.validation_errors_checker(password, msg)
 
     @data(
-        (u'password', 'This password is too common.'),
-        (u'good_password', None),
+        ('password', 'This password is too common.'),
+        ('good_password', None),
     )
     @unpack
     @override_settings(AUTH_PASSWORD_VALIDATORS=[
@@ -162,13 +161,13 @@ class PasswordPolicyValidatorsTestCase(unittest.TestCase):
 
     @data(
         ([create_validator_config('common.djangoapps.util.password_policy_validators.AlphabeticValidator', {'min_alphabetic': 1})],  # lint-amnesty, pylint: disable=line-too-long
-            u'12345', 'This password must contain at least 1 letter.'),
+            '12345', 'This password must contain at least 1 letter.'),
 
         ([create_validator_config('common.djangoapps.util.password_policy_validators.AlphabeticValidator', {'min_alphabetic': 5})],  # lint-amnesty, pylint: disable=line-too-long
-            u'test123', 'This password must contain at least 5 letters.'),
+            'test123', 'This password must contain at least 5 letters.'),
 
         ([create_validator_config('common.djangoapps.util.password_policy_validators.AlphabeticValidator', {'min_alphabetic': 2})],  # lint-amnesty, pylint: disable=line-too-long
-            u'password', None),
+            'password', None),
     )
     @unpack
     def test_alphabetic_validation_errors(self, config, password, msg):
@@ -178,13 +177,13 @@ class PasswordPolicyValidatorsTestCase(unittest.TestCase):
 
     @data(
         ([create_validator_config('common.djangoapps.util.password_policy_validators.NumericValidator', {'min_numeric': 1})],  # lint-amnesty, pylint: disable=line-too-long
-            u'test', 'This password must contain at least 1 number.'),
+            'test', 'This password must contain at least 1 number.'),
 
         ([create_validator_config('common.djangoapps.util.password_policy_validators.NumericValidator', {'min_numeric': 4})],  # lint-amnesty, pylint: disable=line-too-long
-            u'test123', 'This password must contain at least 4 numbers.'),
+            'test123', 'This password must contain at least 4 numbers.'),
 
         ([create_validator_config('common.djangoapps.util.password_policy_validators.NumericValidator', {'min_numeric': 2})],  # lint-amnesty, pylint: disable=line-too-long
-            u'password123', None),
+            'password123', None),
     )
     @unpack
     def test_numeric_validation_errors(self, config, password, msg):
@@ -194,13 +193,13 @@ class PasswordPolicyValidatorsTestCase(unittest.TestCase):
 
     @data(
         ([create_validator_config('common.djangoapps.util.password_policy_validators.UppercaseValidator', {'min_upper': 1})],  # lint-amnesty, pylint: disable=line-too-long
-            u'lowercase', 'This password must contain at least 1 uppercase letter.'),
+            'lowercase', 'This password must contain at least 1 uppercase letter.'),
 
         ([create_validator_config('common.djangoapps.util.password_policy_validators.UppercaseValidator', {'min_upper': 6})],  # lint-amnesty, pylint: disable=line-too-long
-            u'NOTenough', 'This password must contain at least 6 uppercase letters.'),
+            'NOTenough', 'This password must contain at least 6 uppercase letters.'),
 
         ([create_validator_config('common.djangoapps.util.password_policy_validators.UppercaseValidator', {'min_upper': 1})],  # lint-amnesty, pylint: disable=line-too-long
-            u'camelCase', None),
+            'camelCase', None),
     )
     @unpack
     def test_upper_case_validation_errors(self, config, password, msg):
@@ -210,13 +209,13 @@ class PasswordPolicyValidatorsTestCase(unittest.TestCase):
 
     @data(
         ([create_validator_config('common.djangoapps.util.password_policy_validators.LowercaseValidator', {'min_lower': 1})],  # lint-amnesty, pylint: disable=line-too-long
-            u'UPPERCASE', 'This password must contain at least 1 lowercase letter.'),
+            'UPPERCASE', 'This password must contain at least 1 lowercase letter.'),
 
         ([create_validator_config('common.djangoapps.util.password_policy_validators.LowercaseValidator', {'min_lower': 4})],  # lint-amnesty, pylint: disable=line-too-long
-            u'notENOUGH', 'This password must contain at least 4 lowercase letters.'),
+            'notENOUGH', 'This password must contain at least 4 lowercase letters.'),
 
         ([create_validator_config('common.djangoapps.util.password_policy_validators.LowercaseValidator', {'min_lower': 1})],  # lint-amnesty, pylint: disable=line-too-long
-            u'goodPassword', None),
+            'goodPassword', None),
     )
     @unpack
     def test_lower_case_validation_errors(self, config, password, msg):
@@ -226,13 +225,13 @@ class PasswordPolicyValidatorsTestCase(unittest.TestCase):
 
     @data(
         ([create_validator_config('common.djangoapps.util.password_policy_validators.PunctuationValidator', {'min_punctuation': 1})],  # lint-amnesty, pylint: disable=line-too-long
-            u'no punctuation', 'This password must contain at least 1 punctuation mark.'),
+            'no punctuation', 'This password must contain at least 1 punctuation mark.'),
 
         ([create_validator_config('common.djangoapps.util.password_policy_validators.PunctuationValidator', {'min_punctuation': 7})],  # lint-amnesty, pylint: disable=line-too-long
-            u'p@$$w0rd$!', 'This password must contain at least 7 punctuation marks.'),
+            'p@$$w0rd$!', 'This password must contain at least 7 punctuation marks.'),
 
         ([create_validator_config('common.djangoapps.util.password_policy_validators.PunctuationValidator', {'min_punctuation': 3})],  # lint-amnesty, pylint: disable=line-too-long
-            u'excl@m@t!on', None),
+            'excl@m@t!on', None),
     )
     @unpack
     def test_punctuation_validation_errors(self, config, password, msg):
@@ -242,13 +241,13 @@ class PasswordPolicyValidatorsTestCase(unittest.TestCase):
 
     @data(
         ([create_validator_config('common.djangoapps.util.password_policy_validators.SymbolValidator', {'min_symbol': 1})],  # lint-amnesty, pylint: disable=line-too-long
-            u'no symbol', 'This password must contain at least 1 symbol.'),
+            'no symbol', 'This password must contain at least 1 symbol.'),
 
         ([create_validator_config('common.djangoapps.util.password_policy_validators.SymbolValidator', {'min_symbol': 3})],  # lint-amnesty, pylint: disable=line-too-long
-            u'☹️boo☹️', 'This password must contain at least 3 symbols.'),
+            '☹️boo☹️', 'This password must contain at least 3 symbols.'),
 
         ([create_validator_config('common.djangoapps.util.password_policy_validators.SymbolValidator', {'min_symbol': 2})],  # lint-amnesty, pylint: disable=line-too-long
-            u'☪symbols!☹️', None),
+            '☪symbols!☹️', None),
     )
     @unpack
     def test_symbol_validation_errors(self, config, password, msg):

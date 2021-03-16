@@ -7,7 +7,6 @@ import json
 import unittest
 
 import requests
-import six
 
 from common.djangoapps.terrain.stubs.http import StubHttpRequestHandler, StubHttpService, require_params
 
@@ -15,10 +14,10 @@ from common.djangoapps.terrain.stubs.http import StubHttpRequestHandler, StubHtt
 class StubHttpServiceTest(unittest.TestCase):  # lint-amnesty, pylint: disable=missing-class-docstring
 
     def setUp(self):
-        super(StubHttpServiceTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.server = StubHttpService()
         self.addCleanup(self.server.shutdown)
-        self.url = "http://127.0.0.1:{0}/set_config".format(self.server.port)
+        self.url = f"http://127.0.0.1:{self.server.port}/set_config"
 
     def test_configure(self):
         """
@@ -34,12 +33,12 @@ class StubHttpServiceTest(unittest.TestCase):  # lint-amnesty, pylint: disable=m
                 'test_key': 'test_val',
             },
             'test_empty_dict': {},
-            'test_unicode': u'\u2603 the snowman',
+            'test_unicode': '\u2603 the snowman',
             'test_none': None,
             'test_boolean': False
         }
 
-        for key, val in six.iteritems(params):
+        for key, val in params.items():
 
             # JSON-encode each parameter
             post_params = {key: json.dumps(val)}
@@ -47,7 +46,7 @@ class StubHttpServiceTest(unittest.TestCase):  # lint-amnesty, pylint: disable=m
             assert response.status_code == 200
 
         # Check that the expected values were set in the configuration
-        for key, val in six.iteritems(params):
+        for key, val in params.items():
             assert self.server.config.get(key) == val
 
     def test_bad_json(self):
@@ -60,12 +59,12 @@ class StubHttpServiceTest(unittest.TestCase):  # lint-amnesty, pylint: disable=m
 
     def test_unicode_non_json(self):
         # Send unicode without json-encoding it
-        response = requests.put(self.url, data={'test_unicode': u'\u2603 the snowman'})
+        response = requests.put(self.url, data={'test_unicode': '\u2603 the snowman'})
         assert response.status_code == 400
 
     def test_unknown_path(self):
         response = requests.put(
-            "http://127.0.0.1:{0}/invalid_url".format(self.server.port),
+            f"http://127.0.0.1:{self.server.port}/invalid_url",
             data="{}"
         )
         assert response.status_code == 404
@@ -91,10 +90,10 @@ class RequireParamTest(unittest.TestCase):
     """
 
     def setUp(self):
-        super(RequireParamTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.server = RequireHttpService()
         self.addCleanup(self.server.shutdown)
-        self.url = "http://127.0.0.1:{port}".format(port=self.server.port)
+        self.url = f"http://127.0.0.1:{self.server.port}"
 
     def test_require_get_param(self):
 

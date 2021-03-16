@@ -2,13 +2,12 @@
 
 import logging
 
-import six
 from xmodule.fields import Timedelta
 
 log = logging.getLogger(__name__)
 
 
-class TimeInfo(object):
+class TimeInfo:
     """
     This is a simple object that calculates and stores datetime information for an XModule
     based on the due date and the grace period string
@@ -29,11 +28,11 @@ class TimeInfo(object):
             self.display_due_date = None
 
         if grace_period_string_or_timedelta is not None and self.display_due_date:
-            if isinstance(grace_period_string_or_timedelta, six.string_types):
+            if isinstance(grace_period_string_or_timedelta, str):
                 try:
                     self.grace_period = TimeInfo._delta_standin.from_json(grace_period_string_or_timedelta)
                 except:
-                    log.error("Error parsing the grace period {0}".format(grace_period_string_or_timedelta))
+                    log.error(f"Error parsing the grace period {grace_period_string_or_timedelta}")
                     raise
             else:
                 self.grace_period = grace_period_string_or_timedelta

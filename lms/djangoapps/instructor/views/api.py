@@ -32,7 +32,6 @@ from edx_rest_framework_extensions.auth.session.authentication import SessionAut
 from edx_when.api import get_date_for_block
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey, UsageKey
-from ratelimit.decorators import ratelimit
 from rest_framework import status
 from rest_framework.permissions import IsAdminUser, IsAuthenticated
 from rest_framework.response import Response
@@ -57,10 +56,8 @@ from common.djangoapps.student.models import (
     ManualEnrollmentAudit,
     Registration,
     UserProfile,
-    anonymous_id_for_user,
     get_user_by_username_or_email,
     is_email_retired,
-    unique_id_for_user
 )
 from common.djangoapps.student.roles import CourseFinanceAdminRole, CourseSalesAdminRole
 from common.djangoapps.util.file import (
@@ -74,8 +71,7 @@ from lms.djangoapps.bulk_email.api import is_bulk_email_feature_enabled
 from lms.djangoapps.bulk_email.models import CourseEmail
 from lms.djangoapps.certificates import api as certs_api
 from lms.djangoapps.certificates.models import (
-    CertificateStatuses,
-    CertificateWhitelist
+    CertificateStatuses
 )
 from lms.djangoapps.courseware.access import has_access
 from lms.djangoapps.courseware.courses import get_course_by_id, get_course_with_access
@@ -1359,40 +1355,18 @@ def get_proctored_exam_results(request, course_id):
     return JsonResponse({"status": success_status})
 
 
+@transaction.non_atomic_requests
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
-@ratelimit(key="user", rate="1/5m", block=True)
 @require_course_permission(permissions.CAN_RESEARCH)
 def get_anon_ids(request, course_id):
     """
     Respond with 2-column CSV output of user-id, anonymized-user-id
     """
-    # TODO: the User.objects query and CSV generation here could be
-    # centralized into instructor_analytics. Currently instructor_analytics
-    # has similar functionality but not quite what's needed.
-    course_id = CourseKey.from_string(course_id)
-
-    def csv_response(filename, header, rows):
-        """Returns a CSV http response for the given header and rows (excel/utf-8)."""
-        response = HttpResponse(content_type='text/csv')
-        response['Content-Disposition'] = 'attachment; filename={}'.format(str(filename))
-        writer = csv.writer(response, dialect='excel', quotechar='"', quoting=csv.QUOTE_ALL)
-        # In practice, there should not be non-ascii data in this query,
-        # but trying to do the right thing anyway.
-        encoded = [str(s) for s in header]
-        writer.writerow(encoded)
-        for row in rows:
-            encoded = [str(s) for s in row]
-            writer.writerow(encoded)
-        return response
-
-    students = User.objects.filter(
-        courseenrollment__course_id=course_id,
-    ).order_by('id')
-    header = ['User ID', 'Anonymized User ID', 'Course Specific Anonymized User ID']
-    rows = [[s.id, unique_id_for_user(s), anonymous_id_for_user(s, course_id)]
-            for s in students]
-    return csv_response(str(course_id).replace('/', '-') + '-anon-ids.csv', header, rows)
+    report_type = _('Anonymized User IDs')
+    success_status = SUCCESS_MESSAGE_TEMPLATE.format(report_type=report_type)
+    task_api.generate_anonymous_ids(request, course_id)
+    return JsonResponse({"status": success_status})
 
 
 @require_POST
@@ -2664,13 +2638,11 @@ def add_certificate_exception(course_key, student, certificate_exception):
             _("Student (username/email={user}) already in certificate exception list.").format(user=student.username)
         )
 
-    certificate_allowlist_entry = certs_api.create_certificate_allowlist_entry(
+    certificate_allowlist_entry, __ = certs_api.create_or_update_certificate_allowlist_entry(
         student,
         course_key,
         certificate_exception.get("notes", "")
     )
-
-    log.info(f"Student {student.id} has been added to the whitelist in course {course_key}")
 
     generated_certificate = certs_api.get_certificate_for_user(student.username, course_key, False)
 
@@ -2688,31 +2660,20 @@ def add_certificate_exception(course_key, student, certificate_exception):
 
 def remove_certificate_exception(course_key, student):
     """
-    Remove certificate exception for given course and student from CertificateWhitelist table and
-    invalidate its GeneratedCertificate if present.
-    Raises ValueError in case no exception exists for the student in the given course.
+    Remove certificate exception for given course and student from the certificate allowlist.
+
+    Raises ValueError if an error occurs during removal of the allowlist entry.
 
     :param course_key: identifier of the course whose certificate exception needs to be removed.
     :param student: User object whose certificate exception needs to be removed.
     :return:
     """
-    log.info(f"Request received to remove an allowlist entry for student {student.id} in course {course_key}.")
-
-    allowlist_entry = certs_api.get_allowlist_entry(student, course_key)
-    if not allowlist_entry:
-        raise ValueError(  # lint-amnesty, pylint: disable=raise-missing-from
-            _('Certificate exception (user={user}) does not exist in certificate white list. '
-              'Please refresh the page and try again.').format(user=student.username)
+    result = certs_api.remove_allowlist_entry(student, course_key)
+    if not result:
+        raise ValueError(
+            _("Error occurred removing the allowlist entry for student {student}. Please refresh the page "
+              "and try again").format(student=student.username)
         )
-
-    # If a certificate was generated then we should invalidate it before removing the learner from the allowlist
-    certificate = certs_api.get_certificate_for_user(student.username, course_key, False)
-    if certificate:
-        log.info(f"Invalidating certificate for student {student.id} in course {course_key} before allowlist removal.")
-        certificate.invalidate()
-
-    log.info(f"Removing student {student.id} from the allowlist in course {course_key}.")
-    allowlist_entry.delete()
 
 
 def parse_request_data_and_get_user(request):
@@ -2887,7 +2848,7 @@ def generate_bulk_certificate_exceptions(request, course_id):
                     build_row_errors('user_on_certificate_invalidation_list', user, row_num)
                     log.warning(f'Student {user.id} is blocked from receiving a Certificate in Course {course_key}')
                 # make sure user isn't already on the exception list
-                elif CertificateWhitelist.get_certificate_white_list(course_key, user):
+                elif certs_api.is_on_allowlist(user, course_key):
                     build_row_errors('user_already_white_listed', user, row_num)
                     log.warning(f'Student {user.id} already on exception list in Course {course_key}.')
                 # make sure user is enrolled in course
@@ -2895,10 +2856,9 @@ def generate_bulk_certificate_exceptions(request, course_id):
                     build_row_errors('user_not_enrolled', user, row_num)
                     log.warning(f'Student {user.id} is not enrolled in Course {course_key}')
                 else:
-                    CertificateWhitelist.objects.create(
-                        user=user,
-                        course_id=course_key,
-                        whitelist=True,
+                    certs_api.create_or_update_certificate_allowlist_entry(
+                        user,
+                        course_key,
                         notes=student[notes_index]
                     )
                     success.append(_('user "{username}" in row# {row}').format(username=user.username, row=row_num))

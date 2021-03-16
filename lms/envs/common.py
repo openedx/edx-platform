@@ -143,8 +143,15 @@ FEATURES = {
     # .. toggle_tickets: https://github.com/edx/edx-platform/pull/3064
     'ENABLE_TEXTBOOK': True,
 
-    # discussion home panel, which includes a subscription on/off setting for discussion digest emails.
-    # this should remain off in production until digest notifications are online.
+    # .. toggle_name: FEATURES['ENABLE_DISCUSSION_HOME_PANEL']
+    # .. toggle_implementation: DjangoSetting
+    # .. toggle_default: True
+    # .. toggle_description: Hides or displays a welcome panel under the Discussion tab, which includes a subscription
+    #   on/off setting for discussion digest emails.
+    # .. toggle_use_cases: open_edx
+    # .. toggle_creation_date: 2013-07-30
+    # .. toggle_warnings: This should remain off in production until digest notifications are online.
+    # .. toggle_tickets: https://github.com/edx/edx-platform/pull/520
     'ENABLE_DISCUSSION_HOME_PANEL': False,
 
     # .. toggle_name: FEATURES['ENABLE_DISCUSSION_EMAIL_DIGEST']
@@ -263,6 +270,17 @@ FEATURES = {
     # .. toggle_tickets: https://github.com/edx/edx-platform/pull/1073
     'COURSES_ARE_BROWSABLE': True,
 
+    # Can be turned off to disable the help link in the navbar
+    # .. toggle_name: FEATURES['ENABLE_HELP_LINK']
+    # .. toggle_implementation: DjangoSetting
+    # .. toggle_default: True
+    # .. toggle_description: When True, a help link is displayed on the main navbar. Set False to hide it.
+    # .. toggle_use_cases: open_edx
+    # .. toggle_creation_date: 2021-03-05
+    # .. toggle_tickets: https://github.com/edx/edx-platform/pull/26106
+    'ENABLE_HELP_LINK': True,
+
+
     # .. toggle_name: FEATURES['HIDE_DASHBOARD_COURSES_UNTIL_ACTIVATED']
     # .. toggle_implementation: DjangoSetting
     # .. toggle_default: False
@@ -307,7 +325,17 @@ FEATURES = {
     # True.
     'INDIVIDUAL_DUE_DATES': False,
 
-    # Enable Custom Courses for EdX
+    # .. toggle_name: CUSTOM_COURSES_EDX
+    # .. toggle_implementation: DjangoSetting
+    # .. toggle_default: False
+    # .. toggle_description: Set to True to enable Custom Courses for edX, a feature that is more commonly known as
+    #   CCX. Documentation for configuring and using this feature is available at
+    #   https://edx.readthedocs.io/projects/open-edx-ca/en/latest/set_up_course/custom_courses.html
+    # .. toggle_warnings: When set to true, 'lms.djangoapps.ccx.overrides.CustomCoursesForEdxOverrideProvider' will
+    #    be added to MODULESTORE_FIELD_OVERRIDE_PROVIDERS
+    # .. toggle_use_cases: opt_in, circuit_breaker
+    # .. toggle_creation_date: 2015-04-10
+    # .. toggle_tickets: https://github.com/edx/edx-platform/pull/6636
     'CUSTOM_COURSES_EDX': False,
 
     # Toggle to enable certificates of courses on dashboard
@@ -327,7 +355,17 @@ FEATURES = {
 
     'DISABLE_AUDIT_CERTIFICATES': False,  # Toggle to disable audit certificates
 
-    # for acceptance and load testing
+    # .. toggle_name: FEATURES['AUTOMATIC_AUTH_FOR_TESTING']
+    # .. toggle_implementation: DjangoSetting
+    # .. toggle_default: False
+    # .. toggle_description: Set to True to perform acceptance and load test. Auto auth view is responsible for load
+    #   testing and is controlled by this feature flag. Auto-auth causes issues in Bok Choy tests because it resets the
+    #   requesting user. Session verification (of CacheBackedAuthenticationMiddleware) is a security feature, but it
+    #   can be turned off by enabling this feature flag.
+    # .. toggle_use_cases: open_edx
+    # .. toggle_creation_date: 2013-07-25
+    # .. toggle_warnings: If this has been set to True then the account activation email will be skipped.
+    # .. toggle_tickets: https://github.com/edx/edx-platform/pull/417
     'AUTOMATIC_AUTH_FOR_TESTING': False,
 
     # .. toggle_name: FEATURES['RESTRICT_AUTOMATIC_AUTH']
@@ -4092,9 +4130,10 @@ RSS_PROXY_CACHE_TIMEOUT = 3600  # The length of time we cache RSS retrieved from
 
 #### Custom Courses for EDX (CCX) configuration
 
-# This is an arbitrary hard limit.
-# The reason we introcuced this number is because we do not want the CCX
-# to compete with the MOOC.
+# .. setting_name: CCX_MAX_STUDENTS_ALLOWED
+# .. setting_default: 200
+# .. setting_description: Maximum number of students allowed in a CCX (Custom Courses for edX), This is an arbitrary
+#   hard limit, chosen so that a CCX does not compete with public MOOCs.
 CCX_MAX_STUDENTS_ALLOWED = 200
 
 # Financial assistance settings
@@ -4612,8 +4651,15 @@ BLOCKSTORE_API_URL = 'http://localhost:18250/api/v1/'
 # .. setting_description: The django cache key of the cache to use for storing anonymous user state for XBlocks.
 XBLOCK_RUNTIME_V2_EPHEMERAL_DATA_CACHE = 'default'
 
-# Blockstore data could contain S3 links, so this should be lower than Blockstore's AWS_QUERYSTRING_EXPIRE
-BLOCKSTORE_BUNDLE_CACHE_TIMEOUT = 169200
+# .. setting_name: BLOCKSTORE_BUNDLE_CACHE_TIMEOUT
+# .. setting_default: 3000
+# .. setting_description: Maximum time-to-live of cached Bundles fetched from
+#     Blockstore, in seconds. When the values returned from Blockstore have
+#     TTLs of their own (such as signed S3 URLs), the maximum TTL of this cache
+#     must be lower than the minimum TTL of those values.
+#     We use a default of 3000s (50mins) because temporary URLs are often
+#     configured to expire after one hour.
+BLOCKSTORE_BUNDLE_CACHE_TIMEOUT = 3000
 
 ######################### MICROSITE ###############################
 MICROSITE_ROOT_DIR = '/edx/app/edxapp/edx-microsite'
@@ -4644,17 +4690,3 @@ LOGO_URL_PNG = None
 LOGO_TRADEMARK_URL = None
 FAVICON_URL = None
 DEFAULT_EMAIL_LOGO_URL = 'https://edx-cdn.org/v3/default/logo.png'
-
-# .. toggle_name: ERROR_ON_DEPRECATED_EDX_PLATFORM_IMPORTS
-# .. toggle_implementation: DjangoSetting
-# .. toggle_default: False
-# .. toggle_use_cases: rollout
-# .. toggle_creation_date: 2021-01-20
-# .. toggle_target_removal_date: 2021-01-27
-# .. toggle_tickets: https://github.com/edx/edx-platform/pull/25932
-# .. toggle_description: Whether to raise an exception where,
-#  normally, a DeprecatedEdxPlatformImportWarning would be raised.
-#  This will allow us to test dropping support for the deprecated
-#  import paths without yet removing all of the import_shims
-#  machinery.
-ERROR_ON_DEPRECATED_EDX_PLATFORM_IMPORTS = False

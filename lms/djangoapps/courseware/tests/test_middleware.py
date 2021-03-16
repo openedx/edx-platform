@@ -17,7 +17,7 @@ class CoursewareMiddlewareTestCase(SharedModuleStoreTestCase):
 
     @classmethod
     def setUpClass(cls):
-        super(CoursewareMiddlewareTestCase, cls).setUpClass()
+        super().setUpClass()
         cls.course = CourseFactory.create()
 
     def test_process_404(self):

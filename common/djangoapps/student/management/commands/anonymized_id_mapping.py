@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Dump username, per-student anonymous id, and per-course anonymous id triples as CSV.
 
 Give instructors easy access to the mapping from anonymized IDs to user IDs
@@ -36,12 +35,12 @@ class Command(BaseCommand):
 
         # Generate the output filename from the course ID.
         # Change slashes to dashes first, and then append .csv extension.
-        output_filename = text_type(course_key).replace('/', '-') + ".csv"
+        output_filename = str(course_key).replace('/', '-') + ".csv"
 
         # Figure out which students are enrolled in the course
         students = User.objects.filter(courseenrollment__course_id=course_key)
         if len(students) == 0:
-            self.stdout.write("No students enrolled in %s" % text_type(course_key))
+            self.stdout.write("No students enrolled in %s" % str(course_key))
             return
 
         # Write mapping to output file in CSV format with a simple header
@@ -59,5 +58,5 @@ class Command(BaseCommand):
                         anonymous_id_for_user(student, None),
                         anonymous_id_for_user(student, course_key)
                     ))
-        except IOError:
+        except OSError:
             raise CommandError("Error writing to file: %s" % output_filename)  # lint-amnesty, pylint: disable=raise-missing-from

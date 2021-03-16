@@ -31,7 +31,7 @@ class EDXJSONEncoder(DjangoJSONEncoder):
                 return int(o)
             return float(o)
         else:
-            return super(EDXJSONEncoder, self).default(o)  # lint-amnesty, pylint: disable=super-with-arguments
+            return super().default(o)
 
 
 def expect_json(view_function):
@@ -73,7 +73,7 @@ class JsonResponse(HttpResponse):
         kwargs.setdefault("content_type", "application/json")
         if status:
             kwargs["status"] = status
-        super(JsonResponse, self).__init__(content, *args, **kwargs)  # lint-amnesty, pylint: disable=super-with-arguments
+        super().__init__(content, *args, **kwargs)
 
 
 class JsonResponseBadRequest(HttpResponseBadRequest):
@@ -93,4 +93,4 @@ class JsonResponseBadRequest(HttpResponseBadRequest):
             content = json.dumps(obj, cls=encoder, indent=2, ensure_ascii=False)
         kwargs.setdefault("content_type", "application/json")
         kwargs["status"] = status
-        super(JsonResponseBadRequest, self).__init__(content, *args, **kwargs)  # lint-amnesty, pylint: disable=super-with-arguments
+        super().__init__(content, *args, **kwargs)

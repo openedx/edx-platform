@@ -2,21 +2,19 @@
 Tests for the cert_allowlist command
 """
 
-import mock
+from unittest import mock
+
 import pytest
 from django.core.management import CommandError, call_command
 from edx_toggles.toggles.testutils import override_waffle_flag
 from waffle.testutils import override_switch
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory
 
 from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
 from lms.djangoapps.certificates.generation_handler import CERTIFICATES_USE_ALLOWLIST
 from lms.djangoapps.certificates.tests.factories import CertificateWhitelistFactory
-from lms.djangoapps.certificates.tests.test_generation_handler import (
-    AUTO_GENERATION_SWITCH_NAME,
-    ID_VERIFIED_METHOD
-)
+from lms.djangoapps.certificates.tests.test_generation_handler import AUTO_GENERATION_SWITCH_NAME, ID_VERIFIED_METHOD
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from xmodule.modulestore.tests.factories import CourseFactory
 
 
 @override_switch(AUTO_GENERATION_SWITCH_NAME, active=True)

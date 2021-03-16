@@ -6,10 +6,9 @@ Test for LMS courseware app.
 from textwrap import dedent
 from unittest import TestCase
 
-import mock
+from unittest import mock
 from django.urls import reverse
 from opaque_keys.edx.keys import CourseKey
-from six import text_type
 
 from lms.djangoapps.courseware.tests.helpers import LoginEnrollmentTestCase
 from lms.djangoapps.lms_xblock.field_data import LmsFieldData
@@ -24,7 +23,7 @@ class ActivateLoginTest(LoginEnrollmentTestCase):
     Test logging in and logging out.
     """
     def setUp(self):
-        super(ActivateLoginTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.setup_user()
 
     def test_activate_login(self):
@@ -76,22 +75,22 @@ class PageLoaderTestCase(LoginEnrollmentTestCase):
 
             if descriptor.location.category == 'about':
                 self._assert_loads('about_course',
-                                   {'course_id': text_type(course_key)},
+                                   {'course_id': str(course_key)},
                                    descriptor)
 
             elif descriptor.location.category == 'static_tab':
-                kwargs = {'course_id': text_type(course_key),
+                kwargs = {'course_id': str(course_key),
                           'tab_slug': descriptor.location.name}
                 self._assert_loads('static_tab', kwargs, descriptor)
 
             elif descriptor.location.category == 'course_info':
-                self._assert_loads('info', {'course_id': text_type(course_key)},
+                self._assert_loads('info', {'course_id': str(course_key)},
                                    descriptor)
 
             else:
 
-                kwargs = {'course_id': text_type(course_key),
-                          'location': text_type(descriptor.location)}
+                kwargs = {'course_id': str(course_key),
+                          'location': str(descriptor.location)}
 
                 self._assert_loads('jump_to', kwargs, descriptor,
                                    expect_redirect=True,
@@ -111,7 +110,7 @@ class PageLoaderTestCase(LoginEnrollmentTestCase):
         response = self.client.get(url, follow=True)
 
         if response.status_code != 200:
-            self.fail(u'Status %d for page %s' %
+            self.fail('Status %d for page %s' %
                       (response.status_code, descriptor.location))
 
         if expect_redirect:
@@ -129,7 +128,7 @@ class TestMongoCoursesLoad(ModuleStoreTestCase, PageLoaderTestCase):
     MODULESTORE = TEST_DATA_MIXED_MODULESTORE
 
     def setUp(self):
-        super(TestMongoCoursesLoad, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.setup_user()
         self.toy_course_key = ToyCourseFactory.create().id
 

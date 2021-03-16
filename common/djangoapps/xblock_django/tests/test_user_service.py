@@ -26,7 +26,7 @@ class UserServiceTestCase(TestCase):
     Tests for the DjangoXBlockUserService.
     """
     def setUp(self):
-        super(UserServiceTestCase, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.user = UserFactory(username="tester", email="test@tester.com")
         self.user.profile.name = "Test Tester"
         set_user_preference(self.user, 'pref-lang', 'en')
@@ -52,7 +52,7 @@ class UserServiceTestCase(TestCase):
         assert xb_user.opt_attrs[ATTR_KEY_USERNAME] == dj_user.username
         assert xb_user.opt_attrs[ATTR_KEY_USER_ID] == dj_user.id
         assert not xb_user.opt_attrs[ATTR_KEY_USER_IS_STAFF]
-        assert all(((pref in USER_PREFERENCES_WHITE_LIST) for pref in xb_user.opt_attrs[ATTR_KEY_USER_PREFERENCES]))
+        assert all((pref in USER_PREFERENCES_WHITE_LIST) for pref in xb_user.opt_attrs[ATTR_KEY_USER_PREFERENCES])
 
     def test_convert_anon_user(self):
         """

@@ -212,11 +212,11 @@ class TaskTestCase(ModuleStoreTestCase):  # lint-amnesty, pylint: disable=missin
                 'thread_title': 'thread-title',
                 'thread_username': self.thread_author.username,
                 'thread_commentable_id': self.thread['commentable_id'],
-                'post_link': self.mock_permalink.return_value,
+                'post_link': 'https://{}{}'.format(site.domain, self.mock_permalink.return_value),
                 'site': site,
                 'site_id': site.id
             })
-            expected_recipient = Recipient(self.thread_author.username, self.thread_author.email)
+            expected_recipient = Recipient(self.thread_author.id, self.thread_author.email)
             actual_message = self.mock_ace_send.call_args_list[0][0][0]
             assert expected_message_context == actual_message.context
             assert expected_recipient == actual_message.recipient

@@ -44,7 +44,7 @@ class CourseMetadataUtilsTestCase(TestCase):
         """
         Set up module store testing capabilities and initialize test courses.
         """
-        super(CourseMetadataUtilsTestCase, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
 
         mongo_builder = MongoModulestoreBuilder()
         split_builder = VersioningModulestoreBuilder()
