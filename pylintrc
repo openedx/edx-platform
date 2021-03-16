@@ -72,7 +72,7 @@
 [MASTER]
 ignore = ,.git,.tox,migrations,node_modules,.pycharm_helpers
 persistent = yes
-load-plugins = edx_lint.pylint,pylint_django,pylint_celery
+load-plugins = edx_lint.pylint,pylint_django_settings,pylint_django,pylint_celery
 
 [MESSAGES CONTROL]
 enable =
