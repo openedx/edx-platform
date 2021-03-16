@@ -32,7 +32,7 @@ class AuthenticateTestCase(TestCase):
     """
 
     def setUp(self):
-        super(AuthenticateTestCase, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.user = User.objects.create_user(
             username='darkhelmet',
             password='12345',
@@ -57,7 +57,7 @@ class CustomValidationTestCase(TestCase):
     In particular, inactive users should be able to validate.
     """
     def setUp(self):
-        super(CustomValidationTestCase, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.user = User.objects.create_user(
             username='darkhelmet',
             password='12345',
@@ -88,7 +88,7 @@ class CustomAuthorizationViewTestCase(TestCase):
     (This is a temporary override until Auth Scopes is implemented.)
     """
     def setUp(self):
-        super(CustomAuthorizationViewTestCase, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.dot_adapter = adapters.DOTAdapter()
         self.user = UserFactory()
         self.client.login(username=self.user.username, password='test')

@@ -23,7 +23,7 @@ EXPECTED_DEFAULT_EXPIRES_IN = 36000
 class TestOAuthDispatchAPI(TestCase):
     """ Tests for oauth_dispatch's api.py module. """
     def setUp(self):
-        super(TestOAuthDispatchAPI, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.adapter = DOTAdapter()
         self.user = UserFactory()
         self.client = self.adapter.create_public_client(
@@ -45,9 +45,9 @@ class TestOAuthDispatchAPI(TestCase):
         assert token['refresh_token']
         self.assertDictContainsSubset(
             {
-                u'token_type': u'Bearer',
-                u'expires_in': EXPECTED_DEFAULT_EXPIRES_IN,
-                u'scope': u'',
+                'token_type': 'Bearer',
+                'expires_in': EXPECTED_DEFAULT_EXPIRES_IN,
+                'scope': '',
             },
             token,
         )
@@ -63,5 +63,5 @@ class TestOAuthDispatchAPI(TestCase):
         token = api.create_dot_access_token(
             HttpRequest(), self.user, self.client, expires_in=expires_in, scopes=['profile'],
         )
-        self.assertDictContainsSubset({u'scope': u'profile'}, token)
-        self.assertDictContainsSubset({u'expires_in': expires_in}, token)
+        self.assertDictContainsSubset({'scope': 'profile'}, token)
+        self.assertDictContainsSubset({'expires_in': expires_in}, token)

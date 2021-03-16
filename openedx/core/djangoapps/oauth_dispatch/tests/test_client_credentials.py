@@ -21,7 +21,7 @@ class ClientCredentialsTest(mixins.AccessTokenMixin, TestCase):
     """ Tests validating the client credentials grant behavior. """
 
     def setUp(self):
-        super(ClientCredentialsTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.user = UserFactory()
 
     def test_jwt_access_token(self):

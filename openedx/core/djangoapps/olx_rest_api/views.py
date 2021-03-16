@@ -113,5 +113,5 @@ def get_block_exportfs_file(request, usage_key_str, path):
         raise NotFound
 
     response = HttpResponse(static_file.data, content_type='application/octet-stream')
-    response['Content-Disposition'] = 'attachment; filename="{}"'.format(path)
+    response['Content-Disposition'] = f'attachment; filename="{path}"'
     return response

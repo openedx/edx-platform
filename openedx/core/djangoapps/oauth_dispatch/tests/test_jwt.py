@@ -3,11 +3,11 @@
 
 import itertools  # lint-amnesty, pylint: disable=unused-import
 from datetime import timedelta
+from unittest.mock import patch
 
 import ddt
 from django.test import TestCase
 from django.utils.timezone import now
-from mock import patch
 
 from openedx.core.djangoapps.oauth_dispatch import jwt as jwt_api
 from openedx.core.djangoapps.oauth_dispatch.adapters import DOTAdapter
@@ -20,7 +20,7 @@ from common.djangoapps.student.tests.factories import UserFactory
 class TestCreateJWTs(AccessTokenMixin, TestCase):
     """ Tests for oauth_dispatch's jwt creation functionality. """
     def setUp(self):
-        super(TestCreateJWTs, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.user = UserFactory()
         self.default_scopes = ['email', 'profile']
 

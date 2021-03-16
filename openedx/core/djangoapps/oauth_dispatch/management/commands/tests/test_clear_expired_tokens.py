@@ -5,8 +5,9 @@ Tests the ``edx_clear_expired_tokens`` management command.
 
 import unittest
 from datetime import timedelta
-import pytest
+from unittest.mock import patch
 
+import pytest
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 from django.core.management import call_command
@@ -14,7 +15,6 @@ from django.db.models import QuerySet
 from django.test import TestCase
 from django.test.utils import override_settings
 from django.utils import timezone
-from mock import patch
 from oauth2_provider.models import AccessToken, RefreshToken
 from testfixtures import LogCapture
 
@@ -67,12 +67,12 @@ class EdxClearExpiredTokensTests(TestCase):  # lint-amnesty, pylint: disable=mis
                 (
                     LOGGER_NAME,
                     'INFO',
-                    u'Cleaning {} rows from {} table'.format(0, RefreshToken.__name__)
+                    'Cleaning {} rows from {} table'.format(0, RefreshToken.__name__)
                 ),
                 (
                     LOGGER_NAME,
                     'INFO',
-                    u'Cleaning {} rows from {} table'.format(0, AccessToken.__name__),
+                    'Cleaning {} rows from {} table'.format(0, AccessToken.__name__),
                 ),
                 (
                     LOGGER_NAME,

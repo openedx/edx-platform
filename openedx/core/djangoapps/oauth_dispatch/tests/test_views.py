@@ -5,6 +5,7 @@ Tests for Blocks Views
 
 import json
 import unittest
+from unittest.mock import call, patch
 
 import ddt
 import httpretty
@@ -13,7 +14,6 @@ from django.conf import settings
 from django.test import RequestFactory, TestCase
 from django.urls import reverse
 from jwkest import jwk
-from mock import call, patch
 from oauth2_provider import models as dot_models
 
 from common.djangoapps.student.tests.factories import UserFactory
@@ -38,7 +38,7 @@ if OAUTH_PROVIDER_ENABLED:
     from .. import views
 
 
-class AccessTokenLoginMixin(object):
+class AccessTokenLoginMixin:
     """
     Shared helper class to assert proper access levels when using access_tokens
     """
@@ -47,7 +47,7 @@ class AccessTokenLoginMixin(object):
         """
         Initialize mixin
         """
-        super(AccessTokenLoginMixin, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.login_with_access_token_url = reverse("login_with_access_token")
 
     def login_with_access_token(self, access_token=None):
@@ -59,7 +59,7 @@ class AccessTokenLoginMixin(object):
 
         return self.client.post(
             self.login_with_access_token_url,
-            HTTP_AUTHORIZATION=u"Bearer {0}".format(access_token if access_token else self.access_token).encode('utf-8')
+            HTTP_AUTHORIZATION="Bearer {}".format(access_token if access_token else self.access_token).encode('utf-8')
         )
 
     def _assert_access_token_is_valid(self, access_token=None):
@@ -83,7 +83,7 @@ class _DispatchingViewTestCase(TestCase):
     Subclasses need to define self.url.
     """
     def setUp(self):
-        super(_DispatchingViewTestCase, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.dot_adapter = adapters.DOTAdapter()
         self.user = UserFactory()
         self.dot_app = self.dot_adapter.create_public_client(
@@ -129,7 +129,7 @@ class TestAccessTokenView(AccessTokenLoginMixin, mixins.AccessTokenMixin, _Dispa
     """
 
     def setUp(self):
-        super(TestAccessTokenView, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.url = reverse('access_token')
         self.view_class = views.AccessTokenView
 
@@ -309,7 +309,7 @@ class TestAccessTokenView(AccessTokenLoginMixin, mixins.AccessTokenMixin, _Dispa
             name='test dot application',
             user=self.user,
             redirect_uri=DUMMY_REDIRECT_URL,
-            client_id='dot-app-client-id-{grant_type}'.format(grant_type=grant_type),
+            client_id=f'dot-app-client-id-{grant_type}',
             grant_type=grant_type,
         )
         dot_app_access = models.ApplicationAccess.objects.create(
@@ -342,7 +342,7 @@ class TestAccessTokenExchangeView(ThirdPartyOAuthTestMixinGoogle, ThirdPartyOAut
     def setUp(self):
         self.url = reverse('exchange_access_token', kwargs={'backend': 'google-oauth2'})
         self.view_class = views.AccessTokenExchangeView
-        super(TestAccessTokenExchangeView, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
 
     def _post_body(self, user, client, token_type=None, scope=None):
         return {
@@ -367,7 +367,7 @@ class TestAuthorizationView(_DispatchingViewTestCase):
     """
 
     def setUp(self):
-        super(TestAuthorizationView, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.user = UserFactory()
         self.dot_app = self.dot_adapter.create_confidential_client(
             name='test dot application',
@@ -390,7 +390,7 @@ class TestAuthorizationView(_DispatchingViewTestCase):
     )
     @ddt.unpack
     def test_post_authorization_view(self, client_type, allow_field):
-        oauth_application = getattr(self, '{}_app'.format(client_type))
+        oauth_application = getattr(self, f'{client_type}_app')
         self.client.login(username=self.user.username, password='test')
         response = self.client.post(
             '/oauth2/authorize/',
@@ -405,7 +405,7 @@ class TestAuthorizationView(_DispatchingViewTestCase):
             follow=True,
         )
 
-        check_response = getattr(self, '_check_{}_response'.format(client_type))
+        check_response = getattr(self, f'_check_{client_type}_response')
         check_response(response)
 
     def test_check_dot_authorization_page_get(self):
@@ -437,7 +437,7 @@ class TestAuthorizationView(_DispatchingViewTestCase):
         # is the application name specified?
         self.assertContains(
             response,
-            u"Authorize {name}".format(name=self.dot_app.name)
+            f"Authorize {self.dot_app.name}"
         )
 
         # are the cancel and allow buttons on the page?
@@ -469,14 +469,14 @@ class TestAuthorizationView(_DispatchingViewTestCase):
         # django-oauth-toolkit tries to redirect to the user's redirect URL
         assert response.status_code == 404
         # We used a non-existent redirect url.
-        expected_redirect_prefix = u'{}?'.format(DUMMY_REDIRECT_URL)
+        expected_redirect_prefix = f'{DUMMY_REDIRECT_URL}?'
         self._assert_startswith(self._redirect_destination(response), expected_redirect_prefix)
 
     def _assert_startswith(self, string, prefix):
         """
         Assert that the string starts with the specified prefix.
         """
-        assert string.startswith(prefix), u'{} does not start with {}'.format(string, prefix)
+        assert string.startswith(prefix), f'{string} does not start with {prefix}'
 
     @staticmethod
     def _redirect_destination(response):
@@ -493,7 +493,7 @@ class TestViewDispatch(TestCase):
     """
 
     def setUp(self):
-        super(TestViewDispatch, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.dot_adapter = adapters.DOTAdapter()
         self.user = UserFactory()
         self.view = views._DispatchingView()  # pylint: disable=protected-access
@@ -511,9 +511,9 @@ class TestViewDispatch(TestCase):
         could take any name, this assertion requires the argument to be named
         `request`.  This is good practice.  You should do it anyway.
         """
-        _msg_base = u'{view} is not a view: {reason}'
-        msg_not_callable = _msg_base.format(view=view_candidate, reason=u'it is not callable')
-        msg_no_request = _msg_base.format(view=view_candidate, reason=u'it has no request argument')
+        _msg_base = '{view} is not a view: {reason}'
+        msg_not_callable = _msg_base.format(view=view_candidate, reason='it is not callable')
+        msg_no_request = _msg_base.format(view=view_candidate, reason='it has no request argument')
         assert hasattr(view_candidate, '__call__'), msg_not_callable
         args = view_candidate.__code__.co_varnames
         assert args, msg_no_request
@@ -529,7 +529,7 @@ class TestViewDispatch(TestCase):
         """
         Return a request with the specified client_id in the get parameters
         """
-        return RequestFactory().get('/?client_id={}'.format(client_id))
+        return RequestFactory().get(f'/?client_id={client_id}')
 
     def test_dispatching_post_to_dot(self):
         request = self._post_request('dot-id')
@@ -565,7 +565,7 @@ class TestRevokeTokenView(AccessTokenLoginMixin, _DispatchingViewTestCase):  # p
         self.revoke_token_url = reverse('revoke_token')
         self.access_token_url = reverse('access_token')
 
-        super(TestRevokeTokenView, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         response = self.client.post(self.access_token_url, self.access_token_post_body_with_password())
         access_token_data = json.loads(response.content.decode('utf-8'))
         self.access_token = access_token_data['access_token']
