@@ -10,6 +10,7 @@ import logging
 
 from edx_toggles.toggles import LegacyWaffleFlagNamespace
 
+from common.djangoapps.course_modes import api as modes_api
 from common.djangoapps.student.models import CourseEnrollment
 from lms.djangoapps.certificates.models import (
     CertificateInvalidation,
@@ -162,6 +163,11 @@ def _can_generate_allowlist_certificate(user, course_key):
     enrollment_mode, __ = CourseEnrollment.enrollment_mode_for_user(user, course_key)
     if enrollment_mode is None:
         log.info(f'{user.id} : {course_key} does not have an enrollment. Certificate cannot be generated.')
+        return False
+
+    if not modes_api.is_eligible_for_certificate(enrollment_mode):
+        log.info(f'{user.id} : {course_key} has an enrollment mode of {enrollment_mode}, which is not eligible for an '
+                 f'allowlist certificate. Certificate cannot be generated.')
         return False
 
     if not IDVerificationService.user_is_verified(user):

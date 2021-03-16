@@ -21,6 +21,7 @@ from testfixtures import LogCapture
 # and verify that items are being correctly added to the queue
 # in our `XQueueCertInterface` implementation.
 from capa.xqueue_interface import XQueueInterface
+from common.djangoapps.course_modes import api as modes_api
 from common.djangoapps.course_modes.models import CourseMode
 from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
 from lms.djangoapps.certificates.models import (
@@ -91,7 +92,7 @@ class XQueueCertInterfaceAddCertificateTest(ModuleStoreTestCase):
             id=self.course.id
         )
         mock_send = self.add_cert_to_queue(mode)
-        if CourseMode.is_eligible_for_certificate(mode):
+        if modes_api.is_eligible_for_certificate(mode):
             self.assert_certificate_generated(mock_send, mode, template_name)
         else:
             self.assert_ineligible_certificate_generated(mock_send, mode)
