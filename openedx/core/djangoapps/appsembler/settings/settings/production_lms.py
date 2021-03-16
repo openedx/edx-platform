@@ -126,6 +126,14 @@ def plugin_settings(settings):
             ])
         )
 
+    if settings.FEATURES.get('TAHOE_YEARLY_AMC_TOKENS', True):
+        # TODO: RED-1901 Remove this feature and reduce the time back to one hour.
+        #       Extending AMC tokens from an hour to a year is _not_ a good idea but needed for AMC to work and
+        #       maintain pre-Juniper behaviour. This should be refactored to improve AMC token and refresh flow.
+        total_seconds_in_year = 365 * 24 * 3600
+        settings.OAUTH2_PROVIDER['REFRESH_TOKEN_EXPIRE_SECONDS'] = total_seconds_in_year
+        settings.OAUTH2_PROVIDER['ACCESS_TOKEN_EXPIRE_SECONDS'] = total_seconds_in_year
+
     if settings.SENTRY_DSN:
         settings.RAVEN_CONFIG['tags']['app'] = 'lms'
 
