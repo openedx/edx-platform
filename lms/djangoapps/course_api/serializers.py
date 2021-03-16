@@ -6,6 +6,7 @@ Course API Serializers.  Representing course catalog data
 import urllib
 
 from django.urls import reverse
+from django.contrib.auth import get_user_model
 from edx_django_utils import monitoring as monitoring_utils
 from rest_framework import serializers
 
@@ -13,6 +14,8 @@ from openedx.core.djangoapps.content.course_overviews.models import \
     CourseOverview  # lint-amnesty, pylint: disable=unused-import
 from openedx.core.djangoapps.models.course_details import CourseDetails
 from openedx.core.lib.api.fields import AbsoluteURLField
+from common.djangoapps.student.models import CourseEnrollment, CourseAccessRole
+from openedx.core.djangoapps.user_api.accounts.serializers import AccountLegacyProfileSerializer
 
 
 class _MediaSerializer(serializers.Serializer):  # pylint: disable=abstract-method
@@ -173,3 +176,26 @@ class CourseKeySerializer(serializers.BaseSerializer):  # pylint:disable=abstrac
         monitoring_utils.increment('course_key_serializer_to_representation_call_count')
 
         return str(instance)
+
+
+class CourseEnrollmentSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = CourseEnrollment
+        fields = ['mode']
+
+
+class CourseAccessRoleSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = CourseAccessRole
+        fields = ['role']
+
+
+class CourseMemberSerializer(serializers.ModelSerializer):
+
+    profile = AccountLegacyProfileSerializer()
+    enrollments = CourseEnrollmentSerializer(source='courseenrollment_set', many=True)
+    course_access_roles = CourseAccessRoleSerializer(source='courseaccessrole_set', many=True)
+    class Meta:
+        model = get_user_model()
+        fields = ['id', 'username', 'profile', 'enrollments', 'course_access_roles']

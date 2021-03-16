@@ -6,6 +6,7 @@ import logging
 import search
 from django.conf import settings
 from django.contrib.auth.models import AnonymousUser, User  # lint-amnesty, pylint: disable=imported-auth-user
+from django.core.paginator import Paginator
 from django.db.models import Prefetch, Q
 from django.urls import reverse
 from edx_django_utils.monitoring import function_trace
@@ -16,6 +17,7 @@ from rest_framework.exceptions import PermissionDenied
 from common.djangoapps.student.models import CourseAccessRole, CourseEnrollment
 from common.djangoapps.student.roles import GlobalStaff, REGISTERED_ACCESS_ROLES
 from lms.djangoapps.courseware.access import has_access
+from lms.djangoapps.course_api.serializers import CourseMemberSerializer
 from lms.djangoapps.courseware.courses import (
     get_course_overview_with_access,
     get_courses,
@@ -269,7 +271,7 @@ def get_course_run_url(request, course_id):
     return request.build_absolute_uri(course_run_url)
 
 
-def get_course_member_queryset(course_key, include_students=True, access_roles=None, prefetch_user_course_roles=False):
+def get_course_members(course_key, page=1, limit=20, include_students=True, access_roles=None):
     """
     Returns a User queryset that filters all users related to a course. For example - Students, Teachers, Staffs etc.
 
@@ -324,22 +326,32 @@ def get_course_member_queryset(course_key, include_students=True, access_roles=N
     else:
         queryset = queryset.filter(access_role_qs)
 
-    if prefetch_user_course_roles:
-
-        # prefetch CourseAccessRole items related to the course and given roles
-        queryset = queryset.prefetch_related(Prefetch(
-            'courseaccessrole_set',
-            CourseAccessRole.objects.filter(
-                course_id=course_key, role__in=access_roles)
-        ))
-
-        # prefetch CourseEnrollment items related to the course
-        queryset = queryset.prefetch_related(Prefetch(
-            'courseenrollment_set',
-            CourseEnrollment.objects.filter(course_id=course_key)
-        ))
-
     # prevent duplicates
     queryset = queryset.distinct()
 
-    return queryset
+    # prefetch UserProfile
+    queryset = queryset.prefetch_related('profile')
+
+    # prefetch CourseAccessRole items related to the course and given roles
+    queryset = queryset.prefetch_related(Prefetch(
+        'courseaccessrole_set',
+        CourseAccessRole.objects.filter(
+            course_id=course_key, role__in=access_roles)
+    ))
+
+    # prefetch CourseEnrollment items related to the course
+    queryset = queryset.prefetch_related(Prefetch(
+        'courseenrollment_set',
+        CourseEnrollment.objects.filter(course_id=course_key)
+    ))
+
+    paginator = Paginator(queryset, limit)
+
+    serialized_data = CourseMemberSerializer(paginator.page(page), many=True).data
+
+    return {
+        'count': paginator.count,
+        'num_pages': paginator.num_pages,
+        'current_page': page,
+        'result': serialized_data,
+    }
