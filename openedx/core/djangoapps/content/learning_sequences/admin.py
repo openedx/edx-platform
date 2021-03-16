@@ -52,7 +52,7 @@ class CourseSectionSequenceInline(admin.TabularInline):
     fields = (
         'title',
         'is_time_limited',
-        'is_proctored_exam',
+        'is_proctored_enabled',
         'is_practice_exam',
         'accessible_after_due',
         'visible_to_staff_only',
@@ -61,7 +61,7 @@ class CourseSectionSequenceInline(admin.TabularInline):
     readonly_fields = (
         'title',
         'is_time_limited',
-        'is_proctored_exam',
+        'is_proctored_enabled',
         'is_practice_exam',
         'accessible_after_due',
         'visible_to_staff_only',
@@ -100,10 +100,10 @@ class CourseSectionSequenceInline(admin.TabularInline):
     is_time_limited.boolean = True
     is_time_limited.short_description = "Timed Exam"
 
-    def is_proctored_exam(self, cs_seq):
-        return cs_seq.exam.is_proctored_exam
-    is_proctored_exam.boolean = True
-    is_proctored_exam.short_description = "Proctored Exam"
+    def is_proctored_enabled(self, cs_seq):
+        return cs_seq.exam.is_proctored_enabled
+    is_proctored_enabled.boolean = True
+    is_proctored_enabled.short_description = "Proctored Exam"
 
     def is_practice_exam(self, cs_seq):
         return cs_seq.exam.is_practice_exam
