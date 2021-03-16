@@ -170,7 +170,8 @@ class AccountCreationForm(forms.Form):
         extra_fields=None,
         extended_profile_fields=None,
         do_third_party_auth=True,
-        tos_required=True
+        tos_required=True,
+        ignore_email_blacklist=False # EOL
     ):
         super(AccountCreationForm, self).__init__(data)
 
