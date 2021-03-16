@@ -24,7 +24,7 @@ class TestDiscountRestrictionConfig(CacheIsolationTestCase):
     def setUp(self):
         self.course_overview = CourseOverviewFactory.create()
         self.user = UserFactory.create()
-        super(TestDiscountRestrictionConfig, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
 
     @ddt.data(True, False)
     def test_disabled_for_course_stacked_config(
