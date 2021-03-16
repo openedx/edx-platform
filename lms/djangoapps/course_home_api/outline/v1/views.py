@@ -295,6 +295,17 @@ class OutlineTabView(RetrieveAPIView):
 
         return Response(serializer.data)
 
+    def finalize_response(self, request, response, *args, **kwargs):
+        """
+        Return the final response, exposing the 'Date' header for computing relative time to the dates in the data.
+        """
+        response = super().finalize_response(request, response, *args, **kwargs)
+        # Adding this header should be moved somewhere global, not just this endpoint
+        exposedHeaders = response.get('Access-Control-Expose-Headers', '')
+        exposedHeaders += ', Date' if exposedHeaders else 'Date'
+        response['Access-Control-Expose-Headers'] = exposedHeaders
+        return response
+
 
 @api_view(['POST'])
 @authentication_classes((JwtAuthentication,))
