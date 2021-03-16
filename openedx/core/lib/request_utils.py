@@ -455,7 +455,7 @@ def _log_and_monitor_expected_errors(request, exception, caller):
             return
 
         # Currently, it seems unexpected that middleware and drf will both handle different uncaught exceptions.
-        # However, since it is possible, we will add an additional attribute and log message and then continue.
+        # We will monitor for this and adjust accordingly if it turns out this is a common case.
         set_custom_attribute('unexpected_multiple_exceptions', cached_module_and_class)
         log.warning(
             "Unexpected scenario where different exceptions are handled by _log_and_monitor_expected_errors. "
