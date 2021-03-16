@@ -1495,6 +1495,10 @@ class CourseEnrollment(models.Model):
             segment_traits = dict(segment_properties)
             # Add course_title to the traits, as it is used by Hubspot filters
             segment_traits['course_title'] = self.course_overview.display_name if self.course_overview else None
+            # Hubspot requires all incoming events have an email address to link it
+            # to a Contact object.
+            segment_traits['email'] = self.user.email
+
             if event_name == EVENT_NAME_ENROLLMENT_ACTIVATED:
                 segment_properties['email'] = self.user.email
                 # This next property is for an experiment, see method's comments for more information
