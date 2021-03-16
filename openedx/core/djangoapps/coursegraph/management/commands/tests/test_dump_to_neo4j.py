@@ -1,4 +1,3 @@
-# coding=utf-8
 """
 Tests for the dump_to_neo4j management command.
 """
@@ -6,9 +5,8 @@ Tests for the dump_to_neo4j management command.
 
 from datetime import datetime
 
+from unittest import mock
 import ddt
-import mock
-import six
 from django.core.management import call_command
 from edx_toggles.toggles.testutils import override_waffle_switch
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
@@ -59,7 +57,7 @@ class TestDumpToNeo4jCommandBase(SharedModuleStoreTestCase):
         test for a bug where xblocks with the same block_ids (but different
         locations) pointed to themselves erroneously.
         """
-        super(TestDumpToNeo4jCommandBase, cls).setUpClass()
+        super().setUpClass()
         cls.course = CourseFactory.create()
         cls.chapter = ItemFactory.create(parent=cls.course, category='chapter')
         cls.sequential = ItemFactory.create(parent=cls.chapter, category='sequential')
@@ -71,7 +69,7 @@ class TestDumpToNeo4jCommandBase(SharedModuleStoreTestCase):
 
         cls.course2 = CourseFactory.create()
 
-        cls.course_strings = [six.text_type(cls.course.id), six.text_type(cls.course2.id)]
+        cls.course_strings = [str(cls.course.id), str(cls.course2.id)]
 
     @staticmethod
     def setup_mock_graph(mock_selector_class, mock_graph_class, transaction_errors=False):
@@ -105,7 +103,7 @@ class TestDumpToNeo4jCommandBase(SharedModuleStoreTestCase):
             number_commits: number of commits we expect against the graph
             number_rollbacks: number of commit rollbacks we expect
         """
-        courses = set([node['course_key'] for node in mock_graph.nodes])  # lint-amnesty, pylint: disable=consider-using-set-comprehension
+        courses = {node['course_key'] for node in mock_graph.nodes}
         assert len(courses) == number_of_courses
         assert mock_graph.number_commits == number_commits
         assert mock_graph.number_rollbacks == number_rollbacks
@@ -222,7 +220,7 @@ class TestDumpToNeo4jCommand(TestDumpToNeo4jCommandBase):
         )
 
 
-class SomeThing(object):
+class SomeThing:
     """Just to test the stringification of an object."""
     def __str__(self):
         return "<SomeThing>"
@@ -237,7 +235,7 @@ class TestModuleStoreSerializer(TestDumpToNeo4jCommandBase):
     @classmethod
     def setUpClass(cls):
         """Any ModuleStore course/content operations can go here."""
-        super(TestModuleStoreSerializer, cls).setUpClass()
+        super().setUpClass()
         cls.mss = ModuleStoreSerializer.create()
 
     def test_serialize_item(self):
@@ -316,7 +314,7 @@ class TestModuleStoreSerializer(TestDumpToNeo4jCommandBase):
         Returns:
             A tuple of the string representations of those XBlocks' locations.
         """
-        return (six.text_type(xblock1.location), six.text_type(xblock2.location))
+        return (str(xblock1.location), str(xblock2.location))
 
     def assertBlockPairIsRelationship(self, xblock1, xblock2, relationships, relationship_type):
         """
@@ -423,7 +421,7 @@ class TestModuleStoreSerializer(TestDumpToNeo4jCommandBase):
         # 2 nodes and no relationships from the second
 
         assert len(mock_graph.nodes) == 11
-        six.assertCountEqual(self, submitted, self.course_strings)
+        self.assertCountEqual(submitted, self.course_strings)
 
     @mock.patch('openedx.core.djangoapps.coursegraph.tasks.NodeSelector')
     @mock.patch('openedx.core.djangoapps.coursegraph.tasks.authenticate_and_create_graph')
@@ -447,7 +445,7 @@ class TestModuleStoreSerializer(TestDumpToNeo4jCommandBase):
             number_rollbacks=2,
         )
 
-        six.assertCountEqual(self, submitted, self.course_strings)
+        self.assertCountEqual(submitted, self.course_strings)
 
     @mock.patch('openedx.core.djangoapps.coursegraph.tasks.NodeSelector')
     @mock.patch('openedx.core.djangoapps.coursegraph.tasks.authenticate_and_create_graph')
@@ -506,15 +504,15 @@ class TestModuleStoreSerializer(TestDumpToNeo4jCommandBase):
         # make sure only the published course was dumped
         submitted, __ = self.mss.dump_courses_to_neo4j(credentials)
         assert len(submitted) == 1
-        assert submitted[0] == six.text_type(self.course.id)
+        assert submitted[0] == str(self.course.id)
 
     @mock.patch('openedx.core.djangoapps.coursegraph.tasks.get_course_last_published')
     @mock.patch('openedx.core.djangoapps.coursegraph.tasks.get_command_last_run')
     @ddt.data(
-        (six.text_type(datetime(2016, 3, 30)), six.text_type(datetime(2016, 3, 31)), True),
-        (six.text_type(datetime(2016, 3, 31)), six.text_type(datetime(2016, 3, 30)), False),
-        (six.text_type(datetime(2016, 3, 31)), None, False),
-        (None, six.text_type(datetime(2016, 3, 30)), True),
+        (str(datetime(2016, 3, 30)), str(datetime(2016, 3, 31)), True),
+        (str(datetime(2016, 3, 31)), str(datetime(2016, 3, 30)), False),
+        (str(datetime(2016, 3, 31)), None, False),
+        (None, str(datetime(2016, 3, 30)), True),
         (None, None, True),
     )
     @ddt.unpack

@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 Tests that the request came from a crawler or not.
 """
@@ -14,7 +13,7 @@ from ..models import CrawlersConfig
 class CrawlersConfigTest(TestCase):  # lint-amnesty, pylint: disable=missing-class-docstring
 
     def setUp(self):
-        super(CrawlersConfigTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         CrawlersConfig(known_user_agents='edX-downloader,crawler_foo', enabled=True).save()
 
     @ddt.data(
@@ -31,8 +30,8 @@ class CrawlersConfigTest(TestCase):  # lint-amnesty, pylint: disable=missing-cla
         assert not CrawlersConfig.is_crawler(fake_request)
 
     @ddt.data(
-        u"edX-downloader",
-        "crawler_foo".encode("utf-8")
+        "edX-downloader",
+        b"crawler_foo"
     )
     def test_req_user_agent_is_crawler(self, req_user_agent):
         """

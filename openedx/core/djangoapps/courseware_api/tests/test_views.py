@@ -6,8 +6,8 @@ from datetime import datetime
 from urllib.parse import urlencode
 from typing import Optional
 
+from unittest import mock
 import ddt
-import mock
 from completion.test_utils import CompletionWaffleTestMixin, submit_completions_for_testing
 from django.conf import settings
 from django.contrib.auth import get_user_model
@@ -65,7 +65,7 @@ class BaseCoursewareTests(SharedModuleStoreTestCase):
 
         cls.user = UserFactory(
             username='student',
-            email=u'user@example.com',
+            email='user@example.com',
             password='foo',
             is_staff=False
         )
@@ -76,7 +76,7 @@ class BaseCoursewareTests(SharedModuleStoreTestCase):
             is_staff=False
         )
         CourseInstructorRole(cls.course.id).add_users(cls.instructor)
-        cls.url = '/api/courseware/course/{}'.format(cls.course.id)
+        cls.url = f'/api/courseware/course/{cls.course.id}'
 
     @classmethod
     def tearDownClass(cls):
@@ -297,7 +297,7 @@ class SequenceApiTestViews(BaseCoursewareTests):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
-        cls.url = '/api/courseware/sequence/{}'.format(cls.sequence.location)
+        cls.url = f'/api/courseware/sequence/{cls.sequence.location}'
 
     @classmethod
     def tearDownClass(cls):
@@ -318,7 +318,7 @@ class ResumeApiTestViews(BaseCoursewareTests, CompletionWaffleTestMixin):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
-        cls.url = '/api/courseware/resume/{}'.format(cls.course.id)
+        cls.url = f'/api/courseware/resume/{cls.course.id}'
 
     def test_resume_no_completion(self):
         response = self.client.get(self.url)
@@ -345,7 +345,7 @@ class CelebrationApiTestViews(BaseCoursewareTests, MasqueradeMixin):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
-        cls.url = '/api/courseware/celebration/{}'.format(cls.course.id)
+        cls.url = f'/api/courseware/celebration/{cls.course.id}'
 
     def setUp(self):
         super().setUp()

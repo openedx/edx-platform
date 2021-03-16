@@ -14,7 +14,7 @@ class _MediaSerializer(serializers.Serializer):  # pylint: disable=abstract-meth
     """
 
     def __init__(self, uri_attribute, *args, **kwargs):
-        super(_MediaSerializer, self).__init__(*args, **kwargs)  # lint-amnesty, pylint: disable=super-with-arguments
+        super().__init__(*args, **kwargs)
         self.uri_attribute = uri_attribute
 
     uri = serializers.SerializerMethodField(source='*')
