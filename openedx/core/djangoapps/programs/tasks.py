@@ -1,7 +1,7 @@
 """
 This file contains celery tasks for programs-related functionality.
 """
-
+from datetime import datetime
 
 from celery import shared_task
 from celery.exceptions import MaxRetriesExceededError
@@ -300,10 +300,17 @@ def post_course_certificate(client, username, certificate, visible_date):
 
 @shared_task(bind=True, ignore_result=True)
 @set_code_owner_attribute
-def award_course_certificate(self, username, course_run_key):
+def award_course_certificate(self, username, course_run_key, certificate_available_date=None):
     """
     This task is designed to be called whenever a student GeneratedCertificate is updated.
     It can be called independently for a username and a course_run, but is invoked on each GeneratedCertificate.save.
+
+    Arguments:
+        username (str): The user to award the Credentials course cert to
+        course_run_key (str): The course run key to award the certificate for
+        certificate_available_date (str): A string representation of the datetime for when to make the certificate
+            available to the user. If not provided, it will calculate the date.
+
     """
     def _retry_with_custom_exception(username, course_run_key, reason, countdown):
         exception = MaxRetriesExceededError(
@@ -368,10 +375,20 @@ def award_course_certificate(self, username, course_run_key):
                 username=settings.CREDENTIALS_SERVICE_USERNAME),
                 org=course_key.org,
             )
-            # FIXME This may result in visible dates that do not update alongside the Course Overview if that changes
-            # This is a known limitation of this implementation and was chosen to reduce the amount of replication,
-            # endpoints, celery tasks, and jenkins jobs that needed to be written for this functionality
-            visible_date = available_date_for_certificate(course_overview, certificate)
+
+            # Date is being passed via JSON and is encoded in the EMCA date time string format. The rest of the code
+            # expects a datetime.
+            if certificate_available_date:
+                certificate_available_date = datetime.strptime(certificate_available_date, VISIBLE_DATE_FORMAT)
+
+            # Even in the cases where this task is called with a certificate_available_date, we still need to retrieve
+            # the course overview because it's required to determine if we should use the certificate_available_date or
+            # the certs modified date
+            visible_date = available_date_for_certificate(
+                course_overview,
+                certificate,
+                certificate_available_date=certificate_available_date
+            )
             LOGGER.info(
                 "Task award_course_certificate will award certificate for course "
                 f"{course_key} with a visible date of {visible_date}"
@@ -588,7 +605,7 @@ def revoke_program_certificates(self, username, course_key):
 
 @shared_task(bind=True, ignore_result=True)
 @set_code_owner_attribute
-def update_certificate_visible_date_on_course_update(self, course_key):
+def update_certificate_visible_date_on_course_update(self, course_key, certificate_available_date):
     """
     This task is designed to be called whenever a course is updated with
     certificate_available_date so that visible_date is updated on credential
@@ -598,8 +615,10 @@ def update_certificate_visible_date_on_course_update(self, course_key):
     the credentials API to update all these certificates visible_date value
     to keep certificates in sync on both sides.
 
-    Args:
+    Arguments:
         course_key (str): The course identifier
+        certificate_available_date (str): The date to update the certificate availablity date to. It's a string
+            representation of a datetime object because task parameters must be JSON-able.
 
     Returns:
         None
@@ -626,8 +645,8 @@ def update_certificate_visible_date_on_course_update(self, course_key):
     ).values_list('user__username', flat=True)
 
     LOGGER.info(
-        "Task update_certificate_visible_date_on_course_update resending course certificates"
+        "Task update_certificate_visible_date_on_course_update resending course certificates "
         f"for {len(users_with_certificates_in_course)} users in course {course_key}."
     )
     for user in users_with_certificates_in_course:
-        award_course_certificate.delay(user, str(course_key))
+        award_course_certificate.delay(user, str(course_key), certificate_available_date=certificate_available_date)
