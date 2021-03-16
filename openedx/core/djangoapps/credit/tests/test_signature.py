@@ -1,4 +1,3 @@
-# coding=utf-8
 """
 Tests for digital signatures used to validate messages to/from credit providers.
 """
@@ -11,7 +10,7 @@ from openedx.core.djangoapps.credit import signature
 
 
 @override_settings(CREDIT_PROVIDER_SECRET_KEYS={
-    "asu": u'abcd1234'
+    "asu": 'abcd1234'
 })
 class SignatureTest(TestCase):
     """
@@ -27,7 +26,7 @@ class SignatureTest(TestCase):
         assert sig == '7d70a26b834d9881cc14466eceac8d39188fc5ef5ffad9ab281a8327c2c0d093'
 
     @override_settings(CREDIT_PROVIDER_SECRET_KEYS={
-        "asu": u'\u4567'
+        "asu": '\u4567'
     })
     def test_non_ascii_unicode_secret_key(self):
         # Test a key that contains non-ASCII unicode characters
@@ -40,7 +39,7 @@ class SignatureTest(TestCase):
     def test_unicode_data(self):
         """ Verify the signature generation method supports Unicode data. """
         key = signature.get_shared_secret_key("asu")
-        sig = signature.signature({'name': u'Ed Xavíer'}, key)
+        sig = signature.signature({'name': 'Ed Xavíer'}, key)
         assert sig == '76b6c9a657000829253d7c23977b35b34ad750c5681b524d7fdfb25cd5273cec'
 
     @override_settings(CREDIT_PROVIDER_SECRET_KEYS={
@@ -66,7 +65,7 @@ class SignatureTest(TestCase):
         assert key == ['abcd1234', 'zyxw9876']
 
     @override_settings(CREDIT_PROVIDER_SECRET_KEYS={
-        "asu": [u'\u4567', u'zyxw9876']
+        "asu": ['\u4567', 'zyxw9876']
     })
     def test_get_shared_secret_key_string_multiple_keys_with_none(self):
         """

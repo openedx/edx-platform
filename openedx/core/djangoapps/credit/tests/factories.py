@@ -22,7 +22,7 @@ from common.djangoapps.util.date_utils import to_timestamp
 
 
 class CreditCourseFactory(factory.DjangoModelFactory):
-    class Meta(object):
+    class Meta:
         model = CreditCourse
 
     course_key = FuzzyText(prefix='fake.org/', suffix='/fake.run')
@@ -30,14 +30,14 @@ class CreditCourseFactory(factory.DjangoModelFactory):
 
 
 class CreditRequirementFactory(factory.DjangoModelFactory):
-    class Meta(object):
+    class Meta:
         model = CreditRequirement
 
     course = factory.SubFactory(CreditCourseFactory)
 
 
 class CreditRequirementStatusFactory(factory.DjangoModelFactory):
-    class Meta(object):
+    class Meta:
         model = CreditRequirementStatus
 
     requirement = factory.SubFactory(CreditRequirementFactory)
@@ -45,7 +45,7 @@ class CreditRequirementStatusFactory(factory.DjangoModelFactory):
 
 
 class CreditProviderFactory(factory.DjangoModelFactory):
-    class Meta(object):
+    class Meta:
         model = CreditProvider
 
     provider_id = FuzzyText(length=5)
@@ -53,14 +53,14 @@ class CreditProviderFactory(factory.DjangoModelFactory):
 
 
 class CreditEligibilityFactory(factory.DjangoModelFactory):
-    class Meta(object):
+    class Meta:
         model = CreditEligibility
 
     course = factory.SubFactory(CreditCourseFactory)
 
 
 class CreditRequestFactory(factory.DjangoModelFactory):
-    class Meta(object):
+    class Meta:
         model = CreditRequest
 
     uuid = factory.LazyAttribute(lambda o: uuid.uuid4().hex)  # pylint: disable=undefined-variable

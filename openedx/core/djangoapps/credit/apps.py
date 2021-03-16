@@ -12,7 +12,7 @@ class CreditConfig(AppConfig):
     """
     Default configuration for the "openedx.core.djangoapps.credit" Django application.
     """
-    name = u'openedx.core.djangoapps.credit'
+    name = 'openedx.core.djangoapps.credit'
 
     def ready(self):
         from . import signals  # lint-amnesty, pylint: disable=unused-import
