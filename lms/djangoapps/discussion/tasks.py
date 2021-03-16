@@ -57,7 +57,9 @@ def update_discussions_map(context):
 
 
 class ResponseNotification(BaseMessageType):
-    pass
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.options['transactional'] = True
 
 
 @shared_task(base=LoggedTask)
