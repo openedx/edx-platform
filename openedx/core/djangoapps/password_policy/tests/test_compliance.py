@@ -3,12 +3,12 @@ Test password policy utilities
 """
 
 from datetime import datetime, timedelta
+from unittest.mock import patch
 
 import pytest
 import pytz
 from dateutil.parser import parse as parse_date
 from django.test import TestCase, override_settings
-from mock import patch
 
 from openedx.core.djangoapps.password_policy.compliance import (NonCompliantPasswordException,
                                                                 NonCompliantPasswordWarning,

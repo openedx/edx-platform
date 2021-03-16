@@ -4,10 +4,11 @@ Test password policy settings
 
 
 import datetime
+from unittest.mock import patch
+
 from dateutil.parser import parse as parse_date
 from django.conf import settings
 from django.test import TestCase, override_settings
-from mock import patch
 
 import openedx.core.djangoapps.password_policy as password_policy
 from openedx.core.djangoapps.password_policy.apps import PasswordPolicyConfig
