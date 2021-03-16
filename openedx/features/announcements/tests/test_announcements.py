@@ -5,7 +5,7 @@ Unit tests for the announcements feature.
 
 import json
 import unittest
-from mock import patch
+from unittest.mock import patch
 
 from django.conf import settings
 from django.test import TestCase
@@ -13,7 +13,6 @@ from django.test.client import Client
 from django.urls import reverse
 
 from common.djangoapps.student.tests.factories import AdminFactory
-
 from openedx.features.announcements.models import Announcement
 
 TEST_ANNOUNCEMENTS = [
@@ -33,14 +32,14 @@ class TestGlobalAnnouncements(TestCase):
 
     @classmethod
     def setUpTestData(cls):
-        super(TestGlobalAnnouncements, cls).setUpTestData()
+        super().setUpTestData()
         Announcement.objects.bulk_create([
             Announcement(content=content, active=active)
             for content, active in TEST_ANNOUNCEMENTS
         ])
 
     def setUp(self):
-        super(TestGlobalAnnouncements, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.client = Client()
         self.admin = AdminFactory.create(
             email='staff@edx.org',
