@@ -458,8 +458,10 @@ def _log_and_monitor_expected_errors(request, exception, caller):
         set_custom_attribute('unexpected_multiple_exceptions', cached_module_and_class)
         log.warning(
             "Unexpected scenario where different exceptions are handled by _log_and_monitor_expected_errors. "
-            "See 'unexpected_multiple_exceptions' custom attribute."
+            "See 'unexpected_multiple_exceptions' custom attribute. Skipping exception for %s.",
+            module_and_class,
         )
+        return
     request_cache.set('handled_exception', module_and_class)
 
     if module_and_class not in expected_error_settings_dict:
