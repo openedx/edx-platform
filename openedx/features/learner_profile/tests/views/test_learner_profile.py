@@ -1,19 +1,19 @@
-# -*- coding: utf-8 -*-
 """ Tests for student profile views. """
 
 
 import datetime
+from unittest import mock
 
 import ddt
-import mock
 from django.conf import settings
-from django.test import override_settings  # lint-amnesty, pylint: disable=unused-import
 from django.test.client import RequestFactory
 from django.urls import reverse
 from edx_toggles.toggles.testutils import override_waffle_flag
 from opaque_keys.edx.locator import CourseLocator
 
 from common.djangoapps.course_modes.models import CourseMode
+from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
+from common.djangoapps.util.testing import UrlResetMixin
 from lms.djangoapps.certificates.api import is_passing_status
 from lms.djangoapps.certificates.tests.factories import GeneratedCertificateFactory
 from lms.envs.test import CREDENTIALS_PUBLIC_SERVICE_URL
@@ -21,8 +21,6 @@ from openedx.core.djangoapps.content.course_overviews.models import CourseOvervi
 from openedx.core.djangoapps.site_configuration.tests.mixins import SiteMixin
 from openedx.features.learner_profile.toggles import REDIRECT_TO_PROFILE_MICROFRONTEND
 from openedx.features.learner_profile.views.learner_profile import learner_profile_context
-from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
-from common.djangoapps.util.testing import UrlResetMixin
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
@@ -49,7 +47,7 @@ class LearnerProfileViewTest(SiteMixin, UrlResetMixin, ModuleStoreTestCase):
     ]
 
     def setUp(self):
-        super(LearnerProfileViewTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.user = UserFactory.create(username=self.USERNAME, password=self.PASSWORD)
         self.other_user = UserFactory.create(username=self.OTHER_USERNAME, password=self.PASSWORD)
         self.client.login(username=self.USERNAME, password=self.PASSWORD)
@@ -125,7 +123,7 @@ class LearnerProfileViewTest(SiteMixin, UrlResetMixin, ModuleStoreTestCase):
     def test_records_link(self):
         profile_path = reverse('learner_profile', kwargs={'username': self.USERNAME})
         response = self.client.get(path=profile_path)
-        self.assertContains(response, u'<a href="{}/records/">'.format(CREDENTIALS_PUBLIC_SERVICE_URL))
+        self.assertContains(response, f'<a href="{CREDENTIALS_PUBLIC_SERVICE_URL}/records/">')
 
     def test_undefined_profile_page(self):
         """
@@ -155,9 +153,9 @@ class LearnerProfileViewTest(SiteMixin, UrlResetMixin, ModuleStoreTestCase):
         cert = self._create_certificate(enrollment_mode=cert_mode)
         cert.save()
 
-        response = self.client.get('/u/{username}'.format(username=self.user.username))
+        response = self.client.get(f'/u/{self.user.username}')
 
-        self.assertContains(response, u'card certificate-card mode-{cert_mode}'.format(cert_mode=cert_mode))
+        self.assertContains(response, f'card certificate-card mode-{cert_mode}')
 
     @ddt.data(
         ['downloadable', True],
@@ -175,12 +173,12 @@ class LearnerProfileViewTest(SiteMixin, UrlResetMixin, ModuleStoreTestCase):
         # Ensure that this test is actually using both passing and non-passing certs.
         assert is_passing_status(cert.status) == is_passed_status
 
-        response = self.client.get('/u/{username}'.format(username=self.user.username))
+        response = self.client.get(f'/u/{self.user.username}')
 
         if is_passed_status:
-            self.assertContains(response, u'card certificate-card mode-{cert_mode}'.format(cert_mode=cert.mode))
+            self.assertContains(response, f'card certificate-card mode-{cert.mode}')
         else:
-            self.assertNotContains(response, u'card certificate-card mode-{cert_mode}'.format(cert_mode=cert.mode))
+            self.assertNotContains(response, f'card certificate-card mode-{cert.mode}')
 
     def test_certificate_for_missing_course(self):
         """
@@ -190,9 +188,9 @@ class LearnerProfileViewTest(SiteMixin, UrlResetMixin, ModuleStoreTestCase):
         cert = self._create_certificate(course_key=CourseLocator.from_string('course-v1:edX+INVALID+1'))
         cert.save()
 
-        response = self.client.get('/u/{username}'.format(username=self.user.username))
+        response = self.client.get(f'/u/{self.user.username}')
 
-        self.assertNotContains(response, u'card certificate-card mode-{cert_mode}'.format(cert_mode=cert.mode))
+        self.assertNotContains(response, f'card certificate-card mode-{cert.mode}')
 
     @ddt.data(True, False)
     def test_no_certificate_visibility(self, own_profile):
@@ -202,7 +200,7 @@ class LearnerProfileViewTest(SiteMixin, UrlResetMixin, ModuleStoreTestCase):
         another user that does not have any certificates.
         """
         profile_username = self.user.username if own_profile else self.other_user.username
-        response = self.client.get('/u/{username}'.format(username=profile_username))
+        response = self.client.get(f'/u/{profile_username}')
 
         if own_profile:
             self.assertContains(response, 'You haven&#39;t earned any certificates yet.')
@@ -212,7 +210,7 @@ class LearnerProfileViewTest(SiteMixin, UrlResetMixin, ModuleStoreTestCase):
     @ddt.data(True, False)
     def test_explore_courses_visibility(self, courses_browsable):
         with mock.patch.dict('django.conf.settings.FEATURES', {'COURSES_ARE_BROWSABLE': courses_browsable}):
-            response = self.client.get('/u/{username}'.format(username=self.user.username))
+            response = self.client.get(f'/u/{self.user.username}')
             if courses_browsable:
                 self.assertContains(response, 'Explore New Courses')
             else:
@@ -230,9 +228,9 @@ class LearnerProfileViewTest(SiteMixin, UrlResetMixin, ModuleStoreTestCase):
         cert = self._create_certificate(course_key=course.id)
         cert.save()
 
-        response = self.client.get('/u/{username}'.format(username=self.user.username))
+        response = self.client.get(f'/u/{self.user.username}')
 
-        self.assertNotContains(response, u'card certificate-card mode-{cert_mode}'.format(cert_mode=cert.mode))
+        self.assertNotContains(response, f'card certificate-card mode-{cert.mode}')
 
     def test_certificates_visible_only_for_staff_and_profile_user(self):
         """
@@ -266,16 +264,16 @@ class LearnerProfileViewTest(SiteMixin, UrlResetMixin, ModuleStoreTestCase):
         cert.download_url = ''
         cert.save()
 
-        response = self.client.get('/u/{username}'.format(username=self.user.username))
+        response = self.client.get(f'/u/{self.user.username}')
         self.assertNotContains(
-            response, u'card certificate-card mode-{cert_mode}'.format(cert_mode=CourseMode.VERIFIED)
+            response, f'card certificate-card mode-{CourseMode.VERIFIED}'
         )
 
         course_overview = CourseOverview.get_from_id(self.course.id)
         course_overview.has_any_active_web_certificate = True
         course_overview.save()
 
-        response = self.client.get('/u/{username}'.format(username=self.user.username))
+        response = self.client.get(f'/u/{self.user.username}')
         self.assertContains(
-            response, u'card certificate-card mode-{cert_mode}'.format(cert_mode=CourseMode.VERIFIED)
+            response, f'card certificate-card mode-{CourseMode.VERIFIED}'
         )

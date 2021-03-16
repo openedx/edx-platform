@@ -176,7 +176,7 @@ class LtiCourseTab(LtiCourseLaunchMixin, EnrolledTab):
             tab_dict['name'] = name
 
         tab_dict['link_func'] = link_func
-        tab_dict['tab_id'] = 'lti_tab_{0}'.format(self.lti_config_id)
+        tab_dict['tab_id'] = f'lti_tab_{self.lti_config_id}'
 
         super().__init__(tab_dict)
 
