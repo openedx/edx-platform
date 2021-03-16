@@ -7,8 +7,10 @@ import logging
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 
+from common.djangoapps.course_modes import api as modes_api
 from common.djangoapps.course_modes.models import CourseMode
 from common.djangoapps.student.models import CourseEnrollment
+from common.djangoapps.student.signals import ENROLLMENT_TRACK_UPDATED
 from lms.djangoapps.certificates.generation_handler import (
     generate_allowlist_certificate_task,
     is_using_certificate_allowlist_and_is_on_allowlist
@@ -143,6 +145,22 @@ def _listen_for_id_verification_status_changed(sender, user, **kwargs):  # pylin
                     course=enrollment.course_id,
                     status=expected_verification_status
                 ))
+
+
+@receiver(ENROLLMENT_TRACK_UPDATED)
+def _listen_for_enrollment_mode_change(sender, user, course_key, mode, **kwargs):  # pylint: disable=unused-argument
+    """
+    Listen for the signal indicating that a user's enrollment mode has changed.
+
+    If possible, grant the user a course certificate. Note that we intentionally do not revoke certificates here, even
+    if the user has moved to the audit track.
+    """
+    if modes_api.is_eligible_for_certificate(mode):
+        if is_using_certificate_allowlist_and_is_on_allowlist(user, course_key):
+            log.info(f'{course_key} is using allowlist certificates, and the user {user.id} is on its allowlist. '
+                     f'Attempt will be made to generate an allowlist certificate since the enrollment mode is now '
+                     f'{mode}.')
+            generate_allowlist_certificate_task(user, course_key)
 
 
 def _fire_ungenerated_certificate_task(user, course_key, expected_verification_status=None):

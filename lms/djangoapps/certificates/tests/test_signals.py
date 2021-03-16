@@ -58,9 +58,9 @@ class SelfGeneratedCertsSignalTest(ModuleStoreTestCase):
         assert not cert_generation_enabled(course.id)
 
 
-class WhitelistGeneratedCertificatesTest(ModuleStoreTestCase):
+class AllowlistGeneratedCertificatesTest(ModuleStoreTestCase):
     """
-    Tests for whitelisted student auto-certificate generation
+    Tests for allowlisted student auto-certificate generation
     """
 
     def setUp(self):
@@ -573,3 +573,63 @@ class CertificateGenerationTaskTest(ModuleStoreTestCase):
                 _fire_ungenerated_certificate_task(self.user, self.course.id)
                 task_created = mock_generate_certificate_apply_async.called
                 assert task_created == should_create
+
+
+@override_waffle_flag(CERTIFICATES_USE_ALLOWLIST, active=True)
+@override_waffle_flag(AUTO_CERTIFICATE_GENERATION_SWITCH, active=True)
+class EnrollmentModeChangeCertsTest(ModuleStoreTestCase):
+    """
+    Tests for certificate generation task firing when the user's enrollment mode changes
+    """
+    def setUp(self):
+        super().setUp()
+        self.user = UserFactory.create()
+        self.verified_course = CourseFactory.create(
+            self_paced=True,
+        )
+        self.verified_course_key = self.verified_course.id  # pylint: disable=no-member
+        self.verified_enrollment = CourseEnrollmentFactory(
+            user=self.user,
+            course_id=self.verified_course_key,
+            is_active=True,
+            mode='verified',
+        )
+        CertificateWhitelistFactory(
+            user=self.user,
+            course_id=self.verified_course_key
+        )
+
+        self.audit_course = CourseFactory.create(self_paced=False)
+        self.audit_course_key = self.audit_course.id  # pylint: disable=no-member
+        self.audit_enrollment = CourseEnrollmentFactory(
+            user=self.user,
+            course_id=self.audit_course_key,
+            is_active=True,
+            mode='audit',
+        )
+        CertificateWhitelistFactory(
+            user=self.user,
+            course_id=self.audit_course_key
+        )
+
+    def test_audit_to_verified(self):
+        """
+        Test that we try to generate a certificate when the user switches from audit to verified
+        """
+        with mock.patch(
+            'lms.djangoapps.certificates.signals.generate_allowlist_certificate_task',
+            return_value=None
+        ) as mock_allowlist_task:
+            self.audit_enrollment.change_mode('verified')
+            mock_allowlist_task.assert_called_with(self.user, self.audit_course_key)
+
+    def test_verified_to_audit(self):
+        """
+        Test that we do not try to generate a certificate when the user switches from verified to audit
+        """
+        with mock.patch(
+            'lms.djangoapps.certificates.signals.generate_allowlist_certificate_task',
+            return_value=None
+        ) as mock_allowlist_task:
+            self.verified_enrollment.change_mode('audit')
+            mock_allowlist_task.assert_not_called()
