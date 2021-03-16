@@ -291,6 +291,7 @@ class ExpectedErrorMiddleware:
 # .. toggle_description: If True, adds a custom attribute ``error_ignored`` if the error is configured to be ignored
 #      from monitoring. For example, for ignoring errors in New Relic, see:
 #      https://docs.newrelic.com/docs/agents/manage-apm-agents/agent-data/manage-errors-apm-collect-ignore-or-mark-expected/#ignore  pylint: disable=line-too-long,useless-suppression
+#      Ignored errors would be errors where ``error_ignored IS NOT NULL``.
 #      Note: This is defaulted to True because it will be easier for us to detect if True is not the correct value, by
 #      seeing that these errors aren't actually ignored.
 # .. toggle_warning: At this time, this toggle does not actually configure the error to be ignored. It is meant to match
