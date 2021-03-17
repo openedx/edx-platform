@@ -15,7 +15,7 @@ from django.test.utils import override_settings
 from django.urls import reverse
 from django.utils import timezone
 from django.contrib.auth.models import User
-from mock import patch, Mock
+from unittest.mock import patch, Mock
 from pyquery import PyQuery as pq
 
 from lms.djangoapps.course_api.blocks.api import get_blocks
@@ -76,8 +76,8 @@ def _get_content_from_fragment(block, user_id, course, request_factory, mock_get
     block = load_single_xblock(
         request=fake_request,
         user_id=user_id,
-        course_id=six.text_type(course.id),
-        usage_key_string=six.text_type(block.scope_ids.usage_id),
+        course_id=str(course.id),
+        usage_key_string=str(block.scope_ids.usage_id),
         course=course,
         will_recheck_access=True,
     )
@@ -103,7 +103,7 @@ def _get_content_from_lms_index(block, user_id, course, request_factory):
     page = pq(page_content.content)
     seq_contents = page('#seq_contents_0').html()
     seq = pq(seq_contents)
-    block_contents = seq('[data-id="{}"]'.format(block.scope_ids.usage_id))
+    block_contents = seq(f'[data-id="{block.scope_ids.usage_id}"]')
 
     return block_contents.html()
 
@@ -186,7 +186,7 @@ class TestProblemTypeAccess(SharedModuleStoreTestCase, MasqueradeMixin):
 
     @classmethod
     def setUpClass(cls):
-        super(TestProblemTypeAccess, cls).setUpClass()
+        super().setUpClass()
         cls.factory = RequestFactory()
 
         cls.courses = {}
@@ -337,7 +337,7 @@ class TestProblemTypeAccess(SharedModuleStoreTestCase, MasqueradeMixin):
         )
 
     def setUp(self):
-        super(TestProblemTypeAccess, self).setUp()
+        super().setUp()
 
         # enroll all users into the all track types course
         self.users = {}
@@ -557,8 +557,8 @@ class TestProblemTypeAccess(SharedModuleStoreTestCase, MasqueradeMixin):
         url = reverse(
             'xblock_handler',
             kwargs={
-                'course_id': six.text_type(self.course.id),
-                'usage_id': quote_slashes(six.text_type(problem_location)),
+                'course_id': str(self.course.id),
+                'usage_id': quote_slashes(str(problem_location)),
                 'handler': 'xmodule_handler',
                 'suffix': 'problem_show',
             }
@@ -681,7 +681,7 @@ class TestProblemTypeAccess(SharedModuleStoreTestCase, MasqueradeMixin):
         self.update_masquerade(**masquerade_config)
 
         block = self.blocks_dict['problem']
-        block_view_url = reverse('render_xblock', kwargs={'usage_key_string': six.text_type(block.scope_ids.usage_id)})
+        block_view_url = reverse('render_xblock', kwargs={'usage_key_string': str(block.scope_ids.usage_id)})
         response = self.client.get(block_view_url)
         if is_gated:
             assert response.status_code == 404
@@ -719,7 +719,7 @@ class TestProblemTypeAccess(SharedModuleStoreTestCase, MasqueradeMixin):
         self.update_masquerade(username=user.username)
 
         block = self.blocks_dict['problem']
-        block_view_url = reverse('render_xblock', kwargs={'usage_key_string': six.text_type(block.scope_ids.usage_id)})
+        block_view_url = reverse('render_xblock', kwargs={'usage_key_string': str(block.scope_ids.usage_id)})
         response = self.client.get(block_view_url)
         assert response.status_code == 200
 
@@ -788,12 +788,12 @@ class TestConditionalContentAccess(TestConditionalContent):
     """
     @classmethod
     def setUpClass(cls):
-        super(TestConditionalContentAccess, cls).setUpClass()
+        super().setUpClass()
         cls.factory = RequestFactory()
         ContentTypeGatingConfig.objects.create(enabled=True, enabled_as_of=datetime(2018, 1, 1))
 
     def setUp(self):
-        super(TestConditionalContentAccess, self).setUp()
+        super().setUp()
 
         # Add a verified mode to the course
         CourseModeFactory.create(course_id=self.course.id, mode_slug='audit')
@@ -813,14 +813,14 @@ class TestConditionalContentAccess(TestConditionalContent):
         UserCourseTagFactory(
             user=self.student_verified_a,
             course_id=self.course.id,
-            key='xblock.partition_service.partition_{0}'.format(self.partition.id),
-            value=str('0'),
+            key=f'xblock.partition_service.partition_{self.partition.id}',
+            value='0',
         )
         UserCourseTagFactory(
             user=self.student_verified_b,
             course_id=self.course.id,
-            key='xblock.partition_service.partition_{0}'.format(self.partition.id),
-            value=str('1'),
+            key=f'xblock.partition_service.partition_{self.partition.id}',
+            value='1',
         )
         # Create blocks to go into the verticals
         self.block_a = ItemFactory.create(
@@ -890,7 +890,7 @@ class TestMessageDeduplication(ModuleStoreTestCase):
     """
 
     def setUp(self):
-        super(TestMessageDeduplication, self).setUp()
+        super().setUp()
 
         self.user = UserFactory.create()
         self.request_factory = RequestFactory()
@@ -1099,7 +1099,7 @@ class TestContentTypeGatingService(ModuleStoreTestCase):
     """
 
     def setUp(self):
-        super(TestContentTypeGatingService, self).setUp()
+        super().setUp()
 
         self.user = UserFactory.create()
         self.request_factory = RequestFactory()

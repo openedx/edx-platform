@@ -1,10 +1,8 @@
-
-
 from datetime import datetime
 
 from django.conf import settings
 from django.test import RequestFactory
-from mock import Mock, patch
+from unittest.mock import Mock, patch
 from opaque_keys.edx.keys import CourseKey
 
 from common.djangoapps.course_modes.tests.factories import CourseModeFactory
