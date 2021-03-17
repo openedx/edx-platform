@@ -115,7 +115,7 @@ edx-milestones==0.3.0     # via -r requirements/edx/base.txt
 edx-opaque-keys[django]==2.2.0  # via -r requirements/edx/base.txt, edx-bulk-grades, edx-ccx-keys, edx-completion, edx-drf-extensions, edx-enterprise, edx-milestones, edx-organizations, edx-proctoring, edx-user-state-client, edx-when, lti-consumer-xblock, xmodule
 edx-organizations==6.9.0  # via -r requirements/edx/base.txt
 edx-proctoring-proctortrack==1.0.5  # via -r requirements/edx/base.txt
-edx-proctoring==3.7.12    # via -r requirements/edx/base.txt, edx-proctoring-proctortrack
+edx-proctoring==3.7.13    # via -r requirements/edx/base.txt, edx-proctoring-proctortrack
 edx-rbac==1.4.1           # via -r requirements/edx/base.txt, edx-enterprise
 edx-rest-api-client==5.3.0  # via -r requirements/edx/base.txt, edx-enterprise, edx-proctoring
 edx-search==3.0.0         # via -r requirements/edx/base.txt
