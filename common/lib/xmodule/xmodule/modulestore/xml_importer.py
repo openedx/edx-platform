@@ -274,8 +274,8 @@ class ImportManager:
         Import all static items into the content store.
         """
         if self.static_content_store is None:
-            log.warning(
-                "Course import %s: Static content store is None. Skipping static content import...", self.target_id
+            log.error(
+                f"Course import {self.target_id}: Static content store is None. Skipping static content import."
             )
             return
 
@@ -286,15 +286,15 @@ class ImportManager:
         )
         if self.do_import_static:
             if self.verbose:
-                log.debug("Course import %s: Importing static content and python library", self.target_id)
+                log.info(f"Course import {self.target_id}: Importing static content and python library")
             # first pass to find everything in the static content directory
             static_content_importer.import_static_content_directory(
                 content_subdir=self.static_content_subdir, verbose=self.verbose
             )
         elif self.do_import_python_lib and self.python_lib_filename:
             if self.verbose:
-                log.debug(
-                    "Course import %s: Skipping static content import, still importing python library", self.target_id
+                log.info(
+                    f"Course import {self.target_id}: Skipping static content import, still importing python library"
                 )
             python_lib_dir_path = data_path / self.static_content_subdir
             python_lib_full_path = python_lib_dir_path / self.python_lib_filename
@@ -304,7 +304,7 @@ class ImportManager:
                 )
         else:
             if self.verbose:
-                log.debug("Course import %s: Skipping import of static content and python library", self.target_id)
+                log.info(f"Course import {self.target_id}: Skipping import of static content and python library")
 
         # No matter what do_import_static is, import "static_import" directory.
         # This is needed because the "about" pages (eg "overview") are
@@ -318,7 +318,7 @@ class ImportManager:
         simport = 'static_import'
         if os.path.exists(data_path / simport):
             if self.verbose:
-                log.debug("Importing %s directory", simport)
+                log.info(f"Course import {self.target_id}: Importing {simport} directory")
             static_content_importer.import_static_content_directory(
                 content_subdir=simport, verbose=self.verbose
             )
@@ -356,12 +356,12 @@ class ImportManager:
                     asset_md.from_xml(asset)
                     all_assets.append(asset_md)
         except OSError:
-            logging.info(
-                'Course import %s: No %s file is present with asset metadata.', self.target_id, assets_filename
+            logging.error(
+                f'Course import {self.target_id}: No {assets_filename} file is present with asset metadata.'
             )
             return
         except Exception:  # pylint: disable=W0703
-            logging.error('Course import %s: Error while parsing asset xml.', self.target_id)
+            logging.exception(f'Course import {self.target_id}: Error while parsing asset xml.')
             if self.raise_on_failure:  # lint-amnesty, pylint: disable=no-else-raise
                 raise
             else:
@@ -477,8 +477,8 @@ class ImportManager:
                             runtime=courselike.runtime,
                         )
                     except Exception:
-                        log.error(
-                            'Course import %s: failed to import module location %s', self.target_id, child.location
+                        log.exception(
+                            f'Course import {self.target_id}: failed to import module location {child.location}'
                         )
                         raise
 
