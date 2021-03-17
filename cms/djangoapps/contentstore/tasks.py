@@ -543,7 +543,7 @@ def import_olx(self, user_id, course_key_string, archive_path, archive_name, lan
 
         LOGGER.info(f'Course import {courselike_key}: Course import successful')
     except Exception as exception:   # pylint: disable=broad-except
-        LOGGER.exception(f'Course import {courselike_key}: Unknown error while updating course', exc_info=True)
+        LOGGER.exception(f'Course import {courselike_key}: Unknown error while updating course')
         self.status.fail(str(exception))
     finally:
         if course_dir.isdir():

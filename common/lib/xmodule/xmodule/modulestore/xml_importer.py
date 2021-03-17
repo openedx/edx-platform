@@ -173,7 +173,7 @@ class StaticContentImporter:  # lint-amnesty, pylint: disable=missing-class-docs
         try:
             self.static_content_store.save(content)
         except Exception as err:  # lint-amnesty, pylint: disable=broad-except
-            msg = f"Error importing {file_subpath}, error={err}"
+            msg = f"Course import {self.target_id}: Error importing {file_subpath}, error={err}"
             log.exception(msg)
             set_custom_attribute('course_import_failure', f"Static Content Save Failure: {msg}")
 
@@ -275,7 +275,7 @@ class ImportManager:
         """
         if self.static_content_store is None:
             log.error(
-                f"Course import {self.target_id}: Static content store is None. Skipping static content import."
+                f'Course import {self.target_id}: Static content store is None. Skipping static content import.'
             )
             return
 
@@ -286,7 +286,7 @@ class ImportManager:
         )
         if self.do_import_static:
             if self.verbose:
-                log.info(f"Course import {self.target_id}: Importing static content and python library")
+                log.info(f'Course import {self.target_id}: Importing static content and python library')
             # first pass to find everything in the static content directory
             static_content_importer.import_static_content_directory(
                 content_subdir=self.static_content_subdir, verbose=self.verbose
@@ -294,7 +294,7 @@ class ImportManager:
         elif self.do_import_python_lib and self.python_lib_filename:
             if self.verbose:
                 log.info(
-                    f"Course import {self.target_id}: Skipping static content import, still importing python library"
+                    f'Course import {self.target_id}: Skipping static content import, still importing python library'
                 )
             python_lib_dir_path = data_path / self.static_content_subdir
             python_lib_full_path = python_lib_dir_path / self.python_lib_filename
@@ -304,7 +304,7 @@ class ImportManager:
                 )
         else:
             if self.verbose:
-                log.info(f"Course import {self.target_id}: Skipping import of static content and python library")
+                log.info(f'Course import {self.target_id}: Skipping import of static content and python library')
 
         # No matter what do_import_static is, import "static_import" directory.
         # This is needed because the "about" pages (eg "overview") are
@@ -318,7 +318,7 @@ class ImportManager:
         simport = 'static_import'
         if os.path.exists(data_path / simport):
             if self.verbose:
-                log.info(f"Course import {self.target_id}: Importing {simport} directory")
+                log.info(f'Course import {self.target_id}: Importing {simport} directory')
             static_content_importer.import_static_content_directory(
                 content_subdir=simport, verbose=self.verbose
             )
