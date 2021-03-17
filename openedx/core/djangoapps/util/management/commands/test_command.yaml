@@ -1,0 +1,17 @@
+users:
+  - username: verified
+    email: verified@example.com
+  - username: robot1
+    email: robot1@example.com
+  - username: robot2
+    email: robot2@example.com
+enrollments:
+  - username: verified
+    course_id: 'course-v1:edX+DemoX+Demo_Course'
+    mode: verified
+  - username: robot1
+    course_id: 'course-v1:edX+DemoX+Demo_Course'
+    mode: verified
+  - username: robot2
+    course_id: 'course-v1:edX+DemoX+Demo_Course'
+    mode: verified
