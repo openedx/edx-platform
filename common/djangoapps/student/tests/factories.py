@@ -127,6 +127,7 @@ class SuperuserFactory(UserFactory):
 class CourseEnrollmentFactory(DjangoModelFactory):  # lint-amnesty, pylint: disable=missing-class-docstring
     class Meta:
         model = CourseEnrollment
+        django_get_or_create = ('course', 'user' )
 
     user = factory.SubFactory(UserFactory)
 
@@ -163,6 +164,10 @@ class CourseEnrollmentFactory(DjangoModelFactory):  # lint-amnesty, pylint: disa
                 course_overview = CourseOverviewFactory(**course_kwargs)
             kwargs['course'] = course_overview
 
+        if cls._meta.django_get_or_create:
+            if all(x in kwargs for x in cls._meta.django_get_or_create):
+                key_fields = {key:kwargs[key] for key in cls._meta.django_get_or_create}
+                return manager.get_or_create(*args, **key_fields)
         return manager.create(*args, **kwargs)
 
 
