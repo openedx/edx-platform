@@ -300,3 +300,8 @@ urlpatterns.extend(plugin_urls.get_patterns(plugin_constants.ProjectType.CMS))
 urlpatterns += (
     url(r'^hijack/', include('hijack.urls')),
 )
+
+if settings.FEATURES.get('STUDIO_LOCAL_LOGIN'):
+    urlpatterns += [
+        url(r'', include('cms.djangoapps.appsembler.urls'))
+    ]

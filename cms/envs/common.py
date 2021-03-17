@@ -406,6 +406,7 @@ FEATURES = {
     # .. toggle_tickets: https://openedx.atlassian.net/browse/DEPR-58
     # .. toggle_status: supported
     'DEPRECATE_OLD_COURSE_KEYS_IN_STUDIO': True,
+    'STUDIO_LOCAL_LOGIN': False,
 }
 
 ENABLE_JASMINE = False
