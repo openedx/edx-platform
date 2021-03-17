@@ -11,7 +11,6 @@ import pytest
 import pytz
 from django.utils import timezone
 from edx_django_utils.cache import RequestCache
-from unittest.mock import Mock
 from opaque_keys.edx.locator import CourseLocator
 
 from common.djangoapps.course_modes.tests.factories import CourseModeFactory

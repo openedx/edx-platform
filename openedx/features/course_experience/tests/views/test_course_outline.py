@@ -5,19 +5,19 @@ Tests for the Course Outline view and supporting views.
 
 import datetime
 import re
+from unittest.mock import Mock, patch
 
 import ddt
 import six
-from completion.waffle import ENABLE_COMPLETION_TRACKING_SWITCH
 from completion.models import BlockCompletion
 from completion.test_utils import CompletionWaffleTestMixin
+from completion.waffle import ENABLE_COMPLETION_TRACKING_SWITCH
 from django.contrib.sites.models import Site
 from django.test import RequestFactory, override_settings
 from django.urls import reverse
 from django.utils import timezone
 from edx_toggles.toggles.testutils import override_waffle_switch
 from milestones.tests.utils import MilestonesTestCaseMixin
-from unittest.mock import Mock, patch
 from opaque_keys.edx.keys import CourseKey, UsageKey
 from pyquery import PyQuery as pq
 from pytz import UTC
@@ -26,11 +26,13 @@ from waffle.models import Switch
 
 from common.djangoapps.course_modes.models import CourseMode
 from common.djangoapps.course_modes.tests.factories import CourseModeFactory
+from common.djangoapps.student.models import CourseEnrollment
+from common.djangoapps.student.tests.factories import UserFactory
 from lms.djangoapps.course_api.blocks.transformers.milestones import MilestonesAndSpecialExamsTransformer
-from lms.djangoapps.gating import api as lms_gating_api
 from lms.djangoapps.courseware.tests.factories import StaffFactory
 from lms.djangoapps.courseware.tests.helpers import MasqueradeMixin
 from lms.djangoapps.experiments.testutils import override_experiment_waffle_flag
+from lms.djangoapps.gating import api as lms_gating_api
 from lms.urls import RESET_COURSE_DEADLINES_NAME
 from openedx.core.djangoapps.course_date_signals.models import SelfPacedRelativeDatesConfig
 from openedx.core.djangoapps.schedules.models import Schedule
@@ -42,8 +44,6 @@ from openedx.features.course_experience.views.course_outline import (
     DEFAULT_COMPLETION_TRACKING_START,
     CourseOutlineFragmentView
 )
-from common.djangoapps.student.models import CourseEnrollment
-from common.djangoapps.student.tests.factories import UserFactory
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory

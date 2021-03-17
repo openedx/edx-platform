@@ -4,9 +4,9 @@ Tests for the course home page.
 
 
 from datetime import datetime, timedelta
+from unittest import mock
 
 import ddt
-from unittest import mock
 import six
 from django.conf import settings
 from django.http import QueryDict
@@ -20,8 +20,9 @@ from waffle.testutils import override_flag
 
 from common.djangoapps.course_modes.models import CourseMode
 from common.djangoapps.course_modes.tests.factories import CourseModeFactory
-from common.djangoapps.util.date_utils import strftime_localized_html
-from lms.djangoapps.experiments.models import ExperimentData
+from common.djangoapps.student.models import CourseEnrollment, FBEEnrollmentExclusion
+from common.djangoapps.student.tests.factories import UserFactory
+from common.djangoapps.util.date_utils import strftime_localized, strftime_localized_html
 from lms.djangoapps.commerce.models import CommerceConfiguration
 from lms.djangoapps.commerce.utils import EcommerceService
 from lms.djangoapps.course_goals.api import add_course_goal, remove_course_goal
@@ -36,6 +37,7 @@ from lms.djangoapps.courseware.tests.factories import (
 from lms.djangoapps.courseware.tests.helpers import get_expiration_banner_text
 from lms.djangoapps.courseware.utils import verified_upgrade_deadline_link
 from lms.djangoapps.discussion.django_comment_client.tests.factories import RoleFactory
+from lms.djangoapps.experiments.models import ExperimentData
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.django_comment_common.models import (
     FORUM_ROLE_ADMINISTRATOR,
@@ -55,9 +57,6 @@ from openedx.features.course_experience import (
 from openedx.features.course_experience.tests import BaseCourseUpdatesTestCase
 from openedx.features.discounts.applicability import get_discount_expiration_date
 from openedx.features.discounts.utils import REV1008_EXPERIMENT_ID, format_strikeout_price
-from common.djangoapps.student.models import CourseEnrollment, FBEEnrollmentExclusion
-from common.djangoapps.student.tests.factories import UserFactory
-from common.djangoapps.util.date_utils import strftime_localized
 from xmodule.course_module import COURSE_VISIBILITY_PRIVATE, COURSE_VISIBILITY_PUBLIC, COURSE_VISIBILITY_PUBLIC_OUTLINE
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.tests.django_utils import CourseUserType, ModuleStoreTestCase
