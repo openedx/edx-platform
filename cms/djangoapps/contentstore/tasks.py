@@ -534,7 +534,8 @@ def import_olx(self, user_id, course_key_string, archive_path, archive_name, lan
             settings.GITHUB_REPO_ROOT, [dirpath],
             load_error_modules=False,
             static_content_store=contentstore(),
-            target_id=courselike_key
+            target_id=courselike_key,
+            verbose=True
         )
 
         new_location = courselike_items[0].location
