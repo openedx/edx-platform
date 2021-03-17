@@ -150,6 +150,7 @@ def _write_chunk(request, courselike_key):
             content_range = matches.groupdict()
         except KeyError:  # Single chunk
             # no Content-Range header, so make one that will work
+            logging.info(f'Course import {courselike_key}: single chunk found')
             content_range = {'start': 0, 'stop': 1, 'end': 2}
 
         # stream out the uploaded files in chunks to disk
