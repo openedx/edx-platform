@@ -8,7 +8,7 @@ from abc import abstractmethod
 import functools
 
 
-class BlockStructureTransformer(object):
+class BlockStructureTransformer:
     """
     Abstract base class for all block structure transformers.
     """

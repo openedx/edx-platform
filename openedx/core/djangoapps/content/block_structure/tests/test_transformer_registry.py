@@ -39,7 +39,7 @@ class TransformerRegistryTestCase(TestCase):
     """
 
     def tearDown(self):
-        super(TransformerRegistryTestCase, self).tearDown()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().tearDown()
         clear_registered_transformers_cache()
 
     @ddt.data(
