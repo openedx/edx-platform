@@ -21,7 +21,8 @@ At a minimum, it is recommended that you add monitoring for any expected errors,
 By default, this will provide an ``error_expected`` custom attribute for every expected error. This custom attribute can be used in the following ways:
 
 * Alert conditions can exclude or include expected errors as necessary.
-* The value of the custom attribute includes the error name and message, which may help in diagnosing an unexpected scenario.
+* The value of the custom attribute includes the error module and class name.
+* The message of the expected error can be found in the ``error_expected_message`` custom attribute, which may also help in diagnosing an unexpected scenario.
 
 Additionally, a subset of these errors will also have an ``error_ignored`` custom attribute if the error is configured as ignored.
 

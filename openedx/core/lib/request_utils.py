@@ -275,7 +275,8 @@ class ExpectedErrorMiddleware:
 #     If this setting is a non-empty list, all uncaught errors processed will get a ``checked_error_expected_from``
 #     attribute, whether they are expected or not. This can be used to ensure that all uncaught errors are actually
 #     processed. Those errors that are processed and match a 'MODULE_AND_CLASS' (documented elsewhere), will get an
-#     ``error_expected`` custom attribute. The value of the custom attribute will include the error class module, name
+#     ``error_expected`` custom attribute. The value of the custom attribute will include the error module and class.
+#     Another custom attribute ``error_expected_message`` will contain the message of the error.
 #     and message. Unexpected errors would be errors with ``error_expected IS NULL``.
 # .. setting_warning: We use Django Middleware and a DRF custom error handler to find uncaught errors. It is still
 #     possible that some errors could slip by these mechanisms.
@@ -468,9 +469,9 @@ def _log_and_monitor_expected_errors(request, exception, caller):
     if module_and_class not in expected_error_settings_dict:
         return
 
-    exception_message = repr(str(exception))
-    module_and_class_with_message = f'{module_and_class}({exception_message})'
-    set_custom_attribute('error_expected', module_and_class_with_message)
+    exception_message = str(exception)
+    set_custom_attribute('error_expected', module_and_class)
+    set_custom_attribute('error_expected_message', exception_message)
 
     expected_error_settings = expected_error_settings_dict[module_and_class]
     if expected_error_settings['is_ignored']:
@@ -479,4 +480,10 @@ def _log_and_monitor_expected_errors(request, exception, caller):
     if expected_error_settings['log_error']:
         exc_info = exception if expected_error_settings['log_stack_trace'] else None
         request_path = getattr(request, 'path', 'request-path-unknown')
-        log.info('Expected error %s seen for path %s', module_and_class_with_message, request_path, exc_info=exc_info)
+        log.info(
+            'Expected error %s: %s: seen for path %s',
+            module_and_class,
+            exception_message,
+            request_path,
+            exc_info=exc_info,
+        )

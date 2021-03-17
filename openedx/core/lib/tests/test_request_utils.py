@@ -399,7 +399,8 @@ class TestExpectedErrorMiddleware(unittest.TestCase):
         mock_set_custom_attribute.assert_has_calls(
             [
                 call('checked_error_expected_from', 'middleware'),
-                call('error_expected', "openedx.core.lib.tests.test_request_utils.CustomError1('Test failure')"),
+                call('error_expected', 'openedx.core.lib.tests.test_request_utils.CustomError1'),
+                call('error_expected_message', 'Test failure'),
                 call('error_ignored', True)
             ],
             any_order=True
@@ -426,7 +427,8 @@ class TestExpectedErrorMiddleware(unittest.TestCase):
 
         expected_calls = [
             call('checked_error_expected_from', 'middleware'),
-            call('error_expected', "openedx.core.lib.tests.test_request_utils.CustomError1('Test failure')"),
+            call('error_expected', 'openedx.core.lib.tests.test_request_utils.CustomError1'),
+            call('error_expected_message', 'Test failure'),
             call('error_ignored', True),
             call('checked_error_expected_from', 'middleware'),
         ]
@@ -448,7 +450,10 @@ class TestExpectedErrorMiddleware(unittest.TestCase):
         mock_exception = Exception("Oops")
         ExpectedErrorMiddleware('mock-response').process_exception(self.mock_request, mock_exception)
 
-        mock_set_custom_attribute.assert_has_calls([call('error_expected', "Exception('Oops')")])
+        mock_set_custom_attribute.assert_has_calls([
+            call('error_expected', "Exception"),
+            call('error_expected_message', 'Oops'),
+        ])
 
     @patch('openedx.core.lib.request_utils.set_custom_attribute')
     @patch('openedx.core.lib.request_utils.log')
@@ -461,8 +466,11 @@ class TestExpectedErrorMiddleware(unittest.TestCase):
     def test_process_exception_expected_error_with_overrides(
         self, log_error, log_stack_trace, mock_logger, mock_set_custom_attribute,
     ):
+        expected_class = 'openedx.core.lib.tests.test_request_utils.CustomError1'
+        expected_message = 'Test failure'
+
         with override_settings(EXPECTED_ERRORS=[{
-            'MODULE_AND_CLASS': 'openedx.core.lib.tests.test_request_utils.CustomError1',
+            'MODULE_AND_CLASS': expected_class,
             'IS_IGNORED': False,
             'LOG_ERROR': log_error,
             'LOG_STACK_TRACE': log_stack_trace,
@@ -470,18 +478,18 @@ class TestExpectedErrorMiddleware(unittest.TestCase):
         }]):
             ExpectedErrorMiddleware('mock-response').process_exception(self.mock_request, self.mock_exception)
 
-        expected_class_with_message = "openedx.core.lib.tests.test_request_utils.CustomError1('Test failure')"
         if log_error:
             exc_info = self.mock_exception if log_stack_trace else None
             mock_logger.info.assert_called_once_with(
-                'Expected error %s seen for path %s', expected_class_with_message, '/test', exc_info=exc_info
+                'Expected error %s: %s: seen for path %s', expected_class, expected_message, '/test', exc_info=exc_info
             )
         else:
             mock_logger.info.assert_not_called()
         mock_set_custom_attribute.assert_has_calls(
             [
                 call('checked_error_expected_from', 'middleware'),
-                call('error_expected', expected_class_with_message),
+                call('error_expected', expected_class),
+                call('error_expected_message', expected_message),
             ],
             any_order=True
         )
@@ -520,17 +528,20 @@ class TestExpectedErrorExceptionHandler(unittest.TestCase):
             expected_request_path = 'request-path-unknown'
         expected_error_exception_handler(self.mock_exception, mock_context)
 
-        expected_class_with_message = "openedx.core.lib.tests.test_request_utils.CustomError1('Test failure')"
+        expected_class = 'openedx.core.lib.tests.test_request_utils.CustomError1'
+        expected_message = 'Test failure'
         mock_logger.info.assert_called_once_with(
-            'Expected error %s seen for path %s',
-            expected_class_with_message,
+            'Expected error %s: %s: seen for path %s',
+            expected_class,
+            expected_message,
             expected_request_path,
             exc_info=None,
         )
         mock_set_custom_attribute.assert_has_calls(
             [
                 call('checked_error_expected_from', 'drf'),
-                call('error_expected', expected_class_with_message),
+                call('error_expected', expected_class),
+                call('error_expected_message', expected_message),
                 call('error_ignored', True)
             ],
             any_order=True
