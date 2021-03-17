@@ -142,7 +142,7 @@ def _write_chunk(request, courselike_key):
         if not course_dir.isdir():
             os.mkdir(course_dir)
 
-        logging.debug(f'importing course to {temp_filepath}')
+        logging.debug(f'Course import {courselike_key}: git sgit importing course to {temp_filepath}')
 
         # Get upload chunks byte ranges
         try:
@@ -199,7 +199,7 @@ def _write_chunk(request, courselike_key):
                 }]
             })
 
-        log.info("Course import %s: Upload complete", courselike_key)
+        log.info(f'Course import {courselike_key}: Upload complete')
         with open(temp_filepath, 'rb') as local_file:
             django_file = File(local_file)
             storage_path = course_import_export_storage.save('olx_import/' + filename, django_file)
