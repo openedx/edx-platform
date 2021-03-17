@@ -87,7 +87,7 @@ class CreateDevstackSiteCommandTestCase(TestCase):
         Test that `create_devstack_site` and creates the required objects.
         """
         with patch.object(Command, 'congrats') as mock_congrats:
-            call_command('create_devstack_site', self.name)
+            call_command('create_devstack_site', self.name, 'localhost')
 
         mock_congrats.assert_called_once()  # Ensure that congrats message is printed
 
@@ -128,8 +128,8 @@ class RemoveSiteCommandTestCase(TestCase):
         self.shall_remain = 'keep'
 
         # This command should be tested above
-        call_command('create_devstack_site', self.to_be_deleted)
-        call_command('create_devstack_site', self.shall_remain)
+        call_command('create_devstack_site', self.to_be_deleted, 'localhost')
+        call_command('create_devstack_site', self.shall_remain, 'localhost')
 
     def test_create_devstack_site(self):
         """

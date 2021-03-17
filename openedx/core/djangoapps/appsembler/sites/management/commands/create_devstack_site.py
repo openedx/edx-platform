@@ -24,7 +24,13 @@ class Command(BaseCommand):
     def add_arguments(self, parser):
         parser.add_argument(
             'name',
-            help='A slug for the username and used as a site name prefix e.g. something.devstack.tahoe:18000',
+            help='A slug for the username and used as a site name prefix e.g. something.localhost:18000',
+            nargs=1,
+            type=str,
+        )
+        parser.add_argument(
+            'base-domain',
+            help='The base domain set to either `localhost` or something like `devstack.tahoe`',
             nargs=1,
             type=str,
         )
@@ -60,6 +66,7 @@ class Command(BaseCommand):
             raise CommandError('This only works on devstack.')
 
         name = options['name'][0].lower()
+        base_domain = options['base-domain'][0].lower()
         try:
             validate_slug(name)
         except ValidationError:
@@ -68,8 +75,8 @@ class Command(BaseCommand):
         if User.objects.filter(username=name).exists():
             raise CommandError('User exists with the username: "{}". Please choose another name.'.format(name))
 
-        domain = '{}.devstack.tahoe'.format(name)
-        site_name = '{}:18000'.format(domain)
+        domain = '{name}.{base_domain}'.format(name=name, base_domain=base_domain)
+        site_name = '{domain}:18000'.format(domain=domain)
 
         user = User.objects.create_user(
             username=name,
