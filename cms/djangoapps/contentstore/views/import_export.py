@@ -142,7 +142,7 @@ def _write_chunk(request, courselike_key):
         if not course_dir.isdir():
             os.mkdir(course_dir)
 
-        logging.debug(f'Course import {courselike_key}: git sgit importing course to {temp_filepath}')
+        logging.info(f'Course import {courselike_key}: importing course to {temp_filepath}')
 
         # Get upload chunks byte ranges
         try:
